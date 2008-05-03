@@ -523,7 +523,7 @@ error:
 int __vlc_object_waitpipe( vlc_object_t *obj )
 {
     int pfd[2] = { -1, -1 };
-    struct vlc_object_internals_t *internals = obj->p_internals;
+    vlc_object_internals_t *internals = vlc_internals( obj );
     bool killed = false;
 
     vlc_spin_lock (&internals->spin);
@@ -655,7 +655,7 @@ void __vlc_object_signal_unlocked( vlc_object_t *obj )
  */
 void __vlc_object_kill( vlc_object_t *p_this )
 {
-    struct vlc_object_internals_t *internals = p_this->p_internals;
+    vlc_object_internals_t *internals = vlc_internals( p_this );
     int fd;
 
     vlc_mutex_lock( &p_this->object_lock );
@@ -717,7 +717,7 @@ void * vlc_object_get( int i_id )
             {
                 /* This happens when there are only two remaining objects */
                 if( pp_objects[i_middle+1]->i_object_id == i_id
-                    && pp_objects[i_middle+1]->p_internals->i_refcount > 0 )
+                    && vlc_internals( pp_objects[i_middle+1] )->i_refcount > 0 )
                 {
                     vlc_object_yield_locked( pp_objects[i_middle+1] );
                     vlc_mutex_unlock( &structure_lock );
@@ -726,7 +726,7 @@ void * vlc_object_get( int i_id )
                 break;
             }
         }
-        else if( pp_objects[i_middle]->p_internals->i_refcount > 0 )
+        else if( vlc_internals( pp_objects[i_middle] )->i_refcount > 0 )
         {
             vlc_object_yield_locked( pp_objects[i_middle] );
             vlc_mutex_unlock( &structure_lock );
@@ -760,7 +760,7 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 
     /* If we are of the requested type ourselves, don't look further */
     if( !(i_mode & FIND_STRICT) && p_this->i_object_type == i_type
-        && p_this->p_internals->i_refcount > 0 )
+        && vlc_internals( p_this )->i_refcount > 0 )
     {
         vlc_object_yield_locked( p_this );
         vlc_mutex_unlock( &structure_lock );
@@ -811,13 +811,13 @@ void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
     vlc_mutex_lock( &structure_lock );
 
     /* Avoid obvious freed object uses */
-    assert( p_this->p_internals->i_refcount > 0 );
+    assert( vlc_internals( p_this )->i_refcount > 0 );
 
     /* If have the requested name ourselves, don't look further */
     if( !(i_mode & FIND_STRICT)
         && p_this->psz_object_name
         && !strcmp( p_this->psz_object_name, psz_name )
-        && p_this->p_internals->i_refcount > 0 )
+        && vlc_internals( p_this )->i_refcount > 0 )
     {
         vlc_object_yield_locked( p_this );
         vlc_mutex_unlock( &structure_lock );
@@ -865,10 +865,10 @@ static void vlc_object_yield_locked( vlc_object_t *p_this )
     vlc_assert_locked (&structure_lock);
 
     /* Avoid obvious freed object uses */
-    assert( p_this->p_internals->i_refcount > 0 );
+    assert( vlc_internals( p_this )->i_refcount > 0 );
 
     /* Increment the counter */
-    p_this->p_internals->i_refcount++;
+    vlc_internals( p_this )->i_refcount++;
 }
 
 /* Public function */
@@ -890,9 +890,9 @@ void __vlc_object_release( vlc_object_t *p_this )
 
     vlc_mutex_lock( &structure_lock );
 
-    assert( p_this->p_internals->i_refcount > 0 );
-    p_this->p_internals->i_refcount--;
-    b_should_destroy = (p_this->p_internals->i_refcount == 0);
+    assert( vlc_internals( p_this )->i_refcount > 0 );
+    vlc_internals( p_this )->i_refcount--;
+    b_should_destroy = (vlc_internals( p_this )->i_refcount == 0);
 
     if( b_should_destroy )
     {
@@ -929,7 +929,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     vlc_mutex_lock( &structure_lock );
 
     /* Avoid obvious freed object uses */
-    assert( p_this->p_internals->i_refcount > 0 );
+    assert( vlc_internals( p_this )->i_refcount > 0 );
 
     /* Attach the parent to its child */
     p_this->p_parent = p_parent;
@@ -939,7 +939,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
                  p_parent->i_children, p_this );
 
     /* Climb up the tree to see whether we are connected with the root */
-    if( p_parent->p_internals->b_attached )
+    if( vlc_internals( p_parent )->b_attached )
     {
         SetAttachment( p_this, true );
     }
@@ -967,7 +967,7 @@ void __vlc_object_detach( vlc_object_t *p_this )
     }
 
     /* Climb up the tree to see whether we are connected with the root */
-    if( p_this->p_parent->p_internals->b_attached )
+    if( vlc_internals( p_this->p_parent )->b_attached )
     {
         SetAttachment( p_this, false );
     }
@@ -1002,7 +1002,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 
         for( ; pp_current < pp_end ; pp_current++ )
         {
-            if( (*pp_current)->p_internals->b_attached
+            if( vlc_internals(*pp_current)->b_attached
                  && (*pp_current)->i_object_type == i_type )
             {
                 i_count++;
@@ -1014,7 +1014,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 
         for( ; pp_current < pp_end ; pp_current++ )
         {
-            if( (*pp_current)->p_internals->b_attached
+            if( vlc_internals(*pp_current)->b_attached
                  && (*pp_current)->i_object_type == i_type )
             {
                 ListReplace( p_list, *pp_current, i_index );
@@ -1074,7 +1074,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 
         for( ; pp_current < pp_end ; pp_current++ )
         {
-            if( (*pp_current)->p_internals->b_attached )
+            if( vlc_internals(*pp_current)->b_attached )
             {
                 PrintObject( *pp_current, "" );
             }
@@ -1146,11 +1146,11 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 
             PrintObject( p_object, "" );
 
-            if( !p_object->p_internals->i_vars )
+            if( !vlc_internals( p_object )->i_vars )
                 printf( " `-o No variables\n" );
-            for( i = 0; i < p_object->p_internals->i_vars; i++ )
+            for( i = 0; i < vlc_internals( p_object )->i_vars; i++ )
             {
-                variable_t *p_var = p_object->p_internals->p_vars + i;
+                variable_t *p_var = vlc_internals( p_object )->p_vars + i;
 
                 const char *psz_type = "unknown";
                 switch( p_var->i_type & VLC_VAR_TYPE )
@@ -1176,7 +1176,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 #undef MYCASE
                 }
                 printf( " %c-o \"%s\" (%s",
-                        i + 1 == p_object->p_internals->i_vars ? '`' : '|',
+                        i + 1 == vlc_internals( p_object )->i_vars ? '`' : '|',
                         p_var->psz_name, psz_type );
                 if( p_var->psz_text )
                     printf( ", %s", p_var->psz_text );
@@ -1312,7 +1312,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
         if( p_tmp )
         {
             if( p_tmp->i_object_type == i_type
-                && p_tmp->p_internals->i_refcount > 0 )
+                && vlc_internals( p_tmp )->i_refcount > 0 )
             {
                 vlc_object_yield_locked( p_tmp );
                 return p_tmp;
@@ -1329,7 +1329,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
         {
             p_tmp = p_this->pp_children[i];
             if( p_tmp->i_object_type == i_type
-                && p_tmp->p_internals->i_refcount > 0 )
+                && vlc_internals( p_tmp )->i_refcount > 0 )
             {
                 vlc_object_yield_locked( p_tmp );
                 return p_tmp;
@@ -1368,7 +1368,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
         {
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name )
-                && p_tmp->p_internals->i_refcount > 0 )
+                && vlc_internals( p_tmp )->i_refcount > 0 )
             {
                 vlc_object_yield_locked( p_tmp );
                 return p_tmp;
@@ -1386,7 +1386,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
             p_tmp = p_this->pp_children[i];
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name )
-                && p_tmp->p_internals->i_refcount > 0 )
+                && vlc_internals( p_tmp )->i_refcount > 0 )
             {
                 vlc_object_yield_locked( p_tmp );
                 return p_tmp;
@@ -1458,7 +1458,7 @@ static void SetAttachment( vlc_object_t *p_this, bool b_attached )
         SetAttachment( p_this->pp_children[i_index], b_attached );
     }
 
-    p_this->p_internals->b_attached = b_attached;
+    vlc_internals( p_this )->b_attached = b_attached;
 }
 
 static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
@@ -1488,17 +1488,17 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
     }
 
     psz_refcount[0] = '\0';
-    if( p_this->p_internals->i_refcount > 0 )
+    if( vlc_internals( p_this )->i_refcount > 0 )
         snprintf( psz_refcount, 19, ", refcount %u",
-                  p_this->p_internals->i_refcount );
+                  vlc_internals( p_this )->i_refcount );
 
     psz_thread[0] = '\0';
-    if( p_this->p_internals->b_thread )
+    if( vlc_internals( p_this )->b_thread )
         snprintf( psz_thread, 29, " (thread %u)",
 #if defined(WIN32) || defined(UNDER_CE)
-                  (unsigned)p_this->p_internals->thread_id.id );
+                  (unsigned)vlc_internals( p_this )->thread_id.id );
 #else
-                  (unsigned)p_this->p_internals->thread_id );
+                  (unsigned)vlc_internals( p_this )->thread_id );
 #endif
 
     psz_parent[0] = '\0';
