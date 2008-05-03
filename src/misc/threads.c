@@ -45,7 +45,6 @@
  * Global mutex for lazy initialization of the threads system
  *****************************************************************************/
 static volatile unsigned i_initializations = 0;
-static vlc_object_t *p_root;
 
 #if defined( UNDER_CE )
 #elif defined( WIN32 )
@@ -53,6 +52,20 @@ static vlc_object_t *p_root;
 #elif defined( LIBVLC_USE_PTHREAD )
 static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
+
+/**
+ * Global process-wide VLC object.
+ * Contains inter-instance data, such as the module cache and global mutexes.
+ */
+static vlc_object_t *p_root;
+static libvlc_global_data_t   libvlc_global;
+
+libvlc_global_data_t *vlc_global( void )
+{
+    assert( i_initializations > 0 );
+    return &libvlc_global;
+}
+
 
 vlc_threadvar_t msg_context_global_key;
 
@@ -115,9 +128,8 @@ void vlc_pthread_fatal (const char *action, int error,
  * keep the library really thread-safe. Some architectures don't support this
  * and thus do not guarantee the complete reentrancy.
  *****************************************************************************/
-int __vlc_threads_init( vlc_object_t *p_this )
+int vlc_threads_init( void )
 {
-    libvlc_global_data_t *p_libvlc_global = (libvlc_global_data_t *)p_this;
     int i_ret = VLC_SUCCESS;
 
     /* If we have lazy mutex initialization, use it. Otherwise, we just
@@ -132,9 +144,9 @@ int __vlc_threads_init( vlc_object_t *p_this )
     if( i_initializations == 0 )
     {
         /* We should be safe now. Do all the initialization stuff we want. */
-        p_libvlc_global->b_ready = false;
+        libvlc_global.b_ready = false;
 
-        p_root = vlc_custom_create( VLC_OBJECT(p_libvlc_global), 0,
+        p_root = vlc_custom_create( VLC_OBJECT(&libvlc_global), 0,
                                     VLC_OBJECT_GLOBAL, "global" );
         if( p_root == NULL )
         {
@@ -163,9 +175,8 @@ out:
  *****************************************************************************
  * FIXME: This function is far from being threadsafe.
  *****************************************************************************/
-int __vlc_threads_end( vlc_object_t *p_this )
+void vlc_threads_end( void )
 {
-    (void)p_this;
 #if defined( UNDER_CE )
 #elif defined( WIN32 )
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
@@ -183,7 +194,6 @@ int __vlc_threads_end( vlc_object_t *p_this )
 #elif defined( LIBVLC_USE_PTHREAD )
     pthread_mutex_unlock( &once_mutex );
 #endif
-    return VLC_SUCCESS;
 }
 
 #ifdef __linux__

@@ -51,18 +51,6 @@ VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 
 /*****************************************************************************
- * vlc_threads_init: initialize threads system
- *****************************************************************************/
-#define vlc_threads_init( P_THIS )                                          \
-    __vlc_threads_init( VLC_OBJECT(P_THIS) )
-
-/*****************************************************************************
- * vlc_threads_end: deinitialize threads system
- *****************************************************************************/
-#define vlc_threads_end( P_THIS )                                           \
-    __vlc_threads_end( VLC_OBJECT(P_THIS) )
-
-/*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
 #define vlc_mutex_init( P_THIS, P_MUTEX )                                   \

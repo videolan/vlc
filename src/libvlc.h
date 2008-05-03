@@ -56,8 +56,8 @@ VLC_EXPORT( const char * , system_VLCPath, (void));
 /*
  * Threads subsystem
  */
-int __vlc_threads_init( vlc_object_t * );
-int __vlc_threads_end( vlc_object_t * );
+int vlc_threads_init( void );
+void vlc_threads_end( void );
 
 /** The global thread var for msg stack context
  *  We store this as a static global variable so we don't need a vlc_object_t

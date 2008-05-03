@@ -98,8 +98,6 @@
 /*****************************************************************************
  * The evil global variable. We handle it with care, don't worry.
  *****************************************************************************/
-static libvlc_global_data_t   libvlc_global;
-static libvlc_global_data_t *p_libvlc_global = &libvlc_global;
 static libvlc_int_t *    p_static_vlc = NULL;
 static volatile unsigned int i_instances = 0;
 
@@ -128,11 +126,6 @@ static int  VerboseCallback( vlc_object_t *, char const *,
 
 static void InitDeviceValues( libvlc_int_t * );
 
-libvlc_global_data_t *vlc_global( void )
-{
-    return p_libvlc_global;
-}
-
 /*****************************************************************************
  * vlc_current_object: return the current object.
  *****************************************************************************
@@ -156,9 +149,10 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* vlc_threads_init *must* be the first internal call! No other call is
      * allowed before the thread system has been initialized. */
-    if( vlc_threads_init( p_libvlc_global ) )
+    if (vlc_threads_init ())
         return NULL;
 
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have variables */
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
@@ -230,6 +224,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                          const char *ppsz_argv[] )
 {
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
     char         p_capabilities[200];
     char *       p_tmp = NULL;
     char *       psz_modules = NULL;
@@ -1108,7 +1103,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
     /* Stop thread system: last one out please shut the door!
      * The number of initializations of the thread system is counted, we
      * can call this each time */
-    vlc_threads_end( p_libvlc_global );
+    vlc_threads_end ();
 
     return VLC_SUCCESS;
 }
@@ -1136,7 +1131,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     }
 
 #ifndef WIN32
-    if( p_libvlc_global->b_daemon && b_block && !psz_module )
+    if( vlc_global()->b_daemon && b_block && !psz_module )
     {
         /* Daemon mode hack.
          * We prefer the dummy interface if none is specified. */
