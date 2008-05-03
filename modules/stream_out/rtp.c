@@ -73,6 +73,8 @@
     "session will be made available. You must use an url: http://location to " \
     "access the SDP via HTTP, rtsp://location for RTSP access, and sap:// " \
     "for the SDP to be announced via SAP." )
+#define SAP_TEXT N_("SAP announcing")
+#define SAP_LONGTEXT N_("Announce this session with SAP.")
 #define MUX_TEXT N_("Muxer")
 #define MUX_LONGTEXT N_( \
     "This allows you to specify the muxer used for the streaming output. " \
@@ -158,6 +160,8 @@ vlc_module_begin();
                 SDP_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
                 MUX_LONGTEXT, true );
+    add_bool( SOUT_CFG_PREFIX "sap", false, NULL, SAP_TEXT, SAP_LONGTEXT,
+              true );
 
     add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,
                 NAME_LONGTEXT, true );
@@ -196,7 +200,7 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
-    "description", "url", "email", "phone",
+    "sap", "description", "url", "email", "phone",
     "proto", "rtcp-mux",
     "mp4a-latm", NULL
 };
@@ -495,6 +499,9 @@ static int Open( vlc_object_t *p_this )
         p_stream->pf_del    = Del;
         p_stream->pf_send   = Send;
     }
+
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
+        SDPHandleUrl( p_stream, "sap" );
 
     psz = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "sdp" );
     if( psz != NULL )
