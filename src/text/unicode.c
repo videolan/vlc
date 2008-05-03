@@ -177,7 +177,10 @@ static inline char *locale_dup (const char *string, bool from)
 #endif
 }
 
-
+/**
+ * Releases (if needed) a localized or uniformized string.
+ * @param str non-NULL return value from FromLocale() or ToLocale().
+ */
 void LocaleFree (const char *str)
 {
 #if defined (USE_ICONV)
@@ -192,9 +195,9 @@ void LocaleFree (const char *str)
 
 
 /**
- * FromLocale: converts a locale string to UTF-8
+ * Converts a string from the system locale character encoding to UTF-8.
  *
- * @param locale nul-terminated string to be converted
+ * @param locale nul-terminated string to convert
  *
  * @return a nul-terminated UTF-8 string, or NULL in case of error.
  * To avoid memory leak, you have to pass the result to LocaleFree()
@@ -205,6 +208,15 @@ char *FromLocale (const char *locale)
     return locale_fast (locale, true);
 }
 
+/**
+ * converts a string from the system locale character encoding to utf-8,
+ * the result is always allocated on the heap.
+ *
+ * @param locale nul-terminated string to convert
+ *
+ * @return a nul-terminated utf-8 string, or null in case of error.
+ * The result must be freed using free() - as with the strdup() function.
+ */
 char *FromLocaleDup (const char *locale)
 {
     return locale_dup (locale, true);
@@ -212,7 +224,7 @@ char *FromLocaleDup (const char *locale)
 
 
 /**
- * ToLocale: converts a UTF-8 string to local system encoding.
+ * ToLocale: converts an UTF-8 string to local system encoding.
  *
  * @param utf8 nul-terminated string to be converted
  *
@@ -226,6 +238,15 @@ char *ToLocale (const char *utf8)
 }
 
 
+/**
+ * converts a string from UTF-8 to the system locale character encoding,
+ * the result is always allocated on the heap.
+ *
+ * @param utf8 nul-terminated string to convert
+ *
+ * @return a nul-terminated string, or null in case of error.
+ * The result must be freed using free() - as with the strdup() function.
+ */
 char *ToLocaleDup (const char *utf8)
 {
     return locale_dup (utf8, false);
@@ -233,7 +254,12 @@ char *ToLocaleDup (const char *utf8)
 
 
 /**
- * utf8_open: open() wrapper for UTF-8 filenames
+ * Opens a system file handle using UTF-8 paths.
+ *
+ * @param filename file path to open (with UTF-8 encoding)
+ * @param flags open() flags, see the C library open() documentation
+ * @param mode file permissions if creating a new file
+ * @return a file handle on success, -1 on error (see errno).
  */
 int utf8_open (const char *filename, int flags, mode_t mode)
 {
@@ -271,7 +297,10 @@ int utf8_open (const char *filename, int flags, mode_t mode)
 }
 
 /**
- * utf8_fopen: fopen() wrapper for UTF-8 filenames
+ * Opens a FILE pointer using UTF-8 filenames.
+ * @param filename file path, using UTF-8 encoding
+ * @param mode fopen file open mode
+ * @return NULL on error, an open FILE pointer on success.
  */
 FILE *utf8_fopen (const char *filename, const char *mode)
 {
@@ -327,12 +356,12 @@ FILE *utf8_fopen (const char *filename, const char *mode)
 }
 
 /**
- * utf8_mkdir: Calls mkdir() after conversion of file name to OS locale
+ * Creates a directory using UTF-8 paths.
  *
  * @param dirname a UTF-8 string with the name of the directory that you
  *        want to create.
- * @return A 0 return value indicates success. A -1 return value indicates an
- *        error, and an error code is stored in errno
+ * @param mode directory permissions
+ * @return 0 on success, -1 on error (see errno).
  */
 int utf8_mkdir( const char *dirname, mode_t mode )
 {
@@ -391,11 +420,11 @@ int utf8_mkdir( const char *dirname, mode_t mode )
 }
 
 /**
- * utf8_opendir: wrapper that converts dirname to the locale in use by the OS
+ * Opens a DIR pointer using UTF-8 paths
  *
  * @param dirname UTF-8 representation of the directory name
- *
- * @return a pointer to the DIR struct. Release with closedir().
+ * @return a pointer to the DIR struct, or NULL in case of error.
+ * Release with standard closedir().
  */
 DIR *utf8_opendir( const char *dirname )
 {
@@ -423,12 +452,12 @@ DIR *utf8_opendir( const char *dirname )
 }
 
 /**
- * utf8_readdir: a readdir wrapper that returns the name of the next entry
- *     in the directory as a UTF-8 string.
+ * Reads the next file name from an open directory.
  *
  * @param dir The directory that is being read
  *
- * @return a UTF-8 string of the directory entry. Use free() to free this memory.
+ * @return a UTF-8 string of the directory entry.
+ * Use free() to free this memory.
  */
 char *utf8_readdir( DIR *dir )
 {
@@ -455,6 +484,10 @@ static int dummy_select( const char *str )
     return 1;
 }
 
+/**
+ * Does the same as utf8_scandir(), but takes an open directory pointer
+ * instead of a directory path.
+ */
 int utf8_loaddir( DIR *dir, char ***namelist,
                   int (*select)( const char * ),
                   int (*compar)( const char **, const char ** ) )
@@ -511,6 +544,18 @@ int utf8_loaddir( DIR *dir, char ***namelist,
     return -1;
 }
 
+/**
+ * Selects file entries from a directory, as GNU C scandir(), yet using
+ * UTF-8 file names.
+ *
+ * @param dirname UTF-8 diretory path
+ * @param pointer [OUT] pointer set, on succesful completion, to the address
+ * of a table of UTF-8 filenames. All filenames must be freed with free().
+ * The table itself must be freed with free() as well.
+ *
+ * @return How many file names were selected (possibly 0),
+ * or -1 in case of error.
+ */
 int utf8_scandir( const char *dirname, char ***namelist,
                   int (*select)( const char * ),
                   int (*compar)( const char **, const char ** ) )
@@ -561,19 +606,30 @@ static int utf8_statEx( const char *filename, struct stat *buf,
     return -1;
 }
 
-
+/**
+ * Finds file/inode informations, as stat().
+ * Consider usign fstat() instead, if possible.
+ *
+ * @param filename UTF-8 file path
+ */
 int utf8_stat( const char *filename, struct stat *buf)
 {
     return utf8_statEx( filename, buf, true );
 }
 
+/**
+ * Finds file/inode informations, as lstat().
+ * Consider usign fstat() instead, if possible.
+ *
+ * @param filename UTF-8 file path
+ */
 int utf8_lstat( const char *filename, struct stat *buf)
 {
     return utf8_statEx( filename, buf, false );
 }
 
 /**
- * utf8_unlink: Calls unlink() after conversion of file name to OS locale
+ * Removes a file.
  *
  * @param filename a UTF-8 string with the name of the file you want to delete.
  * @return A 0 return value indicates success. A -1 return value indicates an
@@ -617,7 +673,8 @@ int utf8_unlink( const char *filename )
 
 
 /**
- * utf8_*printf: *printf with conversion from UTF-8 to local encoding
+ * Formats an UTF-8 string as vasprintf(), then print it to stdout, with
+ * appropriate conversion to local encoding.
  */
 static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
 {
@@ -631,6 +688,10 @@ static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
     return res;
 }
 
+/**
+ * Formats an UTF-8 string as vfprintf(), then print it, with
+ * appropriate conversion to local encoding.
+ */
 int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
 {
     char *str;
@@ -643,6 +704,10 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
     return res;
 }
 
+/**
+ * Formats an UTF-8 string as fprintf(), then print it, with
+ * appropriate conversion to local encoding.
+ */
 int utf8_fprintf( FILE *stream, const char *fmt, ... )
 {
     va_list ap;
@@ -720,7 +785,7 @@ static char *CheckUTF8( char *str, char rep )
 }
 
 /**
- * EnsureUTF8: replaces invalid/overlong UTF-8 sequences with question marks
+ * Replaces invalid/overlong UTF-8 sequences with question marks.
  * Note that it is not possible to convert from Latin-1 to UTF-8 on the fly,
  * so we don't try that, even though it would be less disruptive.
  *
@@ -733,7 +798,7 @@ char *EnsureUTF8( char *str )
 
 
 /**
- * IsUTF8: checks whether a string is a valid UTF-8 byte sequence.
+ * Checks whether a string is a valid UTF-8 byte sequence.
  *
  * @param str nul-terminated string to be checked
  *
