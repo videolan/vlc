@@ -412,7 +412,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 {
     int i_ret;
     void *p_data = (void *)p_this;
-    vlc_object_internals_t *p_priv = p_this->p_internals;
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
     vlc_mutex_lock( &p_this->object_lock );
 
@@ -539,7 +539,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
                                int i_line, int i_priority )
 {
-    vlc_object_internals_t *p_priv = p_this->p_internals;
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
 #if defined( WIN32 ) || defined( UNDER_CE )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
@@ -603,7 +603,7 @@ void __vlc_thread_ready( vlc_object_t *p_this )
  *****************************************************************************/
 void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line )
 {
-    vlc_object_internals_t *p_priv = p_this->p_internals;
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
 #if defined( UNDER_CE ) || defined( WIN32 )
     HMODULE hmodule;
