@@ -826,7 +826,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
         VLC_AddIntf( 0, "dbus,none", false, false );
 
-    /* Prevents the power management daemon to suspend the computer
+    /* Prevents the power management daemon from suspending the system
      * when VLC is active */
     if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
         VLC_AddIntf( 0, "inhibit,none", false, false );
