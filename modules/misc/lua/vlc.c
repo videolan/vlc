@@ -460,7 +460,6 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
 {
     int i_ret = VLC_EGENERIC;
 
-    DIR   *dir           = NULL;
     char **ppsz_filelist = NULL;
     char **ppsz_fileend  = NULL;
     char **ppsz_file;
@@ -487,16 +486,8 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
             ppsz_filelist = NULL;
         }
 
-        if( dir )
-        {
-            closedir( dir );
-        }
-
         msg_Dbg( p_this, "Trying Lua scripts in %s", *ppsz_dir );
-        dir = utf8_opendir( *ppsz_dir );
-
-        if( !dir ) continue;
-        i_files = utf8_loaddir( dir, &ppsz_filelist, file_select,
+        i_files = utf8_scandir( *ppsz_dir, &ppsz_filelist, file_select,
                                 file_compare );
         if( i_files < 1 ) continue;
         ppsz_fileend = ppsz_filelist + i_files;
@@ -527,8 +518,6 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     }
     for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
         free( *ppsz_dir );
-
-    if( dir ) closedir( dir );
 
     return i_ret;
 }
