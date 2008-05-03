@@ -56,8 +56,8 @@
   "helper setting for dst, dst=bind+'/'+path, dst-parameter overrides this" )
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
-  "This allows you to specify a name for the session, that will be announced "\
-  "if you choose to use SAP." )
+    "This is the name of the session that will be announced in the SDP " \
+    "(Session Descriptor)." )
 
 #define GROUP_TEXT N_("Session groupname")
 #define GROUP_LONGTEXT N_( \
