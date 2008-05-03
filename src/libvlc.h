@@ -169,7 +169,7 @@ struct vlc_object_internals_t
 
 static inline vlc_object_internals_t *vlc_internals( vlc_object_t *obj )
 {
-    return obj->p_internals;
+    return ((vlc_object_internals_t *)obj) - 1;
 }
 
 extern module_config_t libvlc_config[];
