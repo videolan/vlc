@@ -120,9 +120,6 @@ struct libvlc_global_data_t
     intf_thread_t         *p_probe;       ///< Devices prober
 
     /* Arch-specific variables */
-#if !defined( WIN32 )
-    bool             b_daemon;
-#endif
 #if defined( SYS_BEOS )
     vlc_object_t *         p_appthread;
     char *                 psz_vlcpath;

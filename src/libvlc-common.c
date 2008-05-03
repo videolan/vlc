@@ -96,10 +96,12 @@
 #include <vlc_vlm.h>
 
 /*****************************************************************************
- * The evil global variable. We handle it with care, don't worry.
+ * The evil global variables. We handle them with care, don't worry.
  *****************************************************************************/
 static libvlc_int_t *    p_static_vlc = NULL;
 static volatile unsigned int i_instances = 0;
+
+static bool b_daemon = false;
 
 /*****************************************************************************
  * Local prototypes
@@ -324,7 +326,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
             b_exit = true;
         }
-        p_libvlc_global->b_daemon = true;
+        b_daemon = true;
 
         /* lets check if we need to write the pidfile */
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
@@ -371,7 +373,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             close( STDOUT_FILENO );
             close( STDERR_FILENO );
 
-            p_libvlc_global->b_daemon = true;
+            b_daemon = true;
         }
 #endif
     }
@@ -1131,7 +1133,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     }
 
 #ifndef WIN32
-    if( vlc_global()->b_daemon && b_block && !psz_module )
+    if( b_daemon && b_block && !psz_module )
     {
         /* Daemon mode hack.
          * We prefer the dummy interface if none is specified. */
