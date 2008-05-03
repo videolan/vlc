@@ -52,14 +52,12 @@ extern char *FromLocale (const char *);
 #include <windows.h>
 extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
                            int expand_wildcards, int *startupinfo);
-static inline void Kill(void) { }
 #else
 
 # include <signal.h>
 # include <time.h>
 # include <pthread.h>
 
-static void Kill (void);
 static void *SigHandler (void *set);
 #endif
 
@@ -68,7 +66,7 @@ static void *SigHandler (void *set);
  *****************************************************************************/
 int main( int i_argc, const char *ppsz_argv[] )
 {
-    int i_ret;
+    int i_ret, id;
 
 #   ifdef __GLIBC__
     if (dlsym (RTLD_NEXT, "inet6_rth_add") && !dlsym (RTLD_NEXT, "qsort_r"))
@@ -109,11 +107,9 @@ int main( int i_argc, const char *ppsz_argv[] )
 #endif
 
     /* Create a libvlc structure */
-    i_ret = VLC_Create();
-    if( i_ret < 0 )
-    {
-        return -i_ret;
-    }
+    id = VLC_Create();
+    if( id < 0 )
+        return 1;
 
 #if !defined(WIN32) && !defined(UNDER_CE)
     /* Synchronously intercepted POSIX signals.
@@ -208,7 +204,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     }
 
     /* Initialize libvlc */
-    i_ret = VLC_Init( 0, i_argc, ppsz_argv );
+    i_ret = VLC_Init( id, i_argc, ppsz_argv );
     if( i_ret < 0 )
     {
         VLC_Destroy( 0 );
@@ -219,8 +215,6 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     /* Finish the threads */
     VLC_CleanUp( 0 );
-
-    Kill ();
 
     /* Destroy the libvlc structure */
     VLC_Destroy( 0 );
@@ -284,9 +278,7 @@ static void *SigHandler (void *data)
 
             fprintf (stderr, "signal %d received, terminating vlc - do it "
                             "again quickly in case it gets stuck\n", i_signal);
-
-            /* Acknowledge the signal received */
-            Kill ();
+            VLC_Die( 0 );
         }
         else /* time (NULL) <= abort_time */
         {
@@ -308,19 +300,6 @@ static void *SigHandler (void *data)
     }
     /* Never reached */
 }
-
-
-static void KillOnce (void)
-{
-    VLC_Die (0);
-}
-
-static void Kill (void)
-{
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once (&once, KillOnce);
-}
-
 #endif
 
 #if defined(UNDER_CE)
