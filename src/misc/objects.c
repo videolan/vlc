@@ -118,10 +118,8 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     assert (i_size >= sizeof (vlc_object_t));
     p_new = (vlc_object_t *)(p_priv + 1);
 
-    p_new->p_internals = p_priv;
     p_new->i_object_type = i_type;
     p_new->psz_object_type = psz_type;
-
     p_new->psz_object_name = NULL;
 
     p_new->b_die = false;

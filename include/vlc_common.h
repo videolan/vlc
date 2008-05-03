@@ -462,7 +462,6 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
  * these members are common for all vlc objects                             \
  */                                                                         \
 /**@{*/                                                                     \
-    vlc_object_internals_t *p_internals;                                    \
     int   i_object_id;                                                      \
     int   i_object_type;                                                    \
     const char *psz_object_type;                                            \
