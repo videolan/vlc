@@ -243,14 +243,14 @@ struct block_fifo_t
     bool          b_force_wake;
 };
 
-block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
+block_fifo_t *block_FifoNew( void )
 {
-    block_fifo_t *p_fifo;
+    block_fifo_t *p_fifo = malloc( sizeof( block_fifo_t ) );
+    if( !p_fifo )
+        return NULL;
 
-    p_fifo = malloc( sizeof( block_fifo_t ) );
-    if( !p_fifo ) return NULL;
-    vlc_mutex_init( p_obj, &p_fifo->lock );
-    vlc_cond_init( p_obj, &p_fifo->wait );
+    vlc_mutex_init( NULL, &p_fifo->lock );
+    vlc_cond_init( NULL, &p_fifo->wait );
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
     p_fifo->i_depth = p_fifo->i_size = 0;

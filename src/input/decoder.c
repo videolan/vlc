@@ -483,7 +483,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->p_owner->p_packetizer = NULL;
 
     /* decoder fifo */
-    if( ( p_dec->p_owner->p_fifo = block_FifoNew( p_dec ) ) == NULL )
+    if( ( p_dec->p_owner->p_fifo = block_FifoNew() ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return NULL;

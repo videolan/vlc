@@ -146,8 +146,8 @@ static int Open( vlc_object_t *p_this )
     vlc_object_attach( p_sys->p_thread, p_access );
     p_sys->p_thread->b_die = 0;
     p_sys->p_thread->b_error= 0;
-    p_sys->p_thread->p_fifo_media = block_FifoNew( p_access );
-    p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
+    p_sys->p_thread->p_fifo_media = block_FifoNew();
+    p_sys->p_thread->p_empty_blocks = block_FifoNew();
     p_sys->p_thread->has_audio = 0;
     p_sys->p_thread->has_video = 0;
     p_sys->p_thread->metadata_received = 0;

@@ -337,7 +337,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     p_sys->psz_name = strdup( psz_demux );
 
     /* decoder fifo */
-    if( ( p_sys->p_fifo = block_FifoNew( s ) ) == NULL )
+    if( ( p_sys->p_fifo = block_FifoNew() ) == NULL )
     {
         msg_Err( s, "out of memory" );
         vlc_object_release( s );

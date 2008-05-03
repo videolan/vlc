@@ -221,8 +221,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->p_sout = p_access->p_sout;
     p_sys->p_thread->b_die  = 0;
     p_sys->p_thread->b_error= 0;
-    p_sys->p_thread->p_fifo = block_FifoNew( p_access );
-    p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
+    p_sys->p_thread->p_fifo = block_FifoNew();
+    p_sys->p_thread->p_empty_blocks = block_FifoNew();
 
     i_handle = net_ConnectDgram( p_this, psz_dst_addr, i_dst_port, -1,
                                  IPPROTO_UDP );

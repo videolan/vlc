@@ -271,8 +271,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
  *   (this is used to wakeup a thread when there is no data to queue)
  ****************************************************************************/
 
-#define block_FifoNew( a ) __block_FifoNew( VLC_OBJECT(a) )
-VLC_EXPORT( block_fifo_t *, __block_FifoNew,    ( vlc_object_t * ) );
+VLC_EXPORT( block_fifo_t *, block_FifoNew,      ( void ) );
 VLC_EXPORT( void,           block_FifoRelease,  ( block_fifo_t * ) );
 VLC_EXPORT( void,           block_FifoEmpty,    ( block_fifo_t * ) );
 VLC_EXPORT( size_t,         block_FifoPut,      ( block_fifo_t *, block_t * ) );

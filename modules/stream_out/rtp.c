@@ -1162,7 +1162,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                                  p_sys->psz_destination,
                                  p_sys->i_ttl, id->i_port, id->i_port + 1 );
 
-    id->p_fifo = block_FifoNew( p_stream );
+    id->p_fifo = block_FifoNew();
     if( vlc_thread_create( id, "RTP send thread", ThreadSend,
                            VLC_THREAD_PRIORITY_HIGHEST, false ) )
         goto error;

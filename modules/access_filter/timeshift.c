@@ -161,7 +161,7 @@ static int Open( vlc_object_t *p_this )
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
 
     /* */
-    p_sys->p_fifo = block_FifoNew( p_access );
+    p_sys->p_fifo = block_FifoNew();
     p_sys->i_write_size = 0;
     p_sys->i_files = 0;
     p_sys->i_data = 0;
