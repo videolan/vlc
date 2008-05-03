@@ -147,3 +147,60 @@ const char *net_strerror( int value )
     /* Remember to update src/misc/messages.c if you change this one */
     return "Unknown network stack error";
 }
+
+ssize_t sendmsg (int s, struct msghdr *hdr, int flags)
+{
+    /* WSASendMsg would be more straightforward, and would support ancilliary
+     * data, but it's not yet in mingw32. */
+    if ((hdr->msg_iovlen > 100) || (hdr->msg_controllen > 0))
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    WSABUF buf[hdr->msg_iovlen];
+    for (size_t i = 0; i < sizeof (buf) / sizeof (buf[0]); i++)
+        buf[i].buf = hdr->msg_iov[i].iov_base,
+        buf[i].len = hdr->msg_iov[i].iov_len;
+
+    DWORD sent;
+    if (WSASendTo (s, buf, sizeof (buf) / sizeof (buf[0]), &sent, flags,
+                   hdr->msg_name, hdr->msg_namelen, NULL, NULL) == 0)
+        return sent;
+    return -1;
+}
+
+ssize_t recvmsg (int s, struct msghdr *hdr, int flags)
+{
+    /* WSARecvMsg would be more straightforward, and would support ancilliary
+     * data, but it's not yet in mingw32. */
+    if (hdr->msg_iovlen > 100)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    WSABUF buf[hdr->msg_iovlen];
+    for (size_t i = 0; i < sizeof (buf) / sizeof (buf[0]); i++)
+        buf[i].buf = hdr->msg_iov[i].iov_base,
+        buf[i].len = hdr->msg_iov[i].iov_len;
+
+    DWORD recvd;
+    hdr->msg_controllen = 0;
+    hdr->msg_flags = 0;
+
+    if (WSARecvFrom (s, buf, sizeof (buf) / sizeof (buf[0]), &recvd, flags,
+                     hdr->msg_name, hdr->msg_namelen, NULL, NULL) == 0)
+        return recvd;
+
+#ifdef MSG_TRUNC
+    if (WSAGetLastError() == WSAEMSGSIZE)
+    {
+        hdr->msg_flags |= MSG_TRUNC;
+        return recvd;
+    }
+#else
+# warning Out-of-date Winsock header files!
+#endif
+    return -1;
+}
