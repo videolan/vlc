@@ -180,7 +180,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     priv = libvlc_priv (p_libvlc);
     p_libvlc->p_playlist = NULL;
-    p_libvlc->p_interaction = NULL;
+    priv->p_interaction = NULL;
     priv->p_vlm = NULL;
     p_libvlc->psz_object_name = strdup( "libvlc" );
 
@@ -740,7 +740,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                      p_libvlc->p_hotkeys );
 
     /* Initialize interaction */
-    p_libvlc->p_interaction = interaction_Init( p_libvlc );
+    priv->p_interaction = interaction_Init( p_libvlc );
 
     /* Initialize playlist and get commandline files */
     playlist_ThreadCreate( p_libvlc );
@@ -988,7 +988,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Free interaction */
     msg_Dbg( p_libvlc, "removing interaction" );
-    vlc_object_release( p_libvlc->p_interaction );
+    vlc_object_release( priv->p_interaction );
 
     stats_TimersDumpAll( p_libvlc );
     stats_TimersCleanAll( p_libvlc );
