@@ -115,7 +115,6 @@ struct libvlc_global_data_t
     vlc_object_t **        pp_objects;  ///< Array of all objects
 
     module_bank_t *        p_module_bank; ///< The module bank
-    intf_thread_t         *p_probe;       ///< Devices prober
 
     /* Arch-specific variables */
 #if defined( SYS_BEOS )
