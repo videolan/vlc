@@ -48,6 +48,7 @@
 #include <vlc_pgpkey.h>
 #include <vlc_stream.h>
 #include <vlc_interface.h>
+#include <vlc_gcrypt.h>
 
 
 /*****************************************************************************
@@ -853,6 +854,7 @@ update_t *__update_New( vlc_object_t *p_this )
     p_update->release.psz_desc = NULL;
 
     p_update->p_pkey = NULL;
+    vlc_gcrypt_init();
 
     return p_update;
 }
