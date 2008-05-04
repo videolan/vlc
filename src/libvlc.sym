@@ -434,8 +434,10 @@ vlc_parse_cmdline
 vlc_pthread_fatal
 vlc_rand_bytes
 vlc_readdir
+vlc_recvmsg
 vlc_scandir
 vlc_sdp_Start
+vlc_sendmsg
 vlc_strcasecmp
 vlc_strcasestr
 vlc_strdup

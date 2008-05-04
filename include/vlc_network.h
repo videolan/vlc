@@ -59,8 +59,10 @@ struct msghdr
     int           msg_flags;
 };
 
-VLC_EXPORT( ssize_t, sendmsg, ( int, struct msghdr *, int ) );
-VLC_EXPORT( ssize_t, recvmsg, ( int, struct msghdr *, int ) );
+VLC_EXPORT( ssize_t, vlc_sendmsg, ( int, struct msghdr *, int ) );
+VLC_EXPORT( ssize_t, vlc_recvmsg, ( int, struct msghdr *, int ) );
+#define sendmsg vlc_sendmsg
+#define recvmsg vlc_recvmsg
 
 #   ifndef IPV6_V6ONLY
 #       define IPV6_V6ONLY 27

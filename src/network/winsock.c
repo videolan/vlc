@@ -148,7 +148,7 @@ const char *net_strerror( int value )
     return "Unknown network stack error";
 }
 
-ssize_t sendmsg (int s, struct msghdr *hdr, int flags)
+ssize_t vlc_sendmsg (int s, struct msghdr *hdr, int flags)
 {
     /* WSASendMsg would be more straightforward, and would support ancilliary
      * data, but it's not yet in mingw32. */
@@ -170,7 +170,7 @@ ssize_t sendmsg (int s, struct msghdr *hdr, int flags)
     return -1;
 }
 
-ssize_t recvmsg (int s, struct msghdr *hdr, int flags)
+ssize_t vlc_recvmsg (int s, struct msghdr *hdr, int flags)
 {
     /* WSARecvMsg would be more straightforward, and would support ancilliary
      * data, but it's not yet in mingw32. */
