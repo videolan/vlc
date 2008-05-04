@@ -866,7 +866,7 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
         free( stream );
         return NULL;
     }
-    vlc_mutex_init( host, &stream->lock );
+    vlc_mutex_init( &stream->lock );
     if( psz_mime && *psz_mime )
     {
         stream->psz_mime = strdup( psz_mime );
@@ -1087,7 +1087,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     vlc_object_unlock( host );
 
     host->httpd = httpd;
-    vlc_mutex_init( httpd, &host->lock );
+    vlc_mutex_init( &host->lock );
     host->i_ref = 1;
 
     host->fds = net_ListenTCP( p_this, psz_host, i_port );
@@ -1238,7 +1238,7 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
     url = malloc( sizeof( httpd_url_t ) );
     url->host = host;
 
-    vlc_mutex_init( host->httpd, &url->lock );
+    vlc_mutex_init( &url->lock );
     url->psz_url = strdup( psz_url );
     url->psz_user = strdup( psz_user ? psz_user : "" );
     url->psz_password = strdup( psz_password ? psz_password : "" );

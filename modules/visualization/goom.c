@@ -181,7 +181,7 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    vlc_mutex_init( p_filter, &p_thread->lock );
+    vlc_mutex_init( &p_thread->lock );
     vlc_cond_init( p_filter, &p_thread->wait );
 
     p_thread->i_blocks = 0;

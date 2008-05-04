@@ -328,7 +328,7 @@ libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
 
     p_mlv->p_this_view_data = this_view_data;
 
-    vlc_mutex_init( p_mlv->p_libvlc_instance->p_libvlc_int, &p_mlv->object_lock );
+    vlc_mutex_init( &p_mlv->object_lock );
     p_mlv->i_refcount = 1;
 
     return p_mlv;

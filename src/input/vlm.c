@@ -129,7 +129,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         return NULL;
     }
 
-    vlc_mutex_init( p_this->p_libvlc, &p_vlm->lock );
+    vlc_mutex_init( &p_vlm->lock );
     p_vlm->i_id = 1;
     TAB_INIT( p_vlm->i_media, p_vlm->media );
     TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );

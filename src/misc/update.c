@@ -845,7 +845,7 @@ update_t *__update_New( vlc_object_t *p_this )
     p_update = (update_t *)malloc( sizeof( update_t ) );
     if( !p_update ) return NULL;
 
-    vlc_mutex_init( p_this, &p_update->lock );
+    vlc_mutex_init( &p_update->lock );
 
     p_update->p_libvlc = p_this->p_libvlc;
 

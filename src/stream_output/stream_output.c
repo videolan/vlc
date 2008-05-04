@@ -92,7 +92,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
     p_sout->i_out_pace_nocontrol = 0;
     p_sout->p_sys       = NULL;
 
-    vlc_mutex_init( p_sout, &p_sout->lock );
+    vlc_mutex_init( &p_sout->lock );
     if( psz_dest && psz_dest[0] == '#' )
     {
         p_sout->psz_chain = strdup( &psz_dest[1] );

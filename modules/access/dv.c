@@ -165,7 +165,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_frame = NULL;
     p_sys->p_ev = NULL;
 
-    vlc_mutex_init( p_access, &p_sys->lock );
+    vlc_mutex_init( &p_sys->lock );
 
     p_sys->i_node = DiscoverAVC( p_access, &p_sys->i_port, p_sys->i_guid );
     if( p_sys->i_node < 0 )
@@ -235,7 +235,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ev->p_frame = NULL;
     p_sys->p_ev->pp_last = &p_sys->p_ev->p_frame;
     p_sys->p_ev->p_access = p_access;
-    vlc_mutex_init( p_access, &p_sys->p_ev->lock );
+    vlc_mutex_init( &p_sys->p_ev->lock );
     vlc_thread_create( p_sys->p_ev, "dv event thread handler", Raw1394EventThread,
                        VLC_THREAD_PRIORITY_OUTPUT, false );
 

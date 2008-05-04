@@ -101,7 +101,7 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
 #endif
-    vlc_mutex_init( p_filter, &p_filter->p_sys->lock );
+    vlc_mutex_init( &p_filter->p_sys->lock );
 
     return VLC_SUCCESS;
 }

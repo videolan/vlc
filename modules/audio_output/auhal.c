@@ -1195,7 +1195,7 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
 
     /* Condition because SetProperty is asynchronious */
     vlc_cond_init( p_aout, &w.cond );
-    vlc_mutex_init( p_aout, &w.lock );
+    vlc_mutex_init( &w.lock );
     vlc_mutex_lock( &w.lock );
 
     /* Install the callback */

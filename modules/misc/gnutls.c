@@ -119,7 +119,7 @@ static int gcry_vlc_mutex_init( void **p_sys )
     if( p_lock == NULL)
         return ENOMEM;
 
-    i_val = vlc_mutex_init( (vlc_object_t *)NULL, p_lock );
+    i_val = vlc_mutex_init( p_lock );
     if( i_val )
         free( p_lock );
     else
@@ -1123,7 +1123,7 @@ static int OpenServer (vlc_object_t *obj)
     /* No certificate validation by default */
     p_sys->pf_handshake  = gnutls_ContinueHandshake;
 
-    vlc_mutex_init( p_server, &p_sys->cache_lock );
+    vlc_mutex_init( &p_sys->cache_lock );
 
     /* Sets server's credentials */
     val = gnutls_certificate_allocate_credentials( &p_sys->x509_cred );

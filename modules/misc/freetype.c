@@ -363,7 +363,7 @@ static int Create( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    vlc_mutex_init( p_filter, &p_sys->fontconfig_lock );
+    vlc_mutex_init( &p_sys->fontconfig_lock );
     p_sys->b_fontconfig_ok = false;
     p_sys->p_fontconfig    = NULL;
 

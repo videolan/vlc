@@ -204,8 +204,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
 
     /* Initialize mutexes */
-    vlc_mutex_init( p_libvlc, &p_libvlc->timer_lock );
-    vlc_mutex_init( p_libvlc, &p_libvlc->config_lock );
+    vlc_mutex_init( &p_libvlc->timer_lock );
+    vlc_mutex_init( &p_libvlc->config_lock );
 #ifdef __APPLE__
     vlc_thread_set_priority( p_libvlc, VLC_THREAD_PRIORITY_LOW );
 #endif
@@ -720,7 +720,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         vlc_object_release( p_libvlc );
         return VLC_ENOMEM;
     }
-    vlc_mutex_init( p_libvlc, &p_libvlc->p_stats->lock );
+    vlc_mutex_init( &p_libvlc->p_stats->lock );
     p_libvlc->p_stats_computer = NULL;
 
     /* Init the array that holds every input item */

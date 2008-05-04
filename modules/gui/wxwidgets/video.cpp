@@ -97,7 +97,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     p_parent = _p_parent;
     p_child_window = 0;
 
-    vlc_mutex_init( p_intf, &lock );
+    vlc_mutex_init( &lock );
 
     b_auto_size = p_intf->p_sys->b_video_autosize;
 

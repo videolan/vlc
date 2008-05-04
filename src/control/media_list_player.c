@@ -259,7 +259,7 @@ libvlc_media_list_player_new( libvlc_instance_t * p_instance,
     p_mlp->current_playing_item_path = NULL;
     p_mlp->p_mi = NULL;
     p_mlp->p_mlist = NULL;
-    vlc_mutex_init( p_instance->p_libvlc_int, &p_mlp->object_lock );
+    vlc_mutex_init( &p_mlp->object_lock );
     p_mlp->p_event_manager = libvlc_event_manager_new( p_mlp,
                                                        p_instance,
                                                        p_e );

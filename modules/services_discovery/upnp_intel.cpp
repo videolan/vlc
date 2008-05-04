@@ -86,7 +86,7 @@ public:
 
     Lockable( Cookie* c )
     {
-    vlc_mutex_init( c->serviceDiscovery, &_mutex );
+    vlc_mutex_init( &_mutex );
     }
 
     ~Lockable()

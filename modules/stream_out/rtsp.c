@@ -84,7 +84,7 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
     rtsp->host = NULL;
     rtsp->url = NULL;
     rtsp->psz_path = NULL;
-    vlc_mutex_init( p_stream, &rtsp->lock );
+    vlc_mutex_init( &rtsp->lock );
 
     rtsp->port = (url->i_port > 0) ? url->i_port : 554;
     rtsp->psz_path = strdup( ( url->psz_path != NULL ) ? url->psz_path : "/" );

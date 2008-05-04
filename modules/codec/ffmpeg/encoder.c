@@ -790,7 +790,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             pp_contexts[i] = vlc_object_create( p_enc,
                                      sizeof(struct thread_context_t) );
             pp_contexts[i]->p_context = p_sys->p_context;
-            vlc_mutex_init( p_enc, &pp_contexts[i]->lock );
+            vlc_mutex_init( &pp_contexts[i]->lock );
             vlc_cond_init( p_enc, &pp_contexts[i]->cond );
             pp_contexts[i]->b_work = 0;
             pp_contexts[i]->b_done = 0;

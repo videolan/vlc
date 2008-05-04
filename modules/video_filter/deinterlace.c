@@ -206,7 +206,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys->b_double_rate = false;
     p_vout->p_sys->last_date = 0;
     p_vout->p_sys->p_vout = 0;
-    vlc_mutex_init( p_vout, &p_vout->p_sys->filter_lock );
+    vlc_mutex_init( &p_vout->p_sys->filter_lock );
 
 #if defined(CAN_COMPILE_C_ALTIVEC)
     if( vlc_CPU() & CPU_CAPABILITY_ALTIVEC )

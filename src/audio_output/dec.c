@@ -85,7 +85,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     }
     memset( p_input, 0, sizeof(aout_input_t) );
 
-    vlc_mutex_init( p_aout, &p_input->lock );
+    vlc_mutex_init( &p_input->lock );
 
     p_input->b_changed = 0;
     p_input->b_error = 1;

@@ -243,7 +243,7 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    vlc_mutex_init( p_filter, &p_sys->lock );
+    vlc_mutex_init( &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,

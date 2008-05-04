@@ -217,7 +217,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->slave   = NULL;
 
     /* Init control buffer */
-    vlc_mutex_init( p_input, &p_input->p->lock_control );
+    vlc_mutex_init( &p_input->p->lock_control );
     p_input->p->i_control = 0;
 
     /* Parse input options */
@@ -299,7 +299,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     }
 
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
-    vlc_mutex_init( p_input, &p_input->p->counters.counters_lock );
+    vlc_mutex_init( &p_input->p->counters.counters_lock );
 
     /* Attach only once we are ready */
     vlc_object_attach( p_input, p_parent );

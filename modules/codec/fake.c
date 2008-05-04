@@ -326,7 +326,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_decode_video = DecodeBlock;
 
     p_dec->p_sys->p_image = p_image;
-    vlc_mutex_init( p_dec, &p_dec->p_sys->lock );
+    vlc_mutex_init( &p_dec->p_sys->lock );
 
     return VLC_SUCCESS;
 }

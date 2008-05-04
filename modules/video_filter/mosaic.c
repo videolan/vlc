@@ -301,7 +301,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     p_filter->pf_sub_filter = Filter;
 
-    vlc_mutex_init( p_filter, &p_sys->lock );
+    vlc_mutex_init( &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );
 
     var_Create( p_libvlc, "mosaic-lock", VLC_VAR_MUTEX );

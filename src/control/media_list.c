@@ -152,7 +152,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
         return NULL;
     }
 
-    vlc_mutex_init( p_inst->p_libvlc_int, &p_mlist->object_lock );
+    vlc_mutex_init( &p_mlist->object_lock );
  
     vlc_array_init( &p_mlist->items );
     p_mlist->i_refcount = 1;

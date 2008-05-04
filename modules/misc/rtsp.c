@@ -287,7 +287,7 @@ static int Open( vlc_object_t *p_this )
 
     vlc_UrlClean( &url );
 
-    vlc_mutex_init( p_vod, &p_sys->lock_media );
+    vlc_mutex_init( &p_sys->lock_media );
 
     TAB_INIT( p_sys->i_media, p_sys->media );
     p_sys->i_media_id = 0;
@@ -421,7 +421,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     TAB_APPEND( p_sys->i_media, p_sys->media, p_media );
     vlc_mutex_unlock( &p_sys->lock_media );
 
-    vlc_mutex_init( p_vod, &p_media->lock );
+    vlc_mutex_init( &p_media->lock );
     p_media->psz_session_name = strdup("");
     p_media->psz_session_description = strdup("");
     p_media->psz_session_url = strdup("");

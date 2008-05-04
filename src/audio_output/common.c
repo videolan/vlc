@@ -52,9 +52,9 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     }
 
     /* Initialize members. */
-    vlc_mutex_init( p_parent, &p_aout->input_fifos_lock );
-    vlc_mutex_init( p_parent, &p_aout->mixer_lock );
-    vlc_mutex_init( p_parent, &p_aout->output_fifo_lock );
+    vlc_mutex_init( &p_aout->input_fifos_lock );
+    vlc_mutex_init( &p_aout->mixer_lock );
+    vlc_mutex_init( &p_aout->output_fifo_lock );
     p_aout->i_nb_inputs = 0;
     p_aout->mixer.f_multiplier = 1.0;
     p_aout->mixer.b_error = 1;

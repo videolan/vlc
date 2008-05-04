@@ -169,7 +169,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         CFRelease( all_locales );
     }
 
-    vlc_mutex_init( p_this, &vlc_global()->iconv_lock );
+    vlc_mutex_init( &vlc_global()->iconv_lock );
     vlc_global()->iconv_macosx = vlc_iconv_open( "UTF-8", "UTF-8-MAC" );
 }
 

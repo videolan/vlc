@@ -174,7 +174,7 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_filter, CFG_PREFIX "y", EraseCallback, p_sys );
     var_AddCallback( p_filter, CFG_PREFIX "mask", EraseCallback, p_sys );
 
-    vlc_mutex_init( p_filter, &p_sys->lock );
+    vlc_mutex_init( &p_sys->lock );
 
     return VLC_SUCCESS;
 }

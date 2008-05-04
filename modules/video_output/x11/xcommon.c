@@ -211,7 +211,7 @@ int E_(Activate) ( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
+    vlc_mutex_init( &p_vout->p_sys->lock );
 
     /* Open display, using the "display" config variable or the DISPLAY
      * environment variable */

@@ -110,7 +110,7 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    vlc_mutex_init( p_filter, &p_sys->mask_lock );
+    vlc_mutex_init( &p_sys->mask_lock );
     psz_string =
         var_CreateGetStringCommand( p_filter, CFG_PREFIX "mask" );
     var_AddCallback( p_filter, CFG_PREFIX "mask", MaskCallback,

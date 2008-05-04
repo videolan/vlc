@@ -130,7 +130,7 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
 
     p_sap->psz_object_name = strdup( "sap announcer" );
 
-    vlc_mutex_init( p_sap, &p_sap->object_lock );
+    vlc_mutex_init( &p_sap->object_lock );
 
     p_sap->pf_add = announce_SAPAnnounceAdd;
     p_sap->pf_del = announce_SAPAnnounceDel;

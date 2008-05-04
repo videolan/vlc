@@ -85,12 +85,11 @@ static void PrintMsg ( vlc_object_t *, msg_item_t * );
 void __msg_Create( vlc_object_t *p_this )
 {
     int i;
-    vlc_mutex_init( (vlc_object_t *)NULL,
-                    &(p_this->p_libvlc->msg_bank.lock) );
+    vlc_mutex_init( &(p_this->p_libvlc->msg_bank.lock) );
 
     for( i = 0; i < 2; i++ )
     {
-         vlc_mutex_init( (vlc_object_t *)NULL, &QUEUE(i).lock );
+         vlc_mutex_init( &QUEUE(i).lock );
          QUEUE(i).b_overflow = false;
          QUEUE(i).i_id = i;
          QUEUE(i).i_start = 0;

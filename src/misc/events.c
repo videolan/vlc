@@ -115,7 +115,7 @@ int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj,
 {
     p_em->p_obj = p_obj;
     p_em->p_parent_object = p_parent_obj;
-    vlc_mutex_init( p_parent_obj, &p_em->object_lock );
+    vlc_mutex_init( &p_em->object_lock );
 
     /* We need a recursive lock here, because we need to be able
      * to call libvlc_event_detach even if vlc_event_send is in

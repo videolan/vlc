@@ -168,7 +168,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     vlc_cond_init( p_sys->p_thread, &p_sys->p_thread->wait );
-    vlc_mutex_init( p_sys->p_thread, &p_sys->p_thread->lock );    
+    vlc_mutex_init( &p_sys->p_thread->lock );
 
     p_sys->p_thread->result_connect = 1;
     p_sys->p_thread->result_play = 1;

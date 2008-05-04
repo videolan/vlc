@@ -991,7 +991,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     p_sys->i_atmo_height         = 48;
 
 
-    vlc_mutex_init( p_filter, &p_sys->filter_lock );
+    vlc_mutex_init( &p_sys->filter_lock );
 
 
 #if defined(WIN32)

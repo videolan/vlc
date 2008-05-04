@@ -230,7 +230,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
     p_vout->p_sys->i_changes = 0;
     p_vout->p_sys->b_wallpaper = 0;
-    vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
+    vlc_mutex_init( &p_vout->p_sys->lock );
     SetRectEmpty( &p_vout->p_sys->rect_display );
     SetRectEmpty( &p_vout->p_sys->rect_parent );
 

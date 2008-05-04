@@ -149,7 +149,7 @@ input_stats_t *stats_NewInputStats( input_thread_t *p_input )
         return NULL;
 
     memset( p_stats, 0, sizeof(*p_stats) );
-    vlc_mutex_init( p_input, &p_stats->lock );
+    vlc_mutex_init( &p_stats->lock );
     stats_ReinitInputStats( p_stats );
 
     return p_stats;

@@ -96,7 +96,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, HWND _p_parent )
     p_parent = _p_parent;
     p_child_window = NULL;
 
-    vlc_mutex_init( p_intf, &lock );
+    vlc_mutex_init( &lock );
 
     p_vout = NULL;
 

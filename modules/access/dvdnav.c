@@ -1223,7 +1223,7 @@ static int EventThread( vlc_object_t *p_this )
     demux_sys_t    *p_sys = p_ev->p_demux->p_sys;
     vlc_object_t   *p_vout = NULL;
 
-    vlc_mutex_init( p_ev, &p_ev->lock );
+    vlc_mutex_init( &p_ev->lock );
     p_ev->b_moved   = false;
     p_ev->b_clicked = false;
     p_ev->i_key_action = 0;

@@ -94,7 +94,7 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     /* Register the default subpicture channel */
     p_spu->i_channel = 2;
 
-    vlc_mutex_init( p_this, &p_spu->subpicture_lock );
+    vlc_mutex_init( &p_spu->subpicture_lock );
 
     vlc_object_attach( p_spu, p_this );
 

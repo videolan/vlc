@@ -563,7 +563,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
             p_owner->b_cc_supported = true;
     }
 
-    vlc_mutex_init( p_dec, &p_owner->lock_cc );
+    vlc_mutex_init( &p_owner->lock_cc );
     for( i = 0; i < 4; i++ )
     {
         p_owner->pb_cc_present[i] = false;

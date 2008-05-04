@@ -438,8 +438,8 @@ static int Open( vlc_object_t *p_this )
 
     p_stream->p_sys     = p_sys;
 
-    vlc_mutex_init( p_stream, &p_sys->lock_sdp );
-    vlc_mutex_init( p_stream, &p_sys->lock_es );
+    vlc_mutex_init( &p_sys->lock_sdp );
+    vlc_mutex_init( &p_sys->lock_es );
 
     psz = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "mux" );
     if( psz != NULL )
@@ -891,7 +891,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
 
-    vlc_mutex_init( p_stream, &id->lock_sink );
+    vlc_mutex_init( &id->lock_sink );
     id->sinkc = 0;
     id->sinkv = NULL;
     id->rtsp_id = NULL;

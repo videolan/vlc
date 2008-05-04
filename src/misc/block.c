@@ -249,7 +249,7 @@ block_fifo_t *block_FifoNew( void )
     if( !p_fifo )
         return NULL;
 
-    vlc_mutex_init( NULL, &p_fifo->lock );
+    vlc_mutex_init( &p_fifo->lock );
     vlc_cond_init( NULL, &p_fifo->wait );
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;

@@ -19,7 +19,7 @@ CAtmoExternalCaptureInput::CAtmoExternalCaptureInput(CAtmoDynData *pAtmoDynData)
 {
     m_pCurrentFramePixels = NULL;
     vlc_cond_init( this->m_pAtmoThread, &m_WakeupCond );
-    vlc_mutex_init( m_pAtmoThread, &m_WakeupLock );
+    vlc_mutex_init( &m_WakeupLock );
     msg_Dbg( m_pAtmoThread, "CAtmoExternalCaptureInput created.");
 
 }

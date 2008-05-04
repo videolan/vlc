@@ -265,7 +265,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             p_var->pf_cmp = CmpAddress;
             p_var->pf_free = FreeMutex;
             p_var->val.p_address = malloc( sizeof(vlc_mutex_t) );
-            vlc_mutex_init( p_this, (vlc_mutex_t*)p_var->val.p_address );
+            vlc_mutex_init( (vlc_mutex_t*)p_var->val.p_address );
             break;
         case VLC_VAR_LIST:
             p_var->pf_cmp = CmpAddress;

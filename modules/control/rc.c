@@ -319,7 +319,7 @@ static int Activate( vlc_object_t *p_this )
     p_intf->p_sys->pi_socket_listen = pi_socket;
     p_intf->p_sys->i_socket = -1;
     p_intf->p_sys->psz_unix_path = psz_unix_path;
-    vlc_mutex_init( p_intf, &p_intf->p_sys->status_lock );
+    vlc_mutex_init( &p_intf->p_sys->status_lock );
     p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
 
     /* Non-buffered stdout */

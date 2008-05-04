@@ -129,8 +129,8 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     p_new->b_playlist_locked = 0;
     p_new->ref_count = 1;
     p_new->p_callback_list = NULL;
-    vlc_mutex_init(p_libvlc_int, &p_new->instance_lock);
-    vlc_mutex_init(p_libvlc_int, &p_new->event_callback_lock);
+    vlc_mutex_init(&p_new->instance_lock);
+    vlc_mutex_init(&p_new->event_callback_lock);
  
     libvlc_event_init(p_new, p_e);
 

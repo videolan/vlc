@@ -17,7 +17,7 @@ CAtmoDynData::CAtmoDynData(vlc_object_t *p_atmo_filter, CAtmoConfig *pAtmoConfig
     this->m_pAtmoConnection = NULL;
     this->m_pCurrentEffectThread = NULL;
 
-    vlc_mutex_init( p_atmo_filter, &m_lock );
+    vlc_mutex_init( &m_lock );
 
 }
 #else

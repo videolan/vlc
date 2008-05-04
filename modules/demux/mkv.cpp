@@ -1326,7 +1326,7 @@ public:
         ,b_pci_packet_set(false)
         ,p_ev(NULL)
     {
-        vlc_mutex_init( &demuxer, &lock_demuxer );
+        vlc_mutex_init( &lock_demuxer );
     }
 
     virtual ~demux_sys_t()
@@ -2719,7 +2719,7 @@ void demux_sys_t::StartUiThread()
         p_ev = (event_thread_t *) vlc_object_create( &demuxer, sizeof( event_thread_t ) );
         p_ev->p_demux = &demuxer;
         p_ev->b_die = false;
-        vlc_mutex_init( p_ev, &p_ev->lock );
+        vlc_mutex_init( &p_ev->lock );
         vlc_thread_create( p_ev, "mkv event thread handler", EventThread,
                         VLC_THREAD_PRIORITY_LOW, false );
     }

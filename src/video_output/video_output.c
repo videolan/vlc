@@ -314,9 +314,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->i_par_num = p_vout->i_par_den = 1;
 
     /* Initialize locks */
-    vlc_mutex_init( p_vout, &p_vout->picture_lock );
-    vlc_mutex_init( p_vout, &p_vout->change_lock );
-    vlc_mutex_init( p_vout, &p_vout->vfilter_lock );
+    vlc_mutex_init( &p_vout->picture_lock );
+    vlc_mutex_init( &p_vout->change_lock );
+    vlc_mutex_init( &p_vout->vfilter_lock );
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );

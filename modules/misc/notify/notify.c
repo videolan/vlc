@@ -97,7 +97,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_init( p_this, &p_sys->lock );
+    vlc_mutex_init( &p_sys->lock );
 
     p_intf->p_sys = p_sys;
 

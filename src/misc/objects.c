@@ -153,7 +153,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_libvlc_global->i_objects = 0;
         p_libvlc_global->pp_objects = NULL;
         p_priv->b_attached = true;
-        vlc_mutex_init( p_new, &structure_lock );
+        vlc_mutex_init( &structure_lock );
     }
     else
     {
@@ -188,9 +188,9 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_new->p_private = NULL;
 
     /* Initialize mutexes and condvars */
-    vlc_mutex_init( p_new, &p_new->object_lock );
+    vlc_mutex_init( &p_new->object_lock );
     vlc_cond_init( p_new, &p_new->object_wait );
-    vlc_mutex_init( p_new, &p_priv->var_lock );
+    vlc_mutex_init( &p_priv->var_lock );
     vlc_spin_init( &p_priv->spin );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 

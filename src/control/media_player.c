@@ -305,8 +305,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
      * - No lock held in constructor
      * - Lock when accessing all variable this lock is held
      * - Lock when attempting to destroy the object the lock is also held */
-    vlc_mutex_init( p_mi->p_libvlc_instance->p_libvlc_int,
-                    &p_mi->object_lock );
+    vlc_mutex_init( &p_mi->object_lock );
     p_mi->p_event_manager = libvlc_event_manager_new( p_mi,
             p_libvlc_instance, p_e );
     if( libvlc_exception_raised( p_e ) )

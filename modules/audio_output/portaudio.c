@@ -217,10 +217,10 @@ static int Open( vlc_object_t * p_this )
         pa_thread = vlc_object_create( p_aout, sizeof(pa_thread_t) );
         pa_thread->p_aout = p_aout;
         pa_thread->b_error = false;
-        vlc_mutex_init( p_aout, &pa_thread->lock_wait );
+        vlc_mutex_init( &pa_thread->lock_wait );
         vlc_cond_init( p_aout, &pa_thread->wait );
         pa_thread->b_wait = false;
-        vlc_mutex_init( p_aout, &pa_thread->lock_signal );
+        vlc_mutex_init( &pa_thread->lock_signal );
         vlc_cond_init( p_aout, &pa_thread->signal );
         pa_thread->b_signal = false;
 
