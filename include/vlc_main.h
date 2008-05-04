@@ -49,10 +49,6 @@ struct libvlc_int_t
 
     vlc_object_t          *p_interaction;    ///< interface interaction object
 
-    vlm_t                 *p_vlm;            ///< vlm if created from libvlc-common.
-                                             /// (this is clearly private and
-                                             //  shouldn't be used)
-
     void                 *p_stats_computer;  ///< Input thread computing stats (needs cleanup)
     global_stats_t       *p_stats;           ///< Global statistics
 

@@ -178,6 +178,9 @@ typedef struct libvlc_priv_t
     bool               b_stats;     ///< Whether to collect stats
 
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
+    vlm_t             *p_vlm;  ///< VLM if created from libvlc-common.c
+
+    httpd_t           *p_httpd; ///< HTTP daemon (src/network/httpd.c)
 } libvlc_priv_t;
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
