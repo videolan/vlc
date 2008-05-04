@@ -121,7 +121,6 @@ struct libvlc_global_data_t
 
     /* Arch-specific variables */
 #if defined( SYS_BEOS )
-    vlc_object_t *         p_appthread;
     char *                 psz_vlcpath;
 #elif defined( __APPLE__ )
     char *                 psz_vlcpath;

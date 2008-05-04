@@ -71,6 +71,8 @@ private:
 #include "../../modules/gui/beos/MsgVals.h"
 #define REALLY_QUIT 'requ'
 
+static vlc_object_t *p_appthread;
+
 extern "C"
 {
 
@@ -84,11 +86,11 @@ static void AppThread( vlc_object_t *p_appthread );
  *****************************************************************************/
 void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
-    vlc_global()->p_appthread =
+    p_appthread =
             (vlc_object_t *)vlc_object_create( p_this, sizeof(vlc_object_t) );
 
     /* Create the BApplication thread and wait for initialization */
-    vlc_thread_create( vlc_global()->p_appthread, "app thread", AppThread,
+    vlc_thread_create( p_appthread, "app thread", AppThread,
                        VLC_THREAD_PRIORITY_LOW, true );
 }
 
@@ -107,8 +109,8 @@ void system_End( libvlc_int_t *p_this )
     /* Tell the BApplication to die */
     be_app->PostMessage( REALLY_QUIT );
 
-    vlc_thread_join( vlc_global()->p_appthread );
-    vlc_object_release( vlc_global()->p_appthread );
+    vlc_thread_join( p_appthread );
+    vlc_object_release( p_appthread );
 
     free( vlc_global()->psz_vlcpath );
 }
