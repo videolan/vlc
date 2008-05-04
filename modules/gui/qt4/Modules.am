@@ -64,9 +64,7 @@ nodist_SOURCES_qt4 = \
 		ui/streampanel.h \
 		ui/sout.h
 
-if ENABLE_QT4
 BUILT_SOURCES += $(nodist_SOURCES_qt4)
-endif
 
 resources.cpp: vlc.qrc
 	$(RCC) -name vlc -o $@ $<

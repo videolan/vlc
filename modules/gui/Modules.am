@@ -1,3 +1,26 @@
-SUBDIRS = beos pda macosx minimal_macosx qnx qt4 skins2 wxwidgets wince
+DIST_SUBDIRS = beos macosx minimal_macosx pda qnx qt4 skins2 wxwidgets wince
+SUBDIRS =
+
+if HAVE_BEOS
+SUBDIRS += beos
+endif
+if HAVE_DARWIN
+SUBDIRS += macosx minimal_macosx
+endif
+if BUILD_PDA
+SUBDIRS += pda
+endif
+SUBDIRS += qnx
+if ENABLE_QT4
+SUBDIRS += qt4
+endif
+if BUILD_SKINS
+SUBDIRS += skins2
+endif
+SUBDIRS += wxwidgets
+if HAVE_WINCE
+SUBDIRS += wince
+endif
+
 SOURCES_ncurses = ncurses.c
 SOURCES_fbosd = fbosd.c
