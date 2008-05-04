@@ -7,9 +7,21 @@
 # which have makefiles with distribution information.
 #  - src (libvlc) is nedeed by modules, mozilla and bindings
 #  - libs/* are needed by modules
-SUBDIRS = po libs/loader libs/srtp src modules \
-		projects/mozilla bindings projects/activex share doc test
-DIST_SUBDIRS = $(SUBDIRS) m4  extras/package/ipkg
+EXTRA_SUBDIRS = m4 extras/package/ipkg \
+	bindings/python \
+	projects/mozilla projects/activex
+SUBDIRS = po libs/loader libs/srtp src modules share doc test
+DIST_SUBDIRS = $(SUBDIRS) $(EXTRA_SUBDIRS)
+
+if BUILD_MOZILLA
+SUBDIRS += projects/mozilla
+endif
+if BUILD_ACTIVEX
+SUBDIRS += projects/activex
+endif
+if BUILD_PYTHON
+SUBDIRS += bindings/python
+endif
 
 EXTRA_DIST = \
 	HACKING \
