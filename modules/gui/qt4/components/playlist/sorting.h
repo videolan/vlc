@@ -33,9 +33,9 @@ enum
     COLUMN_TRACK_NUMBER = 0x0040,
     COLUMN_DESCRIPTION  = 0x0080,
 
-    /* Add new entries here */
+    /* Add new entries here and update the COLUMN_END value*/
 
-    COLUMN_END
+    COLUMN_END          = 0x0100
 };
 
 /* Return the title of a column */
