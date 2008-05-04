@@ -73,6 +73,44 @@ extern uint32_t cpu_flags;
 uint32_t CPUCapabilities( void );
 
 /*
+ * Message/logging stuff
+ */
+
+#define NB_QUEUES 2
+
+typedef struct msg_queue_t
+{
+    int                     i_id;
+
+    /** Message queue lock */
+    vlc_mutex_t             lock;
+    bool              b_overflow;
+
+    /* Message queue */
+    msg_item_t              msg[VLC_MSG_QSIZE];           /**< message queue */
+    int i_start;
+    int i_stop;
+
+    /* Subscribers */
+    int i_sub;
+    msg_subscription_t **pp_sub;
+
+    /* Logfile for WinCE */
+#ifdef UNDER_CE
+    FILE *logfile;
+#endif
+} msg_queue_t;
+
+/**
+ * Store all data requiered by messages interfaces.
+ */
+typedef struct msg_bank_t
+{
+    vlc_mutex_t             lock;
+    msg_queue_t             queues[NB_QUEUES];
+} msg_bank_t;
+
+/*
  * Unicode stuff
  */
 
@@ -172,6 +210,12 @@ typedef struct libvlc_priv_t
 {
     vlc_mutex_t        config_lock; ///< config file lock
 
+    /* Messages */
+    msg_bank_t         msg_bank;    ///< The message bank
+    int                i_verbose;   ///< info messages
+    bool               b_color;     ///< color messages?
+
+    /* Timer stats */
     vlc_mutex_t        timer_lock;  ///< Lock to protect timers
     counter_t        **pp_timers;   ///< Array of all timers
     int                i_timers;    ///< Number of timers

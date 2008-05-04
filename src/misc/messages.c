@@ -66,9 +66,9 @@
 #   define vlc_va_copy(dest,src) (dest)=(src)
 #endif
 
-#define QUEUE(i) p_this->p_libvlc->msg_bank.queues[i]
-#define LOCK_BANK vlc_mutex_lock( &p_this->p_libvlc->msg_bank.lock );
-#define UNLOCK_BANK vlc_mutex_unlock( &p_this->p_libvlc->msg_bank.lock );
+#define QUEUE(i) priv->msg_bank.queues[i]
+#define LOCK_BANK vlc_mutex_lock( &priv->msg_bank.lock );
+#define UNLOCK_BANK vlc_mutex_unlock( &priv->msg_bank.lock );
 
 /*****************************************************************************
  * Local prototypes
@@ -84,10 +84,10 @@ static void PrintMsg ( vlc_object_t *, msg_item_t * );
  */
 void __msg_Create( vlc_object_t *p_this )
 {
-    int i;
-    vlc_mutex_init( &(p_this->p_libvlc->msg_bank.lock) );
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+    vlc_mutex_init( &priv->msg_bank.lock );
 
-    for( i = 0; i < 2; i++ )
+    for( int i = 0; i < 2; i++ )
     {
          vlc_mutex_init( &QUEUE(i).lock );
          QUEUE(i).b_overflow = false;
@@ -112,8 +112,9 @@ void __msg_Create( vlc_object_t *p_this )
  */
 void __msg_Flush( vlc_object_t *p_this )
 {
-    int i;
-    for( i = 0 ; i < NB_QUEUES ; i++ )
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+
+    for( int i = 0 ; i < NB_QUEUES ; i++ )
     {
         vlc_mutex_lock( &QUEUE(i).lock );
         FlushMsg( &QUEUE(i) );
@@ -130,8 +131,9 @@ void __msg_Flush( vlc_object_t *p_this )
  */
 void __msg_Destroy( vlc_object_t *p_this )
 {
-    int i;
-    for( i = NB_QUEUES -1 ; i >= 0;  i-- )
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+
+    for( int i = NB_QUEUES -1 ; i >= 0;  i-- )
     {
         if( QUEUE(i).i_sub )
             msg_Err( p_this, "stale interface subscribers" );
@@ -145,7 +147,7 @@ void __msg_Destroy( vlc_object_t *p_this )
         /* Destroy lock */
         vlc_mutex_destroy( &QUEUE(i).lock );
     }
-    vlc_mutex_destroy( &(p_this->p_libvlc->msg_bank.lock) );
+    vlc_mutex_destroy( &priv->msg_bank.lock);
 }
 
 /**
@@ -153,7 +155,11 @@ void __msg_Destroy( vlc_object_t *p_this )
  */
 msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this, int i )
 {
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     msg_subscription_t *p_sub = malloc( sizeof( msg_subscription_t ) );
+
+    if (p_sub == NULL)
+        return NULL;
 
     assert( i < NB_QUEUES );
 
@@ -178,13 +184,13 @@ msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this, int i )
  */
 void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
 {
-    int i,j;
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
 
     LOCK_BANK;
-    for( i = 0 ; i< NB_QUEUES ; i++ )
+    for( int i = 0 ; i< NB_QUEUES ; i++ )
     {
         vlc_mutex_lock( &QUEUE(i).lock );
-        for( j = 0 ; j< QUEUE(i).i_sub ; j++ )
+        for( int j = 0 ; j< QUEUE(i).i_sub ; j++ )
         {
             if( QUEUE(i).pp_sub[j] == p_sub )
             {
@@ -262,6 +268,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
                       const char *psz_module,
                       const char *psz_format, va_list _args )
 {
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     int         i_header_size;             /* Size of the additionnal header */
     vlc_object_t *p_obj;
     char *       psz_str = NULL;                 /* formatted message string */
@@ -556,21 +563,22 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
     static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
     const char *psz_object;
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     int i_type = p_item->i_type;
 
     switch( i_type )
     {
         case VLC_MSG_ERR:
-            if( p_this->p_libvlc->i_verbose < 0 ) return;
+            if( priv->i_verbose < 0 ) return;
             break;
         case VLC_MSG_INFO:
-            if( p_this->p_libvlc->i_verbose < 0 ) return;
+            if( priv->i_verbose < 0 ) return;
             break;
         case VLC_MSG_WARN:
-            if( p_this->p_libvlc->i_verbose < 1 ) return;
+            if( priv->i_verbose < 1 ) return;
             break;
         case VLC_MSG_DBG:
-            if( p_this->p_libvlc->i_verbose < 2 ) return;
+            if( priv->i_verbose < 2 ) return;
             break;
     }
 
@@ -590,7 +598,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 
 #else
     /* Send the message to stderr */
-    if( p_this->p_libvlc->b_color )
+    if( priv->b_color )
     {
         if( p_item->psz_header )
         {

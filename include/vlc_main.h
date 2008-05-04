@@ -57,11 +57,6 @@ struct libvlc_int_t
     input_item_array_t    input_items;       ///< Array of all created input items
     int                   i_last_input_id ;  ///< Last id of input item
 
-    /* Messages */
-    msg_bank_t             msg_bank;    ///< The message bank
-    int                    i_verbose;   ///< info messages
-    bool             b_color;     ///< color messages?
-
     /* Structure storing the action name / key associations */
     struct hotkey
     {

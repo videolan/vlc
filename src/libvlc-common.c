@@ -190,13 +190,13 @@ libvlc_int_t * libvlc_InternalCreate( void )
     /* Find verbosity from VLC_VERBOSE environment variable */
     psz_env = getenv( "VLC_VERBOSE" );
     if( psz_env != NULL )
-        p_libvlc->i_verbose = atoi( psz_env );
+        priv->i_verbose = atoi( psz_env );
     else
-        p_libvlc->i_verbose = 3;
+        priv->i_verbose = 3;
 #if defined( HAVE_ISATTY ) && !defined( WIN32 )
-    p_libvlc->b_color = isatty( 2 ); /* 2 is for stderr */
+    priv->b_color = isatty( 2 ); /* 2 is for stderr */
 #else
-    p_libvlc->b_color = false;
+    priv->b_color = false;
 #endif
 
     /* Announce who we are - Do it only for first instance ? */
@@ -313,7 +313,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* Will be re-done properly later on */
-    p_libvlc->i_verbose = config_GetInt( p_libvlc, "verbose" );
+    priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
 
     /* Check for daemon mode */
 #ifndef WIN32
@@ -656,8 +656,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_AddCallback( p_libvlc, "verbose", VerboseCallback, NULL );
     var_Change( p_libvlc, "verbose", VLC_VAR_TRIGGER_CALLBACKS, NULL, NULL );
 
-    if( p_libvlc->b_color )
-        p_libvlc->b_color = config_GetInt( p_libvlc, "color" ) > 0;
+    if( priv->b_color )
+        priv->b_color = config_GetInt( p_libvlc, "color" ) > 0;
 
     /*
      * Output messages that may still be in the queue
@@ -1973,7 +1973,7 @@ static int VerboseCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if( new_val.i_int >= -1 )
     {
-        p_libvlc->i_verbose = __MIN( new_val.i_int, 2 );
+        libvlc_priv (p_libvlc)->i_verbose = __MIN( new_val.i_int, 2 );
     }
     return VLC_SUCCESS;
 }

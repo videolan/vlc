@@ -130,8 +130,6 @@ typedef struct dict_t dict_t;
 typedef struct gc_object_t gc_object_t ;
 
 /* Messages */
-typedef struct msg_bank_t msg_bank_t;
-typedef struct msg_queue_t msg_queue_t;
 typedef struct msg_subscription_t msg_subscription_t;
 
 /* Playlist */

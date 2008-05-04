@@ -79,39 +79,6 @@ typedef struct
 
 #define MSG_QUEUE_NORMAL 0
 #define MSG_QUEUE_HTTPD_ACCESS 1
-#define NB_QUEUES 2
-
-struct msg_queue_t
-{
-    int                     i_id;
-
-    /** Message queue lock */
-    vlc_mutex_t             lock;
-    bool              b_overflow;
-
-    /* Message queue */
-    msg_item_t              msg[VLC_MSG_QSIZE];           /**< message queue */
-    int i_start;
-    int i_stop;
-
-    /* Subscribers */
-    int i_sub;
-    msg_subscription_t **pp_sub;
-
-    /* Logfile for WinCE */
-#ifdef UNDER_CE
-    FILE *logfile;
-#endif
-};
-
-/**
- * Store all data requiered by messages interfaces.
- */
-struct msg_bank_t
-{
-    vlc_mutex_t             lock;
-    msg_queue_t             queues[NB_QUEUES];
-};
 
 /**
  * Used by interface plugins which subscribe to the message bank.
