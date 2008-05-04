@@ -764,7 +764,7 @@ out:
 /**
  * Get the user's VLC configuration directory
  */
-char *config_GetConfigDir( libvlc_int_t *p_libvlc )
+char *config_GetConfigDir( void )
 {
     return config_GetFooDir ("CONFIG", ".config");
 }
@@ -773,7 +773,7 @@ char *config_GetConfigDir( libvlc_int_t *p_libvlc )
  * Get the user's VLC data directory
  * (used for stuff like the skins, custom lua modules, ...)
  */
-char *config_GetUserDataDir( libvlc_int_t *p_libvlc )
+char *config_GetUserDataDir( void )
 {
     return config_GetFooDir ("DATA", ".local/share");
 }
@@ -782,7 +782,7 @@ char *config_GetUserDataDir( libvlc_int_t *p_libvlc )
  * Get the user's VLC cache directory
  * (used for stuff like the modules cache, the album art cache, ...)
  */
-char *config_GetCacheDir( libvlc_int_t *p_libvlc )
+char *config_GetCacheDir( void )
 {
     return config_GetFooDir ("CACHE", ".cache");
 }
