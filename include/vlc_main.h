@@ -68,13 +68,6 @@ struct libvlc_int_t
 
     module_t *             p_memcpy_module;  ///< Fast memcpy plugin used
 
-    bool             b_stats;       ///< Should we collect stats ?
-    vlc_mutex_t            timer_lock;    ///< Lock to protect timers
-    int                    i_timers;      ///< Number of timers
-    counter_t            **pp_timers;     ///< Array of all timers
-
-    vlc_mutex_t            config_lock;    ///< Lock for the config file
-
     /* Structure storing the action name / key associations */
     struct hotkey
     {

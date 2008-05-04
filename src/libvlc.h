@@ -130,7 +130,9 @@ typedef struct libvlc_global_data_t
 libvlc_global_data_t *vlc_global (void);
 libvlc_int_t *vlc_current_object (int i_object);
 
-/* Private LibVLC data for each objects */
+/**
+ * Private LibVLC data for each object.
+ */
 struct vlc_object_internals_t
 {
     /* Object variables */
@@ -163,6 +165,32 @@ static inline vlc_object_internals_t *vlc_internals( vlc_object_t *obj )
     return ((vlc_object_internals_t *)obj) - 1;
 }
 
+/**
+ * Private LibVLC instance data.
+ */
+typedef struct libvlc_priv_t
+{
+    vlc_mutex_t        config_lock; ///< config file lock
+
+    vlc_mutex_t        timer_lock;  ///< Lock to protect timers
+    counter_t        **pp_timers;   ///< Array of all timers
+    int                i_timers;    ///< Number of timers
+    bool               b_stats;     ///< Whether to collect stats
+} libvlc_priv_t;
+
+static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
+{
+    return (libvlc_priv_t *)(libvlc + 1);
+}
+
+static inline bool libvlc_stats (vlc_object_t *obj)
+{
+   return libvlc_priv (obj->p_libvlc)->b_stats;
+}
+
+/**
+ * LibVLC "main module" configuration settings array.
+ */
 extern module_config_t libvlc_config[];
 extern const size_t libvlc_config_count;
 

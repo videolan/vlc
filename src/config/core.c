@@ -557,12 +557,13 @@ void config_UnsetCallbacks( module_config_t *p_new, size_t n )
  *****************************************************************************/
 void __config_ResetAll( vlc_object_t *p_this )
 {
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     int i_index;
     vlc_list_t *p_list;
     module_t *p_module;
 
     /* Acquire config file lock */
-    vlc_mutex_lock( &p_this->p_libvlc->config_lock );
+    vlc_mutex_lock( &priv->config_lock );
 
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
@@ -589,7 +590,7 @@ void __config_ResetAll( vlc_object_t *p_this )
     }
 
     vlc_list_release( p_list );
-    vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
+    vlc_mutex_unlock( &priv->config_lock );
 }
 
 /**

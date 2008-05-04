@@ -160,7 +160,7 @@ void sout_UpdateStatistic( sout_instance_t *p_sout, sout_statistic_t i_type, int
     int i_bytes; /* That's pretty stupid to define it as an integer, it will overflow
                     really fast ... */
 
-    if( !p_sout->p_libvlc->b_stats )
+    if( !libvlc_stats (p_sout) )
         return;
 
     /* FIXME that's ugly

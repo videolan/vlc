@@ -146,7 +146,8 @@ libvlc_int_t * vlc_current_object( int i_object )
  */
 libvlc_int_t * libvlc_InternalCreate( void )
 {
-    libvlc_int_t * p_libvlc = NULL;
+    libvlc_int_t *p_libvlc;
+    libvlc_priv_t *priv;
     char *psz_env = NULL;
 
     /* vlc_threads_init *must* be the first internal call! No other call is
@@ -167,7 +168,9 @@ libvlc_int_t * libvlc_InternalCreate( void )
     }
 
     /* Allocate a libvlc instance object */
-    p_libvlc = vlc_object_create( p_libvlc_global, VLC_OBJECT_LIBVLC );
+    p_libvlc = vlc_custom_create( VLC_OBJECT(p_libvlc_global),
+                                  sizeof (*p_libvlc) + sizeof (libvlc_priv_t),
+                                  VLC_OBJECT_LIBVLC, "libvlc" );
     if( p_libvlc != NULL )
         i_instances++;
     vlc_mutex_unlock( lock );
@@ -179,6 +182,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     p_libvlc->p_interaction = NULL;
     p_libvlc->p_vlm = NULL;
     p_libvlc->psz_object_name = strdup( "libvlc" );
+    priv = libvlc_priv (p_libvlc);
 
     /* Initialize message queue */
     msg_Create( p_libvlc );
@@ -200,8 +204,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
 
     /* Initialize mutexes */
-    vlc_mutex_init( &p_libvlc->timer_lock );
-    vlc_mutex_init( &p_libvlc->config_lock );
+    vlc_mutex_init( &priv->timer_lock );
+    vlc_mutex_init( &priv->config_lock );
 #ifdef __APPLE__
     vlc_thread_set_priority( p_libvlc, VLC_THREAD_PRIORITY_LOW );
 #endif
@@ -223,6 +227,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                          const char *ppsz_argv[] )
 {
     libvlc_global_data_t *p_libvlc_global = vlc_global();
+    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     char         p_capabilities[200];
     char *       p_tmp = NULL;
     char *       psz_modules = NULL;
@@ -705,9 +710,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     p_libvlc->p_memcpy_module = module_Need( p_libvlc, "memcpy", "$memcpy", 0 );
 
-    p_libvlc->b_stats = config_GetInt( p_libvlc, "stats" ) > 0;
-    p_libvlc->i_timers = 0;
-    p_libvlc->pp_timers = NULL;
+    priv->b_stats = config_GetInt( p_libvlc, "stats" ) > 0;
+    priv->i_timers = 0;
+    priv->pp_timers = NULL;
 
     /* Init stats */
     p_libvlc->p_stats = (global_stats_t *)malloc( sizeof( global_stats_t ) );
@@ -1030,6 +1035,8 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
     if( !p_libvlc )
         return VLC_EGENERIC;
 
+    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
+
 #ifndef WIN32
     char* psz_pidfile = NULL;
 
@@ -1081,8 +1088,8 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
     msg_Destroy( p_libvlc );
 
     /* Destroy mutexes */
-    vlc_mutex_destroy( &p_libvlc->config_lock );
-    vlc_mutex_destroy( &p_libvlc->timer_lock );
+    vlc_mutex_destroy( &priv->config_lock );
+    vlc_mutex_destroy( &priv->timer_lock );
 
     if( b_release ) vlc_object_release( p_libvlc );
     vlc_object_release( p_libvlc );

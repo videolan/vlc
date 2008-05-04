@@ -139,6 +139,7 @@ static int strtoi (const char *str)
  *****************************************************************************/
 int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     vlc_list_t *p_list;
     FILE *file;
 
@@ -147,7 +148,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         return VLC_EGENERIC;
 
     /* Acquire config file lock */
-    vlc_mutex_lock( &p_this->p_libvlc->config_lock );
+    vlc_mutex_lock( &priv->config_lock );
 
     /* Look for the selected module, if NULL then save everything */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -296,7 +297,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
     vlc_list_release( p_list );
 
-    vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
+    vlc_mutex_unlock( &priv->config_lock );
     return 0;
 }
 
@@ -386,6 +387,7 @@ config_Write (FILE *file, const char *type, const char *desc,
 static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                            bool b_autosave )
 {
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     module_t *p_parser;
     vlc_list_t *p_list;
     FILE *file;
@@ -396,7 +398,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     int i_index;
 
     /* Acquire config file lock */
-    vlc_mutex_lock( &p_this->p_libvlc->config_lock );
+    vlc_mutex_lock( &priv->config_lock );
 
     if( p_this->p_libvlc->psz_configfile == NULL )
     {
@@ -404,7 +406,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         if( !psz_configdir ) /* XXX: This should never happen */
         {
             msg_Err( p_this, "no configuration directory defined" );
-            vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
+            vlc_mutex_unlock( &priv->config_lock );
             return -1;
         }
 
@@ -424,7 +426,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     if( !p_bigbuffer )
     {
         if( file ) fclose( file );
-        vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
+        vlc_mutex_unlock( &priv->config_lock );
         return -1;
     }
     p_bigbuffer[0] = 0;
@@ -498,7 +500,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     {
         vlc_list_release( p_list );
         free( p_bigbuffer );
-        vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
+        vlc_mutex_unlock( &priv->config_lock );
         return -1;
     }
 
@@ -619,20 +621,21 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     free( p_bigbuffer );
 
     fclose( file );
-    vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
+    vlc_mutex_unlock( &priv->config_lock );
 
     return 0;
 }
 
 int config_AutoSaveConfigFile( vlc_object_t *p_this )
 {
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     vlc_list_t *p_list;
     int i_index, i_count;
 
     assert( p_this );
 
     /* Check if there's anything to save */
-    vlc_mutex_lock( &p_this->p_libvlc->config_lock );
+    vlc_mutex_lock( &priv->config_lock );
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     i_count = p_list->i_count;
     for( i_index = 0; i_index < i_count; i_index++ )
@@ -651,7 +654,7 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
         if( p_item < p_end ) break;
     }
     vlc_list_release( p_list );
-    vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
+    vlc_mutex_unlock( &priv->config_lock );
 
     if( i_index == i_count ) return VLC_SUCCESS;
     return SaveConfigFile( p_this, 0, true );

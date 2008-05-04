@@ -795,7 +795,7 @@ static void InitStatistics( input_thread_t * p_input )
     /* Prepare statistics */
 #define INIT_COUNTER( c, type, compute ) p_input->p->counters.p_##c = \
  stats_CounterCreate( p_input, VLC_VAR_##type, STATS_##compute);
-    if( p_input->p_libvlc->b_stats )
+    if( libvlc_stats (p_input) )
     {
         INIT_COUNTER( read_bytes, INTEGER, COUNTER );
         INIT_COUNTER( read_packets, INTEGER, COUNTER );
@@ -863,7 +863,7 @@ static int InitSout( input_thread_t * p_input )
                 return VLC_EGENERIC;
             }
         }
-        if( p_input->p_libvlc->b_stats )
+        if( libvlc_stats (p_input) )
         {
             INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
             INIT_COUNTER (sout_sent_bytes, INTEGER, COUNTER );
@@ -1260,7 +1260,7 @@ error:
     }
 #endif
 
-    if( !p_input->b_preparsing && p_input->p_libvlc->b_stats )
+    if( !p_input->b_preparsing && libvlc_stats (p_input) )
     {
 #define EXIT_COUNTER( c ) do { if( p_input->p->counters.p_##c ) \
                                    stats_CounterClean( p_input->p->counters.p_##c );\
@@ -1343,7 +1343,7 @@ static void End( input_thread_t * p_input )
     if( !p_input->b_preparsing )
     {
 #define CL_CO( c ) stats_CounterClean( p_input->p->counters.p_##c ); p_input->p->counters.p_##c = NULL;
-        if( p_input->p_libvlc->b_stats )
+        if( libvlc_stats (p_input) )
         {
             /* make sure we are up to date */
             stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );

@@ -1362,7 +1362,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else
         i_delay = 0;
 
-    if( p_input->p_libvlc->b_stats )
+    if( libvlc_stats (p_input) )
     {
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
         stats_UpdateInteger( p_input, p_input->p->counters.p_demux_read,
