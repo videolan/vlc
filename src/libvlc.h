@@ -125,8 +125,6 @@ struct libvlc_global_data_t
     char *                 psz_vlcpath;
 #elif defined( __APPLE__ )
     char *                 psz_vlcpath;
-    vlc_iconv_t            iconv_macosx; /* for HFS+ file names */
-    vlc_mutex_t            iconv_lock;
 #elif defined( WIN32 )
     char *                 psz_vlcpath;
 #endif
