@@ -46,12 +46,14 @@
 #endif
 
 
-#include "vlc_tls.h"
+#include <vlc_tls.h>
 #include <vlc_charset.h>
 
 #include <gcrypt.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+
+#include <vlc_gcrypt.h>
 
 #define CACHE_TIMEOUT     3600
 #define CACHE_SIZE          64
@@ -101,64 +103,6 @@ vlc_module_begin();
                     CACHE_SIZE_LONGTEXT, true );
 vlc_module_end();
 
-
-
-#ifdef LIBVLC_USE_PTHREAD
-GCRY_THREAD_OPTION_PTHREAD_IMPL;
-# define gcry_threads_vlc gcry_threads_pthread
-#else
-/**
- * gcrypt thread option VLC implementation
- */
-
-static int gcry_vlc_mutex_init( void **p_sys )
-{
-    int i_val;
-    vlc_mutex_t *p_lock = (vlc_mutex_t *)malloc( sizeof( vlc_mutex_t ) );
-
-    if( p_lock == NULL)
-        return ENOMEM;
-
-    i_val = vlc_mutex_init( p_lock );
-    if( i_val )
-        free( p_lock );
-    else
-        *p_sys = p_lock;
-    return i_val;
-}
-
-static int gcry_vlc_mutex_destroy( void **p_sys )
-{
-    vlc_mutex_t *p_lock = (vlc_mutex_t *)*p_sys;
-    vlc_mutex_destroy( p_lock );
-    free( p_lock );
-    return VLC_SUCCESS;
-}
-
-static int gcry_vlc_mutex_lock( void **p_sys )
-{
-    vlc_mutex_lock( (vlc_mutex_t *)*p_sys );
-    return VLC_SUCCESS;
-}
-
-static int gcry_vlc_mutex_unlock( void **lock )
-{
-    vlc_mutex_unlock( (vlc_mutex_t *)*lock );
-    return VLC_SUCCESS;
-}
-
-static struct gcry_thread_cbs gcry_threads_vlc =
-{
-    GCRY_THREAD_OPTION_USER,
-    NULL,
-    gcry_vlc_mutex_init,
-    gcry_vlc_mutex_destroy,
-    gcry_vlc_mutex_lock,
-    gcry_vlc_mutex_unlock
-};
-#endif
-
-
 /**
  * Initializes GnuTLS with proper locking.
  * @return VLC_SUCCESS on success, a VLC error code otherwise.
@@ -167,9 +111,9 @@ static int gnutls_Init (vlc_object_t *p_this)
 {
     int ret = VLC_EGENERIC;
 
-    vlc_mutex_t *lock = var_AcquireMutex ("gnutls_mutex");
+    vlc_gcrypt_init (); /* GnuTLS depends on gcrypt */
 
-    gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
+    vlc_mutex_t *lock = var_AcquireMutex ("gnutls_mutex");
     if (gnutls_global_init ())
     {
         msg_Err (p_this, "cannot initialize GnuTLS");

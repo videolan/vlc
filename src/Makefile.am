@@ -73,6 +73,7 @@ noinst_HEADERS = \
 	../include/vlc_events.h \
 	../include/vlc_filter.h \
 	../include/vlc_fixups.h \
+	../include/vlc_gcrypt.h \
 	../include/vlc_httpd.h \
 	../include/vlc_image.h \
 	../include/vlc_input.h \
