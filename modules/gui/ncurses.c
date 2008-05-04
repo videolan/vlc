@@ -255,7 +255,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_box_plidx = 0;
     p_sys->i_box_bidx = 0;
     p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
-    p_sys->b_color = p_this->p_libvlc->b_color;
+    p_sys->b_color = isatty( 0 );
     p_sys->b_color_started = false;
 
 #ifndef HAVE_NCURSESW
