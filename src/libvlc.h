@@ -98,14 +98,14 @@ extern void *
 vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
                    const char *psz_type);
 
-/*****************************************************************************
+/**
  * libvlc_global_data_t (global variable)
- *****************************************************************************
- * This structure has an unique instance, statically allocated in main and
- * never accessed from the outside. It stores once-initialized data such as
- * the CPU capabilities or the global lock.
- *****************************************************************************/
-struct libvlc_global_data_t
+ *
+ * This structure has an unique instance, statically allocated in libvlc and
+ * never accessed from the outside. It stores process-wide VLC variables,
+ * mostly process-wide locks, and (currently) the module bank and objects tree.
+ */
+typedef struct libvlc_global_data_t
 {
     VLC_COMMON_MEMBERS
 
@@ -124,7 +124,7 @@ struct libvlc_global_data_t
 #elif defined( WIN32 )
     char *                 psz_vlcpath;
 #endif
-};
+} libvlc_global_data_t;
 
 
 libvlc_global_data_t *vlc_global (void);
