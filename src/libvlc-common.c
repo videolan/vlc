@@ -178,11 +178,11 @@ libvlc_int_t * libvlc_InternalCreate( void )
     if( p_libvlc == NULL )
         return NULL;
 
+    priv = libvlc_priv (p_libvlc);
     p_libvlc->p_playlist = NULL;
     p_libvlc->p_interaction = NULL;
     priv->p_vlm = NULL;
     p_libvlc->psz_object_name = strdup( "libvlc" );
-    priv = libvlc_priv (p_libvlc);
 
     /* Initialize message queue */
     msg_Create( p_libvlc );
