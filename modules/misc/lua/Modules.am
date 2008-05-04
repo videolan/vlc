@@ -1,1 +1,3 @@
 SOURCES_lua = playlist.c meta.c intf.c vlc.c vlc.h callbacks.c objects.c variables.c configuration.c net.c vlm.c httpd.c acl.c sd.c
+
+libvlc_LTLIBRARIES += liblua_plugin.la

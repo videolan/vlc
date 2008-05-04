@@ -1766,7 +1766,6 @@ then
     ])
   if test "x${have_lua}" = "xyes" ;  then
      AC_DEFINE(HAVE_LUA, 1, [Define if you have the lua library])
-     VLC_ADD_PLUGIN([lua])
      VLC_ADD_LIBS([lua],[$LUA_LIBS])
      VLC_ADD_CFLAGS([lua],[$LUA_CFLAGS])
   fi
