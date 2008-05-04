@@ -731,34 +731,35 @@ static char *config_GetFooDir (libvlc_int_t *p_libvlc, const char *xdg_name,
 #if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
     char *psz_parent = config_GetUserDir();
 
-    if( !psz_parent )
-        psz_parent = p_libvlc->psz_homedir;
     if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
         psz_dir = NULL;
 
+    free (psz_parent);
     (void)xdg_name; (void)xdg_default;
-    return psz_dir;
 #else
     char var[sizeof ("XDG__HOME") + strlen (xdg_name)], *psz_env;
 
     /* XDG Base Directory Specification - Version 0.6 */
     snprintf (var, sizeof (var), "XDG_%s_HOME", xdg_name);
-    psz_env = getenv (var);
+    psz_env = FromLocaleDup (getenv (var));
     if( psz_env )
     {
         if( asprintf( &psz_dir, "%s/vlc", psz_env ) == -1 )
-            return NULL;
-        return psz_dir;
+            psz_dir = NULL;
+        goto out;
     }
 
-    psz_env = getenv( "HOME" );
+    psz_env = FromLocaleDup (getenv ("HOME"));
     /* not part of XDG spec but we want a sensible fallback */
     if( !psz_env )
-        psz_env = p_libvlc->psz_homedir;
+        psz_env = config_GetHomeDir();
     if( asprintf( &psz_dir, "%s/%s/vlc", psz_env, xdg_default ) == -1 )
-        return NULL;
-    return psz_dir;
+        psz_dir = NULL;
+
+out:
+    free (psz_env);
 #endif
+    return psz_dir;
 }
 
 /**
