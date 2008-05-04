@@ -1379,8 +1379,8 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Setup vertices */
-    f_width  = (float)(p_vout->output.i_width);
-    f_height = (float)(p_vout->output.i_height);
+    f_width  = (float)(p_vout->output.i_width) + 1;
+    f_height = (float)(p_vout->output.i_height) + 1;
 
     p_vertices[0].x       = 0.0f;       // left
     p_vertices[0].y       = 0.0f;       // top
