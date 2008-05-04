@@ -724,8 +724,7 @@ char *config_GetUserDir( void )
     return GetDir( true );
 }
 
-static char *config_GetFooDir (libvlc_int_t *p_libvlc, const char *xdg_name,
-                               const char *xdg_default)
+static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
 {
     char *psz_dir;
 #if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
@@ -767,7 +766,7 @@ out:
  */
 char *config_GetConfigDir( libvlc_int_t *p_libvlc )
 {
-    return config_GetFooDir (p_libvlc, "CONFIG", ".config");
+    return config_GetFooDir ("CONFIG", ".config");
 }
 
 /**
@@ -776,7 +775,7 @@ char *config_GetConfigDir( libvlc_int_t *p_libvlc )
  */
 char *config_GetUserDataDir( libvlc_int_t *p_libvlc )
 {
-    return config_GetFooDir (p_libvlc, "DATA", ".local/share");
+    return config_GetFooDir ("DATA", ".local/share");
 }
 
 /**
@@ -785,5 +784,5 @@ char *config_GetUserDataDir( libvlc_int_t *p_libvlc )
  */
 char *config_GetCacheDir( libvlc_int_t *p_libvlc )
 {
-    return config_GetFooDir (p_libvlc, "CACHE", ".cache");
+    return config_GetFooDir ("CACHE", ".cache");
 }
