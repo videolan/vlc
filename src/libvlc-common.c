@@ -722,7 +722,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         return VLC_ENOMEM;
     }
     vlc_mutex_init( &p_libvlc->p_stats->lock );
-    p_libvlc->p_stats_computer = NULL;
+    priv->p_stats_computer = NULL;
 
     /* Init the array that holds every input item */
     ARRAY_INIT( p_libvlc->input_items );

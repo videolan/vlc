@@ -158,11 +158,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
      * the global stats. Check if there is already someone doing this */
     if( p_input->p_libvlc->p_stats && !b_quick )
     {
+        libvlc_priv_t *priv = libvlc_priv (p_input->p_libvlc);
         vlc_mutex_lock( &p_input->p_libvlc->p_stats->lock );
-        if( p_input->p_libvlc->p_stats_computer == NULL )
-        {
-            p_input->p_libvlc->p_stats_computer = p_input;
-        }
+        if( priv->p_stats_computer == NULL )
+            priv->p_stats_computer = p_input;
         vlc_mutex_unlock( &p_input->p_libvlc->p_stats->lock );
     }
 
@@ -779,10 +778,10 @@ static void MainLoop( input_thread_t *p_input )
         {
             stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
             /* Are we the thread responsible for computing global stats ? */
-            if( p_input->p_libvlc->p_stats_computer == p_input )
+            if( libvlc_priv (p_input->p_libvlc)->p_stats_computer == p_input )
             {
                 stats_ComputeGlobalStats( p_input->p_libvlc,
-                                     p_input->p_libvlc->p_stats );
+                                          p_input->p_libvlc->p_stats );
             }
         }
     }
@@ -1345,13 +1344,15 @@ static void End( input_thread_t * p_input )
 #define CL_CO( c ) stats_CounterClean( p_input->p->counters.p_##c ); p_input->p->counters.p_##c = NULL;
         if( libvlc_stats (p_input) )
         {
+            libvlc_priv_t *priv = libvlc_priv (p_input->p_libvlc);
+
             /* make sure we are up to date */
             stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
-            if( p_input->p_libvlc->p_stats_computer == p_input )
+            if( priv->p_stats_computer == p_input )
             {
                 stats_ComputeGlobalStats( p_input->p_libvlc,
                                           p_input->p_libvlc->p_stats );
-                p_input->p_libvlc->p_stats_computer = NULL;
+                priv->p_stats_computer = NULL;
             }
             CL_CO( read_bytes );
             CL_CO( read_packets );

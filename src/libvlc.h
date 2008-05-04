@@ -223,6 +223,9 @@ typedef struct libvlc_priv_t
     int                i_timers;    ///< Number of timers
     bool               b_stats;     ///< Whether to collect stats
 
+    void              *p_stats_computer;  ///< Input thread computing stats
+                                          /// (needs cleanup)
+
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
     vlm_t             *p_vlm;  ///< VLM if created from libvlc-common.c
     vlc_object_t      *p_interaction;    ///< interface interaction object
