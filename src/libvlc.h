@@ -176,6 +176,8 @@ typedef struct libvlc_priv_t
     counter_t        **pp_timers;   ///< Array of all timers
     int                i_timers;    ///< Number of timers
     bool               b_stats;     ///< Whether to collect stats
+
+    module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
 } libvlc_priv_t;
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)

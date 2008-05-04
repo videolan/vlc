@@ -66,8 +66,6 @@ struct libvlc_int_t
     int                    i_verbose;   ///< info messages
     bool             b_color;     ///< color messages?
 
-    module_t *             p_memcpy_module;  ///< Fast memcpy plugin used
-
     /* Structure storing the action name / key associations */
     struct hotkey
     {
