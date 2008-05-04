@@ -813,13 +813,14 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 void PLModel::viewchanged( int meta )
 {
     assert( meta );
+    int _meta = meta;
     if( rootItem )
     {
         int index=-1;
-        while( meta )
+        while( _meta )
         {
             index++;
-            meta >>= 1;
+            _meta >>= 1;
         }
 
         /* UNUSED        emit layoutAboutToBeChanged(); */
