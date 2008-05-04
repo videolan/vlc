@@ -204,7 +204,7 @@ int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
-int __vlc_mutex_init( vlc_mutex_t *p_mutex )
+int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
 #if defined( UNDER_CE )
     InitializeCriticalSection( &p_mutex->csection );
@@ -258,7 +258,7 @@ int __vlc_mutex_init( vlc_mutex_t *p_mutex )
 /*****************************************************************************
  * vlc_mutex_init: initialize a recursive mutex (Do not use)
  *****************************************************************************/
-int __vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
+int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
 #if defined( WIN32 )
     /* Create mutex returns a recursive mutex */
