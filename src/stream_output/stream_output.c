@@ -761,41 +761,6 @@ static void mrl_Clean( mrl_t *p_mrl )
  *  return a pointer on the rest
  *  XXX: psz_chain is modified
  */
-#define SKIPSPACE( p ) { while( *p && ( *p == ' ' || *p == '\t' ) ) p++; }
-#define SKIPTRAILINGSPACE( p, e ) \
-    { while( e > p && ( *(e-1) == ' ' || *(e-1) == '\t' ) ) e--; }
-
-/* go accross " " and { } */
-static char *_get_chain_end( char *str )
-{
-    char c, *p = str;
-
-    SKIPSPACE( p );
-
-    for( ;; )
-    {
-        if( !*p || *p == ',' || *p == '}' ) return p;
-
-        if( *p != '{' && *p != '"' && *p != '\'' )
-        {
-            p++;
-            continue;
-        }
-
-        if( *p == '{' ) c = '}';
-        else c = *p;
-        p++;
-
-        for( ;; )
-        {
-            if( !*p ) return p;
-
-            if( *p == c ) return ++p;
-            else if( *p == '{' && c == '}' ) p = _get_chain_end( p );
-            else p++;
-        }
-    }
-}
 
 /*
  * XXX name and p_cfg are used (-> do NOT free them)
