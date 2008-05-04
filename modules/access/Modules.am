@@ -1,3 +1,4 @@
+SUBDIRS = bda dshow dvb mms cdda rtsp rtmp v4l2 vcd vcdx screen
 # Automake forgets to add a proper tag to libtool with Objective-C files.
 # Moreover Libtool should default tag to CC when none is specified but
 # obviously does not. Here is a fix for that.

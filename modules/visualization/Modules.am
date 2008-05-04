@@ -1,1 +1,2 @@
+SUBDIRS = visual galaktos
 SOURCES_goom = goom.c

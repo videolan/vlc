@@ -1,2 +1,3 @@
+SUBDIRS = beos pda macosx minimal_macosx qnx qt4 skins2 wxwidgets wince
 SOURCES_ncurses = ncurses.c
 SOURCES_fbosd = fbosd.c
