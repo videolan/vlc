@@ -98,6 +98,10 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 set( HAVE_DYNAMIC_PLUGINS ${ENABLE_DYNAMIC_PLUGINS})
 set( LIBEXT ${CMAKE_SHARED_MODULE_SUFFIX})
 
+check_c_source_compiles(
+    "struct __attribute__((__packed__)) foo { int a; } b; int main(){return 0;}"
+    HAVE_ATTRIBUTE_PACKED)
+
 ###########################################################
 # Headers checks
 ###########################################################
