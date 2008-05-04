@@ -109,8 +109,6 @@ struct libvlc_global_data_t
 {
     VLC_COMMON_MEMBERS
 
-    bool             b_ready;     ///< Initialization boolean
-
    /* Object structure data */
     int                    i_counter;   ///< object counter
     int                    i_objects;   ///< Attached objects count

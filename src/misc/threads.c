@@ -151,7 +151,6 @@ int vlc_threads_init( void )
         }
 
         /* We should be safe now. Do all the initialization stuff we want. */
-        p_root->b_ready = false;
         vlc_threadvar_create( p_root, &msg_context_global_key );
     }
     i_initializations++;

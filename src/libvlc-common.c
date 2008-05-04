@@ -158,14 +158,12 @@ libvlc_int_t * libvlc_InternalCreate( void )
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have variables */
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
-    if( !p_libvlc_global->b_ready )
+    if( i_instances == 0 )
     {
         /* Guess what CPU we have */
         cpu_flags = CPUCapabilities();
        /* The module bank will be initialized later */
         p_libvlc_global->p_module_bank = NULL;
-
-        p_libvlc_global->b_ready = true;
     }
 
     /* Allocate a libvlc instance object */
