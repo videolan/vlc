@@ -59,7 +59,7 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 /*****************************************************************************
  * vlc_mutex_init: initialize a recursive mutex (Don't use it)
  *****************************************************************************/
-#define vlc_mutex_init_recursive( P_THIS, P_MUTEX )                         \
+#define vlc_mutex_init_recursive( P_MUTEX )                         \
     __vlc_mutex_init_recursive( P_MUTEX )
 
 /*****************************************************************************

@@ -101,7 +101,7 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
     libvlc_retain( p_libvlc_inst );
     vlc_array_init( &p_em->listeners_groups );
     vlc_mutex_init( &p_em->object_lock );
-    vlc_mutex_init_recursive( p_libvlc_inst->p_libvlc_int, &p_em->event_sending_lock );
+    vlc_mutex_init_recursive( &p_em->event_sending_lock );
     return p_em;
 }
 

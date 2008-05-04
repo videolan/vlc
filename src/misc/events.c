@@ -123,7 +123,7 @@ int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj,
      * This ensures that after libvlc_event_detach, the callback
      * will never gets triggered.
      * */
-    vlc_mutex_init_recursive( p_parent_obj, &p_em->event_sending_lock );
+    vlc_mutex_init_recursive( &p_em->event_sending_lock );
     ARRAY_INIT( p_em->listeners_groups );
     return VLC_SUCCESS;
 }
