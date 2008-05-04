@@ -143,7 +143,7 @@ int vlc_threads_init( void )
     if( i_initializations == 0 )
     {
         p_root = vlc_custom_create( NULL, sizeof( *p_root ),
-                                    VLC_OBJECT_GLOBAL, "global" );
+                                    VLC_OBJECT_GENERIC, "root" );
         if( p_root == NULL )
         {
             i_ret = VLC_ENOMEM;

@@ -143,9 +143,9 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     }
 
     libvlc_global_data_t *p_libvlc_global;
-    if( i_type == VLC_OBJECT_GLOBAL )
+    if( p_this == NULL )
     {
-        /* If i_type is global, then p_new is actually p_libvlc_global */
+        /* Only the global root object is created out of the blue */
         p_libvlc_global = (libvlc_global_data_t *)p_new;
         p_new->p_libvlc = NULL;
 
@@ -379,10 +379,12 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     free( p_this->psz_header );
 
-    if( p_this->i_object_type == VLC_OBJECT_GLOBAL )
+    if( p_this->p_libvlc == NULL )
     {
         libvlc_global_data_t *p_global = (libvlc_global_data_t *)p_this;
 
+#ifndef NDEBUG
+        assert( p_global == vlc_global() );
         /* Test for leaks */
         if( p_global->i_objects > 0 )
         {
@@ -408,6 +410,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
             /* Strongly abort, cause we want these to be fixed */
             abort();
         }
+#endif
 
         /* We are the global object ... no need to lock. */
         free( p_global->pp_objects );
