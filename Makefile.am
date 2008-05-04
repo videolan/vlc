@@ -9,10 +9,18 @@
 #  - libs/* are needed by modules
 EXTRA_SUBDIRS = m4 extras/package/ipkg \
 	bindings/python \
+	libs/loader libs/srtp \
 	projects/mozilla projects/activex
-SUBDIRS = po libs/loader libs/srtp src modules share doc test
 DIST_SUBDIRS = $(SUBDIRS) $(EXTRA_SUBDIRS)
 
+SUBDIRS = po src
+if LOADER
+SUBDIRS += libs/loader
+endif
+if HAVE_LIBGCRYPT
+SUBDIRS += libs/srtp
+endif
+SUBDIRS += modules share doc test
 if BUILD_MOZILLA
 SUBDIRS += projects/mozilla
 endif

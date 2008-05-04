@@ -25,11 +25,9 @@ endif
 noinst_HEADERS = srtp.h
 
 EXTRA_PROGRAMS = srtp
-if HAVE_LIBGCRYPT
 noinst_LTLIBRARIES = libvlc_srtp.la
 check_PROGRAMS = test-aes test-recv
 TESTS = $(check_PROGRAMS)
-endif
 
 libvlc_srtp_la_SOURCES = srtp.c
 srtp_SOURCES = recv.c
