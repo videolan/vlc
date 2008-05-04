@@ -46,7 +46,7 @@ static inline char *strdupnull (const char *src)
 
 static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
-    char *psz_filename = p_obj->p_libvlc->psz_configfile;
+    char *psz_filename = libvlc_priv (p_obj->p_libvlc)->psz_configfile;
     FILE *p_stream;
 
     if( !psz_filename )
@@ -105,7 +105,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 #endif
     else if( p_stream != NULL )
     {
-        p_obj->p_libvlc->psz_configfile = psz_filename;
+        libvlc_priv (p_obj->p_libvlc)->psz_configfile = psz_filename;
     }
 
     return p_stream;
@@ -400,7 +400,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     /* Acquire config file lock */
     vlc_mutex_lock( &priv->config_lock );
 
-    if( p_this->p_libvlc->psz_configfile == NULL )
+    if( libvlc_priv (p_this->p_libvlc)->psz_configfile == NULL )
     {
         const char *psz_configdir = p_this->p_libvlc->psz_configdir;
         if( !psz_configdir ) /* XXX: This should never happen */

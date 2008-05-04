@@ -43,8 +43,6 @@ struct libvlc_int_t
     char *                 psz_datadir;      ///< user's data directory
     char *                 psz_cachedir;     ///< user's cache directory
 
-    char *                 psz_configfile;   ///< location of config file
-
     playlist_t            *p_playlist;       ///< playlist object
 
     void                 *p_stats_computer;  ///< Input thread computing stats (needs cleanup)

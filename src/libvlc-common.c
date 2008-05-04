@@ -304,7 +304,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     p_libvlc->psz_configdir  = config_GetConfigDir( p_libvlc );
     p_libvlc->psz_datadir    = config_GetUserDataDir( p_libvlc );
     p_libvlc->psz_cachedir   = config_GetCacheDir( p_libvlc );
-    p_libvlc->psz_configfile = config_GetCustomConfigFile( p_libvlc );
+    priv->psz_configfile = config_GetCustomConfigFile( p_libvlc );
 
     /* Check for plugins cache options */
     if( config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0 )
@@ -1070,7 +1070,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
     FREENULL( p_libvlc->psz_configdir );
     FREENULL( p_libvlc->psz_datadir );
     FREENULL( p_libvlc->psz_cachedir );
-    FREENULL( p_libvlc->psz_configfile );
+    FREENULL( priv->psz_configfile );
     var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,
                      p_libvlc->p_hotkeys );
     FREENULL( p_libvlc->p_hotkeys );

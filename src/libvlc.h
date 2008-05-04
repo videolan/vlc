@@ -208,7 +208,9 @@ static inline vlc_object_internals_t *vlc_internals( vlc_object_t *obj )
  */
 typedef struct libvlc_priv_t
 {
+    /* Configuration */
     vlc_mutex_t        config_lock; ///< config file lock
+    char *             psz_configfile;   ///< location of config file
 
     /* Messages */
     msg_bank_t         msg_bank;    ///< The message bank
