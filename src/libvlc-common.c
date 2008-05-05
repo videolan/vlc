@@ -248,23 +248,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     system_Init( p_libvlc, &i_argc, ppsz_argv );
 
     /* Get the executable name (similar to the basename command) */
-    if( i_argc > 0 )
+    if( i_argc > 0 && ppsz_argv[0][0] )
     {
-        const char *psz_exe = ppsz_argv[0] + strlen( ppsz_argv[0] );
-        for( ; psz_exe > ppsz_argv[0] ; psz_exe-- )
-        {
-            if( *psz_exe == '/' )
-            {
-                psz_exe++;
-                break;
-            }
-        }
+        free( p_libvlc->psz_object_name );
 
-        if( *psz_exe )
-        {
-            free( p_libvlc->psz_object_name );
-            p_libvlc->psz_object_name = strdup( psz_exe );
-        }
+        const char *psz_exe = strrchr( ppsz_argv[0], '/' );
+        if( psz_exe && *(psz_exe + 1) )
+            p_libvlc->psz_object_name = strdup( psz_exe + 1 );
+        else
+            p_libvlc->psz_object_name = strdup( ppsz_argv[0] );
     }
 
     /*
