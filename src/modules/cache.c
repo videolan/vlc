@@ -106,7 +106,7 @@ void CacheLoad( vlc_object_t *p_this )
     int32_t i_file_size, i_marker;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    psz_cachedir = p_this->p_libvlc->psz_cachedir;
+    psz_cachedir = libvlc_priv(p_this->p_libvlc)->psz_cachedir;
     if( !psz_cachedir ) /* XXX: this should never happen */
     {
         msg_Err( p_this, "Unable to get cache directory" );
@@ -461,7 +461,7 @@ void CacheSave( vlc_object_t *p_this )
     uint32_t i_file_size = 0;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    psz_cachedir = p_this->p_libvlc->psz_cachedir;
+    psz_cachedir = libvlc_priv(p_this->p_libvlc)->psz_cachedir;
     if( !psz_cachedir ) /* XXX: this should never happen */
     {
         msg_Err( p_this, "unable to get cache directory" );

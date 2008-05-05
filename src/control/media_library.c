@@ -23,6 +23,7 @@
  *****************************************************************************/
 #include "libvlc_internal.h"
 #include <vlc/libvlc.h>
+#include "libvlc.h"
 #include "vlc_arrays.h"
 
 /*
@@ -88,7 +89,8 @@ void
 libvlc_media_library_load( libvlc_media_library_t * p_mlib,
                            libvlc_exception_t * p_e )
 {
-    const char *psz_datadir = p_mlib->p_libvlc_instance->p_libvlc_int->psz_datadir;
+    const char *psz_datadir =
+        libvlc_priv (p_mlib->p_libvlc_instance->p_libvlc_int)->psz_datadir;
     char * psz_uri;
 
     if( !psz_datadir ) /* XXX: i doubt that this can ever happen */

@@ -86,14 +86,13 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
                     FILE *p_readme = utf8_fopen( psz_readme, "wt" );
                     if( p_readme )
                     {
-                        fputs( "The VLC media player configuration folder has "
-                               "moved to comply with the XDG Base "
-                               "Directory Specification version 0.6. Your "
-                               "configuration has been copied to the new "
-                               "location (", p_readme );
-                        fputs( p_obj->p_libvlc->psz_configdir, p_readme );
-                        fputs( "). You can delete this directory and "
-                               "all its contents.", p_readme );
+                        fprintf( p_readme, "The VLC media player "
+                                 "configuration folder has moved to comply\n"
+                                 "with the XDG Base Directory Specification "
+                                 "version 0.6. Your\nconfiguration has been "
+                                 "copied to the new location:\n%s\nYou can "
+                                 "delete this directory and all its contents.",
+                                  libvlc_priv(p_obj->p_libvlc)->psz_configdir);
                         fclose( p_readme );
                     }
                     free( psz_readme );
@@ -402,7 +401,8 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
     if( libvlc_priv (p_this->p_libvlc)->psz_configfile == NULL )
     {
-        const char *psz_configdir = p_this->p_libvlc->psz_configdir;
+        const char *psz_configdir =
+            libvlc_priv(p_this->p_libvlc)->psz_configdir;
         if( !psz_configdir ) /* XXX: This should never happen */
         {
             msg_Err( p_this, "no configuration directory defined" );
@@ -672,7 +672,7 @@ char *config_GetConfigFile( libvlc_int_t *p_libvlc )
 {
     char *psz_configfile;
     if( asprintf( &psz_configfile, "%s" DIR_SEP CONFIG_FILE,
-                  p_libvlc->psz_configdir ) == -1 )
+                  libvlc_priv (p_libvlc)->psz_configdir ) == -1 )
         return NULL;
     return psz_configfile;
 }

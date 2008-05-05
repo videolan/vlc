@@ -108,7 +108,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-    const char *psz_datadir = p_playlist->p_libvlc->psz_datadir;
+    const char *psz_datadir = libvlc_priv (p_playlist->p_libvlc)->psz_datadir;
     char *psz_uri = NULL;
     input_item_t *p_input;
 
@@ -188,7 +188,7 @@ error:
 
 int playlist_MLDump( playlist_t *p_playlist )
 {
-    char *psz_datadir = p_playlist->p_libvlc->psz_datadir;
+    char *psz_datadir = libvlc_priv (p_playlist->p_libvlc)->psz_datadir;
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
     if( !psz_datadir ) /* XXX: This should never happen */
     {

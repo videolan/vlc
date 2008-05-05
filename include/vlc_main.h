@@ -39,9 +39,6 @@ struct libvlc_int_t
 
     /* Global properties */
     char *                 psz_homedir;      ///< user's home directory
-    char *                 psz_configdir;    ///< user's configuration directory
-    char *                 psz_datadir;      ///< user's data directory
-    char *                 psz_cachedir;     ///< user's cache directory
 
     playlist_t            *p_playlist;       ///< playlist object
 
