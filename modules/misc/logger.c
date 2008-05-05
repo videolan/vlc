@@ -305,7 +305,8 @@ static void Close( vlc_object_t *p_this )
 
     /* Flush the queue and unsubscribe from the message queue */
     FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
-                p_intf->p_sys->i_mode, p_intf->p_libvlc->i_verbose );
+                p_intf->p_sys->i_mode,
+                var_CreateGetInteger( p_intf, "verbose" ) );
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     switch( p_intf->p_sys->i_mode )
@@ -343,8 +344,8 @@ static void Run( intf_thread_t *p_intf )
     while( !p_intf->b_die )
     {
         FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
-                    p_intf->p_sys->i_mode, p_intf->p_libvlc->i_verbose );
-
+                    p_intf->p_sys->i_mode,
+                    var_CreateGetInteger( p_intf, "verbose" ) );
         if( p_intf->p_sys->p_rrd )
             DoRRD( p_intf );
 
