@@ -25,6 +25,16 @@
 # include "config.h"
 #endif
 
+#if defined( WIN32 )
+#   if !defined( UNDER_CE )
+#       define _WIN32_IE IE5
+#       include <w32api.h>
+#       include <direct.h>
+#       include <shlobj.h>
+#   endif
+#   include <tchar.h>
+#endif
+
 #include <vlc/vlc.h>
 #include "../libvlc.h"
 #include "vlc_keys.h"
@@ -48,12 +58,6 @@
 #endif
 #if defined( HAVE_SYS_TYPES_H )
 #   include <sys/types.h>
-#endif
-#if defined( WIN32 )
-#   if !defined( UNDER_CE )
-#       include <direct.h>
-#   endif
-#include <tchar.h>
 #endif
 
 #include "configuration.h"
@@ -622,46 +626,12 @@ static char *GetDir( bool b_appdata )
     const char *psz_localhome = NULL;
 
 #if defined(WIN32) && !defined(UNDER_CE)
-    typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
-                                               LPWSTR );
-#ifndef CSIDL_FLAG_CREATE
-#   define CSIDL_FLAG_CREATE 0x8000
-#endif
-#ifndef CSIDL_APPDATA
-#   define CSIDL_APPDATA 0x1A
-#endif
-#ifndef CSIDL_PROFILE
-#   define CSIDL_PROFILE 0x28
-#endif
-#ifndef SHGFP_TYPE_CURRENT
-#   define SHGFP_TYPE_CURRENT 0
-#endif
-
-    HINSTANCE shfolder_dll;
-    SHGETFOLDERPATH SHGetFolderPath ;
-
-    /* load the shfolder dll to retrieve SHGetFolderPath */
-    if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
-    {
-        SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
-                                                  _T("SHGetFolderPathW") );
-        if ( SHGetFolderPath != NULL )
-        {
-            wchar_t whomedir[MAX_PATH];
-
-            /* get the "Application Data" folder for the current user */
-            if( S_OK == SHGetFolderPath( NULL,
-                                         (b_appdata ? CSIDL_APPDATA :
-                                           CSIDL_PROFILE) | CSIDL_FLAG_CREATE,
-                                         NULL, SHGFP_TYPE_CURRENT,
-                                         whomedir ) )
-            {
-                FreeLibrary( shfolder_dll );
-                return FromWide( whomedir );
-            }
-        }
-        FreeLibrary( shfolder_dll );
-    }
+    wchar_t whomedir[MAX_PATH];
+    /* Get the "Application Data" folder for the current user */
+    if( S_OK == SHGetFolderPathW( NULL,
+              (b_appdata ? CSIDL_APPDATA : CSIDL_PROFILE) | CSIDL_FLAG_CREATE,
+                                  NULL, SHGFP_TYPE_CURRENT, whomedir ) )
+        return FromWide( whomedir );
 
 #elif defined(UNDER_CE)
     (void)b_appdata;
