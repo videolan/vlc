@@ -675,23 +675,11 @@ char *config_GetHomeDir( void )
     return GetDir( false );
 }
 
-/**
- * Get the user's main data and config directory:
- *   - on windows that's the App Data directory;
- *   - on other OSes it's the same as the home directory.
- */
-char *config_GetUserDir( void ); /* XXX why does gcc wants a declaration ?
-                                  * --funman */
-char *config_GetUserDir( void )
-{
-    return GetDir( true );
-}
-
 static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
 {
     char *psz_dir;
 #if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
-    char *psz_parent = config_GetUserDir();
+    char *psz_parent = GetDir (true);
 
     if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
         psz_dir = NULL;
