@@ -643,13 +643,6 @@ static int OpenClient (vlc_object_t *obj)
 
     p_sys->session.b_handshaked = false;
 
-    const char *homedir = obj->p_libvlc->psz_datadir,
-               *datadir = config_GetDataDir ();
-    size_t l1 = strlen (homedir), l2 = strlen (datadir);
-    char path[((l1 > l2) ? l1 : l2) + sizeof ("/ca-certificates.crt")];
-    //                              > sizeof ("/ssl/private")
-    //                              > sizeof ("/ssl/certs")
-
     i_val = gnutls_certificate_allocate_credentials (&p_sys->x509_cred);
     if (i_val != 0)
     {
@@ -658,22 +651,31 @@ static int OpenClient (vlc_object_t *obj)
         goto error;
     }
 
-    sprintf (path, "%s/ssl", homedir);
-    utf8_mkdir (path, 0755);
+    char *userdir = config_GetUserDataDir ();
+    if (userdir != NULL)
+    {
+        char path[strlen (userdir) + sizeof ("/ssl/private")];
+        sprintf (path, "%s/ssl", userdir);
+        utf8_mkdir (path, 0755);
 
-    sprintf (path, "%s/ssl/certs", homedir);
-    gnutls_Addx509Directory (VLC_OBJECT (p_session),
-                             p_sys->x509_cred, path, false);
+        sprintf (path, "%s/ssl/certs", userdir);
+        gnutls_Addx509Directory (VLC_OBJECT (p_session),
+                                 p_sys->x509_cred, path, false);
+        sprintf (path, "%s/ssl/private", userdir);
+        gnutls_Addx509Directory (VLC_OBJECT (p_session), p_sys->x509_cred,
+                                 path, true);
+        free (userdir);
+    }
 
-    sprintf (path, "%s/ca-certificates.crt", datadir);
-    gnutls_Addx509File (VLC_OBJECT (p_session),
-                        p_sys->x509_cred, path, false);
+    const char *datadir = config_GetDataDir ();
+    {
+        char path[strlen (datadir) + sizeof ("/ca-certificates.crt")];
+        sprintf (path, "%s/ca-certificates.crt", datadir);
+        gnutls_Addx509File (VLC_OBJECT (p_session),
+                            p_sys->x509_cred, path, false);
+    }
     p_session->pf_handshake = gnutls_HandshakeAndValidate;
     /*p_session->pf_handshake = gnutls_ContinueHandshake;*/
-
-    sprintf (path, "%s/ssl/private", homedir);
-    gnutls_Addx509Directory (VLC_OBJECT (p_session), p_sys->x509_cred,
-                             path, true);
 
     i_val = gnutls_init (&p_sys->session.session, GNUTLS_CLIENT);
     if (i_val != 0)

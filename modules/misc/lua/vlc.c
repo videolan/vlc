@@ -164,12 +164,16 @@ int vlclua_homedir( lua_State *L )
 }
 int vlclua_configdir( lua_State *L )
 {
-    lua_pushstring( L, vlclua_get_this( L )->p_libvlc->psz_configdir );
+    char *dir = config_GetConfigDir();
+    lua_pushstring( L, dir );
+    free( dir );
     return 1;
 }
 int vlclua_cachedir( lua_State *L )
 {
-    lua_pushstring( L, vlclua_get_this( L )->p_libvlc->psz_cachedir );
+    char *dir = config_GetCacheDir();
+    lua_pushstring( L, dir );
+    free( dir );
     return 1;
 }
 int vlclua_datadir_list( lua_State *L )
@@ -400,9 +404,17 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
                      char **ppsz_dir_list )
 {
     int i = 0;
-    if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
-                   p_this->p_libvlc->psz_datadir, luadirname ) < 0 )
+    char *datadir = config_GetUserDataDir();
+    if( datadir == NULL )
         return VLC_ENOMEM;
+
+    if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
+                   datadir, luadirname ) < 0 )
+    {
+        free( datadir );
+        return VLC_ENOMEM;
+    }
+    free( datadir );
     i++;
 
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
