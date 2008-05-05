@@ -164,7 +164,7 @@ int vlclua_homedir( lua_State *L )
 }
 int vlclua_configdir( lua_State *L )
 {
-    char *dir = config_GetConfigDir();
+    char *dir = config_GetUserConfDir();
     lua_pushstring( L, dir );
     free( dir );
     return 1;

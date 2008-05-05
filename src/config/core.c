@@ -714,7 +714,7 @@ out:
 /**
  * Get the user's VLC configuration directory
  */
-char *config_GetConfigDir( void )
+char *config_GetUserConfDir( void )
 {
     return config_GetFooDir ("CONFIG", ".config");
 }
