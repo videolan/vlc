@@ -165,7 +165,6 @@ src/modules/modules.c
 src/modules/modules.h
 src/modules/os.c
 src/network/acl.c
-src/network/error.c
 src/network/getaddrinfo.c
 src/network/httpd.c
 src/network/io.c
