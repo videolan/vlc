@@ -196,9 +196,8 @@ int playlist_MLDump( playlist_t *p_playlist )
         return VLC_EGENERIC;
     }
 
-    char psz_dirname[ strlen( psz_datadir )
-                      + sizeof( DIR_SEP "ml.xspf")];
-    sprintf( psz_dirname, "%s", psz_datadir );
+    char psz_dirname[ strlen( psz_datadir ) + sizeof( DIR_SEP "ml.xspf")];
+    strcpy( psz_dirname, psz_datadir );
     if( config_CreateDir( (vlc_object_t *)p_playlist, psz_dirname ) )
     {
         return VLC_EGENERIC;
