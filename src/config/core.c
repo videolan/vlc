@@ -740,7 +740,8 @@ static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
 
     /* XDG Base Directory Specification - Version 0.6 */
     snprintf (var, sizeof (var), "XDG_%s_HOME", xdg_name);
-    psz_env = FromLocaleDup (getenv (var));
+    char *psz_home = getenv( var );
+    psz_env = psz_home ? FromLocaleDup( psz_home ) : NULL;
     if( psz_env )
     {
         if( asprintf( &psz_dir, "%s/vlc", psz_env ) == -1 )
@@ -748,7 +749,8 @@ static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
         goto out;
     }
 
-    psz_env = FromLocaleDup (getenv ("HOME"));
+    psz_home = getenv( "HOME" );
+    psz_env = psz_home ? FromLocaleDup( psz_home ) : NULL;
     /* not part of XDG spec but we want a sensible fallback */
     if( !psz_env )
         psz_env = config_GetHomeDir();
