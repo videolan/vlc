@@ -115,7 +115,7 @@ static inline vlc_meta_t *vlc_meta_New( void )
 static inline void vlc_meta_Delete( vlc_meta_t *m )
 {
     int i;
-    for( i = 0; i < 0; i++ )
+    for( i = 0; i < VLC_META_TYPE_COUNT ; i++ )
         free( m->ppsz_meta[i] );
     vlc_dictionary_clear( &m->extra_tags );
     free( m );
