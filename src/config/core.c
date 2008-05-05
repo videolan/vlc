@@ -699,29 +699,26 @@ static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
     free (psz_parent);
     (void)xdg_name; (void)xdg_default;
 #else
-    char var[sizeof ("XDG__HOME") + strlen (xdg_name)], *psz_env;
+    char var[sizeof ("XDG__HOME") + strlen (xdg_name)];
 
     /* XDG Base Directory Specification - Version 0.6 */
     snprintf (var, sizeof (var), "XDG_%s_HOME", xdg_name);
     char *psz_home = getenv( var );
-    psz_env = psz_home ? FromLocaleDup( psz_home ) : NULL;
-    if( psz_env )
+    psz_home = psz_home ? FromLocaleDup( psz_home ) : NULL;
+    if( psz_home )
     {
-        if( asprintf( &psz_dir, "%s/vlc", psz_env ) == -1 )
+        if( asprintf( &psz_dir, "%s/vlc", psz_home ) == -1 )
             psz_dir = NULL;
         goto out;
     }
 
-    psz_home = getenv( "HOME" );
-    psz_env = psz_home ? FromLocaleDup( psz_home ) : NULL;
-    /* not part of XDG spec but we want a sensible fallback */
-    if( !psz_env )
-        psz_env = config_GetHomeDir();
-    if( asprintf( &psz_dir, "%s/%s/vlc", psz_env, xdg_default ) == -1 )
+    /* Try HOME, then fallback to non-XDG dirs */
+    psz_home = config_GetHomeDir();
+    if( asprintf( &psz_dir, "%s/%s/vlc", psz_home, xdg_default ) == -1 )
         psz_dir = NULL;
 
 out:
-    free (psz_env);
+    free (psz_home);
 #endif
     return psz_dir;
 }
