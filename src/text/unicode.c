@@ -165,6 +165,8 @@ static char *locale_fast (const char *string, bool from)
 
 static inline char *locale_dup (const char *string, bool from)
 {
+    assert( string );
+
 #if defined (USE_ICONV)
     if (find_charset ())
         return strdup (string);
