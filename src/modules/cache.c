@@ -265,6 +265,7 @@ void CacheLoad( vlc_object_t *p_this )
         pp_cache[i]->p_module = vlc_module_create( p_this );
 
         /* Load additional infos */
+        free( pp_cache[i]->p_module->psz_object_name );
         LOAD_STRING( pp_cache[i]->p_module->psz_object_name );
         LOAD_STRING( pp_cache[i]->p_module->psz_shortname );
         LOAD_STRING( pp_cache[i]->p_module->psz_longname );

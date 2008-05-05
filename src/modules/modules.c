@@ -1312,7 +1312,6 @@ static void DupModule( module_t *p_module )
 
     /* We strdup() these entries so that they are still valid when the
      * module is unloaded. */
-    p_module->psz_object_name = strdup( p_module->psz_object_name );
     p_module->psz_capability = strdup( p_module->psz_capability );
     p_module->psz_shortname = p_module->psz_shortname ?
                                  strdup( p_module->psz_shortname ) : NULL;
