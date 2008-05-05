@@ -39,8 +39,8 @@
 #    include <unistd.h>                                          /* getuid() */
 #endif
 
-#if defined(HAVE_GETPWUID)
-#   include <pwd.h>                                            /* getpwuid() */
+#if defined(HAVE_GETPWUID_R)
+#   include <pwd.h>
 #endif
 
 #if defined( HAVE_SYS_STAT_H )
@@ -617,13 +617,6 @@ const char *config_GetDataDir( void )
 #endif
 }
 
-/*****************************************************************************
- * config_GetHomeDir, config_GetUserDir: find the user's home directory.
- *****************************************************************************
- * This function will try by different ways to find the user's home path.
- * Note that this function is not reentrant, it should be called only once
- * at the beginning of main where the result will be stored for later use.
- *****************************************************************************/
 static char *GetDir( bool b_appdata )
 {
     const char *psz_localhome = NULL;
@@ -671,7 +664,7 @@ static char *GetDir( bool b_appdata )
     }
 
 #elif defined(UNDER_CE)
-
+    (void)b_appdata;
 #ifndef CSIDL_APPDATA
 #   define CSIDL_APPDATA 0x1A
 #endif
@@ -681,25 +674,25 @@ static char *GetDir( bool b_appdata )
     /* get the "Application Data" folder for the current user */
     if( SHGetSpecialFolderPath( NULL, whomedir, CSIDL_APPDATA, 1 ) )
         return FromWide( whomedir );
+#else
+    (void)b_appdata;
 #endif
 
     psz_localhome = getenv( "HOME" );
+#if defined(HAVE_GETPWUID_R)
+    char buf[sysconf (_SC_GETPW_R_SIZE_MAX)];
     if( psz_localhome == NULL )
     {
-#if defined(HAVE_GETPWUID)
-        struct passwd *p_pw;
-        (void)b_appdata;
+        struct passwd pw, *res;
 
-        if( ( p_pw = getpwuid( getuid() ) ) != NULL )
-            psz_localhome = p_pw->pw_dir;
-        else
-#endif
-        {
-            psz_localhome = getenv( "TMP" );
-            if( psz_localhome == NULL )
-                psz_localhome = "/tmp";
-        }
+        if (!getpwuid_r (getuid (), &pw, buf, sizeof (buf), &res) && res)
+            psz_localhome = pw.pw_dir;
     }
+#endif
+    if (psz_localhome == NULL)
+        psz_localhome = getenv( "TMP" );
+    if (psz_localhome == NULL)
+        psz_localhome = "/tmp";
 
     return FromLocaleDup( psz_localhome );
 }
