@@ -107,6 +107,7 @@ int E_(OpenAccess)( vlc_object_t *p_this )
     p_access->p_sys = NULL;
 
     /* Force dummy demux plug-in */
+    free( p_access->psz_demux );
     p_access->psz_demux = strdup( "vlc" );
 
     return VLC_SUCCESS;
