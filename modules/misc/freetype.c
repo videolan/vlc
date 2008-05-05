@@ -280,7 +280,6 @@ static int Create( vlc_object_t *p_this )
     char          *psz_fontfile = NULL;
     int            i_error;
     vlc_value_t    val;
-    vlc_mutex_t   *lock;
     vlc_object_t  *p_fontbuilder;
 
     /* Allocate structure */
@@ -368,7 +367,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_fontconfig    = NULL;
 
     /* Check for an existing Fontbuilder thread */
-    lock = var_AcquireMutex( "fontbuilder" );
+    vlc_mutex_t *lock = var_AcquireMutex( "fontbuilder" );
     p_fontbuilder = vlc_object_find_name( p_filter->p_libvlc,
                                           "fontlist builder",
                                           FIND_CHILD );
