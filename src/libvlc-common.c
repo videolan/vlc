@@ -720,8 +720,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     priv->p_stats_computer = NULL;
 
     /* Init the array that holds every input item */
-    ARRAY_INIT( p_libvlc->input_items );
-    p_libvlc->i_last_input_id = 0;
+    ARRAY_INIT( priv->input_items );
+    priv->i_last_input_id = 0;
 
     /*
      * Initialize hotkey handling
@@ -1003,13 +1003,13 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 #endif
 
     bool b_clean = true;
-    FOREACH_ARRAY( input_item_t *p_del, p_libvlc->input_items )
+    FOREACH_ARRAY( input_item_t *p_del, priv->input_items )
         msg_Err( p_libvlc, "input item %p has not been deleted properly: refcount %d, name %s",
             p_del, p_del->i_gc_refcount, p_del->psz_name ? p_del->psz_name : "(null)" );
         b_clean = false;
     FOREACH_END();
     assert( b_clean );
-    ARRAY_RESET( p_libvlc->input_items );
+    ARRAY_RESET( priv->input_items );
 
     msg_Dbg( p_libvlc, "removing stats" );
     vlc_mutex_destroy( &p_libvlc->p_stats->lock );

@@ -47,10 +47,6 @@ struct libvlc_int_t
 
     global_stats_t       *p_stats;           ///< Global statistics
 
-    /* There is no real reason to keep a list of items, but not to break
-     * everything, let's keep it */
-    input_item_array_t    input_items;       ///< Array of all created input items
-    int                   i_last_input_id ;  ///< Last id of input item
 
     /* Structure storing the action name / key associations */
     struct hotkey

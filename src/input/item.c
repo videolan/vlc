@@ -183,6 +183,7 @@ char *input_ItemGetInfo( input_item_t *p_i,
 static void input_ItemDestroy ( gc_object_t *p_this )
 {
     vlc_object_t *p_obj = (vlc_object_t *)p_this->p_destructor_arg;
+    libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
     input_item_t *p_input = (input_item_t *) p_this;
     int i;
 
@@ -190,9 +191,9 @@ static void input_ItemDestroy ( gc_object_t *p_this )
 
     vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
 
-    ARRAY_BSEARCH( p_obj->p_libvlc->input_items,->i_id, int, p_input->i_id, i);
+    ARRAY_BSEARCH( priv->input_items,->i_id, int, p_input->i_id, i);
     if( i != -1 )
-        ARRAY_REMOVE( p_obj->p_libvlc->input_items, i);
+        ARRAY_REMOVE( priv->input_items, i);
 
     vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
 
@@ -301,14 +302,15 @@ int input_ItemAddInfo( input_item_t *p_i,
 
 input_item_t *__input_ItemGetById( vlc_object_t *p_obj, int i_id )
 {
+    libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
     input_item_t * p_ret = NULL;
     int i;
 
     vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
 
-    ARRAY_BSEARCH( p_obj->p_libvlc->input_items, ->i_id, int, i_id, i);
+    ARRAY_BSEARCH( priv->input_items, ->i_id, int, i_id, i);
     if( i != -1 )
-        p_ret = ARRAY_VAL( p_obj->p_libvlc->input_items, i);
+        p_ret = ARRAY_VAL( priv->input_items, i);
 
     vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
 
@@ -334,14 +336,16 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                 mtime_t i_duration,
                                 int i_type )
 {
+    libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
+
     DECMALLOC_NULL( p_input, input_item_t );
 
     input_ItemInit( p_obj, p_input );
     vlc_gc_init( p_input, input_ItemDestroy, (void *)p_obj );
 
     vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
-    p_input->i_id = ++p_obj->p_libvlc->i_last_input_id;
-    ARRAY_APPEND( p_obj->p_libvlc->input_items, p_input );
+    p_input->i_id = ++priv->i_last_input_id;
+    ARRAY_APPEND( priv->input_items, p_input );
     vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
 
     p_input->b_fixed_name = false;
