@@ -1152,14 +1152,11 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args,
             i_state = 0;
     }
 
-    var_Get( p_playlist, "random", &val );
-    i_random = val.i_int;
+    i_random = var_CreateGetBool( p_playlist, "random" );
 
-    var_Get( p_playlist, "repeat", &val );
-    i_repeat = val.i_int;
+    i_repeat = var_CreateGetBool( p_playlist, "repeat" );
 
-    var_Get( p_playlist, "loop", &val );
-    i_loop = val.i_int;
+    i_loop = var_CreateGetBool( p_playlist, "loop" );
 
     if( lock )
         PL_UNLOCK;
