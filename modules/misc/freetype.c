@@ -1293,6 +1293,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
             glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
         if( line.xMax > (int)p_filter->fmt_out.video.i_visible_width - 20 )
         {
+            FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
             p_line->pp_glyphs[ i ] = NULL;
             FreeLine( p_line );
             p_line = NewLine( strlen( psz_string ));
