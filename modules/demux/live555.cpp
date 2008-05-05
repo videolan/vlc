@@ -386,6 +386,7 @@ error:
         live_track_t *tk = p_sys->track[i];
 
         if( tk->b_muxed ) stream_DemuxDelete( tk->p_out_muxed );
+        es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
     }
@@ -427,6 +428,7 @@ static void Close( vlc_object_t *p_this )
         live_track_t *tk = p_sys->track[i];
 
         if( tk->b_muxed ) stream_DemuxDelete( tk->p_out_muxed );
+        es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
     }
@@ -981,6 +983,7 @@ static int SessionsSetup( demux_t *p_demux )
             {
                 /* BUG ??? */
                 msg_Err( p_demux, "unusable RTSP track. this should not happen" );
+                es_format_Clean( &tk->fmt );
                 free( tk );
             }
         }
@@ -1481,6 +1484,7 @@ static int RollOverTcp( demux_t *p_demux )
         live_track_t *tk = p_sys->track[i];
 
         if( tk->b_muxed ) stream_DemuxDelete( tk->p_out_muxed );
+        es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
     }
