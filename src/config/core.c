@@ -621,6 +621,30 @@ const char *config_GetDataDir( void )
 #endif
 }
 
+/**
+ * Determines the system configuration directory.
+ *
+ * @return a string (always succeeds).
+ */
+const char *config_GetConfDir( void )
+{
+#if defined (WIN32) || defined (UNDER_CE)
+    return vlc_global()->psz_vlcpath;
+#elif defined(__APPLE__) || defined (SYS_BEOS)
+    static char path[PATH_MAX] = "";
+
+    if( *path == '\0' )
+    {
+        snprintf( path, sizeof( path ), "%s/share", /* FIXME: Duh? */
+                  vlc_global()->psz_vlcpath );
+        path[sizeof( path ) - 1] = '\0';
+    }
+    return path;
+#else
+    return SYSCONFDIR;
+#endif
+}
+
 static char *GetDir( bool b_appdata )
 {
     const char *psz_localhome = NULL;

@@ -172,6 +172,7 @@ libvlc_la_SOURCES = $(SOURCES_libvlc)
 nodist_libvlc_la_SOURCES = misc/revision.c
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DLOCALEDIR=\"$(localedir)\" \
+	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DDATA_PATH=\"$(pkgdatadir)\" \
 	-DPLUGIN_PATH=\"$(pkglibdir)\"
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
