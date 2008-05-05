@@ -912,7 +912,7 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, false );
+    UpdateCaps( p_intf, true );
 
     if( !p_sys->b_meta_read && newval.i_int == PLAYING_S )
     {
