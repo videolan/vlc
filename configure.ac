@@ -637,6 +637,9 @@ AC_CHECK_LIB(m,ceil,[
 AC_CHECK_LIB(m,exp,[
   VLC_ADD_LIBS([gaussianblur],[-lm])
 ])
+AC_CHECK_LIB(m,round,[
+  VLC_ADD_LIBS([dbus],[-lm])
+])
 AC_CHECK_LIB(mx,sqrtf,[
   VLC_ADD_LIBS([x264],[-lmx])
 ])

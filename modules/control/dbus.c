@@ -54,6 +54,8 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 
+#include <math.h>
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -221,7 +223,8 @@ DBUS_METHOD( VolumeGet )
     audio_volume_t i_vol;
     /* 2nd argument of aout_VolumeGet is int32 */
     aout_VolumeGet( (vlc_object_t*) p_this, &i_vol );
-    i_dbus_vol = ( 100 * i_vol ) / AOUT_VOLUME_MAX;
+    double f_vol = 100. * i_vol / AOUT_VOLUME_MAX;
+    i_dbus_vol = round( f_vol );
     ADD_INT32( &i_dbus_vol );
     REPLY_SEND;
 }
@@ -248,7 +251,8 @@ DBUS_METHOD( VolumeSet )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    i_vol = ( AOUT_VOLUME_MAX / 100 ) *i_dbus_vol;
+    double f_vol = AOUT_VOLUME_MAX * i_dbus_vol / 100.;
+    i_vol = round( f_vol );
     aout_VolumeSet( (vlc_object_t*) p_this, i_vol );
 
     REPLY_SEND;
