@@ -50,11 +50,14 @@ config_ChainDestroy
 __config_ChainParse
 __config_ExistIntf
 config_FindConfig
+config_GetCacheDir
+config_GetConfigDir
 config_GetDataDir
 __config_GetFloat
 __config_GetInt
 __config_GetPsz
 __config_GetType
+config_GetUserDataDir
 __config_PutFloat
 __config_PutInt
 __config_PutPsz

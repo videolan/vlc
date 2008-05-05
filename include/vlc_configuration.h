@@ -215,6 +215,9 @@ VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) );
 
 VLC_EXPORT(const char *, config_GetDataDir, ( void ));
+VLC_EXPORT(char *, config_GetConfigDir, ( void ) );
+VLC_EXPORT(char *, config_GetUserDataDir, ( void ) );
+VLC_EXPORT(char *, config_GetCacheDir, ( void ) );
 
 VLC_EXPORT( void,       __config_AddIntf,    ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void,       __config_RemoveIntf, ( vlc_object_t *, const char * ) );
