@@ -1079,7 +1079,7 @@ static int GetInputMeta( input_item_t* p_input,
     "title", "artist", "genre", "copyright", "album", "tracknum",
     "description", "rating", "date", "setting", "url", "language",
     "nowplaying", "publisher", "encodedby", "arturl", "trackid",
-    "status", "URI", "length", "video-codec", "audio-codec",
+    "status", "location", "length", "video-codec", "audio-codec",
     "video-bitrate", "audio-bitrate", "audio-samplerate"
     };
 
