@@ -183,7 +183,8 @@ void vlc_threads_end( void )
 #endif
 
     assert( i_initializations > 0 );
-    if( i_initializations == 0 )
+
+    if( i_initializations == 1 )
         vlc_object_release( p_root );
     i_initializations--;
 
