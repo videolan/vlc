@@ -292,6 +292,7 @@ void CacheLoad( vlc_object_t *p_this )
         while( i_submodules-- )
         {
             module_t *p_module = vlc_submodule_create( pp_cache[i]->p_module );
+            free( p_module->psz_object_name );
             LOAD_STRING( p_module->psz_object_name );
             LOAD_STRING( p_module->psz_shortname );
             LOAD_STRING( p_module->psz_longname );
