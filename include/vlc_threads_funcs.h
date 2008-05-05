@@ -443,7 +443,7 @@ typedef vlc_mutex_t vlc_spinlock_t;
 
 static inline int vlc_spin_init (vlc_spinlock_t *spin)
 {
-    return __vlc_mutex_init (spin);
+    return vlc_mutex_init (spin);
 }
 
 # define vlc_spin_lock    vlc_mutex_lock
