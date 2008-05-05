@@ -1194,8 +1194,6 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_object_release( httpd );
     if( httpd->i_host <= 0 )
     {
-        vlc_value_t ptrval;
-
         msg_Dbg( httpd, "no host left, stopping httpd" );
 
         libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
