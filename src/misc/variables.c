@@ -53,7 +53,13 @@ static int CmpTime( vlc_value_t v, vlc_value_t w )
 {
     return v.i_time == w.i_time ? 0 : v.i_time > w.i_time ? 1 : -1;
 }
-static int CmpString( vlc_value_t v, vlc_value_t w ) { return strcmp( v.psz_string, w.psz_string ); }
+static int CmpString( vlc_value_t v, vlc_value_t w )
+{
+    if( !v.psz_string )
+        return !w.psz_string ? 0 : -1;
+    else
+        return !w.psz_string ? 1 : strcmp( v.psz_string, w.psz_string );
+}
 static int CmpFloat( vlc_value_t v, vlc_value_t w ) { return v.f_float == w.f_float ? 0 : v.f_float > w.f_float ? 1 : -1; }
 static int CmpAddress( vlc_value_t v, vlc_value_t w ) { return v.p_address == w.p_address ? 0 : v.p_address > w.p_address ? 1 : -1; }
 
@@ -61,7 +67,7 @@ static int CmpAddress( vlc_value_t v, vlc_value_t w ) { return v.p_address == w.
  * Local duplication functions, and local deallocation functions
  *****************************************************************************/
 static void DupDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
-static void DupString( vlc_value_t *p_val ) { p_val->psz_string = strdup( p_val->psz_string ); }
+static void DupString( vlc_value_t *p_val ) { if( p_val->psz_string ) p_val->psz_string = strdup( p_val->psz_string ); }
 
 static void DupList( vlc_value_t *p_val )
 {
@@ -247,7 +253,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             p_var->pf_cmp = CmpString;
             p_var->pf_dup = DupString;
             p_var->pf_free = FreeString;
-            p_var->val.psz_string = strdup( "" );
+            p_var->val.psz_string = NULL;
             break;
         case VLC_VAR_FLOAT:
             p_var->pf_cmp = CmpFloat;
