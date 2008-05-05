@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "libvlc_internal.h"
+#include "../libvlc.h"
 #include <vlc/libvlc.h>
 
 struct libvlc_log_t
@@ -43,7 +44,8 @@ unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance, libvlc_e
 {
     if( p_instance )
     {
-        return p_instance->p_libvlc_int->i_verbose;
+        libvlc_priv_t *p_priv = libvlc_priv( p_instance->p_libvlc_int );
+        return p_priv->i_verbose;
     }
     RAISEZERO("Invalid VLC instance!");
 }
@@ -52,7 +54,8 @@ void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level, li
 {
     if( p_instance )
     {
-        p_instance->p_libvlc_int->i_verbose = level;
+        libvlc_priv_t *p_priv = libvlc_priv( p_instance->p_libvlc_int );
+        p_priv->i_verbose = level;
     }
     else
         RAISEVOID("Invalid VLC instance!");
