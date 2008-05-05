@@ -1752,7 +1752,7 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
     {
         p_block = p_access->pf_block( p_access );
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
-        if( p_input && p_block && libvlc_stats (p_access) )
+        if( p_input && p_block && libvlc_stats (VLC_OBJECT(p_access)) )
         {
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
             stats_UpdateInteger( s, p_input->p->counters.p_read_bytes,
