@@ -96,7 +96,7 @@ static char * CacheName        ( void );
  *****************************************************************************/
 void CacheLoad( vlc_object_t *p_this )
 {
-    char *psz_filename, *psz_cachedir;
+    char *psz_filename, *psz_cachedir = config_GetCacheDir();
     FILE *file;
     int i, j, i_size, i_read;
     char p_cachestring[sizeof("cache " COPYRIGHT_MESSAGE)];
@@ -106,7 +106,6 @@ void CacheLoad( vlc_object_t *p_this )
     int32_t i_file_size, i_marker;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    psz_cachedir = libvlc_priv(p_this->p_libvlc)->psz_cachedir;
     if( !psz_cachedir ) /* XXX: this should never happen */
     {
         msg_Err( p_this, "Unable to get cache directory" );
@@ -115,9 +114,9 @@ void CacheLoad( vlc_object_t *p_this )
 
     i_size = asprintf( &psz_filename, "%s"DIR_SEP"%s",
                        psz_cachedir, CacheName() );
+    free( psz_cachedir );
     if( i_size <= 0 )
     {
-        msg_Err( p_this, "out of memory" );
         return;
     }
 
@@ -454,14 +453,13 @@ void CacheSave( vlc_object_t *p_this )
         "# For information about cache directory tags, see:\r\n"
         "#   http://www.brynosaurus.com/cachedir/\r\n";
 
-    char *psz_cachedir;
+    char *psz_cachedir = config_GetCacheDir();
     FILE *file;
     int i, j, i_cache;
     module_cache_t **pp_cache;
     uint32_t i_file_size = 0;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    psz_cachedir = libvlc_priv(p_this->p_libvlc)->psz_cachedir;
     if( !psz_cachedir ) /* XXX: this should never happen */
     {
         msg_Err( p_this, "unable to get cache directory" );
@@ -483,6 +481,7 @@ void CacheSave( vlc_object_t *p_this )
 
     snprintf( psz_filename, sizeof( psz_filename ),
               "%s"DIR_SEP"%s", psz_cachedir, CacheName() );
+    free( psz_cachedir );
     msg_Dbg( p_this, "writing plugins cache %s", psz_filename );
 
     file = utf8_fopen( psz_filename, "wb" );

@@ -213,7 +213,6 @@ typedef struct libvlc_priv_t
     char *             psz_configfile;   ///< location of config file
     char              *psz_configdir;    ///< user configuration directory
     char              *psz_datadir;      ///< user data directory
-    char              *psz_cachedir; ///< user cache directory
 
     /* There is no real reason to keep a list of items, but not to break
      * everything, let's keep it */

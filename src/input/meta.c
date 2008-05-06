@@ -239,15 +239,15 @@ static void __ArtCacheGetDirPath( vlc_object_t *p_obj,
                                   const char *psz_title,
                                   const char *psz_artist, const char *psz_album )
 {
+   char *psz_cachedir = config_GetCacheDir();
+
     if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
         char * psz_album_sanitized = ArtCacheGetSanitizedFileName( psz_album );
         char * psz_artist_sanitized = ArtCacheGetSanitizedFileName( psz_artist );
-
         snprintf( psz_dir, PATH_MAX, "%s" DIR_SEP
                   "art" DIR_SEP "artistalbum" DIR_SEP "%s" DIR_SEP "%s",
-                      libvlc_priv (p_obj->p_libvlc)->psz_cachedir,
-                      psz_artist_sanitized, psz_album_sanitized );
+                  psz_cachedir, psz_artist_sanitized, psz_album_sanitized );
         free( psz_album_sanitized );
         free( psz_artist_sanitized );
     }
@@ -256,10 +256,10 @@ static void __ArtCacheGetDirPath( vlc_object_t *p_obj,
         char * psz_title_sanitized = ArtCacheGetSanitizedFileName( psz_title );
         snprintf( psz_dir, PATH_MAX, "%s" DIR_SEP
                   "art" DIR_SEP "title" DIR_SEP "%s",
-                  libvlc_priv (p_obj->p_libvlc)->psz_cachedir,
-                  psz_title_sanitized );
+                  psz_cachedir, psz_title_sanitized );
         free( psz_title_sanitized );
     }
+    free( psz_cachedir );
 }
 
 
