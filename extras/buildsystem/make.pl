@@ -45,8 +45,15 @@ while(<STDIN>)
 	$line =~ /^rm\s-fr\s(.*)/ ||
 	$line =~ /^mv\s-f\s(.*)/ ||
 	$line =~ /^ln\s-s\s(.*)/ ||
+	$line =~ /^echo\s/ ||
+	$line =~ /^mkdir\s/ ||
+	$line =~ /^cat\s/ ||
+	$line =~ /^grep\s/ ||
+	$line =~ /^cd\s/ ||
+	$line =~ /^sed\s/ ||
+	$line =~ /^bindir=\s/ ||
 	$line =~ /^creating lib.*/ ||
-        $line =~ /^\// )
+        $line =~ /^\s*\// )
      {}
      # Info
      elsif(
