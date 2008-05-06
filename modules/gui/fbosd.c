@@ -803,6 +803,7 @@ static int RenderPicture( intf_thread_t *p_intf, int i_x_offset, int i_y_offset,
                           picture_t *p_src, picture_t *p_dest )
 {
     int i;
+    VLC_UNUSED( p_intf );
 
     if( !p_dest && !p_src ) return VLC_EGENERIC;
 
