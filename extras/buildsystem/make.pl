@@ -36,14 +36,17 @@ while(<STDIN>)
         $line =~ /^touch.*/ ||
         $line =~ /^srcdir=.*/ ||
         $line =~ /^.* (lib[A-z0-9-_]*plugin.so).*/ ||
-	$line =~ /^\sgcc\s-std=.*/ ||
-    $line =~ /^\sgcc\s-mmacosx.*/ ||
-    $line =~ /^\sg\+\+\s.*/ ||
+	$line =~ /^\s*gcc\s-std=.*/ ||
+        $line =~ /^\sgcc\s-mmacosx.*/ ||
+        $line =~ /^\sg\+\+\s.*/ ||
 #    $line =~ /^.*moc.*/ ||
 	$line =~ /^.*libtool.*\-o\s(lib.*\.la).*/ ||
         $line =~ /^.*rm\s\-f\s(.*)/ ||
 	$line =~ /^rm\s-fr\s(.*)/ ||
-	$line =~ /^creating lib.*/ )
+	$line =~ /^mv\s-f\s(.*)/ ||
+	$line =~ /^ln\s-s\s(.*)/ ||
+	$line =~ /^creating lib.*/ ||
+        $line =~ /^\// )
      {}
      # Info
      elsif(
