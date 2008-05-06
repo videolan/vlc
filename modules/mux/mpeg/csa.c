@@ -281,7 +281,7 @@ static void csa_ComputeKey( uint8_t kk[57], uint8_t ck[8] )
     int i,j,k;
     int bit[64];
     int newbit[64];
-    int kb[9][8];
+    int kb[8][9];
 
     /* from a cw create 56 key bytes, here kk[1..56] */
 
