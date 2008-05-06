@@ -634,7 +634,7 @@ VLC.app: vlc
 		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
-	find modules/ -name '*_plugin.$(LIBEXT)' | while read i; do \
+	find modules/ -name '*_plugin$(LIBEXT)' | while read i; do \
 	  if test -n "$$i" ; \
 	   then ln -sfn "`pwd`/$$i" \
 				   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
