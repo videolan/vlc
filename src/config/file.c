@@ -44,6 +44,20 @@ static inline char *strdupnull (const char *src)
     return src ? strdup (src) : NULL;
 }
 
+/**
+ * Get the user's configuration file
+ */
+static char *config_GetConfigFile( void )
+{
+    char *psz_dir = config_GetUserConfDir();
+    char *psz_configfile;
+
+    if( asprintf( &psz_configfile, "%s" DIR_SEP CONFIG_FILE, psz_dir ) == -1 )
+        psz_configfile = NULL;
+    free( psz_dir );
+    return psz_configfile;
+}
+
 static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
     char *psz_filename = libvlc_priv (p_obj->p_libvlc)->psz_configfile;
@@ -51,7 +65,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 
     if( !psz_filename )
     {
-        psz_filename = config_GetConfigFile( p_obj->p_libvlc );
+        psz_filename = config_GetConfigFile();
     }
 
     msg_Dbg( p_obj, "opening config file (%s)", psz_filename );
@@ -663,20 +677,6 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
 int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     return SaveConfigFile( p_this, psz_module_name, false );
-}
-
-/**
- * Get the user's configuration file
- */
-char *config_GetConfigFile( libvlc_int_t *p_libvlc )
-{
-    char *psz_dir = config_GetUserConfDir();
-    char *psz_configfile;
-
-    if( asprintf( &psz_configfile, "%s" DIR_SEP CONFIG_FILE, psz_dir ) == -1 )
-        psz_configfile = NULL;
-    free( psz_dir );
-    return psz_configfile;
 }
 
 /**
