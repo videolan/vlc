@@ -50,7 +50,8 @@
 #include <vlc_osd.h>
 #include <vlc_strings.h>
 
-// #define FBOSD_BLENDING
+#undef FBOSD_BLENDING
+#undef FBOSD_DEBUG
 
 /*****************************************************************************
  * Local prototypes
@@ -72,11 +73,6 @@ static void CloseBlending    ( intf_thread_t * );
 #endif
 static int  OpenTextRenderer ( intf_thread_t * );
 static void CloseTextRenderer( intf_thread_t * );
-
-#if 0
-static int  OpenScaling      ( intf_thread_t * );
-static int  CloseScaling     ( intf_thread_t * );
-#endif
 
 /* Manipulate the overlay buffer */
 static int  OverlayCallback( vlc_object_t *, char const *,
@@ -279,9 +275,6 @@ struct intf_sys_t
     filter_t *p_blend;                              /* alpha blending module */
 #endif
     filter_t *p_text;                                /* text renderer module */
-#if 0
-    filter_t *p_scale;                                     /* scaling module */
-#endif
 
     /* Render */
     struct fbosd_render_t render[FBOSD_RENDER_MAX];
@@ -291,11 +284,11 @@ struct intf_sys_t
 
     /* Position */
     bool      b_absolute;
-    int             i_x;
-    int             i_y;
-    int             i_pos;
+    int       i_x;
+    int       i_y;
+    int       i_pos;
 
-    int             i_alpha;                      /* transparency for images */
+    int       i_alpha;                      /* transparency for images */
 
     /* commands control */
     bool      b_need_update;    /* update display with \overlay buffer */
@@ -313,7 +306,6 @@ static int Create( vlc_object_t *p_this )
     char          *psz_aspect;
     char          *psz_tmp;
     int i;
-
 
     /* Allocate instance and initialize some members */
     p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
@@ -470,15 +462,7 @@ static int Create( vlc_object_t *p_this )
         Destroy( VLC_OBJECT(p_intf) );
         return VLC_EGENERIC;
     }
-#if 0
-    /* Load scaling module */
-    if( OpenScaling( p_intf ) )
-    {
-        msg_Err( p_intf, "Unable to load image scaling module" );
-        Destroy( VLC_OBJECT(p_intf) );
-        return VLC_EGENERIC;
-    }
-#endif
+
     p_sys->b_render = true;
     p_sys->b_need_update = true;
 
@@ -543,9 +527,7 @@ static void Destroy( vlc_object_t *p_this )
     if( p_sys->p_blend ) CloseBlending( p_intf );
 #endif
     if( p_sys->p_text )  CloseTextRenderer( p_intf );
-#if 0
-    if( p_sys->p_scale ) CloseScaling( p_intf );
-#endif
+
     if( p_sys->p_image )
         image_HandlerDelete( p_sys->p_image );
     if( p_sys->p_overlay )
@@ -648,46 +630,6 @@ static void CloseTextRenderer( intf_thread_t *p_intf )
         vlc_object_release( p_intf->p_sys->p_text );
     }
 }
-#if 0
-static int OpenScaling( intf_thread_t *p_intf )
-{
-    if( p_intf->p_sys->p_scale ) return VLC_EGENERIC;
-
-    p_intf->p_sys->p_scale =
-            vlc_object_create( p_intf, VLC_OBJECT_FILTER );
-    vlc_object_attach( p_intf->p_sys->p_scale, p_intf );
-    p_intf->p_sys->p_scale->fmt_out.video.i_chroma =
-        p_intf->p_sys->p_scale->fmt_in.video.i_chroma =
-            p_intf->p_sys->fmt_out.i_chroma;
-
-    /* XXX: We'll also be using it for YUVA and RGBA blending ... */
-    p_intf->p_sys->p_scale->fmt_in.video.i_width =
-        p_intf->p_sys->p_scale->fmt_in.video.i_height = 32;
-    p_intf->p_sys->p_scale->fmt_out.video.i_width =
-        p_intf->p_sys->p_scale->fmt_out.video.i_height = 16;
-
-    p_intf->p_sys->p_scale->p_module =
-        module_Need( p_intf->p_sys->p_scale, "video filter2", 0, 0 );
-
-    if( !p_intf->p_sys->p_scale->p_module )
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
-}
-
-static int CloseScaling( intf_thread_t *p_intf )
-{
-    if( p_intf->p_sys->p_scale )
-    {
-        if( p_intf->p_sys->p_scale->p_module )
-            module_Unneed( p_intf->p_sys->p_scale,
-                           p_intf->p_sys->p_scale->p_module );
-
-        vlc_object_detach( p_intf->p_sys->p_scale );
-        vlc_object_release( p_intf->p_sys->p_scale );
-    }
-}
-#endif
 
 /*****************************************************************************
  * AllocatePicture:
@@ -785,22 +727,7 @@ static int BlendPicture( intf_thread_t *p_intf, video_format_t *p_fmt_src,
         int i_y_offset = p_sys->i_y;
 
         memcpy( &p_sys->p_blend->fmt_in.video, p_fmt_src, sizeof( video_format_t ) );
-#if 0
-        msg_Dbg( p_intf, "Blending pictures %p %4.4s (%dx%d) %d bits %d planes: 0=%p 1=%p 2=%p 3=%p",
-                 p_pic_src, (char*)&p_fmt_src->i_chroma,
-                 p_sys->p_blend->fmt_in.video.i_width, p_sys->p_blend->fmt_in.video.i_height,
-                 p_fmt_src->i_bits_per_pixel,
-                 p_pic_src->i_planes,
-                 p_pic_src->p[0].p_pixels, p_pic_src->p[1].p_pixels,
-                 p_pic_src->p[2].p_pixels, p_pic_src->p[3].p_pixels );
-        msg_Dbg( p_intf, "Blending pictures %p %4.4s (%dx%d) %d bits %d planes: 0=%p 1=%p 2=%p 3=%p",
-                 p_pic_dst, (char*)&p_fmt_dst->i_chroma,
-                 p_fmt_dst->i_width, p_fmt_dst->i_height,
-                 p_fmt_dst->i_bits_per_pixel,
-                 p_pic_dst->i_planes,
-                 p_pic_dst->p[0].p_pixels, p_pic_dst->p[1].p_pixels,
-                 p_pic_dst->p[2].p_pixels, p_pic_dst->p[3].p_pixels );
-#endif
+
         /* Update the output picture size */
         p_sys->p_blend->fmt_out.video.i_width =
             p_sys->p_blend->fmt_out.video.i_visible_width =
@@ -820,7 +747,6 @@ static int BlendPicture( intf_thread_t *p_intf, video_format_t *p_fmt_src,
     }
     return VLC_EGENERIC;
 }
-#endif
 
 static int InvertAlpha( intf_thread_t *p_intf, picture_t **p_pic, video_format_t fmt )
 {
@@ -866,6 +792,7 @@ static int InvertAlpha( intf_thread_t *p_intf, picture_t **p_pic, video_format_t
     /* end of kludge */
     return VLC_SUCCESS;
 }
+#endif
 
 /*****************************************************************************
  * RenderPicture: Render the picture into the p_dest buffer.
@@ -902,7 +829,7 @@ static int RenderPicture( intf_thread_t *p_intf, int i_x_offset, int i_y_offset,
 
             i_y_clip = ( i_y_offset + p_src->p[i].i_visible_lines ) - p_dest->p[i].i_visible_lines;
             i_y_clip = ( i_y_clip > 0 ) ? i_y_clip : 0;
-#if 0
+#if defined(FBOSD_DEBUG)
             msg_Dbg( p_intf, "i_pitch (%d,%d), (%d,%d)/(%d,%d)",
                      p_dest->p[i].i_visible_pitch, p_src->p[i].i_visible_pitch,
                      i_x_offset, i_y_offset, i_x, i_x_clip );
@@ -1201,7 +1128,6 @@ static int OpenDisplay( intf_thread_t *p_intf )
         p_sys->p_palette = malloc( 8 * 256 * sizeof( uint16_t ) );
         if( !p_sys->p_palette )
         {
-            msg_Err( p_intf, "out of memory" );
             close( p_sys->i_fd );
             return VLC_ENOMEM;
         }
@@ -1365,8 +1291,8 @@ static void Run( intf_thread_t *p_intf )
             {
                 Render( p_intf, &p_sys->render[i] );
                 RenderClear( p_intf, &p_sys->render[i] );
-             }
-         }
+            }
+        }
 
         if( p_sys->b_clear )
         {
