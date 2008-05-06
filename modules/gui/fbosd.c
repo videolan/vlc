@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fbosd.c : framebuffer osd plugin for vlc
  *****************************************************************************
- * Copyright (C) 2007, the VideoLAN team
+ * Copyright (C) 2007-2008, the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Paul Saman
@@ -50,7 +50,7 @@
 #include <vlc_osd.h>
 #include <vlc_strings.h>
 
-// #define FBOSD_BLENDING 1
+// #define FBOSD_BLENDING
 
 /*****************************************************************************
  * Local prototypes
@@ -66,7 +66,7 @@ static int  OpenDisplay    ( intf_thread_t * );
 static void CloseDisplay   ( intf_thread_t * );
 
 /* Load modules needed for rendering and blending */
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
 static int  OpenBlending     ( intf_thread_t * );
 static void CloseBlending    ( intf_thread_t * );
 #endif
@@ -91,7 +91,7 @@ static void SetOverlayTransparency( intf_thread_t *,
 static picture_t *LoadImage( intf_thread_t *, video_format_t *,
                              char * );
 
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
 static int BlendPicture( intf_thread_t *, video_format_t *,
                          video_format_t *, picture_t *, picture_t * );
 #else
@@ -192,7 +192,7 @@ vlc_module_begin();
     add_string( "fbosd-text", NULL, NULL, FBOSD_TEXT,
                 FBOSD_LONGTEXT, true );
 
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
     add_integer_with_range( "fbosd-alpha", 255, 0, 255, NULL, ALPHA_TEXT,
                             ALPHA_LONGTEXT, true );
 
@@ -275,7 +275,7 @@ struct intf_sys_t
 
     /* Image and Picture rendering */
     image_handler_t *p_image;
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
     filter_t *p_blend;                              /* alpha blending module */
 #endif
     filter_t *p_text;                                /* text renderer module */
@@ -344,7 +344,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_intf, "fbosd-alpha" );
     var_AddCallback( p_intf, "fbosd-alpha", OverlayCallback, NULL );
 #else
@@ -453,7 +453,7 @@ static int Create( vlc_object_t *p_this )
 
     Init( p_intf );
 
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
     /* Load the blending module */
     if( OpenBlending( p_intf ) )
     {
@@ -500,7 +500,7 @@ static void Destroy( vlc_object_t *p_this )
     p_sys->b_render = false;
     p_sys->b_clear = false;
 
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
     var_DelCallback( p_intf, "fbosd-alpha", OverlayCallback, NULL );
     var_Destroy( p_intf, "fbosd-alpha" );
 #endif
@@ -539,7 +539,7 @@ static void Destroy( vlc_object_t *p_this )
         p_sys->render[i].i_state = FBOSD_STATE_FREE;
     }
 
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
     if( p_sys->p_blend ) CloseBlending( p_intf );
 #endif
     if( p_sys->p_text )  CloseTextRenderer( p_intf );
@@ -555,7 +555,7 @@ static void Destroy( vlc_object_t *p_this )
     free( p_sys );
 }
 
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
 static int OpenBlending( intf_thread_t *p_intf )
 {
     if( p_intf->p_sys->p_blend ) return VLC_EGENERIC;
@@ -770,7 +770,7 @@ static void SetOverlayTransparency( intf_thread_t *p_intf,
     }
 }
 
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
 /*****************************************************************************
  * BlendPicture: Blend two pictures together..
  *****************************************************************************/
@@ -821,6 +821,51 @@ static int BlendPicture( intf_thread_t *p_intf, video_format_t *p_fmt_src,
     return VLC_EGENERIC;
 }
 #endif
+
+static int InvertAlpha( intf_thread_t *p_intf, picture_t **p_pic, video_format_t fmt )
+{
+    uint8_t *p_begin = NULL, *p_end = NULL;
+    uint8_t i_skip = 0;
+
+    if( *p_pic && ((*p_pic)->i_planes != 1) )
+    {
+        msg_Err( p_intf,
+                 "cannot invert alpha channel too many planes %d (only 1 supported)",
+                 (*p_pic)->i_planes );
+        return VLC_EGENERIC;
+    }
+
+    switch( fmt.i_chroma )
+    {
+        case VLC_FOURCC('R','V','2','4'):
+            p_begin = (uint8_t *)(*p_pic)->p[Y_PLANE].p_pixels;
+            p_end   = (uint8_t *)(*p_pic)->p[Y_PLANE].p_pixels +
+                      ( fmt.i_height * (*p_pic)->p[Y_PLANE].i_pitch );
+            i_skip = 3;
+            break;
+        case VLC_FOURCC('R','V','3','2'):
+            p_begin = (uint8_t *)(*p_pic)->p[Y_PLANE].p_pixels;
+            p_end   = (uint8_t *)(*p_pic)->p[Y_PLANE].p_pixels +
+                      ( fmt.i_height * (*p_pic)->p[Y_PLANE].i_pitch );
+            i_skip = 4;
+            break;
+        default:
+            msg_Err( p_intf, "cannot invert alpha channel chroma not supported %4.4s",
+                    (char *)&fmt.i_chroma );
+            return VLC_EGENERIC;
+    }
+
+    for( ; p_begin < p_end; p_begin += i_skip )
+    {
+        uint8_t i_opacity;
+
+        if( i_opacity != 0xFF )
+            i_opacity = 255 - *p_begin;
+        *p_begin = i_opacity;
+    }
+    /* end of kludge */
+    return VLC_SUCCESS;
+}
 
 /*****************************************************************************
  * RenderPicture: Render the picture into the p_dest buffer.
@@ -922,11 +967,7 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
             p_sys->p_text->pf_render_text( p_sys->p_text,
                                            p_region, p_region );
 
-#ifndef FBOSD_BLENDING
-            fmt_out.i_chroma = p_fmt->i_chroma;
-            p_dest = ConvertImage( p_intf, &p_region->picture,
-                                   &p_region->fmt, &fmt_out );
-#else
+#if defined(FBOSD_BLENDING)
             fmt_out = p_region->fmt;
             fmt_out.i_bits_per_pixel = 32;
             vlc_memcpy( p_fmt, &fmt_out, sizeof(video_format_t) );
@@ -941,6 +982,10 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
                 return NULL;
             }
             vout_CopyPicture( VLC_OBJECT(p_intf), p_dest, &p_region->picture );
+#else
+            fmt_out.i_chroma = p_fmt->i_chroma;
+            p_dest = ConvertImage( p_intf, &p_region->picture,
+                                   &p_region->fmt, &fmt_out );
 #endif
             if( p_region->picture.pf_release )
                 p_region->picture.pf_release( &p_region->picture );
@@ -980,7 +1025,7 @@ static picture_t *LoadImage( intf_thread_t *p_intf, video_format_t *p_fmt,
     return p_pic;
 }
 
-#ifndef FBOSD_BLENDING
+#if ! defined(FBOSD_BLENDING)
 /*****************************************************************************
  * Convertmage: Convert image to another fourcc
  *****************************************************************************/
@@ -1243,7 +1288,7 @@ static void Render( intf_thread_t *p_intf, struct fbosd_render_t *render )
     else if( render->i_type == FBOSD_RENDER_TEXT )
     {
         picture_t *p_text;
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
         video_format_t fmt_in;
         memset( &fmt_in, 0, sizeof(video_format_t) );
         p_text = RenderText( p_intf, render->psz_string, &render->text_style,
@@ -1280,9 +1325,7 @@ static void RenderClear( intf_thread_t *p_intf, struct fbosd_render_t *render )
     render->i_x = p_sys->i_x;
     render->i_y = p_sys->i_y;
     render->i_pos = p_sys->i_pos;
-#ifdef FBOSD_BLENDING
     render->i_alpha = p_sys->i_alpha;
-#endif
     render->b_absolute = p_sys->b_absolute;
     render->i_state = FBOSD_STATE_FREE;
 }
@@ -1340,6 +1383,10 @@ static void Run( intf_thread_t *p_intf )
             isRendererReady( p_intf ) )
         {
             int ret;
+#if defined(FBOSD_BLENDING)
+            /* Reverse alpha channel to work around FPGA bug */
+            InvertAlpha( p_intf, &p_sys->p_overlay, p_sys->fmt_out );
+#endif
             ret = write( p_sys->i_fd, p_sys->p_overlay->p[0].p_pixels,
                          p_sys->i_page_size );
             if( ret < 0 )
@@ -1460,7 +1507,7 @@ static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,
         {
             p_sys->render[i].text_style.i_font_alpha = 255 - newval.i_int;
         }
-#ifdef FBOSD_BLENDING
+#if defined(FBOSD_BLENDING)
         else if( !strncmp( psz_cmd, "fbosd-alpha", 11 ) )
         {
             p_sys->render[i].i_alpha = newval.i_int;
