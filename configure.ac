@@ -1939,7 +1939,7 @@ if test "${enable_live555}" != "no"; then
     if test -f "${real_live555_tree}/liveMedia/libliveMedia.a"; then
       AC_MSG_RESULT(${real_live555_tree}/liveMedia/libliveMedia.a)
 
-      VLC_ADD_BUILTINS([live555])
+      VLC_ADD_PLUGIN([live555])
 
       if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
