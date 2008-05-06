@@ -89,8 +89,7 @@ void
 libvlc_media_library_load( libvlc_media_library_t * p_mlib,
                            libvlc_exception_t * p_e )
 {
-    const char *psz_datadir =
-        libvlc_priv (p_mlib->p_libvlc_instance->p_libvlc_int)->psz_datadir;
+    char *psz_datadir = config_GetUserDataDir();
     char * psz_uri;
 
     if( !psz_datadir ) /* XXX: i doubt that this can ever happen */
@@ -102,9 +101,11 @@ libvlc_media_library_load( libvlc_media_library_t * p_mlib,
     if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP "ml.xsp",
                   psz_datadir ) == -1 )
     {
+        free( psz_datadir );
         libvlc_exception_raise( p_e, "Can't get create the path" );
         return;
     }
+    free( psz_datadir );
     if( p_mlib->p_mlist )
         libvlc_media_list_release( p_mlib->p_mlist );
 

@@ -637,12 +637,13 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 #else
     /* XXX: This saves in the data directory. Shouldn't we try saving
      *      to psz_homedir/Desktop or something nicer ? */
-    if( !val.psz_string && libvlc_priv (p_vout->p_libvlc)->psz_datadir )
+    char *psz_datadir = config_GetUserDataDir();
+    if( !val.psz_string && psz_datadir )
     {
-        if( asprintf( &val.psz_string, "%s",
-                      libvlc_priv (p_vout->p_libvlc)->psz_datadir ) == -1 )
+        if( asprintf( &val.psz_string, "%s", psz_datadir ) == -1 )
             val.psz_string = NULL;
     }
+    free( psz_datadir );
 #endif
 
     if( !val.psz_string )

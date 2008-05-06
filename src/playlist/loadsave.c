@@ -108,7 +108,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-    const char *psz_datadir = libvlc_priv (p_playlist->p_libvlc)->psz_datadir;
+    char *psz_datadir = config_GetUserDataDir();
     char *psz_uri = NULL;
     input_item_t *p_input;
 
@@ -127,18 +127,18 @@ int playlist_MLLoad( playlist_t *p_playlist )
     struct stat p_stat;
     /* checks if media library file is present */
     if( utf8_stat( psz_uri , &p_stat ) )
-    {
-        free( psz_uri );
-        return VLC_EGENERIC;
-    }
+        goto error;
     free( psz_uri );
 
+    /* FIXME: WTF? stat() should never be used right before open()! */
     if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP "ml.xspf",
                   psz_datadir ) == -1 )
     {
         psz_uri = NULL;
         goto error;
     }
+    free( psz_datadir );
+    psz_datadir = NULL;
 
     const char *const psz_option = "meta-file";
     /* that option has to be cleaned in input_item_subitem_added() */
@@ -183,12 +183,13 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
 error:
     free( psz_uri );
+    free( psz_datadir );
     return VLC_ENOMEM;
 }
 
 int playlist_MLDump( playlist_t *p_playlist )
 {
-    char *psz_datadir = libvlc_priv (p_playlist->p_libvlc)->psz_datadir;
+    char *psz_datadir = config_GetUserDataDir();
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
     if( !psz_datadir ) /* XXX: This should never happen */
     {
@@ -198,6 +199,7 @@ int playlist_MLDump( playlist_t *p_playlist )
 
     char psz_dirname[ strlen( psz_datadir ) + sizeof( DIR_SEP "ml.xspf")];
     strcpy( psz_dirname, psz_datadir );
+    free( psz_datadir );
     if( config_CreateDir( (vlc_object_t *)p_playlist, psz_dirname ) )
     {
         return VLC_EGENERIC;

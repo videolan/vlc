@@ -211,7 +211,6 @@ typedef struct libvlc_priv_t
     /* Configuration */
     vlc_mutex_t        config_lock; ///< config file lock
     char *             psz_configfile;   ///< location of config file
-    char              *psz_datadir;      ///< user data directory
 
     /* There is no real reason to keep a list of items, but not to break
      * everything, let's keep it */
