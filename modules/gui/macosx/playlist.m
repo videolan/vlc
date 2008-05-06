@@ -584,7 +584,7 @@
     if ( p_temp_item )
     {
         int i;
-        vlc_mutex_lock( &p_playlist->object_lock );
+        PL_LOCK;
 
         if( b_check )
         {
@@ -597,7 +597,7 @@
                 else if ( i == p_playlist->all_items.i_size - 1 )
                 {
                     vlc_object_release( p_playlist );
-                    vlc_mutex_unlock( &p_playlist->object_lock );
+                    PL_UNLOCK;
                     return NO;
                 }
             }
@@ -608,12 +608,12 @@
             p_temp_item = p_temp_item->p_parent;
             if( p_temp_item == p_node )
             {
-                 vlc_mutex_unlock( &p_playlist->object_lock );
-                 vlc_object_release( p_playlist );
-                 return YES;
+                PL_UNLOCK;
+                vlc_object_release( p_playlist );
+                return YES;
             }
         }
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        PL_UNLOCK;
     }
 
     vlc_object_release( p_playlist );
@@ -882,16 +882,16 @@
 
     if( p_item->i_children > -1 ) // the item is a node
     {
-        vlc_mutex_lock( &p_playlist->object_lock );
+        PL_LOCK;
         playlist_RecursiveNodeSort( p_playlist, p_item, i_mode, ORDER_NORMAL );
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        PL_UNLOCK;
     }
     else
     {
-        vlc_mutex_lock( &p_playlist->object_lock );
+        PL_LOCK;
         playlist_RecursiveNodeSort( p_playlist,
                 p_item->p_parent, i_mode, ORDER_NORMAL );
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        PL_UNLOCK;
     }
     vlc_object_release( p_playlist );
     [self playlistUpdated];
@@ -1088,14 +1088,14 @@
         char *psz_temp;
         NSString *o_current_name, *o_current_author;
 
-        vlc_mutex_lock( &p_playlist->object_lock );
+        PL_LOCK;
         o_current_name = [NSString stringWithUTF8String:
             p_item->pp_children[i_current]->p_input->psz_name];
         psz_temp = input_ItemGetInfo( p_item->p_input ,
                    _("Meta-information"),_("Artist") );
         o_current_author = [NSString stringWithUTF8String: psz_temp];
         free( psz_temp);
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        PL_UNLOCK;
 
         if( p_selected_item == p_item->pp_children[i_current] &&
                     b_selected_item_met == NO )
@@ -1557,8 +1557,8 @@
                 }
             }
 
-            vlc_mutex_lock( &p_playlist->object_lock );
-            // Acually detach the item from the old position
+            PL_LOCK;
+            // Actually detach the item from the old position
             if( playlist_NodeRemoveItem( p_playlist, p_item, p_old_parent ) ==
                 VLC_SUCCESS )
             {
@@ -1580,7 +1580,7 @@
                 // Reattach the item to the new position
                 playlist_NodeInsert( p_playlist, p_item, p_new_parent, i_new_index );
             }
-            vlc_mutex_unlock( &p_playlist->object_lock );
+            PL_UNLOCK;
         }
         [self playlistUpdated];
         i_row = [o_outline_view rowForItem:[o_outline_dict
