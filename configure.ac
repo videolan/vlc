@@ -1917,7 +1917,7 @@ if test "${enable_live555}" != "no"; then
       ], [
         AC_CHECK_LIB(liveMedia, main, [
           # We only have -lliveMedia, do builtins
-          VLC_ADD_BUILTINS([live555])
+          VLC_ADD_PLUGIN([live555])
           VLC_ADD_LIBS([live555], [-lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment])
         ])
       ])
@@ -3201,17 +3201,9 @@ dnl Trying with pkg-config
      CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
      CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
      AC_CHECK_HEADERS(postproc/postprocess.h)
-     if test "${SYS}" = "darwin"; then
-        VLC_ADD_BUILTINS([ffmpeg])
-     else
-        VLC_ADD_PLUGIN([ffmpeg])
-     fi
+     VLC_ADD_PLUGIN([ffmpeg])
      if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes"; then
-        if test "${SYS}" = "darwin"; then
-            VLC_ADD_BUILTINS([stream_out_switcher])
-        else
-            VLC_ADD_PLUGIN([stream_out_switcher])
-        fi
+        VLC_ADD_PLUGIN([stream_out_switcher])
      fi
      VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
      VLC_ADD_LIBS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
@@ -3415,7 +3407,7 @@ then
     VLC_ADD_BUILTINS([quicktime])
   else
   AC_CHECK_HEADERS(QuickTime/QuickTime.h,
-    [ VLC_ADD_BUILTINS([quicktime])
+    [ VLC_ADD_PLUGIN([quicktime])
       VLC_ADD_LDFLAGS([quicktime],[-Wl,-framework,QuickTime,-framework,Carbon])
     ], [ AC_MSG_ERROR([cannot find QuickTime headers]) ])
   fi
@@ -5525,7 +5517,9 @@ then
  
   ORIGCFLAGS=$CFLAGS
   CFLAGS="$CFLAGS -x objective-c"
-  AC_CHECK_HEADER(QuartzCore/CALayer.h, [VLC_ADD_BUILTINS([opengllayer])])
+  AC_CHECK_HEADER(QuartzCore/CALayer.h, 
+  [VLC_ADD_PLUGIN([opengllayer])
+  VLC_ADD_OBJCFLAGS([opengllayer], [-isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5])])
   CFLAGS=$ORIGCFLAGS
 fi
 
