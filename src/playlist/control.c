@@ -437,6 +437,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
                                    p_playlist->status.p_item );
 
         p_playlist->i_current_index++;
+        assert( p_playlist->i_current_index <= p_playlist->current.i_size );
         if( p_playlist->i_current_index == p_playlist->current.i_size )
         {
             if( !b_loop || p_playlist->current.i_size == 0 ) return NULL;
