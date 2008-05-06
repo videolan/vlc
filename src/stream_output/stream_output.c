@@ -214,6 +214,7 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
 
     /* *** create a packetizer input *** */
     p_input         = malloc( sizeof( sout_packetizer_input_t ) );
+    if( !p_input )  return NULL;
     p_input->p_sout = p_sout;
     p_input->p_fmt  = p_fmt;
 
