@@ -283,7 +283,7 @@ static int CreateFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     vlc_object_t *p_libvlc = VLC_OBJECT( p_filter->p_libvlc );
-    char *psz_order;
+    char *psz_order, *_psz_order;
     char *psz_offsets;
     int i_index;
     vlc_value_t val;
@@ -349,6 +349,7 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_order_length = 0;
     p_sys->ppsz_order = NULL;
     psz_order = var_CreateGetStringCommand( p_filter, CFG_PREFIX "order" );
+    _psz_order = psz_order;
     var_AddCallback( p_filter, CFG_PREFIX "order", MosaicCallback, p_sys );
 
     if( *psz_order )
@@ -368,12 +369,15 @@ static int CreateFilter( vlc_object_t *p_this )
         p_sys->i_order_length = i_index;
     }
 
+    free( _psz_order );
+
     /* Manage specific offsets for substreams */
     psz_offsets = var_CreateGetStringCommand( p_filter, CFG_PREFIX "offsets" );
     p_sys->i_offsets_length = 0;
     p_sys->pi_x_offsets = NULL;
     p_sys->pi_y_offsets = NULL;
     mosaic_ParseSetOffsets( p_filter, p_sys, psz_offsets );
+    free( psz_offsets );
     var_AddCallback( p_filter, CFG_PREFIX "offsets", MosaicCallback, p_sys );
 
     vlc_mutex_unlock( &p_sys->lock );
