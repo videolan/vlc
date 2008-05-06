@@ -82,26 +82,6 @@ static int Open( vlc_object_t *p_this )
     int length_path, length_media_name;
     int i;
 
-    /*DOWN:
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->pf_read = Read;
-    p_access->pf_block = Block;
-    p_access->pf_control = Control;
-    p_access->pf_seek = Seek;
-    do
-    {
-        p_access->p_sys = (access_sys_t *) malloc( sizeof( access_sys_t ) );
-        if( !p_access->p_sys )
-            return VLC_ENOMEM;
-    } while(0);
-    p_sys = p_access->p_sys;
-    memset( p_sys, 0, sizeof( access_sys_t ) );
-    */
     STANDARD_READ_ACCESS_INIT
 
     p_sys->p_thread =
@@ -387,13 +367,6 @@ static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             i_len_tmp += i_len - i_len_tmp;
         }
     }
-/*int i;
-for(i = 0; i < i_len_tmp; i += 16)
-{
-    msg_Warn(p_access,"%.2x%.2x %.2x%.2x %.2x%.2x %.2x%.2x %.2x%.2x %.2x%.2x %.2x%.2x %.2x%.2x",
-p_buffer[i], p_buffer[i+1], p_buffer[i+2], p_buffer[i+3], p_buffer[i+4], p_buffer[i+5], p_buffer[i+6], p_buffer[i+7],
-p_buffer[i+8], p_buffer[i+9], p_buffer[i+10], p_buffer[i+11], p_buffer[i+12], p_buffer[i+13], p_buffer[i+14], p_buffer[i+15]);
-}*/
     if( i_len_tmp > 0 ) {
         if( p_sys->p_thread->result_publish )
         {
@@ -412,6 +385,7 @@ p_buffer[i+8], p_buffer[i+9], p_buffer[i+10], p_buffer[i+11], p_buffer[i+12], p_
                 free( rtmp_packet );
                 free( tmp_buffer );
                 msg_Err( p_access, "failed send publish start" );
+                return -1;
             }
             free( rtmp_packet->body->body );
             free( rtmp_packet->body );
@@ -433,6 +407,7 @@ p_buffer[i+8], p_buffer[i+9], p_buffer[i+10], p_buffer[i+11], p_buffer[i+12], p_
             free( rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_access, "failed send bytes read" );
+            return -1;
         }
         free( rtmp_packet->body->body );
         free( rtmp_packet->body );

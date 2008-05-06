@@ -228,7 +228,7 @@ const uint8_t FLV_VIDEO_FRAME_TYPE_DISPOSABLE_INTER_FRAME = 0x30;
  ******************************************************************************/
 static void rtmp_handler_null       ( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet );
 static void rtmp_handler_chunk_size ( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet );
-static void rtmp_handler_invoke     ( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet );
+static int rtmp_handler_invoke     ( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet );
 static void rtmp_handler_audio_data ( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet );
 static void rtmp_handler_video_data ( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet );
 static void rtmp_handler_notify     ( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet );
@@ -1118,7 +1118,7 @@ rtmp_handler_notify( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
     free( rtmp_packet );
 }
 
-static void
+static int
 rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet )
 {
     rtmp_packet_t *tmp_rtmp_packet;
@@ -1153,6 +1153,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send connection bandwith" );
+            return VLC_EGENERIC;
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1172,6 +1173,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send server bandwith" );
+            return VLC_EGENERIC;
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1191,6 +1193,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send clear stream" );
+            return VLC_EGENERIC;
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1210,6 +1213,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send reply NetConnection.connect" );
+            return VLC_EGENERIC;
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1234,6 +1238,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send reply createStream" );
+            return VLC_EGENERIC; 
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1253,6 +1258,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send reset stream" );
+            return VLC_EGENERIC;
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1272,6 +1278,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send clear stream" );
+            return VLC_EGENERIC;
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1313,6 +1320,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send reply NetStream.play.reset" );
+            return VLC_EGENERIC;
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1332,6 +1340,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
             free( tmp_rtmp_packet );
             free( tmp_buffer );
             msg_Err( p_thread, "failed send reply NetStream.play.start" );
+            return VLC_EGENERIC;
         }
         free( tmp_rtmp_packet->body->body );
         free( tmp_rtmp_packet->body );
@@ -1463,6 +1472,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
     free( rtmp_packet->body->body );
     free( rtmp_packet->body );
     free( rtmp_packet );
+    return VLC_SUCCESS;
 }
 
 /* length header calculated automatically based on last packet in the same channel */
