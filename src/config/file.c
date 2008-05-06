@@ -92,7 +92,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
                                  "version 0.6. Your\nconfiguration has been "
                                  "copied to the new location:\n%s\nYou can "
                                  "delete this directory and all its contents.",
-                                  libvlc_priv(p_obj->p_libvlc)->psz_configdir);
+                                  psz_filename);
                         fclose( p_readme );
                     }
                     free( psz_readme );
@@ -401,8 +401,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
     if( libvlc_priv (p_this->p_libvlc)->psz_configfile == NULL )
     {
-        const char *psz_configdir =
-            libvlc_priv(p_this->p_libvlc)->psz_configdir;
+        char *psz_configdir = config_GetUserConfDir();
         if( !psz_configdir ) /* XXX: This should never happen */
         {
             msg_Err( p_this, "no configuration directory defined" );
@@ -411,6 +410,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         }
 
         config_CreateDir( p_this, psz_configdir );
+        free( psz_configdir );
     }
 
     file = config_OpenConfigFile( p_this, "rt" );
@@ -670,10 +670,12 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
  */
 char *config_GetConfigFile( libvlc_int_t *p_libvlc )
 {
+    char *psz_dir = config_GetUserConfDir();
     char *psz_configfile;
-    if( asprintf( &psz_configfile, "%s" DIR_SEP CONFIG_FILE,
-                  libvlc_priv (p_libvlc)->psz_configdir ) == -1 )
-        return NULL;
+
+    if( asprintf( &psz_configfile, "%s" DIR_SEP CONFIG_FILE, psz_dir ) == -1 )
+        psz_configfile = NULL;
+    free( psz_dir );
     return psz_configfile;
 }
 

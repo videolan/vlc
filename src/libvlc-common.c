@@ -296,7 +296,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     /* Set the config file stuff */
     p_libvlc->psz_homedir    = config_GetHomeDir();
-    priv->psz_configdir  = config_GetUserConfDir();
     priv->psz_datadir    = config_GetUserDataDir();
     priv->psz_configfile = config_GetCustomConfigFile( p_libvlc );
 
@@ -1061,7 +1060,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
     module_EndBank( p_libvlc );
 
     FREENULL( p_libvlc->psz_homedir );
-    free( priv->psz_configdir );
     free( priv->psz_datadir );
     FREENULL( priv->psz_configfile );
     var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,
