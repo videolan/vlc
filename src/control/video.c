@@ -450,6 +450,22 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
     vlc_object_release( p_input_thread );
 }
 
+int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
+                                    char *psz_subtitle,
+                                    libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    bool b_ret = false;
+
+    if( p_input_thread )
+    {
+        if( input_AddSubtitles( p_input_thread, psz_subtitle, true ) )
+            b_ret = true;
+        vlc_object_release( p_input_thread );
+    }
+    return b_ret;
+}
+
 char *libvlc_video_get_crop_geometry( libvlc_media_player_t *p_mi,
                                    libvlc_exception_t *p_e )
 {

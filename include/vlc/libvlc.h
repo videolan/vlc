@@ -517,6 +517,16 @@ VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_media_player_t *, libvlc_excepti
 VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_media_player_t *, int , libvlc_exception_t * );
 
 /**
+ * Set new video subtitle file.
+ *
+ * \param p_mediaplayer the media player
+ * \param psz_subtitle new video subtitle file
+ * \param p_e an initialized exception pointer
+ * \return the success status (boolean)
+ */
+VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, char *, libvlc_exception_t * );
+
+/**
  * Get current crop filter geometry.
  *
  * \param p_mediaplayer the media player
