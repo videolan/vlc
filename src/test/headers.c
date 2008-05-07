@@ -43,6 +43,8 @@
 #include <vlc/mediacontrol.h>
 #include <vlc/mediacontrol_structures.h>
 
+#include <stdio.h>
+
 int main (void)
 {
     puts ("Public headers can be used for external compilation.");
