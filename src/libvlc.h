@@ -187,6 +187,7 @@ struct vlc_object_internals_t
     vlc_spinlock_t  spin;
 
     /* Objects management */
+    vlc_spinlock_t   ref_spin;
     unsigned         i_refcount;
     vlc_destructor_t pf_destructor;
     bool             b_attached;
