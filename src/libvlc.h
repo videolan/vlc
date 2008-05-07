@@ -242,10 +242,7 @@ static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
     return (libvlc_priv_t *)(libvlc + 1);
 }
 
-static inline bool libvlc_stats (vlc_object_t *obj)
-{
-   return libvlc_priv (obj->p_libvlc)->b_stats;
-}
+#define libvlc_stats( o ) (libvlc_priv((VLC_OBJECT(o))->p_libvlc)->b_stats)
 
 /**
  * LibVLC "main module" configuration settings array.
