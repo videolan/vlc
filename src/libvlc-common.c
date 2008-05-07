@@ -309,7 +309,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     /* Check for daemon mode */
 #ifndef WIN32
-    if( config_GetInt( p_libvlc, "daemon" ) )
+    if( config_GetInt( p_libvlc, "daemon" ) > 0 )
     {
 #ifdef HAVE_DAEMON
         char *psz_pidfile = NULL;
@@ -1033,7 +1033,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
 #ifndef WIN32
     char* psz_pidfile = NULL;
 
-    if( config_GetInt( p_libvlc, "daemon" ) > 0 )
+    if( b_daemon )
     {
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
         if( psz_pidfile != NULL )
