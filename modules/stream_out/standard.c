@@ -284,8 +284,7 @@ static int Open( vlc_object_t *p_this )
         {
             psz_mux = strdup("asfh");
         }
-        else if (!strcmp (psz_access, "udp")
-              || !strcmp (psz_access, "rtp"))
+        else if (!strcmp (psz_access, "udp"))
         {
             psz_mux = strdup("ts");
         }
@@ -333,19 +332,18 @@ static int Open( vlc_object_t *p_this )
             psz_mux = strdup("asfh");
         }
     }
-    else if( ( !strncmp( psz_access, "rtp", 3 ) ||
-               !strncmp( psz_access, "udp", 3 ) ) )
+    else if( !strncmp( psz_access, "udp", 3 ) )
     {
         if( !strncmp( psz_mux, "ffmpeg", 6 ) )
         {   /* why would you use ffmpeg's ts muxer ? YOU DON'T LOVE VLC ??? */
             char *psz_ffmpeg_mux = var_CreateGetString( p_this, "ffmpeg-mux" );
             if( !psz_ffmpeg_mux || strncmp( psz_ffmpeg_mux, "mpegts", 6 ) )
-                msg_Err( p_stream, "UDP and RTP are only valid with TS" );
+                msg_Err( p_stream, "UDP is only valid with TS" );
             free( psz_ffmpeg_mux );
         }
         else if( strncmp( psz_mux, "ts", 2 ) )
         {
-            msg_Err( p_stream, "UDP and RTP are only valid with TS" );
+            msg_Err( p_stream, "UDP is only valid with TS" );
         }
     }
     else if( strncmp( psz_access, "file", 4 ) &&
