@@ -178,6 +178,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
  *****************************************************************************/
 void vlm_Delete( vlm_t *p_vlm )
 {
+    /* FIXME XXX: we need to set libvlc_priv->p_vlm bacl to NULL */
     vlc_object_release( p_vlm );
 }
 
