@@ -266,6 +266,7 @@ DIST_lua= \
 	lua/playlist/appletrailers.lua \
 	lua/playlist/break.lua \
 	lua/playlist/dailymotion.lua \
+	lua/playlist/france2.lua \
 	lua/playlist/joox.lua \
 	lua/playlist/lelombrik.lua \
 	lua/playlist/youtube.lua \
