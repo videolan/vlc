@@ -686,6 +686,7 @@ void * vlc_object_get( int i_id )
     int i_max, i_middle;
     vlc_object_t **pp_objects;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
+    vlc_object_t *obj = NULL;
 
     vlc_mutex_lock( &structure_lock );
 
@@ -710,33 +711,24 @@ void * vlc_object_get( int i_id )
             else
             {
                 /* This happens when there are only two remaining objects */
-                if( pp_objects[i_middle+1]->i_object_id == i_id
-                    && vlc_internals( pp_objects[i_middle+1] )->i_refcount > 0 )
+                if( pp_objects[i_middle+1]->i_object_id == i_id )
                 {
                     vlc_object_yield_locked( pp_objects[i_middle+1] );
-                    vlc_mutex_unlock( &structure_lock );
-                    return pp_objects[i_middle+1];
+                    obj = pp_objects[i_middle+1];
                 }
                 break;
             }
         }
-        else if( vlc_internals( pp_objects[i_middle] )->i_refcount > 0 )
+        else
         {
             vlc_object_yield_locked( pp_objects[i_middle] );
             vlc_mutex_unlock( &structure_lock );
             return pp_objects[i_middle];
         }
-
-        if( i_max == 0 )
-        {
-            /* this means that i_max == i_middle, and since we have already
-             * tested pp_objects[i_middle]), p_found is properly set. */
-            break;
-        }
     }
 
     vlc_mutex_unlock( &structure_lock );
-    return NULL;
+    return obj;
 }
 
 /**
