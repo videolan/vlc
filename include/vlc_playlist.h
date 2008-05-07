@@ -262,8 +262,6 @@ struct playlist_add_t
 #define PL_LOCK vlc_object_lock( p_playlist )
 #define PL_UNLOCK vlc_object_unlock( p_playlist )
 
-#define pl_Get( a ) a->p_libvlc->p_playlist
-
 VLC_EXPORT( playlist_t *, __pl_Yield, ( vlc_object_t * ) );
 #define pl_Yield( a ) __pl_Yield( VLC_OBJECT(a) )
 
