@@ -119,6 +119,15 @@ static inline struct tm *localtime_r (const time_t *timep, struct tm *result)
     *result = *s;
     return result;
 }
+static inline struct tm *gmtime_r (const time_t *timep, struct tm *result)
+{
+    struct tm *s = gmtime (timep);
+    if (s == NULL)
+        return NULL;
+
+    *result = *s;
+    return result;
+}
 #endif
 
 #ifndef HAVE_DIRENT_H
