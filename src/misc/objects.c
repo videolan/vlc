@@ -722,8 +722,8 @@ void * vlc_object_get( int i_id )
         else
         {
             vlc_object_yield( pp_objects[i_middle] );
-            vlc_mutex_unlock( &structure_lock );
-            return pp_objects[i_middle];
+            obj = pp_objects[i_middle];
+            break;
         }
     }
 
