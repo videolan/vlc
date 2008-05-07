@@ -100,7 +100,7 @@ static vlm_media_sys_t *vlm_MediaSearch( vlm_t *, const char *);
 vlm_t *__vlm_New ( vlc_object_t *p_this )
 {
     vlc_value_t lockval;
-    vlm_t *p_vlm = NULL;
+    vlm_t *p_vlm = NULL, **pp_vlm = &(libvlc_priv (p_this->p_libvlc)->p_vlm);
     char *psz_vlmconf;
     static const char vlm_object_name[] = "vlm daemon";
 
@@ -111,9 +111,9 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
 
     vlc_mutex_lock( lockval.p_address );
 
-    p_vlm = vlc_object_find( p_this, VLC_OBJECT_VLM, FIND_ANYWHERE );
+    p_vlm = *pp_vlm;
     if( p_vlm )
-    {
+    {   /* VLM already exists */
         vlc_object_yield( p_vlm );
         vlc_mutex_unlock( lockval.p_address );
         return p_vlm;
@@ -121,7 +121,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
 
     msg_Dbg( p_this, "creating VLM" );
 
-    p_vlm = vlc_custom_create( p_this, sizeof( *p_vlm ), VLC_OBJECT_VLM,
+    p_vlm = vlc_custom_create( p_this, sizeof( *p_vlm ), VLC_OBJECT_GENERIC,
                                vlm_object_name );
     if( !p_vlm )
     {
@@ -167,6 +167,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     free(psz_vlmconf);
 
     vlc_object_set_destructor( p_vlm, (vlc_destructor_t)vlm_Destructor );
+    *pp_vlm = p_vlm; /* for future reference */
     vlc_mutex_unlock( lockval.p_address );
 
     return p_vlm;

@@ -56,7 +56,7 @@ int vlclua_vlm_new( lua_State *L )
 
 int vlclua_vlm_delete( lua_State *L )
 {
-    vlm_t *p_vlm = (vlm_t*)vlclua_checkobject( L, 1, VLC_OBJECT_VLM );
+    vlm_t *p_vlm = (vlm_t*)vlclua_checkobject( L, 1, VLC_OBJECT_GENERIC );
     vlm_Delete( p_vlm );
     return 0;
 }
@@ -88,7 +88,7 @@ void push_message( lua_State *L, vlm_message_t *message )
 
 int vlclua_vlm_execute_command( lua_State *L )
 {
-    vlm_t *p_vlm = (vlm_t*)vlclua_checkobject( L, 1, VLC_OBJECT_VLM );
+    vlm_t *p_vlm = (vlm_t*)vlclua_checkobject( L, 1, VLC_OBJECT_GENERIC );
     const char *psz_command = luaL_checkstring( L, 2 );
     vlm_message_t *message;
     int i_ret;

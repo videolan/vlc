@@ -119,7 +119,6 @@ static int vlc_object_type_from_string( const char *psz_name )
           { VLC_OBJECT_PACKETIZER, "packetizer" },
           { VLC_OBJECT_ENCODER, "encoder" },
           { VLC_OBJECT_DIALOGS, "dialogs" },
-          { VLC_OBJECT_VLM, "vlm" },
           { VLC_OBJECT_ANNOUNCE, "announce" },
           { VLC_OBJECT_DEMUX, "demux" },
           { VLC_OBJECT_ACCESS, "access" },

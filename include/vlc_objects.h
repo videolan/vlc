@@ -51,7 +51,7 @@
 #define VLC_OBJECT_PACKETIZER  (-13)
 #define VLC_OBJECT_ENCODER     (-14)
 #define VLC_OBJECT_DIALOGS     (-15)
-#define VLC_OBJECT_VLM         (-16)
+
 #define VLC_OBJECT_ANNOUNCE    (-17)
 #define VLC_OBJECT_DEMUX       (-18)
 #define VLC_OBJECT_ACCESS      (-19)
