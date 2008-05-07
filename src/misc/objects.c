@@ -307,10 +307,7 @@ void __vlc_object_set_destructor( vlc_object_t *p_this,
                                   vlc_destructor_t pf_destructor )
 {
     vlc_object_internals_t *p_priv = vlc_internals(p_this );
-
-    vlc_mutex_lock( &structure_lock );
     p_priv->pf_destructor = pf_destructor;
-    vlc_mutex_unlock( &structure_lock );
 }
 
 /**
