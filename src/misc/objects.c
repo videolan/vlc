@@ -742,17 +742,14 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 {
     vlc_object_t *p_found;
 
-    vlc_mutex_lock( &structure_lock );
-
-    assert( vlc_internals( p_this )->i_refcount > 0 );
-
     /* If we are of the requested type ourselves, don't look further */
     if( !(i_mode & FIND_STRICT) && p_this->i_object_type == i_type )
     {
         vlc_object_yield( p_this );
-        vlc_mutex_unlock( &structure_lock );
         return p_this;
     }
+
+    vlc_mutex_lock( &structure_lock );
 
     /* Otherwise, recursively look for the object */
     if( (i_mode & 0x000f) == FIND_ANYWHERE )
@@ -795,17 +792,16 @@ void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
 {
     vlc_object_t *p_found;
 
-    vlc_mutex_lock( &structure_lock );
-
     /* If have the requested name ourselves, don't look further */
     if( !(i_mode & FIND_STRICT)
         && p_this->psz_object_name
         && !strcmp( p_this->psz_object_name, psz_name ) )
     {
         vlc_object_yield( p_this );
-        vlc_mutex_unlock( &structure_lock );
         return p_this;
     }
+
+    vlc_mutex_lock( &structure_lock );
 
     /* Otherwise, recursively look for the object */
     if( (i_mode & 0x000f) == FIND_ANYWHERE )
