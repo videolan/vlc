@@ -108,6 +108,10 @@ static void ManageSlider   ( intf_thread_t * );
 static void ReadDir        ( intf_thread_t * );
 
 static void start_color_and_pairs ( intf_thread_t * );
+static playlist_t *pl_Get( intf_thread_t *p_intf )
+{
+    return p_intf->p_sys->p_playlist;
+}
 
 /*****************************************************************************
  * Module descriptor
@@ -180,6 +184,7 @@ struct pl_item_t
 struct intf_sys_t
 {
     input_thread_t *p_input;
+    playlist_t     *p_playlist;
 
     bool      b_color;
     bool      b_color_started;
@@ -335,11 +340,7 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys = p_intf->p_sys;
-    playlist_t    *p_playlist = pl_Get( p_intf );
     int i;
-
-    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
-    var_DelCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
 
     PlaylistDestroy( p_intf );
 
@@ -384,6 +385,7 @@ static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
     playlist_t    *p_playlist = pl_Yield( p_intf );
+    p_sys->p_playlist = p_playlist;
 
     int i_key;
     time_t t_last_refresh;
@@ -396,15 +398,14 @@ static void Run( intf_thread_t *p_intf )
      * force building of the playlist array
      */
     PlaylistRebuild( p_intf );
+    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
+    var_AddCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
 
     while( !intf_ShouldDie( p_intf ) )
     {
         msleep( INTF_IDLE_SLEEP );
 
         /* Update the input */
-        var_AddCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
-        var_AddCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
-
         PL_LOCK;
         if( p_sys->p_input == NULL )
         {
@@ -458,6 +459,8 @@ static void Run( intf_thread_t *p_intf )
             Redraw( p_intf, &t_last_refresh );
         }
     }
+    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
+    var_DelCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
 }
 
 /* following functions are local */
