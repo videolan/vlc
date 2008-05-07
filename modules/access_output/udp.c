@@ -74,9 +74,6 @@ static void Close( vlc_object_t * );
                           "of packets that will be sent at a time. It " \
                           "helps reducing the scheduling load on " \
                           "heavily-loaded systems." )
-#define AUTO_MCAST_TEXT N_("Automatic multicast streaming")
-#define AUTO_MCAST_LONGTEXT N_("Allocates an outbound multicast address " \
-                               "automatically.")
 
 vlc_module_begin();
     set_description( _("UDP stream output") );
@@ -88,8 +85,6 @@ vlc_module_begin();
                                  true );
     add_obsolete_integer( SOUT_CFG_PREFIX "late" );
     add_obsolete_bool( SOUT_CFG_PREFIX "raw" );
-    add_bool( SOUT_CFG_PREFIX "auto-mcast", false, NULL, AUTO_MCAST_TEXT,
-              AUTO_MCAST_LONGTEXT, true );
 
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
@@ -101,7 +96,6 @@ vlc_module_end();
  *****************************************************************************/
 
 static const char *const ppsz_sout_options[] = {
-    "auto-mcast",
     "caching",
     "group",
     NULL
@@ -186,25 +180,16 @@ static int Open( vlc_object_t *p_this )
     p_access->p_sys = p_sys;
 
     i_dst_port = DEFAULT_PORT;
-    if (var_GetBool (p_access, SOUT_CFG_PREFIX"auto-mcast"))
-    {
-        char buf[INET6_ADDRSTRLEN];
-        if (MakeRandMulticast (AF_INET, buf, sizeof (buf)) != NULL)
-            psz_dst_addr = strdup (buf);
-    }
-    else
-    {
-        char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
+    char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
 
-        if (psz_parser[0] == '[')
-            psz_parser = strchr (psz_parser, ']');
+    if (psz_parser[0] == '[')
+        psz_parser = strchr (psz_parser, ']');
 
-        psz_parser = strchr (psz_parser ?: psz_dst_addr, ':');
-        if (psz_parser != NULL)
-        {
-            *psz_parser++ = '\0';
-            i_dst_port = atoi (psz_parser);
-        }
+    psz_parser = strchr (psz_parser ?: psz_dst_addr, ':');
+    if (psz_parser != NULL)
+    {
+        *psz_parser++ = '\0';
+        i_dst_port = atoi (psz_parser);
     }
 
     p_sys->p_thread =
@@ -533,37 +518,4 @@ static void ThreadWrite( vlc_object_t *p_this )
 
         i_date_last = i_date;
     }
-}
-
-
-static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
-{
-    uint32_t rand = (getpid() & 0xffff)
-                  | (uint32_t)(((mdate () >> 10) & 0xffff) << 16);
-
-    switch (family)
-    {
-#ifdef AF_INET6
-        case AF_INET6:
-        {
-            struct in6_addr addr;
-            memcpy (&addr, "\xff\x38\x00\x00" "\x00\x00\x00\x00"
-                           "\x00\x00\x00\x00", 12);
-            rand |= 0x80000000;
-            memcpy (addr.s6_addr + 12, &(uint32_t){ htonl (rand) }, 4);
-            return inet_ntop (family, &addr, buf, buflen);
-        }
-#endif
-
-        case AF_INET:
-        {
-            struct in_addr addr;
-            addr.s_addr = htonl ((rand & 0xffffff) | 0xe8000000);
-            return inet_ntop (family, &addr, buf, buflen);
-        }
-    }
-#ifdef EAFNOSUPPORT
-    errno = EAFNOSUPPORT;
-#endif
-    return NULL;
 }
