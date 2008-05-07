@@ -600,15 +600,6 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             rtsp_session_t *ses;
             answer->i_status = 200;
 
-            psz_session = httpd_MsgGet( query, "Session" );
-#if 0
-            /* FIXME: This breaks totem, mplayer and quicktime at least */
-            if( httpd_MsgGet( query, "Range" ) != NULL )
-            {
-                answer->i_status = 456; /* cannot seek, stream not seekable */
-                break;
-            }
-#endif
             vlc_mutex_lock( &rtsp->lock );
             ses = RtspClientGet( rtsp, psz_session );
             if( ses != NULL )
@@ -642,6 +633,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             }
             vlc_mutex_unlock( &rtsp->lock );
 
+            httpd_MsgAdd( answer, "Range", "npt=now-" );
             if( httpd_MsgGet( query, "Scale" ) != NULL )
                 httpd_MsgAdd( answer, "Scale", "1." );
             break;
