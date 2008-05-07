@@ -222,7 +222,7 @@ mediacontrol_start( mediacontrol_Instance *self,
             /* A start position was specified. Add it to media options */
             psz_from = ( char * )malloc( 20 * sizeof( char ) );
             i_from = private_mediacontrol_position2microsecond( self->p_media_player, a_position ) / 1000000;
-            snprintf( psz_from, 20, "start-time=%ld", i_from );
+            snprintf( psz_from, 20, "start-time=%"PRId64, i_from );
             libvlc_media_add_option( p_media, psz_from, &ex );
             HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
         }
