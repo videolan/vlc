@@ -169,15 +169,6 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         }
     }
 
-    vlc_mutex_lock( &structure_lock );
-    p_new->i_object_id = p_libvlc_global->i_counter++;
-
-    /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
-     * useless to try and recover anything if pp_objects gets smashed. */
-    TAB_APPEND( p_libvlc_global->i_objects, p_libvlc_global->pp_objects,
-                p_new );
-    vlc_mutex_unlock( &structure_lock );
-
     p_priv->i_refcount = 1;
     p_priv->pf_destructor = kVLCDestructor;
     p_priv->b_thread = false;
@@ -193,6 +184,15 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_mutex_init( &p_priv->var_lock );
     vlc_spin_init( &p_priv->spin );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
+
+    vlc_mutex_lock( &structure_lock );
+    p_new->i_object_id = p_libvlc_global->i_counter++;
+
+    /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
+     * useless to try and recover anything if pp_objects gets smashed. */
+    TAB_APPEND( p_libvlc_global->i_objects, p_libvlc_global->pp_objects,
+                p_new );
+    vlc_mutex_unlock( &structure_lock );
 
     if( i_type == VLC_OBJECT_LIBVLC )
     {
