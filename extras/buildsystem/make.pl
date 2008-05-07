@@ -52,6 +52,7 @@ while(<STDIN>)
 	$line =~ /^cd\s/ ||
 	$line =~ /^sed\s/ ||
 	$line =~ /^bindir=\s/ ||
+	$line =~ /^libtool:\s/ ||
 	$line =~ /^creating lib.*/ ||
         $line =~ /^\s*\// )
      {}
