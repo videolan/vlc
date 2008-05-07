@@ -50,6 +50,7 @@
 
 struct services_discovery_sys_t
 {
+    playlist_t *p_playlist;
     playlist_item_t *p_node_cat;
     playlist_item_t *p_node_one;
 };
@@ -254,6 +255,10 @@ private:
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
 static void Run( services_discovery_t *p_sd );
+static playlist_t *pl_Get( service_discovery_t *p_sd )
+{
+    return p_sd->p_sys->p_playlist;
+}
 
 // Module descriptor
 
@@ -286,6 +291,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sd->pf_run = Run;
     p_sd->p_sys = p_sys;
+    p_sys->p_playlist = pl_Yield( p_sd );
 
     /* Create our playlist node */
     playlist_NodesPairCreate( pl_Get( p_sd ), _("Devices"),
@@ -304,7 +310,7 @@ static void Close( vlc_object_t *p_this )
                          true );
     playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, true,
                          true );
-
+    pl_Release( p_intf );
     free( p_sys );
 }
 
