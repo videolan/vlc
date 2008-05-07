@@ -30,7 +30,7 @@
 
 #include "../playlist/playlist_internal.h"
 
-#define PL p_instance->p_libvlc_int->p_playlist
+#define PL (libvlc_priv (p_instance->p_libvlc_int)->p_playlist)
 
 static inline int playlist_was_locked( libvlc_instance_t *p_instance )
 {

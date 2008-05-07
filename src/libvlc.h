@@ -232,7 +232,8 @@ typedef struct libvlc_priv_t
                                           /// (needs cleanup)
 
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
-    vlm_t             *p_vlm;  ///< VLM if created from libvlc-common.c
+    playlist_t        *p_playlist; //< the playlist singleton
+    vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_object_t      *p_interaction;    ///< interface interaction object
     httpd_t           *p_httpd; ///< HTTP daemon (src/network/httpd.c)
 } libvlc_priv_t;

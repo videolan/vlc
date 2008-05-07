@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #include "libvlc_internal.h"
-
+#include "libvlc.h"
 #include <vlc/libvlc.h>
 #include <vlc_input.h>
 #include <vlc_meta.h>
@@ -215,7 +215,7 @@ static void preparse_if_needed( libvlc_media_t *p_md )
     if (!p_md->b_preparsed)
     {
         playlist_PreparseEnqueue(
-                p_md->p_libvlc_instance->p_libvlc_int->p_playlist,
+                libvlc_priv (p_md->p_libvlc_instance->p_libvlc_int)->p_playlist,
                 p_md->p_input_item );
         p_md->b_preparsed = true;
     }
@@ -430,7 +430,7 @@ char * libvlc_media_get_meta( libvlc_media_t *p_md,
     if( e_meta == libvlc_meta_ArtworkURL && !psz_meta )
     {
         playlist_AskForArtEnqueue(
-                p_md->p_libvlc_instance->p_libvlc_int->p_playlist,
+                libvlc_priv(p_md->p_libvlc_instance->p_libvlc_int)->p_playlist,
                 p_md->p_input_item );
     }
 

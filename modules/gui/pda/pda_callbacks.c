@@ -120,7 +120,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
             gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
                                     0, name,   /* Add path to it !!! */
                                     1, "no info",
-                                    2, playlist_CurrentSize(p_intf), /* Hidden index. */
+                                    2, playlist_CurrentSize(p_playlist), /* Hidden index. */
                                     -1 );
 
             /* Add to VLC's playlist */
@@ -163,7 +163,7 @@ void PlaylistRebuildListStore( intf_thread_t *p_intf,
     red.green   = 0;
 #endif
     vlc_mutex_lock( &p_playlist->object_lock );
-    for( i_dummy = 0; i_dummy < playlist_CurrentSize(p_intf) ; i_dummy++ )
+    for( i_dummy = 0; i_dummy < playlist_CurrentSize(p_playlist) ; i_dummy++ )
     {
         playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_dummy, true );
         if( p_item )
@@ -384,7 +384,7 @@ void onPlay(GtkButton *button, gpointer user_data)
     if (p_playlist)
     {
         vlc_mutex_lock( &p_playlist->object_lock );
-        if (playlist_CurrentSize(p_intf))
+        if (playlist_CurrentSize(p_playlist))
         {
             vlc_mutex_unlock( &p_playlist->object_lock );
             playlist_Play( p_playlist );
@@ -929,7 +929,7 @@ void onClearPlaylist(GtkButton *button, gpointer user_data)
         return;
     }
 
-    for(item = playlist_CurrentSize(p_intf) - 1; item >= 0 ;item-- )
+    for(item = playlist_CurrentSize(p_playlist) - 1; item >= 0 ;item-- )
     {
         msg_Err( p_playlist, "fix pda delete" );
     }

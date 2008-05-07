@@ -296,11 +296,12 @@ int VLC_VariableType( int i_object, char const *psz_var, int *pi_type )
 
 #define LIBVLC_PLAYLIST_FUNC \
     libvlc_int_t *p_libvlc = vlc_current_object( i_object );\
-    if( !p_libvlc || !p_libvlc->p_playlist ) return VLC_ENOOBJ; \
-    vlc_object_yield( p_libvlc->p_playlist );
+    if( !p_libvlc ) return VLC_ENOOBJ; \
+    playlist_t *p_playlist = pl_Yield( p_libvlc ); \
+    if( !p_playlist ) return VLC_ENOOBJ
 
 #define LIBVLC_PLAYLIST_FUNC_END \
-    vlc_object_release( p_libvlc->p_playlist ); \
+    pl_Release( p_libvlc ); \
     if( i_object ) vlc_object_release( p_libvlc );
 
 /*****************************************************************************
@@ -315,7 +316,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
 {
     int i_err;
     LIBVLC_PLAYLIST_FUNC;
-    i_err = playlist_AddExt( p_libvlc->p_playlist, psz_target,
+    i_err = playlist_AddExt( p_playlist, psz_target,
                              NULL,  i_mode, i_pos, -1,
                              ppsz_options, i_options, true, false );
     LIBVLC_PLAYLIST_FUNC_END;
@@ -328,7 +329,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
 int VLC_Play( int i_object )
 {
     LIBVLC_PLAYLIST_FUNC;
-    playlist_Play( p_libvlc->p_playlist );
+    playlist_Play( p_playlist );
     LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }
@@ -339,7 +340,7 @@ int VLC_Play( int i_object )
 int VLC_Pause( int i_object )
 {
     LIBVLC_PLAYLIST_FUNC;
-    playlist_Pause( p_libvlc->p_playlist );
+    playlist_Pause( p_playlist );
     LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }
@@ -350,7 +351,7 @@ int VLC_Pause( int i_object )
 int VLC_Stop( int i_object )
 {
     LIBVLC_PLAYLIST_FUNC;
-    playlist_Stop( p_libvlc->p_playlist );
+    playlist_Stop( p_playlist );
     LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }
@@ -363,15 +364,15 @@ bool VLC_IsPlaying( int i_object )
     bool   b_playing;
 
     LIBVLC_PLAYLIST_FUNC;
-    if( p_libvlc->p_playlist->p_input )
+    if( p_playlist->p_input )
     {
         vlc_value_t  val;
-        var_Get( p_libvlc->p_playlist->p_input, "state", &val );
+        var_Get( p_playlist->p_input, "state", &val );
         b_playing = ( val.i_int == PLAYING_S );
     }
     else
     {
-        b_playing = playlist_IsPlaying( p_libvlc->p_playlist );
+        b_playing = playlist_IsPlaying( p_playlist );
     }
     LIBVLC_PLAYLIST_FUNC_END;
     return b_playing;
@@ -672,7 +673,7 @@ int VLC_PlaylistNumberOfItems( int i_object )
 {
     int i_size;
     LIBVLC_PLAYLIST_FUNC;
-    i_size = p_libvlc->p_playlist->items.i_size;
+    i_size = p_playlist->items.i_size;
     LIBVLC_PLAYLIST_FUNC_END;
     return i_size;
 }
@@ -685,7 +686,7 @@ int VLC_PlaylistNumberOfItems( int i_object )
 int VLC_PlaylistNext( int i_object )
 {
     LIBVLC_PLAYLIST_FUNC;
-    playlist_Next( p_libvlc->p_playlist );
+    playlist_Next( p_playlist );
     LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }
@@ -698,7 +699,7 @@ int VLC_PlaylistNext( int i_object )
 int VLC_PlaylistPrev( int i_object )
 {
     LIBVLC_PLAYLIST_FUNC;
-    playlist_Prev( p_libvlc->p_playlist );
+    playlist_Prev( p_playlist );
     LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }
@@ -709,7 +710,7 @@ int VLC_PlaylistPrev( int i_object )
 int VLC_PlaylistClear( int i_object )
 {
     LIBVLC_PLAYLIST_FUNC;
-    playlist_Clear( p_libvlc->p_playlist, true );
+    playlist_Clear( p_playlist, true );
     LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }

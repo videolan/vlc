@@ -43,7 +43,7 @@ static void PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
 
 playlist_t *__pl_Yield( vlc_object_t *p_this )
 {
-    playlist_t *pl = p_this->p_libvlc->p_playlist;
+    playlist_t *pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
     assert( pl != NULL );
     vlc_object_yield( pl );
     return pl;
@@ -51,7 +51,7 @@ playlist_t *__pl_Yield( vlc_object_t *p_this )
 
 void __pl_Release( vlc_object_t *p_this )
 {
-    playlist_t *pl = p_this->p_libvlc->p_playlist;
+    playlist_t *pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
     assert( pl != NULL );
     vlc_object_release( pl );
 }

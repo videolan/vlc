@@ -179,7 +179,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
         return NULL;
 
     priv = libvlc_priv (p_libvlc);
-    p_libvlc->p_playlist = NULL;
+    priv->p_playlist = NULL;
     priv->p_interaction = NULL;
     priv->p_vlm = NULL;
     p_libvlc->psz_object_name = strdup( "libvlc" );
@@ -736,7 +736,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     /* Initialize playlist and get commandline files */
     playlist_ThreadCreate( p_libvlc );
-    if( !p_libvlc->p_playlist )
+    if( !priv->p_playlist )
     {
         msg_Err( p_libvlc, "playlist initialization failed" );
         if( priv->p_memcpy_module != NULL )
@@ -746,7 +746,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
     }
-    p_playlist = p_libvlc->p_playlist;
+    p_playlist = priv->p_playlist;
 
     psz_modules = config_GetPsz( p_playlist, "services-discovery" );
     if( psz_modules && *psz_modules )
@@ -939,7 +939,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Free playlist */
     msg_Dbg( p_libvlc, "removing playlist" );
-    playlist_ThreadDestroy( p_libvlc->p_playlist );
+    playlist_ThreadDestroy( priv->p_playlist );
 
     /* Free video outputs */
     msg_Dbg( p_libvlc, "removing all video outputs" );
@@ -1138,7 +1138,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
 
     /* Interface doesn't handle play on start so do it ourselves */
     if( !p_intf->b_play && b_play )
-        playlist_Play( p_libvlc->p_playlist );
+        playlist_Play( libvlc_priv(p_libvlc)->p_playlist );
 
     /* Try to run the interface */
     p_intf->b_play = b_play;

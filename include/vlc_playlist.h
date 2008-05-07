@@ -412,7 +412,7 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
 #define playlist_IsEmpty( pl ) ( pl->items.i_size == 0 )
 
 /** Tell the number of items in the current playing context */
-#define playlist_CurrentSize( obj ) obj->p_libvlc->p_playlist->current.i_size
+#define playlist_CurrentSize( pl ) pl->current.i_size
 
 /** Ask the playlist to do some work */
 #define playlist_Signal( p_playlist ) vlc_object_signal( p_playlist )

@@ -1,9 +1,8 @@
 /*****************************************************************************
  * main.h: access to all program variables
- * Declaration and extern access to global program object.
+ * Declaration and extern access to LibVLC instance object.
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001, 2002 the VideoLAN team
- * $Id$
+ * Copyright (C) 1999, 2000, 2001, 2002, 2008 the VideoLAN team
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -39,8 +38,6 @@ struct libvlc_int_t
 
     /* Global properties */
     char *                 psz_homedir;      ///< user's home directory
-
-    playlist_t            *p_playlist;       ///< playlist object
 
     global_stats_t       *p_stats;           ///< Global statistics
 

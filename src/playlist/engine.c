@@ -74,7 +74,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     TAB_INIT( p_playlist->i_sds, p_playlist->pp_sds );
 
-    p_parent->p_libvlc->p_playlist = p_playlist;
+    libvlc_priv(p_parent->p_libvlc)->p_playlist = p_playlist;
 
     VariablesInit( p_playlist );
 
