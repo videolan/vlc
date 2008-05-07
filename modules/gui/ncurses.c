@@ -589,19 +589,16 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 var_Get( p_playlist, "random", &val );
                 val.b_bool = !val.b_bool;
                 var_Set( p_playlist, "random", val );
-                vlc_object_release( p_playlist );
                 ReturnTrue;
             case 'l':
                 var_Get( p_playlist, "loop", &val );
                 val.b_bool = !val.b_bool;
                 var_Set( p_playlist, "loop", val );
-                vlc_object_release( p_playlist );
                 ReturnTrue;
             case 'R':
                 var_Get( p_playlist, "repeat", &val );
                 val.b_bool = !val.b_bool;
                 var_Set( p_playlist, "repeat", val );
-                vlc_object_release( p_playlist );
                 ReturnTrue;
 
             /* Playlist sort */
