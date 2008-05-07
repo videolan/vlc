@@ -348,6 +348,9 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
     const char *psz_session = NULL, *psz;
     char control[sizeof("rtsp://[]:12345") + NI_MAXNUMERICHOST
                   + strlen( rtsp->psz_path )];
+    time_t now;
+
+    time (&now);
 
     if( answer == NULL || query == NULL || cl == NULL )
         return VLC_SUCCESS;
@@ -375,6 +378,22 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
     answer->i_type   = HTTPD_MSG_ANSWER;
     answer->i_body = 0;
     answer->p_body = NULL;
+
+    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
+
+    /* Date: is always allowed, and sometimes mandatory with RTSP/2.0. */
+    struct tm ut;
+    if (gmtime_r (&now, &ut) != NULL)
+    {   /* RFC1123 format, GMT is mandatory */
+        static const char wdays[7][4] = {
+            "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+        static const char mons[12][4] = {
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        httpd_MsgAdd (answer, "Date", "%s, %02u %s %04u %02u:%02u:%02u GMT",
+                      wdays[ut.tm_wday], ut.tm_mday, mons[ut.tm_mon],
+                      1900 + ut.tm_year, ut.tm_hour, ut.tm_min, ut.tm_sec);
+    }
 
     if( query->i_proto != HTTPD_PROTO_RTSP )
     {
@@ -689,7 +708,6 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             return VLC_EGENERIC;
     }
 
-    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
     if( psz_session )
         httpd_MsgAdd( answer, "Session", "%s"/*;timeout=5*/, psz_session );
 
