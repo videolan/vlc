@@ -1,7 +1,9 @@
 --[[
  $Id$
 
- Copyright © 2007 the VideoLAN team
+ Copyright © 2008 the VideoLAN team
+
+ Authors: Antoine Cellerier <dionoea at videolan dot org>
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
