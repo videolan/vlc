@@ -391,8 +391,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * Plug-in stuff
  *****************************************************************************/
 
-#include "vlc_modules_macros.h"
-
 #if defined (WIN32) && defined (DLL_EXPORT)
 #  ifdef __cplusplus
 #    define VLC_PUBLIC_API extern "C" __declspec(dllexport)
@@ -431,6 +429,8 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #    endif
 #  endif
 #endif
+
+#include "vlc_modules_macros.h"
 
 /*****************************************************************************
  * OS-specific headers and thread types

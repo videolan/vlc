@@ -1,7 +1,8 @@
 /*****************************************************************************
  * entry.c : Callbacks for module entry point
  *****************************************************************************
- * Copyright (C) 2001-2007 the VideoLAN team
+ * Copyright (C) 2007 the VideoLAN team
+ * Copyright © 2007-2008 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,13 +80,17 @@ module_t *vlc_submodule_create (module_t *module)
 }
 
 
-int vlc_module_set (module_t *module, int propid, void *value)
+int vlc_module_set (module_t *module, int propid, ...)
 {
+    va_list ap;
+    int ret = VLC_SUCCESS;
+
+    va_start (ap, propid);
     switch (propid)
     {
         case VLC_MODULE_CPU_REQUIREMENT:
             assert (!module->b_submodule);
-            module->i_cpu |= (intptr_t)value;
+            module->i_cpu |= va_arg (ap, int);
             break;
 
         case VLC_MODULE_SHORTCUT:
@@ -93,51 +98,57 @@ int vlc_module_set (module_t *module, int propid, void *value)
             unsigned i;
             for (i = 0; module->pp_shortcuts[i] != NULL; i++);
             if (i >= (MODULE_SHORTCUT_MAX - 1))
-                return VLC_ENOMEM;
+            {
+                ret = VLC_ENOMEM;
+                break;
+            }
 
-            module->pp_shortcuts[i] = (char *)value;
+            module->pp_shortcuts[i] = va_arg (ap, char *);
             break;
         }
 
         case VLC_MODULE_SHORTNAME:
-            module->psz_shortname = (char *)value;
+            module->psz_shortname = va_arg (ap, char *);
             break;
 
         case VLC_MODULE_DESCRIPTION:
-            module->psz_longname = (char *)value;
+            module->psz_longname = va_arg (ap, char *);
             break;
 
         case VLC_MODULE_HELP:
-            module->psz_help = (char *)value;
+            module->psz_help = va_arg (ap, char *);
             break;
 
         case VLC_MODULE_CAPABILITY:
-            module->psz_capability = (char *)value;
+            module->psz_capability = va_arg (ap, char *);
             break;
 
         case VLC_MODULE_SCORE:
-            module->i_score = (intptr_t)value;
+            module->i_score = va_arg (ap, int);
             break;
 
         case VLC_MODULE_CB_OPEN:
-            module->pf_activate = (int (*) (vlc_object_t *))value;
+            module->pf_activate = va_arg (ap, int (*) (vlc_object_t *));
             break;
 
         case VLC_MODULE_CB_CLOSE:
-            module->pf_deactivate = (void (*) (vlc_object_t *))value;
+            module->pf_deactivate = va_arg (ap, void (*) (vlc_object_t *));
             break;
 
-        case VLC_MODULE_UNLOADABLE:
-            module->b_unloadable = (value != NULL);
+        case VLC_MODULE_NO_UNLOAD:
+            module->b_unloadable = false;
             break;
 
         case VLC_MODULE_NAME:
+        {
+            const char *value = va_arg (ap, const char *);
             free( module->psz_object_name );
-            module->psz_object_name = strdup( (char *)value );
-            module->pp_shortcuts[0] = (char *)value;
+            module->psz_object_name = strdup( value );
+            module->pp_shortcuts[0] = value;
             if (module->psz_longname == default_name)
-                module->psz_longname = (char *)value;
+                module->psz_longname = value;
             break;
+        }
 
         case VLC_MODULE_PROGRAM:
             msg_Warn (module, "deprecated module property %d", propid);
@@ -146,9 +157,11 @@ int vlc_module_set (module_t *module, int propid, void *value)
         default:
             msg_Err (module, "unknown module property %d", propid);
             msg_Err (module, "LibVLC might be too old to use this module.");
-            return VLC_EGENERIC;
+            ret = VLC_EGENERIC;
+            break;
     }
-    return 0;
+    va_end (ap);
+    return ret;
 }
 
 module_config_t *vlc_config_create (module_t *module, int type)

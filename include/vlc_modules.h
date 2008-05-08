@@ -52,28 +52,6 @@ VLC_EXPORT(char **, __module_GetModulesNamesForCapability,
                     ( vlc_object_t *p_this, const char * psz_capability,
                       char ***psz_longname ) );
 
-VLC_EXPORT( module_t *, vlc_module_create, ( vlc_object_t * ) );
-VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
-VLC_EXPORT( int, vlc_module_set, (module_t *module, int propid, void *value) );
-
-enum vlc_module_properties
-{
-    /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
-     * Append new items at the end ONLY. */
-    VLC_MODULE_CPU_REQUIREMENT,
-    VLC_MODULE_SHORTCUT,
-    VLC_MODULE_SHORTNAME,
-    VLC_MODULE_DESCRIPTION,
-    VLC_MODULE_HELP,
-    VLC_MODULE_CAPABILITY,
-    VLC_MODULE_SCORE,
-    VLC_MODULE_PROGRAM,
-    VLC_MODULE_CB_OPEN,
-    VLC_MODULE_CB_CLOSE,
-    VLC_MODULE_UNLOADABLE,
-    VLC_MODULE_NAME,
-};
-
 VLC_EXPORT( bool, module_IsCapable, ( const module_t *m, const char *cap ) );
 VLC_EXPORT( const char *, module_GetObjName, ( const module_t *m ) );
 VLC_EXPORT( const char *, module_GetName, ( const module_t *m, bool long_name ) );
