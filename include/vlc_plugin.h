@@ -140,7 +140,8 @@ E_(vlc_entry) ( module_t *p_module );
         goto error
 
 #define set_capability( cap, score ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_CAPABILITY, (int)(cap)) \
+    if (vlc_module_set (p_submodule, VLC_MODULE_CAPABILITY, \
+                        (const char *)(cap)) \
      || vlc_module_set (p_submodule, VLC_MODULE_SCORE, (int)(score))) \
         goto error
 
