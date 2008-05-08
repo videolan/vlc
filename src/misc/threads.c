@@ -46,10 +46,7 @@
  *****************************************************************************/
 static volatile unsigned i_initializations = 0;
 
-#if defined( UNDER_CE )
-#elif defined( WIN32 )
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-#elif defined( LIBVLC_USE_PTHREAD )
+#if defined( LIBVLC_USE_PTHREAD )
 static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -133,10 +130,7 @@ int vlc_threads_init( void )
 
     /* If we have lazy mutex initialization, use it. Otherwise, we just
      * hope nothing wrong happens. */
-#if defined( UNDER_CE )
-#elif defined( WIN32 )
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-#elif defined( LIBVLC_USE_PTHREAD )
+#if defined( LIBVLC_USE_PTHREAD )
     pthread_mutex_lock( &once_mutex );
 #endif
 
@@ -158,10 +152,7 @@ int vlc_threads_init( void )
 out:
     /* If we have lazy mutex initialization support, unlock the mutex.
      * Otherwize, we are screwed. */
-#if defined( UNDER_CE )
-#elif defined( WIN32 )
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-#elif defined( LIBVLC_USE_PTHREAD )
+#if defined( LIBVLC_USE_PTHREAD )
     pthread_mutex_unlock( &once_mutex );
 #endif
 
@@ -175,10 +166,7 @@ out:
  *****************************************************************************/
 void vlc_threads_end( void )
 {
-#if defined( UNDER_CE )
-#elif defined( WIN32 )
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-#elif defined( LIBVLC_USE_PTHREAD )
+#if defined( LIBVLC_USE_PTHREAD )
     pthread_mutex_lock( &once_mutex );
 #endif
 
@@ -188,10 +176,7 @@ void vlc_threads_end( void )
         vlc_object_release( p_root );
     i_initializations--;
 
-#if defined( UNDER_CE )
-#elif defined( WIN32 )
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-#elif defined( LIBVLC_USE_PTHREAD )
+#if defined( LIBVLC_USE_PTHREAD )
     pthread_mutex_unlock( &once_mutex );
 #endif
 }
@@ -206,7 +191,24 @@ int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
  *****************************************************************************/
 int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
-#if defined( UNDER_CE )
+#if defined( LIBVLC_USE_PTHREAD )
+    pthread_mutexattr_t attr;
+    int                 i_result;
+
+    pthread_mutexattr_init( &attr );
+
+# ifndef NDEBUG
+    /* Create error-checking mutex to detect problems more easily. */
+#  if defined(SYS_LINUX)
+    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
+#  else
+    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
+#  endif
+# endif
+    i_result = pthread_mutex_init( p_mutex, &attr );
+    pthread_mutexattr_destroy( &attr );
+    return i_result;
+#elif defined( UNDER_CE )
     InitializeCriticalSection( &p_mutex->csection );
     return 0;
 
@@ -235,23 +237,6 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     p_mutex->init = 9999;
     return B_OK;
 
-#elif defined( LIBVLC_USE_PTHREAD )
-    pthread_mutexattr_t attr;
-    int                 i_result;
-
-    pthread_mutexattr_init( &attr );
-
-# ifndef NDEBUG
-    /* Create error-checking mutex to detect problems more easily. */
-#  if defined(SYS_LINUX)
-    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
-#  else
-    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
-#  endif
-# endif
-    i_result = pthread_mutex_init( p_mutex, &attr );
-    pthread_mutexattr_destroy( &attr );
-    return i_result;
 #endif
 }
 
@@ -260,11 +245,7 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
-#if defined( WIN32 )
-    /* Create mutex returns a recursive mutex */
-    *p_mutex = CreateMutex( 0, FALSE, 0 );
-    return (*p_mutex != NULL) ? 0 : ENOMEM;
-#elif defined( LIBVLC_USE_PTHREAD )
+#if defined( LIBVLC_USE_PTHREAD )
     pthread_mutexattr_t attr;
     int                 i_result;
 
@@ -273,6 +254,10 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
     i_result = pthread_mutex_init( p_mutex, &attr );
     pthread_mutexattr_destroy( &attr );
     return( i_result );
+#elif defined( WIN32 )
+    /* Create mutex returns a recursive mutex */
+    *p_mutex = CreateMutex( 0, FALSE, 0 );
+    return (*p_mutex != NULL) ? 0 : ENOMEM;
 #else
 # error Unimplemented!
 #endif
@@ -284,7 +269,11 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex )
 {
-#if defined( UNDER_CE )
+#if defined( LIBVLC_USE_PTHREAD )
+    int val = pthread_mutex_destroy( p_mutex );
+    VLC_THREAD_ASSERT ("destroying mutex");
+
+#elif defined( UNDER_CE )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
     DeleteCriticalSection( &p_mutex->csection );
@@ -300,10 +289,6 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
 
     p_mutex->init = 0;
 
-#elif defined( LIBVLC_USE_PTHREAD )
-    int val = pthread_mutex_destroy( p_mutex );
-    VLC_THREAD_ASSERT ("destroying mutex");
-
 #endif
 }
 
@@ -312,7 +297,28 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
  *****************************************************************************/
 int __vlc_cond_init( vlc_cond_t *p_condvar )
 {
-#if defined( UNDER_CE ) || defined( WIN32 )
+#if defined( LIBVLC_USE_PTHREAD )
+    pthread_condattr_t attr;
+    int ret;
+
+    ret = pthread_condattr_init (&attr);
+    if (ret)
+        return ret;
+
+# if !defined (_POSIX_CLOCK_SELECTION)
+   /* Fairly outdated POSIX support (that was defined in 2001) */
+#  define _POSIX_CLOCK_SELECTION (-1)
+# endif
+# if (_POSIX_CLOCK_SELECTION >= 0)
+    /* NOTE: This must be the same clock as the one in mtime.c */
+    pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
+# endif
+
+    ret = pthread_cond_init (p_condvar, &attr);
+    pthread_condattr_destroy (&attr);
+    return ret;
+
+#elif defined( UNDER_CE ) || defined( WIN32 )
     /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
 
@@ -338,27 +344,6 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
     p_condvar->init = 9999;
     return 0;
 
-#elif defined( LIBVLC_USE_PTHREAD )
-    pthread_condattr_t attr;
-    int ret;
-
-    ret = pthread_condattr_init (&attr);
-    if (ret)
-        return ret;
-
-# if !defined (_POSIX_CLOCK_SELECTION)
-   /* Fairly outdated POSIX support (that was defined in 2001) */
-#  define _POSIX_CLOCK_SELECTION (-1)
-# endif
-# if (_POSIX_CLOCK_SELECTION >= 0)
-    /* NOTE: This must be the same clock as the one in mtime.c */
-    pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
-# endif
-
-    ret = pthread_cond_init (p_condvar, &attr);
-    pthread_condattr_destroy (&attr);
-    return ret;
-
 #endif
 }
 
@@ -367,17 +352,17 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
  *****************************************************************************/
 void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar )
 {
-#if defined( UNDER_CE ) || defined( WIN32 )
+#if defined( LIBVLC_USE_PTHREAD )
+    int val = pthread_cond_destroy( p_condvar );
+    VLC_THREAD_ASSERT ("destroying condition");
+
+#elif defined( UNDER_CE ) || defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
     CloseHandle( p_condvar->event );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_condvar->init = 0;
-
-#elif defined( LIBVLC_USE_PTHREAD )
-    int val = pthread_cond_destroy( p_condvar );
-    VLC_THREAD_ASSERT ("destroying condition");
 
 #endif
 }
@@ -389,15 +374,14 @@ int __vlc_threadvar_create( vlc_threadvar_t *p_tls )
 {
     int i_ret = -1;
 
-#if defined( HAVE_KERNEL_SCHEDULER_H )
-# error Unimplemented!
+#if defined( LIBVLC_USE_PTHREAD )
+    i_ret =  pthread_key_create( p_tls, NULL );
 #elif defined( UNDER_CE )
 #elif defined( WIN32 )
     *p_tls = TlsAlloc();
     i_ret = (*p_tls == INVALID_HANDLE_VALUE) ? EAGAIN : 0;
-
-#elif defined( LIBVLC_USE_PTHREAD )
-    i_ret =  pthread_key_create( p_tls, NULL );
+#else
+# error Unimplemented!
 #endif
     return i_ret;
 }
@@ -418,7 +402,44 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 
     vlc_mutex_lock( &p_this->object_lock );
 
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( LIBVLC_USE_PTHREAD )
+    i_ret = pthread_create( &p_priv->thread_id, NULL, func, p_data );
+
+#ifndef __APPLE__
+    if( config_GetInt( p_this, "rt-priority" ) > 0 )
+#endif
+    {
+        int i_error, i_policy;
+        struct sched_param param;
+
+        memset( &param, 0, sizeof(struct sched_param) );
+        if( config_GetType( p_this, "rt-offset" ) )
+            i_priority += config_GetInt( p_this, "rt-offset" );
+        if( i_priority <= 0 )
+        {
+            param.sched_priority = (-1) * i_priority;
+            i_policy = SCHED_OTHER;
+        }
+        else
+        {
+            param.sched_priority = i_priority;
+            i_policy = SCHED_RR;
+        }
+        if( (i_error = pthread_setschedparam( p_priv->thread_id,
+                                               i_policy, &param )) )
+        {
+            errno = i_error;
+            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %m",
+                      psz_file, i_line );
+            i_priority = 0;
+        }
+    }
+#ifndef __APPLE__
+    else
+        i_priority = 0;
+#endif
+
+#elif defined( WIN32 ) || defined( UNDER_CE )
     {
         /* When using the MSVCRT C library you have to use the _beginthreadex
          * function instead of CreateThread, otherwise you'll end up with
@@ -457,47 +478,6 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
                                       i_priority, p_data );
     i_ret = resume_thread( p_priv->thread_id );
 
-#elif defined( LIBVLC_USE_PTHREAD )
-    i_ret = pthread_create( &p_priv->thread_id, NULL, func, p_data );
-
-#ifndef __APPLE__
-    if( config_GetInt( p_this, "rt-priority" ) )
-#endif
-    {
-        int i_error, i_policy;
-        struct sched_param param;
-
-        memset( &param, 0, sizeof(struct sched_param) );
-        if( config_GetType( p_this, "rt-offset" ) )
-        {
-            i_priority += config_GetInt( p_this, "rt-offset" );
-        }
-        if( i_priority <= 0 )
-        {
-            param.sched_priority = (-1) * i_priority;
-            i_policy = SCHED_OTHER;
-        }
-        else
-        {
-            param.sched_priority = i_priority;
-            i_policy = SCHED_RR;
-        }
-        if( (i_error = pthread_setschedparam( p_priv->thread_id,
-                                               i_policy, &param )) )
-        {
-            errno = i_error;
-            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %m",
-                      psz_file, i_line );
-            i_priority = 0;
-        }
-    }
-#ifndef __APPLE__
-    else
-    {
-        i_priority = 0;
-    }
-#endif
-
 #endif
 
     if( i_ret == 0 )
@@ -512,25 +492,22 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 
 #if defined( WIN32 ) || defined( UNDER_CE )
         msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
-                 (unsigned int)p_priv->thread_id.id, psz_name,
-         i_priority, psz_file, i_line );
+                 (unsigned int)p_priv->thread_id.id, psz_name, i_priority,
+                 psz_file, i_line );
 #else
         msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
                  (unsigned int)p_priv->thread_id, psz_name, i_priority,
                  psz_file, i_line );
 #endif
-
-
-        vlc_mutex_unlock( &p_this->object_lock );
     }
     else
     {
         errno = i_ret;
         msg_Err( p_this, "%s thread could not be created at %s:%d (%m)",
                          psz_name, psz_file, i_line );
-        vlc_mutex_unlock( &p_this->object_lock );
     }
 
+    vlc_mutex_unlock( &p_this->object_lock );
     return i_ret;
 }
 
@@ -542,18 +519,8 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
                                int i_line, int i_priority )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-#if defined( WIN32 ) || defined( UNDER_CE )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( !p_priv->thread_id.hThread )
-        p_priv->thread_id.hThread = GetCurrentThread();
-    if( !SetThreadPriority(p_priv->thread_id.hThread, i_priority) )
-    {
-        msg_Warn( p_this, "couldn't set a faster priority" );
-        return 1;
-    }
-
-#elif defined( LIBVLC_USE_PTHREAD )
+#if defined( LIBVLC_USE_PTHREAD )
 # ifndef __APPLE__
     if( config_GetInt( p_this, "rt-priority" ) > 0 )
 # endif
@@ -563,9 +530,7 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 
         memset( &param, 0, sizeof(struct sched_param) );
         if( config_GetType( p_this, "rt-offset" ) )
-        {
             i_priority += config_GetInt( p_this, "rt-offset" );
-        }
         if( i_priority <= 0 )
         {
             param.sched_priority = (-1) * i_priority;
@@ -587,6 +552,18 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
             i_priority = 0;
         }
     }
+
+#elif defined( WIN32 ) || defined( UNDER_CE )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
+    if( !p_priv->thread_id.hThread )
+        p_priv->thread_id.hThread = GetCurrentThread();
+    if( !SetThreadPriority(p_priv->thread_id.hThread, i_priority) )
+    {
+        msg_Warn( p_this, "couldn't set a faster priority" );
+        return 1;
+    }
+
 #endif
 
     return 0;
@@ -606,8 +583,17 @@ void __vlc_thread_ready( vlc_object_t *p_this )
 void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
+    int i_ret = 0;
 
-#if defined( UNDER_CE ) || defined( WIN32 )
+#if defined( LIBVLC_USE_PTHREAD )
+    /* Make sure we do return if we are calling vlc_thread_join()
+     * from the joined thread */
+    if (pthread_equal (pthread_self (), p_priv->thread_id))
+        i_ret = pthread_detach (p_priv->thread_id);
+    else
+        i_ret = pthread_join (p_priv->thread_id, NULL);
+
+#elif defined( UNDER_CE ) || defined( WIN32 )
     HMODULE hmodule;
     BOOL (WINAPI *OurGetThreadTimes)( HANDLE, FILETIME*, FILETIME*,
                                       FILETIME*, FILETIME* );
@@ -676,21 +662,10 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     }
     CloseHandle( hThread );
 
-#else /* !defined(WIN32) */
-
-    int i_ret = 0;
-
-#if defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
     int32_t exit_value;
     i_ret = (B_OK == wait_for_thread( p_priv->thread_id, &exit_value ));
 
-#elif defined( LIBVLC_USE_PTHREAD )
-    /* Make sure we do return if we are calling vlc_thread_join()
-     * from the joined thread */
-    if (pthread_equal (pthread_self (), p_priv->thread_id))
-        i_ret = pthread_detach (p_priv->thread_id);
-    else
-        i_ret = pthread_join (p_priv->thread_id, NULL);
 #endif
 
     if( i_ret )
@@ -700,13 +675,8 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
                          (unsigned int)p_priv->thread_id, psz_file, i_line );
     }
     else
-    {
         msg_Dbg( p_this, "thread %u joined (%s:%d)",
                          (unsigned int)p_priv->thread_id, psz_file, i_line );
-    }
-
-#endif
 
     p_priv->b_thread = false;
 }
-
