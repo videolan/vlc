@@ -230,6 +230,15 @@ int VLC_VariableSet( int i_object, char const *psz_var, vlc_value_t value )
             return VLC_SUCCESS;
         }
     }
+    /* EXPLICIT HACK (this is the legacy API anyway):
+     * VLC_VariableSet is only used from the browser plugins, so we
+     *  can pretty much assume that the input is _not_ trusted. */
+    module_config_t *p_item;
+    p_item = config_FindConfig( VLC_OBJECT(p_libvlc), psz_var );
+    if( !p_item )
+        return VLC_ENOVAR;
+    if( !p_item->b_safe )
+        return VLC_EGENERIC;
 
     i_ret = var_Set( p_libvlc, psz_var, value );
 
