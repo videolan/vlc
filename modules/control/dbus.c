@@ -435,9 +435,9 @@ DBUS_METHOD( GetMetadata )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    if( i_position <= p_playlist->items.i_size / 2 )
+    if( i_position < p_playlist->current.i_size )
     {
-        GetInputMeta( p_playlist->items.p_elems[i_position*2-1]->p_input, &args );
+        GetInputMeta( p_playlist->current.p_elems[i_position]->p_input, &args );
     }
 
     PL_UNLOCK;
@@ -451,7 +451,7 @@ DBUS_METHOD( GetLength )
     OUT_ARGUMENTS;
 
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    dbus_int32_t i_elements = p_playlist->items.i_size / 2;
+    dbus_int32_t i_elements = p_playlist->current.i_size;
     pl_Release( p_playlist );
 
     ADD_INT32( &i_elements );
@@ -480,12 +480,14 @@ DBUS_METHOD( DelTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    if( i_position <= p_playlist->items.i_size / 2 )
+    PL_LOCK;
+    if( i_position < p_playlist->current.i_size )
     {
         playlist_DeleteFromInput( p_playlist,
-            p_playlist->items.p_elems[i_position*2-1]->i_id,
-            false );
+            p_playlist->current.p_elems[i_position]->p_input->i_id,
+            true );
     }
+    PL_UNLOCK;
 
     pl_Release( p_playlist );
 
@@ -830,7 +832,7 @@ DBUS_SIGNAL( TrackListChangeSignal )
     OUT_ARGUMENTS;
 
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_data );
-    dbus_int32_t i_elements = p_playlist->items.i_size / 2;
+    dbus_int32_t i_elements = p_playlist->current.i_size;
     pl_Release( p_playlist );
 
     ADD_INT32( &i_elements );
@@ -1012,7 +1014,7 @@ static int UpdateCaps( intf_thread_t* p_intf, bool b_playlist_locked )
     playlist_t* p_playlist = pl_Yield( (vlc_object_t*)p_intf );
     if( !b_playlist_locked ) PL_LOCK;
     
-    if( p_playlist->items.i_size > 0 )
+    if( p_playlist->current.i_size > 0 )
         i_caps |= CAPS_CAN_PLAY | CAPS_CAN_GO_PREV | CAPS_CAN_GO_NEXT;
 
     if( p_playlist->p_input )
