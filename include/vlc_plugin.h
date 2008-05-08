@@ -122,7 +122,8 @@ E_(vlc_entry) ( module_t *p_module );
         goto error
 
 #define add_shortcut( shortcut ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, (int)(shortcut))) \
+    if (vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, \
+        (const char *)(shortcut))) \
         goto error
 
 #define set_shortname( shortname ) \
