@@ -181,8 +181,8 @@ void vlc_threads_end( void )
 #endif
 }
 
-#ifdef __linux__
-/* This is not prototyped under Linux, though it exists. */
+#if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
+/* This is not prototyped under glibc, though it exists. */
 int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 #endif
 
@@ -199,7 +199,7 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 
 # ifndef NDEBUG
     /* Create error-checking mutex to detect problems more easily. */
-#  if defined(SYS_LINUX)
+#  if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
     pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
 #  else
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
@@ -250,7 +250,11 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
     int                 i_result;
 
     pthread_mutexattr_init( &attr );
+#  if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
+    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_RECURSIVE_NP );
+#  else
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
+#  endif
     i_result = pthread_mutex_init( p_mutex, &attr );
     pthread_mutexattr_destroy( &attr );
     return( i_result );
