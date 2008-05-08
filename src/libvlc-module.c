@@ -35,6 +35,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include "libvlc.h"
 
 //#define Nothing here, this is just to prevent update-po from being stupid

@@ -247,7 +247,7 @@ done
 #  If a module was requested, use its name
 #
 if test -n "${module}"; then
-  cppflags="${cppflags} -DMODULE_NAME=${module} -DMODULE_NAME_IS_${module}"
+  cppflags="${cppflags} -DMODULE_NAME=${module} -DMODULE_NAME_IS_${module} -DMODULE_STRING=\"${module}\""
 fi
 
 #

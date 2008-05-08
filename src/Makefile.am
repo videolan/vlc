@@ -43,9 +43,9 @@ pluginsinclude_HEADERS = \
 	../include/vlc_main.h \
 	../include/vlc_messages.h \
 	../include/vlc_modules.h \
-	../include/vlc_modules_macros.h \
 	../include/vlc_mtime.h \
 	../include/vlc_objects.h \
+	../include/vlc_plugin.h \
 	../include/vlc_threads.h \
 	../include/vlc_threads_funcs.h \
 	../include/vlc_variables.h \
@@ -86,7 +86,6 @@ noinst_HEADERS = \
 	../include/vlc_osd.h \
 	../include/vlc_pgpkey.h \
 	../include/vlc_playlist.h \
-	../include/vlc_plugin.h \
 	../include/vlc_rand.h \
 	../include/vlc_services_discovery.h \
 	../include/vlc_sout.h \
@@ -171,6 +170,7 @@ endif
 libvlc_la_SOURCES = $(SOURCES_libvlc)
 nodist_libvlc_la_SOURCES = misc/revision.c
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
+	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DDATA_PATH=\"$(pkgdatadir)\" \
@@ -190,7 +190,8 @@ libvlc_la_DEPENDENCIES = libvlc.sym
 
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
-libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
+libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
+	-DMODULE_STRING=\"control\"
 libvlc_control_la_LDFLAGS = $(AM_LDFLAGS) -version-info 1:0:0
 if HAVE_COMPILER_EXPORT
 libvlc_control_la_LDFLAGS += -export-dynamic

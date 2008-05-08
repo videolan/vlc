@@ -430,7 +430,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #  endif
 #endif
 
-#include "vlc_modules_macros.h"
+#include <vlc_plugin.h>
 
 /*****************************************************************************
  * OS-specific headers and thread types

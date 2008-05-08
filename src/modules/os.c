@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h> /* MODULE_SUFFIX */
 #include "libvlc.h"
 #include "modules.h"
 
@@ -259,6 +260,8 @@ void module_Unload( module_handle_t handle )
 #elif defined(HAVE_DL_DLOPEN)
 # ifdef NDEBUG
     dlclose( handle );
+# else
+    (void)handle;
 # endif
 
 #elif defined(HAVE_DL_SHL_LOAD)
