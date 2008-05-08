@@ -123,8 +123,8 @@ void __module_InitBank( vlc_object_t *p_this )
 
     if( p_libvlc_global->p_module_bank == NULL )
     {
-        p_bank = vlc_object_create( p_this, sizeof(module_bank_t) );
-        p_bank->psz_object_name = strdup( "module bank" );
+        p_bank = vlc_custom_create( p_this, sizeof(module_bank_t),
+                                    VLC_OBJECT_GENERIC, "module bank");
         p_bank->i_usage = 1;
         p_bank->i_cache = p_bank->i_loaded_cache = 0;
         p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
