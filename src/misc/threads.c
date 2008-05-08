@@ -269,14 +269,6 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
     int                 i_result;
 
     pthread_mutexattr_init( &attr );
-# ifndef NDEBUG
-    /* Create error-checking mutex to detect problems more easily. */
-#   if defined(SYS_LINUX)
-    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
-#   else
-    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
-#   endif
-# endif
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
     i_result = pthread_mutex_init( p_mutex, &attr );
     pthread_mutexattr_destroy( &attr );
