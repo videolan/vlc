@@ -220,3 +220,8 @@ void HTTPClose( access_t *p_access );
 char *HTTPExtractValue( char *psz_uri, const char *psz_name,
                             char *psz_value, int i_value_max );
 #endif
+/*****************************************************************************
+ * Hacks
+ *****************************************************************************/
+#define STRINGIFY( z )   UGLY_KLUDGE( z )
+#define UGLY_KLUDGE( z ) #z
