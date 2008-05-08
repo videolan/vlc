@@ -153,7 +153,8 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         char *psz_buffer = NULL;
 
         msg_Dbg( p_this, "loading VLM configuration" );
-        asprintf(&psz_buffer, "load %s", psz_vlmconf );
+        if( asprintf(&psz_buffer, "load %s", psz_vlmconf ) == -1 )
+            psz_buffer = NULL;
         if( psz_buffer )
         {
             msg_Dbg( p_this, psz_buffer );
@@ -676,19 +677,25 @@ static int ExecuteSave( vlm_t *p_vlm, const char *psz_file, vlm_message_t **pp_s
 
     psz_save = Save( p_vlm );
     if( psz_save == NULL )
+        goto error;
+    if( fputs( psz_save, f ) == EOF )
+        goto error;;
+    if( fclose( f ) )
     {
-        fclose( f );
+        f = NULL;
         goto error;
     }
-    fwrite( psz_save, strlen( psz_save ), 1, f );
+
     free( psz_save );
-    fclose( f );
 
     *pp_status = vlm_MessageNew( "save", vlm_NULL );
     return VLC_SUCCESS;
 
 error:
-    *pp_status = vlm_MessageNew( "save", "Unable to save to file" );
+    free( psz_save );
+    if( f )
+         fclose( f );
+    *pp_status = vlm_MessageNew( "save", "Unable to save to file");
     return VLC_EGENERIC;
 }
 
@@ -1451,10 +1458,12 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
     for( i = 0; i < p_cfg->i_input; i++ )
     {
         char *psz_tmp;
-        asprintf( &psz_tmp, "%d", i+1 );
-        vlm_MessageAdd( p_msg_sub,
-                        vlm_MessageNew( psz_tmp, p_cfg->ppsz_input[i] ) );
-        free( psz_tmp );
+        if( asprintf( &psz_tmp, "%d", i+1 ) != -1 )
+        {
+            vlm_MessageAdd( p_msg_sub,
+                            vlm_MessageNew( psz_tmp, p_cfg->ppsz_input[i] ) );
+            free( psz_tmp );
+        }
     }
 
     vlm_MessageAdd( p_msg,
@@ -1490,10 +1499,13 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
         if( p_instance->p_input )
         {
 #define APPEND_INPUT_INFO( a, format, type ) \
-            asprintf( &psz_tmp, format, \
-                      var_Get ## type( p_instance->p_input, a ) ); \
-            vlm_MessageAdd( p_msg_instance, vlm_MessageNew( a, psz_tmp ) ); \
-            free( psz_tmp );
+            if( asprintf( &psz_tmp, format, \
+                      var_Get ## type( p_instance->p_input, a ) ) != -1 ) \
+            { \
+                vlm_MessageAdd( p_msg_instance, vlm_MessageNew( a, \
+                                psz_tmp ) ); \
+                free( psz_tmp ); \
+            }
             APPEND_INPUT_INFO( "position", "%f", Float );
             APPEND_INPUT_INFO( "time", "%"PRIi64, Time );
             APPEND_INPUT_INFO( "length", "%"PRIi64, Time );
@@ -1503,9 +1515,12 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
             APPEND_INPUT_INFO( "seekable", "%d", Bool );
         }
 #undef APPEND_INPUT_INFO
-        asprintf( &psz_tmp, "%d", p_instance->i_index + 1 );
-        vlm_MessageAdd( p_msg_instance, vlm_MessageNew( "playlistindex", psz_tmp ) );
-        free( psz_tmp );
+        if( asprintf( &psz_tmp, "%d", p_instance->i_index + 1 ) != -1 )
+        {
+            vlm_MessageAdd( p_msg_instance, vlm_MessageNew( "playlistindex",
+                            psz_tmp ) );
+            free( psz_tmp );
+        }
     }
     return p_msg;
 }
@@ -1548,13 +1563,14 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
             char *psz_date;
 
             localtime_r( &i_time, &date);
-            asprintf( &psz_date, "%d/%d/%d-%d:%d:%d",
-                      date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
-                      date.tm_hour, date.tm_min, date.tm_sec );
-
-            vlm_MessageAdd( msg_schedule,
-                            vlm_MessageNew( "date", psz_date ) );
-            free( psz_date );
+            if( asprintf( &psz_date, "%d/%d/%d-%d:%d:%d",
+                          date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
+                          date.tm_hour, date.tm_min, date.tm_sec ) != -1 )
+            {
+                 vlm_MessageAdd( msg_schedule,
+                                 vlm_MessageNew( "date", psz_date ) );
+                 free( psz_date );
+            }
         }
         else
         {
@@ -1622,8 +1638,9 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
                 i_broadcast++;
         }
 
-        asprintf( &psz_count, "( %d broadcast - %d vod )", i_broadcast, i_vod);
-
+        if( asprintf( &psz_count, "( %d broadcast - %d vod )", i_broadcast,
+                      i_vod) == -1 )
+            return NULL;
         p_msg = vlm_MessageNew( "show", vlm_NULL );
         p_msg_child = vlm_MessageAdd( p_msg, vlm_MessageNew( "media", psz_count ) );
         free( psz_count );
