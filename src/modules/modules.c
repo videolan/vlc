@@ -100,7 +100,7 @@ static int  AllocatePluginFile  ( vlc_object_t *, char *, int64_t, int64_t );
 static module_t * AllocatePlugin( vlc_object_t *, char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
-static int  DeleteModule ( module_t *, bool );
+static void DeleteModule ( module_t *, bool );
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void   DupModule        ( module_t * );
 static void   UndupModule      ( module_t * );
@@ -217,17 +217,7 @@ void __module_EndBank( vlc_object_t *p_this )
     while( p_libvlc_global->p_module_bank->i_children )
     {
         p_next = (module_t *)p_libvlc_global->p_module_bank->pp_children[0];
-
-        if( DeleteModule( p_next, true ) )
-        {
-            /* Module deletion failed */
-            msg_Err( p_this, "module \"%s\" can't be removed, trying harder",
-                     p_next->psz_object_name );
-
-            /* We just free the module by hand. Niahahahahaha. */
-            vlc_object_detach( p_next );
-            vlc_object_release( p_next );
-        }
+        DeleteModule( p_next, true );
     }
 
     vlc_object_release( p_libvlc_global->p_module_bank );
@@ -1402,9 +1392,10 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
  *****************************************************************************
  * This function can only be called if the module isn't being used.
  *****************************************************************************/
-static int DeleteModule( module_t * p_module, bool b_detach )
+static void DeleteModule( module_t * p_module, bool b_detach )
 {
-    if( !p_module ) return VLC_EGENERIC;
+    assert( p_module );
+
     if( b_detach )
         vlc_object_detach( p_module );
 
@@ -1431,6 +1422,4 @@ static int DeleteModule( module_t * p_module, bool b_detach )
 
     config_Free( p_module );
     vlc_object_release( p_module );
-    p_module = NULL;
-    return 0;
 }
