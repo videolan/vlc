@@ -357,7 +357,7 @@ unsigned vlc_CPU (void)
 }
 
 static vlc_memcpy_t pf_vlc_memcpy = memcpy;
-static vlc_memcpy_t pf_vlc_memset = memset;
+static vlc_memset_t pf_vlc_memset = memset;
 
 void vlc_fastmem_register (vlc_memcpy_t cpy, vlc_memset_t set)
 {
