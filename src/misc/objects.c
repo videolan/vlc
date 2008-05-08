@@ -419,8 +419,8 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
 #if defined(WIN32) || defined(UNDER_CE)
     /* if object has an associated thread, close it now */
-    if( p_priv->thread_id.hThread )
-       CloseHandle(p_priv->thread_id.hThread);
+    if( p_priv->thread_id )
+       CloseHandle(p_priv->thread_id);
 #endif
 
     vlc_spin_destroy( &p_priv->ref_spin );
@@ -1470,12 +1470,8 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 
     psz_thread[0] = '\0';
     if( vlc_internals( p_this )->b_thread )
-        snprintf( psz_thread, 29, " (thread %u)",
-#if defined(WIN32) || defined(UNDER_CE)
-                  (unsigned)vlc_internals( p_this )->thread_id.id );
-#else
-                  (unsigned)vlc_internals( p_this )->thread_id );
-#endif
+        snprintf( psz_thread, 29, " (thread %lu)",
+                  (unsigned long)vlc_internals( p_this )->thread_id );
 
     psz_parent[0] = '\0';
     if( p_this->p_parent )
