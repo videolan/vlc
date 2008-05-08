@@ -119,16 +119,7 @@ typedef pthread_cond_t  vlc_cond_t;
 typedef pthread_key_t   vlc_threadvar_t;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-typedef struct
-{
-    /* thread id */
-    DWORD  id;
-    /*
-    ** handle to created thread, needs be closed to dispose of it
-    ** even after thread has exited
-    */
-    HANDLE hThread;
-} vlc_thread_t;
+typedef HANDLE  vlc_thread_t;
 
 typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT) ( HANDLE, HANDLE, DWORD, BOOL );
 
@@ -211,12 +202,12 @@ static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
     VLC_THREAD_ASSERT ("locking mutex");
 
 #elif defined( UNDER_CE )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+    (void)psz_file; (void)i_line;
 
     EnterCriticalSection( &p_mutex->csection );
 
 #elif defined( WIN32 )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+    (void)psz_file; (void)i_line;
 
     WaitForSingleObject( *p_mutex, INFINITE );
 
@@ -244,12 +235,12 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
     VLC_THREAD_ASSERT ("unlocking mutex");
 
 #elif defined( UNDER_CE )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+    (void)psz_file); (void)i_line;
 
     LeaveCriticalSection( &p_mutex->csection );
 
 #elif defined( WIN32 )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+    (void)psz_file; (void)i_line;
 
     ReleaseMutex( *p_mutex );
 
@@ -285,7 +276,7 @@ static inline void __vlc_cond_signal( const char * psz_file, int i_line,
     VLC_THREAD_ASSERT ("signaling condition variable");
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+    (void)psz_file; (void)i_line;
 
     /* Release one waiting thread if one is available. */
     /* For this trick to work properly, the vlc_cond_signal must be surrounded
@@ -343,7 +334,7 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     vlc_mutex_lock( p_mutex );
 
 #elif defined( WIN32 )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+    (void)psz_file; (void)i_line;
 
     /* Increase our wait count */
     p_condvar->i_waiting_threads++;
@@ -392,7 +383,6 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
 #elif defined( UNDER_CE )
     mtime_t delay_ms = (deadline - mdate())/1000;
-
     DWORD result;
     if( delay_ms < 0 )
         delay_ms = 0;
@@ -408,12 +398,11 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     if(result == WAIT_TIMEOUT)
        return ETIMEDOUT; /* this error is perfectly normal */
 
+    (void)psz_file; (void)i_line;
+
 #elif defined( WIN32 )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
-
-    DWORD result;
-
     mtime_t delay_ms = (deadline - mdate())/1000;
+    DWORD result;
     if( delay_ms < 0 )
         delay_ms = 0;
 
@@ -427,6 +416,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     vlc_mutex_lock( p_mutex );
     if(result == WAIT_TIMEOUT)
        return ETIMEDOUT; /* this error is perfectly normal */
+
+    (void)psz_file; (void)i_line;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #   error Unimplemented

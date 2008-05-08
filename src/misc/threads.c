@@ -383,7 +383,7 @@ int __vlc_threadvar_create( vlc_threadvar_t *p_tls )
 #elif defined( UNDER_CE )
 #elif defined( WIN32 )
     *p_tls = TlsAlloc();
-    i_ret = (*p_tls == INVALID_HANDLE_VALUE) ? EAGAIN : 0;
+    i_ret = (*p_tls == TLS_OUT_OF_INDEXES) ? EAGAIN : 0;
 #else
 # error Unimplemented!
 #endif
@@ -450,27 +450,23 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
          * memory leaks and the signal functions not working (see Microsoft
          * Knowledge Base, article 104641) */
 #if defined( UNDER_CE )
-        DWORD  threadId;
         HANDLE hThread = CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)func,
-                                      (LPVOID)p_data, CREATE_SUSPENDED,
-                      &threadId );
+                                       (LPVOID)p_data, CREATE_SUSPENDED,
+                                        NULL );
 #else
-        unsigned threadId;
-        uintptr_t hThread = _beginthreadex( NULL, 0,
-                        (LPTHREAD_START_ROUTINE)func,
-                                            (void*)p_data, CREATE_SUSPENDED,
-                        &threadId );
+        HANDLE hThread = (HANDLE)(uintptr_t)
+            _beginthreadex( NULL, 0, (LPTHREAD_START_ROUTINE)func,
+                            (void *)p_data, CREATE_SUSPENDED, NULL );
 #endif
-        p_priv->thread_id.id = (DWORD)threadId;
-        p_priv->thread_id.hThread = (HANDLE)hThread;
-        ResumeThread((HANDLE)hThread);
+        p_priv->thread_id = hThread;
+        ResumeThread(hThread);
     }
 
-    i_ret = ( p_priv->thread_id.hThread ? 0 : 1 );
+    i_ret = ( p_priv->thread_id ? 0 : errno );
 
     if( !i_ret && i_priority )
     {
-        if( !SetThreadPriority(p_priv->thread_id.hThread, i_priority) )
+        if( !SetThreadPriority(p_priv->thread_id, i_priority) )
         {
             msg_Warn( p_this, "couldn't set a faster priority" );
             i_priority = 0;
@@ -493,16 +489,9 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         }
 
         p_priv->b_thread = true;
-
-#if defined( WIN32 ) || defined( UNDER_CE )
-        msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
-                 (unsigned int)p_priv->thread_id.id, psz_name, i_priority,
+        msg_Dbg( p_this, "thread %lu (%s) created at priority %d (%s:%d)",
+                 (unsigned long)p_priv->thread_id, psz_name, i_priority,
                  psz_file, i_line );
-#else
-        msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
-                 (unsigned int)p_priv->thread_id, psz_name, i_priority,
-                 psz_file, i_line );
-#endif
     }
     else
     {
@@ -560,9 +549,9 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 #elif defined( WIN32 ) || defined( UNDER_CE )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( !p_priv->thread_id.hThread )
-        p_priv->thread_id.hThread = GetCurrentThread();
-    if( !SetThreadPriority(p_priv->thread_id.hThread, i_priority) )
+    if( !p_priv->thread_id )
+        p_priv->thread_id = GetCurrentThread();
+    if( !SetThreadPriority(p_priv->thread_id, i_priority) )
     {
         msg_Warn( p_this, "couldn't set a faster priority" );
         return 1;
@@ -610,25 +599,20 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     ** to be on the safe side
     */
     if( ! DuplicateHandle(GetCurrentProcess(),
-            p_priv->thread_id.hThread,
+            p_priv->thread_id,
             GetCurrentProcess(),
             &hThread,
             0,
             FALSE,
             DUPLICATE_SAME_ACCESS) )
     {
-        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%u)",
-                         (unsigned int)p_priv->thread_id.id,
-             psz_file, i_line, (unsigned int)GetLastError() );
         p_priv->b_thread = false;
-        return;
+        i_ret = GetLastError();
+        goto error;
     }
 
     WaitForSingleObject( hThread, INFINITE );
 
-    msg_Dbg( p_this, "thread %u joined (%s:%d)",
-             (unsigned int)p_priv->thread_id.id,
-             psz_file, i_line );
 #if defined( UNDER_CE )
     hmodule = GetModuleHandle( _T("COREDLL") );
 #else
@@ -665,6 +649,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
                  (double)((user_time%(60*1000000))/1000000.0) );
     }
     CloseHandle( hThread );
+error:
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     int32_t exit_value;
@@ -675,12 +660,12 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     if( i_ret )
     {
         errno = i_ret;
-        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%m)",
-                         (unsigned int)p_priv->thread_id, psz_file, i_line );
+        msg_Err( p_this, "thread_join(%lu) failed at %s:%d (%m)",
+                         (unsigned long)p_priv->thread_id, psz_file, i_line );
     }
     else
-        msg_Dbg( p_this, "thread %u joined (%s:%d)",
-                         (unsigned int)p_priv->thread_id, psz_file, i_line );
+        msg_Dbg( p_this, "thread %lu joined (%s:%d)",
+                         (unsigned long)p_priv->thread_id, psz_file, i_line );
 
     p_priv->b_thread = false;
 }

@@ -443,6 +443,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #   endif
 #endif
 
+#include "vlc_mtime.h"
 #include "vlc_threads.h"
 
 typedef struct vlc_object_internals_t vlc_object_internals_t;
@@ -929,7 +930,6 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #include "vlc_messages.h"
 #include "vlc_variables.h"
 #include "vlc_objects.h"
-#include "vlc_mtime.h"
 #include "vlc_modules.h"
 #include "vlc_main.h"
 #include "vlc_configuration.h"
