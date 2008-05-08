@@ -281,7 +281,7 @@ static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
 /*****************************************************************************
  * Module entry point for art.
  *****************************************************************************/
-int E_(FindArt)( vlc_object_t *p_this )
+int FindArt( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t *)p_this;
     input_item_t *p_item = (input_item_t *)(p_playlist->p_private);

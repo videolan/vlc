@@ -49,14 +49,14 @@ static int Demux( demux_t * );
 /**
  * \brief iTML submodule initialization function
  */
-int E_(Import_iTML)( vlc_object_t *p_this )
+int Import_iTML( vlc_object_t *p_this )
 {
     DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".xml", "itml",
                                       "using iTunes Media Library reader" );
     return VLC_SUCCESS;
 }
 
-void E_(Close_iTML)( vlc_object_t *p_this )
+void Close_iTML( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     free( p_demux->p_sys );

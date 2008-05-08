@@ -111,7 +111,7 @@ static int Activate( vlc_object_t *p_this )
             {
 #if defined (MODULE_NAME_IS_i420_rgb)
                 case VLC_FOURCC('R','G','B','2'):
-                    p_vout->chroma.pf_convert = E_(I420_RGB8);
+                    p_vout->chroma.pf_convert = I420_RGB8;
                     break;
 #endif
                 case VLC_FOURCC('R','V','1','5'):
@@ -124,7 +124,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R5G5B6 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R5G5B5");
-                        p_vout->chroma.pf_convert = E_(I420_R5G5B5);
+                        p_vout->chroma.pf_convert = I420_R5G5B5;
                     }
                     else if( ( p_vout->output.i_rmask == 0xf800
                             && p_vout->output.i_gmask == 0x07e0
@@ -132,13 +132,13 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R5G6B5 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R5G6B5");
-                        p_vout->chroma.pf_convert = E_(I420_R5G6B5);
+                        p_vout->chroma.pf_convert = I420_R5G6B5;
                     }
                     else
                         return -1;
 #else
                     // generic C chroma converter */
-                    p_vout->chroma.pf_convert = E_(I420_RGB16);
+                    p_vout->chroma.pf_convert = I420_RGB16;
 #endif
                     break;
 
@@ -156,7 +156,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* A8R8G8B8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is A8R8G8B8");
-                        p_vout->chroma.pf_convert = E_(I420_A8R8G8B8);
+                        p_vout->chroma.pf_convert = I420_A8R8G8B8;
                     }
                     else if( p_vout->output.i_rmask == 0xff000000
                           && p_vout->output.i_gmask == 0x00ff0000
@@ -164,7 +164,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R8G8B8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R8G8B8A8");
-                        p_vout->chroma.pf_convert = E_(I420_R8G8B8A8);
+                        p_vout->chroma.pf_convert = I420_R8G8B8A8;
                     }
                     else if( p_vout->output.i_rmask == 0x0000ff00
                           && p_vout->output.i_gmask == 0x00ff0000
@@ -172,7 +172,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* B8G8R8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is B8G8R8A8");
-                        p_vout->chroma.pf_convert = E_(I420_B8G8R8A8);
+                        p_vout->chroma.pf_convert = I420_B8G8R8A8;
                     }
                     else if( p_vout->output.i_rmask == 0x000000ff
                           && p_vout->output.i_gmask == 0x0000ff00
@@ -180,13 +180,13 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* A8B8G8R8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is A8B8G8R8");
-                        p_vout->chroma.pf_convert = E_(I420_A8B8G8R8);
+                        p_vout->chroma.pf_convert = I420_A8B8G8R8;
                     }
                     else
                         return -1;
 #else
                     /* generic C chroma converter */
-                    p_vout->chroma.pf_convert = E_(I420_RGB32);
+                    p_vout->chroma.pf_convert = I420_RGB32;
 #endif
                     break;
 

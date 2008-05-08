@@ -85,7 +85,7 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence );
 /*****************************************************************************
  * Open
  *****************************************************************************/
-int E_(OpenDemux)( vlc_object_t *p_this )
+int OpenDemux( vlc_object_t *p_this )
 {
     demux_t       *p_demux = (demux_t*)p_this;
     demux_sys_t   *p_sys;
@@ -181,7 +181,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "av_open_input_stream failed" );
         if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
-        E_(CloseDemux)( p_this );
+        CloseDemux( p_this );
         return VLC_EGENERIC;
     }
 
@@ -189,7 +189,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "av_find_stream_info failed" );
         if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
-        E_(CloseDemux)( p_this );
+        CloseDemux( p_this );
         return VLC_EGENERIC;
     }
     if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
@@ -201,7 +201,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
         es_format_t  fmt;
         vlc_fourcc_t fcc;
 
-        if( !E_(GetVlcFourcc)( cc->codec_id, NULL, &fcc, NULL ) )
+        if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
         {
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
 
@@ -209,7 +209,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
             if( cc->codec_id == CODEC_ID_RAWVIDEO )
             {
                 msg_Dbg( p_demux, "raw video, pixel format: %i", cc->pix_fmt );
-                fcc = E_(GetVlcChroma)( cc->pix_fmt );
+                fcc = GetVlcChroma( cc->pix_fmt );
             }
         }
 
@@ -267,7 +267,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
 /*****************************************************************************
  * Close
  *****************************************************************************/
-void E_(CloseDemux)( vlc_object_t *p_this )
+void CloseDemux( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;

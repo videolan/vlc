@@ -86,7 +86,7 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence );
 /*****************************************************************************
  * Open
  *****************************************************************************/
-int E_(OpenMux)( vlc_object_t *p_this )
+int OpenMux( vlc_object_t *p_this )
 {
     AVOutputFormat *file_oformat;
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
@@ -96,7 +96,7 @@ int E_(OpenMux)( vlc_object_t *p_this )
 
     /* Should we call it only once ? */
     av_register_all();
-    av_log_set_callback( E_(LibavcodecCallback) );
+    av_log_set_callback( LibavcodecCallback );
 
     config_ChainParse( p_mux, "ffmpeg-", ppsz_mux_options, p_mux->p_cfg );
 
@@ -171,7 +171,7 @@ int E_(OpenMux)( vlc_object_t *p_this )
 /*****************************************************************************
  * Close
  *****************************************************************************/
-void E_(CloseMux)( vlc_object_t *p_this )
+void CloseMux( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
@@ -207,7 +207,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     msg_Dbg( p_mux, "adding input" );
 
-    if( !E_(GetFfmpegCodec)( p_input->p_fmt->i_codec, 0, &i_codec_id, 0 ) )
+    if( !GetFfmpegCodec( p_input->p_fmt->i_codec, 0, &i_codec_id, 0 ) )
     {
         msg_Dbg( p_mux, "couldn't find codec for fourcc '%4.4s'",
                  (char *)&p_input->p_fmt->i_codec );

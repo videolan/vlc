@@ -40,11 +40,11 @@
 /*****************************************************************************
  * External prototypes
  *****************************************************************************/
-int  E_(OpenIntf)     ( vlc_object_t * );
-void E_(CloseIntf)    ( vlc_object_t * );
+int  OpenIntf     ( vlc_object_t * );
+void CloseIntf    ( vlc_object_t * );
 
-int  E_(OpenVideoGL)  ( vlc_object_t * );
-void E_(CloseVideoGL) ( vlc_object_t * );
+int  OpenVideoGL  ( vlc_object_t * );
+void CloseVideoGL ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -56,7 +56,7 @@ vlc_module_begin();
     add_shortcut( "minimal_macosx" );
     set_description( _("Minimal Mac OS X interface") );
     set_capability( "interface", 50 );
-    set_callbacks( E_(OpenIntf), E_(CloseIntf) );
+    set_callbacks( OpenIntf, CloseIntf );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
 
@@ -66,6 +66,6 @@ vlc_module_begin();
         set_capability( "opengl provider", 50 );
         set_category( CAT_VIDEO);
         set_subcategory( SUBCAT_VIDEO_VOUT );
-        set_callbacks( E_(OpenVideoGL), E_(CloseVideoGL) );
+        set_callbacks( OpenVideoGL, CloseVideoGL );
 vlc_module_end();
 

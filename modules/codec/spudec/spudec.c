@@ -154,7 +154,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     block_ChainRelease( p_spu_block );
 
     /* Parse and decode */
-    p_spu = E_(ParsePacket)( p_dec );
+    p_spu = ParsePacket( p_dec );
 
     /* reinit context */
     p_sys->i_spu_size = 0;

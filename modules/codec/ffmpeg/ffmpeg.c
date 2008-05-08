@@ -148,7 +148,7 @@ vlc_module_begin();
     set_section( N_("Encoding") , NULL );
     set_description( _("FFmpeg audio/video encoder") );
     set_capability( "encoder", 100 );
-    set_callbacks( E_(OpenEncoder), E_(CloseEncoder) );
+    set_callbacks( OpenEncoder, CloseEncoder );
 
     add_string( ENC_CFG_PREFIX "hq", "simple", NULL, ENC_HQ_TEXT,
                 ENC_HQ_LONGTEXT, false );
@@ -215,7 +215,7 @@ vlc_module_begin();
     add_submodule();
     set_description( _("FFmpeg demuxer" ) );
     set_capability( "demux", 2 );
-    set_callbacks( E_(OpenDemux), E_(CloseDemux) );
+    set_callbacks( OpenDemux, CloseDemux );
 
 #ifdef ENABLE_SOUT
     /* mux submodule */
@@ -224,7 +224,7 @@ vlc_module_begin();
     set_capability( "sout mux", 2 );
     add_string( "ffmpeg-mux", NULL, NULL, MUX_TEXT,
                 MUX_LONGTEXT, true );
-    set_callbacks( E_(OpenMux), E_(CloseMux) );
+    set_callbacks( OpenMux, CloseMux );
 #endif
 #endif
 
@@ -235,7 +235,7 @@ vlc_module_begin();
     set_capability( "video filter2", 1000 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_callbacks( E_(OpenScaler), E_(CloseScaler) );
+    set_callbacks( OpenScaler, CloseScaler );
     add_integer( "swscale-mode", 0, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, true );
         change_integer_list( pi_mode_values, ppsz_mode_descriptions, 0 );
 
@@ -243,26 +243,26 @@ vlc_module_begin();
     /* video filter submodule */
     add_submodule();
     set_capability( "video filter2", 50 );
-    set_callbacks( E_(OpenFilter), E_(CloseFilter) );
+    set_callbacks( OpenFilter, CloseFilter );
     set_description( _("FFmpeg video filter") );
 
     /* crop/padd submodule */
     add_submodule();
     set_capability( "crop padd", 10 );
-    set_callbacks( E_(OpenCropPadd), E_(CloseFilter) );
+    set_callbacks( OpenCropPadd, CloseFilter );
     set_description( _("FFmpeg crop padd filter") );
 #endif
 
     /* chroma conversion submodule */
     add_submodule();
     set_capability( "chroma", 50 );
-    set_callbacks( E_(OpenChroma), E_(CloseChroma) );
+    set_callbacks( OpenChroma, CloseChroma );
     set_description( _("FFmpeg chroma conversion") );
 
     /* video filter submodule */
     add_submodule();
     set_capability( "video filter2", 0 );
-    set_callbacks( E_(OpenDeinterlace), E_(CloseDeinterlace) );
+    set_callbacks( OpenDeinterlace, CloseDeinterlace );
     set_description( _("FFmpeg deinterlace video filter") );
     add_shortcut( "ffmpeg-deinterlace" );
 
@@ -281,7 +281,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     AVCodec        *p_codec = NULL;
 
     /* *** determine codec type *** */
-    if( !E_(GetFfmpegCodec)( p_dec->fmt_in.i_codec, &i_cat, &i_codec_id,
+    if( !GetFfmpegCodec( p_dec->fmt_in.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
         return VLC_EGENERIC;
@@ -296,7 +296,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Initialization must be done before avcodec_find_decoder() */
-    E_(InitLibavcodec)(p_this);
+    InitLibavcodec(p_this);
 
     /* *** ask ffmpeg for a decoder *** */
     p_codec = avcodec_find_decoder( i_codec_id );
@@ -341,13 +341,13 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( i_cat )
     {
     case VIDEO_ES:
-        p_dec->pf_decode_video = E_(DecodeVideo);
-        i_result = E_( InitVideoDec )( p_dec, p_context, p_codec,
+        p_dec->pf_decode_video = DecodeVideo;
+        i_result =  InitVideoDec ( p_dec, p_context, p_codec,
                                        i_codec_id, psz_namecodec );
         break;
     case AUDIO_ES:
-        p_dec->pf_decode_audio = E_(DecodeAudio);
-        i_result = E_( InitAudioDec )( p_dec, p_context, p_codec,
+        p_dec->pf_decode_audio = DecodeAudio;
+        i_result =  InitAudioDec ( p_dec, p_context, p_codec,
                                        i_codec_id, psz_namecodec );
         break;
     default:
@@ -370,10 +370,10 @@ static void CloseDecoder( vlc_object_t *p_this )
     switch( p_sys->i_cat )
     {
     case AUDIO_ES:
-        E_( EndAudioDec )( p_dec );
+         EndAudioDec ( p_dec );
         break;
     case VIDEO_ES:
-        E_( EndVideoDec )( p_dec );
+         EndVideoDec ( p_dec );
         break;
     }
 
@@ -398,7 +398,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  *
  *****************************************************************************/
-void E_(LibavcodecCallback)( void *p_opaque, int i_level,
+void LibavcodecCallback( void *p_opaque, int i_level,
                              const char *psz_format, va_list va )
 {
     int i_vlc_level;
@@ -452,7 +452,7 @@ void E_(LibavcodecCallback)( void *p_opaque, int i_level,
     free( psz_new_format );
 }
 
-void E_(InitLibavcodec)( vlc_object_t *p_object )
+void InitLibavcodec( vlc_object_t *p_object )
 {
     static int b_ffmpeginit = 0;
     vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
@@ -462,7 +462,7 @@ void E_(InitLibavcodec)( vlc_object_t *p_object )
     {
         avcodec_init();
         avcodec_register_all();
-        av_log_set_callback( E_(LibavcodecCallback) );
+        av_log_set_callback( LibavcodecCallback );
         b_ffmpeginit = 1;
 
         msg_Dbg( p_object, "libavcodec initialized (interface %d )",
@@ -528,7 +528,7 @@ static struct
     { 0, 0 }
 };
 
-int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )
+int GetFfmpegChroma( vlc_fourcc_t i_chroma )
 {
     int i;
 
@@ -540,7 +540,7 @@ int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )
     return -1;
 }
 
-vlc_fourcc_t E_(GetVlcChroma)( int i_ffmpeg_chroma )
+vlc_fourcc_t GetVlcChroma( int i_ffmpeg_chroma )
 {
     int i;
 
@@ -1541,7 +1541,7 @@ static struct
     { 0, 0, 0, 0 }
 };
 
-int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
+int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
                         int *pi_ffmpeg_codec, const char **ppsz_name )
 {
     int i;
@@ -1560,7 +1560,7 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
     return false;
 }
 
-int E_(GetVlcFourcc)( int i_ffmpeg_codec, int *pi_cat,
+int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
                       vlc_fourcc_t *pi_fourcc, const char **ppsz_name )
 {
     int i;

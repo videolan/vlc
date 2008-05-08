@@ -55,8 +55,8 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int            E_(OpenAudio)    ( vlc_object_t *p_this );
-void           E_(CloseAudio)   ( vlc_object_t *p_this );
+int            OpenAudio    ( vlc_object_t *p_this );
+void           CloseAudio   ( vlc_object_t *p_this );
 static int     GetBufInfo       ( aout_instance_t * );
 static void    Play             ( aout_instance_t * );
 static int     QNXaoutThread    ( aout_instance_t * );
@@ -66,7 +66,7 @@ static int     QNXaoutThread    ( aout_instance_t * );
  *****************************************************************************
  * This function opens an alsa device, through the alsa API
  *****************************************************************************/
-int E_(OpenAudio)( vlc_object_t *p_this )
+int OpenAudio( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     int i_ret;
@@ -101,7 +101,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
                                               PLUGIN_DISABLE_MMAP ) ) < 0 )
     {
         msg_Err( p_aout, "unable to disable mmap (%s)", snd_strerror(i_ret) );
-        E_(CloseAudio)( p_this );
+        CloseAudio( p_this );
         free( p_aout->output.p_sys );
         return -1;
     }
@@ -119,7 +119,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "unable to get plugin info (%s)",
                          snd_strerror( i_ret ) );
-        E_(CloseAudio)( p_this );
+        CloseAudio( p_this );
         free( p_aout->output.p_sys );
         return -1;
     }
@@ -158,7 +158,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
                                          &pp ) ) < 0 )
     {
         msg_Err( p_aout, "unable to set parameters (%s)", snd_strerror(i_ret) );
-        E_(CloseAudio)( p_this );
+        CloseAudio( p_this );
         free( p_aout->output.p_sys );
         return -1;
     }
@@ -169,7 +169,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "unable to prepare channel (%s)",
                          snd_strerror( i_ret ) );
-        E_(CloseAudio)( p_this );
+        CloseAudio( p_this );
         free( p_aout->output.p_sys );
         return -1;
     }
@@ -179,7 +179,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
                            VLC_THREAD_PRIORITY_OUTPUT, false ) )
     {
         msg_Err( p_aout, "cannot create QNX audio thread (%m)" );
-        E_(CloseAudio)( p_this );
+        CloseAudio( p_this );
         free( p_aout->output.p_sys );
         return -1;
     }
@@ -239,7 +239,7 @@ static void Play( aout_instance_t *p_aout )
 /*****************************************************************************
  * CloseAudio: close the audio device
  *****************************************************************************/
-void E_(CloseAudio) ( vlc_object_t *p_this )
+void CloseAudio ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     int i_ret;

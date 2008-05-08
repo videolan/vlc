@@ -79,7 +79,7 @@ static int HttpCallback( httpd_file_sys_t *p_args,
 /*****************************************************************************
  * HTTPOpen: Start the internal HTTP server
  *****************************************************************************/
-int E_(HTTPOpen)( access_t *p_access )
+int HTTPOpen( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     char          *psz_address, *psz_cert = NULL, *psz_key = NULL,
@@ -194,7 +194,7 @@ int E_(HTTPOpen)( access_t *p_access )
 /*****************************************************************************
  * HTTPClose: Stop the internal HTTP server
  *****************************************************************************/
-void E_(HTTPClose)( access_t *p_access )
+void HTTPClose( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -295,7 +295,7 @@ static int HttpCallback( httpd_file_sys_t *p_args,
 /****************************************************************************
  * HTTPExtractValue: Extract a GET variable from psz_request
  ****************************************************************************/
-char *E_(HTTPExtractValue)( char *psz_uri, const char *psz_name,
+char *HTTPExtractValue( char *psz_uri, const char *psz_name,
                             char *psz_value, int i_value_max )
 {
     char *p = psz_uri;

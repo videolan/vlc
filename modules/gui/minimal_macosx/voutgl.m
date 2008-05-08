@@ -33,7 +33,7 @@
 #include "intf.h"
 #include "voutgl.h"
 
-int E_(OpenVideoGL)  ( vlc_object_t * p_this )
+int OpenVideoGL  ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
     vlc_value_t value_drawable;
@@ -84,7 +84,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     return VLC_SUCCESS;
 }
 
-void E_(CloseVideoGL) ( vlc_object_t * p_this )
+void CloseVideoGL ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
     /* Clean up */

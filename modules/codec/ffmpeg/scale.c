@@ -85,7 +85,7 @@ static const char *ppsz_mode_descriptions[] =
 /*****************************************************************************
  * OpenScaler: probe the filter and return score
  *****************************************************************************/
-int E_(OpenScaler)( vlc_object_t *p_this )
+int OpenScaler( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
@@ -101,10 +101,10 @@ int E_(OpenScaler)( vlc_object_t *p_this )
 
     /* Supported Input formats: YV12, I420/IYUV, YUY2, UYVY, BGR32, BGR24,
      * BGR16, BGR15, RGB32, RGB24, Y8/Y800, YVU9/IF09 */
-    i_fmt_in = E_(GetFfmpegChroma)(p_filter->fmt_in.video.i_chroma);
+    i_fmt_in = GetFfmpegChroma(p_filter->fmt_in.video.i_chroma);
     /* Supported output formats: YV12, I420/IYUV, YUY2, UYVY,
      * {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09 */
-    i_fmt_out = E_(GetFfmpegChroma)(p_filter->fmt_out.video.i_chroma);
+    i_fmt_out = GetFfmpegChroma(p_filter->fmt_out.video.i_chroma);
     if( ( i_fmt_in < 0 ) || ( i_fmt_out < 0 ) )
     {
         return VLC_EGENERIC;
@@ -201,7 +201,7 @@ int E_(OpenScaler)( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseFilter: clean up the filter
  *****************************************************************************/
-void E_(CloseScaler)( vlc_object_t *p_this )
+void CloseScaler( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -225,8 +225,8 @@ static int CheckInit( filter_t *p_filter )
     {
         int i_fmt_in, i_fmt_out;
 
-        i_fmt_in = E_(GetFfmpegChroma)(p_filter->fmt_in.video.i_chroma);
-        i_fmt_out = E_(GetFfmpegChroma)(p_filter->fmt_out.video.i_chroma);
+        i_fmt_in = GetFfmpegChroma(p_filter->fmt_in.video.i_chroma);
+        i_fmt_out = GetFfmpegChroma(p_filter->fmt_out.video.i_chroma);
         if( (i_fmt_in < 0) || (i_fmt_out < 0) )
         {
             msg_Err( p_filter, "format not supported" );
@@ -320,12 +320,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
 #else /* LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0) */
 
-int E_(OpenScaler)( vlc_object_t *p_this )
+int OpenScaler( vlc_object_t *p_this )
 {
     return VLC_EGENERIC;
 }
 
-void E_(CloseScaler)( vlc_object_t *p_this )
+void CloseScaler( vlc_object_t *p_this )
 {
 }
 

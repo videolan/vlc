@@ -65,7 +65,7 @@ static inline unsigned int AddNibble( unsigned int i_code,
  * This function parses the SPU packet and, if valid, sends it to the
  * video output.
  *****************************************************************************/
-subpicture_t * E_(ParsePacket)( decoder_t *p_dec )
+subpicture_t * ParsePacket( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_data_t *p_spu_data;

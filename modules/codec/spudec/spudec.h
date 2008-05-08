@@ -77,4 +77,4 @@ typedef struct subpicture_data_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-subpicture_t * E_(ParsePacket)( decoder_t * );
+subpicture_t * ParsePacket( decoder_t * );

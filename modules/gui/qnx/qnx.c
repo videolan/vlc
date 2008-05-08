@@ -34,11 +34,11 @@
 /*****************************************************************************
  * External prototypes
  ******************************************************************************/
-int  E_(OpenAudio)    ( vlc_object_t * );
-void E_(CloseAudio)   ( vlc_object_t * );
+int  OpenAudio    ( vlc_object_t * );
+void CloseAudio   ( vlc_object_t * );
 
-int  E_(OpenVideo)    ( vlc_object_t * );
-void E_(CloseVideo)   ( vlc_object_t * );
+int  OpenVideo    ( vlc_object_t * );
+void CloseVideo   ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -46,11 +46,11 @@ void E_(CloseVideo)   ( vlc_object_t * );
 vlc_module_begin();
     set_description( _("QNX RTOS video and audio output") );
     set_capability( "video output", 100 );
-    set_callbacks( E_(OpenVideo), E_(CloseVideo) );
+    set_callbacks( OpenVideo, CloseVideo );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_submodule();
         set_capability( "audio output", 100 );
-        set_callbacks( E_(OpenAudio), E_(CloseAudio) );
+        set_callbacks( OpenAudio, CloseAudio );
 vlc_module_end();
 

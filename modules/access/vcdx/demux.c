@@ -74,7 +74,7 @@ struct demux_sys_t
 /*****************************************************************************
  * VCDInit: initializes structures
  *****************************************************************************/
-int E_(VCDInit) ( vlc_object_t *p_this )
+int VCDInit ( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     vcd_data_t *    p_vcd = (vcd_data_t *)p_input->p_sys;
@@ -117,7 +117,7 @@ int E_(VCDInit) ( vlc_object_t *p_this )
 /*****************************************************************************
  * VCDEnd: frees unused data
  *****************************************************************************/
-void E_(VCDEnd) ( vlc_object_t *p_this )
+void VCDEnd ( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     vcd_data_t *    p_vcd = p_input->p_demux_data->p_vcd;

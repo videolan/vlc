@@ -64,7 +64,7 @@ static int DemuxStation( demux_t *p_demux );
 /*****************************************************************************
  * Import_Shoutcast: main import function
  *****************************************************************************/
-int E_(Import_Shoutcast)( vlc_object_t *p_this )
+int Import_Shoutcast( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
@@ -87,7 +87,7 @@ int E_(Import_Shoutcast)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_Shoutcast)( vlc_object_t *p_this )
+void Close_Shoutcast( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;

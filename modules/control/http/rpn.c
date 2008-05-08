@@ -66,12 +66,12 @@ static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
     return p_object;
 }
 
-void E_(SSInit)( rpn_stack_t *st )
+void SSInit( rpn_stack_t *st )
 {
     st->i_stack = 0;
 }
 
-void E_(SSClean)( rpn_stack_t *st )
+void SSClean( rpn_stack_t *st )
 {
     while( st->i_stack > 0 )
     {
@@ -79,7 +79,7 @@ void E_(SSClean)( rpn_stack_t *st )
     }
 }
 
-void E_(SSPush)( rpn_stack_t *st, const char *s )
+void SSPush( rpn_stack_t *st, const char *s )
 {
     if( st->i_stack < STACK_MAX )
     {
@@ -87,7 +87,7 @@ void E_(SSPush)( rpn_stack_t *st, const char *s )
     }
 }
 
-char *E_(SSPop)( rpn_stack_t *st )
+char *SSPop( rpn_stack_t *st )
 {
     if( st->i_stack <= 0 )
     {
@@ -99,7 +99,7 @@ char *E_(SSPop)( rpn_stack_t *st )
     }
 }
 
-int E_(SSPopN)( rpn_stack_t *st, mvar_t  *vars )
+int SSPopN( rpn_stack_t *st, mvar_t  *vars )
 {
     char *name;
     char *value;
@@ -107,11 +107,11 @@ int E_(SSPopN)( rpn_stack_t *st, mvar_t  *vars )
     char *end;
     int  i;
 
-    name = E_(SSPop)( st );
+    name = SSPop( st );
     i = strtol( name, &end, 0 );
     if( end == name )
     {
-        value = E_(mvar_GetValue)( vars, name );
+        value = mvar_GetValue( vars, name );
         i = atoi( value );
     }
     free( name );
@@ -119,15 +119,15 @@ int E_(SSPopN)( rpn_stack_t *st, mvar_t  *vars )
     return( i );
 }
 
-void E_(SSPushN)( rpn_stack_t *st, int i )
+void SSPushN( rpn_stack_t *st, int i )
 {
     char v[12];
 
     snprintf( v, sizeof (v), "%d", i );
-    E_(SSPush)( st, v );
+    SSPush( st, v );
 }
 
-void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
+void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                       rpn_stack_t *st, char *exp )
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
@@ -145,14 +145,14 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         if( *exp == '\'' )
         {
             /* extract string */
-            p = E_(FirstWord)( exp, exp );
-            E_(SSPush)( st, exp );
+            p = FirstWord( exp, exp );
+            SSPush( st, exp );
             exp = p;
             continue;
         }
 
         /* extract token */
-        p = E_(FirstWord)( exp, exp );
+        p = FirstWord( exp, exp );
         s = exp;
         if( p == NULL )
         {
@@ -171,129 +171,129 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         /* 1. Integer function */
         if( !strcmp( s, "!" ) )
         {
-            E_(SSPushN)( st, ~E_(SSPopN)( st, vars ) );
+            SSPushN( st, ~SSPopN( st, vars ) );
         }
         else if( !strcmp( s, "^" ) )
         {
-            E_(SSPushN)( st, E_(SSPopN)( st, vars ) ^ E_(SSPopN)( st, vars ) );
+            SSPushN( st, SSPopN( st, vars ) ^ SSPopN( st, vars ) );
         }
         else if( !strcmp( s, "&" ) )
         {
-            E_(SSPushN)( st, E_(SSPopN)( st, vars ) & E_(SSPopN)( st, vars ) );
+            SSPushN( st, SSPopN( st, vars ) & SSPopN( st, vars ) );
         }
         else if( !strcmp( s, "|" ) )
         {
-            E_(SSPushN)( st, E_(SSPopN)( st, vars ) | E_(SSPopN)( st, vars ) );
+            SSPushN( st, SSPopN( st, vars ) | SSPopN( st, vars ) );
         }
         else if( !strcmp( s, "+" ) )
         {
-            E_(SSPushN)( st, E_(SSPopN)( st, vars ) + E_(SSPopN)( st, vars ) );
+            SSPushN( st, SSPopN( st, vars ) + SSPopN( st, vars ) );
         }
         else if( !strcmp( s, "-" ) )
         {
-            int j = E_(SSPopN)( st, vars );
-            int i = E_(SSPopN)( st, vars );
-            E_(SSPushN)( st, i - j );
+            int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
+            SSPushN( st, i - j );
         }
         else if( !strcmp( s, "*" ) )
         {
-            E_(SSPushN)( st, E_(SSPopN)( st, vars ) * E_(SSPopN)( st, vars ) );
+            SSPushN( st, SSPopN( st, vars ) * SSPopN( st, vars ) );
         }
         else if( !strcmp( s, "/" ) )
         {
             int i, j;
 
-            j = E_(SSPopN)( st, vars );
-            i = E_(SSPopN)( st, vars );
+            j = SSPopN( st, vars );
+            i = SSPopN( st, vars );
 
-            E_(SSPushN)( st, j != 0 ? i / j : 0 );
+            SSPushN( st, j != 0 ? i / j : 0 );
         }
         else if( !strcmp( s, "%" ) )
         {
             int i, j;
 
-            j = E_(SSPopN)( st, vars );
-            i = E_(SSPopN)( st, vars );
+            j = SSPopN( st, vars );
+            i = SSPopN( st, vars );
 
-            E_(SSPushN)( st, j != 0 ? i % j : 0 );
+            SSPushN( st, j != 0 ? i % j : 0 );
         }
         /* 2. integer tests */
         else if( !strcmp( s, "=" ) )
         {
-            E_(SSPushN)( st, E_(SSPopN)( st, vars ) == E_(SSPopN)( st, vars ) ? -1 : 0 );
+            SSPushN( st, SSPopN( st, vars ) == SSPopN( st, vars ) ? -1 : 0 );
         }
         else if( !strcmp( s, "!=" ) )
         {
-            E_(SSPushN)( st, E_(SSPopN)( st, vars ) != E_(SSPopN)( st, vars ) ? -1 : 0 );
+            SSPushN( st, SSPopN( st, vars ) != SSPopN( st, vars ) ? -1 : 0 );
         }
         else if( !strcmp( s, "<" ) )
         {
-            int j = E_(SSPopN)( st, vars );
-            int i = E_(SSPopN)( st, vars );
+            int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
 
-            E_(SSPushN)( st, i < j ? -1 : 0 );
+            SSPushN( st, i < j ? -1 : 0 );
         }
         else if( !strcmp( s, ">" ) )
         {
-            int j = E_(SSPopN)( st, vars );
-            int i = E_(SSPopN)( st, vars );
+            int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
 
-            E_(SSPushN)( st, i > j ? -1 : 0 );
+            SSPushN( st, i > j ? -1 : 0 );
         }
         else if( !strcmp( s, "<=" ) )
         {
-            int j = E_(SSPopN)( st, vars );
-            int i = E_(SSPopN)( st, vars );
+            int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
 
-            E_(SSPushN)( st, i <= j ? -1 : 0 );
+            SSPushN( st, i <= j ? -1 : 0 );
         }
         else if( !strcmp( s, ">=" ) )
         {
-            int j = E_(SSPopN)( st, vars );
-            int i = E_(SSPopN)( st, vars );
+            int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
 
-            E_(SSPushN)( st, i >= j ? -1 : 0 );
+            SSPushN( st, i >= j ? -1 : 0 );
         }
         /* 3. string functions */
         else if( !strcmp( s, "strcat" ) )
         {
-            char *s2 = E_(SSPop)( st );
-            char *s1 = E_(SSPop)( st );
+            char *s2 = SSPop( st );
+            char *s1 = SSPop( st );
             char *str = malloc( strlen( s1 ) + strlen( s2 ) + 1 );
 
             strcpy( str, s1 );
             strcat( str, s2 );
 
-            E_(SSPush)( st, str );
+            SSPush( st, str );
             free( s1 );
             free( s2 );
             free( str );
         }
         else if( !strcmp( s, "strcmp" ) )
         {
-            char *s2 = E_(SSPop)( st );
-            char *s1 = E_(SSPop)( st );
+            char *s2 = SSPop( st );
+            char *s1 = SSPop( st );
 
-            E_(SSPushN)( st, strcmp( s1, s2 ) );
+            SSPushN( st, strcmp( s1, s2 ) );
             free( s1 );
             free( s2 );
         }
         else if( !strcmp( s, "strncmp" ) )
         {
-            int n = E_(SSPopN)( st, vars );
-            char *s2 = E_(SSPop)( st );
-            char *s1 = E_(SSPop)( st );
+            int n = SSPopN( st, vars );
+            char *s2 = SSPop( st );
+            char *s1 = SSPop( st );
 
-            E_(SSPushN)( st, strncmp( s1, s2 , n ) );
+            SSPushN( st, strncmp( s1, s2 , n ) );
             free( s1 );
             free( s2 );
         }
         else if( !strcmp( s, "strsub" ) )
         {
-            int n = E_(SSPopN)( st, vars );
-            int m = E_(SSPopN)( st, vars );
+            int n = SSPopN( st, vars );
+            int m = SSPopN( st, vars );
             int i_len;
-            char *s = E_(SSPop)( st );
+            char *s = SSPop( st );
             char *str;
 
             if( n >= m )
@@ -310,22 +310,22 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             memcpy( str, s + m - 1, i_len );
             str[ i_len ] = '\0';
 
-            E_(SSPush)( st, str );
+            SSPush( st, str );
             free( s );
             free( str );
         }
         else if( !strcmp( s, "strlen" ) )
         {
-            char *str = E_(SSPop)( st );
+            char *str = SSPop( st );
 
-            E_(SSPushN)( st, strlen( str ) );
+            SSPushN( st, strlen( str ) );
             free( str );
         }
         else if( !strcmp( s, "str_replace" ) )
         {
-            char *psz_to = E_(SSPop)( st );
-            char *psz_from = E_(SSPop)( st );
-            char *psz_in = E_(SSPop)( st );
+            char *psz_to = SSPop( st );
+            char *psz_from = SSPop( st );
+            char *psz_in = SSPop( st );
             char *psz_in_current = psz_in;
             char *psz_out = malloc( strlen(psz_in) * strlen(psz_to) + 1 );
             char *psz_out_current = psz_out;
@@ -342,7 +342,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             psz_out_current += strlen(psz_in_current);
             *psz_out_current = '\0';
 
-            E_(SSPush)( st, psz_out );
+            SSPush( st, psz_out );
             free( psz_to );
             free( psz_from );
             free( psz_in );
@@ -350,31 +350,31 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "url_extract" ) )
         {
-            char *url = E_(mvar_GetValue)( vars, "url_value" );
-            char *name = E_(SSPop)( st );
-            char *value = E_(ExtractURIString)( url, name );
+            char *url = mvar_GetValue( vars, "url_value" );
+            char *name = SSPop( st );
+            char *value = ExtractURIString( url, name );
             if( value != NULL )
             {
                 decode_URI( value );
-                E_(SSPush)( st, value );
+                SSPush( st, value );
                 free( value );
             }
             else
-                E_(SSPush)( st, "" );
+                SSPush( st, "" );
 
             free( name );
         }
         else if( !strcmp( s, "url_encode" ) )
         {
-            char *url = E_(SSPop)( st );
+            char *url = SSPop( st );
             char *value = vlc_UrlEncode( url );
             free( url );
-            E_(SSPush)( st, value );
+            SSPush( st, value );
             free( value );
         }
         else if( !strcmp( s, "addslashes" ) )
         {
-            char *psz_src = E_(SSPop)( st );
+            char *psz_src = SSPop( st );
             char *psz_dest;
             char *str = psz_src;
 
@@ -391,13 +391,13 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             }
             *p = '\0';
 
-            E_(SSPush)( st, psz_dest );
+            SSPush( st, psz_dest );
             free( psz_src );
             free( psz_dest );
         }
         else if( !strcmp( s, "stripslashes" ) )
         {
-            char *psz_src = E_(SSPop)( st );
+            char *psz_src = SSPop( st );
             char *psz_dest;
             char *str = psz_src;
 
@@ -413,80 +413,80 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             }
             *p = '\0';
 
-            E_(SSPush)( st, psz_dest );
+            SSPush( st, psz_dest );
             free( psz_src );
             free( psz_dest );
         }
         else if( !strcmp( s, "htmlspecialchars" ) )
         {
-            char *psz_src = E_(SSPop)( st );
+            char *psz_src = SSPop( st );
             char *psz_dest;
 
             psz_dest = convert_xml_special_chars( psz_src );
 
-            E_(SSPush)( st, psz_dest );
+            SSPush( st, psz_dest );
             free( psz_src );
             free( psz_dest );
         }
         else if( !strcmp( s, "realpath" ) )
         {
-            char *psz_src = E_(SSPop)( st );
-            char *psz_dir = E_(RealPath)( p_intf, psz_src );
+            char *psz_src = SSPop( st );
+            char *psz_dir = RealPath( p_intf, psz_src );
 
-            E_(SSPush)( st, psz_dir );
+            SSPush( st, psz_dir );
             free( psz_src );
             free( psz_dir );
         }
         /* 4. stack functions */
         else if( !strcmp( s, "dup" ) )
         {
-            char *str = E_(SSPop)( st );
-            E_(SSPush)( st, str );
-            E_(SSPush)( st, str );
+            char *str = SSPop( st );
+            SSPush( st, str );
+            SSPush( st, str );
             free( str );
         }
         else if( !strcmp( s, "drop" ) )
         {
-            char *str = E_(SSPop)( st );
+            char *str = SSPop( st );
             free( str );
         }
         else if( !strcmp( s, "swap" ) )
         {
-            char *s1 = E_(SSPop)( st );
-            char *s2 = E_(SSPop)( st );
+            char *s1 = SSPop( st );
+            char *s2 = SSPop( st );
 
-            E_(SSPush)( st, s1 );
-            E_(SSPush)( st, s2 );
+            SSPush( st, s1 );
+            SSPush( st, s2 );
             free( s1 );
             free( s2 );
         }
         else if( !strcmp( s, "flush" ) )
         {
-            E_(SSClean)( st );
-            E_(SSInit)( st );
+            SSClean( st );
+            SSInit( st );
         }
         else if( !strcmp( s, "store" ) )
         {
-            char *value = E_(SSPop)( st );
-            char *name  = E_(SSPop)( st );
+            char *value = SSPop( st );
+            char *name  = SSPop( st );
 
-            E_(mvar_PushNewVar)( vars, name, value );
+            mvar_PushNewVar( vars, name, value );
             free( name );
             free( value );
         }
         else if( !strcmp( s, "value" ) )
         {
-            char *name  = E_(SSPop)( st );
-            char *value = E_(mvar_GetValue)( vars, name );
+            char *name  = SSPop( st );
+            char *value = mvar_GetValue( vars, name );
 
-            E_(SSPush)( st, value );
+            SSPush( st, value );
 
             free( name );
         }
         /* 5. player control */
         else if( !strcmp( s, "vlc_play" ) )
         {
-            int i_id = E_(SSPopN)( st, vars );
+            int i_id = SSPopN( st, vars );
             int i_ret;
 
             i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
@@ -494,7 +494,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                                       playlist_ItemGetById( p_sys->p_playlist,
                                       i_id, true ) );
             msg_Dbg( p_intf, "requested playlist item: %i", i_id );
-            E_(SSPushN)( st, i_ret );
+            SSPushN( st, i_ret );
         }
         else if( !strcmp( s, "vlc_stop" ) )
         {
@@ -518,8 +518,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "vlc_seek" ) )
         {
-            char *psz_value = E_(SSPop)( st );
-            E_(HandleSeek)( p_intf, psz_value );
+            char *psz_value = SSPop( st );
+            HandleSeek( p_intf, psz_value );
             msg_Dbg( p_intf, "requested playlist seek: %s", psz_value );
             free( psz_value );
         }
@@ -532,8 +532,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
 
             if( !strcmp( s, "vlc_var_type" ) )
             {
-                char *psz_object = E_(SSPop)( st );
-                char *psz_variable = E_(SSPop)( st );
+                char *psz_object = SSPop( st );
+                char *psz_variable = SSPop( st );
                 bool b_need_release;
 
                 p_object = GetVLCObject( p_intf, psz_object, &b_need_release );
@@ -547,7 +547,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             }
             else
             {
-                char *psz_variable = E_(SSPop)( st );
+                char *psz_variable = SSPop( st );
                 p_object = VLC_OBJECT(p_intf);
                 i_type = config_GetType( p_object, psz_variable );
                 free( psz_variable );
@@ -591,12 +591,12 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             else
                 psz_type = "INVALID";
 
-            E_(SSPush)( st, psz_type );
+            SSPush( st, psz_type );
         }
         else if( !strcmp( s, "vlc_var_set" ) )
         {
-            char *psz_object = E_(SSPop)( st );
-            char *psz_variable = E_(SSPop)( st );
+            char *psz_object = SSPop( st );
+            char *psz_variable = SSPop( st );
             bool b_need_release;
 
             vlc_object_t *p_object = GetVLCObject( p_intf, psz_object,
@@ -614,13 +614,13 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 switch( i_type & VLC_VAR_TYPE )
                 {
                 case VLC_VAR_BOOL:
-                    val.b_bool = E_(SSPopN)( st, vars );
+                    val.b_bool = SSPopN( st, vars );
                     msg_Dbg( p_intf, "requested %s var change: %s->%d",
                              psz_object, psz_variable, val.b_bool );
                     break;
                 case VLC_VAR_INTEGER:
                 case VLC_VAR_HOTKEY:
-                    val.i_int = E_(SSPopN)( st, vars );
+                    val.i_int = SSPopN( st, vars );
                     msg_Dbg( p_intf, "requested %s var change: %s->%d",
                              psz_object, psz_variable, val.i_int );
                     break;
@@ -629,18 +629,18 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 case VLC_VAR_FILE:
                 case VLC_VAR_DIRECTORY:
                 case VLC_VAR_VARIABLE:
-                    val.psz_string = psz_value = E_(SSPop)( st );
+                    val.psz_string = psz_value = SSPop( st );
                     msg_Dbg( p_intf, "requested %s var change: %s->%s",
                              psz_object, psz_variable, psz_value );
                     break;
                 case VLC_VAR_FLOAT:
-                    psz_value = E_(SSPop)( st );
+                    psz_value = SSPop( st );
                     val.f_float = atof( psz_value );
                     msg_Dbg( p_intf, "requested %s var change: %s->%f",
                              psz_object, psz_variable, val.f_float );
                     break;
                 default:
-                    E_(SSPopN)( st, vars );
+                    SSPopN( st, vars );
                     msg_Warn( p_intf, "invalid %s variable type %d (%s)",
                               psz_object, i_type & VLC_VAR_TYPE, psz_variable );
                     b_error = true;
@@ -661,8 +661,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "vlc_var_get" ) )
         {
-            char *psz_object = E_(SSPop)( st );
-            char *psz_variable = E_(SSPop)( st );
+            char *psz_object = SSPop( st );
+            char *psz_variable = SSPop( st );
             bool b_need_release;
 
             vlc_object_t *p_object = GetVLCObject( p_intf, psz_object,
@@ -679,18 +679,18 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 switch( i_type & VLC_VAR_TYPE )
                 {
                 case VLC_VAR_BOOL:
-                    E_(SSPushN)( st, val.b_bool );
+                    SSPushN( st, val.b_bool );
                     break;
                 case VLC_VAR_INTEGER:
                 case VLC_VAR_HOTKEY:
-                    E_(SSPushN)( st, val.i_int );
+                    SSPushN( st, val.i_int );
                     break;
                 case VLC_VAR_STRING:
                 case VLC_VAR_MODULE:
                 case VLC_VAR_FILE:
                 case VLC_VAR_DIRECTORY:
                 case VLC_VAR_VARIABLE:
-                    E_(SSPush)( st, val.psz_string );
+                    SSPush( st, val.psz_string );
                     free( val.psz_string );
                     break;
                 case VLC_VAR_FLOAT:
@@ -699,19 +699,19 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                     lldiv_t value = lldiv( val.f_float * 1000000, 1000000 );
                     snprintf( psz_value, sizeof(psz_value), "%lld.%06u",
                                     value.quot, (unsigned int)value.rem );
-                    E_(SSPush)( st, psz_value );
+                    SSPush( st, psz_value );
                     break;
                 }
                 default:
                     msg_Warn( p_intf, "invalid %s variable type %d (%s)",
                               psz_object, i_type & VLC_VAR_TYPE, psz_variable );
-                    E_(SSPush)( st, "" );
+                    SSPush( st, "" );
                 }
             }
             else
             {
                 msg_Warn( p_intf, "vlc_var_get called without an object" );
-                E_(SSPush)( st, "" );
+                SSPush( st, "" );
             }
             free( psz_variable );
             free( psz_object );
@@ -721,7 +721,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "vlc_object_exists" ) )
         {
-            char *psz_object = E_(SSPop)( st );
+            char *psz_object = SSPop( st );
             bool b_need_release;
 
             vlc_object_t *p_object = GetVLCObject( p_intf, psz_object,
@@ -730,34 +730,34 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 vlc_object_release( p_object );
 
             if( p_object != NULL )
-                E_(SSPush)( st, "1" );
+                SSPush( st, "1" );
             else
-                E_(SSPush)( st, "0" );
+                SSPush( st, "0" );
         }
         else if( !strcmp( s, "vlc_config_set" ) )
         {
-            char *psz_variable = E_(SSPop)( st );
+            char *psz_variable = SSPop( st );
             int i_type = config_GetType( p_intf, psz_variable );
 
             switch( i_type & VLC_VAR_TYPE )
             {
             case VLC_VAR_BOOL:
             case VLC_VAR_INTEGER:
-                config_PutInt( p_intf, psz_variable, E_(SSPopN)( st, vars ) );
+                config_PutInt( p_intf, psz_variable, SSPopN( st, vars ) );
                 break;
             case VLC_VAR_STRING:
             case VLC_VAR_MODULE:
             case VLC_VAR_FILE:
             case VLC_VAR_DIRECTORY:
             {
-                char *psz_string = E_(SSPop)( st );
+                char *psz_string = SSPop( st );
                 config_PutPsz( p_intf, psz_variable, psz_string );
                 free( psz_string );
                 break;
             }
             case VLC_VAR_FLOAT:
             {
-                char *psz_string = E_(SSPop)( st );
+                char *psz_string = SSPop( st );
                 config_PutFloat( p_intf, psz_variable, atof(psz_string) );
                 free( psz_string );
                 break;
@@ -770,14 +770,14 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "vlc_config_get" ) )
         {
-            char *psz_variable = E_(SSPop)( st );
+            char *psz_variable = SSPop( st );
             int i_type = config_GetType( p_intf, psz_variable );
 
             switch( i_type & VLC_VAR_TYPE )
             {
             case VLC_VAR_BOOL:
             case VLC_VAR_INTEGER:
-                E_(SSPushN)( st, config_GetInt( p_intf, psz_variable ) );
+                SSPushN( st, config_GetInt( p_intf, psz_variable ) );
                 break;
             case VLC_VAR_STRING:
             case VLC_VAR_MODULE:
@@ -785,7 +785,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             case VLC_VAR_DIRECTORY:
             {
                 char *psz_string = config_GetPsz( p_intf, psz_variable );
-                E_(SSPush)( st, psz_string );
+                SSPush( st, psz_string );
                 free( psz_string );
                 break;
             }
@@ -796,19 +796,19 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                                        * 1000000, 1000000 );
                 snprintf( psz_string, sizeof(psz_string), "%lld.%06u",
                           value.quot, (unsigned int)value.rem );
-                E_(SSPush)( st, psz_string );
+                SSPush( st, psz_string );
                 break;
             }
             default:
                 msg_Warn( p_intf, "vlc_config_get called on unknown var (%s)",
                           psz_variable );
-                E_(SSPush)( st, "" );
+                SSPush( st, "" );
             }
             free( psz_variable );
         }
         else if( !strcmp( s, "vlc_config_save" ) )
         {
-            char *psz_module = E_(SSPop)( st );
+            char *psz_module = SSPop( st );
             int i_result;
 
             if( !*psz_module )
@@ -820,7 +820,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
 
             if( psz_module != NULL )
                 free( psz_module );
-            E_(SSPushN)( st, i_result );
+            SSPushN( st, i_result );
         }
         else if( !strcmp( s, "vlc_config_reset" ) )
         {
@@ -829,12 +829,12 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         /* 6. playlist functions */
         else if( !strcmp( s, "playlist_add" ) )
         {
-            char *psz_name = E_(SSPop)( st );
-            char *mrl = E_(SSPop)( st );
+            char *psz_name = SSPop( st );
+            char *mrl = SSPop( st );
             input_item_t *p_input;
             int i_ret;
 
-            p_input = E_(MRLParse)( p_intf, mrl, psz_name );
+            p_input = MRLParse( p_intf, mrl, psz_name );
 
             char *psz_uri = input_item_GetURI( p_input );
             if( !p_input || !psz_uri || !*psz_uri )
@@ -854,7 +854,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                     msg_Warn( p_intf, "adding mrl %s failed", mrl );
             }
             free( psz_uri );
-            E_(SSPushN)( st, i_ret );
+            SSPushN( st, i_ret );
 
             free( mrl );
             free( psz_name );
@@ -866,7 +866,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "playlist_delete" ) )
         {
-            int i_id = E_(SSPopN)( st, vars );
+            int i_id = SSPopN( st, vars );
             playlist_item_t *p_item = playlist_ItemGetById( p_sys->p_playlist,
                                                             i_id, false );
             if( p_item )
@@ -883,8 +883,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "playlist_move" ) )
         {
-            /*int i_newpos =*/ E_(SSPopN)( st, vars );
-            /*int i_pos =*/ E_(SSPopN)( st, vars );
+            /*int i_newpos =*/ SSPopN( st, vars );
+            /*int i_pos =*/ SSPopN( st, vars );
             /* FIXME FIXME TODO TODO XXX XXX
             do not release before fixing this
             if ( i_pos < i_newpos )
@@ -902,8 +902,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "playlist_sort" ) )
         {
-            int i_order = E_(SSPopN)( st, vars );
-            int i_sort = E_(SSPopN)( st, vars );
+            int i_order = SSPopN( st, vars );
+            int i_sort = SSPopN( st, vars );
             i_order = i_order % 2;
             i_sort = i_sort % 9;
             /* FIXME FIXME TODO TODO XXX XXX
@@ -918,26 +918,26 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "services_discovery_add" ) )
         {
-            char *psz_sd = E_(SSPop)( st );
+            char *psz_sd = SSPop( st );
             playlist_ServicesDiscoveryAdd( p_sys->p_playlist, psz_sd );
             free( psz_sd );
         }
         else if( !strcmp( s, "services_discovery_remove" ) )
         {
-            char *psz_sd = E_(SSPop)( st );
+            char *psz_sd = SSPop( st );
             playlist_ServicesDiscoveryRemove( p_sys->p_playlist, psz_sd );
             free( psz_sd );
         }
         else if( !strcmp( s, "services_discovery_is_loaded" ) )
         {
-            char *psz_sd = E_(SSPop)( st );
-            E_(SSPushN)( st,
+            char *psz_sd = SSPop( st );
+            SSPushN( st,
             playlist_IsServicesDiscoveryLoaded( p_sys->p_playlist, psz_sd ) );
             free( psz_sd );
         }
         else if( !strcmp( s, "vlc_volume_set" ) )
         {
-            char *psz_vol = E_(SSPop)( st );
+            char *psz_vol = SSPop( st );
             int i_value;
             audio_volume_t i_volume;
             aout_VolumeGet( p_intf, &i_volume );
@@ -976,7 +976,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "vlc_get_meta" ) )
         {
-            char *psz_meta = E_(SSPop)( st );
+            char *psz_meta = SSPop( st );
             char *psz_val = NULL;
             if( p_sys->p_input && input_GetItem(p_sys->p_input) )
             {
@@ -1002,7 +1002,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
 #undef p_item
             }
             if( psz_val == NULL ) psz_val = strdup( "" );
-            E_(SSPush)( st, psz_val );
+            SSPush( st, psz_val );
             free( psz_meta );
             free( psz_val );
         }
@@ -1020,7 +1020,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
 
             /* vlm command uses the ';' delimiter
              * (else we can't know when to stop) */
-            while( strcmp( psz_elt = E_(SSPop)( st ), "" )
+            while( strcmp( psz_elt = SSPop( st ), "" )
                    && strcmp( psz_elt, ";" ) )
             {
                 char *psz_buf =
@@ -1047,10 +1047,10 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                                                  vlm_answer->psz_value );
             }
 
-            E_(mvar_AppendNewVar)( vars, "vlm_error", psz_error );
+            mvar_AppendNewVar( vars, "vlm_error", psz_error );
             /* this is kind of a duplicate but we need to have the message
              * without the command name for the "export" command */
-            E_(mvar_AppendNewVar)( vars, "vlm_value", vlm_answer->psz_value );
+            mvar_AppendNewVar( vars, "vlm_value", vlm_answer->psz_value );
             vlm_MessageDelete( vlm_answer );
 
             free( psz_cmd );
@@ -1076,7 +1076,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else
         {
-            E_(SSPush)( st, s );
+            SSPush( st, s );
         }
     }
 }

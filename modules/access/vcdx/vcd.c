@@ -44,14 +44,14 @@ int  VCDOpen       ( vlc_object_t * );
 void VCDClose      ( vlc_object_t * );
 int  VCDOpenIntf   ( vlc_object_t * );
 void VCDCloseIntf  ( vlc_object_t * );
-int  E_(VCDInit)   ( vlc_object_t * );
-void E_(VCDEnd)    ( vlc_object_t * );
+int  VCDInit   ( vlc_object_t * );
+void VCDEnd    ( vlc_object_t * );
 
-int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
+int  DebugCallback ( vlc_object_t *p_this, const char *psz_name,
                          vlc_value_t oldval, vlc_value_t val,
                          void *p_data );
 
-int  E_(BlocksPerReadCallback) ( vlc_object_t *p_this, const char *psz_name,
+int  BlocksPerReadCallback ( vlc_object_t *p_this, const char *psz_name,
                  vlc_value_t oldval, vlc_value_t val,
                  void *p_data );
 

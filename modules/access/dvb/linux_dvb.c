@@ -91,7 +91,7 @@ static int FrontendSetATSC( access_t * );
 /*****************************************************************************
  * FrontendOpen : Determine frontend device information and capabilities
  *****************************************************************************/
-int E_(FrontendOpen)( access_t *p_access )
+int FrontendOpen( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     frontend_t * p_frontend;
@@ -212,7 +212,7 @@ int E_(FrontendOpen)( access_t *p_access )
 /*****************************************************************************
  * FrontendClose : Close the frontend
  *****************************************************************************/
-void E_(FrontendClose)( access_t *p_access )
+void FrontendClose( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -228,7 +228,7 @@ void E_(FrontendClose)( access_t *p_access )
 /*****************************************************************************
  * FrontendSet : Tune !
  *****************************************************************************/
-int E_(FrontendSet)( access_t *p_access )
+int FrontendSet( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -283,7 +283,7 @@ int E_(FrontendSet)( access_t *p_access )
 /*****************************************************************************
  * FrontendPoll : Poll for frontend events
  *****************************************************************************/
-void E_(FrontendPoll)( access_t *p_access )
+void FrontendPoll( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     frontend_t * p_frontend = p_sys->p_frontend;
@@ -359,7 +359,7 @@ void E_(FrontendPoll)( access_t *p_access )
             {
                 /* The frontend was reinited. */
                 msg_Warn( p_access, "reiniting frontend");
-                E_(FrontendSet)( p_access );
+                FrontendSet( p_access );
             }
         }
 #undef IF_UP
@@ -370,7 +370,7 @@ void E_(FrontendPoll)( access_t *p_access )
 /*****************************************************************************
  * FrontendStatus : Read frontend status
  *****************************************************************************/
-void E_(FrontendStatus)( access_t *p_access )
+void FrontendStatus( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     frontend_t *p_frontend = p_sys->p_frontend;
@@ -1223,7 +1223,7 @@ static int FrontendSetATSC( access_t *p_access )
 /*****************************************************************************
  * DMXSetFilter : controls the demux to add a filter
  *****************************************************************************/
-int E_(DMXSetFilter)( access_t * p_access, int i_pid, int * pi_fd, int i_type )
+int DMXSetFilter( access_t * p_access, int i_pid, int * pi_fd, int i_type )
 {
     struct dmx_pes_filter_params s_filter_params;
     int i_ret;
@@ -1361,7 +1361,7 @@ int E_(DMXSetFilter)( access_t * p_access, int i_pid, int * pi_fd, int i_type )
 /*****************************************************************************
  * DMXUnsetFilter : removes a filter
  *****************************************************************************/
-int E_(DMXUnsetFilter)( access_t * p_access, int i_fd )
+int DMXUnsetFilter( access_t * p_access, int i_fd )
 {
     int i_ret;
 
@@ -1384,7 +1384,7 @@ int E_(DMXUnsetFilter)( access_t * p_access, int i_fd )
 /*****************************************************************************
  * DVROpen :
  *****************************************************************************/
-int E_(DVROpen)( access_t * p_access )
+int DVROpen( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     unsigned int i_adapter, i_device;
@@ -1421,7 +1421,7 @@ int E_(DVROpen)( access_t * p_access )
 /*****************************************************************************
  * DVRClose :
  *****************************************************************************/
-void E_(DVRClose)( access_t * p_access )
+void DVRClose( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -1436,7 +1436,7 @@ void E_(DVRClose)( access_t * p_access )
 /*****************************************************************************
  * CAMOpen :
  *****************************************************************************/
-int E_(CAMOpen)( access_t *p_access )
+int CAMOpen( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     char ca[128];
@@ -1522,13 +1522,13 @@ int E_(CAMOpen)( access_t *p_access )
     memset( p_sys->pb_slot_mmi_undisplayed, 0,
             sizeof(bool) * MAX_CI_SLOTS );
 
-    return E_(en50221_Init)( p_access );
+    return en50221_Init( p_access );
 }
 
 /*****************************************************************************
  * CAMPoll :
  *****************************************************************************/
-int E_(CAMPoll)( access_t * p_access )
+int CAMPoll( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_ret = VLC_EGENERIC;
@@ -1541,7 +1541,7 @@ int E_(CAMPoll)( access_t * p_access )
     switch( p_sys->i_ca_type )
     {
     case CA_CI_LINK:
-        i_ret = E_(en50221_Poll)( p_access );
+        i_ret = en50221_Poll( p_access );
         break;
     case CA_CI:
         i_ret = VLC_SUCCESS;
@@ -1558,7 +1558,7 @@ int E_(CAMPoll)( access_t * p_access )
 /*****************************************************************************
  * CAMStatus :
  *****************************************************************************/
-void E_(CAMStatus)( access_t * p_access )
+void CAMStatus( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     char *p;
@@ -1592,7 +1592,7 @@ void E_(CAMStatus)( access_t * p_access )
 
         p_sys->psz_request = NULL;
 
-        if ( E_(HTTPExtractValue)( psz_request, "slot", psz_value,
+        if ( HTTPExtractValue( psz_request, "slot", psz_value,
                                    sizeof(psz_value) ) == NULL )
         {
             p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
@@ -1600,27 +1600,27 @@ void E_(CAMStatus)( access_t * p_access )
         }
         i_slot = atoi(psz_value);
 
-        if ( E_(HTTPExtractValue)( psz_request, "open", psz_value,
+        if ( HTTPExtractValue( psz_request, "open", psz_value,
                                    sizeof(psz_value) ) != NULL )
         {
-            E_(en50221_OpenMMI)( p_access, i_slot );
+            en50221_OpenMMI( p_access, i_slot );
             return;
         }
 
-        if ( E_(HTTPExtractValue)( psz_request, "close", psz_value,
+        if ( HTTPExtractValue( psz_request, "close", psz_value,
                                    sizeof(psz_value) ) != NULL )
         {
-            E_(en50221_CloseMMI)( p_access, i_slot );
+            en50221_CloseMMI( p_access, i_slot );
             return;
         }
 
-        if ( E_(HTTPExtractValue)( psz_request, "cancel", psz_value,
+        if ( HTTPExtractValue( psz_request, "cancel", psz_value,
                                    sizeof(psz_value) ) == NULL )
         {
             b_ok = true;
         }
 
-        if ( E_(HTTPExtractValue)( psz_request, "type", psz_value,
+        if ( HTTPExtractValue( psz_request, "type", psz_value,
                                    sizeof(psz_value) ) == NULL )
         {
             p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
@@ -1637,7 +1637,7 @@ void E_(CAMStatus)( access_t * p_access )
             }
             else
             {
-                if ( E_(HTTPExtractValue)( psz_request, "answ", psz_value,
+                if ( HTTPExtractValue( psz_request, "answ", psz_value,
                                            sizeof(psz_value) ) == NULL )
                 {
                     p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
@@ -1656,7 +1656,7 @@ void E_(CAMStatus)( access_t * p_access )
             }
             else
             {
-                if ( E_(HTTPExtractValue)( psz_request, "choice", psz_value,
+                if ( HTTPExtractValue( psz_request, "choice", psz_value,
                                            sizeof(psz_value) ) == NULL )
                     mmi_object.u.menu_answ.i_choice = 0;
                 else
@@ -1664,7 +1664,7 @@ void E_(CAMStatus)( access_t * p_access )
             }
         }
 
-        E_(en50221_SendMMIObject)( p_access, i_slot, &mmi_object );
+        en50221_SendMMIObject( p_access, i_slot, &mmi_object );
         return;
     }
 
@@ -1739,7 +1739,7 @@ void E_(CAMStatus)( access_t * p_access )
 
         if ( sinfo.flags & CA_CI_MODULE_READY )
         {
-            en50221_mmi_object_t *p_object = E_(en50221_GetMMIObject)( p_access,
+            en50221_mmi_object_t *p_object = en50221_GetMMIObject( p_access,
                                                                        i_slot );
 
             p += sprintf( p, "module present and ready<p>\n" );
@@ -1818,7 +1818,7 @@ out:
 /*****************************************************************************
  * CAMSet :
  *****************************************************************************/
-int E_(CAMSet)( access_t * p_access, dvbpsi_pmt_t *p_pmt )
+int CAMSet( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -1828,7 +1828,7 @@ int E_(CAMSet)( access_t * p_access, dvbpsi_pmt_t *p_pmt )
         return VLC_EGENERIC;
     }
 
-    E_(en50221_SetCAPMT)( p_access, p_pmt );
+    en50221_SetCAPMT( p_access, p_pmt );
 
     return VLC_SUCCESS;
 }
@@ -1836,11 +1836,11 @@ int E_(CAMSet)( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 /*****************************************************************************
  * CAMClose :
  *****************************************************************************/
-void E_(CAMClose)( access_t * p_access )
+void CAMClose( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    E_(en50221_End)( p_access );
+    en50221_End( p_access );
 
     if ( p_sys->i_ca_handle )
     {

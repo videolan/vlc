@@ -56,7 +56,7 @@ static char *get_file_perms(struct stat st);
 /*****************************************************************************
  * Useful function to retrieve p_intf
  ****************************************************************************/
-void * E_(__GtkGetIntf)( GtkWidget * widget )
+void * __GtkGetIntf( GtkWidget * widget )
 {
     void *p_data;
 

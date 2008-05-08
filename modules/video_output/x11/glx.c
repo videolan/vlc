@@ -129,8 +129,8 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-extern int  E_(Activate)   ( vlc_object_t * );
-extern void E_(Deactivate) ( vlc_object_t * );
+extern int  Activate   ( vlc_object_t * );
+extern void Deactivate ( vlc_object_t * );
 
 /*****************************************************************************
  * CreateOpenGL: initialize an OpenGL provider
@@ -139,7 +139,7 @@ static int CreateOpenGL( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    if( E_(Activate)( p_this ) != VLC_SUCCESS )
+    if( Activate( p_this ) != VLC_SUCCESS )
     {
         return VLC_EGENERIC;
     }
@@ -165,7 +165,7 @@ static void DestroyOpenGL( vlc_object_t *p_this )
         glXDestroyWindow( p_sys->p_display, p_sys->gwnd );
     }
 
-    E_(Deactivate)( p_this );
+    Deactivate( p_this );
 }
 
 /*****************************************************************************

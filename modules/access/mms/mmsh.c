@@ -49,8 +49,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int  E_(MMSHOpen)  ( access_t * );
-void E_(MMSHClose) ( access_t * );
+int  MMSHOpen  ( access_t * );
+void MMSHClose ( access_t * );
 
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static ssize_t ReadRedirect( access_t *, uint8_t *, size_t );
@@ -73,7 +73,7 @@ static int Reset( access_t * );
 /****************************************************************************
  * Open: connect to ftp server and ask for file
  ****************************************************************************/
-int E_(MMSHOpen)( access_t *p_access )
+int MMSHOpen( access_t *p_access )
 {
     access_sys_t    *p_sys;
     char            *psz_location = NULL;
@@ -220,7 +220,7 @@ int E_(MMSHOpen)( access_t *p_access )
 /*****************************************************************************
  * Close: free unused data structures
  *****************************************************************************/
-void E_( MMSHClose )( access_t *p_access )
+void  MMSHClose ( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -472,13 +472,13 @@ static int Reset( access_t *p_access )
     if( p_sys->i_header <= 0 )
         return VLC_EGENERIC;
 
-    E_( asf_HeaderParse )( &p_sys->asfh,
+     asf_HeaderParse ( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
     msg_Dbg( p_access, "packet count=%"PRId64" packet size=%d",
              p_sys->asfh.i_data_packets_count,
              p_sys->asfh.i_min_data_packet_size );
 
-    E_( asf_StreamSelect)( &p_sys->asfh,
+     asf_StreamSelect( &p_sys->asfh,
                            var_CreateGetInteger( p_access, "mms-maxbitrate" ),
                            var_CreateGetInteger( p_access, "mms-all" ),
                            var_CreateGetInteger( p_access, "audio" ),
@@ -574,7 +574,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     p_sys->i_packet_used = 0;
     p_sys->i_packet_length = 0;
     p_sys->p_packet = NULL;
-    E_( GenerateGuid )( &p_sys->guid );
+     GenerateGuid ( &p_sys->guid );
 
     if( OpenConnection( p_access ) )
         return VLC_EGENERIC;
@@ -703,13 +703,13 @@ static int Describe( access_t  *p_access, char **ppsz_location )
      *
      * TODO : stream bitrates properties(optional)
      *        and bitrate mutual exclusion(optional) */
-    E_( asf_HeaderParse )( &p_sys->asfh,
+     asf_HeaderParse ( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
     msg_Dbg( p_access, "packet count=%"PRId64" packet size=%d",
              p_sys->asfh.i_data_packets_count,
              p_sys->asfh.i_min_data_packet_size );
 
-    E_( asf_StreamSelect)( &p_sys->asfh,
+     asf_StreamSelect( &p_sys->asfh,
                            var_CreateGetInteger( p_access, "mms-maxbitrate" ),
                            var_CreateGetInteger( p_access, "mms-all" ),
                            var_CreateGetInteger( p_access, "audio" ),

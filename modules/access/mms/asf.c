@@ -45,7 +45,7 @@ static int CmpGuid( const guid_t *p_guid1, const guid_t *p_guid2 )
               p_guid1->v4[7] == p_guid2->v4[7] ) ? 1 : 0 );
 }
 
-void E_( GenerateGuid )( guid_t *p_guid )
+void  GenerateGuid ( guid_t *p_guid )
 {
     int i;
 
@@ -61,7 +61,7 @@ void E_( GenerateGuid )( guid_t *p_guid )
     }
 }
 
-void E_( asf_HeaderParse )( asf_header_t *hdr,
+void  asf_HeaderParse ( asf_header_t *hdr,
                             uint8_t *p_header, int i_header )
 {
     var_buffer_t buffer;
@@ -201,7 +201,7 @@ void E_( asf_HeaderParse )( asf_header_t *hdr,
     }
 }
 
-void E_( asf_StreamSelect ) ( asf_header_t *hdr,
+void  asf_StreamSelect  ( asf_header_t *hdr,
                               int i_bitrate_max,
                               bool b_all, bool b_audio, bool b_video )
 {

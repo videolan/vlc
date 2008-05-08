@@ -130,7 +130,7 @@ static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t *
  * vout properties to choose the window size, and change them according to the
  * actual properties of the display.
  *****************************************************************************/
-int E_(OpenVideo) ( vlc_object_t *p_this )
+int OpenVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
@@ -278,7 +278,7 @@ static void QNXEnd( vout_thread_t *p_vout )
  *****************************************************************************
  * Terminate an output method created by QNXCreate
  *****************************************************************************/
-void E_(CloseVideo) ( vlc_object_t *p_this )
+void CloseVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 

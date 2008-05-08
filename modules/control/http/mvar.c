@@ -43,7 +43,7 @@ static int InsensitiveAlphasort( const char **foo1,
 
 
 
-mvar_t *E_(mvar_New)( const char *name, const char *value )
+mvar_t *mvar_New( const char *name, const char *value )
 {
     mvar_t *v = malloc( sizeof( mvar_t ) );
 
@@ -58,7 +58,7 @@ mvar_t *E_(mvar_New)( const char *name, const char *value )
     return v;
 }
 
-void E_(mvar_Delete)( mvar_t *v )
+void mvar_Delete( mvar_t *v )
 {
     int i;
 
@@ -67,34 +67,34 @@ void E_(mvar_Delete)( mvar_t *v )
 
     for( i = 0; i < v->i_field; i++ )
     {
-        E_(mvar_Delete)( v->field[i] );
+        mvar_Delete( v->field[i] );
     }
     free( v->field );
     free( v );
 }
 
-void E_(mvar_AppendVar)( mvar_t *v, mvar_t *f )
+void mvar_AppendVar( mvar_t *v, mvar_t *f )
 {
     v->field = realloc( v->field, sizeof( mvar_t * ) * ( v->i_field + 2 ) );
     v->field[v->i_field] = f;
     v->i_field++;
 }
 
-mvar_t *E_(mvar_Duplicate)( const mvar_t *v )
+mvar_t *mvar_Duplicate( const mvar_t *v )
 {
     int i;
     mvar_t *n;
 
-    n = E_(mvar_New)( v->name, v->value );
+    n = mvar_New( v->name, v->value );
     for( i = 0; i < v->i_field; i++ )
     {
-        E_(mvar_AppendVar)( n, E_(mvar_Duplicate)( v->field[i] ) );
+        mvar_AppendVar( n, mvar_Duplicate( v->field[i] ) );
     }
 
     return n;
 }
 
-void E_(mvar_PushVar)( mvar_t *v, mvar_t *f )
+void mvar_PushVar( mvar_t *v, mvar_t *f )
 {
     v->field = realloc( v->field, sizeof( mvar_t * ) * ( v->i_field + 2 ) );
     if( v->i_field > 0 )
@@ -105,7 +105,7 @@ void E_(mvar_PushVar)( mvar_t *v, mvar_t *f )
     v->i_field++;
 }
 
-void E_(mvar_RemoveVar)( mvar_t *v, mvar_t *f )
+void mvar_RemoveVar( mvar_t *v, mvar_t *f )
 {
     int i;
     for( i = 0; i < v->i_field; i++ )
@@ -128,7 +128,7 @@ void E_(mvar_RemoveVar)( mvar_t *v, mvar_t *f )
     /* FIXME should do a realloc */
 }
 
-mvar_t *E_(mvar_GetVar)( mvar_t *s, const char *name )
+mvar_t *mvar_GetVar( mvar_t *s, const char *name )
 {
     /* format: name[index].field */
     const char *field = strchr( name, '.' );
@@ -168,7 +168,7 @@ mvar_t *E_(mvar_GetVar)( mvar_t *s, const char *name )
             {
                 if( field )
                 {
-                    return E_(mvar_GetVar)( s->field[i], field );
+                    return mvar_GetVar( s->field[i], field );
                 }
                 else
                 {
@@ -180,7 +180,7 @@ mvar_t *E_(mvar_GetVar)( mvar_t *s, const char *name )
     return NULL;
 }
 
-char *E_(mvar_GetValue)( mvar_t *v, char *field )
+char *mvar_GetValue( mvar_t *v, char *field )
 {
     if( *field == '\0' )
     {
@@ -188,7 +188,7 @@ char *E_(mvar_GetValue)( mvar_t *v, char *field )
     }
     else
     {
-        mvar_t *f = E_(mvar_GetVar)( v, field );
+        mvar_t *f = mvar_GetVar( v, field );
         if( f )
         {
             return f->value;
@@ -200,27 +200,27 @@ char *E_(mvar_GetValue)( mvar_t *v, char *field )
     }
 }
 
-void E_(mvar_PushNewVar)( mvar_t *vars, const char *name,
+void mvar_PushNewVar( mvar_t *vars, const char *name,
                           const char *value )
 {
-    mvar_t *f = E_(mvar_New)( name, value );
-    E_(mvar_PushVar)( vars, f );
+    mvar_t *f = mvar_New( name, value );
+    mvar_PushVar( vars, f );
 }
 
-void E_(mvar_AppendNewVar)( mvar_t *vars, const char *name,
+void mvar_AppendNewVar( mvar_t *vars, const char *name,
                             const char *value )
 {
-    mvar_t *f = E_(mvar_New)( name, value );
-    E_(mvar_AppendVar)( vars, f );
+    mvar_t *f = mvar_New( name, value );
+    mvar_AppendVar( vars, f );
 }
 
 
 /* arg= start[:stop[:step]],.. */
-mvar_t *E_(mvar_IntegerSetNew)( const char *name, const char *arg )
+mvar_t *mvar_IntegerSetNew( const char *name, const char *arg )
 {
     char *dup = strdup( arg );
     char *str = dup;
-    mvar_t *s = E_(mvar_New)( name, "set" );
+    mvar_t *s = mvar_New( name, "set" );
 
     while( str )
     {
@@ -266,7 +266,7 @@ mvar_t *E_(mvar_IntegerSetNew)( const char *name, const char *arg )
 
                     sprintf( value, "%d", i );
 
-                    E_(mvar_PushNewVar)( s, name, value );
+                    mvar_PushNewVar( s, name, value );
                 }
             }
         }
@@ -281,19 +281,19 @@ mvar_t *E_(mvar_IntegerSetNew)( const char *name, const char *arg )
  * Special sets handling
  ********************************************************************/
 
-mvar_t *E_(mvar_PlaylistSetNew)( intf_thread_t *p_intf, char *name,
+mvar_t *mvar_PlaylistSetNew( intf_thread_t *p_intf, char *name,
                                  playlist_t *p_pl )
 {
-    mvar_t *s = E_(mvar_New)( name, "set" );
+    mvar_t *s = mvar_New( name, "set" );
     vlc_mutex_lock( &p_pl->object_lock );
-    E_(PlaylistListNode)( p_intf, p_pl, p_pl->p_root_category , name, s, 0 );
+    PlaylistListNode( p_intf, p_pl, p_pl->p_root_category , name, s, 0 );
     vlc_mutex_unlock( &p_pl->object_lock );
     return s;
 }
 
-mvar_t *E_(mvar_InfoSetNew)( char *name, input_thread_t *p_input )
+mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
 {
-    mvar_t *s = E_(mvar_New)( name, "set" );
+    mvar_t *s = mvar_New( name, "set" );
     int i, j;
 
     if( p_input == NULL || p_input->p == NULL /* workarround assert in input_GetItem */ )
@@ -306,34 +306,34 @@ mvar_t *E_(mvar_InfoSetNew)( char *name, input_thread_t *p_input )
     {
         info_category_t *p_category = input_GetItem(p_input)->pp_categories[i];
 
-        mvar_t *cat  = E_(mvar_New)( name, "set" );
-        mvar_t *iset = E_(mvar_New)( "info", "set" );
+        mvar_t *cat  = mvar_New( name, "set" );
+        mvar_t *iset = mvar_New( "info", "set" );
 
-        E_(mvar_AppendNewVar)( cat, "name", p_category->psz_name );
-        E_(mvar_AppendVar)( cat, iset );
+        mvar_AppendNewVar( cat, "name", p_category->psz_name );
+        mvar_AppendVar( cat, iset );
 
         for ( j = 0; j < p_category->i_infos; j++ )
         {
             info_t *p_info = p_category->pp_infos[j];
-            mvar_t *info = E_(mvar_New)( "info", "" );
+            mvar_t *info = mvar_New( "info", "" );
 
             /* msg_Dbg( p_input, "adding info name=%s value=%s",
                      psz_name, psz_value ); */
-            E_(mvar_AppendNewVar)( info, "name",  p_info->psz_name );
-            E_(mvar_AppendNewVar)( info, "value", p_info->psz_value );
-            E_(mvar_AppendVar)( iset, info );
+            mvar_AppendNewVar( info, "name",  p_info->psz_name );
+            mvar_AppendNewVar( info, "value", p_info->psz_value );
+            mvar_AppendVar( iset, info );
         }
-        E_(mvar_AppendVar)( s, cat );
+        mvar_AppendVar( s, cat );
     }
     vlc_mutex_unlock( &input_GetItem(p_input)->lock );
 
     return s;
 }
 
-mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *psz_name,
+mvar_t *mvar_ObjectSetNew( intf_thread_t *p_intf, char *psz_name,
                                const char *psz_capability )
 {
-    mvar_t *s = E_(mvar_New)( psz_name, "set" );
+    mvar_t *s = mvar_New( psz_name, "set" );
     int i;
 
     vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
@@ -344,10 +344,10 @@ mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *psz_name,
         module_t *p_parser = (module_t *)p_list->p_values[i].p_object;
         if( module_IsCapable( p_parser, psz_capability ) )
         {
-            mvar_t *sd = E_(mvar_New)( "sd", module_GetObjName( p_parser ) );
-            E_(mvar_AppendNewVar)( sd, "name",
+            mvar_t *sd = mvar_New( "sd", module_GetObjName( p_parser ) );
+            mvar_AppendNewVar( sd, "name",
                                    module_GetName( p_parser, true ) );
-            E_(mvar_AppendVar)( s, sd );
+            mvar_AppendVar( s, sd );
         }
     }
 
@@ -356,12 +356,12 @@ mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *psz_name,
     return s;
 }
 
-mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
+mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
                                  input_thread_t *p_input,
                                  const char *psz_variable )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
-    mvar_t *s = E_(mvar_New)( name, "set" );
+    mvar_t *s = mvar_New( name, "set" );
     vlc_value_t val, val_list, text_list;
     int i_type, i;
 
@@ -419,31 +419,31 @@ mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
         switch( i_type & VLC_VAR_TYPE )
         {
         case VLC_VAR_STRING:
-            itm = E_(mvar_New)( name, "set" );
+            itm = mvar_New( name, "set" );
             /* FIXME: Memory leak here?? (remove strdup?) */
             psz = strdup( text_list.p_list->p_values[i].psz_string );
-            E_(mvar_AppendNewVar)( itm, "name", psz );
-            E_(mvar_AppendNewVar)( itm, "id", val_list.p_list->p_values[i].psz_string );
+            mvar_AppendNewVar( itm, "name", psz );
+            mvar_AppendNewVar( itm, "id", val_list.p_list->p_values[i].psz_string );
             snprintf( psz_int, sizeof(psz_int), "%d",
                       ( !strcmp( val.psz_string,
                                    val_list.p_list->p_values[i].psz_string )
                            && !( i_type & VLC_VAR_ISCOMMAND ) ) );
-            E_(mvar_AppendNewVar)( itm, "selected", psz_int );
-            E_(mvar_AppendVar)( s, itm );
+            mvar_AppendNewVar( itm, "selected", psz_int );
+            mvar_AppendVar( s, itm );
             break;
 
         case VLC_VAR_INTEGER:
-            itm = E_(mvar_New)( name, "set" );
+            itm = mvar_New( name, "set" );
             psz = strdup( text_list.p_list->p_values[i].psz_string );
-            E_(mvar_AppendNewVar)( itm, "name", psz );
+            mvar_AppendNewVar( itm, "name", psz );
             snprintf( psz_int, sizeof(psz_int), "%d",
                       val_list.p_list->p_values[i].i_int );
-            E_(mvar_AppendNewVar)( itm, "id", psz_int );
+            mvar_AppendNewVar( itm, "id", psz_int );
             snprintf( psz_int, sizeof(psz_int), "%d",
                       ( val.i_int == val_list.p_list->p_values[i].i_int )
                          && !( i_type & VLC_VAR_ISCOMMAND ) );
-            E_(mvar_AppendNewVar)( itm, "selected", psz_int );
-            E_(mvar_AppendVar)( s, itm );
+            mvar_AppendNewVar( itm, "selected", psz_int );
+            mvar_AppendVar( s, itm );
             break;
 
         default:
@@ -458,9 +458,9 @@ mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
 }
 
 #if 0
-mvar_t *E_(mvar_HttpdInfoSetNew)( char *name, httpd_t *p_httpd, int i_type )
+mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
 {
-    mvar_t       *s = E_(mvar_New)( name, "set" );
+    mvar_t       *s = mvar_New( name, "set" );
     httpd_info_t info;
     int          i;
 
@@ -470,17 +470,17 @@ mvar_t *E_(mvar_HttpdInfoSetNew)( char *name, httpd_t *p_httpd, int i_type )
         {
             mvar_t *inf;
 
-            inf = E_(mvar_New)( name, "set" );
+            inf = mvar_New( name, "set" );
             do
             {
                 /* fprintf( stderr," mvar_HttpdInfoSetNew: append name=`%s' value=`%s'\n",
                             info.info[i].psz_name, info.info[i].psz_value ); */
-                E_(mvar_AppendNewVar)( inf,
+                mvar_AppendNewVar( inf,
                                    info.info[i].psz_name,
                                    info.info[i].psz_value );
                 i++;
             } while( i < info.i_count && strcmp( info.info[i].psz_name, "id" ) );
-            E_(mvar_AppendVar)( s, inf );
+            mvar_AppendVar( s, inf );
         }
     }
 
@@ -499,16 +499,16 @@ mvar_t *E_(mvar_HttpdInfoSetNew)( char *name, httpd_t *p_httpd, int i_type )
 }
 #endif
 
-mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
+mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                              char *psz_dir )
 {
-    mvar_t *s = E_(mvar_New)( name, "set" );
+    mvar_t *s = mvar_New( name, "set" );
 #ifdef HAVE_SYS_STAT_H
     struct stat   stat_info;
 #endif
     char        **ppsz_dir_content;
     int           i_dir_content, i;
-    psz_dir = E_(RealPath)( p_intf, psz_dir );
+    psz_dir = RealPath( p_intf, psz_dir );
 
 #ifdef HAVE_SYS_STAT_H
     if( (utf8_stat( psz_dir, &stat_info ) == -1 )
@@ -556,7 +556,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
             }
 #endif
         }
-        f = E_(mvar_New)( name, "set" );
+        f = mvar_New( name, "set" );
 
         /* put lower-case file extension in 'ext' */
         psz_ext = strrchr( psz_name, '.' );
@@ -564,7 +564,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
         for( psz_dummy = psz_ext; *psz_dummy != '\0'; psz_dummy++ )
             *psz_dummy = tolower( *psz_dummy );
 
-        E_(mvar_AppendNewVar)( f, "ext", psz_ext );
+        mvar_AppendNewVar( f, "ext", psz_ext );
         free( psz_ext );
 
 #if defined( WIN32 )
@@ -572,11 +572,11 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
         {
             char psz_tmp[3];
             sprintf( psz_tmp, "%c:", psz_name[0] );
-            E_(mvar_AppendNewVar)( f, "name", psz_name );
-            E_(mvar_AppendNewVar)( f, "basename", psz_tmp );
-            E_(mvar_AppendNewVar)( f, "type", "directory" );
-            E_(mvar_AppendNewVar)( f, "size", "unknown" );
-            E_(mvar_AppendNewVar)( f, "date", "unknown" );
+            mvar_AppendNewVar( f, "name", psz_name );
+            mvar_AppendNewVar( f, "basename", psz_tmp );
+            mvar_AppendNewVar( f, "type", "directory" );
+            mvar_AppendNewVar( f, "size", "unknown" );
+            mvar_AppendNewVar( f, "date", "unknown" );
         }
         else
 #endif
@@ -585,42 +585,42 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
             char psz_tmp[strlen( psz_dir ) + 1 + strlen( psz_name ) + 1];
 
             sprintf( psz_tmp, "%s"DIR_SEP"%s", psz_dir, psz_name );
-            E_(mvar_AppendNewVar)( f, "name", psz_tmp );
-            E_(mvar_AppendNewVar)( f, "basename", psz_name );
+            mvar_AppendNewVar( f, "name", psz_tmp );
+            mvar_AppendNewVar( f, "basename", psz_name );
 
 #ifdef HAVE_SYS_STAT_H
             if( S_ISDIR( stat_info.st_mode ) )
             {
-                E_(mvar_AppendNewVar)( f, "type", "directory" );
+                mvar_AppendNewVar( f, "type", "directory" );
             }
             else if( S_ISREG( stat_info.st_mode ) )
             {
-                E_(mvar_AppendNewVar)( f, "type", "file" );
+                mvar_AppendNewVar( f, "type", "file" );
             }
             else
             {
-                E_(mvar_AppendNewVar)( f, "type", "unknown" );
+                mvar_AppendNewVar( f, "type", "unknown" );
             }
 
             sprintf( psz_ctime, "%"PRId64, (int64_t)stat_info.st_size );
-            E_(mvar_AppendNewVar)( f, "size", psz_ctime );
+            mvar_AppendNewVar( f, "size", psz_ctime );
 
             /* FIXME memory leak FIXME */
 #   ifdef HAVE_CTIME_R
             ctime_r( &stat_info.st_mtime, psz_ctime );
-            E_(mvar_AppendNewVar)( f, "date", psz_ctime );
+            mvar_AppendNewVar( f, "date", psz_ctime );
 #   else
-            E_(mvar_AppendNewVar)( f, "date", ctime( &stat_info.st_mtime ) );
+            mvar_AppendNewVar( f, "date", ctime( &stat_info.st_mtime ) );
 #   endif
 
 #else
-            E_(mvar_AppendNewVar)( f, "type", "unknown" );
-            E_(mvar_AppendNewVar)( f, "size", "unknown" );
-            E_(mvar_AppendNewVar)( f, "date", "unknown" );
+            mvar_AppendNewVar( f, "type", "unknown" );
+            mvar_AppendNewVar( f, "size", "unknown" );
+            mvar_AppendNewVar( f, "date", "unknown" );
 #endif
         }
 
-        E_(mvar_AppendVar)( s, f );
+        mvar_AppendVar( s, f );
 
         free( psz_name );
     }
@@ -630,18 +630,18 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
     return s;
 }
 
-void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, bool b_name );
-void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, bool b_name )
+void mvar_VlmSetNewLoop( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, bool b_name );
+void mvar_VlmSetNewLoop( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, bool b_name )
 {
     /* Over name */
     mvar_t        *set;
     int k;
 
     /* Add a node with name and info */
-    set = E_(mvar_New)( name, "set" );
+    set = mvar_New( name, "set" );
     if( b_name == true )
     {
-        E_(mvar_AppendNewVar)( set, "name", el->psz_name );
+        mvar_AppendNewVar( set, "name", el->psz_name );
     }
 
     for( k = 0; k < el->i_child; k++ )
@@ -649,27 +649,27 @@ void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *e
         vlm_message_t *ch = el->child[k];
         if( ch->i_child > 0 )
         {
-            E_(mvar_VlmSetNewLoop)( ch->psz_name, vlm, set, ch, false );
+            mvar_VlmSetNewLoop( ch->psz_name, vlm, set, ch, false );
         }
         else
         {
             if( ch->psz_value )
             {
-                E_(mvar_AppendNewVar)( set, ch->psz_name, ch->psz_value );
+                mvar_AppendNewVar( set, ch->psz_name, ch->psz_value );
             }
             else
             {
-                E_(mvar_AppendNewVar)( set, el->psz_name, ch->psz_name );
+                mvar_AppendNewVar( set, el->psz_name, ch->psz_name );
             }
         }
     }
 
-    E_(mvar_AppendVar)( s, set );
+    mvar_AppendVar( s, set );
 }
 
-mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm )
+mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
 {
-    mvar_t        *s = E_(mvar_New)( name, "set" );
+    mvar_t        *s = mvar_New( name, "set" );
     vlm_message_t *msg;
     int    i;
 
@@ -698,7 +698,7 @@ mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm )
                 continue;
             desc = inf->child[0];
 
-            E_(mvar_VlmSetNewLoop)( el->psz_name, vlm, s, desc, true );
+            mvar_VlmSetNewLoop( el->psz_name, vlm, s, desc, true );
 
             vlm_MessageDelete( inf );
         }

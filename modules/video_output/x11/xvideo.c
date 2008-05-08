@@ -38,8 +38,8 @@
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-extern int  E_(Activate)   ( vlc_object_t * );
-extern void E_(Deactivate) ( vlc_object_t * );
+extern int  Activate   ( vlc_object_t * );
+extern void Deactivate ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -94,7 +94,7 @@ vlc_module_begin();
 
     set_description( _("XVideo extension video output") );
     set_capability( "video output", 150 );
-    set_callbacks( E_(Activate), E_(Deactivate) );
+    set_callbacks( Activate, Deactivate );
 vlc_module_end();
 
 /* following functions are local */

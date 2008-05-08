@@ -45,7 +45,7 @@ static void    Play        ( aout_instance_t * );
 /*****************************************************************************
  * OpenAudio: open a dummy audio device
  *****************************************************************************/
-int E_(OpenAudio) ( vlc_object_t * p_this )
+int OpenAudio ( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 

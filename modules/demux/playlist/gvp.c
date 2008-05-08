@@ -74,7 +74,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 /*****************************************************************************
  * Import_GVP: main import function
  *****************************************************************************/
-int E_(Import_GVP)( vlc_object_t *p_this )
+int Import_GVP( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     int i_peek, i, b_found = false;
@@ -106,7 +106,7 @@ int E_(Import_GVP)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_GVP)( vlc_object_t *p_this )
+void Close_GVP( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;

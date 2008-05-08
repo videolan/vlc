@@ -40,7 +40,7 @@ static void SetOffset( int, int, int, int, bool *, int *, int * );
 /*****************************************************************************
  * I420_RGB8: color YUV 4:2:0 to RGB 8 bpp
  *****************************************************************************/
-void E_(I420_RGB8)( vout_thread_t *p_vout, picture_t *p_src, picture_t *p_dest )
+void I420_RGB8( vout_thread_t *p_vout, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint8_t *p_pic = (uint8_t*)p_dest->p->p_pixels;

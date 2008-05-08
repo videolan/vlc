@@ -46,7 +46,7 @@
 #include "ffmpeg.h"
 
 #if !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
-void E_(InitLibavcodec) ( vlc_object_t *p_object );
+void InitLibavcodec ( vlc_object_t *p_object );
 static int CheckInit( filter_t *p_filter );
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic );
 
@@ -80,8 +80,8 @@ static int OpenFilterEx( vlc_object_t *p_this, bool b_enable_croppadd )
     bool b_convert, b_resize;
 
     /* Check if we can handle that formats */
-    if( E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma ) < 0 ||
-        E_(GetFfmpegChroma)( p_filter->fmt_out.video.i_chroma ) < 0 )
+    if( GetFfmpegChroma( p_filter->fmt_in.video.i_chroma ) < 0 ||
+        GetFfmpegChroma( p_filter->fmt_out.video.i_chroma ) < 0 )
     {
         return VLC_EGENERIC;
     }
@@ -124,9 +124,9 @@ static int OpenFilterEx( vlc_object_t *p_this, bool b_enable_croppadd )
     p_sys->p_rsc = NULL;
     p_sys->b_enable_croppadd = b_enable_croppadd;
     p_sys->i_src_ffmpeg_chroma =
-        E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma );
+        GetFfmpegChroma( p_filter->fmt_in.video.i_chroma );
     p_sys->i_dst_ffmpeg_chroma =
-        E_(GetFfmpegChroma)( p_filter->fmt_out.video.i_chroma );
+        GetFfmpegChroma( p_filter->fmt_out.video.i_chroma );
     p_filter->pf_video_filter = Process;
     es_format_Init( &p_sys->fmt_in, 0, 0 );
     es_format_Init( &p_sys->fmt_out, 0, 0 );
@@ -151,7 +151,7 @@ static int OpenFilterEx( vlc_object_t *p_this, bool b_enable_croppadd )
              (char *)&p_filter->fmt_out.video.i_chroma );
 
     /* libavcodec needs to be initialized for some chroma conversions */
-    E_(InitLibavcodec)(p_this);
+    InitLibavcodec(p_this);
 
     return VLC_SUCCESS;
 }
@@ -159,7 +159,7 @@ static int OpenFilterEx( vlc_object_t *p_this, bool b_enable_croppadd )
 /*****************************************************************************
  * OpenFilter: probe the filter and return score
  *****************************************************************************/
-int E_(OpenFilter)( vlc_object_t *p_this )
+int OpenFilter( vlc_object_t *p_this )
 {
     return OpenFilterEx( p_this, false );
 }
@@ -167,7 +167,7 @@ int E_(OpenFilter)( vlc_object_t *p_this )
 /*****************************************************************************
  * OpenCropPadd: probe the filter and return score
  *****************************************************************************/
-int E_(OpenCropPadd)( vlc_object_t *p_this )
+int OpenCropPadd( vlc_object_t *p_this )
 {
     return OpenFilterEx( p_this, true );
 }
@@ -176,7 +176,7 @@ int E_(OpenCropPadd)( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseFilter: clean up the filter
  *****************************************************************************/
-void E_(CloseFilter)( vlc_object_t *p_this )
+void CloseFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;

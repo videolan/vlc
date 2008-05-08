@@ -63,8 +63,8 @@ static void          ParseText     ( decoder_t *, block_t * );
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-int  E_(OpenIntf)  ( vlc_object_t * );
-void E_(CloseIntf) ( vlc_object_t * );
+int  OpenIntf  ( vlc_object_t * );
+void CloseIntf ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor.
@@ -77,7 +77,7 @@ vlc_module_begin();
 
     add_submodule();
         set_capability( "interface", 0 );
-        set_callbacks( E_(OpenIntf), E_(CloseIntf) );
+        set_callbacks( OpenIntf, CloseIntf );
 vlc_module_end();
 
 /*****************************************************************************

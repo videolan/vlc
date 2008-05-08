@@ -123,23 +123,23 @@ static int Open( vlc_object_t *p_this )
     {
         if( !strncmp( p_access->psz_access, "mmsu", 4 ) )
         {
-            return E_( MMSTUOpen )( p_access );
+            return  MMSTUOpen ( p_access );
         }
         else if( !strncmp( p_access->psz_access, "mmst", 4 ) )
         {
-            return E_( MMSTUOpen )( p_access );
+            return  MMSTUOpen ( p_access );
         }
         else if( !strncmp( p_access->psz_access, "mmsh", 4 ) ||
                  !strncmp( p_access->psz_access, "http", 4 ) )
         {
-            return E_( MMSHOpen )( p_access );
+            return  MMSHOpen ( p_access );
         }
     }
 
-    if( E_( MMSTUOpen )( p_access ) )
+    if(  MMSTUOpen ( p_access ) )
     {
         /* try mmsh if mmstu failed */
-        return E_( MMSHOpen )( p_access );
+        return  MMSHOpen ( p_access );
     }
     return VLC_SUCCESS;
 }
@@ -155,10 +155,10 @@ static void Close( vlc_object_t *p_this )
     if( ( p_sys->i_proto == MMS_PROTO_TCP ) ||
         ( p_sys->i_proto == MMS_PROTO_UDP ) )
     {
-        E_( MMSTUClose )( p_access );
+         MMSTUClose ( p_access );
     }
     else if( p_sys->i_proto == MMS_PROTO_HTTP )
     {
-        E_( MMSHClose )( p_access );
+         MMSHClose ( p_access );
     }
 }

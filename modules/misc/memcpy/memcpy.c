@@ -56,7 +56,7 @@
  * Extern prototype
  *****************************************************************************/
 #ifndef MODULE_NAME_IS_memcpy
-#   define fast_memcpy E_(fast_memcpy)
+#   define fast_memcpy fast_memcpy
 #   include "fastmemcpy.h"
 #endif
 

@@ -177,7 +177,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
             {
                 break;
             }
-            E_(ExtractURIValue)( p_request, "control", control, 512 );
+            ExtractURIValue( p_request, "control", control, 512 );
             if( *m->param1 && !strstr( m->param1, control ) )
             {
                 msg_Warn( p_intf, "unauthorized control=%s", control );
@@ -190,7 +190,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     int i_item;
                     char item[512];
 
-                    E_(ExtractURIValue)( p_request, "item", item, 512 );
+                    ExtractURIValue( p_request, "item", item, 512 );
                     i_item = atoi( item );
                     /* id = 0 : simply ask playlist to play */
                     if( i_item == 0 )
@@ -244,9 +244,9 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_SEEK:
                 {
                     char value[30];
-                    E_(ExtractURIValue)( p_request, "seek_value", value, 30 );
+                    ExtractURIValue( p_request, "seek_value", value, 30 );
                     decode_URI( value );
-                    E_(HandleSeek)( p_intf, value );
+                    HandleSeek( p_intf, value );
                     break;
                 }
                 case MVLC_VOLUME:
@@ -255,7 +255,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     audio_volume_t i_volume;
                     int i_value;
 
-                    E_(ExtractURIValue)( p_request, "value", vol, 8 );
+                    ExtractURIValue( p_request, "value", vol, 8 );
                     aout_VolumeGet( p_intf, &i_volume );
                     decode_URI( vol );
 
@@ -314,9 +314,9 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     char *p, *str;
                     input_item_t *p_input;
 
-                    E_(ExtractURIValue)( p_request, "mrl", tmp, 1024 );
+                    ExtractURIValue( p_request, "mrl", tmp, 1024 );
                     decode_URI( tmp );
-                    E_(ExtractURIValue)( p_request, "name", psz_name, 1024 );
+                    ExtractURIValue( p_request, "name", psz_name, 1024 );
                     decode_URI( psz_name );
                     if( !*psz_name )
                     {
@@ -336,7 +336,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     }
                     *p = '\0';
 
-                    p_input = E_(MRLParse)( p_intf, mrl, psz_name );
+                    p_input = MRLParse( p_intf, mrl, psz_name );
 
                     char *psz_uri = input_item_GetURI( p_input );
                     if( !p_input || !psz_uri || !*psz_uri )
@@ -366,7 +366,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     /* Get the list of items to delete */
                     while( (p_parser =
-                            E_(ExtractURIValue)( p_parser, "item", item, 512 )) )
+                            ExtractURIValue( p_parser, "item", item, 512 )) )
                     {
                         if( !*item ) continue;
 
@@ -401,7 +401,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     /* Get the list of items to keep */
                     while( (p_parser =
-                       E_(ExtractURIValue)( p_parser, "item", item, 512 )) )
+                       ExtractURIValue( p_parser, "item", item, 512 )) )
                     {
                         if( !*item ) continue;
 
@@ -449,9 +449,9 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     int i_order;
                     int i_item;
 
-                    E_(ExtractURIValue)( p_request, "type", type, 12 );
-                    E_(ExtractURIValue)( p_request, "order", order, 2 );
-                    E_(ExtractURIValue)( p_request, "item", item, 512 );
+                    ExtractURIValue( p_request, "type", type, 12 );
+                    ExtractURIValue( p_request, "order", order, 2 );
+                    ExtractURIValue( p_request, "item", item, 512 );
                     i_item = atoi( item );
 
                     if( order[0] == '0' ) i_order = ORDER_NORMAL;
@@ -491,8 +491,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     char psz_newpos[6];
                     int i_pos;
                     int i_newpos;
-                    E_(ExtractURIValue)( p_request, "psz_pos", psz_pos, 6 );
-                    E_(ExtractURIValue)( p_request, "psz_newpos", psz_newpos, 6 );
+                    ExtractURIValue( p_request, "psz_pos", psz_pos, 6 );
+                    ExtractURIValue( p_request, "psz_newpos", psz_newpos, 6 );
                     i_pos = atoi( psz_pos );
                     i_newpos = atoi( psz_newpos );
                     /* FIXME FIXME TODO TODO XXX XXX
@@ -514,7 +514,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_CLOSE:
                 {
                     char id[512];
-                    E_(ExtractURIValue)( p_request, "id", id, 512 );
+                    ExtractURIValue( p_request, "id", id, 512 );
                     msg_Dbg( p_intf, "requested close id=%s", id );
 #if 0
                     if( p_sys->p_httpd->pf_control( p_sys->p_httpd, HTTPD_SET_CLOSE, id, NULL ) )
@@ -553,11 +553,11 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
-                    E_(ExtractURIValue)( p_request, "name", name, 512 );
+                    ExtractURIValue( p_request, "name", name, 512 );
                     if( StrToMacroType( control ) == MVLC_VLM_NEW )
                     {
                         char type[20];
-                        E_(ExtractURIValue)( p_request, "type", type, 20 );
+                        ExtractURIValue( p_request, "type", type, 20 );
                         p += sprintf( psz, "new %s %s", name, type );
                     }
                     else
@@ -568,14 +568,14 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     for( i = 0; i < 11; i++ )
                     {
                         char val[512];
-                        E_(ExtractURIValue)( p_request,
+                        ExtractURIValue( p_request,
                                                vlm_properties[i], val, 512 );
                         decode_URI( val );
                         if( strlen( val ) > 0 && i >= 4 )
                         {
                             p += sprintf( p, " %s %s", vlm_properties[i], val );
                         }
-                        else if( E_(TestURIParam)( p_request, vlm_properties[i] ) && i < 4 )
+                        else if( TestURIParam( p_request, vlm_properties[i] ) && i < 4 )
                         {
                             p += sprintf( p, " %s", vlm_properties[i] );
                         }
@@ -594,7 +594,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                                                          vlm_answer->psz_value );
                     }
 
-                    E_(mvar_AppendNewVar)( p_args->vars, "vlm_error", vlm_error );
+                    mvar_AppendNewVar( p_args->vars, "vlm_error", vlm_error );
 
                     vlm_MessageDelete( vlm_answer );
                     free( vlm_error );
@@ -612,7 +612,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
-                    E_(ExtractURIValue)( p_request, "name", name, 512 );
+                    ExtractURIValue( p_request, "name", name, 512 );
                     sprintf( psz, "del %s", name );
 
                     vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
@@ -634,7 +634,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
-                    E_(ExtractURIValue)( p_request, "name", name, 512 );
+                    ExtractURIValue( p_request, "name", name, 512 );
                     if( StrToMacroType( control ) == MVLC_VLM_PLAY )
                         sprintf( psz, "control %s play", name );
                     else if( StrToMacroType( control ) == MVLC_VLM_PAUSE )
@@ -644,7 +644,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     else if( StrToMacroType( control ) == MVLC_VLM_SEEK )
                     {
                         char percent[20];
-                        E_(ExtractURIValue)( p_request, "percent", percent, 512 );
+                        ExtractURIValue( p_request, "percent", percent, 512 );
                         sprintf( psz, "control %s seek %s", name, percent );
                     }
 
@@ -665,7 +665,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
-                    E_(ExtractURIValue)( p_request, "file", file, 512 );
+                    ExtractURIValue( p_request, "file", file, 512 );
                     decode_URI( file );
 
                     if( StrToMacroType( control ) == MVLC_VLM_LOAD )
@@ -700,7 +700,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
             {
                 break;
             }
-            E_(ExtractURIValue)( p_request, m->param1,  value, 512 );
+            ExtractURIValue( p_request, m->param1,  value, 512 );
             decode_URI( value );
 
             switch( StrToMacroType( m->param2 ) )
@@ -771,13 +771,13 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
             if( m->param1 )
             {
-                E_(EvaluateRPN)( p_intf, p_args->vars, &p_args->stack, m->param1 );
-                s = E_(SSPop)( &p_args->stack );
-                v = E_(mvar_GetValue)( p_args->vars, s );
+                EvaluateRPN( p_intf, p_args->vars, &p_args->stack, m->param1 );
+                s = SSPop( &p_args->stack );
+                v = mvar_GetValue( p_args->vars, s );
             }
             else
             {
-                v = s = E_(SSPop)( &p_args->stack );
+                v = s = SSPop( &p_args->stack );
             }
 
             PRINTS( "%s", v );
@@ -785,7 +785,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
             break;
         }
         case MVLC_RPN:
-            E_(EvaluateRPN)( p_intf, p_args->vars, &p_args->stack, m->param1 );
+            EvaluateRPN( p_intf, p_args->vars, &p_args->stack, m->param1 );
             break;
 
         /* Useful to learn stack management */
@@ -862,7 +862,7 @@ char *MacroSearch( char *src, char *end, int i_mvlc, bool b_after )
     return NULL;
 }
 
-void E_(Execute)( httpd_file_sys_t *p_args,
+void Execute( httpd_file_sys_t *p_args,
                      char *p_request, int i_request,
                      char **pp_data, int *pi_data,
                      char **pp_dst,
@@ -936,10 +936,10 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                     }
 
                     /* first we load in a temporary buffer */
-                    E_(FileLoad)( f, &p_buffer, &i_buffer );
+                    FileLoad( f, &p_buffer, &i_buffer );
 
                     /* we parse executing all  <vlc /> macros */
-                    E_(Execute)( p_args, p_request, i_request, pp_data, pi_data,
+                    Execute( p_args, p_request, i_request, pp_data, pi_data,
                              &dst, &p_buffer[0], &p_buffer[i_buffer] );
                     free( p_buffer );
                     fclose(f);
@@ -950,8 +950,8 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                     bool i_test;
                     char    *endif;
 
-                    E_(EvaluateRPN)( p_intf, p_args->vars, &p_args->stack, m.param1 );
-                    if( E_(SSPopN)( &p_args->stack, p_args->vars ) )
+                    EvaluateRPN( p_intf, p_args->vars, &p_args->stack, m.param1 );
+                    if( SSPopN( &p_args->stack, p_args->vars ) )
                     {
                         i_test = 1;
                     }
@@ -970,7 +970,7 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                             char *stop  = MacroSearch( start, endif, MVLC_END, false );
                             if( stop )
                             {
-                                E_(Execute)( p_args, p_request, i_request,
+                                Execute( p_args, p_request, i_request,
                                          pp_data, pi_data, &dst, start, stop );
                             }
                         }
@@ -984,7 +984,7 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                         }
                         if( stop )
                         {
-                            E_(Execute)( p_args, p_request, i_request,
+                            Execute( p_args, p_request, i_request,
                                      pp_data, pi_data, &dst, src, stop );
                         }
                     }
@@ -1005,30 +1005,30 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                         mvar_t *v;
                         if( !strcmp( m.param2, "integer" ) )
                         {
-                            char *arg = E_(SSPop)( &p_args->stack );
-                            index = E_(mvar_IntegerSetNew)( m.param1, arg );
+                            char *arg = SSPop( &p_args->stack );
+                            index = mvar_IntegerSetNew( m.param1, arg );
                             free( arg );
                         }
                         else if( !strcmp( m.param2, "directory" ) )
                         {
-                            char *arg = E_(SSPop)( &p_args->stack );
-                            index = E_(mvar_FileSetNew)( p_intf, m.param1, arg );
+                            char *arg = SSPop( &p_args->stack );
+                            index = mvar_FileSetNew( p_intf, m.param1, arg );
                             free( arg );
                         }
                         else if( !strcmp( m.param2, "object" ) )
                         {
-                            char *arg = E_(SSPop)( &p_args->stack );
-                            index = E_(mvar_ObjectSetNew)( p_intf, m.param1, arg );
+                            char *arg = SSPop( &p_args->stack );
+                            index = mvar_ObjectSetNew( p_intf, m.param1, arg );
                             free( arg );
                         }
                         else if( !strcmp( m.param2, "playlist" ) )
                         {
-                            index = E_(mvar_PlaylistSetNew)( p_intf, m.param1,
+                            index = mvar_PlaylistSetNew( p_intf, m.param1,
                                                     p_intf->p_sys->p_playlist );
                         }
                         else if( !strcmp( m.param2, "information" ) )
                         {
-                            index = E_(mvar_InfoSetNew)( m.param1,
+                            index = mvar_InfoSetNew( m.param1,
                                                      p_intf->p_sys->p_input );
                         }
                         else if( !strcmp( m.param2, "program" )
@@ -1038,7 +1038,7 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                                   || !strcmp( m.param2, "video-es" )
                                   || !strcmp( m.param2, "spu-es" ) )
                         {
-                            index = E_(mvar_InputVarSetNew)( p_intf, m.param1,
+                            index = mvar_InputVarSetNew( p_intf, m.param1,
                                                          p_intf->p_sys->p_input,
                                                          m.param2 );
                         }
@@ -1046,25 +1046,25 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                         {
                             if( p_intf->p_sys->p_vlm == NULL )
                                 p_intf->p_sys->p_vlm = vlm_New( p_intf );
-                            index = E_(mvar_VlmSetNew)( m.param1, p_intf->p_sys->p_vlm );
+                            index = mvar_VlmSetNew( m.param1, p_intf->p_sys->p_vlm );
                         }
 #if 0
                         else if( !strcmp( m.param2, "hosts" ) )
                         {
-                            index = E_(mvar_HttpdInfoSetNew)( m.param1, p_intf->p_sys->p_httpd, HTTPD_GET_HOSTS );
+                            index = mvar_HttpdInfoSetNew( m.param1, p_intf->p_sys->p_httpd, HTTPD_GET_HOSTS );
                         }
                         else if( !strcmp( m.param2, "urls" ) )
                         {
-                            index = E_(mvar_HttpdInfoSetNew)( m.param1, p_intf->p_sys->p_httpd, HTTPD_GET_URLS );
+                            index = mvar_HttpdInfoSetNew( m.param1, p_intf->p_sys->p_httpd, HTTPD_GET_URLS );
                         }
                         else if( !strcmp( m.param2, "connections" ) )
                         {
-                            index = E_(mvar_HttpdInfoSetNew)(m.param1, p_intf->p_sys->p_httpd, HTTPD_GET_CONNECTIONS);
+                            index = mvar_HttpdInfoSetNew(m.param1, p_intf->p_sys->p_httpd, HTTPD_GET_CONNECTIONS);
                         }
 #endif
-                        else if( ( v = E_(mvar_GetVar)( p_args->vars, m.param2 ) ) )
+                        else if( ( v = mvar_GetVar( p_args->vars, m.param2 ) ) )
                         {
-                            index = E_(mvar_Duplicate)( v );
+                            index = mvar_Duplicate( v );
                         }
                         else
                         {
@@ -1075,7 +1075,7 @@ void E_(Execute)( httpd_file_sys_t *p_args,
 
                         for( i_idx = 0; i_idx < index->i_field; i_idx++ )
                         {
-                            mvar_t *f = E_(mvar_Duplicate)( index->field[i_idx] );
+                            mvar_t *f = mvar_Duplicate( index->field[i_idx] );
 
                             //msg_Dbg( p_intf, "foreach field[%d] name=%s value=%s", i_idx, f->name, f->value );
 
@@ -1083,14 +1083,14 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                             f->name = strdup( m.param1 );
 
 
-                            E_(mvar_PushVar)( p_args->vars, f );
-                            E_(Execute)( p_args, p_request, i_request,
+                            mvar_PushVar( p_args->vars, f );
+                            Execute( p_args, p_request, i_request,
                                      pp_data, pi_data, &dst, start, stop );
-                            E_(mvar_RemoveVar)( p_args->vars, f );
+                            mvar_RemoveVar( p_args->vars, f );
 
-                            E_(mvar_Delete)( f );
+                            mvar_Delete( f );
                         }
-                        E_(mvar_Delete)( index );
+                        mvar_Delete( index );
 
                         src = endfor;
                     }

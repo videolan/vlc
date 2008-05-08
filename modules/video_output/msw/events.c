@@ -98,7 +98,7 @@ static int DirectXConvertKey( int i_key );
  * The main goal of this thread is to isolate the Win32 PeekMessage function
  * because this one can block for a long time.
  *****************************************************************************/
-void E_(EventThread)( event_thread_t *p_event )
+void EventThread( event_thread_t *p_event )
 {
     MSG msg;
     POINT old_mouse_pos = {0,0}, mouse_pos;
@@ -608,7 +608,7 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
  * its job is to update the source and destination RECTs used to display the
  * picture.
  *****************************************************************************/
-void E_(UpdateRects)( vout_thread_t *p_vout, bool b_force )
+void UpdateRects( vout_thread_t *p_vout, bool b_force )
 {
 #define rect_src p_vout->p_sys->rect_src
 #define rect_src_clipped p_vout->p_sys->rect_src_clipped
@@ -861,7 +861,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
 
     case WM_WINDOWPOSCHANGED:
-        E_(UpdateRects)( p_vout, true );
+        UpdateRects( p_vout, true );
         return 0;
 
     /* the user wants to close the window */

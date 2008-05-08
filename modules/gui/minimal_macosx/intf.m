@@ -50,7 +50,7 @@ static void Run ( intf_thread_t *p_intf );
 /*****************************************************************************
  * OpenIntf: initialize interface
  *****************************************************************************/
-int E_(OpenIntf) ( vlc_object_t *p_this )
+int OpenIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
@@ -71,7 +71,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseIntf: destroy interface
  *****************************************************************************/
-void E_(CloseIntf) ( vlc_object_t *p_this )
+void CloseIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 

@@ -71,8 +71,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int  E_( MMSTUOpen )  ( access_t * );
-void E_( MMSTUClose ) ( access_t * );
+int   MMSTUOpen   ( access_t * );
+void  MMSTUClose  ( access_t * );
 
 
 static ssize_t Read( access_t *, uint8_t *, size_t );
@@ -93,7 +93,7 @@ static int  mms_HeaderMediaRead( access_t *, int );
 static int  mms_ReceivePacket( access_t * );
 
 
-int  E_(MMSTUOpen)( access_t *p_access )
+int  MMSTUOpen( access_t *p_access )
 {
     access_sys_t   *p_sys;
     int             i_proto;
@@ -193,7 +193,7 @@ int  E_(MMSTUOpen)( access_t *p_access )
     if( MMSStart( p_access, 0xffffffff ) < 0 )
     {
         msg_Err( p_access, "cannot start stream" );
-        E_(MMSTUClose) ( p_access );
+        MMSTUClose ( p_access );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -202,7 +202,7 @@ int  E_(MMSTUOpen)( access_t *p_access )
 /*****************************************************************************
  * Close: free unused data structures
  *****************************************************************************/
-void E_(MMSTUClose)( access_t *p_access )
+void MMSTUClose( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -499,7 +499,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     }
 
     /* *** Init context for mms prototcol *** */
-    E_( GenerateGuid )( &p_sys->guid );    /* used to identify client by server */
+     GenerateGuid ( &p_sys->guid );    /* used to identify client by server */
     msg_Dbg( p_access,
              "generated guid: "GUID_FMT,
              GUID_PRINT( p_sys->guid ) );
@@ -754,9 +754,9 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
      *
      * TODO : stream bitrates properties(optional)
      *        and bitrate mutual exclusion(optional) */
-    E_( asf_HeaderParse )( &p_sys->asfh,
+     asf_HeaderParse ( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
-    E_( asf_StreamSelect)( &p_sys->asfh,
+     asf_StreamSelect( &p_sys->asfh,
                            var_CreateGetInteger( p_access, "mms-maxbitrate" ),
                            var_CreateGetInteger( p_access, "mms-all" ),
                            var_CreateGetInteger( p_access, "audio" ),

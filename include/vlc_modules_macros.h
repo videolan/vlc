@@ -62,10 +62,8 @@
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef __PLUGIN__
-#   define E_( function )          CONCATENATE( function, MODULE_SYMBOL )
 #   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
 #else
-#   define E_( function )          CONCATENATE( function, MODULE_NAME )
 #   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
 #endif
 
@@ -96,7 +94,7 @@
  */
 #if defined (__PLUGIN__) || defined (__BUILTIN__)
 EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL
-E_(vlc_entry) ( module_t *p_module );
+__VLC_SYMBOL(vlc_entry) ( module_t *p_module );
 #endif
 
 #define vlc_module_begin( )                                                   \

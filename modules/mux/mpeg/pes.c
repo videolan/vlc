@@ -230,7 +230,7 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
     }
 }
 
-int E_( EStoPES )( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
+int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
                    es_format_t *p_fmt, int i_stream_id,
                    int b_mpeg2, int b_data_alignment, int i_header_size,
                    int i_max_pes_size )

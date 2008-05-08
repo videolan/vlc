@@ -114,7 +114,7 @@ static void QTFreePicture       ( vout_thread_t *, picture_t * );
  *****************************************************************************
  * This function allocates and initializes a MacOS X vout method.
  *****************************************************************************/
-int E_(OpenVideoQT) ( vlc_object_t *p_this )
+int OpenVideoQT ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     OSErr err;
@@ -232,7 +232,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseVideo: destroy video thread output method
  *****************************************************************************/
-void E_(CloseVideoQT) ( vlc_object_t *p_this )
+void CloseVideoQT ( vlc_object_t *p_this )
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     vout_thread_t * p_vout = (vout_thread_t *)p_this;

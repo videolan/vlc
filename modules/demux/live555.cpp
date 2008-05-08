@@ -1851,7 +1851,7 @@ static int ParseASF( demux_t *p_demux )
     }
 
     /* Parse it to get packet size */
-    E_(asf_HeaderParse)( &p_sys->asfh, p_header->p_buffer, p_header->i_buffer );
+    asf_HeaderParse( &p_sys->asfh, p_header->p_buffer, p_header->i_buffer );
 
     /* Send it to demuxer */
     stream_DemuxSend( p_sys->p_out_asf, p_header );

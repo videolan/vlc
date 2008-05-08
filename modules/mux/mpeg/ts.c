@@ -1486,7 +1486,7 @@ static int Mux( sout_mux_t *p_mux )
                                     p_spu->p_buffer[1] = 1;
                                     p_spu->p_buffer[2] = ' ';
 
-                                    E_(EStoPES)( p_mux->p_sout, &p_spu, p_spu,
+                                    EStoPES( p_mux->p_sout, &p_spu, p_spu,
                                                  p_input->p_fmt,
                                                  p_stream->i_stream_id, 1,
                                                  0, 0, 0 );
@@ -1530,7 +1530,7 @@ static int Mux( sout_mux_t *p_mux )
                             p_data->i_pts = p_data->i_dts;
                         }
 
-                        E_( EStoPES )( p_mux->p_sout, &p_data, p_data,
+                         EStoPES ( p_mux->p_sout, &p_data, p_data,
                                        p_input->p_fmt, p_stream->i_stream_id,
                                        1, b_data_alignment, i_header_size, 0 );
 

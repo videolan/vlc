@@ -64,7 +64,7 @@ static void DoNothing    ( aout_instance_t * p_aout );
 /*****************************************************************************
  * OpenAudio
  *****************************************************************************/
-int E_(OpenAudio) ( vlc_object_t * p_this )
+int OpenAudio ( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t*) p_this;
     p_aout->output.p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
@@ -124,7 +124,7 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
 /*****************************************************************************
  * CloseAudio
  *****************************************************************************/
-void E_(CloseAudio) ( vlc_object_t * p_this )
+void CloseAudio ( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *) p_this;
     aout_sys_t * p_sys = (aout_sys_t *) p_aout->output.p_sys;

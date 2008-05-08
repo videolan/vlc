@@ -991,7 +991,7 @@ static const char *GetModuleName( intf_thread_t *p_intf )
     return config_GetPsz( p_intf, "lua-intf" );
 }
 
-int E_(Open_LuaIntf)( vlc_object_t *p_this )
+int Open_LuaIntf( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t *p_sys;
@@ -1097,12 +1097,12 @@ int E_(Open_LuaIntf)( vlc_object_t *p_this )
     p_sys->L = L;
 
     p_intf->pf_run = Run;
-    p_intf->psz_header = strdup( psz_name ); /* Do I need to clean that up myself in E_(Close_LuaIntf)? */
+    p_intf->psz_header = strdup( psz_name ); /* Do I need to clean that up myself in Close_LuaIntf? */
 
     return VLC_SUCCESS;
 }
 
-void E_(Close_LuaIntf)( vlc_object_t *p_this )
+void Close_LuaIntf( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
 

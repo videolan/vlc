@@ -60,8 +60,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int  E_(OpenEncoder) ( vlc_object_t * );
-void E_(CloseEncoder)( vlc_object_t * );
+int  OpenEncoder ( vlc_object_t * );
+void CloseEncoder( vlc_object_t * );
 
 static block_t *EncodeVideo( encoder_t *, picture_t * );
 static block_t *EncodeAudio( encoder_t *, aout_buffer_t * );
@@ -197,7 +197,7 @@ static const uint16_t mpeg4_default_non_intra_matrix[64] = {
  * OpenEncoder: probe the encoder
  *****************************************************************************/
 
-int E_(OpenEncoder)( vlc_object_t *p_this )
+int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
@@ -207,10 +207,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     const char *psz_namecodec;
     vlc_value_t val;
 
-    if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
+    if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
-        if( E_(GetFfmpegChroma)( p_enc->fmt_out.i_codec ) < 0 )
+        if( GetFfmpegChroma( p_enc->fmt_out.i_codec ) < 0 )
         {
             /* handed chroma output */
             return VLC_EGENERIC;
@@ -237,7 +237,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     }
 
     /* Initialization must be done before avcodec_find_encoder() */
-    E_(InitLibavcodec)(p_this);
+    InitLibavcodec(p_this);
 
     p_codec = avcodec_find_encoder( i_codec_id );
     if( !p_codec )
@@ -459,7 +459,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_sys->p_buffer_out = malloc( p_context->height * p_context->width * 3 );
 
         p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
-        p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->fmt_in.i_codec );
+        p_context->pix_fmt = GetFfmpegChroma( p_enc->fmt_in.i_codec );
         if( p_codec->pix_fmts )
         {
             const enum PixelFormat *p = p_codec->pix_fmts;
@@ -468,7 +468,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
                 if( *p == p_context->pix_fmt ) break;
             }
             if( *p == -1 ) p_context->pix_fmt = p_codec->pix_fmts[0];
-            p_enc->fmt_in.i_codec = E_(GetVlcChroma)( p_context->pix_fmt );
+            p_enc->fmt_in.i_codec = GetVlcChroma( p_context->pix_fmt );
         }
 
         if ( p_sys->b_strict_rc )
@@ -588,7 +588,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     {
         /* XXX: hack: Force same codec (will be handled by transcode) */
         p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
-        p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->fmt_in.i_codec );
+        p_context->pix_fmt = GetFfmpegChroma( p_enc->fmt_in.i_codec );
     }
 
     /* Make sure we get extradata filled by the encoder */
@@ -1064,7 +1064,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 /*****************************************************************************
  * CloseEncoder: ffmpeg encoder destruction
  *****************************************************************************/
-void E_(CloseEncoder)( vlc_object_t *p_this )
+void CloseEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;

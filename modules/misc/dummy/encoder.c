@@ -41,7 +41,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_buf );
 /*****************************************************************************
  * OpenDecoder: open the dummy encoder.
  *****************************************************************************/
-int E_(OpenEncoder) ( vlc_object_t *p_this )
+int OpenEncoder ( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
 
@@ -72,7 +72,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_buf )
 /*****************************************************************************
  * CloseDecoder: decoder destruction
  *****************************************************************************/
-void E_(CloseEncoder) ( vlc_object_t *p_this )
+void CloseEncoder ( vlc_object_t *p_this )
 {
     VLC_UNUSED(p_this);
 }

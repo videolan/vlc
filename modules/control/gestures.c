@@ -66,8 +66,8 @@ struct intf_sys_t
 #define NONE 0
 #define GESTURE( a, b, c, d ) (a | ( b << 4 ) | ( c << 8 ) | ( d << 12 ))
 
-int  E_(Open)   ( vlc_object_t * );
-void E_(Close)  ( vlc_object_t * );
+int  Open   ( vlc_object_t * );
+void Close  ( vlc_object_t * );
 static int  InitThread     ( intf_thread_t *p_intf );
 static void EndThread      ( intf_thread_t *p_intf );
 static int  MouseEvent     ( vlc_object_t *, char const *,
@@ -103,13 +103,13 @@ vlc_module_begin();
     set_description( _("Mouse gestures control interface") );
 
     set_capability( "interface", 0 );
-    set_callbacks( E_(Open), E_(Close) );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
  * OpenIntf: initialize interface
  *****************************************************************************/
-int E_(Open) ( vlc_object_t *p_this )
+int Open ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
@@ -153,7 +153,7 @@ static input_thread_t * input_from_playlist ( playlist_t *p_playlist )
 /*****************************************************************************
  * CloseIntf: destroy dummy interface
  *****************************************************************************/
-void E_(Close) ( vlc_object_t *p_this )
+void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 

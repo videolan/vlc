@@ -336,7 +336,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Getting frontend info */
-    if( E_(FrontendOpen)( p_access) )
+    if( FrontendOpen( p_access) )
     {
         free( p_sys );
         return VLC_EGENERIC;
@@ -344,17 +344,17 @@ static int Open( vlc_object_t *p_this )
 
     /* Setting frontend parameters for tuning the hardware */
     msg_Dbg( p_access, "trying to tune the frontend...");
-    if( E_(FrontendSet)( p_access ) < 0 )
+    if( FrontendSet( p_access ) < 0 )
     {
-        E_(FrontendClose)( p_access );
+        FrontendClose( p_access );
         free( p_sys );
         return VLC_EGENERIC;
     }
 
     /* Opening DVR device */
-    if( E_(DVROpen)( p_access ) < 0 )
+    if( DVROpen( p_access ) < 0 )
     {
-        E_(FrontendClose)( p_access );
+        FrontendClose( p_access );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -371,7 +371,7 @@ static int Open( vlc_object_t *p_this )
         FilterSet( p_access, 0x0, OTHER_TYPE );
     }
 
-    E_(CAMOpen)( p_access );
+    CAMOpen( p_access );
 
     if( p_sys->b_budget_mode )
         p_sys->i_read_once = DVB_READ_ONCE;
@@ -379,7 +379,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_read_once = DVB_READ_ONCE_START;
 
 #ifdef ENABLE_HTTPD
-    E_(HTTPOpen)( p_access );
+    HTTPOpen( p_access );
 #endif
 
     return VLC_SUCCESS;
@@ -395,12 +395,12 @@ static void Close( vlc_object_t *p_this )
 
     FilterUnset( p_access, p_sys->b_budget_mode ? 1 : MAX_DEMUX );
 
-    E_(DVRClose)( p_access );
-    E_(FrontendClose)( p_access );
-    E_(CAMClose)( p_access );
+    DVRClose( p_access );
+    FrontendClose( p_access );
+    CAMClose( p_access );
 
 #ifdef ENABLE_HTTPD
-    E_(HTTPClose)( p_access );
+    HTTPClose( p_access );
 #endif
 
     free( p_sys );
@@ -444,13 +444,13 @@ static block_t *Block( access_t *p_access )
 
         if ( p_sys->i_ca_handle && mdate() > p_sys->i_ca_next_event )
         {
-            E_(CAMPoll)( p_access );
+            CAMPoll( p_access );
             p_sys->i_ca_next_event = mdate() + p_sys->i_ca_timeout;
         }
 
         if ( ufds[1].revents )
         {
-            E_(FrontendPoll)( p_access );
+            FrontendPoll( p_access );
         }
 
 #ifdef ENABLE_HTTPD
@@ -475,19 +475,19 @@ static block_t *Block( access_t *p_access )
 
         if ( p_sys->b_request_frontend_info )
         {
-            E_(FrontendStatus)( p_access );
+            FrontendStatus( p_access );
         }
 
         if ( p_sys->b_request_mmi_info )
         {
-            E_(CAMStatus)( p_access );
+            CAMStatus( p_access );
         }
 #endif
 
         if ( p_sys->i_frontend_timeout && mdate() > p_sys->i_frontend_timeout )
         {
             msg_Warn( p_access, "no lock, tuning again" );
-            E_(FrontendSet)( p_access );
+            FrontendSet( p_access );
         }
 
         if ( ufds[0].revents )
@@ -569,7 +569,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
             p_pmt = (dvbpsi_pmt_t *)va_arg( args, dvbpsi_pmt_t * );
 
-            E_(CAMSet)( p_access, p_pmt );
+            CAMSet( p_access, p_pmt );
             break;
         }
 
@@ -605,7 +605,7 @@ static void FilterSet( access_t *p_access, int i_pid, int i_type )
         return;
     }
 
-    if( E_(DMXSetFilter)( p_access, i_pid,
+    if( DMXSetFilter( p_access, i_pid,
                            &p_sys->p_demux_handles[i].i_handle, i_type ) )
     {
         msg_Err( p_access, "DMXSetFilter failed" );
@@ -627,7 +627,7 @@ static void FilterUnset( access_t *p_access, int i_max )
     {
         if( p_sys->p_demux_handles[i].i_type )
         {
-            E_(DMXUnsetFilter)( p_access, p_sys->p_demux_handles[i].i_handle );
+            DMXUnsetFilter( p_access, p_sys->p_demux_handles[i].i_handle );
             p_sys->p_demux_handles[i].i_type = 0;
         }
     }
@@ -643,7 +643,7 @@ static void FilterUnsetPID( access_t *p_access, int i_pid )
         if( p_sys->p_demux_handles[i].i_type &&
             p_sys->p_demux_handles[i].i_pid == i_pid )
         {
-            E_(DMXUnsetFilter)( p_access, p_sys->p_demux_handles[i].i_handle );
+            DMXUnsetFilter( p_access, p_sys->p_demux_handles[i].i_handle );
             p_sys->p_demux_handles[i].i_type = 0;
         }
     }

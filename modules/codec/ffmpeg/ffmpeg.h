@@ -28,60 +28,60 @@ struct AVFrame;
 struct AVCodecContext;
 struct AVCodec;
 
-void E_(InitLibavcodec)( vlc_object_t * );
-void E_(LibavcodecCallback)( void *p_opaque, int i_level,
+void InitLibavcodec( vlc_object_t * );
+void LibavcodecCallback( void *p_opaque, int i_level,
                              const char *psz_format, va_list va );
-int E_(GetFfmpegCodec) ( vlc_fourcc_t, int *, int *, const char ** );
-int E_(GetVlcFourcc)   ( int, int *, vlc_fourcc_t *, const char ** );
-int E_(GetFfmpegChroma)( vlc_fourcc_t );
-vlc_fourcc_t E_(GetVlcChroma)( int );
+int GetFfmpegCodec ( vlc_fourcc_t, int *, int *, const char ** );
+int GetVlcFourcc   ( int, int *, vlc_fourcc_t *, const char ** );
+int GetFfmpegChroma( vlc_fourcc_t );
+vlc_fourcc_t GetVlcChroma( int );
 
 /* Video decoder module */
-int  E_( InitVideoDec )( decoder_t *, struct AVCodecContext *, struct AVCodec *,
+int   InitVideoDec ( decoder_t *, struct AVCodecContext *, struct AVCodec *,
                          int, const char * );
-void E_( EndVideoDec ) ( decoder_t * );
-picture_t *E_( DecodeVideo ) ( decoder_t *, block_t ** );
+void  EndVideoDec  ( decoder_t * );
+picture_t * DecodeVideo  ( decoder_t *, block_t ** );
 
 /* Audio decoder module */
-int  E_( InitAudioDec )( decoder_t *, struct AVCodecContext *, struct AVCodec *,
+int   InitAudioDec ( decoder_t *, struct AVCodecContext *, struct AVCodec *,
                          int, const char * );
-void E_( EndAudioDec ) ( decoder_t * );
-aout_buffer_t *E_( DecodeAudio ) ( decoder_t *, block_t ** );
+void  EndAudioDec  ( decoder_t * );
+aout_buffer_t * DecodeAudio  ( decoder_t *, block_t ** );
 
 /* Chroma conversion module */
-int  E_(OpenChroma)( vlc_object_t * );
-void E_(CloseChroma)( vlc_object_t * );
+int  OpenChroma( vlc_object_t * );
+void CloseChroma( vlc_object_t * );
 
 /* Video encoder module */
-int  E_(OpenEncoder) ( vlc_object_t * );
-void E_(CloseEncoder)( vlc_object_t * );
+int  OpenEncoder ( vlc_object_t * );
+void CloseEncoder( vlc_object_t * );
 
 /* Audio encoder module */
-int  E_(OpenAudioEncoder) ( vlc_object_t * );
-void E_(CloseAudioEncoder)( vlc_object_t * );
+int  OpenAudioEncoder ( vlc_object_t * );
+void CloseAudioEncoder( vlc_object_t * );
 
 /* Demux module */
-int  E_(OpenDemux) ( vlc_object_t * );
-void E_(CloseDemux)( vlc_object_t * );
+int  OpenDemux ( vlc_object_t * );
+void CloseDemux( vlc_object_t * );
 
 /* Mux module */
-int  E_(OpenMux) ( vlc_object_t * );
-void E_(CloseMux)( vlc_object_t * );
+int  OpenMux ( vlc_object_t * );
+void CloseMux( vlc_object_t * );
 
 /* Video filter module */
-int  E_(OpenFilter)( vlc_object_t * );
-int  E_(OpenCropPadd)( vlc_object_t * );
-void E_(CloseFilter)( vlc_object_t * );
-int  E_(OpenDeinterlace)( vlc_object_t * );
-void E_(CloseDeinterlace)( vlc_object_t * );
-int  E_(OpenScaler)( vlc_object_t * );
-void E_(CloseScaler)( vlc_object_t * );
+int  OpenFilter( vlc_object_t * );
+int  OpenCropPadd( vlc_object_t * );
+void CloseFilter( vlc_object_t * );
+int  OpenDeinterlace( vlc_object_t * );
+void CloseDeinterlace( vlc_object_t * );
+int  OpenScaler( vlc_object_t * );
+void CloseScaler( vlc_object_t * );
 
 /* Postprocessing module */
-void *E_(OpenPostproc)( decoder_t *, bool * );
-int E_(InitPostproc)( void *, int, int, int );
-int E_(PostprocPict)( void *, picture_t *, struct AVFrame * );
-void E_(ClosePostproc)( decoder_t *, void * );
+void *OpenPostproc( decoder_t *, bool * );
+int InitPostproc( void *, int, int, int );
+int PostprocPict( void *, picture_t *, struct AVFrame * );
+void ClosePostproc( decoder_t *, void * );
 
 /*****************************************************************************
  * Module descriptor help strings

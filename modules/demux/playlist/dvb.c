@@ -51,7 +51,7 @@ static int ParseLine( char *, char **, char ***, int *);
 /*****************************************************************************
  * Import_DVB: main import function
  *****************************************************************************/
-int E_(Import_DVB)( vlc_object_t *p_this )
+int Import_DVB( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
@@ -89,7 +89,7 @@ int E_(Import_DVB)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_DVB)( vlc_object_t *p_this )
+void Close_DVB( vlc_object_t *p_this )
 {
     VLC_UNUSED(p_this);
 }

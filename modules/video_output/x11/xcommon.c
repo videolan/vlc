@@ -98,8 +98,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int  E_(Activate)   ( vlc_object_t * );
-void E_(Deactivate) ( vlc_object_t * );
+int  Activate   ( vlc_object_t * );
+void Deactivate ( vlc_object_t * );
 
 static int  InitVideo      ( vout_thread_t * );
 static void EndVideo       ( vout_thread_t * );
@@ -178,7 +178,7 @@ static const int i_backlight_on_interval = 300;
  * vout properties to choose the window size, and change them according to the
  * actual properties of the display.
  *****************************************************************************/
-int E_(Activate) ( vlc_object_t *p_this )
+int Activate ( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *        psz_display;
@@ -429,7 +429,7 @@ int E_(Activate) ( vlc_object_t *p_this )
     if( checkXvMCCap( p_vout ) == VLC_EGENERIC )
     {
         msg_Err( p_vout, "no XVMC capability found" );
-        E_(Deactivate)( p_vout );
+        Deactivate( p_vout );
         return VLC_EGENERIC;
     }
     subpicture_t sub_pic;
@@ -464,7 +464,7 @@ int E_(Activate) ( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method created by Open
  *****************************************************************************/
-void E_(Deactivate) ( vlc_object_t *p_this )
+void Deactivate ( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 

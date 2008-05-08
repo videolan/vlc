@@ -37,7 +37,7 @@
 /*****************************************************************************
  * Open: initialize dummy interface
  *****************************************************************************/
-int  E_(OpenIntf) ( vlc_object_t *p_this )
+int  OpenIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 

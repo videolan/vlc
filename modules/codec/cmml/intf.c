@@ -79,8 +79,8 @@ struct navigation_history_t
  * Local prototypes.
  *****************************************************************************/
 
-int          E_(OpenIntf)               ( vlc_object_t * );
-void         E_(CloseIntf)              ( vlc_object_t * );
+int          OpenIntf               ( vlc_object_t * );
+void         CloseIntf              ( vlc_object_t * );
 
 static int   InitThread                 ( intf_thread_t * );
 static int   MouseEvent                 ( vlc_object_t *, char const *,
@@ -114,7 +114,7 @@ static void RunIntf        ( intf_thread_t *p_intf );
 /*****************************************************************************
  * OpenIntf: initialize CMML interface
  *****************************************************************************/
-int E_(OpenIntf) ( vlc_object_t *p_this )
+int OpenIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
@@ -146,7 +146,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseIntf: destroy dummy interface
  *****************************************************************************/
-void E_(CloseIntf) ( vlc_object_t *p_this )
+void CloseIntf ( vlc_object_t *p_this )
 {
     intf_thread_t * p_intf = (intf_thread_t *)p_this;
     vout_thread_t * p_vout;

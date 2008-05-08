@@ -60,7 +60,7 @@ vlc_module_begin();
         set_shortname( N_( "Lua Art" ) );
         set_description( _("Fetch artwork using lua scripts") );
         set_capability( "art finder", 10 );
-        set_callbacks( E_(FindArt), NULL );
+        set_callbacks( FindArt, NULL );
     add_submodule();
         add_shortcut( "luaplaylist" );
         set_category( CAT_INPUT );
@@ -68,7 +68,7 @@ vlc_module_begin();
         set_shortname( _("Lua Playlist") );
         set_description( _("Lua Playlist Parser Interface") );
         set_capability( "demux", 2 );
-        set_callbacks( E_(Import_LuaPlaylist), E_(Close_LuaPlaylist) );
+        set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist );
     add_submodule();
         add_shortcut( "luaintf" );
         add_shortcut( "luarc" );
@@ -85,7 +85,7 @@ vlc_module_begin();
                     INTF_TEXT, INTF_LONGTEXT, false );
         add_string( "lua-config", "", NULL,
                     CONFIG_TEXT, CONFIG_LONGTEXT, false );
-        set_callbacks( E_(Open_LuaIntf), E_(Close_LuaIntf) );
+        set_callbacks( Open_LuaIntf, Close_LuaIntf );
 vlc_module_end();
 
 /*****************************************************************************

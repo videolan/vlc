@@ -89,7 +89,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-int E_(OpenAccess)( vlc_object_t *p_this )
+int OpenAccess( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
 
@@ -142,7 +142,7 @@ static int DemuxControl( demux_t *, int, va_list );
 /*****************************************************************************
  * OpenDemux: initialize the target, ie. parse the command
  *****************************************************************************/
-int E_(OpenDemux) ( vlc_object_t *p_this )
+int OpenDemux ( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
     char * psz_name = p_demux->psz_path;
@@ -190,7 +190,7 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseDemux: initialize the target, ie. parse the command
  *****************************************************************************/
-void E_(CloseDemux) ( vlc_object_t *p_this )
+void CloseDemux ( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
 

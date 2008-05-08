@@ -1221,7 +1221,7 @@ static void BeosCloseDisplay( vout_thread_t *p_vout );
  *****************************************************************************
  * This function allocates and initializes a BeOS vout method.
  *****************************************************************************/
-int E_(OpenVideo) ( vlc_object_t *p_this )
+int OpenVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
@@ -1344,7 +1344,7 @@ static int Manage( vout_thread_t * p_vout )
  *****************************************************************************
  * Terminate an output method created by DummyCreateOutputMethod
  *****************************************************************************/
-void E_(CloseVideo) ( vlc_object_t *p_this )
+void CloseVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 

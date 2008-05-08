@@ -36,7 +36,7 @@
  ***************************************************************************/
 int Export_M3U    ( vlc_object_t *p_intf );
 int Export_Old    ( vlc_object_t *p_intf );
-int E_(xspf_export_playlist)( vlc_object_t *p_intf );
+int xspf_export_playlist( vlc_object_t *p_intf );
 
 /*****************************************************************************
  * Module descriptor
@@ -61,6 +61,6 @@ vlc_module_begin();
         set_description( _("XSPF playlist export") );
         add_shortcut( "export-xspf" );
         set_capability( "playlist export" , 0);
-        set_callbacks( E_(xspf_export_playlist) , NULL );
+        set_callbacks( xspf_export_playlist , NULL );
 
 vlc_module_end();

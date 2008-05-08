@@ -51,7 +51,7 @@ static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name,
 /*****************************************************************************
  * Import_M3U: main import function
  *****************************************************************************/
-int E_(Import_M3U)( vlc_object_t *p_this )
+int Import_M3U( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
@@ -65,7 +65,7 @@ int E_(Import_M3U)( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );
-    p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
+    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
 
     return VLC_SUCCESS;
 }
@@ -73,7 +73,7 @@ int E_(Import_M3U)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_M3U)( vlc_object_t *p_this )
+void Close_M3U( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     free( p_demux->p_sys->psz_prefix );
@@ -176,7 +176,7 @@ static int Demux( demux_t *p_demux )
                 psz_name = MaybeFromLocaleDup( psz_parse );
             }
 
-            psz_mrl = E_(ProcessMRL)( psz_parse, p_demux->p_sys->psz_prefix );
+            psz_mrl = ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
             MaybeFromLocaleRep( &psz_mrl );
 
             b_cleanup = true;

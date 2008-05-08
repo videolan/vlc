@@ -185,7 +185,7 @@ static int ParseTime(char *s, size_t i_strlen)
 /*****************************************************************************
  * Import_ASX: main import function
  *****************************************************************************/
-int E_(Import_ASX)( vlc_object_t *p_this )
+int Import_ASX( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
@@ -204,7 +204,7 @@ int E_(Import_ASX)( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "found valid ASX playlist" );
-    p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
+    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
     p_demux->p_sys->psz_data = NULL;
     p_demux->p_sys->i_data_len = -1;
     p_demux->p_sys->b_utf8 = false;
@@ -216,7 +216,7 @@ int E_(Import_ASX)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_ASX)( vlc_object_t *p_this )
+void Close_ASX( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;

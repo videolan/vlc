@@ -181,42 +181,42 @@ struct access_sys_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int  E_(FrontendOpen)( access_t * );
-void E_(FrontendPoll)( access_t *p_access );
-int  E_(FrontendSet)( access_t * );
-void E_(FrontendClose)( access_t * );
+int  FrontendOpen( access_t * );
+void FrontendPoll( access_t *p_access );
+int  FrontendSet( access_t * );
+void FrontendClose( access_t * );
 #ifdef ENABLE_HTTPD
-void E_(FrontendStatus)( access_t * );
+void FrontendStatus( access_t * );
 #endif
 
-int E_(DMXSetFilter)( access_t *, int i_pid, int * pi_fd, int i_type );
-int E_(DMXUnsetFilter)( access_t *, int i_fd );
+int DMXSetFilter( access_t *, int i_pid, int * pi_fd, int i_type );
+int DMXUnsetFilter( access_t *, int i_fd );
 
-int  E_(DVROpen)( access_t * );
-void E_(DVRClose)( access_t * );
+int  DVROpen( access_t * );
+void DVRClose( access_t * );
 
-int  E_(CAMOpen)( access_t * );
-int  E_(CAMPoll)( access_t * );
-int  E_(CAMSet)( access_t *, dvbpsi_pmt_t * );
-void E_(CAMClose)( access_t * );
+int  CAMOpen( access_t * );
+int  CAMPoll( access_t * );
+int  CAMSet( access_t *, dvbpsi_pmt_t * );
+void CAMClose( access_t * );
 #ifdef ENABLE_HTTPD
-void E_(CAMStatus)( access_t * );
+void CAMStatus( access_t * );
 #endif
 
-int E_(en50221_Init)( access_t * );
-int E_(en50221_Poll)( access_t * );
-int E_(en50221_SetCAPMT)( access_t *, dvbpsi_pmt_t * );
-int E_(en50221_OpenMMI)( access_t * p_access, int i_slot );
-int E_(en50221_CloseMMI)( access_t * p_access, int i_slot );
-en50221_mmi_object_t *E_(en50221_GetMMIObject)( access_t * p_access,
+int en50221_Init( access_t * );
+int en50221_Poll( access_t * );
+int en50221_SetCAPMT( access_t *, dvbpsi_pmt_t * );
+int en50221_OpenMMI( access_t * p_access, int i_slot );
+int en50221_CloseMMI( access_t * p_access, int i_slot );
+en50221_mmi_object_t *en50221_GetMMIObject( access_t * p_access,
                                                 int i_slot );
-void E_(en50221_SendMMIObject)( access_t * p_access, int i_slot,
+void en50221_SendMMIObject( access_t * p_access, int i_slot,
                                 en50221_mmi_object_t *p_object );
-void E_(en50221_End)( access_t * );
+void en50221_End( access_t * );
 
 #ifdef ENABLE_HTTPD
-int E_(HTTPOpen)( access_t *p_access );
-void E_(HTTPClose)( access_t *p_access );
-char *E_(HTTPExtractValue)( char *psz_uri, const char *psz_name,
+int HTTPOpen( access_t *p_access );
+void HTTPClose( access_t *p_access );
+char *HTTPExtractValue( char *psz_uri, const char *psz_name,
                             char *psz_value, int i_value_max );
 #endif

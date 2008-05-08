@@ -1844,7 +1844,7 @@ static int InitSlot( access_t * p_access, int i_slot )
 /*****************************************************************************
  * en50221_Init : Initialize the CAM for en50221
  *****************************************************************************/
-int E_(en50221_Init)( access_t * p_access )
+int en50221_Init( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -1941,7 +1941,7 @@ int E_(en50221_Init)( access_t * p_access )
 /*****************************************************************************
  * en50221_Poll : Poll the CAM for TPDUs
  *****************************************************************************/
-int E_(en50221_Poll)( access_t * p_access )
+int en50221_Poll( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_slot;
@@ -2088,7 +2088,7 @@ int E_(en50221_Poll)( access_t * p_access )
 /*****************************************************************************
  * en50221_SetCAPMT :
  *****************************************************************************/
-int E_(en50221_SetCAPMT)( access_t * p_access, dvbpsi_pmt_t *p_pmt )
+int en50221_SetCAPMT( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i, i_session_id;
@@ -2159,7 +2159,7 @@ int E_(en50221_SetCAPMT)( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 /*****************************************************************************
  * en50221_OpenMMI :
  *****************************************************************************/
-int E_(en50221_OpenMMI)( access_t * p_access, int i_slot )
+int en50221_OpenMMI( access_t * p_access, int i_slot )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -2202,7 +2202,7 @@ int E_(en50221_OpenMMI)( access_t * p_access, int i_slot )
 /*****************************************************************************
  * en50221_CloseMMI :
  *****************************************************************************/
-int E_(en50221_CloseMMI)( access_t * p_access, int i_slot )
+int en50221_CloseMMI( access_t * p_access, int i_slot )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -2233,7 +2233,7 @@ int E_(en50221_CloseMMI)( access_t * p_access, int i_slot )
 /*****************************************************************************
  * en50221_GetMMIObject :
  *****************************************************************************/
-en50221_mmi_object_t *E_(en50221_GetMMIObject)( access_t * p_access,
+en50221_mmi_object_t *en50221_GetMMIObject( access_t * p_access,
                                                 int i_slot )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -2262,7 +2262,7 @@ en50221_mmi_object_t *E_(en50221_GetMMIObject)( access_t * p_access,
 /*****************************************************************************
  * en50221_SendMMIObject :
  *****************************************************************************/
-void E_(en50221_SendMMIObject)( access_t * p_access, int i_slot,
+void en50221_SendMMIObject( access_t * p_access, int i_slot,
                                 en50221_mmi_object_t *p_object )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -2284,7 +2284,7 @@ void E_(en50221_SendMMIObject)( access_t * p_access, int i_slot,
 /*****************************************************************************
  * en50221_End :
  *****************************************************************************/
-void E_(en50221_End)( access_t * p_access )
+void en50221_End( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_session_id, i;

@@ -194,8 +194,8 @@ int DirectDrawUpdateOverlay( vout_thread_t *p_vout );
 /*****************************************************************************
  * Prototypes from events.c
  *****************************************************************************/
-void E_(EventThread) ( event_thread_t *p_event );
-void E_(UpdateRects) ( vout_thread_t *p_vout, bool b_force );
+void EventThread ( event_thread_t *p_event );
+void UpdateRects ( vout_thread_t *p_vout, bool b_force );
 void Win32ToggleFullscreen ( vout_thread_t *p_vout );
 
 /*****************************************************************************

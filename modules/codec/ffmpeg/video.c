@@ -221,7 +221,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 
     if( p_sys->p_pp && p_sys->b_pp && !p_sys->b_pp_init )
     {
-        E_(InitPostproc)( p_sys->p_pp, p_context->width,
+        InitPostproc( p_sys->p_pp, p_context->width,
                           p_context->height, p_context->pix_fmt );
         p_sys->b_pp_init = true;
     }
@@ -235,7 +235,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
  * the ffmpeg codec will be opened, some memory allocated. The vout is not yet
  * opened (done after the first decoded frame).
  *****************************************************************************/
-int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
+int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
@@ -361,7 +361,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_sys->p_pp = NULL;
     p_sys->b_pp = p_sys->b_pp_async = p_sys->b_pp_init = false;
-    p_sys->p_pp = E_(OpenPostproc)( p_dec, &p_sys->b_pp_async );
+    p_sys->p_pp = OpenPostproc( p_dec, &p_sys->b_pp_async );
 
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
     //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = 0;
@@ -426,7 +426,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 /*****************************************************************************
  * DecodeVideo: Called to decode one or more frames
  *****************************************************************************/
-picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
+picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int b_drawpicture;
@@ -719,12 +719,12 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
  * This function is called when the thread ends after a successful
  * initialization.
  *****************************************************************************/
-void E_(EndVideoDec)( decoder_t *p_dec )
+void EndVideoDec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
-    E_(ClosePostproc)( p_dec, p_sys->p_pp );
+    ClosePostproc( p_dec, p_sys->p_pp );
     free( p_sys->p_buffer_orig );
 }
 
@@ -820,7 +820,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         int i_src_stride, i_dst_stride;
 
         if( p_sys->p_pp && p_sys->b_pp )
-            E_(PostprocPict)( p_sys->p_pp, p_pic, p_ff_pic );
+            PostprocPict( p_sys->p_pp, p_pic, p_ff_pic );
         else
         {
             for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )

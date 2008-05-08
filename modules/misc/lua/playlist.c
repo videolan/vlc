@@ -184,7 +184,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
 /*****************************************************************************
  * Import_LuaPlaylist: main import function
  *****************************************************************************/
-int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
+int Import_LuaPlaylist( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     lua_State *L;
@@ -227,7 +227,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     ret = vlclua_scripts_batch_execute( p_this, "playlist",
                                         &probe_luascript, L, NULL );
     if( ret )
-        E_(Close_LuaPlaylist)( p_this );
+        Close_LuaPlaylist( p_this );
     return ret;
 }
 
@@ -235,7 +235,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_LuaPlaylist)( vlc_object_t *p_this )
+void Close_LuaPlaylist( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     lua_close( p_demux->p_sys->L );
@@ -261,7 +261,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "Error while runing script %s, "
                   "function parse() not found", psz_filename );
-        E_(Close_LuaPlaylist)( VLC_OBJECT( p_demux ) );
+        Close_LuaPlaylist( VLC_OBJECT( p_demux ) );
         return VLC_EGENERIC;
     }
 
@@ -270,7 +270,7 @@ static int Demux( demux_t *p_demux )
         msg_Warn( p_demux, "Error while runing script %s, "
                   "function parse(): %s", psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
-        E_(Close_LuaPlaylist)( VLC_OBJECT( p_demux ) );
+        Close_LuaPlaylist( VLC_OBJECT( p_demux ) );
         return VLC_EGENERIC;
     }
 

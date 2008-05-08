@@ -56,7 +56,7 @@ static void SetOffset( int, int, int, int, bool *,
  *  - input: 2 lines (2 Y lines, 1 U/V line)
  *  - output: 1 line
  *****************************************************************************/
-void E_(I420_RGB16_dither)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_RGB16_dither( vout_thread_t *p_vout, picture_t *p_src,
                                                       picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -207,7 +207,7 @@ void E_(I420_RGB16_dither)( vout_thread_t *p_vout, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 
-void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_RGB16( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -307,7 +307,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
 
 #else // ! defined (MODULE_NAME_IS_i420_rgb)
 
-void E_(I420_R5G5B5)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -548,7 +548,7 @@ void E_(I420_R5G5B5)( vout_thread_t *p_vout, picture_t *p_src,
 #endif
 }
 
-void E_(I420_R5G6B5)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -804,7 +804,7 @@ void E_(I420_R5G6B5)( vout_thread_t *p_vout, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 
-void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_RGB32( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -903,7 +903,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx) || defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-void E_(I420_A8R8G8B8)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_A8R8G8B8( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -1142,7 +1142,7 @@ void E_(I420_A8R8G8B8)( vout_thread_t *p_vout, picture_t *p_src,
 #endif
 }
 
-void E_(I420_R8G8B8A8)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_R8G8B8A8( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -1381,7 +1381,7 @@ void E_(I420_R8G8B8A8)( vout_thread_t *p_vout, picture_t *p_src,
 #endif
 }
 
-void E_(I420_B8G8R8A8)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_B8G8R8A8( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -1617,7 +1617,7 @@ void E_(I420_B8G8R8A8)( vout_thread_t *p_vout, picture_t *p_src,
 #endif
 }
 
-void E_(I420_A8B8G8R8)( vout_thread_t *p_vout, picture_t *p_src,
+void I420_A8B8G8R8( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */

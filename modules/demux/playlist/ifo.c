@@ -42,7 +42,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 /*****************************************************************************
  * Import_IFO: main import function
  *****************************************************************************/
-int E_(Import_IFO)( vlc_object_t *p_this )
+int Import_IFO( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
@@ -77,7 +77,7 @@ int E_(Import_IFO)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_IFO)( vlc_object_t *p_this )
+void Close_IFO( vlc_object_t *p_this )
 {
     VLC_UNUSED(p_this);
 }

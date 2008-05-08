@@ -87,7 +87,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 /*****************************************************************************
  * Import_QTL: main import function
  *****************************************************************************/
-int E_(Import_QTL)( vlc_object_t *p_this )
+int Import_QTL( vlc_object_t *p_this )
 {
     DEMUX_BY_EXTENSION_MSG( ".qtl", "using QuickTime Media Link reader" );
     p_demux->p_sys->p_playlist = NULL;
@@ -99,7 +99,7 @@ int E_(Import_QTL)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_QTL)( vlc_object_t *p_this )
+void Close_QTL( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;

@@ -68,13 +68,13 @@ struct filter_sys_t
 /*****************************************************************************
  * OpenDeinterlace: probe the filter and return score
  *****************************************************************************/
-int E_(OpenDeinterlace)( vlc_object_t *p_this )
+int OpenDeinterlace( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
 
     /* Check if we can handle that formats */
-    if( E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma ) < 0 )
+    if( GetFfmpegChroma( p_filter->fmt_in.video.i_chroma ) < 0 )
     {
         return VLC_EGENERIC;
     }
@@ -89,13 +89,13 @@ int E_(OpenDeinterlace)( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->i_src_ffmpeg_chroma =
-        E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma );
+        GetFfmpegChroma( p_filter->fmt_in.video.i_chroma );
     p_filter->pf_video_filter = Deinterlace;
 
     msg_Dbg( p_filter, "deinterlacing" );
 
     /* libavcodec needs to be initialized for some chroma conversions */
-    E_(InitLibavcodec)(p_this);
+    InitLibavcodec(p_this);
 
     return VLC_SUCCESS;
 }
@@ -103,7 +103,7 @@ int E_(OpenDeinterlace)( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseDeinterlace: clean up the filter
  *****************************************************************************/
-void E_(CloseDeinterlace)( vlc_object_t *p_this )
+void CloseDeinterlace( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;

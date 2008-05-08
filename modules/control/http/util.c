@@ -36,7 +36,7 @@
  ****************************************************************************/
 
 /* ToUrl: create a good name for an url from filename */
-char *E_(FileToUrl)( char *name, bool *pb_index )
+char *FileToUrl( char *name, bool *pb_index )
 {
     char *url, *p;
 
@@ -84,7 +84,7 @@ char *E_(FileToUrl)( char *name, bool *pb_index )
 }
 
 /* Load a file */
-int E_(FileLoad)( FILE *f, char **pp_data, int *pi_data )
+int FileLoad( FILE *f, char **pp_data, int *pi_data )
 {
     int i_read;
 
@@ -106,7 +106,7 @@ int E_(FileLoad)( FILE *f, char **pp_data, int *pi_data )
 }
 
 /* Parse a directory and recursively add files */
-int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
+int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                         char *psz_dir )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
@@ -214,14 +214,14 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
         snprintf( dir, sizeof( dir ), "%s%c%s", psz_dir, sep, psz_filename );
         free( psz_filename );
 
-        if( E_(ParseDirectory)( p_intf, psz_root, dir ) )
+        if( ParseDirectory( p_intf, psz_root, dir ) )
         {
             httpd_file_sys_t *f = NULL;
             httpd_handler_sys_t *h = NULL;
             bool b_index;
             char *psz_name, *psz_ext;
 
-            psz_name = E_(FileToUrl)( &dir[strlen( psz_root )], &b_index );
+            psz_name = FileToUrl( &dir[strlen( psz_root )], &b_index );
             psz_ext = strrchr( dir, '.' );
             if( psz_ext != NULL )
             {
@@ -281,7 +281,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
                                            f->name,
                                            f->b_html ? psz_type : NULL,
                                            user, password, p_acl,
-                                           E_(HttpCallback), f );
+                                           HttpCallback, f );
                 free( psz_type );
                 if( f->p_file != NULL )
                 {
@@ -293,7 +293,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
                 h->p_handler = httpd_HandlerNew( p_sys->p_httpd_host,
                                                  f->name,
                                                  user, password, p_acl,
-                                                 E_(HandlerCallback), h );
+                                                 HandlerCallback, h );
                 if( h->p_handler != NULL )
                 {
                     TAB_APPEND( p_sys->i_files, p_sys->pp_files,
@@ -341,7 +341,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 /*************************************************************************
  * Playlist stuff
  *************************************************************************/
-void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
+void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
                            playlist_item_t *p_node, char *name, mvar_t *s,
                            int i_depth )
 {
@@ -351,85 +351,85 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
         {
             char value[512];
             char *psz;
-            mvar_t *itm = E_(mvar_New)( name, "set" );
+            mvar_t *itm = mvar_New( name, "set" );
 
             if( p_pl->status.p_item && p_node &&
                 p_pl->status.p_item->p_input && p_node->p_input &&
                 p_pl->status.p_item->p_input->i_id == p_node->p_input->i_id )
             {
-                E_(mvar_AppendNewVar)( itm, "current", "1" );
+                mvar_AppendNewVar( itm, "current", "1" );
             }
             else
             {
-                E_(mvar_AppendNewVar)( itm, "current", "0" );
+                mvar_AppendNewVar( itm, "current", "0" );
             }
 
             sprintf( value, "%d", p_node->i_id );
-            E_(mvar_AppendNewVar)( itm, "index", value );
+            mvar_AppendNewVar( itm, "index", value );
 
             psz = input_item_GetName( p_node->p_input );
-            E_(mvar_AppendNewVar)( itm, "name", psz );
+            mvar_AppendNewVar( itm, "name", psz );
             free( psz );
 
             psz = input_item_GetURI( p_node->p_input );
-            E_(mvar_AppendNewVar)( itm, "uri", psz );
+            mvar_AppendNewVar( itm, "uri", psz );
             free( psz );
 
             sprintf( value, "Item");
-            E_(mvar_AppendNewVar)( itm, "type", value );
+            mvar_AppendNewVar( itm, "type", value );
 
             sprintf( value, "%d", i_depth );
-            E_(mvar_AppendNewVar)( itm, "depth", value );
+            mvar_AppendNewVar( itm, "depth", value );
 
             if( p_node->i_flags & PLAYLIST_RO_FLAG )
             {
-                E_(mvar_AppendNewVar)( itm, "ro", "ro" );
+                mvar_AppendNewVar( itm, "ro", "ro" );
             }
             else
             {
-                E_(mvar_AppendNewVar)( itm, "ro", "rw" );
+                mvar_AppendNewVar( itm, "ro", "rw" );
             }
 
             sprintf( value, "%ld",
                     (long) input_item_GetDuration( p_node->p_input ) );
-            E_(mvar_AppendNewVar)( itm, "duration", value );
+            mvar_AppendNewVar( itm, "duration", value );
 
-            E_(mvar_AppendVar)( s, itm );
+            mvar_AppendVar( s, itm );
         }
         else
         {
             char value[512];
             int i_child;
-            mvar_t *itm = E_(mvar_New)( name, "set" );
+            mvar_t *itm = mvar_New( name, "set" );
 
-            E_(mvar_AppendNewVar)( itm, "name", p_node->p_input->psz_name );
-            E_(mvar_AppendNewVar)( itm, "uri", p_node->p_input->psz_name );
+            mvar_AppendNewVar( itm, "name", p_node->p_input->psz_name );
+            mvar_AppendNewVar( itm, "uri", p_node->p_input->psz_name );
 
             sprintf( value, "Node" );
-            E_(mvar_AppendNewVar)( itm, "type", value );
+            mvar_AppendNewVar( itm, "type", value );
 
             sprintf( value, "%d", p_node->i_id );
-            E_(mvar_AppendNewVar)( itm, "index", value );
+            mvar_AppendNewVar( itm, "index", value );
 
             sprintf( value, "%d", p_node->i_children);
-            E_(mvar_AppendNewVar)( itm, "i_children", value );
+            mvar_AppendNewVar( itm, "i_children", value );
 
             sprintf( value, "%d", i_depth );
-            E_(mvar_AppendNewVar)( itm, "depth", value );
+            mvar_AppendNewVar( itm, "depth", value );
 
             if( p_node->i_flags & PLAYLIST_RO_FLAG )
             {
-                E_(mvar_AppendNewVar)( itm, "ro", "ro" );
+                mvar_AppendNewVar( itm, "ro", "ro" );
             }
             else
             {
-                E_(mvar_AppendNewVar)( itm, "ro", "rw" );
+                mvar_AppendNewVar( itm, "ro", "rw" );
             }
 
-            E_(mvar_AppendVar)( s, itm );
+            mvar_AppendVar( s, itm );
 
             for (i_child = 0 ; i_child < p_node->i_children ; i_child++)
-                E_(PlaylistListNode)( p_intf, p_pl,
+                PlaylistListNode( p_intf, p_pl,
                                       p_node->pp_children[i_child],
                                       name, s, i_depth + 1);
 
@@ -440,7 +440,7 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
 /****************************************************************************
  * Seek command parsing handling
  ****************************************************************************/
-void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value )
+void HandleSeek( intf_thread_t *p_intf, char *p_value )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     vlc_value_t val;
@@ -632,7 +632,7 @@ void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value )
 /****************************************************************************
  * URI Parsing functions
  ****************************************************************************/
-int E_(TestURIParam)( char *psz_uri, const char *psz_name )
+int TestURIParam( char *psz_uri, const char *psz_name )
 {
     char *p = psz_uri;
 
@@ -695,7 +695,7 @@ static char *FindURIValue( char *psz_uri, const char *restrict psz_name,
     return p;
 }
 
-char *E_(ExtractURIValue)( char *restrict psz_uri,
+char *ExtractURIValue( char *restrict psz_uri,
                            const char *restrict psz_name,
                            char *restrict psz_buf, size_t bufsize )
 {
@@ -723,7 +723,7 @@ char *E_(ExtractURIValue)( char *restrict psz_uri,
     return psz_next;
 }
 
-char *E_(ExtractURIString)( char *restrict psz_uri,
+char *ExtractURIString( char *restrict psz_uri,
                             const char *restrict psz_name )
 {
     size_t len;
@@ -745,7 +745,7 @@ char *E_(ExtractURIString)( char *restrict psz_uri,
 /* Since the resulting string is smaller we can work in place, so it is
  * permitted to have psz == new. new points to the first word of the
  * string, the function returns the remaining string. */
-char *E_(FirstWord)( char *psz, char *new )
+char *FirstWord( char *psz, char *new )
 {
     bool b_end;
 
@@ -833,7 +833,7 @@ static char *FirstOption( char *psz, char *new )
         return NULL;
 }
 
-input_item_t *E_(MRLParse)( intf_thread_t *p_intf, char *_psz,
+input_item_t *MRLParse( intf_thread_t *p_intf, char *_psz,
                                    char *psz_name )
 {
     char *psz = strdup( _psz );
@@ -872,7 +872,7 @@ input_item_t *E_(MRLParse)( intf_thread_t *p_intf, char *_psz,
 /**********************************************************************
  * RealPath: parse ../, ~ and path stuff
  **********************************************************************/
-char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src )
+char *RealPath( intf_thread_t *p_intf, const char *psz_src )
 {
     char *psz_dir;
     char *p;

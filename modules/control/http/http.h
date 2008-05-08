@@ -101,36 +101,36 @@
 /* File and directory functions */
 
 /** This function recursively parses a directory and adds all files */
-int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
+int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                         char *psz_dir );
 /** This function loads a file into a buffer */
-int E_(FileLoad)( FILE *f, char **pp_data, int *pi_data );
+int FileLoad( FILE *f, char **pp_data, int *pi_data );
 /** This function creates a suitable URL for a filename */
-char *E_(FileToUrl)( char *name, bool *pb_index );
+char *FileToUrl( char *name, bool *pb_index );
 /** This function returns the real path of a file or directory */
-char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src );
+char *RealPath( intf_thread_t *p_intf, const char *psz_src );
 
 /** This command parses the "seek" command for the HTTP interface
  * and performs the requested action */
-void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value );
+void HandleSeek( intf_thread_t *p_intf, char *p_value );
 
 /* URI Handling functions */
 
 /** This function extracts the value for a given argument name
  * from an HTTP request */
-char *E_(ExtractURIValue)( char *restrict psz_uri,
+char *ExtractURIValue( char *restrict psz_uri,
                            const char *restrict psz_name,
                            char *restrict psz_value, size_t i_value_max );
-char *E_(ExtractURIString)( char *restrict psz_uri,
+char *ExtractURIString( char *restrict psz_uri,
                             const char *restrict psz_name );
 /** \todo Describe this function */
-int E_(TestURIParam)( char *psz_uri, const char *psz_name );
+int TestURIParam( char *psz_uri, const char *psz_name );
 
 /** This function parses a MRL */
-input_item_t *E_(MRLParse)( intf_thread_t *, char *psz, char *psz_name );
+input_item_t *MRLParse( intf_thread_t *, char *psz, char *psz_name );
 
 /** Return the first word from a string (works in-place) */
-char *E_(FirstWord)( char *psz, char *new );
+char *FirstWord( char *psz, char *new );
 
 /**@}*/
 
@@ -163,28 +163,28 @@ typedef struct mvar_s
 
 
 /** This function creates a new variable */
-mvar_t  *E_(mvar_New)( const char *name, const char *value );
+mvar_t  *mvar_New( const char *name, const char *value );
 /** This function deletes a variable */
-void     E_(mvar_Delete)( mvar_t *v );
+void     mvar_Delete( mvar_t *v );
 /** This function adds f to the children variables of v, at last position */
-void     E_(mvar_AppendVar)( mvar_t *v, mvar_t *f );
+void     mvar_AppendVar( mvar_t *v, mvar_t *f );
 /** This function duplicates a variable */
-mvar_t  *E_(mvar_Duplicate)( const mvar_t *v );
+mvar_t  *mvar_Duplicate( const mvar_t *v );
 /** This function adds f to the children variables of v, at fist position */
-void     E_(mvar_PushVar)( mvar_t *v, mvar_t *f );
+void     mvar_PushVar( mvar_t *v, mvar_t *f );
 /** This function removes f from the children variables of v */
-void     E_(mvar_RemoveVar)( mvar_t *v, mvar_t *f );
+void     mvar_RemoveVar( mvar_t *v, mvar_t *f );
 /** This function retrieves the child variable named "name" */
-mvar_t  *E_(mvar_GetVar)( mvar_t *s, const char *name );
+mvar_t  *mvar_GetVar( mvar_t *s, const char *name );
 /** This function retrieves the value of the child variable named "field" */
-char    *E_(mvar_GetValue)( mvar_t *v, char *field );
+char    *mvar_GetValue( mvar_t *v, char *field );
 /** This function creates a variable with the given name and value and
  * adds it as first child of vars */
-void     E_(mvar_PushNewVar)( mvar_t *vars, const char *name,
+void     mvar_PushNewVar( mvar_t *vars, const char *name,
                               const char *value );
 /** This function creates a variable with the given name and value and
  * adds it as last child of vars */
-void     E_(mvar_AppendNewVar)( mvar_t *vars, const char *name,
+void     mvar_AppendNewVar( mvar_t *vars, const char *name,
                                 const char *value );
 /** @} */
 
@@ -198,30 +198,30 @@ void     E_(mvar_AppendNewVar)( mvar_t *vars, const char *name,
 
 /** This function creates a set variable which represents a series of integer
  * The arg parameter must be of the form "start[:stop[:step]]"  */
-mvar_t *E_(mvar_IntegerSetNew)( const char *name, const char *arg );
+mvar_t *mvar_IntegerSetNew( const char *name, const char *arg );
 
 /** This function creates a set variable with a list of VLC objects */
-mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *name, const char *arg );
+mvar_t *mvar_ObjectSetNew( intf_thread_t *p_intf, char *name, const char *arg );
 
 /** This function creates a set variable with the contents of the playlist */
-mvar_t *E_(mvar_PlaylistSetNew)( intf_thread_t *p_intf, char *name,
+mvar_t *mvar_PlaylistSetNew( intf_thread_t *p_intf, char *name,
                                  playlist_t *p_pl );
 /** This function creates a set variable with the contents of the Stream
  * and media info box */
-mvar_t *E_(mvar_InfoSetNew)( char *name, input_thread_t *p_input );
+mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input );
 /** This function creates a set variable with the input parameters */
-mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
+mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
                                  input_thread_t *p_input,
                                  const char *psz_variable );
 /** This function creates a set variable representing the files of the psz_dir
  * directory */
-mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
+mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                              char *psz_dir );
 /** This function creates a set variable representing the VLM streams */
-mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm );
+mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm );
 
 /** This function converts the listing of a playlist node into a mvar set */
-void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
+void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
                            playlist_item_t *p_node, char *name, mvar_t *s,
                            int i_depth );
 
@@ -248,21 +248,21 @@ typedef struct
 } rpn_stack_t;
 
 /** This function creates the RPN evaluator stack */
-void E_(SSInit)( rpn_stack_t * );
+void SSInit( rpn_stack_t * );
 /** This function cleans the evaluator stack */
-void E_(SSClean)( rpn_stack_t * );
+void SSClean( rpn_stack_t * );
 /* Evaluate and execute the RPN Stack */
-void  E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
+void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                        rpn_stack_t *st, char *exp );
 
 /* Push an operand on top of the RPN stack */
-void E_(SSPush)  ( rpn_stack_t *, const char * );
+void SSPush  ( rpn_stack_t *, const char * );
 /* Remove the first operand from the RPN Stack */
-char *E_(SSPop)  ( rpn_stack_t * );
+char *SSPop  ( rpn_stack_t * );
 /* Pushes an operand at a given position in the stack */
-void E_(SSPushN) ( rpn_stack_t *, int );
+void SSPushN ( rpn_stack_t *, int );
 /* Removes an operand at the given position in the stack */
-int  E_(SSPopN)  ( rpn_stack_t *, mvar_t  * );
+int  SSPopN  ( rpn_stack_t *, mvar_t  * );
 
 /**@}*/
 
@@ -292,7 +292,7 @@ typedef struct
 } macro_t;
 
 /** This function parses a file for macros */
-void E_(Execute)( httpd_file_sys_t *p_args,
+void Execute( httpd_file_sys_t *p_args,
                   char *p_request, int i_request,
                   char **pp_data, int *pi_data,
                   char **pp_dst,
@@ -369,12 +369,12 @@ struct intf_sys_t
 };
 
 /** This function is the main HTTPD Callback used by the HTTP Interface */
-int E_(HttpCallback)( httpd_file_sys_t *p_args,
+int HttpCallback( httpd_file_sys_t *p_args,
                       httpd_file_t *,
                       uint8_t *p_request,
                       uint8_t **pp_data, int *pi_data );
 /** This function is the HTTPD Callback used for CGIs */
-int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
+int  HandlerCallback( httpd_handler_sys_t *p_args,
                           httpd_handler_t *p_handler, char *_p_url,
                           uint8_t *_p_request, int i_type,
                           uint8_t *_p_in, int i_in,

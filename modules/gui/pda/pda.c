@@ -53,8 +53,8 @@ static void Run          ( intf_thread_t * );
 
 void GtkAutoPlayFile     ( vlc_object_t * );
 static int Manage        ( intf_thread_t *p_intf );
-void E_(GtkDisplayDate)  ( GtkAdjustment *p_adj, gpointer userdata );
-gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
+void GtkDisplayDate  ( GtkAdjustment *p_adj, gpointer userdata );
+gint GtkModeManage   ( intf_thread_t * p_intf );
 
 /*****************************************************************************
  * Module descriptor
@@ -208,7 +208,7 @@ static void Run( intf_thread_t *p_intf )
     if (p_intf->p_sys->p_adj == NULL)
         msg_Err( p_intf, "Adjustment range not found." );
     g_signal_connect( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
-                         G_CALLBACK( E_(GtkDisplayDate) ), p_intf );
+                         G_CALLBACK( GtkDisplayDate ), p_intf );
     p_intf->p_sys->f_adj_oldvalue = 0;
     p_intf->p_sys->i_adj_oldvalue = 0;
 
@@ -429,7 +429,7 @@ static int Manage( intf_thread_t *p_intf )
         {
             playlist_t *p_playlist;
 
-            E_(GtkModeManage)( p_intf );
+            GtkModeManage( p_intf );
             p_intf->p_sys->b_playing = 1;
 
             /* update playlist interface */
@@ -524,7 +524,7 @@ static int Manage( intf_thread_t *p_intf )
     }
     else if( p_intf->p_sys->b_playing && !intf_ShouldDie( p_intf ) )
     {
-        E_(GtkModeManage)( p_intf );
+        GtkModeManage( p_intf );
         p_intf->p_sys->b_playing = 0;
     }
 
@@ -552,7 +552,7 @@ static int Manage( intf_thread_t *p_intf )
  * the stream. It is called whenever the slider changes its value.
  * The lock has to be taken before you call the function.
  *****************************************************************************/
-void E_(GtkDisplayDate)( GtkAdjustment *p_adj, gpointer userdata )
+void GtkDisplayDate( GtkAdjustment *p_adj, gpointer userdata )
 {
     intf_thread_t *p_intf;
 
@@ -579,7 +579,7 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj, gpointer userdata )
  *****************************************************************************
  * The lock has to be taken before you call the function.
  *****************************************************************************/
-gint E_(GtkModeManage)( intf_thread_t * p_intf )
+gint GtkModeManage( intf_thread_t * p_intf )
 {
     GtkWidget *     p_slider = NULL;
     bool      b_control;

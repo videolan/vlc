@@ -51,7 +51,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 /*****************************************************************************
  * Import_podcast: main import function
  *****************************************************************************/
-int E_(Import_podcast)( vlc_object_t *p_this )
+int Import_podcast( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
@@ -59,7 +59,7 @@ int E_(Import_podcast)( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "using podcast reader" );
-    p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
+    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
     p_demux->p_sys->p_playlist = NULL;
     p_demux->p_sys->p_xml = NULL;
     p_demux->p_sys->p_xml_reader = NULL;
@@ -70,7 +70,7 @@ int E_(Import_podcast)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_podcast)( vlc_object_t *p_this )
+void Close_podcast( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;

@@ -40,14 +40,14 @@
 /*****************************************************************************
  * External prototypes
  *****************************************************************************/
-int  E_(OpenIntf)     ( vlc_object_t * );
-void E_(CloseIntf)    ( vlc_object_t * );
+int  OpenIntf     ( vlc_object_t * );
+void CloseIntf    ( vlc_object_t * );
 
-int  E_(OpenVideoQT)  ( vlc_object_t * );
-void E_(CloseVideoQT) ( vlc_object_t * );
+int  OpenVideoQT  ( vlc_object_t * );
+void CloseVideoQT ( vlc_object_t * );
 
-int  E_(OpenVideoGL)  ( vlc_object_t * );
-void E_(CloseVideoGL) ( vlc_object_t * );
+int  OpenVideoGL  ( vlc_object_t * );
+void CloseVideoGL ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -93,7 +93,7 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 vlc_module_begin();
     set_description( _("Mac OS X interface") );
     set_capability( "interface", 200 );
-    set_callbacks( E_(OpenIntf), E_(CloseIntf) );
+    set_callbacks( OpenIntf, CloseIntf );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
@@ -110,7 +110,7 @@ vlc_module_begin();
         set_capability( "video output", 100 );
         set_category( CAT_VIDEO);
         set_subcategory( SUBCAT_VIDEO_VOUT );
-        set_callbacks( E_(OpenVideoQT), E_(CloseVideoQT) );
+        set_callbacks( OpenVideoQT, CloseVideoQT );
 
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
                      false );
@@ -127,6 +127,6 @@ vlc_module_begin();
         set_capability( "opengl provider", 100 );
         set_category( CAT_VIDEO);
         set_subcategory( SUBCAT_VIDEO_VOUT );
-        set_callbacks( E_(OpenVideoGL), E_(CloseVideoGL) );
+        set_callbacks( OpenVideoGL, CloseVideoGL );
 vlc_module_end();
 

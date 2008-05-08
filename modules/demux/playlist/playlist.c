@@ -70,69 +70,69 @@ vlc_module_begin();
         set_description( _("M3U playlist import") );
         add_shortcut( "m3u-open" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_M3U), E_(Close_M3U) );
+        set_callbacks( Import_M3U, Close_M3U );
     add_submodule();
         set_description( _("PLS playlist import") );
         add_shortcut( "pls-open" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_PLS), E_(Close_PLS) );
+        set_callbacks( Import_PLS, Close_PLS );
     add_submodule();
         set_description( _("B4S playlist import") );
         add_shortcut( "b4s-open" );
         add_shortcut( "shout-b4s" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_B4S), E_(Close_B4S) );
+        set_callbacks( Import_B4S, Close_B4S );
     add_submodule();
         set_description( _("DVB playlist import") );
         add_shortcut( "dvb-open" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_DVB), E_(Close_DVB) );
+        set_callbacks( Import_DVB, Close_DVB );
     add_submodule();
         set_description( _("Podcast parser") );
         add_shortcut( "podcast" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_podcast), E_(Close_podcast) );
+        set_callbacks( Import_podcast, Close_podcast );
     add_submodule();
         set_description( _("XSPF playlist import") );
         add_shortcut( "xspf-open" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_xspf),E_(Close_xspf) );
+        set_callbacks( Import_xspf, Close_xspf );
     add_submodule();
         set_description( _("New winamp 5.2 shoutcast import") );
         add_shortcut( "shout-winamp" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_Shoutcast), E_(Close_Shoutcast) );
+        set_callbacks( Import_Shoutcast, Close_Shoutcast );
         add_bool( "shoutcast-show-adult", false, NULL,
                    SHOW_ADULT_TEXT, SHOW_ADULT_LONGTEXT, false );
     add_submodule();
         set_description( _("ASX playlist import") );
         add_shortcut( "asx-open" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_ASX), E_(Close_ASX) );
+        set_callbacks( Import_ASX, Close_ASX );
     add_submodule();
         set_description( _("Kasenna MediaBase parser") );
         add_shortcut( "sgimb" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_SGIMB), E_(Close_SGIMB) );
+        set_callbacks( Import_SGIMB, Close_SGIMB );
     add_submodule();
         set_description( _("QuickTime Media Link importer") );
         add_shortcut( "qtl" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_QTL), E_(Close_QTL) );
+        set_callbacks( Import_QTL, Close_QTL );
     add_submodule();
         set_description( _("Google Video Playlist importer") );
         add_shortcut( "gvp" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_GVP), E_(Close_GVP) );
+        set_callbacks( Import_GVP, Close_GVP );
     add_submodule();
         set_description( _("Dummy ifo demux") );
         set_capability( "demux", 12 );
-        set_callbacks( E_(Import_IFO), E_(Close_IFO) );
+        set_callbacks( Import_IFO, Close_IFO );
     add_submodule();
         set_description( _("iTunes Music Library importer") );
         add_shortcut( "itml" );
         set_capability( "demux", 10 );
-        set_callbacks( E_(Import_iTML), E_(Close_iTML) );
+        set_callbacks( Import_iTML, Close_iTML );
 vlc_module_end();
 
 
@@ -140,7 +140,7 @@ vlc_module_end();
  * Find directory part of the path to the playlist file, in case of
  * relative paths inside
  */
-char *E_(FindPrefix)( demux_t *p_demux )
+char *FindPrefix( demux_t *p_demux )
 {
     char *psz_name;
     char *psz_path = strdup( p_demux->psz_path );
@@ -161,7 +161,7 @@ char *E_(FindPrefix)( demux_t *p_demux )
  * Add the directory part of the playlist file to the start of the
  * mrl, if the mrl is a relative file path
  */
-char *E_(ProcessMRL)( char *psz_mrl, char *psz_prefix )
+char *ProcessMRL( char *psz_mrl, char *psz_prefix )
 {
     /* Check for a protocol name.
      * for URL, we should look for "://"

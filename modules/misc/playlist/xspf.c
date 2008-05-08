@@ -46,7 +46,7 @@
  * \param p_this the VLC playlist object
  * \return VLC_SUCCESS if some memory is available, otherwise VLC_ENONMEM
  */
-int E_(xspf_export_playlist)( vlc_object_t *p_this )
+int xspf_export_playlist( vlc_object_t *p_this )
 {
     const playlist_t *p_playlist = (playlist_t *)p_this;
     const playlist_export_t *p_export =

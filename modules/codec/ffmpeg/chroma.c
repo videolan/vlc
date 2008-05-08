@@ -48,7 +48,7 @@
 #include "ffmpeg.h"
 
 #if !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
-void E_(InitLibavcodec) ( vlc_object_t *p_object );
+void InitLibavcodec ( vlc_object_t *p_object );
 static void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
@@ -72,7 +72,7 @@ struct chroma_sys_t
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-int E_(OpenChroma)( vlc_object_t *p_this )
+int OpenChroma( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     int i_ffmpeg_chroma[2], i_vlc_chroma[2], i;
@@ -84,7 +84,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     i_vlc_chroma[1] = p_vout->output.i_chroma;
     for( i = 0; i < 2; i++ )
     {
-        i_ffmpeg_chroma[i] = E_(GetFfmpegChroma)( i_vlc_chroma[i] );
+        i_ffmpeg_chroma[i] = GetFfmpegChroma( i_vlc_chroma[i] );
         if( i_ffmpeg_chroma[i] < 0 ) return VLC_EGENERIC;
     }
 
@@ -121,7 +121,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     }
 
     /* libavcodec needs to be initialized for some chroma conversions */
-    E_(InitLibavcodec)(p_this);
+    InitLibavcodec(p_this);
 
     return VLC_SUCCESS;
 }
@@ -189,7 +189,7 @@ static void ChromaConversion( vout_thread_t *p_vout,
  *****************************************************************************
  * This function frees the previously allocated chroma function
  *****************************************************************************/
-void E_(CloseChroma)( vlc_object_t *p_this )
+void CloseChroma( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     if( p_vout->chroma.p_sys->p_rsc )
@@ -262,7 +262,7 @@ static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-int E_(OpenChroma)( vlc_object_t *p_this )
+int OpenChroma( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     chroma_sys_t  *p_sys = p_vout->chroma.p_sys;
@@ -348,7 +348,7 @@ static void ChromaConversion( vout_thread_t *p_vout,
  *****************************************************************************
  * This function frees the previously allocated chroma function
  *****************************************************************************/
-void E_(CloseChroma)( vlc_object_t *p_this )
+void CloseChroma( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     chroma_sys_t  *p_sys  = (chroma_sys_t *)p_vout->chroma.p_sys;

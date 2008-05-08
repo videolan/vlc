@@ -53,8 +53,8 @@ struct intf_sys_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-int  E_(Open) ( vlc_object_t * );
-void E_(Close)( vlc_object_t * );
+int  Open ( vlc_object_t * );
+void Close( vlc_object_t * );
 static void RunIntf( intf_thread_t *p_intf );
 static int  InitThread( intf_thread_t *p_intf );
 static int  MouseEvent( vlc_object_t *, char const *,
@@ -72,13 +72,13 @@ vlc_module_begin();
     set_description( _("Show interface with mouse") );
 
     set_capability( "interface", 0 );
-    set_callbacks( E_(Open), E_(Close) );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
  * Open: initialize interface
  *****************************************************************************/
-int E_(Open)( vlc_object_t *p_this )
+int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
@@ -97,7 +97,7 @@ int E_(Open)( vlc_object_t *p_this )
 /*****************************************************************************
  * Close: destroy interface
  *****************************************************************************/
-void E_(Close)( vlc_object_t *p_this )
+void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 

@@ -54,7 +54,7 @@ static int  Control   ( vout_thread_t *, int, va_list );
  *****************************************************************************
  * This function initializes a dummy vout method.
  *****************************************************************************/
-int E_(OpenVideo) ( vlc_object_t *p_this )
+int OpenVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 

@@ -48,7 +48,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 /*****************************************************************************
  * Import_PLS: main import function
  *****************************************************************************/
-int E_(Import_PLS)( vlc_object_t *p_this )
+int Import_PLS( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
@@ -62,7 +62,7 @@ int E_(Import_PLS)( vlc_object_t *p_this )
     else return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG(  "found valid PLS playlist file");
-    p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
+    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
 
     return VLC_SUCCESS;
 }
@@ -70,7 +70,7 @@ int E_(Import_PLS)( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_PLS)( vlc_object_t *p_this )
+void Close_PLS( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     free( p_demux->p_sys->psz_prefix );
@@ -180,7 +180,7 @@ static int Demux( demux_t *p_demux )
         {
             free( psz_mrl_orig );
             psz_mrl_orig =
-            psz_mrl = E_(ProcessMRL)( psz_value, p_demux->p_sys->psz_prefix );
+            psz_mrl = ProcessMRL( psz_value, p_demux->p_sys->psz_prefix );
 
             if( !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
             {

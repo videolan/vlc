@@ -35,7 +35,7 @@
 static int RenderText( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
 
-int E_(OpenRenderer)( vlc_object_t *p_this )
+int OpenRenderer( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     p_filter->pf_render_text = RenderText;

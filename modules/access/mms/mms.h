@@ -30,12 +30,12 @@
 #define MMS_PROTO_HTTP  3
 
 /* mmst and mmsu */
-int  E_( MMSTUOpen )  ( access_t * );
-void E_( MMSTUClose ) ( access_t * );
+int   MMSTUOpen   ( access_t * );
+void  MMSTUClose  ( access_t * );
 
 /* mmsh */
-int  E_( MMSHOpen )  ( access_t * );
-void E_( MMSHClose ) ( access_t * );
+int   MMSHOpen   ( access_t * );
+void  MMSHClose  ( access_t * );
 
 #endif
 

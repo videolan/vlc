@@ -138,7 +138,7 @@ static int OpenVideo( vlc_object_t *p_this )
         vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
     if( vlc_thread_create( p_vout->p_sys->p_event, "Vout Events Thread",
-                           E_(EventThread), 0, 1 ) )
+                           EventThread, 0, 1 ) )
     {
         msg_Err( p_vout, "cannot create Vout EventThread" );
         vlc_object_release( p_vout->p_sys->p_event );
@@ -316,7 +316,7 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
         p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
-        E_(UpdateRects)( p_vout, true );
+        UpdateRects( p_vout, true );
     }
 
     /* We used to call the Win32 PeekMessage function here to read the window

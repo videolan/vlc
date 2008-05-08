@@ -135,7 +135,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 /*****************************************************************************
  * Activate: initializes m3u demux structures
  *****************************************************************************/
-int E_(Import_SGIMB)( vlc_object_t * p_this )
+int Import_SGIMB( vlc_object_t * p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
@@ -179,7 +179,7 @@ int E_(Import_SGIMB)( vlc_object_t * p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void E_(Close_SGIMB)( vlc_object_t *p_this )
+void Close_SGIMB( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;

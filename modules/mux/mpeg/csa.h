@@ -25,11 +25,11 @@
 #define _CSA_H 1
 
 typedef struct csa_t csa_t;
-#define csa_New     E_(__csa_New)
-#define csa_Delete  E_(__csa_Delete)
-#define csa_SetCW  E_(__csa_SetCW)
-#define csa_Decrypt E_(__csa_decrypt)
-#define csa_Encrypt E_(__csa_encrypt)
+#define csa_New     __csa_New
+#define csa_Delete  __csa_Delete
+#define csa_SetCW  __csa_SetCW
+#define csa_Decrypt __csa_decrypt
+#define csa_Encrypt __csa_encrypt
 
 csa_t *csa_New( void );
 void   csa_Delete( csa_t * );

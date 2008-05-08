@@ -91,7 +91,7 @@ struct decoder_sys_t
  *****************************************************************************
  * The ffmpeg codec will be opened, some memory allocated.
  *****************************************************************************/
-int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
+int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
@@ -221,7 +221,7 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
 /*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
-aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
+aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_used, i_output;
@@ -352,7 +352,7 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
 /*****************************************************************************
  * EndAudioDec: audio decoder destruction
  *****************************************************************************/
-void E_(EndAudioDec)( decoder_t *p_dec )
+void EndAudioDec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
