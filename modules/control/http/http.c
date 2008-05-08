@@ -27,6 +27,7 @@
 #endif
 
 #include "http.h"
+#include <vlc_plugin.h>
 
 /*****************************************************************************
  * Module descriptor

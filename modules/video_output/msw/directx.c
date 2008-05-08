@@ -41,6 +41,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>

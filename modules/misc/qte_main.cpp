@@ -31,6 +31,7 @@ extern "C"
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 }
 
 #include <qapplication.h>

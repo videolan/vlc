@@ -33,6 +33,7 @@ extern "C"
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include <vlc_aout.h>
 
 #include "aout_internal.h"

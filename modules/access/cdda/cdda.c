@@ -28,6 +28,7 @@
 #include "callback.h"
 #include "access.h"
 #include <cdio/version.h>
+#include <vlc_plugin.h>
 
 /*****************************************************************************
  * Module descriptor

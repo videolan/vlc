@@ -39,6 +39,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 
 #ifdef HAVE_NCURSESW
 #   define _XOPEN_SOURCE_EXTENDED 1

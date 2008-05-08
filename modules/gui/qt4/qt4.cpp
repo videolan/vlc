@@ -42,6 +42,7 @@
 
 #include "../../../share/vlc32x32.xpm"
 #include "../../../share/vlc32x32-christmas.xpm"
+#include <vlc_plugin.h>
 
 /*****************************************************************************
  * Local prototypes.

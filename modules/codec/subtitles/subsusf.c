@@ -25,6 +25,7 @@
 #endif
 
 #include "subsdec.h"
+#include <vlc_plugin.h>
 
 /*****************************************************************************
  * Local prototypes

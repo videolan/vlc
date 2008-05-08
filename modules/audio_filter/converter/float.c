@@ -34,6 +34,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>

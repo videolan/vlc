@@ -30,6 +30,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include <errno.h>
 #include <time.h>
 

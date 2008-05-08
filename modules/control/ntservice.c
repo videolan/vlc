@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include <vlc_interface.h>
 
 #define VLCSERVICENAME "VLC media player"

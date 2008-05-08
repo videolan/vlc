@@ -30,6 +30,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include <vlc_vout.h>
 
 #define SRC_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,cyuv"

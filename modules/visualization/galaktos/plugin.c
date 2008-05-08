@@ -36,6 +36,7 @@
 
 #include <vlc_input.h>
 #include <vlc_playlist.h>
+#include <vlc_plugin.h>
 
 /*****************************************************************************
  * Module descriptor

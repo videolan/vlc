@@ -35,6 +35,7 @@
 #include <inttypes.h>
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 
 #ifdef HAVE_TIME_H
 #   include <time.h>                                               /* time() */

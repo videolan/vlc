@@ -30,6 +30,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 
 #undef HAVE_MMX
 #undef HAVE_MMX2

@@ -36,6 +36,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>

@@ -32,6 +32,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 
 #ifdef HAVE_STDINT_H
 #   include <stdint.h>                                         /* int16_t .. */

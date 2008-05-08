@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include <vlc_stream.h>
 #include <vlc_streaming.h>
 #include "vlc_xml.h"

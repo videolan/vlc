@@ -35,6 +35,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include "vlc_aout.h"
 #include "revmodel.hpp"
 #define SPAT_AMP 0.3
