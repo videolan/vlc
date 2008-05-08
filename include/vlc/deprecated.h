@@ -264,13 +264,6 @@ VLC_DEPRECATED_API libvlc_media_player_t * libvlc_playlist_get_media_player(
 VLC_DEPRECATED_API char const * VLC_Version ( void );
 
 /**
- * Retrieve libvlc compile time
- *
- * \return a string containing the libvlc compile time
- */
-VLC_DEPRECATED_API char const * VLC_CompileTime ( void );
-
-/**
  * Retrieve the username of the libvlc builder
  *
  * \return a string containing the username of the libvlc builder
