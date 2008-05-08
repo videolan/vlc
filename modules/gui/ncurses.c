@@ -2250,6 +2250,7 @@ static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
     {
         case VIEW_CATEGORY:
             p_item = p_playlist->p_root_category;
+            break;
         default:
             p_item = p_playlist->p_root_onelevel;
     }
