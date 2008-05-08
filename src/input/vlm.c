@@ -178,8 +178,15 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
  *****************************************************************************/
 void vlm_Delete( vlm_t *p_vlm )
 {
-    /* FIXME XXX: we need to set libvlc_priv->p_vlm bacl to NULL */
+    vlc_value_t lockval;
+
+    /* vlm_Delete() is serialized against itself, and against vlm_New().
+     * This way, vlm_Destructor () (called from vlc_objet_release() above)
+     * is serialized against setting libvlc_priv->p_vlm from vlm_New(). */
+    var_Get( p_vlm->p_libvlc, "vlm_mutex", &lockval );
+    vlc_mutex_lock( lockval.p_address );
     vlc_object_release( p_vlm );
+    vlc_mutex_unlock( lockval.p_address );
 }
 
 /*****************************************************************************
@@ -187,6 +194,8 @@ void vlm_Delete( vlm_t *p_vlm )
  *****************************************************************************/
 static void vlm_Destructor( vlm_t *p_vlm )
 {
+    libvlc_priv (p_vlm->p_libvlc)->p_vlm = NULL;
+
     vlm_ControlInternal( p_vlm, VLM_CLEAR_MEDIAS );
     TAB_CLEAN( p_vlm->i_media, p_vlm->media );
 
