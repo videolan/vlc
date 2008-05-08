@@ -930,7 +930,6 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #include "vlc_variables.h"
 #include "vlc_objects.h"
 #include "vlc_mtime.h"
-#include "vlc_threads_funcs.h"
 #include "vlc_modules.h"
 #include "vlc_main.h"
 #include "vlc_configuration.h"
