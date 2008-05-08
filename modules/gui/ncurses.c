@@ -568,12 +568,16 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     vlc_value_t val;
     
     #define ReturnTrue \
+    do { \
     vlc_object_release( p_playlist ); \
-    return 1
+    return 1; \
+    } while(0)
     
     #define ReturnFalse \
+    do { \
     vlc_object_release( p_playlist ); \
-    return 0
+    return 0; \
+    } while(0)
 
     playlist_t *p_playlist = pl_Yield( p_intf );
 
