@@ -188,7 +188,7 @@ int VLC_Destroy( int i_object )
 }
 
 /*****************************************************************************
- * VLC_VariableSet: set a vlc variable
+ * VLC_VariableSet: set a "safe" vlc variable
  *****************************************************************************/
 int VLC_VariableSet( int i_object, char const *psz_var, vlc_value_t value )
 {
@@ -206,6 +206,11 @@ int VLC_VariableSet( int i_object, char const *psz_var, vlc_value_t value )
 
         if( p_item )
         {
+            /* VLC_VariableSet is only used from the browser plugins, so we
+             *  can pretty much assume that the input is _not_ trusted. */
+            if( !p_item->b_safe )
+                return VLC_EGENERIC;
+
             switch( p_item->i_type )
             {
                 case CONFIG_ITEM_BOOL:
