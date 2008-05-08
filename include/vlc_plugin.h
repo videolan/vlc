@@ -43,19 +43,13 @@
 
 /* Explanation:
  *
- * if user has #defined MODULE_NAME foo, then we will need:
- * #define MODULE_STRING "foo"
- *
- * and, if HAVE_DYNAMIC_PLUGINS is NOT set, we will also need:
+ * if HAVE_DYNAMIC_PLUGINS is NOT set, we will need:
  * #define MODULE_FUNC( zog ) module_foo_zog
  *
  * this can't easily be done with the C preprocessor, thus a few ugly hacks.
  */
 
-/* I can't believe I need to do this to change « foo » to « "foo" » */
-#define STRINGIFY( z )   UGLY_KLUDGE( z )
-#define UGLY_KLUDGE( z ) #z
-/* And I need to do _this_ to change « foo bar » to « module_foo_bar » ! */
+/* I need to do _this_ to change « foo bar » to « module_foo_bar » ! */
 #define CONCATENATE( y, z ) CRUDE_HACK( y, z )
 #define CRUDE_HACK( y, z )  y##__##z
 
@@ -85,8 +79,6 @@
 #else
 #   define EXTERN_SYMBOL
 #endif
-
-#define MODULE_STRING STRINGIFY( MODULE_NAME )
 
 /*
  * InitModule: this function is called once and only once, when the module
