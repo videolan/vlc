@@ -46,7 +46,6 @@ include/vlc/mediacontrol_structures.h
 include/vlc_messages.h
 include/vlc_meta.h
 include/vlc_modules.h
-include/vlc_modules_macros.h
 include/vlc_mtime.h
 include/vlc_network.h
 include/vlc_objects.h
@@ -60,7 +59,6 @@ include/vlc_sout.h
 include/vlc_stream.h
 include/vlc_streaming.h
 include/vlc_strings.h
-include/vlc_threads_funcs.h
 include/vlc_threads.h
 include/vlc_tls.h
 include/vlc_update.h

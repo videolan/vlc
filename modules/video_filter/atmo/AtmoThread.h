@@ -14,7 +14,6 @@
 #if defined(_ATMO_VLC_PLUGIN_)
 // use threading stuff from videolan!
 #   include <vlc/vlc.h>
-#   include <vlc_threads_funcs.h>
 #   include <vlc_threads.h>
 
     typedef struct
