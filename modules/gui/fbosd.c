@@ -703,9 +703,10 @@ static void SetOverlayTransparency( intf_thread_t *p_intf,
     {
         msg_Dbg( p_intf, "Make overlay %s",
                  b_transparent ? "transparent" : "opaque" );
-        memset( p_sys->p_overlay->p[0].p_pixels, 0x00, i_page_size );
         if( b_transparent )
             memset( p_sys->p_overlay->p[0].p_pixels, 0xFF, i_page_size );
+        else
+            memset( p_sys->p_overlay->p[0].p_pixels, 0x00, i_page_size );
     }
 }
 
