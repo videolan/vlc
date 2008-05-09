@@ -773,9 +773,9 @@ static int InvertAlpha( intf_thread_t *p_intf, picture_t **p_pic, video_format_t
 
     for( ; p_begin < p_end; p_begin += i_skip )
     {
-        uint8_t i_opacity;
+        uint8_t i_opacity = 0;
 
-        if( i_opacity != 0xFF )
+        if( *p_begin != 0xFF )
             i_opacity = 255 - *p_begin;
         *p_begin = i_opacity;
     }
