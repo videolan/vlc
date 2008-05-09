@@ -273,7 +273,9 @@ static int Demux( demux_t *p_demux )
     {
         p_sys->b_start = false;
         p_block_in = p_sys->p_block_in;
+        p_sys->p_block_in = NULL;
         p_block_out = p_sys->p_block_out;
+        p_sys->p_block_out = NULL;
     }
     else
     {
@@ -325,7 +327,6 @@ static void Close( vlc_object_t * p_this )
 
     DESTROY_PACKETIZER( p_sys->p_packetizer );
     if( p_sys->p_block_out ) block_Release( p_sys->p_block_out );
-    if( p_sys->p_block_in ) block_Release( p_sys->p_block_in );
 
     free( p_sys );
 }
