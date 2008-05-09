@@ -106,13 +106,15 @@ C: littlejohn
 D: Java bindings
 S: Italy
 
-N: Rafaël Carré
+N: Rafaël "Hanz, David" Carré
 E: funman@videolanorg
 C: funman
 P: C0AFF10F
-D: D-Bus control
-D: Audioscrobbler
-S: France
+D: D-Bus control, Audioscrobbler, Telepathy, Taglib meta reader/writer
+D: Ncurses enhancements, Power management inhibition
+D: PGP update core
+D: Spread bugfixes
+S: Netherlands
 
 N: Tony Castley
 E: tony@castley.net
