@@ -1058,7 +1058,8 @@ static void End( intf_thread_t *p_intf )
     if( p_sys->p_overlay )
     {
         int ret;
-        ret = write( p_sys->i_fd, p_sys->p_overlay->p[0].p_pixels, p_sys->i_page_size );
+        ret = write( p_sys->i_fd, p_sys->p_overlay->p[0].p_pixels,
+                     p_sys->i_page_size );
         if( ret < 0 )
             msg_Err( p_intf, "unable to clear overlay" );
     }
@@ -1270,7 +1271,7 @@ static bool isRendererReady( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * Run: rc thread
+ * Run: thread
  *****************************************************************************
  * This part of the interface is in a separate thread so that we can call
  * exec() from within it without annoying the rest of the program.
