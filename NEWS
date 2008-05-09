@@ -27,7 +27,7 @@ Important notes:
    vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
    You can then use commands like: @test marq-marquee Goodbye
    These new commands are also available in the telnet interface.
- * The "rtp" access output module has been removed:
+ * The "rtp" access output module has been removed.
    Please use the RTP stream output instead, e.g.:
      Old: '#std{access=rtp,mux=ts,dst=239.255.1.2:5004,sap}'
      New: '#rtp{mux=ts,dst=239.255.1.2,port=5004,sap}'
