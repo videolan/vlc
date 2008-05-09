@@ -315,12 +315,13 @@ static int Open( vlc_object_t *p_this )
     if( val.psz_string && *val.psz_string )
     {
         p_sys->psz_current_dir = strdup( val.psz_string );
-        free( val.psz_string );
     }
     else
     {
         p_sys->psz_current_dir = strdup( p_intf->p_libvlc->psz_homedir );
     }
+
+    free( val.psz_string );
 
     p_sys->i_dir_entries = 0;
     p_sys->pp_dir_entries = NULL;
@@ -337,15 +338,14 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys = p_intf->p_sys;
-    int i;
 
     PlaylistDestroy( p_intf );
 
-    for( i = 0; i < p_sys->i_dir_entries; i++ )
+    while( p_sys->i_dir_entries )
     {
-        struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[i];
+        struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[0];
         free( p_dir_entry->psz_path );
-        REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, i );
+        REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, 0 );
         free( p_dir_entry );
     }
     p_sys->pp_dir_entries = NULL;
@@ -1336,13 +1336,13 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     char    *p_buf = NULL;
     int      i_len;
 
+    if( w <= 0 )
+        return;
+
     va_start( vl_args, p_fmt );
     if( vasprintf( &p_buf, p_fmt, vl_args ) == -1 )
         return;
     va_end( vl_args );
-
-    if( ( p_buf == NULL ) || ( w <= 0 ) )
-        return;
 
     i_len = strlen( p_buf );
 
@@ -1355,8 +1355,11 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     size_t i_width; /* number of columns */
 
     if( i_char_len == (size_t)-1 )
-        /* an invalid character was encountered */
+    /* an invalid character was encountered */
+    {
+        free( p_buf );
         return;
+    }
     else
     {
         i_width = wcswidth( psz_wide, i_char_len );
@@ -1423,6 +1426,8 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
         mvprintw( y, x, "%s", p_buf );
         mvhline( y, x + i_width, ' ', w - i_width );
     }
+
+    free( p_buf );
 #else
     if( i_len > w )
     {
@@ -2129,6 +2134,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         }
 
         DrawBox( p_sys->w, y++, 0, h, COLS, psz_title, p_sys->b_color );
+        free( psz_title );
 
         if( p_sys->b_need_update || p_sys->pp_plist == NULL )
         {
@@ -2383,17 +2389,15 @@ static void FindIndex( intf_thread_t *p_intf )
 static void PlaylistDestroy( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    int i;
 
-    for( i = 0; i < p_sys->i_plist_entries; i++ )
+    while( p_sys->i_plist_entries )
     {
-        struct pl_item_t *p_pl_item = p_sys->pp_plist[i];
+        struct pl_item_t *p_pl_item = p_sys->pp_plist[0];
         free( p_pl_item->psz_display );
-        REMOVE_ELEM( p_sys->pp_plist, p_sys->i_plist_entries, i );
+        REMOVE_ELEM( p_sys->pp_plist, p_sys->i_plist_entries, 0 );
         free( p_pl_item );
     }
     p_sys->pp_plist = NULL;
-    p_sys->i_plist_entries = 0;
 }
 
 static void Eject( intf_thread_t *p_intf )
