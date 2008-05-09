@@ -3,7 +3,7 @@ echo "Searching $1"
 for file in `find $1 -name "Modules.am"`; do
      cmake_file=`dirname $file`/CMakeLists.txt
      echo "Creating $cmake_file"
-     cat $file | perl -ne 's/\\\n/ /g; print' | sed -n -e "s/^SOURCES_\(.*\)[ ]*=\(.*\)$/vlc_add_module( \1 \2 )/p" | tr '\t' ' '  | sed 's/  */ /g'  | sed 's/\$(NULL)//g' > $cmake_file
+     cat $file | perl -ne 's/\\\n/ /g; print' | sed -n -e "s/^SOURCES_\([^\ ]*\)[ ]*=\(.*\)$/vlc_add_module( \1 \2 )/p" | tr '\t' ' '  | sed 's/  */ /g'  | sed 's/\$(NULL)//g' > $cmake_file
      dir=`dirname $file`
      echo "" >> $cmake_file
      for subdirfile in `find $dir -name "Modules.am"`; do
