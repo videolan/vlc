@@ -107,11 +107,12 @@ static void Close( vlc_object_t *p_this )
 
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
-    __msg_Dbg( NULL, "description: Adding a stream" );
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
     es_format_t *p_fmt_copy;
     input_item_t *p_item;
+
+    msg_Dbg( p_stream, "description: Adding a stream" );
 
     if( !p_sys->p_input )
         p_sys->p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_PARENT );
@@ -140,7 +141,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    __msg_Dbg( NULL, "description: Removing a stream (id:%d)", p_sys->i_id );
+    msg_Dbg( p_stream, "description: Removing a stream (id:%d)", p_sys->i_id );
 
     p_sys->i_id--;
     if( p_sys->i_id <= 0 )
