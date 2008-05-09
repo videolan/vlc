@@ -194,7 +194,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         var_Create( p_real_vout, "video-device", VLC_VAR_INTEGER |
                                             VLC_VAR_HASCHOICE );
-        text.psz_string = _("Video Device");
+        text.psz_string = _("Fullscreen Video Device");
         var_Change( p_real_vout, "video-device", VLC_VAR_SETTEXT, &text, NULL );
 
         NSEnumerator * o_enumerator = [o_screens objectEnumerator];
