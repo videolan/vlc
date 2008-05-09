@@ -1476,12 +1476,8 @@ static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt
         return;
     va_end( vl_args );
 
-    if( p_buf == NULL )
-    {
-        return;
-    }
-
     mvnprintw( p_sys->i_box_y + l - p_sys->i_box_start, x, COLS - x - 1, "%s", p_buf );
+    free( p_buf );
 }
 
 static void DumpObject( intf_thread_t *p_intf, int *l, vlc_object_t *p_obj, int i_level )
