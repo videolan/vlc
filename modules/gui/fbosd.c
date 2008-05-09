@@ -238,7 +238,7 @@ struct fbosd_render_t
     char            *psz_string;
 
     /* Position */
-    bool      b_absolute;
+    bool            b_absolute;
     int             i_x;
     int             i_y;
     int             i_pos;
