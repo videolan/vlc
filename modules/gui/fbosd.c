@@ -675,6 +675,7 @@ static void DeAllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     {
         free( p_pic->p_data_orig );
         if( p_pic->pf_release ) p_pic->pf_release( p_pic );
+        else free( p_pic );
     }
     if( p_fmt )
     {
