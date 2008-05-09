@@ -189,11 +189,8 @@ vlc_module_begin();
     add_string( "fbosd-text", NULL, NULL, FBOSD_TEXT,
                 FBOSD_LONGTEXT, true );
 
-#if defined(FBOSD_BLENDING)
     add_integer_with_range( "fbosd-alpha", 255, 0, 255, NULL, ALPHA_TEXT,
                             ALPHA_LONGTEXT, true );
-
-#endif
 
     set_section( N_("Position"), NULL );
     add_integer( "fbosd-x", 0, NULL, POSX_TEXT,
@@ -332,12 +329,9 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-#if defined(FBOSD_BLENDING)
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_intf, "fbosd-alpha" );
     var_AddCallback( p_intf, "fbosd-alpha", OverlayCallback, NULL );
-#else
-    p_sys->i_alpha = 255;
-#endif
+
     p_sys->i_aspect = -1;
     psz_aspect =
             var_CreateGetNonEmptyString( p_intf, "fbosd-aspect-ratio" );
@@ -480,10 +474,8 @@ static void Destroy( vlc_object_t *p_this )
     p_sys->b_render = false;
     p_sys->b_clear = false;
 
-#if defined(FBOSD_BLENDING)
     var_DelCallback( p_intf, "fbosd-alpha", OverlayCallback, NULL );
     var_Destroy( p_intf, "fbosd-alpha" );
-#endif
 
     var_DelCallback( p_intf, "fbosd-x", OverlayCallback, NULL );
     var_DelCallback( p_intf, "fbosd-y", OverlayCallback, NULL );
@@ -1438,12 +1430,10 @@ static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,
         {
             p_sys->render[i].text_style.i_font_alpha = 255 - newval.i_int;
         }
-#if defined(FBOSD_BLENDING)
         else if( !strncmp( psz_cmd, "fbosd-alpha", 11 ) )
         {
             p_sys->render[i].i_alpha = newval.i_int;
         }
-#endif
     }
     return VLC_SUCCESS;
 }
