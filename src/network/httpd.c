@@ -2024,6 +2024,7 @@ static void httpd_HostThread( httpd_host_t *host )
     int evfd;
     bool b_die;
 
+retry:
     vlc_object_lock( host );
     evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
     b_die = !vlc_object_alive( host );
@@ -2035,7 +2036,7 @@ static void httpd_HostThread( httpd_host_t *host )
         {
             /* 0.2s (FIXME: use a condition variable) */
             msleep( 200000 );
-            continue;
+            goto retry;
         }
 
         /* prepare a new TLS session */
