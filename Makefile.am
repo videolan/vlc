@@ -291,7 +291,7 @@ dist-hook:
 # Building libvlc
 ###############################################################################
 
-bin_SCRIPTS = vlc-config
+noinst_SCRIPTS = vlc-config
 vlc-config: $(top_builddir)/config.status $(top_builddir)/vlc-config.in
 	$(SHELL) ./config.status --file=$@
 	chmod 0755 $@
