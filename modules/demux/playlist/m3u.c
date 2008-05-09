@@ -187,7 +187,6 @@ static int Demux( demux_t *p_demux )
 
             if ( psz_artist && *psz_artist )
                 input_item_SetArtist( p_input, psz_artist );
-            free( psz_artist );
 
             input_ItemAddSubItem( p_current_input, p_input );
             for( unsigned i = 0; i < i_options; i++ )
