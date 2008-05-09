@@ -873,6 +873,11 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
         memset( p_region, 0, sizeof(subpicture_region_t) );
 
         p_region->psz_text = strdup( psz_string );
+        if( !p_region->psz_text )
+        {
+            free( p_region );
+            return NULL;
+        }
         p_region->p_style = p_style;
 
         p_region->fmt.i_chroma = VLC_FOURCC('T','E','X','T');
