@@ -123,10 +123,11 @@ S: Australia
 N: Antoine Cellerier
 E: dionoea@videolan.org
 C: dionoea
-D: Video Filters: mosaic, gradient and edge detection, magnify, rss
-D: Podcast demux
+D: Video Filters: mosaic, gradient and edge detection, magnify, rss, croppadd, erase, extract, gaussianblur, motion detect, puzzle, rotate, bluescreen, alphamask, psychedelic
+D: Demux: podcast, shoutcast
+D: Access: v4l2
 D: HTTP interface pages
-D: Lua (interface,meta fetcher, playlist, ...) modules
+D: Lua (interface, meta fetcher, playlist, ...) modules
 S: France
 
 N: Renaud Dartus
