@@ -268,6 +268,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
                       const char *psz_module,
                       const char *psz_format, va_list _args )
 {
+    assert (p_this);
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     int         i_header_size;             /* Size of the additionnal header */
     vlc_object_t *p_obj;
@@ -281,17 +282,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
 #if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
     int          i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
 #endif
-
-    if( p_this == NULL )
-    {
-#ifndef NDEBUG
-        if( i_type == VLC_MSG_DBG )
-            return;
-#endif
-        utf8_vfprintf( stderr, psz_format, _args );
-        fputc ('\n', stderr);
-        return;
-    }
 
     if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
         (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
