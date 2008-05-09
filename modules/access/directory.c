@@ -166,6 +166,7 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_control= Control;
 
     /* Force a demux */
+    free( p_access->psz_demux );
     p_access->psz_demux = strdup( "directory" );
 
     return VLC_SUCCESS;

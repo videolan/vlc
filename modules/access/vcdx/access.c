@@ -957,6 +957,7 @@ VCDOpen ( vlc_object_t *p_this )
 
     vcdplayer_play( p_access, itemid );
 
+    free( p_access->psz_demux );
     p_access->psz_demux = strdup( "ps" );
 
 #if FIXED

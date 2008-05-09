@@ -657,11 +657,13 @@ static int AccessOpen( vlc_object_t *p_this )
             p_stream->i_fourcc == VLC_FOURCC('d','v','s','d') ||
             p_stream->i_fourcc == VLC_FOURCC('d','v','h','d') )
         {
+            free( p_access->psz_demux );
             p_access->psz_demux = strdup( "rawdv" );
         }
         else if( p_stream->i_fourcc == VLC_FOURCC('m','p','2','v') )
         {
-            p_access->psz_demux = "mpgv";
+            free( p_access->psz_demux );
+            p_access->psz_demux = strdup( "mpgv" );
         }
     }
 

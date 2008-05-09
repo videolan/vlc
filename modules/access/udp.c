@@ -743,16 +743,19 @@ static block_t *BlockChoose( access_t *p_access )
     {
         case 33:
             msg_Dbg( p_access, "detected MPEG2 TS over RTP" );
+            free( p_access->psz_demux );
             p_access->psz_demux = strdup( "ts" );
             break;
 
         case 14:
             msg_Dbg( p_access, "detected MPEG Audio over RTP" );
+            free( p_access->psz_demux );
             p_access->psz_demux = strdup( "mpga" );
             break;
 
         case 32:
             msg_Dbg( p_access, "detected MPEG Video over RTP" );
+            free( p_access->psz_demux );
             p_access->psz_demux = strdup( "mpgv" );
             break;
 

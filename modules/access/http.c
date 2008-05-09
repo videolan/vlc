@@ -454,12 +454,21 @@ connect:
         {
             if( !strcasecmp( p_sys->psz_mime, "video/nsv" ) ||
                 !strcasecmp( p_sys->psz_mime, "video/nsa" ) )
+            {
+                free( p_access->psz_demux );
                 p_access->psz_demux = strdup( "nsv" );
+            }
             else if( !strcasecmp( p_sys->psz_mime, "audio/aac" ) ||
                      !strcasecmp( p_sys->psz_mime, "audio/aacp" ) )
+            {
+                free( p_access->psz_demux );
                 p_access->psz_demux = strdup( "m4a" );
+            }
             else if( !strcasecmp( p_sys->psz_mime, "audio/mpeg" ) )
+            {
+                free( p_access->psz_demux );
                 p_access->psz_demux = strdup( "mp3" );
+            }
 
             msg_Info( p_access, "Raw-audio server found, %s demuxer selected",
                       p_access->psz_demux );
@@ -472,8 +481,9 @@ connect:
         }
         else if( !p_sys->psz_mime )
         {
-             /* Shoutcast */
-             p_access->psz_demux = strdup( "mp3" );
+            free( p_access->psz_demux );
+            /* Shoutcast */
+            p_access->psz_demux = strdup( "mp3" );
         }
         /* else probably Ogg Vorbis */
     }
@@ -481,17 +491,22 @@ connect:
              p_sys->psz_mime &&
              !strcasecmp( p_sys->psz_mime, "misc/ultravox" ) )
     {
+        free( p_access->psz_demux );
         /* Grrrr! detect ultravox server and force NSV demuxer */
         p_access->psz_demux = strdup( "nsv" );
     }
     else if( !strcmp( p_access->psz_access, "itpc" ) )
     {
+        free( p_access->psz_demux );
         p_access->psz_demux = strdup( "podcast" );
     }
     else if( p_sys->psz_mime &&
              !strncasecmp( p_sys->psz_mime, "application/xspf+xml", 20 ) &&
              ( memchr( " ;\t", p_sys->psz_mime[20], 4 ) != NULL ) )
+    {
+        free( p_access->psz_demux );
         p_access->psz_demux = strdup( "xspf-open" );
+    }
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
 
