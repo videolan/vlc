@@ -45,7 +45,7 @@ void system_End       ( libvlc_int_t * );
 #elif defined( __APPLE__ )
 /* Nothing at the moment, create darwin_specific.h when needed */
 #elif defined( WIN32 ) || defined( UNDER_CE )
-VLC_EXPORT( const char * , system_VLCPath, (void));
+
 #else
 # define system_Init( a, b, c )      (void)0
 # define system_Configure( a, b, c ) (void)0
