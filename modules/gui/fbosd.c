@@ -311,17 +311,13 @@ static int Create( vlc_object_t *p_this )
     /* Allocate instance and initialize some members */
     p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
-    {
-        msg_Err( p_intf, "out of memory" );
         return VLC_ENOMEM;
-    };
     memset( p_sys, 0, sizeof(intf_sys_t) );
 
     p_sys->p_style = malloc( sizeof( text_style_t ) );
     if( !p_sys->p_style )
     {
         free( p_intf->p_sys );
-        msg_Err( p_intf, "out of memory" );
         return VLC_ENOMEM;
     }
     vlc_memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
@@ -333,7 +329,6 @@ static int Create( vlc_object_t *p_this )
     {
         free( p_intf->p_sys->p_style );
         free( p_intf->p_sys );
-        msg_Err( p_intf, "out of memory" );
         return VLC_ENOMEM;
     }
 
