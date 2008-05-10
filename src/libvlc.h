@@ -46,13 +46,6 @@ void system_End       ( libvlc_int_t * );
 int vlc_threads_init( void );
 void vlc_threads_end( void );
 
-/** The global thread var for msg stack context
- *  We store this as a static global variable so we don't need a vlc_object_t
- *  everywhere.
- *  This key is created in vlc_threads_init and is therefore ready to use at
- *  the very beginning of the universe */
-extern vlc_threadvar_t msg_context_global_key;
-
 /*
  * CPU capabilities
  */
@@ -107,6 +100,13 @@ typedef struct
 void msg_StackSet ( int, const char*, ... );
 void msg_StackAdd ( const char*, ... );
 const char* msg_StackMsg ( void );
+/** The global thread var for msg stack context
+ *  We store this as a static global variable so we don't need a vlc_object_t
+ *  everywhere.
+ *  This key is created in vlc_threads_init and is therefore ready to use at
+ *  the very beginning of the universe */
+extern vlc_threadvar_t msg_context_global_key;
+void msg_StackDestroy (void *);
 
 /*
  * Unicode stuff

@@ -170,7 +170,8 @@ VLC_EXPORT( int,  vlc_mutex_init_recursive, ( vlc_mutex_t * ) );
 VLC_EXPORT( void,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_cond_t * ) );
 VLC_EXPORT( void,  __vlc_cond_destroy,  ( const char *, int, vlc_cond_t * ) );
-VLC_EXPORT( int, __vlc_threadvar_create, (vlc_threadvar_t * ) );
+VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) );
+VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( void * ), int, bool ) );
 VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
 VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
@@ -432,12 +433,6 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
  *****************************************************************************/
 #define vlc_cond_destroy( P_COND )                                          \
     __vlc_cond_destroy( __FILE__, __LINE__, P_COND )
-
-/*****************************************************************************
- * vlc_threadvar_create: create a thread-local variable
- *****************************************************************************/
-#define vlc_threadvar_create( PTHIS, P_TLS )                                 \
-   __vlc_threadvar_create( P_TLS )
 
 /*****************************************************************************
  * vlc_threadvar_set: create: set the value of a thread-local variable

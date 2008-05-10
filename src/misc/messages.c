@@ -614,6 +614,14 @@ static msg_context_t* GetContext(void)
     return p_ctx;
 }
 
+void msg_StackDestroy (void *data)
+{
+    msg_context_t *p_ctx = data;
+
+    free (p_ctx->psz_message);
+    free (p_ctx);
+}
+
 void msg_StackSet( int i_code, const char *psz_message, ... )
 {
     va_list ap;
@@ -621,10 +629,9 @@ void msg_StackSet( int i_code, const char *psz_message, ... )
 
     if( p_ctx == NULL )
         return;
-
-    va_start( ap, psz_message );
     free( p_ctx->psz_message );
 
+    va_start( ap, psz_message );
     if( vasprintf( &p_ctx->psz_message, psz_message, ap ) == -1 )
         p_ctx->psz_message = NULL;
     va_end( ap );

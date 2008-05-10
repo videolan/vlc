@@ -145,7 +145,7 @@ int vlc_threads_init( void )
         }
 
         /* We should be safe now. Do all the initialization stuff we want. */
-        vlc_threadvar_create( p_root, &msg_context_global_key );
+        vlc_threadvar_create( &msg_context_global_key, msg_StackDestroy );
     }
     i_initializations++;
 
@@ -173,7 +173,10 @@ void vlc_threads_end( void )
     assert( i_initializations > 0 );
 
     if( i_initializations == 1 )
+    {
         vlc_object_release( p_root );
+        vlc_threadvar_delete( &msg_context_global_key );
+    }
     i_initializations--;
 
 #if defined( LIBVLC_USE_PTHREAD )
@@ -374,13 +377,14 @@ void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condva
 /*****************************************************************************
  * vlc_tls_create: create a thread-local variable
  *****************************************************************************/
-int __vlc_threadvar_create( vlc_threadvar_t *p_tls )
+int vlc_threadvar_create( vlc_threadvar_t *p_tls, void (*destr) (void *) )
 {
-    int i_ret = -1;
+    int i_ret;
 
 #if defined( LIBVLC_USE_PTHREAD )
-    i_ret =  pthread_key_create( p_tls, NULL );
+    i_ret =  pthread_key_create( p_tls, destr );
 #elif defined( UNDER_CE )
+    i_ret = ENOSYS;
 #elif defined( WIN32 )
     *p_tls = TlsAlloc();
     i_ret = (*p_tls == TLS_OUT_OF_INDEXES) ? EAGAIN : 0;
@@ -388,6 +392,18 @@ int __vlc_threadvar_create( vlc_threadvar_t *p_tls )
 # error Unimplemented!
 #endif
     return i_ret;
+}
+
+void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
+{
+#if defined( LIBVLC_USE_PTHREAD )
+    pthread_key_delete (p_tls);
+#elif defined( UNDER_CE )
+#elif defined( WIN32 )
+    TlsFree (*p_tls);
+#else
+# error Unimplemented!
+#endif
 }
 
 /*****************************************************************************
