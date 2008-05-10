@@ -447,7 +447,7 @@ void LibavcodecCallback( void *p_opaque, int i_level,
                               + 18 + 5 );
     snprintf( psz_new_format, strlen(psz_format) + strlen(psz_item_name)
               + 18 + 5, "%s (%s@%p)", psz_format, p_avc->item_name(p_opaque), p_opaque );
-    msg_GenericVa( p_this, MSG_QUEUE_NORMAL, i_vlc_level,
+    msg_GenericVa( p_this, i_vlc_level,
                     MODULE_STRING, psz_new_format, va );
     free( psz_new_format );
 }

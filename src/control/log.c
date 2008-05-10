@@ -69,7 +69,7 @@ libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t
     if( !p_log ) RAISENULL( "Out of memory" );
 
     p_log->p_instance = p_instance;
-    p_log->p_messages = msg_Subscribe(p_instance->p_libvlc_int, MSG_QUEUE_NORMAL);
+    p_log->p_messages = msg_Subscribe(p_instance->p_libvlc_int);
 
     if( !p_log->p_messages )
     {

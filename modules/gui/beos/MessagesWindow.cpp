@@ -126,7 +126,7 @@ MessagesWindow::MessagesWindow( intf_thread_t * _p_intf,
 {
     SetSizeLimits( 400, 2000, 200, 2000 );
 
-    p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
+    p_sub = msg_Subscribe( p_intf );
  
     BRect rect, textRect;
 

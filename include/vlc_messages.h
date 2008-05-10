@@ -66,9 +66,6 @@ typedef struct
 /** debug messages */
 #define VLC_MSG_DBG   3
 
-#define MSG_QUEUE_NORMAL 0
-#define MSG_QUEUE_HTTPD_ACCESS 1
-
 /**
  * Used by interface plugins which subscribe to the message bank.
  */
@@ -84,30 +81,30 @@ struct msg_subscription_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 5, 6 ) );
-VLC_EXPORT( void, __msg_GenericVa, ( vlc_object_t *, int, int, const char *, const char *, va_list args ) );
-#define msg_GenericVa(a, b, c, d, e,f) __msg_GenericVa(VLC_OBJECT(a), b, c, d, e,f)
+VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 4, 5 ) );
+VLC_EXPORT( void, __msg_GenericVa, ( vlc_object_t *, int, const char *, const char *, va_list args ) );
+#define msg_GenericVa(a, b, c, d, e) __msg_GenericVa(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( void, __msg_Info,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Err,     ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Warn,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Dbg,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 
 #define msg_Info( p_this, ... ) \
-      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_INFO, \
+      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_INFO, \
                      MODULE_STRING, __VA_ARGS__ )
 #define msg_Err( p_this, ... ) \
-      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_ERR, \
+      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_ERR, \
                      MODULE_STRING, __VA_ARGS__ )
 #define msg_Warn( p_this, ... ) \
-      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_WARN, \
+      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_WARN, \
                      MODULE_STRING, __VA_ARGS__ )
 #define msg_Dbg( p_this, ... ) \
-      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_DBG, \
+      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_DBG, \
                      MODULE_STRING, __VA_ARGS__ )
 
-#define msg_Subscribe(a,b) __msg_Subscribe(VLC_OBJECT(a),b)
+#define msg_Subscribe(a) __msg_Subscribe(VLC_OBJECT(a))
 #define msg_Unsubscribe(a,b) __msg_Unsubscribe(VLC_OBJECT(a),b)
-VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t *, int ) );
+VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t * ) );
 VLC_EXPORT( void, __msg_Unsubscribe, ( vlc_object_t *, msg_subscription_t * ) );
 
 /**

@@ -107,7 +107,7 @@ int OpenIntf ( vlc_object_t *p_this )
     p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
     p_intf->p_sys->o_sendport = [[NSPort port] retain];
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
     p_intf->b_play = true;
     p_intf->pf_run = Run;
     p_intf->b_should_run_on_first_thread = true;

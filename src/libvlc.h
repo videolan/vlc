@@ -63,12 +63,8 @@ uint32_t CPUCapabilities( void );
  * Message/logging stuff
  */
 
-#define NB_QUEUES 2
-
 typedef struct msg_queue_t
 {
-    int                     i_id;
-
     /** Message queue lock */
     vlc_mutex_t             lock;
     bool              b_overflow;
@@ -94,7 +90,7 @@ typedef struct msg_queue_t
 typedef struct msg_bank_t
 {
     vlc_mutex_t             lock;
-    msg_queue_t             queues[NB_QUEUES];
+    msg_queue_t             queue;
 } msg_bank_t;
 
 void msg_Create  (libvlc_int_t *);
