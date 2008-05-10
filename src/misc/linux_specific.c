@@ -22,13 +22,13 @@
 # include "config.h"
 #endif
 
+#include <vlc/vlc.h>
+#include "../libvlc.h"
+
 #if 0
 #include <stdio.h>
 #include <assert.h>
 #include <pthread.h>
-
-#include <vlc/vlc.h>
-#include "../libvlc.h"
 
 static void set_libvlc_path (void)
 {
