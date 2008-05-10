@@ -223,6 +223,8 @@ libvlc_la_SOURCES += $(SOURCES_libvlc_win32)
 else
 if HAVE_WINCE
 libvlc_la_SOURCES += $(SOURCES_libvlc_win32)
+else
+libvlc_la_SOURCES += $(SOURCES_libvlc_other)
 endif
 endif
 endif
