@@ -903,37 +903,21 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
+    const char *vlcpath = vlc_global()->psz_vlcpath;
     int count,i;
     char * path;
     vlc_array_t *arraypaths = vlc_array_new();
 
     /* Contruct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/modules and <vlc path>/plugins. */
-#define RETURN_ENOMEM                               \
-    {                                               \
-        msg_Err( p_this, "Not enough memory" );     \
-        return;                                     \
-    }
 
-    vlc_array_append( arraypaths, strdup( "modules" ) );
-#if defined( WIN32 ) || defined( UNDER_CE ) || defined( __APPLE__ ) || defined( SYS_BEOS )
-    if( asprintf( &path, "%s" DIR_SEP "modules",
-        vlc_global()->psz_vlcpath ) < 0 )
-        RETURN_ENOMEM
-    vlc_array_append( arraypaths, path );
-    if( asprintf( &path, "%s" DIR_SEP "plugins",
-        vlc_global()->psz_vlcpath ) < 0 )
-        RETURN_ENOMEM
-    vlc_array_append( arraypaths, path );
-#if ! defined( WIN32 ) && ! defined( UNDER_CE )
-    if( asprintf( &path, "%s", PLUGIN_PATH ) < 0 )
-        RETURN_ENOMEM
-    vlc_array_append( arraypaths, path );
-#endif
-#else
+    if( vlcpath && asprintf( &path, "%s" DIR_SEP "modules", vlcpath ) != -1 )
+        vlc_array_append( arraypaths, path );
+    if( vlcpath && asprintf( &path, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
+        vlc_array_append( arraypaths, path );
+#ifndef WIN32
     vlc_array_append( arraypaths, strdup( PLUGIN_PATH ) );
 #endif
-    vlc_array_append( arraypaths, strdup( "plugins" ) );
 
     /* If the user provided a plugin path, we add it to the list */
     char * userpaths = config_GetPsz( p_this, "plugin-path" );
@@ -942,9 +926,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     for( paths_iter = userpaths; paths_iter; )
     {
         path = copy_next_paths_token( paths_iter, &paths_iter );
-        if( !path )
-            RETURN_ENOMEM
-        vlc_array_append( arraypaths, strdup( path ) );
+        if( path )
+            vlc_array_append( arraypaths, strdup( path ) );
     }
 
     count = vlc_array_count( arraypaths );
@@ -952,9 +935,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     {
         path = vlc_array_item_at_index( arraypaths, i );
         if( !path )
-        {
             continue;
-        }
 
         msg_Dbg( p_this, "recursively browsing `%s'", path );
 
@@ -965,7 +946,6 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     }
 
     vlc_array_destroy( arraypaths );
-#undef RETURN_ENOMEM
 }
 
 /*****************************************************************************
