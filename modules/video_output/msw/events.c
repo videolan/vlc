@@ -1205,6 +1205,10 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
 
             HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
             ShowWindow( topLevelParent, SW_HIDE );
+
+            /* Disable "video-on-top" status for main interface if needed */
+            if( var_GetBool( p_vout, "video-on-top" ) )
+                ControlParentWindow( p_vout, VOUT_SET_STAY_ON_TOP, false );
         }
 
         SetForegroundWindow( hwnd );
