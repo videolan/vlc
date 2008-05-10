@@ -307,7 +307,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     rtmp_packet_t *rtmp_packet;
     uint8_t *tmp_buffer;
     ssize_t i_ret;
-    int i_len_tmp;
+    size_t i_len_tmp;
 
     i_len_tmp = 0;
 
@@ -368,7 +368,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             i_len_tmp += i_len - i_len_tmp;
         }
     }
-    if( i_len_tmp > 0 ) {
+    if( i_len_tmp > 0 )
+    {
         if( p_sys->p_thread->result_publish )
         {
             /* Send publish onStatus event only once */
@@ -424,6 +425,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Seek( access_t *p_access, int64_t i_pos )
 {
+    VLC_UNUSED( p_access );
+    VLC_UNUSED( i_pos );
 /*msg_Warn ( p_access, "Seek to %lld", i_pos);
     switch( rtmp_seek( p_access, i_pos ) )
     {
