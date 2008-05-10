@@ -380,7 +380,7 @@ nvlc: make-alias
 	$(MKALIAS) ncurses
 
 if BUILD_VLC
-noinst_SCRIPTS = vlc$(EXEEXT)
+noinst_SCRIPTS += vlc$(EXEEXT)
 endif
 
 vlc$(EXEEXT): core
