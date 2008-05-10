@@ -3,9 +3,10 @@
 # obviously does not. Here is a fix for that.
 LIBTOOL=@LIBTOOL@ --tag=CC
 
+BASE_SUBDIRS = dvb mms cdda rtsp rtmp v4l2 vcd vcdx screen
 EXTRA_SUBDIRS = bda dshow
-SUBDIRS = dvb mms cdda rtsp rtmp v4l2 vcd vcdx screen
-DIST_SUBDIRS = $(EXTRA_SUBDIRS) $(SUBDIRS)
+SUBDIRS = $(BASE_SUBDIRS)
+DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 if HAVE_WIN32
 SUBDIRS += bda dshow

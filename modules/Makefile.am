@@ -1,4 +1,4 @@
-SUBDIRS = \
+BASE_SUBDIRS = \
 	access \
 	access_filter \
 	audio_filter \
@@ -20,11 +20,12 @@ EXTRA_SUBDIRS = \
 	access_output \
 	mux \
 	stream_out
+
+SUBDIRS = $(BASE_SUBDIRS)
+DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 if ENABLE_SOUT
 SUBDIRS += access_output mux stream_out
 endif
-
-DIST_SUBDIRS = $(SUBDIRS) $(EXTRA_SUBDIRS)
 
 dist_noinst_SCRIPTS = genmf list.sh
 dist_noinst_DATA = LIST

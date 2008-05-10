@@ -1,5 +1,8 @@
-SUBDIRS = dummy memcpy notify testsuite playlist osd xml probe
-DIST_SUBDIRS = lua $(SUBDIRS)
+BASE_SUBDIRS = dummy memcpy notify testsuite playlist osd xml probe
+EXTRA_SUBDIRS = lua
+
+SUBDIRS = $(BASE_SUBDIRS)
+DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 if BUILD_LUA
 SUBDIRS += lua

@@ -7,11 +7,12 @@
 # which have makefiles with distribution information.
 #  - src (libvlc) is nedeed by modules, mozilla and bindings
 #  - libs/* are needed by modules
+BASE_SUBDIRS = po src modules share doc test
 EXTRA_SUBDIRS = m4 extras/package/ipkg \
 	bindings/python \
 	libs/loader libs/srtp \
 	projects/mozilla projects/activex
-DIST_SUBDIRS = $(SUBDIRS) $(EXTRA_SUBDIRS)
+DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 SUBDIRS = po src
 if LOADER
