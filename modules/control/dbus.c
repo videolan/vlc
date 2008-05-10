@@ -315,7 +315,22 @@ DBUS_METHOD( Play )
 {
     REPLY_INIT;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    playlist_Play( p_playlist );
+
+    PL_LOCK;
+    input_thread_t *p_input = p_playlist->p_input;
+    if( p_input )
+        vlc_object_yield( p_input );
+    PL_UNLOCK;
+
+    if( p_input )
+    {
+        double i_pos = 0;
+        input_Control( p_input, INPUT_SET_POSITION, i_pos );
+        vlc_object_release( p_input );
+    }
+    else
+        playlist_Play( p_playlist );
+
     pl_Release( p_playlist );
     REPLY_SEND;
 }
