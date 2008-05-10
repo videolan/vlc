@@ -40,19 +40,6 @@ void system_Init      ( libvlc_int_t *, int *, const char *[] );
 void system_Configure ( libvlc_int_t *, int *, const char *[] );
 void system_End       ( libvlc_int_t * );
 
-#if defined( SYS_BEOS )
-/* Nothing at the moment, create beos_specific.h when needed */
-#elif defined( __APPLE__ )
-/* Nothing at the moment, create darwin_specific.h when needed */
-#elif defined( WIN32 ) || defined( UNDER_CE )
-
-#else
-# define system_Init( a, b, c )      (void)0
-# define system_Configure( a, b, c ) (void)0
-# define system_End( a )             (void)0
-#endif
-
-
 /*
  * Threads subsystem
  */
@@ -154,14 +141,7 @@ typedef struct libvlc_global_data_t
 
     module_bank_t *        p_module_bank; ///< The module bank
 
-    /* Arch-specific variables */
-#if defined( SYS_BEOS )
     char *                 psz_vlcpath;
-#elif defined( __APPLE__ )
-    char *                 psz_vlcpath;
-#elif defined( WIN32 )
-    char *                 psz_vlcpath;
-#endif
 } libvlc_global_data_t;
 
 

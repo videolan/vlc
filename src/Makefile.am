@@ -173,6 +173,7 @@ libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DDATA_PATH=\"$(pkgdatadir)\" \
+	-DLIBDIR=\"$(libdir)\" \
 	-DPLUGIN_PATH=\"$(pkglibdir)\"
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
@@ -201,22 +202,31 @@ endif
 EXTRA_libvlc_la_SOURCES = \
 	$(SOURCES_libvlc_beos) \
 	$(SOURCES_libvlc_darwin) \
+	$(SOURCES_libvlc_linux) \
 	$(SOURCES_libvlc_win32) \
+	$(SOURCES_libvlc_other) \
 	$(SOURCES_libvlc_dirent) \
 	$(SOURCES_libvlc_getopt) \
 	$(SOURCES_libvlc_sout) \
 	$(NULL)
 if HAVE_BEOS
 libvlc_la_SOURCES += $(SOURCES_libvlc_beos)
-endif
+else
 if HAVE_DARWIN
 libvlc_la_SOURCES += $(SOURCES_libvlc_darwin)
-endif
+else
+if HAVE_LINUX
+libvlc_la_SOURCES += $(SOURCES_libvlc_linux)
+else
 if HAVE_WIN32
 libvlc_la_SOURCES += $(SOURCES_libvlc_win32)
-endif
+else
 if HAVE_WINCE
 libvlc_la_SOURCES += $(SOURCES_libvlc_win32)
+endif
+endif
+endif
+endif
 endif
 if BUILD_DIRENT
 libvlc_la_SOURCES += $(SOURCES_libvlc_dirent)
@@ -236,10 +246,16 @@ SOURCES_libvlc_darwin = \
 	misc/darwin_specific.c \
 	$(NULL)
 
+SOURCES_libvlc_linux = \
+	misc/linux_specific.c \
+	$(NULL)
+
 SOURCES_libvlc_win32 = \
 	misc/win32_specific.c \
 	network/winsock.c \
 	$(NULL)
+
+SOURCES_libvlc_other = misc/not_specific.c
 
 SOURCES_libvlc_dirent = \
 	extras/dirent.c \
