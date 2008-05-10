@@ -204,10 +204,10 @@ void VLMSliderManager::ProcessUpdate( wxScrollEvent &event )
             char psz_time[ MSTRTIME_MAX_SIZE ], psz_total[ MSTRTIME_MAX_SIZE ];
             mtime_t i_seconds;
 
-            i_seconds = var_GetTime( p_input, "length" ) / I64C(1000000 );
+            i_seconds = var_GetTime( p_input, "length" ) / INT64_C( 1000000 );
             secstotimestr( psz_total, i_seconds );
 
-            i_seconds = var_GetTime( p_input, "time" ) /   I64C(1000000 );
+            i_seconds = var_GetTime( p_input, "time" ) / INT_64C( 1000000 );
             secstotimestr( psz_time, i_seconds );
 
             time_string = wxU(psz_time) + wxString(wxT(" / ") ) +wxU(psz_total) ;

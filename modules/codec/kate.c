@@ -564,7 +564,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
 
     p_spu->p_region->psz_text = strdup(ev->text); /* no leak, this actually gets killed by the core */
     p_spu->i_start = p_block->i_pts;
-    p_spu->i_stop = p_block->i_pts + I64C(1000000)*ev->duration*p_sys->ki.gps_denominator/p_sys->ki.gps_numerator;
+    p_spu->i_stop = p_block->i_pts + INT64_C(1000000)*ev->duration*p_sys->ki.gps_denominator/p_sys->ki.gps_numerator;
     p_spu->b_ephemer = (p_block->i_length == 0);
     p_spu->b_absolute = false;
 
