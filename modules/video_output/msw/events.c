@@ -1205,10 +1205,6 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
 
             HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
             ShowWindow( topLevelParent, SW_HIDE );
-
-            /* Disable "video-on-top" status for main interface if needed */
-            if( var_GetBool( p_vout, "video-on-top" ) )
-                ControlParentWindow( p_vout, VOUT_SET_STAY_ON_TOP, false );
         }
 
         SetForegroundWindow( hwnd );
@@ -1235,22 +1231,18 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
             ShowWindow( topLevelParent, SW_SHOW );
             SetForegroundWindow( p_vout->p_sys->hparent );
             ShowWindow( hwnd, SW_HIDE );
-
-            /* Update "video-on-top" status for main interface window, it
-            needs to be updated as we were hiding VOUT_SET_STAY_ON_TOP
-            queries from it while we were in fullscreen mode */
-            int b_ontop = var_GetBool( p_vout, "video-on-top" );
-            ControlParentWindow( p_vout, VOUT_SET_STAY_ON_TOP, b_ontop );
         }
 
         /* Make sure the mouse cursor is displayed */
         PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
     }
 
-    {
-        vlc_value_t val;
-        /* Update the object variable and trigger callback */
-        val.b_bool = p_vout->b_fullscreen;
-        var_Set( p_vout, "fullscreen", val );
-    }
+    vlc_value_t val;
+    /* Update the object variable and trigger callback */
+    val.b_bool = p_vout->b_fullscreen;
+    var_Set( p_vout, "fullscreen", val );
+
+    /* Disable video-on-top while in fullscreen mode */
+    if( var_GetBool( p_vout, "video-on-top" ) )
+        ControlParentWindow( p_vout, VOUT_SET_STAY_ON_TOP, !val.b_bool );
 }
