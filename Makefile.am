@@ -383,14 +383,12 @@ if BUILD_VLC
 noinst_SCRIPTS += vlc$(EXEEXT)
 endif
 
-vlc$(EXEEXT): core
-	rm -f vlc$(EXEEXT)
-	ln -s src/vlc$(EXEEXT)
-#	rm -f -- vlc vlc.tmp
-#	echo '#! /bin/sh' > vlc.tmp
-#	echo 'exec "$$(dirname "$$0")/src/vlc$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
-#	chmod +x vlc.tmp
-#	mv -f -- vlc.tmp vlc
+vlc$(EXEEXT): Makefile.am
+	rm -f -- vlc vlc.tmp
+	echo '#! /bin/sh' > vlc.tmp
+	echo 'exec "$$(dirname "$$0")/src/vlc$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
+	chmod +x vlc.tmp
+	mv -f -- vlc.tmp vlc
 
 if HAVE_DARWIN
 # Create the MacOS X app
