@@ -618,7 +618,9 @@ void msg_StackSet( int i_code, const char *psz_message, ... )
 {
     va_list ap;
     msg_context_t *p_ctx = GetContext();
-    assert( p_ctx );
+
+    if( p_ctx == NULL )
+        return;
 
     va_start( ap, psz_message );
     free( p_ctx->psz_message );
@@ -635,7 +637,9 @@ void msg_StackAdd( const char *psz_message, ... )
     char *psz_tmp;
     va_list ap;
     msg_context_t *p_ctx = GetContext();
-    assert( p_ctx );
+
+    if( p_ctx == NULL )
+        return;
 
     va_start( ap, psz_message );
     if( vasprintf( &psz_tmp, psz_message, ap ) == -1 )
