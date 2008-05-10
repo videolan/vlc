@@ -82,9 +82,9 @@ static void PrintMsg ( vlc_object_t *, msg_item_t * );
  * Initialize messages queues
  * This function initializes all message queues
  */
-void __msg_Create( vlc_object_t *p_this )
+void msg_Create (libvlc_int_t *p_libvlc)
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     vlc_mutex_init( &priv->msg_bank.lock );
 
     for( int i = 0; i < 2; i++ )
@@ -110,9 +110,9 @@ void __msg_Create( vlc_object_t *p_this )
 /**
  * Flush all message queues
  */
-void __msg_Flush( vlc_object_t *p_this )
+void msg_Flush (libvlc_int_t *p_libvlc)
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
 
     for( int i = 0 ; i < NB_QUEUES ; i++ )
     {
@@ -129,14 +129,14 @@ void __msg_Flush( vlc_object_t *p_this )
  * then frees all the allocated ressources
  * No other messages interface functions should be called after this one.
  */
-void __msg_Destroy( vlc_object_t *p_this )
+void msg_Destroy (libvlc_int_t *p_libvlc)
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
 
     for( int i = NB_QUEUES -1 ; i >= 0;  i-- )
     {
         if( QUEUE(i).i_sub )
-            msg_Err( p_this, "stale interface subscribers" );
+            msg_Err( p_libvlc, "stale interface subscribers" );
 
         FlushMsg( &QUEUE(i) );
 

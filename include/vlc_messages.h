@@ -41,17 +41,6 @@
  * @{
  */
 
-/** Internal message stack context */
-typedef struct
-{
-    int i_code;
-    char * psz_message;
-} msg_context_t;
-
-void msg_StackSet ( int, const char*, ... );
-void msg_StackAdd ( const char*, ... );
-const char* msg_StackMsg ( void );
-
 /**
  * Store a single message sent to user.
  */
@@ -115,13 +104,6 @@ VLC_EXPORT( void, __msg_Dbg,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_
 #define msg_Dbg( p_this, ... ) \
       __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_DBG, \
                      MODULE_STRING, __VA_ARGS__ )
-
-#define msg_Create(a) __msg_Create(VLC_OBJECT(a))
-#define msg_Flush(a) __msg_Flush(VLC_OBJECT(a))
-#define msg_Destroy(a) __msg_Destroy(VLC_OBJECT(a))
-void __msg_Create  ( vlc_object_t * );
-void __msg_Flush   ( vlc_object_t * );
-void __msg_Destroy ( vlc_object_t * );
 
 #define msg_Subscribe(a,b) __msg_Subscribe(VLC_OBJECT(a),b)
 #define msg_Unsubscribe(a,b) __msg_Unsubscribe(VLC_OBJECT(a),b)

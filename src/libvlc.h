@@ -89,13 +89,28 @@ typedef struct msg_queue_t
 } msg_queue_t;
 
 /**
- * Store all data requiered by messages interfaces.
+ * Store all data required by messages interfaces.
  */
 typedef struct msg_bank_t
 {
     vlc_mutex_t             lock;
     msg_queue_t             queues[NB_QUEUES];
 } msg_bank_t;
+
+void msg_Create  (libvlc_int_t *);
+void msg_Flush   (libvlc_int_t *);
+void msg_Destroy (libvlc_int_t *);
+
+/** Internal message stack context */
+typedef struct
+{
+    int i_code;
+    char * psz_message;
+} msg_context_t;
+
+void msg_StackSet ( int, const char*, ... );
+void msg_StackAdd ( const char*, ... );
+const char* msg_StackMsg ( void );
 
 /*
  * Unicode stuff
