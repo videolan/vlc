@@ -223,6 +223,7 @@ const uint8_t FLV_VIDEO_FRAME_TYPE_MASK = 0xF0;
 const uint8_t FLV_VIDEO_FRAME_TYPE_KEYFRAME = 0x10;
 const uint8_t FLV_VIDEO_FRAME_TYPE_INTER_FRAME = 0x20;
 const uint8_t FLV_VIDEO_FRAME_TYPE_DISPOSABLE_INTER_FRAME = 0x30;
+
 /*****************************************************************************
  * static RTMP functions:
  ******************************************************************************/
@@ -429,6 +430,7 @@ rtmp_connect_active( rtmp_control_thread_t *p_thread )
     free( tmp_buffer );
 
     tmp_url = (char *) malloc( strlen( "rtmp://") + strlen( p_thread->url.psz_buffer ) + 1 );
+    /* FIXME: Handle error case when malloc FAILS */
     sprintf( tmp_url, "rtmp://%s", p_thread->url.psz_buffer );
     tmp_buffer = amf_encode_object_variable( "tcUrl",
         AMF_DATATYPE_STRING, tmp_url );
@@ -781,6 +783,8 @@ rtmp_build_bytes_read( rtmp_control_thread_t *p_thread, uint32_t reply )
     rtmp_body = rtmp_body_new( -1 );
 
     tmp_buffer = (uint8_t *) malloc( sizeof( uint32_t ) * sizeof( uint8_t ) );
+    if( !tmp_buffer ) return NULL;
+
     reply = hton32( reply );
     memcpy( tmp_buffer, &reply, sizeof( uint32_t ) );
 
@@ -997,6 +1001,7 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
         if( p_thread->rtmp_headers_recv[stream_index].length_body == p_thread->rtmp_headers_recv[stream_index].body->length_body )
         {
             rtmp_packet = (rtmp_packet_t *) malloc( sizeof( rtmp_packet_t ) );
+            if( !rtmp_packet ) goto error;
 
             rtmp_packet->stream_index = stream_index;
             rtmp_packet->timestamp = p_thread->rtmp_headers_recv[stream_index].timestamp;
@@ -1014,7 +1019,6 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
 
 error:
     msg_Err( p_thread, "rtmp_read_net_packet: net_Read error");
-
     return NULL;
 }
 
@@ -1042,6 +1046,7 @@ rtmp_init_handler( rtmp_handler_t *rtmp_handler )
 static void
 rtmp_handler_null( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet )
 {
+    VLC_UNUSED(p_thread);
     free( rtmp_packet->body->body );
     free( rtmp_packet->body );
     free( rtmp_packet );
@@ -1455,6 +1460,8 @@ rtmp_new_packet( rtmp_control_thread_t *p_thread, uint8_t stream_index, uint32_t
     rtmp_packet_t *rtmp_packet;
 
     rtmp_packet = (rtmp_packet_t *) malloc( sizeof( rtmp_packet_t ) );
+    if( !rtmp_packet ) return NULL;
+
     interchunk_headers = body->length_body / p_thread->chunk_size_send;
     if( body->length_body % p_thread->chunk_size_send == 0 )
         interchunk_headers--;
@@ -1509,10 +1516,21 @@ rtmp_new_packet( rtmp_control_thread_t *p_thread, uint8_t stream_index, uint32_t
     rtmp_packet->src_dst = src_dst;
 
     rtmp_packet->body = (rtmp_body_t *) malloc( sizeof( rtmp_body_t ) );
+    if( !rtmp_packet->body )
+    {
+       free( rtmp_packet );
+       return NULL;
+    }
 
     rtmp_packet->body->length_body = body->length_body;
     rtmp_packet->body->length_buffer = body->length_body;
     rtmp_packet->body->body = (uint8_t *) malloc( rtmp_packet->body->length_buffer * sizeof( uint8_t ) );
+    if( !rtmp_packet->body->body )
+    {
+        free( rtmp_packet->body );
+        free( rtmp_packet );
+        return NULL;
+    }
     memcpy( rtmp_packet->body->body, body->body, rtmp_packet->body->length_body );
 
     return rtmp_packet;
@@ -1557,6 +1575,8 @@ rtmp_encode_packet( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet 
     int i, j;
 
     out = (uint8_t *) malloc( rtmp_packet->length_encoded * sizeof( uint8_t ) );
+    if( !out ) return NULL;
+
     interchunk_headers = rtmp_packet->body->length_body / p_thread->chunk_size_send;
     if( rtmp_packet->body->length_body % p_thread->chunk_size_send == 0 )
         interchunk_headers--;
@@ -1833,6 +1853,8 @@ rtmp_encode_NetStream_play_reset_onStatus( rtmp_control_thread_t *p_thread, char
     free( tmp_buffer );
 
     description = (char *) malloc( strlen( "Playing and resetting ") + strlen( psz_media ) + strlen( "." ) + 1 );
+    /* FIXME: Handle error case when malloc FAILS */
+
     sprintf( description, "Playing and resetting %s.", psz_media );
     tmp_buffer = amf_encode_object_variable( "description",
         AMF_DATATYPE_STRING, description );
@@ -1913,6 +1935,8 @@ rtmp_encode_NetStream_play_start_onStatus( rtmp_control_thread_t *p_thread, char
     free( tmp_buffer );
 
     description = (char *) malloc( strlen( "Started playing ") + strlen( psz_media ) + strlen( "." ) + 1 );
+    /* FIXME: Handle error case when MALLOC FAILS */
+
     sprintf( description, "Started playing %s.", psz_media );
     tmp_buffer = amf_encode_object_variable( "description",
         AMF_DATATYPE_STRING, description );
@@ -2006,6 +2030,7 @@ rtmp_body_new( int length_buffer )
     rtmp_body_t *rtmp_body;
 
     rtmp_body = (rtmp_body_t *) malloc( sizeof( rtmp_body_t ) );
+    if( !rtmp_body ) return NULL;
 
     rtmp_body->length_body = 0;
     if( length_buffer < 0 )
@@ -2013,7 +2038,11 @@ rtmp_body_new( int length_buffer )
     else
         rtmp_body->length_buffer = length_buffer;
     rtmp_body->body = (uint8_t *) malloc( rtmp_body->length_buffer * sizeof( uint8_t ) );
-
+    if( !rtmp_body->body )
+    {
+        free( rtmp_body );
+        return NULL;
+    }
     return rtmp_body;
 }
 
@@ -2042,7 +2071,8 @@ rtmp_body_append( rtmp_body_t *rtmp_body, uint8_t *buffer, uint32_t length )
 static uint8_t *
 rtmp_encode_ping( uint16_t type, uint32_t src_dst, uint32_t third_arg, uint32_t fourth_arg )
 {
-    uint8_t *out;
+    uint8_t *out = NULL;
+    VLC_UNUSED(fourth_arg);
 
     if( type == RTMP_PING_CLEAR_STREAM )
         out = (uint8_t *) malloc( RTMP_PING_SIZE_CLEAR_STREAM * sizeof( uint8_t ) );
@@ -2051,7 +2081,7 @@ rtmp_encode_ping( uint16_t type, uint32_t src_dst, uint32_t third_arg, uint32_t 
     else if( type == RTMP_PING_BUFFER_TIME_CLIENT )
     {
         out = (uint8_t *) malloc( RTMP_PING_SIZE_BUFFER_TIME_CLIENT * sizeof( uint8_t ) );
-
+        if( !out ) goto error;
         third_arg = hton32( third_arg );
         memcpy( out + 6, &third_arg, sizeof( uint32_t ) );
     }
@@ -2068,9 +2098,11 @@ rtmp_encode_ping( uint16_t type, uint32_t src_dst, uint32_t third_arg, uint32_t 
 */    else
     {
         out = (uint8_t *) malloc( RTMP_PING_SIZE_BUFFER_TIME_CLIENT * sizeof( uint8_t ) );
-
+        if( !out ) goto error;
         out[6] = 0x0D; out[7] = 0x0E; out[8] = 0x0A; out[9] = 0x0D;
     }
+
+    if( !out ) goto error;
 
     type = hton16( type );
     memcpy( out, &type, sizeof( uint16_t ) );
@@ -2079,6 +2111,9 @@ rtmp_encode_ping( uint16_t type, uint32_t src_dst, uint32_t third_arg, uint32_t 
     memcpy( out + 2, &src_dst, sizeof( uint32_t ) );
 
     return out;
+
+error:
+    return NULL;
 }
 
 /*****************************************************************************
@@ -2094,6 +2129,7 @@ amf_encode_element( uint8_t element, const void *value )
         uint64_t number = *(uint64_t *) value;
 
         out = (uint8_t *) malloc( AMF_DATATYPE_SIZE_NUMBER * sizeof( uint8_t ) );
+        if( !out ) return NULL;
         
         number = hton64( number );
         out[0] = AMF_DATATYPE_NUMBER;
@@ -2101,6 +2137,7 @@ amf_encode_element( uint8_t element, const void *value )
     } else if ( element == AMF_DATATYPE_BOOLEAN )
     {
         out = (uint8_t *) malloc( AMF_DATATYPE_SIZE_BOOLEAN * sizeof( uint8_t ) );
+        if( !out ) return NULL;
 
         out[0] = AMF_DATATYPE_BOOLEAN;
         out[1] = *(uint8_t *) value;
@@ -2110,6 +2147,7 @@ amf_encode_element( uint8_t element, const void *value )
 
         length_psz = length_psz_cpy = strlen( (char *) value );
         out = (uint8_t *) malloc( ( AMF_DATATYPE_SIZE_STRING + length_psz ) * sizeof( uint8_t ) );
+        if( !out ) return NULL;
 
         out[0] = AMF_DATATYPE_STRING;
         length_psz = hton16( length_psz );
@@ -2118,11 +2156,13 @@ amf_encode_element( uint8_t element, const void *value )
     } else if ( element == AMF_DATATYPE_OBJECT )
     {
         out = (uint8_t *) malloc( AMF_DATATYPE_SIZE_OBJECT * sizeof( uint8_t ) );
+        if( !out ) return NULL;
 
         out[0] = AMF_DATATYPE_OBJECT;
     } else if ( element == AMF_DATATYPE_NULL )
     {
         out = (uint8_t *) malloc( AMF_DATATYPE_SIZE_NULL * sizeof( uint8_t ) );
+        if( !out ) return NULL;
 
         out[0] = AMF_DATATYPE_NULL;
     } else if ( element == AMF_DATATYPE_MIXED_ARRAY )
@@ -2130,6 +2170,7 @@ amf_encode_element( uint8_t element, const void *value )
         uint32_t highest_index = *(uint32_t *) value;
 
         out = (uint8_t *) malloc( AMF_DATATYPE_SIZE_MIXED_ARRAY * sizeof( uint8_t ) );
+        if( !out ) return NULL;
 
         highest_index = hton32( highest_index );
         out[0] = AMF_DATATYPE_MIXED_ARRAY;
@@ -2142,6 +2183,7 @@ amf_encode_element( uint8_t element, const void *value )
     } else
     {
         out = (uint8_t *) malloc( AMF_DATATYPE_SIZE_NUMBER * sizeof( uint8_t ) );
+        if( !out ) return NULL;
 
         out[0] = AMF_DATATYPE_NUMBER;
         out[1] = 0x0D; out[2] = 0x0E; out[3] = 0x0A; out[4] = 0x0D;
@@ -2171,6 +2213,7 @@ amf_encode_object_variable( const char *key, uint8_t element, const void *value 
     else
     {
         out = (uint8_t *) malloc( AMF_DATATYPE_SIZE_NUMBER * sizeof( uint8_t ) );
+        if( !out ) return NULL;
 
         out[0] = AMF_DATATYPE_NUMBER;
         out[1] = 0xD; out[2] = 0xE; out[3] = 0xA; out[4] = 0xD;
@@ -2180,6 +2223,7 @@ amf_encode_object_variable( const char *key, uint8_t element, const void *value 
     }
 
     out = (uint8_t *) malloc( ( AMF_DATATYPE_SIZE_OBJECT_VARIABLE + length_psz + length_value ) * sizeof( uint8_t ) );
+    if( !out ) return NULL;
 
     length_psz = hton16( length_psz );
     memcpy( out, &length_psz, sizeof( uint16_t ) );
@@ -2228,6 +2272,7 @@ amf_decode_string( uint8_t **buffer )
     *buffer += sizeof( uint16_t );
 
     out = (char *) malloc( length + 1 ); /* '\0' terminated */
+    if( !out ) return NULL;
 
     for(i = 0; i < length; i++)
         out[i] = (*buffer)[i];
