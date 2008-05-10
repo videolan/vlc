@@ -1503,7 +1503,7 @@ static int ManageVideo( vout_thread_t *p_vout )
         /* Disable "always on top" in fullscreen mode */
         var_Get( p_vout, "video-on-top", &val_ontop );
         if( val_ontop.b_bool )
-            WindowOnTop( p_vout, val_fs.b_bool );
+            WindowOnTop( p_vout, !val_fs.b_bool );
 
         ToggleFullScreen( p_vout );
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
