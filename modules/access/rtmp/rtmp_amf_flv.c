@@ -2071,8 +2071,12 @@ rtmp_body_append( rtmp_body_t *rtmp_body, uint8_t *buffer, uint32_t length )
 {
     if( rtmp_body->length_body + length > rtmp_body->length_buffer )
     {
+        uint8_t *tmp;
         rtmp_body->length_buffer = rtmp_body->length_body + length;
-        rtmp_body->body = (uint8_t *) realloc( rtmp_body->body, rtmp_body->length_buffer * sizeof( uint8_t ) );
+        tmp =  realloc( rtmp_body->body,
+                        rtmp_body->length_buffer * sizeof( uint8_t ) );
+        if( !tmp ) return;
+        rtmp_body->body = tmp;
     }
 
     memcpy( rtmp_body->body + rtmp_body->length_body, buffer, length );
@@ -2320,11 +2324,15 @@ static void
 flv_rebuild( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet )
 {
     uint32_t length_tag, timestamp;
+    uint8_t *tmp;
 
-    rtmp_packet->body->body = (uint8_t *) realloc( rtmp_packet->body->body,
-        rtmp_packet->body->length_body + FLV_TAG_PREVIOUS_TAG_SIZE + FLV_TAG_SIZE );
+    tmp = (uint8_t *) realloc( rtmp_packet->body->body,
+                               rtmp_packet->body->length_body +
+                               FLV_TAG_PREVIOUS_TAG_SIZE + FLV_TAG_SIZE );
+    if( !tmp ) return;
+    rtmp_packet->body->body = tmp;
     memmove( rtmp_packet->body->body + FLV_TAG_PREVIOUS_TAG_SIZE + FLV_TAG_SIZE,
-        rtmp_packet->body->body, rtmp_packet->body->length_body );
+             rtmp_packet->body->body, rtmp_packet->body->length_body );
 
     /* Insert tag */
     p_thread->flv_tag_previous_tag_size = hton32( p_thread->flv_tag_previous_tag_size );
