@@ -1493,17 +1493,8 @@ static int ManageVideo( vout_thread_t *p_vout )
      */
     if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
-        vlc_value_t val_fs, val_ontop;
-
         /* Update the object variable and trigger callback */
-        val_fs.b_bool = !p_vout->b_fullscreen;
-
-        var_Set( p_vout, "fullscreen", val_fs );
-
-        /* Disable "always on top" in fullscreen mode */
-        var_Get( p_vout, "video-on-top", &val_ontop );
-        if( val_ontop.b_bool )
-            WindowOnTop( p_vout, !val_fs.b_bool );
+        var_SetBool( p_vout, "fullscreen", !p_vout->b_fullscreen );
 
         ToggleFullScreen( p_vout );
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;

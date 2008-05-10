@@ -1241,8 +1241,4 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
     /* Update the object variable and trigger callback */
     val.b_bool = p_vout->b_fullscreen;
     var_Set( p_vout, "fullscreen", val );
-
-    /* Disable video-on-top while in fullscreen mode */
-    if( var_GetBool( p_vout, "video-on-top" ) )
-        ControlParentWindow( p_vout, VOUT_SET_STAY_ON_TOP, !val.b_bool );
 }
