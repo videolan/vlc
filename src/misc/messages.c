@@ -650,14 +650,13 @@ void msg_StackAdd( const char *psz_message, ... )
         p_ctx->psz_message = psz_tmp;
     else
     {
-        char *psz_old = malloc( strlen( p_ctx->psz_message ) + 1 );
-        memcpy( psz_old, p_ctx->psz_message, strlen( p_ctx->psz_message ) + 1 );
-        p_ctx->psz_message = realloc( p_ctx->psz_message,
-                                      strlen( p_ctx->psz_message ) +
-                                      /* ':', ' ', '0' */
-                                      strlen( psz_tmp ) + 3 );
-        sprintf( p_ctx->psz_message, "%s: %s", psz_tmp, psz_old );
-        free( psz_tmp ); free( psz_old );
+        char *psz_new;
+        if( asprintf( &psz_new, "%s: %s", psz_tmp, p_ctx->psz_message ) == -1 )
+            psz_new = NULL;
+
+        free( p_ctx->psz_message );
+        p_ctx->psz_message = psz_new;
+        free( psz_tmp );
     }
 }
 
