@@ -199,10 +199,7 @@ static int Open( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     p_dec->p_sys = p_sys = malloc( sizeof( *p_sys ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     /* init of p_sys */
     memset( p_sys, 0, sizeof( *p_sys ) );
@@ -1110,6 +1107,8 @@ static char *Eia608Text( eia608_t *h, bool b_html )
 
     /* We allocate a buffer big enough for normal case */
     psz = malloc( i_size );
+    if( !psz )
+        return NULL;
     *psz = '\0';
     if( b_html )
         Eia608Strlcat( psz, "<text>", i_size );

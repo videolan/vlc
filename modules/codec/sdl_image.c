@@ -108,10 +108,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
     p_sys->psz_sdl_type = p_supported_fmt[i].psz_sdl_type;
 
     /* Set output properties - this is a decoy and isn't used anywhere */

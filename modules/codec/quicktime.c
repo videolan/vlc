@@ -462,6 +462,8 @@ static int OpenAudio( decoder_t *p_dec )
     p_sys->i_buffer      = 0;
     p_sys->i_buffer_size = 100*1000;
     p_sys->p_buffer      = malloc( p_sys->i_buffer_size );
+    if( !p_sys->p_buffer )
+        goto exit_error;
 
     p_sys->i_out = 0;
     p_sys->i_out_frames = 0;
@@ -621,6 +623,8 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 static int OpenVideo( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = malloc( sizeof( decoder_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
 #ifndef WIN32
     vlc_mutex_t                        *lock;
@@ -716,6 +720,8 @@ static int OpenVideo( decoder_t *p_dec )
     /* codec data FIXME use codec not SVQ3 */
     msg_Dbg( p_dec, "vide = %d", i_vide  );
     id = malloc( sizeof( ImageDescription ) + ( i_vide - 70 ) );
+    if( !id )
+        goto exit_error;
     id->idSize          = sizeof( ImageDescription ) + ( i_vide - 70 );
     id->cType           = FCC( fcc[0], fcc[1], fcc[2], fcc[3] );
     id->version         = GetWBE ( p_vide +  0 );
@@ -752,6 +758,8 @@ static int OpenVideo( decoder_t *p_dec )
     memcpy( *p_sys->framedescHandle, id, id->idSize );
 
     p_sys->plane = malloc( p_dec->fmt_in.video.i_width * p_dec->fmt_in.video.i_height * 3 );
+    if( !p_sys->plane )
+        goto exit_error;
 
     i_result = p_sys->QTNewGWorldFromPtr( &p_sys->OutBufferGWorld,
                                           /*pixel format of new GWorld==YUY2 */

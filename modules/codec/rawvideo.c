@@ -132,10 +132,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
     /* Misc init */
     p_dec->p_sys->b_packetizer = false;
     p_sys->i_pts = 0;
@@ -338,6 +335,8 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
         }
 
         p_tmp = malloc( pic.p[0].i_pitch );
+        if( !p_tmp )
+            return p_block;
         p_pixels = p_block->p_buffer;
         for( i = 0; i < pic.i_planes; i++ )
         {

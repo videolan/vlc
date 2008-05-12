@@ -769,6 +769,8 @@ static int  Open ( vlc_object_t *p_this )
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->i_interpolated_dts = 0;
     p_sys->psz_stat_name = NULL;
 

@@ -126,10 +126,7 @@ static int Create( vlc_object_t *p_this )
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_sys )
-    {
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
-    }
     memset( &p_dec->p_sys->fmt_cached, 0, sizeof( p_dec->p_sys->fmt_cached ) );
 
     p_sys->pf_push_packet = p_streamext->push_packet;
@@ -180,7 +177,6 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_sys = malloc( sizeof( subpicture_sys_t ));
     if( !p_spu->p_sys )
     {
-        msg_Err( p_dec, "out of memory" );
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
         block_Release( *pp_block );
         *pp_block = NULL;
@@ -192,7 +188,6 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_sys->p_subs_data = malloc( p_block->i_buffer );
     if( !p_spu->p_sys->p_subs_data )
     {
-        msg_Err( p_dec, "out of memory" );
         free( p_spu->p_sys );
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
         block_Release( *pp_block );

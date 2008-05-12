@@ -117,6 +117,8 @@ static int DecoderOpen( vlc_object_t *p_this )
     }
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_sys->b_packetizer  = false;
 

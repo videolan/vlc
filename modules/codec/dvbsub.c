@@ -303,10 +303,7 @@ static int Open( vlc_object_t *p_this )
     p_dec->pf_decode_sub = Decode;
     p_sys = p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
     if( !p_sys )
-    {
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
-    }
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     p_sys->i_pts          = (mtime_t) 0;
@@ -634,7 +631,9 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "new clut: %i", i_id );
 #endif
-        p_clut = malloc( sizeof(dvbsub_clut_t) );
+        p_clut = malloc( sizeof( dvbsub_clut_t ) );
+        if( !p_clut )
+            return;
         p_clut->p_next = p_sys->p_cluts;
         p_sys->p_cluts = p_clut;
     }
@@ -772,6 +771,8 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s )
 #endif
         /* Allocate a new page */
         p_sys->p_page = malloc( sizeof(dvbsub_page_t) );
+        if( !p_sys->p_page )
+            return;
     }
 
     p_sys->p_page->i_version = i_version;

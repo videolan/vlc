@@ -388,10 +388,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
         p_pic = ( picture_t * ) malloc( sizeof( picture_t ) );
         if( !p_pic )
-        {
-            msg_Err( p_dec, "out of memory" );
             goto error;
-        }
 
         memset( &fmt_in, 0, sizeof( video_format_t ) );
         memset( p_pic, 0, sizeof( picture_t ) );

@@ -116,10 +116,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
     memset( &p_sys->context, 0, sizeof( cinepak_context_t ) );
 
     var_Create( p_dec, "grayscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -448,6 +445,8 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
         {
             p_context->p_pix[i] = malloc( p_context->i_stride[i] *
                                           p_context->i_lines[i] );
+            if( p_context->p_pix[i] == NULL )
+                return -1;
             /* Set it to all black */
             memset( p_context->p_pix[i], ( i == 0 ) ? 0 : 128 ,
                     p_context->i_stride[i] * p_context->i_lines[i] );
