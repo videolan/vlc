@@ -84,8 +84,6 @@ Input/Demuxers:
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
- * MKV USF subtitles support
- * HTML-based subtitles support
  * Flash Screen Video support
  * CamStudio Screen Video support
  * DosBox Capture support
@@ -100,7 +98,16 @@ Decoders:
  * NellyMoser ASAO support
  * APE (Monkey audio) support
  * VBI & EBU (Teletext) support
+
+Subtitles:
  * Ogg/Kate subtitles support
+ * AQTitle subtitles support
+ * MKV USF subtitles support
+ * HTML-based subtitles support
+ * MPSub subtitles support
+ * JacoSub subtitles basic support
+ * MPL2 subtitles support
+ * Rewrite of ASS/SSA scripts and subtitles support.
 
 Encoders:
  * Flash Screen Video support

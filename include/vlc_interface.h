@@ -154,36 +154,36 @@ VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
 
 /* Interface dialog ids for dialog providers */
 typedef enum vlc_dialog {
-	INTF_DIALOG_FILE_SIMPLE = 1,
-	INTF_DIALOG_FILE,
-	INTF_DIALOG_DISC,
-	INTF_DIALOG_NET,
-	INTF_DIALOG_CAPTURE,
-	INTF_DIALOG_SAT,
-	INTF_DIALOG_DIRECTORY,
+    INTF_DIALOG_FILE_SIMPLE = 1,
+    INTF_DIALOG_FILE,
+    INTF_DIALOG_DISC,
+    INTF_DIALOG_NET,
+    INTF_DIALOG_CAPTURE,
+    INTF_DIALOG_SAT,
+    INTF_DIALOG_DIRECTORY,
 
-	INTF_DIALOG_STREAMWIZARD,
-	INTF_DIALOG_WIZARD,
+    INTF_DIALOG_STREAMWIZARD,
+    INTF_DIALOG_WIZARD,
 
-	INTF_DIALOG_PLAYLIST,
-	INTF_DIALOG_MESSAGES,
-	INTF_DIALOG_FILEINFO,
-	INTF_DIALOG_PREFS,
-	INTF_DIALOG_BOOKMARKS,
-	INTF_DIALOG_EXTENDED,
+    INTF_DIALOG_PLAYLIST,
+    INTF_DIALOG_MESSAGES,
+    INTF_DIALOG_FILEINFO,
+    INTF_DIALOG_PREFS,
+    INTF_DIALOG_BOOKMARKS,
+    INTF_DIALOG_EXTENDED,
 
-	INTF_DIALOG_POPUPMENU = 20,
-	INTF_DIALOG_AUDIOPOPUPMENU,
-	INTF_DIALOG_VIDEOPOPUPMENU,
-	INTF_DIALOG_MISCPOPUPMENU,
+    INTF_DIALOG_POPUPMENU = 20,
+    INTF_DIALOG_AUDIOPOPUPMENU,
+    INTF_DIALOG_VIDEOPOPUPMENU,
+    INTF_DIALOG_MISCPOPUPMENU,
 
-	INTF_DIALOG_FILE_GENERIC = 30,
-	INTF_DIALOG_INTERACTION = 50,
+    INTF_DIALOG_FILE_GENERIC = 30,
+    INTF_DIALOG_INTERACTION = 50,
 
-	INTF_DIALOG_UPDATEVLC = 90,
-	INTF_DIALOG_VLM,
+    INTF_DIALOG_UPDATEVLC = 90,
+    INTF_DIALOG_VLM,
 
-	INTF_DIALOG_EXIT = 99
+    INTF_DIALOG_EXIT = 99
 } vlc_dialog_t;
 
 /* Useful text messages shared by interfaces */
@@ -202,7 +202,8 @@ typedef enum vlc_dialog {
 #define EXTENSIONS_MEDIA EXTENSIONS_VIDEO ";" EXTENSIONS_AUDIO ";" \
                           EXTENSIONS_PLAYLIST
 
-#define EXTENSIONS_SUBTITLE "*.cdg;*.idx;*.srt;*.sub;*.utf"
+#define EXTENSIONS_SUBTITLE "*.cdg;*.idx;*.srt;*.sub;*.utf;*.ass;*.ssa;*.aqt;" \
+                            "*.jss"
 
 /** \defgroup vlc_interaction Interaction
  * \ingroup vlc_interface
@@ -241,6 +242,7 @@ struct interaction_dialog_t
     vlc_object_t   *p_parent;           ///< The vlc object that asked
                                         //for interaction
 };
+
 /**
  * Possible flags . Dialog types
  */
