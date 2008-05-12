@@ -371,6 +371,7 @@ SOURCES_libvlc_common = \
 
 SOURCES_libvlc_sout = \
 	input/vlm.c \
+	input/vlmshell.c \
 	stream_output/stream_output.c \
 	stream_output/stream_output.h \
 	stream_output/announce.c \
