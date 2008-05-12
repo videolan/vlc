@@ -63,8 +63,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     /* Create and configure the QTreeView */
     view = new QVLCTreeView( 0 );
     view->setSortingEnabled( true );
-    view->sortByColumn( -1, Qt::AscendingOrder );
-    view->setModel(model);
+    view->sortByColumn( 0 , Qt::AscendingOrder );
+    view->setModel( model );
     view->setIconSize( QSize( 20, 20 ) );
     view->setAlternatingRowColors( true );
     view->setAnimated( true );
