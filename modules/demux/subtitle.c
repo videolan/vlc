@@ -1373,27 +1373,28 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
         if( !s )
             return VLC_EGENERIC;
-
-        if( sscanf (s, "FORMAT=TIM%c", &p_dummy ) == 1 && p_dummy == 'E')
+        if( strstr( s, "FORMAT" ) )
         {
-            mpsub_factor = 100.0;
-            break;
-        }
+            if( sscanf (s, "FORMAT=TIM%c", &p_dummy ) == 1 && p_dummy == 'E')
+            {
+                mpsub_factor = 100.0;
+                break;
+            }
 
-        psz_temp = malloc( strlen(s) - 6 );
-        if( sscanf( s, "FORMAT=%[^\r\n]", psz_temp ) )
-        {
-            float f_fps;
-            f_fps = us_strtod( psz_temp, NULL );
-            if( f_fps > 0.0 && var_GetFloat( p_demux, "sub-fps" ) <= 0.0 )
-                var_SetFloat( p_demux, "sub-fps", f_fps );
+            psz_temp = malloc( strlen(s) );
+            if( sscanf( s, "FORMAT=%[^\r\n]", psz_temp ) )
+            {
+                float f_fps;
+                f_fps = us_strtod( psz_temp, NULL );
+                if( f_fps > 0.0 && var_GetFloat( p_demux, "sub-fps" ) <= 0.0 )
+                    var_SetFloat( p_demux, "sub-fps", f_fps );
 
-            mpsub_factor = 1.0;
+                mpsub_factor = 1.0;
+                free( psz_temp );
+                break;
+            }
             free( psz_temp );
-            break;
         }
-        free( psz_temp );
-
         /* Data Lines */
         if( sscanf (s, "%f %f", &f1, &f2 ) == 2 )
         {
@@ -1616,12 +1617,9 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
                     while ( *s2 == ' ' ) s2++;
 
-/*                    int i_len = strlen( psz_orig2 );
-
-
-                    psz_orig2 = realloc( psz_orig2, strlen( s2 ) +  i_len + 1 );
-
-
+                    /* Here to parse the second line, we should add s2 to
+                       psz_text and go on the for( ) line 1556 in order to
+                       parse the next line.
                     */
                 }
             default:
