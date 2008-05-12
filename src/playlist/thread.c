@@ -61,13 +61,13 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     // Preparse
     p_playlist->p_preparse = vlc_object_create( p_playlist,
                                   sizeof( playlist_preparse_t ) );
-    p_playlist->p_preparse->psz_object_name = strdup( "preparser" );
     if( !p_playlist->p_preparse )
     {
         msg_Err( p_playlist, "unable to create preparser" );
         vlc_object_release( p_playlist );
         return;
     }
+    p_playlist->p_preparse->psz_object_name = strdup( "preparser" );
     p_playlist->p_preparse->i_waiting = 0;
     p_playlist->p_preparse->pp_waiting = NULL;
 
@@ -85,13 +85,13 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     // Secondary Preparse
     p_playlist->p_fetcher = vlc_object_create( p_playlist,
                               sizeof( playlist_fetcher_t ) );
-    p_playlist->p_fetcher->psz_object_name = strdup( "fetcher" );
     if( !p_playlist->p_fetcher )
     {
         msg_Err( p_playlist, "unable to create secondary preparser" );
         vlc_object_release( p_playlist );
         return;
     }
+    p_playlist->p_fetcher->psz_object_name = strdup( "fetcher" );
     p_playlist->p_fetcher->i_waiting = 0;
     p_playlist->p_fetcher->pp_waiting = NULL;
     p_playlist->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
