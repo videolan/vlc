@@ -1580,6 +1580,8 @@ static int transcode_audio_process( sout_stream_t *p_stream,
                                                     p_audio_block );
         }
 
+        assert( p_audio_block );
+
         p_audio_buf->p_buffer = p_audio_block->p_buffer;
         p_audio_buf->i_nb_bytes = p_audio_block->i_buffer;
         p_audio_buf->i_nb_samples = p_audio_block->i_samples;
