@@ -267,9 +267,8 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 
     QMenu selectColMenu;
 
-    char *psz_title;
 #define ADD_META_ACTION( meta ) {                                              \
-    QAction* option = selectColMenu.addAction( psz_column_title( meta ) );     \
+    QAction* option = selectColMenu.addAction( qfu( psz_column_title( meta ) ) );     \
     option->setCheckable( true );                                              \
     option->setChecked( model->shownFlags() & meta );                          \
     ContextUpdateMapper->setMapping( option, meta );                           \

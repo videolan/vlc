@@ -43,7 +43,7 @@ static const char * psz_column_title( uint32_t i_column )
 {
     switch( i_column )
     {
-    case COLUMN_NUMBER:          return "";
+    case COLUMN_NUMBER:          return _("ID");
     case COLUMN_TITLE:           return VLC_META_TITLE;
     case COLUMN_DURATION:        return _("Duration");
     case COLUMN_ARTIST:          return VLC_META_ARTIST;

@@ -116,7 +116,7 @@ void PLItem::updateColumnHeaders()
     for( uint32_t i_index=1; i_index < COLUMN_END; i_index <<= 1 )
     {
         if( i_showflags & i_index )
-            item_col_strings.append( psz_column_title( i_index ) );
+            item_col_strings.append( qfu( psz_column_title( i_index ) ) );
     }
 }
 
@@ -187,7 +187,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
         if( parentItem->i_showflags & i_index )
         {
             char *psz = psz_column_meta( p_item->p_input, i_index );
-            item_col_strings.append( psz );
+            item_col_strings.append( qfu( psz ) );
             free( psz );
         }
     }
