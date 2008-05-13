@@ -177,6 +177,7 @@ const char* psz_introspection_xml_data_tracklist =
 "    <method name=\"AddTrack\">\n"
 "      <arg type=\"s\" direction=\"in\" />\n"
 "      <arg type=\"b\" direction=\"in\" />\n"
+"      <arg type=\"i\" direction=\"out\" />\n"
 "    </method>\n"
 "    <method name=\"DelTrack\">\n"
 "      <arg type=\"i\" direction=\"in\" />\n"

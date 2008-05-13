@@ -382,6 +382,7 @@ DBUS_METHOD( Identity )
 DBUS_METHOD( AddTrack )
 { /* add the string to the playlist, and play it if the boolean is true */
     REPLY_INIT;
+    OUT_ARGUMENTS;
 
     DBusError error;
     dbus_error_init( &error );
@@ -408,6 +409,9 @@ DBUS_METHOD( AddTrack )
             ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) ,
             PLAYLIST_END, true, false );
     pl_Release( p_playlist );
+
+    dbus_int32_t i_success = 0;
+    ADD_INT32( &i_success );
 
     REPLY_SEND;
 }
