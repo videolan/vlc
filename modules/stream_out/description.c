@@ -57,7 +57,6 @@ vlc_module_end();
 
 struct sout_stream_sys_t
 {
-    int            i_id;
     input_thread_t *p_input;
 
     mtime_t i_stream_start;
@@ -81,7 +80,6 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_send = Send;
     p_sys = p_stream->p_sys = malloc(sizeof(sout_stream_sys_t));
 
-    p_sys->i_id = 0;
     p_sys->p_input = NULL;
 
     p_sys->i_stream_start = 0;
@@ -97,10 +95,7 @@ static void Close( vlc_object_t *p_this )
     sout_stream_t *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    msg_Dbg( p_this, "description: Closing the module" );
-
-    /* It can happen only if buggy */
-    assert( !p_sys->p_input );
+    msg_Dbg( p_this, "Closing" );
 
     free( p_sys );
 }
@@ -112,12 +107,22 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     es_format_t *p_fmt_copy;
     input_item_t *p_item;
 
-    msg_Dbg( p_stream, "description: Adding a stream" );
+    msg_Dbg( p_stream, "Adding a stream" );
 
     if( !p_sys->p_input )
-        p_sys->p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( !p_sys->p_input )
-        return NULL;
+    {
+        p_sys->p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT,
+                FIND_PARENT );
+        /* This module is a children of the input object
+         * We don't want to keep a reference on it, because we will be alive
+         * as long as the input is alive.
+         *
+         * Since vlc_object_find() increments the reference count,
+         * we release the input just after finding it.
+         * */
+        assert( p_sys->p_input );
+        vlc_object_release( p_sys->p_input );
+    }
  
     p_item = input_GetItem(p_sys->p_input);
 
@@ -128,7 +133,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     TAB_APPEND( p_item->i_es, p_item->es, p_fmt_copy );
     vlc_mutex_unlock( &p_item->lock );
 
-    p_sys->i_id++;
     if( p_sys->i_stream_start <= 0 )
         p_sys->i_stream_start = mdate();
 
@@ -141,14 +145,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    msg_Dbg( p_stream, "description: Removing a stream (id:%d)", p_sys->i_id );
-
-    p_sys->i_id--;
-    if( p_sys->i_id <= 0 )
-    {
-        vlc_object_release( p_sys->p_input );
-        p_sys->p_input = NULL;
-    }
+    msg_Dbg( p_stream, "Removing a stream" );
 
     free( id );
     return VLC_SUCCESS;
