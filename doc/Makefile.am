@@ -51,7 +51,7 @@ DISTCLEANFILES = $(CHANGELOGS)
 
 $(CHANGELOGS): Makefile.am
 	if test -d "$(top_srcdir)/.git"; then \
-		y="$@"; y="$${y##ChangeLog-}" ;
+		y="$@"; y="$${y##ChangeLog-}" ; \
 		git --git-dir="$(top_srcdir)/.git" log \
 			--since="$$y-01-01" \
 			--until="$$y-12-31 23:00:00 -0100" \
