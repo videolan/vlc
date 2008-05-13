@@ -143,8 +143,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     msg_Dbg( p_stream, "Removing a stream" );
 
     free( id );
