@@ -107,7 +107,8 @@ enum
     SUB_TYPE_AQT,
     SUB_TYPE_PJS,
     SUB_TYPE_MPSUB,
-    SUB_TYPE_JACOSUB
+    SUB_TYPE_JACOSUB,
+    SUB_TYPE_PSB
 };
 
 typedef struct
@@ -158,6 +159,7 @@ static int  ParseAQT        ( demux_t *, subtitle_t *, int );
 static int  ParsePJS        ( demux_t *, subtitle_t *, int );
 static int  ParseMPSub      ( demux_t *, subtitle_t *, int );
 static int  ParseJSS        ( demux_t *, subtitle_t *, int );
+static int  ParsePSB        ( demux_t *, subtitle_t *, int );
 
 static struct
 {
@@ -181,6 +183,7 @@ static struct
     { "pjs",        SUB_TYPE_PJS,         "PhoenixSub",  ParsePJS },
     { "mpsub",      SUB_TYPE_MPSUB,       "MPSub",       ParseMPSub },
     { "jacosub",    SUB_TYPE_JACOSUB,     "JacoSub",     ParseJSS },
+    { "psb",        SUB_TYPE_PSB,         "PowerDivx",   ParsePSB },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 
@@ -365,6 +368,10 @@ static int Open ( vlc_object_t *p_this )
             else if( sscanf( s, "%d,%d,", &i_dummy, &i_dummy ) == 2 )
             {
                 p_sys->i_type = SUB_TYPE_PJS;
+            }
+            else if( sscanf( s, "{%d:%d:%d}", &i_dummy, &i_dummy, &i_dummy ) == 3 )
+            {
+                p_sys->i_type = SUB_TYPE_PSB;
             }
 
             free( s );
@@ -1002,7 +1009,7 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
  *  or
  *      h:m:s Line1|Line2|Line3....
  */
-static int  ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle,
+static int ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle,
                           int i_idx )
 {
     VLC_UNUSED( i_idx );
@@ -1677,4 +1684,51 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         return VLC_SUCCESS;
     }
 }
+
+static int ParsePSB( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+{
+    VLC_UNUSED( i_idx );
+
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char *psz_text;
+    int i;
+
+    for( ;; )
+    {
+        int h1, m1, s1;
+        int h2, m2, s2;
+        const char *s = TextGetLine( txt );
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        psz_text = malloc( strlen( s ) + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+
+        if( sscanf( s, "{%d:%d:%d}{%d:%d:%d}%[^\r\n]",
+                    &h1, &m1, &s1, &h2, &m2, &s2, psz_text ) == 7 )
+        {
+            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
+                                    (int64_t)m1 * 60*1000 +
+                                    (int64_t)s1 * 1000 ) * 1000;
+            p_subtitle->i_stop  = ( (int64_t)h2 * 3600*1000 +
+                                    (int64_t)m2 * 60*1000 +
+                                    (int64_t)s2 * 1000 ) * 1000;
+            break;
+        }
+        free( psz_text );
+    }
+
+    /* replace | by \n */
+    for( i = 0; psz_text[i] != '\0'; i++ )
+    {
+        if( psz_text[i] == '|' )
+            psz_text[i] = '\n';
+    }
+    p_subtitle->psz_text = psz_text;
+    return VLC_SUCCESS;
+}
+
 
