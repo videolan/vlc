@@ -108,6 +108,7 @@ Subtitles:
  * JacoSub subtitles basic support
  * MPL2 subtitles support
  * Rewrite of ASS/SSA scripts and subtitles support.
+ * PowerDivx (.psb) Subtitles support
 
 Encoders:
  * Flash Screen Video support

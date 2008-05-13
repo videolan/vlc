@@ -59,13 +59,13 @@ static void Close( vlc_object_t *p_this );
     N_("Force the subtiles format. Valid values are : \"microdvd\", " \
     "\"subrip\",  \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
     "\"sami\", \"dvdsubtitle\", \"mpl2\", \"aqt\", \"pjs\" "\
-    "\"mpsub\" \"jacosub\" and \"auto\" (meaning autodetection, this " \
+    "\"mpsub\" \"jacosub\" \"psb\" and \"auto\" (meaning autodetection, this " \
     "should always work).")
 static const char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
     "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2",
-    "aqt", "pjs", "mpsub", "jacosub"
+    "aqt", "pjs", "mpsub", "jacosub", "psb"
 };
 
 vlc_module_begin();
@@ -369,7 +369,8 @@ static int Open ( vlc_object_t *p_this )
             {
                 p_sys->i_type = SUB_TYPE_PJS;
             }
-            else if( sscanf( s, "{%d:%d:%d}", &i_dummy, &i_dummy, &i_dummy ) == 3 )
+            else if( sscanf( s, "{%d:%d:%d}",
+                                &i_dummy, &i_dummy, &i_dummy ) == 3 )
             {
                 p_sys->i_type = SUB_TYPE_PSB;
             }
