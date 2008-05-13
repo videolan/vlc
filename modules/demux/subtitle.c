@@ -1353,6 +1353,7 @@ static int ParsePJS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
     char *psz_text;
+    int i;
 
     for( ;; )
     {
@@ -1379,6 +1380,14 @@ static int ParsePJS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         }
         free( psz_text );
     }
+
+    /* replace | by \n */
+    for( i = 0; psz_text[i] != '\0'; i++ )
+    {
+        if( psz_text[i] == '|' )
+            psz_text[i] = '\n';
+    }
+
     p_subtitle->psz_text = psz_text;
     msg_Dbg( p_demux, "%s", psz_text );
     return VLC_SUCCESS;
