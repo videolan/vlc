@@ -63,12 +63,6 @@
 #include <assert.h>
 
 /*****************************************************************************
- * Constants
- *****************************************************************************/
-
-const vlc_destructor_t kVLCDestructor = NULL;
-
-/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  DumpCommand( vlc_object_t *, char const *,
@@ -170,7 +164,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     vlc_spin_init( &p_priv->ref_spin );
     p_priv->i_refcount = 1;
-    p_priv->pf_destructor = kVLCDestructor;
+    p_priv->pf_destructor = NULL;
     p_priv->b_thread = false;
     p_new->p_parent = NULL;
     p_new->pp_children = NULL;
@@ -321,7 +315,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    /* Automatically detach the object from its parents */
+    /* Automatically detach the object from its parent */
     if( p_this->p_parent ) vlc_object_detach( p_this );
 
 
