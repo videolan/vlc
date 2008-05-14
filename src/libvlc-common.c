@@ -960,15 +960,22 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 
 #ifdef ENABLE_SOUT
+    playlist_t         * p_playlist;
     sout_instance_t    * p_sout;
 
-    p_sout = vlc_object_find( p_libvlc, VLC_OBJECT_SOUT, FIND_CHILD );
-    if( p_sout )
+    p_playlist = vlc_object_find( p_libvlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    if( p_playlist )
     {
-        msg_Dbg( p_sout, "removing kept stream output" );
-        vlc_object_detach( (vlc_object_t*)p_sout );
-        vlc_object_release( (vlc_object_t*)p_sout );
-        sout_DeleteInstance( p_sout );
+        p_sout = vlc_object_find( p_playlist, VLC_OBJECT_SOUT, FIND_CHILD );
+        if( p_sout )
+        {
+            msg_Dbg( p_sout, "removing kept stream output" );
+            vlc_object_detach( (vlc_object_t*)p_sout );
+            vlc_object_release( (vlc_object_t*)p_sout );
+            sout_DeleteInstance( p_sout );
+        }
+
+        vlc_object_release( p_playlist );
     }
 
     /* Destroy VLM if created in libvlc_InternalInit */

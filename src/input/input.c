@@ -1419,20 +1419,27 @@ static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, 
      * XXX it might be unusable but this will be checked later */
     if( b_keep_sout )
     {
-        p_sout = vlc_object_find( p_parent->p_libvlc, VLC_OBJECT_SOUT,
-                                                      FIND_CHILD );
-        if( p_sout )
+        playlist_t *p_playlist = vlc_object_find( p_parent->p_libvlc,
+                VLC_OBJECT_PLAYLIST, FIND_CHILD );
+        if( p_playlist )
         {
-            if( p_sout->p_parent != VLC_OBJECT( p_sout->p_libvlc ) )
+            vlc_mutex_lock( &p_playlist->gc_lock );
+            p_sout = vlc_object_find( p_playlist, VLC_OBJECT_SOUT, FIND_CHILD );
+            if( p_sout )
             {
-                vlc_object_release( p_sout );
-                p_sout = NULL;
+                if( p_sout->p_parent != VLC_OBJECT( p_playlist ) )
+                {
+                    vlc_object_release( p_sout );
+                    p_sout = NULL;
+                }
+                else
+                {
+                    vlc_object_detach( p_sout );    /* Remove it from the GC */
+                    vlc_object_release( p_sout );
+                }
             }
-            else
-            {
-                vlc_object_detach( p_sout );    /* Remove it from the GC */
-                vlc_object_release( p_sout );
-            }
+            vlc_mutex_unlock( &p_playlist->gc_lock );
+            vlc_object_release( p_playlist );
         }
     }
 
@@ -1444,8 +1451,14 @@ static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, 
 
 static void SoutKeep( sout_instance_t *p_sout )
 {
+    playlist_t * p_playlist = vlc_object_find( p_sout, VLC_OBJECT_PLAYLIST,
+                                                FIND_PARENT );
+    if( !p_playlist ) return;
+
     msg_Dbg( p_sout, "sout has been kept" );
-    vlc_object_attach( p_sout, p_sout->p_libvlc );
+    vlc_object_attach( p_sout, p_playlist );
+
+    vlc_object_release( p_playlist );
 }
 
 /*****************************************************************************
