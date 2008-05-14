@@ -879,15 +879,9 @@ void __vlc_object_release( vlc_object_t *p_this )
         /* Detach from parent to protect against FIND_CHILDREN */
         if (p_this->p_parent)
             vlc_object_detach_unlocked (p_this);
-#ifndef NDEBUG
-        /* Detach from children to protect against FIND_PARENT.
-         * Destroying an object with children is currently not allowed anyway.
-         * This code is there only to ensure that the debugging code in
-         * vlc_object_destroy() will be invoked before a concurrent
-         * FIND_PARENT gets the chance to crash the process. */
+        /* Detach from children to protect against FIND_PARENT */
         for (int i = 0; i < p_this->i_children; i++)
             p_this->pp_children[i]->p_parent = NULL;
-#endif
     }
 
     vlc_mutex_unlock( &structure_lock );
