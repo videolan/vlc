@@ -83,6 +83,7 @@ static int            CountChildren ( vlc_object_t *, int );
 static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
 static void vlc_object_destroy( vlc_object_t *p_this );
+static void vlc_object_detach_unlocked (vlc_object_t *p_this);
 
 /*****************************************************************************
  * Local structure lock
@@ -315,9 +316,8 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    /* Automatically detach the object from its parent */
-    if( p_this->p_parent ) vlc_object_detach( p_this );
-
+    /* Objects are always detached beforehand */
+    assert( !p_this->p_parent );
 
     /* Send a kill to the object's thread if applicable */
     vlc_object_kill( p_this );
@@ -884,6 +884,8 @@ void __vlc_object_release( vlc_object_t *p_this )
                              p_libvlc_global->i_objects );
         REMOVE_ELEM( p_libvlc_global->pp_objects,
                      p_libvlc_global->i_objects, i_index );
+        if (p_this->p_parent)
+            vlc_object_detach_unlocked (p_this);
     }
 
     vlc_mutex_unlock( &structure_lock );
@@ -921,6 +923,19 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     vlc_mutex_unlock( &structure_lock );
 }
 
+
+static void vlc_object_detach_unlocked (vlc_object_t *p_this)
+{
+    assert (p_this->p_parent);
+
+    /* Climb up the tree to see whether we are connected with the root */
+    if( vlc_internals( p_this->p_parent )->b_attached )
+        SetAttachment( p_this, false );
+
+    DetachObject( p_this );
+}
+
+
 /**
  ****************************************************************************
  * detach object from its parent
@@ -940,15 +955,8 @@ void __vlc_object_detach( vlc_object_t *p_this )
         return;
     }
 
-    /* Climb up the tree to see whether we are connected with the root */
-    if( vlc_internals( p_this->p_parent )->b_attached )
-    {
-        SetAttachment( p_this, false );
-    }
-
-    DetachObject( p_this );
+    vlc_object_detach_unlocked( p_this );
     vlc_mutex_unlock( &structure_lock );
-    p_this = NULL;
 }
 
 /**
