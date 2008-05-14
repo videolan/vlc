@@ -866,8 +866,8 @@ void __vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
-        /* Remove the object from the table so that it cannot be returned from
-         * vlc_object_find() and friends. */
+        /* Remove the object from the table
+         * so that it cannot be encountered by vlc_object_get() */
         libvlc_global_data_t *p_libvlc_global = vlc_global();
         int i_index;
 
@@ -875,8 +875,19 @@ void __vlc_object_release( vlc_object_t *p_this )
                              p_libvlc_global->i_objects );
         REMOVE_ELEM( p_libvlc_global->pp_objects,
                      p_libvlc_global->i_objects, i_index );
+
+        /* Detach from parent to protect against FIND_CHILDREN */
         if (p_this->p_parent)
             vlc_object_detach_unlocked (p_this);
+#ifndef NDEBUG
+        /* Detach from children to protect against FIND_PARENT.
+         * Destroying an object with children is currently not allowed anyway.
+         * This code is there only to ensure that the debugging code in
+         * vlc_object_destroy() will be invoked before a concurrent
+         * FIND_PARENT gets the chance to crash the process. */
+        for (int i = 0; i < p_this->i_children; i++)
+            p_this->pp_children[i]->p_parent = NULL;
+#endif
     }
 
     vlc_mutex_unlock( &structure_lock );
@@ -899,6 +910,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     vlc_mutex_lock( &structure_lock );
 
     /* Attach the parent to its child */
+    assert (!p_this->p_parent);
     p_this->p_parent = p_parent;
 
     /* Attach the child to its parent */
