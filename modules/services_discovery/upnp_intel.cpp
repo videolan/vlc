@@ -256,7 +256,7 @@ private:
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
 static void Run( services_discovery_t *p_sd );
-static playlist_t *pl_Get( service_discovery_t *p_sd )
+static playlist_t *pl_Get( services_discovery_t *p_sd )
 {
     return p_sd->p_sys->p_playlist;
 }
