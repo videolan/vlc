@@ -483,13 +483,14 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if ( p_sys->p_decoder != NULL )
     {
-        picture_t **pp_ring = p_sys->p_decoder->p_owner->pp_pics;
+        decoder_owner_sys_t *p_owner = p_sys->p_decoder->p_owner;
 
         if( p_sys->p_decoder->p_module )
             module_Unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
         vlc_object_detach( p_sys->p_decoder );
         vlc_object_release( p_sys->p_decoder );
 
+        picture_t **pp_ring = p_owner->pp_pics;
         for( i = 0; i < PICTURE_RING_SIZE; i++ )
         {
             if ( pp_ring[i] != NULL )
@@ -499,6 +500,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
                 free( pp_ring[i] );
             }
         }
+        free( p_owner );
     }
 
     /* Destroy user specified video filters */
