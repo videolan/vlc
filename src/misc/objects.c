@@ -73,11 +73,10 @@ static vlc_object_t * FindObjectName( vlc_object_t *, const char *, int );
 static void           PrintObject   ( vlc_object_t *, const char * );
 static void           DumpStructure ( vlc_object_t *, int, char * );
 static int            FindIndex     ( vlc_object_t *, vlc_object_t **, int );
-static void           SetAttachment ( vlc_object_t *, bool );
 
 static vlc_list_t   * NewList       ( int );
 static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
-static void           ListAppend    ( vlc_list_t *, vlc_object_t * );
+/*static void           ListAppend    ( vlc_list_t *, vlc_object_t * );*/
 static int            CountChildren ( vlc_object_t *, int );
 static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
@@ -971,18 +970,6 @@ void __vlc_object_detach( vlc_object_t *p_this )
 }
 
 
-static void vlc_tree_find (vlc_object_t *node, int type, vlc_list_t *list)
-{
-    assert (node);
-    vlc_assert_locked (&structure_lock);
-
-    if (node->i_object_type == type)
-        ListAppend (list, node);
-
-    for (int i = 0; i < node->i_children; i++)
-        vlc_tree_find (node->pp_children[i], type, list);
-}
-
 /**
  ****************************************************************************
  * find a list typed objects and increment their refcount
@@ -993,21 +980,16 @@ static void vlc_tree_find (vlc_object_t *node, int type, vlc_list_t *list)
 vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 {
     vlc_list_t *p_list;
-    int i_count = 0, i_index = 0;
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
-
-    vlc_mutex_lock( &structure_lock );
+    int i_count = 0;
 
     /* Look for the objects */
     switch( i_mode & 0x000f )
     {
     case FIND_ANYWHERE:
-        p_list = NewList (0);
-        if (p_list != NULL)
-            vlc_tree_find (VLC_OBJECT (p_libvlc_global), i_type, p_list);
-        break;
+        return vlc_list_find (vlc_global (), i_type, FIND_CHILD);
 
     case FIND_CHILD:
+        vlc_mutex_lock( &structure_lock );
         i_count = CountChildren( p_this, i_type );
         p_list = NewList( i_count );
 
@@ -1021,6 +1003,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 
         p_list->i_count = 0;
         ListChildren( p_list, p_this, i_type );
+        vlc_mutex_unlock( &structure_lock );
         break;
 
     default:
@@ -1028,8 +1011,6 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
         p_list = NewList( 0 );
         break;
     }
-
-    vlc_mutex_unlock( &structure_lock );
 
     return p_list;
 }
@@ -1511,7 +1492,7 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
     return;
 }
 
-static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
+/*static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
 {
     if( p_list == NULL )
     {
@@ -1532,7 +1513,7 @@ static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
     p_list->i_count++;
 
     return;
-}
+}*/
 
 static int CountChildren( vlc_object_t *p_this, int i_type )
 {
