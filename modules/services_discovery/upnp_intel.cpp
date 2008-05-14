@@ -311,7 +311,7 @@ static void Close( vlc_object_t *p_this )
                          true );
     playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, true,
                          true );
-    pl_Release( p_intf );
+    pl_Release( p_sd );
     free( p_sys );
 }
 
