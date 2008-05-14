@@ -939,7 +939,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Free playlist */
     msg_Dbg( p_libvlc, "removing playlist" );
-    playlist_ThreadDestroy( priv->p_playlist );
+    vlc_object_release( priv->p_playlist );
 
     /* Free video outputs */
     msg_Dbg( p_libvlc, "removing all video outputs" );

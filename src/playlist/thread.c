@@ -126,19 +126,6 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 }
 
 /**
- * Destroy the playlist global thread.
- *
- * Deinits all things controlled by the playlist global thread
- * \param p_playlist the playlist thread to destroy
- * \return VLC_SUCCESS or an error
- */
-int playlist_ThreadDestroy( playlist_t * p_playlist )
-{
-    playlist_Destroy( p_playlist );
-    return VLC_SUCCESS;
-}
-
-/**
  * Run the main control thread itself
  */
 static void RunControlThread ( playlist_t *p_playlist )

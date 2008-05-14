@@ -62,11 +62,9 @@ struct playlist_fetcher_t
 /* Global thread */
 #define playlist_ThreadCreate(a) __playlist_ThreadCreate(VLC_OBJECT(a))
 void        __playlist_ThreadCreate   ( vlc_object_t * );
-int           playlist_ThreadDestroy  ( playlist_t * );
 
 /* Creation/Deletion */
 playlist_t *playlist_Create   ( vlc_object_t * );
-void        playlist_Destroy  ( playlist_t * );
 
 /* Engine */
 void playlist_MainLoop( playlist_t * );

@@ -166,39 +166,16 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
  * \param p_playlist the playlist object
  * \return nothing
  */
-void playlist_Destroy( playlist_t *p_playlist )
-{
-    /* XXX: should go in the playlist destructor */
-    var_Destroy( p_playlist, "intf-change" );
-    var_Destroy( p_playlist, "item-change" );
-    var_Destroy( p_playlist, "playlist-current" );
-    var_Destroy( p_playlist, "intf-popupmenu" );
-    var_Destroy( p_playlist, "intf-show" );
-    var_Destroy( p_playlist, "play-and-stop" );
-    var_Destroy( p_playlist, "play-and-exit" );
-    var_Destroy( p_playlist, "random" );
-    var_Destroy( p_playlist, "repeat" );
-    var_Destroy( p_playlist, "loop" );
-    var_Destroy( p_playlist, "activity" );
-
-    vlc_object_release( p_playlist );
-}
 
 static void playlist_Destructor( vlc_object_t * p_this )
 {
     playlist_t * p_playlist = (playlist_t *)p_this;
 
-    // Kill preparser
     if( p_playlist->p_preparse )
-    {
         vlc_object_release( p_playlist->p_preparse );
-    }
 
-    // Kill meta fetcher
     if( p_playlist->p_fetcher )
-    {
         vlc_object_release( p_playlist->p_fetcher );
-    }
 }
 
 /* Destroy remaining objects */
