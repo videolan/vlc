@@ -760,6 +760,7 @@ libtheora-$(THEORA_VERSION).tar.bz2:
 libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/theora.patch
+	patch -p0 < Patches/libtheora-includes.patch
 	(cd $@; autoconf)
 
 .theora: libtheora .ogg
