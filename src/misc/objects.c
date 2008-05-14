@@ -70,7 +70,6 @@ static int  DumpCommand( vlc_object_t *, char const *,
 
 static vlc_object_t * FindObject    ( vlc_object_t *, int, int );
 static vlc_object_t * FindObjectName( vlc_object_t *, const char *, int );
-static void           DetachObject  ( vlc_object_t * );
 static void           PrintObject   ( vlc_object_t *, const char * );
 static void           DumpStructure ( vlc_object_t *, int, char * );
 static int            FindIndex     ( vlc_object_t *, vlc_object_t **, int );
@@ -915,7 +914,36 @@ static void vlc_object_detach_unlocked (vlc_object_t *p_this)
 {
     assert (p_this->p_parent);
 
-    DetachObject( p_this );
+    vlc_object_t *p_parent = p_this->p_parent;
+    int i_index, i;
+
+    /* Remove p_this's parent */
+    p_this->p_parent = NULL;
+
+    /* Remove all of p_parent's children which are p_this */
+    for( i_index = p_parent->i_children ; i_index-- ; )
+    {
+        if( p_parent->pp_children[i_index] == p_this )
+        {
+            p_parent->i_children--;
+            for( i = i_index ; i < p_parent->i_children ; i++ )
+            {
+                p_parent->pp_children[i] = p_parent->pp_children[i+1];
+            }
+        }
+    }
+
+    if( p_parent->i_children )
+    {
+        p_parent->pp_children = (vlc_object_t **)realloc( p_parent->pp_children,
+                               p_parent->i_children * sizeof(vlc_object_t *) );
+    }
+    else
+    {
+        /* Special case - don't realloc() to zero to avoid leaking */
+        free( p_parent->pp_children );
+        p_parent->pp_children = NULL;
+    }
 }
 
 
@@ -1349,39 +1377,6 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
     }
 
     return NULL;
-}
-
-static void DetachObject( vlc_object_t *p_this )
-{
-    vlc_object_t *p_parent = p_this->p_parent;
-    int i_index, i;
-
-    /* Remove p_this's parent */
-    p_this->p_parent = NULL;
-
-    /* Remove all of p_parent's children which are p_this */
-    for( i_index = p_parent->i_children ; i_index-- ; )
-    {
-        if( p_parent->pp_children[i_index] == p_this )
-        {
-            p_parent->i_children--;
-            for( i = i_index ; i < p_parent->i_children ; i++ )
-            {
-                p_parent->pp_children[i] = p_parent->pp_children[i+1];
-            }
-        }
-    }
-
-    if( p_parent->i_children )
-    {
-        p_parent->pp_children = (vlc_object_t **)realloc( p_parent->pp_children,
-                               p_parent->i_children * sizeof(vlc_object_t *) );
-    }
-    else
-    {
-        free( p_parent->pp_children );
-        p_parent->pp_children = NULL;
-    }
 }
 
 
