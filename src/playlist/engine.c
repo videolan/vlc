@@ -38,6 +38,7 @@
  * Local prototypes
  *****************************************************************************/
 static void VariablesInit( playlist_t *p_playlist );
+static void playlist_Destructor( vlc_object_t * p_this );
 
 static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval, void *a )
@@ -153,6 +154,8 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     playlist_MLLoad( p_playlist );
     p_playlist->b_auto_preparse = true;
 
+    vlc_object_set_destructor( p_playlist, playlist_Destructor );
+
     return p_playlist;
 }
 
@@ -165,6 +168,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
  */
 void playlist_Destroy( playlist_t *p_playlist )
 {
+    /* XXX: should go in the playlist destructor */
     var_Destroy( p_playlist, "intf-change" );
     var_Destroy( p_playlist, "item-change" );
     var_Destroy( p_playlist, "playlist-current" );
@@ -177,12 +181,24 @@ void playlist_Destroy( playlist_t *p_playlist )
     var_Destroy( p_playlist, "loop" );
     var_Destroy( p_playlist, "activity" );
 
-    if( p_playlist->p_preparse )
-        vlc_object_release( p_playlist->p_preparse );
-    if( p_playlist->p_fetcher )
-        vlc_object_release( p_playlist->p_fetcher );
-
     vlc_object_release( p_playlist );
+}
+
+static void playlist_Destructor( vlc_object_t * p_this )
+{
+    playlist_t * p_playlist = (playlist_t *)p_this;
+
+    // Kill preparser
+    if( p_playlist->p_preparse )
+    {
+        vlc_object_release( p_playlist->p_preparse );
+    }
+
+    // Kill meta fetcher
+    if( p_playlist->p_fetcher )
+    {
+        vlc_object_release( p_playlist->p_fetcher );
+    }
 }
 
 /* Destroy remaining objects */
