@@ -119,7 +119,6 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_new->b_die = false;
     p_new->b_error = false;
     p_new->b_dead = false;
-    p_priv->b_attached = false;
     p_new->b_force = false;
 
     p_new->psz_header = NULL;
@@ -146,21 +145,15 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_libvlc_global->i_counter = 0;
         p_libvlc_global->i_objects = 0;
         p_libvlc_global->pp_objects = NULL;
-        p_priv->b_attached = true;
         vlc_mutex_init( &structure_lock );
     }
     else
     {
         p_libvlc_global = vlc_global();
         if( i_type == VLC_OBJECT_LIBVLC )
-        {
             p_new->p_libvlc = (libvlc_int_t*)p_new;
-            p_priv->b_attached = true;
-        }
         else
-        {
             p_new->p_libvlc = p_this->p_libvlc;
-        }
     }
 
     vlc_spin_init( &p_priv->ref_spin );
@@ -914,12 +907,6 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     INSERT_ELEM( p_parent->pp_children, p_parent->i_children,
                  p_parent->i_children, p_this );
 
-    /* Climb up the tree to see whether we are connected with the root */
-    if( vlc_internals( p_parent )->b_attached )
-    {
-        SetAttachment( p_this, true );
-    }
-
     vlc_mutex_unlock( &structure_lock );
 }
 
@@ -927,10 +914,6 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 static void vlc_object_detach_unlocked (vlc_object_t *p_this)
 {
     assert (p_this->p_parent);
-
-    /* Climb up the tree to see whether we are connected with the root */
-    if( vlc_internals( p_this->p_parent )->b_attached )
-        SetAttachment( p_this, false );
 
     DetachObject( p_this );
 }
@@ -1046,18 +1029,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
         pp_end = pp_current + p_libvlc_global->i_objects;
 
         for( ; pp_current < pp_end ; pp_current++ )
-        {
-            if( vlc_internals(*pp_current)->b_attached )
-            {
-                PrintObject( *pp_current, "" );
-            }
-            else
-            {
-                printf( " o %.8i %s (not attached)\n",
-                        (*pp_current)->i_object_id,
-                        (*pp_current)->psz_object_type );
-            }
-        }
+            PrintObject( *pp_current, "" );
 
         vlc_mutex_unlock( &structure_lock );
     }
@@ -1412,23 +1384,6 @@ static void DetachObject( vlc_object_t *p_this )
     }
 }
 
-/*****************************************************************************
- * SetAttachment: recursively set the b_attached flag of a subtree.
- *****************************************************************************
- * This function is used by the attach and detach functions to propagate
- * the b_attached flag in a subtree.
- *****************************************************************************/
-static void SetAttachment( vlc_object_t *p_this, bool b_attached )
-{
-    int i_index;
-
-    for( i_index = p_this->i_children ; i_index-- ; )
-    {
-        SetAttachment( p_this->pp_children[i_index], b_attached );
-    }
-
-    vlc_internals( p_this )->b_attached = b_attached;
-}
 
 static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 {
