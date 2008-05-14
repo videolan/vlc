@@ -43,13 +43,13 @@ struct module_bank_t
 
     int              i_usage;
 
-    bool       b_builtins;
-    bool       b_plugins;
+    bool             b_builtins;
+    bool             b_plugins;
 
     /* Plugins cache */
-    bool     b_cache;
-    bool     b_cache_dirty;
-    bool     b_cache_delete;
+    bool             b_cache;
+    bool             b_cache_dirty;
+    bool             b_cache_delete;
 
     int            i_cache;
     module_cache_t **pp_cache;
