@@ -108,7 +108,8 @@ enum
     SUB_TYPE_PJS,
     SUB_TYPE_MPSUB,
     SUB_TYPE_JACOSUB,
-    SUB_TYPE_PSB
+    SUB_TYPE_PSB,
+    SUB_TYPE_RT
 };
 
 typedef struct
@@ -160,6 +161,7 @@ static int  ParsePJS        ( demux_t *, subtitle_t *, int );
 static int  ParseMPSub      ( demux_t *, subtitle_t *, int );
 static int  ParseJSS        ( demux_t *, subtitle_t *, int );
 static int  ParsePSB        ( demux_t *, subtitle_t *, int );
+static int  ParseRealText   ( demux_t *, subtitle_t *, int );
 
 static struct
 {
@@ -184,13 +186,12 @@ static struct
     { "mpsub",      SUB_TYPE_MPSUB,       "MPSub",       ParseMPSub },
     { "jacosub",    SUB_TYPE_JACOSUB,     "JacoSub",     ParseJSS },
     { "psb",        SUB_TYPE_PSB,         "PowerDivx",   ParsePSB },
+    { "realtext",   SUB_TYPE_RT,          "RealText",    ParseRealText },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 
 /* Missing Detect
     SubViewer 1
-    JSS
-    RealText
     Subrip09
    */
 
@@ -374,6 +375,10 @@ static int Open ( vlc_object_t *p_this )
             {
                 p_sys->i_type = SUB_TYPE_PSB;
             }
+            else if( strcasestr( s, "<time" ) )
+            {
+                p_sys->i_type = SUB_TYPE_RT;
+            }
 
             free( s );
             s = NULL;
@@ -388,6 +393,8 @@ static int Open ( vlc_object_t *p_this )
             msg_Warn( p_demux, "failed to rewind" );
         }
     }
+
+    /* Quit on unknown subtitles */
     if( p_sys->i_type == SUB_TYPE_UNKNOWN )
     {
         msg_Err( p_demux, "failed to recognize subtitle type" );
@@ -1741,4 +1748,114 @@ static int ParsePSB( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     return VLC_SUCCESS;
 }
 
+static int64_t ParseRealTime( char *psz, int *h, int *m, int *s, int *f )
+{
+    if( strlen( psz ) == 0 ) return 0;
+    if( sscanf( psz, "%d:%d:%d.%d", h, m, s, f ) == 4 ||
+            sscanf( psz, "%d:%d.%d", m, s, f ) == 3 ||
+            sscanf( psz, "%d.%d", s, f ) == 2 ||
+            sscanf( psz, "%d:%d", m, s ) == 2 ||
+            sscanf( psz, "%d", s ) == 1 )
+    {
+        return (int64_t)((( *h * 60 + *m ) * 60 ) + *s ) * 1000 * 1000
+               + (int64_t)*f * 10 * 1000;
+    }
+    else return VLC_EGENERIC;
+}
+
+static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+{
+    VLC_UNUSED( i_idx );
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char *psz_text;
+    char psz_end[12]= "", psz_begin[12] = "";
+
+    for( ;; )
+    {
+        int h1 = 0, m1 = 0, s1 = 0, f1 = 0;
+        int h2 = 0, m2 = 0, s2 = 0, f2 = 0;
+        const char *s = TextGetLine( txt );
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        psz_text = malloc( strlen( s ) + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+
+        /* Find the good begining. This removes extra spaces at the beginning
+           of the line.*/
+        char *psz_temp = strcasestr( s, "<time");
+        if( psz_temp != NULL )
+        {
+            /* Line has begin and end */
+            if( ( sscanf( psz_temp,
+                            "<%*[t|T]ime %*[b|B]egin=\"%[^\"]\" %*[e|E]nd=\"%[^\"]%*[^>]%[^\n\r]",
+                            psz_begin, psz_end, psz_text) != 3 ) &&
+                    /* Line has begin and no end */
+                    ( sscanf( psz_temp,
+                              "<%*[t|T]ime %*[b|B]egin=\"%[^\"]\"%*[^>]%[^\n\r]",
+                              psz_begin, psz_text ) != 2) )
+                /* Line is not recognized */
+            {
+                free( psz_text );
+                continue;
+            }
+
+
+            /* Get the times */
+            int64_t i_time = ParseRealTime( psz_begin, &h1, &m1, &s1, &f1 );
+            if( i_time >= 0)
+            {
+                p_subtitle->i_start = i_time;
+            }
+
+            i_time = ParseRealTime( psz_end, &h2, &m2, &s2, &f2 );
+            if( i_time >= 0 )
+            {
+                p_subtitle->i_stop = i_time;
+            }
+            break;
+        }
+        /* Line is not recognized */
+        else continue;
+        free( psz_text );
+    }
+
+    /* Get the following Lines */
+    for( ;; )
+    {
+        const char *s = TextGetLine( txt );
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        int i_len = strlen( s );
+        if( i_len == 0 ) break;
+
+        if( strcasestr( s, "<time" ) ||
+            strcasestr( s, "<clear/") )
+        {
+            txt->i_line--;
+            break;
+        }
+
+        int i_old = strlen( psz_text );
+
+        psz_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+
+        strcat( psz_text, s );
+        strcat( psz_text, "\n" );
+    }
+
+    /* Remove the starting ">" that remained after the sscanf */
+    memmove( &psz_text[0], &psz_text[1], strlen( psz_text ) );
+
+    p_subtitle->psz_text = psz_text;
+
+    return VLC_SUCCESS;
+}
 
