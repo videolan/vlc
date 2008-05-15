@@ -80,112 +80,12 @@ const char* VLC_Changeset( void )
     return psz_vlc_changeset;
 }
 
-/*****************************************************************************
- * VLC_Error: strerror() equivalent
- *****************************************************************************
- * This function returns full version string (numeric version and codename).
- *****************************************************************************/
-char const * VLC_Error( int i_err )
-{
-    return vlc_error( i_err );
-}
-
-/*****************************************************************************
- * VLC_Create: allocate a libvlc instance and intialize global libvlc stuff if needed
- *****************************************************************************
- * This function allocates a libvlc instance and returns a negative value
- * in case of failure. Also, the thread system is initialized.
- *****************************************************************************/
-int VLC_Create( void )
-{
-    libvlc_int_t *p_object = libvlc_InternalCreate();
-    if( p_object ) return p_object->i_object_id;
-    return VLC_ENOOBJ;
-}
-
 #define LIBVLC_FUNC \
     libvlc_int_t * p_libvlc = vlc_current_object( i_object ); \
     if( !p_libvlc ) return VLC_ENOOBJ;
 #define LIBVLC_FUNC_END \
     if( i_object ) vlc_object_release( p_libvlc );
 
-
-/*****************************************************************************
- * VLC_Init: initialize a libvlc instance
- *****************************************************************************
- * This function initializes a previously allocated libvlc instance:
- *  - CPU detection
- *  - gettext initialization
- *  - message queue, module bank and playlist initialization
- *  - configuration and commandline parsing
- *****************************************************************************/
-int VLC_Init( int i_object, int i_argc, const char *ppsz_argv[] )
-{
-    int i_ret;
-    LIBVLC_FUNC;
-    i_ret = libvlc_InternalInit( p_libvlc, i_argc, ppsz_argv );
-    LIBVLC_FUNC_END;
-    return i_ret;
-}
-
-/*****************************************************************************
- * VLC_AddIntf: add an interface
- *****************************************************************************
- * This function opens an interface plugin and runs it. If b_block is set
- * to 0, VLC_AddIntf will return immediately and let the interface run in a
- * separate thread. If b_block is set to 1, VLC_AddIntf will continue until
- * user requests to quit. If b_play is set to 1, VLC_AddIntf will start playing
- * the playlist when it is completely initialised.
- *****************************************************************************/
-int VLC_AddIntf( int i_object, char const *psz_module,
-                 bool b_block, bool b_play )
-{
-    int i_ret;
-    LIBVLC_FUNC;
-    i_ret = libvlc_InternalAddIntf( p_libvlc, psz_module, b_block, b_play,
-                                    0, NULL );
-    LIBVLC_FUNC_END;
-    return i_ret;
-}
-
-
-/*****************************************************************************
- * VLC_Die: ask vlc to die.
- *****************************************************************************
- * This function sets p_libvlc->b_die to true, but does not do any other
- * task. It is your duty to call VLC_CleanUp and VLC_Destroy afterwards.
- *****************************************************************************/
-int VLC_Die( int i_object )
-{
-    LIBVLC_FUNC;
-    vlc_object_kill( p_libvlc );
-    LIBVLC_FUNC_END;
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * VLC_CleanUp: CleanUp all the intf, playlist, vout, aout
- *****************************************************************************/
-int VLC_CleanUp( int i_object )
-{
-    int i_ret;
-    LIBVLC_FUNC;
-    i_ret = libvlc_InternalCleanup( p_libvlc );
-    LIBVLC_FUNC_END;
-    return i_ret;
-}
-
-/*****************************************************************************
- * VLC_Destroy: Destroy everything.
- *****************************************************************************
- * This function requests the running threads to finish, waits for their
- * termination, and destroys their structure.
- *****************************************************************************/
-int VLC_Destroy( int i_object )
-{
-    LIBVLC_FUNC;
-    return libvlc_InternalDestroy( p_libvlc, i_object ? true : false );
-}
 
 /*****************************************************************************
  * VLC_VariableSet: set a "safe" vlc variable
