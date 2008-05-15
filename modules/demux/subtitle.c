@@ -1492,6 +1492,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     char         *psz_text, *psz_orig;
     char         *psz_text2, *psz_orig2;
     int h1, h2, m1, m2, s1, s2, f1, f2;
+
     static int i_comment = 0;
 
     static int jss_time_resolution = 30;
@@ -1802,7 +1803,6 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
                 free( psz_text );
                 continue;
             }
-
 
             /* Get the times */
             int64_t i_time = ParseRealTime( psz_begin, &h1, &m1, &s1, &f1 );
