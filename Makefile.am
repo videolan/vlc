@@ -309,7 +309,7 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile ChangeLog
 # Don't use it if you don't know what it is about.
 # Don't complain if it doesn't work. -- Courmisch
 libvlc:
-	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlc.la
+	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlccore.la
 
 core:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
@@ -671,8 +671,8 @@ package-win-common:
 # Copy relevant files
 	cp "$(top_builddir)/src/.libs/vlc$(EXEEXT)" "$(top_builddir)/vlc-$(VERSION)/"
 	cp "$(top_srcdir)/extras/package/win32/vlc.exe.manifest" "$(top_builddir)/vlc-$(VERSION)/"
+	cp "$(top_builddir)/src/.libs/libvlccore$(LIBEXT)" "vlc-$(VERSION)/"
 	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "vlc-$(VERSION)/"
-	cp "$(top_builddir)/src/.libs/libvlc-control$(LIBEXT)" "vlc-$(VERSION)/"
 
 	for file in AUTHORS MAINTAINERS THANKS ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-$(VERSION)/$${file}.txt" ; done;
@@ -774,8 +774,8 @@ endif
 
 package-win-common-strip:
 	$(STRIP) "$(top_builddir)/vlc-$(VERSION)/vlc$(EXEEXT)"
+	$(STRIP) "vlc-$(VERSION)/libvlccore$(LIBEXT)"
 	$(STRIP) "vlc-$(VERSION)/libvlc$(LIBEXT)"
-	$(STRIP) "vlc-$(VERSION)/libvlc-control$(LIBEXT)"
 if BUILD_MOZILLA
 	$(STRIP) $(top_builddir)/vlc-$(VERSION)/mozilla/npvlc$(LIBEXT);
 endif

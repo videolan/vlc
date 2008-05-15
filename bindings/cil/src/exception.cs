@@ -1,5 +1,5 @@
 /*
- * libvlc.cs - libvlc-control CIL bindings
+ * libvlc.cs - libvlc CIL bindings
  *
  * $Id$
  */
@@ -68,14 +68,14 @@ namespace VideoLAN.LibVLC
         int code;
         IntPtr message;
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_exception_init")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_exception_init")]
         static extern void Init (NativeException e);
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_exception_clear")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_exception_clear")]
         static extern void Clear (NativeException e);
-        /*[DllImport ("libvlc-control.dll",
+        /*[DllImport ("libvlc.dll",
                     EntryPoint="libvlc_exception_raised")]
         static extern int Raised (NativeException e);*/
-        [DllImport ("libvlc-control.dll",
+        [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_exception_get_message")]
         static extern IntPtr GetMessage (NativeException e);
 

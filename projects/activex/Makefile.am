@@ -66,8 +66,8 @@ if BUILD_ACTIVEX
 
 lib_LTLIBRARIES = axvlc.la
 
-LIBRARIES_libvlc = $(top_builddir)/src/libvlc-control.la \
-				   $(top_builddir)/src/libvlc.la
+LIBRARIES_libvlc = $(top_builddir)/src/libvlc.la \
+				   $(top_builddir)/src/libvlccore.la
 
 axvlc_la_SOURCES = $(SOURCES_activex)
 axvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags activex`

@@ -1,6 +1,6 @@
 /**
  * @file libvlc.cs
- * @brief libvlc-control CIL bindings
+ * @brief libvlc CIL bindings
  *
  * $Id$
  */
@@ -71,11 +71,11 @@ namespace VideoLAN.LibVLC
         {
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_new")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_new")]
         internal static extern
         InstanceHandle Create (int argc, U8String[] argv, NativeException ex);
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_release")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_release")]
         static extern void Destroy (IntPtr ptr, NativeException ex);
 
         /**
@@ -115,7 +115,7 @@ namespace VideoLAN.LibVLC
             return new MediaDescriptor (dh);
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_loop")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_playlist_loop")]
         static extern void PlaylistLoop (InstanceHandle self, bool b,
                                          NativeException ex);
         /** Sets the playlist loop flag. */
@@ -128,7 +128,7 @@ namespace VideoLAN.LibVLC
             }
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_play")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_playlist_play")]
         static extern void PlaylistPlay (InstanceHandle self, int id, int optc,
                                          U8String[] optv, NativeException ex);
         /** Plays the next playlist item (if not already playing). */
@@ -138,7 +138,7 @@ namespace VideoLAN.LibVLC
             ex.Raise ();
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_pause")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_playlist_pause")]
         static extern void PlaylistPause (InstanceHandle self,
                                           NativeException ex);
         /** Toggles pause (starts playing if stopped, pauses if playing). */
@@ -148,7 +148,7 @@ namespace VideoLAN.LibVLC
             ex.Raise ();
         }
 
-        [DllImport ("libvlc-control.dll",
+        [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_playlist_isplaying")]
         static extern int PlaylistIsPlaying (InstanceHandle self,
                                              NativeException ex);
@@ -163,7 +163,7 @@ namespace VideoLAN.LibVLC
             }
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_stop")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_playlist_stop")]
         static extern void PlaylistStop (InstanceHandle self,
                                          NativeException ex);
         /** Stops playing. */
@@ -173,7 +173,7 @@ namespace VideoLAN.LibVLC
             ex.Raise ();
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_next")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_playlist_next")]
         static extern void PlaylistNext (InstanceHandle self,
                                          NativeException ex);
         /** Switches to next playlist item, and starts playing it. */
@@ -183,7 +183,7 @@ namespace VideoLAN.LibVLC
             ex.Raise ();
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_prev")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_playlist_prev")]
         static extern void PlaylistPrev (InstanceHandle self,
                                          NativeException ex);
         /** Switches to previous playlist item, and starts playing it. */
@@ -193,7 +193,7 @@ namespace VideoLAN.LibVLC
             ex.Raise ();
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_clear")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_playlist_clear")]
         static extern void PlaylistClear (InstanceHandle self,
                                           NativeException ex);
         /** Clears the whole playlist. */
@@ -207,7 +207,7 @@ namespace VideoLAN.LibVLC
             items.Clear ();
         }
 
-        [DllImport ("libvlc-control.dll",
+        [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_playlist_add_extended")]
         static extern int PlaylistAdd (InstanceHandle self, U8String uri,
                                        U8String name, int optc,
@@ -264,7 +264,7 @@ namespace VideoLAN.LibVLC
             return Add (mrl, null, new string[0]);
         }
 
-        [DllImport ("libvlc-control.dll",
+        [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_playlist_delete_item")]
         static extern int PlaylistDelete (InstanceHandle self, int id,
                                           NativeException e);
@@ -320,13 +320,13 @@ namespace VideoLAN.LibVLC
         {
         }
 
-        [DllImport ("libvlc-control.dll",
+        [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_new")]
         public static extern
         DescriptorHandle Create (InstanceHandle inst, U8String mrl,
                                  NativeException ex);
 
-        [DllImport ("libvlc-control.dll",
+        [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_release")]
         public static extern void Release (IntPtr ptr);
 

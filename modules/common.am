@@ -13,7 +13,7 @@ BUILT_SOURCES =
 CLEANFILES = $(BUILT_SOURCES)
 
 if HAVE_PLUGINS
-LTLIBVLC = $(top_builddir)/src/libvlc.la
+LTLIBVLCCORE = $(top_builddir)/src/libvlccore.la
 
 AM_CFLAGS = `$(VLC_CONFIG) --cflags plugin $@`
 AM_CXXFLAGS = `$(VLC_CONFIG) --cxxflags plugin $@`
@@ -22,7 +22,7 @@ AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-avoid-version -module -no-undefined \
 	-shrext $(LIBEXT) \
 	 `$(VLC_CONFIG) --ldflags plugin $@`
-AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` $(LTLIBVLC)
+AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` $(LTLIBVLCCORE)
 
 if HAVE_COMPILER_EXPORT
 AM_LDFLAGS += -export-dynamic

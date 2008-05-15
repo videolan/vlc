@@ -71,7 +71,7 @@ def get_cflags():
 def get_ldflags():
     vlcconfig=get_vlcconfig()
     if vlcconfig is None:
-        return [ '-lvlc-control' ]
+        return [ '-lvlc' ]
     else:
 	ldflags = []
 	if os.sys.platform == 'darwin':
@@ -81,9 +81,9 @@ def get_ldflags():
 	if os.sys.platform == 'darwin':
 	    ldflags.append('-lstdc++')
         if not libtool:
-            # vlc-config is broken and gives a -lvlc-control which
+            # vlc-config is broken and gives a -lvlc which
             # does not exist if libtool is disabled.
-            ldflags.remove('-lvlc-control')
+            ldflags.remove('-lvlc')
         return ldflags
 
 #source_files = [ 'vlc_module.c', 'vlc_mediacontrol.c',

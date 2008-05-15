@@ -8,7 +8,7 @@ NULL =
 EXTRA_DIST = extras/COPYING modules/builtin.h.in \
 	vlc-control.pc.in \
 	vlc-plugin.pc.in \
-	libvlc.sym
+	libvlccore.sym
 
 BUILT_SOURCES = modules/builtin.h misc/revision.c ../include/vlc_about.h
 CLEANFILES = $(BUILT_SOURCES)
@@ -159,47 +159,46 @@ CLEANFILES += $(pkgconfig_DATA)
 nice:
 	$(top_builddir)/compile
 
-lib_LTLIBRARIES = libvlc.la libvlc-control.la
+lib_LTLIBRARIES = libvlccore.la libvlc.la
 
 AM_LDFLAGS = -no-undefined -no-install
 if HAVE_WIN32
 AM_LDFLAGS += -avoid-version
 endif
 
-libvlc_la_SOURCES = $(SOURCES_libvlc)
-nodist_libvlc_la_SOURCES = misc/revision.c
-libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
+libvlccore_la_SOURCES = $(SOURCES_libvlc)
+nodist_libvlccore_la_SOURCES = misc/revision.c
+libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DDATA_PATH=\"$(pkgdatadir)\" \
 	-DLIBDIR=\"$(libdir)\" \
 	-DPLUGIN_PATH=\"$(pkglibdir)\"
-libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
-libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
-	-version-info 1:0:0
+libvlccore_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
+libvlccore_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
+libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
+	-version-info 0:0:0
+if HAVE_COMPILER_EXPORT
+libvlccore_la_LDFLAGS += -export-dynamic
+else
+libvlccore_la_LDFLAGS += -export-symbols $(srcdir)/libvlccore.sym 
+endif
+libvlccore_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` $(AM_LIBADD) $(LTLIBINTL)
+libvlccore_la_DEPENDENCIES = libvlccore.sym
+
+libvlc_la_SOURCES = $(SOURCES_libvlc_control)
+libvlc_la_LIBADD = libvlccore.la
+libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
+	-DMODULE_STRING=\"control\"
+libvlc_la_LDFLAGS = $(AM_LDFLAGS) -version-info 2:0:0
 if HAVE_COMPILER_EXPORT
 libvlc_la_LDFLAGS += -export-dynamic
 else
-libvlc_la_LDFLAGS += -export-symbols $(srcdir)/libvlc.sym 
-endif
-libvlc_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` $(AM_LIBADD) $(LTLIBINTL)
-
-libvlc_la_DEPENDENCIES = libvlc.sym
-
-libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
-libvlc_control_la_LIBADD = libvlc.la
-libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
-	-DMODULE_STRING=\"control\"
-libvlc_control_la_LDFLAGS = $(AM_LDFLAGS) -version-info 1:0:0
-if HAVE_COMPILER_EXPORT
-libvlc_control_la_LDFLAGS += -export-dynamic
-else
-libvlc_control_la_LDFLAGS += -export-symbols-regex '^_?(libvlc|mediacontrol)_.*'
+libvlc_la_LDFLAGS += -export-symbols-regex '^_?(libvlc|mediacontrol)_.*'
 endif
 
-EXTRA_libvlc_la_SOURCES = \
+EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_beos) \
 	$(SOURCES_libvlc_darwin) \
 	$(SOURCES_libvlc_linux) \
@@ -210,34 +209,34 @@ EXTRA_libvlc_la_SOURCES = \
 	$(SOURCES_libvlc_sout) \
 	$(NULL)
 if HAVE_BEOS
-libvlc_la_SOURCES += $(SOURCES_libvlc_beos)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_beos)
 else
 if HAVE_DARWIN
-libvlc_la_SOURCES += $(SOURCES_libvlc_darwin)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_darwin)
 else
 if HAVE_LINUX
-libvlc_la_SOURCES += $(SOURCES_libvlc_linux)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_linux)
 else
 if HAVE_WIN32
-libvlc_la_SOURCES += $(SOURCES_libvlc_win32)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_win32)
 else
 if HAVE_WINCE
-libvlc_la_SOURCES += $(SOURCES_libvlc_win32)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_win32)
 else
-libvlc_la_SOURCES += $(SOURCES_libvlc_other)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_other)
 endif
 endif
 endif
 endif
 endif
 if BUILD_DIRENT
-libvlc_la_SOURCES += $(SOURCES_libvlc_dirent)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_dirent)
 endif
 if BUILD_GETOPT
-libvlc_la_SOURCES += $(SOURCES_libvlc_getopt)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_getopt)
 endif
 if ENABLE_SOUT
-libvlc_la_SOURCES += $(SOURCES_libvlc_sout)
+libvlccore_la_SOURCES += $(SOURCES_libvlc_sout)
 endif
 
 SOURCES_libvlc_beos = \
@@ -440,7 +439,8 @@ vlc_DEPENDENCIES = $(DATA_win32_rc) libvlc.la
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
-vlc_LDADD = $(DATA_win32_rc) libvlc.la $(LTLIBINTL) `$(VLC_CONFIG) -libs vlc`
+vlc_LDADD = $(DATA_win32_rc) libvlccore.la $(LTLIBINTL) \
+	`$(VLC_CONFIG) -libs vlc`
 
 if BUILD_VLC
 vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)

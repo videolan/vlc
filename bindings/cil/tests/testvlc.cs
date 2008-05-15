@@ -1,5 +1,5 @@
 /*
- * testvlc.cs - tests for libvlc-control CIL bindings
+ * testvlc.cs - tests for libvlc CIL bindings
  *
  * $Id$
  */

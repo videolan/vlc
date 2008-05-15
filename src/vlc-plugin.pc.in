@@ -12,4 +12,4 @@ Cflags: -I${includedir} -I${includedir}/vlc/plugins \
 	-D_LARGEFILE64_SOURCE \
 	-D_REENTRANT \
 	-D_THREAD_SAFE
-Libs: -L${libdir} -lvlc
+Libs: -L${libdir} -lvlccore
