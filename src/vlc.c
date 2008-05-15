@@ -56,9 +56,6 @@ extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
 static void *SigHandler (void *set);
 #endif
 
-/* running vlc instance */
-static libvlc_instance_t * vlc = NULL;
-
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
  *****************************************************************************/
@@ -187,7 +184,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     libvlc_exception_init (&ex);
 
     /* Initialize libvlc */
-    vlc = libvlc_new (i_argc, ppsz_argv, &ex);
+    libvlc_instance_t *vlc = libvlc_new (i_argc, ppsz_argv, &ex);
     if (vlc != NULL)
     {
         libvlc_run_interface (vlc, NULL, &ex);
@@ -255,7 +252,7 @@ static void *SigHandler (void *data)
 
             fprintf (stderr, "signal %d received, terminating vlc - do it "
                             "again quickly in case it gets stuck\n", i_signal);
-            if (vlc) libvlc_release (vlc);
+            //VLC_Die( 0 );
         }
         else /* time (NULL) <= abort_time */
         {
