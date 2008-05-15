@@ -134,6 +134,7 @@ public:
     PrefsPanel *panel;
     wxBoxSizer *sizer;
 
+    module_t *p_module;
     int i_object_id;
     int i_subcat_id;
     int i_type;
@@ -584,9 +585,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         config_data->b_submodule = module_IsSubModule(p_module);
 #endif
         config_data->i_type = TYPE_MODULE;
-        config_data->i_object_id = config_data->b_submodule ?
-            ((vlc_object_t *)p_module)->p_parent->i_object_id :
-            ((vlc_object_t *)p_module)->i_object_id;
+        config_data->p_module = config_data->b_submodule ?
+            p_module->p_parent : p_module;
         config_data->psz_help = NULL;
 
         /* WXMSW doesn't know image -1 ... FIXME */
@@ -769,7 +769,7 @@ ConfigTreeData *PrefsTreeCtrl::FindModuleConfig( ConfigTreeData *config_data )
             {
                 config_new = (ConfigTreeData *)GetItemData( module );
                 if( config_new && !config_new->b_submodule &&
-                    config_new->i_object_id == config_data->i_object_id )
+                    config_new->p_module == config_data->p_module )
                 {
                     return config_new;
                 }
@@ -899,8 +899,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         /* Get a pointer to the module */
         if( config_data->i_type == TYPE_MODULE )
         {
-            p_module = (module_t *)
-                vlc_object_get( config_data->i_object_id );
+            p_module = config_data->p_module;
         }
         else
         {
