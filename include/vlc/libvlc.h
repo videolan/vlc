@@ -146,6 +146,18 @@ VLC_PUBLIC_API void libvlc_release( libvlc_instance_t * );
 VLC_PUBLIC_API void libvlc_retain( libvlc_instance_t * );
 
 /**
+ * Try to start a user interface for the libvlc instance, and wait until the
+ * user exits.
+ *
+ * \param p_instance the instance
+ * \param name interface name, or NULL for default
+ * \param p_exception an initialized exception pointer
+ */
+VLC_PUBLIC_API
+void libvlc_run_interface( libvlc_instance_t *p_instance, const char *name,
+                           libvlc_exception_t *p_exception );
+
+/**
  * Retrieve libvlc version.
  *
  * Example: "0.9.0-git Grishenko"
