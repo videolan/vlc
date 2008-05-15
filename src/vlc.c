@@ -25,8 +25,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "config.h"
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -63,13 +61,13 @@ static void *SigHandler (void *set);
  *****************************************************************************/
 int main( int i_argc, const char *ppsz_argv[] )
 {
-    int i_ret, id;
+    int i_ret;
 
     setlocale (LC_ALL, "");
 
 #ifndef __APPLE__
     /* This clutters OSX GUI error logs */
-    fprintf( stderr, "VLC media player %s\n", VLC_Version() );
+    fprintf( stderr, "VLC media player %s\n", libvlc_get_version() );
 #endif
 
 #ifdef HAVE_PUTENV
@@ -88,11 +86,6 @@ int main( int i_argc, const char *ppsz_argv[] )
 #if defined (HAVE_GETEUID) && !defined (SYS_BEOS)
     /* FIXME: rootwrap (); */
 #endif
-
-    /* Create a libvlc structure */
-    id = VLC_Create();
-    if( id < 0 )
-        return 1;
 
 #if !defined(WIN32) && !defined(UNDER_CE)
     /* Synchronously intercepted POSIX signals.
@@ -181,26 +174,24 @@ int main( int i_argc, const char *ppsz_argv[] )
     else
 #endif
     {
+        /* Note that FromLocale() can be used before libvlc is initialized */
         for (int i = 0; i < i_argc; i++)
             if ((ppsz_argv[i] = FromLocale (ppsz_argv[i])) == NULL)
                 return 1; // BOOM!
     }
 
+    libvlc_exception_t ex;
+    libvlc_exception_init (&ex);
+
     /* Initialize libvlc */
-    i_ret = VLC_Init( id, i_argc, ppsz_argv );
-    if( i_ret < 0 )
+    libvlc_instance_t *vlc = libvlc_new (i_argc, ppsz_argv, &ex);
+    if (vlc != NULL)
     {
-        VLC_Destroy( 0 );
-        return i_ret == VLC_EEXITSUCCESS ? 0 : -i_ret;
+        libvlc_run_interface (vlc, NULL, &ex);
+        libvlc_release (vlc);
     }
-
-    i_ret = VLC_AddIntf( 0, NULL, true, true );
-
-    /* Finish the threads */
-    VLC_CleanUp( 0 );
-
-    /* Destroy the libvlc structure */
-    VLC_Destroy( 0 );
+    i_ret = libvlc_exception_raised (&ex);
+    libvlc_exception_clear (&ex);
 
     for (int i = 0; i < i_argc; i++)
         LocaleFree (ppsz_argv[i]);
@@ -216,7 +207,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_join (sigth, NULL);
 #endif
 
-    return -i_ret;
+    return i_ret;
 }
 
 #if !defined(WIN32) && !defined(UNDER_CE)
@@ -261,7 +252,7 @@ static void *SigHandler (void *data)
 
             fprintf (stderr, "signal %d received, terminating vlc - do it "
                             "again quickly in case it gets stuck\n", i_signal);
-            VLC_Die( 0 );
+            //VLC_Die( 0 );
         }
         else /* time (NULL) <= abort_time */
         {

@@ -439,7 +439,8 @@ vlc_DEPENDENCIES = $(DATA_win32_rc) libvlc.la
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
-vlc_LDADD = $(DATA_win32_rc) libvlccore.la $(LTLIBINTL) \
+# vlc needs libvlccore for locale conversion
+vlc_LDADD = $(DATA_win32_rc) libvlc.la libvlccore.la $(LTLIBINTL) \
 	`$(VLC_CONFIG) -libs vlc`
 
 if BUILD_VLC
