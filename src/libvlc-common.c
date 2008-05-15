@@ -801,7 +801,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( psz_temp )
         {
             sprintf( psz_temp, "%s,none", psz_module );
-            VLC_AddIntf( 0, psz_temp, false, false );
+            libvlc_InternalAddIntf( p_libvlc, psz_temp, false, false, 0, NULL );
             free( psz_temp );
         }
     }
@@ -811,18 +811,18 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Always load the hotkeys interface if it exists
      */
-    VLC_AddIntf( 0, "hotkeys,none", false, false );
+    libvlc_InternalAddIntf( p_libvlc, "hotkeys,none", false, false, 0, NULL );
 
 #ifdef HAVE_DBUS_3
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
     if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
-        VLC_AddIntf( 0, "dbus,none", false, false );
+        libvlc_InternalAddIntf( p_libvlc, "dbus,none", false, false, 0, NULL );
 
     /* Prevents the power management daemon from suspending the system
      * when VLC is active */
     if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
-        VLC_AddIntf( 0, "inhibit,none", false, false );
+        libvlc_InternalAddIntf( p_libvlc, "inhibit,none", false, false, 0, NULL );
 #endif
 
     /*
@@ -832,13 +832,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_X11_XLIB_H
     if( config_GetInt( p_libvlc, "disable-screensaver" ) )
     {
-        VLC_AddIntf( 0, "screensaver,none", false, false );
+        libvlc_InternalAddIntf( p_libvlc, "screensaver,none", false, false, 0, NULL );
     }
 #endif
 
     if( config_GetInt( p_libvlc, "file-logging" ) > 0 )
     {
-        VLC_AddIntf( 0, "logger,none", false, false );
+        libvlc_InternalAddIntf( p_libvlc, "logger,none", false, false, 0, NULL );
     }
 #ifdef HAVE_SYSLOG_H
     if( config_GetInt( p_libvlc, "syslog" ) > 0 )
@@ -851,12 +851,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( config_GetInt( p_libvlc, "show-intf" ) > 0 )
     {
-        VLC_AddIntf( 0, "showintf,none", false, false );
+        libvlc_InternalAddIntf( p_libvlc, "showintf,none", false, false, 0, NULL );
     }
 
     if( config_GetInt( p_libvlc, "network-synchronisation") > 0 )
     {
-        VLC_AddIntf( 0, "netsync,none", false, false );
+        libvlc_InternalAddIntf( p_libvlc, "netsync,none", false, false, 0, NULL );
     }
 
 #ifdef WIN32
