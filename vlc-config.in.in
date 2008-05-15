@@ -228,10 +228,6 @@ while test $# -gt 0; do
       ;;
     mozilla)
       ;;
-    external)
-      echo_external=yes
-      libs="${libs} -lvlc -lvlc-control"
-      ;;
     *)
       module="$tgt"
       ;;
@@ -295,22 +291,10 @@ fi
 # Libs
 # There are 4 possibilities
 #  - We are a plugin or a builtin
-#  - We are building from the outside (external):
-#	- Give full libvlc linkflags + -lvlc (in libdir)
-# 	- Link with builtins in libdir
 #  - We are building something from the inside (builtin)
 #       - Link with builtins in place
 #  If you want something shared from the inside (binding),
 #  you need "builtin vlc"
 if test "${echo_libs}" = yes; then
-  if test "${echo_external}" = yes; then
-    for module in `echo "${builtins}"`; do
-      libs="${libs} @libdir@/vlc/lib${module}.a"
-    done
-    for module in `echo "${builtins}"`; do
-      register_flags "${module}"
-    done
-    register_flags "vlc"
-  fi
   echo "${libs}"
 fi
