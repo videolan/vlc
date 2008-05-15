@@ -481,19 +481,19 @@ TESTS = $(check_PROGRAMS) check_symbols
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
 
 test_dictionary_SOURCES = test/dictionary.c
-test_dictionary_LDADD = libvlc.la
+test_dictionary_LDADD = libvlccore.la
 test_dictionary_CFLAGS = $(CFLAGS_tests)
 
 test_i18n_atof_SOURCES = test/i18n_atof.c text/charset.c
-test_i18n_atof_LDADD = libvlc.la
+test_i18n_atof_LDADD = libvlccore.la
 test_i18n_atof_CFLAGS = $(CFLAGS_tests)
 
 test_url_SOURCES = test/url.c
-test_url_LDADD = libvlc.la
+test_url_LDADD = libvlccore.la
 test_url_CFLAGS = $(CFLAGS_tests)
 
 test_utf8_SOURCES = test/utf8.c
-test_utf8_LDADD = libvlc.la
+test_utf8_LDADD = libvlccore.la
 test_utf8_CFLAGS = $(CFLAGS_tests)
 
 test_headers_SOURCES = test/headers.c
