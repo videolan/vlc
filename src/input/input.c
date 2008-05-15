@@ -2834,6 +2834,12 @@ void MRLSplit( char *psz_dup, const char **ppsz_access, const char **ppsz_demux,
         psz_demux = strchr( psz_access, '/' );
         if( psz_demux )
             *psz_demux++ = '\0';
+
+        /* We really don't want module name substitution here! */
+        if( psz_access[0] == '$' )
+            psz_access++;
+        if( psz_demux && psz_demux[0] == '$' )
+            psz_demux++;
     }
     else
     {
