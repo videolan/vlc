@@ -255,7 +255,7 @@ static void *SigHandler (void *data)
 
             fprintf (stderr, "signal %d received, terminating vlc - do it "
                             "again quickly in case it gets stuck\n", i_signal);
-            if (vlc) libvlc_release( vlc );
+            if (vlc) libvlc_release (vlc);
         }
         else /* time (NULL) <= abort_time */
         {
