@@ -214,9 +214,9 @@ void __module_EndBank( vlc_object_t *p_this )
 
     vlc_object_detach( p_libvlc_global->p_module_bank );
 
-    while( p_libvlc_global->p_module_bank->i_children )
+    while( vlc_internals( p_libvlc_global->p_module_bank )->i_children )
     {
-        p_next = (module_t *)p_libvlc_global->p_module_bank->pp_children[0];
+        p_next = (module_t *)vlc_internals( p_libvlc_global->p_module_bank )->pp_children[0];
         DeleteModule( p_next, true );
     }
 
@@ -1290,9 +1290,9 @@ static void DupModule( module_t *p_module )
     p_module->psz_help = p_module->psz_help ? strdup( p_module->psz_help )
                                             : NULL;
 
-    for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
+    for( i_submodule = 0; i_submodule < vlc_internals( p_module )->i_children; i_submodule++ )
     {
-        DupModule( (module_t*)p_module->pp_children[ i_submodule ] );
+        DupModule( (module_t*)vlc_internals( p_module )->pp_children[ i_submodule ] );
     }
 }
 
@@ -1306,9 +1306,9 @@ static void UndupModule( module_t *p_module )
     char **pp_shortcut;
     int i_submodule;
 
-    for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
+    for( i_submodule = 0; i_submodule < vlc_internals( p_module )->i_children; i_submodule++ )
     {
-        UndupModule( (module_t*)p_module->pp_children[ i_submodule ] );
+        UndupModule( (module_t*)vlc_internals( p_module )->pp_children[ i_submodule ] );
     }
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
@@ -1393,9 +1393,9 @@ static void DeleteModule( module_t * p_module, bool b_detach )
 #endif
 
     /* Free and detach the object's children */
-    while( p_module->i_children )
+    while( vlc_internals( p_module )->i_children )
     {
-        vlc_object_t *p_this = p_module->pp_children[0];
+        vlc_object_t *p_this = vlc_internals( p_module )->pp_children[0];
         vlc_object_detach( p_this );
         vlc_object_release( p_this );
     }

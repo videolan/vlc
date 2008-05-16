@@ -481,8 +481,6 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
     libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
                                                                             \
     vlc_object_t *  p_parent;                            /**< our parent */ \
-    vlc_object_t ** pp_children;                       /**< our children */ \
-    volatile int    i_children;                                             \
                                                                             \
     /* Private data */                                                      \
     void *          p_private;                                              \

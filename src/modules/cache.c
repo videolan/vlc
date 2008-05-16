@@ -34,6 +34,7 @@
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
+#include <vlc_plugin.h>
 
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
@@ -562,14 +563,14 @@ void CacheSave( vlc_object_t *p_this )
 
         SAVE_STRING( pp_cache[i]->p_module->psz_filename );
 
-        i_submodule = pp_cache[i]->p_module->i_children;
+        i_submodule = vlc_internals( pp_cache[i]->p_module )->i_children;
         SAVE_IMMEDIATE( i_submodule );
         for( i_submodule = 0;
-             i_submodule < (unsigned)pp_cache[i]->p_module->i_children;
+             i_submodule < (unsigned)vlc_internals( pp_cache[i]->p_module)->i_children;
              i_submodule++ )
         {
             module_t *p_module =
-                (module_t *)pp_cache[i]->p_module->pp_children[i_submodule];
+                (module_t *)vlc_internals( pp_cache[i]->p_module )->pp_children[i_submodule];
 
             SAVE_STRING( p_module->psz_object_name );
             SAVE_STRING( p_module->psz_shortname );
@@ -686,10 +687,10 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
     p_cache->pf_deactivate = p_module->pf_deactivate;
     p_cache->handle = p_module->handle;
 
-    for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
+    for( i_submodule = 0; i_submodule < vlc_internals( p_module )->i_children; i_submodule++ )
     {
-        module_t *p_child = (module_t*)p_module->pp_children[i_submodule];
-        module_t *p_cchild = (module_t*)p_cache->pp_children[i_submodule];
+        module_t *p_child = (module_t*)vlc_internals( p_module )->pp_children[i_submodule];
+        module_t *p_cchild = (module_t*)vlc_internals( p_cache )->pp_children[i_submodule];
         p_cchild->pf_activate = p_child->pf_activate;
         p_cchild->pf_deactivate = p_child->pf_deactivate;
     }

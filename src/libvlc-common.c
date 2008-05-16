@@ -426,7 +426,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     msg_Dbg( p_libvlc, "module bank initialized, found %i modules",
-             p_libvlc_global->p_module_bank->i_children );
+             vlc_internals( p_libvlc_global->p_module_bank )->i_children );
 
     /* Check for help on modules */
     if( (p_tmp = config_GetPsz( p_libvlc, "module" )) )

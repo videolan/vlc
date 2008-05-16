@@ -159,8 +159,8 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->pf_destructor = NULL;
     p_priv->b_thread = false;
     p_new->p_parent = NULL;
-    p_new->pp_children = NULL;
-    p_new->i_children = 0;
+    p_priv->pp_children = NULL;
+    p_priv->i_children = 0;
 
     p_new->p_private = NULL;
 
@@ -322,23 +322,23 @@ static void vlc_object_destroy( vlc_object_t *p_this )
         p_priv->pf_destructor( p_this );
 
     /* Sanity checks */
-    if( p_this->i_children )
+    if( p_priv->i_children )
     {
         int i;
 
         fprintf( stderr,
                  "ERROR: cannot delete object (%i, %s) with %d children\n",
                  p_this->i_object_id, p_this->psz_object_name,
-                 p_this->i_children );
+                 p_priv->i_children );
 
-        for( i = 0; i < p_this->i_children; i++ )
+        for( i = 0; i < p_priv->i_children; i++ )
         {
             fprintf( stderr,
                      "ERROR: Remaining children object "
                      "(id:%i, type:%s, name:%s)\n",
-                     p_this->pp_children[i]->i_object_id,
-                     p_this->pp_children[i]->psz_object_type,
-                     p_this->pp_children[i]->psz_object_name );
+                     p_priv->pp_children[i]->i_object_id,
+                     p_priv->pp_children[i]->psz_object_type,
+                     p_priv->pp_children[i]->psz_object_name );
         }
         fflush(stderr);
 
@@ -652,8 +652,8 @@ void __vlc_object_kill( vlc_object_t *p_this )
     }
 
     if( p_this->i_object_type == VLC_OBJECT_LIBVLC )
-        for( int i = 0; i < p_this->i_children ; i++ )
-            vlc_object_kill( p_this->pp_children[i] );
+        for( int i = 0; i < internals->i_children ; i++ )
+            vlc_object_kill( internals->pp_children[i] );
 
     vlc_object_signal_unlocked( p_this );
     vlc_mutex_unlock( &p_this->object_lock );
@@ -880,8 +880,8 @@ void __vlc_object_release( vlc_object_t *p_this )
         if (p_this->p_parent)
             vlc_object_detach_unlocked (p_this);
         /* Detach from children to protect against FIND_PARENT */
-        for (int i = 0; i < p_this->i_children; i++)
-            p_this->pp_children[i]->p_parent = NULL;
+        for (int i = 0; i < internals->i_children; i++)
+            internals->pp_children[i]->p_parent = NULL;
     }
 
     vlc_mutex_unlock( &structure_lock );
@@ -908,8 +908,9 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     p_this->p_parent = p_parent;
 
     /* Attach the child to its parent */
-    INSERT_ELEM( p_parent->pp_children, p_parent->i_children,
-                 p_parent->i_children, p_this );
+    vlc_object_internals_t *priv = vlc_internals( p_parent );
+    INSERT_ELEM( priv->pp_children, priv->i_children, priv->i_children,
+                 p_this );
 
     vlc_mutex_unlock( &structure_lock );
 }
@@ -919,35 +920,34 @@ static void vlc_object_detach_unlocked (vlc_object_t *p_this)
 {
     assert (p_this->p_parent);
 
-    vlc_object_t *p_parent = p_this->p_parent;
+    vlc_object_internals_t *priv = vlc_internals( p_this->p_parent );
+
     int i_index, i;
 
     /* Remove p_this's parent */
     p_this->p_parent = NULL;
 
     /* Remove all of p_parent's children which are p_this */
-    for( i_index = p_parent->i_children ; i_index-- ; )
+    for( i_index = priv->i_children ; i_index-- ; )
     {
-        if( p_parent->pp_children[i_index] == p_this )
+        if( priv->pp_children[i_index] == p_this )
         {
-            p_parent->i_children--;
-            for( i = i_index ; i < p_parent->i_children ; i++ )
-            {
-                p_parent->pp_children[i] = p_parent->pp_children[i+1];
-            }
+            priv->i_children--;
+            for( i = i_index ; i < priv->i_children ; i++ )
+                priv->pp_children[i] = priv->pp_children[i+1];
         }
     }
 
-    if( p_parent->i_children )
+    if( priv->i_children )
     {
-        p_parent->pp_children = (vlc_object_t **)realloc( p_parent->pp_children,
-                               p_parent->i_children * sizeof(vlc_object_t *) );
+        priv->pp_children = (vlc_object_t **)realloc( priv->pp_children,
+                               priv->i_children * sizeof(vlc_object_t *) );
     }
     else
     {
         /* Special case - don't realloc() to zero to avoid leaking */
-        free( p_parent->pp_children );
-        p_parent->pp_children = NULL;
+        free( priv->pp_children );
+        priv->pp_children = NULL;
     }
 }
 
@@ -1029,13 +1029,14 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 vlc_list_t *__vlc_list_children( vlc_object_t *obj )
 {
     vlc_list_t *l;
+    vlc_object_internals_t *priv = vlc_internals( obj );
 
     vlc_mutex_lock( &structure_lock );
-    l = NewList( obj->i_children );
+    l = NewList( priv->i_children );
     for (int i = 0; i < l->i_count; i++)
     {
-        vlc_object_yield( obj->pp_children[i] );
-        l->p_values[i].p_object = obj->pp_children[i];
+        vlc_object_yield( priv->pp_children[i] );
+        l->p_values[i].p_object = priv->pp_children[i];
     }
     vlc_mutex_unlock( &structure_lock );
     return l;
@@ -1304,15 +1305,15 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
         break;
 
     case FIND_CHILD:
-        for( i = p_this->i_children; i--; )
+        for( i = vlc_internals( p_this )->i_children; i--; )
         {
-            p_tmp = p_this->pp_children[i];
+            p_tmp = vlc_internals( p_this )->pp_children[i];
             if( p_tmp->i_object_type == i_type )
             {
                 vlc_object_yield( p_tmp );
                 return p_tmp;
             }
-            else if( p_tmp->i_children )
+            else if( vlc_internals( p_tmp )->i_children )
             {
                 p_tmp = FindObject( p_tmp, i_type, i_mode );
                 if( p_tmp )
@@ -1358,16 +1359,16 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
         break;
 
     case FIND_CHILD:
-        for( i = p_this->i_children; i--; )
+        for( i = vlc_internals( p_this )->i_children; i--; )
         {
-            p_tmp = p_this->pp_children[i];
+            p_tmp = vlc_internals( p_this )->pp_children[i];
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name ) )
             {
                 vlc_object_yield( p_tmp );
                 return p_tmp;
             }
-            else if( p_tmp->i_children )
+            else if( vlc_internals( p_tmp )->i_children )
             {
                 p_tmp = FindObjectName( p_tmp, psz_name, i_mode );
                 if( p_tmp )
@@ -1401,7 +1402,7 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
     }
 
     psz_children[0] = '\0';
-    switch( p_this->i_children )
+    switch( vlc_internals( p_this )->i_children )
     {
         case 0:
             break;
@@ -1409,7 +1410,8 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
             strcpy( psz_children, ", 1 child" );
             break;
         default:
-            snprintf( psz_children, 19, ", %i children", p_this->i_children );
+            snprintf( psz_children, 19, ", %i children",
+                      vlc_internals( p_this )->i_children );
             break;
     }
 
@@ -1449,7 +1451,7 @@ static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
         return;
     }
 
-    for( i = 0 ; i < p_this->i_children ; i++ )
+    for( i = 0 ; i < vlc_internals( p_this )->i_children ; i++ )
     {
         if( i_level )
         {
@@ -1461,7 +1463,7 @@ static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
             }
         }
 
-        if( i == p_this->i_children - 1 )
+        if( i == vlc_internals( p_this )->i_children - 1 )
         {
             psz_foo[i_level] = '`';
         }
@@ -1473,7 +1475,8 @@ static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
         psz_foo[i_level+1] = '-';
         psz_foo[i_level+2] = '\0';
 
-        DumpStructure( p_this->pp_children[i], i_level + 2, psz_foo );
+        DumpStructure( vlc_internals( p_this )->pp_children[i], i_level + 2,
+                       psz_foo );
     }
 }
 
@@ -1546,19 +1549,15 @@ static int CountChildren( vlc_object_t *p_this, int i_type )
     vlc_object_t *p_tmp;
     int i, i_count = 0;
 
-    for( i = 0; i < p_this->i_children; i++ )
+    for( i = 0; i < vlc_internals( p_this )->i_children; i++ )
     {
-        p_tmp = p_this->pp_children[i];
+        p_tmp = vlc_internals( p_this )->pp_children[i];
 
         if( p_tmp->i_object_type == i_type )
         {
             i_count++;
         }
-
-        if( p_tmp->i_children )
-        {
-            i_count += CountChildren( p_tmp, i_type );
-        }
+        i_count += CountChildren( p_tmp, i_type );
     }
 
     return i_count;
@@ -1569,18 +1568,13 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
     vlc_object_t *p_tmp;
     int i;
 
-    for( i = 0; i < p_this->i_children; i++ )
+    for( i = 0; i < vlc_internals( p_this )->i_children; i++ )
     {
-        p_tmp = p_this->pp_children[i];
+        p_tmp = vlc_internals( p_this )->pp_children[i];
 
         if( p_tmp->i_object_type == i_type )
-        {
             ListReplace( p_list, p_tmp, p_list->i_count++ );
-        }
 
-        if( p_tmp->i_children )
-        {
-            ListChildren( p_list, p_tmp, i_type );
-        }
+        ListChildren( p_list, p_tmp, i_type );
     }
 }

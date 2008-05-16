@@ -181,6 +181,9 @@ struct vlc_object_internals_t
     vlc_spinlock_t   ref_spin;
     unsigned         i_refcount;
     vlc_destructor_t pf_destructor;
+
+    vlc_object_t   **pp_children;
+    int              i_children;
 };
 
 #define ZOOM_SECTION N_("Zoom")
