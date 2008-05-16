@@ -843,7 +843,7 @@ function update_input_fake()
     remove_input_options( ":fake" );
     var mrl = document.getElementById( 'input_mrl' );
 
-    mrl.value = "fake:";
+    mrl.value = "fake://";
 
     add_input_option( ":fake-file=" + value( "input_fake_filename" ) );
 

@@ -821,7 +821,7 @@ function update_input_fake()
 {
     var mrl = document.getElementById( 'input_mrl' );
 
-    mrl.value = "fake:";
+    mrl.value = "fake://";
     mrl.value += " :fake-file=" + value( "input_fake_filename" );
 
     if( value( "input_fake_width" ) )
