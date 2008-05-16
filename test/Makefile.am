@@ -39,27 +39,27 @@ samples/meta.sample:
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
 
 test_libvlc_core_SOURCES = libvlc/core.c
-test_libvlc_core_LDADD = $(top_builddir)/src/libvlc-control.la
+test_libvlc_core_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_core_CFLAGS = $(CFLAGS_tests)
 
 test_libvlc_events_SOURCES = libvlc/events.c
-test_libvlc_events_LDADD = $(top_builddir)/src/libvlc-control.la
+test_libvlc_events_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_events_CFLAGS = $(CFLAGS_tests)
 
 test_libvlc_media_list_player_SOURCES = libvlc/media_list_player.c
-test_libvlc_media_list_player_LDADD = $(top_builddir)/src/libvlc-control.la
+test_libvlc_media_list_player_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_media_list_player_CFLAGS = $(CFLAGS_tests)
 
 test_libvlc_media_list_SOURCES = libvlc/media_list.c
-test_libvlc_media_list_LDADD = $(top_builddir)/src/libvlc-control.la
+test_libvlc_media_list_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_media_list_CFLAGS = $(CFLAGS_tests)
 
 test_libvlc_media_player_SOURCES = libvlc/media_player.c
-test_libvlc_media_player_LDADD = $(top_builddir)/src/libvlc-control.la
+test_libvlc_media_player_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_media_player_CFLAGS = $(CFLAGS_tests)
 
 test_libvlc_meta_SOURCES = libvlc/meta.c
-test_libvlc_meta_LDADD = $(top_builddir)/src/libvlc-control.la
+test_libvlc_meta_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_meta_CFLAGS = $(CFLAGS_tests)
 
 
