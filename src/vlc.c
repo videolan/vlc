@@ -184,7 +184,10 @@ int main( int i_argc, const char *ppsz_argv[] )
     libvlc_exception_init (&ex);
 
     /* Initialize libvlc */
-    libvlc_instance_t *vlc = libvlc_new (i_argc, ppsz_argv, &ex);
+    int i_argc_real = i_argc ? i_argc - 1 : 0;
+    const char **ppsz_argv_real = i_argc ? &ppsz_argv[1] : ppsz_argv;
+    libvlc_instance_t *vlc = libvlc_new (i_argc_real, ppsz_argv_real, &ex);
+
     if (vlc != NULL)
     {
         libvlc_run_interface (vlc, NULL, &ex);
