@@ -840,54 +840,43 @@ void __vlc_object_yield( vlc_object_t *p_this )
 void __vlc_object_release( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
-    bool b_should_destroy;
 
     vlc_spin_lock( &internals->ref_spin );
     assert( internals->i_refcount > 0 );
 
-    if( internals->i_refcount > 1 )
+    if( --internals->i_refcount )
     {
         /* Fast path */
         /* There are still other references to the object */
-        internals->i_refcount--;
         vlc_spin_unlock( &internals->ref_spin );
         return;
     }
     vlc_spin_unlock( &internals->ref_spin );
 
-    /* Slow path */
+    /* Slow path : object destruction */
     /* Remember that we cannot hold the spin while waiting on the mutex */
     vlc_mutex_lock( &structure_lock );
-    /* Take the spin again. Note that another thread may have yielded the
-     * object in the (very short) mean time. */
-    vlc_spin_lock( &internals->ref_spin );
-    b_should_destroy = --internals->i_refcount == 0;
-    vlc_spin_unlock( &internals->ref_spin );
 
-    if( b_should_destroy )
-    {
-        /* Remove the object from the table
-         * so that it cannot be encountered by vlc_object_get() */
-        libvlc_global_data_t *p_libvlc_global = vlc_global();
-        int i_index;
+    /* Remove the object from the table
+     * so that it cannot be encountered by vlc_object_get() */
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
+    int i_index;
 
-        i_index = FindIndex( p_this, p_libvlc_global->pp_objects,
-                             p_libvlc_global->i_objects );
-        REMOVE_ELEM( p_libvlc_global->pp_objects,
-                     p_libvlc_global->i_objects, i_index );
+    i_index = FindIndex( p_this, p_libvlc_global->pp_objects,
+                         p_libvlc_global->i_objects );
+    REMOVE_ELEM( p_libvlc_global->pp_objects,
+                 p_libvlc_global->i_objects, i_index );
 
-        /* Detach from parent to protect against FIND_CHILDREN */
-        if (p_this->p_parent)
-            vlc_object_detach_unlocked (p_this);
-        /* Detach from children to protect against FIND_PARENT */
-        for (int i = 0; i < p_this->i_children; i++)
-            p_this->pp_children[i]->p_parent = NULL;
-    }
+    /* Detach from parent to protect against FIND_CHILDREN */
+    if (p_this->p_parent)
+        vlc_object_detach_unlocked (p_this);
+    /* Detach from children to protect against FIND_PARENT */
+    for (int i = 0; i < p_this->i_children; i++)
+        p_this->pp_children[i]->p_parent = NULL;
 
     vlc_mutex_unlock( &structure_lock );
 
-    if( b_should_destroy )
-        vlc_object_destroy( p_this );
+    vlc_object_destroy( p_this );
 }
 
 /**
