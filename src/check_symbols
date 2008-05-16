@@ -9,7 +9,7 @@ sed -n -e 's/^[ ]*VLC_EXPORT[ ]*([^,]*,\([^,]*\),.*/\1/p' | \
 sed -e 's/[^a-zA-Z0-9_]*//' | \
 sort -fdu > libvlc-headers.sym
 
-if ! diff -u ${srcdir}/libvlc.sym libvlc-headers.sym; then
+if ! diff -u ${srcdir}/libvlccore.sym libvlc-headers.sym; then
 	echo "Mismatching symbols found!"
 	exit 1
 fi
