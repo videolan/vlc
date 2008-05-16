@@ -872,7 +872,7 @@ void __vlc_object_release( vlc_object_t *p_this )
         vlc_object_detach_unlocked (p_this);
     /* Detach from children to protect against FIND_PARENT */
     for (int i = 0; i < p_this->i_children; i++)
-        p_this->pp_children[i]->p_parent = NULL;
+        vlc_object_detach_unlocked( p_this->pp_children[i] );
 
     vlc_mutex_unlock( &structure_lock );
 
