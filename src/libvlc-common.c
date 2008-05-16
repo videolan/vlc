@@ -1998,6 +1998,7 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     p_connection = dbus_bus_get ( DBUS_BUS_SYSTEM, &error );
     if( dbus_error_is_set( &error ) || !p_connection )
     {
+        libhal_ctx_free( ctx );
         dbus_error_free( &error );
         return;
     }
