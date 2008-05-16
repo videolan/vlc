@@ -191,23 +191,3 @@
  noinst_LTLIBRARIES = testdso.la
  testdso_la_SOURCES = testdso.c
  testdso_la_LDFLAGS = -module -rpath $(libdir)
---- xml/xmlmodule.c	2005-10-28 16:24:34.000000000 +0200
-+++ xml-new/xmlmodule.c	2006-10-11 13:56:13.748125000 +0200
-@@ -190,6 +190,8 @@
-     return (0);
- }
- 
-+#ifndef _WIN32
-+
- #ifdef HAVE_DLOPEN
- #ifdef HAVE_DLFCN_H
- #include <dlfcn.h>
-@@ -288,7 +290,7 @@
- #endif /* HAVE_SHLLOAD */
- #endif /* ! HAVE_DLOPEN */
- 
--#ifdef _WIN32
-+#else /* _WIN32 */
- 
- #include <windows.h>
- 
