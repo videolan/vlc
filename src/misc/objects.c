@@ -1021,6 +1021,26 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     return p_list;
 }
 
+/**
+ * Gets the list of children of an objects, and increment their reference
+ * count.
+ * @return a list (possibly empty) or NULL in case of error.
+ */
+vlc_list_t *__vlc_list_children( vlc_object_t *obj )
+{
+    vlc_list_t *l;
+
+    vlc_mutex_lock( &structure_lock );
+    l = NewList( obj->i_children );
+    for (int i = 0; i < l->i_count; i++)
+    {
+        vlc_object_yield( obj->pp_children[i] );
+        l->p_values[i].p_object = obj->pp_children[i];
+    }
+    vlc_mutex_unlock( &structure_lock );
+    return l;
+}
+
 /*****************************************************************************
  * DumpCommand: print the current vlc structure
  *****************************************************************************

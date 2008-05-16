@@ -111,6 +111,7 @@ VLC_EXPORT( void *, __vlc_object_find_name, ( vlc_object_t *, const char *, int 
 VLC_EXPORT( void, __vlc_object_yield, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );
 VLC_EXPORT( vlc_list_t *, __vlc_list_find, ( vlc_object_t *, int, int ) );
+VLC_EXPORT( vlc_list_t *, __vlc_list_children, ( vlc_object_t * ) );
 VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 
 /* __vlc_object_dump */
@@ -144,6 +145,9 @@ VLC_EXPORT( void, __vlc_object_dump, ( vlc_object_t *p_this ) );
 
 #define vlc_list_find(a,b,c) \
     __vlc_list_find( VLC_OBJECT(a),b,c)
+
+#define vlc_list_children(a) \
+    __vlc_list_children( VLC_OBJECT(a) )
 
 #define vlc_object_dump(a) \
     __vlc_object_dump( VLC_OBJECT(a))

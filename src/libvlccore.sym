@@ -405,6 +405,7 @@ vlc_getnameinfo
 vlc_iconv
 vlc_iconv_close
 vlc_iconv_open
+__vlc_list_children
 __vlc_list_find
 vlc_list_release
 vlc_lldiv
