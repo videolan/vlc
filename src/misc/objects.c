@@ -877,8 +877,7 @@ void __vlc_object_release( vlc_object_t *p_this )
                      p_libvlc_global->i_objects, i_index );
 
         /* Detach from parent to protect against FIND_CHILDREN */
-        if (p_this->p_parent)
-            vlc_object_detach_unlocked (p_this);
+        vlc_object_detach_unlocked (p_this);
         /* Detach from children to protect against FIND_PARENT */
         for (int i = 0; i < internals->i_children; i++)
             internals->pp_children[i]->p_parent = NULL;
@@ -966,15 +965,10 @@ void __vlc_object_detach( vlc_object_t *p_this )
     if( !p_this ) return;
 
     vlc_mutex_lock( &structure_lock );
-
     if( !p_this->p_parent )
-    {
         msg_Err( p_this, "object is not attached" );
-        vlc_mutex_unlock( &structure_lock );
-        return;
-    }
-
-    vlc_object_detach_unlocked( p_this );
+    else
+        vlc_object_detach_unlocked( p_this );
     vlc_mutex_unlock( &structure_lock );
 }
 
