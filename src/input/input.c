@@ -153,6 +153,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         STATS_TIMER_INPUT_LAUNCHING );
 
     MALLOC_NULL( p_input->p, input_thread_private_t );
+    memset( p_input->p, 0, sizeof( input_thread_private_t ) );
 
     /* One "randomly" selected input thread is responsible for computing
      * the global stats. Check if there is already someone doing this */
@@ -2179,27 +2180,8 @@ static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
 static input_source_t *InputSourceNew( input_thread_t *p_input )
 {
     input_source_t *in = (input_source_t*) malloc( sizeof( input_source_t ) );
-
-    if( !in )
-    {
-        msg_Err( p_input, "out of memory for new input source" );
-        return NULL;
-    }
-
-    in->p_item   = NULL;
-    in->p_access = NULL;
-    in->p_stream = NULL;
-    in->p_demux  = NULL;
-    in->b_title_demux = false;
-    TAB_INIT( in->i_title, in->title );
-    in->b_can_pause = true;
-    in->b_can_pace_control = true;
-    in->b_can_rate_control = true;
-    in->b_rescale_ts = true;
-    in->b_eof = false;
-    in->f_fps = 0.0;
-    in->i_cr_average = 0;
-
+    if( in )
+        memset( in, 0, sizeof( input_source_t ) );
     return in;
 }
 
