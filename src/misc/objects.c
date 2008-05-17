@@ -661,11 +661,14 @@ void __vlc_object_kill( vlc_object_t *p_this )
 
 
 /**
- * find an object given its ID
+ * Find an object given its ID.
  *
- * This function looks for the object whose i_object_id field is i_id. We
- * use a dichotomy so that lookups are in log2(n).
- *****************************************************************************/
+ * This function looks for the object whose i_object_id field is i_id.
+ * This function is slow, and often used to hide bugs. Do not use it.
+ * If you need to retain reference to an object, yield the object pointer with
+ * vlc_object_yield(), use the pointer as your reference, and call
+ * vlc_object_release() when you're done.
+ */
 void * vlc_object_get( int i_id )
 {
     int i_max, i_middle;
