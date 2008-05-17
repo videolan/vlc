@@ -174,8 +174,7 @@ static int Open( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc( sizeof(decoder_sys_t) ) ) == NULL )
     {
-        msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
     p_sys->i_state = STATE_NOSYNC;
     p_sys->i_offset = 0;
@@ -260,16 +259,19 @@ static int Open( vlc_object_t *p_this )
                  p_sys->i_avcC_length_size, i_sps, i_pps );
 
         /* FIXME: FFMPEG isn't happy at all if you leave this */
-        if( p_dec->fmt_out.i_extra ) free( p_dec->fmt_out.p_extra );
-        p_dec->fmt_out.i_extra = 0; p_dec->fmt_out.p_extra = NULL;
+        if( p_dec->fmt_out.i_extra > 0 ) free( p_dec->fmt_out.p_extra );
+        p_dec->fmt_out.i_extra = 0;
+        p_dec->fmt_out.p_extra = NULL;
 
         /* Set the new extradata */
         p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
-        p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
+        p_dec->fmt_out.p_extra = malloc( p_dec->fmt_out.i_extra );
         if( p_dec->fmt_out.p_extra )
         {
-            memcpy( (uint8_t*)p_dec->fmt_out.p_extra, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
-            memcpy( (uint8_t*)p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
+            memcpy( (uint8_t*)p_dec->fmt_out.p_extra,
+                    p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
+            memcpy( (uint8_t*)p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer,
+                    p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
             p_sys->b_header = true;
         }
         else p_dec->fmt_out.i_extra = 0;
