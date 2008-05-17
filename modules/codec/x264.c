@@ -1296,7 +1296,7 @@ static int  Open ( vlc_object_t *p_this )
         p_enc->fmt_out.p_extra = p_tmp;
 
         memcpy( (uint8_t*)p_enc->fmt_out.p_extra + p_enc->fmt_out.i_extra,
-            p_sys->p_buffer, i_size );
+                p_sys->p_buffer, i_size );
 
         p_enc->fmt_out.i_extra += i_size;
     }
