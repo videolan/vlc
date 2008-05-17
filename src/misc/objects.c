@@ -321,33 +321,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     if( p_priv->pf_destructor )
         p_priv->pf_destructor( p_this );
 
-    /* Sanity checks */
-    if( p_priv->i_children )
-    {
-        int i;
-
-        fprintf( stderr,
-                 "ERROR: cannot delete object (%i, %s) with %d children\n",
-                 p_this->i_object_id, p_this->psz_object_name,
-                 p_priv->i_children );
-
-        for( i = 0; i < p_priv->i_children; i++ )
-        {
-            fprintf( stderr,
-                     "ERROR: Remaining children object "
-                     "(id:%i, type:%s, name:%s)\n",
-                     p_priv->pp_children[i]->i_object_id,
-                     p_priv->pp_children[i]->psz_object_type,
-                     p_priv->pp_children[i]->psz_object_name );
-        }
-        fflush(stderr);
-
-        /* Dump libvlc object to ease debugging */
-        vlc_object_dump( p_this->p_libvlc );
-
-        abort();
-    }
-
     /* Destroy the associated variables, starting from the end so that
      * no memmove calls have to be done. */
     while( p_priv->i_vars )
