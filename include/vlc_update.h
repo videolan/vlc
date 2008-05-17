@@ -33,15 +33,23 @@
 
 #include <vlc/vlc.h>
 
-#include <vlc_stream.h>     /* key & signature downloading */
-#include <vlc_strings.h>    /* b64 decoding */
-#include <vlc_charset.h>    /* utf8_fopen() */
-#include <gcrypt.h>         /* cryptography and digest algorithms */
-
 /**
  * \defgroup update Update
  *
  * @{
+ */
+
+/* Go reading the rfc 4880 ! NOW !! */
+
+/*
+ * XXX
+ *  When PGP-signing a file, we only sign a SHA-1 hash of this file
+ *
+ *  As soon as SHA-1 is broken, this method is not secure anymore, because an
+ *  attacker could generate a file with the same SHA-1 hash.
+ *
+ *  Whenever this happens, we need to use another algorithm / type of key.
+ * XXX
  */
 
 enum    /* Public key algorithms */
@@ -75,13 +83,10 @@ enum    /* Signature types */
     POSITIVE_KEY_SIGNATURE  = 0x13  /* Substantial verification */
 };
 
-
 enum    /* Signature subpacket types */
 {
     ISSUER_SUBPACKET    = 0x10
 };
-
-
 
 struct public_key_packet_t
 { /* a public key packet (DSA/SHA-1) is 418 bytes */
@@ -96,52 +101,49 @@ struct public_key_packet_t
     uint8_t y[2+128];
 };
 
-/* used for public key signatures */
-struct signature_packet_v4_t
-{ /* hashed_data or unhashed_data can be empty, so the signature packet is
-   * theorically at least 54 bytes long, but always more than that. */
-
-    uint8_t version;
-    uint8_t type;
-    uint8_t public_key_algo;
-    uint8_t digest_algo;
-    uint8_t hashed_data_len[2];
-    uint8_t *hashed_data;
-    uint8_t unhashed_data_len[2];
-    uint8_t *unhashed_data;
-    uint8_t hash_verification[2];
-
-    /* The part below is made of consecutive MPIs, their number and size being
-     * public-key-algorithm dependant.
-     * But since we use DSA signatures only, we fix it. */
-    uint8_t r[2+20];
-    uint8_t s[2+20];
-};
-
-/* Used for binary document signatures (to be compatible with older software)
- * DSA/SHA-1 is always 65 bytes */
-struct signature_packet_v3_t
+/* used for public key and file signatures */
+struct signature_packet_t
 {
-    uint8_t header[2];
-    uint8_t version;            /* 3 */
-    uint8_t hashed_data_len;    /* MUST be 5 */
+    uint8_t version; /* 3 or 4 */
+
     uint8_t type;
-    uint8_t timestamp[4];       /* 4 bytes scalar number */
-    uint8_t issuer_longid[8];  /* The key which signed the document */
-    uint8_t public_key_algo;    /* we only know about DSA */
-    uint8_t digest_algo;        /* and his little sister SHA-1 */
-    uint8_t hash_verification[2];/* the 2 1st bytes of the SHA-1 hash */
+    uint8_t public_key_algo;    /* DSA only */
+    uint8_t digest_algo;        /* SHA-1 only */
+
+    uint8_t hash_verification[2];
+    uint8_t issuer_longid[8];
+
+    union   /* version specific data */
+    {
+        struct
+        {
+            uint8_t hashed_data_len[2];     /* scalar number */
+            uint8_t *hashed_data;           /* hashed_data_len bytes */
+            uint8_t unhashed_data_len[2];   /* scalar number */
+            uint8_t *unhashed_data;         /* unhashed_data_len bytes */
+        } v4;
+        struct
+        {
+            uint8_t hashed_data_len;    /* MUST be 5 */
+            uint8_t timestamp[4];       /* 4 bytes scalar number */
+        } v3;
+    } specific;
 
     /* The part below is made of consecutive MPIs, their number and size being
      * public-key-algorithm dependant.
-     * But since we use DSA signatures only, we fix it. */
+     *
+     * Since we use DSA signatures only, there is 2 integers, r & s, made of:
+     *      2 bytes for the integer length (scalar number)
+     *      160 bits (20 bytes) for the integer itself
+     *
+     * Note: the integers may be less than 160 significant bits
+     */
     uint8_t r[2+20];
     uint8_t s[2+20];
 };
 
 typedef struct public_key_packet_t public_key_packet_t;
-typedef struct signature_packet_v4_t signature_packet_v4_t;
-typedef struct signature_packet_v3_t signature_packet_v3_t;
+typedef struct signature_packet_t signature_packet_t;
 
 struct public_key_t
 {
@@ -150,7 +152,7 @@ struct public_key_t
 
     public_key_packet_t key;       /* Public key packet */
 
-    signature_packet_v4_t sig;     /* Signature packet, by the embedded key */
+    signature_packet_t sig;     /* Signature packet, by the embedded key */
 };
 
 typedef struct public_key_t public_key_t;
