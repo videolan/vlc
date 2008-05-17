@@ -981,12 +981,12 @@ static int  Open ( vlc_object_t *p_this )
     {
         p_sys->param.analyse.i_me_method = X264_ME_ESA;
     }
-    #if X264_BUILD >= 58 /* r728 */
-        else if( !strcmp( val.psz_string, "tesa" ) )
-        {
-            p_sys->param.analyse.i_me_method = X264_ME_TESA;
-        }
-    #endif
+#   if X264_BUILD >= 58 /* r728 */
+    else if( !strcmp( val.psz_string, "tesa" ) )
+    {
+        p_sys->param.analyse.i_me_method = X264_ME_TESA;
+    }
+#   endif
     free( val.psz_string );
 
     var_Get( p_enc, SOUT_CFG_PREFIX "merange", &val );
@@ -1061,14 +1061,14 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val );
     if( val.i_int > 0 && val.i_int <= 51 )
     {
-#if X264_BUILD >= 54
+#   if X264_BUILD >= 54
         p_sys->param.rc.f_rf_constant = val.i_int;
-#else
+#   else
         p_sys->param.rc.i_rf_constant = val.i_int;
-#endif
-#if X264_BUILD >= 48
+#   endif
+#   if X264_BUILD >= 48
         p_sys->param.rc.i_rc_method = X264_RC_CRF;
-#endif
+#   endif
     }
 #endif
 
@@ -1183,6 +1183,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.vui.i_sar_width = i_dst_num;
         p_sys->param.vui.i_sar_height = i_dst_den;
     }
+
     if( p_enc->fmt_in.video.i_frame_rate_base > 0 )
     {
         p_sys->param.i_fps_num = p_enc->fmt_in.video.i_frame_rate;
@@ -1245,10 +1246,10 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc->p_libvlc, "pthread_win32_count", &count );
 
     if( count.i_int == 0 )
-    {   
+    {
         msg_Dbg( p_enc, "initializing pthread-win32" );
         if( !pthread_win32_process_attach_np() || !pthread_win32_thread_attach_np() )   
-        {   
+        {
             msg_Warn( p_enc, "pthread Win32 Initialization failed" );
             vlc_mutex_unlock( lock.p_address );
             return VLC_EGENERIC;
@@ -1268,6 +1269,11 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_buffer = 4 * p_enc->fmt_in.video.i_width *
         p_enc->fmt_in.video.i_height + 1000;
     p_sys->p_buffer = malloc( p_sys->i_buffer );
+    if( !p_sys->p_buffer )
+    {
+        Close( VLC_OBJECT(p_enc) );
+        return VLC_ENOMEM;
+    }
 
     /* get the globals headers */
     p_enc->fmt_out.i_extra = 0;
@@ -1276,11 +1282,18 @@ static int  Open ( vlc_object_t *p_this )
     x264_encoder_headers( p_sys->h, &nal, &i_nal );
     for( i = 0; i < i_nal; i++ )
     {
+        void *p_tmp;
         int i_size = p_sys->i_buffer;
 
         x264_nal_encode( p_sys->p_buffer, &i_size, 1, &nal[i] );
 
-        p_enc->fmt_out.p_extra = realloc( p_enc->fmt_out.p_extra, p_enc->fmt_out.i_extra + i_size );
+        p_tmp = realloc( p_enc->fmt_out.p_extra, p_enc->fmt_out.i_extra + i_size );
+        if( !p_tmp )
+        {
+            Close( VLC_OBJECT(p_enc) );
+            return VLC_ENOMEM;
+        }
+        p_enc->fmt_out.p_extra = p_tmp;
 
         memcpy( (uint8_t*)p_enc->fmt_out.p_extra + p_enc->fmt_out.i_extra,
             p_sys->p_buffer, i_size );
@@ -1330,6 +1343,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     }
 
     p_block = block_New( p_enc, i_out );
+    if( !p_block ) return NULL;
     memcpy( p_block->p_buffer, p_sys->p_buffer, i_out );
 
     if( pic.i_type == X264_TYPE_IDR || pic.i_type == X264_TYPE_I )
