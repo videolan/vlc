@@ -889,7 +889,12 @@ void __vlc_object_release( vlc_object_t *p_this )
     vlc_mutex_unlock( &structure_lock );
 
     if( b_should_destroy )
+    {
+        free( internals->pp_children );
+        internals->pp_children = NULL;
+        internals->i_children = 0;
         vlc_object_destroy( p_this );
+    }
 }
 
 /**
