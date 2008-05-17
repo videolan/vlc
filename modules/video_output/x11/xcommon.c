@@ -3009,8 +3009,13 @@ static int X11ErrorHandler( Display * display, XErrorEvent * event )
         return i_shm_major = 0;
 #endif
 
+#ifndef HAVE_OSSO
     XSetErrorHandler(NULL);
     return (XSetErrorHandler(X11ErrorHandler))( display, event );
+#else
+    /* Work-around Maemo Xvideo bug */
+    return 0;
+#endif
 }
 
 #ifdef MODULE_NAME_IS_x11
