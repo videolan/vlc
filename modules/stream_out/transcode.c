@@ -362,6 +362,9 @@ static int pi_channels_maps[6] =
 #define SUBPICTURE_RING_SIZE 20
 #define TRANSCODE_FILTERS 10
 
+#define ENC_FRAMERATE (25 * 1000 + .5)
+#define ENC_FRAMERATE_BASE 1000
+
 struct sout_stream_sys_t
 {
     VLC_COMMON_MEMBERS
@@ -1023,8 +1026,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( p_sys->f_fps > 0 )
         {
             id->p_encoder->fmt_out.video.i_frame_rate =
-                (p_sys->f_fps * 1001) + 0.5;
-            id->p_encoder->fmt_out.video.i_frame_rate_base = 1001;
+                (p_sys->f_fps * 1000) + 0.5;
+            id->p_encoder->fmt_out.video.i_frame_rate_base =
+                ENC_FRAMERATE_BASE;
         }
     }
     else if( ( p_fmt->i_cat == SPU_ES ) &&
@@ -1778,8 +1782,8 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         id->p_encoder->fmt_out.video.i_height :
         id->p_decoder->fmt_in.video.i_height ?
         id->p_decoder->fmt_in.video.i_height : 16;
-    id->p_encoder->fmt_in.video.i_frame_rate = 25;
-    id->p_encoder->fmt_in.video.i_frame_rate_base = 1;
+    id->p_encoder->fmt_in.video.i_frame_rate = ENC_FRAMERATE;
+    id->p_encoder->fmt_in.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
 
     id->p_encoder->i_threads = p_sys->i_threads;
     id->p_encoder->p_cfg = p_sys->p_video_cfg;
@@ -1833,10 +1837,10 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 static int transcode_video_encoder_open( sout_stream_t *p_stream,
                                          sout_stream_id_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-     /* Calculate scaling, padding, cropping etc. */
-     /* width/height of source */
+     /* Calculate scaling, padding, cropping etc.
+      * width/height of source */
      int i_src_width = id->p_decoder->fmt_out.video.i_width;
      int i_src_height = id->p_decoder->fmt_out.video.i_height;
 
@@ -1923,6 +1927,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
      {
          f_scale_width = (float)p_sys->i_maxwidth / p_sys->i_crop_width;
      }
+
      if( p_sys->i_maxheight && f_scale_height > (float)p_sys->i_maxheight /
                                                        p_sys->i_crop_height )
      {
@@ -2071,8 +2076,8 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
         else
         {
             /* Pick a sensible default value */
-            id->p_encoder->fmt_out.video.i_frame_rate = 25;
-            id->p_encoder->fmt_out.video.i_frame_rate_base = 1;
+            id->p_encoder->fmt_out.video.i_frame_rate = ENC_FRAMERATE;
+            id->p_encoder->fmt_out.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
         }
     }
 
@@ -2088,12 +2093,14 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
     /* Check whether a particular aspect ratio was requested */
     if( !id->p_encoder->fmt_out.video.i_aspect )
     {
-        id->p_encoder->fmt_out.video.i_aspect = (int)( f_aspect * VOUT_ASPECT_FACTOR + 0.5 );
+        id->p_encoder->fmt_out.video.i_aspect =
+                (int)( f_aspect * VOUT_ASPECT_FACTOR + 0.5 );
     }
     id->p_encoder->fmt_in.video.i_aspect =
         id->p_encoder->fmt_out.video.i_aspect;
 
-    msg_Dbg( p_stream, "encoder aspect is %i:%i", id->p_encoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
+    msg_Dbg( p_stream, "encoder aspect is %i:%i",
+             id->p_encoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
 
     id->p_encoder->p_module =
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, true );
@@ -2256,7 +2263,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out, &id->p_decoder->fmt_out,
+                            &id->p_decoder->fmt_out,
+                            &id->p_decoder->fmt_out,
                             p_sys->p_deinterlace_cfg,
                             p_sys->psz_deinterlace );
 
@@ -2274,7 +2282,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
+                            &id->p_decoder->fmt_out,
+                            &id->p_encoder->fmt_in,
                             NULL, "scale" );
                 if( !id->pp_filter[id->i_filter] )
                 {
@@ -2308,7 +2317,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
+                            &id->p_decoder->fmt_out,
+                            &id->p_encoder->fmt_in,
                             NULL, "croppadd" );
                 if( id->pp_filter[id->i_filter] )
                 {
@@ -2342,7 +2352,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
+                            &id->p_decoder->fmt_out,
+                            &id->p_encoder->fmt_in,
                             NULL, "crop padd" );
                 if( !id->pp_filter[id->i_filter] )
                 {
