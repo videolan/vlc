@@ -114,8 +114,7 @@ int OpenScaler( vlc_object_t *p_this )
     if( ( p_filter->p_sys = p_sys =
           (filter_sys_t *)malloc(sizeof(filter_sys_t)) ) == NULL )
     {
-        msg_Err( p_filter, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     swscale_fast_memcpy = vlc_memcpy;
