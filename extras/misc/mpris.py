@@ -290,7 +290,7 @@ def GetPlayStatus(widget):
 # loads glade file from the directory where the script is,
 # so we can use /path/to/mpris.py to execute it.
 import sys
-xml = gtk.glade.XML(os.path.dirname(sys.argv[0]) + '/mpris.glade')
+xml = gtk.glade.XML(os.path.join(os.path.dirname(sys.argv[0]) , 'mpris.glade'))
 
 # ui setup
 bt_close    = xml.get_widget('close')
