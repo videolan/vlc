@@ -9,12 +9,12 @@ add_executable(test_libvlc_media_list_player libvlc/media_list_player.c
 add_executable(test_libvlc_meta              libvlc/meta.c
                                              samples/meta.sample)
 
-target_link_libraries(test_libvlc_core               libvlc-control)
-target_link_libraries(test_libvlc_events             libvlc-control)
-target_link_libraries(test_libvlc_media_player       libvlc-control)
-target_link_libraries(test_libvlc_media_list         libvlc-control)
-target_link_libraries(test_libvlc_media_list_player  libvlc-control)
-target_link_libraries(test_libvlc_meta               libvlc-control)
+target_link_libraries(test_libvlc_core               libvlc)
+target_link_libraries(test_libvlc_events             libvlc)
+target_link_libraries(test_libvlc_media_player       libvlc)
+target_link_libraries(test_libvlc_media_list         libvlc)
+target_link_libraries(test_libvlc_media_list_player  libvlc)
+target_link_libraries(test_libvlc_meta               libvlc)
 
 set(SAMPLES_SERVER http://streams.videolan.org/streams-videolan/reference)
 
