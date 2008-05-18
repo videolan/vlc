@@ -53,12 +53,13 @@ static const libvlc_state_t vlc_to_libvlc_state_array[] =
 {
     [INIT_S]        = libvlc_Opening,
     [OPENING_S]     = libvlc_Opening,
-    [BUFFERING_S]   = libvlc_Buffering,    
-    [PLAYING_S]     = libvlc_Playing,    
-    [PAUSE_S]       = libvlc_Paused,    
-    [END_S]         = libvlc_Ended,    
-    [ERROR_S]       = libvlc_Error,    
+    [BUFFERING_S]   = libvlc_Buffering,
+    [PLAYING_S]     = libvlc_Playing,
+    [PAUSE_S]       = libvlc_Paused,
+    [END_S]         = libvlc_Ended,
+    [ERROR_S]       = libvlc_Error,
 };
+
 static inline libvlc_state_t vlc_to_libvlc_state( int vlc_state )
 {
     if( vlc_state < 0 || vlc_state > 6 )
@@ -113,7 +114,7 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi,
     input_thread_t *p_input_thread;
 
     if( !p_mi ) RAISENULL( "Media Instance is NULL" );
-    
+
     vlc_mutex_lock( &p_mi->object_lock );
 
     if( !p_mi->p_input_thread )
@@ -257,7 +258,7 @@ input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
     if (!strncmp(psz_cmd, "intf", 4 /* "-change" no need to go further */))
     {
         input_thread_t * p_input = (input_thread_t *)p_this;
-    
+
         var_Get( p_input, "state", &val );
         if( val.i_int != PLAYING_S )
             return VLC_SUCCESS; /* Don't send the position while stopped */
@@ -290,6 +291,11 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     }
 
     p_mi = malloc( sizeof(libvlc_media_player_t) );
+    if( !p_mi )
+    {
+        libvlc_exception_raise( p_e, "Not enough memory" );
+        return NULL;
+    }
     p_mi->p_md = NULL;
     p_mi->drawable = 0;
     p_mi->p_libvlc_instance = p_libvlc_instance;
@@ -438,7 +444,7 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
         return;
 
     vlc_mutex_lock( &p_mi->object_lock );
- 
+
     p_mi->i_refcount--;
 
     if( p_mi->i_refcount > 0 )
@@ -452,7 +458,7 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
     release_input_thread( p_mi );
 
     libvlc_event_manager_release( p_mi->p_event_manager );
- 
+
     libvlc_media_release( p_mi->p_md );
 
     free( p_mi );
@@ -477,7 +483,7 @@ void libvlc_media_player_set_media(
                             libvlc_media_t *p_md,
                             libvlc_exception_t *p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
 
     if( !p_mi )
         return;
@@ -500,7 +506,7 @@ void libvlc_media_player_set_media(
 
     libvlc_media_retain( p_md );
     p_mi->p_md = p_md;
- 
+
     /* The policy here is to ignore that we were created using a different
      * libvlc_instance, because we don't really care */
     p_mi->p_libvlc_instance = p_md->p_libvlc_instance;
@@ -516,7 +522,7 @@ libvlc_media_player_get_media(
                             libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
 
     if( !p_mi->p_md )
         return NULL;
@@ -533,7 +539,7 @@ libvlc_media_player_event_manager(
                             libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
 
     return p_mi->p_event_manager;
 }
@@ -558,7 +564,7 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     libvlc_exception_clear( p_e );
 
     vlc_mutex_lock( &p_mi->object_lock );
- 
+
     if( !p_mi->p_md )
     {
         libvlc_exception_raise( p_e, "no associated media descriptor" );
@@ -665,7 +671,7 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
                                          libvlc_drawable_t drawable,
                                          libvlc_exception_t *p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
     p_mi->drawable = drawable;
 }
 
@@ -675,7 +681,7 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
 libvlc_drawable_t
 libvlc_media_player_get_drawable ( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
     return p_mi->drawable;
 }
 

@@ -240,6 +240,12 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     }
 
     p_md = malloc( sizeof(libvlc_media_t) );
+    if( !p_md )
+    {
+        libvlc_exception_raise( p_e, "Not enough memory" );
+        return NULL;
+    }
+
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
     p_md->b_preparsed       = false;
@@ -295,7 +301,7 @@ libvlc_media_t * libvlc_media_new(
 
     /* The p_input_item is retained in libvlc_media_new_from_input_item */
     vlc_gc_decref( p_input_item );
-    
+
     return p_md;
 }
 
@@ -339,7 +345,7 @@ void libvlc_media_add_option(
                                    const char * ppsz_option,
                                    libvlc_exception_t *p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
     input_ItemAddOpt( p_md->p_input_item, ppsz_option,
                       VLC_INPUT_OPTION_UNIQUE|VLC_INPUT_OPTION_TRUSTED );
 }
@@ -404,7 +410,7 @@ char *
 libvlc_media_get_mrl( libvlc_media_t * p_md,
                                  libvlc_exception_t * p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
     return input_item_GetURI( p_md->p_input_item );
 }
 
@@ -416,9 +422,8 @@ char * libvlc_media_get_meta( libvlc_media_t *p_md,
                                          libvlc_meta_t e_meta,
                                          libvlc_exception_t *p_e )
 {
-    VLC_UNUSED(p_e);
-
     char * psz_meta;
+    VLC_UNUSED(p_e);
 
     /* XXX: locking */
 
@@ -426,7 +431,7 @@ char * libvlc_media_get_meta( libvlc_media_t *p_md,
 
     psz_meta = input_item_GetMeta( p_md->p_input_item,
                                    libvlc_to_vlc_meta[e_meta] );
-    
+
     if( e_meta == libvlc_meta_ArtworkURL && !psz_meta )
     {
         playlist_AskForArtEnqueue(
@@ -453,7 +458,7 @@ libvlc_state_t
 libvlc_media_get_state( libvlc_media_t *p_md,
                                    libvlc_exception_t *p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
     return p_md->state;
 }
 
@@ -466,8 +471,8 @@ libvlc_media_set_state( libvlc_media_t *p_md,
                                    libvlc_state_t state,
                                    libvlc_exception_t *p_e )
 {
-    (void)p_e;
     libvlc_event_t event;
+    VLC_UNUSED(p_e);
 
     p_md->state = state;
 
@@ -581,4 +586,3 @@ libvlc_media_get_user_data( libvlc_media_t * p_md,
         return NULL;
     }
 }
-

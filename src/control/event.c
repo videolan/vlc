@@ -26,7 +26,6 @@
 #include <vlc/libvlc.h>
 #include <vlc_playlist.h>
 
-
 /*
  * Private functions
  */
@@ -64,7 +63,8 @@ group_contains_listener( libvlc_event_listeners_group_t * group,
  **************************************************************************/
 void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
-    (void)p_instance;(void)p_e;
+    VLC_UNUSED(p_instance);
+    VLC_UNUSED(p_e);
     /* Will certainly be used to install libvlc_instance event */
 }
 
@@ -75,7 +75,7 @@ void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
  **************************************************************************/
 void libvlc_event_fini( libvlc_instance_t *p_instance )
 {
-    (void)p_instance;
+    VLC_UNUSED(p_instance);
 }
 
 /**************************************************************************
@@ -233,7 +233,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
                 continue;
             }
         }
-        
+
         listener_cached->pf_callback( p_event, listener_cached->p_user_data );
         listener_cached++;
     }
@@ -286,6 +286,7 @@ static const char * event_type_to_name[] =
     EVENT(libvlc_MediaDiscovererEnded)
 #undef EVENT
 };
+
 static const char * unkwown_event_name = "Unknown Event";
 
 const char * libvlc_event_type_name( libvlc_event_type_t event_type )
@@ -316,7 +317,7 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
         libvlc_exception_raise( p_e, "No Memory left" );
         return;
     }
- 
+
     listener->event_type = event_type;
     listener->p_user_data = p_user_data;
     listener->pf_callback = pf_callback;
@@ -370,7 +371,7 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                     listener->p_user_data == p_user_data )
                 {
                     /* that's our listener */
-                    
+
                     /* Mark this group as edited so that libvlc_event_send
                      * will recheck what listener to call */
                     listeners_group->b_sublistener_removed = false;

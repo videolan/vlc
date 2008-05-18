@@ -71,7 +71,7 @@ static void libvlc_exception_not_handled( const char *psz )
 }
 
 void libvlc_exception_raise( libvlc_exception_t *p_exception,
-                                           const char *psz_format, ... )
+                             const char *psz_format, ... )
 {
     va_list args;
     char * psz;
@@ -131,7 +131,7 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     p_new->p_callback_list = NULL;
     vlc_mutex_init(&p_new->instance_lock);
     vlc_mutex_init(&p_new->event_callback_lock);
- 
+
     libvlc_event_init(p_new, p_e);
 
     return p_new;
