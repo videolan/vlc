@@ -428,7 +428,7 @@ static void Run( intf_thread_t *p_intf )
         {
             FindIndex( p_intf );
         }
-    
+
         while( ( i_key = wgetch( p_sys->w ) ) != -1 )
         {
             /*
@@ -566,13 +566,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     vlc_value_t val;
-    
+
     #define ReturnTrue \
     do { \
     vlc_object_release( p_playlist ); \
     return 1; \
     } while(0)
-    
+
     #define ReturnFalse \
     do { \
     vlc_object_release( p_playlist ); \
@@ -795,7 +795,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
                     playlist_Add( p_playlist, psz_uri, NULL, PLAYLIST_APPEND,
                                   PLAYLIST_END,
-                                  p_parent->p_input == 
+                                  p_parent->p_input ==
                                     p_playlist->p_local_onelevel->p_input
                                   , false );
 
@@ -927,7 +927,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                  * man 3X curs_getch says:
                  *
                  * Use of the escape key by a programmer for a single
-                 * character function is discouraged, as it will cause a delay 
+                 * character function is discouraged, as it will cause a delay
                  * of up to one second while the keypad code looks for a
                  * following function-key sequence.
                  *
@@ -981,12 +981,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 clear();
                 ReturnTrue;
             case KEY_ENTER:
-            case '\r': 
+            case '\r':
             case '\n':
                 if( i_chain_len > 0 )
                 {
                     playlist_item_t *p_parent = p_sys->p_node;
-                   
+
                     if( !p_parent )
                     p_parent = p_playlist->status.p_node;
                     if( !p_parent )
@@ -997,7 +997,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
                     playlist_Add( p_playlist, p_sys->psz_open_chain, NULL,
                                   PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
-                                  p_parent->p_input == 
+                                  p_parent->p_input ==
                                     p_playlist->p_local_onelevel->p_input
                                   , false );
 
@@ -1348,7 +1348,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
 
 #ifdef HAVE_NCURSESW
     wchar_t psz_wide[i_len + 1];
-    
+
     EnsureUTF8( p_buf );
     size_t i_char_len = mbstowcs( psz_wide, p_buf, i_len );
 
@@ -1494,7 +1494,7 @@ static void DumpObject( intf_thread_t *p_intf, int *l, vlc_object_t *p_obj, int 
     vlc_object_release( p_obj );
     for( int i = 0; i < list->i_count ; i++ )
     {
-        MainBoxWrite( p_intf, *l, 1 + 2 * i_level, 
+        MainBoxWrite( p_intf, *l, 1 + 2 * i_level,
             i == list->i_count - 1 ? "`-" : "|-" );
         DumpObject( p_intf, l, list->p_values[i].p_object, i_level + 1 );
     }
@@ -1509,8 +1509,6 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     int y = 0;
     int h;
     int y_end;
-
-    clear();
 
     /* Title */
     attrset( A_REVERSE );
@@ -1908,7 +1906,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 break;
             }
             if( p_sys->b_color )
-                wcolor_set( p_sys->w, 
+                wcolor_set( p_sys->w,
                     p_sys->p_sub->p_msg[i_stop].i_type + C_INFO,
                     NULL );
             mvnprintw( y + h-2-i_line, 1, COLS - 2, "   [%s] %s",
@@ -2276,7 +2274,7 @@ static void PlaylistRebuild( intf_thread_t *p_intf )
     p_sys->b_need_update = false;
 
     PL_UNLOCK;
-    
+
     vlc_object_release( p_playlist );
 }
 
@@ -2324,7 +2322,7 @@ static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
             char *psz_tmp;
             if( asprintf( &psz_tmp, "%s%c ", c,
                      k == p_node->i_children - 1 ? ' ' : '|' ) == -1 )
-                return; 
+                return;
             PlaylistAddNode( p_intf, p_child, i,
                              strlen( c ) ? psz_tmp : " " );
             free( psz_tmp );
