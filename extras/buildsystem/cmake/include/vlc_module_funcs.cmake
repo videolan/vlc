@@ -18,7 +18,7 @@ MACRO(vlc_add_module module_name)
 ENDMACRO(vlc_add_module)
 
 MACRO(vlc_get_module_compile_flags var module_name)
-    set(${var} "-D__PLUGIN__ -DMODULE_NAME=${module_name} -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR} ${VLC_${module_name}_COMPILE_FLAG}")
+    set(${var} "-D__PLUGIN__ -DMODULE_STRING=\\\"${module_name}\\\" -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR} ${VLC_${module_name}_COMPILE_FLAG}")
 ENDMACRO(vlc_get_module_compile_flags)
 
 MACRO(vlc_register_modules module_state)
