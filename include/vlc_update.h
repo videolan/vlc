@@ -44,6 +44,10 @@
 /*
  * XXX
  *  When PGP-signing a file, we only sign a SHA-1 hash of this file
+ *  The DSA key size requires that we use an algorithm which produce
+ *  a 160 bits long hash
+ *  An alternative is RIPEMD160 , which you can use by giving the option
+ *      --digest-algo RIPEMD160 to GnuPG
  *
  *  As soon as SHA-1 is broken, this method is not secure anymore, because an
  *  attacker could generate a file with the same SHA-1 hash.
