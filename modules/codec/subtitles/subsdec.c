@@ -580,211 +580,214 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
 
     psz_tag[ 0 ] = '\0';
 
-    if( psz_html_start != NULL )
+    if( psz_html_start == NULL )
     {
-        char *psz_html = psz_html_start;
+        free( psz_tag );
+        return NULL;
+    }
+    
+    char *psz_html = psz_html_start;
 
-        strcpy( psz_html, "<text>" );
-        psz_html += 6;
+    strcpy( psz_html, "<text>" );
+    psz_html += 6;
 
-        while( *psz_subtitle )
+    while( *psz_subtitle )
+    {
+        if( *psz_subtitle == '\n' )
         {
-            if( *psz_subtitle == '\n' )
+            strcpy( psz_html, "<br/>" );
+            psz_html += 5;
+            psz_subtitle++;
+        }
+        else if( *psz_subtitle == '<' )
+        {
+            if( !strncasecmp( psz_subtitle, "<br/>", 5 ))
             {
                 strcpy( psz_html, "<br/>" );
                 psz_html += 5;
-                psz_subtitle++;
+                psz_subtitle += 5;
             }
-            else if( *psz_subtitle == '<' )
+            else if( !strncasecmp( psz_subtitle, "<b>", 3 ) )
             {
-                if( !strncasecmp( psz_subtitle, "<br/>", 5 ))
-                {
-                    strcpy( psz_html, "<br/>" );
-                    psz_html += 5;
-                    psz_subtitle += 5;
-                }
-                else if( !strncasecmp( psz_subtitle, "<b>", 3 ) )
-                {
-                    strcpy( psz_html, "<b>" );
-                    strcat( psz_tag, "b" );
-                    psz_html += 3;
-                    psz_subtitle += 3;
-                }
-                else if( !strncasecmp( psz_subtitle, "<i>", 3 ) )
-                {
-                    strcpy( psz_html, "<i>" );
-                    strcat( psz_tag, "i" );
-                    psz_html += 3;
-                    psz_subtitle += 3;
-                }
-                else if( !strncasecmp( psz_subtitle, "<u>", 3 ) )
-                {
-                    strcpy( psz_html, "<u>" );
-                    strcat( psz_tag, "u" );
-                    psz_html += 3;
-                    psz_subtitle += 3;
-                }
-                else if( !strncasecmp( psz_subtitle, "<font ", 6 ))
-                {
-                    const char *psz_attribs[] = { "face=\"", "family=\"", "size=\"",
-                            "color=\"", "outline-color=\"", "shadow-color=\"",
-                            "outline-level=\"", "shadow-level=\"", "back-color=\"",
-                            "alpha=\"", NULL };
+                strcpy( psz_html, "<b>" );
+                strcat( psz_tag, "b" );
+                psz_html += 3;
+                psz_subtitle += 3;
+            }
+            else if( !strncasecmp( psz_subtitle, "<i>", 3 ) )
+            {
+                strcpy( psz_html, "<i>" );
+                strcat( psz_tag, "i" );
+                psz_html += 3;
+                psz_subtitle += 3;
+            }
+            else if( !strncasecmp( psz_subtitle, "<u>", 3 ) )
+            {
+                strcpy( psz_html, "<u>" );
+                strcat( psz_tag, "u" );
+                psz_html += 3;
+                psz_subtitle += 3;
+            }
+            else if( !strncasecmp( psz_subtitle, "<font ", 6 ))
+            {
+                const char *psz_attribs[] = { "face=\"", "family=\"", "size=\"",
+                        "color=\"", "outline-color=\"", "shadow-color=\"",
+                        "outline-level=\"", "shadow-level=\"", "back-color=\"",
+                        "alpha=\"", NULL };
 
-                    strcpy( psz_html, "<font " );
-                    strcat( psz_tag, "f" );
-                    psz_html += 6;
-                    psz_subtitle += 6;
+                strcpy( psz_html, "<font " );
+                strcat( psz_tag, "f" );
+                psz_html += 6;
+                psz_subtitle += 6;
 
-                    while( *psz_subtitle != '>' )
+                while( *psz_subtitle != '>' )
+                {
+                    int  k;
+
+                    for( k=0; psz_attribs[ k ]; k++ )
                     {
-                        int  k;
+                        int i_len = strlen( psz_attribs[ k ] );
 
-                        for( k=0; psz_attribs[ k ]; k++ )
+                        if( !strncasecmp( psz_subtitle, psz_attribs[k], i_len ))
                         {
-                            int i_len = strlen( psz_attribs[ k ] );
-
-                            if( !strncasecmp( psz_subtitle, psz_attribs[ k ], i_len ))
-                            {
-                                i_len += strcspn( psz_subtitle + i_len, "\"" ) + 1;
-
-                                strncpy( psz_html, psz_subtitle, i_len );
-                                psz_html += i_len;
-                                psz_subtitle += i_len;
-                                break;
-                            }
-                        }
-                        if( psz_attribs[ k ] == NULL )
-                        {
-                            /* Jump over unrecognised tag */
-                            int i_len = strcspn( psz_subtitle, "\"" ) + 1;
-
                             i_len += strcspn( psz_subtitle + i_len, "\"" ) + 1;
+
+                            strncpy( psz_html, psz_subtitle, i_len );
+                            psz_html += i_len;
                             psz_subtitle += i_len;
+                            break;
                         }
-                        while (*psz_subtitle == ' ')
-                            *psz_html++ = *psz_subtitle++;
                     }
-                    *psz_html++ = *psz_subtitle++;
+                    if( psz_attribs[ k ] == NULL )
+                    {
+                        /* Jump over unrecognised tag */
+                        int i_len = strcspn( psz_subtitle, "\"" ) + 1;
+
+                        i_len += strcspn( psz_subtitle + i_len, "\"" ) + 1;
+                        psz_subtitle += i_len;
+                    }
+                    while (*psz_subtitle == ' ')
+                        *psz_html++ = *psz_subtitle++;
                 }
-                else if( !strncmp( psz_subtitle, "</", 2 ))
+                *psz_html++ = *psz_subtitle++;
+            }
+            else if( !strncmp( psz_subtitle, "</", 2 ))
+            {
+                bool   b_match     = false;
+                int    i_len       = strlen( psz_tag ) - 1;
+                char  *psz_lastTag = NULL;
+
+                if( i_len >= 0 )
                 {
-                    bool  b_match     = false;
-                    int         i_len       = strlen( psz_tag ) - 1;
-                    char       *psz_lastTag = NULL;
+                    psz_lastTag = psz_tag + i_len;
+                    i_len = 0;
 
-                    if( i_len >= 0 )
+                    switch( *psz_lastTag )
                     {
-                        psz_lastTag = psz_tag + i_len;
-                        i_len = 0;
-
-                        switch( *psz_lastTag )
-                        {
-                            case 'b':
-                                b_match = !strncasecmp( psz_subtitle, "</b>", 4 );
-                                i_len   = 4;
-                                break;
-                            case 'i':
-                                b_match = !strncasecmp( psz_subtitle, "</i>", 4 );
-                                i_len   = 4;
-                                break;
-                            case 'u':
-                                b_match = !strncasecmp( psz_subtitle, "</u>", 4 );
-                                i_len   = 4;
-                                break;
-                            case 'f':
-                                b_match = !strncasecmp( psz_subtitle, "</font>", 7 );
-                                i_len   = 7;
-                                break;
-                        }
-                    }
-                    if( ! b_match )
-                    {
-                        /* Not well formed -- kill everything */
-                        free( psz_html_start );
-                        psz_html_start = NULL;
+                    case 'b':
+                        b_match = !strncasecmp( psz_subtitle, "</b>", 4 );
+                        i_len   = 4;
+                        break;
+                    case 'i':
+                        b_match = !strncasecmp( psz_subtitle, "</i>", 4 );
+                        i_len   = 4;
+                        break;
+                    case 'u':
+                        b_match = !strncasecmp( psz_subtitle, "</u>", 4 );
+                        i_len   = 4;
+                        break;
+                    case 'f':
+                        b_match = !strncasecmp( psz_subtitle, "</font>", 7 );
+                        i_len   = 7;
                         break;
                     }
-                    *psz_lastTag = '\0';
-                    strncpy( psz_html, psz_subtitle, i_len );
-                    psz_html += i_len;
-                    psz_subtitle += i_len;
                 }
-                else
+                if( ! b_match )
                 {
-                    psz_subtitle += strcspn( psz_subtitle, ">" );
+                    /* Not well formed -- kill everything */
+                    free( psz_html_start );
+                    psz_html_start = NULL;
+                    break;
                 }
-            }
-            else if( *psz_subtitle == '&' )
-            {
-                if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
-                {
-                    strcpy( psz_html, "&lt;" );
-                    psz_html += 4;
-                    psz_subtitle += 4;
-                }
-                else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
-                {
-                    strcpy( psz_html, "&gt;" );
-                    psz_html += 4;
-                    psz_subtitle += 4;
-                }
-                else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
-                {
-                    strcpy( psz_html, "&amp;" );
-                    psz_html += 5;
-                    psz_subtitle += 5;
-                }
-                else
-                {
-                    strcpy( psz_html, "&amp;" );
-                    psz_html += 5;
-                    psz_subtitle++;
-                }
+                *psz_lastTag = '\0';
+                strncpy( psz_html, psz_subtitle, i_len );
+                psz_html += i_len;
+                psz_subtitle += i_len;
             }
             else
             {
-                *psz_html = *psz_subtitle;
-                if( psz_html > psz_html_start )
-                {
-                    /* Check for double whitespace */
-                    if((( *psz_html == ' ' ) ||
-                        ( *psz_html == '\t' )) &&
-                       (( *(psz_html-1) == ' ' ) ||
-                        ( *(psz_html-1) == '\t' )))
-                    {
-                        strcpy( psz_html, NO_BREAKING_SPACE );
-                        psz_html += strlen( NO_BREAKING_SPACE ) - 1;
-                    }
-                }
-                psz_html++;
+                psz_subtitle += strcspn( psz_subtitle, ">" );
+            }
+        }
+        else if( *psz_subtitle == '&' )
+        {
+            if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
+            {
+                strcpy( psz_html, "&lt;" );
+                psz_html += 4;
+                psz_subtitle += 4;
+            }
+            else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
+            {
+                strcpy( psz_html, "&gt;" );
+                psz_html += 4;
+                psz_subtitle += 4;
+            }
+            else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
+            {
+                strcpy( psz_html, "&amp;" );
+                psz_html += 5;
+                psz_subtitle += 5;
+            }
+            else
+            {
+                strcpy( psz_html, "&amp;" );
+                psz_html += 5;
                 psz_subtitle++;
             }
-
-            if( ( size_t )( psz_html - psz_html_start ) > i_buf_size - 10 )
+        }
+        else
+        {
+            *psz_html = *psz_subtitle;
+            if( psz_html > psz_html_start )
             {
-                int i_len = psz_html - psz_html_start;
-
-                i_buf_size += 100;
-                psz_html_start = realloc( psz_html_start, i_buf_size );
-                psz_html = psz_html_start + i_len;
-                *psz_html = '\0';
+                /* Check for double whitespace */
+                if((( *psz_html == ' ' ) ||
+                    ( *psz_html == '\t' )) &&
+                   (( *(psz_html-1) == ' ' ) ||
+                    ( *(psz_html-1) == '\t' )))
+                {
+                    strcpy( psz_html, NO_BREAKING_SPACE );
+                    psz_html += strlen( NO_BREAKING_SPACE ) - 1;
+                }
             }
+            psz_html++;
+            psz_subtitle++;
         }
-        strcpy( psz_html, "</text>" );
-        psz_html += 7;
 
-        if( psz_tag[ 0 ] != '\0' )
+        if( ( size_t )( psz_html - psz_html_start ) > i_buf_size - 10 )
         {
-            /* Not well formed -- kill everything */
-            free( psz_html_start );
-            psz_html_start = NULL;
+            int i_len = psz_html - psz_html_start;
+
+            i_buf_size += 100;
+            psz_html_start = realloc( psz_html_start, i_buf_size );
+            psz_html = psz_html_start + i_len;
+            *psz_html = '\0';
         }
-        else if( psz_html_start )
-        {
-            /* Shrink the memory requirements */
-            psz_html_start = realloc( psz_html_start,  psz_html - psz_html_start + 1 );
-        }
+    }
+    strcpy( psz_html, "</text>" );
+    psz_html += 7;
+
+    if( psz_tag[ 0 ] != '\0' )
+    {
+        /* Not well formed -- kill everything */
+        free( psz_html_start );
+        psz_html_start = NULL;
+    }
+    else if( psz_html_start )
+    {
+        /* Shrink the memory requirements */
+        psz_html_start = realloc( psz_html_start,  psz_html - psz_html_start + 1 );
     }
     free( psz_tag );
     return psz_html_start;
