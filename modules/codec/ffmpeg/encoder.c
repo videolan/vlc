@@ -86,7 +86,7 @@ struct thread_context_t
 
     vlc_mutex_t     lock;
     vlc_cond_t      cond;
-    bool      b_work, b_done;
+    bool            b_work, b_done;
 };
 
 /*****************************************************************************
@@ -112,7 +112,7 @@ struct encoder_sys_t
     mtime_t i_last_ref_pts;
     mtime_t i_buggy_pts_detect;
     mtime_t i_last_pts;
-    bool b_inited;
+    bool    b_inited;
 
     /*
      * Audio properties
@@ -128,16 +128,16 @@ struct encoder_sys_t
     int        i_qmin;
     int        i_qmax;
     int        i_hq;
-    bool b_strict_rc;
+    bool       b_strict_rc;
     int        i_rc_buffer_size;
     float      f_rc_buffer_aggressivity;
-    bool b_pre_me;
-    bool b_hurry_up;
-    bool b_interlace, b_interlace_me;
+    bool       b_pre_me;
+    bool       b_hurry_up;
+    bool       b_interlace, b_interlace_me;
     float      f_i_quant_factor;
     int        i_noise_reduction;
-    bool b_mpeg4_matrix;
-    bool b_trellis;
+    bool       b_mpeg4_matrix;
+    bool       b_trellis;
     int        i_quality; /* for VBR */
     float      f_lumi_masking, f_dark_masking, f_p_masking, f_border_masking;
     int        i_luma_elim, i_chroma_elim;
@@ -155,9 +155,9 @@ static const char *ppsz_enc_options[] = {
     "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
     "p-masking", "border-masking", "luma-elim-threshold",
-    "chroma-elim-threshold", 
+    "chroma-elim-threshold",
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
-     "aac-profile", 
+     "aac-profile",
 #endif
      NULL
 };
@@ -237,7 +237,7 @@ int OpenEncoder( vlc_object_t *p_this )
     }
 
     /* Initialization must be done before avcodec_find_encoder() */
-    InitLibavcodec(p_this);
+    InitLibavcodec( p_this );
 
     p_codec = avcodec_find_encoder( i_codec_id );
     if( !p_codec )
@@ -529,8 +529,8 @@ int OpenEncoder( vlc_object_t *p_this )
         if( p_sys->i_vtolerance > 0 )
             p_context->bit_rate_tolerance = p_sys->i_vtolerance;
 
-        /* usually if someone sets bitrate, he likes more to get that bitrate over quality 
-         * should help 'normal' user to get asked bitrate
+        /* usually if someone sets bitrate, he likes more to get that bitrate
+         * over quality should help 'normal' user to get asked bitrate
          */
         if( p_enc->fmt_out.i_bitrate > 0 && p_sys->i_qmax == 0 && p_sys->i_qmin == 0 )
         {
@@ -655,7 +655,8 @@ int OpenEncoder( vlc_object_t *p_this )
             {
                 vlc_mutex_unlock( lock );
                 msg_Err( p_enc, "cannot open encoder" );
-                intf_UserFatal( p_enc, false, _("Streaming / Transcoding failed"),
+                intf_UserFatal( p_enc, false,
+                                _("Streaming / Transcoding failed"),
                                 _("VLC could not open the encoder.") );
                 free( p_sys );
                 return VLC_EGENERIC;
@@ -1021,7 +1022,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             p_samples = (int16_t *)p_buffer;
         }
 
-        i_out = avcodec_encode_audio( p_sys->p_context, (uint8_t *)p_sys->p_buffer_out,
+        i_out = avcodec_encode_audio( p_sys->p_context,
+                                      (uint8_t *)p_sys->p_buffer_out,
                                       2 * AVCODEC_MAX_AUDIO_FRAME_SIZE,
                                       p_samples );
 
