@@ -172,8 +172,6 @@ static inline unsigned mprec( void )
 #endif
 }
 
-static volatile mtime_t cached_time = 0;
-
 /**
  * Return high precision date
  *
@@ -313,7 +311,7 @@ mtime_t mdate( void )
     res = (mtime_t) tv_date.tv_sec * 1000000 + (mtime_t) tv_date.tv_usec;
 #endif
 
-    return cached_time = res;
+    return res;
 }
 
 /**
@@ -327,9 +325,8 @@ mtime_t mdate( void )
 void mwait( mtime_t date )
 {
     /* If the deadline is already elapsed, or within the clock precision,
-     * do not even bother the clock. */
-    if( ( date - cached_time ) < (mtime_t)mprec() ) // OK: mtime_t is signed
-        return;
+     * do not even bother the system timer. */
+    date -= mprec();
 
 #if 0 && defined (HAVE_CLOCK_NANOSLEEP)
     lldiv_t d = lldiv( date, 1000000 );
@@ -360,8 +357,6 @@ void mwait( mtime_t date )
  */
 void msleep( mtime_t delay )
 {
-    mtime_t earlier = cached_time;
-
 #if defined( HAVE_CLOCK_NANOSLEEP )
     lldiv_t d = lldiv( delay, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
@@ -398,10 +393,6 @@ void msleep( mtime_t delay )
      * or clock_nanosleep() if this is an issue. */
     select( 0, NULL, NULL, NULL, &tv_delay );
 #endif
-
-    earlier += delay;
-    if( cached_time < earlier )
-        cached_time = earlier;
 }
 
 /*
