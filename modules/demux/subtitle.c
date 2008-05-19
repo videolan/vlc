@@ -59,13 +59,14 @@ static void Close( vlc_object_t *p_this );
     N_("Force the subtiles format. Valid values are : \"microdvd\", " \
     "\"subrip\",  \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
     "\"sami\", \"dvdsubtitle\", \"mpl2\", \"aqt\", \"pjs\" "\
-    "\"mpsub\" \"jacosub\" \"psb\" and \"auto\" (meaning autodetection, this " \
-    "should always work).")
+    "\"mpsub\" \"jacosub\" \"psb\" \"realtext\" \"dks\" and \"auto\" " \
+    "(meaning autodetection, this should always work).")
+
 static const char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
     "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2",
-    "aqt", "pjs", "mpsub", "jacosub", "psb"
+    "aqt", "pjs", "mpsub", "jacosub", "psb", "rt", "dks"
 };
 
 vlc_module_begin();
