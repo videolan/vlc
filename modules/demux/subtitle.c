@@ -1333,7 +1333,7 @@ static int ParseAQT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             /* We have been too far: end of the subtitle, begin of next */
             else
             {
-                txt->i_line--;
+                TextPreviousLine( txt );
                 break;
             }
         }
@@ -1505,10 +1505,10 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         if( !s )
             return VLC_EGENERIC;
 
-        psz_text = malloc( strlen( s ) + 1 );
-        if( !psz_text )
+        psz_orig = malloc( strlen( s ) + 1 );
+        if( !psz_orig )
             return VLC_ENOMEM;
-        psz_orig = psz_text;
+        psz_text = psz_orig;
 
         /* Complete time lines */
         if( sscanf( s, "%d:%d:%d.%d %d:%d:%d.%d %[^\n\r]",
@@ -1520,6 +1520,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             p_subtitle->i_stop = ( (int64_t)( h2 *3600 + m2 * 60 + s2 ) +
                 (int64_t)( ( f2 +  jss_time_shift ) /  jss_time_resolution ) )
                 * 1000000;
+            break;
         }
         /* Short time lines */
         else if( sscanf( s, "@%d @%d %[^\n\r]", &f1, &f2, psz_text ) == 3 )
@@ -1528,6 +1529,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
                     ( f1 + jss_time_shift ) / jss_time_resolution * 1000000.0 );
             p_subtitle->i_stop = (int64_t)(
                     ( f2 + jss_time_shift ) / jss_time_resolution * 1000000.0 );
+            break;
         }
         /* General Directive lines */
         /* Only TIME and SHIFT are supported so far */
@@ -1584,123 +1586,136 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
                 sscanf( &psz_text[shift], "%d", &jss_time_resolution );
                 break;
             }
-            free( psz_text );
+            free( psz_orig );
             continue;
         }
         else
             /* Unkown type line, probably a comment */
         {
-            free( psz_text );
+            free( psz_orig );
             continue;
         }
-
-        /* Skip the blanks */
-        while( *psz_text == ' ' || *psz_text == '\t' ) psz_text++;
-
-        /* Parse the directives */
-        if( isalpha( *psz_text ) || *psz_text == '[' )
-        {
-            while( *psz_text != ' ' )
-            { psz_text++ ;};
-
-            /* Directives are NOT parsed yet */
-            /* This has probably a better place in a decoder ? */
-            /* directive = malloc( strlen( psz_text ) + 1 );
-            if( sscanf( psz_text, "%s %[^\n\r]", directive, psz_text2 ) == 2 )*/
-        }
-
-        /* Skip the blanks after directives */
-        while( *psz_text == ' ' || *psz_text == '\t' ) psz_text++;
-
-
-        /* Clean all the lines from inline comments and other stuffs */
-        psz_text2 = calloc( strlen( psz_text) + 1, 1 );
-        psz_orig2 = psz_text2;
-
-        for( ; *psz_text != '\0' && *psz_text != '\n' && *psz_text != '\r'; )
-        {
-            switch( *psz_text )
-            {
-            case '{':
-                i_comment++;
-                break;
-            case '}':
-                if( i_comment )
-                {
-                    i_comment = 0;
-                    if( (*(psz_text + 1 ) ) == ' ' ) psz_text++;
-                }
-                break;
-            case '~':
-                if( !i_comment )
-                {
-                    *psz_text2 = ' ';
-                    psz_text2++;
-                }
-                break;
-            case ' ':
-            case '\t':
-                if( (*(psz_text + 1 ) ) == ' ' || (*(psz_text + 1 ) ) == '\t' )
-                    break;
-                if( !i_comment )
-                {
-                    *psz_text2 = ' ';
-                    psz_text2++;
-                }
-                break;
-            case '\\':
-                if( (*(psz_text + 1 ) ) == 'n' )
-                {
-                    *psz_text2 = '\n';
-                    psz_text++;
-                    psz_text2++;
-                    break;
-                }
-                if( ( toupper(*(psz_text + 1 ) ) == 'C' ) ||
-                    ( toupper(*(psz_text + 1 ) ) == 'F' ) )
-                {
-                    psz_text++; psz_text++;
-                    break;
-                }
-                if( (*(psz_text + 1 ) ) == 'B' || (*(psz_text + 1 ) ) == 'b' ||
-                    (*(psz_text + 1 ) ) == 'I' || (*(psz_text + 1 ) ) == 'i' ||
-                    (*(psz_text + 1 ) ) == 'U' || (*(psz_text + 1 ) ) == 'u' ||
-                    (*(psz_text + 1 ) ) == 'D' || (*(psz_text + 1 ) ) == 'N' )
-                {
-                    psz_text++;
-                    break;
-                }
-                if( (*(psz_text + 1 ) ) == '~' || (*(psz_text + 1 ) ) == '{' ||
-                    (*(psz_text + 1 ) ) == '\\' )
-                    psz_text++;
-                else if( *(psz_text + 1 ) == '\r' ||  *(psz_text + 1 ) == '\n'
-                         ||  *(psz_text + 1 ) == '\0' )
-                {
-                    char *s2 = TextGetLine( txt );
-                    if( !s2 )
-                        return VLC_EGENERIC;
-
-                    while ( *s2 == ' ' ) s2++;
-
-                    /* Here to parse the second line, we should add s2 to
-                       psz_text and go on the for( ) line 1556 in order to
-                       parse the next line.
-                    */
-                }
-            default:
-                if( !i_comment )
-                {
-                    *psz_text2 = *psz_text;
-                    psz_text2++;
-                }
-            }
-            psz_text++;
-        }
-
-        p_subtitle->psz_text = psz_orig2;
-        free( psz_orig );
-        return VLC_SUCCESS;
     }
+	
+	while( psz_text[ strlen( psz_text ) - 1 ] == '\\' )
+	{
+        const char *s2 = TextGetLine( txt );
+
+        if( !s2 )
+            return VLC_EGENERIC;
+
+        int i_len = strlen( s2 );
+        if( i_len == 0 )
+            break;
+
+        int i_old = strlen( psz_text );
+
+        psz_text = realloc( psz_text, i_old + i_len + 1 );
+        if( !psz_text )
+             return VLC_ENOMEM;
+
+		psz_orig = psz_text;
+        strcat( psz_text, s2 );
+	}
+
+    /* Skip the blanks */
+    while( *psz_text == ' ' || *psz_text == '\t' ) psz_text++;
+
+    /* Parse the directives */
+    if( isalpha( *psz_text ) || *psz_text == '[' )
+    {
+        while( *psz_text != ' ' )
+        { psz_text++ ;};
+
+        /* Directives are NOT parsed yet */
+        /* This has probably a better place in a decoder ? */
+        /* directive = malloc( strlen( psz_text ) + 1 );
+           if( sscanf( psz_text, "%s %[^\n\r]", directive, psz_text2 ) == 2 )*/
+    }
+
+    /* Skip the blanks after directives */
+    while( *psz_text == ' ' || *psz_text == '\t' ) psz_text++;
+
+    /* Clean all the lines from inline comments and other stuffs */
+    psz_orig2 = calloc( strlen( psz_text) + 1, 1 );
+    psz_text2 = psz_orig2;
+
+    for( ; *psz_text != '\0' && *psz_text != '\n' && *psz_text != '\r'; )
+    {
+        switch( *psz_text )
+        {
+        case '{':
+            i_comment++;
+            break;
+        case '}':
+            if( i_comment )
+            {
+                i_comment = 0;
+                if( (*(psz_text + 1 ) ) == ' ' ) psz_text++;
+            }
+            break;
+        case '~':
+            if( !i_comment )
+            {
+                *psz_text2 = ' ';
+                psz_text2++;
+            }
+            break;
+        case ' ':
+        case '\t':
+            if( (*(psz_text + 1 ) ) == ' ' || (*(psz_text + 1 ) ) == '\t' )
+                break;
+            if( !i_comment )
+            {
+                *psz_text2 = ' ';
+                psz_text2++;
+            }
+            break;
+        case '\\':
+            if( (*(psz_text + 1 ) ) == 'n' )
+            {
+                *psz_text2 = '\n';
+                psz_text++;
+                psz_text2++;
+                break;
+            }
+            if( ( toupper(*(psz_text + 1 ) ) == 'C' ) ||
+                    ( toupper(*(psz_text + 1 ) ) == 'F' ) )
+            {
+                psz_text++; psz_text++;
+                break;
+            }
+            if( (*(psz_text + 1 ) ) == 'B' || (*(psz_text + 1 ) ) == 'b' ||
+                (*(psz_text + 1 ) ) == 'I' || (*(psz_text + 1 ) ) == 'i' ||
+                (*(psz_text + 1 ) ) == 'U' || (*(psz_text + 1 ) ) == 'u' ||
+                (*(psz_text + 1 ) ) == 'D' || (*(psz_text + 1 ) ) == 'N' )
+            {
+                psz_text++;
+                break;
+            }
+            if( (*(psz_text + 1 ) ) == '~' || (*(psz_text + 1 ) ) == '{' ||
+                (*(psz_text + 1 ) ) == '\\' )
+                psz_text++;
+            else if( *(psz_text + 1 ) == '\r' ||  *(psz_text + 1 ) == '\n' ||
+                     *(psz_text + 1 ) == '\0' )
+            {
+				psz_text++;
+            }
+            break;
+        default:
+            if( !i_comment )
+            {
+                *psz_text2 = *psz_text;
+                psz_text2++;
+            }
+        }
+        psz_text++;
+    }
+
+    p_subtitle->psz_text = psz_orig2;
+    msg_Dbg( p_demux, "%s", p_subtitle->psz_text );
+    free( psz_orig );
+    return VLC_SUCCESS;
 }
 
 static int ParsePSB( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
@@ -1837,7 +1852,7 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         if( strcasestr( s, "<time" ) ||
             strcasestr( s, "<clear/") )
         {
-            txt->i_line--;
+            TextPreviousLine( txt );
             break;
         }
 
