@@ -99,7 +99,7 @@
  * The evil global variables. We handle them with care, don't worry.
  *****************************************************************************/
 static libvlc_int_t *    p_static_vlc = NULL;
-static volatile unsigned int i_instances = 0;
+static unsigned          i_instances = 0;
 
 static bool b_daemon = false;
 
