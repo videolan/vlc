@@ -144,6 +144,19 @@ char *secstotimestr( char *psz_buffer, int i_seconds )
     return( psz_buffer );
 }
 
+#if defined (HAVE_CLOCK_NANOSLEEP)
+static unsigned prec = 0;
+
+static void mprec_once( void )
+{
+    struct timespec ts;
+    if( clock_getres( CLOCK_MONOTONIC, &ts ))
+        clock_getres( CLOCK_REALTIME, &ts );
+
+    prec = ts.tv_nsec / 1000;
+}
+#endif
+
 /**
  * Return a value that is no bigger than the clock precision
  * (possibly zero).
@@ -151,16 +164,14 @@ char *secstotimestr( char *psz_buffer, int i_seconds )
 static inline unsigned mprec( void )
 {
 #if defined (HAVE_CLOCK_NANOSLEEP)
-    struct timespec ts;
-    if( clock_getres( CLOCK_MONOTONIC, &ts ))
-        clock_getres( CLOCK_REALTIME, &ts );
-
-    return ts.tv_nsec / 1000;
-#endif
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    pthread_once( &once, mprec_once );
+    return prec;
+#else
     return 0;
+#endif
 }
 
-static unsigned prec = 0;
 static volatile mtime_t cached_time = 0;
 
 /**
@@ -315,12 +326,9 @@ mtime_t mdate( void )
  */
 void mwait( mtime_t date )
 {
-    if( prec == 0 )
-        prec = mprec();
-
     /* If the deadline is already elapsed, or within the clock precision,
      * do not even bother the clock. */
-    if( ( date - cached_time ) < (mtime_t)prec ) // OK: mtime_t is signed
+    if( ( date - cached_time ) < (mtime_t)mprec() ) // OK: mtime_t is signed
         return;
 
 #if 0 && defined (HAVE_CLOCK_NANOSLEEP)
