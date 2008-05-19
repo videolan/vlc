@@ -1080,6 +1080,7 @@ dnl
 dnl  default modules
 dnl
 VLC_ADD_PLUGIN([dummy])
+VLC_ADD_PLUGIN([stats])
 VLC_ADD_PLUGIN([logger])
 VLC_ADD_PLUGIN([memcpy])
 dnl Demuxers:
@@ -5898,6 +5899,7 @@ AC_CONFIG_FILES([
   modules/misc/testsuite/Makefile
   modules/misc/playlist/Makefile
   modules/misc/osd/Makefile
+  modules/misc/stats/Makefile
   modules/misc/xml/Makefile
   modules/misc/probe/Makefile
   modules/mux/Makefile

@@ -1,0 +1,8 @@
+SOURCES_stats = \
+	stats.c \
+	stats.h \
+	decoder.c \
+	demux.c \
+	encoder.c \
+	$(NULL)
+
