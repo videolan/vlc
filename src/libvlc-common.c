@@ -937,10 +937,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         p_intf = NULL;
     }
 
-    /* Free playlist */
-    msg_Dbg( p_libvlc, "removing playlist" );
-    vlc_object_release( priv->p_playlist );
-
     /* Free video outputs */
     msg_Dbg( p_libvlc, "removing all video outputs" );
     while( (p_vout = vlc_object_find( p_libvlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
@@ -984,6 +980,10 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         vlm_Delete( priv->p_vlm );
     }
 #endif
+
+    /* Free playlist */
+    msg_Dbg( p_libvlc, "removing playlist" );
+    vlc_object_release( priv->p_playlist );
 
     /* Free interaction */
     msg_Dbg( p_libvlc, "removing interaction" );
