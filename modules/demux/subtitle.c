@@ -109,7 +109,9 @@ enum
     SUB_TYPE_MPSUB,
     SUB_TYPE_JACOSUB,
     SUB_TYPE_PSB,
-    SUB_TYPE_RT
+    SUB_TYPE_RT,
+    SUB_TYPE_SUBVIEW1,
+    SUB_TYPE_DKS
 };
 
 typedef struct
@@ -162,6 +164,8 @@ static int  ParseMPSub      ( demux_t *, subtitle_t *, int );
 static int  ParseJSS        ( demux_t *, subtitle_t *, int );
 static int  ParsePSB        ( demux_t *, subtitle_t *, int );
 static int  ParseRealText   ( demux_t *, subtitle_t *, int );
+static int  ParseDKS        ( demux_t *, subtitle_t *, int );
+static int  ParseSub1       ( demux_t *, subtitle_t *, int );
 
 static struct
 {
@@ -187,14 +191,10 @@ static struct
     { "jacosub",    SUB_TYPE_JACOSUB,     "JacoSub",     ParseJSS },
     { "psb",        SUB_TYPE_PSB,         "PowerDivx",   ParsePSB },
     { "realtext",   SUB_TYPE_RT,          "RealText",    ParseRealText },
+    { "dks",        SUB_TYPE_DKS,         "DKS",         ParseDKS },
+    { "subviewer1", SUB_TYPE_SUBVIEW1,    "Subviewer 1", ParseSub1 },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
-
-/* Missing Detect
-    SubViewer 1
-    Subrip09
-   */
-
 
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
@@ -233,7 +233,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_microsecperframe = 40000;
 
     /* Get the FPS */
-    f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" );
+    f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" ); /* FIXME */
     if( f_fps >= 1.0 )
         p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
 
@@ -333,10 +333,13 @@ static int Open ( vlc_object_t *p_this )
                 p_sys->i_type = SUB_TYPE_SUBVIEWER; /* I hope this will work */
                 break;
             }
-            else if( sscanf( s, "%d:%d:%d.%d %d:%d:%d", &i_dummy, &i_dummy, &i_dummy, &i_dummy, &i_dummy, &i_dummy, &i_dummy ) == 7 ||
-                    sscanf( s, "@%d @%d", &i_dummy, &i_dummy) == 2)
+            else if( sscanf( s, "%d:%d:%d.%d %d:%d:%d",
+                                 &i_dummy, &i_dummy, &i_dummy, &i_dummy,
+                                 &i_dummy, &i_dummy, &i_dummy ) == 7 ||
+                     sscanf( s, "@%d @%d", &i_dummy, &i_dummy) == 2)
             {
                 p_sys->i_type = SUB_TYPE_JACOSUB;
+                break;
             }
             else if( sscanf( s, "%d:%d:%d:", &i_dummy, &i_dummy, &i_dummy ) == 3 ||
                      sscanf( s, "%d:%d:%d ", &i_dummy, &i_dummy, &i_dummy ) == 3 )
@@ -350,6 +353,17 @@ static int Open ( vlc_object_t *p_this )
                 p_sys->i_type = SUB_TYPE_DVDSUBTITLE;
                 break;
             }
+            else if( sscanf( s, "[%d:%d:%d]%c",
+                     &i_dummy, &i_dummy, &i_dummy, &p_dummy ) == 4 )
+            {
+                p_sys->i_type = SUB_TYPE_DKS;
+                break;
+            }
+            else if( strstr( s, "*** START SCRIPT" ) )
+            {
+                p_sys->i_type = SUB_TYPE_SUBVIEW1;
+                break;
+            }
             else if( sscanf( s, "[%d][%d]", &i_dummy, &i_dummy ) == 2 ||
                      sscanf( s, "[%d][]", &i_dummy ) == 1)
             {
@@ -361,23 +375,28 @@ static int Open ( vlc_object_t *p_this )
                        && p_dummy =='E' ) )
             {
                 p_sys->i_type = SUB_TYPE_MPSUB;
+                break;
             }
             else if( sscanf( s, "-->> %d", &i_dummy) == 1 )
             {
                 p_sys->i_type = SUB_TYPE_AQT;
+                break;
             }
             else if( sscanf( s, "%d,%d,", &i_dummy, &i_dummy ) == 2 )
             {
                 p_sys->i_type = SUB_TYPE_PJS;
+                break;
             }
             else if( sscanf( s, "{%d:%d:%d}",
                                 &i_dummy, &i_dummy, &i_dummy ) == 3 )
             {
                 p_sys->i_type = SUB_TYPE_PSB;
+                break;
             }
             else if( strcasestr( s, "<time" ) )
             {
                 p_sys->i_type = SUB_TYPE_RT;
+                break;
             }
 
             free( s );
@@ -1807,7 +1826,7 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         {
             /* Line has begin and end */
             if( ( sscanf( psz_temp,
-                            "<%*[t|T]ime %*[b|B]egin=\"%[^\"]\" %*[e|E]nd=\"%[^\"]%*[^>]%[^\n\r]",
+                  "<%*[t|T]ime %*[b|B]egin=\"%[^\"]\" %*[e|E]nd=\"%[^\"]%*[^>]%[^\n\r]",
                             psz_begin, psz_end, psz_text) != 3 ) &&
                     /* Line has begin and no end */
                     ( sscanf( psz_temp,
@@ -1868,6 +1887,107 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
     /* Remove the starting ">" that remained after the sscanf */
     memmove( &psz_text[0], &psz_text[1], strlen( psz_text ) );
+
+    p_subtitle->psz_text = psz_text;
+
+    return VLC_SUCCESS;
+}
+
+static int ParseDKS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+{
+    VLC_UNUSED( i_idx );
+
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char *psz_text;
+
+    for( ;; )
+    {
+        int h1, m1, s1;
+        int h2, m2, s2;
+        char *s = TextGetLine( txt );
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        psz_text = malloc( strlen( s ) + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+
+        if( sscanf( s, "[%d:%d:%d]%[^\r\n]",
+                    &h1, &m1, &s1, psz_text ) == 4 )
+        {
+            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
+                                    (int64_t)m1 * 60*1000 +
+                                    (int64_t)s1 * 1000 ) * 1000;
+
+            char *s = TextGetLine( txt );
+            if( !s )
+                return VLC_EGENERIC;
+
+            if( sscanf( s, "[%d:%d:%d]", &h2, &m2, &s2 ) == 3 )
+                p_subtitle->i_stop  = ( (int64_t)h2 * 3600*1000 +
+                                        (int64_t)m2 * 60*1000 +
+                                        (int64_t)s2 * 1000 ) * 1000;
+            break;
+        }
+        free( psz_text );
+    }
+
+    /* replace [br] by \n */
+    char *p;
+    while( ( p = strstr( psz_text, "[br]" ) ) )
+    {
+        *p++ = '\n';
+        memmove( p, &p[3], strlen(&p[3])+1 );
+    }
+
+    p_subtitle->psz_text = psz_text;
+    return VLC_SUCCESS;
+}
+
+static int ParseSub1( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+{
+    VLC_UNUSED( i_idx );
+
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char *psz_text;
+
+    for( ;; )
+    {
+        int h1, m1, s1;
+        int h2, m2, s2;
+        char *s = TextGetLine( txt );
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        if( sscanf( s, "[%d:%d:%d]", &h1, &m1, &s1 ) == 3 )
+        {
+            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
+                                    (int64_t)m1 * 60*1000 +
+                                    (int64_t)s1 * 1000 ) * 1000;
+
+            char *s = TextGetLine( txt );
+            if( !s )
+                return VLC_EGENERIC;
+
+            psz_text = strdup( s );
+            if( !psz_text )
+                return VLC_ENOMEM;
+
+            s = TextGetLine( txt );
+            if( !s )
+                return VLC_EGENERIC;
+
+            if( sscanf( s, "[%d:%d:%d]", &h2, &m2, &s2 ) == 3 )
+                p_subtitle->i_stop  = ( (int64_t)h2 * 3600*1000 +
+                                        (int64_t)m2 * 60*1000 +
+                                        (int64_t)s2 * 1000 ) * 1000;
+            break;
+        }
+    }
 
     p_subtitle->psz_text = psz_text;
 
