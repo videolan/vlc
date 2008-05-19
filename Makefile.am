@@ -353,9 +353,7 @@ endif
 ALL_ALIASES = cvlc rvlc svlc wxvlc qvlc nvlc
 bin_SCRIPTS = $(ALIASES)
 CLEANFILES += $(ALIASES)
-if BUILD_VLC
 EXTRA_SCRIPTS = $(ALL_ALIASES)
-endif
 
 dist_noinst_SCRIPTS += make-alias
 
