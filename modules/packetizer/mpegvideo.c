@@ -164,6 +164,9 @@ static int Open( vlc_object_t *p_this )
     p_dec->pf_get_cc = GetCc;
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
+    if( !p_dec->p_sys )
+        return VLC_ENOMEM;
+    memset( p_dec->p_sys, 0, sizeof( decoder_sys_t ) );
 
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
