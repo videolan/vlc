@@ -252,7 +252,6 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
                             video_format_t *p_fmt_out )
 {
     block_t *p_block;
-    void (*pf_release)( picture_t * );
 
     /* Check if we can reuse the current encoder */
     if( p_image->p_enc &&
@@ -563,12 +562,11 @@ static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
 
 static void video_release_buffer( picture_t *p_pic )
 {
-    if( p_pic )
-    {
-        free( p_pic->p_data_orig );
-        free( p_pic->p_sys );
-        free( p_pic );
-    }
+    if( --p_pic->i_refcount > 0 ) return;
+
+    free( p_pic->p_data_orig );
+    free( p_pic->p_sys );
+    free( p_pic );
 }
 
 static picture_t *video_new_buffer( decoder_t *p_dec )
@@ -588,6 +586,7 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
         return 0;
     }
 
+    p_pic->i_refcount = 1;
     p_pic->pf_release = video_release_buffer;
     p_pic->i_status = RESERVED_PICTURE;
     p_pic->p_sys = NULL;
@@ -598,22 +597,21 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
 static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 {
     (void)p_dec;
-    if( p_pic )
-    {
-        free( p_pic->p_data_orig );
-        free( p_pic->p_sys );
-        free( p_pic );
-    }
+    free( p_pic->p_data_orig );
+    free( p_pic->p_sys );
+    free( p_pic );
 }
 
 static void video_link_picture( decoder_t *p_dec, picture_t *p_pic )
 {
-    (void)p_dec; (void)p_pic;
+    (void)p_dec;
+    p_pic->i_refcount++;
 }
 
 static void video_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 {
     (void)p_dec; (void)p_pic;
+    video_release_buffer( p_pic );
 }
 
 static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
