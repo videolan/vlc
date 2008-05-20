@@ -298,7 +298,7 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_b_frames = val.i_int;
 
     var_Get( p_enc, ENC_CFG_PREFIX "vt", &val );
-    p_sys->i_vtolerance = val.i_int;
+    p_sys->i_vtolerance = val.i_int * 1000;
 
     var_Get( p_enc, ENC_CFG_PREFIX "interlace", &val );
     p_sys->b_interlace = val.b_bool;
