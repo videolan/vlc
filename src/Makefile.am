@@ -468,6 +468,7 @@ endif
 # Unit/regression test
 ###############################################################################
 check_PROGRAMS = \
+	test_block \
 	test_dictionary \
 	test_i18n_atof \
 	test_url \
@@ -479,6 +480,10 @@ dist_check_SCRIPTS = check_symbols check_headers
 TESTS = $(check_PROGRAMS) check_symbols
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
+
+test_block_SOURCES = test/block.c
+test_block_LDADD = libvlccore.la
+test_block_CFLAGS = $(CFLAGS_tests)
 
 test_dictionary_SOURCES = test/dictionary.c
 test_dictionary_LDADD = libvlccore.la
