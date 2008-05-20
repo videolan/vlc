@@ -100,9 +100,6 @@ int  ArtCallback( httpd_handler_sys_t *p_args,
 #if !defined(__APPLE__) && !defined(SYS_BEOS) && !defined(WIN32)
 static int DirectoryCheck( const char *psz_dir )
 {
-    DIR           *p_dir;
-
-#ifdef HAVE_SYS_STAT_H
     struct stat   stat_info;
 
     if( ( utf8_stat( psz_dir, &stat_info ) == -1 )
@@ -110,14 +107,6 @@ static int DirectoryCheck( const char *psz_dir )
     {
         return VLC_EGENERIC;
     }
-#endif
-
-    if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-    closedir( p_dir );
-
     return VLC_SUCCESS;
 }
 #endif
