@@ -86,6 +86,7 @@ struct intf_sys_t
     int i_mode;
     FILE *p_rrd;
     mtime_t last_update;
+    time_t now;  /* timestamp for rrd-log */
 
     FILE *    p_file; /* The log file */
     msg_subscription_t *p_sub;
@@ -442,6 +443,7 @@ static void DoRRD( intf_thread_t *p_intf )
 
     if( p_intf->p_libvlc->p_stats )
     {
+        time(&p_intf->p_sys->now);
         lldiv_t din = lldiv( p_intf->p_libvlc->p_stats->f_input_bitrate * 1000000,
                              1000 );
         lldiv_t ddm = lldiv( p_intf->p_libvlc->p_stats->f_demux_bitrate * 1000000,
@@ -450,7 +452,7 @@ static void DoRRD( intf_thread_t *p_intf )
                              1000 );
         fprintf( p_intf->p_sys->p_rrd,
                    "%"PRIi64":%lld.%03u:%lld.%03u:%lld.%03u\n",
-                   p_intf->p_sys->last_update/1000000,
+                   (uintmax_t)p_intf->p_sys->now,
                    din.quot, (unsigned int)din.rem,
                    ddm.quot, (unsigned int)ddm.rem,
                    dout.quot, (unsigned int)dout.rem );
