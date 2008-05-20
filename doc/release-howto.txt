@@ -13,16 +13,19 @@
      · read all the commits and add important things to the NEWS file
      · update the milestones info on https://trac.videolan.org/vlc
    - Add a note about the matching contrib package in INSTALL.win32
-   - Make sure that the gpg key embedded in include/vlc_update.h is the last one
+   - Update OpenGPG key embedded in include/vlc_update.h if needed
+   - Increase the libvlccore and libvlc revisions in src/Makefile.am
+     _if_and_only_if_ the ABI number has not been increased instead, in
+     which case the revision goes back to zero.
 
  * Commit
 
  * Tarballs (Use a clean tree !!!)
   - Use 'make distcheck' to make sure all files are exported
     correctly
-  - copy the tar.gz and tar.bz2 file on ftp.videolan.org in
+  - copy the tar.bz2 file on ftp.videolan.org in
     /opt/ftp/pub/videolan/testing/vlc-X.X.X/
-  - generate md5 hashes and gpg signature of these files
+  - generate SHA1 hashes and gpg signature of these files
     (use gpg --sign --detach --armor)
 
  * Contribs
