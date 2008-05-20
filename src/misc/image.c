@@ -247,8 +247,6 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
  *
  */
 
-static void PicRelease( picture_t *p_pic ) { (void)p_pic; }
-
 static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
                             video_format_t *p_fmt_in,
                             video_format_t *p_fmt_out )
@@ -316,11 +314,9 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
             p_image->p_filter->fmt_out.video = p_image->p_enc->fmt_in.video;
         }
 
-        pf_release = p_pic->pf_release;
-        p_pic->pf_release = PicRelease; /* Small hack */
+        p_pic->i_refcount++; /* pf_video_filter() will call pf_release() */
         p_tmp_pic =
             p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
-        p_pic->pf_release = pf_release;
 
         p_block = p_image->p_enc->pf_encode_video( p_image->p_enc, p_tmp_pic );
 
@@ -391,7 +387,6 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
                                 video_format_t *p_fmt_in,
                                 video_format_t *p_fmt_out )
 {
-    void (*pf_release)( picture_t * );
     picture_t *p_pif;
 
     if( !p_fmt_out->i_width && !p_fmt_out->i_height &&
@@ -448,10 +443,8 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt_out;
     }
 
-    pf_release = p_pic->pf_release;
-    p_pic->pf_release = PicRelease; /* Small hack */
+    p_pic->i_refcount++; /* pf_video_filter() will call pf_release() */
     p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
-    p_pic->pf_release = pf_release;
 
     if( p_fmt_in->i_chroma == p_fmt_out->i_chroma &&
         p_fmt_in->i_width == p_fmt_out->i_width &&
@@ -474,9 +467,6 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
 static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
                                video_format_t *p_fmt, const char *psz_module )
 {
-    void (*pf_release)( picture_t * );
-    picture_t *p_pif;
-
     /* Start a filter */
     if( !p_image->p_filter )
     {
@@ -499,12 +489,8 @@ static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt;
     }
 
-    pf_release = p_pic->pf_release;
-    p_pic->pf_release = PicRelease; /* Small hack */
-    p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
-    p_pic->pf_release = pf_release;
-
-    return p_pif;
+    p_pic->i_refcount++; /* pf_video_filter() will call pf_release() */
+    return p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 }
 
 /**
