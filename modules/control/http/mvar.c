@@ -503,20 +503,12 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                              char *psz_dir )
 {
     mvar_t *s = mvar_New( name, "set" );
-#ifdef HAVE_SYS_STAT_H
-    struct stat   stat_info;
-#endif
     char        **ppsz_dir_content;
     int           i_dir_content, i;
     psz_dir = RealPath( p_intf, psz_dir );
 
-#ifdef HAVE_SYS_STAT_H
-    if( (utf8_stat( psz_dir, &stat_info ) == -1 )
-     || !S_ISDIR( stat_info.st_mode )
-#   if defined( WIN32 )
-          && psz_dir[0] != '\0' && (psz_dir[0] != '\\' || psz_dir[1] != '\0')
-#   endif
-      )
+#if defined( WIN32 )
+    if( psz_dir[0] != '\0' && (psz_dir[0] != '\\' || psz_dir[1] != '\0') )
     {
         free( psz_dir );
         return s;
@@ -527,13 +519,17 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
     if( ( i_dir_content = utf8_scandir( psz_dir, &ppsz_dir_content, Filter,
                                         InsensitiveAlphasort ) ) == -1 )
     {
-        msg_Warn( p_intf, "error while scanning dir %s (%m)", psz_dir );
+        if( errno != ENOENT && errno != ENOTDIR )
+            msg_Warn( p_intf, "error while scanning dir %s (%m)", psz_dir );
         free( psz_dir );
         return s;
     }
 
     for( i = 0; i < i_dir_content; i++ )
     {
+#ifdef HAVE_SYS_STAT_H
+        struct stat stat_info;
+#endif
         char *psz_name = ppsz_dir_content[i], *psz_ext, *psz_dummy;
         char psz_tmp[strlen( psz_dir ) + 1 + strlen( psz_name ) + 1];
         mvar_t *f;
