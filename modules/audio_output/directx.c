@@ -418,6 +418,7 @@ static void Probe( aout_instance_t * p_aout )
     int i_format;
     unsigned int i_physical_channels;
     DWORD ui_speaker_config;
+    bool is_default_output_set = false;
 
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Audio Device");
@@ -437,6 +438,8 @@ static void Probe( aout_instance_t * p_aout )
             text.psz_string = "5.1";
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
+            var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+            is_default_output_set = true;
             msg_Dbg( p_aout, "device supports 5.1 channels" );
         }
     }
@@ -456,6 +459,8 @@ static void Probe( aout_instance_t * p_aout )
                text.psz_string = "7.1";
                var_Change( p_aout, "audio-device",
                            VLC_VAR_ADDCHOICE, &val, &text );
+               var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+               is_default_output_set = true;
                msg_Dbg( p_aout, "device supports 7.1 channels" );
            }
        }
@@ -474,6 +479,11 @@ static void Probe( aout_instance_t * p_aout )
             text.psz_string = N_("3 Front 2 Rear");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
+            if(!is_default_output_set)
+            {
+                var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+                is_default_output_set = true;
+            }
             msg_Dbg( p_aout, "device supports 5 channels" );
         }
     }
@@ -492,6 +502,11 @@ static void Probe( aout_instance_t * p_aout )
             text.psz_string = N_("2 Front 2 Rear");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
+            if(!is_default_output_set)
+            {
+                var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+                is_default_output_set = true;
+            }
             msg_Dbg( p_aout, "device supports 4 channels" );
         }
     }
@@ -505,7 +520,12 @@ static void Probe( aout_instance_t * p_aout )
         val.i_int = AOUT_VAR_STEREO;
         text.psz_string = N_("Stereo");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-        var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+        if(!is_default_output_set)
+        {
+            var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+            is_default_output_set = true;
+            msg_Dbg( p_aout, "device supports 2 channels (DEFAULT!)" );
+        }
         msg_Dbg( p_aout, "device supports 2 channels" );
     }
 
@@ -527,16 +547,20 @@ static void Probe( aout_instance_t * p_aout )
                                               &ui_speaker_config ) )
     {
         ui_speaker_config = DSSPEAKER_STEREO;
+        msg_Dbg( p_aout, "GetSpeakerConfig failed" );
     }
     switch( DSSPEAKER_CONFIG(ui_speaker_config) )
     {
     case DSSPEAKER_7POINT1:
+        msg_Dbg( p_aout, "Windows says your SpeakerConfig is 7.1" );
         val.i_int = AOUT_VAR_7_1;
         break;
     case DSSPEAKER_5POINT1:
+        msg_Dbg( p_aout, "Windows says your SpeakerConfig is 5.1" );
         val.i_int = AOUT_VAR_5_1;
         break;
     case DSSPEAKER_QUAD:
+        msg_Dbg( p_aout, "Windows says your SpeakerConfig is Quad" );
         val.i_int = AOUT_VAR_2F2R;
         break;
 #if 0 /* Lots of people just get their settings wrong and complain that
@@ -546,8 +570,11 @@ static void Probe( aout_instance_t * p_aout )
         break;
 #endif
     case DSSPEAKER_SURROUND:
+        msg_Dbg( p_aout, "Windows says your SpeakerConfig is surround" );
     case DSSPEAKER_STEREO:
+        msg_Dbg( p_aout, "Windows says your SpeakerConfig is stereo" );
     default:
+        /* If nothing else is found, choose stereo output */
         val.i_int = AOUT_VAR_STEREO;
         break;
     }
