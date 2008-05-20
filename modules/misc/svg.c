@@ -184,10 +184,8 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
         else
         {
             struct stat s;
-            int i_ret;
 
-            i_ret = utf8_stat( psz_filename, &s );
-            if( i_ret )
+            if( fstat( fileno( file ), &s ) )
             {
                 /* Problem accessing file information. Should not
                    happen as we could open it. */
