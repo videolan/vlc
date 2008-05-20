@@ -429,6 +429,7 @@ static int Open( vlc_object_t *p_this )
             p_sys->p_session =
                 sout_AnnounceRegisterSDP (p_sout, psz_sdp, dhost, p_method);
             sout_MethodRelease (p_method);
+            free( psz_sdp );
         }
         free (dhost);
     }
