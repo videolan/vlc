@@ -270,10 +270,6 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfgpref,
     char varname[cfglen + sizeof ("description")], *subvar = varname + cfglen;
     strcpy (varname, cfgpref);
 
-    session_descriptor_t *p_session = calloc (1, sizeof (*p_session));
-    if (p_session == NULL)
-        return NULL;
-
     strcpy (subvar, "name");
     char *name = var_GetNonEmptyString (obj, varname);
     strcpy (subvar, "description");
