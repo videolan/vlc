@@ -1,13 +1,13 @@
 
 add_executable(test_libvlc_core              libvlc/core.c)
 add_executable(test_libvlc_events            libvlc/events.c)
-add_executable(test_libvlc_media_player      libvlc/media_player.c
-                                             samples/test.sample)
+#add_executable(test_libvlc_media_player      libvlc/media_player.c
+#                                             samples/test.sample)
 add_executable(test_libvlc_media_list        libvlc/media_list.c)
-add_executable(test_libvlc_media_list_player libvlc/media_list_player.c
-                                             samples/test.sample)
-add_executable(test_libvlc_meta              libvlc/meta.c
-                                             samples/meta.sample)
+#add_executable(test_libvlc_media_list_player libvlc/media_list_player.c
+#                                             samples/test.sample)
+#add_executable(test_libvlc_meta              libvlc/meta.c
+#                                             samples/meta.sample)
 
 target_link_libraries(test_libvlc_core               libvlc)
 target_link_libraries(test_libvlc_events             libvlc)
@@ -26,8 +26,8 @@ MACRO(download_sample sample dest)
   )
 ENDMACRO(download_sample)
 
-download_sample(avi/Hero-Div3.avi samples/test.sample)
-download_sample(metadata/id3tag/Wesh-Bonneville.mp3 samples/meta.sample)
+#download_sample(avi/Hero-Div3.avi samples/test.sample)
+#download_sample(metadata/id3tag/Wesh-Bonneville.mp3 samples/meta.sample)
 
 add_test(test_libvlc_core
     ${CMAKE_CURRENT_BINARY_DIR}/test_libvlc_core)
