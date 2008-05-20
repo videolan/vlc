@@ -524,6 +524,7 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
     {
         if( p_session == p_sap->pp_sessions[i]->p_sd )
         {
+            free( p_session->psz_sdp );
             sap_session_t *p_mysession = p_sap->pp_sessions[i];
             REMOVE_ELEM( p_sap->pp_sessions,
                          p_sap->i_sessions,
