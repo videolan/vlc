@@ -681,8 +681,9 @@ static int OpenClient (vlc_object_t *obj)
 
     const char *confdir = config_GetConfDir ();
     {
-        char path[strlen (confdir) + sizeof ("/ca-certificates.crt")];
-        sprintf (path, "%s/ca-certificates.crt", confdir);
+        char path[strlen (confdir)
+                   + sizeof ("/ssl/certs/ca-certificates.crt")];
+        sprintf (path, "%s/ssl/certs/ca-certificates.crt", confdir);
         gnutls_Addx509File (VLC_OBJECT (p_session),
                             p_sys->x509_cred, path, false);
     }
