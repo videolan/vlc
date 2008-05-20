@@ -283,13 +283,7 @@ int vlclua_opendir( lua_State *L )
     const char *psz_dir = luaL_checkstring( L, 1 );
     DIR *p_dir;
     int i = 0;
-#ifdef HAVE_SYS_STAT_H
-    struct stat s;
-    if( utf8_stat( psz_dir, &s ) == -1 )
-        return luaL_error( L, "Error while trying to stat `%s'.", psz_dir );
-    if( !S_ISDIR( s.st_mode ) )
-        return luaL_error( L, "`%s' is not a directory.", psz_dir );
-#endif
+
     if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
         return luaL_error( L, "cannot open directory `%s'.", psz_dir );
 
