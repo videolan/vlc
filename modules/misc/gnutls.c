@@ -41,14 +41,18 @@
 #endif
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
-# ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-# endif
+#endif
+#ifdef WIN32
+# include <io.h>
+#else
+# include <unistd.h>
+# include <fcntl.h>
 #endif
 
 
 #include <vlc_tls.h>
 #include <vlc_charset.h>
+#include <vlc_block.h>
 
 #include <gcrypt.h>
 #include <gnutls/gnutls.h>
@@ -571,41 +575,48 @@ gnutls_Addx509File( vlc_object_t *p_this,
 {
     struct stat st;
 
-    if( utf8_stat( psz_path, &st ) == 0 )
-    {
-        if( S_ISREG( st.st_mode ) )
-        {
-            char *psz_localname = ToLocale( psz_path );
-            int i = b_priv
-                    ? gnutls_certificate_set_x509_key_file( cred,
-                    psz_localname,  psz_localname, GNUTLS_X509_FMT_PEM )
-                : gnutls_certificate_set_x509_trust_file( cred,
-                        psz_localname, GNUTLS_X509_FMT_PEM );
-            LocaleFree( psz_localname );
+    int fd = utf8_open (psz_path, O_RDONLY, 0);
+    if (fd == -1)
+        goto error;
 
-            if( i < 0 )
-            {
-                msg_Warn( p_this, "cannot add x509 credentials (%s): %s",
-                          psz_path, gnutls_strerror( i ) );
-                return VLC_EGENERIC;
-            }
-            else
-            {
-                msg_Dbg( p_this, "added x509 credentials (%s)",
-                         psz_path );
-                return VLC_SUCCESS;
-            }
-        }
-        else if( S_ISDIR( st.st_mode ) )
+    block_t *block = block_File (fd);
+    if (block != NULL)
+    {
+        close (fd);
+
+        gnutls_datum data = {
+            .data = block->p_buffer,
+            .size = block->i_buffer,
+        };
+        int res = b_priv
+            ? gnutls_certificate_set_x509_key_mem (cred, &data, &data,
+                                                   GNUTLS_X509_FMT_PEM)
+            : gnutls_certificate_set_x509_trust_mem (cred, &data,
+                                                     GNUTLS_X509_FMT_PEM);
+        block_Release (block);
+
+        if (res < 0)
         {
-            msg_Dbg( p_this,
-                     "looking recursively for x509 credentials in %s",
-                     psz_path );
-            return gnutls_Addx509Directory( p_this, cred, psz_path, b_priv);
+            msg_Warn (p_this, "cannot add x509 credentials (%s): %s",
+                      psz_path, gnutls_strerror (res));
+            return VLC_EGENERIC;
         }
+        msg_Dbg (p_this, "added x509 credentials (%s)", psz_path);
+        return VLC_SUCCESS;
     }
-    else
-        msg_Warn( p_this, "cannot add x509 credentials (%s): %m", psz_path );
+
+    if (!fstat (fd, &st) && S_ISDIR (st.st_mode))
+    {
+        close (fd);
+        msg_Dbg (p_this, "looking recursively for x509 credentials in %s",
+                 psz_path);
+        return gnutls_Addx509Directory (p_this, cred, psz_path, b_priv);
+    }
+
+error:
+    msg_Warn (p_this, "cannot add x509 credentials (%s): %m", psz_path);
+    if (fd != -1)
+        close (fd);
     return VLC_EGENERIC;
 }
 
