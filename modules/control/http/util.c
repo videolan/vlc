@@ -111,9 +111,6 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     char           dir[MAX_DIR_SIZE];
-#ifdef HAVE_SYS_STAT_H
-    struct stat   stat_info;
-#endif
     DIR           *p_dir;
     vlc_acl_t     *p_acl;
     FILE          *file;
@@ -131,16 +128,10 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     sep = '/';
 #endif
 
-#ifdef HAVE_SYS_STAT_H
-    if( utf8_stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
-    {
-        return VLC_EGENERIC;
-    }
-#endif
-
     if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
     {
-        msg_Err( p_intf, "cannot open directory (%s)", psz_dir );
+        if( errno != ENOENT && errno != ENOTDIR )
+            msg_Err( p_intf, "cannot open directory (%s)", psz_dir );
         return VLC_EGENERIC;
     }
 
