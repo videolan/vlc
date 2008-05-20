@@ -7,7 +7,7 @@ add_definitions(-DDATA_PATH="${CMAKE_INSTALL_PREFIX}/share/vlc")
 
 # vlc
 add_executable(vlc vlc.c)
-target_link_libraries(vlc libvlccore general libvlc)
+target_link_libraries(vlc libvlccore libvlc)
 
 # libvlccore
 
@@ -145,8 +145,8 @@ endif(SYS_DARWIN)
 add_library(libvlccore SHARED ${SOURCES_libvlccore})
 
 set_target_properties(libvlccore PROPERTIES
-        OUTPUT_NAME vlc
-        SOVERSION 1 VERSION 1.0.0)
+        OUTPUT_NAME vlccore
+        SOVERSION 0 VERSION 0.0.0)
 
 if(UPDATE_CHECK)
 target_link_libraries(libvlccore ${LIBM} ${LIBRT} ${LIBICONV} ${Dlopen_LIBRARIES} "-lgcrypt")
@@ -183,7 +183,7 @@ set( SOURCES_libvlc
 add_library(libvlc SHARED ${SOURCES_libvlc})
 
 set_target_properties(libvlc PROPERTIES OUTPUT_NAME vlc)
-set_target_properties(libvlc PROPERTIES SOVERSION 0)
+set_target_properties(libvlc PROPERTIES SOVERSION 2)
 set_target_properties(libvlccore PROPERTIES VERSION 0.0.0)
 
 set_source_files_properties(${SOURCES_libvlc} PROPERTIES COMPILE_FLAGS -DMODULE_STRING=\\"control\\")
