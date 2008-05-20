@@ -139,6 +139,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     if( i_dirlen + 10 > MAX_DIR_SIZE )
     {
         msg_Warn( p_intf, "skipping too deep directory (%s)", psz_dir );
+        closedir( p_dir );
         return 0;
     }
 
