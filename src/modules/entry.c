@@ -221,8 +221,9 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             const char *text = va_arg (ap, const char *);
             const char *longtext = va_arg (ap, const char *);
 
-            item->psz_text = text ? strdup ( _(text)) : NULL;
-            item->psz_longtext = longtext ? strdup ( _(longtext)) : NULL;
+            item->psz_text = text ? strdup (dgettext (PACKAGE, text)) : NULL;
+            item->psz_longtext =
+                longtext ? strdup (dgettext (PACKAGE, longtext)) : NULL;
             ret = 0;
             break;
         }
@@ -373,7 +374,8 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             if (text != NULL)
             {
                 for (size_t i = 0; i < len; i++)
-                    dtext[i] = text[i] ? strdup ( _(text[i])) : NULL;
+                    dtext[i] =
+                        text[i] ? strdup (dgettext (PACKAGE, text[i])) : NULL;
 
                 dtext[len] = NULL;
                 item->ppsz_list_text = dtext;
@@ -411,7 +413,7 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             item->ppsz_action_text = tabtext;
 
             if (name)
-                tabtext[item->i_action] = strdup ( _(name));
+                tabtext[item->i_action] = strdup (dgettext (PACKAGE, name));
             else
                 tabtext[item->i_action] = NULL;
             tabtext[item->i_action + 1] = NULL;
