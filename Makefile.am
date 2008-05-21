@@ -9,7 +9,6 @@
 #  - libs/* are needed by modules
 BASE_SUBDIRS = po src modules share doc test
 EXTRA_SUBDIRS = m4 extras/package/ipkg \
-	bindings/python \
 	libs/loader libs/srtp \
 	projects/mozilla projects/activex
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
@@ -27,9 +26,6 @@ SUBDIRS += projects/mozilla
 endif
 if BUILD_ACTIVEX
 SUBDIRS += projects/activex
-endif
-if BUILD_PYTHON
-SUBDIRS += bindings/python
 endif
 
 EXTRA_DIST = \

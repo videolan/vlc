@@ -2,16 +2,8 @@ from distutils.core import setup, Extension
 import os
 
 # Get build variables (buildir, srcdir)
-try:
-    top_builddir=os.environ['top_builddir']
-except KeyError:
-    # Note: do not initialize here, so that we get
-    # a correct default value if the env. var is
-    # defined but empty
-    top_builddir=None
-if not top_builddir:
-    top_builddir = os.path.join( '..', '..' )
-    os.environ['top_builddir'] = top_builddir
+top_builddir = os.path.join( '..', '..' )
+os.environ['top_builddir'] = top_builddir
 
 # Determine the extra link args. Normally, vlc-config should take care
 # of this and return the right path values, from a development tree or
@@ -30,13 +22,7 @@ else:
         linkargs=[ '-L' + d ]
 
 # For out-of-tree compilations
-try:
-    srcdir=os.environ['srcdir']
-except KeyError:
-    # Note: same as above
-    srcdir=None
-if not srcdir:
-    srcdir = '.'
+srcdir = '.'
 
 def get_vlcconfig():
     vlcconfig=None

@@ -30,6 +30,24 @@ AS_IF([test "x${enable_maintainer_mode}" != "xno"],
 AM_MAINTAINER_MODE
 
 dnl
+dnl  Deprecated options
+dnl  to notify packagers that stuff has changed
+dnl
+AC_ARG_ENABLE(python-bindings,
+  [  --enable-python-bindings Always fails for historical reasons)],,
+  [enable_python_bindings="no"])
+AS_IF([test "${enable_python_bindings}" != "no"], [
+  AC_MSG_ERROR([Python bindings are now built from a separate source package])
+])
+
+AC_ARG_ENABLE(java-bindings,
+  [  --enable-java-bindings  Always fails for historical reasons],,
+  [enable_java_bindings="no"])
+AS_IF([test "${enable_java_bindings}" != "no"], [
+  AC_MSG_ERROR([Java bindings are now built from a separate source package])
+])
+
+dnl
 dnl  Save *FLAGS
 dnl
 VLC_SAVE_FLAGS
@@ -6146,34 +6164,6 @@ AC_CHECK_LIB(Xsp, XSPSetPixelDoubling,[
 ])
 
 dnl
-dnl  Mediacontrol Python bindings
-dnl
-AC_ARG_ENABLE(python-bindings,
-  [  --enable-python-bindings Enable Python bindings (default disabled)])
-
-if test "${enable_python_bindings}" = "yes"; then
-  AC_PATH_PROG(PYTHON_CONFIG, python-config, no)
-  CFLAGS="${CFLAGS_save} `${PYTHON_CONFIG} --cflags`"
-  AC_CHECK_HEADER([Python.h],
-    PLUGINS_BINDINGS="${PLUGINS_BINDINGS} python",
-    AC_MSG_ERROR([You have to install python-dev to build the bindings]),
-    []
-  )
-  CFLAGS="${CFLAGS_save}"
-fi
-AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"])
-
-dnl
-dnl  Java bindings
-dnl
-AC_ARG_ENABLE(java-bindings,
-  [  --enable-java-bindings  Always fail for historical reasons],,
-  [enable_java_bindings="no"])
-AS_IF([test "${enable_java_bindings}" != "no"], [
-  AC_MSG_ERROR([Java bindings are now built from a separate source package])
-])
-
-dnl
 dnl  test plugins
 dnl
 AC_ARG_ENABLE(testsuite,
@@ -6247,7 +6237,6 @@ then
     VLC_ADD_CXXFLAGS([qte_main],[${CXXFLAGS_qte} ${CXXFLAGS_qt_video}])
     VLC_ADD_LDFLAGS([qte_main],[${LDFLAGS_qte} ${LDFLAGS_qt_video}])
 fi
-
 
 dnl
 dnl  Plugin and builtin checks
