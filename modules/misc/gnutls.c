@@ -46,8 +46,8 @@
 # include <io.h>
 #else
 # include <unistd.h>
-# include <fcntl.h>
 #endif
+# include <fcntl.h>
 
 
 #include <vlc_tls.h>
