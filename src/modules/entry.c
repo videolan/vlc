@@ -109,15 +109,15 @@ int vlc_module_set (module_t *module, int propid, ...)
         }
 
         case VLC_MODULE_SHORTNAME:
-            module->psz_shortname = va_arg (ap, char *);
+            module->psz_shortname = dgettext (PACKAGE, va_arg (ap, char *));
             break;
 
         case VLC_MODULE_DESCRIPTION:
-            module->psz_longname = va_arg (ap, char *);
+            module->psz_longname = dgettext (PACKAGE, va_arg (ap, char *));
             break;
 
         case VLC_MODULE_HELP:
-            module->psz_help = va_arg (ap, char *);
+            module->psz_help = dgettext (PACKAGE, va_arg (ap, char *));
             break;
 
         case VLC_MODULE_CAPABILITY:
