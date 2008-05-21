@@ -148,7 +148,7 @@ vlc_module_begin();
     add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, false );
     add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, false );
 
-    set_description( _("XVMC extension video output") );
+    set_description( N_("XVMC extension video output") );
     set_capability( "video output", 10 );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();

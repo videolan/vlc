@@ -69,7 +69,7 @@ vlc_module_begin();
     set_shortname( "DirectFB" );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( _("DirectFB video output http://www.directfb.org/") );
+    set_description( N_("DirectFB video output http://www.directfb.org/") );
     set_capability( "video output", 60 );
     add_shortcut( "directfb" );
     set_callbacks( Create, Destroy );

@@ -164,7 +164,7 @@ static const char *ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
 
 vlc_module_begin();
     set_shortname( "WaveOut" );
-    set_description( _("Win32 waveOut extension output") );
+    set_description( N_("Win32 waveOut extension output") );
     set_capability( "audio output", 50 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );

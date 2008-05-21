@@ -57,8 +57,8 @@ static void Close( vlc_object_t * );
     "end-of-file (default is 0, meaning that the stream is unlimited).")
 
 vlc_module_begin();
-    set_shortname( _("Fake") );
-    set_description( _("Fake input") );
+    set_shortname( N_("Fake") );
+    set_description( N_("Fake input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

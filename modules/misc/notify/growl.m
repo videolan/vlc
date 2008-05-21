@@ -93,7 +93,7 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_shortname( "Growl" );
-    set_description( _("Growl Notification Plugin") );
+    set_description( N_("Growl Notification Plugin") );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();

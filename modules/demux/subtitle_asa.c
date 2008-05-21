@@ -61,8 +61,8 @@ static void Close( vlc_object_t *p_this );
     N_("Force the subtiles format. Use \"auto\", the set of supported values varies.")
 
 vlc_module_begin();
-    set_shortname( _("Subtitles (asa demuxer)"));
-    set_description( _("Text subtitles parser") );
+    set_shortname( N_("Subtitles (asa demuxer)"));
+    set_description( N_("Text subtitles parser") );
     set_capability( "demux", 50 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );

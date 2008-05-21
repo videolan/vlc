@@ -84,8 +84,8 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("DVD with menus") );
-    set_description( _("DVDnav Input") );
+    set_shortname( N_("DVD with menus") );
+    set_description( N_("DVDnav Input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dvdnav-angle", 1, NULL, ANGLE_TEXT,

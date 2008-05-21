@@ -94,7 +94,7 @@ static int  SendEvents( vlc_object_t *, char const *,
 
 vlc_module_begin();
     set_description( N_("Panoramix: wall with overlap video filter") );
-    set_shortname( _("Panoramix" ));
+    set_shortname( N_("Panoramix" ));
     set_capability( "video filter", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

@@ -64,7 +64,7 @@ static int    Signal    ( vlc_object_t *, char const *,
  * Module descriptor.
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Miscellaneous stress tests") );
+    set_description( N_("Miscellaneous stress tests") );
     var_Create( p_module->p_libvlc, "foo-test",
                 VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_module->p_libvlc, "foo-test", Foo, NULL );

@@ -53,7 +53,7 @@
 
 vlc_module_begin();
     set_shortname( "Bonjour" );
-    set_description( _("Bonjour services") );
+    set_description( N_("Bonjour services") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
     set_capability( "services_discovery", 0 );

@@ -47,7 +47,7 @@ vlc_module_begin();
     set_shortname( "VC-1");
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( _("VC1 video demuxer" ) );
+    set_description( N_("VC1 video demuxer" ) );
     set_capability( "demux", 0 );
     add_float( "vc1-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
     set_callbacks( Open, Close );

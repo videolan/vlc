@@ -81,7 +81,7 @@ static int  Process      ( jack_nframes_t i_frames, void *p_arg );
  *****************************************************************************/
 vlc_module_begin();
     set_shortname( "JACK" );
-    set_description( _("JACK audio output") );
+    set_description( N_("JACK audio output") );
     set_capability( "audio output", 100 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );

@@ -147,8 +147,8 @@ static const char *psz_norm_list_text[] =
     { N_("Automatic"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
 
 vlc_module_begin();
-    set_shortname( _("Video4Linux") );
-    set_description( _("Video4Linux input") );
+    set_shortname( N_("Video4Linux") );
+    set_description( N_("Video4Linux input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

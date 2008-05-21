@@ -49,7 +49,7 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Description stream output") );
+    set_description( N_("Description stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "description" );
     set_callbacks( Open, Close );

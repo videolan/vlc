@@ -73,8 +73,8 @@ static const char *type_list_text[] = { N_("Rotate by 90 degrees"),
 #define CFG_PREFIX "transform-"
 
 vlc_module_begin();
-    set_description( _("Video transformation filter") );
-    set_shortname( _("Transformation"));
+    set_description( N_("Video transformation filter") );
+    set_shortname( N_("Transformation"));
     set_capability( "video filter", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

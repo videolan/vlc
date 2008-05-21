@@ -71,7 +71,7 @@ vlc_module_begin();
               EMBED_TEXT, EMBED_LONGTEXT, false );
 
     add_submodule();
-    set_description( _("WinCE dialogs provider") );
+    set_description( N_("WinCE dialogs provider") );
     set_capability( "dialogs provider", 10 );
     set_callbacks( OpenDialogs, Close );
 vlc_module_end();

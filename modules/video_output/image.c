@@ -83,8 +83,8 @@ static const char *psz_format_list_text[] = { "PNG", "JPEG" };
 #define CFG_PREFIX "image-out-"
 
 vlc_module_begin( );
-    set_shortname( _( "Image file" ) );
-    set_description( _( "Image video output" ) );
+    set_shortname( N_( "Image file" ) );
+    set_description( N_( "Image video output" ) );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     set_capability( "video output", 0 );

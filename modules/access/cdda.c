@@ -68,8 +68,8 @@ static void Close( vlc_object_t * );
     "value should be set in milliseconds." )
 
 vlc_module_begin();
-    set_shortname( _("Audio CD"));
-    set_description( _("Audio CD input") );
+    set_shortname( N_("Audio CD"));
+    set_description( N_("Audio CD input") );
     set_capability( "access", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );

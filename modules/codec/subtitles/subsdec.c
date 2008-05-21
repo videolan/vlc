@@ -112,8 +112,8 @@ static const char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Righ
 
 
 vlc_module_begin();
-    set_shortname( _("Subtitles"));
-    set_description( _("Text subtitles decoder") );
+    set_shortname( N_("Subtitles"));
+    set_description( N_("Text subtitles decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, CloseDecoder );
     set_category( CAT_INPUT );

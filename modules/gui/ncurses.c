@@ -121,7 +121,7 @@ static void start_color_and_pairs ( intf_thread_t * );
 
 vlc_module_begin();
     set_shortname( "Ncurses" );
-    set_description( _("Ncurses interface") );
+    set_description( N_("Ncurses interface") );
     set_capability( "interface", 10 );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );

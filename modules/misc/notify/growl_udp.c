@@ -70,7 +70,7 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_shortname( "Growl-UDP" );
-    set_description( _("Growl UDP Notification Plugin") );
+    set_description( N_("Growl UDP Notification Plugin") );
 
     add_string( "growl-server", SERVER_DEFAULT, NULL,
                 SERVER_TEXT, SERVER_LONGTEXT, false );

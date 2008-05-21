@@ -112,17 +112,17 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
 
-    set_description( _("Speex audio decoder") );
+    set_description( N_("Speex audio decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
-    set_description( _("Speex audio packetizer") );
+    set_description( N_("Speex audio packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 
     add_submodule();
-    set_description( _("Speex audio encoder") );
+    set_description( N_("Speex audio encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
 vlc_module_end();

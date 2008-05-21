@@ -124,8 +124,8 @@
     static void CloseDemux ( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("SAP"));
-    set_description( _("SAP Announcements") );
+    set_shortname( N_("SAP"));
+    set_description( N_("SAP Announcements") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
@@ -152,7 +152,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_submodule();
-        set_description( _("SDP Descriptions parser") );
+        set_description( N_("SDP Descriptions parser") );
         add_shortcut( "sdp" );
         set_capability( "demux", 51 );
         set_callbacks( OpenDemux, CloseDemux );

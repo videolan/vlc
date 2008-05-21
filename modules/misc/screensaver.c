@@ -91,7 +91,7 @@ struct intf_sys_t
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("X Screensaver disabler") );
+    set_description( N_("X Screensaver disabler") );
     set_capability( "interface", 0 );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();

@@ -60,8 +60,8 @@ static void CloseIn ( vlc_object_t * );
 #define SOUT_CFG_PREFIX_IN "sout-bridge-in-"
 
 vlc_module_begin();
-    set_shortname( _("Bridge"));
-    set_description( _("Bridge stream output"));
+    set_shortname( N_("Bridge"));
+    set_description( N_("Bridge stream output"));
     add_submodule();
     set_section( N_("Bridge out"), NULL );
     set_capability( "sout stream", 50 );

@@ -181,18 +181,18 @@ vlc_module_begin();
     add_shortcut( "flac" );
 
 #ifdef USE_LIBFLAC
-    set_description( _("Flac audio decoder") );
+    set_description( N_("Flac audio decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
-    set_description( _("Flac audio encoder") );
+    set_description( N_("Flac audio encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
 
     add_submodule();
 #endif
-    set_description( _("Flac audio packetizer") );
+    set_description( N_("Flac audio packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 

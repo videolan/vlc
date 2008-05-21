@@ -202,7 +202,7 @@ static struct
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Audio filter for PCM format conversion") );
+    set_description( N_("Audio filter for PCM format conversion") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
     set_capability( "audio filter2", 1 );

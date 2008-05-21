@@ -50,8 +50,8 @@ static picture_t *Filter( filter_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Psychedelic video filter") );
-    set_shortname( _( "Psychedelic" ));
+    set_description( N_("Psychedelic video filter") );
+    set_shortname( N_( "Psychedelic" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

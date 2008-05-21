@@ -174,7 +174,7 @@ static void    Close  ( vlc_object_t * );
 #define MAX_PMT_PID 64       /* Maximum pids in each pmt.  FIXME: I just chose an arbitary number. Where is the maximum in the spec? */
 
 vlc_module_begin();
-    set_description( _("TS muxer (libdvbpsi)") );
+    set_description( N_("TS muxer (libdvbpsi)") );
     set_shortname( "MPEG-TS");
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_MUX );

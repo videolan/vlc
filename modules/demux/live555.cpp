@@ -84,7 +84,7 @@ static void Close( vlc_object_t * );
     "used for the connection.")
 
 vlc_module_begin();
-    set_description( _("RTP/RTSP/SDP demuxer (using Live555)" ) );
+    set_description( N_("RTP/RTSP/SDP demuxer (using Live555)" ) );
     set_capability( "demux", 50 );
     set_shortname( "RTP/RTSP");
     set_callbacks( Open, Close );
@@ -94,7 +94,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_DEMUX );
 
     add_submodule();
-        set_description( _("RTSP/RTP access and demux") );
+        set_description( N_("RTSP/RTP access and demux") );
         add_shortcut( "rtsp" );
         add_shortcut( "sdp" );
         set_capability( "access_demux", 0 );

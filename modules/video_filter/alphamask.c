@@ -60,8 +60,8 @@ static int MaskCallback( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Alpha mask video filter") );
-    set_shortname( _("Alpha mask" ));
+    set_description( N_("Alpha mask video filter") );
+    set_shortname( N_("Alpha mask" ));
     set_help( ALPHAMASK_HELP );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

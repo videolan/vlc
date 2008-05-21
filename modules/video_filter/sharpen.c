@@ -62,8 +62,8 @@ static int SharpenCallback( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Augment contrast between contours.") );
-    set_shortname( _("Sharpen video filter") );
+    set_description( N_("Augment contrast between contours.") );
+    set_shortname( N_("Sharpen video filter") );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter2", 0 );

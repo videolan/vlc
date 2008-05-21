@@ -42,8 +42,8 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Dummy stream output") );
-    set_shortname( _( "Dummy" ));
+    set_description( N_("Dummy stream output") );
+    set_shortname( N_( "Dummy" ));
     set_capability( "sout access", 0 );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );

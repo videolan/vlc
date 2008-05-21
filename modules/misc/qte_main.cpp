@@ -73,7 +73,7 @@ static qte_thread_t * p_qte_main = NULL;
     "from normal Qt.")
 
 vlc_module_begin();
-    set_description( _("Qt Embedded GUI helper") );
+    set_description( N_("Qt Embedded GUI helper") );
     set_capability( "gui-helper", 90 );
     add_bool( "qte-guiserver", 0, NULL, STANDALONE_TEXT, STANDALONE_LONGTEXT, false );
     add_shortcut( "qte" );

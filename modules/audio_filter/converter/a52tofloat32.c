@@ -107,7 +107,7 @@ struct filter_sys_t
 
 vlc_module_begin();
     set_shortname( "A/52" );
-    set_description( _("ATSC A/52 (AC-3) audio decoder") );
+    set_description( N_("ATSC A/52 (AC-3) audio decoder") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
     add_bool( "a52-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, false );
@@ -116,7 +116,7 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 
     add_submodule();
-    set_description( _("ATSC A/52 (AC-3) audio decoder") );
+    set_description( N_("ATSC A/52 (AC-3) audio decoder") );
     set_capability( "audio filter2", 100 );
     set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end();

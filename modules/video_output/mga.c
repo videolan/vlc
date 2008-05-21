@@ -59,7 +59,7 @@ static int  NewPicture     ( vout_thread_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Matrox Graphic Array video output") );
+    set_description( N_("Matrox Graphic Array video output") );
     set_capability( "video output", 10 );
     set_callbacks( Create, Destroy );
 vlc_module_end();

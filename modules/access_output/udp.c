@@ -77,7 +77,7 @@ static void Close( vlc_object_t * );
                           "heavily-loaded systems." )
 
 vlc_module_begin();
-    set_description( _("UDP stream output") );
+    set_description( N_("UDP stream output") );
     set_shortname( "UDP" );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );

@@ -80,8 +80,8 @@ typedef struct aout_filter_sys_t
                "between 0.5 and 10 seems sensible." )
 
 vlc_module_begin();
-    set_description( _("Volume normalizer") );
-    set_shortname( _("Volume normalizer") );
+    set_description( N_("Volume normalizer") );
+    set_shortname( N_("Volume normalizer") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AFILTER );
     add_shortcut( "volnorm" );

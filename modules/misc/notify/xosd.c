@@ -86,7 +86,7 @@ static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
 vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_description( _("XOSD interface") );
+    set_description( N_("XOSD interface") );
     set_shortname( "XOSD" );
     add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, true );
     add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, true );

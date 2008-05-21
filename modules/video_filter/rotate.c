@@ -62,8 +62,8 @@ static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Rotate video filter") );
-    set_shortname( _( "Rotate" ));
+    set_description( N_("Rotate video filter") );
+    set_shortname( N_( "Rotate" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

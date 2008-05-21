@@ -107,28 +107,28 @@ vlc_module_begin();
     add_obsolete_integer( "shoutcast-limit" );
 
         set_shortname( "Shoutcast");
-        set_description( _("Shoutcast radio listings") );
+        set_description( N_("Shoutcast radio listings") );
         set_capability( "services_discovery", 0 );
         set_callbacks( OpenShoutRadio, Close );
         add_shortcut( "shoutcast" );
 
     add_submodule();
         set_shortname( "ShoutcastTV" );
-        set_description( _("Shoutcast TV listings") );
+        set_description( N_("Shoutcast TV listings") );
         set_capability( "services_discovery", 0 );
         set_callbacks( OpenShoutTV, Close );
         add_shortcut( "shoutcasttv" );
 
     add_submodule();
         set_shortname( "frenchtv");
-        set_description( _("French TV") );
+        set_description( N_("French TV") );
         set_capability( "services_discovery", 0 );
         set_callbacks( OpenFrenchTV, Close );
         add_shortcut( "frenchtv" );
 
     add_submodule();
         set_shortname( "Freebox");
-        set_description( _("Freebox TV listing (French ISP free.fr services)") );
+        set_description( N_("Freebox TV listing (French ISP free.fr services)") );
         set_capability( "services_discovery", 0 );
         set_callbacks( OpenFreebox, Close );
         add_shortcut( "freebox" );

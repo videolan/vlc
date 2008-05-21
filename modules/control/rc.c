@@ -180,10 +180,10 @@ static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #endif
 
 vlc_module_begin();
-    set_shortname( _("RC"));
+    set_shortname( N_("RC"));
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
-    set_description( _("Remote control interface") );
+    set_description( N_("Remote control interface") );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, true );
 
 #ifdef WIN32

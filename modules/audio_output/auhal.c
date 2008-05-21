@@ -135,7 +135,7 @@ static int      AudioDeviceCallback     ( vlc_object_t *, const char *,
 
 vlc_module_begin();
     set_shortname( "auhal" );
-    set_description( _("HAL AudioUnit output") );
+    set_description( N_("HAL AudioUnit output") );
     set_capability( "audio output", 101 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );

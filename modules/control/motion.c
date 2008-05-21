@@ -73,9 +73,9 @@ static int GetOrientation( intf_thread_t *p_intf );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_shortname( _("motion"));
+    set_shortname( N_("motion"));
     set_category( CAT_INTERFACE );
-    set_description( _("motion control interface") );
+    set_description( N_("motion control interface") );
 
     add_bool( "motion-use-rotate", 0, NULL,
               USE_ROTATE_TEXT, USE_ROTATE_TEXT, false );

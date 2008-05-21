@@ -72,8 +72,8 @@ static int PuzzleCallback( vlc_object_t *, char const *,
 #define CFG_PREFIX "puzzle-"
 
 vlc_module_begin();
-    set_description( _("Puzzle interactive game video filter") );
-    set_shortname( _( "Puzzle" ));
+    set_description( N_("Puzzle interactive game video filter") );
+    set_shortname( N_( "Puzzle" ));
     set_capability( "video filter", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

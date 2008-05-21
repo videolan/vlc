@@ -59,8 +59,8 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("CC 608/708"));
-    set_description( _("Closed Captions decoder") );
+    set_shortname( N_("CC 608/708"));
+    set_description( N_("Closed Captions decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( Open, Close );
 vlc_module_end();

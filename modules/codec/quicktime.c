@@ -65,7 +65,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("QuickTime library decoder") );
+    set_description( N_("QuickTime library decoder") );
     set_capability( "decoder", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );

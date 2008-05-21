@@ -78,7 +78,7 @@ vlc_module_begin();
 #ifdef HAVE_XINERAMA
     add_integer ( "x11-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
 #endif
-    set_description( _("X11 video output") );
+    set_description( N_("X11 video output") );
     set_capability( "video output", 70 );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();

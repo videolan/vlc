@@ -64,7 +64,7 @@ static void OpenAudioDev( demux_t *p_demux );
 static inline void CloseAudioDev( demux_t *p_demux );
 
 vlc_module_begin();
-    set_description( _("dc1394 input") );
+    set_description( N_("dc1394 input") );
     set_capability( "access_demux", 10 );
     add_shortcut( "dc1394" );
     set_callbacks( Open, Close );

@@ -59,7 +59,7 @@ using namespace CyberLink;
 
 vlc_module_begin();
     set_shortname( "UPnP");
-    set_description( _("Universal Plug'n'Play discovery") );
+    set_description( N_("Universal Plug'n'Play discovery") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 

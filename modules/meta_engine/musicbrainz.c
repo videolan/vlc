@@ -49,7 +49,7 @@ static int FindArt( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( N_( "MusicBrainz" ) );
-    set_description( _("MusicBrainz meta data") );
+    set_description( N_("MusicBrainz meta data") );
 
     /* This art finder module fetches the album ID from musicbrainz and
      * uses it to fetch the amazon ASIN from musicbrainz.

@@ -63,14 +63,14 @@ static void I422_Y211           ( vout_thread_t *, picture_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin();
 #if defined (MODULE_NAME_IS_i422_yuy2)
-    set_description( _("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 80 );
 #elif defined (MODULE_NAME_IS_i422_yuy2_mmx)
-    set_description( _("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 100 );
     add_requirement( MMX );
 #elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
-    set_description( _("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 120 );
     add_requirement( SSE2 );
 #endif

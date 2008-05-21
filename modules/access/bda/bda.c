@@ -168,8 +168,8 @@ static const char *ppsz_polar_text[] = { N_("Horizontal"), N_("Vertical"),
     N_("Circular Left"), N_("Circular Right") };
 
 vlc_module_begin();
-    set_shortname( _("DVB") );
-    set_description( _("DirectShow DVB input") );
+    set_shortname( N_("DVB") );
+    set_description( N_("DirectShow DVB input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

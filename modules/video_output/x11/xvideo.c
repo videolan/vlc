@@ -92,7 +92,7 @@ vlc_module_begin();
     add_integer ( "xvideo-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
 #endif
 
-    set_description( _("XVideo extension video output") );
+    set_description( N_("XVideo extension video output") );
     set_capability( "video output", 150 );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();

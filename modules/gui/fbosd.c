@@ -214,7 +214,7 @@ vlc_module_begin();
     add_bool( "fbosd-render", false, NULL, RENDER_TEXT, RENDER_LONGTEXT, true );
     add_bool( "fbosd-display", false, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
 
-    set_description( _("GNU/Linux osd/overlay framebuffer interface") );
+    set_description( N_("GNU/Linux osd/overlay framebuffer interface") );
     set_capability( "interface", 10 );
     set_callbacks( Create, Destroy );
 vlc_module_end();

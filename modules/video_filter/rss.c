@@ -217,7 +217,7 @@ vlc_module_begin();
     add_integer( CFG_PREFIX "title", default_title, NULL, TITLE_TEXT, TITLE_LONGTEXT, false );
         change_integer_list( pi_title_modes, ppsz_title_modes, 0 );
 
-    set_description( _("RSS and Atom feed display") );
+    set_description( N_("RSS and Atom feed display") );
     add_shortcut( "rss" );
     add_shortcut( "atom" );
 vlc_module_end();

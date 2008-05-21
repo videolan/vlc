@@ -67,7 +67,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_PACKETIZER );
-    set_description( _("MPEG-I/II video packetizer") );
+    set_description( N_("MPEG-I/II video packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( Open, Close );
 

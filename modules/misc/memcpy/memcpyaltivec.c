@@ -56,7 +56,7 @@ static int Activate ( vlc_object_t *p_this )
  * Module descriptor.
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("AltiVec memcpy") );
+    set_description( N_("AltiVec memcpy") );
     set_category( CAT_ADVANCED );
     set_subcategory( SUBCAT_ADVANCED_MISC );
     add_requirement( ALTIVEC );

@@ -44,7 +44,7 @@ static void Chain    ( vout_thread_t *, picture_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Chroma conversions using a chain of chroma conversion modules") );
+    set_description( N_("Chroma conversions using a chain of chroma conversion modules") );
     set_capability( "chroma", 1 );
     set_callbacks( Activate, Destroy );
 vlc_module_end();

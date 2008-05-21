@@ -48,10 +48,10 @@ static void I420_YMGA  ( vout_thread_t *, picture_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin();
 #if defined (MODULE_NAME_IS_i420_ymga)
-    set_description( _("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 80 );
 #elif defined (MODULE_NAME_IS_i420_ymga_mmx)
-    set_description( _("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 100 );
     add_requirement( MMX );
 #endif

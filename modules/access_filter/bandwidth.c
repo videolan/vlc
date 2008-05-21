@@ -42,8 +42,8 @@ static void Close (vlc_object_t *);
 /* TODO: burst support */
 
 vlc_module_begin ();
-    set_shortname (_("Bandwidth"));
-    set_description (_("Bandwidth limiter"));
+    set_shortname (N_("Bandwidth"));
+    set_description (N_("Bandwidth limiter"));
     set_category (CAT_INPUT);
     set_subcategory (SUBCAT_INPUT_ACCESS_FILTER);
     set_capability ("access_filter", 0);

@@ -70,8 +70,8 @@ static const char *ppsz_sub_type[] =
 };
 
 vlc_module_begin();
-    set_shortname( _("Subtitles"));
-    set_description( _("Text subtitles parser") );
+    set_shortname( N_("Subtitles"));
+    set_description( N_("Text subtitles parser") );
     set_capability( "demux", 0 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );

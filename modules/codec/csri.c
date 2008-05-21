@@ -64,8 +64,8 @@ static subpicture_region_t *UpdateRegions( video_format_t *, spu_t *,
  *****************************************************************************/
 
 vlc_module_begin();
-    set_shortname( _("Subtitles (advanced)"));
-    set_description( _("Wrapper for subtitle renderers using CSRI/asa") );
+    set_shortname( N_("Subtitles (advanced)"));
+    set_description( N_("Wrapper for subtitle renderers using CSRI/asa") );
     set_capability( "decoder", 60 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_SCODEC );

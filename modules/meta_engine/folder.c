@@ -56,7 +56,7 @@ static int FindMeta( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( N_( "Folder" ) );
-    set_description( _("Folder meta data") );
+    set_description( N_("Folder meta data") );
 
     set_capability( "art finder", 90 );
     set_callbacks( FindMeta, NULL );

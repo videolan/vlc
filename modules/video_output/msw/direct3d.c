@@ -109,7 +109,7 @@ vlc_module_begin();
     set_shortname( "Direct3D" );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( _("DirectX 3D video output") );
+    set_description( N_("DirectX 3D video output") );
     set_capability( "video output", get_capability_for_osversion() );
     add_shortcut( "direct3d" );
     set_callbacks( OpenVideo, CloseVideo );

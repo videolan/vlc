@@ -109,7 +109,7 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     "Mute audio when command is not 0." )
 
 vlc_module_begin();
-    set_description( _("MPEG2 video switcher stream output") );
+    set_description( N_("MPEG2 video switcher stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "switcher" );
     set_callbacks( Open, Close );

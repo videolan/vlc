@@ -125,8 +125,8 @@ static const char *psz_bitrates_list_text[] = { N_("vbr"), N_("cbr") };
 static int pi_radio_range[2] = { 65000, 108000 };
 
 vlc_module_begin();
-    set_shortname( _("PVR") );
-    set_description( _("IVTV MPEG Encoding cards input") );
+    set_shortname( N_("PVR") );
+    set_description( N_("IVTV MPEG Encoding cards input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     set_capability( "access", 0 );

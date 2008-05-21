@@ -63,8 +63,8 @@ static const char *ppsz_color_descriptions[] = {
 #define CFG_PREFIX "colorthres-"
 
 vlc_module_begin();
-    set_description( _("Color threshold filter") );
-    set_shortname( _("Color threshold" ));
+    set_description( N_("Color threshold filter") );
+    set_shortname( N_("Color threshold" ));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter2", 0 );

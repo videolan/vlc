@@ -54,8 +54,8 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("TY") );
-    set_description(_("TY Stream audio/video demux"));
+    set_shortname( N_("TY") );
+    set_description(N_("TY Stream audio/video demux"));
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_capability("demux", 6);

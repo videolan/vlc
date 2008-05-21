@@ -50,7 +50,7 @@ static void Close( vlc_object_t * );
     "This value should be set in milliseconds." )
 
 vlc_module_begin();
-    set_description( _("GnomeVFS input") );
+    set_description( N_("GnomeVFS input") );
     set_shortname( "GnomeVFS" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );

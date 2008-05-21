@@ -52,8 +52,8 @@ static void GaussianConvolution( uint32_t *, uint32_t *, int, int, int );
 #define FILTER_PREFIX "motiondetect-"
 
 vlc_module_begin();
-    set_description( _("Motion detect video filter") );
-    set_shortname( _( "Motion Detect" ));
+    set_description( N_("Motion detect video filter") );
+    set_shortname( N_( "Motion Detect" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

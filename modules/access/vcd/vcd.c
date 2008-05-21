@@ -49,8 +49,8 @@ static void Close( vlc_object_t * );
     "value should be set in milliseconds." )
 
 vlc_module_begin();
-    set_shortname( _("VCD"));
-    set_description( _("VCD input") );
+    set_shortname( N_("VCD"));
+    set_description( N_("VCD input") );
     set_capability( "access", 60 );
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );

@@ -97,7 +97,7 @@ static void BlendRGBAR24( filter_t *, picture_t *, picture_t *, picture_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Video pictures blending") );
+    set_description( N_("Video pictures blending") );
     set_capability( "video blending", 100 );
     set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end();

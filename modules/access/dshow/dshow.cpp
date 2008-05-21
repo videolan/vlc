@@ -170,8 +170,8 @@ static int  DemuxOpen  ( vlc_object_t * );
 static void DemuxClose ( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("DirectShow") );
-    set_description( _("DirectShow input") );
+    set_shortname( N_("DirectShow") );
+    set_description( N_("DirectShow input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
@@ -232,7 +232,7 @@ vlc_module_begin();
     set_callbacks( DemuxOpen, DemuxClose );
 
     add_submodule();
-    set_description( _("DirectShow input") );
+    set_description( N_("DirectShow input") );
     set_capability( "access", 0 );
     set_callbacks( AccessOpen, AccessClose );
 

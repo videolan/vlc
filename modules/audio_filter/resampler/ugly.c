@@ -45,7 +45,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Audio filter for ugly resampling") );
+    set_description( N_("Audio filter for ugly resampling") );
     set_capability( "audio filter", 2 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );

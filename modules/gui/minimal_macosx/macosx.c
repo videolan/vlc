@@ -54,7 +54,7 @@ vlc_module_begin();
     /* Minimal interface. see intf.m */
     set_shortname( "Minimal Macosx" );
     add_shortcut( "minimal_macosx" );
-    set_description( _("Minimal Mac OS X interface") );
+    set_description( N_("Minimal Mac OS X interface") );
     set_capability( "interface", 50 );
     set_callbacks( OpenIntf, CloseIntf );
     set_category( CAT_INTERFACE );
@@ -62,7 +62,7 @@ vlc_module_begin();
 
     add_submodule();
         /* Will be loaded even without interface module. see voutgl.m */
-        set_description( _("Minimal Mac OS X OpenGL video output (opens a borderless window)") );
+        set_description( N_("Minimal Mac OS X OpenGL video output (opens a borderless window)") );
         set_capability( "opengl provider", 50 );
         set_category( CAT_VIDEO);
         set_subcategory( SUBCAT_VIDEO_VOUT );

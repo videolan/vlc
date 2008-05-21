@@ -47,7 +47,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( _("AU demuxer") );
+    set_description( N_("AU demuxer") );
     set_capability( "demux", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "au" );

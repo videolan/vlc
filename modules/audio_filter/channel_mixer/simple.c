@@ -49,14 +49,14 @@ static block_t *Filter( filter_t *, block_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Audio filter for simple channel mixing") );
+    set_description( N_("Audio filter for simple channel mixing") );
     set_capability( "audio filter", 10 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
     set_callbacks( Create, NULL );
 
     add_submodule();
-    set_description( _("audio filter for simple channel mixing") );
+    set_description( N_("audio filter for simple channel mixing") );
     set_capability( "audio filter2", 10 );
     set_callbacks( OpenFilter, NULL );
 vlc_module_end();

@@ -165,7 +165,7 @@ vlc_module_begin();
         add_deprecated_alias( "wxwin-config-last" ); /*Deprecated since 0.8.4*/
 
     add_submodule();
-    set_description( _("wxWidgets dialogs provider") );
+    set_description( N_("wxWidgets dialogs provider") );
     set_capability( "dialogs provider", 50 );
     set_callbacks( OpenDialogs, Close );
 

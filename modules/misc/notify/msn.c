@@ -72,7 +72,7 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_shortname( "MSN" );
-    set_description( _("MSN Now-Playing") );
+    set_description( N_("MSN Now-Playing") );
 
     add_string( "msn-format", FORMAT_DEFAULT, NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, false );

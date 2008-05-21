@@ -69,7 +69,7 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
         "your subtitles don't appear.")
 
 vlc_module_begin();
-    set_description( _("Teletext subtitles decoder") );
+    set_description( N_("Teletext subtitles decoder") );
     set_shortname( "Teletext" );
     set_capability( "decoder", 50 );
     set_category( CAT_INPUT );

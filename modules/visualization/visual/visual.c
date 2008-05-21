@@ -109,10 +109,10 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("Visualizer"));
+    set_shortname( N_("Visualizer"));
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_VISUAL );
-    set_description( _("Visualizer filter") );
+    set_description( N_("Visualizer filter") );
     set_section( N_( "General") , NULL );
     add_string("effect-list", "spectrum", NULL,
             ELIST_TEXT, ELIST_LONGTEXT, true );

@@ -102,11 +102,11 @@ vlc_module_begin();
     /* decoder main module */
 #if defined(MODULE_NAME_is_ffmpegaltivec) \
      || (defined(CAN_COMPILE_ALTIVEC) && !defined(NO_ALTIVEC_IN_FFMPEG))
-    set_description( _("AltiVec FFmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
+    set_description( N_("AltiVec FFmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
     /*add_requirement( ALTIVEC );*/
     set_capability( "decoder", 71 );
 #else
-    set_description( _("FFmpeg audio/video decoders/encoders") );
+    set_description( N_("FFmpeg audio/video decoders/encoders") );
     set_help( MODULE_DESCRIPTION );
     set_capability( "decoder", 70 );
 #endif
@@ -146,7 +146,7 @@ vlc_module_begin();
     /* encoder submodule */
     add_submodule();
     set_section( N_("Encoding") , NULL );
-    set_description( _("FFmpeg audio/video encoder") );
+    set_description( N_("FFmpeg audio/video encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
 
@@ -213,14 +213,14 @@ vlc_module_begin();
 
     /* demux submodule */
     add_submodule();
-    set_description( _("FFmpeg demuxer" ) );
+    set_description( N_("FFmpeg demuxer" ) );
     set_capability( "demux", 2 );
     set_callbacks( OpenDemux, CloseDemux );
 
 #ifdef ENABLE_SOUT
     /* mux submodule */
     add_submodule();
-    set_description( _("FFmpeg muxer" ) );
+    set_description( N_("FFmpeg muxer" ) );
     set_capability( "sout mux", 2 );
     add_string( "ffmpeg-mux", NULL, NULL, MUX_TEXT,
                 MUX_LONGTEXT, true );
@@ -231,7 +231,7 @@ vlc_module_begin();
 #if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
     /* video filter submodule */
     add_submodule();
-    set_description( _("Video scaling filter") );
+    set_description( N_("Video scaling filter") );
     set_capability( "video filter2", 1000 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
@@ -244,26 +244,26 @@ vlc_module_begin();
     add_submodule();
     set_capability( "video filter2", 50 );
     set_callbacks( OpenFilter, CloseFilter );
-    set_description( _("FFmpeg video filter") );
+    set_description( N_("FFmpeg video filter") );
 
     /* crop/padd submodule */
     add_submodule();
     set_capability( "crop padd", 10 );
     set_callbacks( OpenCropPadd, CloseFilter );
-    set_description( _("FFmpeg crop padd filter") );
+    set_description( N_("FFmpeg crop padd filter") );
 #endif
 
     /* chroma conversion submodule */
     add_submodule();
     set_capability( "chroma", 50 );
     set_callbacks( OpenChroma, CloseChroma );
-    set_description( _("FFmpeg chroma conversion") );
+    set_description( N_("FFmpeg chroma conversion") );
 
     /* video filter submodule */
     add_submodule();
     set_capability( "video filter2", 0 );
     set_callbacks( OpenDeinterlace, CloseDeinterlace );
-    set_description( _("FFmpeg deinterlace video filter") );
+    set_description( N_("FFmpeg deinterlace video filter") );
     add_shortcut( "ffmpeg-deinterlace" );
 
 vlc_module_end();

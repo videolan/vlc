@@ -51,8 +51,8 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-display-"
 
 vlc_module_begin();
-    set_shortname( _("Display"));
-    set_description( _("Display stream output") );
+    set_shortname( N_("Display"));
+    set_description( N_("Display stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "display" );
     set_category( CAT_SOUT );

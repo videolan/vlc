@@ -89,8 +89,8 @@ static char *ppsz_color_descriptions[] = {
   N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), N_("Aqua") };
 
 vlc_module_begin();
-    set_shortname( _("Text renderer"));
-    set_description( _("Win32 font renderer") );
+    set_shortname( N_("Text renderer"));
+    set_description( N_("Win32 font renderer") );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
 

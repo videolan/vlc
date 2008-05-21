@@ -66,7 +66,7 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     set_shortname( "OpenGL" );
-    set_description( _("OpenGL video output") );
+    set_description( N_("OpenGL video output") );
     set_capability( "opengl provider", 100 );
     add_shortcut( "glwin32" );
     set_callbacks( OpenVideo, CloseVideo );

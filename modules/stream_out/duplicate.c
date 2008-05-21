@@ -41,7 +41,7 @@ static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Duplicate stream output") );
+    set_description( N_("Duplicate stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "duplicate" );
     add_shortcut( "dup" );

@@ -86,9 +86,9 @@ static void Close( vlc_object_t * );
 #define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies Across http redirections ")
 
 vlc_module_begin();
-    set_description( _("HTTP input") );
+    set_description( N_("HTTP input") );
     set_capability( "access", 0 );
-    set_shortname( _( "HTTP(S)" ) );
+    set_shortname( N_( "HTTP(S)" ) );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

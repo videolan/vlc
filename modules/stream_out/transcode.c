@@ -192,8 +192,8 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-transcode-"
 
 vlc_module_begin();
-    set_shortname( _("Transcode"));
-    set_description( _("Transcode stream output") );
+    set_shortname( N_("Transcode"));
+    set_description( N_("Transcode stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "transcode" );
     set_callbacks( Open, Close );

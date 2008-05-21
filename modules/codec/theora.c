@@ -101,18 +101,18 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_shortname( "Theora" );
-    set_description( _("Theora video decoder") );
+    set_description( N_("Theora video decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "theora" );
 
     add_submodule();
-    set_description( _("Theora video packetizer") );
+    set_description( N_("Theora video packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 
     add_submodule();
-    set_description( _("Theora video encoder") );
+    set_description( N_("Theora video encoder") );
     set_capability( "encoder", 150 );
     set_callbacks( OpenEncoder, CloseEncoder );
 

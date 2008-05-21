@@ -61,7 +61,7 @@ static vlc_object_t * p_gtk_main = NULL;
  *****************************************************************************/
 vlc_module_begin();
     int i_cap;
-    set_description( _("Gtk+ GUI helper") );
+    set_description( N_("Gtk+ GUI helper") );
 #if defined(MODULE_NAME_IS_gtk_main)
     i_cap = 90;
     add_shortcut( "gtk" );

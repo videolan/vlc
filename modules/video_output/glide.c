@@ -64,7 +64,7 @@ static void CloseDisplay   ( vout_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("3dfx Glide video output") );
+    set_description( N_("3dfx Glide video output") );
     set_capability( "video output", 20 );
     add_shortcut( "3dfx" );
     set_callbacks( Create, Destroy );

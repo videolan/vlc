@@ -63,8 +63,8 @@ static void Close( vlc_object_t * );
 #define CRL_LONGTEXT N_( "HTTP interace Certificates Revocation List file." )
 
 vlc_module_begin();
-    set_shortname( _("HTTP"));
-    set_description( _("HTTP remote control interface") );
+    set_shortname( N_("HTTP"));
+    set_description( N_("HTTP remote control interface") );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true );

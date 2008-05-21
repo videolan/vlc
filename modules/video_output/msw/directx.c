@@ -179,7 +179,7 @@ vlc_module_begin();
     add_bool( "directx-wallpaper", 0, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
               true );
 
-    set_description( _("DirectX video output") );
+    set_description( N_("DirectX video output") );
     set_capability( "video output", 100 );
     add_shortcut( "directx" );
     set_callbacks( OpenVideo, CloseVideo );

@@ -58,15 +58,15 @@
 vlc_module_begin();
     add_submodule();
         set_shortname( N_( "Lua Art" ) );
-        set_description( _("Fetch artwork using lua scripts") );
+        set_description( N_("Fetch artwork using lua scripts") );
         set_capability( "art finder", 10 );
         set_callbacks( FindArt, NULL );
     add_submodule();
         add_shortcut( "luaplaylist" );
         set_category( CAT_INPUT );
         set_subcategory( SUBCAT_INPUT_DEMUX );
-        set_shortname( _("Lua Playlist") );
-        set_description( _("Lua Playlist Parser Interface") );
+        set_shortname( N_("Lua Playlist") );
+        set_description( N_("Lua Playlist Parser Interface") );
         set_capability( "demux", 2 );
         set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist );
     add_submodule();
@@ -79,7 +79,7 @@ vlc_module_begin();
         /* add_shortcut( "telnet" ); */
         add_shortcut( "luahttp" );
         /* add_shortcut( "http" ); */
-        set_description( _("Lua Interface Module") );
+        set_description( N_("Lua Interface Module") );
         set_capability( "interface", 0 );
         add_string( "lua-intf", "dummy", NULL,
                     INTF_TEXT, INTF_LONGTEXT, false );

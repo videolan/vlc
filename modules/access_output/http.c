@@ -92,7 +92,7 @@ static void Close( vlc_object_t * );
 
 
 vlc_module_begin();
-    set_description( _("HTTP stream output") );
+    set_description( N_("HTTP stream output") );
     set_capability( "sout access", 0 );
     set_shortname( "HTTP" );
     add_shortcut( "http" );

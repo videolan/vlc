@@ -51,8 +51,8 @@ static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 vlc_module_begin();
-    set_shortname (_("MMap"));
-    set_description (_("Memory-mapped file input"));
+    set_shortname (N_("MMap"));
+    set_description (N_("Memory-mapped file input"));
     set_category (CAT_INPUT);
     set_subcategory (SUBCAT_INPUT_ACCESS);
     set_capability ("access", 52);

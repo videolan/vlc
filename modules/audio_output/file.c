@@ -109,8 +109,8 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
 #define FILE_LONGTEXT N_("File to which the audio samples will be written to. (\"-\" for stdout")
 
 vlc_module_begin();
-    set_description( _("File audio output") );
-    set_shortname( _("File") );
+    set_description( N_("File audio output") );
+    set_shortname( N_("File") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
 

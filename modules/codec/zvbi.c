@@ -102,7 +102,7 @@ static const char *ppsz_pos_descriptions[] =
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 vlc_module_begin();
-    set_description( _("VBI and Teletext decoder") );
+    set_description( N_("VBI and Teletext decoder") );
     set_shortname( "VBI & Teletext" );
     set_capability( "decoder", 51 );
     set_category( CAT_INPUT );

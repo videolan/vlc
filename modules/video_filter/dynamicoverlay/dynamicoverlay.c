@@ -62,8 +62,8 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
 #define OUTPUT_LONGTEXT N_("FIFO which will be written to for responses")
 
 vlc_module_begin();
-    set_description( _("Dynamic video overlay") );
-    set_shortname( _("Overlay" ));
+    set_description( N_("Dynamic video overlay") );
+    set_shortname( N_("Overlay" ));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "sub filter", 0 );

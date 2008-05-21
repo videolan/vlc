@@ -50,7 +50,7 @@ static void cyuv_I422           ( vout_thread_t *, picture_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 80 );
     set_callbacks( Activate, NULL );
 vlc_module_end();

@@ -117,7 +117,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VOUT );
 //    add_category_hint( N_("QT Embedded"), NULL );
 //    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
-    set_description( _("QT Embedded video output") );
+    set_description( N_("QT Embedded video output") );
     set_capability( "video output", 70 );
     add_shortcut( "qte" );
     set_callbacks( Open, Close);

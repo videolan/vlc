@@ -62,7 +62,7 @@ static void    Close  ( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-ps-"
 
 vlc_module_begin();
-    set_description( _("PS muxer") );
+    set_description( N_("PS muxer") );
     set_shortname( "MPEG-PS" );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_MUX );

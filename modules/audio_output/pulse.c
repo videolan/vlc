@@ -92,7 +92,7 @@ static void uninit(aout_instance_t *p_aout);
  *****************************************************************************/
 vlc_module_begin();
     set_shortname( "Pulse Audio" );
-    set_description( _("Pulseaudio audio output") );
+    set_description( N_("Pulseaudio audio output") );
     set_capability( "audio output", 40 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );

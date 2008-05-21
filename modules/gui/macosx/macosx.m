@@ -91,7 +91,7 @@ void CloseVideoGL ( vlc_object_t * );
                             "termination. This feature can be disabled here.")
 
 vlc_module_begin();
-    set_description( _("Mac OS X interface") );
+    set_description( N_("Mac OS X interface") );
     set_capability( "interface", 200 );
     set_callbacks( OpenIntf, CloseIntf );
     set_category( CAT_INTERFACE );
@@ -106,7 +106,7 @@ vlc_module_begin();
               false );
 
     add_submodule();
-        set_description( _("Quartz video") );
+        set_description( N_("Quartz video") );
         set_capability( "video output", 100 );
         set_category( CAT_VIDEO);
         set_subcategory( SUBCAT_VIDEO_VOUT );

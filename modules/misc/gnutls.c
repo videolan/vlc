@@ -85,7 +85,7 @@ static void CloseServer (vlc_object_t *);
 
 vlc_module_begin();
     set_shortname( "GnuTLS" );
-    set_description( _("GnuTLS transport layer security") );
+    set_description( N_("GnuTLS transport layer security") );
     set_capability( "tls client", 1 );
     set_callbacks( OpenClient, CloseClient );
     set_category( CAT_ADVANCED );
@@ -95,7 +95,7 @@ vlc_module_begin();
     add_obsolete_bool( "tls-check-hostname" );
 
     add_submodule();
-        set_description( _("GnuTLS server") );
+        set_description( N_("GnuTLS server") );
         set_capability( "tls server", 1 );
         set_category( CAT_ADVANCED );
         set_subcategory( SUBCAT_ADVANCED_MISC );

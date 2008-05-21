@@ -70,7 +70,7 @@ static void OutClose( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "FTP" );
-    set_description( _("FTP input") );
+    set_description( N_("FTP input") );
     set_capability( "access", 0 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
@@ -87,7 +87,7 @@ vlc_module_begin();
 
     add_submodule();
     set_shortname( "FTP" );
-    set_description( _("FTP upload output") );
+    set_description( N_("FTP upload output") );
     set_capability( "sout access", 0 );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );

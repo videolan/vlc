@@ -121,8 +121,8 @@ static const char *mode_list_text[] = { N_("Discard"), N_("Blend"), N_("Mean"),
                                   N_("Bob"), N_("Linear"), "X" };
 
 vlc_module_begin();
-    set_description( _("Deinterlacing video filter") );
-    set_shortname( _("Deinterlace" ));
+    set_description( N_("Deinterlacing video filter") );
+    set_shortname( N_("Deinterlace" ));
     set_capability( "video filter", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

@@ -67,7 +67,7 @@ static void Play         ( aout_instance_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("EsounD audio output") );
+    set_description( N_("EsounD audio output") );
     set_shortname( "EsounD" );
     set_capability( "audio output", 50 );
     add_string( "esdserver", "", NULL, N_("Esound server"), NULL, false );

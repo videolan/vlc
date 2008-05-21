@@ -70,7 +70,7 @@ void CloseIntf ( vlc_object_t * );
  * Module descriptor.
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("CMML annotations decoder") );
+    set_description( N_("CMML annotations decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "cmml" );

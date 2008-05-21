@@ -74,8 +74,8 @@ static int Control( access_t *, int, va_list );
     "value should be set in milliseconds." )
 
 vlc_module_begin();
-    set_description( _("Digital Video (Firewire/ieee1394)  input") );
-    set_shortname( _("dv") );
+    set_description( N_("Digital Video (Firewire/ieee1394)  input") );
+    set_shortname( N_("dv") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dv-caching", 60000 / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );

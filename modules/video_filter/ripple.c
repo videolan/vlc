@@ -49,8 +49,8 @@ static picture_t *Filter( filter_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Ripple video filter") );
-    set_shortname( _( "Ripple" ));
+    set_description( N_("Ripple video filter") );
+    set_shortname( N_( "Ripple" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

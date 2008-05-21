@@ -94,8 +94,8 @@ static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 #define BOOKMARK_LONGTEXT N_("Define playlist bookmarks.")
 
 vlc_module_begin();
-    set_shortname( _("Hotkeys") );
-    set_description( _("Hotkeys management interface") );
+    set_shortname( N_("Hotkeys") );
+    set_description( N_("Hotkeys management interface") );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();

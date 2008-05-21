@@ -70,14 +70,14 @@ static block_t   *SendFrame  ( decoder_t *, block_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Pseudo raw video decoder") );
+    set_description( N_("Pseudo raw video decoder") );
     set_capability( "decoder", 50 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
-    set_description( _("Pseudo raw video packetizer") );
+    set_description( N_("Pseudo raw video packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 vlc_module_end();

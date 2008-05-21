@@ -97,12 +97,12 @@ static block_t       *GetSoutBuffer( decoder_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("DTS parser") );
+    set_description( N_("DTS parser") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
-    set_description( _("DTS audio packetizer") );
+    set_description( N_("DTS audio packetizer") );
     set_capability( "packetizer", 10 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 vlc_module_end();

@@ -76,13 +76,13 @@ static const char *ppsz_enc_options[] = {
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_description( _("Dirac video decoder") );
+    set_description( N_("Dirac video decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "dirac" );
 
     add_submodule();
-    set_description( _("Dirac video encoder") );
+    set_description( N_("Dirac video encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
     add_float( ENC_CFG_PREFIX "quality", 7.0, NULL, ENC_QUALITY_TEXT,

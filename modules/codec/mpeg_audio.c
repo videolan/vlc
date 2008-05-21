@@ -113,7 +113,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("MPEG audio layer I/II/III decoder") );
+    set_description( N_("MPEG audio layer I/II/III decoder") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
 #if defined(UNDER_CE)
@@ -124,7 +124,7 @@ vlc_module_begin();
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
-    set_description( _("MPEG audio layer I/II/III packetizer") );
+    set_description( N_("MPEG audio layer I/II/III packetizer") );
     set_capability( "packetizer", 10 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 vlc_module_end();

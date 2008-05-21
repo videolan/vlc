@@ -110,8 +110,8 @@ static void ParseKateComments( decoder_t * );
 
 
 vlc_module_begin();
-    set_shortname( _("Kate"));
-    set_description( _("Kate text subtitles decoder") );
+    set_shortname( N_("Kate"));
+    set_description( N_("Kate text subtitles decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, CloseDecoder );
     set_category( CAT_INPUT );
@@ -120,7 +120,7 @@ vlc_module_begin();
 
 #ifdef ENABLE_PACKETIZER
     add_submodule();
-    set_description( _("Kate text subtitles packetizer") );
+    set_description( N_("Kate text subtitles packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
     add_shortcut( "kate" );

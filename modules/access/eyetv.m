@@ -57,7 +57,7 @@ static void Close( vlc_object_t * );
     "-1 for S-Video input, -2 for Composite input" )
 vlc_module_begin();
     set_shortname( "EyeTV" );
-    set_description( _("EyeTV access module") );
+    set_description( N_("EyeTV access module") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

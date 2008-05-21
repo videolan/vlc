@@ -71,8 +71,8 @@ static const char *ppsz_component_descriptions[] = { "Red", "Green", "Blue" };
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Extract RGB component video filter") );
-    set_shortname( _("Extract" ));
+    set_description( N_("Extract RGB component video filter") );
+    set_shortname( N_("Extract" ));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter2", 0 );

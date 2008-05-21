@@ -169,8 +169,8 @@ static int yCallback( vlc_object_t *, char const *,
 #define CFG_PREFIX "sout-mosaic-bridge-"
 
 vlc_module_begin();
-    set_shortname( _( "Mosaic bridge" ) );
-    set_description(_("Mosaic bridge stream output") );
+    set_shortname( N_( "Mosaic bridge" ) );
+    set_description(N_("Mosaic bridge stream output") );
     set_capability( "sout stream", 0 );
     add_shortcut( "mosaic-bridge" );
 

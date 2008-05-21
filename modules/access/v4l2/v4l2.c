@@ -272,8 +272,8 @@ static const char *psz_tuner_audio_modes_list_text[] =
 #define CFG_PREFIX "v4l2-"
 
 vlc_module_begin();
-    set_shortname( _("Video4Linux2") );
-    set_description( _("Video4Linux2 input") );
+    set_shortname( N_("Video4Linux2") );
+    set_description( N_("Video4Linux2 input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
@@ -379,7 +379,7 @@ vlc_module_begin();
 
     add_submodule();
     add_shortcut( "v4l2c" );
-    set_description( _("Video4Linux2 Compressed A/V") );
+    set_description( N_("Video4Linux2 Compressed A/V") );
     set_capability( "access", 0 );
     /* use these when open as access_demux fails; VLC will use another demux */
     set_callbacks( AccessOpen, AccessClose );

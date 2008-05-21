@@ -87,8 +87,8 @@ static void Close( vlc_object_t * );
     "value should be set in milliseconds." )
 
 vlc_module_begin();
-    set_description( _("File input") );
-    set_shortname( _("File") );
+    set_description( N_("File input") );
+    set_shortname( N_("File") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );

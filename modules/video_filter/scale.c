@@ -56,7 +56,7 @@ static picture_t *Filter( filter_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Video scaling filter") );
+    set_description( N_("Video scaling filter") );
     set_capability( "video filter2", 10000 );
 //    set_category( CAT_VIDEO );
 //    set_subcategory( SUBCAT_VIDEO_VFILTER2 );

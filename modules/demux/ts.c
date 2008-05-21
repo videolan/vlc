@@ -138,7 +138,7 @@ static void Close ( vlc_object_t * );
     "Specify the size of the buffer here and not the number of packets." )
 
 vlc_module_begin();
-    set_description( _("MPEG Transport Stream demuxer") );
+    set_description( N_("MPEG Transport Stream demuxer") );
     set_shortname ( "MPEG-TS" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );

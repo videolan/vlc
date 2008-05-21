@@ -44,7 +44,7 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "MPJPEG" );
-    set_description( _("Multipart JPEG muxer") );
+    set_description( N_("Multipart JPEG muxer") );
     set_capability( "sout mux", 5 );
     add_obsolete_string( SOUT_CFG_PREFIX "separator" );
     set_category( CAT_SOUT );

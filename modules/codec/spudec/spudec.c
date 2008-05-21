@@ -43,14 +43,14 @@ static int  PacketizerOpen( vlc_object_t * );
 static void Close         ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("DVD subtitles decoder") );
+    set_description( N_("DVD subtitles decoder") );
     set_capability( "decoder", 50 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_SCODEC );
     set_callbacks( DecoderOpen, Close );
 
     add_submodule();
-    set_description( _("DVD subtitles packetizer") );
+    set_description( N_("DVD subtitles packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( PacketizerOpen, Close );
 vlc_module_end();

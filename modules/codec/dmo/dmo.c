@@ -99,7 +99,7 @@ static int LoadDMO( vlc_object_t *, HINSTANCE *, IMediaObject **,
 static void CopyPicture( decoder_t *, picture_t *, uint8_t * );
 
 vlc_module_begin();
-    set_description( _("DirectMedia Object decoder") );
+    set_description( N_("DirectMedia Object decoder") );
     add_shortcut( "dmo" );
     set_capability( "decoder", 1 );
     set_callbacks( DecoderOpen, DecoderClose );
@@ -108,7 +108,7 @@ vlc_module_begin();
 
 #   define ENC_CFG_PREFIX "sout-dmo-"
     add_submodule();
-    set_description( _("DirectMedia Object encoder") );
+    set_description( N_("DirectMedia Object encoder") );
     set_capability( "encoder", 10 );
     set_callbacks( EncoderOpen, EncoderClose );
 

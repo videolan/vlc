@@ -101,9 +101,9 @@ static const char *ppsz_pos_descriptions[] =
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 vlc_module_begin();
-    set_description( _("Logo video filter") );
+    set_description( N_("Logo video filter") );
     set_capability( "video filter", 0 );
-    set_shortname( _("Logo overlay") );
+    set_shortname( N_("Logo overlay") );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     add_shortcut( "logo" );
@@ -124,7 +124,7 @@ vlc_module_begin();
     add_submodule();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
-    set_description( _("Logo sub filter") );
+    set_description( N_("Logo sub filter") );
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {

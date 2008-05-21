@@ -185,8 +185,8 @@ static void Close( vlc_object_t *p_this );
 #define CRL_LONGTEXT N_( "HTTP interface Certificates Revocation List file" )
 
 vlc_module_begin();
-    set_shortname( _("DVB") );
-    set_description( _("DVB input with v4l2 support") );
+    set_shortname( N_("DVB") );
+    set_description( N_("DVB input with v4l2 support") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

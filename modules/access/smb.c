@@ -77,7 +77,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "SMB" );
-    set_description( _("SMB input") );
+    set_description( N_("SMB input") );
     set_capability( "access", 0 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );

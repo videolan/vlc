@@ -99,7 +99,7 @@ vlc_module_begin();
                  TELNETPORT_LONGTEXT, true );
     add_password( "telnet-password", TELNETPWD_DEFAULT, NULL, TELNETPWD_TEXT,
                 TELNETPWD_LONGTEXT, true );
-    set_description( _("VLM remote control interface") );
+    set_description( N_("VLM remote control interface") );
     add_category_hint( "VLM", NULL, false );
     set_capability( "interface", 0 );
     set_callbacks( Open , Close );

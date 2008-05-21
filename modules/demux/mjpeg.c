@@ -51,7 +51,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "MJPEG");
-    set_description( _("M-JPEG camera demuxer") );
+    set_description( N_("M-JPEG camera demuxer") );
     set_capability( "demux", 5 );
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );

@@ -86,8 +86,8 @@ static const char *ppsz_deinterlace_type[] =
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_shortname( _("Fake") );
-    set_description( _("Fake video decoder") );
+    set_shortname( N_("Fake") );
+    set_description( N_("Fake video decoder") );
     set_capability( "decoder", 1000 );
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "fake" );

@@ -46,7 +46,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "DV" );
-    set_description( _("DV (Digital Video) demuxer") );
+    set_description( N_("DV (Digital Video) demuxer") );
     set_capability( "demux", 3 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );

@@ -79,8 +79,8 @@ static char *verbosity_list_text[] = { N_("Show only errors"),
   N_("Show errors and warnings"), N_("Show everything including debug messages")};
 
 vlc_module_begin();
-    set_description( _("OpenCV video filter wrapper") );
-    set_shortname( _("OpenCV" ));
+    set_description( N_("OpenCV video filter wrapper") );
+    set_shortname( N_("OpenCV" ));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter", 0 );

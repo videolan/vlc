@@ -61,8 +61,8 @@ static int  MouseEvent   ( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Magnify/Zoom interactive video filter") );
-    set_shortname( _( "Magnify" ));
+    set_description( N_("Magnify/Zoom interactive video filter") );
+    set_shortname( N_( "Magnify" ));
     set_capability( "video filter", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

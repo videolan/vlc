@@ -105,7 +105,7 @@ static const char *ppsz_devices[] = { "default" };
 static const char *ppsz_devices_text[] = { N_("Default") };
 vlc_module_begin();
     set_shortname( "ALSA" );
-    set_description( _("ALSA audio output") );
+    set_description( N_("ALSA audio output") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,

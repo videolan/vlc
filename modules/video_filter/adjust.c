@@ -78,8 +78,8 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
 #define GAMMA_LONGTEXT N_("Set the image gamma, between 0.01 and 10. Defaults to 1.")
 
 vlc_module_begin();
-    set_description( _("Image properties filter") );
-    set_shortname( _("Image adjust" ));
+    set_description( N_("Image properties filter") );
+    set_shortname( N_("Image adjust" ));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter2", 0 );

@@ -61,7 +61,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "Podcast");
-    set_description( _("Podcasts") );
+    set_description( N_("Podcasts") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 

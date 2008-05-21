@@ -63,7 +63,7 @@ static void Close  ( vlc_object_t * );
 #define PACKETSIZE_LONGTEXT N_("ASF packet size -- default is 4096 bytes")
 
 vlc_module_begin();
-    set_description( _("ASF muxer") );
+    set_description( N_("ASF muxer") );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_MUX );
     set_shortname( "ASF" );

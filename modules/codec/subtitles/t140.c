@@ -34,7 +34,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     add_submodule();
-    set_description( _("T.140 text encoder") );
+    set_description( N_("T.140 text encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( Open, Close );
 vlc_module_end();

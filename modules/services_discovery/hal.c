@@ -84,7 +84,7 @@ services_discovery_t        *p_sd_global;
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("HAL devices detection") );
+    set_description( N_("HAL devices detection") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 

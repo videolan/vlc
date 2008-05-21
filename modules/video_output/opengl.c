@@ -185,7 +185,7 @@ vlc_module_begin();
     set_shortname( "OpenGL" );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( _("OpenGL video output") );
+    set_description( N_("OpenGL video output") );
 #ifdef __APPLE__
     set_capability( "video output", 200 );
 #else

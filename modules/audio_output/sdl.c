@@ -66,7 +66,7 @@ static void SDLCallback ( void *, uint8_t *, int );
  *****************************************************************************/
 vlc_module_begin();
     set_shortname( "SDL" );
-    set_description( _("Simple DirectMedia Layer audio output") );
+    set_description( N_("Simple DirectMedia Layer audio output") );
     set_capability( "audio output", 40 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );

@@ -54,7 +54,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_bool( "beos-dvdmenus", 0, NULL, _("Use DVD Menus"), "", true );
     set_shortname( "BeOS" );
-    set_description( _("BeOS standard API interface") );
+    set_description( N_("BeOS standard API interface") );
     set_capability( "interface", 100 );
     set_callbacks( OpenIntf, CloseIntf );
 

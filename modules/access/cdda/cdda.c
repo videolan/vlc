@@ -111,9 +111,9 @@ static const char *psz_paranoia_list_text[] = { N_("none"), N_("overlap"),
 
 vlc_module_begin();
     add_usage_hint( N_("cddax://[device-or-file][@[T]track]") );
-    set_description( _("Compact Disc Digital Audio (CD-DA) input") );
+    set_description( N_("Compact Disc Digital Audio (CD-DA) input") );
     set_capability( "access", 10 /* compare with priority of cdda */ );
-    set_shortname( _("Audio Compact Disc"));
+    set_shortname( N_("Audio Compact Disc"));
     set_callbacks( CDDAOpen, CDDAClose );
     add_shortcut( "cddax" );
     add_shortcut( "cd" );

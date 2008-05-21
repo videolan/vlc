@@ -49,8 +49,8 @@ static picture_t *Filter( filter_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Noise video filter") );
-    set_shortname( _( "Noise" ));
+    set_description( N_("Noise video filter") );
+    set_shortname( N_( "Noise" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

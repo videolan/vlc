@@ -57,13 +57,13 @@ vlc_module_begin();
     set_subcategory( SUBCAT_OSD_IMPORT );
 
     add_submodule();
-        set_description( _("OSD configuration importer") );
+        set_description( N_("OSD configuration importer") );
         add_shortcut( "import-osd" );
         set_capability( "osd parser", 0);
         set_callbacks( osd_parser_simpleOpen, osd_parser_Close );
 
     add_submodule();
-        set_description( _("XML OSD configuration importer") );
+        set_description( N_("XML OSD configuration importer") );
         add_shortcut( "import-osd-xml" );
         set_capability( "osd parser", 0);
         set_callbacks( osd_parser_xmlOpen, osd_parser_Close );

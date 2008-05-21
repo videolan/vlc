@@ -55,7 +55,7 @@ static void Close ( vlc_object_t * );
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( _("MusePack demuxer") );
+    set_description( N_("MusePack demuxer") );
     set_capability( "demux", 145 );
 
     set_callbacks( Open, Close );

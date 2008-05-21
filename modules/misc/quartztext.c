@@ -82,8 +82,8 @@ static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size,
 // override the fallback font selection used when this style information is
 // absent.
 vlc_module_begin();
-    set_shortname( _("Mac Text renderer"));
-    set_description( _("Quartz font renderer") );
+    set_shortname( N_("Mac Text renderer"));
+    set_description( N_("Quartz font renderer") );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
 

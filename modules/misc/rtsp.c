@@ -72,8 +72,8 @@ static void Close( vlc_object_t * );
     "those made by HansunTech) which get confused by it. The default is 5." )
 
 vlc_module_begin();
-    set_shortname( _("RTSP VoD" ) );
-    set_description( _("RTSP VoD server") );
+    set_shortname( N_("RTSP VoD" ) );
+    set_description( N_("RTSP VoD server") );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_VOD );
     set_capability( "vod server", 1 );

@@ -107,7 +107,7 @@ static void Close( vlc_object_t * );
                            "shoutcast. Requires Ogg streaming for icecast." )
 
 vlc_module_begin();
-    set_description( _("IceCAST output") );
+    set_description( N_("IceCAST output") );
     set_shortname( "Shoutcast" );
     set_capability( "sout access", 50 );
     set_category( CAT_SOUT );

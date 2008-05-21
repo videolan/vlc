@@ -71,9 +71,9 @@ static void Close( vlc_object_t * );
     "Automatically connect VLC input ports to available output ports." )
 
 vlc_module_begin();
-     set_description( _("JACK audio input") );
+     set_description( N_("JACK audio input") );
      set_capability( "access_demux", 0 );
-     set_shortname( _( "JACK Input" ) );
+     set_shortname( N_( "JACK Input" ) );
      set_category( CAT_INPUT );
      set_subcategory( SUBCAT_INPUT_ACCESS );
 

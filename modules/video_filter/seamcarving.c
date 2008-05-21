@@ -59,8 +59,8 @@ static void FilterSeamCarving( filter_t *, picture_t *, picture_t * );
 #define FILTER_PREFIX "seamcarving-"
 
 vlc_module_begin();
-    set_description( _("Seam Carving video filter") );
-    set_shortname( _( "Seam Carving" ));
+    set_description( N_("Seam Carving video filter") );
+    set_shortname( N_( "Seam Carving" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

@@ -42,7 +42,7 @@ static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Dummy/Raw muxer") );
+    set_description( N_("Dummy/Raw muxer") );
     set_capability( "sout mux", 5 );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_MUX );

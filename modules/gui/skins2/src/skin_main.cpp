@@ -464,14 +464,14 @@ vlc_module_begin();
 
     add_bool( "skinned-playlist", true, NULL, SKINS2_PLAYLIST,
               SKINS2_PLAYLIST_LONG, false );
-    set_shortname( _("Skins"));
-    set_description( _("Skinnable Interface") );
+    set_shortname( N_("Skins"));
+    set_description( N_("Skinnable Interface") );
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );
     add_shortcut( "skins" );
 
     add_submodule();
-        set_description( _("Skins loader demux") );
+        set_description( N_("Skins loader demux") );
         set_capability( "demux", 5 );
         set_callbacks( DemuxOpen, NULL );
 

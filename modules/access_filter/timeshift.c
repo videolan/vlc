@@ -62,8 +62,8 @@ static void Close( vlc_object_t * );
   "access declares that it can control pace or pause." )
 
 vlc_module_begin();
-    set_shortname( _("Timeshift") );
-    set_description( _("Timeshift") );
+    set_shortname( N_("Timeshift") );
+    set_description( N_("Timeshift") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS_FILTER );
     set_capability( "access_filter", 0 );
