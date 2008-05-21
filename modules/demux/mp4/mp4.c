@@ -1609,6 +1609,21 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         switch( p_sample->i_type )
         {
             /* qt decoder, send the complete chunk */
+            case VLC_FOURCC ('h', 'd', 'v', '1'): // HDV 720p30
+            case VLC_FOURCC ('h', 'd', 'v', '2'): // HDV 1080i60
+            case VLC_FOURCC ('h', 'd', 'v', '3'): // HDV 1080i50
+            case VLC_FOURCC ('h', 'd', 'v', '5'): // HDV 720p25
+            case VLC_FOURCC ('m', 'x', '5', 'n'): // MPEG2 IMX NTSC 525/60 50mb/s produced by FCP
+            case VLC_FOURCC ('m', 'x', '5', 'p'): // MPEG2 IMX PAL 625/60 50mb/s produced by FCP
+            case VLC_FOURCC ('m', 'x', '4', 'n'): // MPEG2 IMX NTSC 525/60 40mb/s produced by FCP
+            case VLC_FOURCC ('m', 'x', '4', 'p'): // MPEG2 IMX PAL 625/60 40mb/s produced by FCP
+            case VLC_FOURCC ('m', 'x', '3', 'n'): // MPEG2 IMX NTSC 525/60 30mb/s produced by FCP
+            case VLC_FOURCC ('m', 'x', '3', 'p'): // MPEG2 IMX PAL 625/50 30mb/s produced by FCP
+            case VLC_FOURCC ('x', 'd', 'v', '2'): // XDCAM HD 1080i60
+            case VLC_FOURCC ('A', 'V', 'm', 'p'): // AVID IMX PAL
+                p_track->fmt.i_codec = VLC_FOURCC( 'm','p','g','v' );
+                break;
+            /* qt decoder, send the complete chunk */
             case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
             case VLC_FOURCC( 'S', 'V', 'Q', '1' ):
             case VLC_FOURCC( 'V', 'P', '3', '1' ):
