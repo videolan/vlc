@@ -182,6 +182,10 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     char line[1024], section[1022];
     section[0] = '\0';
 
+    /* Ensure consistent number formatting... */
+    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    locale_t baseloc = uselocale (loc);
+
     while (fgets (line, 1024, file) != NULL)
     {
         /* Ignore comments and empty lines */
@@ -273,7 +277,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 case CONFIG_ITEM_FLOAT:
                     if( !*psz_option_value )
                         break;                    /* ignore empty option */
-                    p_item->value.f = (float)i18n_atof( psz_option_value);
+                    p_item->value.f = (float)atof (psz_option_value);
                     p_item->saved.f = p_item->value.f;
                     break;
 
@@ -310,6 +314,11 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     fclose (file);
 
     vlc_list_release( p_list );
+    if (loc != (locale_t)0)
+    {
+        uselocale (baseloc);
+        freelocale (loc);
+    }
 
     vlc_mutex_unlock( &priv->config_lock );
     return 0;
