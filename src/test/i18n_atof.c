@@ -56,13 +56,6 @@ int main (void)
     assert (us_atof(sharp9) == 999999.);
     assert (us_atof("invalid") == 0.);
 
-    assert ((i18n_strtod(dot9, &end ) == 999999.999999)
-            && (*end == '\0'));
-    assert ((i18n_strtod(comma9, &end ) == 999999.999999)
-            && (*end == '\0'));
-    assert ((i18n_strtod(sharp9, &end ) == 999999.)
-            && (*end == '#'));
-
     assert ((us_strtod(dot9, &end ) == 999999.999999)
             && (*end == '\0'));
     assert ((us_strtod(comma9, &end ) == 999999.)

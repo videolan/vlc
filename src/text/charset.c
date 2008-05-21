@@ -377,16 +377,7 @@ char *vlc_fix_readdir( const char *psz_string )
 }
 
 
-/**
- * There are two decimal separators in the computer world-wide locales:
- * dot (which is the american default), and comma (which is used in France,
- * the country with the most VLC developers, among others).
- *
- * i18n_strtod() has the same prototype as ANSI C strtod() but it accepts
- * either decimal separator when deserializing the string to a float number,
- * independant of the local computer setting.
- */
-double i18n_strtod( const char *str, char **end )
+static double i18n_strtod( const char *str, char **end )
 {
     char *end_buf, e;
     double d;
