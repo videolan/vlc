@@ -81,7 +81,6 @@ VLC_INTERNAL( bool, vlc_current_charset, ( char ** ) );
 
 VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) );
 
-VLC_INTERNAL( double, i18n_atof, ( const char * ) );
 VLC_EXPORT( double, us_strtod, ( const char *, char ** ) );
 VLC_EXPORT( double, us_atof, ( const char * ) );
 

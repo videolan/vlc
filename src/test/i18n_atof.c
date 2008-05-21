@@ -1,5 +1,5 @@
 /*****************************************************************************
- * i18n_atof.c: Test for i18n_atof
+ * i18n_atof.c: Test for us_atof
  *****************************************************************************
  * Copyright (C) 2006 Rémi Denis-Courmont
  * $Id$
@@ -35,16 +35,6 @@ int main (void)
     const char comma9[] = "999999,999999";
     const char sharp9[] = "999999#999999";
     char *end;
-
-    assert (i18n_atof("0") == 0.);
-    assert (i18n_atof("1") == 1.);
-    assert (i18n_atof("1.") == 1.);
-    assert (i18n_atof("1,") == 1.);
-    assert (i18n_atof("1#") == 1.);
-    assert (i18n_atof(dot9) == 999999.999999);
-    assert (i18n_atof(comma9) == 999999.999999);
-    assert (i18n_atof(sharp9) == 999999.);
-    assert (i18n_atof("invalid") == 0.);
 
     assert (us_atof("0") == 0.);
     assert (us_atof("1") == 1.);

@@ -377,41 +377,6 @@ char *vlc_fix_readdir( const char *psz_string )
 }
 
 
-static double i18n_strtod( const char *str, char **end )
-{
-    char *end_buf, e;
-    double d;
-
-    if( end == NULL )
-        end = &end_buf;
-    d = strtod( str, end );
-
-    e = **end;
-    if(( e == ',' ) || ( e == '.' ))
-    {
-        char dup[strlen( str ) + 1];
-        strcpy( dup, str );
-
-        if( dup == NULL )
-            return d;
-
-        dup[*end - str] = ( e == ',' ) ? '.' : ',';
-        d = strtod( dup, end );
-    }
-    return d;
-}
-
-/**
- * i18n_atof() has the same prototype as ANSI C atof() but it accepts
- * either decimal separator when deserializing the string to a float number,
- * independant of the local computer setting.
- */
-double i18n_atof( const char *str )
-{
-    return i18n_strtod( str, NULL );
-}
-
-
 /**
  * us_strtod() has the same prototype as ANSI C strtod() but it expects
  * a dot as decimal separator regardless of the system locale.
