@@ -6340,7 +6340,6 @@ AC_CONFIG_FILES([
   Makefile
   projects/activex/Makefile
   projects/activex/axvlc.inf
-  bindings/python/Makefile
   doc/Makefile
   extras/package/ipkg/Makefile
   libs/loader/Makefile
