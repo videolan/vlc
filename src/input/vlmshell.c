@@ -438,7 +438,7 @@ static int ExecuteControl( vlm_t *p_vlm, const char *psz_name, const int i_arg, 
             else
             {
                 /* Percent */
-                double d_new_position = i18n_atof( psz_argument ) / 100.0;
+                double d_new_position = us_atof( psz_argument ) / 100.0;
 
                 if( b_relative )
                 {
@@ -463,7 +463,7 @@ static int ExecuteControl( vlm_t *p_vlm, const char *psz_name, const int i_arg, 
     {
         if( psz_argument )
         {
-            const double d_scale = i18n_atof( psz_argument );
+            const double d_scale = us_atof( psz_argument );
             double d_position;
 
             vlm_ControlInternal( p_vlm, VLM_GET_MEDIA_INSTANCE_POSITION, p_media->cfg.id, psz_instance, &d_position );
@@ -481,7 +481,7 @@ static int ExecuteControl( vlm_t *p_vlm, const char *psz_name, const int i_arg, 
     {
         if( psz_argument )
         {
-            const double d_scale = i18n_atof( psz_argument );
+            const double d_scale = us_atof( psz_argument );
             double d_position;
 
             vlm_ControlInternal( p_vlm, VLM_GET_MEDIA_INSTANCE_POSITION, p_media->cfg.id, psz_instance, &d_position );
