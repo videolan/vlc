@@ -33,6 +33,7 @@
 #include <errno.h>                                                  /* errno */
 #include <assert.h>
 #include <limits.h>
+#include <locale.h>
 
 #include "configuration.h"
 #include "modules/modules.h"
@@ -521,6 +522,10 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     fprintf( file, "\xEF\xBB\xBF###\n###  " COPYRIGHT_MESSAGE "\n###\n\n"
        "###\n### lines beginning with a '#' character are comments\n###\n\n" );
 
+    /* Ensure consistent number formatting... */
+    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    locale_t baseloc = uselocale (loc);
+
     /* Look for the selected module, if NULL then save everything */
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
@@ -627,6 +632,11 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     }
 
     vlc_list_release( p_list );
+    if (loc != (locale_t)0)
+    {
+        uselocale (baseloc);
+        freelocale (loc);
+    }
 
     /*
      * Restore old settings from the config in file
