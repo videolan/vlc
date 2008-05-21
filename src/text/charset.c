@@ -378,24 +378,21 @@ char *vlc_fix_readdir( const char *psz_string )
 
 
 /**
- * us_strtod() has the same prototype as ANSI C strtod() but it expects
- * a dot as decimal separator regardless of the system locale.
+ * us_strtod() has the same prototype as ANSI C strtod() but it uses the
+ * POSIX/C decimal format, regardless of the current numeric locale.
  */
 double us_strtod( const char *str, char **end )
 {
-    char dup[strlen( str ) + 1], *ptr;
-    double d;
-    strcpy( dup, str );
+    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    locale_t oldloc = uselocale (loc);
+    double res = strtod (str, end);
 
-    ptr = strchr( dup, ',' );
-    if( ptr != NULL )
-        *ptr = '\0';
-
-    d = strtod( dup, &ptr );
-    if( end != NULL )
-        *end = (char *)&str[ptr - dup];
-
-    return d;
+    if (loc != (locale_t)0)
+    {
+        uselocale (oldloc);
+        freelocale (loc);
+    }
+    return res;
 }
 
 /**
