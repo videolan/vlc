@@ -2286,7 +2286,7 @@ msgstr ""
 "être 16:9 alors qu’ils sont 4:3. Cela peut aussi donner un indice à VLC "
 "lorsque le film ne dispose pas d’information de format d’écran. Les formats "
 "acceptés sont de la forme x:y (4:3, 16:9, etc.), ou une valeur décimale "
-"(1.25, 1.3333, etc.)."
+"(1,25, 1,3333, etc.)."
 
 #: src/libvlc-module.c:476
 msgid "Custom crop ratios list"
@@ -6212,8 +6212,8 @@ msgid ""
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
 "Force l’entrée vidéo DirectShow à utiliser un nombre d’images par seconde "
-"donné (par exemple 0 correspond à la valeur par defaut, 25, 29.97, 50, "
-"59.94, etc.)"
+"donné (par exemple 0 correspond à la valeur par defaut, 25, 29,97, 50, "
+"59,94, etc.)"
 
 #: modules/access/dshow/dshow.cpp:121
 msgid "Device properties"
@@ -6602,7 +6602,7 @@ msgstr "Débit d’images"
 
 #: modules/access/fake.c:48
 msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
-msgstr "Nombre d’images par seconde (i.e. 24, 25, 29.997, 30)."
+msgstr "Nombre d’images par seconde (i.e. 24, 25, 29,997, 30)."
 
 #: modules/access/fake.c:49 modules/stream_out/bridge.c:39
 #: modules/stream_out/mosaic_bridge.c:121
@@ -8572,7 +8572,7 @@ msgid ""
 msgstr ""
 "Si le niveau moyen sur les N derniers tampons dépasse cette valeur, le "
 "volume sera normalisé. La valeur est un nombre en virgule flottante positif. "
-"Une valeur entre 0.5 et 10 semble correcte."
+"Une valeur entre 0,5 et 10 semble correcte."
 
 #: modules/audio_filter/normvol.c:82 modules/audio_filter/normvol.c:83
 #: modules/gui/qt4/ui/sprefs_audio.ui:322
@@ -9030,7 +9030,7 @@ msgstr "Qualité d’encodage"
 
 #: modules/codec/dirac.c:73
 msgid "Quality of the encoding between 1.0 (low) and 10.0 (high)."
-msgstr "Qualité entre 1.0 (basse) et 10.0 (haute)."
+msgstr "Qualité entre 1,0 (basse) et 10,0 (haute)."
 
 #: modules/codec/dirac.c:78
 msgid "Dirac video decoder"
@@ -9635,7 +9635,7 @@ msgid ""
 "same qscale for I and P frames)."
 msgstr ""
 "Facteur de quantisation des images I, par rapport aux images P (par exemple "
-"1.0 => même quantisation pour les images I et P)."
+"1,0 => même quantisation pour les images I et P)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:240 modules/codec/x264.c:309
 #: modules/demux/mod.c:74
@@ -9726,7 +9726,7 @@ msgid ""
 "255.0)."
 msgstr ""
 "Echelle de quantisation fixe pour l’encodage VBR. Les valeurs acceptées sont "
-"0.01 à 255.0."
+"0,01 à 255,0."
 
 #: modules/codec/ffmpeg/ffmpeg.h:279
 msgid "Strict standard compliance"
@@ -9747,7 +9747,7 @@ msgstr "Masquage de luminance"
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr ""
 "Augmenter la quantisation pour les macroblocs très brillants (par défaut: "
-"0.0)."
+"0,0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:287
 msgid "Darkness masking"
@@ -9756,7 +9756,7 @@ msgstr "Masquage d’obscurité"
 #: modules/codec/ffmpeg/ffmpeg.h:288
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
-"Augmenter la quantisation pour les macroblocs très sombres (par défaut: 0.0)."
+"Augmenter la quantisation pour les macroblocs très sombres (par défaut: 0,0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:291
 msgid "Motion masking"
@@ -9768,7 +9768,7 @@ msgid ""
 "(default: 0.0)."
 msgstr ""
 "Augmenter la quantization pour les macroblocs présentant un mouvement "
-"important (par défaut: 0.0)."
+"important (par défaut: 0,0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:295
 msgid "Border masking"
@@ -9780,7 +9780,7 @@ msgid ""
 "0.0)."
 msgstr ""
 "Augmenter la quantisation pour les macroblocs en marge de l’image (par "
-"défaut: 0.0)."
+"défaut: 0,0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:299
 msgid "Luminance elimination"
@@ -9793,7 +9793,7 @@ msgid ""
 "The H264 specification recommends -4."
 msgstr ""
 "Ceci vous permet d’éliminer les blocs de luminance lorsque le PSNR n’a que "
-"peu changé (par défaut: 0.0). La spécification H264 recommande une valeur de "
+"peu changé (par défaut: 0,0). La spécification H264 recommande une valeur de "
 "-4."
 
 #: modules/codec/ffmpeg/ffmpeg.h:304
@@ -9807,7 +9807,7 @@ msgid ""
 "0.0). The H264 specification recommends 7."
 msgstr ""
 "Ceci vous permet d’éliminer les blocs de luminance lorsque le PSNR n’a que "
-"peu changé (par défaut: 0.0). La spécification H264 recommande une valeur de "
+"peu changé (par défaut: 0,0). La spécification H264 recommande une valeur de "
 "7."
 
 #: modules/codec/ffmpeg/ffmpeg.h:309
@@ -10098,7 +10098,7 @@ msgid ""
 "Force a specific encoding quality between 0.0 (high) and 50.0 (low), instead "
 "of specifying a particular bitrate. This will produce a VBR stream."
 msgstr ""
-"Spécifier une valeur de qualité comprise entre 0.0 (haute) et 50.0 (basse), "
+"Spécifier une valeur de qualité comprise entre 0,0 (haute) et 50,0 (basse), "
 "au lieu de préciser un débit particulier. Cela produira un flux à débit "
 "variable."
 
@@ -10354,7 +10354,7 @@ msgstr "Niveau maximal"
 msgid ""
 "Specify H.264 level (as defined by Annex A of the standard). Levels are not "
 "enforced; it's up to the user to select a level compatible with the rest of "
-"the encoding options. Range 1 to 5.1 (10 to 51 is also allowed)."
+"the encoding options. Range 1 to 5,1 (10 to 51 is also allowed)."
 msgstr ""
 
 #: modules/codec/x264.c:129
@@ -10501,7 +10501,7 @@ msgstr "Compression dynamique de QP"
 #: modules/codec/x264.c:186
 #, fuzzy
 msgid "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP)."
-msgstr "Compression de la courbe de QP. (0.0 = CBR, 1.0 = QCP)"
+msgstr "Compression de la courbe de QP. (0,0 = CBR, 1,0 = QCP)"
 
 #: modules/codec/x264.c:188 modules/codec/x264.c:192
 msgid "Reduce fluctuations in QP"
@@ -21116,7 +21116,7 @@ msgstr "Dimensionnement vidéo"
 #: modules/stream_out/transcode.c:62
 msgid "Scale factor to apply to the video while transcoding (eg: 0.25)"
 msgstr ""
-"Facteur d’échelle à appliquer pendant le transcodage (par exemple, 0.25)"
+"Facteur d’échelle à appliquer pendant le transcodage (par exemple, 0,25)"
 
 #: modules/stream_out/transcode.c:63
 msgid "Video frame-rate"
@@ -21490,7 +21490,7 @@ msgstr "Gamma (0-10)"
 
 #: modules/video_filter/adjust.c:77
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "Fixe le gamma de l’image, entre 0.01 et 10. 1 par défaut."
+msgstr "Fixe le gamma de l’image, entre 0,01 et 10. 1 par défaut."
 
 #: modules/video_filter/adjust.c:80
 msgid "Image properties filter"
