@@ -6167,19 +6167,11 @@ dnl
 dnl  Java bindings
 dnl
 AC_ARG_ENABLE(java-bindings,
-  [  --enable-java-bindings  Enable Java bindings (default disabled)])
-if test "${enable_java_bindings}" = "yes"
-then
-        echo ""
-        echo "****** WARNING **** WARNING ***** WARNING *************"
-        echo "*** To compile the java bindings go to the "
-        echo "*** bindings/java folder and run mvn install. "
-	echo "*** You need maven2 installed. "
-	echo "*** This configuration will continue, so you will be "
-	echo "*** able to compile VideoLAN as usual. "
-        echo "*******************************************************"
-        echo ""
-fi
+  [  --enable-java-bindings  Always fail for historical reasons],,
+  [enable_java_bindings="no"])
+AS_IF([test "${enable_java_bindings}" != "no"], [
+  AC_MSG_ERROR([Java bindings are now built from a separate source package])
+])
 
 dnl
 dnl  test plugins

@@ -201,6 +201,10 @@ New Localizations:
  * Persian
  * Polish
 
+Developpers:
+  * LibVLC now supports externally built plugins properly.
+    A "vlc-plugin" pkg-config package is provided.
+  * Java bindings are now built from a separate source.
 
 Changes between 0.8.6e and 0.8.6f:
 ----------------------------------
