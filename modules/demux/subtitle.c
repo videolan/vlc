@@ -57,16 +57,17 @@ static void Close( vlc_object_t *p_this );
     "This will only work with MicroDVD and SubRIP (SRT) subtitles.")
 #define SUB_TYPE_LONGTEXT \
     N_("Force the subtiles format. Valid values are : \"microdvd\", " \
-    "\"subrip\",  \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
-    "\"sami\", \"dvdsubtitle\", \"mpl2\", \"aqt\", \"pjs\" "\
-    "\"mpsub\" \"jacosub\" \"psb\" \"realtext\" \"dks\" and \"auto\" " \
-    "(meaning autodetection, this should always work).")
+    "\"subrip\", \"subviewer\", \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\", " \
+    "\"sami\", \"dvdsubtitle\", \"mpl2\", \"aqt\", \"pjs\", "\
+    "\"mpsub\", \"jacosub\", \"psb\", \"realtext\", \"dks\", \"subviewer1\", " \
+    " and \"auto\" (meaning autodetection, this should always work).")
 
 static const char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
     "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2",
-    "aqt", "pjs", "mpsub", "jacosub", "psb", "rt", "dks"
+    "aqt", "pjs", "mpsub", "jacosub", "psb", "realtext", "dks",
+    "subviewer1"
 };
 
 vlc_module_begin();
@@ -102,8 +103,8 @@ enum
     SUB_TYPE_ASS,
     SUB_TYPE_VPLAYER,
     SUB_TYPE_SAMI,
-    SUB_TYPE_SUBVIEWER, //SUBVIEWER 2!
-    SUB_TYPE_DVDSUBTITLE,
+    SUB_TYPE_SUBVIEWER, /* SUBVIEWER 2 */
+    SUB_TYPE_DVDSUBTITLE, /* Mplayer calls it subviewer2 */
     SUB_TYPE_MPL2,
     SUB_TYPE_AQT,
     SUB_TYPE_PJS,
@@ -111,8 +112,9 @@ enum
     SUB_TYPE_JACOSUB,
     SUB_TYPE_PSB,
     SUB_TYPE_RT,
-    SUB_TYPE_SUBVIEW1,
-    SUB_TYPE_DKS
+    SUB_TYPE_DKS,
+    SUB_TYPE_SUBVIEW1 /* SUBVIEWER 1 - mplayer calls it subrip09,
+                         and Gnome subtitles SubViewer 1.0 */
 };
 
 typedef struct
@@ -166,7 +168,7 @@ static int  ParseJSS        ( demux_t *, subtitle_t *, int );
 static int  ParsePSB        ( demux_t *, subtitle_t *, int );
 static int  ParseRealText   ( demux_t *, subtitle_t *, int );
 static int  ParseDKS        ( demux_t *, subtitle_t *, int );
-static int  ParseSub1       ( demux_t *, subtitle_t *, int );
+static int  ParseSubViewer1 ( demux_t *, subtitle_t *, int );
 
 static struct
 {
@@ -193,7 +195,7 @@ static struct
     { "psb",        SUB_TYPE_PSB,         "PowerDivx",   ParsePSB },
     { "realtext",   SUB_TYPE_RT,          "RealText",    ParseRealText },
     { "dks",        SUB_TYPE_DKS,         "DKS",         ParseDKS },
-    { "subviewer1", SUB_TYPE_SUBVIEW1,    "Subviewer 1", ParseSub1 },
+    { "subviewer1", SUB_TYPE_SUBVIEW1,    "Subviewer 1", ParseSubViewer1 },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 
@@ -913,7 +915,7 @@ static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
         if( b_replace_br )
         {
             char *p;
- 
+
             while( ( p = strstr( psz_text, "[br]" ) ) )
             {
                 *p++ = '\n';
@@ -1949,7 +1951,7 @@ static int ParseDKS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     return VLC_SUCCESS;
 }
 
-static int ParseSub1( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+static int ParseSubViewer1( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 {
     VLC_UNUSED( i_idx );
 

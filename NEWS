@@ -105,8 +105,11 @@ Subtitles:
  * MPSub subtitles support
  * JacoSub subtitles basic support
  * MPL2 subtitles support
- * Rewrite of ASS/SSA scripts and subtitles support.
+ * Rewrite of ASS/SSA scripts and subtitles support
  * PowerDivx (.psb) Subtitles support
+ * Realtext subtitle support
+ * DKS subtitle support
+ * SubViewer 1.0 (SubRip09) subtitles support
 
 Encoders:
  * Flash Screen Video support
