@@ -1468,8 +1468,10 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             free( psz_temp );
         }
         /* Data Lines */
-        if( sscanf (s, "%f %f", &f1, &f2 ) == 2 )
+        f1 = us_strtod( s, &psz_temp );
+        if( *psz_temp )
         {
+            f2 = us_strtod( psz_temp, NULL );
             mpsub_total += f1 * mpsub_factor;
             p_subtitle->i_start = (int64_t)(10000.0 * mpsub_total);
             mpsub_total += f2 * mpsub_factor;
