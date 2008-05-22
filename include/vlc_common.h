@@ -695,19 +695,16 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
     SetDWBE( p, ( i_qw >> 32)&0xffffffff );
 }
 
+#define hton16(i) htons(i)
+#define hton32(i) htonl(i)
+#define ntoh16(i) ntohs(i)
+#define ntoh32(i) ntohl(i)
+
 #ifdef WORDS_BIGENDIAN
-#   define hton16(i)   ( i )
-#   define hton32(i)   ( i )
 #   define hton64(i)   ( i )
-#   define ntoh16(i)   ( i )
-#   define ntoh32(i)   ( i )
 #   define ntoh64(i)   ( i )
 #else
-#   define hton16(i)   U16_AT(&i)
-#   define hton32(i)   U32_AT(&i)
 #   define hton64(i)   U64_AT(&i)
-#   define ntoh16(i)   U16_AT(&i)
-#   define ntoh32(i)   U32_AT(&i)
 #   define ntoh64(i)   U64_AT(&i)
 #endif
 
