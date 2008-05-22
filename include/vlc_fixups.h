@@ -163,16 +163,12 @@ typedef void *locale_t;
 #endif
 
 /* libintl support */
-#define _(str) dgettext (PACKAGE_NAME, str)
+#define _(str) vlc_gettext (str)
 
 #if defined (ENABLE_NLS)
 # include <libintl.h>
-# ifdef WIN32
-#  undef _
-#  define _(str) vlc_dgettext (PACKAGE_NAME, str)
-# endif
 #else
-# define dgettext(dom, str) (str)
+# define dgettext(dom, str) ((char *)(str))
 #endif
 
 #define N_(str) gettext_noop (str)

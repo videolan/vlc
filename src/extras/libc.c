@@ -607,20 +607,24 @@ int vlc_scandir( const char *name, struct dirent ***namelist,
 }
 #endif
 
-#ifdef WIN32
-/*****************************************************************************
- * dgettext: gettext for plugins.
- *****************************************************************************/
+#if defined (WIN32)
+/**
+ * gettext callbacks for plugins.
+ * LibVLC links libintl statically on Windows.
+ */
 char *vlc_dgettext( const char *package, const char *msgid )
 {
-#if defined( ENABLE_NLS ) \
-     && ( defined(HAVE_GETTEXT) || defined(HAVE_INCLUDED_GETTEXT) )
     return dgettext( package, msgid );
-#else
-    return (char *)msgid;
-#endif
 }
 #endif
+
+/**
+ * In-tree plugins share their gettext domain with LibVLC.
+ */
+char *vlc_gettext( const char *msgid )
+{
+    return dgettext( PACKAGE_NAME, msgid );
+}
 
 /*****************************************************************************
  * count_utf8_string: returns the number of characters in the string.

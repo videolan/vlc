@@ -404,6 +404,7 @@ vlc_gai_strerror
 vlc_getaddrinfo
 vlc_getenv
 vlc_getnameinfo
+vlc_gettext
 vlc_iconv
 vlc_iconv_close
 vlc_iconv_open
