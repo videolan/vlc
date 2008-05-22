@@ -89,10 +89,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
     if( !p_sys )
-    {
-        msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     p_sys->p_directfb = NULL;
     p_sys->p_primary = NULL;

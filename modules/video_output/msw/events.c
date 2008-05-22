@@ -343,9 +343,12 @@ void EventThread( event_thread_t *p_event )
 #ifdef UNICODE
             {
                 wchar_t *psz_title = malloc( strlen(val.psz_string) * 2 + 2 );
-                mbstowcs( psz_title, val.psz_string, strlen(val.psz_string)*2);
-                psz_title[strlen(val.psz_string)] = 0;
-                free( val.psz_string ); val.psz_string = (char *)psz_title;
+                if( psz_title )
+                {
+                    mbstowcs( psz_title, val.psz_string, strlen(val.psz_string)*2);
+                    psz_title[strlen(val.psz_string)] = 0;
+                    free( val.psz_string ); val.psz_string = (char *)psz_title;
+                }
             }
 #endif
 

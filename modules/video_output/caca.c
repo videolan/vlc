@@ -163,10 +163,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     p_vout->p_sys->p_cv = cucul_create_canvas(0, 0);
     if( !p_vout->p_sys->p_cv )

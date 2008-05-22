@@ -250,10 +250,7 @@ static int CreateVout( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
 
     var_Create( p_vout, "opengl-effect", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
@@ -409,17 +406,11 @@ static int Init( vout_thread_t *p_vout )
     p_sys->pp_buffer[0] =
         malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
     if( !p_sys->pp_buffer[0] )
-    {
-        msg_Err( p_vout, "out of memory" );
         return -1;
-    }
     p_sys->pp_buffer[1] =
         malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
     if( !p_sys->pp_buffer[1] )
-    {
-        msg_Err( p_vout, "out of memory" );
         return -1;
-    }
 
     p_vout->p_picture[0].i_planes = 1;
     p_vout->p_picture[0].p->p_pixels = p_sys->pp_buffer[0];

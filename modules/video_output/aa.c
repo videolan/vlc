@@ -90,10 +90,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return( 1 );
-    }
 
     /* Don't parse any options, but take $AAOPTS into account */
     aa_parseoptions( NULL, NULL, NULL, NULL );

@@ -186,10 +186,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate instance and initialize some members */
     p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
-    };
     memset( p_sys, 0, sizeof(vout_sys_t) );
 
     p_vout->pf_init = Init;
@@ -874,8 +871,6 @@ static int OpenDisplay( vout_thread_t *p_vout )
         p_sys->p_palette = malloc( 8 * 256 * sizeof( uint16_t ) );
         if( !p_sys->p_palette )
         {
-            msg_Err( p_vout, "out of memory" );
-
             /* Restore fb config */
             ioctl( p_sys->i_fd, FBIOPUT_VSCREENINFO, &p_sys->old_info );
 

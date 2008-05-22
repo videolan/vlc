@@ -96,10 +96,7 @@ static int OpenVideo( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
-    }
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
     /* Initialisations */

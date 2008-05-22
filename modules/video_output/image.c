@@ -315,6 +315,9 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         psz_prefix = psz_tmp;
     psz_filename = (char *)malloc( 10 + strlen( psz_prefix )
                                       + strlen( p_vout->p_sys->psz_format ) );
+    if( !psz_filename )
+        return;
+
     if( p_vout->p_sys->b_replace )
     {
         sprintf( psz_filename, "%s.%s", psz_prefix,

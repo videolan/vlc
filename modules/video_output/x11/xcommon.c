@@ -206,10 +206,7 @@ int Activate ( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     vlc_mutex_init( &p_vout->p_sys->lock );
 
@@ -2942,10 +2939,7 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
     p_data = malloc( i_bytes_per_line * i_height );
 #endif
     if( !p_data )
-    {
-        msg_Err( p_vout, "out of memory" );
         return NULL;
-    }
 
 #ifdef MODULE_NAME_IS_x11
     /* Optimize the quantum of a scanline regarding its size - the quantum is
