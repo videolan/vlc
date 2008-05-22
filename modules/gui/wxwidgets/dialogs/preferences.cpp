@@ -586,7 +586,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 #endif
         config_data->i_type = TYPE_MODULE;
         config_data->p_module = config_data->b_submodule ?
-            p_module->p_parent : p_module;
+            ((module_t*)((vlc_object_t*)p_module)->p_parent) : p_module;
         config_data->psz_help = NULL;
 
         /* WXMSW doesn't know image -1 ... FIXME */
