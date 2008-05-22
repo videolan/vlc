@@ -145,7 +145,7 @@ typedef struct libvlc_global_data_t
 {
     VLC_COMMON_MEMBERS
 
-   /* Object structure data */
+    /* Object structure data */
     int                    i_counter;   ///< object counter
     int                    i_objects;   ///< Attached objects count
     vlc_object_t **        pp_objects;  ///< Array of all objects
