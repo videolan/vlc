@@ -385,10 +385,12 @@ vlc$(EXEEXT): Makefile.am
 	mv -f -- vlc.tmp vlc
 
 if HAVE_DARWIN
-# Create the MacOS X app
 if BUILD_VLC
+# Create the MacOS X app
 noinst_DATA = VLC.app
 endif
+endif
+
 # VLC-release.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
 VLC-release.app: vlc
@@ -643,7 +645,6 @@ VLC.app: vlc
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC.app/Contents/PkgInfo
-endif
 
 ###############################################################################
 # Building architecture-specific binary packages
