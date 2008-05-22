@@ -43,7 +43,7 @@ void config_UnsetCallbacks( module_config_t *, size_t );
 #define config_LoadConfigFile(a,b) __config_LoadConfigFile(VLC_OBJECT(a),b)
 
 int __config_LoadCmdLine   ( vlc_object_t *, int *, const char *[], bool );
-char *config_GetHomeDir    ( void );
+const char *config_GetHomeDir ( void );
 char *config_GetCustomConfigFile( libvlc_int_t * );
 int __config_LoadConfigFile( vlc_object_t *, const char * );
 

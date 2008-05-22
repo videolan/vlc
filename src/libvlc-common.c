@@ -1065,7 +1065,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank( p_libvlc );
 
-    FREENULL( p_libvlc->psz_homedir );
     FREENULL( priv->psz_configfile );
     var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,
                      p_libvlc->p_hotkeys );

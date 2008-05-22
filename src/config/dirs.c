@@ -92,6 +92,7 @@ const char *config_GetConfDir( void )
 
 static const char *GetDir( bool b_appdata )
 {
+    /* FIXME: a full memory page here - quite a waste... */
     static char homedir[PATH_MAX] = "";
 
 #if defined (WIN32)
@@ -153,43 +154,40 @@ static const char *GetDir( bool b_appdata )
 /**
  * Get the user's home directory
  */
-char *config_GetHomeDir( void )
+const char *config_GetHomeDir( void )
 {
-    return strdup (GetDir( false ));
+    return GetDir (false);
 }
 
 static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
 {
     char *psz_dir;
 #if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
-    char *psz_parent = strdup (GetDir (true));
+    const char *psz_parent = GetDir (true);
 
     if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
         psz_dir = NULL;
 
-    free (psz_parent);
     (void)xdg_name; (void)xdg_default;
 #else
     char var[sizeof ("XDG__HOME") + strlen (xdg_name)];
-
     /* XDG Base Directory Specification - Version 0.6 */
     snprintf (var, sizeof (var), "XDG_%s_HOME", xdg_name);
-    char *psz_home = getenv( var );
-    psz_home = psz_home ? FromLocaleDup( psz_home ) : NULL;
+
+    const char *psz_home = getenv (var);
+    psz_home = psz_home ? FromLocale (psz_home) : NULL;
     if( psz_home )
     {
         if( asprintf( &psz_dir, "%s/vlc", psz_home ) == -1 )
             psz_dir = NULL;
-        goto out;
+        LocaleFree (psz_home);
+        return psz_dir;
     }
 
     /* Try HOME, then fallback to non-XDG dirs */
     psz_home = config_GetHomeDir();
     if( asprintf( &psz_dir, "%s/%s/vlc", psz_home, xdg_default ) == -1 )
         psz_dir = NULL;
-
-out:
-    free (psz_home);
 #endif
     return psz_dir;
 }

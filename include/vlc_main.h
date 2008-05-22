@@ -37,7 +37,7 @@ struct libvlc_int_t
     VLC_COMMON_MEMBERS
 
     /* Global properties */
-    char *                 psz_homedir;      ///< user's home directory
+    const char *          psz_homedir;      ///< user's home directory
 
     global_stats_t       *p_stats;           ///< Global statistics
 
