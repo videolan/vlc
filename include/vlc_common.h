@@ -48,10 +48,6 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
-
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
