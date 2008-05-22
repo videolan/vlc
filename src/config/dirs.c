@@ -53,9 +53,7 @@
  */
 const char *config_GetDataDir( void )
 {
-#if defined (WIN32) || defined (UNDER_CE)
-    return vlc_global()->psz_vlcpath;
-#elif defined(__APPLE__) || defined (SYS_BEOS)
+#if defined (WIN32) || defined(__APPLE__) || defined (SYS_BEOS)
     static char path[PATH_MAX] = "";
 
     if( *path == '\0' )
@@ -77,9 +75,7 @@ const char *config_GetDataDir( void )
  */
 const char *config_GetConfDir( void )
 {
-#if defined (WIN32) || defined (UNDER_CE)
-    return vlc_global()->psz_vlcpath;
-#elif defined(__APPLE__) || defined (SYS_BEOS)
+#if defined (WIN32) || defined(__APPLE__) || defined (SYS_BEOS)
     static char path[PATH_MAX] = "";
 
     if( *path == '\0' )
