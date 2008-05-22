@@ -1,8 +1,7 @@
 /*****************************************************************************
  * fixups.h: portability fixups included from config.h
  *****************************************************************************
- * Copyright © 1998-2007 the VideoLAN project
- * $Id$
+ * Copyright © 1998-2008 the VideoLAN project
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -162,5 +161,21 @@ typedef void *locale_t;
 # define uselocale( a ) ((locale_t)0)
 # define freelocale( a ) (void)0
 #endif
+
+/* libintl support */
+#define _(str) dgettext (PACKAGE_NAME, str)
+
+#if defined (ENABLE_NLS)
+# include <libintl.h>
+# ifdef WIN32
+#  undef _
+#  define _(str) vlc_dgettext (PACKAGE_NAME, str)
+# endif
+#else
+# define dgettext(dom, str) (str)
+#endif
+
+#define N_(str) gettext_noop (str)
+#define gettext_noop(str) (str)
 
 #endif /* !LIBVLC_FIXUPS_H */

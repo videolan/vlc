@@ -892,25 +892,6 @@ VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );
     VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #endif
 
-#if defined( ENABLE_NLS ) && \
-     (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main)||\
-      defined(MODULE_NAME_IS_gnome2)||defined(MODULE_NAME_IS_gnome2_main)||\
-      defined(MODULE_NAME_IS_pda))
-    /* Declare nothing: gnome.h will do it for us */
-#elif defined( ENABLE_NLS )
-#   include <libintl.h>
-#   undef _
-#   ifdef WIN32
-#       define _(String) vlc_dgettext (PACKAGE_NAME, String)
-#   else
-#       define _(String) dgettext(PACKAGE_NAME, String)
-#   endif
-#   define N_(String) (String)
-#else
-#   define _(String) (String)
-#   define N_(String) (String)
-#endif
-
 /*****************************************************************************
  * libvlc features
  *****************************************************************************/
