@@ -1,6 +1,6 @@
---- gnutls-1.4.0/gl/gai_strerror.c	2006-05-12 06:02:19.000000000 -0400
-+++ gnutls/gl/gai_strerror.c	2006-11-22 10:28:13.937500000 -0500
-@@ -64,7 +64,7 @@
+--- gnutls-2.2.5/gl/gai_strerror.c	2008-02-21 08:58:18.000000000 +0100
++++ gnutls/gl/gai_strerror.c	2008-05-22 08:20:56.000000000 +0200
+@@ -62,7 +62,7 @@
      { EAI_IDN_ENCODE, N_("Parameter string not correctly encoded") }
  #endif
    };
@@ -9,7 +9,7 @@
  const char *
  gai_strerror (int code)
  {
-@@ -75,6 +75,7 @@
+@@ -73,6 +73,7 @@
  
    return _("Unknown error");
  }
@@ -17,27 +17,55 @@
  #ifdef _LIBC
  libc_hidden_def (gai_strerror)
  #endif
---- gnutls-1.6.1/configure.in	2006-11-26 11:19:05.000000000 +0100
-+++ gnutls/configure.in	2007-01-20 01:52:24.000000000 +0100
-@@ -187,9 +187,6 @@
+--- gnutls-2.2.5/configure.in	2008-05-19 21:45:47.000000000 +0200
++++ gnutls/configure.in	2008-05-22 08:19:02.000000000 +0200
+@@ -200,8 +200,6 @@
  	fi
  fi
  
 -# Needs to be called outside of 'if' clause.
 -AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
--
- AC_MSG_RESULT([***
- *** Detecting C library capabilities...
- ])
-@@ -583,6 +572,11 @@
- LIBGNUTLS_EXTRA_CFLAGS="$LIBOPENCDK_CFLAGS -I${includedir}"
- AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
- AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
-+
+ AM_CONDITIONAL([HAVE_GCC_GNU89_INLINE_OPTION],
+                [test "$_gcc_gnu89_inline" = "yes"])
+ 
+@@ -715,6 +713,10 @@
+ AC_SUBST(LIBGNUTLS_LIBS)
+ AC_SUBST(LIBGNUTLS_CFLAGS)
+ 
 +
 +# Needs to be called outside of 'if' clause.
-+AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes" -a "${enable_shared}" != "no")
++AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
 +
- export ac_full
+ LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LTLIBOPENCDK $LZO_LIBS $LIBGNUTLS_LIBS"
+ LIBGNUTLS_EXTRA_CFLAGS="$INCOPENCDK -I${includedir}"
+ AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
+--- gnutls-2.2.5/lib/Makefile.in	2008-05-19 21:48:35.000000000 +0200
++++ gnutls/lib/Makefile.in	2008-05-22 08:30:01.000000000 +0200
+@@ -643,7 +643,6 @@
+ target_cpu = @target_cpu@
+ target_os = @target_os@
+ target_vendor = @target_vendor@
+-top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ SUBDIRS = x509 $(am__append_1)
+@@ -712,7 +711,7 @@
+ libgnutls_la_LIBADD = ../lgl/liblgnu.la x509/libgnutls_x509.la \
+ 	@LTLIBZ@ $(LIBGCRYPT_LIBS) @LTLIBINTL@ $(am__append_6)
+ @HAVE_LD_OUTPUT_DEF_TRUE@defexecdir = $(bindir)
+-@HAVE_LD_OUTPUT_DEF_TRUE@defexec_DATA = libgnutls-$(SOVERSION).def
++@HAVE_LD_OUTPUT_DEF_TRUE@defexec_DATA =
  
- CFLAGS="${CFLAGS} ${LIBGCRYPT_CFLAGS}"
+ # C++ library
+ @ENABLE_CXX_TRUE@CPP_OBJECTS = gnutlsxx.cpp
+--- gnutls-2.2.5/lib/Makefile.am	2008-05-19 21:45:13.000000000 +0200
++++ gnutls/lib/Makefile.am	2008-05-22 08:44:16.000000000 +0200
+@@ -123,7 +123,7 @@
+ if HAVE_LD_OUTPUT_DEF
+ libgnutls_la_LDFLAGS += -Wl,--output-def,libgnutls-$(SOVERSION).def
+ defexecdir = $(bindir)
+-defexec_DATA = libgnutls-$(SOVERSION).def
++defexec_DATA = 
+ DISTCLEANFILES += $(defexec_DATA)
+ endif
+ 
