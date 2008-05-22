@@ -295,7 +295,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* Set the config file stuff */
-    p_libvlc->psz_homedir    = config_GetHomeDir();
     priv->psz_configfile = config_GetCustomConfigFile( p_libvlc );
 
     /* Check for plugins cache options */

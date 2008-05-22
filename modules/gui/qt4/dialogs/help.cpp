@@ -257,7 +257,7 @@ void UpdateDialog::UpdateOrDownload()
         updateButton->setEnabled( false );
         QString dest_dir = QFileDialog::getExistingDirectory( this,
                                  qtr( "Select a directory ..." ),
-                                 qfu( p_update->p_libvlc->psz_homedir ) );
+                                 qfu( config_GetHomeDir() ) );
 
         if( dest_dir != "" )
         {

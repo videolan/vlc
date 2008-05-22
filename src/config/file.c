@@ -85,7 +85,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
          * Specification configs */
         char *psz_old;
         if( asprintf( &psz_old, "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
-                  p_obj->p_libvlc->psz_homedir ) != -1 )
+                      config_GetHomeDir() ) != -1 )
         {
             p_stream = utf8_fopen( psz_old, mode );
             if( p_stream )
@@ -96,7 +96,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
                           "VLC will now use %s.", psz_old, psz_filename );
                 char *psz_readme;
                 if( asprintf(&psz_readme,"%s"DIR_SEP CONFIG_DIR DIR_SEP"README",
-                              p_obj->p_libvlc->psz_homedir ) != -1 )
+                              config_GetHomeDir() ) != -1 )
                 {
                     FILE *p_readme = utf8_fopen( psz_readme, "wt" );
                     if( p_readme )
@@ -710,7 +710,7 @@ char *config_GetCustomConfigFile( libvlc_int_t *p_libvlc )
         {
             /* This is incomplete: we should also support the ~cmassiot/ syntax */
             char *psz_buf;
-            if( asprintf( &psz_buf, "%s/%s", p_libvlc->psz_homedir,
+            if( asprintf( &psz_buf, "%s/%s", config_GetHomeDir(),
                           psz_configfile + 2 ) == -1 )
             {
                 free( psz_configfile );

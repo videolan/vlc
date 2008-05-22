@@ -368,7 +368,7 @@ static void Init( intf_thread_t *p_intf )
     /*        retrieve last known path used in file browsing */
     char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
     p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? psz_path
-                           : p_intf->p_libvlc->psz_homedir;
+                           : config_GetHomeDir();
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */

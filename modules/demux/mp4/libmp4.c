@@ -1218,7 +1218,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->i_type == FOURCC_drms )
     {
         p_box->data.p_sample_soun->p_drms =
-            drms_alloc( p_stream->p_libvlc->psz_homedir );
+            drms_alloc( config_GetHomeDir() );
 
         if( p_box->data.p_sample_soun->p_drms == NULL )
         {

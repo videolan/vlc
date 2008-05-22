@@ -208,30 +208,10 @@ static int Open( vlc_object_t *p_this )
         if( !psz_file )
         {
 #ifdef __APPLE__
-            char *psz_homedir = p_this->p_libvlc->psz_homedir;
-
-            if( !psz_homedir ) /* XXX: This should never happen */
-            {
-                msg_Err( p_this, "unable to find home directory" );
-                return -1;
-            }
-            psz_file = (char *)malloc( sizeof("/" LOG_DIR "/" LOG_FILE_HTML) +
-                                           strlen(psz_homedir) );
-            if( psz_file )
-            {
-                switch( p_intf->p_sys->i_mode )
-                {
-                case MODE_HTML:
-                    sprintf( psz_file, "%s/" LOG_DIR "/" LOG_FILE_HTML,
-                         psz_homedir );
-                    break;
-                case MODE_TEXT:
-                default:
-                    sprintf( psz_file, "%s/" LOG_DIR "/" LOG_FILE_TEXT,
-                         psz_homedir );
-                    break;
-                }
-            }
+            if( asprintf( &psz_file, "%s/"LOG_DIR"/%s", config_GetHomeDir(),
+                (p_intf->p_sys->i_mode == MODE_HTML) ? LOG_FILE_HTML
+                                                     : LOG_FILE_TEXT ) == -1 )
+                psz_file = NULL;
 #else
             switch( p_intf->p_sys->i_mode )
             {

@@ -267,7 +267,7 @@ static void Trigger (access_t *access)
         // and there is an off-by-one in the following sprintf().
         return;
 
-    const char *home = access->p_libvlc->psz_homedir;
+    const char *home = config_GetHomeDir();
 
     /* Hmm what about the extension?? */
     char filename[strlen (home) + sizeof ("/vlcdump-YYYYYYYYY-MM-DD-HH-MM-SS.ts")];

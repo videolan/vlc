@@ -318,7 +318,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        p_sys->psz_current_dir = strdup( p_intf->p_libvlc->psz_homedir );
+        p_sys->psz_current_dir = strdup( config_GetHomeDir() );
     }
 
     free( val.psz_string );

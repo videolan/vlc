@@ -576,15 +576,15 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
 #if defined(__APPLE__) || defined(SYS_BEOS)
-    if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
+    if( !val.psz_string )
     {
         if( asprintf( &val.psz_string, "%s/Desktop",
-                      p_vout->p_libvlc->psz_homedir ) == -1 )
+                      config_GetHomeDir() ) == -1 )
             val.psz_string = NULL;
     }
 
 #elif defined(WIN32) && !defined(UNDER_CE)
-    if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
+    if( !val.psz_string )
     {
         /* Get the My Pictures folder path */
 
@@ -622,8 +622,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( p_mypicturesdir == NULL )
         {
-            if( asprintf( &val.psz_string, "%s",
-                          p_vout->p_libvlc->psz_homedir ) == -1 )
+            if( asprintf( &val.psz_string, "%s", config_GetHomeDir() ) == -1 )
                 val.psz_string = NULL;
         }
         else

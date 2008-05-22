@@ -160,7 +160,7 @@ int vlclua_datadir( lua_State *L )
 }
 int vlclua_homedir( lua_State *L )
 {
-    lua_pushstring( L, vlclua_get_this( L )->p_libvlc->psz_homedir );
+    lua_pushstring( L, config_GetHomeDir() );
     return 1;
 }
 int vlclua_configdir( lua_State *L )

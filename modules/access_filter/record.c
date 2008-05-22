@@ -154,8 +154,7 @@ static int Open( vlc_object_t *p_this )
     if( *psz == '\0' )
     {
         free( psz );
-        if( p_access->p_libvlc->psz_homedir ) /* XXX: This should never happen */
-            psz = strdup( p_access->p_libvlc->psz_homedir );
+        psz = strdup( config_GetHomeDir() );
     }
     p_sys->psz_path = psz;
     msg_Dbg( p_access, "Record access filter path %s", psz );

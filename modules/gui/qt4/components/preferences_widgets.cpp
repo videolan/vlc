@@ -299,7 +299,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
 void FileConfigControl::updateField()
 {
     QString file = QFileDialog::getOpenFileName( NULL,
-                  qtr( "Select File" ), qfu( p_this->p_libvlc->psz_homedir ) );
+                  qtr( "Select File" ), qfu( config_GetHomeDir() ) );
     if( file.isNull() ) return;
     text->setText( file );
 }
@@ -330,7 +330,7 @@ void DirectoryConfigControl::updateField()
     QString dir = QFileDialog::getExistingDirectory( NULL,
                       qtr( "Select Directory" ),
                       text->text().isEmpty() ?
-                        qfu( p_this->p_libvlc->psz_homedir ) : text->text(),
+                        qfu( config_GetHomeDir() ) : text->text(),
                       QFileDialog::ShowDirsOnly |
                         QFileDialog::DontResolveSymlinks );
     if( dir.isNull() ) return;
