@@ -90,50 +90,64 @@ const char *config_GetConfDir( void )
 #endif
 }
 
-static char *GetDir( bool b_appdata )
+static const char *GetDir( bool b_appdata )
 {
-    const char *psz_localhome = NULL;
+    static char homedir[PATH_MAX] = "";
 
-#if defined(WIN32) && !defined(UNDER_CE)
-    wchar_t whomedir[MAX_PATH];
+#if defined (WIN32)
+    wchar_t wdir[MAX_PATH];
+
+# if defined (UNDER_CE)
+    if( SHGetSpecialFolderPath( NULL, wdir, CSIDL_APPDATA, 1 ) )
+# else
     /* Get the "Application Data" folder for the current user */
     if( S_OK == SHGetFolderPathW( NULL,
               (b_appdata ? CSIDL_APPDATA : CSIDL_PROFILE) | CSIDL_FLAG_CREATE,
-                                  NULL, SHGFP_TYPE_CURRENT, whomedir ) )
-        return FromWide( whomedir );
-
-#elif defined(UNDER_CE)
-    (void)b_appdata;
-#ifndef CSIDL_APPDATA
-#   define CSIDL_APPDATA 0x1A
-#endif
-
-    wchar_t whomedir[MAX_PATH];
-
-    /* get the "Application Data" folder for the current user */
-    if( SHGetSpecialFolderPath( NULL, whomedir, CSIDL_APPDATA, 1 ) )
-        return FromWide( whomedir );
+                                  NULL, SHGFP_TYPE_CURRENT, wdir ) )
+# endif
+    {
+        static char appdir[PATH_MAX] = "";
+        WideCharToMultiByte (CP_UTF8, 0, wdir, -1,
+                             b_appdata ? appdir : homedir, PATH_MAX,
+                             NULL, NULL);
+        return b_appdata ? appdir : homedir;
+    }
 #else
     (void)b_appdata;
 #endif
 
-    psz_localhome = getenv( "HOME" );
-#if defined(HAVE_GETPWUID_R)
-    char buf[sysconf (_SC_GETPW_R_SIZE_MAX)];
-    if( psz_localhome == NULL )
-    {
-        struct passwd pw, *res;
-
-        if (!getpwuid_r (getuid (), &pw, buf, sizeof (buf), &res) && res)
-            psz_localhome = pw.pw_dir;
-    }
+#ifdef LIBVLC_USE_PTHREAD
+    static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_lock (&lock);
 #endif
-    if (psz_localhome == NULL)
-        psz_localhome = getenv( "TMP" );
-    if (psz_localhome == NULL)
-        psz_localhome = "/tmp";
 
-    return FromLocaleDup( psz_localhome );
+    if (!*homedir)
+    {
+        const char *psz_localhome = getenv( "HOME" );
+#if defined(HAVE_GETPWUID_R)
+        char buf[sysconf (_SC_GETPW_R_SIZE_MAX)];
+        if (psz_localhome == NULL)
+        {
+            struct passwd pw, *res;
+
+            if (!getpwuid_r (getuid (), &pw, buf, sizeof (buf), &res) && res)
+                psz_localhome = pw.pw_dir;
+        }
+#endif
+        if (psz_localhome == NULL)
+            psz_localhome = getenv( "TMP" );
+        if (psz_localhome == NULL)
+            psz_localhome = "/tmp";
+
+        const char *uhomedir = FromLocale (psz_localhome);
+        strncpy (homedir, uhomedir, sizeof (homedir) - 1);
+        homedir[sizeof (homedir) - 1] = '\0';
+        LocaleFree (uhomedir);
+    }
+#ifdef LIBVLC_USE_PTHREAD
+    pthread_mutex_unlock (&lock);
+#endif
+    return homedir;
 }
 
 /**
@@ -141,14 +155,14 @@ static char *GetDir( bool b_appdata )
  */
 char *config_GetHomeDir( void )
 {
-    return GetDir( false );
+    return strdup (GetDir( false ));
 }
 
 static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
 {
     char *psz_dir;
 #if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
-    char *psz_parent = GetDir (true);
+    char *psz_parent = strdup (GetDir (true));
 
     if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
         psz_dir = NULL;
