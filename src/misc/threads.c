@@ -397,7 +397,7 @@ int vlc_threadvar_create( vlc_threadvar_t *p_tls, void (*destr) (void *) )
 void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
 #if defined( LIBVLC_USE_PTHREAD )
-    pthread_key_delete (p_tls);
+    pthread_key_delete (*p_tls);
 #elif defined( UNDER_CE )
 #elif defined( WIN32 )
     TlsFree (*p_tls);
