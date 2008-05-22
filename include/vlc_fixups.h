@@ -156,4 +156,11 @@ VLC_INTERNAL( void, vlc_seekdir, ( void *, long ) );
 VLC_INTERNAL( long, vlc_telldir, ( void * ) );
 #endif
 
+#ifndef HAVE_USELOCALE
+typedef void *locale_t;
+# define newlocale( a, b, c ) ((locale_t)0)
+# define uselocale( a ) ((locale_t)0)
+# define freelocale( a ) (void)0
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
