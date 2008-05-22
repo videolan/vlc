@@ -124,20 +124,21 @@ static void DetectImage( FileRef f, demux_t *p_demux )
             ByteVector p_data_taglib; const char *p_data; int i_data;
 
             psz_mime = p_apic->mimeType().toCString(true);
+            psz_description = psz_name = p_apic->description().toCString(true);
 
             /* some old iTunes version not only sets incorrectly the mime type
+             * or the description of the image,
              * but also embeds incorrectly the image.
              * Recent versions seem to behave correctly */
-            if( !strncmp( psz_mime, "PNG", 3 ) )
+            if( !strncmp( psz_mime, "PNG", 3 ) ||
+                !strncmp( psz_name, "\xC2\x89PNG", 5 ) )
             {
                 msg_Warn( p_demux,
-                    "%s: Invalid picture embedded by broken iTunes version",
+                    "%s: Invalid picture embedded by broken iTunes version, "
+                    "you really shouldn't use this crappy software.",
                     f.file()->name() );
                 break;
             }
-
-            psz_description = p_apic->description().toCString(true);
-            psz_name = psz_description;
 
             p_data_taglib = p_apic->picture();
             p_data = p_data_taglib.data();
