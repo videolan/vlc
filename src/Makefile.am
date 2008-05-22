@@ -351,6 +351,7 @@ SOURCES_libvlc_common = \
 	misc/action.c \
 	config/configuration.h \
 	config/core.c \
+	config/dirs.c \
 	config/chain.c \
 	config/file.c \
 	config/intf.c \
