@@ -34,6 +34,12 @@
 
 #include "stats.h"
 
+/* Example usage:
+ *  $ vlc movie.avi --sout="#transcode{aenc=dummy,venc=stats}:\
+ *                          std{access=http,mux=dummy,dst=0.0.0.0:8081}"
+ *  $ vlc -vvv http://127.0.0.1:8081 --demux=stats --vout=stats --codec=stats
+ */
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -54,5 +60,10 @@ vlc_module_begin();
         set_description( _("Stats demux function") );
         set_capability( "demux", 0 );
         set_callbacks( OpenDemux, CloseDemux );
+    add_submodule();
+        set_section( N_( "Stats video output" ), NULL );
+        set_description( _("Stats video output function") );
+        set_capability( "video output", 0 );
+        set_callbacks( OpenVideo, NULL );
 vlc_module_end();
 

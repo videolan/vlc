@@ -30,6 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc_codec.h>
+#include <vlc_vout.h>
 
 #include "stats.h"
 
@@ -60,21 +61,37 @@ int OpenDecoder ( vlc_object_t *p_this )
  ****************************************************************************/
 static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
+    picture_t * p_pic = NULL;
 
     if( !pp_block || !*pp_block ) return NULL;
     p_block = *pp_block;
 
+    p_dec->fmt_out.video.i_width = 100;
+    p_dec->fmt_out.video.i_height = 100;
+    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;
+    p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
+
+    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+
     if( p_block->i_buffer == kBufferSize )
     {
+        msg_Dbg( p_dec, "got %d ms", *(mtime_t *)p_block->p_buffer  / 1000 );
         msg_Dbg( p_dec, "got %d ms offset", (mdate() - *(mtime_t *)p_block->p_buffer) / 1000 );
+        *(mtime_t *)(p_pic->p->p_pixels) = *(mtime_t *)p_block->p_buffer;
     }
     else
-        msg_Dbg( p_dec, "got offset of size %d", p_block->i_buffer );
+    {
+        msg_Dbg( p_dec, "got a packet not from stats demuxer" );
+        *(mtime_t *)(p_pic->p->p_pixels) = mdate();
+    }
+
+    p_pic->date = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
+    p_pic->b_force = true;
 
     block_Release( p_block );
-    return NULL;
+    *pp_block = NULL;
+    return p_pic;
 }
 
 /*****************************************************************************
