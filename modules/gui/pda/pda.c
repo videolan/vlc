@@ -168,14 +168,7 @@ static void Run( intf_thread_t *p_intf )
 #endif
 
     /* Create some useful widgets that will certainly be used */
-/* FIXME: magic path */
-    add_pixmap_directory("share");
-    add_pixmap_directory("/usr/share/vlc");
-
-    /* Path for pixmaps under linupy 1.4 */
-    add_pixmap_directory("/usr/local/share/pixmaps/vlc");
-    /* Path for pixmaps under linupy 2.0 */
-    add_pixmap_directory("/usr/share/pixmaps/vlc");
+    add_pixmap_directory(config_GetDataDir());
 
     p_intf->p_sys->p_window = create_pda();
     if (p_intf->p_sys->p_window == NULL)
@@ -257,7 +250,7 @@ static void Run( intf_thread_t *p_intf )
                 G_TYPE_UINT64, /* File size */
                 G_TYPE_STRING, /* Owner */
                 G_TYPE_STRING);/* Group */
-    ReadDirectory(p_intf, p_filelist, ".");
+    ReadDirectory(p_intf, p_filelist, (char*)".");
     gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile), GTK_TREE_MODEL(p_filelist));
     g_object_unref(p_filelist);     /* Model will be released by GtkTreeView */
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile)),GTK_SELECTION_MULTIPLE);
@@ -554,6 +547,8 @@ static int Manage( intf_thread_t *p_intf )
  *****************************************************************************/
 void GtkDisplayDate( GtkAdjustment *p_adj, gpointer userdata )
 {
+    (void)p_adj;
+
     intf_thread_t *p_intf;
 
     p_intf = (intf_thread_t*) userdata;
