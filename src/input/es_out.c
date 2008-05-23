@@ -1403,7 +1403,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         p_block->i_pts =
             input_ClockGetTS( p_input, &p_pgrm->clock, p_block->i_pts ) + i_delay;
     }
-    if ( es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
+    if ( p_block->i_rate == INPUT_RATE_DEFAULT &&
+         es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
     {
         mtime_t current_date = mdate();
         if( !p_block->i_pts
