@@ -74,12 +74,10 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
         /* GDMF!... I can't do this or else the MacOSX window server will
          * not pick up the PSN and not register the app and we crash...
          * hence the following kludge otherwise we'll get confused w/ argv[1]
-         * being an input file name */
-#if 0
-        ppsz_argv[ 1 ] = NULL;
-#endif
-        *pi_argc = *pi_argc - 1;
-        pi_argc--;
+         * being an input file name.
+         * As there won't be any more args to parse, just exit. */
+        assert( *pi_argc == 2 );
+        *pi_argc = 1;
         return 0;
     }
 #endif
