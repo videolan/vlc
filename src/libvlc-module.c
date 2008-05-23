@@ -993,6 +993,12 @@ static const char *const ppsz_clock_descriptions[] =
 #define MINIMIZE_THREADS_LONGTEXT N_( \
      "This option minimizes the number of threads needed to run VLC.")
 
+#define USE_STREAM_IMMEDIATE N_("(Experimental) Use the StreamImmediate " \
+    "method and minimize the caching done at the access level.")
+#define USE_STREAM_IMMEDIATE_LONGTEXT N_( \
+     "This option is useful if you want to lower the latency when " \
+     "reading a stream")
+
 #define PLUGIN_PATH_TEXT N_("Modules search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
     "Additional path for VLC to look for its modules. You can add " \
@@ -1813,6 +1819,9 @@ vlc_module_begin();
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, true );
         change_need_restart();
+
+    add_bool( "use-stream-immediate", false, NULL,
+               USE_STREAM_IMMEDIATE, USE_STREAM_IMMEDIATE_LONGTEXT, false );
 
 #if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
     add_bool( "rt-priority", false, NULL, RT_PRIORITY_TEXT,
