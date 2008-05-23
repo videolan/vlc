@@ -839,7 +839,6 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #endif
 
 VLC_EXPORT( bool, vlc_ureduce, ( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t ) );
-VLC_EXPORT( char **, vlc_parse_cmdline, ( const char *, int * ) );
 
 /* vlc_wraptext (defined in src/extras/libc.c) */
 #define wraptext vlc_wraptext

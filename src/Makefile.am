@@ -435,7 +435,12 @@ if BUILD_VLC
 bin_PROGRAMS = vlc
 endif
 
+if !HAVE_WIN32
 vlc_SOURCES = vlc.c
+else
+vlc_SOURCES = winvlc.c
+endif
+
 vlc_DEPENDENCIES = $(DATA_win32_rc) libvlc.la
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`

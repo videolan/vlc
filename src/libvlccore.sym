@@ -438,7 +438,6 @@ __vlc_object_wait
 __vlc_object_waitpipe
 __vlc_object_yield
 vlc_opendir
-vlc_parse_cmdline
 vlc_pthread_fatal
 vlc_rand_bytes
 vlc_readdir
