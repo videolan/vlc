@@ -2547,7 +2547,9 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 block_t *p_block;
                 p_pic->date = i_pts;
+                video_timer_start( id->p_encoder );
                 p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
+                video_timer_stop( id->p_encoder );
                 block_ChainAppend( out, p_block );
             }
         }
