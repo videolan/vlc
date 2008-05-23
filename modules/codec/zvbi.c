@@ -326,9 +326,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                                    VLC_FOURCC('R','G','B','A');
 #endif
     fmt.i_aspect = p_sys->b_text ? 0 : VOUT_ASPECT_FACTOR;
-    fmt.i_sar_num = fmt.i_sar_den = 1;
-    fmt.i_width = fmt.i_visible_width = p_page.columns * 12;
-    fmt.i_height = fmt.i_visible_height = p_page.rows * 10;
+    if( !p_sys->b_text )
+    {
+        fmt.i_sar_num = fmt.i_sar_den = 1;
+        fmt.i_width = fmt.i_visible_width = p_page.columns * 12;
+        fmt.i_height = fmt.i_visible_height = p_page.rows * 10;
+    }
     fmt.i_bits_per_pixel = p_sys->b_text ? 0 : 32;
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
@@ -351,10 +354,13 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->b_ephemer = true;
     p_spu->b_absolute = false;
     p_spu->b_pausable = true;
-    p_spu->i_width = fmt.i_width;
-    p_spu->i_height = fmt.i_height;
-    p_spu->i_original_picture_width = p_page.columns * 12;
-    p_spu->i_original_picture_height = p_page.rows * 10;
+    if( !p_sys->b_text )
+    {
+        p_spu->i_width = fmt.i_width;
+        p_spu->i_height = fmt.i_height;
+        p_spu->i_original_picture_width = p_page.columns * 12;
+        p_spu->i_original_picture_height = p_page.rows * 10;
+    }
 
 #ifdef WORDS_BIGENDIAN
 # define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_BE
