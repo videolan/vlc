@@ -28,6 +28,8 @@
 #include "config.h"
 #endif
 
+#include "qt4.hpp"
+
 #include "util/qvlcframe.hpp"
 
 class QPushButton;
