@@ -53,6 +53,7 @@
 #ifdef __APPLE__
 #   include <errno.h>
 #   include <string.h>
+#   include <xlocale.h>
 #endif
 
 #include <vlc_charset.h>
