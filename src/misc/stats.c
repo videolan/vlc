@@ -376,7 +376,7 @@ void __stats_TimerDump( vlc_object_t *p_obj, unsigned int i_id )
             break;
         }
     }
-    TimerDump( p_obj, p_counter, true );
+    if( p_counter ) TimerDump( p_obj, p_counter, true );
     vlc_mutex_unlock( &priv->timer_lock );
 }
 
