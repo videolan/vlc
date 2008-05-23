@@ -5199,6 +5199,8 @@ then
   VLC_ADD_PLUGIN([pda])
   if test "${SYS}" != "mingw32"; then
     NEED_GTK2_MAIN=yes
+    VLC_ADD_CFLAGS([gtk2_main],[$GTK2_CFLAGS])
+    VLC_ADD_LIBS([gtk2_main],[$GTK2_LIBS])
   fi
 fi
 AM_CONDITIONAL(BUILD_PDA, [test "${enable_pda}" = "yes"])
