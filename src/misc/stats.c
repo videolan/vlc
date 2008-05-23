@@ -32,6 +32,8 @@
 #include <vlc/vlc.h>
 #include <stdio.h>                                               /* required */
 
+#include <assert.h>
+
 #include "input/input_internal.h"
 
 /*****************************************************************************
@@ -376,6 +378,7 @@ void __stats_TimerDump( vlc_object_t *p_obj, unsigned int i_id )
             break;
         }
     }
+    assert( p_counter );
     TimerDump( p_obj, p_counter, true );
     vlc_mutex_unlock( &priv->timer_lock );
 }
@@ -581,9 +584,11 @@ static int CounterUpdate( vlc_object_t *p_handler,
 static void TimerDump( vlc_object_t *p_obj, counter_t *p_counter,
                        bool b_total )
 {
+    assert( p_counter );
+
     mtime_t last, total;
     int i_total;
-    if( !p_counter || p_counter->i_samples != 2 )
+    if( p_counter->i_samples != 2 )
     {
         msg_Err( p_obj, "timer %s does not exist", p_counter->psz_name );
         return;
