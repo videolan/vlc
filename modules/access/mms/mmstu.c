@@ -460,6 +460,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     int          i;
     int          i_streams;
     int          i_first;
+    char         *mediapath;
 
 
     /* *** Open a TCP connection with server *** */
@@ -620,7 +621,14 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     /* *** send command 5 : media file name/path requested *** */
     var_buffer_reinitwrite( &buffer, 0 );
     var_buffer_add64( &buffer, 0 );
-    var_buffer_addUTF16( &buffer, p_url->psz_path );
+
+    /* media file path shouldn't start with / character */
+    mediapath = p_url->psz_path;
+    if ( *mediapath == '/' )
+    {
+        mediapath++;
+    }
+    var_buffer_addUTF16( &buffer, mediapath );
 
     mms_CommandSend( p_access,
                      0x05,
