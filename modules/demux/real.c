@@ -166,9 +166,8 @@ static int Open( vlc_object_t *p_this )
 
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     if( p_sys == NULL )
-    {
         return VLC_ENOMEM;
-    }
+
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
     p_sys->i_data_offset = 0;
@@ -288,10 +287,8 @@ static int Demux( demux_t *p_demux )
     i_pts += 1000; /* Avoid 0 pts */
     i_flags= header[11]; /* flags 0x02 -> keyframe */
 
-#if 0
     msg_Dbg( p_demux, "packet %d size=%d id=%d pts=%u",
              p_sys->i_data_packets, i_size, i_id, (uint32_t)(i_pts/1000) );
-#endif
 
     p_sys->i_data_packets++;
 
@@ -604,7 +601,6 @@ static int Demux( demux_t *p_demux )
 
                 block_t *p_block = tk->p_subpackets[tk->i_out_subpacket];
                 tk->p_subpackets[tk->i_out_subpacket] = 0;
-                //if ( p_block->i_dts )
                 if ( tk->p_subpackets_timecode[tk->i_out_subpacket]  )
                 {
                     p_block->i_dts = p_block->i_pts =
@@ -756,8 +752,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             f = (double) va_arg( args, double );
             i64 = (int64_t) ( stream_Size( p_demux->s ) * f );
 
-            //msg_Dbg(p_demux,"Seek Real  DEMUX_SET_POSITION : %f file_offset :"I64Fd" p_sys->i_pcr "I64Fd" ", f, i64 , p_sys->i_pcr );
-
             if ( p_sys->i_index_offset == 0 && i64 != 0 )
             {
                 msg_Err(p_demux,"Seek No Index Real File failed!" );
@@ -766,7 +760,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if ( i64 == 0 )
             {
                 /* it is a rtsp stream , it is specials in access/rtsp/... */
-
                 msg_Dbg(p_demux, "Seek in real rtsp stream!");
                 p_sys->i_pcr = (int64_t)1000 * ( p_sys->i_our_duration * f  );
 
@@ -783,9 +776,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     if ( p_index->file_offset > i64 )
                     {
-    /*
-                    msg_Dbg(p_demux, "Seek Real find! %d %d %d", p_index->time_offset, p_index->file_offset ,(uint32_t) i64);
-    */
+                        msg_Dbg( p_demux, "Seek Real find! %d %d %d",
+                                 p_index->time_offset, p_index->file_offset,
+                                 (uint32_t) i64 );
                         if ( p_index != p_sys->p_index ) p_index --;
                         i64 = p_index->file_offset;
                         break;
@@ -793,7 +786,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     p_index++;
                 }
 
-                //msg_Dbg(p_demux, "Seek Real pcr from :"I64Fd" to "I64Fd"  ", p_sys->i_pcr , 1000 * (int64_t) p_index->time_offset  );
                 p_sys->i_pcr = 1000 * (int64_t) p_index->time_offset;
 
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR , p_sys->i_pcr );
@@ -802,7 +794,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
         case DEMUX_SET_TIME:
             i64 = (int64_t) va_arg( args, int64_t ) / 1000;
-            //msg_Dbg(p_demux,"DEMUX_SET_TIME :OK  "I64Fd" ",i64);
 
             p_index = p_sys->p_index;
             while( p_index->file_offset !=0 )
@@ -873,13 +864,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static void ReadRealIndex( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    uint8_t buffer[100];
-    uint32_t    i_id;
-    uint32_t    i_size;
-    int         i_version;
-    int            i;
+    uint8_t       buffer[100];
+    uint32_t      i_id;
+    uint32_t      i_size;
+    int           i_version;
+    unsigned int  i;
 
-    uint32_t    i_index_count;
+    uint32_t      i_index_count;
 
     if ( p_sys->i_index_offset == 0 )
         return;
@@ -903,16 +894,18 @@ static void ReadRealIndex( demux_t *p_demux )
 
     msg_Dbg( p_demux, "Real Index : num : %d ", i_index_count );
 
-    if ( i_index_count == 0 )
+    if( i_index_count == 0 )
         return;
 
-    if (  GetDWBE( &buffer[16] ) > 0 )
-        msg_Dbg( p_demux, "Real Index: next index is exist? %d ", GetDWBE( &buffer[16] )  );
+    if( GetDWBE( &buffer[16] ) > 0 )
+        msg_Dbg( p_demux, "Real Index: Does next index exist? %d ",
+                        GetDWBE( &buffer[16] )  );
 
-    p_sys->p_index =  ( rm_index_t *) malloc( sizeof(rm_index_t) * (i_index_count+1) );
-    if ( p_sys->p_index == NULL )
+    p_sys->p_index = 
+            (rm_index_t *)malloc( sizeof( rm_index_t ) * (i_index_count+1) );
+    if( p_sys->p_index == NULL )
     {
-        msg_Err( p_demux, "Real Index: Error , fail to malloc index buffer " );
+        msg_Err( p_demux, "Memory allocation error" ); 
         return;
     }
 
@@ -920,24 +913,25 @@ static void ReadRealIndex( demux_t *p_demux )
 
     for( i=0; i<i_index_count; i++ )
     {
-        if ( stream_Read( p_demux->s, buffer, 14 ) < 14 )
+        if( stream_Read( p_demux->s, buffer, 14 ) < 14 )
             return ;
 
-        if ( GetWBE( &buffer[0] ) != 0 )
+        if( GetWBE( &buffer[0] ) != 0 )
         {
-            msg_Dbg( p_demux, "Real Index: invaild version of index entry %d ", GetWBE( &buffer[0] ) );
+            msg_Dbg( p_demux, "Real Index: invaild version of index entry %d ",
+                              GetWBE( &buffer[0] ) );
             return;
         }
 
         p_sys->p_index[i].time_offset = GetDWBE( &buffer[2] );
         p_sys->p_index[i].file_offset = GetDWBE( &buffer[6] );
         p_sys->p_index[i].frame_index = GetDWBE( &buffer[10] );
-#if 0
-        msg_Dbg( p_demux, "Real Index: time %d file %d frame %d ", p_sys->p_index[i].time_offset, p_sys->p_index[i].file_offset , p_sys->p_index[i].frame_index );
-#endif
+        msg_Dbg( p_demux, "Real Index: time %d file %d frame %d ",
+                        p_sys->p_index[i].time_offset,
+                        p_sys->p_index[i].file_offset,
+                        p_sys->p_index[i].frame_index );
 
     }
-
 }
 
 /*****************************************************************************
@@ -1031,8 +1025,6 @@ static int HeaderRead( demux_t *p_demux )
                 EnsureUTF8( psz );
                 msg_Dbg( p_demux, "    - title=`%s'", psz );
                 p_sys->psz_title = psz;
-                vlc_meta_Add( p_sys->p_meta, VLC_META_TITLE, psz );
-                free( psz );
                 i_skip -= i_len;
             }
             i_skip -= 2;
@@ -1047,8 +1039,6 @@ static int HeaderRead( demux_t *p_demux )
                 EnsureUTF8( psz );
                 msg_Dbg( p_demux, "    - author=`%s'", psz );
                 p_sys->psz_artist = psz;
-                vlc_meta_Add( p_sys->p_meta, VLC_META_ARTIST, psz );
-                free( psz );
                 i_skip -= i_len;
             }
             i_skip -= 2;
@@ -1063,8 +1053,6 @@ static int HeaderRead( demux_t *p_demux )
                 EnsureUTF8( psz );
                 msg_Dbg( p_demux, "    - copyright=`%s'", psz );
                 p_sys->psz_copyright = psz;
-                vlc_meta_Add( p_sys->p_meta, VLC_META_COPYRIGHT, psz );
-                free( psz );
                 i_skip -= i_len;
             }
             i_skip -= 2;
@@ -1079,8 +1067,6 @@ static int HeaderRead( demux_t *p_demux )
                 EnsureUTF8( psz );
                 msg_Dbg( p_demux, "    - comment=`%s'", psz );
                 p_sys->psz_description = psz;
-                vlc_meta_Add( p_sys->p_meta, VLC_META_DESCRIPTION, psz );
-                free( psz );
                 i_skip -= i_len;
             }
             i_skip -= 2;
