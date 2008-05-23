@@ -1222,8 +1222,46 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 /****************************************************************************
+ * decoder helper
+ ****************************************************************************/
+static inline void video_timer_start( encoder_t * p_encoder )
+{
+    stats_TimerStart( p_encoder, "encoding video frame",
+                      STATS_TIMER_VIDEO_FRAME_ENCODING );
+}
+
+static inline void video_timer_stop( encoder_t * p_encoder )
+{
+    stats_TimerStop( p_encoder, STATS_TIMER_VIDEO_FRAME_ENCODING );
+}
+
+static inline void video_timer_close( encoder_t * p_encoder )
+{
+    stats_TimerDump(  p_encoder, STATS_TIMER_VIDEO_FRAME_ENCODING );
+    stats_TimerClean( p_encoder, STATS_TIMER_VIDEO_FRAME_ENCODING );
+}
+
+static inline void audio_timer_start( encoder_t * p_encoder )
+{
+    stats_TimerStart( p_encoder, "encoding audio frame",
+                      STATS_TIMER_AUDIO_FRAME_ENCODING );
+}
+
+static inline void audio_timer_stop( encoder_t * p_encoder )
+{
+    stats_TimerStop( p_encoder, STATS_TIMER_AUDIO_FRAME_ENCODING );
+}
+
+static inline void audio_timer_close( encoder_t * p_encoder )
+{
+    stats_TimerDump(  p_encoder, STATS_TIMER_AUDIO_FRAME_ENCODING );
+    stats_TimerClean( p_encoder, STATS_TIMER_AUDIO_FRAME_ENCODING );
+}
+
+/****************************************************************************
  * decoder reencoder part
  ****************************************************************************/
+
 static int audio_BitsPerSample( vlc_fourcc_t i_format )
 {
     switch( i_format )
@@ -1500,6 +1538,8 @@ static void transcode_audio_close( sout_stream_id_t *id )
 {
     int i;
 
+    audio_timer_close( id->p_encoder );
+
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
@@ -1592,7 +1632,10 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_buf->start_date = p_audio_block->i_dts;
         p_audio_buf->end_date = p_audio_block->i_dts + p_audio_block->i_length;
 
+        audio_timer_start( id->p_encoder );
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, p_audio_buf );
+        audio_timer_stop( id->p_encoder );
+
         block_ChainAppend( out, p_block );
         block_Release( p_audio_block );
         free( p_audio_buf );
@@ -2146,6 +2189,8 @@ static void transcode_video_close( sout_stream_t *p_stream,
         vlc_cond_destroy( &p_stream->p_sys->cond );
     }
 
+    video_timer_close( id->p_encoder );
+
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
@@ -2455,7 +2500,11 @@ static int transcode_video_process( sout_stream_t *p_stream,
         if( p_sys->i_threads == 0 )
         {
             block_t *p_block;
+
+            video_timer_start( id->p_encoder );
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
+            video_timer_stop( id->p_encoder );
+
             block_ChainAppend( out, p_block );
         }
 
@@ -2552,7 +2601,10 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
         p_sys->i_first_pic %= PICTURE_RING_SIZE;
         vlc_mutex_unlock( &p_sys->lock_out );
 
+        video_timer_start( id->p_encoder );
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
+        video_timer_stop( id->p_encoder );
+
         vlc_mutex_lock( &p_sys->lock_out );
         block_ChainAppend( &p_sys->p_buffers, p_block );
 
