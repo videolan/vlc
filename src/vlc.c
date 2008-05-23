@@ -1,7 +1,7 @@
 /*****************************************************************************
- * vlc.c: the vlc player
+ * vlc.c: the VLC player
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -39,22 +39,11 @@
 extern void LocaleFree (const char *);
 extern char *FromLocale (const char *);
 
-
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-#ifdef WIN32
-#include <windows.h>
-extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
-                           int expand_wildcards, int *startupinfo);
-#else
-
 # include <signal.h>
 # include <time.h>
 # include <pthread.h>
 
 static void *SigHandler (void *set);
-#endif
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
@@ -87,7 +76,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* FIXME: rootwrap (); */
 #endif
 
-#if !defined(WIN32) && !defined(UNDER_CE)
     /* Synchronously intercepted POSIX signals.
      *
      * In a threaded program such as VLC, the only sane way to handle signals
@@ -130,55 +118,11 @@ int main( int i_argc, const char *ppsz_argv[] )
         sigdelset (&set, dummysigs[i]);
 
     pthread_create (&sigth, NULL, SigHandler, &set);
-#endif
 
-#ifdef WIN32
-    /* Replace argv[1..n] with unicode for Windows NT and above */
-    if( GetVersion() < 0x80000000 )
-    {
-        wchar_t **wargv, **wenvp;
-        int i,i_wargc;
-        int si = { 0 };
-        __wgetmainargs(&i_wargc, &wargv, &wenvp, 0, &si);
-
-        for( i = 0; i < i_wargc; i++ )
-        {
-            int len = WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, NULL, 0, NULL, NULL);
-            if( len > 0 )
-            {
-                if( len > 1 ) {
-                    char *utf8arg = (char *)malloc(len);
-                    if( NULL != utf8arg )
-                    {
-                        WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, utf8arg, len, NULL, NULL);
-                        ppsz_argv[i] = utf8arg;
-                    }
-                    else
-                    {
-                        /* failed!, quit */
-                        return 1;
-                    }
-                }
-                else
-                {
-                    ppsz_argv[i] = strdup ("");
-                }
-            }
-            else
-            {
-                /* failed!, quit */
-                return 1;
-            }
-        }
-    }
-    else
-#endif
-    {
-        /* Note that FromLocale() can be used before libvlc is initialized */
-        for (int i = 0; i < i_argc; i++)
-            if ((ppsz_argv[i] = FromLocale (ppsz_argv[i])) == NULL)
-                return 1; // BOOM!
-    }
+    /* Note that FromLocale() can be used before libvlc is initialized */
+    for (int i = 0; i < i_argc; i++)
+        if ((ppsz_argv[i] = FromLocale (ppsz_argv[i])) == NULL)
+            return 1; // BOOM!
 
     libvlc_exception_t ex;
     libvlc_exception_init (&ex);
@@ -199,7 +143,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     for (int i = 0; i < i_argc; i++)
         LocaleFree (ppsz_argv[i]);
 
-#if !defined(WIN32) && !defined(UNDER_CE)
     pthread_cancel (sigth);
 # ifdef __APPLE__
     /* In Mac OS X up to 10.4.8 sigwait (among others) is not a pthread
@@ -208,12 +151,10 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_kill (sigth, SIGQUIT);
 # endif
     pthread_join (sigth, NULL);
-#endif
 
     return i_ret;
 }
 
-#if !defined(WIN32) && !defined(UNDER_CE)
 /*****************************************************************************
  * SigHandler: system signal handler
  *****************************************************************************
@@ -277,34 +218,3 @@ static void *SigHandler (void *data)
     }
     /* Never reached */
 }
-#endif
-
-#if defined(UNDER_CE)
-#   if defined( _MSC_VER ) && defined( UNDER_CE )
-#       include "vlc_common.h"
-#   endif
-/*****************************************************************************
- * WinMain: parse command line, start interface and spawn threads. (WinCE only)
- *****************************************************************************/
-int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                    LPTSTR lpCmdLine, int nCmdShow )
-{
-    char **argv, psz_cmdline[MAX_PATH];
-    int argc, i_ret;
-
-    WideCharToMultiByte( CP_ACP, 0, lpCmdLine, -1,
-                         psz_cmdline, MAX_PATH, NULL, NULL );
-
-    argv = vlc_parse_cmdline( psz_cmdline, &argc );
-    argv = realloc( argv, (argc + 1) * sizeof(char *) );
-    if( !argv ) return -1;
-
-    if( argc ) memmove( argv + 1, argv, argc * sizeof(char *) );
-    argv[0] = ""; /* Fake program path */
-
-    i_ret = main( argc + 1, argv );
-
-    /* No need to free the argv memory */
-    return i_ret;
-}
-#endif
