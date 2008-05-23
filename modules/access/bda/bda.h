@@ -48,7 +48,9 @@
 #   define AM_NOVTABLE
 #   define _OBJBASE_H_
 #   undef _X86_
-#   define _I64_MAX LONG_LONG_MAX
+#   ifndef _I64_MAX
+#     define _I64_MAX LONG_LONG_MAX
+#   endif
 #   define LONGLONG long long
 #endif
 
