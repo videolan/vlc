@@ -33,7 +33,11 @@
 #include <errno.h>                                                  /* errno */
 #include <assert.h>
 #include <limits.h>
+#ifdef __APPLE__
+#   include <xlocale.h>
+#else
 #include <locale.h>
+#endif
 
 #include "configuration.h"
 #include "modules/modules.h"
