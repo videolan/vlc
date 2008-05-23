@@ -346,7 +346,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     /* Normal text subs, easy markup */
     p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM;
 
-    p_spu->i_start = (mtime_t) p_block->i_dts;
+    p_spu->i_start = (mtime_t) p_block->i_pts;
     p_spu->i_stop = (mtime_t) 0;
     p_spu->b_ephemer = true;
     p_spu->b_absolute = false;
