@@ -382,8 +382,11 @@ static int Demux( demux_t *p_demux )
             p_sys->i_scr = -1;
 
             if( tk->b_seen && tk->es &&
-                ( tk->fmt.i_codec == VLC_FOURCC('t','e','l','x') ||
-                  !ps_pkt_parse_pes( p_pkt, tk->i_skip ) ) )
+                (
+#ifdef ZVBI_COMPILED /* FIXME!! */
+                tk->fmt.i_codec == VLC_FOURCC('t','e','l','x') ||
+#endif
+                !ps_pkt_parse_pes( p_pkt, tk->i_skip ) ) )
             {
                 if( !b_new && !p_sys->b_have_pack && tk->fmt.i_cat == AUDIO_ES && p_pkt->i_pts > 0 )
                 {
