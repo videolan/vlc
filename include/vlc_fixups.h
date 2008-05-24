@@ -137,6 +137,7 @@ typedef void *locale_t;
 #endif
 
 #ifdef WIN32
+# include <dirent.h>
 # define opendir Use_utf8_opendir_or_vlc_wopendir_instead!
 # define readdir Use_utf8_readdir_or_vlc_wreaddir_instead!
 # define closedir vlc_wclosedir
