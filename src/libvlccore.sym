@@ -371,8 +371,6 @@ __var_TriggerCallback
 __var_Type
 vlc_alphasort
 vlc_asprintf
-vlc_atof
-vlc_atoll
 vlc_b64_decode
 vlc_b64_decode_binary
 vlc_b64_decode_binary_to_buffer

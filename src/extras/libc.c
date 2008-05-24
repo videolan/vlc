@@ -226,27 +226,6 @@ int vlc_asprintf( char **strp, const char *fmt, ... )
 #endif
 
 /*****************************************************************************
- * atof: convert a string to a double.
- *****************************************************************************/
-#if !defined( HAVE_ATOF )
-double vlc_atof( const char *nptr )
-{
-    double f_result;
-    wchar_t *psz_tmp = NULL;
-    int i_len = strlen( nptr ) + 1;
-
-    psz_tmp = malloc( i_len * sizeof(wchar_t) );
-    if( !psz_tmp )
-        return NULL;
-    MultiByteToWideChar( CP_ACP, 0, nptr, -1, psz_tmp, i_len );
-    f_result = wcstod( psz_tmp, NULL );
-    free( psz_tmp );
-
-    return f_result;
-}
-#endif
-
-/*****************************************************************************
  * strtoll: convert a string to a 64 bits int.
  *****************************************************************************/
 #if !defined( HAVE_STRTOLL )
@@ -315,16 +294,6 @@ int64_t vlc_strtoll( const char *nptr, char **endptr, int base )
     }
 
     return i_value * sign;
-}
-#endif
-
-/*****************************************************************************
- * atoll: convert a string to a 64 bits int.
- *****************************************************************************/
-#if !defined( HAVE_ATOLL )
-int64_t vlc_atoll( const char *nptr )
-{
-    return strtoll( nptr, (char **)NULL, 10 );
 }
 #endif
 

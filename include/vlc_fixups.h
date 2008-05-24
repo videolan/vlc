@@ -70,22 +70,20 @@ static inline char *strndup (const char *str, size_t max)
 # define strlcpy vlc_strlcpy
 #endif
 
-#ifndef HAVE_ATOF
-# define atof vlc_atof
-#endif
-
 #ifndef HAVE_STRTOF
-# ifdef HAVE_STRTOD
-#  define strtof( a, b ) ((float)strtod (a, b))
-# endif
+# define strtof( a, b ) ((float)strtod (a, b))
 #endif
 
-#ifndef HAVE_ATOLL
-# define atoll vlc_atoll
+#ifndef HAVE_ATOF
+# define atof( str ) (strtod ((str), (char **)NULL, 10))
 #endif
 
 #ifndef HAVE_STRTOLL
 # define strtoll vlc_strtoll
+#endif
+
+#ifndef HAVE_ATOLL
+# define atoll( str ) (strtoll ((str), (char **)NULL, 10))
 #endif
 
 #ifndef HAVE_LLDIV
