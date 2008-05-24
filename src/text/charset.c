@@ -56,6 +56,7 @@
 #   include <xlocale.h>
 #endif
 
+#include "libvlc.h"
 #include <vlc_charset.h>
 
 typedef struct VLCCharsetAlias

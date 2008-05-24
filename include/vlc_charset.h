@@ -76,7 +76,6 @@ static inline char *FromWide (const wchar_t *wide)
 }
 #endif
 
-VLC_INTERNAL( char *, vlc_fix_readdir, ( const char * ) );
 VLC_INTERNAL( bool, vlc_current_charset, ( char ** ) );
 
 VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) );

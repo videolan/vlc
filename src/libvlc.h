@@ -111,6 +111,7 @@ void msg_StackDestroy (void *);
 /*
  * Unicode stuff
  */
+char *vlc_fix_readdir (const char *);
 
 /*
  * LibVLC objects stuff
