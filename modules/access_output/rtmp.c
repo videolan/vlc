@@ -63,10 +63,6 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static const char *ppsz_sout_options[] = {
-    NULL
-};
-
 static ssize_t Write( sout_access_out_t *, block_t * );
 static int     Seek ( sout_access_out_t *, off_t  );
 static void ThreadControl( vlc_object_t * );
@@ -89,8 +85,6 @@ static int Open( vlc_object_t *p_this )
     char *psz, *p;
     int length_path, length_media_name;
     int i;
-
-    config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     if( !( p_sys = calloc ( 1, sizeof( sout_access_out_sys_t ) ) ) )
     {
