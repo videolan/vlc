@@ -47,11 +47,18 @@ static inline char *strdup (const char *str)
 # define asprintf vlc_asprintf
 #endif
 
+#ifndef HAVE_STRNLEN
+static inline size_t strnlen (const char *str, size_t max)
+{
+    const char *end = memchr (str, 0, max);
+    return end ? (size_t)(end - str) : max;
+}
+#endif
+
 #ifndef HAVE_STRNDUP
 static inline char *strndup (const char *str, size_t max)
 {
-    const char *end = memchr (str, '\0', max);
-    size_t len = end ? (size_t)(end - str) : max;
+    size_t len = strnlen (str, max);
     char *res = malloc (len + 1);
     if (res)
     {
@@ -60,10 +67,6 @@ static inline char *strndup (const char *str, size_t max)
     }
     return res;
 }
-#endif
-
-#ifndef HAVE_STRNLEN
-# define strnlen vlc_strnlen
 #endif
 
 #ifndef HAVE_STRLCPY
