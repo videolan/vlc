@@ -1361,7 +1361,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         module_Need( id->p_decoder, "decoder", "$codec", 0 );
     if( !id->p_decoder->p_module )
     {
-        msg_Err( p_stream, "cannot find decoder" );
+        msg_Err( p_stream, "cannot find audio decoder" );
         return VLC_EGENERIC;
     }
     id->p_decoder->fmt_out.audio.i_bitspersample =
@@ -1401,7 +1401,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_aenc );
+        msg_Err( p_stream, "cannot find audio encoder (%s)", p_sys->psz_aenc );
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
         return VLC_EGENERIC;
@@ -1495,7 +1495,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
             module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
         if( !id->p_encoder->p_module )
         {
-            msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_aenc );
+            msg_Err( p_stream, "cannot find audio encoder (%s)", p_sys->psz_aenc );
             transcode_audio_close( id );
             return VLC_EGENERIC;
         }
@@ -1797,7 +1797,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if( !id->p_decoder->p_module )
     {
-        msg_Err( p_stream, "cannot find decoder" );
+        msg_Err( p_stream, "cannot find video decoder" );
         return VLC_EGENERIC;
     }
 
@@ -1835,7 +1835,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_venc );
+        msg_Err( p_stream, "cannot find video encoder (%s)", p_sys->psz_venc );
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = 0;
         return VLC_EGENERIC;
@@ -2149,7 +2149,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_venc );
+        msg_Err( p_stream, "cannot find video encoder (%s)", p_sys->psz_venc );
         return VLC_EGENERIC;
     }
 
@@ -2805,7 +2805,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if( !id->p_decoder->p_module )
     {
-        msg_Err( p_stream, "cannot find decoder" );
+        msg_Err( p_stream, "cannot find spu decoder" );
         return VLC_EGENERIC;
     }
 
@@ -2824,7 +2824,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         if( !id->p_encoder->p_module )
         {
             module_Unneed( id->p_decoder, id->p_decoder->p_module );
-            msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_senc );
+            msg_Err( p_stream, "cannot find spu encoder (%s)", p_sys->psz_senc );
             return VLC_EGENERIC;
         }
     }
@@ -2932,7 +2932,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
         if( !id->p_encoder->p_module )
         {
-            msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_osdenc );
+            msg_Err( p_stream, "cannot find spu encoder (%s)", p_sys->psz_osdenc );
             goto error;
         }
 
