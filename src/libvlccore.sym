@@ -158,6 +158,11 @@ __intf_UserStringInput
 __intf_UserWarn
 __intf_UserYesNo
 IsUTF8
+libvlc_InternalInit
+libvlc_InternalCreate
+libvlc_InternalCleanup
+libvlc_InternalAddIntf
+libvlc_InternalDestroy
 LocaleFree
 mdate
 __module_Exists
