@@ -265,7 +265,7 @@ static playlist_t *pl_Get( services_discovery_t *p_sd )
 
 vlc_module_begin();
 set_shortname( "UPnP" );
-set_description( _( "Universal Plug'n'Play discovery ( Intel SDK )" ) );
+set_description( N_( "Universal Plug'n'Play discovery ( Intel SDK )" ) );
 set_category( CAT_PLAYLIST );
 set_subcategory( SUBCAT_PLAYLIST_SD );
 set_capability( "services_discovery", 0 );

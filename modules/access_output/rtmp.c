@@ -28,6 +28,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_plugin.h>
 #include <vlc_sout.h>
 
 #include <vlc_network.h> /* DOWN: #include <network.h> */
@@ -50,8 +51,8 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-rtmp-"
 
 vlc_module_begin();
-    set_description( _("RTMP stream output") );
-    set_shortname( _("RTMP" ) );
+    set_description( N_("RTMP stream output") );
+    set_shortname( N_("RTMP" ) );
     set_capability( "sout access", 50 );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );

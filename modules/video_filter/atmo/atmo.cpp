@@ -279,9 +279,9 @@ static const char *ppsz_channel_assignment_descriptions[] = {
 * Module descriptor
 *****************************************************************************/
 vlc_module_begin();
-set_description( _("AtmoLight Filter") );
+set_description( N_("AtmoLight Filter") );
 set_help( MODULE_DESCRIPTION );
-set_shortname( _( "AtmoLight" ));
+set_shortname( N_( "AtmoLight" ));
 set_capability( "video filter2", 0 );
 
 set_category( CAT_VIDEO );
