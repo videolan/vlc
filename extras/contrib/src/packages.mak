@@ -38,6 +38,8 @@ LIBAMR_WB=$(PENGUIN)/amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 # we have to use a newer though, because bootstrap won't work otherwise
 AUTOCONF_VERSION=2.61
 AUTOCONF_URL=$(GNU)/autoconf/autoconf-$(AUTOCONF_VERSION).tar.bz2
+GNUMAKE_VERSION=3.81
+GNUMAKE_URL=$(GNU)/make/make-$(GNUMAKE_VERSION).tar.bz2
 CMAKE_VERSION=2.6.0
 CMAKE_URL=http://www.cmake.org/files/v2.6/cmake-$(CMAKE_VERSION).tar.gz
 LIBTOOL_VERSION=1.5.24

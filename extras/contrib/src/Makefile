@@ -260,6 +260,28 @@ CLEAN_PKG += autoconf
 DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
 
 # ***************************************************************************
+# gnumake
+# ***************************************************************************
+
+make-$(GNUMAKE_VERSION).tar.bz2:
+	$(WGET) $(GNUMAKE_URL)
+
+gnumake: make-$(GNUMAKE_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.gnumake: gnumake
+ifdef HAVE_DARWIN_OS
+ifndef HAVE_DARWIN_9
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+endif
+endif
+	touch $@
+
+CLEAN_FILE += .gnumake
+CLEAN_PKG += gnumake
+DISTCLEAN_PKG += make-$(GNUMAKE_VERSION).tar.bz2
+
+# ***************************************************************************
 # CMake
 # ***************************************************************************
 cmake-$(CMAKE_VERSION).tar.gz:
