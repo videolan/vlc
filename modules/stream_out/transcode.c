@@ -1401,8 +1401,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find audio encoder (%s/%4.4s)",
-                 p_sys->psz_aenc, (char *)&p_sys->i_acodec );
+        msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s)",
+                 p_sys->psz_aenc ? p_sys->psz_aenc : "any",
+                 (char *)&p_sys->i_acodec );
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
         return VLC_EGENERIC;
@@ -1496,8 +1497,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
             module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
         if( !id->p_encoder->p_module )
         {
-            msg_Err( p_stream, "cannot find audio encoder (%s/%4.4s)",
-                     p_sys->psz_aenc, (char *)&p_sys->i_acodec );
+            msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s)",
+                     p_sys->psz_aenc ? p_sys->psz_aenc : "any",
+                     (char *)&p_sys->i_acodec );
             transcode_audio_close( id );
             return VLC_EGENERIC;
         }
@@ -1837,8 +1839,9 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find video encoder (%s/%4.4s)",
-                 p_sys->psz_venc, (char *)&p_sys->i_vcodec );
+        msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s)",
+                 p_sys->psz_venc ? p_sys->psz_venc : "any",
+                 (char *)&p_sys->i_vcodec );
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = 0;
         return VLC_EGENERIC;
@@ -2152,8 +2155,9 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find video encoder (%s/%4.4s)",
-                 p_sys->psz_venc, (char *)&p_sys->i_vcodec );
+        msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s)",
+                 p_sys->psz_venc ? p_sys->psz_venc : "any",
+                 (char *)&p_sys->i_vcodec );
         return VLC_EGENERIC;
     }
 
