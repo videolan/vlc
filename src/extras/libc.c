@@ -74,52 +74,6 @@
 #   define strcoll strcmp
 #endif
 
-/*****************************************************************************
- * strcasecmp: compare two strings ignoring case
- *****************************************************************************/
-#if !defined( HAVE_STRCASECMP ) && !defined( HAVE_STRICMP )
-int vlc_strcasecmp( const char *s1, const char *s2 )
-{
-    int c1, c2;
-    if( !s1 || !s2 ) return  -1;
-
-    while( *s1 && *s2 )
-    {
-        c1 = tolower(*s1);
-        c2 = tolower(*s2);
-
-        if( c1 != c2 ) return (c1 < c2 ? -1 : 1);
-        s1++; s2++;
-    }
-
-    if( !*s1 && !*s2 ) return 0;
-    else return (*s1 ? 1 : -1);
-}
-#endif
-
-/*****************************************************************************
- * strncasecmp: compare n chars from two strings ignoring case
- *****************************************************************************/
-#if !defined( HAVE_STRNCASECMP ) && !defined( HAVE_STRNICMP )
-int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
-{
-    int c1, c2;
-    if( !s1 || !s2 ) return  -1;
-
-    while( n > 0 && *s1 && *s2 )
-    {
-        c1 = tolower(*s1);
-        c2 = tolower(*s2);
-
-        if( c1 != c2 ) return (c1 < c2 ? -1 : 1);
-        s1++; s2++; n--;
-    }
-
-    if( !n || (!*s1 && !*s2) ) return 0;
-    else return (*s1 ? 1 : -1);
-}
-#endif
-
 /******************************************************************************
  * strcasestr: find a substring (little) in another substring (big)
  * Case sensitive. Return NULL if not found, return big if little == null

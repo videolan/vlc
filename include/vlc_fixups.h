@@ -117,7 +117,16 @@ static inline getenv (const char *name)
 
 #ifndef HAVE_STRCASECMP
 # ifndef HAVE_STRICMP
-#  define strcasecmp vlc_strcasecmp
+#  include <ctype.h>
+static inline int strcasecmp (const char *s1, const char *s2)
+{
+    for (size_t i = 0;; i++)
+    {
+        int d = tolower (s1[i]) - tolower (s2[i]);
+        if (d) return d;
+    }
+    return 0;
+}
 # else
 #  define strcasecmp stricmp
 # endif
@@ -125,7 +134,16 @@ static inline getenv (const char *name)
 
 #ifndef HAVE_STRNCASECMP
 # ifndef HAVE_STRNICMP
-#  define strncasecmp vlc_strncasecmp
+#  include <ctype.h>
+static inline int strncasecmp (const char *s1, const char *s2, size_t n)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        int d = tolower (s1[i]) - tolower (s2[i]);
+        if (d) return d;
+    }
+    return 0;
+}
 # else
 #  define strncasecmp strnicmp
 # endif

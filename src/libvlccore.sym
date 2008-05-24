@@ -438,10 +438,8 @@ vlc_recvmsg
 vlc_scandir
 vlc_sdp_Start
 vlc_sendmsg
-vlc_strcasecmp
 vlc_strcasestr
 vlc_strlcpy
-vlc_strncasecmp
 vlc_strtoll
 vlc_submodule_create
 __vlc_thread_create

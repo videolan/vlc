@@ -728,8 +728,6 @@ struct dirent;
 VLC_EXPORT( int, vlc_scandir, ( const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ) ) );
 VLC_EXPORT( int, vlc_alphasort, ( const struct dirent **a, const struct dirent **b ) );
 
-VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
-VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
 VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 
 #if defined(WIN32) || defined(UNDER_CE)
