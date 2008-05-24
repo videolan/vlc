@@ -754,21 +754,6 @@ VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
 VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
 VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 
-#if defined (WIN32)
-#   include <dirent.h>
- VLC_INTERNAL( void *, vlc_wopendir, ( const wchar_t * ) );
- VLC_INTERNAL( struct _wdirent *, vlc_wreaddir, ( void * ) );
- VLC_EXPORT( int, vlc_wclosedir, ( void * ) );
- VLC_INTERNAL( void, vlc_rewinddir, ( void * ) );
-#   define opendir Use_utf8_opendir_or_vlc_wopendir_instead!
-#   define readdir Use_utf8_readdir_or_vlc_wreaddir_instead!
-#   define closedir vlc_wclosedir
-#   define _wopendir vlc_wopendir
-#   define _wreaddir vlc_wreaddir
-#   define _wclosedir vlc_wclosedir
-#   define rewinddir vlc_rewinddir
-#endif
-
 #if defined(WIN32) || defined(UNDER_CE)
 /* win32, cl and icl support */
 #   if defined( _MSC_VER ) || !defined( __MINGW32__ )
