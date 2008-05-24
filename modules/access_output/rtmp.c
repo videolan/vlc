@@ -181,36 +181,7 @@ static int Open( vlc_object_t *p_this )
     /* Open connection */
     p_sys->p_thread->fd = net_ConnectTCP( p_access, p_sys->p_thread->url.psz_host, p_sys->p_thread->url.i_port );
     if( p_sys->p_thread->fd == -1 )
-    {
-        int *p_fd_listen;
-
-        msg_Warn( p_access, "cannot connect to %s:%d", p_sys->p_thread->url.psz_host, p_sys->p_thread->url.i_port );
-        msg_Dbg( p_access, "switching to passive mode" );
-
-        p_sys->active = 0;
-
-        p_fd_listen = net_ListenTCP( p_access, p_sys->p_thread->url.psz_host, p_sys->p_thread->url.i_port );
-        if( p_fd_listen == NULL )
-        {
-            msg_Warn( p_access, "cannot listen to %s port %i", p_sys->p_thread->url.psz_host, p_sys->p_thread->url.i_port );
-            goto error2;
-        }
-
-        p_sys->p_thread->fd = net_Accept( p_access, p_fd_listen, -1 );
-
-        net_ListenClose( p_fd_listen );
-
-        if( rtmp_handshake_passive( p_this, p_sys->p_thread->fd ) < 0 )
-        {
-            msg_Err( p_access, "handshake passive failed");
-            goto error2;
-        }
-    }
-    else
-    {
-        msg_Err( p_access, "to be implemented" );
         goto error2;
-    }
 
     if( vlc_thread_create( p_sys->p_thread, "rtmp control thread", ThreadControl,
                            VLC_THREAD_PRIORITY_INPUT, false ) )
