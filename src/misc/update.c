@@ -1638,5 +1638,32 @@ end:
 
     vlc_object_release( p_udt );
 }
+#else
+update_t *__update_New( vlc_object_t *p_this )
+{
+    (void)p_this;
+    return NULL;
+}
 
+void update_Delete( update_t *p_update )
+{
+    (void)p_update;
+}
+
+void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ),
+                   void *p_data )
+{
+    (void)p_update; (void)pf_callback; (void)p_data;
+}
+
+bool update_NeedUpgrade( update_t *p_update )
+{
+    (void)p_update;
+    return false;
+}
+
+void update_Download( update_t *p_update, char *psz_destdir )
+{
+    (void)p_update; (void)psz_destdir;
+}
 #endif
