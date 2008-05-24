@@ -369,7 +369,6 @@ __var_Get
 __var_Set
 __var_TriggerCallback
 __var_Type
-vlc_alphasort
 vlc_asprintf
 vlc_b64_decode
 vlc_b64_decode_binary
@@ -435,7 +434,6 @@ __vlc_object_yield
 vlc_pthread_fatal
 vlc_rand_bytes
 vlc_recvmsg
-vlc_scandir
 vlc_sdp_Start
 vlc_sendmsg
 vlc_strcasestr

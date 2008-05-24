@@ -724,10 +724,6 @@ VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) ATTRIBUTE_FORMAT( 2
 VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
 VLC_EXPORT( int64_t, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
 
-struct dirent;
-VLC_EXPORT( int, vlc_scandir, ( const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ) ) );
-VLC_EXPORT( int, vlc_alphasort, ( const struct dirent **a, const struct dirent **b ) );
-
 VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 
 #if defined(WIN32) || defined(UNDER_CE)

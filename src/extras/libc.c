@@ -70,10 +70,6 @@
 #   include <windows.h>
 #endif
 
-#ifdef UNDER_CE
-#   define strcoll strcmp
-#endif
-
 /******************************************************************************
  * strcasestr: find a substring (little) in another substring (big)
  * Case sensitive. Return NULL if not found, return big if little == null
@@ -375,72 +371,6 @@ void vlc_rewinddir( void *_p_dir )
 
     if ( p_dir->p_real_dir != NULL )
         _wrewinddir( p_dir->p_real_dir );
-}
-#endif
-
-/*****************************************************************************
- * scandir: scan a directory alpha-sorted
- *****************************************************************************/
-#if !defined( HAVE_SCANDIR )
-/* FIXME: I suspect this is dead code -> utf8_scandir */
-#ifdef WIN32
-# undef opendir
-# undef readdir
-# undef closedir
-#endif
-int vlc_alphasort( const struct dirent **a, const struct dirent **b )
-{
-    return strcoll( (*a)->d_name, (*b)->d_name );
-}
-
-int vlc_scandir( const char *name, struct dirent ***namelist,
-                    int (*filter) ( const struct dirent * ),
-                    int (*compar) ( const struct dirent **,
-                                    const struct dirent ** ) )
-{
-    DIR            * p_dir;
-    struct dirent  * p_content;
-    struct dirent ** pp_list;
-    int              ret, size;
-
-    if( !namelist || !( p_dir = opendir( name ) ) ) return -1;
-
-    ret     = 0;
-    pp_list = NULL;
-    while( ( p_content = readdir( p_dir ) ) )
-    {
-        if( filter && !filter( p_content ) )
-        {
-            continue;
-        }
-        pp_list = realloc( pp_list, ( ret + 1 ) * sizeof( struct dirent * ) );
-        size = sizeof( struct dirent ) + strlen( p_content->d_name ) + 1;
-        pp_list[ret] = malloc( size );
-        if( pp_list[ret] )
-        {
-            memcpy( pp_list[ret], p_content, size );
-            ret++;
-        }
-        else
-        {
-            /* Continuing is useless when no more memory can be allocted,
-             * so better return what we have found.
-             */
-            ret = -1;
-            break;
-        }
-    }
-
-    closedir( p_dir );
-
-    if( compar )
-    {
-        qsort( pp_list, ret, sizeof( struct dirent * ),
-               (int (*)(const void *, const void *)) compar );
-    }
-
-    *namelist = pp_list;
-    return ret;
 }
 #endif
 
