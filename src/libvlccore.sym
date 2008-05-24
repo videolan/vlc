@@ -123,8 +123,6 @@ httpd_UrlNew
 httpd_UrlNewUnique
 __image_HandlerCreate
 image_HandlerDelete
-inet_ntop
-inet_pton
 InitMD5
 input_AddSubtitles
 input_Control
@@ -339,11 +337,6 @@ ToLocale
 ToLocaleDup
 unescape_URI
 unescape_URI_duplicate
-update_Check
-update_Delete
-update_Download
-update_NeedUpgrade
-__update_New
 us_atof
 us_strtod
 utf8_fopen
@@ -385,7 +378,6 @@ __vlc_cond_init
 vlc_config_create
 vlc_config_set
 vlc_CPU
-vlc_dgettext
 vlc_error
 __vlc_event_attach
 vlc_event_detach
@@ -433,11 +425,7 @@ __vlc_object_waitpipe
 __vlc_object_yield
 vlc_pthread_fatal
 vlc_rand_bytes
-vlc_recvmsg
 vlc_sdp_Start
-vlc_sendmsg
-vlc_strcasestr
-vlc_strlcpy
 vlc_strtoll
 vlc_submodule_create
 __vlc_thread_create
@@ -449,7 +437,6 @@ vlc_threadvar_delete
 vlc_ureduce
 vlc_vasprintf
 VLC_Version
-vlc_wclosedir
 vlc_wraptext
 vlm_Control
 vlm_Delete
