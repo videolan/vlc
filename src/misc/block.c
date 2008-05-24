@@ -237,7 +237,13 @@ block_t *block_mmap_Alloc (void *addr, size_t length)
     block->length = length;
     return &block->self;
 }
+#else
+block_t *block_mmap_Alloc (void *addr, size_t length)
+{
+    (void)addr; (void)length; return NULL;
+}
 #endif
+
 
 #ifdef WIN32
 static
