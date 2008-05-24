@@ -145,14 +145,10 @@ struct dirent
 #   define readdir vlc_readdir
 #   define closedir vlc_closedir
 #   define rewinddir vlc_rewindir
-#   define seekdir vlc_seekdir
-#   define telldir vlc_telldir
 VLC_EXPORT( void *, vlc_opendir, ( const char * ) );
 VLC_EXPORT( void *, vlc_readdir, ( void * ) );
 VLC_EXPORT( int, vlc_closedir, ( void * ) );
 VLC_INTERNAL( void, vlc_rewinddir, ( void * ) );
-VLC_INTERNAL( void, vlc_seekdir, ( void *, long ) );
-VLC_INTERNAL( long, vlc_telldir, ( void * ) );
 #endif
 
 #ifndef HAVE_USELOCALE

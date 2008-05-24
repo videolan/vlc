@@ -66,8 +66,6 @@
 #   undef _wreaddir
 #   undef _wclosedir
 #   undef rewinddir
-#   undef seekdir
-#   undef telldir
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
 #endif
@@ -521,23 +519,6 @@ void vlc_rewinddir( void *_p_dir )
 
     if ( p_dir->p_real_dir != NULL )
         _wrewinddir( p_dir->p_real_dir );
-}
-
-void vlc_seekdir( void *_p_dir, long loc)
-{
-    vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
-
-    if ( p_dir->p_real_dir != NULL )
-        _wseekdir( p_dir->p_real_dir, loc );
-}
-
-long vlc_telldir( void *_p_dir )
-{
-    vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
-
-    if ( p_dir->p_real_dir != NULL )
-        return _wtelldir( p_dir->p_real_dir );
-    return 0;
 }
 #endif
 

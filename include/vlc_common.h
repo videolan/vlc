@@ -760,8 +760,6 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
  VLC_INTERNAL( struct _wdirent *, vlc_wreaddir, ( void * ) );
  VLC_EXPORT( int, vlc_wclosedir, ( void * ) );
  VLC_INTERNAL( void, vlc_rewinddir, ( void * ) );
- VLC_INTERNAL( void, vlc_seekdir, ( void *, long ) );
- VLC_INTERNAL( long, vlc_telldir, ( void * ) );
 #   define opendir Use_utf8_opendir_or_vlc_wopendir_instead!
 #   define readdir Use_utf8_readdir_or_vlc_wreaddir_instead!
 #   define closedir vlc_wclosedir
@@ -769,8 +767,6 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #   define _wreaddir vlc_wreaddir
 #   define _wclosedir vlc_wclosedir
 #   define rewinddir vlc_rewinddir
-#   define seekdir vlc_seekdir
-#   define telldir vlc_telldir
 #endif
 
 #if defined(WIN32) || defined(UNDER_CE)
