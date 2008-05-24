@@ -719,30 +719,17 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #define VLC_UNUSED(x) (void)(x)
 
 /* Stuff defined in src/extras/libc.c */
-VLC_EXPORT( char *, vlc_strdup, ( const char *s ) );
 VLC_EXPORT( int, vlc_vasprintf, (char **, const char *, va_list ) );
 VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
-VLC_EXPORT( char *, vlc_strndup, ( const char *s, size_t n ) );
 VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
 VLC_EXPORT( double, vlc_atof, ( const char *nptr ) );
 VLC_EXPORT( int64_t, vlc_atoll, ( const char *nptr ) );
 VLC_EXPORT( int64_t, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
 VLC_EXPORT( size_t, vlc_strnlen, ( const char *, size_t ) );
 
-#if defined(SYS_BEOS) \
- || (defined (__FreeBSD__) && (__FreeBSD__ < 5))
-    typedef struct {
-        long long quot; /* Quotient. */
-        long long rem;  /* Remainder. */
-    } lldiv_t;
-#endif
-VLC_EXPORT( lldiv_t, vlc_lldiv, ( long long numer, long long denom ) );
-
 struct dirent;
 VLC_EXPORT( int, vlc_scandir, ( const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ) ) );
 VLC_EXPORT( int, vlc_alphasort, ( const struct dirent **a, const struct dirent **b ) );
-
-VLC_EXPORT( char *, vlc_getenv, ( const char *name ) );
 
 VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
 VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );

@@ -26,8 +26,17 @@
 #ifndef LIBVLC_FIXUPS_H
 # define LIBVLC_FIXUPS_H 1
 
+# include <string.h>
+# include <stdlib.h>
+
 #ifndef HAVE_STRDUP
-# define strdup vlc_strdup
+static inline char *strdup (const char *str)
+{
+    size_t len = strlen (str) + 1;
+    char *res = malloc (len);
+    if (res) memcpy (res, str, len);
+    return res;
+}
 #endif
 
 #ifndef HAVE_VASPRINTF
@@ -39,7 +48,18 @@
 #endif
 
 #ifndef HAVE_STRNDUP
-# define strndup vlc_strndup
+static inline char *strndup (const char *str, size_t max)
+{
+    const char *end = memchr (str, '\0', max);
+    size_t len = end ? (size_t)(end - str) : max;
+    char *res = malloc (len + 1);
+    if (res)
+    {
+        memcpy (res, str, len);
+        res[len] = '\0';
+    }
+    return res;
+}
 #endif
 
 #ifndef HAVE_STRNLEN
@@ -69,7 +89,16 @@
 #endif
 
 #ifndef HAVE_LLDIV
-# define lldiv vlc_lldiv
+typedef struct {
+    long long quot; /* Quotient. */
+    long long rem;  /* Remainder. */
+} lldiv_t;
+
+static inline lldiv_t lldiv (long long numer, long long denom)
+{
+    lldiv_t d = { .quot = numer / denom, .rem = numer % denom };
+    return d;
+}
 #endif
 
 #ifndef HAVE_SCANDIR
@@ -78,7 +107,11 @@
 #endif
 
 #ifndef HAVE_GETENV
-# define getenv vlc_getenv
+static inline getenv (const char *name)
+{
+    (void)name;
+    return NULL;
+}
 #endif
 
 #ifndef HAVE_STRCASECMP

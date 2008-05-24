@@ -401,7 +401,6 @@ vlc_fastmem_register
 vlc_freeaddrinfo
 vlc_gai_strerror
 vlc_getaddrinfo
-vlc_getenv
 vlc_getnameinfo
 vlc_gettext
 vlc_iconv
@@ -410,7 +409,6 @@ vlc_iconv_open
 __vlc_list_children
 __vlc_list_find
 vlc_list_release
-vlc_lldiv
 vlc_memcpy
 vlc_memset
 vlc_module_create
@@ -444,10 +442,8 @@ vlc_sdp_Start
 vlc_sendmsg
 vlc_strcasecmp
 vlc_strcasestr
-vlc_strdup
 vlc_strlcpy
 vlc_strncasecmp
-vlc_strndup
 vlc_strnlen
 vlc_strtoll
 vlc_submodule_create

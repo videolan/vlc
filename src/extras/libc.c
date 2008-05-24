@@ -75,48 +75,6 @@
 #endif
 
 /*****************************************************************************
- * getenv: just in case, but it should never be called
- *****************************************************************************/
-#if !defined( HAVE_GETENV )
-char *vlc_getenv( const char *name )
-{
-    return NULL;
-}
-#endif
-
-/*****************************************************************************
- * strdup: returns a malloc'd copy of a string
- *****************************************************************************/
-#if !defined( HAVE_STRDUP )
-char *vlc_strdup( const char *string )
-{
-    return strndup( string, strlen( string ) );
-}
-#endif
-
-/*****************************************************************************
- * strndup: returns a malloc'd copy of at most n bytes of string
- * Does anyone know whether or not it will be present in Jaguar?
- *****************************************************************************/
-#if !defined( HAVE_STRNDUP )
-char *vlc_strndup( const char *string, size_t n )
-{
-    char *psz;
-    size_t len = strlen( string );
-
-    len = __MIN( len, n );
-    psz = (char*)malloc( len + 1 );
-    if( psz != NULL )
-    {
-        memcpy( (void*)psz, (const void*)string, len );
-        psz[ len ] = 0;
-    }
-
-    return psz;
-}
-#endif
-
-/*****************************************************************************
  * strnlen:
  *****************************************************************************/
 #if !defined( HAVE_STRNLEN )
@@ -369,20 +327,6 @@ int64_t vlc_atoll( const char *nptr )
     return strtoll( nptr, (char **)NULL, 10 );
 }
 #endif
-
-/*****************************************************************************
- * lldiv: returns quotient and remainder
- *****************************************************************************/
-#if !defined( HAVE_LLDIV )
-lldiv_t vlc_lldiv( long long numer, long long denom )
-{
-    lldiv_t d;
-    d.quot = numer / denom;
-    d.rem  = numer % denom;
-    return d;
-}
-#endif
-
 
 /**
  * Copy a string to a sized buffer. The result is always nul-terminated
