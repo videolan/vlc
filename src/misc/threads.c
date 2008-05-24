@@ -73,7 +73,6 @@ static inline unsigned long vlc_threadid (void)
      return v.i;
 }
 
-
 /*****************************************************************************
  * vlc_thread_fatal: Report an error from the threading layer
  *****************************************************************************
@@ -114,8 +113,14 @@ void vlc_pthread_fatal (const char *action, int error,
     fflush (stderr);
     abort ();
 }
+#else
+void vlc_pthread_fatal (const char *action, int error,
+                        const char *file, unsigned line)
+{
+    (void)action; (void)error; (void)file; (void)line;
+    abort();
+}
 #endif
-
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
