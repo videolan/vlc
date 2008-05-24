@@ -40,11 +40,29 @@ static inline char *strdup (const char *str)
 #endif
 
 #ifndef HAVE_VASPRINTF
-# define vasprintf vlc_vasprintf
+# include <stdarg.h>
+static inline int vasprintf (char **strp, const char *fmt, va_list ap)
+{
+    int len = vsnprintf (NULL, 0, fmt, ap) + 1;
+    char *res = malloc (len);
+    if (res == NULL)
+        return -1;
+    *strp = res;
+    return vsprintf (res, fmt, ap);
+}
 #endif
 
 #ifndef HAVE_ASPRINTF
-# define asprintf vlc_asprintf
+# include <stdarg.h>
+static inline int asprintf (char **strp, const char *fmt, ...)
+{
+    va_list ap;
+    int ret;
+    va_start (fmt, ap);
+    ret = vasprintf (strp, fmt, ap);
+    va_end (ap);
+    return ret;
+}
 #endif
 
 #ifndef HAVE_STRNLEN

@@ -74,9 +74,11 @@
  * strcasestr: find a substring (little) in another substring (big)
  * Case sensitive. Return NULL if not found, return big if little == null
  *****************************************************************************/
-#if !defined( HAVE_STRCASESTR ) && !defined( HAVE_STRISTR )
 char * vlc_strcasestr( const char *psz_big, const char *psz_little )
 {
+#if defined (HAVE_STRCASESTR) || defined (HAVE_STRISTR)
+    return strcasestr (psz_big, psz_little);
+#else
     char *p_pos = (char *)psz_big;
 
     if( !psz_big || !psz_little || !*psz_little ) return p_pos;
@@ -98,71 +100,8 @@ char * vlc_strcasestr( const char *psz_big, const char *psz_little )
         p_pos++;
     }
     return NULL;
-}
 #endif
-
-/*****************************************************************************
- * vasprintf:
- *****************************************************************************/
-#if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
-int vlc_vasprintf(char **strp, const char *fmt, va_list ap)
-{
-    /* Guess we need no more than 100 bytes. */
-    int     i_size = 100;
-    char    *p = malloc( i_size );
-    int     n;
-
-    if( p == NULL )
-    {
-        *strp = NULL;
-        return -1;
-    }
-
-    for( ;; )
-    {
-        /* Try to print in the allocated space. */
-        n = vsnprintf( p, i_size, fmt, ap );
-
-        /* If that worked, return the string. */
-        if (n > -1 && n < i_size)
-        {
-            *strp = p;
-            return strlen( p );
-        }
-        /* Else try again with more space. */
-        if (n > -1)    /* glibc 2.1 */
-        {
-           i_size = n+1; /* precisely what is needed */
-        }
-        else           /* glibc 2.0 */
-        {
-           i_size *= 2;  /* twice the old size */
-        }
-        if( (p = realloc( p, i_size ) ) == NULL)
-        {
-            *strp = NULL;
-            return -1;
-        }
-    }
 }
-#endif
-
-/*****************************************************************************
- * asprintf:
- *****************************************************************************/
-#if !defined(HAVE_ASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
-int vlc_asprintf( char **strp, const char *fmt, ... )
-{
-    va_list args;
-    int i_ret;
-
-    va_start( args, fmt );
-    i_ret = vasprintf( strp, fmt, args );
-    va_end( args );
-
-    return i_ret;
-}
-#endif
 
 /*****************************************************************************
  * strtoll: convert a string to a 64 bits int.
@@ -249,9 +188,11 @@ long long vlc_strtoll( const char *nptr, char **endptr, int base )
  *
  * @return strlen(src)
  */
-#ifndef HAVE_STRLCPY
 extern size_t vlc_strlcpy (char *tgt, const char *src, size_t bufsize)
 {
+#ifdef HAVE_STRLCPY
+    return strlcpy (tgt, src, bufsize);
+#else
     size_t length;
 
     for (length = 1; (length < bufsize) && *src; length++)
@@ -264,8 +205,8 @@ extern size_t vlc_strlcpy (char *tgt, const char *src, size_t bufsize)
         length++;
 
     return length - 1;
-}
 #endif
+}
 
 /*****************************************************************************
  * vlc_*dir_wrapper: wrapper under Windows to return the list of drive letters

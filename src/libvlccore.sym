@@ -367,7 +367,6 @@ __var_Get
 __var_Set
 __var_TriggerCallback
 __var_Type
-vlc_asprintf
 vlc_b64_decode
 vlc_b64_decode_binary
 vlc_b64_decode_binary_to_buffer
@@ -431,6 +430,7 @@ __vlc_object_yield
 vlc_pthread_fatal
 vlc_rand_bytes
 vlc_sdp_Start
+vlc_strlcpy
 vlc_strtoll
 vlc_submodule_create
 __vlc_thread_create
@@ -440,7 +440,6 @@ __vlc_thread_set_priority
 vlc_threadvar_create
 vlc_threadvar_delete
 vlc_ureduce
-vlc_vasprintf
 VLC_Version
 vlc_wraptext
 vlm_Control
