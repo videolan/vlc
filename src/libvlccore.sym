@@ -379,7 +379,6 @@ vlc_b64_decode_binary_to_buffer
 vlc_b64_encode
 vlc_b64_encode_binary
 VLC_Changeset
-vlc_closedir
 VLC_CompileBy
 VLC_CompileDomain
 VLC_CompileHost
@@ -437,10 +436,8 @@ __vlc_object_unlock
 __vlc_object_wait
 __vlc_object_waitpipe
 __vlc_object_yield
-vlc_opendir
 vlc_pthread_fatal
 vlc_rand_bytes
-vlc_readdir
 vlc_recvmsg
 vlc_scandir
 vlc_sdp_Start
