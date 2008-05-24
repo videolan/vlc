@@ -722,7 +722,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 VLC_EXPORT( int, vlc_vasprintf, (char **, const char *, va_list ) );
 VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
-VLC_EXPORT( int64_t, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
+VLC_EXPORT( long long, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
 
 VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 

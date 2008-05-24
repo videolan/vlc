@@ -167,10 +167,12 @@ int vlc_asprintf( char **strp, const char *fmt, ... )
 /*****************************************************************************
  * strtoll: convert a string to a 64 bits int.
  *****************************************************************************/
-#if !defined( HAVE_STRTOLL )
-int64_t vlc_strtoll( const char *nptr, char **endptr, int base )
+long long vlc_strtoll( const char *nptr, char **endptr, int base )
 {
-    int64_t i_value = 0;
+#if defined( HAVE_STRTOLL )
+    return strtoll( nptr, endptr, base );
+#else
+    long long i_value = 0;
     int sign = 1, newbase = base ? base : 10;
 
     while( isspace(*nptr) ) nptr++;
@@ -233,8 +235,8 @@ int64_t vlc_strtoll( const char *nptr, char **endptr, int base )
     }
 
     return i_value * sign;
-}
 #endif
+}
 
 /**
  * Copy a string to a sized buffer. The result is always nul-terminated
