@@ -12,7 +12,6 @@ EXTRA_DIST = Modules.am
 BUILT_SOURCES =
 CLEANFILES = $(BUILT_SOURCES)
 
-if HAVE_PLUGINS
 LTLIBVLCCORE = $(top_builddir)/src/libvlccore.la
 
 AM_CFLAGS = `$(VLC_CONFIG) --cflags plugin $@`
@@ -20,16 +19,10 @@ AM_CXXFLAGS = `$(VLC_CONFIG) --cxxflags plugin $@`
 AM_OBJCFLAGS = `$(VLC_CONFIG) --objcflags plugin $@`
 AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-avoid-version -module -no-undefined \
+	-export-symbol-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
 	 `$(VLC_CONFIG) --ldflags plugin $@`
 AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` $(LTLIBVLCCORE)
-
-if HAVE_COMPILER_EXPORT
-AM_LDFLAGS += -export-dynamic
-else
-AM_LDFLAGS += -export-symbol-regex ^vlc_entry
-endif
-endif
 
 include $(srcdir)/Modules.am
 

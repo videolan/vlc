@@ -1080,8 +1080,6 @@ if test "${ac_cv_c_visibility_hidden}" != "no"; then
 fi
 fi
 
-AM_CONDITIONAL(HAVE_COMPILER_EXPORT, [test "$SYS" = "mingw32" -o "${ac_cv_c_visibility_hidden}" != "no"])
-
 dnl Check for -fvisibility-inlines-hidden (breaks x86_64 linkers)
 dnl AC_LANG_PUSH(C++)
 dnl     AC_CACHE_CHECK([if \$CXX accepts -fvisibility-inlines-hidden],

@@ -178,12 +178,8 @@ libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 libvlccore_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlccore_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
 libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
+	-export-symbols $(srcdir)/libvlccore.sym \
 	-version-info 0:0:0
-if HAVE_COMPILER_EXPORT
-libvlccore_la_LDFLAGS += -export-dynamic
-else
-libvlccore_la_LDFLAGS += -export-symbols $(srcdir)/libvlccore.sym 
-endif
 libvlccore_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` $(AM_LIBADD) $(LTLIBINTL)
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 
@@ -191,12 +187,9 @@ libvlc_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_la_LIBADD = libvlccore.la
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DMODULE_STRING=\"control\"
-libvlc_la_LDFLAGS = $(AM_LDFLAGS) -version-info 2:0:0
-if HAVE_COMPILER_EXPORT
-libvlc_la_LDFLAGS += -export-dynamic
-else
-libvlc_la_LDFLAGS += -export-symbols-regex '^_?(libvlc|mediacontrol)_.*'
-endif
+libvlc_la_LDFLAGS = $(AM_LDFLAGS) \
+	-version-info 2:0:0 \
+	-export-symbols-regex '^_?(libvlc|mediacontrol)_.*'
 
 EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_beos) \
