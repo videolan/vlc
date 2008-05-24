@@ -400,6 +400,11 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     size_t      i_data;
     size_t      i_copy;
 
+    if( p_access->info.b_eof )
+    {
+        return 0;
+    }
+
     i_data = 0;
 
     /* *** now send data if needed *** */
