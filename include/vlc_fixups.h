@@ -50,7 +50,7 @@ static inline char *strdup (const char *str)
 #ifndef HAVE_STRNLEN
 static inline size_t strnlen (const char *str, size_t max)
 {
-    const char *end = memchr (str, 0, max);
+    const char *end = (const char *) memchr (str, 0, max);
     return end ? (size_t)(end - str) : max;
 }
 #endif
@@ -59,7 +59,7 @@ static inline size_t strnlen (const char *str, size_t max)
 static inline char *strndup (const char *str, size_t max)
 {
     size_t len = strnlen (str, max);
-    char *res = malloc (len + 1);
+    char *res = (char *) malloc (len + 1);
     if (res)
     {
         memcpy (res, str, len);
