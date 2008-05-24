@@ -281,11 +281,7 @@ void  vlc_rewinddir(void *);
 #   include <dirent.h>
 void *vlc_wopendir (const wchar_t *);
 struct _wdirent *vlc_wreaddir (void *);
-int vlc_wclosedir (void *);
 void vlc_rewinddir (void *);
-#   define opendir Use_utf8_opendir_or_vlc_wopendir_instead!
-#   define readdir Use_utf8_readdir_or_vlc_wreaddir_instead!
-#   define closedir vlc_wclosedir
 #   define _wopendir vlc_wopendir
 #   define _wreaddir vlc_wreaddir
 #   define _wclosedir vlc_wclosedir
