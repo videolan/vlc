@@ -158,11 +158,11 @@ __intf_UserStringInput
 __intf_UserWarn
 __intf_UserYesNo
 IsUTF8
-libvlc_InternalInit
-libvlc_InternalCreate
-libvlc_InternalCleanup
 libvlc_InternalAddIntf
+libvlc_InternalCleanup
+libvlc_InternalCreate
 libvlc_InternalDestroy
+libvlc_InternalInit
 LocaleFree
 mdate
 __module_Exists
@@ -430,6 +430,7 @@ __vlc_object_yield
 vlc_pthread_fatal
 vlc_rand_bytes
 vlc_sdp_Start
+vlc_strcasestr
 vlc_strlcpy
 vlc_strtoll
 vlc_submodule_create
