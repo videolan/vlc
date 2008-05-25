@@ -1910,7 +1910,7 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
 	patch -p0 < Patches/gnutls-win32.patch
-	(cd $@; cd lgl; ln -sf alloca_.h alloca.h; rm vasprintf.c; touch vasprintf.c; rm vasnprintf.c; touch vasnprintf.c) 
+	(cd $@; cd lgl; ln -sf alloca_.h alloca.h;)
 endif
 
 .gnutls: gnutls .opencdk .gcrypt .gpg-error 
