@@ -42,16 +42,13 @@
 #include <vlc_charset.h>
 #include "vlc_strings.h"
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#elif defined( WIN32 ) && !defined( UNDER_CE )
+#if defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
+#   define lseek _lseeki64
+#else
+#   include <unistd.h>
 #endif
 
-/* For those platforms that don't use these */
-#ifndef STDOUT_FILENO
-#   define STDOUT_FILENO 1
-#endif
 #ifndef O_LARGEFILE
 #   define O_LARGEFILE 0
 #endif
@@ -103,8 +100,7 @@ struct sout_access_out_sys_t
 static int Open( vlc_object_t *p_this )
 {
     sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
-    int                 i_flags;
-    vlc_value_t         val;
+    int                 fd;
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
@@ -114,47 +110,40 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( !( p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
-    {
-        return( VLC_ENOMEM );
-    }
-
-    i_flags = O_RDWR|O_CREAT|O_LARGEFILE;
-
-    var_Get( p_access, SOUT_CFG_PREFIX "append", &val );
-    i_flags |= val.b_bool ? O_APPEND : O_TRUNC;
+    bool append = var_GetBool( p_access, SOUT_CFG_PREFIX "append" );
 
     if( !strcmp( p_access->psz_path, "-" ) )
     {
-#if defined(WIN32)
-        setmode (STDOUT_FILENO, O_BINARY);
+#ifdef WIN32
+        setmode (fileno (stdout), O_BINARY);
 #endif
-        p_access->p_sys->i_handle = STDOUT_FILENO;
+        fd = dup (fileno (stdout));
         msg_Dbg( p_access, "using stdout" );
     }
     else
     {
-        int fd;
         char *psz_tmp = str_format( p_access, p_access->psz_path );
         path_sanitize( psz_tmp );
 
-        fd = utf8_open( psz_tmp, i_flags, 0666 );
+        fd = utf8_open( psz_tmp, O_RDWR | O_CREAT | O_LARGEFILE |
+                        (append ? 0 : O_TRUNC), 0666 );
         free( psz_tmp );
+    }
 
-        if( fd == -1 )
-        {
-            msg_Err( p_access, "cannot open `%s' (%m)", p_access->psz_path );
-            free( p_access->p_sys );
-            return( VLC_EGENERIC );
-        }
-        p_access->p_sys->i_handle = fd;
+    if (fd == -1)
+    {
+        msg_Err( p_access, "cannot open `%s' (%m)", p_access->psz_path );
+        return VLC_EGENERIC;
     }
 
     p_access->pf_write = Write;
     p_access->pf_read  = Read;
     p_access->pf_seek  = Seek;
+    p_access->p_sys    = (void *)(intptr_t)fd;
 
-    msg_Dbg( p_access, "file access output opened (`%s')", p_access->psz_path );
+    msg_Dbg( p_access, "file access output opened (%s)", p_access->psz_path );
+    if (append)
+        lseek (fd, 0, SEEK_END);
 
     /* Update pace control flag */
     if( p_access->psz_access && !strcmp( p_access->psz_access, "stream" ) )
@@ -170,14 +159,7 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
 
-    if( strcmp( p_access->psz_path, "-" ) )
-    {
-        if( p_access->p_sys->i_handle )
-        {
-            close( p_access->p_sys->i_handle );
-        }
-    }
-    free( p_access->p_sys );
+    close( (intptr_t)p_access->p_sys );
 
     /* Update pace control flag */
     if( p_access->psz_access && !strcmp( p_access->psz_access, "stream" ) )
@@ -191,14 +173,8 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static ssize_t Read( sout_access_out_t *p_access, block_t *p_buffer )
 {
-    if( strcmp( p_access->psz_path, "-" ) )
-    {
-        return read( p_access->p_sys->i_handle, p_buffer->p_buffer,
-                     p_buffer->i_buffer );
-    }
-
-    msg_Err( p_access, "cannot read while using stdout" );
-    return VLC_EGENERIC;
+    return read( (intptr_t)p_access->p_sys, p_buffer->p_buffer,
+                 p_buffer->i_buffer );
 }
 
 /*****************************************************************************
@@ -212,7 +188,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     {
         block_t *p_next = p_buffer->p_next;;
 
-        i_write += write( p_access->p_sys->i_handle,
+        i_write += write( (intptr_t)p_access->p_sys,
                           p_buffer->p_buffer, p_buffer->i_buffer );
         block_Release( p_buffer );
 
@@ -227,17 +203,5 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-    if( strcmp( p_access->psz_path, "-" ) )
-    {
-#if defined( WIN32 ) && !defined( UNDER_CE )
-        return( _lseeki64( p_access->p_sys->i_handle, i_pos, SEEK_SET ) );
-#else
-        return( lseek( p_access->p_sys->i_handle, i_pos, SEEK_SET ) );
-#endif
-    }
-    else
-    {
-        msg_Err( p_access, "cannot seek while using stdout" );
-        return VLC_EGENERIC;
-    }
+    return lseek( (intptr_t)p_access->p_sys, i_pos, SEEK_SET );
 }
