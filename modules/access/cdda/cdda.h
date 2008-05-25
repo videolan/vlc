@@ -70,11 +70,6 @@
 #include <cdio/paranoia.h>
 #else
 #define CdIo_t CdIo
-typedef enum {
-  PARANOIA_MODE_DISABLE = 0x00, /* Note: We make use of 0 as being the same as false */
-  PARANOIA_MODE_OVERLAP = 0x04,
-  PARANOIA_MODE_FULL    = 0xff
-} paranoia_mode_t;
 #endif
  
 /*****************************************************************************
