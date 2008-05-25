@@ -3064,6 +3064,15 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
              LDFLAGS="${LDFLAGS_save}"
      fi])
 
+ AC_ARG_WITH(ffmpeg-dca,
+   [    --with-ffmpeg-dca     specify if ffmpeg has been compiled with dca support],
+   [
+     if test "$with_ffmpeg_dca" = "yes"; then
+             LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg} ${LIBS_ffmpeg}"
+             AC_CHECK_LIB(dca, dca_free, [ VLC_ADD_LIBS([ffmpeg],[-ldca]) ])
+             LDFLAGS="${LDFLAGS_save}"
+     fi])
+
  AC_ARG_WITH(ffmpeg-vorbis,
    [    --with-ffmpeg-vorbis    specify if ffmpeg has been compiled with vorbis support],
    [
