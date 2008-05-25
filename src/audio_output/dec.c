@@ -173,30 +173,21 @@ aout_input_t * __aout_DecNew( vlc_object_t * p_this,
                               audio_sample_format_t * p_format,
                               audio_replay_gain_t *p_replay_gain )
 {
-    if ( *pp_aout == NULL )
+    aout_instance_t *p_aout = *pp_aout;
+    if ( p_aout == NULL )
     {
-        /* Create an audio output if there is none. */
-        *pp_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+        msg_Dbg( p_this, "no aout present, spawning one" );
+        p_aout = aout_New( p_this );
 
-        if( *pp_aout == NULL )
-        {
-            msg_Dbg( p_this, "no aout present, spawning one" );
+        /* Everything failed, I'm a loser, I just wanna die */
+        if( p_aout == NULL )
+            return NULL;
 
-            *pp_aout = aout_New( p_this );
-            /* Everything failed, I'm a loser, I just wanna die */
-            if( *pp_aout == NULL )
-            {
-                return NULL;
-            }
-            vlc_object_attach( *pp_aout, p_this->p_libvlc );
-        }
-        else
-        {
-            vlc_object_release( *pp_aout );
-        }
+        vlc_object_attach( p_aout, p_this );
+        *pp_aout = p_aout;
     }
 
-    return DecNew( p_this, *pp_aout, p_format, p_replay_gain );
+    return DecNew( p_this, p_aout, p_format, p_replay_gain );
 }
 
 /*****************************************************************************

@@ -945,15 +945,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         vout_Destroy( p_vout );
     }
 
-    /* Free audio outputs */
-    msg_Dbg( p_libvlc, "removing all audio outputs" );
-    while( (p_aout = vlc_object_find( p_libvlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
-    {
-        vlc_object_detach( (vlc_object_t *)p_aout );
-        vlc_object_release( (vlc_object_t *)p_aout );
-        aout_Delete( p_aout );
-    }
-
 #ifdef ENABLE_SOUT
     playlist_t         * p_playlist;
     sout_instance_t    * p_sout;
