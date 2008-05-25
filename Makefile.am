@@ -353,7 +353,7 @@ EXTRA_SCRIPTS = $(ALL_ALIASES)
 
 dist_noinst_SCRIPTS += make-alias
 
-MKALIAS = bindir="$(bindir)" transform="$(transform)" $(top_srcdir)/make-alias $@
+MKALIAS = bindir="$(bindir)" transform="$(transform)" program_prefix="$(program_prefix)" program_suffix="$(program_suffix)" $(top_srcdir)/make-alias $@
 
 cvlc: make-alias
 	$(MKALIAS) dummy

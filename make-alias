@@ -7,7 +7,7 @@ IFACE="$2"
 
 cat > "$OUT.tmp" << EOF
 #! /bin/sh
-exec $bindir/`echo vlc | sed -e "$transform"` -I "$IFACE" "\$@"
+exec $bindir/`echo "$program_prefix"vlc"$program_suffix" | sed -e "$transform"` -I "$IFACE" "\$@"
 EOF
 
 chmod +x "$OUT.tmp"
