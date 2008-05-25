@@ -26,10 +26,9 @@
 #ifndef LIBVLC_FIXUPS_H
 # define LIBVLC_FIXUPS_H 1
 
+#ifndef HAVE_STRDUP
 # include <string.h>
 # include <stdlib.h>
-
-#ifndef HAVE_STRDUP
 static inline char *strdup (const char *str)
 {
     size_t len = strlen (str) + 1;
@@ -40,6 +39,8 @@ static inline char *strdup (const char *str)
 #endif
 
 #ifndef HAVE_VASPRINTF
+# include <stdio.h>
+# include <stdlib.h>
 # include <stdarg.h>
 static inline int vasprintf (char **strp, const char *fmt, va_list ap)
 {
@@ -53,6 +54,7 @@ static inline int vasprintf (char **strp, const char *fmt, va_list ap)
 #endif
 
 #ifndef HAVE_ASPRINTF
+# include <stdio.h>
 # include <stdarg.h>
 static inline int asprintf (char **strp, const char *fmt, ...)
 {
@@ -66,6 +68,7 @@ static inline int asprintf (char **strp, const char *fmt, ...)
 #endif
 
 #ifndef HAVE_STRNLEN
+# include <string.h>
 static inline size_t strnlen (const char *str, size_t max)
 {
     const char *end = (const char *) memchr (str, 0, max);
@@ -74,6 +77,8 @@ static inline size_t strnlen (const char *str, size_t max)
 #endif
 
 #ifndef HAVE_STRNDUP
+# include <string.h>
+# include <stdlib.h>
 static inline char *strndup (const char *str, size_t max)
 {
     size_t len = strnlen (str, max);
