@@ -678,10 +678,10 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #endif
 
 /* Format string sanity checks */
-#ifdef HAVE_ATTRIBUTE_FORMAT
-#   define ATTRIBUTE_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
+#ifdef __GNUC__
+#   define LIBVLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
 #else
-#   define ATTRIBUTE_FORMAT(x,y)
+#   define LIBVLC_FORMAT(x,y)
 #endif
 
 /* Alignment of critical static data structures */

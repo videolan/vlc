@@ -1115,19 +1115,6 @@ if test "${ac_cv_c_attribute_aligned}" != "0"; then
         [${ac_cv_c_attribute_aligned}],[Maximum supported data alignment])
 fi
 
-dnl Checks for __attribute__(format()) directive
-AC_CACHE_CHECK([__attribute__ ((format ())) support with function pointers],
-    [ac_cv_c_attribute_format],
-    [ac_cv_c_attribute_format=no
-        CFLAGS="${CFLAGS_save} -Werror"
-        AC_TRY_COMPILE([],
-        [static void (*pf_printf)(const char *, ...) __attribute__ ((format(printf,1,2)));(void)pf_printf;],
-        [ac_cv_c_attribute_format=yes])
-        CFLAGS="${CFLAGS_save}"])
-if test "${ac_cv_c_attribute_format}" != "no"; then
-    AC_DEFINE(HAVE_ATTRIBUTE_FORMAT, 1, Support for __attribute__((format())) with function pointers)
-fi
-
 dnl Check for __attribute__((packed))
 AC_CACHE_CHECK([for __attribute__((packed))],
   [ac_cv_c_attribute_packed],

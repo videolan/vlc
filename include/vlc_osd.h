@@ -595,7 +595,7 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, bool b_value )
  */
 VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
 VLC_EXPORT( int, osd_ShowTextAbsolute, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
-VLC_EXPORT( void,osd_Message, ( spu_t *, int, char *, ... ) ATTRIBUTE_FORMAT( 3, 4 ) );
+VLC_EXPORT( void,osd_Message, ( spu_t *, int, char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
 
 /**
  * Default feedback images
@@ -650,7 +650,7 @@ VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, const char *, te
  * \param i_channel Subpicture channel
  * \param psz_format printf style formatting
  **/
-VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, int, const char *, ... ) ATTRIBUTE_FORMAT( 3, 4 ) );
+VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, int, const char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
 
 /**
  * Same as __vlc_OSDMessage() but with automatic casting
