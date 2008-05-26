@@ -3237,7 +3237,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     pid->es->fmt.i_cat = SPU_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 't', 'e', 'l', 'x' );
                     pid->es->fmt.i_extra = p_dr->i_length;
-                    pid->es->fmt.p_extra = malloc( p_dr->i_length );
+                    pid->es->fmt.p_extra = p_dr->i_length ?
+                        malloc( p_dr->i_length ) : NULL;
                     if( pid->es->fmt.p_extra )
                         memcpy( pid->es->fmt.p_extra, p_dr->p_data,
                                 p_dr->i_length );
