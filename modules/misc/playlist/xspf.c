@@ -40,6 +40,8 @@
 #include <vlc_charset.h>
 #include "xspf.h"
 
+#include <assert.h>
+
 /**
  * \brief Prints the XSPF header to file, writes each item by xspf_export_item()
  * and closes the open xml elements

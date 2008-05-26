@@ -31,6 +31,8 @@
 #include <vlc_charset.h>
 #include <limits.h>
 
+#include <assert.h>
+
 #define TEMPO_MIN  20
 #define TEMPO_MAX 250 /* Beats per minute */
 

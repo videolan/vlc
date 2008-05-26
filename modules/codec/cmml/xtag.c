@@ -36,6 +36,8 @@
 
 #include <xlist.h>
 
+#include <assert.h>
+
 #undef XTAG_DEBUG
 
 #undef FALSE

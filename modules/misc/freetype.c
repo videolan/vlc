@@ -73,6 +73,8 @@
 #include <fontconfig/fontconfig.h>
 #endif
 
+#include <assert.h>
+
 typedef struct line_desc_t line_desc_t;
 
 /*****************************************************************************

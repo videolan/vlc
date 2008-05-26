@@ -49,6 +49,7 @@ woven in by Terry Thorsen 1/2003.
 #   include <errno.h>
 #endif
 
+#include <assert.h>
 
 #ifndef local
 #  define local static

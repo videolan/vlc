@@ -42,6 +42,8 @@
 
 #include "vlc_block_helper.h"
 
+#include <assert.h>
+
 /* AAC Config in ES:
  *
  * AudioObjectType          5 bits

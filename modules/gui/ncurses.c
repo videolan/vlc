@@ -57,6 +57,8 @@
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
 
+#include <assert.h>
+
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif

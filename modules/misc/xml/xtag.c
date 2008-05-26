@@ -40,6 +40,8 @@
 #include <ctype.h>
 #include <stdarg.h>
 
+#include <assert.h>
+
 #undef XTAG_DEBUG
 
 typedef struct _XList

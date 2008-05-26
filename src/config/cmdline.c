@@ -40,6 +40,8 @@
 #include "configuration.h"
 #include "modules/modules.h"
 
+#include <assert.h>
+
 /*****************************************************************************
  * config_LoadCmdLine: parse command line
  *****************************************************************************

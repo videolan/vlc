@@ -34,6 +34,8 @@
 #include <vlc_sout.h>
 #include "rtp.h"
 
+#include <assert.h>
+
 /*
  * NOTE on RTCP implementation:
  * - there is a single sender (us), no conferencing here! => n = sender = 1,
