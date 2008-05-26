@@ -575,8 +575,6 @@ static struct
       VIDEO_ES, "MPEG-1 Video" },
     { VLC_FOURCC('m','p','g','1'), CODEC_ID_MPEG1VIDEO,
       VIDEO_ES, "MPEG-1 Video" },
-    { VLC_FOURCC('m','p','e','g'), CODEC_ID_MPEG1VIDEO,
-      VIDEO_ES, "MPEG-1 Video" },
     { VLC_FOURCC('P','I','M','1'), CODEC_ID_MPEG1VIDEO,
       VIDEO_ES, "Pinnacle DC1000 (MPEG-1 Video)" },
 
