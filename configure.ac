@@ -3239,7 +3239,7 @@ dnl Trying with pkg-config
        VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}])
        VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
        AC_CHECK_LIB(swscale, sws_getContext,
-         [AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])],[],[-lavutil -lm])
+         [AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])],[],[${SWSCALE_LIBS}])
        ],[ true ])
      VLC_RESTORE_FLAGS
     ],[
