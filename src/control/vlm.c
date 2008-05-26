@@ -362,7 +362,7 @@ void libvlc_vlm_seek_media( libvlc_instance_t *p_instance, char *psz_name,
 }
 
 #define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, ret, code )\
-returnType libvlc_vlm_get_media_## attr( libvlc_instance_t *p_instance, \
+returnType libvlc_vlm_get_media_instance_## attr( libvlc_instance_t *p_instance, \
                         char *psz_name, int i_instance, libvlc_exception_t *p_exception ) \
 { \
     vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name, i_instance, \
