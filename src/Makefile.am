@@ -514,8 +514,7 @@ check-local:
 		fi ; \
 	done
 	$(srcdir)/check_headers $(pkginclude_HEADERS)
-# Hmm, this test should not fail:
-	-$(srcdir)/check_headers $(pluginsinclude_HEADERS)
+	$(srcdir)/check_headers $(pluginsinclude_HEADERS)
 
 FORCE:
 	@echo "Generated source cannot be phony. Go away." >&2
