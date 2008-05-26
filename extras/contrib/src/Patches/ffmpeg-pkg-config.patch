@@ -8,7 +8,7 @@ Index: configure
  requires=$5
 +libdir_pc=`echo $libdir|sed s'|$(PREFIX)|${prefix}|'`
 +incdir_pc=`echo $incdir|sed 's|$(PREFIX)|${prefix}|'`
- cat <<EOF > $name.pc
+ cat <<EOF >$name.pc
  prefix=$prefix
  exec_prefix=\${prefix}
 -libdir=$libdir
