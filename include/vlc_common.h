@@ -89,17 +89,21 @@ typedef int64_t mtime_t;
  */
 typedef uint32_t vlc_fourcc_t;
 
-static inline uint32_t VLC_FOURCC (uint8_t a, uint8_t b, uint8_t c, uint8_t d)
-{
-    union { uint8_t b[4]; uint32_t dw; } v = { { a, b, c, d } };
-    return v.dw;
-}
+#ifdef WORDS_BIGENDIAN
+#   define VLC_FOURCC( a, b, c, d ) \
+        ( ((uint32_t)d) | ( ((uint32_t)c) << 8 ) \
+           | ( ((uint32_t)b) << 16 ) | ( ((uint32_t)a) << 24 ) )
+#   define VLC_TWOCC( a, b ) \
+        ( (uint16_t)(b) | ( (uint16_t)(a) << 8 ) )
 
-static inline uint16_t VLC_TWOCC (uint8_t a, uint8_t b)
-{
-    union { uint8_t b[2]; uint16_t w; } v = { { a, b } };
-    return v.w;
-}
+#else
+#   define VLC_FOURCC( a, b, c, d ) \
+        ( ((uint32_t)a) | ( ((uint32_t)b) << 8 ) \
+           | ( ((uint32_t)c) << 16 ) | ( ((uint32_t)d) << 24 ) )
+#   define VLC_TWOCC( a, b ) \
+        ( (uint16_t)(a) | ( (uint16_t)(b) << 8 ) )
+
+#endif
 
 static inline void __vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
 {
