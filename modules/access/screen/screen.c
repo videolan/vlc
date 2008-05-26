@@ -51,6 +51,24 @@
     "of predefined height (16 might be a good value, and 0 means disabled)." )
 #endif
 
+#ifdef SCREEN_SUBSCREEN
+#define TOP_TEXT N_( "Subscreen top left corner" )
+#define TOP_LONGTEXT N_( \
+    "Top coordinate of the subscreen top left corner." )
+
+#define LEFT_TEXT N_( "Subscreen top left corner" )
+#define LEFT_LONGTEXT N_( \
+    "Left coordinate of the subscreen top left corner." )
+
+#define WIDTH_TEXT N_( "Subscreen width" )
+#define WIDTH_LONGTEXT N_( \
+    "Subscreen width." )
+
+#define HEIGHT_TEXT N_( "Subscreen height" )
+#define HEIGHT_LONGTEXT N_( \
+    "Subscreen height."  )
+#endif
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -69,6 +87,13 @@ vlc_module_begin();
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, true );
     add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, true );
+
+#ifdef SCREEN_SUBSCREEN
+    add_integer( "screen-top", 0, NULL, TOP_TEXT, TOP_LONGTEXT, true );
+    add_integer( "screen-left", 0, NULL, LEFT_TEXT, LEFT_LONGTEXT, true );
+    add_integer( "screen-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true );
+    add_integer( "screen-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
+#endif
 
 #ifdef WIN32
     add_integer( "screen-fragment-size", 0, NULL, FRAGS_TEXT,
@@ -110,6 +135,20 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_incr = 1000000 / val.f_float;
     p_sys->i_next_date = 0;
 
+#ifdef SCREEN_SUBSCREEN
+    p_sys->i_top = var_CreateGetInteger( p_demux, "screen-top" );
+    p_sys->i_left = var_CreateGetInteger( p_demux, "screen-left" );
+    p_sys->i_width = var_CreateGetInteger( p_demux, "screen-width" );
+    p_sys->i_height = var_CreateGetInteger( p_demux, "screen-height" );
+    if( p_sys->i_width > 0 && p_sys->i_height > 0 )
+        msg_Dbg( p_demux, "capturing subscreen top: %d, left: %d, "
+                          "width: %d, height: %d",
+                          p_sys->i_top,
+                          p_sys->i_left,
+                          p_sys->i_width,
+                          p_sys->i_height );
+#endif
+
     if( screen_InitCapture( p_demux ) != VLC_SUCCESS )
     {
         free( p_sys );
@@ -119,6 +158,24 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_demux, "screen width: %i, height: %i, depth: %i",
              p_sys->fmt.video.i_width, p_sys->fmt.video.i_height,
              p_sys->fmt.video.i_bits_per_pixel );
+
+#ifdef SCREEN_SUBSCREEN
+    if( p_sys->i_width > 0 && p_sys->i_height > 0 )
+    {
+        if( p_sys->i_left + p_sys->i_width > p_sys->fmt.video.i_width ||
+            p_sys->i_top + p_sys->i_height > p_sys->fmt.video.i_height )
+        {
+            msg_Err( p_demux, "subscreen region overflows the screen" );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+        else
+        {
+            p_sys->fmt.video.i_width = p_sys->i_width;
+            p_sys->fmt.video.i_height = p_sys->i_height;
+        }
+    }
+#endif
 
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
 

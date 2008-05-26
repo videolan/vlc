@@ -25,6 +25,10 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 
+#if !defined( HAVE_WIN32 ) && !defined( HAVE_BEOS ) && !defined( HAVE_DARWIN )
+#   define SCREEN_SUBSCREEN
+#endif
+
 typedef struct screen_data_t screen_data_t;
 
 struct demux_sys_t
@@ -35,6 +39,13 @@ struct demux_sys_t
     float f_fps;
     mtime_t i_next_date;
     int i_incr;
+
+#ifdef SCREEN_SUBSCREEN
+    unsigned int i_top;
+    unsigned int i_left;
+    unsigned int i_width;
+    unsigned int i_height;
+#endif
 
     screen_data_t *p_data;
 };

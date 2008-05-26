@@ -114,7 +114,7 @@ block_t *screen_Capture( demux_t *p_demux )
     int i_size;
 
     image = XGetImage( p_display, DefaultRootWindow( p_display ),
-                       0, 0, p_sys->fmt.video.i_width,
+                       p_sys->i_left, p_sys->i_top, p_sys->fmt.video.i_width,
                        p_sys->fmt.video.i_height, AllPlanes, ZPixmap );
 
     if( !image )
@@ -132,7 +132,7 @@ block_t *screen_Capture( demux_t *p_demux )
         return 0;
     }
 
-    memcpy( p_block->p_buffer, image->data, i_size );
+    vlc_memcpy( p_block->p_buffer, image->data, i_size );
 
     XDestroyImage( image );
 
