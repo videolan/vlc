@@ -43,7 +43,7 @@
 
 /* Explanation:
  *
- * if HAVE_DYNAMIC_PLUGINS is NOT set, we will need:
+ * if linking a module statically, we will need:
  * #define MODULE_FUNC( zog ) module_foo_zog
  *
  * this can't easily be done with the C preprocessor, thus a few ugly hacks.

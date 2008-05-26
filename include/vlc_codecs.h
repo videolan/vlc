@@ -28,6 +28,12 @@
 #ifndef _VLC_CODECS_H
 #define _VLC_CODECS_H 1
 
+#ifdef HAVE_ATTRIBUTE_PACKED
+#   define ATTR_PACKED __attribute__((__packed__))
+#else
+#   error FIXME
+#endif
+
 /* Structures exported to the demuxers and decoders */
 
 #if !(defined _GUID_DEFINED || defined GUID_DEFINED)

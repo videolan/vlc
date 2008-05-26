@@ -515,13 +515,6 @@ __vlc_gc_init( gc_object_t * p_gc, void (*pf_destructor)( gc_object_t * ),
 /*****************************************************************************
  * Macros and inline functions
  *****************************************************************************/
-#ifdef NTOHL_IN_SYS_PARAM_H
-#   include <sys/param.h>
-
-#elif !defined(WIN32) && !defined( UNDER_CE )
-#   include <netinet/in.h>
-
-#endif /* NTOHL_IN_SYS_PARAM_H || WIN32 */
 
 /* CEIL: division with round to nearest greater integer */
 #define CEIL(n, d)  ( ((n) / (d)) + ( ((n) % (d)) ? 1 : 0) )
@@ -696,10 +689,6 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
 #else
 #   define ATTR_ALIGN(align)
-#endif
-
-#ifdef HAVE_ATTRIBUTE_PACKED
-#   define ATTR_PACKED __attribute__((__packed__))
 #endif
 
 /* */
