@@ -33,7 +33,7 @@
 
 #include <vlc/vlc.h>
 
-#include "iso_lang.h"
+#include "vlc_iso_lang.h"
 
 /*****************************************************************************
  * Local tables

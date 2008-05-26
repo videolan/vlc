@@ -38,7 +38,7 @@
 #include <vlc_codecs.h>
 #include <vlc_block.h>
 
-#include "iso_lang.h"
+#include <vlc_iso_lang.h>
 
 #include "bits.h"
 #include "pes.h"

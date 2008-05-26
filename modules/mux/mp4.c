@@ -39,7 +39,7 @@
 #include <time.h>
 #endif
 
-#include "iso_lang.h"
+#include <vlc_iso_lang.h>
 #include "vlc_meta.h"
 
 /*****************************************************************************

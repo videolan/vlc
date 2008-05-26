@@ -41,7 +41,7 @@
 #include "input_internal.h"
 
 #include "vlc_playlist.h"
-#include "iso_lang.h"
+#include <vlc_iso_lang.h>
 /* FIXME we should find a better way than including that */
 #include "../text/iso-639_def.h"
 

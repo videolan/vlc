@@ -41,7 +41,7 @@
 #include "bits.h"
 #include "pes.h"
 
-#include "iso_lang.h"
+#include <vlc_iso_lang.h>
 
 /*****************************************************************************
  * Module descriptor

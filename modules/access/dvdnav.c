@@ -52,7 +52,7 @@
 #endif
 
 #include "vlc_keys.h"
-#include "iso_lang.h"
+#include "vlc_iso_lang.h"
 
 /* FIXME we should find a better way than including that */
 #include "../../src/text/iso-639_def.h"

@@ -43,7 +43,7 @@
 
 
 #include <vlc_codecs.h>               /* BITMAPINFOHEADER, WAVEFORMATEX */
-#include "iso_lang.h"
+#include <vlc_iso_lang.h>
 #include "vlc_meta.h"
 #include <vlc_charset.h>
 #include <vlc_input.h>

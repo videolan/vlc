@@ -38,7 +38,7 @@
 
 #include <vlc_interface.h>
 
-#include "iso_lang.h"
+#include <vlc_iso_lang.h>
 
 #include "../demux/ps.h"
 

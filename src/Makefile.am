@@ -70,7 +70,6 @@ pluginsinclude_HEADERS = \
 	$(NULL)
 
 noinst_HEADERS = \
-	../include/iso_lang.h \
 	../include/mmx.h \
 	../include/vlc_aout.h \
 	../include/vlc_codec_synchro.h \
@@ -84,6 +83,7 @@ noinst_HEADERS = \
 	../include/vlc_input.h \
 	../include/vlc_interface.h \
 	../include/vlc_intf_strings.h \
+	../include/vlc_iso_lang.h \
 	../include/vlc_keys.h \
 	../include/vlc_network.h \
 	../include/vlc_osd.h \
