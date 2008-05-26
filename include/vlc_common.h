@@ -89,21 +89,17 @@ typedef int64_t mtime_t;
  */
 typedef uint32_t vlc_fourcc_t;
 
-#ifdef WORDS_BIGENDIAN
-#   define VLC_FOURCC( a, b, c, d ) \
-        ( ((uint32_t)d) | ( ((uint32_t)c) << 8 ) \
-           | ( ((uint32_t)b) << 16 ) | ( ((uint32_t)a) << 24 ) )
-#   define VLC_TWOCC( a, b ) \
-        ( (uint16_t)(b) | ( (uint16_t)(a) << 8 ) )
+static inline uint32_t VLC_FOURCC (uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+{
+    union { uint8_t b[4]; uint32_t dw; } v = { { a, b, c, d } };
+    return v.dw;
+}
 
-#else
-#   define VLC_FOURCC( a, b, c, d ) \
-        ( ((uint32_t)a) | ( ((uint32_t)b) << 8 ) \
-           | ( ((uint32_t)c) << 16 ) | ( ((uint32_t)d) << 24 ) )
-#   define VLC_TWOCC( a, b ) \
-        ( (uint16_t)(a) | ( (uint16_t)(b) << 8 ) )
-
-#endif
+static inline uint16_t VLC_TWOCC (uint8_t a, uint8_t b)
+{
+    union { uint8_t b[2]; uint16_t w; } v = { { a, b } };
+    return v.w;
+}
 
 static inline void __vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
 {
@@ -669,13 +665,19 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #define ntoh16(i) ntohs(i)
 #define ntoh32(i) ntohl(i)
 
-#ifdef WORDS_BIGENDIAN
-#   define hton64(i)   ( i )
-#   define ntoh64(i)   ( i )
-#else
-#   define hton64(i)   U64_AT(&i)
-#   define ntoh64(i)   U64_AT(&i)
-#endif
+static inline uint64_t ntoh64 (uint64_t ll)
+{
+    union { uint64_t qw; uint8_t b[16]; } v = { ll };
+    return ((uint64_t)v.b[0] << 56)
+         | ((uint64_t)v.b[1] << 48)
+         | ((uint64_t)v.b[2] << 40)
+         | ((uint64_t)v.b[3] << 32)
+         | ((uint64_t)v.b[4] << 24)
+         | ((uint64_t)v.b[5] << 16)
+         | ((uint64_t)v.b[6] <<  8)
+         | ((uint64_t)v.b[7] <<  0);
+}
+#define hton64(i) ntoh64(i)
 
 /* Format string sanity checks */
 #ifdef __GNUC__
