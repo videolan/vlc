@@ -258,11 +258,10 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
 {
     uint8_t *p_src, *p_dst;
-    int i_src, i_plane, i_line, i_width;
+    int i_plane, i_line, i_width;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     p_src = p_block->p_buffer;
-    i_src = p_block->i_buffer;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
