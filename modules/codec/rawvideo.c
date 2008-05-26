@@ -257,29 +257,26 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
  *****************************************************************************/
 static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
 {
-    uint8_t *p_src, *p_dst;
-    int i_plane, i_line, i_width;
+    int i_plane;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    p_src = p_block->p_buffer;
+    uint8_t *p_src = p_block->p_buffer;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
-        p_dst = p_pic->p[i_plane].p_pixels;
-        i_width = p_pic->p[i_plane].i_pitch;
+        int i_pitch = p_pic->p[i_plane].i_pitch;
+        int i_visible_pitch = p_pic->p[i_plane].i_visible_pitch;
+        int i_visible_lines = p_pic->p[i_plane].i_visible_lines;
+        uint8_t *p_dst = p_pic->p[i_plane].p_pixels;
+        uint8_t *p_dst_end = p_dst+i_pitch*i_visible_lines;
 
         if( p_sys->b_invert )
-            p_src += (i_width * (p_pic->p[i_plane].i_visible_lines - 1));
-
-        for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
-        {
-            vlc_memcpy( p_dst, p_src, i_width );
-            p_src += p_sys->b_invert ? -i_width : i_width;
-            p_dst += i_width;
-        }
-
-        if( p_sys->b_invert )
-            p_src += (i_width * (p_pic->p[i_plane].i_visible_lines + 1));
+            for( p_dst_end -= i_pitch; p_dst <= p_dst_end;
+                 p_dst_end -= i_pitch, p_src += i_visible_pitch )
+                vlc_memcpy( p_dst_end, p_src, i_visible_pitch );
+        else
+            for( ; p_dst < p_dst_end;
+                 p_dst += i_pitch, p_src += i_visible_pitch )
+                vlc_memcpy( p_dst, p_src, i_visible_pitch );
     }
 }
 
