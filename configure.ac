@@ -1138,16 +1138,6 @@ if test "${ac_cv_c_attribute_packed}" != "no"; then
   AC_DEFINE(HAVE_ATTRIBUTE_PACKED, 1, Support for __attribute__((packed)) for structs)
 fi
 
-dnl Check for __attribute__((visibility()))
-AC_CACHE_CHECK([for __attribute__((visibility()))],
-  [ac_cv_c_attribute_visibility],
-  [ac_cv_c_attribute_visibility=no
-   AC_TRY_COMPILE(, [extern __attribute__((visibility("default"))) int foo(int);],
-                    [ac_cv_c_attribute_visibility=yes])])
-if test "${ac_cv_c_attribute_visibility}" != "no"; then
-  AC_DEFINE(HAVE_ATTRIBUTE_VISIBILITY, 1, Support for __attribute__((visibility())) for exporting symbols)
-fi
-
 dnl
 dnl  Check the CPU
 dnl
