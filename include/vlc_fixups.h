@@ -204,6 +204,13 @@ static inline struct tm *gmtime_r (const time_t *timep, struct tm *result)
 }
 #endif
 
+/* Alignment of critical static data structures */
+#ifdef ATTRIBUTE_ALIGNED_MAX
+#   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
+#else
+#   define ATTR_ALIGN(align)
+#endif
+
 #ifndef HAVE_USELOCALE
 typedef void *locale_t;
 # define newlocale( a, b, c ) ((locale_t)0)

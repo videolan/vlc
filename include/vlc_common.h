@@ -684,13 +684,6 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define LIBVLC_FORMAT(x,y)
 #endif
 
-/* Alignment of critical static data structures */
-#ifdef ATTRIBUTE_ALIGNED_MAX
-#   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
-#else
-#   define ATTR_ALIGN(align)
-#endif
-
 /* */
 #define VLC_UNUSED(x) (void)(x)
 
