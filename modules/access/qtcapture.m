@@ -70,7 +70,7 @@ vlc_module_end();
 }
 - (id)init;
 - (void)outputVideoFrame:(CVImageBufferRef)videoFrame withSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection;
-- (BOOL)copyCurrentFrameToBuffer:(void *)buffer;
+- (mtime_t)copyCurrentFrameToBuffer:(void *)buffer;
 @end
 
 /* Apple sample code */
