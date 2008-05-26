@@ -123,8 +123,12 @@ block_t *screen_Capture( demux_t *p_demux )
             &root, &child, &root_x, &root_y, &win_x, &win_y,
             &mask ) )
         {
+            root_x -= p_sys->i_width/2;
+            if( root_x < 0 ) root_x = 0;
             p_sys->i_left = __MIN( (unsigned int)root_x,
                                    p_sys->i_screen_width - p_sys->i_width );
+            root_y -= p_sys->i_height/2;
+            if( root_y < 0 ) root_y = 0;
             p_sys->i_top = __MIN( (unsigned int)root_y,
                                   p_sys->i_screen_height - p_sys->i_height );
         }
