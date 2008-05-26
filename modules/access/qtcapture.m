@@ -127,6 +127,10 @@ vlc_module_end();
 
 @end
 
+/*****************************************************************************
+* Struct
+*****************************************************************************/
+
 struct demux_sys_t {
    QTCaptureSession * session;
    VLCDecompressedVideoOutput * output;
@@ -135,7 +139,10 @@ struct demux_sys_t {
 };
 
 
-int qtchroma_to_fourcc( int i_qt )
+/*****************************************************************************
+* qtchroma_to_fourcc
+*****************************************************************************/
+static int qtchroma_to_fourcc( int i_qt )
 {
     static struct
     {
