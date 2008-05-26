@@ -41,10 +41,14 @@ struct demux_sys_t
     int i_incr;
 
 #ifdef SCREEN_SUBSCREEN
+    bool b_follow_mouse;
+    unsigned int i_screen_height;
+    unsigned int i_screen_width;
+
     unsigned int i_top;
     unsigned int i_left;
-    unsigned int i_width;
     unsigned int i_height;
+    unsigned int i_width;
 #endif
 
     screen_data_t *p_data;

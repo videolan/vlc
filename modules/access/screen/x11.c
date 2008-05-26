@@ -113,6 +113,26 @@ block_t *screen_Capture( demux_t *p_demux )
     XImage *image;
     int i_size;
 
+    if( p_sys->b_follow_mouse )
+    {
+        Window root = DefaultRootWindow( p_display ), child;
+        int root_x, root_y;
+        int win_x, win_y;
+        unsigned int mask;
+        if( XQueryPointer( p_display, root,
+            &root, &child, &root_x, &root_y, &win_x, &win_y,
+            &mask ) )
+        {
+            p_sys->i_left = __MIN( (unsigned int)root_x,
+                                   p_sys->i_screen_width - p_sys->i_width );
+            p_sys->i_top = __MIN( (unsigned int)root_y,
+                                  p_sys->i_screen_height - p_sys->i_height );
+        }
+        else
+            msg_Dbg( p_demux, "XQueryPointer() failed" );
+
+    }
+
     image = XGetImage( p_display, DefaultRootWindow( p_display ),
                        p_sys->i_left, p_sys->i_top, p_sys->fmt.video.i_width,
                        p_sys->fmt.video.i_height, AllPlanes, ZPixmap );

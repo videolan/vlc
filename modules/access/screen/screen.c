@@ -67,6 +67,10 @@
 #define HEIGHT_TEXT N_( "Subscreen height" )
 #define HEIGHT_LONGTEXT N_( \
     "Subscreen height."  )
+
+#define FOLLOW_MOUSE_TEXT N_( "Follow the mouse" )
+#define FOLLOW_MOUSE_LONGTEXT N_( \
+    "Follow the mouse when capturing a subscreen" )
 #endif
 
 static int  Open ( vlc_object_t * );
@@ -93,6 +97,9 @@ vlc_module_begin();
     add_integer( "screen-left", 0, NULL, LEFT_TEXT, LEFT_LONGTEXT, true );
     add_integer( "screen-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true );
     add_integer( "screen-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
+    add_integer( "screen-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
+    add_bool( "screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
+              FOLLOW_MOUSE_LONGTEXT, true );
 #endif
 
 #ifdef WIN32
@@ -171,8 +178,14 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
+            p_sys->i_screen_width = p_sys->fmt.video.i_width;
+            p_sys->i_screen_height = p_sys->fmt.video.i_height;
             p_sys->fmt.video.i_width = p_sys->i_width;
             p_sys->fmt.video.i_height = p_sys->i_height;
+            p_sys->b_follow_mouse = var_CreateGetInteger( p_demux,
+                                                "screen-follow-mouse" );
+            if( p_sys->b_follow_mouse )
+                msg_Dbg( p_demux, "mouse following enabled" );
         }
     }
 #endif
