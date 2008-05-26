@@ -335,7 +335,7 @@ static void SigHandler( int i_signal )
                      "operating system.\n", psz_capability );
     fprintf( stderr, "         some optimizations will be disabled unless "
                      "you upgrade your OS\n" );
-#   if defined( SYS_LINUX )
+#   if defined( __linux__ )
     fprintf( stderr, "         (for instance Linux kernel 2.4.x or later)\n" );
 #   endif
 #endif

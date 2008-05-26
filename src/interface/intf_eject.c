@@ -47,7 +47,7 @@
 #   include <dvd.h>
 #endif
 
-#if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
+#if defined(__linux__) && defined(HAVE_LINUX_VERSION_H)
 #   include <linux/version.h>
     /* handy macro found in 2.1 kernels, but not in older ones */
 #   ifndef KERNEL_VERSION
@@ -80,7 +80,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
+#if defined(__linux__) && defined(HAVE_LINUX_VERSION_H)
 static int EjectSCSI ( int i_fd );
 #endif
 
@@ -192,7 +192,7 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
         return VLC_EGENERIC;
     }
 
-#if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
+#if defined(__linux__) && defined(HAVE_LINUX_VERSION_H)
     /* Try a simple ATAPI eject */
     i_ret = ioctl( i_fd, CDROMEJECT, 0 );
 
@@ -222,7 +222,7 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
 
 /* The following functions are local */
 
-#if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
+#if defined(__linux__) && defined(HAVE_LINUX_VERSION_H)
 /*****************************************************************************
  * Eject using SCSI commands. Return 0 if successful
  *****************************************************************************/
