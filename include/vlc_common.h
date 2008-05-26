@@ -387,38 +387,20 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * Plug-in stuff
  *****************************************************************************/
 
-#if defined (WIN32) && defined (DLL_EXPORT)
-#  ifdef __cplusplus
-#    define VLC_PUBLIC_API extern "C" __declspec(dllexport)
-#    define VLC_PRIVATE_API extern "C" __declspec(dllexport)
-#    define   VLC_EXPORT( type, name, args ) extern "C" __declspec(dllexport) type name args
-#  else
-#    define VLC_PUBLIC_API extern __declspec(dllexport)
-#    define VLC_PRIVATE_API extern __declspec(dllexport)
-#    define   VLC_EXPORT( type, name, args ) __declspec(dllexport) type name args
-#  endif
+#ifdef __cplusplus
+# define LIBVLC_EXTERN extern "C"
 #else
-#  ifdef __cplusplus
-#    ifdef HAVE_ATTRIBUTE_VISIBILITY
-#      define VLC_PUBLIC_API extern "C" __attribute__((visibility("default")))
-#      define VLC_PRIVATE_API extern "C" __attribute__((visibility("default")))
-#      define   VLC_EXPORT( type, name, args ) extern "C" __attribute__((visibility("default"))) type name args
-#    else
-#      define VLC_PUBLIC_API extern "C"
-#      define   VLC_EXPORT( type, name, args ) extern "C" type name args
-#    endif
-#  else
-#    ifdef HAVE_ATTRIBUTE_VISIBILITY
-#      define VLC_PUBLIC_API extern __attribute__((visibility("default")))
-#      define VLC_PRIVATE_API extern __attribute__((visibility("default")))
-#      define   VLC_EXPORT( type, name, args ) __attribute__((visibility("default"))) type name args
-#    else
-#      define VLC_PUBLIC_API extern
-#      define VLC_PRIVATE_API extern
-#      define   VLC_EXPORT( type, name, args ) extern type name args
-#    endif
-#  endif
+# define LIBVLC_EXTERN extern
 #endif
+#if defined (WIN32) && defined (DLL_EXPORT)
+# define LIBVLC_EXPORT __declspec(dllexport)
+#else
+# define LIBVLC_EXPORT
+#endif
+#define VLC_PUBLIC_API  LIBVLC_EXTERN LIBVLC_EXPORT
+#define VLC_PRIVATE_API LIBVLC_EXTERN LIBVLC_EXPORT /* FIXME: dubious! */
+#define VLC_EXPORT( type, name, args ) \
+                        LIBVLC_EXTERN LIBVLC_EXPORT type name args
 
 /*****************************************************************************
  * OS-specific headers and thread types
