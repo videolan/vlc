@@ -3001,7 +3001,7 @@ dnl Trying with pkg-config
      PKG_CHECK_MODULES(POSTPROC, libpostproc,[
        VLC_ADD_CFLAGS([ffmpeg],[${POSTPROC_CFLAGS}]) 
        VLC_ADD_LIBS([ffmpeg],[${POSTPROC_LIBS}]) 
-       ],[ true ])
+       ])
      CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
      CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
      AC_CHECK_HEADERS(postproc/postprocess.h)
