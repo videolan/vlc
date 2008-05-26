@@ -65,7 +65,8 @@ vlc_module_end();
 *****************************************************************************/
 @interface VLCDecompressedVideoOutput : QTCaptureDecompressedVideoOutput
 {
-   CVImageBufferRef currentImageBuffer;
+    CVImageBufferRef currentImageBuffer;
+    mtime_t currentPts;
 }
 - (id)init;
 - (void)outputVideoFrame:(CVImageBufferRef)videoFrame withSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection;
@@ -76,53 +77,57 @@ vlc_module_end();
 @implementation VLCDecompressedVideoOutput : QTCaptureDecompressedVideoOutput
 - (id)init
 {
-   if( self = [super init] )
-   {
-       currentImageBuffer = nil;
-   }
-   return self;
+    if( self = [super init] )
+    {
+        currentImageBuffer = nil;
+        currentPts = 0;
+    }
+    return self;
 }
 - (void)dealloc
 {
-   @synchronized (self) {
-       CVBufferRelease(currentImageBuffer);
-       currentImageBuffer = nil;
-   }
-   [super dealloc];
+    @synchronized (self) {
+        CVBufferRelease(currentImageBuffer);
+        currentImageBuffer = nil;
+    }
+    [super dealloc];
 }
 
 - (void)outputVideoFrame:(CVImageBufferRef)videoFrame withSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection
 {
-   // Store the latest frame
-   // This must be done in a @synchronized block because this delegate method is not called on the main thread
-   CVImageBufferRef imageBufferToRelease;
+    // Store the latest frame
+    // This must be done in a @synchronized block because this delegate method is not called on the main thread
+    CVImageBufferRef imageBufferToRelease;
 
-   CVBufferRetain(videoFrame);
+    CVBufferRetain(videoFrame);
 
-   @synchronized (self) {
-       imageBufferToRelease = currentImageBuffer;
-       currentImageBuffer = videoFrame;
-   }
-   CVBufferRelease(imageBufferToRelease);
+    @synchronized (self) {
+        imageBufferToRelease = currentImageBuffer;
+        currentImageBuffer = videoFrame;
+        /* FIXME: is it the right PTS? */
+        currentPts = [sampleBuffer presentationTime].timeValue * 1000;
+    }
+    CVBufferRelease(imageBufferToRelease);
 }
 
-- (BOOL)copyCurrentFrameToBuffer:(void *)buffer
+- (mtime_t)copyCurrentFrameToBuffer:(void *)buffer
 {
-   CVImageBufferRef imageBuffer;
+    CVImageBufferRef imageBuffer;
+    mtime_t pts;
+    @synchronized (self) {
+        if(!currentImageBuffer) return 0;
+        imageBuffer = CVBufferRetain(currentImageBuffer);
+        pts = currentPts;
+    }
 
-   @synchronized (self) {
-       if(!currentImageBuffer) return NO;
-       imageBuffer = CVBufferRetain(currentImageBuffer);
-   }
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    void * pixels = CVPixelBufferGetBaseAddress(imageBuffer);
+    memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer) );
+    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 
-   CVPixelBufferLockBaseAddress(imageBuffer, 0);
-   void * pixels = CVPixelBufferGetBaseAddress(imageBuffer);
-   memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer) );
-   CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+    CVBufferRelease(imageBuffer);
 
-   CVBufferRelease(imageBuffer);
-
-   return YES;
+    return currentPts;
 }
 
 @end
@@ -315,7 +320,9 @@ static int Demux( demux_t *p_demux )
 
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
-    if( ![p_sys->output copyCurrentFrameToBuffer: p_block->p_buffer] )
+    p_block->i_pts = [p_sys->output copyCurrentFrameToBuffer: p_block->p_buffer];
+
+    if( !p_block->i_pts )
     {
         /* Nothing to display yet, just forget */
         block_Release( p_block );
@@ -323,7 +330,7 @@ static int Demux( demux_t *p_demux )
         return 1;
     }
 
-    p_block->i_pts = mdate(); /* FIXME */
+    p_block->i_pts += mdate();
 
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
     es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
