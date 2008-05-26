@@ -38,7 +38,7 @@
 #   include <process.h>                                         /* Win32 API */
 #   include <errno.h>
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )                             /* BeOS */
+#elif defined( SYS_BEOS )                                            /* BeOS */
 #   include <kernel/OS.h>
 #   include <kernel/scheduler.h>
 #   include <byteorder.h>
@@ -133,7 +133,7 @@ typedef struct
 
 typedef DWORD   vlc_threadvar_t;
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( SYS_BEOS )
 /* This is the BeOS implementation of the vlc threads, note that the mutex is
  * not a real mutex and the cond_var is not like a pthread cond_var but it is
  * enough for what we need */
@@ -212,7 +212,7 @@ static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
 
     WaitForSingleObject( *p_mutex, INFINITE );
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( SYS_BEOS )
     acquire_sem( p_mutex->lock );
 
 #endif
@@ -245,7 +245,7 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
 
     ReleaseMutex( *p_mutex );
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( SYS_BEOS )
     release_sem( p_mutex->lock );
 
 #endif
@@ -287,7 +287,7 @@ static inline void __vlc_cond_signal( const char * psz_file, int i_line,
      * as documented in http://support.microsoft.com/kb/q173260/ */
     PulseEvent( p_condvar->event );
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( SYS_BEOS )
     while( p_condvar->thread != -1 )
     {
         thread_info info;
@@ -345,7 +345,7 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( SYS_BEOS )
     /* The p_condvar->thread var is initialized before the unlock because
      * it enables to identify when the thread is interrupted beetwen the
      * unlock line and the suspend_thread line */
@@ -420,7 +420,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
     (void)psz_file; (void)i_line;
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( SYS_BEOS )
 #   error Unimplemented
 
 #endif
@@ -444,7 +444,7 @@ static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
 #if defined(LIBVLC_USE_PTHREAD)
     i_ret = pthread_setspecific( *p_tls, p_value );
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( SYS_BEOS )
     i_ret = EINVAL;
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
@@ -465,7 +465,7 @@ static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
 #if defined(LIBVLC_USE_PTHREAD)
     p_ret = pthread_getspecific( *p_tls );
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( SYS_BEOS )
     p_ret = NULL;
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
