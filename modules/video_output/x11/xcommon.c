@@ -1290,12 +1290,26 @@ static int ManageVideo( vout_thread_t *p_vout )
             switch( ((XButtonEvent *)&xevent)->button )
             {
                 case Button1:
-                    var_Get( p_vout, "mouse-button-down", &val );
-                    val.i_int &= ~1;
-                    var_Set( p_vout, "mouse-button-down", val );
+                    {
+                        playlist_t *p_playlist;
 
-                    val.b_bool = true;
-                    var_Set( p_vout, "mouse-clicked", val );
+                        var_Get( p_vout, "mouse-button-down", &val );
+                        val.i_int &= ~1;
+                        var_Set( p_vout, "mouse-button-down", val );
+
+                        val.b_bool = true;
+                        var_Set( p_vout, "mouse-clicked", val );
+
+                        p_playlist = vlc_object_find( p_vout,
+                                                      VLC_OBJECT_PLAYLIST,
+                                                      FIND_ANYWHERE );
+                        if( p_playlist != NULL )
+                        {
+                            vlc_value_t val; val.b_bool = false;
+                            var_Set( p_playlist, "intf-popupmenu", val );
+                            vlc_object_release( p_playlist );
+                        }
+                    }
                     break;
 
                 case Button2:

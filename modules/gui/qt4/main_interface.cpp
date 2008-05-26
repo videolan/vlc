@@ -1208,7 +1208,6 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    msg_Dbg( p_this, "Menu Requested" ); // DEBUG to track the non disparition of the menu...
 
     if( p_intf->pf_show_dialog )
     {
@@ -1226,7 +1225,6 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    msg_Dbg( p_this, "Intf Show Requested" ); // DEBUG to track the non disparition of the menu...
     p_intf->p_sys->p_mi->requestLayoutUpdate();
 
     return VLC_SUCCESS;
