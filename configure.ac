@@ -1066,32 +1066,6 @@ if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
 fi
 
-dnl Check for -fvisibility=hidden
-dnl Don't test on mingw32, because it is going to work with just a warning
-dnl even if it doesn't support it
-if test "${SYS}" != "mingw32"
-then
-AC_CACHE_CHECK([if \$CC accepts -fvisibility=hidden],
-    [ac_cv_c_visibility_hidden],
-    [CFLAGS="${CFLAGS_save} -fvisibility=hidden"
-     AC_TRY_COMPILE([],,ac_cv_c_visibility_hidden=yes, ac_cv_c_visibility_hidden=no)])
-if test "${ac_cv_c_visibility_hidden}" != "no"; then
-    VLC_ADD_CFLAGS([libvlc plugin],[-fvisibility=hidden])
-fi
-fi
-
-dnl Check for -fvisibility-inlines-hidden (breaks x86_64 linkers)
-dnl AC_LANG_PUSH(C++)
-dnl     AC_CACHE_CHECK([if \$CXX accepts -fvisibility-inlines-hidden],
-dnl         [ac_cv_c_visibility_inlines_hidden],
-dnl         [CXXFLAGS="${CXXFLAGS_save} -fvisibility-inlines-hidden"
-dnl          AC_TRY_COMPILE([],,ac_cv_c_visibility_inlines_hidden=yes, ac_cv_c_visibility_inlines_hidden=no)])
-dnl     if test "${ac_cv_c_visibility_inlines_hidden}" != "no"; then
-dnl         VLC_ADD_CXXFLAGS([libvlc plugin],[-fvisibility-inlines-hidden])
-dnl     fi
-dnl     CXXFLAGS="${CXXFLAGS_save}"
-dnl AC_LANG_POP(C++)
-
 dnl Check for -mdynamic-no-pic
 dnl AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
 dnl     [ac_cv_c_dynamic_no_pic],
