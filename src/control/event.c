@@ -57,28 +57,6 @@ group_contains_listener( libvlc_event_listeners_group_t * group,
  */
 
 /**************************************************************************
- *       libvlc_event_init (internal) :
- *
- * initialization function.
- **************************************************************************/
-void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
-{
-    VLC_UNUSED(p_instance);
-    VLC_UNUSED(p_e);
-    /* Will certainly be used to install libvlc_instance event */
-}
-
-/**************************************************************************
- *       libvlc_event_fini (internal) :
- *
- * finalization function.
- **************************************************************************/
-void libvlc_event_fini( libvlc_instance_t *p_instance )
-{
-    VLC_UNUSED(p_instance);
-}
-
-/**************************************************************************
  *       libvlc_event_manager_init (internal) :
  *
  * Init an object's event manager.

@@ -132,8 +132,6 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     vlc_mutex_init(&p_new->instance_lock);
     vlc_mutex_init(&p_new->event_callback_lock);
 
-    libvlc_event_init(p_new, p_e);
-
     return p_new;
 }
 
@@ -156,8 +154,6 @@ void libvlc_release( libvlc_instance_t *p_instance )
 
     vlc_mutex_lock( lock );
     refs = --p_instance->ref_count;
-    if( refs == 0 )
-        libvlc_event_fini( p_instance );
     vlc_mutex_unlock( lock );
 
     if( refs == 0 )
