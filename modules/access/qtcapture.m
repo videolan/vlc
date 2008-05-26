@@ -245,7 +245,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->width = fmt.video.i_width = 640;/* size.width; FIXME */
     p_sys->height = fmt.video.i_height = 480;/* size.height; FIXME */
 
-    msg_Err( p_demux, "added new video es %4.4s %dx%d",
+    msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
             (char*)&fmt.i_codec, fmt.video.i_width, fmt.video.i_height );
 
     p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
