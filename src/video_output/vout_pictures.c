@@ -35,6 +35,8 @@
 #include <vlc_osd.h>
 #include "vout_pictures.h"
 
+#include <assert.h>
+
 /**
  * Display a picture
  *

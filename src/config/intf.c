@@ -27,6 +27,8 @@
 
 #include <vlc/vlc.h>
 
+#include <assert.h>
+
 /* Adds an extra interface to the configuration */
 void __config_AddIntf( vlc_object_t *p_this, const char *psz_intf )
 {
