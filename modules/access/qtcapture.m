@@ -225,6 +225,11 @@ static int Open( vlc_object_t *p_this )
 
     output = [[VLCDecompressedVideoOutput alloc] init];
 
+    /* Hack - This will lower CPU consumption for some reason */
+    [output setPixelBufferAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSNumber numberWithInt:480], kCVPixelBufferHeightKey,
+        [NSNumber numberWithInt:640], kCVPixelBufferWidthKey, nil]];
+
     session = [[QTCaptureSession alloc] init];
 
     bool ret = [session addInput:input error:nil  /* FIXME */];
