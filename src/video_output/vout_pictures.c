@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
+#include <vlc_filter.h>
 #include "vout_pictures.h"
 
 #include <assert.h>
@@ -377,7 +378,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         }
 
         /* Convert image to the first direct buffer */
-        p_vout->chroma.pf_convert( p_vout, p_pic, p_tmp_pic );
+        p_vout->p_chroma->pf_video_filter_io( p_vout->p_chroma, p_pic, p_tmp_pic );
 
         /* Render subpictures on the first direct buffer */
         spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out, p_tmp_pic,
@@ -397,7 +398,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                 return NULL;
 
         /* Convert image to the first direct buffer */
-        p_vout->chroma.pf_convert( p_vout, p_pic, &p_vout->p_picture[0] );
+        p_vout->p_chroma->pf_video_filter_io( p_vout->p_chroma, p_pic, &p_vout->p_picture[0] );
 
         /* Render subpictures on the first direct buffer */
         spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,

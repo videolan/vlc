@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_video.h: common video definitions
  *****************************************************************************
- * Copyright (C) 1999 - 2005 the VideoLAN team
+ * Copyright (C) 1999 - 2008 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -365,31 +365,6 @@ VLC_EXPORT( int, __vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic
  * @{
  */
 
-/**
- * Chroma conversion function
- *
- * This is the prototype common to all conversion functions.
- * \param p_vout video output thread
- * \param p_source source picture
- * \param p_dest destination picture
- * Picture width and source dimensions must be multiples of 16.
- */
-typedef void (vout_chroma_convert_t)( vout_thread_t *,
-                                      picture_t *, picture_t * );
-
-typedef struct vout_chroma_t
-{
-    /** conversion functions */
-    vout_chroma_convert_t *pf_convert;
-
-    /** Private module-dependent data */
-    chroma_sys_t *      p_sys;                               /* private data */
-
-    /** Plugin used and shortcuts to access its capabilities */
-    module_t * p_module;
-
-} vout_chroma_t;
-
 /** Maximum numbers of video filters2 that can be attached to a vout */
 #define MAX_VFILTERS 10
 
@@ -462,7 +437,7 @@ struct vout_thread_t
     picture_heap_t      render;                       /**< rendered pictures */
     picture_heap_t      output;                          /**< direct buffers */
     bool          b_direct;            /**< rendered are like direct ? */
-    vout_chroma_t       chroma;                      /**< translation tables */
+    filter_t            *p_chroma;                      /**< translation tables */
 
     video_format_t      fmt_render;      /* render format (from the decoder) */
     video_format_t      fmt_in;            /* input (modified render) format */

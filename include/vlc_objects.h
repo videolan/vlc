@@ -68,6 +68,7 @@
 #define VLC_OBJECT_HTTPD_HOST  (-30)
 
 #define VLC_OBJECT_INTERACTION (-32)
+#define VLC_OBJECT_CHROMA      (-33)
 
 #define VLC_OBJECT_GENERIC     (-666)
 

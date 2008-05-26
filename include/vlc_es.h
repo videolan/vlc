@@ -28,6 +28,10 @@
 #ifndef _VLC_ES_H
 #define _VLC_ES_H 1
 
+/* FIXME: i'm not too sure about this include but it fixes compilation of
+ * video chromas -- dionoea */
+#include "vlc_common.h"
+
 /**
  * \file
  * This file defines the elementary streams format types
@@ -130,6 +134,9 @@ struct video_format_t
     unsigned int i_frame_rate_base;              /**< frame rate denominator */
 
     int i_rmask, i_gmask, i_bmask;          /**< color masks for RGB chroma */
+    int i_rrshift, i_lrshift;
+    int i_rgshift, i_lgshift;
+    int i_rbshift, i_lbshift;
     video_palette_t *p_palette;              /**< video palette from demuxer */
 };
 

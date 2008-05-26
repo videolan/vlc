@@ -30,7 +30,8 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
+#include <vlc/vlc.h>
+#include <vlc_filter.h>
 #include <vlc_vout.h>
 
 #include "i420_rgb.h"
@@ -56,8 +57,8 @@ static void SetOffset( int, int, int, int, bool *,
  *  - input: 2 lines (2 Y lines, 1 U/V line)
  *  - output: 1 line
  *****************************************************************************/
-void I420_RGB16_dither( vout_thread_t *p_vout, picture_t *p_src,
-                                                      picture_t *p_dest )
+void I420_RGB16_dither( filter_t *p_filter, picture_t *p_src,
+                                                picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
@@ -73,19 +74,19 @@ void I420_RGB16_dither( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint16_t *  p_pic_start;       /* beginning of the current line for copy */
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
-    uint16_t *  p_yuv = p_vout->chroma.p_sys->p_rgb16;
-    uint16_t *  p_ybase;                     /* Y dependent conversion table */
+    uint16_t *  p_yuv = p_filter->p_sys->p_rgb16;
+    uint16_t *  p_ybase;                     /* Y dependant conversion table */
 
     /* Conversion buffer pointer */
-    uint16_t *  p_buffer_start = (uint16_t*)p_vout->chroma.p_sys->p_buffer;
+    uint16_t *  p_buffer_start = (uint16_t*)p_filter->p_sys->p_buffer;
     uint16_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -101,17 +102,17 @@ void I420_RGB16_dither( vout_thread_t *p_vout, picture_t *p_src,
 
     for(i_x = 0; i_x < 4; i_x++)
     {
-        dither10[i_x] = dither10[i_x] << (SHIFT - 4 + p_vout->output.i_rrshift);
-        dither11[i_x] = dither11[i_x] << (SHIFT - 4 + p_vout->output.i_rrshift);
-        dither12[i_x] = dither12[i_x] << (SHIFT - 4 + p_vout->output.i_rrshift);
-        dither13[i_x] = dither13[i_x] << (SHIFT - 4 + p_vout->output.i_rrshift);
+        dither10[i_x] = dither10[i_x] << (SHIFT - 4 + p_filter->fmt_out.video.i_rrshift);
+        dither11[i_x] = dither11[i_x] << (SHIFT - 4 + p_filter->fmt_out.video.i_rrshift);
+        dither12[i_x] = dither12[i_x] << (SHIFT - 4 + p_filter->fmt_out.video.i_rrshift);
+        dither13[i_x] = dither13[i_x] << (SHIFT - 4 + p_filter->fmt_out.video.i_rrshift);
     }
 
     i_right_margin = p_dest->p->i_pitch - p_dest->p->i_visible_pitch;
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
@@ -121,22 +122,25 @@ void I420_RGB16_dither( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
     /*
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         i_real_y = i_y & 0x3;
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             int *p_dither = dither10;
             CONVERT_YUV_PIXEL_DITHER(2);
@@ -207,8 +211,8 @@ void I420_RGB16_dither( vout_thread_t *p_vout, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 
-void I420_RGB16( vout_thread_t *p_vout, picture_t *p_src,
-                                            picture_t *p_dest )
+void I420_RGB16( filter_t *p_filter, picture_t *p_src,
+                                         picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
@@ -223,19 +227,19 @@ void I420_RGB16( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint16_t *  p_pic_start;       /* beginning of the current line for copy */
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
-    uint16_t *  p_yuv = p_vout->chroma.p_sys->p_rgb16;
-    uint16_t *  p_ybase;                     /* Y dependent conversion table */
+    uint16_t *  p_yuv = p_filter->p_sys->p_rgb16;
+    uint16_t *  p_ybase;                     /* Y dependant conversion table */
 
     /* Conversion buffer pointer */
-    uint16_t *  p_buffer_start = (uint16_t*)p_vout->chroma.p_sys->p_buffer;
+    uint16_t *  p_buffer_start = (uint16_t*)p_filter->p_sys->p_buffer;
     uint16_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -245,9 +249,9 @@ void I420_RGB16( vout_thread_t *p_vout, picture_t *p_src,
 
     i_right_margin = p_dest->p->i_pitch - p_dest->p->i_visible_pitch;
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
@@ -257,21 +261,24 @@ void I420_RGB16( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
     /*
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
@@ -307,8 +314,8 @@ void I420_RGB16( vout_thread_t *p_vout, picture_t *p_src,
 
 #else // ! defined (MODULE_NAME_IS_i420_rgb)
 
-void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
-                                            picture_t *p_dest )
+void I420_R5G5B5( filter_t *p_filter, picture_t *p_src,
+                                          picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
@@ -323,15 +330,15 @@ void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint16_t *  p_pic_start;       /* beginning of the current line for copy */
 
     /* Conversion buffer pointer */
-    uint16_t *  p_buffer_start = (uint16_t*)p_vout->chroma.p_sys->p_buffer;
+    uint16_t *  p_buffer_start = (uint16_t*)p_filter->p_sys->p_buffer;
     uint16_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -344,8 +351,10 @@ void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
 
@@ -353,13 +362,14 @@ void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_vout->render.i_width & 15 )
+    if( p_filter->fmt_in.video.i_width & 15 )
     {
-        i_rewind = 16 - ( p_vout->render.i_width & 15 );
+        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
     }
     else
     {
@@ -378,11 +388,11 @@ void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
                     ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
 
-            for ( i_x = p_vout->render.i_width/16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width/16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_16_ALIGNED
@@ -429,12 +439,12 @@ void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
     else
     {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
             p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-            for ( i_x = p_vout->render.i_width/16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width/16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_16_UNALIGNED
@@ -484,21 +494,21 @@ void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
         i_rewind = 0;
     }
 
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             MMX_CALL (
                 MMX_INIT_16
@@ -548,8 +558,8 @@ void I420_R5G5B5( vout_thread_t *p_vout, picture_t *p_src,
 #endif
 }
 
-void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
-                                            picture_t *p_dest )
+void I420_R5G6B5( filter_t *p_filter, picture_t *p_src,
+                                          picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
@@ -564,15 +574,15 @@ void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint16_t *  p_pic_start;       /* beginning of the current line for copy */
 
     /* Conversion buffer pointer */
-    uint16_t *  p_buffer_start = (uint16_t*)p_vout->chroma.p_sys->p_buffer;
+    uint16_t *  p_buffer_start = (uint16_t*)p_filter->p_sys->p_buffer;
     uint16_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -585,8 +595,10 @@ void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
 
@@ -594,13 +606,14 @@ void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_vout->render.i_width & 15 )
+    if( p_filter->fmt_in.video.i_width & 15 )
     {
-        i_rewind = 16 - ( p_vout->render.i_width & 15 );
+        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
     }
     else
     {
@@ -619,11 +632,11 @@ void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
                     ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
 
-            for ( i_x = p_vout->render.i_width/16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width/16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_16_ALIGNED
@@ -670,12 +683,12 @@ void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
     else
     {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
             p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-            for ( i_x = p_vout->render.i_width/16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width/16; i_x--; )
             {
                 SSE2_CALL(
                     SSE2_INIT_16_UNALIGNED
@@ -725,21 +738,21 @@ void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
         i_rewind = 0;
     }
 
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             MMX_CALL (
                 MMX_INIT_16
@@ -804,8 +817,8 @@ void I420_R5G6B5( vout_thread_t *p_vout, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 
-void I420_RGB32( vout_thread_t *p_vout, picture_t *p_src,
-                                            picture_t *p_dest )
+void I420_RGB32( filter_t *p_filter, picture_t *p_src,
+                                         picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint32_t *p_pic = (uint32_t*)p_dest->p->p_pixels;
@@ -820,19 +833,19 @@ void I420_RGB32( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint32_t *  p_pic_start;       /* beginning of the current line for copy */
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
-    uint32_t *  p_yuv = p_vout->chroma.p_sys->p_rgb32;
-    uint32_t *  p_ybase;                     /* Y dependent conversion table */
+    uint32_t *  p_yuv = p_filter->p_sys->p_rgb32;
+    uint32_t *  p_ybase;                     /* Y dependant conversion table */
 
     /* Conversion buffer pointer */
-    uint32_t *  p_buffer_start = (uint32_t*)p_vout->chroma.p_sys->p_buffer;
+    uint32_t *  p_buffer_start = (uint32_t*)p_filter->p_sys->p_buffer;
     uint32_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -842,9 +855,9 @@ void I420_RGB32( vout_thread_t *p_vout, picture_t *p_src,
 
     i_right_margin = p_dest->p->i_pitch - p_dest->p->i_visible_pitch;
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
@@ -854,21 +867,24 @@ void I420_RGB32( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
     /*
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
@@ -903,7 +919,7 @@ void I420_RGB32( vout_thread_t *p_vout, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx) || defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-void I420_A8R8G8B8( vout_thread_t *p_vout, picture_t *p_src,
+void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -919,14 +935,14 @@ void I420_A8R8G8B8( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint32_t *  p_pic_start;       /* beginning of the current line for copy */
     /* Conversion buffer pointer */
-    uint32_t *  p_buffer_start = (uint32_t*)p_vout->chroma.p_sys->p_buffer;
+    uint32_t *  p_buffer_start = (uint32_t*)p_filter->p_sys->p_buffer;
     uint32_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -939,21 +955,24 @@ void I420_A8R8G8B8( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
     /*
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_vout->render.i_width & 15 )
+    if( p_filter->fmt_in.video.i_width & 15 )
     {
-        i_rewind = 16 - ( p_vout->render.i_width & 15 );
+        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
     }
     else
     {
@@ -972,11 +991,11 @@ void I420_A8R8G8B8( vout_thread_t *p_vout, picture_t *p_src,
                     ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
 
-            for ( i_x = p_vout->render.i_width / 16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width / 16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_32_ALIGNED
@@ -1023,12 +1042,12 @@ void I420_A8R8G8B8( vout_thread_t *p_vout, picture_t *p_src,
     else
     {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
             p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-            for ( i_x = p_vout->render.i_width / 16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width / 16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_32_UNALIGNED
@@ -1078,21 +1097,21 @@ void I420_A8R8G8B8( vout_thread_t *p_vout, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
         i_rewind = 0;
     }
 
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             MMX_CALL (
                 MMX_INIT_32
@@ -1142,7 +1161,7 @@ void I420_A8R8G8B8( vout_thread_t *p_vout, picture_t *p_src,
 #endif
 }
 
-void I420_R8G8B8A8( vout_thread_t *p_vout, picture_t *p_src,
+void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -1158,14 +1177,14 @@ void I420_R8G8B8A8( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint32_t *  p_pic_start;       /* beginning of the current line for copy */
     /* Conversion buffer pointer */
-    uint32_t *  p_buffer_start = (uint32_t*)p_vout->chroma.p_sys->p_buffer;
+    uint32_t *  p_buffer_start = (uint32_t*)p_filter->p_sys->p_buffer;
     uint32_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -1178,21 +1197,24 @@ void I420_R8G8B8A8( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
     /*
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_vout->render.i_width & 15 )
+    if( p_filter->fmt_in.video.i_width & 15 )
     {
-        i_rewind = 16 - ( p_vout->render.i_width & 15 );
+        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
     }
     else
     {
@@ -1211,11 +1233,11 @@ void I420_R8G8B8A8( vout_thread_t *p_vout, picture_t *p_src,
                     ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
 
-            for ( i_x = p_vout->render.i_width / 16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width / 16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_32_ALIGNED
@@ -1262,12 +1284,12 @@ void I420_R8G8B8A8( vout_thread_t *p_vout, picture_t *p_src,
     else
     {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
             p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-            for ( i_x = p_vout->render.i_width / 16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width / 16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_32_UNALIGNED
@@ -1317,21 +1339,21 @@ void I420_R8G8B8A8( vout_thread_t *p_vout, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
         i_rewind = 0;
     }
 
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             MMX_CALL (
                 MMX_INIT_32
@@ -1381,7 +1403,7 @@ void I420_R8G8B8A8( vout_thread_t *p_vout, picture_t *p_src,
 #endif
 }
 
-void I420_B8G8R8A8( vout_thread_t *p_vout, picture_t *p_src,
+void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -1397,14 +1419,14 @@ void I420_B8G8R8A8( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint32_t *  p_pic_start;       /* beginning of the current line for copy */
     /* Conversion buffer pointer */
-    uint32_t *  p_buffer_start = (uint32_t*)p_vout->chroma.p_sys->p_buffer;
+    uint32_t *  p_buffer_start = (uint32_t*)p_filter->p_sys->p_buffer;
     uint32_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -1417,21 +1439,24 @@ void I420_B8G8R8A8( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
     /*
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_vout->render.i_width & 15 )
+    if( p_filter->fmt_in.video.i_width & 15 )
     {
-        i_rewind = 16 - ( p_vout->render.i_width & 15 );
+        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
     }
     else
     {
@@ -1450,11 +1475,11 @@ void I420_B8G8R8A8( vout_thread_t *p_vout, picture_t *p_src,
                     ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
 
-            for ( i_x = p_vout->render.i_width / 16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width / 16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_32_ALIGNED
@@ -1501,12 +1526,12 @@ void I420_B8G8R8A8( vout_thread_t *p_vout, picture_t *p_src,
     else
     {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
             p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-            for ( i_x = p_vout->render.i_width / 16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width / 16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_32_UNALIGNED
@@ -1553,21 +1578,21 @@ void I420_B8G8R8A8( vout_thread_t *p_vout, picture_t *p_src,
 
 #else
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
         i_rewind = 0;
     }
 
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             MMX_CALL (
                 MMX_INIT_32
@@ -1617,7 +1642,7 @@ void I420_B8G8R8A8( vout_thread_t *p_vout, picture_t *p_src,
 #endif
 }
 
-void I420_A8B8G8R8( vout_thread_t *p_vout, picture_t *p_src,
+void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
@@ -1633,14 +1658,14 @@ void I420_A8B8G8R8( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
+    int         i_chroma_width = p_filter->fmt_in.video.i_width / 2; /* chroma width */
     uint32_t *  p_pic_start;       /* beginning of the current line for copy */
     /* Conversion buffer pointer */
-    uint32_t *  p_buffer_start = (uint32_t*)p_vout->chroma.p_sys->p_buffer;
+    uint32_t *  p_buffer_start = (uint32_t*)p_filter->p_sys->p_buffer;
     uint32_t *  p_buffer;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset_start = p_filter->p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch
@@ -1653,21 +1678,24 @@ void I420_A8B8G8R8( vout_thread_t *p_vout, picture_t *p_src,
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
      * then y1 grows to y1' = x1' * y2/x2 * r2/r1 */
-    SetOffset( p_vout->render.i_width, p_vout->render.i_height,
-               p_vout->output.i_width, p_vout->output.i_height,
+    SetOffset( p_filter->fmt_in.video.i_width,
+               p_filter->fmt_in.video.i_height,
+               p_filter->fmt_out.video.i_width,
+               p_filter->fmt_out.video.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
     /*
      * Perform conversion
      */
     i_scale_count = ( i_vscale == 1 ) ?
-                    p_vout->output.i_height : p_vout->render.i_height;
+                    p_filter->fmt_out.video.i_height :
+                    p_filter->fmt_in.video.i_height;
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_vout->render.i_width & 15 )
+    if( p_filter->fmt_in.video.i_width & 15 )
     {
-        i_rewind = 16 - ( p_vout->render.i_width & 15 );
+        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
     }
     else
     {
@@ -1686,11 +1714,11 @@ void I420_A8B8G8R8( vout_thread_t *p_vout, picture_t *p_src,
                     ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
 
-            for ( i_x = p_vout->render.i_width / 16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width / 16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_32_ALIGNED
@@ -1737,12 +1765,12 @@ void I420_A8B8G8R8( vout_thread_t *p_vout, picture_t *p_src,
     else
     {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+        for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
         {
             p_pic_start = p_pic;
             p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-            for ( i_x = p_vout->render.i_width / 16; i_x--; )
+            for ( i_x = p_filter->fmt_in.video.i_width / 16; i_x--; )
             {
                 SSE2_CALL (
                     SSE2_INIT_32_UNALIGNED
@@ -1789,21 +1817,21 @@ void I420_A8B8G8R8( vout_thread_t *p_vout, picture_t *p_src,
 
 #else
 
-    if( p_vout->render.i_width & 7 )
+    if( p_filter->fmt_in.video.i_width & 7 )
     {
-        i_rewind = 8 - ( p_vout->render.i_width & 7 );
+        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
     }
     else
     {
         i_rewind = 0;
     }
 
-    for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
+    for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
-        for ( i_x = p_vout->render.i_width / 8; i_x--; )
+        for ( i_x = p_filter->fmt_in.video.i_width / 8; i_x--; )
         {
             MMX_CALL (
                 MMX_INIT_32

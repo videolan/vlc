@@ -60,6 +60,7 @@ struct filter_t
     config_chain_t *    p_cfg;
 
     picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
+    void                ( * pf_video_filter_io ) ( filter_t *, picture_t *, picture_t * ); /* Used by video filters with a preallocated output buffer (ie chroma conversion modules) */
     block_t *           ( * pf_audio_filter ) ( filter_t *, block_t * );
     void                ( * pf_video_blend )  ( filter_t *, picture_t *,
                                                 picture_t *, picture_t *,

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2004 the VideoLAN team
+ * Copyright (C) 2000, 2001, 2004, 2008 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_filter.h>
 #include <vlc_vout.h>
 
 #include "i420_rgb.h"
@@ -43,13 +44,13 @@
 /*****************************************************************************
  * RGB2PIXEL: assemble RGB components to a pixel value, returns a uint32_t
  *****************************************************************************/
-#define RGB2PIXEL( p_vout, i_r, i_g, i_b )          \
-    (((((uint32_t)i_r) >> p_vout->output.i_rrshift) \
-                       << p_vout->output.i_lrshift) \
-   | ((((uint32_t)i_g) >> p_vout->output.i_rgshift) \
-                       << p_vout->output.i_lgshift) \
-   | ((((uint32_t)i_b) >> p_vout->output.i_rbshift) \
-                       << p_vout->output.i_lbshift))
+#define RGB2PIXEL( p_filter, i_r, i_g, i_b )                 \
+    (((((uint32_t)i_r) >> p_filter->fmt_out.video.i_rrshift) \
+                       << p_filter->fmt_out.video.i_lrshift) \
+   | ((((uint32_t)i_g) >> p_filter->fmt_out.video.i_rgshift) \
+                       << p_filter->fmt_out.video.i_lgshift) \
+   | ((((uint32_t)i_b) >> p_filter->fmt_out.video.i_rbshift) \
+                       << p_filter->fmt_out.video.i_lbshift))
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -59,8 +60,8 @@ static void Deactivate ( vlc_object_t * );
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 static void SetGammaTable       ( int *pi_table, double f_gamma );
-static void SetYUV              ( vout_thread_t * );
-static void Set8bppPalette      ( vout_thread_t *, uint8_t * );
+static void SetYUV              ( filter_t * );
+static void Set8bppPalette      ( filter_t *, uint8_t * );
 #endif
 
 /*****************************************************************************
@@ -92,53 +93,54 @@ vlc_module_end();
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 #if defined (MODULE_NAME_IS_i420_rgb)
     size_t i_tables_size;
 #endif
 
-    if( p_vout->render.i_width & 1 || p_vout->render.i_height & 1 )
+    if( p_filter->fmt_out.video.i_width & 1
+     || p_filter->fmt_out.video.i_height & 1 )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    switch( p_vout->render.i_chroma )
+    switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_FOURCC('Y','V','1','2'):
         case VLC_FOURCC('I','4','2','0'):
         case VLC_FOURCC('I','Y','U','V'):
-            switch( p_vout->output.i_chroma )
+            switch( p_filter->fmt_out.video.i_chroma )
             {
 #if defined (MODULE_NAME_IS_i420_rgb)
                 case VLC_FOURCC('R','G','B','2'):
-                    p_vout->chroma.pf_convert = I420_RGB8;
+                    p_filter->pf_video_filter_io = I420_RGB8;
                     break;
 #endif
                 case VLC_FOURCC('R','V','1','5'):
                 case VLC_FOURCC('R','V','1','6'):
 #if ! defined (MODULE_NAME_IS_i420_rgb)
                     /* If we don't have support for the bitmasks, bail out */
-                    if( ( p_vout->output.i_rmask == 0x7c00
-                       && p_vout->output.i_gmask == 0x03e0
-                       && p_vout->output.i_bmask == 0x001f ) )
+                    if( ( p_filter->fmt_out.video.i_rmask == 0x7c00
+                       && p_filter->fmt_out.video.i_gmask == 0x03e0
+                       && p_filter->fmt_out.video.i_bmask == 0x001f ) )
                     {
                         /* R5G5B6 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R5G5B5");
-                        p_vout->chroma.pf_convert = I420_R5G5B5;
+                        p_filter->pf_video_filter_io = I420_R5G5B5;
                     }
-                    else if( ( p_vout->output.i_rmask == 0xf800
-                            && p_vout->output.i_gmask == 0x07e0
-                            && p_vout->output.i_bmask == 0x001f ) )
+                    else if( ( p_filter->fmt_out.video.i_rmask == 0xf800
+                            && p_filter->fmt_out.video.i_gmask == 0x07e0
+                            && p_filter->fmt_out.video.i_bmask == 0x001f ) )
                     {
                         /* R5G6B5 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R5G6B5");
-                        p_vout->chroma.pf_convert = I420_R5G6B5;
+                        p_filter->pf_video_filter_io = I420_R5G6B5;
                     }
                     else
-                        return -1;
+                        return VLC_EGENERIC;
 #else
                     // generic C chroma converter */
-                    p_vout->chroma.pf_convert = I420_RGB16;
+                    p_filter->pf_video_filter_io = I420_RGB16;
 #endif
                     break;
 
@@ -150,103 +152,103 @@ static int Activate( vlc_object_t *p_this )
                 case VLC_FOURCC('R','V','3','2'):
 #if ! defined (MODULE_NAME_IS_i420_rgb)
                     /* If we don't have support for the bitmasks, bail out */
-                    if( p_vout->output.i_rmask == 0x00ff0000
-                     && p_vout->output.i_gmask == 0x0000ff00
-                     && p_vout->output.i_bmask == 0x000000ff )
+                    if( p_filter->fmt_out.video.i_rmask == 0x00ff0000
+                     && p_filter->fmt_out.video.i_gmask == 0x0000ff00
+                     && p_filter->fmt_out.video.i_bmask == 0x000000ff )
                     {
                         /* A8R8G8B8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is A8R8G8B8");
-                        p_vout->chroma.pf_convert = I420_A8R8G8B8;
+                        p_filter->pf_video_filter_io = I420_A8R8G8B8;
                     }
-                    else if( p_vout->output.i_rmask == 0xff000000
-                          && p_vout->output.i_gmask == 0x00ff0000
-                          && p_vout->output.i_bmask == 0x0000ff00 )
+                    else if( p_filter->fmt_out.video.i_rmask == 0xff000000
+                          && p_filter->fmt_out.video.i_gmask == 0x00ff0000
+                          && p_filter->fmt_out.video.i_bmask == 0x0000ff00 )
                     {
                         /* R8G8B8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R8G8B8A8");
-                        p_vout->chroma.pf_convert = I420_R8G8B8A8;
+                        p_filter->pf_video_filter_io = I420_R8G8B8A8;
                     }
-                    else if( p_vout->output.i_rmask == 0x0000ff00
-                          && p_vout->output.i_gmask == 0x00ff0000
-                          && p_vout->output.i_bmask == 0xff000000 )
+                    else if( p_filter->fmt_out.video.i_rmask == 0x0000ff00
+                          && p_filter->fmt_out.video.i_gmask == 0x00ff0000
+                          && p_filter->fmt_out.video.i_bmask == 0xff000000 )
                     {
                         /* B8G8R8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is B8G8R8A8");
-                        p_vout->chroma.pf_convert = I420_B8G8R8A8;
+                        p_filter->pf_video_filter_io = I420_B8G8R8A8;
                     }
-                    else if( p_vout->output.i_rmask == 0x000000ff
-                          && p_vout->output.i_gmask == 0x0000ff00
-                          && p_vout->output.i_bmask == 0x00ff0000 )
+                    else if( p_filter->fmt_out.video.i_rmask == 0x000000ff
+                          && p_filter->fmt_out.video.i_gmask == 0x0000ff00
+                          && p_filter->fmt_out.video.i_bmask == 0x00ff0000 )
                     {
                         /* A8B8G8R8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is A8B8G8R8");
-                        p_vout->chroma.pf_convert = I420_A8B8G8R8;
+                        p_filter->pf_video_filter_io = I420_A8B8G8R8;
                     }
                     else
-                        return -1;
+                        return VLC_EGENERIC;
 #else
                     /* generic C chroma converter */
-                    p_vout->chroma.pf_convert = I420_RGB32;
+                    p_filter->pf_video_filter_io = I420_RGB32;
 #endif
                     break;
 
                 default:
-                    return -1;
+                    return VLC_EGENERIC;
             }
             break;
 
         default:
-            return -1;
+            return VLC_EGENERIC;
     }
 
-    p_vout->chroma.p_sys = malloc( sizeof( chroma_sys_t ) );
-    if( p_vout->chroma.p_sys == NULL )
+    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_filter->p_sys == NULL )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    switch( p_vout->output.i_chroma )
+    switch( p_filter->fmt_out.video.i_chroma )
     {
 #if defined (MODULE_NAME_IS_i420_rgb)
         case VLC_FOURCC('R','G','B','2'):
-            p_vout->chroma.p_sys->p_buffer = malloc( VOUT_MAX_WIDTH );
+            p_filter->p_sys->p_buffer = malloc( VOUT_MAX_WIDTH );
             break;
 #endif
 
         case VLC_FOURCC('R','V','1','5'):
         case VLC_FOURCC('R','V','1','6'):
-            p_vout->chroma.p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 2 );
+            p_filter->p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 2 );
             break;
 
         case VLC_FOURCC('R','V','2','4'):
         case VLC_FOURCC('R','V','3','2'):
-            p_vout->chroma.p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 4 );
+            p_filter->p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 4 );
             break;
 
         default:
-            p_vout->chroma.p_sys->p_buffer = NULL;
+            p_filter->p_sys->p_buffer = NULL;
             break;
     }
 
-    if( p_vout->chroma.p_sys->p_buffer == NULL )
+    if( p_filter->p_sys->p_buffer == NULL )
     {
-        free( p_vout->chroma.p_sys );
-        return -1;
+        free( p_filter->p_sys );
+        return VLC_EGENERIC;
     }
 
-    p_vout->chroma.p_sys->p_offset = malloc( p_vout->output.i_width
-                    * ( ( p_vout->output.i_chroma
+    p_filter->p_sys->p_offset = malloc( p_filter->fmt_out.video.i_width
+                    * ( ( p_filter->fmt_out.video.i_chroma
                            == VLC_FOURCC('R','G','B','2') ) ? 2 : 1 )
                     * sizeof( int ) );
-    if( p_vout->chroma.p_sys->p_offset == NULL )
+    if( p_filter->p_sys->p_offset == NULL )
     {
-        free( p_vout->chroma.p_sys->p_buffer );
-        free( p_vout->chroma.p_sys );
-        return -1;
+        free( p_filter->p_sys->p_buffer );
+        free( p_filter->p_sys );
+        return VLC_EGENERIC;
     }
 
 #if defined (MODULE_NAME_IS_i420_rgb)
-    switch( p_vout->output.i_chroma )
+    switch( p_filter->fmt_out.video.i_chroma )
     {
     case VLC_FOURCC('R','G','B','2'):
         i_tables_size = sizeof( uint8_t ) * PALETTE_TABLE_SIZE;
@@ -260,16 +262,16 @@ static int Activate( vlc_object_t *p_this )
         break;
     }
 
-    p_vout->chroma.p_sys->p_base = malloc( i_tables_size );
-    if( p_vout->chroma.p_sys->p_base == NULL )
+    p_filter->p_sys->p_base = malloc( i_tables_size );
+    if( p_filter->p_sys->p_base == NULL )
     {
-        free( p_vout->chroma.p_sys->p_offset );
-        free( p_vout->chroma.p_sys->p_buffer );
-        free( p_vout->chroma.p_sys );
+        free( p_filter->p_sys->p_offset );
+        free( p_filter->p_sys->p_buffer );
+        free( p_filter->p_sys );
         return -1;
     }
 
-    SetYUV( p_vout );
+    SetYUV( p_filter );
 #endif
 
     return 0;
@@ -282,14 +284,14 @@ static int Activate( vlc_object_t *p_this )
  *****************************************************************************/
 static void Deactivate( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
 #if defined (MODULE_NAME_IS_i420_rgb)
-    free( p_vout->chroma.p_sys->p_base );
+    free( p_filter->p_sys->p_base );
 #endif
-    free( p_vout->chroma.p_sys->p_offset );
-    free( p_vout->chroma.p_sys->p_buffer );
-    free( p_vout->chroma.p_sys );
+    free( p_filter->p_sys->p_offset );
+    free( p_filter->p_sys->p_buffer );
+    free( p_filter->p_sys );
 }
 
 #if defined (MODULE_NAME_IS_i420_rgb)
@@ -315,7 +317,7 @@ static void SetGammaTable( int *pi_table, double f_gamma )
 /*****************************************************************************
  * SetYUV: compute tables and set function pointers
  *****************************************************************************/
-static void SetYUV( vout_thread_t *p_vout )
+static void SetYUV( filter_t *p_filter )
 {
     int          pi_gamma[256];                               /* gamma table */
     volatile int i_index;                                 /* index in tables */
@@ -323,84 +325,84 @@ static void SetYUV( vout_thread_t *p_vout )
                     * optimization bug */
 
     /* Build gamma table */
-    SetGammaTable( pi_gamma, p_vout->f_gamma );
+    SetGammaTable( pi_gamma, 0 ); //p_filter/*FIXME wasn't used anywhere anyway*/->f_gamma );
 
     /*
      * Set pointers and build YUV tables
      */
 
     /* Color: build red, green and blue tables */
-    switch( p_vout->output.i_chroma )
+    switch( p_filter->fmt_out.video.i_chroma )
     {
     case VLC_FOURCC('R','G','B','2'):
-        p_vout->chroma.p_sys->p_rgb8 = (uint8_t *)p_vout->chroma.p_sys->p_base;
-        Set8bppPalette( p_vout, p_vout->chroma.p_sys->p_rgb8 );
+        p_filter->p_sys->p_rgb8 = (uint8_t *)p_filter->p_sys->p_base;
+        Set8bppPalette( p_filter, p_filter->p_sys->p_rgb8 );
         break;
 
     case VLC_FOURCC('R','V','1','5'):
     case VLC_FOURCC('R','V','1','6'):
-        p_vout->chroma.p_sys->p_rgb16 = (uint16_t *)p_vout->chroma.p_sys->p_base;
+        p_filter->p_sys->p_rgb16 = (uint16_t *)p_filter->p_sys->p_base;
         for( i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
-            p_vout->chroma.p_sys->p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_vout, pi_gamma[0], 0, 0 );
-            p_vout->chroma.p_sys->p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_vout, pi_gamma[255], 0, 0 );
+            p_filter->p_sys->p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, pi_gamma[0], 0, 0 );
+            p_filter->p_sys->p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, pi_gamma[255], 0, 0 );
         }
         for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
         {
-            p_vout->chroma.p_sys->p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[0], 0 );
-            p_vout->chroma.p_sys->p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_vout, 0, pi_gamma[255], 0 );
+            p_filter->p_sys->p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, pi_gamma[0], 0 );
+            p_filter->p_sys->p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, pi_gamma[255], 0 );
         }
         for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
         {
-            p_vout->chroma.p_sys->p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[0] );
-            p_vout->chroma.p_sys->p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[255] );
+            p_filter->p_sys->p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, pi_gamma[0] );
+            p_filter->p_sys->p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, pi_gamma[255] );
         }
         for( i_index = 0; i_index < 256; i_index++ )
         {
-            p_vout->chroma.p_sys->p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_vout, pi_gamma[ i_index ], 0, 0 );
-            p_vout->chroma.p_sys->p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[ i_index ], 0 );
-            p_vout->chroma.p_sys->p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] );
+            p_filter->p_sys->p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, pi_gamma[ i_index ], 0, 0 );
+            p_filter->p_sys->p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, pi_gamma[ i_index ], 0 );
+            p_filter->p_sys->p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_filter, 0, 0, pi_gamma[ i_index ] );
         }
         break;
 
     case VLC_FOURCC('R','V','2','4'):
     case VLC_FOURCC('R','V','3','2'):
-        p_vout->chroma.p_sys->p_rgb32 = (uint32_t *)p_vout->chroma.p_sys->p_base;
+        p_filter->p_sys->p_rgb32 = (uint32_t *)p_filter->p_sys->p_base;
         for( i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
-            p_vout->chroma.p_sys->p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_vout, pi_gamma[0], 0, 0 );
-            p_vout->chroma.p_sys->p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_vout, pi_gamma[255], 0, 0 );
+            p_filter->p_sys->p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, pi_gamma[0], 0, 0 );
+            p_filter->p_sys->p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, pi_gamma[255], 0, 0 );
         }
         for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
         {
-            p_vout->chroma.p_sys->p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[0], 0 );
-            p_vout->chroma.p_sys->p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_vout, 0, pi_gamma[255], 0 );
+            p_filter->p_sys->p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, pi_gamma[0], 0 );
+            p_filter->p_sys->p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, pi_gamma[255], 0 );
         }
         for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
         {
-            p_vout->chroma.p_sys->p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[0] );
-            p_vout->chroma.p_sys->p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[255] );
+            p_filter->p_sys->p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, pi_gamma[0] );
+            p_filter->p_sys->p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, pi_gamma[255] );
         }
         for( i_index = 0; i_index < 256; i_index++ )
         {
-            p_vout->chroma.p_sys->p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_vout, pi_gamma[ i_index ], 0, 0 );
-            p_vout->chroma.p_sys->p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[ i_index ], 0 );
-            p_vout->chroma.p_sys->p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] );
+            p_filter->p_sys->p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, pi_gamma[ i_index ], 0, 0 );
+            p_filter->p_sys->p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, pi_gamma[ i_index ], 0 );
+            p_filter->p_sys->p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_filter, 0, 0, pi_gamma[ i_index ] );
         }
         break;
     }
 }
 
-static void Set8bppPalette( vout_thread_t *p_vout, uint8_t *p_rgb8 )
+static void Set8bppPalette( filter_t *p_filter, uint8_t *p_rgb8 )
 {
     #define CLIP( x ) ( ((x < 0) ? 0 : (x > 255) ? 255 : x) << 8 )
 
     int y,u,v;
     int r,g,b;
     int i = 0, j = 0;
-    uint16_t *p_cmap_r=p_vout->chroma.p_sys->p_rgb_r;
-    uint16_t *p_cmap_g=p_vout->chroma.p_sys->p_rgb_g;
-    uint16_t *p_cmap_b=p_vout->chroma.p_sys->p_rgb_b;
+    uint16_t *p_cmap_r = p_filter->p_sys->p_rgb_r;
+    uint16_t *p_cmap_g = p_filter->p_sys->p_rgb_g;
+    uint16_t *p_cmap_b = p_filter->p_sys->p_rgb_b;
 
     unsigned char p_lookup[PALETTE_TABLE_SIZE];
 
@@ -423,7 +425,7 @@ static void Set8bppPalette( vout_thread_t *p_vout, uint8_t *p_rgb8 )
                      * fscked up my code */
                     if( j == 256 )
                     {
-                        msg_Err( p_vout, "no colors left in palette" );
+                        msg_Err( p_filter, "no colors left in palette" );
                         break;
                     }
 
@@ -453,7 +455,8 @@ static void Set8bppPalette( vout_thread_t *p_vout, uint8_t *p_rgb8 )
     }
 
     /* The colors have been allocated, we can set the palette */
-    p_vout->output.pf_setpalette( p_vout, p_cmap_r, p_cmap_g, p_cmap_b );
+    /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+    p_filter->fmt_out.video.pf_setpalette( p_filter, p_cmap_r, p_cmap_g, p_cmap_b );*/
 
 #if 0
     /* There will eventually be a way to know which colors

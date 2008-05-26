@@ -252,13 +252,13 @@ vlc_module_begin();
     set_capability( "crop padd", 10 );
     set_callbacks( OpenCropPadd, CloseFilter );
     set_description( N_("FFmpeg crop padd filter") );
-#endif
 
     /* chroma conversion submodule */
     add_submodule();
     set_capability( "chroma", 50 );
     set_callbacks( OpenChroma, CloseChroma );
     set_description( N_("FFmpeg chroma conversion") );
+#endif
 
     /* video filter submodule */
     add_submodule();

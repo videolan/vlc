@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_filter.h>
 #include <vlc_vout.h>
 
 #define SRC_FOURCC  "I422,J422"
@@ -42,9 +43,9 @@
  *****************************************************************************/
 static int  Activate ( vlc_object_t * );
 
-static void I422_I420( vout_thread_t *, picture_t *, picture_t * );
-static void I422_YV12( vout_thread_t *, picture_t *, picture_t * );
-static void I422_YUVA( vout_thread_t *, picture_t *, picture_t * );
+static void I422_I420( filter_t *, picture_t *, picture_t * );
+static void I422_YV12( filter_t *, picture_t *, picture_t * );
+static void I422_YUVA( filter_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -62,31 +63,32 @@ vlc_module_end();
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
-    if( p_vout->render.i_width & 1 || p_vout->render.i_height & 1 )
+    if( p_filter->fmt_in.video.i_width & 1
+     || p_filter->fmt_in.video.i_height & 1 )
     {
         return -1;
     }
 
-    switch( p_vout->render.i_chroma )
+    switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_FOURCC('I','4','2','2'):
         case VLC_FOURCC('J','4','2','2'):
-            switch( p_vout->output.i_chroma )
+            switch( p_filter->fmt_out.video.i_chroma )
             {
                 case VLC_FOURCC('I','4','2','0'):
                 case VLC_FOURCC('I','Y','U','V'):
                 case VLC_FOURCC('J','4','2','0'):
-                    p_vout->chroma.pf_convert = I422_I420;
+                    p_filter->pf_video_filter_io = I422_I420;
                     break;
 
                 case VLC_FOURCC('Y','V','1','2'):
-                    p_vout->chroma.pf_convert = I422_YV12;
+                    p_filter->pf_video_filter_io = I422_YV12;
                     break;
 
                 case VLC_FOURCC('Y','U','V','A'):
-                    p_vout->chroma.pf_convert = I422_YUVA;
+                    p_filter->pf_video_filter_io = I422_YUVA;
                     break;
 
                 default:
@@ -105,15 +107,15 @@ static int Activate( vlc_object_t *p_this )
 /*****************************************************************************
  * I422_I420: planar YUV 4:2:2 to planar I420 4:2:0 Y:U:V
  *****************************************************************************/
-static void I422_I420( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_I420( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint16_t i_dpy = p_dest->p[Y_PLANE].i_pitch;
     uint16_t i_spy = p_source->p[Y_PLANE].i_pitch;
     uint16_t i_dpuv = p_dest->p[U_PLANE].i_pitch;
     uint16_t i_spuv = p_source->p[U_PLANE].i_pitch;
-    uint16_t i_width = p_vout->render.i_width;
-    uint16_t i_y = p_vout->render.i_height;
+    uint16_t i_width = p_filter->fmt_in.video.i_width;
+    uint16_t i_y = p_filter->fmt_in.video.i_height;
     uint8_t *p_dy = p_dest->Y_PIXELS + (i_y-1)*i_dpy;
     uint8_t *p_y = p_source->Y_PIXELS + (i_y-1)*i_spy;
     uint8_t *p_du = p_dest->U_PIXELS + (i_y/2-1)*i_dpuv;
@@ -134,15 +136,15 @@ static void I422_I420( vout_thread_t *p_vout, picture_t *p_source,
 /*****************************************************************************
  * I422_YV12: planar YUV 4:2:2 to planar YV12 4:2:0 Y:V:U
  *****************************************************************************/
-static void I422_YV12( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_YV12( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint16_t i_dpy = p_dest->p[Y_PLANE].i_pitch;
     uint16_t i_spy = p_source->p[Y_PLANE].i_pitch;
     uint16_t i_dpuv = p_dest->p[U_PLANE].i_pitch;
     uint16_t i_spuv = p_source->p[U_PLANE].i_pitch;
-    uint16_t i_width = p_vout->render.i_width;
-    uint16_t i_y = p_vout->render.i_height;
+    uint16_t i_width = p_filter->fmt_in.video.i_width;
+    uint16_t i_y = p_filter->fmt_in.video.i_height;
     uint8_t *p_dy = p_dest->Y_PIXELS + (i_y-1)*i_dpy;
     uint8_t *p_y = p_source->Y_PIXELS + (i_y-1)*i_spy;
     uint8_t *p_du = p_dest->V_PIXELS + (i_y/2-1)*i_dpuv; /* U and V are swapped */
@@ -163,10 +165,10 @@ static void I422_YV12( vout_thread_t *p_vout, picture_t *p_source,
 /*****************************************************************************
  * I422_YUVA: planar YUV 4:2:2 to planar YUVA 4:2:0:4 Y:U:V:A
  *****************************************************************************/
-static void I422_YUVA( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_YUVA( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
-    I422_I420( p_vout, p_source, p_dest );
+    I422_I420( p_filter, p_source, p_dest );
     vlc_memset( p_dest->p[A_PLANE].p_pixels, 0xff,
                 p_dest->p[A_PLANE].i_lines * p_dest->p[A_PLANE].i_pitch );
 }

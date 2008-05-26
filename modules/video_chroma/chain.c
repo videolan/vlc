@@ -1,7 +1,7 @@
 /*****************************************************************************
  * chain.c : chain multiple chroma modules as a last resort solution
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan dot org>
@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_filter.h>
 #include <vlc_vout.h>
 
 /*****************************************************************************
@@ -38,7 +39,7 @@
  *****************************************************************************/
 static int  Activate ( vlc_object_t * );
 static void Destroy  ( vlc_object_t * );
-static void Chain    ( vout_thread_t *, picture_t *, picture_t * );
+static void Chain    ( filter_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -51,19 +52,21 @@ vlc_module_end();
 
 #define MAX_CHROMAS 2
 
-struct chroma_sys_t
+struct filter_sys_t
 {
     vlc_fourcc_t i_chroma;
 
-    vout_chroma_t chroma1;
-    vout_chroma_t chroma2;
+    filter_t    *p_chroma1;
+    filter_t    *p_chroma2;
 
-    picture_t *p_tmp;
+    picture_t   *p_tmp;
 };
 
 static const vlc_fourcc_t pi_allowed_chromas[] = {
     VLC_FOURCC('I','4','2','0'),
     VLC_FOURCC('I','4','2','2'),
+    VLC_FOURCC('R','V','3','2'),
+    VLC_FOURCC('R','V','2','4'),
     0
 };
 
@@ -74,8 +77,9 @@ static const vlc_fourcc_t pi_allowed_chromas[] = {
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
+#if 0
     static int hack = 1;
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
     hack++;
     if( hack > MAX_CHROMAS )
@@ -86,25 +90,25 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    chroma_sys_t *p_sys = (chroma_sys_t *)malloc( sizeof( chroma_sys_t ) );
+    filter_sys_t *p_sys = (filter_sys_t *)malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
     {
         hack--;
         return VLC_ENOMEM;
     }
-    memset( p_sys, 0, sizeof( chroma_sys_t ) );
+    memset( p_sys, 0, sizeof( filter_sys_t ) );
 
     int i;
-    vlc_fourcc_t i_output_chroma = p_vout->output.i_chroma;
-    vlc_fourcc_t i_render_chroma = p_vout->render.i_chroma;
+    vlc_fourcc_t i_output_chroma = p_filter->fmt_in.video.i_chroma;
+    vlc_fourcc_t i_render_chroma = p_filter->fmt_out.video.i_chroma;
 
     for( i = 0; pi_allowed_chromas[i]; i++ )
     {
-        msg_Warn( p_vout, "Trying %4s as a chroma chain",
+        msg_Warn( p_filter, "Trying %4s as a chroma chain",
                   (const char *)&pi_allowed_chromas[i] );
-        p_vout->output.i_chroma = pi_allowed_chromas[i];
-        p_vout->chroma.p_module = module_Need( p_vout, "chroma", NULL, 0 );
-        p_vout->output.i_chroma = i_output_chroma;
+        p_filter->output.i_chroma = pi_allowed_chromas[i];
+        p_filter->p_chroma1.p_module = module_Need( p_vout, "chroma", NULL, 0 );
+        p_filter->output.i_chroma = i_output_chroma;
 
         if( !p_vout->chroma.p_module )
             continue;
@@ -136,14 +140,15 @@ static int Activate( vlc_object_t *p_this )
 
     free( p_sys );
     hack--;
+#endif
     return VLC_EGENERIC;
 }
 
 static void Destroy( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+#if 0
+    filter_t *p_filter = (filter_t *)p_this;
     vout_chroma_t chroma = p_vout->chroma;
-
 
     p_vout->chroma = chroma.p_sys->chroma1;
     module_Unneed( p_vout, p_vout->chroma.p_module );
@@ -158,14 +163,16 @@ static void Destroy( vlc_object_t *p_this )
     }
     free( chroma.p_sys );
     chroma.p_sys = NULL;
+#endif
 }
 
 /*****************************************************************************
  * Chain
  *****************************************************************************/
-static void Chain( vout_thread_t *p_vout, picture_t *p_source,
+static void Chain( filter_t *p_filter, picture_t *p_source,
                    picture_t *p_dest )
 {
+#if 0
     chroma_sys_t *p_sys = p_vout->chroma.p_sys;
 
     if( !p_sys->p_tmp )
@@ -190,4 +197,5 @@ static void Chain( vout_thread_t *p_vout, picture_t *p_source,
     p_vout->chroma = p_sys->chroma2;
     p_sys->chroma2.pf_convert( p_vout, p_sys->p_tmp, p_dest );
     p_vout->chroma = chroma;
+#endif
 }

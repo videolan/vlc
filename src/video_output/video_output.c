@@ -655,13 +655,34 @@ static int InitThread( vout_thread_t *p_vout )
         p_vout->b_direct = 0;
 
         /* Choose the best module */
-        p_vout->chroma.p_module = module_Need( p_vout, "chroma", NULL, 0 );
+        p_vout->p_chroma = vlc_object_create( p_vout, VLC_OBJECT_FILTER );
+        filter_t *p_chroma = p_vout->p_chroma;
+        vlc_object_attach( p_chroma, p_vout );
+        /* TODO: Set the fmt_in and fmt_out stuff here */
+        p_chroma->fmt_in.video = p_vout->fmt_render;
+        p_chroma->fmt_out.video = p_vout->fmt_out;
 
-        if( p_vout->chroma.p_module == NULL )
+        /* TODO: put in a function */
+        p_chroma->fmt_out.video.i_rmask = p_vout->output.i_rmask;
+        p_chroma->fmt_out.video.i_gmask = p_vout->output.i_gmask;
+        p_chroma->fmt_out.video.i_bmask = p_vout->output.i_bmask;
+        p_chroma->fmt_out.video.i_rrshift = p_vout->output.i_rrshift;
+        p_chroma->fmt_out.video.i_lrshift = p_vout->output.i_lrshift;
+        p_chroma->fmt_out.video.i_rgshift = p_vout->output.i_rgshift;
+        p_chroma->fmt_out.video.i_lgshift = p_vout->output.i_lgshift;
+        p_chroma->fmt_out.video.i_rbshift = p_vout->output.i_rbshift;
+        p_chroma->fmt_out.video.i_lbshift = p_vout->output.i_lbshift;
+        msg_Err( p_vout, "HOLA! %4.4s\n", (char*)&p_chroma->fmt_in.video.i_chroma );
+        msg_Err( p_vout, "HOLA! %4.4s\n", (char*)&p_chroma->fmt_out.video.i_chroma );
+        p_chroma->p_module = module_Need( p_chroma, "chroma", NULL, 0 );
+
+        if( p_chroma->p_module == NULL )
         {
             msg_Err( p_vout, "no chroma module for %4.4s to %4.4s",
                      (char*)&p_vout->render.i_chroma,
                      (char*)&p_vout->output.i_chroma );
+            vlc_object_detach( p_vout->p_chroma );
+            p_vout->p_chroma = NULL;
             p_vout->pf_end( p_vout );
             vlc_mutex_unlock( &p_vout->change_lock );
             return VLC_EGENERIC;
@@ -1153,11 +1174,11 @@ static void RunThread( vout_thread_t *p_vout)
             }
 
             /* Need to reinitialise the chroma plugin */
-            if( p_vout->chroma.p_module )
+            if( p_vout->p_chroma->p_module )
             {
-                if( p_vout->chroma.p_module->pf_deactivate )
-                    p_vout->chroma.p_module->pf_deactivate( VLC_OBJECT(p_vout) );
-                p_vout->chroma.p_module->pf_activate( VLC_OBJECT(p_vout) );
+                if( p_vout->p_chroma->p_module->pf_deactivate )
+                    p_vout->p_chroma->p_module->pf_deactivate( VLC_OBJECT(p_vout->p_chroma) );
+                p_vout->p_chroma->p_module->pf_activate( VLC_OBJECT(p_vout->p_chroma) );
             }
         }
 
@@ -1172,7 +1193,8 @@ static void RunThread( vout_thread_t *p_vout)
 
             if( !p_vout->b_direct )
             {
-                module_Unneed( p_vout, p_vout->chroma.p_module );
+                module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
+                p_vout->p_chroma = NULL;
             }
 
             vlc_mutex_lock( &p_vout->picture_lock );
@@ -1245,7 +1267,8 @@ static void EndThread( vout_thread_t *p_vout )
 
     if( !p_vout->b_direct )
     {
-        module_Unneed( p_vout, p_vout->chroma.p_module );
+        module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
+        p_vout->p_chroma->p_module = NULL;
     }
 
     /* Destroy all remaining pictures */

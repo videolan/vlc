@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_filter.h>
 #include <vlc_vout.h>
 
 #define SRC_FOURCC  "I420,IYUV,YV12"
@@ -41,7 +42,7 @@
  * Local and extern prototypes.
  *****************************************************************************/
 static int  Activate   ( vlc_object_t * );
-static void I420_YMGA  ( vout_thread_t *, picture_t *, picture_t * );
+static void I420_YMGA  ( filter_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -65,22 +66,23 @@ vlc_module_end();
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
-    if( p_vout->render.i_width & 1 || p_vout->render.i_height & 1 )
+    if( p_filter->fmt_in.video.i_width & 1
+     || p_filter->fmt_in.video.i_height & 1 )
     {
         return -1;
     }
 
-    switch( p_vout->render.i_chroma )
+    switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_FOURCC('Y','V','1','2'):
         case VLC_FOURCC('I','4','2','0'):
         case VLC_FOURCC('I','Y','U','V'):
-            switch( p_vout->output.i_chroma )
+            switch( p_filter->fmt_out.video.i_chroma )
             {
                 case VLC_FOURCC('Y','M','G','A'):
-                    p_vout->chroma.pf_convert = I420_YMGA;
+                    p_filter->pf_video_filter_io = I420_YMGA;
                     break;
 
                 default:
@@ -100,8 +102,8 @@ static int Activate( vlc_object_t *p_this )
 /*****************************************************************************
  * I420_YMGA: planar YUV 4:2:0 to Matrox's planar/packed YUV 4:2:0
  *****************************************************************************/
-static void I420_YMGA( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I420_YMGA( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_uv = p_dest->U_PIXELS;
     uint8_t *p_u = p_source->U_PIXELS;

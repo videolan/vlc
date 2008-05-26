@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_filter.h>
 #include <vlc_vout.h>
 
 #include "i422_yuy2.h"
@@ -48,14 +49,14 @@
  *****************************************************************************/
 static int  Activate ( vlc_object_t * );
 
-static void I422_YUY2           ( vout_thread_t *, picture_t *, picture_t * );
-static void I422_YVYU           ( vout_thread_t *, picture_t *, picture_t * );
-static void I422_UYVY           ( vout_thread_t *, picture_t *, picture_t * );
-static void I422_IUYV           ( vout_thread_t *, picture_t *, picture_t * );
-static void I422_cyuv           ( vout_thread_t *, picture_t *, picture_t * );
+static void I422_YUY2           ( filter_t *, picture_t *, picture_t * );
+static void I422_YVYU           ( filter_t *, picture_t *, picture_t * );
+static void I422_UYVY           ( filter_t *, picture_t *, picture_t * );
+static void I422_IUYV           ( filter_t *, picture_t *, picture_t * );
+static void I422_cyuv           ( filter_t *, picture_t *, picture_t * );
 #if defined (MODULE_NAME_IS_i422_yuy2)
-static void I422_Y211           ( vout_thread_t *, picture_t *, picture_t * );
-static void I422_Y211           ( vout_thread_t *, picture_t *, picture_t * );
+static void I422_Y211           ( filter_t *, picture_t *, picture_t * );
+static void I422_Y211           ( filter_t *, picture_t *, picture_t * );
 #endif
 
 /*****************************************************************************
@@ -84,44 +85,45 @@ vlc_module_end();
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
-    if( p_vout->render.i_width & 1 || p_vout->render.i_height & 1 )
+    if( p_filter->fmt_in.video.i_width & 1
+     || p_filter->fmt_in.video.i_height & 1 )
     {
         return -1;
     }
 
-    switch( p_vout->render.i_chroma )
+    switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_FOURCC('I','4','2','2'):
-            switch( p_vout->output.i_chroma )
+            switch( p_filter->fmt_out.video.i_chroma )
             {
                 case VLC_FOURCC('Y','U','Y','2'):
                 case VLC_FOURCC('Y','U','N','V'):
-                    p_vout->chroma.pf_convert = I422_YUY2;
+                    p_filter->pf_video_filter_io = I422_YUY2;
                     break;
 
                 case VLC_FOURCC('Y','V','Y','U'):
-                    p_vout->chroma.pf_convert = I422_YVYU;
+                    p_filter->pf_video_filter_io = I422_YVYU;
                     break;
 
                 case VLC_FOURCC('U','Y','V','Y'):
                 case VLC_FOURCC('U','Y','N','V'):
                 case VLC_FOURCC('Y','4','2','2'):
-                    p_vout->chroma.pf_convert = I422_UYVY;
+                    p_filter->pf_video_filter_io = I422_UYVY;
                     break;
 
                 case VLC_FOURCC('I','U','Y','V'):
-                    p_vout->chroma.pf_convert = I422_IUYV;
+                    p_filter->pf_video_filter_io = I422_IUYV;
                     break;
 
                 case VLC_FOURCC('c','y','u','v'):
-                    p_vout->chroma.pf_convert = I422_cyuv;
+                    p_filter->pf_video_filter_io = I422_cyuv;
                     break;
 
 #if defined (MODULE_NAME_IS_i422_yuy2)
                 case VLC_FOURCC('Y','2','1','1'):
-                    p_vout->chroma.pf_convert = I422_Y211;
+                    p_filter->pf_video_filter_io = I422_Y211;
                     break;
 #endif
 
@@ -141,8 +143,8 @@ static int Activate( vlc_object_t *p_this )
 /*****************************************************************************
  * I422_YUY2: planar YUV 4:2:2 to packed YUY2 4:2:2
  *****************************************************************************/
-static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_YUY2( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_dest->p->p_pixels;
     uint8_t *p_y = p_source->Y_PIXELS;
@@ -164,13 +166,13 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
         ((intptr_t)p_line|(intptr_t)p_y))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
         {
-            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
             {
                 SSE2_CALL( SSE2_YUV422_YUYV_ALIGNED );
             }
-            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
             {
                 C_YUV422_YUYV( p_line, p_y, p_u, p_v );
             }
@@ -182,13 +184,13 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
     }
     else {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
         {
-            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
             {
                 SSE2_CALL( SSE2_YUV422_YUYV_UNALIGNED );
             }
-            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
             {
                 C_YUV422_YUYV( p_line, p_y, p_u, p_v );
             }
@@ -202,9 +204,9 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 
 #else
 
-    for( i_y = p_vout->render.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
     {
-        for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
+        for( i_x = p_filter->fmt_in.video.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_i422_yuy2)
             C_YUV422_YUYV( p_line, p_y, p_u, p_v );
@@ -215,7 +217,7 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV422_YUYV );
 #endif
         }
-        for( i_x = ( p_vout->render.i_width % 8 ) / 2; i_x-- ; )
+        for( i_x = ( p_filter->fmt_in.video.i_width % 8 ) / 2; i_x-- ; )
         {
             C_YUV422_YUYV( p_line, p_y, p_u, p_v );
         }
@@ -234,8 +236,8 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 /*****************************************************************************
  * I422_YVYU: planar YUV 4:2:2 to packed YVYU 4:2:2
  *****************************************************************************/
-static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_YVYU( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_dest->p->p_pixels;
     uint8_t *p_y = p_source->Y_PIXELS;
@@ -257,13 +259,13 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
         ((intptr_t)p_line|(intptr_t)p_y))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
         {
-            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
             {
                 SSE2_CALL( SSE2_YUV422_YVYU_ALIGNED );
             }
-            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
             {
                 C_YUV422_YVYU( p_line, p_y, p_u, p_v );
             }
@@ -275,13 +277,13 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
     }
     else {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
         {
-            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
             {
                 SSE2_CALL( SSE2_YUV422_YVYU_UNALIGNED );
             }
-            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
             {
                 C_YUV422_YVYU( p_line, p_y, p_u, p_v );
             }
@@ -295,9 +297,9 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 
 #else
 
-    for( i_y = p_vout->render.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
     {
-        for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
+        for( i_x = p_filter->fmt_in.video.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_i422_yuy2)
             C_YUV422_YVYU( p_line, p_y, p_u, p_v );
@@ -308,7 +310,7 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV422_YVYU );
 #endif
         }
-        for( i_x = ( p_vout->render.i_width % 8 ) / 2; i_x-- ; )
+        for( i_x = ( p_filter->fmt_in.video.i_width % 8 ) / 2; i_x-- ; )
         {
             C_YUV422_YVYU( p_line, p_y, p_u, p_v );
         }
@@ -327,8 +329,8 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 /*****************************************************************************
  * I422_UYVY: planar YUV 4:2:2 to packed UYVY 4:2:2
  *****************************************************************************/
-static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_UYVY( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_dest->p->p_pixels;
     uint8_t *p_y = p_source->Y_PIXELS;
@@ -350,13 +352,13 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
         ((intptr_t)p_line|(intptr_t)p_y))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
         {
-            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
             {
                 SSE2_CALL( SSE2_YUV422_UYVY_ALIGNED );
             }
-            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
             {
                 C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             }
@@ -368,13 +370,13 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
     }
     else {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
         {
-            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
             {
                 SSE2_CALL( SSE2_YUV422_UYVY_UNALIGNED );
             }
-            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
             {
                 C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             }
@@ -388,9 +390,9 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 
 #else
 
-    for( i_y = p_vout->render.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
     {
-        for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
+        for( i_x = p_filter->fmt_in.video.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_i422_yuy2)
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
@@ -401,7 +403,7 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV422_UYVY );
 #endif
         }
-        for( i_x = ( p_vout->render.i_width % 8 ) / 2; i_x-- ; )
+        for( i_x = ( p_filter->fmt_in.video.i_width % 8 ) / 2; i_x-- ; )
         {
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
         }
@@ -420,19 +422,19 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 /*****************************************************************************
  * I422_IUYV: planar YUV 4:2:2 to interleaved packed IUYV 4:2:2
  *****************************************************************************/
-static void I422_IUYV( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_IUYV( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     VLC_UNUSED(p_source); VLC_UNUSED(p_dest);
     /* FIXME: TODO ! */
-    msg_Err( p_vout, "I422_IUYV unimplemented, please harass <sam@zoy.org>" );
+    msg_Err( p_filter, "I422_IUYV unimplemented, please harass <sam@zoy.org>" );
 }
 
 /*****************************************************************************
  * I422_cyuv: planar YUV 4:2:2 to upside-down packed UYVY 4:2:2
  *****************************************************************************/
-static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_cyuv( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_dest->p->p_pixels + p_dest->p->i_visible_lines * p_dest->p->i_pitch;
     uint8_t *p_y = p_source->Y_PIXELS;
@@ -454,15 +456,15 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
         ((intptr_t)p_line|(intptr_t)p_y))) )
     {
         /* use faster SSE2 aligned fetch and store */
-        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
         {
             p_line -= 2 * p_dest->p->i_pitch;
 
-            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
             {
                 SSE2_CALL( SSE2_YUV422_UYVY_ALIGNED );
             }
-            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
             {
                 C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             }
@@ -474,15 +476,15 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
     }
     else {
         /* use slower SSE2 unaligned fetch and store */
-        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
         {
             p_line -= 2 * p_dest->p->i_pitch;
 
-            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
             {
                 SSE2_CALL( SSE2_YUV422_UYVY_UNALIGNED );
             }
-            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
             {
                 C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             }
@@ -496,9 +498,9 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 
 #else
 
-    for( i_y = p_vout->render.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
     {
-        for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
+        for( i_x = p_filter->fmt_in.video.i_width / 8 ; i_x-- ; )
         {
             p_line -= 2 * p_dest->p->i_pitch;
 
@@ -529,8 +531,8 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
  * I422_Y211: planar YUV 4:2:2 to packed YUYV 2:1:1
  *****************************************************************************/
 #if defined (MODULE_NAME_IS_i422_yuy2)
-static void I422_Y211( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void I422_Y211( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_dest->p->p_pixels + p_dest->p->i_visible_lines * p_dest->p->i_pitch;
     uint8_t *p_y = p_source->Y_PIXELS;
@@ -539,9 +541,9 @@ static void I422_Y211( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    for( i_y = p_vout->render.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
     {
-        for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
+        for( i_x = p_filter->fmt_in.video.i_width / 8 ; i_x-- ; )
         {
             C_YUV422_Y211( p_line, p_y, p_u, p_v );
             C_YUV422_Y211( p_line, p_y, p_u, p_v );

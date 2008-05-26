@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_filter.h>
 #include <vlc_vout.h>
 
 #define SRC_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,cyuv"
@@ -41,10 +42,10 @@
  *****************************************************************************/
 static int  Activate ( vlc_object_t * );
 
-static void YUY2_I420           ( vout_thread_t *, picture_t *, picture_t * );
-static void YVYU_I420           ( vout_thread_t *, picture_t *, picture_t * );
-static void UYVY_I420           ( vout_thread_t *, picture_t *, picture_t * );
-static void cyuv_I420           ( vout_thread_t *, picture_t *, picture_t * );
+static void YUY2_I420           ( filter_t *, picture_t *, picture_t * );
+static void YVYU_I420           ( filter_t *, picture_t *, picture_t * );
+static void UYVY_I420           ( filter_t *, picture_t *, picture_t * );
+static void cyuv_I420           ( filter_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -62,35 +63,36 @@ vlc_module_end();
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
-    if( p_vout->render.i_width & 1 || p_vout->render.i_height & 1 )
+    if( p_filter->fmt_in.video.i_width & 1
+     || p_filter->fmt_in.video.i_height & 1 )
     {
         return -1;
     }
 
-    switch( p_vout->output.i_chroma )
+    switch( p_filter->fmt_out.video.i_chroma )
     {
         case VLC_FOURCC('I','4','2','0'):
-            switch( p_vout->render.i_chroma )
+            switch( p_filter->fmt_in.video.i_chroma )
             {
                 case VLC_FOURCC('Y','U','Y','2'):
                 case VLC_FOURCC('Y','U','N','V'):
-                    p_vout->chroma.pf_convert = YUY2_I420;
+                    p_filter->pf_video_filter_io = YUY2_I420;
                     break;
 
                 case VLC_FOURCC('Y','V','Y','U'):
-                    p_vout->chroma.pf_convert = YVYU_I420;
+                    p_filter->pf_video_filter_io = YVYU_I420;
                     break;
 
                 case VLC_FOURCC('U','Y','V','Y'):
                 case VLC_FOURCC('U','Y','N','V'):
                 case VLC_FOURCC('Y','4','2','2'):
-                    p_vout->chroma.pf_convert = UYVY_I420;
+                    p_filter->pf_video_filter_io = UYVY_I420;
                     break;
 
                 case VLC_FOURCC('c','y','u','v'):
-                    p_vout->chroma.pf_convert = cyuv_I420;
+                    p_filter->pf_video_filter_io = cyuv_I420;
                     break;
 
                 default:
@@ -109,8 +111,8 @@ static int Activate( vlc_object_t *p_this )
 /*****************************************************************************
  * YUY2_I420: packed YUY2 4:2:2 to planar YUV 4:2:0
  *****************************************************************************/
-static void YUY2_I420( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void YUY2_I420( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_source->p->p_pixels;
 
@@ -129,11 +131,11 @@ static void YUY2_I420( vout_thread_t *p_vout, picture_t *p_source,
 
     bool b_skip = false;
 
-    for( i_y = p_vout->output.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_out.video.i_height ; i_y-- ; )
     {
         if( b_skip )
         {
-            for( i_x = p_vout->output.i_width / 8 ; i_x-- ; )
+            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
             {
     #define C_YUYV_YUV422_skip( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; p_line++; \
@@ -143,14 +145,14 @@ static void YUY2_I420( vout_thread_t *p_vout, picture_t *p_source,
                 C_YUYV_YUV422_skip( p_line, p_y, p_u, p_v );
                 C_YUYV_YUV422_skip( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_vout->output.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
             {
                 C_YUYV_YUV422_skip( p_line, p_y, p_u, p_v );
             }
         }
         else
         {
-            for( i_x = p_vout->output.i_width / 8 ; i_x-- ; )
+            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
             {
     #define C_YUYV_YUV422( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; *p_u++ = *p_line++; \
@@ -160,7 +162,7 @@ static void YUY2_I420( vout_thread_t *p_vout, picture_t *p_source,
                 C_YUYV_YUV422( p_line, p_y, p_u, p_v );
                 C_YUYV_YUV422( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_vout->output.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
             {
                 C_YUYV_YUV422( p_line, p_y, p_u, p_v );
             }
@@ -177,8 +179,8 @@ static void YUY2_I420( vout_thread_t *p_vout, picture_t *p_source,
 /*****************************************************************************
  * YVYU_I420: packed YVYU 4:2:2 to planar YUV 4:2:0
  *****************************************************************************/
-static void YVYU_I420( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void YVYU_I420( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_source->p->p_pixels;
 
@@ -197,11 +199,11 @@ static void YVYU_I420( vout_thread_t *p_vout, picture_t *p_source,
 
     bool b_skip = false;
 
-    for( i_y = p_vout->output.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_out.video.i_height ; i_y-- ; )
     {
         if( b_skip )
         {
-            for( i_x = p_vout->output.i_width / 8 ; i_x-- ; )
+            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
             {
     #define C_YVYU_YUV422_skip( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; p_line++; \
@@ -211,14 +213,14 @@ static void YVYU_I420( vout_thread_t *p_vout, picture_t *p_source,
                 C_YVYU_YUV422_skip( p_line, p_y, p_u, p_v );
                 C_YVYU_YUV422_skip( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_vout->output.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
             {
                 C_YVYU_YUV422_skip( p_line, p_y, p_u, p_v );
             }
         }
         else
         {
-            for( i_x = p_vout->output.i_width / 8 ; i_x-- ; )
+            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
             {
     #define C_YVYU_YUV422( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; *p_v++ = *p_line++; \
@@ -228,7 +230,7 @@ static void YVYU_I420( vout_thread_t *p_vout, picture_t *p_source,
                 C_YVYU_YUV422( p_line, p_y, p_u, p_v );
                 C_YVYU_YUV422( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_vout->output.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
             {
                 C_YVYU_YUV422( p_line, p_y, p_u, p_v );
             }
@@ -245,8 +247,8 @@ static void YVYU_I420( vout_thread_t *p_vout, picture_t *p_source,
 /*****************************************************************************
  * UYVY_I420: packed UYVY 4:2:2 to planar YUV 4:2:0
  *****************************************************************************/
-static void UYVY_I420( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void UYVY_I420( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_source->p->p_pixels;
 
@@ -265,11 +267,11 @@ static void UYVY_I420( vout_thread_t *p_vout, picture_t *p_source,
 
     bool b_skip = false;
 
-    for( i_y = p_vout->output.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_out.video.i_height ; i_y-- ; )
     {
         if( b_skip )
         {
-            for( i_x = p_vout->output.i_width / 8 ; i_x-- ; )
+            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
             {
     #define C_UYVY_YUV422_skip( p_line, p_y, p_u, p_v )      \
                 *p_u++ = *p_line++; p_line++; \
@@ -279,14 +281,14 @@ static void UYVY_I420( vout_thread_t *p_vout, picture_t *p_source,
                 C_UYVY_YUV422_skip( p_line, p_y, p_u, p_v );
                 C_UYVY_YUV422_skip( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_vout->output.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
             {
                 C_UYVY_YUV422_skip( p_line, p_y, p_u, p_v );
             }
         }
         else
         {
-            for( i_x = p_vout->output.i_width / 8 ; i_x-- ; )
+            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
             {
     #define C_UYVY_YUV422( p_line, p_y, p_u, p_v )      \
                 *p_u++ = *p_line++; *p_y++ = *p_line++; \
@@ -296,7 +298,7 @@ static void UYVY_I420( vout_thread_t *p_vout, picture_t *p_source,
                 C_UYVY_YUV422( p_line, p_y, p_u, p_v );
                 C_UYVY_YUV422( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_vout->output.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
             {
                 C_UYVY_YUV422( p_line, p_y, p_u, p_v );
             }
@@ -314,8 +316,8 @@ static void UYVY_I420( vout_thread_t *p_vout, picture_t *p_source,
  * cyuv_I420: upside-down packed UYVY 4:2:2 to planar YUV 4:2:0
  * FIXME
  *****************************************************************************/
-static void cyuv_I420( vout_thread_t *p_vout, picture_t *p_source,
-                                              picture_t *p_dest )
+static void cyuv_I420( filter_t *p_filter, picture_t *p_source,
+                                           picture_t *p_dest )
 {
     uint8_t *p_line = p_source->p->p_pixels;
 
@@ -334,11 +336,11 @@ static void cyuv_I420( vout_thread_t *p_vout, picture_t *p_source,
 
     bool b_skip = false;
 
-    for( i_y = p_vout->output.i_height ; i_y-- ; )
+    for( i_y = p_filter->fmt_out.video.i_height ; i_y-- ; )
     {
         if( b_skip )
         {
-            for( i_x = p_vout->output.i_width / 8 ; i_x-- ; )
+            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
             {
     #define C_cyuv_YUV422_skip( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; p_line++; \
@@ -348,14 +350,14 @@ static void cyuv_I420( vout_thread_t *p_vout, picture_t *p_source,
                 C_cyuv_YUV422_skip( p_line, p_y, p_u, p_v );
                 C_cyuv_YUV422_skip( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_vout->output.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
             {
                 C_cyuv_YUV422_skip( p_line, p_y, p_u, p_v );
             }
         }
         else
         {
-            for( i_x = p_vout->output.i_width / 8 ; i_x-- ; )
+            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
             {
     #define C_cyuv_YUV422( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; *p_v++ = *p_line++; \
@@ -365,7 +367,7 @@ static void cyuv_I420( vout_thread_t *p_vout, picture_t *p_source,
                 C_cyuv_YUV422( p_line, p_y, p_u, p_v );
                 C_cyuv_YUV422( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_vout->output.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
             {
                 C_cyuv_YUV422( p_line, p_y, p_u, p_v );
             }

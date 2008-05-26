@@ -221,7 +221,6 @@ typedef struct aout_filter_t aout_filter_t;
 /* Video */
 typedef struct vout_thread_t vout_thread_t;
 typedef struct vout_sys_t vout_sys_t;
-typedef struct chroma_sys_t chroma_sys_t;
 
 typedef video_format_t video_frame_format_t;
 typedef struct picture_t picture_t;
