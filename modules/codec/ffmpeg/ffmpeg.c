@@ -79,7 +79,7 @@ static const char *enc_hq_list[] = { "rd", "bits", "simple" };
 static const char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
 #endif
 
-#if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H)
 static int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
@@ -209,7 +209,7 @@ vlc_module_begin();
 #endif
 #endif /* ENABLE_SOUT */
 
-#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
+#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_FFMPEG_AVFORMAT_H)
 
     /* demux submodule */
     add_submodule();
@@ -228,7 +228,7 @@ vlc_module_begin();
 #endif
 #endif
 
-#if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H)
     /* video filter submodule */
     add_submodule();
     set_description( N_("Video scaling filter") );

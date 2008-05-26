@@ -40,8 +40,6 @@
 #   include <libavformat/avformat.h>
 #elif defined(HAVE_FFMPEG_AVFORMAT_H)
 #   include <ffmpeg/avformat.h>
-#elif defined(HAVE_LIBAVFORMAT_TREE)
-#   include <avformat.h>
 #endif
 
 #include "ffmpeg.h"
@@ -49,7 +47,7 @@
 //#define AVFORMAT_DEBUG 1
 
 /* Version checking */
-#if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
+#if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
 
 /*****************************************************************************
  * demux_sys_t: demux descriptor
