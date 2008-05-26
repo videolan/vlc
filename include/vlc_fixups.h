@@ -32,7 +32,7 @@
 static inline char *strdup (const char *str)
 {
     size_t len = strlen (str) + 1;
-    char *res = malloc (len);
+    char *res = (char *)malloc (len);
     if (res) memcpy (res, str, len);
     return res;
 }
@@ -45,7 +45,7 @@ static inline char *strdup (const char *str)
 static inline int vasprintf (char **strp, const char *fmt, va_list ap)
 {
     int len = vsnprintf (NULL, 0, fmt, ap) + 1;
-    char *res = malloc (len);
+    char *res = (char *)malloc (len);
     if (res == NULL)
         return -1;
     *strp = res;
