@@ -261,79 +261,91 @@ typedef struct libvlc_event_manager_t
 /***************************************************************************
  * Other internal functions
  ***************************************************************************/
-input_thread_t *libvlc_get_input_thread( struct libvlc_media_player_t *,
-                                         libvlc_exception_t * );
+VLC_PRIVATE_API input_thread_t *libvlc_get_input_thread(
+     libvlc_media_player_t *,
+    libvlc_exception_t * );
 
 /* Media instance */
-libvlc_media_player_t *
-libvlc_media_player_new_from_input_thread( struct libvlc_instance_t *,
+VLC_PRIVATE_API libvlc_media_player_t *
+libvlc_media_player_new_from_input_thread( libvlc_instance_t *,
                                            input_thread_t *,
                                            libvlc_exception_t * );
 
-void libvlc_media_player_destroy( libvlc_media_player_t * );
+VLC_PRIVATE_API void libvlc_media_player_destroy(
+        libvlc_media_player_t * );
 
 /* Media Descriptor */
-libvlc_media_t *
-libvlc_media_new_from_input_item( struct libvlc_instance_t *, input_item_t *,
-                                  libvlc_exception_t * );
+VLC_PRIVATE_API libvlc_media_t * libvlc_media_new_from_input_item(
+        libvlc_instance_t *, input_item_t *,
+        libvlc_exception_t * );
 
-void libvlc_media_set_state( libvlc_media_t *, libvlc_state_t,
-                             libvlc_exception_t * );
+VLC_PRIVATE_API void libvlc_media_set_state(
+        libvlc_media_t *, libvlc_state_t,
+        libvlc_exception_t * );
 
 /* Media List */
-void _libvlc_media_list_add_media( libvlc_media_list_t * p_mlist,
-                                   libvlc_media_t * p_md,
-                                   libvlc_exception_t * p_e );
+VLC_PRIVATE_API void _libvlc_media_list_add_media(
+        libvlc_media_list_t * p_mlist,
+        libvlc_media_t * p_md,
+        libvlc_exception_t * p_e );
 
-void
-_libvlc_media_list_insert_media( libvlc_media_list_t * p_mlist,
-                                 libvlc_media_t * p_md, int index,
-                                 libvlc_exception_t * p_e );
+VLC_PRIVATE_API void _libvlc_media_list_insert_media(
+        libvlc_media_list_t * p_mlist,
+        libvlc_media_t * p_md, int index,
+        libvlc_exception_t * p_e );
 
-void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist, int index,
-                                      libvlc_exception_t * p_e );
+VLC_PRIVATE_API void _libvlc_media_list_remove_index(
+        libvlc_media_list_t * p_mlist, int index,
+        libvlc_exception_t * p_e );
 
 /* Media List View */
-libvlc_media_list_view_t *
-libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
-                            libvlc_media_list_view_count_func_t pf_count,
-                            libvlc_media_list_view_item_at_index_func_t pf_item_at_index,
-                            libvlc_media_list_view_children_at_index_func_t pf_children_at_index,
-                            libvlc_media_list_view_constructor_func_t pf_constructor,
-                            libvlc_media_list_view_release_func_t pf_release,
-                            void * this_view_data,
-                            libvlc_exception_t * p_e );
+VLC_PRIVATE_API libvlc_media_list_view_t * libvlc_media_list_view_new(
+        libvlc_media_list_t * p_mlist,
+        libvlc_media_list_view_count_func_t pf_count,
+        libvlc_media_list_view_item_at_index_func_t pf_item_at_index,
+        libvlc_media_list_view_children_at_index_func_t pf_children_at_index,
+        libvlc_media_list_view_constructor_func_t pf_constructor,
+        libvlc_media_list_view_release_func_t pf_release,
+        void * this_view_data,
+        libvlc_exception_t * p_e );
 
-void
-libvlc_media_list_view_set_ml_notification_callback(
-                libvlc_media_list_view_t * p_mlv,
-                void (*item_added)(const libvlc_event_t *, libvlc_media_list_view_t *),
-                void (*item_removed)(const libvlc_event_t *, libvlc_media_list_view_t *) );
+VLC_PRIVATE_API void libvlc_media_list_view_set_ml_notification_callback(
+        libvlc_media_list_view_t * p_mlv,
+        void (*item_added)(const libvlc_event_t *, libvlc_media_list_view_t *),
+        void (*item_removed)(const libvlc_event_t *, libvlc_media_list_view_t *) );
 
-void
-libvlc_media_list_view_will_delete_item( libvlc_media_list_view_t * p_mlv,
-                                         libvlc_media_t * p_item, int index );
-void libvlc_media_list_view_item_deleted( libvlc_media_list_view_t * p_mlv,
-                                          libvlc_media_t * p_item, int index );
-void
-libvlc_media_list_view_will_add_item ( libvlc_media_list_view_t * p_mlv,
-                                       libvlc_media_t * p_item, int index );
-void libvlc_media_list_view_item_added( libvlc_media_list_view_t * p_mlv,
-                                        libvlc_media_t * p_item, int index );
+VLC_PRIVATE_API void libvlc_media_list_view_will_delete_item(
+        libvlc_media_list_view_t * p_mlv,
+        libvlc_media_t * p_item, int index );
+
+VLC_PRIVATE_API void libvlc_media_list_view_item_deleted(
+        libvlc_media_list_view_t * p_mlv,
+        libvlc_media_t * p_item, int index );
+
+VLC_PRIVATE_API void libvlc_media_list_view_will_add_item (
+        libvlc_media_list_view_t * p_mlv,
+        libvlc_media_t * p_item, int index );
+
+VLC_PRIVATE_API void libvlc_media_list_view_item_added(
+        libvlc_media_list_view_t * p_mlv,
+        libvlc_media_t * p_item, int index );
 
 /* Events */
-libvlc_event_manager_t *
-libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
-                          libvlc_exception_t *p_e );
+VLC_PRIVATE_API libvlc_event_manager_t * libvlc_event_manager_new(
+        void * p_obj, libvlc_instance_t * p_libvlc_inst,
+        libvlc_exception_t *p_e );
 
-void libvlc_event_manager_release( libvlc_event_manager_t * p_em );
+VLC_PRIVATE_API void libvlc_event_manager_release(
+        libvlc_event_manager_t * p_em );
 
-void libvlc_event_manager_register_event_type( libvlc_event_manager_t * p_em,
-                                               libvlc_event_type_t event_type,
-                                               libvlc_exception_t * p_e );
+VLC_PRIVATE_API void libvlc_event_manager_register_event_type(
+        libvlc_event_manager_t * p_em,
+        libvlc_event_type_t event_type,
+        libvlc_exception_t * p_e );
 
-void libvlc_event_send( libvlc_event_manager_t * p_em,
-                        libvlc_event_t * p_event );
+VLC_PRIVATE_API void libvlc_event_send(
+        libvlc_event_manager_t * p_em,
+        libvlc_event_t * p_event );
 
 
 /* Exception shorcuts */
