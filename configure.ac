@@ -2988,179 +2988,6 @@ AC_ARG_ENABLE(ffmpeg,
 if test "${enable_ffmpeg}" != "no"
 then
 
-dnl Those options have to be here because the .pc can be bogus for ffmpeg previous nov 05
-
- AC_ARG_WITH(ffmpeg-mp3lame,
-   [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
-   [
-     if test "$with_ffmpeg_mp3lame" = "yes";	then
-        VLC_ADD_LIBS([ffmpeg],[-lmp3lame])
-     fi])
-
- AC_ARG_WITH(ffmpeg-faac,
-   [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
-   [
-     if test "$with_ffmpeg_faac" = "yes"; then
-        VLC_ADD_LIBS([ffmpeg],[-lfaac])
-     fi])
-
- AC_ARG_WITH(ffmpeg-dts,
-   [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
-   [
-     if test "$with_ffmpeg_dts" = "yes"; then
-             LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg} ${LIBS_ffmpeg}"
-             AC_CHECK_LIB(dts_pic, dts_free, 
-               [ VLC_ADD_LIBS([ffmpeg],[-ldts_pic]) ],
-               [ VLC_ADD_LIBS([ffmpeg],[-ldts]) ])
-             LDFLAGS="${LDFLAGS_save}"
-     fi])
-
- AC_ARG_WITH(ffmpeg-dca,
-   [    --with-ffmpeg-dca     specify if ffmpeg has been compiled with dca support],
-   [
-     if test "$with_ffmpeg_dca" = "yes"; then
-             LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg} ${LIBS_ffmpeg}"
-             AC_CHECK_LIB(dca, dca_free, [ VLC_ADD_LIBS([ffmpeg],[-ldca]) ])
-             LDFLAGS="${LDFLAGS_save}"
-     fi])
-
- AC_ARG_WITH(ffmpeg-vorbis,
-   [    --with-ffmpeg-vorbis    specify if ffmpeg has been compiled with vorbis support],
-   [
-     if test "$with_ffmpeg_vorbis" = "yes"; then
-        VLC_ADD_LIBS([ffmpeg],[-lvorbisenc -lvorbis])
-     fi])
-
- AC_ARG_WITH(ffmpeg-theora,
-   [    --with-ffmpeg-theora    specify if ffmpeg has been compiled with theora support],
-   [
-     if test "$with_ffmpeg_theora" = "yes"; then
-        VLC_ADD_LIBS([ffmpeg],[-ltheora])
-     fi])
-
- AC_ARG_WITH(ffmpeg-ogg,
-   [    --with-ffmpeg-ogg    specify if ffmpeg has been compiled with ogg support],
-   [
-     if test "$with_ffmpeg_ogg" = "yes"; then
-        VLC_ADD_LIBS([ffmpeg],[-logg])
-     fi])
-
- AC_ARG_WITH(ffmpeg-zlib,
-   [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
-   [
-     if test "$with_ffmpeg_zlib" = "yes"; then
-        VLC_ADD_LIBS([ffmpeg],[-lz])
-     fi])
-
- AC_ARG_WITH(ffmpeg-amrnb,
-   [    --with-ffmpeg-amrnb specify if ffmpeg has been compiled with libamrnb support],
-   [
-     if test "$with_ffmpeg_amrnb" = "yes";	then
-        VLC_ADD_LIBS([ffmpeg],[-lamrnb])
-     fi])
-
- AC_ARG_WITH(ffmpeg-amrwb,
-   [    --with-ffmpeg-amrwb specify if ffmpeg has been compiled with libamrwb support],
-   [
-     if test "$with_ffmpeg_amrwb" = "yes";	then
-        VLC_ADD_LIBS([ffmpeg],[-lamrwb])
-     fi])
-
- AC_ARG_WITH(ffmpeg-x264,
-   [    --with-ffmpeg-x264 specify if ffmpeg has been compiled with libx264 support],
-   [
-     if test "$with_ffmpeg_x264" = "yes";	then
-        VLC_ADD_LIBS([ffmpeg],[-lx264])
-     fi])
-
- AC_ARG_WITH(ffmpeg-a52,
-   [    --with-ffmpeg-a52 specify if ffmpeg has been compiled with liba52 support],
-   [
-     if test "$with_ffmpeg_a52" = "yes";	then
-        VLC_ADD_LIBS([ffmpeg],[-la52])
-     fi])
-
- dnl
- dnl test for --with-ffmpeg-tree
- dnl
- AC_ARG_WITH(ffmpeg-tree,
-   [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
-
- if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
-   AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
-   real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
-   if test -z "${real_ffmpeg_tree}"; then
-     dnl  The given directory can't be found
-     AC_MSG_RESULT(no)
-     AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
-   fi
-   if ! test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
-     dnl  The given libavcodec wasn't built
-     AC_MSG_RESULT(no)
-     AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
-   fi
-   if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
-     if test -f "${real_ffmpeg_tree}/libavcodec/libpostproc/libpostproc.a"; then
-       VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec/libpostproc ${real_ffmpeg_tree}/libavcodec/libpostproc/libpostproc.a])	
-     elif test -f "${real_ffmpeg_tree}/libpostproc/libpostproc.a"; then 
-        VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libpostproc ${real_ffmpeg_tree}/libpostproc/libpostproc.a])
-        VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}])
-     else
-       dnl  The given libavcodec wasn't built with --enable-postproc
-       AC_MSG_RESULT(no)
-       AC_MSG_ERROR([cannot find libpostproc.a in ${real_ffmpeg_tree}/[libavcodec/]libpostproc/. Make sure you configured ffmpeg with --enable-postproc])
-     fi
-   fi
-   dnl  Use a custom libffmpeg
-   AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-
-   dnl Use pkg-config to look for the ldflags in libav*-uninstalled.pc
-   PKG_CONFIG_PATH_save="$PKG_CONFIG_PATH"
-   PKG_CONFIG_LIBDIR_save="$PKG_CONFIG_LIBDIR"
-   export PKG_CONFIG_PATH=""
-   export PKG_CONFIG_LIBDIR="${real_ffmpeg_tree}"
-   VLC_SAVE_FLAGS
-
-   PKG_CHECK_MODULES( [FFMPEG],[libavformat libavcodec libpostproc], [
-        VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher], ${FFMPEG_CFLAGS})
-        VLC_ADD_LIBS([ffmpeg stream_out_switcher], ${FFMPEG_LIBS})]
-        AC_DEFINE(HAVE_LIBAVFORMAT_TREE, 1, [Define if you have ffmpeg's libavformat.])
-      )
-   AS_IF([ test -f "${real_ffmpeg_tree}/libswscale/libswscale.a"],[
-     AC_DEFINE(HAVE_LIBSWSCALE_TREE, 1, [Define if you have ffmpeg's libswscale.])
-     PKG_CHECK_MODULES( [SWSCALE],[libswscale], [
-     VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
-     VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[${SWSCALE_CFLAGS}])])
-     ])
-   CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS} ${SWSCALE_CFLAGS}"
-   CFLAGS="${CFLAGS} ${FFMPEG_CFLAGS} ${SWSCALE_CFLAGS}"
-   
-   AC_CHECK_HEADERS(ffmpeg/avcodec.h libavcodec/avcodec.h)
-   AC_CHECK_HEADERS(ffmpeg/avformat.h libavformat/avformat.h)
-   AC_CHECK_HEADERS(ffmpeg/avutil.h libavutil/avutil.h)
-   AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])
-
-   VLC_RESTORE_FLAGS
-   AS_IF([test -n "${PKG_CONFIG_PATH_save}"],[
-         export PKG_CONFIG_PATH="${PKG_CONFIG_PATH_save}"
-   ],[
-        unset PKG_CONFIG_PATH
-   ])
-   AS_IF([test -n "${PKG_CONFIG_LIBDIR_save}"],[
-        export PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR_save}"
-   ],[
-        unset PKG_CONFIG_LIBDIR
-   ])
-
-   VLC_ADD_BUILTINS([ffmpeg])
-   if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes" ; then
-     VLC_ADD_BUILTINS([stream_out_switcher])
-   fi
-
-
-else
-
-
 dnl Trying with pkg-config
    PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat],
     [
@@ -3190,10 +3017,19 @@ dnl Trying with pkg-config
        VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}])
        VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
        AC_CHECK_LIB(swscale, sws_getContext,
-         [AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])],[],[${SWSCALE_LIBS}])
-       ],[ true ])
+         [AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])],
+         [AC_CHECK_LIB(avcodec,img_resample,[],
+            [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
+         [${SWSCALE_LIBS}])
+       ])
      VLC_RESTORE_FLAGS
-    ],[
+    ],[AC_CHECK_LIB(avcodec,img_resample,[],
+        [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
+        [${SWSCALE_LIBS}])
+      ]
+    )
+
+  ],[
 
     dnl
     dnl last chance: at the default place
@@ -3229,53 +3065,14 @@ dnl Trying with pkg-config
 
       AC_CHECK_LIB(swscale, sws_getContext, [
         AC_CHECK_HEADERS(ffmpeg/swscale.h libswscale/swscale.h)
-        VLC_ADD_LIBS([ffmpeg],[-lswscale]) ], [], [-lavcodec $LDAVUTIL])
+        VLC_ADD_LIBS([ffmpeg],[-lswscale]) ],
+        [AC_CHECK_LIB(avcodec,img_resample,[],
+            [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
+        [-lavcodec $LDAVUTIL])
       LDFLAGS="${LDFLAGS_save}"
       CPPFLAGS="${CPPFLAGS_save}"
     ])
-  fi
-fi
-
-dnl
-dnl  ffmpegaltivec plugin
-dnl
-AC_ARG_ENABLE(ffmpegaltivec,
-[  --enable-ffmpegaltivec  ffmpegaltivec codec (DO NOT USE)])
-if test "${enable_ffmpegaltivec}" = "yes"
-then
-  if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
-    AC_MSG_CHECKING(for libavcodecaltivec.a in ${with_ffmpeg_tree})
-    real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
-    if test -z "${real_ffmpeg_tree}"; then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
-    fi
-    if ! test -f "${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a"; then
-      dnl  The given libavcodecaltivec wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a, make sure you compiled libavcodecaltivec in ${with_ffmpeg_tree}])
-    fi
-    if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a"; then
-      dnl  The given libavcodecaltivec wasn't built with --enable-postproc
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-postproc])
-    fi
-    dnl  Use a custom libffmpeg
-    AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a)
-    VLC_ADD_BUILTINS([ffmpegaltivec])
-    VLC_ADD_LIBS([ffmpegaltivec],[-L${real_ffmpeg_tree}/libavcodec -lavcodecaltivec])
-    VLC_ADD_CPPFLAGS([ffmpeg],[-DNO_ALTIVEC_IN_FFMPEG])
-    VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
-
-    if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
-      AC_DEFINE(HAVE_LIBAVFORMAT_TREE, 1, [Define if you have ffmpeg's libavformat.])
-      VLC_ADD_LIBS([ffmpegaltivec],[-L${real_ffmpeg_tree}/libavformat -lavformataltivec -lz])
-      VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavformat])
-    fi
-    VLC_ADD_LIBS([stream_out_switcher],[-L${real_ffmpeg_tree}/libavcodec])
-    VLC_ADD_CPPFLAGS([stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
-  fi
+  ])
 fi
 
 dnl
