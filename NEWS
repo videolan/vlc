@@ -74,6 +74,7 @@ Input/Demuxers:
  * MXF files support
  * Re-written Screen access module for Mac OS X using OpenGL 
    instead of QuickDraw
+ * Screen module now supports partial screen capture and mouse following on X11.
  * Experimental EyeTV access module (Mac OS X only)
    This requires the user to install a plugin to EyeTV.app
    (available as a separate download).
