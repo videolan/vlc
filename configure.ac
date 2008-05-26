@@ -5598,6 +5598,12 @@ dnl
 dnl  Endianness check
 dnl
 AC_C_BIGENDIAN
+AS_IF([test "${ac_cv_c_bigendian}" = "yes"], [
+  DEFS_BIGENDIAN="-DWORDS_BIGENDIAN=1"
+], [
+  DEFS_BIGENDIAN=""
+])
+AC_SUBST(DEFS_BIGENDIAN)
 
 dnl
 dnl  DLL loader copied from MPlayer copied from somewhere else (WINE ?)

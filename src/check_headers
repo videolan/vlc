@@ -7,6 +7,7 @@ cd "$(dirname "$0")" || exit $?
 # There are incorrect, as external users don't have our <config.h>.
 regexp="$(cat ../config.h.in | \
 	sed -n -e 's/^#undef \([A-Z0-9_]*\)$/\1/p' | \
+	grep -v 'WORDS_BIGENDIAN' | \
 	xargs | \
 	sed -e 's/ /\\\|/g')"
 

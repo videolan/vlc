@@ -10,6 +10,7 @@ Cflags: -I${includedir} -I${includedir}/vlc/plugins \
 	-D_FILE_OFFSET_BITS=64 \
 	-D__USE_UNIX98 \
 	-D_LARGEFILE64_SOURCE \
+	@DEFS_BIGENDIAN@ \
 	-D_REENTRANT \
 	-D_THREAD_SAFE
 Libs: -L${libdir} -lvlccore
