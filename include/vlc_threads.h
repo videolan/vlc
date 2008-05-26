@@ -236,7 +236,7 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
     VLC_THREAD_ASSERT ("unlocking mutex");
 
 #elif defined( UNDER_CE )
-    (void)psz_file); (void)i_line;
+    (void)psz_file; (void)i_line;
 
     LeaveCriticalSection( &p_mutex->csection );
 
