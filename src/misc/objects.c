@@ -970,7 +970,13 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     switch( i_mode & 0x000f )
     {
     case FIND_ANYWHERE:
-        return vlc_list_find (vlc_global (), i_type, FIND_CHILD);
+        /* Modules should probably not be object, and the module should perhaps
+         * not be shared across LibVLC instances. In the mean time, this ugly
+         * hack is brought to you by Courmisch. */
+        if (i_type == VLC_OBJECT_MODULE)
+            return vlc_list_find ((vlc_object_t *)vlc_global ()->p_module_bank,
+                                  i_type, FIND_CHILD);
+        return vlc_list_find (p_this->p_libvlc, i_type, FIND_CHILD);
 
     case FIND_CHILD:
         vlc_mutex_lock( &structure_lock );
