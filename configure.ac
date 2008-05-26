@@ -1757,7 +1757,7 @@ fi
 
 dnl Lua modules
 AC_ARG_ENABLE(lua,
-  [  --enable-lua            lua playlist and metafetcher plugins (default enabled)])
+  [  --enable-lua            lua playlist, metafetcher and interface plugins (default enabled)])
 if test "${enable_lua}" != "no"
 then
   PKG_CHECK_MODULES(LUA, lua5.1,
