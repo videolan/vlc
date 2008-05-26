@@ -120,7 +120,6 @@ struct access_t
 static inline int access_vaControl( access_t *p_access, int i_query, va_list args )
 {
     if( !p_access ) return VLC_EGENERIC;
-    assert( p_access->pf_control );
     return p_access->pf_control( p_access, i_query, args );
 }
 

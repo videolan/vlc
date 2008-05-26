@@ -28,8 +28,6 @@
 #ifndef _VLC_ARRAYS_H_
 #define _VLC_ARRAYS_H_
 
-#include <assert.h>
-
 /**
  * Simple dynamic array handling. Array is realloced at each insert/removal
  */
@@ -192,7 +190,6 @@
     array.i_alloc = newsize;                                                \
     array.p_elems = VLCCVP realloc( array.p_elems, array.i_alloc *          \
                                     sizeof(*array.p_elems) );               \
-    assert(array.p_elems);                                                  \
 }
 
 #define _ARRAY_GROW1(array) {                                               \
@@ -419,7 +416,6 @@ static inline void vlc_dictionary_init( vlc_dictionary_t * p_dict, int i_size )
     if( i_size > 0 )
     {
         p_dict->p_entries = (struct vlc_dictionary_entry_t **)malloc(sizeof(struct vlc_dictionary_entry_t *) * i_size);
-        assert( p_dict->p_entries );
         memset( p_dict->p_entries, 0, sizeof(struct vlc_dictionary_entry_t *) * i_size );
     }
     else
@@ -497,16 +493,12 @@ vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
     int i, count = vlc_dictionary_keys_count( p_dict );
 
     ppsz_ret = (char**)malloc(sizeof(char *) * (count + 1));
-    assert( ppsz_ret );
 
     count = 0;
     for( i = 0; i < p_dict->i_size; i++ )
     {
         for( p_entry = p_dict->p_entries[i]; p_entry; p_entry = p_entry->p_next )
-        {
             ppsz_ret[count++] = strdup( p_entry->psz_key );
-            assert( ppsz_ret );
-        }
     }
     ppsz_ret[count] = NULL;
     return ppsz_ret;
@@ -523,7 +515,6 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
     struct vlc_dictionary_entry_t * p_entry;
 
     p_entry = (struct vlc_dictionary_entry_t *)malloc(sizeof(struct vlc_dictionary_entry_t));
-    assert( p_entry );
     p_entry->psz_key = strdup( psz_key );
     p_entry->p_value = p_value;
     p_entry->p_next = p_dict->p_entries[i_pos];
