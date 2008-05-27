@@ -1270,7 +1270,6 @@ AC_LANG_POP(C++)
 if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGIN([gestures])
   VLC_ADD_PLUGIN([rc])
-  VLC_ADD_PLUGIN([telnet])
   VLC_ADD_PLUGIN([hotkeys])
   VLC_ADD_PLUGIN([showintf])
   VLC_ADD_PLUGIN([marq])
@@ -1766,6 +1765,7 @@ AS_IF([test "${enable_vlm}" != "no"], [
     AC_MSG_ERROR([VLM requires the stream output. Do not use --disable-sout.])
   ])
   AC_DEFINE(ENABLE_VLM, 1, [Define if you want the VideoLAN manager support])
+  VLC_ADD_PLUGIN([telnet])
 ])
 
 dnl
