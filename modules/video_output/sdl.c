@@ -439,15 +439,14 @@ static int Manage( vout_thread_t *p_vout )
                     val.b_bool = true;
                     var_Set( p_vout, "mouse-clicked", val );
 
-                    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
+                    p_playlist = pl_Yield( p_vout );
 
                     if( p_playlist != NULL )
                     {
                         vlc_value_t val;
                         val.b_bool = false;
                         var_Set( p_playlist, "intf-popupmenu", val );
-                        vlc_object_release( p_playlist );
+                        pl_Release( p_playlist );
                     }
                 }
                 break;
@@ -460,15 +459,14 @@ static int Manage( vout_thread_t *p_vout )
                     val.i_int &= ~2;
                     var_Set( p_vout, "mouse-button-down", val );
 
-                    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                              FIND_ANYWHERE );
+                    p_playlist = pl_Yield( p_vout );
                     if( p_playlist != NULL )
                     {
                         vlc_value_t val;
                         var_Get( p_playlist, "intf-show", &val );
                         val.b_bool = !val.b_bool;
                         var_Set( p_playlist, "intf-show", val );
-                        vlc_object_release( p_playlist );
+                        pl_Release( p_playlist );
                     }
                 }
                 break;
@@ -489,15 +487,14 @@ static int Manage( vout_thread_t *p_vout )
                         vlc_object_release( p_intf );
                     }
 
-                    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
+                    p_playlist = pl_Yield( p_vout );
 
                     if( p_playlist != NULL )
                     {
                         vlc_value_t val;
                         val.b_bool = true;
                         var_Set( p_playlist, "intf-popupmenu", val );
-                        vlc_object_release( p_playlist );
+                        pl_Release( p_playlist );
                     }
                 }
                 break;
@@ -537,11 +534,11 @@ static int Manage( vout_thread_t *p_vout )
         /* Quit event (close the window) */
         case SDL_QUIT:
             {
-                playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+                playlist_t *p_playlist = pl_Yield( p_vout );
                 if( p_playlist != NULL )
                 {
                     playlist_Stop( p_playlist );
-                    vlc_object_release( p_playlist );
+                    pl_Release( p_playlist );
                 }
             }
             break;
