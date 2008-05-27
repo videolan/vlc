@@ -535,7 +535,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_VLM_NEW:
                 case MVLC_VLM_SETUP:
                 {
-                    static const char *vlm_properties[] =
+                    static const char vlm_properties[][9] =
                     {
                         /* no args */
                         "enabled", "disabled", "loop", "unloop",
