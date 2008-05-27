@@ -41,7 +41,6 @@ extern "C" {
 VLC_EXPORT( const iso639_lang_t *, GetLang_1, ( const char * ) );
 VLC_EXPORT( const iso639_lang_t *, GetLang_2T, ( const char * ) );
 VLC_EXPORT( const iso639_lang_t *, GetLang_2B, ( const char * ) );
-VLC_EXPORT( const char *, DecodeLanguage, ( uint16_t ) );
 #if defined( __cplusplus )
 }
 #endif
