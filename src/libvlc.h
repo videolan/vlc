@@ -280,7 +280,7 @@ void  vlc_rewinddir(void *);
 #if defined (WIN32)
 #   include <dirent.h>
 void *vlc_wopendir (const wchar_t *);
-void *vlc_wclosedir (void *);
+/* void *vlc_wclosedir (void *); in vlc's exported symbols */
 struct _wdirent *vlc_wreaddir (void *);
 void vlc_rewinddir (void *);
 #   define _wopendir vlc_wopendir

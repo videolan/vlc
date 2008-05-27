@@ -296,18 +296,6 @@ struct _wdirent *vlc_wreaddir( void *_p_dir )
     return &p_dir->dd_dir;
 }
 
-int vlc_wclosedir( void *_p_dir )
-{
-    vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
-    int i_ret = 0;
-
-    if ( p_dir->p_real_dir != NULL )
-        i_ret = _wclosedir( p_dir->p_real_dir );
-
-    free( p_dir );
-    return i_ret;
-}
-
 void vlc_rewinddir( void *_p_dir )
 {
     vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
@@ -316,6 +304,23 @@ void vlc_rewinddir( void *_p_dir )
         _wrewinddir( p_dir->p_real_dir );
 }
 #endif
+
+/* This one is in the libvlccore exported symbol list */
+int vlc_wclosedir( void *_p_dir )
+{
+#if defined(WIN32) && !defined(UNDER_CE)
+    vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
+    int i_ret = 0;
+
+    if ( p_dir->p_real_dir != NULL )
+        i_ret = _wclosedir( p_dir->p_real_dir );
+
+    free( p_dir );
+    return i_ret;
+#else
+    return closedir( _p_dir );
+#endif
+}
 
 #if defined (WIN32)
 /**
