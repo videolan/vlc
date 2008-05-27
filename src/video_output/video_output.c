@@ -509,8 +509,7 @@ static void vout_Destructor( vlc_object_t * p_this )
 #ifndef __APPLE__
     vout_thread_t *p_another_vout;
 
-    playlist_t *p_playlist = vlc_object_find( p_this->p_libvlc,
-                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_this );
     if( !p_playlist )
         return;
 
@@ -525,7 +524,7 @@ static void vout_Destructor( vlc_object_t * p_this )
         var_SetBool( p_playlist, "intf-show", true );
     else
         vlc_object_release( p_another_vout );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 #endif
 }
 
