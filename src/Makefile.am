@@ -191,6 +191,7 @@ libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 libvlc_la_LDFLAGS = $(AM_LDFLAGS) \
 	-version-info 2:0:0 \
 	-export-symbols $(srcdir)/libvlc.sym
+libvlc_la_DEPENDENCIES = libvlc.sym
 
 EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_beos) \
