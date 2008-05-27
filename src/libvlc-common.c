@@ -208,9 +208,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     /* Initialize mutexes */
     vlc_mutex_init( &priv->timer_lock );
     vlc_mutex_init( &priv->config_lock );
-#ifdef __APPLE__
-    vlc_thread_set_priority( p_libvlc, VLC_THREAD_PRIORITY_LOW );
-#endif
+
     /* Store data for the non-reentrant API */
     p_static_vlc = p_libvlc;
 
@@ -280,6 +278,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
     }
+
+#ifdef __APPLE__
+    /* vlc_thread_set_priority needs to query the config,
+     * so this is the earliest moment where we can set this */
+    vlc_thread_set_priority( p_libvlc, VLC_THREAD_PRIORITY_LOW );
+#endif
 
     /* Check for short help option */
     if( config_GetInt( p_libvlc, "help" ) > 0 )
