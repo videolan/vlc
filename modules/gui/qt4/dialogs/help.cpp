@@ -286,10 +286,12 @@ void UpdateDialog::updateNotify( bool b_result )
     {
         if( update_NeedUpgrade( p_update ) )
         {
+            update_release_t *p_release = update_GetRelease( p_update );
+            assert( p_release );
             b_checked = true;
             updateButton->setText( "Download" );
             updateLabel->setText( qtr( "There is a new version of VLC :\n" )
-                                + qfu( p_update->release.psz_desc )  );
+                                + qfu( p_release->psz_desc )  );
         }
         else
             updateLabel->setText( qtr( "You have the latest version of VLC" ) );

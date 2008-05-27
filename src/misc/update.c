@@ -52,6 +52,7 @@
 #include <gcrypt.h>
 #include <vlc_gcrypt.h>
 
+#include "update.h"
 
 /*****************************************************************************
  * Misc defines
@@ -1638,6 +1639,12 @@ end:
 
     vlc_object_release( p_udt );
 }
+
+update_release_t *update_GetRelease( update_t *p_update )
+{
+    return &p_update->release;
+}
+
 #else
 update_t *__update_New( vlc_object_t *p_this )
 {
@@ -1665,5 +1672,11 @@ bool update_NeedUpgrade( update_t *p_update )
 void update_Download( update_t *p_update, char *psz_destdir )
 {
     (void)p_update; (void)psz_destdir;
+}
+
+update_release_t *update_GetRelease( update_t *p_update )
+{
+    (void)p_update;
+    return NULL;
 }
 #endif
