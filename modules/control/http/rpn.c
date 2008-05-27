@@ -1006,6 +1006,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             free( psz_meta );
             free( psz_val );
         }
+#ifdef ENABLE_VLM
         else if( !strcmp( s, "vlm_command" ) || !strcmp( s, "vlm_cmd" ) )
         {
             char *psz_elt;
@@ -1056,6 +1057,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             free( psz_cmd );
             free( psz_error );
         }
+#endif /* ENABLE_VLM */
         else if( !strcmp( s, "snapshot" ) )
         {
             if( p_sys->p_input )

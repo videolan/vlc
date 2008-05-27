@@ -668,15 +668,14 @@ static void mvar_VlmSetNewLoop( char *name, vlm_t *vlm, mvar_t *s,
 mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
 {
     mvar_t        *s = mvar_New( name, "set" );
+#ifdef ENABLE_VLM
     vlm_message_t *msg;
     int    i;
 
     if( vlm == NULL ) return s;
 
     if( vlm_ExecuteCommand( vlm, "show", &msg ) )
-    {
         return s;
-    }
 
     for( i = 0; i < msg->i_child; i++ )
     {
@@ -702,6 +701,6 @@ mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
         }
     }
     vlm_MessageDelete( msg );
-
+#endif /* ENABLE_VLM */
     return s;
 }

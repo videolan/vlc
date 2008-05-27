@@ -530,6 +530,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     vlc_object_kill( p_intf->p_libvlc );
                     break;
                 }
+#ifdef ENABLE_VLM
                 /* vlm */
                 case MVLC_VLM_NEW:
                 case MVLC_VLM_SETUP:
@@ -679,7 +680,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     vlm_MessageDelete( vlm_answer );
                     break;
                 }
-
+#endif /* ENABLE_VLM */
                 default:
                     if( *control )
                     {
@@ -1043,12 +1044,14 @@ void Execute( httpd_file_sys_t *p_args,
                                                          p_intf->p_sys->p_input,
                                                          m.param2 );
                         }
+#ifdef ENABLE_VLM
                         else if( !strcmp( m.param2, "vlm" ) )
                         {
                             if( p_intf->p_sys->p_vlm == NULL )
                                 p_intf->p_sys->p_vlm = vlm_New( p_intf );
                             index = mvar_VlmSetNew( m.param1, p_intf->p_sys->p_vlm );
                         }
+#endif
 #if 0
                         else if( !strcmp( m.param2, "hosts" ) )
                         {

@@ -338,13 +338,12 @@ static void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys = p_intf->p_sys;
-
     int i;
 
+#ifdef ENABLE_VLM
     if( p_sys->p_vlm )
-    {
         vlm_Delete( p_sys->p_vlm );
-    }
+#endif
     for( i = 0; i < p_sys->i_files; i++ )
     {
         if( p_sys->pp_files[i]->b_handler )
