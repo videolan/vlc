@@ -714,27 +714,10 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 
     /* Otherwise, recursively look for the object */
     if( (i_mode & 0x000f) == FIND_ANYWHERE )
-    {
-        vlc_object_t *p_root = p_this;
-
-        /* Find the root */
-        while( p_root->p_parent != NULL &&
-               p_root != VLC_OBJECT( p_this->p_libvlc ) )
-        {
-            p_root = p_root->p_parent;
-        }
-
-        p_found = FindObject( p_root, i_type, (i_mode & ~0x000f)|FIND_CHILD );
-        if( p_found == NULL && p_root != VLC_OBJECT( p_this->p_libvlc ) )
-        {
-            p_found = FindObject( VLC_OBJECT( p_this->p_libvlc ),
-                                  i_type, (i_mode & ~0x000f)|FIND_CHILD );
-        }
-    }
+        p_found = FindObject( p_this->p_libvlc, i_type,
+                              (i_mode & ~0x000f)|FIND_CHILD );
     else
-    {
         p_found = FindObject( p_this, i_type, i_mode );
-    }
 
     vlc_mutex_unlock( &structure_lock );
 
