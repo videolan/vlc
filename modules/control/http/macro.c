@@ -534,12 +534,13 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_VLM_NEW:
                 case MVLC_VLM_SETUP:
                 {
-                    static const char *vlm_properties[11] =
+                    static const char *vlm_properties[] =
                     {
                         /* no args */
                         "enabled", "disabled", "loop", "unloop",
                         /* args required */
-                        "input", "output", "option", "date", "period", "repeat", "append",
+                        "input", "output", "option", "date", "period",
+                        "repeat", "append", "",
                     };
                     vlm_message_t *vlm_answer;
                     char name[512];
@@ -565,7 +566,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         p += sprintf( psz, "setup %s", name );
                     }
                     /* Parse the request */
-                    for( i = 0; i < 11; i++ )
+                    for( i = 0; vlm_properties[i][0]; i++ )
                     {
                         char val[512];
                         ExtractURIValue( p_request,
