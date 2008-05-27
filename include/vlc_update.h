@@ -26,8 +26,6 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
-#ifdef UPDATE_CHECK
-
 #ifndef _VLC_UPDATE_H
 #define _VLC_UPDATE_H
 
@@ -38,6 +36,8 @@
  *
  * @{
  */
+
+#ifdef UPDATE_CHECK
 
 /**
  * Describes an update VLC release number
@@ -51,6 +51,9 @@ struct update_release_t
     char* psz_url;      ///< Download URL
     char* psz_desc;     ///< Release description
 };
+
+
+#endif /* UPDATE_CHECK */
 
 typedef struct update_release_t update_release_t;
 
@@ -67,6 +70,4 @@ VLC_EXPORT( update_release_t*, update_GetRelease, ( update_t * ) );
  * @}
  */
 
-#endif
-
-#endif
+#endif /* _VLC_UPDATE_H */
