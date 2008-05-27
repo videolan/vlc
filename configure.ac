@@ -1759,11 +1759,14 @@ dnl
 dnl VideoLAN manager
 dnl
 AC_ARG_ENABLE(vlm,
-  [  --enable-vlm            VideoLAN manager (default enabled)])
-if test "${enable_vlm}" != "no"
-then
-  AC_DEFINE(ENABLE_VLM, 1, Define if you want the VideoLAN manager support)
-fi
+  [  --enable-vlm            VideoLAN manager (default enabled)],,
+  [enable_vlm="${enable_sout}"])
+AS_IF([test "${enable_vlm}" != "no"], [
+  AS_IF([test "${enable_sout}" = "no"], [
+    AC_MSG_ERROR([VLM requires the stream output. Do not use --disable-sout.])
+  ])
+  AC_DEFINE(ENABLE_VLM, 1, [Define if you want the VideoLAN manager support])
+])
 
 dnl
 dnl Growl notification plugin
