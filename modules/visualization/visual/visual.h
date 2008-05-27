@@ -55,6 +55,8 @@ typedef struct aout_filter_sys_t
 /* Prototypes */
 int scope_Run
         (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
+int vuMeter_Run
+        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
 int dummy_Run
         (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
 int random_Run

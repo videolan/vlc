@@ -99,6 +99,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         val.psz_string = (char*)"spectrum"; text.psz_string = _("Spectrum");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        val.psz_string = (char*)"vuMeter"; text.psz_string = _("Vu meter");
+        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
 
         /* Look for goom plugin */
         if( module_Exists( VLC_OBJECT(p_aout), "goom" ) )

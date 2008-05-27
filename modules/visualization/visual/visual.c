@@ -175,6 +175,7 @@ static struct
 } pf_effect_run[]=
 {
     { "scope",      scope_Run },
+    { "vuMeter",    vuMeter_Run },
     { "spectrum",   spectrum_Run },
     { "spectrometer",   spectrometer_Run },
     { "dummy",      dummy_Run},
