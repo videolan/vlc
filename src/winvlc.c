@@ -173,12 +173,21 @@ static char **vlc_parse_cmdline( const char *psz_cmdline, int *i_args )
 # define wWinMain WinMain
 #endif
 
+#ifdef IF_MINGW_SUPPORTED_UNICODE
 /*****************************************************************************
  * wWinMain: parse command line, start interface and spawn threads.
  *****************************************************************************/
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPWSTR lpCmdLine, int nCmdShow )
 {
+#else
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                    LPSTR args, int nCmdShow )
+{
+    /* This makes little sense, but at least it links properly */
+    wchar_t lpCmdLine[strlen(args) * 3];
+    MultiByteToWideChar( CP_ACP, 0, args, -1, lpCmdLine, sizeof(lpCmdLine) );
+#endif
     char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
     int argc, ret;
 
@@ -187,7 +196,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     fprintf( stderr, "VLC media player %s\n", libvlc_get_version() );
 
     WideCharToMultiByte( CP_UTF8, 0, lpCmdLine, -1,
-                         psz_cmdline, MAX_PATH, NULL, NULL );
+                         psz_cmdline, sizeof (psz_cmdline), NULL, NULL );
     argv = vlc_parse_cmdline( psz_cmdline, &argc );
 
     libvlc_exception_t ex;
