@@ -146,7 +146,7 @@ static inline int strcasecmp (const char *s1, const char *s2)
     for (size_t i = 0;; i++)
     {
         int d = tolower (s1[i]) - tolower (s2[i]);
-        if (d) return d;
+        if (d || !s1[i]) return d;
     }
     return 0;
 }
@@ -163,7 +163,7 @@ static inline int strncasecmp (const char *s1, const char *s2, size_t n)
     for (size_t i = 0; i < n; i++)
     {
         int d = tolower (s1[i]) - tolower (s2[i]);
-        if (d) return d;
+        if (d || !s1[i]) return d;
     }
     return 0;
 }
