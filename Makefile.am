@@ -56,7 +56,7 @@ SUFFIXES =
 
 DISTCHECK_CONFIGURE_FLAGS = --disable-dvd --disable-mad --disable-libmpeg2 \
 	--disable-ffmpeg --disable-faad --disable-wxwidgets --disable-skins2 \
-	--disable-fribidi
+	--disable-fribidi --disable-glx
 
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = \
