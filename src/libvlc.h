@@ -280,12 +280,15 @@ void  vlc_rewinddir(void *);
 #if defined (WIN32)
 #   include <dirent.h>
 void *vlc_wopendir (const wchar_t *);
+void *vlc_wclosedir (void *);
 struct _wdirent *vlc_wreaddir (void *);
 void vlc_rewinddir (void *);
 #   define _wopendir vlc_wopendir
 #   define _wreaddir vlc_wreaddir
 #   define _wclosedir vlc_wclosedir
 #   define rewinddir vlc_rewinddir
+
+char *vlc_dgettext ( const char *package, const char *msgid );
 #endif
 
 #endif

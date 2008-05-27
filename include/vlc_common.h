@@ -800,11 +800,6 @@ VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-#ifdef WIN32
-VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
-VLC_EXPORT( int, vlc_wclosedir, (void *) );
-#endif
-
 VLC_EXPORT( char *, vlc_gettext, ( const char *msgid ) );
 
 /*****************************************************************************

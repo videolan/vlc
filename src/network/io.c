@@ -552,9 +552,9 @@ ssize_t __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 /*****************************************************************************
  * inet_pton replacement for obsolete and/or crap operating systems
  *****************************************************************************/
-#ifndef HAVE_INET_PTON
-int inet_pton(int af, const char *src, void *dst)
+int vlc_inet_pton(int af, const char *src, void *dst)
 {
+#ifndef HAVE_INET_PTON
 # ifdef WIN32
     /* As we already know, Microsoft always go its own way, so even if they do
      * provide IPv6, they don't provide the API. */
@@ -612,14 +612,16 @@ int inet_pton(int af, const char *src, void *dst)
     memcpy( dst, &ipv4, 4 );
 # endif /* WIN32 */
     return 0;
-}
+#else /* HAVE_INET_PTON */
+    return inet_pton( af, src, dst );
 #endif /* HAVE_INET_PTON */
+}
 
-#ifndef HAVE_INET_NTOP
-#ifdef WIN32
-const char *inet_ntop(int af, const void * src,
+const char *vlc_inet_ntop(int af, const void * src,
                                char * dst, socklen_t cnt)
 {
+#ifndef HAVE_INET_NTOP
+#ifdef WIN32
     switch( af )
     {
 #ifdef AF_INET6
@@ -662,6 +664,25 @@ const char *inet_ntop(int af, const void * src,
     }
     errno = EAFNOSUPPORT;
     return NULL;
+#else /* WIN32 */
+    return NULL;
+#endif /* WIN32 */
+#else /* HAVE_INET_NTOP */
+    return inet_ntop( af, src, dst, cnt );
+#endif /* HAVE_INET_NTOP */
 }
-#endif
-#endif
+
+#ifdef WIN32
+    /* vlc_sendmsg, vlc_recvmsg Defined in winsock.c */
+#else /* !WIN32 */
+ssize_t vlc_sendmsg (int s, struct msghdr *hdr, int flags)
+{
+    return sendmsg (s, hdr, flags);
+}
+
+ssize_t vlc_recvmsg (int s, struct msghdr *hdr, int flags)
+{
+    return recvmsg (s, hdr, flags);
+}
+#endif /* WIN32 */
+

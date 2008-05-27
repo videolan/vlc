@@ -59,8 +59,6 @@ struct msghdr
     int           msg_flags;
 };
 
-VLC_EXPORT( ssize_t, vlc_sendmsg, ( int, struct msghdr *, int ) );
-VLC_EXPORT( ssize_t, vlc_recvmsg, ( int, struct msghdr *, int ) );
 #define sendmsg vlc_sendmsg
 #define recvmsg vlc_recvmsg
 
@@ -80,6 +78,9 @@ VLC_EXPORT( ssize_t, vlc_recvmsg, ( int, struct msghdr *, int ) );
 #   include <netdb.h>
 #   define net_errno errno
 #endif
+
+VLC_EXPORT( ssize_t, vlc_sendmsg, ( int, struct msghdr *, int ) );
+VLC_EXPORT( ssize_t, vlc_recvmsg, ( int, struct msghdr *, int ) );
 
 # ifdef __cplusplus
 extern "C" {
@@ -154,18 +155,17 @@ VLC_EXPORT( ssize_t, net_Printf, ( vlc_object_t *p_this, int fd, const v_socket_
 VLC_EXPORT( ssize_t, __net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args ) );
 
 
+/* Don't go to an extra call layer if we have the symbol */
 #ifndef HAVE_INET_PTON
-/* only in core, so no need for C++ extern "C" */
-    VLC_EXPORT (int, inet_pton, (int af, const char *src, void *dst) );
+#define inet_pton vlc_inet_pton
+#endif
+#ifndef HAVE_INET_NTOP
+#define inet_ntop vlc_inet_ntop
 #endif
 
-#ifndef HAVE_INET_NTOP
-#ifdef WIN32
-/* only in core, so no need for C++ extern "C" */
-    VLC_EXPORT (const char *, inet_ntop, (int af, const void *src,
+VLC_EXPORT (int, vlc_inet_pton, (int af, const char *src, void *dst) );
+VLC_EXPORT (const char *, vlc_inet_ntop, (int af, const void *src,
                                           char *dst, socklen_t cnt) );
-#endif
-#endif
 
 #ifndef HAVE_POLL
 enum
