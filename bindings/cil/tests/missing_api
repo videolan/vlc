@@ -1,4 +1,4 @@
-#! /bin/dash
+#! /bin/sh
 # Finds LibVLC API mismatch within the CIL bindings
 # Copyright 2008 Rémi Denis-Courmont
 
