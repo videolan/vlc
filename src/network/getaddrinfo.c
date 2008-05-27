@@ -82,7 +82,7 @@ static struct
     { 0,              NULL }
 };
 
-static const char *__gai_unknownerr = "Unrecognized error number";
+static const char __gai_unknownerr[] = "Unrecognized error number";
 
 /****************************************************************************
  * Converts an EAI_* error code into human readable english text.

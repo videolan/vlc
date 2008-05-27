@@ -229,7 +229,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
  *
  * Get the char * name of an event type.
  **************************************************************************/
-static const char * event_type_to_name[] =
+static const char event_type_to_name[][35] =
 {
 #define EVENT(a) [a]=#a
     EVENT(libvlc_MediaMetaChanged),
@@ -265,7 +265,7 @@ static const char * event_type_to_name[] =
 #undef EVENT
 };
 
-static const char * unkwown_event_name = "Unknown Event";
+static const char unkwown_event_name[] = "Unknown Event";
 
 const char * libvlc_event_type_name( libvlc_event_type_t event_type )
 {

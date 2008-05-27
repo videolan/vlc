@@ -523,8 +523,8 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #ifdef UNDER_CE
     int i_dummy;
 #endif
-    static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
-    static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
+    static const char ppsz_type[4][9] = { "", " error", " warning", " debug" };
+    static const char ppsz_color[4][8] = { WHITE, RED, YELLOW, GRAY };
     const char *psz_object;
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     int i_type = p_item->i_type;

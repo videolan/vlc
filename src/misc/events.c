@@ -70,7 +70,7 @@ typedef struct vlc_event_listeners_group_t
 } vlc_event_listeners_group_t;
 
 #ifdef DEBUG_EVENT
-static const char * ppsz_event_type_to_name[] =
+static const char ppsz_event_type_to_name[][33] =
 {
     [vlc_InputItemMetaChanged]          = "vlc_InputItemMetaChanged",
     [vlc_InputItemSubItemAdded]         = "vlc_InputItemSubItemAdded",

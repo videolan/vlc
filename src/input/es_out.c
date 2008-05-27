@@ -1441,7 +1441,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
                 VLC_FOURCC('c', 'c', '3', ' '),
                 VLC_FOURCC('c', 'c', '4', ' '),
             };
-            static const char *ppsz_description[4] = {
+            static const char ppsz_description[4][18] = {
                 N_("Closed captions 1"),
                 N_("Closed captions 2"),
                 N_("Closed captions 3"),
