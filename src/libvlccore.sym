@@ -74,7 +74,6 @@ date_Increment
 date_Init
 date_Move
 date_Set
-DecodeLanguage
 decoder_GetDisplayDate
 decoder_GetInputAttachment
 decoder_GetInputAttachments
