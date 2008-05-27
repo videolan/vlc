@@ -37,12 +37,12 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_update.h>
 
 #ifdef UPDATE_CHECK
 
 #include <assert.h>
 
-#include <vlc_update.h>
 #include <vlc_pgpkey.h>
 #include <vlc_stream.h>
 #include <vlc_strings.h>
