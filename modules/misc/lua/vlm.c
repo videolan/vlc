@@ -68,8 +68,7 @@ int vlclua_vlm_delete( lua_State *L )
 }
 
 #ifdef ENABLE_VLM
-void push_message( lua_State *L, vlm_message_t *message );
-void push_message( lua_State *L, vlm_message_t *message )
+static void push_message( lua_State *L, vlm_message_t *message )
 {
     lua_createtable( L, 0, 2 );
     lua_pushstring( L, message->psz_name );
