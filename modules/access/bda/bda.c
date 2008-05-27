@@ -59,7 +59,7 @@ static int Control( access_t *, int, va_list );
 #define INVERSION_TEXT N_("Inversion mode")
 #define INVERSION_LONGTEXT N_("Inversion mode [0=off, 1=on, 2=auto]")
 static const int i_inversion_list[] = { -1, 0, 1, 2 };
-static const char *ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
+static const char *const ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
     N_("On"), N_("Auto") };
 
 #define PROBE_TEXT N_("Probe DVB card for capabilities")
@@ -111,47 +111,47 @@ static const char *ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
 #define MODULATION_LONGTEXT N_("QAM constellation points " \
     "[16, 32, 64, 128, 256]")
 static const int i_qam_list[] = { -1, 16, 32, 64, 128, 256 };
-static const char *ppsz_qam_text[] = { N_("Undefined"), N_("16"), N_("32"),
-    N_("64"), N_("128"), N_("256") };
+static const char *const ppsz_qam_text[] = {
+    N_("Undefined"), N_("16"), N_("32"), N_("64"), N_("128"), N_("256") };
 
 /* Terrestrial */
 #define CODE_RATE_HP_TEXT N_("Terrestrial high priority stream code rate (FEC)")
 #define CODE_RATE_HP_LONGTEXT N_("High Priority FEC Rate " \
     "[Undefined,1/2,2/3,3/4,5/6,7/8]")
 static const int i_hp_fec_list[] = { -1, 1, 2, 3, 4, 5 };
-static const char *ppsz_hp_fec_text[] = { N_("Undefined"), N_("1/2"), N_("2/3"),
-    N_("3/4"), N_("5/6"), N_("7/8") };
+static const char *const ppsz_hp_fec_text[] = {
+    N_("Undefined"), N_("1/2"), N_("2/3"), N_("3/4"), N_("5/6"), N_("7/8") };
 
 #define CODE_RATE_LP_TEXT N_("Terrestrial low priority stream code rate (FEC)")
 #define CODE_RATE_LP_LONGTEXT N_("Low Priority FEC Rate " \
     "[Undefined,1/2,2/3,3/4,5/6,7/8]")
 static const int i_lp_fec_list[] = { -1, 1, 2, 3, 4, 5 };
-static const char *ppsz_lp_fec_text[] = { N_("Undefined"), N_("1/2"), N_("2/3"),
-    N_("3/4"), N_("5/6"), N_("7/8") };
+static const char *const ppsz_lp_fec_text[] = {
+    N_("Undefined"), N_("1/2"), N_("2/3"), N_("3/4"), N_("5/6"), N_("7/8") };
 
 #define BANDWIDTH_TEXT N_("Terrestrial bandwidth")
 #define BANDWIDTH_LONGTEXT N_("Terrestrial bandwidth [0=auto,6,7,8 in MHz]")
 static const int i_band_list[] = { -1, 6, 7, 8 };
-static const char *ppsz_band_text[] = { N_("Undefined"), N_("6 MHz"),
-    N_("7 MHz"), N_("8 MHz") };
+static const char *const ppsz_band_text[] = {
+    N_("Undefined"), N_("6 MHz"), N_("7 MHz"), N_("8 MHz") };
 
 #define GUARD_TEXT N_("Terrestrial guard interval")
 #define GUARD_LONGTEXT N_("Guard interval [Undefined,1/4,1/8,1/16,1/32]")
 static const int i_guard_list[] = { -1, 4, 8, 16, 32 };
-static const char *ppsz_guard_text[] = { N_("Undefined"), N_("1/4"), N_("1/8"),
-    N_("1/16"), N_("1/32") };
+static const char *const ppsz_guard_text[] = {
+    N_("Undefined"), N_("1/4"), N_("1/8"), N_("1/16"), N_("1/32") };
 
 #define TRANSMISSION_TEXT N_("Terrestrial transmission mode")
 #define TRANSMISSION_LONGTEXT N_("Transmission mode [Undefined,2k,8k]")
 static const int i_transmission_list[] = { -1, 2, 8 };
-static const char *ppsz_transmission_text[] = { N_("Undefined"), N_("2k"),
-    N_("8k") };
+static const char *const ppsz_transmission_text[] = {
+    N_("Undefined"), N_("2k"), N_("8k") };
 
 #define HIERARCHY_TEXT N_("Terrestrial hierarchy mode")
 #define HIERARCHY_LONGTEXT N_("Hierarchy alpha value [Undefined,1,2,4]")
 static const int i_hierarchy_list[] = { -1, 1, 2, 4 };
-static const char *ppsz_hierarchy_text[] = { N_("Undefined"), N_("1"),
-    N_("2"), N_("4") };
+static const char *const ppsz_hierarchy_text[] = {
+    N_("Undefined"), N_("1"), N_("2"), N_("4") };
 
 /* BDA module additional DVB-S Parameters */
 #define AZIMUTH_TEXT N_("Satellite Azimuth")
@@ -163,8 +163,9 @@ static const char *ppsz_hierarchy_text[] = { N_("Undefined"), N_("1"),
     "Satellite Longitude in 10ths of degree, -ve=West")
 #define POLARISATION_TEXT N_("Satellite Polarisation")
 #define POLARISATION_LONGTEXT N_("Satellite Polarisation [H/V/L/R]")
-static const char *ppsz_polar_list[] = { "H", "V", "L", "R" };
-static const char *ppsz_polar_text[] = { N_("Horizontal"), N_("Vertical"),
+static const char *const ppsz_polar_list[] = { "H", "V", "L", "R" };
+static const char *const ppsz_polar_text[] = {
+    N_("Horizontal"), N_("Vertical"),
     N_("Circular Left"), N_("Circular Right") };
 
 vlc_module_begin();

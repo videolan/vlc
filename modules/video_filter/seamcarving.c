@@ -68,10 +68,6 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
-    NULL
-};
-
 struct filter_sys_t
 {
     int *p_energy;
@@ -96,9 +92,6 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys->p_energy = NULL;
     p_filter->p_sys->p_grad = NULL;
     p_filter->p_sys->i_crop = 0;
-
-    config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
-                   p_filter->p_cfg );
 
     var_Create( p_filter, "crop", VLC_VAR_INTEGER|VLC_VAR_ISCOMMAND );
     var_AddCallback( p_filter, "crop", CropCallback, p_filter->p_sys );

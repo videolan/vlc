@@ -132,7 +132,7 @@ vlc_module_begin();
               AUDIO_TEXT, AUDIO_LONGTEXT, true );
 vlc_module_end();
 
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "files", "sizes", "aspect-ratio", "port", "command", "gop", "qscale",
     "mute-audio", NULL
 };

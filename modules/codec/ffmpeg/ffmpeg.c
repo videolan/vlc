@@ -70,18 +70,19 @@ struct decoder_sys_t
 static int OpenDecoder( vlc_object_t * );
 static void CloseDecoder( vlc_object_t * );
 
-static int  nloopf_list[] = { 0, 1, 2, 3, 4 };
-static const char *nloopf_list_text[] =
+static const int  nloopf_list[] = { 0, 1, 2, 3, 4 };
+static const char *const nloopf_list_text[] =
   { N_("None"), N_("Non-ref"), N_("Bidir"), N_("Non-key"), N_("All") };
 
 #ifdef ENABLE_SOUT
-static const char *enc_hq_list[] = { "rd", "bits", "simple" };
-static const char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
+static const char *const enc_hq_list[] = { "rd", "bits", "simple" };
+static const char *const enc_hq_list_text[] = {
+    N_("rd"), N_("bits"), N_("simple") };
 #endif
 
 #if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H)
-static int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *ppsz_mode_descriptions[] =
+static const int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
   N_("Experimental"), N_("Nearest neighbour (bad quality)"),
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),

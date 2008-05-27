@@ -144,8 +144,8 @@ static uint32_t findDeviceID(char *);
 
 static const char psz_device_name_fmt[] = "%s ($%x,$%x)";
 
-static const char *ppsz_adev[] = { "wavemapper", };
-static const char *ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
+static const char *const ppsz_adev[] = { "wavemapper", };
+static const char *const ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
 
 
 

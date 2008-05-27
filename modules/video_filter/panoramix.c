@@ -201,7 +201,7 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "cols", "rows", "offset-x", "bz-length", "bz-height", "attenuate",
     "bz-begin", "bz-middle", "bz-end", "bz-middle-pos", "bz-gamma-red",
     "bz-gamma-green", "bz-gamma-blue", "bz-blackcrush-red",

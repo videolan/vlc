@@ -96,14 +96,14 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 
 // #define ZVBI_DEBUG
 
-static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *ppsz_pos_descriptions[] =
+static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 vlc_module_begin();
     set_description( N_("VBI and Teletext decoder") );
-    set_shortname( "VBI & Teletext" );
+    set_shortname( N_("VBI & Teletext") );
     set_capability( "decoder", 51 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_SCODEC );

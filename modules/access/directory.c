@@ -79,9 +79,9 @@ static int  DemuxOpen ( vlc_object_t * );
         "collapse: subdirectories appear but are expanded on first play.\n" \
         "expand: all subdirectories are expanded.\n" )
 
-static const char *psz_recursive_list[] = { "none", "collapse", "expand" };
-static const char *psz_recursive_list_text[] = { N_("none"), N_("collapse"),
-                                                 N_("expand") };
+static const char *const psz_recursive_list[] = { "none", "collapse", "expand" };
+static const char *const psz_recursive_list_text[] = {
+    N_("none"), N_("collapse"), N_("expand") };
 
 #define IGNORE_TEXT N_("Ignored extensions")
 #define IGNORE_LONGTEXT N_( \

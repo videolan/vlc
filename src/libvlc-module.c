@@ -43,7 +43,7 @@
 #include "vlc_meta.h"
 
 #if defined (WIN32) || defined (__APPLE__)
-static const char *ppsz_language[] =
+static const char *const ppsz_language[] =
 {
     "auto",
     "en",
@@ -79,7 +79,7 @@ static const char *ppsz_language[] =
     "tr"
 };
 
-static const char *ppsz_language_text[] =
+static const char *const ppsz_language_text[] =
 {
     N_("Auto"),
     N_("American English"),
@@ -116,7 +116,7 @@ static const char *ppsz_language_text[] =
 };
 #endif
 
-static const char *ppsz_snap_formats[] =
+static const char *const ppsz_snap_formats[] =
 { "png", "jpg" };
 
 /*****************************************************************************
@@ -272,8 +272,9 @@ static const char *ppsz_snap_formats[] =
     "not actually encoded with Dolby Surround, turning on this option might "\
     "enhance your experience, especially when combined with the Headphone "\
     "Channel Mixer." )
-static int pi_force_dolby_values[] = { 0, 1, 2 };
-static const char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_("Off") };
+static const int pi_force_dolby_values[] = { 0, 1, 2 };
+static const char *const ppsz_force_dolby_descriptions[] = {
+    N_("Auto"), N_("On"), N_("Off") };
 
 
 #define AUDIO_FILTER_TEXT N_("Audio filters")
@@ -304,8 +305,10 @@ static const char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_(
 #define AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT N_( \
     "Protect against sound clipping" )
 
-static const char *ppsz_replay_gain_mode[] = { "none", "track", "album" };
-static const char *ppsz_replay_gain_mode_text[] = { N_("None"), N_("Track"), N_("Album") };
+static const char *const ppsz_replay_gain_mode[] = {
+    "none", "track", "album" };
+static const char *const ppsz_replay_gain_mode_text[] = {
+    N_("None"), N_("Track"), N_("Album") };
 
 /*****************************************************************************
  * Video
@@ -359,8 +362,8 @@ static const char *ppsz_replay_gain_mode_text[] = { N_("None"), N_("Track"), N_(
     "Enforce the alignment of the video in its window. By default (0) it " \
     "will be centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
     "also use combinations of these values, like 6=4+2 meaning top-right).")
-static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *ppsz_align_descriptions[] =
+static const int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_align_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -408,8 +411,8 @@ static const char *ppsz_align_descriptions[] =
     "Hide mouse cursor and fullscreen controller after " \
     "n miliseconds, default is 3000 ms (3 sec.)")
 
-static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *ppsz_pos_descriptions[] =
+static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -548,8 +551,8 @@ static const char *ppsz_pos_descriptions[] =
         "synchronise clocks for server and client. The detailed settings " \
         "are available in Advanced / Network Sync." )
 
-static int pi_clock_values[] = { -1, 0, 1 };
-static const char *ppsz_clock_descriptions[] =
+static const int pi_clock_values[] = { -1, 0, 1 };
+static const char *const ppsz_clock_descriptions[] =
 { N_("Default"), N_("Disable"), N_("Enable") };
 
 #define SERVER_PORT_TEXT N_("UDP port")
@@ -1081,10 +1084,10 @@ static const char *ppsz_clock_descriptions[] =
 #define ALBUM_ART_LONGTEXT N_( \
     "Choose how album art will be downloaded." )
 
-static int pi_albumart_values[] = { ALBUM_ART_WHEN_ASKED,
-                                    ALBUM_ART_WHEN_PLAYED,
-                                    ALBUM_ART_ALL };
-static const char *ppsz_albumart_descriptions[] =
+static const int pi_albumart_values[] = { ALBUM_ART_WHEN_ASKED,
+                                          ALBUM_ART_WHEN_PLAYED,
+                                          ALBUM_ART_ALL };
+static const char *const ppsz_albumart_descriptions[] =
     { N_("Manual download only"),
       N_("When track starts playing"),
       N_("As soon as track is added") };

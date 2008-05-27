@@ -97,7 +97,7 @@ vlc_module_begin();
                             false );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "u", "v", "ut", "vt", NULL
 };
 

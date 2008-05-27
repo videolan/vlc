@@ -469,9 +469,9 @@ set_callbacks( CreateFilter, DestroyFilter  );
 vlc_module_end();
 
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
 #if defined(WIN32)
-    "usebuildin",
+        "usebuildin",
 #endif
         "serialdev",
 

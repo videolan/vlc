@@ -61,11 +61,13 @@ static subpicture_t *Filter( filter_t *, mtime_t );
 static int FetchRSS( filter_t * );
 static void FreeRSS( filter_t * );
 
-static int pi_color_values[] = { 0xf0000000, 0x00000000, 0x00808080, 0x00C0C0C0,
+static const int pi_color_values[] = {
+               0xf0000000, 0x00000000, 0x00808080, 0x00C0C0C0,
                0x00FFFFFF, 0x00800000, 0x00FF0000, 0x00FF00FF, 0x00FFFF00,
                0x00808000, 0x00008000, 0x00008080, 0x0000FF00, 0x00800080,
                0x00000080, 0x000000FF, 0x0000FFFF};
-static const char *ppsz_color_descriptions[] = { N_("Default"), N_("Black"),
+static const char *const ppsz_color_descriptions[] = {
+               N_("Default"), N_("Black"),
                N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"), N_("Red"),
                N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"),
                N_("Teal"), N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"),
@@ -164,8 +166,8 @@ struct filter_sys_t
 #define TITLE_TEXT N_("Title display mode")
 #define TITLE_LONGTEXT N_("Title display mode. Default is 0 (hidden) if the feed has an image and feed images are enabled, 1 otherwise.")
 
-static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *ppsz_pos_descriptions[] =
+static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_pos_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
      N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -175,8 +177,8 @@ enum title_modes {
     prepend_title,
     scroll_title };
 
-static int pi_title_modes[] = { default_title, hide_title, prepend_title, scroll_title };
-static const char *ppsz_title_modes[] =
+static const int pi_title_modes[] = { default_title, hide_title, prepend_title, scroll_title };
+static const char *const ppsz_title_modes[] =
     { N_("Default"), N_("Don't show"), N_("Always visible"), N_("Scroll with feed") };
 
 #define CFG_PREFIX "rss-"
@@ -222,7 +224,7 @@ vlc_module_begin();
     add_shortcut( "atom" );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "urls", "x", "y", "position", "color", "size", "speed", "length",
     "ttl", "images", "title", NULL
 };

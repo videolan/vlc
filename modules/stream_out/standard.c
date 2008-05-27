@@ -136,7 +136,7 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "access", "mux", "url", "dst",
     "sap", "name", "group", "description", "url", "email", "phone",
     "bind", "path", NULL

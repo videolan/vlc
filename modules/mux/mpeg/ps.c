@@ -139,7 +139,7 @@ struct sout_mux_sys_t
     uint32_t crc32_table[256];
 };
 
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "dts-delay", "pes-max-size", NULL
 };
 

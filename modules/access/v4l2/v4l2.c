@@ -240,21 +240,21 @@ typedef enum {
     IO_METHOD_USERPTR,
 } io_method;
 
-static int i_standards_list[] =
+static const int i_standards_list[] =
     { V4L2_STD_UNKNOWN, V4L2_STD_SECAM, V4L2_STD_PAL, V4L2_STD_NTSC };
-static const char *psz_standards_list_text[] =
+static const char *const psz_standards_list_text[] =
     { N_("Default"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
 
-static int i_iomethod_list[] =
+static const int i_iomethod_list[] =
     { IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR };
-static const char *psz_iomethod_list_text[] =
+static const char *const psz_iomethod_list_text[] =
     { N_("READ"), N_("MMAP"),  N_("USERPTR") };
 
-static int i_tuner_audio_modes_list[] =
+static const int i_tuner_audio_modes_list[] =
     { V4L2_TUNER_MODE_MONO, V4L2_TUNER_MODE_STEREO,
       V4L2_TUNER_MODE_LANG1, V4L2_TUNER_MODE_LANG2,
       V4L2_TUNER_MODE_SAP, V4L2_TUNER_MODE_LANG1_LANG2 };
-static const char *psz_tuner_audio_modes_list_text[] =
+static const char *const psz_tuner_audio_modes_list_text[] =
     { N_( "Mono" ),
       N_( "Stereo" ),
       N_( "Primary language (Analog TV tuners only)" ),

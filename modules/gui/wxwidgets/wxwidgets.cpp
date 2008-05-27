@@ -112,17 +112,16 @@ private:
                 "less features). You can select which one will be available " \
                 "on the toolbar (or both)." )
 
-static int pi_playlist_views[] = { 0,1,2 };
-static const char *psz_playlist_views[] = { N_("Normal" ), N_("Embedded" ) ,
-                                            N_("Both") };
+static const int pi_playlist_views[] = { 0,1,2 };
+static const char *const psz_playlist_views[] = {
+    N_("Normal" ), N_("Embedded" ), N_("Both") };
 
 vlc_module_begin();
-    int i_score = 150;
-    set_shortname( (char*) "wxWidgets" );
-    set_description( (char *) _("wxWidgets interface module") );
+    set_shortname( "wxWidgets" );
+    set_description( N_("wxWidgets interface module") );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
-    set_capability( "interface", i_score );
+    set_capability( "interface", 150 );
     set_callbacks( Open, Close );
     add_shortcut( "wxwindows" );
     add_shortcut( "wxwin" );
@@ -191,10 +190,7 @@ static int Open( vlc_object_t *p_this )
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
-    {
-        msg_Err( p_intf, "out of memory" );
         return VLC_ENOMEM;
-    }
     memset( p_intf->p_sys, 0, sizeof( intf_sys_t ) );
 
     p_intf->pf_run = Run;

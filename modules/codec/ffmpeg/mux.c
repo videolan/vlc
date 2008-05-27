@@ -47,7 +47,7 @@
 /* Version checking */
 #if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_FFMPEG_AVFORMAT_H)
 
-static const char *ppsz_mux_options[] = {
+static const char *const ppsz_mux_options[] = {
     "mux", NULL
 };
 

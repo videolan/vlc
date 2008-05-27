@@ -31,12 +31,12 @@
 #define EQZ_BANDS_MAX 10
 
 #define NB_PRESETS 18
-static const char *preset_list[] = {
+static const char *const preset_list[] = {
     "flat", "classical", "club", "dance", "fullbass", "fullbasstreble",
     "fulltreble", "headphones","largehall", "live", "party", "pop", "reggae",
     "rock", "ska", "soft", "softrock", "techno"
 };
-static const char *preset_list_text[] = {
+static const char *const preset_list_text[] = {
     N_("Flat"), N_("Classical"), N_("Club"), N_("Dance"), N_("Full bass"),
     N_("Full bass and treble"), N_("Full treble"), N_("Headphones"),
     N_("Large Hall"), N_("Live"), N_("Party"), N_("Pop"), N_("Reggae"),

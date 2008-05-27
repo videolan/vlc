@@ -87,8 +87,8 @@
            "libcss.\n" \
     "The default method is: key.")
 
-static const char *psz_css_list[] = { "title", "disc", "key" };
-static const char *psz_css_list_text[] = { N_("title"), N_("Disc"), N_("Key") };
+static const char *const psz_css_list[] = { "title", "disc", "key" };
+static const char *const psz_css_list_text[] = { N_("title"), N_("Disc"), N_("Key") };
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );

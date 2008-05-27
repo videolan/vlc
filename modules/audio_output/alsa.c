@@ -101,8 +101,8 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static const char *ppsz_devices[] = { "default" };
-static const char *ppsz_devices_text[] = { N_("Default") };
+static const char *const ppsz_devices[] = { "default" };
+static const char *const ppsz_devices_text[] = { N_("Default") };
 vlc_module_begin();
     set_shortname( "ALSA" );
     set_description( N_("ALSA audio output") );

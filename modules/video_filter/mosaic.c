@@ -163,12 +163,12 @@ enum
 {
     position_auto = 0, position_fixed = 1, position_offsets = 2
 };
-static int pi_pos_values[] = { 0, 1, 2 };
-static const char *ppsz_pos_descriptions[] =
+static const int pi_pos_values[] = { 0, 1, 2 };
+static const char *const ppsz_pos_descriptions[] =
     { N_("auto"), N_("fixed"), N_("offsets") };
 
-static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *ppsz_align_descriptions[] =
+static const int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_align_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
      N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -229,7 +229,7 @@ vlc_module_begin();
                  false );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "alpha", "height", "width", "align", "xoffset", "yoffset",
     "borderw", "borderh", "position", "rows", "cols",
     "keep-aspect-ratio", "keep-picture", "order", "offsets",

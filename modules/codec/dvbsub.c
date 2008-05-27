@@ -70,8 +70,8 @@
 #define ENC_POSY_TEXT N_("Encoding Y coordinate")
 #define ENC_POSY_LONGTEXT N_("Y coordinate of the encoded subtitle" )
 
-static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *ppsz_pos_descriptions[] =
+static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -110,7 +110,7 @@ vlc_module_begin();
     add_obsolete_integer( ENC_CFG_PREFIX "timeout" ); /* Suppressed since 0.8.5 */
 vlc_module_end();
 
-static const char *ppsz_enc_options[] = { "x", "y", NULL };
+static const char *const ppsz_enc_options[] = { "x", "y", NULL };
 
 /****************************************************************************
  * Local structures

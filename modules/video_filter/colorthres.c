@@ -54,10 +54,10 @@ static picture_t *Filter( filter_t *, picture_t * );
     "grayscaled. This must be an hexadecimal (like HTML colors). The first two "\
     "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
     " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
-static int pi_color_values[] = {
+static const int pi_color_values[] = {
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x0000FF00, 0x000000FF, 0x0000FFFF };
 
-static const char *ppsz_color_descriptions[] = {
+static const char *const ppsz_color_descriptions[] = {
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Lime"), N_("Blue"), N_("Aqua") };
 
 #define CFG_PREFIX "colorthres-"
@@ -78,7 +78,7 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "color", "saturationthes", "similaritythres", NULL
 };
 

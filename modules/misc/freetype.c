@@ -127,9 +127,9 @@ static void YUVFromRGB( uint32_t i_argb,
     "fonts that will be rendered on the video. If absolute font size is set, "\
     "relative size will be overriden." )
 
-static int   pi_sizes[] = { 20, 18, 16, 12, 6 };
-static const char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
-                                         N_("Large"), N_("Larger") };
+static const int pi_sizes[] = { 20, 18, 16, 12, 6 };
+static const char *const ppsz_sizes_text[] = {
+    N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
 #define YUVP_TEXT N_("Use YUVP renderer")
 #define YUVP_LONGTEXT N_("This renders the font using \"paletized YUV\". " \
   "This option is only needed if you want to encode into DVB subtitles" )
@@ -141,15 +141,15 @@ static const char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"
 #define EFFECT_OUTLINE     2
 #define EFFECT_OUTLINE_FAT 3
 
-static int   pi_effects[] = { 1, 2, 3 };
-static const char *ppsz_effects_text[] = { N_("Background"),N_("Outline"),
-                                           N_("Fat Outline") };
-static int pi_color_values[] = {
+static int const pi_effects[] = { 1, 2, 3 };
+static const char *const ppsz_effects_text[] = {
+    N_("Background"),N_("Outline"), N_("Fat Outline") };
+static const int pi_color_values[] = {
   0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00808000, 0x00008000, 0x00008080,
   0x0000FF00, 0x00800080, 0x00000080, 0x000000FF, 0x0000FFFF };
 
-static const char *ppsz_color_descriptions[] = {
+static const char *const ppsz_color_descriptions[] = {
   N_("Black"), N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"),
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"), N_("Teal"),
   N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), N_("Aqua") };

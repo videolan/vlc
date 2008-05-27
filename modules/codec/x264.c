@@ -373,33 +373,33 @@ static void Close( vlc_object_t * );
 #define AUD_LONGTEXT N_( "Generate access unit delimiter NAL units.")
 
 #if X264_BUILD >= 24 && X264_BUILD < 58
-static const char *enc_me_list[] =
+static const char *const enc_me_list[] =
   { "dia", "hex", "umh", "esa" };
-static const char *enc_me_list_text[] =
+static const char *const enc_me_list_text[] =
   { N_("dia"), N_("hex"), N_("umh"), N_("esa") };
 #endif
 
 #if X264_BUILD >= 58 /* r728 */
-static const char *enc_me_list[] =
+static const char *const enc_me_list[] =
   { "dia", "hex", "umh", "esa", "tesa" };
-static const char *enc_me_list_text[] =
+static const char *const enc_me_list_text[] =
   { N_("dia"), N_("hex"), N_("umh"), N_("esa"), N_("tesa") };
 #endif
 
-static const char *enc_analyse_list[] =
+static const char *const enc_analyse_list[] =
   { "none", "fast", "normal", "slow", "all" };
-static const char *enc_analyse_list_text[] =
+static const char *const enc_analyse_list_text[] =
   { N_("none"), N_("fast"), N_("normal"), N_("slow"), N_("all") };
 
 #if X264_BUILD >= 45 /* r457 */
-static const char *direct_pred_list[] =
+static const char *const direct_pred_list[] =
   { "none", "spatial", "temporal", "auto" };
-static const char *direct_pred_list_text[] =
+static const char *const direct_pred_list_text[] =
   { N_("none"), N_("spatial"), N_("temporal"), N_("auto") };
 #else
-static const char *direct_pred_list[] =
+static const char *const direct_pred_list[] =
   { "none", "spatial", "temporal" };
-static const char *direct_pred_list_text[] =
+static const char *const direct_pred_list_text[] =
   { N_("none"), N_("spatial"), N_("temporal") };
 #endif
 
@@ -690,7 +690,7 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "8x8dct", "analyse", "asm", "aud", "bframes", "bime", "bpyramid",
     "b-adapt", "b-bias", "b-rdo", "cabac", "chroma-me", "chroma-qp-offset",
     "cplxblur", "crf", "dct-decimate", "deadzone-inter", "deadzone-intra",

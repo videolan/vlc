@@ -235,7 +235,7 @@ vlc_module_end();
 /*****************************************************************************
  * Local data structures
  *****************************************************************************/
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "netid",
     "es-id-pid", "shaping", "pcr", "bmin", "bmax", "use-key-frames",
     "dts-delay", "csa-ck", "csa-pkt", "crypt-audio", "crypt-video",

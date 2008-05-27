@@ -91,19 +91,19 @@ static void    Play        ( aout_instance_t * );
 #define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a WAV " \
                         "header to the file.")
 
-static const char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le",
+static const char *const format_list[] = { "u8", "s8", "u16", "s16", "u16_le",
                                      "s16_le", "u16_be", "s16_be", "fixed32",
                                      "float32", "spdif" };
-static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
-                            VLC_FOURCC('s','8',' ',' '),
-                            AOUT_FMT_U16_NE, AOUT_FMT_S16_NE,
-                            VLC_FOURCC('u','1','6','l'),
-                            VLC_FOURCC('s','1','6','l'),
-                            VLC_FOURCC('u','1','6','b'),
-                            VLC_FOURCC('s','1','6','b'),
-                            VLC_FOURCC('f','i','3','2'),
-                            VLC_FOURCC('f','l','3','2'),
-                            VLC_FOURCC('s','p','i','f') };
+static const int format_int[] = { VLC_FOURCC('u','8',' ',' '),
+                                  VLC_FOURCC('s','8',' ',' '),
+                                  AOUT_FMT_U16_NE, AOUT_FMT_S16_NE,
+                                  VLC_FOURCC('u','1','6','l'),
+                                  VLC_FOURCC('s','1','6','l'),
+                                  VLC_FOURCC('u','1','6','b'),
+                                  VLC_FOURCC('s','1','6','b'),
+                                  VLC_FOURCC('f','i','3','2'),
+                                  VLC_FOURCC('f','l','3','2'),
+                                  VLC_FOURCC('s','p','i','f') };
 
 #define FILE_TEXT N_("Output file")
 #define FILE_LONGTEXT N_("File to which the audio samples will be written to. (\"-\" for stdout")

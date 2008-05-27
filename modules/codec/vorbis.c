@@ -223,7 +223,7 @@ vlc_module_begin();
 vlc_module_end();
 
 #ifndef MODULE_NAME_IS_tremor
-static const char *ppsz_enc_options[] = {
+static const char *const ppsz_enc_options[] = {
     "quality", "max-bitrate", "min-bitrate", "cbr", NULL
 };
 #endif

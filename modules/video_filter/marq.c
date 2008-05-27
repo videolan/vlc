@@ -52,12 +52,14 @@ static subpicture_t *Filter( filter_t *, mtime_t );
 static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
                             void *p_data );
-static int pi_color_values[] = { 0xf0000000, 0x00000000, 0x00808080, 0x00C0C0C0,
+static const int pi_color_values[] = {
+               0xf0000000, 0x00000000, 0x00808080, 0x00C0C0C0,
                0x00FFFFFF, 0x00800000, 0x00FF0000, 0x00FF00FF, 0x00FFFF00,
                0x00808000, 0x00008000, 0x00008080, 0x0000FF00, 0x00800080,
                0x00000080, 0x000000FF, 0x0000FFFF};
-static const char *ppsz_color_descriptions[] = { N_("Default"), N_("Black"),
-               N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"), N_("Red"),
+static const char *const ppsz_color_descriptions[] = {
+               N_("Default"), N_("Black"), N_("Gray"),
+               N_("Silver"), N_("White"), N_("Maroon"), N_("Red"),
                N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"),
                N_("Teal"), N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"),
                N_("Aqua") };
@@ -129,8 +131,8 @@ struct filter_sys_t
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
   "also use combinations of these values, eg 6 = top-right).")
 
-static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *ppsz_pos_descriptions[] =
+static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_pos_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
      N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -181,7 +183,7 @@ vlc_module_begin();
     add_obsolete_string( "time-size" );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "marquee", "x", "y", "position", "color", "size", "timeout", "refresh",
     NULL
 };

@@ -119,9 +119,9 @@
     #define SIGN(x)     (x < 0 ? (-1) : 1)
     #define PID2     1.570796326794896619231322
 
-    static const char *ppsz_effects[] = {
+    static const char *const ppsz_effects[] = {
             "none", "cube", "transparent-cube", "cylinder", "torus", "sphere","SQUAREXY","SQUARER", "ASINXY", "ASINR", "SINEXY", "SINER" };
-    static const char *ppsz_effects_text[] = {
+    static const char *const ppsz_effects_text[] = {
             N_("None"), N_("Cube"), N_("Transparent Cube"),
             N_("Cylinder"), N_("Torus"), N_("Sphere"), N_("SQUAREXY"),N_("SQUARER"), N_("ASINXY"), N_("ASINR"), N_("SINEXY"), N_("SINER") };
 #endif
@@ -175,9 +175,9 @@ static void Transform    ( int, float, float, int, int, int, int, double *, doub
     "Several visual OpenGL effects are available." )
 
 #ifndef OPENGL_MORE_EFFECT
-static const char *ppsz_effects[] = {
+static const char *const ppsz_effects[] = {
         "none", "cube", "transparent-cube" };
-static const char *ppsz_effects_text[] = {
+static const char *const ppsz_effects_text[] = {
         N_("None"), N_("Cube"), N_("Transparent Cube") };
 #endif
 

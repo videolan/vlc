@@ -121,7 +121,7 @@ vlc_module_begin();
                  ENC_QUALITY_LONGTEXT, false );
 vlc_module_end();
 
-static const char *ppsz_enc_options[] = {
+static const char *const ppsz_enc_options[] = {
     "quality", NULL
 };
 

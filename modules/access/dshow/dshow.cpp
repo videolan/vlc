@@ -77,19 +77,19 @@ static void ConfigTuner( vlc_object_t *, ICaptureGraphBuilder2 *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static const char *ppsz_vdev[] = { "", "none" };
-static const char *ppsz_vdev_text[] = { N_("Default"), N_("None") };
-static const char *ppsz_adev[] = { "", "none" };
-static const char *ppsz_adev_text[] = { N_("Default"), N_("None") };
-static int  pi_tuner_input[] = { 0, 1, 2 };
-static const char *ppsz_tuner_input_text[] =
+static const char *const ppsz_vdev[] = { "", "none" };
+static const char *const ppsz_vdev_text[] = { N_("Default"), N_("None") };
+static const char *const ppsz_adev[] = { "", "none" };
+static const char *const ppsz_adev_text[] = { N_("Default"), N_("None") };
+static const int pi_tuner_input[] = { 0, 1, 2 };
+static const char *const ppsz_tuner_input_text[] =
     {N_("Default"), N_("Cable"), N_("Antenna")};
 static const int pi_amtuner_mode[]  = { AMTUNER_MODE_DEFAULT,
                                  AMTUNER_MODE_TV,
                                  AMTUNER_MODE_FM_RADIO,
                                  AMTUNER_MODE_AM_RADIO,
                                  AMTUNER_MODE_DSS };
-static const char *ppsz_amtuner_mode_text[] = { N_("Default"),
+static const char *const ppsz_amtuner_mode_text[] = { N_("Default"),
                                           N_("TV"),
                                           N_("FM radio"),
                                           N_("AM radio"),

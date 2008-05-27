@@ -131,14 +131,14 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_ALWAYS_VIDEO_MODE_TEXT N_( "Complete look with information area" )
 #define QT_MINIMAL_MODE_TEXT N_( "Minimal look with no menus" )
 
-static int i_mode_list[] =
+static const int i_mode_list[] =
     { QT_NORMAL_MODE, QT_ALWAYS_VIDEO_MODE, QT_MINIMAL_MODE };
-static const char *psz_mode_list_text[] =
+static const char *const psz_mode_list_text[] =
     { QT_NORMAL_MODE_TEXT, QT_ALWAYS_VIDEO_MODE_TEXT, QT_MINIMAL_MODE_TEXT };
 
 vlc_module_begin();
-    set_shortname( (char *)"Qt" );
-    set_description( (char*)_("Qt interface") );
+    set_shortname( "Qt" );
+    set_description( N_("Qt interface") );
     set_category( CAT_INTERFACE ) ;
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     set_capability( "interface", 151 );

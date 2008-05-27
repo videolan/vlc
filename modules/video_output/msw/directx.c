@@ -157,8 +157,8 @@ static int WallpaperCallback( vlc_object_t *, char const *,
     "background. Note that this feature only works in overlay mode and " \
     "the desktop must not already have a wallpaper." )
 
-static char *ppsz_dev[] = { "" };
-static char *ppsz_dev_text[] = { N_("Default") };
+static const char *const ppsz_dev[] = { "" };
+static const char *const ppsz_dev_text[] = { N_("Default") };
 
 vlc_module_begin();
     set_shortname( "DirectX" );

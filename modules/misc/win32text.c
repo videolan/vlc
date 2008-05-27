@@ -75,15 +75,15 @@ static int SetFont( filter_t *, int );
   "fonts that will be rendered on the video. If absolute font size is set, "\
    "relative size will be overriden." )
 
-static int   pi_sizes[] = { 20, 18, 16, 12, 6 };
-static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
-                                   N_("Large"), N_("Larger") };
-static int pi_color_values[] = {
+static int const pi_sizes[] = { 20, 18, 16, 12, 6 };
+static char *const ppsz_sizes_text[] = {
+    N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
+static const int pi_color_values[] = {
   0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00808000, 0x00008000, 0x00008080,
   0x0000FF00, 0x00800080, 0x00000080, 0x000000FF, 0x0000FFFF };
 
-static char *ppsz_color_descriptions[] = {
+static const char *const ppsz_color_descriptions[] = {
   N_("Black"), N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"),
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"), N_("Teal"),
   N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), N_("Aqua") };

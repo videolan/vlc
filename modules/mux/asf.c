@@ -90,7 +90,7 @@ vlc_module_end();
 /*****************************************************************************
  * Locales prototypes
  *****************************************************************************/
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "title", "author", "copyright", "comment", "rating", NULL
 };
 

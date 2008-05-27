@@ -149,7 +149,7 @@ struct encoder_sys_t
     mtime_t  pi_delay_pts[MAX_FRAME_DELAY];
 };
 
-static const char *ppsz_enc_options[] = {
+static const char *const ppsz_enc_options[] = {
     "keyint", "bframes", "vt", "qmin", "qmax", "hq", "strict-rc",
     "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
     "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",

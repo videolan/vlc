@@ -64,8 +64,9 @@ static void get_custom_from_packedyuv422( picture_t *, picture_t *, int * );
 #define COMPONENT_LONGTEXT N_("RGB component to extract. 0 for Red, 1 for Green and 2 for Blue.")
 #define FILTER_PREFIX "extract-"
 
-static int pi_component_values[] = { 0xFF0000, 0x00FF00, 0x0000FF };
-static const char *ppsz_component_descriptions[] = { "Red", "Green", "Blue" };
+static const int pi_component_values[] = { 0xFF0000, 0x00FF00, 0x0000FF };
+static const char *const ppsz_component_descriptions[] = {
+    "Red", "Green", "Blue" };
 
 /*****************************************************************************
  * Module descriptor
@@ -85,7 +86,7 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "component", NULL
 };
 

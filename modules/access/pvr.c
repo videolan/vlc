@@ -114,15 +114,15 @@ static void Close( vlc_object_t * );
 #define CHAN_LONGTEXT N_( "Channel of the card to use (Usually, 0 = tuner, " \
     "1 = composite, 2 = svideo)" )
 
-static int i_norm_list[] =
+static const int i_norm_list[] =
     { V4L2_STD_UNKNOWN, V4L2_STD_SECAM, V4L2_STD_PAL, V4L2_STD_NTSC };
-static const char *psz_norm_list_text[] =
+static const char *const psz_norm_list_text[] =
     { N_("Automatic"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
 
-static int i_bitrates[] = { 0, 1 };
-static const char *psz_bitrates_list_text[] = { N_("vbr"), N_("cbr") };
+static const int i_bitrates[] = { 0, 1 };
+static const char *const psz_bitrates_list_text[] = { N_("vbr"), N_("cbr") };
 
-static int pi_radio_range[2] = { 65000, 108000 };
+static const int pi_radio_range[2] = { 65000, 108000 };
 
 vlc_module_begin();
     set_shortname( N_("PVR") );

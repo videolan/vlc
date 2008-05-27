@@ -87,8 +87,8 @@ static void RunIntf        ( intf_thread_t *p_intf );
 #define BUTTON_LONGTEXT N_( \
     "Trigger button for mouse gestures." )
 
-static const char *button_list[] = { "left", "middle", "right" };
-static const char *button_list_text[] =
+static const char *const button_list[] = { "left", "middle", "right" };
+static const char *const button_list_text[] =
                                    { N_("Left"), N_("Middle"), N_("Right") };
 
 vlc_module_begin();

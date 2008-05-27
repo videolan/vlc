@@ -196,7 +196,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "id", "width", "height", "sar", "vfilter", "chroma", "alpha", "x", "y", NULL
 };
 

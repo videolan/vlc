@@ -74,7 +74,7 @@ vlc_module_begin();
                 MASK_LONGTEXT, false );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "mask", NULL
 };
 

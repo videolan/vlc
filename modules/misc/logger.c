@@ -111,12 +111,12 @@ static void DoRRD( intf_thread_t *p_intf );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static const char *mode_list[] = { "text", "html"
+static const char *const mode_list[] = { "text", "html"
 #ifdef HAVE_SYSLOG_H
 ,"syslog"
 #endif
 };
-static const char *mode_list_text[] = { N_("Text"), "HTML"
+static const char *const mode_list_text[] = { N_("Text"), "HTML"
 #ifdef HAVE_SYSLOG_H
 , "syslog"
 #endif

@@ -78,7 +78,7 @@ static int FakeCallback( vlc_object_t *, char const *,
 #define CHROMA_LONGTEXT N_( \
     "Force use of a specific chroma for output. Default is I420." )
 
-static const char *ppsz_deinterlace_type[] =
+static const char *const ppsz_deinterlace_type[] =
 {
     "deinterlace", "ffmpeg-deinterlace"
 };

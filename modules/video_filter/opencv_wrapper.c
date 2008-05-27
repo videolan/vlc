@@ -66,16 +66,16 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in );
  * Module descriptor
  *****************************************************************************/
 
-static char *chroma_list[] = { "input", "I420", "RGB32"};
-static char *chroma_list_text[] = { N_("Use input chroma unaltered"),
+static const char *const chroma_list[] = { "input", "I420", "RGB32"};
+static const char *const chroma_list_text[] = { N_("Use input chroma unaltered"),
   N_("I420 - first plane is greyscale"), N_("RGB32")};
 
-static char *output_list[] = { "none", "input", "processed"};
-static char *output_list_text[] = { N_("Don't display any video"),
+static const char *const output_list[] = { "none", "input", "processed"};
+static const char *const output_list_text[] = { N_("Don't display any video"),
   N_("Display the input video"), N_("Display the processed video")};
 
-static char *verbosity_list[] = { "error", "warning", "debug"};
-static char *verbosity_list_text[] = { N_("Show only errors"),
+static const char *const verbosity_list[] = { "error", "warning", "debug"};
+static const char *const verbosity_list_text[] = { N_("Show only errors"),
   N_("Show errors and warnings"), N_("Show everything including debug messages")};
 
 vlc_module_begin();

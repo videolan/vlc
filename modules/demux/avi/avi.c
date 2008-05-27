@@ -55,9 +55,9 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-static int pi_index[] = {0,1,2};
+static const int pi_index[] = {0,1,2};
 
-static const char *ppsz_indexes[] = { N_("Ask"), N_("Always fix"),
+static const char *const ppsz_indexes[] = { N_("Ask"), N_("Always fix"),
                                 N_("Never fix") };
 
 vlc_module_begin();

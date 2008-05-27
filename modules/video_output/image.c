@@ -77,8 +77,8 @@ static void Display   ( vout_thread_t *, picture_t * );
                             "creating one file per image. In this case, " \
                              "the number is not appended to the filename." )
 
-static const char *psz_format_list[] = { "png", "jpeg" };
-static const char *psz_format_list_text[] = { "PNG", "JPEG" };
+static const char *const psz_format_list[] = { "png", "jpeg" };
+static const char *const psz_format_list_text[] = { "PNG", "JPEG" };
 
 #define CFG_PREFIX "image-out-"
 
@@ -107,7 +107,7 @@ vlc_module_begin( );
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
-static const char *ppsz_vout_options[] = {
+static const char *const ppsz_vout_options[] = {
     "format", "width", "height", "ratio", "prefix", "replace", NULL
 };
 

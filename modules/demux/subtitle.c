@@ -62,7 +62,7 @@ static void Close( vlc_object_t *p_this );
     "\"mpsub\", \"jacosub\", \"psb\", \"realtext\", \"dks\", \"subviewer1\", " \
     " and \"auto\" (meaning autodetection, this should always work).")
 
-static const char *ppsz_sub_type[] =
+static const char *const ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
     "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2",

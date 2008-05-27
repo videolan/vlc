@@ -62,12 +62,6 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
-#if 0
-static const char *ppsz_filter_options[] = {
-    NULL
-};
-#endif
-
 struct filter_sys_t
 {
     uint8_t *p_oldpix;
@@ -98,10 +92,6 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys->p_oldpix = NULL;
     p_filter->p_sys->p_buf = NULL;
 
-#if 0
-    config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
-                   p_filter->p_cfg );
-#endif
     vlc_mutex_init( &p_filter->p_sys->lock );
 
     return VLC_SUCCESS;

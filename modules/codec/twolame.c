@@ -66,8 +66,8 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
 #define ENC_PSY_LONGTEXT N_( \
   "Integer from -1 (no model) to 4." )
 
-static int pi_stereo_values[] = { 0, 1, 2 };
-static char *ppsz_stereo_descriptions[] =
+static const int pi_stereo_values[] = { 0, 1, 2 };
+static const char *const ppsz_stereo_descriptions[] =
 { N_("Stereo"), N_("Dual mono"), N_("Joint stereo") };
 
 
@@ -90,7 +90,7 @@ vlc_module_begin();
                  ENC_PSY_LONGTEXT, false );
 vlc_module_end();
 
-static const char *ppsz_enc_options[] = {
+static const char *const ppsz_enc_options[] = {
     "quality", "mode", "vbr", "psy", NULL
 };
 

@@ -116,9 +116,10 @@ static int FilterCallback ( vlc_object_t *, char const *,
 
 #define FILTER_CFG_PREFIX "sout-deinterlace-"
 
-static const char *mode_list[] = { "discard", "blend", "mean", "bob", "linear", "x" };
-static const char *mode_list_text[] = { N_("Discard"), N_("Blend"), N_("Mean"),
-                                  N_("Bob"), N_("Linear"), "X" };
+static const char *const mode_list[] = {
+    "discard", "blend", "mean", "bob", "linear", "x" };
+static const char *const mode_list_text[] = {
+    N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"), N_("Linear"), "X" };
 
 vlc_module_begin();
     set_description( N_("Deinterlacing video filter") );
@@ -144,7 +145,7 @@ vlc_module_begin();
     set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
+static const char *const ppsz_filter_options[] = {
     "mode", NULL
 };
 

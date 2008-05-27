@@ -183,7 +183,7 @@
 #define HURRYUP_LONGTEXT N_( "The transcoder will drop frames if your CPU " \
                 "can't keep up with the encoding rate." )
 
-static const char *ppsz_deinterlace_type[] =
+static const char *const ppsz_deinterlace_type[] =
 {
     "deinterlace", "ffmpeg-deinterlace"
 };
@@ -297,7 +297,7 @@ vlc_module_begin();
 
 vlc_module_end();
 
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
     "paddtop", "paddbottom", "paddleft", "paddright",
     "canvas-width", "canvas-height", "canvas-aspect",

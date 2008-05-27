@@ -91,11 +91,11 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static const char *ppsz_sout_options_out[] = {
+static const char *const ppsz_sout_options_out[] = {
     "id", NULL
 };
 
-static const char *ppsz_sout_options_in[] = {
+static const char *const ppsz_sout_options_in[] = {
     "delay", "id-offset", NULL
 };
 

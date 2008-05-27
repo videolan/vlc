@@ -62,7 +62,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
 
 #define ENC_CFG_PREFIX "sout-dirac-"
 
-static const char *ppsz_enc_options[] = {
+static const char *const ppsz_enc_options[] = {
     "quality", NULL
 };
 

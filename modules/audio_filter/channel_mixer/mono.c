@@ -97,7 +97,7 @@ struct filter_sys_t
     "2=rear left, 3=rear right, 4=center, 5=left front)")
 
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5 };
-static const char *ppsz_pos_descriptions[] =
+static const char *const ppsz_pos_descriptions[] =
 { N_("Left"), N_("Right"), N_("Left rear"), N_("Right rear"), N_("Center"),
   N_("Left front") };
 

@@ -49,7 +49,8 @@ static char           *CreateHtmlSubtitle ( char * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-static const char *ppsz_encodings[] = { DEFAULT_NAME, "ASCII", "UTF-8", "",
+static const char *const ppsz_encodings[] = {
+    DEFAULT_NAME, "ASCII", "UTF-8", "",
     "ISO-8859-1", "CP1252", "MacRoman", "MacIceland","ISO-8859-15", "",
     "ISO-8859-2", "CP1250", "MacCentralEurope", "MacCroatian", "MacRomania", "",
     "ISO-8859-5", "CP1251", "MacCyrillic", "MacUkraine", "KOI8-R", "KOI8-U", "KOI8-RU", "",
@@ -96,8 +97,9 @@ The following known charsets are used:
 254 = PC 437
 */
 
-static int  pi_justification[] = { 0, 1, 2 };
-static const char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
+static const int  pi_justification[] = { 0, 1, 2 };
+static const char *const ppsz_justification_text[] = {
+    N_("Center"),N_("Left"),N_("Right")};
 
 #define ENCODING_TEXT N_("Subtitles text encoding")
 #define ENCODING_LONGTEXT N_("Set the encoding used in text subtitles")

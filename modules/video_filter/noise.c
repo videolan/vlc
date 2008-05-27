@@ -59,10 +59,6 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
-static const char *ppsz_filter_options[] = {
-    NULL
-};
-
 /*****************************************************************************
  * vout_sys_t: Distort video output method descriptor
  *****************************************************************************
@@ -90,9 +86,6 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
-
-    config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
-                       p_filter->p_cfg );
 
     p_filter->pf_video_filter = Filter;
 
