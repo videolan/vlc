@@ -710,17 +710,21 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
         return p_this;
     }
 
-    vlc_mutex_lock( &structure_lock );
-
     /* Otherwise, recursively look for the object */
-    if( (i_mode & 0x000f) == FIND_ANYWHERE )
-        p_found = FindObject( p_this->p_libvlc, i_type,
-                              (i_mode & ~0x000f)|FIND_CHILD );
-    else
-        p_found = FindObject( p_this, i_type, i_mode );
+    if ((i_mode & 0x000f) == FIND_ANYWHERE)
+    {
+#ifndef NDEBUG
+        if (i_type == VLC_OBJECT_PLAYLIST)
+	    msg_Warn (p_this, "using vlc_object_find(VLC_OBJECT_PLAYLIST) "
+                      "instead of pl_Yield()");
+#endif
+        return vlc_object_find (p_this->p_libvlc, i_type,
+                                (i_mode & ~0x000f)|FIND_CHILD);
+    }
 
+    vlc_mutex_lock( &structure_lock );
+    p_found = FindObject( p_this, i_type, i_mode );
     vlc_mutex_unlock( &structure_lock );
-
     return p_found;
 }
 
