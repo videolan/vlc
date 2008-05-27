@@ -628,8 +628,8 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
     return s;
 }
 
-void mvar_VlmSetNewLoop( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, bool b_name );
-void mvar_VlmSetNewLoop( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, bool b_name )
+static void mvar_VlmSetNewLoop( char *name, vlm_t *vlm, mvar_t *s,
+                                vlm_message_t *el, bool b_name )
 {
     /* Over name */
     mvar_t        *set;
