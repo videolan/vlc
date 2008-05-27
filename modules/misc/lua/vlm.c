@@ -46,21 +46,28 @@
  *****************************************************************************/
 int vlclua_vlm_new( lua_State *L )
 {
+#ifdef ENABLE_VLM
     vlc_object_t *p_this = vlclua_get_this( L );
     vlm_t *p_vlm = vlm_New( p_this );
     if( !p_vlm )
-        return luaL_error( L, "Cannot start VLM." );
+        goto err;
     __vlclua_push_vlc_object( L, (vlc_object_t*)p_vlm, NULL );
     return 1;
+err:
+#endif
+    return luaL_error( L, "Cannot start VLM." );
 }
 
 int vlclua_vlm_delete( lua_State *L )
 {
+#ifdef ENABLE_VLM
     vlm_t *p_vlm = (vlm_t*)vlclua_checkobject( L, 1, VLC_OBJECT_GENERIC );
     vlm_Delete( p_vlm );
+#endif
     return 0;
 }
 
+#ifdef ENABLE_VLM
 void push_message( lua_State *L, vlm_message_t *message );
 void push_message( lua_State *L, vlm_message_t *message )
 {
@@ -98,3 +105,9 @@ int vlclua_vlm_execute_command( lua_State *L )
     vlm_MessageDelete( message );
     return 1 + vlclua_push_ret( L, i_ret );
 }
+#else
+int vlclua_vlm_execute_command( lua_State *L )
+{
+    return 1 + vlclua_push_ret( L, VLC_EGENERIC );
+}
+#endif
