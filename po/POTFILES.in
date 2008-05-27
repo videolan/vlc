@@ -1,7 +1,6 @@
 # automatically created by make update-po
 
 # main sources
-include/iso_lang.h
 include/mmx.h
 include/vlc_access.h
 include/vlc_acl.h
@@ -33,6 +32,7 @@ include/vlc_image.h
 include/vlc_input.h
 include/vlc_interface.h
 include/vlc_intf_strings.h
+include/vlc_iso_lang.h
 include/vlc_keys.h
 include/vlc/libvlc_events.h
 include/vlc/libvlc.h
