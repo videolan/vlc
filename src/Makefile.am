@@ -8,6 +8,7 @@ NULL =
 EXTRA_DIST = extras/COPYING modules/builtin.h.in \
 	vlc-control.pc.in \
 	vlc-plugin.pc.in \
+	libvlc.sym \
 	libvlccore.sym
 
 BUILT_SOURCES = modules/builtin.h misc/revision.c ../include/vlc_about.h
@@ -189,7 +190,7 @@ libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DMODULE_STRING=\"control\"
 libvlc_la_LDFLAGS = $(AM_LDFLAGS) \
 	-version-info 2:0:0 \
-	-export-symbols-regex '^_?(libvlc|mediacontrol)_.*'
+	-export-symbols $(srcdir)/libvlc.sym
 
 EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_beos) \
