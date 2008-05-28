@@ -648,10 +648,12 @@ void * vlc_object_get( int i_id )
         if( obj->i_object_id == i_id )
         {
             vlc_object_yield( obj );
-            return obj;
+            goto out;
         }
     }
+    obj = NULL;
 
+out:
     vlc_mutex_unlock( &structure_lock );
     return obj;
 }
