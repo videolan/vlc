@@ -194,10 +194,7 @@ struct vlc_object_internals_t
 #define ZOOM_ORIGINAL_KEY_TEXT N_("1:1 Original")
 #define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
 
-static inline vlc_object_internals_t *vlc_internals( vlc_object_t *obj )
-{
-    return ((vlc_object_internals_t *)obj) - 1;
-}
+#define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
 
 /**
  * Private LibVLC instance data.
