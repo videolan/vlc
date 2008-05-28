@@ -1469,3 +1469,58 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
         ListChildren( p_list, p_tmp, i_type );
     }
 }
+
+#ifndef NDEBUG
+void vlc_refcheck (vlc_object_t *obj)
+{
+    static unsigned errors = 0;
+    vlc_object_t *caller = vlc_threadobj ();
+    vlc_object_internals_t *priv = vlc_internals (obj);
+    int refs;
+
+    if (errors > 100)
+        return;
+
+    if (!caller)
+        return; /* main thread, not sure how to handle it */
+
+    /* An object can always access itself without reference! */
+    if (caller == obj)
+        return;
+
+    /* The calling thread is younger than the object.
+     * Access could be valid, we would need more accounting. */
+    if (caller->i_object_id > obj->i_object_id)
+        return;
+
+    vlc_spin_lock (&priv->ref_spin);
+    refs = priv->i_refcount;
+    vlc_spin_unlock (&priv->ref_spin);
+
+    /* Object has more than one reference.
+     * The current thread could be holding a valid reference. */
+    if (refs > 1)
+        return;
+
+    /* The parent of an object normally holds the unique reference.
+     * As not all objects are threads, it could also be an ancestor. */
+    vlc_mutex_lock (&structure_lock);
+    for (vlc_object_t *cur = obj; cur != NULL; cur = cur->p_parent)
+        if (cur == caller)
+        {
+            vlc_mutex_unlock (&structure_lock);
+            return;
+        }
+    vlc_mutex_unlock (&structure_lock);
+
+#if 1
+    if (caller->i_object_type == VLC_OBJECT_PLAYLIST)
+        return; /* Playlist is too clever, or hopelessly broken. */
+#endif
+    msg_Err (caller, "This thread is accessing...");
+    msg_Err (obj, "...this object in a suspicious manner.");
+
+    if (++errors == 100)
+        msg_Err (caller, "Too many reference errors");
+}
+#endif
