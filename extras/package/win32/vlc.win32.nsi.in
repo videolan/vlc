@@ -17,8 +17,8 @@
 !define MUI_LANGDLL_REGISTRY_KEY "${PRODUCT_DIR_REGKEY}"
 !define MUI_LANGDLL_REGISTRY_VALUENAME "Language"
 
+@FILE_LIBVLCCORE_DLL@
 @FILE_LIBVLC_DLL@
-@FILE_LIBVLC_CONTROL_DLL@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General configuration ;
