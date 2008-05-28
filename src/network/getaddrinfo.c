@@ -674,8 +674,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
         hints.ai_flags &= ~AI_NUMERICHOST;
     }
 #endif
-#if defined (HAVE_GETADDRINFO)
-# ifdef AI_IDN
+#ifdef AI_IDN
     /* Run-time I18n Domain Names support */
     hints.ai_flags |= AI_IDN;
     int ret = getaddrinfo (psz_node, psz_service, &hints, res);
@@ -684,20 +683,8 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 
     /* IDN not available: disable and retry without it */
     hints.ai_flags &= ~AI_IDN;
-# endif
-    return getaddrinfo (psz_node, psz_service, &hints, res);
-#else
-    int ret;
-    vlc_value_t lock;
-
-    var_Create (p_this->p_libvlc, "getaddrinfo_mutex", VLC_VAR_MUTEX);
-    var_Get (p_this->p_libvlc, "getaddrinfo_mutex", &lock);
-    vlc_mutex_lock (lock.p_address);
-
-    ret = getaddrinfo (psz_node, psz_service, &hints, res);
-    vlc_mutex_unlock (lock.p_address);
-    return ret;
 #endif
+    return getaddrinfo (psz_node, psz_service, &hints, res);
 }
 
 
