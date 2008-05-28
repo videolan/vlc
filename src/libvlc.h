@@ -287,8 +287,6 @@ void vlc_rewinddir (void *);
 #   define _wreaddir vlc_wreaddir
 #   define _wclosedir vlc_wclosedir
 #   define rewinddir vlc_rewinddir
-
-char *vlc_dgettext ( const char *package, const char *msgid );
 #endif
 
 #endif

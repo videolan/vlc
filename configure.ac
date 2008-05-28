@@ -2234,10 +2234,9 @@ if test "${enable_opencv}" = "yes" -a "${CXX}" != "";
 then
   AC_ARG_WITH(opencv-tree,
   [    --with-opencv-tree=PATH opencv tree for linking])
-  if test -n "${with_opencv_tree}"
-  then
     if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
     then
+      test -z "${with_opencv_tree}" && AC_MSG_ERROR([You have to specify --with-opencv-tree])
 	  AC_MSG_CHECKING(for opencv in ${with_opencv_tree})
 	  if test -f ${with_opencv_tree}/cv/include/cv.h -a -f ${with_opencv_tree}/cxcore/include/cxcore.h \
 	    -a -f ${with_opencv_tree}/cvaux/include/cvaux.h -a -f ${with_opencv_tree}/otherlibs/highgui/highgui.h
@@ -2257,9 +2256,17 @@ then
         AC_MSG_ERROR([cannot find opencv in ${with_opencv_tree}])
 	  fi
     else
-	  AC_MSG_WARN([--enable-opencv currently only works on windows])
+      PKG_CHECK_MODULES(OPENCV, opencv,
+        [
+          VLC_ADD_PLUGIN([opencv_example])
+          VLC_ADD_PLUGIN([opencv_wrapper])
+          VLC_ADD_LIBS([opencv_example opencv_wrapper],[${OPENCV_LIBS}])
+          VLC_ADD_CFLAGS([opencv_wrapper],[${OPENCV_CFLAGS}])
+          VLC_ADD_CXXFLAGS([opencv_example],[${OPENCV_CFLAGS}])
+        ],
+        [AC_MSG_ERROR([libopencv not found!])]
+      )
     fi
-  fi  
 fi
 
 
@@ -3023,18 +3030,19 @@ dnl Trying with pkg-config
          [AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])],
          [],
          [${SWSCALE_LIBS}])
-     VLC_RESTORE_FLAGS
     ],[AC_CHECK_LIB(avcodec,img_resample,[],
         [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
         [${FFMPEG_LIBS}])
       ]
     )
+    VLC_RESTORE_FLAGS
 
   ],[
 
     dnl
     dnl last chance: at the default place
     dnl
+      VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg} ${LIBS_ffmpeg}"
       AC_CHECK_HEADERS(ffmpeg/avcodec.h libavcodec/avcodec.h)
@@ -3061,8 +3069,7 @@ dnl Trying with pkg-config
 
       AC_CHECK_LIB(avformat, av_open_input_stream, [
         VLC_ADD_LIBS([ffmpeg],[-lavformat -lz]) ], [], [-lavcodec -lz $LDAVUTIL])
-      LDFLAGS="${LDFLAGS_save}"
-      CPPFLAGS="${CPPFLAGS_save}"
+      VLC_RESTORE_FLAGS
 
       AC_CHECK_LIB(swscale, sws_getContext, [
         AC_CHECK_HEADERS(ffmpeg/swscale.h libswscale/swscale.h)
@@ -3070,10 +3077,10 @@ dnl Trying with pkg-config
         [AC_CHECK_LIB(avcodec,img_resample,[],
             [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
         [-lavcodec $LDAVUTIL])
-      LDFLAGS="${LDFLAGS_save}"
-      CPPFLAGS="${CPPFLAGS_save}"
       ],
       [${SWSCALE_LIBS}])
+
+      VLC_RESTORE_FLAGS
   ])
 fi
 
