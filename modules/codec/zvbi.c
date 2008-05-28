@@ -344,7 +344,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_spu->p_region->i_x = 0;
     p_spu->p_region->i_y = 0;
-    p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
+    p_spu->p_region->i_align = p_sys->i_align;
 
     /* Normal text subs, easy markup */
     p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM;
@@ -381,7 +381,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         if( i_total <= 40 ) goto error;
         p_spu->p_region->psz_text = strdup( &p_text[8] );
 
-        p_spu->p_region->fmt.i_height = p_spu->p_region->fmt.i_visible_height = p_page.rows + 1;
 #ifdef ZVBI_DEBUG
         msg_Info( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
 #endif
