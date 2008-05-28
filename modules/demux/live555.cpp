@@ -44,6 +44,7 @@
 
 #include <iostream>
 #include <limits.h>
+#include <stdint.h> /* UINT64_C */
 
 #if defined( WIN32 )
 #   include <winsock2.h>
