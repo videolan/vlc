@@ -44,7 +44,7 @@
 
 #include <iostream>
 #include <limits.h>
-#include <stdint.h> /* UINT64_C */
+
 
 #if defined( WIN32 )
 #   include <winsock2.h>
@@ -58,6 +58,14 @@
 extern "C" {
 #include "../access/mms/asf.h"  /* Who said ugly ? */
 }
+
+/* XXX Ugly workaround: Buggy Mac OS X headers fail to define them */
+#ifndef INT64_C
+# define INT64_C(v)   (v ## LL)
+#endif
+#ifndef UINT64_C
+# define UINT64_C(v)   (v ## ULL)
+#endif
 
 using namespace std;
 
