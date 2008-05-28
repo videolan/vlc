@@ -3021,10 +3021,7 @@ dnl Trying with pkg-config
        VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
        AC_CHECK_LIB(swscale, sws_getContext,
          [AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])],
-         [AC_CHECK_LIB(avcodec,img_resample,[],
-            [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
-         [${FFMPEG_LIBS}])
-         ],
+         [],
          [${SWSCALE_LIBS}])
      VLC_RESTORE_FLAGS
     ],[AC_CHECK_LIB(avcodec,img_resample,[],
