@@ -45,6 +45,7 @@ void system_End       ( libvlc_int_t * );
  */
 int vlc_threads_init( void );
 void vlc_threads_end( void );
+vlc_object_t *vlc_threadobj (void);
 
 /*
  * CPU capabilities

@@ -62,6 +62,15 @@ libvlc_global_data_t *vlc_global( void )
     return p_root;
 }
 
+/**
+ * Object running the current thread
+ */
+static vlc_threadvar_t thread_object_key;
+
+vlc_object_t *vlc_threadobj (void)
+{
+    return vlc_threadvar_get (&thread_object_key);
+}
 
 vlc_threadvar_t msg_context_global_key;
 
@@ -150,6 +159,7 @@ int vlc_threads_init( void )
         }
 
         /* We should be safe now. Do all the initialization stuff we want. */
+        vlc_threadvar_create( &thread_object_key, NULL );
         vlc_threadvar_create( &msg_context_global_key, msg_StackDestroy );
     }
     i_initializations++;
@@ -181,6 +191,7 @@ void vlc_threads_end( void )
     {
         vlc_object_release( p_root );
         vlc_threadvar_delete( &msg_context_global_key );
+        vlc_threadvar_delete( &thread_object_key );
     }
     i_initializations--;
 
@@ -411,6 +422,33 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 #endif
 }
 
+struct vlc_thread_boot
+{
+    void * (*entry) (void *);
+    vlc_object_t *object;
+};
+
+#if defined (LIBVLC_USE_PTHREAD)
+# define THREAD_RTYPE void *
+# define THREAD_RVAL  NULL
+#elif defined (WIN32)
+# define THREAD_RTYPE __stdcall unsigned
+# define THREAD_RVAL 0
+#endif
+
+static THREAD_RTYPE thread_entry (void *data)
+{
+    vlc_object_t *obj = ((struct vlc_thread_boot *)data)->object;
+    void *(*func) (void *) = ((struct vlc_thread_boot *)data)->entry;
+
+    free (data);
+    vlc_threadvar_set (&thread_object_key, obj);
+    msg_Dbg (obj, "thread started");
+    func (obj);
+    msg_Dbg (obj, "thread ended");
+    return THREAD_RVAL;
+}
+
 /*****************************************************************************
  * vlc_thread_create: create a thread, inner version
  *****************************************************************************
@@ -422,13 +460,18 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
                          int i_priority, bool b_wait )
 {
     int i_ret;
-    void *p_data = (void *)p_this;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
+
+    struct vlc_thread_boot *boot = malloc (sizeof (*boot));
+    if (boot == NULL)
+        return errno;
+    boot->entry = func;
+    boot->object = p_this;
 
     vlc_mutex_lock( &p_this->object_lock );
 
 #if defined( LIBVLC_USE_PTHREAD )
-    i_ret = pthread_create( &p_priv->thread_id, NULL, func, p_data );
+    i_ret = pthread_create( &p_priv->thread_id, NULL, thread_entry, boot );
 
 #ifndef __APPLE__
     if( config_GetInt( p_this, "rt-priority" ) > 0 )
@@ -471,13 +514,13 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
          * memory leaks and the signal functions not working (see Microsoft
          * Knowledge Base, article 104641) */
 #if defined( UNDER_CE )
-        HANDLE hThread = CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)func,
-                                       (LPVOID)p_data, CREATE_SUSPENDED,
+        HANDLE hThread = CreateThread( NULL, 0, thread_entry,
+                                       (LPVOID)boot, CREATE_SUSPENDED,
                                         NULL );
 #else
         HANDLE hThread = (HANDLE)(uintptr_t)
-            _beginthreadex( NULL, 0, (LPTHREAD_START_ROUTINE)func,
-                            (void *)p_data, CREATE_SUSPENDED, NULL );
+            _beginthreadex( NULL, 0, thread_entry, boot,
+                            CREATE_SUSPENDED, NULL );
 #endif
         p_priv->thread_id = hThread;
         ResumeThread(hThread);
@@ -495,7 +538,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     }
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    p_priv->thread_id = spawn_thread( (thread_func)func, psz_name,
+    p_priv->thread_id = spawn_thread( (thread_func)thread_entry, psz_name,
                                       i_priority, p_data );
     i_ret = resume_thread( p_priv->thread_id );
 
