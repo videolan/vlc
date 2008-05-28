@@ -623,7 +623,7 @@ void MainInterface::debug()
 {
     msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
-    if( videoWidget->isVisible() )
+    if( videoWidget && videoWidget->isVisible() )
     {
 //    sleep( 10 );
     msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
