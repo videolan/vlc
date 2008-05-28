@@ -322,17 +322,6 @@ int vlc_wclosedir( void *_p_dir )
 #endif
 }
 
-#if defined (WIN32)
-/**
- * gettext callbacks for plugins.
- * LibVLC links libintl statically on Windows.
- */
-char *vlc_dgettext( const char *package, const char *msgid )
-{
-    return dgettext( package, msgid );
-}
-#endif
-
 /**
  * In-tree plugins share their gettext domain with LibVLC.
  */
