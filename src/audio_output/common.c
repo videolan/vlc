@@ -82,9 +82,6 @@ static void aout_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy( &p_aout->input_fifos_lock );
     vlc_mutex_destroy( &p_aout->mixer_lock );
     vlc_mutex_destroy( &p_aout->output_fifo_lock );
-
-    /* Free structure. */
-    vlc_object_release( p_aout );
 }
 
 
