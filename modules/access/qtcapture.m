@@ -55,7 +55,7 @@ vlc_module_begin();
    set_category( CAT_INPUT );
    set_subcategory( SUBCAT_INPUT_ACCESS );
    add_shortcut( "qtcapture" );
-   set_capability( "access_demux", 10 );
+   set_capability( "access_demux", 0 );
    set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -188,6 +188,10 @@ static int Open( vlc_object_t *p_this )
     p_demux->info.i_update = 0;
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
+
+    /* Only when selected */
+    if( *p_demux->psz_access == '\0' )
+        return VLC_EGENERIC;
 
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
