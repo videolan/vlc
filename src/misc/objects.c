@@ -932,6 +932,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
         /* Check allocation was successful */
         if( p_list->i_count != i_count )
         {
+            vlc_mutex_unlock( &structure_lock );
             msg_Err( p_this, "list allocation failed!" );
             p_list->i_count = 0;
             break;
