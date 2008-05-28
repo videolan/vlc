@@ -60,11 +60,11 @@
 
 
 #ifndef HAVE_GAI_STRERROR
-static struct
+static const struct
 {
-    int code;
-    const char *msg;
-} const __gai_errlist[] =
+    char       code;
+    const char msg[41]
+} gai_errlist[] =
 {
     { 0,              "Error 0" },
     { EAI_BADFLAGS,   "Invalid flag used" },
@@ -82,18 +82,18 @@ static struct
     { 0,              NULL }
 };
 
-static const char __gai_unknownerr[] = "Unrecognized error number";
+static const char gai_unknownerr[] = "Unrecognized error number";
 
 /****************************************************************************
  * Converts an EAI_* error code into human readable english text.
  ****************************************************************************/
 const char *vlc_gai_strerror (int errnum)
 {
-    for (unsigned i = 0; __gai_errlist[i].msg != NULL; i++)
-        if (errnum == __gai_errlist[i].code)
-            return __gai_errlist[i].msg;
+    for (unsigned i = 0; gai_errlist[i].msg != NULL; i++)
+        if (errnum == gai_errlist[i].code)
+            return gai_errlist[i].msg;
 
-    return __gai_unknownerr;
+    return gai_unknownerr;
 }
 #else /* ifndef HAVE_GAI_STRERROR */
 const char *vlc_gai_strerror (int errnum)
@@ -622,19 +622,13 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 
     if( hints.ai_family == AF_UNSPEC )
     {
-        vlc_value_t val;
-
-        var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-        var_Get( p_this, "ipv4", &val );
-        if( val.b_bool )
-            hints.ai_family = AF_INET;
-
 #ifdef AF_INET6
-        var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-        var_Get( p_this, "ipv6", &val );
-        if( val.b_bool )
+        if (var_CreateGetBool (p_this, "ipv6"))
             hints.ai_family = AF_INET6;
+        else
 #endif
+        if (var_CreateGetBool (p_this, "ipv4"))
+            hints.ai_family = AF_INET;
     }
 
     /*
@@ -683,21 +677,13 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 #if defined (HAVE_GETADDRINFO)
 # ifdef AI_IDN
     /* Run-time I18n Domain Names support */
-    static bool b_idn = true; /* beware of thread-safety */
+    hints.ai_flags |= AI_IDN;
+    int ret = getaddrinfo (psz_node, psz_service, &hints, res);
+    if (ret != EAI_BADFLAGS)
+        return ret;
 
-    if (b_idn)
-    {
-        hints.ai_flags |= AI_IDN;
-        int ret = getaddrinfo (psz_node, psz_service, &hints, res);
-
-        if (ret != EAI_BADFLAGS)
-            return ret;
-
-        /* IDN not available: disable and retry without it */
-        hints.ai_flags &= ~AI_IDN;
-        b_idn = false;
-        msg_Info (p_this, "International Domain Names not supported");
-    }
+    /* IDN not available: disable and retry without it */
+    hints.ai_flags &= ~AI_IDN;
 # endif
     return getaddrinfo (psz_node, psz_service, &hints, res);
 #else
