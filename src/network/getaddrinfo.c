@@ -62,8 +62,8 @@
 #ifndef HAVE_GAI_STRERROR
 static const struct
 {
-    char       code;
-    const char msg[41]
+    int        code;
+    const char msg[41];
 } gai_errlist[] =
 {
     { 0,              "Error 0" },
@@ -79,7 +79,7 @@ static const struct
     { EAI_MEMORY,     "Memory allocation failure" },
     { EAI_OVERFLOW,   "Buffer overflow" },
     { EAI_SYSTEM,     "System error" },
-    { 0,              NULL }
+    { 0,              "" },
 };
 
 static const char gai_unknownerr[] = "Unrecognized error number";
@@ -89,7 +89,7 @@ static const char gai_unknownerr[] = "Unrecognized error number";
  ****************************************************************************/
 const char *vlc_gai_strerror (int errnum)
 {
-    for (unsigned i = 0; gai_errlist[i].msg != NULL; i++)
+    for (unsigned i = 0; *gai_errlist[i].msg; i++)
         if (errnum == gai_errlist[i].code)
             return gai_errlist[i].msg;
 
