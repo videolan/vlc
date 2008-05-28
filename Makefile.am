@@ -554,6 +554,7 @@ VLC-release.app: vlc
 # This is just for development purposes. 
 # The resulting VLC.app will only in this tree.
 VLC.app: vlc 
+	(cd src && make install)
 	rm -Rf $(top_builddir)/tmp
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC.app
@@ -626,7 +627,7 @@ VLC.app: vlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
 	touch $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	chmod +x $(top_builddir)/VLC.app/Contents/MacOS/VLC
-	echo "#! /bin/sh\nexec \"\$$(dirname \"\$$0\")/../../../src/vlc\" \"--plugin-path=\$$(dirname \"\$$0\")/../../../modules\" \"\$$@\"" > $(top_builddir)/VLC.app/Contents/MacOS/VLC
+	$(INSTALL) $(top_builddir)/src/.libs/vlc $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	find modules/ -name '*_plugin$(LIBEXT)' | while read i; do \
 	  if test -n "$$i" ; \
