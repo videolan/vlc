@@ -55,7 +55,7 @@ vlc_module_begin();
    set_category( CAT_INPUT );
    set_subcategory( SUBCAT_INPUT_ACCESS );
    add_shortcut( "qtcapture" );
-   set_capability( "access_demux", 0 );
+   set_capability( "access_demux", 10 );
    set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -182,13 +182,6 @@ static int Open( vlc_object_t *p_this )
     int i_aspect;
     int result = 0;
 
-    /* Set up p_demux */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->info.i_update = 0;
-    p_demux->info.i_title = 0;
-    p_demux->info.i_seekpoint = 0;
-
     /* Only when selected */
     if( *p_demux->psz_access == '\0' )
         return VLC_EGENERIC;
@@ -196,12 +189,6 @@ static int Open( vlc_object_t *p_this )
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
     msg_Dbg( p_demux, "QTCapture Probed" );
-
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    if( !p_sys ) return VLC_ENOMEM;
-
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
-    memset( &fmt, 0, sizeof( es_format_t ) );
 
     QTCaptureDeviceInput * input = nil;
     QTCaptureSession * session = nil;
@@ -252,6 +239,7 @@ static int Open( vlc_object_t *p_this )
 
     [session startRunning];
 
+
     int qtchroma = [[[device formatDescriptions] objectAtIndex: 0] formatType]; /* FIXME */
     int chroma = qtchroma_to_fourcc( qtchroma );
     if( !chroma )
@@ -259,6 +247,21 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_demux, "Unknown qt chroma %4.4s provided by camera", (char*)&qtchroma );
         goto error;
     }
+
+    /* Now we can init */
+
+    /* Set up p_demux */
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->info.i_update = 0;
+    p_demux->info.i_title = 0;
+    p_demux->info.i_seekpoint = 0;
+
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys ) return VLC_ENOMEM;
+
+    memset( p_sys, 0, sizeof( demux_sys_t ) );
+    memset( &fmt, 0, sizeof( es_format_t ) );
 
     es_format_Init( &fmt, VIDEO_ES, chroma );
 
