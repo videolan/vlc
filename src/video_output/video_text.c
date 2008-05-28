@@ -131,14 +131,7 @@ void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
 
     if( !config_GetInt( p_caller, "osd" ) ) return;
 
-    if( p_caller->i_object_type == VLC_OBJECT_VOUT )
-    {
-        p_vout = (vout_thread_t*) p_caller;
-        vlc_object_yield( p_vout );
-    }
-    else
-        p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-
+    p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout )
     {
         va_start( args, psz_format );

@@ -386,24 +386,33 @@ static int Open( vlc_object_t *p_this )
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
     {
         /* Create the SDP */
+        static const struct addrinfo hints = {
+            .ai_family = AF_UNSPEC,
+            .ai_socktype = SOCK_DGRAM,
+            .ai_protocol = 0,
+            .ai_flags = AI_NUMERICHOST | AI_NUMERICSERV
+        };
         char *shost = var_GetNonEmptyString (p_access, "src-addr");
         char *dhost = var_GetNonEmptyString (p_access, "dst-addr");
         int sport = var_GetInteger (p_access, "src-port");
         int dport = var_GetInteger (p_access, "dst-port");
+        char port[6];
         struct sockaddr_storage src, dst;
         socklen_t srclen = 0, dstlen = 0;
-
         struct addrinfo *res;
-        if (vlc_getaddrinfo (VLC_OBJECT (p_stream), dhost, dport, NULL, &res) == 0)
+
+        snprintf (port, sizeof (port), "%d", dport);
+        if (getaddrinfo (dhost, port, &hints, &res) == 0)
         {
             memcpy (&dst, res->ai_addr, dstlen = res->ai_addrlen);
-            vlc_freeaddrinfo (res);
+            freeaddrinfo (res);
         }
 
-        if (vlc_getaddrinfo (VLC_OBJECT (p_stream), shost, sport, NULL, &res) == 0)
+        snprintf (port, sizeof (port), "%d", sport);
+        if (getaddrinfo (shost, port, &hints, &res) == 0)
         {
             memcpy (&src, res->ai_addr, srclen = res->ai_addrlen);
-            vlc_freeaddrinfo (res);
+            freeaddrinfo (res);
         }
 
         char *head = vlc_sdp_Start (VLC_OBJECT (p_stream), SOUT_CFG_PREFIX,
