@@ -400,7 +400,8 @@ Section "Media player (required)" SEC01
   !insertmacro InstallFolder skins
   !insertmacro InstallFolder http
   ;!insertmacro InstallFolder share
-  !insertmacro InstallFolder scripts
+  !insertmacro InstallFolder lua
+  ;!insertmacro InstallFolder scripts
 
   ; URLs
   WriteIniStr "$INSTDIR\${PRODUCT_GROUP} Website.url" "InternetShortcut" "URL" \
