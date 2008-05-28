@@ -988,7 +988,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         aout_DecDelete( p_dec->p_owner->p_aout, p_dec->p_owner->p_aout_input );
     if( p_dec->p_owner->p_aout )
     {
-        aout_Delete( p_dec->p_owner->p_aout );
+        vlc_object_release( p_dec->p_owner->p_aout );
         p_dec->p_owner->p_aout = NULL;
     }
     if( p_dec->p_owner->p_vout )

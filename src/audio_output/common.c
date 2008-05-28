@@ -36,6 +36,9 @@
  * Instances management (internal and external)
  */
 
+/* Local functions */
+static void aout_Destructor( vlc_object_t * p_this );
+
 /*****************************************************************************
  * aout_New: initialize aout structure
  *****************************************************************************/
@@ -65,16 +68,17 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     val.b_bool = true;
     var_Set( p_aout, "intf-change", val );
 
+    vlc_object_set_destructor( p_parent, aout_Destructor );
+
     return p_aout;
 }
 
 /*****************************************************************************
- * aout_Delete: destroy aout structure
+ * aout_Destructor: destroy aout structure
  *****************************************************************************/
-void aout_Delete( aout_instance_t * p_aout )
+static void aout_Destructor( vlc_object_t * p_this )
 {
-    var_Destroy( p_aout, "intf-change" );
-
+    aout_instance_t * p_aout = (aout_instance_t *)p_this;
     vlc_mutex_destroy( &p_aout->input_fifos_lock );
     vlc_mutex_destroy( &p_aout->mixer_lock );
     vlc_mutex_destroy( &p_aout->output_fifo_lock );
