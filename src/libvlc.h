@@ -149,8 +149,6 @@ typedef struct libvlc_global_data_t
 
     /* Object structure data */
     int                    i_counter;   ///< object counter
-    int                    i_objects;   ///< Attached objects count
-    vlc_object_t **        pp_objects;  ///< Array of all objects
 
     module_bank_t *        p_module_bank; ///< The module bank
 
@@ -184,6 +182,8 @@ struct vlc_object_internals_t
     unsigned         i_refcount;
     vlc_destructor_t pf_destructor;
 
+    /* Objects tree structure */
+    vlc_object_t    *prev, *next;
     vlc_object_t   **pp_children;
     int              i_children;
 };

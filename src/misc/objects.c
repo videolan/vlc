@@ -72,7 +72,6 @@ static vlc_object_t * FindObject    ( vlc_object_t *, int, int );
 static vlc_object_t * FindObjectName( vlc_object_t *, const char *, int );
 static void           PrintObject   ( vlc_object_t *, const char * );
 static void           DumpStructure ( vlc_object_t *, int, char * );
-static int            FindIndex     ( vlc_object_t *, vlc_object_t **, int );
 
 static vlc_list_t   * NewList       ( int );
 static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
@@ -141,8 +140,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_new->p_libvlc = NULL;
 
         p_libvlc_global->i_counter = 0;
-        p_libvlc_global->i_objects = 0;
-        p_libvlc_global->pp_objects = NULL;
+        p_priv->next = p_priv->prev = p_new;
         vlc_mutex_init( &structure_lock );
     }
     else
@@ -171,12 +169,12 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_spin_init( &p_priv->spin );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
+    p_priv->next = VLC_OBJECT (p_libvlc_global);
     vlc_mutex_lock( &structure_lock );
+    p_priv->prev = vlc_internals (p_libvlc_global)->prev;
+    vlc_internals (p_libvlc_global)->prev = p_new;
+    vlc_internals (p_priv->prev)->next = p_new;
     p_new->i_object_id = p_libvlc_global->i_counter++;
-    /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
-     * useless to try and recover anything if pp_objects gets smashed. */
-    TAB_APPEND( p_libvlc_global->i_objects, p_libvlc_global->pp_objects,
-                p_new );
     vlc_mutex_unlock( &structure_lock );
 
     if( i_type == VLC_OBJECT_LIBVLC )
@@ -340,36 +338,30 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 #ifndef NDEBUG
         assert( p_global == vlc_global() );
         /* Test for leaks */
-        if( p_global->i_objects > 0 )
+        for( vlc_object_t *leaked = p_priv->next;
+             leaked != p_this;
+             leaked = vlc_internals (leaked)->next )
         {
-            int i;
-            for( i = 0; i < p_global->i_objects; i++ )
-            {
-                /* We are leaking this object */
-                fprintf( stderr,
-                         "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
-                         p_global->pp_objects[i]->i_object_id,
-                         p_global->pp_objects[i]->psz_object_type,
-                         p_global->pp_objects[i]->psz_object_name );
+            /* We are leaking this object */
+            fprintf( stderr,
+                     "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
+                     leaked->i_object_id, leaked->psz_object_type,
+                     leaked->psz_object_name );
+            /* Dump libvlc object to ease debugging */
+            vlc_object_dump( leaked );
+            fflush(stderr);
+        }
 
-                /* Dump libvlc object to ease debugging */
-                vlc_object_dump( p_global->pp_objects[i] );
-
-                fflush(stderr);
-            }
-
+        if( p_priv->next != p_this )
+        {
             /* Dump libvlc object to ease debugging */
             vlc_object_dump( p_this );
-
             /* Strongly abort, cause we want these to be fixed */
             abort();
         }
 #endif
 
         /* We are the global object ... no need to lock. */
-        free( p_global->pp_objects );
-        p_global->pp_objects = NULL;
-
         vlc_mutex_destroy( &structure_lock );
     }
 
@@ -644,47 +636,19 @@ void __vlc_object_kill( vlc_object_t *p_this )
  */
 void * vlc_object_get( int i_id )
 {
-    int i_max, i_middle;
-    vlc_object_t **pp_objects;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
     vlc_object_t *obj = NULL;
 
     vlc_mutex_lock( &structure_lock );
 
-    pp_objects = p_libvlc_global->pp_objects;
-
-    /* Perform our dichotomy */
-    for( i_max = p_libvlc_global->i_objects - 1 ; ; )
+    for( obj = vlc_internals (p_libvlc_global)->next;
+         obj != VLC_OBJECT (p_libvlc_global);
+         obj = vlc_internals (obj)->next )
     {
-        i_middle = i_max / 2;
-
-        if( pp_objects[i_middle]->i_object_id > i_id )
+        if( obj->i_object_id == i_id )
         {
-            i_max = i_middle;
-        }
-        else if( pp_objects[i_middle]->i_object_id < i_id )
-        {
-            if( i_middle )
-            {
-                pp_objects += i_middle;
-                i_max -= i_middle;
-            }
-            else
-            {
-                /* This happens when there are only two remaining objects */
-                if( pp_objects[i_middle+1]->i_object_id == i_id )
-                {
-                    vlc_object_yield( pp_objects[i_middle+1] );
-                    obj = pp_objects[i_middle+1];
-                }
-                break;
-            }
-        }
-        else
-        {
-            vlc_object_yield( pp_objects[i_middle] );
-            obj = pp_objects[i_middle];
-            break;
+            vlc_object_yield( obj );
+            return obj;
         }
     }
 
@@ -829,15 +793,10 @@ void __vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
-        /* Remove the object from the table
+        /* Remove the object from object list
          * so that it cannot be encountered by vlc_object_get() */
-        libvlc_global_data_t *p_libvlc_global = vlc_global();
-        int i_index;
-
-        i_index = FindIndex( p_this, p_libvlc_global->pp_objects,
-                             p_libvlc_global->i_objects );
-        REMOVE_ELEM( p_libvlc_global->pp_objects,
-                     p_libvlc_global->i_objects, i_index );
+        vlc_internals (internals->next)->prev = internals->prev;
+        vlc_internals (internals->prev)->next = internals->next;
 
         /* Detach from parent to protect against FIND_CHILDREN */
         vlc_object_detach_unlocked (p_this);
@@ -1023,21 +982,18 @@ vlc_list_t *__vlc_list_children( vlc_object_t *obj )
 static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
-
     (void)oldval; (void)p_data;
     if( *psz_cmd == 'l' )
     {
+        vlc_object_t *root = VLC_OBJECT (vlc_global ()), *cur = root; 
+
         vlc_mutex_lock( &structure_lock );
-
-        vlc_object_t **pp_current, **pp_end;
-
-        pp_current = p_libvlc_global->pp_objects;
-        pp_end = pp_current + p_libvlc_global->i_objects;
-
-        for( ; pp_current < pp_end ; pp_current++ )
-            PrintObject( *pp_current, "" );
-
+        do
+        {
+            PrintObject (cur, "");
+            cur = vlc_internals (cur)->next;
+        }
+        while (cur != root);
         vlc_mutex_unlock( &structure_lock );
     }
     else
@@ -1211,46 +1167,6 @@ void __vlc_object_dump( vlc_object_t *p_this )
 }
 
 /* Following functions are local */
-
-/*****************************************************************************
- * FindIndex: find the index of an object in an array of objects
- *****************************************************************************
- * This function assumes that p_this can be found in pp_objects. It will not
- * crash if p_this cannot be found, but will return a wrong value. It is your
- * duty to check the return value if you are not certain that the object could
- * be found for sure.
- *****************************************************************************/
-static int FindIndex( vlc_object_t *p_this,
-                      vlc_object_t **pp_objects, int i_count )
-{
-    int i_middle = i_count / 2;
-
-    if( i_count == 0 )
-    {
-        return 0;
-    }
-
-    if( pp_objects[i_middle] == p_this )
-    {
-        return i_middle;
-    }
-
-    if( i_count == 1 )
-    {
-        return 0;
-    }
-
-    /* We take advantage of the sorted array */
-    if( pp_objects[i_middle]->i_object_id < p_this->i_object_id )
-    {
-        return i_middle + FindIndex( p_this, pp_objects + i_middle,
-                                             i_count - i_middle );
-    }
-    else
-    {
-        return FindIndex( p_this, pp_objects, i_middle );
-    }
-}
 
 static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
 {
