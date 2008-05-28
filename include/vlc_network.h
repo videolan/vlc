@@ -40,6 +40,7 @@
 #   include <ws2tcpip.h>
 #   define ENETUNREACH WSAENETUNREACH
 #   define net_errno (WSAGetLastError())
+#   define AI_NUMERICSERV 0
 extern const char *net_strerror( int val );
 
 struct iovec
