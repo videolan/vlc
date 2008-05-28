@@ -26,6 +26,8 @@
 
 #ifdef UPDATE_CHECK
 
+#include <assert.h>
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -132,8 +134,10 @@ static VLCUpdate *_o_sharedInstance = nil;
     [saveFilePanel setRequiredFileType: @"dmg"];
     [saveFilePanel setCanSelectHiddenExtension: YES];
     [saveFilePanel setCanCreateDirectories: YES];
+    update_release_t *p_release = update_GetRelease( p_u );
+    assert( p_release );
     [saveFilePanel beginSheetForDirectory:nil file:
-        [[[NSString stringWithUTF8String: p_u->release.psz_url] componentsSeparatedByString:@"/"] lastObject]
+        [[[NSString stringWithUTF8String: p_release->psz_url] componentsSeparatedByString:@"/"] lastObject]
                            modalForWindow: o_update_window 
                             modalDelegate:self
                            didEndSelector:sel
@@ -176,11 +180,12 @@ static VLCUpdate *_o_sharedInstance = nil;
     }
     else
     {
-        [o_fld_releaseNote setString: [NSString stringWithUTF8String: (p_u->release.psz_desc ? p_u->release.psz_desc : "" )]];
+        update_release_t *p_release = update_GetRelease( p_u );
+        [o_fld_releaseNote setString: [NSString stringWithUTF8String: (p_release->psz_desc ? p_release->psz_desc : "" )]];
         [o_fld_status setStringValue: _NS("This version of VLC is outdated.")];
         [o_fld_currentVersion setStringValue: [NSString stringWithFormat:
-            _NS("The current release is %d.%d.%d%c."), p_u->release.i_major,
-            p_u->release.i_minor, p_u->release.i_revision, p_u->release.extra]];
+            _NS("The current release is %d.%d.%d%c."), p_release->i_major,
+            p_release->i_minor, p_release->i_revision, p_release->extra]];
         [o_btn_DownloadNow setEnabled: YES];
         /* Make sure the update window is showed in case we have something */
         [o_update_window center];
