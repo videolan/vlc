@@ -624,8 +624,9 @@ VLC.app: vlc
 	          $(top_builddir)/VLC.app
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
-	ln -sf ../../../vlc $(top_builddir)/VLC.app/Contents/MacOS/VLC
-	ln -sf ../../../vlc $(top_builddir)/VLC.app/Contents/MacOS/clivlc
+	touch $(top_builddir)/VLC.app/Contents/MacOS/VLC
+	chmod +x $(top_builddir)/VLC.app/Contents/MacOS/VLC
+	echo "#! /bin/sh\nexec \"\$$(dirname \"\$$0\")/../../../src/vlc\" \"--plugin-path=\$$(dirname \"\$$0\")/../../../modules\" \"\$$@\"" > $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	find modules/ -name '*_plugin$(LIBEXT)' | while read i; do \
 	  if test -n "$$i" ; \
