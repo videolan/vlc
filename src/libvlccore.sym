@@ -147,7 +147,6 @@ __input_Read
 input_StopThread
 input_vaControl
 __intf_Create
-intf_Destroy
 __intf_Eject
 __intf_Progress
 __intf_ProgressUpdate

@@ -164,7 +164,7 @@ static void Run( intf_thread_t *p_intf )
         intf_StopThread( p_extraintf );
         vlc_object_detach( p_extraintf );
         vlc_object_release( p_extraintf );
-        intf_Destroy( p_extraintf );
+        vlc_object_release( p_extraintf );
     }
 
     /* Make sure we exit (In case other interfaces have been spawned) */
@@ -332,7 +332,7 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
             if( intf_RunThread( p_new_intf ) )
             {
                 vlc_object_detach( p_new_intf );
-                intf_Destroy( p_new_intf );
+                vlc_object_release( p_new_intf );
                 msg_Err( p_intf, "interface \"%s\" cannot run", psz_temp );
             }
 

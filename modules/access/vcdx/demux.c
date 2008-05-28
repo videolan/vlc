@@ -129,7 +129,7 @@ void VCDEnd ( vlc_object_t *p_this )
         intf_StopThread( p_intf );
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
-        intf_Destroy( p_intf );
+        vlc_object_release( p_intf );
     }
 
     p_vcd->p_intf = NULL;

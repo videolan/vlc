@@ -1543,7 +1543,7 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
         if( intf_RunThread( p_newintf ) )
         {
             vlc_object_detach( p_newintf );
-            intf_Destroy( p_newintf );
+            vlc_object_release( p_newintf );
         }
     }
 

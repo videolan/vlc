@@ -936,9 +936,8 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     {
         intf_StopThread( p_intf );
         vlc_object_detach( p_intf );
-        vlc_object_release( p_intf );
-        intf_Destroy( p_intf );
-        p_intf = NULL;
+        vlc_object_release( p_intf ); /* for intf_Create() */
+        vlc_object_release( p_intf ); /* for vlc_object_find() */
     }
 
     /* Free video outputs */
@@ -1144,11 +1143,10 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     /* Try to run the interface */
     p_intf->b_play = b_play;
     i_err = intf_RunThread( p_intf );
-    if( i_err || p_intf->b_should_run_on_first_thread )
+    if( i_err )
     {
         vlc_object_detach( p_intf );
-        intf_Destroy( p_intf );
-        p_intf = NULL;
+        vlc_object_release( p_intf );
         return i_err;
     }
 
@@ -1161,7 +1159,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
             while( vlc_object_lock_and_wait( p_intf ) == 0 );
 
         vlc_object_detach( p_intf );
-        intf_Destroy( p_intf );
+        vlc_object_release( p_intf );
     }
 
     return VLC_SUCCESS;

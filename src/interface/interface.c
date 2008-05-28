@@ -54,6 +54,24 @@ static void RunInterface( intf_thread_t *p_intf );
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
+/**
+ * \brief Destroy the interface after the main loop endeed.
+ *
+ * \param p_intf the interface thread
+ * \return nothing
+ */
+static void intf_Destroy( vlc_object_t *obj )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)obj;
+
+    /* Unlock module if present (a switch may have failed) */
+    if( p_intf->p_module )
+        module_Unneed( p_intf, p_intf->p_module );
+
+    free( p_intf->psz_intf );
+    vlc_mutex_destroy( &p_intf->change_lock );
+}
+
 /*****************************************************************************
  * intf_Create: prepare interface before main loop
  *****************************************************************************
@@ -114,6 +132,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
 
     /* Attach interface to its parent object */
     vlc_object_attach( p_intf, p_this );
+    vlc_object_set_destructor( p_intf, intf_Destroy );
 
     return p_intf;
 }
@@ -140,6 +159,8 @@ int intf_RunThread( intf_thread_t *p_intf )
     if( p_intf->b_should_run_on_first_thread )
     {
         RunInterface( p_intf );
+        vlc_object_detach( p_intf );
+        vlc_object_release( p_intf );
         return VLC_SUCCESS;
     }
     
@@ -171,29 +192,6 @@ void intf_StopThread( intf_thread_t *p_intf )
         vlc_thread_join( p_intf );
     }
 }
-
-/**
- * \brief Destroy the interface after the main loop endeed.
- *
- * Destroys interfaces and closes output devices
- * \param p_intf the interface thread
- * \return nothing
- */
-void intf_Destroy( intf_thread_t *p_intf )
-{
-    /* Unlock module if present (a switch may have failed) */
-    if( p_intf->p_module )
-    {
-        module_Unneed( p_intf, p_intf->p_module );
-    }
-    free( p_intf->psz_intf );
-
-    vlc_mutex_destroy( &p_intf->change_lock );
-
-    /* Free structure */
-    vlc_object_release( p_intf );
-}
-
 
 /* Following functions are local */
 
@@ -283,7 +281,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( intf_RunThread( p_intf ) != VLC_SUCCESS )
     {
         vlc_object_detach( p_intf );
-        intf_Destroy( p_intf );
+        vlc_object_release( p_intf );
         return VLC_EGENERIC;
     }
 

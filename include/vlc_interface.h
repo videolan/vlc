@@ -120,7 +120,6 @@ struct intf_dialog_args_t
 VLC_EXPORT( intf_thread_t *, __intf_Create,     ( vlc_object_t *, const char *, int, const char *const * ) );
 VLC_EXPORT( int,               intf_RunThread,  ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
-VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 
 /* If the interface is in the main thread, it should listen both to
  * p_intf->b_die and p_libvlc->b_die */
