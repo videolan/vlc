@@ -762,6 +762,8 @@ static void RunThread( vout_thread_t *p_vout)
     if( p_vout->b_error )
         return;
 
+    vlc_object_lock( p_vout );
+
     if( p_vout->b_title_show )
         DisplayTitleOnOSD( p_vout );
 
@@ -769,7 +771,7 @@ static void RunThread( vout_thread_t *p_vout)
      * Main loop - it is not executed if an error occurred during
      * initialization
      */
-    while( (!p_vout->b_die) && (!p_vout->b_error) )
+    while( (vlc_object_alive( p_vout )) && (!p_vout->b_error) )
     {
         /* Initialize loop variables */
         p_picture = NULL;
@@ -1091,6 +1093,8 @@ static void RunThread( vout_thread_t *p_vout)
         /* Give back change lock */
         vlc_mutex_unlock( &p_vout->change_lock );
 
+        vlc_object_unlock( p_vout );
+
         /* Sleep a while or until a given date */
         if( display_date != 0 )
         {
@@ -1108,6 +1112,9 @@ static void RunThread( vout_thread_t *p_vout)
 
         /* On awakening, take back lock and send immediately picture
          * to display. */
+        vlc_object_lock( p_vout );
+        /* Note: vlc_object_alive() could be false here, and we
+         * could be dead */
         vlc_mutex_lock( &p_vout->change_lock );
 
         /*
@@ -1201,6 +1208,7 @@ static void RunThread( vout_thread_t *p_vout)
         }
     }
 
+
     if( p_input )
     {
         vlc_object_release( p_input );
@@ -1216,6 +1224,7 @@ static void RunThread( vout_thread_t *p_vout)
 
     /* End of thread */
     EndThread( p_vout );
+    vlc_object_unlock( p_vout );
 }
 
 /*****************************************************************************
