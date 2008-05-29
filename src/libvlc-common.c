@@ -1150,12 +1150,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
 
     if( b_block )
     {
-        /* FIXME: should be moved to interface/interface.c */
-        if( p_intf->pf_run )
-            vlc_thread_join( p_intf );
-        else
-            while( vlc_object_lock_and_wait( p_intf ) == 0 );
-
+        vlc_thread_join( p_intf );
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
     }

@@ -150,10 +150,6 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
  */
 int intf_RunThread( intf_thread_t *p_intf )
 {
-    /* This interface doesn't need to be run */
-    if( p_intf->pf_run == NULL )
-        return VLC_SUCCESS;
-
     /* Hack to get Mac OS X Cocoa runtime running
      * (it needs access to the main thread) */
     if( p_intf->b_should_run_on_first_thread )
@@ -186,11 +182,8 @@ void intf_StopThread( intf_thread_t *p_intf )
 {
     /* Tell the interface to die */
     vlc_object_kill( p_intf );
-    if( p_intf->pf_run != NULL )
-    {
-        vlc_cond_signal( &p_intf->object_wait );
-        vlc_thread_join( p_intf );
-    }
+    vlc_cond_signal( &p_intf->object_wait );
+    vlc_thread_join( p_intf );
 }
 
 /* Following functions are local */
@@ -229,7 +222,10 @@ static void RunInterface( intf_thread_t *p_intf )
     do
     {
         /* Give control to the interface */
-        p_intf->pf_run( p_intf );
+        if( p_intf->pf_run )
+            p_intf->pf_run( p_intf );
+        else
+            while( vlc_object_lock_and_wait( p_intf ) == 0 );
 
         /* Reset play on start status */
         p_intf->b_play = false;
