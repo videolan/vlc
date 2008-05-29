@@ -339,23 +339,24 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 #ifndef NDEBUG
         assert( p_global == vlc_global() );
         /* Test for leaks */
-        for( vlc_object_t *leaked = p_priv->next;
-             leaked != p_this;
-             leaked = vlc_internals (leaked)->next )
+        if (p_priv->next != p_this)
         {
-            /* We are leaking this object */
-            fprintf( stderr,
-                     "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
-                     leaked->i_object_id, leaked->psz_object_type,
-                     leaked->psz_object_name );
-            /* Dump libvlc object to ease debugging */
-            vlc_object_dump( leaked );
-            fflush(stderr);
-        }
+            vlc_object_t *leaked = p_priv->next, *first = leaked;
+            do
+            {
+                /* We are leaking this object */
+                fprintf( stderr,
+                         "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
+                         leaked->i_object_id, leaked->psz_object_type,
+                         leaked->psz_object_name );
+                /* Dump libvlc object to ease debugging */
+                vlc_object_dump( leaked );
+                fflush(stderr);
+                leaked = vlc_internals (leaked)->next;
+            }
+            while (leaked != first);
 
-        if( p_priv->next != p_this )
-        {
-            /* Dump libvlc object to ease debugging */
+            /* Dump global object to ease debugging */
             vlc_object_dump( p_this );
             /* Strongly abort, cause we want these to be fixed */
             abort();
