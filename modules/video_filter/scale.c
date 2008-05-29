@@ -234,6 +234,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_pic_dst->b_progressive = p_pic->b_progressive;
     p_pic_dst->b_top_field_first = p_pic->b_top_field_first;
 
-    p_pic->pf_release( p_pic );
+    if( p_pic->pf_release )
+        p_pic->pf_release( p_pic );
     return p_pic_dst;
 }
