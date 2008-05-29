@@ -166,7 +166,7 @@ N_("<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...
 "tn:64:128:256\n" \
 "Filters                        Options\n" \
 "short  long name       short   long option     Description\n" \
-"*      *               a       autoq           cpu power dependant enabler\n" \
+"*      *               a       autoq           cpu power dependent enabler\n" \
 "                       c       chrom           chrominance filtring enabled\n" \
 "                       y       nochrom         chrominance filtring disabled\n" \
 "hb     hdeblock        (2 Threshold)           horizontal deblocking filter\n" \

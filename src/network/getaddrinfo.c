@@ -107,7 +107,7 @@ const char *vlc_gai_strerror (int errnum)
                   NI_DGRAM)
 /*
  * getnameinfo() non-thread-safe IPv4-only implementation,
- * Address-family-independant address to hostname translation
+ * Address-family-independent address to hostname translation
  * (reverse DNS lookup in case of IPv4).
  *
  * This is meant for use on old IP-enabled systems that are not IPv6-aware,
@@ -281,7 +281,7 @@ makeipv4info (int type, int proto, u_long ip, u_short port, const char *name)
 
 /*
  * getaddrinfo() non-thread-safe IPv4-only implementation
- * Address-family-independant hostname to address resolution.
+ * Address-family-independent hostname to address resolution.
  *
  * This is meant for IPv6-unaware systems that do probably not provide
  * getaddrinfo(), but still have old function gethostbyname().

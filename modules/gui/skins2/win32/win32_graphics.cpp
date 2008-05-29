@@ -107,7 +107,7 @@ void Win32Graphics::drawBitmap( const GenericBitmap &rBitmap,
     bmpInfo.bmiHeader.biCompression = BI_RGB;
     bmpInfo.bmiHeader.biSizeImage = width * height * 4;
 
-    // Create a DIB (Device Independant Bitmap) and associate it with
+    // Create a DIB (Device Independent Bitmap) and associate it with
     // a temporary DC
     HDC hDC = CreateCompatibleDC( m_hDC );
     HBITMAP hBmp = CreateDIBSection( hDC, &bmpInfo, DIB_RGB_COLORS,

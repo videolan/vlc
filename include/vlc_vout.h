@@ -382,7 +382,7 @@ typedef struct vout_chroma_t
     /** conversion functions */
     vout_chroma_convert_t *pf_convert;
 
-    /** Private module-dependant data */
+    /** Private module-dependent data */
     chroma_sys_t *      p_sys;                               /* private data */
 
     /** Plugin used and shortcuts to access its capabilities */
@@ -396,7 +396,7 @@ typedef struct vout_chroma_t
 /**
  * Video output thread descriptor
  *
- * Any independant video output device, such as an X11 window or a GGI device,
+ * Any independent video output device, such as an X11 window or a GGI device,
  * is represented by a video output thread, and described using the following
  * structure.
  */

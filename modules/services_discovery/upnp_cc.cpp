@@ -6,7 +6,7 @@
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
  *
- * Based on original wxWindows patch for VLC, and dependant on CyberLink
+ * Based on original wxWindows patch for VLC, and dependent on CyberLink
  * UPnP library from :
  *          Satoshi Konno <skonno@cybergarage.org>
  *

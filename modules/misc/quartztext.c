@@ -1032,7 +1032,7 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
                     // you move down the page
                     y -= ascent;
 
-                    // Set the outlining for this line to be dependant on the size of the line -
+                    // Set the outlining for this line to be dependent on the size of the line -
                     // make it about 5% of the ascent, with a minimum at 1.0
                     float f_thickness = FixedToFloat( ascent ) * 0.05;
                     CGContextSetLineWidth( p_context, (( f_thickness > 1.0 ) ? 1.0 : f_thickness ));

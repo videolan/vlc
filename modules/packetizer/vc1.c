@@ -338,7 +338,7 @@ static void BuildExtraData( decoder_t *p_dec )
     memcpy( (uint8_t*)p_es->p_extra + p_sys->sh.p_sh->i_buffer,
             p_sys->ep.p_ep->p_buffer, p_sys->ep.p_ep->i_buffer );
 }
-/* ParseIDU: parse an Independant Decoding Unit */
+/* ParseIDU: parse an Independent Decoding Unit */
 static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;

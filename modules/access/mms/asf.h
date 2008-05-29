@@ -24,7 +24,7 @@
 /****************************************************************************
  * XXX:
  *  Definitions and data duplicated from asf demuxers but I want access
- * and demux plugins to be independant
+ * and demux plugins to be independent
  *
  ****************************************************************************/
 

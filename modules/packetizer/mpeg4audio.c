@@ -830,7 +830,7 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
     if( !p_sys->b_latm_cfg )
         return 0;
 
-    /* FIXME do we need to split the subframe into independant packet ? */
+    /* FIXME do we need to split the subframe into independent packet ? */
     if( p_sys->latm.i_sub_frames > 1 )
         msg_Err( p_dec, "latm sub frames not yet supported, please send a sample" );
 

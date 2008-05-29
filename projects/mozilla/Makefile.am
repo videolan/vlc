@@ -94,7 +94,7 @@ npvlc.rsrc: $(srcdir)/vlc.r
 # Plugin uses shared libraries that are located relatively through @executable_path,
 # which unfortunately references the path of the App using the Plugin, rather than the
 # Plugin itself. Since this Plugin should always be installed in '/Library/Internet Plug-Ins',
-# it is safer to force dylibs to locate dependants through a fixed path
+# it is safer to force dylibs to locate dependents through a fixed path
 #
 define FIXEXECPATH
 	otool -L "$$dylib" | \

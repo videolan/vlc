@@ -40,7 +40,7 @@
 #define OVERLAP        2350
 #ifdef OVERLAP
     #include <math.h>
-    // OS CODE DEPENDANT to get display dimensions
+    // OS CODE DEPENDENT to get display dimensions
     #ifdef SYS_MINGW32
         #include <windows.h>
     #else
@@ -360,7 +360,7 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
     p_vout->p_sys->i_col = var_CreateGetInteger( p_vout, CFG_PREFIX "cols" );
     p_vout->p_sys->i_row = var_CreateGetInteger( p_vout, CFG_PREFIX "rows" );
 
-// OS dependant code :  Autodetect number of displays in wall
+// OS dependent code :  Autodetect number of displays in wall
 #ifdef SYS_MINGW32
     if ((p_vout->p_sys->i_col < 0) || (p_vout->p_sys->i_row < 0) )
     {
@@ -552,7 +552,7 @@ static int AdjustHeight( vout_thread_t *p_vout )
     double d_halfLength_calculated;
     int    i_offset = 0;
 
-// OS DEPENDANT CODE to get display dimensions
+// OS DEPENDENT CODE to get display dimensions
         if (b_fullscreen)
         {
 #ifdef SYS_MINGW32

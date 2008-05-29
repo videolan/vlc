@@ -115,7 +115,7 @@ struct signature_packet_t
     } specific;
 
 /* The part below is made of consecutive MPIs, their number and size being
- * public-key-algorithm dependant.
+ * public-key-algorithm dependent.
  *
  * Since we use DSA signatures only, there is 2 integers, r & s, made of:
  *      2 bytes for the integer length (scalar number)

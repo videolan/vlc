@@ -129,7 +129,7 @@ int module_Call( module_t *p_module )
 }
 
 /**
- * Load a dynamically linked library using a system dependant method.
+ * Load a dynamically linked library using a system dependent method.
  *
  * \param p_this vlc object
  * \param psz_file library file
@@ -241,7 +241,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
  * CloseModule: unload a dynamic library
  *
  * This function unloads a previously opened dynamically linked library
- * using a system dependant method. No return value is taken in consideration,
+ * using a system dependent method. No return value is taken in consideration,
  * since some libraries sometimes refuse to close properly.
  * \param handle handle of the library
  * \return nothing

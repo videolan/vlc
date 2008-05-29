@@ -96,7 +96,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* Signals that cause a no-op:
      * - SIGALRM should not happen, but lets stay on the safe side.
      * - SIGPIPE might happen with sockets and would crash VLC. It MUST be
-     *   blocked by any LibVLC-dependant application, in addition to VLC.
+     *   blocked by any LibVLC-dependent application, in addition to VLC.
      * - SIGCHLD is comes after exec*() (such as httpd CGI support) and must
      *   be dequeued to cleanup zombie processes.
      */

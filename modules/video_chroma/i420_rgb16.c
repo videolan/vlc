@@ -78,7 +78,7 @@ void I420_RGB16_dither( vout_thread_t *p_vout, picture_t *p_src,
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     uint16_t *  p_yuv = p_vout->chroma.p_sys->p_rgb16;
-    uint16_t *  p_ybase;                     /* Y dependant conversion table */
+    uint16_t *  p_ybase;                     /* Y dependent conversion table */
 
     /* Conversion buffer pointer */
     uint16_t *  p_buffer_start = (uint16_t*)p_vout->chroma.p_sys->p_buffer;
@@ -228,7 +228,7 @@ void I420_RGB16( vout_thread_t *p_vout, picture_t *p_src,
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     uint16_t *  p_yuv = p_vout->chroma.p_sys->p_rgb16;
-    uint16_t *  p_ybase;                     /* Y dependant conversion table */
+    uint16_t *  p_ybase;                     /* Y dependent conversion table */
 
     /* Conversion buffer pointer */
     uint16_t *  p_buffer_start = (uint16_t*)p_vout->chroma.p_sys->p_buffer;
@@ -825,7 +825,7 @@ void I420_RGB32( vout_thread_t *p_vout, picture_t *p_src,
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     uint32_t *  p_yuv = p_vout->chroma.p_sys->p_rgb32;
-    uint32_t *  p_ybase;                     /* Y dependant conversion table */
+    uint32_t *  p_ybase;                     /* Y dependent conversion table */
 
     /* Conversion buffer pointer */
     uint32_t *  p_buffer_start = (uint32_t*)p_vout->chroma.p_sys->p_buffer;
