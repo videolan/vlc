@@ -179,13 +179,13 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     QMenuBar *bar = mi->menuBar();
     BAR_ADD( FileMenu(), qtr( "&Media" ) );
     BAR_ADD( PlaylistMenu( p_intf, mi ), qtr( "&Playlist" ) );
-    BAR_ADD( ToolsMenu( p_intf, mi, visual_selector_enabled, true ),
+    BAR_ADD( ToolsMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
              qtr( "&Tools" ) );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 2 );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 1 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "&Playback" ), 3 );
 
-    BAR_ADD( HelpMenu(), qtr( "&Help" ) );
+    BAR_ADD( HelpMenu( NULL ), qtr( "&Help" ) );
 }
 #undef BAR_ADD
 #undef BAR_DADD
@@ -249,11 +249,12 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
  * This menu can be an interface menu but also a right click menu.
  **/
 QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
+                            QMenu *current,
                             MainInterface *mi,
                             bool visual_selector_enabled,
                             bool with_intf )
 {
-    QMenu *menu = new QMenu;
+    QMenu *menu = new QMenu( current );
     if( mi )
     {
         menu->addAction( QIcon( ":/pixmaps/playlist_16px.png" ),
@@ -268,7 +269,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
 
     if( with_intf )
     {
-        QMenu *intfmenu = InterfacesMenu( p_intf, NULL );
+        QMenu *intfmenu = InterfacesMenu( p_intf, menu );
         intfmenu->setTitle( qtr( "Add Interfaces" ) );
         menu->addMenu( intfmenu );
         menu->addSeparator();
@@ -333,7 +334,8 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     varnames.push_back( "intf-add" );
     objects.push_back( VLC_OBJECT(p_intf) );
 
-    QMenu *menu = Populate( p_intf, current, varnames, objects );
+    QMenu *submenu = new QMenu( current );
+    QMenu *menu = Populate( p_intf, submenu, varnames, objects );
 
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
     THEDP->menusUpdateMapper->setMapping( menu, 4 );
@@ -399,7 +401,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
  * Navigation Menu
  * For DVD, MP4, MOV and other chapter based format
  **/
-QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *navMenu )
+QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     vlc_object_t *p_object;
     vector<vlc_object_t *> objects;
@@ -414,7 +416,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *navMenu )
         PUSH_VAR( "prev-chapter" ); PUSH_VAR( "next-chapter" );
         vlc_object_release( p_object );
     }
-    navMenu = new QMenu();
+    QMenu *navMenu = new QMenu( menu );
     addDPStaticEntry( navMenu, qtr( I_MENU_GOTOTIME ), "","",
         SLOT( gotoTimeDialog() ), "Ctrl+T" );
     navMenu->addSeparator();
@@ -462,9 +464,9 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 /**
  * Help/About Menu
 **/
-QMenu *QVLCMenu::HelpMenu()
+QMenu *QVLCMenu::HelpMenu( QMenu *current )
 {
-    QMenu *menu = new QMenu();
+    QMenu *menu = new QMenu( current );
     addDPStaticEntry( menu, qtr( "Help..." ) , "",
         ":/pixmaps/menus_help_16px.png", SLOT( helpDialog() ), "F1" );
 #ifdef UPDATE_CHECK
@@ -522,11 +524,11 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
 
 void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
 {
-    QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, true );
+    QMenu *toolsmenu = ToolsMenu( p_intf, menu, false, true );
     toolsmenu->setTitle( qtr( "Tools" ) );
     menu->addMenu( toolsmenu );
 
-    QMenu *openmenu = new QMenu( qtr( "Open" ) );
+    QMenu *openmenu = new QMenu( qtr( "Open" ), menu );
     openmenu->addAction( qtr( "Open &File..." ), THEDP,
                          SLOT( openFileDialog() ) );
     openmenu->addAction( qtr( "Open &Disc..." ), THEDP,
@@ -538,7 +540,7 @@ void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
     menu->addMenu( openmenu );
 
     menu->addSeparator();
-    QMenu *helpmenu = HelpMenu();
+    QMenu *helpmenu = HelpMenu( menu );
     helpmenu->setTitle( qtr( "Help" ) );
     menu->addMenu( helpmenu );
 
@@ -862,7 +864,7 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
         /* Append choices menu */
         if( b_submenu )
         {
-            QMenu *submenu = new QMenu();
+            QMenu *submenu = new QMenu( menu );
             submenu->setTitle( qfu( text.psz_string ?
                         text.psz_string : psz_var ) );
             if( CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0 )
@@ -936,7 +938,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     {
         vlc_value_t another_val;
         QString menutext;
-        QMenu *subsubmenu = new QMenu();
+        QMenu *subsubmenu = new QMenu( submenu );
 
         switch( i_type & VLC_VAR_TYPE )
         {

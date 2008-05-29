@@ -79,12 +79,12 @@ public:
     static QMenu *FileMenu();
     static QMenu *SDMenu( intf_thread_t * );
     static QMenu *PlaylistMenu( intf_thread_t *, MainInterface * );
-    static QMenu *ToolsMenu( intf_thread_t *, MainInterface *, bool, bool with = true );
-    static QMenu *NavigMenu( intf_thread_t * , QMenu * );
-    static QMenu *VideoMenu( intf_thread_t * , QMenu * );
-    static QMenu *AudioMenu( intf_thread_t * , QMenu * );
+    static QMenu *ToolsMenu( intf_thread_t *, QMenu *, MainInterface *, bool, bool with = true );
+    static QMenu *NavigMenu( intf_thread_t *, QMenu * );
+    static QMenu *VideoMenu( intf_thread_t *, QMenu * );
+    static QMenu *AudioMenu( intf_thread_t *, QMenu * );
     static QMenu *InterfacesMenu( intf_thread_t *p_intf, QMenu * );
-    static QMenu *HelpMenu();
+    static QMenu *HelpMenu( QMenu * );
 
     /* Popups Menus */
     static void AudioPopupMenu( intf_thread_t * );
