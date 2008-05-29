@@ -203,6 +203,7 @@ libvlc_vlm_set_loop
 libvlc_vlm_set_output
 libvlc_vlm_show_media
 libvlc_vlm_stop_media
+libvlc_wait
 mediacontrol_RGBPicture__free
 mediacontrol_StreamInformation__free
 mediacontrol_display_text

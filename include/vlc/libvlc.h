@@ -158,6 +158,15 @@ void libvlc_run_interface( libvlc_instance_t *p_instance, const char *name,
                            libvlc_exception_t *p_exception );
 
 /**
+ * Waits until an interface causes the instance to exit.
+ * You should start at least one interface first, using libvlc_add_intf().
+ *
+ * \param p_instance the instance
+ */
+VLC_PUBLIC_API
+void libvlc_wait( libvlc_instance_t *p_instance );
+
+/**
  * Retrieve libvlc version.
  *
  * Example: "0.9.0-git Grishenko"
