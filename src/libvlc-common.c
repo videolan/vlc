@@ -1111,20 +1111,18 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     {
         char *psz_interface = config_GetPsz( p_libvlc, "intf" );
         if( !psz_interface || !*psz_interface ) /* "intf" has not been set */
-            msg_Info( p_libvlc, _("Running vlc with the default interface. Use 'cvlc' to use vlc without interface.") );
-        free( psz_interface );
-    }
-
+        {
 #ifndef WIN32
-    if( b_daemon && b_block && !psz_module )
-    {
-        /* Daemon mode hack.
-         * We prefer the dummy interface if none is specified. */
-        char *psz_interface = config_GetPsz( p_libvlc, "intf" );
-        if( !psz_interface || !*psz_interface ) psz_module = "dummy";
+            if( b_daemon )
+                 /* Daemon mode hack.
+                  * We prefer the dummy interface if none is specified. */
+                psz_module = "dummy";
+            else
+#endif
+                msg_Info( p_libvlc, _("Running vlc with the default interface. Use 'cvlc' to use vlc without interface.") );
+        }
         free( psz_interface );
     }
-#endif
 
     /* Try to create the interface */
     p_intf = intf_Create( p_libvlc, psz_module ? psz_module : "$intf",
