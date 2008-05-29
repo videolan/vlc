@@ -1,3 +1,4 @@
+libvlc_add_intf
 libvlc_audio_get_channel
 libvlc_audio_get_mute
 libvlc_audio_get_track
@@ -157,7 +158,6 @@ libvlc_playlist_stop
 libvlc_playlist_unlock
 libvlc_release
 libvlc_retain
-libvlc_run_interface
 libvlc_set_fullscreen
 libvlc_set_log_verbosity
 libvlc_toggle_fullscreen

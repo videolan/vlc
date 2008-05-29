@@ -154,8 +154,8 @@ VLC_PUBLIC_API void libvlc_retain( libvlc_instance_t * );
  * \param p_exception an initialized exception pointer
  */
 VLC_PUBLIC_API
-void libvlc_run_interface( libvlc_instance_t *p_instance, const char *name,
-                           libvlc_exception_t *p_exception );
+void libvlc_add_intf( libvlc_instance_t *p_instance, const char *name,
+                      libvlc_exception_t *p_exception );
 
 /**
  * Waits until an interface causes the instance to exit.

@@ -134,7 +134,8 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     if (vlc != NULL)
     {
-        libvlc_run_interface (vlc, NULL, &ex);
+        libvlc_add_intf (vlc, NULL, &ex);
+        libvlc_wait (vlc);
         libvlc_release (vlc);
     }
     i_ret = libvlc_exception_raised (&ex);
