@@ -39,11 +39,10 @@
 extern void LocaleFree (const char *);
 extern char *FromLocale (const char *);
 
-# include <signal.h>
-# include <time.h>
-# include <pthread.h>
-
-static void *SigHandler (void *set);
+#include <signal.h>
+#include <time.h>
+#include <pthread.h>
+#include <unistd.h>
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
@@ -92,32 +91,24 @@ int main( int i_argc, const char *ppsz_argv[] )
      * if they are triggered again 2+ seconds later.
      * We have to handle SIGTERM cleanly because of daemon mode.
      * Note that we set the signals after the vlc_create call. */
-    static const int exitsigs[] = { SIGINT, SIGHUP, SIGQUIT, SIGTERM };
+    static const int sigs[] = {
+        SIGINT, SIGHUP, SIGQUIT, SIGTERM,
     /* Signals that cause a no-op:
-     * - SIGALRM should not happen, but lets stay on the safe side.
      * - SIGPIPE might happen with sockets and would crash VLC. It MUST be
      *   blocked by any LibVLC-dependent application, in addition to VLC.
      * - SIGCHLD is comes after exec*() (such as httpd CGI support) and must
      *   be dequeued to cleanup zombie processes.
      */
-    static const int dummysigs[] = { SIGALRM, SIGPIPE, SIGCHLD };
+        SIGPIPE, SIGCHLD
+    };
 
     sigset_t set;
-    pthread_t sigth;
-
     sigemptyset (&set);
-    for (unsigned i = 0; i < sizeof (exitsigs) / sizeof (exitsigs[0]); i++)
-        sigaddset (&set, exitsigs[i]);
-    for (unsigned i = 0; i < sizeof (dummysigs) / sizeof (dummysigs[0]); i++)
-        sigaddset (&set, dummysigs[i]);
+    for (unsigned i = 0; i < sizeof (sigs) / sizeof (sigs[0]); i++)
+        sigaddset (&set, sigs[i]);
 
     /* Block all these signals */
     pthread_sigmask (SIG_BLOCK, &set, NULL);
-
-    for (unsigned i = 0; i < sizeof (dummysigs) / sizeof (dummysigs[0]); i++)
-        sigdelset (&set, dummysigs[i]);
-
-    pthread_create (&sigth, NULL, SigHandler, &set);
 
     /* Note that FromLocale() can be used before libvlc is initialized */
     for (int i = 0; i < i_argc; i++)
@@ -134,6 +125,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     if (vlc != NULL)
     {
+        libvlc_add_intf (vlc, "signals", NULL);
         libvlc_add_intf (vlc, NULL, &ex);
         libvlc_wait (vlc);
         libvlc_release (vlc);
@@ -144,78 +136,5 @@ int main( int i_argc, const char *ppsz_argv[] )
     for (int i = 0; i < i_argc; i++)
         LocaleFree (ppsz_argv[i]);
 
-    pthread_cancel (sigth);
-# ifdef __APPLE__
-    /* In Mac OS X up to 10.4.8 sigwait (among others) is not a pthread
-     * cancellation point, so we throw a dummy quit signal to end
-     * sigwait() in the sigth thread */
-    pthread_kill (sigth, SIGQUIT);
-# endif
-    pthread_join (sigth, NULL);
-
     return i_ret;
-}
-
-/*****************************************************************************
- * SigHandler: system signal handler
- *****************************************************************************
- * This thread receives all handled signals synchronously.
- * It tries to end the program in a clean way.
- *****************************************************************************/
-static void *SigHandler (void *data)
-{
-    const sigset_t *exitset = (sigset_t *)data;
-    sigset_t fullset;
-    time_t abort_time = 0;
-
-    pthread_sigmask (SIG_BLOCK, exitset, &fullset);
-
-    for (;;)
-    {
-        int i_signal, state;
-        if( sigwait (&fullset, &i_signal) != 0 )
-            continue;
-
-#ifdef __APPLE__
-        /* In Mac OS X up to 10.4.8 sigwait (among others) is not a pthread
-         * cancellation point */
-        pthread_testcancel();
-#endif
-
-        if (!sigismember (exitset, i_signal))
-            continue; /* Ignore "dummy" signals */
-
-        /* Once a signal has been trapped, the termination sequence will be
-         * armed and subsequent signals will be ignored to avoid sending
-         * signals to a libvlc structure having been destroyed */
-
-        pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
-        if (abort_time == 0 || time (NULL) > abort_time)
-        {
-            time (&abort_time);
-            abort_time += 2;
-
-            fprintf (stderr, "signal %d received, terminating vlc - do it "
-                            "again quickly in case it gets stuck\n", i_signal);
-            //VLC_Die( 0 );
-        }
-        else /* time (NULL) <= abort_time */
-        {
-            /* If user asks again more than 2 seconds later, die badly */
-            pthread_sigmask (SIG_UNBLOCK, exitset, NULL);
-            fprintf (stderr, "user insisted too much, dying badly\n");
-#ifdef __APPLE__
-            /* On Mac OS X, use exit(-1) as it doesn't trigger
-             * backtrace generation, whereas abort() does.
-             * The backtrace generation trigger a Crash Dialog
-             * And takes way too much time, which is not what
-             * we want. */
-            exit (-1);
-#else
-            abort ();
-#endif
-        }
-        pthread_setcancelstate (state, NULL);
-    }
-    /* Never reached */
 }
