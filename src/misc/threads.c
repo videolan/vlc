@@ -35,6 +35,7 @@
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
+#include <signal.h>
 
 #define VLC_THREADS_UNINITIALIZED  0
 #define VLC_THREADS_PENDING        1
@@ -471,7 +472,25 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     vlc_mutex_lock( &p_this->object_lock );
 
 #if defined( LIBVLC_USE_PTHREAD )
+    sigset_t set, oldset;
+
+    /* We really don't want signals to (literaly) interrupt our blocking I/O
+     * system calls. SIGPIPE is especially bad, as it can be caused by remote
+     * peers through connected sockets. Generally, we cannot know which signals
+     * are handled by the main program. Also, external LibVLC bindings tend not
+     * to setup a proper signal mask before invoking LibVLC.
+     * Hence, we hereby block all signals, except those for which blocking is
+     * undefined, as listed below. Note that SIGKILL and SIGSTOP need not be
+     * listed (see the documentation for pthread_sigmask) here. */
+    sigfillset (&set);
+    sigdelset (&set, SIGFPE);
+    sigdelset (&set, SIGILL);
+    sigdelset (&set, SIGSEGV);
+    sigdelset (&set, SIGBUS);
+    pthread_sigmask (SIG_BLOCK, &set, &oldset);
+
     i_ret = pthread_create( &p_priv->thread_id, NULL, thread_entry, boot );
+    pthread_sigmask (SIG_SETMASK, &oldset, NULL);
 
 #ifndef __APPLE__
     if( config_GetInt( p_this, "rt-priority" ) > 0 )
