@@ -83,7 +83,7 @@ static inline unsigned long vlc_threadid (void)
      return v.i;
 }
 
-#ifdef __GLIBC__
+#if defined(__GLIBC__) || defined(__APPLE__)
 # include <execinfo.h>
 #endif
 
@@ -105,10 +105,6 @@ void vlc_pthread_fatal (const char *action, int error,
     /* Avoid the strerror_r() prototype brain damage in glibc */
     errno = error;
     dprintf (2, " Error message: %m at:\n");
-
-    void *stack[20];
-    int len = backtrace (stack, sizeof (stack) / sizeof (stack[0]));
-    backtrace_symbols_fd (stack, len, 2);
 #else
     char buf[1000];
     const char *msg;
@@ -127,6 +123,12 @@ void vlc_pthread_fatal (const char *action, int error,
     }
     fprintf (stderr, " Error message: %s\n", msg);
     fflush (stderr);
+#endif
+
+#if defined(__GLIBC__) || defined(__APPLE__)
+    void *stack[20];
+    int len = backtrace (stack, sizeof (stack) / sizeof (stack[0]));
+    backtrace_symbols_fd (stack, len, 2);
 #endif
 
     abort ();
