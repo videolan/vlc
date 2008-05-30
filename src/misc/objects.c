@@ -851,8 +851,6 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     if( p_this->p_parent->b_die )
         vlc_object_kill( p_this );
 
-    vlc_object_unlock( p_this->p_parent );
-
     vlc_mutex_unlock( &structure_lock );
 }
 
