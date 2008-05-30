@@ -487,7 +487,7 @@ void libvlc_media_player_set_media(
     release_input_thread( p_mi );
 
     if( p_mi->p_md )
-        libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL );
+        libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, p_e );
 
     libvlc_media_release( p_mi->p_md );
 
@@ -605,9 +605,9 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
     if( !p_input_thread )
         return;
 
-    int state = var_GetInteger( p_input_thread, "state" );
+    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
 
-    if( state == PLAYING_S )
+    if( state == libvlc_Playing )
     {
         if( libvlc_media_player_can_pause( p_mi, p_e ) )
             input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
@@ -626,6 +626,20 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
 void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
+    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
+
+    if( state == libvlc_Playing || state == libvlc_Paused )
+    {
+        /* Send a stop notification event only of we are in playing or paused states */
+
+        libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, p_e );
+
+        /* Construct and send the event */
+        libvlc_event_t event;
+        event.type = libvlc_MediaPlayerStopped;
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
+
     if( p_mi->b_own_its_input_thread )
     {
         vlc_mutex_lock( &p_mi->object_lock );
@@ -642,12 +656,6 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
         input_StopThread( p_input_thread );
         vlc_object_release( p_input_thread );
     }
-
-    /* Send a stop notification event */
-    libvlc_event_t event;
-    libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, NULL);
-    event.type = libvlc_MediaPlayerStopped;
-    libvlc_event_send( p_mi->p_event_manager, &event );
 }
 
 /**************************************************************************
