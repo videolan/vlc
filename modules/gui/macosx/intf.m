@@ -1818,6 +1818,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_eyetv release];
 
     [o_img_pause_pressed release];
+    [o_img_play_pressed release];
     [o_img_pause release];
     [o_img_play release];
 
