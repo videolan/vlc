@@ -278,7 +278,7 @@ bool mediacontrol_set_visual( mediacontrol_Instance *self,
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    libvlc_media_player_set_drawable( self->p_media_player, visual_id, &ex );
+    libvlc_media_player_set_drawable( self->p_media_player, (libvlc_drawable_t)visual_id, &ex );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
     return true;
 }
