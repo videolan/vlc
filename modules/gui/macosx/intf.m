@@ -195,6 +195,8 @@ static void Run( intf_thread_t *p_intf )
     if(setjmp(jmpbuffer) == 0)
         [NSApp run];
 
+    pthread_join( &killer_thread, NULL );
+
     [o_pool release];
 }
 
