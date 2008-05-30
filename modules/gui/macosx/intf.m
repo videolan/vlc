@@ -146,7 +146,7 @@ static void * KillerThread( void *user_data )
         vlc_object_wait( p_intf );
     vlc_object_unlock( p_intf );
 
-    msg_Dbg( p_intf, "Killing the Mac OS X module\n" );
+    msg_Dbg( p_intf, "Killing the Mac OS X module" );
 
     /* We are dead, terminate */
     [NSApp terminate: nil];
