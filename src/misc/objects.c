@@ -837,10 +837,18 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     assert (!p_this->p_parent);
     p_this->p_parent = p_parent;
 
+    vlc_object_lock( p_this->p_parent );
+
     /* Attach the child to its parent */
     vlc_object_internals_t *priv = vlc_internals( p_parent );
     INSERT_ELEM( priv->pp_children, priv->i_children, priv->i_children,
                  p_this );
+
+    /* Kill the object if parent is already dead */
+    if( !vlc_object_alive( p_this->p_parent) )
+        vlc_object_kill( p_this );
+
+    vlc_object_unlock( p_this->p_parent );
 
     vlc_mutex_unlock( &structure_lock );
 }
