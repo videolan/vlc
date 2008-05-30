@@ -396,8 +396,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if( id->p_input == NULL )
     {
-        free( id );
-
         sout_MuxDelete( p_mux );
         sout_AccessOutDelete( p_access );
         free( id );
