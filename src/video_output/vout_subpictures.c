@@ -148,6 +148,8 @@ int spu_ParseChain( spu_t *p_spu )
         p_spu->pp_filter[p_spu->i_filter]->p_module =
             module_Need( p_spu->pp_filter[p_spu->i_filter],
                          "sub filter", psz_name, true );
+        free( psz_name );
+
         if( p_spu->pp_filter[p_spu->i_filter]->p_module )
         {
             filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
@@ -170,9 +172,9 @@ int spu_ParseChain( spu_t *p_spu )
         if( p_spu->i_filter >= 10 )
         {
             msg_Dbg( p_spu, "can't add anymore filters" );
+            break;
         }
 
-        free( psz_name );
     }
     free( val.psz_string );
 
