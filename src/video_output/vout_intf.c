@@ -648,6 +648,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     if( !val.psz_string )
     {
         msg_Err( p_vout, "no path specified for snapshots" );
+        image_HandlerDelete( p_image );
         return VLC_EGENERIC;
     }
     var_Get( p_vout, "snapshot-format", &format );
