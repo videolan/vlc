@@ -95,7 +95,7 @@ class VideoPlayer:
         self.vlc = DecoratedVLCWidget()
 
     def main(self, fname):
-        self.vlc.player.playlist_add_item(fname)
+        self.vlc.player.set_mrl(fname)
         self.popup()
         gtk.main()
 
