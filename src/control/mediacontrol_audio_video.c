@@ -149,6 +149,7 @@ int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
 
     p_spu->p_region->psz_text = strdup( psz_string );
     p_spu->p_region->i_align = i_flags & SUBPICTURE_ALIGN_MASK;
+    p_spu->p_region->p_style = p_style;
     p_spu->i_start = i_start;
     p_spu->i_stop = i_stop;
     p_spu->b_ephemer = false;
