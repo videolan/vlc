@@ -177,7 +177,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     }
     fft_perform( p_buffer1, p_output, p_state);
     for(i= 0; i< FFT_BUFFER_SIZE ; i++ )
-        p_dest[i] = ( (int) sqrt( p_output [ i + 1 ] ) ) >> 8;
+        p_dest[i] = ( (int) sqrt( p_output [ i ] ) ) >> 8;
 
     for ( i = 0 ; i< i_nb_bands ;i++)
     {
@@ -477,7 +477,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     }
     fft_perform( p_buffer1, p_output, p_state);
     for(i= 0; i< FFT_BUFFER_SIZE ; i++ )
-        p_dest[i] = ( (int) sqrt( p_output [ i + 1 ] ) ) >> 8;
+        p_dest[i] = ( (int) sqrt( p_output [ i ] ) ) >> 8;
 
     i_nb_bands *= i_sections;
 
