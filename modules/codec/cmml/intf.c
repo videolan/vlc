@@ -188,17 +188,16 @@ static void RunIntf( intf_thread_t *p_intf )
     msg_Dbg( p_intf, "CMML intf initialized" );
 #endif
 
-    /* if video output is dying, disassociate ourselves from it */
-    if( p_vout && p_vout->b_die )
-    {
-        var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
-        vlc_object_release( p_vout );
-        p_vout = NULL;
-    }
-
     /* Main loop */
     while( !p_intf->b_die )
     {
+        /* if video output is dying, disassociate ourselves from it */
+        if( p_vout && p_vout->b_die )
+        {
+            var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+            vlc_object_release( p_vout );
+            p_vout = NULL;
+        }
 
         /* find a video output if we currently don't have one */
         if( p_vout == NULL )
