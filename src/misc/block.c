@@ -106,7 +106,13 @@ block_t *block_Alloc( size_t i_size )
 block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 {
     block_sys_t *p_sys = (block_sys_t *)p_block;
-    ssize_t i_buffer_size;
+    ssize_t i_buffer_size = i_prebody + i_body;
+
+    if( i_buffer_size <= 0 )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
 
     if( p_block->pf_release != BlockRelease )
     {
@@ -118,14 +124,6 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
             return NULL;
 
         p_block = p_dup;
-    }
-
-    i_buffer_size = i_prebody + i_body;
-
-    if( i_buffer_size <= 0 )
-    {
-        block_Release( p_block );
-        return NULL;
     }
 
     /* Adjust reserved header if there is enough room */
