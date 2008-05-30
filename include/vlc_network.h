@@ -274,6 +274,11 @@ struct addrinfo
 #  define AI_NUMERICHOST 4
 # endif /* if !HAVE_STRUCT_ADDRINFO */
 
+/* Mac OS X doesn't define that one */
+#ifndef AI_NUMERICSERV
+#define AI_NUMERICSERV 0
+#endif
+
 VLC_EXPORT( const char *, vlc_gai_strerror, ( int ) );
 VLC_EXPORT( int, vlc_getnameinfo, ( const struct sockaddr *, int, char *, int, int *, int ) );
 VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** ) );

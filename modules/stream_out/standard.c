@@ -394,10 +394,7 @@ static int Open( vlc_object_t *p_this )
             .ai_family = AF_UNSPEC,
             .ai_socktype = SOCK_DGRAM,
             .ai_protocol = 0,
-            .ai_flags = AI_NUMERICHOST
-#ifdef AI_NUMERICSERV
-                      | AI_NUMERICSERV
-#endif
+            .ai_flags = AI_NUMERICHOST | AI_NUMERICSERV
         };
         char *shost = var_GetNonEmptyString (p_access, "src-addr");
         char *dhost = var_GetNonEmptyString (p_access, "dst-addr");
