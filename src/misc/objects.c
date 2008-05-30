@@ -171,6 +171,13 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
     p_priv->next = VLC_OBJECT (p_libvlc_global);
+#if defined (NDEBUG)
+    /* ... */
+#elif defined (LIBVLC_USE_PTRHEAD)
+    p_priv->creator_id = pthread_self ();
+#elif defined (WIN32)
+    p_priv->creator_id = GetCurrentThreadId ();
+#endif
     vlc_mutex_lock( &structure_lock );
     p_priv->prev = vlc_internals (p_libvlc_global)->prev;
     vlc_internals (p_libvlc_global)->prev = p_new;
@@ -1481,28 +1488,47 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
 }
 
 #ifndef NDEBUG
+# ifdef __GLIBC__
+#  include <execinfo.h>
+# endif
+
 void vlc_refcheck (vlc_object_t *obj)
 {
     static unsigned errors = 0;
-    vlc_object_t *caller = vlc_threadobj ();
-    vlc_object_internals_t *priv = vlc_internals (obj);
-    int refs;
-
     if (errors > 100)
         return;
 
-    if (!caller)
-        return; /* main thread, not sure how to handle it */
+    /* Anyone can use the root object (though it should not exist) */
+    if (obj == VLC_OBJECT (vlc_global ()))
+        return;
 
-    /* An object can always access itself without reference! */
+    /* Anyone can use its libvlc instance object */
+    if (obj == VLC_OBJECT (obj->p_libvlc))
+        return;
+
+    /* The thread that created the object holds the initial reference */
+    vlc_object_internals_t *priv = vlc_internals (obj);
+#if defined (LIBVLC_USE_PTHREAD)
+    if (pthread_equal (priv->creator_id, pthread_self ()))
+#elif defined WIN32
+    if (priv->creator_id == GetCurrentThreadId ())
+#else
+    if (0)
+#endif
+        return;
+
+    /* A thread can use its own object without reference! */
+    vlc_object_t *caller = vlc_threadobj ();
     if (caller == obj)
         return;
 
     /* The calling thread is younger than the object.
-     * Access could be valid, we would need more accounting. */
-    if (caller->i_object_id > obj->i_object_id)
+     * Access could be valid through cross-thread synchronization;
+     * we would need better accounting. */
+    if (caller && (caller->i_object_id > obj->i_object_id))
         return;
 
+    int refs;
     vlc_spin_lock (&priv->ref_spin);
     refs = priv->i_refcount;
     vlc_spin_unlock (&priv->ref_spin);
@@ -1512,25 +1538,22 @@ void vlc_refcheck (vlc_object_t *obj)
     if (refs > 1)
         return;
 
-    /* The parent of an object normally holds the unique reference.
-     * As not all objects are threads, it could also be an ancestor. */
-    vlc_mutex_lock (&structure_lock);
-    for (vlc_object_t *cur = obj; cur != NULL; cur = cur->p_parent)
-        if (cur == caller)
-        {
-            vlc_mutex_unlock (&structure_lock);
-            return;
-        }
-    vlc_mutex_unlock (&structure_lock);
+    fprintf (stderr, "The %s %s thread object is accessing...\n"
+             "the %s %s object in a suspicous manner.\n",
+             caller && caller->psz_object_name
+                     ? caller->psz_object_name : "unnamed",
+             caller ? caller->psz_object_type : "main",
+             obj->psz_object_name ? obj->psz_object_name : "unnamed",
+             obj->psz_object_type);
+    fflush (stderr);
 
-#if 1
-    if (caller->i_object_type == VLC_OBJECT_PLAYLIST)
-        return; /* Playlist is too clever, or hopelessly broken. */
+#ifdef __GLIBC__
+    void *stack[20];
+    int stackdepth = backtrace (stack, sizeof (stack) / sizeof (stack[0]));
+    backtrace_symbols_fd (stack, stackdepth, 2);
 #endif
-    msg_Err (caller, "This thread is accessing...");
-    msg_Err (obj, "...this object in a suspicious manner.");
 
     if (++errors == 100)
-        msg_Err (caller, "Too many reference errors");
+        fprintf (stderr, "Too many reference errors!\n");
 }
 #endif
