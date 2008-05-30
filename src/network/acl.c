@@ -189,9 +189,6 @@ int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
 
         if( i_len > 128 )
             i_len = 128;
-        else
-        if( i_len < 0 )
-            i_len = 0;
     }
     else
         i_len = 128; /* ACL_AddHost */
