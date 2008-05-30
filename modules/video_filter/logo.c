@@ -489,12 +489,9 @@ static void End( vout_thread_t *p_vout )
     var_DelCallback( p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
     var_DelCallback( p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
 
-    if( p_sys->p_vout )
-    {
-        DEL_CALLBACKS( p_sys->p_vout, SendEvents );
-        vlc_object_detach( p_sys->p_vout );
-        vout_Destroy( p_sys->p_vout );
-    }
+    DEL_CALLBACKS( p_sys->p_vout, SendEvents );
+    vlc_object_detach( p_sys->p_vout );
+    vout_Destroy( p_sys->p_vout );
 
     if( p_sys->p_blend->p_module )
         module_Unneed( p_sys->p_blend, p_sys->p_blend->p_module );
