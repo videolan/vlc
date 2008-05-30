@@ -359,10 +359,10 @@ static inline float __var_GetFloat( vlc_object_t *p_obj, const char *psz_name )
 static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val; val.psz_string = NULL;
-    if( !__var_Get( p_obj, psz_name, &val ) )
-        return val.psz_string;
+    if( __var_Get( p_obj, psz_name, &val ) )
+        return NULL;
     else
-        return strdup( "" );
+        return val.psz_string;
 }
 
 static inline char *__var_GetNonEmptyString( vlc_object_t *obj, const char *name )
