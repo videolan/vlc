@@ -448,10 +448,11 @@ static void AStreamDestroy( stream_t *s )
     {
         free( p_sys->list[p_sys->i_list]->psz_path );
         free( p_sys->list[p_sys->i_list] );
-        free( p_sys->list );
     }
 
-    free( s->p_sys );
+    free( p_sys->list );
+    free( p_sys );
+
     vlc_object_release( s );
 }
 
