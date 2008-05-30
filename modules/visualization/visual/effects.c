@@ -68,7 +68,6 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     int i_separ;                      /* Should we let blanks ? */
     int i_amp;                        /* Vertical amplification */
     int i_peak;                       /* Should we draw peaks ? */
-    char *psz_parse = NULL;           /* Args line */
 
     /* Horizontal scale for 20-band equalizer */
     const int xscale1[]={0,1,2,3,4,5,6,7,8,11,15,20,27,
@@ -318,7 +317,6 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     p_s16_buff = NULL;
 
     free( height );
-    free( psz_parse );
 
     return 0;
 }
@@ -358,8 +356,6 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     int x,y,xx,yy;           /* various misc x/y */
     char color1;             /* V slide on a YUV color cube */
     //char color2;             /* U slide.. ?  color2 fade color ? */
-
-    char *psz_parse = NULL;           /* Args line */
 
     /* Horizontal scale for 20-band equalizer */
     const int xscale1[]={0,1,2,3,4,5,6,7,8,11,15,20,27,
@@ -772,7 +768,6 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     p_s16_buff = NULL;
 
     free( height );
-    free( psz_parse );
 
     return 0;
 }
