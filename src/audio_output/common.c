@@ -68,7 +68,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     val.b_bool = true;
     var_Set( p_aout, "intf-change", val );
 
-    vlc_object_set_destructor( p_parent, aout_Destructor );
+    vlc_object_set_destructor( p_aout, aout_Destructor );
 
     return p_aout;
 }
