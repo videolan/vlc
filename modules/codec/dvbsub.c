@@ -870,14 +870,9 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
 
     /* Free old object defs */
     while( p_region->i_object_defs )
-    {
-        int i = p_region->i_object_defs - 1;
-        free( p_region->p_object_defs[i].psz_text );
-        if( !i )
-            free( p_region->p_object_defs );
+        free( p_region->p_object_defs[--p_region->i_object_defs].psz_text );
 
-        p_region->i_object_defs--;
-    }
+    free( p_region->p_object_defs );
     p_region->p_object_defs = NULL;
 
     /* Extra sanity checks */
