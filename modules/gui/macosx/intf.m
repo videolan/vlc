@@ -1766,11 +1766,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     vout_thread_t * p_vout;
     int returnedValue = 0;
  
-    /* Stop playback */
-    p_playlist = pl_Yield( p_intf );
-    playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
-
     /* make sure that the current volume is saved */
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
     returnedValue = config_SaveConfigFile( p_intf->p_libvlc, "main" );
@@ -1794,80 +1789,48 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
     
-    if( nib_about_loaded && o_about )
+    if( nib_about_loaded )
         [o_about release];
     
-    if( nib_prefs_loaded && o_prefs )
+    if( nib_prefs_loaded )
         [o_prefs release];
     
-    if( nib_open_loaded && o_open )
+    if( nib_open_loaded )
         [o_open release];
  
-    if( nib_extended_loaded && o_extended )
+    if( nib_extended_loaded )
     {
         [o_extended collapsAll];
         [o_extended release];
     }
  
-    if( nib_bookmarks_loaded && o_bookmarks )
+    if( nib_bookmarks_loaded )
         [o_bookmarks release];
 
-    if( nib_info_loaded && o_info )
+    if( nib_info_loaded )
         [o_info release];
     
-    if( nib_wizard_loaded && o_wizard )
+    if( nib_wizard_loaded )
         [o_wizard release];
  
-    if( o_embedded_list != nil )
-        [o_embedded_list release];
+    [o_embedded_list release];
+    [o_interaction_list release];
+    [o_eyetv release];
 
-    if( o_interaction_list != nil )
-        [o_interaction_list release];
+    [o_img_pause_pressed release];
+    [o_img_pause_pressed release];
+    [o_img_pause release];
+    [o_img_play release];
 
-    if( o_eyetv != nil )
-        [o_eyetv release];
+    [o_msg_arr removeAllObjects];
+    [o_msg_arr release];
 
-    if( o_img_pause_pressed != nil )
-    {
-        [o_img_pause_pressed release];
-        o_img_pause_pressed = nil;
-    }
-
-    if( o_img_play_pressed != nil )
-    {
-        [o_img_pause_pressed release];
-        o_img_pause_pressed = nil;
-    }
-
-    if( o_img_pause != nil )
-    {
-        [o_img_pause release];
-        o_img_pause = nil;
-    }
-
-    if( o_img_play != nil )
-    {
-        [o_img_play release];
-        o_img_play = nil;
-    }
-
-    if( o_msg_arr != nil )
-    {
-        [o_msg_arr removeAllObjects];
-        [o_msg_arr release];
-        o_msg_arr = nil;
-    }
-
-    if( o_msg_lock != nil )
-    {
-        [o_msg_lock release];
-        o_msg_lock = nil;
-    }
+    [o_msg_lock release];
 
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    vlc_object_kill( p_intf );
+    vlc_object_kill( p_intf->p_libvlc );
 
     /* Go back to Run() and make libvlc exit properly */
     if( jmpbuffer )
