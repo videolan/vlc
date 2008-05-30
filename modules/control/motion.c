@@ -49,7 +49,8 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    enum { NO_SENSOR, HDAPS_SENSOR, AMS_SENSOR, UNIMOTION_SENSOR } sensor;
+    enum { NO_SENSOR, HDAPS_SENSOR, AMS_SENSOR, APPLESMC_SENSOR,
+           UNIMOTION_SENSOR } sensor;
 #ifdef __APPLE__
     enum sms_hardware unimotion_hw;
 #endif
@@ -76,6 +77,8 @@ vlc_module_begin();
     set_shortname( N_("motion"));
     set_category( CAT_INTERFACE );
     set_description( N_("motion control interface") );
+    set_help( N_("Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors " \
+                 "to rotate the video") )
 
     add_bool( "motion-use-rotate", 0, NULL,
               USE_ROTATE_TEXT, USE_ROTATE_TEXT, false );
@@ -120,6 +123,24 @@ int Open ( vlc_object_t *p_this )
     {
         /* Apple Motion Sensor support */
         p_intf->p_sys->sensor = AMS_SENSOR;
+    }
+    else if( access( "/sys/devices/applesmc.768/position", R_OK ) == 0 )
+    {
+        /* Apple SMC (newer macbooks) */
+        /* Should be factorised with HDAPS */
+        f = fopen( "/sys/devices/applesmc.768/calibrate", "r" );
+        if( f )
+        {
+            i_x = i_y = 0;
+            fscanf( f, "(%d,%d)", &i_x, &i_y );
+            fclose( f );
+            p_intf->p_sys->i_calibrate = i_x;
+            p_intf->p_sys->sensor = APPLESMC_SENSOR;
+        }
+        else
+        {
+            p_intf->p_sys->sensor = NO_SENSOR;
+        }
     }
 #ifdef __APPLE__
     else if( p_intf->p_sys->unimotion_hw = detect_sms() )
@@ -242,10 +263,8 @@ static void RunIntf( intf_thread_t *p_intf )
 static int GetOrientation( intf_thread_t *p_intf )
 {
     FILE *f;
-    int i_x, i_y;
-#ifdef __APPLE__
-    int i_z;
-#endif
+    int i_x, i_y, i_z = 0;
+
     switch( p_intf->p_sys->sensor )
     {
     case HDAPS_SENSOR:
@@ -272,6 +291,20 @@ static int GetOrientation( intf_thread_t *p_intf )
         fclose( f );
 
         return - i_x * 30; /* FIXME: arbitrary */
+
+    case APPLESMC_SENSOR:
+        f = fopen( "/sys/devices/applesmc.768/position", "r" );
+        if( !f )
+        {
+            return 0;
+        }
+
+        i_x = i_y = i_z = 0;
+        fscanf( f, "(%d,%d,%d)", &i_x, &i_y, &i_z );
+        fclose( f );
+
+        return ( i_x - p_intf->p_sys->i_calibrate ) * 10;
+
 #ifdef __APPLE__
     case UNIMOTION_SENSOR:
         if( read_sms_raw( p_intf->p_sys->unimotion_hw, &i_x, &i_y, &i_z ) )
