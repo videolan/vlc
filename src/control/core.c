@@ -177,7 +177,8 @@ void libvlc_wait( libvlc_instance_t *p_i )
 {
     libvlc_int_t *p_libvlc = p_i->p_libvlc_int;
     vlc_object_lock( p_libvlc );
-    while( !vlc_object_wait( p_libvlc ) );
+    if( vlc_object_alive( p_libvlc ) )
+        while( !vlc_object_wait( p_libvlc ) );
     vlc_object_unlock( p_libvlc );
 }
 
