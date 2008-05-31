@@ -938,15 +938,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         vlc_object_release( p_intf ); /* for vlc_object_find() */
     }
 
-    /* Free video outputs */
-    msg_Dbg( p_libvlc, "removing all video outputs" );
-    while( (p_vout = vlc_object_find( p_libvlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
-    {
-        vlc_object_detach( p_vout );
-        vlc_object_release( p_vout );
-        vout_Destroy( p_vout );
-    }
-
 #ifdef ENABLE_SOUT
     playlist_t         * p_playlist;
     sout_instance_t    * p_sout;
@@ -980,6 +971,15 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free interaction */
     msg_Dbg( p_libvlc, "removing interaction" );
     vlc_object_release( priv->p_interaction );
+
+    /* Free video outputs */
+    msg_Dbg( p_libvlc, "removing all video outputs" );
+    while( (p_vout = vlc_object_find( p_libvlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
+    {
+        vlc_object_detach( p_vout );
+        vlc_object_release( p_vout );
+        vout_Destroy( p_vout );
+    }
 
     stats_TimersDumpAll( p_libvlc );
     stats_TimersCleanAll( p_libvlc );
