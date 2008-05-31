@@ -607,6 +607,8 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
             break;
 
         case FOURCC_GREY:
+        case FOURCC_Y800:
+        case FOURCC_Y8:
             p_format->i_bits_per_pixel = 8;
             break;
 
@@ -836,6 +838,8 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_GREY:
+        case FOURCC_Y800:
+        case FOURCC_Y8:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned;
@@ -905,6 +909,20 @@ int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
             {
                 case FOURCC_YUY2:
                 case FOURCC_YUNV:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        case FOURCC_GREY:
+        case FOURCC_Y800:
+        case FOURCC_Y8:
+            switch( i_amorhc )
+            {
+                case FOURCC_GREY:
+                case FOURCC_Y800:
+                case FOURCC_Y8:
                     return 1;
 
                 default:

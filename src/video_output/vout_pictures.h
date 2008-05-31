@@ -102,6 +102,8 @@
 
 /* Planar 8-bit grayscale */
 #define FOURCC_GREY         VLC_FOURCC('G','R','E','Y')
+#define FOURCC_Y800         VLC_FOURCC('Y','8','0','0')
+#define FOURCC_Y8           VLC_FOURCC('Y','8',' ',' ')
 
 /* Alignment of critical dynamic data structure
  *
