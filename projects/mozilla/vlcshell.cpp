@@ -855,7 +855,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             /* if a movie is loaded */
             if( p_md )
             {
-                vlc_int64_t f_length;
+                int64_t f_length;
                 libvlc_exception_init( &ex );
                 f_length = libvlc_media_player_get_length( p_md, &ex ) / 100;
                 libvlc_exception_clear( &ex );

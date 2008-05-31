@@ -603,11 +603,11 @@ RuntimeNPObject::InvokeResult LibvlcInputNPObject::setProperty(int index, const 
             }
             case ID_input_time:
             {
-                vlc_int64_t val;
+                int64_t val;
                 if( NPVARIANT_IS_INT32(value) )
-                    val = (vlc_int64_t)NPVARIANT_TO_INT32(value);
+                    val = (int64_t)NPVARIANT_TO_INT32(value);
                 else if( NPVARIANT_IS_DOUBLE(value) )
-                    val = (vlc_int64_t)NPVARIANT_TO_DOUBLE(value);
+                    val = (int64_t)NPVARIANT_TO_DOUBLE(value);
                 else
                 {
                     libvlc_media_player_release(p_md);

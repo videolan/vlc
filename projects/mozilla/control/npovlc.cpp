@@ -536,7 +536,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_plugin->getVLC(), &ex);
                     if( p_md )
                     {
-                        vlc_int64_t val = libvlc_media_player_get_length(p_md, &ex);
+                        int64_t val = libvlc_media_player_get_length(p_md, &ex);
                         libvlc_media_player_release(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
@@ -600,7 +600,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_plugin->getVLC(), &ex);
                     if( p_md )
                     {
-                        vlc_int64_t val = libvlc_media_player_get_time(p_md, &ex);
+                        int64_t val = libvlc_media_player_get_time(p_md, &ex);
                         libvlc_media_player_release(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
@@ -634,16 +634,16 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_plugin->getVLC(), &ex);
                     if( p_md )
                     {
-                        vlc_int64_t pos = 0;
+                        int64_t pos = 0;
                         if( NPVARIANT_IS_INT32(args[0]) )
-                            pos = (vlc_int64_t)NPVARIANT_TO_INT32(args[0]);
+                            pos = (int64_t)NPVARIANT_TO_INT32(args[0]);
                         else
-                            pos = (vlc_int64_t)NPVARIANT_TO_DOUBLE(args[0]);
+                            pos = (int64_t)NPVARIANT_TO_DOUBLE(args[0]);
 
                         if( NPVARIANT_TO_BOOLEAN(args[1]) )
                         {
                             /* relative seek */
-                            vlc_int64_t from = libvlc_media_player_get_time(p_md, &ex);
+                            int64_t from = libvlc_media_player_get_time(p_md, &ex);
                             if( libvlc_exception_raised(&ex) )
                             {
                                 libvlc_media_player_release(p_md);
