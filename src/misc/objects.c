@@ -173,7 +173,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->next = VLC_OBJECT (p_libvlc_global);
 #if defined (NDEBUG)
     /* ... */
-#elif defined (LIBVLC_USE_PTRHEAD)
+#elif defined (LIBVLC_USE_PTHREAD)
     p_priv->creator_id = pthread_self ();
 #elif defined (WIN32)
     p_priv->creator_id = GetCurrentThreadId ();
