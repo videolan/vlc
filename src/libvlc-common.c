@@ -920,8 +920,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Get( p_libvlc, "open", &val );
     if ( val.psz_string != NULL && *val.psz_string )
     {
-        VLC_AddTarget( p_libvlc->i_object_id, val.psz_string, NULL, 0,
-                       PLAYLIST_INSERT, 0 );
+        playlist_t *p_playlist = pl_Yield( p_libvlc );
+        playlist_AddExt( p_playlist, val.psz_string, NULL, PLAYLIST_INSERT, 0,
+                         -1, NULL, 0, true, false );
+        pl_Release( p_libvlc );
     }
     free( val.psz_string );
 
@@ -1257,10 +1259,11 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[
         /* TODO: write an internal function of this one, to avoid
          *       unnecessary lookups. */
 
-        VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[i_opt],
-                       ( i_options ? &ppsz_argv[i_opt + 1] :
-                                        NULL ), i_options,
-                       PLAYLIST_INSERT, 0 );
+        playlist_t *p_playlist = pl_Yield( p_vlc );
+        playlist_AddExt( p_playlist, ppsz_argv[i_opt], NULL, PLAYLIST_INSERT,
+                         0, -1, ( i_options ? &ppsz_argv[i_opt + 1] : NULL ),
+                         i_options, true, false );
+        pl_Release( p_vlc );
     }
 
     return VLC_SUCCESS;
