@@ -224,7 +224,7 @@ static void Run( intf_thread_t *p_intf )
         }
 
         /* Check screensaver every 30 seconds */
-        refresh = mdate() + 30000000;
+        deadline = mdate() + 30000000;
     }
     vlc_object_unlock( p_intf );
 }
