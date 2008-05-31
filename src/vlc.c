@@ -131,6 +131,9 @@ int main( int i_argc, const char *ppsz_argv[] )
         libvlc_release (vlc);
     }
     i_ret = libvlc_exception_raised (&ex);
+    if( i_ret )
+        fprintf( stderr, "%s\n", libvlc_exception_get_message( &ex));
+
     libvlc_exception_clear (&ex);
 
     for (int i = 0; i < i_argc; i++)
