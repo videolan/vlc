@@ -88,7 +88,6 @@ static void intf_Destroy( vlc_object_t *obj )
 intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 {
     intf_thread_t * p_intf;
-    int i;
 
     /* Allocate structure */
     p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
