@@ -32,7 +32,6 @@
 #endif
 
 #include "vlcplugin.h"
-#include "control/npovlc.h"
 #include "control/npolibvlc.h"
 
 #include <ctype.h>
