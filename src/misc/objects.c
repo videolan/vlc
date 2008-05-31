@@ -647,6 +647,13 @@ void * vlc_object_get( int i_id )
 {
     libvlc_global_data_t *p_libvlc_global = vlc_global();
     vlc_object_t *obj = NULL;
+    vlc_object_t *caller = vlc_threadobj ();
+
+    if (caller)
+        msg_Dbg (caller, "uses deprecated vlc_object_get(%d)", i_id);
+    else
+        fprintf (stderr, "main thread uses deprecated vlc_object_get(%d)\n",
+                 i_id);
 
     vlc_mutex_lock( &structure_lock );
 
@@ -661,7 +668,10 @@ void * vlc_object_get( int i_id )
         }
     }
     obj = NULL;
-
+    if (caller)
+        msg_Warn (caller, "wants non-existing object %d", i_id);
+    else
+        fprintf (stderr, "main thread wants non-existing object %d\n", i_id);
 out:
     vlc_mutex_unlock( &structure_lock );
     return obj;
