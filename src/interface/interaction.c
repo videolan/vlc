@@ -535,17 +535,13 @@ static void InteractionLoop( vlc_object_t *p_this )
     int i;
     interaction_t *p_interaction = (interaction_t*) p_this;
 
-    while( !p_this->b_die )
+    vlc_object_lock( p_this );
+    while( vlc_object_alive( p_this ) )
     {
-        vlc_object_lock( p_this );
-        if( vlc_object_wait( p_this ) )
-        {
-            vlc_object_unlock( p_this );
-            break;
-        }
         InteractionManage( p_interaction );
-        vlc_object_unlock( p_this );
+        vlc_object_wait( p_this );
     }
+    vlc_object_unlock( p_this );
 
     /* Remove all dialogs - Interfaces must be able to clean up their data */
     for( i = p_interaction->i_dialogs -1 ; i >= 0; i-- )
