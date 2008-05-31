@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_input.h>
 #include "vcdplayer.h"
 

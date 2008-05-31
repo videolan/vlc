@@ -33,7 +33,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include "rtsp.h"
 #include "real_rmff.h"
 #include "real_sdpplin.h"

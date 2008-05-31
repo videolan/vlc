@@ -26,7 +26,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include "vlc_image.h"
 #include "file_bitmap.hpp"
 

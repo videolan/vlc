@@ -29,7 +29,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

@@ -41,7 +41,7 @@ hppfile.write(
 #ifndef BUILDER_DATA_HPP
 #define BUILDER_DATA_HPP
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <list>
 #include <map>
 #include <string>

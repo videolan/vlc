@@ -25,7 +25,7 @@
 #ifndef _VLM_STREAM_H_
 #define _VLM_STREAM_H_
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_vlm.h>
 

@@ -27,7 +27,7 @@
 #ifndef __XURL_H__
 #define __XURL_H__
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 /* Specialise boolean definitions to VLC's boolean types */
 typedef bool XURL_Bool;

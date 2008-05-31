@@ -27,7 +27,7 @@
 #ifndef SUBSDEC_HEADER_H
 #define SUBSDEC_HEADER_H
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_vout.h>
 #include <vlc_codec.h>
 #include <vlc_input.h>

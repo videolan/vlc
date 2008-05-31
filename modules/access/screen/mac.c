@@ -31,7 +31,7 @@
 # import "config.h"
 #endif
 
-#import <vlc/vlc.h>
+#import <vlc_common.h>
 
 #import <ApplicationServices/ApplicationServices.h>
 #import <OpenGL/OpenGL.h>

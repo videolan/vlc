@@ -23,7 +23,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 @interface VLCMinimalVoutWindow : NSWindow
 {

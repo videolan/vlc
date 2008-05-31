@@ -29,7 +29,7 @@
 #ifndef SKIN_COMMON_HPP
 #define SKIN_COMMON_HPP
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_interface.h>
 #include "vlc_charset.h"
 

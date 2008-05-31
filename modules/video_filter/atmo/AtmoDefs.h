@@ -16,7 +16,7 @@
 #   define __STDC_CONSTANT_MACROS 1
 #   include <inttypes.h>
 
-#   include <vlc/vlc.h>
+#   include <vlc_common.h>
 
 /* some things need to be changed if this code is used inside VideoLan Filter Module */
 #   define _ATMO_VLC_PLUGIN_

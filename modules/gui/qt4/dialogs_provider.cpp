@@ -30,7 +30,7 @@
 #include <QSignalMapper>
 #include <QFileDialog>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
 #include "main_interface.hpp"

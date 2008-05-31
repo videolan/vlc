@@ -24,7 +24,7 @@
 #ifndef DYNAMIC_OVERLAY_H
 #define DYNAMIC_OVERLAY_H   1
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_filter.h>
 
 /*****************************************************************************

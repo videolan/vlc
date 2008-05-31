@@ -25,7 +25,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #include "asf.h"
 #include "buffer.h"

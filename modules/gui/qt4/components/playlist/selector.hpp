@@ -28,7 +28,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <QWidget>
 #include <QString>
 #include "components/playlist/playlist_model.hpp"

@@ -52,7 +52,7 @@ description:The now infamous Apple Macintosh commercial aired during the 1984 Su
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_demux.h>
 
 #include "playlist.h"

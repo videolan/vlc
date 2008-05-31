@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include "http.h"
 #include "vlc_strings.h"
 

@@ -32,7 +32,7 @@
 
 #include <AGL/agl.h>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 int  aglInit   ( vout_thread_t * p_vout );
 void aglEnd    ( vout_thread_t * p_vout );

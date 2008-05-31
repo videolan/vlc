@@ -27,7 +27,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "intf.h"
-#import <vlc/vlc.h>
+#import <vlc_common.h>
 
 @interface VLCExtended : NSObject
 {

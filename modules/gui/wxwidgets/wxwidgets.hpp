@@ -41,7 +41,7 @@
 /* Let vlc take care of the i18n stuff */
 #define WXINTL_NO_GETTEXT_MACRO
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_interface.h>
 #include "vlc_charset.h"
 #include <vlc_playlist.h>

@@ -32,7 +32,7 @@
  * base commit d8c269b0fae9a8f8904e16e92313da165d664c74
  ****************************************************************************/
 #include "config.h"
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
 

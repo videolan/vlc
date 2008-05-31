@@ -18,7 +18,7 @@
 #if !defined(_ATMO_VLC_PLUGIN_)
 #    include "AtmoDisplays.h"
 #else
-#    include <vlc/vlc.h>
+#    include <vlc_common.h>
 #    include <vlc_threads.h>
 #endif
 

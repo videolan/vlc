@@ -32,7 +32,7 @@
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 /* Entry point */
 int  cocoaglvoutviewInit( vout_thread_t * p_vout );

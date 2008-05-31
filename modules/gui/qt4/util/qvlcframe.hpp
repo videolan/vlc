@@ -36,7 +36,7 @@
 #include <QDesktopWidget>
 
 #include "qt4.hpp"
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_charset.h>
 
 class QVLCTools

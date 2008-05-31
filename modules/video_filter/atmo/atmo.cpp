@@ -34,7 +34,7 @@
 
 // #define __ATMO_DEBUG__
 // [:Zs]+$
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 

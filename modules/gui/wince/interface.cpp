@@ -33,7 +33,7 @@
 #define __STDC_CONSTANT_MACROS 1
 #include <inttypes.h>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_interface.h>
