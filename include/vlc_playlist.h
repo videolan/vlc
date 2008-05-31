@@ -254,6 +254,16 @@ struct playlist_add_t
 #define ORDER_NORMAL 0
 #define ORDER_REVERSE 1
 
+/* Used by playlist_Import */
+#define PLAYLIST_INSERT          0x0001
+#define PLAYLIST_APPEND          0x0002
+#define PLAYLIST_GO              0x0004
+#define PLAYLIST_PREPARSE        0x0008
+#define PLAYLIST_SPREPARSE       0x0010
+#define PLAYLIST_NO_REBUILD      0x0020
+
+#define PLAYLIST_END           -666
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
