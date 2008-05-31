@@ -54,6 +54,7 @@ vlc_module_begin();
     /* Minimal interface. see intf.m */
     set_shortname( "Minimal Macosx" );
     add_shortcut( "minimal_macosx" );
+    add_shortcut( "miosx" );
     set_description( N_("Minimal Mac OS X interface") );
     set_capability( "interface", 50 );
     set_callbacks( OpenIntf, CloseIntf );
