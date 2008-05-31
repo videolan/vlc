@@ -26,7 +26,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #ifndef WIN32
 # include <locale.h>

@@ -26,7 +26,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #include <stddef.h> /* size_t */
 #include <string.h> /* strlen(), memcpy(), memset(), strchr() */

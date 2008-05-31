@@ -22,7 +22,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include "../libvlc.h"
 
 void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])

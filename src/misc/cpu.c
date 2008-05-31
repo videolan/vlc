@@ -30,7 +30,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #ifdef HAVE_SIGNAL_H
 #   include <signal.h>                            /* SIGHUP, SIGINT, SIGKILL */

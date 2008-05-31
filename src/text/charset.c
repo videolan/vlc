@@ -39,7 +39,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #if !defined WIN32
 # ifdef HAVE_LANGINFO_CODESET

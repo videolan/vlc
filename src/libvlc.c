@@ -39,7 +39,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #include "control/libvlc_internal.h"
 #include "libvlc.h"

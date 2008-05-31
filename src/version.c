@@ -28,7 +28,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 /*****************************************************************************
  * VLC_Version: return the libvlc version.

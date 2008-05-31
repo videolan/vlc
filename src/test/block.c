@@ -27,7 +27,7 @@
 #undef NDEBUG
 #include <assert.h>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_block.h>
 
 static const char text[] =

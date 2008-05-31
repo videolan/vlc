@@ -22,7 +22,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include "../libvlc.h"
 
 int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,

@@ -33,7 +33,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #include <time.h>                      /* clock_gettime(), clock_nanosleep() */
 #include <assert.h>

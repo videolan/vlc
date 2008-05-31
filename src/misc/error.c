@@ -28,13 +28,13 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 /*****************************************************************************
  * vlc_error: strerror() equivalent
  *****************************************************************************
  * This function returns a string describing the error code passed in the
- * argument. A list of all errors can be found in include/vlc/vlc.h.
+ * argument. A list of all errors can be found in include/vlc_common.h.
  *****************************************************************************/
 char const * vlc_error ( int i_err )
 {

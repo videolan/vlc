@@ -26,7 +26,7 @@
 #undef NDEBUG
 #include <assert.h>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include "vlc_arrays.h"
 
 #include <stdio.h>

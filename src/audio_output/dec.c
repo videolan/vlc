@@ -28,7 +28,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>

@@ -27,7 +27,7 @@
 #endif
 
 #define UNICODE
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include "../libvlc.h"
 #include <vlc_playlist.h>
 #include <vlc_charset.h>

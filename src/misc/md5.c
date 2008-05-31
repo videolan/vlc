@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_md5.h>
 
 #ifdef WORDS_BIGENDIAN
