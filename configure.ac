@@ -1137,6 +1137,10 @@ case "${host_cpu}" in
     ;;
 esac
 
+dnl Check for backtrace() support
+AC_CHECK_HEADERS(execinfo.h)
+AC_CHECK_FUNCS(backtrace)
+
 dnl
 dnl  Enable profiling
 dnl

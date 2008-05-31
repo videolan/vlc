@@ -1482,7 +1482,7 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
 }
 
 #ifndef NDEBUG
-# if defined(__GLIBC__) || defined(__APPLE__)
+# ifdef (HAVE_EXECINFO_H)
 #  include <execinfo.h>
 # endif
 
@@ -1541,7 +1541,7 @@ void vlc_refcheck (vlc_object_t *obj)
              obj->psz_object_type);
     fflush (stderr);
 
-#if defined(__GLIBC__) || defined(__APPLE__)
+#ifdef HAVE_BACKTRACE
     void *stack[20];
     int stackdepth = backtrace (stack, sizeof (stack) / sizeof (stack[0]));
     backtrace_symbols_fd (stack, stackdepth, 2);
