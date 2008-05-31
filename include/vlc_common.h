@@ -29,6 +29,9 @@
  * This file is a collection of common definitions and types
  */
 
+#ifndef VLC_COMMON_H
+# define VLC_COMMON_H 1
+
 /*****************************************************************************
  * Required vlc headers
  *****************************************************************************/
@@ -917,3 +920,5 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #   define PATH_SEP_CHAR ':'
 #   define PATH_SEP ":"
 #endif
+
+#endif /* !VLC_COMMON_H */
