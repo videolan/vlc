@@ -3000,7 +3000,7 @@ if test "${enable_ffmpeg}" != "no"
 then
 
 dnl Trying with pkg-config
-   PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat],
+   PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat, libavutil],
     [
      VLC_SAVE_FLAGS
      CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS}"
