@@ -83,7 +83,7 @@ static inline unsigned long vlc_threadid (void)
      return v.i;
 }
 
-#if HAVE_EXECINFO_H
+#if defined(HAVE_EXECINFO_H) && defined(HAVE_BACKTRACE)
 # include <execinfo.h>
 #endif
 

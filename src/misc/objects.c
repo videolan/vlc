@@ -1482,7 +1482,7 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
 }
 
 #ifndef NDEBUG
-# ifdef HAVE_EXECINFO_H
+# if defined(HAVE_EXECINFO_H) && defined(HAVE_BACKTRACE)
 #  include <execinfo.h>
 # endif
 
