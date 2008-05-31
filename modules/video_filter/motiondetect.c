@@ -35,6 +35,7 @@
 #include <vlc_vout.h>
 
 #include "vlc_filter.h"
+#include "filter_picture.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -78,6 +79,19 @@ struct filter_sys_t
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+
+    switch( p_filter->fmt_in.video.i_chroma )
+    {
+        CASE_PLANAR_YUV
+            break;
+
+        CASE_PACKED_YUV_422
+            msg_Err( p_filter, "FIXME ... this should be easy." );
+        default:
+            msg_Err( p_filter, "Unsupported input chroma (%4s)",
+                     (char*)&(p_filter->fmt_in.video.i_chroma) );
+            return VLC_EGENERIC;
+    }
 
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
