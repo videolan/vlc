@@ -274,25 +274,21 @@ static void Run( intf_thread_t *p_intf )
         bool b_die = false, b_wait = false;
 
         vlc_object_lock( p_intf );
-        if( vlc_object_alive( p_intf ) )
+        if( !vlc_object_alive( p_intf ) )
         {
-           if( mdate() < p_sys->next_exchange )
-                /* wait until we can resubmit, i.e.  */
-                b_wait = !vlc_object_timedwait( p_intf,
-                                                p_sys->next_exchange );
-            else
-                /* wait for data to submit */
-                /* we are signaled each time there is a song to submit */
-               vlc_object_wait( p_intf );
-        }
-        b_die = !vlc_object_alive( p_intf );
-        vlc_object_unlock( p_intf );
-
-        if( b_die )
-        {
+            vlc_object_unlock( p_intf );
             msg_Dbg( p_intf, "audioscrobbler is dying");
             return;
         }
+        if( mdate() < p_sys->next_exchange )
+            /* wait until we can resubmit, i.e.  */
+            b_wait = vlc_object_timedwait( p_intf, p_sys->next_exchange ) == 0;
+        else
+            /* wait for data to submit */
+            /* we are signaled each time there is a song to submit */
+            vlc_object_wait( p_intf );
+        vlc_object_unlock( p_intf );
+
         if( b_wait )
             continue; /* holding on until next_exchange */
 

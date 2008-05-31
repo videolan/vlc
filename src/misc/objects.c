@@ -545,19 +545,13 @@ void __vlc_object_wait( vlc_object_t *obj )
  * Waits for the object to be signaled (using vlc_object_signal()), or for
  * a timer to expire. It is asserted that the caller holds the object lock.
  *
- * @return negative if the object is dying and should terminate,
- * positive if the the object has been signaled but is not dying,
- * 0 if timeout has been reached.
+ * @return 0 if the object was signaled before the timer expiration, or
+ * ETIMEDOUT if the timer expired without any signal.
  */
 int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
 {
-    int v;
-
     vlc_assert_locked( &obj->object_lock );
-    v = vlc_cond_timedwait( &obj->object_wait, &obj->object_lock, deadline );
-    if( v == 0 ) /* signaled */
-        return obj->b_die ? -1 : 1;
-    return 0;
+    return vlc_cond_timedwait( &obj->object_wait, &obj->object_lock, deadline );
 }
 
 
