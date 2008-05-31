@@ -487,13 +487,10 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 
     while( vlc_object_alive( p_obj ) )
     {
-        while( p_obj->i_waiting == 0 )
+        if( p_obj->i_waiting == 0 )
         {
-            if( vlc_object_wait( p_obj ) || p_playlist->b_die )
-            {
-                vlc_object_unlock( p_obj );
-                return;
-            }
+            vlc_object_wait( p_obj );
+            continue;
         }
 
         p_current = p_obj->pp_waiting[0];
@@ -579,13 +576,10 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
 
     while( vlc_object_alive( p_obj ) )
     {
-        while( p_obj->i_waiting == 0 )
+        if( p_obj->i_waiting == 0 )
         {
-            if( vlc_object_wait( p_obj ) || p_playlist->b_die )
-            {
-                vlc_mutex_unlock( &p_obj->object_lock );
-                return;
-            }
+            vlc_object_wait( p_obj );
+            continue;
         }
 
         p_item = p_obj->pp_waiting[0];
