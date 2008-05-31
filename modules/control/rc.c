@@ -1537,7 +1537,7 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_newintf = NULL;
 
-    p_newintf = intf_Create( p_this->p_libvlc, newval.psz_string, 0, NULL );
+    p_newintf = intf_Create( p_this->p_libvlc, newval.psz_string );
     if( p_newintf )
     {
         if( intf_RunThread( p_newintf ) )

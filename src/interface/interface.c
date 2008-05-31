@@ -80,16 +80,12 @@ static void intf_Destroy( vlc_object_t *obj )
  *****************************************************************************/
 /**
  * Create the interface, and prepare it for main loop.
- * You can give some additional options to be used for interface initialization
  *
  * \param p_this the calling vlc_object_t
  * \param psz_module a preferred interface module
- * \param i_options number additional options
- * \param ppsz_options additional option strings
  * \return a pointer to the created interface thread, NULL on error
  */
-intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
-                              int i_options, const char *const *ppsz_options  )
+intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 {
     intf_thread_t * p_intf;
     int i;
@@ -107,9 +103,6 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
     p_intf->b_play = false;
     p_intf->b_interaction = false;
     p_intf->b_should_run_on_first_thread = false;
-
-    for( i = 0 ; i< i_options; i++ )
-        var_OptionParse( p_this, ppsz_options[i], true );
 
     /* Choose the best module */
     p_intf->psz_intf = strdup( psz_module );
@@ -264,7 +257,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* Try to create the interface */
     sprintf( psz_intf, "%s,none", newval.psz_string );
-    p_intf = intf_Create( p_this->p_libvlc, psz_intf, 0, NULL );
+    p_intf = intf_Create( p_this->p_libvlc, psz_intf );
     free( psz_intf );
     if( p_intf == NULL )
     {

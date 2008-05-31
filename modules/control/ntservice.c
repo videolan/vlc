@@ -319,7 +319,7 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
             sprintf( psz_temp, "%s,none", psz_module );
 
             /* Try to create the interface */
-            p_new_intf = intf_Create( p_intf, psz_temp, 0, NULL );
+            p_new_intf = intf_Create( p_intf, psz_temp );
             if( p_new_intf == NULL )
             {
                 msg_Err( p_intf, "interface \"%s\" initialization failed",

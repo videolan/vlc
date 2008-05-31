@@ -1131,7 +1131,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module,
     }
 
     /* Try to create the interface */
-    p_intf = intf_Create( p_libvlc, psz_module ? psz_module : "$intf", 0, NULL );
+    p_intf = intf_Create( p_libvlc, psz_module ? psz_module : "$intf" );
     if( p_intf == NULL )
     {
         msg_Err( p_libvlc, "interface \"%s\" initialization failed",
