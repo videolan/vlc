@@ -48,6 +48,10 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#ifndef __cplusplus
+# include <stdbool.h>
+#endif
+
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
@@ -118,6 +122,8 @@ static inline void __vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
  *****************************************************************************/
 
 /* Internal types */
+typedef struct vlc_list_t vlc_list_t;
+typedef struct vlc_object_t vlc_object_t;
 typedef struct libvlc_int_t libvlc_int_t;
 typedef struct variable_t variable_t;
 typedef struct date_t date_t;
@@ -374,6 +380,81 @@ struct _stati64;
 struct stat;
 #endif
 
+/**
+ * VLC value structure
+ */
+typedef union
+{
+    int             i_int;
+    bool      b_bool;
+    float           f_float;
+    char *          psz_string;
+    void *          p_address;
+    vlc_object_t *  p_object;
+    vlc_list_t *    p_list;
+    mtime_t         i_time;
+
+    struct { char *psz_name; int i_object_id; } var;
+
+   /* Make sure the structure is at least 64bits */
+    struct { char a, b, c, d, e, f, g, h; } padding;
+
+} vlc_value_t;
+
+/**
+ * VLC list structure
+ */
+struct vlc_list_t
+{
+    int             i_count;
+    vlc_value_t *   p_values;
+    int *           pi_types;
+
+};
+
+/**
+ * \defgroup var_type Variable types
+ * These are the different types a vlc variable can have.
+ * @{
+ */
+#define VLC_VAR_VOID      0x0010
+#define VLC_VAR_BOOL      0x0020
+#define VLC_VAR_INTEGER   0x0030
+#define VLC_VAR_HOTKEY    0x0031
+#define VLC_VAR_STRING    0x0040
+#define VLC_VAR_MODULE    0x0041
+#define VLC_VAR_FILE      0x0042
+#define VLC_VAR_DIRECTORY 0x0043
+#define VLC_VAR_VARIABLE  0x0044
+#define VLC_VAR_FLOAT     0x0050
+#define VLC_VAR_TIME      0x0060
+#define VLC_VAR_ADDRESS   0x0070
+#define VLC_VAR_MUTEX     0x0080
+#define VLC_VAR_LIST      0x0090
+/**@}*/
+
+/*****************************************************************************
+ * Error values (shouldn't be exposed)
+ *****************************************************************************/
+#define VLC_SUCCESS         -0                                   /* No error */
+#define VLC_ENOMEM          -1                          /* Not enough memory */
+#define VLC_ETHREAD         -2                               /* Thread error */
+#define VLC_ETIMEOUT        -3                                    /* Timeout */
+
+#define VLC_ENOMOD         -10                           /* Module not found */
+
+#define VLC_ENOOBJ         -20                           /* Object not found */
+#define VLC_EBADOBJ        -21                            /* Bad object type */
+
+#define VLC_ENOVAR         -30                         /* Variable not found */
+#define VLC_EBADVAR        -31                         /* Bad variable value */
+
+#define VLC_ENOITEM        -40                           /**< Item not found */
+
+#define VLC_EEXIT         -255                             /* Program exited */
+#define VLC_EEXITSUCCESS  -999                /* Program exited successfully */
+#define VLC_EGENERIC      -666                              /* Generic error */
+
 /*****************************************************************************
  * Variable callbacks
  *****************************************************************************/
@@ -397,7 +478,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #else
 # define LIBVLC_EXPORT
 #endif
-#define VLC_PUBLIC_API  LIBVLC_EXTERN LIBVLC_EXPORT
 #define VLC_EXPORT( type, name, args ) \
                         LIBVLC_EXTERN LIBVLC_EXPORT type name args
 

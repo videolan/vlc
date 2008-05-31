@@ -25,7 +25,6 @@ pluginsincludedir = $(pkgincludedir)/plugins
 
 pkginclude_HEADERS = \
 	../include/vlc/vlc.h \
-	../include/vlc/common.h \
 	../include/vlc/deprecated.h \
 	../include/vlc/libvlc.h \
 	../include/vlc/libvlc_structures.h \
