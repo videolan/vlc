@@ -217,10 +217,9 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
     item->setExpanded( true );
 
     vlc_list_t *l = vlc_list_children( p_obj );
-    vlc_object_release( p_obj );
-
     for( int i=0; i < l->i_count; i++ )
         buildTree( item, l->p_values[i].p_object );
+    vlc_list_release( l );
 }
 
 void MessagesDialog::clearOrUpdate()
@@ -234,8 +233,6 @@ void MessagesDialog::clearOrUpdate()
 void MessagesDialog::updateTree()
 {
     modulesTree->clear();
-
-    vlc_object_yield( p_intf->p_libvlc );
     buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
 }
 

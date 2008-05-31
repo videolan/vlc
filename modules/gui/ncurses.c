@@ -1493,14 +1493,13 @@ static void DumpObject( intf_thread_t *p_intf, int *l, vlc_object_t *p_obj, int 
                 p_obj->psz_object_type, p_obj->i_object_id );
 
     vlc_list_t *list = vlc_list_children( p_obj );
-    vlc_object_release( p_obj );
     for( int i = 0; i < list->i_count ; i++ )
     {
         MainBoxWrite( p_intf, *l, 1 + 2 * i_level,
             i == list->i_count - 1 ? "`-" : "|-" );
         DumpObject( p_intf, l, list->p_values[i].p_object, i_level + 1 );
     }
-
+    vlc_list_release( list );
 }
 
 static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
@@ -1984,7 +1983,6 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     {
         int l = 0;
         DrawBox( p_sys->w, y++, 0, h, COLS, _(" Objects "), p_sys->b_color );
-        vlc_object_yield( p_intf->p_libvlc );
         DumpObject( p_intf, &l, VLC_OBJECT( p_intf->p_libvlc ), 0 );
 
         p_sys->i_box_lines_total = l;
