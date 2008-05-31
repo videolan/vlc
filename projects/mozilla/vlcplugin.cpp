@@ -229,16 +229,8 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     }
 
     /* assign plugin script root class */
-    if( (NULL != progid) && (!strcmp(progid, "VideoLAN.VLCPlugin.2")) )
-    {
-        /* new APIs */
-        p_scriptClass = RuntimeNPClass<LibvlcRootNPObject>::getClass();
-    }
-    else
-    {
-        /* legacy APIs */
-        p_scriptClass = RuntimeNPClass<VlcNPObject>::getClass();
-    }
+    /* new APIs */
+    p_scriptClass = RuntimeNPClass<LibvlcRootNPObject>::getClass();
 
     return NPERR_NO_ERROR;
 }

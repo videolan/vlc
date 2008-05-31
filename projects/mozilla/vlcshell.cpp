@@ -95,7 +95,7 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
 
         case NPPVpluginDescriptionString:
             snprintf( psz_desc, sizeof(psz_desc), PLUGIN_DESCRIPTION,
-                      VLC_Version() );
+                      libvlc_get_version() );
             *((char **)value) = psz_desc;
             return NPERR_NO_ERROR;
 

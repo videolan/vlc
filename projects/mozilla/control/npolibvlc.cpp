@@ -117,11 +117,11 @@ RuntimeNPObject::InvokeResult LibvlcRootNPObject::getProperty(int index, NPVaria
                 return INVOKERESULT_NO_ERROR;
             case ID_root_VersionInfo:
             {
-                int len = strlen(VLC_Version());
+                int len = strlen(libvlc_get_version());
                 NPUTF8 *retval =(NPUTF8*)NPN_MemAlloc(len);
                 if( retval )
                 {
-                    memcpy(retval, VLC_Version(), len);
+                    memcpy(retval, libvlc_get_version(), len);
                     STRINGN_TO_NPVARIANT(retval, len, result);
                 }
                 else
@@ -162,11 +162,11 @@ RuntimeNPObject::InvokeResult LibvlcRootNPObject::invoke(int index, const NPVari
             case ID_root_versionInfo:
                 if( argCount == 0 )
                 {
-                    int len = strlen(VLC_Version());
+                    int len = strlen(libvlc_get_version());
                     NPUTF8 *retval =(NPUTF8*)NPN_MemAlloc(len);
                     if( retval )
                     {
-                        memcpy(retval, VLC_Version(), len);
+                        memcpy(retval, libvlc_get_version(), len);
                         STRINGN_TO_NPVARIANT(retval, len, result);
                     }
                     else

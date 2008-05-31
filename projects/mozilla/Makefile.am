@@ -12,8 +12,6 @@ SOURCES_mozilla_common = \
 	vlcplugin.h \
 	control/npolibvlc.cpp \
 	control/npolibvlc.h \
-	control/npovlc.cpp \
-	control/npovlc.h \
 	control/nporuntime.cpp \
 	control/nporuntime.h \
 	support/classinfo.h
