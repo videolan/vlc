@@ -300,12 +300,15 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_DelCallback( p_filter, OSD_CFG "update", OSDMenuCallback, p_sys );
     var_DelCallback( p_filter, OSD_CFG "alpha", OSDMenuCallback, p_sys );
 
-    var_DelCallback( p_sys->p_menu, "osd-menu-update",
-                     OSDMenuUpdateEvent, p_filter );
-    var_DelCallback( p_sys->p_menu, "osd-menu-visible",
-                     OSDMenuVisibleEvent, p_filter );
+    if( p_sys )
+    {
+        var_DelCallback( p_sys->p_menu, "osd-menu-update",
+                         OSDMenuUpdateEvent, p_filter );
+        var_DelCallback( p_sys->p_menu, "osd-menu-visible",
+                         OSDMenuVisibleEvent, p_filter );
+    }
 
-    if( p_sys->p_vout )
+    if( p_sys && p_sys->p_vout )
     {
         var_DelCallback( p_sys->p_vout, "mouse-x",
                         MouseEvent, p_sys );
@@ -327,10 +330,13 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_this, OSD_CFG "update" );
     var_Destroy( p_this, OSD_CFG "alpha" );
 
-    osd_MenuDelete( p_filter, p_sys->p_menu );
+    if( p_sys )
+    {
+        osd_MenuDelete( p_filter, p_sys->p_menu );
 
-    free( p_sys->psz_file );
-    free( p_sys );
+        free( p_sys->psz_file );
+        free( p_sys );
+    }
 }
 
 /*****************************************************************************
