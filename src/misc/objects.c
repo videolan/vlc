@@ -1555,29 +1555,29 @@ void vlc_refcheck (vlc_object_t *obj)
 #endif
         return;
 
-    /* A thread can use its own object without reference! */
+    /* A thread can use its own object without references! */
     vlc_object_t *caller = vlc_threadobj ();
     if (caller == obj)
         return;
-
+#if 0
     /* The calling thread is younger than the object.
      * Access could be valid through cross-thread synchronization;
      * we would need better accounting. */
     if (caller && (caller->i_object_id > obj->i_object_id))
         return;
-
+#endif
     int refs;
     vlc_spin_lock (&priv->ref_spin);
     refs = priv->i_refcount;
     vlc_spin_unlock (&priv->ref_spin);
 
-    /* Object has more than one reference.
-     * The current thread could be holding a valid reference. */
-    if (refs > 1)
-        return;
+    for (held_list_t *hlcur = vlc_threadvar_get (&held_objects);
+         hlcur != NULL; hlcur = hlcur->next)
+        if (hlcur->obj == obj)
+            return;
 
     fprintf (stderr, "The %s %s thread object is accessing...\n"
-             "the %s %s object in a suspicous manner.\n",
+             "the %s %s object without references.\n",
              caller && caller->psz_object_name
                      ? caller->psz_object_name : "unnamed",
              caller ? caller->psz_object_type : "main",
