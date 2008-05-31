@@ -126,8 +126,10 @@ static void Run (intf_thread_t *obj)
     intf_sys_t *p_sys = obj->p_sys;
 
     vlc_object_lock (obj);
-    do
+    while (vlc_object_alive (obj))
     {
+        vlc_object_wait (obj);
+
         switch (p_sys->signum)
         {
             case SIGINT:
@@ -139,7 +141,6 @@ static void Run (intf_thread_t *obj)
                 goto out;
         }
     }
-    while (!vlc_object_wait (obj));
 
 out:
     vlc_object_unlock (obj);
