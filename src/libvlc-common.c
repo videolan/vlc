@@ -806,7 +806,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( psz_temp )
         {
             sprintf( psz_temp, "%s,none", psz_module );
-            libvlc_InternalAddIntf( p_libvlc, psz_temp, false, false, 0, NULL );
+            libvlc_InternalAddIntf( p_libvlc, psz_temp, false, 0, NULL );
             free( psz_temp );
         }
     }
@@ -816,18 +816,18 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Always load the hotkeys interface if it exists
      */
-    libvlc_InternalAddIntf( p_libvlc, "hotkeys,none", false, false, 0, NULL );
+    libvlc_InternalAddIntf( p_libvlc, "hotkeys,none", false, 0, NULL );
 
 #ifdef HAVE_DBUS_3
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
     if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
-        libvlc_InternalAddIntf( p_libvlc, "dbus,none", false, false, 0, NULL );
+        libvlc_InternalAddIntf( p_libvlc, "dbus,none", false, 0, NULL );
 
     /* Prevents the power management daemon from suspending the system
      * when VLC is active */
     if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
-        libvlc_InternalAddIntf( p_libvlc, "inhibit,none", false, false, 0, NULL );
+        libvlc_InternalAddIntf( p_libvlc, "inhibit,none", false, 0, NULL );
 #endif
 
     /*
@@ -837,31 +837,31 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_X11_XLIB_H
     if( config_GetInt( p_libvlc, "disable-screensaver" ) )
     {
-        libvlc_InternalAddIntf( p_libvlc, "screensaver,none", false, false, 0, NULL );
+        libvlc_InternalAddIntf( p_libvlc, "screensaver,none", false, 0, NULL );
     }
 #endif
 
     if( config_GetInt( p_libvlc, "file-logging" ) > 0 )
     {
-        libvlc_InternalAddIntf( p_libvlc, "logger,none", false, false, 0, NULL );
+        libvlc_InternalAddIntf( p_libvlc, "logger,none", false, 0, NULL );
     }
 #ifdef HAVE_SYSLOG_H
     if( config_GetInt( p_libvlc, "syslog" ) > 0 )
     {
         const char *psz_logmode = "logmode=syslog";
-        libvlc_InternalAddIntf( p_libvlc, "logger,none", false, false,
+        libvlc_InternalAddIntf( p_libvlc, "logger,none", false,
                                 1, &psz_logmode );
     }
 #endif
 
     if( config_GetInt( p_libvlc, "show-intf" ) > 0 )
     {
-        libvlc_InternalAddIntf( p_libvlc, "showintf,none", false, false, 0, NULL );
+        libvlc_InternalAddIntf( p_libvlc, "showintf,none", false, 0, NULL );
     }
 
     if( config_GetInt( p_libvlc, "network-synchronisation") > 0 )
     {
-        libvlc_InternalAddIntf( p_libvlc, "netsync,none", false, false, 0, NULL );
+        libvlc_InternalAddIntf( p_libvlc, "netsync,none", false, 0, NULL );
     }
 
 #ifdef WIN32
@@ -1098,7 +1098,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
  */
 int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
                             char const *psz_module,
-                            bool b_block, bool b_play,
+                            bool b_play,
                             int i_options, const char *const *ppsz_options )
 {
     int i_err;
@@ -1146,13 +1146,6 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
         return i_err;
-    }
-
-    if( b_block )
-    {
-        vlc_thread_join( p_intf );
-        vlc_object_detach( p_intf );
-        vlc_object_release( p_intf );
     }
 
     return VLC_SUCCESS;
