@@ -134,6 +134,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
 
     if(  an_origin != mediacontrol_AbsolutePosition )
     {
+        free( retval );
         /* Relative or ModuloPosition make no sense */
         RAISE_NULL( mediacontrol_PositionOriginNotSupported,
                     "Only absolute position is valid." );
