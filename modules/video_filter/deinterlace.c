@@ -30,15 +30,15 @@
 # include "config.h"
 #endif
 
+#ifdef HAVE_ALTIVEC_H
+#   include <altivec.h>
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include <vlc_sout.h>
 #include "vlc_filter.h"
-
-#ifdef HAVE_ALTIVEC_H
-#   include <altivec.h>
-#endif
 
 #ifdef CAN_COMPILE_MMXEXT
 #   include "mmx.h"
