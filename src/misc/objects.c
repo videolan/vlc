@@ -621,12 +621,16 @@ void __vlc_object_kill( vlc_object_t *p_this )
         close (fd);
     }
 
-    if( p_this->i_object_type == VLC_OBJECT_LIBVLC )
-        for( int i = 0; i < internals->i_children ; i++ )
-            vlc_object_kill( internals->pp_children[i] );
-
     vlc_object_signal_unlocked( p_this );
     vlc_mutex_unlock( &p_this->object_lock );
+
+    if (p_this->i_object_type == VLC_OBJECT_LIBVLC)
+    {
+        vlc_list_t *children = vlc_list_children (p_this);
+        for (int i = 0; i < children->i_count; i++)
+            vlc_object_kill (children->p_values[i].p_object);
+        vlc_list_release (children);
+    }
 }
 
 
