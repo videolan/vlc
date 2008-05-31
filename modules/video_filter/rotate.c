@@ -36,6 +36,7 @@
 #include <vlc_vout.h>
 
 #include "vlc_filter.h"
+#include "filter_picture.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -104,19 +105,15 @@ static int Create( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
-    if(   p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0')
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','Y','U','V')
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','0')
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2')
-
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','2')
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','2')
-      )
+    switch( p_filter->fmt_in.video.i_chroma )
     {
-        /* We only want planar YUV 4:2:0 or 4:2:2 */
-        msg_Err( p_filter, "Unsupported input chroma (%4s)",
-                 (char*)&(p_filter->fmt_in.video.i_chroma) );
-        return VLC_EGENERIC;
+        CASE_PLANAR_YUV
+            break;
+
+        default:
+            msg_Err( p_filter, "Unsupported input chroma (%4s)",
+                     (char*)&(p_filter->fmt_in.video.i_chroma) );
+            return VLC_EGENERIC;
     }
 
     if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
