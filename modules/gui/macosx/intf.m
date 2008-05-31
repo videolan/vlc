@@ -153,6 +153,7 @@ static void * KillerThread( void *user_data )
     [o_pool release];
     return NULL;
 }
+
 /*****************************************************************************
  * Run: main loop
  *****************************************************************************/
@@ -195,7 +196,7 @@ static void Run( intf_thread_t *p_intf )
     if(setjmp(jmpbuffer) == 0)
         [NSApp run];
 
-    pthread_join( &killer_thread, NULL );
+    pthread_join( killer_thread, NULL );
 
     [o_pool release];
 }
@@ -797,12 +798,14 @@ static VLCMain *_o_sharedMainInstance = nil;
         addPort: p_intf->p_sys->o_sendport
         forMode: NSDefaultRunLoopMode];
 
+    /* FIXME: don't poll */
     [NSTimer scheduledTimerWithTimeInterval: 0.5
         target: self selector: @selector(manageIntf:)
         userInfo: nil repeats: FALSE];
 
-    [NSThread detachNewThreadSelector: @selector(manage)
-        toTarget: self withObject: nil];
+    /* FIXME: don't poll */
+    manageThread = [[NSThread alloc] initWithTarget:self selector:@selector(manage)
+                                     object: nil];
 
     [o_controls setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
         var: "intf-add" selector: @selector(toggleVar:)];
@@ -1240,10 +1243,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     vlc_object_release( p_playlist );
 
-    while( (p_intf = VLCIntf) && !intf_ShouldDie( p_intf ) )
+    vlc_object_lock( p_intf );
+    while( vlc_object_alive( p_intf ) )
     {
         vlc_mutex_lock( &p_intf->change_lock );
-
 
         if( p_intf->p_sys->p_input == NULL )
         {
@@ -1269,8 +1272,11 @@ static VLCMain *_o_sharedMainInstance = nil;
         [self manageVolumeSlider];
 
         vlc_mutex_unlock( &p_intf->change_lock );
+        vlc_object_unlock( p_intf );
         msleep( 100000 );
+        vlc_object_lock( p_intf );
     }
+    vlc_object_unlock( p_intf );
     [o_pool release];
 }
 
@@ -1280,8 +1286,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_t * p_playlist;
     input_thread_t * p_input;
 
-    if( p_intf->p_libvlc->b_die == true )
+    vlc_object_lock( p_intf );
+
+    if( !vlc_object_alive( p_intf ) )
     {
+        vlc_object_unlock( p_intf );
         [o_timer invalidate];
         return;
     }
@@ -1304,12 +1313,13 @@ static VLCMain *_o_sharedMainInstance = nil;
         playlist_t * p_playlist = pl_Yield( p_intf );
     /* TODO: fix i_size use */
         b_plmul = p_playlist->items.i_size > 1;
-        p_input = p_playlist->p_input;
+
+        p_input = vlc_object_find( p_playlist, VLC_OBJECT_INPUT,
+                                   FIND_CHILD );
 
         if( ( b_input = ( p_input != NULL ) ) )
         {
             /* seekable streams */
-            vlc_object_yield( p_input );
             b_seekable = var_GetBool( p_input, "seekable" );
 
             /* check whether slow/fast motion is possible */
@@ -1364,12 +1374,12 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 
     p_playlist = pl_Yield( p_intf );
-    p_input = p_playlist->p_input;
+    p_input = vlc_object_find( p_playlist, VLC_OBJECT_INPUT,
+                               FIND_CHILD );
 
     if( p_input && !p_input->b_die )
     {
         vlc_value_t val;
-        vlc_object_yield( p_input );
 
         if( p_intf->p_sys->b_current_title_update )
         {
@@ -1461,6 +1471,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [NSTimer scheduledTimerWithTimeInterval: 0.3
         target: self selector: @selector(manageIntf:)
         userInfo: nil repeats: FALSE];
+    vlc_object_unlock( p_intf );
 }
 
 - (void)setupMenus
@@ -1768,6 +1779,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     vout_thread_t * p_vout;
     int returnedValue = 0;
  
+    msg_Dbg( p_intf, "Terminating" );
+
+    [manageThread cancel];
+    [manageThread release];
+
     /* make sure that the current volume is saved */
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
     returnedValue = config_SaveConfigFile( p_intf->p_libvlc, "main" );

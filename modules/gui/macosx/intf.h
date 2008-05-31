@@ -302,6 +302,8 @@ struct intf_sys_t
 
     NSSize o_size_with_playlist;
 
+    NSThread * manageThread;
+
     int     i_lastShownVolume;
 
     AppleRemote * o_remote;
