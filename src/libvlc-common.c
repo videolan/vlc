@@ -848,9 +848,17 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_SYSLOG_H
     if( config_GetInt( p_libvlc, "syslog" ) > 0 )
     {
-        const char *psz_logmode = "logmode=syslog";
-        libvlc_InternalAddIntf( p_libvlc, "logger,none", false,
-                                1, &psz_logmode );
+        char *logmode = var_CreateGetString( p_libvlc, "logmode" );
+        var_SetString( p_libvlc, "logmode", "syslog" );
+        libvlc_InternalAddIntf( p_libvlc, "logger,none", false, 0, NULL );
+
+        if( logmode )
+        {
+            var_SetString( p_libvlc, "logmode", logmode );
+            free( logmode );
+        }
+        else
+            var_Destroy( p_libvlc, "logmode" );
     }
 #endif
 
