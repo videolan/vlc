@@ -1038,25 +1038,9 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
             if( end != newval.psz_string )
                 p_object = vlc_object_get( i_id );
             else
-            {
                 /* try using the object's name to find it */
-                vlc_object_t *p_libvlc = vlc_object_get( 1 );
-                if( p_libvlc )
-                {
-                    /* Look in p_libvlc's children tree */
-                    p_object = vlc_object_find_name( p_libvlc,
-                                                     newval.psz_string,
-                                                     FIND_CHILD );
-                    vlc_object_release( p_libvlc );
-                }
-                if( !p_object )
-                {
-                    /* If it's not in libvlc, look in libvlc_global (== p_this) */
-                    p_object = vlc_object_find_name( p_this,
-                                                     newval.psz_string,
-                                                     FIND_CHILD );
-                }
-            }
+                p_object = vlc_object_find_name( p_this, newval.psz_string,
+                                                 FIND_ANYWHERE );
 
             if( !p_object )
             {
