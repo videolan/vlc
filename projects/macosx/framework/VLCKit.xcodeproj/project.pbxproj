@@ -431,14 +431,14 @@
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/../../../extras/buildsystem/cmake/scripts/convert_vlc_to_cmake.sh",
+				"$(SRCROOT)/../../../bootstrap",
 			);
 			outputPaths = (
-				"$(SRCROOT)/../../../CMakeLists.txt",
+				"$(SRCROOT)/../../../configure",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "top_srcdir=`pwd`/../../..\n\nif test $ACTION = \"clean\"\nthen\n    rm -f $SYMROOT/vlc_build_dir/CMakeLists.txt\n    exit 0\nfi\n\ncd $top_srcdir && ./extras/buildsystem/cmake/scripts/convert_vlc_to_cmake.sh\n";
+			shellScript = "top_srcdir=`pwd`/../../..\n\nif test $ACTION = \"clean\"\nthen\n    exit 0\nfi\n\ncd $top_srcdir && ./bootstrap\n";
 			showEnvVarsInLog = 0;
 		};
 		633BD6E30D2ADF030012A314 /* ShellScript */ = {
@@ -482,7 +482,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n\trm -Rf $SYMROOT/vlc_build_dir\n     exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\n#if ! test -e $SYMROOT/vlc_build_dir/CMakeCache.txt\n#then\n\tmkdir -p $SYMROOT/vlc_build_dir\n\trm -Rf $top_srcdir/CMakeCache.txt\n\tcd $SYMROOT/vlc_build_dir && $top_srcdir/extras/contrib/bin/cmake $top_srcdir -DENABLE_NO_SYMBOL_CHECK=ON\n#fi";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n\trm -Rf $SYMROOT/vlc_build_dir\n     exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir && $top_srcdir/configure --disable-nls --enable-debug -C\n";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
@@ -579,7 +579,6 @@
 					"-read_only_relocs",
 					suppress,
 					"-lvlc",
-					"-lvlc-control",
 					"$(LD_FLAGS_LIBINTL)",
 					"$(LD_FLAGS_LIBVLC)",
 					"$(LD_FLAGS_LIBVLC_CONTROL)",
@@ -622,7 +621,6 @@
 					"-read_only_relocs",
 					suppress,
 					"-lvlc",
-					"-lvlc-control",
 					"$(LD_FLAGS_LIBINTL)",
 					"$(LD_FLAGS_LIBVLC)",
 					"$(LD_FLAGS_LIBVLC_CONTROL)",

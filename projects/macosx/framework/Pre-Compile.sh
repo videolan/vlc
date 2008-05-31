@@ -53,7 +53,7 @@ if test "${ACTION}" = "build"; then
         else
             local lib_install_prefix="@loader_path/../lib"
         fi
-        
+
         if test -e ${1} && ((! test -e ${lib_dest}) || test ${1} -nt ${lib_dest} ); then
             
             mkdir -p ${2}
@@ -87,17 +87,15 @@ if test "${ACTION}" = "build"; then
     # @function install_library
     ##########################
 
+    prefix=".libs/"
+    suffix="dylib"
+
     ##########################
     # Hack for VLC-release.app
     if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
-        prefix=".libs/"
         install_library "${VLC_BUILD_DIR}/src/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
         mv ${target}/vlc ${target}/VLC
         chmod +x ${target}/VLC
-        suffix="dylib"
-    else
-        prefix=""
-        suffix="so"
     fi
 
     ##########################
@@ -141,8 +139,6 @@ if test "${ACTION}" = "build"; then
         esac
     done
 
-
-    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc-control.dylib" ${target_lib} "library"
     install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.dylib" ${target_lib} "library"
 
     ##########################
