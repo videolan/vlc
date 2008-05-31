@@ -109,6 +109,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     ppsz_argv[ppsz_argc++] = "-vv";
     ppsz_argv[ppsz_argc++] = "--no-stats";
     ppsz_argv[ppsz_argc++] = "--no-media-library";
+    ppsz_argv[ppsz_argc++] = "--ignore-config";
     ppsz_argv[ppsz_argc++] = "--intf";
     ppsz_argv[ppsz_argc++] = "dummy";
 
@@ -173,10 +174,13 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     }
 
 
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
-    libvlc_instance = libvlc_new(ppsz_argc, ppsz_argv, NULL);
-    if( ! libvlc_instance )
+    libvlc_instance = libvlc_new(ppsz_argc, ppsz_argv, &ex);
+    if( libvlc_exception_raised(&ex) )
     {
+        libvlc_exception_clear(&ex);
         return NPERR_GENERIC_ERROR;
     }
 
