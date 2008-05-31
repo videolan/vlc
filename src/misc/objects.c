@@ -2,7 +2,6 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2004-2008 the VideoLAN team
- * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -82,6 +81,15 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 static void vlc_object_destroy( vlc_object_t *p_this );
 static void vlc_object_detach_unlocked (vlc_object_t *p_this);
 
+#ifndef NDEBUG
+static vlc_threadvar_t held_objects;
+typedef struct held_list_t
+{
+    struct held_list_t *next;
+    vlc_object_t *obj;
+} held_list_t;
+#endif
+
 /*****************************************************************************
  * Local structure lock
  *****************************************************************************/
@@ -142,6 +150,10 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_libvlc_global->i_counter = 0;
         p_priv->next = p_priv->prev = p_new;
         vlc_mutex_init( &structure_lock );
+#ifndef NDEBUG
+        /* TODO: use the destruction callback to track ref leaks */
+        vlc_threadvar_create( &held_objects, NULL );
+#endif
     }
     else
     {
@@ -371,6 +383,9 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
         /* We are the global object ... no need to lock. */
         vlc_mutex_destroy( &structure_lock );
+#ifndef NDEBUG
+        vlc_threadvar_delete( &held_objects );
+#endif
     }
 
     FREENULL( p_this->psz_object_name );
@@ -778,6 +793,15 @@ void __vlc_object_yield( vlc_object_t *p_this )
     /* Increment the counter */
     internals->i_refcount++;
     vlc_spin_unlock( &internals->ref_spin );
+#ifndef NDEBUG
+    /* Update the list of referenced objects */
+    /* Using TLS, so no need to lock */
+    held_list_t *newhead = malloc (sizeof (*newhead));
+    held_list_t *oldhead = vlc_threadvar_get (&held_objects);
+    newhead->next = oldhead;
+    newhead->obj = p_this;
+    vlc_threadvar_set (&held_objects, newhead);
+#endif
 }
 
 /*****************************************************************************
@@ -788,6 +812,27 @@ void __vlc_object_release( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
     bool b_should_destroy;
+
+#ifndef NDEBUG
+    /* Update the list of referenced objects */
+    /* Using TLS, so no need to lock */
+    for (held_list_t *hlcur = vlc_threadvar_get (&held_objects),
+                     *hlprev = NULL;
+         hlcur != NULL;
+         hlcur = hlcur->next)
+    {
+        if (hlcur->obj == p_this)
+        {
+            if (hlprev == NULL)
+                vlc_threadvar_set (&held_objects, hlcur->next);
+            else
+                hlprev->next = hlcur->next;
+            free (hlcur);
+            break;
+        }
+    }
+    /* TODO: what if releasing without references? */
+#endif
 
     vlc_spin_lock( &internals->ref_spin );
     assert( internals->i_refcount > 0 );
