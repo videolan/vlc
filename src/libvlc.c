@@ -49,37 +49,6 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 
-/*****************************************************************************
- * VLC_Version: return the libvlc version.
- *****************************************************************************
- * This function returns full version string (numeric version and codename).
- *****************************************************************************/
-char const * VLC_Version( void )
-{
-    return VERSION_MESSAGE;
-}
-
-/*****************************************************************************
- * VLC_CompileBy, VLC_CompileHost, VLC_CompileDomain,
- * VLC_Compiler, VLC_Changeset
- *****************************************************************************/
-#define DECLARE_VLC_VERSION( func, var )                                    \
-char const * VLC_##func ( void )                                            \
-{                                                                           \
-    return VLC_##var ;                                                      \
-}
-
-DECLARE_VLC_VERSION( CompileBy, COMPILE_BY );
-DECLARE_VLC_VERSION( CompileHost, COMPILE_HOST );
-DECLARE_VLC_VERSION( CompileDomain, COMPILE_DOMAIN );
-DECLARE_VLC_VERSION( Compiler, COMPILER );
-
-extern const char psz_vlc_changeset[];
-const char* VLC_Changeset( void )
-{
-    return psz_vlc_changeset;
-}
-
 #define LIBVLC_FUNC \
     libvlc_int_t * p_libvlc = vlc_current_object( i_object ); \
     if( !p_libvlc ) return VLC_ENOOBJ;

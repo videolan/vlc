@@ -267,6 +267,7 @@ SOURCES_libvlc_common = \
 	libvlc-common.c \
 	libvlc.h \
 	libvlc-module.c \
+	version.c \
 	interface/interface.h \
 	interface/interface.c \
 	interface/intf_eject.c \
