@@ -28,8 +28,6 @@
 #ifndef _VLC_STREAMING_H_
 #define _VLC_STREAMING_H_
 
-#include <vlc/vlc.h>
-
 /***********************************************************************
  * Predefined lists of streaming data
  ***********************************************************************/

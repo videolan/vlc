@@ -28,8 +28,6 @@
 #ifndef _VLC_STRINGS_H
 #define _VLC_STRINGS_H 1
 
-#include <vlc/vlc.h>
-
 /**
  * \defgroup strings Strings
  * @{

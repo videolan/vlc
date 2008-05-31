@@ -29,8 +29,6 @@
 #ifndef _VLC_UPDATE_H
 #define _VLC_UPDATE_H
 
-#include <vlc/vlc.h>
-
 /**
  * \defgroup update Update
  *
