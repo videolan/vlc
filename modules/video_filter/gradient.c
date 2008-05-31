@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gradient.c : Gradient and edge detection video effects plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2006 the VideoLAN team
+ * Copyright (C) 2000-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -38,6 +38,7 @@
 #include <vlc_vout.h>
 
 #include "vlc_filter.h"
+#include "filter_picture.h"
 
 enum { GRADIENT, EDGE, HOUGH };
 
@@ -130,6 +131,17 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     char *psz_method;
+
+    switch( p_filter->fmt_in.video.i_chroma )
+    {
+        CASE_PLANAR_YUV
+            break;
+
+        default:
+             msg_Err( p_filter, "Unsupported input chroma (%4s)",
+                      (char*)&(p_filter->fmt_in.video.i_chroma) );
+            return VLC_EGENERIC;
+    }
 
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
