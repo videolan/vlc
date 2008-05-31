@@ -90,6 +90,28 @@ extern OSErr    CPSEnableForegroundOperation( CPSProcessSerNum *psn, UInt32 _arg
 extern OSErr    CPSSetFrontProcess( CPSProcessSerNum *psn);
 
 /*****************************************************************************
+ * KillerThread: Thread that kill the application
+ *****************************************************************************/
+static void * KillerThread( void *user_data )
+{
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    intf_thread_t *p_intf = user_data;
+
+    vlc_object_lock ( p_intf );
+    while( vlc_object_alive( p_intf ) )
+        vlc_object_wait( p_intf );
+    vlc_object_unlock( p_intf );
+
+    msg_Dbg( p_intf, "Killing the Mac OS X module" );
+
+    /* We are dead, terminate */
+    [NSApp terminate: nil];
+    [o_pool release];
+    return NULL;
+}
+
+/*****************************************************************************
  * Run: main loop
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
@@ -108,6 +130,11 @@ static void Run( intf_thread_t *p_intf )
     sigemptyset( &set );
     sigaddset( &set, SIGTERM );
     pthread_sigmask( SIG_UNBLOCK, &set, NULL );
+
+    /* Setup a thread that will monitor the module killing */
+    pthread_t killer_thread;
+    pthread_create( &killer_thread, NULL, KillerThread, p_intf );
+
     CPSProcessSerNum PSN;
     NSAutoreleasePool   *pool = [[NSAutoreleasePool alloc] init];
     [NSApplication sharedApplication];
@@ -116,6 +143,9 @@ static void Run( intf_thread_t *p_intf )
             if (!CPSSetFrontProcess(&PSN))
                 [NSApplication sharedApplication];
     [NSApp run];
+
+    pthread_join( killer_thread, NULL );
+
     [pool release];
 }
 
