@@ -108,7 +108,7 @@ static inline void PreUpdateFlags( access_t *p_access )
 static inline void PostUpdateFlags( access_t *p_access )
 {
     access_t *p_src = p_access->p_source;
-    /* */
+
     p_access->info = p_src->info;
     p_access->p_sys->i_update_sav = p_access->info.i_update;
 }
@@ -124,17 +124,15 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
     char *psz;
 
-    /* */
     p_access->pf_read  = p_src->pf_read  ? Read : NULL;
     p_access->pf_block = p_src->pf_block ? Block : NULL;
     p_access->pf_seek  = p_src->pf_seek  ? Seek : NULL;
     p_access->pf_control = Control;
 
-    /* */
     p_access->info = p_src->info;
 
-    /* */
     p_access->p_sys = p_sys = malloc( sizeof( access_t ) );
+    if( !p_sys ) return VLC_ENOMEM;
 
     /* */
     p_sys->f = NULL;
@@ -193,15 +191,12 @@ static block_t *Block( access_t *p_access )
     access_t     *p_src = p_access->p_source;
     block_t      *p_block;
 
-    /* */
     PreUpdateFlags( p_access );
 
-    /* */
     p_block = p_src->pf_block( p_src );
     if( p_block && p_block->i_buffer )
         Dump( p_access, p_block->p_buffer, p_block->i_buffer );
 
-    /* */
     PostUpdateFlags( p_access );
 
     return p_block;
@@ -215,16 +210,12 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     access_t     *p_src = p_access->p_source;
     int i_ret;
 
-    /* */
     PreUpdateFlags( p_access );
 
-    /* */
     i_ret = p_src->pf_read( p_src, p_buffer, i_len );
-
     if( i_ret > 0 )
         Dump( p_access, p_buffer, i_ret );
 
-    /* */
     PostUpdateFlags( p_access );
 
     return i_ret;
@@ -238,13 +229,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
     access_t     *p_src = p_access->p_source;
     int i_ret;
 
-    /* */
     PreUpdateFlags( p_access );
 
-    /* */
     i_ret = p_src->pf_control( p_src, i_query, args );
 
-    /* */
     PostUpdateFlags( p_access );
 
     return i_ret;
@@ -258,13 +246,10 @@ static int Seek( access_t *p_access, int64_t i_pos )
     access_t     *p_src = p_access->p_source;
     int i_ret;
 
-    /* */
     PreUpdateFlags( p_access );
 
-    /* */
     i_ret = p_src->pf_seek( p_src, i_pos );
 
-    /* */
     PostUpdateFlags( p_access );
 
     return i_ret;
@@ -330,7 +315,6 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
     access_sys_t *p_sys = p_access->p_sys;
     int i_write;
 
-    /* */
     if( !p_sys->b_dump )
     {
         if( p_sys->f )
@@ -351,7 +335,6 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         return;
     }
 
-    /* */
     if( !p_sys->f )
     {
         input_thread_t *p_input;
@@ -448,7 +431,6 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         p_sys->i_size = 0;
     }
 
-    /* */
     if( ( i_write = fwrite( p_buffer, 1, i_buffer, p_sys->f ) ) > 0 )
         p_sys->i_size += i_write;
 }
