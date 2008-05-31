@@ -52,7 +52,7 @@
 libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_player,
                                                  mediacontrol_PositionKey from,
                                                  mediacontrol_PositionKey to,
-                                                 vlc_int64_t value )
+                                                 int64_t value )
 {
     if( to == from )
         return value;
@@ -100,12 +100,12 @@ libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_
         {
             /* FIXME */
             /* vlc < 0.8 API */
-/*             return ( vlc_int64_t )( value * 50 * p_input->stream.i_mux_rate / f_fps ); */
+/*             return ( int64_t )( value * 50 * p_input->stream.i_mux_rate / f_fps ); */
             return 0;
         }
 
         if( to == mediacontrol_MediaTime )
-            return( vlc_int64_t )( value * 1000.0 / ( double )f_fps );
+            return( int64_t )( value * 1000.0 / ( double )f_fps );
 
         /* Cannot happen */
         break;
@@ -246,7 +246,7 @@ mediacontrol_exception_free( mediacontrol_Exception *exception )
 }
 
 mediacontrol_RGBPicture*
-private_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma, vlc_int64_t l_date,
+private_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma, int64_t l_date,
                                 char* p_data, int i_datasize )
 {
     mediacontrol_RGBPicture *retval;

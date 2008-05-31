@@ -513,7 +513,7 @@ libvlc_media_event_manager( libvlc_media_t * p_md,
 /**************************************************************************
  * Get duration of media object.
  **************************************************************************/
-vlc_int64_t
+int64_t
 libvlc_media_get_duration( libvlc_media_t * p_md,
                                       libvlc_exception_t * p_e )
 {

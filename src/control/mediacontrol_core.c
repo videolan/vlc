@@ -123,7 +123,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
 {
     mediacontrol_Position* retval = NULL;
     libvlc_exception_t ex;
-    vlc_int64_t pos;
+    int64_t pos;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
@@ -163,7 +163,7 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
                                  mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    vlc_int64_t i_pos;
+    int64_t i_pos;
 
     libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );

@@ -41,7 +41,7 @@ struct mediacontrol_Instance {
 libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_player,
                                                  mediacontrol_PositionKey from,
                                                  mediacontrol_PositionKey to,
-                                                 vlc_int64_t value );
+                                                 int64_t value );
 libvlc_time_t private_mediacontrol_position2microsecond( libvlc_media_player_t *p_media_player,
                                                          const mediacontrol_Position *pos );
 
@@ -51,7 +51,7 @@ libvlc_time_t private_mediacontrol_position2microsecond( libvlc_media_player_t *
  */
 mediacontrol_RGBPicture *private_mediacontrol_RGBPicture__alloc( int datasize );
 
-mediacontrol_RGBPicture *private_mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date, char *, int);
+mediacontrol_RGBPicture *private_mediacontrol_createRGBPicture( int, int, long, int64_t l_date, char *, int);
 
 
 #define RAISE( c, m )  if( exception ) { exception->code = c;    \

@@ -40,11 +40,7 @@
 # define VLC_DEPRECATED_API VLC_PUBLIC_API
 #endif
 
-#if (defined( WIN32 ) || defined( UNDER_CE )) && !defined( __MINGW32__ )
-typedef signed __int64 vlc_int64_t;
-# else
-typedef signed long long vlc_int64_t;
-#endif
+#include <stdint.h>
 
 # ifdef __cplusplus
 extern "C" {
@@ -81,7 +77,7 @@ typedef struct libvlc_exception_t
  * @{
  */
 
-typedef vlc_int64_t libvlc_time_t;
+typedef int64_t libvlc_time_t;
 
 /**@} */
 

@@ -100,7 +100,7 @@ typedef struct libvlc_event_t
         } media_subitem_added;
         struct
         {
-            vlc_int64_t new_duration;
+            int64_t new_duration;
         } media_duration_changed;
         struct
         {
