@@ -14,7 +14,6 @@ include/vlc_codec.h
 include/vlc_codecs.h
 include/vlc_codec_synchro.h
 include/vlc_common.h
-include/vlc/common.h
 include/vlc_config_cat.h
 include/vlc_config.h
 include/vlc_configuration.h
@@ -133,7 +132,6 @@ src/interface/interface.c
 src/interface/interface.h
 src/interface/intf_eject.c
 src/libvlc.c
-src/libvlc-common.c
 src/libvlc.h
 src/libvlc-module.c
 src/misc/action.c

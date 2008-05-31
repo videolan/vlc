@@ -264,7 +264,6 @@ SOURCES_libvlc_getopt = \
 
 SOURCES_libvlc_common = \
 	libvlc.c \
-	libvlc-common.c \
 	libvlc.h \
 	libvlc-module.c \
 	version.c \
