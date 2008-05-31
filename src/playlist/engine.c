@@ -479,7 +479,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
  */
 void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 {
-    playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
+    playlist_t *p_playlist = pl_Yield( p_obj );
     input_item_t *p_current;
     int i_activity;
 
@@ -557,6 +557,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         vlc_object_lock( p_obj );
     }
     vlc_object_unlock( p_obj );
+    pl_Release( p_obj );
 }
 
 /**
