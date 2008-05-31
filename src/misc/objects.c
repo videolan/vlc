@@ -527,24 +527,23 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
 
 /**
  * Waits for the object to be signaled (using vlc_object_signal()).
- * If the object already has a signal pending, this function will return
- * immediately. It is asserted that the caller holds the object lock.
+ * It is assumed that the caller has locked the object. This function will
+ * unlock the object, and lock it again before returning.
+ * If the object was signaled before the caller locked the object, it is
+ * undefined whether the signal will be lost or will wake the process.
  *
  * @return true if the object is dying and should terminate.
  */
-bool __vlc_object_wait( vlc_object_t *obj )
+void __vlc_object_wait( vlc_object_t *obj )
 {
     vlc_assert_locked( &obj->object_lock );
     vlc_cond_wait( &obj->object_wait, &obj->object_lock );
-    return obj->b_die;
 }
 
 
 /**
  * Waits for the object to be signaled (using vlc_object_signal()), or for
- * a timer to expire.
- * If the object already has a signal pending, this function will return
- * immediately. It is asserted that the caller holds the object lock.
+ * a timer to expire. It is asserted that the caller holds the object lock.
  *
  * @return negative if the object is dying and should terminate,
  * positive if the the object has been signaled but is not dying,
@@ -574,8 +573,7 @@ int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
    {
        ...preprocessing...
 
-       if (vlc_object_wait (self))
-           continue;
+       vlc_object_wait (self);
 
        ...postprocessing...
    }
@@ -594,6 +592,10 @@ bool __vlc_object_alive( vlc_object_t *obj )
 
 /**
  * Signals an object for which the lock is held.
+ * At least one thread currently sleeping in vlc_object_wait() or
+ * vlc_object_timedwait() will wake up, assuming that there is at least one
+ * such thread in the first place. Otherwise, it is undefined whether the
+ * signal will be lost or will wake up one or more thread later.
  */
 void __vlc_object_signal_unlocked( vlc_object_t *obj )
 {

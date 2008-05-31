@@ -162,7 +162,7 @@ VLC_EXPORT( void, __vlc_object_unlock, ( vlc_object_t * ) );
 #define vlc_object_unlock( obj ) \
     __vlc_object_unlock( VLC_OBJECT( obj ) )
 
-VLC_EXPORT( bool, __vlc_object_wait, ( vlc_object_t * ) );
+VLC_EXPORT( void, __vlc_object_wait, ( vlc_object_t * ) );
 #define vlc_object_wait( obj ) \
     __vlc_object_wait( VLC_OBJECT( obj ) )
 
@@ -201,11 +201,15 @@ VLC_EXPORT( int, __vlc_object_waitpipe, ( vlc_object_t *obj ));
 static inline
 bool __vlc_object_lock_and_wait( vlc_object_t *obj )
 {
-    bool b = true;
+    bool b;
 
     vlc_object_lock( obj );
-    if( vlc_object_alive( obj ) )
-        b = vlc_object_wait( obj );
+    b = vlc_object_alive( obj );
+    if( b )
+    {
+        vlc_object_wait( obj );
+        b = vlc_object_alive( obj );
+    }
     vlc_object_unlock( obj );
     return b;
 }
