@@ -163,7 +163,6 @@ typedef struct libvlc_global_data_t
 
 
 libvlc_global_data_t *vlc_global (void);
-libvlc_int_t *vlc_current_object (int i_object);
 
 /**
  * Private LibVLC data for each object.

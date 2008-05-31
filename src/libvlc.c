@@ -130,18 +130,6 @@ static int  VerboseCallback( vlc_object_t *, char const *,
 
 static void InitDeviceValues( libvlc_int_t * );
 
-/*****************************************************************************
- * vlc_current_object: return the current object.
- *****************************************************************************
- * If i_object is non-zero, return the corresponding object. Otherwise,
- * return the statically allocated p_vlc object.
- *****************************************************************************/
-libvlc_int_t * vlc_current_object( int i_object )
-{
-    return i_object ? vlc_object_get( i_object ) : p_static_vlc;
-}
-
-
 /**
  * Allocate a libvlc instance, initialize global data if needed
  * It also initializes the threading system

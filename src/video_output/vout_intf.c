@@ -505,7 +505,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
         /* Destination object-id is following object: */
         i_id = atoi( &val.psz_string[7] );
-        p_dest = ( vlc_object_t* )vlc_current_object( i_id );
+        p_dest = ( vlc_object_t* )vlc_object_get( i_id );
         if( !p_dest )
         {
             msg_Err( p_vout, "Cannot find calling object" );
