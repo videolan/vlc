@@ -270,8 +270,14 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                         else /* absolute paths are used. */
                             p_range_current = osd_StateNew( p_menu, &file[0], "pressed" );
 
-                        if( !p_range_current || !p_range_current->p_pic )
+                        if( !p_range_current )
                             goto error;
+
+                        if( !p_range_current->p_pic )
+                        {
+                            osd_StatesFree( p_menu, p_range_current );
+                            goto error;
+                        }
 
                         p_range_current->i_x = i_x;
                         p_range_current->i_y = i_y;
@@ -369,8 +375,14 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                     else /* absolute paths are used. */
                         p_range_current = osd_StateNew( p_menu, &file[0], "pressed" );
 
-                    if( !p_range_current || !p_range_current->p_pic )
+                    if( !p_range_current )
                         goto error;
+
+                    if( !p_range_current->p_pic )
+                    {
+                        osd_StatesFree( p_menu, p_range_current );
+                        goto error;
+                    }
 
                     p_range_current->i_x = i_x;
                     p_range_current->i_y = i_y;
@@ -439,8 +451,14 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
             else /* absolute paths are used. */
                 p_state_current = osd_StateNew( p_menu, &file[0], &state[0] );
 
-            if( !p_state_current || !p_state_current->p_pic )
+            if( !p_state_current )
                 goto error;
+
+            if( !p_state_current->p_pic )
+            {
+                osd_StatesFree( p_menu, p_state_current );
+                goto error;
+            }
 
             p_state_current->i_x = i_x;
             p_state_current->i_y = i_y;
