@@ -32,13 +32,14 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-#include <vlc/libvlc.h>
+#include <vlc/vlc.h>
 
 #undef NDEBUG
 #include <assert.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 
 
