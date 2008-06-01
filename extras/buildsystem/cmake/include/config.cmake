@@ -384,7 +384,7 @@ set( VLC_COMPILER "${CMAKE_C_COMPILER}" )
 # Modules: Following are all listed in options
 ###########################################################
 
-# This module will be enabled but user could disabled it
+# This modules are enabled by default but can still be disabled manually
 vlc_enable_modules(dummy logger memcpy)
 vlc_enable_modules(mpgv mpga m4v m4a h264 vc1 demux_cdg cdg ps pva avi mp4 rawdv rawvid nsv real aiff mjpeg demuxdump flacsys tta)
 vlc_enable_modules(cvdsub svcdsub spudec subsdec subsusf t140 dvbsub cc mpeg_audio lpcm a52 dts cinepak flac)
@@ -401,8 +401,9 @@ vlc_enable_modules(access_filter_bandwidth)
 vlc_enable_modules(packetizer_mpegvideo packetizer_h264)
 vlc_enable_modules(packetizer_mpeg4video packetizer_mpeg4audio)
 vlc_enable_modules(packetizer_vc1)
-vlc_enable_modules(spatializer)
+vlc_enable_modules(spatializer atmo blendbench croppadd)
 vlc_enable_modules(asf)
+vlc_enable_modules(vmem visual growl_udp)
 
 set(enabled ${ENABLE_STREAM_OUT})
 vlc_register_modules(${enabled} access_output_dummy access_output_udp access_output_file access_output_http)
@@ -430,7 +431,7 @@ vlc_register_modules(${enabled} converter_float a52tospdif dtstospdif audio_form
 set(enabled)
 
 if(NOT WIN32)
-   vlc_enable_modules(screensaver)
+   vlc_enable_modules(screensaver signals dynamicoverlay) #motion
 endif(NOT WIN32)
 
 # This module is disabled because the CMakeList.txt which
@@ -595,6 +596,11 @@ if(X11_FOUND)
   vlc_module_add_link_libraries(x11       ${X11_LIBRARIES})
   vlc_module_add_link_libraries(panoramix ${X11_LIBRARIES})
 endif(X11_FOUND)
+
+vlc_check_include_files (linux/fb.h)
+if(HAVE_LINUX_FB_H)
+  vlc_enable_modules(fb)
+endif(HAVE_LINUX_FB_H)
 
 find_package(Mpeg2)
 if(Mpeg2_FOUND)
