@@ -177,6 +177,9 @@ set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_EXTRA_INCLUDE_FILES sys/mman.h)
 vlc_check_functions_exist(mmap)
+if(HAVE_MMAP)
+  vlc_enable_modules(access_mmap)
+endif(HAVE_MMAP)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_EXTRA_INCLUDE_FILES locale.h)
