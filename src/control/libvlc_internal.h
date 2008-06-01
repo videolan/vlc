@@ -32,12 +32,9 @@
 #include <vlc/vlc.h>
 #include <vlc/libvlc_structures.h>
 
+#include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_input.h>
-
-# ifdef __cplusplus
-extern "C" {
-# endif
 
 /***************************************************************************
  * Internal creation and destruction functions
@@ -351,9 +348,5 @@ void libvlc_event_send(
                                 return; }
 #define RAISEZERO( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
                                 return 0; }
-
-# ifdef __cplusplus
-}
-# endif
 
 #endif
