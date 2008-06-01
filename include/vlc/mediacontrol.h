@@ -38,9 +38,9 @@ extern "C" {
 
 #if defined( WIN32 )
 #include <windows.h>
-#define WINDOWHANDLE HWND
+typedef HWND WINDOWHANDLE;
 #else
-#define WINDOWHANDLE int
+typedef int WINDOWHANDLE;
 #endif
 
 #include <vlc/libvlc.h>
@@ -286,7 +286,7 @@ VLC_PUBLIC_API void mediacontrol_sound_set_volume( mediacontrol_Instance *self,
  * \param visual_id the Xid or HWND, depending on the platform
  * \param exception an initialized exception pointer
  */
-VLC_PUBLIC_API bool mediacontrol_set_visual( mediacontrol_Instance *self,
+VLC_PUBLIC_API int mediacontrol_set_visual( mediacontrol_Instance *self,
                                     WINDOWHANDLE visual_id,
                                     mediacontrol_Exception *exception );
 

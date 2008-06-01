@@ -26,8 +26,8 @@
 #endif
 
 #include <vlc/mediacontrol.h>
-#include <vlc/libvlc.h>
 
+#include <vlc_common.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include "mediacontrol_internal.h"

@@ -270,7 +270,7 @@ mediacontrol_sound_set_volume( mediacontrol_Instance *self,
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
-bool mediacontrol_set_visual( mediacontrol_Instance *self,
+int mediacontrol_set_visual( mediacontrol_Instance *self,
                                     WINDOWHANDLE visual_id,
                                     mediacontrol_Exception *exception )
 {
