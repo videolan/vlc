@@ -28,10 +28,6 @@
 #ifndef _VLC_VLC_H
 #define _VLC_VLC_H 1
 
-# ifdef __LIBVLC__
-#  include <vlc_common.h> /* FIXME */
-# endif
-
 # ifdef __cplusplus
 extern "C" {
 # endif
