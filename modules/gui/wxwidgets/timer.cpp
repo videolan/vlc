@@ -46,6 +46,8 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
     p_main_interface = _p_main_interface;
     b_init = 0;
 
+    var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
+
     /* Register callback for the intf-popupmenu variable */
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -53,7 +55,6 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
     if( p_playlist != NULL )
     {
         var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
-        var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
 
@@ -62,6 +63,8 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
 
 Timer::~Timer()
 {
+    var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
+
     /* Unregister callback */
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -69,7 +72,6 @@ Timer::~Timer()
     if( p_playlist != NULL )
     {
         var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
-        var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
 }

@@ -127,9 +127,7 @@ static void RunIntf( intf_thread_t *p_intf )
         /* Notify the interfaces */
         if( p_intf->p_sys->b_triggered )
         {
-            playlist_t *p_playlist = pl_Yield( p_intf );
-            var_SetBool( p_playlist, "intf-show", true );
-            vlc_object_release( p_playlist );
+            var_SetBool( p_intf->p_libvlc, "intf-show", true );
             p_intf->p_sys->b_triggered = false;
         }
 

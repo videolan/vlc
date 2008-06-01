@@ -896,6 +896,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Create volume callback system. */
     var_Create( p_libvlc, "volume-change", VLC_VAR_BOOL );
 
+    /* Create a variable for showing the interface (moved from playlist). */
+    var_Create( p_playlist, "intf-show", VLC_VAR_BOOL );
+    var_SetBool( p_playlist, "intf-show", true );
+
     /*
      * Get input filenames given as commandline arguments
      */

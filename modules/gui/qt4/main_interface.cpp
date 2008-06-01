@@ -222,10 +222,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     p_intf->b_interaction = true;
 
+    var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
+
     /* Register callback for the intf-popupmenu variable */
     playlist_t *p_playlist = pl_Yield( p_intf );
     var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
-    var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
     pl_Release( p_intf );
 
     /* VideoWidget connect mess to avoid different threads speaking to each other */
@@ -284,10 +285,11 @@ MainInterface::~MainInterface()
     settings->endGroup();
     delete settings;
 
+    var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
+
     /* Unregister callback for the intf-popupmenu variable */
     playlist_t *p_playlist = pl_Yield( p_intf );
     var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
-    var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
     pl_Release( p_intf );
 
     p_intf->b_interaction = false;
@@ -1211,7 +1213,7 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
 }
 
 /*****************************************************************************
- * IntfShowCB: callback triggered by the intf-show playlist variable.
+ * IntfShowCB: callback triggered by the intf-show libvlc variable.
  *****************************************************************************/
 static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param )

@@ -664,10 +664,6 @@ static void VariablesInit( playlist_t *p_playlist )
 
     var_Create( p_playlist, "intf-popupmenu", VLC_VAR_BOOL );
 
-    var_Create( p_playlist, "intf-show", VLC_VAR_BOOL );
-    val.b_bool = true;
-    var_Set( p_playlist, "intf-show", val );
-
     var_Create( p_playlist, "activity", VLC_VAR_INTEGER );
     var_SetInteger( p_playlist, "activity", 0 );
 

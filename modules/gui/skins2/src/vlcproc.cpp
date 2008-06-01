@@ -148,7 +148,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_AddCallback( pIntf->p_sys->p_playlist, "item-deleted",
                      onItemDelete, this );
     // Called when the "interface shower" wants us to show the skin
-    var_AddCallback( pIntf->p_sys->p_playlist, "intf-show",
+    var_AddCallback( pIntf->p_libvlc, "intf-show",
                      onIntfShow, this );
     // Called when the current played item changes
     var_AddCallback( pIntf->p_sys->p_playlist, "playlist-current",
@@ -193,7 +193,7 @@ VlcProc::~VlcProc()
                      onItemAppend, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-deleted",
                      onItemDelete, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "intf-show",
+    var_DelCallback( getIntf()->p_libvlc, "intf-show",
                      onIntfShow, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-current",
                      onPlaylistChange, this );

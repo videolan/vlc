@@ -459,15 +459,10 @@ static int Manage( vout_thread_t *p_vout )
                     val.i_int &= ~2;
                     var_Set( p_vout, "mouse-button-down", val );
 
-                    p_playlist = pl_Yield( p_vout );
-                    if( p_playlist != NULL )
-                    {
-                        vlc_value_t val;
-                        var_Get( p_playlist, "intf-show", &val );
-                        val.b_bool = !val.b_bool;
-                        var_Set( p_playlist, "intf-show", val );
-                        pl_Release( p_playlist );
-                    }
+                    vlc_value_t val;
+                    var_Get( p_vout->p_libvlc, "intf-show", &val );
+                    val.b_bool = !val.b_bool;
+                    var_Set( p_vout->p_libvlc, "intf-show", val );
                 }
                 break;
 

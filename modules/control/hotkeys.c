@@ -226,9 +226,9 @@ static void Run( intf_thread_t *p_intf )
         }
         /* Interface showing */
         else if( i_action == ACTIONID_INTF_SHOW )
-            var_SetBool( p_playlist, "intf-show", true );
+            var_SetBool( p_intf->p_libvlc, "intf-show", true );
         else if( i_action == ACTIONID_INTF_HIDE )
-            var_SetBool( p_playlist, "intf-show", false );
+            var_SetBool( p_intf->p_libvlc, "intf-show", false );
         /* Video Output actions */
         else if( i_action == ACTIONID_SNAPSHOT )
         {

@@ -493,10 +493,6 @@ static void vout_Destructor( vlc_object_t * p_this )
 #ifndef __APPLE__
     vout_thread_t *p_another_vout;
 
-    playlist_t *p_playlist = pl_Yield( p_this );
-    if( !p_playlist )
-        return;
-
     /* This is a dirty hack mostly for Linux, where there is no way to get the
      * GUI back if you closed it while playing video. This is solved in
      * Mac OS X, where we have this novelty called menubar, that will always
@@ -505,10 +501,9 @@ static void vout_Destructor( vlc_object_t * p_this )
     p_another_vout = vlc_object_find( p_this->p_libvlc,
                                       VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_another_vout == NULL )
-        var_SetBool( p_playlist, "intf-show", true );
+        var_SetBool( p_this->p_libvlc, "intf-show", true );
     else
         vlc_object_release( p_another_vout );
-    pl_Release( p_playlist );
 #endif
 }
 

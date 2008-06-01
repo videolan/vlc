@@ -569,7 +569,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     val.b_bool = false;
 
     var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
-    var_AddCallback( p_playlist, "intf-show", ShowController, self);
+    var_AddCallback( p_intf->p_libvlc, "intf-show", ShowController, self);
 
     vlc_object_release( p_playlist );
  
