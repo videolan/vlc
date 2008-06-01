@@ -25,7 +25,7 @@ if BUILD_MOZILLA
 SUBDIRS += projects/mozilla
 endif
 if BUILD_ACTIVEX
-SUBDIRS += projects/activex
+#FIXME:SUBDIRS += projects/activex
 endif
 
 EXTRA_DIST = \
@@ -707,7 +707,7 @@ if BUILD_ACTIVEX
 	cp $(srcdir)/projects/activex/test.html  $(top_builddir)/vlc-$(VERSION)/activex/
 	unix2dos $(top_builddir)/vlc-$(VERSION)/activex/*
 
-	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/activex/
+#FIXME	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/activex/
 endif
 
 # Rebase all those DLLs to speed up loading (need cygwin rebase)
@@ -850,7 +850,7 @@ if BUILD_MOZILLA
 	$(STRIP) $(top_builddir)/vlc-$(VERSION)/mozilla/npvlc$(LIBEXT);
 endif
 if BUILD_ACTIVEX
-	$(STRIP) $(top_builddir)/vlc-$(VERSION)/activex/axvlc$(LIBEXT);
+#FIXME	$(STRIP) $(top_builddir)/vlc-$(VERSION)/activex/axvlc$(LIBEXT);
 endif
 
 package-win32-base: package-win32-base-debug package-win-common-strip
