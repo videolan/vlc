@@ -2162,14 +2162,6 @@ static int UpdateFromAccess( input_thread_t *p_input )
 static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
 {
     input_item_SetDuration( p_input->p->input.p_item, (mtime_t) i_length );
-
-    if( !p_input->b_preparsing )
-    {
-        pl_Yield( p_input );
-        var_SetInteger( libvlc_priv (p_input->p_libvlc)->p_playlist,
-                        "item-change", p_input->p->input.p_item->i_id );
-        pl_Release( p_input );
-    }
 }
 
 /*****************************************************************************
