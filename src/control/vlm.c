@@ -391,6 +391,7 @@ LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool,     0, ret_value = false );
 char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
                              libvlc_exception_t *p_exception )
 {
+    (void)p_instance;
     /* FIXME is it needed ? */
     libvlc_exception_raise( p_exception, "Unable to call show %s", psz_name );
     return NULL;
