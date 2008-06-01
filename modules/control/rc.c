@@ -1900,14 +1900,14 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t    *p_playlist = NULL;
+    int i_error = VLC_SUCCESS;
     vlc_value_t val;
-    int i_error = VLC_EGENERIC;
 
     if ( !*newval.psz_string )
     {
         msg_rc( _("Please provide one of the following parameters:") );
         msg_rc( "[on|off|up|down|left|right|select]" );
-        return i_error;
+        return VLC_EGENERIC;
     }
 
     p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -1928,9 +1928,12 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
     vlc_object_release( p_playlist );
 
     val.psz_string = strdup( newval.psz_string );
+    if( !val.psz_string )
+        return VLC_ENOMEM;
     if( !strcmp( val.psz_string, "on" ) || !strcmp( val.psz_string, "show" ))
         osd_MenuShow( p_this );
-    else if( !strcmp( val.psz_string, "off" ) || !strcmp( val.psz_string, "hide" ) )
+    else if( !strcmp( val.psz_string, "off" )
+          || !strcmp( val.psz_string, "hide" ) )
         osd_MenuHide( p_this );
     else if( !strcmp( val.psz_string, "up" ) )
         osd_MenuUp( p_this );
@@ -1946,11 +1949,9 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
     {
         msg_rc( _("Please provide one of the following parameters:") );
         msg_rc( "[on|off|up|down|left|right|select]" );
-        free( val.psz_string );
-        return i_error;
+        i_error = VLC_EGENERIC;
     }
 
-    i_error = VLC_SUCCESS;
     free( val.psz_string );
     return i_error;
 }
