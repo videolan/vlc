@@ -31,8 +31,8 @@
  */
 
 
-#ifndef _LIBVLC_H
-#define _LIBVLC_H 1
+#ifndef VLC_LIBVLC_H
+#define VLC_LIBVLC_H 1
 
 #if defined (WIN32) && defined (DLL_EXPORT)
 # define VLC_PUBLIC_API __declspec(dllexport)
@@ -187,7 +187,7 @@ void libvlc_wait( libvlc_instance_t *p_instance );
  *
  * \return a string containing the libvlc version
  */
-VLC_PUBLIC_API const char * libvlc_get_version();
+VLC_PUBLIC_API const char * libvlc_get_version(void);
 
 /**
  * Retrieve libvlc compiler version.
@@ -196,7 +196,7 @@ VLC_PUBLIC_API const char * libvlc_get_version();
  *
  * \return a string containing the libvlc compiler version
  */
-VLC_PUBLIC_API const char * libvlc_get_compiler();
+VLC_PUBLIC_API const char * libvlc_get_compiler(void);
 
 /**
  * Retrieve libvlc changeset.
@@ -205,7 +205,7 @@ VLC_PUBLIC_API const char * libvlc_get_compiler();
  *
  * \return a string containing the libvlc changeset
  */
-VLC_PUBLIC_API const char * libvlc_get_changeset();
+VLC_PUBLIC_API const char * libvlc_get_changeset(void);
 
 /** @}*/
 
