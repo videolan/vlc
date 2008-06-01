@@ -34,7 +34,21 @@
 #ifndef _LIBVLC_H
 #define _LIBVLC_H 1
 
-#include <vlc/vlc.h>
+#if defined (WIN32) && defined (DLL_EXPORT)
+# define VLC_PUBLIC_API __declspec(dllexport)
+#else
+# define VLC_PUBLIC_API
+#endif
+
+#ifdef __LIBVLC__
+/* Avoid unuseful warnings from libvlc with our deprecated APIs */
+#   define VLC_DEPRECATED_API VLC_PUBLIC_API
+#elif defined(__GNUC__) && \
+      (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
+# define VLC_DEPRECATED_API VLC_PUBLIC_API __attribute__((deprecated))
+#else
+# define VLC_DEPRECATED_API VLC_PUBLIC_API
+#endif
 
 # ifdef __cplusplus
 extern "C" {
