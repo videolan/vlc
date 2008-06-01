@@ -39,8 +39,8 @@
 #include <vlc/libvlc_events.h>
 #include <vlc/libvlc_media_list.h>
 #include <vlc/libvlc_vlm.h>
-//#include <vlc/mediacontrol.h>
-//#include <vlc/mediacontrol_structures.h>
+#include <vlc/mediacontrol.h>
+#include <vlc/mediacontrol_structures.h>
 
 #include <stdio.h>
 
