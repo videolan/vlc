@@ -67,7 +67,7 @@
  *      * e is an OPTIONAL extra letter
  *      * AKA "0.8.6d" or "0.9.0"
  * Second line is an url of the binary for this last version
- * Third line is a description of the update (it MAY be extended to several lines, but for now it is only one line)
+ * Remaining text is a required description of the update
  */
 
 #if defined( UNDER_CE )
@@ -1104,7 +1104,6 @@ static bool GetUpdateFile( update_t *p_update )
     int i_minor = 0;
     int i_revision = 0;
     unsigned char extra;
-    char *psz_line = NULL;
     char *psz_version_line = NULL;
 
     p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
@@ -1115,18 +1114,18 @@ static bool GetUpdateFile( update_t *p_update )
         goto error;
     }
 
-    /* Try to read three lines */
-    if( !( psz_line = stream_ReadLine( p_stream ) ) )
+    /* Start reading the status file */
+    if( !( psz_version_line = stream_ReadLine( p_stream ) ) )
     {
         msg_Err( p_update->p_libvlc, "Update file %s is corrupted : missing version",
                  UPDATE_VLC_STATUS_URL );
         goto error;
     }
 
-    psz_version_line = psz_line;
     /* first line : version number */
     p_update->release.extra = 0;
-    switch( sscanf( psz_line, "%i.%i.%i%c", &i_major, &i_minor, &i_revision, &extra ) )
+    switch( sscanf( psz_version_line, "%i.%i.%i%c",
+                    &i_major, &i_minor, &i_revision, &extra ) )
     {
         case 4:
             p_update->release.extra = extra;
@@ -1140,24 +1139,35 @@ static bool GetUpdateFile( update_t *p_update )
             goto error;
     }
 
-    /* Second line : URL */
-    if( !( psz_line = stream_ReadLine( p_stream ) ) )
+    /* second line : URL */
+    if( !( p_update->release.psz_url = stream_ReadLine( p_stream ) ) )
     {
         msg_Err( p_update->p_libvlc, "Update file %s is corrupted : URL missing",
                  UPDATE_VLC_STATUS_URL );
         goto error;
     }
-    p_update->release.psz_url = psz_line;
 
-
-    /* Third line : description */
-    if( !( psz_line = stream_ReadLine( p_stream ) ) )
+    /* Remaining data : description */
+    int i_read = stream_Size( p_stream ) - stream_Tell( p_stream );
+    if( i_read <= 0 )
     {
-        msg_Err( p_update->p_libvlc, "Update file %s is corrupted : description missing",
-                 UPDATE_VLC_STATUS_URL );
+        msg_Err( p_update->p_libvlc,
+                "Update file %s is corrupted: description missing",
+                UPDATE_VLC_STATUS_URL );
         goto error;
     }
-    p_update->release.psz_desc = psz_line;
+
+    p_update->release.psz_desc = (char*) malloc( i_read + 1 );
+    if( !p_update->release.psz_desc )
+        goto error;
+
+    if( stream_Read( p_stream, p_update->release.psz_desc, i_read ) != i_read )
+    {
+        msg_Err( p_update->p_libvlc, "Couldn't download update file %s",
+                UPDATE_VLC_STATUS_URL );
+        goto error;
+    }
+    p_update->release.psz_desc[i_read] = '\0';
 
     stream_Delete( p_stream );
     p_stream = NULL;
@@ -1244,12 +1254,23 @@ static bool GetUpdateFile( update_t *p_update )
     if( sign.type == TEXT_SIGNATURE )
         gcry_md_putc( hd, '\r' );
     gcry_md_putc( hd, '\n' );
-    gcry_md_write( hd, p_update->release.psz_desc,
-                        strlen( p_update->release.psz_desc ) );
-    if( sign.type == TEXT_SIGNATURE )
-        gcry_md_putc( hd, '\r' );
-    gcry_md_putc( hd, '\n' );
 
+    char *psz_desc = p_update->release.psz_desc;
+    while( *psz_desc )
+    {
+        size_t i_len = strcspn( psz_desc, "\r\n" );
+        if( !i_len )
+            break;
+
+        gcry_md_write( hd, psz_desc, i_len );
+        if( sign.type == TEXT_SIGNATURE )
+            gcry_md_putc( hd, '\r' );
+        gcry_md_putc( hd, '\n' );
+
+        psz_desc += i_len;
+        while( *psz_desc == '\r' || *psz_desc == '\n' )
+            psz_desc++;
+    }
 
     if( sign.version == 3 )
     {
