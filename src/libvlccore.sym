@@ -470,7 +470,6 @@ __vout_CopyPicture
 __vout_Create
 vout_CreatePicture
 vout_DatePicture
-vout_Destroy
 vout_DestroyPicture
 vout_DisplayPicture
 vout_EnableFilter

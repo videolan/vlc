@@ -589,7 +589,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
                  SendEvents );
              vlc_object_detach(
                  p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
-             vout_Destroy(
+             vlc_object_release(
                  p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
          }
     }

@@ -391,7 +391,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
          DEL_CALLBACKS( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones],
                         SendEvents );
          vlc_object_detach( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
-         vout_Destroy( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
+         vlc_object_release( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
     }
 }
 

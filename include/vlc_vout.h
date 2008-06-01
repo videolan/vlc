@@ -568,7 +568,6 @@ struct vout_thread_t
 VLC_EXPORT( vout_thread_t *, __vout_Request,    ( vlc_object_t *, vout_thread_t *, video_format_t * ) );
 #define vout_Create(a,b) __vout_Create(VLC_OBJECT(a),b)
 VLC_EXPORT( vout_thread_t *, __vout_Create,       ( vlc_object_t *, video_format_t * ) );
-VLC_EXPORT( void,            vout_Destroy,        ( vout_thread_t * ) );
 VLC_EXPORT( int, vout_VarCallback, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );

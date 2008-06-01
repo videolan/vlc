@@ -196,7 +196,7 @@ static int Open( vlc_object_t *p_this )
                            VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_filter, "cannot lauch goom thread" );
-        vout_Destroy( p_thread->p_vout );
+        vlc_object_release( p_thread->p_vout );
         vlc_mutex_destroy( &p_thread->lock );
         vlc_cond_destroy( &p_thread->wait );
         free( p_thread->psz_title );

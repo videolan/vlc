@@ -900,7 +900,7 @@ static void Destroy( vlc_object_t *p_this )
 #ifdef GLOBAL_OUTPUT
     DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents);
     vlc_object_detach( p_vout->p_sys->p_vout );
-    vout_Destroy( p_vout->p_sys->p_vout );
+    vlc_object_release( p_vout->p_sys->p_vout );
     DEL_PARENT_CALLBACKS( SendEventsToChild);
 #endif
 
@@ -1914,7 +1914,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
                  SendEvents );
              vlc_object_detach(
                  p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
-             vout_Destroy(
+             vlc_object_release(
                  p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
          }
     }

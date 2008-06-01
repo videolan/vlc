@@ -491,7 +491,7 @@ static void End( vout_thread_t *p_vout )
 
     DEL_CALLBACKS( p_sys->p_vout, SendEvents );
     vlc_object_detach( p_sys->p_vout );
-    vout_Destroy( p_sys->p_vout );
+    vlc_object_release( p_sys->p_vout );
 
     if( p_sys->p_blend->p_module )
         module_Unneed( p_sys->p_blend, p_sys->p_blend->p_module );

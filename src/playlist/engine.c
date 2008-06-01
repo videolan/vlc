@@ -206,7 +206,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
         msg_Dbg( p_playlist, "garbage collector destroying 1 vout" );
         vlc_object_detach( p_obj );
         vlc_object_release( p_obj );
-        vout_Destroy( (vout_thread_t *)p_obj );
+        vlc_object_release( (vout_thread_t *)p_obj );
     }
 #ifdef ENABLE_SOUT
     while( ( p_obj = vlc_object_find( p_playlist, VLC_OBJECT_SOUT,
@@ -445,7 +445,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
     {
         vlc_object_detach( p_obj );
         vlc_object_release( p_obj );
-        vout_Destroy( (vout_thread_t *)p_obj );
+        vlc_object_release( (vout_thread_t *)p_obj );
     }
 
     while( p_playlist->i_sds )

@@ -186,11 +186,6 @@ functions :
       Frees optional picture buffers.
       </para> </listitem>
 
-      <listitem> <para> <function> vout_Destroy </function> <parameter>
-      ( vout_thread_t *p_vout ) </parameter> :
-      Unmaps the window and frees all allocated resources.
-      </para> </listitem>
-
       <listitem> <para> <type> int </type> <function> vout_Manage
       </function> <parameter> ( vout_thread_t *p_vout ) </parameter> :
       Manages events (including for instance resize events).

@@ -573,7 +573,7 @@ int libvlc_video_destroy( libvlc_media_player_t *p_mi,
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     vlc_object_detach( p_vout );
     vlc_object_release( p_vout );
-    vout_Destroy( p_vout );
+    vlc_object_release( p_vout );
 
     return 0;
 }

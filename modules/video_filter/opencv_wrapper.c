@@ -409,7 +409,7 @@ static void Destroy( vlc_object_t *p_this )
     {
         DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
         vlc_object_detach( p_vout->p_sys->p_vout );
-        vout_Destroy( p_vout->p_sys->p_vout );
+        vlc_object_release( p_vout->p_sys->p_vout );
     }
 
     DEL_PARENT_CALLBACKS( SendEventsToChild );

@@ -198,7 +198,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         {
             /* We are not interested in this format, close this vout */
             vlc_object_release( p_vout );
-            vout_Destroy( p_vout );
+            vlc_object_release( p_vout );
             p_vout = NULL;
         }
         else
@@ -469,22 +469,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     vlc_object_set_destructor( p_vout, vout_Destructor );
 
     return p_vout;
-}
-
-/*****************************************************************************
- * vout_Destroy: destroys a previously created video output
- *****************************************************************************
- * Destroy a terminated thread.
- * The function will request a destruction of the specified thread. If pi_error
- * is NULL, it will return once the thread is destroyed. Else, it will be
- * update using one of the THREAD_* constants.
- *****************************************************************************/
-void vout_Destroy( vout_thread_t *p_vout )
-{
-    /* XXX: should go in the destructor */
-    var_Destroy( p_vout, "intf-change" );
-
-    vlc_object_release( p_vout );
 }
 
 static void vout_Destructor( vlc_object_t * p_this )

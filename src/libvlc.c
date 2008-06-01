@@ -978,7 +978,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     {
         vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
-        vout_Destroy( p_vout );
+        vlc_object_release( p_vout );
     }
 
     stats_TimersDumpAll( p_libvlc );

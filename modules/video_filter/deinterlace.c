@@ -433,7 +433,7 @@ static void End( vout_thread_t *p_vout )
     {
         DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
         vlc_object_detach( p_vout->p_sys->p_vout );
-        vout_Destroy( p_vout->p_sys->p_vout );
+        vlc_object_release( p_vout->p_sys->p_vout );
     }
 
     DEL_PARENT_CALLBACKS( SendEventsToChild );
@@ -2067,7 +2067,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
 
     vlc_object_detach( p_vout->p_sys->p_vout );
-    vout_Destroy( p_vout->p_sys->p_vout );
+    vlc_object_release( p_vout->p_sys->p_vout );
 
     /* Try to open a new video output */
     p_vout->p_sys->p_vout = SpawnRealVout( p_vout );

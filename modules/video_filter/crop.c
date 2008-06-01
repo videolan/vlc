@@ -424,7 +424,7 @@ static void Destroy( vlc_object_t *p_this )
     {
         DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
         vlc_object_detach( p_vout->p_sys->p_vout );
-        vout_Destroy( p_vout->p_sys->p_vout );
+        vlc_object_release( p_vout->p_sys->p_vout );
     }
 
     DEL_PARENT_CALLBACKS( SendEventsToChild );
@@ -458,7 +458,7 @@ static int Manage( vout_thread_t *p_vout )
     msg_Info( p_vout, "ratio %d",  p_vout->p_sys->i_aspect / 432);
 #endif
 
-    vout_Destroy( p_vout->p_sys->p_vout );
+    vlc_object_release( p_vout->p_sys->p_vout );
 
     fmt.i_width = fmt.i_visible_width = p_vout->p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_vout->p_sys->i_height;
