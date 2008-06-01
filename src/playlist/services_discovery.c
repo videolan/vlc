@@ -219,6 +219,22 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
                 p_input->psz_name ? p_input->psz_name : "(null)",
                 psz_cat ? psz_cat : "(null)" );
 
+    /* If p_parent is in root category (this is clearly a hack) and we have a cat */
+    if( !EMPTY_STR(psz_cat) &&
+        p_parent->p_parent == p_parent->p_playlist->p_root_category )
+    {
+        /* */
+        playlist_item_t * p_cat;
+        p_cat = playlist_ChildSearchName( p_parent, psz_cat );
+        if( !p_cat )
+        {
+            p_cat = playlist_NodeCreate( p_parent->p_playlist, psz_cat,
+                                         p_parent, 0, NULL );
+            p_cat->i_flags &= ~PLAYLIST_SKIP_FLAG;
+        }
+        p_parent = p_cat;
+    }
+
     p_new_item = playlist_NodeAddInput( p_parent->p_playlist, p_input, p_parent,
                                         PLAYLIST_APPEND, PLAYLIST_END, false );
     if( p_new_item )
