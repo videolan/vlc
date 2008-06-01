@@ -40,7 +40,6 @@
 #   include <ws2tcpip.h>
 #   define ENETUNREACH WSAENETUNREACH
 #   define net_errno (WSAGetLastError())
-#   define AI_NUMERICSERV 0
 extern const char *net_strerror( int val );
 
 struct iovec
@@ -274,9 +273,8 @@ struct addrinfo
 #  define AI_NUMERICHOST 4
 # endif /* if !HAVE_STRUCT_ADDRINFO */
 
-/* Mac OS X doesn't define that one */
 #ifndef AI_NUMERICSERV
-#define AI_NUMERICSERV 0
+# define AI_NUMERICSERV 0
 #endif
 
 VLC_EXPORT( const char *, vlc_gai_strerror, ( int ) );

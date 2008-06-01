@@ -591,9 +591,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
             AI_PASSIVE |
             AI_CANONNAME |
             AI_NUMERICHOST |
-#ifdef AI_NUMERICSERV
             AI_NUMERICSERV |
-#endif
 #ifdef AI_ALL
             AI_ALL |
 #endif
@@ -615,10 +613,8 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
         hints.ai_flags = p_hints->ai_flags & safe_flags;
     }
 
-#ifdef AI_NUMERICSERV
     /* We only ever use port *numbers* */
     hints.ai_flags |= AI_NUMERICSERV;
-#endif
 
     if( hints.ai_family == AF_UNSPEC )
     {
