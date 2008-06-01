@@ -32,7 +32,7 @@
 # undef __LIBVLC__
 #endif
 
-#include <vlc_common.h>
+#include <vlc/vlc.h>
 #include <vlc/deprecated.h>
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_structures.h>
