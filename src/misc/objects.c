@@ -819,7 +819,7 @@ void __vlc_object_release( vlc_object_t *p_this )
     for (held_list_t *hlcur = vlc_threadvar_get (&held_objects),
                      *hlprev = NULL;
          hlcur != NULL;
-         hlcur = hlcur->next)
+         hlprev = hlcur, hlcur = hlcur->next)
     {
         if (hlcur->obj == p_this)
         {
