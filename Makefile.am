@@ -54,7 +54,9 @@ BUILT_SOURCES = $(BUILT_SOURCES_distclean) $(BUILT_SOURCES_clean)
 
 SUFFIXES = 
 
-DISTCHECK_CONFIGURE_FLAGS = --disable-dvd --disable-mad --disable-libmpeg2 \
+DISTCHECK_CONFIGURE_FLAGS = \
+	--enable-fast-install \
+	--disable-dvd --disable-mad --disable-libmpeg2 \
 	--disable-ffmpeg --disable-faad --disable-wxwidgets --disable-skins2 \
 	--disable-fribidi --disable-glx
 
@@ -349,7 +351,7 @@ endif
 
 ALL_ALIASES = cvlc rvlc svlc wxvlc qvlc nvlc
 bin_SCRIPTS = $(ALIASES)
-CLEANFILES += $(ALIASES)
+CLEANFILES += $(ALIASES) $(noinst_SCRIPTS)
 EXTRA_SCRIPTS = $(ALL_ALIASES)
 
 dist_noinst_SCRIPTS += make-alias
