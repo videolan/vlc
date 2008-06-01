@@ -107,6 +107,17 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 }
 
 /*****************************************************************************
+ * An input item's meta has changed (Event Callback)
+ *****************************************************************************/
+static void input_item_meta_changed( const vlc_event_t * p_event,
+                                      void * user_data )
+{
+    playlist_item_t * p_item = user_data;
+    var_SetInteger( p_item->p_playlist,
+                    "item-change", p_item->i_id );
+}
+
+/*****************************************************************************
  * Listen to vlc_InputItemAddSubItem event
  *****************************************************************************/
 static void install_input_item_observer( playlist_item_t * p_item )
@@ -115,15 +126,22 @@ static void install_input_item_observer( playlist_item_t * p_item )
                       vlc_InputItemSubItemAdded,
                       input_item_subitem_added,
                       p_item );
+    vlc_event_attach( &p_item->p_input->event_manager,
+                      vlc_InputItemMetaChanged,
+                      input_item_meta_changed,
+                      p_item );
 }
 
 static void uninstall_input_item_observer( playlist_item_t * p_item )
 {
     vlc_event_detach( &p_item->p_input->event_manager,
+                      vlc_InputItemMetaChanged,
+                      input_item_meta_changed,
+                      p_item );
+    vlc_event_detach( &p_item->p_input->event_manager,
                       vlc_InputItemSubItemAdded,
                       input_item_subitem_added,
                       p_item );
-
 }
 
 /*****************************************************************************

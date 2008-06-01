@@ -2124,8 +2124,6 @@ static int UpdateFromAccess( input_thread_t *p_input )
         vlc_meta_t *p_meta = vlc_meta_New();
         access_Control( p_input->p->input.p_access,ACCESS_GET_META, p_meta );
         InputUpdateMeta( p_input, p_meta );
-        var_SetInteger( libvlc_priv (p_input->p_libvlc)->p_playlist,
-                        "item-change", p_input->p->input.p_item->i_id );
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }
 
