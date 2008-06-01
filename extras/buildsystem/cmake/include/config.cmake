@@ -20,7 +20,8 @@ OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
 OPTION( UPDATE_CHECK           "Enable automatic new version checking" OFF )
 OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" OFF )
 OPTION( ENABLE_CONTRIB         "Attempt to use VLC contrib system to get the third-party libraries" ON )
-OPTION( ENABLE_LOADER          "Enable the win32 codec loader" ON )
+OPTION( ENABLE_LOADER          "Enable the win32 codec loader" OFF )
+OPTION( ENABLE_NLS             "Enable translation of the program's messages" ON)
 
 if(ENABLE_CONTRIB)
 
@@ -71,6 +72,7 @@ set(VLC_VERSION_EXTRA "-svn")
 set(VLC_VERSION ${VLC_VERSION_MAJOR}.${VLC_VERSION_MINOR}.${VLC_VERSION_PATCH}${VLC_VERSION_EXTRA})
 
 set(PACKAGE "vlc")
+set(PACKAGE_NAME "vlc") #for gettext
 set(PACKAGE_VERSION "${VLC_VERSION}")
 set(PACKAGE_STRING "vlc")
 set(VERSION_MESSAGE "vlc-${VLC_VERSION}")
@@ -134,8 +136,8 @@ find_package (Threads)
 
 set(CMAKE_REQUIRED_LIBRARIES c)
 set(CMAKE_EXTRA_INCLUDE_FILES string.h)
-vlc_check_functions_exist(strcpy strcasecmp)
-vlc_check_functions_exist(strcasestr strdup)
+vlc_check_functions_exist(strcpy strcasecmp strncasecmp)
+vlc_check_functions_exist(strcasestr stristr strdup)
 vlc_check_functions_exist(strndup stricmp strnicmp)
 vlc_check_functions_exist(atof strtoll atoll lldiv)
 vlc_check_functions_exist(strlcpy stristr strnlen strsep)
@@ -175,6 +177,10 @@ set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_EXTRA_INCLUDE_FILES sys/mman.h)
 vlc_check_functions_exist(mmap)
+set(CMAKE_EXTRA_INCLUDE_FILES)
+
+set(CMAKE_EXTRA_INCLUDE_FILES locale.h)
+vlc_check_functions_exist(uselocale)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_REQUIRED_LIBRARIES)
@@ -503,7 +509,12 @@ if(QT4_FOUND)
   include_directories(${QT_INCLUDES})
   vlc_check_include_files (qt.h)
   vlc_enable_modules(qt4)
-  vlc_add_module_compile_flag(qt4 ${QT_CFLAGS} )
+  #execute_process leaves the trailing newline appended to the variable, unlike exec_program
+  #execute_process( COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=prefix QtCore OUTPUT_VARIABLE QT4LOCALEDIR)
+  exec_program( ${PKG_CONFIG_EXECUTABLE} ARGS --variable=prefix QtCore OUTPUT_VARIABLE QT4LOCALEDIR)
+  set(QT4LOCALEDIR ${QT4LOCALEDIR}/share/qt4/translations )
+  vlc_add_module_compile_flag(qt4 ${QT_CFLAGS})
+  vlc_add_module_compile_flag(qt4 -DQT4LOCALEDIR=\\\\"${QT4LOCALEDIR}\\\\" )
   vlc_module_add_link_libraries(qt4 ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 
   # Define our own qt4_wrap_ui macro to match wanted behaviour
@@ -567,6 +578,7 @@ if(Live555_FOUND)
   vlc_module_add_link_libraries(live555 ${Live555_LIBRARIES})
 endif(Live555_FOUND)
 
+set(CURSES_NEED_NCURSES TRUE)
 find_package(Curses)
 if(CURSES_LIBRARIES)
   vlc_enable_modules(ncurses)

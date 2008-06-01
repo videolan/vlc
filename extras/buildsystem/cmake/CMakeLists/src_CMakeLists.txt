@@ -6,7 +6,11 @@ add_definitions(-DPLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/lib/vlc")
 add_definitions(-DDATA_PATH="${CMAKE_INSTALL_PREFIX}/share/vlc")
 
 # vlc
-add_executable(vlc vlc.c)
+if(SYS_WIN32)
+  add_executable(vlc winvlc.c)
+else(SYS_WIN32)
+  add_executable(vlc vlc.c)
+endif(SYS_WIN32)
 target_link_libraries(vlc libvlccore libvlc)
 
 # libvlccore
@@ -20,7 +24,6 @@ set( SOURCES_libvlccore_dirent extras/dirent.c )
 set( SOURCES_libvlccore_getopt misc/getopt.c misc/getopt.h misc/getopt1.c )
 set( SOURCES_libvlccore_common
     libvlc.c
-    libvlc-common.c
     libvlc.h
     libvlc-module.c
     interface/interface.c
@@ -107,6 +110,7 @@ set( SOURCES_libvlccore_common
     misc/cpu.c
     config/configuration.h
     config/core.c
+    config/dirs.c
     config/chain.c
     config/file.c
     config/intf.c
@@ -125,6 +129,7 @@ set( SOURCES_libvlccore_common
     input/vlmshell.c
     misc/xml.c
     misc/devices.c
+    version.c
     extras/libc.c
     ${CMAKE_BINARY_DIR}/include/vlc_about.h )
 

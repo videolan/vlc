@@ -35,7 +35,9 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
 add_subdirectory(libs/loader)
 add_subdirectory(src)
 add_subdirectory(modules)
-add_subdirectory(po)
+if(ENABLE_NLS)
+  add_subdirectory(po)
+endif(ENABLE_NLS)
 add_subdirectory(test)
 
 # Enable uninstall

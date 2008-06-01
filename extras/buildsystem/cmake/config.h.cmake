@@ -286,6 +286,7 @@
 #cmakedefine HAVE_UNISTD_H
 #cmakedefine HAVE_UNSIGNED_LONG_LONG
 #cmakedefine HAVE_UNSIGNED_LONG_LONG_INT
+#cmakedefine HAVE_USELOCALE
 #cmakedefine HAVE_VASPRINTF
 #cmakedefine HAVE_VA_COPY
 #cmakedefine HAVE_VCDINFO
