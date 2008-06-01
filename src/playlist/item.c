@@ -112,6 +112,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 static void input_item_changed( const vlc_event_t * p_event,
                                 void * user_data )
 {
+    (void)p_event;
     playlist_item_t * p_item = user_data;
     var_SetInteger( p_item->p_playlist,
                     "item-change", p_item->i_id );
@@ -128,11 +129,11 @@ static void install_input_item_observer( playlist_item_t * p_item )
                       p_item );
     vlc_event_attach( &p_item->p_input->event_manager,
                       vlc_InputItemDurationChanged,
-                      input_item_meta_changed,
+                      input_item_changed,
                       p_item );
     vlc_event_attach( &p_item->p_input->event_manager,
                       vlc_InputItemMetaChanged,
-                      input_item_meta_changed,
+                      input_item_changed,
                       p_item );
 }
 
@@ -140,11 +141,11 @@ static void uninstall_input_item_observer( playlist_item_t * p_item )
 {
     vlc_event_detach( &p_item->p_input->event_manager,
                       vlc_InputItemMetaChanged,
-                      input_item_meta_changed,
+                      input_item_changed,
                       p_item );
     vlc_event_detach( &p_item->p_input->event_manager,
                       vlc_InputItemDurationChanged,
-                      input_item_meta_changed,
+                      input_item_changed,
                       p_item );
     vlc_event_detach( &p_item->p_input->event_manager,
                       vlc_InputItemSubItemAdded,
