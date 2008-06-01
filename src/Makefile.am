@@ -357,7 +357,7 @@ SOURCES_libvlc_common = \
 	misc/variables.h \
 	misc/variables.c \
 	misc/error.c \
-	misc/variables.h \
+	misc/update.h \
 	misc/update.c \
 	misc/xml.c \
 	misc/devices.c \
