@@ -25,6 +25,7 @@
 # include "config.h"
 #endif
 
+#include "mediacontrol_internal.h"
 #include <vlc/mediacontrol.h>
 
 #include <vlc/libvlc.h>
@@ -36,7 +37,6 @@
 #include <vlc_aout.h>
 #include <vlc_input.h>
 #include <vlc_osd.h>
-#include "mediacontrol_internal.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>

@@ -25,12 +25,12 @@
 # include "config.h"
 #endif
 
+#include "mediacontrol_internal.h"
 #include <vlc/mediacontrol.h>
 
 #include <vlc_common.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
-#include "mediacontrol_internal.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
