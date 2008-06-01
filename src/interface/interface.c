@@ -217,7 +217,12 @@ static void RunInterface( intf_thread_t *p_intf )
         if( p_intf->pf_run )
             p_intf->pf_run( p_intf );
         else
-            while( vlc_object_lock_and_wait( p_intf ) == 0 );
+        {
+            vlc_object_lock( p_intf );
+            while( vlc_object_alive( p_intf ) )
+                vlc_object_wait( p_intf );
+            vlc_object_unlock( p_intf );
+        }
 
         /* Reset play on start status */
         p_intf->b_play = false;
