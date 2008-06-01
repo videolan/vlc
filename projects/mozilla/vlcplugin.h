@@ -28,7 +28,7 @@
 #ifndef __VLCPLUGIN_H__
 #define __VLCPLUGIN_H__
 
-#include <vlc/libvlc.h>
+#include <vlc/vlc.h>
 #include <npapi.h>
 #include "control/nporuntime.h"
 

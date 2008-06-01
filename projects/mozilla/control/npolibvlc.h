@@ -23,7 +23,7 @@
 /*
 ** defined runtime script objects
 */
-#include <vlc/libvlc.h>
+#include <vlc/vlc.h>
 
 #include "nporuntime.h"
 
