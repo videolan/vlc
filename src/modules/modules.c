@@ -920,7 +920,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 #endif
 
     /* If the user provided a plugin path, we add it to the list */
-    char * userpaths = config_GetPsz( p_this, "plugin-path" );
+    char *userpaths = config_GetPsz( p_this, "plugin-path" );
     char *paths_iter;
 
     for( paths_iter = userpaths; paths_iter; )
@@ -946,6 +946,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     }
 
     vlc_array_destroy( arraypaths );
+    free( userpaths );
 }
 
 /*****************************************************************************
