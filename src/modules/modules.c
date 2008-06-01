@@ -927,7 +927,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     {
         path = copy_next_paths_token( paths_iter, &paths_iter );
         if( path )
-            vlc_array_append( arraypaths, strdup( path ) );
+            vlc_array_append( arraypaths, path );
     }
 
     count = vlc_array_count( arraypaths );
