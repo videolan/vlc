@@ -88,6 +88,7 @@ typedef struct held_list_t
     struct held_list_t *next;
     vlc_object_t *obj;
 } held_list_t;
+static void held_objects_destroy (void *);
 #endif
 
 /*****************************************************************************
@@ -152,7 +153,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         vlc_mutex_init( &structure_lock );
 #ifndef NDEBUG
         /* TODO: use the destruction callback to track ref leaks */
-        vlc_threadvar_create( &held_objects, NULL );
+        vlc_threadvar_create( &held_objects, held_objects_destroy );
 #endif
     }
     else
@@ -384,6 +385,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
         /* We are the global object ... no need to lock. */
         vlc_mutex_destroy( &structure_lock );
 #ifndef NDEBUG
+        held_objects_destroy( vlc_threadvar_get( &held_objects ) );
         vlc_threadvar_delete( &held_objects );
 #endif
     }
@@ -796,6 +798,7 @@ void __vlc_object_yield( vlc_object_t *p_this )
 #ifndef NDEBUG
     /* Update the list of referenced objects */
     /* Using TLS, so no need to lock */
+    /* The following line may leak memory if a thread leaks objects. */
     held_list_t *newhead = malloc (sizeof (*newhead));
     held_list_t *oldhead = vlc_threadvar_get (&held_objects);
     newhead->next = oldhead;
@@ -1593,5 +1596,27 @@ void vlc_refcheck (vlc_object_t *obj)
 
     if (++errors == 100)
         fprintf (stderr, "Too many reference errors!\n");
+}
+
+static void held_objects_destroy (void *data)
+{
+    held_list_t *hl = vlc_threadvar_get (&held_objects);
+    vlc_object_t *caller = vlc_threadobj ();
+
+    while (hl != NULL)
+    {
+        held_list_t *buf = hl->next;
+        vlc_object_t *obj = hl->obj;
+
+        fprintf (stderr, "The %s %s thread object leaked a reference to...\n"
+                         "the %s %s object.\n",
+                 caller && caller->psz_object_name
+                     ? caller->psz_object_name : "unnamed",
+                 caller ? caller->psz_object_type : "main",
+                 obj->psz_object_name ? obj->psz_object_name : "unnamed",
+                 obj->psz_object_type);
+        free (hl);
+        hl = buf;
+    }
 }
 #endif
