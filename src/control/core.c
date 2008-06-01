@@ -187,17 +187,17 @@ int libvlc_get_vlc_id( libvlc_instance_t *p_instance )
     return p_instance->p_libvlc_int->i_object_id;
 }
 
-const char * libvlc_get_version()
+const char * libvlc_get_version(void)
 {
     return VLC_Version();
 }
 
-const char * libvlc_get_compiler()
+const char * libvlc_get_compiler(void)
 {
     return VLC_Compiler();
 }
 
-const char * libvlc_get_changeset()
+const char * libvlc_get_changeset(void)
 {
     return VLC_Changeset();
 }
