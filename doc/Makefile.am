@@ -59,7 +59,9 @@ $(CHANGELOGS): Makefile.am
 	fi
 
 # This one needs to be rebuilt all the time :)
-.PHONY: ChangeLog-2008
-#
+.PHONY: ChangeLog-2008 changelogs
+
+changelogs: $(CHANGELOGS)
+
 #distclean-hook:
 #	test "$(srcdir)" = "$(builddir)" || rm -f -- $(CHANGELOGS)
