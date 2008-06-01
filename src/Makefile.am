@@ -6,7 +6,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 NULL =
 EXTRA_DIST = extras/COPYING modules/builtin.h.in \
-	vlc-control.pc.in \
+	libvlc.pc.in \
 	vlc-plugin.pc.in \
 	libvlc.sym \
 	libvlccore.sym
@@ -145,7 +145,7 @@ modules/modules.c: modules/builtin.h
 ###############################################################################
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = vlc-control.pc vlc-plugin.pc
+pkgconfig_DATA = libvlc.pc vlc-plugin.pc
 CLEANFILES += $(pkgconfig_DATA)
 
 .pc.in.pc: $(top_builddir)/config.status
