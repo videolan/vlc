@@ -2408,7 +2408,7 @@ then
     
 
   AC_CACHE_CHECK([for new linux/videodev2.h],
-      [new_linux_videodev2_h],
+      [ac_cv_new_linux_videodev2_h],
       [AC_TRY_COMPILE([
           #include <sys/types.h>
           #   ifdef VIDEODEV2_H_FILE
@@ -2418,9 +2418,9 @@ then
 	  #   endif
 	  ],
           [struct v4l2_ext_controls ctrls; ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG; ],
-          new_linux_videodev2_h=yes,
-          new_linux_videodev2_h=no)])
-  if test "${new_linux_videodev2_h}" != "no"; then
+          ac_cv_new_linux_videodev2_h=yes,
+          ac_cv_new_linux_videodev2_h=no)])
+  if test "${ac_cv_new_linux_videodev2_h}" != "no"; then
     AC_DEFINE(HAVE_NEW_LINUX_VIDEODEV2_H, 1, [Define if new linux/videodev2.h present])
   fi
 fi
