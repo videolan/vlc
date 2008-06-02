@@ -26,6 +26,7 @@ include/vlc_es_out.h
 include/vlc_events.h
 include/vlc_filter.h
 include/vlc_fixups.h
+include/vlc_gcrypt.h
 include/vlc_httpd.h
 include/vlc_image.h
 include/vlc_input.h
@@ -80,6 +81,7 @@ src/config/chain.c
 src/config/cmdline.c
 src/config/configuration.h
 src/config/core.c
+src/config/dirs.c
 src/config/file.c
 src/config/intf.c
 src/control/audio.c
@@ -127,6 +129,7 @@ src/input/subtitles.c
 src/input/var.c
 src/input/vlm.c
 src/input/vlm_internal.h
+src/input/vlmshell.c
 src/interface/interaction.c
 src/interface/interface.c
 src/interface/interface.h
@@ -143,14 +146,17 @@ src/misc/devices.c
 src/misc/error.c
 src/misc/events.c
 src/misc/image.c
+src/misc/linux_specific.c
 src/misc/md5.c
 src/misc/messages.c
 src/misc/mtime.c
+src/misc/not_specific.c
 src/misc/objects.c
 src/misc/rand.c
 src/misc/stats.c
 src/misc/threads.c
 src/misc/update.c
+src/misc/update.h
 src/misc/variables.c
 src/misc/variables.h
 src/misc/win32_specific.c
@@ -169,6 +175,7 @@ src/network/rootwrap.c
 src/network/tcp.c
 src/network/tls.c
 src/network/udp.c
+src/network/winsock.c
 src/osd/osd.c
 src/osd/osd_text.c
 src/osd/osd_widgets.c
@@ -188,6 +195,7 @@ src/stream_output/sap.c
 src/stream_output/sdp.c
 src/stream_output/stream_output.c
 src/stream_output/stream_output.h
+src/test/block.c
 src/test/dictionary.c
 src/test/headers.c
 src/test/i18n_atof.c
@@ -199,6 +207,7 @@ src/text/iso_lang.c
 src/text/strings.c
 src/text/unicode.c
 src/text/wincp.c
+src/version.c
 src/video_output/video_output.c
 src/video_output/video_text.c
 src/video_output/video_widgets.c
@@ -207,6 +216,7 @@ src/video_output/vout_pictures.c
 src/video_output/vout_pictures.h
 src/video_output/vout_subpictures.c
 src/vlc.c
+src/winvlc.c
 
 # modules
 modules/access/bda/bda.c
@@ -265,9 +275,11 @@ modules/access_output/bonjour.h
 modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http.c
+modules/access_output/rtmp.c
 modules/access_output/shout.c
 modules/access_output/udp.c
 modules/access/pvr.c
+modules/access/qtcapture.m
 modules/access/rtmp/access.c
 modules/access/rtmp/rtmp_amf_flv.c
 modules/access/rtmp/rtmp_amf_flv.h
@@ -388,15 +400,17 @@ modules/codec/dvbsub.c
 modules/codec/faad.c
 modules/codec/fake.c
 modules/codec/ffmpeg/audio.c
+modules/codec/ffmpeg/avcodec.c
+modules/codec/ffmpeg/avformat.c
 modules/codec/ffmpeg/chroma.c
 modules/codec/ffmpeg/deinterlace.c
 modules/codec/ffmpeg/demux.c
 modules/codec/ffmpeg/encoder.c
-modules/codec/ffmpeg/ffmpeg.c
 modules/codec/ffmpeg/ffmpeg.h
 modules/codec/ffmpeg/mux.c
 modules/codec/ffmpeg/postprocess.c
 modules/codec/ffmpeg/scale.c
+modules/codec/ffmpeg/swscale.c
 modules/codec/ffmpeg/video.c
 modules/codec/ffmpeg/video_filter.c
 modules/codec/flac.c
@@ -410,6 +424,7 @@ modules/codec/png.c
 modules/codec/quicktime.c
 modules/codec/rawvideo.c
 modules/codec/realaudio.c
+modules/codec/realvideo.c
 modules/codec/sdl_image.c
 modules/codec/speex.c
 modules/codec/spudec/parse.c
@@ -462,6 +477,7 @@ modules/control/netsync.c
 modules/control/ntservice.c
 modules/control/rc.c
 modules/control/showintf.c
+modules/control/signals.c
 modules/control/telnet.c
 modules/control/unimotion.c
 modules/control/unimotion.h
@@ -1146,7 +1162,6 @@ modules/stream_out/transrate/getvlc.h
 modules/stream_out/transrate/putvlc.h
 modules/stream_out/transrate/transrate.c
 modules/stream_out/transrate/transrate.h
-modules/video_chroma/chain.c
 modules/video_chroma/grey_yuv.c
 modules/video_chroma/i420_rgb16.c
 modules/video_chroma/i420_rgb8.c
@@ -1193,6 +1208,7 @@ modules/video_filter/atmo/AtmoZoneDefinition.h
 modules/video_filter/blendbench.c
 modules/video_filter/blend.c
 modules/video_filter/bluescreen.c
+modules/video_filter/chain.c
 modules/video_filter/clone.c
 modules/video_filter/colorthres.c
 modules/video_filter/crop.c
