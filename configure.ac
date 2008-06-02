@@ -1015,16 +1015,6 @@ if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
 fi
 
-dnl Check for -mdynamic-no-pic
-dnl AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
-dnl     [ac_cv_c_dynamic_no_pic],
-dnl     [CFLAGS="${CFLAGS_save} -mdynamic-no-pic"
-dnl      AC_TRY_COMPILE([],,ac_cv_c_dynamic_no_pic=yes, ac_cv_c_dynamic_no_pic=no)])
-dnl AS_IF([test "${ac_cv_c_dynamic_no_pic}" != "no"], [
-dnl     VLC_ADD_CFLAGS([builtin],[-mdynamic-no-pic])
-dnl     VLC_ADD_CFLAGS([libvlc],[-mdynamic-no-pic])
-dnl ])
-
 dnl Check for Darwin plugin linking flags
 AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
     [ac_cv_ld_darwin],
@@ -1033,20 +1023,6 @@ AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
 if test "${ac_cv_ld_darwin}" != "no"; then
     VLC_ADD_LDFLAGS([plugin],[-bundle -undefined error])
 fi
-
-dnl Check for standard plugin linking flags
-dnl BeOS' gcc needs -nostart instead of -shared, even if -shared isn't harmful (just a warning)
-dnl AS_IF([test "${SYS}" = "beos"], [
-dnl   VLC_ADD_LDFLAGS([plugin mozilla],[-nostart])
-dnl ], [
-dnl   AC_CACHE_CHECK([if \$CC accepts -shared],
-dnl         [ac_cv_ld_plugins],
-dnl         [CFLAGS="${CFLAGS_save} -shared"
-dnl        AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
-dnl   AS_IF([test "${ac_cv_ld_plugins}" != "no"], [
-dnl     VLC_ADD_LDFLAGS([plugin mozilla],[-shared])
-dnl   ])
-dnl ])
 
 dnl Checks for __attribute__(aligned()) directive
 AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
@@ -4206,29 +4182,6 @@ then
 fi
 
 dnl
-dnl  Qt Video output module
-dnl  (disabled by default)
-dnl
-dnl AC_ARG_ENABLE(qt_video,
-dnl   [  --enable-qt_video            QT Video Output support (default disabled)])
-dnl if test "${enable_qt_video}" = "yes"
-dnl then
-dnl  VLC_ADD_PLUGIN([qt_video])
-dnl  VLC_ADD_LIBS([qt_video],[-L${QTDIR}/lib])
-dnl  LDFLAGS="${LDFLAGS_save} ${LDFLAGS_qt_video}"
-dnl   AC_CHECK_LIB(qt-mt,main,[
-dnl    VLC_ADD_LIBS([qt_video],[-lqt-mt])
-dnl  ],[
-dnl    AC_CHECK_LIB(qt,main,[
-dnl      VLC_ADD_LIBS([qt_video],[-lqt])
-dnl    ])
-dnl  ])
-dnl  NEED_QTE_MAIN=yes
-dnl  LDFLAGS="${LDFLAGS_save}"
-dnl  VLC_ADD_CXXFLAGS([qt_video],[-I/usr/include/qt3 -I/usr/include/qt -I${QTDIR}/include])
-dnl fi
-
-dnl
 dnl Roku HD1000 Video output module
 dnl
 AC_ARG_ENABLE(hd1000v,
@@ -4832,75 +4785,6 @@ if test "${enable_skins2}" = "yes" ||
 fi
 AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes"])
 
-dnl dnl
-dnl dnl  Gtk+ module
-dnl dnl
-dnl AC_ARG_ENABLE(gtk,
-dnl   [  --enable-gtk            Gtk+ support (default enabled)])
-dnl if test "${enable_gtk}" != "no"
-dnl then
-dnl   GTK_PATH="${PATH}"
-dnl   AC_ARG_WITH(gtk-config-path,
-dnl     [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
-dnl     [ if test "${with_gtk_config_path}" != "no"
-dnl       then
-dnl         GTK_PATH="${with_gtk_config_path}:${PATH}"
-dnl       fi ])
-dnl   # look for gtk-config
-dnl   AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, ${GTK_PATH})
-dnl   GTK_CONFIG=${GTK12_CONFIG}
-dnl   if test "${GTK_CONFIG}" = "no"
-dnl   then
-dnl     AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
-dnl   fi
-dnl   if test "${GTK_CONFIG}" != "no"
-dnl   then
-dnl     if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
-dnl     then
-dnl       AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-gtk.])
-dnl     fi
-dnl     if test "${SYS}" != "mingw32"; then
-dnl       VLC_ADD_CFLAGS([gtk],[`${GTK_CONFIG} --cflags gtk gthread`])
-dnl       VLC_ADD_LIBS([gtk],[`${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`])
-dnl     else
-dnl       VLC_ADD_CFLAGS([gtk],[`${GTK_CONFIG} --cflags gtk`])
-dnl       VLC_ADD_LIBS([gtk],[`${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`])
-dnl     fi
-dnl     # now look for the gtk.h header
-dnl     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_gtk}"
-dnl     ac_cv_gtk_headers=yes
-dnl     AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
-dnl       ac_cv_gtk_headers=no
-dnl       echo "Cannot find gtk development headers."
-dnl     ])
-dnl     if test "${ac_cv_gtk_headers}" = "yes"
-dnl     then
-dnl       VLC_ADD_PLUGIN([gtk])
-dnl       if test "${SYS}" != "mingw32"; then
-dnl         NEED_GTK_MAIN=yes
-dnl       fi
-dnl       ALIASES="${ALIASES} gvlc"
-dnl     fi
-dnl     CPPFLAGS="${CPPFLAGS_save}"
-dnl   fi
-dnl fi
-dnl 
-dnl
-dnl  Gtk+2 module ! Disabled for now as it is unusable and confuses users
-dnl
-dnl AC_ARG_ENABLE(gtk2,
-dnl   [  --enable-gtk2           Gtk2 support (default disabled)])
-dnl if test "${enable_gtk2}" = "yes"
-dnl then
-dnl   PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
-dnl   VLC_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
-dnl   VLC_ADD_LIBS([gtk2],[${GTK2_LIBS}])
-dnl   VLC_ADD_PLUGIN([gtk2])
-dnl   if test "${SYS}" != "mingw32"; then
-dnl     NEED_GTK2_MAIN=yes
-dnl   fi
-dnl fi
-
 dnl
 dnl  PDA Gtk+2 module
 dnl
@@ -4922,56 +4806,6 @@ then
   fi
 fi
 AM_CONDITIONAL(BUILD_PDA, [test "${enable_pda}" = "yes"])
-
-dnl dnl
-dnl dnl  Gnome module
-dnl dnl
-dnl AC_ARG_ENABLE(gnome,
-dnl   [  --enable-gnome          Gnome interface support (default disabled)],
-dnl   [if test "${enable_gnome}" = "yes"; then
-dnl     # look for gnome-config
-dnl     AC_PATH_PROG(GNOME_CONFIG, gnome-config, no)
-dnl     if test -x ${GNOME_CONFIG}
-dnl     then
-dnl        VLC_ADD_CFLAGS([gnome],[`${GNOME_CONFIG} --cflags gtk gnomeui`])
-dnl        VLC_ADD_LIBS([gnome],[`${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`])
-dnl     fi
-dnl     # now look for the gnome.h header
-dnl     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_gnome}"
-dnl     AC_CHECK_HEADERS(gnome.h, [
-dnl       VLC_ADD_PLUGIN([gnome])
-dnl       NEED_GTK_MAIN=yes
-dnl       NEED_GNOME_MAIN=yes
-dnl       ALIASES="${ALIASES} gnome-vlc"
-dnl       dnl We need this because of some moronic gnomesupport.h flavours
-dnl       AC_MSG_CHECKING(for strndup in gnome.h)
-dnl       AC_EGREP_HEADER(strndup,gnome.h,[
-dnl         AC_MSG_RESULT(yes)
-dnl         AC_DEFINE(STRNDUP_IN_GNOME_H, 1,
-dnl                   Define if <gnome.h> defines strndup.)],[
-dnl         AC_MSG_RESULT(no)])
-dnl      ],[
-dnl       AC_MSG_ERROR([Can't find gnome headers. Please install the gnome
-dnl developement tools or remove the --enable-gnome option])
-dnl      ])
-dnl     CPPFLAGS="${CPPFLAGS_save}"
-dnl   fi])
-
-dnl
-dnl  Gnome2 module ! Disabled for know as it is unuseable and confuses users
-dnl
-dnl AC_ARG_ENABLE(gnome2,
-dnl   [  --enable-gnome2         Gnome2 support (default disabled)])
-dnl if test "${enable_gnome2}" = "yes"
-dnl then
-dnl   PKG_CHECK_MODULES(GNOME2, [libgnomeui-2.0])
-dnl   VLC_ADD_CFLAGS([gnome2],[${GNOME2_CFLAGS}])
-dnl   VLC_ADD_LIBS([gnome2],[${GNOME2_LIBS}])
-dnl   VLC_ADD_PLUGIN([gnome2])
-dnl   if test "${SYS}" != "mingw32"; then
-dnl     NEED_GNOME2_MAIN=yes
-dnl   fi
-dnl fi
 
 dnl
 dnl  wxWidgets module
@@ -5136,66 +4970,6 @@ then
     AC_MSG_ERROR([The skins2 module depends on the wxWidgets development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the wxWidgets development package or alternatively you can also configure with: --disable-wxwidgets --disable-skins2.])
   fi
 fi
-
-dnl dnl
-dnl dnl  Qt module
-dnl dnl
-dnl AC_ARG_ENABLE(qt,
-dnl   [  --enable-qt             Qt interface support (default disabled)],
-dnl   [if test "${enable_qt}" = "yes"; then
-dnl      VLC_ADD_PLUGIN([qt])
-dnl      ALIASES="${ALIASES} qvlc"
-dnl      VLC_ADD_LIBS([qt],[-L${QTDIR}/lib])
-dnl      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_qt}"
-dnl      AC_CHECK_LIB(qt-mt,main,[
-dnl        VLC_ADD_LIBS([qt],[-lqt-mt])
-dnl      ],[
-dnl        AC_CHECK_LIB(qt,main,[
-dnl          VLC_ADD_LIBS([qt],[-lqt])
-dnl        ])
-dnl      ])
-dnl      LDFLAGS="${LDFLAGS_save}"
-dnl      VLC_ADD_CXXFLAGS([qt],[-I/usr/include/qt3 -I/usr/include/qt -I${QTDIR}/include])
-dnl      if test -x ${QTDIR}/bin/moc
-dnl      then
-dnl        MOC=${QTDIR}/bin/moc
-dnl      else
-dnl        MOC=moc
-dnl      fi
-dnl    fi])
-dnl 
-dnl dnl
-dnl dnl  KDE module
-dnl dnl
-dnl AC_ARG_ENABLE(kde,
-dnl   [  --enable-kde            KDE interface support (default disabled)],
-dnl   [if test "${enable_kde}" = "yes"; then
-dnl      VLC_ADD_PLUGIN([kde])
-dnl      ALIASES="${ALIASES} kvlc"
-dnl      VLC_ADD_LIBS([kde],[-L${KDEDIR}/lib])
-dnl      dnl Check for -lkfile (only in KDE 2) or -lkdeui -lkio (KDE 3)
-dnl      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
-dnl      AC_CHECK_LIB(kfile,main,[
-dnl        VLC_ADD_LIBS([kde],[-lkfile])
-dnl      ])
-dnl      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
-dnl      AC_CHECK_LIB(kdeui,main,[
-dnl        VLC_ADD_LIBS([kde],[-lkdeui])
-dnl      ])
-dnl      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
-dnl      AC_CHECK_LIB(kio,main,[
-dnl        VLC_ADD_LIBS([kde],[-lkio])
-dnl      ])
-dnl      LDFLAGS="${LDFLAGS_save}"
-dnl      VLC_ADD_CXXFLAGS([kde],[-I/usr/include/kde -I/usr/include/qt3 -I/usr/include/qt])
-dnl      VLC_ADD_CXXFLAGS([kde],[-I${KDEDIR}/include -I${QTDIR}/include])
-dnl      if test -x ${QTDIR}/bin/moc
-dnl      then
-dnl        MOC=${QTDIR}/bin/moc
-dnl      else
-dnl        MOC=moc
-dnl      fi
-dnl    fi])
 
 dnl
 dnl  Opie QT embedded module
