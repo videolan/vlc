@@ -790,5 +790,4 @@ static void DeleteFilter( filter_t * p_filter )
     es_format_Clean( &p_filter->fmt_out );
 
     vlc_object_release( p_filter );
-    p_filter = NULL;
 }
