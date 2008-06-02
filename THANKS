@@ -95,9 +95,10 @@ Geoffroy Couprie <geo dot couprie -- gmail # com> - Podcast fix
 Georgi Chorbadzhiyski <gf at unixsol dot org> - HTTP access error handling fix
 Gisle Vanem <giva at bgnet dot no>  - gettimeoffay under win32
 Glen Gray <slaine at slaine do rog> - RTSP keepalive
+Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
+Gorana Milicevic <gorana.milicevic at gmail dot com> - Serbian localisation
 Greg Farrell <greg at gregfarell dot org> - rc interface "enqueue" command
 Gregory Hazel <ghazel at gmail dot com> - wxWidgets fixes and improvements
-Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
 Han HoJoong <0demon0 at paran dot com> - Korean translation
 Hans Lambermont <hans dot lambermont at newtec dot eu> - Syslog improvements
@@ -150,6 +151,7 @@ Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
 Marco Munderloh <Marco.Munderloh at web.de> - HTTP fix for Win32 to URL filenames
 Marián Hikaník <podnety _at_ mojepreklady _dot_ net> - Slovak localisation
 Mark Gritter <mgritter at kealia.com> - fix for netlist packet leak in demuxPSI
+Marko Uskokovic <uskokovic at etf dot bg.ac.yu> - Serbian localisation
 Markus Kern <markus-kern at gmx dot net> - video output window fixes (win32)
 Markus Kuespert <ltlBeBoy at beosmail.com> - BeOS CSS support
 Martin Hamrle <hamrle 47 post d0t cz> - PulseAudio output module
