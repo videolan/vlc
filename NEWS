@@ -97,6 +97,7 @@ Decoders:
  * NellyMoser ASAO support
  * APE (Monkey audio) support
  * VBI & EBU (Teletext) support
+ * RealVideo support (with the RealVideo run-time)
 
 Subtitles:
  * Ogg/Kate subtitles support
