@@ -645,7 +645,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlc vorbis freetype mod mpc dmo quicktime realaudio galaktos opengl],[-lm])
+  VLC_ADD_LIBS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlc vorbis freetype mod mpc dmo quicktime realaudio realvideo galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol speex mono colorthres extract],[-lm])
@@ -3208,9 +3208,10 @@ dnl
 dnl  Real plugin
 dnl
 AC_ARG_ENABLE(real,
-  [  --enable-real           Real audio module (default disabled)])
+  [  --enable-real           Real media module (default disabled)])
 if test "${enable_real}" = "yes"; then
   VLC_ADD_PLUGIN([realaudio])
+  VLC_ADD_PLUGIN([realvideo])
 fi
 
 dnl
@@ -5637,6 +5638,8 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_LIBS([quicktime],[../../libs/loader/libloader.la -lpthread])
     VLC_ADD_CPPFLAGS([realaudio],[-I../../@top_srcdir@/libs/loader -DLOADER])
     VLC_ADD_LIBS([realaudio],[../../libs/loader/libloader.la])
+    VLC_ADD_CPPFLAGS([realvideo],[-I../../@top_srcdir@/libs/loader -DLOADER])
+    VLC_ADD_LIBS([realvideo],[../../libs/loader/libloader.la])
   ])
 
 AC_ARG_WITH(,[Components:])

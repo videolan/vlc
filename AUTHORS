@@ -459,3 +459,13 @@ D: skins module (core and win32 port)
 D: skins2 module (core and win32 port)
 S: France
 
+N: Yuehua Zhao
+E: zhao908@hotmail.com
+D: real video codec
+S: China
+
+N: Bo Wang
+E: silencewang@msn.com
+D: real file/rtsp pause and seek support
+S: China
+
