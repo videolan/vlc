@@ -6115,11 +6115,8 @@ AC_OUTPUT
 ${SHELL} ./config.status --file=vlc-config
 chmod 0755 vlc-config
 
-dnl echo "Enabled builtin modules :"
-dnl for a in `./vlc-config --target builtin` ; do echo $a; done | sed -e 's,modules\/\(.*\)\/lib\(.*\)\.a,\2 (\1),'
-
-dnl echo "Enabled plugin modules :"
-dnl for a in `./vlc-config --target plugin` ; do echo $a; done | sed -e 's,modules\/\(.*\)\/lib\(.*\)_plugin,\2 (\1),'
+/bin/echo -n "Enabled modules :"
+./vlc-config --list plugin
 
 dnl Shortcut to nice compile message
 rm -f compile
@@ -6154,8 +6151,6 @@ echo "build vlc executable  : no"
 fi
 echo "plugins/bindings      :${PLUGINS_BINDINGS}
 
-You can check which modules have been enabled 
-with \`./vlc-config --list plugin'.
 You can tune the compiler flags in vlc-config.
 To build vlc and its plugins, type \`./compile' or \`make'.
 "
