@@ -1824,7 +1824,7 @@ vlc_module_begin();
         change_need_restart();
 #endif
 
-#if defined(HAVE_DBUS_3)
+#if defined(HAVE_DBUS)
     add_bool( "one-instance", 0, NULL, ONEINSTANCE_DBUS_TEXT,
               ONEINSTANCE_DBUS_LONGTEXT, true );
     add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,

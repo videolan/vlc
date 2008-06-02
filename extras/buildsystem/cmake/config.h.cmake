@@ -57,9 +57,6 @@
 #cmakedefine HAVE_D3D9_H
 #cmakedefine HAVE_DAEMON
 #cmakedefine HAVE_DBUS
-#cmakedefine HAVE_DBUS_1
-#cmakedefine HAVE_DBUS_2
-#cmakedefine HAVE_DBUS_3
 #cmakedefine HAVE_DCGETTEXT
 #cmakedefine HAVE_DDRAW_H
 #cmakedefine HAVE_DECL_FEOF_UNLOCKED
@@ -122,7 +119,6 @@
 #cmakedefine HAVE_GMTIME_R
 #cmakedefine HAVE_GOOM_GOOM_H
 #cmakedefine HAVE_HAL
-#cmakedefine HAVE_HAL_1
 #cmakedefine HAVE_ICONV
 #cmakedefine HAVE_ID3TAG_H
 #cmakedefine HAVE_IF_NAMETOINDEX

@@ -861,20 +861,13 @@ AC_ARG_ENABLE(hal,
 if test "${enable_hal}" != "no"
 then
   PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
-    [ AC_DEFINE( HAVE_HAL_1, 1 , [Define if you have the new HAL library API])
+    [
       AC_DEFINE( HAVE_HAL, 1, [Define if you have the HAL library] )
       VLC_ADD_PLUGIN([hal])
       VLC_ADD_PLUGIN([probe_hal])
       VLC_ADD_LIBS([libvlc hal probe_hal],[$HAL_LIBS])
-      VLC_ADD_CFLAGS([libvlc hal probe_hal],[$HAL_CFLAGS])],   
-    dnl No hal 0.5 Test for 0.2
-    [ PKG_CHECK_MODULES( HAL, hal >= 0.2.97, 
-       [AC_DEFINE(HAVE_HAL, 1, [Define if you have the HAL library])
-        VLC_ADD_PLUGIN([hal])
-        VLC_ADD_LIBS([libvlc hal],[$HAL_LIBS])
-        VLC_ADD_CFLAGS([libvlc hal],[$HAL_CFLAGS])],
-       [AC_MSG_WARN(HAL library not found)])
-    ]
+      VLC_ADD_CFLAGS([libvlc hal probe_hal],[$HAL_CFLAGS])],
+    [AC_MSG_ERROR([libhal >= 0.5.0 was not found. Install libhal-dev ?])]
   )
 fi
 
@@ -887,10 +880,7 @@ if test "${enable_dbus}" != "no"
 then
   dnl api stable dbus
   PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.0.0,
-    [ AC_DEFINE( HAVE_DBUS_3, 1, [Define if you have the D-BUS library API >= 1.0.0] )
-      AC_DEFINE( HAVE_DBUS_2, 1, [Define if you have the D-BUS library API >= 0.92] )
-      AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30] )
-      AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
+    [ AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
       VLC_ADD_LIBS([screensaver libvlc],[$DBUS_LIBS])
       VLC_ADD_CFLAGS([screensaver libvlc],[$DBUS_CFLAGS])
       dnl Check for dbus control interface
@@ -912,49 +902,8 @@ then
         VLC_ADD_PLUGIN([inhibit])
         VLC_ADD_LIBS([inhibit],[$DBUS_LIBS])
         VLC_ADD_CFLAGS([inhibit],[$DBUS_CFLAGS])
-        ],
-    if ${PKG_CONFIG} --exists dbus-1
-    then
-      [AC_ARG_ENABLE(old-dbus,
-        [  --enable-old-dbus       Deprecated D-Bus support (default disabled)])]
-
-      if test "${enable_old_dbus}" != "yes"
-      then
-        echo ""
-        echo "****** WARNING **** WARNING ***** WARNING *************"
-        echo "*** Your D-Bus version is < 1.0.0"
-        echo "*** You are using old and buggy software and so"
-        echo "*** D-Bus support has been disabled."
-        echo "*** Please upgrade D-Bus : http://dbus.freedesktop.org"
-        echo "*** Alternatively you can force the use of your old and"
-        echo "*** buggy D-Bus version by specifying --enable-old-dbus"
-        echo "*******************************************************"
-        echo ""
-      else
-        dnl not too old dbus
-        [ PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.92,
-          [ AC_DEFINE( HAVE_DBUS_2, 1, [Define if you have the D-BUS library API >= 0.92] )
-            AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30] )
-            AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
-            VLC_ADD_LIBS([screensaver],[$DBUS_LIBS])
-            VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
-          dnl older dbus
-          [ PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
-            [ AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30 ] )
-              AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
-              VLC_ADD_LIBS([screensaver],[$DBUS_LIBS])
-              VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
-            dnl much older dbus
-            [ PKG_CHECK_MODULES( DBUS, dbus-1, 
-               [AC_DEFINE(HAVE_DBUS, 1, [Define if you have the D-BUS library])
-                VLC_ADD_LIBS([screensaver],[$DBUS_LIBS])
-                VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
-               [AC_MSG_WARN(DBUS library not found)])
-            ]
-          )]
-        )]
-      fi
-    fi
+    ],
+    [AC_MSG_ERROR([Couldn't find DBus >= 1.0.0, install libdbus-dev ?])]
   )
 fi
 ;;

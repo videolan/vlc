@@ -67,7 +67,7 @@
 #   include <locale.h>
 #endif
 
-#ifdef HAVE_DBUS_3
+#ifdef HAVE_DBUS
 /* used for one-instance mode */
 #   include <dbus/dbus.h>
 #endif
@@ -506,7 +506,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     system_Configure( p_libvlc, &i_argc, ppsz_argv );
 
 /* FIXME: could be replaced by using Unix sockets */
-#ifdef HAVE_DBUS_3
+#ifdef HAVE_DBUS
     dbus_threads_init_default();
 
     if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
@@ -806,7 +806,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     libvlc_InternalAddIntf( p_libvlc, "hotkeys,none", false );
 
-#ifdef HAVE_DBUS_3
+#ifdef HAVE_DBUS
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
     if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
@@ -1966,7 +1966,6 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     char *block_dev = NULL;
     dbus_bool_t b_dvd;
 
-#ifdef HAVE_HAL_1
     DBusConnection *p_connection = NULL;
     DBusError       error;
 
@@ -1982,41 +1981,20 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     }
     libhal_ctx_set_dbus_connection( ctx, p_connection );
     if( libhal_ctx_init( ctx, &error ) )
-#else
-    ctx = hal_initialize( NULL, FALSE );
-    if( ctx )
-#endif
-
     {
-#ifdef HAVE_HAL_1
         if( ( devices = libhal_get_all_devices( ctx, &i_devices, NULL ) ) )
-#else
-        if( ( devices = hal_get_all_devices( ctx, &i_devices ) ) )
-#endif
         {
             for( i = 0; i < i_devices; i++ )
             {
-#ifdef HAVE_HAL_1
                 if( !libhal_device_property_exists( ctx, devices[i],
                                                 "storage.cdrom.dvd", NULL ) )
-#else
-                if( !hal_device_property_exists( ctx, devices[ i ],
-                                                "storage.cdrom.dvd" ) )
-#endif
                 {
                     continue;
                 }
-#ifdef HAVE_HAL_1
                 b_dvd = libhal_device_get_property_bool( ctx, devices[ i ],
                                                  "storage.cdrom.dvd", NULL  );
                 block_dev = libhal_device_get_property_string( ctx,
                                 devices[ i ], "block.device" , NULL );
-#else
-                b_dvd = hal_device_get_property_bool( ctx, devices[ i ],
-                                                      "storage.cdrom.dvd" );
-                block_dev = hal_device_get_property_string( ctx, devices[ i ],
-                                                            "block.device" );
-#endif
                 if( b_dvd )
                 {
                     config_PutPsz( p_vlc, "dvd", block_dev );
@@ -2024,26 +2002,13 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
 
                 config_PutPsz( p_vlc, "vcd", block_dev );
                 config_PutPsz( p_vlc, "cd-audio", block_dev );
-#ifdef HAVE_HAL_1
                 libhal_free_string( block_dev );
-#else
-                hal_free_string( block_dev );
-#endif
             }
-#ifdef HAVE_HAL_1
             libhal_free_string_array( devices );
-#else
-            hal_free_string_array( devices );
-#endif
         }
-
-#ifdef HAVE_HAL_1
         libhal_ctx_shutdown( ctx, NULL );
         dbus_connection_unref( p_connection );
         libhal_ctx_free( ctx );
-#else
-        hal_shutdown( ctx );
-#endif
     }
     else
     {

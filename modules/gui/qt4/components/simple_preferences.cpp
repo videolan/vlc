@@ -497,7 +497,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.updatesDays->hide();
 #endif
             /* ONE INSTANCE options */
-#if defined( WIN32 ) || defined( HAVE_DBUS_3 ) || defined(__APPLE__)
+#if defined( WIN32 ) || defined( HAVE_DBUS ) || defined(__APPLE__)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL,
                     EnqueueOneInterfaceMode );

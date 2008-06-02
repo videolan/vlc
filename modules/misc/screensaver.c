@@ -47,18 +47,12 @@
 
 #ifdef HAVE_DBUS
 
-#define DBUS_API_SUBJECT_TO_CHANGE
 #include <dbus/dbus.h>
 
 #define GS_SERVICE   "org.gnome.ScreenSaver"
 #define GS_PATH      "/org/gnome/ScreenSaver"
 #define GS_INTERFACE "org.gnome.ScreenSaver"
 
-#endif
-
-/* this is for dbus < 0.3 */
-#ifndef HAVE_DBUS_1
-#define dbus_bus_name_has_owner(connection, name, err) dbus_bus_service_exists(connection, name, err)
 #endif
 
 /*****************************************************************************
@@ -123,11 +117,7 @@ static void Deactivate( vlc_object_t *p_this )
 
     if( p_intf->p_sys->p_connection )
     {
-#  ifdef HAVE_DBUS_2
         dbus_connection_unref( p_intf->p_sys->p_connection );
-#  else
-        dbus_connection_disconnect( p_intf->p_sys->p_connection );
-#  endif
     }
 
     free( p_intf->p_sys );
