@@ -867,7 +867,7 @@ then
       VLC_ADD_PLUGIN([probe_hal])
       VLC_ADD_LIBS([libvlc hal probe_hal],[$HAL_LIBS])
       VLC_ADD_CFLAGS([libvlc hal probe_hal],[$HAL_CFLAGS])],
-    [AC_MSG_ERROR([libhal >= 0.5.0 was not found. Install libhal-dev ?])]
+    [AC_MSG_WARN([libhal >= 0.5.0 was not found. Install libhal-dev ?])]
   )
 fi
 
