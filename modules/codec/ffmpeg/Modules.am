@@ -37,7 +37,6 @@ SOURCES_swscale = \
 	$(NULL)
 
 SOURCES_postproc = \
-	postproc.c \
 	postprocess.c \
 	$(NULL)
 
