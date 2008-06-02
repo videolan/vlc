@@ -46,7 +46,7 @@ static void Chain    ( filter_t *, picture_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( N_("Chroma conversions using a chain of chroma conversion modules") );
-    set_capability( "chroma", 1 );
+    set_capability( "video filter2", 1 );
     set_callbacks( Activate, Destroy );
 vlc_module_end();
 

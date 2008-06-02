@@ -71,16 +71,16 @@ vlc_module_begin();
 #if defined (MODULE_NAME_IS_i420_rgb)
     set_description( N_("I420,IYUV,YV12 to "
                        "RGB2,RV15,RV16,RV24,RV32 conversions") );
-    set_capability( "chroma", 80 );
+    set_capability( "video filter2", 80 );
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
     set_description( N_( "MMX I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") );
-    set_capability( "chroma", 100 );
+    set_capability( "video filter2", 100 );
     add_requirement( MMX );
 #elif defined (MODULE_NAME_IS_i420_rgb_sse2)
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") );
-    set_capability( "chroma", 120 );
+    set_capability( "video filter2", 120 );
     add_requirement( SSE2 );
 #endif
     set_callbacks( Activate, Deactivate );
@@ -113,7 +113,7 @@ static int Activate( vlc_object_t *p_this )
             {
 #if defined (MODULE_NAME_IS_i420_rgb)
                 case VLC_FOURCC('R','G','B','2'):
-                    p_filter->pf_video_filter_io = I420_RGB8;
+                    p_filter->pf_video_filter = I420_RGB8_Filter;
                     break;
 #endif
                 case VLC_FOURCC('R','V','1','5'):
@@ -126,7 +126,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R5G5B6 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R5G5B5");
-                        p_filter->pf_video_filter_io = I420_R5G5B5;
+                        p_filter->pf_video_filter = I420_R5G5B5_Filter;
                     }
                     else if( ( p_filter->fmt_out.video.i_rmask == 0xf800
                             && p_filter->fmt_out.video.i_gmask == 0x07e0
@@ -134,13 +134,13 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R5G6B5 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R5G6B5");
-                        p_filter->pf_video_filter_io = I420_R5G6B5;
+                        p_filter->pf_video_filter = I420_R5G6B5_Filter;
                     }
                     else
                         return VLC_EGENERIC;
 #else
                     // generic C chroma converter */
-                    p_filter->pf_video_filter_io = I420_RGB16;
+                    p_filter->pf_video_filter = I420_RGB16_Filter;
 #endif
                     break;
 
@@ -158,7 +158,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* A8R8G8B8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is A8R8G8B8");
-                        p_filter->pf_video_filter_io = I420_A8R8G8B8;
+                        p_filter->pf_video_filter = I420_A8R8G8B8_Filter;
                     }
                     else if( p_filter->fmt_out.video.i_rmask == 0xff000000
                           && p_filter->fmt_out.video.i_gmask == 0x00ff0000
@@ -166,7 +166,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R8G8B8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R8G8B8A8");
-                        p_filter->pf_video_filter_io = I420_R8G8B8A8;
+                        p_filter->pf_video_filter = I420_R8G8B8A8_Filter;
                     }
                     else if( p_filter->fmt_out.video.i_rmask == 0x0000ff00
                           && p_filter->fmt_out.video.i_gmask == 0x00ff0000
@@ -174,7 +174,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* B8G8R8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is B8G8R8A8");
-                        p_filter->pf_video_filter_io = I420_B8G8R8A8;
+                        p_filter->pf_video_filter = I420_B8G8R8A8_Filter;
                     }
                     else if( p_filter->fmt_out.video.i_rmask == 0x000000ff
                           && p_filter->fmt_out.video.i_gmask == 0x0000ff00
@@ -182,13 +182,13 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* A8B8G8R8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is A8B8G8R8");
-                        p_filter->pf_video_filter_io = I420_A8B8G8R8;
+                        p_filter->pf_video_filter = I420_A8B8G8R8_Filter;
                     }
                     else
                         return VLC_EGENERIC;
 #else
                     /* generic C chroma converter */
-                    p_filter->pf_video_filter_io = I420_RGB32;
+                    p_filter->pf_video_filter = I420_RGB32_Filter;
 #endif
                     break;
 
@@ -293,6 +293,19 @@ static void Deactivate( vlc_object_t *p_this )
     free( p_filter->p_sys->p_buffer );
     free( p_filter->p_sys );
 }
+
+#if defined (MODULE_NAME_IS_i420_rgb)
+VIDEO_FILTER_WRAPPER( I420_RGB8 )
+VIDEO_FILTER_WRAPPER( I420_RGB16 )
+VIDEO_FILTER_WRAPPER( I420_RGB32 )
+#else
+VIDEO_FILTER_WRAPPER( I420_R5G5B5 )
+VIDEO_FILTER_WRAPPER( I420_R5G6B5 )
+VIDEO_FILTER_WRAPPER( I420_A8R8G8B8 )
+VIDEO_FILTER_WRAPPER( I420_R8G8B8A8 )
+VIDEO_FILTER_WRAPPER( I420_B8G8R8A8 )
+VIDEO_FILTER_WRAPPER( I420_A8B8G8R8 )
+#endif
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 /*****************************************************************************

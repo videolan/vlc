@@ -46,13 +46,16 @@ static int  Activate ( vlc_object_t * );
 static void I422_I420( filter_t *, picture_t *, picture_t * );
 static void I422_YV12( filter_t *, picture_t *, picture_t * );
 static void I422_YUVA( filter_t *, picture_t *, picture_t * );
+static picture_t *I422_I420_Filter( filter_t *, picture_t * );
+static picture_t *I422_YV12_Filter( filter_t *, picture_t * );
+static picture_t *I422_YUVA_Filter( filter_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 60 );
+    set_capability( "video filter2", 60 );
     set_callbacks( Activate, NULL );
 vlc_module_end();
 
@@ -80,15 +83,15 @@ static int Activate( vlc_object_t *p_this )
                 case VLC_FOURCC('I','4','2','0'):
                 case VLC_FOURCC('I','Y','U','V'):
                 case VLC_FOURCC('J','4','2','0'):
-                    p_filter->pf_video_filter_io = I422_I420;
+                    p_filter->pf_video_filter = I422_I420_Filter;
                     break;
 
                 case VLC_FOURCC('Y','V','1','2'):
-                    p_filter->pf_video_filter_io = I422_YV12;
+                    p_filter->pf_video_filter = I422_YV12_Filter;
                     break;
 
                 case VLC_FOURCC('Y','U','V','A'):
-                    p_filter->pf_video_filter_io = I422_YUVA;
+                    p_filter->pf_video_filter = I422_YUVA_Filter;
                     break;
 
                 default:
@@ -103,6 +106,9 @@ static int Activate( vlc_object_t *p_this )
 }
 
 /* Following functions are local */
+VIDEO_FILTER_WRAPPER( I422_I420 )
+VIDEO_FILTER_WRAPPER( I422_YV12 )
+VIDEO_FILTER_WRAPPER( I422_YUVA )
 
 /*****************************************************************************
  * I422_I420: planar YUV 4:2:2 to planar I420 4:2:0 Y:U:V

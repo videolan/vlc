@@ -47,12 +47,17 @@ static void YVYU_I420           ( filter_t *, picture_t *, picture_t * );
 static void UYVY_I420           ( filter_t *, picture_t *, picture_t * );
 static void cyuv_I420           ( filter_t *, picture_t *, picture_t * );
 
+static picture_t *YUY2_I420_Filter    ( filter_t *, picture_t * );
+static picture_t *YVYU_I420_Filter    ( filter_t *, picture_t * );
+static picture_t *UYVY_I420_Filter    ( filter_t *, picture_t * );
+static picture_t *cyuv_I420_Filter    ( filter_t *, picture_t * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 80 );
+    set_capability( "video filter2", 80 );
     set_callbacks( Activate, NULL );
 vlc_module_end();
 
@@ -78,21 +83,21 @@ static int Activate( vlc_object_t *p_this )
             {
                 case VLC_FOURCC('Y','U','Y','2'):
                 case VLC_FOURCC('Y','U','N','V'):
-                    p_filter->pf_video_filter_io = YUY2_I420;
+                    p_filter->pf_video_filter = YUY2_I420_Filter;
                     break;
 
                 case VLC_FOURCC('Y','V','Y','U'):
-                    p_filter->pf_video_filter_io = YVYU_I420;
+                    p_filter->pf_video_filter = YVYU_I420_Filter;
                     break;
 
                 case VLC_FOURCC('U','Y','V','Y'):
                 case VLC_FOURCC('U','Y','N','V'):
                 case VLC_FOURCC('Y','4','2','2'):
-                    p_filter->pf_video_filter_io = UYVY_I420;
+                    p_filter->pf_video_filter = UYVY_I420_Filter;
                     break;
 
                 case VLC_FOURCC('c','y','u','v'):
-                    p_filter->pf_video_filter_io = cyuv_I420;
+                    p_filter->pf_video_filter = cyuv_I420_Filter;
                     break;
 
                 default:
@@ -107,6 +112,10 @@ static int Activate( vlc_object_t *p_this )
 }
 
 /* Following functions are local */
+VIDEO_FILTER_WRAPPER( YUY2_I420 )
+VIDEO_FILTER_WRAPPER( YVYU_I420 )
+VIDEO_FILTER_WRAPPER( UYVY_I420 )
+VIDEO_FILTER_WRAPPER( cyuv_I420 )
 
 /*****************************************************************************
  * YUY2_I420: packed YUY2 4:2:2 to planar YUV 4:2:0

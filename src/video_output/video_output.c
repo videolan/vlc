@@ -514,6 +514,13 @@ static void vout_Destructor( vlc_object_t * p_this )
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
  *****************************************************************************/
+static picture_t *get_pic( filter_t *p_filter )
+{
+    picture_t *p_pic = (picture_t *)p_filter->p_owner;
+    p_filter->p_owner = NULL;
+    return p_pic;
+}
+
 static int InitThread( vout_thread_t *p_vout )
 {
     int i, i_aspect_x, i_aspect_y;
@@ -672,9 +679,9 @@ static int InitThread( vout_thread_t *p_vout )
         p_chroma->fmt_out.video.i_lgshift = p_vout->output.i_lgshift;
         p_chroma->fmt_out.video.i_rbshift = p_vout->output.i_rbshift;
         p_chroma->fmt_out.video.i_lbshift = p_vout->output.i_lbshift;
-        msg_Err( p_vout, "HOLA! %4.4s\n", (char*)&p_chroma->fmt_in.video.i_chroma );
-        msg_Err( p_vout, "HOLA! %4.4s\n", (char*)&p_chroma->fmt_out.video.i_chroma );
-        p_chroma->p_module = module_Need( p_chroma, "chroma", NULL, 0 );
+        msg_Err( p_vout, "HOLA! %4.4s", (char*)&p_chroma->fmt_in.video.i_chroma );
+        msg_Err( p_vout, "HOLA! %4.4s", (char*)&p_chroma->fmt_out.video.i_chroma );
+        p_chroma->p_module = module_Need( p_chroma, "video filter2", NULL, 0 );
 
         if( p_chroma->p_module == NULL )
         {
@@ -687,6 +694,7 @@ static int InitThread( vout_thread_t *p_vout )
             vlc_mutex_unlock( &p_vout->change_lock );
             return VLC_EGENERIC;
         }
+        p_chroma->pf_vout_buffer_new = get_pic;
 
         msg_Dbg( p_vout, "indirect render, mapping "
                  "render pictures 0-%i to system pictures %i-%i",

@@ -60,7 +60,6 @@ struct filter_t
     config_chain_t *    p_cfg;
 
     picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
-    void                ( * pf_video_filter_io ) ( filter_t *, picture_t *, picture_t * ); /* Used by video filters with a preallocated output buffer (ie chroma conversion modules) */
     block_t *           ( * pf_audio_filter ) ( filter_t *, block_t * );
     void                ( * pf_video_blend )  ( filter_t *, picture_t *,
                                                 picture_t *, picture_t *,
@@ -92,5 +91,38 @@ struct filter_t
     /* Private structure for the owner of the decoder */
     filter_owner_sys_t *p_owner;
 };
+
+
+/**
+ * Create a picture_t *(*)( filter_t *, picture_t * ) compatible wrapper
+ * using a void (*)( filter_t *, picture_t *, picture_t * ) function
+ *
+ * Currently used by the chroma video filters
+ */
+#define VIDEO_FILTER_WRAPPER( name )                                    \
+    static picture_t *name ## _Filter ( filter_t *p_filter,             \
+                                        picture_t *p_pic )              \
+    {                                                                   \
+        picture_t *p_outpic = p_filter->pf_vout_buffer_new( p_filter ); \
+        if( !p_outpic )                                                 \
+        {                                                               \
+            msg_Warn( p_filter, "can't get output picture" );           \
+            if( p_pic->pf_release )                                     \
+                p_pic->pf_release( p_pic );                             \
+            return NULL;                                                \
+        }                                                               \
+                                                                        \
+        name( p_filter, p_pic, p_outpic );                              \
+                                                                        \
+        p_outpic->date = p_pic->date;                                   \
+        p_outpic->b_force = p_pic->b_force;                             \
+        p_outpic->i_nb_fields = p_pic->i_nb_fields;                     \
+        p_outpic->b_progressive = p_pic->b_progressive;                 \
+        p_outpic->b_top_field_first = p_pic->b_top_field_first;         \
+                                                                        \
+        if( p_pic->pf_release )                                         \
+            p_pic->pf_release( p_pic );                                 \
+        return p_outpic;                                                \
+    }
 
 #endif /* _VLC_FILTER_H */

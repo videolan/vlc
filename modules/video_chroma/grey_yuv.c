@@ -45,12 +45,15 @@ static int  Activate ( vlc_object_t * );
 static void GREY_I420( filter_t *, picture_t *, picture_t * );
 static void GREY_YUY2( filter_t *, picture_t *, picture_t * );
 
+static picture_t *GREY_I420_Filter( filter_t *, picture_t * );
+static picture_t *GREY_YUY2_Filter( filter_t *, picture_t * );
+
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
 vlc_module_begin();
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 80 );
+    set_capability( "video filter2", 80 );
     set_callbacks( Activate, NULL );
 vlc_module_end();
 
@@ -77,10 +80,10 @@ static int Activate( vlc_object_t *p_this )
             switch( p_filter->fmt_out.video.i_chroma )
             {
                 case VLC_FOURCC('I','4','2','0'):
-                    p_filter->pf_video_filter_io = GREY_I420;
+                    p_filter->pf_video_filter = GREY_I420_Filter;
                     break;
                 case VLC_FOURCC('Y','U','Y','2'):
-                    p_filter->pf_video_filter_io = GREY_YUY2;
+                    p_filter->pf_video_filter = GREY_YUY2_Filter;
                     break;
                 default:
                     return -1;
@@ -93,6 +96,9 @@ static int Activate( vlc_object_t *p_this )
 
     return 0;
 }
+
+VIDEO_FILTER_WRAPPER( GREY_I420 )
+VIDEO_FILTER_WRAPPER( GREY_YUY2 )
 
 /* Following functions are local */
 

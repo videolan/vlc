@@ -61,12 +61,18 @@ static int  Activate ( vlc_object_t * );
 static void I420_YUY2           ( filter_t *, picture_t *, picture_t * );
 static void I420_YVYU           ( filter_t *, picture_t *, picture_t * );
 static void I420_UYVY           ( filter_t *, picture_t *, picture_t * );
+static picture_t *I420_YUY2_Filter    ( filter_t *, picture_t * );
+static picture_t *I420_YVYU_Filter    ( filter_t *, picture_t * );
+static picture_t *I420_UYVY_Filter    ( filter_t *, picture_t * );
 #if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
 static void I420_IUYV           ( filter_t *, picture_t *, picture_t * );
 static void I420_cyuv           ( filter_t *, picture_t *, picture_t * );
+static picture_t *I420_IUYV_Filter    ( filter_t *, picture_t * );
+static picture_t *I420_cyuv_Filter    ( filter_t *, picture_t * );
 #endif
 #if defined (MODULE_NAME_IS_i420_yuy2)
 static void I420_Y211           ( filter_t *, picture_t *, picture_t * );
+static picture_t *I420_Y211_Filter    ( filter_t *, picture_t * );
 #endif
 
 #ifdef MODULE_NAME_IS_i420_yuy2_mmx
@@ -81,19 +87,19 @@ static const uint64_t i_80w   = 0x0000000080808080ULL;
 vlc_module_begin();
 #if defined (MODULE_NAME_IS_i420_yuy2)
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 80 );
+    set_capability( "video filter2", 80 );
 #elif defined (MODULE_NAME_IS_i420_yuy2_mmx)
     set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 100 );
+    set_capability( "video filter2", 100 );
     add_requirement( MMX );
 #elif defined (MODULE_NAME_IS_i420_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 120 );
+    set_capability( "video filter2", 120 );
     add_requirement( SSE2 );
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
     set_description(
             _("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 100 );
+    set_capability( "video filter2", 100 );
     add_requirement( ALTIVEC );
 #endif
     set_callbacks( Activate, NULL );
@@ -123,31 +129,31 @@ static int Activate( vlc_object_t *p_this )
             {
                 case VLC_FOURCC('Y','U','Y','2'):
                 case VLC_FOURCC('Y','U','N','V'):
-                    p_filter->pf_video_filter_io = I420_YUY2;
+                    p_filter->pf_video_filter = I420_YUY2_Filter;
                     break;
 
                 case VLC_FOURCC('Y','V','Y','U'):
-                    p_filter->pf_video_filter_io = I420_YVYU;
+                    p_filter->pf_video_filter = I420_YVYU_Filter;
                     break;
 
                 case VLC_FOURCC('U','Y','V','Y'):
                 case VLC_FOURCC('U','Y','N','V'):
                 case VLC_FOURCC('Y','4','2','2'):
-                    p_filter->pf_video_filter_io = I420_UYVY;
+                    p_filter->pf_video_filter = I420_UYVY_Filter;
                     break;
 #if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
                 case VLC_FOURCC('I','U','Y','V'):
-                    p_filter->pf_video_filter_io = I420_IUYV;
+                    p_filter->pf_video_filter = I420_IUYV_Filter;
                     break;
 
                 case VLC_FOURCC('c','y','u','v'):
-                    p_filter->pf_video_filter_io = I420_cyuv;
+                    p_filter->pf_video_filter = I420_cyuv_Filter;
                     break;
 #endif
 
 #if defined (MODULE_NAME_IS_i420_yuy2)
                 case VLC_FOURCC('Y','2','1','1'):
-                    p_filter->pf_video_filter_io = I420_Y211;
+                    p_filter->pf_video_filter = I420_Y211_Filter;
                     break;
 #endif
 
@@ -174,6 +180,17 @@ static inline unsigned long long read_cycles(void)
 #endif
 
 /* Following functions are local */
+
+VIDEO_FILTER_WRAPPER( I420_YUY2 )
+VIDEO_FILTER_WRAPPER( I420_YVYU )
+VIDEO_FILTER_WRAPPER( I420_UYVY )
+#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
+VIDEO_FILTER_WRAPPER( I420_IUYV )
+#endif
+#if defined (MODULE_NAME_IS_i420_yuy2)
+VIDEO_FILTER_WRAPPER( I420_Y211 )
+#endif
+
 /*****************************************************************************
  * I420_YUY2: planar YUV 4:2:0 to packed YUYV 4:2:2
  *****************************************************************************/

@@ -43,6 +43,7 @@
  *****************************************************************************/
 static int  Activate   ( vlc_object_t * );
 static void I420_YMGA  ( filter_t *, picture_t *, picture_t * );
+static picture_t *I420_YMGA_Filter( filter_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -50,10 +51,10 @@ static void I420_YMGA  ( filter_t *, picture_t *, picture_t * );
 vlc_module_begin();
 #if defined (MODULE_NAME_IS_i420_ymga)
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 80 );
+    set_capability( "video filter2", 80 );
 #elif defined (MODULE_NAME_IS_i420_ymga_mmx)
     set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "chroma", 100 );
+    set_capability( "video filter2", 100 );
     add_requirement( MMX );
 #endif
     set_callbacks( Activate, NULL );
@@ -82,7 +83,7 @@ static int Activate( vlc_object_t *p_this )
             switch( p_filter->fmt_out.video.i_chroma )
             {
                 case VLC_FOURCC('Y','M','G','A'):
-                    p_filter->pf_video_filter_io = I420_YMGA;
+                    p_filter->pf_video_filter = I420_YMGA_Filter;
                     break;
 
                 default:
@@ -98,6 +99,8 @@ static int Activate( vlc_object_t *p_this )
 }
 
 /* Following functions are local */
+
+VIDEO_FILTER_WRAPPER( I420_YMGA )
 
 /*****************************************************************************
  * I420_YMGA: planar YUV 4:2:0 to Matrox's planar/packed YUV 4:2:0
