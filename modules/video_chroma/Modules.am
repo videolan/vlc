@@ -78,7 +78,3 @@ SOURCES_yuy2_i422 = \
 SOURCES_yuy2_i420 = \
 	yuy2_i420.c \
 	$(NULL)
-
-SOURCES_chroma_chain = \
-	chain.c \
-	$(NULL)
