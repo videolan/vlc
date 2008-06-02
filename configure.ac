@@ -192,7 +192,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([mkv mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LDFLAGS([libvlc_control],[-Wl,dynamic_lookup])
-    VLC_ADD_LDFLAGS([ffmpeg i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
+    VLC_ADD_LDFLAGS([avcodec avformat swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LDFLAGS([libvlc],[-Wl,-framework,Cocoa,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
@@ -645,7 +645,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlc vorbis freetype mod mpc dmo quicktime realaudio realvideo galaktos opengl],[-lm])
+  VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlc vorbis freetype mod mpc dmo quicktime realaudio realvideo galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol speex mono colorthres extract],[-lm])
@@ -2993,102 +2993,98 @@ AS_IF([test "${enable_id3tag}" != "no"], [
 ])
 
 dnl
-dnl  ffmpeg decoder/demuxer plugin
+dnl  avcodec decoder/encoder plugin
 dnl
-dnl we try to find ffmpeg using : 1- given tree, 2- pkg-config
-dnl                               3- default place,
 
-AC_ARG_ENABLE(ffmpeg,
-[  --enable-ffmpeg         ffmpeg codec (default enabled)])
-if test "${enable_ffmpeg}" != "no"
+AC_ARG_ENABLE(avcodec,
+[  --enable-avcodec	   libavcodec codec (default enabled)])
+if test "${enable_avcodec}" != "no"
 then
-
-dnl Trying with pkg-config
-   PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat, libavutil],
+  PKG_CHECK_MODULES(AVCODEC,[libavcodec, libavutil],
     [
-     VLC_SAVE_FLAGS
-     CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS}"
-     CFLAGS="${CFLAGS} ${FFMPEG_CFLAGS}"
-     AC_CHECK_HEADERS(ffmpeg/avcodec.h libavcodec/avcodec.h)
-     AC_CHECK_HEADERS(ffmpeg/avformat.h libavformat/avformat.h)
-     AC_CHECK_HEADERS(ffmpeg/avutil.h libavutil/avutil.h)
-     dnl newer ffmpeg have a separate libpostproc
-     PKG_CHECK_MODULES(POSTPROC, libpostproc,[
-       VLC_ADD_CFLAGS([ffmpeg],[${POSTPROC_CFLAGS}]) 
-       VLC_ADD_LIBS([ffmpeg],[${POSTPROC_LIBS}]) 
-       ])
-     CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
-     CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
-     AC_CHECK_HEADERS(postproc/postprocess.h)
-     VLC_ADD_PLUGIN([ffmpeg])
-     if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes"; then
-        VLC_ADD_PLUGIN([stream_out_switcher])
-     fi
-     VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
-     VLC_ADD_LIBS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
-
-     dnl even newer ffmpeg has a libswscale
-     PKG_CHECK_MODULES(SWSCALE,[libswscale],[
-       VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}])
-       VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
-       AC_CHECK_LIB(swscale, sws_getContext,
-         [AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])],
-         [AC_CHECK_LIB(avcodec,img_resample,[],
-            [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
-         [${FFMPEG_LIBS}])
-         ],
-         [${SWSCALE_LIBS}])
-    ],[AC_CHECK_LIB(avcodec,img_resample,[],
-        [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
-        [${FFMPEG_LIBS}])
-      ]
-    )
-    VLC_RESTORE_FLAGS
-
-  ],[
-
-    dnl
-    dnl last chance: at the default place
-    dnl
       VLC_SAVE_FLAGS
-      CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg} ${LIBS_ffmpeg}"
-      AC_CHECK_HEADERS(ffmpeg/avcodec.h libavcodec/avcodec.h)
-      AC_CHECK_HEADERS(ffmpeg/avformat.h libavformat/avformat.h)
-      AC_CHECK_HEADERS(ffmpeg/avutil.h libavutil/avutil.h)
-      AC_CHECK_HEADERS(postproc/postprocess.h)
-
-      AC_CHECK_LIB(avutil, av_crc_init, [
-        VLC_ADD_LIBS([ffmpeg],[-lavutil])
-        LDAVUTIL="-lavutil"])
-
-      AC_CHECK_LIB(avcodec, avcodec_init, [
-        VLC_ADD_BUILTINS([ffmpeg])
-        VLC_ADD_LIBS([ffmpeg],[-lavcodec])
-        if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes"; then
-            VLC_ADD_BUILTINS([stream_out_switcher])
-        fi],
-         [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (svn version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ], [$LDAVUTIL])
-
-      AC_CHECK_LIB(postproc, pp_postprocess, [
-        VLC_ADD_LIBS([ffmpeg],[-lpostproc])],
-      AC_MSG_ERROR([Could not find libpostproc inside FFmpeg. You should configure FFmpeg with --enable-gpl --enable-postproc.]),
-        [$LDAVUTIL])
-
-      AC_CHECK_LIB(avformat, av_open_input_stream, [
-        VLC_ADD_LIBS([ffmpeg],[-lavformat -lz]) ], [], [-lavcodec -lz $LDAVUTIL])
+      CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
+      CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
+      AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
+      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
+      VLC_ADD_PLUGIN([avcodec])
+      VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
+      VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
       VLC_RESTORE_FLAGS
+    ],[
+      AC_MSG_ERROR([Could not find libavcodec or libavutil.])
+  ])
+fi
 
-      AC_CHECK_LIB(swscale, sws_getContext, [
-        AC_CHECK_HEADERS(ffmpeg/swscale.h libswscale/swscale.h)
-        VLC_ADD_LIBS([ffmpeg],[-lswscale]) ],
-        [AC_CHECK_LIB(avcodec,img_resample,[],
-            [AC_MSG_ERROR([Your FFmpeg library doesn't have the needed img_resample() function. You should rebuild it with software scaler disabled, or install the swscale headers.])],
-        [-lavcodec $LDAVUTIL])
-      ],
-      [${SWSCALE_LIBS}])
+dnl
+dnl  avformat demuxer/muxer plugin
+dnl
 
+AC_ARG_ENABLE(avformat,
+[  --enable-avformat   libavformat containers (default enabled)])
+if test "${enable_avformat}" != "no"
+then
+  PKG_CHECK_MODULES(AVFORMAT,[libavformat, libavcodec, libavutil],
+    [
+      VLC_SAVE_FLAGS
+      CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"
+      CFLAGS="${CFLAGS} ${AVFORMAT_CFLAGS}"
+      AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h)
+      AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
+      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
+      VLC_ADD_PLUGIN([avformat])
+      VLC_ADD_LIBS([avformat],[$AVFORMAT_LIBS])
+      VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS])
       VLC_RESTORE_FLAGS
+    ],[
+      AC_MSG_ERROR([Could not find libavformat, libavcodec or libavutil.])
+  ])
+fi
+
+dnl
+dnl  swscale image scaling and conversion plugin
+dnl
+
+AC_ARG_ENABLE(swscale,
+[  --enable-swscale    libswscale image scaling and conversion (default enabled)])
+if test "${enable_swscale}" != "no"
+then
+  PKG_CHECK_MODULES(SWSCALE,[libswscale, libavutil],
+    [
+      VLC_SAVE_FLAGS
+      CPPFLAGS="${CPPFLAGS} ${SWSCALE_CFLAGS}"
+      CFLAGS="${CFLAGS} ${SWSCALE_CFLAGS}"
+      AC_CHECK_HEADERS(libswscale/swscale.h ffmpeg/swscale.h)
+      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
+      VLC_ADD_PLUGIN([swscale])
+      VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
+      VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
+      VLC_RESTORE_FLAGS
+    ],[
+      AC_MSG_ERROR([Could not find libswscale or libavutil.])
+  ])
+fi
+
+dnl
+dnl  postproc plugin
+dnl
+
+AC_ARG_ENABLE(postproc,
+[  --enable-postproc   libpostproc image post-processing (default enabled)])
+if test "${enable_postproc}" != "no"
+then
+  PKG_CHECK_MODULES(POSTPROC,[libpostproc],
+    [
+      VLC_SAVE_FLAGS
+      CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
+      CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
+      AC_CHECK_HEADERS(libpostproc/postproc.h ffmpeg/postproc.h)
+      VLC_ADD_PLUGIN([postproc])
+      VLC_ADD_LIBS([postproc],[$POSTPROC_LIBS])
+      VLC_ADD_CFLAGS([postproc],[$POSTPROC_CFLAGS])
+      VLC_RESTORE_FLAGS
+    ],[
+      AC_MSG_ERROR([Could not find libpostproc.])
   ])
 fi
 

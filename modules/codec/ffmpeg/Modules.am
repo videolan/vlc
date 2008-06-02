@@ -1,38 +1,70 @@
-SOURCES_ffmpeg = \
-	ffmpeg.c \
-	ffmpeg.h \
+SOURCES_avcodec = \
+	avcodec.c \
+	avcodec.h \
 	video.c \
 	audio.c \
-	video_filter.c \
 	deinterlace.c \
-	chroma.c \
-	postprocess.c \
-	demux.c \
-	scale.c \
-	$(NULL)
-EXTRA_libffmpeg_plugin_la_SOURCES = \
-	mux.c \
-	encoder.c \
 	$(NULL)
 
 if ENABLE_SOUT
-SOURCES_ffmpeg += mux.c encoder.c
+SOURCES_avcodec += encoder.c
 endif
-libvlc_LTLIBRARIES += $(LTLIBffmpeg)
-EXTRA_LTLIBRARIES += libffmpeg_plugin.la
 
-SOURCES_ffmpegaltivec = \
-	ffmpeg.c \
-	ffmpeg.h \
-	video.c \
-	audio.c \
-	video_filter.c \
-	deinterlace.c \
-	chroma.c \
+EXTRA_libavcodec_plugin_la_SOURCES = \
 	encoder.c \
-	postprocess.c \
+	$(NULL)
+
+SOURCES_avformat = \
+	avformat.c \
+	avformat.h \
 	demux.c \
+	$(NULL)
+
+if ENABLE_SOUT
+SOURCES_avformat += mux.c
+endif
+
+EXTRA_libavformat_plugin_la_SOURCES = \
 	mux.c \
+	$(NULL)
+
+SOURCES_swscale = \
+	swscale.c \
+	swscale.h \
+	video_filter.c \
+	chroma.c \
 	scale.c \
 	$(NULL)
+
+SOURCES_postproc = \
+	postproc.c \
+	postprocess.c \
+	$(NULL)
+
+libvlc_LTLIBRARIES += \
+	$(LTLIBavcodec) \
+	$(LTLIBavformat) \
+	$(LTLIBswscale) \
+	$(LTLIBpostproc)
+
+EXTRA_LTLIBRARIES += \
+	libavcodec_plugin.la \
+	libavformat_plugin.la \
+	libswscale_plugin.la \
+	libpostproc_plugin.la
+
+# FIXME SOURCES_ffmpegaltivec = \
+# FIXME 	ffmpeg.c \
+# FIXME 	ffmpeg.h \
+# FIXME 	video.c \
+# FIXME 	audio.c \
+# FIXME 	video_filter.c \
+# FIXME 	deinterlace.c \
+# FIXME 	chroma.c \
+# FIXME 	encoder.c \
+# FIXME 	postprocess.c \
+# FIXME 	demux.c \
+# FIXME 	mux.c \
+# FIXME 	scale.c \
+# FIXME 	$(NULL)
 

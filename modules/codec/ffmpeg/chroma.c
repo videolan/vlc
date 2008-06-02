@@ -48,7 +48,6 @@
 #include "ffmpeg.h"
 
 #if !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H)
-void InitLibavcodec ( vlc_object_t *p_object );
 static void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
@@ -122,9 +121,6 @@ int OpenChroma( vlc_object_t *p_this )
         msg_Dbg( p_filter, "no resampling" );
         p_filter->p_sys->p_rsc = NULL;
     }
-
-    /* libavcodec needs to be initialized for some chroma conversions */
-    InitLibavcodec(p_this);
 
     return VLC_SUCCESS;
 }

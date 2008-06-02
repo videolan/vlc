@@ -219,12 +219,12 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
-    if( p_sys->p_pp && p_sys->b_pp && !p_sys->b_pp_init )
-    {
-        InitPostproc( p_sys->p_pp, p_context->width,
-                          p_context->height, p_context->pix_fmt );
-        p_sys->b_pp_init = true;
-    }
+// FIXME    if( p_sys->p_pp && p_sys->b_pp && !p_sys->b_pp_init )
+// FIXME    {
+// FIXME        InitPostproc( p_sys->p_pp, p_context->width,
+// FIXME                          p_context->height, p_context->pix_fmt );
+// FIXME        p_sys->b_pp_init = true;
+// FIXME    }
 
     return p_pic;
 }
@@ -361,7 +361,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_sys->p_pp = NULL;
     p_sys->b_pp = p_sys->b_pp_async = p_sys->b_pp_init = false;
-    p_sys->p_pp = OpenPostproc( p_dec, &p_sys->b_pp_async );
+    // FIXME p_sys->p_pp = OpenPostproc( p_dec, &p_sys->b_pp_async );
 
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
     //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = 0;
@@ -724,7 +724,7 @@ void EndVideoDec( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
-    ClosePostproc( p_dec, p_sys->p_pp );
+    // FIXME ClosePostproc( p_dec, p_sys->p_pp );
     free( p_sys->p_buffer_orig );
 }
 
@@ -819,9 +819,9 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         uint8_t *p_dst, *p_src;
         int i_src_stride, i_dst_stride;
 
-        if( p_sys->p_pp && p_sys->b_pp )
-            PostprocPict( p_sys->p_pp, p_pic, p_ff_pic );
-        else
+        // FIXME if( p_sys->p_pp && p_sys->b_pp )
+        // FIXME    PostprocPict( p_sys->p_pp, p_pic, p_ff_pic );
+        // FIXME else
         {
             for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
             {

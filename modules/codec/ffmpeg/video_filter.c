@@ -46,7 +46,6 @@
 #include "ffmpeg.h"
 
 #if !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H)
-void InitLibavcodec ( vlc_object_t *p_object );
 static int CheckInit( filter_t *p_filter );
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic );
 
@@ -149,9 +148,6 @@ static int OpenFilterEx( vlc_object_t *p_this, bool b_enable_croppadd )
              (char *)&p_filter->fmt_in.video.i_chroma,
              p_filter->fmt_out.video.i_width, p_filter->fmt_out.video.i_height,
              (char *)&p_filter->fmt_out.video.i_chroma );
-
-    /* libavcodec needs to be initialized for some chroma conversions */
-    InitLibavcodec(p_this);
 
     return VLC_SUCCESS;
 }
