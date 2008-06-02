@@ -402,7 +402,7 @@ vlc_enable_modules(packetizer_mpegvideo packetizer_h264)
 vlc_enable_modules(packetizer_mpeg4video packetizer_mpeg4audio)
 vlc_enable_modules(packetizer_vc1)
 vlc_enable_modules(spatializer atmo blendbench croppadd)
-vlc_enable_modules(asf)
+vlc_enable_modules(asf cmml)
 vlc_enable_modules(vmem visual growl_udp)
 
 set(enabled ${ENABLE_STREAM_OUT})
