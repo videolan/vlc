@@ -108,7 +108,7 @@ enum demux_query_e
     DEMUX_SET_GROUP,            /* arg1= int            can fail */
 
     /* Ask the demux to demux until the given date at the next pf_demux call
-     * but not more (and not less, at the precision avaiable of course).
+     * but not more (and not less, at the precision available of course).
      * XXX: not mandatory (except for subtitle demux) but I will help a lot
      * for multi-input
      */
