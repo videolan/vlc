@@ -2925,19 +2925,18 @@ AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec	   libavcodec codec (default enabled)])
 if test "${enable_avcodec}" != "no"
 then
-  PKG_CHECK_MODULES(AVCODEC,[libavcodec, libavutil],
+  PKG_CHECK_MODULES(AVCODEC,[libavcodec],
     [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
       CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
       AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
-      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       VLC_ADD_PLUGIN([avcodec])
       VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
       VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libavcodec or libavutil. Use --disable-avcodec to ignore this error.])
+      AC_MSG_ERROR([Could not find libavcodec. Use --disable-avcodec to ignore this error.])
   ])
 fi
 
@@ -2949,20 +2948,18 @@ AC_ARG_ENABLE(avformat,
 [  --enable-avformat   libavformat containers (default enabled)])
 if test "${enable_avformat}" != "no"
 then
-  PKG_CHECK_MODULES(AVFORMAT,[libavformat, libavcodec, libavutil],
+  PKG_CHECK_MODULES(AVFORMAT,[libavformat],
     [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"
       CFLAGS="${CFLAGS} ${AVFORMAT_CFLAGS}"
       AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h)
-      AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
-      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       VLC_ADD_PLUGIN([avformat])
       VLC_ADD_LIBS([avformat],[$AVFORMAT_LIBS])
       VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libavformat, libavcodec or libavutil. Use --disable-avformat to ignore this error.])
+      AC_MSG_ERROR([Could not find libavformat. Use --disable-avformat to ignore this error.])
   ])
 fi
 
@@ -2974,19 +2971,18 @@ AC_ARG_ENABLE(swscale,
 [  --enable-swscale    libswscale image scaling and conversion (default enabled)])
 if test "${enable_swscale}" != "no"
 then
-  PKG_CHECK_MODULES(SWSCALE,[libswscale, libavutil],
+  PKG_CHECK_MODULES(SWSCALE,[libswscale],
     [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${SWSCALE_CFLAGS}"
       CFLAGS="${CFLAGS} ${SWSCALE_CFLAGS}"
       AC_CHECK_HEADERS(libswscale/swscale.h ffmpeg/swscale.h)
-      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       VLC_ADD_PLUGIN([swscale])
       VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_WARN([Could not find libswscale or libavutil. Trying to enable imgresample.])
+      AC_MSG_WARN([Could not find libswscale. Trying to enable imgresample.])
       enable_imgresample=yes
   ])
 fi
@@ -3003,13 +2999,12 @@ AC_ARG_ENABLE(imgresample,
 [  --enable-imgresample deprecated libavcodec image scaling and conversion (default disabled)])
 if test "${enable_imgresample}" = "yes"
 then
-  PKG_CHECK_MODULES(IMGRESAMPLE,[libavcodec, libavutil],
+  PKG_CHECK_MODULES(IMGRESAMPLE,[libavcodec],
     [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${IMGRESAMPLE_CFLAGS}"
       CFLAGS="${CFLAGS} ${IMGRESAMPLE_CFLAGS}"
       AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
-      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       AC_CHECK_LIB(avcodec,img_resample,
         [
           VLC_ADD_PLUGIN([imgresample])
@@ -3021,10 +3016,14 @@ then
           then
             AC_MSG_ERROR([swscale (and its fallback module imgresample) support will be missing. Use --disable-swscale to ignore this error. (This basically means that you will be missing any good software scaling module and some video chroma converters.)])
           fi
-        ],${IMGRESAMPLE_LIBS})
+	# That sed hack to add -rpath is kind of ugly but at least it fixes
+        # detection when linking against a shared libavcodec with
+        # a libavutil not in one of your ld.so.conf directories.
+	# (for example a local install)
+        ],[${IMGRESAMPLE_LIBS} `echo ${IMGRESAMPLE_LIBS}|sed s'/-L/-Wl,-rpath=/'`])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_WARN([Could not find libavcodec or libavutil.])
+      AC_MSG_WARN([Could not find libavcodec.])
   ])
 fi
 
