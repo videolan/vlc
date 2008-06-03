@@ -12,6 +12,7 @@ SOURCES_mkv = mkv.cpp mp4/libmp4.c mp4/drms.c
 SOURCES_live555 = live555.cpp ../access/mms/asf.c ../access/mms/buffer.c
 SOURCES_nsv = nsv.c
 SOURCES_real = real.c
+SOURCES_rtp = rtp.c rtp.h rtpsession.c
 SOURCES_ts = ts.c ../mux/mpeg/csa.c
 SOURCES_ps = ps.c ps.h
 SOURCES_mod = mod.c
