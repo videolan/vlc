@@ -33,6 +33,7 @@
 #include <vlc_codec.h>
 #include <vlc_vout.h>
 #include <vlc_input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
+#include <vlc_codecs.h>                               /* BITMAPINFOHEADER */
 
 /* ffmpeg header */
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H

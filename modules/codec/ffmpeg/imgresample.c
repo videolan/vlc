@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ffmpeg.c: video decoder using ffmpeg library
+ * imageresample.c: scaling and chroma conversion using the old libavcodec API
  *****************************************************************************
  * Copyright (C) 1999-2001 the VideoLAN team
  * $Id$
@@ -33,31 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
-/* ffmpeg header */
-#define HAVE_MMX 1
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-#   include <libavcodec/avcodec.h>
-#elif defined(HAVE_FFMPEG_AVCODEC_H)
-#   include <ffmpeg/avcodec.h>
-#else
-#   include <avcodec.h>
-#endif
-
-#if LIBAVCODEC_BUILD < 5000
-#   error You must have a libavcodec >= 5000 (get CVS)
-#endif
-
 #include "imgresample.h"
-
-/****************************************************************************
- * Local prototypes
- ****************************************************************************/
-static const int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *const ppsz_mode_descriptions[] =
-{ N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
-  N_("Experimental"), N_("Nearest neighbour (bad quality)"),
-  N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),
-  N_("SincR"), N_("Lanczos"), N_("Bicubic spline") };
 
 /*****************************************************************************
  * Module descriptor

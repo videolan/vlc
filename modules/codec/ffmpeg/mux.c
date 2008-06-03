@@ -42,11 +42,9 @@
 
 #include "avformat.h"
 #include "fourcc.h"
+#include "avutil.h"
 
 //#define AVFORMAT_DEBUG 1
-
-/* Version checking */
-#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_FFMPEG_AVFORMAT_H)
 
 static const char *const ppsz_mux_options[] = {
     "mux", NULL
@@ -95,7 +93,7 @@ int OpenMux( vlc_object_t *p_this )
 
     /* Should we call it only once ? */
     av_register_all();
-    av_log_set_callback( LibavcodecCallback );
+    av_log_set_callback( LibavutilCallback );
 
     config_ChainParse( p_mux, "ffmpeg-", ppsz_mux_options, p_mux->p_cfg );
 
@@ -224,7 +222,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     codec = stream->codec;
 
-    /* This is used by LibavcodecCallback (ffmpeg.c) to print messages */
+    /* This is used by LibavutilCallback (avutil.h) to print messages */
     codec->opaque = (void*)p_mux;
 
     switch( p_input->p_fmt->i_cat )
@@ -505,5 +503,3 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
 
     return 0;
 }
-
-#endif /* HAVE_FFMPEG_AVFORMAT_H */

@@ -38,7 +38,7 @@
  * Local prototypes
  ****************************************************************************/
 static const int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *const ppsz_mode_descriptions[] =
+const char *const ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
   N_("Experimental"), N_("Nearest neighbour (bad quality)"),
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),

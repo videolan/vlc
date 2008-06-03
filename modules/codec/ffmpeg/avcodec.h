@@ -21,8 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc_codecs.h>                               /* BITMAPINFOHEADER */
-
 picture_t * DecodeVideo    ( decoder_t *, block_t ** );
 aout_buffer_t * DecodeAudio( decoder_t *, block_t ** );
 

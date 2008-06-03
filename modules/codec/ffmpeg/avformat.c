@@ -34,17 +34,10 @@
 #include <vlc_codec.h>
 
 /* ffmpeg header */
-#define HAVE_MMX 1
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-#   include <libavcodec/avcodec.h>
-#elif defined(HAVE_FFMPEG_AVCODEC_H)
-#   include <ffmpeg/avcodec.h>
-#else
-#   include <avcodec.h>
-#endif
-
-#if LIBAVCODEC_BUILD < 5000
-#   error You must have a libavcodec >= 5000 (get CVS)
+#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+#   include <libavformat/avformat.h>
+#elif defined(HAVE_FFMPEG_AVFORMAT_H)
+#   include <ffmpeg/avformat.h>
 #endif
 
 #include "avformat.h"
@@ -70,84 +63,3 @@ vlc_module_begin();
     set_callbacks( OpenMux, CloseMux );
 #endif
 vlc_module_end();
-
-/*****************************************************************************
- *
- *****************************************************************************/
-void LibavcodecCallback( void *p_opaque, int i_level,
-                             const char *psz_format, va_list va )
-{
-    int i_vlc_level;
-    AVCodecContext *p_avctx = (AVCodecContext *)p_opaque;
-    AVClass *p_avc;
-    vlc_object_t *p_this;
-    char *psz_new_format;
-    const char *psz_item_name;
-
-    p_avc = p_avctx ? p_avctx->av_class : 0;
-
-#define cln p_avc->class_name
-    /* Make sure we can get p_this back */
-    if( !p_avctx || !p_avc || !cln ||
-        cln[0]!='A' || cln[1]!='V' || cln[2]!='C' || cln[3]!='o' ||
-        cln[4]!='d' || cln[5]!='e' || cln[6]!='c' )
-    {
-        if( i_level == AV_LOG_ERROR ) vfprintf( stderr, psz_format, va );
-        return;
-    }
-#undef cln
-
-    p_this = (vlc_object_t *)p_avctx->opaque;
-
-    switch( i_level )
-    {
-    case AV_LOG_QUIET:
-        i_vlc_level = VLC_MSG_ERR;
-        break;
-    case AV_LOG_ERROR:
-        i_vlc_level = VLC_MSG_WARN;
-        break;
-    case AV_LOG_INFO:
-        i_vlc_level = VLC_MSG_DBG;
-        break;
-    case AV_LOG_DEBUG:
-        /* Print debug messages if they were requested */
-        if( p_avctx->debug ) vfprintf( stderr, psz_format, va );
-        return;
-    default:
-        return;
-    }
-
-    psz_item_name = p_avc->item_name(p_opaque);
-    psz_new_format = malloc( strlen(psz_format) + strlen(psz_item_name)
-                              + 18 + 5 );
-    snprintf( psz_new_format, strlen(psz_format) + strlen(psz_item_name)
-              + 18 + 5, "%s (%s@%p)", psz_format, p_avc->item_name(p_opaque), p_opaque );
-    msg_GenericVa( p_this, i_vlc_level,
-                    MODULE_STRING, psz_new_format, va );
-    free( psz_new_format );
-}
-
-void InitLibavcodec( vlc_object_t *p_object )
-{
-    static int b_ffmpeginit = 0;
-    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
-
-    /* *** init ffmpeg library (libavcodec) *** */
-    if( !b_ffmpeginit )
-    {
-        avcodec_init();
-        avcodec_register_all();
-        av_log_set_callback( LibavcodecCallback );
-        b_ffmpeginit = 1;
-
-        msg_Dbg( p_object, "libavcodec initialized (interface %d )",
-                 LIBAVCODEC_VERSION_INT );
-    }
-    else
-    {
-        msg_Dbg( p_object, "libavcodec already initialized" );
-    }
-
-    vlc_mutex_unlock( lock );
-}

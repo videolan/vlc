@@ -4,6 +4,7 @@ SOURCES_avcodec = \
 	video.c \
 	audio.c \
 	deinterlace.c \
+	avutil.h \
 	fourcc.h \
 	chroma.h \
 	$(NULL)
@@ -20,6 +21,7 @@ SOURCES_avformat = \
 	avformat.c \
 	avformat.h \
 	demux.c \
+	avutil.h \
 	fourcc.h \
 	chroma.h \
 	$(NULL)

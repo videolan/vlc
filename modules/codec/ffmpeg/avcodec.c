@@ -49,6 +49,7 @@
 
 #include "avcodec.h"
 #include "fourcc.h"
+#include "avutil.h"
 
 /*****************************************************************************
  * decoder_sys_t: decoder descriptor
@@ -333,63 +334,6 @@ static void CloseDecoder( vlc_object_t *p_this )
     free( p_sys );
 }
 
-/*****************************************************************************
- *
- *****************************************************************************/
-void LibavcodecCallback( void *p_opaque, int i_level,
-                             const char *psz_format, va_list va )
-{
-    int i_vlc_level;
-    AVCodecContext *p_avctx = (AVCodecContext *)p_opaque;
-    AVClass *p_avc;
-    vlc_object_t *p_this;
-    char *psz_new_format;
-    const char *psz_item_name;
-
-    p_avc = p_avctx ? p_avctx->av_class : 0;
-
-#define cln p_avc->class_name
-    /* Make sure we can get p_this back */
-    if( !p_avctx || !p_avc || !cln ||
-        cln[0]!='A' || cln[1]!='V' || cln[2]!='C' || cln[3]!='o' ||
-        cln[4]!='d' || cln[5]!='e' || cln[6]!='c' )
-    {
-        if( i_level == AV_LOG_ERROR ) vfprintf( stderr, psz_format, va );
-        return;
-    }
-#undef cln
-
-    p_this = (vlc_object_t *)p_avctx->opaque;
-
-    switch( i_level )
-    {
-    case AV_LOG_QUIET:
-        i_vlc_level = VLC_MSG_ERR;
-        break;
-    case AV_LOG_ERROR:
-        i_vlc_level = VLC_MSG_WARN;
-        break;
-    case AV_LOG_INFO:
-        i_vlc_level = VLC_MSG_DBG;
-        break;
-    case AV_LOG_DEBUG:
-        /* Print debug messages if they were requested */
-        if( p_avctx->debug ) vfprintf( stderr, psz_format, va );
-        return;
-    default:
-        return;
-    }
-
-    psz_item_name = p_avc->item_name(p_opaque);
-    psz_new_format = malloc( strlen(psz_format) + strlen(psz_item_name)
-                              + 18 + 5 );
-    snprintf( psz_new_format, strlen(psz_format) + strlen(psz_item_name)
-              + 18 + 5, "%s (%s@%p)", psz_format, p_avc->item_name(p_opaque), p_opaque );
-    msg_GenericVa( p_this, i_vlc_level,
-                    MODULE_STRING, psz_new_format, va );
-    free( psz_new_format );
-}
-
 void InitLibavcodec( vlc_object_t *p_object )
 {
     static int b_ffmpeginit = 0;
@@ -400,7 +344,7 @@ void InitLibavcodec( vlc_object_t *p_object )
     {
         avcodec_init();
         avcodec_register_all();
-        av_log_set_callback( LibavcodecCallback );
+        av_log_set_callback( LibavutilCallback );
         b_ffmpeginit = 1;
 
         msg_Dbg( p_object, "libavcodec initialized (interface %d )",
