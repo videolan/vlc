@@ -43,7 +43,7 @@
 #   include <avcodec.h>
 #endif
 
-#include "ffmpeg.h"
+#include "avcodec.h"
 
 static unsigned int pi_channels_maps[7] =
 {

@@ -40,7 +40,8 @@
 #   include <ffmpeg/avformat.h>
 #endif
 
-#include "ffmpeg.h"
+#include "avformat.h"
+#include "fourcc.h"
 
 //#define AVFORMAT_DEBUG 1
 

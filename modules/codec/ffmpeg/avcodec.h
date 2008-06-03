@@ -1,7 +1,7 @@
 /*****************************************************************************
- * ffmpeg.h: decoder using the ffmpeg library
+ * avcodec.h: decoder and encoder using libavcodec
  *****************************************************************************
- * Copyright (C) 2001 the VideoLAN team
+ * Copyright (C) 2001-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -23,34 +23,8 @@
 
 #include <vlc_codecs.h>                               /* BITMAPINFOHEADER */
 
-struct picture_t;
-struct AVFrame;
-struct AVCodecContext;
-struct AVCodec;
-
-void InitLibavcodec( vlc_object_t * );
-void LibavcodecCallback( void *p_opaque, int i_level,
-                             const char *psz_format, va_list va );
-int GetFfmpegCodec ( vlc_fourcc_t, int *, int *, const char ** );
-int GetVlcFourcc   ( int, int *, vlc_fourcc_t *, const char ** );
-int GetFfmpegChroma( vlc_fourcc_t );
-vlc_fourcc_t GetVlcChroma( int );
-
-/* Video decoder module */
-int   InitVideoDec ( decoder_t *, struct AVCodecContext *, struct AVCodec *,
-                         int, const char * );
-void  EndVideoDec  ( decoder_t * );
-picture_t * DecodeVideo  ( decoder_t *, block_t ** );
-
-/* Audio decoder module */
-int   InitAudioDec ( decoder_t *, struct AVCodecContext *, struct AVCodec *,
-                         int, const char * );
-void  EndAudioDec  ( decoder_t * );
-aout_buffer_t * DecodeAudio  ( decoder_t *, block_t ** );
-
-/* Chroma conversion module */
-int  OpenChroma( vlc_object_t * );
-void CloseChroma( vlc_object_t * );
+picture_t * DecodeVideo    ( decoder_t *, block_t ** );
+aout_buffer_t * DecodeAudio( decoder_t *, block_t ** );
 
 /* Video encoder module */
 int  OpenEncoder ( vlc_object_t * );
@@ -60,28 +34,9 @@ void CloseEncoder( vlc_object_t * );
 int  OpenAudioEncoder ( vlc_object_t * );
 void CloseAudioEncoder( vlc_object_t * );
 
-/* Demux module */
-int  OpenDemux ( vlc_object_t * );
-void CloseDemux( vlc_object_t * );
-
-/* Mux module */
-int  OpenMux ( vlc_object_t * );
-void CloseMux( vlc_object_t * );
-
-/* Video filter module */
-int  OpenFilter( vlc_object_t * );
-int  OpenCropPadd( vlc_object_t * );
-void CloseFilter( vlc_object_t * );
+/* Deinterlace video filter module */
 int  OpenDeinterlace( vlc_object_t * );
 void CloseDeinterlace( vlc_object_t * );
-int  OpenScaler( vlc_object_t * );
-void CloseScaler( vlc_object_t * );
-
-/* Postprocessing module */
-void *OpenPostproc( decoder_t *, bool * );
-int InitPostproc( void *, int, int, int );
-int PostprocPict( void *, picture_t *, struct AVFrame * );
-void ClosePostproc( decoder_t *, void * );
 
 /*****************************************************************************
  * Module descriptor help strings
@@ -312,12 +267,6 @@ N_("<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...
    "for encoding the audio bitstream. It takes the following options: " \
    "main, low, ssr (not supported) and ltp (default: main)" )
 #endif
-
-#define SCALEMODE_TEXT N_("Scaling mode")
-#define SCALEMODE_LONGTEXT N_("Scaling mode to use.")
-
-#define MUX_TEXT N_("Ffmpeg mux")
-#define MUX_LONGTEXT N_("Force use of ffmpeg muxer.")
 
 #define FFMPEG_COMMON_MEMBERS   \
     int i_cat;                  \

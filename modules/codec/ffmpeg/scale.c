@@ -29,18 +29,8 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_codec.h>
 #include <vlc_vout.h>
 #include <vlc_filter.h>
-
-/* ffmpeg headers */
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-#   include <libavcodec/avcodec.h>
-#elif defined(HAVE_FFMPEG_AVCODEC_H)
-#   include <ffmpeg/avcodec.h>
-#else
-#   include <avcodec.h>
-#endif
 
 #ifdef HAVE_LIBSWSCALE_SWSCALE_H
 #   include <libswscale/swscale.h>
@@ -48,7 +38,7 @@
 #   include <ffmpeg/swscale.h>
 #endif
 
-#include "ffmpeg.h"
+#include "chroma.h"
 
 /* Version checking */
 #if LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)

@@ -43,7 +43,8 @@
 #   include <avcodec.h>
 #endif
 
-#include "ffmpeg.h"
+#include "avcodec.h"
+#include "chroma.h"
 
 static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic );
 

@@ -39,8 +39,6 @@
 #   include <avcodec.h>
 #endif
 
-#include "ffmpeg.h"
-
 #ifdef HAVE_POSTPROC_POSTPROCESS_H
 #   include <postproc/postprocess.h>
 #else

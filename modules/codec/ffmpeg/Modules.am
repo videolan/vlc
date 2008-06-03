@@ -4,6 +4,8 @@ SOURCES_avcodec = \
 	video.c \
 	audio.c \
 	deinterlace.c \
+	fourcc.h \
+	chroma.h \
 	$(NULL)
 
 if ENABLE_SOUT
@@ -18,6 +20,8 @@ SOURCES_avformat = \
 	avformat.c \
 	avformat.h \
 	demux.c \
+	fourcc.h \
+	chroma.h \
 	$(NULL)
 
 if ENABLE_SOUT
@@ -32,6 +36,7 @@ SOURCES_swscale = \
 	swscale.c \
 	swscale.h \
 	scale.c \
+	chroma.h \
 	$(NULL)
 
 SOURCES_imgresample = \
@@ -39,6 +44,7 @@ SOURCES_imgresample = \
 	imgresample.h \
         chroma.c \
         video_filter.c \
+	chroma.h \
 	$(NULL)
 
 SOURCES_postproc = \

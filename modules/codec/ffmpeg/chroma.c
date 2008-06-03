@@ -42,7 +42,7 @@
 #   include <avcodec.h>
 #endif
 
-#include "ffmpeg.h"
+#include "chroma.h"
 
 static void ChromaConversion( filter_t *, picture_t *, picture_t * );
 static picture_t *ChromaConversion_Filter( filter_t *, picture_t * );

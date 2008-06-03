@@ -43,7 +43,7 @@
 #   include <avcodec.h>
 #endif
 
-#include "ffmpeg.h"
+#include "chroma.h"
 
 static int CheckInit( filter_t *p_filter );
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic );

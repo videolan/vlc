@@ -49,7 +49,9 @@
 #   include <avcodec.h>
 #endif
 
-#include "ffmpeg.h"
+#include "avcodec.h"
+#include "chroma.h"
+#include "fourcc.h"
 
 #define HURRY_UP_GUARD1 (450000)
 #define HURRY_UP_GUARD2 (300000)

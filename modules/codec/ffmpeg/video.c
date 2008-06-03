@@ -43,7 +43,7 @@
 #   include <avcodec.h>
 #endif
 
-#include "ffmpeg.h"
+#include "avcodec.h"
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
