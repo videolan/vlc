@@ -31,6 +31,7 @@
 #define _VLC_VOUT_H_ 1
 
 #include <vlc_es.h>
+#include <vlc_filter.h>
 
 /** Description of a planar graphic field */
 typedef struct plane_t
@@ -78,7 +79,7 @@ struct picture_t
      * @{*/
     int             i_status;                             /**< picture flags */
     int             i_type;                /**< is picture a direct buffer ? */
-    bool      b_slow;                 /**< is picture in slow memory ? */
+    bool            b_slow;                 /**< is picture in slow memory ? */
     int             i_matrix_coefficients;   /**< in YUV type, encoding type */
     /**@}*/
 
@@ -88,16 +89,16 @@ struct picture_t
     /**@{*/
     unsigned        i_refcount;                  /**< link reference counter */
     mtime_t         date;                                  /**< display date */
-    bool      b_force;
+    bool            b_force;
     /**@}*/
 
     /** \name Picture dynamic properties
      * Those properties can be changed by the decoder
      * @{
      */
-    bool      b_progressive;          /**< is it a progressive frame ? */
+    bool            b_progressive;          /**< is it a progressive frame ? */
     unsigned int    i_nb_fields;                  /**< # of displayed fields */
-    bool      b_top_field_first;             /**< which field is first */
+    bool            b_top_field_first;             /**< which field is first */
     /**@}*/
 
     /** The picture heap we are attached to */
@@ -139,7 +140,7 @@ struct picture_heap_t
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];             /**< pictures */
     int             i_last_used_pic;              /**< last used pic in heap */
-    bool      b_allow_modify_pics;
+    bool            b_allow_modify_pics;
 
     /* Stuff used for truecolor RGB planes */
     uint32_t i_rmask; int i_rrshift, i_lrshift;
@@ -248,10 +249,10 @@ struct subpicture_t
     /**@{*/
     mtime_t         i_start;                  /**< beginning of display date */
     mtime_t         i_stop;                         /**< end of display date */
-    bool      b_ephemer;    /**< If this flag is set to true the subtitle
+    bool            b_ephemer;    /**< If this flag is set to true the subtitle
                                 will be displayed untill the next one appear */
-    bool      b_fade;                               /**< enable fading */
-    bool      b_pausable;               /**< subpicture will be paused if
+    bool            b_fade;                               /**< enable fading */
+    bool            b_pausable;               /**< subpicture will be paused if
                                                             stream is paused */
     /**@}*/
 
@@ -269,7 +270,7 @@ struct subpicture_t
     int          i_alpha;                                  /**< transparency */
     int          i_original_picture_width;  /**< original width of the movie */
     int          i_original_picture_height;/**< original height of the movie */
-    bool   b_absolute;                       /**< position is absolute */
+    bool         b_absolute;                       /**< position is absolute */
     int          i_flags;                                /**< position flags */
      /**@}*/
 
@@ -365,9 +366,6 @@ VLC_EXPORT( int, __vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic
  * @{
  */
 
-/** Maximum numbers of video filters2 that can be attached to a vout */
-#define MAX_VFILTERS 10
-
 /**
  * Video output thread descriptor
  *
@@ -393,11 +391,11 @@ struct vout_thread_t
     uint16_t            i_changes;          /**< changes made to the thread.
                                                       \see \ref vout_changes */
     float               f_gamma;                                  /**< gamma */
-    bool          b_grayscale;         /**< color or grayscale display */
-    bool          b_info;            /**< print additional information */
-    bool          b_interface;                   /**< render interface */
-    bool          b_scale;                  /**< allow picture scaling */
-    bool          b_fullscreen;         /**< toogle fullscreen display */
+    bool                b_grayscale;         /**< color or grayscale display */
+    bool                b_info;            /**< print additional information */
+    bool                b_interface;                   /**< render interface */
+    bool                b_scale;                  /**< allow picture scaling */
+    bool                b_fullscreen;         /**< toogle fullscreen display */
     uint32_t            render_time;           /**< last picture render time */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
@@ -436,8 +434,8 @@ struct vout_thread_t
     int                 i_heap_size;                          /**< heap size */
     picture_heap_t      render;                       /**< rendered pictures */
     picture_heap_t      output;                          /**< direct buffers */
-    bool          b_direct;            /**< rendered are like direct ? */
-    filter_t            *p_chroma;                      /**< translation tables */
+    bool                b_direct;            /**< rendered are like direct ? */
+    filter_t           *p_chroma;                    /**< translation tables */
 
     video_format_t      fmt_render;      /* render format (from the decoder) */
     video_format_t      fmt_in;            /* input (modified render) format */
@@ -448,42 +446,34 @@ struct vout_thread_t
     picture_t           p_picture[2*VOUT_MAX_PICTURES+1];      /**< pictures */
 
     /* Subpicture unit */
-    spu_t            *p_spu;
+    spu_t          *p_spu;
 
     /* Statistics */
-    count_t          c_loops;
-    count_t          c_pictures, c_late_pictures;
-    mtime_t          display_jitter;    /**< average deviation from the PTS */
-    count_t          c_jitter_samples;  /**< number of samples used
+    count_t         c_loops;
+    count_t         c_pictures, c_late_pictures;
+    mtime_t         display_jitter;    /**< average deviation from the PTS */
+    count_t         c_jitter_samples;  /**< number of samples used
                                            for the calculation of the
                                            jitter  */
     /** delay created by internal caching */
-    int                 i_pts_delay;
+    int             i_pts_delay;
 
     /* Filter chain */
-    char *psz_filter_chain;
-    bool b_filter_change;
+    char           *psz_filter_chain;
+    bool            b_filter_change;
 
-    /* Video filter2 chain
-     * these are handled like in transcode.c
-     * XXX: we might need to merge the two chains (v1 and v2 filters) */
-    char       *psz_vfilters[MAX_VFILTERS];
-    config_chain_t *p_vfilters_cfg[MAX_VFILTERS];
-    int         i_vfilters_cfg;
-
-    filter_t   *pp_vfilters[MAX_VFILTERS];
-    int         i_vfilters;
-
-    bool b_vfilter_change;
+    /* Video filter2 chain */
+    filter_chain_t *p_vf2_chain;
+    char           *psz_vf2;
 
     /* Misc */
-    bool       b_snapshot;     /**< take one snapshot on the next loop */
+    bool            b_snapshot;     /**< take one snapshot on the next loop */
 
     /* Video output configuration */
     config_chain_t *p_cfg;
 
     /* Show media title on videoutput */
-    bool      b_title_show;
+    bool            b_title_show;
     mtime_t         i_title_timeout;
     int             i_title_position;
 };
