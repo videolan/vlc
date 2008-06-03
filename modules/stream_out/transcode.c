@@ -7,6 +7,7 @@
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
  *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
+ *          Antoine Cellerier <dionoea at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -298,7 +299,6 @@ static int pi_channels_maps[6] =
 
 #define PICTURE_RING_SIZE 64
 #define SUBPICTURE_RING_SIZE 20
-#define TRANSCODE_FILTERS 10
 
 #define ENC_FRAMERATE (25 * 1000 + .5)
 #define ENC_FRAMERATE_BASE 1000
@@ -322,9 +322,8 @@ struct sout_stream_sys_t
     uint32_t        i_sample_rate;
     uint32_t        i_channels;
     int             i_abitrate;
-    char            *psz_afilters[TRANSCODE_FILTERS];
-    config_chain_t  *p_afilters_cfg[TRANSCODE_FILTERS];
-    int             i_afilters;
+
+    char            *psz_af2;
 
     /* Video */
     vlc_fourcc_t    i_vcodec;   /* codec video (0 if not transcode) */
@@ -335,20 +334,19 @@ struct sout_stream_sys_t
     double          f_fps;
     unsigned int    i_width, i_maxwidth;
     unsigned int    i_height, i_maxheight;
-    bool      b_deinterlace;
+    bool            b_deinterlace;
     char            *psz_deinterlace;
     config_chain_t  *p_deinterlace_cfg;
     int             i_threads;
-    bool      b_high_priority;
-    bool      b_hurry_up;
-    char            *psz_vfilters[TRANSCODE_FILTERS];
-    config_chain_t  *p_vfilters_cfg[TRANSCODE_FILTERS];
-    int             i_vfilters;
+    bool            b_high_priority;
+    bool            b_hurry_up;
+
+    char            *psz_vf2;
 
     /* SPU */
     vlc_fourcc_t    i_scodec;   /* codec spu (0 if not transcode) */
     char            *psz_senc;
-    bool      b_soverlay;
+    bool            b_soverlay;
     config_chain_t  *p_spu_cfg;
     spu_t           *p_spu;
 
@@ -356,10 +354,10 @@ struct sout_stream_sys_t
     vlc_fourcc_t    i_osdcodec; /* codec osd menu (0 if not transcode) */
     char            *psz_osdenc;
     config_chain_t  *p_osd_cfg;
-    bool      b_osd;   /* true when osd es is registered */
+    bool            b_osd;   /* true when osd es is registered */
 
     /* Sync */
-    bool      b_master_sync;
+    bool            b_master_sync;
     mtime_t         i_master_drift;
 };
 
@@ -446,27 +444,12 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "afilter", &val );
-    p_sys->i_afilters = 0;
     if( val.psz_string && *val.psz_string )
+        p_sys->psz_af2 = val.psz_string;
+    else
     {
-        char *psz_parser = val.psz_string;
-
-        while( (psz_parser != NULL) && (*psz_parser != '\0')
-                && (p_sys->i_afilters < TRANSCODE_FILTERS) )
-        {
-            psz_parser = config_ChainCreate(
-                                   &p_sys->psz_afilters[p_sys->i_afilters],
-                                   &p_sys->p_afilters_cfg[p_sys->i_afilters],
-                                   psz_parser );
-            p_sys->i_afilters++;
-            if( (psz_parser != NULL) && (*psz_parser != '\0') ) psz_parser++;
-        }
-    }
-    free( val.psz_string );
-    if( p_sys->i_afilters < TRANSCODE_FILTERS-1 )
-    {
-        p_sys->psz_afilters[p_sys->i_afilters] = NULL;
-        p_sys->p_afilters_cfg[p_sys->i_afilters] = NULL;
+        free( val.psz_string );
+        p_sys->psz_af2 = NULL;
     }
 
     /* Video transcoding parameters */
@@ -518,27 +501,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_maxheight = val.i_int;
 
     var_Get( p_stream, SOUT_CFG_PREFIX "vfilter", &val );
-    p_sys->i_vfilters = 0;
     if( val.psz_string && *val.psz_string )
+        p_sys->psz_vf2 = val.psz_string;
+    else
     {
-        char *psz_parser = val.psz_string;
-
-        while( (psz_parser != NULL) && (*psz_parser != '\0')
-                && (p_sys->i_vfilters < TRANSCODE_FILTERS) )
-        {
-            psz_parser = config_ChainCreate(
-                                   &p_sys->psz_vfilters[p_sys->i_vfilters],
-                                   &p_sys->p_vfilters_cfg[p_sys->i_vfilters],
-                                   psz_parser );
-            p_sys->i_vfilters++;
-            if( psz_parser != NULL && *psz_parser != '\0' ) psz_parser++;
-        }
-    }
-    free( val.psz_string );
-    if( p_sys->i_vfilters < TRANSCODE_FILTERS-1 )
-    {
-        p_sys->psz_vfilters[p_sys->i_vfilters] = NULL;
-        p_sys->p_vfilters_cfg[p_sys->i_vfilters] = NULL;
+        free( val.psz_string );
+        p_sys->psz_vf2 = NULL;
     }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "deinterlace", &val );
@@ -672,12 +640,7 @@ static void Close( vlc_object_t * p_this )
 
     sout_StreamDelete( p_sys->p_out );
 
-    while( p_sys->i_afilters )
-    {
-        p_sys->i_afilters--;
-        free( p_sys->psz_afilters[p_sys->i_afilters] );
-        free( p_sys->p_afilters_cfg[p_sys->i_afilters] );
-    }
+    free( p_sys->psz_af2 );
 
     while( p_sys->p_audio_cfg != NULL )
     {
@@ -691,12 +654,7 @@ static void Close( vlc_object_t * p_this )
     }
     free( p_sys->psz_aenc );
 
-    while( p_sys->i_vfilters )
-    {
-        p_sys->i_vfilters--;
-        free( p_sys->psz_vfilters[p_sys->i_vfilters] );
-        free( p_sys->p_vfilters_cfg[p_sys->i_vfilters] );
-    }
+    free( p_sys->psz_vf2 );
 
     while( p_sys->p_video_cfg != NULL )
     {
@@ -762,11 +720,9 @@ struct sout_stream_id_t
     decoder_t       *p_decoder;
 
     /* Filters */
-    filter_t        *pp_filter[TRANSCODE_FILTERS];
-    int             i_filter;
+    filter_chain_t  *p_f_chain;
     /* User specified filters */
-    filter_t        *pp_ufilter[TRANSCODE_FILTERS];
-    int             i_ufilter;
+    filter_chain_t  *p_uf_chain;
 
     /* Encoder */
     encoder_t       *p_encoder;
@@ -1171,44 +1127,17 @@ static int audio_BitsPerSample( vlc_fourcc_t i_format )
     return 0;
 }
 
-static block_t *transcode_audio_alloc (filter_t *filter, int size)
+static block_t *transcode_audio_alloc( filter_t *filter, int size )
 {
-    return block_New (filter, size);
+    return block_New( filter, size );
 }
 
-static filter_t *transcode_audio_filter_new( sout_stream_t *p_stream,
-                                             sout_stream_id_t *id,
-                                             es_format_t *p_fmt_in,
-                                             es_format_t *p_fmt_out,
-                                             char *psz_name )
+static int transcode_audio_filter_allocation_init( filter_t *p_filter,
+                                                   void *data )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    filter_t *p_filter = vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-
-    vlc_object_attach( p_filter, p_stream );
+    VLC_UNUSED(data);
     p_filter->pf_audio_buffer_new = transcode_audio_alloc;
-
-    p_filter->fmt_in = *p_fmt_in;
-    p_filter->fmt_out = *p_fmt_out;
-    if( psz_name )
-        p_filter->p_cfg = p_sys->p_afilters_cfg[id->i_ufilter];
-
-    p_filter->p_module = module_Need( p_filter, "audio filter2", psz_name,
-                                      true );
-    if( p_filter->p_module )
-    {
-        p_filter->fmt_out.audio.i_bitspersample =
-            audio_BitsPerSample( p_filter->fmt_out.i_codec );
-        *p_fmt_in = p_filter->fmt_out;
-    }
-    else
-    {
-        vlc_object_detach( p_filter );
-        vlc_object_release( p_filter );
-        p_filter = 0;
-    }
-
-    return p_filter;
+    return VLC_SUCCESS;
 }
 
 static int transcode_audio_new( sout_stream_t *p_stream,
@@ -1216,7 +1145,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     es_format_t fmt_last;
-    int i;
 
     /*
      * Open decoder
@@ -1286,6 +1214,11 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_in.audio.i_bitspersample =
         audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
+    /* Init filter chain */
+    id->p_f_chain = filter_chain_New( p_stream, "audio filter2", false,
+                    transcode_audio_filter_allocation_init, NULL, NULL );
+    filter_chain_Reset( id->p_uf_chain, &fmt_last, &id->p_encoder->fmt_in );
+
     /* Load conversion filters */
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels ||
         fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate )
@@ -1293,13 +1226,13 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         /* We'll have to go through fl32 first */
         es_format_t fmt_out = id->p_encoder->fmt_in;
         fmt_out.i_codec = fmt_out.audio.i_format = VLC_FOURCC('f','l','3','2');
-
-        id->pp_filter[id->i_filter] =
-            transcode_audio_filter_new( p_stream, id, &fmt_last, &fmt_out, NULL );
-
-        if( id->pp_filter[id->i_filter] ) id->i_filter++;
+        filter_chain_AppendFilter( id->p_f_chain, NULL, NULL, &fmt_last, &fmt_out );
+        fmt_last = fmt_out;
     }
 
+#if 0
+/* FIXME FIXME FIXME WHAT DOES THIS CODE DO? LOOKS LIKE IT'S RANDOMLY TRYING
+TO CHAIN A BUNCH OF AUDIO FILTERS */
     for( i = 0; i < TRANSCODE_FILTERS; i++ )
     {
         if( (fmt_last.audio.i_channels !=
@@ -1317,6 +1250,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                 break;
         }
     }
+#endif
 
     /* Final checks to see if conversions were successful */
     if( fmt_last.i_codec != id->p_encoder->fmt_in.i_codec )
@@ -1329,18 +1263,12 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     }
 
     /* Load user specified audio filters now */
-    for( i = 0; (i < p_sys->i_afilters) &&
-                (id->i_ufilter < TRANSCODE_FILTERS); i++ )
+    if( p_sys->psz_af2 )
     {
-        id->pp_ufilter[id->i_ufilter] =
-            transcode_audio_filter_new( p_stream, id, &fmt_last,
-                                        &id->p_encoder->fmt_in,
-                                        p_sys->psz_afilters[i] );
-
-        if( id->pp_ufilter[id->i_ufilter] )
-            id->i_ufilter++;
-        else
-            break;
+        id->p_uf_chain = filter_chain_New( p_stream, "audio filter2", false,
+                       transcode_audio_filter_allocation_init, NULL, NULL );
+        filter_chain_Reset( id->p_uf_chain, &fmt_last, &id->p_encoder->fmt_in );
+        filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_af2 );
     }
 
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
@@ -1414,8 +1342,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 
 static void transcode_audio_close( sout_stream_id_t *id )
 {
-    int i;
-
     audio_timer_close( id->p_encoder );
 
     /* Close decoder */
@@ -1429,23 +1355,10 @@ static void transcode_audio_close( sout_stream_id_t *id )
     id->p_encoder->p_module = NULL;
 
     /* Close filters */
-    for( i = 0; i < id->i_filter; i++ )
-    {
-        vlc_object_detach( id->pp_filter[i] );
-        if( id->pp_filter[i]->p_module )
-            module_Unneed( id->pp_filter[i], id->pp_filter[i]->p_module );
-        vlc_object_release( id->pp_filter[i] );
-    }
-    id->i_filter = 0;
-
-    for( i = 0; i < id->i_ufilter; i++ )
-    {
-        vlc_object_detach( id->pp_ufilter[i] );
-        if( id->pp_ufilter[i]->p_module )
-            module_Unneed( id->pp_ufilter[i], id->pp_ufilter[i]->p_module );
-        vlc_object_release( id->pp_ufilter[i] );
-    }
-    id->i_ufilter = 0;
+    if( id->p_f_chain )
+        filter_chain_Delete( id->p_f_chain );
+    if( id->p_uf_chain )
+        filter_chain_Delete( id->p_uf_chain );
 }
 
 static int transcode_audio_process( sout_stream_t *p_stream,
@@ -1455,7 +1368,6 @@ static int transcode_audio_process( sout_stream_t *p_stream,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     aout_buffer_t *p_audio_buf;
     block_t *p_block, *p_audio_block;
-    int i;
     *out = NULL;
 
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
@@ -1487,21 +1399,9 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_block->i_samples = p_audio_buf->i_nb_samples;
 
         /* Run filter chain */
-        for( i = 0; i < id->i_filter; i++ )
-        {
-            p_audio_block =
-                id->pp_filter[i]->pf_audio_filter( id->pp_filter[i],
-                                                   p_audio_block );
-        }
-
-        /* Run user specified filter chain */
-        for( i = 0; i < id->i_ufilter; i++ )
-        {
-            p_audio_block =
-                id->pp_ufilter[i]->pf_audio_filter( id->pp_ufilter[i],
-                                                    p_audio_block );
-        }
-
+        p_audio_block = filter_chain_AudioFilter( id->p_f_chain, p_audio_block );
+        if( id->p_uf_chain )
+            p_audio_block = filter_chain_AudioFilter( id->p_uf_chain, p_audio_block );
         assert( p_audio_block );
 
         p_audio_buf->p_buffer = p_audio_block->p_buffer;
@@ -1575,64 +1475,29 @@ static void audio_del_buffer( decoder_t *p_dec, aout_buffer_t *p_buffer )
  * video
  */
 
-static filter_t *transcode_video_filter_new( sout_stream_t *p_stream,
-                                             es_format_t *p_fmt_in,
-                                             es_format_t *p_fmt_out,
-                                             config_chain_t  *p_cfg,
-                                             const char *psz_name )
+static int transcode_video_filter_allocation_init( filter_t *p_filter,
+                                                   void *p_data )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    filter_t *p_filter;
+    sout_stream_sys_t *p_sys = (sout_stream_sys_t*)p_data;
     int i;
-
-    if( !p_stream || !p_fmt_in || !p_fmt_out ) return NULL;
-
-    p_filter = vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-    vlc_object_attach( p_filter, p_stream );
 
     p_filter->pf_vout_buffer_new = video_new_buffer_filter;
     p_filter->pf_vout_buffer_del = video_del_buffer_filter;
 
-    es_format_Copy( &p_filter->fmt_in,  p_fmt_in );
-    es_format_Copy( &p_filter->fmt_out, p_fmt_out );
-    p_filter->p_cfg = p_cfg;
-
-    p_filter->p_module = module_Need( p_filter, "video filter2",
-                                      psz_name, true );
-    if( !p_filter->p_module )
-    {
-        msg_Dbg( p_stream, "no video filter found" );
-        vlc_object_detach( p_filter );
-        vlc_object_release( p_filter );
-        return NULL;
-    }
-
     p_filter->p_owner = malloc( sizeof(filter_owner_sys_t) );
     if( !p_filter->p_owner )
-    {
-        module_Unneed( p_filter,p_filter->p_module );
-        vlc_object_detach( p_filter );
-        vlc_object_release( p_filter );
-        return NULL;
-    }
+        return VLC_EGENERIC;
 
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
         p_filter->p_owner->pp_pics[i] = 0;
     p_filter->p_owner->p_sys = p_sys;
 
-    return p_filter;
+    return VLC_SUCCESS;
 }
 
-static void transcode_video_filter_close( sout_stream_t *p_stream,
-                                          filter_t *p_filter )
+static void transcode_video_filter_allocation_clear( filter_t *p_filter )
 {
     int j;
-
-    if( !p_stream || !p_filter ) return;
-
-    vlc_object_detach( p_filter );
-    if( p_filter->p_module )
-        module_Unneed( p_filter, p_filter->p_module );
 
     /* Clean-up pictures ring buffer */
     for( j = 0; j < PICTURE_RING_SIZE; j++ )
@@ -1642,8 +1507,6 @@ static void transcode_video_filter_close( sout_stream_t *p_stream,
                               p_filter->p_owner->pp_pics[j] );
     }
     free( p_filter->p_owner );
-    vlc_object_release( p_filter );
-    p_filter = NULL;
 }
 
 static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
@@ -1976,19 +1839,10 @@ static void transcode_video_close( sout_stream_t *p_stream,
         module_Unneed( id->p_encoder, id->p_encoder->p_module );
 
     /* Close filters */
-    for( i = 0; i < id->i_filter; i++ )
-    {
-        transcode_video_filter_close( p_stream, id->pp_filter[i] );
-        id->pp_filter[i] = NULL;
-    }
-    id->i_filter = 0;
-
-    for( i = 0; i < id->i_ufilter; i++ )
-    {
-        transcode_video_filter_close( p_stream, id->pp_ufilter[i] );
-        id->pp_ufilter[i] = NULL;
-    }
-    id->i_ufilter = 0;
+    if( id->p_f_chain )
+        filter_chain_Delete( id->p_f_chain );
+    if( id->p_uf_chain )
+        filter_chain_Delete( id->p_uf_chain );
 }
 
 static int transcode_video_process( sout_stream_t *p_stream,
@@ -1996,7 +1850,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                                     block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int i_duplicate = 1, i;
+    int i_duplicate = 1;
     picture_t *p_pic, *p_pic2 = NULL;
     *out = NULL;
 
@@ -2067,18 +1921,20 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 return VLC_EGENERIC;
             }
 
+            id->p_f_chain = filter_chain_New( p_stream, "video filter2",
+                                              false,
+                               transcode_video_filter_allocation_init,
+                               transcode_video_filter_allocation_clear,
+                               p_stream->p_sys );
+
             /* Deinterlace */
             if( p_stream->p_sys->b_deinterlace )
             {
-                id->pp_filter[id->i_filter] =
-                    transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out,
-                            &id->p_decoder->fmt_out,
-                            p_sys->p_deinterlace_cfg,
-                            p_sys->psz_deinterlace );
-
-                if( id->pp_filter[id->i_filter] )
-                    id->i_filter++;
+                filter_chain_AppendFilter( id->p_f_chain,
+                                           p_sys->psz_deinterlace,
+                                           p_sys->p_deinterlace_cfg,
+                                           &id->p_decoder->fmt_out,
+                                           &id->p_decoder->fmt_out );
             }
 
             /* Take care of the scaling and chroma conversions */
@@ -2089,38 +1945,28 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 ( id->p_decoder->fmt_out.video.i_height !=
                   id->p_encoder->fmt_in.video.i_height ) )
             {
-                id->pp_filter[id->i_filter] =
-                    transcode_video_filter_new( p_stream,
-                        &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
-                        NULL, NULL );
-                if( !id->pp_filter[id->i_filter] )
-                {
-                    p_pic->pf_release( p_pic );
-                    transcode_video_close( p_stream, id );
-                    id->b_transcode = false;
-                    return VLC_EGENERIC;
-                }
-                id->i_filter++;
+                filter_chain_AppendFilter( id->p_f_chain,
+                                           NULL, NULL,
+                                           &id->p_decoder->fmt_out,
+                                           &id->p_encoder->fmt_in );
             }
 
-            for( i = 0; (i < p_sys->i_vfilters) && (id->i_ufilter < TRANSCODE_FILTERS); i++ )
+            if( p_sys->psz_vf2 )
             {
-                id->pp_ufilter[id->i_ufilter] =
-                    transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
-                            p_sys->p_vfilters_cfg[i], p_sys->psz_vfilters[i] );
-                if( id->pp_ufilter[id->i_filter] )
-                    id->i_ufilter++;
-                else
-                    id->pp_ufilter[id->i_ufilter] = NULL;
+                id->p_uf_chain = filter_chain_New( p_stream, "video filter2",
+                                                   true,
+                                   transcode_video_filter_allocation_init,
+                                   transcode_video_filter_allocation_clear,
+                                   p_stream->p_sys );
+                filter_chain_Reset( id->p_uf_chain, &id->p_decoder->fmt_out,
+                                    &id->p_encoder->fmt_in );
+                filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_vf2 );
             }
         }
 
         /* Run filter chain */
-        for( i = 0; i < id->i_filter; i++ )
-        {
-            p_pic = id->pp_filter[i]->pf_video_filter(id->pp_filter[i], p_pic);
-        }
+        if( id->p_f_chain )
+            p_pic = filter_chain_VideoFilter( id->p_f_chain, p_pic );
 
         /*
          * Encoding
@@ -2145,7 +1991,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             i_scale_height = id->p_encoder->fmt_in.video.i_height * 1000 /
                 id->p_decoder->fmt_out.video.i_height;
 
-            if( p_pic->i_refcount && !id->i_filter )
+            if( p_pic->i_refcount && !filter_chain_GetLength( id->p_f_chain ) )
             {
                 /* We can't modify the picture, we need to duplicate it */
                 picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
@@ -2157,10 +2003,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 }
             }
 
-            if( id->i_filter )
-                p_fmt = &id->pp_filter[id->i_filter -1]->fmt_out.video;
-            else
-                p_fmt = &id->p_decoder->fmt_out.video;
+            *p_fmt = filter_chain_GetFmtOut( id->p_f_chain )->video;
 
             /* FIXME (shouldn't have to be done here) */
             p_fmt->i_sar_num = p_fmt->i_aspect *
@@ -2172,11 +2015,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
         }
 
         /* Run user specified filter chain */
-        for( i = 0; i < id->i_ufilter; i++ )
-        {
-            p_pic = id->pp_ufilter[i]->pf_video_filter( id->pp_ufilter[i],
-                                                        p_pic );
-        }
+        if( id->p_uf_chain )
+            p_pic = filter_chain_VideoFilter( id->p_uf_chain, p_pic );
 
         if( p_sys->i_threads == 0 )
         {
