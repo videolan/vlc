@@ -35,6 +35,9 @@ Important notes:
  * The old access:url syntax is no longer supported. Use access://url instead.
 	E.g.:  vlc:quit -> vlc://quit ; 
 	       udp:@239.255.12.12 -> udp://@239.255.12.12
+ * The ffmpeg module has been removed and replaced by the avcodec, avformat,
+   swscale (or imgresample if you use a swscale-less ffmpeg build) and
+   postproc modules.
 
 Changes:
 --------
