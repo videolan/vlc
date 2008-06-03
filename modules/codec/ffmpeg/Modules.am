@@ -36,6 +36,15 @@ SOURCES_swscale = \
 	scale.c \
 	$(NULL)
 
+# FIXME
+SOURCES_imgresample = \
+	avcodec.c \
+	avcodec.h \
+	video.c \
+	audio.c \
+	deinterlace.c \
+	$(NULL)
+
 SOURCES_postproc = \
 	postprocess.c \
 	$(NULL)

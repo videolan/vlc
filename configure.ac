@@ -192,7 +192,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([mkv mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LDFLAGS([libvlc_control],[-Wl,dynamic_lookup])
-    VLC_ADD_LDFLAGS([avcodec avformat swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
+    VLC_ADD_LDFLAGS([avcodec avformat swscale imgresample postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LDFLAGS([libvlc],[-Wl,-framework,Cocoa,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
@@ -645,7 +645,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlc vorbis freetype mod mpc dmo quicktime realaudio realvideo galaktos opengl],[-lm])
+  VLC_ADD_LIBS([avcodec avformat swscale imgresample postproc ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlc vorbis freetype mod mpc dmo quicktime realaudio realvideo galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol speex mono colorthres extract],[-lm])
@@ -2937,7 +2937,7 @@ then
       VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libavcodec or libavutil.])
+      AC_MSG_ERROR([Could not find libavcodec or libavutil. Use --disable-avcodec to ignore this error.])
   ])
 fi
 
@@ -2962,7 +2962,7 @@ then
       VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libavformat, libavcodec or libavutil.])
+      AC_MSG_ERROR([Could not find libavformat, libavcodec or libavutil. Use --disable-avformat to ignore this error.])
   ])
 fi
 
@@ -2986,7 +2986,46 @@ then
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libswscale or libavutil.])
+      AC_MSG_WARN([Could not find libswscale or libavutil. Trying to enable imgresample.])
+      enable_imgresample=yes
+  ])
+fi
+
+dnl
+dnl  avcodec (deprecated API) image scaling and conversion plugin
+dnl
+dnl  This is build as a seperate module than the avcodec one to prevent
+dnl  stupid run time library load errors from disabling most codecs
+dnl  from VLC.
+dnl
+
+AC_ARG_ENABLE(imgresample,
+[  --enable-imgresample deprecated libavcodec image scaling and conversion (default disabled)])
+if test "${enable_imgresample}" = "yes"
+then
+  PKG_CHECK_MODULES(IMGRESAMPLE,[libavcodec, libavutil],
+    [
+      VLC_SAVE_FLAGS
+      CPPFLAGS="${CPPFLAGS} ${IMGRESAMPLE_CFLAGS}"
+      CFLAGS="${CFLAGS} ${IMGRESAMPLE_CFLAGS}"
+      LIBS="${CFLAGS} ${IMGRESAMPLE_LIBS}"
+      AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
+      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
+      AC_CHECK_LIB(avcodec,img_resample,
+        [
+          VLC_ADD_PLUGIN([imgresample])
+          VLC_ADD_LIBS([imgresample],[$IMGRESAMPLE_LIBS])
+          VLC_ADD_CFLAGS([imgresample],[$IMGRESAMPLE_CFLAGS])
+        ],[
+          AC_MSG_WARN([Could not find img_resample in libavcodec.])
+          if test "${enable_swscale}" != "no"
+          then
+            AC_MSG_ERROR([swscale (and its fallback module imgresample) support will be missing. Use --disable-swscale to ignore this error. (This basically means that you will be missing any good software scaling module and some video chroma converters.)])
+          fi
+        ])
+      VLC_RESTORE_FLAGS
+    ],[
+      AC_MSG_WARN([Could not find libavcodec or libavutil.])
   ])
 fi
 
