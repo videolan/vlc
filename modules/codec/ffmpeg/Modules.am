@@ -44,8 +44,8 @@ SOURCES_swscale = \
 SOURCES_imgresample = \
 	imgresample.c \
 	imgresample.h \
-        chroma.c \
-        video_filter.c \
+	chroma.c \
+	video_filter.c \
 	chroma.h \
 	$(NULL)
 
