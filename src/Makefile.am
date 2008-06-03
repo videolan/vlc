@@ -362,6 +362,7 @@ SOURCES_libvlc_common = \
 	misc/xml.c \
 	misc/devices.c \
 	extras/libc.c \
+	misc/filter_chain.c \
 	$(NULL)
 
 SOURCES_libvlc_sout = \

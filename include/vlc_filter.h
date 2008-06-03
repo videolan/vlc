@@ -1,10 +1,11 @@
 /*****************************************************************************
- * vlc_filter.h: filter related structures
+ * vlc_filter.h: filter related structures and functions
  *****************************************************************************
- * Copyright (C) 1999-2003 the VideoLAN team
+ * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Antoine Cellerier <dionoea at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +56,7 @@ struct filter_t
 
     /* Output format of filter */
     es_format_t         fmt_out;
+    bool                b_allow_fmt_out_change;
 
     /* Filter configuration */
     config_chain_t *    p_cfg;
@@ -81,8 +83,8 @@ struct filter_t
     /* Video output callbacks */
     picture_t     * ( * pf_vout_buffer_new) ( filter_t * );
     void            ( * pf_vout_buffer_del) ( filter_t *, picture_t * );
-    void            ( * pf_picture_link)    ( picture_t * );
-    void            ( * pf_picture_unlink)  ( picture_t * );
+    /* void            ( * pf_picture_link)    ( picture_t * );
+    void            ( * pf_picture_unlink)  ( picture_t * ); */
 
     /* SPU output callbacks */
     subpicture_t *  ( * pf_sub_buffer_new) ( filter_t * );
@@ -124,5 +126,31 @@ struct filter_t
             p_pic->pf_release( p_pic );                                 \
         return p_outpic;                                                \
     }
+
+/**
+ * Filter chain management API
+ */
+
+typedef struct filter_chain_t filter_chain_t;
+
+VLC_EXPORT( filter_chain_t *, __filter_chain_New, ( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) );
+#define filter_chain_New( a, b, c, d, e, f ) __filter_chain_New( VLC_OBJECT( a ), b, c, d, e, f )
+VLC_EXPORT( void, filter_chain_Delete, ( filter_chain_t * ) );
+VLC_EXPORT( void, filter_chain_Reset, ( filter_chain_t *, const es_format_t *, const es_format_t * ) );
+
+VLC_EXPORT( filter_t *, filter_chain_AppendFilter, ( filter_chain_t *, const char *, config_chain_t *, const es_format_t *, const es_format_t * ) );
+VLC_EXPORT( int, filter_chain_AppendFromString, ( filter_chain_t *, const char * ) );
+VLC_EXPORT( int, filter_chain_DeleteFilter, ( filter_chain_t *, filter_t * ) );
+
+VLC_EXPORT( filter_t *, filter_chain_GetFilter, ( filter_chain_t *, int, const char * ) );
+VLC_EXPORT( int, filter_chain_GetLength, ( filter_chain_t * ) );
+VLC_EXPORT( const es_format_t *, filter_chain_GetFmtOut, ( filter_chain_t * ) );
+
+/**
+ * Apply the filter chain
+ */
+VLC_EXPORT( picture_t *, filter_chain_VideoFilter, ( filter_chain_t *, picture_t * ) );
+VLC_EXPORT( block_t *, filter_chain_AudioFilter, ( filter_chain_t *, block_t * ) );
+VLC_EXPORT( void, filter_chain_SubFilter, ( filter_chain_t *, mtime_t ) );
 
 #endif /* _VLC_FILTER_H */
