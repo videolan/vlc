@@ -1,7 +1,7 @@
 /*****************************************************************************
  * chroma.c: chroma conversion using ffmpeg library
  *****************************************************************************
- * Copyright (C) 1999-2001 the VideoLAN team
+ * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -31,10 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_vout.h>
-
-#if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H)
 #include <vlc_filter.h>
-#endif
 
 /* ffmpeg header */
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
@@ -47,8 +44,8 @@
 
 #include "ffmpeg.h"
 
-#if !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H)
-static void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
+static void ChromaConversion( filter_t *, picture_t *, picture_t * );
+static picture_t *ChromaConversion_Filter( filter_t *, picture_t * );
 
 /*****************************************************************************
  * chroma_sys_t: chroma method descriptor
@@ -87,7 +84,7 @@ int OpenChroma( vlc_object_t *p_this )
         if( i_ffmpeg_chroma[i] < 0 ) return VLC_EGENERIC;
     }
 
-    p_filter->pf_video_filter_io = ChromaConversion;
+    p_filter->pf_video_filter = ChromaConversion_Filter;
 
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
@@ -95,8 +92,8 @@ int OpenChroma( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    p_filter->.p_sys->i_src_vlc_chroma = p_vout->render.i_chroma;
-    p_filter->p_sys->i_dst_vlc_chroma = p_vout->output.i_chroma;
+    p_filter->p_sys->i_src_vlc_chroma = p_filter->fmt_in.video.i_chroma;
+    p_filter->p_sys->i_dst_vlc_chroma = p_filter->fmt_out.video.i_chroma;
     p_filter->p_sys->i_src_ffmpeg_chroma = i_ffmpeg_chroma[0];
     p_filter->p_sys->i_dst_ffmpeg_chroma = i_ffmpeg_chroma[1];
 
@@ -124,6 +121,8 @@ int OpenChroma( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
+
+VIDEO_FILTER_WRAPPER( ChromaConversion )
 
 /*****************************************************************************
  * ChromaConversion: actual chroma conversion function
@@ -200,4 +199,3 @@ void CloseChroma( vlc_object_t *p_this )
     }
     free( p_filter->p_sys );
 }
-#endif

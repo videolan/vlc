@@ -63,13 +63,21 @@ static const char *const ppsz_mode_descriptions[] =
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( N_("Video scaling filter") );
-    set_capability( "video filter2", 1000 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_callbacks( OpenScaler, CloseScaler );
-    add_integer( "swscale-mode", 0, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, true );
-        change_integer_list( pi_mode_values, ppsz_mode_descriptions, 0 );
+    set_capability( "video filter2", 50 );
+    set_callbacks( OpenFilter, CloseFilter );
+    set_description( N_("FFmpeg video filter") );
+
+    /* crop/padd submodule */
+    add_submodule();
+    set_capability( "crop padd", 10 );
+    set_callbacks( OpenCropPadd, CloseFilter );
+    set_description( N_("FFmpeg crop padd filter") );
+
+    /* chroma conversion submodule */
+    add_submodule();
+    set_capability( "chroma", 50 );
+    set_callbacks( OpenChroma, CloseChroma );
+    set_description( N_("FFmpeg chroma conversion") );
 vlc_module_end();
 
 /*****************************************************************************

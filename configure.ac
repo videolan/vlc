@@ -3008,7 +3008,6 @@ then
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${IMGRESAMPLE_CFLAGS}"
       CFLAGS="${CFLAGS} ${IMGRESAMPLE_CFLAGS}"
-      LIBS="${CFLAGS} ${IMGRESAMPLE_LIBS}"
       AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
       AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       AC_CHECK_LIB(avcodec,img_resample,
@@ -3022,7 +3021,7 @@ then
           then
             AC_MSG_ERROR([swscale (and its fallback module imgresample) support will be missing. Use --disable-swscale to ignore this error. (This basically means that you will be missing any good software scaling module and some video chroma converters.)])
           fi
-        ])
+        ],${IMGRESAMPLE_LIBS})
       VLC_RESTORE_FLAGS
     ],[
       AC_MSG_WARN([Could not find libavcodec or libavutil.])

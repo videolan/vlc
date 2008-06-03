@@ -45,7 +45,6 @@
 
 #include "ffmpeg.h"
 
-#if !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H)
 static int CheckInit( filter_t *p_filter );
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic );
 
@@ -564,4 +563,3 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
     p_pic->pf_release( p_pic );
     return p_pic_dst;
 }
-#endif /* ( (defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) */

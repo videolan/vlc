@@ -31,18 +31,14 @@ EXTRA_libavformat_plugin_la_SOURCES = \
 SOURCES_swscale = \
 	swscale.c \
 	swscale.h \
-	video_filter.c \
-	chroma.c \
 	scale.c \
 	$(NULL)
 
-# FIXME
 SOURCES_imgresample = \
-	avcodec.c \
-	avcodec.h \
-	video.c \
-	audio.c \
-	deinterlace.c \
+	imgresample.c \
+	imgresample.h \
+        chroma.c \
+        video_filter.c \
 	$(NULL)
 
 SOURCES_postproc = \
@@ -53,12 +49,14 @@ libvlc_LTLIBRARIES += \
 	$(LTLIBavcodec) \
 	$(LTLIBavformat) \
 	$(LTLIBswscale) \
+	$(LTLIBimgresample) \
 	$(LTLIBpostproc)
 
 EXTRA_LTLIBRARIES += \
 	libavcodec_plugin.la \
 	libavformat_plugin.la \
 	libswscale_plugin.la \
+	libimgresample_plugin.la \
 	libpostproc_plugin.la
 
 # FIXME SOURCES_ffmpegaltivec = \
