@@ -322,6 +322,32 @@ static void stream_decode (demux_t *demux, void *data, block_t *block)
  * Static payload types handler
  */
 
+/* PT=0
+ * PCMU:
+ */
+static void *pcmu_init (demux_t *demux)
+{
+    es_format_t fmt;
+
+    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('u', 'l', 'a', 'w'));
+    fmt.audio.i_rate = 8000;
+    fmt.audio.i_channels = 1;
+    return codec_init (demux, &fmt);
+}
+
+/* PT=8
+ * PCMA:
+ */
+static void *pcma_init (demux_t *demux)
+{
+    es_format_t fmt;
+
+    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('a', 'l', 'a', 'w'));
+    fmt.audio.i_rate = 8000;
+    fmt.audio.i_channels = 1;
+    return codec_init (demux, &fmt);
+}
+
 /* PT=14
  * MPA: MPEG Audio (RFC2250, §3.4)
  */
@@ -419,22 +445,34 @@ static int Demux (demux_t *demux)
 
             switch (pt.number)
             {
+              case 0:
+                msg_Dbg (demux, "detected G.711 mu-law");
+                pt.init = pcmu_init;
+                pt.frequency = 8000;
+                break;
+
+              case 8:
+                msg_Dbg (demux, "detected G.711 A-law");
+                pt.init = pcma_init;
+                pt.frequency = 8000;
+                break;
+
               case 14:
-                msg_Dbg (demux, "detected MPEG Audio over RTP");
+                msg_Dbg (demux, "detected MPEG Audio");
                 pt.init = mpa_init;
                 pt.decode = mpa_decode;
                 pt.frequency = 44100;
                 break;
 
               case 32:
-                msg_Dbg (demux, "detected MPEG Video over RTP");
+                msg_Dbg (demux, "detected MPEG Video");
                 pt.init = mpv_init;
                 pt.decode = mpv_decode;
                 pt.frequency = 90000;
                 break;
 
               case 33:
-                msg_Dbg (demux, "detected MPEG2 TS over RTP");
+                msg_Dbg (demux, "detected MPEG2 TS");
                 pt.init = ts_init;
                 pt.destroy = stream_destroy;
                 pt.decode = stream_decode;
