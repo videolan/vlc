@@ -68,12 +68,6 @@
 /* Counter for statistics and profiling */
 typedef unsigned long       count_t;
 
-/* DCT elements types */
-typedef int16_t             dctelem_t;
-
-/* Video buffer types */
-typedef uint8_t             yuv_data_t;
-
 /* Audio volume */
 typedef uint16_t            audio_volume_t;
 
@@ -388,7 +382,7 @@ struct stat;
 typedef union
 {
     int             i_int;
-    bool      b_bool;
+    bool            b_bool;
     float           f_float;
     char *          psz_string;
     void *          p_address;
@@ -558,7 +552,7 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
 
 struct gc_object_t
 {
-            VLC_GC_MEMBERS
+    VLC_GC_MEMBERS
 };
 
 static inline void __vlc_gc_incref( gc_object_t * p_gc )
