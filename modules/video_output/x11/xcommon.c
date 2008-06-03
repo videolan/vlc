@@ -1449,7 +1449,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                                     p_win->video_window, p_win->gc, 0, 0,
                                     p_win->i_width, p_win->i_height );
                 }
-#endif 
+#endif
 
 #if 0
                 if( p_vout->p_libvlc->p_input_bank->pp_input[0] != NULL )
@@ -2002,6 +2002,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 p_pic->V_PIXELS = (uint8_t*)p_pic->p_sys->p_image->data
                     + p_pic->p_sys->p_image->offsets[1];
             }
+
             break;
 
 #else
@@ -2838,11 +2839,6 @@ IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
 
     /* Create XImage / XvImage */
 #ifdef MODULE_NAME_IS_xvideo
-
-    /* Make sure the buffer is aligned to multiple of 16 */
-    i_height = ( i_height + 15 ) >> 4 << 4;
-    i_width = ( i_width + 15 ) >> 4 << 4;
-
     p_image = XvShmCreateImage( p_display, i_xvport, i_chroma, 0,
                                 i_width, i_height, p_shm );
 #elif defined(MODULE_NAME_IS_xvmc)
@@ -2928,11 +2924,6 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
 
     /* Allocate memory for image */
 #ifdef MODULE_NAME_IS_xvideo
-
-    /* Make sure the buffer is aligned to multiple of 16 */
-    i_height = ( i_height + 15 ) >> 4 << 4;
-    i_width = ( i_width + 15 ) >> 4 << 4;
-
     p_data = malloc( i_width * i_height * i_bits_per_pixel / 8 );
 #elif defined(MODULE_NAME_IS_x11)
     i_bytes_per_line = i_width * i_bytes_per_pixel;
