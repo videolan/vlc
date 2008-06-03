@@ -440,6 +440,15 @@ static int Demux (demux_t *demux)
                 pt.decode = stream_decode;
                 pt.frequency = 90000;
                 break;
+
+              case 72: /* muxed SR */
+              case 73: /* muxed RR */
+              case 74: /* muxed SDES */
+              case 75: /* muxed BYE */
+              case 76: /* muxed APP */
+              default:
+                block_Release (block); /* ooh! ignoring RTCP is evil! */
+                return 1;
             }
             rtp_add_type (demux, p_sys->session, &pt);
             p_sys->autodetect = false;
