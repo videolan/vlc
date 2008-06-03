@@ -45,6 +45,7 @@ struct demux_sys_t
     rtp_session_t *session;
     int           fd;
 
+    unsigned      caching;
     unsigned      timeout;
     uint8_t       max_src;
     uint16_t      max_dropout;

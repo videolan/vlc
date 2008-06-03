@@ -87,7 +87,8 @@ void rtp_session_destroy (demux_t *demux, rtp_session_t *session)
 
 static void *no_init (demux_t *demux)
 {
-    return demux;
+    (void)demux;
+    return NULL;
 }
 
 static void no_destroy (demux_t *demux, void *opaque)
@@ -124,6 +125,8 @@ int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt)
     ppt->decode = pt->decode ? pt->decode : no_decode;
     ppt->frequency = pt->frequency;
     ppt->number = pt->number;
+    msg_Dbg (demux, "added payload type %"PRIu8" (f = %"PRIu32" Hz)",
+             ppt->number, ppt->frequency);
 
     assert (ppt->frequency > 0); /* SIGFPE! */
     (void)demux;
@@ -139,7 +142,7 @@ struct rtp_source_t
     uint16_t max_seq; /* next expected sequence */
 
     block_t *blocks; /* re-ordered blocks queue */
-    void    *opaque[0]; /* Per-source prviate payload data */
+    void    *opaque[0]; /* Per-source private payload data */
 };
 
 /**
@@ -347,7 +350,6 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     /* TODO: sync multiple sources sanely... */
     const uint32_t timestamp = GetDWBE (block->p_buffer + 4);
     block->i_pts = UINT64_C(1) * CLOCK_FREQ * timestamp / pt->frequency;
-    //msg_Dbg (demux, "pts = %"PRIu64, block->i_pts);
 
     /* CSRC count */
     size_t skip = 12u + (block->p_buffer[0] & 0x0F) * 4;

@@ -145,7 +145,7 @@ static int Open (vlc_object_t *obj)
     if (p_sys == NULL)
         goto error;
 
-    var_Create (obj, "rtp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    p_sys->caching      = var_CreateGetInteger (obj, "rtp-caching");
     p_sys->max_src      = var_CreateGetInteger (obj, "rtp-max-src");
     p_sys->timeout      = var_CreateGetInteger (obj, "rtp-timeout");
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
@@ -166,7 +166,7 @@ static int Open (vlc_object_t *obj)
 error:
     net_Close (fd);
     free (p_sys);
-    return VLC_SUCCESS;
+    return VLC_EGENERIC;
 }
 
 
@@ -217,8 +217,7 @@ static int extract_port (char **phost)
  */
 static int Control (demux_t *demux, int i_query, va_list args)
 {
-    /*demux_sys_t *p_sys  = demux->p_sys;*/
-    (void)demux;
+    demux_sys_t *p_sys = demux->p_sys;
 
     switch (i_query)
     {
@@ -240,7 +239,7 @@ static int Control (demux_t *demux, int i_query, va_list args)
         case DEMUX_GET_PTS_DELAY:
         {
             int64_t *v = va_arg (args, int64_t *);
-            *v = var_GetInteger (demux, "rtp-caching");
+            *v = p_sys->caching;
             return 0;
         }
     }
@@ -270,6 +269,33 @@ static block_t *rtp_dgram_recv (demux_t *demux, int fd)
 /*
  * Generic packet handlers
  */
+
+static void *codec_init (demux_t *demux, es_format_t *fmt)
+{
+    return es_out_Add (demux->out, fmt);
+}
+
+static void codec_destroy (demux_t *demux, void *data)
+{
+    if (data)
+        es_out_Del (demux->out, (es_out_id_t *)data);
+}
+
+/* Send a packet to decoder */
+static void codec_decode (demux_t *demux, void *data, block_t *block)
+{
+    if (data)
+    {
+        block->i_dts = 0; /* RTP does not specify this */
+        es_out_Control (demux->out, ES_OUT_SET_PCR,
+                        block->i_pts - demux->p_sys->caching * 1000);
+        es_out_Send (demux->out, (es_out_id_t *)data, block);
+    }
+    else
+        block_Release (block);
+}
+
+
 static void *stream_init (demux_t *demux, const char *name)
 {
     return stream_DemuxNew (demux, name, demux->out);
@@ -287,8 +313,73 @@ static void stream_decode (demux_t *demux, void *data, block_t *block)
 {
     if (data)
         stream_DemuxSend ((stream_t *)data, block);
+    else
+        block_Release (block);
     (void)demux;
 }
+
+/*
+ * Static payload types handler
+ */
+
+/* PT=14
+ * MPA: MPEG Audio (RFC2250, §3.4)
+ */
+static void *mpa_init (demux_t *demux)
+{
+    es_format_t fmt;
+
+    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('m', 'p', 'g', 'a'));
+    fmt.audio.i_channels = 2;
+    return codec_init (demux, &fmt);
+}
+
+static void mpa_decode (demux_t *demux, void *data, block_t *block)
+{
+    if (block->i_buffer < 4)
+    {
+        block_Release (block);
+        return;
+    }
+
+    block->i_buffer -= 4; /* 32-bits RTP/MPA header */
+    block->p_buffer += 4;
+
+    codec_decode (demux, data, block);
+}
+
+
+/* PT=32
+ * MPV: MPEG Video (RFC2250, §3.5)
+ */
+static void *mpv_init (demux_t *demux)
+{
+    es_format_t fmt;
+
+    es_format_Init (&fmt, VIDEO_ES, VLC_FOURCC ('m', 'p', 'g', 'v'));
+    return codec_init (demux, &fmt);
+}
+
+static void mpv_decode (demux_t *demux, void *data, block_t *block)
+{
+    if (block->i_buffer < 4)
+    {
+        block_Release (block);
+        return;
+    }
+
+    block->i_buffer -= 4; /* 32-bits RTP/MPV header */
+    block->p_buffer += 4;
+#if 0
+    if (block->p_buffer[-3] & 0x4)
+    {
+        /* MPEG2 Video extension header */
+        /* TODO: shouldn't we skip this too ? */
+    }
+#endif
+    codec_decode (demux, data, block);
+}
+
 
 /* PT=33
  * MP2: MPEG TS (RFC2250, §2)
@@ -298,6 +389,11 @@ static void *ts_init (demux_t *demux)
     return stream_init (demux, "ts");
 }
 
+
+/*
+ * Dynamic payload type handlers
+ * Hmm, none implemented yet.
+ */
 
 /**
  * Processing callback
@@ -313,17 +409,27 @@ static int Demux (demux_t *demux)
         /* Not using SDP, we need to guess the payload format used */
         if (p_sys->autodetect && block->i_buffer >= 2)
         {
-            rtp_pt_t pt = { .init = NULL, };
+            rtp_pt_t pt = {
+                .init = NULL,
+                .destroy = codec_destroy,
+                .decode = codec_decode,
+                .frequency = 0,
+                .number = block->p_buffer[1] & 0x7f,
+            };
 
-            switch (pt.number = (block->p_buffer[1] & 0x7f))
+            switch (pt.number)
             {
               case 14:
                 msg_Dbg (demux, "detected MPEG Audio over RTP");
+                pt.init = mpa_init;
+                pt.decode = mpa_decode;
                 pt.frequency = 44100;
                 break;
 
               case 32:
                 msg_Dbg (demux, "detected MPEG Video over RTP");
+                pt.init = mpv_init;
+                pt.decode = mpv_decode;
                 pt.frequency = 90000;
                 break;
 
@@ -344,64 +450,3 @@ static int Demux (demux_t *demux)
 
     return 1;
 }
-
-
-/* Send a packet to decoder */
-#if 0
-static void pt_decode (demux_t *obj, block_t *block, rtp_pt_t *self)
-{
-    p_block->i_pts = p_block->i_dts = date_... (...);
-    es_out_Control (obj->out, ES_OUT_SET_PCR, p_block->i_pts);
-    es_out_Send (obj->out, (es_out_id_t *)*p_id, block);
-    return 0;
-}
-#endif
-
-
-#if 0
-/*
- * Static payload types handler
- */
-
-/* PT=14
- * MPA: MPEG Audio (RFC2250, §3.4)
- */
-static int pt_mpa (demux_t *obj, block_t *block, rtp_pt_t *self)
-{
-    if (block->i_buffer < 4)
-        return VLC_EGENERIC;
-
-    block->i_buffer -= 4; // 32 bits RTP/MPA header
-    block->p_buffer += 4;
-
-    return pt_demux (obj, block, self, "mpga");
-}
-
-
-/* PT=32
- * MPV: MPEG Video (RFC2250, §3.5)
- */
-static int pt_mpv (demux_t *obj, block_t *block, rtp_pt_t *self)
-{
-    if (block->i_buffer < 4)
-        return VLC_EGENERIC;
-
-    block->i_buffer -= 4; // 32 bits RTP/MPV header
-    block->p_buffer += 4;
-
-    if (block->p_buffer[-3] & 0x4)
-    {
-        /* MPEG2 Video extension header */
-        /* TODO: shouldn't we skip this too ? */
-    }
-
-    return pt_demux (obj, block, self, "mpgv");
-}
-
-
-#endif
-
-/*
- * Dynamic payload type handlers
- * Hmm, none implemented yet.
- */
