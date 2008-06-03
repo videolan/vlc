@@ -629,13 +629,14 @@ static int DemuxPacket( demux_t *p_demux )
 
     if( i_packet_size_left > 0 )
     {
+#ifdef ASF_DEBUG
         if( i_packet_size_left > i_packet_padding_length )
             msg_Warn( p_demux, "Didn't read %d bytes in the packet",
                             i_packet_size_left - i_packet_padding_length );
         else if( i_packet_size_left < i_packet_padding_length )
             msg_Warn( p_demux, "Read %d too much bytes in the packet",
                             i_packet_padding_length - i_packet_size_left );
-
+#endif
         if( stream_Read( p_demux->s, NULL, i_packet_size_left )
                                                          < i_packet_size_left )
         {
