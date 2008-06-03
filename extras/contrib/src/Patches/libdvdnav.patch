@@ -113,9 +113,9 @@ diff -r -u libdvdnav-4.1.1/src/dvdnav_internal.h libdvdnav/src/dvdnav_internal.h
  #include <io.h> /* read() */
  #define lseek64 _lseeki64
  
-diff -r -u libdvdnav-4.1.1/src/dvdread/dvd_input.c libdvdnav/src/dvdread/dvd_input.c
---- libdvdnav-4.1.1/src/dvdread/dvd_input.c	2007-04-19 16:45:30.000000000 +0100
-+++ libdvdnav/src/dvdread/dvd_input.c	2007-11-12 11:19:57.984375000 +0000
+diff -r -u libdvdnav-4.1.1/src/libdvdread/dvd_input.c libdvdnav/src/libdvdread/dvd_input.c
+--- libdvdnav-4.1.1/src/libdvdread/dvd_input.c	2007-04-19 16:45:30.000000000 +0100
++++ libdvdnav/src/libdvdread/dvd_input.c	2007-11-12 11:19:57.984375000 +0000
 @@ -27,6 +27,11 @@
  #include "dvd_reader.h"
  #include "dvd_input.h"
@@ -135,7 +135,7 @@ diff -r -u libdvdnav-4.1.1/src/vm/vm.c libdvdnav/src/vm/vm.c
  }
  #endif
  
-+#include <dvdread/dvd_input.h>
++#include <libdvdread/dvd_input.h>
 +
  static void dvd_read_name(char *name, const char *device) {
      /* Because we are compiling with _FILE_OFFSET_BITS=64
