@@ -81,13 +81,53 @@ void   csa_Delete( csa_t *c )
 /*****************************************************************************
  * csa_SetCW:
  *****************************************************************************/
-void csa_SetCW( csa_t *c, uint8_t o_ck[8], uint8_t e_ck[8] )
+int csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, int set_odd )
 {
-    memcpy( c->o_ck, o_ck, 8 );
-    csa_ComputeKey( c->o_kk, o_ck );
+    if ( !c )
+    {
+        msg_Dbg( p_caller, "no CSA found" );
+        return VLC_EGENERIC;
+    }
+    /* skip 0x */
+    if( psz_ck[0] == '0' && ( psz_ck[1] == 'x' || psz_ck[1] == 'X' ) )
+    {
+        psz_ck += 2;
+    }
+    if( strlen( psz_ck ) != 16 )
+    {
+        msg_Warn( p_caller, "invalid csa ck (it must be 16 chars long)" );
+        return VLC_EGENERIC;
+    }
+    else
+    {
+#ifndef UNDER_CE
+        uint64_t i_ck = strtoull( psz_ck, NULL, 16 );
+#else
+        uint64_t i_ck = strtoll( psz_ck, NULL, 16 );
+#endif
+        uint8_t  ck[8];
+        int      i;
 
-    memcpy( c->e_ck, e_ck, 8 );
-    csa_ComputeKey( c->e_kk, e_ck );
+        for( i = 0; i < 8; i++ )
+        {
+            ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
+        }
+#ifndef TS_NO_CSA_CK_MSG
+        msg_Dbg( p_caller, "using CSA (de)scrambling with %s key=%x:%x:%x:%x:%x:%x:%x:%x", ((set_odd == 1) ? "odd" : "even" ),
+                 ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
+#endif
+        if ( set_odd == 1 )
+        {
+                 memcpy( c->o_ck, ck, 8 );
+                 csa_ComputeKey( c->o_kk, ck );
+        }
+        else
+        {
+                 memcpy( c->e_ck , ck, 8 );
+                 csa_ComputeKey( c->e_kk , ck );
+        }
+        return VLC_SUCCESS;
+    }
 }
 
 /*****************************************************************************

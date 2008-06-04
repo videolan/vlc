@@ -771,48 +771,29 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_mux, SOUT_CFG_PREFIX "csa-ck", &val );
     if( val.psz_string && *val.psz_string )
     {
-        char *psz = val.psz_string;
+        int i_res;
 
-        /* skip 0x */
-        if( psz[0] == '0' && ( psz[1] == 'x' || psz[1] == 'X' ) )
+        p_sys->csa = csa_New();
+
+        i_res = csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, 1 );
+        if( i_res != VLC_SUCCESS || csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, 0 ) != VLC_SUCCESS )
         {
-            psz += 2;
+            csa_Delete( p_sys->csa );
         }
-        if( strlen( psz ) != 16 )
+
+        if( p_sys->csa )
         {
-            msg_Dbg( p_mux, "invalid csa ck (it must be 16 chars long)" );
-        }
-        else
-        {
-            uint64_t i_ck = strtoull( psz, NULL, 16 );
-            uint8_t  ck[8];
-            int      i;
+            vlc_value_t pkt_val;
 
-            for( i = 0; i < 8; i++ )
+            var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &pkt_val );
+            if( pkt_val.i_int < 12 || pkt_val.i_int > 188 )
             {
-                ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
+                msg_Err( p_mux, "wrong packet size %d specified.", pkt_val.i_int );
+                msg_Warn( p_mux, "using default packet size of 188 bytes" );
+                p_sys->i_csa_pkt_size = 188;
             }
-#ifndef TS_NO_CSA_CK_MSG
-            msg_Dbg( p_mux, "using CSA scrambling with ck=%x:%x:%x:%x:%x:%x:%x:%x",
-                     ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
-#endif
-            p_sys->csa = csa_New();
-            if( p_sys->csa )
-            {
-                vlc_value_t pkt_val;
-
-                csa_SetCW( p_sys->csa, ck, ck );
-
-                var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &pkt_val );
-                if( pkt_val.i_int < 12 || pkt_val.i_int > 188 )
-                {
-                    msg_Err( p_mux, "wrong packet size %d specified.", pkt_val.i_int );
-                    msg_Warn( p_mux, "using default packet size of 188 bytes" );
-                    p_sys->i_csa_pkt_size = 188;
-                }
-                else p_sys->i_csa_pkt_size = pkt_val.i_int;
-                msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
-            }
+            else p_sys->i_csa_pkt_size = pkt_val.i_int;
+            msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
         }
     }
     free( val.psz_string );

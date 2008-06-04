@@ -34,7 +34,7 @@ typedef struct csa_t csa_t;
 csa_t *csa_New( void );
 void   csa_Delete( csa_t * );
 
-void   csa_SetCW( csa_t *, uint8_t o_ck[8], uint8_t e_ck[8] );
+int    csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, int set_odd );
 
 void   csa_Decrypt( csa_t *, uint8_t *pkt, int i_pkt_size );
 void   csa_Encrypt( csa_t *, uint8_t *pkt, int i_pkt_size, int b_odd );

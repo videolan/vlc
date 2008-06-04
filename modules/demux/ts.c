@@ -777,52 +777,30 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_demux, "ts-csa-ck", &val );
     if( val.psz_string && *val.psz_string )
     {
-        char *psz = val.psz_string;
-        if( psz[0] == '0' && ( psz[1] == 'x' || psz[1] == 'X' ) )
+        int i_res;
+
+        p_sys->csa = csa_New();
+
+        i_res = csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, 1 );
+        if( i_res != VLC_SUCCESS || csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, 0 ) != VLC_SUCCESS )
         {
-            psz += 2;
+            csa_Delete( p_sys->csa );
         }
-        if( strlen( psz ) != 16 )
+
+        if( p_sys->csa )
         {
-            msg_Warn( p_demux, "invalid csa ck (it must be 16 chars long)" );
-        }
-        else
-        {
-#ifndef UNDER_CE
-            uint64_t i_ck = strtoull( psz, NULL, 16 );
-#else
-            uint64_t i_ck = strtoll( psz, NULL, 16 );
-#endif
-            uint8_t ck[8];
-            int     i;
-            for( i = 0; i < 8; i++ )
+            vlc_value_t pkt_val;
+
+            var_Create( p_demux, "ts-csa-pkt", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+            var_Get( p_demux, "ts-csa-pkt", &pkt_val );
+            if( pkt_val.i_int < 4 || pkt_val.i_int > 188 )
             {
-                ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
+                msg_Err( p_demux, "wrong packet size %d specified.", pkt_val.i_int );
+                msg_Warn( p_demux, "using default packet size of 188 bytes" );
+                p_sys->i_csa_pkt_size = 188;
             }
-#ifndef TS_NO_CSA_CK_MSG
-            msg_Dbg( p_demux, "using CSA scrambling with "
-                     "ck=%x:%x:%x:%x:%x:%x:%x:%x",
-                     ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
-#endif
-            p_sys->csa = csa_New();
-
-            if( p_sys->csa )
-            {
-                vlc_value_t pkt_val;
-
-                csa_SetCW( p_sys->csa, ck, ck );
-
-                var_Create( p_demux, "ts-csa-pkt", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-                var_Get( p_demux, "ts-csa-pkt", &pkt_val );
-                if( pkt_val.i_int < 4 || pkt_val.i_int > 188 )
-                {
-                    msg_Err( p_demux, "wrong packet size %d specified.", pkt_val.i_int );
-                    msg_Warn( p_demux, "using default packet size of 188 bytes" );
-                    p_sys->i_csa_pkt_size = 188;
-                }
-                else p_sys->i_csa_pkt_size = pkt_val.i_int;
-                msg_Dbg( p_demux, "decrypting %d bytes of packet", p_sys->i_csa_pkt_size );
-            }
+            else p_sys->i_csa_pkt_size = pkt_val.i_int;
+            msg_Dbg( p_demux, "decrypting %d bytes of packet", p_sys->i_csa_pkt_size );
         }
     }
     free( val.psz_string );
