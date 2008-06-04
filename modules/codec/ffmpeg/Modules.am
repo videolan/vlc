@@ -50,7 +50,6 @@ SOURCES_imgresample = \
 	$(NULL)
 
 SOURCES_postproc = \
-	postprocess.c \
 	$(NULL)
 
 libvlc_LTLIBRARIES += \
