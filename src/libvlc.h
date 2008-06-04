@@ -46,7 +46,7 @@ void system_End       ( libvlc_int_t * );
 int vlc_threads_init( void );
 void vlc_threads_end( void );
 vlc_object_t *vlc_threadobj (void);
-#ifndef NDEBUG
+#ifdef LIBVLC_REFCHECK
 void vlc_refcheck (vlc_object_t *obj);
 #else
 # define vlc_refcheck( obj ) (void)0
@@ -186,7 +186,7 @@ struct vlc_object_internals_t
     vlc_spinlock_t   ref_spin;
     unsigned         i_refcount;
     vlc_destructor_t pf_destructor;
-#ifndef NDEBUG
+#ifndef LIBVLC_REFCHECK
     vlc_thread_t     creator_id;
 #endif
 

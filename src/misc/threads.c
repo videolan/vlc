@@ -63,6 +63,7 @@ libvlc_global_data_t *vlc_global( void )
     return p_root;
 }
 
+#ifndef NDEBUG
 /**
  * Object running the current thread
  */
@@ -72,6 +73,7 @@ vlc_object_t *vlc_threadobj (void)
 {
     return vlc_threadvar_get (&thread_object_key);
 }
+#endif
 
 vlc_threadvar_t msg_context_global_key;
 
@@ -170,7 +172,9 @@ int vlc_threads_init( void )
         }
 
         /* We should be safe now. Do all the initialization stuff we want. */
+#ifndef NDEBUG
         vlc_threadvar_create( &thread_object_key, NULL );
+#endif
         vlc_threadvar_create( &msg_context_global_key, msg_StackDestroy );
     }
     i_initializations++;
@@ -202,7 +206,9 @@ void vlc_threads_end( void )
     {
         vlc_object_release( p_root );
         vlc_threadvar_delete( &msg_context_global_key );
+#ifndef NDEBUG
         vlc_threadvar_delete( &thread_object_key );
+#endif
     }
     i_initializations--;
 
@@ -453,7 +459,9 @@ static THREAD_RTYPE thread_entry (void *data)
     void *(*func) (void *) = ((struct vlc_thread_boot *)data)->entry;
 
     free (data);
+#ifdef NDEBUG
     vlc_threadvar_set (&thread_object_key, obj);
+#endif
     msg_Dbg (obj, "thread started");
     func (obj);
     msg_Dbg (obj, "thread ended");

@@ -81,7 +81,7 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 static void vlc_object_destroy( vlc_object_t *p_this );
 static void vlc_object_detach_unlocked (vlc_object_t *p_this);
 
-#ifndef NDEBUG
+#ifdef LIBVLC_REFCHECK
 static vlc_threadvar_t held_objects;
 typedef struct held_list_t
 {
@@ -151,7 +151,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_libvlc_global->i_counter = 0;
         p_priv->next = p_priv->prev = p_new;
         vlc_mutex_init( &structure_lock );
-#ifndef NDEBUG
+#ifdef LIBVLC_REFCHECK
         /* TODO: use the destruction callback to track ref leaks */
         vlc_threadvar_create( &held_objects, held_objects_destroy );
 #endif
@@ -183,7 +183,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
     p_priv->next = VLC_OBJECT (p_libvlc_global);
-#if defined (NDEBUG)
+#if !defined (LIBVLC_REFCHECK)
     /* ... */
 #elif defined (LIBVLC_USE_PTHREAD)
     p_priv->creator_id = pthread_self ();
@@ -384,7 +384,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
         /* We are the global object ... no need to lock. */
         vlc_mutex_destroy( &structure_lock );
-#ifndef NDEBUG
+#ifdef LIBVLC_REFCHECK
         held_objects_destroy( vlc_threadvar_get( &held_objects ) );
         vlc_threadvar_delete( &held_objects );
 #endif
@@ -663,6 +663,7 @@ void * vlc_object_get( int i_id )
 {
     libvlc_global_data_t *p_libvlc_global = vlc_global();
     vlc_object_t *obj = NULL;
+#ifndef NDEBUG
     vlc_object_t *caller = vlc_threadobj ();
 
     if (caller)
@@ -670,7 +671,7 @@ void * vlc_object_get( int i_id )
     else
         fprintf (stderr, "main thread uses deprecated vlc_object_get(%d)\n",
                  i_id);
-
+#endif
     vlc_mutex_lock( &structure_lock );
 
     for( obj = vlc_internals (p_libvlc_global)->next;
@@ -684,10 +685,12 @@ void * vlc_object_get( int i_id )
         }
     }
     obj = NULL;
+#ifndef NDEBUG
     if (caller)
         msg_Warn (caller, "wants non-existing object %d", i_id);
     else
         fprintf (stderr, "main thread wants non-existing object %d\n", i_id);
+#endif
 out:
     vlc_mutex_unlock( &structure_lock );
     return obj;
@@ -795,7 +798,7 @@ void __vlc_object_yield( vlc_object_t *p_this )
     /* Increment the counter */
     internals->i_refcount++;
     vlc_spin_unlock( &internals->ref_spin );
-#ifndef NDEBUG
+#ifdef LIBVLC_REFCHECK
     /* Update the list of referenced objects */
     /* Using TLS, so no need to lock */
     /* The following line may leak memory if a thread leaks objects. */
@@ -816,7 +819,7 @@ void __vlc_object_release( vlc_object_t *p_this )
     vlc_object_internals_t *internals = vlc_internals( p_this );
     bool b_should_destroy;
 
-#ifndef NDEBUG
+#ifdef LIBVLC_REFCHECK
     /* Update the list of referenced objects */
     /* Using TLS, so no need to lock */
     for (held_list_t *hlcur = vlc_threadvar_get (&held_objects),
@@ -1528,7 +1531,7 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
     }
 }
 
-#ifndef NDEBUG
+#ifdef LIBVLC_REFCHECK
 # if defined(HAVE_EXECINFO_H) && defined(HAVE_BACKTRACE)
 #  include <execinfo.h>
 # endif
