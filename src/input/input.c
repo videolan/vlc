@@ -384,7 +384,7 @@ input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
 }
 
 /**
- * Initialize an input thread and run it. This thread will clean after himself,
+ * Initialize an input thread and run it. This thread will clean after itself,
  * you can forget about it. It can work either in blocking or non-blocking mode
  *
  * \param p_parent a vlc_object
