@@ -111,6 +111,7 @@ struct access_sys_t
     int        fd_data;
 
     char       sz_epsv_ip[NI_MAXNUMERICHOST];
+    bool       out;
 };
 #define GET_OUT_SYS( p_this ) \
     ((access_sys_t *)(((sout_access_out_t *)(p_this))->p_sys))
@@ -318,6 +319,7 @@ static int InOpen( vlc_object_t *p_this )
     /* Init p_access */
     STANDARD_READ_ACCESS_INIT
     p_sys->fd_data = -1;
+    p_sys->out = false;
 
     if( parseURL( &p_sys->url, p_access->psz_path ) )
         goto exit_error;
@@ -368,6 +370,7 @@ static int OutOpen( vlc_object_t *p_this )
 
     /* Init p_access */
     p_sys->fd_data = -1;
+    p_sys->out = true;
 
     if( parseURL( &p_sys->url, p_access->psz_path ) )
         goto exit_error;
@@ -472,7 +475,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     int i_read;
 
     assert( p_sys->fd_data != -1 );
-    assert( p_access->i_object_type == VLC_OBJECT_ACCESS );
+    assert( !p_sys->out );
 
     if( p_access->info.b_eof )
         return 0;
@@ -755,8 +758,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
 
     /* "1xx" message */
     if( ftp_SendCommand( p_access, p_sys, "%s %s",
-                         (p_access->i_object_type == VLC_OBJECT_ACCESS)
-                                 ? "RETR" : "STOR",
+                         p_sys->out ? "STOR" : "RETR",
                          p_sys->url.psz_path ) < 0 ||
         ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
     {
@@ -764,8 +766,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
         return VLC_EGENERIC;
     }
 
-    shutdown( p_sys->fd_data,
-              ( p_access->i_object_type == VLC_OBJECT_ACCESS ) );
+    shutdown( p_sys->fd_data, p_sys->out ? SHUT_RD : SHUT_WR );
 
     return VLC_SUCCESS;
 }
