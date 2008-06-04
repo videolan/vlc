@@ -115,8 +115,9 @@ int main( int i_argc, const char *ppsz_argv[] )
         if ((ppsz_argv[i] = FromLocale (ppsz_argv[i])) == NULL)
             return 1; // BOOM!
 
-    libvlc_exception_t ex;
+    libvlc_exception_t ex, dummy;
     libvlc_exception_init (&ex);
+    libvlc_exception_init (&dummy);
 
     /* Initialize libvlc */
     int i_argc_real = i_argc ? i_argc - 1 : 0;
@@ -125,9 +126,9 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     if (vlc != NULL)
     {
-        libvlc_add_intf (vlc, "signals", NULL);
+        libvlc_add_intf (vlc, "signals", &dummy);
         libvlc_add_intf (vlc, NULL, &ex);
-        libvlc_playlist_play (vlc, -1, 0, NULL, NULL);
+        libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
         libvlc_wait (vlc);
         libvlc_release (vlc);
     }
@@ -136,6 +137,7 @@ int main( int i_argc, const char *ppsz_argv[] )
         fprintf( stderr, "%s\n", libvlc_exception_get_message( &ex));
 
     libvlc_exception_clear (&ex);
+    libvlc_exception_clear (&dummy);
 
     for (int i = 0; i < i_argc; i++)
         LocaleFree (ppsz_argv[i]);

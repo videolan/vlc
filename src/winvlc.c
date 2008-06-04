@@ -103,15 +103,16 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     argc = parse_cmdline (psz_cmdline, &argv);
 
-    libvlc_exception_t ex;
+    libvlc_exception_t ex, dummy;
     libvlc_exception_init (&ex);
+    libvlc_exception_init (&dummy);
 
     /* Initialize libvlc */
     libvlc_instance_t *vlc = libvlc_new (argc, (const char **)argv, &ex);
     if (vlc != NULL)
     {
         libvlc_add_intf (vlc, NULL, &ex);
-        libvlc_playlist_play (vlc, -1, 0, NULL, NULL);
+        libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
         libvlc_wait (vlc);
         libvlc_release (vlc);
     }
@@ -119,6 +120,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     ret = libvlc_exception_raised (&ex);
     libvlc_exception_clear (&ex);
+    libvlc_exception_clear (&dummy);
     return ret;
 }
 
