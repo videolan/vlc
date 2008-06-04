@@ -515,7 +515,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             for( i = 0; i < p_cfg->i_option; i++ )
                 input_ItemAddOption( p_media->vod.p_item,
                                      p_cfg->ppsz_option[i] );
-            input_ItemAddOption( p_media->vod.p_item, "no-sout-keep" );
 
             asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name );
 
@@ -823,15 +822,6 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             else
                 input_ItemAddOption( p_instance->p_item, p_cfg->ppsz_option[i] );
         }
-        /* We force the right sout-keep value (avoid using the sout-keep from the global configuration)
-         * FIXME implement input list for VOD (need sout-keep)
-         * */
-        if( !p_cfg->b_vod && p_instance->b_sout_keep )
-            psz_keep = "sout-keep";
-        else
-            psz_keep = "no-sout-keep";
-        input_ItemAddOption( p_instance->p_item, psz_keep );
-
         TAB_APPEND( p_media->i_instance, p_media->instance, p_instance );
     }
 
