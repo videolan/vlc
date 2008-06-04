@@ -2336,8 +2336,8 @@ dnl
 dnl  Video4Linux2 plugin
 dnl
 AC_ARG_ENABLE(v4l2,
-  [  --enable-v4l2           Video4Linux2 input support (default disabled)])
-if test "${enable_v4l2}" = "yes"
+  [  --enable-v4l2           Video4Linux2 input support (default enabled)])
+if test "${enable_v4l2}" != "no"
 then
   AC_ARG_WITH(v4l2,
     [    --with-v4l2=PATH       path to a v4l2-enabled kernel tree],[],[])
@@ -2579,9 +2579,9 @@ dnl
 dnl  DVB-S/DVB-T/DVB-C satellite/teresterial/cable input using v4l2
 dnl
 AC_ARG_ENABLE(dvb,
-  [  --enable-dvb            DVB-S/T/C card support (default disabled)])
+  [  --enable-dvb            DVB-S/T/C card support (default enabled)])
 
-if test "${enable_dvb}" = "yes"
+if test "${enable_dvb}" != "no"
 then
   AC_ARG_WITH(dvb,
   [    --with-dvb=PATH       path to a dvb- and v4l2-enabled kernel tree],[],[])
