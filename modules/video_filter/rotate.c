@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rotate.c : video rotation filter
  *****************************************************************************
- * Copyright (C) 2000-2006 the VideoLAN team
+ * Copyright (C) 2000-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -45,6 +45,7 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
+static picture_t *FilterPacked( filter_t *, picture_t * );
 
 static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
@@ -105,21 +106,26 @@ static int Create( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
+    if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
+    {
+        msg_Err( p_filter, "Input and output chromas don't match" );
+        return VLC_EGENERIC;
+    }
+
     switch( p_filter->fmt_in.video.i_chroma )
     {
         CASE_PLANAR_YUV
+            p_filter->pf_video_filter = Filter;
+            break;
+
+        CASE_PACKED_YUV_422
+            p_filter->pf_video_filter = FilterPacked;
             break;
 
         default:
             msg_Err( p_filter, "Unsupported input chroma (%4s)",
                      (char*)&(p_filter->fmt_in.video.i_chroma) );
             return VLC_EGENERIC;
-    }
-
-    if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
-    {
-        msg_Err( p_filter, "Input and output chromas don't match" );
-        return VLC_EGENERIC;
     }
 
     /* Allocate structure */
@@ -143,8 +149,6 @@ static int Create( vlc_object_t *p_this )
                      PreciseRotateCallback, p_sys );
 
     cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
-
-    p_filter->pf_video_filter = Filter;
 
     return VLC_SUCCESS;
 }
@@ -279,16 +283,110 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
     }
 
-    p_outpic->date = p_pic->date;
-    p_outpic->b_force = p_pic->b_force;
-    p_outpic->i_nb_fields = p_pic->i_nb_fields;
-    p_outpic->b_progressive = p_pic->b_progressive;
-    p_outpic->b_top_field_first = p_pic->b_top_field_first;
+    return CopyMetaAndRelease( p_outpic, p_pic );
+}
 
-    if( p_pic->pf_release )
-        p_pic->pf_release( p_pic );
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
+{
+    picture_t *p_outpic;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    const int i_sin = p_sys->i_sin, i_cos = p_sys->i_cos;
 
-    return p_outpic;
+    if( !p_pic ) return NULL;
+
+    int i_u_offset, i_v_offset, i_y_offset;
+
+    if( GetPackedYuvOffsets( p_pic->format.i_chroma, &i_y_offset,
+                             &i_u_offset, &i_v_offset ) != VLC_SUCCESS )
+    {
+        msg_Warn( p_filter, "Unsupported input chroma (%4s)",
+                  (char*)&(p_pic->format.i_chroma) );
+        if( p_pic->pf_release )
+            p_pic->pf_release( p_pic );
+        return NULL;
+    }
+
+    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    if( !p_outpic )
+    {
+        msg_Warn( p_filter, "can't get output picture" );
+        if( p_pic->pf_release )
+            p_pic->pf_release( p_pic );
+        return NULL;
+    }
+
+    const uint8_t *p_in   = p_pic->p->p_pixels+i_y_offset;
+    const uint8_t *p_in_u = p_pic->p->p_pixels+i_u_offset;
+    const uint8_t *p_in_v = p_pic->p->p_pixels+i_v_offset;
+
+    const int i_pitch         = p_pic->p->i_pitch;
+    const int i_visible_pitch = p_pic->p->i_visible_pitch>>1; /* In fact it's i_visible_pixels */
+    const int i_visible_lines = p_pic->p->i_visible_lines;
+
+    uint8_t *p_out   = p_outpic->p->p_pixels+i_y_offset;
+    uint8_t *p_out_u = p_outpic->p->p_pixels+i_u_offset;
+    uint8_t *p_out_v = p_outpic->p->p_pixels+i_v_offset;
+
+    const int i_line_center = i_visible_lines>>1;
+    const int i_col_center  = i_visible_pitch>>1;
+
+    int i_col, i_line;
+    for( i_line = 0; i_line < i_visible_lines; i_line++ )
+    {
+        for( i_col = 0; i_col < i_visible_pitch; i_col++ )
+        {
+            int i_line_orig;
+            int i_col_orig;
+            /* Handle "1st Y", U and V */
+            i_line_orig = i_line_center +
+                ( ( i_sin * ( i_col - i_col_center )
+                  + i_cos * ( i_line - i_line_center ) )>>12 );
+            i_col_orig = i_col_center +
+                ( ( i_cos * ( i_col - i_col_center )
+                  - i_sin * ( i_line - i_line_center ) )>>12 );
+            if( 0 <= i_col_orig && i_col_orig < i_visible_pitch
+             && 0 <= i_line_orig && i_line_orig < i_visible_lines )
+            {
+                p_out[i_line*i_pitch+2*i_col] = p_in[i_line_orig*i_pitch+2*i_col_orig];
+                i_col_orig /= 2;
+                p_out_u[i_line*i_pitch+2*i_col] = p_in_u[i_line_orig*i_pitch+4*i_col_orig];
+                p_out_v[i_line*i_pitch+2*i_col] = p_in_v[i_line_orig*i_pitch+4*i_col_orig];
+            }
+            else
+            {
+                p_out[i_line*i_pitch+2*i_col] = 0x00;
+                i_col_orig /= 2;
+                p_out_u[i_line*i_pitch+2*i_col] = 0x80;
+                p_out_v[i_line*i_pitch+2*i_col] = 0x80;
+            }
+
+            /* Handle "2nd Y" */
+            i_col++;
+            if( i_col >= i_visible_pitch )
+                break;
+
+            i_line_orig = i_line_center +
+                ( ( i_sin * ( i_col - i_col_center )
+                  + i_cos * ( i_line - i_line_center ) )>>12 );
+            i_col_orig = i_col_center +
+                ( ( i_cos * ( i_col - i_col_center )
+                  - i_sin * ( i_line - i_line_center ) )>>12 );
+            if( 0 <= i_col_orig && i_col_orig < i_visible_pitch
+             && 0 <= i_line_orig && i_line_orig < i_visible_lines )
+            {
+                p_out[i_line*i_pitch+2*i_col] = p_in[i_line_orig*i_pitch+2*i_col_orig];
+            }
+            else
+            {
+                p_out[i_line*i_pitch+2*i_col] = 0x00;
+            }
+        }
+    }
+
+    return CopyMetaAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************
