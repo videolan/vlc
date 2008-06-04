@@ -82,3 +82,20 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
             return VLC_EGENERIC;
     }
 }
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static inline picture_t *CopyMetaAndRelease( picture_t *p_outpic, picture_t *p_inpic )
+{
+    p_outpic->date = p_inpic->date;
+    p_outpic->b_force = p_inpic->b_force;
+    p_outpic->i_nb_fields = p_inpic->i_nb_fields;
+    p_outpic->b_progressive = p_inpic->b_progressive;
+    p_outpic->b_top_field_first = p_inpic->b_top_field_first;
+
+    if( p_inpic->pf_release )
+        p_inpic->pf_release( p_inpic );
+
+    return p_outpic;
+}
