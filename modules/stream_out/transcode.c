@@ -1217,7 +1217,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     /* Init filter chain */
     id->p_f_chain = filter_chain_New( p_stream, "audio filter2", false,
                     transcode_audio_filter_allocation_init, NULL, NULL );
-    filter_chain_Reset( id->p_uf_chain, &fmt_last, &id->p_encoder->fmt_in );
+    filter_chain_Reset( id->p_f_chain, &fmt_last, &id->p_encoder->fmt_in );
 
     /* Load conversion filters */
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels ||
