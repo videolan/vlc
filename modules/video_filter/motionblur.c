@@ -35,6 +35,7 @@
 #include <vlc_sout.h>
 #include <vlc_vout.h>
 #include <vlc_filter.h>
+#include "filter_picture.h"
 
 /*****************************************************************************
  * Local protypes
@@ -129,17 +130,6 @@ static void Destroy( vlc_object_t *p_this )
     free( p_filter->p_sys );
 }
 
-#define RELEASE( pic ) \
-        if( pic ->pf_release ) \
-            pic ->pf_release( pic );
-
-#define INITPIC( dst, src ) \
-    dst ->date = src ->date; \
-    dst ->b_force = src ->b_force; \
-    dst ->i_nb_fields = src ->i_nb_fields; \
-    dst ->b_progressive = src->b_progressive; \
-    dst ->b_top_field_first = src ->b_top_field_first;
-
 /*****************************************************************************
  * Filter
  *****************************************************************************/
@@ -154,10 +144,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( !p_outpic )
     {
         msg_Warn( p_filter, "can't get output picture" );
-        RELEASE( p_pic );
+        if( p_pic->pf_release )
+            p_pic->pf_release( p_pic );
         return NULL;
     }
-    INITPIC( p_outpic, p_pic );
 
     if( !p_sys->pp_planes )
     {
@@ -178,8 +168,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     RenderBlur( p_sys, p_pic, p_outpic );
     Copy( p_filter, p_outpic );
 
-    RELEASE( p_pic );
-    return p_outpic;
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

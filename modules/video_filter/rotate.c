@@ -283,7 +283,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
     }
 
-    return CopyMetaAndRelease( p_outpic, p_pic );
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************
@@ -385,7 +385,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
         }
     }
 
-    return CopyMetaAndRelease( p_outpic, p_pic );
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

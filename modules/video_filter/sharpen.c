@@ -42,6 +42,7 @@
 #include <vlc_vout.h>
 
 #include "vlc_filter.h"
+#include "filter_picture.h"
 
 #define SIG_TEXT N_("Sharpen strength (0-2)")
 #define SIG_LONGTEXT N_("Set the Sharpen strength, between 0 and 2. Defaults to 0.05.")
@@ -101,7 +102,7 @@ inline static int32_t clip( int32_t a )
 static void init_precalc_table(filter_sys_t *p_filter)
 {
     float sigma = p_filter->f_sigma;
- 
+
     for(int i = 0; i < 512; ++i)
     {
         p_filter->tab_precalc[i] = (i - 256) * sigma;
@@ -237,16 +238,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
 
 
-    p_outpic->date = p_pic->date;
-    p_outpic->b_force = p_pic->b_force;
-    p_outpic->i_nb_fields = p_pic->i_nb_fields;
-    p_outpic->b_progressive = p_pic->b_progressive;
-    p_outpic->b_top_field_first = p_pic->b_top_field_first;
-
-    if( p_pic->pf_release )
-        p_pic->pf_release( p_pic );
-
-    return p_outpic;
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 static int SharpenCallback( vlc_object_t *p_this, char const *psz_var,

@@ -86,7 +86,7 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
 /*****************************************************************************
  *
  *****************************************************************************/
-static inline picture_t *CopyMetaAndRelease( picture_t *p_outpic, picture_t *p_inpic )
+static inline picture_t *CopyInfoAndRelease( picture_t *p_outpic, picture_t *p_inpic )
 {
     p_outpic->date = p_inpic->date;
     p_outpic->b_force = p_inpic->b_force;

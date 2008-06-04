@@ -410,16 +410,7 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
 #undef WRITE_UV
     }
 
-    p_outpic->date = p_pic->date;
-    p_outpic->b_force = p_pic->b_force;
-    p_outpic->i_nb_fields = p_pic->i_nb_fields;
-    p_outpic->b_progressive = p_pic->b_progressive;
-    p_outpic->b_top_field_first = p_pic->b_top_field_first;
-
-    if( p_pic->pf_release )
-        p_pic->pf_release( p_pic );
-
-    return p_outpic;
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************
@@ -652,16 +643,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 #undef WRITE_UV
     }
 
-    p_outpic->date = p_pic->date;
-    p_outpic->b_force = p_pic->b_force;
-    p_outpic->i_nb_fields = p_pic->i_nb_fields;
-    p_outpic->b_progressive = p_pic->b_progressive;
-    p_outpic->b_top_field_first = p_pic->b_top_field_first;
-
-    if( p_pic->pf_release )
-        p_pic->pf_release( p_pic );
-
-    return p_outpic;
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,

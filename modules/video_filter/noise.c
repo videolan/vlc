@@ -34,6 +34,7 @@
 #include <vlc_vout.h>
 
 #include "vlc_filter.h"
+#include "filter_picture.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -171,14 +172,5 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
     }
 
-    p_outpic->date = p_pic->date;
-    p_outpic->b_force = p_pic->b_force;
-    p_outpic->i_nb_fields = p_pic->i_nb_fields;
-    p_outpic->b_progressive = p_pic->b_progressive;
-    p_outpic->b_top_field_first = p_pic->b_top_field_first;
-
-    if( p_pic->pf_release )
-        p_pic->pf_release( p_pic );
-
-    return p_outpic;
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
