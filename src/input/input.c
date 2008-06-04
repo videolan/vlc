@@ -325,10 +325,7 @@ static void Destructor( input_thread_t * p_input )
         if( priv->b_sout_keep )
             SoutKeep( priv->p_sout );
         else
-        {
             sout_DeleteInstance( priv->p_sout );
-            priv->p_sout = NULL;
-        }
     }
 #endif
     vlc_gc_decref( p_input->p->input.p_item );
@@ -1454,12 +1451,14 @@ static void SoutKeep( sout_instance_t *p_sout )
 {
     playlist_t * p_playlist = vlc_object_find( p_sout, VLC_OBJECT_PLAYLIST,
                                                 FIND_PARENT );
-    if( !p_playlist ) return;
-
-    msg_Dbg( p_sout, "sout has been kept" );
-    vlc_object_attach( p_sout, p_playlist );
-
-    vlc_object_release( p_playlist );
+    if( p_playlist )
+    {
+        msg_Dbg( p_sout, "sout has been kept" );
+        vlc_object_attach( p_sout, p_playlist );
+        vlc_object_release( p_playlist );
+    }
+    else
+        sout_DeleteInstance( p_sout );
 }
 
 /*****************************************************************************
