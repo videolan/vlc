@@ -52,8 +52,6 @@ static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
         i_object_type = VLC_OBJECT_VOUT;
     else if( !strcmp( psz_object, "VLC_OBJECT_AOUT" ) )
         i_object_type = VLC_OBJECT_AOUT;
-    else if( !strcmp( psz_object, "VLC_OBJECT_SOUT" ) )
-        i_object_type = VLC_OBJECT_SOUT;
     else
         msg_Warn( p_intf, "unknown object type (%s)", psz_object );
 

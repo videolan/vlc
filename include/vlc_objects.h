@@ -36,39 +36,28 @@
  */
 
 /* Object types */
-
 #define VLC_OBJECT_LIBVLC      (-2)
 #define VLC_OBJECT_MODULE      (-3)
 #define VLC_OBJECT_INTF        (-4)
 #define VLC_OBJECT_PLAYLIST    (-5)
-
 #define VLC_OBJECT_INPUT       (-7)
 #define VLC_OBJECT_DECODER     (-8)
 #define VLC_OBJECT_VOUT        (-9)
 #define VLC_OBJECT_AOUT        (-10)
-#define VLC_OBJECT_SOUT        (-11)
-
 #define VLC_OBJECT_PACKETIZER  (-13)
 #define VLC_OBJECT_ENCODER     (-14)
 #define VLC_OBJECT_DIALOGS     (-15)
-
 #define VLC_OBJECT_ANNOUNCE    (-17)
 #define VLC_OBJECT_DEMUX       (-18)
 #define VLC_OBJECT_ACCESS      (-19)
 #define VLC_OBJECT_STREAM      (-20)
 #define VLC_OBJECT_OPENGL      (-21)
 #define VLC_OBJECT_FILTER      (-22)
-
-
-
-
-
 #define VLC_OBJECT_OSDMENU     (-28)
-
 #define VLC_OBJECT_HTTPD_HOST  (-30)
-
 #define VLC_OBJECT_INTERACTION (-32)
-
+/* Please add new object types below -34 */
+/* Please do not add new object types anyway */
 #define VLC_OBJECT_GENERIC     (-666)
 
 /* Object search mode */

@@ -76,15 +76,14 @@ static void mrl_Clean( mrl_t *p_mrl );
  *****************************************************************************/
 sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
 {
+    static const char typename[] = "stream output";
     sout_instance_t *p_sout;
 
     /* *** Allocate descriptor *** */
-    p_sout = vlc_object_create( p_parent, VLC_OBJECT_SOUT );
+    p_sout = vlc_custom_create( p_parent, sizeof( *p_sout ),
+                                VLC_OBJECT_GENERIC, typename );
     if( p_sout == NULL )
-    {
-        msg_Err( p_parent, "out of memory" );
         return NULL;
-    }
 
     /* *** init descriptor *** */
     p_sout->psz_sout    = strdup( psz_dest );
