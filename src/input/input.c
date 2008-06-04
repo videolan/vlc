@@ -400,9 +400,10 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
     input_thread_t *p_input;
 
     p_input = Create( p_parent, p_item, NULL, false, p_sout );
-    if( !p_input && p_sout )
+    if( !p_input )
     {
-        SoutKeep( p_sout );
+        if( p_sout )
+            SoutKeep( p_sout );
         return VLC_EGENERIC;
     }
     p_input->p->b_sout_keep = b_sout_keep;
