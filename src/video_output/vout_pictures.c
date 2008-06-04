@@ -378,7 +378,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         }
 
         /* Convert image to the first direct buffer */
-        p_vout->p_chroma->p_owner = (picture_t *)p_tmp_pic;
+        p_vout->p_chroma->p_owner = (filter_owner_sys_t *)p_tmp_pic;
         p_vout->p_chroma->pf_video_filter( p_vout->p_chroma, p_pic );
 
         /* Render subpictures on the first direct buffer */
@@ -399,7 +399,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                 return NULL;
 
         /* Convert image to the first direct buffer */
-        p_vout->p_chroma->p_owner = (picture_t *)&p_vout->p_picture[0];
+        p_vout->p_chroma->p_owner = (filter_owner_sys_t *)&p_vout->p_picture[0];
         p_vout->p_chroma->pf_video_filter( p_vout->p_chroma, p_pic );
 
         /* Render subpictures on the first direct buffer */
@@ -926,6 +926,7 @@ int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
 void __vout_CopyPicture( vlc_object_t *p_this,
                          picture_t *p_dest, picture_t *p_src )
 {
+    VLC_UNUSED( p_this );
     int i;
 
     for( i = 0; i < p_src->i_planes ; i++ )

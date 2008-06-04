@@ -1600,6 +1600,7 @@ void vlc_refcheck (vlc_object_t *obj)
 
 static void held_objects_destroy (void *data)
 {
+    VLC_UNUSED( data );
     held_list_t *hl = vlc_threadvar_get (&held_objects);
     vlc_object_t *caller = vlc_threadobj ();
 
