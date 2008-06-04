@@ -51,10 +51,6 @@
 # define IPPROTO_DCCP 33 /* IANA */
 #endif
 
-#ifndef IPPROTO_UDPLITE
-# define IPPROTO_UDPLITE 136 /* from IANA */
-#endif
-
 #define MTU 65535
 
 /*****************************************************************************
@@ -89,7 +85,6 @@ vlc_module_begin();
     add_shortcut( "udpstream" );
     add_shortcut( "udp4" );
     add_shortcut( "udp6" );
-    add_shortcut( "udplite" );
     add_shortcut( "rtptcp" ); /* tcp name is already taken */
     add_shortcut( "dccp" );
 
@@ -155,9 +150,6 @@ static int Open( vlc_object_t *p_this )
                 break;
         }
 
-        if (strcmp (p_access->psz_access, "udplite") == 0)
-            proto = IPPROTO_UDPLITE;
-        else
         if (strncmp (p_access->psz_access, "udp", 3 ) == 0 )
             p_access->pf_block = BlockChoose;
         else
@@ -216,7 +208,6 @@ static int Open( vlc_object_t *p_this )
     switch (proto)
     {
         case IPPROTO_UDP:
-        case IPPROTO_UDPLITE:
             p_sys->fd = net_OpenDgram( p_access, psz_bind_addr, i_bind_port,
                                        psz_server_addr, i_server_port, fam,
                                        proto );
