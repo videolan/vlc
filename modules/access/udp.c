@@ -89,9 +89,6 @@ vlc_module_begin();
     add_shortcut( "udpstream" );
     add_shortcut( "udp4" );
     add_shortcut( "udp6" );
-    add_shortcut( "rtp" );
-    add_shortcut( "rtp4" );
-    add_shortcut( "rtp6" );
     add_shortcut( "udplite" );
     add_shortcut( "rtptcp" ); /* tcp name is already taken */
     add_shortcut( "dccp" );
