@@ -104,9 +104,7 @@ struct input_thread_private_t
     /* Output */
     es_out_t    *p_es_out;
     sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
-    bool      b_sout_keep;
     bool      b_out_pace_control; /*     idem ? */
-    bool      b_owns_its_sout;
 
     /* Main input properties */
     input_source_t input;

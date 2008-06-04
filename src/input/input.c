@@ -87,9 +87,6 @@ static void SlaveSeek( input_thread_t *p_input );
 static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
 static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta );
 
-static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, bool * );
-static void SoutKeep( sout_instance_t * );
-
 static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_demux );
 static void AccessMeta( input_thread_t * p_input, vlc_meta_t *p_meta );
 static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
@@ -185,8 +182,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout  = NULL;
-    p_input->p->b_owns_its_sout = true;
-    p_input->p->b_sout_keep  = false;
     p_input->p->b_out_pace_control = false;
     p_input->i_pts_delay = 0;
 
@@ -293,10 +288,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* */
     if( p_sout )
-    {
         p_input->p->p_sout = p_sout;
-        p_input->p->b_owns_its_sout = false;
-    }
 
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
     vlc_mutex_init( &p_input->p->counters.counters_lock );
@@ -320,13 +312,8 @@ static void Destructor( input_thread_t * p_input )
     stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
     stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
 #ifdef ENABLE_SOUT
-    if( priv->b_owns_its_sout && priv->p_sout )
-    {
-        if( priv->b_sout_keep )
-            SoutKeep( priv->p_sout );
-        else
-            sout_DeleteInstance( priv->p_sout );
-    }
+    if( priv->p_sout )
+        sout_DeleteInstance( priv->p_sout );
 #endif
     vlc_gc_decref( p_input->p->input.p_item );
 
@@ -347,15 +334,7 @@ static void Destructor( input_thread_t * p_input )
 input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
                                       input_item_t *p_item )
 {
-    bool b_sout_keep;
-    sout_instance_t *p_sout = SoutFind( p_parent, p_item, &b_sout_keep );
-    input_thread_t *p_input =  __input_CreateThreadExtended( p_parent, p_item, NULL, p_sout );
-
-    if( !p_input && p_sout )
-        SoutKeep( p_sout );
-
-    p_input->p->b_sout_keep = b_sout_keep;
-    return p_input;
+    return __input_CreateThreadExtended( p_parent, p_item, NULL, NULL );
 }
 
 /* */
@@ -395,18 +374,11 @@ input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
 int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
                    bool b_block )
 {
-    bool b_sout_keep;
-    sout_instance_t *p_sout = SoutFind( p_parent, p_item, &b_sout_keep );
     input_thread_t *p_input;
 
-    p_input = Create( p_parent, p_item, NULL, false, p_sout );
+    p_input = Create( p_parent, p_item, NULL, false, NULL );
     if( !p_input )
-    {
-        if( p_sout )
-            SoutKeep( p_sout );
         return VLC_EGENERIC;
-    }
-    p_input->p->b_sout_keep = b_sout_keep;
 
     if( b_block )
     {
@@ -499,8 +471,10 @@ void input_StopThread( input_thread_t *p_input )
 
 sout_instance_t * input_DetachSout( input_thread_t *p_input )
 {
-    p_input->p->b_owns_its_sout = false;
-    return p_input->p->p_sout;
+    sout_instance_t *p_sout = p_input->p->p_sout;
+    vlc_object_detach( p_sout );
+    p_input->p->p_sout = NULL;
+    return p_sout;
 }
 
 /*****************************************************************************
@@ -1388,78 +1362,6 @@ static void End( input_thread_t * p_input )
 
     /* Tell we're dead */
     p_input->b_dead = true;
-}
-
-static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, bool *pb_sout_keep )
-{
-    bool b_keep_sout = var_CreateGetBool( p_parent, "sout-keep" );
-    sout_instance_t *p_sout = NULL;
-    int i;
-
-    /* Search sout-keep options
-     * XXX it has to be done here, but it is duplicated work :( */
-    vlc_mutex_lock( &p_item->lock );
-    for( i = 0; i < p_item->i_options; i++ )
-    {
-        const char *psz_option = p_item->ppsz_options[i];
-        if( !psz_option )
-            continue;
-        if( *psz_option == ':' )
-            psz_option++;
-
-        if( !strcmp( psz_option, "sout-keep" ) )
-            b_keep_sout = true;
-        else if( !strcmp( psz_option, "no-sout-keep" ) || !strcmp( psz_option, "nosout-keep" ) )
-            b_keep_sout = false;
-    }
-    vlc_mutex_unlock( &p_item->lock );
-
-    /* Find a potential sout to reuse
-     * XXX it might be unusable but this will be checked later */
-    if( b_keep_sout )
-    {
-        playlist_t *p_playlist = vlc_object_find( p_parent->p_libvlc,
-                VLC_OBJECT_PLAYLIST, FIND_CHILD );
-        if( p_playlist )
-        {
-            vlc_mutex_lock( &p_playlist->gc_lock );
-            p_sout = vlc_object_find( p_playlist, VLC_OBJECT_SOUT, FIND_CHILD );
-            if( p_sout )
-            {
-                if( p_sout->p_parent != VLC_OBJECT( p_playlist ) )
-                {
-                    vlc_object_release( p_sout );
-                    p_sout = NULL;
-                }
-                else
-                {
-                    vlc_object_detach( p_sout );    /* Remove it from the GC */
-                    vlc_object_release( p_sout );
-                }
-            }
-            vlc_mutex_unlock( &p_playlist->gc_lock );
-            vlc_object_release( p_playlist );
-        }
-    }
-
-    if( pb_sout_keep )
-        *pb_sout_keep = b_keep_sout;
-
-    return p_sout;
-}
-
-static void SoutKeep( sout_instance_t *p_sout )
-{
-    playlist_t * p_playlist = vlc_object_find( p_sout, VLC_OBJECT_PLAYLIST,
-                                                FIND_PARENT );
-    if( p_playlist )
-    {
-        msg_Dbg( p_sout, "sout has been kept" );
-        vlc_object_attach( p_sout, p_playlist );
-        vlc_object_release( p_playlist );
-    }
-    else
-        sout_DeleteInstance( p_sout );
 }
 
 /*****************************************************************************
