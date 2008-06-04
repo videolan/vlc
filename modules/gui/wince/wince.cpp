@@ -253,19 +253,6 @@ static void MainLoop( intf_thread_t *p_intf )
     /* OK, initialization is over */
     vlc_thread_ready( p_intf );
 
-    /* Check if we need to start playing */
-    if( !p_intf->pf_show_dialog && p_intf->b_play )
-    {
-        playlist_t *p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-        if( p_playlist )
-        {
-            playlist_Play( p_playlist );
-            vlc_object_release( p_playlist );
-        }
-    }
-
     // Main message loop
     while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
     {

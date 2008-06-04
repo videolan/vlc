@@ -108,7 +108,6 @@ int OpenIntf ( vlc_object_t *p_this )
 
     p_intf->p_sys->o_sendport = [[NSPort port] retain];
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
-    p_intf->b_play = true;
     p_intf->pf_run = Run;
     p_intf->b_should_run_on_first_thread = true;
 
@@ -560,11 +559,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     p_playlist = pl_Yield( p_intf );
 
-    /* Check if we need to start playing */
-    if( p_intf->b_play )
-    {
-        playlist_Control( p_playlist, PLAYLIST_PLAY, false );
-    }
     var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     val.b_bool = false;
 

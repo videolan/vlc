@@ -99,7 +99,6 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     p_intf->pf_request_window = NULL;
     p_intf->pf_release_window = NULL;
     p_intf->pf_control_window = NULL;
-    p_intf->b_play = false;
     p_intf->b_interaction = false;
     p_intf->b_should_run_on_first_thread = false;
 
@@ -223,9 +222,6 @@ static void RunInterface( intf_thread_t *p_intf )
                 vlc_object_wait( p_intf );
             vlc_object_unlock( p_intf );
         }
-
-        /* Reset play on start status */
-        p_intf->b_play = false;
 
         if( !p_intf->psz_switch_intf )
         {

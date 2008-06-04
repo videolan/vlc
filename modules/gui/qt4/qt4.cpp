@@ -235,9 +235,6 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_playlist = pl_Yield( p_intf );
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
-    /* We support play on start */
-    p_intf->b_play = true;
-
     return VLC_SUCCESS;
 }
 
@@ -352,12 +349,6 @@ static void Init( intf_thread_t *p_intf )
         msg_Dbg( p_intf, "Error while initializing qt-specific localization" );
     app->installTranslator( &qtTranslator );
 #endif  //ENABLE_NLS
-
-    /* Start playing if needed */
-    if( !p_intf->pf_show_dialog && p_intf->b_play )
-    {
-        playlist_Control( THEPL, PLAYLIST_PLAY, false );
-    }
 
     /* Explain to the core how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;

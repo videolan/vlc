@@ -1133,7 +1133,6 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
     }
 
     /* Try to run the interface */
-    p_intf->b_play = false; /* TODO: remove b_play completely */
     i_err = intf_RunThread( p_intf );
     if( i_err )
     {
