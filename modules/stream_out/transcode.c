@@ -1215,7 +1215,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     /* Init filter chain */
-    id->p_f_chain = filter_chain_New( p_stream, "audio filter2", false,
+    id->p_f_chain = filter_chain_New( p_stream, "audio filter2", true,
                     transcode_audio_filter_allocation_init, NULL, NULL );
     filter_chain_Reset( id->p_f_chain, &fmt_last, &id->p_encoder->fmt_in );
 
@@ -1228,6 +1228,20 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         fmt_out.i_codec = fmt_out.audio.i_format = VLC_FOURCC('f','l','3','2');
         filter_chain_AppendFilter( id->p_f_chain, NULL, NULL, &fmt_last, &fmt_out );
         fmt_last = fmt_out;
+    }
+
+    /* FIXME: same comment as in "#if 0"ed code */
+    int i;
+    for( i = 0; i < 4; i++ )
+    {
+        if( (fmt_last.audio.i_channels !=
+            id->p_encoder->fmt_in.audio.i_channels) ||
+            (fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate) ||
+            (fmt_last.i_codec != id->p_encoder->fmt_in.i_codec) )
+        {
+            filter_chain_AppendFilter( id->p_f_chain, NULL, NULL, &fmt_last, &id->p_encoder->fmt_in );
+            fmt_last = *filter_chain_GetFmtOut( id->p_f_chain );
+        }
     }
 
 #if 0
