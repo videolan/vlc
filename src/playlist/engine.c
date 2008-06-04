@@ -209,21 +209,6 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
         vlc_object_release( p_obj );
         vlc_object_release( (vout_thread_t *)p_obj );
     }
-#ifdef ENABLE_SOUT
-    while( ( p_obj = vlc_object_find( p_playlist, VLC_OBJECT_SOUT,
-                                                  FIND_CHILD ) ) )
-    {
-        if( p_obj->p_parent != VLC_OBJECT(p_playlist) )
-        {
-            vlc_object_release( p_obj );
-            break;
-        }
-        msg_Dbg( p_playlist, "garbage collector destroying 1 sout" );
-        vlc_object_detach( p_obj );
-        vlc_object_release( p_obj );
-        sout_DeleteInstance( (sout_instance_t*)p_obj );
-    }
-#endif
     p_playlist->b_cant_sleep = false;
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
