@@ -509,7 +509,7 @@ void MainInputManager::customEvent( QEvent *event )
     }
 
     /* Should be PLItemChanged Event */
-    if( VLC_OBJECT_INTF == p_intf->i_object_type )
+    if( VLC_OBJECT_INTF == p_intf->i_object_type ) /* FIXME: don't use object type */
     {
         vlc_mutex_lock( &p_intf->change_lock );
         if( p_input && ( p_input->b_dead || p_input->b_die ) )

@@ -552,7 +552,7 @@ static VLCTreeItem *o_root_item = nil;
         if( i_object_category == -1 )
         {
             p_parser = (module_t *) vlc_object_get( i_object_id );
-            if( !p_parser || ((vlc_object_t*)p_parser)->i_object_type != VLC_OBJECT_MODULE )
+            if( !p_parser )
             {
                 /* 0OOoo something went really bad */
                 return nil;

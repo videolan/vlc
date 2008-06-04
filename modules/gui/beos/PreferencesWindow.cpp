@@ -445,11 +445,9 @@ ConfigItem::ConfigItem( intf_thread_t * _p_intf, char * name,
         }
     }
 
-    if( !p_module || p_module->i_object_type != VLC_OBJECT_MODULE )
-    {
+    if( !p_module )
         /* Shouldn't happen */
         return;
-    }
 
     module_config_t * p_item;
     p_item = fSubModule ? ((module_t *)p_module->p_parent)->p_config :

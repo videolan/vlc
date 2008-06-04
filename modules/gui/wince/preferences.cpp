@@ -706,11 +706,6 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
     {
         /* Get a pointer to the module */
         p_module = (module_t *)vlc_object_get( i_object_id );
-        if( p_module->i_object_type != VLC_OBJECT_MODULE )
-        {
-            /* 0OOoo something went really bad */
-            return;
-        }
 
         /* Enumerate config options and add corresponding config boxes
          * (submodules don't have config options, they are stored in the
