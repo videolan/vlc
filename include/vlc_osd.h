@@ -77,8 +77,7 @@ struct spu_t
     int ( *pf_control ) ( spu_t *, int, va_list );
 
     /* Supciture filters */
-    filter_t *pp_filter[10];
-    int      i_filter;
+    filter_chain_t *p_chain;
 };
 
 static inline int spu_vaControl( spu_t *p_spu, int i_query, va_list args )

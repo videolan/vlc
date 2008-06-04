@@ -305,6 +305,8 @@ block_t *filter_chain_AudioFilter( filter_chain_t *p_chain, block_t *p_block )
     return p_block;
 }
 
+#include <vlc_osd.h>
+
 void filter_chain_SubFilter( filter_chain_t *p_chain,
                              mtime_t display_date )
 {

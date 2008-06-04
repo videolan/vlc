@@ -58,6 +58,8 @@ static void spu_DeleteChain( spu_t * );
 static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 
+static int sub_filter_allocation_init( filter_t *, void * );
+static void sub_filter_allocation_clear( filter_t * );
 struct filter_owner_sys_t
 {
     spu_t *p_spu;
@@ -69,6 +71,7 @@ enum {
     SCALE_TEXT,
     SCALE_SIZE
 };
+
 /**
  * Creates the subpicture unit
  *
@@ -88,7 +91,6 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     p_spu->p_blend = NULL;
     p_spu->p_text = NULL;
     p_spu->p_scale = NULL;
-    p_spu->i_filter = 0;
     p_spu->pf_control = spu_vaControlDefault;
 
     /* Register the default subpicture channel */
@@ -98,6 +100,10 @@ spu_t *__spu_Create( vlc_object_t *p_this )
 
     vlc_object_attach( p_spu, p_this );
 
+    p_spu->p_chain = filter_chain_New( p_spu, "sub filter", false,
+                                       sub_filter_allocation_init,
+                                       sub_filter_allocation_clear,
+                                       p_spu );
     return p_spu;
 }
 
@@ -125,59 +131,14 @@ int spu_Init( spu_t *p_spu )
 
 int spu_ParseChain( spu_t *p_spu )
 {
-    char *psz_parser;
-    vlc_value_t val;
-    var_Get( p_spu, "sub-filter", &val );
-    psz_parser = val.psz_string;
-
-    while( psz_parser && *psz_parser )
+    char *psz_parser = var_GetString( p_spu, "sub-filter" );
+    if( filter_chain_AppendFromString( p_spu->p_chain, psz_parser ) < 0 )
     {
-        config_chain_t *p_cfg;
-        char *psz_name;
-
-        psz_parser = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
-
-        msg_Dbg( p_spu, "adding sub-filter: %s", psz_name );
-
-        p_spu->pp_filter[p_spu->i_filter] =
-            vlc_object_create( p_spu, VLC_OBJECT_FILTER );
-        vlc_object_attach( p_spu->pp_filter[p_spu->i_filter], p_spu );
-        p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_new = sub_new_buffer;
-        p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_del = sub_del_buffer;
-        p_spu->pp_filter[p_spu->i_filter]->p_cfg = p_cfg;
-        p_spu->pp_filter[p_spu->i_filter]->p_module =
-            module_Need( p_spu->pp_filter[p_spu->i_filter],
-                         "sub filter", psz_name, true );
-        free( psz_name );
-
-        if( p_spu->pp_filter[p_spu->i_filter]->p_module )
-        {
-            filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
-            if( p_sys )
-            {
-                p_spu->pp_filter[p_spu->i_filter]->p_owner = p_sys;
-                spu_Control( p_spu, SPU_CHANNEL_REGISTER, &p_sys->i_channel );
-                p_sys->p_spu = p_spu;
-                p_spu->i_filter++;
-            }
-        }
-        else
-        {
-            msg_Dbg( p_spu, "no sub filter found" );
-            config_ChainDestroy( p_spu->pp_filter[p_spu->i_filter]->p_cfg );
-            vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
-            vlc_object_release( p_spu->pp_filter[p_spu->i_filter] );
-        }
-
-        if( p_spu->i_filter >= 10 )
-        {
-            msg_Dbg( p_spu, "can't add anymore filters" );
-            break;
-        }
-
+        free( psz_parser );
+        return VLC_EGENERIC;
     }
-    free( val.psz_string );
 
+    free( psz_parser );
     return VLC_SUCCESS;
 }
 
@@ -236,17 +197,7 @@ void spu_Destroy( spu_t *p_spu )
 
 static void spu_DeleteChain( spu_t *p_spu )
 {
-    if( p_spu->i_filter )
-    while( p_spu->i_filter )
-    {
-        p_spu->i_filter--;
-        module_Unneed( p_spu->pp_filter[p_spu->i_filter],
-                       p_spu->pp_filter[p_spu->i_filter]->p_module );
-        free( p_spu->pp_filter[p_spu->i_filter]->p_owner );
-        config_ChainDestroy( p_spu->pp_filter[p_spu->i_filter]->p_cfg );
-        vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
-        vlc_object_release( p_spu->pp_filter[p_spu->i_filter] );
-    }
+    filter_chain_Delete( p_spu->p_chain );
 }
 
 /**
@@ -1116,16 +1067,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
     mtime_t      ephemer_date;
 
     /* Run subpicture filters */
-    for( i_index = 0; i_index < p_spu->i_filter; i_index++ )
-    {
-        subpicture_t *p_subpic_filter;
-        p_subpic_filter = p_spu->pp_filter[i_index]->
-            pf_sub_filter( p_spu->pp_filter[i_index], display_date );
-        if( p_subpic_filter )
-        {
-            spu_DisplaySubpicture( p_spu, p_subpic_filter );
-        }
-    }
+    filter_chain_SubFilter( p_spu->p_chain, display_date );
 
     /* We get an easily parsable chained list of subpictures which
      * ends with NULL since p_subpic was initialized to NULL. */
@@ -1407,4 +1349,26 @@ static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
     spu_ParseChain( p_spu );
     vlc_mutex_unlock( &p_spu->subpicture_lock );
     return VLC_SUCCESS;
+}
+
+static int sub_filter_allocation_init( filter_t *p_filter, void *p_data )
+{
+    spu_t *p_spu = (spu_t *)p_data;
+
+    p_filter->pf_sub_buffer_new = sub_new_buffer;
+    p_filter->pf_sub_buffer_del = sub_del_buffer;
+
+    filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
+    if( !p_sys ) return VLC_EGENERIC;
+
+    p_filter->p_owner = p_sys;
+    spu_Control( p_spu, SPU_CHANNEL_REGISTER, &p_sys->i_channel );
+    p_sys->p_spu = p_spu;
+
+    return VLC_SUCCESS;
+}
+
+static void sub_filter_allocation_clear( filter_t *p_filter )
+{
+    free( p_filter->p_owner );
 }
