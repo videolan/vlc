@@ -794,7 +794,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( psz_temp )
         {
             sprintf( psz_temp, "%s,none", psz_module );
-            libvlc_InternalAddIntf( p_libvlc, psz_temp, false );
+            libvlc_InternalAddIntf( p_libvlc, psz_temp );
             free( psz_temp );
         }
     }
@@ -804,18 +804,18 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Always load the hotkeys interface if it exists
      */
-    libvlc_InternalAddIntf( p_libvlc, "hotkeys,none", false );
+    libvlc_InternalAddIntf( p_libvlc, "hotkeys,none" );
 
 #ifdef HAVE_DBUS
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
     if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
-        libvlc_InternalAddIntf( p_libvlc, "dbus,none", false );
+        libvlc_InternalAddIntf( p_libvlc, "dbus,none" );
 
     /* Prevents the power management daemon from suspending the system
      * when VLC is active */
     if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
-        libvlc_InternalAddIntf( p_libvlc, "inhibit,none", false );
+        libvlc_InternalAddIntf( p_libvlc, "inhibit,none" );
 #endif
 
     /*
@@ -825,20 +825,20 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_X11_XLIB_H
     if( config_GetInt( p_libvlc, "disable-screensaver" ) )
     {
-        libvlc_InternalAddIntf( p_libvlc, "screensaver,none", false );
+        libvlc_InternalAddIntf( p_libvlc, "screensaver,none" );
     }
 #endif
 
     if( config_GetInt( p_libvlc, "file-logging" ) > 0 )
     {
-        libvlc_InternalAddIntf( p_libvlc, "logger,none", false );
+        libvlc_InternalAddIntf( p_libvlc, "logger,none" );
     }
 #ifdef HAVE_SYSLOG_H
     if( config_GetInt( p_libvlc, "syslog" ) > 0 )
     {
         char *logmode = var_CreateGetString( p_libvlc, "logmode" );
         var_SetString( p_libvlc, "logmode", "syslog" );
-        libvlc_InternalAddIntf( p_libvlc, "logger,none", false );
+        libvlc_InternalAddIntf( p_libvlc, "logger,none" );
 
         if( logmode )
         {
@@ -852,12 +852,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( config_GetInt( p_libvlc, "show-intf" ) > 0 )
     {
-        libvlc_InternalAddIntf( p_libvlc, "showintf,none", false );
+        libvlc_InternalAddIntf( p_libvlc, "showintf,none" );
     }
 
     if( config_GetInt( p_libvlc, "network-synchronisation") > 0 )
     {
-        libvlc_InternalAddIntf( p_libvlc, "netsync,none", false );
+        libvlc_InternalAddIntf( p_libvlc, "netsync,none" );
     }
 
 #ifdef WIN32
@@ -1098,8 +1098,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
 /**
  * Add an interface plugin and run it
  */
-int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module,
-                            bool b_play )
+int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
 {
     int i_err;
     intf_thread_t *p_intf = NULL;
@@ -1133,12 +1132,8 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module,
         return VLC_EGENERIC;
     }
 
-    /* Interface doesn't handle play on start so do it ourselves */
-    if( !p_intf->b_play && b_play )
-        playlist_Play( libvlc_priv(p_libvlc)->p_playlist );
-
     /* Try to run the interface */
-    p_intf->b_play = b_play;
+    p_intf->b_play = false; /* TODO: remove b_play completely */
     i_err = intf_RunThread( p_intf );
     if( i_err )
     {
