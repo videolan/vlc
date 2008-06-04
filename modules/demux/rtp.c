@@ -339,7 +339,7 @@ static void stream_decode (demux_t *demux, void *data, block_t *block)
  */
 
 /* PT=0
- * PCMU:
+ * PCMU: G.711 µ-law (RFC3551)
  */
 static void *pcmu_init (demux_t *demux)
 {
@@ -352,7 +352,7 @@ static void *pcmu_init (demux_t *demux)
 }
 
 /* PT=8
- * PCMA:
+ * PCMA: G.711 A-law (RFC3551)
  */
 static void *pcma_init (demux_t *demux)
 {
@@ -360,6 +360,29 @@ static void *pcma_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('a', 'l', 'a', 'w'));
     fmt.audio.i_rate = 8000;
+    fmt.audio.i_channels = 1;
+    return codec_init (demux, &fmt);
+}
+
+/* PT=10,11
+ * L16: 16-bits (network byte order) PCM
+ */
+static void *l16s_init (demux_t *demux)
+{
+    es_format_t fmt;
+
+    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('s', '1', '6', 'b'));
+    fmt.audio.i_rate = 44100;
+    fmt.audio.i_channels = 2;
+    return codec_init (demux, &fmt);
+}
+
+static void *l16m_init (demux_t *demux)
+{
+    es_format_t fmt;
+
+    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('s', '1', '6', 'b'));
+    fmt.audio.i_rate = 44100;
     fmt.audio.i_channels = 1;
     return codec_init (demux, &fmt);
 }
@@ -449,6 +472,7 @@ static int Demux (demux_t *demux)
     if (block)
     {
         /* Not using SDP, we need to guess the payload format used */
+        /* see http://www.iana.org/assignments/rtp-parameters */
         if (p_sys->autodetect && block->i_buffer >= 2)
         {
             rtp_pt_t pt = {
@@ -471,6 +495,18 @@ static int Demux (demux_t *demux)
                 msg_Dbg (demux, "detected G.711 A-law");
                 pt.init = pcma_init;
                 pt.frequency = 8000;
+                break;
+
+              case 10:
+                msg_Dbg (demux, "detected stereo PCM");
+                pt.init = l16s_init;
+                pt.frequency = 44100;
+                break;
+
+              case 11:
+                msg_Dbg (demux, "detected mono PCM");
+                pt.init = l16m_init;
+                pt.frequency = 44100;
                 break;
 
               case 14:
