@@ -237,6 +237,9 @@ typedef struct libvlc_priv_t
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_object_t      *p_interaction;    ///< interface interaction object
     httpd_t           *p_httpd; ///< HTTP daemon (src/network/httpd.c)
+
+    /* Private playlist data (FIXME - playlist_t is too public...) */
+    sout_instance_t   *p_sout; ///< kept sout instance (for playlist)
 } libvlc_priv_t;
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)

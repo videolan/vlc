@@ -26,6 +26,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_vout.h>
 #include <vlc_sout.h>
@@ -263,10 +264,16 @@ check_input:
         {
             int i_activity;
             input_thread_t *p_input;
+            sout_instance_t **pp_sout =
+                &libvlc_priv(p_playlist->p_libvlc)->p_sout;
+
             PL_DEBUG( "dead input" );
 
             p_input = p_playlist->p_input;
             p_playlist->p_input = NULL;
+            assert( *pp_sout == NULL );
+            if( var_CreateGetBool( p_input, "sout-keep" ) )
+                *pp_sout = input_DetachSout( p_input );
 
             /* Release the playlist lock, because we may get stuck
              * in vlc_object_release() for some time. */
@@ -404,6 +411,9 @@ void playlist_LastLoop( playlist_t *p_playlist )
             p_playlist->p_input = NULL;
             PL_UNLOCK;
 
+            /* sout-keep: no need to anything here.
+             * The last input will destroy its sout, if any, by itself */
+
             /* Destroy input */
             vlc_object_release( p_input );
             continue;
@@ -429,14 +439,10 @@ void playlist_LastLoop( playlist_t *p_playlist )
     }
 
 #ifdef ENABLE_SOUT
-    /* close all remaining sout */
-    while( ( p_obj = vlc_object_find( p_playlist,
-                                      VLC_OBJECT_SOUT, FIND_CHILD ) ) )
-    {
-        vlc_object_detach( p_obj );
-        vlc_object_release( p_obj );
-        sout_DeleteInstance( (sout_instance_t*)p_obj );
-    }
+    /* close the remaining sout-keep (if there was no input atm) */
+    sout_instance_t *p_sout = libvlc_priv (p_playlist->p_libvlc)->p_sout;
+    if (p_sout)
+        sout_DeleteInstance( p_sout );
 #endif
 
     /* close all remaining vout */

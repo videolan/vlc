@@ -464,6 +464,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     input_item_t *p_input = p_item->p_input;
+    sout_instance_t **pp_sout = &libvlc_priv(p_playlist->p_libvlc)->p_sout;
     int i_activity = var_GetInteger( p_playlist, "activity" ) ;
 
     msg_Dbg( p_playlist, "creating new input thread" );
@@ -475,7 +476,9 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     var_SetInteger( p_playlist, "activity", i_activity +
                     DEFAULT_INPUT_ACTIVITY );
-    p_playlist->p_input = input_CreateThread( p_playlist, p_input );
+    p_playlist->p_input =
+        input_CreateThreadExtended( p_playlist, p_input, NULL, *pp_sout );
+    *pp_sout = NULL;
 
     char *psz_uri = input_item_GetURI( p_item->p_input );
     if( psz_uri && ( !strncmp( psz_uri, "directory:", 10 ) ||
