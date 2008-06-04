@@ -86,7 +86,7 @@ static void AccessClose( vlc_object_t * );
 #define CHROMA_TEXT N_("Video input chroma format")
 #define CHROMA_LONGTEXT N_( \
     "Force the Video4Linux2 video device to use a specific chroma format " \
-    "(eg. I420 or I422 for raw images, MJPEG for M-JPEG compressed input) " \
+    "(eg. I420 or I422 for raw images, MJPG for M-JPEG compressed input) " \
     "(Complete list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, " \
     "I41N, I422, I420, I411, I410, MJPG)")
 #define INPUT_TEXT N_( "Input" )
