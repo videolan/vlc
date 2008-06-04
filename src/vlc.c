@@ -127,6 +127,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     {
         libvlc_add_intf (vlc, "signals", NULL);
         libvlc_add_intf (vlc, NULL, &ex);
+        libvlc_playlist_play (vlc, -1, 0, NULL, NULL);
         libvlc_wait (vlc);
         libvlc_release (vlc);
     }

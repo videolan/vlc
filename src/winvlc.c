@@ -111,6 +111,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (vlc != NULL)
     {
         libvlc_add_intf (vlc, NULL, &ex);
+        libvlc_playlist_play (vlc, -1, 0, NULL, NULL);
         libvlc_wait (vlc);
         libvlc_release (vlc);
     }
