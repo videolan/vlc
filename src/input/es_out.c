@@ -195,7 +195,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     out->pf_del     = EsOutDel;
     out->pf_control = EsOutControl;
     out->p_sys      = p_sys;
-    out->b_sout     = (p_input->p->p_sout != NULL ? true : false);
+    out->b_sout     = p_input->p->p_sout != NULL;
 
     p_sys->p_input = p_input;
 
@@ -1057,8 +1057,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     {
         if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
         {
-            if( !var_GetBool( p_input, "video" ) ||
-                ( p_input->p->p_sout && !var_GetBool( p_input, "sout-video" ) ) )
+            if( !var_GetBool( p_input, out->b_sout ? "sout-video" : "video" ) )
             {
                 msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x",
                          es->i_id );
@@ -1068,8 +1067,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         else if( es->fmt.i_cat == AUDIO_ES )
         {
             var_Get( p_input, "audio", &val );
-            if( !var_GetBool( p_input, "audio" ) ||
-                ( p_input->p->p_sout && !var_GetBool( p_input, "sout-audio" ) ) )
+            if( !var_GetBool( p_input, out->b_sout ? "sout-audio" : "audio" ) )
             {
                 msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
                          es->i_id );
@@ -1079,8 +1077,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         if( es->fmt.i_cat == SPU_ES )
         {
             var_Get( p_input, "spu", &val );
-            if( !var_GetBool( p_input, "spu" ) ||
-                ( p_input->p->p_sout && !var_GetBool( p_input, "sout-spu" ) ) )
+            if( !var_GetBool( p_input, out->b_sout ? "sout-spu" : "spu" ) )
             {
                 msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
                          es->i_id );
