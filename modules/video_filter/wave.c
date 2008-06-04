@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wave.c : Wave video effect plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2006 the VideoLAN team
+ * Copyright (C) 2000-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -152,7 +152,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         i_pixel_pitch = p_pic->p[i_index].i_pixel_pitch;
         i_visible_pixels = i_visible_pitch/i_pixel_pitch;
 
-        black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
+        black_pixel = ( p_pic->i_planes > 1 && i_index == Y_PLANE ) ? 0x00
+                                                                    : 0x80;
 
         /* Ok, we do 3 times the sin() calculation for each line. So what ? */
         for( i_line = 0 ; i_line < i_num_lines ; i_line++ )

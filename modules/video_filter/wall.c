@@ -299,12 +299,12 @@ static int Init( vout_thread_t *p_vout )
     w1 &= ~1;
     h1 = w1 * VOUT_ASPECT_FACTOR / i_aspect&~1;
     h1 &= ~1;
- 
+
     h2 = p_vout->output.i_height / p_vout->p_sys->i_row&~1;
     h2 &= ~1;
     w2 = h2 * i_aspect / VOUT_ASPECT_FACTOR&~1;
     w2 &= ~1;
- 
+
     if ( h1 * p_vout->p_sys->i_row < p_vout->output.i_height )
     {
         unsigned int i_tmp;
@@ -340,7 +340,7 @@ static int Init( vout_thread_t *p_vout )
 
     p_vout->p_sys->i_vout = 0;
     msg_Dbg( p_vout, "target window (%d,%d)-(%d,%d)", i_hstart,i_vstart,i_hend,i_vend );
- 
+
 
     i_top = 0;
     i_height = 0;
@@ -375,7 +375,7 @@ static int Init( vout_thread_t *p_vout )
                     i_align |= VOUT_ALIGN_RIGHT;
                 }
             }
- 
+
             if( i_row * i_target_height >= i_vstart &&
                 ( i_row + 1 ) * i_target_height <= i_vend )
             {

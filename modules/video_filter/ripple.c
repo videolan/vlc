@@ -143,7 +143,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         uint8_t black_pixel;
         uint8_t *p_in, *p_out;
 
-        black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
+        black_pixel = ( p_pic->i_planes > 1 && i_index == Y_PLANE ) ? 0x00
+                                                                    : 0x80;
 
         i_num_lines = p_pic->p[i_index].i_visible_lines;
         i_pixel_pitch = p_pic->p[i_index].i_pixel_pitch;
