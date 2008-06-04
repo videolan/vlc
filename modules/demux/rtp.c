@@ -89,6 +89,7 @@ vlc_module_begin ();
         change_integer_range (0, 32767);
 
     add_shortcut ("rtp");
+    add_shortcut ("udplite");
 vlc_module_end ();
 
 /*
@@ -98,6 +99,15 @@ vlc_module_end ();
  * - multiple medias (need SDP parser, and RTCP-SR parser for lip-sync)
  * - support for access_filter in case of stream_Demux (MPEG-TS)
  */
+
+#ifndef IPPROTO_DCCP
+# define IPPROTO_DCCP 33 /* IANA */
+#endif
+
+#ifndef IPPROTO_UDPLITE
+# define IPPROTO_UDPLITE 136 /* from IANA */
+#endif
+
 
 /*
  * Local prototypes
@@ -112,8 +122,14 @@ static int extract_port (char **phost);
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
+    int tp; /* transport protocol */
 
-    if (strcmp (demux->psz_access, "rtp"))
+    if (!strcmp (demux->psz_access, "rtp"))
+        tp = IPPROTO_UDP;
+    else
+    if (!strcmp (demux->psz_access, "udplite"))
+        tp = IPPROTO_UDPLITE;
+    else
         return VLC_EGENERIC;
 
     char *tmp = strdup (demux->psz_path);
@@ -134,11 +150,11 @@ static int Open (vlc_object_t *obj)
         dport = 5004; /* avt-profile-1 port */
 
     /* Try to connect */
-    int fd = net_OpenDgram (obj, dhost, dport, shost, sport,
-                            AF_UNSPEC, IPPROTO_UDP);
+    int fd = net_OpenDgram (obj, dhost, dport, shost, sport, AF_UNSPEC, tp);
     free (tmp);
     if (fd == -1)
         return VLC_EGENERIC;
+    net_SetCSCov (fd, -1, 12);
 
     /* Initializes demux */
     demux_sys_t *p_sys = malloc (sizeof (*p_sys));
