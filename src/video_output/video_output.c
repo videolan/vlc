@@ -675,8 +675,6 @@ static int InitThread( vout_thread_t *p_vout )
         p_chroma->fmt_out.video.i_lgshift = p_vout->output.i_lgshift;
         p_chroma->fmt_out.video.i_rbshift = p_vout->output.i_rbshift;
         p_chroma->fmt_out.video.i_lbshift = p_vout->output.i_lbshift;
-        msg_Err( p_vout, "HOLA! %4.4s", (char*)&p_chroma->fmt_in.video.i_chroma );
-        msg_Err( p_vout, "HOLA! %4.4s", (char*)&p_chroma->fmt_out.video.i_chroma );
         p_chroma->p_module = module_Need( p_chroma, "video filter2", NULL, 0 );
 
         if( p_chroma->p_module == NULL )
