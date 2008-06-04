@@ -463,7 +463,6 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
  */
 int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
-    vlc_value_t val;
     input_item_t *p_input = p_item->p_input;
     int i_activity = var_GetInteger( p_playlist, "activity" ) ;
 
@@ -508,9 +507,8 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         free( psz_name );
     }
 
-    val.i_int = p_input->i_id;
     PL_UNLOCK;
-    var_Set( p_playlist, "playlist-current", val );
+    var_SetInteger( p_playlist, "playlist-current", p_input->i_id );
     PL_LOCK;
 
     return VLC_SUCCESS;
