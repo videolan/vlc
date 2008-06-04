@@ -966,11 +966,8 @@ static void RunThread( vout_thread_t *p_vout)
                                                p_vout->psz_vf2 ) < 0 )
                 msg_Err( p_vout, "Video filter chain creation failed" );
 
-            else
-            {
-                free( p_vout->psz_vf2 );
-                p_vout->psz_vf2 = NULL;
-            }
+            free( p_vout->psz_vf2 );
+            p_vout->psz_vf2 = NULL;
             vlc_mutex_unlock( &p_vout->vfilter_lock );
         }
 
