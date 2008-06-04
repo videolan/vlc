@@ -358,7 +358,6 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
             else
             {
                 p_out[i_line*i_pitch+2*i_col] = 0x00;
-                i_col_orig /= 2;
                 p_out_u[i_line*i_pitch+2*i_col] = 0x80;
                 p_out_v[i_line*i_pitch+2*i_col] = 0x80;
             }
