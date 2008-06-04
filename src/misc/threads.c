@@ -459,7 +459,7 @@ static THREAD_RTYPE thread_entry (void *data)
     void *(*func) (void *) = ((struct vlc_thread_boot *)data)->entry;
 
     free (data);
-#ifdef NDEBUG
+#ifndef NDEBUG
     vlc_threadvar_set (&thread_object_key, obj);
 #endif
     msg_Dbg (obj, "thread started");
