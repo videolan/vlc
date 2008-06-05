@@ -1,19 +1,8 @@
-diff -r -u libdvdnav-4.1.1/configure.ac libdvdnav/configure.ac
---- libdvdnav-4.1.1/configure.ac	2007-05-01 11:11:52.000000000 +0100
-+++ libdvdnav/configure.ac	2007-11-12 11:40:20.406250000 +0000
-@@ -130,6 +130,11 @@
- AC_C_BIGENDIAN
- 
- dnl ---------------------------------------------
-+dnl Check for basic *nix fonction that we may emulate on other OS
-+dnl ---------------------------------------------
-+AC_CHECK_FUNCS(gettimeofday)
-+
-+dnl ---------------------------------------------
- dnl threads
- dnl ---------------------------------------------
- case $host in
-@@ -150,25 +155,61 @@
+diff --git a/configure.ac b/configure.ac
+index e5ee5c4..b381093 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -161,25 +166,61 @@ AC_SUBST(THREAD_LIBS)
  AC_SUBST(THREAD_CFLAGS)
  
  dnl ---------------------------------------------
@@ -93,29 +82,23 @@ diff -r -u libdvdnav-4.1.1/configure.ac libdvdnav/configure.ac
  
  dnl ---------------------------------------------
  dnl cflags
-diff -r -u libdvdnav-4.1.1/src/dvdnav_internal.h libdvdnav/src/dvdnav_internal.h
---- libdvdnav-4.1.1/src/dvdnav_internal.h	2007-04-21 12:56:41.000000000 +0100
-+++ libdvdnav/src/dvdnav_internal.h	2007-11-12 11:42:26.046875000 +0000
-@@ -39,6 +39,7 @@
- #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
- #define pthread_mutex_destroy(a)
+diff --git a/examples/Makefile.am b/examples/Makefile.am
+index 3cfda2f..3015dd5 100644
+--- a/examples/Makefile.am
++++ b/examples/Makefile.am
+@@ -8,7 +8,7 @@ noinst_PROGRAMS = menus
  
-+#ifndef HAVE_GETTIMEOFDAY
- /* replacement gettimeofday implementation */
- #include <sys/timeb.h>
- static inline int _private_gettimeofday( struct timeval *tv, void *tz )
-@@ -50,6 +51,8 @@
-   return 0;
- }
- #define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
-+#endif
-+
- #include <io.h> /* read() */
- #define lseek64 _lseeki64
+ menus_SOURCES = menus.c
+ menus_LDFLAGS = -L$(top_srcdir)/src/
+-menus_LDADD   = $(DVDNAV_LIB)
++menus_LDADD   = $(DVDNAV_LIB) $(CSS_LIBS)  
  
-diff -r -u libdvdnav-4.1.1/src/libdvdread/dvd_input.c libdvdnav/src/libdvdread/dvd_input.c
---- libdvdnav-4.1.1/src/libdvdread/dvd_input.c	2007-04-19 16:45:30.000000000 +0100
-+++ libdvdnav/src/libdvdread/dvd_input.c	2007-11-12 11:19:57.984375000 +0000
+ $(DVDNAV_LIB):
+ 	@cd $(top_builddir)/src/ && $(MAKE) libdvdnav.la
+diff --git a/src/libdvdread/dvd_input.c b/src/libdvdread/dvd_input.c
+index d55aac7..63b416f 100644
+--- a/src/libdvdread/dvd_input.c
++++ b/src/libdvdread/dvd_input.c
 @@ -27,6 +27,11 @@
  #include "dvd_reader.h"
  #include "dvd_input.h"
@@ -128,10 +111,11 @@ diff -r -u libdvdnav-4.1.1/src/libdvdread/dvd_input.c libdvdnav/src/libdvdread/d
  
  /* The function pointers that is the exported interface of this file. */
  dvd_input_t (*dvdinput_open)  (const char *);
-diff -r -u libdvdnav-4.1.1/src/vm/vm.c libdvdnav/src/vm/vm.c
---- libdvdnav-4.1.1/src/vm/vm.c	2007-04-25 00:06:22.000000000 +0100
-+++ libdvdnav/src/vm/vm.c	2007-11-12 11:35:55.859375000 +0000
-@@ -135,24 +135,25 @@
+diff --git a/src/vm/vm.c b/src/vm/vm.c
+index 53bef88..db855c7 100644
+--- a/src/vm/vm.c
++++ b/src/vm/vm.c
+@@ -134,24 +134,25 @@ static void vm_print_current_domain_state(vm_t *vm) {
  }
  #endif
  
@@ -165,23 +149,23 @@ diff -r -u libdvdnav-4.1.1/src/vm/vm.c libdvdnav/src/vm/vm.c
              if((data[i] == 0)) break;
              if((data[i] > 32) && (data[i] < 127)) {
                fprintf(MSG_OUT, "%c", data[i]);
-@@ -160,10 +161,12 @@
+@@ -159,10 +160,12 @@ static void dvd_read_name(char *name, const char *device) {
                fprintf(MSG_OUT, " ");
              }
            }
--          strncpy(name, &data[25], 48);
+-          strncpy(name, (char*) &data[25], 48);
 -          name[48] = 0;
-+	  strncpy(name, &data[40], 32);
-+	  i=31;
-+	  while( (i >= 0) && (name[i] <= ' ')) --i;
-+	  name[i+1] = '\0';
++          strncpy(name, (char*) &data[40], 32);
++          i=31;
++          while( (i >= 0) && (name[i] <= ' ')) --i;
++          name[i+1] = '\0';
            fprintf(MSG_OUT, "\nlibdvdnav: DVD Serial Number: ");
 -          for(i=73; i < 89; i++ ) {
 +          for(i=813; i < 829; i++ ) {
              if((data[i] == 0)) break;
              if((data[i] > 32) && (data[i] < 127)) {
                fprintf(MSG_OUT, "%c", data[i]);
-@@ -187,7 +190,7 @@
+@@ -186,7 +189,7 @@ static void dvd_read_name(char *name, const char *device) {
        } else {
          fprintf(MSG_OUT, "libdvdnav: Can't seek to block %u\n", 32 );
        }
@@ -190,14 +174,3 @@ diff -r -u libdvdnav-4.1.1/src/vm/vm.c libdvdnav/src/vm/vm.c
      } else {
      fprintf(MSG_OUT, "NAME OPEN FAILED\n");
    }
---- libdvdnav-4.1.1/examples/Makefile.am	2004-01-11 21:43:13.000000000 +0000
-+++ libdvdnav/examples/Makefile.am	2007-11-12 12:44:09.328125000 +0000
-@@ -8,7 +8,7 @@
- 
- menus_SOURCES = menus.c
- menus_LDFLAGS = -L$(top_srcdir)/src/
--menus_LDADD   = $(DVDNAV_LIB)
-+menus_LDADD   = $(DVDNAV_LIB) $(CSS_LIBS)  
- 
- $(DVDNAV_LIB):
- 	@cd $(top_builddir)/src/ && $(MAKE) libdvdnav.la

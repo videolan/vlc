@@ -1173,7 +1173,7 @@ CLEAN_FILE += .dvdread
 ifdef SVN
 libdvdnav:
 	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav
-	patch -p0 < Patches/libdvdnav.patch
+	patch -d libdvdnav -p1 < Patches/libdvdnav.patch
 ifdef HAVE_WIN32
 	patch -p0 < Patches/libdvdnav-win32.patch
 endif
