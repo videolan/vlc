@@ -93,6 +93,7 @@ E_(vlc_entry) ( module_t *p_module );
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
         module_config_t *p_config = NULL;                                     \
+        const char *domain = NULL;                                            \
         if (vlc_module_set (p_module, VLC_MODULE_NAME,                        \
                             (const char *)(MODULE_STRING)))                   \
             goto error;                                                       \
@@ -151,6 +152,8 @@ E_(vlc_entry) ( module_t *p_module );
     if (vlc_module_set (p_submodule, VLC_MODULE_NO_UNLOAD)) \
         goto error;
 
+#define set_text_domain( dom ) domain = (dom);
+
 VLC_EXPORT( module_t *, vlc_module_create, ( vlc_object_t * ) );
 VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
 VLC_EXPORT( int, vlc_module_set, (module_t *module, int propid, ...) );
@@ -186,7 +189,7 @@ enum vlc_config_properties
     VLC_CONFIG_NAME,
     /* command line name (args=const char *, vlc_callback_t) */
 
-    VLC_CONFIG_DESC,
+    VLC_CONFIG_DESC_NODOMAIN,
     /* description (args=const char *, const char *) */
 
     VLC_CONFIG_VALUE,
@@ -219,11 +222,11 @@ enum vlc_config_properties
     VLC_CONFIG_SHORTCUT,
     /* one-character (short) command line option name (args=char) */
 
-    VLC_CONFIG_LIST,
+    VLC_CONFIG_LIST_NODOMAIN,
     /* possible values list
      * (args=size_t, const <type> *, const char *const *) */
 
-    VLC_CONFIG_ADD_ACTION,
+    VLC_CONFIG_ADD_ACTION_NODOMAIN,
     /* add value change callback (args=vlc_callback_t, const char *) */
 
     VLC_CONFIG_OLDNAME,
@@ -231,6 +234,17 @@ enum vlc_config_properties
 
     VLC_CONFIG_SAFE,
     /* tag as modifiable by untrusted input item "sources" (args=none) */
+
+    VLC_CONFIG_DESC,
+    /* description (args=const char *, const char *, const char *) */
+
+    VLC_CONFIG_LIST,
+    /* possible values list
+     * (args=const char *, size_t, const <type> *, const char *const *) */
+
+    VLC_CONFIG_ADD_ACTION,
+    /* add value change callback
+     * (args=const char *, vlc_callback_t, const char *) */
 };
 
 /*****************************************************************************
@@ -251,7 +265,7 @@ enum vlc_config_properties
 
 #define add_typedesc_inner( type, text, longtext ) \
     add_type_inner( type ) \
-    vlc_config_set (p_config, VLC_CONFIG_DESC, \
+    vlc_config_set (p_config, VLC_CONFIG_DESC, domain, \
                     (const char *)(text), (const char *)(longtext));
 
 #define add_typeadv_inner( type, text, longtext, advc ) \
@@ -386,21 +400,21 @@ enum vlc_config_properties
     vlc_config_set (p_config, VLC_CONFIG_SHORTCUT, (int)(ch));
 
 #define change_string_list( list, list_text, list_update_func ) \
-    vlc_config_set (p_config, VLC_CONFIG_LIST, \
+    vlc_config_set (p_config, VLC_CONFIG_LIST, domain, \
                     (size_t)(sizeof (list) / sizeof (char *)), \
                     (const char *const *)(list), \
                     (const char *const *)(list_text), \
                     list_update_func);
 
 #define change_integer_list( list, list_text, list_update_func ) \
-    vlc_config_set (p_config, VLC_CONFIG_LIST, \
+    vlc_config_set (p_config, VLC_CONFIG_LIST, domain, \
                     (size_t)(sizeof (list) / sizeof (int)), \
                     (const int *)(list), \
                     (const char *const *)(list_text), \
                     list_update_func);
 
 #define change_float_list( list, list_text, list_update_func ) \
-    vlc_config_set (p_config, VLC_CONFIG_LIST, \
+    vlc_config_set (p_config, VLC_CONFIG_LIST, domain, \
                     (size_t)(sizeof (list) / sizeof (float)), \
                     (const float *)(list), \
                     (const char *const *)(list_text), \
@@ -414,7 +428,7 @@ enum vlc_config_properties
                     (double)(minv), (double)(maxv));
 
 #define change_action_add( pf_action, text ) \
-    vlc_config_set (p_config, VLC_CONFIG_ADD_ACTION, \
+    vlc_config_set (p_config, VLC_CONFIG_ADD_ACTION, domain, \
                     (vlc_callback_t)(pf_action), (const char *)(text));
 
 #define change_internal() \

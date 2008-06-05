@@ -252,15 +252,11 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             break;
         }
 
-        case VLC_CONFIG_DESC:
+        case VLC_CONFIG_DESC_NODOMAIN:
         {
             const char *text = va_arg (ap, const char *);
             const char *longtext = va_arg (ap, const char *);
-
-            item->psz_text = text ? strdup (dgettext (PACKAGE, text)) : NULL;
-            item->psz_longtext =
-                longtext ? strdup (dgettext (PACKAGE, longtext)) : NULL;
-            ret = 0;
+            ret = vlc_config_set (item, VLC_CONFIG_DESC, NULL, text, longtext);
             break;
         }
 
@@ -352,8 +348,66 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             ret = 0;
             break;
 
+        case VLC_CONFIG_LIST_NODOMAIN:
+        {
+            size_t len = va_arg (ap, size_t);
+            if (IsConfigIntegerType (item->i_type))
+            {
+                const int *src = va_arg (ap, const int *);
+                const char *const *text = va_arg (ap, const char *const *);
+                ret = vlc_config_set (item, VLC_CONFIG_LIST, NULL, len, src,
+                                      text);
+            }
+            else
+            if (IsConfigStringType (item->i_type))
+            {
+                const char *const *src = va_arg (ap, const char *const *);
+                const char *const *text = va_arg (ap, const char *const *);
+                ret = vlc_config_set (item, VLC_CONFIG_LIST, NULL, len, src,
+                                      text);
+            }
+            break;
+        }
+
+        case VLC_CONFIG_ADD_ACTION_NODOMAIN:
+        {
+            vlc_callback_t cb = va_arg (ap, vlc_callback_t);
+            const char *name = va_arg (ap, const char *);
+            ret = vlc_config_set (item, VLC_CONFIG_ADD_ACTION, NULL, cb, name);
+            break;
+        }
+
+        case VLC_CONFIG_OLDNAME:
+        {
+            const char *oldname = va_arg (ap, const char *);
+            item->psz_oldname = oldname ? strdup (oldname) : NULL;
+            ret = 0;
+            break;
+        }
+
+        case VLC_CONFIG_SAFE:
+            item->b_safe = true;
+            ret = 0;
+            break;
+
+        case VLC_CONFIG_DESC:
+        {
+            const char *domain = va_arg (ap, const char *);
+            const char *text = va_arg (ap, const char *);
+            const char *longtext = va_arg (ap, const char *);
+
+            if (domain == NULL)
+                domain = PACKAGE;
+            item->psz_text = text ? strdup (dgettext (domain, text)) : NULL;
+            item->psz_longtext =
+                longtext ? strdup (dgettext (domain, longtext)) : NULL;
+            ret = 0;
+            break;
+        }
+
         case VLC_CONFIG_LIST:
         {
+            const char *domain = va_arg (ap, const char *);
             size_t len = va_arg (ap, size_t);
             char **dtext = malloc (sizeof (char *) * (len + 1));
 
@@ -406,12 +460,15 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
                 break;
 
             /* Copy textual descriptions */
+            if (domain == NULL)
+                domain = PACKAGE;
+
             const char *const *text = va_arg (ap, const char *const *);
             if (text != NULL)
             {
                 for (size_t i = 0; i < len; i++)
                     dtext[i] =
-                        text[i] ? strdup (dgettext (PACKAGE, text[i])) : NULL;
+                        text[i] ? strdup (dgettext (domain, text[i])) : NULL;
 
                 dtext[len] = NULL;
                 item->ppsz_list_text = dtext;
@@ -430,6 +487,7 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
 
         case VLC_CONFIG_ADD_ACTION:
         {
+            const char *domain = va_arg (ap, const char *);
             vlc_callback_t cb = va_arg (ap, vlc_callback_t), *tabcb;
             const char *name = va_arg (ap, const char *);
             char **tabtext;
@@ -448,8 +506,10 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
                 break;
             item->ppsz_action_text = tabtext;
 
+            if (domain == NULL)
+                domain = PACKAGE;
             if (name)
-                tabtext[item->i_action] = strdup (dgettext (PACKAGE, name));
+                tabtext[item->i_action] = strdup (dgettext (domain, name));
             else
                 tabtext[item->i_action] = NULL;
             tabtext[item->i_action + 1] = NULL;
@@ -458,19 +518,6 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             ret = 0;
             break;
         }
-
-        case VLC_CONFIG_OLDNAME:
-        {
-            const char *oldname = va_arg (ap, const char *);
-            item->psz_oldname = oldname ? strdup (oldname) : NULL;
-            ret = 0;
-            break;
-        }
-
-        case VLC_CONFIG_SAFE:
-            item->b_safe = true;
-            ret = 0;
-            break;
     }
 
     va_end (ap);
