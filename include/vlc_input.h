@@ -577,7 +577,7 @@ struct input_thread_t
     int64_t     i_time;     /* Current time */
 
     /* Internal caching common to all inputs */
-    int i_pts_delay;
+    mtime_t i_pts_delay;
 
     /* All other data is input_thread is PRIVATE. You can't access it
      * outside of src/input */
