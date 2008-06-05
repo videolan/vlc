@@ -963,8 +963,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->linesize[2] = p_pic->p[2].i_pitch;
     p_ff_pic->linesize[3] = 0;
 
-    if( p_ff_pic->reference != 0 ||
-        p_sys->i_codec_id == CODEC_ID_H264 /* Bug in libavcodec */ )
+    if( p_ff_pic->reference != 0 )
     {
         p_dec->pf_picture_link( p_dec, p_pic );
     }
@@ -994,8 +993,7 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->data[2] = NULL;
     p_ff_pic->data[3] = NULL;
 
-    if( p_ff_pic->reference != 0 ||
-        p_dec->p_sys->i_codec_id == CODEC_ID_H264 /* Bug in libavcodec */ )
+    if( p_ff_pic->reference != 0 )
     {
         p_dec->pf_picture_unlink( p_dec, p_pic );
     }
