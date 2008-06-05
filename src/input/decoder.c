@@ -759,7 +759,14 @@ static void optimize_video_pts( decoder_t *p_dec )
      * This first draft is way to simple, and we can't say if the
      * algo will converge. It's also full of constants.
      * But this simple algo allows to reduce the latency
-     * to the minimum. */
+     * to the minimum.
+     * The whole point of this, is to bypass the pts_delay set
+     * by the access but also the delay arbitraly set by
+     * the remote server.
+     * Actually the remote server's muxer may set up a
+     * pts<->dts delay in the muxed stream. That is
+     * why we may end up in having a negative pts_delay,
+     * to compensate that artificial delay. */
     mtime_t buffer_size = youngest_pict->date - oldest_pict->date;
     int64_t pts_slide = 0;
     if( buffer_size < 10000 )
