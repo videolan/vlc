@@ -1174,9 +1174,6 @@ ifdef SVN
 libdvdnav:
 	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav
 	patch -d libdvdnav -p1 < Patches/libdvdnav.patch
-ifdef HAVE_WIN32
-	patch -p0 < Patches/libdvdnav-win32.patch
-endif
 	(cd $@; ./autogen.sh noconfig)
 else
 libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:
