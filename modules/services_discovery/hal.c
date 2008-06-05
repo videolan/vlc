@@ -270,7 +270,7 @@ static void ParseDevice( services_discovery_t *p_sd, const char *psz_device )
     char *psz_disc_type;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
 
-    if( libhal_device_property_exists( p_sys->p_ctx, psz_device,
+    if( !libhal_device_property_exists( p_sys->p_ctx, psz_device,
                                        "volume.disc.type", NULL ) )
         return;
 
