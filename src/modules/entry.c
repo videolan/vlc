@@ -108,17 +108,26 @@ int vlc_module_set (module_t *module, int propid, ...)
             break;
         }
 
-        case VLC_MODULE_SHORTNAME:
-            module->psz_shortname = dgettext (PACKAGE, va_arg (ap, char *));
+        case VLC_MODULE_SHORTNAME_NODOMAIN:
+        {
+            const char *name = va_arg (ap, char *);
+            ret = vlc_module_set (module, VLC_MODULE_SHORTNAME, NULL, name);
             break;
+        }
 
-        case VLC_MODULE_DESCRIPTION:
-            module->psz_longname = dgettext (PACKAGE, va_arg (ap, char *));
+        case VLC_MODULE_DESCRIPTION_NODOMAIN:
+        {
+            const char *desc = va_arg (ap, char *);
+            ret = vlc_module_set (module, VLC_MODULE_DESCRIPTION, NULL, desc);
             break;
+        }
 
-        case VLC_MODULE_HELP:
-            module->psz_help = dgettext (PACKAGE, va_arg (ap, char *));
+        case VLC_MODULE_HELP_NODOMAIN:
+        {
+            const char *help = va_arg (ap, char *);
+            ret = vlc_module_set (module, VLC_MODULE_HELP, NULL, help);
             break;
+        }
 
         case VLC_MODULE_CAPABILITY:
             module->psz_capability = va_arg (ap, char *);
@@ -126,6 +135,10 @@ int vlc_module_set (module_t *module, int propid, ...)
 
         case VLC_MODULE_SCORE:
             module->i_score = va_arg (ap, int);
+            break;
+
+        case VLC_MODULE_PROGRAM:
+            msg_Warn (module, "deprecated module property %d", propid);
             break;
 
         case VLC_MODULE_CB_OPEN:
@@ -151,9 +164,32 @@ int vlc_module_set (module_t *module, int propid, ...)
             break;
         }
 
-        case VLC_MODULE_PROGRAM:
-            msg_Warn (module, "deprecated module property %d", propid);
+        case VLC_MODULE_SHORTNAME:
+        {
+            const char *domain = va_arg (ap, const char *);
+            if (domain == NULL)
+                domain = PACKAGE;
+            module->psz_shortname = dgettext (domain, va_arg (ap, char *));
             break;
+        }
+
+        case VLC_MODULE_DESCRIPTION:
+        {
+            const char *domain = va_arg (ap, const char *);
+            if (domain == NULL)
+                domain = PACKAGE;
+            module->psz_longname = dgettext (domain, va_arg (ap, char *));
+            break;
+        }
+
+        case VLC_MODULE_HELP:
+        {
+            const char *domain = va_arg (ap, const char *);
+            if (domain == NULL)
+                domain = PACKAGE;
+            module->psz_help = dgettext (domain, va_arg (ap, char *));
+            break;
+        }
 
         default:
             msg_Err (module, "unknown module property %d", propid);

@@ -122,17 +122,18 @@ E_(vlc_entry) ( module_t *p_module );
         goto error;
 
 #define set_shortname( shortname ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_SHORTNAME, \
-        (const char *)(shortname))) \
+    if (vlc_module_set (p_submodule, VLC_MODULE_SHORTNAME, domain, \
+                        (const char *)(shortname))) \
         goto error;
 
 #define set_description( desc ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_DESCRIPTION, \
+    if (vlc_module_set (p_submodule, VLC_MODULE_DESCRIPTION, domain, \
                         (const char *)(desc))) \
         goto error;
 
 #define set_help( help ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_HELP, (const char *)(help))) \
+    if (vlc_module_set (p_submodule, VLC_MODULE_HELP, domain, \
+                        (const char *)(help))) \
         goto error;
 
 #define set_capability( cap, score ) \
@@ -162,16 +163,19 @@ enum vlc_module_properties
      * Append new items at the end ONLY. */
     VLC_MODULE_CPU_REQUIREMENT,
     VLC_MODULE_SHORTCUT,
-    VLC_MODULE_SHORTNAME,
-    VLC_MODULE_DESCRIPTION,
-    VLC_MODULE_HELP,
+    VLC_MODULE_SHORTNAME_NODOMAIN,
+    VLC_MODULE_DESCRIPTION_NODOMAIN,
+    VLC_MODULE_HELP_NODOMAIN,
     VLC_MODULE_CAPABILITY,
     VLC_MODULE_SCORE,
-    VLC_MODULE_PROGRAM,
+    VLC_MODULE_PROGRAM, /* obsoleted */
     VLC_MODULE_CB_OPEN,
     VLC_MODULE_CB_CLOSE,
     VLC_MODULE_NO_UNLOAD,
     VLC_MODULE_NAME,
+    VLC_MODULE_SHORTNAME,
+    VLC_MODULE_DESCRIPTION,
+    VLC_MODULE_HELP,
 };
 
 enum vlc_config_properties
