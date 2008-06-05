@@ -253,7 +253,7 @@ static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
         {
             /* Line 1 and 2, pixels 0 to ( width - 16 ) */
             VEC_NEXT_LINES( );
-            for( i_x = p_fiter->fmt_in.video.i_width / 32 ; i_x-- ; )
+            for( i_x = p_filter->fmt_in.video.i_width / 32 ; i_x-- ; )
             {
                 VEC_LOAD_UV( );
                 VEC_MERGE( vec_mergeh );
