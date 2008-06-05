@@ -165,6 +165,9 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
     ADD_CALLBACK( "spu-delay", EsDelayCallback );
 
+    p_input->p->pts_adjust.auto_adjust = var_CreateGetBool(
+            p_input, "auto-adjust-pts-delay" );
+
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Video Track");

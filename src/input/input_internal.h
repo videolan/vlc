@@ -112,6 +112,13 @@ struct input_thread_private_t
     int            i_slave;
     input_source_t **slave;
 
+    /* pts delay fixup */
+    struct {
+        int  i_num_faulty;
+        bool to_high;
+        bool auto_adjust;
+    } pts_adjust;
+
     /* Stats counters */
     struct {
         counter_t *p_read_packets;
