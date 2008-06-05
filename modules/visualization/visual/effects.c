@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
+ *          Adrien Maglo <magsoft@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -830,7 +831,7 @@ int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
 
 /*****************************************************************************
- * vuMeter_Run: scope effect
+ * vuMeter_Run: vu meter effect
  *****************************************************************************/
 int vuMeter_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
               aout_buffer_t * p_buffer , picture_t * p_picture)
@@ -899,7 +900,7 @@ int vuMeter_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                 /* Draw the two scales */
                 k = 0;
                 teta_grad = GRAD_ANGLE_MIN;
-                for ( teta = -M_PI_4; teta <= M_PI_4; teta = teta + 0.001 )
+                for ( teta = -M_PI_4; teta <= M_PI_4; teta = teta + 0.003 )
                 {
                         for ( i = 140; i <= 150; i++ )
                         {
@@ -941,7 +942,7 @@ int vuMeter_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                 }
 
                 /* Draw the hand bases */
-                for ( teta = -M_PI_2; teta <= M_PI_2 + 0.01; teta = teta + 0.001 )
+                for ( teta = -M_PI_2; teta <= M_PI_2 + 0.01; teta = teta + 0.003 )
                 {
                         for ( i = 0; i < 10; i++ )
                         {
