@@ -194,7 +194,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([libvlc_control],[-Wl,dynamic_lookup])
     VLC_ADD_LDFLAGS([avcodec avformat swscale imgresample postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
-    VLC_ADD_LDFLAGS([libvlc],[-Wl,-framework,Cocoa,-framework,CoreFoundation])
+    VLC_ADD_LDFLAGS([libvlc],[-Wl,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
         [  --enable-macosx-defaults Build the default configuration on Mac OS X (default enabled)])
