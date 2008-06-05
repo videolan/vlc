@@ -39,7 +39,7 @@
 
 /* #define ENABLE_PACKETIZER */
 /* #define ENABLE_FORMATTING */
-/* #define ENABLE_BITMAPS */
+#define ENABLE_BITMAPS
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -468,7 +468,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     p_spu->b_pausable = true;
 
 #ifdef ENABLE_BITMAPS
-    if (ev->bitmap && ev->palette) {
+    if (ev->bitmap && ev->bitmap->type==kate_bitmap_type_paletted && ev->palette) {
         /* create a separate region for the bitmap */
         memset( &fmt, 0, sizeof(video_format_t) );
         fmt.i_chroma = VLC_FOURCC('Y','U','V','P');

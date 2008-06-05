@@ -3752,7 +3752,7 @@ dnl
 AC_ARG_ENABLE(kate,
 [  --enable-kate           kate codec (default enabled)])
 AS_IF([test "${enable_kate}" != "no"], [
-  PKG_CHECK_MODULES(KATE,[kate >= 0.1.1], [
+  PKG_CHECK_MODULES(KATE,[kate >= 0.1.2], [
       VLC_ADD_PLUGIN([kate])
       VLC_ADD_CFLAGS([kate],[$KATE_CFLAGS])
       VLC_ADD_LIBS([kate],[$KATE_LIBS]) ],[
