@@ -5478,7 +5478,6 @@ then
   then
     dnl New firefox-1.5 SDK api
     PKG_CHECK_MODULES([FIREFOX], [firefox-plugin],
-    [],
       [
         PKG_CHECK_MODULES([FIREFOX_XPCOM], [firefox-xpcom],
           [],
