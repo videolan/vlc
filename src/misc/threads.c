@@ -48,6 +48,8 @@
 static volatile unsigned i_initializations = 0;
 
 #if defined( LIBVLC_USE_PTHREAD )
+# include <sched.h>
+
 static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -520,8 +522,10 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
             pthread_attr_setschedpolicy (&attr, SCHED_OTHER);
         else
         {
-            struct sched_param param = { .sched_priority = +i_priority, };
-            pthread_attr_setschedpolicy (&attr, SCHED_OTHER);
+            struct sched_param param = { .sched_priority = i_priority, };
+
+            param.sched_priority += sched_get_priority_min (SCHED_RR);
+            pthread_attr_setschedpolicy (&attr, SCHED_RR);
             pthread_attr_setschedparam (&attr, &param);
         }
     }
