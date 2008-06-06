@@ -490,8 +490,10 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     vlc_mutex_lock( &p_this->object_lock );
 
 #if defined( LIBVLC_USE_PTHREAD )
-    sigset_t set, oldset;
+    pthread_attr_t attr;
+    pthread_attr_init (&attr);
 
+    sigset_t set, oldset;
     /* We really don't want signals to (literaly) interrupt our blocking I/O
      * system calls. SIGPIPE is especially bad, as it can be caused by remote
      * peers through connected sockets. Generally, we cannot know which signals
@@ -507,42 +509,30 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     sigdelset (&set, SIGBUS);
     pthread_sigmask (SIG_BLOCK, &set, &oldset);
 
-    i_ret = pthread_create( &p_priv->thread_id, NULL, thread_entry, boot );
-    pthread_sigmask (SIG_SETMASK, &oldset, NULL);
-
 #ifndef __APPLE__
     if( config_GetInt( p_this, "rt-priority" ) > 0 )
 #endif
     {
-        int i_error, i_policy;
-        struct sched_param param;
-
-        memset( &param, 0, sizeof(struct sched_param) );
+        /* Hack to avoid error msg */
         if( config_GetType( p_this, "rt-offset" ) )
             i_priority += config_GetInt( p_this, "rt-offset" );
         if( i_priority <= 0 )
         {
-            param.sched_priority = (-1) * i_priority;
-            i_policy = SCHED_OTHER;
+            struct sched_param param = { .sched_priority = -i_priority, };
+            pthread_attr_setschedpolicy (&attr, SCHED_OTHER);
+            pthread_attr_setschedparam (&attr, &param);
         }
         else
         {
-            param.sched_priority = i_priority;
-            i_policy = SCHED_RR;
-        }
-        if( (i_error = pthread_setschedparam( p_priv->thread_id,
-                                               i_policy, &param )) )
-        {
-            errno = i_error;
-            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %m",
-                      psz_file, i_line );
-            i_priority = 0;
+            struct sched_param param = { .sched_priority = +i_priority, };
+            pthread_attr_setschedpolicy (&attr, SCHED_OTHER);
+            pthread_attr_setschedparam (&attr, &param);
         }
     }
-#ifndef __APPLE__
-    else
-        i_priority = 0;
-#endif
+
+    i_ret = pthread_create( &p_priv->thread_id, &attr, thread_entry, boot );
+    pthread_sigmask (SIG_SETMASK, &oldset, NULL);
+    pthread_attr_destroy (&attr);
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
     {
