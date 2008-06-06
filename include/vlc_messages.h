@@ -24,10 +24,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if !defined( __LIBVLC__ )
-  #error You are not libvlc or one of its plugins. You cannot include this file
-#endif
-
 #ifndef _VLC_MESSAGES_H_
 #define _VLC_MESSAGES_H_
 
