@@ -1524,15 +1524,20 @@ static int AStreamReadImmediate( stream_t *s, void *p_read, int i_read )
              p_read, i_read );
 #endif
 
-    if( p_read == NULL )
+    /* No buffer, do as if we were seeking. */
+    if( !p_read )
     {
         /* seek within this stream if possible, else use plain old read and discard */
-        stream_sys_t *p_sys = s->p_sys;
         access_t     *p_access = p_sys->p_access;
-        bool   b_aseek;
-        access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
-        if( b_aseek )
-            return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
+
+        /* seeking after EOF is not what we want */
+        if( !( p_access->info.b_eof ) )
+        {
+            bool   b_aseek;
+            access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+            if( b_aseek )
+                return AStreamSeekImmediate( s, p_sys->i_pos + i_read ) ? 0 : i_read;
+        }
     }
 
     /* First, check if we already have some data in the buffer,
@@ -1560,7 +1565,14 @@ static int AStreamReadImmediate( stream_t *s, void *p_read, int i_read )
     int i_to_read = i_read - i_copy;
     if( i_to_read )
     {
-        i_to_read = AReadStream( s, p_read, i_to_read );
+        if( p_read )
+            i_to_read = AReadStream( s, p_read, i_to_read );
+        else
+        {
+            void * dummy = malloc(i_to_read);
+            i_to_read = AReadStream( s, dummy, i_to_read );
+            free(dummy);
+        }
     }
 
     p_sys->i_pos += i_to_read;
