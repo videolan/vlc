@@ -85,6 +85,7 @@ Input/Demuxers:
    Authentication.
  * New options to reduce latency between arrival of raw data and display of
    frames. (--auto-adjust-pts-delay and --use-stream-immediate)
+ * RTMP input support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
@@ -158,6 +159,7 @@ Stream output:
  * UDP-Lite transport for RTP
  * DCCP transport for RTP
  * Lots of fixes for RTSP broadcasting
+ * RTMP output
 
 Interfaces:
  * Windows/Linux
