@@ -479,7 +479,7 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
     if( !p_he->i_header_extension_size ) return VLC_SUCCESS;
 
     /* Read the extension objects */
-    stream_Read( s, NULL, 46 );
+    stream_Seek( s, stream_Tell( s ) + 46 );
     for( ; ; )
     {
         asf_object_t *p_obj = malloc( sizeof( asf_object_t ) );
