@@ -427,10 +427,12 @@ misc/revision.c:
 # Building vlc
 ###############################################################################
 
+EXTRA_PROGRAMS = vlc
 if BUILD_VLC
 bin_PROGRAMS = vlc
 endif
 
+EXTRA_vlc_SOURCES = vlc.c winvlc.c
 if !HAVE_WIN32
 vlc_SOURCES = vlc.c
 else
