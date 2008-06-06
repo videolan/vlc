@@ -83,6 +83,8 @@ Input/Demuxers:
    (available as a separate download).
  * HTTP access now supports gzip compressed data and Digest Access
    Authentication.
+ * New options to reduce latency between arrival of raw data and display of
+   frames. (--auto-adjust-pts-delay and --use-stream-immediate)
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
