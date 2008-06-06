@@ -1,10 +1,7 @@
 /*****************************************************************************
  * rootwrap.c
  *****************************************************************************
- * Copyright © 2005 Rémi Denis-Courmont
- * $Id$
- *
- * Author: Rémi Denis-Courmont <rem # videolan.org>
+ * Copyright © 2005-2008 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +22,6 @@
 # include <config.h>
 #endif
 
-#if defined (HAVE_GETEUID) && !defined (SYS_BEOS)
-# define ENABLE_ROOTWRAP 1
-#endif
-
-#ifdef ENABLE_ROOTWRAP
-
 #include <stdlib.h> /* exit() */
 #include <stdio.h>
 #include <string.h>
@@ -38,19 +29,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
 #include <sys/uio.h>
 #include <sys/resource.h> /* getrlimit() */
-#include <sys/wait.h>
-#include <sys/un.h>
-#include <pwd.h> /* getpwnam(), getpwuid() */
-#include <grp.h> /* setgroups() */
+#include <sched.h>
 #include <errno.h>
 #include <netinet/in.h>
-#include <pthread.h>
 
 #if defined (AF_INET6) && !defined (IPV6_V6ONLY)
 # warning Uho, your IPv6 support is broken and has been disabled. Fix your C library.
@@ -61,66 +46,20 @@
 # define AF_LOCAL AF_UNIX
 #endif
 
-/*#ifndef HAVE_CLEARENV
-extern char **environ;
-
-static int clearenv (void)
-{
-    environ = NULL;
-    return 0;
-}
-#endif*/
-
-/**
- * Tries to find a real non-root user to use
- */
-static struct passwd *guess_user (void)
-{
-    const char *name;
-    struct passwd *pw;
-    uid_t uid;
-
-    /* Try real UID */
-    uid = getuid ();
-    if (uid)
-        if ((pw = getpwuid (uid)) != NULL)
-            return pw;
-
-    /* Try sudo */
-    name = getenv ("SUDO_USER");
-    if (name != NULL)
-        if ((pw = getpwnam (name)) != NULL)
-            return pw;
-
-    /* Try VLC_USER */
-    name = getenv ("VLC_USER");
-    if (name != NULL)
-        if ((pw = getpwnam (name)) != NULL)
-            return pw;
-
-    /* Try vlc */
-    if ((pw = getpwnam ("vlc")) != NULL)
-        return pw;
-
-    return getpwuid (0);
-}
-
-
-static int is_allowed_port (uint16_t port)
+static inline int is_allowed_port (uint16_t port)
 {
     port = ntohs (port);
-
     return (port == 80) || (port == 443) || (port == 554);
 }
 
 
-static int send_err (int fd, int err)
+static inline int send_err (int fd, int err)
 {
     return send (fd, &err, sizeof (err), 0) == sizeof (err) ? 0 : -1;
 }
 
 /**
- * Ugly POSIX(?) code to pass a file descriptor to another process
+ * Send a file descriptor to another process
  */
 static int send_fd (int p, int fd)
 {
@@ -158,10 +97,6 @@ static void rootprocess (int fd)
 {
     struct sockaddr_storage ss;
 
-    /* TODO:
-     *  - use libcap if available,
-     *  - call chroot
-     */
     while (recv (fd, &ss, sizeof (ss), 0) == sizeof (ss))
     {
         unsigned len;
@@ -218,236 +153,76 @@ static void rootprocess (int fd)
     }
 }
 
-static int rootwrap_sock = -1;
-static pid_t rootwrap_pid = -1;
+/* TODO?
+ *  - use libcap if available,
+ *  - call chroot
+ */
 
-static void close_rootwrap (void)
+int main (int argc, char *argv[])
 {
-    close (rootwrap_sock);
-    waitpid (rootwrap_pid, NULL, 0);
-}
-
-void rootwrap (void)
-{
-    struct rlimit lim;
-    int fd, pair[2];
-    struct passwd *pw;
-    uid_t u;
-
-    u = geteuid ();
-    /* Are we running with root privileges? */
-    if (u != 0)
-    {
-        setuid (u);
-        return;
-    }
-
-    /* Make sure 0, 1 and 2 are opened, and only these. */
-    if (getrlimit (RLIMIT_NOFILE, &lim))
-        exit (1);
-
-    for (fd = 3; ((unsigned)fd) < lim.rlim_cur; fd++)
-        close (fd);
-
-    fd = dup (2);
-    if (fd <= 2)
-        exit (1);
-    close (fd);
-
-    fputs ("starting VLC root wrapper...", stderr);
-
-    pw = guess_user ();
-    if (pw == NULL)
-        return; /* Should we rather print an error and exit ? */
-
-    u = pw->pw_uid,
-    fprintf (stderr, " using UID %u (%s)\n", (unsigned)u, pw->pw_name);
-    if (u == 0)
-    {
-        fputs ("***************************************\n"
-               "* Running VLC as root is discouraged. *\n"
-               "***************************************\n"
-               "\n"
-               " It is potentially dangerous, "
-                "and might not even work properly.\n", stderr);
-        return;
-    }
-
-    /* GID */
-    initgroups (pw->pw_name, pw->pw_gid);
-    setgid (pw->pw_gid);
+    /* Support for dynamically opening RTSP, HTTP and HTTP/SSL ports */
+    int pair[2];
 
     if (socketpair (AF_LOCAL, SOCK_STREAM, 0, pair))
-    {
-        perror ("socketpair");
-        goto nofork;
-    }
+        return 1;
+    if (pair[0] < 3)
+        goto error; /* we want 0, 1 and 2 open */
 
-    switch (rootwrap_pid = fork ())
+    pid_t pid = fork ();
+    switch (pid)
     {
         case -1:
-            perror ("fork");
-            close (pair[0]);
-            close (pair[1]);
-            break;
+            goto error;
 
         case 0:
-            close (0);
-            close (1);
-            close (2);
+        {
+            int null = open ("/dev/null", O_RDWR);
+            if (null != -1)
+            {
+                dup2 (null, 0);
+                dup2 (null, 1);
+                dup2 (null, 2);
+                close (null);
+            }
             close (pair[0]);
+            setsid ();
             rootprocess (pair[1]);
             exit (0);
-
-        default:
-            close (pair[1]);
-            rootwrap_sock = pair[0];
-            break;
-    }
-
-nofork:
-    /* UID */
-    setuid (u);
-
-    atexit (close_rootwrap);
-}
-
-
-/**
- * Ugly POSIX(?) code to receive a file descriptor from another process
- */
-static int recv_fd (int p)
-{
-    struct msghdr hdr;
-    struct iovec iov;
-    struct cmsghdr *cmsg;
-    int val, fd;
-    char buf[CMSG_SPACE (sizeof (fd))];
-
-    hdr.msg_name = NULL;
-    hdr.msg_namelen = 0;
-    hdr.msg_iov = &iov;
-    hdr.msg_iovlen = 1;
-    hdr.msg_control = buf;
-    hdr.msg_controllen = sizeof (buf);
-
-    iov.iov_base = &val;
-    iov.iov_len = sizeof (val);
-
-    if (recvmsg (p, &hdr, 0) != sizeof (val))
-        return -1;
-
-    for (cmsg = CMSG_FIRSTHDR (&hdr); cmsg != NULL;
-         cmsg = CMSG_NXTHDR (&hdr, cmsg))
-    {
-        if ((cmsg->cmsg_level == SOL_SOCKET)
-         && (cmsg->cmsg_type = SCM_RIGHTS)
-         && (cmsg->cmsg_len >= CMSG_LEN (sizeof (fd))))
-        {
-            memcpy (&fd, CMSG_DATA (cmsg), sizeof (fd));
-            return fd;
         }
     }
 
-    return -1;
-}
+    close (pair[1]);
+    pair[1] = -1;
 
-/**
- * Tries to obtain a bound TCP socket from the root process
- */
-int rootwrap_bind (int family, int socktype, int protocol,
-                   const struct sockaddr *addr, size_t alen)
-{
-    /* can't use libvlc */
-    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    char buf[21];
+    snprintf (buf, sizeof (buf), "%d", pair[0]);
+    setenv ("VLC_ROOTWRAP_SOCK", buf, 1);
 
-    struct sockaddr_storage ss;
-    int fd;
-
-    if (rootwrap_sock == -1)
-    {
-        errno = EACCES;
-        return -1;
-    }
-
-    switch (family)
-    {
-        case AF_INET:
-            if (alen < sizeof (struct sockaddr_in))
-            {
-                errno = EINVAL;
-                return -1;
-            }
-            break;
-
-#ifdef AF_INET6
-        case AF_INET6:
-            if (alen < sizeof (struct sockaddr_in6))
-            {
-                errno = EINVAL;
-                return -1;
-            }
-            break;
+    /* Support for real-time priorities */
+#ifdef RLIMIT_RTPRIO
+    struct rlimit rlim;
+    rlim.rlim_max = rlim.rlim_cur = sched_get_priority_min (SCHED_RR) + 24;
+    setrlimit (RLIMIT_RTPRIO, &rlim);
 #endif
 
-        default:
-            errno = EAFNOSUPPORT;
-            return -1;
-    }
+    setuid (getuid ());
 
-    if (family != addr->sa_family)
-    {
-        errno = EAFNOSUPPORT;
-        return -1;
-    }
+    if (!setuid (0)) /* sanity check: we cannot get root back */
+        exit (1);
 
-    /* Only TCP is implemented at the moment */
-    if ((socktype != SOCK_STREAM)
-     || (protocol && (protocol != IPPROTO_TCP)))
-    {
-        errno = EACCES;
-        return -1;
-    }
+    /* Yeah, the user can force to execute just about anything from here.
+     * But we've dropped privileges, so it does not matter. */
+    if (strlen (argv[0]) < sizeof ("-wrapper"))
+        goto error;
+    argv[0][strlen (argv[0]) - strlen ("-wrapper")] = '\0';
 
-    memset (&ss, 0, sizeof (ss));
-    memcpy (&ss, addr, alen > sizeof (ss) ? sizeof (ss) : alen);
+    (void)argc;
+    if (execvp (argv[0], argv))
+        perror (argv[0]);
 
-    pthread_mutex_lock (&mutex);
-    if (send (rootwrap_sock, &ss, sizeof (ss), 0) != sizeof (ss))
-        return -1;
-
-    fd = recv_fd (rootwrap_sock);
-    pthread_mutex_unlock (&mutex);
-
-    if (fd != -1)
-    {
-        int val;
-
-        val = fcntl (fd, F_GETFL, 0);
-        fcntl (fd, F_SETFL, ((val != -1) ? val : 0) | O_NONBLOCK);
-    }
-
-    return fd;
+error:
+    close (pair[0]);
+    if (pair[1] != -1)
+        close (pair[1]);
+    return 1;
 }
-
-#else
-# include <stddef.h>
-
-struct sockaddr;
-
-void rootwrap (void)
-{
-}
-
-int rootwrap_bind (int family, int socktype, int protocol,
-                   const struct sockaddr *addr, size_t alen)
-{
-    (void)family;
-    (void)socktype;
-    (void)protocol;
-    (void)addr;
-    (void)alen;
-    return -1;
-}
-
-#endif /* ENABLE_ROOTWRAP */

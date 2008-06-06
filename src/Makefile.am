@@ -427,9 +427,12 @@ misc/revision.c:
 # Building vlc
 ###############################################################################
 
-EXTRA_PROGRAMS = vlc
+EXTRA_PROGRAMS = vlc vlc-wrapper
 if BUILD_VLC
 bin_PROGRAMS = vlc
+if !HAVE_WIN32
+bin_PROGRAMS += vlc-wrapper
+endif
 endif
 
 EXTRA_vlc_SOURCES = vlc.c winvlc.c
@@ -438,6 +441,7 @@ vlc_SOURCES = vlc.c
 else
 vlc_SOURCES = winvlc.c
 endif
+vlc_wrapper_SOURCES = network/rootwrap.c
 
 vlc_DEPENDENCIES = $(DATA_win32_rc) libvlc.la
 
