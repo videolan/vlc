@@ -165,7 +165,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
 #endif
 
     /* Cannot fail as peek succeed */
-    stream_Seek( s, stream_Tell( s ) + 30 );
+    stream_Read( s, NULL, 30 );
 
     /* Now load sub object */
     for( ; ; )
