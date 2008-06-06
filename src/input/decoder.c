@@ -738,6 +738,7 @@ static void optimize_video_pts( decoder_t *p_dec )
     vout_thread_t * p_vout = p_dec->p_owner->p_vout;
     input_thread_private_t * p_priv = p_input->p;
 
+    /* Enable with --auto-adjust-pts-delay */
     if( !p_priv->pts_adjust.auto_adjust ) return;
 
     for( i = 0; i < I_RENDERPICTURES; i++ )
