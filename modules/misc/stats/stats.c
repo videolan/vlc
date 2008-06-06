@@ -1,10 +1,10 @@
 /*****************************************************************************
  * stats.c : stats plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 the VideoLAN team
- * $Id$
+ * Copyright (C) 2000-2008 the VideoLAN team
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Pierre d'Herbemont <pdherbemont@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
