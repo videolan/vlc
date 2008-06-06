@@ -804,10 +804,13 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
         int i_copy = __MIN( i_current, i_read - i_data);
 
         /* Copy data */
-        memcpy( p_data,
+        if( p_data )
+        {
+            memcpy( p_data,
                     &p_sys->block.p_current->p_buffer[p_sys->block.i_offset],
                     i_copy );
-        p_data += i_copy;
+            p_data += i_copy;
+        }
         i_data += i_copy;
 
         p_sys->block.i_offset += i_copy;
@@ -1145,8 +1148,11 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
 
         /* Copy data */
         /* msg_Dbg( s, "AStreamReadStream: copy %d", i_copy ); */
-        memcpy( p_data, &tk->p_buffer[i_off], i_copy );
-        p_data += i_copy;
+        if( p_data )
+        {
+            memcpy( p_data, &tk->p_buffer[i_off], i_copy );
+            p_data += i_copy;
+        }
         i_data += i_copy;
         p_sys->stream.i_offset += i_copy;
 
@@ -2068,8 +2074,6 @@ static int ASeek( stream_t *s, int64_t i_pos )
  */
 int stream_Read( stream_t *s, void *p_read, int i_read )
 {
-    assert( s );
-    assert( p_read );
     return s->pf_read( s, p_read, i_read );
 }
 
