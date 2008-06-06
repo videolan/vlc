@@ -51,6 +51,15 @@ int main( int i_argc, const char *ppsz_argv[] )
 {
     int i_ret;
 
+    if (geteuid () == 0)
+    {
+        fprintf (stderr, "VLC is not supposed to be run as root. Sorry.\n"
+        "If you need to use real-time priorities and/or privileged TCP ports\n"
+        "you can use %s-wrapper (make sure it is Set-UID root first and\n"
+        "cannot be run by non-trusted users first).\n", ppsz_argv[0]);
+        return 1;
+    }
+
     setlocale (LC_ALL, "");
 
 #ifndef __APPLE__
