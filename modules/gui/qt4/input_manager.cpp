@@ -383,7 +383,10 @@ void InputManager::sectionNext()
 void InputManager::sectionMenu()
 {
     if( hasInput() )
-        var_SetInteger( p_input, "title 0", 2 );
+    {
+        vlc_value_t val; val.i_int = 2;
+        var_Set( p_input, "title  0", val );
+    }
 }
 
 #ifdef ZVBI_COMPILED
