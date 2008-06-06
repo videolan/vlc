@@ -637,9 +637,8 @@ static int DemuxPacket( demux_t *p_demux )
             msg_Warn( p_demux, "Read %d too much bytes in the packet",
                             i_packet_padding_length - i_packet_size_left );
 #endif
-        if( stream_Seek( p_demux->s,
-                stream_Tell( p_demux->s ) + i_packet_size_left )
-            != VLC_SUCCESS)
+        if( stream_Read( p_demux->s, NULL, i_packet_size_left )
+                                                         < i_packet_size_left )
         {
             msg_Err( p_demux, "cannot skip data, EOF ?" );
             return 0;
