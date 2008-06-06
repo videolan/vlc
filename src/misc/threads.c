@@ -517,11 +517,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         if( config_GetType( p_this, "rt-offset" ) )
             i_priority += config_GetInt( p_this, "rt-offset" );
         if( i_priority <= 0 )
-        {
-            struct sched_param param = { .sched_priority = -i_priority, };
             pthread_attr_setschedpolicy (&attr, SCHED_OTHER);
-            pthread_attr_setschedparam (&attr, &param);
-        }
         else
         {
             struct sched_param param = { .sched_priority = +i_priority, };
