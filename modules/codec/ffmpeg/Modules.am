@@ -17,18 +17,11 @@ EXTRA_libavcodec_plugin_la_SOURCES = \
 	encoder.c \
 	$(NULL)
 
-SOURCES_imgresample = \
-	imgresample.c \
-	chroma.h \
-	$(NULL)
-
 libvlc_LTLIBRARIES += \
-	$(LTLIBavcodec) \
-	$(LTLIBimgresample)
+	$(LTLIBavcodec)
 
 EXTRA_LTLIBRARIES += \
-	libavcodec_plugin.la \
-	libimgresample_plugin.la
+	libavcodec_plugin.la
 
 # FIXME SOURCES_ffmpegaltivec = \
 # FIXME 	ffmpeg.c \

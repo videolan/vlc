@@ -42,4 +42,5 @@ SOURCES_blendbench = blendbench.c
 SOURCES_chain = chain.c
 SOURCES_postproc = postproc.c
 SOURCES_swscale = swscale.c ../codec/ffmpeg/chroma.h
+SOURCES_imgresample = imgresample.c ../codec/ffmpeg/chroma.h
 noinst_HEADERS = filter_common.h filter_picture.h
