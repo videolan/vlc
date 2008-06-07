@@ -568,8 +568,8 @@ static int Demux (demux_t *demux)
     block_t     *block;
 
     block = p_sys->framed_rtp
-        ? rtp_dgram_recv (demux, p_sys->fd)
-        : rtp_stream_recv (demux, p_sys->fd);
+        ? rtp_stream_recv (demux, p_sys->fd)
+        : rtp_dgram_recv (demux, p_sys->fd);
     if (!block)
         return 0;
 
