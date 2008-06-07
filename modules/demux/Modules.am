@@ -1,4 +1,4 @@
-SUBDIRS = asf avi mp4 mpeg playlist
+SUBDIRS = asf avformat avi mp4 mpeg playlist
 SOURCES_a52sys = a52.c
 SOURCES_dtssys = dts.c
 SOURCES_flacsys = flac.c

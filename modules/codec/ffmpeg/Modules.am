@@ -17,23 +17,6 @@ EXTRA_libavcodec_plugin_la_SOURCES = \
 	encoder.c \
 	$(NULL)
 
-SOURCES_avformat = \
-	avformat.c \
-	avformat.h \
-	demux.c \
-	avutil.h \
-	fourcc.h \
-	chroma.h \
-	$(NULL)
-
-if ENABLE_SOUT
-SOURCES_avformat += mux.c
-endif
-
-EXTRA_libavformat_plugin_la_SOURCES = \
-	mux.c \
-	$(NULL)
-
 SOURCES_imgresample = \
 	imgresample.c \
 	imgresample.h \
@@ -44,12 +27,10 @@ SOURCES_imgresample = \
 
 libvlc_LTLIBRARIES += \
 	$(LTLIBavcodec) \
-	$(LTLIBavformat) \
 	$(LTLIBimgresample)
 
 EXTRA_LTLIBRARIES += \
 	libavcodec_plugin.la \
-	libavformat_plugin.la \
 	libimgresample_plugin.la
 
 # FIXME SOURCES_ffmpegaltivec = \

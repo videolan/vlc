@@ -5879,6 +5879,7 @@ AC_CONFIG_FILES([
   modules/control/http/Makefile
   modules/demux/Makefile
   modules/demux/asf/Makefile
+  modules/demux/avformat/Makefile
   modules/demux/avi/Makefile
   modules/demux/mp4/Makefile
   modules/demux/mpeg/Makefile
