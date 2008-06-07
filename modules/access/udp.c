@@ -88,7 +88,6 @@ vlc_module_end();
 static block_t *BlockUDP( access_t * );
 static block_t *BlockStartRTP( access_t * );
 static block_t *BlockRTP( access_t * );
-static block_t *BlockChoose( access_t * );
 static int Control( access_t *, int, va_list );
 
 struct access_sys_t
@@ -140,7 +139,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         if (strncmp (p_access->psz_access, "udp", 3 ) == 0 )
-            p_access->pf_block = BlockChoose;
+            p_access->pf_block = BlockUDP;
         else
         if (strcmp (p_access->psz_access, "rtptcp") == 0)
             proto = IPPROTO_TCP;
@@ -660,73 +659,4 @@ static block_t *BlockStartRTP( access_t *p_access )
 {
     p_access->pf_block = BlockRTP;
     return BlockPrebufferRTP( p_access, BlockUDP( p_access ) );
-}
-
-
-/*****************************************************************************
- * BlockChoose: decide between RTP and UDP
- *****************************************************************************/
-static block_t *BlockChoose( access_t *p_access )
-{
-    block_t *p_block;
-    int     i_rtp_version;
-    int     i_payload_type;
-
-    if( ( p_block = BlockUDP( p_access ) ) == NULL )
-        return NULL;
-
-    if( p_block->p_buffer[0] == 0x47 )
-    {
-        msg_Dbg( p_access, "detected TS over raw UDP" );
-        p_access->pf_block = BlockUDP;
-        p_access->info.b_prebuffered = true;
-        return p_block;
-    }
-
-    if( p_block->i_buffer < RTP_HEADER_LEN )
-        return p_block;
-
-    /* Parse the header and make some verifications.
-     * See RFC 3550. */
-
-    i_rtp_version  = p_block->p_buffer[0] >> 6;
-    i_payload_type = ( p_block->p_buffer[1] & 0x7F );
-
-    if( i_rtp_version != 2 )
-    {
-        msg_Dbg( p_access, "no supported RTP header detected" );
-        p_access->pf_block = BlockUDP;
-        p_access->info.b_prebuffered = true;
-        return p_block;
-    }
-
-    switch( i_payload_type )
-    {
-        case 33:
-            msg_Dbg( p_access, "detected MPEG2 TS over RTP" );
-            free( p_access->psz_demux );
-            p_access->psz_demux = strdup( "ts" );
-            break;
-
-        case 14:
-            msg_Dbg( p_access, "detected MPEG Audio over RTP" );
-            free( p_access->psz_demux );
-            p_access->psz_demux = strdup( "mpga" );
-            break;
-
-        case 32:
-            msg_Dbg( p_access, "detected MPEG Video over RTP" );
-            free( p_access->psz_demux );
-            p_access->psz_demux = strdup( "mpgv" );
-            break;
-
-        default:
-            msg_Dbg( p_access, "no RTP header detected" );
-            p_access->pf_block = BlockUDP;
-            p_access->info.b_prebuffered = true;
-            return p_block;
-    }
-
-    p_access->pf_block = BlockRTP;
-    return BlockPrebufferRTP( p_access, p_block );
 }
