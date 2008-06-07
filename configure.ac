@@ -5300,33 +5300,10 @@ dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
   [  --enable-libgcrypt      libgcrypts support (default enabled)])
-
-GCRYPT_PATH="${PATH}"
-AC_ARG_WITH(libgcrypt-config-path,
-[    --with-libgcrypt-config-path=PATH libgcrypt-config path (default search in \$PATH)],
-   [ if test "${with_libgcrypt_config_path}" != "no"
-     then
-       GCRYPT_PATH="${with_libgcrypt_config_path}:${PATH}"
-     fi ])
-
-if test "${enable_libgcrypt}" != "no"
-then
-  dnl Workaround for cross-compiling since AM_PATH_LIBGRYPT doesn't dectect
-  dnl it and looks for libgcrypt headers in the wrong place.
-  if test "${host_cpu}" = "${build_cpu}"
-  then
-    AM_PATH_LIBGCRYPT([1:1.1.94], [have_libgcrypt="yes"], [have_libgcrypt="no"])
-  else
-    AC_CHECK_HEADERS(gcrypt.h,have_libgcrypt="yes",have_libgcrypt="no")
-  fi
-fi
-AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
-AS_IF([test "${have_libgcrypt}" = "yes"],[
-	# look for libgcrypt-config
-	AC_PATH_PROG(GCRYPT_CONFIG, "libgcrypt-config", no, ${GCRYPT_PATH})
-	GCRYPT_CFLAGS=`${GCRYPT_CONFIG} --cflags`
-	GCRYPT_LIBS=`${GCRYPT_CONFIG} --libs`
+AS_IF([test "${enable_libgcrypt}" != "no"], [
+  AM_PATH_LIBGCRYPT([1:1.1.94], [have_libgcrypt="yes"], [have_libgcrypt="no"])
 ])
+AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
 
 dnl
 dnl TLS/SSL
@@ -5343,9 +5320,10 @@ AS_IF([test "${enable_gnutls}" != "no"], [
       VLC_ADD_LIBS([gnutls], [-lz])
       VLC_ADD_LIBS([gnutls], [${LTLIBINTL}])
     ])
+    dnl The GnuTLS plugin invokes gcry_control directly.
     AS_IF([test "${have_libgcrypt}" = "yes"],[
-      VLC_ADD_LIBS([gnutls], ${GCRYPT_LIBS})
-      VLC_ADD_CFLAGS([gnutls], ${GCRYPT_CFLAGS})
+      VLC_ADD_LIBS([gnutls], [${LIBGCRYPT_LIBS}])
+      VLC_ADD_CFLAGS([gnutls], [${LIBGCRYPT_CFLAGS}])
     ])
     VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
   ], [
@@ -5366,8 +5344,8 @@ then
   then
     AC_MSG_ERROR([libgcrypt is required for update checking system])
   fi
-  VLC_ADD_LIBS([libvlc], ${GCRYPT_LIBS})
-  VLC_ADD_CFLAGS([libvlc], ${GCRYPT_CFLAGS})
+  VLC_ADD_LIBS([libvlc], [${LIBGCRYPT_LIBS}])
+  VLC_ADD_CFLAGS([libvlc], [${LIBGCRYPT_CFLAGS}])
   AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
 fi
 
