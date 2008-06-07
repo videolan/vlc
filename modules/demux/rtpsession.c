@@ -288,6 +288,9 @@ rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
             goto drop;
         }
     }
+    else
+    if (delta_seq < 0x8000)
+        src->max_seq = seq;
 
     /* Queues the block in sequence order,
      * hence there is a single queue for all payload types. */
