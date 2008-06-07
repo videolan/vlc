@@ -41,16 +41,6 @@
 #include <vlc_access.h>
 #include <vlc_network.h>
 
-#ifndef SOCK_DCCP /* provisional API */
-# ifdef __linux__
-#  define SOCK_DCCP 6
-# endif
-#endif
-
-#ifndef IPPROTO_DCCP
-# define IPPROTO_DCCP 33 /* IANA */
-#endif
-
 #define MTU 65535
 
 /*****************************************************************************
@@ -86,7 +76,6 @@ vlc_module_begin();
     add_shortcut( "udp4" );
     add_shortcut( "udp6" );
     add_shortcut( "rtptcp" ); /* tcp name is already taken */
-    add_shortcut( "dccp" );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -155,9 +144,6 @@ static int Open( vlc_object_t *p_this )
         else
         if (strcmp (p_access->psz_access, "rtptcp") == 0)
             proto = IPPROTO_TCP;
-        else
-        if (strcmp (p_access->psz_access, "dccp") == 0)
-            proto = IPPROTO_DCCP;
     }
 
     i_bind_port = var_CreateGetInteger( p_access, "server-port" );
@@ -217,19 +203,6 @@ static int Open( vlc_object_t *p_this )
             p_sys->fd = net_ConnectTCP( p_access, psz_server_addr, i_server_port );
             p_access->pf_block = BlockRTP;
             p_sys->b_comedia = p_sys->b_framed_rtp = true;
-            break;
-
-        case IPPROTO_DCCP:
-#ifdef SOCK_DCCP
-            var_Create( p_access, "dccp-service", VLC_VAR_STRING );
-            var_SetString( p_access, "dccp-service", "RTPV" );
-            p_sys->fd = net_Connect( p_access, psz_server_addr, i_server_port,
-                                     SOCK_DCCP, IPPROTO_DCCP );
-#else
-            p_sys->fd = -1;
-            msg_Err( p_access, "DCCP support not compiled-in!" );
-#endif
-            p_sys->b_comedia = true;
             break;
     }
     free (psz_name);
