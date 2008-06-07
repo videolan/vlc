@@ -710,6 +710,10 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             }
             break;
 
+        case VLC_VAR_SETISCOMMAND:
+            p_var->i_type |= VLC_VAR_ISCOMMAND;
+            break;
+
         default:
             break;
     }
