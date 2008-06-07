@@ -415,7 +415,6 @@ modules/codec/ffmpeg/fourcc.h
 modules/codec/ffmpeg/imgresample.c
 modules/codec/ffmpeg/imgresample.h
 modules/codec/ffmpeg/mux.c
-modules/codec/ffmpeg/postprocess.c
 modules/codec/ffmpeg/scale.c
 modules/codec/ffmpeg/swscale.c
 modules/codec/ffmpeg/swscale.h
