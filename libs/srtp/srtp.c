@@ -372,6 +372,53 @@ srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
     return srtp_derive (s, key, keylen, salt, saltlen) ? EINVAL : 0;
 }
 
+static int hexdigit (char c)
+{
+    if ((c >= '0') && (c <= '9'))
+        return c - '0';
+    if ((c >= 'A') && (c <= 'F'))
+        return c - 'A' + 0xA;
+    if ((c >= 'a') && (c <= 'f'))
+        return c - 'a' + 0xa;
+    return -1;
+}
+
+static ssize_t hexstring (const char *in, uint8_t *out, size_t outlen)
+{
+    size_t inlen = strlen (in);
+
+    if ((inlen > (2 * outlen)) || (inlen & 1))
+        return -1;
+
+    for (size_t i = 0; i < inlen; i += 2)
+    {
+        int a = hexdigit (in[2 * i]), b = hexdigit (in[2 * i + 1]);
+        if ((a == -1) || (b == -1))
+            return EINVAL;
+        out[i] = (a << 4) | b;
+    }
+    return inlen / 2;
+}
+
+/**
+ * Sets (or resets) the master key and master salt for a SRTP session
+ * from hexadecimal strings. See also srtp_setkey().
+ *
+ * @return 0 on success, in case of error:
+ *  EINVAL  invalid or unsupported key/salt sizes combination
+ */
+int
+srtp_setkeystring (srtp_session_t *s, const char *key, const char *salt)
+{
+    uint8_t bkey[32]; /* TODO/NOTE: hard-coded for AES */
+    uint8_t bsalt[14]; /* TODO/NOTE: hard-coded for the PRF-AES-CM */
+    ssize_t bkeylen = hexstring (key, bkey, sizeof (bkey));
+    ssize_t bsaltlen = hexstring (salt, bsalt, sizeof (bsalt));
+
+    if ((bkeylen == -1) || (bsaltlen == -1))
+        return EINVAL;
+    return srtp_derive (s, bkey, bkeylen, bsalt, bsaltlen) ? EINVAL : 0;
+}
 
 /**
  * Sets Roll-over-Counter Carry (RCC) rate for the SRTP session. If not

@@ -66,6 +66,8 @@ void srtp_destroy (srtp_session_t *s);
 
 int srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
                  const void *salt, size_t saltlen);
+int srtp_setkeystring (srtp_session_t *s, const char *key, const char *salt);
+
 void srtp_setrcc_rate (srtp_session_t *s, uint16_t rate);
 
 int srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t maxsize);
