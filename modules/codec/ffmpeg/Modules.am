@@ -19,9 +19,6 @@ EXTRA_libavcodec_plugin_la_SOURCES = \
 
 SOURCES_imgresample = \
 	imgresample.c \
-	imgresample.h \
-	chroma.c \
-	video_filter.c \
 	chroma.h \
 	$(NULL)
 
