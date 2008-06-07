@@ -43,6 +43,7 @@ int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt);
 struct demux_sys_t
 {
     rtp_session_t *session;
+    struct srtp_session_t *srtp;
     int           fd;
 
     unsigned      caching;

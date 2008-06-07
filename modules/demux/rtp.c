@@ -39,10 +39,20 @@
 #include <vlc_codecs.h>
 
 #include "rtp.h"
+#include <srtp.h>
 
 #define RTP_CACHING_TEXT N_("RTP de-jitter buffer length (msec)")
 #define RTP_CACHING_LONGTEXT N_( \
     "How long to wait for late RTP packets (and delay the performance)." )
+
+#define SRTP_KEY_TEXT N_("SRTP key (hexadecimal)")
+#define SRTP_KEY_LONGTEXT N_( \
+    "RTP packets will be authenticated and deciphered "\
+    "with this Secure RTP master shared secret key.")
+
+#define SRTP_SALT_TEXT N_("SRTP salt (hexadecimal)")
+#define SRTP_SALT_LONGTEXT N_( \
+    "Secure RTP requires a (non-secret) master salt value.")
 
 #define RTP_MAX_SRC_TEXT N_("Maximum RTP sources")
 #define RTP_MAX_SRC_LONGTEXT N_( \
@@ -79,6 +89,10 @@ vlc_module_begin ();
     add_integer ("rtp-caching", 1000, NULL, RTP_CACHING_TEXT,
                  RTP_CACHING_LONGTEXT, true);
         change_integer_range (0, 65535);
+    add_string ("srtp-key", "", NULL,
+                SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false);
+    add_string ("srtp-salt", "", NULL,
+                SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false);
     add_integer ("rtp-max-src", 1, NULL, RTP_MAX_SRC_TEXT,
                  RTP_MAX_SRC_LONGTEXT, true);
         change_integer_range (1, 255);
@@ -200,8 +214,13 @@ static int Open (vlc_object_t *obj)
     /* Initializes demux */
     demux_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
-        goto error;
+    {
+        net_Close (fd);
+        return VLC_EGENERIC;
+    }
 
+    p_sys->srtp         = NULL;
+    p_sys->fd           = fd;
     p_sys->caching      = var_CreateGetInteger (obj, "rtp-caching");
     p_sys->max_src      = var_CreateGetInteger (obj, "rtp-max-src");
     p_sys->timeout      = var_CreateGetInteger (obj, "rtp-timeout");
@@ -218,12 +237,32 @@ static int Open (vlc_object_t *obj)
     if (p_sys->session == NULL)
         goto error;
 
-    p_sys->fd = fd;
+    char *key = var_GetNonEmptyString (demux, "srtp-key");
+    if (key)
+    {
+        p_sys->srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
+                                   SRTP_PRF_AES_CM, 0);
+        if (p_sys->srtp == NULL)
+        {
+            free (key);
+            goto error;
+        }
+
+        char *salt = var_GetNonEmptyString (demux, "srtp-salt");
+        errno = srtp_setkeystring (p_sys->srtp, key, salt ? salt : "");
+        free (salt);
+        free (key);
+        if (errno)
+        {
+            msg_Err (obj, "bad SRTP key/salt combination (%m)");
+            goto error;
+        }
+    }
+
     return VLC_SUCCESS;
 
 error:
-    net_Close (fd);
-    free (p_sys);
+    Close (obj);
     return VLC_EGENERIC;
 }
 
@@ -236,7 +275,10 @@ static void Close (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *p_sys = demux->p_sys;
 
-    rtp_session_destroy (demux, p_sys->session);
+    if (p_sys->srtp)
+        srtp_destroy (p_sys->srtp);
+    if (p_sys->session)
+        rtp_session_destroy (demux, p_sys->session);
     net_Close (p_sys->fd);
     free (p_sys);
 }
@@ -579,6 +621,17 @@ static int Demux (demux_t *demux)
     const uint8_t ptype = block->p_buffer[1] & 0x7F;
     if (ptype >= 72 && ptype <= 76)
         goto drop; /* Muxed RTCP, ignore for now */
+
+    if (p_sys->srtp)
+    {
+        size_t len = block->i_buffer;
+        if (srtp_recv (p_sys->srtp, block->p_buffer, &len))
+        {
+            msg_Dbg (demux, "SRTP authentication/decryption failed");
+            goto drop;
+        }
+        block->i_buffer = len;
+    }
 
     /* Not using SDP, we need to guess the payload format used */
     /* see http://www.iana.org/assignments/rtp-parameters */
