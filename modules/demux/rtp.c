@@ -469,83 +469,85 @@ static int Demux (demux_t *demux)
     block_t     *block;
 
     block = rtp_dgram_recv (demux, p_sys->fd);
-    if (block)
+    if (!block)
+        return 1;
+
+    if (block->i_buffer < 2)
+        goto drop;
+
+    const uint8_t ptype = block->p_buffer[1] & 0x7F;
+    if (ptype >= 72 && ptype <= 76)
+        goto drop; /* Muxed RTCP, ignore for now */
+
+    /* Not using SDP, we need to guess the payload format used */
+    /* see http://www.iana.org/assignments/rtp-parameters */
+    if (p_sys->autodetect)
     {
-        /* Not using SDP, we need to guess the payload format used */
-        /* see http://www.iana.org/assignments/rtp-parameters */
-        if (p_sys->autodetect && block->i_buffer >= 2)
+        rtp_pt_t pt = {
+            .init = NULL,
+            .destroy = codec_destroy,
+            .decode = codec_decode,
+            .frequency = 0,
+            .number = ptype,
+        };
+        switch (ptype)
         {
-            rtp_pt_t pt = {
-                .init = NULL,
-                .destroy = codec_destroy,
-                .decode = codec_decode,
-                .frequency = 0,
-                .number = block->p_buffer[1] & 0x7f,
-            };
+          case 0:
+            msg_Dbg (demux, "detected G.711 mu-law");
+            pt.init = pcmu_init;
+            pt.frequency = 8000;
+            break;
 
-            switch (pt.number)
-            {
-              case 0:
-                msg_Dbg (demux, "detected G.711 mu-law");
-                pt.init = pcmu_init;
-                pt.frequency = 8000;
-                break;
+          case 8:
+            msg_Dbg (demux, "detected G.711 A-law");
+            pt.init = pcma_init;
+            pt.frequency = 8000;
+            break;
 
-              case 8:
-                msg_Dbg (demux, "detected G.711 A-law");
-                pt.init = pcma_init;
-                pt.frequency = 8000;
-                break;
+          case 10:
+            msg_Dbg (demux, "detected stereo PCM");
+            pt.init = l16s_init;
+            pt.frequency = 44100;
+            break;
 
-              case 10:
-                msg_Dbg (demux, "detected stereo PCM");
-                pt.init = l16s_init;
-                pt.frequency = 44100;
-                break;
+          case 11:
+            msg_Dbg (demux, "detected mono PCM");
+            pt.init = l16m_init;
+            pt.frequency = 44100;
+            break;
 
-              case 11:
-                msg_Dbg (demux, "detected mono PCM");
-                pt.init = l16m_init;
-                pt.frequency = 44100;
-                break;
+          case 14:
+            msg_Dbg (demux, "detected MPEG Audio");
+            pt.init = mpa_init;
+            pt.decode = mpa_decode;
+            pt.frequency = 44100;
+            break;
 
-              case 14:
-                msg_Dbg (demux, "detected MPEG Audio");
-                pt.init = mpa_init;
-                pt.decode = mpa_decode;
-                pt.frequency = 44100;
-                break;
+          case 32:
+            msg_Dbg (demux, "detected MPEG Video");
+            pt.init = mpv_init;
+            pt.decode = mpv_decode;
+            pt.frequency = 90000;
+            break;
 
-              case 32:
-                msg_Dbg (demux, "detected MPEG Video");
-                pt.init = mpv_init;
-                pt.decode = mpv_decode;
-                pt.frequency = 90000;
-                break;
+          case 33:
+            msg_Dbg (demux, "detected MPEG2 TS");
+            pt.init = ts_init;
+            pt.destroy = stream_destroy;
+            pt.decode = stream_decode;
+            pt.frequency = 90000;
+            break;
 
-              case 33:
-                msg_Dbg (demux, "detected MPEG2 TS");
-                pt.init = ts_init;
-                pt.destroy = stream_destroy;
-                pt.decode = stream_decode;
-                pt.frequency = 90000;
-                break;
-
-              case 72: /* muxed SR */
-              case 73: /* muxed RR */
-              case 74: /* muxed SDES */
-              case 75: /* muxed BYE */
-              case 76: /* muxed APP */
-              default:
-                block_Release (block); /* ooh! ignoring RTCP is evil! */
-                return 1;
-            }
-            rtp_add_type (demux, p_sys->session, &pt);
-            p_sys->autodetect = false;
+          default:
+            goto drop;
         }
-
-        rtp_receive (demux, p_sys->session, block);
+        rtp_add_type (demux, p_sys->session, &pt);
+        p_sys->autodetect = false;
     }
+    rtp_receive (demux, p_sys->session, block);
 
+    return 1;
+drop:
+    block_Release (block);
     return 1;
 }
