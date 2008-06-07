@@ -5869,9 +5869,9 @@ AC_CONFIG_FILES([
   modules/audio_mixer/Makefile
   modules/audio_output/Makefile
   modules/codec/Makefile
+  modules/codec/avcodec/Makefile
   modules/codec/cmml/Makefile
   modules/codec/dmo/Makefile
-  modules/codec/ffmpeg/Makefile
   modules/codec/subtitles/Makefile
   modules/codec/spudec/Makefile
   modules/codec/xvmc/Makefile

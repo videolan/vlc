@@ -1,4 +1,4 @@
-SUBDIRS = cmml dmo ffmpeg subtitles spudec xvmc
+SUBDIRS = cmml dmo avcodec subtitles spudec xvmc
 # Disabled modules
 SOURCES_a52 = a52.c
 SOURCES_cinepak = cinepak.c

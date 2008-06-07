@@ -41,8 +41,8 @@
 #endif
 
 #include "avformat.h"
-#include "../../codec/ffmpeg/fourcc.h"
-#include "../../codec/ffmpeg/avutil.h"
+#include "../../codec/avcodec/fourcc.h"
+#include "../../codec/avcodec/avutil.h"
 
 //#define AVFORMAT_DEBUG 1
 

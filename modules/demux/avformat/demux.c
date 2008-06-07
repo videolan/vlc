@@ -42,8 +42,8 @@
 #   include <ffmpeg/avformat.h>
 #endif
 
-#include "../../codec/ffmpeg/fourcc.h"
-#include "../../codec/ffmpeg/chroma.h"
+#include "../../codec/avcodec/fourcc.h"
+#include "../../codec/avcodec/chroma.h"
 
 //#define AVFORMAT_DEBUG 1
 
