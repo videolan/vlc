@@ -42,6 +42,9 @@ static int const ItemStateChanged_Type = QEvent::User + IMEventType + 3;
 static int const ItemTitleChanged_Type = QEvent::User + IMEventType + 4;
 static int const ItemRateChanged_Type  = QEvent::User + IMEventType + 5;
 static int const VolumeChanged_Type    = QEvent::User + IMEventType + 6;
+static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 7;
+static int const FullscreenControlHide_Type = QEvent::User + IMEventType + 8;
+static int const FullscreenControlPlanHide_Type = QEvent::User + IMEventType + 9;
 
 class IMEvent : public QEvent
 {
@@ -113,6 +116,8 @@ signals:
     /// Play/pause status
     void statusChanged( int );
     void artChanged( QString );
+    /// Controll of fullscreen controller
+    void inputUnset();
 #ifdef ZVBI_COMPILED
     void teletextEnabled( bool );
 #endif

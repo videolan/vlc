@@ -82,10 +82,19 @@ static void *DoRequest( intf_thread_t *p_intf, vout_thread_t *p_vout,
 {
     return p_intf->p_sys->p_mi->requestVideo( p_vout, pi1, pi2, pi3, pi4 );
 }
+
+static void *DoNotEmbeddedRequest( intf_thread_t *p_intf, vout_thread_t *p_vout,
+                        int *pi1, int *pi2, unsigned int*pi3,unsigned int*pi4)
+{
+    p_intf->p_sys->p_mi->requestNotEmbeddedVideo( p_vout );
+    return NULL;
+}
+
 static void DoRelease( intf_thread_t *p_intf, void *p_win )
 {
     return p_intf->p_sys->p_mi->releaseVideo( p_win );
 }
+
 static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
 {
     return p_intf->p_sys->p_mi->controlVideo( p_win, i_q, a );
@@ -239,6 +248,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
+
+    CONNECT( fullscreenControls, advancedControlsToggled( bool ),
+             this, doComponentsUpdate() );
+
+    CONNECT( THEMIM->getIM(), inputUnset(),
+            fullscreenControls, unregFullscreenCallback() );
+
 
     /* Size and placement of interface */
     QVLCTools::restoreWidgetPosition(settings,this,QSize(350,60));
@@ -404,6 +420,12 @@ void MainInterface::handleMainUi( QSettings *settings )
                    settings->value( "adv-controls", false ).toBool(),
                    config_GetInt( p_intf, "qt-blingbling" ) );
 
+    /* Create the FULLSCREEN CONTROLS Widget */
+    /* bool b_shiny = config_GetInt( p_intf, "qt-blingbling" ); */
+    fullscreenControls = new FullscreenControllerWidget( p_intf, this,
+                   settings->value( "adv-controls", false ).toBool(),
+                   config_GetInt( p_intf, "qt-blingbling" ) );
+
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
 
@@ -443,6 +465,10 @@ void MainInterface::handleMainUi( QSettings *settings )
         p_intf->pf_request_window  = ::DoRequest;
         p_intf->pf_release_window  = ::DoRelease;
         p_intf->pf_control_window  = ::DoControl;
+    }
+    else
+    {
+        p_intf->pf_request_window  = ::DoNotEmbeddedRequest;
     }
 
     /* Finish the sizing */
@@ -695,8 +721,17 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 
         emit askVideoToResize( *pi_width, *pi_height );
         emit askUpdate();
+
+        fullscreenControls->regFullscreenCallback( p_nvout );
     }
     return ret;
+}
+
+/* function called from ::DoRequest in order to show a nice VideoWidget
+    at the good size */
+void MainInterface::requestNotEmbeddedVideo( vout_thread_t *p_nvout )
+{
+    fullscreenControls->regFullscreenCallback( p_nvout );
 }
 
 void MainInterface::releaseVideo( void *p_win )
@@ -898,8 +933,10 @@ void MainInterface::setStatus( int status )
     msg_Dbg( p_intf, "I was here, updating your status" );
     /* Forward the status to the controls to toggle Play/Pause */
     controls->setStatus( status );
+    fullscreenControls->setStatus( status );
 
     controls->updateInput();
+    fullscreenControls->updateInput();
     speedControl->setEnable( THEMIM->getIM()->hasInput() );
 
     /* And in the systray for the menu */

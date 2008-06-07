@@ -42,6 +42,22 @@
 #include <QFrame>
 #define VOLUME_MAX 200
 
+/* on WIN32 hide() for fullscreen controller doesnt work, so it have to be
+   done by trick with setting the opacity of window */
+#ifdef WIN32
+    #define WIN32TRICK
+#endif
+
+/* to trying transparency with fullscreen controller on windows enable that */
+/* #define TRANSPARENCY */
+
+/* it can be enabled on non windows systems,
+   but it will be transparent only with composite manager */
+#ifndef WIN32
+    #define TRANSPARENCY
+#endif
+
+
 class ResizeEvent;
 class QPalette;
 class QPixmap;
@@ -155,7 +171,8 @@ class ControlsWidget : public QFrame
     Q_OBJECT
 public:
     /* p_intf, advanced control visible or not, blingbling or not */
-    ControlsWidget( intf_thread_t *, MainInterface*, bool, bool );
+    ControlsWidget( intf_thread_t *_p_i, MainInterface *_p_mi,
+        bool b_advControls, bool b_shiny, bool b_fsCreation = false);
     virtual ~ControlsWidget();
 
     QPushButton *playlistButton;
@@ -167,21 +184,23 @@ public slots:
 protected:
     friend class MainInterface;
     friend class VolumeClickHandler;
-private:
+protected:
     intf_thread_t       *p_intf;
     QWidget             *discFrame;
     QWidget             *telexFrame;
     QGridLayout         *controlLayout;
     InputSlider         *slider;
     QPushButton         *prevSectionButton, *nextSectionButton, *menuButton;
-    QPushButton         *playButton, *fullscreenButton;
+    QPushButton         *playButton, *fullscreenButton, *extSettingsButton;
     QToolButton         *slowerButton, *fasterButton;
+    QHBoxLayout         *controlButLayout;
     AdvControlsWidget   *advControls;
     QLabel              *volMuteLabel;
     QAbstractSlider     *volumeSlider;
+    VolumeClickHandler  *hVolLabel;
 
     bool                 b_advancedVisible;
-private slots:
+protected slots:
     void play();
     void stop();
     void prev();
@@ -197,6 +216,69 @@ private slots:
 signals:
     void advancedControlsToggled( bool );
 };
+
+/***********************************
+ * Fullscreen controller
+ ***********************************/
+
+static int showFullscreenControllCallback(vlc_object_t *vlc_object, const char *variable, vlc_value_t old_val,
+    vlc_value_t new_val, void *data);
+
+static int regMouseMoveCallback(vlc_object_t *vlc_object, const char *variable, vlc_value_t old_val,
+    vlc_value_t new_val, void *data);
+
+class FullscreenControllerWidget : public ControlsWidget
+{
+    Q_OBJECT
+public:
+    FullscreenControllerWidget( intf_thread_t *, MainInterface*, bool, bool );
+    virtual ~FullscreenControllerWidget();
+
+    void SetHideTimeout( int hideTimeout ) { i_hideTimeout = hideTimeout; }
+    void regFullscreenCallback( vout_thread_t *p_vout );
+
+    bool isFSCHidden();
+
+public slots:
+    void unregFullscreenCallback();
+
+protected:
+    friend class MainInterface;
+    friend class VolumeClickHandler;
+
+    virtual void mouseMoveEvent( QMouseEvent *event );
+    virtual void mousePressEvent( QMouseEvent *event );
+    virtual void enterEvent( QEvent *event );
+    virtual void leaveEvent( QEvent *event );
+    virtual void keyPressEvent( QKeyEvent *event );
+
+private slots:
+    void hideFSControllerWidget();
+
+    #ifdef TRANSPARENCY
+    void slowHideFSC();
+    #endif
+
+private:
+    QTimer *p_hideTimer;
+
+    #ifdef TRANSPARENCY
+    QTimer *p_slowHideTimer;
+    #endif
+
+    int i_lastPosX;
+    int i_lastPosY;
+    int i_hideTimeout;  /* FSC hiding timeout, same as mouse hiding timeout */
+    bool b_mouseIsOver;
+
+    #ifdef WIN32TRICK
+    bool fscHidden;
+    #endif
+
+    virtual void customEvent( QEvent *event );
+};
+
+
 
 class VolumeClickHandler : public QObject
 {

@@ -284,8 +284,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
 
     /* A to B Button */
     ABButton = new QPushButton( "AB" );
-    ABButton->setMaximumSize( QSize( 26, 26 ) );
-    ABButton->setIconSize( QSize( 20, 20 ) );
+    setupSmallButton( ABButton );
     advLayout->addWidget( ABButton );
     BUTTON_SET_ACT( ABButton, "AB", qtr( "A to B" ), fromAtoB() );
     timeA = timeB = 0;
@@ -300,16 +299,14 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
 #endif
 
     recordButton = new QPushButton( "R" );
-    recordButton->setMaximumSize( QSize( 26, 26 ) );
-    recordButton->setIconSize( QSize( 20, 20 ) );
+    setupSmallButton( recordButton );
     advLayout->addWidget( recordButton );
     BUTTON_SET_ACT_I( recordButton, "", record_16px.png,
             qtr( "Record" ), record() );
 
     /* Snapshot Button */
     snapshotButton = new QPushButton( "S" );
-    snapshotButton->setMaximumSize( QSize( 26, 26 ) );
-    snapshotButton->setIconSize( QSize( 20, 20 ) );
+    setupSmallButton( snapshotButton );
     advLayout->addWidget( snapshotButton );
     BUTTON_SET_ACT( snapshotButton, "S", qtr( "Take a snapshot" ), snapshot() );
 }
@@ -383,16 +380,21 @@ void AdvControlsWidget::frame(){}
 ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                                 MainInterface *_p_mi,
                                 bool b_advControls,
-                                bool b_shiny ) :
-                                QFrame( NULL ), p_intf( _p_i )
+                                bool b_shiny,
+                                bool b_fsCreation) :
+                                QFrame( _p_mi ), p_intf( _p_i )
 {
-    controlLayout = new QGridLayout( this );
+    controlLayout = new QGridLayout( );
+
     controlLayout->setSpacing( 0 );
 #if QT43
     controlLayout->setContentsMargins( 9, 6, 9, 6 );
 #else
     controlLayout->setMargin( 6 );
 #endif
+
+    if( !b_fsCreation )
+        setLayout( controlLayout );
 
     setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
 
@@ -525,7 +527,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout->setColumnStretch( 2, 0 );
 
     /** Prev + Stop + Next Block **/
-    QHBoxLayout *controlButLayout = new QHBoxLayout;
+    controlButLayout = new QHBoxLayout;
     controlButLayout->setSpacing( 0 ); /* Don't remove that, will be useful */
 
     /* Prev */
@@ -550,7 +552,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlButLayout->addWidget( nextButton );
 
     /* Add this block to the main layout */
-    controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
+    if( !b_fsCreation )
+        controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
 
     BUTTON_SET_ACT_I( playButton, "", play.png, qtr( "Play" ), play() );
     BUTTON_SET_ACT_I( prevButton, "" , previous.png,
@@ -580,7 +583,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     CONNECT( playlistButton, clicked(), _p_mi, togglePlaylist() );
 
     /** extended Settings **/
-    QPushButton *extSettingsButton = new QPushButton( "F" );
+    extSettingsButton = new QPushButton;
     BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended Settings" ),
             extSettings() );
     setupSmallButton( extSettingsButton );
@@ -591,7 +594,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout->setColumnStretch( 14, 5 );
 
     /* Volume */
-    VolumeClickHandler *hVolLabel = new VolumeClickHandler( p_intf, this );
+    hVolLabel = new VolumeClickHandler( p_intf, this );
 
     volMuteLabel = new QLabel;
     volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-medium.png" ) );
@@ -805,6 +808,323 @@ void ControlsWidget::toggleAdvanced()
     emit advancedControlsToggled( b_advancedVisible );
 }
 
+
+/**********************************************************************
+ * Fullscrenn control widget
+ **********************************************************************/
+FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
+        MainInterface *_p_mi, bool b_advControls, bool b_shiny )
+        : ControlsWidget( _p_i, _p_mi, b_advControls, b_shiny, true ),
+        i_lastPosX( -1 ), i_lastPosY( -1 ), i_hideTimeout( 1 ),
+        b_mouseIsOver( false )
+{
+    setWindowFlags( Qt::ToolTip );
+
+    setFrameShape( QFrame::StyledPanel );
+    setFrameStyle( QFrame::Sunken );
+    setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
+
+    QGridLayout *fsLayout = new QGridLayout( this );
+    controlLayout->setSpacing( 0 );
+    controlLayout->setContentsMargins( 5, 1, 5, 1 );
+
+    fsLayout->addWidget( slowerButton, 0, 0 );
+    slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);
+    fsLayout->addWidget( slider, 0, 1, 1, 6 );
+    fsLayout->addWidget( fasterButton, 0, 7 );
+
+    fsLayout->addWidget( volMuteLabel, 1, 0);
+    fsLayout->addWidget( volumeSlider, 1, 1 );
+
+    fsLayout->addLayout( controlButLayout, 1, 2 );
+
+    fsLayout->addWidget( playButton, 1, 3 );
+
+    fsLayout->addWidget( discFrame, 1, 4 );
+
+    fsLayout->addWidget( telexFrame, 1, 5 );
+
+    fsLayout->addWidget( advControls, 1, 6, Qt::AlignVCenter );
+
+    fsLayout->addWidget( fullscreenButton, 1, 7 );
+
+    /* hiding timer */
+    p_hideTimer = new QTimer( this );
+    CONNECT( p_hideTimer, timeout(), this, hideFSControllerWidget() );
+    p_hideTimer->setSingleShot( true );
+
+    /* slow hiding timer */
+    #ifdef TRANSPARENCY
+    p_slowHideTimer = new QTimer( this );
+    CONNECT( p_slowHideTimer, timeout(), this, slowHideFSC() );
+    #endif
+
+    adjustSize ();  /* need to get real width and height for moving */
+
+    /* center down */
+    QDesktopWidget * p_desktop = QApplication::desktop();
+
+    move( p_desktop->width() / 2 - width() / 2,
+          p_desktop->height() - height() );
+
+    #ifdef WIN32TRICK
+    setWindowOpacity( 0.0 );
+    fscHidden = true;
+    show();
+    #endif
+}
+
+FullscreenControllerWidget::~FullscreenControllerWidget()
+{
+}
+
+/**
+ * Hide fullscreen controller
+ * FIXME: under windows it have to be done by moving out of screen
+ *        because hide() doesnt work
+ */
+void FullscreenControllerWidget::hideFSControllerWidget()
+{
+    #ifdef WIN32TRICK
+    fscHidden = true;
+    setWindowOpacity( 0.0 );    // simulate hidding
+    #else
+    hide();
+    #endif
+}
+
+#ifdef TRANSPARENCY
+/**
+ * Hidding fullscreen controller slowly
+ * Linux: need composite manager
+ * Windows: it is blinking, so it can be enabled by define TRASPARENCY
+ */
+void FullscreenControllerWidget::slowHideFSC()
+{
+    static bool first_call = true;
+
+    if ( first_call )
+    {
+        first_call = false;
+
+        p_slowHideTimer->stop();
+        /* the last part of time divided to 100 pieces */
+        p_slowHideTimer->start( i_hideTimeout / 2 / ( windowOpacity() * 100 ) );
+    }
+    else
+    {
+         if ( windowOpacity() > 0.0 )
+         {
+             /* we should use 0.01 because of 100 pieces ^^^
+                but than it cannt be done in time */
+             setWindowOpacity( windowOpacity() - 0.02 );
+         }
+
+         if ( windowOpacity() == 0.0 )
+         {
+             first_call = true;
+             p_slowHideTimer->stop();
+         }
+    }
+}
+#endif
+
+/**
+ * Get state of visibility of FS controller on screen
+ * On windows control if it is on hidden position
+ */
+bool FullscreenControllerWidget::isFSCHidden()
+{
+    #ifdef WIN32TRICK
+    return fscHidden;
+    #endif
+
+    return isHidden();
+}
+
+/**
+ * event handling
+ * events: show, hide, start timer for hidding
+ */
+void FullscreenControllerWidget::customEvent( QEvent *event )
+{
+    int type = event->type();
+
+    if ( type == FullscreenControlShow_Type )
+    {
+        #ifdef WIN32TRICK
+        // after quiting and going to fs, we need to call show()
+        if ( isHidden() )
+            show();
+
+        if ( fscHidden )
+        {
+            fscHidden = false;
+            setWindowOpacity( 1.0 );
+        }
+        #else
+        show();
+        #endif
+
+        #ifdef TRANSPARENCY
+        setWindowOpacity( 0.75 );
+        #endif
+    }
+    else if ( type == FullscreenControlHide_Type )
+    {
+        hideFSControllerWidget();
+    }
+    else if ( type == FullscreenControlPlanHide_Type && !b_mouseIsOver )
+    {
+        p_hideTimer->start( i_hideTimeout );
+        #ifdef TRANSPARENCY
+        p_slowHideTimer->start( i_hideTimeout / 2 );
+        #endif
+    }
+}
+
+/**
+ * On mouse move
+ * moving with FSC
+ */
+void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
+{
+    if ( event->buttons() == Qt::LeftButton )
+    {
+        int i_moveX = event->globalX() - i_lastPosX;
+        int i_moveY = event->globalY() - i_lastPosY;
+
+        move( x() + i_moveX, y() + i_moveY );
+
+        i_lastPosX = event->globalX();
+        i_lastPosY = event->globalY();
+    }
+}
+
+/**
+ * On mouse press
+ * store position of cursor
+ */
+void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
+{
+    i_lastPosX = event->globalX();
+    i_lastPosY = event->globalY();
+}
+
+/**
+ * On mouse go above FSC
+ */
+void FullscreenControllerWidget::enterEvent( QEvent *event )
+{
+    p_hideTimer->stop();
+    #ifdef TRANSPARENCY
+    p_slowHideTimer->stop();
+    #endif
+    b_mouseIsOver = true;
+}
+
+/**
+ * On mouse go out from FSC
+ */
+void FullscreenControllerWidget::leaveEvent( QEvent *event )
+{
+    p_hideTimer->start( i_hideTimeout );
+    #ifdef TRANSPARENCY
+    p_slowHideTimer->start( i_hideTimeout / 2 );
+    #endif
+    b_mouseIsOver = false;
+}
+
+/**
+ * When you get pressed key, send it to video output
+ * FIXME: clearing focus by clearFocus() to not getting
+ * key press events didnt work
+ */
+void FullscreenControllerWidget::keyPressEvent( QKeyEvent *event )
+{
+    int i_vlck = qtEventToVLCKey( event );
+    if( i_vlck > 0 )
+    {
+        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlck );
+        event->accept();
+    }
+    else
+        event->ignore();
+}
+
+/**
+ * It is called when video start
+ */
+void FullscreenControllerWidget::regFullscreenCallback( vout_thread_t *p_vout )
+{
+    if ( p_vout )
+    {
+        var_AddCallback( p_vout, "fullscreen", regMouseMoveCallback, this );
+    }
+}
+
+/**
+ * It is called after turn off video, because p_vout is NULL now
+ * we cannt delete callback, just hide if FScontroller is visible
+ */
+void FullscreenControllerWidget::unregFullscreenCallback()
+{
+    if ( isVisible() )
+        hide();
+}
+
+/**
+ * Register and unregister callback for mouse moving
+ */
+static int regMouseMoveCallback( vlc_object_t *vlc_object, const char *variable,
+                                 vlc_value_t old_val, vlc_value_t new_val,
+                                 void *data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *) vlc_object;
+
+    static bool b_registered = false;
+    FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *) data;
+
+    if ( var_GetBool( p_vout, "fullscreen" ) && !b_registered )
+    {
+        p_fs->SetHideTimeout( var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+        var_AddCallback( p_vout, "mouse-moved",
+                        showFullscreenControllCallback, (void *) p_fs );
+        b_registered = true;
+    }
+
+    if ( !var_GetBool( p_vout, "fullscreen" ) && b_registered )
+    {
+        var_DelCallback( p_vout, "mouse-moved",
+                        showFullscreenControllCallback, (void *) p_fs );
+        b_registered = false;
+        p_fs->hide();
+    }
+
+    return VLC_SUCCESS;
+}
+
+/**
+ * Show fullscreen controller after mouse move
+ * after show immediately plan hide event
+ */
+static int showFullscreenControllCallback( vlc_object_t *vlc_object, const char *variable,
+                                           vlc_value_t old_val, vlc_value_t new_val,
+                                           void *data )
+{
+    FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *) data;
+
+    if ( p_fs->isFSCHidden() )
+    {
+        IMEvent *event = new IMEvent( FullscreenControlShow_Type, 0 );
+        QApplication::postEvent( p_fs, static_cast<QEvent *>(event) );
+    }
+
+    IMEvent *e = new IMEvent( FullscreenControlPlanHide_Type, 0 );
+    QApplication::postEvent( p_fs, static_cast<QEvent *>(e) );
+
+    return VLC_SUCCESS;
+}
 
 /**********************************************************************
  * Speed control widget
