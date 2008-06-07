@@ -49,10 +49,9 @@ class MenuItemData : public QObject
 Q_OBJECT
 
 public:
-    MenuItemData( vlc_object_t *_obj, int _i_type, vlc_value_t _val,
-                  const char *_var )
+    MenuItemData( int i_id, int _i_type, vlc_value_t _val, const char *_var )
     {
-        obj = _obj;
+        i_object_id = i_id;
         i_val_type = _i_type;
         val = _val;
         psz_var = strdup( _var );
@@ -63,7 +62,7 @@ public:
         if( ( i_val_type & VLC_VAR_TYPE) == VLC_VAR_STRING )
             free( val.psz_string );
     }
-    vlc_object_t *obj;
+    int i_object_id;
     int i_val_type;
     vlc_value_t val;
     char *psz_var;
@@ -103,12 +102,11 @@ public:
 private:
     /* Generic automenu methods */
     static QMenu * Populate( intf_thread_t *, QMenu *current,
-                             vector<const char*>&, vector<vlc_object_t *>&,
+                             vector<const char*>&, vector<int>&,
                              bool append = false );
 
     static void CreateAndConnect( QMenu *, const char *, QString, QString,
-                                  int, vlc_object_t *, vlc_value_t, int,
-                                  bool c = false );
+                                  int, int, vlc_value_t, int, bool c = false );
     static void CreateItem( QMenu *, const char *, vlc_object_t *, bool );
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
 };
