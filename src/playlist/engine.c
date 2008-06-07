@@ -28,7 +28,6 @@
 
 #include <assert.h>
 #include <vlc_common.h>
-#include <vlc_vout.h>
 #include <vlc_sout.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
@@ -196,19 +195,6 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
     }
 
     vlc_mutex_lock( &p_playlist->gc_lock );
-    while( ( p_obj = vlc_object_find( p_playlist->p_libvlc, VLC_OBJECT_VOUT,
-                                                  FIND_CHILD ) ) )
-    {
-        if( p_obj->p_parent != VLC_OBJECT(p_playlist->p_libvlc) )
-        {
-            vlc_object_release( p_obj );
-            break;
-        }
-        msg_Dbg( p_playlist, "garbage collector destroying 1 vout" );
-        vlc_object_detach( p_obj );
-        vlc_object_release( p_obj );
-        vlc_object_release( (vout_thread_t *)p_obj );
-    }
     p_playlist->b_cant_sleep = false;
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
@@ -429,15 +415,6 @@ void playlist_LastLoop( playlist_t *p_playlist )
     if (p_sout)
         sout_DeleteInstance( p_sout );
 #endif
-
-    /* close all remaining vout */
-    while( ( p_obj = vlc_object_find( p_playlist,
-                                      VLC_OBJECT_VOUT, FIND_CHILD ) ) )
-    {
-        vlc_object_detach( p_obj );
-        vlc_object_release( p_obj );
-        vlc_object_release( (vout_thread_t *)p_obj );
-    }
 
     while( p_playlist->i_sds )
     {

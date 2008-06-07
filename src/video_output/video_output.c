@@ -124,7 +124,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 {
     if( !p_fmt )
     {
-        /* Reattach video output to playlist before bailing out */
+        /* Reattach video output to the instance before bailing out */
         if( p_vout )
         {
             spu_Attach( p_vout->p_spu, p_this, false );
