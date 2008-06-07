@@ -107,7 +107,8 @@ E_(vlc_entry) ( module_t *p_module );
                                                                               \
     error:                                                                    \
         return VLC_EGENERIC;                                                  \
-    }
+    }                                                                         \
+    VLC_METADATA_EXPORTS
 
 #define add_submodule( ) \
     p_submodule = vlc_submodule_create( p_module );
@@ -447,5 +448,26 @@ enum vlc_config_properties
 
 #define change_safe() \
     vlc_config_set (p_config, VLC_CONFIG_SAFE);
+
+/* Meta data plugin exports */
+#define VLC_META_EXPORT( name, value ) \
+    EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL \
+    __VLC_SYMBOL(vlc_entry_ ## name) (void) \
+    { \
+         return value; \
+    }
+
+#if defined (__LIBVLC__)
+# define VLC_COPYRIGHT_EXPORT VLC_META_EXPORT (copyright, COPYRIGHT_MESSAGE)
+#elif !defined (VLC_COPYRIGHT_EXPORT)
+# define VLC_COPYRIGHT_EXPORT
+#endif
+#define VLC_LICENSE_EXPORT VLC_META_EXPORT (license, \
+    "Licensed under the terms of the GNU General Public License, " \
+    "version 2 or later.")
+
+#define VLC_METADATA_EXPORTS \
+    VLC_COPYRIGHT_EXPORT \
+    VLC_LICENSE_EXPORT
 
 #endif
