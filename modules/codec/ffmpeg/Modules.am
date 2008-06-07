@@ -36,8 +36,6 @@ EXTRA_libavformat_plugin_la_SOURCES = \
 
 SOURCES_swscale = \
 	swscale.c \
-	swscale.h \
-	scale.c \
 	chroma.h \
 	$(NULL)
 
