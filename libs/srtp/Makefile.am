@@ -16,11 +16,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AM_CPPFLAGS = @LIBGCRYPT_CFLAGS@
-AM_LDFLAGS = @LIBGCRYPT_LIBS@
-
-if !HAVE_WIN32
-AM_LDFLAGS += -lpthread
-endif
 
 noinst_HEADERS = srtp.h
 
@@ -30,6 +25,11 @@ check_PROGRAMS = test-aes test-recv
 TESTS = $(check_PROGRAMS)
 
 libvlc_srtp_la_SOURCES = srtp.c
+libvlc_srtp_la_LIBADD = @LIBGCRYPT_LIBS@
+if !HAVE_WIN32
+libvlc_srtp_la_LIBADD += -lpthread
+endif
+
 srtp_SOURCES = recv.c
 srtp_LDADD = libvlc_srtp.la
 test_recv_LDADD = libvlc_srtp.la
