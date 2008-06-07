@@ -83,12 +83,10 @@
  * instance the module name, its shortcuts, its capabilities... we also create
  * a copy of its config because the module can be unloaded at any time.
  */
-#if defined (__PLUGIN__) || defined (__BUILTIN__)
-EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL
-E_(vlc_entry) ( module_t *p_module );
-#endif
-
 #define vlc_module_begin( )                                                   \
+    EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
+    E_(vlc_entry) ( module_t *p_module );                                     \
+                                                                              \
     EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
@@ -451,6 +449,8 @@ enum vlc_config_properties
 
 /* Meta data plugin exports */
 #define VLC_META_EXPORT( name, value ) \
+    EXTERN_SYMBOL DLL_SYMBOL const char * CDECL_SYMBOL \
+    E_(vlc_entry_ ## name) (void); \
     EXTERN_SYMBOL DLL_SYMBOL const char * CDECL_SYMBOL \
     __VLC_SYMBOL(vlc_entry_ ## name) (void) \
     { \
