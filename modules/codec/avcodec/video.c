@@ -80,12 +80,6 @@ struct decoder_sys_t
 
     int i_buffer_orig, i_buffer;
     char *p_buffer_orig, *p_buffer;
-
-    /* Postprocessing handle */
-    void *p_pp;
-    bool b_pp;
-    bool b_pp_async;
-    bool b_pp_init;
 };
 
 /* FIXME (dummy palette for now) */
@@ -166,7 +160,6 @@ static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
 static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
                                             AVCodecContext *p_context )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic;
 
     p_dec->fmt_out.video.i_width = p_context->width;
@@ -219,13 +212,6 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
     }
 
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
-
-// FIXME    if( p_sys->p_pp && p_sys->b_pp && !p_sys->b_pp_init )
-// FIXME    {
-// FIXME        InitPostproc( p_sys->p_pp, p_context->width,
-// FIXME                          p_context->height, p_context->pix_fmt );
-// FIXME        p_sys->b_pp_init = true;
-// FIXME    }
 
     return p_pic;
 }
@@ -359,10 +345,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
          * so we need to do another check in ffmpeg_GetFrameBuf() */
         p_sys->b_direct_rendering = 1;
     }
-
-    p_sys->p_pp = NULL;
-    p_sys->b_pp = p_sys->b_pp_async = p_sys->b_pp_init = false;
-    // FIXME p_sys->p_pp = OpenPostproc( p_dec, &p_sys->b_pp_async );
 
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
     //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = 0;
@@ -529,9 +511,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     /*
      * Do the actual decoding now
      */
-
-    /* Check if post-processing was enabled */
-    p_sys->b_pp = p_sys->b_pp_async;
 
     /* Don't forget that ffmpeg requires a little more bytes
      * that the real frame size */
@@ -725,7 +704,6 @@ void EndVideoDec( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
-    // FIXME ClosePostproc( p_dec, p_sys->p_pp );
     free( p_sys->p_buffer_orig );
 }
 
@@ -820,25 +798,20 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         uint8_t *p_dst, *p_src;
         int i_src_stride, i_dst_stride;
 
-        // FIXME if( p_sys->p_pp && p_sys->b_pp )
-        // FIXME    PostprocPict( p_sys->p_pp, p_pic, p_ff_pic );
-        // FIXME else
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-            {
-                p_src  = p_ff_pic->data[i_plane];
-                p_dst = p_pic->p[i_plane].p_pixels;
-                i_src_stride = p_ff_pic->linesize[i_plane];
-                i_dst_stride = p_pic->p[i_plane].i_pitch;
+            p_src  = p_ff_pic->data[i_plane];
+            p_dst = p_pic->p[i_plane].p_pixels;
+            i_src_stride = p_ff_pic->linesize[i_plane];
+            i_dst_stride = p_pic->p[i_plane].i_pitch;
 
-                i_size = __MIN( i_src_stride, i_dst_stride );
-                for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
-                     i_line++ )
-                {
-                    vlc_memcpy( p_dst, p_src, i_size );
-                    p_src += i_src_stride;
-                    p_dst += i_dst_stride;
-                }
+            i_size = __MIN( i_src_stride, i_dst_stride );
+            for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
+                 i_line++ )
+            {
+                vlc_memcpy( p_dst, p_src, i_size );
+                p_src += i_src_stride;
+                p_dst += i_dst_stride;
             }
         }
     }
@@ -926,7 +899,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->opaque = 0;
 
     /* Not much to do in indirect rendering mode */
-    if( !p_sys->b_direct_rendering || p_sys->b_pp )
+    if( !p_sys->b_direct_rendering )
     {
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
