@@ -31,6 +31,9 @@
 #include <vlc_demux.h>
 #include <vlc_aout.h>
 #include <vlc_network.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 #include <vlc_plugin.h>
 
 #include <vlc_codecs.h>
@@ -88,6 +91,7 @@ vlc_module_begin ();
                  RTP_MAX_MISORDER_LONGTEXT, true);
         change_integer_range (0, 32767);
 
+    add_shortcut ("dccp");
     add_shortcut ("rtp");
     add_shortcut ("udplite");
 vlc_module_end ();
@@ -124,6 +128,9 @@ static int Open (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     int tp; /* transport protocol */
 
+    if (!strcmp (demux->psz_access, "dccp"))
+        tp = IPPROTO_DCCP;
+    else
     if (!strcmp (demux->psz_access, "rtp"))
         tp = IPPROTO_UDP;
     else
@@ -150,7 +157,32 @@ static int Open (vlc_object_t *obj)
         dport = 5004; /* avt-profile-1 port */
 
     /* Try to connect */
-    int fd = net_OpenDgram (obj, dhost, dport, shost, sport, AF_UNSPEC, tp);
+    int fd = -1;
+
+    switch (tp)
+    {
+        case IPPROTO_UDP:
+        case IPPROTO_UDPLITE:
+            fd = net_OpenDgram (obj, dhost, dport, shost, sport, AF_UNSPEC,
+                                tp);
+            break;
+
+         case IPPROTO_DCCP:
+#ifndef SOCK_DCCP /* provisional API (FIXME) */
+# ifdef __linux__
+#  define SOCK_DCCP 6
+# endif
+#endif
+#ifdef SOCK_DCCP
+            var_Create (obj, "dccp-service", VLC_VAR_STRING);
+            var_SetString (obj, "dccp-service", "RTPV");
+            fd = net_Connect (obj, shost, sport, SOCK_DCCP, tp);
+#else
+            msg_Err (obj, "DCCP support not included");
+#endif
+            break;
+    }
+
     free (tmp);
     if (fd == -1)
         return VLC_EGENERIC;
@@ -265,19 +297,37 @@ static int Control (demux_t *demux, int i_query, va_list args)
 
 
 /**
- * Gets a datagram from the network
+ * Checks if a file descriptor is hung up.
+ */
+static bool fd_dead (int fd)
+{
+    struct pollfd ufd = { .fd = fd, };
+
+    return (poll (&ufd, 1, 0) == 1) && (ufd.revents & POLLHUP);
+}
+
+
+/**
+ * Gets a datagram from the network, or NULL in case of fatal error.
  */
 static block_t *rtp_dgram_recv (demux_t *demux, int fd)
 {
     block_t *block = block_Alloc (0xffff);
+    ssize_t len;
 
-    ssize_t len = net_Read (VLC_OBJECT (demux), fd, NULL,
-                            block->p_buffer, block->i_buffer, false);
-    if (len == -1)
+    do
     {
-        block_Release (block);
-        return NULL;
+        len = net_Read (VLC_OBJECT (demux), fd, NULL,
+                                block->p_buffer, block->i_buffer, false);
+        if (((len <= 0) && fd_dead (fd))
+         || demux->b_die)
+        {
+            block_Release (block);
+            return NULL;
+        }
     }
+    while (len == -1);
+
     return block_Realloc (block, 0, len);
 }
 
@@ -470,7 +520,7 @@ static int Demux (demux_t *demux)
 
     block = rtp_dgram_recv (demux, p_sys->fd);
     if (!block)
-        return 1;
+        return 0;
 
     if (block->i_buffer < 2)
         goto drop;
