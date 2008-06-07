@@ -40,4 +40,5 @@ SOURCES_seamcarving = seamcarving.c
 SOURCES_croppadd = croppadd.c
 SOURCES_blendbench = blendbench.c
 SOURCES_chain = chain.c
+SOURCES_postproc = postproc.c
 noinst_HEADERS = filter_common.h filter_picture.h

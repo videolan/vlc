@@ -49,22 +49,17 @@ SOURCES_imgresample = \
 	chroma.h \
 	$(NULL)
 
-SOURCES_postproc = \
-	$(NULL)
-
 libvlc_LTLIBRARIES += \
 	$(LTLIBavcodec) \
 	$(LTLIBavformat) \
 	$(LTLIBswscale) \
-	$(LTLIBimgresample) \
-	$(LTLIBpostproc)
+	$(LTLIBimgresample)
 
 EXTRA_LTLIBRARIES += \
 	libavcodec_plugin.la \
 	libavformat_plugin.la \
 	libswscale_plugin.la \
-	libimgresample_plugin.la \
-	libpostproc_plugin.la
+	libimgresample_plugin.la
 
 # FIXME SOURCES_ffmpegaltivec = \
 # FIXME 	ffmpeg.c \

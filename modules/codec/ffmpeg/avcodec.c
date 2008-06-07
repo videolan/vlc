@@ -125,9 +125,6 @@ vlc_module_begin();
                   SKIPLOOPF_LONGTEXT, true );
         change_integer_list( nloopf_list, nloopf_list_text, 0 );
 
-    add_integer( "ffmpeg-pp-q", 0, NULL, PP_Q_TEXT, PP_Q_LONGTEXT, false );
-    add_string( "ffmpeg-pp-name", "default", NULL, LIBAVCODEC_PP_TEXT,
-        LIBAVCODEC_PP_LONGTEXT, true );
     add_integer( "ffmpeg-debug", 0, NULL, DEBUG_TEXT, DEBUG_LONGTEXT,
                  true );
 

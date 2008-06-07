@@ -91,12 +91,6 @@ void EndAudioDec( decoder_t *p_dec );
     "Force skipping of idct to speed up decoding for frame types" \
     "(-1=None, 0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)." )
 
-#define PP_Q_TEXT N_("Post processing quality")
-#define PP_Q_LONGTEXT N_( \
-    "Quality of post processing. Valid range is 0 to 6\n" \
-    "Higher levels require considerable more CPU power, but produce " \
-    "better looking pictures." )
-
 #define DEBUG_TEXT N_( "Debug mask" )
 #define DEBUG_LONGTEXT N_( "Set ffmpeg debug mask" )
 
@@ -118,43 +112,6 @@ void EndAudioDec( decoder_t *p_dec );
 #define SKIPLOOPF_LONGTEXT N_( "Skipping the loop filter (aka deblocking) " \
     "usually has a detrimental effect on quality. However it provides a big " \
     "speedup for high definition streams." )
-
-#define LIBAVCODEC_PP_TEXT N_("FFmpeg post processing filter chains")
-/* FIXME (cut/past from ffmpeg */
-#define LIBAVCODEC_PP_LONGTEXT \
-N_("<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n" \
-"long form example:\n" \
-"vdeblock:autoq/hdeblock:autoq/linblenddeint    default,-vdeblock\n" \
-"short form example:\n" \
-"vb:a/hb:a/lb de,-vb\n" \
-"more examples:\n" \
-"tn:64:128:256\n" \
-"Filters                        Options\n" \
-"short  long name       short   long option     Description\n" \
-"*      *               a       autoq           cpu power dependent enabler\n" \
-"                       c       chrom           chrominance filtring enabled\n" \
-"                       y       nochrom         chrominance filtring disabled\n" \
-"hb     hdeblock        (2 Threshold)           horizontal deblocking filter\n" \
-"       1. difference factor: default=64, higher -> more deblocking\n" \
-"       2. flatness threshold: default=40, lower -> more deblocking\n" \
-"                       the h & v deblocking filters share these\n" \
-"                       so u cant set different thresholds for h / v\n" \
-"vb     vdeblock        (2 Threshold)           vertical deblocking filter\n" \
-"h1     x1hdeblock                              Experimental h deblock filter 1\n" \
-"v1     x1vdeblock                              Experimental v deblock filter 1\n" \
-"dr     dering                                  Deringing filter\n" \
-"al     autolevels                              automatic brightness / contrast\n" \
-"                       f       fullyrange      stretch luminance to (0..255)\n" \
-"lb     linblenddeint                           linear blend deinterlacer\n" \
-"li     linipoldeint                            linear interpolating deinterlace\n" \
-"ci     cubicipoldeint                          cubic interpolating deinterlacer\n" \
-"md     mediandeint                             median deinterlacer\n" \
-"fd     ffmpegdeint                             ffmpeg deinterlacer\n" \
-"de     default                                 hb:a,vb:a,dr:a,al\n" \
-"fa     fast                                    h1:a,v1:a,dr:a,al\n" \
-"tn     tmpnoise        (3 Thresholds)          Temporal Noise Reducer\n" \
-"                       1. <= 2. <= 3.          larger -> stronger filtering\n" \
-"fq     forceQuant      <quantizer>             Force quantizer\n")
 
 /*
  * Encoder options
