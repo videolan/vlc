@@ -451,7 +451,7 @@ enum vlc_config_properties
 
 /* Meta data plugin exports */
 #define VLC_META_EXPORT( name, value ) \
-    EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL \
+    EXTERN_SYMBOL DLL_SYMBOL const char * CDECL_SYMBOL \
     __VLC_SYMBOL(vlc_entry_ ## name) (void) \
     { \
          return value; \
