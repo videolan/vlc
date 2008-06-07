@@ -92,6 +92,8 @@ vlc_module_begin ();
         change_integer_range (0, 32767);
 
     add_shortcut ("dccp");
+    /*add_shortcut ("sctp");*/
+    add_shortcut ("rtptcp"); /* "tcp" is already taken :( */
     add_shortcut ("rtp");
     add_shortcut ("udplite");
 vlc_module_end ();
@@ -130,6 +132,9 @@ static int Open (vlc_object_t *obj)
 
     if (!strcmp (demux->psz_access, "dccp"))
         tp = IPPROTO_DCCP;
+    else
+    if (!strcmp (demux->psz_access, "rtptcp"))
+        tp = IPPROTO_TCP;
     else
     if (!strcmp (demux->psz_access, "rtp"))
         tp = IPPROTO_UDP;
@@ -181,6 +186,10 @@ static int Open (vlc_object_t *obj)
             msg_Err (obj, "DCCP support not included");
 #endif
             break;
+
+        case IPPROTO_TCP:
+            fd = net_Connect (obj, shost, sport, SOCK_STREAM, tp);
+            break;
     }
 
     free (tmp);
@@ -199,6 +208,7 @@ static int Open (vlc_object_t *obj)
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
     p_sys->max_misorder = var_CreateGetInteger (obj, "rtp-max-misorder");
     p_sys->autodetect   = true;
+    p_sys->framed_rtp   = (tp == IPPROTO_TCP);
 
     demux->pf_demux   = Demux;
     demux->pf_control = Control;
@@ -329,6 +339,45 @@ static block_t *rtp_dgram_recv (demux_t *demux, int fd)
     while (len == -1);
 
     return block_Realloc (block, 0, len);
+}
+
+/**
+ * Gets a framed RTP packet, or NULL in case of fatal error.
+ */
+static block_t *rtp_stream_recv (demux_t *demux, int fd)
+{
+    ssize_t len = 0;
+    uint8_t hdr[2]; /* frame header */
+
+    /* Receives the RTP frame header */
+    do
+    {
+        ssize_t val = net_Read (VLC_OBJECT (demux), fd, NULL,
+                                hdr + len, 2 - len, false);
+        if (val <= 0)
+            return NULL;
+        len += val;
+    }
+    while (len < 2);
+
+    block_t *block = block_Alloc (GetWBE (hdr));
+
+    /* Receives the RTP packet */
+    for (ssize_t i = 0; i < len;)
+    {
+        ssize_t val;
+
+        val = net_Read (VLC_OBJECT (demux), fd, NULL,
+                        block->p_buffer + i, block->i_buffer - i, false);
+        if (val <= 0)
+        {
+            block_Release (block);
+            return NULL;
+        }
+        i += val;
+    }
+
+    return block;
 }
 
 
@@ -518,7 +567,9 @@ static int Demux (demux_t *demux)
     demux_sys_t *p_sys = demux->p_sys;
     block_t     *block;
 
-    block = rtp_dgram_recv (demux, p_sys->fd);
+    block = p_sys->framed_rtp
+        ? rtp_dgram_recv (demux, p_sys->fd)
+        : rtp_stream_recv (demux, p_sys->fd);
     if (!block)
         return 0;
 

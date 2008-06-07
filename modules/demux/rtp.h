@@ -51,5 +51,6 @@ struct demux_sys_t
     uint16_t      max_dropout;
     uint16_t      max_misorder;
     bool          autodetect;
+    bool          framed_rtp;
 };
 
