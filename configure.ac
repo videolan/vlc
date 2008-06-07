@@ -5346,7 +5346,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     AS_IF([test "${have_libgcrypt}" = "yes"],[
       VLC_ADD_LIBS([gnutls], ${GCRYPT_LIBS})
       VLC_ADD_CFLAGS([gnutls], ${GCRYPT_CFLAGS})
-    ], [-lgpg-error])
+    ])
     VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
