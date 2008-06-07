@@ -34,11 +34,6 @@ EXTRA_libavformat_plugin_la_SOURCES = \
 	mux.c \
 	$(NULL)
 
-SOURCES_swscale = \
-	swscale.c \
-	chroma.h \
-	$(NULL)
-
 SOURCES_imgresample = \
 	imgresample.c \
 	imgresample.h \
@@ -50,13 +45,11 @@ SOURCES_imgresample = \
 libvlc_LTLIBRARIES += \
 	$(LTLIBavcodec) \
 	$(LTLIBavformat) \
-	$(LTLIBswscale) \
 	$(LTLIBimgresample)
 
 EXTRA_LTLIBRARIES += \
 	libavcodec_plugin.la \
 	libavformat_plugin.la \
-	libswscale_plugin.la \
 	libimgresample_plugin.la
 
 # FIXME SOURCES_ffmpegaltivec = \

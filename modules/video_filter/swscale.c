@@ -40,7 +40,8 @@
 #   include <ffmpeg/swscale.h>
 #endif
 
-#include "chroma.h"
+/* Gruikkkkkkkkkk!!!!! */
+#include "../codec/ffmpeg/chroma.h"
 
 /****************************************************************************
  * Local prototypes
