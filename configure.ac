@@ -1666,6 +1666,21 @@ fi
 AM_CONDITIONAL(BUILD_HTTPD, [test "${enable_httpd}" != "no"])
 
 dnl
+dnl libproxy support
+dnl
+AC_ARG_ENABLE(libproxy,
+  [  --enable-libproxy       libproxy support (default auto)])
+AS_IF([test "${enable_libproxy}" != "no"], [
+  AC_CHECK_HEADERS(proxy.h, [
+    VLC_ADD_LIBS([access_http],[-lproxy])
+  ], [
+    AS_IF([test "x${enable_libproxy}" != "x"], [
+      AC_MSG_ERROR([libproxy could not be found on your system])
+    ])
+  ])
+])
+
+dnl
 dnl VideoLAN manager
 dnl
 AC_ARG_ENABLE(vlm,

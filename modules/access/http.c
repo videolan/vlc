@@ -52,6 +52,9 @@
 
 #include <assert.h>
 
+#ifdef HAVE_PROXY_H
+#    include "proxy.h"
+#endif
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -315,7 +318,40 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
         vlc_UrlParse( &p_sys->proxy, psz, 0 );
         free( psz );
     }
-#ifdef HAVE_GETENV
+#ifdef HAVE_PROXY_H
+    else
+    {
+        pxProxyFactory *pf = px_proxy_factory_new();
+        if (pf)
+        {
+            char *buf;
+            int i;
+            i=asprintf(&buf, "%s://%s", p_access->psz_access, p_access->psz_path);
+            if (i >= 0)
+            {
+                msg_Dbg(p_access, "asking libproxy about url '%s'", buf);
+                char **proxies = px_proxy_factory_get_proxies(pf, buf);
+                if (proxies[0])
+                {
+                    msg_Dbg(p_access, "libproxy suggest to use '%s'", proxies[0]);
+                    if(strcmp(proxies[0],"direct://") != 0) 
+                    {
+                        p_sys->b_proxy = true;
+                        vlc_UrlParse( &p_sys->proxy, proxies[0], 0);
+                    }
+                }
+                for(i=0;proxies[i];i++) free(proxies[i]);
+                free(proxies);
+                free(buf);
+                px_proxy_factory_free(pf);
+            }
+        }
+        else
+        {
+            msg_Err(p_access, "Allocating memory for libproxy failed");
+        }
+    }
+#elif HAVE_GETENV
     else
     {
         psz = getenv( "http_proxy" );
