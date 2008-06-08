@@ -600,7 +600,7 @@ static void *ts_init (demux_t *demux)
  * Dynamic payload type handlers
  * Hmm, none implemented yet.
  */
-
+#if 0
 /* PT=dynamic
  * vorbis: Xiph Vorbis audio (draft-ietf-avt-rtp-vorbis-09, RFC FIXME)
  */
@@ -724,6 +724,7 @@ static void vorbis_decode (demux_t *demux, void *data, block_t *block)
 drop:
     block_Release (block);
 }
+#endif
 
 /**
  * Processing callback
@@ -814,14 +815,6 @@ static int Demux (demux_t *demux)
             pt.destroy = stream_destroy;
             pt.decode = stream_decode;
             pt.frequency = 90000;
-            break;
-
-          case 96:
-            msg_Dbg (demux, "detected Vorbis");
-            pt.init = vorbis_init;
-            pt.destroy = vorbis_destroy;
-            pt.decode = vorbis_decode;
-            pt.frequency = 4281000;
             break;
 
           default:
