@@ -531,14 +531,14 @@ Section /o "Mozilla plugin" SEC03
 
 SectionEnd
 
-;Section "ActiveX plugin" SEC04
-;  SectionIn 1 3
-;  SetOutPath "$INSTDIR"
-;  !insertmacro OpenUninstallLog
-;  !insertmacro InstallFile activex\axvlc.dll
-;  !insertmacro CloseUninstallLog
-;  RegDLL "$INSTDIR\axvlc.dll"
-;SectionEnd
+Section "ActiveX plugin" SEC04
+  SectionIn 1 3
+  SetOutPath "$INSTDIR"
+  !insertmacro OpenUninstallLog
+  !insertmacro InstallFile activex\axvlc.dll
+  !insertmacro CloseUninstallLog
+  RegDLL "$INSTDIR\axvlc.dll"
+SectionEnd
 
 Section "Discs Playback" SEC05
   SectionIn 1 2 3
@@ -607,8 +607,8 @@ SectionEnd
     "Adds icon to your desktop for easy access"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} \
     "The VLC Mozilla and Mozilla Firefox plugin"
-;  !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} \
-;    "The VLC ActiveX plugin"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} \
+    "The VLC ActiveX plugin"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} \
     "DVD and CD playback registration"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} \
