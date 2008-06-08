@@ -5319,13 +5319,13 @@ then
           AC_CHECK_HEADERS(objsafe.h,
             VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER]),,
             [
-	     #if HAVE_OLE2_H
+             #if HAVE_OLE2_H
              #   include <ole2.h>
              #endif
-	     ]
+            ]
           )
           activex=:
-  	  PLUGINS_BINDINGS="${PLUGINS_BINDINGS} activex"
+          PLUGINS_BINDINGS="${PLUGINS_BINDINGS} activex"
         ],
         [ AC_MSG_ERROR([required OLE headers are missing from your system]) ]
       )],
