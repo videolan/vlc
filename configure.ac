@@ -5303,6 +5303,11 @@ AC_ARG_ENABLE(libgcrypt,
 AS_IF([test "${enable_libgcrypt}" != "no"], [
   AM_PATH_LIBGCRYPT([1:1.1.94], [have_libgcrypt="yes"], [have_libgcrypt="no"])
 ])
+if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"; then
+  AS_IF([test "${have_libgcrypt}" = "yes"],[
+    VLC_ADD_LIBS([rtp], [${LIBGCRYPT_LIBS}])
+  ])
+fi
 AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
 
 dnl
