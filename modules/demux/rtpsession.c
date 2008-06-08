@@ -297,7 +297,7 @@ rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
     block_t **pp = &src->blocks;
     for (block_t *prev = *pp; prev != NULL; prev = *pp)
     {
-        if ((int16_t)(seq - rtp_seq (*pp)) >= 0)
+        if ((int16_t)(seq - rtp_seq (*pp)) < 0)
             break;
         pp = &prev->p_next;
     }
