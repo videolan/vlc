@@ -58,7 +58,7 @@
 #   define ETIMEDOUT WSAETIMEDOUT
 #endif
 
-static int SocksNegociate( vlc_object_t *, int fd, int i_socks_version,
+static int SocksNegotiate( vlc_object_t *, int fd, int i_socks_version,
                            const char *psz_user, const char *psz_passwd );
 static int SocksHandshakeTCP( vlc_object_t *,
                               int fd, int i_socks_version,
@@ -334,11 +334,11 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 
 
 /*****************************************************************************
- * SocksNegociate:
+ * SocksNegotiate:
  *****************************************************************************
- * Negociate authentication with a SOCKS server.
+ * Negotiate authentication with a SOCKS server.
  *****************************************************************************/
-static int SocksNegociate( vlc_object_t *p_obj,
+static int SocksNegotiate( vlc_object_t *p_obj,
                            int fd, int i_socks_version,
                            const char *psz_socks_user,
                            const char *psz_socks_passwd )
@@ -350,7 +350,7 @@ static int SocksNegociate( vlc_object_t *p_obj,
     if( i_socks_version != 5 )
         return VLC_SUCCESS;
 
-    /* We negociate authentication */
+    /* We negotiate authentication */
 
     if( ( psz_socks_user == NULL ) && ( psz_socks_passwd == NULL ) )
         b_auth = true;
@@ -442,7 +442,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
     }
 
     if( i_socks_version == 5 &&
-        SocksNegociate( p_obj, fd, i_socks_version,
+        SocksNegotiate( p_obj, fd, i_socks_version,
                         psz_user, psz_passwd ) )
         return VLC_EGENERIC;
 
