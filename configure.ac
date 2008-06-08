@@ -313,13 +313,13 @@ case "${host_os}" in
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([activex mozilla],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx cddax sdl_image],[-lwinmm])
-        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp rtp telnet rc netsync gnutls growl_udp flac ts audioscrobbler lua],[-lws2_32])
+        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp rtp telnet rc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
         VLC_ADD_CPPFLAGS([libvlc vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([libvlc vlc],[-e WinMainCRTStartup])
-        VLC_ADD_LIBS([libvlc access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp sap http netsync audioscrobbler growl rtp stream_out_rtp],[-lws2])
+        VLC_ADD_LIBS([libvlc access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp sap http netsync audioscrobbler growl rtp stream_out_rtp remoteosd],[-lws2])
         VLC_ADD_LIBS([libvlc],[-lmmtimer])
    fi
     ;;
@@ -518,7 +518,7 @@ AC_CHECK_FUNCS(connect,,[
 
 AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,[
-    VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp sap access_output_udp access_output_rtmp stream_out_standard growl_udp],[-lsocket])
+    VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp sap access_output_udp access_output_rtmp stream_out_standard growl_udp remoteosd],[-lsocket])
   ])
 ])
 
@@ -5337,6 +5337,24 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     ])
   ])
 ])
+
+
+dnl
+dnl RemoteOSD plugin (VNC client as video filter)
+dnl
+AC_ARG_ENABLE(remoteosd,
+  [  --disable-remoteosd         RemoteOSD plugin (default enabled)])
+
+AS_IF([test "${enable_remoteosd}" != "no"], [
+  AS_IF([test "${have_libgcrypt}" = "yes"],[
+    VLC_ADD_PLUGIN([remoteosd])
+    VLC_ADD_LIBS([remoteosd], ${GCRYPT_LIBS})
+    VLC_ADD_CFLAGS([remoteosd], ${GCRYPT_CFLAGS})
+  ], [
+    AC_MSG_ERROR([libgcrypt support required for RemoteOSD plugin])
+  ])
+])
+
 
 dnl
 dnl update checking system
