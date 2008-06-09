@@ -43,6 +43,7 @@ Brian C. Wiles - vlm schedule date fix
 Brian Robb <vascy at hotmail dot com> - win32 CD/DVD drive detection in wx, bug fixes
 Brian Raymond <braymond at echostorm dot net> - Quicktime 404 error on RTSP SETUP fix
 Brieuc Jeunhomme <bbp at via.ecp.fr> - bug fixes
+Bruno Queirós <brunoqueiros at portugalmail dot com> - Portuguese localisation
 Bruno Vella <allevb at tin.it> - Italian localization
 Carlo Calabrò <murray at via.ecp.fr> - Italian localization
 Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fix
