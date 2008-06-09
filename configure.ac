@@ -231,6 +231,8 @@ case "${host_os}" in
         echo "  Assuming --enable-twolame"
         enable_realrtsp="yes"
         echo "  Assuming --enable-realrtsp"
+        enable_update_check="yes"
+        echo "  Assuming --enable-update-check"
 
         enable_skins2="no"
         echo "  Assuming --disable-skins2"
