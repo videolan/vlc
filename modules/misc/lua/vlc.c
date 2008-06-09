@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc.c: Generic lua inteface functions
+ * vlc.c: Generic lua interface functions
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
@@ -52,7 +52,7 @@
 #define INTF_TEXT N_("Lua interface")
 #define INTF_LONGTEXT N_("Lua interface module to load")
 
-#define CONFIG_TEXT N_("Lua inteface configuration")
+#define CONFIG_TEXT N_("Lua interface configuration")
 #define CONFIG_LONGTEXT N_("Lua interface configuration string. Format is: '[\"<interface module name>\"] = { <option> = <value>, ...}, ...'.")
 
 vlc_module_begin();

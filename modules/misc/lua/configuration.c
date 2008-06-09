@@ -1,5 +1,5 @@
 /*****************************************************************************
- * configuration.c: Generic lua<->vlc config inteface
+ * configuration.c: Generic lua<->vlc config interface
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$

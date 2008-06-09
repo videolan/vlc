@@ -1,5 +1,5 @@
 /*****************************************************************************
- * intf.c: Generic lua inteface functions
+ * intf.c: Generic lua interface functions
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$

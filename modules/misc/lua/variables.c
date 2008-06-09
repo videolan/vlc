@@ -1,5 +1,5 @@
 /*****************************************************************************
- * variables.c: Generic lua<->vlc variables inteface
+ * variables.c: Generic lua<->vlc variables interface
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
