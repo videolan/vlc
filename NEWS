@@ -46,20 +46,36 @@ Playlist:
     * Media library support
     * "Live search"
     * Shoutcast TV listings
-    * Audioscrobbler/last.fm support
+    * Audioscrobbler/Last.FM support
  * Album art support
  * User definable Lua playlist scripts. See share/lua/playlist/README.txt
    (Default scripts open YouTube, DailyMotion, metacafe and Google Video URLs)
  * User definable Lua metadata and album art fetcher scripts. See
    share/lua/meta/README.txt
 
-Input/Demuxers:
+Inputs:
  * UDP-Lite transport for RTP/AVP
  * DCCP transport for RTP/AVP
  * Proxy support for MMSH stream
  * JACK audio input support
- * MP4 gpac and Apple chapter support
  * Input run time option (improved live stream recording)
+ * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
+ * Re-written Screen access module for Mac OS X
+   using OpenGL instead of QuickDraw
+ * Screen module now supports partial screen capture and mouse following on X11.
+ * Experimental EyeTV access module (Mac OS X only)
+   This requires the user to install a plugin to EyeTV.app
+   (available as a separate download).
+ * RTMP input support
+ * QTKit-based Input module for Mac OS X allowing display and streaming of video
+   taken from all QuickTime-compatible video devices (no audio yet)
+ * HTTP access now supports gzip compressed data and Digest Access
+   Authentication.
+ * New options to reduce latency between arrival of raw data and display of
+   frames. (--auto-adjust-pts-delay and --use-stream-immediate)
+
+Demuxers:
+ * MP4 gpac and Apple chapter support
  * Fixed playback of AIFF stereo files
  * Fixed audio glitch on seek
  * Improved FLAC demuxer (duration / current time / meta data)
@@ -71,20 +87,8 @@ Input/Demuxers:
  * Standard MIDI File (types 0 & 1) support
  * TiVo Series 2 support
  * v4l2 access module support
- * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
  * CD+G karaoke Files support
  * MXF files support
- * Re-written Screen access module for Mac OS X
-   using OpenGL instead of QuickDraw
- * Screen module now supports partial screen capture and mouse following on X11.
- * Experimental EyeTV access module (Mac OS X only)
-   This requires the user to install a plugin to EyeTV.app
-   (available as a separate download).
- * HTTP access now supports gzip compressed data and Digest Access
-   Authentication.
- * New options to reduce latency between arrival of raw data and display of
-   frames. (--auto-adjust-pts-delay and --use-stream-immediate)
- * RTMP input support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
@@ -122,7 +126,7 @@ Encoders:
  * Flash Screen Video support
  * Improved H.264 encoding speed
 
-Video output and filters:
+Video outputs and filters:
  * New CoreAnimation output module (Mac OS X 10.5 only)
  * Adjust, Invert and Distort (now split into Wave, Ripple, Gradient and
    Psychedelic) video filters can now be streamed
@@ -143,7 +147,7 @@ Video output and filters:
  * Support for Intel SSE2 instruction set in chroma converters
  * Improved use of Intel MMX instruction set in chroma converters
 
-Audio output and filters
+Audio outputs and filters:
  * Replay gain support
  * Audio playback when going slower/faster (no pitch filter yet)
  * New spatializer audio filter
@@ -199,6 +203,7 @@ Linux Port:
 Mac OS X Port:
  * Mac OS X Framework that can be used to embed VLC in third party
    applications (Google Summer of Code Student project, Mac OS X 10.5 only)
+ * New text renderer based on Quartz replacing the existing Freetype solution
  * Complete compatibility with Mac OS X 10.5 Leopard
    * It is now required to compile a fully featured build
  * The support of Mac OS X 10.3.9 was discontinued.
