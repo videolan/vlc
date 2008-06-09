@@ -1,0 +1,7 @@
+SOURCES_avformat = \
+    avformat.c \
+    avformat.h \
+    demux.c \
+    mux.c \
+    $(NULL)
+
