@@ -153,7 +153,7 @@ def Stop(widget):
     update(0)
 
 def Quit(widget):
-    player.Quit(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
+    root.Quit(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     l_title.set_text("")
 
 def Pause(widget):
