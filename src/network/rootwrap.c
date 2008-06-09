@@ -205,12 +205,24 @@ int main (int argc, char *argv[])
     setrlimit (RLIMIT_RTPRIO, &rlim);
 #endif
 
-    setuid (getuid ());
+    uid_t uid = getuid ();
+    if (uid == 0)
+    {
+        const char *sudo = getenv ("SUDO_UID");
+        if (sudo)
+            uid = atoi (sudo);
+    }
+    if (uid == 0)
+    {
+        fprintf (stderr, "Cannot determine unprivileged user for VLC!\n");
+        exit (1);
+    }
+    setuid (uid);
 
     if (!setuid (0)) /* sanity check: we cannot get root back */
         exit (1);
 
-    /* Yeah, the user can force to execute just about anything from here.
+    /* Yeah, the user can execute just about anything from here.
      * But we've dropped privileges, so it does not matter. */
     if (strlen (argv[0]) < sizeof ("-wrapper"))
         goto error;
