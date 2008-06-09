@@ -54,6 +54,7 @@ Playlist:
    share/lua/meta/README.txt
 
 Inputs:
+ * Video for Linux 2 (V4L2) input support
  * UDP-Lite transport for RTP/AVP
  * DCCP transport for RTP/AVP
  * Proxy support for MMSH stream
@@ -86,7 +87,6 @@ Demuxers:
  * Raw video support
  * Standard MIDI File (types 0 & 1) support
  * TiVo Series 2 support
- * v4l2 access module support
  * CD+G karaoke Files support
  * MXF files support
 
