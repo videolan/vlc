@@ -35,9 +35,8 @@ Important notes:
  * The old access:url syntax is no longer supported. Use access://url instead.
 	E.g.:  vlc:quit -> vlc://quit ; 
 	       udp:@239.255.12.12 -> udp://@239.255.12.12
- * The ffmpeg module has been removed and replaced by the avcodec, avformat,
-   swscale (or imgresample if you use a swscale-less ffmpeg build) and
-   postproc modules.
+ * The ffmpeg module has been removed and replaced by avcodec, avformat, swscale
+   (or imgresample if you use a swscale-less ffmpeg build) and postproc modules.
 
 Changes:
 --------
@@ -75,8 +74,8 @@ Input/Demuxers:
  * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
  * CD+G karaoke Files support
  * MXF files support
- * Re-written Screen access module for Mac OS X using OpenGL 
-   instead of QuickDraw
+ * Re-written Screen access module for Mac OS X
+   using OpenGL instead of QuickDraw
  * Screen module now supports partial screen capture and mouse following on X11.
  * Experimental EyeTV access module (Mac OS X only)
    This requires the user to install a plugin to EyeTV.app
@@ -173,7 +172,7 @@ Interfaces:
    * Full support for meta data editing (ID3v2, Ogg/Vorbis, AAC, APEv1/2)
  * Mac OS X
    * Improved video output features
-   * Access to VideoLAN's Help Wiki within VLC
+   * Online access to VideoLAN's Help Wiki within VLC
    * New setting to disable the "Recent Items" service
    * When playing Radio (live) streams, the current track is shown correctly
    * Correct appearance on Macs using Aqua's graphite theme
@@ -188,7 +187,7 @@ Interfaces:
      (Media Player Remote Interfacing specification), a common dbus control 
      interface for media players that intends to become an xdg standard when 
      finished: http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces .
-   * Motion module use disk accelerometers to keep video horizontal
+   * Motion module using disk accelerometers to keep video horizontal
    * Plugin to set Telepathy presence message using MissionControl
  * Fixed VLM schedule time on Linux
 
@@ -213,10 +212,54 @@ New Localizations:
  * Persian
  * Polish
 
-Developpers:
+Developers:
   * LibVLC now supports externally built plugins properly.
     A "vlc-plugin" pkg-config package is provided.
   * Java bindings are now built from a separate source.
+
+
+Changes between 0.8.6g and 0.8.6h:
+----------------------------------
+
+Security updates:
+ * Updated GnuTLS and libgcrypt on Windows and Mac OS X (CVE-2008-1948, 
+   CVE-2008-1949, CVE-2008-1950)
+ * Updated libxml2 on Windows and Mac OS X (CVE-2007-6284)
+
+Goodies:
+ * Updated libebml and libmatroska on Mac OS X. Reliability improvements.
+ * Miscellaneous bugfixes in multiple modules and in libvlc
+   (ftp access, record access filter, video filters, RC interface, 
+    playlist demuxer, IP networking, MPJPEG muxer, stream outputs)
+ * Improved support for MPEG2 content created by Final Cut Pro
+ * More reliable audio reception for MPEG TS streams
+ * Fixed a regression in 0.8.6g where usage of the snapshot feature could lead
+   to an unexpected application termination
+ * New Serbian translation
+ * Updated Romanian translation
+
+
+Changes between 0.8.6f and 0.8.6g:
+----------------------------------
+
+Security updates:
+ * Removed VLC variable settings from Mozilla and ActiveX 
+   (CVE-2007-6683, VideoLAN-SA-0804)
+ * Removed loading plugins from the current directory 
+   (CVE-2008-2147, VideoLAN-SA-0805)
+ * Updated libpng on Windows and Mac OS X (CVE-2008-1382)
+ * Fixed libid3tag denial of service (CVE-2008-2109)
+ * Fixed libvorbis vulnerabilities (CVE-2008-1419, CVE-2008-1420, CVE-2008-1423)
+ * Fixed speex insufficient boundary check (CVE-2008-1686, oCERT-2008-004)
+
+Various bugfixes:
+ * Fixed various memory leaks, improving stability when running as a server
+ * Fixed compilation with recent versions of FFmpeg
+ * Correctly parses SAP announcements from MPEG-TS
+ * Fixed AAC resampling
+ * The Fullscreen Controller appears correctly on Mac OS X, 
+   if the 'Always-on-top' video option was selected.
+
 
 Changes between 0.8.6e and 0.8.6f:
 ----------------------------------
