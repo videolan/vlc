@@ -47,7 +47,7 @@ typedef struct
     demux_t  *p_demux;
 
     /* Title infos for that input */
-    bool   b_title_demux; /* Titles/Seekpoints provided by demux */
+    bool         b_title_demux; /* Titles/Seekpoints provided by demux */
     int          i_title;
     input_title_t **title;
 
@@ -65,7 +65,7 @@ typedef struct
     bool b_can_rate_control;
     bool b_rescale_ts;
 
-    bool b_eof;   /* eof of demuxer */
+    bool       b_eof;   /* eof of demuxer */
     double     f_fps;
 
     /* Clock average variation */
@@ -80,8 +80,8 @@ struct input_thread_private_t
     vlc_event_manager_t event_manager;
 
     /* Global properties */
-    bool  b_can_pause;
-    bool  b_can_rate_control;
+    bool        b_can_pause;
+    bool        b_can_rate_control;
 
     int         i_rate;
     /* */
@@ -105,9 +105,9 @@ struct input_thread_private_t
     input_attachment_t **attachment;
 
     /* Output */
-    es_out_t    *p_es_out;
+    es_out_t        *p_es_out;
     sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
-    bool      b_out_pace_control; /*     idem ? */
+    bool            b_out_pace_control; /*     idem ? */
 
     /* Main input properties */
     input_source_t input;
@@ -363,7 +363,7 @@ typedef struct
     mtime_t                 last_update;
     int                     i_synchro_state;
 
-    bool              b_master;
+    bool                    b_master;
 
     int                     i_rate;
 
@@ -466,7 +466,7 @@ struct stream_t
     /* UTF-16 and UTF-32 file reading */
     vlc_iconv_t     conv;
     int             i_char_width;
-    bool      b_little_endian;
+    bool            b_little_endian;
 };
 
 #include <libvlc.h>

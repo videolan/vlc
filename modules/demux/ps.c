@@ -388,7 +388,7 @@ static int Demux( demux_t *p_demux )
 #endif
                 !ps_pkt_parse_pes( p_pkt, tk->i_skip ) ) )
             {
-                if( !b_new && !p_sys->b_have_pack && 
+                if( !b_new && !p_sys->b_have_pack &&
                     (tk->fmt.i_cat == AUDIO_ES) &&
                     (p_pkt->i_pts > 0) )
                 {
