@@ -5350,8 +5350,8 @@ AC_ARG_ENABLE(remoteosd,
 AS_IF([test "${enable_remoteosd}" != "no"], [
   AS_IF([test "${have_libgcrypt}" = "yes"],[
     VLC_ADD_PLUGIN([remoteosd])
-    VLC_ADD_LIBS([remoteosd], ${GCRYPT_LIBS})
-    VLC_ADD_CFLAGS([remoteosd], ${GCRYPT_CFLAGS})
+    VLC_ADD_LIBS([remoteosd], ${LIBGCRYPT_LIBS})
+    VLC_ADD_CFLAGS([remoteosd], ${LIBGCRYPT_CFLAGS})
   ], [
     AC_MSG_ERROR([libgcrypt support required for RemoteOSD plugin])
   ])
