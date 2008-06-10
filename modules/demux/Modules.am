@@ -34,7 +34,30 @@ SOURCES_demux_cdg = cdg.c
 SOURCES_smf = smf.c
 
 libvlc_LTLIBRARIES += \
+	liba52sys_plugin.la \
+	libaiff_plugin.la \
+	libau_plugin.la \
+	libdemux_cdg_plugin.la \
+	libdemuxdump_plugin.la \
+	libdtssys_plugin.la \
+	libflacsys_plugin.la \
+	libmjpeg_plugin.la \
+	libnsv_plugin.la \
+	libnuv_plugin.la \
+	libpva_plugin.la \
+	librawdv_plugin.la \
+	librawvid_plugin.la \
+	libreal_plugin.la \
 	librtp_plugin.la \
+	libsmf_plugin.la \
+	libsubtitle_plugin.la \
+	libtta_plugin.la \
+	libty_plugin.la \
+	libvc1_plugin.la \
+	libvobsub_plugin.la \
+	libvoc_plugin.la \
+	libwav_plugin.la \
+	libxa_plugin.la \
 	$(NULL)
 
 # RTP plugin
