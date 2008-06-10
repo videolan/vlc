@@ -40,6 +40,7 @@
 
 #include <QWidget>
 #include <QFrame>
+
 #define VOLUME_MAX 200
 
 /* on WIN32 hide() for fullscreen controller doesnt work, so it have to be
@@ -49,14 +50,12 @@
 #endif
 
 /* to trying transparency with fullscreen controller on windows enable that */
-/* #define TRANSPARENCY */
-
-/* it can be enabled on non windows systems,
+#define HAVE_TRANSPARENCY 0
+/* it can be enabled on-non windows systems,
    but it will be transparent only with composite manager */
 #ifndef WIN32
-    #define TRANSPARENCY
+    #define HAVE_TRANSPARENCY 1
 #endif
-
 
 class ResizeEvent;
 class QPalette;
@@ -254,26 +253,23 @@ protected:
 
 private slots:
     void hideFSControllerWidget();
-
-    #ifdef TRANSPARENCY
     void slowHideFSC();
-    #endif
 
 private:
     QTimer *p_hideTimer;
 
-    #ifdef TRANSPARENCY
+#if HAVE_TRANSPARENCY
     QTimer *p_slowHideTimer;
-    #endif
+#endif
 
     int i_lastPosX;
     int i_lastPosY;
     int i_hideTimeout;  /* FSC hiding timeout, same as mouse hiding timeout */
     bool b_mouseIsOver;
 
-    #ifdef WIN32TRICK
+#ifdef WIN32TRICK
     bool fscHidden;
-    #endif
+#endif
 
     virtual void customEvent( QEvent *event );
 };

@@ -23,6 +23,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -860,10 +861,10 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     p_hideTimer->setSingleShot( true );
 
     /* slow hiding timer */
-    #ifdef TRANSPARENCY
+#if HAVE_TRANSPARENCY
     p_slowHideTimer = new QTimer( this );
     CONNECT( p_slowHideTimer, timeout(), this, slowHideFSC() );
-    #endif
+#endif
 
     adjustSize ();  /* need to get real width and height for moving */
 
@@ -899,7 +900,6 @@ void FullscreenControllerWidget::hideFSControllerWidget()
     #endif
 }
 
-#ifdef TRANSPARENCY
 /**
  * Hidding fullscreen controller slowly
  * Linux: need composite manager
@@ -907,6 +907,7 @@ void FullscreenControllerWidget::hideFSControllerWidget()
  */
 void FullscreenControllerWidget::slowHideFSC()
 {
+#if HAVE_TRANSPARENCY
     static bool first_call = true;
 
     if ( first_call )
@@ -933,8 +934,8 @@ void FullscreenControllerWidget::slowHideFSC()
              p_slowHideTimer->stop();
          }
     }
-}
 #endif
+}
 
 /**
  * Get state of visibility of FS controller on screen
@@ -973,9 +974,9 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
         show();
         #endif
 
-        #ifdef TRANSPARENCY
+#if HAVE_TRANSPARENCY
         setWindowOpacity( 0.75 );
-        #endif
+#endif
     }
     else if ( type == FullscreenControlHide_Type )
     {
@@ -984,9 +985,9 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
     else if ( type == FullscreenControlPlanHide_Type && !b_mouseIsOver )
     {
         p_hideTimer->start( i_hideTimeout );
-        #ifdef TRANSPARENCY
+#if HAVE_TRANSPARENCY
         p_slowHideTimer->start( i_hideTimeout / 2 );
-        #endif
+#endif
     }
 }
 
@@ -1024,9 +1025,9 @@ void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
 void FullscreenControllerWidget::enterEvent( QEvent *event )
 {
     p_hideTimer->stop();
-    #ifdef TRANSPARENCY
+#if HAVE_TRANSPARENCY
     p_slowHideTimer->stop();
-    #endif
+#endif
     b_mouseIsOver = true;
 }
 
@@ -1036,9 +1037,9 @@ void FullscreenControllerWidget::enterEvent( QEvent *event )
 void FullscreenControllerWidget::leaveEvent( QEvent *event )
 {
     p_hideTimer->start( i_hideTimeout );
-    #ifdef TRANSPARENCY
+#if HAVE_TRANSPARENCY
     p_slowHideTimer->start( i_hideTimeout / 2 );
-    #endif
+#endif
     b_mouseIsOver = false;
 }
 
