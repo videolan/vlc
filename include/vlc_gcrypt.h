@@ -79,7 +79,6 @@ static struct gcry_thread_cbs gcry_threads_vlc =
 
 /**
  * Initializes gcrypt with proper locking.
- * @return VLC_SUCCESS on success, a VLC error code otherwise.
  */
 static inline void vlc_gcrypt_init (void)
 {
