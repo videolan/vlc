@@ -4,6 +4,7 @@
  * Copyright (C) 2005 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -403,30 +404,68 @@ STDMETHODIMP VLCControl::get_Length(int *seconds)
 
 STDMETHODIMP VLCControl::playFaster(void)
 {
+    int32_t rate = 2;
+
     HRESULT result = E_UNEXPECTED;
-    if( _p_instance->isRunning() )
+    if( !_p_instance->isRunning() )
+        return result;
+
+    libvlc_instance_t* p_libvlc;
+    result = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(result) )
     {
-        libvlc_instance_t *p_libvlc;
-        result = _p_instance->getVLC(&p_libvlc);
-        if( SUCCEEDED(result) )
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_player_t *p_md;
+        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
         {
-            VLC_SpeedFaster(i_vlc);
+            libvlc_media_player_set_rate(p_md, rate, &ex);
+            libvlc_media_player_release(p_md);
+            if( ! libvlc_exception_raised(&ex) )
+            {
+                return NOERROR;
+            }
         }
+        _p_instance->setErrorInfo(IID_IVLCControl,
+                     libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
     return result;
 };
 
 STDMETHODIMP VLCControl::playSlower(void)
 {
+    float rate = 0.5;
+
     HRESULT result = E_UNEXPECTED;
-    if( _p_instance->isRunning() )
+    if( !_p_instance->isRunning() )
+        return result;
+
+    libvlc_instance_t* p_libvlc;
+    result = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(result) )
     {
-        libvlc_instance_t *p_libvlc;
-        result = _p_instance->getVLC(&p_libvlc);
-        if( SUCCEEDED(result) )
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_player_t *p_md;
+        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
         {
-            VLC_SpeedSlower(i_vlc);
+            libvlc_media_player_set_rate(p_md, rate, &ex);
+            libvlc_media_player_release(p_md);
+            if( ! libvlc_exception_raised(&ex) )
+            {
+                return NOERROR;
+            }
         }
+        _p_instance->setErrorInfo(IID_IVLCControl,
+                     libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
     return result;
 };
@@ -470,6 +509,8 @@ STDMETHODIMP VLCControl::toggleMute(void)
 
 STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
 {
+    return E_INVALIDARG;
+#if 0
     if( 0 == SysStringLen(name) )
         return E_INVALIDARG;
 
@@ -576,10 +617,13 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
         CoTaskMemFree(psz_varname);
     }
     return hr;
+#endif
 };
 
 STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
 {
+    return E_INVALIDARG;
+#if 0
     if( NULL == value )
         return E_POINTER;
 
@@ -649,6 +693,7 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
         return hr;
     }
     return hr;
+#endif
 };
 
 void VLCControl::FreeTargetOptions(char **cOptions, int cOptionCount)
@@ -970,7 +1015,7 @@ HRESULT VLCControl::CreateTargetOptions(int codePage, VARIANT *options, char ***
 ** for compatibility with some scripting language (JScript)
 */
 
-STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistMode mode, int position)
+STDMETHODIMP VLCControl::addTarget(BSTR uri, VARIANT options, enum VLCPlaylistMode mode, int position)
 {
     if( 0 == SysStringLen(uri) )
         return E_INVALIDARG;
@@ -989,27 +1034,39 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
         if( FAILED(CreateTargetOptions(CP_UTF8, &options, &cOptions, &cOptionsCount)) )
             return E_INVALIDARG;
 
-        if( VLC_SUCCESS <= VLC_AddTarget(i_vlc, cUri, (const char **)cOptions, cOptionsCount, mode, position) )
-        {
-            hr = NOERROR;
-            if( mode & PLAYLIST_GO )
-                _p_instance->fireOnPlayEvent();
-        }
-        else
-        {
-            hr = E_FAIL;
-            if( mode & PLAYLIST_GO )
-                _p_instance->fireOnStopEvent();
-        }
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        position = libvlc_playlist_add_extended(p_libvlc, cUri, cUri,
+                                                cOptionsCount,
+                                                const_cast<const char**>(cOptions),
+                                                &ex);
 
         FreeTargetOptions(cOptions, cOptionsCount);
         CoTaskMemFree(cUri);
+
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCPlaylist,
+                libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+
+            if( mode & VLCPlayListAppendAndGo )
+                _p_instance->fireOnStopEvent();
+            return E_FAIL;
+        }
+
+        if( mode & VLCPlayListAppendAndGo )
+            _p_instance->fireOnPlayEvent();
+        return NOERROR;
     }
     return hr;
 };
 
 STDMETHODIMP VLCControl::get_PlaylistIndex(int *index)
 {
+    return E_INVALIDARG;
+#if 0
     if( NULL == index )
         return E_POINTER;
 
@@ -1022,6 +1079,7 @@ STDMETHODIMP VLCControl::get_PlaylistIndex(int *index)
     }
     *index = 0;
     return result;
+#endif
 };
 
 STDMETHODIMP VLCControl::get_PlaylistCount(int *count)
