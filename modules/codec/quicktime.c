@@ -66,7 +66,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( N_("QuickTime library decoder") );
-    set_capability( "decoder", 10 );
+    set_capability( "decoder", 100 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_callbacks( Open, Close );
@@ -229,6 +229,7 @@ static int Open( vlc_object_t *p_this )
 
     switch( p_dec->fmt_in.i_codec )
     {
+        case VLC_FOURCC('h','2','6','4'): /* H.264 */
         case VLC_FOURCC('S','V','Q','3'): /* Sorenson v3 */
     /*    case VLC_FOURCC('S','V','Q','1'):  Sorenson v1
         case VLC_FOURCC('Z','y','G','o'):
