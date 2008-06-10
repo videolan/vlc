@@ -95,10 +95,16 @@ void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
     while( p_chain->filters.i_count )
         filter_chain_DeleteFilter( p_chain,
                                    (filter_t*)p_chain->filters.pp_elems[0] );
-    es_format_Clean( &p_chain->fmt_in );
-    es_format_Clean( &p_chain->fmt_out );
-    es_format_Copy( &p_chain->fmt_in, p_fmt_in );
-    es_format_Copy( &p_chain->fmt_out, p_fmt_out );
+    if( p_fmt_in )
+    {
+        es_format_Clean( &p_chain->fmt_in );
+        es_format_Copy( &p_chain->fmt_in, p_fmt_in );
+    }
+    if( p_fmt_out )
+    {
+        es_format_Clean( &p_chain->fmt_out );
+        es_format_Copy( &p_chain->fmt_out, p_fmt_out );
+    }
 }
 
 

@@ -54,7 +54,6 @@ static picture_t *spu_new_video_buffer( filter_t * );
 static void spu_del_video_buffer( filter_t *, picture_t * );
 
 static int spu_ParseChain( spu_t * );
-static void spu_DeleteChain( spu_t * );
 static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 
@@ -189,15 +188,10 @@ void spu_Destroy( spu_t *p_spu )
         vlc_object_release( p_spu->p_scale );
     }
 
-    spu_DeleteChain( p_spu );
+    filter_chain_Delete( p_spu->p_chain );
 
     vlc_mutex_destroy( &p_spu->subpicture_lock );
     vlc_object_release( p_spu );
-}
-
-static void spu_DeleteChain( spu_t *p_spu )
-{
-    filter_chain_Delete( p_spu->p_chain );
 }
 
 /**
@@ -1345,7 +1339,7 @@ static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
 
     spu_t *p_spu = (spu_t *)p_data;
     vlc_mutex_lock( &p_spu->subpicture_lock );
-    spu_DeleteChain( p_spu );
+    filter_chain_Reset( p_spu->p_chain, NULL, NULL );
     spu_ParseChain( p_spu );
     vlc_mutex_unlock( &p_spu->subpicture_lock );
     return VLC_SUCCESS;
