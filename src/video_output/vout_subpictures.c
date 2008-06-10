@@ -1142,12 +1142,13 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
  * This function destroys the subpictures which belong to the spu channel
  * corresponding to i_channel_id.
  *****************************************************************************/
-static void SpuClearChannel( spu_t *p_spu, int i_channel )
+static void SpuClearChannel( spu_t *p_spu, int i_channel, bool b_locked )
 {
     int          i_subpic;                               /* subpicture index */
     subpicture_t *p_subpic = NULL;                  /* first free subpicture */
 
-    vlc_mutex_lock( &p_spu->subpicture_lock );
+    if( !b_locked )
+        vlc_mutex_lock( &p_spu->subpicture_lock );
 
     for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
     {
@@ -1173,7 +1174,8 @@ static void SpuClearChannel( spu_t *p_spu, int i_channel )
         }
     }
 
-    vlc_mutex_unlock( &p_spu->subpicture_lock );
+    if( !b_locked )
+        vlc_mutex_unlock( &p_spu->subpicture_lock );
 }
 
 /*****************************************************************************
@@ -1192,7 +1194,7 @@ static int spu_vaControlDefault( spu_t *p_spu, int i_query, va_list args )
 
     case SPU_CHANNEL_CLEAR:
         i = (int)va_arg( args, int );
-        SpuClearChannel( p_spu, i );
+        SpuClearChannel( p_spu, i, false );
         break;
 
     default:
@@ -1364,5 +1366,7 @@ static int sub_filter_allocation_init( filter_t *p_filter, void *p_data )
 
 static void sub_filter_allocation_clear( filter_t *p_filter )
 {
+    filter_owner_sys_t *p_sys = p_filter->p_owner;
+    SpuClearChannel( p_sys->p_spu, p_sys->i_channel, true );
     free( p_filter->p_owner );
 }
