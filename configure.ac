@@ -3040,7 +3040,7 @@ AC_ARG_ENABLE(postproc,
 [  --enable-postproc   libpostproc image post-processing (default enabled)])
 if test "${enable_postproc}" != "no"
 then
-  PKG_CHECK_MODULES(POSTPROC,[libpostproc],
+  PKG_CHECK_MODULES(POSTPROC,[libpostproc libavutil],
     [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
