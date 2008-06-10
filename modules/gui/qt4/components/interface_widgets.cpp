@@ -826,7 +826,11 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     QGridLayout *fsLayout = new QGridLayout( this );
     controlLayout->setSpacing( 0 );
+    #if QT43
     controlLayout->setContentsMargins( 5, 1, 5, 1 );
+    #else
+    controlLayout->setMargin( 5 );
+    #endif
 
     fsLayout->addWidget( slowerButton, 0, 0 );
     slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -842,7 +846,9 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     fsLayout->addWidget( discFrame, 1, 4 );
 
+    #ifdef ZVBI_COMPILED
     fsLayout->addWidget( telexFrame, 1, 5 );
+    #endif
 
     fsLayout->addWidget( advControls, 1, 6, Qt::AlignVCenter );
 
@@ -909,7 +915,8 @@ void FullscreenControllerWidget::slowHideFSC()
 
         p_slowHideTimer->stop();
         /* the last part of time divided to 100 pieces */
-        p_slowHideTimer->start( i_hideTimeout / 2 / ( windowOpacity() * 100 ) );
+        p_slowHideTimer->start(
+            (int) ( i_hideTimeout / 2 / ( windowOpacity() * 100 ) ) );
     }
     else
     {
