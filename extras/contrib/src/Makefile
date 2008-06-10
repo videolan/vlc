@@ -1067,8 +1067,7 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 ifdef SVN
 ffmpeg:
-	$(SVN) co $(FFMPEG_SVN) ffmpeg -r 12920
-	(cd $@; patch -p0 < ../Patches/ffmpeg-pkg-config.patch)
+	$(SVN) co $(FFMPEG_SVN) ffmpeg 
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-beos.patch)
 endif
@@ -1090,7 +1089,6 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
-	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-configure.patch )
 else
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	echo "ffmpeg snapshot is too old, you MUST use subversion !"
