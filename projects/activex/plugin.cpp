@@ -410,21 +410,6 @@ HRESULT VLCPlugin::onLoad(void)
     return S_OK;
 };
 
-HRESULT VLCPlugin::getVLCObject(int* i_vlc)
-{
-    libvlc_instance_t *p_libvlc;
-    HRESULT result = getVLC(&p_libvlc);
-    if( SUCCEEDED(result) )
-    {
-        *i_vlc = libvlc_get_vlc_id(p_libvlc);
-    }
-    else
-    {
-        *i_vlc = 0;
-    }
-    return result;
-}
-
 HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
 {
     extern HMODULE DllGetModule();
@@ -485,16 +470,21 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         /* common settings */
         ppsz_argv[ppsz_argc++] = "--no-stats";
         ppsz_argv[ppsz_argc++] = "--no-media-library";
+        ppsz_argv[ppsz_argc++] = "--ignore-config";
         ppsz_argv[ppsz_argc++] = "--intf=dummy";
 
         // loop mode is a configuration option only
         if( _b_autoloop )
             ppsz_argv[ppsz_argc++] = "--loop";
 
-        _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv, NULL);
-        if( NULL == _p_libvlc )
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv, &ex);
+        if( libvlc_exception_raised(&ex) )
         {
             *pp_libvlc = NULL;
+            libvlc_exception_clear(&ex);
             return E_FAIL;
         }
 
@@ -668,7 +658,8 @@ HRESULT VLCPlugin::onClose(DWORD dwSaveOption)
         _p_libvlc = NULL;
         vlcDataObject->onClose();
 
-        libvlc_release(p_libvlc);
+        if( p_libvlc )
+            libvlc_release(p_libvlc);
     }
     return S_OK;
 };

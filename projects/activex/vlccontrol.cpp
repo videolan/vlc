@@ -123,8 +123,8 @@ STDMETHODIMP VLCControl::put_Visible(VARIANT_BOOL isVisible)
 
 STDMETHODIMP VLCControl::play(void)
 {
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         VLC_Play(i_vlc);
@@ -135,8 +135,8 @@ STDMETHODIMP VLCControl::play(void)
 
 STDMETHODIMP VLCControl::pause(void)
 {
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         VLC_Pause(i_vlc);
@@ -147,8 +147,8 @@ STDMETHODIMP VLCControl::pause(void)
 
 STDMETHODIMP VLCControl::stop(void)
 {
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         VLC_Stop(i_vlc);
@@ -165,11 +165,14 @@ STDMETHODIMP VLCControl::get_Playing(VARIANT_BOOL *isPlaying)
     HRESULT result = NOERROR;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
-            *isPlaying = VLC_IsPlaying(i_vlc) ? VARIANT_TRUE : VARIANT_FALSE;
+            if( libvlc_playlist_isplaying(p_libvlc, NULL) )
+                *isPlaying = VARIANT_TRUE;
+            else
+                *isPlaying = VARIANT_FALSE;
             return NOERROR;
         }
     }
@@ -185,8 +188,8 @@ STDMETHODIMP VLCControl::get_Position(float *position)
     HRESULT result = E_UNEXPECTED;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
             *position = VLC_PositionGet(i_vlc);
@@ -202,8 +205,8 @@ STDMETHODIMP VLCControl::put_Position(float position)
     HRESULT result = E_UNEXPECTED;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
             VLC_PositionSet(i_vlc, position);
@@ -220,8 +223,8 @@ STDMETHODIMP VLCControl::get_Time(int *seconds)
     HRESULT result = NOERROR;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
             *seconds = VLC_TimeGet(i_vlc);
@@ -245,8 +248,8 @@ STDMETHODIMP VLCControl::shuttle(int seconds)
     HRESULT result = E_UNEXPECTED;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
             VLC_TimeSet(i_vlc, seconds, true);
@@ -260,11 +263,20 @@ STDMETHODIMP VLCControl::fullscreen(void)
     HRESULT result = E_UNEXPECTED;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
-            VLC_FullScreen(i_vlc);
+            if( libvlc_playlist_isplaying(p_libvlc, NULL) )
+            {
+                libvlc_media_player_t *p_md =
+                    libvlc_playlist_get_media_player(p_libvlc, NULL);
+                if( p_md )
+                {
+                    libvlc_toggle_fullscreen(p_md, NULL);
+                    libvlc_media_player_release(p_md);
+                }
+            }
         }
     }
     return result;
@@ -278,8 +290,8 @@ STDMETHODIMP VLCControl::get_Length(int *seconds)
     HRESULT result = NOERROR;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
             *seconds = VLC_LengthGet(i_vlc);
@@ -295,8 +307,8 @@ STDMETHODIMP VLCControl::playFaster(void)
     HRESULT result = E_UNEXPECTED;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
             VLC_SpeedFaster(i_vlc);
@@ -310,8 +322,8 @@ STDMETHODIMP VLCControl::playSlower(void)
     HRESULT result = E_UNEXPECTED;
     if( _p_instance->isRunning() )
     {
-        int i_vlc;
-        result = _p_instance->getVLCObject(&i_vlc);
+        libvlc_instance_t *p_libvlc;
+        result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
             VLC_SpeedSlower(i_vlc);
@@ -337,8 +349,8 @@ STDMETHODIMP VLCControl::put_Volume(int volume)
 
 STDMETHODIMP VLCControl::toggleMute(void)
 {
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         VLC_VolumeMute(i_vlc);
@@ -351,8 +363,8 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
     if( 0 == SysStringLen(name) )
         return E_INVALIDARG;
 
-    int i_vlc;
-    HRESULT hr = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
     {
         int codePage = _p_instance->getCodePage();
@@ -466,8 +478,8 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
     if( 0 == SysStringLen(name) )
         return E_INVALIDARG;
 
-    int i_vlc;
-    HRESULT hr = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
     {
         UINT codePage = _p_instance->getCodePage();
@@ -853,8 +865,8 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
     if( 0 == SysStringLen(uri) )
         return E_INVALIDARG;
 
-    int i_vlc;
-    HRESULT hr = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
     {
         char *cUri = CStrFromBSTR(CP_UTF8, uri);
@@ -891,8 +903,8 @@ STDMETHODIMP VLCControl::get_PlaylistIndex(int *index)
     if( NULL == index )
         return E_POINTER;
 
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         *index = VLC_PlaylistIndex(i_vlc);
@@ -904,8 +916,8 @@ STDMETHODIMP VLCControl::get_PlaylistIndex(int *index)
 
 STDMETHODIMP VLCControl::get_PlaylistCount(int *count)
 {
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         *count = VLC_PlaylistNumberOfItems(i_vlc);
@@ -917,8 +929,8 @@ STDMETHODIMP VLCControl::get_PlaylistCount(int *count)
 
 STDMETHODIMP VLCControl::playlistNext(void)
 {
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         VLC_PlaylistNext(i_vlc);
@@ -929,8 +941,8 @@ STDMETHODIMP VLCControl::playlistNext(void)
 
 STDMETHODIMP VLCControl::playlistPrev(void)
 {
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         VLC_PlaylistPrev(i_vlc);
@@ -941,8 +953,8 @@ STDMETHODIMP VLCControl::playlistPrev(void)
 
 STDMETHODIMP VLCControl::playlistClear(void)
 {
-    int i_vlc;
-    HRESULT result = _p_instance->getVLCObject(&i_vlc);
+    libvlc_instance_t *p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
         VLC_PlaylistClear(i_vlc);
@@ -956,11 +968,11 @@ STDMETHODIMP VLCControl::get_VersionInfo(BSTR *version)
     if( NULL == version )
         return E_POINTER;
 
-    const char *versionStr = VLC_Version();
+    const char *versionStr = libvlc_get_version();
     if( NULL != versionStr )
     {
         *version = BSTRFromCStr(CP_UTF8, versionStr);
- 
+
         return NULL == *version ? E_OUTOFMEMORY : NOERROR;
     }
     *version = NULL;

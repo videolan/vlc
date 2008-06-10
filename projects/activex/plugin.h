@@ -27,7 +27,6 @@
 #include <olectl.h>
 
 #include <vlc/vlc.h>
-#include <vlc/libvlc.h>
 
 extern "C" const GUID CLSID_VLCPlugin;
 extern "C" const GUID CLSID_VLCPlugin2;
@@ -194,7 +193,6 @@ public:
     inline void setDirty(BOOL dirty) { _b_dirty = dirty; };
 
     inline BOOL isRunning(void) { return NULL != _p_libvlc; };
-    HRESULT getVLCObject(int *i_vlc);
     HRESULT getVLC(libvlc_instance_t** p_vlc);
     void setErrorInfo(REFIID riid, const char *description);
 
