@@ -404,6 +404,7 @@ STDMETHODIMP VLCInput::get_length(double* length)
 {
     if( NULL == length )
         return E_POINTER;
+    *length = 0;
 
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
@@ -434,6 +435,7 @@ STDMETHODIMP VLCInput::get_position(double* position)
     if( NULL == position )
         return E_POINTER;
 
+    *position = 0.0f;
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
@@ -1630,6 +1632,7 @@ STDMETHODIMP VLCPlaylist::get_itemCount(long* count)
     if( NULL == count )
         return E_POINTER;
 
+    *count = 0;
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
