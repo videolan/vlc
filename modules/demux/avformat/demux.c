@@ -44,6 +44,7 @@
 
 #include "../../codec/avcodec/fourcc.h"
 #include "../../codec/avcodec/chroma.h"
+#include "avformat.h"
 
 //#define AVFORMAT_DEBUG 1
 
