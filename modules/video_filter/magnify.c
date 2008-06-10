@@ -455,7 +455,7 @@ o o X o o o X X X X X o o X X X X o o o X X X X X o o X X X o o o X X X o o X o 
         {
             int width = v_h + 90 - y;
             width = (width*width)/160;
-            if( (80 - y + v_h)*10 < o_zoom )
+            if( (80 - y + v_h)*ZOOM_FACTOR/10 < o_zoom )
             {
                 vlc_memset( p_oyp->p_pixels + y*p_oyp->i_pitch, 0xff, width );
             }
