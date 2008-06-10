@@ -333,6 +333,8 @@ static int CreateFilter ( vlc_object_t *p_this )
     es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
     p_filter->fmt_out.i_priority = 0;
 
+    vlc_gcrypt_init();
+
     /* create the vnc worker thread */
     p_sys->p_worker_thread = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
     vlc_object_attach( p_sys->p_worker_thread, p_this );
