@@ -26,6 +26,7 @@
 #include <ole2.h>
 #include <olectl.h>
 
+#include <vlc/vlc.h>
 #include <vlc/libvlc.h>
 
 extern "C" const GUID CLSID_VLCPlugin;
