@@ -542,7 +542,7 @@ STDMETHODIMP VLCInput::put_time(double time)
         p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_media_player_set_time(p_md, (vlc_int64_t)time, &ex);
+            libvlc_media_player_set_time(p_md, (int64_t)time, &ex);
             libvlc_media_player_release(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
