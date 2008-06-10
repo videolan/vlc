@@ -26,13 +26,16 @@ TESTS = $(check_PROGRAMS)
 
 libvlc_srtp_la_SOURCES = srtp.c
 libvlc_srtp_la_LIBADD = @LIBGCRYPT_LIBS@
-if !HAVE_WIN32
-libvlc_srtp_la_LIBADD += -lpthread
-endif
 
 srtp_SOURCES = recv.c
 srtp_LDADD = libvlc_srtp.la
 test_recv_LDADD = libvlc_srtp.la
+test_aes_LDADD = @LIBGCRYPT_LIBS@
+
+if !HAVE_WIN32
+libvlc_srtp_la_LIBADD += -lpthread
+test_aes_LDADD += -lpthread
+endif
 
 lcov-run:
 	rm -Rf *.gcda lcov
