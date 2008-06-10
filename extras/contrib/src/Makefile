@@ -1174,6 +1174,8 @@ ifdef SVN
 libdvdnav:
 	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav
 	patch -d libdvdnav -p1 < Patches/libdvdnav.patch
+	$(WGET) $(LIBDVDREAD_URL)
+	(cd $@/src; tar xf ../../libdvdread-$(LIBDVDREAD_VERSION).tar.gz; mv libdvdread-$(LIBDVDREAD_VERSION)/dvdread libdvdread)
 	(cd $@; ./autogen.sh noconfig)
 else
 libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:

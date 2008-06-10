@@ -82,35 +82,17 @@ index e5ee5c4..b381093 100644
  
  dnl ---------------------------------------------
  dnl cflags
-diff --git a/examples/Makefile.am b/examples/Makefile.am
-index 3cfda2f..3015dd5 100644
---- a/examples/Makefile.am
-+++ b/examples/Makefile.am
-@@ -8,7 +8,7 @@ noinst_PROGRAMS = menus
+--- a/examples/Makefile.am.orig	2008-06-10 01:56:16.000000000 +0200
++++ b/examples/Makefile.am	2008-06-10 01:57:04.000000000 +0200
+@@ -8,7 +8,7 @@
  
  menus_SOURCES = menus.c
- menus_LDFLAGS = -L$(top_srcdir)/src/
+ menus_LDFLAGS = -L$(top_srcdir)/src/ -ldvdread
 -menus_LDADD   = $(DVDNAV_LIB)
-+menus_LDADD   = $(DVDNAV_LIB) $(CSS_LIBS)  
++menus_LDADD   = $(DVDNAV_LIB) $(CSS_LIBS)
  
  $(DVDNAV_LIB):
  	@cd $(top_builddir)/src/ && $(MAKE) libdvdnav.la
-diff --git a/src/libdvdread/dvd_input.c b/src/libdvdread/dvd_input.c
-index d55aac7..63b416f 100644
---- a/src/libdvdread/dvd_input.c
-+++ b/src/libdvdread/dvd_input.c
-@@ -27,6 +27,11 @@
- #include "dvd_reader.h"
- #include "dvd_input.h"
- 
-+#ifdef WIN32
-+#   define lseek _lseeki64
-+#   undef off_t
-+#   define off_t int64_t
-+#endif
- 
- /* The function pointers that is the exported interface of this file. */
- dvd_input_t (*dvdinput_open)  (const char *);
 diff --git a/src/vm/vm.c b/src/vm/vm.c
 index 53bef88..db855c7 100644
 --- a/src/vm/vm.c
