@@ -50,7 +50,7 @@ int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        block_t *out = block_New( p_stream, 16 + i_payload );
+        block_t *out = block_Alloc( 16 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1)?1:0, in->i_pts );
@@ -145,8 +145,7 @@ int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        block_t *out = block_New( p_stream,
-                                             16 + i_payload );
+        block_t *out = block_Alloc( 16 + i_payload );
         uint32_t      h = ( i_temporal_ref << 16 )|
                           ( b_sequence_start << 13 )|
                           ( b_start_slice << 12 )|
@@ -192,7 +191,7 @@ int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        block_t *out = block_New( p_stream, 14 + i_payload );
+        block_t *out = block_Alloc( 14 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1)?1:0, in->i_pts );
@@ -229,7 +228,7 @@ int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        block_t *out = block_New( p_stream, 12 + i_payload );
+        block_t *out = block_Alloc( 12 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1),
@@ -268,7 +267,7 @@ int rtp_packetize_mp4a_latm( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         if( i != 0 )
             latmhdrsize = 0;
-        out = block_New( p_stream, 12 + latmhdrsize + i_payload );
+        out = block_Alloc( 12 + latmhdrsize + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1) ? 1 : 0),
@@ -316,7 +315,7 @@ int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        block_t *out = block_New( p_stream, 16 + i_payload );
+        block_t *out = block_Alloc( 16 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
@@ -378,8 +377,7 @@ int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
     for( i = 0; i < i_count; i++ )
     {
         int      i_payload = __MIN( i_max, i_data );
-        block_t *out = block_New( p_stream,
-                                  RTP_H263_PAYLOAD_START + i_payload );
+        block_t *out = block_Alloc( RTP_H263_PAYLOAD_START + i_payload );
         b_p_bit = (i == 0) ? 1 : 0;
         h = ( b_p_bit << 10 )|
             ( b_v_bit << 9  )|
@@ -433,7 +431,7 @@ rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
     if( i_data <= i_max )
     {
         /* Single NAL unit packet */
-        block_t *out = block_New( p_stream, 12 + i_data );
+        block_t *out = block_Alloc( 12 + i_data );
         out->i_dts    = i_dts;
         out->i_length = i_length;
 
@@ -457,7 +455,7 @@ rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
         for( i = 0; i < i_count; i++ )
         {
             const int i_payload = __MIN( i_data, i_max-2 );
-            block_t *out = block_New( p_stream, 12 + 2 + i_payload );
+            block_t *out = block_Alloc( 12 + 2 + i_payload );
             out->i_dts    = i_dts + i * i_length / i_count;
             out->i_length = i_length / i_count;
 
@@ -535,7 +533,7 @@ int rtp_packetize_amr( sout_stream_t *p_stream, sout_stream_id_t *id,
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        block_t *out = block_New( p_stream, 14 + i_payload );
+        block_t *out = block_Alloc( 14 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
@@ -586,7 +584,7 @@ int rtp_packetize_t140( sout_stream_t *p_stream, sout_stream_id_t *id,
             }
         }
 
-        block_t *out = block_New( p_stream, 12 + i_payload );
+        block_t *out = block_Alloc( 12 + i_payload );
         if( out == NULL )
             return VLC_SUCCESS;
 
@@ -641,7 +639,7 @@ int rtp_packetize_spx( sout_stream_t *p_stream, sout_stream_id_t *id,
       Allocate a new RTP p_output block of the appropriate size. 
       Allow for 12 extra bytes of RTP header. 
     */
-    p_out = block_New( p_stream, 12 + i_payload_size );
+    p_out = block_Alloc( 12 + i_payload_size );
 
     if ( i_payload_padding )
     {
