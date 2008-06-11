@@ -11528,7 +11528,7 @@ msgstr "| add XYZ  . . . .  ajoute XYZ à la playlist et le lit"
 
 #: modules/control/rc.c:848
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
-msgstr "| add XYZ  . . . . . . . . .  ajoute XYZ à la playlist"
+msgstr "| enqueue XYZ  . . . . . . .  ajoute XYZ à la playlist"
 
 #: modules/control/rc.c:849
 msgid "| playlist . . . . .  show items currently in playlist"
