@@ -1,7 +1,7 @@
 /*****************************************************************************
  * httpd.c: HTTPd wrapper
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -39,34 +39,33 @@
 #include <lauxlib.h>    /* Higher level C API */
 #include <lualib.h>     /* Lua libs */
 
-#include "vlc.h"
+#include "../vlc.h"
+#include "../libs.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static uint8_t *vlclua_todata( lua_State *L, int narg, int *i_data );
 
+static int vlclua_httpd_host_delete( lua_State * );
+static int vlclua_httpd_handler_new( lua_State * );
+static int vlclua_httpd_handler_delete( lua_State * );
+static int vlclua_httpd_file_new( lua_State * );
+static int vlclua_httpd_file_delete( lua_State * );
+static int vlclua_httpd_redirect_new( lua_State * );
+static int vlclua_httpd_redirect_delete( lua_State * );
+
 /*****************************************************************************
  * HTTPD Host
  *****************************************************************************/
-#if 0
-/* This is kind of a useless function since TLS with the 4 last args
- * unset does the same thing as far as I know. */
-int vlclua_httpd_host_new( lua_State *L )
-{
-    vlc_object_t *p_this = vlclua_get_this( L );
-    const char *psz_host = luaL_checkstring( L, 1 );
-    int i_port = luaL_checkint( L, 2 );
-    httpd_host_t *p_httpd_host = httpd_HostNew( p_this, psz_host, i_port );
-    if( !p_httpd_host )
-        return luaL_error( L, "Failed to create HTTP host \"%s:%d\".",
-                           psz_host, i_port );
-    vlclua_push_vlc_object( L, p_httpd_host, vlclua_httpd_host_delete );
-    return 1;
-}
-#endif
+static const luaL_Reg vlclua_httpd_reg[] = {
+    { "handler", vlclua_httpd_handler_new },
+    { "file", vlclua_httpd_file_new },
+    { "redirect", vlclua_httpd_redirect_new },
+    { NULL, NULL }
+};
 
-int vlclua_httpd_tls_host_new( lua_State *L )
+static int vlclua_httpd_tls_host_new( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     const char *psz_host = luaL_checkstring( L, 1 );
@@ -75,24 +74,35 @@ int vlclua_httpd_tls_host_new( lua_State *L )
     const char *psz_key = luaL_optstring( L, 4, NULL );
     const char *psz_ca = luaL_optstring( L, 5, NULL );
     const char *psz_crl = luaL_optstring( L, 6, NULL );
-    httpd_host_t *p_httpd_host = httpd_TLSHostNew( p_this, psz_host, i_port,
+    httpd_host_t *p_host = httpd_TLSHostNew( p_this, psz_host, i_port,
                                                    psz_cert, psz_key,
                                                    psz_ca, psz_crl );
-    if( !p_httpd_host )
+    if( !p_host )
         return luaL_error( L, "Failed to create HTTP TLS host \"%s:%d\" "
                            "(cert: \"%s\", key: \"%s\", ca: \"%s\", "
                            "crl: \"%s\").", psz_host, i_port,
                            psz_cert, psz_key, psz_ca, psz_crl );
-    vlclua_push_vlc_object( L, (vlc_object_t*)p_httpd_host, vlclua_httpd_host_delete );
+
+    httpd_host_t **pp_host = lua_newuserdata( L, sizeof( httpd_host_t * ) );
+    *pp_host = p_host;
+
+    if( luaL_newmetatable( L, "httpd_host" ) )
+    {
+        lua_newtable( L );
+        luaL_register( L, NULL, vlclua_httpd_reg );
+        lua_setfield( L, -2, "__index" );
+        lua_pushcfunction( L, vlclua_httpd_host_delete );
+        lua_setfield( L, -2, "__gc" );
+    }
+
+    lua_setmetatable( L, -2 );
     return 1;
 }
 
-#define ARG_1_IS_HTTPD_HOST httpd_host_t *p_httpd_host = \
-    (httpd_host_t*)vlclua_checkobject( L, 1, VLC_OBJECT_HTTPD_HOST );
-int vlclua_httpd_host_delete( lua_State *L )
+static int vlclua_httpd_host_delete( lua_State *L )
 {
-    ARG_1_IS_HTTPD_HOST
-    httpd_HostDelete( p_httpd_host );
+    httpd_host_t **pp_host = (httpd_host_t **)luaL_checkudata( L, 1, "httpd_host" );
+    httpd_HostDelete( *pp_host );
     return 0;
 }
 
@@ -148,13 +158,13 @@ static int vlclua_httpd_handler_callback(
     return VLC_SUCCESS;
 }
 
-int vlclua_httpd_handler_new( lua_State * L )
+static int vlclua_httpd_handler_new( lua_State * L )
 {
-    ARG_1_IS_HTTPD_HOST
+    httpd_host_t **pp_host = (httpd_host_t **)luaL_checkudata( L, 1, "httpd_host" );
     const char *psz_url = luaL_checkstring( L, 2 );
     const char *psz_user = luaL_nilorcheckstring( L, 3 );
     const char *psz_password = luaL_nilorcheckstring( L, 4 );
-    const vlc_acl_t *p_acl = NULL; /* FIXME 5 */
+    const vlc_acl_t *p_acl = lua_isnil( L, 5 ) ? NULL : luaL_checkudata( L, 5, "acl" );
     /* Stack item 6 is the callback function */
     luaL_argcheck( L, lua_isfunction( L, 6 ), 6, "Should be a function" );
     /* Stack item 7 is the callback data */
@@ -169,18 +179,31 @@ int vlclua_httpd_handler_new( lua_State * L )
      * the callback's stack. */
     lua_xmove( L, p_sys->L, 2 );
     httpd_handler_t *p_handler = httpd_HandlerNew(
-                            p_httpd_host, psz_url, psz_user, psz_password,
+                            *pp_host, psz_url, psz_user, psz_password,
                             p_acl, vlclua_httpd_handler_callback, p_sys );
     if( !p_handler )
+    {
+        free( p_sys );
         return luaL_error( L, "Failed to create HTTPd handler." );
-    lua_pushlightuserdata( L, p_handler ); /* FIXME */
+    }
+
+    httpd_handler_t **pp_handler = lua_newuserdata( L, sizeof( httpd_handler_t * ) );
+    *pp_handler = p_handler;
+
+    if( luaL_newmetatable( L, "httpd_handler" ) )
+    {
+        lua_pushcfunction( L, vlclua_httpd_handler_delete );
+        lua_setfield( L, -2, "__gc" );
+    }
+
+    lua_setmetatable( L, -2 );
     return 1;
 }
 
-int vlclua_httpd_handler_delete( lua_State *L )
+static int vlclua_httpd_handler_delete( lua_State *L )
 {
-    httpd_handler_t *p_handler = (httpd_handler_t*)luaL_checklightuserdata( L, 1 ); /* FIXME */
-    httpd_handler_sys_t *p_sys = httpd_HandlerDelete( p_handler );
+    httpd_handler_t **pp_handler = (httpd_handler_t**)luaL_checkudata( L, 1, "httpd_handler" );
+    httpd_handler_sys_t *p_sys = httpd_HandlerDelete( *pp_handler );
     luaL_unref( p_sys->L, LUA_REGISTRYINDEX, p_sys->ref );
     free( p_sys );
     return 0;
@@ -226,14 +249,14 @@ static int vlclua_httpd_file_callback(
     return VLC_SUCCESS;
 }
 
-int vlclua_httpd_file_new( lua_State *L )
+static int vlclua_httpd_file_new( lua_State *L )
 {
-    ARG_1_IS_HTTPD_HOST
+    httpd_host_t **pp_host = (httpd_host_t **)luaL_checkudata( L, 1, "httpd_host" );
     const char *psz_url = luaL_checkstring( L, 2 );
     const char *psz_mime = luaL_nilorcheckstring( L, 3 );
     const char *psz_user = luaL_nilorcheckstring( L, 4 );
     const char *psz_password = luaL_nilorcheckstring( L, 5 );
-    const vlc_acl_t *p_acl = lua_isnil( L, 6 ) ? NULL : luaL_checklightuserdata( L, 6 );
+    const vlc_acl_t *p_acl = lua_isnil( L, 6 ) ? NULL : luaL_checkudata( L, 6, "acl" );
     /* Stack item 7 is the callback function */
     luaL_argcheck( L, lua_isfunction( L, 7 ), 7, "Should be a function" );
     /* Stack item 8 is the callback data */
@@ -244,20 +267,32 @@ int vlclua_httpd_file_new( lua_State *L )
     p_sys->L = lua_newthread( L );
     p_sys->ref = luaL_ref( L, LUA_REGISTRYINDEX ); /* pops the object too */
     lua_xmove( L, p_sys->L, 2 );
-    httpd_file_t *p_file = httpd_FileNew( p_httpd_host, psz_url, psz_mime,
+    httpd_file_t *p_file = httpd_FileNew( *pp_host, psz_url, psz_mime,
                                           psz_user, psz_password, p_acl,
                                           vlclua_httpd_file_callback, p_sys );
     if( !p_file )
+    {
+        free( p_sys );
         return luaL_error( L, "Failed to create HTTPd file." );
-    lua_pushlightuserdata( L, p_file ); /* FIXME */
+    }
+
+    httpd_file_t **pp_file = lua_newuserdata( L, sizeof( httpd_file_t * ) );
+    *pp_file = p_file;
+
+    if( luaL_newmetatable( L, "httpd_file" ) )
+    {
+        lua_pushcfunction( L, vlclua_httpd_file_delete );
+        lua_setfield( L, -2, "__gc" );
+    }
+
+    lua_setmetatable( L, -2 );
     return 1;
 }
 
-int vlclua_httpd_file_delete( lua_State *L )
+static int vlclua_httpd_file_delete( lua_State *L )
 {
-    httpd_file_t *p_file = (httpd_file_t*)luaL_checklightuserdata( L, 1 ); /* FIXME */
-    /* FIXME: How do we delete p_sys ? the struct is hidden in the VLC core */
-    httpd_file_sys_t *p_sys = httpd_FileDelete( p_file );
+    httpd_file_t **pp_file = (httpd_file_t**)luaL_checkudata( L, 1, "httpd_file" );
+    httpd_file_sys_t *p_sys = httpd_FileDelete( *pp_file );
     luaL_unref( p_sys->L, LUA_REGISTRYINDEX, p_sys->ref );
     free( p_sys );
     return 0;
@@ -266,24 +301,34 @@ int vlclua_httpd_file_delete( lua_State *L )
 /*****************************************************************************
  * HTTPd Redirect
  *****************************************************************************/
-int vlclua_httpd_redirect_new( lua_State *L )
+static int vlclua_httpd_redirect_new( lua_State *L )
 {
-    ARG_1_IS_HTTPD_HOST
+    httpd_host_t **pp_host = (httpd_host_t **)luaL_checkudata( L, 1, "httpd_host" );
     const char *psz_url_dst = luaL_checkstring( L, 2 );
     const char *psz_url_src = luaL_checkstring( L, 3 );
-    httpd_redirect_t *p_redirect = httpd_RedirectNew( p_httpd_host,
+    httpd_redirect_t *p_redirect = httpd_RedirectNew( *pp_host,
                                                       psz_url_dst,
                                                       psz_url_src );
     if( !p_redirect )
         return luaL_error( L, "Failed to create HTTPd redirect." );
-    lua_pushlightuserdata( L, p_redirect ); /* FIXME */
+
+    httpd_redirect_t **pp_redirect = lua_newuserdata( L, sizeof( httpd_redirect_t * ) );
+    *pp_redirect = p_redirect;
+
+    if( luaL_newmetatable( L, "httpd_redirect" ) )
+    {
+        lua_pushcfunction( L, vlclua_httpd_redirect_delete );
+        lua_setfield( L, -2, "__gc" );
+    }
+
+    lua_setmetatable( L, -2 );
     return 1;
 }
 
-int vlclua_httpd_redirect_delete( lua_State *L )
+static int vlclua_httpd_redirect_delete( lua_State *L )
 {
-    httpd_redirect_t *p_redirect = (httpd_redirect_t*)luaL_checklightuserdata( L, 1 ); /* FIXME */
-    httpd_RedirectDelete( p_redirect );
+    httpd_redirect_t **pp_redirect = (httpd_redirect_t**)luaL_checkudata( L, 1, "httpd_redirect" );
+    httpd_RedirectDelete( *pp_redirect );
     return 0;
 }
 
@@ -303,4 +348,13 @@ static uint8_t *vlclua_todata( lua_State *L, int narg, int *pi_data )
     }
     memcpy( p_data, psz_data, i_data );
     return p_data;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+void luaopen_httpd( lua_State *L )
+{
+    lua_pushcfunction( L, vlclua_httpd_tls_host_new );
+    lua_setfield( L, -2, "httpd" );
 }

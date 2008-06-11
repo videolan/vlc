@@ -1,7 +1,7 @@
 /*****************************************************************************
- * objects.c: Generic lua VLM wrapper
+ * vlm.c: Generic lua VLM wrapper
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -37,37 +37,52 @@
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
-#include <lualib.h>     /* Lua libs */
 
-#include "vlc.h"
+#include "../vlc.h"
+#include "../libs.h"
 
 /*****************************************************************************
  *
  *****************************************************************************/
-int vlclua_vlm_new( lua_State *L )
-{
 #ifdef ENABLE_VLM
+static int vlclua_vlm_delete( lua_State * );
+static int vlclua_vlm_execute_command( lua_State * );
+
+static const luaL_Reg vlclua_vlm_reg[] = {
+    { "execute_command", vlclua_vlm_execute_command },
+    { NULL, NULL }
+};
+
+static int vlclua_vlm_new( lua_State *L )
+{
     vlc_object_t *p_this = vlclua_get_this( L );
     vlm_t *p_vlm = vlm_New( p_this );
     if( !p_vlm )
-        goto err;
-    __vlclua_push_vlc_object( L, (vlc_object_t*)p_vlm, NULL );
+        return luaL_error( L, "Cannot start VLM." );
+
+    vlm_t **pp_vlm = lua_newuserdata( L, sizeof( vlm_t * ) );
+    *pp_vlm = p_vlm;
+
+    if( luaL_newmetatable( L, "vlm" ) )
+    {
+        lua_newtable( L );
+        luaL_register( L, NULL, vlclua_vlm_reg );
+        lua_setfield( L, -2, "__index" );
+        lua_pushcfunction( L, vlclua_vlm_delete );
+        lua_setfield( L, -2, "__gc" );
+    }
+
+    lua_setmetatable( L, -2 );
     return 1;
-err:
-#endif
-    return luaL_error( L, "Cannot start VLM." );
 }
 
-int vlclua_vlm_delete( lua_State *L )
+static int vlclua_vlm_delete( lua_State *L )
 {
-#ifdef ENABLE_VLM
-    vlm_t *p_vlm = (vlm_t*)vlclua_checkobject( L, 1, VLC_OBJECT_GENERIC );
-    vlm_Delete( p_vlm );
-#endif
+    vlm_t **pp_vlm = (vlm_t**)luaL_checkudata( L, 1, "vlm" );
+    vlm_Delete( *pp_vlm );
     return 0;
 }
 
-#ifdef ENABLE_VLM
 static void push_message( lua_State *L, vlm_message_t *message )
 {
     lua_createtable( L, 0, 2 );
@@ -92,21 +107,31 @@ static void push_message( lua_State *L, vlm_message_t *message )
     }
 }
 
-int vlclua_vlm_execute_command( lua_State *L )
+static int vlclua_vlm_execute_command( lua_State *L )
 {
-    vlm_t *p_vlm = (vlm_t*)vlclua_checkobject( L, 1, VLC_OBJECT_GENERIC );
+    vlm_t **pp_vlm = (vlm_t**)luaL_checkudata( L, 1, "vlm" );
     const char *psz_command = luaL_checkstring( L, 2 );
     vlm_message_t *message;
     int i_ret;
-    i_ret = vlm_ExecuteCommand( p_vlm, psz_command, &message );
+    i_ret = vlm_ExecuteCommand( *pp_vlm, psz_command, &message );
     lua_settop( L, 0 );
     push_message( L, message );
     vlm_MessageDelete( message );
     return 1 + vlclua_push_ret( L, i_ret );
 }
+
 #else
-int vlclua_vlm_execute_command( lua_State *L )
+static int vlclua_vlm_new( lua_State *L )
 {
-    return 1 + vlclua_push_ret( L, VLC_EGENERIC );
+    return luaL_error( L, "Cannot start VLM because it was disabled when compiling VLC." );
 }
 #endif
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+void luaopen_vlm( lua_State *L )
+{
+    lua_pushcfunction( L, vlclua_vlm_new );
+    lua_setfield( L, -2, "vlm" );
+}

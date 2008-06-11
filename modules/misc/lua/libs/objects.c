@@ -1,7 +1,7 @@
 /*****************************************************************************
  * objects.c: Generic lua<->vlc object wrapper
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -36,9 +36,12 @@
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
-#include <lualib.h>     /* Lua libs */
 
-#include "vlc.h"
+#include "../vlc.h"
+#include "../libs.h"
+#include "objects.h"
+#include "playlist.h"
+#include "input.h"
 
 typedef struct
 {
@@ -51,20 +54,21 @@ typedef struct
 int __vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj,
                               lua_CFunction pf_gc )
 {
-    vlclua_object_t *p_ud = (vlclua_object_t *)
-        lua_newuserdata( L, sizeof( vlclua_object_t ) );
-    p_ud->p_obj = p_obj;
-    lua_newtable( L );
-    /* Hide the metatable */
-    lua_pushstring( L, "__metatable" );
-    lua_pushstring( L, "none of your business" );
-    lua_settable( L, -3 );
-    if( pf_gc )
+    vlc_object_t **udata = (vlc_object_t **)
+        lua_newuserdata( L, sizeof( vlc_object_t * ) );
+    *udata = p_obj;
+
+    if( luaL_newmetatable( L, "vlc_object" ) )
     {
-        /* Set the garbage collector if needed */
-        lua_pushstring( L, "__gc" );
-        lua_pushcfunction( L, pf_gc );
-        lua_settable( L, -3 );
+        /* Hide the metatable */
+        lua_pushstring( L, "none of your business" );
+        lua_setfield( L, -2, "__metatable" );
+        if( pf_gc ) /* FIXME */
+        {
+            /* Set the garbage collector if needed */
+            lua_pushcfunction( L, pf_gc );
+            lua_setfield( L, -2, "__gc" );
+        }
     }
     lua_setmetatable( L, -2 );
     return 1;
@@ -72,32 +76,10 @@ int __vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj,
 
 int vlclua_gc_release( lua_State *L )
 {
-    vlclua_object_t *p_ud = (vlclua_object_t *)lua_touserdata( L, -1 );
+    vlc_object_t **p_obj = (vlc_object_t **)luaL_checkudata( L, 1, "vlc_object" );
     lua_pop( L, 1 );
-    vlc_object_release( p_ud->p_obj );
+    vlc_object_release( *p_obj );
     return 0;
-}
-
-vlc_object_t *vlclua_checkobject( lua_State *L, int narg, int i_type )
-{
-    vlclua_object_t *p_obj = (vlclua_object_t *)luaL_checkuserdata( L, narg, sizeof( vlclua_object_t ) );
-    /* TODO: add some metatable based method to check that this isn't
-     * any userdata, but really some vlc object */
-    if( i_type )
-    {
-        if( p_obj->p_obj->i_object_type == i_type )
-            return p_obj->p_obj;
-        else
-        {
-            luaL_error( L, "VLC object type doesn't match requirements." );
-            return NULL; /* luaL_error alread longjmp-ed out of here.
-                          * This is to make gcc happy */
-        }
-    }
-    else
-    {
-        return p_obj->p_obj;
-    }
 }
 
 static int vlc_object_type_from_string( const char *psz_name )
@@ -125,6 +107,7 @@ static int vlc_object_type_from_string( const char *psz_name )
           { VLC_OBJECT_FILTER, "filter" },
           { VLC_OBJECT_OSDMENU, "osdmenu" },
           { VLC_OBJECT_HTTPD_HOST, "httpd_host" },
+          { VLC_OBJECT_INTERACTION, "interaction" },
           { VLC_OBJECT_GENERIC, "generic" },
           { 0, "" } };
     int i;
@@ -156,7 +139,7 @@ static int vlc_object_search_mode_from_string( const char *psz_name )
     return 0;
 }
 
-int vlclua_object_find( lua_State *L )
+static int vlclua_object_find( lua_State *L )
 {
     const char *psz_type = luaL_checkstring( L, 2 );
     const char *psz_mode = luaL_checkstring( L, 3 );
@@ -174,7 +157,10 @@ int vlclua_object_find( lua_State *L )
     if( lua_type( L, 1 ) == LUA_TNIL )
         p_this = vlclua_get_this( L );
     else
-        p_this = vlclua_checkobject( L, 1, 0 );
+    {
+        vlc_object_t **p_obj = luaL_checkudata( L, 1, "vlc_object" );
+        p_this = *p_obj;
+    }
 
     p_result = vlc_object_find( p_this, i_type, i_mode );
     if( !p_result )
@@ -184,7 +170,7 @@ int vlclua_object_find( lua_State *L )
     return 1;
 }
 
-int vlclua_object_find_name( lua_State *L )
+static int vlclua_object_find_name( lua_State *L )
 {
     const char *psz_name = luaL_checkstring( L, 2 );
     const char *psz_mode = luaL_checkstring( L, 3 );
@@ -200,7 +186,10 @@ int vlclua_object_find_name( lua_State *L )
     if( lua_type( L, 1 ) == LUA_TNIL )
         p_this = vlclua_get_this( L );
     else
-        p_this = vlclua_checkobject( L, 1, 0 );
+    {
+        vlc_object_t **p_obj = luaL_checkudata( L, 1, "vlc_object" );
+        p_this = *p_obj;
+    }
 
     p_result = vlc_object_find_name( p_this, psz_name, i_mode );
     if( !p_result )
@@ -208,4 +197,52 @@ int vlclua_object_find_name( lua_State *L )
     else
         vlclua_push_vlc_object( L, p_result, vlclua_gc_release );
     return 1;
+}
+
+static int vlclua_get_libvlc( lua_State *L )
+{
+    vlclua_push_vlc_object( L, vlclua_get_this( L )->p_libvlc,
+                            NULL );
+    return 1;
+}
+
+static int vlclua_get_playlist( lua_State *L )
+{
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    if( p_playlist )
+    {
+        vlclua_push_vlc_object( L, p_playlist, vlclua_gc_release );
+    }
+    else lua_pushnil( L );
+    return 1;
+}
+
+static int vlclua_get_input( lua_State *L )
+{
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    if( p_input )
+    {
+        vlclua_push_vlc_object( L, p_input, vlclua_gc_release );
+    }
+    else lua_pushnil( L );
+    return 1;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static const luaL_Reg vlclua_object_reg[] = {
+    { "input", vlclua_get_input },
+    { "playlist", vlclua_get_playlist },
+    { "libvlc", vlclua_get_libvlc },
+    { "find", vlclua_object_find },
+    { "find_name", vlclua_object_find_name },
+    { NULL, NULL }
+};
+
+void luaopen_object( lua_State *L )
+{
+    lua_newtable( L );
+    luaL_register( L, NULL, vlclua_object_reg );
+    lua_setfield( L, -2, "object" );
 }

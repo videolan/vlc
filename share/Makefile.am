@@ -295,8 +295,6 @@ DIST_lua= \
 	lua/intf/hotkeys.lua \
 	lua/intf/modules/common.lua \
 	lua/intf/modules/host.lua \
-	lua/intf/modules/httpd.lua \
-	lua/intf/modules/acl.lua \
 	lua/intf/modules/sandbox.lua \
 	lua/intf/telnet.lua \
 	lua/intf/dummy.lua

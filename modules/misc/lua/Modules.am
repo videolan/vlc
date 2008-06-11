@@ -1,3 +1,31 @@
-SOURCES_lua = playlist.c meta.c intf.c vlc.c vlc.h callbacks.c objects.c variables.c configuration.c net.c vlm.c httpd.c acl.c sd.c
+SOURCES_lua = \
+	intf.c \
+	meta.c \
+	demux.c \
+	vlc.c \
+	vlc.h \
+	libs.h \
+	libs/acl.c \
+	libs/configuration.c \
+	libs/httpd.c \
+	libs/input.c \
+	libs/input.h \
+	libs/messages.c \
+	libs/misc.c \
+	libs/net.c \
+	libs/objects.c \
+	libs/objects.h \
+	libs/osd.c \
+	libs/playlist.c \
+	libs/playlist.h \
+	libs/sd.c \
+	libs/stream.c \
+	libs/strings.c \
+	libs/variables.c \
+	libs/variables.h \
+	libs/video.c \
+	libs/vlm.c \
+	libs/volume.c \
+	$(NULL)
 
 libvlc_LTLIBRARIES += liblua_plugin.la

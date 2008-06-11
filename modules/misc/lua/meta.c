@@ -1,7 +1,7 @@
 /*****************************************************************************
  * meta.c: Get meta/artwork using lua scripts
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -43,51 +43,17 @@
 #include <vlc_charset.h>
 
 #include "vlc.h"
+#include "libs.h"
 
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
-                       lua_State * L, void * user_data );
 static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
                       lua_State * L, void * user_data );
 static lua_State *vlclua_meta_init( vlc_object_t *p_this,
                                     input_item_t * p_item );
 
-
-/*****************************************************************************
- * Lua function bridge
- *****************************************************************************/
-/* Functions to register */
-static luaL_Reg p_reg[] =
-{
-    /* TODO: make an object out of the stream stuff, so we can do something
-     * like:
-     *
-     * s = vlc.stream_new( "http://www.videolan.org" )
-     * page = s:read( 2^16 )
-     * s:delete()
-     *
-     * instead of (which could be problematic since we don't check if
-     * s is really a stream object):
-     *
-     * s = vlc.stream_new( "http://www.videolan.org" )
-     * page = vlc.stream_read( s, 2^16 )
-     * vlc.stream_delete( s )
-     */
-    { "stream_new", vlclua_stream_new },
-    { "stream_read", vlclua_stream_read },
-    { "stream_readline", vlclua_stream_readline },
-    { "stream_delete", vlclua_stream_delete },
-    { "decode_uri", vlclua_decode_uri },
-    { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars },
-    { "msg_dbg", vlclua_msg_dbg },
-    { "msg_warn", vlclua_msg_warn },
-    { "msg_err", vlclua_msg_err },
-    { "msg_info", vlclua_msg_info },
-    { NULL, NULL }
-};
 
 /*****************************************************************************
  * Init lua
@@ -105,7 +71,11 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
     /* Load Lua libraries */
     luaL_openlibs( L ); /* XXX: Don't open all the libs? */
 
-    luaL_register( L, "vlc", p_reg );
+    luaL_register( L, "vlc", NULL /* FIXME ? */ );
+
+    luaopen_msg( L );
+    luaopen_stream( L );
+    luaopen_strings( L );
 
     lua_pushlightuserdata( L, p_this );
     lua_setfield( L, -2, "private" );
@@ -209,73 +179,6 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
     }
 
     return i_ret;
-}
-
-/*****************************************************************************
- * Called through lua_scripts_batch_execute to call 'fetch_meta' on the script
- * pointed by psz_filename.
- *****************************************************************************/
-static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
-                       lua_State * L, void * user_data )
-{
-    input_item_t * p_input = user_data;
-
-    /* In lua, setting a variable to nil is equivalent to deleting it */
-    lua_pushnil( L );
-    lua_setglobal( L, "fetch_meta" );
-
-    /* Load and run the script(s) */
-    if( luaL_dofile( L, psz_filename ) )
-    {
-        msg_Warn( p_this, "Error loading script %s: %s", psz_filename,
-                  lua_tostring( L, lua_gettop( L ) ) );
-        lua_pop( L, 1 );
-        return VLC_EGENERIC;
-    }
-
-    lua_getglobal( L, "fetch_meta" );
-
-    if( !lua_isfunction( L, lua_gettop( L ) ) )
-    {
-        msg_Warn( p_this, "Error while runing script %s, "
-                  "function fetch_meta() not found", psz_filename );
-        lua_pop( L, 1 );
-        return VLC_EGENERIC;
-    }
-
-    if( lua_pcall( L, 0, 1, 0 ) )
-    {
-        msg_Warn( p_this, "Error while runing script %s, "
-                  "function fetch_meta(): %s", psz_filename,
-                  lua_tostring( L, lua_gettop( L ) ) );
-        lua_pop( L, 1 );
-        return VLC_EGENERIC;
-    }
-
-
-    if( lua_gettop( L ) )
-    {
-        if( lua_istable( L, -1 ) )
-        {
-            /* ... item */
-            vlclua_read_meta_data( p_this, L, p_input );
-            vlclua_read_custom_meta_data( p_this, L, p_input );
-        }
-        else
-        {
-            msg_Err( p_this, "Lua playlist script %s: "
-                     "didn't return a table", psz_filename );
-        }
-    }
-    else
-    {
-        msg_Err( p_this, "Script went completely foobar" );
-    }
-
-    /* We tell the batch thing to continue, hence all script
-     * will get the change to add its meta. This behaviour could
-     * be changed. */
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

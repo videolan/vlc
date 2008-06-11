@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc.c: Generic lua interface functions
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -58,11 +58,11 @@
 #define CONFIG_LONGTEXT N_("Lua interface configuration string. Format is: '[\"<interface module name>\"] = { <option> = <value>, ...}, ...'.")
 
 vlc_module_begin();
-    add_submodule();
         set_shortname( N_( "Lua Art" ) );
         set_description( N_("Fetch artwork using lua scripts") );
         set_capability( "art finder", 10 );
         set_callbacks( FindArt, NULL );
+
     add_submodule();
         add_shortcut( "luaplaylist" );
         set_category( CAT_INPUT );
@@ -71,6 +71,7 @@ vlc_module_begin();
         set_description( N_("Lua Playlist Parser Interface") );
         set_capability( "demux", 2 );
         set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist );
+
     add_submodule();
         add_shortcut( "luaintf" );
         add_shortcut( "luarc" );
@@ -91,305 +92,6 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Internal lua<->vlc utils
- *****************************************************************************/
-vlc_object_t * vlclua_get_this( lua_State *L )
-{
-    vlc_object_t * p_this;
-    lua_getglobal( L, "vlc" );
-    lua_getfield( L, -1, "private" );
-    p_this = (vlc_object_t*)lua_topointer( L, lua_gettop( L ) );
-    lua_pop( L, 2 );
-    return p_this;
-}
-
-/*****************************************************************************
- * VLC error code translation
- *****************************************************************************/
-int vlclua_push_ret( lua_State *L, int i_error )
-{
-    lua_pushnumber( L, i_error );
-    lua_pushstring( L, vlc_error( i_error ) );
-    return 2;
-}
-
-/*****************************************************************************
- * Get the VLC version string
- *****************************************************************************/
-int vlclua_version( lua_State *L )
-{
-    lua_pushstring( L, VLC_Version() );
-    return 1;
-}
-
-/*****************************************************************************
- * Get the VLC copyright
- *****************************************************************************/
-int vlclua_copyright( lua_State *L )
-{
-    lua_pushstring( L, COPYRIGHT_MESSAGE );
-    return 1;
-}
-
-/*****************************************************************************
- * Get the VLC license msg/disclaimer
- *****************************************************************************/
-int vlclua_license( lua_State *L )
-{
-    lua_pushstring( L, LICENSE_MSG );
-    return 1;
-}
-
-/*****************************************************************************
- * Quit VLC
- *****************************************************************************/
-int vlclua_quit( lua_State *L )
-{
-    vlc_object_t *p_this = vlclua_get_this( L );
-    /* The rc.c code also stops the playlist ... not sure if this is needed
-     * though. */
-    vlc_object_kill( p_this->p_libvlc );
-    return 0;
-}
-
-/*****************************************************************************
- * Global properties getters
- *****************************************************************************/
-int vlclua_datadir( lua_State *L )
-{
-    lua_pushstring( L, config_GetDataDir() );
-    return 1;
-}
-int vlclua_homedir( lua_State *L )
-{
-    lua_pushstring( L, config_GetHomeDir() );
-    return 1;
-}
-int vlclua_configdir( lua_State *L )
-{
-    char *dir = config_GetUserConfDir();
-    lua_pushstring( L, dir );
-    free( dir );
-    return 1;
-}
-int vlclua_cachedir( lua_State *L )
-{
-    char *dir = config_GetCacheDir();
-    lua_pushstring( L, dir );
-    free( dir );
-    return 1;
-}
-int vlclua_datadir_list( lua_State *L )
-{
-    const char *psz_dirname = luaL_checkstring( L, 1 );
-    vlc_object_t *p_this = vlclua_get_this( L );
-    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
-    char **ppsz_dir = ppsz_dir_list;
-    int i = 1;
-
-    if( vlclua_dir_list( p_this, psz_dirname, ppsz_dir_list ) != VLC_SUCCESS )
-        return 0;
-    lua_newtable( L );
-    for( ; *ppsz_dir; ppsz_dir++ )
-    {
-        lua_pushstring( L, *ppsz_dir );
-        lua_rawseti( L, -2, i );
-        i ++;
-    }
-    return 1;
-}
-
-/*****************************************************************************
- * Volume related
- *****************************************************************************/
-int vlclua_volume_set( lua_State *L )
-{
-    vlc_object_t *p_this = vlclua_get_this( L );
-    int i_volume = luaL_checkint( L, 1 );
-    /* Do we need to check that i_volume is in the AOUT_VOLUME_MIN->MAX range?*/
-    return vlclua_push_ret( L, aout_VolumeSet( p_this, i_volume ) );
-}
-
-int vlclua_volume_get( lua_State *L )
-{
-    vlc_object_t *p_this = vlclua_get_this( L );
-    audio_volume_t i_volume;
-    if( aout_VolumeGet( p_this, &i_volume ) == VLC_SUCCESS )
-        lua_pushnumber( L, i_volume );
-    else
-        lua_pushnil( L );
-    return 1;
-}
-
-int vlclua_volume_up( lua_State *L )
-{
-    audio_volume_t i_volume;
-    aout_VolumeUp( vlclua_get_this( L ),
-                   luaL_optint( L, 1, 1 ),
-                   &i_volume );
-    lua_pushnumber( L, i_volume );
-    return 1;
-}
-
-int vlclua_volume_down( lua_State *L )
-{
-    audio_volume_t i_volume;
-    aout_VolumeDown( vlclua_get_this( L ),
-                     luaL_optint( L, 1, 1 ),
-                     &i_volume );
-    lua_pushnumber( L, i_volume );
-    return 1;
-}
-
-/*****************************************************************************
- * Stream handling
- *****************************************************************************/
-int vlclua_stream_new( lua_State *L )
-{
-    vlc_object_t * p_this = vlclua_get_this( L );
-    stream_t * p_stream;
-    const char * psz_url;
-    psz_url = luaL_checkstring( L, -1 );
-    p_stream = stream_UrlNew( p_this, psz_url );
-    if( !p_stream )
-        return luaL_error( L, "Error when opening url: `%s'", psz_url );
-    lua_pushlightuserdata( L, p_stream );
-    return 1;
-}
-
-int vlclua_stream_read( lua_State *L )
-{
-    stream_t * p_stream;
-    int n;
-    uint8_t *p_read;
-    int i_read;
-    p_stream = (stream_t *)luaL_checklightuserdata( L, 1 );
-    n = luaL_checkint( L, 2 );
-    p_read = malloc( n );
-    if( !p_read ) return vlclua_error( L );
-    i_read = stream_Read( p_stream, p_read, n );
-    lua_pushlstring( L, (const char *)p_read, i_read );
-    free( p_read );
-    return 1;
-}
-
-int vlclua_stream_readline( lua_State *L )
-{
-    stream_t * p_stream;
-    p_stream = (stream_t *)luaL_checklightuserdata( L, 1 );
-    char *psz_line = stream_ReadLine( p_stream );
-    if( psz_line )
-    {
-        lua_pushstring( L, psz_line );
-        free( psz_line );
-    }
-    else
-        lua_pushnil( L );
-    return 1;
-}
-
-int vlclua_stream_delete( lua_State *L )
-{
-    stream_t * p_stream;
-    p_stream = (stream_t *)luaL_checklightuserdata( L, 1 );
-    stream_Delete( p_stream );
-    return 0;
-}
-
-/*****************************************************************************
- * String transformations
- *****************************************************************************/
-int vlclua_decode_uri( lua_State *L )
-{
-    int i_top = lua_gettop( L );
-    int i;
-    for( i = 1; i <= i_top; i++ )
-    {
-        const char *psz_cstring = luaL_checkstring( L, 1 );
-        char *psz_string = strdup( psz_cstring );
-        lua_remove( L, 1 ); /* remove elements to prevent being limited by
-                             * the stack's size (this function will work with
-                             * up to (stack size - 1) arguments */
-        decode_URI( psz_string );
-        lua_pushstring( L, psz_string );
-        free( psz_string );
-    }
-    return i_top;
-}
-
-int vlclua_resolve_xml_special_chars( lua_State *L )
-{
-    int i_top = lua_gettop( L );
-    int i;
-    for( i = 1; i <= i_top; i++ )
-    {
-        const char *psz_cstring = luaL_checkstring( L, 1 );
-        char *psz_string = strdup( psz_cstring );
-        lua_remove( L, 1 ); /* remove elements to prevent being limited by
-                             * the stack's size (this function will work with
-                             * up to (stack size - 1) arguments */
-        resolve_xml_special_chars( psz_string );
-        lua_pushstring( L, psz_string );
-        free( psz_string );
-    }
-    return i_top;
-}
-
-int vlclua_convert_xml_special_chars( lua_State *L )
-{
-    int i_top = lua_gettop( L );
-    int i;
-    for( i = 1; i <= i_top; i++ )
-    {
-        char *psz_string = convert_xml_special_chars( luaL_checkstring(L,1) );
-        lua_remove( L, 1 );
-        lua_pushstring( L, psz_string );
-        free( psz_string );
-    }
-    return i_top;
-}
-
-/*****************************************************************************
- * Messaging facilities
- *****************************************************************************/
-int vlclua_msg_dbg( lua_State *L )
-{
-    int i_top = lua_gettop( L );
-    vlc_object_t *p_this = vlclua_get_this( L );
-    int i;
-    for( i = 1; i <= i_top; i++ )
-        msg_Dbg( p_this, "%s", luaL_checkstring( L, 1 ) );
-    return 0;
-}
-int vlclua_msg_warn( lua_State *L )
-{
-    int i_top = lua_gettop( L );
-    vlc_object_t *p_this = vlclua_get_this( L );
-    int i;
-    for( i = 1; i <= i_top; i++ )
-        msg_Warn( p_this, "%s", luaL_checkstring( L, i ) );
-    return 0;
-}
-int vlclua_msg_err( lua_State *L )
-{
-    int i_top = lua_gettop( L );
-    vlc_object_t *p_this = vlclua_get_this( L );
-    int i;
-    for( i = 1; i <= i_top; i++ )
-        msg_Err( p_this, "%s", luaL_checkstring( L, i ) );
-    return 0;
-}
-int vlclua_msg_info( lua_State *L )
-{
-    int i_top = lua_gettop( L );
-    vlc_object_t *p_this = vlclua_get_this( L );
-    int i;
-    for( i = 1; i <= i_top; i++ )
-        msg_Info( p_this, "%s", luaL_checkstring( L, i ) );
-    return 0;
-}
-
-/*****************************************************************************
  *
  *****************************************************************************/
 static int file_select( const char *file )
@@ -403,8 +105,7 @@ static int file_compare( const char **a, const char **b )
     return strcmp( *a, *b );
 }
 
-int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
-                     char **ppsz_dir_list )
+int vlclua_dir_list( const char *luadirname, char **ppsz_dir_list )
 {
     int i = 0;
     char *datadir = config_GetUserDataDir();
@@ -475,7 +176,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
     char **ppsz_dir;
 
-    i_ret = vlclua_dir_list( p_this, luadirname, ppsz_dir_list );
+    i_ret = vlclua_dir_list( luadirname, ppsz_dir_list );
     if( i_ret != VLC_SUCCESS )
         return i_ret;
     i_ret = VLC_EGENERIC;

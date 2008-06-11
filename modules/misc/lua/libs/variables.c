@@ -1,7 +1,7 @@
 /*****************************************************************************
- * callbacks.c: Generic lua<->vlc callbacks interface
+ * variables.c: Generic lua<->vlc variables interface
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -38,7 +38,212 @@
 #include <lauxlib.h>    /* Higher level C API */
 #include <lualib.h>     /* Lua libs */
 
-#include "vlc.h"
+#include "../vlc.h"
+#include "../libs.h"
+#include "variables.h"
+#include "objects.h"
+
+/*****************************************************************************
+ * Variables handling
+ *****************************************************************************/
+int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
+{
+    switch( i_type &= 0xf0 )
+    {
+        case VLC_VAR_VOID:
+            vlclua_error( L );
+            break;
+        case VLC_VAR_BOOL:
+            lua_pushboolean( L, val.b_bool );
+            break;
+        case VLC_VAR_INTEGER:
+            lua_pushinteger( L, val.i_int );
+            break;
+        case VLC_VAR_STRING:
+            lua_pushstring( L, val.psz_string );
+            break;
+        case VLC_VAR_FLOAT:
+            lua_pushnumber( L, val.f_float );
+            break;
+        case VLC_VAR_TIME:
+            /* FIXME? (we're losing some precision, but does it really matter?) */
+            lua_pushnumber( L, ((double)val.i_time)/1000000. );
+            break;
+        case VLC_VAR_ADDRESS:
+            vlclua_error( L );
+            break;
+        case VLC_VAR_MUTEX:
+            vlclua_error( L );
+            break;
+        case VLC_VAR_LIST:
+            {
+                int i_count = val.p_list->i_count;
+                int i;
+                lua_createtable( L, i_count, 0 );
+                for( i = 0; i < i_count; i++ )
+                {
+                    lua_pushinteger( L, i+1 );
+                    if( !vlclua_pushvalue( L, val.p_list->pi_types[i],
+                                           val.p_list->p_values[i] ) )
+                        lua_pushnil( L );
+                    lua_settable( L, -3 );
+                }
+            }
+            break;
+        default:
+            vlclua_error( L );
+    }
+    return 1;
+}
+
+static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
+{
+    switch( i_type & 0xf0 )
+    {
+        case VLC_VAR_VOID:
+            break;
+        case VLC_VAR_BOOL:
+            val->b_bool = luaL_checkboolean( L, -1 );
+            break;
+        case VLC_VAR_INTEGER:
+            val->i_int = luaL_checkint( L, -1 );
+            break;
+        case VLC_VAR_STRING:
+            val->psz_string = (char*)luaL_checkstring( L, -1 ); /* XXX: Beware, this only stays valid as long as (L,-1) stays in the stack */
+            break;
+        case VLC_VAR_FLOAT:
+            val->f_float = luaL_checknumber( L, -1 );
+            break;
+        case VLC_VAR_TIME:
+            {
+                double f = luaL_checknumber( L, -1 );
+                val->i_time = (int64_t)(f*1000000.);
+            }
+            break;
+        case VLC_VAR_ADDRESS:
+            vlclua_error( L );
+            break;
+        case VLC_VAR_MUTEX:
+            vlclua_error( L );
+            break;
+        case VLC_VAR_LIST:
+            vlclua_error( L );
+            break;
+        default:
+            vlclua_error( L );
+    }
+    return 1;
+}
+
+static int vlclua_var_get( lua_State *L )
+{
+    int i_type;
+    vlc_value_t val;
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+    i_type = var_Type( *pp_obj, psz_var );
+    var_Get( *pp_obj, psz_var, &val );
+    lua_pop( L, 2 );
+    return vlclua_pushvalue( L, i_type, val );
+}
+
+static int vlclua_var_set( lua_State *L )
+{
+    int i_type;
+    vlc_value_t val;
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+    int i_ret;
+    i_type = var_Type( *pp_obj, psz_var );
+    vlclua_tovalue( L, i_type, &val );
+    i_ret = var_Set( *pp_obj, psz_var, val );
+    lua_pop( L, 3 );
+    return vlclua_push_ret( L, i_ret );
+}
+
+static int vlclua_var_get_list( lua_State *L )
+{
+    vlc_value_t val;
+    vlc_value_t text;
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+    int i_ret = var_Change( *pp_obj, psz_var, VLC_VAR_GETLIST, &val, &text );
+    if( i_ret < 0 ) return vlclua_push_ret( L, i_ret );
+    vlclua_pushvalue( L, VLC_VAR_LIST, val );
+    vlclua_pushvalue( L, VLC_VAR_LIST, text );
+    var_Change( *pp_obj, psz_var, VLC_VAR_FREELIST, &val, &text );
+    return 2;
+}
+
+static int vlclua_command( lua_State *L )
+{
+    vlc_object_t * p_this = vlclua_get_this( L );
+    const char *psz_name;
+    const char *psz_cmd;
+    const char *psz_arg;
+    char *psz_msg;
+    psz_name = luaL_checkstring( L, 1 );
+    psz_cmd = luaL_checkstring( L, 2 );
+    psz_arg = luaL_checkstring( L, 3 );
+    lua_pop( L, 3 );
+    var_Command( p_this, psz_name, psz_cmd, psz_arg, &psz_msg );
+    if( psz_msg )
+    {
+        lua_pushstring( L, psz_msg );
+        free( psz_msg );
+    }
+    else
+    {
+        lua_pushstring( L, "" );
+    }
+    return 1;
+}
+
+static int vlclua_libvlc_command( lua_State *L )
+{
+    vlc_object_t * p_this = vlclua_get_this( L );
+    const char *psz_cmd;
+    vlc_value_t val_arg;
+    psz_cmd = luaL_checkstring( L, 1 );
+    val_arg.psz_string = strdup( luaL_optstring( L, 2, "" ) );
+    lua_pop( L, 2 );
+    if( !var_Type( p_this->p_libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
+    {
+        free( val_arg.psz_string );
+        return luaL_error( L, "libvlc's \"%s\" is not a command",
+                           psz_cmd );
+    }
+
+    return vlclua_push_ret( L,
+                            var_Set( p_this->p_libvlc, psz_cmd, val_arg ) );
+}
+
+int __vlclua_var_toggle_or_set( lua_State *L, vlc_object_t *p_obj,
+                                const char *psz_name )
+{
+    bool b_bool;
+    if( lua_gettop( L ) > 1 ) return vlclua_error( L );
+
+    if( lua_gettop( L ) == 0 )
+        b_bool = !var_GetBool( p_obj, psz_name );
+    else /* lua_gettop( L ) == 1 */
+    {
+        b_bool = luaL_checkboolean( L, -1 )?true:false;
+        lua_pop( L, 1 );
+    }
+
+    if( b_bool != var_GetBool( p_obj, psz_name ) )
+        var_SetBool( p_obj, psz_name, b_bool );
+
+    lua_pushboolean( L, b_bool );
+    return 1;
+}
+
+static inline const void *luaL_checklightuserdata( lua_State *L, int narg )
+{
+    luaL_checktype( L, narg, LUA_TLIGHTUSERDATA ); /* can raise an error */
+    return lua_topointer( L, narg );
+}
 
 typedef struct
 {
@@ -97,11 +302,11 @@ static int vlclua_callback( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
-int vlclua_add_callback( lua_State *L )
+static int vlclua_add_callback( lua_State *L )
 {
     vlclua_callback_t *p_callback;
     static int i_index = 0;
-    vlc_object_t *p_obj = vlclua_checkobject( L, 1, 0 );
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
     lua_settop( L, 4 ); /* makes sure that optional data arg is set */
     if( !lua_isfunction( L, 3 ) )
@@ -142,7 +347,7 @@ int vlclua_add_callback( lua_State *L )
     /* obj var callbacks index cbtable func */
     lua_setfield( L, -2, "callback" );
     /* obj var callbacks index cbtable */
-    lua_pushlightuserdata( L, p_obj ); /* will be needed in vlclua_del_callback */
+    lua_pushlightuserdata( L, *pp_obj ); /* will be needed in vlclua_del_callback */
     /* obj var callbacks index cbtable p_obj */
     lua_setfield( L, -2, "private1" );
     /* obj var callbacks index cbtable */
@@ -162,18 +367,18 @@ int vlclua_add_callback( lua_State *L )
     /* Do not move this before the lua specific code (it somehow changes
      * the function in the stack to nil) */
     p_callback->i_index = i_index;
-    p_callback->i_type = var_Type( p_obj, psz_var );
+    p_callback->i_type = var_Type( *pp_obj, psz_var );
     p_callback->L = lua_newthread( L ); /* Do we have to keep a reference to this thread somewhere to prevent garbage collection? */
 
-    var_AddCallback( p_obj, psz_var, vlclua_callback, p_callback );
+    var_AddCallback( *pp_obj, psz_var, vlclua_callback, p_callback );
     return 0;
 }
 
-int vlclua_del_callback( lua_State *L )
+static int vlclua_del_callback( lua_State *L )
 {
     vlclua_callback_t *p_callback;
     bool b_found = false;
-    vlc_object_t *p_obj = vlclua_checkobject( L, 1, 0 );
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
     lua_settop( L, 4 ); /* makes sure that optional data arg is set */
     if( !lua_isfunction( L, 3 ) )
@@ -217,7 +422,7 @@ int vlclua_del_callback( lua_State *L )
                         lua_getfield( L, -1, "private1" );
                         /* obj var func data callbacks index value private1 */
                         p_obj2 = (vlc_object_t*)luaL_checklightuserdata( L, -1 );
-                        if( p_obj2 == p_obj ) /* object is equal */
+                        if( p_obj2 == *pp_obj ) /* object is equal */
                         {
                             lua_pop( L, 1 );
                             /* obj var func data callbacks index value */
@@ -267,7 +472,7 @@ int vlclua_del_callback( lua_State *L )
     /* else */
         /* obj var func data callbacks index*/
 
-    var_DelCallback( p_obj, psz_var, vlclua_callback, p_callback );
+    var_DelCallback( *pp_obj, psz_var, vlclua_callback, p_callback );
     free( p_callback );
 
     /* obj var func data callbacks index */
@@ -278,4 +483,25 @@ int vlclua_del_callback( lua_State *L )
     lua_pop( L, 5 );
     /* <empty stack> */
     return 0;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static const luaL_Reg vlclua_var_reg[] = {
+    { "get", vlclua_var_get },
+    { "get_list", vlclua_var_get_list },
+    { "set", vlclua_var_set },
+    { "add_callback", vlclua_add_callback },
+    { "del_callback", vlclua_del_callback },
+    { "command", vlclua_command },
+    { "libvlc_command", vlclua_libvlc_command },
+    { NULL, NULL }
+};
+
+void luaopen_variables( lua_State *L )
+{
+    lua_newtable( L );
+    luaL_register( L, NULL, vlclua_var_reg );
+    lua_setfield( L, -2, "var" );
 }

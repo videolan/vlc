@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sd.c: Services discovery related functions
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -40,12 +40,14 @@
 #include <lauxlib.h>    /* Higher level C API */
 #include <lualib.h>     /* Lua libs */
 
-#include "vlc.h"
+#include "../vlc.h"
+#include "../libs.h"
+#include "playlist.h"
 
 /*****************************************************************************
  *
  *****************************************************************************/
-int vlclua_sd_get_services_names( lua_State *L )
+static int vlclua_sd_get_services_names( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     char **ppsz_longnames;
@@ -69,7 +71,7 @@ int vlclua_sd_get_services_names( lua_State *L )
     return 1;
 }
 
-int vlclua_sd_add( lua_State *L )
+static int vlclua_sd_add( lua_State *L )
 {
     const char *psz_sd = luaL_checkstring( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
@@ -78,7 +80,7 @@ int vlclua_sd_add( lua_State *L )
     return vlclua_push_ret( L, i_ret );
 }
 
-int vlclua_sd_remove( lua_State *L )
+static int vlclua_sd_remove( lua_State *L )
 {
     const char *psz_sd = luaL_checkstring( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
@@ -87,11 +89,29 @@ int vlclua_sd_remove( lua_State *L )
     return vlclua_push_ret( L, i_ret );
 }
 
-int vlclua_sd_is_loaded( lua_State *L )
+static int vlclua_sd_is_loaded( lua_State *L )
 {
     const char *psz_sd = luaL_checkstring( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     lua_pushboolean( L, playlist_IsServicesDiscoveryLoaded( p_playlist, psz_sd ));
     vlc_object_release( p_playlist );
     return 1;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static const luaL_Reg vlclua_sd_reg[] = {
+    { "get_services_names", vlclua_sd_get_services_names },
+    { "add", vlclua_sd_add },
+    { "remove", vlclua_sd_remove },
+    { "is_loaded", vlclua_sd_is_loaded },
+    { NULL, NULL }
+};
+
+void luaopen_sd( lua_State *L )
+{
+    lua_newtable( L );
+    luaL_register( L, NULL, vlclua_sd_reg );
+    lua_setfield( L, -2, "sd" );
 }

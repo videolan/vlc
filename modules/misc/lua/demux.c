@@ -1,7 +1,7 @@
 /*****************************************************************************
- * playlist.c :  Lua playlist demux module
+ * demux.c :  Lua playlist demux module
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -40,6 +40,7 @@
 #endif
 
 #include "vlc.h"
+#include "libs.h"
 
 
 /*****************************************************************************
@@ -49,17 +50,13 @@ static int Demux( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 /*****************************************************************************
- *
+ * Demux specific functions
  *****************************************************************************/
 struct demux_sys_t
 {
     lua_State *L;
     char *psz_filename;
 };
-
-/*****************************************************************************
- *
- *****************************************************************************/
 
 static int vlclua_demux_peek( lua_State *L )
 {
@@ -97,17 +94,13 @@ static int vlclua_demux_readline( lua_State *L )
     return 1;
 }
 
-
+/*****************************************************************************
+ *
+ *****************************************************************************/
 /* Functions to register */
 static luaL_Reg p_reg[] =
 {
     { "peek", vlclua_demux_peek },
-    { "decode_uri", vlclua_decode_uri },
-    { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars },
-    { "msg_dbg", vlclua_msg_dbg },
-    { "msg_warn", vlclua_msg_warn },
-    { "msg_err", vlclua_msg_err },
-    { "msg_info", vlclua_msg_info },
     { NULL, NULL }
 };
 
@@ -215,6 +208,8 @@ int Import_LuaPlaylist( vlc_object_t *p_this )
     luaL_openlibs( L ); /* FIXME: Don't open all the libs? */
 
     luaL_register( L, "vlc", p_reg );
+    luaopen_msg( L );
+    luaopen_strings( L );
     lua_pushlightuserdata( L, p_demux );
     lua_setfield( L, -2, "private" );
     lua_pushstring( L, p_demux->psz_path );

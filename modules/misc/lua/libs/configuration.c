@@ -1,7 +1,7 @@
 /*****************************************************************************
  * configuration.c: Generic lua<->vlc config interface
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -36,14 +36,14 @@
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
-#include <lualib.h>     /* Lua libs */
 
-#include "vlc.h"
+#include "../vlc.h"
+#include "../libs.h"
 
 /*****************************************************************************
  * Config handling
  *****************************************************************************/
-int vlclua_config_get( lua_State *L )
+static int vlclua_config_get( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
     const char *psz_name;
@@ -76,7 +76,7 @@ int vlclua_config_get( lua_State *L )
     return 1;
 }
 
-int vlclua_config_set( lua_State *L )
+static int vlclua_config_set( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     const char *psz_name;
@@ -107,4 +107,20 @@ int vlclua_config_set( lua_State *L )
             return vlclua_error( L );
     }
     return 0;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static const luaL_Reg vlclua_config_reg[] = {
+    { "get", vlclua_config_get },
+    { "set", vlclua_config_set },
+    { NULL, NULL }
+};
+
+void luaopen_config( lua_State *L )
+{
+    lua_newtable( L );
+    luaL_register( L, NULL, vlclua_config_reg );
+    lua_setfield( L, -2, "config" );
 }
