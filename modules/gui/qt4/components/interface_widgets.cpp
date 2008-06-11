@@ -975,7 +975,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
         #endif
 
 #if HAVE_TRANSPARENCY
-        setWindowOpacity( 0.75 );
+        setWindowOpacity( DEFAULT_OPACITY );
 #endif
     }
     else if ( type == FullscreenControlHide_Type )
@@ -1122,7 +1122,7 @@ static int showFullscreenControllCallback( vlc_object_t *vlc_object, const char 
 {
     FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *) data;
 
-    if ( p_fs->isFSCHidden() )
+    if ( p_fs->isFSCHidden() || p_fs->windowOpacity() < DEFAULT_OPACITY )
     {
         IMEvent *event = new IMEvent( FullscreenControlShow_Type, 0 );
         QApplication::postEvent( p_fs, static_cast<QEvent *>(event) );

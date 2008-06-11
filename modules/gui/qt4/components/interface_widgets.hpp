@@ -57,6 +57,9 @@
     #define HAVE_TRANSPARENCY 1
 #endif
 
+/* Default value of opacity for FS controller */
+#define DEFAULT_OPACITY 0.75
+
 class ResizeEvent;
 class QPalette;
 class QPixmap;
