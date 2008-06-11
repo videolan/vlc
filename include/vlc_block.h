@@ -100,9 +100,9 @@ struct block_t
 /****************************************************************************
  * Blocks functions:
  ****************************************************************************
- * - block_New : create a new block with the requested size ( >= 0 ), return
+ * - block_Alloc : create a new block with the requested size ( >= 0 ), return
  *      NULL for failure.
- * - block_Release : release a block allocated with block_New.
+ * - block_Release : release a block allocated with block_Alloc.
  * - block_Realloc : realloc a block,
  *      i_pre: how many bytes to insert before body if > 0, else how many
  *      bytes of body to skip (the latter can be done without using
@@ -117,15 +117,11 @@ VLC_EXPORT( void,      block_Init,    ( block_t *, void *, size_t ) );
 VLC_EXPORT( block_t *, block_Alloc,   ( size_t ) );
 VLC_EXPORT( block_t *, block_Realloc, ( block_t *, ssize_t i_pre, size_t i_body ) );
 
-static inline block_t *block_New( void *dummy, size_t size )
-{
-    (void)dummy;
-    return block_Alloc (size);
-}
+#define block_New( dummy, size ) block_Alloc(size)
 
 static inline block_t *block_Duplicate( block_t *p_block )
 {
-    block_t *p_dup = block_New( NULL, p_block->i_buffer );
+    block_t *p_dup = block_Alloc( p_block->i_buffer );
     if( p_dup == NULL )
         return NULL;
 
@@ -227,7 +223,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
         i_length += b->i_length;
     }
 
-    g = block_New( NULL, i_total );
+    g = block_Alloc( i_total );
     block_ChainExtract( p_list, g->p_buffer, g->i_buffer );
 
     g->i_flags = p_list->i_flags;
