@@ -31,6 +31,9 @@
 #include "modules/modules.h"
 #include "config/configuration.h"
 #include "libvlc.h"
+#ifndef ENABLE_NLS
+# define dgettext(d, m) ((char *)(m))
+#endif
 
 static const char default_name[] = "unnamed";
 

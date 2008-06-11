@@ -327,7 +327,11 @@ int vlc_wclosedir( void *_p_dir )
  */
 char *vlc_gettext( const char *msgid )
 {
+#ifdef ENABLE_NLS
     return dgettext( PACKAGE_NAME, msgid );
+#else
+    return (char *)msgid;
+#endif
 }
 
 /*****************************************************************************

@@ -230,8 +230,6 @@ typedef void *locale_t;
 
 #if defined (ENABLE_NLS)
 # include <libintl.h>
-#else
-# define dgettext(dom, str) ((char *)(str))
 #endif
 
 #define N_(str) gettext_noop (str)
