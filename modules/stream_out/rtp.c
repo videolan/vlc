@@ -1006,7 +1006,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             }
             id->psz_enc = "L16";
             id->pf_packetize = rtp_packetize_split;
-            rtp_set_ptime (id, 20, 1);
+            rtp_set_ptime (id, 20, 2);
             break;
         case VLC_FOURCC( 'u', '8', ' ', ' ' ):
             id->psz_enc = "L8";
