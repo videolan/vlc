@@ -271,8 +271,7 @@ struct sout_stream_sys_t
     sout_stream_id_t **es;
 };
 
-typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
-                                    block_t * );
+typedef int (*pf_rtp_packetizer_t)( sout_stream_id_t *, block_t * );
 
 typedef struct rtp_sink_t
 {
@@ -1274,7 +1273,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     while( p_buffer != NULL )
     {
         p_next = p_buffer->p_next;
-        if( id->pf_packetize( p_stream, id, p_buffer ) )
+        if( id->pf_packetize( id, p_buffer ) )
             break;
 
         block_Release( p_buffer );

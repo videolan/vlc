@@ -33,11 +33,11 @@
 #include "rtp.h"
 
 int
-rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
+rtp_packetize_h264_nal( sout_stream_id_t *id,
                         const uint8_t *p_data, int i_data, int64_t i_pts,
                         int64_t i_dts, bool b_last, int64_t i_length );
 
-int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
+int rtp_packetize_mpa( sout_stream_id_t *id,
                        block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
@@ -76,8 +76,7 @@ int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 /* rfc2250 */
-int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
-                       block_t *in )
+int rtp_packetize_mpv( sout_stream_id_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -178,8 +177,7 @@ int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
-int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
-                       block_t *in )
+int rtp_packetize_ac3( sout_stream_id_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 2; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -215,8 +213,7 @@ int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
-int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
-                         block_t *in )
+int rtp_packetize_split( sout_stream_id_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id); /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -249,8 +246,7 @@ int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 /* rfc3016 */
-int rtp_packetize_mp4a_latm( sout_stream_t *p_stream, sout_stream_id_t *id,
-                             block_t *in )
+int rtp_packetize_mp4a_latm( sout_stream_id_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 2;              /* payload max in one packet */
     int     latmhdrsize = in->i_buffer / 0xff + 1;
@@ -302,8 +298,7 @@ int rtp_packetize_mp4a_latm( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
-int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
-                        block_t *in )
+int rtp_packetize_mp4a( sout_stream_id_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -347,8 +342,7 @@ int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
 /* rfc2429 */
 #define RTP_H263_HEADER_SIZE (2)  // plen = 0
 #define RTP_H263_PAYLOAD_START (14)  // plen = 0
-int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
-                        block_t *in )
+int rtp_packetize_h263( sout_stream_id_t *id, block_t *in )
 {
     uint8_t *p_data = in->p_buffer;
     int     i_data  = in->i_buffer;
@@ -409,7 +403,7 @@ int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
 
 /* rfc3984 */
 int
-rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
+rtp_packetize_h264_nal( sout_stream_id_t *id,
                         const uint8_t *p_data, int i_data, int64_t i_pts,
                         int64_t i_dts, bool b_last, int64_t i_length )
 {
@@ -478,8 +472,7 @@ rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
-int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
-                        block_t *in )
+int rtp_packetize_h264( sout_stream_id_t *id, block_t *in )
 {
     const uint8_t *p_buffer = in->p_buffer;
     int i_buffer = in->i_buffer;
@@ -509,7 +502,7 @@ int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
             }
         }
         /* TODO add STAP-A to remove a lot of overhead with small slice/sei/... */
-        rtp_packetize_h264_nal( p_stream, id, p_buffer, i_size,
+        rtp_packetize_h264_nal( id, p_buffer, i_size,
                                 (in->i_pts > 0 ? in->i_pts : in->i_dts), in->i_dts,
                                 (i_size >= i_buffer), in->i_length * i_size / in->i_buffer );
 
@@ -519,8 +512,7 @@ int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
-int rtp_packetize_amr( sout_stream_t *p_stream, sout_stream_id_t *id,
-                       block_t *in )
+int rtp_packetize_amr( sout_stream_id_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 2; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -558,8 +550,7 @@ int rtp_packetize_amr( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
-int rtp_packetize_t140( sout_stream_t *p_stream, sout_stream_id_t *id,
-                        block_t *in )
+int rtp_packetize_t140( sout_stream_id_t *id, block_t *in )
 {
     const size_t   i_max  = rtp_mtu (id);
     const uint8_t *p_data = in->p_buffer;
@@ -605,8 +596,7 @@ int rtp_packetize_t140( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 
-int rtp_packetize_spx( sout_stream_t *p_stream, sout_stream_id_t *id,
-                       block_t *in )
+int rtp_packetize_spx( sout_stream_id_t *id, block_t *in )
 {
     uint8_t *p_buffer = in->p_buffer;
     int i_data_size, i_payload_size, i_payload_padding;
@@ -615,10 +605,7 @@ int rtp_packetize_spx( sout_stream_t *p_stream, sout_stream_id_t *id,
     block_t *p_out;
 
     if ( in->i_buffer > rtp_mtu (id) )
-    {
-        msg_Warn( p_stream, "Cannot send packet larger than output MTU" );
         return VLC_SUCCESS;
-    }
 
     /*
       RFC for Speex in RTP says that each packet must end on an octet 
