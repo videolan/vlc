@@ -905,15 +905,6 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     INSERT_ELEM( priv->pp_children, priv->i_children, priv->i_children,
                  p_this );
 
-    /* Kill the object if parent is already dead.
-     * Note: We should surely lock parent here, but that would
-     * create quite a few dead lock case. Hopefully, it
-     * is perfectly safe to do it that way. We only risk
-     * receiving kill event twice. But given current API
-     * it is ok. */
-    if( p_this->p_parent->b_die )
-        vlc_object_kill( p_this );
-
     vlc_mutex_unlock( &structure_lock );
 }
 
