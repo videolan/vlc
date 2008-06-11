@@ -237,6 +237,19 @@ static int Open( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
         case VLC_FOURCC('h','2','6','4'): /* H.264 */
+        case VLC_FOURCC('a','v','c','1'): /* dto. */
+        case VLC_FOURCC('c','v','i','d'): /* Cinepak */
+        case VLC_FOURCC('I','V','4','1'): /* Indeo Video IV */
+        case VLC_FOURCC('i','v','4','1'): /* dto. */
+#ifdef __APPLE__
+        case VLC_FOURCC('p','x','l','t'): /* Pixlet */
+#endif
+        case VLC_FOURCC('d','v','1','n'): /* DVC Pro 100 NTSC */
+        case VLC_FOURCC('d','v','1','p'): /* DVC Pro 100 PAL */
+        case VLC_FOURCC('d','v','h','p'): /* DVC PRO HD 720p */
+        case VLC_FOURCC('d','v','h','6'): /* DVC PRO HD 1080i 60 */
+        case VLC_FOURCC('d','v','h','5'): /* DVC PRO HD 1080i 50 */
+
         case VLC_FOURCC('S','V','Q','3'): /* Sorenson v3 */
     /*    case VLC_FOURCC('S','V','Q','1'):  Sorenson v1
         case VLC_FOURCC('Z','y','G','o'):
