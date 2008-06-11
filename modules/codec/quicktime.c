@@ -255,13 +255,14 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef __APPLE__
         case VLC_FOURCC('I','L','B','C'): /* iLBC */
-            if ((err == noErr) && (qtVersion < 0x07500000)) 
+            if ((err == noErr) || (qtVersion < 0x07500000)) 
                 return VLC_EGENERIC;
         case VLC_FOURCC('i','l','b','c'): /* iLBC */
-            if ((err == noErr) && (qtVersion < 0x07500000)) 
+            if ((err == noErr) || (qtVersion < 0x07500000)) 
                 return VLC_EGENERIC;
 #endif
         case VLC_FOURCC('s','a','m','r'): /* 3GPP AMR audio */
+        case VLC_FOURCC('s','a','m','b'): /* 3GPP AMR-WB audio */
         case VLC_FOURCC('m','p','4','a'): /* MPEG-4 audio */
         case VLC_FOURCC('Q','D','M','C'): /* QDesign */
         case VLC_FOURCC('Q','D','M','2'): /* QDesign* 2 */
