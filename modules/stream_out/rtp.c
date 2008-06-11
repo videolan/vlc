@@ -826,7 +826,7 @@ rtp_set_ptime (sout_stream_id_t *id, unsigned ptime_ms, size_t bytes)
     if (spl < rtp_mtu (id)) /* MTU is big enough for ptime */
         id->i_mtu = 12 + spl;
     else /* MTU is too small for ptime, align to a sample boundary */
-        id->i_mtu = (id->i_mtu / bytes) * bytes;
+        id->i_mtu = 12 + (((id->i_mtu - 12) / bytes) * bytes);
 }
 
 /** Add an ES as a new RTP stream */
