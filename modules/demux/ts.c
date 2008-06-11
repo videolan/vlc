@@ -88,6 +88,11 @@
  */
 
 /*****************************************************************************
+ * Callback prototypes
+ *****************************************************************************/
+static int ChangeKeyCallback    ( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
+
+/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 static int  Open  ( vlc_object_t * );
@@ -112,6 +117,10 @@ static void Close ( vlc_object_t * );
 
 #define CSA_TEXT N_("CSA ck")
 #define CSA_LONGTEXT N_("Control word for the CSA encryption algorithm")
+
+#define CSA2_TEXT N_("Second CSA Key")
+#define CSA2_LONGTEXT N_("The even CSA encryption key. This must be a " \
+  "16 char string (8 hexadecimal bytes).")
 
 #define SILENT_TEXT N_("Silent mode")
 #define SILENT_LONGTEXT N_("Do not complain on encrypted PES.")
@@ -149,6 +158,7 @@ vlc_module_begin();
     add_integer( "ts-out-mtu", 1400, NULL, MTUOUT_TEXT,
                  MTUOUT_LONGTEXT, true );
     add_string( "ts-csa-ck", NULL, NULL, CSA_TEXT, CSA_LONGTEXT, true );
+    add_string( "ts-csa2-ck", NULL, NULL, CSA_TEXT, CSA_LONGTEXT, true );
     add_integer( "ts-csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true );
     add_bool( "ts-silent", 0, NULL, SILENT_TEXT, SILENT_LONGTEXT, true );
 
@@ -311,6 +321,8 @@ typedef struct
 
 struct demux_sys_t
 {
+    vlc_mutex_t     csa_lock;
+
     /* TS packet size (188, 192, 204) */
     int         i_packet_size;
 
@@ -539,6 +551,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_packet_size = i_packet_size;
+    vlc_mutex_init( &p_sys->csa_lock );
 
     /* Fill dump mode fields */
     p_sys->i_write = 0;
@@ -773,23 +786,41 @@ static int Open( vlc_object_t *p_this )
     }
     free( val.psz_string );
 
-    var_Create( p_demux, "ts-csa-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_demux, "ts-csa-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_Get( p_demux, "ts-csa-ck", &val );
     if( val.psz_string && *val.psz_string )
     {
         int i_res;
+        vlc_value_t csa2;
 
         p_sys->csa = csa_New();
 
-        i_res = csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, 1 );
-        if( i_res != VLC_SUCCESS || csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, 0 ) != VLC_SUCCESS )
+        var_Create( p_demux, "ts-csa2-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND);
+        var_Get( p_demux, "ts-csa2-ck", &csa2 );
+        i_res = csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, true );
+        if( i_res == VLC_SUCCESS && csa2.psz_string && *csa2.psz_string )
+        {
+            if( csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, csa2.psz_string, false ) != VLC_SUCCESS )
+            {
+                csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, false );
+            }
+        }
+        else if ( i_res == VLC_SUCCESS )
+        {
+            csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, false );
+        }
+        else
         {
             csa_Delete( p_sys->csa );
+            p_sys->csa = NULL;
         }
 
         if( p_sys->csa )
         {
             vlc_value_t pkt_val;
+
+            var_AddCallback( p_demux, "ts-csa-ck", ChangeKeyCallback, (void *)1 );
+            var_AddCallback( p_demux, "ts-csa2-ck", ChangeKeyCallback, NULL );
 
             var_Create( p_demux, "ts-csa-pkt", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
             var_Get( p_demux, "ts-csa-pkt", &pkt_val );
@@ -802,6 +833,7 @@ static int Open( vlc_object_t *p_this )
             else p_sys->i_csa_pkt_size = pkt_val.i_int;
             msg_Dbg( p_demux, "decrypting %d bytes of packet", p_sys->i_csa_pkt_size );
         }
+        free( csa2.psz_string );
     }
     free( val.psz_string );
 
@@ -873,10 +905,15 @@ static void Close( vlc_object_t *p_this )
         net_Close( p_sys->fd );
         free( p_sys->buffer );
     }
+    vlc_mutex_lock( &p_sys->csa_lock );
     if( p_sys->csa )
     {
+        var_DelCallback( p_demux, "ts-csa-ck", ChangeKeyCallback, NULL );
+        var_DelCallback( p_demux, "ts-csa2-ck", ChangeKeyCallback, NULL );
         csa_Delete( p_sys->csa );
+        p_sys->csa = NULL;
     }
+    vlc_mutex_unlock( &p_sys->csa_lock );
 
     if( p_sys->i_pmt ) free( p_sys->pmt );
 
@@ -905,7 +942,30 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_file );
     p_sys->psz_file = NULL;
 
+    vlc_mutex_destroy( &p_sys->csa_lock );
     free( p_sys );
+}
+
+/*****************************************************************************
+ * ChangeKeyCallback: called when changing the odd encryption key on the fly.
+ *****************************************************************************/
+static int ChangeKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int         i_tmp = (intptr_t)p_data;
+
+    vlc_mutex_lock( &p_sys->csa_lock );
+    if ( i_tmp )
+        i_tmp = csa_SetCW( p_this, p_sys->csa, newval.psz_string, true );
+    else
+        i_tmp = csa_SetCW( p_this, p_sys->csa, newval.psz_string, false );
+
+    vlc_mutex_unlock( &p_sys->csa_lock );
+    return i_tmp;
 }
 
 /*****************************************************************************
@@ -997,7 +1057,11 @@ static int DemuxFile( demux_t *p_demux )
 
         /* Test if user wants to decrypt it first */
         if( p_sys->csa )
+        {
+            vlc_mutex_lock( &p_sys->csa_lock );
             csa_Decrypt( p_demux->p_sys->csa, &p_buffer[i_pos], p_demux->p_sys->i_csa_pkt_size );
+            vlc_mutex_unlock( &p_sys->csa_lock );
+        }
 
         i_pos += p_sys->i_packet_size;
     }
@@ -1789,7 +1853,9 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
     if( p_demux->p_sys->csa )
     {
+        vlc_mutex_lock( &p_demux->p_sys->csa_lock );
         csa_Decrypt( p_demux->p_sys->csa, p_bk->p_buffer, p_demux->p_sys->i_csa_pkt_size );
+        vlc_mutex_unlock( &p_demux->p_sys->csa_lock );
     }
 
     if( !b_adaptation )

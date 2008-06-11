@@ -50,6 +50,8 @@ struct csa_t
     int     X, Y, Z;
     int     D, E, F;
     int     p, q, r;
+
+    bool    use_odd;
 };
 
 static void csa_ComputeKey( uint8_t kk[57], uint8_t ck[8] );
@@ -81,12 +83,12 @@ void   csa_Delete( csa_t *c )
 /*****************************************************************************
  * csa_SetCW:
  *****************************************************************************/
-int csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, int set_odd )
+int csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, bool set_odd )
 {
     if ( !c )
     {
         msg_Dbg( p_caller, "no CSA found" );
-        return VLC_EGENERIC;
+        return VLC_ENOOBJ;
     }
     /* skip 0x */
     if( psz_ck[0] == '0' && ( psz_ck[1] == 'x' || psz_ck[1] == 'X' ) )
@@ -96,7 +98,7 @@ int csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, int set_odd )
     if( strlen( psz_ck ) != 16 )
     {
         msg_Warn( p_caller, "invalid csa ck (it must be 16 chars long)" );
-        return VLC_EGENERIC;
+        return VLC_EBADVAR;
     }
     else
     {
@@ -113,21 +115,36 @@ int csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, int set_odd )
             ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
         }
 #ifndef TS_NO_CSA_CK_MSG
-        msg_Dbg( p_caller, "using CSA (de)scrambling with %s key=%x:%x:%x:%x:%x:%x:%x:%x", ((set_odd == 1) ? "odd" : "even" ),
+        msg_Dbg( p_caller, "using CSA (de)scrambling with %s "
+                 "key=%x:%x:%x:%x:%x:%x:%x:%x", set_odd ? "odd" : "even",
                  ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
 #endif
-        if ( set_odd == 1 )
+        if( set_odd )
         {
-                 memcpy( c->o_ck, ck, 8 );
-                 csa_ComputeKey( c->o_kk, ck );
+            memcpy( c->o_ck, ck, 8 );
+            csa_ComputeKey( c->o_kk, ck );
         }
         else
         {
-                 memcpy( c->e_ck , ck, 8 );
-                 csa_ComputeKey( c->e_kk , ck );
+            memcpy( c->e_ck , ck, 8 );
+            csa_ComputeKey( c->e_kk , ck );
         }
         return VLC_SUCCESS;
     }
+}
+
+/*****************************************************************************
+ * csa_UseKey:
+ *****************************************************************************/
+int csa_UseKey( vlc_object_t *p_caller, csa_t *c, bool use_odd )
+{
+    if ( !c ) return VLC_ENOOBJ;
+    c->use_odd = use_odd;
+#ifndef TS_NO_CSA_CK_MSG
+        msg_Dbg( p_caller, "using the %s key for scrambling",
+                 use_odd ? "odd" : "even" );
+#endif
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -222,7 +239,7 @@ void csa_Decrypt( csa_t *c, uint8_t *pkt, int i_pkt_size )
 /*****************************************************************************
  * csa_Encrypt:
  *****************************************************************************/
-void csa_Encrypt( csa_t *c, uint8_t *pkt, int i_pkt_size, int b_odd )
+void csa_Encrypt( csa_t *c, uint8_t *pkt, int i_pkt_size )
 {
     uint8_t *ck;
     uint8_t *kk;
@@ -234,13 +251,10 @@ void csa_Encrypt( csa_t *c, uint8_t *pkt, int i_pkt_size, int b_odd )
 
     /* set transport scrambling control */
     pkt[3] |= 0x80;
-    if( b_odd )
+
+    if( c->use_odd )
     {
         pkt[3] |= 0x40;
-    }
-
-    if( b_odd )
-    {
         ck = c->o_ck;
         kk = c->o_kk;
     }

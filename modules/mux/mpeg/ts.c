@@ -79,6 +79,13 @@
  *    if they arrive a bit late
  *    (We cannot rely on the fact that the fifo should be full)
  */
+
+/*****************************************************************************
+ * Callback prototypes
+ *****************************************************************************/
+static int ChangeKeyCallback    ( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
+static int ActiveKeyCallback    ( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -160,6 +167,14 @@ static void    Close  ( vlc_object_t * );
 #define CK_LONGTEXT N_("CSA encryption key. This must be a " \
   "16 char string (8 hexadecimal bytes).")
 
+#define CK2_TEXT N_("Second CSA Key")
+#define CK2_LONGTEXT N_("The even CSA encryption key. This must be a " \
+  "16 char string (8 hexadecimal bytes).")
+
+#define CU_TEXT N_("CSA Key in use")
+#define CU_LONGTEXT N_("CSA encryption key used. It can be the odd/first/1 " \
+  "(default) or the even/second/2 one.")
+
 #define CPKT_TEXT N_("Packet size in bytes to encrypt")
 #define CPKT_LONGTEXT N_("Size of the TS packet to encrypt. " \
     "The encryption routines subtract the TS-header from the value before " \
@@ -227,6 +242,10 @@ vlc_module_begin();
 
     add_string( SOUT_CFG_PREFIX "csa-ck", NULL, NULL, CK_TEXT, CK_LONGTEXT,
                 true );
+    add_string( SOUT_CFG_PREFIX "csa2-ck", NULL, NULL, CK2_TEXT, CK2_LONGTEXT,
+                true );
+    add_string( SOUT_CFG_PREFIX "csa-use", "1", NULL, CU_TEXT, CU_LONGTEXT,
+                true );
     add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true );
 
     set_callbacks( Open, Close );
@@ -238,7 +257,7 @@ vlc_module_end();
 static const char *const ppsz_sout_options[] = {
     "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "netid",
     "es-id-pid", "shaping", "pcr", "bmin", "bmax", "use-key-frames",
-    "dts-delay", "csa-ck", "csa-pkt", "crypt-audio", "crypt-video",
+    "dts-delay", "csa-ck", "csa2-ck", "csa-use", "csa-pkt", "crypt-audio", "crypt-video",
     "muxpmt", "sdtdesc", "program-pmt", "alignment",
     NULL
 };
@@ -355,6 +374,8 @@ struct sout_mux_sys_t
 {
     int             i_pcr_pid;
     sout_input_t    *p_pcr_input;
+
+    vlc_mutex_t     csa_lock;
 
     int             i_audio_bound;
     int             i_video_bound;
@@ -492,6 +513,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_num_pmt = 1;
     p_sys->dvbpmt = NULL;
     memset( &p_sys->pmtmap, 0, sizeof(p_sys->pmtmap) );
+
+    vlc_mutex_init( &p_sys->csa_lock );
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
@@ -768,22 +791,49 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pcr    = 0;
 
     p_sys->csa      = NULL;
+    var_Create( p_mux, SOUT_CFG_PREFIX "csa-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_Get( p_mux, SOUT_CFG_PREFIX "csa-ck", &val );
     if( val.psz_string && *val.psz_string )
     {
         int i_res;
+        vlc_value_t csa2;
 
         p_sys->csa = csa_New();
 
-        i_res = csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, 1 );
-        if( i_res != VLC_SUCCESS || csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, 0 ) != VLC_SUCCESS )
+        var_Create( p_mux, SOUT_CFG_PREFIX "csa2-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+        var_Get( p_mux, SOUT_CFG_PREFIX "csa2-ck", &csa2 );
+        i_res = csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, true );
+        if( i_res == VLC_SUCCESS && csa2.psz_string && *csa2.psz_string )
+        {
+            if( csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, csa2.psz_string, false ) != VLC_SUCCESS )
+            {
+                csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, false );
+            }
+        }
+        else if( i_res == VLC_SUCCESS )
+        {
+            csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, false );
+        }
+        else
         {
             csa_Delete( p_sys->csa );
         }
 
         if( p_sys->csa )
         {
-            vlc_value_t pkt_val;
+            vlc_value_t use_val, pkt_val;
+
+            var_Create( p_mux, SOUT_CFG_PREFIX "csa-use", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+            var_Get( p_mux, SOUT_CFG_PREFIX "csa-use", &use_val );
+            var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
+            var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, (void *)1 );
+            var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
+
+            if ( var_Set( p_mux, SOUT_CFG_PREFIX "csa-use", use_val ) != VLC_SUCCESS )
+            {
+                var_SetString( p_mux, SOUT_CFG_PREFIX "csa-use", "odd" );
+            }
+            free( use_val.psz_string );
 
             var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &pkt_val );
             if( pkt_val.i_int < 12 || pkt_val.i_int > 188 )
@@ -795,6 +845,7 @@ static int Open( vlc_object_t *p_this )
             else p_sys->i_csa_pkt_size = pkt_val.i_int;
             msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
         }
+        free( csa2.psz_string );
     }
     free( val.psz_string );
 
@@ -816,10 +867,17 @@ static void Close( vlc_object_t * p_this )
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     int i;
 
+    vlc_mutex_lock( &p_sys->csa_lock );
     if( p_sys->csa )
     {
+        var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, NULL );
+        var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
+        var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
         csa_Delete( p_sys->csa );
     }
+    vlc_mutex_unlock( &p_sys->csa_lock );
+    vlc_mutex_destroy( &p_sys->csa_lock );
+
     for( i = 0; i < MAX_PMT; i++ )
     {
         free( p_sys->sdt_descriptors[i].psz_service_name );
@@ -828,6 +886,58 @@ static void Close( vlc_object_t * p_this )
 
     free( p_sys->dvbpmt );
     free( p_sys );
+}
+
+/*****************************************************************************
+ * ChangeKeyCallback: called when changing the odd encryption key on the fly.
+ *****************************************************************************/
+static int ChangeKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    sout_mux_t      *p_mux = (sout_mux_t*)p_this;
+    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+    int             i_tmp = (int)p_data;
+
+    vlc_mutex_lock( &p_sys->csa_lock );
+    if ( i_tmp )
+    {
+        i_tmp = csa_SetCW( p_this, p_sys->csa, newval.psz_string, true );
+    }
+    else
+    {
+        i_tmp = csa_SetCW( p_this, p_sys->csa, newval.psz_string, false );
+    }
+    vlc_mutex_unlock( &p_sys->csa_lock );
+
+    return i_tmp;
+}
+
+/*****************************************************************************
+ * ActiveKeyCallback: called when changing the active (in use) encryption key on the fly.
+ *****************************************************************************/
+static int ActiveKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+    sout_mux_t      *p_mux = (sout_mux_t*)p_this;
+    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+    int             i_res = VLC_EBADVAR;
+
+    vlc_mutex_lock( &p_sys->csa_lock );
+    if( !strcmp(newval.psz_string, "odd" ) || !strcmp(newval.psz_string, "first" ) || !strcmp(newval.psz_string, "1" ) )
+    {
+        i_res = csa_UseKey( (vlc_object_t*)p_mux, p_sys->csa, 1 );
+    }
+    else if( !strcmp(newval.psz_string, "even" ) || !strcmp(newval.psz_string, "second" ) || !strcmp(newval.psz_string, "2" ) )
+    {
+        i_res = csa_UseKey( (vlc_object_t*)p_mux, p_sys->csa, 0 );
+    }
+    vlc_mutex_unlock( &p_sys->csa_lock );
+
+    return i_res;
 }
 
 /*****************************************************************************
@@ -1869,7 +1979,9 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         }
         if( p_ts->i_flags & BLOCK_FLAG_SCRAMBLED )
         {
-            csa_Encrypt( p_sys->csa, p_ts->p_buffer, p_sys->i_csa_pkt_size, 0 );
+            vlc_mutex_lock( &p_sys->csa_lock );
+            csa_Encrypt( p_sys->csa, p_ts->p_buffer, p_sys->i_csa_pkt_size );
+            vlc_mutex_unlock( &p_sys->csa_lock );
         }
 
         /* latency */
