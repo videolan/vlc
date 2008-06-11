@@ -106,7 +106,8 @@ struct encoder_sys_t
      * Common properties
      */
     char *p_buffer;
-    char *p_buffer_out;
+    uint8_t *p_buffer_out;
+    size_t i_buffer_out;
 
     /*
      * Video properties
@@ -263,8 +264,9 @@ int OpenEncoder( vlc_object_t *p_this )
     p_enc->pf_encode_video = EncodeVideo;
     p_enc->pf_encode_audio = EncodeAudio;
 
-    p_sys->p_buffer_out = NULL;
     p_sys->p_buffer = NULL;
+    p_sys->p_buffer_out = NULL;
+    p_sys->i_buffer_out = 0;
 
     p_sys->p_context = p_context = avcodec_alloc_context();
     p_context->debug = config_GetInt( p_enc, "ffmpeg-debug" );
@@ -458,7 +460,10 @@ int OpenEncoder( vlc_object_t *p_this )
                    i_aspect_num * (int64_t)p_context->height,
                    i_aspect_den * (int64_t)p_context->width, 1 << 30 );
 
-        p_sys->p_buffer_out = malloc( p_context->height * p_context->width * 3 );
+        p_sys->i_buffer_out = p_context->height * p_context->width * 3;
+        if( p_sys->i_buffer_out < FF_MIN_BUFFER_SIZE )
+            p_sys->i_buffer_out = FF_MIN_BUFFER_SIZE;
+        p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
 
         p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
         p_context->pix_fmt = GetFfmpegChroma( p_enc->fmt_in.i_codec );
@@ -686,7 +691,8 @@ int OpenEncoder( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
-        p_sys->p_buffer_out = malloc( 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
+        p_sys->i_buffer_out = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
+        p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
         p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
         p_sys->p_buffer = malloc( p_sys->i_frame_size );
         p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
@@ -902,8 +908,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     frame.pts /= p_enc->fmt_in.video.i_frame_rate;
     /* End work-around */
 
-    i_out = avcodec_encode_video( p_sys->p_context, (uint8_t*)p_sys->p_buffer_out,
-                                  p_sys->p_context->height * p_sys->p_context->width * 3, &frame );
+    i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
+                                  p_sys->i_buffer_out, &frame );
 
     if( i_out > 0 )
     {
@@ -1024,10 +1030,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             p_samples = (int16_t *)p_buffer;
         }
 
-        i_out = avcodec_encode_audio( p_sys->p_context,
-                                      (uint8_t *)p_sys->p_buffer_out,
-                                      2 * AVCODEC_MAX_AUDIO_FRAME_SIZE,
-                                      p_samples );
+        i_out = avcodec_encode_audio( p_sys->p_context, p_sys->p_buffer_out,
+                                      p_sys->i_buffer_out, p_samples );
 
 #if 0
         msg_Warn( p_enc, "avcodec_encode_audio: %d", i_out );
