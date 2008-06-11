@@ -303,66 +303,6 @@ int rtp_packetize_mp4a_latm( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
-int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id,
-                       block_t *in )
-{
-    const uint8_t *p_data = in->p_buffer;
-    size_t i_data  = in->i_buffer;
-    size_t i_plen = 2 * rtp_plen (id, 20);
-
-    for( unsigned i_packet = 0; i_data > 0; i_packet++ )
-    {
-        int           i_payload = __MIN( i_plen, i_data );
-        block_t *out = block_New( p_stream, 12 + i_payload );
-
-        /* rtp common header */
-        rtp_packetize_common( id, out, 0,
-                              (in->i_pts > 0 ? in->i_pts : in->i_dts) );
-        memcpy( &out->p_buffer[12], p_data, i_payload );
-
-        out->i_buffer = 12 + i_payload;
-        out->i_dts    = in->i_dts + i_packet * 20000;
-        out->i_length = i_payload * 20000 / i_plen;
-
-        rtp_packetize_send( id, out );
-
-        p_data += i_payload;
-        i_data -= i_payload;
-    }
-
-    return VLC_SUCCESS;
-}
-
-int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id,
-                      block_t *in )
-{
-    const uint8_t *p_data = in->p_buffer;
-    size_t i_data  = in->i_buffer;
-    size_t i_plen = rtp_plen (id, 20);
-
-    for( unsigned i_packet = 0; i_data > 0; i_packet++ )
-    {
-        int           i_payload = __MIN( i_plen, i_data );
-        block_t *out = block_New( p_stream, 12 + i_payload );
-
-        /* rtp common header */
-        rtp_packetize_common( id, out, 0,
-                              (in->i_pts > 0 ? in->i_pts : in->i_dts) );
-        memcpy( &out->p_buffer[12], p_data, i_payload );
-
-        out->i_buffer = 12 + i_payload;
-        out->i_dts    = in->i_dts + i_packet * 20000;
-        out->i_length = i_payload * 20000 / i_plen;
-
-        rtp_packetize_send( id, out );
-
-        p_data += i_payload;
-        i_data -= i_payload;
-    }
-
-    return VLC_SUCCESS;
-}
-
 int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
                         block_t *in )
 {

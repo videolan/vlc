@@ -46,10 +46,7 @@ void rtp_packetize_common (sout_stream_id_t *id, block_t *out,
                            int b_marker, int64_t i_pts);
 void rtp_packetize_send (sout_stream_id_t *id, block_t *out);
 size_t rtp_mtu (const sout_stream_id_t *id);
-size_t rtp_plen (const sout_stream_id_t * id, unsigned ptime);
 
-int rtp_packetize_l16  (sout_stream_t *, sout_stream_id_t *, block_t *);
-int rtp_packetize_l8   (sout_stream_t *, sout_stream_id_t *, block_t *);
 int rtp_packetize_mpa  (sout_stream_t *, sout_stream_id_t *, block_t *);
 int rtp_packetize_mpv  (sout_stream_t *, sout_stream_id_t *, block_t *);
 int rtp_packetize_ac3  (sout_stream_t *, sout_stream_id_t *, block_t *);

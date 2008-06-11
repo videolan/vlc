@@ -812,6 +812,22 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
     s[2*i_data] = '\0';
 }
 
+/**
+ * Shrink the MTU down to a fixed packetization time (for audio).
+ */
+static void
+rtp_set_ptime (sout_stream_id_t *id, unsigned ptime_ms, size_t bytes)
+{
+    /* Samples per second */
+    size_t spl = (id->i_clock_rate - 1) * ptime_ms / 1000 + 1;
+    bytes *= id->i_channels;
+    spl *= bytes;
+
+    if (spl < rtp_mtu (id)) /* MTU is big enough for ptime */
+        id->i_mtu = 12 + spl;
+    else /* MTU is too small for ptime, align to a sample boundary */
+        id->i_mtu = (id->i_mtu / bytes) * bytes;
+}
 
 /** Add an ES as a new RTP stream */
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
@@ -968,13 +984,15 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 8000 )
                 id->i_payload_type = 0;
             id->psz_enc = "PCMU";
-            id->pf_packetize = rtp_packetize_l8;
+            id->pf_packetize = rtp_packetize_split;
+            rtp_set_ptime (id, 20, 1);
             break;
         case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 8000 )
                 id->i_payload_type = 8;
             id->psz_enc = "PCMA";
-            id->pf_packetize = rtp_packetize_l8;
+            id->pf_packetize = rtp_packetize_split;
+            rtp_set_ptime (id, 20, 1);
             break;
         case VLC_FOURCC( 's', '1', '6', 'b' ):
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 44100 )
@@ -987,11 +1005,13 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 id->i_payload_type = 10;
             }
             id->psz_enc = "L16";
-            id->pf_packetize = rtp_packetize_l16;
+            id->pf_packetize = rtp_packetize_split;
+            rtp_set_ptime (id, 20, 1);
             break;
         case VLC_FOURCC( 'u', '8', ' ', ' ' ):
             id->psz_enc = "L8";
-            id->pf_packetize = rtp_packetize_l8;
+            id->pf_packetize = rtp_packetize_split;
+            rtp_set_ptime (id, 20, 1);
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
         case VLC_FOURCC( 'm', 'p', '3', ' ' ):
@@ -1514,16 +1534,6 @@ size_t rtp_mtu (const sout_stream_id_t *id)
 {
     return id->i_mtu - 12;
 }
-
-/**
- * @return number of audio samples to include for a given packetization time
- * (this really only makes sense for audio formats).
- */
-size_t rtp_plen (const sout_stream_id_t * id, unsigned ptime_ms)
-{
-    return id->i_channels * (((id->i_clock_rate - 1) * ptime_ms / 1000) + 1);
-}
-
 
 /*****************************************************************************
  * Non-RTP mux
