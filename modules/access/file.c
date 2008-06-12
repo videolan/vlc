@@ -193,9 +193,7 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef HAVE_SYS_STAT_H
     p_access->info.i_size = st.st_size;
-    if (!S_ISREG (st.st_mode)
-     && !S_ISBLK (st.st_mode)
-     && !S_ISCHR (st.st_mode))
+    if (!S_ISREG (st.st_mode))
         p_sys->b_seekable = false;
 #else
     p_sys->b_seekable = !b_stdin;
