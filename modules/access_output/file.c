@@ -173,8 +173,13 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static ssize_t Read( sout_access_out_t *p_access, block_t *p_buffer )
 {
-    return read( (intptr_t)p_access->p_sys, p_buffer->p_buffer,
-                 p_buffer->i_buffer );
+    ssize_t val;
+
+    do
+        val = read( (intptr_t)p_access->p_sys, p_buffer->p_buffer,
+                    p_buffer->i_buffer );
+    while (val == -1 && errno == EINTR);
+    return val;
 }
 
 /*****************************************************************************
@@ -186,15 +191,29 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
     while( p_buffer )
     {
-        block_t *p_next = p_buffer->p_next;;
+        ssize_t val = write ((intptr_t)p_access->p_sys,
+                             p_buffer->p_buffer, p_buffer->i_buffer);
+        if (val == -1)
+        {
+            if (errno == EINTR)
+                continue;
+            block_ChainRelease (p_buffer);
+            return -1;
+        }
 
-        i_write += write( (intptr_t)p_access->p_sys,
-                          p_buffer->p_buffer, p_buffer->i_buffer );
-        block_Release( p_buffer );
-
-        p_buffer = p_next;
+        if ((size_t)val >= p_buffer->i_buffer)
+        {
+            block_t *p_next = p_buffer->p_next;
+            block_Release (p_buffer);
+            p_buffer = p_next;
+        }
+        else
+        {
+            p_buffer->p_buffer += val;
+            p_buffer->i_buffer -= val;
+        }
+        i_write += val;
     }
-
     return i_write;
 }
 
