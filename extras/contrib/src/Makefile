@@ -1067,7 +1067,8 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 ifdef SVN
 ffmpeg:
-	$(SVN) co $(FFMPEG_SVN) ffmpeg 
+	$(SVN) co $(FFMPEG_SVN) ffmpeg -r 12920
+	(cd $@; patch -p0 < ../Patches/ffmpeg-pkg-config.patch)
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-beos.patch)
 endif
@@ -1089,6 +1090,7 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
+	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-configure.patch )
 else
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	echo "ffmpeg snapshot is too old, you MUST use subversion !"
@@ -1158,11 +1160,31 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # ***************************************************************************
 # dummy dvdread to trigger the INSTALL_NAME script
 # ***************************************************************************
-.dvdread: .dvdnav
+# .dvdread: .dvdnav
+# 	$(INSTALL_NAME)
+# 	touch $@
+# 
+# CLEAN_FILE += .dvdread
+
+# ***************************************************************************
+# libdvdread: We use dvdnav's dvdread
+# ***************************************************************************
+
+libdvdread-$(LIBDVDREAD_VERSION).tar.gz:
+	$(WGET) $(LIBDVDREAD_URL)
+
+libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
+	$(EXTRACT_GZ)
+#	patch  -p 0 < Patches/libdvdread.patch
+
+.libdvdread: libdvdread .dvdcss
+	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
-CLEAN_FILE += .dvdread
+CLEAN_FILE += .libdvdread
+CLEAN_PKG += libdvdread
+DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 
 # ***************************************************************************
 # libdvdnav
@@ -1171,9 +1193,7 @@ CLEAN_FILE += .dvdread
 ifdef SVN
 libdvdnav:
 	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav
-	patch -d libdvdnav -p1 < Patches/libdvdnav.patch
-	$(WGET) $(LIBDVDREAD_URL)
-	(cd $@/src; tar xf ../../libdvdread-$(LIBDVDREAD_VERSION).tar.gz; mv libdvdread-$(LIBDVDREAD_VERSION)/dvdread libdvdread)
+	patch -d libdvdnav -p0 < Patches/libdvdnav.patch
 	(cd $@; ./autogen.sh noconfig)
 else
 libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:
@@ -1188,7 +1208,7 @@ endif
 	(cd $@; ./autogen.sh noconfig)
 endif
 
-.dvdnav: libdvdnav .dvdcss
+.dvdnav: libdvdnav .libdvdread .dvdcss
 ifdef HAVE_WIN32	
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
 else

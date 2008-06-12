@@ -1,8 +1,226 @@
-diff --git a/configure.ac b/configure.ac
-index e5ee5c4..b381093 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -161,25 +166,61 @@ AC_SUBST(THREAD_LIBS)
+Index: src/read_cache.c
+===================================================================
+--- src/read_cache.c	(revision 1096)
++++ src/read_cache.c	(working copy)
+@@ -37,8 +37,8 @@
+ #include <sys/time.h>
+ #include <time.h>
+ #include "dvd_types.h"
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h>
+ #include "remap.h"
+ #include "vm/decoder.h"
+ #include "vm/vm.h"
+Index: src/navigation.c
+===================================================================
+--- src/navigation.c	(revision 1096)
++++ src/navigation.c	(working copy)
+@@ -30,8 +30,8 @@
+ #include <string.h>
+ #include <sys/time.h>
+ #include "dvd_types.h"
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h>
+ #include "remap.h"
+ #include "vm/decoder.h"
+ #include "vm/vm.h"
+Index: src/settings.c
+===================================================================
+--- src/settings.c	(revision 1096)
++++ src/settings.c	(working copy)
+@@ -30,8 +30,8 @@
+ #include <string.h>
+ #include <sys/time.h>
+ #include "dvd_types.h"
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h>
+ #include "remap.h"
+ #include "vm/decoder.h"
+ #include "vm/vm.h"
+Index: src/vm/vm.c
+===================================================================
+--- src/vm/vm.c	(revision 1096)
++++ src/vm/vm.c	(working copy)
+@@ -40,9 +40,9 @@
+ #include <sys/time.h>
+ #include <fcntl.h>
+ 
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h>
+-#include <libdvdread/ifo_read.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h>
++#include <dvdread/ifo_read.h>
+ #include "dvd_types.h"
+ 
+ #include "decoder.h"
+@@ -139,19 +139,18 @@
+      * all off_t are 64bit.
+      */
+     off_t off;
+-    int fd, i;
++    int i, fd;
+     uint8_t data[DVD_VIDEO_LB_LEN];
+ 
+     /* Read DVD name */
+     fd = open(device, O_RDONLY);
+     if (fd > 0) { 
+       off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
+-      if( off == ( 32 * (off_t) DVD_VIDEO_LB_LEN ) ) {
+-        off = read( fd, data, DVD_VIDEO_LB_LEN ); 
+-        close(fd);
++      if( off == 16 ) {
++        off =  read( fd, data, DVD_VIDEO_LB_LEN );
+         if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
+           fprintf(MSG_OUT, "libdvdnav: DVD Title: ");
+-          for(i=25; i < 73; i++ ) {
++          for(i=40; i < 73; i++ ) {
+             if((data[i] == 0)) break;
+             if((data[i] > 32) && (data[i] < 127)) {
+               fprintf(MSG_OUT, "%c", data[i]);
+@@ -159,10 +158,12 @@
+               fprintf(MSG_OUT, " ");
+             }
+           }
+-          strncpy(name, (char*) &data[25], 48);
+-          name[48] = 0;
++          strncpy(name, (char*) &data[40], 32);
++          i=31;
++          while( (i >= 0) && (name[i] <= ' ')) --i;
++          name[i+1] = '\0';
+           fprintf(MSG_OUT, "\nlibdvdnav: DVD Serial Number: ");
+-          for(i=73; i < 89; i++ ) {
++          for(i=813; i < 829; i++ ) {
+             if((data[i] == 0)) break;
+             if((data[i] > 32) && (data[i] < 127)) {
+               fprintf(MSG_OUT, "%c", data[i]);
+Index: src/vm/decoder.c
+===================================================================
+--- src/vm/decoder.c	(revision 1096)
++++ src/vm/decoder.c	(working copy)
+@@ -33,8 +33,8 @@
+ #include <limits.h>
+ #include <string.h>  /* For memset */
+ #include <sys/time.h>
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h> /* vm_cmd_t */
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h> /* vm_cmd_t */
+ 
+ #include "dvd_types.h"
+ #include "remap.h"
+Index: src/vm/vmcmd.c
+===================================================================
+--- src/vm/vmcmd.c	(revision 1096)
++++ src/vm/vmcmd.c	(working copy)
+@@ -34,8 +34,8 @@
+ #include <sys/time.h>
+ 
+ #include "dvd_types.h"
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h>
+ #include "decoder.h"
+ #include "remap.h"
+ #include "vm.h"
+Index: src/searching.c
+===================================================================
+--- src/searching.c	(revision 1096)
++++ src/searching.c	(working copy)
+@@ -33,8 +33,8 @@
+ #include <stdlib.h>
+ #include <sys/time.h>
+ #include "dvd_types.h"
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h>
+ #include "remap.h"
+ #include "vm/decoder.h"
+ #include "vm/vm.h"
+Index: src/remap.c
+===================================================================
+--- src/remap.c	(revision 1096)
++++ src/remap.c	(working copy)
+@@ -39,8 +39,8 @@
+ #include <limits.h>
+ #include <sys/time.h>
+ #include "dvd_types.h"
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h>
+ #include "remap.h"
+ #include "vm/decoder.h"
+ #include "vm/vm.h"
+Index: src/highlight.c
+===================================================================
+--- src/highlight.c	(revision 1096)
++++ src/highlight.c	(working copy)
+@@ -32,7 +32,7 @@
+ #include <limits.h>
+ #include <string.h>
+ #include <sys/time.h>
+-#include <libdvdread/nav_types.h>
++#include <dvdread/nav_types.h>
+ #include "dvd_types.h"
+ #include "remap.h"
+ #include "vm/decoder.h"
+Index: src/dvdnav.c
+===================================================================
+--- src/dvdnav.c	(revision 1096)
++++ src/dvdnav.c	(working copy)
+@@ -37,9 +37,9 @@
+ #include <string.h>
+ #include <sys/time.h>
+ #include "dvd_types.h"
+-#include <libdvdread/dvd_reader.h>
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h> /* For vm_cmd_t */
++#include <dvdread/dvd_reader.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h> /* For vm_cmd_t */
+ #include "remap.h"
+ #include "vm/decoder.h"
+ #include "vm/vm.h"
+@@ -47,7 +47,7 @@
+ #include "dvdnav_events.h"
+ #include "dvdnav_internal.h"
+ #include "read_cache.h"
+-#include <libdvdread/nav_read.h>
++#include <dvdread/nav_read.h>
+ #include "remap.h"
+ 
+ static dvdnav_status_t dvdnav_clear(dvdnav_t * this) {
+Index: src/dvdnav.h
+===================================================================
+--- src/dvdnav.h	(revision 1096)
++++ src/dvdnav.h	(working copy)
+@@ -37,9 +37,9 @@
+ 
+ #ifndef DVDNAV_COMPILE
+ #  include <dvdnav/dvd_types.h>
+-#  include <libdvdread/dvd_reader.h>
+-#  include <libdvdread/nav_types.h>
+-#  include <libdvdread/ifo_types.h> /* For vm_cmd_t */
++#  include <dvdread/dvd_reader.h>
++#  include <dvdread/nav_types.h>
++#  include <dvdread/ifo_types.h> /* For vm_cmd_t */
+ #  include <dvdnav/dvdnav_events.h>
+ #endif
+ 
+Index: configure.ac
+===================================================================
+--- configure.ac	(revision 1096)
++++ configure.ac	(working copy)
+@@ -155,26 +155,62 @@
  AC_SUBST(THREAD_CFLAGS)
  
  dnl ---------------------------------------------
@@ -34,7 +252,7 @@ index e5ee5c4..b381093 100644
 +     if test x"$withval" != xyes; then
 +       dvdcss_path=$withval
 +     fi])
-+
+ 
 +if test x"$link_dvdcss" != xyes; then
 +dnl dlopen libdvdcss
 +  AC_CHECK_FUNC( dlopen,
@@ -79,11 +297,31 @@ index e5ee5c4..b381093 100644
 +AC_SUBST(CSS_LIBS)
 +AC_SUBST(CSS_CFLAGS)
 + 
- 
++
  dnl ---------------------------------------------
  dnl cflags
---- a/examples/Makefile.am.orig	2008-06-10 01:56:16.000000000 +0200
-+++ b/examples/Makefile.am	2008-06-10 01:57:04.000000000 +0200
+ dnl ---------------------------------------------
+Index: examples/menus.c
+===================================================================
+--- examples/menus.c	(revision 1096)
++++ examples/menus.c	(working copy)
+@@ -28,9 +28,9 @@
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include "dvd_types.h"
+-#include <libdvdread/dvd_reader.h>
+-#include <libdvdread/nav_types.h>
+-#include <libdvdread/ifo_types.h> /* For vm_cmd_t */
++#include <dvdread/dvd_reader.h>
++#include <dvdread/nav_types.h>
++#include <dvdread/ifo_types.h> /* For vm_cmd_t */
+ #include "dvdnav.h"
+ #include "dvdnav_events.h"
+ 
+Index: examples/Makefile.am
+===================================================================
+--- examples/Makefile.am	(revision 1096)
++++ examples/Makefile.am	(working copy)
 @@ -8,7 +8,7 @@
  
  menus_SOURCES = menus.c
@@ -93,66 +331,3 @@ index e5ee5c4..b381093 100644
  
  $(DVDNAV_LIB):
  	@cd $(top_builddir)/src/ && $(MAKE) libdvdnav.la
-diff --git a/src/vm/vm.c b/src/vm/vm.c
-index 53bef88..db855c7 100644
---- a/src/vm/vm.c
-+++ b/src/vm/vm.c
-@@ -134,24 +134,25 @@ static void vm_print_current_domain_state(vm_t *vm) {
- }
- #endif
- 
-+#include <libdvdread/dvd_input.h>
-+
- static void dvd_read_name(char *name, const char *device) {
-     /* Because we are compiling with _FILE_OFFSET_BITS=64
-      * all off_t are 64bit.
-      */
-     off_t off;
--    int fd, i;
-+    dvd_input_t fd; int i;
-     uint8_t data[DVD_VIDEO_LB_LEN];
- 
-     /* Read DVD name */
--    fd = open(device, O_RDONLY);
-+    fd = dvdinput_open(device);
-     if (fd > 0) { 
--      off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
--      if( off == ( 32 * (off_t) DVD_VIDEO_LB_LEN ) ) {
--        off = read( fd, data, DVD_VIDEO_LB_LEN ); 
--        close(fd);
--        if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
-+      off = dvdinput_seek( fd, 16 );
-+      if( off == 16 ) {
-+        off = dvdinput_read( fd, data, 1, DVDINPUT_NOFLAGS ); 
-+        if (off == 1 ) {
-           fprintf(MSG_OUT, "libdvdnav: DVD Title: ");
--          for(i=25; i < 73; i++ ) {
-+          for(i=40; i < 73; i++ ) {
-             if((data[i] == 0)) break;
-             if((data[i] > 32) && (data[i] < 127)) {
-               fprintf(MSG_OUT, "%c", data[i]);
-@@ -159,10 +160,12 @@ static void dvd_read_name(char *name, const char *device) {
-               fprintf(MSG_OUT, " ");
-             }
-           }
--          strncpy(name, (char*) &data[25], 48);
--          name[48] = 0;
-+          strncpy(name, (char*) &data[40], 32);
-+          i=31;
-+          while( (i >= 0) && (name[i] <= ' ')) --i;
-+          name[i+1] = '\0';
-           fprintf(MSG_OUT, "\nlibdvdnav: DVD Serial Number: ");
--          for(i=73; i < 89; i++ ) {
-+          for(i=813; i < 829; i++ ) {
-             if((data[i] == 0)) break;
-             if((data[i] > 32) && (data[i] < 127)) {
-               fprintf(MSG_OUT, "%c", data[i]);
-@@ -186,7 +189,7 @@ static void dvd_read_name(char *name, const char *device) {
-       } else {
-         fprintf(MSG_OUT, "libdvdnav: Can't seek to block %u\n", 32 );
-       }
--      close(fd);
-+      dvdinput_close(fd);
-     } else {
-     fprintf(MSG_OUT, "NAME OPEN FAILED\n");
-   }
