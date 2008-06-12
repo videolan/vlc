@@ -249,7 +249,11 @@ next_ai: /* failure */
 
 int net_AcceptSingle (vlc_object_t *obj, int lfd)
 {
-    int fd = accept (lfd, NULL, NULL);
+    int fd;
+    do
+        fd = accept (lfd, NULL, NULL);
+    while (fd == -1 && errno == EINTR);
+
     if (fd == -1)
     {
         if (net_errno != EAGAIN)
@@ -298,10 +302,13 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
         switch (poll (ufd, n, timeout))
         {
             case -1:
-                if (net_errno != EINTR)
-                    msg_Err (p_this, "poll error: %m");
+                if (net_errno == EINTR)
+                    continue;
+                msg_Err (p_this, "poll error: %m");
+                return -1;
             case 0:
-                return -1; /* NOTE: p_this already unlocked */
+                errno = ETIMEDOUT;
+                return -1;
         }
 
         if (ufd[n].revents)
