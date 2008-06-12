@@ -1124,7 +1124,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info-vlc__Upgraded_.plist";
+				INFOPLIST_FILE = "Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
 				LIBRARY_SEARCH_PATHS = /Volumes/Genitus/vlc/modules/gui/macosx;
@@ -1149,7 +1149,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info-vlc__Upgraded_.plist";
+				INFOPLIST_FILE = "Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
 				LIBRARY_SEARCH_PATHS = /Volumes/Genitus/vlc/modules/gui/macosx;
