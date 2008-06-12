@@ -28,7 +28,7 @@ include ./config.mak
 BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp gecko-sdk config.mak distro.mak
 
 all:
-	$(MAKE) -C src all
+	$(MAKE) -C src
 
 contrib-macosx.tar.bz2:
 	$(WGET) $(CONTRIB_URL)
