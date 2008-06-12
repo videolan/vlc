@@ -176,7 +176,7 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *p_chain,
 }
 
 int filter_chain_AppendFromString( filter_chain_t *p_chain,
-                                         const char *psz_string )
+                                   const char *psz_string )
 {
     config_chain_t *p_cfg = NULL;
     char *psz_name = NULL;

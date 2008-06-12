@@ -61,8 +61,7 @@ struct sout_stream_sys_t
 
     int i_chroma; /* force image format chroma */
 
-    filter_t **pp_vfilters;
-    int i_vfilters;
+    filter_chain_t *p_vf2;
 };
 
 #define PICTURE_RING_SIZE 4
@@ -304,12 +303,20 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
+static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data )
+{
+    p_filter->pf_vout_buffer_new = video_new_buffer_filter;
+    p_filter->pf_vout_buffer_del = video_del_buffer_filter;
+    p_filter->p_owner = p_data;
+    return VLC_SUCCESS;
+}
+
 static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     bridge_t *p_bridge;
     bridged_es_t *p_es;
-    char *psz_chain, *psz_parser;
+    char *psz_chain;
     int i;
 
     if ( p_sys->b_inited )
@@ -419,58 +426,19 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     /* Create user specified video filters */
     psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
     msg_Dbg( p_stream, "psz_chain: %s\n", psz_chain );
+    if( psz_chain )
     {
-        config_chain_t *p_cfg;
-        for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
-        {
-            msg_Dbg( p_stream, " - %s\n", p_cfg->psz_value );
-        }
-    }
-    p_sys->i_vfilters = 0;
-    p_sys->pp_vfilters = NULL;
-    psz_parser = psz_chain;
-    while( psz_parser && *psz_parser )
-    {
-        config_chain_t *p_cfg;
-        char *psz_name;
-        filter_t **pp_vfilter;
-        psz_parser = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
-        p_sys->i_vfilters++;
-        p_sys->pp_vfilters =
-            (filter_t **)realloc( p_sys->pp_vfilters,
-                                  p_sys->i_vfilters * sizeof(filter_t *) );
-        pp_vfilter = p_sys->pp_vfilters+(p_sys->i_vfilters - 1);
-        *pp_vfilter = vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-        vlc_object_attach( *pp_vfilter, p_stream );
-        (*pp_vfilter)->pf_vout_buffer_new = video_new_buffer_filter;
-        (*pp_vfilter)->pf_vout_buffer_del = video_del_buffer_filter;
-        (*pp_vfilter)->fmt_in = p_sys->p_decoder->fmt_out;
+        p_sys->p_vf2 = filter_chain_New( p_stream, "video filter2", false,
+                                         video_filter_buffer_allocation_init,
+                                         NULL, p_sys->p_decoder->p_owner );
+        es_format_t fmt;
+        es_format_Copy( &fmt, &p_sys->p_decoder->fmt_out );
         if( p_sys->i_chroma )
-            (*pp_vfilter)->fmt_in.video.i_chroma = p_sys->i_chroma;
-        (*pp_vfilter)->fmt_out = (*pp_vfilter)->fmt_in;
-        (*pp_vfilter)->p_cfg = p_cfg;
-        (*pp_vfilter)->p_module =
-            module_Need( *pp_vfilter, "video filter2", psz_name, true );
-        if( (*pp_vfilter)->p_module )
-        {
-            /* It worked! */
-            (*pp_vfilter)->p_owner = (filter_owner_sys_t *)
-                p_sys->p_decoder->p_owner;
-            msg_Err( p_stream, "Added video filter %s to the chain",
-                     psz_name );
-        }
-        else
-        {
-            /* Crap ... we didn't find a filter */
-            msg_Warn( p_stream,
-                      "no video filter matching name \"%s\" found",
-                      psz_name );
-            vlc_object_detach( *pp_vfilter );
-            vlc_object_release( *pp_vfilter );
-            p_sys->i_vfilters--;
-        }
+            fmt.video.i_chroma = p_sys->i_chroma;
+        filter_chain_Reset( p_sys->p_vf2, &fmt, &fmt );
+        filter_chain_AppendFromString( p_sys->p_vf2, psz_chain );
+        free( psz_chain );
     }
-    free( psz_chain );
 
     return (sout_stream_id_t *)p_sys;
 }
@@ -482,7 +450,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     bridge_t *p_bridge;
     bridged_es_t *p_es;
     bool b_last_es = true;
-    filter_t **pp_vfilter, **pp_end;
     int i;
 
     if ( !p_sys->b_inited )
@@ -513,16 +480,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     }
 
     /* Destroy user specified video filters */
-    pp_vfilter = p_sys->pp_vfilters;
-    pp_end = pp_vfilter + p_sys->i_vfilters;
-    for( ; pp_vfilter < pp_end; pp_vfilter++ )
-    {
-        vlc_object_detach( *pp_vfilter );
-        if( (*pp_vfilter)->p_module )
-            module_Unneed( *pp_vfilter, (*pp_vfilter)->p_module );
-        vlc_object_release( *pp_vfilter );
-    }
-    free( p_sys->pp_vfilters );
+    filter_chain_Delete( p_sys->p_vf2 );
 
     vlc_mutex_lock( p_sys->p_lock );
 
@@ -681,27 +639,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         p_new_pic->date = p_pic->date;
         p_pic->pf_release( p_pic );
 
-        if( p_sys->pp_vfilters )
-        {
-            /* Apply user specified video filters */
-            filter_t **pp_vfilter = p_sys->pp_vfilters;
-            filter_t **pp_end = pp_vfilter + p_sys->i_vfilters;
-            for( ; pp_vfilter < pp_end; pp_vfilter++ )
-            {
-                (*pp_vfilter)->fmt_in.i_codec = p_new_pic->format.i_chroma;
-                (*pp_vfilter)->fmt_out.i_codec = p_new_pic->format.i_chroma;
-                (*pp_vfilter)->fmt_in.video = p_new_pic->format;
-                (*pp_vfilter)->fmt_out.video = p_new_pic->format;
-                p_new_pic = (*pp_vfilter)->pf_video_filter( *pp_vfilter,
-                                                             p_new_pic );
-                if( !p_new_pic )
-                {
-                    msg_Err( p_stream, "video filter failed" );
-                    break;
-                }
-            }
-            if( !p_new_pic ) continue;
-        }
+        if( p_sys->p_vf2 )
+            p_new_pic = filter_chain_VideoFilter( p_sys->p_vf2, p_new_pic );
 
         PushPicture( p_stream, p_new_pic );
     }
