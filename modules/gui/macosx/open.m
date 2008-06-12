@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.m: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2007 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -44,6 +44,14 @@
 #import "open.h"
 #import "output.h"
 #import "eyetv.h"
+
+#define setEyeTVUnconnected \
+[o_capture_lbl setStringValue: _NS("No device connected")]; \
+[o_capture_long_lbl setStringValue: _NS("VLC could not detect any EyeTV compatible device.\n\nCheck the device's connection, make sure that the latest EyeTV software is installed and try again.")]; \
+[o_capture_lbl displayIfNeeded]; \
+[o_capture_long_lbl displayIfNeeded]; \
+[self showCaptureView: o_capture_label_view]
+
 
 /*****************************************************************************
  * GetEjectableMediaOfClass
@@ -162,6 +170,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [[o_tabview tabViewItemAtIndex: 0] setLabel: _NS("File")];
     [[o_tabview tabViewItemAtIndex: 1] setLabel: _NS("Disc")];
     [[o_tabview tabViewItemAtIndex: 2] setLabel: _NS("Network")];
+    [[o_tabview tabViewItemAtIndex: 3] setLabel: _NS("Capture")];
 
     [o_file_btn_browse setTitle: _NS("Browse...")];
     [o_file_stream setTitle: _NS("Treat as a pipe rather than as a file")];
@@ -191,8 +200,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
  
     [o_eyetv_chn_bgbar setUsesThreadedAnimation: YES];
-    /* FIXME: implement EyeTV l10n here */
- 
+
+    /* FIXME: implement Capturing l10n here completely */
+    [o_capture_mode_pop removeAllItems];
+    if( MACOS_VERSION > 10.4f )
+        [o_capture_mode_pop addItemWithTitle: _NS("iSight")];
+    [o_capture_mode_pop addItemWithTitle: _NS("Screen")];
+    [o_capture_mode_pop addItemWithTitle: @"EyeTV"];
+    [o_screen_lbl setStringValue: _NS("Screen Capture Input")];
+    [o_screen_long_lbl setStringValue: _NS("This facility allows you to process your screen's output.")];
+    
     [self setSubPanel];
 
 
@@ -235,19 +252,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
         name: NSControlTextDidChangeNotification
         object: o_net_http_url];
 
-    /* wake up with the correct EyeTV GUI */
-    if( [[[VLCMain sharedInstance] getEyeTVController] isEyeTVrunning] == YES )
-    {
-        if( [[[VLCMain sharedInstance] getEyeTVController] isDeviceConnected] == YES )
-        {
-            [o_eyetv_tabView selectTabViewItemWithIdentifier:@"eyetvup"];
-            [self setupChannelInfo];
-        }
-        else 
-            [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
-    }
-    else
-        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"noeyetv"];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(screenFPSChanged:)
+                                                 name: NSControlTextDidChangeNotification
+                                               object: o_screen_fps_fld];
 
     [[NSDistributedNotificationCenter defaultCenter] addObserver: self
                                                         selector: @selector(eyetvChanged:)
@@ -414,9 +422,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         [self openNetInfoChanged: nil];
     }
-    else if( [o_label isEqualToString: _NS("EyeTV")] )
+    else if( [o_label isEqualToString: _NS("Capture")] )
     {
-        [o_mrl setStringValue: @"eyetv://"];
+        [self openCaptureModeChanged: nil];
     }
 }
 
@@ -436,6 +444,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     [self openNetInfoChanged: nil];
     [self openTarget: 2];
+}
+
+- (void)openCapture
+{
+    [self openCaptureModeChanged: nil];
+    [self showCaptureView: o_capture_label_view];
+    [self openTarget: 3];
 }
 
 - (void)openFilePathChanged:(NSNotification *)o_notification
@@ -801,6 +816,68 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
 }
 
+- (void)showCaptureView: theView
+{
+    NSRect o_view_rect;
+    o_view_rect = [theView frame];
+    if( o_currentCaptureView )
+    {
+        [o_currentCaptureView removeFromSuperviewWithoutNeedingDisplay];
+        [o_currentCaptureView release];
+    }
+    [theView setFrame: NSMakeRect( 0, 10, o_view_rect.size.width, o_view_rect.size.height)];
+    [theView setNeedsDisplay: YES];
+    [theView setAutoresizesSubviews: YES];
+    [[[o_tabview tabViewItemAtIndex: 3] view] addSubview: theView];
+    [theView displayIfNeeded];
+    o_currentCaptureView = theView;
+    [o_currentCaptureView retain];
+}
+
+- (IBAction)openCaptureModeChanged:(id)sender
+{
+    if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: @"EyeTV"] )
+    {
+        if( [[[VLCMain sharedInstance] getEyeTVController] isEyeTVrunning] == YES )
+        {
+            if( [[[VLCMain sharedInstance] getEyeTVController] isDeviceConnected] == YES )
+            {
+                [self showCaptureView: o_eyetv_running_view];
+                [self setupChannelInfo];
+            }
+            else
+            {
+                setEyeTVUnconnected;
+            }
+        }
+        else
+            [self showCaptureView: o_eyetv_notLaunched_view];
+        [o_mrl setStringValue: @""];
+    } 
+    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: @"Screen"] )
+    {
+        [self showCaptureView: o_screen_view];
+        [o_mrl setStringValue: [NSString stringWithFormat:@"screen:// :screen-fps=%@", [o_screen_fps_fld stringValue]]];
+    }
+    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: @"iSight"] )
+    {
+        [o_capture_lbl setStringValue: _NS("iSight Capture Input")];
+        [o_capture_long_lbl setStringValue: _NS("This facility allows you to process your iSight's input signal.\n\nNo settings are available in this version, so you will be provided a 640px*480px raw video stream.\n\nLive Audio input is not supported.")];
+        [o_capture_lbl displayIfNeeded];
+        [o_capture_long_lbl displayIfNeeded];
+        
+        [self showCaptureView: o_capture_label_view];
+        [o_mrl setStringValue: @"qtcapture://"];
+    }
+}
+
+- (IBAction)openCaptureStepperChanged:(id)sender
+{
+    [o_screen_fps_fld setIntValue: [o_screen_fps_stp intValue]];
+    [o_panel makeFirstResponder: o_screen_fps_fld];
+    [o_mrl setStringValue: [NSString stringWithFormat:@"screen:// :screen-fps=%@", [o_screen_fps_fld stringValue]]];
+}
+
 - (IBAction)eyetvSwitchChannel:(id)sender
 {
     if( sender == o_eyetv_nextProgram_btn )
@@ -835,7 +912,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if( [[o_notification name] isEqualToString: @"DeviceAdded"] )
     {
         msg_Dbg( VLCIntf, "eyetv device was added" );
-        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"eyetvup"];
+        [self showCaptureView: o_eyetv_running_view];
         [self setupChannelInfo];
     }
     else if( [[o_notification name] isEqualToString: @"DeviceRemoved"] )
@@ -843,19 +920,19 @@ static VLCOpen *_o_sharedMainInstance = nil;
         /* leave the channel selection like that,
          * switch to our "no device" tab */
         msg_Dbg( VLCIntf, "eyetv device was removed" );
-        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
+        setEyeTVUnconnected;
     }
     else if( [[o_notification name] isEqualToString: @"PluginQuit"] )
     {
         /* switch to the "launch eyetv" tab */
         msg_Dbg( VLCIntf, "eyetv was terminated" );
-        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"noeyetv"];
+        [self showCaptureView: o_eyetv_notLaunched_view];
     }
     else if( [[o_notification name] isEqualToString: @"PluginInit"] )
     {
         /* we got no device yet */
         msg_Dbg( VLCIntf, "eyetv was launched, no device yet" );
-        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
+        setEyeTVUnconnected;
     }
     else
         msg_Warn( VLCIntf, "unknown external notify '%s' received", [[o_notification name] UTF8String] );

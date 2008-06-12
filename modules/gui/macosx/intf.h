@@ -182,6 +182,7 @@ struct intf_sys_t
     IBOutlet id o_mi_open_generic;
     IBOutlet id o_mi_open_disc;
     IBOutlet id o_mi_open_net;
+    IBOutlet id o_mi_open_capture;
     IBOutlet id o_mi_open_recent;
     IBOutlet id o_mi_open_recent_cm;
     IBOutlet id o_mi_open_wizard;
@@ -358,6 +359,7 @@ struct intf_sys_t
 - (IBAction)intfOpenFileGeneric:(id)sender;
 - (IBAction)intfOpenDisc:(id)sender;
 - (IBAction)intfOpenNet:(id)sender;
+- (IBAction)intfOpenCapture:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showExtended:(id)sender;

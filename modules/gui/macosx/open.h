@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.h: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2007 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -101,21 +101,34 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_file_sub_font_box;
     IBOutlet id o_file_sub_file_box;
 
-    /* open eyetv support */
-    IBOutlet id o_eyetv_tabView;
+    /* generic capturing stuff */
+    IBOutlet id o_capture_lbl;
+    IBOutlet id o_capture_long_lbl;
+    IBOutlet id o_capture_mode_pop;
+    IBOutlet id o_capture_label_view;
+
+    /* eyetv support */
+    IBOutlet id o_eyetv_notLaunched_view;
+    IBOutlet id o_eyetv_running_view;
     IBOutlet id o_eyetv_channels_pop;
     IBOutlet id o_eyetv_currentChannel_lbl;
     IBOutlet id o_eyetv_chn_status_txt;
     IBOutlet id o_eyetv_chn_bgbar;
     IBOutlet id o_eyetv_launchEyeTV_btn;
     IBOutlet id o_eyetv_nextProgram_btn;
-    IBOutlet id o_eyetv_noDevice_lbl;
-    IBOutlet id o_eyetv_noDeviceLong_lbl;
-    IBOutlet id o_eyetv_noEyeTV_lbl;
-    IBOutlet id o_eyetv_noEyeTVLong_lbl;
+    IBOutlet id o_eyetv_noInstance_lbl;
+    IBOutlet id o_eyetv_noInstanceLong_lbl;
     IBOutlet id o_eyetv_previousProgram_btn;
 
+    /* screen support */
+    IBOutlet id o_screen_view;
+    IBOutlet id o_screen_fps_fld;
+    IBOutlet id o_screen_lbl;
+    IBOutlet id o_screen_long_lbl;
+    IBOutlet id o_screen_fps_stp;
+
     BOOL b_autoplay;
+    id o_currentCaptureView;
 }
 
 + (VLCOpen *)sharedInstance;
@@ -143,6 +156,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)openNetStepperChanged:(id)sender;
 - (void)openNetInfoChanged:(NSNotification *)o_notification;
 
+- (void)openCapture;
+- (void)showCaptureView: theView;
+- (IBAction)openCaptureStepperChanged:(id)sender;
+- (IBAction)openCaptureModeChanged:(id)sender;
 - (IBAction)eyetvSwitchChannel:(id)sender;
 - (IBAction)eyetvLaunch:(id)sender;
 - (void)eyetvChanged:(NSNotification *)o_notification;

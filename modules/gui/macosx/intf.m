@@ -673,6 +673,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_open_file setTitle: _NS("Quick Open File...")];
     [o_mi_open_disc setTitle: _NS("Open Disc...")];
     [o_mi_open_net setTitle: _NS("Open Network...")];
+    [o_mi_open_capture setTitle: _NS("Open Capture Device...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_open_recent_cm setTitle: _NS("Clear Menu")];
     [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
@@ -1907,6 +1908,18 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_open openNet];
     } else {
         [o_open openNet];
+    }
+}
+
+- (IBAction)intfOpenCapture:(id)sender
+{
+    if( !nib_open_loaded )
+    {
+        nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
+        [o_open awakeFromNib];
+        [o_open openCapture];
+    } else {
+        [o_open openCapture];
     }
 }
 

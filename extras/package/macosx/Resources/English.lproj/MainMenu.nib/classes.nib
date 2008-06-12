@@ -186,6 +186,7 @@
             ACTIONS =             {
                 checkForUpdate = id;
                 clearRecentItems = id;
+                intfOpenCapture = id;
                 intfOpenDisc = id;
                 intfOpenFile = id;
                 intfOpenFileGeneric = id;
@@ -286,6 +287,7 @@
                 "o_mi_mute" = id;
                 "o_mi_next" = id;
                 "o_mi_normal_window" = id;
+                "o_mi_open_capture" = id;
                 "o_mi_open_disc" = id;
                 "o_mi_open_file" = id;
                 "o_mi_open_generic" = id;
