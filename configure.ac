@@ -4552,7 +4552,8 @@ AC_ARG_ENABLE(portaudio,
    fi])
 
 dnl
-dnl  aRts module -- broken (freeze wxWidgets)
+dnl  aRts module
+dnl  broken? (froze wxWidgets back then)
 dnl
 AC_ARG_ENABLE(arts,
  [  --enable-arts           aRts sound server (default disabled)],
@@ -4825,107 +4826,6 @@ then
   fi
 fi
 AM_CONDITIONAL(BUILD_PDA, [test "${enable_pda}" = "yes"])
-
-dnl
-dnl  wxWidgets module
-dnl
-AC_ARG_ENABLE(wxwidgets,
-  [  --enable-wxwidgets      wxWidgets support (default disabled)])
-
-if test "${enable_wxwidgets}" = "yes"
-then
-  AC_MSG_WARN([wxWidgets support is deprecated and will be removed. Consider using Qt4 instead.])
-  WXWIDGETS_PATH="${PATH}"
-  AC_ARG_WITH(wx-config-path,
-    [    --with-wx-config-path=PATH wx-config path (default search in \$PATH)],
-    [ if test "${with_wx_config_path}" != "no"
-      then
-        WXWIDGETS_PATH="${with_wx_config_path}:${PATH}"
-      fi ])
-  WXWIDGETS_NAME="wx-config"
-  AC_ARG_WITH(wx-config,
-    [    --with-wx-config=NAME      wx-config name (default is wx-config)],
-    [ if test "${with_wx_config}" != "no"
-      then
-        WXWIDGETS_NAME="${with_wx_config}"
-      fi ])
-  # look for wx-config
-  AC_PATH_PROG(WX_CONFIG, ${WXWIDGETS_NAME}, no, ${WXWIDGETS_PATH})
-  if test "${WX_CONFIG}" != "no" -a "${CXX}" != ""
-  then
-    if expr 2.6.0 \> `${WX_CONFIG} --version` >/dev/null
-    then
-      AC_MSG_ERROR([You need wxWidgets version 2.6.0 or upwards. Please upgrade and try again.])
-    fi
-    AC_LANG_PUSH(C++)
-    # Turn this error:
-    #   playlist.cpp:1351: error: ISO C++ forbids cast to non-reference type
-    # into a warning. However better would be to fix playlist.cpp
-    AC_CACHE_CHECK([if \$CXX accepts -fpermissive],
-        [ac_cv_cxx_fpermissive],
-        [CXXFLAGS="${CXXFLAGS_save} -fpermissive"
-         AC_TRY_COMPILE([],,ac_cv_cxx_fpermissive=yes,
-                        ac_cv_cxx_fpermissive=no)])
-    if test "${ac_cv_cxx_fpermissive}" = "yes"; then
-      VLC_ADD_CXXFLAGS([wxwidgets],-fpermissive)
-    fi
-    VLC_ADD_LIBS([wxwidgets],[`${WX_CONFIG} --libs`])
-    VLC_ADD_CXXFLAGS([wxwidgets],[`${WX_CONFIG} --cxxflags`])
-    # check if we must link against gtk2 libs
-    # if __WXGTK20__ && __WXGTK__ are defined
-    # for modules/gui/wxwidgets/video.cpp
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
-#include <wx/wx.h>
-#ifdef __WXGTK20__
-#error ok, we need to link against gtk2
-#endif
-        ])],[WXGTK=no],[WXGTK=yes])
-    if test "$WXGTK" = "yes"; then
-      ${PKG_CONFIG} --exists gtk+-2.0 && VLC_ADD_LIBS([wxwidgets],[`$PKG_CONFIG --libs gtk+-2.0`])
-    fi
-    if ${WX_CONFIG} --unicode
-    then 
-      # wxwidgets should provide the following flags but does not
-      # the following is required to compile for win32
-      VLC_ADD_CXXFLAGS([wxwidgets],[-D_UNICODE -DUNICODE])
-    else
-      AC_MSG_ERROR([You need a unicode build of wxWidgets. Please fix that and try again. Better yet, you can configure with --disable-wxwidgets.])
-    fi
-    if test "$have_libcdio" = "yes"
-    then 
-      VLC_ADD_LIBS([wxwidgets],[$LIBCDIO_LIBS])
-      VLC_ADD_CXXFLAGS([wxwidgets],[$LIBCDIO_CFLAGS])
-    else 
-      AC_MSG_WARN([Probe disc disabled because ok libcdio library not found])
-    fi
-
-    if test "$have_libvcdinfo" = "yes"
-    then 
-      VLC_ADD_LIBS([wxwidgets],[$VCDINFO_LIBS])
-      VLC_ADD_CXXFLAGS([wxwidgets],[$VCDINFO_CFLAGS])
-    else 
-      AC_MSG_WARN([VCD information on Probe disc disabled because ok libvcdinfo not found])
-    fi
-
-    # now look for the wxprec.h header
-    CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_wxwidgets}"
-    ac_cv_wx_headers=yes
-    AC_CHECK_HEADERS(wx/wxprec.h, , [
-      ac_cv_wx_headers=no
-      echo "Cannot find wxWidgets development headers."
-    ])
-    if test "${ac_cv_wx_headers}" = "yes"
-    then
-      VLC_ADD_PLUGIN([wxwidgets])
-      AC_DEFINE([HAVE_WX], 1, [Define to 1 if you have WxWidgets library.])
-      ALIASES="${ALIASES} wxvlc"
-    fi
-    CPPFLAGS="${CPPFLAGS_save}"
-    AC_LANG_POP(C++)
-  fi
-  dnl WxWidgets plugin will yield incorrect code without this
-  VLC_ADD_CXXFLAGS([wxwidgets], [-fno-strict-aliasing])
-fi
 
 dnl
 dnl QT 4
@@ -5865,7 +5765,6 @@ AC_CONFIG_FILES([
   modules/gui/qnx/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
-  modules/gui/wxwidgets/Makefile
   modules/gui/wince/Makefile
   modules/meta_engine/Makefile
   modules/misc/Makefile

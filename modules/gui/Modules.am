@@ -1,4 +1,4 @@
-DIST_SUBDIRS = beos macosx minimal_macosx pda qnx qt4 skins2 wxwidgets wince
+DIST_SUBDIRS = beos macosx minimal_macosx pda qnx qt4 skins2 wince
 SUBDIRS =
 
 if HAVE_BEOS
@@ -17,7 +17,6 @@ endif
 if BUILD_SKINS
 SUBDIRS += skins2
 endif
-SUBDIRS += wxwidgets
 if HAVE_WINCE
 SUBDIRS += wince
 endif
