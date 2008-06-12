@@ -50,11 +50,12 @@
 #endif
 
 /* to trying transparency with fullscreen controller on windows enable that */
-#define HAVE_TRANSPARENCY 0
 /* it can be enabled on-non windows systems,
    but it will be transparent only with composite manager */
 #ifndef WIN32
     #define HAVE_TRANSPARENCY 1
+#else
+    #define HAVE_TRANSPARENCY 0
 #endif
 
 /* Default value of opacity for FS controller */
