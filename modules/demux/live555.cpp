@@ -140,15 +140,15 @@ typedef struct
     es_format_t     fmt;
     es_out_id_t     *p_es;
 
-    bool      b_muxed;
-    bool      b_quicktime;
-    bool      b_asf;
+    bool            b_muxed;
+    bool            b_quicktime;
+    bool            b_asf;
     stream_t        *p_out_muxed;    /* for muxed stream */
 
     uint8_t         *p_buffer;
     unsigned int    i_buffer;
 
-    bool      b_rtcp_sync;
+    bool            b_rtcp_sync;
     char            waiting;
     int64_t         i_pts;
     u_int32_t       i_start_seq;
