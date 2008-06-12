@@ -370,16 +370,16 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
                                      "Increase the mtu size (--mtu option)");
                     n = i_buflen;
                     break;
-
-                default:
-                    goto error;
             }
 #else
-            /* spurious wake-up or TLS did not yield any actual data */
-            if (errno == EAGAIN)
-                continue;
-            goto error;
+            switch (errno)
+            {
+                case EAGAIN: /* spurious wakeup or no TLS data */
+                case EINTR:  /* asynchronous signal */
+                    continue;
+            }
 #endif
+            goto error;
         }
 
         if (n == 0)
@@ -429,20 +429,19 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 
         if (poll (ufd, 1, -1) == -1)
         {
-            if (errno != EINTR)
-            {
-                msg_Err (p_this, "Write error: %m");
-                goto error;
-            }
-            continue;
+            if (errno == EINTR)
+                continue;
+            msg_Err (p_this, "Polling error: %m");
+            return -1;
         }
 
         if (i_total > 0)
-        {
-            /* Errors will be dequeued separately, upon next call. */
-            if (ufd[0].revents & (POLLERR|POLLNVAL|POLLHUP))
+        {   /* If POLLHUP resp. POLLERR|POLLNVAL occurs while we have already
+             * read some data, it is important that we first return the number
+             * of bytes read, and then return 0 resp. -1 on the NEXT call. */
+            if (ufd[0].revents & (POLLHUP|POLLERR|POLLNVAL))
                 break;
-            if (ufd[1].revents)
+            if (ufd[1].revents) /* VLC object signaled */
                 break;
         }
         else
@@ -466,6 +465,8 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 
         if (val == -1)
         {
+            if (errno == EINTR)
+                continue;
             msg_Err (p_this, "Write error: %m");
             break;
         }
