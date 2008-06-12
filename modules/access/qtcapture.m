@@ -104,8 +104,7 @@ vlc_module_end();
     @synchronized (self) {
         imageBufferToRelease = currentImageBuffer;
         currentImageBuffer = videoFrame;
-        /* FIXME: is it the right PTS? */
-        currentPts = [sampleBuffer presentationTime].timeValue / [sampleBuffer presentationTime].timeScale;
+        currentPts = [sampleBuffer presentationTime].timeValue;
     }
     CVBufferRelease(imageBufferToRelease);
 }
@@ -118,12 +117,13 @@ vlc_module_end();
         if(!currentImageBuffer) return 0;
         imageBuffer = CVBufferRetain(currentImageBuffer);
         pts = currentPts;
-    }
+    
 
     CVPixelBufferLockBaseAddress(imageBuffer, 0);
     void * pixels = CVPixelBufferGetBaseAddress(imageBuffer);
     memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer) );
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+    }
 
     CVBufferRelease(imageBuffer);
 
@@ -137,10 +137,11 @@ vlc_module_end();
 *****************************************************************************/
 
 struct demux_sys_t {
-   QTCaptureSession * session;
-   VLCDecompressedVideoOutput * output;
-   int height, width;
-   es_out_id_t * p_es_video;
+    QTCaptureSession * session;
+    QTCaptureDevice * device;
+    VLCDecompressedVideoOutput * output;
+    int height, width;
+    es_out_id_t * p_es_video;
 };
 
 
@@ -185,62 +186,73 @@ static int Open( vlc_object_t *p_this )
     /* Only when selected */
     if( *p_demux->psz_access == '\0' )
         return VLC_EGENERIC;
-
+    
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
+    /* Set up p_demux */
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->info.i_update = 0;
+    p_demux->info.i_title = 0;
+    p_demux->info.i_seekpoint = 0;
+    
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys ) return VLC_ENOMEM;
+    
+    memset( p_sys, 0, sizeof( demux_sys_t ) );
+    memset( &fmt, 0, sizeof( es_format_t ) );    
+    
     msg_Dbg( p_demux, "QTCapture Probed" );
 
     QTCaptureDeviceInput * input = nil;
-    QTCaptureSession * session = nil;
-    VLCDecompressedVideoOutput * output = nil;
 
-    QTCaptureDevice * device = [QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo];
-    if( !device )
+    p_sys->device = [QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo];
+    if( !p_sys->device )
+    {
+        msg_Err( p_demux, "Can't find any Video device" );
+        goto error;
+    }
+
+    if( ![p_sys->device open: nil  /* FIXME */] )
     {
         msg_Err( p_demux, "Can't open any Video device" );
         goto error;
     }
 
-    if( ![device open: nil  /* FIXME */] )
-    {
-        msg_Err( p_demux, "Can't open any Video device" );
-        goto error;
-    }
-
-    input = [[QTCaptureDeviceInput alloc] initWithDevice: device];
-    if( !device )
+    input = [[QTCaptureDeviceInput alloc] initWithDevice: p_sys->device];
+    if( !p_sys->device )
     {
         msg_Err( p_demux, "Can't create a capture session" );
         goto error;
     }
 
-    output = [[VLCDecompressedVideoOutput alloc] init];
+    p_sys->output = [[VLCDecompressedVideoOutput alloc] init];
 
     /* Hack - This will lower CPU consumption for some reason */
-    [output setPixelBufferAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+    [p_sys->output setPixelBufferAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithInt:480], kCVPixelBufferHeightKey,
         [NSNumber numberWithInt:640], kCVPixelBufferWidthKey, nil]];
 
-    session = [[QTCaptureSession alloc] init];
+    p_sys->session = [[QTCaptureSession alloc] init];
 
-    bool ret = [session addInput:input error:nil  /* FIXME */];
+    bool ret = [p_sys->session addInput:input error:nil  /* FIXME */];
     if( !ret )
     {
         msg_Err( p_demux, "Can't add the video device as input" );
         goto error;
     }
 
-    ret = [session addOutput:output error:nil  /* FIXME */];
+    ret = [p_sys->session addOutput:p_sys->output error:nil  /* FIXME */];
     if( !ret )
     {
         msg_Err( p_demux, "Can't get any output output" );
         goto error;
     }
 
-    [session startRunning];
+    [p_sys->session startRunning];
 
 
-    int qtchroma = [[[device formatDescriptions] objectAtIndex: 0] formatType]; /* FIXME */
+    int qtchroma = [[[p_sys->device formatDescriptions] objectAtIndex: 0] formatType]; /* FIXME */
     int chroma = qtchroma_to_fourcc( qtchroma );
     if( !chroma )
     {
@@ -250,22 +262,9 @@ static int Open( vlc_object_t *p_this )
 
     /* Now we can init */
 
-    /* Set up p_demux */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->info.i_update = 0;
-    p_demux->info.i_title = 0;
-    p_demux->info.i_seekpoint = 0;
-
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    if( !p_sys ) return VLC_ENOMEM;
-
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
-    memset( &fmt, 0, sizeof( es_format_t ) );
-
     es_format_Init( &fmt, VIDEO_ES, chroma );
 
-    NSSize size = [[device attributeForKey:QTFormatDescriptionVideoEncodedPixelsSizeAttribute] sizeValue];
+    NSSize size = [[p_sys->device attributeForKey:QTFormatDescriptionVideoEncodedPixelsSizeAttribute] sizeValue];
     p_sys->width = fmt.video.i_width = 640;/* size.width; FIXME */
     p_sys->height = fmt.video.i_height = 480;/* size.height; FIXME */
 
@@ -274,12 +273,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
 
-    p_sys->output = [output retain];
-    p_sys->session = [session retain];
-
     [input release];
-    [output release];
-    [session release];
     [pool release];
 
     msg_Dbg( p_demux, "QTCapture: We have a video device ready!" );
@@ -287,9 +281,9 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 error:
     [input release];
-    [session release];
-    [input release];
-    [output release];
+    [p_sys->device release];
+    [p_sys->output release];
+    [p_sys->session release];
     [pool release];
 
     free( p_sys );
@@ -306,8 +300,11 @@ static void Close( vlc_object_t *p_this )
 
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    [p_sys->session stopRunning];
     [p_sys->output release];
     [p_sys->session release];
+    [p_sys->device release];
     free( p_sys );
 
     [pool release];
@@ -332,7 +329,9 @@ static int Demux( demux_t *p_demux )
 
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
+    @synchronized (p_sys->output) {
     p_block->i_pts = [p_sys->output copyCurrentFrameToBuffer: p_block->p_buffer];
+    }
 
     if( !p_block->i_pts )
     {
