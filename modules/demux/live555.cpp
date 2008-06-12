@@ -110,6 +110,9 @@ vlc_module_begin();
         add_integer( "rtp-client-port", -1, NULL,
                   N_("Client port"),
                   N_("Port to use for the RTP source of the session"), true );
+        add_bool( "rtsp-mcast", false, NULL,
+                  N_("Force multicast RTP via RTSP"),
+                  N_("Force multicast RTP via RTSP"), true );
         add_bool( "rtsp-http", 0, NULL,
                   N_("Tunnel RTSP and RTP over HTTP"),
                   N_("Tunnel RTSP and RTP over HTTP"), true );
@@ -196,8 +199,9 @@ struct demux_sys_t
     timeout_thread_t *p_timeout;    /* the actual thread that makes sure we don't timeout */
 
     /* */
-    bool       b_multicast;   /* true if one of the tracks is multicasted */
-    bool       b_no_data;     /* true if we never receive any data */
+    bool             b_force_mcast;
+    bool             b_multicast;   /* if one of the tracks is multicasted */
+    bool             b_no_data;     /* if we never received any data */
     int              i_no_data_ti;  /* consecutive number of TaskInterrupt */
 
     char             event;
@@ -279,6 +283,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_multicast = false;
     p_sys->b_real = false;
     p_sys->psz_path = strdup( p_demux->psz_path );
+    p_sys->b_force_mcast = var_CreateGetBool( p_demux, "rtsp-mcast" );
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
@@ -720,13 +725,18 @@ static int SessionsSetup( demux_t *p_demux )
             /* Issue the SETUP */
             if( p_sys->rtsp )
             {
-                if( !( p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                                   b_rtsp_tcp ? True : False ) ) )
+                bool tcp = b_rtsp_tcp;
+                bool mcast = p_sys->b_force_mcast;
+                if( !p_sys->rtsp->setupMediaSubsession( *sub, False,
+                                           tcp ? True : False,
+                                           ( mcast && !tcp ) ? True : False ) )
                 {
+                    tcp = !tcp;
                     /* if we get an unsupported transport error, toggle TCP use and try again */
                     if( !strstr(p_sys->env->getResultMsg(), "461 Unsupported Transport")
-                     || !( p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                                   b_rtsp_tcp ? False : True ) ) )
+                     || !p_sys->rtsp->setupMediaSubsession( *sub, False,
+                                           tcp ? False : True,
+                                           ( mcast && !tcp ) ? True : False ) )
                     {
                         msg_Err( p_demux, "SETUP of'%s/%s' failed %s", sub->mediumName(),
                                  sub->codecName(), p_sys->env->getResultMsg() );
