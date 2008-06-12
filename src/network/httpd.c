@@ -1457,26 +1457,32 @@ static httpd_client_t *httpd_ClientNew( int fd, tls_session_t *p_tls, mtime_t no
     return cl;
 }
 
-static int httpd_NetRecv( httpd_client_t *cl, uint8_t *p, int i_len )
+static
+ssize_t httpd_NetRecv (httpd_client_t *cl, uint8_t *p, size_t i_len)
 {
     tls_session_t *p_tls;
+    ssize_t val;
 
     p_tls = cl->p_tls;
-    if( p_tls != NULL)
-        return tls_Recv( p_tls, p, i_len );
-
-    return recv( cl->fd, p, i_len, 0 );
+    do
+        val = p_tls ? tls_Recv (p_tls, p, i_len)
+                    : recv (cl->fd, p, i_len, 0);
+    while (val == -1 && errno == EINTR);
+    return val;
 }
 
-static int httpd_NetSend( httpd_client_t *cl, const uint8_t *p, int i_len )
+static
+ssize_t httpd_NetSend (httpd_client_t *cl, const uint8_t *p, size_t i_len)
 {
     tls_session_t *p_tls;
+    ssize_t val;
 
     p_tls = cl->p_tls;
-    if( p_tls != NULL)
-        return tls_Send( p_tls, p, i_len );
-
-    return send( cl->fd, p, i_len, 0 );
+    do
+        val = p_tls ? tls_Send( p_tls, p, i_len )
+                    : send (cl->fd, p, i_len, 0);
+    while (val == -1 && errno == EINTR);
+    return val;
 }
 
 
@@ -1830,7 +1836,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 #if defined( WIN32 ) || defined( UNDER_CE )
     if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) || ( i_len == 0 ) )
 #else
-    if( ( i_len < 0 && errno != EAGAIN && errno != EINTR ) || ( i_len == 0 ) )
+    if( ( i_len < 0 && errno != EAGAIN ) || ( i_len == 0 ) )
 #endif
     {
         if( cl->query.i_proto != HTTPD_PROTO_NONE && cl->query.i_type != HTTPD_MSG_NONE )
@@ -1970,7 +1976,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
 #if defined( WIN32 ) || defined( UNDER_CE )
         if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) || ( i_len == 0 ) )
 #else
-        if( ( i_len < 0 && errno != EAGAIN && errno != EINTR ) || ( i_len == 0 ) )
+        if( ( i_len < 0 && errno != EAGAIN ) || ( i_len == 0 ) )
 #endif
         {
             /* error */
