@@ -86,7 +86,8 @@ vlc_module_end();
 }
 - (void)dealloc
 {
-    @synchronized (self) {
+    @synchronized (self)
+    {
         CVBufferRelease(currentImageBuffer);
         currentImageBuffer = nil;
     }
@@ -101,7 +102,8 @@ vlc_module_end();
 
     CVBufferRetain(videoFrame);
 
-    @synchronized (self) {
+    @synchronized (self)
+    {
         imageBufferToRelease = currentImageBuffer;
         currentImageBuffer = videoFrame;
         currentPts = [sampleBuffer presentationTime].timeValue;
@@ -113,16 +115,19 @@ vlc_module_end();
 {
     CVImageBufferRef imageBuffer;
     mtime_t pts;
-    @synchronized (self) {
-        if(!currentImageBuffer) return 0;
+
+    if(!currentImageBuffer)
+        return 0;
+
+    @synchronized (self)
+    {
         imageBuffer = CVBufferRetain(currentImageBuffer);
         pts = currentPts;
-    
 
-    CVPixelBufferLockBaseAddress(imageBuffer, 0);
-    void * pixels = CVPixelBufferGetBaseAddress(imageBuffer);
-    memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer) );
-    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+        CVPixelBufferLockBaseAddress(imageBuffer, 0);
+        void * pixels = CVPixelBufferGetBaseAddress(imageBuffer);
+        memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer) );
+        CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
     }
 
     CVBufferRelease(imageBuffer);
@@ -281,9 +286,6 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 error:
     [input release];
-    [p_sys->device release];
-    [p_sys->output release];
-    [p_sys->session release];
     [pool release];
 
     free( p_sys );
@@ -329,7 +331,8 @@ static int Demux( demux_t *p_demux )
 
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
-    @synchronized (p_sys->output) {
+    @synchronized (p_sys->output)
+    {
     p_block->i_pts = [p_sys->output copyCurrentFrameToBuffer: p_block->p_buffer];
     }
 
