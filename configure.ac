@@ -4982,13 +4982,9 @@ fi
 dnl
 dnl Simple test for skins2 dependency
 dnl
-if test "${enable_skins2}" != "no"
-then
-  if test "${WX_CONFIG}" = "no"
-  then
-    AC_MSG_ERROR([The skins2 module depends on the wxWidgets development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the wxWidgets development package or alternatively you can also configure with: --disable-wxwidgets --disable-skins2.])
-  fi
-fi
+AS_IF([test "${enable_skins2}" != "no"], [
+  AC_MSG_ERROR([The skins2 module depends on a the Qt4 development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt4 development package or alternatively you can also configure with: --disable-qt4 --disable-skins2.])
+])
 
 dnl
 dnl  Opie QT embedded module
