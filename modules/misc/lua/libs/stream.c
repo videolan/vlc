@@ -63,7 +63,7 @@ static int vlclua_stream_new( lua_State *L )
     vlc_object_t * p_this = vlclua_get_this( L );
     stream_t * p_stream;
     const char * psz_url;
-    psz_url = luaL_checkstring( L, -1 );
+    psz_url = luaL_checkstring( L, 1 );
     p_stream = stream_UrlNew( p_this, psz_url );
     if( !p_stream )
         return luaL_error( L, "Error when opening url: `%s'", psz_url );

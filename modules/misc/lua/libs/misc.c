@@ -118,6 +118,12 @@ static int vlclua_datadir( lua_State *L )
     return 1;
 }
 
+static int vlclua_userdatadir( lua_State *L )
+{
+    lua_pushstring( L, config_GetUserDataDir() );
+    return 1;
+}
+
 static int vlclua_homedir( lua_State *L )
 {
     lua_pushstring( L, config_GetHomeDir() );
@@ -198,6 +204,7 @@ static const luaL_Reg vlclua_misc_reg[] = {
     { "license", vlclua_license },
 
     { "datadir", vlclua_datadir },
+    { "userdatadir", vlclua_userdatadir },
     { "homedir", vlclua_homedir },
     { "configdir", vlclua_configdir },
     { "cachedir", vlclua_cachedir },
