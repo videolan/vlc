@@ -419,12 +419,8 @@ void playlist_LastLoop( playlist_t *p_playlist )
         sout_DeleteInstance( p_sout );
 #endif
 
-    while( p_playlist->i_sds )
-    {
-        playlist_ServicesDiscoveryRemove( p_playlist,
-                                          p_playlist->pp_sds[0]->p_sd->psz_module );
-    }
-
+    /* Core should have terminated all SDs before the playlist */
+    assert( p_playlist->i_sds == 0 );
     playlist_MLDump( p_playlist );
 
     PL_LOCK;

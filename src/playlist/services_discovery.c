@@ -430,3 +430,10 @@ bool playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
     return false;
 }
 
+void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist )
+{
+    while( p_playlist->i_sds > 0 )
+        playlist_ServicesDiscoveryRemove( p_playlist,
+                                     p_playlist->pp_sds[0]->p_sd->psz_module );
+}
+

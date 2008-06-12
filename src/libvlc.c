@@ -950,6 +950,10 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
+    /* Remove all services discovery */
+    msg_Dbg( p_libvlc, "removing all services discovery tasks" );
+    playlist_ServicesDiscoveryKillAll( priv->p_playlist );
+
     /* Free playlist */
     msg_Dbg( p_libvlc, "removing playlist" );
     vlc_object_release( priv->p_playlist );
