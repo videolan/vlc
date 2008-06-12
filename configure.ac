@@ -4830,34 +4830,34 @@ AM_CONDITIONAL(BUILD_PDA, [test "${enable_pda}" = "yes"])
 dnl
 dnl QT 4
 dnl
-enableqt4=false
 AC_ARG_ENABLE(qt4,
-  [  --enable-qt4            QT 4 support (default enabled) ])
-AS_IF([test "${enable_qt4}" != "no" &&
-  (test "${SYS}" != "darwin" || test "${enable_qt4}" = "yes")], [
-  PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.2.0],
-    [ VLC_ADD_PLUGIN([qt4])
-      AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
-      ALIASES="${ALIASES} qvlc"
-      enableqt4=true
-      if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "cygwin" -a "${SYS}" != "darwin"; then
-          VLC_ADD_LIBS([qt4],[$QT4_LIBS -lX11])
-      else
-          VLC_ADD_LIBS([qt4],[$QT4_LIBS])
-      fi
-      VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS -DQT4LOCALEDIR=\\\\\\\"$($PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/\\\\\\\"])
-      AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
-      AC_PATH_PROG(RCC, rcc, rcc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
-      AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
-      ],
-      AS_IF([test "${enable_qt4}" = "yes"],[
-        AC_MSG_ERROR(QT4 library not found)
-      ],[
-        AC_MSG_WARN(QT4 library not found)
-      ])
-    )
+  [  --enable-qt4            QT 4 support (default enabled) ],, [
+  AS_IF([test "${SYS}" = "darwin"], [enable_qt4=no])
 ])
-AM_CONDITIONAL(ENABLE_QT4, test "$enableqt4" = "true")
+AS_IF([test "${enable_qt4}" != "no"], [
+  PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.2.0], [
+    VLC_ADD_PLUGIN([qt4])
+    AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
+    ALIASES="${ALIASES} qvlc"
+    AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "cygwin" -a "${SYS}" != "darwin"], [
+        VLC_ADD_LIBS([qt4],[$QT4_LIBS -lX11])
+    ], [
+        VLC_ADD_LIBS([qt4],[$QT4_LIBS])
+    ])
+    VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS -DQT4LOCALEDIR=\\\\\\\"$($PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/\\\\\\\"])
+    AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+    AC_PATH_PROG(RCC, rcc, rcc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+    AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+  ], [
+    AS_IF([test "${enable_qt4}" = "yes"],[
+      AC_MSG_ERROR([Qt 4 library not found])
+    ],[
+      AC_MSG_WARN([Qt 4 library not found])
+    ])
+    enable_qt4="no"
+  ])
+])
+AM_CONDITIONAL(ENABLE_QT4, [test "x$enable_qt4" != "xno"])
 
 dnl
 dnl  WinCE GUI module
@@ -4882,7 +4882,7 @@ fi
 dnl
 dnl Simple test for skins2 dependency
 dnl
-AS_IF([test "${enable_skins2}" != "no"], [
+AS_IF([test "${enable_skins2}" != "no" && test "x$enable_qt4" = "xno"], [
   AC_MSG_ERROR([The skins2 module depends on a the Qt4 development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt4 development package or alternatively you can also configure with: --disable-qt4 --disable-skins2.])
 ])
 
