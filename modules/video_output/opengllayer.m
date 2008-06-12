@@ -44,8 +44,6 @@
 #import <Cocoa/Cocoa.h>
 #import <OpenGL/OpenGL.h>
 
-#ifdef CALayer
-
 /* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
    This allows sizes which are not powers of 2 */
 #define VLCGL_TARGET GL_TEXTURE_RECTANGLE_EXT
@@ -518,5 +516,3 @@ static int InitTextures( vout_thread_t *p_vout )
     CGLUnlockContext( glContext );
 }
 @end
-
-#endif
