@@ -1982,6 +1982,7 @@ vlc_module_begin();
  *  open                          KEY_MODIFIER_COMMAND|'o'
  *  open disk                     KEY_MODIFIER_COMMAND|'d'
  *  open network                  KEY_MODIFIER_COMMAND|'n'
+ *  open capture                  KEY_MODIFIER_COMMAND|'r'
  *  save playlist                 KEY_MODIFIER_COMMAND|'s'
  *  playlist random               KEY_MODIFIER_COMMAND|'z'
  *  playlist repeat all           KEY_MODIFIER_COMMAND|'l'
