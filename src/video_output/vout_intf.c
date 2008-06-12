@@ -107,6 +107,19 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     var_Get( p_vout->p_libvlc, "drawable", &val );
     if( val.i_int ) return (void *)(intptr_t)val.i_int;
 
+#if 0
+    /* FIXME:
+     * This code is utter crap w.r.t. threading. And it has always been.
+     * First, one cannot invoke callbacks from another thread's object.
+     * Not without a well-defined locking convention.
+     *
+     * Second, this would need to "wait" for the interface to be ready.
+     * Otherwise, the availability of the embded window would become
+     * time-dependent.
+     *
+     * In the past, this kind of things worked by accident. This time is over.
+     * -- Courmisch, 12 Jun 2008
+     */
     /* Find if the main interface supports embedding */
     p_list = vlc_list_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
     if( !p_list ) return NULL;
@@ -134,6 +147,9 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     else p_vout->p_parent_intf = p_intf;
 
     return p_window;
+#else
+   return NULL;
+#endif
 }
 
 void vout_ReleaseWindow( vout_thread_t *p_vout, void *p_window )
