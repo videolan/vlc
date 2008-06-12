@@ -495,20 +495,24 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     pthread_attr_t attr;
     pthread_attr_init (&attr);
 
+    /* Block the signals that signals interface plugin handles.
+     * If the LibVLC caller wants to handle some signals by itself, it should
+     * block these before whenever invoking LibVLC. And it must obviously not
+     * start the VLC signals interface plugin.
+     *
+     * LibVLC will normally ignore any interruption caused by an asynchronous
+     * signal during a system call. But there may well be some buggy cases
+     * where it fails to handle EINTR (bug reports welcome). Some underlying
+     * libraries might also not handle EINTR properly.
+     */
     sigset_t set, oldset;
-    /* We really don't want signals to (literaly) interrupt our blocking I/O
-     * system calls. SIGPIPE is especially bad, as it can be caused by remote
-     * peers through connected sockets. Generally, we cannot know which signals
-     * are handled by the main program. Also, external LibVLC bindings tend not
-     * to setup a proper signal mask before invoking LibVLC.
-     * Hence, we hereby block all signals, except those for which blocking is
-     * undefined, as listed below. Note that SIGKILL and SIGSTOP need not be
-     * listed (see the documentation for pthread_sigmask) here. */
-    sigfillset (&set);
-    sigdelset (&set, SIGFPE);
-    sigdelset (&set, SIGILL);
-    sigdelset (&set, SIGSEGV);
-    sigdelset (&set, SIGBUS);
+    sigemptyset (&set);
+    sigdelset (&set, SIGHUP);
+    sigaddset (&set, SIGINT);
+    sigaddset (&set, SIGQUIT);
+    sigaddset (&set, SIGTERM);
+
+    sigaddset (&set, SIGPIPE); /* We don't want this one, really! */
     pthread_sigmask (SIG_BLOCK, &set, &oldset);
 
 #ifndef __APPLE__
