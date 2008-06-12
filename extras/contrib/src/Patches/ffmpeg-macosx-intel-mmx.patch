@@ -15,8 +15,8 @@ Index: libavcodec/i386/motion_est_mmx.c
          "sub $2, %0                     \n\t"
          " jg 1b                         \n\t"
          : "+r" (h), "+r" (blk1), "+r" (blk2)
--        : "r" ((long)stride)
-+        : "r" ((long)stride), "m" (bone)
+-        : "r" ((x86_reg)stride)
++        : "r" ((x86_reg)stride), "m" (bone)
      );
  }
  
@@ -33,8 +33,8 @@ Index: libavcodec/i386/motion_est_mmx.c
          "add %4, %%"REG_a"              \n\t"
          " js 1b                         \n\t"
          : "+a" (len)
--        : "r" (blk1 - len), "r" (blk1 -len + stride), "r" (blk2 - len), "r" ((long)stride)
-+        : "r" (blk1 - len), "r" (blk1 -len + stride), "r" (blk2 - len), "r" ((long)stride), "m" (round_tab[0])
+-        : "r" (blk1 - len), "r" (blk1 -len + stride), "r" (blk2 - len), "r" ((x86_reg)stride)
++        : "r" (blk1 - len), "r" (blk1 -len + stride), "r" (blk2 - len), "r" ((x86_reg)stride), "m" (round_tab[0])
      );
  }
   
@@ -89,14 +89,13 @@ Index: libavcodec/i386/simple_idct_mmx.c
  }
 Index: libavcodec/i386/cavsdsp_mmx.c
 ===================================================================
---- libavcodec/i386/cavsdsp_mmx.c	(revision 11727)
+--- libavcodec/i386/cavsdsp_mmx.c	(revision 13752)
 +++ libavcodec/i386/cavsdsp_mmx.c	(working copy)
-@@ -23,9 +23,31 @@
-  */
- 
- #include "dsputil.h"
+@@ -25,8 +25,30 @@
+ #include "libavutil/common.h"
+ #include "libavutil/x86_cpu.h"
+ #include "libavcodec/dsputil.h"
 -#include "dsputil_mmx.h"
- #include "common.h"
  
 +#define SUMSUB_BA( a, b ) \
 +"paddw "#b", "#a" \n\t"\
@@ -131,8 +130,8 @@ Index: libavcodec/i386/flacdsp_mmx.c
 @@ -26,7 +26,6 @@
      double c = 2.0 / (len-1.0);
      int n2 = len>>1;
-     long i = -n2*sizeof(int32_t);
--    long j =  n2*sizeof(int32_t);
+     x86_reg i = -n2*sizeof(int32_t);
+-    x86_reg j =  n2*sizeof(int32_t);
      asm volatile(
          "movsd   %0,     %%xmm7 \n\t"
          "movapd  %1,     %%xmm6 \n\t"
@@ -146,7 +145,7 @@ Index: libavcodec/i386/flacdsp_mmx.c
      );
      if(len&1)
 @@ -84,9 +83,11 @@
-         long i = -len*sizeof(double);
+         x86_reg i = -len*sizeof(double);
          if(j == lag-2) {
              asm volatile(
 -                "movsd     %6,     %%xmm0 \n\t"
