@@ -161,7 +161,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
         {
             int timeout, val;
 
-            if( net_errno != EINPROGRESS )
+            if( net_errno != EINPROGRESS && net_errno != EINTR )
             {
                 msg_Err( p_this, "connection failed: %m" );
                 goto next_ai;
