@@ -420,6 +420,9 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
 /** Tell the number of items in the current playing context */
 #define playlist_CurrentSize( pl ) pl->current.i_size
 
+/** Tell the current item id in current  playing context */
+#define playlist_CurrentId( pl ) pl->status.p_item->i_id
+
 /** Ask the playlist to do some work */
 #define playlist_Signal( p_playlist ) vlc_object_signal( p_playlist )
 

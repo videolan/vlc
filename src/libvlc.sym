@@ -148,6 +148,7 @@ libvlc_playlist_delete_item
 libvlc_playlist_get_media_player
 libvlc_playlist_isplaying
 libvlc_playlist_items_count
+libvlc_playlist_get_current_index
 libvlc_playlist_lock
 libvlc_playlist_loop
 libvlc_playlist_next

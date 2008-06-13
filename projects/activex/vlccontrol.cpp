@@ -890,21 +890,28 @@ STDMETHODIMP VLCControl::addTarget(BSTR uri, VARIANT options, enum VLCPlaylistMo
 
 STDMETHODIMP VLCControl::get_PlaylistIndex(int *index)
 {
-    return E_INVALIDARG;
-#if 0
     if( NULL == index )
         return E_POINTER;
 
+    *index = 0;
     libvlc_instance_t *p_libvlc;
     HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
     {
-        *index = VLC_PlaylistIndex(i_vlc);
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        *index = libvlc_playlist_get_current_index(p_libvlc, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCControl,
+                libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
         return NOERROR;
     }
-    *index = 0;
     return result;
-#endif
 };
 
 STDMETHODIMP VLCControl::get_PlaylistCount(int *count)

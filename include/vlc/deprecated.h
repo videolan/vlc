@@ -127,6 +127,8 @@ VLC_DEPRECATED_API int libvlc_playlist_isplaying( libvlc_instance_t *,
 VLC_DEPRECATED_API int libvlc_playlist_items_count( libvlc_instance_t *,
                                                 libvlc_exception_t * );
 
+VLC_DEPRECATED_API int libvlc_playlist_get_current_index( libvlc_instance_t *,
+                                                 libvlc_exception_t *);
 /**
  * Lock the playlist.
  *

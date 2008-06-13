@@ -62,7 +62,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
                            int i_options, char **ppsz_options,
                            libvlc_exception_t *p_e )
 {
-    VLC_UNUSED(p_e);
+    VLC_UNUSED(p_e); VLC_UNUSED(i_options); VLC_UNUSED(ppsz_options);
 
     int did_lock = 0;
     assert( PL );
@@ -206,6 +206,17 @@ int libvlc_playlist_items_count( libvlc_instance_t *p_instance,
 
     assert( PL );
     return playlist_CurrentSize( PL );
+}
+
+int libvlc_playlist_get_current_index ( libvlc_instance_t *p_instance,
+                                        libvlc_exception_t *p_e )
+{
+    VLC_UNUSED(p_e);
+
+    assert( PL );
+    if( !PL->status.p_item )
+        return -1;
+    return playlist_CurrentId( PL );
 }
 
 void libvlc_playlist_lock( libvlc_instance_t *p_instance )
