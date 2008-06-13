@@ -240,13 +240,7 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
     libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
     if( p_mi )
     {
-        vout_thread_t *p_vout = GetVout( p_mi, p_e );
-        if( p_vout )
-        {
-            /* tell running vout to re-parent */
-            vout_Control( p_vout , VOUT_REPARENT, d);
-            vlc_object_release( p_vout );
-        }
+        libvlc_media_player_set_drawable( p_mi, d, p_e );
         libvlc_media_player_release(p_mi);
     }
 }
