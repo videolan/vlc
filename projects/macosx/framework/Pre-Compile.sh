@@ -24,10 +24,12 @@ if test "${ACTION}" = "build"; then
     lib="lib"
     modules="modules"
     share="share"
+    include="include"
     target="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
     target_lib="${target}/${lib}"            # Should we consider using a different well-known folder like shared resources?
     target_modules="${target}/${modules}"    # Should we consider using a different well-known folder like shared resources?
     target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
+    target_include="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
     linked_libs=" "
     
     ##########################
@@ -147,4 +149,11 @@ if test "${ACTION}" = "build"; then
     pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
     mkdir -p ${target_share}
     $pbxcp ${VLC_SRC_DIR}/share/lua ${target_share}
+
+    ##########################
+    # Exporting headers
+    echo "Exporting headers..."
+    mkdir -p ${target_include}/vlc
+    $pbxcp ${VLC_SRC_DIR}/include/vlc/*.h ${target_include}/vlc
+
 fi
