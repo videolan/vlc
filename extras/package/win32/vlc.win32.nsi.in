@@ -624,12 +624,12 @@ Function .onInit
   ReadRegStr $R0  ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
   "UninstallString"
   StrCmp $R0 "" done
- 
+
   MessageBox MB_YESNO|MB_ICONEXCLAMATION \
   "VLC media player has already been installed. $\nDo you want to remove \
   the previous version before installing $(^Name) ?" \
   IDNO done
-  
+
   ;Run the uninstaller
   ;uninst:
     ClearErrors
