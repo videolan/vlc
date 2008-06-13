@@ -40,12 +40,12 @@ function fetch_art()
     else
         return nil
     end
-    fd = vlc.stream_new( "http://images.google.com/images?q=" .. get_query( title ) )
-    page = vlc.stream_read( fd, 65653 )
-    vlc.stream_delete( fd )
+    fd = vlc:stream( "http://images.google.com/images?q=" .. get_query( title ) )
+    page = fd:read( 65653 )
+    fd = nil
     _, _, arturl = string.find( page, "imgurl=([^&]+)" )
     if arturl then
-        return vlc.decode_uri(arturl)
+        return vlc.strings.decode_uri(arturl)
     else
         return nil
     end
