@@ -96,6 +96,8 @@ int libvlc_get_fullscreen( libvlc_media_player_t *p_mi,
         libvlc_exception_raise( p_e,
                         "Unexpected error while looking up fullscreen value" );
 
+    vlc_object_release( p_vout1 );
+
     return val.b_bool == true ? 1 : 0;
 }
 
