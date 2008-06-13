@@ -235,20 +235,17 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
     /* set as default for future vout instances */
     var_SetInteger(p_instance->p_libvlc_int, "drawable", (int)d);
 
-    if( libvlc_playlist_isplaying(p_instance, p_e) )
+    libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
+    if( p_mi )
     {
-        libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
-        if( p_mi )
+        vout_thread_t *p_vout = GetVout( p_mi, p_e );
+        if( p_vout )
         {
-            vout_thread_t *p_vout = GetVout( p_mi, p_e );
-            if( p_vout )
-            {
-                /* tell running vout to re-parent */
-                vout_Control( p_vout , VOUT_REPARENT, d);
-                vlc_object_release( p_vout );
-            }
-            libvlc_media_player_release(p_mi);
+            /* tell running vout to re-parent */
+            vout_Control( p_vout , VOUT_REPARENT, d);
+            vlc_object_release( p_vout );
         }
+        libvlc_media_player_release(p_mi);
     }
 }
 
@@ -271,20 +268,17 @@ void libvlc_video_set_size( libvlc_instance_t *p_instance, int width, int height
     config_PutInt(p_instance->p_libvlc_int, "width", width);
     config_PutInt(p_instance->p_libvlc_int, "height", height);
 
-    if( libvlc_playlist_isplaying(p_instance, p_e) )
+    libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
+    if( p_mi )
     {
-        libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
-        if( p_mi )
+        vout_thread_t *p_vout = GetVout( p_mi, p_e );
+        if( p_vout )
         {
-            vout_thread_t *p_vout = GetVout( p_mi, p_e );
-            if( p_vout )
-            {
-                /* tell running vout to re-size */
-                vout_Control( p_vout , VOUT_SET_SIZE, width, height);
-                vlc_object_release( p_vout );
-            }
-            libvlc_media_player_release(p_mi);
+            /* tell running vout to re-size */
+            vout_Control( p_vout , VOUT_SET_SIZE, width, height);
+            vlc_object_release( p_vout );
         }
+        libvlc_media_player_release(p_mi);
     }
 }
 
