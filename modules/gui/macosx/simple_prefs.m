@@ -48,10 +48,10 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if (_o_sharedInstance) {
         [self dealloc];
     } else {
-        p_intf = VLCIntf;
         _o_sharedInstance = [super init];
+        p_intf = VLCIntf;
     }
-    
+
     return _o_sharedInstance;
 }
 
@@ -274,14 +274,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_osd_osd_box setTitle: _NS("On Screen Display")];
     [o_osd_osd_ckb setTitle: _NS("Enable OSD")];
 
-    /* generic stuff */
-    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
-    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
-    [o_sprefs_cancel_btn setTitle: _NS("Cancel")];
-    [o_sprefs_reset_btn setTitle: _NS("Reset Preferences")];
-    [o_sprefs_save_btn setTitle: _NS("Save")];
-    [o_sprefs_win setTitle: _NS("Preferences")];
-
     /* video */
     [o_video_black_ckb setTitle: _NS("Black screens in Fullscreen mode")];
     [o_video_device_txt setStringValue: _NS("Display device")];
@@ -297,6 +289,14 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_video_snap_format_txt setStringValue: _NS("Format")];
     [o_video_snap_prefix_txt setStringValue: _NS("Prefix")];
     [o_video_snap_seqnum_ckb setTitle: _NS("Sequential numbering")];
+    
+    /* generic stuff */
+    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
+    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
+    [o_sprefs_cancel_btn setTitle: _NS("Cancel")];
+    [o_sprefs_reset_btn setTitle: _NS("Reset Preferences")];
+    [o_sprefs_save_btn setTitle: _NS("Save")];
+    [o_sprefs_win setTitle: _NS("Preferences")];
 }
 
 - (void)resetControls
@@ -356,6 +356,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     vlc_list_release( p_list ); \
     [object setToolTip: _NS(p_item->psz_longtext)]
 
+    [[o_sprefs_basicFull_matrix cellAtRow:0 column:0] setState: NSOnState];
+    [[o_sprefs_basicFull_matrix cellAtRow:0 column:1] setState: NSOffState];
+    
     /**********************
      * interface settings *
      **********************/
@@ -610,8 +613,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     else if( sender == o_sprefs_basicFull_matrix )
     {
         [o_sprefs_win orderOut: self];
+        [[o_sprefs_basicFull_matrix cellAtRow:0 column:0] setState: NSOffState];
+        [[o_sprefs_basicFull_matrix cellAtRow:0 column:1] setState: NSOnState];
         [[[VLCMain sharedInstance] getPreferences] showPrefs];
-        [self resetControls];
     }
     else
         msg_Err( p_intf, "unknown buttonAction sender" );

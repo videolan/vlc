@@ -66,6 +66,7 @@
     IBOutlet id o_cancel_btn;
     IBOutlet id o_reset_btn;
     IBOutlet id o_advanced_ckb;
+    IBOutlet id o_basicFull_matrix;
 }
 
 + (VLCPrefs *)sharedInstance;
@@ -77,6 +78,7 @@
 - (IBAction)closePrefs: (id)sender;
 - (IBAction)resetAll: (id)sender;
 - (IBAction)advancedToggle: (id)sender;
+- (IBAction)buttonAction: (id)sender;
 
 @end
 

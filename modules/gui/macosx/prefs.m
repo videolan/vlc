@@ -53,10 +53,11 @@
 #include <vlc_common.h>
 #include <vlc_config_cat.h>
 
-#include "intf.h"
-#include "prefs.h"
-#include "prefs_widgets.h"
-#include "vlc_keys.h"
+#import "intf.h"
+#import "prefs.h"
+#import "simple_prefs.h"
+#import "prefs_widgets.h"
+#import "vlc_keys.h"
 
 /*****************************************************************************
  * VLCPrefs implementation
@@ -112,6 +113,9 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (void)showPrefs
 {
+    [[o_basicFull_matrix cellAtRow:0 column:0] setState: NSOffState];
+    [[o_basicFull_matrix cellAtRow:0 column:1] setState: NSOnState];
+    
     [o_prefs_window center];
     [o_prefs_window makeKeyAndOrderFront:self];
 }
@@ -123,6 +127,8 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_cancel_btn setTitle: _NS("Cancel")];
     [o_reset_btn setTitle: _NS("Reset All")];
     [o_advanced_ckb setTitle: _NS("Advanced")];
+    [[o_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
+    [[o_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
 }
 
 - (IBAction)savePrefs: (id)sender
@@ -168,6 +174,14 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     /* refresh the view of the current treeitem */
     [[o_tree itemAtRow:[o_tree selectedRow]] showView:o_prefs_view advancedView:
         ( [o_advanced_ckb state] == NSOnState ) ? true : false];
+}
+
+- (IBAction)buttonAction: (id)sender
+{
+    [o_prefs_window orderOut: self];
+    [[o_basicFull_matrix cellAtRow:0 column:0] setState: NSOnState];
+    [[o_basicFull_matrix cellAtRow:0 column:1] setState: NSOffState];
+    [[[VLCMain sharedInstance] getSimplePreferences] showSimplePrefs];
 }
 
 - (void)loadConfigTree

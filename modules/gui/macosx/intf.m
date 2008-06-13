@@ -423,7 +423,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         _o_sharedMainInstance = [super init];
 
     o_about = [[VLAboutBox alloc] init];
-    o_prefs = [[VLCPrefs alloc] init];
+    o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
     o_extended = nil;
@@ -1801,22 +1801,25 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
-    
+
     if( nib_about_loaded )
         [o_about release];
-    
+
     if( nib_prefs_loaded )
+    {
+        [o_sprefs release];
         [o_prefs release];
-    
+    }
+
     if( nib_open_loaded )
         [o_open release];
- 
+
     if( nib_extended_loaded )
     {
         [o_extended collapsAll];
         [o_extended release];
     }
- 
+
     if( nib_bookmarks_loaded )
         [o_bookmarks release];
 
@@ -2003,11 +2006,14 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (IBAction)viewPreferences:(id)sender
 {
     if( !nib_prefs_loaded )
+    {
         nib_prefs_loaded = [NSBundle loadNibNamed:@"Preferences" owner: self];
+        o_sprefs = [[VLCSimplePrefs alloc] init];
+        o_prefs= [[VLCPrefs alloc] init];
+    }
 
     if( sender == o_mi_sprefs )
     {
-        o_sprefs = [[VLCSimplePrefs alloc] init];
         [o_sprefs showSimplePrefs];
     }
     else
