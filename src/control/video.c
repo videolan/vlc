@@ -139,13 +139,16 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, char *psz_filepath,
 int libvlc_video_get_height( libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
+    int height;
+
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    if( !p_vout )
-        return 0;
+    if( !p_vout ) return 0;
+
+    height = p_vout->i_window_height;
 
     vlc_object_release( p_vout );
 
-    return p_vout->i_window_height;
+    return height;
 }
 
 int libvlc_video_get_width( libvlc_media_player_t *p_mi,
