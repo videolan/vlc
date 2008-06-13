@@ -229,9 +229,14 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef __APPLE__
     OSErr err;
-    SInt32 qtVersion;
+    SInt32 qtVersion, macosversion;
     
     err = Gestalt(gestaltQuickTimeVersion, &qtVersion);
+    err = Gestalt(gestaltSystemVersion, &macosversion);
+#ifndef NDEBUG
+    msg_Dbg( p_this, "mac os version is %#lx", macosversion );
+    msg_Dbg( p_this, "quicktime version is %#lx", qtVersion );
+#endif
 #endif
 
     switch( p_dec->fmt_in.i_codec )
@@ -259,11 +264,11 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC('r','p','z','a'): /* QuickTime Apple Video */
         case VLC_FOURCC('a','z','p','r'): /* QuickTime animation (RLE) */
 #ifdef LOADER
-            p_dec->p_sys = NULL;
-            p_dec->pf_decode_video = DecodeVideo;
-            return VLC_SUCCESS;
+        p_dec->p_sys = NULL;
+        p_dec->pf_decode_video = DecodeVideo;
+        return VLC_SUCCESS;
 #else
-            return OpenVideo( p_dec );
+        return OpenVideo( p_dec );
 #endif
 
 #ifdef __APPLE__
@@ -297,11 +302,24 @@ static int Open( vlc_object_t *p_this )
         case 0x6D730002:                        /* Microsoft ADPCM-ACM */
         case 0x6D730011:                        /* DVI Intel IMAADPCM-ACM */
 #ifdef LOADER
-            p_dec->p_sys = NULL;
-            p_dec->pf_decode_audio = DecodeAudio;
-            return VLC_SUCCESS;
+        p_dec->p_sys = NULL;
+        p_dec->pf_decode_audio = DecodeAudio;
+        return VLC_SUCCESS;
 #else
-            return OpenAudio( p_dec );
+
+#ifdef __APPLE__
+        /* FIXME: right now, we don't support audio decoding on 10.5 and later
+         because we are still using the hardcore-outdated SoundManager API,
+         which was removed after 10.4 */
+
+        if( macosversion >= 0x1050 || err != noErr )
+        {
+            msg_Warn( p_dec, "Your Mac OS version doesn't have SoundManager anymore. "
+                     "You can't use this plugin for audio." );
+            return VLC_EGENERIC;
+        }
+#endif
+        return OpenAudio( p_dec );
 #endif
 
         default:
@@ -887,7 +905,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         p_sys->i_late = 0;
     }
-    msg_Dbg( p_dec, "bufsize: %d", p_block->i_buffer);
+    msg_Dbg( p_dec, "bufsize: %d", (int)p_block->i_buffer);
 
     if( p_sys->i_late > 10 )
     {
