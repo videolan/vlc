@@ -1179,7 +1179,7 @@ libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 #endif
 
 .libdvdread: libdvdread .dvdcss
-	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
+	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
