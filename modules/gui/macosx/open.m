@@ -258,17 +258,17 @@ static VLCOpen *_o_sharedMainInstance = nil;
         name: NSControlTextDidChangeNotification
         object: o_net_http_url];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(screenFPSChanged:)
-                                                 name: NSControlTextDidChangeNotification
-                                               object: o_screen_fps_fld];
-
     [[NSDistributedNotificationCenter defaultCenter] addObserver: self
                                                         selector: @selector(eyetvChanged:)
                                                             name: NULL
                                                           object: @"VLCEyeTVSupport"
                                               suspensionBehavior: NSNotificationSuspensionBehaviorDeliverImmediately];
- 
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(screenFPSfieldChanged:)
+                                                 name: NSControlTextDidChangeNotification
+                                               object: o_screen_fps_fld];
+
     /* register clicks on text fields */
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(textFieldWasClicked:)
@@ -877,11 +877,19 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
 }
 
-- (IBAction)openCaptureStepperChanged:(id)sender
+- (IBAction)screenStepperChanged:(id)sender
 {
     [o_screen_fps_fld setIntValue: [o_screen_fps_stp intValue]];
     [o_panel makeFirstResponder: o_screen_fps_fld];
     [o_mrl setStringValue: [NSString stringWithFormat:@"screen:// :screen-fps=%@", [o_screen_fps_fld stringValue]]];
+}
+
+- (void)screenFPSfieldChanged:(NSNotification *)o_notification
+{
+    [o_screen_fps_stp setIntValue: [o_screen_fps_fld intValue]];
+    if( [[o_screen_fps_fld stringValue] isEqualToString: @""] )
+        [o_screen_fps_fld setIntValue: 1];
+    [o_mrl setStringValue: [NSString stringWithFormat:@"screen:// :screen-fps=%i", [o_screen_fps_fld intValue]]];
 }
 
 - (IBAction)eyetvSwitchChannel:(id)sender
@@ -942,7 +950,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
     else
         msg_Warn( VLCIntf, "unknown external notify '%s' received", [[o_notification name] UTF8String] );
-}
+}    
 
 /* little helper method, since this code needs to be run by multiple objects */
 - (void)setupChannelInfo

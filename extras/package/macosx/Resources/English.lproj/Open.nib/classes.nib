@@ -268,7 +268,6 @@
                 eyetvLaunch = id;
                 eyetvSwitchChannel = id;
                 openCaptureModeChanged = id;
-                openCaptureStepperChanged = id;
                 openDisc = id;
                 openDiscMenusChanged = id;
                 openDiscStepperChanged = id;
@@ -283,6 +282,7 @@
                 openVTSBrowse = id;
                 panelCancel = id;
                 panelOk = id;
+                screenStepperChanged = id;
                 subCloseSheet = id;
                 subDelayStepperChanged = id;
                 subFileBrowse = id;

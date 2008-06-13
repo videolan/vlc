@@ -159,12 +159,13 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
 - (void)openCapture;
 - (void)showCaptureView: theView;
-- (IBAction)openCaptureStepperChanged:(id)sender;
 - (IBAction)openCaptureModeChanged:(id)sender;
 - (IBAction)eyetvSwitchChannel:(id)sender;
 - (IBAction)eyetvLaunch:(id)sender;
 - (void)eyetvChanged:(NSNotification *)o_notification;
 - (void)setupChannelInfo;
+- (IBAction)screenStepperChanged:(id)sender;
+- (void)screenFPSfieldChanged:(NSNotification *)o_notification;
 
 - (IBAction)subsChanged:(id)sender;
 - (IBAction)subSettings:(id)sender;
