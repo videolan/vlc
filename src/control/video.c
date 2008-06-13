@@ -60,70 +60,48 @@ void libvlc_set_fullscreen( libvlc_media_player_t *p_mi, int b_fullscreen,
                             libvlc_exception_t *p_e )
 {
     /* We only work on the first vout */
-    vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
-    vlc_value_t val; int i_ret;
+    vout_thread_t *p_vout = GetVout( p_mi, p_e );
 
     /* GetVout will raise the exception for us */
-    if( !p_vout1 )
-    {
-        return;
-    }
+    if( !p_vout ) return;
 
-    if( b_fullscreen ) val.b_bool = true;
-    else               val.b_bool = false;
+    var_SetBool( p_vout, "fullscreen", b_fullscreen );
 
-    i_ret = var_Set( p_vout1, "fullscreen", val );
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while setting fullscreen value" );
-
-    vlc_object_release( p_vout1 );
+    vlc_object_release( p_vout );
 }
 
 int libvlc_get_fullscreen( libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
     /* We only work on the first vout */
-    vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
-    vlc_value_t val; int i_ret;
+    vout_thread_t *p_vout = GetVout( p_mi, p_e );
+    int i_ret;
 
     /* GetVout will raise the exception for us */
-    if( !p_vout1 )
+    if( !p_vout )
         return 0;
 
-    i_ret = var_Get( p_vout1, "fullscreen", &val );
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while looking up fullscreen value" );
+    i_ret = var_GetBool( p_vout, "fullscreen", &val );
 
-    vlc_object_release( p_vout1 );
+    vlc_object_release( p_vout );
 
-    return val.b_bool == true ? 1 : 0;
+    return i_ret;
 }
 
 void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi,
                                libvlc_exception_t *p_e )
 {
     /* We only work on the first vout */
-    vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
-    vlc_value_t val; int i_ret;
+    vout_thread_t *p_vout = GetVout( p_mi, p_e );
+    bool ret;
 
     /* GetVout will raise the exception for us */
-    if( !p_vout1 )
-        return;
+    if( !p_vout ) return;
 
-    i_ret = var_Get( p_vout1, "fullscreen", &val );
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while looking up fullscreen value" );
+    ret = var_GetBool( p_vout, "fullscreen", &val );
+    var_SetBool( p_vout1, "fullscreen", !ret );
 
-    val.b_bool = !val.b_bool;
-    i_ret = var_Set( p_vout1, "fullscreen", val );
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while setting fullscreen value" );
-
-    vlc_object_release( p_vout1 );
+    vlc_object_release( p_vout );
 }
 
 void
