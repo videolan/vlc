@@ -1254,7 +1254,7 @@ dnl  Check for fully working MMX intrinsics
 dnl  We need support for -mmmx, we need <mmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_ARG_ENABLE(mmx,
-[  --disable-mmx       disable MMX optimizations (default auto)],,[
+[  --disable-mmx           disable MMX optimizations (default auto)],,[
   case "${host_cpu}" in
     i?86|x86_64)
       enable_mmx="yes"
@@ -1321,7 +1321,8 @@ dnl  Check for fully workin SSE2 intrinsics
 dnl  We need support for -mmmx, we need <emmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_ARG_ENABLE(sse,
-[  --disable-sse       disable SSE (1 and 2) optimizations (default auto)],, [
+[  --disable-sse           disable SSE (1 and 2) optimizations (default auto)]
+,, [
   case "${host_cpu}" in
     i686|x86_64)
       enable_sse=yes
@@ -2887,7 +2888,7 @@ dnl
 dnl   libid3tag support (FIXME!!! doesn't work with new input)
 dnl
 AC_ARG_ENABLE( id3tag,
-  [  --disable-id3tag id3tag metadata reader plugin (default enabled)])
+[  --disable-id3tag        id3tag metadata reader plugin (default enabled)])
 AS_IF([test "${enable_id3tag}" != "no"], [
   AC_CHECK_HEADERS(id3tag.h, [
     AC_CHECK_HEADERS(zlib.h, [
@@ -2902,7 +2903,7 @@ dnl  avcodec decoder/encoder plugin
 dnl
 
 AC_ARG_ENABLE(avcodec,
-[  --enable-avcodec	   libavcodec codec (default enabled)])
+[  --enable-avcodec        libavcodec codec (default enabled)])
 if test "${enable_avcodec}" != "no"
 then
   PKG_CHECK_MODULES(AVCODEC,[libavcodec libavutil],
@@ -2926,7 +2927,7 @@ dnl  avformat demuxer/muxer plugin
 dnl
 
 AC_ARG_ENABLE(avformat,
-[  --enable-avformat   libavformat containers (default enabled)])
+[  --enable-avformat       libavformat containers (default enabled)])
 if test "${enable_avformat}" != "no"
 then
   PKG_CHECK_MODULES(AVFORMAT,[libavformat libavutil],
@@ -2950,7 +2951,7 @@ dnl  swscale image scaling and conversion plugin
 dnl
 
 AC_ARG_ENABLE(swscale,
-[  --enable-swscale    libswscale image scaling and conversion (default enabled)])
+[  --enable-swscale        libswscale image scaling and conversion (default enabled)])
 if test "${enable_swscale}" != "no"
 then
   PKG_CHECK_MODULES(SWSCALE,[libswscale],
@@ -2978,7 +2979,7 @@ dnl  from VLC.
 dnl
 
 AC_ARG_ENABLE(imgresample,
-[  --enable-imgresample deprecated libavcodec image scaling and conversion (default disabled)])
+[  --enable-imgresample    deprecated libavcodec image scaling and conversion (default disabled)])
 if test "${enable_imgresample}" = "yes"
 then
   PKG_CHECK_MODULES(IMGRESAMPLE,[libavcodec],
@@ -3014,7 +3015,7 @@ dnl  postproc plugin
 dnl
 
 AC_ARG_ENABLE(postproc,
-[  --enable-postproc   libpostproc image post-processing (default enabled)])
+[  --enable-postproc       libpostproc image post-processing (default enabled)])
 if test "${enable_postproc}" != "no"
 then
   PKG_CHECK_MODULES(POSTPROC,[libpostproc libavutil],
@@ -3686,7 +3687,7 @@ dnl
 dnl asa/csri subtitle rendering module
 dnl
 AC_ARG_ENABLE(csri,
-  [  --enable-csri          Subtitle support using CSRI / asa (default disabled)])
+  [  --enable-csri           Subtitle support using CSRI / asa (default disabled)])
 AS_IF( [test "${enable_csri}" = "yes"], [
   PKG_CHECK_MODULES(CSRI,
       csri >= 0.1.0,
@@ -3703,7 +3704,7 @@ dnl
 dnl asa demuxer
 dnl
 AC_ARG_ENABLE(asademux,
-  [  --enable-asademux      asa subtitle demuxing (default disabled)])
+  [  --enable-asademux       asa subtitle demuxing (default disabled)])
 AS_IF( [test "${enable_asademux}" = "yes"], [
   PKG_CHECK_MODULES(PCRE,
       libpcre >= 6.5,
@@ -5127,7 +5128,7 @@ dnl  AtmoLight (homebrew AmbiLight)
 dnl
 if test "${SYS}" = "mingw32" -o "${SYS}" = "linux"; then
    AC_ARG_ENABLE(atmo,
-[  --disable-atmo	AtmoLight (homebrew philips ambilight) (default enabled)])
+[  --disable-atmo          AtmoLight (homebrew philips ambilight) (default enabled)])
    if test "${enable_atmo}" != "no"; then
       AC_LANG_PUSH(C++)
       VLC_ADD_PLUGIN([atmo])
@@ -5218,7 +5219,7 @@ dnl
 dnl RemoteOSD plugin (VNC client as video filter)
 dnl
 AC_ARG_ENABLE(remoteosd,
-  [  --disable-remoteosd         RemoteOSD plugin (default enabled)])
+  [  --disable-remoteosd     RemoteOSD plugin (default enabled)])
 
 AS_IF([test "${enable_remoteosd}" != "no"], [
   AS_IF([test "${have_libgcrypt}" = "yes"],[
