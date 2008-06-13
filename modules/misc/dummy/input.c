@@ -203,10 +203,7 @@ void CloseDemux ( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    playlist_t *p_playlist;
     bool b_eof = false;
-
-    p_playlist = pl_Yield( p_demux );
 
     switch( p_sys->i_command )
     {
@@ -228,7 +225,6 @@ static int Demux( demux_t *p_demux )
             break;
     }
 
-    vlc_object_release( p_playlist );
     return b_eof ? 0 : 1;
 }
 
