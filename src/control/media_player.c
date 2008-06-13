@@ -680,7 +680,7 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
      * not be supported by every vout. We though can't disable it
      * because of some creepy drawable type that are not flexible enough
      * (Win32 HWND for instance) */
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread( p_mi, p_e );
     if( !p_input_thread ) return;
 
     p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
