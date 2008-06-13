@@ -1173,7 +1173,9 @@ libdvdread-$(LIBDVDREAD_VERSION).tar.gz:
 
 libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
-#	patch  -p 0 < Patches/libdvdread.patch
+#ifdef HAVE_WIN32
+	patch  -p 0 < Patches/libdvdread-win32.patch
+#endif
 
 .libdvdread: libdvdread .dvdcss
 	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
