@@ -526,19 +526,13 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
 {
     /* We only work on the first vout */
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    vlc_value_t val; int i_ret;
+    bool opaque; int i_ret;
 
     /* GetVout will raise the exception for us */
-    if( !p_vout )
-        return;
+    if( !p_vout ) return;
 
-    i_ret = var_Get( p_vout, "vbi-opaque", &val );
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while looking up teletext value" );
-
-    val.b_bool = !val.b_bool;
-    i_ret = var_Set( p_vout, "vbi-opaque", val );
+    opaque = var_GetBool( p_vout, "vbi-opaque" );
+    i_ret = var_SetBool( p_vout, "vbi-opaque", !opaque );
     if( i_ret )
         libvlc_exception_raise( p_e,
                         "Unexpected error while setting teletext value" );
