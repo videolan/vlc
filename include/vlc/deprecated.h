@@ -29,6 +29,9 @@
 extern "C" {
 # endif
 
+/*
+ * This function shall not be used at all. It may lead to crash and race condition.
+ */
 VLC_DEPRECATED_API int libvlc_video_destroy( libvlc_media_player_t *, libvlc_exception_t *);
 
 /*****************************************************************************
