@@ -292,13 +292,14 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
                             const libvlc_rectangle_t *view, const libvlc_rectangle_t *clip,
                            libvlc_exception_t *p_e )
 {
-    if( NULL == view )
+    if( !view )
     {
         libvlc_exception_raise( p_e, "viewport is NULL" );
+        return;
     }
 
     /* if clip is NULL, then use view rectangle as clip */
-    if( NULL == clip )
+    if( !clip )
         clip = view;
 
     /* set as default for future vout instances */
