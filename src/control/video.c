@@ -32,8 +32,7 @@
 #include <vlc_vout.h>
 
 /*
- * Remember to release the returned vout_thread_t since it is locked at
- * the end of this function.
+ * Remember to release the returned vout_thread_t.
  */
 static vout_thread_t *GetVout( libvlc_media_player_t *p_mi,
                                libvlc_exception_t *p_exception )
