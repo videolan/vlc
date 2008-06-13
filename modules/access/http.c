@@ -61,8 +61,12 @@ static void Close( vlc_object_t * );
 #define PROXY_TEXT N_("HTTP proxy")
 #define PROXY_LONGTEXT N_( \
     "HTTP proxy to be used It must be of the form " \
-    "http://[user[:pass]@]myproxy.mydomain:myport/ ; " \
+    "http://[user@]myproxy.mydomain:myport/ ; " \
     "if empty, the http_proxy environment variable will be tried." )
+
+#define PROXY_PASS_TEXT N_("HTTP proxy password")
+#define PROXY_PASS_LONGTEXT N_( \
+    "If your HTTP proxy requires a password, set it here." )
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
@@ -96,6 +100,8 @@ vlc_module_begin();
 
     add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
                 false );
+    add_password( "http-proxy-pwd", NULL, NULL,
+                  PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false );
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true );
     add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, AGENT_TEXT,
@@ -149,6 +155,7 @@ struct access_sys_t
     bool b_proxy;
     vlc_url_t  proxy;
     http_auth_t proxy_auth;
+    char       *psz_proxy_passbuf;
 
     /* */
     int        i_code;
@@ -241,6 +248,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
 #endif
     p_sys->fd = -1;
     p_sys->b_proxy = false;
+    p_sys->psz_proxy_passbuf = NULL;
     p_sys->i_version = 1;
     p_sys->b_seekable = true;
     p_sys->psz_mime = NULL;
@@ -300,24 +308,30 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
     p_sys->psz_user_agent = var_CreateGetString( p_access, "http-user-agent" );
 
     /* Check proxy */
-    psz = var_CreateGetString( p_access, "http-proxy" );
-    if( *psz )
+    psz = var_CreateGetNonEmptyString( p_access, "http-proxy" );
+    if( psz )
     {
         p_sys->b_proxy = true;
         vlc_UrlParse( &p_sys->proxy, psz, 0 );
+        free( psz );
     }
 #ifdef HAVE_GETENV
     else
     {
-        char *psz_proxy = getenv( "http_proxy" );
-        if( psz_proxy && *psz_proxy )
+        psz = getenv( "http_proxy" );
+        if( psz )
         {
             p_sys->b_proxy = true;
-            vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
+            vlc_UrlParse( &p_sys->proxy, psz, 0 );
         }
     }
 #endif
-    free( psz );
+    if( psz ) /* No, this is NOT a use-after-free error */
+    {
+        psz = var_CreateGetNonEmptyString( p_access, "http-proxy-pwd" );
+        if( psz )
+            p_sys->proxy.psz_password = p_sys->psz_proxy_passbuf = psz;
+    }
 
     if( p_sys->b_proxy )
     {
@@ -341,8 +355,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
     }
     if( p_sys->url.psz_username && *p_sys->url.psz_username )
     {
-        msg_Dbg( p_access, "      user='%s', pwd='%s'",
-                 p_sys->url.psz_username, p_sys->url.psz_password );
+        msg_Dbg( p_access, "      user='%s'", p_sys->url.psz_username );
     }
 
     p_sys->b_reconnect = var_CreateGetBool( p_access, "http-reconnect" );
@@ -376,7 +389,7 @@ connect:
 
     if( p_sys->i_code == 401 )
     {
-        char *psz_login = NULL; char *psz_password = NULL;
+        char *psz_login = NULL, *psz_password = NULL;
         char psz_msg[250];
         int i_ret;
         /* FIXME ? */
@@ -430,6 +443,7 @@ connect:
         vlc_UrlClean( &p_sys->url );
         AuthReset( &p_sys->auth );
         vlc_UrlClean( &p_sys->proxy );
+        free( p_sys->psz_proxy_passbuf );
         AuthReset( &p_sys->proxy_auth );
         free( p_sys->psz_mime );
         free( p_sys->psz_pragma );
@@ -520,6 +534,7 @@ connect:
 error:
     vlc_UrlClean( &p_sys->url );
     vlc_UrlClean( &p_sys->proxy );
+    free( p_sys->psz_proxy_passbuf );
     free( p_sys->psz_mime );
     free( p_sys->psz_pragma );
     free( p_sys->psz_location );
