@@ -1175,6 +1175,7 @@ libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
 #ifdef HAVE_WIN32
 	patch  -p 0 < Patches/libdvdread-win32.patch
+	(cd $@; ./bootstrap )
 #endif
 
 .libdvdread: libdvdread .dvdcss
