@@ -81,7 +81,7 @@ int libvlc_get_fullscreen( libvlc_media_player_t *p_mi,
     if( !p_vout )
         return 0;
 
-    i_ret = var_GetBool( p_vout, "fullscreen", &val );
+    i_ret = var_GetBool( p_vout, "fullscreen" );
 
     vlc_object_release( p_vout );
 
@@ -98,8 +98,8 @@ void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi,
     /* GetVout will raise the exception for us */
     if( !p_vout ) return;
 
-    ret = var_GetBool( p_vout, "fullscreen", &val );
-    var_SetBool( p_vout1, "fullscreen", !ret );
+    ret = var_GetBool( p_vout, "fullscreen" );
+    var_SetBool( p_vout, "fullscreen", !ret );
 
     vlc_object_release( p_vout );
 }
@@ -143,25 +143,25 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, char *psz_filepath,
 int libvlc_video_get_height( libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
-    vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
-    if( !p_vout1 )
+    vout_thread_t *p_vout = GetVout( p_mi, p_e );
+    if( !p_vout )
         return 0;
 
-    vlc_object_release( p_vout1 );
+    vlc_object_release( p_vout );
 
-    return p_vout1->i_window_height;
+    return p_vout->i_window_height;
 }
 
 int libvlc_video_get_width( libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
-    vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
-    if( !p_vout1 )
+    vout_thread_t *p_vout = GetVout( p_mi, p_e );
+    if( !p_vout )
         return 0;
 
-    vlc_object_release( p_vout1 );
+    vlc_object_release( p_vout );
 
-    return p_vout1->i_window_width;
+    return p_vout->i_window_width;
 }
 
 int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
