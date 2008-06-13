@@ -25,7 +25,7 @@
 ]]?>
 <vlm><error><?vlc
 if _GET["command"] then
-  local msg = vlc.vlm.execute_command(vlm,_GET["command"])
+  local msg = vlm:execute_command(_GET["command"])
   if msg.value then
     print(msg.name,":",msg.value)
   end

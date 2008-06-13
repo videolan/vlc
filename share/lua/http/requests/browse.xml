@@ -29,15 +29,15 @@ vim:syntax=lua
 <?vlc
 local dir = _GET["dir"]
 if dir then
-  if dir == "~" then dir = vlc.homedir() end
+  if dir == "~" then dir = vlc.misc.homedir() end
   dir = common.realpath(dir.."/")
-  local d = vlc.fd.opendir(dir)
+  local d = vlc.net.opendir(dir)
   table.sort(d)
   for _,f in pairs(d) do
     if f == ".." or not string.match(f,"^%.") then
       local df = common.realpath(dir..f)
-      local s = vlc.fd.stat(df)
-      local path, name = vlc.convert_xml_special_chars( df, f )
+      local s = vlc.net.stat(df)
+      local path, name = vlc.strings.convert_xml_special_chars( df, f )
       print("<element type='"..s.type.."' size='"..s.size.."' path='"..path.."' name='"..name.."'/>\n")
     end
   end

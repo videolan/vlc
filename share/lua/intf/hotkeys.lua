@@ -74,7 +74,7 @@ function action_trigger( action )
     print("action_trigger:",tostring(action))
     local a = actions[action]
     if a then
-        local date = vlc.mdate()
+        local date = vlc.misc.mdate()
         if a.delta and date > a.last + a.delta then
             a.times = 0
         else
@@ -82,9 +82,9 @@ function action_trigger( action )
         end
         a.last = date
         table.insert(queue,action)
-        vlc.signal()
+        vlc.misc.signal()
     else
-        vlc.msg_err("Key `"..key.."' points to unknown action `"..bindings[key].."'.")
+        vlc.msg.err("Key `"..key.."' points to unknown action `"..bindings[key].."'.")
     end
 end
 
@@ -94,7 +94,7 @@ function key_press( var, old, new, data )
     if bindings[key] then
         action_trigger(bindings[key])
     else
-        vlc.msg_err("Key `"..key.."' isn't bound to any action.")
+        vlc.msg.err("Key `"..key.."' isn't bound to any action.")
     end
 end
 
@@ -110,7 +110,7 @@ while not die do
         end
         table.remove(queue,1)
     else
-        die = vlc.lock_and_wait()
+        die = vlc.misc.lock_and_wait()
     end
 end
 

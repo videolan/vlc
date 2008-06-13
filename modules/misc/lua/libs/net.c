@@ -376,8 +376,8 @@ static const luaL_Reg vlclua_net_reg[] = {
     { "recv", vlclua_net_recv },
     { "select", vlclua_net_select },
     { "fd_set_new", vlclua_fd_set_new },
-    { "fd_read", vlclua_fd_read },
-    { "fd_write", vlclua_fd_write },
+    { "read", vlclua_fd_read },
+    { "write", vlclua_fd_write },
     { "stat", vlclua_stat }, /* Not really "net" */
     { "opendir", vlclua_opendir }, /* Not really "net" */
     { NULL, NULL }

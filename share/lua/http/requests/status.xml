@@ -132,7 +132,7 @@ local vout = input and vlc.object.find(input,'vout','child')
   <stats>
   <?vlc
     if input then
-      local stats = vlc.playlist.stats()
+      local stats = vlc.input.stats()
       for k,v in pairs(stats) do
         local tag = string.gsub(k,"_","")
         print("<"..tag..">"..tostring(v).."</"..tag..">\n")

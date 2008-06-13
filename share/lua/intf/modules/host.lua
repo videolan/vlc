@@ -38,7 +38,7 @@ Example use:
     --or h:listen( { "localhost:4212", "*console" } )
 
     -- The main loop
-    while not vlc.should_die() do
+    while not vlc.misc.should_die() do
         -- accept new connections
         h:accept()
 
@@ -75,24 +75,9 @@ function host()
     local listeners = {}
     local status_callbacks = {}
 
-    -- private methods
-    local function new_fd_set()
-        function foo_fds(foo)
-            return function(fd,...) return foo(fd.fds,...) end
-        end
-        return { -- data
-                 fds = vlc.fd.new_fd_set(),
-                 -- methods
-                 zero = foo_fds( vlc.fd.fd_zero ),
-                 set = foo_fds( vlc.fd.fd_set ),
-                 isset = foo_fds( vlc.fd.fd_isset ),
-                 clr = foo_fds( vlc.fd.fd_clr ),
-               }
-    end
-
     -- private data
-    local fds_read = new_fd_set()
-    local fds_write = new_fd_set()
+    local fds_read = vlc.net.fd_set_new()
+    local fds_write = vlc.net.fd_set_new()
 
     -- private methods
     local function client_accept( clients, listen )
@@ -102,7 +87,7 @@ function host()
         else
             wait = 0
         end
-        return vlc.net.accept( listen, wait )
+        return listen:accept( wait )
     end
 
     local function fd_client( client )
@@ -130,14 +115,14 @@ function host()
     end
 
     local function write( client, data )
-        return vlc.fd.write( client.wfd, data or client.buffer )
+        return vlc.net.write( client.wfd, data or client.buffer )
     end
 
     local function read( client, len )
         if len then
-            return vlc.fd.read( client.rfd, len )
+            return vlc.net.read( client.rfd, len )
         else
-            return vlc.fd.read( client.rfd )
+            return vlc.net.read( client.rfd )
         end
     end
 
@@ -200,7 +185,7 @@ function host()
                          switch_status = switch_status,
                          append = append,
                        }
-        client:send( "VLC media player "..vlc.version().."\n" )
+        client:send( "VLC media player "..vlc.misc.version().."\n" )
         table.insert(clients, client)
         client:switch_status(status.password)
     end
@@ -274,7 +259,7 @@ function host()
                 wait = 0
             end
             for _, listener in pairs(listeners.tcp.list) do
-                local fd = vlc.net.accept( listener, wait )
+                local fd = listener:accept( wait )
                 new_client( h, fd, fd, client_type.net )
             end
         end
@@ -283,7 +268,7 @@ function host()
     local function _select( h, timeout )
         local nfds = math.max( filter_client( fds_read, status.read, status.password ),
                                filter_client( fds_write, status.write ) ) + 1
-        local ret = vlc.net.select( nfds, fds_read.fds, fds_write.fds,
+        local ret = vlc.net.select( nfds, fds_read, fds_write,
                                     timeout or 0.5 )
         local wclients = {}
         local rclients = {}
@@ -309,12 +294,6 @@ function host()
                     vlc.net.close(client.rfd)
                 end
                 vlc.net.close(client.wfd)
-            end
-        end
-
-        if listeners.tcp then
-            for _, listener in pairs(listeners.tcp.list) do
-                vlc.net.listen_close( listener )
             end
         end
     end

@@ -101,13 +101,13 @@ h:listen( config.hosts or config.host or "localhost:4212" )
 password = config.password or "admin"
 
 --[[ Launch vlm ]]
-vlm = vlc.vlm.new()
+vlm = vlc.vlm()
 
 --[[ Commands ]]
 function shutdown(client)
     h:broadcast("Shutting down.\r\n")
     vlc.msg.err("shutdown requested")
-    vlc.quit()
+    vlc.misc.quit()
     return true
 end
 function logout(client)
@@ -146,7 +146,7 @@ commands = {
     ["logout"]      = { func = logout, help = "logout" },
     ["lock"]        = { func = lock, help = "lock the telnet prompt" },
     ["description"] = { func = print_text(description), help = "describe this module" },
-    ["license"]     = { func = print_text(vlc.license()), help = "print VLC's license message" },
+    ["license"]     = { func = print_text(vlc.misc.license()), help = "print VLC's license message" },
     ["help"]        = { func = help, help = "show this help", dovlm = true },
     }
 
@@ -155,7 +155,7 @@ function client_command( client )
     client.buffer = ""
     if not commands[cmd] or not commands[cmd].func or commands[cmd].dovlm then
         -- if it's not an interface specific command, it has to be a VLM command
-        local message, vlc_err = vlc.vlm.execute_command( vlm, cmd )
+        local message, vlc_err = vlm:execute_command( cmd )
         vlm_message_to_string( client, message )
         if not commands[cmd] or not commands[cmd].func and not commands[cmd].dovlm then
             if vlc_err ~= 0 then client:append( "Type `help' for help." ) end
@@ -171,7 +171,7 @@ function client_command( client )
 end
 
 --[[ The main loop ]]
-while not vlc.should_die() do
+while not vlc.misc.should_die() do
     h:accept()
     local w, r = h:select( 0.1 )
 
@@ -219,4 +219,4 @@ while not vlc.should_die() do
 end
 
 --[[ Clean up ]]
-vlc.vlm.delete( vlm )
+vlm = nil

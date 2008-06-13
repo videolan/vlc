@@ -22,4 +22,4 @@ function dialogs(...)
 end
 
 _G.dialogs = dialogs
-_G.vlm = vlc.vlm.new()
+_G.vlm = vlc.vlm()

@@ -31,8 +31,6 @@ Configuration options:
 --]==========================================================================]
 
 
-require "httpd"
-require "acl"
 require "common"
 
 vlc.msg.info("Lua HTTP interface")
@@ -69,10 +67,10 @@ function process_raw(filename)
     return assert(loadstring(code,filename))
 end
 function process(filename)
-    local mtime = 0    -- vlc.fd.stat(filename).modification_time
+    local mtime = 0    -- vlc.net.stat(filename).modification_time
     local func = false -- process_raw(filename)
     return function(...)
-        local new_mtime = vlc.fd.stat(filename).modification_time
+        local new_mtime = vlc.net.stat(filename).modification_time
         if new_mtime ~= mtime then
             -- Re-read the file if it changed
             if mtime == 0 then
@@ -122,7 +120,7 @@ function dirlisting(url,listing,acl_)
 </body>
 </html>]]
     end
-    return h:file_new(url,"text/html",nil,nil,acl_,callback,nil)
+    return h:file(url,"text/html",nil,nil,acl_,callback,nil)
 end
 
 function file(h,path,url,acl_,mime)
@@ -151,15 +149,15 @@ function file(h,path,url,acl_,mime)
         end
         return table.concat(page)
     end
-    return h:file_new(url or path,mime,nil,nil,acl_,callback,nil)
+    return h:file(url or path,mime,nil,nil,acl_,callback,nil)
 end
 
 function rawfile(h,path,url,acl_)
     local filename = path
-    local mtime = 0    -- vlc.fd.stat(filename).modification_time
+    local mtime = 0    -- vlc.net.stat(filename).modification_time
     local page = false -- io.open(filename):read("*a")
     local callback = function(data,request)
-        local new_mtime = vlc.fd.stat(filename).modification_time
+        local new_mtime = vlc.net.stat(filename).modification_time
         if mtime ~= new_mtime then
             -- Re-read the file if it changed
             if mtime == 0 then
@@ -172,15 +170,15 @@ function rawfile(h,path,url,acl_)
         end
         return page
     end
-    return h:file_new(url or path,nil,nil,nil,acl_,callback,nil)
+    return h:file(url or path,nil,nil,nil,acl_,callback,nil)
 end
 
 function parse_url_request(request)
     if not request then return {} end
     t = {}
     for k,v in string.gmatch(request,"([^=&]+)=?([^=&]*)") do
-        local k_ = vlc.decode_uri(k)
-        local v_ = vlc.decode_uri(v)
+        local k_ = vlc.strings.decode_uri(k)
+        local v_ = vlc.strings.decode_uri(v)
         if t[k_] ~= nil then
             local t2
             if type(t[k_]) ~= "table" then
@@ -199,9 +197,9 @@ function parse_url_request(request)
 end
 
 local function find_datadir(name)
-    local list = vlc.datadir_list(name)
+    local list = vlc.misc.datadir_list(name)
     for _, l in ipairs(list) do
-        local s = vlc.fd.stat(l)
+        local s = vlc.net.stat(l)
         if s then
             return l
         end
@@ -237,17 +235,17 @@ local function load_dir(dir,root,parent_acl)
     local my_acl = parent_acl
     do
         local af = dir.."/.hosts"
-        local s = vlc.fd.stat(af)
+        local s = vlc.net.stat(af)
         if s and s.type == "file" then
             -- We found an acl
-            my_acl = acl.new(false)
+            my_acl = vlc.acl(false)
             my_acl:load_file(af)
         end
     end
-    local d = vlc.fd.opendir(dir)
+    local d = vlc.net.opendir(dir)
     for _,f in ipairs(d) do
         if not string.match(f,"^%.") then
-            local s = vlc.fd.stat(dir.."/"..f)
+            local s = vlc.net.stat(dir.."/"..f)
             if s.type == "file" then
                 local url
                 if f == "index.html" then
@@ -276,10 +274,10 @@ local function load_dir(dir,root,parent_acl)
 end
 
 local u = vlc.net.url_parse( config.host or "localhost:8080" )
-h = httpd.new(u.host,u.port)
+h = vlc.httpd(u.host,u.port)
 load_dir( http_dir )
 
-while not die do die = vlc.lock_and_wait() end -- everything happens in callbacks
+while not die do die = vlc.misc.lock_and_wait() end -- everything happens in callbacks
 
 -- FIXME: We shouldn't need to do this ourselves.
 for i=1,#files do

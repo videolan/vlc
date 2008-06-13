@@ -149,7 +149,7 @@ local function print_msg(m)
   print("</"..m.name..">\n")
 end
 
-local msg = vlc.vlm.execute_command(vlm,"show")
+local msg = vlm:execute_command("show")
 print_xml(msg)
 --print_msg(msg)
 

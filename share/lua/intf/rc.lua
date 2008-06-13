@@ -143,7 +143,7 @@ function shutdown(name,client)
     client:append("Bye-bye!")
     h:broadcast("Shutting down.")
     vlc.msg.info("Requested shutdown.")
-    vlc.quit()
+    vlc.misc.quit()
 end
 
 function quit(name,client)
@@ -323,7 +323,7 @@ function playlist_status(name,client)
 end
 
 function is_playing(name,client)
-    if vlc.is_playing() then client:append "1" else client:append "0" end
+    if vlc.input.is_playing() then client:append "1" else client:append "0" end
 end
 
 function ret_print(foo,start,stop)
@@ -438,11 +438,11 @@ commands_ordered = {
     { "faster"; { func = rate; help = "faster playing of stream" } };
     { "slower"; { func = rate; help = "slower playing of stream" } };
     { "normal"; { func = rate; help = "normal playing of stream" } };
-    { "fullscreen"; { func = skip2(vlc.fullscreen); args = "[on|off]"; help = "toggle fullscreen"; aliases = { "f", "F" } } };
+    { "fullscreen"; { func = skip2(vlc.video.fullscreen); args = "[on|off]"; help = "toggle fullscreen"; aliases = { "f", "F" } } };
     { "info"; { func = input_info; help = "information about the current stream" } };
     { "get_time"; { func = get_time("time"); help = "seconds elapsed since stream's beginning" } };
     { "is_playing"; { func = is_playing; help = "1 if a stream plays, 0 otherwise" } };
-    { "get_title"; { func = ret_print(vlc.get_title); help = "the title of the current stream" } };
+    { "get_title"; { func = ret_print(vlc.input.get_title); help = "the title of the current stream" } };
     { "get_length"; { func = get_time("length"); help = "the length of the current stream" } };
     { "" };
     { "volume"; { func = volume; args = "[X]"; help = "set/get audio volume" } };
@@ -465,7 +465,7 @@ commands_ordered = {
     { "alias"; { func = skip(alias); args = "[cmd]"; help = "set/get command aliases"; adv = true } };
     { "eval"; { func = skip(eval); help = "eval some lua (*debug*)"; adv =true } }; -- FIXME: comment out if you're not debugging
     { "description"; { func = print_text("Description",description); help = "describe this module" } };
-    { "license"; { func = print_text("License message",vlc.license()); help = "print VLC's license message"; adv = true } };
+    { "license"; { func = print_text("License message",vlc.misc.license()); help = "print VLC's license message"; adv = true } };
     { "help"; { func = help; args = "[pattern]"; help = "a help message"; aliases = { "?" } } };
     { "longhelp"; { func = help; args = "[pattern]"; help = "a longer help message" } };
     { "logout"; { func = logout; help = "exit (if in a socket connection)" } };
@@ -542,7 +542,7 @@ function call_command(cmd,client,arg)
 end
 
 function call_libvlc_command(cmd,client,arg)
-    local ok, vlcerr, vlcmsg = pcall( vlc.libvlc_command, cmd, arg )
+    local ok, vlcerr, vlcmsg = pcall( vlc.var.libvlc_command, cmd, arg )
     if not ok then
         local a = arg or ""
         if a ~= "" then a = " " .. a end
@@ -568,7 +568,7 @@ end
 h:listen( config.hosts or config.host or "*console" )
 
 --[[ The main loop ]]
-while not vlc.should_die() do
+while not vlc.misc.should_die() do
     h:accept()
     local write, read = h:select(0.1)
 
