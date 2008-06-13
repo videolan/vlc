@@ -336,8 +336,7 @@ char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi,
     char *psz_aspect = 0;
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
 
-    if( !p_vout )
-        return 0;
+    if( !p_vout ) return 0;
 
     psz_aspect = var_GetNonEmptyString( p_vout, "aspect-ratio" );
     vlc_object_release( p_vout );
@@ -350,8 +349,7 @@ void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi,
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     int i_ret = -1;
 
-    if( !p_vout )
-        return;
+    if( !p_vout ) return;
 
     i_ret = var_SetString( p_vout, "aspect-ratio", psz_aspect );
     if( i_ret )
@@ -371,8 +369,7 @@ int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
     int i_ret = -1;
     int i;
 
-    if( !p_input_thread )
-        return -1;
+    if( !p_input_thread ) return -1;
 
     i_ret = var_Get( p_input_thread, "spu-es", &val );
     if( i_ret < 0 )
@@ -404,8 +401,7 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
     int i_ret = -1;
     int i;
 
-    if( !p_input_thread )
-        return;
+    if( !p_input_thread ) return;
 
     var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     for( i = 0; i < val_list.p_list->i_count; i++ )
@@ -451,8 +447,7 @@ char *libvlc_video_get_crop_geometry( libvlc_media_player_t *p_mi,
     char *psz_geometry = 0;
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
 
-    if( !p_vout )
-        return 0;
+    if( !p_vout ) return 0;
 
     psz_geometry = var_GetNonEmptyString( p_vout, "crop" );
     vlc_object_release( p_vout );
@@ -465,8 +460,7 @@ void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     int i_ret = -1;
 
-    if( !p_vout )
-        return;
+    if( !p_vout ) return;
 
     i_ret = var_SetString( p_vout, "crop", psz_geometry );
     if( i_ret )
@@ -483,8 +477,7 @@ int libvlc_video_get_teletext( libvlc_media_player_t *p_mi,
     vlc_object_t *p_vbi;
     int i_ret = -1;
 
-    if( !p_vout )
-        return i_ret;
+    if( !p_vout ) return i_ret;
 
     p_vbi = (vlc_object_t *) vlc_object_find_name( p_vout, "zvbi",
                                                    FIND_ANYWHERE );
@@ -505,8 +498,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
     vlc_object_t *p_vbi;
     int i_ret = -1;
 
-    if( !p_vout )
-        return;
+    if( !p_vout ) return;
 
     p_vbi = (vlc_object_t *) vlc_object_find_name( p_vout, "zvbi",
                                                    FIND_ANYWHERE );
