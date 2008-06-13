@@ -545,13 +545,9 @@ void MainInputManager::customEvent( QEvent *event )
     else
     {
         /* we are working as a dialogs provider */
-        playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf,
-                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        if( p_playlist )
-        {
-            p_input = p_playlist->p_input;
-            emit inputChanged( p_input );
-        }
+        playlist_t *p_playlist = pl_Yield( p_intf );
+        p_input = p_playlist->p_input;
+        emit inputChanged( p_input );
     }
 }
 

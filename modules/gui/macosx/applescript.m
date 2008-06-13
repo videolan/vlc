@@ -1,7 +1,7 @@
 /*****************************************************************************
  * applescript.m: MacOS X AppleScript support
  *****************************************************************************
- * Copyright (C) 2002-2003, 2005, 2007 the VideoLAN team
+ * Copyright (C) 2002-2003, 2005, 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -41,8 +41,7 @@
     if ( [o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"] )
     {
         intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                        FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
         if( p_playlist == NULL )
         {
             return nil;
@@ -91,8 +90,7 @@
     NSString *o_command = [[self commandDescription] commandName];
 
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                    FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL )
     {
         return nil;

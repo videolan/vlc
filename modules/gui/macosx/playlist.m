@@ -274,7 +274,7 @@
         else
         {
             char *psz_name = input_item_GetName( p_item->p_input );
-            if( psz_name != NULL )
+            if( !EMPTY_STR( psz_name ) )
             {
                 o_value = [NSString stringWithUTF8String: psz_name];
             }
@@ -372,7 +372,7 @@
         @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
-    /* This uses private Apple API which works fine until 10.4.
+    /* This uses private Apple API which works fine until 10.5.
      * We need to keep checking in the future!
      * These methods are being added artificially to NSOutlineView's interface above */
     o_ascendingSortingImage = [[NSOutlineView class] _defaultTableHeaderSortImage];
@@ -1110,9 +1110,9 @@
         }
         else if( b_selected_item_met == YES &&
                     ( [o_current_name rangeOfString:[o_search_field
-                        stringValue] options:NSCaseInsensitiveSearch ].length ||
+                        stringValue] options:NSCaseInsensitiveSearch].length ||
                       [o_current_author rangeOfString:[o_search_field
-                        stringValue] options:NSCaseInsensitiveSearch ].length ) )
+                        stringValue] options:NSCaseInsensitiveSearch].length ) )
         {
             vlc_object_release( p_playlist );
             /*Adds the parent items in the result array as well, so that we can

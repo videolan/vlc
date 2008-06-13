@@ -1208,8 +1208,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (BOOL)windowShouldClose:(id)sender
 {
-    playlist_t * p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_vout );
     if( p_playlist == NULL )
     {
         return NO;

@@ -206,13 +206,7 @@ static int Demux( demux_t *p_demux )
     playlist_t *p_playlist;
     bool b_eof = false;
 
-    p_playlist = vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST, FIND_PARENT );
-
-    if( p_playlist == NULL )
-    {
-        msg_Err( p_demux, "we are not attached to a playlist" );
-        return -1;
-    }
+    p_playlist = pl_Yield( p_demux );
 
     switch( p_sys->i_command )
     {

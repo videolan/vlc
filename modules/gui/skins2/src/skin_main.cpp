@@ -98,14 +98,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
     p_intf->p_sys->p_input = NULL;
-    p_intf->p_sys->p_playlist = (playlist_t *)vlc_object_find( p_intf,
-        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_intf->p_sys->p_playlist == NULL )
-    {
-        msg_Err( p_intf, "No playlist object found" );
-        msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-        return VLC_EGENERIC;
-    }
+    p_intf->p_sys->p_playlist = pl_Yield( p_intf );
 
     // Initialize "singleton" objects
     p_intf->p_sys->p_logger = NULL;
@@ -290,16 +283,11 @@ static int DemuxOpen( vlc_object_t *p_this )
         // Do nothing is skins2 is not the main interface
         if( var_Type( p_intf, "skin-to-load" ) == VLC_VAR_STRING )
         {
-            playlist_t *p_playlist =
-                (playlist_t *) vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-            if( p_playlist != NULL )
-            {
-                // Make sure the item is deleted afterwards
-                /// \bug does not always work
-                p_playlist->status.p_item->i_flags |= PLAYLIST_REMOVE_FLAG;
-                vlc_object_release( p_playlist );
-            }
+            playlist_t *p_playlist = pl_Yield( p_this );
+            // Make sure the item is deleted afterwards
+            /// \bug does not always work
+            p_playlist->status.p_item->i_flags |= PLAYLIST_REMOVE_FLAG;
+            vlc_object_release( p_playlist );
 
             vlc_value_t val;
             val.psz_string = p_demux->psz_path;

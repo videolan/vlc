@@ -371,13 +371,9 @@ static int Manage( vout_thread_t *p_vout )
             break;
         case CACA_EVENT_QUIT:
         {
-            p_playlist = vlc_object_find( p_vout,
-                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-            if( p_playlist )
-            {
-                playlist_Stop( p_playlist );
-                vlc_object_release( p_playlist );
-            }
+            p_playlist = pl_Yield( p_vout );
+            playlist_Stop( p_playlist );
+            vlc_object_release( p_playlist );
             vlc_object_kill( p_vout->p_libvlc );
             break;
         }

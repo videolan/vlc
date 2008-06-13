@@ -499,8 +499,7 @@ static void Run( intf_thread_t *p_intf )
                                                    FIND_ANYWHERE );
                 if( p_input )
                 {
-                    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                                           FIND_PARENT );
+                    p_playlist = pl_Yield( p_input );
                 }
             }
             /* New input has been registered */
@@ -984,29 +983,26 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
     {
-        p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
-        if( p_playlist )
+        p_playlist = pl_Yield( p_input );
+        char cmd[6];
+        switch( p_playlist->status.i_status )
         {
-            char cmd[6];
-            switch( p_playlist->status.i_status )
-            {
-            case PLAYLIST_STOPPED:
-                strcpy( cmd, "stop" );
-                break;
-            case PLAYLIST_RUNNING:
-                strcpy( cmd, "play" );
-                break;
-            case PLAYLIST_PAUSED:
-                strcpy( cmd, "pause" );
-                break;
-            default:
-                cmd[0] = '\0';
-            } /* var_GetInteger( p_input, "state" )  */
-            msg_rc( STATUS_CHANGE "( %s state: %d ): %s",
-                                  &cmd[0], newval.i_int,
-                                  ppsz_input_state[ newval.i_int ] );
-            vlc_object_release( p_playlist );
-        }
+        case PLAYLIST_STOPPED:
+            strcpy( cmd, "stop" );
+            break;
+        case PLAYLIST_RUNNING:
+            strcpy( cmd, "play" );
+            break;
+        case PLAYLIST_PAUSED:
+            strcpy( cmd, "pause" );
+            break;
+        default:
+            cmd[0] = '\0';
+        } /* var_GetInteger( p_input, "state" )  */
+        msg_rc( STATUS_CHANGE "( %s state: %d ): %s",
+                              &cmd[0], newval.i_int,
+                              ppsz_input_state[ newval.i_int ] );
+        vlc_object_release( p_playlist );
         vlc_object_release( p_input );
     }
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
@@ -1521,12 +1517,10 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
     playlist_t *p_playlist;
 
-    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        playlist_Stop( p_playlist );
-        vlc_object_release( p_playlist );
-    }
+    p_playlist = pl_Yield( p_this );
+    playlist_Stop( p_playlist );
+    vlc_object_release( p_playlist );
+    
     vlc_object_kill( p_this->p_libvlc );
     return VLC_SUCCESS;
 }
@@ -1910,9 +1904,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_EGENERIC;
     }
 
-    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_playlist )
-        return VLC_ENOOBJ;
+    p_playlist = pl_Yield( p_this );
 
     if( p_playlist->p_input )
     {
