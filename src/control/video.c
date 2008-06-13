@@ -312,22 +312,19 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
     var_SetInteger( p_instance->p_libvlc_int, "drawable-clip-bottom", clip->bottom );
     var_SetInteger( p_instance->p_libvlc_int, "drawable-clip-right", clip->right );
 
-    if( libvlc_playlist_isplaying(p_instance, p_e) )
+    libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
+    if( p_mi )
     {
-        libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
-        if( p_mi )
+        vout_thread_t *p_vout = GetVout( p_mi, p_e );
+        if( p_vout )
         {
-            vout_thread_t *p_vout = GetVout( p_mi, p_e );
-            if( p_vout )
-            {
-                /* change viewport for running vout */
-                vout_Control( p_vout , VOUT_SET_VIEWPORT,
-                                   view->top, view->left, view->bottom, view->right,
-                                   clip->top, clip->left, clip->bottom, clip->right );
-                vlc_object_release( p_vout );
-            }
-            libvlc_media_player_release(p_mi);
+            /* change viewport for running vout */
+            vout_Control( p_vout , VOUT_SET_VIEWPORT,
+                               view->top, view->left, view->bottom, view->right,
+                               clip->top, clip->left, clip->bottom, clip->right );
+            vlc_object_release( p_vout );
         }
+        libvlc_media_player_release(p_mi);
     }
 }
 
