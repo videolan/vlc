@@ -619,8 +619,6 @@ VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_player_t *, int, lib
  */
 VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_player_t *, char *,unsigned int, unsigned int, libvlc_exception_t * );
 
-VLC_PUBLIC_API int libvlc_video_destroy( libvlc_media_player_t *, libvlc_exception_t *);
-
 /**
  * Resize the current video output window.
  *

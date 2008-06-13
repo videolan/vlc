@@ -29,6 +29,7 @@
 extern "C" {
 # endif
 
+VLC_DEPRECATED_API int libvlc_video_destroy( libvlc_media_player_t *, libvlc_exception_t *);
 
 /*****************************************************************************
  * Playlist (Deprecated)
