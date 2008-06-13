@@ -78,8 +78,7 @@ int libvlc_get_fullscreen( libvlc_media_player_t *p_mi,
     int i_ret;
 
     /* GetVout will raise the exception for us */
-    if( !p_vout )
-        return 0;
+    if( !p_vout ) return 0;
 
     i_ret = var_GetBool( p_vout, "fullscreen" );
 
@@ -112,10 +111,7 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, char *psz_filepath,
     input_thread_t *p_input_thread;
 
     /* GetVout will raise the exception for us */
-    if( !p_vout )
-    {
-        return;
-    }
+    if( !p_vout ) return;
 
     if( !psz_filepath )
     {
