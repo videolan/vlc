@@ -668,11 +668,30 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
  * Set Drawable
  **************************************************************************/
 void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
-                                         libvlc_drawable_t drawable,
-                                         libvlc_exception_t *p_e )
+                                       libvlc_drawable_t drawable,
+                                       libvlc_exception_t *p_e )
 {
-    VLC_UNUSED(p_e);
+    input_thread_t *p_input_thread;
+    vout_thread_t *p_vout = NULL;
+
     p_mi->drawable = drawable;
+
+    /* Allow on the fly drawable changing. This is tricky has this may
+     * not be supported by every vout. We though can't disable it
+     * because of some creepy drawable type that are not flexible enough
+     * (Win32 HWND for instance) */
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    if( !p_input_thread ) return;
+
+    p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
+    if( !p_vout )
+        libvlc_exception_raise( p_exception, "No active video output" );
+    else
+    {
+        vout_Control( p_vout , VOUT_REPARENT, drawable);
+        vlc_object_release( p_vout );
+    }
+    vlc_object_release( p_input_thread );
 }
 
 /**************************************************************************
