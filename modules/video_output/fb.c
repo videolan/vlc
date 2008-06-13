@@ -132,7 +132,7 @@ struct vout_sys_t
 {
     /* System information */
     int                 i_tty;                          /* tty device handle */
-    bool          b_tty;
+    bool                b_tty;
     struct termios      old_termios;
 
     /* Original configuration information */
@@ -144,21 +144,21 @@ struct vout_sys_t
     int                         i_fd;                       /* device handle */
     struct fb_var_screeninfo    old_info;       /* original mode information */
     struct fb_var_screeninfo    var_info;        /* current mode information */
-    bool                  b_pan;     /* does device supports panning ? */
+    bool                        b_pan;     /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
     uint16_t                    *p_palette;              /* original palette */
-    bool                  b_hw_accel;          /* has hardware support */
+    bool                        b_hw_accel;          /* has hardware support */
 
     /* Video information */
     uint32_t i_width;
     uint32_t i_height;
-    int i_aspect;
-    int i_bytes_per_pixel;
-    bool   b_auto;       /* Automatically adjust video size to fb size */
+    int      i_aspect;
+    int      i_bytes_per_pixel;
+    bool     b_auto;       /* Automatically adjust video size to fb size */
     vlc_fourcc_t i_chroma;
 
     /* Video memory */
-    uint8_t *    p_video;                                     /* base adress */
+    uint8_t    *p_video;                                      /* base adress */
     size_t      i_page_size;                                    /* page size */
 };
 
