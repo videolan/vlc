@@ -60,7 +60,7 @@ function parse()
                 if c < 16 and c > 3 then key = 61 + mod
                 elseif c < 96 and c > 67 then key = 189 + mod
                 elseif c < 20 and c > 6 then key = 65
-                else vlc.msg_err("Oops, please report URL to developers")
+                else vlc.msg.err("Oops, please report URL to developers")
                 end
                 i = i + 1
                 path = path .. string.char(key - c)

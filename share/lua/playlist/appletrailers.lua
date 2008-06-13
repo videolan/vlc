@@ -37,9 +37,9 @@ function parse()
         or string.match( line, "http://images.apple.com/movies/.*%.mov" )
         then
             if string.match( line, "http://movies.apple.com/movies/.*%.mov" ) then
-                path = vlc.decode_uri( string.gsub( line, "^.*(http://movies.apple.com/movies/.*%.mov).*$", "%1" ) )
+                path = vlc.strings.decode_uri( string.gsub( line, "^.*(http://movies.apple.com/movies/.*%.mov).*$", "%1" ) )
             elseif string.match( line, "http://images.apple.com/movies/.*%.mov" ) then
-                path = vlc.decode_uri( string.gsub( line, "^.*(http://images.apple.com/movies/.*%.mov).*$", "%1" ) )
+                path = vlc.strings.decode_uri( string.gsub( line, "^.*(http://images.apple.com/movies/.*%.mov).*$", "%1" ) )
             end
             if string.match( path, "480p" ) then
                 extraname = " (480p)"
@@ -54,11 +54,11 @@ function parse()
         end
         if string.match( line, "<title>" )
         then
-            title = vlc.decode_uri( string.gsub( line, "^.*<title>([^<]*).*$", "%1" ) )
+            title = vlc.strings.decode_uri( string.gsub( line, "^.*<title>([^<]*).*$", "%1" ) )
         end
         if string.match( line, "<meta name=\"Description\"" )
         then
-            description = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"Description\" content=\"([^\"]*)\".*$", "%1" ) )
+            description = vlc.strings.resolve_xml_special_chars( string.gsub( line, "^.*name=\"Description\" content=\"([^\"]*)\".*$", "%1" ) )
         end
     end
     return p

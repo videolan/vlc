@@ -36,8 +36,8 @@ function parse()
         if not line then break end
         if string.match( line, "param name=\"flashvars\" value=\".*video=" )
         then
-            arturl = vlc.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*preview=([^&]*).*$", "%1" ) )
-            videos = vlc.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*video=([^&]*).*$", "%1" ) )
+            arturl = vlc.strings.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*preview=([^&]*).*$", "%1" ) )
+            videos = vlc.strings.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*video=([^&]*).*$", "%1" ) )
        --[[ we get a list of different streams available, at various codecs
             and resolutions:
             /A@@spark||/B@@spark-mini||/C@@vp6-hd||/D@@vp6||/E@@h264
@@ -62,7 +62,7 @@ function parse()
             local bestcodec
             for codec,_ in pairs(available) do
                 if pref[codec] == nil then
-                    vlc.msg_warn( "Unknown codec: " .. codec )
+                    vlc.msg.warn( "Unknown codec: " .. codec )
                     pref[codec] = 42 -- try the 1st unknown codec if other fail
                 end
                 if pref[codec] < score then
@@ -76,8 +76,8 @@ function parse()
         end
         if string.match( line, "<meta name=\"description\"" )
         then
-            name = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ (.*) %w+ %w+ %w+ %w+ Videos\..*$", "%1" ) )
-            description = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ .* %w+ %w+ %w+ %w+ Videos\. ([^\"]*)\".*$", "%1" ) )
+            name = vlc.strings.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ (.*) %w+ %w+ %w+ %w+ Videos\..*$", "%1" ) )
+            description = vlc.strings.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ .* %w+ %w+ %w+ %w+ Videos\. ([^\"]*)\".*$", "%1" ) )
         end
         if path and name and description and arturl then break end
     end

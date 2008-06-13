@@ -26,7 +26,7 @@ end
 -- Parse function.
 function parse()
     p = {}
-    --vlc.msg_dbg( vlc.path )
+    --vlc.msg.dbg( vlc.path )
     if string.match( vlc.path, "www.canalplus.fr/index.php%?pid=" )
     then -- This is the HTML page's URL
         local id, name, description, arturl
@@ -34,7 +34,7 @@ function parse()
             -- Try to find the video's title
             local line = vlc.readline()
             if not line then break end
-            -- vlc.msg_dbg( line )
+            -- vlc.msg.dbg( line )
             if string.match( line, "aVideos" ) then
                 if string.match( line, "CONTENT_ID.*=" ) then
                     id = string.gsub( line, "^.*\"(.-)\".*$", "%1" )
@@ -61,10 +61,10 @@ function parse()
         while true do
             local line = vlc.readline()
             if not line then break end
-            --vlc.msg_dbg( line )
+            --vlc.msg.dbg( line )
             if string.match( line, "<hi>" ) then
                 local path = string.gsub( line, "^.*%[(.-)%].*$", "%1" )
-                vlc.msg_err("Path is: " .. tostring( path ) )
+                vlc.msg.err("Path is: " .. tostring( path ) )
                 return { { path = path } }
             end
         end
@@ -76,10 +76,10 @@ function get_url_param( url, name )
 end
 
 function add_item( p, id, name, description, arturl )
-    --[[vlc.msg_dbg( "id: " .. tostring(id) )
-    vlc.msg_dbg( "name: " .. tostring(name) )
-    vlc.msg_dbg( "arturl: " .. tostring(arturl) )
-    vlc.msg_dbg( "description: " .. tostring(description) )
+    --[[vlc.msg.dbg( "id: " .. tostring(id) )
+    vlc.msg.dbg( "name: " .. tostring(name) )
+    vlc.msg.dbg( "arturl: " .. tostring(arturl) )
+    vlc.msg.dbg( "description: " .. tostring(description) )
     --]]
     --local path = "http://www.canalplus.fr/flash/xml/configuration/configuration-embed-video-player.php?xmlParam="..id.."-"..get_url_param(vlc.path,"pid")
     local path = "http://www.canalplus.fr/flash/xml/module/embed-video-player/embed-video-player.php?video_id="..id.."&pid="..get_url_param(vlc.path,"pid")

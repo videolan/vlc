@@ -34,7 +34,7 @@ function parse()
         for _path, _artist, _name in string.gmatch( line, "href=\"(/watch%?v=[^\"]*)\" onclick=\"_hbLink%('([^']*)','Vid[^\']*'%);\">([^<]*)</a><br/>" )
         do
             path = "http://www.youtube.com" .. _path
-            name = vlc.resolve_xml_special_chars( _name )
+            name = vlc.strings.resolve_xml_special_chars( _name )
             artist = _artist
         end
         for _min, _sec in string.gmatch( line, "<span class=\"runtime\">(%d*):(%d*)</span>" )

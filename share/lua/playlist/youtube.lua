@@ -25,7 +25,7 @@ end
 
 function get_arturl( path, video_id )
     if string.match( vlc.path, "iurl=" ) then
-        return vlc.decode_uri( get_url_param( vlc.path, "iurl" ) )
+        return vlc.strings.decode_uri( get_url_param( vlc.path, "iurl" ) )
     end
     if not arturl then
         return "http://img.youtube.com/vi/"..video_id.."/default.jpg"

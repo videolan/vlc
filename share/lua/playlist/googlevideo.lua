@@ -37,7 +37,7 @@ function parse()
         if string.match( line, "src=\"/googleplayer.swf" ) then
             url = string.gsub( line, ".*videoUrl=([^&]*).*" ,"%1" )
             arturl = string.gsub( line, ".*thumbnailUrl=([^\"]*).*", "%1" )
-            return { { path = vlc.decode_uri(url), title = title, arturl = vlc.decode_uri(arturl) } }
+            return { { path = vlc.strings.decode_uri(url), title = title, arturl = vlc.strings.decode_uri(arturl) } }
         end
     end
 end

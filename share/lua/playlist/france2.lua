@@ -46,7 +46,7 @@ function parse()
             if oldtime then
                 table.insert( p, { path = video; name = name; duration = time - oldtime; options = { ':start-time='..tostring(oldtime); ':stop-time='..tostring(time) } } )
             end
-            name = vlc.resolve_xml_special_chars( string.gsub( line, "^.*>(.*)<..*$", "%1" ) )
+            name = vlc.strings.resolve_xml_special_chars( string.gsub( line, "^.*>(.*)<..*$", "%1" ) )
         end
     end
     if oldtime then
