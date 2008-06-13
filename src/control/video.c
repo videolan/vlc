@@ -231,6 +231,7 @@ void libvlc_video_redraw_rectangle( libvlc_media_player_t *p_mi,
 
 /* global video settings */
 
+/* Deprecated use libvlc_media_player_set_drawable() */
 void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d,
                               libvlc_exception_t *p_e )
 {
@@ -245,6 +246,7 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
     }
 }
 
+/* Deprecated use libvlc_media_player_get_drawable() */
 libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     VLC_UNUSED(p_e);

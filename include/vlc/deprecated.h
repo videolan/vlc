@@ -29,6 +29,30 @@
 extern "C" {
 # endif
 
+/**
+ * Set the default video output's parent.
+ *
+ * This setting will be used as default for all video outputs.
+ *
+ * \param p_instance libvlc instance
+ * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
+ * \param p_e an initialized exception pointer
+ * @deprecated Use libvlc_media_player_set_drawable
+ */
+VLC_PUBLIC_API void libvlc_video_set_parent( libvlc_instance_t *, libvlc_drawable_t, libvlc_exception_t * );
+
+/**
+ * Set the default video output parent.
+ *
+ * This setting will be used as default for all video outputs.
+ *
+ * \param p_instance libvlc instance
+ * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
+ * \param p_e an initialized exception pointer
+ * @deprecated Use libvlc_media_player_get_drawable
+ */
+VLC_PUBLIC_API libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *, libvlc_exception_t * );
+
 /*
  * This function shall not be used at all. It may lead to crash and race condition.
  */
