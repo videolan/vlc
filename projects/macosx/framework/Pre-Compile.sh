@@ -29,7 +29,7 @@ if test "${ACTION}" = "build"; then
     target_lib="${target}/${lib}"            # Should we consider using a different well-known folder like shared resources?
     target_modules="${target}/${modules}"    # Should we consider using a different well-known folder like shared resources?
     target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
-    target_include="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
+    target_include="${target}/${include}"    # Should we consider using a different well-known folder like shared resources?
     linked_libs=" "
     
     ##########################
@@ -124,6 +124,8 @@ if test "${ACTION}" = "build"; then
 
         ln -sf Versions/Current/${lib} .
         ln -sf Versions/Current/${modules} .
+        ln -sf Versions/Current/${include} .
+        ln -sf Versions/Current/${share} .
 
         popd > /dev/null
     fi
