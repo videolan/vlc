@@ -198,20 +198,26 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
- 
+
     [o_eyetv_chn_bgbar setUsesThreadedAnimation: YES];
 
-    /* FIXME: implement Capturing l10n here completely */
     [o_capture_mode_pop removeAllItems];
     if( MACOS_VERSION > 10.4f )
-        [o_capture_mode_pop addItemWithTitle: _NS("iSight")];
+        [o_capture_mode_pop addItemWithTitle: @"iSight"];
     [o_capture_mode_pop addItemWithTitle: _NS("Screen")];
     [o_capture_mode_pop addItemWithTitle: @"EyeTV"];
     [o_screen_lbl setStringValue: _NS("Screen Capture Input")];
     [o_screen_long_lbl setStringValue: _NS("This facility allows you to process your screen's output.")];
-    
-    [self setSubPanel];
+    [o_screen_fps_lbl setStringValue: _NS("Frames per Second:")];
+    [o_eyetv_currentChannel_lbl setStringValue: _NS("Current channel:")];
+    [o_eyetv_previousProgram_btn setTitle: _NS("Previous Channel")];
+    [o_eyetv_nextProgram_btn setTitle: _NS("Next Channel")];
+    [o_eyetv_chn_status_txt setStringValue: _NS("Retrieving Channel Info...")];
+    [o_eyetv_noInstance_lbl setStringValue: _NS("EyeTV is not launched")];
+    [o_eyetv_noInstanceLong_lbl setStringValue: _NS("VLC could not connect to EyeTV.\nMake sure that you installed VLC's EyeTV plugin.")];
+    [o_eyetv_launchEyeTV_btn setTitle: _NS("Launch EyeTV now")];
 
+    [self setSubPanel];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openFilePathChanged:)
@@ -854,7 +860,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [self showCaptureView: o_eyetv_notLaunched_view];
         [o_mrl setStringValue: @""];
     } 
-    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: @"Screen"] )
+    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
     {
         [self showCaptureView: o_screen_view];
         [o_mrl setStringValue: [NSString stringWithFormat:@"screen:// :screen-fps=%@", [o_screen_fps_fld stringValue]]];

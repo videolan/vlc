@@ -365,6 +365,7 @@
                 "o_panel" = id;
                 "o_playlist" = id;
                 "o_screen_fps_fld" = id;
+                "o_screen_fps_lbl" = id;
                 "o_screen_fps_stp" = id;
                 "o_screen_lbl" = id;
                 "o_screen_long_lbl" = id;

@@ -35,6 +35,7 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>
 #include <vlc_demux.h>
+#include <vlc_interface.h>
 
 #import <QTKit/QTKit.h>
 
@@ -214,7 +215,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->device = [QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo];
     if( !p_sys->device )
     {
+        intf_UserFatal( p_demux, true, _("No Input device found"),
+                        _("Your Mac does not seem to be equipped with a suitable input device. "
+                          "Please check your connectors and drivers.") );
         msg_Err( p_demux, "Can't find any Video device" );
+        
         goto error;
     }
 

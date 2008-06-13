@@ -7,13 +7,13 @@
 	<key>IBEditorPositions</key>
 	<dict>
 		<key>2297</key>
-		<string>366 463 548 183 0 0 1280 778 </string>
+		<string>366 462 548 183 0 0 1280 778 </string>
 		<key>2301</key>
-		<string>646 594 548 183 0 0 1280 778 </string>
+		<string>366 462 548 183 0 0 1280 778 </string>
 		<key>2304</key>
-		<string>427 454 547 183 0 0 1280 778 </string>
+		<string>366 462 547 183 0 0 1280 778 </string>
 		<key>2346</key>
-		<string>366 464 548 183 0 0 1280 778 </string>
+		<string>366 462 548 183 0 0 1280 778 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>489.0</string>
@@ -23,13 +23,6 @@
 		<integer>2208</integer>
 		<integer>2206</integer>
 		<integer>2199</integer>
-	</array>
-	<key>IBOpenObjects</key>
-	<array>
-		<integer>2301</integer>
-		<integer>2297</integer>
-		<integer>636</integer>
-		<integer>2346</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9D34</string>

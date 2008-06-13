@@ -126,6 +126,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_screen_lbl;
     IBOutlet id o_screen_long_lbl;
     IBOutlet id o_screen_fps_stp;
+    IBOutlet id o_screen_fps_lbl;
 
     BOOL b_autoplay;
     id o_currentCaptureView;
