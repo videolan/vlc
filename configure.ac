@@ -4730,7 +4730,7 @@ dnl
 dnl UPnP Plugin (Intel SDK)
 dnl
 AC_ARG_ENABLE(upnp,
-  [  --enable-upnp           Intel UPnP SDK (default enabled)])
+  [AS_HELP_STRING([--enable-upnp],[Intel UPnP SDK (default enabled)])])
 
 VLC_ADD_CXXFLAGS([upnp_intel], [ ])
 AS_IF([test "x${enable_upnp}" != "xno"], [
@@ -4766,7 +4766,8 @@ dnl
 dnl Skins2 module
 dnl
 AC_ARG_ENABLE(skins2,
-  [  --enable-skins2         Skins2 interface module (default disabled)])
+  [AS_HELP_STRING([--enable-skins2],[Skins2 interface module (default
+   enabled except on MacOSX, BeOS and WinCE)])])
 if test "${enable_skins2}" = "yes" ||
   (test "${SYS}" != "darwin" && test "${SYS}" != "beos" &&
    test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no"); then
@@ -4804,7 +4805,9 @@ if test "${enable_skins2}" = "yes" ||
     VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} -lXext -lX11])
   fi fi fi
 fi
-AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes"])
+AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes" ||
+	 (test "${SYS}" != "darwin" && test "${SYS}" != "beos" &&
+	  test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no")])
 
 dnl
 dnl  PDA Gtk+2 module
