@@ -37,7 +37,7 @@
     IBOutlet id o_audio_lang_txt;
     IBOutlet id o_audio_last_box;
     IBOutlet id o_audio_last_ckb;
-    IBOutlet id o_audio_lastpwd_fld;
+    IBOutlet id o_audio_lastpwd_sfld;
     IBOutlet id o_audio_lastpwd_txt;
     IBOutlet id o_audio_lastuser_fld;
     IBOutlet id o_audio_lastuser_txt;
@@ -74,6 +74,8 @@
     IBOutlet id o_input_dump_ckb;
     IBOutlet id o_input_httpproxy_fld;
     IBOutlet id o_input_httpproxy_txt;
+    IBOutlet id o_input_httpproxypwd_sfld;
+    IBOutlet id o_input_httpproxypwd_txt;
     IBOutlet id o_input_mux_box;
     IBOutlet id o_input_net_box;
     IBOutlet id o_input_postproc_fld;

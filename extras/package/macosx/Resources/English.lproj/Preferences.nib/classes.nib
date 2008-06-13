@@ -6,6 +6,14 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>VLCHotkeyChangeWindow</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -56,7 +64,7 @@
 				<string>id</string>
 				<key>o_audio_last_ckb</key>
 				<string>id</string>
-				<key>o_audio_lastpwd_fld</key>
+				<key>o_audio_lastpwd_sfld</key>
 				<string>id</string>
 				<key>o_audio_lastpwd_txt</key>
 				<string>id</string>
@@ -127,6 +135,10 @@
 				<key>o_input_httpproxy_fld</key>
 				<string>id</string>
 				<key>o_input_httpproxy_txt</key>
+				<string>id</string>
+				<key>o_input_httpproxypwd_sfld</key>
+				<string>id</string>
+				<key>o_input_httpproxypwd_txt</key>
 				<string>id</string>
 				<key>o_input_mux_box</key>
 				<string>id</string>
@@ -262,11 +274,9 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>NSApplication</string>
+			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -275,12 +285,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>

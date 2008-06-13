@@ -244,6 +244,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_input_cachelevel_custom_txt setStringValue: _NS("Use the complete preferences to configure custom caching values for each access module.")];
     [o_input_dump_ckb setTitle: _NS("Dump")];
     [o_input_httpproxy_txt setStringValue: _NS("HTTP Proxy")];
+    [o_input_httpproxypwd_txt setStringValue: _NS("Password for HTTP Proxy")];
     [o_input_mux_box setTitle: _NS("Codecs / Muxers")];
     [o_input_net_box setTitle: _NS("Network")];
     [o_input_postproc_txt setStringValue: _NS("Post-Processing Quality")];
@@ -391,19 +392,19 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( module_Exists( p_intf, "audioscrobbler" ) )
     {
         [o_audio_lastuser_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-username" )]];
-        [o_audio_lastpwd_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" )]];
+        [o_audio_lastpwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" )]];
 
         if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
         {
             [o_audio_last_ckb setState: NSOnState];
             [o_audio_lastuser_fld setEnabled: YES];
-            [o_audio_lastpwd_fld setEnabled: YES];
+            [o_audio_lastpwd_sfld setEnabled: YES];
         }
         else
         {
             [o_audio_last_ckb setState: NSOffState];
             [o_audio_lastuser_fld setEnabled: NO];
-            [o_audio_lastpwd_fld setEnabled: NO];
+            [o_audio_lastpwd_sfld setEnabled: NO];
         }
     }
     else
@@ -457,6 +458,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_input_serverport_fld setIntValue: config_GetInt( p_intf, "server-port" )];
     if( config_GetPsz( p_intf, "http-proxy" ) != NULL )
         [o_input_httpproxy_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy" )]];
+    if( config_GetPsz( p_intf, "http-proxy" ) != NULL )
+        [o_input_httpproxypwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy-pwd" )]];
     [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "ffmpeg-pp-q" )];
 
     SetupIntList( o_input_avi_pop, "avi-index" );
@@ -738,7 +741,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
                 config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
 
             config_PutPsz( p_intf, "lastfm-username", [[o_audio_lastuser_fld stringValue] UTF8String] );
-            config_PutPsz( p_intf, "lastfm-password", [[o_audio_lastpwd_fld stringValue] UTF8String] );
+            config_PutPsz( p_intf, "lastfm-password", [[o_audio_lastpwd_sfld stringValue] UTF8String] );
         }
         else
             [o_audio_last_ckb setEnabled: NO];
@@ -795,6 +798,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     {
         config_PutInt( p_intf, "server-port", [o_input_serverport_fld intValue] );
         config_PutPsz( p_intf, "http-proxy", [[o_input_httpproxy_fld stringValue] UTF8String] );
+        config_PutPsz( p_intf, "http-proxy-pwd", [[o_input_httpproxypwd_sfld stringValue] UTF8String] );
         config_PutInt( p_intf, "ffmpeg-pp-q", [o_input_postproc_fld intValue] );
 
         SaveIntList( o_input_avi_pop, "avi-index" );
@@ -979,12 +983,12 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     {
         if( [o_audio_last_ckb state] == NSOnState )
         {
-            [o_audio_lastpwd_fld setEnabled: YES];
+            [o_audio_lastpwd_sfld setEnabled: YES];
             [o_audio_lastuser_fld setEnabled: YES];
         }
         else
         {
-            [o_audio_lastpwd_fld setEnabled: NO];
+            [o_audio_lastpwd_sfld setEnabled: NO];
             [o_audio_lastuser_fld setEnabled: NO];
         }
     }
