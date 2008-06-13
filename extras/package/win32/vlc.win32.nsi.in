@@ -4,7 +4,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 !define PRODUCT_NAME "VLC media player"
-!define PRODUCT_VERSION '0.9.0-git'
+!define VERSION @VERSION@
+!define PRODUCT_VERSION @VERSION@ 
 !define PRODUCT_GROUP "VideoLAN"
 !define PRODUCT_PUBLISHER "VideoLAN Team"
 !define PRODUCT_WEB_SITE "http://www.videolan.org"
