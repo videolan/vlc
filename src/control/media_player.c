@@ -26,6 +26,7 @@
 #include <vlc/libvlc.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
+#include <vlc_vout.h>
 #include "libvlc.h"
 
 static int
@@ -685,7 +686,7 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
 
     p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
     if( !p_vout )
-        libvlc_exception_raise( p_exception, "No active video output" );
+        libvlc_exception_raise( p_e, "No active video output" );
     else
     {
         vout_Control( p_vout , VOUT_REPARENT, drawable);
