@@ -533,6 +533,7 @@ static int Run( input_thread_t *p_input )
 
         /* We have finished */
         p_input->b_eof = true;
+        input_ChangeState( p_input, END_S );
         playlist_Signal( libvlc_priv (p_input->p_libvlc)->p_playlist );
     }
 
@@ -644,7 +645,6 @@ static void MainLoop( input_thread_t *p_input )
                 {
                     /* End of file - we do not set b_die because only the
                      * playlist is allowed to do so. */
-                    input_ChangeState( p_input, END_S );
                     msg_Dbg( p_input, "EOF reached" );
                     p_input->p->input.b_eof = true;
                 }
