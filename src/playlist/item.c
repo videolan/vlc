@@ -129,6 +129,10 @@ static void install_input_item_observer( playlist_item_t * p_item )
                       input_item_changed, p_item );
     vlc_event_attach( p_em, vlc_InputItemMetaChanged,
                       input_item_changed, p_item );
+    vlc_event_attach( p_em, vlc_InputItemNameChanged,
+                      input_item_changed, p_item );
+    vlc_event_attach( p_em, vlc_InputItemInfoChanged,
+                      input_item_changed, p_item );
 }
 
 static void uninstall_input_item_observer( playlist_item_t * p_item )
@@ -139,6 +143,10 @@ static void uninstall_input_item_observer( playlist_item_t * p_item )
     vlc_event_detach( p_em, vlc_InputItemDurationChanged,
                       input_item_changed, p_item );
     vlc_event_detach( p_em, vlc_InputItemSubItemAdded,
+                      input_item_subitem_added, p_item );
+    vlc_event_detach( p_em, vlc_InputItemNameChanged,
+                      input_item_subitem_added, p_item );
+    vlc_event_detach( p_em, vlc_InputItemInfoChanged,
                       input_item_subitem_added, p_item );
 }
 
