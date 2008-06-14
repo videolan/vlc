@@ -534,7 +534,6 @@ static int Run( input_thread_t *p_input )
         /* We have finished */
         p_input->b_eof = true;
         input_ChangeState( p_input, END_S );
-        playlist_Signal( libvlc_priv (p_input->p_libvlc)->p_playlist );
     }
 
     /* Wait until we are asked to die */
