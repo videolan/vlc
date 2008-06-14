@@ -408,8 +408,8 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             msg_Dbg( (vlc_object_t*)s,
                      "strf: video:%4.4s %dx%d planes:%d %dbpp",
                      (char*)&p_chk->strf.vids.p_bih->biCompression,
-                     p_chk->strf.vids.p_bih->biWidth,
-                     p_chk->strf.vids.p_bih->biHeight,
+                     (uint32_t)p_chk->strf.vids.p_bih->biWidth,
+                     (uint32_t)p_chk->strf.vids.p_bih->biHeight,
                      p_chk->strf.vids.p_bih->biPlanes,
                      p_chk->strf.vids.p_bih->biBitCount );
 #endif
@@ -651,7 +651,7 @@ static int AVI_ChunkRead_nothing( stream_t *s, avi_chunk_t *p_chk )
 }
 static void AVI_ChunkFree_nothing( avi_chunk_t *p_chk )
 {
-
+    VLC_UNUSED( p_chk );
 }
 
 static struct

@@ -551,8 +551,8 @@ static int Open( vlc_object_t * p_this )
                 fmt.p_extra = &p_vids->p_bih[1];
                 msg_Dbg( p_demux, "stream[%d] video(%4.4s) %dx%d %dbpp %ffps",
                          i, (char*)&p_vids->p_bih->biCompression,
-                         p_vids->p_bih->biWidth,
-                         p_vids->p_bih->biHeight,
+                         (uint32_t)p_vids->p_bih->biWidth,
+                         (uint32_t)p_vids->p_bih->biHeight,
                          p_vids->p_bih->biBitCount,
                          (float)tk->i_rate/(float)tk->i_scale );
 
