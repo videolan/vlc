@@ -271,7 +271,7 @@ static void Run( intf_thread_t *p_intf )
     /* main loop */
     for( ;; )
     {
-        bool b_die = false, b_wait = false;
+        bool b_wait = false;
 
         vlc_object_lock( p_intf );
         if( !vlc_object_alive( p_intf ) )
