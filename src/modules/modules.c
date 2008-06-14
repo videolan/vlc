@@ -874,14 +874,21 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
     if( !path ) return NULL;
 
     /* Look for PATH_SEP_CHAR (a ':' or a ';') */
-    for( i = 0, done = 0 ; paths[i]; i++ ) {
+    for( i = 0, done = 0 ; paths[i]; i++ )
+    {
         /* Take care of \\ and \: or \; escapement */
-        if( escaped ) {
+        if( escaped )
+        {
             escaped = false;
             path[done++] = paths[i];
         }
+#ifdef WIN32
+        else if( paths[i] == '/' )
+            escaped = true;
+#else
         else if( paths[i] == '\\' )
             escaped = true;
+#endif
         else if( paths[i] == PATH_SEP_CHAR )
             break;
         else
