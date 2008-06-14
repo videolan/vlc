@@ -58,7 +58,7 @@ struct input_item_t
 
     char       *psz_name;            /**< text describing this item */
     char       *psz_uri;             /**< mrl of this item */
-    bool  b_fixed_name;        /**< Can the interface change the name ?*/
+    bool       b_fixed_name;        /**< Can the interface change the name ?*/
 
     int        i_options;            /**< Number of input options */
     char       **ppsz_options;       /**< Array of input options */
@@ -403,7 +403,7 @@ typedef struct
 {
     char        *psz_name;
 
-    bool  b_menu;      /* Is it a menu or a normal entry */
+    bool        b_menu;      /* Is it a menu or a normal entry */
 
     int64_t     i_length;   /* Length(microsecond) if known, else 0 */
     int64_t     i_size;     /* Size (bytes) if known, else 0 */
@@ -467,6 +467,7 @@ static inline input_title_t *vlc_input_title_Duplicate( input_title_t *t )
 
     return dup;
 }
+
 /*****************************************************************************
  * Attachments
  *****************************************************************************/
@@ -479,6 +480,7 @@ struct input_attachment_t
     int  i_data;
     void *p_data;
 };
+
 static inline input_attachment_t *vlc_input_attachment_New( const char *psz_name,
                                                             const char *psz_mime,
                                                             const char *psz_description,
@@ -517,6 +519,7 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
     free( a->p_data );
     free( a );
 }
+
 /*****************************************************************************
  * input defines/constants.
  *****************************************************************************/
