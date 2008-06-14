@@ -26,10 +26,6 @@
 char *ProcessMRL( char *, char * );
 char *FindPrefix( demux_t * );
 
-bool FindItem( demux_t *, playlist_t *, playlist_item_t **);
-
-void AddToPlaylist( demux_t *, playlist_t*,input_item_t*,playlist_item_t*,int );
-
 int Import_Old ( vlc_object_t * );
 
 int Import_Native ( vlc_object_t * );
