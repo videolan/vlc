@@ -33,11 +33,11 @@
 
 
 #include <vlc_demux.h>
-#include <vlc_playlist.h>
 #include <vlc_md5.h>
 #include <vlc_charset.h>
 #include <vlc_iso_lang.h>
 #include <vlc_meta.h>
+#include <vlc_input.h>
 
 #include "libmp4.h"
 #include "drms.h"
@@ -64,7 +64,7 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 static int   Demux   ( demux_t * );
-static int   DemuxRef( demux_t *p_demux ){ return 0;}
+static int   DemuxRef( demux_t *p_demux ){ (void)p_demux; return 0;}
 static int   Seek    ( demux_t *, mtime_t );
 static int   Control ( demux_t *, int, va_list );
 
@@ -257,10 +257,6 @@ static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
     return INT64_C(1000000) * p_sys->i_time / p_sys->i_timescale;
 }
 
-/* Function to lookup the currently playing item */
-static bool FindItem( demux_t *p_demux, playlist_t *p_playlist,
-                     playlist_item_t **pp_item );
-
 static void LoadChapter( demux_t  *p_demux );
 
 /*****************************************************************************
@@ -363,97 +359,74 @@ static int Open( vlc_object_t * p_this )
 
     if( ( p_rmra = MP4_BoxGet( p_sys->p_root,  "/moov/rmra" ) ) )
     {
-        playlist_t *p_playlist;
-        playlist_item_t *p_current, *p_item_in_category;
         int        i_count = MP4_BoxCount( p_rmra, "rmda" );
         int        i;
         bool b_play = false;
 
         msg_Dbg( p_demux, "detected playlist mov file (%d ref)", i_count );
 
-        p_playlist = pl_Yield( p_demux );
-        if( p_playlist )
+        input_thread_t * p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+        input_item_t * p_current = input_GetItem( p_input );
+        p_current->i_type = ITEM_TYPE_PLAYLIST;
+
+        for( i = 0; i < i_count; i++ )
         {
-            b_play = FindItem( p_demux, p_playlist, &p_current );
-            p_item_in_category = playlist_ItemToNode( p_playlist, p_current, true );
-            p_current->p_input->i_type = ITEM_TYPE_PLAYLIST;
+            MP4_Box_t *p_rdrf = MP4_BoxGet( p_rmra, "rmda[%d]/rdrf", i );
+            char      *psz_ref;
+            uint32_t  i_ref_type;
 
-            for( i = 0; i < i_count; i++ )
+            if( !p_rdrf || !( psz_ref = strdup( p_rdrf->data.p_rdrf->psz_ref ) ) )
             {
-                MP4_Box_t *p_rdrf = MP4_BoxGet( p_rmra, "rmda[%d]/rdrf", i );
-                char      *psz_ref;
-                uint32_t  i_ref_type;
+                continue;
+            }
+            i_ref_type = p_rdrf->data.p_rdrf->i_ref_type;
 
-                if( !p_rdrf || !( psz_ref = strdup( p_rdrf->data.p_rdrf->psz_ref ) ) )
+            msg_Dbg( p_demux, "new ref=`%s' type=%4.4s",
+                     psz_ref, (char*)&i_ref_type );
+
+            if( i_ref_type == VLC_FOURCC( 'u', 'r', 'l', ' ' ) )
+            {
+                if( strstr( psz_ref, "qt5gateQT" ) )
                 {
+                    msg_Dbg( p_demux, "ignoring pseudo ref =`%s'", psz_ref );
                     continue;
                 }
-                i_ref_type = p_rdrf->data.p_rdrf->i_ref_type;
-
-                msg_Dbg( p_demux, "new ref=`%s' type=%4.4s",
-                         psz_ref, (char*)&i_ref_type );
-
-                if( i_ref_type == VLC_FOURCC( 'u', 'r', 'l', ' ' ) )
+                if( !strncmp( psz_ref, "http://", 7 ) ||
+                    !strncmp( psz_ref, "rtsp://", 7 ) )
                 {
-                    if( strstr( psz_ref, "qt5gateQT" ) )
-                    {
-                        msg_Dbg( p_demux, "ignoring pseudo ref =`%s'", psz_ref );
-                        continue;
-                    }
-                    if( !strncmp( psz_ref, "http://", 7 ) ||
-                        !strncmp( psz_ref, "rtsp://", 7 ) )
-                    {
-                        ;
-                    }
-                    else
-                    {
-                        char *psz_absolute;
-                        char *psz_path = strdup( p_demux->psz_path );
-                        char *end = strrchr( psz_path, '/' );
-                        if( end ) end[1] = '\0';
-                        else *psz_path = '\0';
-
-                        asprintf( &psz_absolute, "%s://%s%s",
-                                      p_demux->psz_access, psz_path, psz_ref );
-
-                        free( psz_ref );
-                        psz_ref = psz_absolute;
-                        free( psz_path );
-                    }
-                    if( p_current )
-                    {
-                        input_item_t *p_input;
-                        msg_Dbg( p_demux, "adding ref = `%s'", psz_ref );
-                        p_input = input_ItemNewExt( p_playlist, psz_ref, NULL,
-                                            0, NULL, -1 );
-                        input_ItemCopyOptions( p_current->p_input, p_input );
-                        /* FIXME: playlist_BothAddInput() can fail */
-                        playlist_BothAddInput( p_playlist, p_input,
-                                               p_item_in_category,
-                                               PLAYLIST_APPEND, PLAYLIST_END,
-                                               NULL, NULL, false );
-                        vlc_gc_decref( p_input );
-                    }
+                    ;
                 }
                 else
                 {
-                    msg_Err( p_demux, "unknown ref type=%4.4s FIXME (send a bug report)",
-                             (char*)&p_rdrf->data.p_rdrf->i_ref_type );
+                    char *psz_absolute;
+                    char *psz_path = strdup( p_demux->psz_path );
+                    char *end = strrchr( psz_path, '/' );
+                    if( end ) end[1] = '\0';
+                    else *psz_path = '\0';
+
+                    asprintf( &psz_absolute, "%s://%s%s",
+                                  p_demux->psz_access, psz_path, psz_ref );
+
+                    free( psz_ref );
+                    psz_ref = psz_absolute;
+                    free( psz_path );
                 }
-                free( psz_ref );
+                input_item_t *p_input;
+                msg_Dbg( p_demux, "adding ref = `%s'", psz_ref );
+                p_input = input_ItemNewExt( p_demux, psz_ref, NULL,
+                                    0, NULL, -1 );
+                input_ItemCopyOptions( p_current, p_input );
+                input_ItemAddSubItem( p_current, p_input );
+                vlc_gc_decref( p_input );
             }
-            if( b_play && p_item_in_category &&
-                p_item_in_category->i_children > 0 )
+            else
             {
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
-                                  p_item_in_category, NULL );
+                msg_Err( p_demux, "unknown ref type=%4.4s FIXME (send a bug report)",
+                         (char*)&p_rdrf->data.p_rdrf->i_ref_type );
             }
-            vlc_object_release( p_playlist );
+            free( psz_ref );
         }
-        else
-        {
-            msg_Err( p_demux, "can't find playlist" );
-        }
+        vlc_object_release( p_input );
     }
 
     if( !(p_mvhd = MP4_BoxGet( p_sys->p_root, "/moov/mvhd" ) ) )
@@ -2477,37 +2450,3 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
         msg_Warn( p_demux, "elst old=%d new=%d", i_elst_last, tk->i_elst );
     }
 }
-
-static bool FindItem( demux_t *p_demux, playlist_t *p_playlist,
-                            playlist_item_t **pp_item )
-{
-    input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
-    bool b_play = var_CreateGetBool( p_demux, "playlist-autostart" );
-
-    *pp_item = NULL;
-    if( p_input )
-    {
-        if( b_play && p_playlist->status.p_item &&
-            p_playlist->status.p_item->p_input == input_GetItem(p_input) )
-        {
-            msg_Dbg( p_playlist, "starting playlist playback" );
-            *pp_item = p_playlist->status.p_item;
-            b_play = true;
-        }
-        else
-        {
-            input_item_t *p_current = input_GetItem( p_input );
-
-            *pp_item = playlist_ItemGetByInput( p_playlist, p_current, false );
-            if( !*pp_item )
-                msg_Dbg( p_playlist, "unable to find item in playlist");
-
-            msg_Dbg( p_playlist, "not starting playlist playback");
-            b_play = false;
-        }
-        vlc_object_release( p_input );
-    }
-    return b_play;
-}
-
-
