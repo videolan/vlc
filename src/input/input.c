@@ -499,15 +499,6 @@ static int Run( input_thread_t *p_input )
         /* If we failed, wait before we are killed, and exit */
         p_input->b_error = true;
 
-        /* FIXME: we don't want to depend on the playlist */
-        playlist_t * p_playlist = vlc_object_find( p_input,
-            VLC_OBJECT_PLAYLIST, FIND_PARENT );
-        if( p_playlist )
-        {
-            playlist_Signal( p_playlist );
-            vlc_object_release( p_playlist );
-        }
-
         Error( p_input );
 
         /* Tell we're dead */
