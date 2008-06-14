@@ -203,6 +203,14 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
 
+/* Input Callback */
+static void input_state_changed( const vlc_event_t * event, void * data )
+{
+    (void)event;
+    playlist_t * p_playlist = data;
+    playlist_Signal( p_playlist );
+}
+
 /* Internals */
 void playlist_release_current_input( playlist_t * p_playlist )
 {
@@ -211,6 +219,10 @@ void playlist_release_current_input( playlist_t * p_playlist )
     if( !p_playlist->p_input ) return;
 
     input_thread_t * p_input = p_playlist->p_input;
+    vlc_event_manager_t * p_em = input_get_event_manager( p_input );
+
+    vlc_event_detach( p_em, vlc_InputStateChanged,
+                      input_state_changed, p_playlist );
     p_playlist->p_input = NULL;
 
     /* Release the playlist lock, because we may get stuck
@@ -231,8 +243,12 @@ void playlist_set_current_input(
     {
         vlc_object_yield( p_input );
         p_playlist->p_input = p_input;
+        vlc_event_manager_t * p_em = input_get_event_manager( p_input );
+        vlc_event_attach( p_em, vlc_InputStateChanged,
+                          input_state_changed, p_playlist );
     }
 }
+
 
 /**
  * @}
