@@ -173,22 +173,22 @@ struct module_config_t
     int            i_action;                           /* actions list size */
 
     /* Misc */
-    vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
-    bool   b_dirty;          /* Dirty flag to indicate a config change */
-    bool   b_advanced;          /* Flag to indicate an advanced option */
-    bool   b_internal;   /* Flag to indicate option is not to be shown */
-    bool   b_restart;   /* Flag to indicate the option needs a restart */
+    vlc_mutex_t *p_lock;           /* Lock to use when modifying the config */
+    bool        b_dirty;          /* Dirty flag to indicate a config change */
+    bool        b_advanced;          /* Flag to indicate an advanced option */
+    bool        b_internal;   /* Flag to indicate option is not to be shown */
+    bool        b_restart;   /* Flag to indicate the option needs a restart */
                               /* to take effect */
 
     /* Deprecated */
-    char          *psz_oldname;                          /* Old option name */
-    bool     b_removed;
+    char        *psz_oldname;                          /* Old option name */
+    bool        b_removed;
 
     /* Option values loaded from config file */
-    bool   b_autosave;      /* Config will be auto-saved at exit time */
-    bool   b_unsaveable;                /* Config should not be saved */
+    bool        b_autosave;      /* Config will be auto-saved at exit time */
+    bool        b_unsaveable;                /* Config should not be saved */
 
-    bool   b_safe;
+    bool        b_safe;
 };
 
 /*****************************************************************************
