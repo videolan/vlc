@@ -211,6 +211,17 @@ static void input_state_changed( const vlc_event_t * event, void * data )
     playlist_Signal( p_playlist );
 }
 
+/* Input Callback */
+static void input_selected_stream_changed( const vlc_event_t * event, void * data )
+{
+    (void)event;
+    playlist_t * p_playlist = data;
+    PL_LOCK;
+    p_playlist->gc_date = mdate();
+    vlc_object_signal_unlocked( p_playlist );
+    PL_UNLOCK;
+}
+
 /* Internals */
 void playlist_release_current_input( playlist_t * p_playlist )
 {
@@ -223,6 +234,8 @@ void playlist_release_current_input( playlist_t * p_playlist )
 
     vlc_event_detach( p_em, vlc_InputStateChanged,
                       input_state_changed, p_playlist );
+    vlc_event_detach( p_em, vlc_InputSelectedStreamChanged,
+                      input_selected_stream_changed, p_playlist );
     p_playlist->p_input = NULL;
 
     /* Release the playlist lock, because we may get stuck
@@ -246,6 +259,8 @@ void playlist_set_current_input(
         vlc_event_manager_t * p_em = input_get_event_manager( p_input );
         vlc_event_attach( p_em, vlc_InputStateChanged,
                           input_state_changed, p_playlist );
+        vlc_event_attach( p_em, vlc_InputSelectedStreamChanged,
+                          input_selected_stream_changed, p_playlist );
     }
 }
 
