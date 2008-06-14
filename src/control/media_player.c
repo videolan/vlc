@@ -56,9 +56,10 @@ static const libvlc_state_t vlc_to_libvlc_state_array[] =
     [BUFFERING_S]   = libvlc_Buffering,
     [PLAYING_S]     = libvlc_Playing,
     [PAUSE_S]       = libvlc_Paused,
-    [END_S]         = libvlc_Ended,
+    [STOP_S]        = libvlc_Stopped,
     [FORWARD_S]     = libvlc_Forward,
     [BACKWARD_S]    = libvlc_Backward,
+    [END_S]         = libvlc_Ended,
     [ERROR_S]       = libvlc_Error,
 };
 
@@ -166,9 +167,9 @@ input_state_changed( const vlc_event_t * event, void * p_userdata )
             libvlc_media_set_state( p_mi->p_md, libvlc_Paused, NULL);
             forwarded_event.type = libvlc_MediaPlayerPaused;
             break;
-        case END_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_Ended, NULL);
-            forwarded_event.type = libvlc_MediaPlayerEndReached;
+        case STOP_S:
+            libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, NULL);
+            forwarded_event.type = libvlc_MediaPlayerStopped;
             break;
         case FORWARD_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Forward, NULL);
@@ -178,6 +179,9 @@ input_state_changed( const vlc_event_t * event, void * p_userdata )
             libvlc_media_set_state( p_mi->p_md, libvlc_Backward, NULL);
             forwarded_event.type = libvlc_MediaPlayerBackward;
             break;
+        case END_S:
+            libvlc_media_set_state( p_mi->p_md, libvlc_Ended, NULL);
+            forwarded_event.type = libvlc_MediaPlayerEndReached;
         case ERROR_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Error, NULL);
             forwarded_event.type = libvlc_MediaPlayerEncounteredError;
@@ -350,11 +354,13 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerPaused, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerEndReached, p_e );
+            libvlc_MediaPlayerStopped, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerForward, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerBackward, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaPlayerEndReached, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerEncounteredError, p_e );
 

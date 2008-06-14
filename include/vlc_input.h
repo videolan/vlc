@@ -532,9 +532,10 @@ enum input_state_e
     BUFFERING_S,
     PLAYING_S,
     PAUSE_S,
-    END_S,
+    STOP_S,
     FORWARD_S,
     BACKWARD_S,
+    END_S,
     ERROR_S
 };
 

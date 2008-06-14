@@ -376,14 +376,17 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
         case libvlc_Paused:
             retval->streamstatus = mediacontrol_PauseStatus;
             break;
-        case libvlc_Ended:
-            retval->streamstatus = mediacontrol_EndStatus;
+        case libvlc_Stopped:
+            retval->streamstatus = mediacontrol_StopStatus;
             break;
         case libvlc_Forward:
             retval->streamstatus = mediacontrol_ForwardStatus;
             break;
         case libvlc_Backward:
             retval->streamstatus = mediacontrol_BackwardStatus;
+            break;
+        case libvlc_Ended:
+            retval->streamstatus = mediacontrol_EndStatus;
             break;
         case libvlc_Error:
             retval->streamstatus = mediacontrol_ErrorStatus;
