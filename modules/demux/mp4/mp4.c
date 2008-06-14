@@ -361,7 +361,6 @@ static int Open( vlc_object_t * p_this )
     {
         int        i_count = MP4_BoxCount( p_rmra, "rmda" );
         int        i;
-        bool b_play = false;
 
         msg_Dbg( p_demux, "detected playlist mov file (%d ref)", i_count );
 
