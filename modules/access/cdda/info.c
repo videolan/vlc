@@ -26,6 +26,8 @@
  *****************************************************************************/
 #include "callback.h"      /* FIXME - reorganize callback.h, cdda.h better */
 #include "cdda.h"          /* private structures. Also #includes vlc things */
+
+#warning playlist code must not be used here.
 #include <vlc_playlist.h>  /* Has to come *after* cdda.h */
 
 #include <cdio/cdio.h>
