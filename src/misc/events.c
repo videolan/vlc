@@ -110,8 +110,8 @@ group_contains_listener( vlc_event_listeners_group_t * group,
  * for instance).
  * p_parent_obj gives a libvlc instance
  */
-int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj,
-                            vlc_object_t * p_parent_obj )
+int __vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj,
+                              vlc_object_t * p_parent_obj )
 {
     p_em->p_obj = p_obj;
     p_em->p_parent_object = p_parent_obj;

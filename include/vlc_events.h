@@ -184,7 +184,12 @@ typedef void ( *vlc_event_callback_t )( const vlc_event_t *, void * );
  * which events are sent
  * p_obj is here to give us a libvlc instance
  */
-VLC_EXPORT(int, vlc_event_manager_init, ( vlc_event_manager_t * p_em,
+#define vlc_event_manager_init_with_vlc_object(a,b) \
+            vlc_event_manager_init( a, b, b )
+
+#define vlc_event_manager_init(a,b,c) \
+            __vlc_event_manager_init(a, b, VLC_OBJECT(c))
+VLC_EXPORT(int, __vlc_event_manager_init, ( vlc_event_manager_t * p_em,
                                           void * p_obj, vlc_object_t * ));
 
 /*
