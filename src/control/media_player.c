@@ -160,7 +160,7 @@ input_state_changed( const vlc_event_t * event, void * p_userdata )
             break;
         case PLAYING_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Playing, NULL);
-            forwarded_event.type = libvlc_MediaPlayerPlayed;
+            forwarded_event.type = libvlc_MediaPlayerPlaying;
             break;
         case PAUSE_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Paused, NULL);
