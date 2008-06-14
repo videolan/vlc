@@ -386,7 +386,15 @@ void MRLSplit( char *, const char **, const char **, char ** );
 
 static inline void input_ChangeState( input_thread_t *p_input, int state )
 {
+    bool changed = (p_input->i_state != state);
     var_SetInteger( p_input, "state", p_input->i_state = state );
+    if( changed )
+    {
+        vlc_event_t event;
+        event.type = vlc_InputStateChanged;
+        event.u.vlc_input_state_changed.new_state = state;
+        vlc_event_send( &p_input->p->event_manager, &event );
+    }
 }
 
 /* Access */
