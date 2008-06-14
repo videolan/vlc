@@ -388,11 +388,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout = new QGridLayout( );
 
     controlLayout->setSpacing( 0 );
-#if QT43
-    controlLayout->setContentsMargins( 9, 6, 9, 6 );
-#else
-    controlLayout->setMargin( 6 );
-#endif
+    controlLayout->setLayoutMargins( 9, 6, 9, 6, 6 );
 
     if( !b_fsCreation )
         setLayout( controlLayout );
@@ -827,11 +823,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     QGridLayout *fsLayout = new QGridLayout( this );
     controlLayout->setSpacing( 0 );
-    #if QT43
-    controlLayout->setContentsMargins( 5, 1, 5, 1 );
-    #else
-    controlLayout->setMargin( 5 );
-    #endif
+    controlLayout->setLayoutMargins( 5, 1, 5, 1, 5 );
 
     fsLayout->addWidget( slowerButton, 0, 0 );
     slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);

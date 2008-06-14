@@ -100,10 +100,16 @@ struct intf_sys_t
 #define TOGGLEV( x ) { if( x->isVisible() ) x->hide();          \
             else  x->show(); }
 
+#if QT43
+    #define setLayoutMargins( a, b, c, d, e) setContentsMargins( a, b, c, d )
+#else
+    #define setLayoutMargins( a, b, c, d, e) setMargin( e )
+#endif
+
 enum {
-DialogEventType = 0,
-IMEventType     = 100,
-PLEventType     = 200
+    DialogEventType = 0,
+    IMEventType     = 100,
+    PLEventType     = 200
 };
 
 static int DialogEvent_Type = QEvent::User + DialogEventType + 1;

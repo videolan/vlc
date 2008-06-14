@@ -1,7 +1,7 @@
 /*****************************************************************************
  * simple_preferences.cpp : "Simple preferences"
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -22,6 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -297,7 +298,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.outputModule, currentIndexChanged( int ),
                      this, updateAudioOptions( int ) );
 
-       // File exists everywhere
+            /* File output exists on all platforms */
             CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel,
                                  ui.fileName, ui.fileBrowseButton );
 
