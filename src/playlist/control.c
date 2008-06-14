@@ -476,8 +476,12 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     var_SetInteger( p_playlist, "activity", i_activity +
                     DEFAULT_INPUT_ACTIVITY );
-    p_playlist->p_input =
+
+    input_thread_t * p_input_thread =
         input_CreateThreadExtended( p_playlist, p_input, NULL, *pp_sout );
+    playlist_set_current_input( p_playlist, p_input_thread );
+    vlc_object_release( p_input_thread );
+
     *pp_sout = NULL;
 
     char *psz_uri = input_item_GetURI( p_item->p_input );

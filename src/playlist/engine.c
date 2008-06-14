@@ -39,6 +39,7 @@
  *****************************************************************************/
 static void VariablesInit( playlist_t *p_playlist );
 static void playlist_Destructor( vlc_object_t * p_this );
+static void playlist_Destructor( vlc_object_t * p_this );
 
 static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval, void *a )
@@ -244,19 +245,13 @@ check_input:
             PL_DEBUG( "dead input" );
 
             p_input = p_playlist->p_input;
-            p_playlist->p_input = NULL;
+
             assert( *pp_sout == NULL );
             if( var_CreateGetBool( p_input, "sout-keep" ) )
                 *pp_sout = input_DetachSout( p_input );
 
-            /* Release the playlist lock, because we may get stuck
-             * in vlc_object_release() for some time. */
-            PL_UNLOCK;
-
             /* Destroy input */
-            vlc_object_release( p_input );
-
-            PL_LOCK;
+            playlist_release_current_input( p_playlist );
 
             p_playlist->gc_date = mdate();
             p_playlist->b_cant_sleep = true;
@@ -275,6 +270,7 @@ check_input:
             i_activity= var_GetInteger( p_playlist, "activity" );
             var_SetInteger( p_playlist, "activity", i_activity -
                             DEFAULT_INPUT_ACTIVITY );
+
             goto check_input;
         }
         /* This input is dying, let it do */
@@ -378,18 +374,13 @@ void playlist_LastLoop( playlist_t *p_playlist )
 
         if( p_playlist->p_input->b_dead )
         {
-            input_thread_t *p_input;
-
-            /* Unlink current input */
-            p_input = p_playlist->p_input;
-            p_playlist->p_input = NULL;
-            PL_UNLOCK;
+            /* remove input */
+            playlist_release_current_input( p_playlist );
 
             /* sout-keep: no need to anything here.
              * The last input will destroy its sout, if any, by itself */
 
-            /* Destroy input */
-            vlc_object_release( p_input );
+            PL_UNLOCK;
             continue;
         }
         else if( p_playlist->p_input->b_die )

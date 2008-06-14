@@ -35,6 +35,7 @@
  */
 
 #include "input/input_internal.h"
+#include <assert.h>
 
 struct playlist_preparse_t
 {
@@ -108,6 +109,37 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
 
 int playlist_DeleteFromItemId( playlist_t*, int );
 int playlist_ItemDelete ( playlist_item_t * );
+
+static inline void playlist_release_current_input( playlist_t * p_playlist )
+{
+    vlc_assert_locked( &p_playlist->object_lock );
+
+    if( !p_playlist->p_input ) return;
+
+    input_thread_t * p_input = p_playlist->p_input;
+    p_playlist->p_input = NULL;
+
+    /* Release the playlist lock, because we may get stuck
+     * in vlc_object_release() for some time. */
+    PL_UNLOCK;
+    vlc_object_release( p_input );
+    PL_LOCK;
+}
+
+static inline void playlist_set_current_input(
+    playlist_t * p_playlist, input_thread_t * p_input )
+{
+    vlc_assert_locked( &p_playlist->object_lock );
+
+    playlist_release_current_input( p_playlist );
+
+    if( p_input )
+    {
+        vlc_object_yield( p_input );
+        p_playlist->p_input = p_input;
+    }
+}
+
 
 /**
  * @}
