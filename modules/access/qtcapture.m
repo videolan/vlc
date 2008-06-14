@@ -211,6 +211,7 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_demux, "QTCapture Probed" );
 
     QTCaptureDeviceInput * input = nil;
+    NSError *o_returnedError;
 
     p_sys->device = [QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo];
     if( !p_sys->device )
@@ -223,16 +224,22 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    if( ![p_sys->device open: nil  /* FIXME */] )
+    if( ![p_sys->device open: &o_returnedError] )
     {
-        msg_Err( p_demux, "Can't open any Video device" );
+        msg_Err( p_demux, "Unable to open the capture device (%i)", [o_returnedError code] );
+        goto error;
+    }
+
+    if( [p_sys->device isInUseByAnotherApplication] == YES )
+    {
+        msg_Err( p_demux, "default capture device is exclusively in use by another application" );
         goto error;
     }
 
     input = [[QTCaptureDeviceInput alloc] initWithDevice: p_sys->device];
-    if( !p_sys->device )
+    if( !input )
     {
-        msg_Err( p_demux, "Can't create a capture session" );
+        msg_Err( p_demux, "can't create a valid capture input facility" );
         goto error;
     }
 
@@ -245,17 +252,17 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->session = [[QTCaptureSession alloc] init];
 
-    bool ret = [p_sys->session addInput:input error:nil  /* FIXME */];
+    bool ret = [p_sys->session addInput:input error: &o_returnedError];
     if( !ret )
     {
-        msg_Err( p_demux, "Can't add the video device as input" );
+        msg_Err( p_demux, "default video capture device could not be added to capture session (%i)", [o_returnedError code] );
         goto error;
     }
 
-    ret = [p_sys->session addOutput:p_sys->output error:nil  /* FIXME */];
+    ret = [p_sys->session addOutput:p_sys->output error: &o_returnedError];
     if( !ret )
     {
-        msg_Err( p_demux, "Can't get any output output" );
+        msg_Err( p_demux, "output could not be added to capture session (%i)", [o_returnedError code] );
         goto error;
     }
 
