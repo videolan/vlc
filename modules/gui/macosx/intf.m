@@ -272,8 +272,8 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_playlist_update = true;
     p_intf->p_sys->b_intf_update = true;
+    p_intf->p_sys->b_playlist_update = true;
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_current_title_update = true;
     return VLC_SUCCESS;
@@ -1452,6 +1452,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         p_intf->p_sys->i_play_status = END_S;
         p_intf->p_sys->b_intf_update = true;
+        p_intf->p_sys->b_playlist_update = true;
         [self playStatusUpdated: p_intf->p_sys->i_play_status];
         [o_embedded_window playStatusUpdated: p_intf->p_sys->i_play_status];
         [self setSubmenusEnabled: FALSE];

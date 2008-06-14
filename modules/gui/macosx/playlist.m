@@ -456,10 +456,8 @@
 
 - (void)playlistUpdated
 {
-    unsigned int i;
-
     /* Clear indications of any existing column sorting */
-    for( i = 0 ; i < [[o_outline_view tableColumns] count] ; i++ )
+    for( unsigned int i = 0 ; i < [[o_outline_view tableColumns] count] ; i++ )
     {
         [o_outline_view setIndicatorImage:nil inTableColumn:
                             [[o_outline_view tableColumns] objectAtIndex:i]];
