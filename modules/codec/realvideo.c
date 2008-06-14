@@ -254,29 +254,29 @@ static int InitVideo(decoder_t *p_dec)
     if( (p_sys->rv_handle = load_syms(p_dec, g_decode_path)) )
         b_so_opened = true;
 #else
-    const char *ppsz_path[] =
+    static const char psz_paths[] =
     {
-        "/usr/lib/win32",
-        "/usr/lib/codecs",
-        "/usr/local/RealPlayer8/Codecs",
-        "/usr/RealPlayer8/Codecs",
-        "/usr/lib/RealPlayer8/Codecs",
-        "/opt/RealPlayer8/Codecs",
-        "/usr/lib/RealPlayer9/users/Real/Codecs",
-        "/usr/lib/RealPlayer10/codecs",
-        "/usr/lib/RealPlayer10GOLD/codecs",
-        "/usr/lib/helix/player/codecs",
-        "/usr/lib64/RealPlayer8/Codecs",
-        "/usr/lib64/RealPlayer9/users/Real/Codecs",
-        "/usr/lib64/RealPlayer10/codecs",
-        "/usr/lib64/RealPlayer10GOLD/codecs",
-        "/usr/local/lib/codecs",
-        NULL
+        "/usr/lib/win32\0"
+        "/usr/lib/codecs\0"
+        "/usr/local/RealPlayer8/Codecs\0"
+        "/usr/RealPlayer8/Codecs\0"
+        "/usr/lib/RealPlayer8/Codecs\0"
+        "/opt/RealPlayer8/Codecs\0"
+        "/usr/lib/RealPlayer9/users/Real/Codecs\0"
+        "/usr/lib/RealPlayer10/codecs\0"
+        "/usr/lib/RealPlayer10GOLD/codecs\0"
+        "/usr/lib/helix/player/codecs\0"
+        "/usr/lib64/RealPlayer8/Codecs\0"
+        "/usr/lib64/RealPlayer9/users/Real/Codecs\0"
+        "/usr/lib64/RealPlayer10/codecs\0"
+        "/usr/lib64/RealPlayer10GOLD/codecs\0"
+        "/usr/local/lib/codecs\0"
+        "\0"
     };
 
-    for( int i = 0; ppsz_path[i]; i++ )
+    for( size_t i = 0; psz_paths[i]; i += strlen( psz_paths[i] ) + 1 )
     {
-        asprintf( &g_decode_path, "%s/drv4.so.6.0", ppsz_path[i] );
+        asprintf( &g_decode_path, "%s/drv4.so.6.0", psz_paths + i );
         if( (p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path)) )
         {
             b_so_opened = true;
@@ -284,7 +284,7 @@ static int InitVideo(decoder_t *p_dec)
             break;
         }
 
-        asprintf( &g_decode_path, "%s/drv3.so.6.0", ppsz_path[i] );
+        asprintf( &g_decode_path, "%s/drv3.so.6.0", psz_paths + i );
         if( (p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path)) )
         {
             b_so_opened = true;
