@@ -192,8 +192,7 @@ static inline int ps_pkt_id( block_t *p_pkt )
     {
         /* ISO 13818 amendment 2 and SMPTE RP 227 */
         const uint8_t i_flags = p_pkt->p_buffer[7];
-        int i_skip = 9;
-
+        unsigned int i_skip = 9;
 
         /* Find PES extension */
         if( (i_flags & 0x80 ) )
@@ -341,7 +340,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
 {
     uint8_t header[30];
-    int     i_skip  = 0;
+    unsigned int i_skip  = 0;
 
     memcpy( header, p_pes->p_buffer, __MIN( p_pes->i_buffer, 30 ) );
 
