@@ -166,6 +166,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->b_preparsing = b_quick;
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
+    /* Init events */
+    vlc_event_manager_init_with_vlc_object(
+        &p_input->p->event_manager, p_input );
+
     /* Init Common fields */
     p_input->b_eof = false;
     p_input->b_can_pace_control = true;
@@ -308,6 +312,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 static void Destructor( input_thread_t * p_input )
 {
     input_thread_private_t *priv = p_input->p;
+
+    vlc_event_manager_fini( &p_input->p->event_manager );
 
     stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
     stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
