@@ -38,7 +38,6 @@
 #include <string.h>
 
 #include <vlc_sout.h>
-#include <vlc_playlist.h>
 
 #include "stream_output.h"
 
