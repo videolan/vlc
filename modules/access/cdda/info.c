@@ -830,7 +830,7 @@ CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
                psz_mrl, psz_title, (long int) i_mduration / 1000000 );
 
     p_child = playlist_ItemNew( p_playlist, psz_mrl, psz_title );
-    input_item_SetDuration( input_GetItem( p_child->p_input ),
+    input_item_SetDuration( p_child->p_input,
             (mtime_t) i_mduration );
     free(psz_mrl);
     free(psz_title);
