@@ -795,7 +795,6 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     if( !p_instance )
     {
         vlm_media_t *p_cfg = &p_media->cfg;
-        const char *psz_keep;
         int i;
 
         p_instance = vlm_MediaInstanceNew( p_vlm, psz_id );
