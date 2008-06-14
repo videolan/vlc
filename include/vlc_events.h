@@ -141,7 +141,7 @@ typedef struct vlc_event_t
         struct vlc_input_state_changed
         {
             int new_state;
-        } vlc_input_state_changed;
+        } input_state_changed;
 
         /* Input item events */
         struct vlc_input_item_meta_changed

@@ -140,7 +140,7 @@ input_state_changed( const vlc_event_t * event, void * p_userdata )
 {
     libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t forwarded_event;
-    libvlc_event_type_t type = event->u.vlc_input_state_changed.new_state;
+    libvlc_event_type_t type = event->u.input_state_changed.new_state;
 
     switch ( type )
     {

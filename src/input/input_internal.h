@@ -392,7 +392,7 @@ static inline void input_ChangeState( input_thread_t *p_input, int state )
     {
         vlc_event_t event;
         event.type = vlc_InputStateChanged;
-        event.u.vlc_input_state_changed.new_state = state;
+        event.u.input_state_changed.new_state = state;
         vlc_event_send( &p_input->p->event_manager, &event );
     }
 }
