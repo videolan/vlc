@@ -399,6 +399,7 @@ static void Run( intf_thread_t *p_intf )
     PlaylistRebuild( p_intf );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
     var_AddCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
+    var_AddCallback( p_playlist, "item-change", PlaylistChanged, p_intf );
 
     while( !intf_ShouldDie( p_intf ) )
     {
@@ -460,6 +461,7 @@ static void Run( intf_thread_t *p_intf )
     }
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
     var_DelCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
+    var_DelCallback( p_playlist, "item-change", PlaylistChanged, p_intf );
 }
 
 /* following functions are local */
