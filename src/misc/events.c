@@ -72,10 +72,17 @@ typedef struct vlc_event_listeners_group_t
 #ifdef DEBUG_EVENT
 static const char ppsz_event_type_to_name[][33] =
 {
+    [vlc_InputStateChanged]             = "vlc_InputStateChanged",
+
     [vlc_InputItemMetaChanged]          = "vlc_InputItemMetaChanged",
     [vlc_InputItemSubItemAdded]         = "vlc_InputItemSubItemAdded",
+    [vlc_InputItemDurationChanged]      = "vlc_InputItemDurationChanged",
+    [vlc_InputItemPreparsedChanged]     = "vlc_InputItemPreparsedChanged",
+
     [vlc_ServicesDiscoveryItemAdded]    = "vlc_ServicesDiscoveryItemAdded",
     [vlc_ServicesDiscoveryItemRemoved]  = "vlc_ServicesDiscoveryItemRemoved"
+    [vlc_ServicesDiscoveryStarted]      = "vlc_ServicesDiscoveryStarted"
+    [vlc_ServicesDiscoveryEnded]        = "vlc_ServicesDiscoveryEnded"
 };
 #endif
 

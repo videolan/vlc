@@ -112,6 +112,9 @@ typedef struct vlc_event_manager_t
 /* List of event */
 /* Be sure to keep sync-ed with misc/events.c debug name table */
 typedef enum vlc_event_type_t {
+    /* Input (thread) events */
+    vlc_InputStateChanged,
+
     /* Input item events */
     vlc_InputItemMetaChanged,
     vlc_InputItemSubItemAdded,
@@ -132,6 +135,12 @@ typedef struct vlc_event_t
     void * p_obj; /* Sender object, automatically filled by vlc_event_send() */
     union vlc_event_type_specific
     {
+        /* Input (thread) events */
+        struct vlc_input_state_changed
+        {
+            int new_state;
+        } vlc_input_state_changed;
+
         /* Input item events */
         struct vlc_input_item_meta_changed
         {
