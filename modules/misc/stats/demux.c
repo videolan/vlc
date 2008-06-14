@@ -115,7 +115,7 @@ static int Demux( demux_t *p_demux )
     p_block->i_dts = p_block->i_pts =
         date_Increment( &p_sys->pts, kBufferSize );
 
-    msg_Dbg( p_demux, "demux got %d ms offset", (mdate() - *(mtime_t *)p_block->p_buffer) / 1000 );
+    msg_Dbg( p_demux, "demux got %d ms offset", (int)(mdate() - *(mtime_t *)p_block->p_buffer) / 1000 );
 
     //es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
 
