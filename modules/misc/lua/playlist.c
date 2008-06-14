@@ -248,7 +248,6 @@ static int Demux( demux_t *p_demux )
     lua_State *L = p_demux->p_sys->L;
     char *psz_filename = p_demux->p_sys->psz_filename;
 
-    playlist_t *p_playlist = pl_Yield( p_demux );
     input_thread_t *p_input_thread = (input_thread_t *)
         vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
     input_item_t *p_current_input = input_GetItem( p_input_thread );
@@ -275,13 +274,12 @@ static int Demux( demux_t *p_demux )
     }
 
     if( lua_gettop( L ) )
-        vlclua_playlist_add_internal( p_demux, L, p_playlist,
+        vlclua_playlist_add_internal( p_demux, L, NULL,
                                       p_current_input, 0 );
     else
         msg_Err( p_demux, "Script went completely foobar" );
 
     vlc_object_release( p_input_thread );
-    vlc_object_release( p_playlist );
 
     return -1; /* Needed for correct operation of go back */
 }

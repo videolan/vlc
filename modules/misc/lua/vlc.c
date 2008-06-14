@@ -33,6 +33,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_meta.h>
@@ -672,6 +674,8 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                                     input_item_t *p_parent, bool b_play )
 {
     int i_count = 0;
+
+    assert( p_parent || p_playlist );
 
     /* playlist */
     if( lua_istable( L, -1 ) )
