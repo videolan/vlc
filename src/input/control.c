@@ -35,7 +35,6 @@
 
 
 static void UpdateBookmarksOption( input_thread_t * );
-static void NotifyPlaylist( input_thread_t * );
 
 /****************************************************************************
  * input_Control
@@ -201,7 +200,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             if( !p_input->b_preparsing )
             {
-                NotifyPlaylist( p_input );
                 vlc_event_t event;
                 event.type = vlc_InputItemInfoChanged;
                 vlc_event_send( &p_input->p->input.p_item->event_manager, &event );
@@ -273,7 +271,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             if( !p_input->b_preparsing )
             {
-                NotifyPlaylist( p_input );
                 vlc_event_t event;
                 event.type = vlc_InputItemInfoChanged;
                 vlc_event_send( &p_input->p->input.p_item->event_manager, &event );
@@ -309,7 +306,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             if( !p_input->b_preparsing )
             {
-                NotifyPlaylist( p_input );
                 vlc_event_t event;
                 event.type = vlc_InputItemNameChanged;
                 event.u.input_item_name_changed.new_name = psz_name;
@@ -608,18 +604,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             msg_Err( p_input, "unknown query in input_vaControl" );
             return VLC_EGENERIC;
     }
-}
-
-static void NotifyPlaylist( input_thread_t *p_input )
-{
-    /* FIXME: We need to avoid that dependency on the playlist
-     * because it is a circular dependency:
-     * ( playlist -> input -> playlist ) */
-    playlist_t *p_playlist = pl_Yield( p_input );
-    if( VLC_OBJECT(p_playlist) == p_input->p_parent )
-        var_SetInteger( p_playlist, "item-change",
-                        p_input->p->input.p_item->i_id );
-    pl_Release( p_input );
 }
 
 static void UpdateBookmarksOption( input_thread_t *p_input )
