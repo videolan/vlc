@@ -203,6 +203,41 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
 
+/* Internals */
+void playlist_release_current_input( playlist_t * p_playlist )
+{
+    vlc_assert_locked( &p_playlist->object_lock );
+
+    if( !p_playlist->p_input ) return;
+
+    input_thread_t * p_input = p_playlist->p_input;
+    p_playlist->p_input = NULL;
+
+    /* Release the playlist lock, because we may get stuck
+     * in vlc_object_release() for some time. */
+    PL_UNLOCK;
+    vlc_object_release( p_input );
+    PL_LOCK;
+}
+
+void playlist_set_current_input(
+    playlist_t * p_playlist, input_thread_t * p_input )
+{
+    vlc_assert_locked( &p_playlist->object_lock );
+
+    playlist_release_current_input( p_playlist );
+
+    if( p_input )
+    {
+        vlc_object_yield( p_input );
+        p_playlist->p_input = p_input;
+    }
+}
+
+/**
+ * @}
+ */
+
 /**
  * Main loop
  *
