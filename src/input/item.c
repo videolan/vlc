@@ -62,6 +62,10 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
         vlc_InputItemDurationChanged );
     vlc_event_manager_register_event_type( &p_i->event_manager,
         vlc_InputItemPreparsedChanged );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemNameChanged );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemInfoChanged );
 }
 
 static inline void input_ItemClean( input_item_t *p_i )

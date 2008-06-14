@@ -78,6 +78,8 @@ static const char ppsz_event_type_to_name[][33] =
     [vlc_InputItemSubItemAdded]         = "vlc_InputItemSubItemAdded",
     [vlc_InputItemDurationChanged]      = "vlc_InputItemDurationChanged",
     [vlc_InputItemPreparsedChanged]     = "vlc_InputItemPreparsedChanged",
+    [vlc_InputItemNameChanged]          = "vlc_InputItemNameChanged",
+    [vlc_InputItemInfoChanged]          = "vlc_InputItemInfoChanged",
 
     [vlc_ServicesDiscoveryItemAdded]    = "vlc_ServicesDiscoveryItemAdded",
     [vlc_ServicesDiscoveryItemRemoved]  = "vlc_ServicesDiscoveryItemRemoved"
