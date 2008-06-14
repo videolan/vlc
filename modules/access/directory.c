@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#warning playlist code must not be used here.
 #include <vlc_playlist.h>
 #include <vlc_input.h>
 #include <vlc_access.h>
