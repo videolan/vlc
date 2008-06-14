@@ -204,7 +204,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 NotifyPlaylist( p_input );
                 vlc_event_t event;
                 event.type = vlc_InputItemInfoChanged;
-                vlc_event_send( p_input->p->input.p_item, &event );
+                vlc_event_send( &p_input->p->input.p_item->event_manager, &event );
             }
         }
         return VLC_SUCCESS;
@@ -276,7 +276,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 NotifyPlaylist( p_input );
                 vlc_event_t event;
                 event.type = vlc_InputItemInfoChanged;
-                vlc_event_send( p_input->p->input.p_item, &event );
+                vlc_event_send( &p_input->p->input.p_item->event_manager, &event );
             }
             return VLC_SUCCESS;
         }
@@ -313,7 +313,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 vlc_event_t event;
                 event.type = vlc_InputItemNameChanged;
                 event.u.input_item_name_changed.new_name = psz_name;
-                vlc_event_send( p_input->p->input.p_item, &event );
+                vlc_event_send( &p_input->p->input.p_item->event_manager, &event );
             }
             return VLC_SUCCESS;
         }
