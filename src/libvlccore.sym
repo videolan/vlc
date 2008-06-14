@@ -145,8 +145,8 @@ __input_CreateThread
 input_DecoderDecode
 input_DecoderDelete
 input_DecoderNew
-input_GetItem
 input_get_event_manager
+input_GetItem
 input_ItemAddInfo
 input_ItemAddOpt
 __input_ItemGetById
