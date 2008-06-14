@@ -509,16 +509,28 @@ STDMETHODIMP VLCControl::toggleMute(void)
 
 STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
 {
-    /** setVariable() is an unsafe interface because of security
-      implications it has and is thus removed. */
-    return E_INVALIDARG;
+    libvlc_instance_t* p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(result) )
+    {
+        _p_instance->setErrorInfo(IID_IVLCControl,
+            "setVariable() is an unsafe interface to use. "
+            "It has been removed because of security implications." );
+    }
+    return E_FAIL;
 };
 
 STDMETHODIMP VLCControl::getVariable(BSTR name, VARIANT *value)
 {
-    /** getVariable() is an unsafe interface because of security
-      implications it has and is thus removed. */
-    return E_INVALIDARG;
+    libvlc_instance_t* p_libvlc;
+    HRESULT result = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(result) )
+    {
+        _p_instance->setErrorInfo(IID_IVLCControl,
+            "getVariable() is an unsafe interface to use. "
+            "It has been removed because of security implications." );
+    }
+    return E_FAIL;
 };
 
 void VLCControl::FreeTargetOptions(char **cOptions, int cOptionCount)
