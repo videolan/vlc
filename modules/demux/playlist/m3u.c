@@ -182,7 +182,7 @@ static int Demux( demux_t *p_demux )
             b_cleanup = true;
             if( !psz_mrl ) goto error;
 
-            p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
+            p_input = input_ItemNewExt( p_demux, psz_mrl, psz_name,
                                         0, NULL, i_duration );
 
             if ( psz_artist && *psz_artist )

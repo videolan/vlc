@@ -459,7 +459,7 @@ static int Demux( demux_t *p_demux )
                             psz_string = malloc( i_strlen*sizeof( char ) +1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
-                            p_input = input_ItemNew( p_playlist, psz_string, psz_title_asx );
+                            p_input = input_ItemNew( p_demux, psz_string, psz_title_asx );
                             input_ItemCopyOptions( p_current_input, p_input );
                             input_ItemAddSubItem( p_current_input, p_input );
                             free( psz_string );
@@ -516,7 +516,7 @@ static int Demux( demux_t *p_demux )
                     /* create the new entry */
                     asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current_input->psz_name ) );
 
-                    p_entry = input_ItemNewExt( p_playlist, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
+                    p_entry = input_ItemNewExt( p_demux, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
                     FREENULL( psz_name );
                     input_ItemCopyOptions( p_current_input, p_entry );
                     while( i_options )

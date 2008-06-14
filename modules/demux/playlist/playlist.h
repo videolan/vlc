@@ -21,7 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc_playlist.h>
+#include <vlc_input.h>
+
 char *ProcessMRL( char *, char * );
 char *FindPrefix( demux_t * );
 
@@ -77,11 +78,8 @@ int Import_iTML ( vlc_object_t * );
 void Close_iTML ( vlc_object_t * );
 
 #define INIT_PLAYLIST_STUFF \
-    playlist_t *p_playlist = pl_Yield( p_demux ); \
     input_thread_t *p_input_thread = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT ); \
     input_item_t *p_current_input = input_GetItem( p_input_thread );
 
 #define HANDLE_PLAY_AND_RELEASE \
-    vlc_object_release( p_input_thread ); \
-    vlc_object_release( p_playlist );
-
+    vlc_object_release( p_input_thread );

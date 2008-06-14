@@ -61,7 +61,6 @@ description:The now infamous Apple Macintosh commercial aired during the 1984 Su
 
 struct demux_sys_t
 {
-    playlist_t *p_playlist;
     input_item_t *p_current_input;
 };
 
@@ -98,7 +97,6 @@ int Import_GVP( vlc_object_t *p_this )
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
     MALLOC_ERR( p_demux->p_sys, demux_sys_t );
-    p_demux->p_sys->p_playlist = NULL;
 
     return VLC_SUCCESS;
 }
@@ -111,8 +109,6 @@ void Close_GVP( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->p_playlist )
-        vlc_object_release( p_sys->p_playlist );
     free( p_sys );
 }
 
@@ -133,7 +129,6 @@ static int Demux( demux_t *p_demux )
 
     INIT_PLAYLIST_STUFF;
 
-    p_sys->p_playlist = p_playlist;
     p_sys->p_current_input = p_current_input;
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
@@ -206,7 +201,7 @@ static int Demux( demux_t *p_demux )
     }
     else
     {
-        p_input = input_ItemNewExt( p_sys->p_playlist,
+        p_input = input_ItemNewExt( p_demux,
                                     psz_url, psz_title, 0, NULL, -1 );
 #define SADD_INFO( type, field ) if( field ) { input_ItemAddInfo( \
                     p_input, _("Google Video"), _(type), "%s", field ) ; }
@@ -224,8 +219,6 @@ static int Demux( demux_t *p_demux )
     free( psz_docid );
     free( psz_title );
     free( psz_description );
-
-    p_sys->p_playlist = NULL;
 
     return 0; /* Needed for correct operation of go back */
 }

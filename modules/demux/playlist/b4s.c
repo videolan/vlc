@@ -109,7 +109,6 @@ static int Demux( demux_t *p_demux )
     if( xml_ReaderRead( p_xml_reader ) != 1 )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
-        vlc_object_release( p_playlist );
         return -1;
     }
 
@@ -120,7 +119,6 @@ static int Demux( demux_t *p_demux )
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_elname );
         free( psz_elname );
-        vlc_object_release( p_playlist );
         return -1;
     }
     free( psz_elname );
@@ -258,16 +256,16 @@ static int Demux( demux_t *p_demux )
                 if( !psz_elname ) return -1;
                 if( !strcmp( psz_elname, "entry" ) )
                 {
-                    p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
+                    p_input = input_ItemNewExt( p_demux, psz_mrl, psz_name,
                                                 0, NULL, -1 );
                     if( psz_now )
                         input_item_SetNowPlaying( p_input, psz_now );
                     if( psz_genre )
                         input_item_SetGenre( p_input, psz_genre );
                     if( psz_listeners )
-                        msg_Err( p_playlist, "Unsupported meta listeners" );
+                        msg_Err( p_demux, "Unsupported meta listeners" );
                     if( psz_bitrate )
-                        msg_Err( p_playlist, "Unsupported meta bitrate" );
+                        msg_Err( p_demux, "Unsupported meta bitrate" );
 
                     input_ItemAddSubItem( p_current_input, p_input );
                     vlc_gc_decref( p_input );

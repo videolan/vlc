@@ -114,7 +114,7 @@ int Demux( demux_t *p_demux )
     {
         xml_elem_hnd_t pl_elements[] =
             { {"dict",    COMPLEX_CONTENT, {.cmplx = parse_plist_dict} } };
-        i_ret = parse_plist_node( p_demux, p_playlist, p_current_input,
+        i_ret = parse_plist_node( p_demux, p_current_input,
                                      NULL, p_xml_reader, "plist",
                                      pl_elements );
         HANDLE_PLAY_AND_RELEASE;
@@ -172,7 +172,7 @@ static bool parse_plist_node COMPLEX_INTERFACE
     if( !b_version_found )
         msg_Warn( p_demux, "<plist> requires \"version\" attribute" );
 
-    return parse_dict( p_demux, p_playlist, p_input_item, NULL, p_xml_reader,
+    return parse_dict( p_demux, p_input_item, NULL, p_xml_reader,
                        "plist", p_handlers );
 }
 
@@ -220,7 +220,6 @@ static bool parse_dict COMPLEX_INTERFACE
                 if( p_handler->type == COMPLEX_CONTENT )
                 {
                     if( p_handler->pf_handler.cmplx( p_demux,
-                                                     p_playlist,
                                                      p_input_item,
                                                      NULL,
                                                      p_xml_reader,
@@ -316,7 +315,7 @@ static bool parse_plist_dict COMPLEX_INTERFACE
           {NULL,      UNKNOWN_CONTENT, {NULL} }
         };
 
-    return parse_dict( p_demux, p_playlist, p_input_item, NULL, p_xml_reader,
+    return parse_dict( p_demux, p_input_item, NULL, p_xml_reader,
                        "dict", pl_elements );
 }
 
@@ -329,7 +328,7 @@ static bool parse_tracks_dict COMPLEX_INTERFACE
           {NULL,      UNKNOWN_CONTENT, {NULL} }
         };
 
-    parse_dict( p_demux, p_playlist, p_input_item, NULL, p_xml_reader,
+    parse_dict( p_demux, p_input_item, NULL, p_xml_reader,
                 "dict", tracks_elements );
 
     msg_Info( p_demux, "added %i tracks successfully",
@@ -357,7 +356,7 @@ static bool parse_track_dict COMPLEX_INTERFACE
           {NULL,      UNKNOWN_CONTENT, {NULL} }
         };
 
-    i_ret = parse_dict( p_demux, p_playlist, p_input_item, p_track,
+    i_ret = parse_dict( p_demux, p_input_item, p_track,
                         p_xml_reader, "dict", track_elements );
 
     msg_Dbg( p_demux, "name: %s, artist: %s, album: %s, genre: %s, trackNum: %s, location: %s",
@@ -381,7 +380,7 @@ static bool parse_track_dict COMPLEX_INTERFACE
             memmove( psz_uri + 7, psz_uri + 17, strlen( psz_uri ) - 9 );
             msg_Info( p_demux, "Adding '%s'", psz_uri );
 
-            p_new_input = input_ItemNewExt( p_playlist, psz_uri,
+            p_new_input = input_ItemNewExt( p_demux, psz_uri,
                                             NULL, 0, NULL, -1 );
             input_ItemAddSubItem( p_input_item, p_new_input );
 
@@ -488,7 +487,7 @@ static bool add_meta( input_item_t *p_input_item,
  */
 static bool skip_element COMPLEX_INTERFACE
 {
-    VLC_UNUSED(p_demux); VLC_UNUSED(p_playlist); VLC_UNUSED(p_input_item);
+    VLC_UNUSED(p_demux); VLC_UNUSED(p_input_item);
     VLC_UNUSED(p_track); VLC_UNUSED(p_handlers);
     char *psz_endname;
 

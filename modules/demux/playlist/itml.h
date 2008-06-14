@@ -41,7 +41,6 @@
                            const char      *psz_name,\
                            char            *psz_value)
 #define COMPLEX_INTERFACE (demux_t         *p_demux,\
-                           playlist_t      *p_playlist,\
                            input_item_t    *p_input_item,\
                            track_elem_t    *p_track,\
                            xml_reader_t    *p_xml_reader,\
