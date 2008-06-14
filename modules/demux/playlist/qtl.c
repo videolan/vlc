@@ -60,7 +60,6 @@ volume - 0 (mute) - 100 (max)
 
 struct demux_sys_t
 {
-    playlist_t *p_playlist;
     input_item_t *p_current_input;
 
     xml_t *p_xml;
@@ -90,7 +89,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int Import_QTL( vlc_object_t *p_this )
 {
     DEMUX_BY_EXTENSION_MSG( ".qtl", "using QuickTime Media Link reader" );
-    p_demux->p_sys->p_playlist = NULL;
     p_demux->p_sys->p_xml = NULL;
     p_demux->p_sys->p_xml_reader = NULL;
     return VLC_SUCCESS;
@@ -104,8 +102,6 @@ void Close_QTL( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->p_playlist )
-        vlc_object_release( p_sys->p_playlist );
     if( p_sys->p_xml_reader )
         xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
     if( p_sys->p_xml )
@@ -139,7 +135,6 @@ static int Demux( demux_t *p_demux )
 
     INIT_PLAYLIST_STUFF;
 
-    p_sys->p_playlist = p_playlist;
     p_sys->p_current_input = p_current_input;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
@@ -354,7 +349,7 @@ static int Demux( demux_t *p_demux )
     }
     else
     {
-        p_input = input_ItemNewExt( p_sys->p_playlist,
+        p_input = input_ItemNewExt( p_demux,
                                 psz_src, psz_moviename, 0, NULL, -1 );
 #define SADD_INFO( type, field ) if( field ) { input_ItemAddInfo( \
                     p_input, "QuickTime Media Link", _(type), "%s", field ) ; }
@@ -364,7 +359,7 @@ static int Demux( demux_t *p_demux )
         vlc_gc_decref( p_input );
         if( psz_qtnext )
         {
-            p_input = input_ItemNewExt( p_sys->p_playlist,
+            p_input = input_ItemNewExt( p_demux,
                                         psz_qtnext, NULL, 0, NULL, -1 );
             input_ItemAddSubItem( p_current_input, p_input );
             vlc_gc_decref( p_input );
@@ -372,8 +367,6 @@ static int Demux( demux_t *p_demux )
     }
 
     HANDLE_PLAY_AND_RELEASE;
-
-    p_sys->p_playlist = NULL;
 
     free( psz_href );
     free( psz_moviename );

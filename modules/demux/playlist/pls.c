@@ -159,7 +159,7 @@ static int Demux( demux_t *p_demux )
         {
             if( psz_mrl )
             {
-                p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
+                p_input = input_ItemNewExt( p_demux, psz_mrl, psz_name,
                                             0, NULL, -1 );
                 input_ItemCopyOptions( p_current_input, p_input );
                 input_ItemAddSubItem( p_current_input, p_input );
@@ -215,7 +215,7 @@ static int Demux( demux_t *p_demux )
     /* Add last object */
     if( psz_mrl )
     {
-        p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,0, NULL, -1 );
+        p_input = input_ItemNewExt( p_demux, psz_mrl, psz_name,0, NULL, -1 );
         input_ItemCopyOptions( p_current_input, p_input );
         input_ItemAddSubItem( p_current_input, p_input );
         vlc_gc_decref( p_input );

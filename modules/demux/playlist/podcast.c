@@ -37,7 +37,6 @@
 struct demux_sys_t
 {
     char *psz_prefix;
-    playlist_t *p_playlist;
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
 };
@@ -60,7 +59,6 @@ int Import_podcast( vlc_object_t *p_this )
 
     STANDARD_DEMUX_INIT_MSG( "using podcast reader" );
     p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
-    p_demux->p_sys->p_playlist = NULL;
     p_demux->p_sys->p_xml = NULL;
     p_demux->p_sys->p_xml_reader = NULL;
 
@@ -76,7 +74,6 @@ void Close_podcast( vlc_object_t *p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     free( p_sys->psz_prefix );
-    if( p_sys->p_playlist ) vlc_object_release( p_sys->p_playlist );
     if( p_sys->p_xml_reader ) xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
     if( p_sys->p_xml ) xml_Delete( p_sys->p_xml );
     free( p_sys );
@@ -275,7 +272,7 @@ static int Demux( demux_t *p_demux )
                         msg_Err( p_demux, "invalid XML (no enclosure markup)" );
                         return -1;
                     }
-                    p_input = input_ItemNewExt( p_playlist, psz_item_mrl,
+                    p_input = input_ItemNewExt( p_demux, psz_item_mrl,
                                                 psz_item_name, 0, NULL, -1 );
                     if( p_input == NULL ) break;
 #define ADD_INFO( info, field ) \
