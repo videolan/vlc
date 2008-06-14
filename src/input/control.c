@@ -31,7 +31,6 @@
 #include <stdlib.h>
 
 #include "input_internal.h"
-#include "vlc_playlist.h"
 
 
 static void UpdateBookmarksOption( input_thread_t * );
