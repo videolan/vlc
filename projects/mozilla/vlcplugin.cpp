@@ -234,39 +234,6 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     return NPERR_NO_ERROR;
 }
 
-#if 0
-#ifdef XP_WIN
-/* This is really ugly but there is a deadlock when stopping a stream
- * (in VLC_CleanUp()) because the video output is a child of the drawable but
- * is in a different thread. */
-static void HackStopVout( VlcPlugin* p_plugin )
-{
-    MSG msg;
-    HWND hwnd;
-    vlc_value_t value;
-
-    int i_vlc = libvlc_get_vlc_id(p_plugin->libvlc_instance);
-    VLC_VariableGet( i_vlc, "drawable", &value );
-
-    hwnd = FindWindowEx( (HWND)value.i_int, 0, 0, 0 );
-    if( !hwnd ) return;
-
-    PostMessage( hwnd, WM_CLOSE, 0, 0 );
-
-    do
-    {
-        while( PeekMessage( &msg, (HWND)value.i_int, 0, 0, PM_REMOVE ) )
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-        if( FindWindowEx( (HWND)value.i_int, 0, 0, 0 ) ) Sleep( 10 );
-    }
-    while( (hwnd = FindWindowEx( (HWND)value.i_int, 0, 0, 0 )) );
-}
-#endif /* XP_WIN */
-#endif
-
 VlcPlugin::~VlcPlugin()
 {
     delete psz_baseURL;
