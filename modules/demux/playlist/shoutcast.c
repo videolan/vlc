@@ -38,7 +38,6 @@
 
 struct demux_sys_t
 {
-    playlist_t *p_playlist;
     input_item_t *p_current_input;
 
     xml_t *p_xml;
@@ -72,7 +71,6 @@ int Import_Shoutcast( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "using shoutcast playlist reader" );
-    p_demux->p_sys->p_playlist = NULL;
     p_demux->p_sys->p_xml = NULL;
     p_demux->p_sys->p_xml_reader = NULL;
 
@@ -92,8 +90,6 @@ void Close_Shoutcast( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->p_playlist )
-        vlc_object_release( p_sys->p_playlist );
     if( p_sys->p_xml_reader )
         xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
     if( p_sys->p_xml )
@@ -108,7 +104,6 @@ static int Demux( demux_t *p_demux )
     xml_reader_t *p_xml_reader;
     char *psz_eltname = NULL;
     INIT_PLAYLIST_STUFF;
-    p_sys->p_playlist = p_playlist;
     p_sys->p_current_input = p_current_input;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
@@ -150,7 +145,6 @@ static int Demux( demux_t *p_demux )
     }
 
     HANDLE_PLAY_AND_RELEASE;
-    p_sys->p_playlist = NULL;
     return 0; /* Needed for correct operation of go back */
 }
 
@@ -234,7 +228,7 @@ static int DemuxGenre( demux_t *p_demux )
                             + strlen( "?genre=" ) + strlen( psz_name ) + 1 );
                     sprintf( psz_mrl, SHOUTCAST_BASE_URL "?genre=%s",
                              psz_name );
-                    p_input = input_ItemNewExt( p_sys->p_playlist, psz_mrl,
+                    p_input = input_ItemNewExt( p_demux, psz_mrl,
                                                 psz_name, 0, NULL, -1 );
                     input_ItemCopyOptions( p_sys->p_current_input,
                                                 p_input );
@@ -408,7 +402,7 @@ static int DemuxStation( demux_t *p_demux )
                         sprintf( psz_mrl, SHOUTCAST_TUNEIN_BASE_URL "%s?id=%s",
                              psz_base, psz_id );
                     }
-                    p_input = input_ItemNewExt( p_sys->p_playlist, psz_mrl,
+                    p_input = input_ItemNewExt( p_demux, psz_mrl,
                                                 psz_name , 0, NULL, -1 );
                     free( psz_mrl );
 
