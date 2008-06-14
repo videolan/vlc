@@ -367,7 +367,7 @@ static int Demux ( demux_t *p_demux )
         free( temp );
     }
 
-    p_child = input_ItemNewWithType( (vlc_object_t *)p_playlist, p_sys->psz_uri,
+    p_child = input_ItemNewWithType( p_demux, p_sys->psz_uri,
                       p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri,
                       0, NULL, p_sys->i_duration, ITEM_TYPE_NET );
  
