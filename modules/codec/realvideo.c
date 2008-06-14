@@ -274,26 +274,31 @@ static int InitVideo(decoder_t *p_dec)
         "\0"
     };
 
-    for( size_t i = 0; psz_paths[i]; i += strlen( psz_paths[i] ) + 1 )
+    for( size_t i = 0; psz_paths[i]; i += strlen( psz_paths + i ) + 1 )
     {
-        asprintf( &g_decode_path, "%s/drv4.so.6.0", psz_paths + i );
-        if( (p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path)) )
+        if( asprintf( &g_decode_path, "%s/drv4.so.6.0", psz_paths + i ) != -1 )
+        {
+            p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path);
+            free( g_decode_path );
+        }
+        if( p_sys->rv_handle )
         {
             b_so_opened = true;
-            free( g_decode_path );
             break;
         }
 
-        asprintf( &g_decode_path, "%s/drv3.so.6.0", psz_paths + i );
-        if( (p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path)) )
+        if( asprintf( &g_decode_path, "%s/drv3.so.6.0", psz_paths + i ) != -1 )
+        {
+            p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path);
+            free( g_decode_path );
+        }
+        if( p_sys->rv_handle )
         {
             b_so_opened = true;
-            free( g_decode_path );
             break;
         }
 
         msg_Dbg( p_dec, "Cannot load real decoder library: %s", g_decode_path);
-        free( g_decode_path );
     }
 #endif
 
