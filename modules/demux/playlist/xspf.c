@@ -33,15 +33,14 @@
 #include <vlc_common.h>
 #include <vlc_demux.h>
 
-#include "playlist.h"
-#include "vlc_xml.h"
-#include "vlc_strings.h"
-#include "vlc_url.h"
+#include <vlc_xml.h>
+#include <vlc_strings.h>
+#include <vlc_url.h>
 #include "xspf.h"
+#include "playlist.h"
 
 struct demux_sys_t
 {
-    playlist_item_t *p_item_in_category;
     input_item_t **pp_tracklist;
     int i_tracklist_entries;
     int i_identifier;
@@ -121,7 +120,7 @@ int Demux( demux_t *p_demux )
     }
 
     if( i_ret == 1 )
-        i_ret = parse_playlist_node( p_demux, p_playlist, p_current_input,
+        i_ret = parse_playlist_node( p_demux, p_current_input,
                                      p_xml_reader, "playlist" ) ? 0 : -1;
 
     int i;
@@ -152,7 +151,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /**
  * \brief parse the root node of a XSPF playlist
  * \param p_demux demuxer instance
- * \param p_playlist playlist instance
  * \param p_input_item current input item
  * \param p_xml_reader xml reader instance
  * \param psz_element name of element to parse
@@ -250,7 +248,6 @@ static bool parse_playlist_node COMPLEX_INTERFACE
                 if( p_handler->type == COMPLEX_CONTENT )
                 {
                     if( p_handler->pf_handler.cmplx( p_demux,
-                                                     p_playlist,
                                                      p_input_item,
                                                      p_xml_reader,
                                                      p_handler->name ) )
@@ -356,7 +353,7 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
             FREE_NAME();
 
             /* parse the track data in a separate function */
-            if( parse_track_node( p_demux, p_playlist, p_input_item,
+            if( parse_track_node( p_demux, p_input_item,
                                    p_xml_reader,"track" ) == true )
                 i_ntracks++;
         }
@@ -454,7 +451,6 @@ static bool parse_track_node COMPLEX_INTERFACE
                         return false;
                     }
                     if( p_handler->pf_handler.cmplx( p_demux,
-                                                     p_playlist,
                                                      p_new_input,
                                                      p_xml_reader,
                                                      p_handler->name ) )
@@ -558,7 +554,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                            free( psz_uri );
                            psz_uri = psz_tmp;
                         }
-                        p_new_input = input_ItemNewExt( p_playlist, psz_uri,
+                        p_new_input = input_ItemNewExt( p_demux, psz_uri,
                                                         NULL, 0, NULL, -1 );
                         free( psz_uri );
                         input_ItemCopyOptions( p_input_item, p_new_input );
@@ -734,7 +730,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<node> requires \"title\" attribute" );
             return false;
         }
-        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "vlc://nop",
+        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_demux ), "vlc://nop",
                                 psz_title, 0, NULL, -1, ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
@@ -792,7 +788,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if( p_handler->type == COMPLEX_CONTENT )
                 {
                     if( p_handler->pf_handler.cmplx( p_demux,
-                                                     p_playlist,
                                                      p_input_item,
                                                      p_xml_reader,
                                                      p_handler->name ) )
@@ -870,7 +865,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
  */
 static bool parse_extitem_node COMPLEX_INTERFACE
 {
-    VLC_UNUSED(p_playlist); VLC_UNUSED(psz_element);
+    VLC_UNUSED(psz_element);
     input_item_t *p_new_input = NULL;
     char *psz_name = NULL;
     char *psz_value = NULL;
@@ -932,7 +927,7 @@ static bool parse_extitem_node COMPLEX_INTERFACE
  */
 static bool skip_element COMPLEX_INTERFACE
 {
-    VLC_UNUSED(p_demux); VLC_UNUSED(p_playlist); VLC_UNUSED(p_input_item);
+    VLC_UNUSED(p_demux); VLC_UNUSED(p_input_item);
     char *psz_endname;
 
     while( xml_ReaderRead( p_xml_reader ) == 1 )
