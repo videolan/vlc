@@ -112,13 +112,13 @@ struct access_sys_t
 
 #ifdef WIN32
 static void Win32AddConnection( access_t *, char *, char *, char *, char * );
-#endif
-
+#else
 static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
                       char *un, int unlen, char *pw, int pwlen )
 {
     //wglen = unlen = pwlen = 0;
 }
+#endif
 
 /****************************************************************************
  * Open: connect to smb server and ask for file
