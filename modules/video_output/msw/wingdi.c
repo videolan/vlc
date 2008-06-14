@@ -837,7 +837,6 @@ static void InitBuffers( vout_thread_t *p_vout )
 {
     BITMAPINFOHEADER *p_header = &p_vout->p_sys->bitmapinfo.bmiHeader;
     BITMAPINFO *p_info = &p_vout->p_sys->bitmapinfo;
-    int i_pixels = p_vout->render.i_height * p_vout->render.i_width;
     HDC window_dc = GetDC( p_vout->p_sys->hvideownd );
 
     /* Get screen properties */
