@@ -107,11 +107,6 @@ struct decoder_sys_t
 };
 
 int dll_type = 1;
-#ifdef WIN32
-const char *g_decode_path="plugins\\drv43260.dll";
-#else
-const char *g_decode_path="../lib/vlc/codec/drv4.so.6.0";
-#endif
 
 static unsigned long (*rvyuv_custom_message)(cmsg_data_t* ,void*);
 static unsigned long (*rvyuv_free)(void*);
@@ -123,6 +118,7 @@ static unsigned long WINAPI (*wrvyuv_free)(void*);
 static unsigned long WINAPI (*wrvyuv_init)(void*, void*); // initdata,context
 static unsigned long WINAPI (*wrvyuv_transform)(char*, char*,transform_in_t*,unsigned int*,void*);
 #endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -213,6 +209,8 @@ static int InitVideo(decoder_t *p_dec)
     struct rv_init_t init_data;
     char fcc[4];
     vlc_mutex_t  *lock;
+    char *g_decode_path;
+
     int  i_vide = p_dec->fmt_in.i_extra;
     unsigned int *p_vide = p_dec->fmt_in.p_extra;
     decoder_sys_t *p_sys = malloc( sizeof( decoder_sys_t ) );
@@ -245,16 +243,63 @@ static int InitVideo(decoder_t *p_dec)
     init_data.subformat = (unsigned int*)p_vide[0];
     init_data.unk5 = 1;
     init_data.format = (unsigned int*)p_vide[1];
-    
+
     /* first try to load linux dlls, if failed and we're supporting win32 dlls,
        then try to load the windows ones */
+    bool b_so_opened = false;
+
 #ifdef WIN32
-    if ( NULL== (p_sys->rv_handle = load_syms(p_dec, g_decode_path)) )
+    g_decode_path="plugins\\drv43260.dll";
+
+    if( (p_sys->rv_handle = load_syms(p_dec, g_decode_path)) )
+        b_so_opened = true;
 #else
-    if ( NULL== (p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path)) )
-#endif
+    const char *ppsz_path[] =
     {
-        msg_Err( p_dec, "Cannot load real decoder library: %s",  g_decode_path);
+        "/usr/lib/win32",
+        "/usr/lib/codecs",
+        "/usr/local/RealPlayer8/Codecs",
+        "/usr/RealPlayer8/Codecs",
+        "/usr/lib/RealPlayer8/Codecs",
+        "/opt/RealPlayer8/Codecs",
+        "/usr/lib/RealPlayer9/users/Real/Codecs",
+        "/usr/lib/RealPlayer10/codecs",
+        "/usr/lib/RealPlayer10GOLD/codecs",
+        "/usr/lib/helix/player/codecs",
+        "/usr/lib64/RealPlayer8/Codecs",
+        "/usr/lib64/RealPlayer9/users/Real/Codecs",
+        "/usr/lib64/RealPlayer10/codecs",
+        "/usr/lib64/RealPlayer10GOLD/codecs",
+        "/usr/local/lib/codecs",
+        NULL
+    };
+
+    for( int i = 0; ppsz_path[i]; i++ )
+    {
+        asprintf( &g_decode_path, "%s/drv4.so.6.0", ppsz_path[i] );
+        if( (p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path)) )
+        {
+            b_so_opened = true;
+            free( g_decode_path );
+            break;
+        }
+
+        asprintf( &g_decode_path, "%s/drv3.so.6.0", ppsz_path[i] );
+        if( (p_sys->rv_handle = load_syms_linux(p_dec, g_decode_path)) )
+        {
+            b_so_opened = true;
+            free( g_decode_path );
+            break;
+        }
+
+        msg_Dbg( p_dec, "Cannot load real decoder library: %s", g_decode_path);
+        free( g_decode_path );
+    }
+#endif
+
+    if(!b_so_opened )
+    {
+        msg_Err( p_dec, "Cannot any real decoder library" );
         free( p_sys );
         return VLC_EGENERIC;
     }
