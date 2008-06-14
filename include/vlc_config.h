@@ -56,7 +56,6 @@
  *****************************************************************************/
 
 #define DEFAULT_INPUT_ACTIVITY 1
-#define DIRECTORY_ACTIVITY 100
 #define TRANSCODE_ACTIVITY 10
 
 /* Used in ErrorThread */

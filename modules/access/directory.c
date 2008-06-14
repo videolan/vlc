@@ -256,16 +256,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
                                               false );
 
-    i_activity = var_GetInteger( p_playlist, "activity" );
-    var_SetInteger( p_playlist, "activity", i_activity +
-                    DIRECTORY_ACTIVITY );
-
     ReadDir( p_playlist, psz_name, i_mode, p_current, p_item_in_category,
              p_current_input, (DIR *)p_access->p_sys, NULL );
-
-    i_activity = var_GetInteger( p_playlist, "activity" );
-    var_SetInteger( p_playlist, "activity", i_activity -
-                    DIRECTORY_ACTIVITY );
 
     playlist_Signal( p_playlist );
 
