@@ -66,7 +66,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     /* Allocate structure */
     p_playlist = vlc_custom_create( p_parent, sizeof( *p_playlist ),
-                                    VLC_OBJECT_PLAYLIST, playlist_name );
+                                    VLC_OBJECT_GENERIC, playlist_name );
     if( !p_playlist )
     {
         msg_Err( p_parent, "out of memory" );

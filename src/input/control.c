@@ -615,13 +615,11 @@ static void NotifyPlaylist( input_thread_t *p_input )
     /* FIXME: We need to avoid that dependency on the playlist
      * because it is a circular dependency:
      * ( playlist -> input -> playlist ) */
-    playlist_t *p_playlist = vlc_object_find( p_input,
-                    VLC_OBJECT_PLAYLIST, FIND_PARENT );
-    if( !p_playlist )
-        return;
-    var_SetInteger( p_playlist, "item-change",
-                    p_input->p->input.p_item->i_id );
-    vlc_object_release( p_playlist );
+    playlist_t *p_playlist = pl_Yield( p_input );
+    if( VLC_OBJECT(p_playlist) == p_input->p_parent )
+        var_SetInteger( p_playlist, "item-change",
+                        p_input->p->input.p_item->i_id );
+    pl_Release( p_input );
 }
 
 static void UpdateBookmarksOption( input_thread_t *p_input )
