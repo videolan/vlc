@@ -43,7 +43,6 @@
 #include <vlc_interface.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
-#include <vlc_playlist.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
