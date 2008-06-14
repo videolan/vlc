@@ -40,7 +40,6 @@
 
 #include "input_internal.h"
 
-#include "vlc_playlist.h"
 #include <vlc_iso_lang.h>
 /* FIXME we should find a better way than including that */
 #include "../text/iso-639_def.h"
@@ -1689,16 +1688,6 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 }
             }
             {
-                /* FIXME: we don't want to depend on the playlist */
-                playlist_t * p_playlist = pl_Yield( p_sys->p_input );
-                if( VLC_OBJECT(p_playlist) == p_sys->p_input )
-                {
-                    PL_LOCK;
-                    p_playlist->gc_date = mdate();
-                    vlc_object_signal_unlocked( p_playlist );
-                    PL_UNLOCK;
-                }
-                pl_Release( p_sys->p_input );
                 vlc_event_t event;
                 event.type = vlc_InputSelectedStreamChanged;
                 vlc_event_send( &p_sys->p_input->p->event_manager, &event );
