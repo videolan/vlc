@@ -31,8 +31,8 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
-#include "vlc_playlist.h"
 #include "vlc_strings.h"
+#include "vlc_input.h"
 
 #include <vlc_network.h>
 #include "vlc_url.h"
@@ -183,14 +183,14 @@ int MMSHOpen( access_t *p_access )
     /* Handle redirection */
     if( psz_location && *psz_location )
     {
-        playlist_t * p_playlist = pl_Yield( p_access );
         msg_Dbg( p_access, "redirection to %s", psz_location );
 
+        input_thread_t * p_input = vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+        input_item_t * p_new_loc;
         /** \bug we do not autodelete here */
-        playlist_Add( p_playlist, psz_location, psz_location,
-                      PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END, true,
-                      false );
-        vlc_object_release( p_playlist );
+        p_new_loc = input_ItemNew( p_access, psz_location, psz_location );
+        input_ItemAddSubItem( input_GetItem( p_input ), p_new_loc );
+        vlc_object_release( p_input );
 
         free( psz_location );
 
