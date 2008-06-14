@@ -73,6 +73,7 @@ typedef struct vlc_event_listeners_group_t
 static const char ppsz_event_type_to_name[][33] =
 {
     [vlc_InputStateChanged]             = "vlc_InputStateChanged",
+    [vlc_InputSelectedStreamChanged]    = "vlc_InputSelectedStreamChanged",
 
     [vlc_InputItemMetaChanged]          = "vlc_InputItemMetaChanged",
     [vlc_InputItemSubItemAdded]         = "vlc_InputItemSubItemAdded",

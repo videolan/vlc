@@ -114,6 +114,7 @@ typedef struct vlc_event_manager_t
 typedef enum vlc_event_type_t {
     /* Input (thread) events */
     vlc_InputStateChanged,
+    vlc_InputSelectedStreamChanged,
 
     /* Input item events */
     vlc_InputItemMetaChanged,
@@ -142,6 +143,10 @@ typedef struct vlc_event_t
         {
             int new_state;
         } input_state_changed;
+        struct vlc_input_selected_stream_changed
+        {
+            void * unused;
+        } input_selected_stream_changed;
 
         /* Input item events */
         struct vlc_input_item_meta_changed

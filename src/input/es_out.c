@@ -1699,6 +1699,9 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                     PL_UNLOCK;
                 }
                 pl_Release( p_sys->p_input );
+                vlc_event_t event;
+                event.type = vlc_InputSelectedStreamChanged;
+                vlc_event_send( &p_sys->p_input->p->event_manager, &event );
             }
             return VLC_SUCCESS;
  

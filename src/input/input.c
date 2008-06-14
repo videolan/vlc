@@ -169,6 +169,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     vlc_event_manager_t * p_em = &p_input->p->event_manager;
     vlc_event_manager_init_with_vlc_object( p_em, p_input );
     vlc_event_manager_register_event_type( p_em, vlc_InputStateChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputSelectedStreamChanged );
 
     /* Init Common fields */
     p_input->b_eof = false;
