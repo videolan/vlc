@@ -69,7 +69,7 @@
  * vlc_my_cool_object_new()
  * {
  *        ...
- *        vlc_event_manager_Create( &p_self->p_event_manager, p_this );
+ *        vlc_event_manager_init( &p_self->p_event_manager, p_self, p_a_libvlc_object );
  *        vlc_event_manager_register_event_type(p_self->p_event_manager,
  *                vlc_MyCoolObjectDidSomething, p_e)
  *        ...
@@ -78,7 +78,7 @@
  * vlc_my_cool_object_release()
  * {
  *         ...
- *         vlc_event_manager_release( p_self->p_event_manager );
+ *         vlc_event_manager_fini( &p_self->p_event_manager );
  *         ...
  * }
  *
@@ -88,7 +88,7 @@
  *        vlc_event_t event;
  *        event.type = vlc_MyCoolObjectDidSomething;
  *        event.u.my_cool_object_did_something.what_it_did = kSomething;
- *        vlc_event_send( p_self->p_event_manager, &event );
+ *        vlc_event_send( &p_self->p_event_manager, &event );
  * }
  * */
 
