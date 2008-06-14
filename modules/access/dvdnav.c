@@ -1243,9 +1243,6 @@ static int EventThread( vlc_object_t *p_this )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            vlc_value_t valk;
-            int i;
-
             vlc_mutex_lock( &p_ev->lock );
             switch( p_ev->i_key_action )
             {
