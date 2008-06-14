@@ -2864,3 +2864,12 @@ bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
 
     return true;
 }
+
+/*****************************************************************************
+ * input_get_event_manager
+ *****************************************************************************/
+vlc_event_manager_t *
+input_get_event_manager( input_thread_t *p_input )
+{
+    return &p_input->p->event_manager;
+}

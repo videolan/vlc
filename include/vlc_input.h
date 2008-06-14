@@ -665,4 +665,6 @@ VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
 
 VLC_EXPORT( bool, input_AddSubtitles, ( input_thread_t *, char *, bool ) );
 
+VLC_EXPORT( vlc_event_manager_t *, input_get_event_manager, ( input_thread_t * ) );
+
 #endif
