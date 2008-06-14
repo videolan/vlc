@@ -46,6 +46,7 @@
 #include <vlc_codecs.h> /* For WAVEHEADER */
 #include "vcd/cdrom.h"
 
+#warning playlist code must not be used here.
 #include <vlc_playlist.h>
 
 #ifdef HAVE_LIBCDDB
