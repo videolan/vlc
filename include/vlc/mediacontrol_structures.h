@@ -62,12 +62,15 @@ typedef enum {
 
 /**
  * Possible player status
+ * Note the order of these enums must match exactly the order of
+ * libvlc_state_t and input_state_e enums.
  */
 typedef enum {
-    mediacontrol_PlayingStatus, mediacontrol_PauseStatus,
-    mediacontrol_ForwardStatus, mediacontrol_BackwardStatus,
-    mediacontrol_InitStatus,    mediacontrol_EndStatus,
-    mediacontrol_UndefinedStatus
+    mediacontrol_UndefinedStatus=0, mediacontrol_InitStatus,
+    mediacontrol_BufferingStatus, mediacontrol_PlayingStatus,
+    mediacontrol_PauseStatus,     mediacontrol_EndStatus,
+    mediacontrol_ForwardStatus,   mediacontrol_BackwardStatus,
+    mediacontrol_ErrorStatus,
 } mediacontrol_PlayerStatus;
 
 /**

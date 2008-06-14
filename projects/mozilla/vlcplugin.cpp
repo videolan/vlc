@@ -172,7 +172,6 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         }
     }
 
-
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
 

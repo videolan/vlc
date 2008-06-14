@@ -67,7 +67,6 @@ static void test_events (const char ** argv, int argc)
         libvlc_MediaPlayerPlayed,
         libvlc_MediaPlayerPaused,
         libvlc_MediaPlayerEndReached,
-        libvlc_MediaPlayerStopped,
         libvlc_MediaPlayerEncounteredError,
         libvlc_MediaPlayerTimeChanged,
         libvlc_MediaPlayerPositionChanged,

@@ -527,12 +527,14 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
 /* "state" value */
 enum input_state_e
 {
-    INIT_S,
+    INIT_S = 0,
     OPENING_S,
     BUFFERING_S,
     PLAYING_S,
     PAUSE_S,
     END_S,
+    FORWARD_S,
+    BACKWARD_S,
     ERROR_S
 };
 

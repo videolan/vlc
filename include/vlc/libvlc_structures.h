@@ -119,16 +119,25 @@ typedef struct libvlc_media_t libvlc_media_t;
 
 typedef struct libvlc_media_player_t libvlc_media_player_t;
 
+/**
+ * Note the order of libvlc_state_t enum must match exactly the order of
+ * @see mediacontrol_PlayerStatus and @see input_state_e enums.
+ *
+ * Expected states by web plugins are:
+ * IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4,
+ * STOPPING=5, FORWARD=6, BACKWARD=7, ERROR=8
+ */
 typedef enum libvlc_state_t
 {
-    libvlc_NothingSpecial,
-    libvlc_Stopped,
+    libvlc_NothingSpecial=0,
     libvlc_Opening,
     libvlc_Buffering,
-    libvlc_Ended,
-    libvlc_Error,
     libvlc_Playing,
-    libvlc_Paused
+    libvlc_Paused,
+    libvlc_Ended,
+    libvlc_Forward,
+    libvlc_Backward,
+    libvlc_Error
 } libvlc_state_t;
 
 /**@} */

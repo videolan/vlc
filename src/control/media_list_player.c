@@ -368,6 +368,7 @@ libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
 {
     libvlc_state_t state = libvlc_media_player_get_state( p_mlp->p_mi, p_e );
     return (state == libvlc_Opening) || (state == libvlc_Buffering) ||
+           (state == libvlc_Forward) || (state == libvlc_Backward) ||
            (state == libvlc_Playing);
 }
 
@@ -379,7 +380,7 @@ libvlc_media_list_player_get_state( libvlc_media_list_player_t * p_mlp,
                                     libvlc_exception_t * p_e )
 {
     if( !p_mlp->p_mi )
-        return libvlc_Stopped;
+        return libvlc_Ended;
     return libvlc_media_player_get_state( p_mlp->p_mi, p_e );
 }
 

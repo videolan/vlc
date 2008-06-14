@@ -357,24 +357,36 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     else
     {
         libvlc_state_t state;
-
         state = libvlc_media_player_get_state( self->p_media_player, &ex );
         HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
         switch( state )
         {
-        case libvlc_Playing :
-            retval->streamstatus = mediacontrol_PlayingStatus;
-            break;
-        case libvlc_Paused :
-            retval->streamstatus = mediacontrol_PauseStatus;
+        case libvlc_NothingSpecial:
+            retval->streamstatus = mediacontrol_UndefinedStatus;
             break;
         case libvlc_Opening :
-        case libvlc_Buffering:
             retval->streamstatus = mediacontrol_InitStatus;
             break;
-        case libvlc_Stopped:
+        case libvlc_Buffering:
+            retval->streamstatus = mediacontrol_BufferingStatus;
+            break;
+        case libvlc_Playing:
+            retval->streamstatus = mediacontrol_PlayingStatus;
+            break;
+        case libvlc_Paused:
+            retval->streamstatus = mediacontrol_PauseStatus;
+            break;
         case libvlc_Ended:
             retval->streamstatus = mediacontrol_EndStatus;
+            break;
+        case libvlc_Forward:
+            retval->streamstatus = mediacontrol_ForwardStatus;
+            break;
+        case libvlc_Backward:
+            retval->streamstatus = mediacontrol_BackwardStatus;
+            break;
+        case libvlc_Error:
+            retval->streamstatus = mediacontrol_ErrorStatus;
             break;
         default :
             retval->streamstatus = mediacontrol_UndefinedStatus;
