@@ -435,9 +435,7 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
 
 void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL )
     {
         return;
@@ -473,15 +471,12 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
             wxLocaleFree( psz_utf8 );
         }
     }
-
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL )
     {
         return;
@@ -499,8 +494,7 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
                       PLAYLIST_END, true, false );
         wxLocaleFree( psz_utf8 );
     }
-
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void DialogsProvider::OnOpenFile( wxCommandEvent& event )

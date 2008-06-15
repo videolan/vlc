@@ -204,28 +204,24 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     main_sizer->Add( main_panel, 1, wxEXPAND );
     SetSizer( main_sizer );
 
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist )
     {
        /* Some global changes happened -> Rebuild all */
        var_AddCallback( p_playlist, "playlist-current",
                         PlaylistChanged, this );
-       vlc_object_release( p_playlist );
+       pl_Release( p_playlist );
     }
 }
 
 BookmarksDialog::~BookmarksDialog()
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist )
     {
        var_DelCallback( p_playlist, "playlist-current",
                         PlaylistChanged, this );
-       vlc_object_release( p_playlist );
+       pl_Release( p_playlist );
     }
 }
 

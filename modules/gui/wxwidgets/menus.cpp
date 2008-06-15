@@ -229,8 +229,7 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf, ArrayOfInts &ri_objects,
     unsigned int i_last_separator = 0; \
     ArrayOfInts ai_objects; \
     ArrayOfStrings as_varnames; \
-    playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf, \
-                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );\
+    playlist_t *p_playlist = pl_Yield( p_intf ); \
     if( !p_playlist ) \
         return; \
     input_thread_t *p_input = p_playlist->p_input
@@ -270,7 +269,7 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf, ArrayOfInts &ri_objects,
             popupmenu.InsertSeparator( 0 ); \
             popupmenu.Insert( 0, Play_Event, wxU(_("Play")) ); \
         } \
-        if( p_playlist ) vlc_object_release( p_playlist ); \
+        if( p_playlist ) pl_Release( p_playlist ); \
     } \
     \
     popupmenu.Append( MenuDummy_Event, wxU(_("Miscellaneous")), \
@@ -297,7 +296,7 @@ void VideoPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         }
         vlc_object_release( p_input );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     CREATE_POPUP;
 }
 
@@ -319,7 +318,7 @@ void AudioPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         }
         vlc_object_release( p_input );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     CREATE_POPUP;
 }
 
@@ -348,7 +347,7 @@ void MiscPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     p_intf->p_sys->p_popup_menu = &popupmenu;
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
     p_intf->p_sys->p_popup_menu = NULL;
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
@@ -404,7 +403,7 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     p_intf->p_sys->p_popup_menu = &popupmenu;
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
     p_intf->p_sys->p_popup_menu = NULL;
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 /*****************************************************************************
@@ -937,9 +936,7 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
     if( event.GetId() >= Play_Event && event.GetId() <= Stop_Event )
     {
         input_thread_t *p_input;
-        playlist_t * p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
         if( !p_playlist ) return;
 
         switch( event.GetId() )
@@ -970,8 +967,7 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
             playlist_Next( p_playlist );
             break;
         }
-
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
         return;
     }
 

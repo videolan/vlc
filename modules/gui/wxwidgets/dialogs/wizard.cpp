@@ -577,9 +577,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     openSizer->Fit(open_panel);
     mainSizer->Add( open_panel );
 
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist )
     {
         if( !playlist_IsEmpty( p_playlist ) )
@@ -601,7 +599,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
         {
             input_radios[1]->Disable();
         }
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
     }
     else
     {
@@ -717,11 +715,10 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
         if( i != -1 )
         {
             long data = listview->GetItemData( i );
-            playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                      VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
+            playlist_t *p_playlist = pl_Yield( p_intf );
             if( p_playlist )
             {
-                playlist_item_t * p_item = playlist_ItemGetById(                                                   p_playlist, (int)data, false );
+                playlist_item_t * p_item = playlist_ItemGetById( p_playlist, (int)data, false );
                 if( p_item )
                 {
                     const char *psz_uri = input_item_GetURI( p_item->p_input );
@@ -730,6 +727,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
                 }
                 else
                     event.Veto();
+                pl_Release( p_playlist );
             }
             else
                 event.Veto();
@@ -1608,8 +1606,7 @@ void WizardDialog::Run()
             free( psz_sap_option );
         }
 
-        playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                            VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
+        playlist_t *p_playlist = pl_Yield( p_intf );
         if( p_playlist )
         {
             input_item_t *p_input = input_ItemNew( p_playlist, mrl,
@@ -1636,7 +1633,7 @@ void WizardDialog::Run()
             playlist_AddInput( p_playlist, p_input,
                                PLAYLIST_GO, PLAYLIST_END, true, false );
             vlc_gc_decref( p_input );
-            vlc_object_release(p_playlist);
+            pl_Release( p_playlist );
         }
         else
         {

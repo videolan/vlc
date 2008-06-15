@@ -217,8 +217,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_sort_mode = MODE_NONE;
     b_need_update = false;
     i_items_to_append = 0;
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
+    p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     SetIcon( *p_intf->p_sys->p_icon );
@@ -425,7 +424,7 @@ Playlist::~Playlist()
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     var_DelCallback( p_playlist, "item-append", ItemAppended, this );
     var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 /**********************************************************************

@@ -55,9 +55,8 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     p_intf = _p_intf;
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                                 VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
+
     b_stats = config_GetInt(p_intf, "stats");
     /* Initializations */
     SetIcon( *p_intf->p_sys->p_icon );
@@ -102,7 +101,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     if( p_playlist )
     {
         var_AddCallback( p_playlist, "item-change", ItemChanged, this );
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
     }
 
     last_update = 0L;
@@ -115,22 +114,20 @@ void FileInfo::Update()
     if( mdate() - last_update < 400000L ) return;
     last_update = mdate();
 
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                                 VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( !p_playlist ) return;
 
     input_thread_t *p_input = p_playlist->p_input ;
-
     if( !p_input || p_input->b_dead || !input_GetItem(p_input)->psz_name )
     {
         item_info->Clear();
         advanced_info->Clear();
         if( b_stats )
             stats_info->Clear();
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
         return;
     }
+    pl_Release( p_playlist );
 
     vlc_object_yield( p_input );
     vlc_mutex_lock( &input_GetItem(p_input)->lock );
@@ -146,7 +143,7 @@ void FileInfo::Update()
     vlc_mutex_unlock( &input_GetItem(p_input)->lock );
 
     vlc_object_release(p_input);
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     b_need_update = false;
     panel_sizer->Layout();
 

@@ -1075,9 +1075,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 void Interface::PlayStream()
 {
     wxCommandEvent dummy;
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     if( !playlist_IsEmpty(p_playlist) )
@@ -1091,7 +1089,7 @@ void Interface::PlayStream()
         {
             /* No stream was playing, start one */
             playlist_Play( p_playlist );
-            vlc_object_release( p_playlist );
+            pl_Release( p_playlist );
             input_manager->Update();
             return;
         }
@@ -1110,13 +1108,13 @@ void Interface::PlayStream()
         var_Set( p_input, "state", state );
 
         vlc_object_release( p_input );
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
         input_manager->Update();
     }
     else
     {
         /* If the playlist is empty, open a file requester instead */
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
         OnShowDialog( dummy );
         GetToolBar()->ToggleTool( PlayStream_Event, false );
     }
@@ -1128,16 +1126,14 @@ void Interface::OnStopStream( wxCommandEvent& WXUNUSED(event) )
 }
 void Interface::StopStream()
 {
-    playlist_t * p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL )
     {
         return;
     }
 
     playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     input_manager->Update();
 }
 
@@ -1148,16 +1144,14 @@ void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::PrevStream()
 {
-    playlist_t * p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL )
     {
         return;
     }
 
     playlist_Prev( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
@@ -1167,15 +1161,13 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::NextStream()
 {
-    playlist_t * p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL )
     {
         return;
     }
     playlist_Next( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Interface::OnSlowStream( wxCommandEvent& WXUNUSED(event) )
@@ -1323,10 +1315,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
                                const wxArrayString& filenames )
 {
     /* Add dropped files to the playlist */
-
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL )
     {
         return FALSE;
@@ -1344,7 +1333,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
             {
                 vlc_object_release( p_input );
                 wxDnDLocaleFree( psz_utf8 );
-                vlc_object_release( p_playlist );
+                pl_Release( p_playlist );
                 return TRUE;
             }
             vlc_object_release( p_input );
@@ -1362,8 +1351,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
         wxDnDLocaleFree( psz_utf8 );
     }
-
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 
     return TRUE;
 }

@@ -194,9 +194,7 @@ bool InputManager::IsPlaying()
  *****************************************************************************/
 void InputManager::UpdateInput()
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist != NULL )
     {
         LockPlaylist( p_intf->p_sys, p_playlist );
@@ -204,7 +202,7 @@ void InputManager::UpdateInput()
         if( p_intf->p_sys->p_input )
              vlc_object_yield( p_intf->p_sys->p_input );
         UnlockPlaylist( p_intf->p_sys, p_playlist );
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
     }
 }
 

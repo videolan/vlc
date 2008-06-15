@@ -1158,9 +1158,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     }
 
     /* Update the playlist */
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     for( int i = 0; i < (int)mrl.GetCount(); i++ )
@@ -1209,10 +1207,9 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         playlist_AddInput( p_playlist, p_input,
                PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
                PLAYLIST_END, true, false );
-	vlc_gc_decref( p_input );
+        vlc_gc_decref( p_input );
     }
-
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 
     Hide();
 
