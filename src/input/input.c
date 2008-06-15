@@ -449,28 +449,10 @@ void input_StopThread( input_thread_t *p_input )
     /* We cannot touch p_input fields directly (we come from another thread),
      * so use the vlc_object_find way, it's perfectly safe */
 
-    /* Set die for all access */
-    p_list = vlc_list_find( p_input, VLC_OBJECT_ACCESS, FIND_CHILD );
+    /* Set die for all access, stream, demux, etc */
+    p_list = vlc_list_children( p_input );
     for( i = 0; i < p_list->i_count; i++ )
-    {
         vlc_object_kill( p_list->p_values[i].p_object );
-    }
-    vlc_list_release( p_list );
-
-    /* Set die for all stream */
-    p_list = vlc_list_find( p_input, VLC_OBJECT_STREAM, FIND_CHILD );
-    for( i = 0; i < p_list->i_count; i++ )
-    {
-        vlc_object_kill( p_list->p_values[i].p_object );
-    }
-    vlc_list_release( p_list );
-
-    /* Set die for all demux */
-    p_list = vlc_list_find( p_input, VLC_OBJECT_DEMUX, FIND_CHILD );
-    for( i = 0; i < p_list->i_count; i++ )
-    {
-        vlc_object_kill( p_list->p_values[i].p_object );
-    }
     vlc_list_release( p_list );
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
