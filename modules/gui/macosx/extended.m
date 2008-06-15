@@ -65,11 +65,6 @@ static VLCExtended *_o_sharedInstance = nil;
     /* localise GUI-strings */
     /* method is called from intf.m (in method showExtended) */
     [o_extended_window setTitle: _NS("Extended controls")];
-    [o_lbl_video setStringValue: _NS("Video")];
-    [o_lbl_audio setStringValue: _NS("Audio")];
-    [o_lbl_audioFlts setStringValue: _NS("Audio filters")];
-    [o_lbl_videoFlts setStringValue: _NS("Video filters")];
-    [o_lbl_adjustImage setStringValue: _NS("Image adjustment")];
     [o_btn_vidFlts_mrInfo setToolTip: _NS("Shows more information about the available video filters.")];
     [o_ckb_wave setTitle: _NS("Wave")];
     [o_ckb_ripple setTitle: _NS("Ripple")];
@@ -170,19 +165,18 @@ static VLCExtended *_o_sharedInstance = nil;
  
         free( psz_afilters );
     }
-}
 
-- (void)collapsAll
-{
-    /* collaps all views so Cocoa saves the window position correctly */
-    if( o_adjImg_expanded )
-        [self expandAdjustImage: nil];
+    /* fill the popup button according to our available views */
+    [o_selector_pop removeAllItems];
+    [o_selector_pop addItemWithTitle: _NS("Adjust Image")];
+    [o_selector_pop addItemWithTitle: _NS("Video Filter")];
+    [o_selector_pop addItemWithTitle: _NS("Audio Filter")];
+    [o_selector_pop selectItemAtIndex: 0];
 
-    if( o_audFlts_expanded )
-        [self expandAudioFilters: nil];
+    /* make sure we draw a view on launch */
+    [self viewSelectorAction: self];
 
-    if( o_vidFlts_expanded )
-        [self expandVideoFilters: nil];
+    [self initStrings];
 }
 
 - (BOOL)getConfigChanged
@@ -230,6 +224,53 @@ static VLCExtended *_o_sharedInstance = nil;
     /* show the window */
     [o_extended_window displayIfNeeded];
     [o_extended_window makeKeyAndOrderFront:nil];
+}
+
+- (IBAction)viewSelectorAction:(id)sender
+{
+    NSView *o_toBeShown_view;
+    /* check which view to show */
+    if( [[[o_selector_pop selectedItem] title] isEqualToString: _NS("Adjust Image")] )
+        o_toBeShown_view = o_adjustImg_view;
+    else if( [[[o_selector_pop selectedItem] title] isEqualToString: _NS("Audio Filter")] )
+        o_toBeShown_view = o_audioFlts_view;
+    else if( [[[o_selector_pop selectedItem] title] isEqualToString: _NS("Video Filter")] )
+        o_toBeShown_view = o_videoFilters_view;
+    else
+        msg_Err( VLCIntf, "invalid ui view requested" );
+    
+    NSRect o_win_rect, o_view_rect, o_old_view_rect;
+    o_win_rect = [o_extended_window frame];
+    o_view_rect = [o_toBeShown_view frame];
+    
+    if( o_currentlyshown_view != nil )
+    {
+        /* restore our window's height, if we've shown another category previously */
+        o_old_view_rect = [o_currentlyshown_view frame];
+        o_win_rect.size.height = o_win_rect.size.height - o_old_view_rect.size.height;
+        o_win_rect.origin.y = ( o_win_rect.origin.y + o_old_view_rect.size.height ) - o_view_rect.size.height;
+        
+        /* remove our previous category view */
+        [o_currentlyshown_view removeFromSuperviewWithoutNeedingDisplay];
+    }
+    
+    o_win_rect.size.height = o_win_rect.size.height + o_view_rect.size.height;
+    
+    //[o_extended_window displayIfNeeded];
+    [o_extended_window setFrame: o_win_rect display:YES animate: YES];
+    
+    [o_toBeShown_view setFrame: NSMakeRect( 0, 
+                                              0, //[o_top_controls_box frame].size.height, 
+                                              o_view_rect.size.width, 
+                                              o_view_rect.size.height )];
+    [o_toBeShown_view setNeedsDisplay: YES];
+    [o_toBeShown_view setAutoresizesSubviews: YES];
+    [[o_extended_window contentView] addSubview: o_toBeShown_view];
+
+    /* keep our current category for further reference */
+    [o_currentlyshown_view release];
+    o_currentlyshown_view = o_toBeShown_view;
+    [o_currentlyshown_view retain];
 }
 
 - (IBAction)enableAdjustImage:(id)sender
@@ -431,150 +472,6 @@ static VLCExtended *_o_sharedInstance = nil;
         [self changeAFiltersString: "normvol" onOrOff: YES ];
     else
         [self changeAFiltersString: "normvol" onOrOff: NO ];
-}
-
-- (IBAction)expandAdjustImage:(id)sender
-{
-    /* expand or collapse adjImg */
-    NSRect o_win_rect = [o_extended_window frame];
-    NSRect o_box_audFlts_rect = [o_box_audFlts frame];
-    NSRect o_box_vidFlts_rect = [o_box_vidFlts frame];
-    NSRect o_box_adjImg_rect = [o_box_adjImg frame];
- 
-    if( o_adjImg_expanded )
-    {
-        /* move the window contents upwards (partially done through settings
-         * inside the nib) and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height - 193;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y + 193;
-        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y + 193;
-        o_box_vidFlts_rect.origin.y = o_box_vidFlts_rect.origin.y + 193;
- 
-        /* remove the inserted view */
-        [o_adjustImg_view removeFromSuperviewWithoutNeedingDisplay];
-    }
-    else
-    {
-        /* move the window contents downwards and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height + 193;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y - 193;
-        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y - 193;
-        o_box_vidFlts_rect.origin.y = o_box_vidFlts_rect.origin.y - 193;
-    }
- 
-    [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
-    [o_box_vidFlts setFrameFromContentFrame: o_box_vidFlts_rect];
-    [o_extended_window displayIfNeeded];
-    [o_extended_window setFrame: o_win_rect display:YES animate: YES];
- 
-    if( o_adjImg_expanded )
-    {
-        o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height - 193;
-        o_adjImg_expanded = NO;
-    } 
-    else
-    {
-        /* insert view */
-        o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height + 193;
-        [o_adjustImg_view setFrame: NSMakeRect( 20, -10, 370, 203)];
-        [o_adjustImg_view setNeedsDisplay:YES];
-        [o_adjustImg_view setAutoresizesSubviews: YES];
-        [[o_box_adjImg contentView] addSubview: o_adjustImg_view];
-        o_adjImg_expanded = YES;
-    }
-    [o_box_adjImg setFrameFromContentFrame: o_box_adjImg_rect];
-}
-
-- (IBAction)expandAudioFilters:(id)sender
-{
-    /* expand or collapse audFlts */
-    NSRect o_win_rect = [o_extended_window frame];
-    NSRect o_box_audFlts_rect = [o_box_audFlts frame];
- 
-    if( o_audFlts_expanded )
-    {
-        /* move the window contents upwards (partially done through settings
-         * inside the nib) and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height - 66;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y + 66;
- 
-        /* remove the inserted view */
-        [o_audioFlts_view removeFromSuperviewWithoutNeedingDisplay];
-    }
-    else
-    {
-        /* move the window contents downwards and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height + 66;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y - 66;
-    }
-    [o_extended_window displayIfNeeded];
-    [o_extended_window setFrame: o_win_rect display:YES animate: YES];
- 
- 
-    if( o_audFlts_expanded )
-    {
-        o_box_audFlts_rect.size.height = [o_box_audFlts frame].size.height - 66;
-        o_audFlts_expanded = NO;
-    } 
-    else
-    {
-        /* insert view */
-        o_box_audFlts_rect.size.height = [o_box_audFlts frame].size.height + 66;
-        [o_audioFlts_view setFrame: NSMakeRect( 20, -20, 370, 76)];
-        [o_audioFlts_view setNeedsDisplay:YES];
-        [o_audioFlts_view setAutoresizesSubviews: YES];
-        [[o_box_audFlts contentView] addSubview: o_audioFlts_view];
-        o_audFlts_expanded = YES;
-    }
-    [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
-}
-
-- (IBAction)expandVideoFilters:(id)sender
-{
-    /* expand or collapse vidFlts */
-    NSRect o_win_rect = [o_extended_window frame];
-    NSRect o_box_audFlts_rect = [o_box_audFlts frame];
-    NSRect o_box_vidFlts_rect = [o_box_vidFlts frame];
- 
-    if( o_vidFlts_expanded )
-    {
-        /* move the window contents upwards (partially done through settings
-         * inside the nib) and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height - 172;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y + 172;
-        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y + 172;
- 
-        /* remove the inserted view */
-        [o_videoFilters_view removeFromSuperviewWithoutNeedingDisplay];
-    }
-    else
-    {
-        /* move the window contents downwards and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height + 172;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y - 172;
-        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y - 172;
-    }
- 
-    [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
-    [o_extended_window displayIfNeeded];
-    [o_extended_window setFrame: o_win_rect display:YES animate: YES];
- 
-    if( o_vidFlts_expanded )
-    {
-        o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height - 172;
-        o_vidFlts_expanded = NO;
-    } 
-    else
-    {
-        /* insert view */
-        o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height + 172;
-        [o_videoFilters_view setFrame: NSMakeRect( 20, -10, 370, 172)];
-        [o_videoFilters_view setNeedsDisplay:YES];
-        [o_videoFilters_view setAutoresizesSubviews: YES];
-        [[o_box_vidFlts contentView] addSubview: o_videoFilters_view];
-        o_vidFlts_expanded = YES;
-    }
-    [o_box_vidFlts setFrameFromContentFrame: o_box_vidFlts_rect];
 }
 
 - (IBAction)videoFilterAction:(id)sender

@@ -1817,7 +1817,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( nib_extended_loaded )
     {
-        [o_extended collapsAll];
         [o_extended release];
     }
 
@@ -1944,17 +1943,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (IBAction)showExtended:(id)sender
 {
     if( o_extended == nil )
-    {
         o_extended = [[VLCExtended alloc] init];
-    }
+
     if( !nib_extended_loaded )
-    {
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner:self];
-        [o_extended initStrings];
-        [o_extended showPanel];
-    } else {
-        [o_extended showPanel];
-    }
+
+    [o_extended showPanel];
 }
 
 - (IBAction)showSFilters:(id)sender

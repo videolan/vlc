@@ -38,17 +38,8 @@
     IBOutlet id o_extended_window;
 
     /* window content */
-    IBOutlet id o_expBtn_adjustImage;
-    IBOutlet id o_expBtn_audioFlts;
-    IBOutlet id o_expBtn_videoFlts;
-    IBOutlet id o_lbl_audioFlts;
-    IBOutlet id o_lbl_videoFlts;
-    IBOutlet id o_lbl_adjustImage;
-    IBOutlet id o_lbl_video;
-    IBOutlet id o_lbl_audio;
-    IBOutlet id o_box_vidFlts;
-    IBOutlet id o_box_audFlts;
-    IBOutlet id o_box_adjImg;
+    IBOutlet id o_selector_pop;
+    IBOutlet id o_top_controls_box;
 
     /* video filters */
     IBOutlet id o_btn_vidFlts_mrInfo;
@@ -88,13 +79,11 @@
     IBOutlet id o_sld_opaque;
 
     /* global variables */
-    BOOL o_adjImg_expanded;
-    BOOL o_audFlts_expanded;
-    BOOL o_vidFlts_expanded;
-
+    NSView * o_currentlyshown_view;
     BOOL o_config_changed;
 }
 
+- (IBAction)viewSelectorAction:(id)sender;
 - (IBAction)enableAdjustImage:(id)sender;
 - (IBAction)restoreDefaultsForAdjustImage:(id)sender;
 - (IBAction)sliderActionAdjustImage:(id)sender;
@@ -102,15 +91,11 @@
 - (IBAction)enableHeadphoneVirtualizer:(id)sender;
 - (IBAction)sliderActionMaximumAudioLevel:(id)sender;
 - (IBAction)enableVolumeNormalization:(id)sender;
-- (IBAction)expandAdjustImage:(id)sender;
-- (IBAction)expandAudioFilters:(id)sender;
-- (IBAction)expandVideoFilters:(id)sender;
 - (IBAction)videoFilterAction:(id)sender;
 - (IBAction)moreInfoVideoFilters:(id)sender;
 
 + (VLCExtended *)sharedInstance;
 - (BOOL)getConfigChanged;
-- (void)collapsAll;
 
 - (void)showPanel;
 - (void)initStrings;
