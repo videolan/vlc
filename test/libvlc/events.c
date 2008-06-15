@@ -64,7 +64,7 @@ static void test_events (const char ** argv, int argc)
     bool callback_was_called;
     libvlc_exception_t ex;
     libvlc_event_type_t mi_events[] = {
-        libvlc_MediaPlayerPlayed,
+        libvlc_MediaPlayerPlaying,
         libvlc_MediaPlayerPaused,
         libvlc_MediaPlayerEndReached,
         libvlc_MediaPlayerEncounteredError,
