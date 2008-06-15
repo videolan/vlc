@@ -136,7 +136,7 @@ static void DetectImage( FileRef f, demux_t *p_demux )
                 msg_Warn( p_demux,
                     "%s: Invalid picture embedded by broken iTunes version, "
                     "you really shouldn't use this crappy software.",
-                    f.file()->name() );
+                    (const char *)f.file()->name() );
                 break;
             }
 
