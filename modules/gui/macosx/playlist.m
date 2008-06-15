@@ -92,7 +92,6 @@
 
 @end
 
-
 /*****************************************************************************
  * VLCPlaylistCommon implementation
  *
@@ -485,22 +484,15 @@
 - (void)playModeUpdated
 {
     playlist_t *p_playlist = pl_Yield( VLCIntf );
-    vlc_value_t val, val2;
 
-    var_Get( p_playlist, "loop", &val2 );
-    var_Get( p_playlist, "repeat", &val );
-    if( val.b_bool == true )
-    {
+    bool loop = var_GetBool( p_playlist, "loop" );
+    bool repeat = var_GetBool( p_playlist, "repeat" );
+    if( repeat )
         [[[VLCMain sharedInstance] getControls] repeatOne];
-   }
-    else if( val2.b_bool == true )
-    {
+    else if( loop )
         [[[VLCMain sharedInstance] getControls] repeatAll];
-    }
     else
-    {
         [[[VLCMain sharedInstance] getControls] repeatOff];
-    }
 
     [[[VLCMain sharedInstance] getControls] shuffle];
 
