@@ -945,6 +945,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             msg_Err (p_stream, "bad SRTP key/salt combination (%m)");
             goto error;
         }
+        id->i_sequence = 0; /* FIXME: awful hack for libvlc_srtp */
     }
 
     vlc_mutex_init( &id->lock_sink );
@@ -1440,16 +1441,10 @@ static void ThreadSend( vlc_object_t *p_this )
         if( id->srtp )
         {   /* FIXME: this is awfully inefficient */
             size_t len = out->i_buffer;
-            int val = srtp_send( id->srtp, out->p_buffer, &len,
-                                out->i_buffer );
-            if( val == ENOSPC )
-            {
-                out = block_Realloc( out, 0, len );
-                if( out == NULL )
-                    continue;
-                val = srtp_send( id->srtp, out->p_buffer, &len,
-                                 out->i_buffer );
-            }
+            out = block_Realloc( out, 0, len + 10 );
+            out->i_buffer = len;
+
+            int val = srtp_send( id->srtp, out->p_buffer, &len, len + 10 );
             if( val )
             {
                 errno = val;
