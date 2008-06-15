@@ -149,24 +149,17 @@
     int i_return = 0;
     playlist_item_t *p_item = NULL;
     playlist_t * p_playlist = pl_Yield( VLCIntf );
-    if( outlineView != o_outline_view )
-    {
-        vlc_object_release( p_playlist );
-        return 0;
-    }
+    NSAssert( outlineView != o_outline_view )
 
-    if( item == nil )
-    {
-        /* root object */
+    if( !item )
         p_item = p_playlist->p_root_category;
-    }
     else
-    {
         p_item = (playlist_item_t *)[item pointerValue];
-    }
+
     if( p_item )
         i_return = p_item->i_children;
-    vlc_object_release( p_playlist );
+
+    pl_Release( VLCIntf );
 
     return i_return > 0 ? i_return : 0;
 }
