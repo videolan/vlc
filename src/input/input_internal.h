@@ -461,7 +461,7 @@ struct stream_t
 static inline stream_t *vlc_stream_create( vlc_object_t *obj )
 {
     return (stream_t *)vlc_custom_create( obj, sizeof(stream_t),
-                                          VLC_OBJECT_STREAM, "stream" );
+                                          VLC_OBJECT_GENERIC, "stream" );
 }
 
 #endif

@@ -36,7 +36,9 @@ static access_t *access_InternalNew( vlc_object_t *p_obj, const char *psz_access
                                       const char *psz_demux, const char *psz_path,
                                       access_t *p_source )
 {
-    access_t *p_access = vlc_object_create( p_obj, VLC_OBJECT_ACCESS );
+    static const char typename[] = "access";
+    access_t *p_access = vlc_custom_create( p_obj, sizeof (*p_access),
+                                            VLC_OBJECT_GENERIC, typename );
 
     if( p_access == NULL )
         return NULL;

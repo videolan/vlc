@@ -41,7 +41,9 @@ demux_t *__demux_New( vlc_object_t *p_obj,
                        const char *psz_path,
                        stream_t *s, es_out_t *out, bool b_quick )
 {
-    demux_t *p_demux = vlc_object_create( p_obj, VLC_OBJECT_DEMUX );
+    static const char typename[] = "demux";
+    demux_t *p_demux = vlc_custom_create( p_obj, sizeof( *p_demux ),
+                                          VLC_OBJECT_GENERIC, typename );
     const char *psz_module;
 
     if( p_demux == NULL ) return NULL;
