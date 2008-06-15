@@ -444,7 +444,8 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
     char psz_remote[MAX_PATH], psz_server[MAX_PATH], psz_share[MAX_PATH];
     NETRESOURCE net_resource;
     DWORD i_result;
-    char *psz_parser;
+    char *ps_parser;
+    VLC_UNUSED( psz_domain );
 
     HINSTANCE hdll = LoadLibrary(_T("MPR.DLL"));
     if( !hdll )
