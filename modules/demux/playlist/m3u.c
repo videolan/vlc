@@ -73,9 +73,8 @@ int Import_M3U( vlc_object_t *p_this )
 
 static bool ContainsURL( demux_t *p_demux )
 {
-    uint8_t *p_peek;
+    const uint8_t *p_peek, *p_peek_end;
     int i_peek;
-    uint8_t *p_peek_end;
 
     i_peek = stream_Peek( p_demux->s, &p_peek, 1024 );
     if( i_peek <= 0 ) return false;
@@ -84,11 +83,11 @@ static bool ContainsURL( demux_t *p_demux )
     while( p_peek + sizeof( "https://" ) < p_peek_end )
     {
         /* One line starting with an URL is enough */
-        if( !strncasecmp( p_peek, "http://", sizeof( "http://" ) - 1 ) ||
-            !strncasecmp( p_peek, "mms://", sizeof( "mms://" ) - 1 ) ||
-            !strncasecmp( p_peek, "rtsp://", sizeof( "rtsp://" ) - 1 ) ||
-            !strncasecmp( p_peek, "https://", sizeof( "https://" ) - 1 ) ||
-            !strncasecmp( p_peek, "ftp://", sizeof( "ftp://" ) - 1 ) )
+        if( !strncasecmp( (const char *)p_peek, "http://", 7 ) ||
+            !strncasecmp( (const char *)p_peek, "mms://", 6 ) ||
+            !strncasecmp( (const char *)p_peek, "rtsp://", 7 ) ||
+            !strncasecmp( (const char *)p_peek, "https://", 8 ) ||
+            !strncasecmp( (const char *)p_peek, "ftp://", 6 ) )
         {
             return true;
         }
