@@ -47,6 +47,7 @@ struct demux_sys_t
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
 static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name, int *pi_duration );
+static bool ContainsURL( demux_t *p_demux );
 
 /*****************************************************************************
  * Import_M3U: main import function
@@ -61,13 +62,48 @@ int Import_M3U( vlc_object_t *p_this )
            demux_IsPathExtension( p_demux, ".m3u" ) || demux_IsPathExtension( p_demux, ".vlc" ) ||
            /* A .ram file can contain a single rtsp link */
            demux_IsPathExtension( p_demux, ".ram" ) || demux_IsPathExtension( p_demux, ".rm" ) ||
-           demux_IsForced( p_demux,  "m3u" ) ) )
+           demux_IsForced( p_demux,  "m3u" ) || ContainsURL( p_demux ) ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );
     p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
 
     return VLC_SUCCESS;
+}
+
+static bool ContainsURL( demux_t *p_demux )
+{
+    uint8_t *p_peek;
+    int i_peek;
+    uint8_t *p_peek_end;
+
+    i_peek = stream_Peek( p_demux->s, &p_peek, 1024 );
+    if( i_peek <= 0 ) return false;
+    p_peek_end = p_peek + i_peek;
+
+    while( p_peek + sizeof( "https://" ) < p_peek_end )
+    {
+        /* One line starting with an URL is enough */
+        if( !strncasecmp( p_peek, "http://", sizeof( "http://" ) - 1 ) ||
+            !strncasecmp( p_peek, "mms://", sizeof( "mms://" ) - 1 ) ||
+            !strncasecmp( p_peek, "rtsp://", sizeof( "rtsp://" ) - 1 ) ||
+            !strncasecmp( p_peek, "https://", sizeof( "https://" ) - 1 ) ||
+            !strncasecmp( p_peek, "ftp://", sizeof( "ftp://" ) - 1 ) )
+        {
+            return true;
+        }
+        /* Comments and blank lines are ignored */
+        else if( *p_peek != '#' && *p_peek != '\n' && *p_peek != '\r')
+        {
+            return false;
+        }
+
+        while( p_peek < p_peek_end && *p_peek != '\n' )
+            p_peek++;
+        if ( *p_peek == '\n' )
+            p_peek++;
+    }
+    return false;
 }
 
 /*****************************************************************************
