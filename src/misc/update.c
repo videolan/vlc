@@ -1447,7 +1447,7 @@ void update_DownloadReal( update_download_thread_t *p_udt );
  * \param dir to store the download file
  * \return nothing
  */
-void update_Download( update_t *p_update, char *psz_destdir )
+void update_Download( update_t *p_update, const char *psz_destdir )
 {
     assert( p_update );
 
@@ -1690,7 +1690,7 @@ bool update_NeedUpgrade( update_t *p_update )
     return false;
 }
 
-void update_Download( update_t *p_update, char *psz_destdir )
+void update_Download( update_t *p_update, const char *psz_destdir )
 {
     (void)p_update; (void)psz_destdir;
 }
