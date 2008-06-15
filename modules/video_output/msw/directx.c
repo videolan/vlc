@@ -2125,12 +2125,16 @@ static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
     {
         playlist_t *p_playlist;
 
-        p_playlist = pl_Yield( p_this );
-        /* Modify playlist as well because the vout might have to be
-         * restarted */
-        var_Create( p_playlist, "directx-wallpaper", VLC_VAR_BOOL );
-        var_Set( p_playlist, "directx-wallpaper", newval );
-        vlc_object_release( p_playlist );
+        p_playlist = vlc_object_find( p_this,
+                                     VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist )
+        {
+            /* Modify playlist as well because the vout might have to be
+             * restarted */
+            var_Create( p_playlist, "directx-wallpaper", VLC_VAR_BOOL );
+            var_Set( p_playlist, "directx-wallpaper", newval );
+            vlc_object_release( p_playlist );
+        }
 
         p_vout->p_sys->i_changes |= DX_WALLPAPER_CHANGE;
     }

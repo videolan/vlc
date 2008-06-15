@@ -77,11 +77,15 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args );
 
 static void DirectXPopupMenu( event_thread_t *p_event, bool b_open )
 {
-    playlist_t *p_playlist = pl_Yield( p_event );
-    vlc_value_t val;
-    val.b_bool = b_open;
-    var_Set( p_playlist, "intf-popupmenu", val );
-    vlc_object_release( p_playlist );
+    playlist_t *p_playlist = vlc_object_find( p_event,
+                                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist )
+    {
+        vlc_value_t val;
+        val.b_bool = b_open;
+        var_Set( p_playlist, "intf-popupmenu", val );
+        vlc_object_release( p_playlist );
+    }
 }
 
 static int DirectXConvertKey( int i_key );
@@ -866,9 +870,13 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     /* the user wants to close the window */
     case WM_CLOSE:
     {
-        playlist_t * p_playlist = pl_Yield( p_vout );
-        playlist_Stop( p_playlist );
-        vlc_object_release( p_playlist );
+        playlist_t * p_playlist = vlc_object_find( p_vout,
+                                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist )
+        {
+            playlist_Stop( p_playlist );
+            vlc_object_release( p_playlist );
+        }
         return 0;
     }
 
