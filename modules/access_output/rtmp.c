@@ -41,9 +41,10 @@
  * Module descriptor
  *****************************************************************************/
 
-#define URL_TEXT N_( "Destination" )
-#define URL_LONGTEXT N_( \
-    "This is the output URL that will be used." )
+#define RTMP_CONNECT_TEXT N_( "Active TCP connection" )
+#define RTMP_CONNECT_LONGTEXT N_( \
+    "If enabled, VLC will connect to a remote destination instead of " \
+    "waiting for an incoming connection." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -58,6 +59,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_STREAM );
     add_shortcut( "rtmp" );
     set_callbacks( Open, Close );
+    add_bool( "rtmp-connect", false, NULL, RTMP_CONNECT_TEXT,
+              RTMP_CONNECT_LONGTEXT, false );
 vlc_module_end();
 
 /*****************************************************************************
@@ -177,11 +180,45 @@ static int Open( vlc_object_t *p_this )
     /* p_sys->p_thread->result_publish = only used on access */
     p_sys->p_thread->result_play = 1;
     p_sys->p_thread->result_stop = 0;
+    p_sys->p_thread->fd = -1;
 
     /* Open connection */
-    p_sys->p_thread->fd = net_ConnectTCP( p_access, p_sys->p_thread->url.psz_host, p_sys->p_thread->url.i_port );
-    if( p_sys->p_thread->fd == -1 )
+    if( var_CreateGetBool( p_access, "rtmp-connect" ) > 0 )
+    {
+#if 0
+        p_sys->p_thread->fd = net_ConnectTCP( p_access,
+                                              p_sys->p_thread->url.psz_host,
+                                              p_sys->p_thread->url.i_port );
+#endif
+        msg_Err( p_access, "to be implemented" );
         goto error2;
+    }
+    else
+    {
+        int *p_fd_listen;
+
+        p_sys->active = 0;
+        p_fd_listen = net_ListenTCP( p_access, p_sys->p_thread->url.psz_host,
+                                     p_sys->p_thread->url.i_port );
+        if( p_fd_listen == NULL )
+        {
+            msg_Warn( p_access, "cannot listen to %s port %i",
+                      p_sys->p_thread->url.psz_host,
+                      p_sys->p_thread->url.i_port );
+            goto error2;
+        }
+
+        do
+            p_sys->p_thread->fd = net_Accept( p_access, p_fd_listen, -1 );
+        while( p_sys->p_thread->fd == -1 );
+        net_ListenClose( p_fd_listen );
+
+        if( rtmp_handshake_passive( p_this, p_sys->p_thread->fd ) < 0 )
+        {
+            msg_Err( p_access, "handshake passive failed");
+            goto error2;
+        }
+    }
 
     if( vlc_thread_create( p_sys->p_thread, "rtmp control thread", ThreadControl,
                            VLC_THREAD_PRIORITY_INPUT, false ) )
@@ -211,7 +248,8 @@ error2:
     free( p_sys->p_thread->psz_application );
     free( p_sys->p_thread->psz_media );
 
-    net_Close( p_sys->p_thread->fd );
+    if( p_sys->p_thread->fd != -1 )
+        net_Close( p_sys->p_thread->fd );
 error:
     vlc_object_detach( p_sys->p_thread );
     vlc_object_release( p_sys->p_thread );
