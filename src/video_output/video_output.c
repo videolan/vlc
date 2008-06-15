@@ -245,10 +245,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* Allocate descriptor */
     p_vout = vlc_object_create( p_parent, VLC_OBJECT_VOUT );
     if( p_vout == NULL )
-    {
-        msg_Err( p_parent, "out of memory" );
         return NULL;
-    }
 
     /* Initialize pictures - translation tables and functions
      * will be initialized later in InitThread */
