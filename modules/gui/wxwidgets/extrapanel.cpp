@@ -51,7 +51,7 @@ static int IntfPreampCallback( vlc_object_t *, char const *,
 static void ChangeFiltersString( intf_thread_t *, aout_instance_t *,
                                  char *, bool );
 static void ChangeVFiltersString( intf_thread_t *, char *, bool );
-
+static void ChangeVFilters2String( intf_thread_t *, char *, bool );
 
 /* IDs for the controls and the menu commands */
 enum
@@ -144,17 +144,20 @@ struct filter {
     char *psz_filter;
     char *psz_name;
     char *psz_help;
+    bool  b_vfilter2;
 };
 
 static const struct filter vfilters[] =
 {
-    { "clone", N_("Image clone"), N_("Creates several clones of the image") },
-    { "distort", N_("Distortion"), N_("Adds distortion effects") },
-    { "invert", N_("Image inversion") , N_("Inverts the colors of the image") },
-    { "motionblur", N_("Blurring"), N_("Adds motion blurring to the image") },
-    { "transform",  N_("Transformation"), N_("Rotates or flips the image") },
-    { "magnify",  N_("Magnify"), N_("Magnifies part of the image") },
-    { "puzzle",  N_("Puzzle"), N_("Turns the image into a puzzle") },
+    { "clone", N_("Image clone"), N_("Creates several clones of the image"), false },
+    { "gradient", N_("Cartoon effect"), N_("Gradient effects (cartoon) on the image"), true },
+    { "invert", N_("Image inversion") , N_("Inverts the colors of the image"), true },
+    { "motionblur", N_("Blurring"), N_("Adds motion blurring to the image"), true },
+    { "ripple", N_("Water effect"), N_("Adds water effect to the image"), true },
+    { "wave", N_("Wave effect"), N_("Adds wave effect to the image"), true },
+    { "transform",  N_("Transformation"), N_("Rotates or flips the image"), false },
+    { "magnify",  N_("Magnify"), N_("Magnifies part of the image"), false },
+    { "puzzle",  N_("Puzzle"), N_("Turns the image into a puzzle"), false },
     { NULL, NULL, NULL } /* Do not remove this line */
 };
 
@@ -993,8 +996,12 @@ void ExtraPanel::OnSelectFilter(wxCommandEvent& event)
     int i_filter = event.GetId() - Filter0_Event ;
     if( vfilters[i_filter].psz_filter  )
     {
-        ChangeVFiltersString( p_intf, vfilters[i_filter].psz_filter ,
-                              event.IsChecked() ? true : false );
+        if( vfilters[i_filter].b_vfilter2 )
+            ChangeVFilters2String( p_intf, vfilters[i_filter].psz_filter ,
+                                event.IsChecked() ? true : false );
+        else
+            ChangeVFiltersString( p_intf, vfilters[i_filter].psz_filter ,
+                                  event.IsChecked() ? true : false );
     }
 }
 
@@ -1049,9 +1056,8 @@ void ExtraPanel::CheckAout()
     }
 }
 
-
 static void ChangeVFiltersString( intf_thread_t *p_intf,
-                                 char *psz_name, bool b_add )
+                                  char *psz_name, bool b_add )
 {
     vout_thread_t *p_vout;
     char *psz_parser, *psz_string;
@@ -1108,6 +1114,66 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
         vlc_object_release( p_vout );
     }
 
+    free( psz_string );
+}
+
+static void ChangeVFilters2String( intf_thread_t *p_intf,
+                                  char *psz_name, bool b_add )
+{
+    vout_thread_t *p_vout;
+    char *psz_parser, *psz_string;
+
+    psz_string = config_GetPsz( p_intf, "video-filter" );
+
+    if( !psz_string ) psz_string = strdup("");
+
+    psz_parser = strstr( psz_string, psz_name );
+
+    if( b_add )
+    {
+        if( !psz_parser )
+        {
+            psz_parser = psz_string;
+            asprintf( &psz_string, (*psz_string) ? "%s:%s" : "%s%s",
+                            psz_string, psz_name );
+            free( psz_parser );
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        if( psz_parser )
+        {
+            memmove( psz_parser, psz_parser + strlen(psz_name) +
+                            (*(psz_parser + strlen(psz_name)) == ':' ? 1 : 0 ),
+                            strlen(psz_parser + strlen(psz_name)) + 1 );
+
+            /* Remove trailing : : */
+            if( *(psz_string+strlen(psz_string ) -1 ) == ':' )
+            {
+                *(psz_string+strlen(psz_string ) -1 ) = '\0';
+            }
+         }
+         else
+         {
+             free( psz_string );
+             return;
+         }
+    }
+    /* Vout is not kept, so put that in the config */
+    config_PutPsz( p_intf, "video-filter", psz_string );
+
+    /* Try to set on the fly */
+    p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+    if( p_vout )
+    {
+        var_SetString( p_vout, "video-filter", psz_string );
+        vlc_object_release( p_vout );
+    }
     free( psz_string );
 }
 
