@@ -391,7 +391,7 @@ static int Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    cucul_set_color( p_vout->p_sys->p_cv,
+    cucul_set_color_ansi( p_vout->p_sys->p_cv,
                      CUCUL_COLOR_DEFAULT, CUCUL_COLOR_BLACK );
     cucul_clear_canvas( p_vout->p_sys->p_cv );
     cucul_dither_bitmap( p_vout->p_sys->p_cv, 0, 0,
