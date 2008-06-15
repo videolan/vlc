@@ -237,7 +237,7 @@ static int Open (vlc_object_t *obj)
     if (p_sys->session == NULL)
         goto error;
 
-    char *key = var_GetNonEmptyString (demux, "srtp-key");
+    char *key = var_CreateGetNonEmptyString (demux, "srtp-key");
     if (key)
     {
         p_sys->srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
@@ -248,7 +248,7 @@ static int Open (vlc_object_t *obj)
             goto error;
         }
 
-        char *salt = var_GetNonEmptyString (demux, "srtp-salt");
+        char *salt = var_CreateGetNonEmptyString (demux, "srtp-salt");
         errno = srtp_setkeystring (p_sys->srtp, key, salt ? salt : "");
         free (salt);
         free (key);
