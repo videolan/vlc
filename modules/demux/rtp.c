@@ -241,7 +241,7 @@ static int Open (vlc_object_t *obj)
     if (key)
     {
         p_sys->srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
-                                   SRTP_PRF_AES_CM, 0);
+                                   SRTP_PRF_AES_CM, SRTP_RCC_MODE1);
         if (p_sys->srtp == NULL)
         {
             free (key);
