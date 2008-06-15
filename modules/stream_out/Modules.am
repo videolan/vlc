@@ -7,7 +7,6 @@ SOURCES_stream_out_duplicate = duplicate.c
 SOURCES_stream_out_es = es.c
 SOURCES_stream_out_display = display.c
 SOURCES_stream_out_gather = gather.c
-SOURCES_stream_out_rtp = rtp.h rtp.c rtpfmt.c rtcp.c rtsp.c
 SOURCES_stream_out_switcher = switcher.c
 SOURCES_stream_out_bridge = bridge.c
 SOURCES_stream_out_mosaic_bridge = mosaic_bridge.c
@@ -27,3 +26,11 @@ libvlc_LTLIBRARIES += \
 	libstream_out_mosaic_bridge_plugin.la \
 	libstream_out_autodel_plugin.la \
 	$(NULL)
+
+# RTP plugin
+libstream_out_rtp_plugin_la_SOURCES = \
+	rtp.c rtp.h rtpfmt.c rtcp.c rtsp.c
+libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/libs/srtp
+libstream_out_rtp_plugin_la_LIBADD = $(AM_LIBADD) \
+	$(top_builddir)/libs/srtp/libvlc_srtp.la
+libstream_out_rtp_plugin_la_DEPENDENCIES =

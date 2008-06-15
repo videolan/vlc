@@ -2,8 +2,7 @@
  * rtp.c: rtp stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 the VideoLAN team
- * Copyright © 2007 Rémi Denis-Courmont
- * $Id$
+ * Copyright © 2007-2008 Rémi Denis-Courmont
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,6 +39,7 @@
 #include <vlc_network.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
+#include <srtp.h>
 
 #include "rtp.h"
 
@@ -130,6 +130,15 @@
 #define PROTO_LONGTEXT N_( \
     "This selects which transport protocol to use for RTP." )
 
+#define SRTP_KEY_TEXT N_("SRTP key (hexadecimal)")
+#define SRTP_KEY_LONGTEXT N_( \
+    "RTP packets will be integrity-protected and ciphered "\
+    "with this Secure RTP master shared secret key.")
+
+#define SRTP_SALT_TEXT N_("SRTP salt (hexadecimal)")
+#define SRTP_SALT_LONGTEXT N_( \
+    "Secure RTP requires a (non-secret) master salt value.")
+
 static const char *const ppsz_protos[] = {
     "dccp", "sctp", "tcp", "udp", "udplite",
 };
@@ -192,6 +201,11 @@ vlc_module_begin();
     add_bool( SOUT_CFG_PREFIX "rtcp-mux", false, NULL,
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false );
 
+    add_string( SOUT_CFG_PREFIX "key", "", NULL,
+                SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false );
+    add_string( SOUT_CFG_PREFIX "salt", "", NULL,
+                SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false );
+
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", 0, NULL, RFC3016_TEXT,
                  RFC3016_LONGTEXT, false );
 
@@ -204,7 +218,7 @@ vlc_module_end();
 static const char *const ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
     "sap", "description", "url", "email", "phone",
-    "proto", "rtcp-mux",
+    "proto", "rtcp-mux", "key", "salt",
     "mp4a-latm", NULL
 };
 
@@ -299,8 +313,9 @@ struct sout_stream_id_t
     int          i_bitrate;
 
     /* Packetizer specific fields */
+    int                 i_mtu;
+    srtp_session_t     *srtp;
     pf_rtp_packetizer_t pf_packetize;
-    int          i_mtu;
 
     /* Packets sinks */
     vlc_mutex_t       lock_sink;
@@ -902,12 +917,35 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->i_bitrate = 0;
     }
 
-    id->pf_packetize = NULL;
     id->i_mtu = config_GetInt( p_stream, "mtu" );
     if( id->i_mtu <= 12 + 16 )
         id->i_mtu = 576 - 20 - 8; /* pessimistic */
-
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
+
+    id->srtp = NULL;
+    id->pf_packetize = NULL;
+
+    char *key = var_CreateGetNonEmptyString (p_stream, SOUT_CFG_PREFIX"key");
+    if (key)
+    {
+        id->srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
+                                   SRTP_PRF_AES_CM, SRTP_RCC_MODE1);
+        if (id->srtp == NULL)
+        {
+            free (key);
+            goto error;
+        }
+
+        char *salt = var_CreateGetNonEmptyString (p_stream, SOUT_CFG_PREFIX"salt");
+        errno = srtp_setkeystring (id->srtp, key, salt ? salt : "");
+        free (salt);
+        free (key);
+        if (errno)
+        {
+            msg_Err (p_stream, "bad SRTP key/salt combination (%m)");
+            goto error;
+        }
+    }
 
     vlc_mutex_init( &id->lock_sink );
     id->sinkc = 0;
@@ -1251,6 +1289,8 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         rtp_del_sink( id, id->sinkv[0].rtp_fd ); /* sink for explicit dst= */
     if( id->listen_fd != NULL )
         net_ListenClose( id->listen_fd );
+    if( id->srtp != NULL )
+        srtp_destroy( id->srtp );
 
     vlc_mutex_destroy( &id->lock_sink );
 
@@ -1397,6 +1437,29 @@ static void ThreadSend( vlc_object_t *p_this )
         if( out == NULL )
             continue; /* Forced wakeup */
 
+        if( id->srtp )
+        {   /* FIXME: this is awfully inefficient */
+            size_t len = out->i_buffer;
+            int val = srtp_send( id->srtp, out->p_buffer, &len,
+                                out->i_buffer );
+            if( val == ENOSPC )
+            {
+                out = block_Realloc( out, 0, len );
+                if( out == NULL )
+                    continue;
+                val = srtp_send( id->srtp, out->p_buffer, &len,
+                                 out->i_buffer );
+            }
+            if( val )
+            {
+                errno = val;
+                msg_Dbg( id, "SRTP sending error: %m" );
+                block_Release( out );
+                continue;
+            }
+            out->i_buffer = len;
+        }
+
         mtime_t  i_date = out->i_dts + i_caching;
         ssize_t  len = out->i_buffer;
 
@@ -1408,7 +1471,8 @@ static void ThreadSend( vlc_object_t *p_this )
 
         for( int i = 0; i < id->sinkc; i++ )
         {
-            SendRTCP( id->sinkv[i].rtcp, out );
+            if( !id->srtp ) /* FIXME: SRTCP support */
+                SendRTCP( id->sinkv[i].rtcp, out );
 
             if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )
                 continue;
