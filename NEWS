@@ -37,6 +37,10 @@ Important notes:
 	       udp:@239.255.12.12 -> udp://@239.255.12.12
  * The ffmpeg module has been removed and replaced by avcodec, avformat, swscale
    (or imgresample if you use a swscale-less ffmpeg build) and postproc modules.
+ * The web plugins ActiveX (IE)/Firefox/Mozilla/Safari now recognize the following
+   states: IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4, STOPPING=5,
+   FORWARD=6, BACKWARD=7, ENDED=8, ERROR=9. With FORWARD and BACKWARD being
+   reserved for future implementations and are thus not functional atm.
 
 Changes:
 --------
