@@ -1113,12 +1113,29 @@ static void RunThread( vout_thread_t *p_vout)
                 p_vout->b_error = 1;
             }
 
-            /* Need to reinitialise the chroma plugin */
+            /* Need to reinitialise the chroma plugin. Since we might need
+             * resizing too and it's not sure that we already had it,
+             * recreate the chroma plugin chain from scratch. */
+            /* dionoea */
             if( p_vout->p_chroma->p_module )
             {
-                if( p_vout->p_chroma->p_module->pf_deactivate )
-                    p_vout->p_chroma->p_module->pf_deactivate( VLC_OBJECT(p_vout->p_chroma) );
-                p_vout->p_chroma->p_module->pf_activate( VLC_OBJECT(p_vout->p_chroma) );
+                filter_t *p_chroma = p_vout->p_chroma;
+                module_Unneed( p_chroma, p_chroma->p_module );
+                p_chroma->fmt_out.video = p_vout->fmt_out;
+                p_chroma->fmt_out.video.i_rmask = p_vout->output.i_rmask;
+                p_chroma->fmt_out.video.i_gmask = p_vout->output.i_gmask;
+                p_chroma->fmt_out.video.i_bmask = p_vout->output.i_bmask;
+                p_chroma->fmt_out.video.i_rrshift = p_vout->output.i_rrshift;
+                p_chroma->fmt_out.video.i_lrshift = p_vout->output.i_lrshift;
+                p_chroma->fmt_out.video.i_rgshift = p_vout->output.i_rgshift;
+                p_chroma->fmt_out.video.i_lgshift = p_vout->output.i_lgshift;
+                p_chroma->fmt_out.video.i_rbshift = p_vout->output.i_rbshift;
+                p_chroma->fmt_out.video.i_lbshift = p_vout->output.i_lbshift;
+                p_chroma->p_module = module_Need( p_chroma, "video filter2", NULL, 0 );
+                if( !p_chroma->p_module )
+                {
+                    msg_Err( p_vout, "WOW THIS SUCKS BIG TIME!!!!!" );
+                }
             }
         }
 
