@@ -66,5 +66,5 @@ librtp_plugin_la_SOURCES = \
 librtp_plugin_la_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/libs/srtp
 librtp_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(top_builddir)/libs/srtp/libvlc_srtp.la
-librtp_plugin_la_DEPENDENCIES =
-
+librtp_plugin_la_DEPENDENCIES = \
+	$(top_builddir)/libs/srtp/libvlc_srtp.la
