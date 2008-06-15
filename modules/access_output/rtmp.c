@@ -334,7 +334,8 @@ p_buffer->p_buffer[i], p_buffer->p_buffer[i+1], p_buffer->p_buffer[i+2], p_buffe
 p_buffer->p_buffer[i+8], p_buffer->p_buffer[i+9], p_buffer->p_buffer[i+10], p_buffer->p_buffer[i+11], p_buffer->p_buffer[i+12], p_buffer->p_buffer[i+13], p_buffer->p_buffer[i+14], p_buffer->p_buffer[i+15]);
 }*/
 ////////////////////////
-msg_Warn(p_access, "rtmp.c:360 i_dts %d i_pts %d", p_buffer->i_dts, p_buffer->i_pts);
+        msg_Warn(p_access, "rtmp.c:360 i_dts %"PRIu64" i_pts %"PRIu64,
+                 p_buffer->i_dts, p_buffer->i_pts);
         rtmp_packet = rtmp_build_flv_over_rtmp( p_access->p_sys->p_thread, p_buffer );
 
         if( rtmp_packet )
@@ -370,6 +371,7 @@ msg_Warn(p_access, "rtmp.c:360 i_dts %d i_pts %d", p_buffer->i_dts, p_buffer->i_
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
+    (void)i_pos;
     msg_Err( p_access, "RTMP sout access cannot seek" );
     return -1;
 }
