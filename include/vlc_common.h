@@ -440,7 +440,6 @@ struct vlc_list_t
 #define VLC_ENOMOD         -10                           /* Module not found */
 
 #define VLC_ENOOBJ         -20                           /* Object not found */
-#define VLC_EBADOBJ        -21                            /* Bad object type */
 
 #define VLC_ENOVAR         -30                         /* Variable not found */
 #define VLC_EBADVAR        -31                         /* Bad variable value */

@@ -55,8 +55,6 @@ char const * vlc_error ( int i_err )
 
         case VLC_ENOOBJ:
             return "object not found";
-        case VLC_EBADOBJ:
-            return "bad object type";
 
         case VLC_ENOVAR:
             return "variable not found";
