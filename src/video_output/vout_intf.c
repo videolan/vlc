@@ -104,8 +104,8 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     *pi_height_hint = p_vout->i_window_height;
 
     /* Check whether someone provided us with a window ID */
-    var_Get( p_vout->p_libvlc, "drawable", &val );
-    if( val.i_int ) return (void *)(intptr_t)val.i_int;
+    int drawable = var_CreateGetInteger( p_vout, "drawable" );
+    if( drawable ) return (void *)(intptr_t)drawable;
 
 #if 0
     /* FIXME:
