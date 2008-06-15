@@ -169,8 +169,6 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (void)setUpToDate:(BOOL)uptodate
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
     if( uptodate )
     {
         [o_fld_releaseNote setString: @""];
@@ -192,13 +190,15 @@ static VLCUpdate *_o_sharedInstance = nil;
         [o_update_window displayIfNeeded];
         [o_update_window makeKeyAndOrderFront: self];
     }
-
-    [pool release];
 }
 
 static void updateCallback( void * p_data, bool b_success )
 {
-    [(id)p_data setUpToDate: !b_success || !update_NeedUpgrade( ((VLCUpdate*)p_data)->p_u )];
+    VLCUpdate * update = p_data;
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    NSNumber * state = [NSNumber numberWithBool:!b_success || !update_NeedUpgrade( update->p_u )];
+    [update performSelectorOnMainThread:@selector(setUpToDate:) withObject:state waitUntilDone:YES];
+    [pool release];
 }
 
 - (void)checkForUpdate
