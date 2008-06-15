@@ -392,10 +392,10 @@ static ssize_t hexstring (const char *in, uint8_t *out, size_t outlen)
 
     for (size_t i = 0; i < inlen; i += 2)
     {
-        int a = hexdigit (in[2 * i]), b = hexdigit (in[2 * i + 1]);
+        int a = hexdigit (in[i]), b = hexdigit (in[i + 1]);
         if ((a == -1) || (b == -1))
-            return EINVAL;
-        out[i] = (a << 4) | b;
+            return -1;
+        out[i / 2] = (a << 4) | b;
     }
     return inlen / 2;
 }
@@ -410,14 +410,14 @@ static ssize_t hexstring (const char *in, uint8_t *out, size_t outlen)
 int
 srtp_setkeystring (srtp_session_t *s, const char *key, const char *salt)
 {
-    uint8_t bkey[32]; /* TODO/NOTE: hard-coded for AES */
+    uint8_t bkey[16]; /* TODO/NOTE: hard-coded for AES */
     uint8_t bsalt[14]; /* TODO/NOTE: hard-coded for the PRF-AES-CM */
     ssize_t bkeylen = hexstring (key, bkey, sizeof (bkey));
     ssize_t bsaltlen = hexstring (salt, bsalt, sizeof (bsalt));
 
     if ((bkeylen == -1) || (bsaltlen == -1))
         return EINVAL;
-    return srtp_derive (s, bkey, bkeylen, bsalt, bsaltlen) ? EINVAL : 0;
+    return srtp_setkey (s, bkey, bkeylen, bsalt, bsaltlen) ? EINVAL : 0;
 }
 
 /**
