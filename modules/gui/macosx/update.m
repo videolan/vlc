@@ -208,7 +208,9 @@ static void updateCallback( void * p_data, bool b_success )
         return;
     update_Check( p_u, updateCallback, self );
 
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: kPrefUpdateLastTimeChecked];
+    [pool release];
 }
 
 - (void)performDownload:(NSString *)path
