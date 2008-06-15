@@ -189,7 +189,7 @@ static int Demux( demux_t *p_demux )
                 input_item_SetArtist( p_input, psz_artist );
 
             input_ItemAddSubItem( p_current_input, p_input );
-            for( unsigned i = 0; i < i_options; i++ )
+            for( int i = 0; i < i_options; i++ )
                 input_ItemAddOpt( p_input, ppsz_options[i], 0 );
             vlc_gc_decref( p_input );
             free( psz_mrl );
