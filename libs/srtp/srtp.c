@@ -600,17 +600,21 @@ int
 srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
 {
     size_t len = *lenp;
+    size_t tag_len = s->tag_len;
+
+    if (!(s->flags & SRTP_UNAUTHENTICATED))
+    {
+        *lenp = len + tag_len;
+        if (bufsize < (len + tag_len))
+            return ENOSPC;
+    }
+
     int val = srtp_crypt (s, buf, len);
     if (val)
         return val;
 
     if (!(s->flags & SRTP_UNAUTHENTICATED))
     {
-        size_t tag_len = s->tag_len;
-        *lenp = len + tag_len;
-        if (bufsize < (len + tag_len))
-            return ENOSPC;
-
         uint32_t roc = srtp_compute_roc (s, rtp_seq (buf));
         const uint8_t *tag = rtp_digest (s, buf, len, roc);
         if (rcc_mode (s))
