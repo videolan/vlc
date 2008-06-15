@@ -101,7 +101,7 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
         p_lg = vlc_array_item_at_index( &p_em->listeners_groups, i );
 
         for( j = 0; j < vlc_array_count(&p_lg->listeners); j++)
-            free( vlc_array_item_at_index( &p_em->listeners_groups, j ) );
+            free( vlc_array_item_at_index( &p_lg->listeners, j ) );
 
         vlc_array_clear( &p_lg->listeners );
         free( p_lg );
