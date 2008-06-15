@@ -41,6 +41,8 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     setWindowTitle( qtr( "Adjustments and Effects" ) );
 
     QGridLayout *layout = new QGridLayout( this );
+    layout->setLayoutMargins( 0, 2, 0, 1, 1 );
+    layout->setSpacing( 3 );
 
     QTabWidget *mainTabW = new QTabWidget( this );
 

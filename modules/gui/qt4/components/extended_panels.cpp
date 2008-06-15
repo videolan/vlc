@@ -941,7 +941,7 @@ void Equalizer::setBand()
 
     for( int i = 0 ; i< BANDS ; i++ )
     {
-        char psz_val[5];
+        char psz_val[8];
         float f_val = ( float )(  bands[i]->value() ) / 10 - 20 ;
         sprintf( psz_values, "%s %f", psz_values, f_val );
         sprintf( psz_val, "% 5.1f", f_val );
@@ -962,9 +962,9 @@ void Equalizer::setValues( char *psz_bands, float f_preamp )
     char *p = psz_bands;
     if ( p )
     {
-        for( int i = 0; i < 10; i++ )
+        for( int i = 0; i < BANDS; i++ )
         {
-            char psz_val[5];
+            char psz_val[8];
             float f = strtof( p, &p );
             int  i_val= ( int )( ( f + 20 ) * 10 );
             bands[i]->setValue(  i_val );
@@ -989,9 +989,14 @@ void Equalizer::setPreset( int preset )
                                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
     char psz_values[102]; memset( psz_values, 0, 102 );
-    for( int i = 0 ; i< 10 ;i++ )
-        sprintf( psz_values, "%s %.1f", psz_values,
-                                        eqz_preset_10b[preset]->f_amp[i] );
+    char psz_values2[102];memset( psz_values2, 0, 102 );
+    for( int i = 0 ; i< BANDS ;i++ )
+    {
+        strcpy( psz_values2, psz_values );
+
+        sprintf( psz_values, "%s %5.1f",
+                 psz_values2, eqz_preset_10b[preset]->f_amp[i] );
+    }
 
     if( p_aout )
     {
