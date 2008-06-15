@@ -5199,7 +5199,7 @@ AS_IF([test "${enable_libgcrypt}" != "no"], [
 ])
 if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"; then
   AS_IF([test "${have_libgcrypt}" = "yes"],[
-    VLC_ADD_LIBS([rtp], [${LIBGCRYPT_LIBS}])
+    VLC_ADD_LIBS([rtp stream_out_rtp], [${LIBGCRYPT_LIBS}])
   ])
 fi
 AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
