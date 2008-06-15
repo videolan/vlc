@@ -45,6 +45,9 @@ Important notes:
 Changes:
 --------
 
+Security updates:
+ * Updated libfreetype on Windows and Mac OS X (CVE-??)
+
 Playlist:
  * Vastly improved playlist support:
     * Media library support
