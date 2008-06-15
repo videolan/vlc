@@ -35,11 +35,10 @@
 
 int main (void)
 {
-    static const uint8_t key[16] =
-        "\x12\x34\x56\x78\x9A\xBC\xDE\xF0"
-        "\x12\x34\x56\x78\x9A\xBC\xDE\xF0";
-    static const uint8_t salt[14] =
-        "\x12\x34\x56\x78\x90" "\x12\x34\x56\x78\x90" "\x12\x34\x56\x78";
+    static const char key[] =
+        "123456789ABCDEF0" "123456789ABCDEF0";
+    static const char salt[] =
+        "1234567890" "1234567890" "12345678";
     int val;
     srtp_session_t *sd, *se;
 
@@ -65,9 +64,9 @@ int main (void)
     srtp_setrcc_rate (se, 1);
     srtp_setrcc_rate (sd, 1);
 
-    val = srtp_setkey (se, key, 16, salt, 14);
+    val = srtp_setkeystring (se, key, salt);
     assert (val == 0);
-    val = srtp_setkey (sd, key, 16, salt, 14);
+    val = srtp_setkeystring (sd, key, salt);
     assert (val == 0);
 
     uint8_t buf[1500], buf2[1500];
