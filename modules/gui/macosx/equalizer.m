@@ -53,8 +53,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
     aout_instance_t *p_aout = (aout_instance_t *)p_object;
     if( p_object == NULL )
-        p_object = vlc_object_find( p_intf,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_object = pl_Yield( p_intf );
     if( p_object == NULL )
         return;
 
@@ -127,8 +126,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     vlc_object_t *p_object = vlc_object_find( p_intf,
                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_object == NULL )
-        p_object = vlc_object_find( p_intf,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_object = pl_Yield( p_intf );
     if( p_object == NULL )
         return false;
 
@@ -186,8 +184,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
     if( p_object == NULL )
-        p_object = vlc_object_find( p_intf,
-                                    VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_object = pl_Yield( p_intf );
     if( p_object == NULL )
         return;
 
@@ -249,8 +246,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
     if( p_object == NULL )
-        p_object = vlc_object_find( p_intf,
-                                    VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_object = pl_Yield( p_intf );
     if( p_object == NULL )
         return;
 
@@ -292,8 +288,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     vlc_object_t *p_object= vlc_object_find( p_intf,
                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_object == NULL )
-        p_object = vlc_object_find( p_intf,
-                                    VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_object = pl_Yield( p_intf );
     if( p_object == NULL )
         return;
 
@@ -338,8 +333,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     vlc_object_t *p_object = vlc_object_find( p_intf,
                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_object == NULL )
-        p_object = vlc_object_find( p_intf,
-                                    VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_object = pl_Yield( p_intf );
     if( p_object == NULL )
         return;
 
@@ -379,8 +373,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
     aout_instance_t *p_aout = (aout_instance_t *)p_object;
     if( p_object == NULL )
-        p_object = vlc_object_find( p_intf,
-                                    VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_object = pl_Yield( p_intf );
     if( p_object == NULL )
         return;
 
@@ -417,8 +410,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     vlc_object_t *p_object= vlc_object_find( VLCIntf,
                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_object == NULL )
-        p_object = vlc_object_find( VLCIntf,
-                                    VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_object = pl_Yield( VLCIntf );
 
     [o_window setExcludedFromWindowsMenu: TRUE];
 
