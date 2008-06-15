@@ -388,7 +388,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout = new QGridLayout( );
 
     controlLayout->setSpacing( 0 );
-    controlLayout->setLayoutMargins( 9, 6, 9, 6, 6 );
+    controlLayout->setLayoutMargins( 7, 5, 7, 3, 6 );
 
     if( !b_fsCreation )
         setLayout( controlLayout );

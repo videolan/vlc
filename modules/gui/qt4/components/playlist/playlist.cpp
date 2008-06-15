@@ -47,6 +47,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
                                 QWidget *_parent )
                : p_intf ( _p_i ), parent( _parent )
 {
+    setContentsMargins( 3, 3, 3, 3 );
+
     /* Left Part and design */
     QSplitter *leftW = new QSplitter( Qt::Vertical, this );
 
