@@ -121,6 +121,7 @@ Subtitles:
  * Realtext subtitle support
  * DKS subtitle support
  * SubViewer 1.0 (SubRip09) subtitles support
+ * Correct Right-to-left languages in subtitles support
 
 Encoders:
  * Flash Screen Video support
