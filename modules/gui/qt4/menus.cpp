@@ -455,15 +455,23 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     if( current->isEmpty() )
     {
         ACT_ADD( current, "video-es", qtr( "Video &Track" ) );
+
+        QAction *action;
+        QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
+        action = current->addMenu( submenu );
+        action->setData( "spu-es" );
+        submenu->addAction( qfu( "Load File..." ), THEDP,
+                            SLOT( loadSubtitlesFile() ) );
+
         ACT_ADD( current, "fullscreen", qtr( "&Fullscreen" ) );
         ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
         ACT_ADD( current, "deinterlace", qtr( "&Deinterlace" ) );
         ACT_ADD( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
         ACT_ADD( current, "crop", qtr( "&Crop" ) );
         ACT_ADD( current, "video-on-top", qtr( "Always &On Top" ) );
-        ACT_ADD( current, "directx-wallpaper", qtr( "&DirectX Wallpaper" ) ); /* FIXME */
-        ACT_ADD( current, "video-snapshot", qtr( "&Snapshot" ) );
-        ACT_ADD( current, "ffmpeg-pp-q", qtr( "D&ecoder" ) ); /* FIXME */
+        /* ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) ); */
+        ACT_ADD( current, "video-snapshot", qtr( "Snapshot" ) );
+        /* ACT_ADD( current, "ffmpeg-pp-q", qtr( "Decoder" ) ); */
     }
 
     p_input = THEMIM->getInput();
@@ -732,7 +740,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 PUSH_SEPARATOR;
                 vlc_object_t *p_vout = ( vlc_object_t * )
                     vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
-                    VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
+                VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
                 if( p_vout )
                     vlc_object_release( p_vout );
 
@@ -838,7 +846,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
 
         if( objects[i] == 0 )
         {
-            continue;
+            p_object = NULL;
         }
         else
         {
@@ -848,6 +856,15 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
                 msg_Dbg( p_intf, "object %d not found !", objects[i] );
                 continue;
             }
+        }
+
+        /* Some specific stuff */
+        if( p_object && !strcmp( varnames[i], "spu-es" ) )
+        {
+            vlc_object_t *p_vout = ( vlc_object_t* )( vlc_object_find( p_object,
+                                        VLC_OBJECT_VOUT, FIND_ANYWHERE ) );
+            if( !p_vout )
+                continue;
         }
 
         /* Ugly specific stuff */
@@ -923,12 +940,6 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         return;
     }
 
-    if( !strcmp( psz_var, "spu-es" ) )
-    {
-        /* TODO: add a static entry "Load File..." */
-        return;
-    }
-
     /* Check the type of the object variable */
     if( !strcmp( psz_var, "audio-es" )
      || !strcmp( psz_var, "video-es" ) )
@@ -951,7 +962,8 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     }
 
     /* Make sure we want to display the variable */
-    if( IsMenuEmpty( psz_var, p_object ) )  return;
+    if( menu->isEmpty() && IsMenuEmpty( psz_var, p_object ) )
+        return;
 
     /* Get the descriptive name of the variable */
     int i_ret = var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );
@@ -965,6 +977,7 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     {
         action = new QAction( TEXT_OR_VAR, menu );
         menu->addAction( action );
+        action->setData( psz_var );
     }
 
     if( i_type & VLC_VAR_HASCHOICE )
@@ -973,17 +986,15 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         if( b_submenu )
         {
             QMenu *submenu;
-            action->setEnabled( true );
             submenu = action->menu();
             if( !submenu )
             {
                 submenu = new QMenu( menu );
                 action->setMenu( submenu );
             }
-            submenu->setEnabled( true );
 
-            if( CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0 )
-                menu->addMenu( submenu );
+            action->setEnabled(
+                   CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0 );
         }
         else
             CreateChoicesMenu( menu, psz_var, p_object, true );
@@ -1020,7 +1031,8 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     i_type = var_Type( p_object, psz_var );
 
     /* Make sure we want to display the variable */
-    if( IsMenuEmpty( psz_var, p_object, b_root ) ) return VLC_EGENERIC;
+    if( submenu->isEmpty() && IsMenuEmpty( psz_var, p_object, b_root ) )
+        return VLC_EGENERIC;
 
     switch( i_type & VLC_VAR_TYPE )
     {

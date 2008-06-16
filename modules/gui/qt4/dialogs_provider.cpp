@@ -529,3 +529,22 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         break;
     }
 }
+
+void DialogsProvider::loadSubtitlesFile()
+{
+    playlist_t *p_playlist = pl_Yield( p_intf );
+    if( !p_playlist || !p_playlist->p_input )
+    {
+        msg_Err( p_intf, "cannot get input" );
+        return;
+    }
+    QString qsFile = QFileDialog::getOpenFileName(
+             NULL,
+             qtr( "Choose subtitles file" ),
+             "",
+             qtr( "Subtitles files (*.cdg *.idx *.srt *.sub *.utf);;"
+                  "All files (*)" ) );
+    if( !input_AddSubtitles( p_playlist->p_input, qtu( qsFile ), true ) )
+        msg_Warn( p_intf, "unable to load subtitles file..." );
+    pl_Release( p_playlist );
+}

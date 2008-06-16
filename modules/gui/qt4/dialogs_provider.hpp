@@ -187,6 +187,8 @@ public slots:
     void openAPlaylist();
     void saveAPlaylist();
 
+    void loadSubtitlesFile();
+
     void quit();
 };
 
