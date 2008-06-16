@@ -1550,9 +1550,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 b_force_update = true;
 
                 /* Switch to play */
-                p_input->i_state = PLAYING_S;
-                val.i_int = PLAYING_S;
-                var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+                input_ChangeState( p_input, PLAYING_S);
 
                 /* */
                 if( !i_ret )
@@ -1561,7 +1559,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S &&
                      p_input->p->b_can_pause )
             {
-                int i_ret;
+                int i_ret, state;
                 if( p_input->p->input.p_access )
                     i_ret = access_Control( p_input->p->input.p_access,
                                              ACCESS_SET_PAUSE_STATE, true );
@@ -1574,16 +1572,15 @@ static bool Control( input_thread_t *p_input, int i_type,
                 if( i_ret )
                 {
                     msg_Warn( p_input, "cannot set pause state" );
-                    val.i_int = p_input->i_state;
+                    state = p_input->i_state;
                 }
                 else
                 {
-                    val.i_int = PAUSE_S;
+                    state = PAUSE_S;
                 }
 
                 /* Switch to new state */
-                p_input->i_state = val.i_int;
-                var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+                input_ChangeState( p_input, state);
 
                 /* */
                 if( !i_ret )
@@ -1594,8 +1591,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 b_force_update = true;
 
                 /* Correct "state" value */
-                val.i_int = p_input->i_state;
-                var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+                input_ChangeState( p_input, p_input->i_state );
             }
             else if( val.i_int != PLAYING_S && val.i_int != PAUSE_S )
             {
