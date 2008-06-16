@@ -898,8 +898,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                                            &oggpacket );
                 }
                 /* Check for Kate header */
-                else if( oggpacket.bytes >= 9 &&
-                    ! memcmp( &oggpacket.packet[1], "kate\0\0\0\0", 8 ) )
+                else if( oggpacket.bytes >= 8 &&
+                    ! memcmp( &oggpacket.packet[1], "kate\0\0\0", 7 ) )
                 {
                     Ogg_ReadKateHeader( p_stream, &oggpacket );
                     msg_Dbg( p_demux, "found kate header" );
