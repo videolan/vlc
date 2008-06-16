@@ -33,6 +33,9 @@
 #define MMS_CMD_HEADERSIZE  48
 
 #define MMS_BUFFER_SIZE 100000
+
+typedef struct mmstu_keepalive_thread_t mmstu_keepalive_thread_t;
+
 struct access_sys_t
 {
     int         i_proto;        /* MMS_PROTO_TCP, MMS_PROTO_UDP */
@@ -92,6 +95,18 @@ struct access_sys_t
 
     /* misc */
     bool  b_seekable;
+
+    mmstu_keepalive_thread_t *p_keepalive_thread;
+    vlc_mutex_t lock_netwrite;
+};
+
+struct mmstu_keepalive_thread_t
+{
+    VLC_COMMON_MEMBERS
+
+    access_t *p_access;
+    bool b_paused;
+    bool b_thread_error;
 };
 
 #endif

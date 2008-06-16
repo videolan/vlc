@@ -240,6 +240,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     bool   *pb_bool;
+    bool    b_bool;
     int          *pi_int;
     int64_t      *pi_64;
     int          i_int;
@@ -253,11 +254,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = false;
             break;
 
+        case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;
@@ -285,6 +286,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         /* */
         case ACCESS_SET_PAUSE_STATE:
+            b_bool = (bool)va_arg( args, int );
+            if( b_bool )
+                Stop( p_access );
+            else
+                Seek( p_access, p_access->info.i_pos );
+            break;
+
         case ACCESS_GET_TITLE_INFO:
         case ACCESS_SET_TITLE:
         case ACCESS_SET_SEEKPOINT:

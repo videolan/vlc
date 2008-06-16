@@ -92,6 +92,7 @@ static int  mms_HeaderMediaRead( access_t *, int );
 
 static int  mms_ReceivePacket( access_t * );
 
+static void KeepAliveThread( vlc_object_t *p_this );
 
 int  MMSTUOpen( access_t *p_access )
 {
@@ -116,12 +117,15 @@ int  MMSTUOpen( access_t *p_access )
 
     p_sys->i_timeout = var_CreateGetInteger( p_access, "mms-timeout" );
 
+    vlc_mutex_init( &p_sys->lock_netwrite );
+
     /* *** Parse URL and get server addr/port and path *** */
     vlc_UrlParse( &p_sys->url, p_access->psz_path, 0 );
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
         msg_Err( p_access, "invalid server name" );
         vlc_UrlClean( &p_sys->url );
+        vlc_mutex_destroy( &p_sys->lock_netwrite );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -162,6 +166,7 @@ int  MMSTUOpen( access_t *p_access )
     {
         msg_Err( p_access, "cannot connect to server" );
         vlc_UrlClean( &p_sys->url );
+        vlc_mutex_destroy( &p_sys->lock_netwrite );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -196,6 +201,16 @@ int  MMSTUOpen( access_t *p_access )
         MMSTUClose ( p_access );
         return VLC_EGENERIC;
     }
+
+    /* Keep the connection alive when paused */
+    p_sys->p_keepalive_thread = vlc_object_create( p_access, sizeof( mmstu_keepalive_thread_t ) );
+    p_sys->p_keepalive_thread->p_access = p_access;
+    p_sys->p_keepalive_thread->b_paused = false;
+    p_sys->p_keepalive_thread->b_thread_error = false;
+    if( vlc_thread_create( p_sys->p_keepalive_thread, "mmstu keepalive thread", KeepAliveThread,
+                           VLC_THREAD_PRIORITY_LOW, false) )
+        p_sys->p_keepalive_thread->b_thread_error = true;
+
     return VLC_SUCCESS;
 }
 
@@ -206,11 +221,17 @@ void MMSTUClose( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
+    vlc_object_kill( p_sys->p_keepalive_thread );
+    if( !p_sys->p_keepalive_thread->b_thread_error )
+        vlc_thread_join( p_sys->p_keepalive_thread );
+    vlc_object_release( p_sys->p_keepalive_thread );
+
     /* close connection with server */
     MMSClose( p_access );
 
     /* free memory */
     vlc_UrlClean( &p_sys->url );
+    vlc_mutex_destroy( &p_sys->lock_netwrite );
 
     free( p_sys );
 }
@@ -222,6 +243,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     bool   *pb_bool;
+    bool    b_bool;
     int          *pi_int;
     int64_t      *pi_64;
     int           i_int;
@@ -236,9 +258,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = false;
+            break;
+
+        case ACCESS_CAN_PAUSE:
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             break;
 
         case ACCESS_CAN_CONTROL_PACE:
@@ -274,6 +300,23 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         /* */
         case ACCESS_SET_PAUSE_STATE:
+            b_bool = (bool)va_arg( args, int );
+            if( b_bool )
+            {
+                MMSStop( p_access );
+                vlc_object_lock( p_sys->p_keepalive_thread );
+                p_sys->p_keepalive_thread->b_paused = true;
+                vlc_object_unlock( p_sys->p_keepalive_thread );
+            }
+            else
+            {
+                Seek( p_access, p_access->info.i_pos );
+                vlc_object_lock( p_sys->p_keepalive_thread );
+                p_sys->p_keepalive_thread->b_paused = false;
+                vlc_object_unlock( p_sys->p_keepalive_thread );
+            }
+            break;
+
         case ACCESS_GET_TITLE_INFO:
         case ACCESS_SET_TITLE:
         case ACCESS_SET_SEEKPOINT:
@@ -986,8 +1029,10 @@ static int mms_CommandSend( access_t *p_access, int i_command,
     var_buffer_add64( &buffer, 0 );
 
     /* send it */
+    vlc_mutex_lock( &p_sys->lock_netwrite );
     i_ret = net_Write( p_access, p_sys->i_handle_tcp, NULL, buffer.p_data,
                        buffer.i_data - ( 8 - ( i_data - i_data_old ) ) );
+    vlc_mutex_unlock( &p_sys->lock_netwrite );
     if( i_ret != buffer.i_data - ( 8 - ( i_data - i_data_old ) ) )
     {
         msg_Err( p_access, "failed to send command" );
@@ -1554,3 +1599,23 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
     return -1;
 }
 
+static void KeepAliveThread( vlc_object_t *p_this )
+{
+    mmstu_keepalive_thread_t *p_thread = (mmstu_keepalive_thread_t *) p_this;
+    access_t *p_access = p_thread->p_access;
+    bool b_paused;
+    bool b_was_paused = false;
+
+    vlc_object_lock( p_thread );
+    while( vlc_object_alive( p_thread) )
+    {
+        b_paused = p_thread->b_paused;
+
+        if( b_paused && b_was_paused )
+                mms_CommandSend( p_access, 0x1b, 0, 0, NULL, 0 );
+
+        b_was_paused = b_paused;
+        vlc_object_timedwait( p_thread, mdate() + 10000000 );
+    }
+    vlc_object_unlock( p_thread );
+}
