@@ -343,8 +343,8 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
                 for(i=0;proxies[i];i++) free(proxies[i]);
                 free(proxies);
                 free(buf);
-                px_proxy_factory_free(pf);
             }
+            px_proxy_factory_free(pf);
         }
         else
         {
