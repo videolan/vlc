@@ -22,6 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/** \todo
+ * - Remove static currentGroup
+ */
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -97,7 +101,10 @@ void addMIMStaticEntry( intf_thread_t *p_intf,
  * Definitions of variables for the dynamic menus
  *****************************************************************************/
 #define PUSH_VAR( var ) varnames.push_back( var ); \
-    objects.push_back( p_object->i_object_id )
+    objects.push_back( p_object ? p_object->i_object_id : 0 )
+
+#define PUSH_INPUTVAR( var ) varnames.push_back( var ); \
+    objects.push_back( p_input ? p_input->i_object_id : 0 );
 
 #define PUSH_SEPARATOR if( objects.size() != i_last_separator ) { \
     objects.push_back( 0 ); varnames.push_back( "" ); \
@@ -117,9 +124,12 @@ static int InputAutoMenuBuilder( vlc_object_t *p_object,
 }
 
 static int VideoAutoMenuBuilder( vlc_object_t *p_object,
+        input_thread_t *p_input,
         vector<int> &objects,
         vector<const char *> &varnames )
 {
+    PUSH_INPUTVAR( "video-es" );
+    PUSH_INPUTVAR( "spu-es" );
     PUSH_VAR( "fullscreen" );
     PUSH_VAR( "zoom" );
     PUSH_VAR( "deinterlace" );
@@ -129,27 +139,54 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
     PUSH_VAR( "directx-wallpaper" );
     PUSH_VAR( "video-snapshot" );
 
-    vlc_object_t *p_dec_obj = ( vlc_object_t * )vlc_object_find( p_object,
-            VLC_OBJECT_DECODER,
-            FIND_PARENT );
-    if( p_dec_obj != NULL )
+    if( p_object )
     {
-        vlc_object_t *p_object = p_dec_obj;
-        PUSH_VAR( "ffmpeg-pp-q" );
-        vlc_object_release( p_dec_obj );
+        vlc_object_t *p_dec_obj = ( vlc_object_t * )vlc_object_find( p_object,
+                VLC_OBJECT_DECODER,
+                FIND_PARENT );
+        if( p_dec_obj )
+        {
+            vlc_object_t *p_object = p_dec_obj;
+            PUSH_VAR( "ffmpeg-pp-q" );
+            vlc_object_release( p_dec_obj );
+        }
     }
     return VLC_SUCCESS;
 }
 
 static int AudioAutoMenuBuilder( vlc_object_t *p_object,
+        input_thread_t *p_input,
         vector<int> &objects,
         vector<const char *> &varnames )
 {
+    PUSH_INPUTVAR( "audio-es" );
     PUSH_VAR( "audio-device" );
     PUSH_VAR( "audio-channels" );
     PUSH_VAR( "visual" );
     PUSH_VAR( "equalizer" );
     return VLC_SUCCESS;
+}
+
+static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
+{
+    QAction *action;
+    Q_FOREACH( action, menu->actions() )
+    {
+        if( action->data().toString() == psz_var )
+            return action;
+    }
+    return NULL;
+}
+
+static QAction * FindActionWithText( QMenu *menu, QString &text )
+{
+    QAction *action;
+    Q_FOREACH( action, menu->actions() )
+    {
+        if( action->text() == text )
+            return action;
+    }
+    return NULL;
 }
 
 /*****************************************************************************
@@ -158,13 +195,17 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
  *****************************************************************************/
 
 #define BAR_ADD( func, title ) { \
-    QMenu *menu = func; menu->setTitle( title ); bar->addMenu( menu ); }
+    QMenu *_menu = func; _menu->setTitle( title ); bar->addMenu( _menu ); }
 
 #define BAR_DADD( func, title, id ) { \
-    QMenu *menu = func; menu->setTitle( title ); bar->addMenu( menu ); \
-    MenuFunc *f = new MenuFunc( menu, id ); \
-    CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() ); \
-    THEDP->menusUpdateMapper->setMapping( menu, f ); }
+    QMenu *_menu = func; _menu->setTitle( title ); bar->addMenu( _menu ); \
+    MenuFunc *f = new MenuFunc( _menu, id ); \
+    CONNECT( _menu, aboutToShow(), THEDP->menusUpdateMapper, map() ); \
+    THEDP->menusUpdateMapper->setMapping( _menu, f ); }
+
+#define ACT_ADD( _menu, val, title ) { \
+    QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
+    _menu->addAction( _action ); }
 
 /**
  * Main Menu Bar Creation
@@ -181,10 +222,9 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     BAR_ADD( PlaylistMenu( p_intf, mi ), qtr( "&Playlist" ) );
     BAR_ADD( ToolsMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
              qtr( "&Tools" ) );
-    BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 2 );
-    BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 1 );
+    BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 1 );
+    BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 2 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "&Playback" ), 3 );
-
     BAR_ADD( HelpMenu( NULL ), qtr( "&Help" ) );
 }
 #undef BAR_ADD
@@ -349,22 +389,35 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     vector<int> objects;
     vector<const char *> varnames;
+    vlc_object_t *p_object;
+    input_thread_t *p_input;
 
-    vlc_object_t *p_object = ( vlc_object_t * )vlc_object_find( p_intf,
-            VLC_OBJECT_INPUT, FIND_ANYWHERE );
-    if( p_object != NULL )
+    if( !current )
+        current = new QMenu();
+
+    if( current->isEmpty() )
     {
-        PUSH_VAR( "audio-es" );
-        vlc_object_release( p_object );
+        ACT_ADD( current, "audio-es", qtr( "Audio &Track" ) );
+        ACT_ADD( current, "audio-device", qtr( "Audio &Device" ) );
+        ACT_ADD( current, "audio-channels", qtr( "Audio &Channels" ) );
+        ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
+        ACT_ADD( current, "equalizer", qtr( "&Equalizer" ) );
     }
 
-    p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-            FIND_ANYWHERE );
+    p_input = THEMIM->getInput();
+    if( p_input )
+        vlc_object_yield( p_input );
+    p_object = ( vlc_object_t * ) vlc_object_find( p_intf,
+                                                   VLC_OBJECT_AOUT,
+                                                   FIND_ANYWHERE );
+
+    AudioAutoMenuBuilder( p_object, p_input, objects, varnames );
+
     if( p_object )
-    {
-        AudioAutoMenuBuilder( p_object, objects, varnames );
         vlc_object_release( p_object );
-    }
+    if( p_input )
+        vlc_object_release( p_input );
+
     return Populate( p_intf, current, varnames, objects );
 }
 
@@ -375,25 +428,40 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 {
     vlc_object_t *p_object;
+    input_thread_t *p_input;
     vector<int> objects;
     vector<const char *> varnames;
 
-    p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-            FIND_ANYWHERE );
-    if( p_object != NULL )
+    if( !current )
+        current = new QMenu();
+
+    if( current->isEmpty() )
     {
-        PUSH_VAR( "video-es" );
-        PUSH_VAR( "spu-es" );
-        vlc_object_release( p_object );
+        ACT_ADD( current, "video-es", qtr( "Video &Track" ) );
+        ACT_ADD( current, "fullscreen", qtr( "&Fullscreen" ) );
+        ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
+        ACT_ADD( current, "deinterlace", qtr( "&Deinterlace" ) );
+        ACT_ADD( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
+        ACT_ADD( current, "crop", qtr( "&Crop" ) );
+        ACT_ADD( current, "video-on-top", qtr( "Always &On Top" ) );
+        ACT_ADD( current, "directx-wallpaper", qtr( "&DirectX Wallpaper" ) ); /* FIXME */
+        ACT_ADD( current, "video-snapshot", qtr( "&Snapshot" ) );
+        ACT_ADD( current, "ffmpeg-pp-q", qtr( "D&ecoder" ) ); /* FIXME */
     }
 
+    p_input = THEMIM->getInput();
+    if( p_input )
+        vlc_object_yield( p_input );
     p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_VOUT,
             FIND_ANYWHERE );
-    if( p_object != NULL )
-    {
-        VideoAutoMenuBuilder( p_object, objects, varnames );
+
+    VideoAutoMenuBuilder( p_object, p_input, objects, varnames );
+
+    if( p_object )
         vlc_object_release( p_object );
-    }
+    if( p_input )
+        vlc_object_release( p_input );
+
     return Populate( p_intf, current, varnames, objects );
 }
 
@@ -409,13 +477,13 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 
     p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_INPUT,
             FIND_ANYWHERE );
-    if( p_object != NULL )
-    {
-        InputAutoMenuBuilder(  p_object, objects, varnames );
-        PUSH_VAR( "prev-title" ); PUSH_VAR ( "next-title" );
-        PUSH_VAR( "prev-chapter" ); PUSH_VAR( "next-chapter" );
+    InputAutoMenuBuilder(  p_object, objects, varnames );
+    PUSH_VAR( "prev-title" );
+    PUSH_VAR( "next-title" );
+    PUSH_VAR( "prev-chapter" );
+    PUSH_VAR( "next-chapter" );
+    if( p_object )
         vlc_object_release( p_object );
-    }
     QMenu *navMenu = new QMenu( menu );
     addDPStaticEntry( navMenu, qtr( I_MENU_GOTOTIME ), "","",
         SLOT( gotoTimeDialog() ), "Ctrl+T" );
@@ -478,6 +546,7 @@ QMenu *QVLCMenu::HelpMenu( QMenu *current )
     return menu;
 }
 
+#undef ACT_ADD
 
 /*****************************************************************************
  * Popup menus - Right Click menus                                           *
@@ -554,15 +623,11 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
     if( p_input )
     {
         vlc_object_yield( p_input );
-        varnames.push_back( "video-es" );
-        objects.push_back( p_input->i_object_id );
-        varnames.push_back( "spu-es" );
-        objects.push_back( p_input->i_object_id );
         vlc_object_t *p_vout = ( vlc_object_t * )vlc_object_find( p_input,
                 VLC_OBJECT_VOUT, FIND_CHILD );
         if( p_vout )
         {
-            VideoAutoMenuBuilder( p_vout, objects, varnames );
+            VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
             vlc_object_release( p_vout );
         }
         vlc_object_release( p_input );
@@ -578,15 +643,11 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
     if( p_input )
     {
         vlc_object_yield( p_input );
-        varnames.push_back( "audio-es" );
-        objects.push_back( p_input->i_object_id );
         vlc_object_t *p_aout = ( vlc_object_t * )vlc_object_find( p_input,
                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
+        AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
         if( p_aout )
-        {
-            AudioAutoMenuBuilder( p_aout, objects, varnames );
             vlc_object_release( p_aout );
-        }
         vlc_object_release( p_input );
     }
     QMenu *menu = new QMenu();
@@ -637,29 +698,19 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
                 /* Audio menu */
                 PUSH_SEPARATOR;
-                varnames.push_back( "audio-es" );
-                objects.push_back( p_input->i_object_id );
                 vlc_object_t *p_aout = ( vlc_object_t * )
                     vlc_object_find( p_input, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+                AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
                 if( p_aout )
-                {
-                    AudioAutoMenuBuilder( p_aout, objects, varnames );
                     vlc_object_release( p_aout );
-                }
 
                 /* Video menu */
                 PUSH_SEPARATOR;
-                varnames.push_back( "video-es" );
-                objects.push_back( p_input->i_object_id );
-                varnames.push_back( "spu-es" );
-                objects.push_back( p_input->i_object_id );
                 vlc_object_t *p_vout = ( vlc_object_t * )
                     vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+                    VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
                 if( p_vout )
-                {
-                    VideoAutoMenuBuilder( p_vout, objects, varnames );
                     vlc_object_release( p_vout );
-                }
 
                 vlc_object_release( p_input );
             }
@@ -727,7 +778,6 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 #undef PUSH_VAR
 #undef PUSH_SEPARATOR
 
-
 /*************************************************************************
  * Builders for automenus
  *************************************************************************/
@@ -740,56 +790,50 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
     QMenu *menu = current;
     if( !menu )
         menu = new QMenu();
-    else if( !append )
-        menu->clear();
+
+    QAction *p_action;
+    Q_FOREACH( p_action, menu->actions() )
+    {
+        p_action->setEnabled( false );
+    }
 
     currentGroup = NULL;
 
     vlc_object_t *p_object;
-    bool b_section_empty = false;
     int i;
-
-#define APPEND_EMPTY { QAction *action = menu->addAction( qtr( "Empty" ) ); \
-    action->setEnabled( false ); }
 
     for( i = 0; i < ( int )objects.size() ; i++ )
     {
         if( !varnames[i] || !*varnames[i] )
         {
-            if( b_section_empty )
-                APPEND_EMPTY;
             menu->addSeparator();
-            b_section_empty = true;
             continue;
         }
 
         if( objects[i] == 0 )
         {
-            /// \bug What is this ?
-            // Append( menu, varnames[i], NULL );
-            b_section_empty = false;
             continue;
         }
+        else
+        {
+            p_object = ( vlc_object_t * )vlc_object_get( objects[i] );
+            if( !p_object )
+            {
+                msg_Dbg( p_intf, "object %d not found !", objects[i] );
+                continue;
+            }
+        }
 
-        p_object = ( vlc_object_t * )vlc_object_get( objects[i] );
-        if( p_object == NULL ) continue;
-
-        b_section_empty = false;
         /* Ugly specific stuff */
         if( strstr( varnames[i], "intf-add" ) )
-            CreateItem( menu, varnames[i], p_object, false );
+            UpdateItem( p_intf, menu, varnames[i], p_object, false );
         else
-            CreateItem( menu, varnames[i], p_object, true );
-        vlc_object_release( p_object );
+            UpdateItem( p_intf, menu, varnames[i], p_object, true );
+        if( p_object )
+            vlc_object_release( p_object );
     }
-
-    /* Special case for empty menus */
-    if( menu->actions().size() == 0 || b_section_empty )
-        APPEND_EMPTY
-
     return menu;
 }
-#undef APPEND_EMPTY
 
 /*****************************************************************************
  * Private methods.
@@ -839,14 +883,32 @@ static bool IsMenuEmpty( const char *psz_var,
     return i_result;
 }
 
-void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
-        vlc_object_t *p_object, bool b_submenu )
+#define TEXT_OR_VAR qfu ( text.psz_string ? text.psz_string : psz_var )
+
+void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
+        const char *psz_var, vlc_object_t *p_object, bool b_submenu )
 {
     vlc_value_t val, text;
     int i_type;
 
+    if( !p_object )
+    {
+        /* Nothing to do */
+        return;
+    }
+
+    if( !strcmp( psz_var, "spu-es" ) )
+    {
+        /* TODO: add a static entry "Load File..." */
+        return;
+    }
+
     /* Check the type of the object variable */
-    i_type = var_Type( p_object, psz_var );
+    if( !strcmp( psz_var, "audio-es" )
+     || !strcmp( psz_var, "video-es" ) )
+        i_type = VLC_VAR_INTEGER | VLC_VAR_HASCHOICE;
+    else
+        i_type = var_Type( p_object, psz_var );
 
     switch( i_type & VLC_VAR_TYPE )
     {
@@ -866,16 +928,34 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
     if( IsMenuEmpty( psz_var, p_object ) )  return;
 
     /* Get the descriptive name of the variable */
-    var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );
+    int i_ret = var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );
+    if( i_ret != VLC_SUCCESS )
+    {
+        text.psz_string = NULL;
+    }
+
+    QAction *action = FindActionWithVar( menu, psz_var );
+    if( !action )
+    {
+        action = new QAction( TEXT_OR_VAR, menu );
+        menu->addAction( action );
+    }
 
     if( i_type & VLC_VAR_HASCHOICE )
     {
         /* Append choices menu */
         if( b_submenu )
         {
-            QMenu *submenu = new QMenu( menu );
-            submenu->setTitle( qfu( text.psz_string ?
-                        text.psz_string : psz_var ) );
+            QMenu *submenu;
+            action->setEnabled( true );
+            submenu = action->menu();
+            if( !submenu )
+            {
+                submenu = new QMenu( menu );
+                action->setMenu( submenu );
+            }
+            submenu->setEnabled( true );
+
             if( CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0 )
                 menu->addMenu( submenu );
         }
@@ -884,8 +964,6 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
         FREENULL( text.psz_string );
         return;
     }
-
-#define TEXT_OR_VAR qfu ( text.psz_string ? text.psz_string : psz_var )
 
     switch( i_type & VLC_VAR_TYPE )
     {
@@ -1009,9 +1087,22 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
         vlc_value_t val, int i_val_type,
         bool checked )
 {
-    QAction *action = new QAction( text, menu );
+    QAction *action = FindActionWithVar( menu, psz_var );
+    if( !action )
+    {
+        /* This is a value */
+        action = FindActionWithText( menu, text );
+        if( !action )
+        {
+            action = new QAction( text, menu );
+            menu->addAction( action );
+        }
+    }
+
     action->setText( text );
     action->setToolTip( help );
+
+    action->setEnabled( i_object_id != 0 );
 
     if( i_item_type == ITEM_CHECK )
     {
@@ -1025,10 +1116,8 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
         currentGroup->addAction( action );
     }
 
-    if( checked )
-    {
-        action->setChecked( true );
-    }
+    action->setChecked( checked );
+
     MenuItemData *itemData = new MenuItemData( i_object_id, i_val_type,
             val, psz_var );
     CONNECT( action, triggered(), THEDP->menusMapper, map() );

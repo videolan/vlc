@@ -107,7 +107,8 @@ private:
 
     static void CreateAndConnect( QMenu *, const char *, QString, QString,
                                   int, int, vlc_value_t, int, bool c = false );
-    static void CreateItem( QMenu *, const char *, vlc_object_t *, bool );
+    static void UpdateItem( intf_thread_t *, QMenu *, const char *,
+                            vlc_object_t *, bool );
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
 };
 
@@ -121,8 +122,8 @@ public:
     {
         switch( id )
         {
-        case 1: QVLCMenu::VideoMenu( p_intf, menu ); break;
-        case 2: QVLCMenu::AudioMenu( p_intf, menu ); break;
+        case 1: QVLCMenu::AudioMenu( p_intf, menu ); break;
+        case 2: QVLCMenu::VideoMenu( p_intf, menu ); break;
         case 3: QVLCMenu::NavigMenu( p_intf, menu ); break;
         case 4: QVLCMenu::InterfacesMenu( p_intf, menu ); break;
         }
