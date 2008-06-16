@@ -654,9 +654,11 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
 
 void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
 {
+#if 0
     QMenu *toolsmenu = ToolsMenu( p_intf, menu, false, true );
     toolsmenu->setTitle( qtr( "Tools" ) );
     menu->addMenu( toolsmenu );
+#endif
 
     QMenu *openmenu = new QMenu( qtr( "Open" ), menu );
     openmenu->addAction( qtr( "Open &File..." ), THEDP,
@@ -670,9 +672,11 @@ void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
     menu->addMenu( openmenu );
 
     menu->addSeparator();
+#if 0
     QMenu *helpmenu = HelpMenu( menu );
     helpmenu->setTitle( qtr( "Help" ) );
     menu->addMenu( helpmenu );
+#endif
 
     addDPStaticEntry( menu, qtr( "Quit" ), "", "", SLOT( quit() ) , "Ctrl+Q" );
 }
@@ -748,43 +752,57 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 {
     if( show )
     {
-        // create a  popup if there is none
-        if( ! p_intf->p_sys->p_popup_menu )
+        /* Delete and recreate a popup if there is one */
+        if( p_intf->p_sys->p_popup_menu )
+            delete p_intf->p_sys->p_popup_menu;
+
+        QMenu *menu = new QMenu();
+        QMenu *submenu;
+        QAction *action;
+
+        POPUP_BOILERPLATE;
+
+        PopupMenuControlEntries( menu, p_intf, p_input );
+        menu->addSeparator();
+
+        if( p_input )
         {
-            POPUP_BOILERPLATE;
-            if( p_input )
-            {
-                vlc_object_yield( p_input );
-                InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
+            vlc_object_yield( p_input );
+            InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
 
-                /* Audio menu */
-                PUSH_SEPARATOR;
-                vlc_object_t *p_aout = ( vlc_object_t * )
-                    vlc_object_find( p_input, VLC_OBJECT_AOUT, FIND_ANYWHERE );
-                AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
-                if( p_aout )
-                    vlc_object_release( p_aout );
+            /* Audio menu */
+            vlc_object_t *p_aout = ( vlc_object_t * )
+                vlc_object_find( p_input, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+            AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
+            if( p_aout )
+                vlc_object_release( p_aout );
+            submenu = Populate( p_intf, NULL, varnames, objects );
+            varnames.clear(); objects.clear();
+            action = menu->addMenu( submenu );
+            action->setText( qtr( "Audio" ) );
+            if( submenu->isEmpty() )
+                action->setEnabled( false );
 
-                /* Video menu */
-                PUSH_SEPARATOR;
-                vlc_object_t *p_vout = ( vlc_object_t * )
-                    vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
-                VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
-                if( p_vout )
-                    vlc_object_release( p_vout );
+            /* Video menu */
+            vlc_object_t *p_vout = ( vlc_object_t * )
+                vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+            VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
+            if( p_vout )
+                vlc_object_release( p_vout );
+            submenu = Populate( p_intf, NULL, varnames, objects );
+            varnames.clear(); objects.clear();
+            action = menu->addMenu( submenu );
+            action->setText( qtr( "Video" ) );
+            if( submenu->isEmpty() )
+                action->setEnabled( false );
 
-                vlc_object_release( p_input );
-            }
-
-            QMenu *menu = new QMenu();
-            Populate( p_intf, menu, varnames, objects );
-            menu->addSeparator();
-            PopupMenuControlEntries( menu, p_intf, p_input );
-            menu->addSeparator();
-            PopupMenuStaticEntries( p_intf, menu );
-
-            p_intf->p_sys->p_popup_menu = menu;
+            vlc_object_release( p_input );
         }
+
+        menu->addSeparator();
+        PopupMenuStaticEntries( p_intf, menu );
+
+        p_intf->p_sys->p_popup_menu = menu;
         p_intf->p_sys->p_popup_menu->popup( QCursor::pos() );
     }
     else
