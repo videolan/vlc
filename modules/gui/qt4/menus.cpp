@@ -62,7 +62,7 @@ void addDPStaticEntry( QMenu *menu,
                        const char *help,
                        const char *icon,
                        const char *member,
-                       const char *shortcut )
+                       const char *shortcut = NULL )
 {
     QAction *action = NULL;
     if( !EMPTY_STR( icon ) > 0 )
@@ -662,14 +662,16 @@ void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
 #endif
 
     QMenu *openmenu = new QMenu( qtr( "Open" ), menu );
-    openmenu->addAction( qtr( "Open &File..." ), THEDP,
-                         SLOT( openFileDialog() ) );
-    openmenu->addAction( qtr( "Open &Disc..." ), THEDP,
-                         SLOT( openDiscDialog() ) );
-    openmenu->addAction( qtr( "Open &Network..." ), THEDP,
-                         SLOT( openNetDialog() ) );
-    openmenu->addAction( qtr( "Open &Capture Device..." ), THEDP,
-                         SLOT( openCaptureDialog() ) );
+    addDPStaticEntry( openmenu, qtr( "&Open File..." ), "",
+        ":/pixmaps/file-asym_16px.png", SLOT( openFileDialog() ) );
+    addDPStaticEntry( openmenu, qtr( I_OPEN_FOLDER ), "",
+        ":/pixmaps/folder-grey_16px.png", SLOT( PLAppendDir() ) );
+    addDPStaticEntry( openmenu, qtr( "Open &Disc..." ), "",
+        ":/pixmaps/disc_16px.png", SLOT( openDiscDialog() ) );
+    addDPStaticEntry( openmenu, qtr( "Open &Network..." ), "",
+        ":/pixmaps/network_16px.png", SLOT( openNetDialog() ) );
+    addDPStaticEntry( openmenu, qtr( "Open &Capture Device..." ), "",
+        ":/pixmaps/capture-card_16px.png", SLOT( openCaptureDialog() ) );
     menu->addMenu( openmenu );
 
     menu->addSeparator();
@@ -679,7 +681,8 @@ void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
     menu->addMenu( helpmenu );
 #endif
 
-    addDPStaticEntry( menu, qtr( "Quit" ), "", "", SLOT( quit() ) , "Ctrl+Q" );
+    addDPStaticEntry( menu, qtr( "Quit" ), "", ":/pixmaps/menus_quit_16px.png",
+                      SLOT( quit() ), "Ctrl+Q" );
 }
 
 /* Video Tracks and Subtitles tracks */
@@ -784,7 +787,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 vlc_value_t val;
                 var_Get( p_vout, "fullscreen", &val );
                 val.b_bool = !val.b_bool;
-                CreateAndConnect( menu, "fullscreen", qtr( "Toggle fullscreen" ), "",
+                CreateAndConnect( menu, "fullscreen", qtr( "Fullscreen" ), "",
                      ITEM_CHECK, p_vout->i_object_id, val, VLC_VAR_BOOL,
                      !val.b_bool );
                 b_fullscreen = !val.b_bool;
@@ -823,6 +826,18 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             submenu = new QMenu( qtr( "Interface" ), menu );
             submenu->addAction( QIcon( ":/pixmaps/playlist_16px.png" ),
                  qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
+            addDPStaticEntry( submenu, qtr( I_MENU_EXT ), "",
+                 ":/pixmaps/menus_settings_16px.png", SLOT( extendedDialog() ) );
+            action = submenu->addAction( QIcon( "" ),
+                 qtr( "Minimal View..." ), mi, SLOT( toggleMinimalView() ) );
+            action->setCheckable( true );
+            action->setChecked( !( mi->getControlsVisibilityStatus() &
+                                   CONTROLS_VISIBLE ) );
+            action = submenu->addAction( QIcon( "" ),
+                 qtr( "Toggle Fullscreen Interface" ),
+                 mi, SLOT( toggleFullScreen() ) );
+            action->setCheckable( true );
+            action->setChecked( mi->isFullScreen() );
             menu->addMenu( submenu );
         }
 
