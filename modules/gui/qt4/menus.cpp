@@ -479,9 +479,8 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
         action = current->addMenu( submenu );
         action->setData( "spu-es" );
-        action =  submenu->addAction( qfu( "Load File..." ), THEDP,
-                                      SLOT( loadSubtitlesFile() ) );
-        action->setData( "_static_" );
+        addDPStaticEntry( submenu, qtr( "Load File..." ), "", "",
+                          SLOT( loadSubtitlesFile() ) );
 
         ACT_ADD( current, "fullscreen", qtr( "Toggle &Fullscreen" ) );
         ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
@@ -607,8 +606,6 @@ QMenu *QVLCMenu::HelpMenu( QMenu *current )
         "Ctrl+F1" );
     return menu;
 }
-
-#undef ACT_ADD
 
 /*****************************************************************************
  * Popup menus - Right Click menus                                           *
@@ -805,10 +802,18 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 action->setEnabled( false );
 
             /* Video menu */
+            submenu = new QMenu();
+            ACT_ADD( submenu, "video-es", qtr( "Video Track" ) );
+            QMenu *subsubmenu = new QMenu( qtr( "&Subtitles Track" ), submenu );
+            addDPStaticEntry( subsubmenu, qtr( "Load File..." ), "", "",
+                              SLOT( loadSubtitlesFile() ) );
+            action = submenu->addMenu( subsubmenu );
+            action->setData( "spu-es" );
+
             VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
             if( p_vout )
                 vlc_object_release( p_vout );
-            submenu = Populate( p_intf, NULL, varnames, objects );
+            Populate( p_intf, submenu, varnames, objects );
             varnames.clear(); objects.clear();
             action = menu->addMenu( submenu );
             action->setText( qtr( "Video" ) );
@@ -853,6 +858,8 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         p_intf->p_sys->p_popup_menu = NULL;
     }
 }
+
+#undef ACT_ADD
 
 /************************************************************************
  * Systray Menu                                                         *
