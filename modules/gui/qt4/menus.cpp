@@ -63,20 +63,23 @@ void addDPStaticEntry( QMenu *menu,
                        const char *member,
                        const char *shortcut )
 {
+    QAction *action = NULL;
     if( !EMPTY_STR( icon ) > 0 )
     {
         if( !EMPTY_STR( shortcut ) > 0 )
-            menu->addAction( QIcon( icon ), text, THEDP, member, qtr( shortcut ) );
+            action = menu->addAction( QIcon( icon ), text, THEDP,
+                                      member, qtr( shortcut ) );
         else
-            menu->addAction( QIcon( icon ), text, THEDP, member );
+            action = menu->addAction( QIcon( icon ), text, THEDP, member );
     }
     else
     {
         if( !EMPTY_STR( shortcut ) > 0 )
-            menu->addAction( text, THEDP, member, qtr( shortcut ) );
+            action = menu->addAction( text, THEDP, member, qtr( shortcut ) );
         else
-            menu->addAction( text, THEDP, member );
+            action = menu->addAction( text, THEDP, member );
     }
+    action->setData( "_static_" );
 }
 
 void addMIMStaticEntry( intf_thread_t *p_intf,
@@ -94,6 +97,19 @@ void addMIMStaticEntry( intf_thread_t *p_intf,
     else
     {
         menu->addAction( text, THEMIM, member );
+    }
+}
+
+void EnableDPStaticEntries( QMenu *menu, bool enable = true )
+{
+    if( !menu )
+        return;
+
+    QAction *action;
+    Q_FOREACH( action, menu->actions() )
+    {
+        if( action->data().toString() == "_static_" )
+            action->setEnabled( enable );
     }
 }
 
@@ -476,6 +492,14 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     vector<int> objects;
     vector<const char *> varnames;
 
+    if( !menu )
+    {
+        menu = new QMenu();
+        addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ), "","",
+                          SLOT( gotoTimeDialog() ), "Ctrl+T" );
+        menu->addSeparator();
+    }
+
     p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_INPUT,
             FIND_ANYWHERE );
     InputAutoMenuBuilder(  p_object, objects, varnames );
@@ -483,13 +507,12 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     PUSH_VAR( "next-title" );
     PUSH_VAR( "prev-chapter" );
     PUSH_VAR( "next-chapter" );
+    EnableDPStaticEntries( menu, ( p_object != NULL ) );
     if( p_object )
+    {
         vlc_object_release( p_object );
-    QMenu *navMenu = new QMenu( menu );
-    addDPStaticEntry( navMenu, qtr( I_MENU_GOTOTIME ), "","",
-        SLOT( gotoTimeDialog() ), "Ctrl+T" );
-    navMenu->addSeparator();
-    return Populate( p_intf, navMenu, varnames, objects, true );
+    }
+    return Populate( p_intf, menu, varnames, objects, true );
 }
 
 /**
@@ -792,10 +815,12 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
     if( !menu )
         menu = new QMenu();
 
+    /* Disable all non static entries */
     QAction *p_action;
     Q_FOREACH( p_action, menu->actions() )
     {
-        p_action->setEnabled( false );
+        if( p_action->data().toString() != "_static_" )
+            p_action->setEnabled( false );
     }
 
     currentGroup = NULL;
