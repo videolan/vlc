@@ -881,6 +881,17 @@ static int Seek( access_t *p_access, int64_t i_pos )
 
     Disconnect( p_access );
 
+    if( p_access->info.i_size
+     && (uint64_t)i_pos >= (uint64_t)p_access->info.i_size ) {
+        msg_Err( p_access, "seek to far" );
+        int retval = Seek( p_access, p_access->info.i_size - 1 );
+        if( retval == VLC_SUCCESS ) {
+            uint8_t p_buffer[2];
+            Read( p_access, p_buffer, 1);
+            p_access->info.b_eof  = false;
+        }
+        return retval;
+    }
     if( Connect( p_access, i_pos ) )
     {
         msg_Err( p_access, "seek failed" );
