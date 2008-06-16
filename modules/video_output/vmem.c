@@ -145,6 +145,7 @@ static int Init( vout_thread_t *p_vout )
         if( strlen( psz_chroma ) < 4 )
         {
             msg_Err( p_vout, "vmem-chroma should be 4 characters long" );
+            free( psz_chroma );
             return VLC_EGENERIC;
         }
         i_chroma = VLC_FOURCC( psz_chroma[0], psz_chroma[1],
