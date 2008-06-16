@@ -113,6 +113,24 @@ void EnableDPStaticEntries( QMenu *menu, bool enable = true )
     }
 }
 
+/**
+ * \return Number of static entries
+ */
+int DeleteNonStaticEntries( QMenu *menu )
+{
+    int i_ret = 0;
+    QAction *action;
+    if( !menu )
+        return VLC_EGENERIC;
+    Q_FOREACH( action, menu->actions() )
+    {
+        if( action->data().toString() != "_static_" )
+            delete action;
+        else
+            i_ret++;
+    }
+}
+
 /*****************************************************************************
  * Definitions of variables for the dynamic menus
  *****************************************************************************/
@@ -460,8 +478,9 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
         action = current->addMenu( submenu );
         action->setData( "spu-es" );
-        submenu->addAction( qfu( "Load File..." ), THEDP,
-                            SLOT( loadSubtitlesFile() ) );
+        action =  submenu->addAction( qfu( "Load File..." ), THEDP,
+                                      SLOT( loadSubtitlesFile() ) );
+        action->setData( "_static_" );
 
         ACT_ADD( current, "fullscreen", qtr( "&Fullscreen" ) );
         ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
@@ -503,9 +522,19 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     if( !menu )
     {
         menu = new QMenu();
+    }
+
+    if( menu->isEmpty() )
+    {
         addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ), "","",
                           SLOT( gotoTimeDialog() ), "Ctrl+T" );
         menu->addSeparator();
+
+        ACT_ADD( menu, "bookmark", qtr( "&Bookmarks" ) );
+        ACT_ADD( menu, "title", qtr( "&Title" ) );
+        ACT_ADD( menu, "chapter", qtr( "&Chapter" ) );
+        ACT_ADD( menu, "program", qtr( "&Program" ) );
+        ACT_ADD( menu, "navigation", qtr( "&Navigation" ) );
     }
 
     p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_INPUT,
@@ -858,15 +887,6 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
             }
         }
 
-        /* Some specific stuff */
-        if( p_object && !strcmp( varnames[i], "spu-es" ) )
-        {
-            vlc_object_t *p_vout = ( vlc_object_t* )( vlc_object_find( p_object,
-                                        VLC_OBJECT_VOUT, FIND_ANYWHERE ) );
-            if( !p_vout )
-                continue;
-        }
-
         /* Ugly specific stuff */
         if( strstr( varnames[i], "intf-add" ) )
             UpdateItem( p_intf, menu, varnames[i], p_object, false );
@@ -934,11 +954,12 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     vlc_value_t val, text;
     int i_type;
 
+    QAction *action = FindActionWithVar( menu, psz_var );
+    if( action )
+        DeleteNonStaticEntries( action->menu() );
+
     if( !p_object )
-    {
-        /* Nothing to do */
         return;
-    }
 
     /* Check the type of the object variable */
     if( !strcmp( psz_var, "audio-es" )
@@ -972,12 +993,22 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         text.psz_string = NULL;
     }
 
-    QAction *action = FindActionWithVar( menu, psz_var );
     if( !action )
     {
         action = new QAction( TEXT_OR_VAR, menu );
         menu->addAction( action );
         action->setData( psz_var );
+    }
+
+    /* Some specific stuff */
+    bool forceDisabled = false;
+    if( !strcmp( psz_var, "spu-es" ) )
+    {
+        vlc_object_t *p_vout = ( vlc_object_t* )( vlc_object_find( p_intf,
+                                    VLC_OBJECT_VOUT, FIND_ANYWHERE ) );
+        forceDisabled = ( p_vout == NULL );
+        if( p_vout )
+            vlc_object_release( p_vout );
     }
 
     if( i_type & VLC_VAR_HASCHOICE )
@@ -994,7 +1025,9 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
             }
 
             action->setEnabled(
-                   CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0 );
+               CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0 );
+            if( forceDisabled )
+                action->setEnabled( false );
         }
         else
             CreateChoicesMenu( menu, psz_var, p_object, true );
