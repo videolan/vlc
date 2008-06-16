@@ -1217,11 +1217,8 @@ static int Demux( demux_t *p_demux )
                 return 0;
             }
         }
-        else if( p_sys->i_no_data_ti > 34 )
-        {
-            msg_Err( p_demux, "no data received in 10s, aborting" );
-            return 0;
-        }
+        msg_Err( p_demux, "no data received in 10s, aborting" );
+        return 0;
     }
     else if( !p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 34 )
     {
