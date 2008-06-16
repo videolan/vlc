@@ -311,6 +311,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     {
         QMenu *intfmenu = InterfacesMenu( p_intf, menu );
         intfmenu->setTitle( qtr( "Add Interfaces" ) );
+        MenuFunc *f = new MenuFunc( intfmenu, 4 );
+        CONNECT( intfmenu, aboutToShow(), THEDP->menusUpdateMapper, map() );
+        THEDP->menusUpdateMapper->setMapping( intfmenu, f );
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
@@ -377,8 +380,6 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     QMenu *submenu = new QMenu( current );
     QMenu *menu = Populate( p_intf, submenu, varnames, objects );
 
-    CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
-    THEDP->menusUpdateMapper->setMapping( menu, 4 );
     return menu;
 }
 
