@@ -106,7 +106,7 @@ void EnableDPStaticEntries( QMenu *menu, bool enable = true )
         return;
 
     QAction *action;
-    Q_FOREACH( action, menu->actions() )
+    foreach( action, menu->actions() )
     {
         if( action->data().toString() == "_static_" )
             action->setEnabled( enable );
@@ -122,7 +122,7 @@ int DeleteNonStaticEntries( QMenu *menu )
     QAction *action;
     if( !menu )
         return VLC_EGENERIC;
-    Q_FOREACH( action, menu->actions() )
+    foreach( action, menu->actions() )
     {
         if( action->data().toString() != "_static_" )
             delete action;
@@ -204,7 +204,7 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
 static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 {
     QAction *action;
-    Q_FOREACH( action, menu->actions() )
+    foreach( action, menu->actions() )
     {
         if( action->data().toString() == psz_var )
             return action;
@@ -215,7 +215,7 @@ static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 static QAction * FindActionWithText( QMenu *menu, QString &text )
 {
     QAction *action;
-    Q_FOREACH( action, menu->actions() )
+    foreach( action, menu->actions() )
     {
         if( action->text() == text )
             return action;
@@ -854,7 +854,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
 
     /* Disable all non static entries */
     QAction *p_action;
-    Q_FOREACH( p_action, menu->actions() )
+    foreach( p_action, menu->actions() )
     {
         if( p_action->data().toString() != "_static_" )
             p_action->setEnabled( false );
