@@ -36,6 +36,7 @@
 #include "main_interface.hpp"
 #include "menus.hpp"
 #include <vlc_intf_strings.h>
+#include "input_manager.hpp"
 
 /* The dialogs */
 #include "dialogs/playlist.hpp"
@@ -532,19 +533,15 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
 
 void DialogsProvider::loadSubtitlesFile()
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
-    if( !p_playlist || !p_playlist->p_input )
-    {
-        msg_Err( p_intf, "cannot get input" );
+    input_thread_t *p_input = THEMIM->getInput();
+    if( !p_input )
         return;
-    }
     QString qsFile = QFileDialog::getOpenFileName(
              NULL,
              qtr( "Choose subtitles file" ),
              "",
              qtr( "Subtitles files (*.cdg *.idx *.srt *.sub *.utf);;"
                   "All files (*)" ) );
-    if( !input_AddSubtitles( p_playlist->p_input, qtu( qsFile ), true ) )
+    if( !input_AddSubtitles( p_input, qtu( qsFile ), true ) )
         msg_Warn( p_intf, "unable to load subtitles file..." );
-    pl_Release( p_playlist );
 }
