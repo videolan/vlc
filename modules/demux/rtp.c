@@ -174,6 +174,7 @@ static int Open (vlc_object_t *obj)
         dport = extract_port (&dhost);
     if (dport == 0)
         dport = 5004; /* avt-profile-1 port */
+    dport = (dport + 1) & ~1; /* RTP is on the "next" even port */
 
     /* Try to connect */
     int fd = -1;
