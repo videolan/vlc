@@ -258,7 +258,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_intf_embedded_ckb setTitle: _NS("Add controls to the video window")];
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_lang_txt setStringValue: _NS("Language")];
-    [o_intf_meta_ckb setTitle: _NS("Fetch the metadata from the Internet")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
     
     /* Subtitles and OSD */
@@ -365,7 +364,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     SetupStringList( o_intf_lang_pop, "language" );
     SetupIntList( o_intf_art_pop, "album-art" );
 
-    [o_intf_meta_ckb setState: config_GetInt( p_intf, "fetch-meta" )];
     [o_intf_fspanel_ckb setState: config_GetInt( p_intf, "macosx-fspanel" )];
     [o_intf_embedded_ckb setState: config_GetInt( p_intf, "embedded-video" )];
 
@@ -684,13 +682,12 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         SaveStringList( o_intf_lang_pop, "language" );
         SaveIntList( o_intf_art_pop, "album-art" );
 
-        config_PutInt( p_intf, "fetch-meta", [o_intf_meta_ckb state] );
         config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
         config_PutInt( p_intf, "embedded-video", [o_intf_embedded_ckb state] );
 
         /* okay, let's save our changes to vlcrc */
         i = config_SaveConfigFile( p_intf, "main" );
-        i = config_SaveConfigFile( p_intf, "macosx" );
+        i = i + config_SaveConfigFile( p_intf, "macosx" );
 
         if( i != 0 )
         {

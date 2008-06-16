@@ -93,7 +93,6 @@
     IBOutlet id o_intf_fspanel_ckb;
     IBOutlet id o_intf_lang_pop;
     IBOutlet id o_intf_lang_txt;
-    IBOutlet id o_intf_meta_ckb;
     IBOutlet id o_intf_network_box;
     IBOutlet id o_intf_view;
 
