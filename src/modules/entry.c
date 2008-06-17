@@ -220,7 +220,7 @@ module_config_t *vlc_config_create (module_t *module, int type)
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
     tab[confsize].i_type = type;
-    tab[confsize].p_lock = &module->object_lock;
+    tab[confsize].p_lock = &(vlc_internals(module)->lock);
 
     if (type & CONFIG_ITEM)
     {

@@ -513,10 +513,6 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
     char *psz_header;                                                       \
     int  i_flags;                                                           \
                                                                             \
-    /* Object access lock */                                                \
-    vlc_mutex_t  object_lock;                                               \
-    vlc_cond_t   object_wait;                                               \
-                                                                            \
     /* Object properties */                                                 \
     volatile bool b_error;                  /**< set by the object */ \
     volatile bool b_die;                   /**< set by the outside */ \

@@ -225,7 +225,7 @@ static void input_selected_stream_changed( const vlc_event_t * event, void * dat
 /* Internals */
 void playlist_release_current_input( playlist_t * p_playlist )
 {
-    vlc_assert_locked( &p_playlist->object_lock );
+    vlc_assert_locked( &(vlc_internals(p_playlist)->lock) );
 
     if( !p_playlist->p_input ) return;
 
@@ -248,7 +248,7 @@ void playlist_release_current_input( playlist_t * p_playlist )
 void playlist_set_current_input(
     playlist_t * p_playlist, input_thread_t * p_input )
 {
-    vlc_assert_locked( &p_playlist->object_lock );
+    vlc_assert_locked( &(vlc_internals(p_playlist)->lock) );
 
     playlist_release_current_input( p_playlist );
 

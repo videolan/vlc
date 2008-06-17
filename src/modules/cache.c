@@ -379,7 +379,7 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
 
         p_module->p_config[i].b_dirty = false;
 
-        p_module->p_config[i].p_lock = &p_module->object_lock;
+        p_module->p_config[i].p_lock = &(vlc_internals(p_module)->lock);
 
         if( p_module->p_config[i].i_list )
         {

@@ -176,8 +176,8 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_new->p_private = NULL;
 
     /* Initialize mutexes and condvars */
-    vlc_mutex_init( &p_new->object_lock );
-    vlc_cond_init( p_new, &p_new->object_wait );
+    vlc_mutex_init( &p_priv->lock );
+    vlc_cond_init( p_new, &p_priv->wait );
     vlc_mutex_init( &p_priv->var_lock );
     vlc_spin_init( &p_priv->spin );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
@@ -387,8 +387,8 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 #endif
 
     vlc_spin_destroy( &p_priv->ref_spin );
-    vlc_mutex_destroy( &p_this->object_lock );
-    vlc_cond_destroy( &p_this->object_wait );
+    vlc_mutex_destroy( &p_priv->lock );
+    vlc_cond_destroy( &p_priv->wait );
     vlc_spin_destroy( &p_priv->spin );
     if( p_priv->pipes[1] != -1 )
         close( p_priv->pipes[1] );
@@ -403,13 +403,13 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
 void __vlc_object_lock( vlc_object_t *obj )
 {
-    vlc_mutex_lock( &obj->object_lock );
+    vlc_mutex_lock( &(vlc_internals(obj)->lock) );
 }
 
 void __vlc_object_unlock( vlc_object_t *obj )
 {
-    vlc_assert_locked( &obj->object_lock );
-    vlc_mutex_unlock( &obj->object_lock );
+    vlc_assert_locked( &(vlc_internals(obj)->lock) );
+    vlc_mutex_unlock( &(vlc_internals(obj)->lock) );
 }
 
 #ifdef WIN32
@@ -540,8 +540,9 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
  */
 void __vlc_object_wait( vlc_object_t *obj )
 {
-    vlc_assert_locked( &obj->object_lock );
-    vlc_cond_wait( &obj->object_wait, &obj->object_lock );
+    vlc_object_internals_t *priv = vlc_internals( obj );
+    vlc_assert_locked( &priv->lock);
+    vlc_cond_wait( &priv->wait, &priv->lock );
 }
 
 
@@ -554,8 +555,9 @@ void __vlc_object_wait( vlc_object_t *obj )
  */
 int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
 {
-    vlc_assert_locked( &obj->object_lock );
-    return vlc_cond_timedwait( &obj->object_wait, &obj->object_lock, deadline );
+    vlc_object_internals_t *priv = vlc_internals( obj );
+    vlc_assert_locked( &priv->lock);
+    return vlc_cond_timedwait( &priv->wait, &priv->lock, deadline );
 }
 
 
@@ -583,7 +585,7 @@ int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
  */
 bool __vlc_object_alive( vlc_object_t *obj )
 {
-    vlc_assert_locked( &obj->object_lock );
+    vlc_assert_locked( &(vlc_internals(obj)->lock) );
     return !obj->b_die;
 }
 
@@ -597,8 +599,8 @@ bool __vlc_object_alive( vlc_object_t *obj )
  */
 void __vlc_object_signal_unlocked( vlc_object_t *obj )
 {
-    vlc_assert_locked (&obj->object_lock);
-    vlc_cond_signal( &obj->object_wait );
+    vlc_assert_locked (&(vlc_internals(obj)->lock));
+    vlc_cond_signal( &(vlc_internals(obj)->wait) );
 }
 
 
