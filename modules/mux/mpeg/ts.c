@@ -2528,7 +2528,8 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                     bits_write( &bits, 8, 0x21 );   /* Visual 14496-2 */
                     bits_write( &bits, 6, 0x04 );   /* VisualStream */
                 }
-                else if( p_stream->i_stream_type == 0x11  || p_stream->i_stream_type == 0x0f )
+                else if( p_stream->i_stream_type == 0x11 ||
+                         p_stream->i_stream_type == 0x0f )
                 {
                     bits_write( &bits, 8, 0x40 );   /* Audio 14496-3 */
                     bits_write( &bits, 6, 0x05 );   /* AudioStream */
