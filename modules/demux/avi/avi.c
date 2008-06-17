@@ -661,9 +661,13 @@ aviindex:
                           (mtime_t)1000000 )
     {
         msg_Warn( p_demux, "broken or missing index, 'seek' will be "
-                           "axproximative or will have strange behaviour" );
+                           "approximative or will exhibit strange behavior" );
         if( i_do_index == 0 && !b_index )
         {
+            if( !p_sys->b_seekable ) {
+                b_index = true;
+                goto aviindex;
+            }
             int i_create;
             i_create = intf_UserYesNo( p_demux, _("AVI Index") ,
                         _( "This AVI file is broken. Seeking will not "
