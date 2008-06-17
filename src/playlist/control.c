@@ -180,7 +180,7 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
                  p_playlist->p_preparse->i_waiting,
                  p_playlist->p_preparse->i_waiting,
                  p_item );
-    vlc_cond_signal( &p_playlist->p_preparse->object_wait );
+    vlc_object_signal_unlocked( p_playlist->p_preparse );
     vlc_object_unlock( p_playlist->p_preparse );
     return VLC_SUCCESS;
 }

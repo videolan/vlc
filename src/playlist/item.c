@@ -596,7 +596,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
                              p_playlist->p_root_onelevel, false );
         }
         p_playlist->b_reset_currently_playing = true;
-        vlc_cond_signal( &p_playlist->object_wait );
+        vlc_object_signal_unlocked( p_playlist );
         var_SetInteger( p_playlist, "item-change", p_item_in_category->
                                                         p_input->i_id );
         if( !b_locked ) PL_UNLOCK;
