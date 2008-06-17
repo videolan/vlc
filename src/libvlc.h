@@ -142,6 +142,16 @@ extern void *
 vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
                    const char *psz_type);
 
+/* Signal an object without checking for locking consistency. This is wrong. */
+#ifdef __GNUC__
+__attribute__((deprecated))
+#endif
+static inline void
+vlc_object_signal_maybe (vlc_object_t *p_this)
+{
+    vlc_cond_signal (&p_this->object_wait);
+}
+
 /**
  * libvlc_global_data_t (global variable)
  *

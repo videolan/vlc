@@ -167,6 +167,6 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
 {
     p_playlist->b_reset_currently_playing = true;
     playlist_LiveSearchUpdateInternal( p_playlist, p_root, psz_string );
-    vlc_cond_signal( &p_playlist->object_wait );
+    vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
     return VLC_SUCCESS;
 }

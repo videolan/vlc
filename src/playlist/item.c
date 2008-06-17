@@ -724,7 +724,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     else
         i_ret = TreeMove( p_playlist, p_item, p_node, i_newpos );
     p_playlist->b_reset_currently_playing = true;
-    vlc_cond_signal( &p_playlist->object_wait );
+    vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
     return i_ret;
 }
 
@@ -750,7 +750,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     val.p_address = p_add;
     p_playlist->b_reset_currently_playing = true;
     if( b_signal )
-        vlc_cond_signal( &p_playlist->object_wait );
+        vlc_object_signal_maybe( p_playlist );
     var_Set( p_playlist, "item-append", val );
     free( p_add );
 }
@@ -808,7 +808,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         if( p_playlist->p_input )
             input_StopThread( p_playlist->p_input );
         p_playlist->request.i_status = PLAYLIST_RUNNING;
-        vlc_cond_signal( &p_playlist->object_wait );
+        vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
     }
     /* Preparse if PREPARSE or SPREPARSE & not enough meta */
     char *psz_artist = input_item_GetArtist( p_item_cat->p_input );
@@ -890,7 +890,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
             p_playlist->request.b_request = true;
             p_playlist->request.p_item = NULL;
             msg_Info( p_playlist, "stopping playback" );
-            vlc_cond_signal( &p_playlist->object_wait );
+            vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
         }
         b_delay_deletion = true;
     }
