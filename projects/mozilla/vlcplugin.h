@@ -66,6 +66,18 @@
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
+typedef enum vlc_toolbar_clicked_e {
+    clicked_Unknown = 0,
+    clicked_Play,
+    clicked_Pause,
+    clicked_Stop,
+    clicked_timeline,
+    clicked_Time,
+    clicked_Fullscreen,
+    clicked_Mute,
+    clicked_Unmute
+} vlc_toolbar_clicked_t;
+
 class VlcPlugin
 {
 public:
@@ -115,6 +127,7 @@ public:
                             { *width = i_tb_width; *height = i_tb_height; };
     int                 setToolbarSize(unsigned int width, unsigned int height)
                             { i_tb_width = width; i_tb_height = height; return 1; };
+    vlc_toolbar_clicked_t getToolbarButtonClicked( int i_xpos, int i_ypos );
 #endif
 
     uint16    i_npmode; /* either NP_EMBED or NP_FULL */

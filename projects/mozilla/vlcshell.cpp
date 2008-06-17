@@ -842,74 +842,90 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
                 libvlc_playlist_get_media_player(p_plugin->getVLC(), &ex);
         libvlc_exception_clear( &ex );
 
-        /* jump in the movie */
-        if( i_yPos <= (i_height-30) )
+        vlc_toolbar_clicked_t clicked;
+        clicked = p_plugin->getToolbarButtonClicked( i_xPos, i_yPos );
+
+        switch( clicked )
         {
-            /* if a movie is loaded */
-            if( p_md )
+            case clicked_Play:
+            case clicked_Pause:
             {
-                int64_t f_length;
+                int i_playing;
                 libvlc_exception_init( &ex );
-                f_length = libvlc_media_player_get_length( p_md, &ex ) / 100;
+                i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
                 libvlc_exception_clear( &ex );
 
-                f_length = (float)f_length *
-                           ( ((float)i_xPos-4 ) / ( ((float)i_width-8)/100) );
-
                 libvlc_exception_init( &ex );
-                libvlc_media_player_set_time( p_md, f_length, &ex );
+                if( i_playing == 1 )
+                    libvlc_playlist_pause( p_plugin->getVLC(), &ex );
+                else
+                    libvlc_playlist_play( p_plugin->getVLC(), -1, 0, NULL, &ex );
                 libvlc_exception_clear( &ex );
             }
-        }
+            break;
 
-        /* play/pause toggle */
-        if( (i_yPos > (i_height-30)) && (i_xPos > 4) && (i_xPos <= 39) )
-        {
-            int i_playing;
-            libvlc_exception_init( &ex );
-            i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
-            libvlc_exception_clear( &ex );
-
-            libvlc_exception_init( &ex );
-            if( i_playing == 1 )
-                libvlc_playlist_pause( p_plugin->getVLC(), &ex );
-            else
-                libvlc_playlist_play( p_plugin->getVLC(), -1, 0, NULL, &ex );
-            libvlc_exception_clear( &ex );
-        }
-
-        /* stop */
-        if( (i_yPos > (i_height-30)) && (i_xPos > 39) && (i_xPos < 67) )
-        {
-            libvlc_exception_init( &ex );
-            libvlc_playlist_stop( p_plugin->getVLC(), &ex );
-            libvlc_exception_clear( &ex );
-        }
-
-        /* fullscreen */
-        if( (i_yPos > (i_height-30)) && (i_xPos >= 67) && (i_xPos < 94) )
-        {
-            int i_playing;
-            libvlc_exception_init( &ex );
-            i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
-            libvlc_exception_clear( &ex );
-
-            if( (i_playing == 1) && p_md )
+            case clicked_Stop:
             {
                 libvlc_exception_init( &ex );
-                libvlc_set_fullscreen( p_md, 1, &ex );
+                libvlc_playlist_stop( p_plugin->getVLC(), &ex );
                 libvlc_exception_clear( &ex );
             }
-        }
+            break;
 
-        /* mute toggle */
-        if( (i_yPos > (i_height-30)) && (i_xPos >= 94) && (i_xPos < 109))
-        {
-            libvlc_exception_init( &ex );
-            libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
-            libvlc_exception_clear( &ex );
-        }
+            case clicked_timeline:
+            {
+                /* if a movie is loaded */
+                if( p_md )
+                {
+                    int64_t f_length;
+                    libvlc_exception_init( &ex );
+                    f_length = libvlc_media_player_get_length( p_md, &ex ) / 100;
+                    libvlc_exception_clear( &ex );
 
+                    f_length = (float)f_length *
+                            ( ((float)i_xPos-4.0 ) / ( ((float)i_width-8.0)/100) );
+
+                    libvlc_exception_init( &ex );
+                    libvlc_media_player_set_time( p_md, f_length, &ex );
+                    libvlc_exception_clear( &ex );
+                }
+            }
+            break;
+
+            case clicked_Time:
+            {
+                /* Not implemented yet*/
+            }
+            break;
+
+            case clicked_Fullscreen:
+            {
+                int i_playing;
+                libvlc_exception_init( &ex );
+                i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
+                libvlc_exception_clear( &ex );
+
+                if( (i_playing == 1) && p_md )
+                {
+                    libvlc_exception_init( &ex );
+                    libvlc_set_fullscreen( p_md, 1, &ex );
+                    libvlc_exception_clear( &ex );
+                }
+            }
+            break;
+
+            case clicked_Mute:
+            case clicked_Unmute:
+            {
+                libvlc_exception_init( &ex );
+                libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
+                libvlc_exception_clear( &ex );
+            }
+            break;
+
+            default: /* button_Unknown */
+            break;
+        }
         if( p_md ) libvlc_media_player_release( p_md );
     }
     Redraw( w, closure, event );

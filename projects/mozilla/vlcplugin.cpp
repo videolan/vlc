@@ -672,4 +672,82 @@ void VlcPlugin::redrawToolbar()
 
     XFreeGC( p_display, gc );
 }
+
+vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos )
+{
+    unsigned int i_dest = 0;
+    int i_playing = 0;
+    bool b_mute = false;
+    libvlc_exception_t ex;
+
+    if( i_xpos >= i_tb_height )
+        return clicked_Unknown;
+
+    /* Note: the order of testing is dependend on the original
+     * drawing positions of the icon buttons. Buttons are tested
+     * left to right.
+     */
+
+    /* get isplaying */
+    libvlc_exception_init( &ex );
+    i_playing = libvlc_playlist_isplaying( getVLC(), &ex );
+    libvlc_exception_clear( &ex );
+
+    /* get mute info */
+    libvlc_exception_init(&ex);
+    b_mute = libvlc_audio_get_mute( getVLC(), &ex );
+    libvlc_exception_clear( &ex );
+
+
+    /* is Pause of Play button clicked */
+    if( (i_playing != 1) &&
+        (i_ypos >= BTN_SPACE>>1) &&
+        (i_ypos <= p_btnPlay->width + (BTN_SPACE>>1)) )
+        return clicked_Play;
+    else if( (i_ypos >= BTN_SPACE>>1)  &&
+             (i_ypos <= p_btnPause->width) )
+        return clicked_Pause;
+
+    /* is Stop button clicked */
+    if( i_playing != 1 )
+        i_dest += BTN_SPACE + p_btnPause->width + (BTN_SPACE>>1);
+    else
+        i_dest += BTN_SPACE + p_btnPlay->width + (BTN_SPACE>>1);
+    if( (i_ypos >= i_dest) &&
+        (i_ypos <= p_btnStop->width + (BTN_SPACE>>1)) )
+        return clicked_Stop;
+
+    /* is Fullscreen button clicked */
+    i_dest += (p_btnStop->width + (BTN_SPACE>>1));
+    if( (i_ypos >= i_dest) &&
+        (i_ypos <= p_btnFullscreen->width + (BTN_SPACE>>1)) )
+        return clicked_Fullscreen;
+
+    /* is Mute or Unmute button clicked */
+    i_dest += (p_btnFullscreen->width + (BTN_SPACE>>1));
+    if( !b_mute && (i_ypos >= i_dest) &&
+        (i_ypos <= p_btnMute->width + (BTN_SPACE>>1)) )
+        return clicked_Mute;
+    else if( (i_ypos >= i_dest) &&
+             (i_ypos <= p_btnUnmute->width + (BTN_SPACE>>1)) )
+        return clicked_Unmute;
+
+    /* is timeline clicked */
+    if( !b_mute )
+        i_dest += (p_btnMute->width + (BTN_SPACE>>1));
+    else
+        i_dest += (p_btnUnmute->width + (BTN_SPACE>>1));
+    if( (i_ypos >= i_dest) &&
+        (i_ypos <= p_timeline->width + (BTN_SPACE>>1)) )
+        return clicked_timeline;
+
+    /* is time button clicked */
+    i_dest += (p_timeline->width + (BTN_SPACE>>1));
+    if( (i_ypos >= i_dest) &&
+        (i_ypos <= p_btnTime->width + (BTN_SPACE>>1)) )
+        return clicked_Time;
+
+    return clicked_Unknown;
+}
+#undef BTN_SPACE
 #endif
