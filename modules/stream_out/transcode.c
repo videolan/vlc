@@ -1127,9 +1127,10 @@ static int audio_BitsPerSample( vlc_fourcc_t i_format )
     return 0;
 }
 
-static block_t *transcode_audio_alloc( filter_t *filter, int size )
+static block_t *transcode_audio_alloc( filter_t *p_filter, int size )
 {
-    return block_New( filter, size );
+    VLC_UNUSED( p_filter );
+    return block_Alloc( size );
 }
 
 static int transcode_audio_filter_allocation_init( filter_t *p_filter,
@@ -1998,7 +1999,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
         if( p_subpic )
         {
             int i_scale_width, i_scale_height;
-            video_format_t *p_fmt;
+            video_format_t fmt;
 
             i_scale_width = id->p_encoder->fmt_in.video.i_width * 1000 /
                 id->p_decoder->fmt_out.video.i_width;
@@ -2017,14 +2018,13 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 }
             }
 
-            *p_fmt = filter_chain_GetFmtOut( id->p_f_chain )->video;
+            fmt = filter_chain_GetFmtOut( id->p_f_chain )->video;
 
             /* FIXME (shouldn't have to be done here) */
-            p_fmt->i_sar_num = p_fmt->i_aspect *
-                p_fmt->i_height / p_fmt->i_width;
-            p_fmt->i_sar_den = VOUT_ASPECT_FACTOR;
+            fmt.i_sar_num = fmt.i_aspect * fmt.i_height / fmt.i_width;
+            fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 
-            spu_RenderSubpictures( p_sys->p_spu, p_fmt, p_pic, p_pic, p_subpic,
+            spu_RenderSubpictures( p_sys->p_spu, &fmt, p_pic, p_pic, p_subpic,
                                    i_scale_width, i_scale_height );
         }
 
