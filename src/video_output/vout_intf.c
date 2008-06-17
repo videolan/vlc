@@ -158,17 +158,17 @@ void vout_ReleaseWindow( vout_thread_t *p_vout, void *p_window )
 
     if( !p_intf ) return;
 
-    vlc_mutex_lock( &p_intf->object_lock );
+    vlc_object_lock( p_intf );
     if( p_intf->b_dead )
     {
-        vlc_mutex_unlock( &p_intf->object_lock );
+        vlc_object_unlock( p_intf );
         return;
     }
 
     if( !p_intf->pf_release_window )
     {
         msg_Err( p_vout, "no pf_release_window");
-        vlc_mutex_unlock( &p_intf->object_lock );
+        vlc_object_unlock( p_intf );
         vlc_object_release( p_intf );
         return;
     }
@@ -176,7 +176,7 @@ void vout_ReleaseWindow( vout_thread_t *p_vout, void *p_window )
     p_intf->pf_release_window( p_intf, p_window );
 
     p_vout->p_parent_intf = NULL;
-    vlc_mutex_unlock( &p_intf->object_lock );
+    vlc_object_unlock( p_intf );
     vlc_object_release( p_intf );
 }
 
@@ -188,22 +188,22 @@ int vout_ControlWindow( vout_thread_t *p_vout, void *p_window,
 
     if( !p_intf ) return VLC_EGENERIC;
 
-    vlc_mutex_lock( &p_intf->object_lock );
+    vlc_object_lock( p_intf );
     if( p_intf->b_dead )
     {
-        vlc_mutex_unlock( &p_intf->object_lock );
+        vlc_object_unlock( p_intf );
         return VLC_EGENERIC;
     }
 
     if( !p_intf->pf_control_window )
     {
         msg_Err( p_vout, "no pf_control_window");
-        vlc_mutex_unlock( &p_intf->object_lock );
+        vlc_object_unlock( p_intf );
         return VLC_EGENERIC;
     }
 
     i_ret = p_intf->pf_control_window( p_intf, p_window, i_query, args );
-    vlc_mutex_unlock( &p_intf->object_lock );
+    vlc_object_unlock( p_intf );
     return i_ret;
 }
 

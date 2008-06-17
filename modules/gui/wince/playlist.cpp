@@ -595,7 +595,7 @@ void Playlist::UpdatePlaylist()
  
     /* Update the colour of items */
 
-    vlc_mutex_lock( &p_playlist->object_lock );
+    vlc_object_lock( p_playlist );
     if( p_intf->p_sys->i_playing != p_playlist->i_index )
     {
         // p_playlist->i_index in RED
@@ -604,7 +604,7 @@ void Playlist::UpdatePlaylist()
         // if exists, p_intf->p_sys->i_playing in BLACK
         p_intf->p_sys->i_playing = p_playlist->i_index;
     }
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_unlock( p_playlist );
 
     vlc_object_release( p_playlist );
 }
@@ -625,7 +625,7 @@ void Playlist::Rebuild()
     ListView_DeleteAllItems( hListView );
 
     /* ...and rebuild it */
-    vlc_mutex_lock( &p_playlist->object_lock );
+    vlc_object_lock( p_playlist );
     for( int i = 0; i < p_playlist->i_size; i++ )
     {
         LVITEM lv;
@@ -639,7 +639,7 @@ void Playlist::Rebuild()
             _FROMMB(p_playlist->pp_items[i]->input.psz_name) );
         UpdateItem( i );
     }
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_unlock( p_playlist );
 
     if ( i_focused )
         ListView_SetItemState( hListView, i_focused, LVIS_FOCUSED |
@@ -874,9 +874,9 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
-    vlc_mutex_lock( &p_playlist->object_lock);
+    vlc_object_lock( p_playlist);
     playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, i_item );
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_unlock( p_playlist );
 
     if( p_item )
     {

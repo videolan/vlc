@@ -362,7 +362,7 @@ static int vlclua_playlist_status( lua_State *L )
         lua_pushstring( L, psz_uri );
         free( psz_uri );
         lua_pushnumber( L, config_GetInt( p_intf, "volume" ) );*/
-        vlc_mutex_lock( &p_playlist->object_lock );
+        vlc_object_lock( p_playlist );
         switch( p_playlist->status.i_status )
         {
             case PLAYLIST_STOPPED:
@@ -378,7 +378,7 @@ static int vlclua_playlist_status( lua_State *L )
                 lua_pushstring( L, "unknown" );
                 break;
         }
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_unlock( p_playlist );
         /*i_count += 3;*/
     }
     else

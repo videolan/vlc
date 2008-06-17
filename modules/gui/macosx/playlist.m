@@ -1251,9 +1251,9 @@
         i_type = ORDER_NORMAL;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
+    vlc_object_lock( p_playlist );
     playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_category, i_mode, i_type );
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_unlock( p_playlist );
 
     vlc_object_release( p_playlist );
     [self playlistUpdated];

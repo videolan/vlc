@@ -215,7 +215,7 @@ static void RunThread( vlc_object_t *p_this)
         }
 
         /* Find the session to announce */
-        vlc_mutex_lock( &p_sap->object_lock );
+        vlc_object_lock( p_sap );
         if( p_sap->i_sessions > p_sap->i_current_session + 1)
         {
             p_sap->i_current_session++;
@@ -226,12 +226,12 @@ static void RunThread( vlc_object_t *p_this)
         }
         else
         {
-            vlc_mutex_unlock( &p_sap->object_lock );
+            vlc_object_unlock( p_sap );
             msleep( SAP_IDLE );
             continue;
         }
         p_session = p_sap->pp_sessions[p_sap->i_current_session];
-        vlc_mutex_unlock( &p_sap->object_lock );
+        vlc_object_unlock( p_sap );
 
         /* And announce it */
         if( p_session->p_address->b_enabled == true &&
@@ -256,11 +256,11 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     struct sockaddr_storage addr;
     socklen_t addrlen;
 
-    vlc_mutex_lock( &p_sap->object_lock );
+    vlc_object_lock( p_sap );
     addrlen = p_session->addrlen;
     if ((addrlen == 0) || (addrlen > sizeof (addr)))
     {
-        vlc_mutex_unlock( &p_sap->object_lock );
+        vlc_object_unlock( p_sap );
         msg_Err( p_sap, "No/invalid address specified for SAP announce" );
         return VLC_EGENERIC;
     }
@@ -327,7 +327,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             {
                 msg_Err( p_sap, "Out-of-scope multicast address "
                          "not supported by SAP" );
-                vlc_mutex_unlock( &p_sap->object_lock );
+                vlc_object_unlock( p_sap );
                 return VLC_EGENERIC;
             }
 
@@ -336,7 +336,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         }
 
         default:
-            vlc_mutex_unlock( &p_sap->object_lock );
+            vlc_object_unlock( p_sap );
             msg_Err( p_sap, "Address family %d not supported by SAP",
                      addr.ss_family );
             return VLC_EGENERIC;
@@ -347,7 +347,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
     if( i )
     {
-        vlc_mutex_unlock( &p_sap->object_lock );
+        vlc_object_unlock( p_sap );
         msg_Err( p_sap, "%s", vlc_gai_strerror( i ) );
         return VLC_EGENERIC;
     }
@@ -375,7 +375,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                                     malloc( sizeof(sap_address_t) );
         if( !p_address )
         {
-            vlc_mutex_unlock( &p_sap->object_lock );
+            vlc_object_unlock( p_sap );
             return VLC_ENOMEM;
         }
         p_address->psz_address = strdup( psz_addr );
@@ -438,7 +438,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         default:
             msg_Err( p_sap, "Address family %d not supported by SAP",
                      addr.ss_family );
-            vlc_mutex_unlock( &p_sap->object_lock );
+            vlc_object_unlock( p_sap );
             return VLC_EGENERIC;
     }
 
@@ -451,7 +451,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     if (p_sap_session->psz_data == NULL)
     {
         free (p_session->psz_sdp);
-        vlc_mutex_unlock( &p_sap->object_lock );
+        vlc_object_unlock( p_sap );
         return VLC_ENOMEM;
     }
 
@@ -505,7 +505,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     msg_Dbg( p_sap,"%i addresses, %i sessions",
                    p_sap->i_addresses,p_sap->i_sessions);
 
-    vlc_mutex_unlock( &p_sap->object_lock );
+    vlc_object_unlock( p_sap );
 
     return VLC_SUCCESS;
 }
@@ -515,7 +515,7 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
                              session_descriptor_t *p_session )
 {
     int i;
-    vlc_mutex_lock( &p_sap->object_lock );
+    vlc_object_lock( p_sap );
 
     msg_Dbg( p_sap, "removing session %p from SAP", p_session);
 
@@ -542,7 +542,7 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
 
     msg_Dbg( p_sap,"%i announcements remaining", p_sap->i_sessions );
 
-    vlc_mutex_unlock( &p_sap->object_lock );
+    vlc_object_unlock( p_sap );
 
     return VLC_SUCCESS;
 }

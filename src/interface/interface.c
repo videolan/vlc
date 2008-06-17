@@ -235,11 +235,11 @@ static void RunInterface( intf_thread_t *p_intf )
         psz_intf = p_intf->psz_switch_intf;
         p_intf->psz_switch_intf = NULL;
 
-        vlc_mutex_lock( &p_intf->object_lock );
+        vlc_object_lock( p_intf );
         p_intf->b_die = false; /* FIXME */
         p_intf->b_dead = false;
 
-        vlc_mutex_unlock( &p_intf->object_lock );
+        vlc_object_unlock( p_intf );
 
         p_intf->psz_intf = psz_intf;
         p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );

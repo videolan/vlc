@@ -48,12 +48,12 @@ bool VLMWrapper::AttachVLM()
 
 void VLMWrapper::LockVLM()
 {
-    vlc_mutex_lock( &p_vlm->object_lock );
+    vlc_object_lock( p_vlm );
 }
 
 void VLMWrapper::UnlockVLM()
 {
-    vlc_mutex_unlock( &p_vlm->object_lock );
+    vlc_object_unlock( p_vlm );
 }
 
 void VLMWrapper::AddBroadcast( const char* name, const char* input,

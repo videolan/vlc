@@ -75,7 +75,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
         if (! playlist_was_locked( p_instance ) )
         {
             playlist_mark_locked( p_instance, 1 );
-            vlc_mutex_lock( &PL->object_lock );
+            vlc_object_lock( PL );
             did_lock = 1;
         }
 
@@ -85,7 +85,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
         {
             if( did_lock == 1 )
             {
-                vlc_mutex_unlock( &PL->object_lock );
+                vlc_object_unlock( PL );
                 playlist_mark_locked( p_instance, 0 );
             }
             RAISEVOID( "Unable to find item" );
@@ -95,7 +95,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
                           PL->status.p_node, p_item );
         if( did_lock == 1 )
         {
-            vlc_mutex_unlock( &PL->object_lock );
+            vlc_object_unlock( PL );
             playlist_mark_locked( p_instance, 0 );
         }
     }
@@ -222,7 +222,7 @@ int libvlc_playlist_get_current_index ( libvlc_instance_t *p_instance,
 void libvlc_playlist_lock( libvlc_instance_t *p_instance )
 {
     assert( PL );
-    vlc_mutex_lock( &PL->object_lock );
+    vlc_object_lock( PL );
     p_instance->b_playlist_locked = 1;
 }
 
@@ -230,7 +230,7 @@ void libvlc_playlist_unlock( libvlc_instance_t *p_instance )
 {
     assert( PL );
     p_instance->b_playlist_locked = 0;
-    vlc_mutex_unlock( &PL->object_lock );
+    vlc_object_unlock( PL );
 }
 
 libvlc_media_player_t * libvlc_playlist_get_media_player(
@@ -240,7 +240,7 @@ libvlc_media_player_t * libvlc_playlist_get_media_player(
     libvlc_media_player_t *p_mi;
     assert( PL );
 
-    vlc_mutex_lock( &PL->object_lock );
+    vlc_object_lock( PL );
     if( PL->p_input )
     {
         p_mi = libvlc_media_player_new_from_input_thread(
@@ -252,7 +252,7 @@ libvlc_media_player_t * libvlc_playlist_get_media_player(
         p_mi = NULL;
         libvlc_exception_raise( p_e, "No active input" );
     }
-    vlc_mutex_unlock( &PL->object_lock );
+    vlc_object_unlock( PL );
 
     return p_mi;
 }

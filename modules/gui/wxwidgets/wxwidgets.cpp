@@ -231,9 +231,9 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    vlc_mutex_lock( &p_intf->object_lock );
+    vlc_object_lock( p_intf );
     p_intf->b_dead = true;
-    vlc_mutex_unlock( &p_intf->object_lock );
+    vlc_object_unlock( p_intf );
 
     if( p_intf->pf_show_dialog )
     {

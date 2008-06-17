@@ -215,7 +215,7 @@ void InteractionDialog::otherB()
 
 void InteractionDialog::Finish( int i_ret )
 {
-    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
+    vlc_object_lock( p_dialog->p_interaction );
 
     if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
     {
@@ -235,7 +235,7 @@ void InteractionDialog::Finish( int i_ret )
         p_dialog->b_cancelled = true;
 
     hide();
-    vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+    vlc_object_unlock( p_dialog->p_interaction );
     playlist_Signal( THEPL );
 }
 

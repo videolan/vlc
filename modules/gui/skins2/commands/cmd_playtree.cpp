@@ -37,10 +37,10 @@ void CmdPlaytreeSort::execute()
     /// \todo Choose sort method/order - Need more commands
     /// \todo Choose the correct view
     playlist_t *p_playlist = getIntf()->p_sys->p_playlist;
-    vlc_mutex_lock( &p_playlist->object_lock );
+    vlc_object_lock( p_playlist );
     playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_onelevel,
                                 SORT_TITLE, ORDER_NORMAL );
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_unlock( p_playlist );
 
     // Ask for rebuild
     Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();

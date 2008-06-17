@@ -611,7 +611,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
     vlc_object_internals_t *internals = vlc_internals( p_this );
     int fd;
 
-    vlc_mutex_lock( &p_this->object_lock );
+    vlc_object_lock( p_this );
     p_this->b_die = true;
 
     vlc_spin_lock (&internals->spin);
@@ -626,7 +626,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
     }
 
     vlc_object_signal_unlocked( p_this );
-    vlc_mutex_unlock( &p_this->object_lock );
+    vlc_object_unlock( p_this );
 
     if (p_this->i_object_type == VLC_OBJECT_LIBVLC)
     {

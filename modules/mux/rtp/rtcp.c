@@ -76,7 +76,7 @@ int rtcp_add_client( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos )
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
     rtcp_client_t *p_client = NULL;
 
-    vlc_mutex_lock( &p_rtcp->object_lock );
+    vlc_object_lock( p_rtcp );
     p_client = (rtcp_client_t*) malloc( sizeof(rtcp_client_t) );
     if( !p_client )
         return VLC_ENOMEM;
@@ -87,7 +87,7 @@ int rtcp_add_client( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos )
                  p_client->i_index, p_client );
     p_rtcp->i_clients++;
     p_rtcp->u_clients++;
-    vlc_mutex_unlock( &p_rtcp->object_lock );
+    vlc_object_unlock( p_rtcp );
     return VLC_SUCCESS;
 }
 
@@ -96,7 +96,7 @@ int rtcp_del_client( vlc_object_t *p_this, uint32_t u_ssrc )
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
     uint32_t i_pos = 0;
 
-    vlc_mutex_lock( &p_rtcp->object_lock );
+    vlc_object_lock( p_rtcp );
     if( p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos ) == VLC_SUCCESS )
     {
         rtcp_client_t *p_old = p_rtcp->pp_clients[i_pos];
@@ -107,7 +107,7 @@ int rtcp_del_client( vlc_object_t *p_this, uint32_t u_ssrc )
         p_rtcp->u_clients--;
         /* BYE message is sent by rtcp_destroy_client() */
     }
-    vlc_mutex_unlock( &p_rtcp->object_lock );
+    vlc_object_unlock( p_rtcp );
     return VLC_SUCCESS;
 }
 
@@ -117,7 +117,7 @@ int rtcp_cleanup_clients( vlc_object_t *p_this )
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
     uint32_t i = 0;
 
-    vlc_mutex_lock( &p_rtcp->object_lock );
+    vlc_object_lock( p_rtcp );
     for( i=0; i < p_rtcp->i_clients; i++ )
     {
         rtcp_client_t *p_old = p_rtcp->pp_clients[i];
@@ -131,7 +131,7 @@ int rtcp_cleanup_clients( vlc_object_t *p_this )
             free( p_old );
         }
     }
-    vlc_mutex_unlock( &p_rtcp->object_lock );
+    vlc_object_unlock( p_rtcp );
     return VLC_SUCCESS;
 }
 
@@ -343,7 +343,7 @@ static int rtcp_decode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
             if( result == VLC_EGENERIC )
                 return VLC_ENOMEM;
         }
-        vlc_mutex_lock( &p_rtcp->object_lock );
+        vlc_object_lock( p_rtcp );
         p_client = p_rtcp->pp_clients[i_pos];
 
         p_client->p_stats->u_SR_received++;
@@ -380,7 +380,7 @@ static int rtcp_decode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
             p_client->p_stats->u_last_SR,
             p_client->p_stats->u_delay_since_last_SR );
         p_client = NULL;
-        vlc_mutex_unlock( &p_rtcp->object_lock );
+        vlc_object_unlock( p_rtcp );
     }
     return VLC_SUCCESS;
 }
@@ -412,7 +412,7 @@ static int rtcp_decode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
                 return VLC_ENOMEM;
         }
 
-        vlc_mutex_lock( &p_rtcp->object_lock );
+        vlc_object_lock( p_rtcp );
         p_client = p_rtcp->pp_clients[i_pos];
 
         p_client->p_stats->u_RR_received++;
@@ -443,7 +443,7 @@ static int rtcp_decode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
             p_client->p_stats->u_last_SR,
             p_client->p_stats->u_delay_since_last_SR );
         p_client = NULL;
-        vlc_mutex_unlock( &p_rtcp->object_lock );
+        vlc_object_unlock( p_rtcp );
     }
     return VLC_SUCCESS;
 }
@@ -478,7 +478,7 @@ static int rtcp_decode_SDES( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
                 return VLC_ENOMEM;
         }
 
-        vlc_mutex_lock( &p_rtcp->object_lock );
+        vlc_object_lock( p_rtcp );
         p_client = p_rtcp->pp_clients[i_pos];
 
         u_item = bs_read( p_rtcp->bs, 8 );
@@ -543,7 +543,7 @@ static int rtcp_decode_SDES( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
               ((double)(0.9375) * p_client->p_stats->u_avg_pkt_size) );
 
         p_client = NULL;
-        vlc_mutex_unlock( &p_rtcp->object_lock );
+        vlc_object_unlock( p_rtcp );
     }
     return VLC_SUCCESS;
 }
@@ -597,7 +597,7 @@ static int rtcp_decode_APP( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
             return VLC_ENOMEM;
     }
 
-    vlc_mutex_lock( &p_rtcp->object_lock );
+    vlc_object_lock( p_rtcp );
     p_client = p_rtcp->pp_clients[i_pos];
 
     for( i = 0 ; i < 4; i++ )
@@ -613,7 +613,7 @@ static int rtcp_decode_APP( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
 
     psz_data = (char *) malloc( p_pkt->u_length );
     if( !psz_data ) {
-        vlc_mutex_unlock( &p_rtcp->object_lock );
+        vlc_object_unlock( p_rtcp );
         return VLC_EGENERIC;
     }
 
@@ -627,7 +627,7 @@ static int rtcp_decode_APP( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     p_pkt->report.app.u_length = p_pkt->u_length;
 
     p_client = NULL;
-    vlc_mutex_unlock( &p_rtcp->object_lock );
+    vlc_object_unlock( p_rtcp );
 
     /* Just ignore this packet */
     return VLC_SUCCESS;
@@ -866,7 +866,7 @@ block_t *rtcp_encode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
         return NULL;
     }
 
-    vlc_mutex_lock( &p_rtcp->object_lock );
+    vlc_object_lock( p_rtcp );
     p_client = p_rtcp->pp_clients[i_pos];
 
     p_stats = p_client->p_stats;
@@ -884,7 +884,7 @@ block_t *rtcp_encode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     bs_write( s, 32, p_stats->u_delay_since_last_SR );
 
     p_client = NULL;
-    vlc_mutex_unlock( &p_rtcp->object_lock );
+    vlc_object_unlock( p_rtcp );
 
     /* possible SR extension */
     return p_block;
@@ -927,7 +927,7 @@ block_t *rtcp_encode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
         return NULL;
     }
 
-    vlc_mutex_lock( &p_rtcp->object_lock );
+    vlc_object_lock( p_rtcp );
     p_client = p_rtcp->pp_clients[i_pos];
 
     p_stats = p_client->p_stats;
@@ -945,7 +945,7 @@ block_t *rtcp_encode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     bs_write( s, 32, p_stats->u_delay_since_last_RR );
 
     p_client = NULL;
-    vlc_mutex_unlock( &p_rtcp->object_lock );
+    vlc_object_unlock( p_rtcp );
 
     /* possible RR extension */
     return p_block;

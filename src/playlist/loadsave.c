@@ -68,7 +68,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     p_export->p_root = p_export_root;
 
     /* Lock the playlist */
-    vlc_mutex_lock( &p_playlist->object_lock );
+    vlc_object_lock( p_playlist );
     p_playlist->p_private = (void *)p_export;
 
     /* And call the module ! All work is done now */
@@ -76,7 +76,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     if( !p_module )
     {
         msg_Warn( p_playlist, "exporting playlist failed" );
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_unlock( p_playlist );
         return VLC_ENOOBJ;
     }
     module_Unneed( p_playlist , p_module );
@@ -86,7 +86,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     free( p_export->psz_filename );
     free ( p_export );
     p_playlist->p_private = NULL;
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_unlock( p_playlist );
 
     return VLC_SUCCESS;
 }

@@ -121,16 +121,16 @@
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
 
-    vlc_mutex_lock( &p_playlist->object_lock );
+    vlc_object_lock( p_playlist );
     if( playlist_IsEmpty( p_playlist ) )
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_unlock( p_playlist );
         vlc_object_release( p_playlist );
         [o_main intfOpenFileGeneric: (id)sender];
     }
     else
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_unlock( p_playlist );
         vlc_object_release( p_playlist );
     }
 
@@ -886,7 +886,7 @@
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
 
-    vlc_mutex_lock( &p_playlist->object_lock );
+    vlc_object_lock( p_playlist );
 
 #define p_input p_playlist->p_input
 
@@ -997,7 +997,7 @@
         [o_main setupMenus]; /* Make sure video menu is up to date */
     }
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_unlock( p_playlist );
     vlc_object_release( p_playlist );
 
     return( bEnabled );

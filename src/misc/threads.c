@@ -489,7 +489,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     boot->entry = func;
     boot->object = p_this;
 
-    vlc_mutex_lock( &p_this->object_lock );
+    vlc_object_lock( p_this );
 
 #if defined( LIBVLC_USE_PTHREAD )
     pthread_attr_t attr;
@@ -595,7 +595,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
                          psz_name, psz_file, i_line );
     }
 
-    vlc_mutex_unlock( &p_this->object_lock );
+    vlc_object_unlock( p_this );
     return i_ret;
 }
 

@@ -235,7 +235,7 @@ void InteractionDialog::OnClear( wxCommandEvent& event )
 {
 #if 0
     int i;
-    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
+    vlc_object_lock( p_dialog->p_interaction );
     for( i = p_dialog->i_widgets - 1 ; i >= 0 ; i-- )
     {
         user_widget_t *p_widget = p_dialog->pp_widgets[i];
@@ -250,7 +250,7 @@ void InteractionDialog::OnClear( wxCommandEvent& event )
     buttons_sizer->Remove( 3 );
     buttons_panel->DestroyChildren();
     input_widgets.clear();
-    vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+    vlc_object_unlock( p_dialog->p_interaction );
     Render();
 #endif
 }
@@ -263,7 +263,7 @@ void InteractionDialog::OnNoShow( wxCommandEvent& event )
 void InteractionDialog::Finish( int i_ret )
 {
 #if 0
-    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
+    vlc_object_lock( p_dialog->p_interaction );
     vector<InputWidget>::iterator it = input_widgets.begin();
     while ( it < input_widgets.end() )
     {
@@ -274,6 +274,6 @@ void InteractionDialog::Finish( int i_ret )
     Hide();
     p_dialog->i_status = ANSWERED_DIALOG;
     p_dialog->i_return = i_ret;
-    vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+    vlc_object_unlock( p_dialog->p_interaction );
 #endif
 }

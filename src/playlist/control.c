@@ -174,14 +174,14 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
 int playlist_PreparseEnqueue( playlist_t *p_playlist,
                               input_item_t *p_item )
 {
-    vlc_mutex_lock( &p_playlist->p_preparse->object_lock );
+    vlc_object_lock( p_playlist->p_preparse );
     vlc_gc_incref( p_item );
     INSERT_ELEM( p_playlist->p_preparse->pp_waiting,
                  p_playlist->p_preparse->i_waiting,
                  p_playlist->p_preparse->i_waiting,
                  p_item );
     vlc_cond_signal( &p_playlist->p_preparse->object_wait );
-    vlc_mutex_unlock( &p_playlist->p_preparse->object_lock );
+    vlc_object_unlock( p_playlist->p_preparse );
     return VLC_SUCCESS;
 }
 
@@ -190,11 +190,11 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
 int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
                                   playlist_item_t *p_item )
 {
-    vlc_mutex_lock( &p_playlist->object_lock );
-    vlc_mutex_lock( &p_playlist->p_preparse->object_lock );
+    vlc_object_lock( p_playlist );
+    vlc_object_lock( p_playlist->p_preparse );
     PreparseEnqueueItemSub( p_playlist, p_item );
-    vlc_mutex_unlock( &p_playlist->p_preparse->object_lock );
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_unlock( p_playlist->p_preparse );
+    vlc_object_unlock( p_playlist );
     return VLC_SUCCESS;
 }
 

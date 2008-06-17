@@ -193,13 +193,13 @@ static void input_ItemDestroy ( gc_object_t *p_this )
 
     input_ItemClean( p_input );
 
-    vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
+    vlc_object_lock( p_obj->p_libvlc );
 
     ARRAY_BSEARCH( priv->input_items,->i_id, int, p_input->i_id, i);
     if( i != -1 )
         ARRAY_REMOVE( priv->input_items, i);
 
-    vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
+    vlc_object_unlock( p_obj->p_libvlc );
 
     free( p_input );
 }
@@ -310,13 +310,13 @@ input_item_t *__input_ItemGetById( vlc_object_t *p_obj, int i_id )
     input_item_t * p_ret = NULL;
     int i;
 
-    vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
+    vlc_object_lock( p_obj->p_libvlc );
 
     ARRAY_BSEARCH( priv->input_items, ->i_id, int, i_id, i);
     if( i != -1 )
         p_ret = ARRAY_VAL( priv->input_items, i);
 
-    vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
+    vlc_object_unlock( p_obj->p_libvlc );
 
     return p_ret;
 }
@@ -347,10 +347,10 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
     input_ItemInit( p_obj, p_input );
     vlc_gc_init( p_input, input_ItemDestroy, (void *)p_obj );
 
-    vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
+    vlc_object_lock( p_obj->p_libvlc );
     p_input->i_id = ++priv->i_last_input_id;
     ARRAY_APPEND( priv->input_items, p_input );
-    vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
+    vlc_object_unlock( p_obj->p_libvlc );
 
     p_input->b_fixed_name = false;
 
