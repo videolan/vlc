@@ -325,8 +325,7 @@ void InputManager::UpdateTracks()
     /* Update ZVBI status */
 #ifdef ZVBI_COMPILED
     /* Update teletext status*/
-    if( b_has_subs )
-        emit teletextEnabled( false );/* FIXME */
+    emit teletextEnabled( b_has_subs );/* FIXME */
 #endif
 }
 
@@ -413,8 +412,20 @@ void InputManager::telexGotoPage( int page )
 
 void InputManager::telexToggle( bool b_enabled )
 {
-    int i_page = b_enabled ? 100 : 0 ;
+    int i_page = 100;
 
+    if( hasInput() )
+    {
+        vlc_object_t *p_vbi;
+        p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
+                    "zvbi", FIND_ANYWHERE );
+        if( p_vbi )
+        {
+            i_page = var_GetInteger( p_vbi, "vbi-page" );
+            vlc_object_release( p_vbi );
+        }
+    }
+    i_page = b_enabled ? i_page : 0;
     telexGotoPage( i_page );
 }
 
@@ -660,6 +671,7 @@ static int ChangeSPU( vlc_object_t *p_this, const char *var, vlc_value_t o,
 {
     InputManager *im = (InputManager*)param;
     im->b_has_subs = true;
+    im->telexToggle( im->b_has_subs );
     return VLC_SUCCESS;
 }
 
