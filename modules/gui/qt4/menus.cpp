@@ -425,11 +425,10 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     vector<int> objects;
     vector<const char *> varnames;
-    vlc_object_t *p_object;
+    vlc_object_t *p_aout;
     input_thread_t *p_input;
 
-    if( !current )
-        current = new QMenu();
+    if( !current ) current = new QMenu();
 
     if( current->isEmpty() )
     {
@@ -443,14 +442,14 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     p_input = THEMIM->getInput();
     if( p_input )
         vlc_object_yield( p_input );
-    p_object = ( vlc_object_t * ) vlc_object_find( p_intf,
-                                                   VLC_OBJECT_AOUT,
-                                                   FIND_ANYWHERE );
+    p_aout = ( vlc_object_t * ) vlc_object_find( p_intf,
+                                                 VLC_OBJECT_AOUT,
+                                                 FIND_ANYWHERE );
 
-    AudioAutoMenuBuilder( p_object, p_input, objects, varnames );
+    AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
 
-    if( p_object )
-        vlc_object_release( p_object );
+    if( p_aout )
+        vlc_object_release( p_aout );
     if( p_input )
         vlc_object_release( p_input );
 
@@ -468,8 +467,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     vector<int> objects;
     vector<const char *> varnames;
 
-    if( !current )
-        current = new QMenu();
+    if( !current ) current = new QMenu();
 
     if( current->isEmpty() )
     {
@@ -519,10 +517,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     vector<int> objects;
     vector<const char *> varnames;
 
-    if( !menu )
-    {
-        menu = new QMenu();
-    }
+    if( !menu ) menu = new QMenu();
 
     if( menu->isEmpty() )
     {
@@ -599,7 +594,8 @@ QMenu *QVLCMenu::HelpMenu( QMenu *current )
     addDPStaticEntry( menu, qtr( "Help..." ) , "",
         ":/pixmaps/menus_help_16px.png", SLOT( helpDialog() ), "F1" );
 #ifdef UPDATE_CHECK
-    addDPStaticEntry( menu, qtr( "Check for updates..." ) , "", "", SLOT( updateDialog() ), "");
+    addDPStaticEntry( menu, qtr( "Check for updates..." ) , "", "",
+                      SLOT( updateDialog() ), "");
 #endif
     menu->addSeparator();
     addDPStaticEntry( menu, qtr( I_MENU_ABOUT ), "", "", SLOT( aboutDialog() ),
@@ -915,8 +911,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
                             bool append )
 {
     QMenu *menu = current;
-    if( !menu )
-        menu = new QMenu();
+    if( !menu ) menu = new QMenu();
 
     /* Disable all non static entries */
     QAction *p_action;
