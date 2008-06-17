@@ -384,10 +384,17 @@ int subtitles_Filter( const char *);
 
 void MRLSplit( char *, const char **, const char **, char ** );
 
-static inline void input_ChangeState( input_thread_t *p_input, int state )
+static inline void input_ChangeStateWithVarCallback( input_thread_t *p_input, int state, bool callback )
 {
     bool changed = (p_input->i_state != state);
-    var_SetInteger( p_input, "state", p_input->i_state = state );
+    if( callback )
+        var_SetInteger( p_input, "state", p_input->i_state = state );
+    else
+    {
+        vlc_value_t val;
+        val.i_int = PLAYING_S;
+        var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+    }
     if( changed )
     {
         vlc_event_t event;
@@ -396,6 +403,12 @@ static inline void input_ChangeState( input_thread_t *p_input, int state )
         vlc_event_send( &p_input->p->event_manager, &event );
     }
 }
+
+static inline void input_ChangeState( input_thread_t *p_input, int state )
+{
+    input_ChangeStateWithVarCallback( p_input, state, true );
+}
+
 
 /* Access */
 

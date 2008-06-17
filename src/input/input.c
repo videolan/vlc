@@ -1550,7 +1550,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 b_force_update = true;
 
                 /* Switch to play */
-                input_ChangeState( p_input, PLAYING_S);
+                input_ChangeStateWithVarCallback( p_input, PLAYING_S, false );
 
                 /* */
                 if( !i_ret )
@@ -1580,7 +1580,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 }
 
                 /* Switch to new state */
-                input_ChangeState( p_input, state);
+                input_ChangeStateWithVarCallback( p_input, state, false );
 
                 /* */
                 if( !i_ret )
@@ -1591,7 +1591,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 b_force_update = true;
 
                 /* Correct "state" value */
-                input_ChangeState( p_input, p_input->i_state );
+                input_ChangeStateWithVarCallback( p_input, p_input->i_state, false );
             }
             else if( val.i_int != PLAYING_S && val.i_int != PAUSE_S )
             {
