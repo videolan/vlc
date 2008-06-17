@@ -406,7 +406,7 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             }
 #ifdef AVI_DEBUG
             msg_Dbg( (vlc_object_t*)s,
-                     "strf: video:%4.4s %dx%d planes:%d %dbpp",
+                     "strf: video:%4.4s %"PRIu32"x%"PRIu32" planes:%d %dbpp",
                      (char*)&p_chk->strf.vids.p_bih->biCompression,
                      (uint32_t)p_chk->strf.vids.p_bih->biWidth,
                      (uint32_t)p_chk->strf.vids.p_bih->biHeight,
