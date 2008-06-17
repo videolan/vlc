@@ -174,7 +174,6 @@ static int Open (vlc_object_t *obj)
         dport = extract_port (&dhost);
     if (dport == 0)
         dport = 5004; /* avt-profile-1 port */
-    dport = (dport + 1) & ~1; /* RTP is on the "next" even port */
 
     /* Try to connect */
     int fd = -1;
@@ -183,8 +182,8 @@ static int Open (vlc_object_t *obj)
     {
         case IPPROTO_UDP:
         case IPPROTO_UDPLITE:
-            fd = net_OpenDgram (obj, dhost, dport, shost, sport, AF_UNSPEC,
-                                tp);
+            fd = net_OpenDgram (obj, dhost, (dport + 1) & ~1,
+                                shost, (sport + 1) & ~1, AF_UNSPEC, tp);
             break;
 
          case IPPROTO_DCCP:
@@ -196,14 +195,14 @@ static int Open (vlc_object_t *obj)
 #ifdef SOCK_DCCP
             var_Create (obj, "dccp-service", VLC_VAR_STRING);
             var_SetString (obj, "dccp-service", "RTPV");
-            fd = net_Connect (obj, shost, sport, SOCK_DCCP, tp);
+            fd = net_Connect (obj, shost, (sport + 1) & ~1, SOCK_DCCP, tp);
 #else
             msg_Err (obj, "DCCP support not included");
 #endif
             break;
 
         case IPPROTO_TCP:
-            fd = net_Connect (obj, shost, sport, SOCK_STREAM, tp);
+            fd = net_Connect (obj, shost, (sport + 1) & ~1, SOCK_STREAM, tp);
             break;
     }
 
