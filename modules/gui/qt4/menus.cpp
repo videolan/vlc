@@ -1,7 +1,7 @@
 /*****************************************************************************
  * menus.cpp : Qt menus
  *****************************************************************************
- * Copyright ( C ) 2006-2007 the VideoLAN team
+ * Copyright © 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -770,55 +770,22 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         {
             vlc_object_yield( p_input );
             InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
-
-            vlc_object_t *p_aout = ( vlc_object_t * )
-                vlc_object_find( p_input, VLC_OBJECT_AOUT, FIND_ANYWHERE );
-            vlc_object_t *p_vout = ( vlc_object_t * )
-                vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
-
-            /* Add a fullscreen switch button */
-            if( p_vout )
-            {
-                vlc_value_t val;
-                var_Get( p_vout, "fullscreen", &val );
-                val.b_bool = !val.b_bool;
-                CreateAndConnect( menu, "fullscreen", qtr( "Fullscreen" ), "",
-                     ITEM_CHECK, p_vout->i_object_id, val, VLC_VAR_BOOL,
-                     !val.b_bool );
-                b_fullscreen = !val.b_bool;
-            }
-
-            /* Audio menu */
-            AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
-            if( p_aout )
-                vlc_object_release( p_aout );
-            submenu = Populate( p_intf, NULL, varnames, objects );
-            varnames.clear(); objects.clear();
-            action = menu->addMenu( submenu );
-            action->setText( qtr( "Audio" ) );
-            if( submenu->isEmpty() )
-                action->setEnabled( false );
-
-            /* Video menu */
-            submenu = new QMenu();
-            ACT_ADD( submenu, "video-es", qtr( "Video Track" ) );
-            QMenu *subsubmenu = new QMenu( qtr( "&Subtitles Track" ), submenu );
-            addDPStaticEntry( subsubmenu, qtr( "Load File..." ), "", "",
-                              SLOT( loadSubtitlesFile() ) );
-            action = submenu->addMenu( subsubmenu );
-            action->setData( "spu-es" );
-
-            VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
-            if( p_vout )
-                vlc_object_release( p_vout );
-            Populate( p_intf, submenu, varnames, objects );
-            varnames.clear(); objects.clear();
-            action = menu->addMenu( submenu );
-            action->setText( qtr( "Video" ) );
-            if( submenu->isEmpty() )
-                action->setEnabled( false );
-
             vlc_object_release( p_input );
+
+            action = menu->addMenu( AudioMenu( p_intf, NULL ) );
+            action->setText( qtr( "&Audio" ) );
+            if( action->menu()->isEmpty() )
+                action->setEnabled( false );
+
+            action = menu->addMenu( VideoMenu( p_intf, NULL ) );
+            action->setText( qtr( "&Video" ) );
+            if( action->menu()->isEmpty() )
+                action->setEnabled( false );
+
+            action = menu->addMenu( NavigMenu( p_intf, NULL ) );
+            action->setText( qtr( "&Playback" ) );
+            if( action->menu()->isEmpty() )
+                action->setEnabled( false );
         }
 
         menu->addSeparator();
