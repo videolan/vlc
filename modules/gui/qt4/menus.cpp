@@ -772,17 +772,20 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
             vlc_object_release( p_input );
 
-            action = menu->addMenu( AudioMenu( p_intf, NULL ) );
+            submenu = new QMenu( menu );
+            action = menu->addMenu( AudioMenu( p_intf, submenu ) );
             action->setText( qtr( "&Audio" ) );
             if( action->menu()->isEmpty() )
                 action->setEnabled( false );
 
-            action = menu->addMenu( VideoMenu( p_intf, NULL ) );
+            submenu = new QMenu( menu );
+            action = menu->addMenu( VideoMenu( p_intf, submenu ) );
             action->setText( qtr( "&Video" ) );
             if( action->menu()->isEmpty() )
                 action->setEnabled( false );
 
-            action = menu->addMenu( NavigMenu( p_intf, NULL ) );
+            submenu = new QMenu( menu );
+            action = menu->addMenu( NavigMenu( p_intf, submenu ) );
             action->setText( qtr( "&Playback" ) );
             if( action->menu()->isEmpty() )
                 action->setEnabled( false );
