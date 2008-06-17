@@ -1141,7 +1141,7 @@ static int Request( access_t *p_access, int64_t i_tell )
     if( p_sys->i_version == 1 )
     {
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
-                    "Range: bytes=%"PRId64"-\r\n", i_tell );
+                    "Range: bytes=%"PRIu64"-\r\n", i_tell );
     }
 
     /* Cookies */
