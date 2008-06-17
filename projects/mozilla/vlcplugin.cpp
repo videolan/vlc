@@ -427,56 +427,56 @@ void VlcPlugin::showToolbar()
     if( p_btnPlay )
     {
         i_height = __MAX( i_height, p_btnPlay->height );
-        i_width  = __MAX( i_width,  p_btnPlay->width );
+        i_width += p_btnPlay->width;
     }
     XpmReadFileToImage( p_display, DATA_PATH "/mozilla/pause.xpm",
                         &p_btnPause, NULL, NULL);
     if( p_btnPause )
     {
         i_height = __MAX( i_height, p_btnPause->height );
-        i_width  = __MAX( i_width,  p_btnPause->width );
+        i_width += p_btnPause->width;
     }
     XpmReadFileToImage( p_display, DATA_PATH "/mozilla/stop.xpm",
                         &p_btnStop, NULL, NULL );
     if( p_btnStop )
     {
         i_height = __MAX( i_height, p_btnStop->height );
-        i_width  = __MAX( i_width,  p_btnStop->width );
+        i_width += p_btnStop->width;
     }
     XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_line.xpm",
                         &p_timeline, NULL, NULL);
     if( p_timeline )
     {
         i_height = __MAX( i_height, p_timeline->height );
-        i_width  = __MAX( i_width,  p_timeline->width );
+        i_width += p_timeline->width;
     }
     XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_icon.xpm",
                         &p_btnTime, NULL, NULL);
     if( p_btnTime )
     {
         i_height = __MAX( i_height, p_btnTime->height );
-        i_width  = __MAX( i_width,  p_btnTime->width );
+        i_width += p_btnTime->width;
     }
     XpmReadFileToImage( p_display, DATA_PATH "/mozilla/fullscreen.xpm",
                         &p_btnFullscreen, NULL, NULL);
     if( p_btnFullscreen )
     {
         i_height = __MAX( i_height, p_btnFullscreen->height );
-        i_width  = __MAX( i_width,  p_btnFullscreen->width );
+        i_width += p_btnFullscreen->width;
     }
     XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_max.xpm",
                         &p_btnMute, NULL, NULL);
     if( p_btnMute )
     {
         i_height = __MAX( i_height, p_btnMute->height );
-        i_width  = __MAX( i_width,  p_btnMute->width );
+        i_width += p_btnMute->width;
     }
     XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_mute.xpm",
                         &p_btnUnmute, NULL, NULL);
     if( p_btnUnmute )
     {
         i_height = __MAX( i_height, p_btnUnmute->height );
-        i_width  = __MAX( i_width,  p_btnUnmute->width );
+        i_width += p_btnUnmute->width;
     }
     setToolbarSize( i_width, i_height );
 
