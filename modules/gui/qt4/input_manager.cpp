@@ -34,6 +34,8 @@ static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param );
 static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param );
+static int ChangeSPU( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                      vlc_value_t n, void *param );
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int PLItemChanged( vlc_object_t *, const char *,
@@ -142,6 +144,8 @@ void InputManager::addCallbacks()
     var_AddCallback( p_input, "audio-es", ChangeAudio, this );
     /* src/input/es-out.c:551 */
     var_AddCallback( p_input, "video-es", ChangeVideo, this );
+    /* src/input/es-out.c:552 */
+    var_AddCallback( p_input, "spu-es", ChangeSPU, this );
     /* src/input/input.c:1765 */
     var_AddCallback( p_input, "rate-change", ItemRateChanged, this );
     /* src/input/input.c:2003 */
@@ -153,6 +157,7 @@ void InputManager::addCallbacks()
 /* Delete the callbacks on Input. Self explanatory */
 void InputManager::delCallbacks()
 {
+    var_DelCallback( p_input, "spu-es", ChangeSPU, this );
     var_DelCallback( p_input, "audio-es", ChangeAudio, this );
     var_DelCallback( p_input, "video-es", ChangeVideo, this );
     var_DelCallback( p_input, "state", ItemStateChanged, this );
@@ -634,7 +639,6 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-
 static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param )
 {
@@ -648,6 +652,14 @@ static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
 {
     InputManager *im = (InputManager*)param;
     im->b_has_video = true;
+    return VLC_SUCCESS;
+}
+
+static int ChangeSPU( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                        vlc_value_t n, void *param )
+{
+    InputManager *im = (InputManager*)param;
+    im->b_has_subs = true;
     return VLC_SUCCESS;
 }
 
