@@ -370,6 +370,14 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             SSPush( st, value );
             free( value );
         }
+        else if( !strcmp( s, "xml_encode" ) )
+        {
+            char *url = SSPop( st );
+            char *value = convert_xml_special_chars( url );
+            free( url );
+            SSPush( st, value );
+            free( value );
+        }
         else if( !strcmp( s, "addslashes" ) )
         {
             char *psz_src = SSPop( st );
