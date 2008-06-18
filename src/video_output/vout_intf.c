@@ -1199,7 +1199,7 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Create( p_playlist, "video-on-top", VLC_VAR_BOOL );
     var_Set( p_playlist, "video-on-top", newval );
 
-    pl_Release( p_playlist );
+    pl_Release( p_this );
     return VLC_SUCCESS;
 }
 
