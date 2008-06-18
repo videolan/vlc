@@ -717,7 +717,11 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
      * because of some creepy drawable type that are not flexible enough
      * (Win32 HWND for instance) */
     p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-    if( !p_input_thread ) return;
+    if( !p_input_thread ) {
+        /* No input, nothing more to do, we are fine */
+        libvlc_exception_clear( p_e );
+        return;
+    }
 
     p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
     if( !p_vout )
