@@ -243,8 +243,8 @@ vlc_module_begin();
                  AUDIO_CHANNELS_LONGTEXT, true );
     add_integer( "dshow-audio-samplerate", 0, NULL, AUDIO_SAMPLERATE_TEXT,
                  AUDIO_SAMPLERATE_LONGTEXT, true );
-    add_integer( "dshow-audio-bitspersample", 0, NULL, AUDIO_BITPERSAMPLE_TEXT,
-                 AUDIO_BITSPERSAMPLE_LONGTEST, true );
+    add_integer( "dshow-audio-bitspersample", 0, NULL, AUDIO_BITSPERSAMPLE_TEXT,
+                 AUDIO_BITSPERSAMPLE_LONGTEXT, true );
 
     add_shortcut( "dshow" );
     set_capability( "access_demux", 0 );
