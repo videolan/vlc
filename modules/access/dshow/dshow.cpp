@@ -160,6 +160,18 @@ static const char *const ppsz_amtuner_mode_text[] = { N_("Default"),
 #define AMTUNER_MODE_LONGTEXT N_( \
     "AM Tuner mode. Can be one of DEFAULT, TV, AM_RADIO, FM_RADIO or DSS.")
 
+#define AUDIO_CHANNELS_TEXT N_("Number of audio channels")
+#define AUDIO_CHANNELS_LONGTEXT N_( \
+    "Select audio input format with the given number of audio channesl (if non 0)" )
+
+#define AUDIO_SAMPLERATE_TEXT N_("Audio sample rate")
+#define AUDIO_SAMPLERATE_LONGTEXT N_( \
+    "Select audio input format with the given sample rate (if non 0)" )
+
+#define AUDIO_BITSPERSAMPLE_TEXT N_("Audio bits per sample")
+#define AUDIO_BITSPERSAMPLE_LONGTEXT N_( \
+    "Select audio input format with the given bits/sample (if non 0)" )
+
 static int  CommonOpen ( vlc_object_t *, access_sys_t *, bool );
 static void CommonClose( vlc_object_t *, access_sys_t * );
 
@@ -226,6 +238,13 @@ vlc_module_begin();
     add_integer( "dshow-amtuner-mode", AMTUNER_MODE_TV, NULL,
                 AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, false);
         change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text, 0 );
+
+    add_integer( "dshow-audio-channels", 0, NULL, AUDIO_CHANNELS_TEXT,
+                 AUDIO_CHANNELS_LONGTEXT, true );
+    add_integer( "dshow-audio-samplerate", 0, NULL, AUDIO_SAMPLERATE_TEXT,
+                 AUDIO_SAMPLERATE_LONGTEXT, true );
+    add_integer( "dshow-audio-bitspersample", 0, NULL, AUDIO_BITPERSAMPLE_TEXT,
+                 AUDIO_BITSPERSAMPLE_LONGTEST, true );
 
     add_shortcut( "dshow" );
     set_capability( "access_demux", 0 );
@@ -909,7 +928,10 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     size_t media_count =
         EnumDeviceCaps( p_this, p_device_filter, b_audio ? 0 : p_sys->i_chroma,
                         p_sys->i_width, p_sys->i_height,
-                        0, 0, 0, media_types, MAX_MEDIA_TYPES );
+      b_audio ? var_CreateGetInteger( p_this, "dshow-audio-channels" ) : 0,
+      b_audio ? var_CreateGetInteger( p_this, "dshow-audio-samplerate" ) : 0,
+      b_audio ? var_CreateGetInteger( p_this, "dshow-audio-bitspersample" ) : 0,
+      media_types, MAX_MEDIA_TYPES );
 
     AM_MEDIA_TYPE *mt = NULL;
 
