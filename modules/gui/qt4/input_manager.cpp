@@ -671,7 +671,9 @@ static int ChangeSPU( vlc_object_t *p_this, const char *var, vlc_value_t o,
 {
     InputManager *im = (InputManager*)param;
     im->b_has_subs = true;
+#ifdef ZVBI_COMPILED
     im->telexToggle( im->b_has_subs );
+#endif
     return VLC_SUCCESS;
 }
 
