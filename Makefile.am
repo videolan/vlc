@@ -269,6 +269,7 @@ EXTRA_DIST += \
 	extras/package/macosx/eyetvplugin/English.lproj/InfoPlist.strings \
 	extras/package/macosx/eyetvplugin/eyetvplugin.xcodeproj/project.pbxproj \
 	extras/package/macosx/README.MacOSX.rtf
+	extras/package/macosx/Info.plist
 
 
 ###############################################################################
@@ -401,7 +402,7 @@ VLC-release.app: vlc
 	rm -Rf "$(top_builddir)/tmp"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC-release.app
-	for i in vlc.xcodeproj Resources README.MacOSX.rtf; do \
+	for i in vlc.xcodeproj Resources README.MacOSX.rtf Info.plist; do \
 	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
 	done
 	for i in AUTHORS COPYING THANKS; do \
