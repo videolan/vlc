@@ -47,6 +47,22 @@
 #include <QSignalMapper>
 #include <QSystemTrayIcon>
 
+/*
+  This file defines the main menus and the pop-up menu (right-click menu)
+  and the systray menu (in that order in the file)
+
+  There are 3 menus that have to be rebuilt everytime there are called:
+  Audio, Video, Navigation
+  3 functions are building those menus: AudioMenu, VideoMenu, NavigMenu
+  and 3 functions associated are collecting the objects :
+  InputAutoMenuBuilder, AudioAutoMenuBuilder, VideoAutoMenuBuilder.
+
+  A QSignalMapper decides when to rebuild those menus cf MenuFunc in the .hpp
+  Just before one of those menus are aboutToShow(), they are rebuild.
+
+
+  */
+
 enum
 {
     ITEM_NORMAL,
@@ -355,19 +371,19 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     if( mi )
     {
         /* Minimal View */
-        QAction *action=menu->addAction( qtr( "Minimal View..." ), mi,
-                SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
+        QAction *action = menu->addAction( qtr( "Minimal View..." ), mi,
+                                SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
         action->setCheckable( true );
         if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE )
             action->setChecked( true );
 
         /* FullScreen View */
         action = menu->addAction( qtr( "Toggle Fullscreen Interface" ), mi,
-                SLOT( toggleFullScreen() ), qtr( "F11" ) );
+                                  SLOT( toggleFullScreen() ), qtr( "F11" ) );
 
         /* Advanced Controls */
         action = menu->addAction( qtr( "Advanced controls" ), mi,
-                SLOT( toggleAdvanced() ) );
+                                  SLOT( toggleAdvanced() ) );
         action->setCheckable( true );
         if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
             action->setChecked( true );
@@ -820,9 +836,9 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         {
             submenu = new QMenu( qtr( "Interface" ), menu );
             submenu->addAction( QIcon( ":/pixmaps/playlist_16px.png" ),
-                 qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
+                     qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
             addDPStaticEntry( submenu, qtr( I_MENU_EXT ), "",
-                 ":/pixmaps/menus_settings_16px.png", SLOT( extendedDialog() ) );
+                ":/pixmaps/menus_settings_16px.png", SLOT( extendedDialog() ) );
             action = submenu->addAction( QIcon( "" ),
                  qtr( "Minimal View..." ), mi, SLOT( toggleMinimalView() ) );
             action->setCheckable( true );
@@ -869,14 +885,14 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     if( mi->isVisible() || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/vlc16.png" ),
-                qtr( "Hide VLC media player in taskbar" ), mi,
-                SLOT( toggleUpdateSystrayMenu() ) );
+                            qtr( "Hide VLC media player in taskbar" ), mi,
+                            SLOT( toggleUpdateSystrayMenu() ) );
     }
     else
     {
         sysMenu->addAction( QIcon( ":/vlc16.png" ),
-                qtr( "Show VLC media player" ), mi,
-                SLOT( toggleUpdateSystrayMenu() ) );
+                            qtr( "Show VLC media player" ), mi,
+                            SLOT( toggleUpdateSystrayMenu() ) );
     }
 
     sysMenu->addSeparator();
@@ -886,7 +902,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     addDPStaticEntry( sysMenu, qtr( "&Open Media" ), "",
             ":/pixmaps/file-wide_16px.png", SLOT( openFileDialog() ), "" );
     addDPStaticEntry( sysMenu, qtr( "&Quit" ) , "",
-        ":/pixmaps/menus_quit_16px.png", SLOT( quit() ), "" );
+            ":/pixmaps/menus_quit_16px.png", SLOT( quit() ), "" );
 
     /* Set the menu */
     mi->getSysTray()->setContextMenu( sysMenu );
