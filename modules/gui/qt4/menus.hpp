@@ -78,7 +78,8 @@ public:
     static QMenu *FileMenu();
     static QMenu *SDMenu( intf_thread_t * );
     static QMenu *PlaylistMenu( intf_thread_t *, MainInterface * );
-    static QMenu *ToolsMenu( intf_thread_t *, QMenu *, MainInterface *, bool, bool with = true );
+    static QMenu *ToolsMenu( intf_thread_t *, QMenu *, MainInterface *,
+                             bool, bool with = true );
     static QMenu *NavigMenu( intf_thread_t *, QMenu * );
     static QMenu *VideoMenu( intf_thread_t *, QMenu * );
     static QMenu *AudioMenu( intf_thread_t *, QMenu * );
@@ -114,7 +115,7 @@ private:
 
 class MenuFunc : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     MenuFunc( QMenu *_menu, int _id ) { menu = _menu; id = _id; };
@@ -128,7 +129,8 @@ public:
         case 4: QVLCMenu::InterfacesMenu( p_intf, menu ); break;
         }
     };
-    int id; QMenu *menu;
+    int id;
+    QMenu *menu;
 };
 
 #endif

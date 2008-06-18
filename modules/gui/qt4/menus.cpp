@@ -463,7 +463,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
  **/
 QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 {
-    vlc_object_t *p_object;
+    vlc_object_t *p_vout;
     input_thread_t *p_input;
     vector<int> objects;
     vector<const char *> varnames;
@@ -496,13 +496,13 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     p_input = THEMIM->getInput();
     if( p_input )
         vlc_object_yield( p_input );
-    p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+    p_vout = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_VOUT,
             FIND_ANYWHERE );
 
-    VideoAutoMenuBuilder( p_object, p_input, objects, varnames );
+    VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
 
-    if( p_object )
-        vlc_object_release( p_object );
+    if( p_vout )
+        vlc_object_release( p_vout );
     if( p_input )
         vlc_object_release( p_input );
 
@@ -639,6 +639,9 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
     else if( THEPL->items.i_size )
         addMIMStaticEntry( p_intf, menu, qtr( "Play" ), "",
                 ":/pixmaps/play_16px.png", SLOT( togglePlayPause() ) );
+    else
+        addDPStaticEntry( menu, qtr( "Play" ), "",
+                ":/pixmaps/play_16px.png", SLOT( openDialog() ) );
 
     addMIMStaticEntry( p_intf, menu, qtr( "Stop" ), "",
             ":/pixmaps/stop_16px.png", SLOT( stop() ) );
@@ -759,15 +762,34 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         QMenu *menu = new QMenu();
         QMenu *submenu;
         QAction *action;
+        bool b_isFullscreen = false;
 
         POPUP_BOILERPLATE;
 
         PopupMenuControlEntries( menu, p_intf, p_input );
         menu->addSeparator();
-        bool b_fullscreen;
 
         if( p_input )
         {
+            vlc_object_t *p_vout = (vlc_object_t *)
+                vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+
+            /* Add a fullscreen switch button */
+            if( p_vout )
+            {
+                vlc_value_t val;
+                var_Get( p_vout, "fullscreen", &val );
+                b_isFullscreen = !( !val.b_bool );
+                if( b_isFullscreen )
+                    CreateAndConnect( menu, "fullscreen",
+                            qtr( "Leave Fullscreen" ),"" , ITEM_NORMAL,
+                            p_vout->i_object_id, val, VLC_VAR_BOOL,
+                            b_isFullscreen );
+            }
+
+            vlc_object_release( p_vout );
+            menu->addSeparator();
+
             vlc_object_yield( p_input );
             InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
             vlc_object_release( p_input );
@@ -793,8 +815,8 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
         menu->addSeparator();
 
-        /* Add some special entries for windowed mode */
-        if( !b_fullscreen )
+        /* Add some special entries for windowed mode: Interface Menu */
+        if( !b_isFullscreen )
         {
             submenu = new QMenu( qtr( "Interface" ), menu );
             submenu->addAction( QIcon( ":/pixmaps/playlist_16px.png" ),
