@@ -5423,24 +5423,70 @@ then
         CPPFLAGS="${CPPFLAGS_save}"
       ],
       [
-        AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
-        if test "${MOZILLA_CONFIG}" = "no"
-        then
-          AC_PATH_PROG(SEAMONKEY_CONFIG, seamonkey-config, no)
-          if test "${SEAMONKEY_CONFIG}" = "no"
-          then
-            AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
-            if test "${XULRUNNER_CONFIG}" = "no"
-            then
-              AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
-            else
-              have_xul=true
-              MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
+        PKG_CHECK_MODULES([XULRUNNER], [libxul],
+          [
+            PKG_CHECK_MODULES([FIREFOX_XPCOM], [firefox-xpcom],
+              [],
+              [
+                PKG_CHECK_MODULES([MOZILLA_NSPR], [mozilla-nspr],
+                  [],
+                  [
+                    PKG_CHECK_MODULES([NSPR], [nspr],
+                      [],
+                      [
+                        AC_MSG_ERROR([Please install the nspr development tools.])
+                      ]
+                    )
+                  ]
+                )
+              ]
+            )
+            CPPFLAGS="${CPPFLAGS_save} ${XULRUNNER_CFLAGS} ${XULRUNNER_CPPFLAGS} ${FIREFOX_XPCOM_CFLAGS} ${MOZILLA_NSPR_CFLAGS} ${NSPR_CFLAGS} ${MOZILLA_CPPFLAGS}"
+            MOZILLA_REQUIRED_HEADERS=1
+            AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
+            AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
+              [#if HAVE_NPAPI_H
+               # include <npapi.h>
+               #endif
+              ])
+            if test "${MOZILLA_REQUIRED_HEADERS}" = "0"; then
+                AC_MSG_ERROR([Please install the Mozilla runtime package xulrunner-devel; plugplugin/npapi.h and plugin/npruntime.h were not found.])
             fi
-          else
-            MOZILLA_CONFIG="${SEAMONKEY_CONFIG}"
-          fi
-        fi
+            MOZILLA_REQUIRED_HEADERS=
+            mozilla=:
+            AC_DEFINE([XP_UNIX],[1],[Defined for Mozilla as we are Unix])
+            AC_DEFINE([MOZ_X11],[1],[Defined as Unix mozilla uses X11])
+            AC_DEFINE([OJI],[1],[Java Runtime Interface])
+            AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
+            VLC_ADD_LIBS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt -lXpm])
+            VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS}])
+            VLC_ADD_LDFLAGS([mozilla],[${MOZILLA_LDFLAGS}])
+            VLC_ADD_LIBS([mozilla],[${FIREFOX_LIBS} ${MOZILLA_NSPR_LIBS} ${NSPR_LIBS}])
+            VLC_ADD_PLUGIN([mozilla])
+            MOZILLA_CONFIG=
+            CPPFLAGS="${CPPFLAGS_save}"
+          ],
+          [
+            AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
+            if test "${MOZILLA_CONFIG}" = "no"
+            then
+              AC_PATH_PROG(SEAMONKEY_CONFIG, seamonkey-config, no)
+              if test "${SEAMONKEY_CONFIG}" = "no"
+              then
+                AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
+                if test "${XULRUNNER_CONFIG}" = "no"
+                then
+                  AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
+                else
+                  have_xul=true
+                  MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
+                fi
+              else
+                MOZILLA_CONFIG="${SEAMONKEY_CONFIG}"
+              fi
+            fi
+          ]
+        )
       ]
     )
     if test ! -z "${MOZILLA_CONFIG}"
