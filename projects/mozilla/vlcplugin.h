@@ -1,11 +1,12 @@
 /*****************************************************************************
  * vlcplugin.h: a VLC plugin for Mozilla
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
-            Damien Fouilleul <damienf@videolan.org>
+ *          Damien Fouilleul <damienf@videolan.org>
+ *         Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -1,11 +1,12 @@
 /*****************************************************************************
  * vlcplugin.cpp: a VLC plugin for Mozilla
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Damien Fouilleul <damienf.fouilleul@laposte.net>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -423,13 +424,14 @@ int  VlcPlugin::setSize(unsigned width, unsigned height)
     return diff;
 }
 
+#define BTN_SPACE ((unsigned int)4)
 void VlcPlugin::showToolbar()
 {
     const NPWindow& window = getWindow();
     Window control = getControlWindow();
     Window video = getVideoWindow();
     Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
-    unsigned int i_height = 0, i_width = 0;
+    unsigned int i_height = 0, i_width = BTN_SPACE;
 
     /* load icons */
     if( !p_btnPlay )
@@ -438,7 +440,6 @@ void VlcPlugin::showToolbar()
     if( p_btnPlay )
     {
         i_height = __MAX( i_height, p_btnPlay->height );
-        i_width += p_btnPlay->width;
     }
     if( !p_btnPause )
         XpmReadFileToImage( p_display, DATA_PATH "/mozilla/pause.xpm",
@@ -446,15 +447,16 @@ void VlcPlugin::showToolbar()
     if( p_btnPause )
     {
         i_height = __MAX( i_height, p_btnPause->height );
-        i_width += p_btnPause->width;
     }
+    i_width += __MAX( p_btnPause->width, p_btnPlay->width );
+
     if( !p_btnStop )
         XpmReadFileToImage( p_display, DATA_PATH "/mozilla/stop.xpm",
                             &p_btnStop, NULL, NULL );
     if( p_btnStop )
     {
         i_height = __MAX( i_height, p_btnStop->height );
-        i_width += p_btnStop->width;
+        i_width += BTN_SPACE + p_btnStop->width;
     }
     if( !p_timeline )
         XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_line.xpm",
@@ -462,7 +464,7 @@ void VlcPlugin::showToolbar()
     if( p_timeline )
     {
         i_height = __MAX( i_height, p_timeline->height );
-        i_width += p_timeline->width;
+        i_width += BTN_SPACE + p_timeline->width;
     }
     if( !p_btnTime )
         XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_icon.xpm",
@@ -470,7 +472,7 @@ void VlcPlugin::showToolbar()
     if( p_btnTime )
     {
         i_height = __MAX( i_height, p_btnTime->height );
-        i_width += p_btnTime->width;
+        i_width += BTN_SPACE + p_btnTime->width;
     }
     if( !p_btnFullscreen )
         XpmReadFileToImage( p_display, DATA_PATH "/mozilla/fullscreen.xpm",
@@ -478,7 +480,7 @@ void VlcPlugin::showToolbar()
     if( p_btnFullscreen )
     {
         i_height = __MAX( i_height, p_btnFullscreen->height );
-        i_width += p_btnFullscreen->width;
+        i_width += BTN_SPACE + p_btnFullscreen->width;
     }
     if( !p_btnMute )
         XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_max.xpm",
@@ -486,7 +488,6 @@ void VlcPlugin::showToolbar()
     if( p_btnMute )
     {
         i_height = __MAX( i_height, p_btnMute->height );
-        i_width += p_btnMute->width;
     }
     if( !p_btnUnmute )
         XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_mute.xpm",
@@ -494,8 +495,9 @@ void VlcPlugin::showToolbar()
     if( p_btnUnmute )
     {
         i_height = __MAX( i_height, p_btnUnmute->height );
-        i_width += p_btnUnmute->width;
     }
+    i_width += BTN_SPACE + __MAX( p_btnUnmute->width, p_btnMute->width );
+
     setToolbarSize( i_width, i_height );
 
     if( !p_btnPlay || !p_btnPause || !p_btnStop || !p_timeline ||
@@ -560,7 +562,6 @@ void VlcPlugin::redrawToolbar()
     GC gc;
     XGCValues gcv;
     unsigned int i_tb_width, i_tb_height;
-#define BTN_SPACE ((unsigned int)4)
 
     /* This method does nothing if toolbar is hidden. */
     if( !b_toolbar )
@@ -608,7 +609,6 @@ void VlcPlugin::redrawToolbar()
     dst_x = BTN_SPACE;
     dst_y = i_tb_height >> 1; /* baseline = vertical middle */
 
-    fprintf( stderr, ">>>>>> is playing = %d\n", i_playing );
     if( p_btnPause && (i_playing == 1) )
     {
         XPutImage( p_display, control, gc, p_btnPause, 0, 0, dst_x,
@@ -675,12 +675,16 @@ void VlcPlugin::redrawToolbar()
 
 vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos )
 {
-    unsigned int i_dest = 0;
+    unsigned int i_dest = BTN_SPACE;//(i_tb_height >> 1);
     int i_playing = 0;
     bool b_mute = false;
     libvlc_exception_t ex;
 
-    if( i_xpos >= i_tb_height )
+    fprintf( stderr, "ToolbarButtonClicked:: "
+                     "trying to match (%d,%d) (%d,%d)\n",
+             i_xpos, i_ypos, i_tb_height, i_tb_width );
+
+    if( i_ypos >= i_tb_width )
         return clicked_Unknown;
 
     /* Note: the order of testing is dependend on the original
@@ -698,38 +702,38 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
     b_mute = libvlc_audio_get_mute( getVLC(), &ex );
     libvlc_exception_clear( &ex );
 
-
     /* is Pause of Play button clicked */
     if( (i_playing != 1) &&
-        (i_ypos >= BTN_SPACE>>1) &&
-        (i_ypos <= p_btnPlay->width + (BTN_SPACE>>1)) )
+        (i_xpos >= (BTN_SPACE>>1)) &&
+        (i_xpos <= i_dest + p_btnPlay->width + (BTN_SPACE>>1)) )
         return clicked_Play;
-    else if( (i_ypos >= BTN_SPACE>>1)  &&
-             (i_ypos <= p_btnPause->width) )
+    else if( (i_xpos >= (BTN_SPACE>>1))  &&
+             (i_xpos <= i_dest + p_btnPause->width) )
         return clicked_Pause;
 
     /* is Stop button clicked */
     if( i_playing != 1 )
-        i_dest += BTN_SPACE + p_btnPause->width + (BTN_SPACE>>1);
+        i_dest += (p_btnPlay->width + (BTN_SPACE>>1));
     else
-        i_dest += BTN_SPACE + p_btnPlay->width + (BTN_SPACE>>1);
-    if( (i_ypos >= i_dest) &&
-        (i_ypos <= p_btnStop->width + (BTN_SPACE>>1)) )
+        i_dest += (p_btnPause->width + (BTN_SPACE>>1));
+
+    if( (i_xpos >= i_dest) &&
+        (i_xpos <= i_dest + p_btnStop->width + (BTN_SPACE>>1)) )
         return clicked_Stop;
 
     /* is Fullscreen button clicked */
     i_dest += (p_btnStop->width + (BTN_SPACE>>1));
-    if( (i_ypos >= i_dest) &&
-        (i_ypos <= p_btnFullscreen->width + (BTN_SPACE>>1)) )
+    if( (i_xpos >= i_dest) &&
+        (i_xpos <= i_dest + p_btnFullscreen->width + (BTN_SPACE>>1)) )
         return clicked_Fullscreen;
 
     /* is Mute or Unmute button clicked */
     i_dest += (p_btnFullscreen->width + (BTN_SPACE>>1));
-    if( !b_mute && (i_ypos >= i_dest) &&
-        (i_ypos <= p_btnMute->width + (BTN_SPACE>>1)) )
+    if( !b_mute && (i_xpos >= i_dest) &&
+        (i_xpos <= i_dest + p_btnMute->width + (BTN_SPACE>>1)) )
         return clicked_Mute;
-    else if( (i_ypos >= i_dest) &&
-             (i_ypos <= p_btnUnmute->width + (BTN_SPACE>>1)) )
+    else if( (i_xpos >= i_dest) &&
+             (i_xpos <= i_dest + p_btnUnmute->width + (BTN_SPACE>>1)) )
         return clicked_Unmute;
 
     /* is timeline clicked */
@@ -737,14 +741,14 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
         i_dest += (p_btnMute->width + (BTN_SPACE>>1));
     else
         i_dest += (p_btnUnmute->width + (BTN_SPACE>>1));
-    if( (i_ypos >= i_dest) &&
-        (i_ypos <= p_timeline->width + (BTN_SPACE>>1)) )
+    if( (i_xpos >= i_dest) &&
+        (i_xpos <= i_dest + p_timeline->width + (BTN_SPACE>>1)) )
         return clicked_timeline;
 
     /* is time button clicked */
     i_dest += (p_timeline->width + (BTN_SPACE>>1));
-    if( (i_ypos >= i_dest) &&
-        (i_ypos <= p_btnTime->width + (BTN_SPACE>>1)) )
+    if( (i_xpos >= i_dest) &&
+        (i_xpos <= i_dest + p_btnTime->width + (BTN_SPACE>>1)) )
         return clicked_Time;
 
     return clicked_Unknown;

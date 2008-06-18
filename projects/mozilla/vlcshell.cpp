@@ -1,10 +1,11 @@
 /*****************************************************************************
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -836,30 +837,37 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
 
     if( p_plugin && p_plugin->b_toolbar )
     {
+        int i_playing;
         libvlc_exception_t ex;
+
         libvlc_exception_init( &ex );
         libvlc_media_player_t *p_md =
                 libvlc_playlist_get_media_player(p_plugin->getVLC(), &ex);
+        if( libvlc_exception_raised(&ex) )
+            fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
+        libvlc_exception_clear( &ex );
+
+        libvlc_exception_init( &ex );
+        i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
+        if( libvlc_exception_raised(&ex) )
+            fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
         libvlc_exception_clear( &ex );
 
         vlc_toolbar_clicked_t clicked;
         clicked = p_plugin->getToolbarButtonClicked( i_xPos, i_yPos );
-
         switch( clicked )
         {
             case clicked_Play:
             case clicked_Pause:
             {
-                int i_playing;
-                libvlc_exception_init( &ex );
-                i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
-                libvlc_exception_clear( &ex );
-
                 libvlc_exception_init( &ex );
                 if( i_playing == 1 )
                     libvlc_playlist_pause( p_plugin->getVLC(), &ex );
                 else
                     libvlc_playlist_play( p_plugin->getVLC(), -1, 0, NULL, &ex );
+
+                if( libvlc_exception_raised(&ex) )
+                    fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
                 libvlc_exception_clear( &ex );
             }
             break;
@@ -868,6 +876,32 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             {
                 libvlc_exception_init( &ex );
                 libvlc_playlist_stop( p_plugin->getVLC(), &ex );
+                if( libvlc_exception_raised(&ex) )
+                    fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
+                libvlc_exception_clear( &ex );
+            }
+            break;
+
+            case clicked_Fullscreen:
+            {
+                if( (i_playing == 1) && p_md )
+                {
+                    libvlc_exception_init( &ex );
+                    libvlc_set_fullscreen( p_md, 1, &ex );
+                    if( libvlc_exception_raised(&ex) )
+                        fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear( &ex );
+                }
+            }
+            break;
+
+            case clicked_Mute:
+            case clicked_Unmute:
+            {
+                libvlc_exception_init( &ex );
+                libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
+                if( libvlc_exception_raised(&ex) )
+                    fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
                 libvlc_exception_clear( &ex );
             }
             break;
@@ -887,6 +921,8 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
 
                     libvlc_exception_init( &ex );
                     libvlc_media_player_set_time( p_md, f_length, &ex );
+                    if( libvlc_exception_raised(&ex) )
+                        fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
                     libvlc_exception_clear( &ex );
                 }
             }
@@ -895,31 +931,6 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             case clicked_Time:
             {
                 /* Not implemented yet*/
-            }
-            break;
-
-            case clicked_Fullscreen:
-            {
-                int i_playing;
-                libvlc_exception_init( &ex );
-                i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
-                libvlc_exception_clear( &ex );
-
-                if( (i_playing == 1) && p_md )
-                {
-                    libvlc_exception_init( &ex );
-                    libvlc_set_fullscreen( p_md, 1, &ex );
-                    libvlc_exception_clear( &ex );
-                }
-            }
-            break;
-
-            case clicked_Mute:
-            case clicked_Unmute:
-            {
-                libvlc_exception_init( &ex );
-                libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
-                libvlc_exception_clear( &ex );
             }
             break;
 
