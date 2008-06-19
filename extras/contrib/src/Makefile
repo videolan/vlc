@@ -1192,7 +1192,7 @@ DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 
 ifdef SVN
 libdvdnav:
-	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav
+	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav -r1100
 	patch -d libdvdnav -p0 < Patches/libdvdnav.patch
 	(cd $@; ./autogen.sh noconfig)
 else
