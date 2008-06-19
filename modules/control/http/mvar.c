@@ -579,7 +579,7 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
         else
 #endif
         {
-            char psz_ctime[26];
+            char psz_buf[26];
             char psz_tmp[strlen( psz_dir ) + 1 + strlen( psz_name ) + 1];
 
             sprintf( psz_tmp, "%s"DIR_SEP"%s", psz_dir, psz_name );
@@ -600,13 +600,14 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                 mvar_AppendNewVar( f, "type", "unknown" );
             }
 
-            sprintf( psz_ctime, "%"PRId64, (int64_t)stat_info.st_size );
-            mvar_AppendNewVar( f, "size", psz_ctime );
+            snprintf( psz_buf, sizeof( psz_buf ), "%"PRId64,
+                      (int64_t)stat_info.st_size );
+            mvar_AppendNewVar( f, "size", psz_buf );
 
             /* FIXME memory leak FIXME */
 #   ifdef HAVE_CTIME_R
-            ctime_r( &stat_info.st_mtime, psz_ctime );
-            mvar_AppendNewVar( f, "date", psz_ctime );
+            ctime_r( &stat_info.st_mtime, psz_buf );
+            mvar_AppendNewVar( f, "date", psz_buf );
 #   else
             mvar_AppendNewVar( f, "date", ctime( &stat_info.st_mtime ) );
 #   endif
