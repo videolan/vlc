@@ -50,10 +50,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     /* Prepare the playlist_export_t structure */
     p_export = (playlist_export_t *)malloc( sizeof(playlist_export_t) );
     if( !p_export)
-    {
-        msg_Err( p_playlist, "out of memory" );
         return VLC_ENOMEM;
-    }
     p_export->psz_filename = NULL;
     if ( psz_filename )
         p_export->psz_filename = strdup( psz_filename );

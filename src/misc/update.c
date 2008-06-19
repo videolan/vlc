@@ -1452,10 +1452,7 @@ void update_Download( update_t *p_update, const char *psz_destdir )
     update_download_thread_t *p_udt = vlc_object_create( p_update->p_libvlc,
                                         sizeof( update_download_thread_t ) );
     if( !p_udt )
-    {
-        msg_Err( p_update->p_libvlc, "out of memory" );
         return;
-    }
 
     p_udt->p_update = p_update;
     p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;

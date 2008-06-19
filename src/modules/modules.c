@@ -1245,7 +1245,6 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     p_module = vlc_module_create( p_this );
     if( p_module == NULL )
     {
-        msg_Err( p_this, "out of memory" );
         module_Unload( handle );
         return NULL;
     }
@@ -1349,10 +1348,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
      * allocate a structure for it */
     p_module = vlc_module_create( p_this );
     if( p_module == NULL )
-    {
-        msg_Err( p_this, "out of memory" );
         return -1;
-    }
 
     /* Initialize the module : fill p_module->psz_object_name, etc. */
     if( pf_entry( p_module ) != 0 )

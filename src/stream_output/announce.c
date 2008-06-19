@@ -159,10 +159,7 @@ static announce_handler_t *announce_HandlerCreate( vlc_object_t *p_this )
     p_announce = vlc_object_create( p_this, VLC_OBJECT_ANNOUNCE );
 
     if( !p_announce )
-    {
-        msg_Err( p_this, "out of memory" );
         return NULL;
-    }
 
     p_announce->p_sap = NULL;
     vlc_object_attach( p_announce, p_this->p_libvlc);

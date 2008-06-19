@@ -443,7 +443,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( vlc_thread_create( p_vout, "video output", RunThread,
                            VLC_THREAD_PRIORITY_OUTPUT, true ) )
     {
-        msg_Err( p_vout, "out of memory" );
         module_Unneed( p_vout, p_vout->p_module );
         vlc_object_release( p_vout );
         return NULL;

@@ -297,10 +297,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
 
     s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( s, "Out of memory when allocating stream_sys_t" );
         goto error;
-    }
 
     /* UTF16 and UTF32 text file conversion */
     s->i_char_width = 1;
@@ -338,10 +335,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     {
         access_entry_t *p_entry = malloc( sizeof(access_entry_t) );
         if( p_entry == NULL )
-        {
-            msg_Err( s, "Out of memory when allocating access_entry_t" );
             goto error;
-        }
         char *psz_name, *psz_parser = psz_name = psz_list;
 
         p_sys->p_list_access = p_access;
@@ -349,7 +343,6 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
         p_entry->psz_path = strdup( p_access->psz_path );
         if( p_entry->psz_path == NULL )
         {
-            msg_Err( s, "Out of memory when duplicating p_access->psz_path" );
             free( p_entry );
             goto error;
         }
@@ -380,10 +373,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
 
                 p_entry = malloc( sizeof(access_entry_t) );
                 if( p_entry == NULL )
-                {
-                    msg_Err( p_access, "Out of memory when allocating access_entry_t" );
                     goto error;
-                }
                 p_entry->i_size = p_tmp->info.i_size;
                 p_entry->psz_path = psz_name;
                 TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
@@ -1793,10 +1783,7 @@ char * stream_ReadLine( stream_t *s )
             i_data = (psz_eol - (char *)p_data) + 1;
             p_line = realloc( p_line, i_line + i_data + s->i_char_width ); /* add \0 */
             if( !p_line )
-            {
-                msg_Err( s, "Out of memory when reallocating p_line" );
                 goto error;
-            }
             i_data = stream_Read( s, &p_line[i_line], i_data );
             if( i_data <= 0 ) break; /* Hmmm */
             i_line += i_data - s->i_char_width; /* skip \n */;
@@ -1809,10 +1796,7 @@ char * stream_ReadLine( stream_t *s )
         /* Read data (+1 for easy \0 append) */
         p_line = realloc( p_line, i_line + STREAM_PROBE_LINE + s->i_char_width );
         if( !p_line )
-        {
-            msg_Err( s, "Out of memory when reallocating p_line" );
             goto error;
-        }
         i_data = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
         if( i_data <= 0 ) break; /* Hmmm */
         i_line += i_data;
@@ -1837,10 +1821,7 @@ char * stream_ReadLine( stream_t *s )
             /* iconv */
             psz_new_line = malloc( i_line );
             if( psz_new_line == NULL )
-            {
-                msg_Err( s, "Out of memory when allocating psz_new_line" );
                 goto error;
-            }
             i_in = i_out = (size_t)i_line;
             p_in = p_line;
             p_out = psz_new_line;

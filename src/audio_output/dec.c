@@ -79,10 +79,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
 
     p_input = malloc(sizeof(aout_input_t));
     if ( p_input == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         goto error;
-    }
     memset( p_input, 0, sizeof(aout_input_t) );
 
     vlc_mutex_init( &p_input->lock );

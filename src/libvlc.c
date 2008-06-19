@@ -577,7 +577,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     if ( !dbus_message_iter_append_basic( &dbus_args,
                                 DBUS_TYPE_STRING, &ppsz_argv[i_input] ) )
                     {
-                        msg_Err( p_libvlc, "Out of memory" );
                         dbus_message_unref( p_dbus_msg );
                         system_End( p_libvlc );
                         exit( VLC_ENOMEM );
@@ -588,7 +587,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     if ( !dbus_message_iter_append_basic( &dbus_args,
                                 DBUS_TYPE_BOOLEAN, &b_play ) )
                     {
-                        msg_Err( p_libvlc, "Out of memory" );
                         dbus_message_unref( p_dbus_msg );
                         system_End( p_libvlc );
                         exit( VLC_ENOMEM );

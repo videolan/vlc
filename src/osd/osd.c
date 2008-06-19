@@ -72,10 +72,7 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
     p_menu = vlc_custom_create( p_this, sizeof( *p_menu ), VLC_OBJECT_OSDMENU,
                                 osdmenu_name );
     if( !p_menu )
-    {
-        msg_Err( p_this, "out of memory" );
         return NULL;
-    }
     vlc_object_yield( p_menu );
     vlc_object_attach( p_menu, p_this->p_libvlc );
 

@@ -314,7 +314,6 @@ static int MixBuffer( aout_instance_t * p_aout )
                       p_output_buffer );
     if ( p_output_buffer == NULL )
     {
-        msg_Err( p_aout, "out of memory" );
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
         return -1;
     }

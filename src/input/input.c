@@ -131,10 +131,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input = vlc_custom_create( p_parent, sizeof( *p_input ),
                                  VLC_OBJECT_INPUT, input_name );
     if( p_input == NULL )
-    {
-        msg_Err( p_parent, "out of memory" );
         return NULL;
-    }
 
     /* Construct a nice name for the input timer */
     char psz_timer_name[255];

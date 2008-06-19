@@ -123,10 +123,7 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
     p_sap = vlc_custom_create( VLC_OBJECT(p_announce), sizeof( sap_handler_t ),
                                VLC_OBJECT_ANNOUNCE, "announce" );
     if( !p_sap )
-    {
-        msg_Err( p_announce, "out of memory" );
         return NULL;
-    }
 
     p_sap->psz_object_name = strdup( "sap announcer" );
 

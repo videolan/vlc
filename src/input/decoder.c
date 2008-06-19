@@ -445,10 +445,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
     p_dec = vlc_object_create( p_input, i_object_type );
     if( p_dec == NULL )
-    {
-        msg_Err( p_input, "out of memory" );
         return NULL;
-    }
 
     p_dec->pf_decode_audio = 0;
     p_dec->pf_decode_video = 0;
@@ -466,10 +463,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     /* Allocate our private structure for the decoder */
     p_dec->p_owner = p_owner = malloc( sizeof( decoder_owner_sys_t ) );
     if( p_dec->p_owner == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
         return NULL;
-    }
     p_dec->p_owner->b_own_thread = true;
     p_dec->p_owner->i_preroll_end = -1;
     p_dec->p_owner->p_input = p_input;
@@ -484,10 +478,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
     /* decoder fifo */
     if( ( p_dec->p_owner->p_fifo = block_FifoNew() ) == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
         return NULL;
-    }
 
     /* Set buffers allocation callbacks for the decoders */
     p_dec->pf_aout_buffer_new = aout_new_buffer;

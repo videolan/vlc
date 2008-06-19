@@ -43,10 +43,7 @@ void devices_ProbeCreate( vlc_object_t *p_this )
     /* Allocate structure */
     p_probe = vlc_object_create( p_this, VLC_OBJECT_INTF );
     if( !p_probe )
-    {
-        msg_Err( p_this, "out of memory" );
         return;
-    }
     p_probe->p_module = module_Need( p_probe, "devices probe", "", false );
     if( p_probe->p_module == NULL )
     {

@@ -92,10 +92,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     /* Allocate structure */
     p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
     if( !p_intf )
-    {
-        msg_Err( p_this, "out of memory" );
         return NULL;
-    }
     p_intf->pf_request_window = NULL;
     p_intf->pf_release_window = NULL;
     p_intf->pf_control_window = NULL;

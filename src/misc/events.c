@@ -210,7 +210,6 @@ void vlc_event_send( vlc_event_manager_t * p_em,
                     sizeof(vlc_event_listener_t)*i_cached_listeners );
             if( !array_of_cached_listeners )
             {
-                msg_Err( p_em->p_parent_object, "Not enough memory in vlc_event_send" );
                 vlc_mutex_unlock( &p_em->object_lock );
                 return;
             }

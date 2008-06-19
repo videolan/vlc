@@ -616,10 +616,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
 
     p_media = malloc( sizeof( vlm_media_sys_t ) );
     if( !p_media )
-    {
-        msg_Err( p_vlm, "out of memory" );
         return VLC_ENOMEM;
-    }
     memset( p_media, 0, sizeof(vlm_media_sys_t) );
 
     if( p_cfg->b_vod )

@@ -989,10 +989,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
     psz_host = strdup( psz_hostname );
     if( psz_host == NULL )
-    {
-        msg_Err( p_this, "memory error" );
         return NULL;
-    }
 
     /* to be sure to avoid multiple creation */
     var_Create( p_this->p_libvlc, "httpd_mutex", VLC_VAR_MUTEX );

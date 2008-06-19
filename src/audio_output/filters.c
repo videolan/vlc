@@ -343,10 +343,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
             * 1000000 / p_filter->input.i_rate,
             *pp_input_buffer, p_output_buffer );
         if ( p_output_buffer == NULL )
-        {
-            msg_Err( p_aout, "out of memory" );
             return;
-        }
         /* Please note that p_output_buffer->i_nb_samples & i_nb_bytes
          * shall be set by the filter plug-in. */
 

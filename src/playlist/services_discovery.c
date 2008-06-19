@@ -335,10 +335,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
         /* Free in playlist_ServicesDiscoveryRemove */
         p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
         if( !p_sds )
-        {
-            msg_Err( p_playlist, "No more memory" );
             return VLC_ENOMEM;
-        }
         p_sds->p_sd = p_sd;
         p_sds->p_one = p_one;
         p_sds->p_cat = p_cat;

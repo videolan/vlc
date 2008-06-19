@@ -164,10 +164,7 @@ decoder_synchro_t * decoder_SynchroInit( decoder_t *p_dec, int i_frame_rate )
 {
     decoder_synchro_t * p_synchro = malloc( sizeof(*p_synchro) );
     if ( p_synchro == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
         return NULL;
-    }
     memset( p_synchro, 0, sizeof(*p_synchro) );
 
     p_synchro->p_dec = p_dec;

@@ -299,17 +299,14 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
 
     if( !( p_access = vlc_object_create( p_sout,
                                          sizeof( sout_access_out_t ) ) ) )
-    {
-        msg_Err( p_sout, "out of memory" );
         return NULL;
-    }
 
     psz_next = config_ChainCreate( &p_access->psz_access, &p_access->p_cfg,
                                    psz_access );
     free( psz_next );
     p_access->psz_path   = strdup( psz_name ? psz_name : "" );
     p_access->p_sout     = p_sout;
-    p_access->p_sys = NULL;
+    p_access->p_sys      = NULL;
     p_access->pf_seek    = NULL;
     p_access->pf_read    = NULL;
     p_access->pf_write   = NULL;
@@ -408,10 +405,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
 
     p_mux = vlc_object_create( p_sout, sizeof( sout_mux_t ) );
     if( p_mux == NULL )
-    {
-        msg_Err( p_sout, "out of memory" );
         return NULL;
-    }
 
     p_mux->p_sout = p_sout;
     psz_next = config_ChainCreate( &p_mux->psz_mux, &p_mux->p_cfg, psz_mux );
@@ -523,10 +517,7 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
     /* create a new sout input */
     p_input = malloc( sizeof( sout_input_t ) );
     if( !p_input )
-    {
-        msg_Err( p_mux, "out of memory" );
         return NULL;
-    }
     p_input->p_sout = p_mux->p_sout;
     p_input->p_fmt  = p_fmt;
     p_input->p_fifo = block_FifoNew();
@@ -777,10 +768,7 @@ sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_chain )
     p_stream = vlc_object_create( p_sout, sizeof( sout_stream_t ) );
 
     if( !p_stream )
-    {
-        msg_Err( p_sout, "out of memory" );
         return NULL;
-    }
 
     p_stream->p_sout   = p_sout;
     p_stream->p_sys    = NULL;

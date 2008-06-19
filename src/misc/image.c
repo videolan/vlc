@@ -620,10 +620,7 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
 
     p_dec = vlc_object_create( p_this, VLC_OBJECT_DECODER );
     if( p_dec == NULL )
-    {
-        msg_Err( p_this, "out of memory" );
         return NULL;
-    }
 
     p_dec->p_module = NULL;
     es_format_Init( &p_dec->fmt_in, VIDEO_ES, fmt->i_chroma );
@@ -673,10 +670,7 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
 
     p_enc = vlc_object_create( p_this, VLC_OBJECT_ENCODER );
     if( p_enc == NULL )
-    {
-        msg_Err( p_this, "out of memory" );
         return NULL;
-    }
 
     p_enc->p_module = NULL;
     es_format_Init( &p_enc->fmt_in, VIDEO_ES, fmt_in->i_chroma );

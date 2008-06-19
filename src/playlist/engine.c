@@ -68,10 +68,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist = vlc_custom_create( p_parent, sizeof( *p_playlist ),
                                     VLC_OBJECT_GENERIC, playlist_name );
     if( !p_playlist )
-    {
-        msg_Err( p_parent, "out of memory" );
         return NULL;
-    }
 
     TAB_INIT( p_playlist->i_sds, p_playlist->pp_sds );
 

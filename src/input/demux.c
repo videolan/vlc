@@ -322,6 +322,8 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     if( psz_demux == NULL || *psz_demux == '\0' ) return NULL;
 
     s = vlc_stream_create( p_obj );
+    if( s == NULL )
+        return NULL;
     s->pf_read   = DStreamRead;
     s->pf_peek   = DStreamPeek;
     s->pf_control= DStreamControl;
@@ -330,6 +332,11 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     s->b_little_endian = false;
 
     s->p_sys = malloc( sizeof( d_stream_sys_t) );
+    if( s->p_sys == NULL )
+    {
+        vlc_object_release( s );
+        return NULL;
+    }
     p_sys = (d_stream_sys_t*)s->p_sys;
 
     p_sys->i_pos = 0;
@@ -341,8 +348,8 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     /* decoder fifo */
     if( ( p_sys->p_fifo = block_FifoNew() ) == NULL )
     {
-        msg_Err( s, "out of memory" );
         vlc_object_release( s );
+        free( p_sys->psz_name );
         free( p_sys );
         return NULL;
     }
