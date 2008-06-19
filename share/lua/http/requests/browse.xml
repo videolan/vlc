@@ -2,7 +2,7 @@
 <?vlc --[[
 vim:syntax=lua
 <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
-<  status.xml: VLC media player web interface
+<  browse.xml: VLC media player web interface
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005-2006 the VideoLAN team
 <  $Id$
