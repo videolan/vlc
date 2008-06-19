@@ -268,7 +268,7 @@ EXTRA_DIST += \
 	extras/package/macosx/eyetvplugin/eyetvplugin.h \
 	extras/package/macosx/eyetvplugin/English.lproj/InfoPlist.strings \
 	extras/package/macosx/eyetvplugin/eyetvplugin.xcodeproj/project.pbxproj \
-	extras/package/macosx/README.MacOSX.rtf
+	extras/package/macosx/README.MacOSX.rtf \
 	extras/package/macosx/Info.plist
 
 
