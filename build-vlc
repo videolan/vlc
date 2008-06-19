@@ -46,7 +46,6 @@ DIRECTX directx
 WINGDI wingdi
 SVGALIB svgalib
 GGI ggi
-GLIDE glide
 AA aa
 CACA caca
 OSS oss
@@ -111,7 +110,6 @@ WITHFRIBIDICONFIGPATH fribidi-config-path
 WITHQTE qte
 WITHDIRECTX directx
 WITHGGI ggi
-WITHGLIDE glide
 WITHCACACONFIGPATH caca-config-path
 WITHMAD mad
 WITHMADTREE mad-tree

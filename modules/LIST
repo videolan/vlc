@@ -119,7 +119,6 @@ $Id$
  * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin
  * ggi: video output module using the GGI API.
- * glide: video output module using the Glide API.
  * glwin32: a opengl provider using DirectX OpenGL
  * glx: a opengl provider using X11 OpenGL
  * gme: game music files demuxer

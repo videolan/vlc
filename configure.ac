@@ -4412,33 +4412,6 @@ then
 fi
 
 dnl
-dnl  Glide module
-dnl
-AC_ARG_ENABLE(glide,
-  [  --enable-glide          Glide (3dfx) support (default disabled)])
-if test "${enable_glide}" = "yes"
-then
-  CFLAGS_save="${CFLAGS}"
-  AC_ARG_WITH(glide,
-    [    --with-glide=PATH     path to libglide],
-    [ if test "${with_glide}" != "no" -a -n "${with_glide}"
-      then
-        VLC_ADD_CPPFLAGS([glide],[-I${with_glide}/include])
-        VLC_ADD_LIBS([glide],[-L${with_glide}/lib])
-        CFLAGS="$CFLAGS -I${with_glide}/include"
-    fi ])
-   CFLAGS="$CFLAGS -I/usr/include/glide"
-   AC_CHECK_HEADER(glide.h,[   
-      VLC_ADD_PLUGIN([glide])
-      VLC_ADD_LIBS([glide],[-lglide2x -lm])
-      VLC_ADD_CPPFLAGS([glide],[-I/usr/include/glide])
-    ],[
-      AC_MSG_ERROR([You don't have libglide. Install it or do not use --enable-glide])
-     ])
-   CFLAGS="${CFLAGS_save}"
-fi
-
-dnl
 dnl  AA plugin
 dnl
 AC_ARG_ENABLE(aa,

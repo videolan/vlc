@@ -127,10 +127,6 @@ bool 'GGI support' CONFIG_GGI
 if [ "$CONFIG_GGI" = "y" ]; then
    string '    Path to libggi' CONFIG_WITHGGI ""
 fi
-bool 'Glide (3dfx) support' CONFIG_GLIDE
-if [ "$CONFIG_GLIDE" = "y" ]; then
-   string '    Path to libglide' CONFIG_WITHGLIDE ""
-fi
 bool 'aalib output' CONFIG_AA
 bool 'cacalib output' CONFIG_CACA
 if [ "$CONFIG_CACA" = "y" ]; then
