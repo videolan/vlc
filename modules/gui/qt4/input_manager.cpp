@@ -30,10 +30,6 @@
 #include "input_manager.hpp"
 #include "dialogs_provider.hpp"
 
-static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
-                        vlc_value_t n, void *param );
-static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
-                        vlc_value_t n, void *param );
 static int ChangeSPU( vlc_object_t *p_this, const char *var, vlc_value_t o,
                       vlc_value_t n, void *param );
 static int ItemChanged( vlc_object_t *, const char *,
@@ -62,8 +58,6 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
                            QObject( parent ), p_intf( _p_intf )
 {
     i_old_playing_status = END_S;
-    b_had_audio  = b_had_video = b_has_audio = b_has_video = false;
-    b_has_subs   = false;
     old_name     = "";
     artUrl       = "";
     p_input      = NULL;
@@ -83,15 +77,14 @@ void InputManager::setInput( input_thread_t *_p_input )
 {
     delInput();
     p_input = _p_input;
-    b_had_audio = b_had_video = b_has_audio = b_has_video = false;
     if( p_input && !( p_input->b_dead || p_input->b_die ) )
     {
         vlc_object_yield( p_input );
         emit statusChanged( PLAYING_S );
         UpdateMeta();
-        UpdateTracks();
         UpdateNavigation();
         UpdateArt();
+        UpdateSPU();
         addCallbacks();
         i_input_id = input_GetItem( p_input )->i_id;
     }
@@ -123,6 +116,7 @@ void InputManager::delInput()
         emit rateChanged( INPUT_RATE_DEFAULT );
         vlc_object_release( p_input );
         p_input = NULL;
+        UpdateSPU();
     }
 }
 
@@ -130,7 +124,6 @@ void InputManager::delInput()
 void InputManager::addCallbacks()
 {
     /* We don't care about:
-       - spu-es
        - chapter
        - programs
        - audio-delay
@@ -140,10 +133,6 @@ void InputManager::addCallbacks()
      */
     /* src/input/input.c:1629 */
     var_AddCallback( p_input, "state", ItemStateChanged, this );
-    /* src/input/es-out.c:550 */
-    var_AddCallback( p_input, "audio-es", ChangeAudio, this );
-    /* src/input/es-out.c:551 */
-    var_AddCallback( p_input, "video-es", ChangeVideo, this );
     /* src/input/es-out.c:552 */
     var_AddCallback( p_input, "spu-es", ChangeSPU, this );
     /* src/input/input.c:1765 */
@@ -158,8 +147,6 @@ void InputManager::addCallbacks()
 void InputManager::delCallbacks()
 {
     var_DelCallback( p_input, "spu-es", ChangeSPU, this );
-    var_DelCallback( p_input, "audio-es", ChangeAudio, this );
-    var_DelCallback( p_input, "video-es", ChangeVideo, this );
     var_DelCallback( p_input, "state", ItemStateChanged, this );
     var_DelCallback( p_input, "rate-change", ItemRateChanged, this );
     var_DelCallback( p_input, "title", ItemTitleChanged, this );
@@ -176,6 +163,7 @@ void InputManager::customEvent( QEvent *event )
          type != ItemChanged_Type &&
          type != ItemRateChanged_Type &&
          type != ItemTitleChanged_Type &&
+         type != ItemSpuChanged_Type &&
          type != ItemStateChanged_Type )
         return;
 
@@ -183,6 +171,7 @@ void InputManager::customEvent( QEvent *event )
 
     if( ( type != PositionUpdate_Type  &&
           type != ItemRateChanged_Type &&
+          type != ItemSpuChanged_Type &&
           type != ItemStateChanged_Type
         )
         && ( i_input_id != ple->i_id ) )
@@ -200,7 +189,6 @@ void InputManager::customEvent( QEvent *event )
     case ItemChanged_Type:
         UpdateMeta();
         UpdateNavigation();
-        UpdateTracks();
         UpdateStatus();
         UpdateArt();
         break;
@@ -212,8 +200,9 @@ void InputManager::customEvent( QEvent *event )
         UpdateMeta();
         break;
     case ItemStateChanged_Type:
-        UpdateTracks();
         UpdateStatus();
+    case ItemSpuChanged_Type:
+        UpdateSPU();
         break;
     }
 }
@@ -311,21 +300,46 @@ void InputManager::UpdateMeta()
     }
 }
 
-void InputManager::UpdateTracks()
+bool InputManager::hasAudio()
 {
-    /* Has Audio, has Video Tracks ? */
-    vlc_value_t val;
-    var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-    b_has_audio = val.i_int > 0;
-    var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-    b_has_video = val.i_int > 0;
-    var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-    b_has_subs = val.i_int > 0;
+    if( hasInput() )
+    {
+        vlc_value_t val;
+        var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        return val.i_int > 0;
+    }
+    return false;
+}
 
-    /* Update ZVBI status */
+bool InputManager::hasVideo()
+{
+    if( hasInput() )
+    {
+        vlc_value_t val;
+        var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        return val.i_int > 0;
+    }
+    return false;
+
+}
+
+void InputManager::UpdateSPU()
+{
 #ifdef ZVBI_COMPILED
-    /* Update teletext status*/
-    emit teletextEnabled( b_has_subs );/* FIXME */
+    if( hasInput() )
+    {
+        vlc_value_t val;
+        var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+
+        /* Update teletext status*/
+        emit teletextEnabled( val.i_int > 0 );/* FIXME */
+        telexToggle( true );
+    }
+    else
+    {
+        emit teletextEnabled( false );
+        telexToggle( false );
+    }
 #endif
 }
 
@@ -650,31 +664,14 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
-                        vlc_value_t n, void *param )
-{
-    InputManager *im = (InputManager*)param;
-    im->b_has_audio = true;
-    return VLC_SUCCESS;
-}
-
-static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
-                        vlc_value_t n, void *param )
-{
-    InputManager *im = (InputManager*)param;
-    im->b_has_video = true;
-    return VLC_SUCCESS;
-}
-
 static int ChangeSPU( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param )
 {
     InputManager *im = (InputManager*)param;
-    im->b_has_subs = true;
-#ifdef ZVBI_COMPILED
-    im->telexToggle( im->b_has_subs );
-#endif
+    IMEvent *event = new IMEvent( ItemSpuChanged_Type, 0 );
+    QApplication::postEvent( im, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
+
 }
 
 /* MIM */

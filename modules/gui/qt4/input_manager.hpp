@@ -45,6 +45,7 @@ static int const VolumeChanged_Type    = QEvent::User + IMEventType + 6;
 static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 7;
 static int const FullscreenControlHide_Type = QEvent::User + IMEventType + 8;
 static int const FullscreenControlPlanHide_Type = QEvent::User + IMEventType + 9;
+static int const ItemSpuChanged_Type = QEvent::User + IMEventType + 10;
 
 class IMEvent : public QEvent
 {
@@ -65,9 +66,8 @@ public:
 
     void delInput();
     bool hasInput() { return p_input && !p_input->b_dead && !p_input->b_die; }
-    bool hasAudio() { return b_has_audio; }
-    bool hasVideo() { return b_has_video; }
-    bool b_has_audio, b_has_video, b_had_audio, b_had_video, b_has_subs;
+    bool hasAudio();
+    bool hasVideo();
 
 private:
     intf_thread_t  *p_intf;
@@ -86,7 +86,7 @@ private:
     void UpdateStatus();
     void UpdateNavigation();
     void UpdatePosition();
-    void UpdateTracks();
+    void UpdateSPU();
     void UpdateArt();
 
 public slots:
