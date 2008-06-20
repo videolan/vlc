@@ -441,7 +441,6 @@ void MainInterface::handleMainUi( QSettings *settings )
         vlc_value_t val;
         val.p_address = this;
         var_Set( p_intf, "window_widget", val );
-        msg_Err( p_intf, "window_widget = %p", this);
     }
 
     /* Finish the sizing */
