@@ -525,6 +525,8 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
  *****************************************************************************/
 
 /* "state" value */
+/* NOTE: you need to update ppsz_input_state in the RC interface
+ * if you modify this list. */
 enum input_state_e
 {
     INIT_S = 0,
@@ -536,7 +538,7 @@ enum input_state_e
     FORWARD_S,
     BACKWARD_S,
     END_S,
-    ERROR_S
+    ERROR_S,
 };
 
 /* "rate" default, min/max

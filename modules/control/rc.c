@@ -67,7 +67,19 @@
 #define MAX_LINE_LENGTH 256
 #define STATUS_CHANGE "status change: "
 
-static const char *ppsz_input_state[] = { N_("Initializing"), N_("Opening"), N_("Buffer"), N_("Play"), N_("Pause"), N_("Stop"), N_("Error") };
+/* input_state_e from <vlc_input.h> */
+static const char *ppsz_input_state[] = {
+    N_("Initializing"),
+    N_("Opening"),
+    N_("Buffer"),
+    N_("Play"),
+    N_("Pause"),
+    N_("Stop"),
+    N_("Forward"),
+    N_("Backward"),
+    N_("End"),
+    N_("Error"),
+};
 
 /*****************************************************************************
  * Local prototypes
@@ -1000,7 +1012,7 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
             cmd[0] = '\0';
         } /* var_GetInteger( p_input, "state" )  */
         msg_rc( STATUS_CHANGE "( %s state: %d ): %s",
-                              &cmd[0], newval.i_int,
+                              cmd, newval.i_int,
                               ppsz_input_state[ newval.i_int ] );
         vlc_object_release( p_playlist );
         vlc_object_release( p_input );
