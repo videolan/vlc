@@ -218,8 +218,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* VideoWidget connect mess to avoid different threads speaking to each other */
     CONNECT( this, askReleaseVideo( void * ),
              this, releaseVideoSlot( void * ) );
-    CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
-             videoWidget, SetSizing( unsigned int, unsigned int ) );
+    if( videoWidget )
+        CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
+                 videoWidget, SetSizing( unsigned int, unsigned int ) );
 
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
 
