@@ -50,6 +50,8 @@
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
+static int  OpenWindow   ( vlc_object_t * );
+static void CloseWindow  ( vlc_object_t * );
 static void Run          ( intf_thread_t * );
 static void Init         ( intf_thread_t * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
@@ -201,6 +203,10 @@ vlc_module_begin();
                 false );
 
         set_callbacks( OpenDialogs, Close );
+
+    add_submodule();
+        set_capability( "vout window", 50 );
+        set_callbacks( OpenWindow, CloseWindow );
 vlc_module_end();
 
 /*****************************************************************************
@@ -420,4 +426,66 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
     intf_thread_t *p_intf = (intf_thread_t *)param;
     ShowDialog( p_intf, INTF_DIALOG_POPUPMENU, new_val.b_bool, 0 );
     return VLC_SUCCESS;
+}
+
+/**
+ * Video output window provider
+ */
+#include <vlc_window.h>
+
+static int ControlWindow (vout_window_t *, int, va_list);
+
+static int OpenWindow (vlc_object_t *obj)
+{
+    vout_window_t *wnd = (vout_window_t *)obj;
+
+    /* TODO: should probably be in the libvlc core instead: */
+    if (!config_GetInt (obj, "embedded-video"))
+        return VLC_EGENERIC;
+
+    intf_thread_t *intf = (intf_thread_t *)
+        vlc_object_find_name (obj, "qt4", FIND_ANYWHERE);
+    if (intf == NULL)
+        return VLC_EGENERIC; /* Qt4 not in use */
+    assert (intf->i_object_type == VLC_OBJECT_INTF);
+
+    var_Create (intf, "window_mutex", VLC_VAR_MUTEX);
+    var_Create (intf, "window_widget", VLC_VAR_ADDRESS);
+
+    vlc_value_t lockval, ptrval;
+    var_Get (intf, "window_mutex", &lockval);
+
+    vlc_mutex_lock ((vlc_mutex_t *)lockval.p_address);
+    msg_Dbg (obj, "waiting for interface...");
+    do
+    {
+        var_Get (intf, "window_widget", &ptrval);
+        /* FIXME A condition variable would be way more appropriate. */
+        msleep (INTF_IDLE_SLEEP);
+    } while (ptrval.p_address == NULL);
+
+    msg_Dbg (obj, "requestiong window...");
+    MainInterface *mi = (MainInterface *)ptrval.p_address;
+
+    wnd->handle = mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
+                                    &wnd->width, &wnd->height);
+    vlc_mutex_unlock ((vlc_mutex_t *)lockval.p_address);
+    wnd->control = ControlWindow;
+    wnd->p_private = intf;
+    return VLC_SUCCESS;
+}
+
+static int ControlWindow (vout_window_t *wnd, int query, va_list args)
+{
+    intf_thread_t *intf = (intf_thread_t *)wnd->p_private;
+    intf->p_sys->p_mi->controlVideo (wnd->handle, query, args);
+}
+
+static void CloseWindow (vlc_object_t *obj)
+{
+    vout_window_t *wnd = (vout_window_t *)obj;
+    intf_thread_t *intf = (intf_thread_t *)obj->p_private;
+
+    intf->p_sys->p_mi->releaseVideo (wnd->handle);
+    vlc_object_release (intf);
 }

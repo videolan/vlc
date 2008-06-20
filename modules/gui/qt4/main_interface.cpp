@@ -437,9 +437,11 @@ void MainInterface::handleMainUi( QSettings *settings )
         videoWidget = new VideoWidget( p_intf );
         mainLayout->insertWidget( 0, videoWidget );
 
-    }
-    else
-    {
+        var_Create( p_intf, "window_widget", VLC_VAR_ADDRESS );
+        vlc_value_t val;
+        val.p_address = this;
+        var_Set( p_intf, "window_widget", val );
+        msg_Err( p_intf, "window_widget = %p", this);
     }
 
     /* Finish the sizing */
