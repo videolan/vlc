@@ -47,6 +47,7 @@ Important notes:
  * Canvas setting in transcode is now done using the canvas video filter.
    For example:
    transcode{vcodec=mp2v,vfilter=canvas{width=640,height=480}}
+ * Glide video output module has been removed.
 
 Changes:
 --------
