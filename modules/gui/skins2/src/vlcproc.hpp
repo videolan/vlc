@@ -209,6 +209,7 @@ class VlcProc: public SkinObject
                                   vlc_value_t oldVal, vlc_value_t newVal,
                                   void *pParam );
 
+    public: /* FIXME: these used to be private for a reason */
         /// Callback to request a vout window
         static void *getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
                                 int *pXHint, int *pYHint,
@@ -221,6 +222,7 @@ class VlcProc: public SkinObject
         /// Callback to change a vout window
         static int controlWindow( struct vout_window_t *pWnd,
                                   int query, va_list args );
+    private: /* end of FIXME */
 
         /// Callback for equalizer-bands variable
         static int onEqBandsChange( vlc_object_t *pObj, const char *pVariable,

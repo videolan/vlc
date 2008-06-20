@@ -272,7 +272,7 @@ static int WindowOpen( vlc_object_t *p_this )
                                        &pWnd->pos_x, &pWnd->pos_y,
                                        &pWnd->width, &pWnd->height );
     pWnd->p_private = pIntf;
-    pWnd->control = &VlcProc::controlWindow
+    pWnd->control = &VlcProc::controlWindow;
     return VLC_SUCCESS;
 }
 
