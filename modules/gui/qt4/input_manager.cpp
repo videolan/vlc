@@ -610,6 +610,26 @@ void MainInputManager::togglePlayPause()
     getIM()->togglePlayPause();
 }
 
+bool MainInputManager::teletextState()
+{
+    im = getIM();
+    if( im->hasInput() )
+    {
+        vlc_value_t val;
+        vlc_object_t *p_vbi;
+        p_vbi = (vlc_object_t *) vlc_object_find_name( getInput(),
+                    "zvbi", FIND_ANYWHERE );
+        if( p_vbi )
+        {
+            vlc_object_release( p_vbi );
+            return true;
+        }
+        var_Change( getInput(), "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        return (val.i_int > 0);
+    }
+    return false;
+}
+
 /* Static callbacks */
 
 /* IM */

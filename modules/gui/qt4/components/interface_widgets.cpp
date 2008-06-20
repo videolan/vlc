@@ -460,6 +460,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
              sectionNext() );
     CONNECT( menuButton, clicked(), THEMIM->getIM(),
              sectionMenu() );
+
     /**
      * Telextext QFrame
      * TODO: Merge with upper menu in a StackLayout
@@ -469,17 +470,16 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     telexLayout->setSpacing( 0 );
     telexLayout->setMargin( 0 );
 
-    QToolButton *telexOn = new QToolButton;
-    telexOn->setText( qtr( "On" ) );
+    QPushButton  *telexOn = new QPushButton;
     setupSmallButton( telexOn );
     telexLayout->addWidget( telexOn );
 
-    QToolButton *telexTransparent = new QToolButton;
-    telexTransparent->setText( qtr( "Transparent" ) );
+    telexTransparent = new QPushButton;
     setupSmallButton( telexTransparent );
     telexLayout->addWidget( telexTransparent );
+    b_telexTransparent = false;
 
-    QSpinBox *telexPage = new QSpinBox;
+    telexPage = new QSpinBox;
     telexPage->setRange( 0, 999 );
     telexPage->setValue( 100 );
     telexPage->setAccelerated( true );
@@ -489,12 +489,20 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     telexLayout->addWidget( telexPage );
 
     controlLayout->addWidget( telexFrame, 1, 10, 2, 3, Qt::AlignBottom );
-    telexFrame->hide();
+    telexFrame->hide(); /* default hidden */
 
     CONNECT( telexPage, valueChanged( int ), THEMIM->getIM(),
              telexGotoPage( int ) );
+
+    BUTTON_SET_ACT_I( telexOn, "", tv.png, qtr( "Teletext on" ),
+                      toggleTeletext() );
     CONNECT( telexOn, clicked( bool ), THEMIM->getIM(),
              telexToggle( bool ) );
+    telexTransparent->setEnabled( false );
+    telexPage->setEnabled( false );
+
+    BUTTON_SET_ACT_I( telexTransparent, "", tvtelx.png, qtr( "Teletext" ),
+                      toggleTeletextTransparency() );
     CONNECT( telexTransparent, clicked( bool ),
              THEMIM->getIM(), telexSetTransparency( bool ) );
     CONNECT( THEMIM->getIM(), teletextEnabled( bool ),
@@ -626,6 +634,39 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
 ControlsWidget::~ControlsWidget()
 {}
+
+void ControlsWidget::toggleTeletext()
+{
+    bool b_enabled = THEMIM->teletextState();
+    if( b_telexEnabled )
+    {
+        telexTransparent->setEnabled( false );
+        telexPage->setEnabled( false );
+        b_telexEnabled = false;
+    }
+    else if( b_enabled )
+    {
+        telexTransparent->setEnabled( true );
+        telexPage->setEnabled( true );
+        b_telexEnabled = true;
+    }
+}
+
+void ControlsWidget::toggleTeletextTransparency()
+{
+    if( b_telexTransparent )
+    {
+        telexTransparent->setIcon( QIcon( ":/pixmaps/tvtelx.png" ) );
+        telexTransparent->setToolTip( qtr( "Teletext" ) );
+        b_telexTransparent = false;
+    }
+    else
+    {
+        telexTransparent->setIcon( QIcon( ":/pixmaps/tvtelx-transparent.png" ) );
+        telexTransparent->setToolTip( qtr( "Transparent" ) );
+        b_telexTransparent = true;
+    }
+}
 
 void ControlsWidget::stop()
 {

@@ -149,6 +149,7 @@ private:
     intf_thread_t           *p_intf;
     static MainInputManager *instance;
 public slots:
+    bool teletextState();
     void togglePlayPause();
     void stop();
     void next();

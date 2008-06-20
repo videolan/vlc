@@ -195,6 +195,8 @@ protected:
     InputSlider         *slider;
     QPushButton         *prevSectionButton, *nextSectionButton, *menuButton;
     QPushButton         *playButton, *fullscreenButton, *extSettingsButton;
+    QPushButton         *telexTransparent;
+    QSpinBox            *telexPage;
     QToolButton         *slowerButton, *fasterButton;
     QHBoxLayout         *controlButLayout;
     AdvControlsWidget   *advControls;
@@ -203,6 +205,8 @@ protected:
     VolumeClickHandler  *hVolLabel;
 
     bool                 b_advancedVisible;
+    bool                 b_telexTransparent;
+    bool                 b_telexEnabled;
 protected slots:
     void play();
     void stop();
@@ -216,6 +220,8 @@ protected slots:
     void faster();
     void slower();
     void toggleAdvanced();
+    void toggleTeletext();
+    void toggleTeletextTransparency();
 signals:
     void advancedControlsToggled( bool );
 };
