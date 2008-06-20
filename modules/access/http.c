@@ -1193,6 +1193,17 @@ static int Request( access_t *p_access, int64_t i_tell )
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Icy-MetaData: 1\r\n" );
 
 
+    if( p_sys->b_continuous )
+    {
+        net_Printf( VLC_OBJECT( p_access ), p_sys->fd, pvs,
+                    "Connection: Keep-Alive\r\n" );
+    }
+    else if( p_sys->i_version == 1 )
+    {
+        net_Printf( VLC_OBJECT( p_access ), p_sys->fd, pvs,
+                    "Connection: Close\r\n");
+    }
+
     if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "\r\n" ) < 0 )
     {
         msg_Err( p_access, "failed to send request" );
@@ -1444,9 +1455,6 @@ static int Request( access_t *p_access, int64_t i_tell )
         }
 
         free( psz );
-    }
-    if(p_sys->i_remaining == 0 && (p_access->info.i_size == -1 || p_access->info.i_size == i_tell)) {
-        Disconnect( p_access );
     }
     return VLC_SUCCESS;
 
