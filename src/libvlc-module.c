@@ -1477,8 +1477,13 @@ vlc_module_begin();
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
               FULLSCREEN_LONGTEXT, false );
         change_short('f');
-    add_bool( "embedded-video", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
+#ifndef __APPLE__
+    add_bool( "embedded-video", false, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
               true );
+#else
+    add_bool( "embedded-video", true, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
+              true );
+#endif
 #ifdef __APPLE__
        add_deprecated_alias( "macosx-embedded" ); /*deprecated since 0.9.0 */
 #endif
