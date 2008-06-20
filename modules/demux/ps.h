@@ -168,8 +168,11 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
     if( ps_id_to_lang( p_psm, i_id ) )
     {
         tk->fmt.psz_language = malloc( 4 );
-        memcpy( tk->fmt.psz_language, ps_id_to_lang( p_psm , i_id ), 3 );
-        tk->fmt.psz_language[3] = 0;
+        if( tk->fmt.psz_language )
+        {
+            memcpy( tk->fmt.psz_language, ps_id_to_lang( p_psm , i_id ), 3 );
+            tk->fmt.psz_language[3] = 0;
+        }
     }
 
     return VLC_SUCCESS;
@@ -534,6 +537,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
 
     while( i_es_base + 4 < i_length )
     {
+        ps_es_t **tmp_es;
         ps_es_t es;
         es.lang[0] = es.lang[1] = es.lang[2] = 0;
 
@@ -556,31 +560,41 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
             int i = 0;
 
             es.p_descriptor = malloc( i_info_length );
-            memcpy( es.p_descriptor, p_buffer + i_es_base + 4, i_info_length);
-
-            while( i <= es.i_descriptor - 2 )
+            if( es.p_descriptor )
             {
-                /* Look for the ISO639 language descriptor */
-                if( es.p_descriptor[i] != 0x0a )
-                {
-                    i += es.p_descriptor[i+1] + 2;
-                    continue;
-                }
+                memcpy( es.p_descriptor, p_buffer + i_es_base + 4, i_info_length);
 
-                if( i <= es.i_descriptor - 6 )
+                while( i <= es.i_descriptor - 2 )
                 {
-                    es.lang[0] = es.p_descriptor[i+2];
-                    es.lang[1] = es.p_descriptor[i+3];
-                    es.lang[2] = es.p_descriptor[i+4];
+                    /* Look for the ISO639 language descriptor */
+                    if( es.p_descriptor[i] != 0x0a )
+                    {
+                        i += es.p_descriptor[i+1] + 2;
+                        continue;
+                    }
+
+                    if( i <= es.i_descriptor - 6 )
+                    {
+                        es.lang[0] = es.p_descriptor[i+2];
+                        es.lang[1] = es.p_descriptor[i+3];
+                        es.lang[2] = es.p_descriptor[i+4];
+                    }
+                    break;
                 }
-                break;
             }
         }
 
-        p_psm->es = realloc( p_psm->es, sizeof(ps_es_t *) * (p_psm->i_es+1) );
-        p_psm->es[p_psm->i_es] = malloc( sizeof(ps_es_t) );
-        *p_psm->es[p_psm->i_es++] = es;
-        i_es_base += 4 + i_info_length;
+        tmp_es = realloc( p_psm->es, sizeof(ps_es_t *) * (p_psm->i_es+1) );
+        if( tmp_es )
+        {
+            p_psm->es = tmp_es;
+            p_psm->es[p_psm->i_es] = malloc( sizeof(ps_es_t) );
+            if( p_psm->es[p_psm->i_es] )
+            {
+                *p_psm->es[p_psm->i_es++] = es;
+                i_es_base += 4 + i_info_length;
+            }
+        }
     }
 
     /* TODO: CRC */

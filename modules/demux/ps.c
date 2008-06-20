@@ -124,6 +124,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys ) return VLC_ENOMEM;
 
     /* Init p_sys */
     p_sys->i_mux_rate = 0;
@@ -559,6 +560,7 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
     const uint8_t *p_peek;
     int      i_peek = stream_Peek( s, &p_peek, 14 );
     int      i_size = ps_pkt_size( p_peek, i_peek );
+    VLC_UNUSED(i_code);
 
     if( i_size <= 6 && p_peek[3] > 0xba )
     {
