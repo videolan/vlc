@@ -275,16 +275,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             FreeFrameBuffer( p_sys->p_dirac );
             break;
 
-        case STATE_PICTURE_START:
-            msg_Dbg( p_dec, "PICTURE_START: frame_type=%i frame_num=%d",
-                     p_sys->p_dirac->frame_params.ftype,
-                     p_sys->p_dirac->frame_params.fnum );
-            break;
-
         case STATE_PICTURE_AVAIL:
-            msg_Dbg( p_dec, "PICTURE_AVAI : frame_type=%i frame_num=%d",
-                     p_sys->p_dirac->frame_params.ftype,
-                     p_sys->p_dirac->frame_params.fnum );
+            msg_Dbg( p_dec, "PICTURE_AVAIL : frame_num=%d",
+                     p_sys->p_dirac->frame_num );
 
             /* Picture available for display */
             p_pic = GetNewPicture( p_dec );
@@ -476,7 +469,7 @@ static void CloseEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-    msg_Dbg( p_enc, "resulting bit-rate: %i bits/sec",
+    msg_Dbg( p_enc, "resulting bit-rate: %lld bits/sec",
              p_sys->p_dirac->enc_seqstats.bit_rate );
 
     /* Free the encoder resources */

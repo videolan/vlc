@@ -1,12 +1,13 @@
-diff -ruN dirac-0.6.0.old/Makefile.am dirac-0.6.0/Makefile.am
---- dirac/Makefile.am	2007-03-27 00:17:15.000000000 +0200
-+++ dirac/Makefile.am	2007-03-27 00:18:31.000000000 +0200
-@@ -2,17 +2,12 @@
- #
+diff --git a/Makefile.am b/Makefile.am
+index dfd6b87..e534452 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -3,17 +3,12 @@
  
- SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder \
--encoder decoder util $(CPPUNITTESTS_DIR) tests $(DOC_DIR) win32
-+encoder decoder util $(CPPUNITTESTS_DIR) win32
+ SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_encoder \
+           libdirac_decoder encoder decoder util $(CPPUNITTESTS_DIR) \
+-          tests $(DOC_DIR) win32
++          win32
  
  .PHONY: valgrind-check
  valgrind-check:
@@ -20,10 +21,11 @@ diff -ruN dirac-0.6.0.old/Makefile.am dirac-0.6.0/Makefile.am
  
  if HAVE_LATEX
  DOC_DIR = doc
-diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
---- dirac/configure.ac	2007-03-27 00:17:15.000000000 +0200
-+++ dirac/configure.ac	2007-03-27 00:19:52.000000000 +0200
-@@ -143,7 +143,7 @@
+diff --git a/configure.ac b/configure.ac
+index a4d0d84..975a83d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -149,7 +149,7 @@ dnl Checks for optional files in doc directory.
  dnl algorithm documentation is not distributed in
  dnl the release. It is available only from CVS
  dnl -----------------------------------------------
@@ -32,7 +34,7 @@ diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
  AM_CONDITIONAL(HAVE_ALGO, $HAVE_ALGO)
  
  dnl -----------------------------------------------
-@@ -151,7 +151,7 @@
+@@ -157,7 +157,7 @@ dnl Checks for optional files in doc directory.
  dnl Enhancements is not distributed in
  dnl the release. It is available only from CVS
  dnl -----------------------------------------------
@@ -41,7 +43,7 @@ diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
  AM_CONDITIONAL(HAVE_ENHANCE, $HAVE_ENHANCE)
  
  dnl -----------------------------------------------
-@@ -159,7 +159,7 @@
+@@ -165,7 +165,7 @@ dnl Checks for optional files in doc directory.
  dnl Global Motion documentation is not distributed in
  dnl the release. It is available only from CVS
  dnl -----------------------------------------------
@@ -50,7 +52,7 @@ diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
  AM_CONDITIONAL(HAVE_GM, $HAVE_GM)
  
  dnl -----------------------------------------------
-@@ -167,7 +167,7 @@
+@@ -173,7 +173,7 @@ dnl Checks for optional files in doc directory.
  dnl Upconversion doc is not distributed in
  dnl the release. It is available only from CVS
  dnl -----------------------------------------------
@@ -59,7 +61,7 @@ diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
  AM_CONDITIONAL(HAVE_UPCONV, $HAVE_UPCONV)
  
  dnl -----------------------------------------------
-@@ -175,7 +175,7 @@
+@@ -181,7 +181,7 @@ dnl Checks for optional files in doc directory.
  dnl programmer's guide is not distributed in
  dnl the release. It is available only from CVS
  dnl -----------------------------------------------
@@ -68,7 +70,7 @@ diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
  AM_CONDITIONAL(HAVE_PROG, $HAVE_PROG)
  
  dnl -----------------------------------------------
-@@ -183,7 +183,7 @@
+@@ -189,7 +189,7 @@ dnl Checks for optional files in doc directory.
  dnl Diagnostics tools docs are is not distributed in
  dnl the release. It is available only from CVS
  dnl -----------------------------------------------
@@ -77,9 +79,11 @@ diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
  AM_CONDITIONAL(HAVE_DIAG, $HAVE_DIAG)
  
  dnl -----------------------------------------------
---- dirac/libdirac_common/band_codec.cpp    2007-07-06 23:20:51.000000000 +0200
-+++ dirac/libdirac_common/band_codec.cpp    2007-03-27 18:29:13.000000000 +0200
-@@ -433,7 +433,7 @@
+diff --git a/libdirac_common/band_codec.cpp b/libdirac_common/band_codec.cpp
+index f750906..bfe6e75 100644
+--- a/libdirac_common/band_codec.cpp
++++ b/libdirac_common/band_codec.cpp
+@@ -433,7 +433,7 @@ inline int BandCodec::ChooseFollowContext( const int bin_number ) const
          }
  
      }
@@ -87,4 +91,4 @@ diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
 +    return 0; // avoid warning
  }
  
- inline int BandCodec::ChooseInfoContext() const 7
+ inline int BandCodec::ChooseInfoContext() const

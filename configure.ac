@@ -3571,11 +3571,11 @@ dnl
 AC_ARG_ENABLE(dirac,
 [  --enable-dirac          experimental dirac codec (default disabled)])
 if test "${enable_dirac}" = "yes"; then
-  PKG_CHECK_MODULES(DIRAC,[dirac >= 0.9.0], [
+  PKG_CHECK_MODULES(DIRAC,[dirac >= 0.10.0], [
       VLC_ADD_PLUGIN([dirac])
       VLC_ADD_CFLAGS([dirac],[$DIRAC_CFLAGS])
       VLC_ADD_LIBS([dirac],[$DIRAC_LIBS -lstdc++]) ],[
-      AC_MSG_ERROR([libdirac doesn't appear to be installed on you system.])
+      AC_MSG_ERROR([libdirac >= 0.10.0 doesn't appear to be installed on your system.])
   ])
 fi
 

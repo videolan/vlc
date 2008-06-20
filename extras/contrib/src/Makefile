@@ -2184,12 +2184,12 @@ dirac-$(DIRAC_VERSION).tar.gz:
 
 dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p0 <Patches/dirac-cross.patch
+	patch -p1 -d dirac <Patches/dirac-cross.patch
 ifdef HAVE_CYGWIN
 	# incorrect compile warning with cygwin compiler 3.4.4
 	patch -p0 <Patches/dirac-cygwin.patch
 endif
-	(cd $@; aclocal && autoconf && automake)
+	(cd $@; aclocal -I m4 && autoconf && automake)
 
 DIRAC_SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder
 
