@@ -474,7 +474,8 @@ void playlist_LastLoop( playlist_t *p_playlist )
 #endif
 
     /* Core should have terminated all SDs before the playlist */
-    assert( p_playlist->i_sds == 0 );
+    /* TODO: It fails to do so when not playing anything -- Courmisch */
+    playlist_ServicesDiscoveryKillAll( p_playlist );
     playlist_MLDump( p_playlist );
 
     PL_LOCK;
