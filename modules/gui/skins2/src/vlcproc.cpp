@@ -30,6 +30,7 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_playlist.h>
+#include <vlc_window.h>
 
 #include "vlcproc.hpp"
 #include "os_factory.hpp"
@@ -164,11 +165,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_AddCallback( pIntf, "interaction", onInteraction, this );
     pIntf->b_interaction = true;
 
-    // Callbacks for vout requests
-/*    getIntf()->pf_request_window = &getWindow;
-    getIntf()->pf_release_window = &releaseWindow;
-    getIntf()->pf_control_window = &controlWindow;
-*/
     getIntf()->p_sys->p_input = NULL;
 }
 
@@ -182,11 +178,6 @@ VlcProc::~VlcProc()
         vlc_object_release( getIntf()->p_sys->p_input );
     }
 
-    // Callbacks for vout requests
-/*    getIntf()->pf_request_window = NULL;
-    getIntf()->pf_release_window = NULL;
-    getIntf()->pf_control_window = NULL;
-*/
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-append",
@@ -633,9 +624,10 @@ void VlcProc::releaseWindow( intf_thread_t *pIntf, void *pWindow )
 }
 
 
-int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
+int VlcProc::controlWindow( struct vout_window_t *pWnd,
                             int query, va_list args )
 {
+    intf_thread_t *pIntf = (intf_thread_t *)pWnd->p_private;
     VlcProc *pThis = pIntf->p_sys->p_vlcProc;
 
     switch( query )
@@ -651,7 +643,7 @@ int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
 
                 // Post a resize vout command
                 CmdResizeVout *pCmd =
-                    new CmdResizeVout( pThis->getIntf(), pWindow,
+                    new CmdResizeVout( pThis->getIntf(), pWnd->handle,
                                        i_width, i_height );
                 AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
                 pQueue->push( CmdGenericPtr( pCmd ) );
@@ -659,7 +651,7 @@ int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
         }
 
         default:
-            msg_Dbg( pIntf, "control query not supported" );
+            msg_Dbg( pWnd, "control query not supported" );
             break;
     }
 

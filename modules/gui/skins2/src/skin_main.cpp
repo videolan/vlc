@@ -255,6 +255,35 @@ static void Run( intf_thread_t *p_intf )
 }
 
 
+// Callbacks for vout requests
+static int WindowOpen( vlc_object_t *p_this )
+{
+    vout_window_t *pWnd = (vout_window_t *)p_this;
+    intf_thread_t *pIntf = (intf_thread_t *)
+        vlc_object_find_name( p_this, "skins2", FIND_ANYWHERE );
+
+    if( p_intf == NULL )
+        return VLC_EGENERIC;
+
+    /* FIXME: most probably not thread-safe,
+     * albeit no worse than ever before */
+    pWind->handle = VlcProc::getWindow( pIntf, pWnd->vout,
+                                        &pWnd->pos_x, &pWnd->pos_y,
+                                        &pWnd->width, &pWnd->height );
+    pWnd->p_private = p_intf;
+    pWnd->control = &VlcProc::controlWindow
+    return VLC_SUCCESS;
+}
+
+
+static void WindowClose( vlc_object_t *p_this )
+{
+    vout_window_t *pWnd = (vout_window_t *)p_this;
+    intf_thread_t *pIntf = (intf_thread_t *)p_this->p_private;
+
+    VlCproc::releaseWindow( pIntf, pWnd->handle );
+}
+
 //---------------------------------------------------------------------------
 // DemuxOpen: initialize demux
 //---------------------------------------------------------------------------
@@ -441,6 +470,10 @@ vlc_module_begin();
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );
     add_shortcut( "skins" );
+
+    add_submodule();
+        set_capability( "vout window", 51 );
+        set_callbacks( WindowOpen, WindowClose );
 
     add_submodule();
         set_description( N_("Skins loader demux") );

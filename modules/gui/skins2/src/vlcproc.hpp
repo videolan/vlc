@@ -38,6 +38,7 @@
 class OSTimer;
 class VarBool;
 struct aout_instance_t;
+struct vout_window_t;
 
 
 /// Singleton object handling VLC internal state and playlist
@@ -218,7 +219,7 @@ class VlcProc: public SkinObject
         static void releaseWindow( intf_thread_t *pIntf, void *pWindow );
 
         /// Callback to change a vout window
-        static int controlWindow( intf_thread_t *pIntf, void *pWindow,
+        static int controlWindow( struct vout_window_t *pWnd,
                                   int query, va_list args );
 
         /// Callback for equalizer-bands variable
