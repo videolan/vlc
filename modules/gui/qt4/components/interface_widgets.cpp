@@ -468,7 +468,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
      * Telextext QFrame
      * TODO: Merge with upper menu in a StackLayout
      **/
-#ifdef ZVBI_COMPILED
     telexFrame = new QWidget( this );
     QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
     telexLayout->setSpacing( 0 );
@@ -504,7 +503,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
              THEMIM->getIM(), telexSetTransparency( bool ) );
     CONNECT( THEMIM->getIM(), teletextEnabled( bool ),
              telexFrame, setVisible( bool ) );
-#endif
 
     /** Play Buttons **/
     QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
@@ -839,9 +837,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     fsLayout->addWidget( discFrame, 1, 4 );
 
-    #ifdef ZVBI_COMPILED
     fsLayout->addWidget( telexFrame, 1, 5 );
-    #endif
 
     fsLayout->addWidget( advControls, 1, 6, Qt::AlignVCenter );
 

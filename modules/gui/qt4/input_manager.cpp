@@ -325,22 +325,16 @@ bool InputManager::hasVideo()
 
 void InputManager::UpdateSPU()
 {
-#ifdef ZVBI_COMPILED
     if( hasInput() )
     {
         vlc_value_t val;
         var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-
-        /* Update teletext status*/
-        emit teletextEnabled( val.i_int > 0 );/* FIXME */
-        telexToggle( true );
+        telexToggle( val.i_int > 0 );
     }
     else
     {
-        emit teletextEnabled( false );
         telexToggle( false );
     }
-#endif
 }
 
 void InputManager::UpdateArt()
@@ -408,7 +402,6 @@ void InputManager::sectionMenu()
     }
 }
 
-#ifdef ZVBI_COMPILED
 void InputManager::telexGotoPage( int page )
 {
     if( hasInput() )
@@ -430,6 +423,7 @@ void InputManager::telexToggle( bool b_enabled )
 
     if( hasInput() )
     {
+        vlc_value_t val;
         vlc_object_t *p_vbi;
         p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
                     "zvbi", FIND_ANYWHERE );
@@ -438,7 +432,10 @@ void InputManager::telexToggle( bool b_enabled )
             i_page = var_GetInteger( p_vbi, "vbi-page" );
             vlc_object_release( p_vbi );
         }
+        var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        b_enabled = (val.i_int > 0);
     }
+    emit teletextEnabled( b_enabled );
     i_page = b_enabled ? i_page : 0;
     telexGotoPage( i_page );
 }
@@ -457,7 +454,6 @@ void InputManager::telexSetTransparency( bool b_transp )
         }
     }
 }
-#endif
 
 void InputManager::slower()
 {

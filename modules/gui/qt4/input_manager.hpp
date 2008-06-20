@@ -100,11 +100,9 @@ public slots:
     void sectionNext();
     void sectionPrev();
     void sectionMenu();
-#ifdef ZVBI_COMPILED
-    void telexGotoPage( int );
-    void telexToggle( bool );
-    void telexSetTransparency( bool );
-#endif
+    void telexGotoPage( int ); ///< Goto teletext page
+    void telexToggle( bool );  ///< Enable disable teletext buttons
+    void telexSetTransparency( bool ); ///< Set transparency on teletext background
 
 signals:
     /// Send new position, new time and new length
@@ -118,9 +116,8 @@ signals:
     void artChanged( QString );
     /// Controll of fullscreen controller
     void inputUnset();
-#ifdef ZVBI_COMPILED
+    /// Teletext
     void teletextEnabled( bool );
-#endif
 };
 
 class MainInputManager : public QObject

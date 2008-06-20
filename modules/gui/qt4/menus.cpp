@@ -665,7 +665,7 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
             ":/pixmaps/previous_16px.png", SLOT( prev() ) );
     addMIMStaticEntry( p_intf, menu, qtr( "Next" ), "",
             ":/pixmaps/next_16px.png", SLOT( next() ) );
-    }
+}
 
 void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
 {
