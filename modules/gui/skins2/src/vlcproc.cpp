@@ -165,10 +165,10 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     pIntf->b_interaction = true;
 
     // Callbacks for vout requests
-    getIntf()->pf_request_window = &getWindow;
+/*    getIntf()->pf_request_window = &getWindow;
     getIntf()->pf_release_window = &releaseWindow;
     getIntf()->pf_control_window = &controlWindow;
-
+*/
     getIntf()->p_sys->p_input = NULL;
 }
 
@@ -183,10 +183,10 @@ VlcProc::~VlcProc()
     }
 
     // Callbacks for vout requests
-    getIntf()->pf_request_window = NULL;
+/*    getIntf()->pf_request_window = NULL;
     getIntf()->pf_release_window = NULL;
     getIntf()->pf_control_window = NULL;
-
+*/
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-append",
