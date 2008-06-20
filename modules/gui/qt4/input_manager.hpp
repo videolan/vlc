@@ -77,6 +77,7 @@ private:
     QString         old_name;
     QString         artUrl;
     int             i_rate;
+    bool            b_transparentTelextext;
 
     void customEvent( QEvent * );
     void addCallbacks();
@@ -102,7 +103,7 @@ public slots:
     void sectionMenu();
     void telexGotoPage( int ); ///< Goto teletext page
     void telexToggle( bool );  ///< Enable disable teletext buttons
-    void telexSetTransparency( bool ); ///< Set transparency on teletext background
+    void telexSetTransparency(); ///< Set transparency on teletext background
 
 signals:
     /// Send new position, new time and new length

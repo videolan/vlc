@@ -63,6 +63,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     p_input      = NULL;
     i_rate       = 0;
     i_input_id   = 0;
+    b_transparentTelextext = false;
 }
 
 InputManager::~InputManager()
@@ -440,7 +441,7 @@ void InputManager::telexToggle( bool b_enabled )
     telexGotoPage( i_page );
 }
 
-void InputManager::telexSetTransparency( bool b_transp )
+void InputManager::telexSetTransparency()
 {
     if( hasInput() )
     {
@@ -449,7 +450,8 @@ void InputManager::telexSetTransparency( bool b_transp )
                     "zvbi", FIND_ANYWHERE );
         if( p_vbi )
         {
-            var_SetBool( p_input->p_libvlc, "vbi-opaque", b_transp );
+            var_SetBool( p_vbi, "vbi-opaque", b_transparentTelextext );
+            b_transparentTelextext = !b_transparentTelextext;
             vlc_object_release( p_vbi );
         }
     }
