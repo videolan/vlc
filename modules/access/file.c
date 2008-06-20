@@ -96,7 +96,6 @@ vlc_module_begin();
     set_capability( "access", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );
-    add_shortcut( "kfir" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -113,7 +112,6 @@ static int  open_file( access_t *, const char * );
 struct access_sys_t
 {
     unsigned int i_nb_reads;
-    bool   b_kfir;
 
     int fd;
 
@@ -137,19 +135,12 @@ static int Open( vlc_object_t *p_this )
 
     STANDARD_READ_ACCESS_INIT;
     p_sys->i_nb_reads = 0;
-    p_sys->b_kfir = false;
     int fd = p_sys->fd = -1;
 
     if (!strcasecmp (p_access->psz_access, "stream"))
     {
         p_sys->b_seekable = false;
         p_sys->b_pace_control = false;
-    }
-    else if (!strcasecmp (p_access->psz_access, "kfir"))
-    {
-        p_sys->b_seekable = false;
-        p_sys->b_pace_control = false;
-        p_sys->b_kfir = true;
     }
     else
     {
@@ -225,43 +216,23 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     int fd = p_sys->fd;
 
 #if !defined(WIN32) && !defined(UNDER_CE)
-    if( !p_sys->b_pace_control )
+    if( !p_sys->b_seekable )
     {
-        if( !p_sys->b_kfir )
-        {
-            /* Find if some data is available. This won't work under Windows. */
-            do
-            {
-                struct pollfd ufd;
+        /* Note that POSIX regular files (b_seekable) opened for read are
+         * guaranteed to always set POLLIN immediately, so we can spare
+         * poll()ing them. */
+        /* Wait until some data is available. Impossible on Windows. */
+        struct pollfd ufd[2] = {
+            { .fd = fd, .events = POLLIN, },
+            { .fd = vlc_object_waitpipe (p_access), .events = POLLIN, },
+        };
 
-                if( p_access->b_die )
-                    return 0;
-
-                memset (&ufd, 0, sizeof (ufd));
-                ufd.fd = fd;
-                ufd.events = POLLIN;
-
-                i_ret = poll (&ufd, 1, 500);
-            }
-            while (i_ret <= 0);
-
-            i_ret = read (fd, p_buffer, i_len);
-        }
-        else
-        {
-            /* b_kfir ; work around a buggy poll() driver implementation */
-            while (((i_ret = read (fd, p_buffer, i_len)) == 0)
-                && !p_access->b_die)
-            {
-                msleep( INPUT_ERROR_SLEEP );
-            }
-        }
+        if (poll (ufd, 2, -1) < 0 || ufd[1].revents)
+            return -1;
     }
-    else
 #endif /* WIN32 || UNDER_CE */
-        /* b_pace_control || WIN32 */
-        i_ret = read( fd, p_buffer, i_len );
 
+    i_ret = read (fd, p_buffer, i_len);
     if( i_ret < 0 )
     {
         switch (errno)
@@ -275,11 +246,11 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                 intf_UserFatal (p_access, false, _("File reading failed"),
                                 _("VLC could not read the file."));
         }
-
-        /* Delay a bit to avoid consuming all the CPU. This is particularly
-         * useful when reading from an unconnected FIFO. */
-        msleep( INPUT_ERROR_SLEEP );
     }
+    else if( i_ret > 0 )
+        p_access->info.i_pos += i_ret;
+    else if( i_ret == 0 )
+        p_access->info.b_eof = true;
 
     p_sys->i_nb_reads++;
 
@@ -297,12 +268,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         }
     }
 #endif
-
-    if( i_ret > 0 )
-        p_access->info.i_pos += i_ret;
-    else if( i_ret == 0 )
-        p_access->info.b_eof = true;
-
     return i_ret;
 }
 
