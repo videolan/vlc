@@ -676,19 +676,19 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
             bgWasVisible = true;
             emit askBgWidgetToToggle();
         }
-
-        /*if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
+#if 0
+        if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
         {
             videoWidget->widgetSize = QSize( *pi_width, *pi_height );
         }
         else /* Background widget available, use its size */
-        /*{
+        {
             /* Ok, our visualizations are bad, so don't do this for the moment
              * use the requested size anyway */
             // videoWidget->widgetSize = bgWidget->widgeTSize;
-          /*  videoWidget->widgetSize = QSize( *pi_width, *pi_height );
-        }*/
-
+            videoWidget->widgetSize = QSize( *pi_width, *pi_height );
+        }
+#endif
         videoIsActive = true;
 
         emit askVideoToResize( *pi_width, *pi_height );
