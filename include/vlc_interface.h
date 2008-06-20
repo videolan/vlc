@@ -68,13 +68,6 @@ struct intf_thread_t
     /** Interaction stuff */
     bool b_interaction;
 
-    /** Video window callbacks */
-    void * ( *pf_request_window ) ( intf_thread_t *, vout_thread_t *,
-                                    int *, int *,
-                                    unsigned int *, unsigned int * );
-    void   ( *pf_release_window ) ( intf_thread_t *, void * );
-    int    ( *pf_control_window ) ( intf_thread_t *, void *, int, va_list );
-
     /* XXX: new message passing stuff will go here */
     vlc_mutex_t  change_lock;
     bool   b_menu_change;

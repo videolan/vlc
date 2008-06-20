@@ -76,29 +76,6 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param );
 static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
-/* Video handling */
-static void *DoRequest( intf_thread_t *p_intf, vout_thread_t *p_vout,
-                        int *pi1, int *pi2, unsigned int*pi3,unsigned int*pi4)
-{
-    return p_intf->p_sys->p_mi->requestVideo( p_vout, pi1, pi2, pi3, pi4 );
-}
-
-static void *DoNotEmbeddedRequest( intf_thread_t *p_intf, vout_thread_t *p_vout,
-                        int *pi1, int *pi2, unsigned int*pi3,unsigned int*pi4)
-{
-    p_intf->p_sys->p_mi->requestNotEmbeddedVideo( p_vout );
-    return NULL;
-}
-
-static void DoRelease( intf_thread_t *p_intf, void *p_win )
-{
-    return p_intf->p_sys->p_mi->releaseVideo( p_win );
-}
-
-static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
-{
-    return p_intf->p_sys->p_mi->controlVideo( p_win, i_q, a );
-}
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
@@ -311,9 +288,6 @@ MainInterface::~MainInterface()
     p_intf->b_interaction = false;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
-    p_intf->pf_request_window = NULL;
-    p_intf->pf_release_window = NULL;
-    p_intf->pf_control_window = NULL;
     p_intf->p_sys->p_mi = NULL;
 }
 
@@ -463,13 +437,9 @@ void MainInterface::handleMainUi( QSettings *settings )
         videoWidget = new VideoWidget( p_intf );
         mainLayout->insertWidget( 0, videoWidget );
 
-        p_intf->pf_request_window  = ::DoRequest;
-        p_intf->pf_release_window  = ::DoRelease;
-        p_intf->pf_control_window  = ::DoControl;
     }
     else
     {
-        p_intf->pf_request_window  = ::DoNotEmbeddedRequest;
     }
 
     /* Finish the sizing */
@@ -745,7 +715,7 @@ void MainInterface::releaseVideoSlot( void *p_win )
     videoWidget->release( p_win );
     videoWidget->hide();
 
-    if( bgWidget )// WORONG
+    if( bgWidget )// WRONG
         bgWidget->show();
 
     adjustSize();
