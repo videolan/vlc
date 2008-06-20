@@ -40,6 +40,8 @@
 
 #include <QWidget>
 #include <QFrame>
+#include <QMutex>
+#include <QWaitCondition>
 
 #define VOLUME_MAX 200
 
@@ -89,6 +91,9 @@ private:
 
     vlc_mutex_t lock;
     QSize videoSize;
+    QMutex         handleLock;
+    QWaitCondition handleWait;
+    bool           handleReady;
 
 signals:
     void askVideoWidgetToShow();
@@ -96,6 +101,9 @@ signals:
 
 public slots:
     void SetSizing( unsigned int, unsigned int );
+
+protected:
+    virtual void paintEvent(QPaintEvent *);
 };
 
 /******************** Background Widget ****************/
