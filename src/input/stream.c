@@ -1872,6 +1872,8 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     if( !p_sys->i_list )
     {
         i_read = p_access->pf_read( p_access, p_read, i_read );
+        if( p_access->b_die )
+            vlc_object_kill( s );
         if( p_input )
         {
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
@@ -1887,6 +1889,8 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
 
     i_read = p_sys->p_list_access->pf_read( p_sys->p_list_access, p_read,
                                             i_read );
+    if( p_access->b_die )
+        vlc_object_kill( s );
 
     /* If we reached an EOF then switch to the next stream in the list */
     if( i_read == 0 && p_sys->i_list_index + 1 < p_sys->i_list )
@@ -1938,6 +1942,8 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
     if( !p_sys->i_list )
     {
         p_block = p_access->pf_block( p_access );
+        if( p_access->b_die )
+            vlc_object_kill( s );
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
         if( p_input && p_block && libvlc_stats (p_access) )
         {
@@ -1953,6 +1959,8 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
     }
 
     p_block = p_sys->p_list_access->pf_block( p_access );
+    if( p_access->b_die )
+        vlc_object_kill( s );
     b_eof = p_sys->p_list_access->info.b_eof;
     if( pb_eof ) *pb_eof = b_eof;
 
