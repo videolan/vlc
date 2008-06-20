@@ -34,12 +34,14 @@
 #include <stdlib.h>                                                /* free() */
 #include <sys/types.h>                                          /* opendir() */
 #include <dirent.h>                                             /* opendir() */
+#include <assert.h>
 
 #include <vlc_interface.h>
 #include <vlc_block.h>
 #include <vlc_playlist.h>
 
 #include <vlc_vout.h>
+#include <vlc_window.h>
 #include <vlc_image.h>
 #include <vlc_osd.h>
 #include <vlc_charset.h>
@@ -100,18 +102,59 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     int drawable = var_CreateGetInteger( p_vout, "drawable" );
     if( drawable ) return (void *)(intptr_t)drawable;
 
-   return NULL;
+    vout_window_t *wnd = vlc_custom_create (VLC_OBJECT(p_vout), sizeof (*wnd),
+                                            VLC_OBJECT_GENERIC, "window");
+    if (wnd == NULL)
+        return NULL;
+
+    wnd->vout = p_vout;
+    wnd->width = *pi_width_hint;
+    wnd->height = *pi_height_hint;
+    wnd->pos_x = *pi_x_hint;
+    wnd->pos_y = *pi_y_hint;
+    vlc_object_attach (wnd, p_vout);
+
+    wnd->module = module_Need (wnd, "vout window", 0, 0);
+    if (wnd->module == NULL)
+    {
+        msg_Dbg (wnd, "no window provider available");
+        vlc_object_release (wnd);
+        return NULL;
+    }
+    p_vout->p_window = wnd;
+    *pi_width_hint = wnd->width;
+    *pi_height_hint = wnd->height;
+    *pi_x_hint = wnd->pos_x;
+    *pi_y_hint = wnd->pos_y;
+    return wnd->handle;
 }
 
-void vout_ReleaseWindow( vout_thread_t *p_vout, void *p_window )
+void vout_ReleaseWindow( vout_thread_t *p_vout, void *dummy )
 {
-    (void)p_vout; (void)p_window;
+    vout_window_t *wnd = p_vout->p_window;
+
+    if (wnd == NULL)
+        return;
+    p_vout->p_window = NULL;
+
+    assert (wnd->module);
+    module_Unneed (wnd, wnd->module);
+
+    vlc_object_detach (wnd);
+    vlc_object_release (wnd);
+    (void)dummy;
 }
 
-int vout_ControlWindow( vout_thread_t *p_vout, void *p_window,
+int vout_ControlWindow( vout_thread_t *p_vout, void *dummy,
                         int i_query, va_list args )
 {
-    (void)p_vout; (void)p_window; (void)i_query; (void)args;
+    vout_window_t *wnd = p_vout->p_window;
+
+    if (wnd == NULL)
+        return VLC_EGENERIC;
+
+    assert (wnd->control);
+    return wnd->control (wnd, i_query, args);
 }
 
 /*****************************************************************************
@@ -782,23 +825,18 @@ int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
     {
     case VOUT_REPARENT:
     case VOUT_CLOSE:
-        if( p_vout->p_parent_intf )
-        {
-            vlc_object_release( p_vout->p_parent_intf );
-            p_vout->p_parent_intf = NULL;
-        }
+        if( p_vout->p_window )
+            vout_ReleaseWindow( p_vout->p_window, NULL );
         return VLC_SUCCESS;
-        break;
 
     case VOUT_SNAPSHOT:
         p_vout->b_snapshot = true;
         return VLC_SUCCESS;
-        break;
 
     default:
         msg_Dbg( p_vout, "control query not supported" );
-        return VLC_EGENERIC;
     }
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

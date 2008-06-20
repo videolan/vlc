@@ -399,8 +399,7 @@ struct vout_thread_t
     unsigned int        i_par_num;           /**< monitor pixel aspect-ratio */
     unsigned int        i_par_den;           /**< monitor pixel aspect-ratio */
 
-    intf_thread_t       *p_parent_intf;   /**< parent interface for embedded
-                                                               vout (if any) */
+    struct vout_window_t *p_window;   /**< window for embedded vout (if any) */
     /**@}*/
 
     /** \name Plugin used and shortcuts to access its capabilities */
