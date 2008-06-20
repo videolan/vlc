@@ -31,6 +31,7 @@
 #include <vlc_input.h>
 #include <vlc_demux.h>
 #include <vlc_playlist.h>
+#include <vlc_window.h>
 
 #include "dialogs.hpp"
 #include "os_factory.hpp"
@@ -262,15 +263,15 @@ static int WindowOpen( vlc_object_t *p_this )
     intf_thread_t *pIntf = (intf_thread_t *)
         vlc_object_find_name( p_this, "skins2", FIND_ANYWHERE );
 
-    if( p_intf == NULL )
+    if( pIntf == NULL )
         return VLC_EGENERIC;
 
     /* FIXME: most probably not thread-safe,
      * albeit no worse than ever before */
-    pWind->handle = VlcProc::getWindow( pIntf, pWnd->vout,
-                                        &pWnd->pos_x, &pWnd->pos_y,
-                                        &pWnd->width, &pWnd->height );
-    pWnd->p_private = p_intf;
+    pWnd->handle = VlcProc::getWindow( pIntf, pWnd->vout,
+                                       &pWnd->pos_x, &pWnd->pos_y,
+                                       &pWnd->width, &pWnd->height );
+    pWnd->p_private = pIntf;
     pWnd->control = &VlcProc::controlWindow
     return VLC_SUCCESS;
 }
