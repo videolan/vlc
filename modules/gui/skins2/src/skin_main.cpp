@@ -282,7 +282,7 @@ static void WindowClose( vlc_object_t *p_this )
     vout_window_t *pWnd = (vout_window_t *)p_this;
     intf_thread_t *pIntf = (intf_thread_t *)p_this->p_private;
 
-    Vlcproc::releaseWindow( pIntf, pWnd->handle );
+    VlcProc::releaseWindow( pIntf, pWnd->handle );
 }
 
 //---------------------------------------------------------------------------
