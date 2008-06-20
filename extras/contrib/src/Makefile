@@ -1108,7 +1108,7 @@ else
 endif
 endif
 
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-postproc --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --disable-devices --disable-protocols && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-postproc --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --disable-devices --disable-protocols --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
