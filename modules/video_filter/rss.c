@@ -241,10 +241,7 @@ static int CreateFilter( vlc_object_t *p_this )
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     vlc_mutex_init( &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );
@@ -267,7 +264,6 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->psz_marquee = (char *)malloc( p_sys->i_length + 1 );
     if( p_sys->psz_marquee == NULL )
     {
-        msg_Err( p_filter, "out of memory" );
         vlc_mutex_unlock( &p_sys->lock );
         vlc_mutex_destroy( &p_sys->lock );
         free( p_sys );
@@ -278,7 +274,6 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_style = malloc( sizeof( text_style_t ));
     if( p_sys->p_style == NULL )
     {
-        msg_Err( p_filter, "out of memory" );
         free( p_sys->psz_marquee );
         vlc_mutex_unlock( &p_sys->lock );
         vlc_mutex_destroy( &p_sys->lock );

@@ -90,8 +90,7 @@ static int OpenFilter( vlc_object_t *p_this )
     if( ( p_filter->p_sys = p_sys =
           (filter_sys_t *)malloc(sizeof(filter_sys_t)) ) == NULL )
     {
-        msg_Err( p_filter, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     //init the video_filter_event_info_t struct
@@ -206,7 +205,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             if( NULL == ( p_filter->p_sys->event_info.p_region =
                   (video_filter_region_info_t *)malloc(faces->total*sizeof(video_filter_region_info_t))))
             {
-                msg_Err( p_filter, "out of memory" );
                 return NULL;
             }
             memset(p_filter->p_sys->event_info.p_region, 0, faces->total*sizeof(video_filter_region_info_t));

@@ -199,10 +199,7 @@ static int CreateFilter( vlc_object_t *p_this )
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     p_sys->p_style = malloc( sizeof( text_style_t ) );
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );

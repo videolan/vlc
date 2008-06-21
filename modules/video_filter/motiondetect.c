@@ -104,10 +104,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     p_filter->p_sys->p_oldpix = NULL;
     p_filter->p_sys->p_buf = NULL;

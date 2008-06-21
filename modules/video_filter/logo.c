@@ -315,14 +315,10 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_sys = p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
-    }
     p_logo_list = p_sys->p_logo_list = malloc( sizeof( logo_list_t ) );
     if( p_logo_list == NULL )
     {
-        msg_Err( p_vout, "out of memory" );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -708,14 +704,10 @@ static int CreateFilter( vlc_object_t *p_this )
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
     p_logo_list = p_sys->p_logo_list = malloc( sizeof( logo_list_t ) );
     if( p_logo_list == NULL )
     {
-        msg_Err( p_filter, "out of memory" );
         free( p_sys );
         return VLC_ENOMEM;
     }

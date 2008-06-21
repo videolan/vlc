@@ -1375,10 +1375,7 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys = (filter_sys_t *)malloc( sizeof( filter_sys_t ) );
     p_filter->p_sys = p_sys;
     if( p_filter->p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory for p_sys structure" );
         return VLC_ENOMEM;
-    }
     /* set all entries to zero */
     memset(p_sys, 0, sizeof( filter_sys_t ));
 

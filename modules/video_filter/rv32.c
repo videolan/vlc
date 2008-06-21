@@ -77,10 +77,7 @@ static int OpenFilter( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_filter->p_sys = p_sys =
           (filter_sys_t *)malloc(sizeof(filter_sys_t)) ) == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
 
     p_filter->pf_video_filter = Filter;
 
