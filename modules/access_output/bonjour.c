@@ -201,10 +201,7 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
 
     p_sys = (bonjour_t *)malloc( sizeof(*p_sys) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_log, "out of memory" );
         return NULL;
-    }
 
     memset( p_sys, 0, sizeof(*p_sys) );
 
@@ -214,19 +211,13 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
     p_sys->psz_name = avahi_strdup( psz_name );
     p_sys->psz_stype = avahi_strdup( psz_stype );
     if( p_sys->psz_name == NULL || p_sys->psz_stype == NULL )
-    {
-        msg_Err( p_sys->p_log, "out of memory" );
         goto error;
-    }
 
     if( psz_txt != NULL )
     {
         p_sys->psz_txt = avahi_strdup( psz_txt );
         if( p_sys->psz_txt == NULL )
-        {
-            msg_Err( p_sys->p_log, "out of memory" );
             goto error;
-        }
     }
 
     p_sys->simple_poll = avahi_simple_poll_new();
@@ -251,10 +242,7 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
     p_sys->poll_thread = vlc_object_create( p_sys->p_log,
                                             sizeof(poll_thread_t) );
     if( p_sys->poll_thread == NULL )
-    {
-        msg_Err( p_sys->p_log, "out of memory" );
         goto error;
-    }
     p_sys->poll_thread->simple_poll = p_sys->simple_poll;
 
     if( vlc_thread_create( p_sys->poll_thread, "Avahi Poll Iterate Thread",

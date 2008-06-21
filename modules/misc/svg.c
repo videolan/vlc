@@ -131,16 +131,12 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     /* Initialize psz_template */
     p_sys->psz_template = svg_GetTemplate( p_this );
     if( !p_sys->psz_template )
     {
-        msg_Err( p_filter, "out of memory" );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -204,10 +200,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
 
                 psz_template = malloc( ( s.st_size + 42 ) * sizeof( char ) );
                 if( !psz_template )
-                {
-                    msg_Err( p_filter, "out of memory" );
                     return NULL;
-                }
                 memset( psz_template, 0, s.st_size + 1 );
                 fread( psz_template, s.st_size, 1, file );
                 fclose( file );
@@ -451,10 +444,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     p_svg = ( svg_rendition_t * )malloc( sizeof( svg_rendition_t ) );
     if( !p_svg )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
@@ -467,7 +457,6 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         p_svg->psz_text = strdup( psz_string );
         if( !p_svg->psz_text )
         {
-            msg_Err( p_filter, "out of memory" );
             free( p_svg );
             return VLC_ENOMEM;
         }
@@ -482,7 +471,6 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         p_svg->psz_text = malloc( ( length + 1 ) * sizeof( char ) );
         if( !p_svg->psz_text )
         {
-            msg_Err( p_filter, "out of memory" );
             free( p_svg );
             return VLC_ENOMEM;
         }

@@ -113,10 +113,7 @@ void EventThread( event_thread_t *p_event )
     /* Creating a window under Windows also initializes the thread's event
      * message queue */
     if( DirectXCreateWindow( p_event->p_vout ) )
-    {
-        msg_Err( p_event, "out of memory" );
         p_event->b_dead = true;
-    }
 
     /* Signal the creation of the window */
     vlc_thread_ready( p_event );

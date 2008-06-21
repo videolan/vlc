@@ -171,10 +171,7 @@ static int Open( vlc_object_t *p_this )
 
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
-    {
-        msg_Err( p_access, "Not enough memory" );
         return VLC_ENOMEM ;
-    }
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 

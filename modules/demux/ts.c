@@ -728,7 +728,6 @@ static int Open( vlc_object_t *p_this )
             prg = malloc( sizeof( ts_prg_psi_t ) );
             if( !prg )
             {
-                msg_Err( p_demux, "out of memory" );
                 Close( VLC_OBJECT(p_demux) );
                 return VLC_ENOMEM;
             }

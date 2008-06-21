@@ -213,10 +213,7 @@ static char *nscdec( vlc_object_t *p_demux, char* p_encoded )
     buf16_size = length;
     buf16 = malloc( buf16_size );
     if( buf16 == NULL )
-    {
-        msg_Err( p_demux, "out of memory" );
         return NULL;
-    }
 
     for( i = 0; i < length; i++ )
     {
@@ -232,7 +229,6 @@ static char *nscdec( vlc_object_t *p_demux, char* p_encoded )
     buf8 = malloc( buf8_size + 1 );
     if( buf8 == NULL )
     {
-        msg_Err( p_demux, "out of memory" );
         free( buf16 );
         return NULL;
     }

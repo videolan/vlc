@@ -184,6 +184,8 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     psz_accessname = psz_parser = strdup( p_access->psz_path );
+    if( !psz_parser )
+        return VLC_ENOMEM;
 
     if( !p_access->psz_path )
     {
@@ -212,7 +214,6 @@ static int Open( vlc_object_t *p_this )
     p_sys = p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) );
     if( !p_sys )
     {
-        msg_Err( p_access, "out of memory" );
         free( psz_accessname );
         return VLC_ENOMEM;
     }

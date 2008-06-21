@@ -216,7 +216,6 @@ static int Open( vlc_object_t *p_this )
 #ifdef USE_CTX
     if( !(p_smb = smbc_new_context()) )
     {
-        msg_Err( p_access, "out of memory" );
         free( psz_uri );
         return VLC_ENOMEM;
     }
