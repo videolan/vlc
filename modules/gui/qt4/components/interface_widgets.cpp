@@ -510,7 +510,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     telexPage->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
     telexLayout->addWidget( telexPage );
 
-    controlLayout->addWidget( telexFrame, 1, 10, 2, 3, Qt::AlignBottom );
+    controlLayout->addWidget( telexFrame, 1, 10, 2, 4, Qt::AlignBottom );
     telexFrame->hide(); /* default hidden */
 
     CONNECT( telexPage, valueChanged( int ), THEMIM->getIM(),
