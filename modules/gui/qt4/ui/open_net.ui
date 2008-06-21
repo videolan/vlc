@@ -23,7 +23,7 @@
       <item row="1" column="0" >
        <widget class="QComboBox" name="protocolCombo" >
         <property name="toolTip" >
-         <string>_("Set the protocol for the URL")</string>
+         <string>_("Select the protocol for the URL.")</string>
         </property>
        </widget>
       </item>
@@ -40,7 +40,7 @@
       <item row="1" column="2" >
        <widget class="QSpinBox" name="portSpin" >
         <property name="toolTip" >
-         <string>_("Set the port used")</string>
+         <string>_("Select the port used")</string>
         </property>
         <property name="maximum" >
          <number>65535</number>

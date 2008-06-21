@@ -155,7 +155,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip" >
-         <string>_("Select the device or the VIDEO_TS folder")</string>
+         <string>_("Select the device or the VIDEO_TS directory")</string>
         </property>
         <property name="text" >
          <string>_("Browse...")</string>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>530</width>
     <height>216</height>
    </rect>
   </property>
@@ -35,7 +35,7 @@
      <property name="sizeType" >
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>273</width>
        <height>16</height>
@@ -46,7 +46,7 @@
    <item row="2" column="0" >
     <widget class="QCheckBox" name="subCheckBox" >
      <property name="toolTip" >
-      <string>_("Add a subtitle file")</string>
+      <string>_("Add a subtitles file")</string>
      </property>
      <property name="text" >
       <string>_("Use a sub&amp;titles file")</string>
@@ -70,7 +70,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>16</width>
           <height>20</height>
@@ -106,7 +106,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>30</width>
           <height>26</height>
@@ -142,7 +142,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>16</width>
           <height>20</height>
@@ -175,7 +175,7 @@
          </size>
         </property>
         <property name="toolTip" >
-         <string>_("Select the subtitle file")</string>
+         <string>_("Select the subtitles file")</string>
         </property>
         <property name="text" >
          <string>_("Browse...")</string>
