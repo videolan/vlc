@@ -31,13 +31,16 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include "../../audio_filter/equalizer_presets.h"
 
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
 #include "ui/v4l2.h"
 
+
 #include <QTabWidget>
-#define BANDS 10
+
+#define BANDS EQZ_BANDS_MAX
 #define NUM_SP_CTRL 5
 
 class QSignalMapper;
