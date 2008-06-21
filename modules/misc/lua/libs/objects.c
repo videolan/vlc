@@ -103,7 +103,6 @@ static int vlc_object_type_from_string( const char *psz_name )
           { VLC_OBJECT_OPENGL, "opengl" },
           { VLC_OBJECT_FILTER, "filter" },
           { VLC_OBJECT_OSDMENU, "osdmenu" },
-          { VLC_OBJECT_INTERACTION, "interaction" },
           { VLC_OBJECT_GENERIC, "generic" },
           { 0, "" } };
     int i;
