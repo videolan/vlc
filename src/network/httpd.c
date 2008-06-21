@@ -1066,7 +1066,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
     /* create the new host */
     host = (httpd_host_t *)vlc_custom_create( p_this, sizeof (*host),
-                                              VLC_OBJECT_HTTPD_HOST,
+                                              VLC_OBJECT_GENERIC,
                                               psz_object_type );
     if (host == NULL)
         goto error;

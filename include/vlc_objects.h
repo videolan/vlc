@@ -47,7 +47,6 @@
 #define VLC_OBJECT_OPENGL      (-21)
 #define VLC_OBJECT_FILTER      (-22)
 #define VLC_OBJECT_OSDMENU     (-28)
-#define VLC_OBJECT_HTTPD_HOST  (-30)
 #define VLC_OBJECT_INTERACTION (-32)
 /* Please add new object types below -34 */
 /* Please do not add new object types anyway */
