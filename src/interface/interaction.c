@@ -39,6 +39,7 @@
 
 #include <vlc_interface.h>
 #include "interface.h"
+#include "libvlc.h"
 
 #include <assert.h>
 
@@ -354,37 +355,36 @@ void __intf_UserHide( vlc_object_t *p_this, int i_id )
  *
  * \return a vlc_object_t that should be freed when done.
  */
-vlc_object_t * interaction_Init( libvlc_int_t *p_libvlc )
+interaction_t * interaction_Init( libvlc_int_t *p_libvlc )
 {
     interaction_t *p_interaction;
 
     /* Make sure we haven't yet created an interaction object */
-    assert( vlc_object_find( p_libvlc, VLC_OBJECT_INTERACTION, FIND_ANYWHERE ) == NULL );
-    
-    p_interaction = vlc_object_create( p_libvlc, VLC_OBJECT_INTERACTION );
+    assert( libvlc_priv(p_libvlc)->p_interaction == NULL );
 
-    if( p_interaction )
+    p_interaction = vlc_custom_create( p_libvlc, sizeof( *p_interaction ),
+                                       VLC_OBJECT_GENERIC, "interaction" );
+    if( !p_interaction )
+        return NULL;
+
+    vlc_object_attach( p_interaction, p_libvlc );
+    p_interaction->i_dialogs = 0;
+    p_interaction->pp_dialogs = NULL;
+    p_interaction->p_intf = NULL;
+    p_interaction->i_last_id = 0;
+
+    if( vlc_thread_create( p_interaction, "Interaction control",
+                           InteractionLoop, VLC_THREAD_PRIORITY_LOW,
+                           false ) )
     {
-        vlc_object_attach( p_interaction, p_libvlc );
-        
-        p_interaction->i_dialogs = 0;
-        p_interaction->pp_dialogs = NULL;
-        p_interaction->p_intf = NULL;
-        p_interaction->i_last_id = 0;
-
-        if( vlc_thread_create( p_interaction, "Interaction control",
-                                InteractionLoop, VLC_THREAD_PRIORITY_LOW,
-                                false ) )
-        {
-            msg_Err( p_interaction, "Interaction control thread creation failed"
-                    ", interaction will not be displayed" );
-            vlc_object_detach( p_interaction );
-            vlc_object_release( p_interaction );
-            p_interaction = NULL;
-        }
+        msg_Err( p_interaction, "Interaction control thread creation failed, "
+                 "interaction will not be displayed" );
+        vlc_object_detach( p_interaction );
+        vlc_object_release( p_interaction );
+        return NULL;
     }
-    
-    return VLC_OBJECT( p_interaction );
+
+    return p_interaction;
 }
 
 /**********************************************************************
@@ -394,7 +394,10 @@ vlc_object_t * interaction_Init( libvlc_int_t *p_libvlc )
 /* Get the interaction object. Create it if needed */
 static interaction_t * InteractionGet( vlc_object_t *p_this )
 {
-    return vlc_object_find( p_this, VLC_OBJECT_INTERACTION, FIND_ANYWHERE );
+    interaction_t *obj = libvlc_priv(p_this->p_libvlc)->p_interaction;
+    if( obj )
+        vlc_object_yield( obj );
+    return obj;
 }
 
 

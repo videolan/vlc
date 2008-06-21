@@ -247,7 +247,7 @@ typedef struct libvlc_priv_t
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
     playlist_t        *p_playlist; //< the playlist singleton
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
-    vlc_object_t      *p_interaction;    ///< interface interaction object
+    interaction_t     *p_interaction;    ///< interface interaction object
     httpd_t           *p_httpd; ///< HTTP daemon (src/network/httpd.c)
 
     /* Private playlist data (FIXME - playlist_t is too public...) */

@@ -35,6 +35,6 @@
  **********************************************************************/
 
 /* release via vlc_object_release() */
-vlc_object_t * interaction_Init( libvlc_int_t *p_libvlc );
+interaction_t * interaction_Init( libvlc_int_t *p_libvlc );
 
 #endif
