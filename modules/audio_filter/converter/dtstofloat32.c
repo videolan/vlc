@@ -128,10 +128,7 @@ static int Create( vlc_object_t *p_this )
     p_sys = malloc( sizeof(filter_sys_t) );
     p_filter->p_sys = (struct aout_filter_sys_t *)p_sys;
     if( p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return -1;
-    }
 
     i_ret = Open( VLC_OBJECT(p_filter), p_sys,
                   p_filter->input, p_filter->output );
@@ -402,18 +399,7 @@ static int OpenFilter( vlc_object_t *p_this )
     /* Allocate the memory needed to store the module's structure */
     p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
-        return VLC_EGENERIC;
-    }
-
-    /* Allocate the memory needed to store the module's structure */
-    p_filter->p_sys = p_sys = malloc( sizeof(filter_sys_t) );
-    if( p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
 
     i_ret = Open( VLC_OBJECT(p_filter), p_sys,
                   p_filter->fmt_in.audio, p_filter->fmt_out.audio );

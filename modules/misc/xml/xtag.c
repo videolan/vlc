@@ -178,10 +178,8 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
 
     /* Open and read file */
     p_buffer = malloc( i_buffer );
-    if( p_buffer == NULL ) {
-        msg_Err( p_xml, "out of memory" );
+    if( p_buffer == NULL )
         return NULL;
-    }
 
     while( ( i_size = stream_Read( s, &p_buffer[i_pos], 2048 ) ) == 2048 )
     {
@@ -190,7 +188,6 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
         p_new = realloc( p_buffer, i_buffer );
         if( !p_new )
         {
-            msg_Err( p_xml, "out of memory" );
             free( p_buffer );
             return NULL;
         }

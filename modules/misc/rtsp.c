@@ -365,10 +365,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     int i;
 
     if( !p_media )
-    {
-        msg_Err( p_vod, "not enough memory" );
         return NULL;
-    }
 
     memset( p_media, 0, sizeof(vod_media_t) );
     p_media->id = p_sys->i_media_id++;

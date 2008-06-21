@@ -739,10 +739,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     id = malloc( sizeof( sout_stream_id_t ) );
     if( !id )
-    {
-        msg_Err( p_stream, "out of memory" );
         goto error;
-    }
     memset( id, 0, sizeof(sout_stream_id_t) );
 
     id->id = NULL;
@@ -752,10 +749,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     /* Create decoder object */
     id->p_decoder = vlc_object_create( p_stream, VLC_OBJECT_DECODER );
     if( !id->p_decoder )
-    {
-        msg_Err( p_stream, "out of memory" );
         goto error;
-    }
     vlc_object_attach( id->p_decoder, p_stream );
     id->p_decoder->p_module = NULL;
     id->p_decoder->fmt_in = *p_fmt;
@@ -764,10 +758,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     /* Create encoder object */
     id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
     if( !id->p_encoder )
-    {
-        msg_Err( p_stream, "out of memory" );
         goto error;
-    }
     vlc_object_attach( id->p_encoder, p_stream );
     id->p_encoder->p_module = NULL;
 
@@ -931,23 +922,26 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     return id;
 
- error:
-    if( id->p_decoder )
+error:
+    if( id )
     {
-        vlc_object_detach( id->p_decoder );
-        vlc_object_release( id->p_decoder );
-        id->p_decoder = NULL;
-    }
+        if( id->p_decoder )
+        {
+            vlc_object_detach( id->p_decoder );
+            vlc_object_release( id->p_decoder );
+            id->p_decoder = NULL;
+        }
 
-    if( id->p_encoder )
-    {
-        vlc_object_detach( id->p_encoder );
-        es_format_Clean( &id->p_encoder->fmt_out );
-        vlc_object_release( id->p_encoder );
-        id->p_encoder = NULL;
-    }
+        if( id->p_encoder )
+        {
+            vlc_object_detach( id->p_encoder );
+            es_format_Clean( &id->p_encoder->fmt_out );
+            vlc_object_release( id->p_encoder );
+            id->p_encoder = NULL;
+        }
 
-    free( id );
+        free( id );
+    }
     return NULL;
 }
 

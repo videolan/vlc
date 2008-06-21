@@ -167,10 +167,7 @@ static int Open( vlc_object_t *p_this )
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
-    {
-        msg_Err( p_intf, "out of memory" );
         return -1;
-    }
 
     psz_mode = var_CreateGetString( p_intf, "logmode" );
     if( psz_mode )

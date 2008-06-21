@@ -142,10 +142,7 @@ static int Create( vlc_object_t *p_this )
     // Allocate structure
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
     p_sys->psz_font_name  = strdup( DEFAULT_FONT );
     p_sys->i_font_opacity = 255;
     p_sys->i_font_color   = DEFAULT_FONT_COLOR;

@@ -96,10 +96,7 @@ vcddev_t *ioctl_Open( vlc_object_t *p_this, const char *psz_dev )
      */
     p_vcddev = (vcddev_t *)malloc( sizeof(vcddev_t) );
     if( p_vcddev == NULL )
-    {
-        msg_Err( p_this, "out of memory" );
         return NULL;
-    }
     p_vcddev->i_vcdimage_handle = -1;
     p_vcddev->psz_dev = NULL;
     b_is_file = 1;
@@ -211,10 +208,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         {
             *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
             if( *pp_sectors == NULL )
-            {
-                msg_Err( p_this, "out of memory" );
                 return 0;
-            }
             memcpy( *pp_sectors, p_vcddev->p_sectors,
                     (i_tracks + 1) * sizeof(int) );
         }
@@ -251,7 +245,6 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
             if( *pp_sectors == NULL )
             {
-                msg_Err( p_this, "out of memory" );
                 darwin_freeTOC( pTOC );
                 return 0;
             }
@@ -360,7 +353,6 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                 {
                     free( *pp_sectors );
                     free( p_fulltoc );
-                    msg_Err( p_this, "out of memory" );
                     CloseHandle( hEvent );
                     return 0;
                 }
@@ -423,10 +415,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
                 *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
                 if( *pp_sectors == NULL )
-                {
-                    msg_Err( p_this, "out of memory" );
                     return 0;
-                }
 
                 for( i = 0 ; i <= i_tracks ; i++ )
                 {
@@ -459,10 +448,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
              *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
              if( *pp_sectors == NULL )
-             {
-                 msg_Err( p_this, "out of memory" );
                  return 0;
-             }
 
              toc_entries.address_format = CD_LBA_FORMAT;
              toc_entries.starting_track = 0;
@@ -472,7 +458,6 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                                     malloc( toc_entries.data_len );
              if( toc_entries.data == NULL )
              {
-                 msg_Err( p_this, "out of memory" );
                  free( *pp_sectors );
                  return 0;
              }
@@ -518,10 +503,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
             *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
             if( *pp_sectors == NULL )
-            {
-                msg_Err( p_this, "out of memory" );
                 return 0;
-            }
 
             /* Fill the p_sectors structure with the track/sector matches */
             for( i = 0 ; i <= i_tracks ; i++ )

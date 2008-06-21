@@ -289,10 +289,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
     p_sys->p_face = 0;
     p_sys->p_library = 0;
     p_sys->i_font_size = 0;
@@ -324,10 +321,7 @@ static int Create( vlc_object_t *p_this )
         free( psz_fontfile );
         psz_fontfile = (char *)malloc( PATH_MAX + 1 );
         if( !psz_fontfile )
-        {
-            msg_Err( p_filter, "out of memory" );
             goto error;
-        }
 #ifdef WIN32
         GetWindowsDirectory( psz_fontfile, PATH_MAX + 1 );
         strcat( psz_fontfile, "\\fonts\\arial.ttf" );
@@ -1128,10 +1122,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     psz_unicode = psz_unicode_orig =
         malloc( ( strlen(psz_string) + 1 ) * sizeof(uint32_t) );
     if( psz_unicode == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         goto error;
-    }
 #if defined(WORDS_BIGENDIAN)
     iconv_handle = vlc_iconv_open( "UCS-4BE", "UTF-8" );
 #else
@@ -1174,10 +1165,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
         if( !p_fribidi_string )
-        {
-            msg_Err( p_filter, "out of memory" );
             goto error;
-        }
 
         /* Do bidi conversion line-by-line */
         while( pos < i_string_length )
@@ -1218,10 +1206,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     /* Calculate relative glyph positions and a bounding box for the
      * entire string */
     if( !(p_line = NewLine( strlen( psz_string ))) )
-    {
-        msg_Err( p_filter, "out of memory" );
         goto error;
-    }
     p_lines = p_line;
     i_pen_x = i_pen_y = 0;
     i_previous = i = 0;
@@ -1242,10 +1227,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         {
             psz_line_start = psz_unicode;
             if( !(p_next = NewLine( strlen( psz_string ))) )
-            {
-                msg_Err( p_filter, "out of memory" );
                 goto error;
-            }
             p_line->p_next = p_next;
             p_line->i_width = line.xMax;
             p_line->i_height = face->size->metrics.height >> 6;
@@ -2285,7 +2267,6 @@ static int ProcessLines( filter_t *p_filter,
             ! p_new_positions ||
             ! p_levels )
         {
-            msg_Err( p_filter, "out of memory" );
             free( p_levels );
             free( p_old_positions );
             free( p_new_positions );
@@ -2500,7 +2481,6 @@ static int ProcessLines( filter_t *p_filter,
                               malloc( (k - i_prev + 1) * sizeof( uint32_t ));
             if( !psz_unicode )
             {
-                msg_Err( p_filter, "out of memory" );
                 if( p_face ) FT_Done_Face( p_face );
                 free( pp_char_styles );
                 free( psz_unicode );
@@ -2519,7 +2499,6 @@ static int ProcessLines( filter_t *p_filter,
                 {
                     if( !(p_line = NewLine( i_len - i_prev)) )
                     {
-                        msg_Err( p_filter, "out of memory" );
                         if( p_face ) FT_Done_Face( p_face );
                         free( pp_char_styles );
                         free( psz_unicode );

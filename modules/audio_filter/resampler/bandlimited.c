@@ -119,10 +119,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
     if( p_filter->p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     /* Calculate worst case for the length of the filter wing */
     d_factor = (double)p_filter->output.i_rate
@@ -135,10 +132,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate enough memory to buffer previous samples */
     p_filter->p_sys->p_buf = malloc( p_filter->p_sys->i_buf_size );
     if( p_filter->p_sys->p_buf == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     p_filter->p_sys->i_old_wing = 0;
     p_filter->pf_do_work = DoWork;

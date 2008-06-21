@@ -91,10 +91,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
     if( p_filter->p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
-    }
     memset( p_filter->p_sys, 0, sizeof(struct aout_filter_sys_t) );
     p_filter->p_sys->p_buf = 0;
 

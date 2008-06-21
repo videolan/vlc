@@ -1662,18 +1662,12 @@ static int InitRead( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
 
     p_sys->p_buffers = calloc( 1, sizeof( *p_sys->p_buffers ) );
     if( !p_sys->p_buffers )
-    {
-        msg_Err( p_demux, "Out of memory" );
         goto open_failed;
-    }
 
     p_sys->p_buffers[0].length = i_buffer_size;
     p_sys->p_buffers[0].start = malloc( i_buffer_size );
     if( !p_sys->p_buffers[0].start )
-    {
-        msg_Err( p_demux, "Out of memory" );
         goto open_failed;
-    }
 
     return VLC_SUCCESS;
 

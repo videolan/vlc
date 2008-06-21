@@ -339,7 +339,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
                 if (proxies[0])
                 {
                     msg_Dbg(p_access, "libproxy suggest to use '%s'", proxies[0]);
-                    if(strcmp(proxies[0],"direct://") != 0) 
+                    if(strcmp(proxies[0],"direct://") != 0)
                     {
                         p_sys->b_proxy = true;
                         vlc_UrlParse( &p_sys->proxy, proxies[0], 0);

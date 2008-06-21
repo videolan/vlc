@@ -634,7 +634,6 @@ int CDDAOpen( vlc_object_t *p_this )
     p_cdda = calloc( 1, sizeof(cdda_data_t) );
     if( p_cdda == NULL )
     {
-        msg_Err( p_access, "out of memory" );
         free( psz_source );
         return VLC_ENOMEM;
     }

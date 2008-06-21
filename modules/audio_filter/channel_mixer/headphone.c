@@ -245,10 +245,7 @@ static int Init( vlc_object_t *p_this, struct aout_filter_sys_t * p_data
     p_data->p_atomic_operations = malloc( sizeof(struct atomic_operation_t)
             * p_data->i_nb_atomic_operations );
     if( p_data->p_atomic_operations == NULL )
-    {
-        msg_Err( p_this, "out of memory" );
         return -1;
-    }
 
     /* For each virtual speaker, computes elementary wave propagation time
      * to each ear */
@@ -346,10 +343,7 @@ static int Init( vlc_object_t *p_this, struct aout_filter_sys_t * p_data
     }
     p_data->p_overflow_buffer = malloc( p_data->i_overflow_buffer_size );
     if( p_data->p_atomic_operations == NULL )
-    {
-        msg_Err( p_this, "out of memory" );
         return -1;
-    }
     memset( p_data->p_overflow_buffer, 0 , p_data->i_overflow_buffer_size );
 
     /* end */
@@ -411,10 +405,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
     if( p_filter->p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
     p_filter->p_sys->i_overflow_buffer_size = 0;
     p_filter->p_sys->p_overflow_buffer = NULL;
     p_filter->p_sys->i_nb_atomic_operations = 0;
@@ -626,10 +617,7 @@ static int OpenFilter( vlc_object_t *p_this )
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = malloc( sizeof(struct filter_sys_t) );
     if( p_filter->p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
     p_filter->p_sys->i_overflow_buffer_size = 0;
     p_filter->p_sys->p_overflow_buffer = NULL;
     p_filter->p_sys->i_nb_atomic_operations = 0;
