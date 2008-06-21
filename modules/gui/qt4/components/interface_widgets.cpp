@@ -48,6 +48,10 @@
 #include <QResizeEvent>
 #include <QDate>
 #include <QMutexLocker>
+#ifdef Q_WS_X11
+# include <X11/Xlib.h>
+# include <qx11info_x11.h>
+#endif
 
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
@@ -85,6 +89,10 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 void VideoWidget::paintEvent(QPaintEvent *ev)
 {
     QFrame::paintEvent(ev);
+#ifdef Q_WS_X11
+    XFlush( QX11Info::display() );
+#endif
+    QMutexLocker locker( &handleLock );
     handleReady = true;
     handleWait.wakeAll();
 }
