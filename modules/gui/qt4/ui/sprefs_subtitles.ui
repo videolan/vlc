@@ -53,7 +53,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>_("Preferred Subtitle language")</string>
+         <string>_("Preferred subtitles language")</string>
         </property>
         <property name="buddy" >
          <cstring>preferredLanguage</cstring>

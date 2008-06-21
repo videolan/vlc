@@ -290,7 +290,7 @@
    <item>
     <widget class="QGroupBox" name="lastFMBox" >
      <property name="title" >
-      <string>_("Last.fm")</string>
+      <string>_("last.fm")</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" colspan="2" >
