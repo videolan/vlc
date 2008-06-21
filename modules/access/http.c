@@ -188,12 +188,13 @@ struct access_sys_t
     char       *psz_icy_genre;
     char       *psz_icy_title;
 
-    int i_remaining;
+    int64_t i_remaining;
 
     bool b_seekable;
     bool b_reconnect;
     bool b_continuous;
     bool b_pace_control;
+    bool b_persist;
 
     vlc_array_t * cookies;
 };
@@ -279,6 +280,10 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
+    p_sys->b_persist = false;
+    p_access->info.i_size = -1;
+    p_access->info.i_pos  = 0;
+    p_access->info.b_eof  = false;
 
     p_sys->cookies = saved_cookies;
 
@@ -638,7 +643,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         return 0;
     }
 
-    if( p_access->info.i_size > 0 &&
+    if( p_access->info.i_size >= 0 &&
         i_len + p_access->info.i_pos > p_access->info.i_size )
     {
         if( ( i_len = p_access->info.i_size - p_access->info.i_pos ) == 0 )
@@ -682,19 +687,15 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             i_len = p_sys->i_chunk;
         }
     }
-
-    if( p_sys->b_continuous && (ssize_t)i_len > p_sys->i_remaining )
-    {
+    else if( p_access->info.i_size != -1 && (int64_t)i_len > p_sys->i_remaining) {
         /* Only ask for the remaining length */
-        int i_new_len = p_sys->i_remaining;
-        if( i_new_len == 0 )
-        {
-            Request( p_access, 0 );
-            i_read = Read( p_access, p_buffer, i_len );
-            return i_read;
+        i_len = (size_t)p_sys->i_remaining;
+        if(i_len == 0) {
+            p_access->info.b_eof = true;
+            return 0;
         }
-        i_len = i_new_len;
     }
+
 
     if( p_sys->i_icy_meta > 0 && p_access->info.i_pos > 0 )
     {
@@ -764,7 +765,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         if( i_read == 0 ) p_access->info.b_eof = true;
     }
 
-    if( p_sys->b_continuous )
+    if( p_access->info.i_size != -1 )
     {
         p_sys->i_remaining -= i_read;
     }
@@ -1007,8 +1008,10 @@ static int Connect( access_t *p_access, int64_t i_tell )
     p_sys->psz_icy_name = NULL;
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
+    p_sys->i_remaining = 0;
+    p_sys->b_persist = false;
 
-    p_access->info.i_size = 0;
+    p_access->info.i_size = -1;
     p_access->info.i_pos  = i_tell;
     p_access->info.b_eof  = false;
 
@@ -1106,7 +1109,10 @@ static int Request( access_t *p_access, int64_t i_tell )
     access_sys_t   *p_sys = p_access->p_sys;
     char           *psz ;
     v_socket_t     *pvs = p_sys->p_vs;
+    bool b_connection_close = false;
+    p_sys->b_persist = false;
 
+    p_sys->i_remaining = 0;
     if( p_sys->b_proxy )
     {
         if( p_sys->url.psz_path )
@@ -1149,8 +1155,9 @@ static int Request( access_t *p_access, int64_t i_tell )
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "User-Agent: %s\r\n",
                 p_sys->psz_user_agent );
     /* Offset */
-    if( p_sys->i_version == 1 )
+    if( p_sys->i_version == 1 && ! p_sys->b_continuous )
     {
+        p_sys->b_persist = true;
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                     "Range: bytes=%"PRIu64"-\r\n", i_tell );
     }
@@ -1192,17 +1199,6 @@ static int Request( access_t *p_access, int64_t i_tell )
     /* ICY meta data request */
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Icy-MetaData: 1\r\n" );
 
-
-    if( p_sys->b_continuous )
-    {
-        net_Printf( VLC_OBJECT( p_access ), p_sys->fd, pvs,
-                    "Connection: Keep-Alive\r\n" );
-    }
-    else if( p_sys->i_version == 1 )
-    {
-        net_Printf( VLC_OBJECT( p_access ), p_sys->fd, pvs,
-                    "Connection: Close\r\n");
-    }
 
     if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "\r\n" ) < 0 )
     {
@@ -1293,16 +1289,33 @@ static int Request( access_t *p_access, int64_t i_tell )
 
         if( !strcasecmp( psz, "Content-Length" ) )
         {
-            if( p_sys->b_continuous )
-            {
-                p_access->info.i_size = -1;
-                msg_Dbg( p_access, "this frame size=%lld", atoll(p ) );
-                p_sys->i_remaining = atoll( p );
+            int64_t i_size = i_tell + (p_sys->i_remaining = atoll( p ));
+            if(i_size > p_access->info.i_size) {
+                p_access->info.i_size = i_size;
             }
-            else
-            {
-                p_access->info.i_size = i_tell + atoll( p );
-                msg_Dbg( p_access, "stream size=%"PRId64, p_access->info.i_size );
+            msg_Dbg( p_access, "this frame size=%"PRId64, p_sys->i_remaining );
+        }
+        else if( !strcasecmp( psz, "Content-Range" ) ) {
+            int64_t i_ntell = i_tell;
+            int64_t i_nend = (p_access->info.i_size > 0)?(p_access->info.i_size - 1):i_tell;
+            int64_t i_nsize = p_access->info.i_size;
+            sscanf(p,"bytes %"PRId64"-%"PRId64"/%"PRId64,&i_ntell,&i_nend,&i_nsize);
+            if(i_nend > i_ntell ) {
+                p_access->info.i_pos = i_ntell;
+                p_sys->i_remaining = i_nend+1-i_ntell;
+                int64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);
+                if(i_size > p_access->info.i_size) {
+                    p_access->info.i_size = i_size;
+                }
+                msg_Dbg( p_access, "stream size=%"PRId64",pos=%"PRId64",remaining=%"PRId64,i_nsize,i_ntell,p_sys->i_remaining);
+            }
+        }
+        else if( !strcasecmp( psz, "Connection" ) ) {
+            msg_Dbg( p_access, "Connection: %s",p );
+            int i = -1;
+            sscanf(p, "close%n",&i);
+            if( i >= 0 ) {
+                p_sys->b_persist = false;
             }
         }
         else if( !strcasecmp( psz, "Location" ) )
@@ -1455,6 +1468,12 @@ static int Request( access_t *p_access, int64_t i_tell )
         }
 
         free( psz );
+    }
+    /* We close the stream for zero length data, unless of course the
+     * server has already promised to do this for us.
+     */
+    if( p_access->info.i_size != -1 && p_sys->i_remaining == 0 && p_sys->b_persist ) {
+        Disconnect( p_access );
     }
     return VLC_SUCCESS;
 
