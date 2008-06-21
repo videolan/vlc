@@ -81,7 +81,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox->setSizeGripEnabled( false );
 
     /* Add a tooltip */
-    dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ) );
+    dialogBox->setToolTip( qtr( "Select one or multiple files" ) );
 
     // But hide the two OK/Cancel buttons. Enable them for debug.
     QDialogButtonBox *fileDialogAcceptBox =
@@ -733,7 +733,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Jack Main panel */
     /* Channels */
-    QLabel *jackChannelsLabel = new QLabel( qtr( "Channels :" ) );
+    QLabel *jackChannelsLabel = new QLabel( qtr( "Channels:" ) );
     jackDevLayout->addWidget( jackChannelsLabel, 1, 0 );
 
     jackChannels = new QSpinBox;
@@ -746,7 +746,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Jack Props panel */
 
     /* Selected ports */
-    QLabel *jackPortsLabel = new QLabel( qtr( "Selected ports :" ) );
+    QLabel *jackPortsLabel = new QLabel( qtr( "Selected ports:" ) );
     jackPropLayout->addWidget( jackPortsLabel, 0 , 0 );
 
     jackPortsSelected = new QLineEdit( qtr( ".*") );
@@ -754,7 +754,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     jackPropLayout->addWidget( jackPortsSelected, 0, 1 );
 
     /* Caching */
-    QLabel *jackCachingLabel = new QLabel( qtr( "Input caching :" ) );
+    QLabel *jackCachingLabel = new QLabel( qtr( "Input caching:" ) );
     jackPropLayout->addWidget( jackCachingLabel, 1 , 0 );
     jackCaching = new QSpinBox;
     setSpinBoxFreq( jackCaching );

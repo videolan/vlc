@@ -178,7 +178,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         /******************************
          * VIDEO Panel Implementation *
          ******************************/
-        START_SPREFS_CAT( Video , qtr("General video settings") );
+        START_SPREFS_CAT( Video , qtr("General Video Settings") );
             CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
 
             CONFIG_GENERIC( "fullscreen", Bool, NULL, fullscreen );
@@ -208,7 +208,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         /******************************
          * AUDIO Panel Implementation *
          ******************************/
-        START_SPREFS_CAT( Audio, qtr("General audio settings") );
+        START_SPREFS_CAT( Audio, qtr("General Audio Settings") );
 
             CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
@@ -347,7 +347,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         END_SPREFS_CAT;
 
         /* Input and Codecs Panel Implementation */
-        START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs settings") );
+        START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs Settings") );
 
             /* Disk Devices */
             {
@@ -448,7 +448,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         /*******************
          * Interface Panel *
          *******************/
-        START_SPREFS_CAT( Interface, qtr("Interface settings") );
+        START_SPREFS_CAT( Interface, qtr("Interface Settings") );
             ui.defaultLabel->setFont( italicFont );
             ui.skinsLabel->setFont( italicFont );
 
@@ -507,7 +507,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Subtitles, qtr("Subtitles & OSD settings") );
+        START_SPREFS_CAT( Subtitles, qtr("Subtitles & OSD Settings") );
             CONFIG_GENERIC( "osd", Bool, NULL, OSDBox);
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );

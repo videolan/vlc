@@ -1294,7 +1294,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     updateButton = new QToolButton;
     updateButton->setAutoRaise( true );
     updateButton->setText( "u" );
-    updateButton->setToolTip( qtr( "Force update of the values in this dialog" ) );
+    updateButton->setToolTip( qtr( "Force update of this dialog's values" ) );
     mainLayout->addWidget( updateButton, 0, 4, 1, 1 );
 
 

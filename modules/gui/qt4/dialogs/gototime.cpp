@@ -59,7 +59,7 @@ GotoTimeDialog::GotoTimeDialog( QWidget *parent, intf_thread_t *_p_intf)
     QGroupBox *timeGroupBox = new QGroupBox;
     QGridLayout *boxLayout = new QGridLayout( timeGroupBox );
 
-    QLabel *timeIntro = new QLabel( qtr( "Go to time:" ) );
+    QLabel *timeIntro = new QLabel( qtr( "Go to time" ) + ":" );
     timeIntro->setWordWrap( true );
     timeIntro->setAlignment( Qt::AlignCenter );
 

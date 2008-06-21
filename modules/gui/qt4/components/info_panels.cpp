@@ -419,7 +419,7 @@ InfoPanel::InfoPanel( QWidget *parent,
      QList<QTreeWidgetItem *> items;
 
      QLabel *topLabel = new QLabel( qtr( "Information about what your media or"
-              " stream is made of.\n Muxer, Audio and Video Codecs, Subtitles "
+              " stream is made of.\nMuxer, Audio and Video Codecs, Subtitles "
               "are shown." ) );
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
@@ -492,8 +492,8 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
 
      QList<QTreeWidgetItem *> items;
 
-     QLabel *topLabel = new QLabel( qtr( "Various statistics about the current"
-                 " media or stream.\n Played and streamed info are shown." ) );
+     QLabel *topLabel = new QLabel( qtr( "Statistics about the currently "
+                 "playing media or stream." ) );
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
 
@@ -540,7 +540,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
     CREATE_AND_ADD_TO_CAT( send_stat, qtr("Sent packets"), "0", streaming, "" );
     CREATE_AND_ADD_TO_CAT( send_bytes_stat, qtr("Sent bytes"),
                            "0", streaming, "kB" );
-    CREATE_AND_ADD_TO_CAT( send_bitrate_stat, qtr("Sent bitrates"),
+    CREATE_AND_ADD_TO_CAT( send_bitrate_stat, qtr("Sent bitrate"),
                            "0", streaming, "kb/s" );
 
     CREATE_AND_ADD_TO_CAT( adecoded_stat, qtr("Decoded blocks"),

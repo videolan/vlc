@@ -58,7 +58,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
     audioLayout->addWidget( audioTab );
 
-    mainTabW->addTab( audioWidget, qtr( "Audio effects" ) );
+    mainTabW->addTab( audioWidget, qtr( "Audio Effects" ) );
 
     /* Video Effects */
     QWidget *videoWidget = new QWidget;

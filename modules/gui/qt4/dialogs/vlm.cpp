@@ -80,9 +80,9 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
 
     /* Schedule Stuffs */
     QGridLayout *schetimelayout = new QGridLayout( ui.schedBox );
-    QLabel *schetimelabel = new QLabel( qtr( "Hours/Minutes/Seconds:" ) );
+    QLabel *schetimelabel = new QLabel( qtr( "Hours / Minutes / Seconds:" ) );
     schetimelayout->addWidget( schetimelabel, 0, 0 );
-    QLabel *schedatelabel = new QLabel( qtr( "Day Month Year:" ) );
+    QLabel *schedatelabel = new QLabel( qtr( "Day / Month / Year:" ) );
     schetimelayout->addWidget( schedatelabel, 1, 0 );
     QLabel *scherepeatLabel = new QLabel( qtr( "Repeat:" ) );
     schetimelayout->addWidget( scherepeatLabel, 2, 0 );

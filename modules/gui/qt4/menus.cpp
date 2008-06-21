@@ -379,7 +379,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
 
         /* FullScreen View */
         action = menu->addAction( qtr( "Toggle Fullscreen Interface" ), mi,
-                                  SLOT( toggleFullScreen() ), qtr( "F11" ) );
+                                  SLOT( toggleFullScreen() ), QString( "F11" ) );
 
         /* Advanced Controls */
         action = menu->addAction( qtr( "Advanced controls" ), mi,
