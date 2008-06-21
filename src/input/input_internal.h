@@ -392,7 +392,7 @@ static inline void input_ChangeStateWithVarCallback( input_thread_t *p_input, in
     else
     {
         vlc_value_t val;
-        val.i_int = PLAYING_S;
+        p_input->i_state = val.i_int = state;
         var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
     }
     if( changed )
