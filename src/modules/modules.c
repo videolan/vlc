@@ -1220,6 +1220,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         p_bank->pp_cache[p_bank->i_cache]->b_used = true;
         p_bank->pp_cache[p_bank->i_cache]->p_module = p_module;
         p_bank->i_cache++;
+#undef p_bank
     }
 
     return p_module ? 0 : -1;
