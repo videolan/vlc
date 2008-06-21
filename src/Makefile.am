@@ -78,6 +78,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_variables.h \
 	../include/vlc_vlm.h \
 	../include/vlc_vout.h \
+	../include/vlc_window.h \
 	../include/vlc_xml.h \
 	$(NULL)
 
