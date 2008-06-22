@@ -1093,41 +1093,6 @@ static inline void audio_timer_close( encoder_t * p_encoder )
  * decoder reencoder part
  ****************************************************************************/
 
-static int audio_BitsPerSample( vlc_fourcc_t i_format )
-{
-    switch( i_format )
-    {
-    case VLC_FOURCC('u','8',' ',' '):
-    case VLC_FOURCC('s','8',' ',' '):
-        return 8;
-
-    case VLC_FOURCC('u','1','6','l'):
-    case VLC_FOURCC('s','1','6','l'):
-    case VLC_FOURCC('u','1','6','b'):
-    case VLC_FOURCC('s','1','6','b'):
-        return 16;
-
-    case VLC_FOURCC('u','2','4','l'):
-    case VLC_FOURCC('s','2','4','l'):
-    case VLC_FOURCC('u','2','4','b'):
-    case VLC_FOURCC('s','2','4','b'):
-        return 24;
-
-    case VLC_FOURCC('u','3','2','l'):
-    case VLC_FOURCC('s','3','2','l'):
-    case VLC_FOURCC('u','3','2','b'):
-    case VLC_FOURCC('s','3','2','b'):
-    case VLC_FOURCC('f','l','3','2'):
-    case VLC_FOURCC('f','i','3','2'):
-        return 32;
-
-    case VLC_FOURCC('f','l','6','4'):
-        return 64;
-    }
-
-    return 0;
-}
-
 static block_t *transcode_audio_alloc( filter_t *p_filter, int size )
 {
     VLC_UNUSED( p_filter );
@@ -1169,7 +1134,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         return VLC_EGENERIC;
     }
     id->p_decoder->fmt_out.audio.i_bitspersample =
-        audio_BitsPerSample( id->p_decoder->fmt_out.i_codec );
+        aout_BitsPerSample( id->p_decoder->fmt_out.i_codec );
     fmt_last = id->p_decoder->fmt_out;
     /* Fix AAC SBR changing number of channels and sampling rate */
     if( !(id->p_decoder->fmt_in.i_codec == VLC_FOURCC('m','p','4','a') &&
@@ -1198,7 +1163,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_in.audio.i_channels =
         id->p_encoder->fmt_out.audio.i_channels;
     id->p_encoder->fmt_in.audio.i_bitspersample =
-        audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
+        aout_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
     id->p_encoder->p_module =
@@ -1214,7 +1179,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     }
     id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
     id->p_encoder->fmt_in.audio.i_bitspersample =
-        audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
+        aout_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     /* Init filter chain */
     id->p_f_chain = filter_chain_New( p_stream, "audio filter2", true,
@@ -1323,7 +1288,7 @@ TO CHAIN A BUNCH OF AUDIO FILTERS */
         }
         id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
         id->p_encoder->fmt_in.audio.i_bitspersample =
-            audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
+            aout_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 #else
         msg_Err( p_stream, "no audio filter found for mixing from"
                  " %i to %i channels", fmt_last.audio.i_channels,
