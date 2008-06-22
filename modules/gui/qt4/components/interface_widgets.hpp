@@ -103,6 +103,11 @@ public slots:
     void SetSizing( unsigned int, unsigned int );
 
 protected:
+    virtual QPaintEngine *paintEngine() const
+    {
+        return NULL;
+    }
+
     virtual void paintEvent(QPaintEvent *);
 };
 
