@@ -197,6 +197,10 @@ libvlc_int_t * libvlc_InternalCreate( void )
     vlc_mutex_init( &priv->timer_lock );
     vlc_mutex_init( &priv->config_lock );
 
+    priv->threads_count = 0;
+    vlc_mutex_init (&priv->threads_lock);
+    vlc_cond_init (NULL, &priv->threads_wait);
+
     /* Store data for the non-reentrant API */
     p_static_vlc = p_libvlc;
 
@@ -986,6 +990,17 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
+    /* Make sure all threads are completed before we start looking for
+     * reference leaks and deinitializing core LibVLC subsytems. */
+    vlc_mutex_lock (&priv->threads_lock);
+    while (priv->threads_count)
+    {
+        msg_Dbg (p_libvlc, "waiting for %u remaining threads",
+                 priv->threads_count);
+        vlc_cond_wait (&priv->threads_wait, &priv->threads_lock);
+    }
+    vlc_mutex_unlock (&priv->threads_lock);
+
     bool b_clean = true;
     FOREACH_ARRAY( input_item_t *p_del, priv->input_items )
         msg_Err( p_libvlc, "input item %p has not been deleted properly: refcount %d, name %s",
@@ -1066,6 +1081,8 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
     /* Destroy mutexes */
     vlc_mutex_destroy( &priv->config_lock );
     vlc_mutex_destroy( &priv->timer_lock );
+    vlc_cond_destroy (&priv->threads_wait);
+    vlc_mutex_destroy (&priv->threads_lock);
 
     if( b_release ) vlc_object_release( p_libvlc );
     vlc_object_release( p_libvlc );
