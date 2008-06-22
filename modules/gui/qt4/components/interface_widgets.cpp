@@ -47,7 +47,6 @@
 #include <QPalette>
 #include <QResizeEvent>
 #include <QDate>
-#include <QMutexLocker>
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
 # include <qx11info_x11.h>
@@ -63,7 +62,6 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     /* Init */
     vlc_mutex_init( &lock );
     p_vout = NULL;
-    handleReady = false;
     hide(); setMinimumSize( 16, 16 );
     videoSize.rwidth() = -1;
     videoSize.rheight() = -1;
@@ -93,9 +91,6 @@ void VideoWidget::paintEvent(QPaintEvent *ev)
 #ifdef Q_WS_X11
     XFlush( QX11Info::display() );
 #endif
-    QMutexLocker locker( &handleLock );
-    handleReady = true;
-    handleWait.wakeAll();
 }
 
 VideoWidget::~VideoWidget()
@@ -124,7 +119,6 @@ VideoWidget::~VideoWidget()
 void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                            unsigned int *pi_width, unsigned int *pi_height )
 {
-    QMutexLocker locker( &handleLock );
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
     emit askVideoWidgetToShow();
     if( p_vout )
@@ -133,11 +127,6 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
         return NULL;
     }
     p_vout = p_nvout;
-    while( !handleReady )
-    {
-        msg_Dbg( p_intf, "embedded video pending (handle %p)", winId() );
-        handleWait.wait( &handleLock );
-    }
     msg_Dbg( p_intf, "embedded video ready (handle %p)", winId() );
     return ( void* )winId();
 }
