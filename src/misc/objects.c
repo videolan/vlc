@@ -606,16 +606,16 @@ void __vlc_object_signal_unlocked( vlc_object_t *obj )
  */
 void __vlc_object_kill( vlc_object_t *p_this )
 {
-    vlc_object_internals_t *internals = vlc_internals( p_this );
+    vlc_object_internals_t *priv = vlc_internals( p_this );
     int fd;
 
     vlc_object_lock( p_this );
     p_this->b_die = true;
 
-    vlc_spin_lock (&internals->spin);
-    fd = internals->pipes[1];
-    internals->pipes[1] = -1;
-    vlc_spin_unlock (&internals->spin);
+    vlc_spin_lock (&priv->spin);
+    fd = priv->pipes[1];
+    priv->pipes[1] = -1;
+    vlc_spin_unlock (&priv->spin);
 
     if( fd != -1 )
     {
@@ -628,10 +628,14 @@ void __vlc_object_kill( vlc_object_t *p_this )
 
     if (p_this->i_object_type == VLC_OBJECT_LIBVLC)
     {
-        vlc_list_t *children = vlc_list_children (p_this);
-        for (int i = 0; i < children->i_count; i++)
-            vlc_object_kill (children->p_values[i].p_object);
-        vlc_list_release (children);
+        /* Do not use vlc_list_children() here! We don't want to yield/release
+         * all the children of LibVLC (-> dead lock). This is a hack anyway:
+         * LibVLC should kill its children by itself as it sees fit, as any
+         * other object. */
+        vlc_mutex_lock (&structure_lock);
+        for (int i = 0; i < priv->i_children; i++)
+            vlc_object_kill (priv->pp_children[i]);
+        vlc_mutex_unlock (&structure_lock);
     }
 }
 
