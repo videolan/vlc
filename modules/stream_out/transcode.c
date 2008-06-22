@@ -1152,7 +1152,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                     id->p_decoder->fmt_out.i_codec );
     id->p_encoder->fmt_in.audio.i_format = id->p_decoder->fmt_out.i_codec;
 
-    id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
+    id->p_encoder->fmt_in.audio.i_rate = fmt_last.audio.i_rate;//id->p_encoder->fmt_out.audio.i_rate;
     id->p_encoder->fmt_in.audio.i_physical_channels =
         id->p_encoder->fmt_out.audio.i_physical_channels;
     id->p_encoder->fmt_in.audio.i_original_channels =
@@ -1188,10 +1188,10 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate )
     {
         /* We'll have to go through fl32 first */
-        es_format_t fmt_out = id->p_encoder->fmt_in;
-        fmt_out.i_codec = fmt_out.audio.i_format = VLC_FOURCC('f','l','3','2');
-        filter_chain_AppendFilter( id->p_f_chain, NULL, NULL, &fmt_last, &fmt_out );
-        fmt_last = fmt_out;
+        fmt_last.i_codec = fmt_last.audio.i_format = VLC_FOURCC('f','l','3','2');
+        fmt_last.audio.i_bitspersample = aout_BitsPerSample( fmt_last.i_codec );
+        filter_chain_AppendFilter( id->p_f_chain, NULL, NULL, NULL, &fmt_last );
+        fmt_last = *filter_chain_GetFmtOut( id->p_f_chain );
     }
 
     for( i = 0; i < 4; i++ )
