@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h> /* INT_MAX */
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
@@ -42,6 +44,34 @@ static void CloseFilter( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
+#define CROPTOP_TEXT N_( "Pixels to crop from top" )
+#define CROPTOP_LONGTEXT N_( \
+    "Number of pixels to crop from the top of the image." )
+#define CROPBOTTOM_TEXT N_( "Pixels to crop from bottom" )
+#define CROPBOTTOM_LONGTEXT N_( \
+    "Number of pixels to crop from the bottom of the image." )
+#define CROPLEFT_TEXT N_( "Pixels to crop from left" )
+#define CROPLEFT_LONGTEXT N_( \
+    "Number of pixels to crop from the left of the image." )
+#define CROPRIGHT_TEXT N_( "Pixels to crop from right" )
+#define CROPRIGHT_LONGTEXT N_( \
+    "Number of pixels to crop from the right of the image." )
+
+#define PADDTOP_TEXT N_( "Pixels to padd to top" )
+#define PADDTOP_LONGTEXT N_( \
+    "Number of pixels to padd to the top of the image after cropping." )
+#define PADDBOTTOM_TEXT N_( "Pixels to padd to bottom" )
+#define PADDBOTTOM_LONGTEXT N_( \
+    "Number of pixels to padd to the bottom of the image after cropping." )
+#define PADDLEFT_TEXT N_( "Pixels to padd to left" )
+#define PADDLEFT_LONGTEXT N_( \
+    "Number of pixels to padd to the left of the image after cropping." )
+#define PADDRIGHT_TEXT N_( "Pixels to padd to right" )
+#define PADDRIGHT_LONGTEXT N_( \
+    "Number of pixels to padd to the right of the image after cropping." )
+
+#define CFG_PREFIX "croppadd-"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -49,7 +79,45 @@ vlc_module_begin();
     set_description( N_("Video scaling filter") );
     set_capability( "video filter2", 0 );
     set_callbacks( OpenFilter, CloseFilter );
+
+    set_section( N_("Crop"), NULL );
+        add_integer_with_range( CFG_PREFIX "croptop", 0, 0, INT_MAX, NULL,
+                                CROPTOP_TEXT, CROPTOP_LONGTEXT, false );
+        add_integer_with_range( CFG_PREFIX "cropbottom", 0, 0, INT_MAX, NULL,
+                                CROPBOTTOM_TEXT, CROPBOTTOM_LONGTEXT, false );
+        add_integer_with_range( CFG_PREFIX "cropleft", 0, 0, INT_MAX, NULL,
+                                CROPLEFT_TEXT, CROPLEFT_LONGTEXT, false );
+        add_integer_with_range( CFG_PREFIX "cropright", 0, 0, INT_MAX, NULL,
+                                CROPRIGHT_TEXT, CROPRIGHT_LONGTEXT, false );
+
+    set_section( N_("Padd"), NULL );
+        add_integer_with_range( CFG_PREFIX "paddtop", 0, 0, INT_MAX, NULL,
+                                PADDTOP_TEXT, PADDTOP_LONGTEXT, false );
+        add_integer_with_range( CFG_PREFIX "paddbottom", 0, 0, INT_MAX, NULL,
+                                PADDBOTTOM_TEXT, PADDBOTTOM_LONGTEXT, false );
+        add_integer_with_range( CFG_PREFIX "paddleft", 0, 0, INT_MAX, NULL,
+                                PADDLEFT_TEXT, PADDLEFT_LONGTEXT, false );
+        add_integer_with_range( CFG_PREFIX "paddright", 0, 0, INT_MAX, NULL,
+                                PADDRIGHT_TEXT, PADDRIGHT_LONGTEXT, false );
 vlc_module_end();
+
+static const char *const ppsz_filter_options[] = {
+    "croptop", "cropbottom", "cropleft", "cropright",
+    "paddtop", "paddbottom", "paddleft", "paddright",
+    NULL
+};
+
+struct filter_sys_t
+{
+    int i_croptop;
+    int i_cropbottom;
+    int i_cropleft;
+    int i_cropright;
+    int i_paddtop;
+    int i_paddbottom;
+    int i_paddleft;
+    int i_paddright;
+};
 
 /*****************************************************************************
  * OpenFilter: probe the filter and return score
@@ -57,23 +125,67 @@ vlc_module_end();
 static int OpenFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
+    filter_sys_t *p_sys;
 
-    if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
+    if( !p_filter->b_allow_fmt_out_change )
     {
+        msg_Err( p_filter, "Picture format change isn't allowed" );
         return VLC_EGENERIC;
     }
 
+    if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
+    {
+        msg_Err( p_filter, "Input and output chromas don't match" );
+        /* In fact we don't really care about this since we're allowed
+         * to change the output format ... FIXME? */
+        return VLC_EGENERIC;
+    }
+
+    p_filter->p_sys = (filter_sys_t *)malloc( sizeof( filter_sys_t ) );
+    if( !p_filter->p_sys ) return VLC_ENOMEM;
+
+    config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
+
+    p_sys = p_filter->p_sys;
+#define GET_OPTION( name ) \
+    p_sys->i_ ## name = var_CreateGetInteger( p_filter, CFG_PREFIX #name ); \
+    if( p_sys->i_ ## name & 1 ) \
+        msg_Warn( p_filter, "Using even values for `" #name "' is recommended" );
+    GET_OPTION( croptop )
+    GET_OPTION( cropbottom )
+    GET_OPTION( cropleft )
+    GET_OPTION( cropright )
+    GET_OPTION( paddtop )
+    GET_OPTION( paddbottom )
+    GET_OPTION( paddleft )
+    GET_OPTION( paddright )
+
+    p_filter->fmt_out.video.i_height =
+    p_filter->fmt_out.video.i_visible_height =
+        p_filter->fmt_in.video.i_visible_height
+        - p_sys->i_croptop - p_sys->i_cropbottom
+        + p_sys->i_paddtop + p_sys->i_paddbottom;
+
+    p_filter->fmt_out.video.i_width =
+    p_filter->fmt_out.video.i_visible_width =
+        p_filter->fmt_in.video.i_visible_width
+        - p_sys->i_cropleft - p_sys->i_cropright
+        + p_sys->i_paddleft + p_sys->i_paddright;
+
     p_filter->pf_video_filter = Filter;
 
-    msg_Dbg( p_filter, "%ix%i + %ix%i -> %ix%i + %ix%i",
-             p_filter->fmt_in.video.i_visible_width,
-             p_filter->fmt_in.video.i_visible_height,
-             p_filter->fmt_in.video.i_x_offset,
-             p_filter->fmt_in.video.i_y_offset,
-             p_filter->fmt_out.video.i_visible_width,
-             p_filter->fmt_out.video.i_visible_height,
-             p_filter->fmt_out.video.i_x_offset,
-             p_filter->fmt_out.video.i_y_offset );
+    msg_Dbg( p_filter, "Crop: Top: %d, Bottom: %d, Left: %d, Right: %d",
+             p_sys->i_croptop, p_sys->i_cropbottom, p_sys->i_cropleft,
+             p_sys->i_cropright );
+    msg_Dbg( p_filter, "Padd: Top: %d, Bottom: %d, Left: %d, Right: %d",
+             p_sys->i_paddtop, p_sys->i_paddbottom, p_sys->i_paddleft,
+             p_sys->i_paddright );
+    msg_Dbg( p_filter, "%dx%d -> %dx%d",
+             p_filter->fmt_in.video.i_width,
+             p_filter->fmt_in.video.i_height,
+             p_filter->fmt_out.video.i_width,
+             p_filter->fmt_out.video.i_height );
 
     return VLC_SUCCESS;
 }
@@ -83,7 +195,8 @@ static int OpenFilter( vlc_object_t *p_this )
  *****************************************************************************/
 static void CloseFilter( vlc_object_t *p_this )
 {
-    VLC_UNUSED(p_this);
+    filter_t *p_filter = (filter_t *)p_this;
+    free( p_filter->p_sys );
 }
 
 /****************************************************************************
@@ -91,6 +204,7 @@ static void CloseFilter( vlc_object_t *p_this )
  ****************************************************************************/
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *p_outpic;
     int i_plane;
     int i_width, i_height, i_xcrop, i_ycrop,
@@ -124,17 +238,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         /* These assignments assume that the first plane always has
          * a width and height equal to the picture's */
-        i_width =     ( p_filter->fmt_in.video.i_visible_width
+        i_width =     ( ( p_filter->fmt_in.video.i_visible_width
+                          - p_sys->i_cropleft - p_sys->i_cropright )
                         * p_plane->i_visible_pitch )
                       / p_pic->p->i_visible_pitch;
-        i_height =    ( p_filter->fmt_in.video.i_visible_height
+        i_height =    ( ( p_filter->fmt_in.video.i_visible_height
+                          - p_sys->i_croptop - p_sys->i_cropbottom )
                         * p_plane->i_visible_lines )
                       / p_pic->p->i_visible_lines;
-        i_xcrop =     ( p_filter->fmt_in.video.i_x_offset
-                        * p_plane->i_visible_pitch)
+        i_xcrop =     ( p_sys->i_cropleft * p_plane->i_visible_pitch)
                       / p_pic->p->i_visible_pitch;
-        i_ycrop =     ( p_filter->fmt_in.video.i_y_offset
-                        * p_plane->i_visible_lines)
+        i_ycrop =     ( p_sys->i_croptop * p_plane->i_visible_lines)
                       / p_pic->p->i_visible_lines;
         i_outwidth =  ( p_filter->fmt_out.video.i_visible_width
                         * p_outplane->i_visible_pitch )
@@ -142,11 +256,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         i_outheight = ( p_filter->fmt_out.video.i_visible_height
                         * p_outplane->i_visible_lines )
                       / p_outpic->p->i_visible_lines;
-        i_xpadd =     ( p_filter->fmt_out.video.i_x_offset
-                        * p_outplane->i_visible_pitch )
+        i_xpadd =     ( p_sys->i_paddleft * p_outplane->i_visible_pitch )
                       / p_outpic->p->i_visible_pitch;
-        i_ypadd =     ( p_filter->fmt_out.video.i_y_offset
-                         * p_outplane->i_visible_lines )
+        i_ypadd =     ( p_sys->i_paddtop * p_outplane->i_visible_lines )
                        / p_outpic->p->i_visible_lines;
 
         /* Crop the top */
