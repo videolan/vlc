@@ -401,6 +401,21 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     }
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
 
+    p_input->p_playback_rate_filter = NULL;
+    for( int i = 0; i < p_input->i_nb_filters; i++ )
+    {
+        aout_filter_t *p_filter = p_input->pp_filters[i];
+        if( strcmp( "scaletempo", p_filter->psz_object_name ) == 0 )
+        {
+          p_input->p_playback_rate_filter = p_filter;
+          break;
+        }
+    }
+    if( ! p_input->p_playback_rate_filter && p_input->i_nb_resamplers > 0 )
+    {
+        p_input->p_playback_rate_filter = p_input->pp_resamplers[0];
+    }
+
     aout_FiltersHintBuffers( p_aout, p_input->pp_filters,
                              p_input->i_nb_filters,
                              &p_input->input_alloc );
@@ -475,7 +490,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         vlc_mutex_unlock( &p_aout->mixer_lock );
     }
 
-    if( i_input_rate != INPUT_RATE_DEFAULT && p_input->i_nb_resamplers <= 0 )
+    if( i_input_rate != INPUT_RATE_DEFAULT && p_input->p_playback_rate_filter == NULL )
     {
         inputDrop( p_aout, p_input, p_buffer );
         return 0;
@@ -502,10 +517,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     }
 #endif
 
-    /* Handle input rate change by modifying resampler input rate */
+    /* Handle input rate change, but keep drift correction */
     if( i_input_rate != p_input->i_last_input_rate )
     {
-        unsigned int * const pi_rate = &p_input->pp_resamplers[0]->input.i_rate;
+        unsigned int * const pi_rate = &p_input->p_playback_rate_filter->input.i_rate;
 #define F(r,ir) ( INPUT_RATE_DEFAULT * (r) / (ir) )
         const int i_delta = *pi_rate - F(p_input->input.i_rate,p_input->i_last_input_rate);
         *pi_rate = F(p_input->input.i_rate + i_delta, i_input_rate);
@@ -551,8 +566,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     /* If the audio drift is too big then it's not worth trying to resample
      * the audio. */
+    mtime_t i_pts_tolerance = 3 * AOUT_PTS_TOLERANCE * i_input_rate / INPUT_RATE_DEFAULT;
     if ( start_date != 0 &&
-         ( start_date < p_buffer->start_date - 3 * AOUT_PTS_TOLERANCE ) )
+         ( start_date < p_buffer->start_date - i_pts_tolerance ) )
     {
         msg_Warn( p_aout, "audio drift is too big (%"PRId64"), clearing out",
                   start_date - p_buffer->start_date );
@@ -566,7 +582,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
     }
     else if ( start_date != 0 &&
-              ( start_date > p_buffer->start_date + 3 * AOUT_PTS_TOLERANCE ) )
+              ( start_date > p_buffer->start_date + i_pts_tolerance) )
     {
         msg_Warn( p_aout, "audio drift is too big (%"PRId64"), dropping buffer",
                   start_date - p_buffer->start_date );
@@ -629,7 +645,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
         /* Check if everything is back to normal, in which case we can stop the
          * resampling */
-        if( p_input->pp_resamplers[0]->input.i_rate == 1000 * p_input->input.i_rate / i_input_rate )
+        unsigned int i_nominal_rate =
+          (p_input->pp_resamplers[0] == p_input->p_playback_rate_filter)
+          ? INPUT_RATE_DEFAULT * p_input->input.i_rate / i_input_rate
+          : p_input->input.i_rate;
+        if( p_input->pp_resamplers[0]->input.i_rate == i_nominal_rate )
         {
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
             msg_Warn( p_aout, "resampling stopped after %"PRIi64" usec "
@@ -733,8 +753,10 @@ static void inputResamplingStop( aout_input_t *p_input )
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
     if( p_input->i_nb_resamplers != 0 )
     {
-        p_input->pp_resamplers[0]->input.i_rate = INPUT_RATE_DEFAULT *
-                            p_input->input.i_rate / p_input->i_last_input_rate;
+        p_input->pp_resamplers[0]->input.i_rate =
+            ( p_input->pp_resamplers[0] == p_input->p_playback_rate_filter )
+            ? INPUT_RATE_DEFAULT * p_input->input.i_rate / p_input->i_last_input_rate
+            : p_input->input.i_rate;
         p_input->pp_resamplers[0]->b_continuity = false;
     }
 }

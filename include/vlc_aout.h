@@ -255,6 +255,8 @@ struct aout_input_t
     aout_filter_t *         pp_filters[AOUT_MAX_FILTERS];
     int                     i_nb_filters;
 
+    aout_filter_t *         p_playback_rate_filter;
+
     /* resamplers */
     aout_filter_t *         pp_resamplers[AOUT_MAX_FILTERS];
     int                     i_nb_resamplers;
