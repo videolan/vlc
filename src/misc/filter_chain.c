@@ -41,6 +41,17 @@ struct filter_chain_t
 };
 
 /**
+ * Local prototypes
+ */
+static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *, const char *, config_chain_t *, const es_format_t *, const es_format_t * );
+static int filter_chain_AppendFromStringInternal( filter_chain_t *, const char * );
+static int filter_chain_DeleteFilterInternal( filter_chain_t *, filter_t * );
+
+static int UpdateBufferFunctions( filter_chain_t * );
+static picture_t *VideoBufferNew( filter_t * );
+static void VideoBufferRelease( picture_t * );
+
+/**
  * Filter chain initialisation
  */
 filter_chain_t *__filter_chain_New( vlc_object_t *p_this,
@@ -78,7 +89,7 @@ filter_chain_t *__filter_chain_New( vlc_object_t *p_this,
 void filter_chain_Delete( filter_chain_t *p_chain )
 {
     while( p_chain->filters.i_count )
-        filter_chain_DeleteFilter( p_chain,
+        filter_chain_DeleteFilterInternal( p_chain,
                                    (filter_t*)p_chain->filters.pp_elems[0] );
     vlc_array_clear( &p_chain->filters );
     free( p_chain->psz_capability );
@@ -93,7 +104,7 @@ void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
                          const es_format_t *p_fmt_out )
 {
     while( p_chain->filters.i_count )
-        filter_chain_DeleteFilter( p_chain,
+        filter_chain_DeleteFilterInternal( p_chain,
                                    (filter_t*)p_chain->filters.pp_elems[0] );
     if( p_fmt_in )
     {
@@ -111,11 +122,11 @@ void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
 /**
  * Modifying the filter chain
  */
-filter_t *filter_chain_AppendFilter( filter_chain_t *p_chain,
-                                     const char *psz_name,
-                                     config_chain_t *p_cfg,
-                                     const es_format_t *p_fmt_in,
-                                     const es_format_t *p_fmt_out )
+static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
+                                                    const char *psz_name,
+                                                    config_chain_t *p_cfg,
+                                                    const es_format_t *p_fmt_in,
+                                                    const es_format_t *p_fmt_out )
 {
     filter_t *p_filter =
         vlc_object_create( p_chain->p_this, VLC_OBJECT_FILTER );
@@ -175,8 +186,22 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *p_chain,
         return NULL;
 }
 
-int filter_chain_AppendFromString( filter_chain_t *p_chain,
-                                   const char *psz_string )
+filter_t *filter_chain_AppendFilter( filter_chain_t *p_chain,
+                                     const char *psz_name,
+                                     config_chain_t *p_cfg,
+                                     const es_format_t *p_fmt_in,
+                                     const es_format_t *p_fmt_out )
+{
+    filter_t *p_filter = filter_chain_AppendFilterInternal( p_chain, psz_name,
+                                                            p_cfg, p_fmt_in,
+                                                            p_fmt_out );
+    if( UpdateBufferFunctions( p_chain ) < 0 )
+        msg_Err( p_filter, "Woah! This doesn't look good." );
+    return p_filter;
+}
+
+static int filter_chain_AppendFromStringInternal( filter_chain_t *p_chain,
+                                                  const char *psz_string )
 {
     config_chain_t *p_cfg = NULL;
     char *psz_name = NULL;
@@ -185,8 +210,8 @@ int filter_chain_AppendFromString( filter_chain_t *p_chain,
 
     psz_string = config_ChainCreate( &psz_name, &p_cfg, psz_string );
 
-    filter_t *p_filter = filter_chain_AppendFilter( p_chain, psz_name, p_cfg,
-                                                    NULL, NULL );
+    filter_t *p_filter = filter_chain_AppendFilterInternal( p_chain, psz_name,
+                                                            p_cfg, NULL, NULL );
     if( !p_filter )
     {
         msg_Err( p_chain->p_this, "Failed while trying to append '%s' "
@@ -197,16 +222,27 @@ int filter_chain_AppendFromString( filter_chain_t *p_chain,
     }
     free( psz_name );
 
-    int ret = filter_chain_AppendFromString( p_chain, psz_string );
+    int ret = filter_chain_AppendFromStringInternal( p_chain, psz_string );
     if( ret < 0 )
     {
-        filter_chain_DeleteFilter( p_chain, p_filter );
+        filter_chain_DeleteFilterInternal( p_chain, p_filter );
         return ret;
     }
     return 1 + ret;
 }
 
-int filter_chain_DeleteFilter( filter_chain_t *p_chain, filter_t *p_filter )
+int filter_chain_AppendFromString( filter_chain_t *p_chain,
+                                   const char *psz_string )
+{
+    int i_ret = filter_chain_AppendFromStringInternal( p_chain, psz_string );
+    if( i_ret < 0 ) return i_ret;
+    int i_ret2 = UpdateBufferFunctions( p_chain );
+    if( i_ret2 < 0 ) return i_ret2;
+    return i_ret;
+}
+
+static int filter_chain_DeleteFilterInternal( filter_chain_t *p_chain,
+                                              filter_t *p_filter )
 {
     int i;
     /* Find the filter in the chain */
@@ -237,8 +273,14 @@ int filter_chain_DeleteFilter( filter_chain_t *p_chain, filter_t *p_filter )
     vlc_object_release( p_filter );
 
     /* FIXME: check fmt_in/fmt_out consitency */
-
     return VLC_SUCCESS;
+}
+
+int filter_chain_DeleteFilter( filter_chain_t *p_chain, filter_t *p_filter )
+{
+    int i_ret = filter_chain_DeleteFilterInternal( p_chain, p_filter );
+    if( i_ret < 0 ) return i_ret;
+    return UpdateBufferFunctions( p_chain );
 }
 
 /**
@@ -337,8 +379,85 @@ void filter_chain_SubFilter( filter_chain_t *p_chain,
     for( i = 0; i < p_chain->filters.i_count; i++ )
     {
         filter_t *p_filter = pp_filter[i];
-        subpicture_t *p_subpic = p_filter->pf_sub_filter( p_filter, display_date );
+        subpicture_t *p_subpic = p_filter->pf_sub_filter( p_filter,
+                                                          display_date );
         if( p_subpic )
             spu_DisplaySubpicture( (spu_t*)p_chain->p_this, p_subpic );
     }
+}
+
+/**
+ * Internal chain buffer handling
+ */
+
+/**
+ * This function should be called after every filter chain change
+ */
+static int UpdateBufferFunctions( filter_chain_t *p_chain )
+{
+    if( !strcmp( p_chain->psz_capability, "video filter2" ) )
+    {
+        /**
+         * Last filter uses the filter chain's parent buffer allocation
+         * functions. All the other filters use internal functions.
+         * This makes it possible to have format changes between each
+         * filter without having to worry about the parent's picture
+         * heap format.
+         */
+        int i;
+        filter_t **pp_filter = (filter_t **)p_chain->filters.pp_elems;
+        filter_t *p_filter;
+        for( i = 0; i < p_chain->filters.i_count - 1; i++ )
+        {
+            p_filter = pp_filter[i];
+            if( p_filter->pf_vout_buffer_new != VideoBufferNew )
+            {
+                if( p_chain->pf_buffer_allocation_clear )
+                    p_chain->pf_buffer_allocation_clear( p_filter );
+                p_filter->pf_vout_buffer_new = VideoBufferNew;
+                p_filter->pf_vout_buffer_del = NULL;
+            }
+        }
+        if( p_chain->filters.i_count >= 1 )
+        {
+            p_filter = pp_filter[i];
+            if( p_filter->pf_vout_buffer_new == VideoBufferNew )
+            {
+                p_filter->pf_vout_buffer_new = NULL;
+                if( p_chain->pf_buffer_allocation_init( p_filter,
+                        p_chain->p_buffer_allocation_data ) != VLC_SUCCESS )
+                    return VLC_EGENERIC;
+            }
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static picture_t *VideoBufferNew( filter_t *p_filter )
+{
+    picture_t *p_pic = malloc( sizeof( picture_t ) );
+    if( !p_pic ) return NULL;
+    memset( p_pic, 0, sizeof( picture_t * ) );
+    int i_ret = vout_AllocatePicture( VLC_OBJECT( p_filter ), p_pic,
+                                      p_filter->fmt_out.video.i_chroma,
+                                      p_filter->fmt_out.video.i_width,
+                                      p_filter->fmt_out.video.i_height,
+                                      p_filter->fmt_out.video.i_aspect );
+    if( i_ret != VLC_SUCCESS )
+    {
+        msg_Err( p_filter, "Failed to allocate picture: %s",
+                 vlc_error( i_ret ) );
+        free( p_pic );
+        return NULL;
+    }
+    p_pic->pf_release = VideoBufferRelease;
+    p_pic->i_type = MEMORY_PICTURE;
+    p_pic->i_status = RESERVED_PICTURE;
+    return p_pic;
+}
+
+static void VideoBufferRelease( picture_t *p_pic )
+{
+    free( p_pic->p_data_orig );
+    free( p_pic );
 }
