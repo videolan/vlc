@@ -6,6 +6,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 NULL =
 EXTRA_DIST = extras/COPYING modules/builtin.h.in \
+	misc/beos_specific.cpp \
 	libvlc.pc.in \
 	vlc-plugin.pc.in \
 	libvlc.sym \
@@ -176,8 +177,6 @@ libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DDATA_PATH=\"$(pkgdatadir)\" \
 	-DLIBDIR=\"$(libdir)\" \
 	-DPLUGIN_PATH=\"$(pkglibdir)\"
-libvlccore_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
-libvlccore_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
 libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
 	-export-symbols $(srcdir)/libvlccore.sym \
 	-version-info 0:0:0
@@ -235,7 +234,6 @@ libvlccore_la_SOURCES += $(SOURCES_libvlc_sout)
 endif
 
 SOURCES_libvlc_beos = \
-	misc/beos_specific.cpp \
 	$(NULL)
 
 SOURCES_libvlc_darwin = \
