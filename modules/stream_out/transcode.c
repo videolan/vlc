@@ -262,6 +262,7 @@ static void audio_del_buffer( decoder_t *, aout_buffer_t * );
 
 static int  transcode_video_new    ( sout_stream_t *, sout_stream_id_t * );
 static void transcode_video_close  ( sout_stream_t *, sout_stream_id_t * );
+static void transcode_video_encoder_init( sout_stream_t *, sout_stream_id_t *);
 static int  transcode_video_encoder_open( sout_stream_t *, sout_stream_id_t *);
 static int  transcode_video_process( sout_stream_t *, sout_stream_id_t *,
                                      block_t *, block_t ** );
@@ -1631,34 +1632,34 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int transcode_video_encoder_open( sout_stream_t *p_stream,
-                                         sout_stream_id_t *id )
+static void transcode_video_encoder_init( sout_stream_t *p_stream,
+                                          sout_stream_id_t *id )
 {
-     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-     /* Calculate scaling
-      * width/height of source */
-     int i_src_width = id->p_decoder->fmt_out.video.i_width;
-     int i_src_height = id->p_decoder->fmt_out.video.i_height;
+    /* Calculate scaling
+     * width/height of source */
+    int i_src_width = id->p_decoder->fmt_out.video.i_width;
+    int i_src_height = id->p_decoder->fmt_out.video.i_height;
 
-     /* with/height scaling */
-     float f_scale_width = 1;
-     float f_scale_height = 1;
+    /* with/height scaling */
+    float f_scale_width = 1;
+    float f_scale_height = 1;
 
-     /* width/height of output stream */
-     int i_dst_width;
-     int i_dst_height;
+    /* width/height of output stream */
+    int i_dst_width;
+    int i_dst_height;
 
-     /* aspect ratio */
-     float f_aspect = (float)id->p_decoder->fmt_out.video.i_aspect /
-                             VOUT_ASPECT_FACTOR;
+    /* aspect ratio */
+    float f_aspect = (float)id->p_decoder->fmt_out.video.i_aspect /
+                            VOUT_ASPECT_FACTOR;
 
-     msg_Dbg( p_stream, "decoder aspect is %i:%i",
-                  id->p_decoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
+    msg_Dbg( p_stream, "decoder aspect is %i:%i",
+                 id->p_decoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
 
-     /* Change f_aspect from source frame to source pixel */
-     f_aspect = f_aspect * i_src_height / i_src_width;
-     msg_Dbg( p_stream, "source pixel aspect is %f:1", f_aspect );
+    /* Change f_aspect from source frame to source pixel */
+    f_aspect = f_aspect * i_src_height / i_src_width;
+    msg_Dbg( p_stream, "source pixel aspect is %f:1", f_aspect );
 
     /* Calculate scaling factor for specified parameters */
     if( id->p_encoder->fmt_out.video.i_width <= 0 &&
@@ -1784,6 +1785,19 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
 
     msg_Dbg( p_stream, "encoder aspect is %i:%i",
              id->p_encoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
+
+    id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
+}
+
+static int transcode_video_encoder_open( sout_stream_t *p_stream,
+                                         sout_stream_id_t *id )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+
+    msg_Dbg( p_stream, "destination (after video filters) %ix%i",
+             id->p_encoder->fmt_in.video.i_width,
+             id->p_encoder->fmt_in.video.i_height );
 
     id->p_encoder->p_module =
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, true );
@@ -1928,13 +1942,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
         if( !id->p_encoder->p_module )
         {
-            if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
-            {
-                p_pic->pf_release( p_pic );
-                transcode_video_close( p_stream, id );
-                id->b_transcode = false;
-                return VLC_EGENERIC;
-            }
+            transcode_video_encoder_init( p_stream, id );
 
             id->p_f_chain = filter_chain_New( p_stream, "video filter2",
                                               false,
@@ -1968,6 +1976,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
             if( p_sys->psz_vf2 )
             {
+                const es_format_t *p_fmt_out;
                 id->p_uf_chain = filter_chain_New( p_stream, "video filter2",
                                                    true,
                                    transcode_video_filter_allocation_init,
@@ -1976,6 +1985,23 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 filter_chain_Reset( id->p_uf_chain, &id->p_decoder->fmt_out,
                                     &id->p_encoder->fmt_in );
                 filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_vf2 );
+                p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
+                es_format_Copy( &id->p_encoder->fmt_in, p_fmt_out );
+                id->p_encoder->fmt_out.video.i_width =
+                    id->p_encoder->fmt_in.video.i_width;
+                id->p_encoder->fmt_out.video.i_height =
+                    id->p_encoder->fmt_in.video.i_height;
+            }
+
+            if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
+            {
+                filter_chain_Delete( id->p_f_chain );
+                if( id->p_uf_chain )
+                    filter_chain_Delete( id->p_uf_chain );
+                p_pic->pf_release( p_pic );
+                transcode_video_close( p_stream, id );
+                id->b_transcode = false;
+                return VLC_EGENERIC;
             }
         }
 
