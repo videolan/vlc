@@ -160,10 +160,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     p_dec->p_sys = p_sys = malloc( sizeof( *p_sys ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     /* init of p_sys */
     memset( p_sys, 0, sizeof( *p_sys ) );

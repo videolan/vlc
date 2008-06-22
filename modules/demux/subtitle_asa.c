@@ -140,6 +140,8 @@ static int Open ( vlc_object_t *p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys  )
+        return VLC_ENOMEM;
     p_sys->psz_header         = NULL;
     p_sys->i_subtitle         = 0;
     p_sys->i_subtitles        = 0;
@@ -220,7 +222,6 @@ static int Open ( vlc_object_t *p_this )
     p_data = malloc( i_ssize );
     if( !p_data )
     {
-        msg_Err( p_demux, "out of memory");
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -281,7 +282,6 @@ static int ProcessLine( demux_t *p_demux, void *p_arg,
         if( !( p_sys->subtitle = realloc( p_sys->subtitle, sizeof(subtitle_t)
                                           * p_sys->i_subs_alloc ) ) )
         {
-            msg_Err( p_demux, "out of memory");
             return VLC_ENOMEM;
         }
     }

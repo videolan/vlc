@@ -313,10 +313,7 @@ static int Open( vlc_object_t *p_this )
     /* Allocate structures */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
-    }
     p_sys->b_playing = false;
     p_sys->start_date = 0;
     vlc_cond_init( p_aout, &p_sys->wait );

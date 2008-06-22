@@ -449,7 +449,6 @@ static int Open ( vlc_object_t *p_this )
             if( !( p_sys->subtitle = realloc( p_sys->subtitle,
                                               sizeof(subtitle_t) * i_max ) ) )
             {
-                msg_Err( p_demux, "out of memory");
                 free( p_sys->subtitle );
                 TextUnload( &p_sys->txt );
                 free( p_sys );

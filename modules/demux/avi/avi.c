@@ -356,10 +356,7 @@ static int Open( vlc_object_t * p_this )
     {
         avi_track_t           *tk     = malloc( sizeof( avi_track_t ) );
         if( !tk )
-        {
-            msg_Err( p_demux, "Out of memory" );
             goto error;
-        }
 
         avi_chunk_list_t      *p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i );
         avi_chunk_strh_t      *p_strh = AVI_ChunkFind( p_strl, AVIFOURCC_strh, 0 );

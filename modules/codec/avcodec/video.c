@@ -232,7 +232,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
     }
     memset( p_sys, 0, sizeof(decoder_sys_t) );

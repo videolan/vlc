@@ -97,18 +97,14 @@ static int Open( vlc_object_t * p_this )
     p_aout->output.p_sys = p_sys =
         (aout_sys_t *)malloc( sizeof( aout_sys_t ) );
     if( p_aout->output.p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
 
     /* New PCMAudioPlayer */
     p_sys->pPlayer = pPlayer = new PCMAudioPlayer();
     if( p_sys->pPlayer == NULL )
     {
-        msg_Err( p_aout, "out of memory" );
         free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     /* Get Buffer Requirements */
@@ -127,10 +123,9 @@ static int Open( vlc_object_t * p_this )
     p_sys->ppBuffers = (void **)malloc( p_sys->nBuffers * sizeof( void * ) );
     if( p_sys->ppBuffers == NULL )
     {
-        msg_Err( p_aout, "out of memory" );
         delete pPlayer;
         free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     /* Open PCMAudioPlayer */

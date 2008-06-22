@@ -545,10 +545,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                                    strlen(p_demux->p_sys->psz_base) +
                                    strlen(psz_uri) +1 );
                            if( !psz_tmp )
-                           {
-                               msg_Err( p_demux, "out of memory");
                                return false;
-                           }
                            sprintf( psz_tmp, "%s%s",
                                     p_demux->p_sys->psz_base, psz_uri );
                            free( psz_uri );

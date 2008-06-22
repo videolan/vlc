@@ -100,7 +100,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
     }
 
@@ -139,12 +138,15 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->p_context->extradata =
             malloc( p_sys->p_context->extradata_size +
                     FF_INPUT_BUFFER_PADDING_SIZE );
-        memcpy( p_sys->p_context->extradata,
-                (char*)p_dec->fmt_in.p_extra + i_offset,
-                p_sys->p_context->extradata_size );
-        memset( (char*)p_sys->p_context->extradata +
-                p_sys->p_context->extradata_size, 0,
-                FF_INPUT_BUFFER_PADDING_SIZE );
+        if( p_sys->p_context->extradata )
+        {
+            memcpy( p_sys->p_context->extradata,
+                    (char*)p_dec->fmt_in.p_extra + i_offset,
+                    p_sys->p_context->extradata_size );
+            memset( (char*)p_sys->p_context->extradata +
+                    p_sys->p_context->extradata_size, 0,
+                    FF_INPUT_BUFFER_PADDING_SIZE );
+        }
     }
     else
         p_sys->p_context->extradata = NULL;

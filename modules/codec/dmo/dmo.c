@@ -520,7 +520,6 @@ static int DecOpen( vlc_object_t *p_this )
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
-        msg_Err( p_dec, "out of memory" );
         goto error;
     }
 
@@ -1341,7 +1340,6 @@ static int EncOpen( vlc_object_t *p_this )
     if( ( p_enc->p_sys = p_sys =
           (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
     {
-        msg_Err( p_enc, "out of memory" );
         goto error;
     }
 

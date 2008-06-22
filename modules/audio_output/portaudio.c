@@ -181,10 +181,7 @@ static int Open( vlc_object_t * p_this )
     /* Allocate p_sys structure */
     p_sys = (aout_sys_t *)malloc( sizeof(aout_sys_t) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
-    }
     p_sys->p_aout = p_aout;
     p_sys->p_stream = 0;
     p_aout->output.p_sys = p_sys;

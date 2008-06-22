@@ -253,10 +253,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
     /* Allocate the memory needed to store the encoder's structure */
     if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
-    {
-        msg_Err( p_enc, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
     memset( p_sys, 0, sizeof(encoder_sys_t) );
     p_enc->p_sys = p_sys;
     p_sys->p_codec = p_codec;

@@ -156,11 +156,8 @@ static char* GetLine( demux_t *p_demux, int *p_pos )
         i--;
     }
     p_line = malloc( i + 1 );
-    if( NULL == p_line )
-    {
-        msg_Err( p_demux, "out of memory" );
+    if( p_line == NULL )
         return NULL;
-    }
     strncpy ( p_line, (char*)p_buf, i );
     p_line[i] = '\0';
 //    msg_Dbg( p_demux, "i = %d, pos = %d, %s", i, *p_pos, p_line );

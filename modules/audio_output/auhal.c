@@ -161,10 +161,7 @@ static int Open( vlc_object_t * p_this )
     /* Allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->output.p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
-        return( VLC_ENOMEM );
-    }
+        return VLC_ENOMEM;
 
     p_sys = p_aout->output.p_sys;
     p_sys->i_default_dev = 0;
@@ -649,10 +646,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     i_streams = i_param_size / sizeof( AudioStreamID );
     p_streams = (AudioStreamID *)malloc( i_param_size );
     if( p_streams == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         return false;
-    }
  
     err = AudioDeviceGetProperty( p_sys->i_selected_dev, 0, FALSE,
                                     kAudioDevicePropertyStreams,
@@ -685,10 +679,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
         i_formats = i_param_size / sizeof( AudioStreamBasicDescription );
         p_format_list = (AudioStreamBasicDescription *)malloc( i_param_size );
         if( p_format_list == NULL )
-        {
-            msg_Err( p_aout, "could not malloc the memory" );
             continue;
-        }
  
         err = AudioStreamGetProperty( p_streams[i], 0,
                                           kAudioStreamPropertyPhysicalFormats,
@@ -951,10 +942,7 @@ static void Probe( aout_instance_t * p_aout )
     /* Allocate DeviceID array */
     p_devices = (AudioDeviceID*)malloc( sizeof(AudioDeviceID) * p_sys->i_devices );
     if( p_devices == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         goto error;
-    }
 
     /* Populate DeviceID array */
     err = AudioHardwareGetProperty( kAudioHardwarePropertyDevices,
@@ -1101,10 +1089,7 @@ static int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_
     i_streams = i_param_size / sizeof( AudioStreamID );
     p_streams = (AudioStreamID *)malloc( i_param_size );
     if( p_streams == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
-    }
  
     err = AudioDeviceGetProperty( i_dev_id, 0, FALSE,
                                     kAudioDevicePropertyStreams,
@@ -1150,10 +1135,7 @@ static int AudioStreamSupportsDigital( aout_instance_t *p_aout, AudioStreamID i_
     i_formats = i_param_size / sizeof( AudioStreamBasicDescription );
     p_format_list = (AudioStreamBasicDescription *)malloc( i_param_size );
     if( p_format_list == NULL )
-    {
-        msg_Err( p_aout, "could not malloc the memory" );
         return false;
-    }
  
     err = AudioStreamGetProperty( i_stream_id, 0,
                                       kAudioStreamPropertyPhysicalFormats,

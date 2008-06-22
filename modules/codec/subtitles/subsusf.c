@@ -79,7 +79,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)calloc(1, sizeof(decoder_sys_t)) ) == NULL )
     {
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
     }
 
@@ -400,7 +399,6 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
         p_text_region->psz_html = strndup( psz_subtitle, i_len );
         if( ! p_text_region->psz_html )
         {
-            msg_Err( p_dec, "out of memory" );
             p_spu->pf_destroy_region( VLC_OBJECT(p_dec), p_text_region );
             return NULL;
         }
@@ -649,7 +647,6 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                     p_style = calloc( 1, sizeof(ssa_style_t) );
                     if( ! p_style )
                     {
-                        msg_Err( p_dec, "out of memory" );
                         free( psz_node );
                         break;
                     }

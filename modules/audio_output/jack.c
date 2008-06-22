@@ -108,7 +108,6 @@ static int Open( vlc_object_t *p_this )
     p_sys = calloc( 1, sizeof( aout_sys_t ) );
     if( p_sys == NULL )
     {
-        msg_Err( p_aout, "out of memory" );
         status = VLC_ENOMEM;
         goto error_out;
     }
@@ -143,7 +142,6 @@ static int Open( vlc_object_t *p_this )
                                   sizeof(jack_port_t *) );
     if( p_sys->p_jack_ports == NULL )
     {
-        msg_Err( p_aout, "out of memory" );
         status = VLC_ENOMEM;
         goto error_out;
     }
@@ -152,7 +150,6 @@ static int Open( vlc_object_t *p_this )
                                     sizeof(jack_sample_t *) );
     if( p_sys->p_jack_buffers == NULL )
     {
-        msg_Err( p_aout, "out of memory" );
         status = VLC_ENOMEM;
         goto error_out;
     }

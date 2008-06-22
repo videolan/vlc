@@ -245,10 +245,7 @@ static int Open( vlc_object_t *p_this )
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
 
     if( p_aout->output.p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
 
     p_aout->output.pf_play = Play;
     p_aout->b_die = false;
@@ -411,7 +408,6 @@ static int Open( vlc_object_t *p_this )
     if( p_aout->output.p_sys->p_silence_buffer == NULL )
     {
         free( p_aout->output.p_sys );
-        msg_Err( p_aout, "out of memory" );
         return 1;
     }
     p_aout->output.p_sys->i_repeat_counter = 0;

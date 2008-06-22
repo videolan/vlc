@@ -254,10 +254,7 @@ static int OpenAudio( vlc_object_t *p_this )
    /* Allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->output.p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     /* Initialize some variables */
     p_aout->output.p_sys->p_dsobject = NULL;
