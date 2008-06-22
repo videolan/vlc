@@ -38,6 +38,7 @@ SOURCES_gaussianblur = gaussianblur.c
 SOURCES_grain = grain.c
 SOURCES_seamcarving = seamcarving.c
 SOURCES_croppadd = croppadd.c
+SOURCES_canvas = canvas.c
 SOURCES_blendbench = blendbench.c
 SOURCES_chain = chain.c
 SOURCES_postproc = postproc.c
