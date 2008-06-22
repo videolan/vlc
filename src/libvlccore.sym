@@ -5,6 +5,7 @@ ACL_Destroy
 __ACL_Duplicate
 ACL_LoadFile
 AddMD5
+aout_BitsPerSample
 aout_ChannelReorder
 aout_ChannelsRestart
 aout_CheckChannelReorder
