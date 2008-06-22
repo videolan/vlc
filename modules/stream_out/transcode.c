@@ -1112,6 +1112,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     es_format_t fmt_last;
+    int i;
 
     /*
      * Open decoder
@@ -1197,8 +1198,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         fmt_last = fmt_out;
     }
 
-    /* FIXME: same comment as in "#if 0"ed code */
-    int i;
     for( i = 0; i < 4; i++ )
     {
         if( (fmt_last.audio.i_channels !=
@@ -1210,28 +1209,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
             fmt_last = *filter_chain_GetFmtOut( id->p_f_chain );
         }
     }
-
-#if 0
-/* FIXME FIXME FIXME WHAT DOES THIS CODE DO? LOOKS LIKE IT'S RANDOMLY TRYING
-TO CHAIN A BUNCH OF AUDIO FILTERS */
-    for( i = 0; i < TRANSCODE_FILTERS; i++ )
-    {
-        if( (fmt_last.audio.i_channels !=
-            id->p_encoder->fmt_in.audio.i_channels) ||
-            (fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate) ||
-            (fmt_last.i_codec != id->p_encoder->fmt_in.i_codec) )
-        {
-            id->pp_filter[id->i_filter] =
-                transcode_audio_filter_new( p_stream, id, &fmt_last,
-                                            &id->p_encoder->fmt_in, NULL );
-
-            if( id->pp_filter[id->i_filter] )
-                id->i_filter++;
-            else
-                break;
-        }
-    }
-#endif
 
     /* Final checks to see if conversions were successful */
     if( fmt_last.i_codec != id->p_encoder->fmt_in.i_codec )
