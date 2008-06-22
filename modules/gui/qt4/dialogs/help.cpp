@@ -124,7 +124,7 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
             + "Compiler: " + qfu( VLC_Compiler() ) + ".\n"
             + qtr( "Based on Git commit: " ) + qfu( VLC_Changeset() ) + ".\n"
             + qtr( "You are using the Qt4 Interface.\n\n" )
-            + qtr( "Copyright © " COPYRIGHT_YEARS " by the VideoLAN Team.\n" )
+            + qtr( "Copyright (C) " COPYRIGHT_YEARS " by the VideoLAN Team.\n" )
             + "vlc@videolan.org, http://www.videolan.org" );
     infoLabel->setWordWrap( infoLabel );
 
