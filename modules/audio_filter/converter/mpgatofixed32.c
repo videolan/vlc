@@ -335,6 +335,8 @@ static int OpenFilter( vlc_object_t *p_this )
     else
         p_filter->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
     p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
+    p_filter->fmt_out.audio.i_bitspersample =
+        aout_BitsPerSample( p_filter->fmt_out.i_codec );
 
     p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
 

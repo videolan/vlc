@@ -396,6 +396,8 @@ static int OpenFilter( vlc_object_t *p_this )
 
     p_filter->fmt_out.audio.i_format =
         p_filter->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+    p_filter->fmt_out.audio.i_bitspersample =
+        aout_BitsPerSample( p_filter->fmt_out.i_codec );
 
     /* Allocate the memory needed to store the module's structure */
     p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );

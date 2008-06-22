@@ -365,6 +365,7 @@ VLC_EXPORT( int, aout_CheckChannelReorder, ( const uint32_t *, const uint32_t *,
 VLC_EXPORT( void, aout_ChannelReorder, ( uint8_t *, int, int, const int *, int ) );
 
 VLC_EXPORT( unsigned int, aout_FormatNbChannels, ( const audio_sample_format_t * p_format ) );
+VLC_EXPORT( unsigned int, aout_BitsPerSample, ( vlc_fourcc_t i_format ) );
 VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatPrint, ( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format ) );
 VLC_EXPORT( const char *, aout_FormatPrintChannels, ( const audio_sample_format_t * ) );

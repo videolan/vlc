@@ -109,52 +109,54 @@ unsigned int aout_FormatNbChannels( const audio_sample_format_t * p_format )
 }
 
 /*****************************************************************************
- * aout_FormatPrepare : compute the number of bytes per frame & frame length
+ * aout_BitsPerSample : get the number of bits per sample
  *****************************************************************************/
-void aout_FormatPrepare( audio_sample_format_t * p_format )
+unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
 {
-    int i_result;
-
-    switch ( p_format->i_format )
+    switch( i_format )
     {
     case VLC_FOURCC('u','8',' ',' '):
     case VLC_FOURCC('s','8',' ',' '):
-        i_result = 1;
-        break;
+        return 8;
 
     case VLC_FOURCC('u','1','6','l'):
     case VLC_FOURCC('s','1','6','l'):
     case VLC_FOURCC('u','1','6','b'):
     case VLC_FOURCC('s','1','6','b'):
-        i_result = 2;
-        break;
+        return 16;
 
     case VLC_FOURCC('u','2','4','l'):
     case VLC_FOURCC('s','2','4','l'):
     case VLC_FOURCC('u','2','4','b'):
     case VLC_FOURCC('s','2','4','b'):
-        i_result = 3;
-        break;
+        return 24;
 
     case VLC_FOURCC('f','l','3','2'):
     case VLC_FOURCC('f','i','3','2'):
-        i_result = 4;
-        break;
+        return 32;
 
-    case VLC_FOURCC('s','p','d','i'):
-    case VLC_FOURCC('s','p','d','b'): /* Big endian spdif output */
-    case VLC_FOURCC('a','5','2',' '):
-    case VLC_FOURCC('d','t','s',' '):
-    case VLC_FOURCC('m','p','g','a'):
-    case VLC_FOURCC('m','p','g','3'):
+    case VLC_FOURCC('f','l','6','4'):
+        return 64;
+
     default:
         /* For these formats the caller has to indicate the parameters
          * by hand. */
-        return;
+        return 0;
     }
+}
 
-    p_format->i_bytes_per_frame = i_result * aout_FormatNbChannels( p_format );
-    p_format->i_frame_length = 1;
+/*****************************************************************************
+ * aout_FormatPrepare : compute the number of bytes per frame & frame length
+ *****************************************************************************/
+void aout_FormatPrepare( audio_sample_format_t * p_format )
+{
+    p_format->i_bitspersample = aout_BitsPerSample( p_format->i_format );
+    if( p_format->i_bitspersample > 0 )
+    {
+        p_format->i_bytes_per_frame = ( p_format->i_bitspersample / 8 )
+                                    * aout_FormatNbChannels( p_format );
+        p_format->i_frame_length = 1;
+    }
 }
 
 /*****************************************************************************
