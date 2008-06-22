@@ -35,6 +35,7 @@ int rootwrap_bind (int, int, int, const struct sockaddr *, size_t);
 #ifdef ENABLE_ROOTWRAP
 
 #include <string.h>
+#include <stdlib.h>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -97,7 +98,7 @@ int rootwrap_bind (int family, int socktype, int protocol,
 
     const char *sockenv = getenv ("VLC_ROOTWRAP_SOCK");
     if (sockenv != NULL)
-        sock = atoi (sock);
+        sock = atoi (sockenv);
     if (sock == -1)
     {
         errno = EACCES;
