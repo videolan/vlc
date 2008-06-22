@@ -221,13 +221,13 @@ static picture_t *Chain( filter_t *p_filter, picture_t *p_pic )
     if( !p_sys->p_tmp )
     {
         picture_t *p_tmp = malloc( sizeof( picture_t ) );
+        if( !p_tmp )
+            return NULL;
         vout_AllocatePicture( VLC_OBJECT( p_vout ), p_tmp,
                               p_sys->fmt_mid.i_chroma,
                               p_sys->fmt_mid.i_width,
                               p_sys->fmt_mid.i_height,
                               p_sys->fmt_mid.i_aspect );
-        if( !p_tmp )
-            return NULL;
         p_sys->p_tmp = p_tmp;
         p_tmp->pf_release = NULL;
         p_tmp->i_status = RESERVED_PICTURE;
