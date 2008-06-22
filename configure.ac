@@ -1216,6 +1216,7 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGIN([normvol])
   VLC_ADD_PLUGIN([equalizer])
   VLC_ADD_PLUGIN([param_eq])
+  VLC_ADD_PLUGIN([scaletempo])
   VLC_ADD_PLUGIN([converter_float])
   VLC_ADD_PLUGIN([a52tospdif])
   VLC_ADD_PLUGIN([dtstospdif])
