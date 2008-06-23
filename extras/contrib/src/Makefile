@@ -2411,8 +2411,45 @@ fluidsynth: fluidsynth-$(FLUID_VERSION).tar.gz
 
 CLEAN_FILE += .fluid
 CLEAN_PKG += fluidsynth
-DISTCLEAN_PKG += fluidsynth-$(NCURSES_VERSION).tar.gz
+DISTCLEAN_PKG += fluidsynth-$(FLUID_VERSION).tar.gz
 
+# ***************************************************************************
+# liboil
+# ***************************************************************************
+
+liboil-$(OIL_VERSION).tar.gz:
+	$(WGET) $(OIL_URL)
+
+liboil: liboil-$(OIL_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.liboil: liboil
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .liboil
+CLEAN_PKG += liboil
+DISTCLEAN_PKG += liboil-$(OIL_VERSION).tar.gz
+
+# ***************************************************************************
+# Schroedinger library
+# ***************************************************************************
+
+schroedinger-$(SCHROED_VERSION).tar.gz:
+	$(WGET) $(SCHROED_URL)
+
+schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	patch -d schroedinger -p1 < Patches/libschroedinger-fix-build-OSX.patch
+	patch -d schroedinger -p1 < Patches/libschroedinger-fix-build-OSX-test.patch
+
+.schroedinger: .liboil schroedinger
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .schroedinger
+CLEAN_PKG += schroedinger
+DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
 
 # ***************************************************************************
 # Some cleaning

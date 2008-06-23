@@ -1,0 +1,24 @@
+From: David Schleef <ds@hutch.local>
+Date: Mon, 23 Jun 2008 20:24:34 +0000 (-0700)
+Subject: [build] Remove i386-only test.  not useful.
+X-Git-Url: http://diracvideo.org/git?p=schroedinger.git;a=commitdiff_plain;h=03a9d4cee3c42715a5b7370d7a62f3d788c77e2a
+
+[build] Remove i386-only test.  not useful.
+---
+
+diff --git a/testsuite/prototype/Makefile.am b/testsuite/prototype/Makefile.am
+index 0513faf..8b13789 100644
+--- a/testsuite/prototype/Makefile.am
++++ b/testsuite/prototype/Makefile.am
+@@ -1,11 +1 @@
+ 
+-if HAVE_I386
+-noinst_PROGRAMS = arith_speed
+-endif
+-
+-AM_CFLAGS = $(SCHRO_CFLAGS) $(ERROR_CFLAGS) $(LIBOIL_CFLAGS) \
+-	    -DSCHRO_ENABLE_UNSTABLE_API
+-LDADD = $(SCHRO_LIBS)
+-
+-arith_speed_SOURCES = arith_speed.c
+-

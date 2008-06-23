@@ -224,3 +224,7 @@ FLUID_URL=http://download.savannah.gnu.org/releases/fluid/fluidsynth-$(FLUID_VER
 YASM_VERSION=0.7.0
 YASM_URL=$(VIDEOLAN)/testing/contrib/yasm-$(YASM_VERSION).tar.gz
 #YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
+OIL_VERSION=0.3.14
+OIL_URL=http://liboil.freedesktop.org/download/liboil-$(OIL_VERSION).tar.gz
+SCHROED_VERSION=1.0.3
+SCHROED_URL=http://www.diracvideo.org/download/schroedinger/schroedinger-$(SCHROED_VERSION).tar.gz
