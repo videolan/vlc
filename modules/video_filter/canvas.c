@@ -50,6 +50,9 @@ static int alloc_init( filter_t *, void * );
 #define HEIGHT_TEXT N_( "Image height" )
 #define HEIGHT_LONGTEXT N_( \
     "Image height" )
+#define ASPECT_TEXT N_( "Aspect ratio" )
+#define ASPECT_LONGTEXT N_( \
+    "Set aspect (like 4:3) of the video canvas" )
 
 #define CFG_PREFIX "canvas-"
 
@@ -65,10 +68,13 @@ vlc_module_begin();
                             WIDTH_TEXT, WIDTH_LONGTEXT, false );
     add_integer_with_range( CFG_PREFIX "height", 0, 0, INT_MAX, NULL,
                             HEIGHT_TEXT, HEIGHT_LONGTEXT, false );
+
+    add_string( CFG_PREFIX "aspect", "4:3", NULL,
+                ASPECT_TEXT, ASPECT_LONGTEXT, false );
 vlc_module_end();
 
 static const char *const ppsz_filter_options[] = {
-    "width", "height", NULL
+    "width", "height", "aspect", NULL
 };
 
 struct filter_sys_t
@@ -86,6 +92,8 @@ static int Activate( vlc_object_t *p_this )
     es_format_t fmt;
     char psz_croppadd[100];
     int i_padd;
+    char *psz_aspect, *psz_parser;
+    int i_aspect;
 
     if( !p_filter->b_allow_fmt_out_change )
     {
@@ -114,6 +122,26 @@ static int Activate( vlc_object_t *p_this )
     if( i_width & 1 || i_height & 1 )
     {
         msg_Err( p_filter, "Width and height options must be even integers" );
+        return VLC_EGENERIC;
+    }
+
+    psz_aspect = var_CreateGetNonEmptyString( p_filter, CFG_PREFIX "aspect" );
+    if( !psz_aspect )
+    {
+        msg_Err( p_filter, "Aspect ratio must be set" );
+        return VLC_EGENERIC;
+    }
+    psz_parser = strchr( psz_aspect, ':' );
+    if( psz_parser ) psz_parser++;
+    if( psz_parser && atoi( psz_parser ) > 0 )
+        i_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR / atoi( psz_parser );
+    else
+        i_aspect = atof( psz_aspect ) * VOUT_ASPECT_FACTOR;
+    free( psz_aspect );
+
+    if( i_aspect <= 0 )
+    {
+        msg_Err( p_filter, "Aspect ratio must be strictly positive" );
         return VLC_EGENERIC;
     }
 
@@ -167,6 +195,8 @@ static int Activate( vlc_object_t *p_this )
 
     fmt = *filter_chain_GetFmtOut( p_sys->p_chain );
     es_format_Copy( &p_filter->fmt_out, &fmt );
+
+    p_filter->fmt_out.video.i_aspect = i_aspect * i_width / i_height;
 
     if( p_filter->fmt_out.video.i_width != i_width
      || p_filter->fmt_out.video.i_height != i_height )
