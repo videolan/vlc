@@ -150,8 +150,6 @@ void spu_Destroy( spu_t *p_spu )
 {
     int i_index;
 
-    vlc_object_detach( p_spu );
-
     /* Destroy all remaining subpictures */
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
     {

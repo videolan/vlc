@@ -1223,7 +1223,6 @@ static void EndThread( vout_thread_t *p_vout )
     if( !p_vout->b_direct )
     {
         module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
-        vlc_object_detach( p_vout->p_chroma );
         vlc_object_release( p_vout->p_chroma );
         p_vout->p_chroma = NULL;
     }
