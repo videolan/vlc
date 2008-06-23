@@ -200,11 +200,14 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
 
                 psz_template = malloc( ( s.st_size + 42 ) * sizeof( char ) );
                 if( !psz_template )
+                {
+                    fclose( file );
                     return NULL;
+                }
                 memset( psz_template, 0, s.st_size + 1 );
                 fread( psz_template, s.st_size, 1, file );
-                fclose( file );
             }
+            fclose( file );
         }
     }
     if( !psz_template )
