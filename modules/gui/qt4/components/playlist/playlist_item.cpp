@@ -73,7 +73,10 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
             QSettings settings( "vlc", "vlc-qt-interface" );
             i_showflags = settings.value( "qt-pl-showflags", 39 ).toInt();
             if( i_showflags < 1)
-                i_showflags = 39; //reasonable default to show something;
+                i_showflags = 39; /* reasonable default to show something; */
+            else if ( i_showflags >= COLUMN_END )
+                i_showflags = COLUMN_END - 1; /* show everything */
+
             updateColumnHeaders();
         }
     }
