@@ -1914,7 +1914,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                                    transcode_video_filter_allocation_init,
                                    transcode_video_filter_allocation_clear,
                                    p_stream->p_sys );
-                filter_chain_Reset( id->p_uf_chain, &id->p_decoder->fmt_out,
+                filter_chain_Reset( id->p_uf_chain, &id->p_encoder->fmt_in,
                                     &id->p_encoder->fmt_in );
                 filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_vf2 );
                 p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
