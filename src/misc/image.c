@@ -29,11 +29,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <ctype.h>
-#include <errno.h>
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <ctype.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_codec.h>

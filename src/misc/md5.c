@@ -22,10 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <string.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <string.h>
 
 #include <vlc_common.h>
 #include <vlc_md5.h>

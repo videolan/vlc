@@ -26,14 +26,15 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
-#include <fcntl.h>                                       /* open(), O_WRONLY */
-#include <sys/ioctl.h>                                            /* ioctl() */
-#include <unistd.h>                                      /* write(), close() */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <errno.h>                                                 /* ENOMEM */
+#include <fcntl.h>                                       /* open(), O_WRONLY */
+#include <sys/ioctl.h>                                            /* ioctl() */
+#include <unistd.h>                                      /* write(), close() */
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>

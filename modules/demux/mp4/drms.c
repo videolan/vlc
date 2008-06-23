@@ -22,13 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
-#ifdef WIN32
-#   include <io.h>
-#else
-#   include <stdio.h>
-#endif
-
 #ifdef __LIBVLC__
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -40,6 +33,12 @@
 #   include <vlc_charset.h>
 #else
 #   include "drmsvl.h"
+#endif
+
+#ifdef WIN32
+#   include <io.h>
+#else
+#   include <stdio.h>
 #endif
 
 #ifdef HAVE_ERRNO_H

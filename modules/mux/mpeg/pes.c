@@ -25,14 +25,15 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <fcntl.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
 
 #include <vlc_common.h>
 #include <vlc_sout.h>

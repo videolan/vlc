@@ -25,11 +25,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <math.h>                                        /* sqrt */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <math.h>                                        /* sqrt */
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>

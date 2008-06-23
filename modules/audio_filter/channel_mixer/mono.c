@@ -24,6 +24,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <math.h>                                        /* sqrt */
 
 #ifdef HAVE_STDINT_H
@@ -34,10 +38,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#endif
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
 #endif
 
 #include <vlc_common.h>

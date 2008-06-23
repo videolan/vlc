@@ -25,6 +25,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <errno.h>                                                 /* ENOMEM */
 #include <signal.h>                                      /* SIGUSR1, SIGUSR2 */
 #include <fcntl.h>                                                 /* open() */
@@ -37,10 +42,6 @@
 #include <linux/fb.h>
 #include <linux/vt.h>                                                /* VT_* */
 #include <linux/kd.h>                                                 /* KD* */
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
