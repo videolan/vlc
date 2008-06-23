@@ -116,7 +116,6 @@ static int  Seek    ( sout_access_out_t *, off_t  );
 
 static void ThreadWrite( vlc_object_t * );
 static block_t *NewUDPPacket( sout_access_out_t *, mtime_t );
-static const char *MakeRandMulticast (int family, char *buf, size_t buflen);
 
 typedef struct sout_access_thread_t
 {
