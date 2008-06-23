@@ -229,6 +229,8 @@ static char * es_print_url( char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
     }
 
     p = psz_dst = malloc( 4096 );
+    if( !psz_dst )
+        return NULL;
     memset( p, 0, 4096 );
     for( ;; )
     {
@@ -391,6 +393,12 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
 
     id = malloc( sizeof( sout_stream_id_t ) );
+    if( !id )
+    {
+        sout_MuxDelete( p_mux );
+        sout_AccessOutDelete( p_access );
+        return NULL;
+    }
     id->p_mux = p_mux;
     id->p_input = sout_MuxAddStream( p_mux, p_fmt );
 
