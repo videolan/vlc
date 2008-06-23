@@ -1666,8 +1666,15 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
      f_aspect = f_aspect * i_dst_width / i_dst_height;
 
      /* Store calculated values */
-     id->p_encoder->fmt_out.video.i_width = i_dst_width;
-     id->p_encoder->fmt_out.video.i_height = i_dst_height;
+     id->p_encoder->fmt_out.video.i_width =
+     id->p_encoder->fmt_out.video.i_visible_width = i_dst_width;
+     id->p_encoder->fmt_out.video.i_height =
+     id->p_encoder->fmt_out.video.i_visible_height = i_dst_height;
+
+     id->p_encoder->fmt_in.video.i_width =
+     id->p_encoder->fmt_in.video.i_visible_width = i_dst_width;
+     id->p_encoder->fmt_in.video.i_height =
+     id->p_encoder->fmt_in.video.i_visible_height = i_dst_height;
 
      id->p_encoder->fmt_in.video.i_width = i_dst_width;
      id->p_encoder->fmt_in.video.i_height = i_dst_height;
