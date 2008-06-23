@@ -174,14 +174,16 @@ static int Open( vlc_object_t *p_this )
     }
 
     if( !( p_sys = calloc ( 1, sizeof( sout_access_out_sys_t ) ) ) )
-    {
-        msg_Err( p_access, "not enough memory" );
         return VLC_ENOMEM;
-    }
     p_access->p_sys = p_sys;
 
     i_dst_port = DEFAULT_PORT;
     char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
+    if( !psz_dst_addr )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
 
     if (psz_parser[0] == '[')
         psz_parser = strchr (psz_parser, ']');
@@ -197,7 +199,6 @@ static int Open( vlc_object_t *p_this )
         vlc_object_create( p_access, sizeof( sout_access_thread_t ) );
     if( !p_sys->p_thread )
     {
-        msg_Err( p_access, "out of memory" );
         free (p_sys);
         free (psz_dst_addr);
         return VLC_ENOMEM;
