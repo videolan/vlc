@@ -857,3 +857,7 @@ VLC development is NOT about being a sed god.
 < funman> ouais surtout les 2 macro blocks pectoraux
   -- #vd
 %
+<kdubois> vlc seems to need more than control-c to kill it lately, do other people experience this too?
+<thresh> yeah, it needs up to four black men to kill vlc for me
+ -- #videolan
+%
