@@ -416,6 +416,7 @@ void InputManager::telexGotoPage( int page )
             vlc_object_release( p_vbi );
         }
     }
+    emit setNewTelexPage( page );
 }
 
 void InputManager::telexToggle( bool b_enabled )
@@ -426,19 +427,24 @@ void InputManager::telexToggle( bool b_enabled )
     {
         vlc_value_t val;
         vlc_object_t *p_vbi;
+        var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        b_enabled = (val.i_int > 0);
         p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
                     "zvbi", FIND_ANYWHERE );
         if( p_vbi )
         {
             i_page = var_GetInteger( p_vbi, "vbi-page" );
             vlc_object_release( p_vbi );
+            i_page = b_enabled ? i_page : 0;
+            telexGotoPage( i_page );
         }
-        var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        b_enabled = (val.i_int > 0);
     }
     emit teletextEnabled( b_enabled );
-    i_page = b_enabled ? i_page : 0;
-    telexGotoPage( i_page );
+}
+
+void InputManager::telexToggleButtons()
+{
+    emit toggleTelexButtons();
 }
 
 void InputManager::telexSetTransparency()
@@ -455,6 +461,7 @@ void InputManager::telexSetTransparency()
             vlc_object_release( p_vbi );
         }
     }
+    emit toggleTelexTransparency();
 }
 
 void InputManager::slower()

@@ -203,7 +203,7 @@ protected:
     InputSlider         *slider;
     QPushButton         *prevSectionButton, *nextSectionButton, *menuButton;
     QPushButton         *playButton, *fullscreenButton, *extSettingsButton;
-    QPushButton         *telexTransparent;
+    QPushButton         *telexTransparent, *telexOn;
     QSpinBox            *telexPage;
     QToolButton         *slowerButton, *fasterButton;
     QHBoxLayout         *controlButLayout;

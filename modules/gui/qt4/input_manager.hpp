@@ -103,6 +103,7 @@ public slots:
     void sectionMenu();
     void telexGotoPage( int ); ///< Goto teletext page
     void telexToggle( bool );  ///< Enable disable teletext buttons
+    void telexToggleButtons(); ///< Toggle buttons after click
     void telexSetTransparency(); ///< Set transparency on teletext background
 
 signals:
@@ -119,6 +120,9 @@ signals:
     void inputUnset();
     /// Teletext
     void teletextEnabled( bool );
+    void toggleTelexButtons();
+    void toggleTelexTransparency();
+    void setNewTelexPage( int );
 };
 
 class MainInputManager : public QObject

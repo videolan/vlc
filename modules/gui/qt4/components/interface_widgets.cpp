@@ -485,7 +485,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     telexLayout->setSpacing( 0 );
     telexLayout->setMargin( 0 );
 
-    QPushButton  *telexOn = new QPushButton;
+    telexOn = new QPushButton;
     setupSmallButton( telexOn );
     telexLayout->addWidget( telexOn );
 
@@ -503,23 +503,32 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     telexPage->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
     telexLayout->addWidget( telexPage );
 
-    controlLayout->addWidget( telexFrame, 1, 10, 2, 4, Qt::AlignBottom );
+    if( !b_fsCreation )
+        controlLayout->addWidget( telexFrame, 1, 10, 2, 4, Qt::AlignBottom );
     telexFrame->hide(); /* default hidden */
 
     CONNECT( telexPage, valueChanged( int ), THEMIM->getIM(),
              telexGotoPage( int ) );
+    CONNECT( THEMIM->getIM(), setNewTelexPage( int ),
+              telexPage, setValue( int ) );
 
-    BUTTON_SET_ACT_I( telexOn, "", tv.png, qtr( "Teletext on" ),
-                      toggleTeletext() );
+    BUTTON_SET_IMG( telexOn, "", tv.png, qtr( "Teletext on" ) );
+
+    CONNECT( telexOn, clicked(), THEMIM->getIM(),
+             telexToggleButtons() );
     CONNECT( telexOn, clicked( bool ), THEMIM->getIM(),
              telexToggle( bool ) );
+    CONNECT( THEMIM->getIM(), toggleTelexButtons(),
+              this, toggleTeletext() );
+    b_telexEnabled = false;
     telexTransparent->setEnabled( false );
     telexPage->setEnabled( false );
 
-    BUTTON_SET_ACT_I( telexTransparent, "", tvtelx.png, qtr( "Teletext" ),
-                      toggleTeletextTransparency() );
+    BUTTON_SET_IMG( telexTransparent, "", tvtelx.png, qtr( "Teletext" ) );
     CONNECT( telexTransparent, clicked( bool ),
              THEMIM->getIM(), telexSetTransparency() );
+    CONNECT( THEMIM->getIM(), toggleTelexTransparency(),
+              this, toggleTeletextTransparency() );
     CONNECT( THEMIM->getIM(), teletextEnabled( bool ),
              telexFrame, setVisible( bool ) );
 
@@ -1146,8 +1155,10 @@ static int regMouseMoveCallback( vlc_object_t *vlc_object, const char *variable,
         var_DelCallback( p_vout, "mouse-moved",
                         showFullscreenControllCallback, (void *) p_fs );
         b_registered = false;
-        p_fs->hide();
     }
+
+    if ( !var_GetBool( p_vout, "fullscreen" ) )
+        p_fs->hide();
 
     return VLC_SUCCESS;
 }
