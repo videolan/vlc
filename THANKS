@@ -147,6 +147,7 @@ Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface
 Leo Spalteholz <leo dot spalteholz at gmail dot com> - Qt interface design
 Loox Thefuture <loox.thefuture at gmail dot com> - Media key in X11 vout
 Lorena Gomes - Catalan translation
+Lukas Durfine <lukas.durfina at gmail.com> - qt4: teletext button fix and fix for fullscreen controller in non-embedded window
 Mahrazi Mohd Kamal <mahrazi at gmail.com> - Malay Translation
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
 Marco Munderloh <Marco.Munderloh at web.de> - HTTP fix for Win32 to URL filenames
