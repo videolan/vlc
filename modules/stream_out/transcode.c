@@ -1676,9 +1676,6 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
      id->p_encoder->fmt_in.video.i_height =
      id->p_encoder->fmt_in.video.i_visible_height = i_dst_height;
 
-     id->p_encoder->fmt_in.video.i_width = i_dst_width;
-     id->p_encoder->fmt_in.video.i_height = i_dst_height;
-
      msg_Dbg( p_stream, "source %ix%i, destination %ix%i",
          i_src_width, i_src_height,
          i_dst_width, i_dst_height
