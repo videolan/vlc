@@ -74,10 +74,9 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     setAttribute( Qt::WA_PaintOnScreen, true );
 
     /* The core can ask through a callback to show the video. */
-    connect( this, SIGNAL(askVideoWidgetToShow()), this, SLOT(show()), Qt::BlockingQueuedConnection );
-
-    /* The core can ask through a callback to resize the video */
-   // CONNECT( this, askResize( int, int ), this, SetSizing( int, int ) );
+    connect( this, SIGNAL(askVideoWidgetToShow( unsigned int, unsigned int)),
+             this, SLOT(SetSizing(unsigned int, unsigned int )),
+             Qt::BlockingQueuedConnection );
 }
 
 void VideoWidget::paintEvent(QPaintEvent *ev)
@@ -115,7 +114,7 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                            unsigned int *pi_width, unsigned int *pi_height )
 {
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
-    emit askVideoWidgetToShow();
+    emit askVideoWidgetToShow( *pi_width, *pi_height );
     if( p_vout )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
@@ -134,6 +133,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     msg_Dbg( p_intf, "Video is resizing to: %i %i", w, h );
     videoSize.rwidth() = w;
     videoSize.rheight() = h;
+    if( isHidden() ) show();
     updateGeometry(); // Needed for deinterlace
 }
 

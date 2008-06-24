@@ -692,7 +692,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 #endif
         videoIsActive = true;
 
-        emit askVideoToResize( *pi_width, *pi_height );
+//        emit askVideoToResize( *pi_width, *pi_height );
         emit askUpdate();
 
         fullscreenControls->regFullscreenCallback( p_nvout );

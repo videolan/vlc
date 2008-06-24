@@ -91,8 +91,7 @@ private:
     QSize videoSize;
 
 signals:
-    void askVideoWidgetToShow();
-    //void askResize();
+    void askVideoWidgetToShow( unsigned int, unsigned int );
 
 public slots:
     void SetSizing( unsigned int, unsigned int );
