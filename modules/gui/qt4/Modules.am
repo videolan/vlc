@@ -214,6 +214,9 @@ EXTRA_DIST += \
 	pixmaps/previous_16px.png \
 	pixmaps/previous.png \
 	pixmaps/record_16px.png \
+	pixmaps/tv.png \
+	pixmaps/tvtelx.png \
+	pixmaps/tvtelx-transparent.png \
 	pixmaps/spref_cone_Audio_64.png \
 	pixmaps/spref_cone_Hotkeys_64.png \
 	pixmaps/spref_cone_Input_64.png \
