@@ -825,8 +825,7 @@ int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
     {
     case VOUT_REPARENT:
     case VOUT_CLOSE:
-        if( p_vout->p_window )
-            vout_ReleaseWindow( p_vout->p_window, NULL );
+        vout_ReleaseWindow( p_vout, NULL );
         return VLC_SUCCESS;
 
     case VOUT_SNAPSHOT:
