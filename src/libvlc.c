@@ -1023,9 +1023,8 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
  * termination, and destroys their structure.
  * It stops the thread systems: no instance can run after this has run
  * \param p_libvlc the instance to destroy
- * \param b_release whether we should do a release on the instance
  */
-int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
+int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 {
     if( !p_libvlc )
         return VLC_EGENERIC;
@@ -1084,7 +1083,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
     vlc_cond_destroy (&priv->threads_wait);
     vlc_mutex_destroy (&priv->threads_lock);
 
-    if( b_release ) vlc_object_release( p_libvlc );
     vlc_object_release( p_libvlc );
     p_libvlc = NULL;
 

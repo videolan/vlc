@@ -42,7 +42,7 @@
 VLC_EXPORT (libvlc_int_t *, libvlc_InternalCreate, ( void ) );
 VLC_EXPORT (int, libvlc_InternalInit, ( libvlc_int_t *, int, const char *ppsz_argv[] ) );
 VLC_EXPORT (int, libvlc_InternalCleanup, ( libvlc_int_t * ) );
-VLC_EXPORT (int, libvlc_InternalDestroy, ( libvlc_int_t *, bool ) );
+VLC_EXPORT (int, libvlc_InternalDestroy, ( libvlc_int_t * ) );
 
 VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char * ) );
 
