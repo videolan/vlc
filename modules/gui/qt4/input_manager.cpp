@@ -83,9 +83,9 @@ void InputManager::setInput( input_thread_t *_p_input )
         vlc_object_yield( p_input );
         emit statusChanged( PLAYING_S );
         UpdateMeta();
-        UpdateNavigation();
         UpdateArt();
         UpdateSPU();
+        UpdateNavigation();
         addCallbacks();
         i_input_id = input_GetItem( p_input )->i_id;
     }
@@ -189,19 +189,21 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemChanged_Type:
         UpdateMeta();
-        UpdateNavigation();
         UpdateStatus();
         UpdateArt();
         break;
-    case ItemRateChanged_Type:
-        UpdateRate();
+    case ItemStateChanged_Type:
+        UpdateStatus();
+        UpdateNavigation();
+        UpdateMeta();
         break;
     case ItemTitleChanged_Type:
         UpdateNavigation();
         UpdateMeta();
         break;
-    case ItemStateChanged_Type:
-        UpdateStatus();
+    case ItemRateChanged_Type:
+        UpdateRate();
+        break;
     case ItemSpuChanged_Type:
         UpdateSPU();
         break;
