@@ -91,7 +91,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define OPACITY_TEXT N_( "Windows opacity between 0.1 and 1." )
 #define OPACITY_LONGTEXT N_( "Sets the windows opacity between 0.1 and 1 " \
-                             "for main interface, playlist and extended panel." \
+                             "for main interface, playlist and extended panel."\
                              " This option only works with Windows and " \
                              "X11 with composite extensions." )
 
@@ -228,6 +228,7 @@ static int Open( vlc_object_t *p_this )
     XCloseDisplay( p_display );
 #endif
 
+    /* Allocations */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
         return VLC_ENOMEM;
@@ -235,7 +236,9 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
+    /* Access to the playlist */
     p_intf->p_sys->p_playlist = pl_Yield( p_intf );
+    /* Listen to the messages */
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
     return VLC_SUCCESS;
@@ -309,20 +312,22 @@ static void Init( intf_thread_t *p_intf )
 
     /* Start the QApplication here */
     QApplication *app = new QApplication( argc, argv , true );
+    p_intf->p_sys->p_app = app;
+
+    /* Icon setting
+       FIXME: use a bigger icon ? */
     if( QDate::currentDate().dayOfYear() >= 354 )
         app->setWindowIcon( QIcon( QPixmap(vlc_christmas_xpm) ) );
     else
         app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
-    p_intf->p_sys->p_app = app;
 
-    // Initialize timers and the Dialog Provider
+    /* Initialize timers and the Dialog Provider */
     DialogsProvider::getInstance( p_intf );
 
-    // Create the normal interface
+    /* Create the normal interface in non-DP mode */
     if( !p_intf->pf_show_dialog )
     {
-        MainInterface *p_mi = new MainInterface( p_intf );
-        p_intf->p_sys->p_mi = p_mi;
+        p_intf->p_sys->p_mi = new MainInterface( p_intf );
         /* We don't show it because it is done in the MainInterface constructor
         p_mi->show(); */
         p_intf->p_sys->b_isDialogProvider = false;
@@ -333,6 +338,8 @@ static void Init( intf_thread_t *p_intf )
         p_intf->p_sys->b_isDialogProvider = true;
     }
 
+    /* Explain to the core how to show a dialog :D */
+    p_intf->pf_show_dialog = ShowDialog;
 
 #ifdef ENABLE_NLS
     // Translation - get locale
@@ -353,16 +360,13 @@ static void Init( intf_thread_t *p_intf )
     app->installTranslator( &qtTranslator );
 #endif  //ENABLE_NLS
 
-    /* Explain to the core how to show a dialog :D */
-    p_intf->pf_show_dialog = ShowDialog;
-
     /* Last settings */
     app->setQuitOnLastWindowClosed( false );
 
-    /*        retrieve last known path used in file browsing */
+    /* Retrieve last known path used in file browsing */
     char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
     p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? psz_path
-                           : config_GetHomeDir();
+                                                        : config_GetHomeDir();
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
@@ -396,8 +400,10 @@ static void Init( intf_thread_t *p_intf )
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
 
+    /* Delete the application */
     delete app;
 
+    /* Save the path */
     config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
     free( psz_path );
 }
@@ -486,3 +492,4 @@ static void CloseWindow (vlc_object_t *obj)
     intf->p_sys->p_mi->releaseVideo (wnd->handle);
     vlc_object_release (intf);
 }
+
