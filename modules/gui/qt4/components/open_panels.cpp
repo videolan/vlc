@@ -425,6 +425,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.protocolCombo->addItem("RTSP", QVariant("rtsp"));
     ui.protocolCombo->addItem("UDP/RTP (unicast)", QVariant("udp"));
     ui.protocolCombo->addItem("UDP/RTP (multicast)", QVariant("udp"));
+    ui.protocolCombo->addItem("RTMP", QVariant("rtmp"));
 }
 
 NetOpenPanel::~NetOpenPanel()
@@ -438,10 +439,12 @@ void NetOpenPanel::updateProtocol( int idx_proto ) {
     QString addr = ui.addressText->text();
     QString proto = ui.protocolCombo->itemData( idx_proto ).toString();
 
-    ui.timeShift->setEnabled( idx_proto >= UDP_PROTO );
+    ui.timeShift->setEnabled( idx_proto == UDP_PROTO ||
+                              idx_proto == UDPM_PROTO );
     ui.ipv6->setEnabled( idx_proto == UDP_PROTO );
     ui.addressText->setEnabled( idx_proto != UDP_PROTO );
-    ui.portSpin->setEnabled( idx_proto >= UDP_PROTO );
+    ui.portSpin->setEnabled( idx_proto == UDP_PROTO ||
+                             idx_proto == UDPM_PROTO );
 
     if( idx_proto == NO_PROTO ) return;
 
@@ -514,6 +517,11 @@ void NetOpenPanel::updateMRL() {
             else mrl += addr;
             mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
+        case RTMP_PROTO:
+            mrl = "rtmp://" + addr;
+            emit methodChanged("rtmp-caching");
+            break;
+
         }
     }
 
