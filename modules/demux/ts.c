@@ -3546,6 +3546,35 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 }
             }
         }
+        else if( p_es->i_type == 0xd1 )
+        {
+            dvbpsi_descriptor_t *p_dr;
+
+            for( p_dr = p_es->p_first_descriptor; p_dr != NULL;
+                 p_dr = p_dr->p_next )
+            {
+                msg_Dbg( p_demux, "  * es pid=%d type=%d dr->i_tag=0x%x",
+                         p_es->i_pid, p_es->i_type, p_dr->i_tag );
+
+                if( p_dr->i_tag == 0x05 )
+                {
+                    /* Registration Descriptor */
+                    if( !memcmp( p_dr->p_data, "drac", 4 ) )
+                    {
+                        /* registration descriptor for Dirac
+                         * (backwards compatable with VC-2 (SMPTE Sxxxx:2008)) */
+                        pid->es->fmt.i_cat = VIDEO_ES;
+                        pid->es->fmt.i_codec = VLC_FOURCC('d','r','a','c');
+                    }
+                    else
+                    {
+                        msg_Warn( p_demux,
+                                  "unknown Registration Descriptor (%4.4s)",
+                                  p_dr->p_data );
+                    }
+                }
+            }
+        }
         else if( p_es->i_type == 0xa0 )
         {
             /* MSCODEC sent by vlc */
