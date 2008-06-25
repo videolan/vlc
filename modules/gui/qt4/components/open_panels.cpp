@@ -926,10 +926,10 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     screenDevLayout->addWidget( screenLabel, 0, 0 );
 
     /* General connects */
-    connect( ui.deviceCombo, SIGNAL( activated( int ) ),
-                     stackedDevLayout, SLOT( setCurrentIndex( int ) ) );
-    connect( ui.deviceCombo, SIGNAL( activated( int ) ),
-                     stackedPropLayout, SLOT( setCurrentIndex( int ) ) );
+    CONNECT( ui.deviceCombo, activated( int ) ,
+             stackedDevLayout, setCurrentIndex( int ) );
+    CONNECT( ui.deviceCombo, activated( int ),
+             stackedPropLayout, setCurrentIndex( int ) );
     CONNECT( ui.deviceCombo, activated( int ), this, updateMRL() );
     CONNECT( ui.deviceCombo, activated( int ), this, updateButtons() );
 
