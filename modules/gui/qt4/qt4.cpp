@@ -333,6 +333,8 @@ static void Init( intf_thread_t *p_intf )
     /* Initialize timers and the Dialog Provider */
     DialogsProvider::getInstance( p_intf );
 
+    QPointer<MainInterface> *miP = NULL;
+
     /* Create the normal interface in non-DP mode */
     if( !p_intf->pf_show_dialog )
     {
@@ -341,7 +343,8 @@ static void Init( intf_thread_t *p_intf )
         p_mi->show(); */
         p_intf->p_sys->b_isDialogProvider = false;
 
-        val.p_address = new QPointer<MainInterface> (p_intf->p_sys->p_mi);
+        miP = new QPointer<MainInterface> (p_intf->p_sys->p_mi);
+        val.p_address = miP;
         QMutexLocker locker (&windowLock);
         var_Set (p_intf, "window_widget", val);
         windowWait.wakeAll ();
@@ -403,13 +406,13 @@ static void Init( intf_thread_t *p_intf )
 
     /* And quit */
 
-    windowLock.lock ();
-    var_Get (p_intf, "window_widget", &val);
-    if (val.p_address)
-        delete (QPointer<MainInterface> *)val.p_address;
-    val.p_address = NULL;
-    var_Set (p_intf, "window_widget", val);
-    windowLock.unlock();
+    if (miP)
+    {
+        QMutexLocker locker (&windowLock);
+        val.p_address = NULL;
+        var_Set (p_intf, "window_widget", val);
+        delete miP;
+    }
 
     /* Destroy first the main interface because it is connected to some slots
        in the MainInputManager */
@@ -486,9 +489,7 @@ static int OpenWindow (vlc_object_t *obj)
 
     msg_Dbg (obj, "requesting window...");
     QPointer<MainInterface> *miP = (QPointer<MainInterface> *)ptrval.p_address;
-    ptrval.p_address = NULL;
-    /* take ownership */
-    var_Set (intf, "window_widget", ptrval);
+    miP = new QPointer<MainInterface> (*miP); /* create our own copy */
     vlc_object_release (intf);
 
     if (miP->isNull ())
