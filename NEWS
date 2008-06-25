@@ -102,6 +102,7 @@ Demuxers:
  * TiVo Series 2 support
  * CD+G karaoke Files support
  * MXF files support
+ * OMA support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
@@ -113,15 +114,15 @@ Decoders:
  * Fluidsynth MIDI software synthesis (with external sound fonts)
  * New codec FOURCCs to support more specific files:
    Avid, FCP, Sony, Samsung, ...
- * Closed Caption Decoder (DVD, ReplayTV, TiVo, DVB/ATSC)
  * H.264 PAFF support
  * DNxHD / VC-3 support
  * NellyMoser ASAO support
  * APE (Monkey audio) support
- * VBI & EBU (Teletext) support
  * RealVideo support (with the RealVideo run-time)
 
 Subtitles:
+ * Closed Caption Decoder (DVD, ReplayTV, TiVo, DVB/ATSC)
+ * VBI & EBU (Teletext) support (*nix, Mac OS)
  * Ogg/Kate subtitles support
  * AQTitle subtitles support
  * MKV USF subtitles support

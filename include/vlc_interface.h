@@ -177,7 +177,8 @@ typedef enum vlc_dialog {
 #define INTF_ABOUT_MSG LICENSE_MSG
 
 #define EXTENSIONS_AUDIO "*.a52;*.aac;*.ac3;*.dts;*.flac;*.m4a;*.m4p;*.mka;" \
-                         "*.mod;*.mp1;*.mp2;*.mp3;*.ogg;*.spx;*.wav;*.wma;*.xm"
+                         "*.mod;*.mp1;*.mp2;*.mp3;*.ogg;*.oma;*.spx;" \
+                         "*.wav;*.wma;*.xm"
 
 #define EXTENSIONS_VIDEO "*.asf;*.avi;*.divx;*.dv;*.flv;*.gxf;*.m1v;*.m2v;" \
                          "*.m4v;*.mkv;*.mov;*.mp2;*.mp4;*.mpeg;*.mpeg1;" \
