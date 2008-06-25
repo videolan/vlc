@@ -878,7 +878,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
         MainInterface *_p_mi, bool b_advControls, bool b_shiny )
         : ControlsWidget( _p_i, _p_mi, b_advControls, b_shiny, true ),
         i_lastPosX( -1 ), i_lastPosY( -1 ), i_hideTimeout( 1 ),
-        b_mouseIsOver( false )
+        b_mouseIsOver( false ), b_isFullscreen( false )
 {
     setWindowFlags( Qt::ToolTip );
 
@@ -976,7 +976,11 @@ void FullscreenControllerWidget::slowHideFSC()
     }
     else
     {
+#ifdef WIN32TRICK
+         if ( windowOpacity() > 0.0 && !fscHidden )
+#else
          if ( windowOpacity() > 0.0 )
+#endif
          {
              /* we should use 0.01 because of 100 pieces ^^^
                 but than it cannt be done in time */
@@ -1013,7 +1017,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
 {
     int type = event->type();
 
-    if ( type == FullscreenControlShow_Type )
+    if ( type == FullscreenControlShow_Type && b_isFullscreen )
     {
         #ifdef WIN32TRICK
         // after quiting and going to fs, we need to call show()
@@ -1150,7 +1154,8 @@ static int regMouseMoveCallback( vlc_object_t *vlc_object, const char *variable,
 
     if ( var_GetBool( p_vout, "fullscreen" ) && !b_registered )
     {
-        p_fs->SetHideTimeout( var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+        p_fs->setHideTimeout( var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+        p_fs->setIsFullscreen( true );
         var_AddCallback( p_vout, "mouse-moved",
                         showFullscreenControllCallback, (void *) p_fs );
         b_registered = true;
@@ -1158,13 +1163,12 @@ static int regMouseMoveCallback( vlc_object_t *vlc_object, const char *variable,
 
     if ( !var_GetBool( p_vout, "fullscreen" ) && b_registered )
     {
+        p_fs->setIsFullscreen( false );
+        p_fs->hide();
         var_DelCallback( p_vout, "mouse-moved",
                         showFullscreenControllCallback, (void *) p_fs );
         b_registered = false;
     }
-
-    if ( !var_GetBool( p_vout, "fullscreen" ) )
-        p_fs->hide();
 
     return VLC_SUCCESS;
 }

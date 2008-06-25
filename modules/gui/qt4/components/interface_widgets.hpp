@@ -250,7 +250,8 @@ public:
     FullscreenControllerWidget( intf_thread_t *, MainInterface*, bool, bool );
     virtual ~FullscreenControllerWidget();
 
-    void SetHideTimeout( int hideTimeout ) { i_hideTimeout = hideTimeout; }
+    void setHideTimeout( int hideTimeout ) { i_hideTimeout = hideTimeout; }
+    void setIsFullscreen( bool isFS ) { b_isFullscreen = isFS; }
     void regFullscreenCallback( vout_thread_t *p_vout );
 
     bool isFSCHidden();
@@ -283,6 +284,7 @@ private:
     int i_lastPosY;
     int i_hideTimeout;  /* FSC hiding timeout, same as mouse hiding timeout */
     bool b_mouseIsOver;
+    bool b_isFullscreen;
 
 #ifdef WIN32TRICK
     bool fscHidden;
