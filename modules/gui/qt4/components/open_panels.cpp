@@ -1133,7 +1133,7 @@ void CaptureOpenPanel::advancedDialog()
     advButtonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
     advButtonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    gLayout->addWidget( advButtonBox, i_confsize + 1, 0, 1, -1  );
+    mainLayout->addWidget( advButtonBox );
 
     /* Creation of the MRL */
     if( adv->exec() )
