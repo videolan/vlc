@@ -462,7 +462,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     BUTTON_SET_IMG( prevSectionButton, "", previous.png, "" );
     BUTTON_SET_IMG( nextSectionButton, "", next.png, "" );
-    BUTTON_SET_IMG( menuButton, "", previous.png, "" );
+    BUTTON_SET_IMG( menuButton, "", previous.png, qtr( "Menu" ) );
 
     discFrame->hide();
 
@@ -722,11 +722,8 @@ void ControlsWidget::next()
 
 void ControlsWidget::setNavigation( int navigation )
 {
-#define HELP_MENU N_( "Menu" )
 #define HELP_PCH N_( "Previous chapter" )
 #define HELP_NCH N_( "Next chapter" )
-#define HELP_PTR N_( "Previous track" )
-#define HELP_NTR N_( "Next track" )
 
     // 1 = chapter, 2 = title, 0 = no
     if( navigation == 0 )
