@@ -468,7 +468,6 @@ static int OpenWindow (vlc_object_t *obj)
         return VLC_EGENERIC; /* Qt4 not in use */
     assert (intf->i_object_type == VLC_OBJECT_INTF);
 
-    var_Create (intf, "window_mutex", VLC_VAR_MUTEX);
     var_Create (intf, "window_widget", VLC_VAR_ADDRESS);
 
     vlc_value_t ptrval;
