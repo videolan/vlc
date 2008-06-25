@@ -29,6 +29,9 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QDate>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QWaitCondition>
 
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
@@ -241,6 +244,7 @@ static int Open( vlc_object_t *p_this )
     /* Listen to the messages */
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
+    var_Create( p_this, "window_widget", VLC_VAR_ADDRESS );
     return VLC_SUCCESS;
 }
 
@@ -291,8 +295,12 @@ static void Run( intf_thread_t *p_intf )
         Init( p_intf );
 }
 
+static QMutex windowLock;
+static QWaitCondition windowWait;
+
 static void Init( intf_thread_t *p_intf )
 {
+    vlc_value_t val;
     char dummy[] = "";
     char *argv[] = { dummy };
     int argc = 1;
@@ -331,6 +339,11 @@ static void Init( intf_thread_t *p_intf )
         /* We don't show it because it is done in the MainInterface constructor
         p_mi->show(); */
         p_intf->p_sys->b_isDialogProvider = false;
+
+        val.p_address = p_intf->p_sys->p_mi;
+        QMutexLocker locker (&windowLock);
+        var_Set (p_intf, "window_widget", val);
+        windowWait.wakeAll ();
     }
     else
     {
@@ -389,6 +402,9 @@ static void Init( intf_thread_t *p_intf )
 
     /* And quit */
 
+    QMutexLocker locker (&windowLock);
+    val.p_address = NULL;
+    var_Set (p_intf, "window_widget", val);
     /* Destroy first the main interface because it is connected to some slots
        in the MainInputManager */
     delete p_intf->p_sys->p_mi;
@@ -455,24 +471,24 @@ static int OpenWindow (vlc_object_t *obj)
     var_Create (intf, "window_mutex", VLC_VAR_MUTEX);
     var_Create (intf, "window_widget", VLC_VAR_ADDRESS);
 
-    vlc_value_t lockval, ptrval;
-    var_Get (intf, "window_mutex", &lockval);
+    vlc_value_t ptrval;
 
-    vlc_mutex_lock ((vlc_mutex_t *)lockval.p_address);
+    windowLock.lock ();
     msg_Dbg (obj, "waiting for interface...");
-    do
+    for (;;)
     {
         var_Get (intf, "window_widget", &ptrval);
-        /* FIXME A condition variable would be way more appropriate. */
-        msleep (INTF_IDLE_SLEEP);
-    } while (ptrval.p_address == NULL);
+        if (ptrval.p_address != NULL)
+            break;
+        windowWait.wait (&windowLock);
+    }
 
-    msg_Dbg (obj, "requestiong window...");
     MainInterface *mi = (MainInterface *)ptrval.p_address;
+    msg_Dbg (obj, "requesting window (%p)...", mi);
 
     wnd->handle = mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
                                     &wnd->width, &wnd->height);
-    vlc_mutex_unlock ((vlc_mutex_t *)lockval.p_address);
+    windowLock.unlock ();
     wnd->control = ControlWindow;
     wnd->p_private = intf;
     return VLC_SUCCESS;
