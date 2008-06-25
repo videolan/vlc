@@ -402,7 +402,6 @@ static void Init( intf_thread_t *p_intf )
 
     /* And quit */
 
-    QMutexLocker locker (&windowLock);
     val.p_address = NULL;
     var_Set (p_intf, "window_widget", val);
     /* Destroy first the main interface because it is connected to some slots
