@@ -659,8 +659,6 @@ private:
  * Thou shall not call/resize/hide widgets from on another thread.
  * This is wrong, and this is TEH reason to emit signals on those Video Functions
  **/
-/* function called from ::DoRequest in order to show a nice VideoWidget
-    at the good size */
 void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
                                    unsigned int *pi_height )
@@ -700,8 +698,6 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
     return ret;
 }
 
-/* function called from ::DoRequest in order to show a nice VideoWidget
-    at the good size */
 void MainInterface::requestNotEmbeddedVideo( vout_thread_t *p_nvout )
 {
     fullscreenControls->regFullscreenCallback( p_nvout );
