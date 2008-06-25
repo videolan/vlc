@@ -2312,25 +2312,6 @@ DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.bz2
 CLEAN_FILE += .aclocal
 
 # ***************************************************************************
-# UNICOWS (Unicode support for WINME/98/95)
-# ***************************************************************************
-
-libunicows-$(UNICOWS_VERSION).tar.gz:
-	$(WGET) $(UNICOWS_URL)
-	mv libunicows-$(UNICOWS_VERSION)-src.tar.gz $@ || true
-
-libunicows: libunicows-$(UNICOWS_VERSION).tar.gz
-	$(EXTRACT_GZ)
-
-.unicows: libunicows
-	(cd $</src; make -f makefile.mingw32 PATHSEP='/' $(HOSTCC) && cp -f ../lib/mingw32/libunicows.a $(PREFIX)/lib)
-	touch $@
-
-CLEAN_FILE += .unicows
-CLEAN_PKG += libunicows
-DISTCLEAN_PKG += libunicows-$(UNICOWS_VERSION).tar.gz
-
-# ***************************************************************************
 # TagLib read and editing of tags of popular audio formats
 # ***************************************************************************
 

@@ -5,7 +5,7 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .live .goom2k4 .caca .mod .x264  .xml .twolame \
         .png .gpg-error .gcrypt .opencdk .gnutls .mpcdec \
         .dvdnav .dvbpsi .wxwidgets .qt4_win32 .dirac .SDL_image \
-        .dx_headers .dshow_headers .gecko-win32 .unicows .dca \
+        .dx_headers .dshow_headers .gecko-win32 .dca \
         .lua .tag .fontconfig .portaudio \
         .aclocal
 #       .daap .cddb .cdio .vcdimager
