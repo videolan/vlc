@@ -32,6 +32,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QWaitCondition>
+#include <QPointer>
 
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
@@ -340,7 +341,7 @@ static void Init( intf_thread_t *p_intf )
         p_mi->show(); */
         p_intf->p_sys->b_isDialogProvider = false;
 
-        val.p_address = p_intf->p_sys->p_mi;
+        val.p_address = new QPointer<MainInterface> (p_intf->p_sys->p_mi);
         QMutexLocker locker (&windowLock);
         var_Set (p_intf, "window_widget", val);
         windowWait.wakeAll ();
@@ -481,29 +482,41 @@ static int OpenWindow (vlc_object_t *obj)
         windowWait.wait (&windowLock);
     }
 
-    MainInterface *mi = (MainInterface *)ptrval.p_address;
-    msg_Dbg (obj, "requesting window (%p)...", mi);
+    msg_Dbg (obj, "requesting window...");
+    QPointer<MainInterface> *miP = (QPointer<MainInterface> *)ptrval.p_address;
+    ptrval.p_address = NULL;
+    /* take ownership */
+    var_Set (intf, "window_widget", ptrval);
+    vlc_object_release (intf);
 
-    wnd->handle = mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
-                                    &wnd->width, &wnd->height);
+    if (miP->isNull ())
+        return VLC_EGENERIC;
+
+    wnd->handle = (*miP)->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
+                                        &wnd->width, &wnd->height);
     windowLock.unlock ();
     wnd->control = ControlWindow;
-    wnd->p_private = intf;
+    wnd->p_private = miP;
     return VLC_SUCCESS;
 }
 
 static int ControlWindow (vout_window_t *wnd, int query, va_list args)
 {
-    intf_thread_t *intf = (intf_thread_t *)wnd->p_private;
-    intf->p_sys->p_mi->controlVideo (wnd->handle, query, args);
+    QPointer<MainInterface> *miP = (QPointer<MainInterface> *)wnd->p_private;
+    QMutexLocker locker (&windowLock);
+
+    if (miP->isNull ())
+        return VLC_EGENERIC;
+    return (*miP)->controlVideo (wnd->handle, query, args);
 }
 
 static void CloseWindow (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
-    intf_thread_t *intf = (intf_thread_t *)obj->p_private;
+    QPointer<MainInterface> *miP = (QPointer<MainInterface> *)wnd->p_private;
+    QMutexLocker locker (&windowLock);
 
-    intf->p_sys->p_mi->releaseVideo (wnd->handle);
-    vlc_object_release (intf);
+    if (!miP->isNull ())
+        (*miP)->releaseVideo (wnd->handle);
+    delete miP;
 }
-
