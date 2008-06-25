@@ -5,7 +5,7 @@ Changes between 0.8.6 and 0.9.0-git (not released yet):
 
 Important notes:
 ----------------
- * This release will not work with Windows 98/ME and MacOS X.3 (Panther)
+ * This release will not work with Windows 98/ME and Mac OS X 10.3.9 (Panther)
  * The HTTP interface is now only available on the local machine by default.
    If you want to make it available from other machines, you will have to
    edit the ".hosts" file.
@@ -38,10 +38,11 @@ Important notes:
            udp:@239.255.12.12 -> udp://@239.255.12.12
  * The ffmpeg module has been removed and replaced by avcodec, avformat, swscale
    (or imgresample if you use a swscale-less ffmpeg build) and postproc modules.
- * The web plugins ActiveX (IE)/Firefox/Mozilla/Safari now recognize the following
-   states: IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4, STOPPING=5,
-   FORWARD=6, BACKWARD=7, ENDED=8, ERROR=9. With FORWARD and BACKWARD being
-   reserved for future implementations and are thus not functional atm.
+ * The web plugins ActiveX (IE)/Firefox/Mozilla/Safari now recognize the
+   following states: IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4,
+   STOPPING=5, FORWARD=6, BACKWARD=7, ENDED=8, ERROR=9. With FORWARD and
+   BACKWARD being reserved for future implementations and are thus not
+   functional atm.
  * Croping and padding in transcode are now done using the croppadd video
    filter. For example:
    transcode{vcodec=mp2v,vfilter=croppadd{cropttop=20,cropbottom=30,paddleft=100}}
@@ -75,15 +76,15 @@ Inputs:
  * JACK audio input support
  * Input run time option (improved live stream recording)
  * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
- * Re-written Screen access module for Mac OS X
+ * Re-written Screen access module for Mac OS X 
    using OpenGL instead of QuickDraw
  * Screen module now supports partial screen capture and mouse following on X11.
- * Experimental EyeTV access module (Mac OS X only)
+ * Experimental EyeTV access module
    This requires the user to install a plugin to EyeTV.app
    (available as a separate download).
  * RTMP input support
  * QTKit-based Input module for Mac OS X allowing display and streaming of video
-   taken from all QuickTime-compatible video devices (no audio yet)
+   taken from all iSight-labelled video cameras (no audio support)
  * HTTP access now supports gzip compressed data and Digest Access
    Authentication.
  * New options to reduce latency between arrival of raw data and display of
@@ -143,7 +144,7 @@ Encoders:
  * Improved H.264 encoding speed
 
 Video outputs and filters:
- * New CoreAnimation output module (Mac OS X 10.5 only)
+ * New CoreAnimation-based output module (VLCKit framework on OS X only)
  * Adjust, Invert and Distort (now split into Wave, Ripple, Gradient and
    Psychedelic) video filters can now be streamed
  * New puzzle video output filter
@@ -198,6 +199,7 @@ Interfaces:
    * New setting to disable the "Recent Items" service
    * When playing Radio (live) streams, the current track is shown correctly
    * Correct appearance on Macs using Aqua's graphite theme
+   * Simplified Extended Controls panel
  * Ncurses:
    * Correctly displays wide characters when using an UTF-8 locale, 
      if libncursesw is available.
@@ -219,12 +221,12 @@ Linux Port:
    (which means that VLC doesn't use the $HOME/.vlc directory anymore)
 
 Mac OS X Port:
- * Mac OS X Framework that can be used to embed VLC in third party
+ * Mac OS X Framework "VLCKit" that can be used to embed VLC in third party
    applications (Google Summer of Code Student project, Mac OS X 10.5 only)
  * New text renderer based on Quartz replacing the existing Freetype solution
  * Complete compatibility with Mac OS X 10.5 Leopard
    * It is now required to compile a fully featured build
- * The support of Mac OS X 10.3.9 was discontinued.
+ * The support of Mac OS X 10.3.9 and QuickTime 6.x was discontinued.
 
 LibVLC:
  * Event management and various improvements in libvlc
