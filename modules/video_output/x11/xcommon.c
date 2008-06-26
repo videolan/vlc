@@ -2989,7 +2989,14 @@ static int X11ErrorHandler( Display * display, XErrorEvent * event )
 
 #ifdef HAVE_SYS_SHM_H
     if( event->request_code == i_shm_major ) /* MIT-SHM */
+    {
+        fprintf( stderr,
+                 "[????????] x11 video output notice:"
+                 " buggy X11 server claims shared memory\n"
+                 "[????????] x11 video output notice:"
+                 " support though it does not work (OpenSSH?)\n" );
         return i_shm_major = 0;
+    }
 #endif
 
 #ifndef HAVE_OSSO
