@@ -182,6 +182,8 @@ static void Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *, ogg_packet * );
+static void Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
+static uint32_t Ogg_ReadDiracPictureNumber( ogg_packet *p_oggpacket );
 
 /*****************************************************************************
  * Open: initializes ogg demux structures
@@ -364,7 +366,6 @@ static int Demux( demux_t * p_demux )
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
     }
 
-
     return 1;
 }
 
@@ -449,6 +450,7 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
     if( p_oggpacket->granulepos >= 0 )
     {
         if( p_stream->fmt.i_codec == VLC_FOURCC( 't','h','e','o' ) ||
+            p_stream->fmt.i_codec == VLC_FOURCC( 'd','r','a','c' ) ||
             p_stream->fmt.i_codec == VLC_FOURCC( 'k','a','t','e' ) )
         {
             ogg_int64_t iframe = p_oggpacket->granulepos >>
@@ -681,6 +683,18 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
     else if( p_stream->fmt.i_codec == VLC_FOURCC( 't','h','e','o' ) )
         p_block->i_dts = p_block->i_pts = i_pts;
+    else if( p_stream->fmt.i_codec == VLC_FOURCC( 'd','r','a','c' ) )
+    {
+        /* every packet[1] in the stream contains a picture, there may
+         * be header cruft infront of it though
+         * [1] EXCEPT the BOS page/packet */
+        uint32_t u_pnum = Ogg_ReadDiracPictureNumber( p_oggpacket );
+
+        if ( u_pnum != 0xffffffff ) {
+            p_block->i_dts =
+            p_block->i_pts = (u_pnum * INT64_C(1000000) / p_stream->f_rate);
+        }
+    }
     else
     {
         p_block->i_dts = i_pts;
@@ -693,6 +707,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->fmt.i_codec != VLC_FOURCC( 't','a','r','k' ) &&
         p_stream->fmt.i_codec != VLC_FOURCC( 't','h','e','o' ) &&
         p_stream->fmt.i_codec != VLC_FOURCC( 'c','m','m','l' ) &&
+        p_stream->fmt.i_codec != VLC_FOURCC( 'd','r','a','c' ) &&
         p_stream->fmt.i_codec != VLC_FOURCC( 'k','a','t','e' ) )
     {
         /* We remove the header from the packet */
@@ -859,6 +874,13 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     msg_Dbg( p_demux,
                              "found theora header, bitrate: %i, rate: %f",
                              p_stream->fmt.i_bitrate, p_stream->f_rate );
+                }
+                /* Check for Dirac header */
+                else if( oggpacket.bytes >= 5 &&
+                         ! memcmp( oggpacket.packet, "BBCD\x00", 5 ) )
+                {
+                    Ogg_ReadDiracHeader( p_stream, &oggpacket );
+                    msg_Dbg( p_demux, "found dirac header" );
                 }
                 /* Check for Tarkin header */
                 else if( oggpacket.bytes >= 7 &&
@@ -1526,4 +1548,103 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
             p_stream->fmt.i_codec = VLC_FOURCC( 'c','m','m','l' );
         }
     }
+}
+
+/* every packet[1] in the stream contains a picture, there may
+ * be header cruft infront of it though
+ * [1] EXCEPT the BOS page/packet */
+static uint32_t Ogg_ReadDiracPictureNumber( ogg_packet *p_oggpacket )
+{
+    uint32_t u_pos = 4;
+    /* find the picture startcode */
+    while ( (p_oggpacket->packet[u_pos] & 0x08) == 0) {
+        /* skip to the next dirac parse unit */
+        u_pos += GetDWBE( p_oggpacket->packet + u_pos + 1 );
+        /* protect against falling off the edge */
+        if ( u_pos > p_oggpacket->bytes )
+             return -1;
+    }
+
+    uint32_t u_pnum = GetDWBE( p_oggpacket->packet + u_pos + 9 );
+
+    return u_pnum;
+}
+
+static uint32_t dirac_uint( bs_t *p_bs )
+{
+  uint32_t count = 0, value = 0;
+  while( !bs_read ( p_bs, 1 ) ) {
+    count++;
+    value <<= 1;
+    value |= bs_read ( p_bs, 1 );
+  }
+
+  return (1<<count) - 1 + value;
+}
+
+static int dirac_bool( bs_t *p_bs )
+{
+    return bs_read ( p_bs, 1 );
+}
+
+static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
+                                 ogg_packet *p_oggpacket )
+{
+    bs_t bs;
+
+    p_stream->fmt.i_cat = VIDEO_ES;
+    p_stream->fmt.i_codec = VLC_FOURCC( 'd','r','a','c' );
+    p_stream->i_granule_shift = 32;
+
+    /* Backing up stream headers is not required -- seqhdrs are repeated
+     * thoughout the stream at suitable decoding start points */
+    p_stream->b_force_backup = 0;
+
+    /* read in useful bits from sequence header */
+    bs_init( &bs, p_oggpacket->packet, p_oggpacket->bytes );
+    bs_skip( &bs, 13*8); /* parse_info_header */
+    dirac_uint( &bs ); /* major_version */
+    dirac_uint( &bs ); /* minor_version */
+    dirac_uint( &bs ); /* profile */
+    dirac_uint( &bs ); /* level */
+
+    uint32_t u_video_format = dirac_uint( &bs ); /* index */
+
+    if (dirac_bool( &bs )) {
+        dirac_uint( &bs ); /* frame_width */
+        dirac_uint( &bs ); /* frame_height */
+    }
+
+    if (dirac_bool( &bs )) {
+        dirac_uint( &bs ); /* chroma_format */
+    }
+    if (dirac_bool( &bs )) {
+        if (dirac_bool( &bs )) { /* interlaced */
+            dirac_bool( &bs ); /* top_field_first */
+        }
+    }
+
+    static const struct {
+        uint32_t u_n /* numerator */, u_d /* denominator */;
+    } dirac_frate_tbl[] = { /* table 10.3 */
+        {24000,1001}, {24,1}, {25,1}, {30000,1001}, {30,1},
+        {50,1}, {60000,1001}, {60,1}, {15000,1001}, {25,2},
+    };
+
+    static const uint32_t dirac_vidfmt_frate[] = { /* table C.1 */
+        1, 9, 10, 9, 10, 9, 10, 4, 3, 7, 6, 4, 3, 7, 6, 2, 2, 7, 6, 7, 6,
+    };
+
+    uint32_t u_n = dirac_frate_tbl[dirac_vidfmt_frate[u_video_format]].u_n;
+    uint32_t u_d = dirac_frate_tbl[dirac_vidfmt_frate[u_video_format]].u_d;
+    if (dirac_bool( &bs )) {
+        uint32_t frame_rate_index = dirac_uint( &bs );
+        u_n = dirac_frate_tbl[frame_rate_index].u_n;
+        u_d = dirac_frate_tbl[frame_rate_index].u_d;
+        if (frame_rate_index == 0) {
+            u_n = dirac_uint( &bs ); /* frame_rate_numerator */
+            u_d = dirac_uint( &bs ); /* frame_rate_denominator */
+        }
+    }
+    p_stream->f_rate = (float) u_n / u_d;
 }
