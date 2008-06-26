@@ -153,8 +153,6 @@ vlc_module_begin();
                  ENC_VT_LONGTEXT, true );
     add_bool( ENC_CFG_PREFIX "pre-me", 0, NULL, ENC_PRE_ME_TEXT,
               ENC_PRE_ME_LONGTEXT, true );
-    add_bool( ENC_CFG_PREFIX "strict-rc", 0, NULL, ENC_RC_STRICT_TEXT,
-              ENC_RC_STRICT_LONGTEXT, true );
     add_integer( ENC_CFG_PREFIX "rc-buffer-size", 224*1024*8, NULL,
                  ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, true );
     add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 1.0, NULL,

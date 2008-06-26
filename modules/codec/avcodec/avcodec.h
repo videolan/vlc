@@ -141,10 +141,6 @@ void EndAudioDec( decoder_t *p_dec );
 #define ENC_PRE_ME_LONGTEXT N_( "Enable the pre-motion " \
   "estimation algorithm.")
 
-#define ENC_RC_STRICT_TEXT N_( "Strict rate control" )
-#define ENC_RC_STRICT_LONGTEXT N_( "Enable the strict rate " \
-  "control algorithm." )
-
 #define ENC_RC_BUF_TEXT N_( "Rate control buffer size" )
 #define ENC_RC_BUF_LONGTEXT N_( "Rate control " \
   "buffer size (in kbytes). A bigger buffer will allow for better rate " \

@@ -131,7 +131,6 @@ struct encoder_sys_t
     int        i_qmin;
     int        i_qmax;
     int        i_hq;
-    bool       b_strict_rc;
     int        i_rc_buffer_size;
     float      f_rc_buffer_aggressivity;
     bool       b_pre_me;
@@ -153,7 +152,7 @@ struct encoder_sys_t
 };
 
 static const char *const ppsz_enc_options[] = {
-    "keyint", "bframes", "vt", "qmin", "qmax", "hq", "strict-rc",
+    "keyint", "bframes", "vt", "qmin", "qmax", "hq", 
     "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
     "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
@@ -318,8 +317,6 @@ int OpenEncoder( vlc_object_t *p_this )
         p_sys->i_noise_reduction = 1;
     }
 
-    var_Get( p_enc, ENC_CFG_PREFIX "strict-rc", &val );
-    p_sys->b_strict_rc = val.b_bool;
     var_Get( p_enc, ENC_CFG_PREFIX "rc-buffer-size", &val );
     p_sys->i_rc_buffer_size = val.i_int;
     var_Get( p_enc, ENC_CFG_PREFIX "rc-buffer-aggressivity", &val );
@@ -475,17 +472,6 @@ int OpenEncoder( vlc_object_t *p_this )
             p_enc->fmt_in.i_codec = GetVlcChroma( p_context->pix_fmt );
         }
 
-        if ( p_sys->b_strict_rc )
-        {
-            p_context->rc_qsquish = 1.0;
-            p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
-            p_context->rc_min_rate = p_enc->fmt_out.i_bitrate;
-            p_context->rc_buffer_size = p_sys->i_rc_buffer_size;
-            /* This is from ffmpeg's ffmpeg.c : */
-            p_context->rc_initial_buffer_occupancy
-                = p_sys->i_rc_buffer_size * 3/4;
-            p_context->rc_buffer_aggressivity = p_sys->f_rc_buffer_aggressivity;
-        }
 
         if ( p_sys->f_i_quant_factor != 0.0 )
             p_context->i_quant_factor = p_sys->f_i_quant_factor;
@@ -560,6 +546,17 @@ int OpenEncoder( vlc_object_t *p_this )
         {
             p_context->flags |= CODEC_FLAG_QSCALE;
             p_context->global_quality = p_sys->i_quality;
+        } 
+        else 
+        {
+            p_context->rc_qsquish = 1.0;
+            p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
+            p_context->rc_min_rate = p_enc->fmt_out.i_bitrate;
+            p_context->rc_buffer_size = p_sys->i_rc_buffer_size;
+            /* This is from ffmpeg's ffmpeg.c : */
+            p_context->rc_initial_buffer_occupancy
+                = p_sys->i_rc_buffer_size * 3/4;
+            p_context->rc_buffer_aggressivity = p_sys->f_rc_buffer_aggressivity;
         }
     }
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
@@ -575,8 +572,8 @@ int OpenEncoder( vlc_object_t *p_this )
         if ( p_enc->fmt_out.i_codec == VLC_FOURCC('m','p','4','a') )
         {
             /* XXX: FAAC does resample only when setting the INPUT samplerate
-             * to the desired value (-R option of the faac frontend) */
-            p_enc->fmt_in.audio.i_rate = p_context->sample_rate;
+             * to the desired value (-R option of the faac frontend) 
+            p_enc->fmt_in.audio.i_rate = p_context->sample_rate;*/
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
         /* Ignore FF_PROFILE_UNKNOWN */
         if( p_sys->i_aac_profile >= FF_PROFILE_AAC_MAIN )
