@@ -292,6 +292,9 @@ void UpdateDialog::updateNotify( bool b_result )
             updateButton->setText( "Download" );
             updateLabel->setText( qtr( "There is a new version of VLC :\n" )
                                 + qfu( p_release->psz_desc )  );
+
+            /* Force the dialog to be shown */
+            this->show();
         }
         else
             updateLabel->setText( qtr( "You have the latest version of VLC" ) );

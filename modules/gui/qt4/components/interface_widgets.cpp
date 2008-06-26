@@ -65,6 +65,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     hide(); setMinimumSize( 16, 16 );
     videoSize.rwidth() = -1;
     videoSize.rheight() = -1;
+    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
     /* Black background is more coherent for a Video Widget IMVHO */
     QPalette plt =  palette();
@@ -74,10 +75,17 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     setAttribute( Qt::WA_PaintOnScreen, true );
 
     /* The core can ask through a callback to show the video. */
-    connect( this, SIGNAL(askVideoWidgetToShow()), this, SLOT(show()), Qt::BlockingQueuedConnection );
+#if HAS_QT43
+    connect( this, SIGNAL(askVideoWidgetToShow( unsigned int, unsigned int)),
+             this, SLOT(SetSizing(unsigned int, unsigned int )),
+             Qt::BlockingQueuedConnection );
+#else
+#error This is broken. Fix it with a QEventLoop with a processEvents () 
+    connect( this, SIGNAL(askVideoWidgetToShow( unsigned int, unsigned int)),
+             this, SLOT(SetSizing(unsigned int, unsigned int )) );
+#endif
 
-    /* The core can ask through a callback to resize the video */
-   // CONNECT( this, askResize( int, int ), this, SetSizing( int, int ) );
+
 }
 
 void VideoWidget::paintEvent(QPaintEvent *ev)
@@ -115,7 +123,7 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                            unsigned int *pi_width, unsigned int *pi_height )
 {
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
-    emit askVideoWidgetToShow();
+    emit askVideoWidgetToShow( *pi_width, *pi_height );
     if( p_vout )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
@@ -134,6 +142,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     msg_Dbg( p_intf, "Video is resizing to: %i %i", w, h );
     videoSize.rwidth() = w;
     videoSize.rheight() = h;
+    if( isHidden() ) show();
     updateGeometry(); // Needed for deinterlace
 }
 
@@ -461,7 +470,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     BUTTON_SET_IMG( prevSectionButton, "", previous.png, "" );
     BUTTON_SET_IMG( nextSectionButton, "", next.png, "" );
-    BUTTON_SET_IMG( menuButton, "", previous.png, "" );
+    BUTTON_SET_IMG( menuButton, "", previous.png, qtr( "Menu" ) );
 
     discFrame->hide();
 
@@ -721,11 +730,8 @@ void ControlsWidget::next()
 
 void ControlsWidget::setNavigation( int navigation )
 {
-#define HELP_MENU N_( "Menu" )
 #define HELP_PCH N_( "Previous chapter" )
 #define HELP_NCH N_( "Next chapter" )
-#define HELP_PTR N_( "Previous track" )
-#define HELP_NTR N_( "Next track" )
 
     // 1 = chapter, 2 = title, 0 = no
     if( navigation == 0 )
@@ -872,7 +878,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
         MainInterface *_p_mi, bool b_advControls, bool b_shiny )
         : ControlsWidget( _p_i, _p_mi, b_advControls, b_shiny, true ),
         i_lastPosX( -1 ), i_lastPosY( -1 ), i_hideTimeout( 1 ),
-        b_mouseIsOver( false )
+        b_mouseIsOver( false ), b_isFullscreen( false )
 {
     setWindowFlags( Qt::ToolTip );
 
@@ -970,7 +976,11 @@ void FullscreenControllerWidget::slowHideFSC()
     }
     else
     {
+#ifdef WIN32TRICK
+         if ( windowOpacity() > 0.0 && !fscHidden )
+#else
          if ( windowOpacity() > 0.0 )
+#endif
          {
              /* we should use 0.01 because of 100 pieces ^^^
                 but than it cannt be done in time */
@@ -1007,7 +1017,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
 {
     int type = event->type();
 
-    if ( type == FullscreenControlShow_Type )
+    if ( type == FullscreenControlShow_Type && b_isFullscreen )
     {
         #ifdef WIN32TRICK
         // after quiting and going to fs, we need to call show()
@@ -1144,7 +1154,8 @@ static int regMouseMoveCallback( vlc_object_t *vlc_object, const char *variable,
 
     if ( var_GetBool( p_vout, "fullscreen" ) && !b_registered )
     {
-        p_fs->SetHideTimeout( var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+        p_fs->setHideTimeout( var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+        p_fs->setIsFullscreen( true );
         var_AddCallback( p_vout, "mouse-moved",
                         showFullscreenControllCallback, (void *) p_fs );
         b_registered = true;
@@ -1152,13 +1163,12 @@ static int regMouseMoveCallback( vlc_object_t *vlc_object, const char *variable,
 
     if ( !var_GetBool( p_vout, "fullscreen" ) && b_registered )
     {
+        p_fs->setIsFullscreen( false );
+        p_fs->hide();
         var_DelCallback( p_vout, "mouse-moved",
                         showFullscreenControllCallback, (void *) p_fs );
         b_registered = false;
     }
-
-    if ( !var_GetBool( p_vout, "fullscreen" ) )
-        p_fs->hide();
 
     return VLC_SUCCESS;
 }

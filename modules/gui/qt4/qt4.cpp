@@ -29,6 +29,10 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QDate>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QWaitCondition>
+#include <QPointer>
 
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
@@ -91,7 +95,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define OPACITY_TEXT N_( "Windows opacity between 0.1 and 1." )
 #define OPACITY_LONGTEXT N_( "Sets the windows opacity between 0.1 and 1 " \
-                             "for main interface, playlist and extended panel." \
+                             "for main interface, playlist and extended panel."\
                              " This option only works with Windows and " \
                              "X11 with composite extensions." )
 
@@ -228,6 +232,7 @@ static int Open( vlc_object_t *p_this )
     XCloseDisplay( p_display );
 #endif
 
+    /* Allocations */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
         return VLC_ENOMEM;
@@ -235,9 +240,12 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
+    /* Access to the playlist */
     p_intf->p_sys->p_playlist = pl_Yield( p_intf );
+    /* Listen to the messages */
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
+    var_Create( p_this, "window_widget", VLC_VAR_ADDRESS );
     return VLC_SUCCESS;
 }
 
@@ -288,8 +296,12 @@ static void Run( intf_thread_t *p_intf )
         Init( p_intf );
 }
 
+static QMutex windowLock;
+static QWaitCondition windowWait;
+
 static void Init( intf_thread_t *p_intf )
 {
+    vlc_value_t val;
     char dummy[] = "";
     char *argv[] = { dummy };
     int argc = 1;
@@ -309,23 +321,33 @@ static void Init( intf_thread_t *p_intf )
 
     /* Start the QApplication here */
     QApplication *app = new QApplication( argc, argv , true );
+    p_intf->p_sys->p_app = app;
+
+    /* Icon setting
+       FIXME: use a bigger icon ? */
     if( QDate::currentDate().dayOfYear() >= 354 )
         app->setWindowIcon( QIcon( QPixmap(vlc_christmas_xpm) ) );
     else
         app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
-    p_intf->p_sys->p_app = app;
 
-    // Initialize timers and the Dialog Provider
+    /* Initialize timers and the Dialog Provider */
     DialogsProvider::getInstance( p_intf );
 
-    // Create the normal interface
+    QPointer<MainInterface> *miP = NULL;
+
+    /* Create the normal interface in non-DP mode */
     if( !p_intf->pf_show_dialog )
     {
-        MainInterface *p_mi = new MainInterface( p_intf );
-        p_intf->p_sys->p_mi = p_mi;
+        p_intf->p_sys->p_mi = new MainInterface( p_intf );
         /* We don't show it because it is done in the MainInterface constructor
         p_mi->show(); */
         p_intf->p_sys->b_isDialogProvider = false;
+
+        miP = new QPointer<MainInterface> (p_intf->p_sys->p_mi);
+        val.p_address = miP;
+        QMutexLocker locker (&windowLock);
+        var_Set (p_intf, "window_widget", val);
+        windowWait.wakeAll ();
     }
     else
     {
@@ -333,6 +355,8 @@ static void Init( intf_thread_t *p_intf )
         p_intf->p_sys->b_isDialogProvider = true;
     }
 
+    /* Explain to the core how to show a dialog :D */
+    p_intf->pf_show_dialog = ShowDialog;
 
 #ifdef ENABLE_NLS
     // Translation - get locale
@@ -353,16 +377,13 @@ static void Init( intf_thread_t *p_intf )
     app->installTranslator( &qtTranslator );
 #endif  //ENABLE_NLS
 
-    /* Explain to the core how to show a dialog :D */
-    p_intf->pf_show_dialog = ShowDialog;
-
     /* Last settings */
     app->setQuitOnLastWindowClosed( false );
 
-    /*        retrieve last known path used in file browsing */
+    /* Retrieve last known path used in file browsing */
     char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
     p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? psz_path
-                           : config_GetHomeDir();
+                                                        : config_GetHomeDir();
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
@@ -385,6 +406,14 @@ static void Init( intf_thread_t *p_intf )
 
     /* And quit */
 
+    if (miP)
+    {
+        QMutexLocker locker (&windowLock);
+        val.p_address = NULL;
+        var_Set (p_intf, "window_widget", val);
+        delete miP;
+    }
+
     /* Destroy first the main interface because it is connected to some slots
        in the MainInputManager */
     delete p_intf->p_sys->p_mi;
@@ -396,8 +425,10 @@ static void Init( intf_thread_t *p_intf )
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
 
+    /* Delete the application */
     delete app;
 
+    /* Save the path */
     config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
     free( psz_path );
 }
@@ -436,53 +467,65 @@ static int OpenWindow (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
 
-    /* TODO: should probably be in the libvlc core instead: */
-    if (!config_GetInt (obj, "embedded-video"))
-        return VLC_EGENERIC;
-
     intf_thread_t *intf = (intf_thread_t *)
         vlc_object_find_name (obj, "qt4", FIND_ANYWHERE);
     if (intf == NULL)
         return VLC_EGENERIC; /* Qt4 not in use */
     assert (intf->i_object_type == VLC_OBJECT_INTF);
 
-    var_Create (intf, "window_mutex", VLC_VAR_MUTEX);
     var_Create (intf, "window_widget", VLC_VAR_ADDRESS);
 
-    vlc_value_t lockval, ptrval;
-    var_Get (intf, "window_mutex", &lockval);
+    vlc_value_t ptrval;
 
-    vlc_mutex_lock ((vlc_mutex_t *)lockval.p_address);
+    windowLock.lock ();
     msg_Dbg (obj, "waiting for interface...");
-    do
+    for (;;)
     {
         var_Get (intf, "window_widget", &ptrval);
-        /* FIXME A condition variable would be way more appropriate. */
-        msleep (INTF_IDLE_SLEEP);
-    } while (ptrval.p_address == NULL);
+        if (ptrval.p_address != NULL)
+            break;
+        windowWait.wait (&windowLock);
+    }
 
-    msg_Dbg (obj, "requestiong window...");
-    MainInterface *mi = (MainInterface *)ptrval.p_address;
+    msg_Dbg (obj, "requesting window...");
+    QPointer<MainInterface> *miP = (QPointer<MainInterface> *)ptrval.p_address;
+    miP = new QPointer<MainInterface> (*miP); /* create our own copy */
+    vlc_object_release (intf);
 
-    wnd->handle = mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
-                                    &wnd->width, &wnd->height);
-    vlc_mutex_unlock ((vlc_mutex_t *)lockval.p_address);
+    if (miP->isNull ())
+        return VLC_EGENERIC;
+
+    if (config_GetInt (obj, "embedded-video") <= 0)
+    {
+        (*miP)->requestNotEmbeddedVideo (wnd->vout);
+        return VLC_EGENERIC;
+    }
+
+    wnd->handle = (*miP)->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
+                                        &wnd->width, &wnd->height);
+    windowLock.unlock ();
     wnd->control = ControlWindow;
-    wnd->p_private = intf;
+    wnd->p_private = miP;
     return VLC_SUCCESS;
 }
 
 static int ControlWindow (vout_window_t *wnd, int query, va_list args)
 {
-    intf_thread_t *intf = (intf_thread_t *)wnd->p_private;
-    intf->p_sys->p_mi->controlVideo (wnd->handle, query, args);
+    QPointer<MainInterface> *miP = (QPointer<MainInterface> *)wnd->p_private;
+    QMutexLocker locker (&windowLock);
+
+    if (miP->isNull ())
+        return VLC_EGENERIC;
+    return (*miP)->controlVideo (wnd->handle, query, args);
 }
 
 static void CloseWindow (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
-    intf_thread_t *intf = (intf_thread_t *)obj->p_private;
+    QPointer<MainInterface> *miP = (QPointer<MainInterface> *)wnd->p_private;
+    QMutexLocker locker (&windowLock);
 
-    intf->p_sys->p_mi->releaseVideo (wnd->handle);
-    vlc_object_release (intf);
+    if (!miP->isNull ())
+        (*miP)->releaseVideo (wnd->handle);
+    delete miP;
 }

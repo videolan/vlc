@@ -291,7 +291,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     if( p_sys->b_images == true && p_sys->p_style->i_font_size == -1 )
     {
-        msg_Warn( p_filter, "rrs-size wasn't specified. Feed images will thus be displayed without being resized" );
+        msg_Warn( p_filter, "rss-size wasn't specified. Feed images will thus be displayed without being resized" );
     }
 
     if( FetchRSS( p_filter ) )

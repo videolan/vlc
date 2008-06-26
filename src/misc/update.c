@@ -1049,6 +1049,9 @@ update_t *__update_New( vlc_object_t *p_this )
     p_update->release.psz_url = NULL;
     p_update->release.psz_desc = NULL;
 
+    p_update->p_download = NULL;
+    p_update->p_check = NULL;
+
     p_update->p_pkey = NULL;
     vlc_gcrypt_init();
 
@@ -1065,6 +1068,21 @@ void update_Delete( update_t *p_update )
 {
     assert( p_update );
 
+    vlc_mutex_lock( &p_update->lock );
+
+    if( p_update->p_check )
+    {
+        assert( !p_update->p_download );
+        vlc_object_kill( p_update->p_check );
+        vlc_thread_join( p_update->p_check );
+    }
+    else if( p_update->p_download )
+    {
+        vlc_object_kill( p_update->p_download );
+        vlc_thread_join( p_update->p_download );
+    }
+
+    vlc_mutex_unlock( &p_update->lock );
     vlc_mutex_destroy( &p_update->lock );
 
     free( p_update->release.psz_url );
@@ -1336,19 +1354,7 @@ error:
     return false;
 }
 
-
-/**
- * Struct to launch the check in an other thread
- */
-typedef struct
-{
-    VLC_COMMON_MEMBERS
-    update_t *p_update;
-    void (*pf_callback)( void *, bool );
-    void *p_data;
-} update_check_thread_t;
-
-void update_CheckReal( update_check_thread_t *p_uct );
+static void update_CheckReal( update_check_thread_t *p_uct );
 
 /**
  * Check for updates
@@ -1367,6 +1373,7 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ), void 
     if( !p_uct ) return;
 
     p_uct->p_update = p_update;
+    p_update->p_check = p_uct;
     p_uct->pf_callback = pf_callback;
     p_uct->p_data = p_data;
 
@@ -1385,6 +1392,10 @@ void update_CheckReal( update_check_thread_t *p_uct )
 
     if( p_uct->pf_callback )
         (p_uct->pf_callback)( p_uct->p_data, b_ret );
+
+    p_uct->p_update->p_check = NULL;
+
+    vlc_object_release( p_uct );
 }
 
 /**
@@ -1425,18 +1436,7 @@ static char *size_str( long int l_size )
     return i_retval == -1 ? NULL : psz_tmp;
 }
 
-
-/**
- * Struct to launch the download in a thread
- */
-typedef struct
-{
-    VLC_COMMON_MEMBERS
-    update_t *p_update;
-    char *psz_destdir;
-} update_download_thread_t;
-
-void update_DownloadReal( update_download_thread_t *p_udt );
+static void update_DownloadReal( update_download_thread_t *p_udt );
 
 /**
  * Download the file given in the update_t
@@ -1455,13 +1455,14 @@ void update_Download( update_t *p_update, const char *psz_destdir )
         return;
 
     p_udt->p_update = p_update;
+    p_update->p_download = p_udt;
     p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;
 
     vlc_thread_create( p_udt, "download update", update_DownloadReal,
                        VLC_THREAD_PRIORITY_LOW, false );
 }
 
-void update_DownloadReal( update_download_thread_t *p_udt )
+static void update_DownloadReal( update_download_thread_t *p_udt )
 {
     int i_progress = 0;
     long int l_size;
@@ -1523,9 +1524,12 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         free( psz_status );
     }
 
-    while( ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
-                                   !intf_ProgressIsCancelled( p_udt, i_progress ) )
+    vlc_object_lock( p_udt );
+    while( vlc_object_alive( p_udt ) &&
+           ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
+           !intf_ProgressIsCancelled( p_udt, i_progress ) )
     {
+        vlc_object_unlock( p_udt );
         if( fwrite( p_buffer, i_read, 1, p_file ) < 1 )
         {
             msg_Err( p_udt, "Failed to write into %s", psz_destfile );
@@ -1544,14 +1548,17 @@ void update_DownloadReal( update_download_thread_t *p_udt )
             free( psz_status );
         }
         free( psz_downloaded );
+        vlc_object_lock( p_udt );
     }
 
     /* Finish the progress bar or delete the file if the user had canceled */
     fclose( p_file );
     p_file = NULL;
 
-    if( !intf_ProgressIsCancelled( p_udt, i_progress ) )
+    if( vlc_object_alive( p_udt ) &&
+        !intf_ProgressIsCancelled( p_udt, i_progress ) )
     {
+        vlc_object_unlock( p_udt );
         if( asprintf( &psz_status, "%s\nDone %s (100.0%%)",
             p_update->release.psz_url, psz_size ) != -1 )
         {
@@ -1561,6 +1568,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     }
     else
     {
+        vlc_object_unlock( p_udt );
         utf8_unlink( psz_destfile );
         goto end;
     }
@@ -1652,6 +1660,10 @@ end:
     free( psz_destfile );
     free( p_buffer );
     free( psz_size );
+
+    p_udt->p_update->p_download = NULL;
+
+    vlc_object_release( p_udt );
 }
 
 update_release_t *update_GetRelease( update_t *p_update )

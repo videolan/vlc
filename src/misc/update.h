@@ -143,6 +143,26 @@ struct public_key_t
 typedef struct public_key_t public_key_t;
 
 /**
+ * Non blocking binary download
+ */
+typedef struct
+{
+    VLC_COMMON_MEMBERS
+    update_t *p_update;
+    char *psz_destdir;
+} update_download_thread_t;
+
+/**
+ * Non blocking update availability verification
+ */
+typedef struct
+{
+    VLC_COMMON_MEMBERS
+    update_t *p_update;
+    void (*pf_callback)( void *, bool );
+    void *p_data;
+} update_check_thread_t;
+/**
  * The update object. Stores (and caches) all information relative to updates
  */
 struct update_t
@@ -151,5 +171,7 @@ struct update_t
     vlc_mutex_t lock;
     struct update_release_t release;    ///< Release (version)
     public_key_t *p_pkey;
+    update_download_thread_t *p_download;
+    update_check_thread_t *p_check;
 };
 

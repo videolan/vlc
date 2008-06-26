@@ -410,13 +410,14 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.setupUi( this );
 
     /* CONNECTs */
-    CONNECT( ui.protocolCombo, currentIndexChanged( int ),
+    CONNECT( ui.protocolCombo, activated( int ),
              this, updateProtocol( int ) );
     CONNECT( ui.portSpin, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.addressText, textChanged( QString ), this, updateMRL());
     CONNECT( ui.timeShift, clicked(), this, updateMRL());
     CONNECT( ui.ipv6, clicked(), this, updateMRL());
 
+    ui.protocolCombo->addItem( "" );
     ui.protocolCombo->addItem("HTTP", QVariant("http"));
     ui.protocolCombo->addItem("HTTPS", QVariant("https"));
     ui.protocolCombo->addItem("FTP", QVariant("ftp"));
@@ -424,6 +425,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.protocolCombo->addItem("RTSP", QVariant("rtsp"));
     ui.protocolCombo->addItem("UDP/RTP (unicast)", QVariant("udp"));
     ui.protocolCombo->addItem("UDP/RTP (multicast)", QVariant("udp"));
+    ui.protocolCombo->addItem("RTMP", QVariant("rtmp"));
 }
 
 NetOpenPanel::~NetOpenPanel()
@@ -433,19 +435,26 @@ void NetOpenPanel::clear()
 {}
 
 /* update the widgets according the type of protocol */
-void NetOpenPanel::updateProtocol( int idx ) {
+void NetOpenPanel::updateProtocol( int idx_proto ) {
     QString addr = ui.addressText->text();
-    QString proto = ui.protocolCombo->itemData( idx ).toString();
+    QString proto = ui.protocolCombo->itemData( idx_proto ).toString();
 
-    ui.timeShift->setEnabled( idx >= 5 );
-    ui.ipv6->setEnabled( idx == 5 );
-    ui.addressText->setEnabled( idx != 5 );
-    ui.portSpin->setEnabled( idx >= 5 );
+    ui.timeShift->setEnabled( idx_proto == UDP_PROTO ||
+                              idx_proto == UDPM_PROTO );
+    ui.ipv6->setEnabled( idx_proto == UDP_PROTO );
+    ui.addressText->setEnabled( idx_proto != UDP_PROTO );
+    ui.portSpin->setEnabled( idx_proto == UDP_PROTO ||
+                             idx_proto == UDPM_PROTO );
+
+    if( idx_proto == NO_PROTO ) return;
 
     /* If we already have a protocol in the address, replace it */
-    if( addr.contains( "://")) {
-        msg_Err( p_intf, "replace");
-        addr.replace( QRegExp("^.*://"), proto + "://");
+    if( addr.contains( "://"))
+    {
+        if( idx_proto != UDPM_PROTO )
+            addr.replace( QRegExp("^.*://@*"), proto + "://");
+        else
+             addr.replace( QRegExp("^.*://"), proto + "://@");
         ui.addressText->setText( addr );
     }
     updateMRL();
@@ -455,36 +464,41 @@ void NetOpenPanel::updateMRL() {
     QString mrl = "";
     QString addr = ui.addressText->text();
     addr = QUrl::toPercentEncoding( addr, ":/?#@!$&'()*+,;=" );
-    int proto = ui.protocolCombo->currentIndex();
+    int idx_proto = ui.protocolCombo->currentIndex();
 
-    if( addr.contains( "://") && ( proto != 5 || proto != 6 ) )
+    if( addr.contains( "://"))
     {
-        mrl = addr;
+        /* Match the correct item in the comboBox */
+        ui.protocolCombo->setCurrentIndex(
+                ui.protocolCombo->findData( addr.section( ':', 0, 0 ) ) );
+
+        if( idx_proto != UDP_PROTO || idx_proto != UDPM_PROTO )
+            mrl = addr;
     }
     else
     {
-        switch( proto ) {
-        case 0:
+        switch( idx_proto ) {
+        case HTTP_PROTO:
             mrl = "http://" + addr;
             emit methodChanged("http-caching");
             break;
-        case 1:
+        case HTTPS_PROTO:
             mrl = "https://" + addr;
             emit methodChanged("http-caching");
             break;
-        case 3:
+        case MMS_PROTO:
             mrl = "mms://" + addr;
             emit methodChanged("mms-caching");
             break;
-        case 2:
+        case FTP_PROTO:
             mrl = "ftp://" + addr;
             emit methodChanged("ftp-caching");
             break;
-        case 4: /* RTSP */
+        case RTSP_PROTO:
             mrl = "rtsp://" + addr;
             emit methodChanged("rtsp-caching");
             break;
-        case 5:
+        case UDP_PROTO:
             mrl = "udp://@";
             if( ui.ipv6->isEnabled() && ui.ipv6->isChecked() )
             {
@@ -493,7 +507,7 @@ void NetOpenPanel::updateMRL() {
             mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
             break;
-        case 6: /* UDP multicast */
+        case UDPM_PROTO: /* UDP multicast */
             mrl = "udp://@";
             /* Add [] to IPv6 */
             if ( addr.contains(':') && !addr.contains('[') )
@@ -503,6 +517,11 @@ void NetOpenPanel::updateMRL() {
             else mrl += addr;
             mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
+        case RTMP_PROTO:
+            mrl = "rtmp://" + addr;
+            emit methodChanged("rtmp-caching");
+            break;
+
         }
     }
 
@@ -907,10 +926,10 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     screenDevLayout->addWidget( screenLabel, 0, 0 );
 
     /* General connects */
-    connect( ui.deviceCombo, SIGNAL( activated( int ) ),
-                     stackedDevLayout, SLOT( setCurrentIndex( int ) ) );
-    connect( ui.deviceCombo, SIGNAL( activated( int ) ),
-                     stackedPropLayout, SLOT( setCurrentIndex( int ) ) );
+    CONNECT( ui.deviceCombo, activated( int ) ,
+             stackedDevLayout, setCurrentIndex( int ) );
+    CONNECT( ui.deviceCombo, activated( int ),
+             stackedPropLayout, setCurrentIndex( int ) );
     CONNECT( ui.deviceCombo, activated( int ), this, updateMRL() );
     CONNECT( ui.deviceCombo, activated( int ), this, updateButtons() );
 
@@ -1114,7 +1133,7 @@ void CaptureOpenPanel::advancedDialog()
     advButtonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
     advButtonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    gLayout->addWidget( advButtonBox, i_confsize + 1, 0, 1, -1  );
+    mainLayout->addWidget( advButtonBox );
 
     /* Creation of the MRL */
     if( adv->exec() )

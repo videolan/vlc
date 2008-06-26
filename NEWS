@@ -5,6 +5,7 @@ Changes between 0.8.6 and 0.9.0-git (not released yet):
 
 Important notes:
 ----------------
+ * This release will not work with Windows 98/ME and Mac OS X 10.3.9 (Panther)
  * The HTTP interface is now only available on the local machine by default.
    If you want to make it available from other machines, you will have to
    edit the ".hosts" file.
@@ -15,9 +16,9 @@ Important notes:
      C:\Program Files\VideoLAN\VLC\http\old\.hosts
    - On Mac OS X, you can find it in VLC.app/Contents/MacOS/share/http/.hosts
      and respectively in VLC.app/Contents/MacOS/share/http/old/.hosts
- * This version of VLC contains a new interface for Windows and Linux. This
-   interface lacks the "Streaming Wizard" that used to be present in VLC 0.8.6.
-   It will be replaced by a better alternative in the next version. 
+ * This version of VLC contains a new interface for Windows and Linux.
+   This interface has a fullscreen controller. This interface lacks the
+   "Streaming Wizard" that used to be present in VLC 0.8.6.
    If you absolutely need it, we advise you to keep VLC 0.8.6.
  * The behavior of --sout-keep was changed. It's now activated by default.
  * The marq, mosaic and logo commands in the rc interface changed. They
@@ -33,14 +34,15 @@ Important notes:
    EXTVLCOPT options parsing in m3u playlists. Note that only a limited set
    of options is available to m3u playlists (CVE-2007-6683).
  * The old access:url syntax is no longer supported. Use access://url instead.
-	E.g.:  vlc:quit -> vlc://quit ; 
-	       udp:@239.255.12.12 -> udp://@239.255.12.12
+    E.g.:  vlc:quit -> vlc://quit ; 
+           udp:@239.255.12.12 -> udp://@239.255.12.12
  * The ffmpeg module has been removed and replaced by avcodec, avformat, swscale
    (or imgresample if you use a swscale-less ffmpeg build) and postproc modules.
- * The web plugins ActiveX (IE)/Firefox/Mozilla/Safari now recognize the following
-   states: IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4, STOPPING=5,
-   FORWARD=6, BACKWARD=7, ENDED=8, ERROR=9. With FORWARD and BACKWARD being
-   reserved for future implementations and are thus not functional atm.
+ * The web plugins ActiveX (IE)/Firefox/Mozilla/Safari now recognize the
+   following states: IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4,
+   STOPPING=5, FORWARD=6, BACKWARD=7, ENDED=8, ERROR=9. With FORWARD and
+   BACKWARD being reserved for future implementations and are thus not
+   functional atm.
  * Croping and padding in transcode are now done using the croppadd video
    filter. For example:
    transcode{vcodec=mp2v,vfilter=croppadd{cropttop=20,cropbottom=30,paddleft=100}}
@@ -56,7 +58,7 @@ Security updates:
 
 Playlist:
  * Vastly improved playlist support:
-    * Media library support
+    * Media library creation to save all your playlist items
     * "Live search"
     * Shoutcast TV listings
     * Audioscrobbler/Last.FM support
@@ -74,15 +76,15 @@ Inputs:
  * JACK audio input support
  * Input run time option (improved live stream recording)
  * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
- * Re-written Screen access module for Mac OS X
+ * Re-written Screen access module for Mac OS X 
    using OpenGL instead of QuickDraw
  * Screen module now supports partial screen capture and mouse following on X11.
- * Experimental EyeTV access module (Mac OS X only)
+ * Experimental EyeTV access module
    This requires the user to install a plugin to EyeTV.app
    (available as a separate download).
  * RTMP input support
  * QTKit-based Input module for Mac OS X allowing display and streaming of video
-   taken from all QuickTime-compatible video devices (no audio yet)
+   taken from all iSight-labelled video cameras (no audio support)
  * HTTP access now supports gzip compressed data and Digest Access
    Authentication.
  * New options to reduce latency between arrival of raw data and display of
@@ -102,6 +104,7 @@ Demuxers:
  * TiVo Series 2 support
  * CD+G karaoke Files support
  * MXF files support
+ * OMA support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
@@ -113,15 +116,15 @@ Decoders:
  * Fluidsynth MIDI software synthesis (with external sound fonts)
  * New codec FOURCCs to support more specific files:
    Avid, FCP, Sony, Samsung, ...
- * Closed Caption Decoder (DVD, ReplayTV, TiVo, DVB/ATSC)
  * H.264 PAFF support
  * DNxHD / VC-3 support
  * NellyMoser ASAO support
  * APE (Monkey audio) support
- * VBI & EBU (Teletext) support
  * RealVideo support (with the RealVideo run-time)
 
 Subtitles:
+ * Closed Caption Decoder (DVD, ReplayTV, TiVo, DVB/ATSC)
+ * VBI & EBU (Teletext) support (*nix, Mac OS)
  * Ogg/Kate subtitles support
  * AQTitle subtitles support
  * MKV USF subtitles support
@@ -141,7 +144,7 @@ Encoders:
  * Improved H.264 encoding speed
 
 Video outputs and filters:
- * New CoreAnimation output module (Mac OS X 10.5 only)
+ * New CoreAnimation-based output module (VLCKit framework on OS X only)
  * Adjust, Invert and Distort (now split into Wave, Ripple, Gradient and
    Psychedelic) video filters can now be streamed
  * New puzzle video output filter
@@ -180,8 +183,6 @@ Stream output:
  * RTMP output
 
 Interfaces:
- * Windows/Linux
-   * Brand new interface for Linux and Windows, based on the Qt toolkit
  * All
    * New Simple Preferences dialogs showing the most important settings in an
      end-user suitable way.
@@ -189,12 +190,16 @@ Interfaces:
    * Improved mouse gestures
    * Vastly improved Update checker
    * Full support for meta data editing (ID3v2, Ogg/Vorbis, AAC, APEv1/2)
+ * Windows/Linux
+   * Brand new interface for Linux and Windows, based on the Qt toolkit
+   * Fullscreen controller (transparency on Linux+Composite)
  * Mac OS X
    * Improved video output features
    * Online access to VideoLAN's Help Wiki within VLC
    * New setting to disable the "Recent Items" service
    * When playing Radio (live) streams, the current track is shown correctly
    * Correct appearance on Macs using Aqua's graphite theme
+   * Simplified Extended Controls panel
  * Ncurses:
    * Correctly displays wide characters when using an UTF-8 locale, 
      if libncursesw is available.
@@ -216,12 +221,12 @@ Linux Port:
    (which means that VLC doesn't use the $HOME/.vlc directory anymore)
 
 Mac OS X Port:
- * Mac OS X Framework that can be used to embed VLC in third party
+ * Mac OS X Framework "VLCKit" that can be used to embed VLC in third party
    applications (Google Summer of Code Student project, Mac OS X 10.5 only)
  * New text renderer based on Quartz replacing the existing Freetype solution
  * Complete compatibility with Mac OS X 10.5 Leopard
    * It is now required to compile a fully featured build
- * The support of Mac OS X 10.3.9 was discontinued.
+ * The support of Mac OS X 10.3.9 and QuickTime 6.x was discontinued.
 
 LibVLC:
  * Event management and various improvements in libvlc
@@ -947,12 +952,12 @@ Video Output:
  * Experimental generic OpenGL video output (X11, Win32, MacOS X)
    with support for effects.
  * Improved filter and subpictures support :
-	- New filters can be streamed.
-	- "Subpicture filters" to overlay subpictures on video 
-	- Centralized scaling and blending
+    - New filters can be streamed.
+    - "Subpicture filters" to overlay subpictures on video 
+    - Centralized scaling and blending
  * New filters : 
-	- "time", to display current time 
-	- "marq", to display a marquee
+    - "time", to display current time 
+    - "marq", to display a marquee
 
 Interfaces:
  * OSD sliders for volume and postition information

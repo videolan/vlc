@@ -50,6 +50,20 @@
 
 enum
 {
+    NO_PROTO,
+    HTTP_PROTO,
+    HTTPS_PROTO,
+    MMS_PROTO,
+    FTP_PROTO,
+    RTSP_PROTO,
+    UDP_PROTO,
+    UDPM_PROTO,
+    RTMP_PROTO
+};
+
+
+enum
+{
     V4L_DEVICE,
     V4L2_DEVICE,
     PVR_DEVICE,
