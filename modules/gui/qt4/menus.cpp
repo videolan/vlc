@@ -801,9 +801,9 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                             qtr( "Leave Fullscreen" ),"" , ITEM_NORMAL,
                             p_vout->i_object_id, val, VLC_VAR_BOOL,
                             b_isFullscreen );
+                vlc_object_release( p_vout );
             }
 
-            vlc_object_release( p_vout );
             menu->addSeparator();
 
             vlc_object_yield( p_input );
