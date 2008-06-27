@@ -817,6 +817,7 @@ static int Open( vlc_object_t *p_this )
         else
         {
             csa_Delete( p_sys->csa );
+            p_sys->csa = NULL;
         }
 
         if( p_sys->csa )
@@ -874,9 +875,9 @@ static void Close( vlc_object_t * p_this )
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
         csa_Delete( p_sys->csa );
+        p_sys->csa = NULL;
     }
     vlc_mutex_unlock( &p_sys->csa_lock );
-    vlc_mutex_destroy( &p_sys->csa_lock );
 
     for( i = 0; i < MAX_PMT; i++ )
     {
@@ -884,6 +885,7 @@ static void Close( vlc_object_t * p_this )
         free( p_sys->sdt_descriptors[i].psz_provider );
     }
 
+    vlc_mutex_destroy( &p_sys->csa_lock );
     free( p_sys->dvbpmt );
     free( p_sys );
 }
