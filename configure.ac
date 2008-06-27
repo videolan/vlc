@@ -3587,6 +3587,22 @@ if test "${enable_dirac}" = "yes"; then
 fi
 
 dnl
+dnl  schroedinger decoder plugin (for dirac format video)
+dnl
+AC_ARG_ENABLE(schroedinger,
+[  --disable-schroedinger   high performance dirac codec (default enabled)])
+if test "${enable_schroedinger}" != "no"; then
+  PKG_CHECK_MODULES(SCHROEDINGER,[schroedinger-1.0 >= 1.0], [
+      VLC_ADD_PLUGIN([schroedinger])
+      VLC_ADD_CFLAGS([schroedinger],[$SCHROEDINGER_CFLAGS])
+      VLC_ADD_LIBS([schroedinger],[$SCHROEDINGER_LIBS]) ], [
+        AS_IF([test "x${enable_schroedinger}" != "x"], [
+          AC_MSG_ERROR([${SCHROEDINGER_PKG_ERRORS}])
+        ])
+])
+fi
+
+dnl
 dnl  PNG decoder module
 dnl
 AC_ARG_ENABLE(png,
