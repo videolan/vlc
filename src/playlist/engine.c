@@ -1,8 +1,7 @@
 /*****************************************************************************
  * engine.c : Run the playlist and handle its control
  *****************************************************************************
- * Copyright (C) 1999-2007 the VideoLAN team
- * $Id$
+ * Copyright (C) 1999-2008 the VideoLAN team
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -196,6 +195,16 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
     }
 
     vlc_mutex_lock( &p_playlist->gc_lock );
+    while( ( p_obj = vlc_object_find( p_playlist->p_libvlc, VLC_OBJECT_VOUT,
+                                                  FIND_CHILD ) ) )
+    {
+        vlc_object_release( p_obj );
+        if( p_obj->p_parent == VLC_OBJECT(p_playlist->p_libvlc) )
+        {
+            msg_Dbg( p_playlist, "garbage collector destroying 1 vout" );
+            vlc_object_release( p_obj ); /* Hmm, is this (thread-)safe?? */
+        }
+    }
     p_playlist->b_cant_sleep = false;
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
