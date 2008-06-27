@@ -109,6 +109,7 @@ LIBDVDCSS_URL=$(VIDEOLAN)/libdvdcss/$(LIBDVDCSS_VERSION)/libdvdcss-$(LIBDVDCSS_V
 LIBDVDNAV_VERSION=4.1.1
 LIBDVDNAV_URL=http://www1.mplayerhq.hu/MPlayer/releases/dvdnav/libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 LIBDVDNAV_SVN=svn://svn.mplayerhq.hu/dvdnav/trunk/libdvdnav
+LIBDVDREAD_SVN=svn://svn.mplayerhq.hu/dvdnav/trunk/libdvdread
 LIBDVDREAD_VERSION=0.9.7
 LIBDVDREAD_URL=http://www.dtek.chalmers.se/groups/dvd/dist/libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 #LIBDVDREAD_URL=$(VIDEOLAN)/libdvdread/$(LIBDVDREAD_VERSION)/libdvdread-$(LIBDVDREAD_VERSION).tar.gz

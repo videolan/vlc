@@ -1167,15 +1167,14 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # libdvdread: We use dvdnav's dvdread
 # ***************************************************************************
 
-libdvdread-$(LIBDVDREAD_VERSION).tar.gz:
-	$(WGET) $(LIBDVDREAD_URL)
 
-libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
-	$(EXTRACT_GZ)
+libdvdread: 
+	$(SVN) co $(LIBDVDREAD_SVN)  libdvdread
+	(cd $@; patch  -p 0 < ../Patches/libdvdread.patch)
 #ifdef HAVE_WIN32
-	patch  -p 0 < Patches/libdvdread-win32.patch
-	(cd $@; ./bootstrap )
+	(cd $@; patch  -p 0 < ../Patches/libdvdread-win32.patch)
 #endif
+	(cd $@; sh autogen.sh)
 
 .libdvdread: libdvdread .dvdcss
 	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
@@ -1184,7 +1183,7 @@ libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 
 CLEAN_FILE += .libdvdread
 CLEAN_PKG += libdvdread
-DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.gz
+#DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 
 # ***************************************************************************
 # libdvdnav
@@ -2443,7 +2442,7 @@ schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
 	patch -d schroedinger -p1 < Patches/libschroedinger-fix-build-OSX.patch
 	patch -d schroedinger -p1 < Patches/libschroedinger-fix-build-OSX-test.patch
 
-.schroedinger: .liboil schroedinger
+.schroedinger: schroedinger .liboil
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	touch $@
 

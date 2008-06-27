@@ -1,75 +1,22 @@
---- libdvdread/configure.in	2006-10-06 10:12:31.000000000 +0200
-+++ libdvdread.new/configure.in	2008-06-12 06:42:29.000000000 +0200
-@@ -16,7 +16,7 @@
-     AC_DEFINE(__DARWIN__, 1, Have a Mac OS X system)
-     ;;
-   x*mingw32* | x*cygwin*)
--    CFLAGS="${CFLAGS} -Dssize_t=long"
-+    CFLAGS="${CFLAGS}"
-     ;;
-   x*)
-     ;;
-@@ -102,6 +102,11 @@
-       [ ],
-       AC_MSG_ERROR(You need libdvdcss (dvdcss.h))
-     )
-+    case "x${host}" in
-+    x*mingw32* | x*cygwin*)
-+    CSS_LIBS=-ldvdcss
-+    ;;
-+    x*)
-     AC_MSG_CHECKING([for dvdcss_interface_2 in -ldvdcss])
-     saved_LDFLAGS=$LDFLAGS
-     LDFLAGS="$LDFLAGS -ldvdcss"
-@@ -113,6 +118,8 @@
-         ] )
-     LDFLAGS=$saved_LDFLAGS
-     AC_MSG_RESULT([yes])
-+    ;;
-+    esac
-   else
-     dnl -w added to shutup GCC3.1's cpp warning about -I/usr/local
-     saved_CPPFLAGS=$CPPFLAGS
-@@ -124,6 +131,12 @@
-     CPPFLAGS=$saved_CPPFLAGS
-     saved_CFLAGS=$CFLAGS
--    CFLAGS="$CFLAGS -I$dvdcss_include -L$dvdcss_lib -ldvdcss"
-+    CFLAGS="$CFLAGS -I$dvdcss_include "
-+    case "x${host}" in
-+    x*mingw32* | x*cygwin*)
-+    CSS_LIBS="-L$dvdcss_path/lib -R$dvdcss_path/lib -ldvdcss"
-+    CSS_CFLAGS=-I$dvdcss_path/include
-+    ;;
-+    x*)
-     AC_MSG_CHECKING([for dvdcss_interface_2 in -ldvdcss])
-     AC_TRY_LINK([#include <dvdcss/dvdcss.h>], 
-                 [if(!dvdcss_interface_2) { return 1; }],
-@@ -134,6 +147,8 @@
-         ] )
-     CFLAGS=$saved_CFLAGS
-     AC_MSG_RESULT([yes])
-+    ;;
-+    esac
-   fi
- fi
+Index: src/dvd_reader.c
+===================================================================
+--- src/dvd_reader.c	(revision 1107)
++++ src/dvd_reader.c	(working copy)
+@@ -32,6 +32,7 @@
+ #include <limits.h>
+ #include <dirent.h>
  
---- libdvdread/dvdread/dvd_reader.c	2006-10-06 09:58:03.000000000 +0200
-+++ libdvdread.new/dvdread/dvd_reader.c	2008-06-12 06:42:28.000000000 +0200
-@@ -182,7 +182,7 @@
- 
-   dev->align = align;
- }
--
 +#if 0
- #ifdef WIN32 /* replacement gettimeofday implementation */
- #include <sys/timeb.h>
- static int gettimeofday( struct timeval *tv, void *tz )
-@@ -194,7 +194,7 @@
-   return 0;
- }
+ /* misc win32 helpers */
+ #ifdef WIN32
+ #ifndef HAVE_GETTIMEOFDAY
+@@ -50,7 +51,8 @@
+ #include <io.h> /* read() */
+ #define lseek64 _lseeki64
  #endif
--
+- 
 +#endif
- 
- /* Loop over all titles and call dvdcss_title to crack the keys. */
- static int initAllCSSKeys( dvd_reader_t *dvd )
++
+ #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__)|| defined(__DARWIN__)
+ #define SYS_BSD 1
+ #endif
