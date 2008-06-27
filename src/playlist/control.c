@@ -44,6 +44,11 @@ static void PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
 playlist_t *__pl_Yield( vlc_object_t *p_this )
 {
     playlist_t *pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
+    /* Objects that are destroyed _after_ the playlist cannot use pl_Yield() */
+    assert (p_this->i_object_type != VLC_OBJECT_VOUT);
+    assert (p_this->i_object_type != VLC_OBJECT_ANNOUNCE);
+    assert ((void *)p_this != libvlc_priv (p_this->p_libvlc)->p_interaction);
+
     assert( pl != NULL );
     vlc_object_yield( pl );
     return pl;
