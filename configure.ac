@@ -4849,6 +4849,28 @@ fi
 AM_CONDITIONAL(BUILD_PDA, [test "${enable_pda}" = "yes"])
 
 dnl
+dnl Maemo
+dnl
+AC_ARG_ENABLE(maemo,
+  [  --enable-maemo          Internet tablets based on Maemo SDK (default disabled)])
+if test "${enable_maemo}" != "no"
+then
+  PKG_CHECK_MODULES(HILDON, [hildon-1 hildon-fm-2], [
+    VLC_ADD_CFLAGS([maemo],[${HILDON_CFLAGS}])
+    VLC_ADD_LIBS([maemo],[${HILDON_LIBS}])
+    VLC_ADD_PLUGIN([maemo])
+    AC_DEFINE([BUILD_MAEMO], 1, [Define if you're using Maemo interfaces])
+    ALIASES="${ALIASES} mvlc"
+  ], [
+    AS_IF([test "${enable_maemo}" = "yes"],[
+      AC_MSG_ERROR([Hildon libraries not found])
+    ])
+    enable_maemo="no"
+  ])
+fi
+AM_CONDITIONAL(BUILD_MAEMO, [test "${enable_maemo}" = "yes"])
+
+dnl
 dnl QT 4
 dnl
 AC_ARG_ENABLE(qt4,
@@ -5796,6 +5818,7 @@ AC_CONFIG_FILES([
   modules/gui/beos/Makefile
   modules/gui/pda/Makefile
   modules/gui/macosx/Makefile
+  modules/gui/maemo/Makefile
   modules/gui/minimal_macosx/Makefile
   modules/gui/qnx/Makefile
   modules/gui/qt4/Makefile

@@ -28,7 +28,8 @@ EXTRA_DIST = \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd) \
 	$(DIST_osdmenu_minimal) \
-	$(DIST_mozilla)
+	$(DIST_mozilla) \
+	$(DIST_maemo)
 
 if BUILD_SKINS
 nobase_pkgdata_DATA = skins2/default.vlt
@@ -55,6 +56,9 @@ endif
 if BUILD_MOZILLA
 # TODO: move to the mozilla directory
 nobase_dist_pkgdata_DATA += $(DIST_mozilla)
+endif
+if BUILD_MAEMO
+nobase_dist_pkgdata_DATA += $(DIST_maemo)
 endif
 
 DIST_rsrc = \
@@ -385,3 +389,27 @@ DIST_mozilla = \
 	mozilla/volume_max.xpm \
 	mozilla/volume_mute.xpm \
 	mozilla/volume_slider_bar.xpm
+
+DIST_maemo = \
+	maemo/vlc_intf.rc \
+	maemo/vlc_left_tab_active.png \
+	maemo/vlc_left_tab_passive.png \
+	maemo/playlist.png \
+	maemo/play.png \
+	maemo/pause.png \
+	maemo/stop.png \
+	maemo/previous.png \
+	maemo/next.png \
+	maemo/vlc32x32.png
+
+maemo_FILES = \
+	../modules/gui/qt4/pixmaps/play.png \
+	../modules/gui/qt4/pixmaps/pause.png \
+	../modules/gui/qt4/pixmaps/stop.png \
+	../modules/gui/qt4/pixmaps/previous.png \
+	../modules/gui/qt4/pixmaps/next.png \
+	vlc32x32.png
+
+$(DIST_maemo): $(maemo_FILES)
+	mkdir -p maemo
+	cp -r $+ maemo

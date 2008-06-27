@@ -358,7 +358,7 @@ endif
 # Building aliases
 ###############################################################################
 
-ALL_ALIASES = cvlc rvlc svlc wxvlc qvlc nvlc
+ALL_ALIASES = cvlc rvlc svlc wxvlc qvlc nvlc mvlc
 bin_SCRIPTS = $(ALIASES)
 CLEANFILES += $(ALIASES) $(noinst_SCRIPTS)
 EXTRA_SCRIPTS = $(ALL_ALIASES)
@@ -384,6 +384,9 @@ qvlc: make-alias
 
 nvlc: make-alias
 	$(MKALIAS) ncurses
+
+mvlc: make-alias
+	$(MKALIAS) maemo
 
 if BUILD_VLC
 noinst_SCRIPTS += vlc$(EXEEXT)

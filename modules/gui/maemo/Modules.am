@@ -1,0 +1,8 @@
+SOURCES_maemo = maemo.c \
+		maemo.h \
+		maemo_callbacks.c \
+		maemo_callbacks.h \
+		maemo_input.c \
+		maemo_input.h \
+		maemo_interface.c \
+		maemo_interface.h
