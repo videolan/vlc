@@ -773,6 +773,11 @@ static struct
       VIDEO_ES, "SGI Image" },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(55<<8)+0)
+    { VLC_FOURCC('d','r','a','c'), CODEC_ID_DIRAC,
+      VIDEO_ES, "Dirac" },
+#endif
+
     /*
      *  Audio Codecs
      */
