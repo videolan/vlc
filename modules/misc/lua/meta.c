@@ -58,6 +58,8 @@ static lua_State *vlclua_meta_init( vlc_object_t *p_this,
 /*****************************************************************************
  * Init lua
  *****************************************************************************/
+static luaL_Reg p_reg[] = { { NULL, NULL } };
+
 static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item )
 {
     lua_State * L = luaL_newstate();
@@ -71,7 +73,7 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
     /* Load Lua libraries */
     luaL_openlibs( L ); /* XXX: Don't open all the libs? */
 
-    luaL_register( L, "vlc", NULL /* FIXME ? */ );
+    luaL_register( L, "vlc", p_reg );
 
     luaopen_msg( L );
     luaopen_stream( L );
