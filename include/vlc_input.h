@@ -31,7 +31,7 @@
 #include <vlc_epg.h>
 #include <vlc_events.h>
 
-#include <string.h>                                     /* strstr() */
+#include <string.h>                                     /* strcasestr() */
 
 struct vlc_meta_t;
 
@@ -169,7 +169,7 @@ static inline bool input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta
         return false;
     }
     const char * meta = vlc_meta_Get( p_i->p_meta, meta_type );
-    bool ret = meta && strstr( meta, psz );
+    bool ret = meta && strcasestr( meta, psz );
     vlc_mutex_unlock( &p_i->lock );
 
     return ret;
