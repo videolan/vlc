@@ -246,6 +246,7 @@ static int Demux( demux_t *p_demux )
     input_thread_t *p_input_thread = (input_thread_t *)
         vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
     input_item_t *p_current_input = input_GetItem( p_input_thread );
+    playlist_t *p_playlist = pl_Yield( p_demux );
 
     luaL_register( L, "vlc", p_reg_parse );
 
@@ -269,12 +270,13 @@ static int Demux( demux_t *p_demux )
     }
 
     if( lua_gettop( L ) )
-        vlclua_playlist_add_internal( p_demux, L, NULL,
+        vlclua_playlist_add_internal( p_demux, L, p_playlist,
                                       p_current_input, 0 );
     else
         msg_Err( p_demux, "Script went completely foobar" );
 
     vlc_object_release( p_input_thread );
+    pl_Release( p_playlist );
 
     return -1; /* Needed for correct operation of go back */
 }
