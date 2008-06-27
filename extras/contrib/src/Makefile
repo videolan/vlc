@@ -1174,7 +1174,7 @@ libdvdread:
 #ifdef HAVE_WIN32
 	(cd $@; patch  -p 0 < ../Patches/libdvdread-win32.patch)
 #endif
-	(cd $@; sh autogen.sh)
+	(cd $@; sh autogen.sh noconfig)
 
 .libdvdread: libdvdread .dvdcss
 	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
@@ -1191,7 +1191,7 @@ CLEAN_PKG += libdvdread
 
 ifdef SVN
 libdvdnav:
-	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav -r1100
+	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav
 	patch -d libdvdnav -p0 < Patches/libdvdnav.patch
 	(cd $@; ./autogen.sh noconfig)
 else
@@ -1207,11 +1207,11 @@ endif
 	(cd $@; ./autogen.sh noconfig)
 endif
 
-.dvdnav: libdvdnav .libdvdread .dvdcss
+.dvdnav: libdvdnav .libdvdread
 ifdef HAVE_WIN32	
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) && make && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
