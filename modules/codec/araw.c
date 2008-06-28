@@ -72,6 +72,7 @@ static block_t *EncoderEncode( encoder_t *, aout_buffer_t * );
 struct decoder_sys_t
 {
     const int16_t *p_logtos16;  /* used with m/alaw to int16_t */
+    int i_bytespersample;
 
     audio_date_t end_date;
 };
@@ -404,6 +405,7 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     aout_DateInit( &p_sys->end_date, p_dec->fmt_out.audio.i_rate );
     aout_DateSet( &p_sys->end_date, 0 );
+    p_sys->i_bytespersample = ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8;
 
     p_dec->pf_decode_audio = DecodeBlock;
 
@@ -441,7 +443,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     /* Don't re-use the same pts twice */
     p_block->i_pts = 0;
 
-    i_samples = p_block->i_buffer * 8 / p_dec->fmt_in.audio.i_bitspersample /
+    i_samples = p_block->i_buffer / p_sys->i_bytespersample /
         p_dec->fmt_in.audio.i_channels;
 
     if( i_samples <= 0 )
