@@ -178,7 +178,9 @@ static int Open( vlc_object_t * p_this )
     /* see the following link for more information:
      * http://www.microsoft.com/whdc/device/audio/multichaud.mspx#EFAA */
     if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_EXTENSIBLE &&
-        i_size >= sizeof( WAVEFORMATEXTENSIBLE ) )
+        i_size >= sizeof( WAVEFORMATEXTENSIBLE ) &&
+        ( p_sys->fmt.i_extra + sizeof( WAVEFORMATEX )
+            >= sizeof( WAVEFORMATEXTENSIBLE ) ) )
     {
         unsigned i, i_channel_mask;
         GUID guid_subformat;
