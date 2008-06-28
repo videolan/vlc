@@ -1236,9 +1236,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
 
-//    vlc_value_t val;
-//    var_Change( p_playlist, "playlist-current", VLC_VAR_CHOICESCOUNT, &val, NULL );
-
     vlc_object_release( p_playlist );
 
     vlc_object_lock( p_intf );
