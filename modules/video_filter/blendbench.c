@@ -215,7 +215,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( p_sys->b_done )
         return p_pic;
 
-    p_blend = vlc_object_create( p_filter, VLC_OBJECT_FILTER );
+    p_blend = vlc_object_create( p_filter, sizeof(filter_t) );
     if( !p_blend )
     {
         p_pic->pf_release( p_pic );

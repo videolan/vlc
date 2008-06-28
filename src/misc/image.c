@@ -751,7 +751,7 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
 {
     filter_t *p_filter;
 
-    p_filter = vlc_object_create( p_this, VLC_OBJECT_FILTER );
+    p_filter = vlc_object_create( p_this, sizeof(filter_t) );
     vlc_object_attach( p_filter, p_this );
 
     p_filter->pf_vout_buffer_new =

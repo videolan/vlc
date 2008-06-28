@@ -655,7 +655,7 @@ static int InitThread( vout_thread_t *p_vout )
         p_vout->b_direct = 0;
 
         /* Choose the best module */
-        p_vout->p_chroma = vlc_object_create( p_vout, VLC_OBJECT_FILTER );
+        p_vout->p_chroma = vlc_object_create( p_vout, sizeof(filter_t) );
         filter_t *p_chroma = p_vout->p_chroma;
         vlc_object_attach( p_chroma, p_vout );
         /* TODO: Set the fmt_in and fmt_out stuff here */

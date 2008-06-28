@@ -44,7 +44,6 @@
 #define VLC_OBJECT_ENCODER     (-14)
 #define VLC_OBJECT_ANNOUNCE    (-17)
 #define VLC_OBJECT_OPENGL      (-21)
-#define VLC_OBJECT_FILTER      (-22)
 #define VLC_OBJECT_OSDMENU     (-28)
 /* Please add new object types below -34 */
 /* Please do not add new object types anyway */

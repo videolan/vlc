@@ -87,7 +87,7 @@ static void DeleteFilter( filter_t *p_filter )
 static filter_t *CreateFilter( vlc_object_t *p_this, video_format_t *fmt_in,
                                video_format_t *fmt_out )
 {
-    filter_t *p_filter = vlc_object_create( p_this, VLC_OBJECT_FILTER );
+    filter_t *p_filter = vlc_object_create( p_this, sizeof(filter_t) );
     vlc_object_attach( p_filter, p_this );
 
     p_filter->pf_vout_buffer_new = get_pic;
