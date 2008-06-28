@@ -140,7 +140,6 @@ void vout_ReleaseWindow( vout_thread_t *p_vout, void *dummy )
     assert (wnd->module);
     module_Unneed (wnd, wnd->module);
 
-    vlc_object_detach (wnd);
     vlc_object_release (wnd);
     (void)dummy;
 }
