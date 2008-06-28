@@ -362,7 +362,8 @@ interaction_t * interaction_Init( libvlc_int_t *p_libvlc )
     /* Make sure we haven't yet created an interaction object */
     assert( libvlc_priv(p_libvlc)->p_interaction == NULL );
 
-    p_interaction = vlc_custom_create( p_libvlc, sizeof( *p_interaction ),
+    p_interaction = vlc_custom_create( VLC_OBJECT(p_libvlc),
+                                       sizeof( *p_interaction ),
                                        VLC_OBJECT_GENERIC, "interaction" );
     if( !p_interaction )
         return NULL;
