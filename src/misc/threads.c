@@ -101,14 +101,13 @@ void vlc_pthread_fatal (const char *action, int error,
 {
     fprintf (stderr, "LibVLC fatal error %s in thread %lu at %s:%u: %d\n",
              action, vlc_threadid (), file, line, error);
-    fflush (stderr);
 
     /* Sometimes strerror_r() crashes too, so make sure we print an error
      * message before we invoke it */
 #ifdef __GLIBC__
     /* Avoid the strerror_r() prototype brain damage in glibc */
     errno = error;
-    dprintf (2, " Error message: %m at:\n");
+    fprintf (stderr, " Error message: %m at:\n");
 #else
     char buf[1000];
     const char *msg;
@@ -126,8 +125,8 @@ void vlc_pthread_fatal (const char *action, int error,
             break;
     }
     fprintf (stderr, " Error message: %s\n", msg);
-    fflush (stderr);
 #endif
+    fflush (stderr);
 
 #ifdef HAVE_BACKTRACE
     void *stack[20];
