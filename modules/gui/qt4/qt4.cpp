@@ -54,8 +54,8 @@
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
-static int  OpenWindow   ( vlc_object_t * );
-static void CloseWindow  ( vlc_object_t * );
+static int  WindowOpen   ( vlc_object_t * );
+static void WindowClose  ( vlc_object_t * );
 static void Run          ( intf_thread_t * );
 static void Init         ( intf_thread_t * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
@@ -210,7 +210,7 @@ vlc_module_begin();
 
     add_submodule();
         set_capability( "vout window", 50 );
-        set_callbacks( OpenWindow, CloseWindow );
+        set_callbacks( WindowOpen, WindowClose );
 vlc_module_end();
 
 /*****************************************************************************
@@ -461,9 +461,9 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
  */
 #include <vlc_window.h>
 
-static int ControlWindow (vout_window_t *, int, va_list);
+static int WindowControl (vout_window_t *, int, va_list);
 
-static int OpenWindow (vlc_object_t *obj)
+static int WindowOpen (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
 
@@ -504,12 +504,12 @@ static int OpenWindow (vlc_object_t *obj)
     wnd->handle = (*miP)->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
                                         &wnd->width, &wnd->height);
     windowLock.unlock ();
-    wnd->control = ControlWindow;
+    wnd->control = WindowControl;
     wnd->p_private = miP;
     return VLC_SUCCESS;
 }
 
-static int ControlWindow (vout_window_t *wnd, int query, va_list args)
+static int WindowControl (vout_window_t *wnd, int query, va_list args)
 {
     QPointer<MainInterface> *miP = (QPointer<MainInterface> *)wnd->p_private;
     QMutexLocker locker (&windowLock);
@@ -519,7 +519,7 @@ static int ControlWindow (vout_window_t *wnd, int query, va_list args)
     return (*miP)->controlVideo (wnd->handle, query, args);
 }
 
-static void CloseWindow (vlc_object_t *obj)
+static void WindowClose (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
     QPointer<MainInterface> *miP = (QPointer<MainInterface> *)wnd->p_private;
