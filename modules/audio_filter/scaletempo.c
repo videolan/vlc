@@ -81,36 +81,36 @@ typedef struct aout_filter_sys_t
     /* Filter static config */
     double    scale;
     /* parameters */
-    uint      ms_stride;
+    unsigned  ms_stride;
     double    percent_overlap;
-    uint      ms_search;
+    unsigned  ms_search;
     /* audio format */
-    uint      samples_per_frame;  /* AKA number of channels */
-    uint      bytes_per_sample;
-    uint      bytes_per_frame;
-    uint      sample_rate;
+    unsigned  samples_per_frame;  /* AKA number of channels */
+    unsigned  bytes_per_sample;
+    unsigned  bytes_per_frame;
+    unsigned  sample_rate;
     /* stride */
     double    frames_stride_scaled;
     double    frames_stride_error;
-    uint      bytes_stride;
+    unsigned  bytes_stride;
     double    bytes_stride_scaled;
-    uint      bytes_queue_max;
-    uint      bytes_queued;
-    uint      bytes_to_slide;
+    unsigned  bytes_queue_max;
+    unsigned  bytes_queued;
+    unsigned  bytes_to_slide;
     uint8_t  *buf_queue;
     /* overlap */
-    uint      samples_overlap;
-    uint      samples_standing;
-    uint      bytes_overlap;
-    uint      bytes_standing;
+    unsigned  samples_overlap;
+    unsigned  samples_standing;
+    unsigned  bytes_overlap;
+    unsigned  bytes_standing;
     void     *buf_overlap;
     void     *table_blend;
-    void    (*output_overlap)( aout_filter_t *p_filter, void *p_out_buf, uint bytes_off );
+    void    (*output_overlap)( aout_filter_t *p_filter, void *p_out_buf, unsigned bytes_off );
     /* best overlap */
-    uint      frames_search;
+    unsigned  frames_search;
     void     *buf_pre_corr;
     void     *table_window;
-    uint    (*best_overlap_offset)( aout_filter_t *p_filter );
+    unsigned(*best_overlap_offset)( aout_filter_t *p_filter );
     /* for "audio filter" only, manage own buffers */
     int       i_buf;
     uint8_t  *p_buffers[2];
@@ -119,13 +119,13 @@ typedef struct aout_filter_sys_t
 /*****************************************************************************
  * best_overlap_offset: calculate best offset for overlap
  *****************************************************************************/
-static uint best_overlap_offset_float( aout_filter_t *p_filter )
+static unsigned best_overlap_offset_float( aout_filter_t *p_filter )
 {
     aout_filter_sys_t *p = p_filter->p_sys;
     float *pw, *po, *ppc, *search_start;
     float best_corr = INT_MIN;
-    uint best_off = 0;
-    uint i, off;
+    unsigned best_off = 0;
+    unsigned i, off;
 
     pw  = p->table_window;
     po  = p->buf_overlap;
@@ -158,14 +158,14 @@ static uint best_overlap_offset_float( aout_filter_t *p_filter )
  *****************************************************************************/
 static void output_overlap_float( aout_filter_t   *p_filter,
                                   void            *buf_out,
-                                  uint             bytes_off )
+                                  unsigned         bytes_off )
 {
     aout_filter_sys_t *p = p_filter->p_sys;
     float *pout = buf_out;
     float *pb   = p->table_blend;
     float *po   = p->buf_overlap;
     float *pin  = (float *)( p->buf_queue + bytes_off );
-    uint i;
+    unsigned i;
     for( i = 0; i < p->samples_overlap; i++ ) {
         *pout++ = *po - *pb++ * ( *po - *pin++ ); po++;
     }
@@ -180,19 +180,19 @@ static size_t fill_queue( aout_filter_t *p_filter,
                           size_t         offset )
 {
     aout_filter_sys_t *p = p_filter->p_sys;
-    uint bytes_in = i_buffer - offset;
+    unsigned bytes_in = i_buffer - offset;
     size_t offset_unchanged = offset;
 
     if( p->bytes_to_slide > 0 ) {
         if( p->bytes_to_slide < p->bytes_queued ) {
-            uint bytes_in_move = p->bytes_queued - p->bytes_to_slide;
+            unsigned bytes_in_move = p->bytes_queued - p->bytes_to_slide;
             memmove( p->buf_queue,
                      p->buf_queue + p->bytes_to_slide,
                      bytes_in_move );
             p->bytes_to_slide = 0;
             p->bytes_queued   = bytes_in_move;
         } else {
-            uint bytes_in_skip;
+            unsigned bytes_in_skip;
             p->bytes_to_slide -= p->bytes_queued;
             bytes_in_skip      = __MIN( p->bytes_to_slide, bytes_in );
             p->bytes_queued    = 0;
@@ -203,7 +203,7 @@ static size_t fill_queue( aout_filter_t *p_filter,
     }
 
     if( bytes_in > 0 ) {
-        uint bytes_in_copy = __MIN( p->bytes_queue_max - p->bytes_queued, bytes_in );
+        unsigned bytes_in_copy = __MIN( p->bytes_queue_max - p->bytes_queued, bytes_in );
         memcpy( p->buf_queue + p->bytes_queued,
                 p_buffer + offset,
                 bytes_in_copy );
@@ -225,9 +225,9 @@ static size_t transform_buffer( aout_filter_t   *p_filter,
     aout_filter_sys_t *p = p_filter->p_sys;
 
     size_t offset_in = fill_queue( p_filter, p_buffer, i_buffer, 0 );
-    uint bytes_out = 0;
+    unsigned bytes_out = 0;
     while( p->bytes_queued >= p->bytes_queue_max ) {
-        uint bytes_off = 0;
+        unsigned bytes_off = 0;
 
         // output stride
         if( p->output_overlap ) {
@@ -247,7 +247,7 @@ static size_t transform_buffer( aout_filter_t   *p_filter,
                 p->buf_queue + bytes_off + p->bytes_stride,
                 p->bytes_overlap );
         double frames_to_slide = p->frames_stride_scaled + p->frames_stride_error;
-        uint   frames_to_stride_whole = (int)frames_to_slide;
+        unsigned frames_to_stride_whole = (int)frames_to_slide;
         p->bytes_to_slide       = frames_to_stride_whole * p->bytes_per_frame;
         p->frames_stride_error  = frames_to_slide - frames_to_stride_whole;
 
@@ -268,7 +268,7 @@ static size_t calculate_output_buffer_size( aout_filter_t   *p_filter,
     int bytes_to_out = bytes_in + p->bytes_queued - p->bytes_to_slide;
     if( bytes_to_out >= (int)p->bytes_queue_max ) {
       /* while (total_buffered - stride_length * n >= queue_max) n++ */
-      bytes_out = p->bytes_stride * ( (uint)(
+      bytes_out = p->bytes_stride * ( (unsigned)(
           ( bytes_to_out - p->bytes_queue_max + /* rounding protection */ p->bytes_per_frame )
           / p->bytes_stride_scaled ) + 1 );
     }
@@ -281,20 +281,20 @@ static size_t calculate_output_buffer_size( aout_filter_t   *p_filter,
 static int reinit_buffers( aout_filter_t *p_filter )
 {
     aout_filter_sys_t *p = p_filter->p_sys;
-    uint i,j;
+    unsigned i,j;
 
-    uint frames_stride = p->ms_stride * p->sample_rate / 1000.0;
+    unsigned frames_stride = p->ms_stride * p->sample_rate / 1000.0;
     p->bytes_stride = frames_stride * p->bytes_per_frame;
 
     /* overlap */
-    uint frames_overlap = frames_stride * p->percent_overlap;
+    unsigned frames_overlap = frames_stride * p->percent_overlap;
     if( frames_overlap < 1 ) { /* if no overlap */
         p->bytes_overlap    = 0;
         p->bytes_standing   = p->bytes_stride;
         p->samples_standing = p->bytes_standing / p->bytes_per_sample;
         p->output_overlap   = NULL;
     } else {
-        uint prev_overlap   = p->bytes_overlap;
+        unsigned prev_overlap   = p->bytes_overlap;
         p->bytes_overlap    = frames_overlap * p->bytes_per_frame;
         p->samples_overlap  = frames_overlap * p->samples_per_frame;
         p->bytes_standing   = p->bytes_stride - p->bytes_overlap;
@@ -323,7 +323,7 @@ static int reinit_buffers( aout_filter_t *p_filter )
     if( p->frames_search < 1 ) { /* if no search */
         p->best_overlap_offset = NULL;
     } else {
-        uint bytes_pre_corr = ( p->samples_overlap - p->samples_per_frame ) * 4; /* sizeof (int32|float) */
+        unsigned bytes_pre_corr = ( p->samples_overlap - p->samples_per_frame ) * 4; /* sizeof (int32|float) */
         p->buf_pre_corr = malloc( bytes_pre_corr );
         p->table_window = malloc( bytes_pre_corr );
         if( ! p->buf_pre_corr || ! p->table_window ) {
@@ -339,13 +339,13 @@ static int reinit_buffers( aout_filter_t *p_filter )
         p->best_overlap_offset = best_overlap_offset_float;
     }
 
-    uint new_size = ( p->frames_search + frames_stride + frames_overlap ) * p->bytes_per_frame;
+    unsigned new_size = ( p->frames_search + frames_stride + frames_overlap ) * p->bytes_per_frame;
     if( p->bytes_queued > new_size ) {
         if( p->bytes_to_slide > p->bytes_queued ) {
           p->bytes_to_slide -= p->bytes_queued;
           p->bytes_queued    = 0;
         } else {
-            uint new_queued = __MIN( p->bytes_queued - p->bytes_to_slide, new_size );
+            unsigned new_queued = __MIN( p->bytes_queued - p->bytes_to_slide, new_size );
             memmove( p->buf_queue,
                      p->buf_queue + p->bytes_queued - new_queued,
                      new_queued );
