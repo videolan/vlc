@@ -463,7 +463,10 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     /* Allocate our private structure for the decoder */
     p_dec->p_owner = p_owner = malloc( sizeof( decoder_owner_sys_t ) );
     if( p_dec->p_owner == NULL )
+    {
+        vlc_object_release( p_dec );
         return NULL;
+    }
     p_dec->p_owner->b_own_thread = true;
     p_dec->p_owner->i_preroll_end = -1;
     p_dec->p_owner->p_input = p_input;
@@ -478,7 +481,11 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
     /* decoder fifo */
     if( ( p_dec->p_owner->p_fifo = block_FifoNew() ) == NULL )
+    {
+        free( p_dec->p_owner );
+        vlc_object_release( p_dec );
         return NULL;
+    }
 
     /* Set buffers allocation callbacks for the decoders */
     p_dec->pf_aout_buffer_new = aout_new_buffer;
