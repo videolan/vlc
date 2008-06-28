@@ -2045,11 +2045,16 @@ then
         [ VLC_ADD_PLUGIN([dvdread])
           VLC_ADD_LIBS([dvdread],[-ldvdread ${LIBS_dvdcss}])
         ],[
-          if test -n "${enable_dvdread}"
-          then
-            AC_MSG_ERROR([cannot find libdvdread headers])
-          fi
-        ])
+	  AC_CHECK_HEADERS(libdvdread/dvd_reader.h,
+            [ VLC_ADD_PLUGIN([dvdread])
+	      VLC_ADD_LIBS([dvdread],[-ldvdread ${LIBS_dvdcss}])
+	    ],[
+	      if test -n "${enable_dvdread}"
+	      then
+	      AC_MSG_ERROR([cannot find libdvdread headers])
+	     fi
+	   ])
+	])
     else
       AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
       real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
