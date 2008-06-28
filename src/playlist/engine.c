@@ -432,8 +432,6 @@ check_input:
 */
 void playlist_LastLoop( playlist_t *p_playlist )
 {
-    vlc_object_t *p_obj;
-
     /* If there is an input, kill it */
     while( 1 )
     {
