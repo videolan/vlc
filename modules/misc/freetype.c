@@ -380,7 +380,7 @@ static int Create( vlc_object_t *p_this )
          */
 
         p_fontbuilder = vlc_object_create( p_filter->p_libvlc,
-                                           VLC_OBJECT_GENERIC );
+                                           sizeof(vlc_object_t) );
         if( p_fontbuilder )
         {
             p_fontbuilder->psz_object_name = strdup( "fontlist builder" );
