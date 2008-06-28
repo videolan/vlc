@@ -432,9 +432,6 @@ static int Manage( vout_thread_t *p_vout )
             {
             case SDL_BUTTON_LEFT:
                 {
-                    playlist_t *p_playlist;
-                    vlc_value_t val;
-
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int &= ~1;
                     var_Set( p_vout, "mouse-button-down", val );
@@ -449,8 +446,6 @@ static int Manage( vout_thread_t *p_vout )
 
             case SDL_BUTTON_MIDDLE:
                 {
-                    playlist_t *p_playlist;
-
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int &= ~2;
                     var_Set( p_vout, "mouse-button-down", val );
@@ -465,7 +460,6 @@ static int Manage( vout_thread_t *p_vout )
             case SDL_BUTTON_RIGHT:
                 {
                     intf_thread_t *p_intf;
-                    playlist_t *p_playlist;
 
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int &= ~4;
