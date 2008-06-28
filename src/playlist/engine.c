@@ -181,8 +181,6 @@ static void playlist_Destructor( vlc_object_t * p_this )
 /* Destroy remaining objects */
 static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
 {
-    vlc_object_t *p_obj;
-
     if( !b_force )
     {
         if( mdate() - p_playlist->gc_date < 1000000 )
@@ -195,15 +193,15 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
     }
 
     vlc_mutex_lock( &p_playlist->gc_lock );
-    while( ( p_obj = vlc_object_find( p_playlist->p_libvlc, VLC_OBJECT_VOUT,
-                                                  FIND_CHILD ) ) )
+    /* Remove video outputs when user presses stop: */
+    vlc_list_t *list = vlc_list_find( p_playlist->p_libvlc, VLC_OBJECT_VOUT,
+                                      FIND_CHILD );
+    if( list != NULL )
     {
-        vlc_object_release( p_obj );
-        if( p_obj->p_parent == VLC_OBJECT(p_playlist->p_libvlc) )
-        {
-            msg_Dbg( p_playlist, "garbage collector destroying 1 vout" );
-            vlc_object_release( p_obj ); /* Hmm, is this (thread-)safe?? */
-        }
+        msg_Dbg( p_playlist, "removing %u vout(s)", list->i_count );
+        for( int i = 0; i < list->i_count; i++)
+            vlc_object_release( list->p_values[i].p_object );
+        vlc_list_release( list );
     }
     p_playlist->b_cant_sleep = false;
     vlc_mutex_unlock( &p_playlist->gc_lock );
