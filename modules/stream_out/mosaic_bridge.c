@@ -82,7 +82,6 @@ static void ReleasePicture( picture_t *p_pic )
     if( --p_pic->i_refcount > 0 )
         return;
 
-    assert( p_pic->p_sys );
     if( p_pic->p_sys )
     {
         pf_release_t pf_release = (pf_release_t)p_pic->p_sys;
@@ -439,6 +438,10 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         filter_chain_Reset( p_sys->p_vf2, &fmt, &fmt );
         filter_chain_AppendFromString( p_sys->p_vf2, psz_chain );
         free( psz_chain );
+    }
+    else
+    {
+        p_sys->p_vf2 = NULL;
     }
 
     return (sout_stream_id_t *)p_sys;
