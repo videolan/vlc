@@ -242,10 +242,11 @@ error2:
 
     net_Close( p_sys->p_thread->fd );
 error:
+    vlc_UrlClean( &p_sys->p_thread->url );
+
     vlc_object_detach( p_sys->p_thread );
     vlc_object_release( p_sys->p_thread );
 
-    vlc_UrlClean( &p_sys->p_thread->url );
     free( p_sys );
 
     return VLC_EGENERIC;
@@ -286,12 +287,12 @@ static void Close( vlc_object_t * p_this )
 
     var_Destroy( p_access, "rtmp-caching" );
 
-    vlc_object_detach( p_sys->p_thread );
-    vlc_object_release( p_sys->p_thread );
-
     vlc_UrlClean( &p_sys->p_thread->url );
     free( p_sys->p_thread->psz_application );
     free( p_sys->p_thread->psz_media );
+
+    vlc_object_detach( p_sys->p_thread );
+    vlc_object_release( p_sys->p_thread );
     free( p_sys );
 }
 
