@@ -795,12 +795,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* FIXME: don't poll */
     [NSTimer scheduledTimerWithTimeInterval: 0.5
-        target: self selector: @selector(manageIntf:)
-        userInfo: nil repeats: FALSE];
+                                     target: self selector: @selector(manageIntf:)
+                                   userInfo: nil repeats: FALSE];
 
     /* FIXME: don't poll */
-    manageThread = [[NSThread alloc] initWithTarget:self selector:@selector(manage)
-                                     object: nil];
+    [NSThread detachNewThreadSelector: @selector(manage)
+                             toTarget: self withObject: nil];
 
     [o_controls setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
         var: "intf-add" selector: @selector(toggleVar:)];
@@ -1230,11 +1230,14 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     p_playlist = pl_Yield( p_intf );
 
+    var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
+
+//    vlc_value_t val;
+//    var_Change( p_playlist, "playlist-current", VLC_VAR_CHOICESCOUNT, &val, NULL );
 
     vlc_object_release( p_playlist );
 
@@ -1247,7 +1250,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         {
             p_intf->p_sys->p_input = p_playlist->p_input;
 
-                /* Refresh the interface */
+            /* Refresh the interface */
             if( p_intf->p_sys->p_input )
             {
                 msg_Dbg( p_intf, "input has changed, refreshing interface" );
@@ -1451,7 +1454,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     else
     {
         p_intf->p_sys->i_play_status = END_S;
-        p_intf->p_sys->b_intf_update = true;
         p_intf->p_sys->b_playlist_update = true;
         [self playStatusUpdated: p_intf->p_sys->i_play_status];
         [o_embedded_window playStatusUpdated: p_intf->p_sys->i_play_status];
@@ -1601,6 +1603,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             o_temp = [NSString stringWithUTF8String:
                 p_playlist->status.p_item->p_input->psz_name];
         [self setScrollField: o_temp stopAfter:-1];
+        [[[self getControls] getFSPanel] setStreamTitle: o_temp];
         vlc_object_release( p_input );
         vlc_object_release( p_playlist );
         return;
@@ -1776,9 +1779,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     int returnedValue = 0;
  
     msg_Dbg( p_intf, "Terminating" );
-
-    [manageThread cancel];
-    [manageThread release];
 
     /* make sure that the current volume is saved */
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
