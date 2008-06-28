@@ -56,13 +56,13 @@
   #include <dvdread/ifo_read.h>
   #include <dvdread/nav_read.h>
   #include <dvdread/nav_print.h>
-#elif
+#else
   #include <libdvdread/dvd_reader.h>
   #include <libdvdread/ifo_types.h>
   #include <libdvdread/ifo_read.h>
   #include <libdvdread/nav_read.h>
   #include <libdvdread/nav_print.h>
-#else
+#endif
 
 #include <assert.h>
 
