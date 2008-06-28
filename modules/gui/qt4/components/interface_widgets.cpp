@@ -60,7 +60,7 @@
 VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     /* Init */
-    p_vout = NULL;
+    i_vout = 0;
     hide(); setMinimumSize( 16, 16 );
     videoSize.rwidth() = -1;
     videoSize.rheight() = -1;
@@ -97,6 +97,9 @@ void VideoWidget::paintEvent(QPaintEvent *ev)
 
 VideoWidget::~VideoWidget()
 {
+    vout_thread_t *p_vout = i_vout
+        ? (vout_thread_t *)vlc_object_get( i_vout ) : NULL;
+
     if( p_vout )
     {
         if( !p_intf->psz_switch_intf )
@@ -109,6 +112,7 @@ VideoWidget::~VideoWidget()
             if( vout_Control( p_vout, VOUT_REPARENT ) != VLC_SUCCESS )
                 vout_Control( p_vout, VOUT_CLOSE );
         }
+        vlc_object_release( p_vout );
     }
 }
 
@@ -120,12 +124,12 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
 {
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
     emit askVideoWidgetToShow( *pi_width, *pi_height );
-    if( p_vout )
+    if( i_vout )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
         return NULL;
     }
-    p_vout = p_nvout;
+    i_vout = p_nvout->i_object_id;
     msg_Dbg( p_intf, "embedded video ready (handle %p)", winId() );
     return ( void* )winId();
 }
@@ -145,7 +149,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 void VideoWidget::release( void *p_win )
 {
     msg_Dbg( p_intf, "Video is not needed anymore" );
-    p_vout = NULL;
+    i_vout = 0;
     videoSize.rwidth() = 0;
     videoSize.rheight() = 0;
     hide();
