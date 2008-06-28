@@ -33,7 +33,7 @@
 
 #define AVI_DEBUG 1
 
-#define __EVEN( x ) ( (x)&0x01 ? (x)+1 : (x) )
+#define __EVEN( x ) (((x) + 1) & ~1)
 
 static vlc_fourcc_t GetFOURCC( const uint8_t *p_buff )
 {

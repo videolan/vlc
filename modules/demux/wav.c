@@ -73,7 +73,7 @@ struct demux_sys_t
     int pi_chan_table[AOUT_CHAN_MAX];
 };
 
-#define __EVEN( x ) ( ( (x)%2 != 0 ) ? ((x)+1) : (x) )
+#define __EVEN( x ) (((x) + 1) & ~1)
 
 static int ChunkFind( demux_t *, const char *, unsigned int * );
 
