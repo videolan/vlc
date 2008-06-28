@@ -50,11 +50,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <dvdread/dvd_reader.h>
-#include <dvdread/ifo_types.h>
-#include <dvdread/ifo_read.h>
-#include <dvdread/nav_read.h>
-#include <dvdread/nav_print.h>
+#ifdef HAVE_DVDREAD_DVD_READER_H
+  #include <dvdread/dvd_reader.h>
+  #include <dvdread/ifo_types.h>
+  #include <dvdread/ifo_read.h>
+  #include <dvdread/nav_read.h>
+  #include <dvdread/nav_print.h>
+#elif
+  #include <libdvdread/dvd_reader.h>
+  #include <libdvdread/ifo_types.h>
+  #include <libdvdread/ifo_read.h>
+  #include <libdvdread/nav_read.h>
+  #include <libdvdread/nav_print.h>
+#else
 
 #include <assert.h>
 
