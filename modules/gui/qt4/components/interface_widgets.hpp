@@ -87,7 +87,6 @@ private:
     intf_thread_t *p_intf;
     vout_thread_t *p_vout;
 
-    vlc_mutex_t lock;
     QSize videoSize;
 
 signals:
