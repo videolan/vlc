@@ -57,14 +57,14 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     {
         msg_Err( p_aout, "too many audio channels (%u)",
                  p_format->i_channels );
-        goto error;
+        return NULL;
     }
 
     if( p_format->i_rate > 192000 )
     {
         msg_Err( p_aout, "excessive audio sample frequency (%u)",
                  p_format->i_rate );
-        goto error;
+        return NULL;
     }
 
     /* We can only be called by the decoder, so no need to lock
