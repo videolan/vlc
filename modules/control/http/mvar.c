@@ -507,7 +507,7 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
     mvar_t *s = mvar_New( name, "set" );
     char        **ppsz_dir_content;
     int           i_dir_content, i;
-    psz_dir = RealPath( p_intf, psz_dir );
+    psz_dir = RealPath( psz_dir );
 
 #if defined( WIN32 )
     if( psz_dir[0] != '\0' && (psz_dir[0] != '\\' || psz_dir[1] != '\0') )

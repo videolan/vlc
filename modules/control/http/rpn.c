@@ -437,7 +437,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "realpath" ) )
         {
             char *psz_src = SSPop( st );
-            char *psz_dir = RealPath( p_intf, psz_src );
+            char *psz_dir = RealPath( psz_src );
 
             SSPush( st, psz_dir );
             free( psz_src );

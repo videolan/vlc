@@ -108,7 +108,7 @@ int FileLoad( FILE *f, char **pp_data, int *pi_data );
 /** This function creates a suitable URL for a filename */
 char *FileToUrl( char *name, bool *pb_index );
 /** This function returns the real path of a file or directory */
-char *RealPath( intf_thread_t *p_intf, const char *psz_src );
+char *RealPath( const char *psz_src );
 
 /** This command parses the "seek" command for the HTTP interface
  * and performs the requested action */

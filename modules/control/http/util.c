@@ -864,7 +864,7 @@ input_item_t *MRLParse( intf_thread_t *p_intf, char *_psz,
 /**********************************************************************
  * RealPath: parse ../, ~ and path stuff
  **********************************************************************/
-char *RealPath( intf_thread_t *p_intf, const char *psz_src )
+char *RealPath( const char *psz_src )
 {
     char *psz_dir;
     char *p;
