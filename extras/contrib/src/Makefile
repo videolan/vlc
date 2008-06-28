@@ -1776,9 +1776,9 @@ else
 .zvbi: zvbi
 endif
 ifdef HAVE_DARWIN_OS
-	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
 else
-	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
