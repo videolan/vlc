@@ -126,8 +126,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if( p_in_buf->i_nb_bytes != p_filter->p_sys->i_frame_size )
     {
         /* Frame size changed, reset everything */
-        msg_Warn( p_aout, "Frame size changed from %d to %d, resetting everything.",
-                          p_filter->p_sys->i_frame_size, p_in_buf->i_nb_bytes );
+        msg_Warn( p_aout, "Frame size changed from %u to %u, "
+                          "resetting everything.",
+                  p_filter->p_sys->i_frame_size,
+                  (unsigned)p_in_buf->i_nb_bytes );
 
         p_filter->p_sys->i_frame_size = p_in_buf->i_nb_bytes;
         p_filter->p_sys->p_buf = realloc( p_filter->p_sys->p_buf,
