@@ -1076,8 +1076,10 @@ endif
 ifdef HAVE_BEOS
 	(cd $@; patch -p0 < ../Patches/ffmpeg-alignment.patch)
 endif
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
+endif
+ifdef HAVE_DARWIN_OS
 	(cd $@/libswscale; patch -p0 < ../../Patches/ffmpeg-fix-noaltivec.patch)
 endif
 ifdef NO_TEXT_RELOCATION
