@@ -34,8 +34,8 @@
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL 0_9_0l
-# define MODULE_SUFFIX "__0_9_0l"
+# define MODULE_SYMBOL 0_9_0m
+# define MODULE_SUFFIX "__0_9_0m"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
