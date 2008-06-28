@@ -243,7 +243,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     char *psz_name;
 
     /* Allocate descriptor */
-    p_vout = vlc_object_create( p_parent, VLC_OBJECT_VOUT );
+    static const char typename[] = "video output";
+    p_vout = vlc_custom_create( p_parent, sizeof( *p_vout ), VLC_OBJECT_VOUT,
+                                typename );
     if( p_vout == NULL )
         return NULL;
 
