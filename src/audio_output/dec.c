@@ -307,17 +307,16 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         return -1;
     }
 
+#ifndef FIXME
+    /* This hack for #transcode{acodec=...}:display to work -- Courmisch */
+    if( i_input_rate == 0 )
+        i_input_rate = INPUT_RATE_DEFAULT;
+#endif
     if( i_input_rate > INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE ||
         i_input_rate < INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE )
     {
-#ifndef FIXME
-        msg_Err( p_aout, "FIXME invalid input rate (%u/%u)", i_input_rate,
-                 INPUT_RATE_DEFAULT );
-        i_input_rate = INPUT_RATE_DEFAULT;
-#else
         aout_BufferFree( p_buffer );
         return 0;
-#endif
     }
 
     /* Apply the desynchronisation requested by the user */
