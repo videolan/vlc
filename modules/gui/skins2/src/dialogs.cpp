@@ -159,7 +159,7 @@ bool Dialogs::init()
 {
     // Allocate descriptor
     m_pProvider = (intf_thread_t *)vlc_object_create( getIntf(),
-                                                      VLC_OBJECT_DIALOGS );
+                                                    sizeof( intf_thread_t ) );
     if( m_pProvider == NULL )
     {
         msg_Err( getIntf(), "out of memory" );

@@ -42,7 +42,6 @@
 #define VLC_OBJECT_AOUT        (-10)
 #define VLC_OBJECT_PACKETIZER  (-13)
 #define VLC_OBJECT_ENCODER     (-14)
-#define VLC_OBJECT_DIALOGS     (-15)
 #define VLC_OBJECT_ANNOUNCE    (-17)
 #define VLC_OBJECT_OPENGL      (-21)
 #define VLC_OBJECT_FILTER      (-22)
