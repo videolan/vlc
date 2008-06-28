@@ -1135,15 +1135,13 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    playlist_t *p_playlist = pl_Yield( p_this );
     vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, newval.b_bool );
     (void)psz_cmd; (void)oldval; (void)p_data;
 
-    /* Modify playlist as well because the vout might have to be restarted */
-    var_Create( p_playlist, "video-on-top", VLC_VAR_BOOL );
-    var_Set( p_playlist, "video-on-top", newval );
+    /* Modify libvlc as well because the vout might have to be restarted */
+    var_Create( p_vout->p_libvlc, "video-on-top", VLC_VAR_BOOL );
+    var_Set( p_vout->p_libvlc, "video-on-top", newval );
 
-    pl_Release( p_this );
     return VLC_SUCCESS;
 }
 
@@ -1152,15 +1150,13 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vlc_value_t val;
-    playlist_t *p_playlist = pl_Yield( p_this );
     (void)psz_cmd; (void)oldval; (void)p_data;
 
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
-    /* Modify playlist as well because the vout might have to be restarted */
-    var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL );
-    var_Set( p_playlist, "fullscreen", newval );
-    pl_Release( p_playlist );
+    /* Modify libvlc as well because the vout might have to be restarted */
+    var_Create( p_vout->p_libvlc, "fullscreen", VLC_VAR_BOOL );
+    var_Set( p_vout->p_libvlc, "fullscreen", newval );
 
     val.b_bool = true;
     var_Set( p_vout, "intf-change", val );

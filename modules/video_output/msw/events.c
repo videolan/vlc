@@ -77,15 +77,9 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args );
 
 static void DirectXPopupMenu( event_thread_t *p_event, bool b_open )
 {
-    playlist_t *p_playlist = vlc_object_find( p_event,
-                                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        vlc_value_t val;
-        val.b_bool = b_open;
-        var_Set( p_playlist, "intf-popupmenu", val );
-        vlc_object_release( p_playlist );
-    }
+    vlc_value_t val;
+    val.b_bool = b_open;
+    var_Set( p_event->p_libvlc, "intf-popupmenu", val );
 }
 
 static int DirectXConvertKey( int i_key );

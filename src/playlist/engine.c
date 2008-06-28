@@ -693,8 +693,6 @@ static void VariablesInit( playlist_t *p_playlist )
     val.i_int = -1;
     var_Set( p_playlist, "playlist-current", val );
 
-    var_Create( p_playlist, "intf-popupmenu", VLC_VAR_BOOL );
-
     var_Create( p_playlist, "activity", VLC_VAR_INTEGER );
     var_SetInteger( p_playlist, "activity", 0 );
 

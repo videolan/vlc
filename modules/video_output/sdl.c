@@ -433,6 +433,7 @@ static int Manage( vout_thread_t *p_vout )
             case SDL_BUTTON_LEFT:
                 {
                     playlist_t *p_playlist;
+                    vlc_value_t val;
 
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int &= ~1;
@@ -441,15 +442,8 @@ static int Manage( vout_thread_t *p_vout )
                     val.b_bool = true;
                     var_Set( p_vout, "mouse-clicked", val );
 
-                    p_playlist = pl_Yield( p_vout );
-
-                    if( p_playlist != NULL )
-                    {
-                        vlc_value_t val;
-                        val.b_bool = false;
-                        var_Set( p_playlist, "intf-popupmenu", val );
-                        pl_Release( p_playlist );
-                    }
+                    val.b_bool = false;
+                    var_Set( p_vout->p_libvlc, "intf-popupmenu", val );
                 }
                 break;
 
@@ -484,15 +478,8 @@ static int Manage( vout_thread_t *p_vout )
                         vlc_object_release( p_intf );
                     }
 
-                    p_playlist = pl_Yield( p_vout );
-
-                    if( p_playlist != NULL )
-                    {
-                        vlc_value_t val;
-                        val.b_bool = true;
-                        var_Set( p_playlist, "intf-popupmenu", val );
-                        pl_Release( p_playlist );
-                    }
+                    val.b_bool = true;
+                    var_Set( p_vout->p_libvlc, "intf-popupmenu", val );
                 }
                 break;
             }
@@ -531,12 +518,16 @@ static int Manage( vout_thread_t *p_vout )
         /* Quit event (close the window) */
         case SDL_QUIT:
             {
+#if 0
                 playlist_t *p_playlist = pl_Yield( p_vout );
                 if( p_playlist != NULL )
                 {
                     playlist_Stop( p_playlist );
                     pl_Release( p_playlist );
                 }
+#else
+#warning FIXME FIXME ?
+#endif
             }
             break;
 

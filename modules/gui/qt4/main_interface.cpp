@@ -211,9 +211,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
 
     /* Register callback for the intf-popupmenu variable */
-    playlist_t *p_playlist = pl_Yield( p_intf );
-    var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
-    pl_Release( p_intf );
+    var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     /* VideoWidget connect mess to avoid different threads speaking to each other */
     CONNECT( this, askReleaseVideo( void * ),
@@ -282,9 +280,7 @@ MainInterface::~MainInterface()
     var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
 
     /* Unregister callback for the intf-popupmenu variable */
-    playlist_t *p_playlist = pl_Yield( p_intf );
-    var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
-    pl_Release( p_intf );
+    var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     p_intf->b_interaction = false;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
