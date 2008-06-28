@@ -263,8 +263,8 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             psz_type = "announce";
             break;
         default:
-            i_size = i_type > (int)sizeof(vlc_object_t)
-                         ? i_type : (int)sizeof(vlc_object_t);
+            assert( i_type > 0 ); /* unknown type?! */
+            i_size = i_type;
             i_type = VLC_OBJECT_GENERIC;
             psz_type = "generic";
             break;
