@@ -387,6 +387,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
     if( lock == NULL )
     {
+        free( p_sys->p_buffer_orig );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -395,6 +396,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     {
         vlc_mutex_unlock( lock );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
+        free( p_sys->p_buffer_orig );
         free( p_sys );
         return VLC_EGENERIC;
     }
