@@ -199,7 +199,7 @@ static int OpenVideo ( vlc_object_t *p_this )
 #endif
 
     p_vout->p_sys->p_event = (vlc_object_t *)
-        vlc_object_create( p_vout, VLC_OBJECT_GENERIC );
+        vlc_object_create( p_vout, sizeof( vlc_object_t ) );
     if( !p_vout->p_sys->p_event )
     {
         free( p_vout->p_sys );

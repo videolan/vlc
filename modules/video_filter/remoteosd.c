@@ -333,7 +333,8 @@ static int CreateFilter ( vlc_object_t *p_this )
     vlc_gcrypt_init();
 
     /* create the vnc worker thread */
-    p_sys->p_worker_thread = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
+    p_sys->p_worker_thread = vlc_object_create( p_this,
+                                                sizeof( vlc_object_t ) );
     vlc_object_attach( p_sys->p_worker_thread, p_this );
     if( vlc_thread_create( p_sys->p_worker_thread, "vnc worker thread",
                            vnc_worker_thread,
@@ -732,7 +733,7 @@ static void vnc_worker_thread( vlc_object_t *p_thread_obj )
 
     /* create the update request thread */
     p_sys->p_update_request_thread = vlc_object_create( p_filter,
-                                                        VLC_OBJECT_GENERIC );
+                                                     sizeof( vlc_object_t ) );
     vlc_object_attach( p_sys->p_update_request_thread, p_filter );
     if( vlc_thread_create( p_sys->p_update_request_thread,
                            "vnc update request thread",

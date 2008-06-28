@@ -168,7 +168,7 @@ static int Callback( vlc_object_t *p_this, char const *psz_cmd,
 
     for( i = 0; i < 10; i++ )
     {
-        pp_objects[i] = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
+        pp_objects[i] = vlc_object_create( p_this, sizeof( vlc_object_t ) );
         vlc_object_attach( pp_objects[i], p_this );
         vlc_thread_create( pp_objects[i], "foo", MyThread, 0, true );
     }
@@ -300,7 +300,7 @@ static int Stress( vlc_object_t *p_this, char const *psz_cmd,
     start = mdate();
     for( i = 0; i < MAXOBJ * i_level; i++ )
     {
-        pp_objects[i] = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
+        pp_objects[i] = vlc_object_create( p_this, sizeof( vlc_object_t ) );
     }
 
     printf( " - randomly looking up %i objects\n", MAXLOOK * i_level );
@@ -385,7 +385,7 @@ static int Stress( vlc_object_t *p_this, char const *psz_cmd,
             MAXTH * i_level, MAXOBJ/MAXTH );
     for( i = 0; i < MAXTH * i_level; i++ )
     {
-        pp_objects[i] = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
+        pp_objects[i] = vlc_object_create( p_this, sizeof( vlc_object_t ) );
         vlc_thread_create( pp_objects[i], "foo", Dummy, 0, true );
     }
 
@@ -417,7 +417,7 @@ static void * Dummy( vlc_object_t *p_this )
 
     for( i = 0; i < MAXOBJ/MAXTH; i++ )
     {
-        pp_objects[i] = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
+        pp_objects[i] = vlc_object_create( p_this, sizeof( vlc_object_t ) );
     }
 
     vlc_thread_ready( p_this );

@@ -99,7 +99,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_SUCCESS;
     }
 
-    p_gtk_main = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
+    p_gtk_main = vlc_object_create( p_this, sizeof( vlc_object_t ) );
 
     /* Only initialize gthreads if it's the first time we do it */
     if( !g_thread_supported() )
