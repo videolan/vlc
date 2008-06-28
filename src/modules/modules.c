@@ -371,11 +371,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     /* Deal with variables */
     if( psz_name && psz_name[0] == '$' )
     {
-        vlc_value_t val;
-        var_Create( p_this, psz_name + 1, VLC_VAR_MODULE | VLC_VAR_DOINHERIT );
-        var_Get( p_this, psz_name + 1, &val );
-        psz_var = val.psz_string;
-        psz_name = psz_var;
+        psz_name = psz_var = var_CreateGetString( p_this, psz_name + 1 );
     }
 
     /* Count how many different shortcuts were asked for */
