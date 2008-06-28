@@ -171,7 +171,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );
     p_sys->fmt.i_bitrate = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
     p_sys->fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
-    p_sys->fmt.i_extra = GetWLE( &p_wf->cbSize );
+    if( i_size >= sizeof(WAVEFORMATEX) )
+        p_sys->fmt.i_extra = __MIN( GetWLE( &p_wf->cbSize ), i_size - sizeof(WAVEFORMATEX) );
     i_extended = 0;
 
     /* Handle new WAVE_FORMAT_EXTENSIBLE wav files */
