@@ -314,7 +314,7 @@ sout_instance_t * input_DetachSout( input_thread_t *p_input );
 
 /* var.c */
 void input_ControlVarInit ( input_thread_t * );
-void input_ControlVarClean( input_thread_t * );
+void input_ControlVarStop( input_thread_t * );
 void input_ControlVarNavigation( input_thread_t * );
 void input_ControlVarTitle( input_thread_t *, int i_title );
 

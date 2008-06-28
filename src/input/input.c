@@ -1271,7 +1271,7 @@ static void End( input_thread_t * p_input )
     input_ChangeState( p_input, END_S );
 
     /* Clean control variables */
-    input_ControlVarClean( p_input );
+    input_ControlVarStop( p_input );
 
     /* Clean up master */
     InputSourceClean( &p_input->p->input );
