@@ -85,7 +85,7 @@ public:
     virtual QSize sizeHint() const;
 private:
     intf_thread_t *p_intf;
-    vout_thread_t *p_vout;
+    int i_vout;
 
     QSize videoSize;
 
