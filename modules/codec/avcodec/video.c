@@ -371,6 +371,11 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_buffer = 0;
     p_sys->i_buffer_orig = 1;
     p_sys->p_buffer_orig = p_sys->p_buffer = malloc( p_sys->i_buffer_orig );
+    if( !p_sys->p_buffer_orig )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -528,6 +533,11 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
         p_sys->p_buffer = p_sys->p_buffer_orig;
         p_sys->i_buffer = p_block->i_buffer;
+        if( !p_sys->p_buffer )
+        {
+            block_Release( p_block );
+            return NULL;
+        }
         vlc_memcpy( p_sys->p_buffer, p_block->p_buffer, p_block->i_buffer );
         memset( p_sys->p_buffer + p_block->i_buffer, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
@@ -725,6 +735,8 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
         p_sys->p_context->extradata_size = i_size + 12;
         p = p_sys->p_context->extradata  =
             malloc( p_sys->p_context->extradata_size );
+        if( !p )
+            return;
 
         memcpy( &p[0],  "SVQ3", 4 );
         memset( &p[4], 0, 8 );
@@ -763,13 +775,15 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
         {
             p_sys->p_context->extradata_size = 8;
             p_sys->p_context->extradata = malloc( 8 );
+            if( p_sys->p_context->extradata )
+            {
+                memcpy( p_sys->p_context->extradata,
+                        p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+                p_sys->p_context->sub_id = ((uint32_t*)p_dec->fmt_in.p_extra)[1];
 
-            memcpy( p_sys->p_context->extradata,
-                    p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-            p_sys->p_context->sub_id= ((uint32_t*)p_dec->fmt_in.p_extra)[1];
-
-            msg_Warn( p_dec, "using extra data for RV codec sub_id=%08x",
-                      p_sys->p_context->sub_id );
+                msg_Warn( p_dec, "using extra data for RV codec sub_id=%08x",
+                          p_sys->p_context->sub_id );
+            }
         }
     }
     else
@@ -777,10 +791,13 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
         p_sys->p_context->extradata_size = i_size;
         p_sys->p_context->extradata =
             malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
-        memcpy( p_sys->p_context->extradata,
-                p_dec->fmt_in.p_extra, i_size );
-        memset( &((uint8_t*)p_sys->p_context->extradata)[i_size],
-                0, FF_INPUT_BUFFER_PADDING_SIZE );
+        if( p_sys->p_context->extradata )
+        {
+            memcpy( p_sys->p_context->extradata,
+                    p_dec->fmt_in.p_extra, i_size );
+            memset( &((uint8_t*)p_sys->p_context->extradata)[i_size],
+                    0, FF_INPUT_BUFFER_PADDING_SIZE );
+        }
     }
 }
 
