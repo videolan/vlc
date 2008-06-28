@@ -85,49 +85,51 @@ static int Open( vlc_object_t * p_this )
     if( stream_Peek( p_demux->s, &p_peek, 20 ) == 20 &&
         !memcmp( p_peek, "RIFF", 4 ) && !memcmp( &p_peek[8], "WAVE", 4 ) )
     {
-        int i_size;
-
         /* Find the wave format header */
-        i_peek = 20;
+        i_peek = 12 + 8;
         while( memcmp( p_peek + i_peek - 8, "fmt ", 4 ) )
         {
-            i_size = GetDWLE( p_peek + i_peek - 4 );
-            if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
-            i_peek += i_size + 8;
+            uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+            if( i_len > DTS_PROBE_SIZE || i_peek + i_len > DTS_PROBE_SIZE )
+                return VLC_EGENERIC;
 
+            i_peek += i_len + 8;
             if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
                 return VLC_EGENERIC;
         }
 
         /* Sanity check the wave format header */
-        i_size = GetDWLE( p_peek + i_peek - 4 );
-        if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
-        i_peek += i_size + 8;
+        uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+        if( i_len > DTS_PROBE_SIZE )
+            return VLC_EGENERIC;
+
+        i_peek += i_len + 8;
         if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
             return VLC_EGENERIC;
-        if( GetWLE( p_peek + i_peek - i_size - 8 /* wFormatTag */ ) !=
+        if( GetWLE( p_peek + i_peek - i_len - 8 /* wFormatTag */ ) !=
             1 /* WAVE_FORMAT_PCM */ )
             return VLC_EGENERIC;
-        if( GetWLE( p_peek + i_peek - i_size - 6 /* nChannels */ ) != 2 )
+        if( GetWLE( p_peek + i_peek - i_len - 6 /* nChannels */ ) != 2 )
             return VLC_EGENERIC;
-        if( GetDWLE( p_peek + i_peek - i_size - 4 /* nSamplesPerSec */ ) !=
+        if( GetDWLE( p_peek + i_peek - i_len - 4 /* nSamplesPerSec */ ) !=
             44100 )
             return VLC_EGENERIC;
 
         /* Skip the wave header */
         while( memcmp( p_peek + i_peek - 8, "data", 4 ) )
         {
-            i_size = GetDWLE( p_peek + i_peek - 4 );
-            if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
-            i_peek += i_size + 8;
+            uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+            if( i_len > DTS_PROBE_SIZE || i_peek + i_len > DTS_PROBE_SIZE )
+                return VLC_EGENERIC;
 
+            i_peek += i_len + 8;
             if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
                 return VLC_EGENERIC;
         }
 
         /* Some DTS wav files don't begin with a sync code so we do a more
          * extensive search */
-        i_size = stream_Peek( p_demux->s, &p_peek, DTS_PROBE_SIZE );
+        int i_size = stream_Peek( p_demux->s, &p_peek, DTS_PROBE_SIZE );
         i_size -= DTS_MAX_HEADER_SIZE;
 
         while( i_peek < i_size )

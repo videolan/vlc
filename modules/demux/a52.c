@@ -74,8 +74,8 @@ static int CheckSync( const uint8_t *p_peek, bool *p_big_endian );
 
 #define PCM_FRAME_SIZE (1536 * 4)
 #define A52_PACKET_SIZE (4 * PCM_FRAME_SIZE)
+#define A52_PROBE_SIZE (512*1024)
 #define A52_MAX_HEADER_SIZE 10
-
 
 /*****************************************************************************
  * Open: initializes ES structures
@@ -89,24 +89,27 @@ static int Open( vlc_object_t * p_this )
     bool  b_big_endian = 0; /* Arbitrary initialisation */
 
     /* Check if we are dealing with a WAV file */
-    if( stream_Peek( p_demux->s, &p_peek, 12 ) == 12 &&
-        !memcmp( p_peek, "RIFF", 4 ) && !memcmp( p_peek + 8, "WAVE", 4 ) )
+    if( stream_Peek( p_demux->s, &p_peek, 12+8 ) == 12+8 &&
+        !memcmp( p_peek, "RIFF", 4 ) && !memcmp( &p_peek[8], "WAVE", 4 ) )
     {
-        int i_size;
-
         /* Skip the wave header */
         i_peek = 12 + 8;
-        while( stream_Peek( p_demux->s, &p_peek, i_peek ) == i_peek &&
-               memcmp( p_peek + i_peek - 8, "data", 4 ) )
+        while( memcmp( p_peek + i_peek - 8, "data", 4 ) )
         {
-            i_peek += GetDWLE( p_peek + i_peek - 4 ) + 8;
+            uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+            if( i_len > A52_PROBE_SIZE || i_peek + i_len > A52_PROBE_SIZE )
+                return VLC_EGENERIC;
+
+            i_peek += i_len + 8;
+            if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+                return VLC_EGENERIC;
         }
 
         /* TODO: should check wave format and sample_rate */
 
         /* Some A52 wav files don't begin with a sync code so we do a more
          * extensive search */
-        i_size = stream_Peek( p_demux->s, &p_peek, i_peek + A52_PACKET_SIZE * 2);
+        int i_size = stream_Peek( p_demux->s, &p_peek, i_peek + A52_PACKET_SIZE * 2);
         i_size -= (PCM_FRAME_SIZE + A52_MAX_HEADER_SIZE);
 
         while( i_peek < i_size )
