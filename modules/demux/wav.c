@@ -382,17 +382,17 @@ static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
 
     for( ;; )
     {
-        int i_size;
+        uint32_t i_size;
 
         if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
         {
-            msg_Err( p_demux, "cannot peek()" );
+            msg_Err( p_demux, "cannot peek" );
             return VLC_EGENERIC;
         }
 
         i_size = GetDWLE( p_peek + 4 );
 
-        msg_Dbg( p_demux, "chunk: fcc=`%4.4s` size=%d", p_peek, i_size );
+        msg_Dbg( p_demux, "chunk: fcc=`%4.4s` size=%"PRIu32, p_peek, i_size );
 
         if( !memcmp( p_peek, fcc, 4 ) )
         {
@@ -403,11 +403,11 @@ static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
             return VLC_SUCCESS;
         }
 
-        i_size = __EVEN( i_size ) + 8;
-        if( stream_Read( p_demux->s, NULL, i_size ) != i_size )
-        {
+        /* Skip chunk */
+        if( stream_Read( p_demux->s, NULL, 8 ) != 8
+         || stream_Read( p_demux->s, NULL, i_size ) != i_size
+         || ((i_size & 1) && stream_Read( p_demux->s, NULL, 1 ) != 1 ))
             return VLC_EGENERIC;
-        }
     }
 }
 
