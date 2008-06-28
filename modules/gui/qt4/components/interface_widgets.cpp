@@ -144,7 +144,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 
 void VideoWidget::release( void *p_win )
 {
-    msg_Dbg( p_intf, "Video is non needed anymore" );
+    msg_Dbg( p_intf, "Video is not needed anymore" );
     p_vout = NULL;
     videoSize.rwidth() = 0;
     videoSize.rheight() = 0;
