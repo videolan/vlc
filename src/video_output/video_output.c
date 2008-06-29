@@ -450,16 +450,16 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         return NULL;
     }
 
+    vlc_object_set_destructor( p_vout, vout_Destructor );
+
     if( p_vout->b_error )
     {
         msg_Err( p_vout, "video output creation failed" );
 
-        /* Make sure the thread is destroyed */
+        /* Make sure the thread is destroyed and data released */
         vlc_object_release( p_vout );
         return NULL;
     }
-
-    vlc_object_set_destructor( p_vout, vout_Destructor );
 
     return p_vout;
 }
@@ -679,7 +679,8 @@ static int InitThread( vout_thread_t *p_vout )
             msg_Err( p_vout, "no chroma module for %4.4s to %4.4s",
                      (char*)&p_vout->render.i_chroma,
                      (char*)&p_vout->output.i_chroma );
-            vlc_object_detach( p_vout->p_chroma );
+
+            vlc_object_release( p_vout->p_chroma );
             p_vout->p_chroma = NULL;
             p_vout->pf_end( p_vout );
             vlc_mutex_unlock( &p_vout->change_lock );
@@ -1086,6 +1087,7 @@ static void RunThread( vout_thread_t *p_vout)
             /* A fatal error occurred, and the thread must terminate
              * immediately, without displaying anything - setting b_error to 1
              * causes the immediate end of the main while() loop. */
+            // FIXME pf_end
             p_vout->b_error = 1;
         }
 
@@ -1245,7 +1247,7 @@ static void EndThread( vout_thread_t *p_vout )
     /* Destroy the video filters2 */
     filter_chain_Delete( p_vout->p_vf2_chain );
 
-    /* Destroy translation tables */
+    /* Destroy translation tables FIXME if b_error is set, it can already be done */
     p_vout->pf_end( p_vout );
 
     /* Release the change lock */
