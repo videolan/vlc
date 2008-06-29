@@ -59,10 +59,21 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
                  p_format->i_channels );
         return NULL;
     }
+    if( p_format->i_channels <= 0 )
+    {
+        msg_Err( p_aout, "no audio channels" );
+        return NULL;
+    }
 
     if( p_format->i_rate > 192000 )
     {
         msg_Err( p_aout, "excessive audio sample frequency (%u)",
+                 p_format->i_rate );
+        return NULL;
+    }
+    if( p_format->i_rate < 4000 )
+    {
+        msg_Err( p_aout, "too low audio sample frequency (%u)",
                  p_format->i_rate );
         return NULL;
     }
