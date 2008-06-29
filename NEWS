@@ -120,6 +120,7 @@ Decoders:
  * NellyMoser ASAO support
  * APE (Monkey audio) support
  * RealVideo support (with the RealVideo run-time)
+ * Dirac video support using libschroedinger
 
 Subtitles:
  * Closed Caption Decoder (DVD, ReplayTV, TiVo, DVB/ATSC)

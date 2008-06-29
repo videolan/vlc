@@ -62,6 +62,7 @@ Daniel Dreibrodt, aka aLtgLasS <daniel d.t dreibrodt -@t- gmx d0t de> - VLC 0.8.
 Daniel Fischer <dan at subsignal dot org> - Shoutcast output support
 Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements. Meta information core fixes. XSPF playlist support
 Danko Dolch <info at dolchonline d0t net> - Icons and Design for Qt4 Interface
+David Flynn - Dirac video codec
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 Daniel Nylander <info @t danielnylander at se> - Swedish translation
 David J LaBarre "DJ" - Forum help, moderation and support
@@ -129,6 +130,7 @@ Johannes Buchner <buchner.johannes at gmx dot at> - Hotkeys for zoom
 Johen Michael Zorko <zorko at att.net> - fix for delay issues in udp sout
 John Dalgliesh <johnd at defyne.org> - macosx interface playlist fix
 John Paul Lorenti <jpl31 at columbia.edu> - ALSA device selection patch
+Johnathan Rosser - Dirac video codec
 Jonas Larsen <jonas at vrt.dk> - Danish translation
 Jouni Kähkönen - Finnish translation
 Julien Blache <jb at technologeek.org> - disc ejection code
