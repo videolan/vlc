@@ -1092,7 +1092,6 @@ static void RunThread( vout_thread_t *p_vout)
 
             I_OUTPUTPICTURES = I_RENDERPICTURES = 0;
 
-            vlc_mutex_lock( &p_vout->change_lock ); // FIXME is that valid ?
             p_vout->b_error = InitThread( p_vout );
 
             vlc_mutex_unlock( &p_vout->picture_lock );
