@@ -253,7 +253,7 @@ static int Open ( vlc_object_t *p_this )
     /* Get or probe the type */
     p_sys->i_type = SUB_TYPE_UNKNOWN;
     psz_type = var_CreateGetString( p_demux, "sub-type" );
-    if( *psz_type )
+    if( psz_type && *psz_type )
     {
         int i;
 
