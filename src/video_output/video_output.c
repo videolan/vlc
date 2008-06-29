@@ -1083,22 +1083,11 @@ static void RunThread( vout_thread_t *p_vout)
              * resizing too and it's not sure that we already had it,
              * recreate the chroma plugin chain from scratch. */
             /* dionoea */
-            if( p_vout->p_chroma->p_module )
+            if( !p_vout->b_direct )
             {
-                filter_t *p_chroma = p_vout->p_chroma;
-                module_Unneed( p_chroma, p_chroma->p_module );
-                p_chroma->fmt_out.video = p_vout->fmt_out;
-                p_chroma->fmt_out.video.i_rmask = p_vout->output.i_rmask;
-                p_chroma->fmt_out.video.i_gmask = p_vout->output.i_gmask;
-                p_chroma->fmt_out.video.i_bmask = p_vout->output.i_bmask;
-                p_chroma->fmt_out.video.i_rrshift = p_vout->output.i_rrshift;
-                p_chroma->fmt_out.video.i_lrshift = p_vout->output.i_lrshift;
-                p_chroma->fmt_out.video.i_rgshift = p_vout->output.i_rgshift;
-                p_chroma->fmt_out.video.i_lgshift = p_vout->output.i_lgshift;
-                p_chroma->fmt_out.video.i_rbshift = p_vout->output.i_rbshift;
-                p_chroma->fmt_out.video.i_lbshift = p_vout->output.i_lbshift;
-                p_chroma->p_module = module_Need( p_chroma, "video filter2", NULL, 0 );
-                if( !p_chroma->p_module )
+                ChromaDestroy( p_vout );
+
+                if( ChromaCreate( p_vout ) )
                 {
                     msg_Err( p_vout, "WOW THIS SUCKS BIG TIME!!!!!" );
                 }
@@ -1115,12 +1104,7 @@ static void RunThread( vout_thread_t *p_vout)
             p_vout->i_changes &= ~VOUT_PICTURE_BUFFERS_CHANGE;
 
             if( !p_vout->b_direct )
-            {
-                module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
-                vlc_object_detach( p_vout->p_chroma );
-                vlc_object_release( p_vout->p_chroma );
-                p_vout->p_chroma = NULL;
-            }
+                ChromaDestroy( p_vout );
 
             vlc_mutex_lock( &p_vout->picture_lock );
 
@@ -1251,9 +1235,12 @@ static int ChromaCreate( vout_thread_t *p_vout )
 
     if( p_chroma->p_module == NULL )
     {
-        msg_Err( p_vout, "no chroma module for %4.4s to %4.4s",
+        msg_Err( p_vout, "no chroma module for %4.4s to %4.4s i=%dx%d o=%dx%d",
                  (char*)&p_vout->render.i_chroma,
-                 (char*)&p_vout->output.i_chroma );
+                 (char*)&p_vout->output.i_chroma,
+                 p_chroma->fmt_in.video.i_width, p_chroma->fmt_in.video.i_height,
+                 p_chroma->fmt_out.video.i_width, p_chroma->fmt_out.video.i_height
+                 );
 
         vlc_object_release( p_vout->p_chroma );
         p_vout->p_chroma = NULL;
@@ -1262,9 +1249,13 @@ static int ChromaCreate( vout_thread_t *p_vout )
     p_chroma->pf_vout_buffer_new = ChromaGetPicture;
     return VLC_SUCCESS;
 }
+
 static void ChromaDestroy( vout_thread_t *p_vout )
 {
-    assert( !p_vout->b_direct && p_vout->p_chroma );
+    assert( !p_vout->b_direct );
+
+    if( !p_vout->p_chroma )
+        return;
 
     module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
     vlc_object_release( p_vout->p_chroma );
