@@ -913,26 +913,6 @@ static void RunThread( vout_thread_t *p_vout)
             i_idle_loops++;
         }
 
-        /* Video Filter2 stuff */
-        if( p_vout->psz_vf2 )
-        {
-            es_format_t fmt;
-
-            vlc_mutex_lock( &p_vout->vfilter_lock );
-
-            es_format_Init( &fmt, VIDEO_ES, p_vout->fmt_render.i_chroma );
-            fmt.video = p_vout->fmt_render;
-            filter_chain_Reset( p_vout->p_vf2_chain, &fmt, &fmt );
-
-            if( filter_chain_AppendFromString( p_vout->p_vf2_chain,
-                                               p_vout->psz_vf2 ) < 0 )
-                msg_Err( p_vout, "Video filter chain creation failed" );
-
-            free( p_vout->psz_vf2 );
-            p_vout->psz_vf2 = NULL;
-            vlc_mutex_unlock( &p_vout->vfilter_lock );
-        }
-
         if( p_picture )
         {
             p_picture = filter_chain_VideoFilter( p_vout->p_vf2_chain,
@@ -1117,6 +1097,25 @@ static void RunThread( vout_thread_t *p_vout)
 
             vlc_mutex_unlock( &p_vout->picture_lock );
         }
+
+        /* Check for "video filter2" changes */
+        vlc_mutex_lock( &p_vout->vfilter_lock );
+        if( p_vout->psz_vf2 )
+        {
+            es_format_t fmt;
+
+            es_format_Init( &fmt, VIDEO_ES, p_vout->fmt_render.i_chroma );
+            fmt.video = p_vout->fmt_render;
+            filter_chain_Reset( p_vout->p_vf2_chain, &fmt, &fmt );
+
+            if( filter_chain_AppendFromString( p_vout->p_vf2_chain,
+                                               p_vout->psz_vf2 ) < 0 )
+                msg_Err( p_vout, "Video filter chain creation failed" );
+
+            free( p_vout->psz_vf2 );
+            p_vout->psz_vf2 = NULL;
+        }
+        vlc_mutex_unlock( &p_vout->vfilter_lock );
     }
 
 
