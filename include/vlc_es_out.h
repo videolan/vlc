@@ -64,7 +64,7 @@ enum es_out_query_e
 
     /* PCR handling, DTS/PTS will be automatically computed using thoses PCR
      * XXX: SET_PCR(_GROUP) are in charge of the pace control. They will wait
-     * to slow down the demuxer to read to the right speed.
+     * to slow down the demuxer so that it reads at the right speed.
      * XXX: if you want PREROLL just call RESET_PCR and
      * ES_OUT_SET_NEXT_DISPLAY_TIME and send data to the decoder *without*
      * calling SET_PCR until preroll is finished.
