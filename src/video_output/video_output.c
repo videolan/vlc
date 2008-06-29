@@ -57,6 +57,7 @@
 #include "input/input_internal.h"
 
 #include "modules/modules.h"
+#include <assert.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -508,12 +509,8 @@ static void vout_Destructor( vlc_object_t * p_this )
  * modified inside this function.
  * XXX You have to enter it with change_lock taken.
  *****************************************************************************/
-static picture_t *get_pic( filter_t *p_filter )
-{
-    picture_t *p_pic = (picture_t *)p_filter->p_owner;
-    p_filter->p_owner = NULL;
-    return p_pic;
-}
+static int ChromaCreate( vout_thread_t *p_vout );
+static void ChromaDestroy( vout_thread_t *p_vout );
 
 static int InitThread( vout_thread_t *p_vout )
 {
@@ -648,38 +645,11 @@ static int InitThread( vout_thread_t *p_vout )
          * find a chroma plugin to do the conversion */
         p_vout->b_direct = 0;
 
-        /* Choose the best module */
-        p_vout->p_chroma = vlc_object_create( p_vout, sizeof(filter_t) );
-        filter_t *p_chroma = p_vout->p_chroma;
-        vlc_object_attach( p_chroma, p_vout );
-        /* TODO: Set the fmt_in and fmt_out stuff here */
-        p_chroma->fmt_in.video = p_vout->fmt_render;
-        p_chroma->fmt_out.video = p_vout->fmt_out;
-
-        /* TODO: put in a function */
-        p_chroma->fmt_out.video.i_rmask = p_vout->output.i_rmask;
-        p_chroma->fmt_out.video.i_gmask = p_vout->output.i_gmask;
-        p_chroma->fmt_out.video.i_bmask = p_vout->output.i_bmask;
-        p_chroma->fmt_out.video.i_rrshift = p_vout->output.i_rrshift;
-        p_chroma->fmt_out.video.i_lrshift = p_vout->output.i_lrshift;
-        p_chroma->fmt_out.video.i_rgshift = p_vout->output.i_rgshift;
-        p_chroma->fmt_out.video.i_lgshift = p_vout->output.i_lgshift;
-        p_chroma->fmt_out.video.i_rbshift = p_vout->output.i_rbshift;
-        p_chroma->fmt_out.video.i_lbshift = p_vout->output.i_lbshift;
-        p_chroma->p_module = module_Need( p_chroma, "video filter2", NULL, 0 );
-
-        if( p_chroma->p_module == NULL )
+        if( ChromaCreate( p_vout ) )
         {
-            msg_Err( p_vout, "no chroma module for %4.4s to %4.4s",
-                     (char*)&p_vout->render.i_chroma,
-                     (char*)&p_vout->output.i_chroma );
-
-            vlc_object_release( p_vout->p_chroma );
-            p_vout->p_chroma = NULL;
             p_vout->pf_end( p_vout );
             return VLC_EGENERIC;
         }
-        p_chroma->pf_vout_buffer_new = get_pic;
 
         msg_Dbg( p_vout, "indirect render, mapping "
                  "render pictures 0-%i to system pictures %i-%i",
@@ -1225,11 +1195,7 @@ static void EndThread( vout_thread_t *p_vout )
 #endif
 
     if( !p_vout->b_direct )
-    {
-        module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
-        vlc_object_release( p_vout->p_chroma );
-        p_vout->p_chroma = NULL;
-    }
+        ChromaDestroy( p_vout );
 
     /* Destroy all remaining pictures */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES + 1; i_index++ )
@@ -1250,6 +1216,62 @@ static void EndThread( vout_thread_t *p_vout )
     /* Destroy translation tables FIXME if b_error is set, it can already be done */
     p_vout->pf_end( p_vout );
 }
+
+/* Thread helpers */
+static picture_t *ChromaGetPicture( filter_t *p_filter )
+{
+    picture_t *p_pic = (picture_t *)p_filter->p_owner;
+    p_filter->p_owner = NULL;
+    return p_pic;
+}
+
+static int ChromaCreate( vout_thread_t *p_vout )
+{
+    filter_t *p_chroma;
+
+    /* Choose the best module */
+    p_chroma = p_vout->p_chroma = vlc_object_create( p_vout, sizeof(filter_t) );
+
+    vlc_object_attach( p_chroma, p_vout );
+
+    /* TODO: Set the fmt_in and fmt_out stuff here */
+    p_chroma->fmt_in.video = p_vout->fmt_render;
+    p_chroma->fmt_out.video = p_vout->fmt_out;
+
+    p_chroma->fmt_out.video.i_rmask = p_vout->output.i_rmask;
+    p_chroma->fmt_out.video.i_gmask = p_vout->output.i_gmask;
+    p_chroma->fmt_out.video.i_bmask = p_vout->output.i_bmask;
+    p_chroma->fmt_out.video.i_rrshift = p_vout->output.i_rrshift;
+    p_chroma->fmt_out.video.i_lrshift = p_vout->output.i_lrshift;
+    p_chroma->fmt_out.video.i_rgshift = p_vout->output.i_rgshift;
+    p_chroma->fmt_out.video.i_lgshift = p_vout->output.i_lgshift;
+    p_chroma->fmt_out.video.i_rbshift = p_vout->output.i_rbshift;
+    p_chroma->fmt_out.video.i_lbshift = p_vout->output.i_lbshift;
+    p_chroma->p_module = module_Need( p_chroma, "video filter2", NULL, 0 );
+
+    if( p_chroma->p_module == NULL )
+    {
+        msg_Err( p_vout, "no chroma module for %4.4s to %4.4s",
+                 (char*)&p_vout->render.i_chroma,
+                 (char*)&p_vout->output.i_chroma );
+
+        vlc_object_release( p_vout->p_chroma );
+        p_vout->p_chroma = NULL;
+        return VLC_EGENERIC;
+    }
+    p_chroma->pf_vout_buffer_new = ChromaGetPicture;
+    return VLC_SUCCESS;
+}
+static void ChromaDestroy( vout_thread_t *p_vout )
+{
+    assert( !p_vout->b_direct && p_vout->p_chroma );
+
+    module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
+    vlc_object_release( p_vout->p_chroma );
+    p_vout->p_chroma = NULL;
+}
+
+
 
 /* following functions are local */
 
