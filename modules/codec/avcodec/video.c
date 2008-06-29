@@ -91,6 +91,7 @@ static AVPaletteControl palette_control;
 static void ffmpeg_InitCodec      ( decoder_t * );
 static void ffmpeg_CopyPicture    ( decoder_t *, picture_t *, AVFrame * );
 static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
+static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
@@ -356,6 +357,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* Always use our get_buffer wrapper so we can calculate the
      * PTS correctly */
     p_sys->p_context->get_buffer = ffmpeg_GetFrameBuf;
+    p_sys->p_context->reget_buffer = ffmpeg_ReGetFrameBuf;
     p_sys->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
     p_sys->p_context->opaque = p_dec;
 
@@ -385,7 +387,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( p_dec->fmt_in.video.p_palette )
         p_sys->p_context->palctrl =
             (AVPaletteControl *)p_dec->fmt_in.video.p_palette;
-    else
+    else if( p_sys->i_codec_id != CODEC_ID_MSVIDEO1 )
         p_sys->p_context->palctrl = &palette_control;
 
     /* ***** Open the codec ***** */
@@ -884,6 +886,8 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
  * It is used for direct rendering as well as to get the right PTS for each
  * decoded picture (even in indirect rendering mode).
  *****************************************************************************/
+static void ffmpeg_SetFrameBufferPts( decoder_t *p_dec, AVFrame *p_ff_pic );
+
 static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
                                AVFrame *p_ff_pic )
 {
@@ -892,28 +896,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     picture_t *p_pic;
 
     /* Set picture PTS */
-    if( p_sys->input_pts )
-    {
-        p_ff_pic->pts = p_sys->input_pts;
-    }
-    else if( p_sys->input_dts )
-    {
-        /* Some demuxers only set the dts so let's try to find a useful
-         * timestamp from this */
-        if( !p_context->has_b_frames || !p_sys->b_has_b_frames ||
-            !p_ff_pic->reference || !p_sys->i_pts )
-        {
-            p_ff_pic->pts = p_sys->input_dts;
-        }
-        else p_ff_pic->pts = 0;
-    }
-    else p_ff_pic->pts = 0;
+    ffmpeg_SetFrameBufferPts( p_dec, p_ff_pic );
 
-    if( p_sys->i_pts ) /* make sure 1st frame has a pts > 0 */
-    {
-        p_sys->input_pts = p_sys->input_dts = 0;
-    }
-
+    /* */
     p_ff_pic->opaque = 0;
 
     /* Not much to do in indirect rendering mode */
@@ -963,6 +948,44 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
 
     return 0;
+}
+static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_ff_pic )
+{
+    decoder_t *p_dec = (decoder_t *)p_context->opaque;
+
+    /* Set picture PTS */
+    ffmpeg_SetFrameBufferPts( p_dec, p_ff_pic );
+
+    /* We always use default reget function, it works perfectly fine */
+    return avcodec_default_reget_buffer( p_context, p_ff_pic );
+}
+
+static void ffmpeg_SetFrameBufferPts( decoder_t *p_dec, AVFrame *p_ff_pic )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* Set picture PTS */
+    if( p_sys->input_pts )
+    {
+        p_ff_pic->pts = p_sys->input_pts;
+    }
+    else if( p_sys->input_dts )
+    {
+        /* Some demuxers only set the dts so let's try to find a useful
+         * timestamp from this */
+        if( !p_sys->p_context->has_b_frames || !p_sys->b_has_b_frames ||
+            !p_ff_pic->reference || !p_sys->i_pts )
+        {
+            p_ff_pic->pts = p_sys->input_dts;
+        }
+        else p_ff_pic->pts = 0;
+    }
+    else p_ff_pic->pts = 0;
+
+    if( p_sys->i_pts ) /* make sure 1st frame has a pts > 0 */
+    {
+        p_sys->input_pts = p_sys->input_dts = 0;
+    }
 }
 
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
