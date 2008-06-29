@@ -112,18 +112,23 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    /* Allocate the memory needed to store the decoder's structure */
+    p_sys = malloc(sizeof(decoder_sys_t));
+    if( p_sys == NULL )
+        return VLC_ENOMEM;
+
     /* Initialise the schroedinger (and hence liboil libraries */
     /* This does no allocation and is safe to call */
     schro_init();
 
     /* Initialise the schroedinger decoder */
-    if( !(p_schro = schro_decoder_new()) ) return VLC_EGENERIC;
+    if( !(p_schro = schro_decoder_new()) )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
-    /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-        return VLC_ENOMEM;
-
+    p_dec->p_sys = p_sys;
     p_sys->p_schro = p_schro;
     p_sys->p_format = NULL;
     p_sys->i_lastpts = -1;
