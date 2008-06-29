@@ -268,6 +268,13 @@ rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
         tab[session->srcc++] = src;
     }
 
+    /* Be optimistic for the first packet. Certain codec, such as Vorbis
+     * do not like loosing the first packet(s), so we cannot just wait
+     * for proper sequence synchronization. And we don't want to assume that
+     * the sender starts at seq=0 either. */
+    if (src->blocks == NULL)
+        src->max_seq = seq - p_sys->max_dropout;
+
     /* Check sequence number */
     /* NOTE: the sequence number is per-source,
      * but is independent from the payload type. */
