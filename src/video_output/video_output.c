@@ -506,6 +506,7 @@ static void vout_Destructor( vlc_object_t * p_this )
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
+ * XXX You have to enter it with change_lock taken.
  *****************************************************************************/
 static picture_t *get_pic( filter_t *p_filter )
 {
@@ -518,25 +519,19 @@ static int InitThread( vout_thread_t *p_vout )
 {
     int i, i_aspect_x, i_aspect_y;
 
-    vlc_mutex_lock( &p_vout->change_lock );
-
 #ifdef STATS
     p_vout->c_loops = 0;
 #endif
 
     /* Initialize output method, it allocates direct buffers for us */
     if( p_vout->pf_init( p_vout ) )
-    {
-        vlc_mutex_unlock( &p_vout->change_lock );
         return VLC_EGENERIC;
-    }
 
     if( !I_OUTPUTPICTURES )
     {
         msg_Err( p_vout, "plugin was unable to allocate at least "
                          "one direct buffer" );
         p_vout->pf_end( p_vout );
-        vlc_mutex_unlock( &p_vout->change_lock );
         return VLC_EGENERIC;
     }
 
@@ -545,7 +540,6 @@ static int InitThread( vout_thread_t *p_vout )
         msg_Err( p_vout, "plugin allocated too many direct buffers, "
                          "our internal buffers must have overflown." );
         p_vout->pf_end( p_vout );
-        vlc_mutex_unlock( &p_vout->change_lock );
         return VLC_EGENERIC;
     }
 
@@ -683,7 +677,6 @@ static int InitThread( vout_thread_t *p_vout )
             vlc_object_release( p_vout->p_chroma );
             p_vout->p_chroma = NULL;
             p_vout->pf_end( p_vout );
-            vlc_mutex_unlock( &p_vout->change_lock );
             return VLC_EGENERIC;
         }
         p_chroma->pf_vout_buffer_new = get_pic;
@@ -716,7 +709,6 @@ static int InitThread( vout_thread_t *p_vout )
         PP_OUTPUTPICTURE[ i ]->p_heap = &p_vout->output;
     }
 
-/* XXX XXX mark thread ready */
     return VLC_SUCCESS;
 }
 
@@ -750,6 +742,7 @@ static void RunThread( vout_thread_t *p_vout)
     /*
      * Initialize thread
      */
+    vlc_mutex_lock( &p_vout->change_lock );
     p_vout->b_error = InitThread( p_vout );
 
     var_Create( p_vout, "drop-late-frames", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -760,7 +753,10 @@ static void RunThread( vout_thread_t *p_vout)
     vlc_thread_ready( p_vout );
 
     if( p_vout->b_error )
+    {
+        vlc_mutex_unlock( &p_vout->change_lock );
         return;
+    }
 
     vlc_object_lock( p_vout );
 
@@ -1162,6 +1158,7 @@ static void RunThread( vout_thread_t *p_vout)
 
             I_OUTPUTPICTURES = I_RENDERPICTURES = 0;
 
+            vlc_mutex_lock( &p_vout->change_lock ); // FIXME is that valid ?
             p_vout->b_error = InitThread( p_vout );
 
             vlc_mutex_unlock( &p_vout->picture_lock );
@@ -1184,6 +1181,8 @@ static void RunThread( vout_thread_t *p_vout)
 
     /* End of thread */
     EndThread( p_vout );
+    vlc_mutex_unlock( &p_vout->change_lock );
+
     vlc_object_unlock( p_vout );
 }
 
@@ -1209,6 +1208,7 @@ static void ErrorThread( vout_thread_t *p_vout )
  *****************************************************************************
  * This function is called when the thread ends after a sucessful
  * initialization. It frees all resources allocated by InitThread.
+ * XXX You have to enter it with change_lock taken.
  *****************************************************************************/
 static void EndThread( vout_thread_t *p_vout )
 {
@@ -1249,9 +1249,6 @@ static void EndThread( vout_thread_t *p_vout )
 
     /* Destroy translation tables FIXME if b_error is set, it can already be done */
     p_vout->pf_end( p_vout );
-
-    /* Release the change lock */
-    vlc_mutex_unlock( &p_vout->change_lock );
 }
 
 /* following functions are local */
