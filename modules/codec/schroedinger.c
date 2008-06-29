@@ -251,6 +251,7 @@ static void SchroFrameFree( SchroFrame *frame, void *priv)
         return;
 
     if( p_pic->pf_release ) p_pic->pf_release( p_pic );
+    (void)frame;
 }
 
 /*****************************************************************************
@@ -320,6 +321,7 @@ static void SchroBufferFree( SchroBuffer *buf, void *priv )
         return;
 
     block_Release( p_block );
+    (void)buf;
 }
 
 /*****************************************************************************
@@ -362,7 +364,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     picture_t *p_pic;
     block_t *p_block;
     uint32_t u_pnum;
-    static int drop = 0;
 
     if( !pp_block ) return NULL;
 
