@@ -307,10 +307,11 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     p_block->i_buffer -= i_used;
     p_block->p_buffer += i_used;
 
-    if( p_sys->p_context->channels <= 0 || p_sys->p_context->channels > 6 )
+    if( p_sys->p_context->channels <= 0 || p_sys->p_context->channels > 6 ||
+        p_sys->p_context->sample_rate <= 0 )
     {
-        msg_Warn( p_dec, "invalid channels count %d",
-                  p_sys->p_context->channels );
+        msg_Warn( p_dec, "invalid audio properties channels count %d, sample rate %d",
+                  p_sys->p_context->channels, p_sys->p_context->sample_rate );
         block_Release( p_block );
         return NULL;
     }
