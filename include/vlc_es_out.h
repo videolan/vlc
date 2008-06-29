@@ -39,7 +39,7 @@ enum es_out_mode_e
 
 enum es_out_query_e
 {
-    /* activate apply of mode */
+    /* activate application of mode */
     ES_OUT_SET_ACTIVE,  /* arg1= bool                     */
     /* see if mode is currently aplied or not */
     ES_OUT_GET_ACTIVE,  /* arg1= bool*                    */
@@ -48,13 +48,13 @@ enum es_out_query_e
     ES_OUT_SET_MODE,    /* arg1= int                            */
     ES_OUT_GET_MODE,    /* arg2= int*                           */
 
-    /* set es selected for the es category(audio/video/spu) */
+    /* set ES selected for the es category (audio/video/spu) */
     ES_OUT_SET_ES,      /* arg1= es_out_id_t*                   */
 
-    /* set 'default' tag on es (copied across from container) */
+    /* set 'default' tag on ES (copied across from container) */
     ES_OUT_SET_DEFAULT, /* arg1= es_out_id_t*                   */
 
-    /* force selection/unselection of the ES (bypass current mode)*/
+    /* force selection/unselection of the ES (bypass current mode) */
     ES_OUT_SET_ES_STATE,/* arg1= es_out_id_t* arg2=bool   */
     ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=bool*  */
 
@@ -62,11 +62,12 @@ enum es_out_query_e
     ES_OUT_SET_GROUP,   /* arg1= int                            */
     ES_OUT_GET_GROUP,   /* arg1= int*                           */
 
-    /* PCR handling, dts/pts will be automatically computed using thoses PCR
-     * XXX: SET_PCR(_GROUP) is in charge of the pace control. They will wait to slow
-     * down the demuxer to read at the right speed.
-     * XXX: if you want PREROLL just call RESET_PCR and ES_OUT_SET_NEXT_DISPLAY_TIME and send
-     * data to the decoder *without* calling SET_PCR until preroll is finished.
+    /* PCR handling, DTS/PTS will be automatically computed using thoses PCR
+     * XXX: SET_PCR(_GROUP) are in charge of the pace control. They will wait
+     * to slow down the demuxer to read to the right speed.
+     * XXX: if you want PREROLL just call RESET_PCR and
+     * ES_OUT_SET_NEXT_DISPLAY_TIME and send data to the decoder *without*
+     * calling SET_PCR until preroll is finished.
      */
     ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
