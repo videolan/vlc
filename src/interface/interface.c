@@ -167,7 +167,6 @@ void intf_StopThread( intf_thread_t *p_intf )
 {
     /* Tell the interface to die */
     vlc_object_kill( p_intf );
-    vlc_object_signal( p_intf );
     vlc_thread_join( p_intf );
 }
 
