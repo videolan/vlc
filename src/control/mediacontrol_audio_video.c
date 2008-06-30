@@ -76,7 +76,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     {
         RAISE_NULL( mediacontrol_InternalException, "No video output" );
     }
-    p_cache = vlc_object_create( p_input, VLC_OBJECT_GENERIC );
+    p_cache = vlc_object_create( p_input, sizeof( vlc_object_t ) );
     if( p_cache == NULL )
     {
         vlc_object_release( p_vout );
