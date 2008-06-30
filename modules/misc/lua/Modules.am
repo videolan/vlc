@@ -12,6 +12,7 @@ SOURCES_lua = \
 	libs/input.h \
 	libs/messages.c \
 	libs/misc.c \
+	libs/misc.h \
 	libs/net.c \
 	libs/objects.c \
 	libs/objects.h \
