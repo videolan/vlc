@@ -25,7 +25,7 @@
 
 include ./config.mak
 
-BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp gecko-sdk config.mak distro.mak
+BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp gecko-sdk
 
 all:
 	$(MAKE) -C src
