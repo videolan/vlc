@@ -242,7 +242,6 @@ static int Open( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
         case VLC_FOURCC('h','2','6','4'): /* H.264 */
-        case VLC_FOURCC('a','v','c','1'): /* dto. */
         case VLC_FOURCC('c','v','i','d'): /* Cinepak */
         case VLC_FOURCC('I','V','4','1'): /* Indeo Video IV */
         case VLC_FOURCC('i','v','4','1'): /* dto. */
@@ -905,11 +904,13 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         p_sys->i_late = 0;
     }
+#ifndef NDEBUG
     msg_Dbg( p_dec, "bufsize: %d", (int)p_block->i_buffer);
+#endif
 
     if( p_sys->i_late > 10 )
     {
-        msg_Dbg( p_dec, "too late buffer -> dropped" );
+        msg_Dbg( p_dec, "late buffer dropped (%i)", i_pts );
         block_Release( p_block );
         return NULL;
     }
