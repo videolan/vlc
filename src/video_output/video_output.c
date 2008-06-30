@@ -395,6 +395,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( p_vout->p_module == NULL )
     {
         msg_Err( p_vout, "no suitable vout module" );
+        // FIXME it's ugly but that's exactly the function that need to be called.
+        EndThread( p_vout );
         vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         return NULL;
@@ -1213,6 +1215,8 @@ static void EndThread( vout_thread_t *p_vout )
                  cpu_usage.tms_utime, cpu_usage.tms_stime );
     }
 #endif
+
+    /* FIXME does that function *really* need to be called inside the thread ? */
 
     /* Destroy subpicture unit */
     spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
