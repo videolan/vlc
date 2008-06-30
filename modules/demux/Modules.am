@@ -48,7 +48,6 @@ libvlc_LTLIBRARIES += \
 	librawdv_plugin.la \
 	librawvid_plugin.la \
 	libreal_plugin.la \
-	librtp_plugin.la \
 	libsmf_plugin.la \
 	libsubtitle_plugin.la \
 	libtta_plugin.la \
@@ -60,7 +59,10 @@ libvlc_LTLIBRARIES += \
 	libxa_plugin.la \
 	$(NULL)
 
+if HAVE_LIBGCRYPT
 # RTP plugin
+libvlc_LTLIBRARIES += \
+	librtp_plugin.la
 librtp_plugin_la_SOURCES = \
 	rtp.c rtp.h rtpsession.c
 librtp_plugin_la_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/libs/srtp
@@ -68,3 +70,4 @@ librtp_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(top_builddir)/libs/srtp/libvlc_srtp.la
 librtp_plugin_la_DEPENDENCIES = \
 	$(top_builddir)/libs/srtp/libvlc_srtp.la
+endif
