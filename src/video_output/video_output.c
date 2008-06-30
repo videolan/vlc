@@ -1413,18 +1413,12 @@ typedef struct suxor_thread_t
 
 static void SuxorRestartVideoES( suxor_thread_t *p_this )
 {
-    vlc_value_t val;
-
-    vlc_thread_ready( p_this );
-
     /* Now restart current video stream */
-    var_Get( p_this->p_input, "video-es", &val );
-    if( val.i_int >= 0 )
+    int val = var_GetInteger( p_this->p_input, "video-es" );
+    if( val >= 0 )
     {
-        vlc_value_t val_es;
-        val_es.i_int = -VIDEO_ES;
-        var_Set( p_this->p_input, "video-es", val_es );
-        var_Set( p_this->p_input, "video-es", val );
+        var_SetInteger( p_this->p_input, "video-es", -VIDEO_ES );
+        var_SetInteger( p_this->p_input, "video-es", val );
     }
 
     vlc_object_release( p_this->p_input );
