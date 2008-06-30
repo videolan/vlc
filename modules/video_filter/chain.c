@@ -134,7 +134,7 @@ static int Activate( vlc_object_t *p_this )
     {
         /* Lets try resizing and then doing the chroma conversion */
         es_format_Copy( &fmt_mid, &p_filter->fmt_out );
-        fmt_mid.video.i_chroma = p_filter->fmt_out.video.i_chroma;
+        fmt_mid.video.i_chroma = p_filter->fmt_in.video.i_chroma;
         if( CreateChain( p_sys->p_chain, &fmt_mid ) == VLC_SUCCESS )
         {
             es_format_Clean( &fmt_mid );
