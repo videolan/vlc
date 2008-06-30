@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
-#include <vlc_vout.h>
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -40,6 +39,7 @@
 static int  Activate   ( vlc_object_t * );
 static void Destroy    ( vlc_object_t * );
 static picture_t *Chain( filter_t *, picture_t * );
+static int AllocInit( filter_t *p_filter, void *p_data );
 
 /*****************************************************************************
  * Module descriptor
@@ -54,10 +54,7 @@ vlc_module_end();
 
 struct filter_sys_t
 {
-    filter_t       *p_filter1; /* conversion from fmt_in to fmr_mid */
-    filter_t       *p_filter2; /* conversion from fmt_mid to fmt_out */
-    picture_t      *p_tmp;     /* temporary picture buffer */
-    video_format_t  fmt_mid;
+    filter_chain_t *p_chain;
 };
 
 static const vlc_fourcc_t pi_allowed_chromas[] = {
@@ -68,57 +65,27 @@ static const vlc_fourcc_t pi_allowed_chromas[] = {
     0
 };
 
-static picture_t *get_pic( filter_t *p_filter )
+static int CreateChain( filter_chain_t *p_chain, es_format_t *p_fmt_mid )
 {
-    picture_t *p_pic = (picture_t *)p_filter->p_owner;
-    p_filter->p_owner = NULL;
-    return p_pic;
-}
-
-/* FIXME: this is almost like DeleteFilter in src/misc/image.c */
-static void DeleteFilter( filter_t *p_filter )
-{
-    vlc_object_detach( p_filter );
-    if( p_filter->p_module ) module_Unneed( p_filter, p_filter->p_module );
-    vlc_object_release( p_filter );
-}
-
-/* FIXME: this is almost like CreateFilter in src/misc/image.c */
-static filter_t *CreateFilter( vlc_object_t *p_this, video_format_t *fmt_in,
-                               video_format_t *fmt_out )
-{
-    filter_t *p_filter = vlc_object_create( p_this, sizeof(filter_t) );
-    vlc_object_attach( p_filter, p_this );
-
-    p_filter->pf_vout_buffer_new = get_pic;
-
-    p_filter->fmt_in = *fmt_in;
-    p_filter->fmt_out = *fmt_out;
-
-    p_filter->p_module = module_Need( p_filter, "video filter2", NULL, 0 );
-
-    if( !p_filter->p_module )
+    filter_t *p_filter1;
+    if( !( p_filter1 =
+           filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, p_fmt_mid )) )
+        return VLC_EGENERIC;
+    if( !filter_chain_AppendFilter( p_chain, NULL, NULL, p_fmt_mid, NULL ) )
     {
-        DeleteFilter( p_filter );
-        return NULL;
+        filter_chain_DeleteFilter( p_chain, p_filter1 );
+        return VLC_EGENERIC;
     }
-
-    return p_filter;
+    return VLC_SUCCESS;
 }
 
-static int CreateChain( vlc_object_t *p_this, filter_sys_t *p_sys )
+static int AllocInit( filter_t *p_filter, void *p_data )
 {
-    p_sys->p_filter1 = CreateFilter( p_this, &p_filter->fmt_in.video,
-                                     &p_sys->fmt_mid );
-    if( p_sys->p_filter1 )
-    {
-        p_sys->p_filter2 = CreateFilter( p_this, &p_sys->fmt_mid,
-                                         &p_filter->fmt_out.video );
-        if( p_sys->p_filter2 )
-            return VLC_SUCCESS;
-        DeleteFilter( p_sys->p_filter1 );
-    }
-    return VLC_EGENERIC;
+    /* Not sure about all of this ... it should work */
+    p_filter->pf_vout_buffer_new = ((filter_t*)p_data)->pf_vout_buffer_new;
+    p_filter->pf_vout_buffer_del = ((filter_t*)p_data)->pf_vout_buffer_del;
+    p_filter->p_owner = ((filter_t*)p_data)->p_owner;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -130,6 +97,7 @@ static int Activate( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     static int hack = 0; /* FIXME */
+    es_format_t fmt_mid;
 
     if( p_filter->fmt_in.video.i_chroma == p_filter->fmt_out.video.i_chroma )
         return VLC_EGENERIC;
@@ -151,37 +119,60 @@ static int Activate( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( filter_sys_t ) );
     p_filter->p_sys = p_sys;
 
-    if( p_filter->fmt_in.i_width != p_filter->fmt_out.i_width ||
-        p_filter->fmt_in.i_height != p_filter->fmt_out.i_height ||
-        p_filter->fmt_in.i_visible_width != p_filter->fmt_out.i_visible_width ||
-        p_filter->fmt_in.i_visible_height != p_filter->fmt_out.i_visible_height )
+    p_sys->p_chain = filter_chain_New( p_filter, "video filter2", false, AllocInit, NULL, p_filter );
+    if( !p_sys->p_chain )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &p_filter->fmt_out );
+
+    if( p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width ||
+        p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height ||
+        p_filter->fmt_in.video.i_visible_width != p_filter->fmt_out.video.i_visible_width ||
+        p_filter->fmt_in.video.i_visible_height != p_filter->fmt_out.video.i_visible_height )
     {
         /* Lets try resizing and then doing the chroma conversion */
-        p_sys->fmt_mid = p_filter->fmt_out.video;
-        p_sys->fmt_mid.i_chroma = p_filter->fmt_in.video.i_chroma;
-        if( CreateChain( p_this, p_sys ) == VLC_SUCCESS )
+        es_format_Copy( &fmt_mid, &p_filter->fmt_out );
+        fmt_mid.video.i_chroma = p_filter->fmt_out.video.i_chroma;
+        if( CreateChain( p_sys->p_chain, &fmt_mid ) == VLC_SUCCESS )
+        {
+            es_format_Clean( &fmt_mid );
+            p_filter->pf_video_filter = Chain;
             return VLC_SUCCESS;
+        }
 
         /* Lets try it the other way arround (chroma and then resize) */
-        p_sys->fmt_mid = p_filter->fmt_in.video;
-        p_sys->fmt_mid.i_chroma = p_filter->fmt_out.video.i_chroma;
-        if( CreateChain( p_this, p_sys ) == VLC_SUCCESS )
+        es_format_Clean( &fmt_mid );
+        es_format_Copy( &fmt_mid, &p_filter->fmt_in );
+        fmt_mid.video.i_chroma = p_filter->fmt_out.video.i_chroma;
+        if( CreateChain( p_sys->p_chain, &fmt_mid ) == VLC_SUCCESS )
+        {
+            es_format_Clean( &fmt_mid );
+            p_filter->pf_video_filter = Chain;
             return VLC_SUCCESS;
+        }
     }
     else
     {
         /* Lets try doing a chroma chain */
         int i;
-        p_sys->fmt_mid = p_filter->fmt_in.video;
-        for( i = 0; pi_allowed_chomas[i]; i++ )
+        es_format_Copy( &fmt_mid, &p_filter->fmt_in );
+        for( i = 0; pi_allowed_chromas[i]; i++ )
         {
-            p_sys->fmt_mid.i_chroma = pi_allowed_chromas[i];
-            if( CreateChain( p_this, p_sys ) == VLC_SUCCESS )
+            fmt_mid.video.i_chroma = pi_allowed_chromas[i];
+            if( CreateChain( p_sys->p_chain, &fmt_mid ) == VLC_SUCCESS )
+            {
+                es_format_Clean( &fmt_mid );
+                p_filter->pf_video_filter = Chain;
                 return VLC_SUCCESS;
+            }
         }
     }
 
     /* Hum ... looks like this really isn't going to work. Too bad. */
+    es_format_Clean( &fmt_mid );
+    filter_chain_Delete( p_sys->p_chain );
     free( p_sys );
     hack--;
     return VLC_EGENERIC;
@@ -190,16 +181,7 @@ static int Activate( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-
-    DeleteFilter( p_filter->p_sys->filter1 );
-    DeleteFilter( p_filter->p_sys->filter2 );
-
-    if( p_filter->p_sys->p_tmp )
-    {
-        free( p_filter->p_sys->p_tmp->p_data_orig );
-        free( p_filter->p_sys->p_tmp );
-    }
-
+    filter_chain_Delete( p_filter->p_sys->p_chain );
     free( p_filter->p_sys );
 }
 
@@ -208,41 +190,5 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static picture_t *Chain( filter_t *p_filter, picture_t *p_pic )
 {
-    picture_t *p_outpic = p_filter->pf_vout_buffer_new( p_filter );
-    if( !p_outpic )
-    {
-        msg_Warn( p_filter, "can't get output picture" );
-        if( p_pic->pf_release )
-            p_pic->pf_release( p_pic );
-        return NULL;
-    }
-
-
-    if( !p_sys->p_tmp )
-    {
-        picture_t *p_tmp = malloc( sizeof( picture_t ) );
-        if( !p_tmp )
-            return NULL;
-        vout_AllocatePicture( VLC_OBJECT( p_vout ), p_tmp,
-                              p_sys->fmt_mid.i_chroma,
-                              p_sys->fmt_mid.i_width,
-                              p_sys->fmt_mid.i_height,
-                              p_sys->fmt_mid.i_aspect );
-        p_sys->p_tmp = p_tmp;
-        p_tmp->pf_release = NULL;
-        p_tmp->i_status = RESERVED_PICTURE;
-        p_tmp->p_sys = NULL;
-    }
-
-    p_sys->p_filter1->p_owner = (filter_owner_sys_t*)p_sys->p_tmp;
-    if( !p_sys->p_filter1->pf_video_filter( p_sys->p_filter1, p_pic ) )
-    {
-        if( p_pic->pf_release )
-            p_pic->pf_release( p_pic );
-        return NULL;
-    }
-    if( p_pic->pf_release )
-        p_pic->pf_release( p_pic );
-    p_sys->p_filter2->p_owner = (filter_owner_sys_t*)p_outpic;
-    return p_sys->p_filter2->pf_video_filter( p_sys->p_filter2, p_sys->p_tmp );
+    return filter_chain_VideoFilter( p_filter->p_sys->p_chain, p_pic );
 }

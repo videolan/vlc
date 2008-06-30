@@ -1204,7 +1204,7 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGIN([i422_i420])
   VLC_ADD_PLUGIN([yuy2_i422])
   VLC_ADD_PLUGIN([yuy2_i420])
-  VLC_ADD_PLUGIN([chroma_chain])
+  VLC_ADD_PLUGIN([chain])
   VLC_ADD_PLUGIN([aout_file])
   VLC_ADD_PLUGIN([linear_resampler])
   VLC_ADD_PLUGIN([bandlimited_resampler])
