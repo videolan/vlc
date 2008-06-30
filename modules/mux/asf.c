@@ -87,9 +87,9 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "rating",  "", NULL, RATING_TEXT,
                                  RATING_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "packet-size", 4096, NULL, PACKETSIZE_TEXT,
-                                 PACKETSIZE_LONGTEXT, VLC_TRUE );
+                                 PACKETSIZE_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "bitrate-override", 0, NULL, BITRATE_TEXT,
-                                 BITRATE_LONGTEXT, VLC_TRUE );
+                                 BITRATE_LONGTEXT, true );
 
 vlc_module_end();
 
