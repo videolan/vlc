@@ -61,6 +61,9 @@ static void Close  ( vlc_object_t * );
 #define RATING_LONGTEXT N_("\"Rating\" to put in ASF comments." )
 #define PACKETSIZE_TEXT N_("Packet Size")
 #define PACKETSIZE_LONGTEXT N_("ASF packet size -- default is 4096 bytes")
+#define BITRATE_TEXT N_("Bitrate override")
+#define BITRATE_LONGTEXT N_("Do not try to guess ASF bitrate. Setting this, allows you to control how Windows Media Player will cache streamed content. Set to audio+video bitrate in bytes")
+
 
 vlc_module_begin();
     set_description( N_("ASF muxer") );
@@ -85,6 +88,8 @@ vlc_module_begin();
                                  RATING_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "packet-size", 4096, NULL, PACKETSIZE_TEXT,
                                  PACKETSIZE_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "bitrate-override", 0, NULL, BITRATE_TEXT,
+                                 BITRATE_LONGTEXT, VLC_TRUE );
 
 vlc_module_end();
 
@@ -130,6 +135,7 @@ struct sout_mux_sys_t
     mtime_t         i_dts_last;
     mtime_t         i_preroll_time;
     int64_t         i_bitrate;
+    int64_t         i_bitrate_override;
 
     int             i_track;
     asf_track_t     track[MAX_ASF_TRACKS];
@@ -207,12 +213,16 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_dts_last   = 0;
     p_sys->i_preroll_time = 2000;
     p_sys->i_bitrate    = 0;
+    p_sys->i_bitrate_override = 0;
     p_sys->i_seq        = 0;
 
     p_sys->b_write_header = true;
     p_sys->i_track = 0;
     p_sys->i_packet_size = config_GetInt( p_mux, "sout-asf-packet-size" );
+    p_sys->i_bitrate_override = config_GetInt( p_mux, "sout-asf-bitrate-override" );
     msg_Dbg( p_mux, "Packet size %d", p_sys->i_packet_size);
+    if (p_sys->i_bitrate_override)
+        msg_Dbg( p_mux, "Bitrate override %d", p_sys->i_bitrate_override);
     p_sys->i_packet_count= 0;
 
     /* Generate a random fid */
@@ -481,6 +491,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             {
                 p_sys->i_bitrate += 512000;
             }
+            if (p_sys->i_bitrate_override)
+                p_sys->i_bitrate = p_sys->i_bitrate_override;
             break;
         }
         case VIDEO_ES:
@@ -565,6 +577,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             {
                 p_sys->i_bitrate += 1000000;
             }
+            if (p_sys->i_bitrate_override)
+                p_sys->i_bitrate = p_sys->i_bitrate_override;
             break;
         }
         default:
