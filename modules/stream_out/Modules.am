@@ -21,13 +21,15 @@ libvlc_LTLIBRARIES += \
 	libstream_out_es_plugin.la \
 	libstream_out_display_plugin.la \
 	libstream_out_gather_plugin.la \
-	libstream_out_rtp_plugin.la \
 	libstream_out_bridge_plugin.la \
 	libstream_out_mosaic_bridge_plugin.la \
 	libstream_out_autodel_plugin.la \
 	$(NULL)
 
+if HAVE_LIBGCRYPT
 # RTP plugin
+libvlc_LTLIBRARIES += \
+	libstream_out_rtp_plugin.la
 libstream_out_rtp_plugin_la_SOURCES = \
 	rtp.c rtp.h rtpfmt.c rtcp.c rtsp.c
 libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/libs/srtp
@@ -35,3 +37,4 @@ libstream_out_rtp_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(top_builddir)/libs/srtp/libvlc_srtp.la
 libstream_out_rtp_plugin_la_DEPENDENCIES = \
 	$(top_builddir)/libs/srtp/libvlc_srtp.la
+endif
