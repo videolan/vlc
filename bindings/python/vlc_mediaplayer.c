@@ -30,7 +30,7 @@ static PyObject *
 vlcMediaPlayer_get_length( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    vlc_int64_t i_ret;
+    int64_t i_ret;
     LIBVLC_TRY;
     i_ret = libvlc_media_player_get_length( LIBVLC_MEDIAPLAYER->p_mp, &ex);
     LIBVLC_EXCEPT;
@@ -41,7 +41,7 @@ static PyObject *
 vlcMediaPlayer_get_time( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    vlc_int64_t i_ret;
+    int64_t i_ret;
     LIBVLC_TRY;
     i_ret = libvlc_media_player_get_time( LIBVLC_MEDIAPLAYER->p_mp, &ex);
     LIBVLC_EXCEPT;
@@ -52,7 +52,7 @@ static PyObject *
 vlcMediaPlayer_set_time( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    vlc_int64_t i_time;
+    int64_t i_time;
 
     if( !PyArg_ParseTuple( args, "L", &i_time ) )
         return NULL;
