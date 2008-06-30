@@ -301,7 +301,12 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     /* If we are running on a thread, wait until it ends */
     if( p_priv->b_thread )
+    {
+        msg_Warn (p_this->p_libvlc, /* do NOT use a dead object for logging! */
+                  "object %d destroyed while thread alive (VLC might crash)",
+                  p_this->i_object_id);
         vlc_thread_join( p_this );
+    }
 
     /* Call the custom "subclass" destructor */
     if( p_priv->pf_destructor )
