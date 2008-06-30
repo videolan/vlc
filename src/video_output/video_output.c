@@ -65,6 +65,7 @@
 static int      InitThread        ( vout_thread_t * );
 static void     RunThread         ( vout_thread_t * );
 static void     ErrorThread       ( vout_thread_t * );
+static void     CleanThread       ( vout_thread_t * );
 static void     EndThread         ( vout_thread_t * );
 
 static void     AspectRatio       ( int, int *, int * );
@@ -724,6 +725,7 @@ static void RunThread( vout_thread_t *p_vout)
 
     if( p_vout->b_error )
     {
+        EndThread( p_vout );
         vlc_mutex_unlock( &p_vout->change_lock );
         return;
     }
@@ -1035,6 +1037,7 @@ static void RunThread( vout_thread_t *p_vout)
              * causes the immediate end of the main while() loop. */
             // FIXME pf_end
             p_vout->b_error = 1;
+            break;
         }
 
         if( p_vout->i_changes & VOUT_SIZE_CHANGE )
@@ -1047,11 +1050,19 @@ static void RunThread( vout_thread_t *p_vout)
 
             p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
+            assert( !p_vout->b_direct );
+
+            ChromaDestroy( p_vout );
+
+            vlc_mutex_lock( &p_vout->picture_lock );
+
             p_vout->pf_end( p_vout );
+
             for( i = 0; i < I_OUTPUTPICTURES; i++ )
                  p_vout->p_picture[ i ].i_status = FREE_PICTURE;
 
             I_OUTPUTPICTURES = 0;
+
             if( p_vout->pf_init( p_vout ) )
             {
                 msg_Err( p_vout, "cannot resize display" );
@@ -1059,19 +1070,19 @@ static void RunThread( vout_thread_t *p_vout)
                 p_vout->b_error = 1;
             }
 
+            vlc_mutex_unlock( &p_vout->picture_lock );
+
             /* Need to reinitialise the chroma plugin. Since we might need
              * resizing too and it's not sure that we already had it,
              * recreate the chroma plugin chain from scratch. */
             /* dionoea */
-            if( !p_vout->b_direct )
+            if( ChromaCreate( p_vout ) )
             {
-                ChromaDestroy( p_vout );
-
-                if( ChromaCreate( p_vout ) )
-                {
-                    msg_Err( p_vout, "WOW THIS SUCKS BIG TIME!!!!!" );
-                }
+                msg_Err( p_vout, "WOW THIS SUCKS BIG TIME!!!!!" );
+                p_vout->b_error = 1;
             }
+            if( p_vout->b_error )
+                break;
         }
 
         if( p_vout->i_changes & VOUT_PICTURE_BUFFERS_CHANGE )
@@ -1093,8 +1104,13 @@ static void RunThread( vout_thread_t *p_vout)
             I_OUTPUTPICTURES = I_RENDERPICTURES = 0;
 
             p_vout->b_error = InitThread( p_vout );
+            if( p_vout->b_error )
+                msg_Err( p_vout, "InitThread after VOUT_PICTURE_BUFFERS_CHANGE failed\n" );
 
             vlc_mutex_unlock( &p_vout->picture_lock );
+
+            if( p_vout->b_error )
+                break;
         }
 
         /* Check for "video filter2" changes */
@@ -1127,11 +1143,10 @@ static void RunThread( vout_thread_t *p_vout)
      * Error loop - wait until the thread destruction is requested
      */
     if( p_vout->b_error )
-    {
         ErrorThread( p_vout );
-    }
 
     /* End of thread */
+    CleanThread( p_vout );
     EndThread( p_vout );
     vlc_mutex_unlock( &p_vout->change_lock );
 
@@ -1148,33 +1163,20 @@ static void RunThread( vout_thread_t *p_vout)
 static void ErrorThread( vout_thread_t *p_vout )
 {
     /* Wait until a `die' order */
-    while( !p_vout->b_die )
-    {
-        /* Sleep a while */
-        msleep( VOUT_IDLE_SLEEP );
-    }
+    while( vlc_object_alive( p_vout ) )
+        vlc_object_wait( p_vout );
 }
 
 /*****************************************************************************
- * EndThread: thread destruction
+ * CleanThread: clean up after InitThread
  *****************************************************************************
- * This function is called when the thread ends after a sucessful
+ * This function is called after a sucessful
  * initialization. It frees all resources allocated by InitThread.
  * XXX You have to enter it with change_lock taken.
  *****************************************************************************/
-static void EndThread( vout_thread_t *p_vout )
+static void CleanThread( vout_thread_t *p_vout )
 {
     int     i_index;                                        /* index in heap */
-
-#ifdef STATS
-    {
-        struct tms cpu_usage;
-        times( &cpu_usage );
-
-        msg_Dbg( p_vout, "cpu usage (user: %d, system: %d)",
-                 cpu_usage.tms_utime, cpu_usage.tms_stime );
-    }
-#endif
 
     if( !p_vout->b_direct )
         ChromaDestroy( p_vout );
@@ -1188,15 +1190,36 @@ static void EndThread( vout_thread_t *p_vout )
         }
     }
 
+    /* Destroy translation tables */
+    if( !p_vout->b_error )
+        p_vout->pf_end( p_vout );
+}
+
+/*****************************************************************************
+ * EndThread: thread destruction
+ *****************************************************************************
+ * This function is called when the thread ends.
+ * It frees all resources not allocated by InitThread.
+ * XXX You have to enter it with change_lock taken.
+ *****************************************************************************/
+static void EndThread( vout_thread_t *p_vout )
+{
+#ifdef STATS
+    {
+        struct tms cpu_usage;
+        times( &cpu_usage );
+
+        msg_Dbg( p_vout, "cpu usage (user: %d, system: %d)",
+                 cpu_usage.tms_utime, cpu_usage.tms_stime );
+    }
+#endif
+
     /* Destroy subpicture unit */
     spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
     spu_Destroy( p_vout->p_spu );
 
     /* Destroy the video filters2 */
     filter_chain_Delete( p_vout->p_vf2_chain );
-
-    /* Destroy translation tables FIXME if b_error is set, it can already be done */
-    p_vout->pf_end( p_vout );
 }
 
 /* Thread helpers */
