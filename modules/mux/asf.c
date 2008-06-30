@@ -83,7 +83,8 @@ vlc_module_begin();
                                  COMMENT_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "rating",  "", NULL, RATING_TEXT,
                                  RATING_LONGTEXT, true );
-    add_integer( "sout-asf-packet-size", 4096, NULL, PACKETSIZE_TEXT, PACKETSIZE_LONGTEXT, true );
+    add_integer( SOUT_CFG_PREFIX "packet-size", 4096, NULL, PACKETSIZE_TEXT,
+                                 PACKETSIZE_LONGTEXT, VLC_TRUE );
 
 vlc_module_end();
 
