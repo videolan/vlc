@@ -193,16 +193,6 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
     }
 
     vlc_mutex_lock( &p_playlist->gc_lock );
-    /* Remove video outputs when user presses stop: */
-    vlc_list_t *list = vlc_list_find( p_playlist->p_libvlc, VLC_OBJECT_VOUT,
-                                      FIND_CHILD );
-    if( list != NULL )
-    {
-        msg_Dbg( p_playlist, "removing %u vout(s)", list->i_count );
-        for( int i = 0; i < list->i_count; i++)
-            vlc_object_release( list->p_values[i].p_object );
-        vlc_list_release( list );
-    }
     p_playlist->b_cant_sleep = false;
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
