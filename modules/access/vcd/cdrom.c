@@ -828,17 +828,9 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     {
         /* psz_dev must be the cue file. Let's assume there's a .bin
          * file with the same filename */
-        if( p_pos )
-        {
-            psz_vcdfile = malloc( p_pos - psz_dev + 5 /* ".bin" */ );
-            strncpy( psz_vcdfile, psz_dev, p_pos - psz_dev );
-            strcpy( psz_vcdfile + (p_pos - psz_dev), ".bin");
-        }
-        else
-        {
-            psz_vcdfile = malloc( strlen(psz_dev) + 5 /* ".bin" */ );
-            sprintf( psz_vcdfile, "%s.bin", psz_dev );
-        }
+        psz_vcdfile = malloc( p_pos - psz_dev + 5 /* ".bin" */ );
+        strncpy( psz_vcdfile, psz_dev, p_pos - psz_dev );
+        strcpy( psz_vcdfile + (p_pos - psz_dev), ".bin");
         psz_cuefile = strdup( psz_dev );
     }
     else
