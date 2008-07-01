@@ -467,6 +467,9 @@ static int WindowOpen (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
 
+    if (config_GetInt (obj, "embedded-video") <= 0)
+        return VLC_EGENERIC;
+
     intf_thread_t *intf = (intf_thread_t *)
         vlc_object_find_name (obj, "qt4", FIND_ANYWHERE);
     if (intf == NULL)
@@ -494,12 +497,6 @@ static int WindowOpen (vlc_object_t *obj)
 
     if (miP->isNull ())
         return VLC_EGENERIC;
-
-    if (config_GetInt (obj, "embedded-video") <= 0)
-    {
-        (*miP)->requestNotEmbeddedVideo (wnd->vout);
-        return VLC_EGENERIC;
-    }
 
     wnd->handle = (*miP)->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
                                         &wnd->width, &wnd->height);
