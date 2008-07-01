@@ -173,7 +173,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
                  :QWidget( NULL ), p_intf( _p_i )
 {
     /* We should use that one to take the more size it can */
-//    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     /* A dark background */
     setAutoFillBackground( true );
