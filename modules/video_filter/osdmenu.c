@@ -228,17 +228,10 @@ static int CreateFilter ( vlc_object_t *p_this )
         p_sys->p_menu->i_x = 0;
         p_sys->p_menu->i_y = 0;
     }
-    else if( (p_sys->i_x >= 0) || (p_sys->i_y >= 0) )
+    else
     {
         p_sys->p_menu->i_x = p_sys->i_x;
         p_sys->p_menu->i_y = p_sys->i_y;
-    }
-    else if( (p_sys->p_menu->i_x < 0) ||
-             (p_sys->p_menu->i_y < 0) )
-    {
-        p_sys->b_absolute = false;
-        p_sys->p_menu->i_x = 0;
-        p_sys->p_menu->i_y = 0;
     }
 
     /* Set up p_filter */
