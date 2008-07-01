@@ -1,5 +1,5 @@
-Changes between 0.8.6 and 0.9.0-test1 (not released yet):
-----------------------------------------------------------
+Changes between 0.8.6i and 0.9.0-test1:
+---------------------------------------
 
 Important notes:
 ----------------
@@ -241,6 +241,13 @@ Developers:
   * LibVLC now supports externally built plugins properly.
     A "vlc-plugin" pkg-config package is provided.
   * Java bindings are now built from a separate source.
+
+
+Changes between 0.8.6h and 0.8.6i:
+----------------------------------
+
+Security updates:
+ * Fixed integer overflow in WAV demuxer (CVE-2008-2430)
 
 
 Changes between 0.8.6g and 0.8.6h:
