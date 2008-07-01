@@ -1401,6 +1401,32 @@ int vout_VarCallback( vlc_object_t * p_this, const char * psz_variable,
 }
 
 /*****************************************************************************
+ * Helper thread for object variables callbacks.
+ * Only used to avoid deadlocks when using the video embedded mode.
+ *****************************************************************************/
+typedef struct suxor_thread_t
+{
+    VLC_COMMON_MEMBERS
+    input_thread_t *p_input;
+
+} suxor_thread_t;
+
+static void SuxorRestartVideoES( suxor_thread_t *p_this )
+{
+    /* Now restart current video stream */
+    int val = var_GetInteger( p_this->p_input, "video-es" );
+    if( val >= 0 )
+    {
+        var_SetInteger( p_this->p_input, "video-es", -VIDEO_ES );
+        var_SetInteger( p_this->p_input, "video-es", val );
+    }
+
+    vlc_object_release( p_this->p_input );
+
+    vlc_object_release( p_this );
+}
+
+/*****************************************************************************
  * object variables callbacks: a bunch of object variables are used by the
  * interfaces to interact with the vout.
  *****************************************************************************/
@@ -1488,14 +1514,17 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
+        suxor_thread_t *p_suxor =
+            vlc_object_create( p_vout, sizeof(suxor_thread_t) );
+        p_suxor->p_input = p_input;
         p_vout->b_filter_change = true;
-        /* To all (embedded) video output developpers:
-         * Beware of callback loops if you listen on video-es. Really.
-         * You were warned. -- Courmisch */
-        var_SetInteger( p_input, "video-es", -VIDEO_ES );
-        var_Set( p_input, "video-es", val );
+        vlc_object_yield( p_input );
+        vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
+                           VLC_THREAD_PRIORITY_LOW, false );
     }
+
     vlc_object_release( p_input );
+
     return VLC_SUCCESS;
 }
 
