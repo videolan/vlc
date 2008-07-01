@@ -808,7 +808,11 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
             p_sdp->psz_uri = NULL;
     }
 
-    if( p_sdp->psz_uri == NULL ) return VLC_EGENERIC;
+    if( p_sdp->psz_uri == NULL )
+    {
+        FreeSDP( p_sdp );
+        return VLC_EGENERIC;
+    }
 
     for( i = 0 ; i< p_sd->p_sys->i_announces ; i++ )
     {
