@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/poll.h>
+#include <netinet/in.h>
 
 /* DVB Card Drivers */
 #include <linux/dvb/version.h>
