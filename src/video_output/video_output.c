@@ -125,12 +125,13 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 {
     if( !p_fmt )
     {
-        /* Reattach video output to the instance before bailing out */
+        /* Video output is no longer used.
+         * TODO: support for reusing video outputs with proper _thread-safe_
+         * reference handling. */
         if( p_vout )
         {
             spu_Attach( p_vout->p_spu, p_this, false );
-            vlc_object_detach( p_vout );
-            vlc_object_attach( p_vout, p_this->p_libvlc );
+            vlc_object_release( p_vout );
         }
         return NULL;
     }
@@ -140,24 +141,8 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
     {
         vlc_object_yield( p_vout );
     }
-    else
-    {
-        p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT, FIND_CHILD );
 
-        if( !p_vout )
-        {
-            p_vout = vlc_object_find( p_this->p_libvlc,
-                                      VLC_OBJECT_VOUT, FIND_CHILD );
-            /* only first children of p_input for unused vout */
-            if( p_vout && p_vout->p_parent != VLC_OBJECT(p_this->p_libvlc) )
-            {
-                vlc_object_release( p_vout );
-                p_vout = NULL;
-            }
-            if( p_vout )
-                vlc_object_detach( p_vout );    /* Remove it from the GC */
-        }
-    }
+    /* TODO: find a suitable unused video output */
 
     /* If we now have a video output, check it has the right properties */
     if( p_vout )
