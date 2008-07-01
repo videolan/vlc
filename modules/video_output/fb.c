@@ -525,13 +525,12 @@ static int Init( vout_thread_t *p_vout )
     }
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
-    if( !p_sys->b_auto )
-    {
-        p_vout->render.i_width = p_sys->i_width;
-        p_vout->render.i_height = p_sys->i_height;
-    }
-    p_vout->output.i_width  = p_vout->fmt_out.i_width = p_sys->i_width;
-    p_vout->output.i_height = p_vout->fmt_out.i_height = p_sys->i_height;
+    p_vout->output.i_width =
+    p_vout->fmt_out.i_width =
+    p_vout->fmt_out.i_visible_width = p_sys->i_width;
+    p_vout->output.i_height =
+    p_vout->fmt_out.i_height =
+    p_vout->fmt_out.i_visible_height = p_sys->i_height;
 
     /* Assume we have square pixels */
     if( p_sys->i_aspect < 0 )
