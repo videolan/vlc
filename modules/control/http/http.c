@@ -2,7 +2,6 @@
  * http.c : HTTP/HTTPS Remote control interface
  *****************************************************************************
  * Copyright (C) 2001-2006 the VideoLAN team
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -600,7 +599,7 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
     char *p_url = (char *)_p_url;
     char *p_request = (char *)_p_request;
     char **pp_data = (char **)_pp_data;
-    char *p_in = (char *)p_in;
+    char *p_in = (char *)_p_in;
     int i_request = p_request != NULL ? strlen( p_request ) : 0;
     char *p;
     int i_env = 0;
