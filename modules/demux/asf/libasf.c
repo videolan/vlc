@@ -245,8 +245,8 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
     if( p_index->i_index_entry_count > (p_index->i_object_size - 56) / 6 )
         p_index->i_index_entry_count = (p_index->i_object_size - 56) / 6;
 
-    p_index->index_entry = malloc( sizeof(asf_index_entry_t) *
-                                   p_index->i_index_entry_count );
+    p_index->index_entry = calloc( p_index->i_index_entry_count,
+                                   sizeof(asf_index_entry_t) );
 
     for( i = 0, p_peek += 56; i < (int)p_index->i_index_entry_count;
          i++, p_peek += 6 )
@@ -631,7 +631,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
             codec.i_type = GetWLE( p_data ); p_data += 2;
             /* codec name */
             i_len = GetWLE( p_data ); p_data += 2;
-            codec.psz_name = calloc( sizeof( char ), i_len + 1);
+            codec.psz_name = calloc( i_len + 1, sizeof(char) );
             for( i = 0; i < i_len; i++ )
             {
                 codec.psz_name[i] = GetWLE( p_data + 2*i );
@@ -641,7 +641,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
 
             /* description */
             i_len = GetWLE( p_data ); p_data += 2;
-            codec.psz_description = calloc( sizeof( char ), i_len + 1);
+            codec.psz_description = calloc( i_len + 1, sizeof(char) );
             for( i = 0; i < i_len; i++ )
             {
                 codec.psz_description[i] = GetWLE( p_data + 2*i );
@@ -807,7 +807,7 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
             int i_size = *p_data++;
             int i_len;
 
-            psz = calloc( i_size/2 + 1, sizeof( char ) );
+            psz = calloc( i_size/2 + 1, sizeof(char) );
             for( i_len = 0; i_len < i_size/2; i_len++ )
             {
                 psz[i_len] = GetWLE( p_data + 2*i_len );
@@ -911,10 +911,10 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 
     p_data += 64;
 
-    p_esp->pi_stream_name_language = calloc( sizeof(int),
-                                             p_esp->i_stream_name_count );
-    p_esp->ppsz_stream_name = calloc( sizeof(char*),
-                                      p_esp->i_stream_name_count );
+    p_esp->pi_stream_name_language = calloc( p_esp->i_stream_name_count,
+                                             sizeof(int) );
+    p_esp->ppsz_stream_name = calloc( p_esp->i_stream_name_count,
+                                      sizeof(char*) );
     for( i = 0; i < p_esp->i_stream_name_count; i++ )
     {
         int i_size;
@@ -925,7 +925,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         i_size = GetWLE( &p_data[2] );
         p_data += 2;
  
-        psz = calloc( i_size/2 + 1, sizeof( char ) );
+        psz = calloc( i_size/2 + 1, sizeof(char) );
         for( i_len = 0; i_len < i_size/2; i_len++ )
         {
             psz[i_len] = GetWLE( p_data + 2*i_len );
@@ -1023,8 +1023,8 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
     p_ae->i_stream_number_count = GetWLE( &p_data[16] );
 
     p_data += 16 + 2;
-    p_ae->pi_stream_number = calloc( sizeof(int),
-                                     p_ae->i_stream_number_count );
+    p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count,
+                                     sizeof(int) );
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
     {
         p_ae->pi_stream_number[i] = GetWLE( p_data );
@@ -1064,9 +1064,9 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
     p_sp->i_priority_count = GetWLE( &p_data[0] );
     p_data += 2;
 
-    p_sp->pi_priority_flag = calloc( sizeof(int), p_sp->i_priority_count );
+    p_sp->pi_priority_flag = calloc( p_sp->i_priority_count, sizeof(int) );
     p_sp->pi_priority_stream_number =
-                             calloc( sizeof(int), p_sp->i_priority_count );
+                             calloc( p_sp->i_priority_count, sizeof(int) );
 
     for( i = 0; i < p_sp->i_priority_count; i++ )
     {
@@ -1107,8 +1107,8 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
     p_data = &p_peek[24];
 
     p_ec->i_count = GetWLE( p_data ); p_data += 2;
-    p_ec->ppsz_name = calloc( sizeof(char*), p_ec->i_count );
-    p_ec->ppsz_value = calloc( sizeof(char*), p_ec->i_count );
+    p_ec->ppsz_name = calloc( p_ec->i_count, sizeof(char*) );
+    p_ec->ppsz_value = calloc( p_ec->i_count, sizeof(char*) );
     for( i = 0; i < p_ec->i_count; i++ )
     {
         int i_size;
