@@ -283,11 +283,11 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_index_t *p_index = &p_obj->index;
     const uint8_t      *p_peek;
-    int                 i;
+    unsigned int       i;
 
     /* We just ignore error on the index */
     if( stream_Peek( s, &p_peek, p_index->i_object_size ) <
-        __MAX( (int)p_index->i_object_size, 56 ) )
+        __MAX( (int64_t)p_index->i_object_size, 56 ) )
         return VLC_SUCCESS;
 
     ASF_GetGUID( &p_index->i_file_id, p_peek + 24 );
@@ -316,8 +316,7 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
     if( !p_index->index_entry )
         return VLC_ENOMEM;
 
-    for( i = 0, p_peek += 56; i < (int)p_index->i_index_entry_count;
-         i++, p_peek += 6 )
+    for( i = 0, p_peek += 56; i < p_index->i_index_entry_count; i++, p_peek += 6 )
     {
         p_index->index_entry[i].i_packet_number = GetDWLE( p_peek );
         p_index->index_entry[i].i_packet_count = GetDWLE( p_peek + 4 );
@@ -397,7 +396,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
 #endif
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_meta->i_object_size ) ) <
-        __MAX( (int)p_meta->i_object_size, 26 ) )
+        __MAX( (int64_t)p_meta->i_object_size, 26 ) )
        return VLC_EGENERIC;
 
     p_meta->i_record_entries_count = GetWLE( p_peek + 24 );
@@ -509,7 +508,7 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
     p_he->i_header_extension_size = GetDWLE( p_peek + 42 );
     if( p_he->i_header_extension_size )
     {
-        if( i_peek-46 < (int)p_he->i_header_extension_size )
+        if( (unsigned int)(i_peek-46) < p_he->i_header_extension_size )
             return VLC_EGENERIC;
 
         p_he->p_header_extension_data =
