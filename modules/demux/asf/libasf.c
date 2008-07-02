@@ -44,6 +44,83 @@
     (guid).v4[0],(guid).v4[1],(guid).v4[2],(guid).v4[3],    \
     (guid).v4[4],(guid).v4[5],(guid).v4[6],(guid).v4[7]
 
+/* Helpers:
+ * They ensure that invalid reads will not create problems.
+ * They are expansion safe
+ * They make the following assumptions:
+ *  const uint8_t *p_peek exists and points to the start of a buffer
+ *  int i_peek gives the size of the buffer pointed by p_peek
+ *  const uint8_t *p_data exits and points to the data inside p_peek to be read.
+ */
+/* ASF_HAVE(n):
+ *  Check that n bytes can be read */
+static inline bool AsfObjectHelperHave( const uint8_t *p_peek, int i_peek, const uint8_t *p_current, int i_wanted )
+{
+    if( i_wanted < 0 || i_wanted > i_peek )
+        return false;
+    return &p_current[i_wanted] <= &p_peek[i_peek];
+}
+#define ASF_HAVE(n) AsfObjectHelperHave( p_peek, i_peek, p_data, n )
+
+/* ASF_SKIP(n)
+ *  Skip n bytes if possible */
+static inline void AsfObjectHelperSkip( const uint8_t *p_peek, int i_peek, uint8_t **pp_data, int i_wanted )
+{
+    if( AsfObjectHelperHave( p_peek, i_peek, *pp_data, i_wanted ) )
+        *pp_data += i_wanted;
+    else
+        *pp_data = (uint8_t*)&p_peek[i_peek];
+}
+#define ASF_SKIP(n) AsfObjectHelperSkip( p_peek, i_peek, (uint8_t**)&p_data, n )
+
+/* ASF_READX()
+ *  Read X byte if possible, else return 0 */
+#define ASF_FUNCTION_READ_X(type, x, cmd ) \
+static inline type AsfObjectHelperRead##x( const uint8_t *p_peek, int i_peek, uint8_t **pp_data ) { \
+    uint8_t *p_data = *pp_data; \
+    type i_ret = 0;  \
+    if( ASF_HAVE(x) )   \
+        i_ret = cmd;    \
+    ASF_SKIP(x);        \
+    *pp_data = p_data;  \
+    return i_ret;   }
+ASF_FUNCTION_READ_X( uint8_t,  1, *p_data )
+ASF_FUNCTION_READ_X( uint16_t, 2, GetWLE(p_data) )
+ASF_FUNCTION_READ_X( uint32_t, 4, GetDWLE(p_data) )
+ASF_FUNCTION_READ_X( uint64_t, 8, GetQWLE(p_data) )
+#define ASF_READ1() AsfObjectHelperRead1( p_peek, i_peek, (uint8_t**)&p_data )
+#define ASF_READ2() AsfObjectHelperRead2( p_peek, i_peek, (uint8_t**)&p_data )
+#define ASF_READ4() AsfObjectHelperRead4( p_peek, i_peek, (uint8_t**)&p_data )
+#define ASF_READ8() AsfObjectHelperRead8( p_peek, i_peek, (uint8_t**)&p_data )
+
+/* ASF_READS(n)
+ *  Read a string of n/2 wchar long ie n bytes. Do a stupid conversion (suppose latin1)
+ *  Return allocated "" if not possible */
+static char *AsfObjectHelperReadString( const uint8_t *p_peek, int i_peek, uint8_t **pp_data, int i_size )
+{
+    uint8_t *p_data = *pp_data;
+    char *psz_string;
+    if( ASF_HAVE(i_size) )
+    {
+        psz_string = calloc( i_size/2 + 1, sizeof( char ) );
+        if( psz_string )
+        {
+            int i;
+            for( i = 0; i < i_size/2; i++ )
+                psz_string[i] = GetWLE( &p_data[2*i] );
+            psz_string[i_size/2] = '\0'; \
+        }
+    }
+    else
+    {
+        psz_string = strdup("");
+    }
+    ASF_SKIP(i_size);
+    *pp_data = p_data;
+    return psz_string;
+}
+#define ASF_READS(n) AsfObjectHelperReadString( p_peek, i_peek, (uint8_t**)&p_data, n )
+
 /****************************************************************************
  *
  ****************************************************************************/
@@ -335,43 +412,29 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
         asf_metadata_record_t *p_record = &p_meta->record[i];
         int i_name;
         int i_data;
-        int j;
 
-        if( &p_data[2+2+2+2+4] > &p_peek[i_peek] )
+        if( !ASF_HAVE( 2+2+2+2+4 ) )
             break;
 
-        if( GetWLE( p_data ) != 0 )
+        if( ASF_READ2() != 0 )
             break;
-        p_data += 2;
 
-        p_record->i_stream = GetWLE( p_data ); p_data += 2;
-        i_name = GetWLE( p_data ); p_data += 2;
-        p_record->i_type = GetWLE( p_data ); p_data += 2;
-        i_data = GetDWLE( p_data ); p_data += 4;
+        p_record->i_stream = ASF_READ2();
+        i_name = ASF_READ2();
+        p_record->i_type = ASF_READ2();
+        i_data = ASF_READ4();
 
-        if( &p_data[i_name+i_data] > &p_peek[i_peek] )
+        if( !ASF_HAVE( i_name + i_data ) )
             break;
 
         /* Read name */
-        p_record->psz_name = malloc( i_name/2 + 1 );
-        for( j = 0; j < i_name/2; j++ )
-        {
-            p_record->psz_name[j] = GetWLE( p_data ); p_data += 2;
-        }
-        p_record->psz_name[j] = 0;
+        p_record->psz_name = ASF_READS( i_name );
 
         /* Read data */
         if( p_record->i_type == ASF_METADATA_TYPE_STRING )
         {
-            p_record->p_data = malloc( i_data/2 + 1 );
+            p_record->p_data = ASF_READS( i_data );
             p_record->i_data = i_data/2; /* FIXME Is that needed ? */
-            for( j = 0; j < i_data/2; j++ )
-            {
-                p_record->p_data[j] = GetWLE( &p_data[2*j] );
-            }
-            p_record->p_data[j] = 0; /* just to make sure */
-
-            p_data += i_data;
         }
         else if( p_record->i_type == ASF_METADATA_TYPE_BYTE )
         {
@@ -384,19 +447,19 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
         }
         else if( p_record->i_type == ASF_METADATA_TYPE_QWORD )
         {
-            p_record->i_val = GetQWLE( p_data ); p_data += 8;
+            p_record->i_val = ASF_READ8();
         }
         else if( p_record->i_type == ASF_METADATA_TYPE_DWORD )
         {
-            p_record->i_val = GetDWLE( p_data ); p_data += 4;
+            p_record->i_val = ASF_READ4();
         }
         else if( p_record->i_type == ASF_METADATA_TYPE_WORD )
         {
-            p_record->i_val = GetWLE( p_data ); p_data += 2;
+            p_record->i_val = ASF_READ2();
         }
         else if( p_record->i_type == ASF_METADATA_TYPE_BOOL )
         {
-            p_record->i_val = GetWLE( p_data ); p_data += 2;
+            p_record->i_val = ASF_READ2();
         }
         else
         {
@@ -445,8 +508,14 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
     p_he->i_header_extension_size = GetDWLE( p_peek + 42 );
     if( p_he->i_header_extension_size )
     {
+        if( i_peek-46 < (int)p_he->i_header_extension_size )
+            return VLC_EGENERIC;
+
         p_he->p_header_extension_data =
             malloc( p_he->i_header_extension_size );
+        if( !p_he->p_header_extension_data )
+            return VLC_ENOMEM;
+
         memcpy( p_he->p_header_extension_data, p_peek + 46,
                 p_he->i_header_extension_size );
     }
@@ -605,36 +674,31 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
     {
         p_cl->codec = calloc( p_cl->i_codec_entries_count,
                               sizeof( asf_codec_entry_t ) );
+        if( !p_cl->codec )
+            return VLC_ENOMEM;
 
         for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
         {
             asf_codec_entry_t *p_codec = &p_cl->codec[i_codec];
-            int i_len, i;
 
-            p_codec->i_type = GetWLE( p_data ); p_data += 2;
+            if( !ASF_HAVE( 2+2+2 ) )
+                break;
+
+            /* */
+            p_codec->i_type = ASF_READ2();
+
+            /* XXX the length here are the number of *unicode* characters and
+             * not of bytes like nearly every elsewhere */
+
             /* codec name */
-            i_len = GetWLE( p_data ); p_data += 2;
-            p_codec->psz_name = calloc( i_len + 1, sizeof(char) );
-            for( i = 0; i < i_len; i++ )
-            {
-                p_codec->psz_name[i] = GetWLE( p_data + 2*i );
-            }
-            p_codec->psz_name[i_len] = '\0';
-            p_data += 2 * i_len;
+            p_codec->psz_name = ASF_READS( 2*ASF_READ2() );
 
             /* description */
-            i_len = GetWLE( p_data ); p_data += 2;
-            p_codec->psz_description = calloc( i_len + 1, sizeof(char) );
-            for( i = 0; i < i_len; i++ )
-            {
-                p_codec->psz_description[i] = GetWLE( p_data + 2*i );
-            }
-            p_codec->psz_description[i_len] = '\0';
-            p_data += 2 * i_len;
+            p_codec->psz_description = ASF_READS( 2*ASF_READ2() );
 
             /* opaque information */
-            p_codec->i_information_length = GetWLE( p_data ); p_data += 2;
-            if( p_codec->i_information_length > 0 )
+            p_codec->i_information_length = ASF_READ2();
+            if( p_codec->i_information_length > 0 && ASF_HAVE( p_codec->i_information_length ) )
             {
                 p_codec->p_information = malloc( p_codec->i_information_length );
                 memcpy( p_codec->p_information, p_data, p_codec->i_information_length );
@@ -645,10 +709,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
                 p_codec->p_information = NULL;
             }
         }
-    }
-    else
-    {
-        p_cl->codec = NULL;
+        p_cl->i_codec_entries_count = i_codec;
     }
 
 #ifdef ASF_DEBUG
@@ -658,15 +719,15 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
 
     for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
     {
-#define codec p_cl->codec[i_codec]
+        const asf_codec_entry_t *p_codec = &p_cl->codec[i_codec];
+
         msg_Dbg( s, "  - codec[%d] %s name:\"%s\" "
                  "description:\"%s\" information_length:%d",
-                 i_codec, ( codec.i_type == ASF_CODEC_TYPE_VIDEO ) ?
-                 "video" : ( ( codec.i_type == ASF_CODEC_TYPE_AUDIO ) ?
+                 i_codec, ( p_codec->i_type == ASF_CODEC_TYPE_VIDEO ) ?
+                 "video" : ( ( p_codec->i_type == ASF_CODEC_TYPE_AUDIO ) ?
                  "audio" : "unknown" ),
-                 codec.psz_name, codec.psz_description,
-                 codec.i_information_length );
-#undef  codec
+                 p_codec->psz_name, p_codec->psz_description,
+                 p_codec->i_information_length );
     }
 #endif
 
@@ -723,12 +784,18 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     p_data += i_size;
 
     p_data = p_peek + 24;
+    
+    i_title         = ASF_READ2();
+    i_artist        = ASF_READ2();
+    i_copyright     = ASF_READ2();
+    i_description   = ASF_READ2();
+    i_rating        = ASF_READ2();
 
-    i_title = GetWLE( p_data ); p_data += 2;
-    i_artist= GetWLE( p_data ); p_data += 2;
-    i_copyright     = GetWLE( p_data ); p_data += 2;
-    i_description   = GetWLE( p_data ); p_data += 2;
-    i_rating        = GetWLE( p_data ); p_data += 2;
+    if( !ASF_HAVE( i_title+i_artist+i_copyright+i_description+i_rating ) )
+    {
+        vlc_iconv_close( cd );
+        return VLC_EGENERIC;
+    }
 
     GETSTRINGW( p_cd->psz_title, i_title );
     GETSTRINGW( p_cd->psz_artist, i_artist );
@@ -778,27 +845,18 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
 
     p_data = &p_peek[24];
 
-    p_ll->i_language = GetWLE( &p_data[0] ); p_data += 2;
+    p_ll->i_language = ASF_READ2();
     if( p_ll->i_language > 0 )
     {
         p_ll->ppsz_language = calloc( p_ll->i_language, sizeof( char *) );
 
         for( i = 0; i < p_ll->i_language; i++ )
         {
-            char *psz;
-            int i_size = *p_data++;
-            int i_len;
-
-            psz = calloc( i_size/2 + 1, sizeof(char) );
-            for( i_len = 0; i_len < i_size/2; i_len++ )
-            {
-                psz[i_len] = GetWLE( p_data + 2*i_len );
-            }
-            psz[i_size/2] = '\0'; \
-            p_data += i_size;
-
-            p_ll->ppsz_language[i] = psz;
+            if( !ASF_HAVE(1) )
+                break;
+            p_ll->ppsz_language[i] = ASF_READS( ASF_READ1() );
         }
+        p_ll->i_language = i;
     }
 
 #ifdef ASF_DEBUG
@@ -837,15 +895,17 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
 
     p_data = &p_peek[24];
 
-    p_sb->i_bitrate = GetWLE( &p_data[0] ); p_data += 2;
-    if( p_sb->i_bitrate > 127 ) p_sb->i_bitrate = 127;  /* Buggy ? */
+    p_sb->i_bitrate = ASF_READ2();
+    if( p_sb->i_bitrate > 127 )
+        p_sb->i_bitrate = 127;  /* Buggy ? */
     for( i = 0; i < p_sb->i_bitrate; i++ )
     {
-        p_sb->bitrate[i].i_stream_number = GetWLE( &p_data[0] )& 0x7f;
-        p_sb->bitrate[i].i_avg_bitrate = GetDWLE( &p_data[2] );
-
-        p_data += 2+4;
+        if( !ASF_HAVE(2 + 4) )
+            break;
+        p_sb->bitrate[i].i_stream_number = ASF_READ2()& 0x7f;
+        p_sb->bitrate[i].i_avg_bitrate = ASF_READ4();
     }
+    p_sb->i_bitrate = i;
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,"read \"stream bitrate properties object\"" );
@@ -900,31 +960,18 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
                                       sizeof(char*) );
     for( i = 0; i < p_esp->i_stream_name_count; i++ )
     {
-        int i_size;
-        char *psz;
-        int i_len;
-
-        p_esp->pi_stream_name_language[i] = GetWLE( &p_data[0] );
-        i_size = GetWLE( &p_data[2] );
-        p_data += 2+2;
- 
-        psz = calloc( i_size/2 + 1, sizeof(char) );
-        for( i_len = 0; i_len < i_size/2; i_len++ )
-        {
-            psz[i_len] = GetWLE( p_data + 2*i_len );
-        }
-        psz[i_size/2] = '\0'; \
-        p_data += i_size;
-
-        p_esp->ppsz_stream_name[i] = psz;
+        if( !ASF_HAVE( 2+2 ) )
+            break;
+        p_esp->pi_stream_name_language[i] = ASF_READ2();
+        p_esp->ppsz_stream_name[i] = ASF_READS( ASF_READ2() );
     }
+    p_esp->i_stream_name_count = i;
 
     for( i = 0; i < p_esp->i_payload_extension_system_count; i++ )
     {
-        /* Skip them */
-        int i_size = GetDWLE( &p_data[16 + 2] );
-
-        p_data += 16+2+4+i_size;
+        ASF_SKIP( 16 );   // GUID
+        ASF_SKIP( 2 );
+        ASF_SKIP( ASF_READ4() );
     }
 
     p_esp->p_sp = NULL;
@@ -1003,16 +1050,17 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
     p_data = &p_peek[24];
 
     ASF_GetGUID( &p_ae->type, &p_data[0] );
-    p_ae->i_stream_number_count = GetWLE( &p_data[16] );
+    ASF_SKIP( 16 );
+    p_ae->i_stream_number_count = ASF_READ2();
+    p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count, sizeof(int) );
 
-    p_data += 16 + 2;
-    p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count,
-                                     sizeof(int) );
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
     {
-        p_ae->pi_stream_number[i] = GetWLE( p_data );
-        p_data += 2;
+        if( !ASF_HAVE(2) )
+            break;
+        p_ae->pi_stream_number[i] = ASF_READ2();
     }
+    p_ae->i_stream_number_count = i;
  
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"advanced mutual exclusion object\"" );
@@ -1044,8 +1092,7 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
 
     p_data = &p_peek[24];
 
-    p_sp->i_priority_count = GetWLE( &p_data[0] );
-    p_data += 2;
+    p_sp->i_priority_count = ASF_READ2();
 
     p_sp->pi_priority_flag = calloc( p_sp->i_priority_count, sizeof(int) );
     p_sp->pi_priority_stream_number =
@@ -1053,9 +1100,13 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
 
     for( i = 0; i < p_sp->i_priority_count; i++ )
     {
-        p_sp->pi_priority_stream_number[i] = GetWLE( p_data ); p_data += 2;
-        p_sp->pi_priority_flag[i] = GetWLE( p_data ); p_data += 2;
+        if( !ASF_HAVE(2+2) )
+            break;
+        p_sp->pi_priority_stream_number[i] = ASF_READ2();
+        p_sp->pi_priority_flag[i] = ASF_READ2();
     }
+    p_sp->i_priority_count = i;
+
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"stream prioritization object\"" );
     for( i = 0; i < p_sp->i_priority_count; i++ )
@@ -1089,76 +1140,76 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
 
     p_data = &p_peek[24];
 
-    p_ec->i_count = GetWLE( p_data ); p_data += 2;
-    p_ec->ppsz_name = calloc( p_ec->i_count, sizeof(char*) );
+    p_ec->i_count = ASF_READ2();
+    p_ec->ppsz_name  = calloc( p_ec->i_count, sizeof(char*) );
     p_ec->ppsz_value = calloc( p_ec->i_count, sizeof(char*) );
+    if( !p_ec->ppsz_name || !p_ec->ppsz_value )
+    {
+        free( p_ec->ppsz_name );
+        free( p_ec->ppsz_value );
+        return VLC_ENOMEM;
+    }
     for( i = 0; i < p_ec->i_count; i++ )
     {
         int i_size;
         int i_type;
-        int i_len;
-#define GETSTRINGW( psz_str, i_size ) \
-       psz_str = calloc( i_size/2 + 1, sizeof( char ) ); \
-       for( i_len = 0; i_len < i_size/2; i_len++ ) \
-       { \
-           psz_str[i_len] = GetWLE( p_data + 2*i_len ); \
-       } \
-       psz_str[i_size/2] = '\0';
 
-        i_size = GetWLE( p_data ); p_data += 2;
-        GETSTRINGW( p_ec->ppsz_name[i], i_size );
-        p_data += i_size;
+        if( !ASF_HAVE(2 + 2+2) )
+            break;
+
+        p_ec->ppsz_name[i] = ASF_READS( ASF_READ2() );
 
         /* Grrr */
-        i_type = GetWLE( p_data ); p_data += 2;
-        i_size = GetWLE( p_data ); p_data += 2;
+        i_type = ASF_READ2();
+        i_size = ASF_READ2();
+
         if( i_type == 0 )
         {
-            GETSTRINGW( p_ec->ppsz_value[i], i_size );
+            p_ec->ppsz_value[i] = ASF_READS( i_size );
         }
         else if( i_type == 1 )
         {
-            int j;
             /* Byte array */
+            static const char hex[16] = "0123456789ABCDEF";
+            int j;
+
             p_ec->ppsz_value[i] = malloc( 2*i_size + 1 );
             for( j = 0; j < i_size; j++ )
             {
-                static const char hex[16] = "0123456789ABCDEF";
-                p_ec->ppsz_value[i][2*j+0] = hex[p_data[0]>>4];
-                p_ec->ppsz_value[i][2*j+1] = hex[p_data[0]&0xf];
+                const uint8_t v = ASF_READ1();
+                p_ec->ppsz_value[i][2*j+0] = hex[v>>4];
+                p_ec->ppsz_value[i][2*j+1] = hex[v&0xf];
             }
             p_ec->ppsz_value[i][2*i_size] = '\0';
         }
         else if( i_type == 2 )
         {
             /* Bool */
-            p_ec->ppsz_value[i] = strdup( *p_data ? "true" : "false" );
+            p_ec->ppsz_value[i] = strdup( ASF_READ1() ? "true" : "false" );
+            ASF_SKIP(i_size-1);
         }
         else if( i_type == 3 )
         {
             /* DWord */
-            asprintf( &p_ec->ppsz_value[i], "%d", GetDWLE(p_data));
+            asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ4() );
         }
         else if( i_type == 4 )
         {
             /* QWord */
-            asprintf( &p_ec->ppsz_value[i], "%"PRId64, GetQWLE(p_data));
+            asprintf( &p_ec->ppsz_value[i], "%"PRId64, ASF_READ8() );
         }
         else if( i_type == 5 )
         {
             /* Word */
-            asprintf( &p_ec->ppsz_value[i], "%d", GetWLE(p_data));
+            asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ2() );
         }
         else
+        {
             p_ec->ppsz_value[i] = NULL;
-
-        p_data += i_size;
- 
-
-
-#undef GETSTRINGW
-
+            ASF_SKIP(i_size);
+        }
     }
+    p_ec->i_count = i;
 
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"extended content description object\"" );
@@ -1406,7 +1457,7 @@ static const struct
     { &asf_object_stream_type_video, "Stream Type Video" },
     { &asf_object_stream_type_command, "Stream Type Command" },
     { &asf_object_language_list, "Language List" },
-    { &asf_object_stream_bitrate_properties, "Stream Bitrate Propoerties" },
+    { &asf_object_stream_bitrate_properties, "Stream Bitrate Properties" },
     { &asf_object_padding, "Padding" },
     { &asf_object_extended_stream_properties, "Extended Stream Properties" },
     { &asf_object_advanced_mutual_exclusion, "Advanced Mutual Exclusion" },
