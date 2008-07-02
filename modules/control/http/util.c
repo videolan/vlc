@@ -184,6 +184,13 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     if( ACL_LoadFile( p_acl, dir ) )
     {
         ACL_Destroy( p_acl );
+
+        struct stat st;
+        if( stat( dir, &st ) == 0 )
+        {
+            closedir( dir );
+            return VLC_EGENERIC;
+        }
         p_acl = NULL;
     }
 
