@@ -246,6 +246,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Allocate instance and initialize some members */
     p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->p_node = NULL;
     p_sys->p_input = NULL;
     p_sys->f_slider = 0.0;
