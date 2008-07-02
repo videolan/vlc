@@ -683,15 +683,8 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 
 //        emit askVideoToResize( *pi_width, *pi_height );
         emit askUpdate();
-
-        fullscreenControls->regFullscreenCallback( p_nvout );
     }
     return ret;
-}
-
-void MainInterface::requestNotEmbeddedVideo( vout_thread_t *p_nvout )
-{
-    fullscreenControls->regFullscreenCallback( p_nvout );
 }
 
 void MainInterface::releaseVideo( void *p_win )
