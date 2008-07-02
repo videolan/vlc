@@ -717,6 +717,11 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     char *ob = NULL;
     size_t i_ibl, i_obl, i_len;
 
+    if( ( i_peek = stream_Peek( s, &p_peek, p_cd->i_object_size ) ) < 34 )
+    {
+       return VLC_EGENERIC;
+    }
+
     cd = vlc_iconv_open("UTF-8", "UTF-16LE");
     if ( cd == (vlc_iconv_t)-1 ) {
         msg_Err( s, "vlc_iconv_open failed" );
@@ -733,10 +738,6 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     i_len = vlc_iconv(cd, &ib, &i_ibl, &ob, &i_obl); \
     p_data += i_size;
 
-    if( ( i_peek = stream_Peek( s, &p_peek, p_cd->i_object_size ) ) < 34 )
-    {
-       return VLC_EGENERIC;
-    }
     p_data = p_peek + 24;
 
     i_title = GetWLE( p_data ); p_data += 2;
