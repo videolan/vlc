@@ -844,18 +844,18 @@ if BUILD_OSDMENU
 	done
 endif
 
-package-win-common-strip:
-	$(STRIP) "$(top_builddir)/vlc-$(VERSION)/vlc$(EXEEXT)"
+package-win-common-strip: package-win32-base-debug
+	$(STRIP) "vlc-$(VERSION)/vlc$(EXEEXT)"
 	$(STRIP) "vlc-$(VERSION)/libvlccore$(LIBEXT)"
 	$(STRIP) "vlc-$(VERSION)/libvlc$(LIBEXT)"
 if BUILD_MOZILLA
-	$(STRIP) $(top_builddir)/vlc-$(VERSION)/mozilla/npvlc$(LIBEXT);
+	$(STRIP) "vlc-$(VERSION)/mozilla/npvlc$(LIBEXT)"
 endif
 if BUILD_ACTIVEX
-	$(STRIP) $(top_builddir)/vlc-$(VERSION)/activex/axvlc$(LIBEXT);
+	$(STRIP) "vlc-$(VERSION)/activex/axvlc$(LIBEXT)"
 endif
 
-package-win32-base: package-win32-base-debug package-win-common-strip
+package-win32-base: package-win-common-strip
 	for i in "" $(top_builddir)/vlc-$(VERSION)/plugins/*$(LIBEXT) ; \
 	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
 
