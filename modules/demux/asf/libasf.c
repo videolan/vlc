@@ -218,7 +218,7 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
     int                 i;
 
     if( stream_Peek( s, &p_peek, p_index->i_object_size ) <
-        (int)p_index->i_object_size )
+        __MAX( (int)p_index->i_object_size, 56 ) )
     {
         /* Just ignore */
         return VLC_SUCCESS;
@@ -334,7 +334,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     p_meta->record = 0;
 
     if( stream_Peek( s, &p_peek, p_meta->i_object_size ) <
-        (int)p_meta->i_object_size )
+        __MAX( (int)p_meta->i_object_size, 26 ) )
     {
        return VLC_EGENERIC;
     }
