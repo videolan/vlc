@@ -450,7 +450,7 @@ typedef union asf_object_u
 
 
 void ASF_GetGUID( guid_t *p_guid, const uint8_t *p_data );
-int  ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 );
+bool ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 );
 
 asf_object_root_t *ASF_ReadObjectRoot( stream_t *, int b_seekable );
 void               ASF_FreeObjectRoot( stream_t *, asf_object_root_t *p_root );

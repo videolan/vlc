@@ -60,16 +60,16 @@ void ASF_GetGUID( guid_t *p_guid, const uint8_t *p_data )
     memcpy( p_guid->v4, p_data + 8, 8 );
 }
 
-int ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
+bool ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
 {
     if( (p_guid1->v1 != p_guid2->v1 )||
         (p_guid1->v2 != p_guid2->v2 )||
         (p_guid1->v3 != p_guid2->v3 )||
         ( memcmp( p_guid1->v4, p_guid2->v4,8 )) )
     {
-        return( 0 );
+        return false;
     }
-    return( 1 ); /* match */
+    return true;
 }
 
 /****************************************************************************
@@ -81,9 +81,8 @@ static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
     const uint8_t *p_peek;
 
     if( stream_Peek( s, &p_peek, 24 ) < 24 )
-    {
-        return( VLC_EGENERIC );
-    }
+        return VLC_EGENERIC;
+
     ASF_GetGUID( &p_common->i_object_id, p_peek );
     p_common->i_object_size = GetQWLE( p_peek + 16 );
     p_common->i_object_pos  = stream_Tell( s );
@@ -96,7 +95,7 @@ static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
              p_common->i_object_size );
 #endif
 
-    return( VLC_SUCCESS );
+    return VLC_SUCCESS;
 }
 
 static int ASF_NextObject( stream_t *s, asf_object_t *p_obj )
@@ -105,16 +104,14 @@ static int ASF_NextObject( stream_t *s, asf_object_t *p_obj )
     if( p_obj == NULL )
     {
         if( ASF_ReadObjectCommon( s, &obj ) )
-        {
-            return( VLC_EGENERIC );
-        }
+            return VLC_EGENERIC;
+
         p_obj = &obj;
     }
 
     if( p_obj->common.i_object_size <= 0 )
-    {
         return VLC_EGENERIC;
-    }
+
     if( p_obj->common.p_father &&
         p_obj->common.p_father->common.i_object_size != 0 )
     {
@@ -135,7 +132,6 @@ static int ASF_NextObject( stream_t *s, asf_object_t *p_obj )
 static void ASF_FreeObject_Null( asf_object_t *pp_obj )
 {
     VLC_UNUSED(pp_obj);
-    return;
 }
 
 static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
@@ -146,9 +142,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
     const uint8_t       *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek, 30 ) ) < 30 )
-    {
-       return( VLC_EGENERIC );
-    }
+       return VLC_EGENERIC;
 
     p_hdr->i_sub_object_count = GetDWLE( p_peek + 24 );
     p_hdr->i_reserved1 = p_peek[28];
@@ -178,9 +172,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
             break;
         }
         if( ASF_NextObject( s, p_subobj ) ) /* Go to the next object */
-        {
             break;
-        }
     }
     return VLC_SUCCESS;
 }
@@ -192,9 +184,8 @@ static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
     const uint8_t     *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek, 50 ) ) < 50 )
-    {
        return VLC_EGENERIC;
-    }
+
     ASF_GetGUID( &p_data->i_file_id, p_peek + 24 );
     p_data->i_total_data_packets = GetQWLE( p_peek + 40 );
     p_data->i_reserved = GetWLE( p_peek + 48 );
@@ -217,12 +208,10 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
     const uint8_t      *p_peek;
     int                 i;
 
+    /* We just ignore error on the index */
     if( stream_Peek( s, &p_peek, p_index->i_object_size ) <
         __MAX( (int)p_index->i_object_size, 56 ) )
-    {
-        /* Just ignore */
         return VLC_SUCCESS;
-    }
 
     ASF_GetGUID( &p_index->i_file_id, p_peek + 24 );
     p_index->i_index_entry_time_interval = GetQWLE( p_peek + 40 );
@@ -272,9 +261,8 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
     const uint8_t *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek,  104 ) ) < 104 )
-    {
        return VLC_EGENERIC;
-    }
+
     ASF_GetGUID( &p_fp->i_file_id, p_peek + 24 );
     p_fp->i_file_size = GetQWLE( p_peek + 40 );
     p_fp->i_creation_date = GetQWLE( p_peek + 48 );
@@ -330,14 +318,12 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     unsigned int j;
 #endif
 
-    p_meta->i_record_entries_count = 0;
-    p_meta->record = 0;
-
     if( stream_Peek( s, &p_peek, p_meta->i_object_size ) <
         __MAX( (int)p_meta->i_object_size, 26 ) )
-    {
        return VLC_EGENERIC;
-    }
+
+    p_meta->i_record_entries_count = 0;
+    p_meta->record = NULL;
 
     i_peek = 24;
     i_entries = GetWLE( p_peek + i_peek ); i_peek += 2;
@@ -515,9 +501,7 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
     const uint8_t *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek,  p_sp->i_object_size ) ) < 78 )
-    {
        return VLC_EGENERIC;
-    }
 
     ASF_GetGUID( &p_sp->i_stream_type, p_peek + 24 );
     ASF_GetGUID( &p_sp->i_error_correction_type, p_peek + 40 );
@@ -609,9 +593,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
     unsigned int i_codec;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_cl->i_object_size ) ) < 44 )
-    {
        return VLC_EGENERIC;
-    }
 
     ASF_GetGUID( &p_cl->i_reserved, p_peek + 24 );
     p_cl->i_codec_entries_count = GetWLE( p_peek + 40 );
@@ -718,12 +700,11 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     size_t i_ibl, i_obl, i_len;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_cd->i_object_size ) ) < 34 )
-    {
        return VLC_EGENERIC;
-    }
 
     cd = vlc_iconv_open("UTF-8", "UTF-16LE");
-    if ( cd == (vlc_iconv_t)-1 ) {
+    if( cd == (vlc_iconv_t)-1 )
+    {
         msg_Err( s, "vlc_iconv_open failed" );
         return VLC_EGENERIC;
     }
@@ -876,6 +857,7 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
 }
 static void ASF_FreeObject_stream_bitrate_properties( asf_object_t *p_obj)
 {
+    VLC_UNUSED(p_obj);
 }
 
 static int ASF_ReadObject_extended_stream_properties( stream_t *s,
@@ -1286,7 +1268,7 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     int i_index;
 
     if( !p_obj )
-        return( 0 );
+        return 0;
 
     memset( p_obj, 0, sizeof( *p_obj ) );
 
@@ -1346,7 +1328,7 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
         p_father->common.p_last = p_obj;
     }
 
-    return( i_result );
+    return i_result;
 }
 
 static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
@@ -1354,7 +1336,8 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
     int i_index;
     asf_object_t *p_child;
 
-    if( !p_obj ) return;
+    if( !p_obj )
+        return;
 
     /* Free all child object */
     p_child = p_obj->common.p_first;
@@ -1395,7 +1378,6 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
         (ASF_Object_Function[i_index].ASF_FreeObject_function)( p_obj );
     }
     free( p_obj );
-    return;
 }
 
 /*****************************************************************************
@@ -1527,9 +1509,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
         }
 
         if( ASF_NextObject( s, p_obj ) ) /* Go to the next object */
-        {
             break;
-        }
     }
 
     if( p_root->p_hdr != NULL && p_root->p_data != NULL )
@@ -1604,19 +1584,19 @@ int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )
     int i_count;
     asf_object_t *p_child;
 
-    if( !p_obj ) return( 0 );
+    if( !p_obj )
+        return 0;
 
     i_count = 0;
     p_child = p_obj->common.p_first;
     while( p_child )
     {
         if( ASF_CmpGUID( &p_child->common.i_object_id, p_guid ) )
-        {
             i_count++;
-        }
+
         p_child = p_child->common.p_next;
     }
-    return( i_count );
+    return i_count;
 }
 
 void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid,
@@ -1631,14 +1611,11 @@ void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid,
         if( ASF_CmpGUID( &p_child->common.i_object_id, p_guid ) )
         {
             if( i_number == 0 )
-            {
-                /* We found it */
-                return( p_child );
-            }
+                return p_child;
 
             i_number--;
         }
         p_child = p_child->common.p_next;
     }
-    return( NULL );
+    return NULL;
 }
