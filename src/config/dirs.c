@@ -80,7 +80,7 @@ const char *config_GetConfDir( void )
 
     if( *path == '\0' )
     {
-        snprintf( path, sizeof( path ), "%s/share", /* FIXME: Duh? */
+        snprintf( path, sizeof( path ), "%s"DIR_SEP"share", /* FIXME: Duh? */
                   vlc_global()->psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
