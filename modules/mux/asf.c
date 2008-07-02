@@ -597,7 +597,27 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
  *****************************************************************************/
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
-    VLC_UNUSED(p_input);
+    /* if bitrate ain't defined in commanline, reduce it when tracks are deleted
+     */
+    sout_mux_sys_t   *p_sys = p_mux->p_sys;
+    asf_track_t      *tk = p_input->p_sys;
+    if(!p_sys->i_bitrate_override)
+    {
+        if( tk->i_cat == AUDIO_ES )
+        {
+             if( p_input->p_fmt->i_bitrate > 24000 )
+                 p_sys->i_bitrate -= p_input->p_fmt->i_bitrate;
+             else
+                 p_sys->i_bitrate -= 512000;
+        }
+        else if(tk->i_cat == VIDEO_ES )
+        {
+             if( p_input->p_fmt->i_bitrate > 50000 )
+                 p_sys->i_bitrate -= p_input->p_fmt->i_bitrate;
+             else
+                 p_sys->i_bitrate -= 1000000;
+        }
+    }
     msg_Dbg( p_mux, "removing input" );
     return VLC_SUCCESS;
 }
