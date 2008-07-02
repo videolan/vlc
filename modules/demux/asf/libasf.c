@@ -243,7 +243,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
     {
         p_subobj = malloc( sizeof( asf_object_t ) );
 
-        if( ASF_ReadObject( s, p_subobj, (asf_object_t*)p_hdr ) )
+        if( !p_subobj || ASF_ReadObject( s, p_subobj, (asf_object_t*)p_hdr ) )
         {
             free( p_subobj );
             break;
@@ -313,6 +313,8 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 
     p_index->index_entry = calloc( p_index->i_index_entry_count,
                                    sizeof(asf_index_entry_t) );
+    if( !p_index->index_entry )
+        return VLC_ENOMEM;
 
     for( i = 0, p_peek += 56; i < (int)p_index->i_index_entry_count;
          i++, p_peek += 6 )
@@ -404,6 +406,8 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
 
     p_meta->record = calloc( p_meta->i_record_entries_count,
                              sizeof(asf_metadata_record_t) );
+    if( !p_meta->record )
+        return VLC_ENOMEM;
 
     for( i = 0; i < p_meta->i_record_entries_count; i++ )
     {
@@ -438,7 +442,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
         {
             p_record->p_data = malloc( i_data );
             p_record->i_data = i_data;
-            if( i_data > 0 )
+            if( p_record->p_data && i_data > 0 )
                 memcpy( p_record->p_data, p_data, i_data );
 
             p_data += i_data;
@@ -537,7 +541,7 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
     {
         asf_object_t *p_obj = malloc( sizeof( asf_object_t ) );
 
-        if( ASF_ReadObject( s, p_obj, (asf_object_t*)p_he ) )
+        if( !p_obj || ASF_ReadObject( s, p_obj, (asf_object_t*)p_he ) )
         {
             free( p_obj );
             break;
@@ -585,16 +589,12 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 
         p_sp->p_type_specific_data =
             malloc( p_sp->i_type_specific_data_length );
-        if( p_sp->p_type_specific_data == NULL )
+        if( !p_sp->p_type_specific_data )
             return VLC_ENOMEM;
 
         memcpy( p_sp->p_type_specific_data, p_peek + 78,
                 p_sp->i_type_specific_data_length );
         i_peek -= p_sp->i_type_specific_data_length;
-    }
-    else
-    {
-        p_sp->p_type_specific_data = NULL;
     }
 
     if( p_sp->i_error_correction_data_length )
@@ -607,7 +607,7 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 
         p_sp->p_error_correction_data =
             malloc( p_sp->i_error_correction_data_length );
-        if( p_sp->p_error_correction_data == NULL )
+        if( !p_sp->p_error_correction_data )
         {
             free( p_sp->p_type_specific_data );
             return VLC_ENOMEM;
@@ -615,10 +615,6 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
         memcpy( p_sp->p_error_correction_data,
                 p_peek + 78 + p_sp->i_type_specific_data_length,
                 p_sp->i_error_correction_data_length );
-    }
-    else
-    {
-        p_sp->p_error_correction_data = NULL;
     }
 
 #ifdef ASF_DEBUG
@@ -695,12 +691,11 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
             if( p_codec->i_information_length > 0 && ASF_HAVE( p_codec->i_information_length ) )
             {
                 p_codec->p_information = malloc( p_codec->i_information_length );
-                memcpy( p_codec->p_information, p_data, p_codec->i_information_length );
+                if( p_codec->p_information )
+                    memcpy( p_codec->p_information, p_data, p_codec->i_information_length );
+                else
+                    p_codec->i_information_length = 0;
                 p_data += p_codec->i_information_length;
-            }
-            else
-            {
-                p_codec->p_information = NULL;
             }
         }
         p_cl->i_codec_entries_count = i_codec;
@@ -767,14 +762,16 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     }
 
 /* FIXME i_size*3 is the worst case. */
-#define GETSTRINGW( psz_str, i_size ) \
-    psz_str = (char *)calloc( i_size*3+1, sizeof( char ) ); \
-    ib = (const char *)p_data; \
-    ob = psz_str; \
-    i_ibl = i_size; \
-    i_obl = i_size*3; \
-    i_len = vlc_iconv(cd, &ib, &i_ibl, &ob, &i_obl); \
-    p_data += i_size;
+#define GETSTRINGW( psz_str, i_size ) do { \
+    psz_str = calloc( i_size*3+1, sizeof(char) ); \
+    if( psz_str ) { \
+        ib = (const char *)p_data; \
+        ob = psz_str; \
+        i_ibl = i_size; \
+        i_obl = i_size*3; \
+        i_len = vlc_iconv(cd, &ib, &i_ibl, &ob, &i_obl); \
+        p_data += i_size; \
+    } } while(0)
 
     p_data = p_peek + 24;
     
@@ -840,6 +837,8 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
     if( p_ll->i_language > 0 )
     {
         p_ll->ppsz_language = calloc( p_ll->i_language, sizeof( char *) );
+        if( !p_ll->ppsz_language )
+            return VLC_ENOMEM;
 
         for( i = 0; i < p_ll->i_language; i++ )
         {
@@ -946,6 +945,13 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
                                              sizeof(int) );
     p_esp->ppsz_stream_name = calloc( p_esp->i_stream_name_count,
                                       sizeof(char*) );
+    if( !p_esp->pi_stream_name_language ||
+        !p_esp->ppsz_stream_name )
+    {
+        free( p_esp->pi_stream_name_language );
+        free( p_esp->ppsz_stream_name );
+        return VLC_ENOMEM;
+    }
     for( i = 0; i < p_esp->i_stream_name_count; i++ )
     {
         if( !ASF_HAVE( 2+2 ) )
@@ -971,7 +977,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
  
         p_sp = malloc( sizeof( asf_object_t ) );
 
-        if( ASF_ReadObject( s, p_sp, NULL ) )
+        if( !p_sp || ASF_ReadObject( s, p_sp, NULL ) )
         {
             free( p_sp );
         }
@@ -1082,6 +1088,13 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
     p_sp->pi_priority_stream_number =
                              calloc( p_sp->i_priority_count, sizeof(int) );
 
+    if( !p_sp->pi_priority_flag || !p_sp->pi_priority_stream_number )
+    {
+        free( p_sp->pi_priority_flag );
+        free( p_sp->pi_priority_stream_number );
+        return VLC_ENOMEM;
+    }
+
     for( i = 0; i < p_sp->i_priority_count; i++ )
     {
         if( !ASF_HAVE(2+2) )
@@ -1157,13 +1170,17 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
             int j;
 
             p_ec->ppsz_value[i] = malloc( 2*i_size + 1 );
-            for( j = 0; j < i_size; j++ )
+            if( p_ec->ppsz_value[i] )
             {
-                const uint8_t v = ASF_READ1();
-                p_ec->ppsz_value[i][2*j+0] = hex[v>>4];
-                p_ec->ppsz_value[i][2*j+1] = hex[v&0xf];
+                char *psz_value = p_ec->ppsz_value[i];
+                for( j = 0; j < i_size; j++ )
+                {
+                    const uint8_t v = ASF_READ1();
+                    psz_value[2*j+0] = hex[v>>4];
+                    psz_value[2*j+1] = hex[v&0xf];
+                }
+                psz_value[2*i_size] = '\0';
             }
-            p_ec->ppsz_value[i][2*i_size] = '\0';
         }
         else if( i_type == 2 )
         {
@@ -1496,6 +1513,9 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
     asf_object_root_t *p_root = malloc( sizeof( asf_object_root_t ) );
     asf_object_t *p_obj;
 
+    if( !p_root )
+        return NULL;
+
     p_root->i_type = ASF_OBJECT_ROOT;
     memcpy( &p_root->i_object_id, &asf_object_null_guid, sizeof( guid_t ) );
     p_root->i_object_pos = stream_Tell( s );
@@ -1513,7 +1533,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
     {
         p_obj = malloc( sizeof( asf_object_t ) );
 
-        if( ASF_ReadObject( s, p_obj, (asf_object_t*)p_root ) )
+        if( !p_obj || ASF_ReadObject( s, p_obj, (asf_object_t*)p_root ) )
         {
             free( p_obj );
             break;
