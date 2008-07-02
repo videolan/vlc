@@ -2,6 +2,11 @@ SOURCES_avformat = \
     avformat.c \
     avformat.h \
     demux.c \
-    mux.c \
     $(NULL)
+if ENABLE_SOUT
+SOURCES_avformat += mux.c
+endif
+EXTRA_libavformat_plugin_la_SOURCES = mux.c
 
+libvlc_LTLIBRARIES += $(LTLIBavformat)
+EXTRA_LTLIBRARIES += libavformat_plugin.la
