@@ -625,6 +625,13 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
+        if( p_dec->b_die )
+        {
+            /* It prevent freezing VLC in case of broken decoder */
+            if( p_block )
+                block_Release( p_block );
+            break;
+        }
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
         stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_audio, 1, NULL );
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
@@ -829,6 +836,14 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
     while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
     {
+        if( p_dec->b_die )
+        {
+            /* It prevent freezing VLC in case of broken decoder */
+            if( p_block )
+                block_Release( p_block );
+            break;
+        }
+
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
         stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_video, 1, NULL );
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
