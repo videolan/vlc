@@ -201,6 +201,7 @@ EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_dirent) \
 	$(SOURCES_libvlc_getopt) \
 	$(SOURCES_libvlc_sout) \
+	$(SOURCES_libvlc_vlm) \
 	$(NULL)
 if HAVE_BEOS
 libvlccore_la_SOURCES += $(SOURCES_libvlc_beos)
@@ -231,6 +232,9 @@ libvlccore_la_SOURCES += $(SOURCES_libvlc_getopt)
 endif
 if ENABLE_SOUT
 libvlccore_la_SOURCES += $(SOURCES_libvlc_sout)
+if ENABLE_VLM
+libvlccore_la_SOURCES += $(SOURCES_libvlc_vlm)
+endif
 endif
 
 SOURCES_libvlc_beos = \
@@ -365,14 +369,17 @@ SOURCES_libvlc_common = \
 	$(NULL)
 
 SOURCES_libvlc_sout = \
-	input/vlm.c \
-	input/vlmshell.c \
 	stream_output/stream_output.c \
 	stream_output/stream_output.h \
 	stream_output/announce.c \
 	stream_output/profiles.c \
 	stream_output/sap.c \
 	stream_output/sdp.c \
+	$(NULL)
+
+SOURCES_libvlc_vlm = \
+	input/vlm.c \
+	input/vlmshell.c \
 	$(NULL)
 
 SOURCES_libvlc = \

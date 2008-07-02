@@ -1695,6 +1695,7 @@ AS_IF([test "${enable_vlm}" != "no"], [
   AC_DEFINE(ENABLE_VLM, 1, [Define if you want the VideoLAN manager support])
   VLC_ADD_PLUGIN([telnet])
 ])
+AM_CONDITIONAL([ENABLE_VLM], [test "${enable_vlm}" != "no"])
 
 dnl
 dnl Growl notification plugin
