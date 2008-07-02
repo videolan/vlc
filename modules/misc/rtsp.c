@@ -522,6 +522,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                     p_fmt->audio.i_channels );
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        case VLC_FOURCC( 'm', 'p', '3', ' ' ):
             p_es->i_payload_type = 14;
             asprintf( &p_es->psz_rtpmap, "MPA/%d", p_fmt->audio.i_rate );
             break;
