@@ -654,7 +654,11 @@ loop_error_recovery:
         msg_Err( p_demux, "unsupported packet header, fatal error" );
         return -1;
     }
-    stream_Read( p_demux->s, NULL, i_data_packet_min );
+    if( stream_Read( p_demux->s, NULL, i_data_packet_min ) != i_data_packet_min )
+    {
+        msg_Warn( p_demux, "cannot skip data, EOF ?" );
+        return 0;
+    }
 
     return 1;
 }
