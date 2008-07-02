@@ -377,7 +377,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
             : ACL_AddHost( p_acl, psz_ip, true ) )
         {
             msg_Err( p_acl->p_owner, "cannot add ACL from %s", psz_path );
-            goto error;
+            continue;
         }
     }
 
