@@ -154,7 +154,7 @@ bool ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
  ****************************************************************************/
 static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_common_t *p_common = (asf_object_common_t*)p_obj;
+    asf_object_common_t *p_common = &p_obj->common;
     const uint8_t *p_peek;
 
     if( stream_Peek( s, &p_peek, 24 ) < 24 )
@@ -213,7 +213,7 @@ static void ASF_FreeObject_Null( asf_object_t *pp_obj )
 
 static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_header_t *p_hdr = (asf_object_header_t*)p_obj;
+    asf_object_header_t *p_hdr = &p_obj->header;
     asf_object_t        *p_subobj;
     int                 i_peek;
     const uint8_t       *p_peek;
@@ -256,7 +256,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
 
 static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_data_t *p_data = (asf_object_data_t*)p_obj;
+    asf_object_data_t *p_data = &p_obj->data;
     int               i_peek;
     const uint8_t     *p_peek;
 
@@ -281,7 +281,7 @@ static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
 
 static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_index_t *p_index = (asf_object_index_t*)p_obj;
+    asf_object_index_t *p_index = &p_obj->index;
     const uint8_t      *p_peek;
     int                 i;
 
@@ -326,14 +326,14 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 
 static void ASF_FreeObject_Index( asf_object_t *p_obj )
 {
-    asf_object_index_t *p_index = (asf_object_index_t*)p_obj;
+    asf_object_index_t *p_index = &p_obj->index;
 
     FREENULL( p_index->index_entry );
 }
 
 static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_file_properties_t *p_fp = (asf_object_file_properties_t*)p_obj;
+    asf_object_file_properties_t *p_fp = &p_obj->file_properties;
     int           i_peek;
     const uint8_t *p_peek;
 
@@ -372,8 +372,7 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
 
 static void ASF_FreeObject_metadata( asf_object_t *p_obj )
 {
-    asf_object_metadata_t *p_meta =
-        (asf_object_metadata_t *)p_obj;
+    asf_object_metadata_t *p_meta = &p_obj->metadata;
     unsigned int i;
 
     for( i = 0; i < p_meta->i_record_entries_count; i++ )
@@ -386,8 +385,7 @@ static void ASF_FreeObject_metadata( asf_object_t *p_obj )
 
 static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_metadata_t *p_meta =
-        (asf_object_metadata_t *)p_obj;
+    asf_object_metadata_t *p_meta = &p_obj->metadata;
 
     int i_peek;
     unsigned int i;
@@ -494,8 +492,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
 
 static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_header_extension_t *p_he =
-        (asf_object_header_extension_t *)p_obj;
+    asf_object_header_extension_t *p_he = &p_obj->header_extension;
     int     i_peek;
     const uint8_t *p_peek;
 
@@ -557,16 +554,14 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
 
 static void ASF_FreeObject_header_extension( asf_object_t *p_obj )
 {
-    asf_object_header_extension_t *p_he =
-        (asf_object_header_extension_t *)p_obj;
+    asf_object_header_extension_t *p_he = &p_obj->header_extension;
 
     FREENULL( p_he->p_header_extension_data );
 }
 
 static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_stream_properties_t *p_sp =
-                    (asf_object_stream_properties_t*)p_obj;
+    asf_object_stream_properties_t *p_sp = &p_obj->stream_properties;
     size_t        i_peek;
     const uint8_t *p_peek;
 
@@ -646,8 +641,7 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 
 static void ASF_FreeObject_stream_properties( asf_object_t *p_obj )
 {
-    asf_object_stream_properties_t *p_sp =
-                (asf_object_stream_properties_t*)p_obj;
+    asf_object_stream_properties_t *p_sp = &p_obj->stream_properties;
 
     FREENULL( p_sp->p_type_specific_data );
     FREENULL( p_sp->p_error_correction_data );
@@ -656,7 +650,7 @@ static void ASF_FreeObject_stream_properties( asf_object_t *p_obj )
 
 static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
 {
-    asf_object_codec_list_t *p_cl = (asf_object_codec_list_t*)p_obj;
+    asf_object_codec_list_t *p_cl = &p_obj->codec_list;
     int     i_peek;
     const uint8_t *p_peek, *p_data;
 
@@ -736,7 +730,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
 
 static void ASF_FreeObject_codec_list( asf_object_t *p_obj )
 {
-    asf_object_codec_list_t *p_cl = (asf_object_codec_list_t*)p_obj;
+    asf_object_codec_list_t *p_cl = &p_obj->codec_list;
     unsigned int i_codec;
 
     for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
@@ -754,8 +748,7 @@ static void ASF_FreeObject_codec_list( asf_object_t *p_obj )
  * and for the some others object, length give char16 count ... */
 static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 {
-    asf_object_content_description_t *p_cd =
-        (asf_object_content_description_t *)p_obj;
+    asf_object_content_description_t *p_cd = &p_obj->content_description;
     const uint8_t *p_peek, *p_data;
     int i_peek, i_title, i_artist, i_copyright, i_description, i_rating;
     vlc_iconv_t cd = (vlc_iconv_t)-1;
@@ -821,8 +814,7 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 
 static void ASF_FreeObject_content_description( asf_object_t *p_obj)
 {
-    asf_object_content_description_t *p_cd =
-        (asf_object_content_description_t *)p_obj;
+    asf_object_content_description_t *p_cd = &p_obj->content_description;
 
     FREENULL( p_cd->psz_title );
     FREENULL( p_cd->psz_artist );
@@ -834,8 +826,7 @@ static void ASF_FreeObject_content_description( asf_object_t *p_obj)
 /* Language list: */
 static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
 {
-    asf_object_language_list_t *p_ll =
-        (asf_object_language_list_t*)p_obj;
+    asf_object_language_list_t *p_ll = &p_obj->language_list;
     const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
@@ -871,8 +862,7 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
 
 static void ASF_FreeObject_language_list( asf_object_t *p_obj)
 {
-    asf_object_language_list_t *p_ll =
-        (asf_object_language_list_t *)p_obj;
+    asf_object_language_list_t *p_ll = &p_obj->language_list;
     int i;
 
     for( i = 0; i < p_ll->i_language; i++ )
@@ -884,8 +874,7 @@ static void ASF_FreeObject_language_list( asf_object_t *p_obj)
 static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
                                                      asf_object_t *p_obj)
 {
-    asf_object_stream_bitrate_properties_t *p_sb =
-        (asf_object_stream_bitrate_properties_t *)p_obj;
+    asf_object_stream_bitrate_properties_t *p_sb = &p_obj->stream_bitrate;
     const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
@@ -926,8 +915,7 @@ static void ASF_FreeObject_stream_bitrate_properties( asf_object_t *p_obj)
 static int ASF_ReadObject_extended_stream_properties( stream_t *s,
                                                       asf_object_t *p_obj)
 {
-    asf_object_extended_stream_properties_t *p_esp =
-        (asf_object_extended_stream_properties_t*)p_obj;
+    asf_object_extended_stream_properties_t *p_esp = &p_obj->ext_stream;
     const uint8_t *p_peek, *p_data;
     int i_peek, i;
 
@@ -1024,8 +1012,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 }
 static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
 {
-    asf_object_extended_stream_properties_t *p_esp =
-        (asf_object_extended_stream_properties_t *)p_obj;
+    asf_object_extended_stream_properties_t *p_esp = &p_obj->ext_stream;
     int i;
 
     for( i = 0; i < p_esp->i_stream_name_count; i++ )
@@ -1038,8 +1025,7 @@ static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
 static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
                                                      asf_object_t *p_obj)
 {
-    asf_object_advanced_mutual_exclusion_t *p_ae =
-        (asf_object_advanced_mutual_exclusion_t *)p_obj;
+    asf_object_advanced_mutual_exclusion_t *p_ae = &p_obj->advanced_mutual_exclusion;
     const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
@@ -1071,8 +1057,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
 }
 static void ASF_FreeObject_advanced_mutual_exclusion( asf_object_t *p_obj)
 {
-    asf_object_advanced_mutual_exclusion_t *p_ae =
-        (asf_object_advanced_mutual_exclusion_t *)p_obj;
+    asf_object_advanced_mutual_exclusion_t *p_ae = &p_obj->advanced_mutual_exclusion;
 
     FREENULL( p_ae->pi_stream_number );
 }
@@ -1081,8 +1066,7 @@ static void ASF_FreeObject_advanced_mutual_exclusion( asf_object_t *p_obj)
 static int ASF_ReadObject_stream_prioritization( stream_t *s,
                                                  asf_object_t *p_obj)
 {
-    asf_object_stream_prioritization_t *p_sp =
-        (asf_object_stream_prioritization_t *)p_obj;
+    asf_object_stream_prioritization_t *p_sp = &p_obj->stream_prioritization;
     const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
@@ -1118,8 +1102,7 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
 }
 static void ASF_FreeObject_stream_prioritization( asf_object_t *p_obj)
 {
-    asf_object_stream_prioritization_t *p_sp =
-        (asf_object_stream_prioritization_t *)p_obj;
+    asf_object_stream_prioritization_t *p_sp = &p_obj->stream_prioritization;
 
     FREENULL( p_sp->pi_priority_stream_number );
     FREENULL( p_sp->pi_priority_flag );
@@ -1130,7 +1113,7 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
                                                         asf_object_t *p_obj)
 {
     asf_object_extended_content_description_t *p_ec =
-        (asf_object_extended_content_description_t *)p_obj;
+                                        &p_obj->extended_content_description;
     const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
@@ -1223,7 +1206,7 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
 static void ASF_FreeObject_extended_content_description( asf_object_t *p_obj)
 {
     asf_object_extended_content_description_t *p_ec =
-        (asf_object_extended_content_description_t *)p_obj;
+                                        &p_obj->extended_content_description;
     int i;
 
     for( i = 0; i < p_ec->i_count; i++ )

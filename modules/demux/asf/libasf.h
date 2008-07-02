@@ -442,9 +442,13 @@ typedef union asf_object_u
     asf_object_metadata_t           metadata;
     asf_object_codec_list_t         codec_list;
     asf_object_marker_t             marker;
-    asf_object_language_list_t      lang;
+    asf_object_language_list_t      language_list;
     asf_object_stream_bitrate_properties_t stream_bitrate;
     asf_object_extended_stream_properties_t ext_stream;
+    asf_object_content_description_t content_description;
+    asf_object_advanced_mutual_exclusion_t advanced_mutual_exclusion;
+    asf_object_stream_prioritization_t stream_prioritization;
+    asf_object_extended_content_description_t extended_content_description;
 
 } asf_object_t;
 
