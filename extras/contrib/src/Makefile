@@ -933,6 +933,7 @@ lame-$(LAME_VERSION).tar.gz:
 
 lame: lame-$(LAME_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/libmp3lame-mingw32.patch
 
 .lame: lame
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-analyser-hooks --disable-decoder --disable-shared --disable-gtktest --disable-frontend && make && make install)
@@ -2441,8 +2442,6 @@ schroedinger-$(SCHROED_VERSION).tar.gz:
 
 schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -d schroedinger -p1 < Patches/libschroedinger-fix-build-OSX.patch
-	patch -d schroedinger -p1 < Patches/libschroedinger-fix-build-OSX-test.patch
 
 .schroedinger: schroedinger .liboil
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
