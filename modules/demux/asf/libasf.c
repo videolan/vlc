@@ -312,98 +312,99 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     asf_object_metadata_t *p_meta =
         (asf_object_metadata_t *)p_obj;
 
-    int i_peek, i_entries, i;
-    const uint8_t *p_peek;
+    int i_peek;
+    unsigned int i;
+    const uint8_t *p_peek, *p_data;
 #ifdef ASF_DEBUG
     unsigned int j;
 #endif
 
-    if( stream_Peek( s, &p_peek, p_meta->i_object_size ) <
+    if( ( i_peek = stream_Peek( s, &p_peek, p_meta->i_object_size ) ) <
         __MAX( (int)p_meta->i_object_size, 26 ) )
        return VLC_EGENERIC;
 
-    p_meta->i_record_entries_count = 0;
-    p_meta->record = NULL;
+    p_meta->i_record_entries_count = GetWLE( p_peek + 24 );
 
-    i_peek = 24;
-    i_entries = GetWLE( p_peek + i_peek ); i_peek += 2;
-    for( i = 0; i < i_entries && i_peek < (int)p_meta->i_object_size -12; i++ )
+    p_data = p_peek + 26;
+
+    p_meta->record = calloc( p_meta->i_record_entries_count,
+                             sizeof(asf_metadata_record_t) );
+
+    for( i = 0; i < p_meta->i_record_entries_count; i++ )
     {
-        asf_metadata_record_t record;
-        int i_name, i_data, j;
+        asf_metadata_record_t *p_record = &p_meta->record[i];
+        int i_name;
+        int i_data;
+        int j;
 
-        if( GetWLE( p_peek + i_peek ) != 0 )
-        {
-            ASF_FreeObject_metadata( p_obj );
-            return VLC_EGENERIC;
-        }
+        if( &p_data[2+2+2+2+4] > &p_peek[i_peek] )
+            break;
 
-        i_peek += 2;
-        record.i_stream = GetWLE( p_peek + i_peek ); i_peek += 2;
-        i_name = GetWLE( p_peek + i_peek ); i_peek += 2;
-        record.i_type = GetWLE( p_peek + i_peek ); i_peek += 2;
-        i_data = GetDWLE( p_peek + i_peek ); i_peek += 4;
+        if( GetWLE( p_data ) != 0 )
+            break;
+        p_data += 2;
 
-        if( record.i_type > ASF_METADATA_TYPE_WORD ||
-            i_peek + i_data + i_name > (int)p_meta->i_object_size )
-        {
-            ASF_FreeObject_metadata( p_obj );
-            return VLC_EGENERIC;
-        }
+        p_record->i_stream = GetWLE( p_data ); p_data += 2;
+        i_name = GetWLE( p_data ); p_data += 2;
+        p_record->i_type = GetWLE( p_data ); p_data += 2;
+        i_data = GetDWLE( p_data ); p_data += 4;
 
-        record.i_val = 0;
-        record.i_data = 0;
-        record.p_data = 0;
+        if( &p_data[i_name+i_data] > &p_peek[i_peek] )
+            break;
 
-        /* get name */
-        record.psz_name = malloc( i_name/2 + 1 );
+        /* Read name */
+        p_record->psz_name = malloc( i_name/2 + 1 );
         for( j = 0; j < i_name/2; j++ )
         {
-            record.psz_name[j] = GetWLE( p_peek + i_peek ); i_peek += 2;
+            p_record->psz_name[j] = GetWLE( p_data ); p_data += 2;
         }
-        record.psz_name[j] = 0; /* just to make sure */
+        p_record->psz_name[j] = 0;
 
-        /* get data */
-        if( record.i_type == ASF_METADATA_TYPE_STRING )
+        /* Read data */
+        if( p_record->i_type == ASF_METADATA_TYPE_STRING )
         {
-            record.p_data = malloc( i_data/2 + 1 );
-            record.i_data = i_data/2;
+            p_record->p_data = malloc( i_data/2 + 1 );
+            p_record->i_data = i_data/2; /* FIXME Is that needed ? */
             for( j = 0; j < i_data/2; j++ )
             {
-                record.p_data[j] = GetWLE( p_peek + i_peek ); i_peek += 2;
+                p_record->p_data[j] = GetWLE( &p_data[2*j] );
             }
-            record.p_data[j] = 0; /* just to make sure */
+            p_record->p_data[j] = 0; /* just to make sure */
+
+            p_data += i_data;
         }
-        else if( record.i_type == ASF_METADATA_TYPE_BYTE )
+        else if( p_record->i_type == ASF_METADATA_TYPE_BYTE )
         {
-            record.p_data = malloc( i_data );
-            record.i_data = i_data;
-            memcpy( record.p_data, p_peek + i_peek, i_data );
-            p_peek += i_data;
+            p_record->p_data = malloc( i_data );
+            p_record->i_data = i_data;
+            if( i_data > 0 )
+                memcpy( p_record->p_data, p_data, i_data );
+
+            p_data += i_data;
+        }
+        else if( p_record->i_type == ASF_METADATA_TYPE_QWORD )
+        {
+            p_record->i_val = GetQWLE( p_data ); p_data += 8;
+        }
+        else if( p_record->i_type == ASF_METADATA_TYPE_DWORD )
+        {
+            p_record->i_val = GetDWLE( p_data ); p_data += 4;
+        }
+        else if( p_record->i_type == ASF_METADATA_TYPE_WORD )
+        {
+            p_record->i_val = GetWLE( p_data ); p_data += 2;
+        }
+        else if( p_record->i_type == ASF_METADATA_TYPE_BOOL )
+        {
+            p_record->i_val = GetWLE( p_data ); p_data += 2;
         }
         else
         {
-            if( record.i_type == ASF_METADATA_TYPE_QWORD )
-            {
-                record.i_val = GetQWLE( p_peek + i_peek ); i_peek += 8;
-            }
-            else if( record.i_type == ASF_METADATA_TYPE_DWORD )
-            {
-                record.i_val = GetDWLE( p_peek + i_peek ); i_peek += 4;
-            }
-            else
-            {
-                record.i_val = GetWLE( p_peek + i_peek ); i_peek += 2;
-            }
+            /* Unknown */
+            p_data += i_data;
         }
-
-        p_meta->i_record_entries_count++;
-        p_meta->record =
-            realloc( p_meta->record, p_meta->i_record_entries_count *
-                     sizeof(asf_metadata_record_t) );
-        memcpy( &p_meta->record[p_meta->i_record_entries_count-1],
-                &record, sizeof(asf_metadata_record_t) );
     }
+    p_meta->i_record_entries_count = i;
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
@@ -597,12 +598,14 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
 
     ASF_GetGUID( &p_cl->i_reserved, p_peek + 24 );
     p_cl->i_codec_entries_count = GetWLE( p_peek + 40 );
+
+    p_data = p_peek + 44;
+
     if( p_cl->i_codec_entries_count > 0 )
     {
         p_cl->codec = calloc( p_cl->i_codec_entries_count,
                               sizeof( asf_codec_entry_t ) );
 
-        p_data = p_peek + 44;
         for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
         {
             asf_codec_entry_t *p_codec = &p_cl->codec[i_codec];
