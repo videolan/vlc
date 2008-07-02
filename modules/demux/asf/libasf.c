@@ -623,43 +623,42 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
         p_data = p_peek + 44;
         for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
         {
-#define codec p_cl->codec[i_codec]
+            asf_codec_entry_t *p_codec = &p_cl->codec[i_codec];
             int i_len, i;
 
-            codec.i_type = GetWLE( p_data ); p_data += 2;
+            p_codec->i_type = GetWLE( p_data ); p_data += 2;
             /* codec name */
             i_len = GetWLE( p_data ); p_data += 2;
-            codec.psz_name = calloc( i_len + 1, sizeof(char) );
+            p_codec->psz_name = calloc( i_len + 1, sizeof(char) );
             for( i = 0; i < i_len; i++ )
             {
-                codec.psz_name[i] = GetWLE( p_data + 2*i );
+                p_codec->psz_name[i] = GetWLE( p_data + 2*i );
             }
-            codec.psz_name[i_len] = '\0';
+            p_codec->psz_name[i_len] = '\0';
             p_data += 2 * i_len;
 
             /* description */
             i_len = GetWLE( p_data ); p_data += 2;
-            codec.psz_description = calloc( i_len + 1, sizeof(char) );
+            p_codec->psz_description = calloc( i_len + 1, sizeof(char) );
             for( i = 0; i < i_len; i++ )
             {
-                codec.psz_description[i] = GetWLE( p_data + 2*i );
+                p_codec->psz_description[i] = GetWLE( p_data + 2*i );
             }
-            codec.psz_description[i_len] = '\0';
+            p_codec->psz_description[i_len] = '\0';
             p_data += 2 * i_len;
 
             /* opaque information */
-            codec.i_information_length = GetWLE( p_data ); p_data += 2;
-            if( codec.i_information_length > 0 )
+            p_codec->i_information_length = GetWLE( p_data ); p_data += 2;
+            if( p_codec->i_information_length > 0 )
             {
-                codec.p_information = malloc( codec.i_information_length );
-                memcpy( codec.p_information, p_data, codec.i_information_length );
-                p_data += codec.i_information_length;
+                p_codec->p_information = malloc( p_codec->i_information_length );
+                memcpy( p_codec->p_information, p_data, p_codec->i_information_length );
+                p_data += p_codec->i_information_length;
             }
             else
             {
-                codec.p_information = NULL;
+                p_codec->p_information = NULL;
             }
-#undef  codec
         }
     }
     else
@@ -696,11 +695,11 @@ static void ASF_FreeObject_codec_list( asf_object_t *p_obj )
 
     for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
     {
-#define codec p_cl->codec[i_codec]
-        FREENULL( codec.psz_name );
-        FREENULL( codec.psz_description );
-        FREENULL( codec.p_information );
-#undef  codec
+        asf_codec_entry_t *p_codec = &p_cl->codec[i_codec];
+
+        FREENULL( p_codec->psz_name );
+        FREENULL( p_codec->psz_description );
+        FREENULL( p_codec->p_information );
     }
     FREENULL( p_cl->codec );
 }
