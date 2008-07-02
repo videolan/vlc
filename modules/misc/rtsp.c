@@ -492,7 +492,10 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     /* TODO: update SDP, etc... */
     if( asprintf( &psz_urlc, "%s/trackID=%d",
               p_media->psz_rtsp_path, p_media->i_es ) < 0 )
+    {
+        free( p_es );
         return VLC_ENOMEM;
+    }
     msg_Dbg( p_vod, "  - ES %4.4s (%s)", (char *)&p_fmt->i_codec, psz_urlc );
 
     switch( p_fmt->i_codec )
@@ -583,11 +586,19 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                 }
                 /* */
                 if( p_64_sps && p_64_pps )
+                {
                     if( asprintf( &p_es->psz_fmtp,
                                   "packetization-mode=1;profile-level-id=%s;"
                                   "sprop-parameter-sets=%s,%s;", hexa, p_64_sps,
                                   p_64_pps ) < 0 )
+                    {
+                        free( p_64_sps );
+                        free( p_64_pps );
+                        free( psz_urlc );
+                        free( p_es );
                         return VLC_ENOMEM;
+                    }
+                }
                 free( p_64_sps );
                 free( p_64_pps );
             }
@@ -649,6 +660,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
         default:
             msg_Err( p_vod, "cannot add this stream (unsupported "
                     "codec: %4.4s)", (char*)&p_fmt->i_codec );
+            free( psz_urlc );
             free( p_es );
             return VLC_EGENERIC;
     }
