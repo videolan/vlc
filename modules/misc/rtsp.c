@@ -523,7 +523,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
             p_es->i_payload_type = 14;
-            p_es->psz_rtpmap = strdup( "MPA/90000" );
+            asprintf( &p_es->psz_rtpmap, "MPA/%d", p_fmt->audio.i_rate );
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
             p_es->i_payload_type = 32;
@@ -531,7 +531,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             break;
         case VLC_FOURCC( 'a', '5', '2', ' ' ):
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = strdup( "ac3/90000" );
+            asprintf( &p_es->psz_rtpmap, "ac3/%d", p_fmt->audio.i_rate );
             break;
         case VLC_FOURCC( 'H', '2', '6', '3' ):
             p_es->i_payload_type = p_media->i_payload_type++;
