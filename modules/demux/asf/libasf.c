@@ -619,8 +619,6 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
     {
         p_cl->codec = calloc( p_cl->i_codec_entries_count,
                               sizeof( asf_codec_entry_t ) );
-        memset( p_cl->codec, 0,
-                p_cl->i_codec_entries_count * sizeof( asf_codec_entry_t ) );
 
         p_data = p_peek + 44;
         for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
@@ -1290,7 +1288,7 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     if( !p_obj )
         return( 0 );
 
-    memset( p_obj, 0, sizeof( p_obj ) );
+    memset( p_obj, 0, sizeof( *p_obj ) );
 
     if( ASF_ReadObjectCommon( s, p_obj ) )
     {
