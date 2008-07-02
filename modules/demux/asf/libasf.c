@@ -920,7 +920,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 
         p_esp->pi_stream_name_language[i] = GetWLE( &p_data[0] );
         i_size = GetWLE( &p_data[2] );
-        p_data += 2;
+        p_data += 2+2;
  
         psz = calloc( i_size/2 + 1, sizeof(char) );
         for( i_len = 0; i_len < i_size/2; i_len++ )
