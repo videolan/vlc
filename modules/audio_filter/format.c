@@ -736,7 +736,7 @@ static block_t *U8toU16( filter_t *p_filter, block_t *p_block )
 static block_t *Swap16( filter_t *p_filter, block_t *p_block )
 {
     VLC_UNUSED(p_filter);
-    int i;
+    size_t i;
     uint8_t *p_in = (uint8_t *)p_block->p_buffer;
     uint8_t tmp;
 
@@ -754,7 +754,7 @@ static block_t *Swap16( filter_t *p_filter, block_t *p_block )
 static block_t *Swap24( filter_t *p_filter, block_t *p_block )
 {
     VLC_UNUSED(p_filter);
-    int i;
+    size_t i;
     uint8_t *p_in = (uint8_t *)p_block->p_buffer;
     uint8_t tmp;
 
