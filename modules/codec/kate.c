@@ -504,7 +504,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
           memcpy(dest, src, ev->bitmap->width);
         }
 
-        msg_Dbg(p_dec, "Created bitmap, %dx%d, %d colors\n", ev->bitmap->width, ev->bitmap->height, ev->palette->ncolors);
+        msg_Dbg(p_dec, "Created bitmap, %zux%zu, %zu colors\n", ev->bitmap->width, ev->bitmap->height, ev->palette->ncolors);
     }
 #endif
 
