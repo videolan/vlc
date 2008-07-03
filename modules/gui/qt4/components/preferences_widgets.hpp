@@ -427,7 +427,9 @@ class KeyShortcutEdit: public QLineEdit
     Q_OBJECT
 public:
     void setValue( int _value ){ value = _value; }
-    int getValue(){ return value; }
+    int getValue() const { return value; }
+public slots:
+    virtual void clear(void) { value = 0; QLineEdit::clear(); }
 private:
     int value;
     virtual void mousePressEvent( QMouseEvent *event );
