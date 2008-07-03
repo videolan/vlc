@@ -11,7 +11,6 @@
       --enable-twolame \
       --enable-quicktime \
       --enable-real \
-      --enable-dirac \
       --enable-realrtsp \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --with-ffmpeg-config-path=/usr/win32/bin --with-ffmpeg-zlib \
