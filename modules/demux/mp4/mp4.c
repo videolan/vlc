@@ -1660,6 +1660,11 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 break;
             }
 
+            case VLC_FOURCC('m','s',0x00,0x02):
+            case VLC_FOURCC('m','s',0x00,0x11):
+                p_track->fmt.audio.i_blockalign = p_sample->data.p_sample_soun->i_bytes_per_frame;
+                break;
+
             default:
                 break;
         }
