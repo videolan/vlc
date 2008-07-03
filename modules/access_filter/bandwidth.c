@@ -144,7 +144,7 @@ retry:
 
     if (len > delta)
     {
-        msg_Dbg (access, "reading %u bytes instead of %u", (unsigned)delta,
+        msg_Dbg (access, "reading %"PRIu64" bytes instead of %zu", delta,
                  len);
         len = (int)delta;
     }

@@ -206,7 +206,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t **pp_block )
         ( p_block->i_pts <= 0 || p_block->i_buffer < 4 ) )
     {
         msg_Dbg( p_dec, "invalid starting packet (size < 4 or pts <=0)" );
-        msg_Dbg( p_dec, "spu size: %d, i_pts: %"PRId64" i_buffer: %d",
+        msg_Dbg( p_dec, "spu size: %d, i_pts: %"PRId64" i_buffer: %zu",
                  p_sys->i_spu_size, p_block->i_pts, p_block->i_buffer );
         block_Release( p_block );
         return NULL;

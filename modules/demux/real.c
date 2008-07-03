@@ -401,7 +401,7 @@ static int Demux( demux_t *p_demux )
                 ( tk->p_frame->i_dts != i_pts ||
                   tk->i_frame != i_len ) )
             {
-                msg_Dbg( p_demux, "sending size=%d", tk->p_frame->i_buffer );
+                msg_Dbg( p_demux, "sending size=%zu", tk->p_frame->i_buffer );
 
                 es_out_Send( p_demux->out, tk->p_es, tk->p_frame );
 

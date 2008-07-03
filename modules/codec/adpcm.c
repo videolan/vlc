@@ -202,7 +202,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         p_sys->i_block = (p_sys->codec == ADPCM_IMA_QT) ?
             34 * p_dec->fmt_in.audio.i_channels : 1024;
-        msg_Warn( p_dec, "block size undefined, using %d", p_sys->i_block );
+        msg_Warn( p_dec, "block size undefined, using %zu", p_sys->i_block );
     }
     else
     {

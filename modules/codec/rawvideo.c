@@ -229,7 +229,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_buffer < p_sys->i_raw_size )
     {
-        msg_Warn( p_dec, "invalid frame size (%d < %d)",
+        msg_Warn( p_dec, "invalid frame size (%zu < %zu)",
                   p_block->i_buffer, p_sys->i_raw_size );
 
         block_Release( p_block );

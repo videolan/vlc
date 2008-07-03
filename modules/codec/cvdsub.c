@@ -220,7 +220,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
 
     if( p_block->i_buffer < SPU_HEADER_LEN )
     {
-        msg_Dbg( p_dec, "invalid packet header (size %d < %d)" ,
+        msg_Dbg( p_dec, "invalid packet header (size %zu < %u)" ,
                  p_block->i_buffer, SPU_HEADER_LEN );
         block_Release( p_block );
         return NULL;
@@ -253,11 +253,11 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
 
         if( p_spu->i_buffer != p_sys->i_spu_size )
         {
-            msg_Warn( p_dec, "SPU packets size=%d should be %d",
+            msg_Warn( p_dec, "SPU packets size=%zu should be %zu",
                       p_spu->i_buffer, p_sys->i_spu_size );
         }
 
-        msg_Dbg( p_dec, "subtitle packet complete, size=%d", p_spu->i_buffer);
+        msg_Dbg( p_dec, "subtitle packet complete, size=%zuu", p_spu->i_buffer);
 
         ParseMetaInfo( p_dec, p_spu );
 
@@ -315,7 +315,7 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
     p_sys->i_image_length = p_sys->metadata_offset - p_sys->i_image_offset;
 
 #ifdef DEBUG_CVDSUB
-    msg_Dbg( p_dec, "total size: %d  image size: %d",
+    msg_Dbg( p_dec, "total size: %zu  image size: %zu",
              p_sys->i_spu_size, p_sys->i_image_length );
 #endif
 }
@@ -461,7 +461,8 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
             p_sys->first_field_offset =
                 (p[2] << 8) + p[3] - p_sys->i_image_offset;
 #ifdef DEBUG_CVDSUB
-            msg_Dbg( p_dec, "1st_field_offset %d", p_sys->first_field_offset );
+            msg_Dbg( p_dec, "1st_field_offset %zu",
+                     p_sys->first_field_offset );
 #endif
             break;
 
@@ -471,7 +472,8 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
             p_sys->second_field_offset =
                 (p[2] << 8) + p[3] - p_sys->i_image_offset;
 #ifdef DEBUG_CVDSUB
-            msg_Dbg( p_dec, "2nd_field_offset %d", p_sys->second_field_offset);
+            msg_Dbg( p_dec, "2nd_field_offset %zu",
+                     p_sys->second_field_offset);
 #endif
             break;
 

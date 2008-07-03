@@ -261,7 +261,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
 
     if( p_block->i_buffer < SPU_HEADER_LEN )
     {
-        msg_Dbg( p_dec, "invalid packet header (size %d < %d)" ,
+        msg_Dbg( p_dec, "invalid packet header (size %zu < %u)" ,
                  p_block->i_buffer, SPU_HEADER_LEN );
         block_Release( p_block );
         return NULL;
@@ -350,12 +350,12 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
 
         if( p_spu->i_buffer != p_sys->i_spu_size )
         {
-            msg_Warn( p_dec, "subtitle packets size=%d should be %d",
+            msg_Warn( p_dec, "subtitle packets size=%zu should be %zu",
                       p_spu->i_buffer, p_sys->i_spu_size );
         }
 
     dbg_print( (DECODE_DBG_PACKET),
-                 "subtitle packet complete, size=%d", p_spu->i_buffer );
+                 "subtitle packet complete, size=%zu", p_spu->i_buffer );
 
         p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
         p_sys->p_spu = 0;
@@ -437,10 +437,10 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
   if (p_sys && p_sys->i_debug & DECODE_DBG_PACKET)
   {
       msg_Dbg( p_dec, "x-start: %d, y-start: %d, width: %d, height %d, "
-           "spu size: %d, duration: %lu (d:%d p:%d)",
+           "spu size: %zu, duration: %"PRIu64" (d:%zu p:%"PRIu16")",
            p_sys->i_x_start, p_sys->i_y_start,
            p_sys->i_width, p_sys->i_height,
-           p_sys->i_spu_size, (long unsigned int) p_sys->i_duration,
+           p_sys->i_spu_size, p_sys->i_duration,
            p_sys->i_image_length, p_sys->i_image_offset);
  
       for( i = 0; i < 4; i++ )

@@ -293,7 +293,7 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( i_used < 0 || i_output < 0 )
     {
         if( i_used < 0 )
-            msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
+            msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
                       p_block->i_buffer );
 
         block_Release( p_block );

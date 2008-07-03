@@ -1629,7 +1629,7 @@ static block_t* GrabAudio( demux_t *p_demux )
             /* Test for overrun */
             if( i_correction_delta > p_sys->i_audio_max_frame_size )
             {
-                msg_Warn( p_demux, "ALSA read overrun (%d > %d)",
+                msg_Warn( p_demux, "ALSA read overrun (%zu > %zu)",
                           i_correction_delta, p_sys->i_audio_max_frame_size );
                 i_correction_delta = p_sys->i_audio_max_frame_size;
                 snd_pcm_prepare( p_sys->p_alsa_pcm );

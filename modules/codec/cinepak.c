@@ -154,7 +154,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                                      p_block->p_buffer );
     if( i_status < 0 )
     {
-        msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
+        msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
                   p_block->i_buffer );
         block_Release( p_block );
         return NULL;
