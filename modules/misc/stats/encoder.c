@@ -83,8 +83,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     p_block->i_length = kBufferSize;
     p_block->i_dts = p_pict->date;
 
-    msg_Dbg( p_enc, "putting %dms", *(mtime_t*)p_block->p_buffer / 1000 );
-
+    msg_Dbg( p_enc, "putting %"PRIu64"ms",
+             *(mtime_t*)p_block->p_buffer / 1000 );
     return p_block;
 }
 

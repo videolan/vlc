@@ -214,7 +214,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    msg_Dbg( p_vout, "VOUT got %d ms offset", (mdate() - *(mtime_t *)p_pic->p->p_pixels) / 1000 );
+    msg_Dbg( p_vout, "VOUT got %"PRIu64" ms offset",
+             (mdate() - *(mtime_t *)p_pic->p->p_pixels) / 1000 );
 
     /* No need to do anything, the fake direct buffers stay as they are */
 }

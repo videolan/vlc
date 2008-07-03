@@ -353,7 +353,7 @@ static void Run( intf_thread_t *p_intf )
             p_song = &p_sys->p_queue[i_song];
             if( !asprintf( &psz_submit_song,
                     "&a%%5B%d%%5D=%s&t%%5B%d%%5D=%s"
-                    "&i%%5B%d%%5D=%llu&o%%5B%d%%5D=P&r%%5B%d%%5D="
+                    "&i%%5B%d%%5D=%ju&o%%5B%d%%5D=P&r%%5B%d%%5D="
                     "&l%%5B%d%%5D=%d&b%%5B%d%%5D=%s"
                     "&n%%5B%d%%5D=%s&m%%5B%d%%5D=%s",
                     i_song, p_song->psz_a,           i_song, p_song->psz_t,
@@ -695,7 +695,7 @@ static int Handshake( intf_thread_t *p_this )
 {
     char                *psz_username, *psz_password;
     time_t              timestamp;
-    char                psz_timestamp[33];
+    char                psz_timestamp[21];
 
     struct md5_s        p_struct_md5;
 
@@ -745,7 +745,8 @@ static int Handshake( intf_thread_t *p_this )
         return VLC_ENOMEM;
     }
 
-    snprintf( psz_timestamp, 33, "%llu", (uintmax_t)timestamp );
+    snprintf( psz_timestamp, sizeof( psz_timestamp ), "%"PRIu64,
+              (uint64_t)timestamp );
 
     /* generates a md5 hash of :
      * - md5 hash of the password, plus

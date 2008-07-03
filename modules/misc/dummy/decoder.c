@@ -135,7 +135,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         write( p_sys->i_fd, p_block->p_buffer, p_block->i_buffer );
 #endif
 
-        msg_Dbg( p_dec, "dumped %i bytes", p_block->i_buffer );
+        msg_Dbg( p_dec, "dumped %zu bytes", p_block->i_buffer );
     }
 
     block_Release( p_block );

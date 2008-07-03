@@ -241,7 +241,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     msg_Dbg( p_dec, "format: samplerate:%d Hz channels:%d bits/sample:%d "
-             "blockalign:%d samplesperblock:%d",
+             "blockalign:%zu samplesperblock:%zu",
              p_dec->fmt_in.audio.i_rate, p_dec->fmt_in.audio.i_channels,
              p_dec->fmt_in.audio.i_bitspersample, p_sys->i_block,
              p_sys->i_samplesperblock );

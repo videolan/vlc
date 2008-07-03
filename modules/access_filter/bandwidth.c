@@ -154,7 +154,7 @@ retry:
     len = src->pf_read (src, buffer, len);
     access->info = src->info;
 
-    msg_Dbg (access, "read %u bytes", len);
+    msg_Dbg (access, "read %zu bytes", len);
     return len;
 }
 

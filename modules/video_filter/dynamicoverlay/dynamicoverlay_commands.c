@@ -510,7 +510,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
         if( i_neededsize > i_size )
         {
             msg_Err( p_filter,
-                     "Insufficient data in shared memory. need %d, got %d",
+                     "Insufficient data in shared memory. need %zu, got %zu",
                      i_neededsize, i_size );
             p_ovl->data.p_pic->pf_release( p_ovl->data.p_pic );
             free( p_ovl->data.p_pic );
@@ -917,7 +917,7 @@ void RegisterCommand( filter_t *p_filter )
         p_sys->pp_commands[i_index]->pf_unparse = p_commands[i_index].pf_unparse;
     }
 
-    msg_Dbg( p_filter, "%d commands are available", p_sys->i_commands );
+    msg_Dbg( p_filter, "%zu commands are available", p_sys->i_commands );
     for( size_t i_index = 0; i_index < p_sys->i_commands; i_index++ )
         msg_Dbg( p_filter, "    %s", p_sys->pp_commands[i_index]->psz_command );
 }

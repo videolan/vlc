@@ -76,8 +76,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_buffer == kBufferSize )
     {
-        msg_Dbg( p_dec, "got %d ms", *(mtime_t *)p_block->p_buffer  / 1000 );
-        msg_Dbg( p_dec, "got %d ms offset", (mdate() - *(mtime_t *)p_block->p_buffer) / 1000 );
+        msg_Dbg( p_dec, "got %"PRIu64" ms",
+                 *(mtime_t *)p_block->p_buffer  / 1000 );
+        msg_Dbg( p_dec, "got %"PRIu64" ms offset",
+                 (mdate() - *(mtime_t *)p_block->p_buffer) / 1000 );
         *(mtime_t *)(p_pic->p->p_pixels) = *(mtime_t *)p_block->p_buffer;
     }
     else

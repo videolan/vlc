@@ -165,7 +165,7 @@ static int Mux( sout_mux_t *p_mux )
         static const char psz_hfmt[] = "\r\n"
             "--"BOUNDARY"\r\n"
             "Content-Type: image/jpeg\r\n"
-            "Content-Length: %u\r\n"
+            "Content-Length: %zu\r\n"
             "\r\n";
         block_t *p_data = block_FifoGet( p_fifo );
         block_t *p_header = block_New( p_mux, sizeof( psz_hfmt ) + 20 );

@@ -222,7 +222,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_bitrate_override = config_GetInt( p_mux, "sout-asf-bitrate-override" );
     msg_Dbg( p_mux, "Packet size %d", p_sys->i_packet_size);
     if (p_sys->i_bitrate_override)
-        msg_Dbg( p_mux, "Bitrate override %d", p_sys->i_bitrate_override);
+        msg_Dbg( p_mux, "Bitrate override %"PRId64, p_sys->i_bitrate_override);
     p_sys->i_packet_count= 0;
 
     /* Generate a random fid */
