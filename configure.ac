@@ -80,6 +80,17 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
 
+dnl Allow binary package maintainer to pass a custom string to avoid 
+dnl cache problem
+AC_ARG_WITH(binary-version, 
+	AS_HELP_STRING([--with-binary-version=STRING],
+	     [To avoid plugins cache problem between binary version]),[],[])
+AS_IF([test -n "${with_binary_version}"],[
+      AC_DEFINE_UNQUOTED([DISTRO_VERSION],["${with_binary_version}"],
+			 [Binary specific version])
+      ])
+
+
 dnl
 dnl  Check for the contrib directory
 dnl

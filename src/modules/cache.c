@@ -178,6 +178,20 @@ void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
+#ifdef DISTRO_VERSION
+    /* Check for distribution specific version */
+    char p_distrostring[sizeof( DISTRO_VERSION )];
+    i_size = sizeof( DISTRO_VERSION ) - 1;
+    i_read = fread( p_distrostring, 1, i_size, file );
+    if( i_read != i_size ||
+        memcmp( p_distrostring, DISTRO_VERSION, i_size ) )
+    {
+        msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
+        fclose( file );
+        return;
+    }
+#endif
+
     /* Check Sub-version number */
     i_read = fread( &i_marker, 1, sizeof(i_marker), file );
     if( i_read != sizeof(i_marker) || i_marker != CACHE_SUBVERSION_NUM )
@@ -496,7 +510,11 @@ void CacheSave( vlc_object_t *p_this )
     /* Contains version number */
     if (fputs ("cache "COPYRIGHT_MESSAGE, file) == EOF)
         goto error;
-
+#ifdef DISTRO_VERSION
+    /* Allow binary maintaner to pass a string to detect new binary version*/
+    if (fputs( DISTRO_VERSION, file ) == EOF)
+        goto error;
+#endif
     /* Sub-version number (to avoid breakage in the dev version when cache
      * structure changes) */
     i_file_size = CACHE_SUBVERSION_NUM;
