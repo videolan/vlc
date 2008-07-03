@@ -2147,7 +2147,7 @@ vlc_module_begin();
 #   define KEY_CROP               'c'
 #   define KEY_DEINTERLACE        'd'
 #   define KEY_INTF_SHOW          'i'
-#   define KEY_INTF_HIDE          KEY_MODIFIED_SHIFT|'i'
+#   define KEY_INTF_HIDE          KEY_MODIFIER_SHIFT|'i'
 #   define KEY_DISC_MENU          KEY_MODIFIER_ALT|'r'
 #   define KEY_TITLE_PREV         KEY_MODIFIER_ALT|'o'
 #   define KEY_TITLE_NEXT         KEY_MODIFIER_ALT|'b'
