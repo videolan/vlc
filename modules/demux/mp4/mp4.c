@@ -1392,7 +1392,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
     p_track->p_sample = p_sample;
 
-    if( p_track->fmt.i_cat == AUDIO_ES && p_track->i_sample_size == 1 )
+    if( p_track->fmt.i_cat == AUDIO_ES && ( p_track->i_sample_size == 1 || p_track->i_sample_size == 2 ) )
     {
         MP4_Box_data_sample_soun_t *p_soun;
 
@@ -1427,6 +1427,11 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
                     p_soun->i_samplesize = 8;
                     break;
+                case VLC_FOURCC( 't', 'w', 'o', 's' ):
+                case VLC_FOURCC( 's', 'o', 'w', 't' ):
+                    /* What would be the fun if you could trust the .mov */
+                    p_track->i_sample_size = ((p_soun->i_samplesize+7)/8) * p_soun->i_channelcount;
+                    break;
                 default:
                     break;
             }
@@ -1437,7 +1442,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_soun->i_qt_version = 0;
         }
     }
-
 
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
