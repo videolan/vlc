@@ -197,7 +197,8 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([libvlc],[-Wl,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
-        [  --enable-macosx-defaults Build the default configuration on Mac OS X (default enabled)])
+      AS_HELP_STRING([--enable-macosx-defaults],[Build the default configuration
+		     on Mac OS X (default enabled)]))
     if test "x${enable_macosx_defaults}" != "xno"
     then
         echo ""
@@ -894,7 +895,8 @@ then
           VLC_ADD_CFLAGS([dbus],[$DBUS_CFLAGS])
         fi
       dnl Check for Telepathy
-        AC_ARG_ENABLE(telepathy, [  --enable-telepathy      Telepathy Presence plugin through DBus(default enabled)])
+        AC_ARG_ENABLE(telepathy,
+          AS_HELP_STRING([--enable-telepathy],[Telepathy Presence plugin through DBus(default enabled)]))
         if test "${enable_telepathy}" != "no"; then
           VLC_ADD_PLUGIN([telepathy])
           VLC_ADD_LIBS([telepathy],[$DBUS_LIBS])
@@ -1620,7 +1622,8 @@ fi
 
 dnl Lua modules
 AC_ARG_ENABLE(lua,
-  [  --enable-lua            lua playlist, metafetcher and interface plugins (default enabled)])
+  AS_HELP_STRING([--enable-lua],[lua playlist, metafetcher and interface 
+		  plugins (default enabled)]))
 if test "${enable_lua}" != "no"
 then
   PKG_CHECK_MODULES(LUA, lua5.1,
@@ -2146,7 +2149,8 @@ dnl
 dnl  Windows DirectShow BDA access module
 dnl
 AC_ARG_ENABLE(bda,
-  [  --enable-bda            Win32 DirectShow BDA support (default enabled on Win32)])
+  AS_HELP_STRING([--enable-bda],[Win32 DirectShow BDA support (default 
+		  enabled on Win32)]))
 if test "${enable_bda}" != "no"
 then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
@@ -2446,7 +2450,8 @@ dnl
 dnl  VCDX and CDDAX modules
 dnl
 AC_ARG_ENABLE(cddax,
-  [  --enable-cddax          audio CD plugin with CD Text and CD paranoia via libcdio (default disabled)])
+  AS_HELP_STRING([--enable-cddax],[audio CD plugin with CD Text and CD paranoia
+		  via libcdio (default disabled)]))
  
 AC_ARG_ENABLE(libcddb,
   [  --enable-libcddb        CDDB support for libcdio audio CD (default enabled)])
@@ -2974,7 +2979,8 @@ dnl  swscale image scaling and conversion plugin
 dnl
 
 AC_ARG_ENABLE(swscale,
-[  --enable-swscale        libswscale image scaling and conversion (default enabled)])
+  AS_HELP_STRING([--enable-swscale],[libswscale image scaling and conversion 
+		  (default enabled)]))
 if test "${enable_swscale}" != "no"
 then
   PKG_CHECK_MODULES(SWSCALE,[libswscale],
@@ -3002,7 +3008,8 @@ dnl  from VLC.
 dnl
 
 AC_ARG_ENABLE(imgresample,
-[  --enable-imgresample    deprecated libavcodec image scaling and conversion (default disabled)])
+  AS_HELP_STRING([--enable-imgresample],[deprecated libavcodec image scaling 
+		  and conversion (default disabled)]))
 if test "${enable_imgresample}" = "yes"
 then
   PKG_CHECK_MODULES(IMGRESAMPLE,[libavcodec],
@@ -3298,7 +3305,8 @@ AS_IF([test "x${with_dts_tree}" != "x"], [
 ])
 
 AC_ARG_ENABLE(dca,
-  [  --enable-dca            DTS Coherent Acoustics support with libdca (default enabled)])
+  AS_HELP_STRING([--enable-dca],[DTS Coherent Acoustics support with libdca 
+		  (default enabled)]))
 AS_IF([test "${enable_dca}" != "no"], [
   AC_ARG_WITH(dca-tree,
     [    --with-dca-tree=PATH  libdca tree for static linking],,
@@ -3697,9 +3705,11 @@ dnl telx module
 dnl uncompatible
 dnl
 AC_ARG_ENABLE(zvbi,
-  [  --enable-zvbi           VBI (inc. Teletext) decoding support with libzvbi (default enabled)])
+  AS_HELP_STRING([--enable-zvbi],[VBI (inc. Teletext) decoding support with 
+		  libzvbi (default enabled)]))
 AC_ARG_ENABLE(telx,
-  [  --enable-telx           Teletext decoding module (conflicting with zvbi) (default disabled)])
+  AS_HELP_STRING([--enable-telx],[Teletext decoding module (conflicting with 
+		  zvbi) (default disabled)]))
 
 AS_IF( [test "${enable_zvbi}" != "no"],[
   AS_IF( [test "${enable_telx}" = "yes"],[
@@ -4742,7 +4752,7 @@ dnl
 dnl UPnP Plugin (Intel SDK)
 dnl
 AC_ARG_ENABLE(upnp,
-  [AS_HELP_STRING([--enable-upnp],[Intel UPnP SDK (default enabled)])])
+  AS_HELP_STRING([--enable-upnp],[Intel UPnP SDK (default enabled)]))
 
 VLC_ADD_CXXFLAGS([upnp_intel], [ ])
 AS_IF([test "x${enable_upnp}" != "xno"], [
@@ -5143,7 +5153,8 @@ dnl  AtmoLight (homebrew AmbiLight)
 dnl
 if test "${SYS}" = "mingw32" -o "${SYS}" = "linux"; then
    AC_ARG_ENABLE(atmo,
-[  --disable-atmo          AtmoLight (homebrew philips ambilight) (default enabled)])
+AS_HELP_STRING([--disable-atmo],[AtmoLight (homebrew philips ambilight) 
+		(default enabled)]))
    if test "${enable_atmo}" != "no"; then
       AC_LANG_PUSH(C++)
       VLC_ADD_PLUGIN([atmo])
@@ -5279,7 +5290,8 @@ dnl  DLL loader copied from MPlayer copied from somewhere else (WINE ?)
 dnl
 loader=false
 AC_ARG_ENABLE(loader,
-  [  --enable-loader         build DLL loader for ELF i386 platforms (default disabled)])
+  AS_HELP_STRING([--enable-loader],[build DLL loader for ELF i386 platforms 
+		  (default disabled)]))
 AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGIN([dmo])
@@ -5307,7 +5319,8 @@ dnl  Microsoft ActiveX support
 dnl
 activex=false
 AC_ARG_ENABLE(activex,
-  [  --enable-activex        build a vlc-based ActiveX control (default enabled on Win32)])
+  AS_HELP_STRING([--enable-activex],[build a vlc-based ActiveX control 
+		  (default enabled on Win32)]))
 AC_ARG_WITH(wine-sdk-path,
   [    --with-wine-sdk-path=PATH path to wine sdk])
 if test "${enable_activex}" != "no"
@@ -5357,7 +5370,8 @@ dnl  Mozilla plugin
 dnl
 mozilla=false
 AC_ARG_ENABLE(mozilla,
-  [  --enable-mozilla        build a vlc-based Firefox/Mozilla plugin (default disabled)])
+  AS_HELP_STRING([--enable-mozilla],[build a vlc-based Firefox/Mozilla plugin
+		  (default disabled)]))
 AC_ARG_WITH(mozilla-sdk-path,
   [    --with-mozilla-sdk-path=PATH path to mozilla sdk])
 AC_LANG_PUSH(C++)
