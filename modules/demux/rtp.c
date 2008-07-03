@@ -674,7 +674,7 @@ static int Demux (demux_t *demux)
             msg_Dbg (demux, "detected MPEG Audio");
             pt.init = mpa_init;
             pt.decode = mpa_decode;
-            pt.frequency = 44100;
+            pt.frequency = 90000;
             break;
 
           case 32:
