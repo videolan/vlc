@@ -387,7 +387,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( p_dec->fmt_in.video.p_palette )
         p_sys->p_context->palctrl =
             (AVPaletteControl *)p_dec->fmt_in.video.p_palette;
-    else if( p_sys->i_codec_id != CODEC_ID_MSVIDEO1 )
+    else if( p_sys->i_codec_id != CODEC_ID_MSVIDEO1 && p_sys->i_codec_id != CODEC_ID_CINEPAK )
         p_sys->p_context->palctrl = &palette_control;
 
     /* ***** Open the codec ***** */
