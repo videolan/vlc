@@ -1427,6 +1427,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
                     p_soun->i_samplesize = 8;
                     break;
+                case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
+                case VLC_FOURCC( 'r', 'a', 'w', ' ' ):
                 case VLC_FOURCC( 't', 'w', 'o', 's' ):
                 case VLC_FOURCC( 's', 'o', 'w', 't' ):
                     /* What would be the fun if you could trust the .mov */
@@ -1452,7 +1454,14 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             break;
 
         case( VLC_FOURCC( 'r', 'a', 'w', ' ' ) ):
-            p_track->fmt.i_codec = VLC_FOURCC( 'a', 'r', 'a', 'w' );
+        case( VLC_FOURCC( 'N', 'O', 'N', 'E' ) ):
+        {
+            MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
+
+            if(p_soun && (p_soun->i_samplesize+7)/8 == 1 )
+                p_track->fmt.i_codec = VLC_FOURCC( 'u', '8', ' ', ' ' );
+            else
+                p_track->fmt.i_codec = VLC_FOURCC( 't', 'w', 'o', 's' );
 
             /* Buggy files workaround */
             if( p_sample->data.p_sample_soun && (p_track->i_timescale !=
@@ -1471,6 +1480,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     p_soun->i_sampleratehi = p_track->i_timescale;
             }
             break;
+        }
 
         case( VLC_FOURCC( 's', '2', '6', '3' ) ):
             p_track->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '3' );
