@@ -215,6 +215,7 @@ static int CreateFilter( vlc_object_t *p_this )
     CREATE_VAR( i_yoff, Integer, "marq-y" );
     CREATE_VAR( i_timeout,Integer, "marq-timeout" );
     CREATE_VAR( i_refresh,Integer, "marq-refresh" );
+    p_sys->i_refresh *= 1000;
     CREATE_VAR( i_pos, Integer, "marq-position" );
     CREATE_VAR( psz_marquee, String, "marq-marquee" );
     CREATE_VAR( p_style->i_font_alpha, Integer, "marq-opacity" );
@@ -265,21 +266,19 @@ static void DestroyFilter( vlc_object_t *p_this )
 static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    subpicture_t *p_spu;
+    subpicture_t *p_spu = NULL;
     video_format_t fmt;
 
-    if( p_sys->last_time + p_sys->i_refresh*1000 > date )
-    {
+    if( p_sys->last_time + p_sys->i_refresh > date )
         return NULL;
-    }
 
+    vlc_object_lock( p_filter );
     if( p_sys->b_need_update == false )
-    {
-        return NULL;
-    }
+        goto out;
 
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
-    if( !p_spu ) return NULL;
+    if( !p_spu )
+        goto out;
 
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
@@ -291,19 +290,16 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     if( !p_spu->p_region )
     {
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
-        return NULL;
+        p_spu = NULL;
+        goto out;
     }
 
     p_sys->last_time = date;
 
-    if( strchr( p_sys->psz_marquee, '%' ) || strchr( p_sys->psz_marquee, '$' ) )
-    {
-        p_sys->b_need_update = true;
-    }
-    else
-    {
+    if( !strchr( p_sys->psz_marquee, '%' )
+     && !strchr( p_sys->psz_marquee, '$' ) )
         p_sys->b_need_update = false;
-    }
+
     p_spu->p_region->psz_text = str_format( p_filter, p_sys->psz_marquee );
     p_spu->i_start = date;
     p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
@@ -326,6 +322,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     p_spu->p_region->p_style = p_sys->p_style;
 
+out:
+    vlc_object_unlock( p_filter );
     return p_spu;
 }
 
@@ -336,9 +334,10 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
                             void *p_data )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+    VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *) p_data;
 
+    vlc_object_lock( p_this );
     if( !strncmp( psz_var, "marq-marquee", 7 ) )
     {
         free( p_sys->psz_marquee );
@@ -370,7 +369,7 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     }
     else if ( !strncmp( psz_var, "marq-refresh", 12 ) )
     {
-        p_sys->i_refresh = newval.i_int;
+        p_sys->i_refresh = newval.i_int * 1000;
     }
     else if ( !strncmp( psz_var, "marq-position", 8 ) )
     /* willing to accept a match against marq-pos */
@@ -379,5 +378,6 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
         p_sys->i_xoff = -1;       /* force to relative positioning */
     }
     p_sys->b_need_update = true;
+    vlc_object_unlock( p_this );
     return VLC_SUCCESS;
 }
