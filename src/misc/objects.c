@@ -326,9 +326,9 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     if( p_this->p_libvlc == NULL )
     {
+#ifndef NDEBUG
         libvlc_global_data_t *p_global = (libvlc_global_data_t *)p_this;
 
-#ifndef NDEBUG
         assert( p_global == vlc_global() );
         /* Test for leaks */
         if (p_priv->next != p_this)
