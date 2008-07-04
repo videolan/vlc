@@ -566,7 +566,6 @@ static void DestroyVout( vlc_object_t *p_this )
     vout_sys_t *p_sys = p_vout->p_sys;
 
     module_Unneed( p_sys->p_vout, p_sys->p_vout->p_module );
-    vlc_object_detach( p_sys->p_vout );
     vlc_object_release( p_sys->p_vout );
 
     free( p_sys );
