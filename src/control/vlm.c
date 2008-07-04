@@ -211,6 +211,40 @@ void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance, char *psz_name,
 #endif
 }
 
+void libvlc_vlm_add_vod( libvlc_instance_t *p_instance, char *psz_name,
+                         char *psz_input, int i_options,
+                         char **ppsz_options, int b_enabled,
+                         char *psz_mux, libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+    vlm_t *p_vlm;
+    vlm_media_t m;
+    int n;
+
+    VLM(p_vlm);
+
+    vlm_media_Init( &m );
+    m.psz_name = strdup( psz_name );
+    m.b_enabled = b_enabled;
+    m.b_vod = true;
+    m.vod.psz_mux = psz_mux ? strdup( psz_mux ) : NULL;
+    if( psz_input )
+        TAB_APPEND( m.i_input, m.ppsz_input, strdup(psz_input) );
+    for( n = 0; n < i_options; n++ )
+        TAB_APPEND( m.i_option, m.ppsz_option, strdup(ppsz_options[n]) );
+
+    if( vlm_Control( p_vlm, VLM_ADD_MEDIA, &m, NULL ) )
+    {
+        vlm_media_Clean( &m );
+        libvlc_exception_raise( p_exception, "Media %s creation failed", psz_name );
+    }
+    vlm_media_Clean( &m );
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
+}
+
 void libvlc_vlm_del_media( libvlc_instance_t *p_instance, char *psz_name,
                            libvlc_exception_t *p_exception )
 {
@@ -274,6 +308,22 @@ void libvlc_vlm_set_loop( libvlc_instance_t *p_instance, char *psz_name,
 #ifdef ENABLE_VLM
 #define VLM_CHANGE_CODE { p_media->broadcast.b_loop = b_loop; }
     VLM_CHANGE( "Unable to change %s loop property", VLM_CHANGE_CODE );
+#undef VLM_CHANGE_CODE
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
+}
+
+void libvlc_vlm_set_mux( libvlc_instance_t *p_instance, char *psz_name,
+                         char *psz_mux, libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+#define VLM_CHANGE_CODE { if( p_media->b_vod ) { \
+                            free( p_media->vod.psz_mux ); \
+                            p_media->vod.psz_mux = psz_mux ? strdup( psz_mux ) : NULL; \
+                          } }
+    VLM_CHANGE( "Unable to change %s mux property", VLM_CHANGE_CODE );
 #undef VLM_CHANGE_CODE
 #else
     libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );

@@ -184,6 +184,7 @@ libvlc_video_set_teletext
 libvlc_video_set_viewport
 libvlc_video_take_snapshot
 libvlc_vlm_add_broadcast
+libvlc_vlm_add_vod
 libvlc_vlm_add_input
 libvlc_vlm_change_media
 libvlc_vlm_del_media
@@ -201,6 +202,7 @@ libvlc_vlm_seek_media
 libvlc_vlm_set_enabled
 libvlc_vlm_set_input
 libvlc_vlm_set_loop
+libvlc_vlm_set_mux
 libvlc_vlm_set_output
 libvlc_vlm_show_media
 libvlc_vlm_stop_media

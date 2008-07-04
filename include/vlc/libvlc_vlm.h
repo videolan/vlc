@@ -38,7 +38,7 @@ extern "C" {
  * @{
  */
 
-    
+
 /**
  * Release the vlm instance related to the given libvlc_instance_t
  *
@@ -46,7 +46,7 @@ extern "C" {
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_vlm_release( libvlc_instance_t *, libvlc_exception_t * );
-    
+
 /**
  * Add a broadcast, with one input.
  *
@@ -62,6 +62,21 @@ VLC_PUBLIC_API void libvlc_vlm_release( libvlc_instance_t *, libvlc_exception_t 
  */
 VLC_PUBLIC_API void libvlc_vlm_add_broadcast( libvlc_instance_t *, char *, char *, char* ,
                                               int, char **, int, int, libvlc_exception_t * );
+
+/**
+ * Add a vod, with one input.
+ *
+ * \param p_instance the instance
+ * \param psz_name the name of the new vod media
+ * \param psz_input the input MRL
+ * \param i_options number of additional options
+ * \param ppsz_options additional options
+ * \param b_enabled boolean for enabling the new vod
+ * \param the muxer of the vod media
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_vlm_add_vod( libvlc_instance_t *, char *, char *, int, char **,
+                                        int, char *, libvlc_exception_t * );
 
 /**
  * Delete a media (VOD or broadcast).
@@ -126,6 +141,17 @@ VLC_PUBLIC_API void libvlc_vlm_add_input( libvlc_instance_t *, char *, char *,
  */
 VLC_PUBLIC_API void libvlc_vlm_set_loop( libvlc_instance_t *, char *, int,
                                          libvlc_exception_t *);
+
+/**
+ * Set a media's vod muxer.
+ *
+ * \param p_instance the instance
+ * \param psz_name the media to work on
+ * \param the new muxer
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_vlm_set_mux( libvlc_instance_t *p_instance, char *psz_name,
+                                        char *psz_mux, libvlc_exception_t *p_exception );
 
 /**
  * Edit the parameters of a media. This will delete all existing inputs and
