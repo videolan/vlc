@@ -389,6 +389,8 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 static iod_descriptor_t *IODNew( int , uint8_t * );
 static void              IODFree( iod_descriptor_t * );
 
+static int UserPmt( demux_t *p_demux, const char * );
+
 #define TS_PACKET_SIZE_188 188
 #define TS_PACKET_SIZE_192 192
 #define TS_PACKET_SIZE_204 204
@@ -712,77 +714,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_demux, "ts-extra-pmt", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-extra-pmt", &val );
     if( val.psz_string && strchr( val.psz_string, '=' ) != NULL )
-    {
-        char *psz = val.psz_string;
-        int  i_pid = strtol( psz, &psz, 0 );
-
-        if( i_pid >= 2 && i_pid < 8192 )
-        {
-            ts_pid_t *pmt = &p_sys->pid[i_pid];
-            ts_prg_psi_t *prg;
-
-            msg_Dbg( p_demux, "extra pmt specified (pid=%d)", i_pid );
-            PIDInit( pmt, true, NULL );
-
-            /* Dummy PMT */
-            prg = malloc( sizeof( ts_prg_psi_t ) );
-            if( !prg )
-            {
-                Close( VLC_OBJECT(p_demux) );
-                return VLC_ENOMEM;
-            }
-
-            memset( prg, 0, sizeof( ts_prg_psi_t ) );
-            prg->i_pid_pcr  = -1;
-            prg->i_pid_pmt  = -1;
-            prg->i_number   = 0;    /* special */
-            prg->handle     = dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack, p_demux );
-            TAB_APPEND( pmt->psi->i_prg, pmt->psi->prg, prg );
-
-            psz = strchr( psz, '=' ) + 1;   /* can't failed */
-            while( psz && *psz )
-            {
-                char *psz_next = strchr( psz, ',' );
-                int i_pid, i_stream_type;
-
-                if( psz_next )
-                {
-                    *psz_next++ = '\0';
-                }
-
-                i_pid = strtol( psz, &psz, 0 );
-                if( *psz == ':' )
-                {
-                    i_stream_type = strtol( psz + 1, &psz, 0 );
-                    if( i_pid >= 2 && i_pid < 8192 &&
-                        !p_sys->pid[i_pid].b_valid )
-                    {
-                        ts_pid_t *pid = &p_sys->pid[i_pid];
-
-                        PIDInit( pid, false, pmt->psi);
-                        if( pmt->psi->prg[0]->i_pid_pcr <= 0 )
-                        {
-                            pmt->psi->prg[0]->i_pid_pcr = i_pid;
-                        }
-                        PIDFillFormat( pid, i_stream_type);
-                        if( pid->es->fmt.i_cat != UNKNOWN_ES )
-                        {
-                            if( p_sys->b_es_id_pid )
-                            {
-                                pid->es->fmt.i_id = i_pid;
-                            }
-                            msg_Dbg( p_demux, "  * es pid=%d type=%d "
-                                     "fcc=%4.4s", i_pid, i_stream_type,
-                                     (char*)&pid->es->fmt.i_codec );
-                            pid->es->id = es_out_Add( p_demux->out,
-                                                      &pid->es->fmt );
-                        }
-                    }
-                }
-                psz = psz_next;
-            }
-        }
-    }
+        UserPmt( p_demux, val.psz_string );
     free( val.psz_string );
 
     var_Create( p_demux, "ts-csa-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
@@ -1447,6 +1379,92 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         default:
             return VLC_EGENERIC;
     }
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static int UserPmt( demux_t *p_demux, const char *psz_fmt )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    char *psz_dup = strdup( psz_fmt );
+    char *psz = psz_dup;
+    int  i_pid;
+
+    if( !psz_dup )
+        return VLC_ENOMEM;
+
+    i_pid = strtol( psz, &psz, 0 );
+    if( i_pid < 2 || i_pid >= 8192 )
+        goto error;
+
+    ts_pid_t *pmt = &p_sys->pid[i_pid];
+    ts_prg_psi_t *prg;
+
+    msg_Dbg( p_demux, "extra pmt specified (pid=%d)", i_pid );
+    PIDInit( pmt, true, NULL );
+
+    /* Dummy PMT */
+    prg = malloc( sizeof( ts_prg_psi_t ) );
+    if( !prg )
+        goto error;
+
+    memset( prg, 0, sizeof( ts_prg_psi_t ) );
+    prg->i_pid_pcr  = -1;
+    prg->i_pid_pmt  = -1;
+    prg->i_number   = 0;    /* special */
+    prg->handle     = dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack, p_demux );
+    TAB_APPEND( pmt->psi->i_prg, pmt->psi->prg, prg );
+
+    psz = strchr( psz, '=' ) + 1;   /* can't failed */
+    while( psz && *psz )
+    {
+        char *psz_next = strchr( psz, ',' );
+        int i_pid, i_stream_type;
+
+        if( psz_next )
+        {
+            *psz_next++ = '\0';
+        }
+
+        i_pid = strtol( psz, &psz, 0 );
+        if( *psz == ':' )
+        {
+            i_stream_type = strtol( psz + 1, &psz, 0 );
+            if( i_pid >= 2 && i_pid < 8192 &&
+                !p_sys->pid[i_pid].b_valid )
+            {
+                ts_pid_t *pid = &p_sys->pid[i_pid];
+
+                PIDInit( pid, false, pmt->psi);
+                if( pmt->psi->prg[0]->i_pid_pcr <= 0 )
+                {
+                    pmt->psi->prg[0]->i_pid_pcr = i_pid;
+                }
+                PIDFillFormat( pid, i_stream_type);
+                if( pid->es->fmt.i_cat != UNKNOWN_ES )
+                {
+                    if( p_sys->b_es_id_pid )
+                    {
+                        pid->es->fmt.i_id = i_pid;
+                    }
+                    msg_Dbg( p_demux, "  * es pid=%d type=%d "
+                             "fcc=%4.4s", i_pid, i_stream_type,
+                             (char*)&pid->es->fmt.i_codec );
+                    pid->es->id = es_out_Add( p_demux->out,
+                                              &pid->es->fmt );
+                }
+            }
+        }
+        psz = psz_next;
+    }
+
+    free( psz_dup );
+    return VLC_SUCCESS;
+
+error:
+    free( psz_dup );
+    return VLC_EGENERIC;
 }
 
 static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
