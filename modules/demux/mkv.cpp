@@ -2554,7 +2554,6 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             }
             tracks[i_track]->fmt.audio.i_blockalign = ( tracks[i_track]->fmt.audio.i_bitspersample + 7 ) / 8 * tracks[i_track]->fmt.audio.i_channels;
         }
-#if 0
         /* disabled due to the potential "S_KATE" namespace issue */
         else if( !strcmp( tracks[i_track]->psz_codec, "S_KATE" ) )
         {
@@ -2605,7 +2604,6 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 i_extra += i_size[i];
             }
         }
-#endif
         else if( !strcmp( tracks[i_track]->psz_codec, "S_TEXT/UTF8" ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
