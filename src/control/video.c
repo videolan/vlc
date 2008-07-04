@@ -397,7 +397,7 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
         vlc_value_t val = val_list.p_list->p_values[i];
-        if( i_spu == i )
+        if( i_spu == val.i_int )
         {
             vlc_value_t new_val;
 
