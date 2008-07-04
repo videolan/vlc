@@ -92,7 +92,6 @@ struct intf_sys_t
 
     /* The messages window */
     msg_subscription_t * p_sub;
-
 };
 
 /*****************************************************************************
@@ -304,6 +303,9 @@ struct intf_sys_t
     NSSize o_size_with_playlist;
 
     int     i_lastShownVolume;
+
+    /* the manage thread */
+    pthread_t manage_thread;
 
     AppleRemote * o_remote;
     BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */

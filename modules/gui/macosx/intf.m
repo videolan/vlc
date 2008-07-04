@@ -132,28 +132,6 @@ void CloseIntf ( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * KillerThread: Thread that kill the application
- *****************************************************************************/
-static void * KillerThread( void *user_data )
-{
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-
-    intf_thread_t *p_intf = user_data;
-    
-    vlc_object_lock ( p_intf );
-    while( vlc_object_alive( p_intf ) )
-        vlc_object_wait( p_intf );
-    vlc_object_unlock( p_intf );
-
-    msg_Dbg( p_intf, "Killing the Mac OS X module" );
-
-    /* We are dead, terminate */
-    [NSApp terminate: nil];
-    [o_pool release];
-    return NULL;
-}
-
-/*****************************************************************************
  * Run: main loop
  *****************************************************************************/
 jmp_buf jmpbuffer;
@@ -186,18 +164,24 @@ static void Run( intf_thread_t *p_intf )
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
-    /* Setup a thread that will monitor the module killing */
-    pthread_t killer_thread;
-    pthread_create( &killer_thread, NULL, KillerThread, p_intf );
-
     /* Install a jmpbuffer to where we can go back before the NSApp exit
      * see applicationWillTerminate: */
     if(setjmp(jmpbuffer) == 0)
         [NSApp run];
 
-    pthread_join( killer_thread, NULL );
-
     [o_pool release];
+}
+
+/*****************************************************************************
+ * ManageThread: An ugly thread that polls
+ *****************************************************************************/
+static void * ManageThread( void *user_data )
+{
+    id self = user_data;
+
+    [self manage];
+
+    return NULL;
 }
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
@@ -798,9 +782,8 @@ static VLCMain *_o_sharedMainInstance = nil;
                                      target: self selector: @selector(manageIntf:)
                                    userInfo: nil repeats: FALSE];
 
-    /* FIXME: don't poll */
-    [NSThread detachNewThreadSelector: @selector(manage)
-                             toTarget: self withObject: nil];
+    /* Note: we use the pthread API to support pre-10.5 */
+    pthread_create( &manage_thread, NULL, ManageThread, self );
 
     [o_controls setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
         var: "intf-add" selector: @selector(toggleVar:)];
@@ -1267,12 +1250,18 @@ static VLCMain *_o_sharedMainInstance = nil;
         [self manageVolumeSlider];
 
         vlc_mutex_unlock( &p_intf->change_lock );
-        vlc_object_unlock( p_intf );
-        msleep( 100000 );
-        vlc_object_lock( p_intf );
+
+        vlc_object_timedwait( p_intf, 100000 + mdate());
     }
     vlc_object_unlock( p_intf );
     [o_pool release];
+
+    pthread_testcancel(); /* If we were cancelled stop here */
+
+    msg_Info( p_intf, "Killing the Mac OS X module" );
+
+    /* We are dead, terminate */
+    [NSApp performSelectorOnMainThread: @selector(terminate:) withObject:nil waitUntilDone:NO];
 }
 
 - (void)manageIntf:(NSTimer *)o_timer
@@ -1280,15 +1269,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     vlc_value_t val;
     playlist_t * p_playlist;
     input_thread_t * p_input;
-
-    vlc_object_lock( p_intf );
-
-    if( !vlc_object_alive( p_intf ) )
-    {
-        vlc_object_unlock( p_intf );
-        [o_timer invalidate];
-        return;
-    }
 
     if( p_intf->p_sys->b_input_update )
     {
@@ -1466,7 +1446,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [NSTimer scheduledTimerWithTimeInterval: 0.3
         target: self selector: @selector(manageIntf:)
         userInfo: nil repeats: FALSE];
-    vlc_object_unlock( p_intf );
 }
 
 - (void)setupMenus
@@ -1776,6 +1755,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     int returnedValue = 0;
  
     msg_Dbg( p_intf, "Terminating" );
+
+    /* Make sure the manage_thread won't call -terminate: again */
+    pthread_cancel( manage_thread );
+
+    /* Make sure the intf object is getting killed */
+    vlc_object_kill( p_intf );
+
+    /* Make sure our manage_thread ends */
+    pthread_join( manage_thread, NULL );
 
     /* make sure that the current volume is saved */
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
