@@ -98,6 +98,15 @@ static int ChangeKeyCallback    ( vlc_object_t *, char const *, vlc_value_t, vlc
 static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 
+/* TODO
+ * - Rename "extra pmt" to "user pmt"
+ * - Update extra pmt description
+ *      pmt_pid[:pmt_number]=pid_description[,pid_description]
+ *      where pid_description could take 3 forms:
+ *          1. pid:pcr (to force the pcr pid)
+ *          2. pid:stream_type
+ *          3. pid:type:fourcc where type=(video|audio|spu)
+ */
 #define PMT_TEXT N_("Extra PMT")
 #define PMT_LONGTEXT N_( \
   "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])." )
@@ -333,6 +342,7 @@ struct demux_sys_t
     ts_pid_t    pid[8192];
 
     /* All PMT */
+    bool        b_user_pmt;
     int         i_pmt;
     ts_pid_t    **pmt;
 
@@ -389,6 +399,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 static iod_descriptor_t *IODNew( int , uint8_t * );
 static void              IODFree( iod_descriptor_t * );
 
+#define TS_USER_PMT_NUMBER (0)
 static int UserPmt( demux_t *p_demux, const char * );
 
 #define TS_PACKET_SIZE_188 188
@@ -713,7 +724,8 @@ static int Open( vlc_object_t *p_this )
     /* We handle description of an extra PMT */
     var_Create( p_demux, "ts-extra-pmt", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-extra-pmt", &val );
-    if( val.psz_string && strchr( val.psz_string, '=' ) != NULL )
+    p_sys->b_user_pmt = false;
+    if( val.psz_string && *val.psz_string )
         UserPmt( p_demux, val.psz_string );
     free( val.psz_string );
 
@@ -1390,18 +1402,26 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
     char *psz_dup = strdup( psz_fmt );
     char *psz = psz_dup;
     int  i_pid;
+    int  i_number;
 
     if( !psz_dup )
         return VLC_ENOMEM;
 
+    /* Parse PID */
     i_pid = strtol( psz, &psz, 0 );
     if( i_pid < 2 || i_pid >= 8192 )
         goto error;
 
+    /* Parse optional program number */
+    i_number = 0;
+    if( *psz == ':' )
+        i_number = strtol( &psz[1], &psz, 0 );
+
+    /* */
     ts_pid_t *pmt = &p_sys->pid[i_pid];
     ts_prg_psi_t *prg;
 
-    msg_Dbg( p_demux, "extra pmt specified (pid=%d)", i_pid );
+    msg_Dbg( p_demux, "user pmt specified (pid=%d,number=%d)", i_pid, i_number );
     PIDInit( pmt, true, NULL );
 
     /* Dummy PMT */
@@ -1412,53 +1432,84 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
     memset( prg, 0, sizeof( ts_prg_psi_t ) );
     prg->i_pid_pcr  = -1;
     prg->i_pid_pmt  = -1;
-    prg->i_number   = 0;    /* special */
-    prg->handle     = dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack, p_demux );
+    prg->i_version  = -1;
+    prg->i_number   = i_number != 0 ? i_number : TS_USER_PMT_NUMBER;
+    prg->handle     = dvbpsi_AttachPMT( i_number != TS_USER_PMT_NUMBER ? i_number : 1, (dvbpsi_pmt_callback)PMTCallBack, p_demux );
     TAB_APPEND( pmt->psi->i_prg, pmt->psi->prg, prg );
 
-    psz = strchr( psz, '=' ) + 1;   /* can't failed */
+    psz = strchr( psz, '=' );
+    if( psz )
+        psz++;
     while( psz && *psz )
     {
         char *psz_next = strchr( psz, ',' );
-        int i_pid, i_stream_type;
+        int i_pid;
 
         if( psz_next )
-        {
             *psz_next++ = '\0';
-        }
 
         i_pid = strtol( psz, &psz, 0 );
-        if( *psz == ':' )
-        {
-            i_stream_type = strtol( psz + 1, &psz, 0 );
-            if( i_pid >= 2 && i_pid < 8192 &&
-                !p_sys->pid[i_pid].b_valid )
-            {
-                ts_pid_t *pid = &p_sys->pid[i_pid];
+        if( *psz != ':' || i_pid < 2 || i_pid >= 8192 )
+            goto next;
 
-                PIDInit( pid, false, pmt->psi);
-                if( pmt->psi->prg[0]->i_pid_pcr <= 0 )
-                {
-                    pmt->psi->prg[0]->i_pid_pcr = i_pid;
-                }
-                PIDFillFormat( pid, i_stream_type);
-                if( pid->es->fmt.i_cat != UNKNOWN_ES )
-                {
-                    if( p_sys->b_es_id_pid )
-                    {
-                        pid->es->fmt.i_id = i_pid;
-                    }
-                    msg_Dbg( p_demux, "  * es pid=%d type=%d "
-                             "fcc=%4.4s", i_pid, i_stream_type,
-                             (char*)&pid->es->fmt.i_codec );
-                    pid->es->id = es_out_Add( p_demux->out,
-                                              &pid->es->fmt );
-                }
+        char *psz_opt = &psz[1];
+        if( !strcmp( psz_opt, "pcr" ) )
+        {
+            prg->i_pid_pcr = i_pid;
+        }
+        else if( !p_sys->pid[i_pid].b_valid )
+        {
+            ts_pid_t *pid = &p_sys->pid[i_pid];
+
+            char *psz_arg = strchr( psz_opt, '=' );
+            if( psz_arg )
+                *psz_arg++ = '\0';
+
+            PIDInit( pid, false, pmt->psi);
+            if( prg->i_pid_pcr <= 0 )
+                prg->i_pid_pcr = i_pid;
+
+            if( psz_arg && strlen( psz_arg ) == 4 )
+            {
+                const vlc_fourcc_t i_codec = VLC_FOURCC( psz_arg[0], psz_arg[1],
+                                                         psz_arg[2], psz_arg[3] );
+                int i_cat = UNKNOWN_ES;
+                es_format_t *fmt = &pid->es->fmt;
+
+                if( !strcmp( psz_opt, "video" ) )
+                    i_cat = VIDEO_ES;
+                else if( !strcmp( psz_opt, "audio" ) )
+                    i_cat = AUDIO_ES;
+                else if( !strcmp( psz_opt, "spu" ) )
+                    i_cat = SPU_ES;
+
+                es_format_Init( fmt, i_cat, i_codec );
+                fmt->b_packetized = false;
+            }
+            else
+            {
+                const int i_stream_type = strtol( psz_opt, NULL, 0 );
+                PIDFillFormat( pid, i_stream_type );
+            }
+            pid->es->fmt.i_group = i_number;
+            if( p_sys->b_es_id_pid )
+                pid->es->fmt.i_id = i_pid;
+
+            if( pid->es->fmt.i_cat != UNKNOWN_ES )
+            {
+                msg_Dbg( p_demux, "  * es pid=%d fcc=%4.4s", i_pid,
+                         (char*)&pid->es->fmt.i_codec );
+                pid->es->id = es_out_Add( p_demux->out,
+                                          &pid->es->fmt );
             }
         }
+
+    next:
         psz = psz_next;
     }
 
+    p_sys->b_user_pmt = true;
+    TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
     free( psz_dup );
     return VLC_SUCCESS;
 
@@ -2977,8 +3028,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         int i_prg;
         for( i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
         {
-            if( p_sys->pmt[i]->psi->prg[i_prg]->i_number ==
-                p_pmt->i_program_number )
+            const int i_pmt_number = p_sys->pmt[i]->psi->prg[i_prg]->i_number;
+            if( i_pmt_number != TS_USER_PMT_NUMBER && i_pmt_number == p_pmt->i_program_number )
             {
                 pmt = p_sys->pmt[i];
                 prg = p_sys->pmt[i]->psi->prg[i_prg];
@@ -3851,9 +3902,10 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 
     msg_Dbg( p_demux, "PATCallBack called" );
 
-    if( pat->psi->i_pat_version != -1 &&
-        ( !p_pat->b_current_next ||
-          p_pat->i_version == pat->psi->i_pat_version ) )
+    if( ( pat->psi->i_pat_version != -1 &&
+            ( !p_pat->b_current_next ||
+              p_pat->i_version == pat->psi->i_pat_version ) ) ||
+        p_sys->b_user_pmt )
     {
         dvbpsi_DeletePAT( p_pat );
         return;
@@ -3946,8 +3998,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
             for( i_prg = 0; i_prg < pmt_rm[i]->psi->i_prg; i_prg++ )
             {
                 const int i_number = pmt_rm[i]->psi->prg[i_prg]->i_number;
-                if( i_number != 0 )
-                    es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, i_number );
+                es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, i_number );
             }
 
             PIDClean( p_demux->out, &p_sys->pid[pmt_rm[i]->i_pid] );
