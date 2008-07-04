@@ -101,7 +101,7 @@ static void Close ( vlc_object_t * );
 /* TODO
  * - Rename "extra pmt" to "user pmt"
  * - Update extra pmt description
- *      pmt_pid[:pmt_number]=pid_description[,pid_description]
+ *      pmt_pid[:pmt_number][=pid_description[,pid_description]]
  *      where pid_description could take 3 forms:
  *          1. pid:pcr (to force the pcr pid)
  *          2. pid:stream_type
