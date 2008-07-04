@@ -105,7 +105,7 @@ static void Close ( vlc_object_t * );
  *      where pid_description could take 3 forms:
  *          1. pid:pcr (to force the pcr pid)
  *          2. pid:stream_type
- *          3. pid:type:fourcc where type=(video|audio|spu)
+ *          3. pid:type=fourcc where type=(video|audio|spu)
  */
 #define PMT_TEXT N_("Extra PMT")
 #define PMT_LONGTEXT N_( \
