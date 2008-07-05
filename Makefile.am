@@ -1123,6 +1123,9 @@ update-po:
 	    | grep -vE 'qt4/ui/.*.h' \
 	    | grep -v 'qt4/resources.cpp\|qt4/dialogs/about.hpp' \
 	    | grep -v 'gui/opie' \
+	    | grep -v 'wxwidgets' \
+	    | grep -v 'mux/rtp/' \
+	    | grep -v 'demux/rtpxiph.c' \
 	    | sort ; \
 	} > $(top_srcdir)/po/POTFILES.in
 	rm -f $(top_srcdir)/po/vlc.pot
