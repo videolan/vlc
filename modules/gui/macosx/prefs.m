@@ -311,60 +311,61 @@ static VLCTreeItem *o_root_item = nil;
                 NSString *o_child_help;
                 switch( p_items[i].i_type )
                 {
-                case CONFIG_CATEGORY:
-                    if( p_items[i].value.i == -1 ) break;
+                    case CONFIG_CATEGORY:
+                        if( p_items[i].value.i == -1 ) break;
 
-                    o_child_name = [[VLCMain sharedInstance]
-                        localizedString: config_CategoryNameGet( p_items[i].value.i )];
-                    o_child_title = o_child_name;
-                    o_child_help = [[VLCMain sharedInstance]
-                        localizedString: config_CategoryHelpGet( p_items[i].value.i )];
-                    p_last_category = [VLCTreeItem alloc];
-                    [o_children addObject:[p_last_category
-                        initWithName: o_child_name
-                        withTitle: o_child_title
-                        withHelp: o_child_help
-                        ID: p_items[i].value.i
-                        parent:self
-                        children:[[NSMutableArray alloc]
-                            initWithCapacity:10]
-                        whithCategory: p_items[i].i_type]];
-                    break;
-                case CONFIG_SUBCATEGORY:
-                    if( p_items[i].value.i == -1 ) break;
-
-                    if( p_items[i].value.i != SUBCAT_PLAYLIST_GENERAL &&
-                        p_items[i].value.i != SUBCAT_VIDEO_GENERAL &&
-                        p_items[i].value.i != SUBCAT_INPUT_GENERAL &&
-                        p_items[i].value.i != SUBCAT_INTERFACE_GENERAL &&
-                        p_items[i].value.i != SUBCAT_SOUT_GENERAL &&
-                        p_items[i].value.i != SUBCAT_ADVANCED_MISC &&
-                        p_items[i].value.i != SUBCAT_AUDIO_GENERAL )
-                    {
                         o_child_name = [[VLCMain sharedInstance]
-                            localizedString: config_CategoryNameGet( p_items[i].value.i ) ];
+                            localizedString: config_CategoryNameGet( p_items[i].value.i )];
                         o_child_title = o_child_name;
                         o_child_help = [[VLCMain sharedInstance]
-                            localizedString: config_CategoryHelpGet( p_items[i].value.i ) ];
-
-                        [p_last_category->o_children
-                            addObject:[[VLCTreeItem alloc]
+                            localizedString: config_CategoryHelpGet( p_items[i].value.i )];
+                        p_last_category = [VLCTreeItem alloc];
+                        [o_children addObject:[p_last_category
                             initWithName: o_child_name
                             withTitle: o_child_title
                             withHelp: o_child_help
                             ID: p_items[i].value.i
-                            parent:p_last_category
+                            parent:self
                             children:[[NSMutableArray alloc]
                                 initWithCapacity:10]
                             whithCategory: p_items[i].i_type]];
-                    }
+                        break;
+                    case CONFIG_SUBCATEGORY:
+                        if( p_items[i].value.i == -1 ) break;
 
-                    break;
-                default:
-                    break;
+                        if( p_items[i].value.i != SUBCAT_PLAYLIST_GENERAL &&
+                            p_items[i].value.i != SUBCAT_VIDEO_GENERAL &&
+                            p_items[i].value.i != SUBCAT_INPUT_GENERAL &&
+                            p_items[i].value.i != SUBCAT_INTERFACE_GENERAL &&
+                            p_items[i].value.i != SUBCAT_SOUT_GENERAL &&
+                            p_items[i].value.i != SUBCAT_ADVANCED_MISC &&
+                            p_items[i].value.i != SUBCAT_AUDIO_GENERAL )
+                        {
+                            o_child_name = [[VLCMain sharedInstance]
+                                localizedString: config_CategoryNameGet( p_items[i].value.i ) ];
+                            o_child_title = o_child_name;
+                            o_child_help = [[VLCMain sharedInstance]
+                                localizedString: config_CategoryHelpGet( p_items[i].value.i ) ];
+
+                            [p_last_category->o_children
+                                addObject:[[VLCTreeItem alloc]
+                                initWithName: o_child_name
+                                withTitle: o_child_title
+                                withHelp: o_child_help
+                                ID: p_items[i].value.i
+                                parent:p_last_category
+                                children:[[NSMutableArray alloc]
+                                    initWithCapacity:10]
+                                whithCategory: p_items[i].i_type]];
+                        }
+
+                        break;
+                    default:
+                        break;
                 }
-                vlc_object_release( (vlc_object_t *)p_main_module );
             }
+
+            vlc_object_release( (vlc_object_t *)p_main_module );
 
             /* List the modules */
             p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -584,7 +585,7 @@ static VLCTreeItem *o_root_item = nil;
         else
         {
             p_main_module = module_GetMainModule( p_intf );
-            assert( !p_main_module );
+            assert( p_main_module );
             module_config_t *p_items;
 
             unsigned int i, confsize;
