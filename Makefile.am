@@ -104,9 +104,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/Extended.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/Extended.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/Extended.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/SFilters.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/SFilters.nib/info.nib \
-	extras/package/macosx/Resources/English.lproj/SFilters.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/Update.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/Update.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/Update.nib/keyedobjects.nib \
@@ -450,8 +447,6 @@ VLC-release.app: vlc
 	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
-	    sfilters.h \
-	    sfilters.m \
 	    update.h \
 	    update.m \
 	    interaction.h \
@@ -610,8 +605,6 @@ VLC.app: vlc
 	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
-	    sfilters.h \
-	    sfilters.m \
 	    update.h \
 	    update.m \
 	    interaction.h \
