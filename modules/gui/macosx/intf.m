@@ -1256,6 +1256,12 @@ static VLCMain *_o_sharedMainInstance = nil;
     vlc_object_unlock( p_intf );
     [o_pool release];
 
+    var_DelCallback( p_playlist, "playlist-current", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "item-change", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "item-append", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "item-deleted", PlaylistChanged, self );
+
     pthread_testcancel(); /* If we were cancelled stop here */
 
     msg_Info( p_intf, "Killing the Mac OS X module" );
