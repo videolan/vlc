@@ -1761,32 +1761,25 @@ static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
     if( ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
     {
         msg_Err( p_demux, "device does not support user pointer i/o" );
-        goto open_failed;
+        return VLC_EGENERIC;
     }
 
     p_sys->p_buffers = calloc( 4, sizeof( *p_sys->p_buffers ) );
     if( !p_sys->p_buffers )
-    {
-        msg_Err( p_demux, "Out of memory" );
         goto open_failed;
-    }
 
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < 4; ++p_sys->i_nbuffers )
     {
         p_sys->p_buffers[p_sys->i_nbuffers].length = i_buffer_size;
-        posix_memalign( &p_sys->p_buffers[p_sys->i_nbuffers].start,
-                /* boundary */ i_page_size, i_buffer_size );
-
-        if( !p_sys->p_buffers[p_sys->i_nbuffers].start )
-        {
-            msg_Err( p_demux, "out of memory" );
+        if( posix_memalign( &p_sys->p_buffers[p_sys->i_nbuffers].start,
+                /* boundary */ i_page_size, i_buffer_size ) )
             goto open_failed;
-        }
     }
 
     return VLC_SUCCESS;
 
 open_failed:
+    free( p_sys->p_buffers );
     return VLC_EGENERIC;
 
 }
