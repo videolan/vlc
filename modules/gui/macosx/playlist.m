@@ -387,7 +387,7 @@
 
         char * name = ppsz_name[i] ? ppsz_name[i] : ppsz_services[i];
         /* Check whether to enable these menuitems */
-        b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, name );
+        b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, ppsz_services[i] );
 
         /* Create the menu entries used in the playlist menu */
         o_lmi = [[o_mi_services submenu] addItemWithTitle:
