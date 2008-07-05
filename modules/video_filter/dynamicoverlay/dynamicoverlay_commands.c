@@ -451,7 +451,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
         if( (size_t)p_params->i_width > i_size )
         {
             msg_Err( p_filter,
-                     "Insufficient data in shared memory. need %d, got %d",
+                     "Insufficient data in shared memory. need %d, got %zu",
                      p_params->i_width, i_size );
             return VLC_EGENERIC;
         }
