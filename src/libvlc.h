@@ -118,7 +118,6 @@ void msg_StackDestroy (void *);
  * Unicode stuff
  */
 char *vlc_fix_readdir (const char *);
-bool vlc_current_charset (char **);
 
 /*
  * LibVLC objects stuff
