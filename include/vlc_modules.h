@@ -58,25 +58,7 @@ VLC_EXPORT( const char *, module_GetHelp, ( const module_t *m ) );
 #define module_GetMainModule(a) __module_GetMainModule(VLC_OBJECT(a))
 static inline module_t * __module_GetMainModule( vlc_object_t * p_this )
 {
-    module_t * p_module;
-    module_t * p_main_module = NULL;
-    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE,
-                                        FIND_ANYWHERE );
-    if( !p_list ) return NULL;
-
-    /* Find the main module */
-    for( int i = 0; i < p_list->i_count; i++ )
-    {
-        p_module = (module_t *)p_list->p_values[i].p_object;
-        if( strcmp( module_GetObjName( p_module ), "main" ) == 0 )
-        {
-            p_main_module = p_module;
-            vlc_object_yield( (vlc_object_t*)p_main_module );
-            break;
-        }
-    }
-    vlc_list_release( p_list );
-    return p_main_module;
+    return module_Find( p_this, "main" );
 }
 
 static inline bool module_IsMainModule( module_t * p_module )
