@@ -1920,12 +1920,7 @@ end:
         o_prefs= [[VLCPrefs alloc] init];
     }
 
-    if( sender == o_mi_sprefs )
-    {
-        [o_sprefs showSimplePrefs];
-    }
-    else
-        [o_prefs showPrefs];
+    [o_sprefs showSimplePrefs];
 }
 
 - (IBAction)checkForUpdate:(id)sender

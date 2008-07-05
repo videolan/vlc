@@ -21,7 +21,6 @@
         },
                 {
             ACTIONS =             {
-                advancedToggle = id;
                 buttonAction = id;
                 closePrefs = id;
                 resetAll = id;
@@ -30,7 +29,6 @@
             CLASS = VLCPrefs;
             LANGUAGE = ObjC;
             OUTLETS =             {
-                "o_advanced_ckb" = id;
                 "o_basicFull_matrix" = id;
                 "o_cancel_btn" = id;
                 "o_prefs_view" = id;

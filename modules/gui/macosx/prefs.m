@@ -30,7 +30,6 @@
    - the documentview with all the prefs widgets in it
    - a saveChanges action
    - a revertChanges action
-   - an advanced action (to hide/show advanced options)
    - a redraw view action
    - the children action should generate a list of the treeitems children (to be used by VLCPrefs datasource)
 
@@ -97,10 +96,8 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 - (void)awakeFromNib
 {
     p_intf = VLCIntf;
-    b_advanced = config_GetInt( p_intf, "advanced" );
 
     [self initStrings];
-    [o_advanced_ckb setState: b_advanced];
     [o_prefs_view setBorderType: NSGrooveBorder];
     [o_prefs_view setHasVerticalScroller: YES];
     [o_prefs_view setDrawsBackground: NO];
@@ -128,7 +125,6 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_save_btn setTitle: _NS("Save")];
     [o_cancel_btn setTitle: _NS("Cancel")];
     [o_reset_btn setTitle: _NS("Reset All")];
-    [o_advanced_ckb setTitle: _NS("Advanced")];
     [[o_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
     [[o_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
 }
@@ -164,18 +160,8 @@ static VLCPrefs *_o_sharedMainInstance = nil;
         config_ResetAll( p_intf );
         [[VLCTreeItem rootItem] resetView];
         [[o_tree itemAtRow:[o_tree selectedRow]]
-            showView:o_prefs_view advancedView:
-            ( [o_advanced_ckb state] == NSOnState ) ? true : false];
+            showView:o_prefs_view];
     }
-}
-
-- (IBAction)advancedToggle: (id)sender
-{
-    b_advanced = !b_advanced;
-    [o_advanced_ckb setState: b_advanced];
-    /* refresh the view of the current treeitem */
-    [[o_tree itemAtRow:[o_tree selectedRow]] showView:o_prefs_view advancedView:
-        ( [o_advanced_ckb state] == NSOnState ) ? true : false];
 }
 
 - (IBAction)buttonAction: (id)sender
@@ -197,9 +183,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 /* update the document view to the view of the selected tree item */
 - (void)outlineViewSelectionDidChange:(NSNotification *)o_notification
 {
-    [[o_tree itemAtRow:[o_tree selectedRow]] showView: o_prefs_view
-        advancedView:( [o_advanced_ckb state] == NSOnState ) ?
-        true : false];
+    [[o_tree itemAtRow:[o_tree selectedRow]] showView: o_prefs_view];
 }
 
 @end
@@ -521,7 +505,6 @@ static VLCTreeItem *o_root_item = nil;
 }
 
 - (NSView *)showView:(NSScrollView *)o_prefs_view
-    advancedView:(bool) b_advanced
 {
     NSRect          s_vrc;
     NSView          *o_view;
@@ -648,27 +631,19 @@ static VLCTreeItem *o_root_item = nil;
         int i_lastItem = 0;
         int i_yPos = -2;
         int i_max_label = 0;
-        int i_show_advanced = 0;
 
         NSEnumerator *enumerator = [o_subviews objectEnumerator];
         VLCConfigControl *o_widget;
         NSRect o_frame;
  
         while( ( o_widget = [enumerator nextObject] ) )
-            if( ( [o_widget isAdvanced] ) && (! b_advanced) )
-                continue;
-            else if( i_max_label < [o_widget getLabelSize] )
+            if( i_max_label < [o_widget getLabelSize] )
                 i_max_label = [o_widget getLabelSize];
 
         enumerator = [o_subviews objectEnumerator];
         while( ( o_widget = [enumerator nextObject] ) )
         {
             int i_widget;
-            if( ( [o_widget isAdvanced] ) && (! b_advanced) )
-            {
-                i_show_advanced++;
-                continue;
-            }
 
             i_widget = [o_widget getViewType];
             i_yPos += [VLCConfigControl calcVerticalMargin:i_widget
@@ -683,28 +658,7 @@ static VLCTreeItem *o_root_item = nil;
             i_lastItem = i_widget;
             [o_view addSubview:o_widget];
          }
-        if( i_show_advanced != 0 )
-        {
-            /* We add the advanced notice... */
-            NSRect s_rc = [o_view frame];
-            NSTextField *o_label;
-            s_rc.size.height = 17;
-            s_rc.origin.x = LEFTMARGIN;
-            s_rc.origin.y = i_yPos += [VLCConfigControl
-                                        calcVerticalMargin:CONFIG_ITEM_STRING
-                                        lastItem:i_lastItem];
-            o_label = [[[NSTextField alloc] initWithFrame: s_rc] retain];
-            [o_label setDrawsBackground: NO];
-            [o_label setBordered: NO];
-            [o_label setEditable: NO];
-            [o_label setSelectable: NO];
-            [o_label setStringValue: _NS("Some options are hidden. " \
-                                "Check \"Advanced\" to display them.")];
-            [o_label setFont:[NSFont systemFontOfSize:10]];
-            [o_label sizeToFit];
-            [o_view addSubview:o_label];
-            i_yPos += [o_label frame].size.height;
-        }
+
         o_frame = [o_view frame];
         o_frame.size.height = i_yPos;
         [o_view setFrame:o_frame];

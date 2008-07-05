@@ -41,7 +41,7 @@
 - (NSString *)getTitle;
 - (NSString *)getHelp;
 - (BOOL)hasPrefs:(NSString *)o_module_name;
-- (NSView *)showView:(NSScrollView *)o_prefs_view advancedView:(bool) b_advanced;
+- (NSView *)showView:(NSScrollView *)o_prefs_view;
 - (void)applyChanges;
 - (void)resetView;
 
@@ -53,7 +53,6 @@
 @interface VLCPrefs : NSObject
 {
     intf_thread_t *p_intf;
-    bool b_advanced;
     VLCTreeItem *o_config_tree;
     NSView *o_empty_view;
     NSMutableDictionary *o_save_prefs;
@@ -65,7 +64,6 @@
     IBOutlet id o_save_btn;
     IBOutlet id o_cancel_btn;
     IBOutlet id o_reset_btn;
-    IBOutlet id o_advanced_ckb;
     IBOutlet id o_basicFull_matrix;
 }
 
@@ -77,7 +75,6 @@
 - (IBAction)savePrefs: (id)sender;
 - (IBAction)closePrefs: (id)sender;
 - (IBAction)resetAll: (id)sender;
-- (IBAction)advancedToggle: (id)sender;
 - (IBAction)buttonAction: (id)sender;
 
 @end
