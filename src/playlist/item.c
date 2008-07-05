@@ -750,7 +750,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     val.p_address = p_add;
     p_playlist->b_reset_currently_playing = true;
     if( b_signal )
-        vlc_object_signal_maybe( p_playlist );
+        vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
     var_Set( p_playlist, "item-append", val );
     free( p_add );
 }

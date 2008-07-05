@@ -2320,8 +2320,8 @@ static inline void *FixUTF8( char *p )
 
 static char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
 {
-    const char *psz_encoding;
-    char *psz_stringstart, *psz_outstring, *psz_tmp;
+    const char *psz_encoding, *psz_stringstart;
+    char *psz_outstring, *psz_tmp;
     char psz_encbuf[12];
     size_t i_in, i_out;
     vlc_iconv_t iconv_handle;

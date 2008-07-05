@@ -55,7 +55,7 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static int     Write( sout_access_out_t *, block_t * );
+static ssize_t Write( sout_access_out_t *, block_t * );
 static int     Seek ( sout_access_out_t *, off_t  );
 
 /*****************************************************************************
@@ -85,9 +85,9 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, block_t *p_buffer )
+static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
-    int64_t i_write = 0;
+    size_t i_write = 0;
     block_t *b = p_buffer;
 
     while( b )
@@ -99,6 +99,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 
     block_ChainRelease( p_buffer );
 
+    (void)p_access;
     return i_write;
 }
 
@@ -107,6 +108,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
+    (void)p_access; (void)i_pos;
     return 0;
 }
 
