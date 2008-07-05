@@ -377,8 +377,6 @@ static int Raw1394EventThread( vlc_object_t *p_this )
                 perror( "error: raw1394 poll" );
                 msg_Err( p_access, "retrying device raw1394" );
             }
-            if( p_sys->p_ev->b_die )
-                break;
         }
         if( !vlc_object_alive (p_sys->p_ev) )
                 break;
