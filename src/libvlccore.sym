@@ -342,8 +342,6 @@ stream_Delete
 stream_DemuxDelete
 __stream_DemuxNew
 stream_DemuxSend
-streaming_ChainToPsz
-streaming_GuiDescToChain
 __stream_MemoryNew
 stream_Peek
 stream_Read
