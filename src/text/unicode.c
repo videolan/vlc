@@ -2,8 +2,7 @@
  * unicode.c: Unicode <-> locale functions
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
- * Copyright © 2005-2006 Rémi Denis-Courmont
- * $Id$
+ * Copyright © 2005-2008 Rémi Denis-Courmont
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
  *
@@ -78,26 +77,22 @@
 #endif
 
 #if defined (USE_ICONV)
-static char charset[sizeof ("CSISO11SWEDISHFORNAMES//translit")] = "";
+# include <langinfo.h>
+static char charset[sizeof ("CSISO11SWEDISHFORNAMES")] = "";
 
 static void find_charset_once (void)
 {
-    char *psz_charset;
-    if (vlc_current_charset (&psz_charset)
-     || (psz_charset == NULL)
-     || (strcmp (psz_charset, "ASCII") == 0)
-     || ((size_t)snprintf (charset, sizeof (charset), "%s//translit",
-                           psz_charset) >= sizeof (charset)))
-        strcpy (charset, "UTF-8");
-
-    free (psz_charset);
+    strlcpy (charset, nl_langinfo (CODESET), sizeof (charset));
+    if (!strcasecmp (charset, "ASCII")
+     || !strcasecmp (charset, "ANSI_X3.4-1968"))
+        strcpy (charset, "UTF-8"); /* superset... */
 }
 
 static int find_charset (void)
 {
     static pthread_once_t once = PTHREAD_ONCE_INIT;
     pthread_once (&once, find_charset_once);
-    return !strcmp (charset, "UTF-8");
+    return !strcasecmp (charset, "UTF-8");
 }
 #endif
 
@@ -111,7 +106,7 @@ static char *locale_fast (const char *string, bool from)
     vlc_iconv_t hd = vlc_iconv_open (from ? "UTF-8" : charset,
                                      from ? charset : "UTF-8");
     if (hd == (vlc_iconv_t)(-1))
-        return strdup (string); /* Uho! */
+        return NULL; /* Uho! */
 
     const char *iptr = string;
     size_t inb = strlen (string);
@@ -127,7 +122,7 @@ static char *locale_fast (const char *string, bool from)
         outb--;
         iptr++;
         inb--;
-        vlc_iconv (hd, NULL, NULL, NULL, NULL);
+        vlc_iconv (hd, NULL, NULL, NULL, NULL); /* reset */
     }
     *optr = '\0';
     vlc_iconv_close (hd);
@@ -149,15 +144,17 @@ static char *locale_fast (const char *string, bool from)
     wchar_t wide[len];
 
     MultiByteToWideChar (from ? CP_ACP : CP_UTF8, 0, string, -1, wide, len);
-    len = 1 + WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1, NULL, 0, NULL, NULL);
+    len = 1 + WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1,
+                                   NULL, 0, NULL, NULL);
     out = malloc (len);
     if (out == NULL)
         return NULL;
 
-    WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1, out, len, NULL, NULL);
+    WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1, out, len,
+                         NULL, NULL);
     return out;
 #else
-    VLC_UNUSED(from);
+    (void)from;
     return (char *)string;
 #endif
 }
@@ -174,7 +171,7 @@ static inline char *locale_dup (const char *string, bool from)
 #elif defined (USE_MB2MB)
     return locale_fast (string, from);
 #else
-    VLC_UNUSED(from);
+    (void)from;
     return strdup (string);
 #endif
 }
@@ -191,7 +188,7 @@ void LocaleFree (const char *str)
 #elif defined (USE_MB2MB)
     free ((char *)str);
 #else
-    VLC_UNUSED(str);
+    (void)str;
 #endif
 }
 
