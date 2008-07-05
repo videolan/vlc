@@ -396,7 +396,7 @@ static int Manage( vout_thread_t *p_vout )
 //        SDL_ShowCursor( 0 );
 //    }
 //
-//    if( p_vout->p_libvlc->b_die )
+//    if( !vlc_object_alive (p_vout->p_libvlc) )
 //        p_vout->p_sys->bRunning = FALSE;
 
     return 0;
@@ -641,10 +641,10 @@ static void RunQtThread(event_thread_t *p_event)
         p_event->p_vout->p_sys->bRunning = TRUE;
 
 #ifdef NEED_QTE_MAIN
-        while(!p_event->b_die && p_event->p_vout->p_sys->bRunning)
+        while(vlc_object_alive (p_event) && p_event->p_vout->p_sys->bRunning)
               {
                /* Check if we are asked to exit */
-           if( p_event->b_die )
+           if( !vlc_object_alive (p_event) )
                break;
 
                msleep(100);

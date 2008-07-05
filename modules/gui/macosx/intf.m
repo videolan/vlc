@@ -1173,7 +1173,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                 p_intf->p_sys->b_input_update = true;
             }
         }
-        else if( p_intf->p_sys->p_input->b_die || p_intf->p_sys->p_input->b_dead )
+        else if( !vlc_object_alive (p_intf->p_sys->p_input) || p_intf->p_sys->p_input->b_dead )
         {
             /* input stopped */
             p_intf->p_sys->b_intf_update = true;
@@ -1294,7 +1294,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     p_input = vlc_object_find( p_playlist, VLC_OBJECT_INPUT,
                                FIND_CHILD );
 
-    if( p_input && !p_input->b_die )
+    if( p_input && vlc_object_alive (p_input) )
     {
         vlc_value_t val;
 
@@ -1513,7 +1513,7 @@ end:
     input_thread_t * p_input = p_playlist->p_input;
 
     i_end_scroll = -1;
-    if( p_input && !p_input->b_die )
+    if( p_input && vlc_object_alive (p_input) )
     {
         NSString *o_temp;
         vlc_object_yield( p_input );

@@ -131,10 +131,10 @@ void EventThread( event_thread_t *p_event )
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
-    while( !p_event->b_die && GetMessage( &msg, 0, 0, 0 ) )
+    while( vlc_object_alive (p_event) && GetMessage( &msg, 0, 0, 0 ) )
     {
         /* Check if we are asked to exit */
-        if( p_event->b_die )
+        if( !vlc_object_alive (p_event) )
             break;
 
         switch( msg.message )

@@ -320,7 +320,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
               == NULL )
     {
-        if( p_vout->b_die || p_vout->b_error )
+        if( !vlc_object_alive (p_vout) || p_vout->b_error )
         {
             return;
         }

@@ -336,7 +336,7 @@ static void Thread( vlc_object_t *p_this )
 
     p_plugin_info = goom_init( width.i_int, height.i_int );
 
-    while( !p_thread->b_die )
+    while( vlc_object_alive (p_thread) )
     {
         uint32_t  *plane;
         picture_t *p_pic;
@@ -361,7 +361,7 @@ static void Thread( vlc_object_t *p_this )
         p_thread->psz_title = NULL;
 
         while( !( p_pic = vout_CreatePicture( p_thread->p_vout, 0, 0, 0 ) ) &&
-               !p_thread->b_die )
+               vlc_object_alive (p_thread) )
         {
             msleep( VOUT_OUTMEM_SLEEP );
         }

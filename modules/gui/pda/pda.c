@@ -418,7 +418,7 @@ static int Manage( intf_thread_t *p_intf )
         int64_t i_time = 0, i_length = 0;
 
         vlc_object_lock( p_input );
-        if( !p_input->b_die )
+        if( vlc_object_alive (p_input) )
         {
             playlist_t *p_playlist;
 

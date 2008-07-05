@@ -150,7 +150,7 @@ static int Demux( demux_t *p_demux )
         mtime_t i_time_begin = GetMoviePTS( p_sys );
         int i_result;
 
-        if( p_demux->b_die )
+        if( !vlc_object_alive (p_demux) )
             break;
 #if 0
         /* FIXME: returns EOF too early for some mms streams */

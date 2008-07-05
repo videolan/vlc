@@ -189,10 +189,10 @@ static void RunIntf( intf_thread_t *p_intf )
 #endif
 
     /* Main loop */
-    while( !p_intf->b_die )
+    while( vlc_object_alive (p_intf) )
     {
         /* if video output is dying, disassociate ourselves from it */
-        if( p_vout && p_vout->b_die )
+        if( p_vout && !vlc_object_alive (p_vout) )
         {
             var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
             vlc_object_release( p_vout );
@@ -334,7 +334,7 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
 static int InitThread( intf_thread_t * p_intf )
 {
     /* We might need some locking here */
-    if( !p_intf->b_die )
+    if( vlc_object_alive (p_intf) )
     {
         input_thread_t * p_input;
         decoder_t *p_cmml_decoder;

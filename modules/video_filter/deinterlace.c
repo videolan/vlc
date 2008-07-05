@@ -486,7 +486,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
                                                 0, 0, 0 ) )
               == NULL )
     {
-        if( p_vout->b_die || p_vout->b_error )
+        if( !vlc_object_alive (p_vout) || p_vout->b_error )
         {
             vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
             return;
@@ -503,7 +503,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
                                                  0, 0, 0 ) )
                   == NULL )
         {
-            if( p_vout->b_die || p_vout->b_error )
+            if( !vlc_object_alive (p_vout) || p_vout->b_error )
             {
                 vout_DestroyPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
                 vlc_mutex_unlock( &p_vout->p_sys->filter_lock );

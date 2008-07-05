@@ -301,7 +301,7 @@ static int QNXManage( vout_thread_t *p_vout )
     PhEvent_t *p_event;
     bool b_repos = 0;
 
-    if (p_vout->b_die)
+    if (!vlc_object_alive (p_vout))
     {
         return ( 0 );
     }

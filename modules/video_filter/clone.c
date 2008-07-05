@@ -328,7 +328,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             vout_CreatePicture( p_vout->p_sys->pp_vout[ i_vout ], 0, 0, 0 )
                ) == NULL )
         {
-            if( p_vout->b_die || p_vout->b_error )
+            if( !vlc_object_alive (p_vout) || p_vout->b_error )
             {
                 vout_DestroyPicture(
                     p_vout->p_sys->pp_vout[ i_vout ], p_outpic );

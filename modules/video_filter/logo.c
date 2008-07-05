@@ -576,7 +576,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_inpic )
     /* This is a new frame. Get a structure from the video_output. */
     while( !(p_outpic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 )) )
     {
-        if( p_vout->b_die || p_vout->b_error ) return;
+        if( !vlc_object_alive (p_vout) || p_vout->b_error ) return;
         msleep( VOUT_OUTMEM_SLEEP );
     }
 

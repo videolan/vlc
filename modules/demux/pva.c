@@ -344,7 +344,7 @@ static int ReSynch( demux_t *p_demux )
     int      i_skip;
     int      i_peek;
 
-    while( !p_demux->b_die )
+    while( vlc_object_alive (p_demux) )
     {
         if( ( i_peek = stream_Peek( p_demux->s, &p_peek, 1024 ) ) < 8 )
         {

@@ -211,7 +211,7 @@ static void Run( intf_thread_t *p_intf )
     char psz_duration[MSTRTIME_MAX_SIZE+2];
     char *psz_display = NULL;
 
-    while( !p_intf->b_die )
+    while( vlc_object_alive (p_intf) )
     {
         if( p_intf->p_sys->b_need_update == true )
         {

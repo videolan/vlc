@@ -74,7 +74,7 @@ void VLMSliderManager::Update()
         p_input = NULL;
     }
 
-    if( p_input && !p_input->b_die )
+    if( p_input && vlc_object_alive (p_input) )
     {
         vlc_value_t pos;
 

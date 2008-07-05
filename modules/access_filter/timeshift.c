@@ -275,7 +275,7 @@ static void Thread( access_t *p_access )
     access_t     *p_src = p_access->p_source;
     block_t      *p_block;
 
-    while( !p_access->b_die )
+    while( vlc_object_alive (p_access) )
     {
         /* Get a new block from the source */
         if( p_src->pf_block )
@@ -320,7 +320,7 @@ static void Thread( access_t *p_access )
 
         /* Read from file to fill up the fifo */
         while( block_FifoSize( p_sys->p_fifo ) < TIMESHIFT_FIFO_MIN &&
-               !p_access->b_die )
+               vlc_object_alive (p_access) )
         {
             p_block = ReadBlockFromFile( p_access );
             if( !p_block ) break;
@@ -331,12 +331,12 @@ static void Thread( access_t *p_access )
 
     msg_Dbg( p_access, "timeshift: no more input data" );
 
-    while( !p_access->b_die &&
+    while( vlc_object_alive (p_access) &&
            (p_sys->p_read_list || block_FifoSize( p_sys->p_fifo ) ) )
     {
         /* Read from file to fill up the fifo */
         while( block_FifoSize( p_sys->p_fifo ) < TIMESHIFT_FIFO_MIN &&
-               !p_access->b_die && p_sys->p_read_list )
+               vlc_object_alive (p_access) && p_sys->p_read_list )
         {
             p_block = ReadBlockFromFile( p_access );
             if( !p_block ) break;

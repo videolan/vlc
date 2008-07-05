@@ -964,7 +964,7 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
                                     0, 0, 0 )
                    ) == NULL )
             {
-                if( p_vout->b_die || p_vout->b_error )
+                if( !vlc_object_alive (p_vout) || p_vout->b_error )
                 {
                     vout_DestroyPicture(
                         p_vout->p_sys->pp_vout[ i_vout ].p_vout, p_outpic );
@@ -1308,7 +1308,7 @@ static void RenderPackedRGB( vout_thread_t *p_vout, picture_t *p_pic )
                                     0, 0, 0 )
                    ) == NULL )
             {
-                if( p_vout->b_die || p_vout->b_error )
+                if( !vlc_object_alive (p_vout) || p_vout->b_error )
                 {
                     vout_DestroyPicture(
                         p_vout->p_sys->pp_vout[ i_vout ].p_vout, p_outpic );
@@ -1646,7 +1646,7 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
                                     0, 0, 0 )
                    ) == NULL )
             {
-                if( p_vout->b_die || p_vout->b_error )
+                if( !vlc_object_alive (p_vout) || p_vout->b_error )
                 {
                     vout_DestroyPicture(
                         p_vout->p_sys->pp_vout[ i_vout ].p_vout, p_outpic );

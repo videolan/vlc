@@ -1064,7 +1064,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
     /* Wait here until Play() is called */
     WaitForSingleObject( p_notif->event, INFINITE );
 
-    if( !p_notif->b_die )
+    if( vlc_object_alive (p_notif) )
     {
         mwait( p_notif->start_date - AOUT_PTS_TOLERANCE / 2 );
 
@@ -1089,7 +1089,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
     }
     last_time = mdate();
 
-    while( !p_notif->b_die )
+    while( vlc_object_alive (p_notif) )
     {
         long l_read, l_free_slots;
         mtime_t mtime = mdate();

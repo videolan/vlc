@@ -798,7 +798,7 @@ static void CommandThread( vlc_object_t *p_this )
     vod_t *p_vod = (vod_t*)p_this;
     vod_sys_t *p_sys = p_vod->p_sys;
 
-    while( !p_vod->b_die )
+    while( vlc_object_alive (p_vod) )
     {
         block_t *p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
         rtsp_cmd_t cmd;

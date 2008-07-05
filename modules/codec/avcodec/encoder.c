@@ -702,16 +702,16 @@ int OpenEncoder( vlc_object_t *p_this )
  ****************************************************************************/
 static int FfmpegThread( struct thread_context_t *p_context )
 {
-    while ( !p_context->b_die && !p_context->b_error )
+    while ( vlc_object_alive (p_context) && !p_context->b_error )
     {
         vlc_mutex_lock( &p_context->lock );
-        while ( !p_context->b_work && !p_context->b_die && !p_context->b_error )
+        while ( !p_context->b_work && vlc_object_alive (p_context) && !p_context->b_error )
         {
             vlc_cond_wait( &p_context->cond, &p_context->lock );
         }
         p_context->b_work = 0;
         vlc_mutex_unlock( &p_context->lock );
-        if ( p_context->b_die || p_context->b_error )
+        if ( !vlc_object_alive (p_context) || p_context->b_error )
             break;
 
         if ( p_context->pf_func )

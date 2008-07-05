@@ -236,7 +236,7 @@ static void * MyThread( vlc_object_t *p_this )
 
     val.i_int = 42;
 
-    while( !p_this->b_die )
+    while( vlc_object_alive (p_this) )
     {
         int i = (int) (100.0 * rand() / (RAND_MAX));
 
@@ -422,7 +422,7 @@ static void * Dummy( vlc_object_t *p_this )
 
     vlc_thread_ready( p_this );
 
-    while( !p_this->b_die )
+    while( vlc_object_alive (p_this) )
     {
         msleep( 10000 );
     }

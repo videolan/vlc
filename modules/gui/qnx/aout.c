@@ -265,7 +265,7 @@ static int QNXaoutThread( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    while ( !p_aout->b_die )
+    while ( vlc_object_alive (p_aout) )
     {
         aout_buffer_t * p_buffer;
         int i_tmp, i_size;

@@ -142,7 +142,7 @@ void Timer::Notify( void )
     {
         input_thread_t *p_input = p_intf->p_sys->p_input;
 
-        if( !p_input->b_die )
+        if( vlc_object_alive (p_input) )
         {
             /* New input or stream map change */
             p_intf->p_sys->b_playing = 1;

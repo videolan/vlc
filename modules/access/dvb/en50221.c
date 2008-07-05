@@ -1910,7 +1910,7 @@ int en50221_Init( access_t * p_access )
 #if HLCI_WAIT_CAM_READY
         while( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
         {
-            if( p_access->b_die ) return VLC_EGENERIC;
+            if( !vlc_object_alive (p_access) ) return VLC_EGENERIC;
             msleep(1);
             msg_Dbg( p_access, "CAM: please wait" );
             APDUSend( p_access, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );

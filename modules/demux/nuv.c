@@ -335,7 +335,7 @@ static int Demux( demux_t *p_demux )
 
     for( ;; )
     {
-        if( p_demux->b_die )
+        if( !vlc_object_alive (p_demux) )
             return -1;
 
         if( FrameHeaderLoad( p_demux, &fh ) )
@@ -442,7 +442,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return VLC_EGENERIC;
             }
 
-            while( !p_demux->b_die )
+            while( vlc_object_alive (p_demux) )
             {
                 frame_header_t fh;
                 int64_t i_tell;
@@ -482,7 +482,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             p_sys->i_pcr = -1;
 
-            while( !p_demux->b_die )
+            while( vlc_object_alive (p_demux) )
             {
                 frame_header_t fh;
 

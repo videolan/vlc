@@ -977,7 +977,7 @@ static int Demux_Seekable( demux_t *p_demux )
                      * affect the reading speed too much. */
                     if( !(++i_loop_count % 1024) )
                     {
-                        if( p_demux->b_die ) return -1;
+                        if( !vlc_object_alive (p_demux) ) return -1;
                         msleep( 10000 );
 
                         if( !(i_loop_count % (1024 * 10)) )
@@ -1595,7 +1595,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
 
     for( ;; )
     {
-        if( p_demux->b_die ) return VLC_EGENERIC;
+        if( !vlc_object_alive (p_demux) ) return VLC_EGENERIC;
 
         if( AVI_PacketGetHeader( p_demux, &avi_pk ) )
         {
@@ -1615,7 +1615,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
              * affect the reading speed too much. */
             if( !(++i_loop_count % 1024) )
             {
-                if( p_demux->b_die ) return VLC_EGENERIC;
+                if( !vlc_object_alive (p_demux) ) return VLC_EGENERIC;
                 msleep( 10000 );
 
                 if( !(i_loop_count % (1024 * 10)) )
@@ -2098,7 +2098,7 @@ static int AVI_PacketSearch( demux_t *p_demux )
          * this code is called only on broken files). */
         if( !(++i_count % 1024) )
         {
-            if( p_demux->b_die ) return VLC_EGENERIC;
+            if( !vlc_object_alive (p_demux) ) return VLC_EGENERIC;
 
             msleep( 10000 );
             if( !(i_count % (1024 * 10)) )
@@ -2394,7 +2394,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
     {
         avi_packet_t pk;
 
-        if( p_demux->b_die )
+        if( !vlc_object_alive (p_demux) )
         {
             return;
         }

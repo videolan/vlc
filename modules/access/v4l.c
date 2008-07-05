@@ -1440,7 +1440,7 @@ static uint8_t *GrabCapture( demux_t *p_demux )
             return NULL;
         }
 
-        if( p_demux->b_die )
+        if( !vlc_object_alive (p_demux) )
         {
             return NULL;
         }

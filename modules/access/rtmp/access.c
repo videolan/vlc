@@ -311,7 +311,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
     while( i_len_tmp < i_len )
     {
-        if( p_sys->p_thread->result_stop || p_access->info.b_eof || p_access->b_die )
+        if( p_sys->p_thread->result_stop || p_access->info.b_eof || !vlc_object_alive (p_access) )
         {
             p_access->info.b_eof = true;
             return 0;
@@ -510,7 +510,7 @@ static void ThreadControl( vlc_object_t *p_this )
 
     rtmp_init_handler( p_thread->rtmp_handler );
 
-    while( !p_thread->b_die )
+    while( vlc_object_alive (p_thread) )
     {
         rtmp_packet = rtmp_read_net_packet( p_thread );
         if( rtmp_packet != NULL )

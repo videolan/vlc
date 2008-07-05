@@ -320,7 +320,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    while( !p_intf->b_die )
+    while( vlc_object_alive (p_intf) )
     {
         FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
                     p_intf->p_sys->i_mode,

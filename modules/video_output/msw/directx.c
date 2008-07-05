@@ -691,7 +691,7 @@ static int Manage( vout_thread_t *p_vout )
     }
 
     /* Check if the event thread is still running */
-    if( p_vout->p_sys->p_event->b_die )
+    if( !vlc_object_alive (p_vout->p_sys->p_event) )
     {
         return VLC_EGENERIC; /* exit */
     }

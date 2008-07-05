@@ -339,7 +339,7 @@ void VlcProc::refreshInput()
     }
 
 
-    if( pInput && !pInput->b_die )
+    if( pInput && vlc_object_alive (pInput) )
     {
         // Refresh time variables
         vlc_value_t pos;

@@ -310,7 +310,7 @@ static void Run( services_discovery_t *p_sd )
             libhal_free_string( devices[ i ] );
         }
     }
-    while( !p_sd->b_die )
+    while( vlc_object_alive (p_sd) )
     {
         /* look for events on the bus, blocking 1 second */
         dbus_connection_read_write_dispatch( p_sys->p_connection, 1000 );

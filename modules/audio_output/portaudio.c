@@ -578,7 +578,7 @@ static void PORTAUDIOThread( pa_thread_t *pa_thread )
     aout_sys_t *p_sys;
     int i_err;
 
-    while( !pa_thread->b_die )
+    while( vlc_object_alive (pa_thread) )
     {
         /* Wait for start of stream */
         vlc_mutex_lock( &pa_thread->lock_signal );

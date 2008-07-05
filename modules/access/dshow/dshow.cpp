@@ -1639,7 +1639,7 @@ static block_t *ReadCompressed( access_t *p_access )
 
     while( 1 )
     {
-        if( p_access->b_die || p_access->b_error ) return 0;
+        if( !vlc_object_alive (p_access) || p_access->b_error ) return 0;
 
         /* Get new sample/frame from the elementary stream (blocking). */
         vlc_mutex_lock( &p_sys->lock );

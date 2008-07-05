@@ -323,7 +323,7 @@ static int  Open ( vlc_object_t *p_this )
             int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp],
                                       i_sdp_max - i_sdp - 1 );
 
-            if( p_demux->b_die || p_demux->b_error )
+            if( !vlc_object_alive (p_demux) || p_demux->b_error )
             {
                 free( p_sdp );
                 goto error;
@@ -507,7 +507,7 @@ static int Connect( demux_t *p_demux )
     i_lefttries = 3;
 createnew:
     i_lefttries--;
-    if( p_demux->b_die || p_demux->b_error )
+    if( !vlc_object_alive (p_demux) || p_demux->b_error )
     {
         free( psz_user );
         free( psz_pwd );
@@ -669,7 +669,7 @@ static int SessionsSetup( demux_t *p_demux )
         Boolean bInit;
         live_track_t *tk;
 
-        if( p_demux->b_die || p_demux->b_error )
+        if( !vlc_object_alive (p_demux) || p_demux->b_error )
         {
             delete iter;
             return VLC_EGENERIC;
@@ -1796,7 +1796,7 @@ static void TimeoutPrevention( timeout_thread_t *p_timeout )
     vlc_thread_ready( p_timeout );
 
     /* Avoid lock */
-    while( !p_timeout->b_die )
+    while( vlc_object_alive (p_timeout) )
     {
         if( p_timeout->i_remain <= 0 )
         {

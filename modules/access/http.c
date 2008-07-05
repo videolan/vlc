@@ -415,7 +415,7 @@ connect:
             p_sys->i_version = 0;
             p_sys->b_seekable = false;
 
-            if( p_access->b_die || Connect( p_access, 0 ) )
+            if( !vlc_object_alive (p_access) || Connect( p_access, 0 ) )
                 goto error;
 
 #ifndef NDEBUG
@@ -1079,7 +1079,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
 
                 free( psz );
 
-                if( p_access->b_die || p_access->b_error )
+                if( !vlc_object_alive (p_access) || p_access->b_error )
                 {
                     Disconnect( p_access );
                     return -1;
@@ -1265,7 +1265,7 @@ static int Request( access_t *p_access, int64_t i_tell )
             goto error;
         }
 
-        if( p_access->b_die || p_access->b_error )
+        if( !vlc_object_alive (p_access) || p_access->b_error )
         {
             free( psz );
             goto error;

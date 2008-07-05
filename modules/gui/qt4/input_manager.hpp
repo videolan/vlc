@@ -66,7 +66,7 @@ public:
     virtual ~InputManager();
 
     void delInput();
-    bool hasInput() { return p_input && !p_input->b_dead && !p_input->b_die; }
+    bool hasInput() { return p_input && !p_input->b_dead && vlc_object_alive (p_input); }
     bool hasAudio();
     bool hasVideo();
 

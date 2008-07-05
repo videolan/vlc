@@ -809,7 +809,7 @@ static void vnc_worker_thread( vlc_object_t *p_thread_obj )
 
        }
 
-       if (p_sys->p_worker_thread->b_die ||
+       if (!vlc_object_alive (p_sys->p_worker_thread) ||
            p_sys->p_worker_thread->b_error)
        {
            p_sys->b_continue = false;
@@ -857,7 +857,7 @@ static void update_request_thread( vlc_object_t *p_thread_obj )
                 msg_Err( p_filter, "Could not write rfbFramebufferUpdateRequestMsg." );
                 p_sys->b_continue = false;
             }
-            if (p_sys->p_update_request_thread->b_die ||
+            if (!vlc_object_alive (p_sys->p_update_request_thread) ||
                 p_sys->p_update_request_thread->b_error)
             {
                 p_sys->b_continue = false;

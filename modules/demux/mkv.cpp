@@ -2796,7 +2796,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
     var_AddCallback( p_ev->p_libvlc, "key-action", EventKey, p_ev );
 
     /* main loop */
-    while( !p_ev->b_die )
+    while( vlc_object_alive (p_ev) )
     {
         if ( !p_sys->b_pci_packet_set )
         {
@@ -3054,7 +3054,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
         }
 
         /* VOUT part */
-        if( p_vout && p_vout->b_die )
+        if( p_vout && !vlc_object_alive (p_vout) )
         {
             var_DelCallback( p_vout, "mouse-moved", EventMouse, p_ev );
             var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_ev );

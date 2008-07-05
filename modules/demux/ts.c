@@ -941,13 +941,13 @@ static int DemuxFile( demux_t *p_demux )
         if( p_sys->buffer[i_pos] != 0x47 )
         {
             msg_Warn( p_demux, "lost sync" );
-            while( !p_demux->b_die && (i_pos < i_data) )
+            while( vlc_object_alive (p_demux) && (i_pos < i_data) )
             {
                 i_pos++;
                 if( p_sys->buffer[i_pos] == 0x47 )
                     break;
             }
-            if( !p_demux->b_die )
+            if( vlc_object_alive (p_demux) )
                 msg_Warn( p_demux, "sync found" );
         }
 
@@ -1052,7 +1052,7 @@ static int Demux( demux_t *p_demux )
             msg_Warn( p_demux, "lost synchro" );
             block_Release( p_pkt );
 
-            while( !p_demux->b_die )
+            while( vlc_object_alive (p_demux) )
             {
                 const uint8_t *p_peek;
                 int i_peek, i_skip = 0;

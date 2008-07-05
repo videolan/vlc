@@ -386,7 +386,7 @@ static void ThreadControl( vlc_object_t *p_this )
 
     rtmp_init_handler( p_thread->rtmp_handler );
 
-    while( !p_thread->b_die )
+    while( vlc_object_alive (p_thread) )
     {
         rtmp_packet = rtmp_read_net_packet( p_thread );
         if( rtmp_packet != NULL )

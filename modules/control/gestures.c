@@ -420,7 +420,7 @@ static void RunIntf( intf_thread_t *p_intf )
         /*
          * video output
          */
-        if( p_intf->p_sys->p_vout && p_intf->p_sys->p_vout->b_die )
+        if( p_intf->p_sys->p_vout && !vlc_object_alive (p_intf->p_sys->p_vout) )
         {
             var_DelCallback( p_intf->p_sys->p_vout, "mouse-moved",
                              MouseEvent, p_intf );

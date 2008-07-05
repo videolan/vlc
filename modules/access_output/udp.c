@@ -444,7 +444,7 @@ static void ThreadWrite( vlc_object_t *p_this )
     mtime_t              i_to_send = p_thread->i_group;
     int                  i_dropped_packets = 0;
 
-    while( !p_thread->b_die )
+    while( vlc_object_alive (p_thread) )
     {
         block_t *p_pk;
         mtime_t       i_date, i_sent;

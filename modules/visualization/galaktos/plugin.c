@@ -241,7 +241,7 @@ static void Thread( vlc_object_t *p_this )
 
     timestart=mdate()/1000;
 
-    while( !p_thread->b_die )
+    while( vlc_object_alive (p_thread) )
     {
         mspf = 1000 / 60;
         if( galaktos_update( p_thread ) == 1 )

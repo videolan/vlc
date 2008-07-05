@@ -908,7 +908,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 
     if( uMsg != WOM_DONE ) return;
 
-    if( p_aout->b_die ) return;
+    if( !vlc_object_alive (p_aout) ) return;
 
     /* Find out the current latency */
     for( i = 0; i < FRAMES_NUM; i++ )
@@ -984,9 +984,9 @@ static void WaveOutThread( notification_thread_t *p_notif )
     b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
 
     // wait for first call to "play()"
-    while( !p_sys->start_date && !p_aout->b_die )
+    while( !p_sys->start_date && vlc_object_alive (p_aout) )
            WaitForSingleObject( p_sys->event, INFINITE );
-    if( p_aout->b_die )
+    if( !vlc_object_alive (p_aout) )
         return;
 
     msg_Dbg( p_aout, "will start to play in %"PRId64" us",
@@ -1003,12 +1003,12 @@ static void WaveOutThread( notification_thread_t *p_notif )
                            p_aout->output.b_starving, msg);
     next_date = mdate();
 
-    while( !p_aout->b_die )
+    while( vlc_object_alive (p_aout) )
     {
         /* Cleanup and find out the current latency */
         i_queued_frames = WaveOutClearDoneBuffers( p_sys );
 
-        if( p_aout->b_die ) return;
+        if( !vlc_object_alive (p_aout) ) return;
 
         /* Try to fill in as many frame buffers as possible */
         for( i = 0; i < FRAMES_NUM; i++ )
@@ -1084,7 +1084,7 @@ static void WaveOutThread( notification_thread_t *p_notif )
             }
         }
 
-        if( p_aout->b_die ) return;
+        if( !vlc_object_alive (p_aout) ) return;
 
         /*
           deal with the case that the loop didn't fillup the buffer to the

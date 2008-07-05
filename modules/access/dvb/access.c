@@ -430,7 +430,7 @@ static block_t *Block( access_t *p_access )
         /* Find if some data is available */
         i_ret = poll( ufds, 2, 500 );
 
-        if ( p_access->b_die )
+        if ( !vlc_object_alive (p_access) )
             return NULL;
 
         if ( i_ret < 0 )

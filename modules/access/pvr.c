@@ -1083,7 +1083,7 @@ static ssize_t Read( access_t * p_access, uint8_t * p_buffer, size_t i_len )
 
     do
     {
-        if( p_access->b_die )
+        if( !vlc_object_alive (p_access) )
             return 0;
 
         ufd.revents = 0;

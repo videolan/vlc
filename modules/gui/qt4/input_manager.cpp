@@ -78,7 +78,7 @@ void InputManager::setInput( input_thread_t *_p_input )
 {
     delInput();
     p_input = _p_input;
-    if( p_input && !( p_input->b_dead || p_input->b_die ) )
+    if( p_input && !( p_input->b_dead || !vlc_object_alive (p_input) ) )
     {
         vlc_object_yield( p_input );
         emit statusChanged( PLAYING_S );
@@ -560,7 +560,7 @@ void MainInputManager::customEvent( QEvent *event )
     if( VLC_OBJECT_INTF == p_intf->i_object_type ) /* FIXME: don't use object type */
     {
         vlc_mutex_lock( &p_intf->change_lock );
-        if( p_input && ( p_input->b_dead || p_input->b_die ) )
+        if( p_input && ( p_input->b_dead || !vlc_object_alive (p_input) ) )
         {
             var_DelCallback( p_input, "state", PLItemChanged, this );
             vlc_object_release( p_input );
@@ -574,7 +574,7 @@ void MainInputManager::customEvent( QEvent *event )
         {
             QPL_LOCK;
             p_input = THEPL->p_input;
-            if( p_input && !( p_input->b_die || p_input->b_dead) )
+            if( p_input && !( !vlc_object_alive (p_input) || p_input->b_dead) )
             {
                 vlc_object_yield( p_input );
                 var_AddCallback( p_input, "state", PLItemChanged, this );

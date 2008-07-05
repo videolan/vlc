@@ -1433,7 +1433,7 @@ static void ThreadSend( vlc_object_t *p_this )
     sout_stream_id_t *id = (sout_stream_id_t *)p_this;
     unsigned i_caching = id->i_caching;
 
-    while( !id->b_die )
+    while( vlc_object_alive (id) )
     {
         block_t *out = block_FifoGet( id->p_fifo );
         if( out == NULL )

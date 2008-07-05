@@ -159,7 +159,7 @@ static void Run( services_discovery_t *p_sd )
     free( psz_urls ); /* Gruik ? */
     var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
 
-    while( !p_sd->b_die )
+    while( vlc_object_alive (p_sd) )
     {
         int i;
         if( p_sys->b_update == true )

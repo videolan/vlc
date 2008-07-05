@@ -548,7 +548,7 @@ static block_t *Block( access_t *p_access )
     block_t *p_block;
     long l_buffer_len;
 
-    if( p_access->b_die )
+    if( !vlc_object_alive (p_access) )
         return NULL;
 
     l_buffer_len = dvb_GetBufferSize( p_access );

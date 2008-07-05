@@ -372,7 +372,7 @@ static block_t *rtp_dgram_recv (demux_t *demux, int fd)
         len = net_Read (VLC_OBJECT (demux), fd, NULL,
                                 block->p_buffer, block->i_buffer, false);
         if (((len <= 0) && fd_dead (fd))
-         || demux->b_die)
+         || !vlc_object_alive (demux))
         {
             block_Release (block);
             return NULL;

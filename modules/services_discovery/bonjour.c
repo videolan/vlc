@@ -354,7 +354,7 @@ static void Run( services_discovery_t *p_sd )
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    while( !p_sd->b_die )
+    while( vlc_object_alive (p_sd) )
     {
         if( avahi_simple_poll_iterate( p_sys->simple_poll, 100 ) != 0 )
         {

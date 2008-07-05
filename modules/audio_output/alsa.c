@@ -764,16 +764,16 @@ static int ALSAThread( aout_instance_t * p_aout )
 
     /* Wait for the exact time to start playing (avoids resampling) */
     vlc_mutex_lock( &p_sys->lock );
-    while( !p_sys->start_date && !p_aout->b_die )
+    while( !p_sys->start_date && vlc_object_alive (p_aout) )
         vlc_cond_wait( &p_sys->wait, &p_sys->lock );
     vlc_mutex_unlock( &p_sys->lock );
 
-    if( p_aout->b_die )
+    if( !vlc_object_alive (p_aout) )
     	goto cleanup;
 
     mwait( p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
 
-    while ( !p_aout->b_die )
+    while ( vlc_object_alive (p_aout) )
     {
         ALSAFill( p_aout );
     }
@@ -876,7 +876,7 @@ static void ALSAFill( aout_instance_t * p_aout )
          * (stream is suspended and waiting for an application recovery) */
         msg_Dbg( p_aout, "entering in suspend mode, trying to resume..." );
 
-        while( !p_aout->b_die && !p_aout->p_libvlc->b_die &&
+        while( vlc_object_alive (p_aout) && vlc_object_alive (p_aout->p_libvlc) &&
                ( i_snd_rc = snd_pcm_resume( p_sys->p_snd_pcm ) ) == -EAGAIN )
         {
             msleep( 1000000 );

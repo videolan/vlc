@@ -1761,7 +1761,7 @@ static void FadeToColorThread(fadethread_t *p_fadethread)
             /* send the same pixel data again... to unlock the buffer! */
             AtmoSendPixelData( p_fadethread->p_filter );
 
-            while( (!p_fadethread->b_die) &&
+            while( (vlc_object_alive (p_fadethread)) &&
                 (i_steps_done < p_fadethread->i_steps))
             {
                 p_transfer = AtmoLockTransferBuffer( p_fadethread->p_filter );
@@ -1774,7 +1774,7 @@ static void FadeToColorThread(fadethread_t *p_fadethread)
                 thread improvements wellcome!
                 */
                 for(i_index = 0;
-                    (i_index < i_size) && (!p_fadethread->b_die);
+                    (i_index < i_size) && (vlc_object_alive (p_fadethread));
                     i_index+=4)
                 {
                     i_src_blue  = p_source[i_index+0];
@@ -1802,13 +1802,13 @@ static void FadeToColorThread(fadethread_t *p_fadethread)
                 the VLC libaries? inside native win32 I would use an Event
                 (CreateEvent) and here an WaitForSingleObject?
                 */
-                if(p_fadethread->b_die) break;
+                if(!vlc_object_alive (p_fadethread)) break;
                 msleep(10000);
-                if(p_fadethread->b_die) break;
+                if(!vlc_object_alive (p_fadethread)) break;
                 msleep(10000);
-                if(p_fadethread->b_die) break;
+                if(!vlc_object_alive (p_fadethread)) break;
                 msleep(10000);
-                if(p_fadethread->b_die) break;
+                if(!vlc_object_alive (p_fadethread)) break;
                 msleep(10000);
             }
             free(p_source);

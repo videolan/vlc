@@ -347,7 +347,7 @@ static void Run( services_discovery_t* p_sd )
     }
 
     msg_Dbg( p_sd, "UPnP discovery started" );
-    while( !p_sd->b_die )
+    while( vlc_object_alive (p_sd) )
     {
         msleep( 500 );
     }

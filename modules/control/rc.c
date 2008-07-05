@@ -517,7 +517,7 @@ static void Run( intf_thread_t *p_intf )
             /* New input has been registered */
             if( p_input )
             {
-                if( !p_input->b_dead || !p_input->b_die )
+                if( !p_input->b_dead || vlc_object_alive (p_input) )
                 {
                     char *psz_uri =
                             input_item_GetURI( input_GetItem( p_input ) );
@@ -554,7 +554,7 @@ static void Run( intf_thread_t *p_intf )
             }
         }
 
-        if( (p_input != NULL) && !p_input->b_dead && !p_input->b_die &&
+        if( (p_input != NULL) && !p_input->b_dead && vlc_object_alive (p_input) &&
             (p_playlist != NULL) )
         {
             vlc_object_lock( p_playlist );

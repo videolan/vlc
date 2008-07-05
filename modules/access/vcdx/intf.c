@@ -124,7 +124,7 @@ RunIntf( intf_thread_t *p_intf )
     dbg_print( INPUT_DBG_CALL, "intf initialized" );
 
     /* Main loop */
-    while( !p_intf->b_die )
+    while( vlc_object_alive (p_intf) )
     {
       vlc_mutex_lock( &p_intf->change_lock );
 
@@ -317,7 +317,7 @@ RunIntf( intf_thread_t *p_intf )
 static int InitThread( intf_thread_t * p_intf )
 {
     /* We might need some locking here */
-    if( !p_intf->b_die )
+    if( vlc_object_alive (p_intf) )
     {
         input_thread_t * p_input;
 

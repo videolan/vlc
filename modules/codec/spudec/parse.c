@@ -327,7 +327,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
         }
 
         /* We need to check for quit commands here */
-        if( p_dec->b_die )
+        if( !vlc_object_alive (p_dec) )
         {
             return VLC_EGENERIC;
         }

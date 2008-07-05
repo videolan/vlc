@@ -351,7 +351,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     /* First, get a new picture */
     while( ( p_outpic = vout_CreatePicture( p_sys->p_vout, 0, 0, 3 ) ) == NULL)
     {
-        if( p_aout->b_die )
+        if( !vlc_object_alive (p_aout) )
         {
             return;
         }

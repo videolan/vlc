@@ -389,7 +389,7 @@ static int Seek( access_t * p_access, int64_t i_pos )
     var_buffer_free( &buffer );
 
 
-    while( !p_access->b_die )
+    while( vlc_object_alive (p_access) )
     {
         if( mms_HeaderMediaRead( p_access, MMS_PACKET_CMD ) < 0 )
         {
@@ -404,7 +404,7 @@ static int Seek( access_t * p_access, int64_t i_pos )
         }
     }
 
-    while( !p_access->b_die )
+    while( vlc_object_alive (p_access) )
     {
         if( mms_HeaderMediaRead( p_access, MMS_PACKET_CMD ) < 0 )
         {
@@ -1116,7 +1116,7 @@ static int NetFillBuffer( access_t *p_access )
             return -1;
         }
 
-        if( p_access->b_die || p_access->b_error ) return -1;
+        if( !vlc_object_alive (p_access) || p_access->b_error ) return -1;
 
         //msg_Dbg( p_access, "NetFillBuffer: trying again (select)" );
 
@@ -1552,7 +1552,7 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
     {
         int i_status;
 
-        if( p_access->b_die )
+        if( !vlc_object_alive (p_access) )
             return -1;
 
         i_status = mms_ReceivePacket( p_access );

@@ -2080,7 +2080,7 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
     sout_stream_id_t *id = p_sys->id_video;
     picture_t *p_pic;
 
-    while( !p_sys->b_die && !p_sys->b_error )
+    while( vlc_object_alive (p_sys) && !p_sys->b_error )
     {
         block_t *p_block;
 
@@ -2088,9 +2088,9 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
         while( p_sys->i_last_pic == p_sys->i_first_pic )
         {
             vlc_cond_wait( &p_sys->cond, &p_sys->lock_out );
-            if( p_sys->b_die || p_sys->b_error ) break;
+            if( !vlc_object_alive (p_sys) || p_sys->b_error ) break;
         }
-        if( p_sys->b_die || p_sys->b_error )
+        if( !vlc_object_alive (p_sys) || p_sys->b_error )
         {
             vlc_mutex_unlock( &p_sys->lock_out );
             break;

@@ -368,7 +368,7 @@ static int Raw1394EventThread( vlc_object_t *p_this )
 
     vlc_thread_ready( p_this );
 
-    while( !p_sys->p_ev->b_die )
+    while( vlc_object_alive (p_sys->p_ev) )
     {
         while( ( result = poll( &(p_sys->raw1394_poll), 1, 200 ) ) < 0 )
         {
@@ -380,7 +380,7 @@ static int Raw1394EventThread( vlc_object_t *p_this )
             if( p_sys->p_ev->b_die )
                 break;
         }
-        if( p_sys->p_ev->b_die )
+        if( !vlc_object_alive (p_sys->p_ev) )
                 break;
         if( result > 0 && ( ( p_sys->raw1394_poll.revents & POLLIN )
                 || ( p_sys->raw1394_poll.revents & POLLPRI ) ) )

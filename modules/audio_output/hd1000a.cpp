@@ -222,7 +222,7 @@ static int Thread( aout_instance_t * p_aout )
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     PCMAudioPlayer * pPlayer = p_sys->pPlayer;
 
-    while( !p_aout->b_die )
+    while( vlc_object_alive (p_aout) )
     {
         pPlayer->WaitForBuffer();
 
