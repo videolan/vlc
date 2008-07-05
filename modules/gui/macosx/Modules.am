@@ -47,8 +47,6 @@ SOURCES_macosx = \
 	extended.m \
 	bookmarks.h \
 	bookmarks.m \
-	sfilters.h \
-	sfilters.m \
 	embeddedwindow.h \
 	embeddedwindow.m \
 	fspanel.m \

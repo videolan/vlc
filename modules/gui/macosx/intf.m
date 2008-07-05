@@ -48,7 +48,6 @@
 #import "wizard.h"
 #import "extended.h"
 #import "bookmarks.h"
-#import "sfilters.h"
 #import "interaction.h"
 #import "embeddedwindow.h"
 #import "update.h"
@@ -351,7 +350,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_embedded_list = [[VLCEmbeddedList alloc] init];
     o_interaction_list = [[VLCInteractionList alloc] init];
     o_info = [[VLCInfo alloc] init];
-    o_sfilters = nil;
 #ifdef UPDATE_CHECK
     o_update = [[VLCUpdate alloc] init];
 #endif
@@ -1884,22 +1882,6 @@ end:
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner:self];
 
     [o_extended showPanel];
-}
-
-- (IBAction)showSFilters:(id)sender
-{
-    if( o_sfilters == nil )
-    {
-        o_sfilters = [[VLCsFilters alloc] init];
-    }
-    if( !nib_sfilters_loaded )
-    {
-        nib_sfilters_loaded = [NSBundle loadNibNamed:@"SFilters" owner:self];
-        [o_sfilters initStrings];
-        [o_sfilters showAsPanel];
-    } else {
-        [o_sfilters showAsPanel];
-    }
 }
 
 - (IBAction)showBookmarks:(id)sender

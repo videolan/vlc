@@ -75,7 +75,6 @@
 		CC402EF10E00ABBB006A4BA4 /* Extended.nib in Resources */ = {isa = PBXBuildFile; fileRef = DC7F46EB08A183FC0027DB24 /* Extended.nib */; };
 		CC402EF20E00ABBB006A4BA4 /* Bookmarks.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */; };
 		CC402EF30E00ABBB006A4BA4 /* about_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = DCDA5E6408F94518009D93A8 /* about_bg.png */; };
-		CC402EF40E00ABBB006A4BA4 /* SFilters.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF3C64A0923B99D00401862 /* SFilters.nib */; };
 		CC402EF50E00ABBB006A4BA4 /* skip_forward_active_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FA0958A6E600018C74 /* skip_forward_active_embedded.png */; };
 		CC402EF60E00ABBB006A4BA4 /* play_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FC0958A94500018C74 /* play_embedded.png */; };
 		CC402EF70E00ABBB006A4BA4 /* pause_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FE0958AA9300018C74 /* pause_embedded.png */; };
@@ -233,8 +232,8 @@
 		8ED6C27E03E2EB1C0059A3A7 /* macosx.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/gui/macosx/macosx.m; sourceTree = SOURCE_ROOT; };
 		8ED6C27F03E2EB1C0059A3A7 /* misc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = misc.h; path = ../../../modules/gui/macosx/misc.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28003E2EB1C0059A3A7 /* misc.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = misc.m; path = ../../../modules/gui/macosx/misc.m; sourceTree = SOURCE_ROOT; };
-		8ED6C28103E2EB1C0059A3A7 /* open.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = open.h; path = ../../../modules/gui/macosx/open.h; sourceTree = SOURCE_ROOT; };
-		8ED6C28203E2EB1C0059A3A7 /* open.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = open.m; path = ../../../modules/gui/macosx/open.m; sourceTree = SOURCE_ROOT; };
+		8ED6C28103E2EB1C0059A3A7 /* open.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = open.h; path = ../../../modules/gui/macosx/open.h; sourceTree = SOURCE_ROOT; };
+		8ED6C28203E2EB1C0059A3A7 /* open.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = open.m; path = ../../../modules/gui/macosx/open.m; sourceTree = SOURCE_ROOT; };
 		8ED6C28303E2EB1C0059A3A7 /* playlist.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = playlist.h; path = ../../../modules/gui/macosx/playlist.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28403E2EB1C0059A3A7 /* playlist.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = playlist.m; path = ../../../modules/gui/macosx/playlist.m; sourceTree = SOURCE_ROOT; };
 		8ED6C28503E2EB1C0059A3A7 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = prefs.h; path = ../../../modules/gui/macosx/prefs.h; sourceTree = SOURCE_ROOT; };
@@ -287,7 +286,6 @@
 		CC33C24F0D2578F5008C4683 /* volumeslider_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = volumeslider_graphite.png; path = Resources/volumeslider_graphite.png; sourceTree = "<group>"; };
 		CC33C2500D2578F5008C4683 /* fullscreen_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fullscreen_graphite.png; path = Resources/fullscreen_graphite.png; sourceTree = "<group>"; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
-		CC402F4A0E00ABBB006A4BA4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded_blue.png; path = Resources/add_embedded_blue.png; sourceTree = "<group>"; };
 		CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded.png; path = Resources/add_embedded.png; sourceTree = "<group>"; };
@@ -353,9 +351,6 @@
 		CCCB86D80ACFDFB300CF1E10 /* fs_stop_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop_highlight.png; path = Resources/fs_stop_highlight.png; sourceTree = "<group>"; };
 		CCCB86D90ACFDFB300CF1E10 /* fs_stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop.png; path = Resources/fs_stop.png; sourceTree = "<group>"; };
 		CCCB86DA0ACFDFB300CF1E10 /* fs_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_background.png; path = Resources/fs_background.png; sourceTree = "<group>"; };
-		CCF3C64B0923B99D00401862 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SFilters.nib; sourceTree = "<group>"; };
-		CCF3C6500923B9D100401862 /* sfilters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sfilters.h; path = ../../../modules/gui/macosx/sfilters.h; sourceTree = SOURCE_ROOT; };
-		CCF3C6510923B9D100401862 /* sfilters.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = sfilters.m; path = ../../../modules/gui/macosx/sfilters.m; sourceTree = SOURCE_ROOT; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
 		DC7F46EC08A183FC0027DB24 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Extended.nib; sourceTree = "<group>"; };
@@ -404,7 +399,6 @@
 				089C167CFE841241C02AAC07 /* Resources */,
 				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
 				19C28FB8FE9D52D311CA2CBB /* Products */,
-				CC402F4A0E00ABBB006A4BA4 /* Info.plist */,
 			);
 			name = vlc;
 			sourceTree = "<group>";
@@ -476,8 +470,6 @@
 				DC7F46F108A187F60027DB24 /* extended.m */,
 				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
 				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
-				CCF3C6500923B9D100401862 /* sfilters.h */,
-				CCF3C6510923B9D100401862 /* sfilters.m */,
 				CC26BF3109A7A08C00E94D62 /* update.h */,
 				CC26BF3209A7A08C00E94D62 /* update.m */,
 				CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */,
@@ -750,7 +742,6 @@
 				DCFCCDB7085CE18F001E36AF /* Wizard.nib */,
 				DC7F46EB08A183FC0027DB24 /* Extended.nib */,
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
-				CCF3C64A0923B99D00401862 /* SFilters.nib */,
 				CC26BF2A09A7A05000E94D62 /* Update.nib */,
 				CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */,
 				CC1AC1BA0A7BDA41002478C3 /* InteractionErrorPanel.nib */,
@@ -869,7 +860,6 @@
 				CC402EF10E00ABBB006A4BA4 /* Extended.nib in Resources */,
 				CC402EF20E00ABBB006A4BA4 /* Bookmarks.nib in Resources */,
 				CC402EF30E00ABBB006A4BA4 /* about_bg.png in Resources */,
-				CC402EF40E00ABBB006A4BA4 /* SFilters.nib in Resources */,
 				CC402EF50E00ABBB006A4BA4 /* skip_forward_active_embedded.png in Resources */,
 				CC402EF60E00ABBB006A4BA4 /* play_embedded.png in Resources */,
 				CC402EF70E00ABBB006A4BA4 /* pause_embedded.png in Resources */,
@@ -991,14 +981,6 @@
 				CCC896B90D9AA9E8005AE59C /* English */,
 			);
 			name = MediaInfo.nib;
-			sourceTree = "<group>";
-		};
-		CCF3C64A0923B99D00401862 /* SFilters.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CCF3C64B0923B99D00401862 /* English */,
-			);
-			name = SFilters.nib;
 			sourceTree = "<group>";
 		};
 		DC7F46EB08A183FC0027DB24 /* Extended.nib */ = {
@@ -1124,7 +1106,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info.plist";
+				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
 				LIBRARY_SEARCH_PATHS = /Volumes/Genitus/vlc/modules/gui/macosx;
@@ -1149,7 +1131,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info.plist";
+				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
 				LIBRARY_SEARCH_PATHS = /Volumes/Genitus/vlc/modules/gui/macosx;
