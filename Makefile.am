@@ -746,7 +746,7 @@ if BUILD_LUA
 	cp $(srcdir)/share/lua/http/dialogs/* $(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs/
 	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs/*
 	cp $(srcdir)/share/lua/http/dialogs/.hosts $(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/dialogs/.hosts
+	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs/.hosts
 	cp $(srcdir)/share/lua/http/*.ico $(top_builddir)/vlc-$(VERSION)/share/lua/http/
 	cp $(srcdir)/share/lua/http/images/*.png $(top_builddir)/vlc-$(VERSION)/share/lua/http/images/
 	cp $(srcdir)/share/lua/http/requests/*.xml $(top_builddir)/vlc-$(VERSION)/share/lua/http/requests/
