@@ -147,6 +147,13 @@ int intf_RunThread( intf_thread_t *p_intf )
             return VLC_EGENERIC;
         }
         RunInterface( p_intf );
+
+        /* Make sure our MonitorLibVLCDeath thread exit */
+        vlc_object_kill( p_intf );
+        /* It is monitoring libvlc, not the p_intf */
+        vlc_object_signal( p_intf->p_libvlc );
+        vlc_thread_join( p_intf );
+
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
         return VLC_SUCCESS;
@@ -255,7 +262,14 @@ static void MonitorLibVLCDeath( intf_thread_t *p_intf )
     libvlc_int_t * p_libvlc = p_intf->p_libvlc;
     vlc_object_lock( p_libvlc );
     while(vlc_object_alive( p_libvlc ) )
+    {
+        if(p_intf->b_die)
+        {
+            vlc_object_unlock( p_libvlc );
+            return;
+        }
         vlc_object_wait( p_libvlc );
+    }
     vlc_object_unlock( p_libvlc );
 
     /* Someone killed libvlc */
