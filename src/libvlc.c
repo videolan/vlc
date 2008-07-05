@@ -933,7 +933,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
     intf_thread_t      * p_intf = NULL;
-    vout_thread_t      * p_vout = NULL;
     libvlc_priv_t      *priv = libvlc_priv (p_libvlc);
 
     /* Ask the interfaces to stop and destroy them */
