@@ -75,20 +75,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 #undef BI
 
     /* Build the tree for the main module */
-    const module_t *p_module = NULL;
-    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
-                                        FIND_ANYWHERE );
-    if( !p_list ) return;
-
-    /* Find the main module */
-    for( unsigned i = 0; p_module == NULL; i++ )
-    {
-        assert (i < (unsigned)p_list->i_count);
-
-        const module_t *p_main = (module_t *)p_list->p_values[i].p_object;
-        if( strcmp( module_GetObjName( p_main ), "main" ) == 0 )
-            p_module = p_main;
-    }
+    const module_t *p_module = module_GetMainModule( p_intf );
 
     /* Initialisation and get the confsize */
     PrefsItemData *data = NULL;
@@ -206,7 +193,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         }
     }
     module_PutConfig( p_config );
+    vlc_object_release( (vlc_object_t*)p_module );
 
+
+    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE,
+                                        FIND_ANYWHERE );
     /* Build the tree of plugins */
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )
     {
@@ -214,7 +205,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
         // Main module excluded
-        if( !strcmp( module_GetObjName( p_module ), "main" ) ) continue;
+        if( module_IsMainModule( p_module) ) continue;
 
         unsigned i_subcategory = 0, i_category = 0, confsize;
         bool b_options = false;
