@@ -564,7 +564,9 @@ static inline int vlc_spin_init (vlc_spinlock_t *spin)
  */
 static inline void barrier (void)
 {
-#if defined (__GNUC__) /* FIXME: || defined (ICC_whatever) */
+#if defined (__APPLE__)
+    OSMemoryBarrier();
+#elif defined (__GNUC__) /* FIXME: || defined (ICC_whatever) */
     __sync_synchronize ();
 #elif defined (LIBVLC_USE_PTHREAD)
     static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
