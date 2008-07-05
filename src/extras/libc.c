@@ -417,7 +417,7 @@ vlc_iconv_t vlc_iconv_open( const char *tocode, const char *fromcode )
 #if defined(HAVE_ICONV)
     return iconv_open( tocode, fromcode );
 #else
-    return NULL;
+    return (vlc_iconv_t)(-1);
 #endif
 }
 
@@ -428,21 +428,7 @@ size_t vlc_iconv( vlc_iconv_t cd, const char **inbuf, size_t *inbytesleft,
     return iconv( cd, (ICONV_CONST char **)inbuf, inbytesleft,
                   outbuf, outbytesleft );
 #else
-    int i_bytes;
-
-    if (inbytesleft == NULL || outbytesleft == NULL)
-    {
-        return 0;
-    }
-
-    i_bytes = __MIN(*inbytesleft, *outbytesleft);
-    if( !inbuf || !outbuf || !i_bytes ) return (size_t)(-1);
-    memcpy( *outbuf, *inbuf, i_bytes );
-    inbuf += i_bytes;
-    outbuf += i_bytes;
-    inbytesleft -= i_bytes;
-    outbytesleft -= i_bytes;
-    return i_bytes;
+    abort ();
 #endif
 }
 
@@ -451,7 +437,7 @@ int vlc_iconv_close( vlc_iconv_t cd )
 #if defined(HAVE_ICONV)
     return iconv_close( cd );
 #else
-    return 0;
+    abort ();
 #endif
 }
 
