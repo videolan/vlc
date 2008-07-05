@@ -50,6 +50,7 @@
  * Local prototypes
  *****************************************************************************/
 static void RunInterface( intf_thread_t *p_intf );
+static void MonitorLibVLCDeath( intf_thread_t *p_intf );
 
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
@@ -139,6 +140,12 @@ int intf_RunThread( intf_thread_t *p_intf )
      * (it needs access to the main thread) */
     if( p_intf->b_should_run_on_first_thread )
     {
+        if( vlc_thread_create( p_intf, "interface", MonitorLibVLCDeath,
+                               VLC_THREAD_PRIORITY_LOW, false ) )
+        {
+            msg_Err( p_intf, "cannot spawn libvlc death monitoring thread" );
+            return VLC_EGENERIC;
+        }
         RunInterface( p_intf );
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
@@ -238,6 +245,31 @@ static void RunInterface( intf_thread_t *p_intf )
         p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
     }
     while( p_intf->p_module );
+}
+
+/*****************************************************************************
+ * MonitorLibVLCDeath: Used when b_should_run_on_first_thread is set.
+ *****************************************************************************/
+static void MonitorLibVLCDeath( intf_thread_t *p_intf )
+{
+    libvlc_int_t * p_libvlc = p_intf->p_libvlc;
+    vlc_object_lock( p_libvlc );
+    while(vlc_object_alive( p_libvlc ) )
+        vlc_object_wait( p_libvlc );
+    vlc_object_unlock( p_libvlc );
+
+    /* Someone killed libvlc */
+
+    /* Make sure we kill all interface objects, especially
+     * those that are blocking libvlc (running on main thread) */
+    vlc_list_t * p_list = vlc_list_find( p_libvlc, VLC_OBJECT_INTF, FIND_CHILD );
+    for( int i = 0; i < p_list->i_count; i++ )
+    {
+        vlc_object_t * p_intf = p_list->p_values[i].p_object;
+        vlc_object_kill( p_intf );
+    }
+    vlc_list_release( p_list );
+
 }
 
 static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
