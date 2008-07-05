@@ -324,11 +324,11 @@ static VLCTreeItem *o_root_item = nil;
                             initWithName: o_child_name
                             withTitle: o_child_title
                             withHelp: o_child_help
-                            ID: p_items[i].value.i
+                            ID: ((vlc_object_t*)p_main_module)->i_object_id
                             parent:self
                             children:[[NSMutableArray alloc]
                                 initWithCapacity:10]
-                            whithCategory: p_items[i].i_type]];
+                            whithCategory: p_items[i].value.i]];
                         break;
                     case CONFIG_SUBCATEGORY:
                         if( p_items[i].value.i == -1 ) break;
@@ -352,11 +352,11 @@ static VLCTreeItem *o_root_item = nil;
                                 initWithName: o_child_name
                                 withTitle: o_child_title
                                 withHelp: o_child_help
-                                ID: p_items[i].value.i
+                                ID: ((vlc_object_t*)p_main_module)->i_object_id
                                 parent:p_last_category
                                 children:[[NSMutableArray alloc]
                                     initWithCapacity:10]
-                                whithCategory: p_items[i].i_type]];
+                                whithCategory: p_items[i].value.i]];
                         }
 
                         break;
@@ -384,9 +384,6 @@ static VLCTreeItem *o_root_item = nil;
 
                 /* Exclude empty plugins (submodules don't have config */
                 /* options, they are stored in the parent module) */
-// Does not work
-//                if( modules_IsSubModule( p_module ) )
-//                    continue;
                 p_items = module_GetConfig( p_module, &confsize );
 
                 unsigned int j;
@@ -415,12 +412,12 @@ static VLCTreeItem *o_root_item = nil;
 
                 long cookie;
                 bool b_found = false;
-                unsigned int i;
+
                 VLCTreeItem* p_category_item, * p_subcategory_item;
-                for (i = 0 ; i < [o_children count] ; i++)
+                for (j = 0 ; j < [o_children count] ; j++)
                 {
-                    p_category_item = [o_children objectAtIndex: i];
-                    if( p_category_item->i_object_id == i_category )
+                    p_category_item = [o_children objectAtIndex: j];
+                    if( p_category_item->i_object_category == i_category )
                     {
                         b_found = true;
                         break;
@@ -431,11 +428,11 @@ static VLCTreeItem *o_root_item = nil;
                 /* Find subcategory item */
                 b_found = false;
                 cookie = -1;
-                for (i = 0 ; i < [p_category_item->o_children count] ; i++)
+                for (j = 0 ; j < [p_category_item->o_children count] ; j++)
                 {
                     p_subcategory_item = [p_category_item->o_children
-                                            objectAtIndex: i];
-                    if( p_subcategory_item->i_object_id == i_subcategory )
+                                            objectAtIndex: j];
+                    if( p_subcategory_item->i_object_category == i_subcategory )
                     {
                         b_found = true;
                         break;
@@ -591,6 +588,11 @@ static VLCTreeItem *o_root_item = nil;
             unsigned int i, confsize;
             p_items = module_GetConfig( p_main_module, &confsize );
 
+            /* We need to first, find the right (sub)category,
+             * and then abort when we find a new (sub)category. Part of the Ugliness. */
+            bool in_right_category = false;
+            bool in_subcategory = false;
+            bool done = false;
             for( i = 0; i < confsize; i++ )
             {
                 if( !p_items[i].i_type )
@@ -601,13 +603,28 @@ static VLCTreeItem *o_root_item = nil;
 
                 switch( p_items[i].i_type )
                 {
-                    case CONFIG_SUBCATEGORY:
                     case CONFIG_CATEGORY:
+                        if(!in_right_category && p_items[i].value.i == i_object_category)
+                            in_right_category = true;
+                        else if(in_right_category)
+                            done = true;
+                        break;
+                    case CONFIG_SUBCATEGORY:
+                        if(!in_right_category && p_items[i].value.i == i_object_category)
+                        {
+                            in_right_category = true;
+                            in_subcategory = true;
+                        }
+                        else if(in_right_category && in_subcategory)
+                            done = true;
+                        break;
                     case CONFIG_SECTION:
                     case CONFIG_HINT_USAGE:
                         break;
                     default:
                     {
+                        if(!in_right_category) break;
+
                         VLCConfigControl *o_control = nil;
                         o_control = [VLCConfigControl newControl:&p_items[i]
                                                       withView:o_view];
@@ -620,6 +637,7 @@ static VLCTreeItem *o_root_item = nil;
                         break;
                     }
                 }
+                if( done ) break;
             }
             vlc_object_release( (vlc_object_t*)p_main_module );
         }
