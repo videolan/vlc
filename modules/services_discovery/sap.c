@@ -394,10 +394,19 @@ static int OpenDemux( vlc_object_t *p_this )
     {
         p_sdp->psz_uri = NULL;
     }
-    if( p_sdp->i_media_type != 33 && p_sdp->i_media_type != 32 &&
-        p_sdp->i_media_type != 14 )
-        goto error;
-
+    switch (p_sdp->i_media_type)
+    {   /* Should be in sync with modules/demux/rtp.c */
+        case  0: /* PCMU/8000 */
+        case  8: /* PCMA/8000 */
+        case 10: /* L16/44100/2 */
+        case 11: /* L16/44100 */
+        case 14: /* MPA/90000 */
+        case 32: /* MPV/90000 */
+        case 33: /* MP2/90000 */
+            break;
+        default:
+            goto error;
+    }
     if( p_sdp->psz_uri == NULL ) goto error;
 
     p_demux->p_sys = (demux_sys_t *)malloc( sizeof(demux_sys_t) );
