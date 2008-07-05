@@ -1306,7 +1306,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             {
                 vlc_object_release( p_input );
                 vlc_object_release( p_playlist );
-                return;
+                goto end;
             }
             if( input_item_GetNowPlaying ( p_playlist->status.p_item->p_input ) )
                 o_temp = [NSString stringWithUTF8String: 
@@ -1380,6 +1380,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     vlc_object_release( p_playlist );
 
+end:
     [self updateMessageArray];
 
     if( ((i_end_scroll != -1) && (mdate() > i_end_scroll)) || !p_input )
