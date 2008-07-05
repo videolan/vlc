@@ -234,7 +234,7 @@ static int               MuxSend( sout_stream_t *, sout_stream_id_t *,
 static sout_access_out_t *GrabberCreate( sout_stream_t *p_sout );
 static void ThreadSend( vlc_object_t *p_this );
 
-static void SDPHandleUrl( sout_stream_t *, char * );
+static void SDPHandleUrl( sout_stream_t *, const char * );
 
 static int SapSetup( sout_stream_t *p_stream );
 static int FileSetup( sout_stream_t *p_stream );
@@ -607,7 +607,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * SDPHandleUrl:
  *****************************************************************************/
-static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
+static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     vlc_url_t url;
@@ -1638,8 +1638,8 @@ static int MuxDel( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 
-static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
-                                        const block_t *p_buffer )
+static ssize_t AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
+                                            const block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id = p_sys->es[0];
@@ -1647,14 +1647,14 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
     int64_t  i_dts = p_buffer->i_dts;
 
     uint8_t         *p_data = p_buffer->p_buffer;
-    unsigned int    i_data  = p_buffer->i_buffer;
-    unsigned int    i_max   = id->i_mtu - 12;
+    size_t          i_data  = p_buffer->i_buffer;
+    size_t          i_max   = id->i_mtu - 12;
 
-    unsigned i_packet = ( p_buffer->i_buffer + i_max - 1 ) / i_max;
+    size_t i_packet = ( p_buffer->i_buffer + i_max - 1 ) / i_max;
 
     while( i_data > 0 )
     {
-        unsigned int i_size;
+        size_t i_size;
 
         /* output complete packet */
         if( p_sys->packet &&
@@ -1689,8 +1689,8 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
 }
 
 
-static int AccessOutGrabberWrite( sout_access_out_t *p_access,
-                                  block_t *p_buffer )
+static ssize_t AccessOutGrabberWrite( sout_access_out_t *p_access,
+                                      block_t *p_buffer )
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_access->p_sys;
 
