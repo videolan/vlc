@@ -135,23 +135,9 @@ int vlclua_dir_list( const char *luadirname, char **ppsz_dir_list )
 
     }
 #   else
-    if( asprintf( &ppsz_dir_list[i],
-                  "share" DIR_SEP "lua" DIR_SEP "%s", luadirname ) < 0 )
+    if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
+                  config_GetDataDir (), luadirname ) < 0 )
         return VLC_ENOMEM;
-
-#   ifdef HAVE_SYS_STAT_H
-    {
-        struct stat stat_info;
-        if( ( utf8_stat( ppsz_dir_list[i], &stat_info ) == -1 )
-            || !S_ISDIR( stat_info.st_mode ) )
-        {
-            free(ppsz_dir_list[i]);
-            if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
-                          config_GetDataDir (), luadirname ) < 0 )
-                return VLC_ENOMEM;
-        }
-    }
-#   endif
     i++;
 #   endif
     return VLC_SUCCESS;
