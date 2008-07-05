@@ -447,9 +447,6 @@ static void ObjectKillChildrens( vlc_object_t *p_obj )
 }
 void input_StopThread( input_thread_t *p_input )
 {
-    vlc_list_t *p_list;
-    int i;
-
     /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
      * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
      * unlock the control loop */

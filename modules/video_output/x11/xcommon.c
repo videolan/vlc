@@ -1291,8 +1291,6 @@ static int ManageVideo( vout_thread_t *p_vout )
             {
                 case Button1:
                     {
-                        playlist_t *p_playlist;
-
                         var_Get( p_vout, "mouse-button-down", &val );
                         val.i_int &= ~1;
                         var_Set( p_vout, "mouse-button-down", val );
@@ -1320,7 +1318,6 @@ static int ManageVideo( vout_thread_t *p_vout )
                 case Button3:
                     {
                         intf_thread_t *p_intf;
-                        playlist_t *p_playlist;
 
                         var_Get( p_vout, "mouse-button-down", &val );
                         val.i_int &= ~4;
