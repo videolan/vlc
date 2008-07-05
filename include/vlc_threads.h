@@ -562,6 +562,9 @@ static inline int vlc_spin_init (vlc_spinlock_t *spin)
 /**
  * Issues a full memory barrier.
  */
+#if defined (__APPLE__)
+# include <libkern/OSAtomic.h> /* OSMemoryBarrier() */
+#endif
 static inline void barrier (void)
 {
 #if defined (__APPLE__)
