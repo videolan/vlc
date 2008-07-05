@@ -61,7 +61,7 @@ static inline module_t * __module_GetMainModule( vlc_object_t * p_this )
     return module_Find( p_this, "main" );
 }
 
-static inline bool module_IsMainModule( module_t * p_module )
+static inline bool module_IsMainModule( const module_t * p_module )
 {
     return !strcmp( module_GetObjName( p_module ), "main" );
 }
