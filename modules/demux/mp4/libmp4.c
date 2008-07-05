@@ -1133,18 +1133,16 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     /*
      * XXX hack -> produce a copy of the nearly complete chunk
      */
+    p_box->data.p_sample_soun->i_qt_description = 0;
+    p_box->data.p_sample_soun->p_qt_description = NULL;
     if( i_read > 0 )
     {
         p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
-        if( p_box->data.p_sample_soun->p_qt_description == NULL )
-            MP4_READBOX_EXIT( 0 );
-        p_box->data.p_sample_soun->i_qt_description = i_read;
-        memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, i_read );
-    }
-    else
-    {
-        p_box->data.p_sample_soun->i_qt_description = 0;
-        p_box->data.p_sample_soun->p_qt_description = NULL;
+        if( p_box->data.p_sample_soun->p_qt_description )
+        {
+            p_box->data.p_sample_soun->i_qt_description = i_read;
+            memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, i_read );
+        }
     }
 
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_version );
@@ -1182,12 +1180,12 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     {
         /* SoundDescriptionV2 */
         double f_sample_rate;
-    int64_t dummy;
+        int64_t dummy;
         uint32_t i_channel;
 
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
         MP4_GET8BYTES( dummy );
-    memcpy( &f_sample_rate, &dummy, 8 );
+        memcpy( &f_sample_rate, &dummy, 8 );
 
         msg_Dbg( p_stream, "read box: %f Hz", f_sample_rate );
         p_box->data.p_sample_soun->i_sampleratehi = (int)f_sample_rate % 65536;
@@ -1232,20 +1230,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_soun->i_channelcount = 1;
     }
 
-    if( p_box->i_type == FOURCC_alac )
-    {
-        free( p_box->data.p_sample_soun->p_qt_description );
-
-        p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
-        if( p_box->data.p_sample_soun->p_qt_description == NULL )
-            MP4_READBOX_EXIT( 0 );
-        p_box->data.p_sample_soun->i_qt_description = i_read;
-        memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, i_read );
-    }
-    else
-    {
-        MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
-    }
+    MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds/wave/... */
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"soun\" in stsd channel %d "

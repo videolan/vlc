@@ -127,29 +127,56 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
     p_sys->p_context->bits_per_sample = p_dec->fmt_in.audio.i_bitspersample;
 
-    if( ( p_sys->p_context->extradata_size = p_dec->fmt_in.i_extra ) > 0 )
+    if( p_dec->fmt_in.i_extra > 0 )
     {
-        int i_offset = 0;
+        const uint8_t * const p_src = p_dec->fmt_in.p_extra;
+        int i_offset;
+        int i_size;
 
         if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
-            i_offset = 8;
-
-        p_sys->p_context->extradata_size -= i_offset;
-        p_sys->p_context->extradata =
-            malloc( p_sys->p_context->extradata_size +
-                    FF_INPUT_BUFFER_PADDING_SIZE );
-        if( p_sys->p_context->extradata )
         {
-            memcpy( p_sys->p_context->extradata,
-                    (char*)p_dec->fmt_in.p_extra + i_offset,
-                    p_sys->p_context->extradata_size );
-            memset( (char*)p_sys->p_context->extradata +
-                    p_sys->p_context->extradata_size, 0,
-                    FF_INPUT_BUFFER_PADDING_SIZE );
+            i_offset = 8;
+            i_size = p_dec->fmt_in.i_extra - 8;
+        }
+        else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'l', 'a', 'c' ) )
+        {
+            static const uint8_t p_pattern[] = { 0, 0, 0, 36, 'a', 'l', 'a', 'c' };
+            /* Find alac atom XXX it is a bit ugly */
+            for( i_offset = 0; i_offset < p_dec->fmt_in.i_extra - sizeof(p_pattern); i_offset++ )
+            {
+                if( !memcmp( &p_src[i_offset], p_pattern, sizeof(p_pattern) ) )
+                    break;
+            }
+            i_size = __MIN( p_dec->fmt_in.i_extra - i_offset, 36 );
+            if( i_size < 36 )
+                i_size = 0;
+        }
+        else
+        {
+            i_offset = 0;
+            i_size = p_dec->fmt_in.i_extra;
+        }
+
+        if( i_size > 0 )
+        {
+            p_sys->p_context->extradata =
+                malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
+            if( p_sys->p_context->extradata )
+            {
+                uint8_t *p_dst = p_sys->p_context->extradata;
+
+                p_sys->p_context->extradata_size = i_size;
+
+                memcpy( &p_dst[0],            &p_src[i_offset], i_size );
+                memset( &p_dst[i_size], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+            }
         }
     }
     else
+    {
+        p_sys->p_context->extradata_size = 0;
         p_sys->p_context->extradata = NULL;
+    }
 
     /* ***** Open the codec ***** */
     vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
