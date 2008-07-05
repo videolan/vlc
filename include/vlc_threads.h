@@ -559,6 +559,22 @@ static inline int vlc_spin_init (vlc_spinlock_t *spin)
 # define vlc_spin_destroy vlc_mutex_destroy
 #endif
 
+/**
+ * Issues a full memory barrier.
+ */
+static inline void barrier (void)
+{
+#if defined (__GNUC__) /* FIXME: || defined (ICC_whatever) */
+    __sync_synchronize ();
+#elif defined (LIBVLC_USE_PTHREAD)
+    static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_lock (&lock);
+    pthread_mutex_unlock (&lock);
+#else
+# error barrier not implemented!
+#endif
+}
+
 /*****************************************************************************
  * vlc_thread_create: create a thread
  *****************************************************************************/
