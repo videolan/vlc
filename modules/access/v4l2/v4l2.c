@@ -3099,10 +3099,10 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
 
     if( b_demux )
         var_AddCallback( p_obj, psz_name,
-                        DemuxControlCallback, (void*)queryctrl.id );
+                        DemuxControlCallback, (void*)(intptr_t)queryctrl.id );
     else
         var_AddCallback( p_obj, psz_name,
-                        AccessControlCallback, (void*)queryctrl.id );
+                        AccessControlCallback, (void*)(intptr_t)queryctrl.id );
 
     free( psz_name );
 }
