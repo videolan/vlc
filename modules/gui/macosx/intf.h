@@ -67,9 +67,6 @@ struct intf_sys_t
 {
     NSAutoreleasePool * o_pool;
 
-    /* the current input */
-    input_thread_t * p_input;
-
     /* special actions */
     bool b_mute;
     int i_play_status;
