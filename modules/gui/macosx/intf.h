@@ -66,7 +66,6 @@ unsigned int CocoaKeyToVLC( unichar i_key );
 struct intf_sys_t
 {
     NSAutoreleasePool * o_pool;
-    NSPort * o_sendport;
 
     /* the current input */
     input_thread_t * p_input;

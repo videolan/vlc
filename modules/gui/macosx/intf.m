@@ -105,7 +105,6 @@ int OpenIntf ( vlc_object_t *p_this )
 
     p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
-    p_intf->p_sys->o_sendport = [[NSPort port] retain];
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
     p_intf->pf_run = Run;
     p_intf->b_should_run_on_first_thread = true;
@@ -124,7 +123,6 @@ void CloseIntf ( vlc_object_t *p_this )
     
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
-    [p_intf->p_sys->o_sendport release];
     [p_intf->p_sys->o_pool release];
 
     free( p_intf->p_sys );
@@ -705,11 +703,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     o_msg_lock = [[NSLock alloc] init];
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
-
-    [p_intf->p_sys->o_sendport setDelegate: self];
-    [[NSRunLoop currentRunLoop]
-        addPort: p_intf->p_sys->o_sendport
-        forMode: NSDefaultRunLoopMode];
 
     /* FIXME: don't poll */
     interfaceTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.5
