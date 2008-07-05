@@ -1109,7 +1109,6 @@ static int Request( access_t *p_access, int64_t i_tell )
     access_sys_t   *p_sys = p_access->p_sys;
     char           *psz ;
     v_socket_t     *pvs = p_sys->p_vs;
-    bool b_connection_close = false;
     p_sys->b_persist = false;
 
     p_sys->i_remaining = 0;
