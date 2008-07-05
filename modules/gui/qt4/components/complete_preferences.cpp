@@ -75,7 +75,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 #undef BI
 
     /* Build the tree for the main module */
-    const module_t *p_module = module_GetMainModule( p_intf );
+    module_t *p_module = module_GetMainModule( p_intf );
 
     /* Initialisation and get the confsize */
     PrefsItemData *data = NULL;
@@ -196,7 +196,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     vlc_object_release( (vlc_object_t*)p_module );
 
 
-    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE,
+    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
                                         FIND_ANYWHERE );
     /* Build the tree of plugins */
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )
