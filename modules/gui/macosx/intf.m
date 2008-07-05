@@ -1368,7 +1368,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     else
     {
         p_intf->p_sys->i_play_status = END_S;
-        p_intf->p_sys->b_playlist_update = true;
         [self playStatusUpdated: p_intf->p_sys->i_play_status];
         [o_embedded_window playStatusUpdated: p_intf->p_sys->i_play_status];
         [self setSubmenusEnabled: FALSE];
