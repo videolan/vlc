@@ -1226,7 +1226,7 @@ static picture_t *ChromaGetPicture( filter_t *p_filter )
     return p_pic;
 }
 
-static int ChromaCopyRgbInfo( es_format_t *p_fmt, picture_heap_t *p_heap )
+static void ChromaCopyRgbInfo( es_format_t *p_fmt, picture_heap_t *p_heap )
 {
     p_fmt->video.i_rmask = p_heap->i_rmask;
     p_fmt->video.i_gmask = p_heap->i_gmask;
