@@ -2,24 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>IBDocumentLocation</key>
-	<string>429 441 496 337 0 0 1280 778 </string>
-	<key>IBEditorPositions</key>
-	<dict>
-		<key>29</key>
-		<string>64 734 438 44 0 0 1280 778 </string>
-	</dict>
 	<key>IBFramework Version</key>
-	<string>489.0</string>
+	<string>667</string>
 	<key>IBLastKnownRelativeProjectPath</key>
 	<string>../../vlc.xcodeproj</string>
 	<key>IBOldestOS</key>
 	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>21</integer>
+		<integer>2197</integer>
+		<integer>915</integer>
 		<integer>2416</integer>
+		<integer>282</integer>
 		<integer>29</integer>
+		<integer>21</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9D34</string>
