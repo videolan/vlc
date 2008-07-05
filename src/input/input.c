@@ -434,23 +434,26 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
  *
  * \param the input thread to stop
  */
+static void ObjectKillChildrens( vlc_object_t *p_obj )
+{
+    vlc_list_t *p_list;
+    int i;
+    vlc_object_kill( p_obj );
+
+    p_list = vlc_list_children( p_obj );
+    for( i = 0; i < p_list->i_count; i++ )
+        ObjectKillChildrens( p_list->p_values[i].p_object );
+    vlc_list_release( p_list );
+}
 void input_StopThread( input_thread_t *p_input )
 {
     vlc_list_t *p_list;
     int i;
 
-    /* Set die for input */
-    vlc_object_kill( p_input );
-    /* FIXME: seems to be duplicated in ControlPush(INPUT_CONTROL_SET_DIE) */
-
-    /* We cannot touch p_input fields directly (we come from another thread),
-     * so use the vlc_object_find way, it's perfectly safe */
-
-    /* Set die for all access, stream, demux, etc */
-    p_list = vlc_list_children( p_input );
-    for( i = 0; i < p_list->i_count; i++ )
-        vlc_object_kill( p_list->p_values[i].p_object );
-    vlc_list_release( p_list );
+    /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
+     * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
+     * unlock the control loop */
+    ObjectKillChildrens( VLC_OBJECT(p_input) );
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
@@ -1425,14 +1428,9 @@ static bool Control( input_thread_t *p_input, int i_type,
     {
         case INPUT_CONTROL_SET_DIE:
             msg_Dbg( p_input, "control: stopping input" );
-            /* Mark all submodules to die */
-            if( p_input->p->input.p_access )
-                vlc_object_kill( p_input->p->input.p_access );
-            if( p_input->p->input.p_stream )
-                vlc_object_kill( p_input->p->input.p_stream );
-            vlc_object_kill( p_input->p->input.p_demux );
 
-            vlc_object_kill( p_input );
+            /* Mark all submodules to die */
+            ObjectKillChildrens( p_input );
             break;
 
         case INPUT_CONTROL_SET_POSITION:
