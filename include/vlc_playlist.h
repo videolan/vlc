@@ -294,6 +294,10 @@ VLC_EXPORT( void, __pl_Release, ( vlc_object_t * ) );
  */
 VLC_EXPORT( int, playlist_Control, ( playlist_t *p_playlist, int i_query, bool b_locked, ...  ) );
 
+/** Get current playing input. The object is retained.
+ */
+VLC_EXPORT( input_thread_t *, playlist_CurrentInput, ( playlist_t *p_playlist ) );
+
 /** Clear the playlist
  * \param b_locked TRUE if playlist is locked when entering this function
  */
@@ -410,6 +414,7 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
     input_Read( p_playlist, p_input, true );
     return VLC_SUCCESS;
 }
+
 
 /** Tell if the playlist is currently running */
 #define playlist_IsPlaying( pl ) ( pl->status.i_status == PLAYLIST_RUNNING )

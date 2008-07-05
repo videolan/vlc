@@ -258,6 +258,18 @@ void playlist_set_current_input(
     }
 }
 
+/** Get current playing input.
+ */
+input_thread_t * playlist_CurrentInput( playlist_t * p_playlist )
+{
+    input_thread_t * p_input;
+    PL_LOCK;
+    p_input = p_playlist->p_input;
+    if( p_input ) vlc_object_yield( p_input );
+    PL_UNLOCK;
+    return p_input;
+}
+
 
 /**
  * @}

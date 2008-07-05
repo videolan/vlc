@@ -244,6 +244,7 @@ playlist_BothAddInput
 playlist_ChildSearchName
 playlist_Clear
 playlist_Control
+playlist_CurrentInput
 playlist_DeleteFromInput
 playlist_DeleteInputInParent
 playlist_Export
