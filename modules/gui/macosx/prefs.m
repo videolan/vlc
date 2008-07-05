@@ -59,6 +59,8 @@
 #import "prefs_widgets.h"
 #import "vlc_keys.h"
 
+/* /!\ Warning: Unreadable code :/ */
+
 /*****************************************************************************
  * VLCPrefs implementation
  *****************************************************************************/
@@ -287,116 +289,96 @@ static VLCTreeItem *o_root_item = nil;
         intf_thread_t   *p_intf = VLCIntf;
         vlc_list_t      *p_list;
         module_t        *p_module = NULL;
-        module_t        *p_parser;
-        module_config_t *p_item,
-                        *p_end;
-        int             i_index = 0;
-
-        /* List the modules */
-        p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-        if( !p_list ) return nil;
-
-        /* get parser */
-        p_parser = (module_t *)p_list->p_values[i_index].p_object;
-
+        module_t        *p_main_module;
+        module_config_t *p_items;
+        int             i = 0;
         if( [[self getName] isEqualToString: @"main"] )
         {
-            /*
-            * Find the main module
-            */
-            for( i_index = 0; i_index < p_list->i_count; i_index++ )
-            {
-                p_module = (module_t *)p_list->p_values[i_index].p_object;
-                if( !strcmp( module_GetObjName( p_module ), "main" ) )
-                    break;
-            }
-            if( p_module == NULL )
-            {
-                msg_Err( p_intf,
-                    "could not load the preferences" );
-                return nil;
-            }
-            if( i_index < p_list->i_count )
-            {
-                /* We found the main module */
-                /* Enumerate config categories and store a reference so we can
-                 * generate their config panel them when it is asked by the user. */
-                VLCTreeItem *p_last_category = NULL;
-                unsigned int i_confsize;
-                p_item = module_GetConfig( p_parser, &i_confsize );
-                p_end = p_item + i_confsize;
-                o_children = [[NSMutableArray alloc] initWithCapacity:10];
-                if( p_item ) do
-                {
-                    NSString *o_child_name;
-                    NSString *o_child_title;
-                    NSString *o_child_help;
-                    switch( p_item->i_type )
-                    {
-                    case CONFIG_CATEGORY:
-                        if( p_item->value.i == -1 ) break;
+            p_main_module = module_GetMainModule( p_intf );
+            assert( p_main_module );
 
+            /* We found the main module */
+            /* Enumerate config categories and store a reference so we can
+             * generate their config panel them when it is asked by the user. */
+            VLCTreeItem *p_last_category = NULL;
+            unsigned int i_confsize;
+            p_items = module_GetConfig( p_main_module, &i_confsize );
+            o_children = [[NSMutableArray alloc] initWithCapacity:10];
+            for( int i = 0; i < i_confsize; i++ )
+            {
+                NSString *o_child_name;
+                NSString *o_child_title;
+                NSString *o_child_help;
+                switch( p_items[i].i_type )
+                {
+                case CONFIG_CATEGORY:
+                    if( p_items[i].value.i == -1 ) break;
+
+                    o_child_name = [[VLCMain sharedInstance]
+                        localizedString: config_CategoryNameGet( p_items[i].value.i )];
+                    o_child_title = o_child_name;
+                    o_child_help = [[VLCMain sharedInstance]
+                        localizedString: config_CategoryHelpGet( p_items[i].value.i )];
+                    p_last_category = [VLCTreeItem alloc];
+                    [o_children addObject:[p_last_category
+                        initWithName: o_child_name
+                        withTitle: o_child_title
+                        withHelp: o_child_help
+                        ID: p_items[i].value.i
+                        parent:self
+                        children:[[NSMutableArray alloc]
+                            initWithCapacity:10]
+                        whithCategory: p_items[i].i_type]];
+                    break;
+                case CONFIG_SUBCATEGORY:
+                    if( p_items[i].value.i == -1 ) break;
+
+                    if( p_items[i].value.i != SUBCAT_PLAYLIST_GENERAL &&
+                        p_items[i].value.i != SUBCAT_VIDEO_GENERAL &&
+                        p_items[i].value.i != SUBCAT_INPUT_GENERAL &&
+                        p_items[i].value.i != SUBCAT_INTERFACE_GENERAL &&
+                        p_items[i].value.i != SUBCAT_SOUT_GENERAL &&
+                        p_items[i].value.i != SUBCAT_ADVANCED_MISC &&
+                        p_items[i].value.i != SUBCAT_AUDIO_GENERAL )
+                    {
                         o_child_name = [[VLCMain sharedInstance]
-                            localizedString: config_CategoryNameGet( p_item->value.i )];
+                            localizedString: config_CategoryNameGet( p_items[i].value.i ) ];
                         o_child_title = o_child_name;
                         o_child_help = [[VLCMain sharedInstance]
-                            localizedString: config_CategoryHelpGet( p_item->value.i )];
-                        p_last_category = [VLCTreeItem alloc];
-                        [o_children addObject:[p_last_category
+                            localizedString: config_CategoryHelpGet( p_items[i].value.i ) ];
+
+                        [p_last_category->o_children
+                            addObject:[[VLCTreeItem alloc]
                             initWithName: o_child_name
                             withTitle: o_child_title
                             withHelp: o_child_help
-                            ID: p_item->value.i
-                            parent:self
+                            ID: p_items[i].value.i
+                            parent:p_last_category
                             children:[[NSMutableArray alloc]
                                 initWithCapacity:10]
-                            whithCategory: p_item - module_GetConfig( p_module, &i_confsize )]];
-                        break;
-                    case CONFIG_SUBCATEGORY:
-                        if( p_item->value.i == -1 ) break;
-
-                        if( p_item->value.i != SUBCAT_PLAYLIST_GENERAL &&
-                            p_item->value.i != SUBCAT_VIDEO_GENERAL &&
-                            p_item->value.i != SUBCAT_INPUT_GENERAL &&
-                            p_item->value.i != SUBCAT_INTERFACE_GENERAL &&
-                            p_item->value.i != SUBCAT_SOUT_GENERAL &&
-                            p_item->value.i != SUBCAT_ADVANCED_MISC &&
-                            p_item->value.i != SUBCAT_AUDIO_GENERAL )
-                        {
-                            o_child_name = [[VLCMain sharedInstance]
-                                localizedString: config_CategoryNameGet( p_item->value.i ) ];
-                            o_child_title = o_child_name;
-                            o_child_help = [[VLCMain sharedInstance]
-                                localizedString: config_CategoryHelpGet( p_item->value.i ) ];
-
-                            [p_last_category->o_children
-                                addObject:[[VLCTreeItem alloc]
-                                initWithName: o_child_name
-                                withTitle: o_child_title
-                                withHelp: o_child_help
-                                ID: p_item->value.i
-                                parent:p_last_category
-                                children:[[NSMutableArray alloc]
-                                    initWithCapacity:10]
-                                whithCategory: p_item - module_GetConfig( p_parser, &i_confsize )]];
-                        }
- 
-                        break;
-                    default:
-                        break;
+                            whithCategory: p_items[i].i_type]];
                     }
-                } while( p_item < p_end && p_item++ );
+
+                    break;
+                default:
+                    break;
+                }
+                vlc_object_release( (vlc_object_t *)p_main_module );
             }
+
+            /* List the modules */
+            p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+            if( !p_list ) return nil;
 
             /* Build a tree of the plugins */
             /* Add the capabilities */
-            for( i_index = 0; i_index < p_list->i_count; i_index++ )
+            for( i = 0; i < p_list->i_count; i++ )
             {
                 unsigned int confsize;
-                p_module = (module_t *)p_list->p_values[i_index].p_object;
+                p_module = (module_t *)p_list->p_values[i].p_object;
 
                 /* Exclude the main module */
-                if( !strcmp( module_GetObjName( p_module ), "main" ) )
+                if( module_IsMainModule( p_module ) )
                     continue;
 
                 /* Exclude empty plugins (submodules don't have config */
@@ -404,26 +386,29 @@ static VLCTreeItem *o_root_item = nil;
 // Does not work
 //                if( modules_IsSubModule( p_module ) )
 //                    continue;
-                p_item = module_GetConfig( p_module, &confsize );
+                p_items = module_GetConfig( p_module, &confsize );
 
-                if( !p_item ) continue;
-                if( !p_item->i_type ) break;
+                unsigned int j;
+
                 int i_category = -1;
                 int i_subcategory = -1;
-                int i_options = 0;
-                do
-                {
-                    if( p_item->i_type == CONFIG_CATEGORY )
-                        i_category = p_item->value.i;
-                    else if( p_item->i_type == CONFIG_SUBCATEGORY )
-                        i_subcategory = p_item->value.i;
+                bool b_item = false;
 
-                    if( p_item->i_type & CONFIG_ITEM )
-                        i_options ++;
-                    if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
+                for( j = 0; j < confsize; j++ )
+                {
+                    if( p_items[j].i_type == CONFIG_CATEGORY )
+                        i_category = p_items[j].value.i;
+                    else if( p_items[j].i_type == CONFIG_SUBCATEGORY )
+                        i_subcategory = p_items[j].value.i;
+
+                    if( p_items[j].i_type & CONFIG_ITEM )
+                        b_item = true;
+            
+                    if( b_item && i_category >= 0 && i_subcategory >= 0 )
                         break;
-                } while( p_item < p_end && p_item++ );
-                if( !i_options ) continue;
+                }
+    
+                if( !b_item ) continue;
 
                 /* Find the right category item */
 
@@ -556,133 +541,86 @@ static VLCTreeItem *o_root_item = nil;
     {
         intf_thread_t   *p_intf = VLCIntf;
         vlc_list_t      *p_list;
-        module_t        *p_parser = NULL;
-        module_config_t *p_item,
-                        *p_end;
+        module_t        *p_module = NULL;
+        module_t        *p_main_module;
+        module_config_t *p_items;
         unsigned int confsize;
 
         o_subviews = [[NSMutableArray alloc] initWithCapacity:10];
         /* Get a pointer to the module */
         if( i_object_category == -1 )
         {
-            p_parser = (module_t *) vlc_object_get( i_object_id );
-            if( !p_parser )
-            {
-                /* 0OOoo something went really bad */
-                return nil;
-            }
-            p_item = module_GetConfig( p_parser, &confsize );
-            p_end = p_item + confsize;
+            p_module = (module_t *) vlc_object_get( i_object_id );
+            assert( p_module );
 
-            do
+            p_items = module_GetConfig( p_module, &confsize );
+
+            for( unsigned int i = 0; i < confsize; i++ )
             {
-                if( !p_item )
+                switch( p_items[i].i_type )
                 {
-                    msg_Err( p_intf, "invalid preference item found" );
-                    break;
-                }
-                if( p_item > p_end )
-                    break;
-                switch(p_item->i_type)
-                {
-                case CONFIG_SUBCATEGORY:
-                    break;
-                case CONFIG_CATEGORY:
-                    break;
-                case CONFIG_SECTION:
-                    break;
-                case CONFIG_HINT_USAGE:
-                    break;
-                default:
-                {
-                    VLCConfigControl *o_control = nil;
-                    o_control = [VLCConfigControl newControl:p_item
-                                                  withView:o_view];
-                    if( o_control != nil )
+                    case CONFIG_SUBCATEGORY:
+                    case CONFIG_CATEGORY:
+                    case CONFIG_SECTION:
+                    case CONFIG_HINT_USAGE:
+                        break;
+                    default:
                     {
-                        [o_control setAutoresizingMask: NSViewMaxYMargin |
-                            NSViewWidthSizable];
-                        [o_subviews addObject: o_control];
+                        VLCConfigControl *o_control = nil;
+                        o_control = [VLCConfigControl newControl:&p_items[i]
+                                                      withView:o_view];
+                        if( o_control )
+                        {
+                            [o_control setAutoresizingMask: NSViewMaxYMargin |
+                                NSViewWidthSizable];
+                            [o_subviews addObject: o_control];
+                        }
                     }
-                }
                     break;
                 }
-            } while( p_item < p_end && p_item++ );
-
-            vlc_object_release( (vlc_object_t*)p_parser );
+            }
+            vlc_object_release( (vlc_object_t*)p_module );
         }
         else
         {
-            int i_index;
-            p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-            if( !p_list ) return o_view;
+            p_main_module = module_GetMainModule( p_intf );
+            assert( !p_main_module );
+            module_config_t *p_items;
 
-            /*
-            * Find the main module
-            */
-            for( i_index = 0; i_index < p_list->i_count; i_index++ )
-            {
-                p_parser = (module_t *)p_list->p_values[i_index].p_object;
-                if( !strcmp( module_GetObjName( p_parser ), "main" ) )
-                    break;
-            }
-            if( p_parser == NULL )
-            {
-                msg_Err( p_intf, "could not load preferences" );
-                return o_view;
-            }
-            unsigned int confsize;
-            p_item = module_GetConfig( p_parser, &confsize );
-            p_end = p_item + confsize;
-            p_item += i_object_category;
+            unsigned int i, confsize;
+            p_items = module_GetConfig( p_main_module, &confsize );
 
-            if( ( p_item->i_type == CONFIG_CATEGORY ) &&
-              ( ( p_item->value.i == CAT_PLAYLIST )  ||
-                ( p_item->value.i == CAT_AUDIO )  ||
-                ( p_item->value.i == CAT_VIDEO ) ||
-                ( p_item->value.i == CAT_INTERFACE ) ||
-                ( p_item->value.i == CAT_INPUT ) ||
-                ( p_item->value.i == CAT_SOUT ) ) )
-                p_item++;
-
-            do
+            for( i = 0; i < confsize; i++ )
             {
-                p_item++;
-                if( !p_item || !p_item->i_type )
+                if( !p_items[i].i_type )
                 {
                     msg_Err( p_intf, "invalid preference item found" );
                     break;
                 }
-                if( p_item > p_end )
-                    break;
-                switch( p_item->i_type )
-                {
-                case CONFIG_SUBCATEGORY:
-                    break;
-                case CONFIG_CATEGORY:
-                    break;
-                case CONFIG_SECTION:
-                    break;
-                case CONFIG_HINT_USAGE:
-                    break;
-                default:
-                {
-                    VLCConfigControl *o_control = nil;
-                    o_control = [VLCConfigControl newControl:p_item
-                                                  withView:o_view];
-                    if( o_control != nil )
-                    {
-                        [o_control setAutoresizingMask: NSViewMaxYMargin |
-                                                        NSViewWidthSizable];
-                        [o_subviews addObject: o_control];
-                    }
-                    break;
-                }
-                }
-            } while ( ( p_item < p_end ) &&
-                      ( p_item->i_type != CONFIG_SUBCATEGORY ) );
 
-            vlc_list_release( p_list );
+                switch( p_items[i].i_type )
+                {
+                    case CONFIG_SUBCATEGORY:
+                    case CONFIG_CATEGORY:
+                    case CONFIG_SECTION:
+                    case CONFIG_HINT_USAGE:
+                        break;
+                    default:
+                    {
+                        VLCConfigControl *o_control = nil;
+                        o_control = [VLCConfigControl newControl:&p_items[i]
+                                                      withView:o_view];
+                        if( o_control != nil )
+                        {
+                            [o_control setAutoresizingMask: NSViewMaxYMargin |
+                                                            NSViewWidthSizable];
+                            [o_subviews addObject: o_control];
+                        }
+                        break;
+                    }
+                }
+            }
+            vlc_object_release( (vlc_object_t*)p_main_module );
         }
     }
 
