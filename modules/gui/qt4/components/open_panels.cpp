@@ -417,15 +417,21 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.timeShift, clicked(), this, updateMRL());
     CONNECT( ui.ipv6, clicked(), this, updateMRL());
 
-    ui.protocolCombo->addItem( "" );
-    ui.protocolCombo->addItem("HTTP", QVariant("http"));
-    ui.protocolCombo->addItem("HTTPS", QVariant("https"));
-    ui.protocolCombo->addItem("FTP", QVariant("ftp"));
-    ui.protocolCombo->addItem("MMS", QVariant("mms"));
-    ui.protocolCombo->addItem("RTSP", QVariant("rtsp"));
-    ui.protocolCombo->addItem("UDP/RTP (unicast)", QVariant("udp"));
-    ui.protocolCombo->addItem("UDP/RTP (multicast)", QVariant("udp"));
-    ui.protocolCombo->addItem("RTMP", QVariant("rtmp"));
+    typedef QPair<QString,QString> QPairString;
+    QMap<int, QPairString> protocols;
+#define P(value,name,dsc) do { protocols[value] = QPairString( QString(dsc), QString(name) );} while(0)
+    P( NO_PROTO,    "",         "" );
+    P( UDPM_PROTO,  "udp",      "UDP/RTP (multicast)" );
+    P( HTTP_PROTO,  "http",     "HTTP" );
+    P( HTTPS_PROTO, "https",    "HTTPS" );
+    P( MMS_PROTO,   "mms",      "MMS" );
+    P( FTP_PROTO,   "ftp",      "FTP" );
+    P( RTSP_PROTO,  "rtsp",     "RTSP" );
+    P( UDP_PROTO,   "udp",      "UDP/RTP (unicast)" );
+    P( RTMP_PROTO,  "rtmp",     "RTMP" );
+#undef P
+    foreach( QPairString e, protocols ) /* Sorted by key, exactly what we need */
+        ui.protocolCombo->addItem( e.first, QVariant(e.second.isEmpty() ) );
 }
 
 NetOpenPanel::~NetOpenPanel()
@@ -517,6 +523,7 @@ void NetOpenPanel::updateMRL() {
             else mrl += addr;
             mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
+            break;
         case RTMP_PROTO:
             mrl = "rtmp://" + addr;
             emit methodChanged("rtmp-caching");
