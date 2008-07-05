@@ -131,6 +131,9 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         if( p_vout )
         {
             spu_Attach( p_vout->p_spu, p_this, false );
+            vlc_object_kill( p_vout );
+            vlc_thread_join( p_vout );
+            module_Unneed( p_vout, p_vout->p_module );
             vlc_object_release( p_vout );
         }
         return NULL;
@@ -446,6 +449,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         msg_Err( p_vout, "video output creation failed" );
 
         /* Make sure the thread is destroyed and data released */
+        vlc_object_kill( p_vout );
+        vlc_thread_join( p_vout );
+        module_Unneed( p_vout, p_vout->p_module );
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -461,12 +467,6 @@ static void vout_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy( &p_vout->picture_lock );
     vlc_mutex_destroy( &p_vout->change_lock );
     vlc_mutex_destroy( &p_vout->vfilter_lock );
-
-    /* Release the module */
-    if( p_vout->p_module )
-    {
-        module_Unneed( p_vout, p_vout->p_module );
-    }
 
     free( p_vout->psz_filter_chain );
 
