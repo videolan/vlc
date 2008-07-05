@@ -383,12 +383,11 @@
     for( i = 0; ppsz_services[i]; i++ )
     {
         bool  b_enabled;
-        char        *objectname;
         NSMenuItem  *o_lmi;
 
         char * name = ppsz_name[i] ? ppsz_name[i] : ppsz_services[i];
         /* Check whether to enable these menuitems */
-        b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, objectname );
+        b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, name );
 
         /* Create the menu entries used in the playlist menu */
         o_lmi = [[o_mi_services submenu] addItemWithTitle:
