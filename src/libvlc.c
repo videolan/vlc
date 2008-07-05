@@ -954,15 +954,18 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
+    playlist_t *p_playlist = priv->p_playlist;
     /* Remove all services discovery */
     msg_Dbg( p_libvlc, "removing all services discovery tasks" );
-    playlist_ServicesDiscoveryKillAll( priv->p_playlist );
+    playlist_ServicesDiscoveryKillAll( p_playlist );
 
     /* Free playlist */
+    /* Any thread still running must not assume pl_Yield() succeeds. */
     msg_Dbg( p_libvlc, "removing playlist" );
-    vlc_object_kill( priv->p_playlist );
-    vlc_thread_join( priv->p_playlist );
-    vlc_object_release( priv->p_playlist );
+    priv->p_playlist = NULL;
+    vlc_object_kill( p_playlist ); /* <-- memory barrier for pl_Yield() */
+    vlc_thread_join( p_playlist );
+    vlc_object_release( p_playlist );
 
     /* Free interaction */
     msg_Dbg( p_libvlc, "removing interaction" );

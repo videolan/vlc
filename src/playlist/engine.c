@@ -173,9 +173,6 @@ static void playlist_Destructor( vlc_object_t * p_this )
 
     if( p_playlist->p_fetcher )
         vlc_object_release( p_playlist->p_fetcher );
-#ifndef NDEBUG
-    libvlc_priv (p_this->p_libvlc)->p_playlist = NULL; /* pl_Yield() will fail */
-#endif
 }
 
 /* Destroy remaining objects */
