@@ -46,7 +46,6 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-int ExecuteOnMainThread( id target, SEL sel, void * p_arg );
 unsigned int CocoaKeyToVLC( unichar i_key );
 
 #define VLCIntf [[VLCMain sharedInstance] getIntf]
