@@ -31,10 +31,65 @@
 #endif
 
 #include "dialogs/sout.hpp"
-#include <vlc_streaming.h>
 
 #include <QString>
 #include <QFileDialog>
+
+struct streaming_account_t
+{
+    char *psz_username; /*< username of account */
+    char *psz_password; /*< password of account */
+};
+
+struct sout_gui_descr_t
+{
+    /* Access types */
+    bool b_local;   /*< local access module */
+    bool b_file;    /*< file access module */
+    bool b_http;    /*< http access module */
+    bool b_mms;     /*< mms access module */
+    bool b_rtp;     /*< rtp access module */
+    bool b_udp;     /*< udp access module */
+    bool b_dump;    /*< dump access module */
+    bool b_icecast; /*< icecast access module */
+
+    char *psz_file;     /*< filename */
+    char *psz_http;     /*< HTTP servername or ipaddress */
+    char *psz_mms;      /*< MMS servername or ipaddress */
+    char *psz_rtp;      /*< RTP servername or ipaddress */
+    char *psz_udp;      /*< UDP servername or ipaddress */
+    char *psz_icecast;  /*< Icecast servername or ipaddress*/
+
+    int32_t i_http;     /*< http port number */
+    int32_t i_mms;      /*< mms port number */
+    int32_t i_rtp;      /*< rtp port number */
+    int32_t i_udp;      /*< udp port number */
+    int32_t i_icecast;  /*< icecast port number */
+
+    /* Mux */
+    char *psz_mux;      /*< name of muxer to use in streaming */
+
+    /* Transcode */
+    bool b_soverlay; /*< enable burning overlay in the video */
+    char *psz_vcodec;   /*< video codec to use in transcoding */
+    char *psz_acodec;   /*< audio codec to use in transcoding */
+    char *psz_scodec;   /*< subtitle codec to use in transcoding */
+    int32_t i_vb;       /*< video bitrate to use in transcoding */
+    int32_t i_ab;       /*< audio bitrate to use in transcoding */
+    int32_t i_channels; /*< number of audio channels to use in transcoding */
+    float f_scale;      /*< scaling factor to use in transcoding */
+
+    /* Misc */
+    bool b_sap;   /*< send SAP announcement */
+    bool b_all_es;/*< send all elementary streams from source stream */
+    char *psz_group;    /*< SAP Group name */
+    char *psz_name;     /*< SAP name */
+    int32_t i_ttl;      /*< Time To Live (TTL) for network traversal */
+
+    /* Icecast */
+    char *psz_icecast_mountpoint;/*< path to Icecast mountpoint */
+    struct streaming_account_t sa_icecast;  /*< Icecast account information */
+};
 
 SoutDialog* SoutDialog::instance = NULL;
 

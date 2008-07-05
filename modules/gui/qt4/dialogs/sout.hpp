@@ -29,7 +29,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_streaming.h>
 
 #include "ui/sout.h"
 #include "util/qvlcframe.hpp"

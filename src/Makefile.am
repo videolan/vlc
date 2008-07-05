@@ -96,7 +96,6 @@ noinst_HEADERS = \
 	../include/vlc_network.h \
 	../include/vlc_osd.h \
 	../include/vlc_pgpkey.h \
-	../include/vlc_streaming.h \
 	../include/vlc_tls.h \
 	../include/vlc_update.h \
 	../include/vlc_vod.h \
@@ -372,7 +371,6 @@ SOURCES_libvlc_sout = \
 	stream_output/stream_output.c \
 	stream_output/stream_output.h \
 	stream_output/announce.c \
-	stream_output/profiles.c \
 	stream_output/sap.c \
 	stream_output/sdp.c \
 	$(NULL)
