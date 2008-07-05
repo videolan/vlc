@@ -593,6 +593,7 @@ void MainInputManager::customEvent( QEvent *event )
         p_input = playlist_CurrentInput( p_playlist );
         emit inputChanged( p_input );
         vlc_object_release( p_input );
+        pl_Release( p_intf );
     }
 }
 
