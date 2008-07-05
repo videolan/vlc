@@ -737,9 +737,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         {   
             [o_audio_last_ckb setEnabled: YES];
             if( [o_audio_last_ckb state] == NSOnState )
-                config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+                config_AddIntf( p_intf, "audioscrobbler" );
             else
-                config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+                config_RemoveIntf( p_intf, "audioscrobbler" );
 
             config_PutPsz( p_intf, "lastfm-username", [[o_audio_lastuser_fld stringValue] UTF8String] );
             config_PutPsz( p_intf, "lastfm-password", [[o_audio_lastpwd_sfld stringValue] UTF8String] );
