@@ -960,6 +960,8 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Free playlist */
     msg_Dbg( p_libvlc, "removing playlist" );
+    vlc_object_kill( priv->p_playlist );
+    vlc_thread_join( priv->p_playlist );
     vlc_object_release( priv->p_playlist );
 
     /* Free interaction */
