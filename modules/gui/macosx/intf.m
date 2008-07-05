@@ -1200,7 +1200,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     pthread_testcancel(); /* If we were cancelled stop here */
 
-    msg_Info( p_intf, "Killing the Mac OS X module" );
+    msg_Dbg( p_intf, "Killing the Mac OS X module" );
 
     /* We are dead, terminate */
     [NSApp performSelectorOnMainThread: @selector(terminate:) withObject:nil waitUntilDone:NO];
