@@ -162,7 +162,12 @@ VLC_EXPORT( void, __vlc_object_kill, ( vlc_object_t * ) );
 #define vlc_object_kill(a) \
     __vlc_object_kill( VLC_OBJECT(a) )
 
-VLC_EXPORT( bool, __vlc_object_alive, ( vlc_object_t * ) );
+static inline bool __vlc_object_alive (vlc_object_t *obj)
+{
+    barrier ();
+    return !obj->b_die;
+}
+
 #define vlc_object_alive(a) \
     __vlc_object_alive( VLC_OBJECT(a) )
 
