@@ -431,8 +431,6 @@ dnl
 dnl Iconv stuff
 dnl
 AM_ICONV
-AS_IF([test "$am_cv_func_iconv" != "yes"],
-	[AC_MSG_ERROR([libiconv is needed for VLC to work properly])])
 VLC_ADD_CFLAGS([libvlc],[${INCICONV}])
 VLC_ADD_LIBS([libvlc],[${LTLIBICONV}])
 
