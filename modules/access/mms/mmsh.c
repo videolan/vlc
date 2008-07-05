@@ -328,7 +328,6 @@ static int Seek( access_t *p_access, int64_t i_pos )
 
     while( vlc_object_alive (p_access) )
     {
-        msg_Warn( p_access, "GetPacket 1" );
         if( GetPacket( p_access, &ck ) )
             break;
 
@@ -404,7 +403,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         else
         {
             chunk_t ck;
-        msg_Warn( p_access, "GetPacket 2" );
             if( GetPacket( p_access, &ck ) )
             {
                 int i_ret = -1;
