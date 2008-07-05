@@ -91,9 +91,9 @@ static int parse_cmdline (char *line, char ***argvp)
  * wWinMain: parse command line, start interface and spawn threads.
  *****************************************************************************/
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                    LPWSTR lpCmdLine, int nCmdShow )
+                     LPWSTR lpCmdLine, int nCmdShow )
 {
-    char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
+    char **argv, psz_cmdline[wcslen(lpCmdLine) * 4 + 1];
     int argc, ret;
 
     (void)hInstance; (void)hPrevInstance; (void)nCmdShow;
@@ -129,8 +129,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPSTR args, int nCmdShow)
 {
     /* This makes little sense, but at least it links properly */
-    wchar_t lpCmdLine[strlen(args) * 3];
-    MultiByteToWideChar( CP_ACP, 0, args, -1, lpCmdLine, sizeof(lpCmdLine) );
+    wchar_t lpCmdLine[(strlen (args) + 1) * 3];
+    MultiByteToWideChar (CP_ACP, 0, args, -1, lpCmdLine, sizeof (lpCmdLine));
     return wWinMain (hInstance, hPrevInstance, lpCmdLine, nCmdShow);
 }
 #endif
