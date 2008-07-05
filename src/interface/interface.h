@@ -34,7 +34,7 @@
  * Interaction
  **********************************************************************/
 
-/* release via vlc_object_release() */
 interaction_t * interaction_Init( libvlc_int_t *p_libvlc );
+void interaction_Destroy( interaction_t * );
 
 #endif

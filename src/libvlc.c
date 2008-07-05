@@ -964,7 +964,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Free interaction */
     msg_Dbg( p_libvlc, "removing interaction" );
-    vlc_object_release( priv->p_interaction );
+    interaction_Destroy( priv->p_interaction );
 
     /* Free video outputs */
     msg_Dbg( p_libvlc, "removing all video outputs" );

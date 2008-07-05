@@ -388,6 +388,16 @@ interaction_t * interaction_Init( libvlc_int_t *p_libvlc )
     return p_interaction;
 }
 
+void interaction_Destroy( interaction_t *p_interaction )
+{
+    if( !p_interaction )
+        return;
+
+    vlc_object_kill( p_interaction );
+    vlc_thread_join( p_interaction );
+    vlc_object_release( p_interaction );
+}
+
 /**********************************************************************
  * The following functions are local
  **********************************************************************/
