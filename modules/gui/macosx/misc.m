@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Felix Paul KŸhne <fkuehne at videolan dot org>
+ *          Felix Paul KÃ¼hne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

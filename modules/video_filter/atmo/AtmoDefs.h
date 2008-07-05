@@ -72,7 +72,7 @@ typedef struct
 
 
 
-// maximal Anzahl Kan‰le...
+// maximal Anzahl Kan√§le...
 #define ATMO_NUM_CHANNELS   5
 
 // capture width/height

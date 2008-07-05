@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
- *          Felix Paul KŸhne <fkuehne -at- videolan.org>
+ *          Felix Paul KÃ¼hne <fkuehne -at- videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

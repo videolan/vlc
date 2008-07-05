@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
- *          Felix Paul KŸhne <fkuehne -at- videolan.org>
+ *          Felix Paul KÃ¼hne <fkuehne -at- videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -205,7 +205,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
-    /* delegate to update button states (we're the frameLoadDelegate for our help's webview)« */
+    /* delegate to update button states (we're the frameLoadDelegate for our help's webview)Â« */
     [o_help_fwd_btn setEnabled: [o_help_web_view canGoForward]]; 
     [o_help_bwd_btn setEnabled: [o_help_web_view canGoBack]];
 }

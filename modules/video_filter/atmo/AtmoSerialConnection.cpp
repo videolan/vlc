@@ -72,7 +72,7 @@ ATMO_BOOL CAtmoSerialConnection::OpenConnection() {
 	    return ATMO_FALSE;
      }
      /* change serial settings (Speed, stopbits etc.) */
-     DCB dcb; // für comport-parameter
+     DCB dcb; // fÃ¼r comport-parameter
      dcb.DCBlength = sizeof(DCB);
      GetCommState (m_hComport, &dcb); // ger current serialport settings
      dcb.BaudRate  = 38400;        // set speed

@@ -4,7 +4,7 @@
 * Copyright (C) 2000-2006 the VideoLAN team
 * $Id$
 *
-* Authors: AndrÈ Weber (WeberAndre@gmx.de)
+* Authors: Andr√© Weber (WeberAndre@gmx.de)
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -1867,7 +1867,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
                controller */
             p_sys->b_pause_live = true;
 
-            // ggf. alten Thread abr‰umen should not happen....
+            // ggf. alten Thread abr√§umen should not happen....
             CheckAndStopFadeThread(p_filter);
 
             // perpare spawn fadeing thread

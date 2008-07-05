@@ -574,7 +574,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
 
        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
-       // assume in a×y case that dirty was set to true
+       // assume in aÃ—y case that dirty was set to true
        // because lazy programmes will use the same callback for
        // this, like the one behind the refresh push button?
        p_module_config->b_dirty = false;

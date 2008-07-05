@@ -142,7 +142,7 @@ char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName
            if( valueType == REG_SZ )
            {
                // free
-               tempValue = ( char * )malloc( size1+1 ); // +1 für NullByte`?
+               tempValue = ( char * )malloc( size1+1 ); // +1 fÃ¼r NullByte`?
                if( RegQueryValueEx(  keyHandle, valueName, NULL, &valueType, (LPBYTE)tempValue, &size1 ) == ERROR_SUCCESS )
                {
                   default_value = tempValue;
@@ -153,8 +153,8 @@ char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName
     }
     if( tempValue == NULL )
     {
-        // wenn tempValue nicht aus registry gelesen wurde dafür sorgen das ein neuer String mit der Kopie von DefaultValue
-        // geliefert wird - das macht das Handling des Rückgabewertes der Funktion einfacher - immer schön mit free freigeben!
+        // wenn tempValue nicht aus registry gelesen wurde dafÃ¼r sorgen das ein neuer String mit der Kopie von DefaultValue
+        // geliefert wird - das macht das Handling des RÃ¼ckgabewertes der Funktion einfacher - immer schÃ¶n mit free freigeben!
         default_value = strdup( default_value );
     }
 
