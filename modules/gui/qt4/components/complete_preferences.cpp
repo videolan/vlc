@@ -362,10 +362,10 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( data->i_type == TYPE_CATEGORY )
         return;
     else if( data->i_type == TYPE_MODULE )
-        p_module = module_Find( VLC_OBJECT(p_intf), data->psz_name );
+        p_module = module_Find( p_intf, data->psz_name );
     else
     {
-        p_module = module_Find( VLC_OBJECT(p_intf), "main" );
+        p_module = module_GetMainModule( p_intf );
         assert( p_module );
     }
 
