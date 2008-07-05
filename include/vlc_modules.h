@@ -24,6 +24,7 @@
 /*****************************************************************************
  * Exported functions.
  *****************************************************************************/
+
 #define module_Need(a,b,c,d) __module_Need(VLC_OBJECT(a),b,c,d)
 VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, const char *, const char *, bool ) );
 #define module_Unneed(a,b) __module_Unneed(VLC_OBJECT(a),b)
@@ -37,7 +38,6 @@ VLC_EXPORT( void, module_Put, ( module_t *module ) );
 
 VLC_EXPORT( module_config_t *, module_GetConfig, ( const module_t *, unsigned * ) );
 VLC_EXPORT( void, module_PutConfig, ( module_config_t * ) );
-
 
 /* Return a NULL terminated array with the names of the modules that have a
  * certain capability.
@@ -53,3 +53,33 @@ VLC_EXPORT( const char *, module_GetObjName, ( const module_t *m ) );
 VLC_EXPORT( const char *, module_GetName, ( const module_t *m, bool long_name ) );
 #define module_GetLongName( m ) module_GetName( m, true )
 VLC_EXPORT( const char *, module_GetHelp, ( const module_t *m ) );
+
+
+#define module_GetMainModule(a) __module_GetMainModule(VLC_OBJECT(a))
+static inline module_t * __module_GetMainModule( vlc_object_t * p_this )
+{
+    module_t * p_module;
+    module_t * p_main_module = NULL;
+    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE,
+                                        FIND_ANYWHERE );
+    if( !p_list ) return NULL;
+
+    /* Find the main module */
+    for( int i = 0; i < p_list->i_count; i++ )
+    {
+        p_module = (module_t *)p_list->p_values[i].p_object;
+        if( strcmp( module_GetObjName( p_module ), "main" ) == 0 )
+        {
+            p_main_module = p_module;
+            vlc_object_yield( (vlc_object_t*)p_main_module );
+            break;
+        }
+    }
+    vlc_list_release( p_list );
+    return p_main_module;
+}
+
+static inline bool module_IsMainModule( module_t * p_module )
+{
+    return !strcmp( module_GetObjName( p_module ), "main" );
+}
