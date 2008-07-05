@@ -1305,7 +1305,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             if( p_playlist->status.p_item == NULL )
             {
                 vlc_object_release( p_input );
-                vlc_object_release( p_playlist );
+                pl_Release( p_intf );
                 goto end;
             }
             if( input_item_GetNowPlaying ( p_playlist->status.p_item->p_input ) )
@@ -1378,7 +1378,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_embedded_window playStatusUpdated: p_intf->p_sys->i_play_status];
         [self setSubmenusEnabled: FALSE];
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 
 end:
     [self updateMessageArray];
