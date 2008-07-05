@@ -970,11 +970,11 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Free video outputs */
     msg_Dbg( p_libvlc, "removing all video outputs" );
-    while( (p_vout = vlc_object_find( p_libvlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
+    vlc_list_t *list = vlc_list_find (p_libvlc, VLC_OBJECT_VOUT, FIND_CHILD);
+    for (unsigned i = 0; i < list->i_count; i++)
     {
-        vlc_object_detach( p_vout );
-        vlc_object_release( p_vout );
-        vlc_object_release( p_vout );
+        vlc_object_release (list->p_values[i].p_object);
+        vlc_object_release (list->p_values[i].p_object);
     }
 
     stats_TimersDumpAll( p_libvlc );
