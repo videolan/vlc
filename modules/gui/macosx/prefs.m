@@ -452,8 +452,8 @@ static VLCTreeItem *o_root_item = nil;
                     children:IsALeafNode
                     whithCategory: -1]];
                 }
+            vlc_list_release( p_list );
         }
-        vlc_list_release( p_list );
     }
     return o_children;
 }
