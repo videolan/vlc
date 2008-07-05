@@ -345,7 +345,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
     DECMALLOC_NULL( p_input, input_item_t );
 
     input_ItemInit( p_obj, p_input );
-    vlc_gc_init( p_input, input_ItemDestroy, (void *)p_obj );
+    vlc_gc_init( p_input, input_ItemDestroy, (void *)p_obj->p_libvlc );
 
     vlc_object_lock( p_obj->p_libvlc );
     p_input->i_id = ++priv->i_last_input_id;
