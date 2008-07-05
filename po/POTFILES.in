@@ -57,7 +57,6 @@ include/vlc_rand.h
 include/vlc_services_discovery.h
 include/vlc_sout.h
 include/vlc_stream.h
-include/vlc_streaming.h
 include/vlc_strings.h
 include/vlc_threads.h
 include/vlc_tls.h
@@ -68,6 +67,7 @@ include/vlc/vlc.h
 include/vlc_vlm.h
 include/vlc_vod.h
 include/vlc_vout.h
+include/vlc_window.h
 include/vlc_xml.h
 src/audio_output/aout_internal.h
 src/audio_output/common.c
@@ -192,7 +192,6 @@ src/playlist/sort.c
 src/playlist/thread.c
 src/playlist/tree.c
 src/stream_output/announce.c
-src/stream_output/profiles.c
 src/stream_output/sap.c
 src/stream_output/sdp.c
 src/stream_output/stream_output.c
@@ -344,6 +343,7 @@ modules/audio_filter/resampler/bandlimited.h
 modules/audio_filter/resampler/linear.c
 modules/audio_filter/resampler/trivial.c
 modules/audio_filter/resampler/ugly.c
+modules/audio_filter/scaletempo.c
 modules/audio_filter/spatializer/allpass.cpp
 modules/audio_filter/spatializer/allpass.hpp
 modules/audio_filter/spatializer/comb.cpp
@@ -422,6 +422,7 @@ modules/codec/quicktime.c
 modules/codec/rawvideo.c
 modules/codec/realaudio.c
 modules/codec/realvideo.c
+modules/codec/schroedinger.c
 modules/codec/sdl_image.c
 modules/codec/speex.c
 modules/codec/spudec/parse.c
@@ -619,8 +620,6 @@ modules/gui/macosx/prefs.h
 modules/gui/macosx/prefs.m
 modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
-modules/gui/macosx/sfilters.h
-modules/gui/macosx/sfilters.m
 modules/gui/macosx/simple_prefs.h
 modules/gui/macosx/simple_prefs.m
 modules/gui/macosx/update.h
@@ -1058,7 +1057,6 @@ modules/misc/playlist/old.c
 modules/misc/playlist/xspf.c
 modules/misc/playlist/xspf.h
 modules/misc/probe/hal.c
-modules/misc/profile_parser.c
 modules/misc/qte_main.cpp
 modules/misc/quartztext.c
 modules/misc/rtsp.c
@@ -1173,6 +1171,7 @@ modules/video_filter/atmo/AtmoZoneDefinition.h
 modules/video_filter/blendbench.c
 modules/video_filter/blend.c
 modules/video_filter/bluescreen.c
+modules/video_filter/canvas.c
 modules/video_filter/chain.c
 modules/video_filter/clone.c
 modules/video_filter/colorthres.c
