@@ -135,7 +135,7 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Read: read on a file descriptor, checking b_die periodically
+ * Read: read on a file descriptor
  *****************************************************************************/
 static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
