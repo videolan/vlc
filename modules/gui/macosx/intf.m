@@ -778,9 +778,9 @@ static VLCMain *_o_sharedMainInstance = nil;
         forMode: NSDefaultRunLoopMode];
 
     /* FIXME: don't poll */
-    [NSTimer scheduledTimerWithTimeInterval: 0.5
+    interfaceTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.5
                                      target: self selector: @selector(manageIntf:)
-                                   userInfo: nil repeats: FALSE];
+                                   userInfo: nil repeats: FALSE] retain];
 
     /* Note: we use the pthread API to support pre-10.5 */
     pthread_create( &manage_thread, NULL, ManageThread, self );
@@ -1443,9 +1443,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( ((i_end_scroll != -1) && (mdate() > i_end_scroll)) || !p_input )
         [self resetScrollField];
 
-    [NSTimer scheduledTimerWithTimeInterval: 0.3
+    [interfaceTimer autorelease];
+
+    interfaceTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.3
         target: self selector: @selector(manageIntf:)
-        userInfo: nil repeats: FALSE];
+        userInfo: nil repeats: FALSE] retain];
 }
 
 - (void)setupMenus
@@ -1764,6 +1766,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* Make sure our manage_thread ends */
     pthread_join( manage_thread, NULL );
+
+    /* Make sure the interfaceTimer is destroyed */
+    [interfaceTimer invalidate];
+    [interfaceTimer release];
+    interfaceTimer = nil;
 
     /* make sure that the current volume is saved */
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
