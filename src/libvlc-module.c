@@ -1429,6 +1429,7 @@ vlc_module_begin();
     add_category_hint( N_("Audio"), AOUT_CAT_LONGTEXT , false );
 
     add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, false );
+        change_safe();
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
                             VOLUME_LONGTEXT, false );
@@ -1447,6 +1448,7 @@ vlc_module_begin();
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, 0 );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true );
+        change_safe();
 
     /* FIXME TODO create a subcat replay gain ? */
     add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], NULL, AUDIO_REPLAY_GAIN_MODE_TEXT,
@@ -1477,11 +1479,13 @@ vlc_module_begin();
     add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , false );
 
     add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, true );
+        change_safe();
     add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT,
               GRAYSCALE_LONGTEXT, true );
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
               FULLSCREEN_LONGTEXT, false );
         change_short('f');
+        change_safe();
     add_bool( "embedded-video", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
               true );
 #ifdef __APPLE__
@@ -1533,14 +1537,20 @@ vlc_module_begin();
 
     set_section( N_("Window properties" ), NULL );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true );
+        change_safe();
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
+        change_safe();
     add_integer( "video-x", -1, NULL, VIDEOX_TEXT, VIDEOX_LONGTEXT, true );
+        change_safe();
     add_integer( "video-y", -1, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, true );
+        change_safe();
     add_string( "crop", NULL, NULL, CROP_TEXT, CROP_LONGTEXT, false );
+        change_safe();
     add_string( "custom-crop-ratios", NULL, NULL, CUSTOM_CROP_RATIOS_TEXT,
                 CUSTOM_CROP_RATIOS_LONGTEXT, false );
     add_string( "aspect-ratio", NULL, NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, false );
+        change_safe();
     add_string( "monitor-par", NULL, NULL,
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, true );
     add_string( "custom-aspect-ratios", NULL, NULL, CUSTOM_ASPECT_RATIOS_TEXT,
@@ -1577,6 +1587,7 @@ vlc_module_begin();
     add_category_hint( N_("Subpictures"), SUB_CAT_LONGTEXT , false );
 
     add_bool( "spu", 1, NULL, SPU_TEXT, SPU_LONGTEXT, true );
+        change_safe();
     add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, false );
     add_module( "text-renderer", "text renderer", NULL, NULL, TEXTRENDERER_TEXT,
                 TEXTRENDERER_LONGTEXT, true );
@@ -1609,34 +1620,46 @@ vlc_module_begin();
     set_section( N_( "Track settings" ), NULL );
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, true );
+        change_safe();
     add_string( "programs", "", NULL,
                 INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, true );
+        change_safe();
     add_integer( "audio-track", -1, NULL,
                  INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, true );
-       add_deprecated_alias( "audio-channel" ); /*deprecated since 0.8.2 */
+        change_safe();
+        add_deprecated_alias( "audio-channel" ); /*deprecated since 0.8.2 */
     add_integer( "sub-track", -1, NULL,
                  INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, true );
-       add_deprecated_alias("spu-channel" ); /*deprecated since 0.8.2*/
+        change_safe();
+        add_deprecated_alias("spu-channel" ); /*deprecated since 0.8.2*/
     add_string( "audio-language", "", NULL,
                  INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT,
                   false );
+        change_safe();
     add_string( "sub-language", "", NULL,
                  INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT,
                   false );
+        change_safe();
     add_integer( "audio-track-id", -1, NULL, INPUT_AUDIOTRACK_ID_TEXT,
                  INPUT_AUDIOTRACK_ID_LONGTEXT, true );
+        change_safe();
     add_integer( "sub-track-id", -1, NULL,
                  INPUT_SUBTRACK_ID_TEXT, INPUT_SUBTRACK_ID_LONGTEXT, true );
+        change_safe();
 
     set_section( N_( "Playback control" ) , NULL);
     add_integer( "input-repeat", 0, NULL,
                  INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, false );
+        change_safe();
     add_integer( "start-time", 0, NULL,
                  START_TIME_TEXT, START_TIME_LONGTEXT, true );
+        change_safe();
     add_integer( "stop-time", 0, NULL,
                  STOP_TIME_TEXT, STOP_TIME_LONGTEXT, true );
+        change_safe();
     add_integer( "run-time", 0, NULL,
                  RUN_TIME_TEXT, RUN_TIME_LONGTEXT, true );
+        change_safe();
     add_string( "input-list", NULL, NULL,
                  INPUT_LIST_TEXT, INPUT_LIST_LONGTEXT, true );
     add_string( "input-slave", NULL, NULL,
