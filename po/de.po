@@ -17148,7 +17148,7 @@ msgstr ""
 "<p>Das <i>VideoLAN Team</i> mag es nicht, wenn ein Programm ohne "
 "Authorisierung online geht.</p>\n"
 " <p><i>VLC media player</i> kann beschränkte Informationen im Internet "
-"anfordern, besonders um CD Cover zu bekommen oder um festzustellen, ob 
+"anfordern, besonders um CD Cover zu bekommen oder um festzustellen, ob "
 "Updates verfügbar sind.</p>\n"
 "<p><i>VLC media player</i> sendet oder sammelt <b>KEINE</b> Informationen "
 "über Ihre Benutzung, auch nicht annonym.</p>\n"
