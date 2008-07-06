@@ -187,10 +187,12 @@ static void PreparseDestructor( vlc_object_t * p_this )
 {
     playlist_preparse_t * p_preparse = (playlist_preparse_t *)p_this;
     free( p_preparse->pp_waiting );
+    msg_Dbg( p_this, "Destroyed" );
 }
 
 static void FetcherDestructor( vlc_object_t * p_this )
 {
     playlist_fetcher_t * p_fetcher = (playlist_fetcher_t *)p_this;
     free( p_fetcher->pp_waiting );
+    msg_Dbg( p_this, "Destroyed" );
 }

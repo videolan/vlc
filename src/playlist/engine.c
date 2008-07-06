@@ -173,6 +173,8 @@ static void playlist_Destructor( vlc_object_t * p_this )
 
     if( p_playlist->p_fetcher )
         vlc_object_release( p_playlist->p_fetcher );
+
+    msg_Dbg( p_this, "Destroyed" );
 }
 
 /* Destroy remaining objects */
