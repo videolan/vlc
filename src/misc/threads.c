@@ -640,13 +640,16 @@ static void *thread_entry (void *data)
 {
     vlc_object_t *obj = ((struct vlc_thread_boot *)data)->object;
     void *(*func) (vlc_object_t *) = ((struct vlc_thread_boot *)data)->entry;
+    int canc;
 
     free (data);
 #ifndef NDEBUG
     vlc_threadvar_set (&thread_object_key, obj);
 #endif
     msg_Dbg (obj, "thread started");
+    canc = vlc_savecancel ();
     func (obj);
+    vlc_restorecancel (canc);
     msg_Dbg (obj, "thread ended");
 
     return NULL;
