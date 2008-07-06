@@ -373,9 +373,23 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
                         PLI_NAME( p_playlist->request.p_item ),
                         PLI_NAME( p_playlist->request.p_node ), i_skip );
 
+        /* Make sure the node wasn't deleted */
+        if( p_playlist->status.p_node &&
+            p_playlist->status.p_node->i_flags & PLAYLIST_REMOVE_FLAG )
+        {
+             PL_DEBUG( "%s was marked for deletion, deleting",
+                             PLI_NAME( p_playlist->status.p_node  ) );
+             playlist_ItemDelete( p_playlist->status.p_node );
+             /* Don't attempt to reuse that node */
+             if( p_playlist->status.p_node == p_playlist->request.p_node )
+                p_playlist->request.p_node = NULL;
+             p_playlist->status.p_node = NULL;
+        }
+
         if( p_playlist->request.p_node &&
             p_playlist->request.p_node != p_playlist->status.p_node )
         {
+
             p_playlist->status.p_node = p_playlist->request.p_node;
             p_playlist->b_reset_currently_playing = true;
         }

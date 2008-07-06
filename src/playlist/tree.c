@@ -171,7 +171,24 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         if( p_root->p_parent )
             playlist_NodeRemoveItem( p_playlist, p_root, p_root->p_parent );
 
-        playlist_ItemDelete( p_root );
+        /* Check if it is the current node */
+        if( p_playlist->status.p_node == p_root )
+        {
+            /* Hack we don't call playlist_Control for lock reasons */
+            p_playlist->request.i_status = PLAYLIST_STOPPED;
+            p_playlist->request.b_request = true;
+            p_playlist->request.p_item = NULL;
+            p_playlist->request.p_node = NULL;
+            msg_Info( p_playlist, "stopping playback" );
+            vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
+
+            PL_DEBUG( "marking %s for further deletion", PLI_NAME( p_root ) );
+            p_root->i_flags |= PLAYLIST_REMOVE_FLAG;
+        }
+        else
+            playlist_ItemDelete( p_root );
+
+
     }
     return VLC_SUCCESS;
 }
