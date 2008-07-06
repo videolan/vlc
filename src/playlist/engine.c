@@ -601,6 +601,13 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         msleep( (i_activity+1) * 1000 );
         vlc_object_lock( p_obj );
     }
+
+    for( int i = 0; i < p_obj->i_waiting; i++ )
+    {
+        vlc_gc_decref( p_obj->pp_waiting[i] );
+        REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
+    }
+
     vlc_object_unlock( p_obj );
 }
 
@@ -682,6 +689,13 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
         msleep( (i_activity+1) * 1000 );
         vlc_object_lock( p_obj );
     }
+
+    for( int i = 0; i < p_obj->i_waiting; i++ )
+    {
+        vlc_gc_decref( p_obj->pp_waiting[i] );
+        REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
+    }
+
     vlc_object_unlock( p_obj );
 }
 
