@@ -1603,7 +1603,7 @@ static void update_DownloadReal( update_download_thread_t *p_udt )
         intf_UserFatal( p_udt, true, _("Invalid signature"),
             _("The cryptographic signature for the downloaded file \"%s\" was "
               "invalid and could not be used to securely verify it. Thus, the "
-              "file was deleted."),,
+              "file was deleted."),
             psz_destfile );
         goto end;
     }
