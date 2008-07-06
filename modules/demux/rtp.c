@@ -227,6 +227,7 @@ static int Open (vlc_object_t *obj)
 
     p_sys->srtp         = NULL;
     p_sys->fd           = fd;
+    p_sys->rtcp_fd      = rtcp_fd;
     p_sys->caching      = var_CreateGetInteger (obj, "rtp-caching");
     p_sys->max_src      = var_CreateGetInteger (obj, "rtp-max-src");
     p_sys->timeout      = var_CreateGetInteger (obj, "rtp-timeout");
