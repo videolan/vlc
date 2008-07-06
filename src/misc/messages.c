@@ -333,6 +333,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 
     if( psz_str == NULL )
     {
+        int canc = vlc_savecancel (); /* Do not print half of a message... */
 #ifdef __GLIBC__
         fprintf( stderr, "main warning: can't store message (%m): " );
 #else
@@ -352,6 +353,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         vfprintf( stderr, psz_format, args );
         va_end( args );
         fputs( "\n", stderr );
+        vlc_restorecancel (canc);
         return;
     }
 
@@ -547,6 +549,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 
     psz_object = p_item->psz_object_type;
 
+    int canc = vlc_savecancel ();
 #ifdef UNDER_CE
 #   define CE_WRITE(str) WriteFile( QUEUE.logfile, \
                                     str, strlen(str), &i_dummy, NULL );
@@ -599,6 +602,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #   if defined(WIN32)
     fflush( stderr );
 #   endif
+    vlc_restorecancel (canc);
 #endif
 }
 
