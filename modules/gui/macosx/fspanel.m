@@ -50,8 +50,8 @@
     [win setLevel:NSModalPanelWindowLevel];
     i_device = 0;
     [win center];
+    hideAgainTimer = fadeTimer = nil;
     [self setNonActive:nil];
-
     return win;
 }
 
@@ -94,7 +94,7 @@
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
+
     if( hideAgainTimer )
     {
         [hideAgainTimer invalidate];
@@ -249,7 +249,7 @@
     /* in case that the user don't want us to appear, just return here */
     if(! config_GetInt( VLCIntf, "macosx-fspanel" ) || b_nonActive )
         return;
-    
+
     [self orderFront: nil];
     
     if( [self alphaValue] < 1.0 || b_displayed != YES )
@@ -285,14 +285,18 @@
     /* get us a valid timer */
     if(! b_alreadyCounting )
     {
-        i_timeToKeepVisibleInSec = config_GetInt( VLCIntf, "mouse-hide-timeout" ) / 500;
-        hideAgainTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5
+        i_timeToKeepVisibleInSec = var_CreateGetInteger( VLCIntf, "mouse-hide-timeout" ) / 500;
+        if( hideAgainTimer )
+        {
+            [hideAgainTimer invalidate];
+            [hideAgainTimer autorelease];
+        }
+        /* released in -autoHide and -dealloc */
+        hideAgainTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.5
                                                           target: self 
                                                         selector: @selector(keepVisible:)
                                                         userInfo: nil 
-                                                         repeats: YES];
-        [hideAgainTimer fire];
-        [hideAgainTimer retain];
+                                                         repeats: YES] retain];
         b_alreadyCounting = YES;
     }
 }
@@ -304,15 +308,12 @@
         b_keptVisible = NO;
 
     /* count down until we hide ourselfes again and do so if necessary */
-    i_timeToKeepVisibleInSec -= 1;
-    if( i_timeToKeepVisibleInSec < 1 )
+    if( --i_timeToKeepVisibleInSec < 1 )
     {
         [NSCursor setHiddenUntilMouseMoves: YES];
         [self fadeOut];
-        [timer invalidate];
-        [timer release];
+        [hideAgainTimer invalidate]; /* released in -autoHide and -dealloc */
         b_alreadyCounting = NO;
-        timer = NULL;
     }
 }
 
@@ -326,7 +327,7 @@
 {
     [timer retain];
     [fadeTimer invalidate];
-    [fadeTimer release];
+    [fadeTimer autorelease];
     fadeTimer=timer;
 }
 
