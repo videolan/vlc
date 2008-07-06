@@ -177,6 +177,7 @@ VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 
 VLC_EXPORT( int, vlc_clone, (vlc_thread_t *, void * (*) (void *), void *, int) );
+VLC_EXPORT( void, vlc_cancel, (vlc_thread_t) );
 VLC_EXPORT( int, vlc_join, (vlc_thread_t, void **) );
 
 #define vlc_thread_ready vlc_object_signal

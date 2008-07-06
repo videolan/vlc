@@ -560,6 +560,20 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
 }
 
 /**
+ * Marks a thread as cancelled. Next time the target thread reaches a
+ * cancellation point (while not having disabled cancellation), it will
+ * run its cancellation cleanup handler, the thread variable destructors, and
+ * terminate. vlc_join() must be used afterward regardless of a thread being
+ * cancelled or not.
+ */
+void vlc_cancel (vlc_thread_t thread_id)
+{
+#if defined (LIBVLC_USE_PTHREAD)
+    pthread_cancel (thread_id);
+#endif
+}
+
+/**
  * Waits for a thread to complete (if needed), and destroys it.
  * @param handle thread handle
  * @param p_result [OUT] pointer to write the thread return value or NULL
@@ -814,3 +828,4 @@ error:
 
     p_priv->b_thread = false;
 }
+
