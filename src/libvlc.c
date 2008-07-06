@@ -1317,6 +1317,34 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
  *****************************************************************************
  * Print a short inline help. Message interface is initialized at this stage.
  *****************************************************************************/
+#   define COL(x)  "\033[" #x ";1m"
+#   define RED     COL(31)
+#   define GREEN   COL(32)
+#   define YELLOW  COL(33)
+#   define BLUE    COL(34)
+#   define MAGENTA COL(35)
+#   define CYAN    COL(36)
+#   define WHITE   COL(0)
+#   define GRAY    "\033[0m"
+static void print_help_section( module_config_t *p_item, bool b_color, bool b_description )
+{
+    if( !p_item ) return;
+    if( b_color )
+    {
+        utf8_fprintf( stdout, RED"   %s:\n"GRAY,
+                      p_item->psz_text );
+        if( b_description && p_item->psz_longtext )
+            utf8_fprintf( stdout, MAGENTA"   %s\n"GRAY,
+                          p_item->psz_longtext );
+    }
+    else
+    {
+        utf8_fprintf( stdout, "   %s:\n", p_item->psz_text );
+        if( b_description && p_item->psz_longtext )
+            utf8_fprintf( stdout, "   %s\n", p_item->psz_longtext );
+    }
+}
+
 static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 {
 #define FORMAT_STRING "  %s --%s%s%s%s%s%s%s "
@@ -1332,15 +1360,6 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
      * The purpose of having bra and ket is that we might i18n them as well.
      */
 
-#   define COL(x)  "\033[" #x ";1m"
-#   define RED     COL(31)
-#   define GREEN   COL(32)
-#   define YELLOW  COL(33)
-#   define BLUE    COL(34)
-#   define MAGENTA COL(35)
-#   define CYAN    COL(36)
-#   define WHITE   COL(0)
-#   define GRAY    "\033[0m"
 #define COLOR_FORMAT_STRING (WHITE"  %s --%s"YELLOW"%s%s%s%s%s%s "GRAY)
 #define COLOR_FORMAT_STRING_BOOL (WHITE"  %s --%s%s%s%s%s%s%s "GRAY)
 
@@ -1401,6 +1420,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         bool b_help_module;
         module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object;
         module_config_t *p_item = NULL;
+        module_config_t *p_section = NULL;
         module_config_t *p_end = p_parser->p_config + p_parser->confsize;
 
         if( psz_module_name && strcmp( psz_module_name,
@@ -1505,22 +1525,9 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 
             case CONFIG_HINT_SUBCATEGORY:
                 if( strcmp( "main", p_parser->psz_object_name ) )
-                break;
+                    break;
             case CONFIG_SECTION:
-                if( b_color )
-                {
-                    utf8_fprintf( stdout, RED"   %s:\n"GRAY,
-                                  p_item->psz_text );
-                    if( b_description && p_item->psz_longtext )
-                        utf8_fprintf( stdout, MAGENTA"   %s\n"GRAY,
-                                      p_item->psz_longtext );
-                }
-                else
-                {
-                    utf8_fprintf( stdout, "   %s:\n", p_item->psz_text );
-                    if( b_description && p_item->psz_longtext )
-                        utf8_fprintf( stdout, "   %s\n", p_item->psz_longtext );
-                }
+                p_section = p_item;
                 break;
 
             case CONFIG_ITEM_STRING:
@@ -1532,6 +1539,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             case CONFIG_ITEM_MODULE_LIST_CAT:
             case CONFIG_ITEM_FONT:
             case CONFIG_ITEM_PASSWORD:
+                print_help_section( p_section, b_color, b_description );
+                p_section = NULL;
                 psz_bra = OPTION_VALUE_SEP "<";
                 psz_type = _("string");
                 psz_ket = ">";
@@ -1551,6 +1560,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 break;
             case CONFIG_ITEM_INTEGER:
             case CONFIG_ITEM_KEY: /* FIXME: do something a bit more clever */
+                print_help_section( p_section, b_color, b_description );
+                p_section = NULL;
                 psz_bra = OPTION_VALUE_SEP "<";
                 psz_type = _("integer");
                 psz_ket = ">";
@@ -1578,6 +1589,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 }
                 break;
             case CONFIG_ITEM_FLOAT:
+                print_help_section( p_section, b_color, b_description );
+                p_section = NULL;
                 psz_bra = OPTION_VALUE_SEP "<";
                 psz_type = _("float");
                 psz_ket = ">";
@@ -1589,6 +1602,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 }
                 break;
             case CONFIG_ITEM_BOOL:
+                print_help_section( p_section, b_color, b_description );
+                p_section = NULL;
                 psz_bra = ""; psz_type = ""; psz_ket = "";
                 if( !b_help_module )
                 {
