@@ -85,7 +85,7 @@ static unsigned int GetF80BE( const uint8_t p[10] )
     int          i_exp = 30 - p[1];
     unsigned int i_last = 0;
 
-    while( i_exp-- )
+    while( i_exp-- > 0 )
     {
         i_last = i_mantissa;
         i_mantissa >>= 1;
