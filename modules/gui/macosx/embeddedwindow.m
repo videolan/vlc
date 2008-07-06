@@ -69,11 +69,6 @@
     /* Not fullscreen when we wake up */
     [o_btn_fullscreen setState: NO];
     b_fullscreen = NO;
-    /* Use a recursive lock to be able to trigger enter/leavefullscreen
-     * in middle of an animation, providing that the enter/leave functions
-     * are called from the same thread */
-    o_animation_lock = [[NSRecursiveLock alloc] init];
-    b_animation_lock_alreadylocked = NO;
 }
 
 - (void)controlTintChanged
@@ -272,7 +267,6 @@
     {
         /* We were already fullscreen nothing to do when NSAnimation
          * is not supported */
-        b_animation_lock_alreadylocked = NO;
         [self unlockFullscreenAnimation];
         return;
     }
@@ -282,7 +276,6 @@
     {
         /* Make sure we are hidden */
         [super orderOut: self];
-        b_animation_lock_alreadylocked = NO;
         [self unlockFullscreenAnimation];
         return;
     }
@@ -298,13 +291,6 @@
         [o_fullscreen_anim2 release];
     }
  
-     /* This is a recursive lock. If we are already in the middle of an animation we
-     * unlock it. We don't add an extra locking here, because enter/leavefullscreen
-     * are executed always in the same thread */
-    if (b_animation_lock_alreadylocked)
-        [self unlockFullscreenAnimation];
-    b_animation_lock_alreadylocked = YES;
-
     if ([screen isMainScreen])
         SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
 
@@ -380,7 +366,6 @@
     /* Don't do anything if o_fullscreen_window is already closed */
     if (!o_fullscreen_window)
     {
-        b_animation_lock_alreadylocked = NO;
         [self unlockFullscreenAnimation];
         return;
     }
@@ -422,13 +407,6 @@
         [o_fullscreen_anim2 stopAnimation];
         [o_fullscreen_anim2 release];
     }
-
-    /* This is a recursive lock. If we are already in the middle of an animation we
-     * unlock it. We don't add an extra locking here, because enter/leavefullscreen
-     * are executed always in the same thread */
-    if (b_animation_lock_alreadylocked)
-        [self unlockFullscreenAnimation];
-    b_animation_lock_alreadylocked = YES;
 
     frame = [[o_temp_view superview] convertRect: [o_temp_view frame] toView: nil]; /* Convert to Window base coord */
     frame.origin.x += [self frame].origin.x;
@@ -486,7 +464,6 @@
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
-    b_animation_lock_alreadylocked = NO;
     [self unlockFullscreenAnimation];
 }
 
