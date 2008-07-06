@@ -516,7 +516,6 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
     }
 
     CONFIG_GENERIC( "album-art", IntegerList ); line++;
-    CONFIG_GENERIC_NOBOOL( "fetch-meta", Bool ); line++;
 #ifdef UPDATE_CHECK
     CONFIG_GENERIC_NOBOOL( "qt-updates-notif", Bool ); line++;
     CONFIG_GENERIC_NOBOOL( "qt-updates-days", Integer ); line++;

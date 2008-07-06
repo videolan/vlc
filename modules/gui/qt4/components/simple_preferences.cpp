@@ -484,7 +484,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel,
                                                       artFetcher );
-            CONFIG_GENERIC( "fetch-meta", Bool, NULL, metaFetcher );
 
             /* UPDATE options */
 #ifdef UPDATE_CHECK
