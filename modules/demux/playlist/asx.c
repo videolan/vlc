@@ -247,7 +247,7 @@ static int Demux( demux_t *p_demux )
         for( ;; )
         {
             int i_read = stream_Read( p_demux->s, &p_sys->psz_data[i_pos], p_sys->i_data_len - i_pos );
-            p_sys->psz_data[i_read] = '\0';
+            p_sys->psz_data[i_pos + i_read] = '\0';
 
             if( i_read < p_sys->i_data_len - i_pos ) break; /* Done */
 
