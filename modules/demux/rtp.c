@@ -176,7 +176,7 @@ static int Open (vlc_object_t *obj)
         dport = 5004; /* avt-profile-1 port */
 
     /* Try to connect */
-    int fd = -1;
+    int fd = -1, rtcp_fd = -1;
 
     switch (tp)
     {
@@ -184,6 +184,10 @@ static int Open (vlc_object_t *obj)
         case IPPROTO_UDPLITE:
             fd = net_OpenDgram (obj, dhost, (dport + 1) & ~1,
                                 shost, (sport + 1) & ~1, AF_UNSPEC, tp);
+            if (fd == -1)
+                break;
+            rtcp_fd = net_OpenDgram (obj, dhost, dport | 1, shost,
+                                     sport ? (sport | 1) : 0, AF_UNSPEC, tp);
             break;
 
          case IPPROTO_DCCP:
@@ -194,7 +198,7 @@ static int Open (vlc_object_t *obj)
 #endif
 #ifdef SOCK_DCCP
             var_Create (obj, "dccp-service", VLC_VAR_STRING);
-            var_SetString (obj, "dccp-service", "RTPV");
+            var_SetString (obj, "dccp-service", "RTPV"); /* FIXME: RTPA? */
             fd = net_Connect (obj, shost, (sport + 1) & ~1, SOCK_DCCP, tp);
 #else
             msg_Err (obj, "DCCP support not included");
@@ -216,6 +220,8 @@ static int Open (vlc_object_t *obj)
     if (p_sys == NULL)
     {
         net_Close (fd);
+        if (rtcp_fd != -1)
+            net_Close (rtcp_fd);
         return VLC_EGENERIC;
     }
 
@@ -279,6 +285,8 @@ static void Close (vlc_object_t *obj)
         srtp_destroy (p_sys->srtp);
     if (p_sys->session)
         rtp_session_destroy (demux, p_sys->session);
+    if (p_sys->rtcp_fd != -1)
+        net_Close (p_sys->rtcp_fd);
     net_Close (p_sys->fd);
     free (p_sys);
 }

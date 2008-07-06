@@ -45,6 +45,7 @@ struct demux_sys_t
     rtp_session_t *session;
     struct srtp_session_t *srtp;
     int           fd;
+    int           rtcp_fd;
 
     unsigned      caching;
     unsigned      timeout;
