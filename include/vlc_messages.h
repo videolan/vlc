@@ -108,6 +108,12 @@ VLC_EXPORT( void, __msg_Dbg,    ( vlc_object_t *, const char *, ... ) LIBVLC_FOR
 VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t * ) );
 VLC_EXPORT( void, __msg_Unsubscribe, ( vlc_object_t *, msg_subscription_t * ) );
 
+/* Enable or disable a certain object debug messages */
+#define msg_EnableObjectPrinting(a,b) __msg_EnableObjectPrinting(VLC_OBJECT(a),b)
+#define msg_DisableObjectPrinting(a,b) __msg_DisableObjectPrinting(VLC_OBJECT(a),b)
+VLC_EXPORT( void, __msg_EnableObjectPrinting, ( vlc_object_t *, char * psz_object ) );
+VLC_EXPORT( void, __msg_DisableObjectPrinting, ( vlc_object_t *, char * psz_object ) );
+
 /**
  * @}
  */
