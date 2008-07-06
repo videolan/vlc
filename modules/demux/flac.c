@@ -678,17 +678,17 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
 
     i_type = GetDWBE( p_data ); RM(4);
     i_len = GetDWBE( p_data ); RM(4);
-    if( i_data < i_len + 4 )
+    if( i_len < 0 || i_data < i_len + 4 )
         goto error;
     psz_mime = strndup( p_data, i_len ); RM(i_len);
     i_len = GetDWBE( p_data ); RM(4);
-    if( i_data < i_len + 4*4 + 4)
+    if( i_len < 0 || i_data < i_len + 4*4 + 4)
         goto error;
     psz_description = strndup( p_data, i_len ); RM(i_len);
     EnsureUTF8( psz_description );
     RM(4*4);
     i_len = GetDWBE( p_data ); RM(4);
-    if( i_len > i_data )
+    if( i_len < 0 || i_len > i_data )
         goto error;
 
     msg_Dbg( p_demux, "FLAC: Picture type=%d mime=%s description='%s' file length=%d",
