@@ -297,8 +297,7 @@
         }
         free( psz_artist );
     }
-
-    return( o_value );
+    return o_value;
 }
 
 @end
@@ -1289,11 +1288,11 @@
                         [item pointerValue] checkItemExistence: YES]
                         || [o_playing_item isEqual: item] )
     {
-        [cell setFont: [NSFont boldSystemFontOfSize: 0]];
+        [cell setFont: [[NSFontManager sharedFontManager] convertFont:[cell font] toHaveTrait:NSBoldFontMask]];
     }
     else
     {
-        [cell setFont: [NSFont systemFontOfSize: 0]];
+        [cell setFont: [[NSFontManager sharedFontManager] convertFont:[cell font] toNotHaveTrait:NSBoldFontMask]];
     }
     vlc_object_release( p_playlist );
 }
