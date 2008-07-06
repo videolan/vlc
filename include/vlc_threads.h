@@ -615,6 +615,18 @@ static inline void vlc_restorecancel (int state)
 #endif
 }
 
+/**
+ * Issues an explicit deferred cancellation point.
+ * This has no effect if thread cancellation is disabled.
+ * This can be called when there is a rather slow non-sleeping operation.
+ */
+static inline void vlc_testcancel (void)
+{
+#if defined (LIBVLC_USE_PTHREAD)
+    pthread_testcancel ();
+#endif
+}
+
 /*****************************************************************************
  * vlc_thread_create: create a thread
  *****************************************************************************/
