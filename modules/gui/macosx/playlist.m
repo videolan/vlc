@@ -292,7 +292,7 @@
             }
             else
             {
-                o_value = @"-:--:--";
+                o_value = @"--:--";
             }
         }
         free( psz_artist );
@@ -467,7 +467,7 @@
     if( playlist_CurrentSize( p_playlist ) >= 2 )
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("%i items in the playlist"),
+                    _NS("%i items"),
                 playlist_CurrentSize( p_playlist )]];
     }
     else
@@ -475,7 +475,7 @@
         if( playlist_IsEmpty( p_playlist ) )
             [o_status_field setStringValue: _NS("No items in the playlist")];
         else
-            [o_status_field setStringValue: _NS("1 item in the playlist")];
+            [o_status_field setStringValue: _NS("1 item")];
     }
     vlc_object_release( p_playlist );
 }
@@ -1351,7 +1351,7 @@
     if( playlist_CurrentSize( p_playlist )  >= 2 )
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("%i items in the playlist"),
+                    _NS("%i items"),
              playlist_CurrentSize( p_playlist )]];
     }
     else
@@ -1362,16 +1362,13 @@
         }
         else
         {
-            [o_status_field setStringValue: _NS("1 item in the playlist")];
+            [o_status_field setStringValue: _NS("1 item")];
         }
     }
     vlc_object_release( p_playlist );
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",
                                                     [o_value pointerValue]]];
-#ifndef NDEBUG
-    msg_Dbg( VLCIntf, "adding item %p", [o_value pointerValue] );
-#endif
     return o_value;
 
 }
