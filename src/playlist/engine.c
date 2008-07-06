@@ -487,6 +487,14 @@ void playlist_LastLoop( playlist_t *p_playlist )
          playlist_ItemDelete( p_playlist->status.p_node );
          p_playlist->status.p_node = NULL;
     }
+    if( p_playlist->status.p_item &&
+        p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
+    {
+         PL_DEBUG( "%s was marked for deletion, deleting",
+                         PLI_NAME( p_playlist->status.p_item  ) );
+         playlist_ItemDelete( p_playlist->status.p_item );
+         p_playlist->status.p_item = NULL;
+    }
 
     /* Core should have terminated all SDs before the playlist */
     /* TODO: It fails to do so when not playing anything -- Courmisch */
