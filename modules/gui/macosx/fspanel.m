@@ -96,7 +96,10 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     if( hideAgainTimer )
+    {
+        [hideAgainTimer invalidate];
         [hideAgainTimer release];
+    }
     [self setFadeTimer:nil];
     [super dealloc];
 }
