@@ -78,6 +78,9 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
     playlist_item_t *p_item, *p_node;
     vlc_value_t val;
 
+    if( !vlc_object_alive( p_playlist ) )
+        return VLC_EGENERIC;
+
     if( playlist_IsEmpty( p_playlist ) )
         return VLC_EGENERIC;
 
