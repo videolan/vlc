@@ -79,7 +79,7 @@ static void Close (vlc_object_t *);
  * Module descriptor
  */
 vlc_module_begin ();
-    set_shortname ( "RTP" );
+    set_shortname (_("RTP"));
     set_description (_("(Experimental) Real-Time Protocol demuxer"));
     set_category (CAT_INPUT);
     set_subcategory (SUBCAT_INPUT_DEMUX);

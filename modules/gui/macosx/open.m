@@ -182,8 +182,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_disc_dvd_menus setTitle: _NS("No DVD menus")];
 
     [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS directory")];
-    [[o_disc_type cellAtRow:1 column:0] setTitle: @"DVD"];
-    [[o_disc_type cellAtRow:2 column:0] setTitle: @"VCD"];
+    [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];
+    [[o_disc_type cellAtRow:2 column:0] setTitle: _NS("VCD")];
     [[o_disc_type cellAtRow:3 column:0] setTitle: _NS("Audio CD")];
 
     [o_net_udp_port_lbl setStringValue: _NS("Port")];
@@ -191,9 +191,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_net_udpm_port_lbl setStringValue: _NS("Port")];
     [o_net_http_url_lbl setStringValue: _NS("URL")];
 
-    [[o_net_mode cellAtRow:0 column:0] setTitle: @"UDP/RTP"];
+    [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("UDP/RTP")];
     [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("UDP/RTP Multicast")];
-    [[o_net_mode cellAtRow:2 column:0] setTitle: @"HTTP/FTP/MMS/RTSP"];
+    [[o_net_mode cellAtRow:2 column:0] setTitle: _NS("HTTP/FTP/MMS/RTSP")];
     [o_net_timeshift_ckbox setTitle: _NS("Allow timeshifting")];
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];

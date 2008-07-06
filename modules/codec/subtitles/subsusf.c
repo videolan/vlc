@@ -48,7 +48,7 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, subpicture_t *p
 
 vlc_module_begin();
     set_capability( "decoder", 40 );
-    set_shortname( "USFSubs" );
+    set_shortname( N_("USFSubs"));
     set_description( N_("USF subtitles decoder") );
     set_callbacks( OpenDecoder, CloseDecoder );
     set_category( CAT_INPUT );
