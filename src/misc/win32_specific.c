@@ -170,8 +170,10 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
         if( GetLastError() != ERROR_ALREADY_EXISTS )
         {
             /* We are the 1st instance. */
+            static const char typename[] = "ipc helper";
             vlc_object_t *p_helper =
-             (vlc_object_t *)vlc_object_create( p_this, sizeof(vlc_object_t) );
+                vlc_custom_create( p_this, sizeof(vlc_object_t),
+                                   VLC_OBJECT_GENERIC, typename );
 
             /* Run the helper thread */
             if( vlc_thread_create( p_helper, "IPC helper", IPCHelperThread,

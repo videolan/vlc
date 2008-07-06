@@ -59,8 +59,10 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     if( !p_playlist ) return;
 
     // Preparse
-    p_playlist->p_preparse = vlc_object_create( p_playlist,
-                                  sizeof( playlist_preparse_t ) );
+    static const char ppname[] = "preparser";
+    p_playlist->p_preparse =
+        vlc_custom_create( p_playlist, sizeof( playlist_preparse_t ),
+                           VLC_OBJECT_GENERIC, ppname );
     if( !p_playlist->p_preparse )
     {
         msg_Err( p_playlist, "unable to create preparser" );
@@ -83,8 +85,10 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     }
 
     // Secondary Preparse
-    p_playlist->p_fetcher = vlc_object_create( p_playlist,
-                              sizeof( playlist_fetcher_t ) );
+    static const char fname[] = "fetcher";
+    p_playlist->p_fetcher =
+        vlc_custom_create( p_playlist, sizeof( playlist_fetcher_t ),
+                           VLC_OBJECT_GENERIC, fname );
     if( !p_playlist->p_fetcher )
     {
         msg_Err( p_playlist, "unable to create secondary preparser" );

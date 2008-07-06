@@ -527,7 +527,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         /* Load the blending module */
         if( !p_spu->p_blend && p_region )
         {
-            p_spu->p_blend = vlc_object_create( p_spu, sizeof(filter_t) );
+            static const char typename[] = "blend";
+            p_spu->p_blend =
+                vlc_custom_create( p_spu, sizeof(filter_t), VLC_OBJECT_GENERIC,
+                                   typename );
             vlc_object_attach( p_spu->p_blend, p_spu );
             p_spu->p_blend->fmt_out.video.i_x_offset =
                 p_spu->p_blend->fmt_out.video.i_y_offset = 0;
@@ -546,9 +549,12 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
          * probably want it sooner or later. */
         if( !p_spu->p_text && p_region )
         {
+            static const char typename[] = "spu text";
             char *psz_modulename = NULL;
 
-            p_spu->p_text = vlc_object_create( p_spu, sizeof(filter_t) );
+            p_spu->p_text =
+                vlc_custom_create( p_spu, sizeof(filter_t), VLC_OBJECT_GENERIC,
+                                   typename );
             vlc_object_attach( p_spu->p_text, p_spu );
 
             p_spu->p_text->fmt_out.video.i_width =
@@ -690,7 +696,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             (((pi_scale_width[ SCALE_DEFAULT ] > 0)     || (pi_scale_height[ SCALE_DEFAULT ] > 0)) &&
              ((pi_scale_width[ SCALE_DEFAULT ] != 1000) || (pi_scale_height[ SCALE_DEFAULT ] != 1000)))) )
         {
-            p_spu->p_scale = vlc_object_create( p_spu, sizeof(filter_t));
+            static const char typename[] = "scale";
+            p_spu->p_scale =
+                vlc_custom_create( p_spu, sizeof(filter_t), VLC_OBJECT_GENERIC,
+                                   typename );
             vlc_object_attach( p_spu->p_scale, p_spu );
             p_spu->p_scale->fmt_out.video.i_chroma =
                 p_spu->p_scale->fmt_in.video.i_chroma =

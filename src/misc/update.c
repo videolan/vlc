@@ -1365,8 +1365,9 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ), void 
 {
     assert( p_update );
 
-    update_check_thread_t *p_uct = vlc_object_create( p_update->p_libvlc,
-                                            sizeof( update_check_thread_t ) );
+    update_check_thread_t *p_uct =
+        vlc_custom_create( p_update->p_libvlc, sizeof( *p_uct ),
+                           VLC_OBJECT_GENERIC, "update check" );
     if( !p_uct ) return;
 
     p_uct->p_update = p_update;
@@ -1446,8 +1447,9 @@ void update_Download( update_t *p_update, const char *psz_destdir )
 {
     assert( p_update );
 
-    update_download_thread_t *p_udt = vlc_object_create( p_update->p_libvlc,
-                                        sizeof( update_download_thread_t ) );
+    update_download_thread_t *p_udt =
+        vlc_custom_create( p_update->p_libvlc, sizeof( *p_udt ),
+                           VLC_OBJECT_GENERIC, "update download" );
     if( !p_udt )
         return;
 

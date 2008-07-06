@@ -27,6 +27,7 @@
 
 #include <vlc_filter.h>
 #include <vlc_arrays.h>
+#include <libvlc.h>
 
 struct filter_chain_t
 {
@@ -132,8 +133,10 @@ static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
                                                     const es_format_t *p_fmt_in,
                                                     const es_format_t *p_fmt_out )
 {
+    static const char typename[] = "filter";
     filter_t *p_filter =
-        vlc_object_create( p_chain->p_this, sizeof(filter_t) );
+        vlc_custom_create( p_chain->p_this, sizeof(filter_t),
+                           VLC_OBJECT_GENERIC, typename );
     if( !p_filter ) return NULL;
     vlc_object_attach( p_filter, p_chain->p_this );
 

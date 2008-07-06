@@ -1241,10 +1241,13 @@ static void ChromaCopyRgbInfo( es_format_t *p_fmt, picture_heap_t *p_heap )
 
 static int ChromaCreate( vout_thread_t *p_vout )
 {
+    static const char typename[] = "chroma";
     filter_t *p_chroma;
 
     /* Choose the best module */
-    p_chroma = p_vout->p_chroma = vlc_object_create( p_vout, sizeof(filter_t) );
+    p_chroma = p_vout->p_chroma =
+        vlc_custom_create( p_vout, sizeof(filter_t), VLC_OBJECT_GENERIC,
+                           typename );
 
     vlc_object_attach( p_chroma, p_vout );
 
@@ -1512,8 +1515,10 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
+        static const char typename[] = "kludge";
         suxor_thread_t *p_suxor =
-            vlc_object_create( p_vout, sizeof(suxor_thread_t) );
+            vlc_custom_create( p_vout, sizeof(suxor_thread_t),
+                               VLC_OBJECT_GENERIC, typename );
         p_suxor->p_input = p_input;
         p_vout->b_filter_change = true;
         vlc_object_yield( p_input );

@@ -246,7 +246,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             }
 
             /* Create a VLC object */
-            p_filter = vlc_object_create( p_aout, sizeof(aout_filter_t) );
+            static const char typename[] = "audio filter";
+            p_filter = vlc_custom_create( p_aout, sizeof(*p_filter),
+                                          VLC_OBJECT_GENERIC, typename );
             if( p_filter == NULL )
             {
                 msg_Err( p_aout, "cannot add user filter %s (skipped)",

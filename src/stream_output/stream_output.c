@@ -294,11 +294,13 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
 sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
                                       const char *psz_access, const char *psz_name )
 {
+    static const char typename[] = "access out";
     sout_access_out_t *p_access;
     char              *psz_next;
 
-    if( !( p_access = vlc_object_create( p_sout,
-                                         sizeof( sout_access_out_t ) ) ) )
+    p_access = vlc_custom_create( p_sout, sizeof( *p_access ),
+                                  VLC_OBJECT_GENERIC, typename );
+    if( !p_access )
         return NULL;
 
     psz_next = config_ChainCreate( &p_access->psz_access, &p_access->p_cfg,
@@ -400,10 +402,12 @@ int sout_AccessOutControl (sout_access_out_t *access, int query, va_list args)
 sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
                           sout_access_out_t *p_access )
 {
+    static const char typename[] = "mux";
     sout_mux_t *p_mux;
     char       *psz_next;
 
-    p_mux = vlc_object_create( p_sout, sizeof( sout_mux_t ) );
+    p_mux = vlc_custom_create( p_sout, sizeof( *p_mux ), VLC_OBJECT_GENERIC,
+                               typename);
     if( p_mux == NULL )
         return NULL;
 
@@ -757,6 +761,7 @@ static void mrl_Clean( mrl_t *p_mrl )
  */
 sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_chain )
 {
+    static const char typename[] = "stream out";
     sout_stream_t *p_stream;
 
     if( !psz_chain )
@@ -765,8 +770,8 @@ sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_chain )
         return NULL;
     }
 
-    p_stream = vlc_object_create( p_sout, sizeof( sout_stream_t ) );
-
+    p_stream = vlc_custom_create( p_sout, sizeof( *p_stream ),
+                                  VLC_OBJECT_GENERIC, typename );
     if( !p_stream )
         return NULL;
 

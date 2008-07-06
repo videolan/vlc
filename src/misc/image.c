@@ -44,6 +44,7 @@
 #include <vlc_image.h>
 #include <vlc_stream.h>
 #include <vlc_charset.h>
+#include <libvlc.h>
 
 static picture_t *ImageRead( image_handler_t *, block_t *,
                              video_format_t *, video_format_t * );
@@ -749,9 +750,11 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
                                video_format_t *p_fmt_out,
                                const char *psz_module )
 {
+    static const char typename[] = "filter";
     filter_t *p_filter;
 
-    p_filter = vlc_object_create( p_this, sizeof(filter_t) );
+    p_filter = vlc_custom_create( p_this, sizeof(filter_t),
+                                  VLC_OBJECT_GENERIC, typename );
     vlc_object_attach( p_filter, p_this );
 
     p_filter->pf_vout_buffer_new =

@@ -37,6 +37,7 @@
 
 #include <vlc_aout.h>
 #include "aout_internal.h"
+#include <libvlc.h>
 
 /*****************************************************************************
  * FindFilter: find an audio filter for a specific transformation
@@ -45,8 +46,11 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
                              const audio_sample_format_t * p_input_format,
                              const audio_sample_format_t * p_output_format )
 {
-    aout_filter_t * p_filter = vlc_object_create( p_aout,
-                                                  sizeof(aout_filter_t) );
+    static const char typename[] = "audio output";
+    aout_filter_t * p_filter;
+
+    p_filter = vlc_custom_create( p_aout, sizeof(*p_filter),
+                                  VLC_OBJECT_GENERIC, typename );
 
     if ( p_filter == NULL ) return NULL;
     vlc_object_attach( p_filter, p_aout );

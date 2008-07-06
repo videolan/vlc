@@ -138,8 +138,10 @@ char *vlc_fix_readdir (const char *);
  * @return the created object, or NULL.
  */
 extern void *
-vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
-                   const char *psz_type);
+__vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
+                     const char *psz_type);
+#define vlc_custom_create(o, s, t, n) \
+        __vlc_custom_create(VLC_OBJECT(o), s, t, n)
 
 /**
  * libvlc_global_data_t (global variable)
