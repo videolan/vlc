@@ -106,6 +106,10 @@ static void SwitchContext( vout_thread_t * );
     "X11 hardware display to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
 
+#define SHM_TEXT N_("Use shared memory")
+#define SHM_LONGTEXT N_( \
+    "Use shared memory to communicate between VLC and the X server.")
+
 #define SCREEN_TEXT N_("Screen for fullscreen mode.")
 #define SCREEN_LONGTEXT N_( \
     "Screen to use in fullscreen mode. For instance " \
@@ -122,6 +126,9 @@ vlc_module_begin();
     add_string( "glx-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
     add_integer( "glx-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true );
     add_bool( "glx-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true );
+#ifdef HAVE_SYS_SHM_H
+    add_bool( "glx-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true );
+#endif
 #ifdef HAVE_XINERAMA
     add_integer ( "glx-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
 #endif
