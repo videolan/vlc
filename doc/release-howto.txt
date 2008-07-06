@@ -91,6 +91,7 @@
  * Update the website
   - edit the /index.php /vlc/*.php pages
   - add a news item to news.msg
+  - update the front page OS dependant screenshots if the interface changed.
 
  * "Check for updates" functionality
   - add /opt/ftp/pub/videolan/vlc/X.X.X/vlc-X.X.X-announce
