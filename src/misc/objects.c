@@ -584,6 +584,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
     vlc_object_internals_t *priv = vlc_internals( p_this );
     int fd;
 
+    vlc_thread_cancel( p_this );
     vlc_object_lock( p_this );
     p_this->b_die = true;
 
