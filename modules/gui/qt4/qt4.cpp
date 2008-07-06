@@ -71,16 +71,16 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define SYSTRAY_TEXT N_( "Systray icon" )
 #define SYSTRAY_LONGTEXT N_( "Show an icon in the systray " \
                              "allowing you to control VLC media player " \
-                             "for basic actions" )
+                             "for basic actions." )
 
 #define MINIMIZED_TEXT N_( "Start VLC with only a systray icon" )
 #define MINIMIZED_LONGTEXT N_( "When you launch VLC with that option, " \
-                               "VLC will start with just an icon in" \
-                               "your taskbar" )
+                               "VLC will start with just an icon in " \
+                               "your taskbar." )
 
 #define TITLE_TEXT N_( "Show playing item name in window title" )
 #define TITLE_LONGTEXT N_( "Show the name of the song or video in the " \
-                           "controler window title" )
+                           "controler window title." )
 
 #define FILEDIALOG_PATH_TEXT N_( "Path to use in openfile dialog" )
 
@@ -91,7 +91,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define ADVANCED_OPTIONS_TEXT N_( "Advanced options" )
 #define ADVANCED_OPTIONS_LONGTEXT N_( "Show all the advanced options " \
-                                      "in the dialogs" )
+                                      "in the dialogs." )
 
 #define OPACITY_TEXT N_( "Windows opacity between 0.1 and 1." )
 #define OPACITY_LONGTEXT N_( "Sets the windows opacity between 0.1 and 1 " \
@@ -118,10 +118,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
 
-#define SLIDERCOL_TEXT N_( "Define the colours of the volume slider " )
-#define SLIDERCOL_LONGTEXT N_( "Define the colours of the volume slider\n " \
-                       "By specifying the 12 numbers separated by a ';'\n " \
-            "Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n " \
+#define SLIDERCOL_TEXT N_( "Define the colors of the volume slider " )
+#define SLIDERCOL_LONGTEXT N_( "Define the colors of the volume slider\n" \
+                       "By specifying the 12 numbers separated by a ';'\n" \
+            "Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n" \
             "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255' ")
 
 #define VIEWDETAIL_TEXT N_( "Show the opening dialog view in detail mode" )
@@ -129,7 +129,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_MODE_TEXT N_( "Selection of the starting mode and look " )
 #define QT_MODE_LONGTEXT N_( "Start VLC with:\n" \
                              " - normal mode\n"  \
-                             " - a zone always present to show information" \
+                             " - a zone always present to show information " \
                                   "as lyrics, album arts...\n" \
                              " - minimal mode with limited controls" )
 

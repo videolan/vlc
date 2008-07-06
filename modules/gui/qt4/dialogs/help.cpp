@@ -256,7 +256,7 @@ void UpdateDialog::UpdateOrDownload()
     {
         updateButton->setEnabled( false );
         QString dest_dir = QFileDialog::getExistingDirectory( this,
-                                 qtr( "Select a directory ..." ),
+                                 qtr( "Select a directory..." ),
                                  qfu( config_GetHomeDir() ) );
 
         if( dest_dir != "" )

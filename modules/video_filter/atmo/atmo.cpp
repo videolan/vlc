@@ -117,53 +117,55 @@ void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename);
 strings for settings menus and hints
 */
 #define MODULE_DESCRIPTION N_ ( \
- "This module allows to control an so called AtmoLight device which "\
- "is connected to your computer.\n"\
- "AtmoLight is the homebrew version of that what Philips calls AmbiLight.\n"\
- "If you need further informations feel free to visit us at\n\n"\
+ "This module allows to control an so called AtmoLight device "\
+ "connected to your computer.\n"\
+ "AtmoLight is the homegrown version of what Philips calls AmbiLight.\n"\
+ "If you need further information feel free to visit us at\n\n"\
  "http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin\n"\
  "http://www.vdr-wiki.de/wiki/index.php/AtmoWin\n\n"\
- "there you will find detailed descriptions how to build it for your self and "\
- "where you can get the required parts and so on.\n There you can also see "\
- "pictures and some movies showing such a device in live action...")
+ "You can find there detailed descriptions on how to build it for yourself "
+ "and where to get the required parts.\n"
+ "You can also have a look at pictures and some movies showing such a device "
+ "in live action.")
 
 
 
 #if defined( __ATMO_DEBUG__ )
 #   define SAVEFRAMES_TEXT     N_("Save Debug Frames")
-#   define SAVEFRAMES_LONGTEXT N_("Writes every 128th miniframe to a folder.")
+#   define SAVEFRAMES_LONGTEXT N_("Write every 128th miniframe to a folder.")
 #   define FRAMEPATH_TEXT      N_("Debug Frame Folder")
-#   define FRAMEPATH_LONGTEXT  N_("defines the path where the debugframes " \
+#   define FRAMEPATH_LONGTEXT  N_("The path where the debugframes " \
                                   "should be saved")
 #endif
 
 #define WIDTH_TEXT             N_("Extracted Image Width")
-#define WIDTH_LONGTEXT         N_("defines the width of the mini image for " \
+#define WIDTH_LONGTEXT         N_("The width of the mini image for " \
                                   "further processing (64 is default)")
 
 #define HEIGHT_TEXT            N_("Extracted Image Height")
-#define HEIGHT_LONGTEXT        N_("defines the height of the mini image for " \
+#define HEIGHT_LONGTEXT        N_("The height of the mini image for " \
                                   "further processing (48 is default)")
 
-#define PCOLOR_TEXT            N_("use Pause Color")
-#define PCOLOR_LONGTEXT        N_("use the color defined below if the user " \
-                          "paused the video.(have light to get another beer?)")
+#define PCOLOR_TEXT            N_("Color when paused")
+#define PCOLOR_LONGTEXT        N_("Set the color to show if the user " \
+                                  "pauses the video. (Have light to get " \
+                                  "another beer?)")
 #define PCOLOR_RED_TEXT        N_("Pause-Red")
-#define PCOLOR_RED_LONGTEXT    N_("the red component of pause color")
+#define PCOLOR_RED_LONGTEXT    N_("Red component of the pause color")
 #define PCOLOR_GREEN_TEXT      N_("Pause-Green")
-#define PCOLOR_GREEN_LONGTEXT  N_("the green component of pause color")
+#define PCOLOR_GREEN_LONGTEXT  N_("Green component of the pause color")
 #define PCOLOR_BLUE_TEXT       N_("Pause-Blue")
-#define PCOLOR_BLUE_LONGTEXT   N_("the blue component of pause color")
+#define PCOLOR_BLUE_LONGTEXT   N_("Blue component of the pause color")
 #define FADESTEPS_TEXT         N_("Pause-Fadesteps")
 #define FADESTEPS_LONGTEXT     N_("Number of steps to change current color " \
                                   "to pause color (each step takes 40ms)")
 
 #define ECOLOR_RED_TEXT        N_("End-Red")
-#define ECOLOR_RED_LONGTEXT    N_("the red component of the shutdown color")
+#define ECOLOR_RED_LONGTEXT    N_("Red component of the shutdown color")
 #define ECOLOR_GREEN_TEXT      N_("End-Green")
-#define ECOLOR_GREEN_LONGTEXT  N_("the green component of the shutdown color")
+#define ECOLOR_GREEN_LONGTEXT  N_("Green component of the shutdown color")
 #define ECOLOR_BLUE_TEXT       N_("End-Blue")
-#define ECOLOR_BLUE_LONGTEXT   N_("the blue component of the shutdown color")
+#define ECOLOR_BLUE_LONGTEXT   N_("Blue component of the shutdown color")
 #define EFADESTEPS_TEXT        N_("End-Fadesteps")
 #define EFADESTEPS_LONGTEXT  N_("Number of steps to change current color to " \
                              "end color for dimming up the light in cinema " \
@@ -171,7 +173,7 @@ strings for settings menus and hints
 
 #define USEWHITEADJ_TEXT       N_("Use Software White adjust")
 #define USEWHITEADJ_LONGTEXT   N_("Should the buildin driver do a white " \
-                                  "adjust or you LED stripes? recommend.")
+                                  "adjust or your LED stripes? recommend.")
 #define WHITE_RED_TEXT         N_("White Red")
 #define WHITE_RED_LONGTEXT     N_("Red value of a pure white on your "\
                                   "LED stripes.")
@@ -184,33 +186,35 @@ strings for settings menus and hints
 
 #define SERIALDEV_TEXT         N_("Serial Port/Device")
 #define SERIALDEV_LONGTEXT   N_("Name of the serial port where the AtmoLight "\
-                       "controller is attached to\n on Windows usually "\
-                       "something like COM1 or COM2 on Linux /dev/ttyS01 f.e.")
+                                "controller is attached to.\n"
+                                "On Windows usually something like COM1 or "
+                                "COM2. On Linux /dev/ttyS01 f.e.")
 
 #define EDGE_TEXT            N_("Edge Weightning")
-#define EDGE_LONGTEXT        N_("increasing this value will result in color "\
-                                "more depending on the border of the frame")
+#define EDGE_LONGTEXT        N_("Increasing this value will result in color "\
+                                "more depending on the border of the frame.")
 #define BRIGHTNESS_TEXT     N_("Brightness")
-#define BRIGHTNESS_LONGTEXT N_("overall Brightness of you LED stripes")
+#define BRIGHTNESS_LONGTEXT N_("Overall brightness of your LED stripes")
 #define DARKNESS_TEXT       N_("Darkness Limit")
-#define DARKNESS_LONGTEXT   N_("pixels with a saturation lower than this will "\
-                               "be ignored should be greater than one for "\
-                               "letterboxed videos")
+#define DARKNESS_LONGTEXT   N_("Pixels with a saturation lower than this will "\
+                               "be ignored. Should be greater than one for "\
+                               "letterboxed videos.")
 #define HUEWINSIZE_TEXT     N_("Hue windowing")
-#define HUEWINSIZE_LONGTEXT N_("used for statistics")
+#define HUEWINSIZE_LONGTEXT N_("Used for statistics.")
 #define SATWINSIZE_TEXT     N_("Sat windowing")
-#define SATWINSIZE_LONGTEXT N_("used for statistics")
+#define SATWINSIZE_LONGTEXT N_("Used for statistics.")
 
 #define MEANLENGTH_TEXT     N_("Filter length (ms)")
-#define MEANLENGTH_LONGTEXT N_("Time it takes until a color is complete "\
-                                "changed, removes flickering")
+#define MEANLENGTH_LONGTEXT N_("Time it takes until a color is completely "\
+                                "changed. This prevents flickering.")
 #define MEANTHRESHOLD_TEXT     N_("Filter threshold")
-#define MEANTHRESHOLD_LONGTEXT N_("How much a color must changed, for an "\
-                                  "imediate color change")
-#define MEANPERCENTNEW_TEXT     N_("Filter Smoothness %")
+#define MEANTHRESHOLD_LONGTEXT N_("How much a color has to be changed for an "\
+                                  "immediate color change.")
+#define MEANPERCENTNEW_TEXT     N_("Filter Smoothness (in %)")
 #define MEANPERCENTNEW_LONGTEXT N_("Filter Smoothness")
 
-#define FILTERMODE_TEXT        N_("Filtermode")
+/* FIXME: WTF?!! feepk, July 6 '08 */
+#define FILTERMODE_TEXT        N_("Filter mode")
 #define FILTERMODE_LONGTEXT    N_("kind of filtering which should be use to "\
                                   "calcuate the color output")
 static int pi_filtermode_values[] = {
@@ -224,9 +228,10 @@ static const char *ppsz_filtermode_descriptions[] = {
         N_("Percent")
 };
 
-#define FRAMEDELAY_TEXT       N_("Framedelay")
-#define FRAMEDELAY_LONGTEXT   N_("helps to get video out and light effects "\
-                             "insync values around 20ms should do the trick")
+#define FRAMEDELAY_TEXT       N_("Frame delay")
+#define FRAMEDELAY_LONGTEXT   N_("Helps to get the video output and the light "
+                                 "effects in sync. Values around 20ms should "
+                                 "do the trick.")
 
 
 #define CHANNEL_0_ASSIGN_TEXT N_("Channel summary")
@@ -235,8 +240,8 @@ static const char *ppsz_filtermode_descriptions[] = {
 #define CHANNEL_3_ASSIGN_TEXT N_("Channel top")
 #define CHANNEL_4_ASSIGN_TEXT N_("Channel bottom")
 
-#define CHANNELASSIGN_LONGTEXT N_("maps the hardware channel X to logical "\
-                                  "channel Y to fix wrong wiring:-)")
+#define CHANNELASSIGN_LONGTEXT N_("Maps the hardware channel X to logical "\
+                                  "channel Y to fix wrong wiring :-)")
 static int pi_channel_assignment_values[] = {
     -1,
      0,
@@ -254,21 +259,21 @@ static const char *ppsz_channel_assignment_descriptions[] = {
         N_("bottom")
 };
 
-#define ZONE_0_GRADIENT_TEXT N_("summary gradient")
-#define ZONE_1_GRADIENT_TEXT N_("left gradient")
-#define ZONE_2_GRADIENT_TEXT N_("right gradient")
-#define ZONE_3_GRADIENT_TEXT N_("top gradient")
-#define ZONE_4_GRADIENT_TEXT N_("bottom gradient")
-#define ZONE_X_GRADIENT_LONG_TEXT N_("defines a small bitmap with 64x48 "\
+#define ZONE_0_GRADIENT_TEXT N_("Summary gradient")
+#define ZONE_1_GRADIENT_TEXT N_("Left gradient")
+#define ZONE_2_GRADIENT_TEXT N_("Right gradient")
+#define ZONE_3_GRADIENT_TEXT N_("Top gradient")
+#define ZONE_4_GRADIENT_TEXT N_("Bottom gradient")
+#define ZONE_X_GRADIENT_LONG_TEXT N_("Defines a small bitmap with 64x48 "\
                                      "pixels, containing a grayscale gradient")
 
 #if defined( WIN32 )
 #   define ATMOWINEXE_TEXT      N_("Filename of AtmoWinA.exe")
-#   define ATMOWINEXE_LONGTEXT  N_("if you wan't that the AtmoLight control "\
-                                   "software is launched by\nVLC enter the "\
-                                   "complete Filename of AtmoWinA.exe here")
-#   define USEBUILDIN_TEXT      N_("Use buildin AtmoLight")
-#   define USEBUILDIN_LONGTEXT N_("VideoLan will directly use your AtmoLight "\
+#   define ATMOWINEXE_LONGTEXT  N_("if you want the AtmoLight control "\
+                                   "software to be launched by VLC, enter the "\
+                                   "complete path of AtmoWinA.exe here.")
+#   define USEBUILDIN_TEXT      N_("Use built-in AtmoLight")
+#   define USEBUILDIN_LONGTEXT N_("VLC will directly use your AtmoLight "\
                                   "hardware without running the external "\
                                   "AtmoWinA.exe Userspace driver.")
 #endif
@@ -288,7 +293,7 @@ set_category( CAT_VIDEO );
 set_subcategory( SUBCAT_VIDEO_VFILTER );
 
 #if defined(WIN32)
-set_section( N_("Choose between the buildin AtmoLight "\
+set_section( N_("Choose between the built-in AtmoLight "\
                  "driver or the external" ), 0 );
 
 /*
@@ -307,7 +312,7 @@ add_string(CFG_PREFIX "serialdev", "COM1", NULL,
 add_file(CFG_PREFIX "atmowinexe", NULL, NULL,
          ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false );
 #else
-set_section( N_("Enter connection of your AtmoLight hardware" ), 0 );
+set_section( N_("Enter the connection of your AtmoLight hardware" ), 0 );
 add_string(CFG_PREFIX "serialdev", "/dev/ttyS01", NULL,
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false );
 #endif
@@ -348,7 +353,7 @@ add_integer_with_range(CFG_PREFIX "efadesteps",    50, 1, 250, NULL,
 
  definition of parameters for the buildin filter ...
 */
-set_section( N_("Settings only for buildin Live Video Processor" ), 0 );
+set_section( N_("Settings for the built-in Live Video Processor only" ), 0 );
 
 add_integer_with_range(CFG_PREFIX "EdgeWeightning",   8, 1, 30, NULL,
                        EDGE_TEXT, EDGE_LONGTEXT, false);

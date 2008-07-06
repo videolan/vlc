@@ -352,11 +352,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /* Disk Devices */
             {
                 ui.DVDDevice->setToolTip(
-                    //TODO: make this sentence understandable
-                    qtr( "If this property is blank, then you have\n"
-                         "values for DVD, VCD, and CDDA.\n"
-                         "You can define a unique one or set that in"
-                         "the advanced preferences" ) );
+                    qtr( "If this property is blank, different values\n"
+                         "for DVD, VCD, and CDDA are set.\n"
+                         "You can define a unique one or configure them \n"
+                         "individually in the advanced preferences." ) );
                 char *psz_dvddiscpath = config_GetPsz( p_intf, "dvd" );
                 char *psz_vcddiscpath = config_GetPsz( p_intf, "vcd" );
                 char *psz_cddadiscpath = config_GetPsz( p_intf, "cd-audio" );

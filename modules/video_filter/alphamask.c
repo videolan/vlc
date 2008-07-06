@@ -41,7 +41,7 @@
 
 #define MASK_TEXT N_("Transparency mask")
 #define MASK_LONGTEXT N_( \
-    "Alpha blending transparency mask. Use's a png alpha channel.")
+    "Alpha blending transparency mask. Uses a png alpha channel.")
 
 #define CFG_PREFIX "alphamask-"
 
