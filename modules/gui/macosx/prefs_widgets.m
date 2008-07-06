@@ -248,7 +248,8 @@
     [o_menu addItem: o_mi];                                                 \
 }
 
-#define ADD_LABEL( o_label, superFrame, x_offset, my_y_offset, label )      \
+#define ADD_LABEL( o_label, superFrame, x_offset, my_y_offset, label,       \
+    tooltip )                                                               \
 {                                                                           \
     NSRect s_rc = superFrame;                                               \
     s_rc.size.height = 17;                                                  \
@@ -260,6 +261,7 @@
     [o_label setEditable: NO];                                              \
     [o_label setSelectable: NO];                                            \
     [o_label setStringValue: label];                                        \
+    [o_label setToolTip: tooltip];                                          \
     [o_label setFont:[NSFont systemFontOfSize:0]];                          \
     [o_label sizeToFit];                                                    \
 }
@@ -989,20 +991,21 @@
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
         i_view_type = CONFIG_ITEM_STRING;
+        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString:
+                              [[VLCMain sharedInstance] localizedString: (char *)p_item->psz_longtext]
+                                                          toWidth: PREFS_WRAP];
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the textfield */
-        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance] localizedString: (char *)p_item->psz_longtext]
-                                         toWidth: PREFS_WRAP];
         if( p_item->value.psz )
             o_textfieldString = [[VLCMain sharedInstance]
                                     localizedString: (char *)p_item->value.psz];
@@ -1059,20 +1062,22 @@
     {
         int i_index;
         i_view_type = CONFIG_ITEM_STRING_LIST;
+
+        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString:
+                              [[VLCMain sharedInstance]
+                               localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the textfield */
-        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         ADD_COMBO( o_combo, mainFrame, [o_label frame].size.width,
             -2, 0, o_textfieldTooltip )
         [o_combo setAutoresizingMask:NSViewWidthSizable ];
@@ -1137,8 +1142,7 @@
            withView: (NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
-    NSString *o_labelString, *o_buttonTooltip, *o_textfieldString;
-    NSString *o_textfieldTooltip;
+    NSString *o_labelString, *o_itemTooltip, *o_textfieldString;
     mainFrame.size.height = 46;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
@@ -1147,6 +1151,10 @@
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
         i_view_type = CONFIG_ITEM_FILE;
+
+        o_itemTooltip = [[VLCMain sharedInstance]
+                           wrapString: [[VLCMain sharedInstance]
+                                        localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
 
         /* is it a directory */
         b_directory = ( [self getType] == CONFIG_ITEM_DIRECTORY ) ? YES : NO;
@@ -1157,30 +1165,24 @@
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, 3, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, 3, o_labelString, o_itemTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the button */
-        o_buttonTooltip = [[VLCMain sharedInstance]
-                wrapString: [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
-        ADD_RIGHT_BUTTON( o_button, mainFrame, 0, 0, o_buttonTooltip,
+        ADD_RIGHT_BUTTON( o_button, mainFrame, 0, 0, o_itemTooltip,
                             _NS("Browse...") )
         [o_button setAutoresizingMask:NSViewMinXMargin ];
         [self addSubview: o_button];
 
         /* build the textfield */
-        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         if( p_item->value.psz )
             o_textfieldString = [NSString stringWithFormat: @"%s", (char *)p_item->value.psz];
         else
             o_textfieldString = [NSString stringWithString: @""];
         ADD_TEXTFIELD( o_textfield, mainFrame, 12, 2, mainFrame.size.width -
                         8 - [o_button frame].size.width,
-                        o_textfieldTooltip, o_textfieldString )
+                        o_itemTooltip, o_textfieldString )
         [o_textfield setAutoresizingMask:NSViewWidthSizable ];
         [self addSubview: o_textfield];
     }
@@ -1257,20 +1259,21 @@
         module_t *p_parser;
         i_view_type = CONFIG_ITEM_MODULE;
 
+        o_popupTooltip = [[VLCMain sharedInstance] wrapString:
+                          [[VLCMain sharedInstance]
+                           localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -1, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -1, o_labelString, o_popupTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the popup */
-        o_popupTooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         ADD_POPUP( o_popup, mainFrame, [o_label frame].size.width,
             -2, 0, o_popupTooltip )
         [o_popup setAutoresizingMask:NSViewWidthSizable ];
@@ -1432,7 +1435,7 @@
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
@@ -1514,20 +1517,21 @@
         int i_index;
         i_view_type = CONFIG_ITEM_STRING_LIST;
 
+        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString:
+                              [[VLCMain sharedInstance]
+                               localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];        
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the textfield */
-        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         ADD_COMBO( o_combo, mainFrame, [o_label frame].size.width,
             -2, 0, o_textfieldTooltip )
         [o_combo setAutoresizingMask:NSViewWidthSizable ];
@@ -1603,20 +1607,21 @@
     {
         i_view_type = CONFIG_ITEM_RANGED_INTEGER;
 
+        o_tooltip = [[VLCMain sharedInstance] wrapString:
+                     [[VLCMain sharedInstance]
+                      localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the textfield */
-        o_tooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         ADD_TEXTFIELD( o_textfield, mainFrame, [o_label frame].size.width + 2,
             28, 49, o_tooltip, @"" )
         [o_textfield setIntValue: p_item->value.i];
@@ -1629,7 +1634,7 @@
         [self addSubview: o_textfield];
 
         /* build the mintextfield */
-        ADD_LABEL( o_textfield_min, mainFrame, 12, -30, @"-8888" )
+        ADD_LABEL( o_textfield_min, mainFrame, 12, -30, @"-8888", @"" )
         [o_textfield_min setIntValue: p_item->min.i];
         [o_textfield_min setAutoresizingMask:NSViewMaxXMargin ];
         [o_textfield_min setAlignment:NSRightTextAlignment];
@@ -1637,7 +1642,7 @@
 
         /* build the maxtextfield */
         ADD_LABEL( o_textfield_max, mainFrame,
-                    mainFrame.size.width - 31, -30, @"8888" )
+                    mainFrame.size.width - 31, -30, @"8888", @"" )
         [o_textfield_max setIntValue: p_item->max.i];
         [o_textfield_max setAutoresizingMask:NSViewMinXMargin ];
         [self addSubview: o_textfield_max];
@@ -1723,7 +1728,7 @@
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -2, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -2, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
@@ -1803,20 +1808,21 @@
     {
         i_view_type = CONFIG_ITEM_RANGED_INTEGER;
 
+        o_tooltip = [[VLCMain sharedInstance] wrapString:
+                     [[VLCMain sharedInstance]
+                      localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];        
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the textfield */
-        o_tooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         ADD_TEXTFIELD( o_textfield, mainFrame, [o_label frame].size.width + 2,
             28, 49, o_tooltip, @"" )
         [o_textfield setFloatValue: p_item->value.f];
@@ -1829,7 +1835,7 @@
         [self addSubview: o_textfield];
 
         /* build the mintextfield */
-        ADD_LABEL( o_textfield_min, mainFrame, 12, -30, @"-8888" )
+        ADD_LABEL( o_textfield_min, mainFrame, 12, -30, @"-8888", @"" )
         [o_textfield_min setFloatValue: p_item->min.f];
         [o_textfield_min setAutoresizingMask:NSViewMaxXMargin ];
         [o_textfield_min setAlignment:NSRightTextAlignment];
@@ -1837,7 +1843,7 @@
 
         /* build the maxtextfield */
         ADD_LABEL( o_textfield_max, mainFrame, mainFrame.size.width - 31,
-            -30, @"8888" )
+            -30, @"8888", @"" )
         [o_textfield_max setFloatValue: p_item->max.f];
         [o_textfield_max setAutoresizingMask:NSViewMinXMargin ];
         [self addSubview: o_textfield_max];
@@ -1929,7 +1935,7 @@
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, [o_checkbox frame].size.width, 0, o_labelString )
+        ADD_LABEL( o_label, mainFrame, [o_checkbox frame].size.width, 0, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
     }
@@ -1964,20 +1970,21 @@
     {
         i_view_type = CONFIG_ITEM_KEY_AFTER_10_3;
 
+        o_tooltip = [[VLCMain sharedInstance] wrapString:
+                     [[VLCMain sharedInstance]
+                      localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -1, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -1, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the popup */
-        o_tooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         ADD_POPUP( o_popup, mainFrame, [o_label frame].origin.x +
             [o_label frame].size.width + 3,
             -2, 0, o_tooltip )
@@ -2094,20 +2101,21 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
     {
         i_view_type = CONFIG_ITEM_MODULE_LIST;
 
+        o_tooltip = [[VLCMain sharedInstance] wrapString:
+                     [[VLCMain sharedInstance]
+                      localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
         /* build the textfield */
-        o_tooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         if( p_item->value.psz )
             o_textfieldString = [[VLCMain sharedInstance]
                 localizedString: (char *)p_item->value.psz];
