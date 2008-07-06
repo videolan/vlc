@@ -477,7 +477,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
         "<p>The <i>VideoLAN Team</i> doesn't like when an application goes "
         "online without authorization.</p>\n "
         "<p><i>VLC media player</i> can request limited information on "
-        "the Internet, especially to get CD covers and songs metadata or to know "
+        "the Internet, especially to get CD covers or to know "
         "if updates are available.</p>\n"
         "<p><i>VLC media player</i> <b>DOES NOT</b> send or collect <b>ANY</b> "
         "information, even anonymously, about your usage.</p>\n"
