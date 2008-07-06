@@ -158,7 +158,7 @@ static void Close( vlc_object_t * );
 #define MAX_EMPTY_BLOCKS 200
 
 vlc_module_begin();
-    set_shortname( N_("RTP"));
+    set_shortname( "RTP" );
     set_description( N_("RTP stream output") );
     set_capability( "sout stream", 0 );
     add_shortcut( "rtp" );

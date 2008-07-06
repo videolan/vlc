@@ -162,7 +162,7 @@ static const char *const ppsz_amtuner_mode_text[] = { N_("Default"),
 
 #define AUDIO_CHANNELS_TEXT N_("Number of audio channels")
 #define AUDIO_CHANNELS_LONGTEXT N_( \
-    "Select audio input format with the given number of audio channesl (if non 0)" )
+    "Select audio input format with the given number of audio channels (if non 0)" )
 
 #define AUDIO_SAMPLERATE_TEXT N_("Audio sample rate")
 #define AUDIO_SAMPLERATE_LONGTEXT N_( \

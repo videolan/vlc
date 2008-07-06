@@ -62,15 +62,15 @@
 
 #define WIDTH_TEXT N_( "Subscreen width" )
 #define WIDTH_LONGTEXT N_( \
-    "Subscreen width." )
+    "Subscreen width" )
 
 #define HEIGHT_TEXT N_( "Subscreen height" )
 #define HEIGHT_LONGTEXT N_( \
-    "Subscreen height."  )
+    "Subscreen height"  )
 
 #define FOLLOW_MOUSE_TEXT N_( "Follow the mouse" )
 #define FOLLOW_MOUSE_LONGTEXT N_( \
-    "Follow the mouse when capturing a subscreen" )
+    "Follow the mouse when capturing a subscreen." )
 #endif
 
 static int  Open ( vlc_object_t * );

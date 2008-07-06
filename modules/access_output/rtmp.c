@@ -53,7 +53,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( N_("RTMP stream output") );
-    set_shortname( N_("RTMP" ) );
+    set_shortname( "RTMP" );
     set_capability( "sout access", 50 );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );

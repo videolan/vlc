@@ -1352,9 +1352,9 @@ static const char *const ppsz_albumart_descriptions[] =
     "video output for the time being." )
 
 #define MENU_ON_KEY_TEXT N_("Display OSD menu on top of video output")
-#define MENU_ON_KEY_LONGTEXT N_("Display OSDmenu on top of video output")
+#define MENU_ON_KEY_LONGTEXT N_("Display OSD menu on top of video output")
 #define MENU_OFF_KEY_TEXT N_("Do not display OSD menu on video output")
-#define MENU_OFF_KEY_LONGTEXT N_("Do not display OSDmenu on top of video output")
+#define MENU_OFF_KEY_LONGTEXT N_("Do not display OSD menu on top of video output")
 #define MENU_RIGHT_KEY_TEXT N_("Highlight widget on the right")
 #define MENU_RIGHT_KEY_LONGTEXT N_( \
         "Move OSD menu highlight to the widget on the right")
