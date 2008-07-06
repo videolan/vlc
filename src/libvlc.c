@@ -1275,7 +1275,7 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[
 static inline void print_help_on_full_help( void )
 {
     utf8_fprintf( stdout, "\n" );
-    utf8_fprintf( stdout, "To get exhaustive help, use '-H'.\n" );
+    utf8_fprintf( stdout, "%s\n", _("To get exhaustive help, use '-H'.") );
 }
 
 static void Help( libvlc_int_t *p_this, char const *psz_help_name )
