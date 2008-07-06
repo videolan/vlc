@@ -80,9 +80,6 @@ static void PrintMsg ( vlc_object_t *, msg_item_t * );
 
 static inline char * object_description( vlc_object_t * p_this )
 {
-    if( p_this->i_object_type == VLC_OBJECT_GENERIC
-        && p_this->psz_object_name )
-        return strdup( p_this->psz_object_name );
     return strdup( p_this->psz_object_type );
 }
 
