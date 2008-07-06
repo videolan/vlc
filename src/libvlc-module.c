@@ -2538,7 +2538,7 @@ vlc_module_begin();
               false );
         change_internal();
         change_unsaveable();
-    add_bool( "reset-config", false, NULL, MODULE_TEXT, "", false );
+    add_bool( "reset-config", false, NULL, RESET_CONFIG_TEXT, "", false );
         change_internal();
         change_unsaveable();
     add_bool( "reset-plugins-cache", false, NULL,
