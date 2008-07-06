@@ -138,6 +138,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     char * psz_name = input_item_GetName( p_item );
     snprintf( psz_timer_name, sizeof(psz_timer_name),
               "input launching for '%s'", psz_name );
+
+    msg_Dbg( p_input, "Creating an input for '%s'", psz_name);
+
     free( psz_name );
 
     /* Start a timer to mesure how long it takes
@@ -310,6 +313,12 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 static void Destructor( input_thread_t * p_input )
 {
     input_thread_private_t *priv = p_input->p;
+
+#ifndef NDEBUG
+    char * psz_name = input_item_GetName( p_input->p->input.p_item );
+    msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
+    free( psz_name );
+#endif
 
     vlc_event_manager_fini( &p_input->p->event_manager );
 
