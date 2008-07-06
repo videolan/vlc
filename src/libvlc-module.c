@@ -2470,6 +2470,8 @@ vlc_module_begin();
 #define HELP_TEXT \
     N_("print help for VLC (can be combined with --advanced and " \
        "--help-verbose)")
+#define FULL_HELP_TEXT \
+    N_("Exhaustive help for VLC and its modules")
 #define LONGHELP_TEXT \
     N_("print help for VLC and all its modules (can be combined with " \
        "--advanced and --help-verbose)")
@@ -2499,8 +2501,11 @@ vlc_module_begin();
         change_short( 'h' );
         change_internal();
         change_unsaveable();
-    add_bool( "longhelp", false, NULL, LONGHELP_TEXT, "", false );
+    add_bool( "full-help", false, NULL, FULL_HELP_TEXT, "", false );
         change_short( 'H' );
+        change_internal();
+        change_unsaveable();
+    add_bool( "longhelp", false, NULL, LONGHELP_TEXT, "", false );
         change_internal();
         change_unsaveable();
     add_bool( "help-verbose", false, NULL, HELP_VERBOSE_TEXT, "",

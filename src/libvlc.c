@@ -433,6 +433,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
+    /* Check for full help option */
+    else if( config_GetInt( p_libvlc, "full-help" ) > 0 )
+    {
+        config_PutInt( p_libvlc, "advanced", 1);
+        config_PutInt( p_libvlc, "help-verbose", 1);
+        Help( p_libvlc, "full-help" );
+        b_exit = true;
+        i_ret = VLC_EEXITSUCCESS;
+    }
     /* Check for long help option */
     else if( config_GetInt( p_libvlc, "longhelp" ) > 0 )
     {
@@ -1274,8 +1283,15 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
         utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
         Usage( p_this, "help" );
         Usage( p_this, "main" );
+        utf8_fprintf( stdout, "To get a exhaustive help use -H\n" );
     }
     else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
+    {
+        utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
+        Usage( p_this, NULL );
+        utf8_fprintf( stdout, "To get an exhaustive help use -H\n" );
+    }
+    else if( psz_help_name && !strcmp( psz_help_name, "full-help" ) )
     {
         utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
         Usage( p_this, NULL );
