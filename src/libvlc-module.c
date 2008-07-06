@@ -1850,10 +1850,10 @@ vlc_module_begin();
         change_need_restart();
 
     add_bool( "use-stream-immediate", false, NULL,
-               USE_STREAM_IMMEDIATE, USE_STREAM_IMMEDIATE_LONGTEXT, false );
+               USE_STREAM_IMMEDIATE, USE_STREAM_IMMEDIATE_LONGTEXT, true );
 
     add_bool( "auto-adjust-pts-delay", false, NULL,
-              AUTO_ADJUST_PTS_DELAY, AUTO_ADJUST_PTS_DELAY_LONGTEXT, false );
+              AUTO_ADJUST_PTS_DELAY, AUTO_ADJUST_PTS_DELAY_LONGTEXT, true );
 
 #if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
     add_bool( "rt-priority", false, NULL, RT_PRIORITY_TEXT,
