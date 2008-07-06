@@ -973,7 +973,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free video outputs */
     msg_Dbg( p_libvlc, "removing all video outputs" );
     vlc_list_t *list = vlc_list_find (p_libvlc, VLC_OBJECT_VOUT, FIND_CHILD);
-    for (unsigned i = 0; i < list->i_count; i++)
+    for (int i = 0; i < list->i_count; i++)
     {
         vlc_object_release (list->p_values[i].p_object);
         vlc_object_release (list->p_values[i].p_object);
@@ -1386,7 +1386,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         if( psz_module_name && strcmp( psz_module_name,
                                        p_parser->psz_object_name ) )
         {
-            const char *const *pp_shortcut = p_parser->pp_shortcuts;
+            char *const *pp_shortcut = p_parser->pp_shortcuts;
             while( *pp_shortcut )
             {
                 if( !strcmp( psz_module_name, *pp_shortcut ) )
@@ -1792,7 +1792,7 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 
         if( b_verbose )
         {
-            const char *const *pp_shortcut = p_parser->pp_shortcuts;
+            char *const *pp_shortcut = p_parser->pp_shortcuts;
             while( *pp_shortcut )
             {
                 if( strcmp( *pp_shortcut, p_parser->psz_object_name ) )
