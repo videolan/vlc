@@ -53,6 +53,7 @@
 #include <vlc_gcrypt.h>
 
 #include "update.h"
+#include "../libvlc.h"
 
 /*****************************************************************************
  * Misc defines
