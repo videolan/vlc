@@ -78,6 +78,14 @@ static void QueueMsg ( vlc_object_t *, int, const char *,
 static void FlushMsg ( msg_queue_t * );
 static void PrintMsg ( vlc_object_t *, msg_item_t * );
 
+static inline char * object_description( vlc_object_t * p_this )
+{
+    if( p_this->i_object_type == VLC_OBJECT_GENERIC
+        && p_this->psz_object_name )
+        return strdup( p_this->psz_object_name );
+    return strdup( p_this->psz_object_type );
+}
+
 /**
  * Initialize messages queues
  * This function initializes all message queues
@@ -422,7 +430,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 
             p_item->i_type =        VLC_MSG_WARN;
             p_item->i_object_id =   p_this->i_object_id;
-            p_item->psz_object_type = p_this->psz_object_type;
+            p_item->psz_object =    object_description( p_this );
             p_item->psz_module =    strdup( "message" );
             p_item->psz_msg =       strdup( "message queue overflowed" );
             p_item->psz_header =    NULL;
@@ -443,7 +451,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     /* Fill message information fields */
     p_item->i_type =        i_type;
     p_item->i_object_id =   p_this->i_object_id;
-    p_item->psz_object_type = p_this->psz_object_type;
+    p_item->psz_object =    object_description( p_this );
     p_item->psz_module =    strdup( psz_module );
     p_item->psz_msg =       psz_str;
     p_item->psz_header =    psz_header;
@@ -455,6 +463,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         free( p_item->psz_module );
         free( p_item->psz_msg );
         free( p_item->psz_header );
+        free( p_item->psz_object );
     }
 
     vlc_mutex_unlock ( &p_queue->lock );
@@ -500,6 +509,7 @@ static void FlushMsg ( msg_queue_t *p_queue )
         free( p_queue->msg[i_index].psz_msg );
         free( p_queue->msg[i_index].psz_module );
         free( p_queue->msg[i_index].psz_header );
+        free( p_queue->msg[i_index].psz_object );
     }
 
     /* Update the new start value */
@@ -545,7 +555,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
             break;
     }
 
-    psz_object = p_item->psz_object_type;
+    psz_object = p_item->psz_object;
 
 #ifdef UNDER_CE
 #   define CE_WRITE(str) WriteFile( QUEUE.logfile, \

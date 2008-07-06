@@ -80,7 +80,7 @@ void MessagesView::Pulse()
                 case VLC_MSG_DBG: color = gray; break;
             }
 
-            psz_module_type = p_sub->p_msg[i_start].psz_object_type;
+            psz_module_type = p_sub->p_msg[i_start].psz_object;
 
             if( LockLooper() )
             {

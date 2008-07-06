@@ -44,7 +44,7 @@ typedef struct
 {
     int     i_type;                             /**< message type, see below */
     int     i_object_id;
-    const char *psz_object_type;
+    char *  psz_object;
     char *  psz_module;
     char *  psz_msg;                            /**< the message itself */
     char *  psz_header;                         /**< Additional header */
