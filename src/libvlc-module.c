@@ -1512,11 +1512,10 @@ vlc_module_begin();
                  VIDEO_TITLE_TIMEOUT_LONGTEXT, false );
     add_integer( "video-title-position", 8, NULL, VIDEO_TITLE_POSITION_TEXT,
                  VIDEO_TITLE_POSITION_LONGTEXT, false );
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     // autohide after 3s
     add_integer( "mouse-hide-timeout", 3000, NULL, MOUSE_HIDE_TIMEOUT_TEXT,
                  MOUSE_HIDE_TIMEOUT_LONGTEXT, false );
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-
     set_section( N_("Snapshot") , NULL );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, false );
