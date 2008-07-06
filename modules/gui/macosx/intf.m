@@ -1775,6 +1775,12 @@ end:
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
 
+    /* Kill the playlist, so that it doesn't accept new request
+     * such as the play request from vlc.c (we are a blocking interface). */
+    p_playlist = pl_Yield( p_intf );
+    vlc_object_kill( p_playlist );
+    pl_Release( p_intf );
+
     vlc_object_kill( p_intf->p_libvlc );
 
     /* Go back to Run() and make libvlc exit properly */
