@@ -13629,8 +13629,8 @@ msgstr "Kein Input"
 msgid ""
 "No input found. A stream must be playing or paused for bookmarks to work."
 msgstr ""
-"Kein Input gefunden. Der Stream muss wiedergegeben oder pausiert werden, "
-"damit die Lesezeichen funktionieren."
+"Kein Input gefunden. Der Stream muss wiedergegeben werden oder angehalten "
+"sein, damit die Lesezeichen funktionieren."
 
 #: modules/gui/macosx/bookmarks.m:234
 msgid "Input has changed"
@@ -13660,8 +13660,8 @@ msgstr "Kein Input gefunden"
 #: modules/gui/macosx/bookmarks.m:294
 msgid "The stream must be playing or paused for bookmarks to work."
 msgstr ""
-"Der Stream muss wiedergegeben oder pausiert werden, damit die Lesezeichen "
-"funktionieren."
+"Der Stream muss wiedergegeben werden oder angehalten sein, damit die "
+"Lesezeichen funktionieren."
 
 #: modules/gui/macosx/controls.m:57 modules/gui/macosx/controls.m:942
 msgid "Jump To Time"
@@ -15463,9 +15463,8 @@ msgid "Local playback"
 msgstr "Lokale Wiedergabe"
 
 #: modules/gui/macosx/wizard.m:405 modules/gui/macosx/wizard.m:414
-#, fuzzy
 msgid "Add Subtitles to transcoded video"
-msgstr "Zusätzliche Transcodierungsoptionen"
+msgstr "Untertitel dem transcodierten Video hinzufügen"
 
 #: modules/gui/macosx/wizard.m:408
 msgid "Additional transcode options"
@@ -15486,6 +15485,9 @@ msgid ""
 "Adds available subtitles directly to the video. These cannot be disabled by "
 "the receiving user as they become part of the image."
 msgstr ""
+"Fügt dem Video direkt verfügbare Untertitel hinzu. Diese können vom "
+"erhaltenden Nutzer nicht deaktiviert werden, da sie ein Teil des Bildes "
+"werden."
 
 #: modules/gui/macosx/wizard.m:422
 msgid ""
@@ -15512,9 +15514,8 @@ msgid "Save file to"
 msgstr "Datei sichern nach"
 
 #: modules/gui/macosx/wizard.m:443
-#, fuzzy
 msgid "Include subtitles"
-msgstr "Untertitel hinzufügen"
+msgstr "Untertitel einschließen"
 
 #: modules/gui/macosx/wizard.m:598
 msgid "No input selected"
@@ -15698,13 +15699,12 @@ msgstr ""
 "Transkodieren oder Streamen."
 
 #: modules/gui/minimal_macosx/macosx.c:58
-#, fuzzy
 msgid "Minimal Mac OS X interface"
-msgstr "Mac OS X Interface"
+msgstr "Minimales Mac OS X Interface"
 
 #: modules/gui/minimal_macosx/macosx.c:66
 msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
-msgstr ""
+msgstr "Minimaler Mac OS X OpenGL Videooutput (öffnet ein rahmenloses Fenster)"
 
 #: modules/gui/ncurses.c:119
 msgid "Filebrowser starting point"
@@ -15723,350 +15723,328 @@ msgid "Ncurses interface"
 msgstr "Ncurses Interface"
 
 #: modules/gui/ncurses.c:1540
-#, fuzzy
 msgid "[Repeat] "
-msgstr "Alle wiederholen"
+msgstr "[Alle wiederholen] "
 
 #: modules/gui/ncurses.c:1541
-#, fuzzy
 msgid "[Random] "
-msgstr "Zufällig"
+msgstr "[Zufällig] "
 
 #: modules/gui/ncurses.c:1542
-#, fuzzy
 msgid "[Loop]"
-msgstr "In Schleife"
+msgstr "[In Schleife]"
 
 #: modules/gui/ncurses.c:1554
 #, c-format
 msgid " Source   : %s"
-msgstr ""
+msgstr " Quelle    : %s"
 
 #: modules/gui/ncurses.c:1561
 #, c-format
 msgid " State    : Playing %s"
-msgstr ""
+msgstr " Status    : Spiele %s"
 
 #: modules/gui/ncurses.c:1565
 #, c-format
 msgid " State    : Stopped %s"
-msgstr ""
+msgstr " Status    : Gestopped %s"
 
 #: modules/gui/ncurses.c:1569
 #, c-format
 msgid " State    : Opening/Connecting %s"
-msgstr ""
+msgstr " Status    : Öffne/Verbinde mit %s"
 
 #: modules/gui/ncurses.c:1573
 #, c-format
 msgid " State    : Buffering %s"
-msgstr ""
+msgstr " Status    : Puffere %s"
 
 #: modules/gui/ncurses.c:1577
 #, c-format
 msgid " State    : Paused %s"
-msgstr ""
+msgstr " Status    : Angehalten %s"
 
 #: modules/gui/ncurses.c:1591
 #, c-format
 msgid " Position : %s/%s (%.2f%%)"
-msgstr ""
+msgstr " Position  : %s/%s (%.2f%%)"
 
 #: modules/gui/ncurses.c:1595
-#, fuzzy, c-format
+#, c-format
 msgid " Volume   : %i%%"
-msgstr "Lautstärke: %d%%"
+msgstr " Lautstärke: %d%%"
 
 #: modules/gui/ncurses.c:1603
-#, fuzzy, c-format
+#, c-format
 msgid " Title    : %d/%d"
-msgstr "Titel %d (%d)"
+msgstr " Titel     : %d/%d"
 
 #: modules/gui/ncurses.c:1614
-#, fuzzy, c-format
+#, c-format
 msgid " Chapter  : %d/%d"
-msgstr "Kapitel %d"
+msgstr " Kapitel   : %d/%d"
 
 #: modules/gui/ncurses.c:1626
 #, c-format
 msgid " Source: <no current item> %s"
-msgstr ""
+msgstr " Quelle: <kein aktuelles Objekt> %s"
 
 #: modules/gui/ncurses.c:1628
-#, fuzzy
 msgid " [ h for help ]"
-msgstr "+----[ Ende der Hilfe ]"
+msgstr " [ h für Hilfe ]"
 
 #: modules/gui/ncurses.c:1650
-#, fuzzy
 msgid " Help "
-msgstr "Hilfe"
+msgstr " Hilfe "
 
 #: modules/gui/ncurses.c:1654
-#, fuzzy
 msgid "[Display]"
-msgstr "Anzeige"
+msgstr "[Anzeige]"
 
 #: modules/gui/ncurses.c:1657
 msgid "     h,H         Show/Hide help box"
-msgstr ""
+msgstr "     h,H         Hilfsbox ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1658
 msgid "     i           Show/Hide info box"
-msgstr ""
+msgstr "     i           Infobox ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1659
 msgid "     m           Show/Hide metadata box"
-msgstr ""
+msgstr "     m           Metadatenbox ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1660
 msgid "     L           Show/Hide messages box"
-msgstr ""
+msgstr "     L           Meldungsbox ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1661
 msgid "     P           Show/Hide playlist box"
-msgstr ""
+msgstr "     P           Wiedergabelistenbox ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1662
 msgid "     B           Show/Hide filebrowser"
-msgstr ""
+msgstr "     B           Dateibrowser ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1663
 msgid "     x           Show/Hide objects box"
-msgstr ""
+msgstr "     x           Objektbox ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1664
 #, fuzzy
 msgid "     S           Show/Hide statistics box"
-msgstr "| next . . . . . . . . . . . . . nächstes Wiedergabelistenobjekt"
+msgstr "     S           Statistikbox ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1665
 msgid "     c           Switch color on/off"
-msgstr ""
+msgstr "     c           Farben an-/ausschalten"
 
 #: modules/gui/ncurses.c:1666
 msgid "     Esc         Close Add/Search entry"
-msgstr ""
+msgstr "     Esc         Schließen, Sucheintrag hinzufügen"
 
 #: modules/gui/ncurses.c:1671
-#, fuzzy
 msgid "[Global]"
-msgstr "Globale Verstärkung"
+msgstr "[Global]"
 
 #: modules/gui/ncurses.c:1674
 msgid "     q, Q, Esc   Quit"
-msgstr ""
+msgstr "     q, Q, Esc   Beenden"
 
 #: modules/gui/ncurses.c:1675
 msgid "     s           Stop"
-msgstr ""
+msgstr "     s           Stopp"
 
 #: modules/gui/ncurses.c:1676
 msgid "     <space>     Pause/Play"
-msgstr ""
+msgstr "   <Leertaste>   Pause/Wiedergabe"
 
 #: modules/gui/ncurses.c:1677
-#, fuzzy
 msgid "     f           Toggle Fullscreen"
-msgstr "| f [on|off] . . . . . . . . . . . . . . . . Vollbild umschalten"
+msgstr "     f           Vollbild an/aus"
 
 #: modules/gui/ncurses.c:1678
-#, fuzzy
 msgid "     n, p        Next/Previous playlist item"
-msgstr "| prev . . . . . . . . . . . . vorheriges Wiedergabelistenobjekt"
+msgstr "     n, p        Nächstes/vorheriges Wiedergabelistenobjekt"
 
 #: modules/gui/ncurses.c:1679
 msgid "     [, ]        Next/Previous title"
-msgstr ""
+msgstr "     [, ]        Nächster/vorheriger Titel"
 
 #: modules/gui/ncurses.c:1680
 msgid "     <, >        Next/Previous chapter"
-msgstr ""
+msgstr "     <, >        Nächstes/vorheriges Kapitel"
 
 #: modules/gui/ncurses.c:1681
 #, c-format
 msgid "     <right>     Seek +1%%"
-msgstr ""
+msgstr "     <rechts>    Durchsuchen +1%%"
 
 #: modules/gui/ncurses.c:1682
 #, c-format
 msgid "     <left>      Seek -1%%"
-msgstr ""
+msgstr "     <links>     Durchsuchen -1%%"
 
 #: modules/gui/ncurses.c:1683
 msgid "     a           Volume Up"
-msgstr ""
+msgstr "     a           Lautstärke erhöhen"
 
 #: modules/gui/ncurses.c:1684
 msgid "     z           Volume Down"
-msgstr ""
+msgstr "     z           Lautstärke verringern"
 
 #: modules/gui/ncurses.c:1689
-#, fuzzy
 msgid "[Playlist]"
-msgstr "Wiedergabeliste"
+msgstr "[Wiedergabeliste]"
 
 #: modules/gui/ncurses.c:1692
-#, fuzzy
 msgid "     r           Toggle Random playing"
-msgstr "| f [on|off] . . . . . . . . . . . . . . . . Vollbild umschalten"
+msgstr "     r           Zufällige Wiedergabe an/aus"
 
 #: modules/gui/ncurses.c:1693
 msgid "     l           Toggle Loop Playlist"
-msgstr ""
+msgstr "     l           Wiedergabelistenwiederholung an/aus"
 
 #: modules/gui/ncurses.c:1694
 msgid "     R           Toggle Repeat item"
-msgstr ""
+msgstr "     R           Ein Objekt wiederholen"
 
 #: modules/gui/ncurses.c:1695
-#, fuzzy
 msgid "     o           Order Playlist by title"
-msgstr "| next . . . . . . . . . . . . . nächstes Wiedergabelistenobjekt"
+msgstr "     o           Wiedergabeliste nach Titel sortieren"
 
 #: modules/gui/ncurses.c:1696
 msgid "     O           Reverse order Playlist by title"
-msgstr ""
+msgstr "     O           Wiedergabeliste umgekehrt nach Titel sortieren"
 
 #: modules/gui/ncurses.c:1697
 msgid "     g           Go to the current playing item"
-msgstr ""
+msgstr "     g           Gehe zum gerade spielenden Objekt"
 
 #: modules/gui/ncurses.c:1698
 msgid "     /           Look for an item"
-msgstr ""
+msgstr "     /           Nach Objekt suchen"
 
 #: modules/gui/ncurses.c:1699
 msgid "     A           Add an entry"
-msgstr ""
+msgstr "     A           Eintrag hinzufügen"
 
 #: modules/gui/ncurses.c:1700
 msgid "     D, <del>    Delete an entry"
-msgstr ""
+msgstr "     D, <dl>     Eintrag löschen"
 
 #: modules/gui/ncurses.c:1701
 msgid "     <backspace> Delete an entry"
-msgstr ""
+msgstr "   <Rückschritt> Eintrag löschen"
 
 #: modules/gui/ncurses.c:1702
 msgid "     e           Eject (if stopped)"
-msgstr ""
+msgstr "     e           Auswerfen (falls gestoppt)"
 
 #: modules/gui/ncurses.c:1707
-#, fuzzy
 msgid "[Filebrowser]"
-msgstr "Filter"
+msgstr "[Dateibrowser]"
 
 #: modules/gui/ncurses.c:1710
 msgid "     <enter>     Add the selected file to the playlist"
-msgstr ""
+msgstr "     <Enter>     Ausgewählte Datei hinzufügen"
 
 #: modules/gui/ncurses.c:1711
 msgid "     <space>     Add the selected directory to the playlist"
-msgstr ""
+msgstr "   <Leertaste>   Ausgewählten Ordner hinzufügen"
 
 #: modules/gui/ncurses.c:1712
 msgid "     .           Show/Hide hidden files"
-msgstr ""
+msgstr "     .           Versteckte Dateien ein-/ausblenden"
 
 #: modules/gui/ncurses.c:1717
 msgid "[Boxes]"
-msgstr ""
+msgstr "[Boxen]"
 
 #: modules/gui/ncurses.c:1720
 msgid "     <up>,<down>     Navigate through the box line by line"
-msgstr ""
+msgstr "   <hoch>,<runter>   Durch die Box Zeile pro Zeile bewegen"
 
 #: modules/gui/ncurses.c:1721
 msgid "     <pgup>,<pgdown> Navigate through the box page by page"
-msgstr ""
+msgstr "   <shoch>,<srunter> Durch die Box Seite pro Seite bewegen"
 
 #: modules/gui/ncurses.c:1726
-#, fuzzy
 msgid "[Player]"
-msgstr "Wiedergabe"
+msgstr "[Steuerung]"
 
 #: modules/gui/ncurses.c:1729
 #, c-format
 msgid "     <up>,<down>     Seek +/-5%%"
-msgstr ""
+msgstr "   <hoch>,<runter>   Durchsuchen +/-5%%"
 
 #: modules/gui/ncurses.c:1734
-#, fuzzy
 msgid "[Miscellaneous]"
-msgstr "Verschiedenes"
+msgstr "[Verschiedenes]"
 
 #: modules/gui/ncurses.c:1737
 msgid "     Ctrl-l          Refresh the screen"
-msgstr ""
+msgstr "     Strg-l          Bildschirm aktualisieren"
 
 #: modules/gui/ncurses.c:1758
-#, fuzzy
 msgid " Information "
-msgstr "Information"
+msgstr " Information "
 
 #: modules/gui/ncurses.c:1770
-#, fuzzy, c-format
+#, c-format
 msgid "  [%s]"
-msgstr "%s [%s %d]"
+msgstr "  [%s]"
 
 #: modules/gui/ncurses.c:1777
 #, c-format
 msgid "      %s: %s"
-msgstr ""
+msgstr "      %s: %s"
 
 #: modules/gui/ncurses.c:1784 modules/gui/ncurses.c:1872
-#, fuzzy
 msgid "No item currently playing"
-msgstr "Keine Objekte in der Wiedergabeliste"
+msgstr "Keine Objekt wird gerade abgespielt"
 
 #: modules/gui/ncurses.c:1895
-#, fuzzy
 msgid " Logs "
-msgstr "Logo"
+msgstr " Protokolle "
 
 #: modules/gui/ncurses.c:1938
-#, fuzzy
 msgid " Browse "
-msgstr "Durchsuchen..."
+msgstr " Durchsuchen "
 
 #: modules/gui/ncurses.c:1993
 msgid " Objects "
-msgstr ""
+msgstr " Objekte "
 
 #: modules/gui/ncurses.c:2007
-#, fuzzy
 msgid " Stats "
-msgstr "Status"
+msgstr " Statistik "
 
 #: modules/gui/ncurses.c:2096
 #, c-format
 msgid "\\ sending bitrate  :   %6.0f kb/s"
-msgstr ""
+msgstr "\\ Versende-Bitrate  :   %6.0f kb/s"
 
 #: modules/gui/ncurses.c:2129
 msgid " Playlist (All, one level) "
-msgstr ""
+msgstr " Wiedergabeliste (all, eine Ebene) "
 
 #: modules/gui/ncurses.c:2132
-#, fuzzy
 msgid " Playlist (By category) "
-msgstr "Nach Kategorie"
+msgstr " Wiedergabeliste (nach Kategorie) "
 
 #: modules/gui/ncurses.c:2135
-#, fuzzy
 msgid " Playlist (Manually added) "
-msgstr "Manuell hinzugefügt"
+msgstr " Wiedergabeliste (manuell hinzugefügt) "
 
 #: modules/gui/ncurses.c:2223 modules/gui/ncurses.c:2227
 #, c-format
 msgid "Find: %s"
-msgstr ""
+msgstr "Suche: %s"
 
 #: modules/gui/ncurses.c:2236
-#, fuzzy, c-format
+#, c-format
 msgid "Open: %s"
-msgstr "Öffnen:"
+msgstr "Öffnen: %s"
 
 #: modules/gui/pda/pda.c:62
 msgid "Autoplay selected file"
@@ -16509,92 +16487,88 @@ msgstr "QNX RTOS Bild- und Tonausgabe."
 
 #: modules/gui/qt4/components/extended_panels.cpp:924
 #: modules/gui/qt4/components/extended_panels.cpp:982
-#, fuzzy
 msgid "Preamp\n"
-msgstr "Vorverstärker"
+msgstr "Vorverstärker\n"
 
 #: modules/gui/qt4/components/extended_panels.cpp:924
 #: modules/gui/qt4/components/extended_panels.cpp:982
 msgid "dB"
-msgstr ""
+msgstr "dB"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1204
-#, fuzzy
 msgid "Audio/Video"
-msgstr "Audiocodec"
+msgstr "Audio/Video"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1220
 msgid "Advance of audio over video:"
-msgstr ""
+msgstr "Audiovorsprung gegenüber Video:"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1229
 msgid ""
 "A positive value means that\n"
 "the audio is ahead of the video"
 msgstr ""
+"Ein positiver Wert bedeutet, dass\n"
+"das Ton dem Video voraus ist"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1237
-#, fuzzy
 msgid "Subtitles/Video"
-msgstr "Untertitel-Datei"
+msgstr "Untertitel/Video"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1253
-#, fuzzy
 msgid "Advance of subtitles over video:"
-msgstr "Einblendungen/Untertitel"
+msgstr "Vorsprung der Untertitel gegenüber Video:"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1262
 msgid ""
 "A positive value means that\n"
 "the subtitles are ahead of the video"
 msgstr ""
+"Ein positiver Wert bedeutet, dass\n"
+"die Untertitel dem Video voraus sind."
 
 #: modules/gui/qt4/components/extended_panels.cpp:1281
-#, fuzzy
 msgid "Speed of the subtitles:"
-msgstr "Textuntertitel-Dekoder"
+msgstr "Geschwindigkeit der Untertitel"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1297
-#, fuzzy
 msgid "Force update of this dialog's values"
-msgstr "Benutzung des Timeshift-Moduls erzwingen."
+msgstr "Aktualisierung der Werte dieses Dialogs erzwingen"
 
 #: modules/gui/qt4/components/info_panels.cpp:349
 msgid "Extra metadata and other information are shown in this panel.\n"
-msgstr ""
+msgstr "Zusätzliche Metadaten und andere Informationen werde in diesem Panel "
+"gezeigt.\n"
 
 #: modules/gui/qt4/components/info_panels.cpp:421
 msgid ""
 "Information about what your media or stream is made of.\n"
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
+"Informationen über den Aufbau Ihres Mediums oder Streams.\n"
+"Muxer, Audio- und Videocodecs, Untertitel werden gezeigt."
 
 #: modules/gui/qt4/components/info_panels.cpp:495
 msgid "Statistics about the currently playing media or stream."
-msgstr ""
+msgstr "Statistik über das gerade abgespielte Medium bzw. Stream."
 
 #: modules/gui/qt4/components/info_panels.cpp:543
-#, fuzzy
 msgid "Sent bitrate"
 msgstr "Senderate"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:253
-#, fuzzy
 msgid "Current visualization:"
-msgstr "Audiovisualisierungen"
+msgstr "Aktuelle Visualisierungen:"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:310
-#, fuzzy
 msgid "A to B"
-msgstr " nach "
+msgstr "A nach B"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:319
-#, fuzzy
 msgid "Frame by Frame"
-msgstr "Framerate"
+msgstr "Frame nach Frame"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:332
-#, fuzzy
 msgid "Take a snapshot"
 msgstr "Videoschnappschuss machen"
 
@@ -16603,104 +16577,88 @@ msgid "Menu"
 msgstr "Menü"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:524
-#, fuzzy
 msgid "Teletext on"
-msgstr "Textuntertitel-Dekoder"
+msgstr "Teletext an"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:536
 #: modules/gui/qt4/components/interface_widgets.cpp:693
-#, fuzzy
 msgid "Teletext"
-msgstr "Textuntertitel-Dekoder"
+msgstr "Teletext"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:614
-#, fuzzy
 msgid "Show playlist"
-msgstr "Wiedergabeliste sichern"
+msgstr "Wiedergabeliste anzeigen"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:619
-#, fuzzy
 msgid "Extended Settings"
-msgstr "Encoder-Einstellungen"
+msgstr "Erweiterte Einstellungen"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:699
-#, fuzzy
 msgid "Transparent"
-msgstr "Transparenz"
+msgstr "Transparent"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:1225
 msgid "Revert to normal play speed"
-msgstr ""
+msgstr "Auf normale Wiedergabegeschwindigkeit zurücksetzen"
 
 #: modules/gui/qt4/components/open_panels.cpp:84
-#, fuzzy
 msgid "Select one or multiple files"
-msgstr "Wählen Sie die Datei, in die gesichert wird"
+msgstr "Wählen Sie eine oder mehrere Dateien aus"
 
 #: modules/gui/qt4/components/open_panels.cpp:102
-#, fuzzy
 msgid "File names:"
-msgstr "Dateiname"
+msgstr "Dateinamen:"
 
 #: modules/gui/qt4/components/open_panels.cpp:104
-#, fuzzy
 msgid "Filter:"
-msgstr "Filter"
+msgstr "Filter:"
 
 #: modules/gui/qt4/components/open_panels.cpp:147
 msgid "Open subtitles file"
 msgstr "Untertiteldatei öffnen"
 
 #: modules/gui/qt4/components/open_panels.cpp:389
-#, fuzzy
 msgid "Open a device or a VIDEO_TS directory"
-msgstr "VIDEO_TS Ordner öffnen"
+msgstr "Ein Laufwerk oder einen VIDEO_TS Ordner öffnen"
 
 #: modules/gui/qt4/components/open_panels.cpp:616
 #: modules/gui/qt4/components/open_panels.cpp:872
-#, fuzzy
 msgid "DVB Type:"
-msgstr "Volumetyp"
+msgstr "DVB Typ:"
 
 #: modules/gui/qt4/components/open_panels.cpp:640
 #: modules/gui/qt4/components/open_panels.cpp:902
-#, fuzzy
 msgid "Transponder symbol rate"
-msgstr "Transponder-Symbolrate in kHz"
+msgstr "Transponder-Symbolrate"
 
 #: modules/gui/qt4/components/open_panels.cpp:762
-#, fuzzy
 msgid "Channels:"
-msgstr "Kanäle"
+msgstr "Kanäle:"
 
 #: modules/gui/qt4/components/open_panels.cpp:775
-#, fuzzy
 msgid "Selected ports:"
-msgstr "Ausgewählt:"
+msgstr "Ausgewählte Ports:"
 
 #: modules/gui/qt4/components/open_panels.cpp:778
 msgid ".*"
-msgstr ""
+msgstr ".*"
 
 #: modules/gui/qt4/components/open_panels.cpp:783
-#, fuzzy
 msgid "Input caching:"
-msgstr "Input hat gewechselt"
+msgstr "Input Caching:"
 
 #: modules/gui/qt4/components/open_panels.cpp:793
 #, fuzzy
 msgid "Use VLC pace"
-msgstr "SAP-Cache benutzen"
+msgstr "VLC-Geschwindigkeit benutzen"
 
 #: modules/gui/qt4/components/open_panels.cpp:797
-#, fuzzy
 msgid "Auto connnection"
-msgstr "Automatisch wieder verbinden"
+msgstr "Automatische Verbindung"
 
 #: modules/gui/qt4/components/open_panels.cpp:821
-#, fuzzy
 msgid "Radio device name"
-msgstr "Audio-Gerätename"
+msgstr "Radio-Gerätename"
 
 #: modules/gui/qt4/components/open_panels.cpp:1107
 #: modules/gui/qt4/ui/open_capture.ui:77
@@ -16708,74 +16666,62 @@ msgid "Advanced options..."
 msgstr "Erweiterte Optionen..."
 
 #: modules/gui/qt4/components/playlist/playlist.cpp:75
-#, fuzzy
 msgid "Double click to get media informations"
 msgstr ""
-"Wählen Sie Ihren Videocodec. Klicken Sie auf einen, um mehr Informationen zu "
-"erhalten."
+"Für Medieninformationen doppelklicken"
 
 #: modules/gui/qt4/components/playlist/standardpanel.cpp:144
-#, fuzzy
 msgid "Show the current item"
-msgstr "Aktuelles Objekt wiederholen"
+msgstr "Aktuelles Objekt anzeigen"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:302
 msgid "Select File"
 msgstr "Datei auswählen"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:331
-#, fuzzy
 msgid "Select Directory"
-msgstr "Wählen Sie einen Ordner"
+msgstr "Verzeichnis auswählen"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1112
 msgid "Select an action to change the associated hotkey"
-msgstr ""
+msgstr "Wählen Sie eine Aktion um den assoziierten Hotkey zu ändern"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1127
-#, fuzzy
 msgid "Set"
-msgstr "QP festlegen"
+msgstr "Festlegen"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1239
-#, fuzzy
 msgid "Unset"
-msgstr "Benutzer"
+msgstr "Festlegung aufheben"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1277
-#, fuzzy
 msgid "Hotkey for "
-msgstr "Hotkeys"
+msgstr "Hotkey für "
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1280
 msgid "Press the new keys for "
-msgstr "Die neuen Tasten drücken für"
+msgstr "Die neuen Tasten drücken für "
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1305
-#, fuzzy
 msgid "Warning: the key is already assigned to \""
-msgstr "Warnung: die Taste ist bereits für \" belegt"
+msgstr "Warnung: die Taste ist bereits belegt für \""
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1325
 #: modules/gui/qt4/components/preferences_widgets.cpp:1333
-#, fuzzy
 msgid "Key: "
-msgstr "Schlüssel"
+msgstr "Schlüssel: "
 
 #: modules/gui/qt4/components/simple_preferences.cpp:80
-#, fuzzy
 msgid "Input and Codecs"
-msgstr "Input / Codecs"
+msgstr "Input und Codecs"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:220
-#, fuzzy
 msgid "Device:"
-msgstr "Device"
+msgstr "Gerät:"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:350
-#, fuzzy
 msgid "Input & Codecs Settings"
-msgstr "Input / Codecs"
+msgstr "Input & Codecs Einstellungen"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:356
 msgid ""
@@ -16785,32 +16731,27 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/components/simple_preferences.cpp:535
-#, fuzzy
 msgid "Configure Hotkeys"
-msgstr "Konfigurieren"
+msgstr "Hotkeys konfigurieren"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:744
 #: modules/gui/qt4/dialogs_provider.hpp:54
-#, fuzzy
 msgid "Audio Files"
-msgstr "Audiofilter"
+msgstr "Audiodateien"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:745
 #: modules/gui/qt4/dialogs_provider.hpp:49
-#, fuzzy
 msgid "Video Files"
-msgstr "Videofilter"
+msgstr "Videodateien"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:746
 #: modules/gui/qt4/dialogs_provider.hpp:59
-#, fuzzy
 msgid "Playlist Files"
-msgstr "Wiedergabelistesansicht"
+msgstr "Dateien in der Wiedergabeliste"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:793
-#, fuzzy
 msgid "&Apply"
-msgstr "Übernehmen"
+msgstr "&Anwenden"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:794
 #: modules/gui/qt4/dialogs/gototime.cpp:52 modules/gui/qt4/dialogs/open.cpp:99
@@ -16845,19 +16786,16 @@ msgid "&Clear"
 msgstr "&Löschen"
 
 #: modules/gui/qt4/dialogs/errors.cpp:58
-#, fuzzy
 msgid "Hide future errors"
-msgstr "Weitere Fehler unterdrücken"
+msgstr "Zukünftige Fehler unterdrücken"
 
 #: modules/gui/qt4/dialogs/extended.cpp:41
-#, fuzzy
 msgid "Adjustments and Effects"
-msgstr "Videocodecs"
+msgstr "Anpassungen und Effekte"
 
 #: modules/gui/qt4/dialogs/extended.cpp:55
-#, fuzzy
 msgid "Graphic Equalizer"
-msgstr "Parametrischer Equalizer"
+msgstr "Graphischer Equalizer"
 
 #: modules/gui/qt4/dialogs/extended.cpp:58
 #, fuzzy
@@ -16865,78 +16803,69 @@ msgid "Spatializer"
 msgstr "spatial"
 
 #: modules/gui/qt4/dialogs/extended.cpp:61
-#, fuzzy
 msgid "Audio Effects"
-msgstr "Audiocodecs"
+msgstr "Audioeffekte"
 
 #: modules/gui/qt4/dialogs/extended.cpp:72
-#, fuzzy
 msgid "Video Effects"
-msgstr "Audiocodecs"
+msgstr "Videoeffekte"
 
 #: modules/gui/qt4/dialogs/extended.cpp:75
-#, fuzzy
 msgid "Synchronisation"
-msgstr "Uhrsynchronisation"
+msgstr "Synchronisation"
 
 #: modules/gui/qt4/dialogs/extended.cpp:80
-#, fuzzy
 msgid "v4l2 controls"
-msgstr "Steuerung"
+msgstr "v4l2 Steuerung"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:46
 #: modules/gui/qt4/dialogs/gototime.cpp:62
-#, fuzzy
 msgid "Go to time"
-msgstr "Gehe zu Titel"
+msgstr "Gehe zu Zeitposition"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:51
-#, fuzzy
 msgid "&Go"
-msgstr "&Nein"
+msgstr "&Los"
 
 #: modules/gui/qt4/dialogs/help.cpp:102
-#, fuzzy
 msgid "VLC media player "
-msgstr "VLC media player"
+msgstr "VLC media player "
 
 #: modules/gui/qt4/dialogs/help.cpp:117
-#, fuzzy
 msgid ""
 "VLC media player is a free media player, encoder and streamer that can read "
 "from files, CDs, DVDs, network streams, capture cards and even more!\n"
 "Also, VLC works on essentially every popular platform.\n"
 "\n"
 msgstr ""
-"Der VLC media player ist ein freier Medienplayer, der vom VideoLAN Team "
-"erstellt wird.\n"
-"Er ist ein eigenständiger Multimediaplayer, Encoder und Streamer, der viele "
-"Medientypen (Dateien, CDs, DVDs, Netzwerke, Aufnahmekarten...) lesen kann "
-"und  auf vielen PLattformen läuft.\n"
+"Der VLC media player ist ein freier Medienplayer, Encodierer und Streamer, "
+"der Dateien, von DVDs und CDs, Netzwerkstreams, Aufnahmekarten und vielem "
+"mehr lesen kann.\n"
+"Außerdem funktioniert VLC auf jeder populären Plattform.\n"
 "\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:121
-#, fuzzy
 msgid ""
 "This version of VLC was compiled by:\n"
 " "
-msgstr "Diese Version von VLC ist veraltet."
+msgstr ""
+"Diese Version von VLC wurde kompiliert von:\n"
+" "
 
 #: modules/gui/qt4/dialogs/help.cpp:125 modules/gui/wince/interface.cpp:508
 msgid "Based on Git commit: "
-msgstr ""
+msgstr "Basiert auf Git commit: "
 
 #: modules/gui/qt4/dialogs/help.cpp:126
-#, fuzzy
 msgid ""
 "You are using the Qt4 Interface.\n"
 "\n"
-msgstr "Sie benutzen das neue Qt4-Interface.\n"
+msgstr "Sie benutzen das Qt4-Interface.\n"
+"\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:127
-#, fuzzy
 msgid "Copyright (C) "
-msgstr "Copyright"
+msgstr "Copyright (C) "
 
 #: modules/gui/qt4/dialogs/help.cpp:148
 msgid ""
@@ -16957,39 +16886,34 @@ msgid "Thanks"
 msgstr "Danke"
 
 #: modules/gui/qt4/dialogs/help.cpp:210
-#, fuzzy
 msgid "&Update List"
-msgstr "Updates"
+msgstr "&Liste aktualisieren"
 
 #: modules/gui/qt4/dialogs/help.cpp:216
-#, fuzzy
 msgid "Checking for an update..."
-msgstr "Nach Updates suchen..."
+msgstr "Suche nach einen Update..."
 
 #: modules/gui/qt4/dialogs/help.cpp:259
-#, fuzzy
 msgid "Select a directory ..."
-msgstr "Wählen Sie einen Ordner"
+msgstr "Wählen Sie ein Verzeichnis..."
 
 #: modules/gui/qt4/dialogs/help.cpp:293
-#, fuzzy
 msgid "There is a new version of VLC :\n"
-msgstr "Diese Version von VLC ist veraltet."
+msgstr "Es gibt eine neue Version von VLC:\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:300
 msgid "You have the latest version of VLC"
-msgstr ""
+msgstr "Sie haben die neueste Version von VLC"
 
 #: modules/gui/qt4/dialogs/help.cpp:304
 msgid "An error occurred while checking for updates"
-msgstr ""
+msgstr "Bei der Suche nach Updates ist ein Fehler aufgetreten"
 
 #: modules/gui/qt4/dialogs/interaction.cpp:93
 msgid "Login"
 msgstr "Login"
 
 #: modules/gui/qt4/dialogs/interaction.cpp:194
-#, fuzzy
 msgid "close"
 msgstr "Schließen"
 
@@ -16998,91 +16922,81 @@ msgid "Media information"
 msgstr "Medien-Information"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:61
-#, fuzzy
 msgid "&General"
-msgstr "Allgemein"
+msgstr "All&gemein"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:63
-#, fuzzy
 msgid "&Extra Metadata"
-msgstr "Metadaten"
+msgstr "&Extra-Metadaten"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:65
-#, fuzzy
 msgid "&Codec Details"
-msgstr "Alle einblenden"
+msgstr "Codecdetails"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:69
-#, fuzzy
 msgid "&Statistics"
-msgstr "Statistiken"
+msgstr "&Statistiken"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:75
-#, fuzzy
 msgid "&Save Metadata"
-msgstr "Metadaten"
+msgstr "Metadaten &speichern"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:81
-#, fuzzy
 msgid "Location :"
-msgstr "Lateinisch"
+msgstr "Ort:"
 
 #: modules/gui/qt4/dialogs/messages.cpp:78
-#, fuzzy
 msgid "Modules tree"
-msgstr "Module"
+msgstr "Modulbaum"
 
 #: modules/gui/qt4/dialogs/messages.cpp:85
-#, fuzzy
 msgid "&Save as..."
-msgstr "Sichern unter..."
+msgstr "&Sichern als..."
 
 #: modules/gui/qt4/dialogs/messages.cpp:93
-#, fuzzy
 msgid "Verbosity Level"
-msgstr "Verbose-Level (0,1,2)"
+msgstr "Verbosity-Level"
 
 #: modules/gui/qt4/dialogs/messages.cpp:119
-#, fuzzy
 msgid "&Update"
-msgstr "Aktualisierung"
+msgstr "Akt&ualisieren"
 
 #: modules/gui/qt4/dialogs/messages.cpp:247
 msgid "Choose a filename to save the logs under..."
-msgstr "Sie müssen eine Datei auswählen, in die gesichert wird..."
+msgstr "Wählen Sie einen Dateinamen, unter dem die Protokolle "
+"gesichert werden..."
 
 #: modules/gui/qt4/dialogs/messages.cpp:249
 msgid "Texts / Logs (*.log *.txt);; All (*.*) "
-msgstr ""
+msgstr "Texte / Protokolle (*.log *.txt);; Alle (*.*) "
 
 #: modules/gui/qt4/dialogs/messages.cpp:256
 msgid ""
 "Cannot write file %1:\n"
 "%2."
 msgstr ""
+"Kann Datei %1 nicht schreiben:\n"
+"%2."
 
 #: modules/gui/qt4/dialogs/open.cpp:83
 msgid "&File"
 msgstr "&Datei"
 
 #: modules/gui/qt4/dialogs/open.cpp:84
-#, fuzzy
 msgid "&Disc"
-msgstr "Volume"
+msgstr "&Volume"
 
 #: modules/gui/qt4/dialogs/open.cpp:85
-#, fuzzy
 msgid "&Network"
-msgstr "Netzwerk"
+msgstr "&Netzwerk"
 
 #: modules/gui/qt4/dialogs/open.cpp:87
-#, fuzzy
 msgid "Capture &Device"
-msgstr "Aufnahmegerät öffnen"
+msgstr "Aufnahme&gerät öffnen"
 
 #: modules/gui/qt4/dialogs/open.cpp:106 modules/gui/qt4/dialogs/open.cpp:186
 msgid "&Enqueue"
-msgstr ""
+msgstr "Anhäng&en"
 
 #: modules/gui/qt4/dialogs/open.cpp:108 modules/gui/qt4/dialogs/open.cpp:190
 msgid "&Play"
@@ -17090,28 +17004,24 @@ msgstr "&Wiedergabe"
 
 #: modules/gui/qt4/dialogs/open.cpp:110 modules/gui/qt4/dialogs/open.cpp:180
 #: modules/gui/qt4/dialogs/sout.cpp:184
-#, fuzzy
 msgid "&Stream"
-msgstr "Stream"
+msgstr "&Stream"
 
 #: modules/gui/qt4/dialogs/open.cpp:112
-#, fuzzy
 msgid "&Convert"
-msgstr "Invertieren"
+msgstr "&Konvertieren"
 
 #: modules/gui/qt4/dialogs/open.cpp:183
-#, fuzzy
 msgid "&Convert / Save"
-msgstr "Invertieren"
+msgstr "&Konvertieren / Sichern"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:79
 msgid "&Save"
 msgstr "&Sichern"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:81
-#, fuzzy
 msgid "&Reset Preferences"
-msgstr "Einstellungen zurücksetzen"
+msgstr "Einstellungen zu&rücksetzen"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:346
 msgid ""
@@ -17122,47 +17032,40 @@ msgstr ""
 "Sind Sie sicher, dass Sie fortfahren möchten?"
 
 #: modules/gui/qt4/dialogs_provider.cpp:379
-#, fuzzy
 msgid "Open playlist file"
 msgstr "Wiedergabeliste öffnen"
 
 #: modules/gui/qt4/dialogs_provider.cpp:390
-#, fuzzy
 msgid "Choose a filename to save playlist"
-msgstr "Sie müssen eine Datei auswählen, in die gesichert wird."
+msgstr "Wählen Sie einen Dateinamen um die Wiedergabeliste zu speichern."
 
 #: modules/gui/qt4/dialogs_provider.cpp:392
-#, fuzzy
 msgid "XSPF playlist (*.xspf);; "
-msgstr "XSPF Wiedergabelistenexport"
+msgstr "XSPF Wiedergabeliste  (*.xspf);; "
 
 #: modules/gui/qt4/dialogs_provider.cpp:393
 msgid "M3U playlist (*.m3u);; Any (*.*) "
-msgstr ""
+msgstr "M3U Wiedergabeliste(*.m3u);; Alle (*.*) "
 
 #: modules/gui/qt4/dialogs_provider.cpp:541
-#, fuzzy
 msgid "Choose subtitles file"
-msgstr "Untertiteldatei benutzen"
+msgstr "Untertiteldatei wählen"
 
 #: modules/gui/qt4/dialogs_provider.cpp:543
 msgid "Subtitles files (*.cdg *.idx *.srt *.sub *.utf);;All files (*)"
-msgstr ""
+msgstr "Untertiteldateien (*.cdg *.idx *.srt *.sub *.utf);;Alle (*)"
 
 #: modules/gui/qt4/dialogs_provider.hpp:44
-#, fuzzy
 msgid "Media Files"
-msgstr "Medium: %s"
+msgstr "Mediendateien"
 
 #: modules/gui/qt4/dialogs_provider.hpp:64
-#, fuzzy
 msgid "Subtitles Files"
-msgstr "Untertitel-Datei"
+msgstr "Untertiteldateien"
 
 #: modules/gui/qt4/dialogs_provider.hpp:69
-#, fuzzy
 msgid "All Files"
-msgstr "Dateien"
+msgstr "Alle Dateien"
 
 #: modules/gui/qt4/dialogs/sout.cpp:152
 msgid ""
@@ -17170,6 +17073,9 @@ msgid ""
 " This is automatically generated when you change the above settings,\n"
 " but you can update it manually."
 msgstr ""
+"Streamausgabe-String.\n"
+" Dies wird automatisch generiert, wenn Sie die oberen Einstellungen ändern,\n"
+" aber Sie können ihn manuell ändern."
 
 #: modules/gui/qt4/dialogs/sout.cpp:200
 msgid "Save file"
@@ -17181,60 +17087,51 @@ msgstr "Container (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:83
 msgid "Hours / Minutes / Seconds:"
-msgstr ""
+msgstr "Stunden / Minuten / Sekunden:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:85
 msgid "Day / Month / Year:"
-msgstr ""
+msgstr "Tag / Monat / Jahr:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:87
-#, fuzzy
 msgid "Repeat:"
-msgstr "Alle wiederholen"
+msgstr "Wiederholen:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:89
-#, fuzzy
 msgid "Repeat delay:"
-msgstr "Alle wiederholen"
+msgstr "Wiederholungsverzögerung:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:114
-#, fuzzy
 msgid " days"
-msgstr "Verzögerung"
+msgstr " Tage"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:133
-#, fuzzy
 msgid "Import"
-msgstr "Sortieren"
+msgstr "Import"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:136
-#, fuzzy
 msgid "Export"
-msgstr "Extrahieren"
+msgstr "Export"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:266
-#, fuzzy
 msgid "Choose a filename to save the VLM configuration..."
-msgstr "Sie müssen eine Datei auswählen, in die gesichert wird..."
+msgstr "Wählen Sie einen Dateinamen, um die VLM Konfiguration zu speichern..."
 
 #: modules/gui/qt4/dialogs/vlm.cpp:268 modules/gui/qt4/dialogs/vlm.cpp:338
 msgid "VLM conf (*.vlm) ;; All (*.*)"
-msgstr ""
+msgstr "VLM Konf (*.vlm) ;; Alle (*.*)"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:336
-#, fuzzy
 msgid "Choose a VLM configuration file to open..."
-msgstr "VLM-Konfigurationsdatei"
+msgstr "Wählen Sie eine VLM-Konfigurationsdatei..."
 
 #: modules/gui/qt4/main_interface.cpp:470
-#, fuzzy
 msgid "Privacy and Network policies"
-msgstr "Oberflächeninteraktionen"
+msgstr "Privatsphäre und Netzwerkpolicies"
 
 #: modules/gui/qt4/main_interface.cpp:474
-#, fuzzy
 msgid "Privacy and Network Warning"
-msgstr "Oberflächeninteraktionen"
+msgstr "Privatsphären- und Netzwerkwarnung"
 
 #: modules/gui/qt4/main_interface.cpp:477
 msgid ""
@@ -17248,29 +17145,36 @@ msgid ""
 "<p>Therefore please check the following options, the default being almost no "
 "access on the web.</p>\n"
 msgstr ""
+"<p>Das <i>VideoLAN Team</i> mag es nicht, wenn ein Programm ohne "
+"Authorisierung online geht.</p>\n"
+" <p><i>VLC media player</i> kann beschränkte Informationen im Internet "
+"anfordern, besonders um CD Cover zu bekommen oder um festzustellen, ob 
+"Updates verfügbar sind.</p>\n"
+"<p><i>VLC media player</i> sendet oder sammelt <b>KEINE</b> Informationen "
+"über Ihre Benutzung, auch nicht annonym.</p>\n"
+"<p>Bitte überprüfen Sie deshalb die folgenden Einstellungen. Standardmäßig "
+"erfolgt fast kein Zugriff auf das Web.</p>\n"
 
 #: modules/gui/qt4/main_interface.cpp:1007
 msgid "Control menu for the player"
-msgstr ""
+msgstr "Steuerungsmenü für den Player"
 
 #: modules/gui/qt4/main_interface.cpp:1056
 msgid "Paused"
-msgstr "Pausiert"
+msgstr "Angehalten"
 
 #: modules/gui/qt4/menus.cpp:272
-#, fuzzy
 msgid "&Media"
-msgstr "Medium: %s"
+msgstr "&Medien"
 
 #: modules/gui/qt4/menus.cpp:273
-#, fuzzy
 msgid "&Playlist"
-msgstr "Wiedergabeliste"
+msgstr "&Wiedergabeliste"
 
+# Wie in Firefox.
 #: modules/gui/qt4/menus.cpp:275
-#, fuzzy
 msgid "&Tools"
-msgstr "Werkzeug"
+msgstr "&Extras"
 
 #: modules/gui/qt4/menus.cpp:276 modules/gui/qt4/menus.cpp:815
 msgid "&Audio"
@@ -17281,43 +17185,38 @@ msgid "&Video"
 msgstr "&Video"
 
 #: modules/gui/qt4/menus.cpp:278 modules/gui/qt4/menus.cpp:827
-#, fuzzy
 msgid "&Playback"
-msgstr "Wiedergabe"
+msgstr "Wieder&gabe"
 
 #: modules/gui/qt4/menus.cpp:279
 msgid "&Help"
 msgstr "&Hilfe"
 
 #: modules/gui/qt4/menus.cpp:292 modules/gui/qt4/menus.cpp:679
-#, fuzzy
 msgid "&Open File..."
-msgstr "Datei öffnen..."
+msgstr "Datei &öffnen..."
 
 #: modules/gui/qt4/menus.cpp:296 modules/gui/qt4/menus.cpp:683
 msgid "Open &Disc..."
-msgstr "Medium öffnen..."
+msgstr "&Medium öffnen..."
 
 #: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:685
-#, fuzzy
 msgid "Open &Network..."
-msgstr "Netzwerk öffnen..."
+msgstr "&Netzwerk öffnen..."
 
 #: modules/gui/qt4/menus.cpp:300 modules/gui/qt4/menus.cpp:687
 msgid "Open &Capture Device..."
 msgstr "Aufnahmegerät öffnen..."
 
 #: modules/gui/qt4/menus.cpp:305
-#, fuzzy
 msgid "&Streaming..."
-msgstr "Stream"
+msgstr "&Streaming..."
 
 #: modules/gui/qt4/menus.cpp:308
 msgid "Conve&rt / Save..."
-msgstr ""
+msgstr "Konve&rtieren / Speichern..."
 
 #: modules/gui/qt4/menus.cpp:312 modules/gui/qt4/menus.cpp:904
-#, fuzzy
 msgid "&Quit"
 msgstr "Beenden"
 
@@ -17330,14 +17229,12 @@ msgid "Undock from interface"
 msgstr "Vom Interface loslösen"
 
 #: modules/gui/qt4/menus.cpp:332
-#, fuzzy
 msgid "Ctrl+U"
-msgstr "Strg"
+msgstr "Strg+U"
 
 #: modules/gui/qt4/menus.cpp:353
-#, fuzzy
 msgid "Ctrl+L"
-msgstr "Strg"
+msgstr "Strg+L"
 
 #: modules/gui/qt4/menus.cpp:364
 msgid "Add Interfaces"
@@ -17348,98 +17245,80 @@ msgid "Minimal View..."
 msgstr "Minimales Interface..."
 
 #: modules/gui/qt4/menus.cpp:375
-#, fuzzy
 msgid "Ctrl+H"
-msgstr "Strg"
+msgstr "Strg+H"
 
 #: modules/gui/qt4/menus.cpp:381 modules/gui/qt4/menus.cpp:848
-#, fuzzy
 msgid "Toggle Fullscreen Interface"
-msgstr "Vollbildmodus wechseln"
+msgstr "Vollbildsteuerung wechseln"
 
 #: modules/gui/qt4/menus.cpp:385
 msgid "Advanced controls"
 msgstr "Erweiterte Optionen"
 
 #: modules/gui/qt4/menus.cpp:391
-#, fuzzy
 msgid "Visualizations selector"
-msgstr "Bewegungsvektoren visualisieren"
+msgstr "Visualisierungsauswahl"
 
 #: modules/gui/qt4/menus.cpp:451
-#, fuzzy
 msgid "Audio &Track"
-msgstr "Audiospur"
+msgstr "Audio&spur"
 
 #: modules/gui/qt4/menus.cpp:452
-#, fuzzy
 msgid "Audio &Device"
-msgstr "Audiodevice"
+msgstr "Audiogerät"
 
 #: modules/gui/qt4/menus.cpp:453
-#, fuzzy
 msgid "Audio &Channels"
-msgstr "Audiokanäle"
+msgstr "Audio&kanäle"
 
 #: modules/gui/qt4/menus.cpp:454
-#, fuzzy
 msgid "&Equalizer"
-msgstr "Equalizer"
+msgstr "&Equalizer"
 
 #: modules/gui/qt4/menus.cpp:456
-#, fuzzy
 msgid "&Visualizations"
-msgstr "Visualisierungen"
+msgstr "&Visualisierungen"
 
 #: modules/gui/qt4/menus.cpp:491
-#, fuzzy
 msgid "Video &Track"
-msgstr "Videospur"
+msgstr "Video&spur"
 
 #: modules/gui/qt4/menus.cpp:494
-#, fuzzy
 msgid "&Subtitles Track"
-msgstr "Untertitelspur"
+msgstr "Untertitel&spur"
 
 #: modules/gui/qt4/menus.cpp:497
-#, fuzzy
 msgid "Load File..."
-msgstr "Datei hinzufügen..."
+msgstr "Datei laden..."
 
 #: modules/gui/qt4/menus.cpp:501
-#, fuzzy
 msgid "Toggle &Fullscreen"
-msgstr "&Vollbild"
+msgstr "&Vollbild an/aus"
 
 #: modules/gui/qt4/menus.cpp:502
-#, fuzzy
 msgid "&Zoom"
-msgstr "Zoomen"
+msgstr "&Zoomen"
 
 #: modules/gui/qt4/menus.cpp:503
-#, fuzzy
 msgid "&Deinterlace"
-msgstr "Deinterlace"
+msgstr "&Deinterlace"
 
 #: modules/gui/qt4/menus.cpp:504
-#, fuzzy
 msgid "&Aspect Ratio"
-msgstr "Seitenverhältnis"
+msgstr "Seitenverh&ältnis"
 
 #: modules/gui/qt4/menus.cpp:505
-#, fuzzy
 msgid "&Crop"
-msgstr "Beschneiden"
+msgstr "&Beschneiden"
 
 #: modules/gui/qt4/menus.cpp:506
-#, fuzzy
 msgid "Always &On Top"
-msgstr "Immer im Vordergrund"
+msgstr "Immer im V&ordergrund"
 
 #: modules/gui/qt4/menus.cpp:546
-#, fuzzy
 msgid "&Bookmarks"
-msgstr "Lesezeichen"
+msgstr "&Lesezeichen"
 
 #: modules/gui/qt4/menus.cpp:547
 msgid "&Title"
@@ -17450,9 +17329,8 @@ msgid "&Chapter"
 msgstr "&Kapitel"
 
 #: modules/gui/qt4/menus.cpp:549
-#, fuzzy
 msgid "&Program"
-msgstr "Programm"
+msgstr "&Programm"
 
 #: modules/gui/qt4/menus.cpp:550
 msgid "&Navigation"
@@ -17464,7 +17342,7 @@ msgstr "Hilfe..."
 
 #: modules/gui/qt4/menus.cpp:615
 msgid "Check for updates..."
-msgstr "Suche Updates..."
+msgstr "Nach Updates suchen..."
 
 # Wie in Firefox.
 #: modules/gui/qt4/menus.cpp:674
@@ -17472,9 +17350,8 @@ msgid "Tools"
 msgstr "Extras"
 
 #: modules/gui/qt4/menus.cpp:801
-#, fuzzy
 msgid "Leave Fullscreen"
-msgstr "Vollbild ausfüllen"
+msgstr "Vollbild verlassen"
 
 # Wie in iTunes; alt. Infobereich (Windows)
 #: modules/gui/qt4/menus.cpp:888
@@ -17482,25 +17359,24 @@ msgid "Hide VLC media player in taskbar"
 msgstr "VLC media player in die Taskleiste minimieren"
 
 #: modules/gui/qt4/menus.cpp:894
-#, fuzzy
 msgid "Show VLC media player"
-msgstr "VLC media player"
+msgstr "VLC media player anzeigen"
 
 #: modules/gui/qt4/menus.cpp:902
-#, fuzzy
 msgid "&Open Media"
-msgstr "Volume öffnen"
+msgstr "V&olume öffnen"
 
 #: modules/gui/qt4/qt4.cpp:66
-#, fuzzy
 msgid "Show advanced prefs over simple ones"
-msgstr "Erweiterte Optionen anzeigen"
+msgstr "Erweiterte statt einfache Einstellungen anzeigen"
 
 #: modules/gui/qt4/qt4.cpp:67
 msgid ""
 "Show advanced preferences and not simple preferences when opening the "
 "preferences dialog."
 msgstr ""
+"Zeigt die Erweiterten Einstellungen und nicht die Einfachen Einstellungen "
+"wenn der Einstellungsdialog geöffnet wird."
 
 #: modules/gui/qt4/qt4.cpp:71 modules/gui/skins2/src/skin_main.cpp:437
 msgid "Systray icon"
@@ -17511,53 +17387,57 @@ msgid ""
 "Show an icon in the systray allowing you to control VLC media player for "
 "basic actions"
 msgstr ""
+"Zeigt ein Icon in der Symbolleiste, dass die Steuerung von VLC media player "
+"für einfache Aktionen erlaubt"
 
 #: modules/gui/qt4/qt4.cpp:76
 msgid "Start VLC with only a systray icon"
-msgstr ""
+msgstr "VLC nur mit einem Icon in der Symbolleiste starten"
 
 #: modules/gui/qt4/qt4.cpp:77
 msgid ""
 "When you launch VLC with that option, VLC will start with just an icon "
 "inyour taskbar"
 msgstr ""
+"Wenn Sie VLC mit dieser Option starten, wird VLC nur ein Icon in ihrer "
+"Taskleiste zeigen."
 
 #: modules/gui/qt4/qt4.cpp:81
 msgid "Show playing item name in window title"
-msgstr ""
+msgstr "Namen des aktuellen Objekts im Fenstertitel zeigen"
 
 #: modules/gui/qt4/qt4.cpp:82
 msgid "Show the name of the song or video in the controler window title"
-msgstr ""
+msgstr "Zeigt den Namen des Songs oder des Videos im Fenstertitel der "
+"Steuerung."
 
 #: modules/gui/qt4/qt4.cpp:85
-#, fuzzy
 msgid "Path to use in openfile dialog"
-msgstr "Pfad zur ui.rc Datei"
+msgstr "Pfad zur Benutzung im Datei-öffnen-Dialog"
 
 #: modules/gui/qt4/qt4.cpp:87
 msgid "Show notification popup on track change"
-msgstr ""
+msgstr "Benachrichtigungspopup beim Wechsel des Titels zeigen"
 
 #: modules/gui/qt4/qt4.cpp:89
 msgid ""
 "Show a notification popup with the artist and track name when the current "
 "playlist item changes, when VLC is minimized or hidden."
 msgstr ""
+"Zeigt ein Benachrichtigungs-Popup mit dem Interpreten und Titelnamen, wenn "
+"das wiedergegebene Objekt wechselt, wenn VLC minimiert oder ausgeblendet ist."
 
 #: modules/gui/qt4/qt4.cpp:92
 msgid "Advanced options"
 msgstr "Erweiterte Optionen"
 
 #: modules/gui/qt4/qt4.cpp:93
-#, fuzzy
 msgid "Show all the advanced options in the dialogs"
-msgstr "Erweiterte Optionen anzeigen"
+msgstr "Alle erweiterten Optionen in den Dialogen anzeigen"
 
 #: modules/gui/qt4/qt4.cpp:96
-#, fuzzy
 msgid "Windows opacity between 0.1 and 1."
-msgstr "QP Faktor zwischen I und P"
+msgstr "Fenstertransparenz zwischen 0,1 und 1."
 
 #: modules/gui/qt4/qt4.cpp:97
 msgid ""
@@ -17565,52 +17445,57 @@ msgid ""
 "extended panel. This option only works with Windows and X11 with composite "
 "extensions."
 msgstr ""
+"Legt die Transparenz des Fensters zwischen 0,1 und 1 für Hauptinterface, "
+"Wiedergabeliste und Erweiterte Optionen fest. Dies funktioniert nur unter "
+"Windows und X11 mit Composite-Erweiterungen."
 
 #: modules/gui/qt4/qt4.cpp:102
 msgid "Show unimportant error and warnings dialogs"
-msgstr ""
+msgstr "Zeige unwichtige Fehler und Warndialoge"
 
 #: modules/gui/qt4/qt4.cpp:104
 msgid "Activate the updates availability notification"
-msgstr ""
+msgstr "Benachrichtigung für Updateverfügbarkeit aktivieren"
 
 #: modules/gui/qt4/qt4.cpp:105
 msgid ""
 "Activate the automatic notification of new versions of the software. It runs "
 "once a week."
 msgstr ""
+"Aktiviert die automatische Benachrichtigung über neue Versionen der Software. "
+"Dies läuft einmal pro Woche."
 
 #: modules/gui/qt4/qt4.cpp:107
-#, fuzzy
 msgid "Number of days between two update checks"
-msgstr "Anzahl von P-Frames zwischen 2 I-Frames."
+msgstr "Anzahl der Tage zwischen zwei Updatesuchen"
 
 #: modules/gui/qt4/qt4.cpp:109
 msgid "Allow the volume to be set to 400%"
-msgstr ""
+msgstr "Einstellen der Lautstärke auf bis zu 400% erlauben"
 
 #: modules/gui/qt4/qt4.cpp:110
 msgid ""
 "Allow the volume to have range from 0% to 400%, instead of 0% to 200%. This "
 "option can distort the audio, since it uses software amplification."
 msgstr ""
+"Erlaubt der Lautstärke einen Bereich von 0 bis 400% anstatt von 0 bis 200%. "
+"Dies kann den Klang verzerren, da es eine software-basierte Verstärkung ist."
 
 #: modules/gui/qt4/qt4.cpp:115
 msgid "Automatically save the volume on exit"
-msgstr ""
+msgstr "Lautstärke beim Beenden automatisch speichern"
 
 #: modules/gui/qt4/qt4.cpp:117
 msgid "Use non native buttons and volume slider"
-msgstr ""
+msgstr "Nicht-native Buttons und Slider benutzen"
 
 #: modules/gui/qt4/qt4.cpp:119
 msgid "Ask for network policy at start"
-msgstr ""
+msgstr "Beim Start nach Netzwerkpolicy fragen"
 
 #: modules/gui/qt4/qt4.cpp:121
-#, fuzzy
 msgid "Define the colours of the volume slider "
-msgstr "Kehrt die Farben des Bildes um"
+msgstr "Definition der Farben des Lautstärkensliders"
 
 #: modules/gui/qt4/qt4.cpp:122
 msgid ""
@@ -17619,14 +17504,18 @@ msgid ""
 " Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n"
 " An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255' "
 msgstr ""
+"Definition der Farben des Lautstärkensliders\n"
+" Geben Sie die 12 Farben getrennt durch ein ';' an.\n"
+" Der Standard ist '255;255;255;20;226;20;255;176;15;235;30;20'.\n"
+" Eine Alternative könnte '30;30;50;40;40;100;50;50;160;150;150;255' sein."
 
 #: modules/gui/qt4/qt4.cpp:127
 msgid "Show the opening dialog view in detail mode"
-msgstr ""
+msgstr "Öffnungsdialog im detaillierten Modus anzeigen"
 
 #: modules/gui/qt4/qt4.cpp:129
 msgid "Selection of the starting mode and look "
-msgstr ""
+msgstr "Auswahl des Startmodus und des Looks "
 
 #: modules/gui/qt4/qt4.cpp:130
 msgid ""
@@ -17635,43 +17524,43 @@ msgid ""
 " - a zone always present to show informationas lyrics, album arts...\n"
 " - minimal mode with limited controls"
 msgstr ""
+"VLC starten mit:\n"
+" - normalem Modus\n"
+" - einer immervorhandenen Zone zur Anzeige von Informationen, Lyrics, "
+"Albumcover, ...\n"
+" - minimalem Modus mit beschränkter Steuerung"
 
 #: modules/gui/qt4/qt4.cpp:136
-#, fuzzy
 msgid "Classic look"
-msgstr "Klassischer Rock"
+msgstr "Klassischer Look"
 
 #: modules/gui/qt4/qt4.cpp:137
 msgid "Complete look with information area"
-msgstr ""
+msgstr "Kompletter Look mit Informationsbereich"
 
 #: modules/gui/qt4/qt4.cpp:138
 msgid "Minimal look with no menus"
-msgstr ""
+msgstr "Minimaler Look ohne Menüs"
 
 #: modules/gui/qt4/qt4.cpp:147
 msgid "Qt interface"
 msgstr "Qt Interface"
 
 #: modules/gui/qt4/ui/equalizer.ui:54
-#, fuzzy
 msgid "Preset"
-msgstr "Vorparsen"
+msgstr "Voreinstellung"
 
 #: modules/gui/qt4/ui/open_capture.ui:17
-#, fuzzy
 msgid "Capture Mode"
-msgstr "Kapitel-Codecs"
+msgstr "Aufnahmemodus"
 
 #: modules/gui/qt4/ui/open_capture.ui:30
-#, fuzzy
 msgid "Select the capture device type"
-msgstr "Wählen Sie den Ordner, in den gesichert wird"
+msgstr "Wählen Sie den Aufnahmegerätstyp"
 
 #: modules/gui/qt4/ui/open_capture.ui:44
-#, fuzzy
 msgid "Card Selection"
-msgstr "&Auswahl"
+msgstr "Kartenauswahl"
 
 #: modules/gui/qt4/ui/open_capture.ui:51 modules/gui/qt4/ui/open_net.ui:98
 msgid "Options"
@@ -17679,30 +17568,27 @@ msgstr "Optionen"
 
 #: modules/gui/qt4/ui/open_capture.ui:74
 msgid "Access advanced options to tweak the device"
-msgstr ""
+msgstr "Auf erweiterte Optionen zugreifen, um das Gerät anzupassen"
 
 #: modules/gui/qt4/ui/open_disk.ui:20
-#, fuzzy
 msgid "Disc selection"
-msgstr "Ungültige Auswahl"
+msgstr "Volumeauswahl"
 
 #: modules/gui/qt4/ui/open_disk.ui:105
 msgid "Disable DVD Menus (for compatibility)"
-msgstr ""
+msgstr "DVD-Menüs (für bessere Kompatibilität) deaktivieren"
 
 #: modules/gui/qt4/ui/open_disk.ui:108
 msgid "No DVD Menus"
-msgstr "Keine DVD-Menüs benutzen"
+msgstr "Keine DVD-Menüs"
 
 #: modules/gui/qt4/ui/open_disk.ui:122
-#, fuzzy
 msgid "Disc device"
-msgstr "Device"
+msgstr "Laufwerk"
 
 #: modules/gui/qt4/ui/open_disk.ui:158
-#, fuzzy
 msgid "Select the device or the VIDEO_TS directory"
-msgstr "VIDEO_TS Ordner öffnen"
+msgstr "Laufwerk oder VIDEO_TS Ordner auswählen"
 
 #: modules/gui/qt4/ui/open_disk.ui:171
 msgid "Starting position"
@@ -18811,11 +18697,11 @@ msgstr "Audioscrobbler"
 
 #: modules/misc/audioscrobbler.c:161
 msgid "Submission of played songs to last.fm"
-msgstr ""
+msgstr "Wiedergegebene Songs an last.fm scrobbeln"
 
 #: modules/misc/audioscrobbler.c:309
 msgid "Last.fm username not set"
-msgstr "Benutzername des Last.fm-Kontos wurde nicht gesetzt"
+msgstr "Benutzername des last.fm-Kontos wurde nicht festgelegt"
 
 #: modules/misc/audioscrobbler.c:310
 msgid ""
@@ -18823,21 +18709,21 @@ msgid ""
 "VLC.\n"
 "Visit http://www.last.fm/join/ to get an account."
 msgstr ""
-"Bitte geben sie einen Benutzernamen an, oder deaktivieren sie das "
+"Bitte geben sie einen Benutzernamen an oder deaktivieren Sie das "
 "Audioscrobbler-Plugin und starten VLC neu.\n"
-"Besuchen http://www.last.fm/join/ um ein Benutzerkonto zu erhalten."
+"Besuchen Sie http://www.last.fm/join/ um ein Konto zu erhalten."
 
 #: modules/misc/audioscrobbler.c:810
 msgid "last.fm: Authentication failed"
-msgstr "Last.fm: Authentifizierung fehlgeschlagen"
+msgstr "last.fm: Authentifizierung fehlgeschlagen"
 
 #: modules/misc/audioscrobbler.c:811
 msgid ""
 "last.fm username or password is incorrect. Please verify your settings and "
 "relaunch VLC."
 msgstr ""
-"Last.fm Benutzername oder Passwort inkorrekt. Überprüfen sie die "
-"Einstellungen und starten sie VLC neu."
+"last.fm Benutzername oder Passwort inkorrekt. Überprüfen Sie die "
+"Einstellungen und starten Sie VLC neu."
 
 #: modules/misc/dummy/dummy.c:40
 msgid "Dummy image chroma format"
@@ -20030,17 +19916,15 @@ msgstr "Benutzer"
 
 #: modules/services_discovery/shout.c:63
 msgid "Les Guignols"
-msgstr ""
+msgstr "Les Guignols"
 
 #: modules/services_discovery/shout.c:68
-#, fuzzy
 msgid "Canal +"
-msgstr " Abbrechen "
+msgstr "Canal +"
 
 #: modules/services_discovery/shout.c:73
-#, fuzzy
 msgid "Shoutcast Radio"
-msgstr "Shoutcast"
+msgstr "Shoutcast Radio"
 
 #: modules/services_discovery/shout.c:74
 msgid "Shoutcast TV"
@@ -20048,13 +19932,12 @@ msgstr "Shoutcast TV"
 
 #: modules/services_discovery/shout.c:75
 msgid "Freebox TV"
-msgstr ""
+msgstr "Freebox TV"
 
 #: modules/services_discovery/shout.c:76
 #: modules/services_discovery/shout.c:124
-#, fuzzy
 msgid "French TV"
-msgstr "Französisch"
+msgstr "Französisches TV"
 
 #: modules/services_discovery/shout.c:110
 msgid "Shoutcast radio listings"
@@ -20066,7 +19949,7 @@ msgstr "Shoutcast TV Listen"
 
 #: modules/services_discovery/shout.c:131
 msgid "Freebox TV listing (French ISP free.fr services)"
-msgstr ""
+msgstr "Freebox TV Liste (Dienste des frz. ISP free.fr)"
 
 #: modules/services_discovery/upnp_cc.cpp:62
 msgid "Universal Plug'n'Play discovery"
@@ -20077,14 +19960,12 @@ msgid "Universal Plug'n'Play discovery ( Intel SDK )"
 msgstr "Universelle Plug'n'Play Gerätesuche (Intel SDK)"
 
 #: modules/stream_out/autodel.c:46
-#, fuzzy
 msgid "Autodel"
-msgstr "Automatisch"
+msgstr "Autolöschen"
 
 #: modules/stream_out/autodel.c:47
-#, fuzzy
 msgid "Automatically add/delete input streams"
-msgstr "Automatisch "
+msgstr "Automatisch Input-Streams hinzufügen/löschen"
 
 #: modules/stream_out/bridge.c:42
 msgid ""
@@ -20240,7 +20121,7 @@ msgstr "Elementare Streamausgabe"
 #: modules/stream_out/es.c:374 modules/stream_out/es.c:388
 #, c-format
 msgid "There is no suitable stream-output access module for \"%s/%s://%s\"."
-msgstr ""
+msgstr "Es gibt kein passendes Streamausgabe Access-Modul für \"%s/%s://%s\"."
 
 #: modules/stream_out/gather.c:44
 msgid "Gathering stream output"
@@ -20268,20 +20149,20 @@ msgid "Video filters will be applied to the video stream."
 msgstr "Videofilter werden benutzt, um den Videostream nachzubearbeiten."
 
 #: modules/stream_out/mosaic_bridge.c:151
-#, fuzzy
 msgid "Image chroma"
-msgstr "Bild-Format"
+msgstr "Bild-Chroma"
 
 #: modules/stream_out/mosaic_bridge.c:153
 msgid ""
 "Force the use of a specific chroma. Use YUVA if you're planning to use the "
 "Alphamask or Bluescreen video filter."
 msgstr ""
+"Erzwingt die Benutzung eines bestimmten Chromas. Benutzen Sie YUVA, wenn Sie "
+"vorhaben, die Alphamask oder Bluescreen Videofilter zu benutzen."
 
 #: modules/stream_out/mosaic_bridge.c:158
-#, fuzzy
 msgid "Transparency of the mosaic picture."
-msgstr "Transparenz des Logos"
+msgstr "Transparenz des mosaic-Bildes."
 
 #: modules/stream_out/mosaic_bridge.c:160 modules/video_filter/marq.c:103
 #: modules/video_filter/rss.c:142
@@ -20289,9 +20170,8 @@ msgid "X offset"
 msgstr "X-Abstand"
 
 #: modules/stream_out/mosaic_bridge.c:162
-#, fuzzy
 msgid "X coordinate of the upper left corner in the mosaic if non negative."
-msgstr "X-Koordinate der linken oberen Ecke des Mosaiks."
+msgstr "X-Koordinate der linken oberen Ecke des Mosaiks, wenn nicht negativ."
 
 #: modules/stream_out/mosaic_bridge.c:164 modules/video_filter/marq.c:105
 #: modules/video_filter/rss.c:144
@@ -20299,9 +20179,8 @@ msgid "Y offset"
 msgstr "Y-Abstand"
 
 #: modules/stream_out/mosaic_bridge.c:166
-#, fuzzy
 msgid "Y coordinate of the upper left corner in the mosaic if non negative."
-msgstr "Y-Koordinate der linken oberen Ecke des Mosaiks."
+msgstr "Y-Koordinate der linken oberen Ecke des Mosaiks, wenn nicht negativ."
 
 #: modules/stream_out/mosaic_bridge.c:171
 msgid "Mosaic bridge"
@@ -20452,27 +20331,32 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:124
 msgid "RTP/RTCP multiplexing"
-msgstr ""
+msgstr "RTP/RTCP Multiplexierung"
 
 #: modules/stream_out/rtp.c:126
 msgid ""
 "This sends and receives RTCP packet multiplexed over the same port as RTP "
 "packets."
 msgstr ""
+"Dies sendet und empfängt RTCP Pakete, die über den selben Port wie RTP Pakete "
+"multiplexiert wurden."
 
 #: modules/stream_out/rtp.c:129
 msgid "Transport protocol"
-msgstr ""
+msgstr "Transportprotokoll"
 
 #: modules/stream_out/rtp.c:131
 msgid "This selects which transport protocol to use for RTP."
-msgstr ""
+msgstr "Dies erlaubt die Auswahl des für RTP zu benutzenden "
+"Transportprotokolls."
 
 #: modules/stream_out/rtp.c:135
 msgid ""
 "RTP packets will be integrity-protected and ciphered with this Secure RTP "
 "master shared secret key."
 msgstr ""
+"Die Integrität von RTP-Paketen wird mit diesem geheimen, geteilten, sicheren "
+"RTP Master Schlüssel sichergestellt. Ferner werden die Pakete damit chiffriert."
 
 #: modules/stream_out/rtp.c:150
 msgid "MP4A LATM"
@@ -20500,10 +20384,10 @@ msgid "Output destination"
 msgstr "Ausgabeziel"
 
 #: modules/stream_out/standard.c:53
-#, fuzzy
 msgid ""
 "Destination (URL) to use for the stream. Overrides path and bind parameters"
-msgstr "Für den Stream zu benutzendes Ziel (URL)."
+msgstr "Für den Stream zu benutzendes Ziel (URL). Überschreibt Pfad- und "
+"Bindeparameter."
 
 #: modules/stream_out/standard.c:54
 msgid "address to bind to (helper setting for dst)"
@@ -20913,7 +20797,7 @@ msgstr "Bildeigenschaftsfilter"
 
 #: modules/video_filter/alphamask.c:40
 msgid "Use an image's alpha channel as a transparency mask."
-msgstr ""
+msgstr "Den Alphakanal eines Bildes als Transparenzmaske benutzen."
 
 #: modules/video_filter/alphamask.c:42
 msgid "Transparency mask"
@@ -20921,7 +20805,7 @@ msgstr "Transparenzmaske"
 
 #: modules/video_filter/alphamask.c:44
 msgid "Alpha blending transparency mask. Use's a png alpha channel."
-msgstr ""
+msgstr "Alphamisch-Transparenzmaske. Benutzt den Alphakanal eines PNGs."
 
 #: modules/video_filter/alphamask.c:63
 msgid "Alpha mask video filter"
@@ -20948,17 +20832,16 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:133
-#, fuzzy
 msgid "Save Debug Frames"
-msgstr "Framerate"
+msgstr "Debug-Frames speichern"
 
 #: modules/video_filter/atmo/atmo.cpp:134
 msgid "Writes every 128th miniframe to a folder."
-msgstr ""
+msgstr "Speichert 128sten Miniframen in einem Ordner."
 
 #: modules/video_filter/atmo/atmo.cpp:135
 msgid "Debug Frame Folder"
-msgstr ""
+msgstr "Ordner für Debug-Frames"
 
 #: modules/video_filter/atmo/atmo.cpp:136
 msgid "defines the path where the debugframes should be saved"
@@ -20996,9 +20879,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:151
-#, fuzzy
 msgid "Pause-Red"
-msgstr "Pausiert"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:152
 msgid "the red component of pause color"
@@ -21772,9 +21654,8 @@ msgid "Video scaling filter"
 msgstr "Videoskalierungsfilter"
 
 #: modules/video_filter/croppadd.c:93
-#, fuzzy
 msgid "Padd"
-msgstr "Pausiert"
+msgstr ""
 
 #: modules/video_filter/deinterlace.c:112 modules/video_output/x11/xvmc.c:130
 msgid "Deinterlace mode"
