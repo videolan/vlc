@@ -995,12 +995,6 @@
             p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, NULL, p_item );
         }
-        else
-        {
-            playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
-            playlist_Control( p_playlist, PLAYLIST_SKIP, true, p_item );
-        }
         vlc_gc_decref( p_input );
     }
     [self playlistUpdated];
@@ -1038,12 +1032,6 @@
             playlist_item_t *p_item;
             p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, NULL, p_item );
-        }
-        else
-        {
-            playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
-            playlist_Control( p_playlist, PLAYLIST_SKIP, true, p_item );
         }
         vlc_gc_decref( p_input );
     }
