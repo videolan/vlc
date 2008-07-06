@@ -3,7 +3,7 @@
  * This header provides portable declarations for mutexes & conditions
  *****************************************************************************
  * Copyright (C) 1999, 2002 the VideoLAN team
- * $Id$
+ * Copyright © 2007-2008 Rémi Denis-Courmont
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -585,6 +585,32 @@ static inline void barrier (void)
     vlc_spin_lock (&spin);
     vlc_spin_unlock (&spin);
     vlc_spin_destroy (&spin);
+#endif
+}
+
+/**
+ * Save the cancellation state and disable cancellation for the calling thread.
+ * This function must be called before entering a piece of code that is not
+ * cancellation-safe.
+ * @param p_state storage for the previous cancellation state
+ * @return Nothing, always succeeds.
+ */
+static inline void vlc_savecancel (int *p_state)
+{
+#if defined (LIBVLC_USE_PTHREAD)
+    (void) pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, p_state);
+#endif
+}
+
+/**
+ * Restore the cancellation state for the calling thread.
+ * @param state previous state as returned by vlc_savecancel().
+ * @return Nothing, always succeeds.
+ */
+static inline void vlc_restorecancel (int state)
+{
+#if defined (LIBVLC_USE_PTHREAD)
+    (void) pthread_setcancelstate (state, NULL);
 #endif
 }
 
