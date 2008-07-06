@@ -417,7 +417,11 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
 
 
 /** Tell if the playlist is currently running */
-#define playlist_IsPlaying( pl ) ( pl->status.i_status == PLAYLIST_RUNNING )
+#define playlist_IsPlaying( pl ) ( pl->status.i_status == PLAYLIST_RUNNING && \
+            !(pl->request.b_request && pl->request.i_status == PLAYLIST_STOPPED) )
+
+#define playlist_IsStopped( pl ) ( pl->status.i_status == PLAYLIST_STOPPED || \
+            (pl->request.b_request && pl->request.i_status == PLAYLIST_STOPPED) )
 
 /** Tell if the playlist is empty */
 #define playlist_IsEmpty( pl ) ( pl->items.i_size == 0 )

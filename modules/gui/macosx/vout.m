@@ -984,10 +984,15 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)closeVout
 {
     playlist_t * p_playlist = pl_Yield( VLCIntf );
+    PL_LOCK;
+    bool stopped = playlist_IsStopped( p_playlist );
+    PL_UNLOCK;
 
-    if(!playlist_IsPlaying( p_playlist ))
+    if(stopped)
         [o_window performSelectorOnMainThread: @selector(orderOut:) withObject: self waitUntilDone: YES];
- 
+    else
+        msg_Dbg( VLCIntf, "we are not closing the window, playlist is playing" );
+
     vlc_object_release( p_playlist );
 
     [super closeVout];

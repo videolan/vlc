@@ -200,6 +200,9 @@ int OpenVideoGL  ( vlc_object_t * p_this )
 void CloseVideoGL ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
+
+    msg_Dbg( p_this, "Closing" );
+
     if( p_vout->p_sys->b_embedded )
     {
         aglDestroyContext(p_vout->p_sys->agl_ctx);
