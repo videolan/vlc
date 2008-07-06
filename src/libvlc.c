@@ -1272,6 +1272,18 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[
  *****************************************************************************
  * Print a short inline help. Message interface is initialized at this stage.
  *****************************************************************************/
+static inline void print_help_on_module_help( void )
+{
+    utf8_fprintf( stdout, "\n" );
+    utf8_fprintf( stdout, "To get the VLC module list, use '--list'.\n" );
+    utf8_fprintf( stdout, "To get help on a particular module, use '-p <module_name>'.\n" );
+}
+static inline void print_help_on_full_help( void )
+{
+    utf8_fprintf( stdout, "\n" );
+    utf8_fprintf( stdout, "To get a exhaustive help, use '-H'.\n" );
+}
+
 static void Help( libvlc_int_t *p_this, char const *psz_help_name )
 {
 #ifdef WIN32
@@ -1283,18 +1295,21 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
         utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
         Usage( p_this, "help" );
         Usage( p_this, "main" );
-        utf8_fprintf( stdout, "To get a exhaustive help use -H\n" );
+        print_help_on_module_help();
+        print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
     {
         utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
         Usage( p_this, NULL );
-        utf8_fprintf( stdout, "To get an exhaustive help use -H\n" );
+        print_help_on_module_help();
+        print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "full-help" ) )
     {
         utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
         Usage( p_this, NULL );
+        print_help_on_module_help();
     }
     else if( psz_help_name )
     {
