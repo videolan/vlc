@@ -162,6 +162,14 @@ static const char *const ppsz_snap_formats[] =
     "This is the verbosity level (0=only errors and " \
     "standard messages, 1=warnings, 2=debug).")
 
+#define VERBOSE_OBJECTS_TEXT N_("Choose which objects should print debug " \
+    "message")
+#define VERBOSE_OBJECTS_LONGTEXT N_( \
+    "This is a ',' separated string, each objects should be prefixed by " \
+    "a '+' or a '-' to respectively enable or disable it. The keyword " \
+    "'all' refers to all objects. Note, you still need to use -vvv " \
+    "to actually display debug message.")
+
 #define QUIET_TEXT N_("Be quiet")
 #define QUIET_LONGTEXT N_( \
     "Turn off all warning and information messages.")
@@ -1934,6 +1942,8 @@ vlc_module_begin();
     add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
                  false );
         change_short('v');
+    add_string( "verbose-objects", 0, NULL, VERBOSE_OBJECTS_TEXT, VERBOSE_OBJECTS_LONGTEXT,
+                 false );
     add_bool( "quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, true );
         change_short('q');
 

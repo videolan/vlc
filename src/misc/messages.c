@@ -87,6 +87,9 @@ void msg_Create (libvlc_int_t *p_libvlc)
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     vlc_mutex_init( &priv->msg_bank.lock );
     vlc_mutex_init( &QUEUE.lock );
+    vlc_dictionary_init( &priv->msg_enabled_objects, 0 );
+    priv->msg_all_objects_enabled = true;
+
     QUEUE.b_overflow = false;
     QUEUE.i_start = 0;
     QUEUE.i_stop = 0;
@@ -113,6 +116,35 @@ void msg_Flush (libvlc_int_t *p_libvlc)
     vlc_mutex_unlock( &QUEUE.lock );
 }
 
+
+/**
+ * Object Printing selection
+ */
+static void const * kObjectPrintingEnabled = (void *) 1;
+static void const * kObjectPrintingDisabled = (void *) -1;
+
+void __msg_EnableObjectPrinting (vlc_object_t *p_this, char * psz_object)
+{
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+    vlc_mutex_lock( &QUEUE.lock );
+    if( !strcmp(psz_object, "all") )
+        priv->msg_all_objects_enabled = true;
+    else
+        vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, kObjectPrintingEnabled );
+    vlc_mutex_unlock( &QUEUE.lock );
+}
+
+void __msg_DisableObjectPrinting (vlc_object_t *p_this, char * psz_object)
+{
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+    vlc_mutex_lock( &QUEUE.lock );
+    if( !strcmp(psz_object, "all") )
+        priv->msg_all_objects_enabled = false;
+    else
+        vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, kObjectPrintingDisabled );
+    vlc_mutex_unlock( &QUEUE.lock );
+}
+
 /**
  * Destroy the message queues
  *
@@ -132,6 +164,9 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
 #ifdef UNDER_CE
     CloseHandle( QUEUE.logfile );
 #endif
+
+    vlc_dictionary_clear( &priv->msg_enabled_objects );
+
     /* Destroy lock */
     vlc_mutex_destroy( &QUEUE.lock );
     vlc_mutex_destroy( &priv->msg_bank.lock);
@@ -546,6 +581,14 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     }
 
     psz_object = p_item->psz_object_type;
+    void * val = vlc_dictionary_value_for_key( &priv->msg_enabled_objects,
+                                               psz_object );
+    if( val == kObjectPrintingDisabled )
+        return;
+    if( val == kObjectPrintingEnabled )
+        /* Allowed */;
+    else if( !priv->msg_all_objects_enabled )
+        return;
 
 #ifdef UNDER_CE
 #   define CE_WRITE(str) WriteFile( QUEUE.logfile, \

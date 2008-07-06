@@ -233,6 +233,8 @@ typedef struct libvlc_priv_t
     msg_bank_t         msg_bank;    ///< The message bank
     int                i_verbose;   ///< info messages
     bool               b_color;     ///< color messages?
+    vlc_dictionary_t   msg_enabled_objects; ///< Enabled objects
+    bool               msg_all_objects_enabled; ///< Should we print all objects?
 
     /* Timer stats */
     vlc_mutex_t        timer_lock;  ///< Lock to protect timers
