@@ -837,6 +837,16 @@ if BUILD_OSDMENU
 	done
 endif
 
+# SDK
+	mkdir -p "$(top_builddir)/vlc-$(VERSION)/sdk.tmp"
+	mkdir -p "$(top_builddir)/vlc-$(VERSION)/sdk"
+	d=$$(pwd) && \
+	cd src && \
+	make install DESTDIR="$$d/vlc-$(VERSION)/sdk.tmp"
+	cd vlc-$(VERSION) && mv sdk.tmp/$(prefix)/* sdk/
+	find vlc-$(VERSION)/sdk.tmp -type d | sort -r | xargs rmdir
+	rm -Rf vlc-$(VERSION)/sdk/bin
+
 package-win-common-strip: package-win32-base-debug
 	$(STRIP) "vlc-$(VERSION)/vlc$(EXEEXT)"
 	$(STRIP) "vlc-$(VERSION)/libvlccore$(LIBEXT)"
