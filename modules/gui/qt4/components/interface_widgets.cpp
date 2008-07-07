@@ -52,6 +52,8 @@
 # include <qx11info_x11.h>
 #endif
 
+#include <math.h>
+
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
  * This class handles resize issues
@@ -1211,22 +1213,24 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
     speedSlider->setOrientation( Qt::Vertical );
     speedSlider->setTickPosition( QSlider::TicksRight );
 
-    speedSlider->setRange( -100, 100 );
-    speedSlider->setSingleStep( 10 );
-    speedSlider->setPageStep( 20 );
-    speedSlider->setTickInterval( 20 );
+    speedSlider->setRange( -24, 24 );
+    speedSlider->setSingleStep( 1 );
+    speedSlider->setPageStep( 1 );
+    speedSlider->setTickInterval( 12 );
 
     CONNECT( speedSlider, valueChanged( int ), this, updateRate( int ) );
 
     QToolButton *normalSpeedButton = new QToolButton( this );
     normalSpeedButton->setMaximumSize( QSize( 26, 20 ) );
     normalSpeedButton->setAutoRaise( true );
-    normalSpeedButton->setText( "N" );
+    normalSpeedButton->setText( "1x" );
     normalSpeedButton->setToolTip( qtr( "Revert to normal play speed" ) );
 
     CONNECT( normalSpeedButton, clicked(), this, resetRate() );
 
     QVBoxLayout *speedControlLayout = new QVBoxLayout;
+    speedControlLayout->setLayoutMargins( 4, 4, 4, 4, 4 );
+    speedControlLayout->setSpacing( 4 );
     speedControlLayout->addWidget( speedSlider );
     speedControlLayout->addWidget( normalSpeedButton );
     setLayout( speedControlLayout );
@@ -1240,10 +1244,6 @@ void SpeedControlWidget::setEnable( bool b_enable )
     speedSlider->setEnabled( b_enable );
 }
 
-#define RATE_SLIDER_MAXIMUM 3.0
-#define RATE_SLIDER_MINIMUM 0.3
-#define RATE_SLIDER_LENGTH 100.0
-
 void SpeedControlWidget::updateControls( int rate )
 {
     if( speedSlider->isSliderDown() )
@@ -1252,32 +1252,16 @@ void SpeedControlWidget::updateControls( int rate )
         return;
     }
 
-    int sliderValue;
-    double speed = INPUT_RATE_DEFAULT / (double)rate;
+    double value = 12 * log( (double)INPUT_RATE_DEFAULT / rate ) / log( 2 );
+    int sliderValue = (int) ( ( value > 0 ) ? value + .5 : value - .5 );
 
-    if( rate >= INPUT_RATE_DEFAULT )
+    if( sliderValue < speedSlider->minimum() )
     {
-        if( speed < RATE_SLIDER_MINIMUM )
-        {
-            sliderValue = speedSlider->minimum();
-        }
-        else
-        {
-            sliderValue = (int)( ( speed - 1.0 ) * RATE_SLIDER_LENGTH
-                                        / ( 1.0 - RATE_SLIDER_MAXIMUM ) );
-        }
+        sliderValue = speedSlider->minimum();
     }
-    else
+    else if( sliderValue > speedSlider->maximum() )
     {
-        if( speed > RATE_SLIDER_MAXIMUM )
-        {
-            sliderValue = speedSlider->maximum();
-        }
-        else
-        {
-            sliderValue = (int)( ( speed - 1.0 ) * RATE_SLIDER_LENGTH
-                                        / ( RATE_SLIDER_MAXIMUM - 1.0 ) );
-        }
+        sliderValue = speedSlider->maximum();
     }
 
     //Block signals to avoid feedback loop
@@ -1288,18 +1272,8 @@ void SpeedControlWidget::updateControls( int rate )
 
 void SpeedControlWidget::updateRate( int sliderValue )
 {
-    int rate;
-
-    if( sliderValue < 0.0 )
-    {
-        rate = (int)(INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
-            ( sliderValue * ( 1.0 - RATE_SLIDER_MINIMUM ) + RATE_SLIDER_LENGTH ));
-    }
-    else
-    {
-        rate = (int)(INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
-            ( sliderValue * ( RATE_SLIDER_MAXIMUM - 1.0 ) + RATE_SLIDER_LENGTH ));
-    }
+    double speed = pow( 2, (double)sliderValue / 12 );
+    int rate = INPUT_RATE_DEFAULT / speed;
 
     THEMIM->getIM()->setRate(rate);
 }
