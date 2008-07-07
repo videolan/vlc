@@ -520,11 +520,11 @@ void NetOpenPanel::updateMRL() {
             else mrl += addr;
             mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
+            break;
         case RTMP_PROTO:
             mrl = "rtmp://" + addr;
             emit methodChanged("rtmp-caching");
             break;
-
         }
     }
 
