@@ -423,8 +423,8 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.protocolCombo->addItem( "" );
     ui.protocolCombo->addItem("HTTP", QVariant("http"));
     ui.protocolCombo->addItem("HTTPS", QVariant("https"));
-    ui.protocolCombo->addItem("FTP", QVariant("ftp"));
     ui.protocolCombo->addItem("MMS", QVariant("mms"));
+    ui.protocolCombo->addItem("FTP", QVariant("ftp"));
     ui.protocolCombo->addItem("RTSP", QVariant("rtsp"));
     ui.protocolCombo->addItem("UDP/RTP (unicast)", QVariant("udp"));
     ui.protocolCombo->addItem("UDP/RTP (multicast)", QVariant("udp"));
