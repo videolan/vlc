@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bookmarks.cpp : Bookmarks
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  *
  * Authors: Antoine Lejeune <phytos@via.ecp.fr>
  *
@@ -78,6 +78,7 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
     BUTTONACT( extractButton, extract() );
 
     readSettings( "Bookmarks" );
+    updateGeometry();
 }
 
 BookmarksDialog::~BookmarksDialog()
