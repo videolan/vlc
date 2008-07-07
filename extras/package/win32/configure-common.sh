@@ -17,6 +17,7 @@
       --enable-live555 --with-live555-tree=/usr/win32/live.com \
       --enable-dca \
       --enable-mkv \
+      --enable-asademux --enable-csri \
       --enable-x264 \
       --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \
       --enable-shout \
