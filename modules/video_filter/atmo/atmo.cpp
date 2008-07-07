@@ -121,11 +121,11 @@ strings for settings menus and hints
  "connected to your computer.\n"\
  "AtmoLight is the homegrown version of what Philips calls AmbiLight.\n"\
  "If you need further information feel free to visit us at\n\n"\
- "http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin\n"\
+ "http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin\n "\
  "http://www.vdr-wiki.de/wiki/index.php/AtmoWin\n\n"\
- "You can find there detailed descriptions on how to build it for yourself "
- "and where to get the required parts.\n"
- "You can also have a look at pictures and some movies showing such a device "
+ "You can find there detailed descriptions on how to build it for yourself "\
+ "and where to get the required parts.\n" \
+ "You can also have a look at pictures and some movies showing such a device " \
  "in live action.")
 
 
@@ -186,8 +186,8 @@ strings for settings menus and hints
 
 #define SERIALDEV_TEXT         N_("Serial Port/Device")
 #define SERIALDEV_LONGTEXT   N_("Name of the serial port where the AtmoLight "\
-                                "controller is attached to.\n"
-                                "On Windows usually something like COM1 or "
+                                "controller is attached to.\n" \
+                                "On Windows usually something like COM1 or " \
                                 "COM2. On Linux /dev/ttyS01 f.e.")
 
 #define EDGE_TEXT            N_("Edge Weightning")
@@ -229,8 +229,8 @@ static const char *ppsz_filtermode_descriptions[] = {
 };
 
 #define FRAMEDELAY_TEXT       N_("Frame delay")
-#define FRAMEDELAY_LONGTEXT   N_("Helps to get the video output and the light "
-                                 "effects in sync. Values around 20ms should "
+#define FRAMEDELAY_LONGTEXT   N_("Helps to get the video output and the light "\
+                                 "effects in sync. Values around 20ms should " \
                                  "do the trick.")
 
 
