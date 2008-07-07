@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <vlc_vout.h>
+
 #include "dialogs_provider.hpp"
 #include "components/interface_widgets.hpp"
 #include "main_interface.hpp"
@@ -35,7 +37,6 @@
 #include "menus.hpp"
 #include "util/input_slider.hpp"
 #include "util/customwidgets.hpp"
-#include <vlc_vout.h>
 
 #include <QLabel>
 #include <QSpacerItem>
@@ -47,6 +48,7 @@
 #include <QPalette>
 #include <QResizeEvent>
 #include <QDate>
+
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
 # include <qx11info_x11.h>
@@ -85,8 +87,6 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     connect( this, SIGNAL(askVideoWidgetToShow( unsigned int, unsigned int)),
              this, SLOT(SetSizing(unsigned int, unsigned int )) );
 #endif
-
-
 }
 
 void VideoWidget::paintEvent(QPaintEvent *ev)
@@ -122,7 +122,7 @@ VideoWidget::~VideoWidget()
  * Request the video to avoid the conflicts
  **/
 void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
-                           unsigned int *pi_width, unsigned int *pi_height )
+                            unsigned int *pi_width, unsigned int *pi_height )
 {
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
     emit askVideoWidgetToShow( *pi_width, *pi_height );
@@ -205,8 +205,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
 }
 
 BackgroundWidget::~BackgroundWidget()
-{
-}
+{}
 
 void BackgroundWidget::resizeEvent( QResizeEvent * event )
 {
@@ -265,8 +264,7 @@ VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
 }
 
 VisualSelector::~VisualSelector()
-{
-}
+{}
 
 void VisualSelector::prev()
 {
