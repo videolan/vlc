@@ -509,14 +509,6 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
     int           i_dir_content, i;
     psz_dir = RealPath( psz_dir );
 
-#if defined( WIN32 )
-    if( psz_dir[0] != '\0' && (psz_dir[0] != '\\' || psz_dir[1] != '\0') )
-    {
-        free( psz_dir );
-        return s;
-    }
-#endif
-
     /* parse psz_src dir */
     if( ( i_dir_content = utf8_scandir( psz_dir, &ppsz_dir_content, Filter,
                                         InsensitiveAlphasort ) ) == -1 )
