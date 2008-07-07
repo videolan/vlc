@@ -147,7 +147,7 @@ VLC_PUBLIC_API void libvlc_vlm_set_loop( libvlc_instance_t *, char *, int,
  *
  * \param p_instance the instance
  * \param psz_name the media to work on
- * \param the new muxer
+ * \param psz_mux the new muxer
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_vlm_set_mux( libvlc_instance_t *p_instance, char *psz_name,
