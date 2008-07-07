@@ -299,6 +299,7 @@ void DiscOpenPanel::updateButtons()
         ui.chapterLabel->show();
         ui.chapterSpin->show();
         ui.diskOptionBox_2->show();
+        ui.dvdsimple->setEnabled( true );
     }
     else if ( ui.vcdRadioButton->isChecked() )
     {
@@ -311,6 +312,7 @@ void DiscOpenPanel::updateButtons()
         ui.chapterLabel->hide();
         ui.chapterSpin->hide();
         ui.diskOptionBox_2->show();
+        ui.dvdsimple->setEnabled( false );
     }
     else /* CDDA */
     {
@@ -323,6 +325,7 @@ void DiscOpenPanel::updateButtons()
         ui.chapterLabel->hide();
         ui.chapterSpin->hide();
         ui.diskOptionBox_2->hide();
+        ui.dvdsimple->setEnabled( false );
     }
 
     updateMRL();
