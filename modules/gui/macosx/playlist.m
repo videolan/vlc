@@ -720,7 +720,7 @@
                 p_item = NULL;
             }
         }
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, p_node, p_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, false, p_node, p_item );
     }
     vlc_object_release( p_playlist );
 }
