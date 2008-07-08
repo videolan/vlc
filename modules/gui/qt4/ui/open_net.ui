@@ -42,6 +42,9 @@
         <property name="toolTip" >
          <string>_("Select the port used")</string>
         </property>
+        <property name="accelerated" >
+         <bool>true</bool>
+        </property>
         <property name="maximum" >
          <number>65535</number>
         </property>
