@@ -52,7 +52,7 @@
     vout_thread_t * p_vout;
 }
 
-+ (void)resetVout: (vout_thread_t *) p_vout;
++ (void)resetVout: (NSValue *) voutValue;
 - (id) initWithVout: (vout_thread_t *) p_vout;
 @end
 
@@ -324,8 +324,9 @@ static void Unlock( vout_thread_t * p_vout )
 }
 
 /* This function will reset the o_vout_view. It's useful to go fullscreen. */
-+ (void)resetVout:(vout_thread_t *) p_vout
++ (void)resetVout:(NSValue *) voutValue
 {
+    vout_thread_t * p_vout = [voutValue pointerValue];
     if( p_vout->b_fullscreen )
     {
         /* Save window size and position */
