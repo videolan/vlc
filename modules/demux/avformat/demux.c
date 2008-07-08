@@ -200,6 +200,7 @@ int OpenDemux( vlc_object_t *p_this )
         es_out_id_t  *es;
         es_format_t  fmt;
         vlc_fourcc_t fcc;
+        const char *psz_type = "unknown";
 
         if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
         {
@@ -221,6 +222,7 @@ int OpenDemux( vlc_object_t *p_this )
             fmt.audio.i_rate = cc->sample_rate;
             fmt.audio.i_bitspersample = cc->bits_per_sample;
             fmt.audio.i_blockalign = cc->block_align;
+            psz_type = "audio";
             break;
         case CODEC_TYPE_VIDEO:
             es_format_Init( &fmt, VIDEO_ES, fcc );
@@ -231,11 +233,20 @@ int OpenDemux( vlc_object_t *p_this )
                 fmt.video.p_palette = malloc( sizeof(video_palette_t) );
                 *fmt.video.p_palette = *(video_palette_t *)cc->palctrl;
             }
+            psz_type = "video";
             break;
         case CODEC_TYPE_SUBTITLE:
             es_format_Init( &fmt, SPU_ES, fcc );
+            psz_type = "subtitle";
             break;
+
         default:
+            es_format_Init( &fmt, UNKNOWN_ES, 0 );
+            if( cc->codec_type == CODEC_TYPE_DATA )
+                psz_type = "data";
+            else if( cc->codec_type == CODEC_TYPE_ATTACHMENT )
+                psz_type = "attachment";
+
             msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
             break;
         }
@@ -246,8 +257,7 @@ int OpenDemux( vlc_object_t *p_this )
         es = es_out_Add( p_demux->out, &fmt );
 
         msg_Dbg( p_demux, "adding es: %s codec = %4.4s",
-                 cc->codec_type == CODEC_TYPE_AUDIO ? "audio" : "video",
-                 (char*)&fcc );
+                 psz_type, (char*)&fcc );
         TAB_APPEND( p_sys->i_tk, p_sys->tk, es );
     }
 
@@ -315,16 +325,16 @@ static int Demux( demux_t *p_demux )
         p_frame->i_flags |= BLOCK_FLAG_TYPE_I;
 
     i_start_time = ( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE ) ?
-        ( p_sys->ic->start_time / AV_TIME_BASE )  : 0;
+        ( p_sys->ic->start_time * 1000000 / AV_TIME_BASE )  : 0;
 
     p_frame->i_dts = ( pkt.dts == (int64_t)AV_NOPTS_VALUE ) ?
-        0 : (pkt.dts - i_start_time) * 1000000 *
+        0 : (pkt.dts) * 1000000 *
         p_sys->ic->streams[pkt.stream_index]->time_base.num /
-        p_sys->ic->streams[pkt.stream_index]->time_base.den;
+        p_sys->ic->streams[pkt.stream_index]->time_base.den - i_start_time;
     p_frame->i_pts = ( pkt.pts == (int64_t)AV_NOPTS_VALUE ) ?
-        0 : (pkt.pts - i_start_time) * 1000000 *
+        0 : (pkt.pts) * 1000000 *
         p_sys->ic->streams[pkt.stream_index]->time_base.num /
-        p_sys->ic->streams[pkt.stream_index]->time_base.den;
+        p_sys->ic->streams[pkt.stream_index]->time_base.den - i_start_time;
 
 #ifdef AVFORMAT_DEBUG
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
