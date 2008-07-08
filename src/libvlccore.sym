@@ -414,9 +414,9 @@ __vlc_execve
 vlc_fastmem_register
 vlc_freeaddrinfo
 vlc_gai_strerror
+__vlc_gc_decref
 __vlc_gc_incref
 __vlc_gc_init
-__vlc_gc_decref
 vlc_getaddrinfo
 vlc_getnameinfo
 vlc_gettext
