@@ -275,7 +275,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     /* video */
     [o_video_black_ckb setTitle: _NS("Black screens in Fullscreen mode")];
-    [o_video_device_txt setStringValue: _NS("Display device")];
+    [o_video_device_txt setStringValue: _NS("Fullscreen Video Device")];
     [o_video_display_box setTitle: _NS("Display")];
     [o_video_enable_ckb setTitle: _NS("Enable Video")];
     [o_video_fullscreen_ckb setTitle: _NS("Fullscreen")];
