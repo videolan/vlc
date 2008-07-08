@@ -106,6 +106,41 @@ static unsigned          i_instances = 0;
 static bool b_daemon = false;
 
 /*****************************************************************************
+ * vlc_gc_*.
+ *****************************************************************************/
+void __vlc_gc_incref( gc_object_t * p_gc )
+{
+    assert( p_gc->i_gc_refcount > 0 );
+
+    /* FIXME: atomic version needed! */
+    p_gc->i_gc_refcount ++;
+}
+
+void __vlc_gc_decref( gc_object_t *p_gc )
+{
+    assert( p_gc );
+    assert( p_gc->i_gc_refcount > 0 );
+
+    /* FIXME: atomic version needed! */
+    p_gc->i_gc_refcount -- ;
+
+    if( p_gc->i_gc_refcount == 0 )
+    {
+        p_gc->pf_destructor( p_gc );
+        /* Do not use the p_gc pointer from now on ! */
+    }
+}
+
+void
+__vlc_gc_init( gc_object_t * p_gc, void (*pf_destructor)( gc_object_t * ),
+               void * arg)
+{
+    p_gc->i_gc_refcount = 1;
+    p_gc->pf_destructor = pf_destructor;
+    p_gc->p_destructor_arg = arg;
+}
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 #if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \
