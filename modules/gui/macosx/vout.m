@@ -896,6 +896,9 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                  frame: (NSRect *)s_arg_frame showWindow: (BOOL)b_show_window
 {
     BOOL b_return;
+
+    [NSObject cancelPreviousPerformRequestsWithTarget:o_window];
+
     b_return = [super setVout: p_arg_vout subView: view frame: s_arg_frame];
     if( b_return )
     {
@@ -964,6 +967,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         [self updateTitle];
 
+        [NSObject cancelPreviousPerformRequestsWithTarget:o_window];
+
         /* Make the window the front and key window before animating */
         if ([o_window isVisible] && (![o_window isFullscreen]))
             [o_window makeKeyAndOrderFront: self];
@@ -983,17 +988,10 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)closeVout
 {
-    playlist_t * p_playlist = pl_Yield( VLCIntf );
-    PL_LOCK;
-    bool stopped = playlist_IsStopped( p_playlist );
-    PL_UNLOCK;
-
-    if(stopped)
-        [o_window performSelectorOnMainThread: @selector(orderOut:) withObject: self waitUntilDone: YES];
-    else
-        msg_Dbg( VLCIntf, "we are not closing the window, playlist is playing" );
-
-    vlc_object_release( p_playlist );
+    /* Don't close the window yet, wait a bit to see if a new input is poping up */
+    /* FIXME: Probably fade the window In and Out */
+    /* FIXME: fix core */
+    [o_window performSelector:@selector(orderOut:) withObject:nil afterDelay:1.5];
 
     [super closeVout];
 }
