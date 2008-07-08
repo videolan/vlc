@@ -970,6 +970,7 @@
     int i_item;
     playlist_t * p_playlist = pl_Yield( VLCIntf );
 
+    PL_LOCK;
     for( i_item = 0; i_item < (int)[o_array count]; i_item++ )
     {
         input_item_t *p_input;
@@ -985,9 +986,10 @@
 
         /* Add the item */
         /* FIXME: playlist_AddInput() can fail */
+        
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
              i_position == -1 ? PLAYLIST_END : i_position + i_item, true,
-         false );
+         true );
 
         if( i_item == 0 && !b_enqueue )
         {
@@ -997,6 +999,8 @@
         }
         vlc_gc_decref( p_input );
     }
+    PL_UNLOCK;
+
     [self playlistUpdated];
     vlc_object_release( p_playlist );
 }
