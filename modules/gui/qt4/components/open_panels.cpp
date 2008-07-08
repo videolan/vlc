@@ -429,6 +429,8 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.protocolCombo->addItem("UDP/RTP (unicast)", QVariant("udp"));
     ui.protocolCombo->addItem("UDP/RTP (multicast)", QVariant("udp"));
     ui.protocolCombo->addItem("RTMP", QVariant("rtmp"));
+
+    updateProtocol( ui.protocolCombo->currentIndex() );
 }
 
 NetOpenPanel::~NetOpenPanel()
