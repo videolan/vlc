@@ -298,11 +298,11 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
     vlc_mutex_init( &p_input->p->counters.counters_lock );
 
-    /* Attach only once we are ready */
-    vlc_object_attach( p_input, p_parent );
-
     /* Set the destructor when we are sure we are initialized */
     vlc_object_set_destructor( p_input, (vlc_destructor_t)Destructor );
+
+    /* Attach only once we are ready */
+    vlc_object_attach( p_input, p_parent );
 
     return p_input;
 }
@@ -443,15 +443,21 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
  *
  * \param the input thread to stop
  */
-static void ObjectKillChildrens( vlc_object_t *p_obj )
+static void ObjectKillChildrens( input_thread_t *p_input, vlc_object_t *p_obj )
 {
     vlc_list_t *p_list;
     int i;
+
+    if( p_obj->i_object_type == VLC_OBJECT_VOUT ||
+        p_obj->i_object_type == VLC_OBJECT_AOUT ||
+        p_obj == VLC_OBJECT(p_input->p->p_sout) )
+        return;
+
     vlc_object_kill( p_obj );
 
     p_list = vlc_list_children( p_obj );
     for( i = 0; i < p_list->i_count; i++ )
-        ObjectKillChildrens( p_list->p_values[i].p_object );
+        ObjectKillChildrens( p_input, p_list->p_values[i].p_object );
     vlc_list_release( p_list );
 }
 void input_StopThread( input_thread_t *p_input )
@@ -459,7 +465,7 @@ void input_StopThread( input_thread_t *p_input )
     /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
      * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
      * unlock the control loop */
-    ObjectKillChildrens( VLC_OBJECT(p_input) );
+    ObjectKillChildrens( p_input, VLC_OBJECT(p_input) );
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
@@ -1436,7 +1442,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             msg_Dbg( p_input, "control: stopping input" );
 
             /* Mark all submodules to die */
-            ObjectKillChildrens( p_input );
+            ObjectKillChildrens( p_input, VLC_OBJECT(p_input) );
             break;
 
         case INPUT_CONTROL_SET_POSITION:
