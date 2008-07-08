@@ -1441,7 +1441,7 @@
 
         /* build the stepper */
         ADD_STEPPER( o_stepper, mainFrame, mainFrame.size.width - 19,
-            0, o_tooltip, -1600, 1600)
+            0, o_tooltip, -100000, 100000)
         [o_stepper setIntValue: p_item->value.i];
         [o_stepper setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_stepper];
@@ -1734,7 +1734,7 @@
 
         /* build the stepper */
         ADD_STEPPER( o_stepper, mainFrame, mainFrame.size.width - 19,
-            0, o_tooltip, -1600, 1600)
+            0, o_tooltip, -100000, 100000)
         [o_stepper setFloatValue: p_item->value.f];
         [o_stepper setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_stepper];
