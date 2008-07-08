@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>VLC Plugin</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Copyright 2002-2007 The VideoLAN Team. All Rights Reserved</string>
+	<string>Copyright 2002-2008 The VideoLAN Team. All Rights Reserved</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.netscape.vlc</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -19,9 +19,9 @@
 	<key>CFBundleSignature</key>
 	<string>MOSS</string>
 	<key>CFBundleVersion</key>
-	<string>0.12</string>
+	<string>0.9.0-test2</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.12</string>
+	<string>0.9.0-test2</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 </dict>
