@@ -163,13 +163,15 @@
     return o_vout_view;
 }
 
-
 - (IBAction)stop:(id)sender
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-stop" );
     var_Set( p_intf->p_libvlc, "key-pressed", val );
+    /* Close the window directly, because we do know that there
+     * won't be anymore video. It's currently waiting a bit. */
+    [[[self getVoutView] window] orderOut:self];
 }
 
 - (IBAction)faster:(id)sender
