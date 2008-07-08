@@ -888,8 +888,6 @@
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
 
-    vlc_object_lock( p_playlist );
-
 #define p_input p_playlist->p_input
 
     if( [[o_mi title] isEqualToString: _NS("Faster")] ||
@@ -916,7 +914,9 @@
              [[o_mi title] isEqualToString: _NS("Next")] )
     {
         /** \todo fix i_size use */
+        PL_LOCK;
         bEnabled = p_playlist->items.i_size > 1;
+        PL_UNLOCK;
     }
     else if( [[o_mi title] isEqualToString: _NS("Random")] )
     {
@@ -999,7 +999,6 @@
         [o_main setupMenus]; /* Make sure video menu is up to date */
     }
 
-    vlc_object_unlock( p_playlist );
     vlc_object_release( p_playlist );
 
     return( bEnabled );
