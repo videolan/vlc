@@ -104,6 +104,8 @@ static const vlc_input_callback_t p_input_title_callbacks[] =
 {
     CALLBACK( "next-chapter", SeekpointCallback ),
     CALLBACK( "prev-chapter", SeekpointCallback ),
+
+    CALLBACK( NULL, NULL )
 };
 #undef CALLBACK
 
