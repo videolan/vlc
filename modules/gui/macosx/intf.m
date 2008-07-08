@@ -481,7 +481,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
     var_AddCallback( p_intf->p_libvlc, "intf-show", ShowController, self);
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
  
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, self );
@@ -1241,7 +1241,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             //b_chapters = p_input->stream.i_area_nb > 1;
             vlc_object_release( p_input );
         }
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
 
         [o_btn_stop setEnabled: b_input];
         [o_btn_ff setEnabled: b_seekable];
@@ -1390,10 +1390,9 @@ end:
 - (void)setupMenus
 {
     playlist_t * p_playlist = pl_Yield( p_intf );
-    input_thread_t * p_input = p_playlist->p_input;
+    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
     if( p_input != NULL )
     {
-        vlc_object_yield( p_input );
         [o_controls setupVarMenuItem: o_mi_program target: (vlc_object_t *)p_input
             var: "program" selector: @selector(toggleVar:)];
 
@@ -1462,7 +1461,7 @@ end:
         }
         vlc_object_release( p_input );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification
@@ -1504,13 +1503,12 @@ end:
 - (void)resetScrollField
 {
     playlist_t * p_playlist = pl_Yield( p_intf );
-    input_thread_t * p_input = p_playlist->p_input;
+    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
     i_end_scroll = -1;
     if( p_input && vlc_object_alive (p_input) )
     {
         NSString *o_temp;
-        vlc_object_yield( p_input );
         if( input_item_GetNowPlaying ( p_playlist->status.p_item->p_input ) )
             o_temp = [NSString stringWithUTF8String: 
                 input_item_GetNowPlaying ( p_playlist->status.p_item->p_input )];
@@ -1520,10 +1518,10 @@ end:
         [self setScrollField: o_temp stopAfter:-1];
         [[[self getControls] getFSPanel] setStreamTitle: o_temp];
         vlc_object_release( p_input );
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     [self setScrollField: _NS("VLC media player") stopAfter:-1];
 }
 
@@ -1663,14 +1661,13 @@ end:
             return;
     }
     p_playlist = pl_Yield( p_intf );
-    p_input = p_playlist->p_input;
+    p_input = playlist_CurrentInput( p_playlist );
     if( p_input != NULL )
     {
         vlc_value_t time;
         vlc_value_t pos;
         NSString * o_time;
         char psz_time[MSTRTIME_MAX_SIZE];
-        vlc_object_yield( p_input );
 
         pos.f_float = f_updated / 10000.;
         var_Set( p_input, "position", pos );
@@ -1684,7 +1681,7 @@ end:
         [o_embedded_window setTime: o_time position: f_updated];
         vlc_object_release( p_input );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
