@@ -35,19 +35,11 @@
 #include <vlc_block.h>
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                        aout_buffer_t * );
-
-static int  OpenFilter ( vlc_object_t * );
-static block_t *Filter( filter_t *, block_t * );
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Create    ( vlc_object_t * );
+static int  OpenFilter( vlc_object_t * );
+
 vlc_module_begin();
     set_description( N_("Audio filter for simple channel mixing") );
     set_capability( "audio filter", 10 );
@@ -62,47 +54,34 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+#define AOUT_CHANS_STEREO_FRONT  ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT )
+#define AOUT_CHANS_STEREO_REAR   ( AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT )
+#define AOUT_CHANS_STEREO_MIDDLE (AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT )
+
+#define AOUT_CHANS_2_0 AOUT_CHANS_STEREO_FRONT
+#define AOUT_CHANS_4_0 (AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_REAR )
+#define AOUT_CHANS_5_0 ( AOUT_CHANS_4_0 | AOUT_CHAN_CENTER )
+#define AOUT_CHANS_6_0 (AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_REAR | AOUT_CHANS_STEREO_MIDDLE )
+#define AOUT_CHANS_7_0 ( AOUT_CHANS_6_0 | AOUT_CHAN_CENTER )
+
+static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output );
+
+static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+                        aout_buffer_t * );
+
+static block_t *Filter( filter_t *, block_t * );
+
+/*****************************************************************************
  * Create: allocate trivial channel mixer
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( (p_filter->input.i_physical_channels
-           == p_filter->output.i_physical_channels
-           && p_filter->input.i_original_channels
-               == p_filter->output.i_original_channels)
-          || p_filter->input.i_format != p_filter->output.i_format
-          || p_filter->input.i_rate != p_filter->output.i_rate
-          || p_filter->input.i_format != VLC_FOURCC('f','l','3','2') )
-    {
+    if( !IsSupported( &p_filter->input, &p_filter->output ) )
         return -1;
-    }
-
-    /* Only conversion to Mono, Stereo and 4.0 right now */
-    if( p_filter->output.i_physical_channels !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
-        && p_filter->output.i_physical_channels !=
-        ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-        AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT)
-        && p_filter->output.i_physical_channels != AOUT_CHAN_CENTER )
-    {
-        return -1;
-    }
-
-    /* Only from 7/7.1/5/5.1/2.0 */
-    if( (p_filter->input.i_physical_channels & ~AOUT_CHAN_LFE) !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT) &&
-        (p_filter->input.i_physical_channels & ~AOUT_CHAN_LFE) !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-         AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT |
-         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT) &&
-        p_filter->input.i_physical_channels !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
-    {
-        return -1;
-    }
 
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = 0;
@@ -120,14 +99,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_input_nb = aout_FormatNbChannels( &p_filter->input );
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
     float *p_dest = (float *)p_out_buf->p_buffer;
-    float *p_src = (float *)p_in_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
     int i;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
 
-    if( p_filter->output.i_physical_channels ==
-                            (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
+    if( p_filter->output.i_physical_channels == AOUT_CHANS_2_0 )
     {
         if( p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT )
         for( i = p_in_buf->i_nb_samples; i--; )
@@ -219,7 +197,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
             if( p_filter->input.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
         }
-
     }
 }
 
@@ -230,41 +207,14 @@ static int OpenFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
-    if ( (p_filter->fmt_in.audio.i_physical_channels
-           == p_filter->fmt_out.audio.i_physical_channels
-           && p_filter->fmt_in.audio.i_original_channels
-               == p_filter->fmt_out.audio.i_original_channels)
-          || p_filter->fmt_in.i_codec != p_filter->fmt_out.i_codec
-          || p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate
-          || p_filter->fmt_in.i_codec != VLC_FOURCC('f','l','3','2') )
-    {
-        return -1;
-    }
+    audio_format_t fmt_in  = p_filter->fmt_in.audio;
+    audio_format_t fmt_out = p_filter->fmt_out.audio;
 
-    /* Only conversion to Mono, Stereo and 4.0 right now */
-    if( p_filter->fmt_out.audio.i_physical_channels !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
-        && p_filter->fmt_out.audio.i_physical_channels !=
-        ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-        AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT)
-        && p_filter->fmt_out.audio.i_physical_channels != AOUT_CHAN_CENTER )
-    {
-        return -1;
-    }
+    fmt_in.i_format = p_filter->fmt_in.i_codec;
+    fmt_out.i_format = p_filter->fmt_out.i_codec;
 
-    /* Only from 7/7.1/5/5.1/2.0 */
-    if( (p_filter->fmt_in.audio.i_physical_channels & ~AOUT_CHAN_LFE) !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT) &&
-        (p_filter->fmt_in.audio.i_physical_channels & ~AOUT_CHAN_LFE) !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-         AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT |
-         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT) &&
-        p_filter->fmt_in.audio.i_physical_channels !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
-    {
+    if( !IsSupported( &fmt_in, &fmt_out ) )
         return -1;
-    }
 
     p_filter->pf_audio_filter = Filter;
 
@@ -327,3 +277,36 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
     return p_out;
 }
 
+/*****************************************************************************
+ * Helpers:
+ *****************************************************************************/
+static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output )
+{
+    if ( (p_input->i_physical_channels
+           == p_output->i_physical_channels
+           && p_input->i_original_channels
+               == p_output->i_original_channels)
+          || p_input->i_format != p_output->i_format
+          || p_input->i_rate != p_output->i_rate
+          || p_input->i_format != VLC_FOURCC('f','l','3','2') )
+    {
+        return false;
+    }
+
+    /* Only conversion to Mono, Stereo and 4.0 right now */
+    if( p_output->i_physical_channels != AOUT_CHAN_CENTER &&
+        p_output->i_physical_channels != AOUT_CHANS_2_0 &&
+        p_output->i_physical_channels != AOUT_CHANS_4_0 )
+    {
+        return false;
+    }
+
+    /* Only from 7/7.1/5/5.1/2.0 */
+    if( (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_7_0 &&
+        (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_5_0 &&
+         p_input->i_physical_channels != AOUT_CHANS_2_0 )
+    {
+        return false;
+    }
+    return true;
+}
