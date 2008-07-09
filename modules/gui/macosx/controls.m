@@ -908,7 +908,6 @@
         {
             bEnabled = FALSE;
         }
-        [o_main setupMenus]; /* Make sure input menu is up to date */
     }
     else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )

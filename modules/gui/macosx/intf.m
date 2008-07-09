@@ -1213,6 +1213,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         p_intf->p_sys->b_current_title_update = true;
         p_intf->p_sys->b_intf_update = true;
         p_intf->p_sys->b_input_update = false;
+        [self setupMenus]; /* Make sure input menu is up to date */
     }
     if( p_intf->p_sys->b_intf_update )
     {
