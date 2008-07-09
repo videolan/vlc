@@ -48,20 +48,10 @@
 #include <csri/stream.h>
 
 /*****************************************************************************
- * Local prototypes
+ * Module descriptor
  *****************************************************************************/
 static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
-
-static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
-static void DestroySubpicture( subpicture_t * );
-static void PreRender( video_format_t *, spu_t *, subpicture_t *, mtime_t );
-static subpicture_region_t *UpdateRegions( video_format_t *, spu_t *,
-                                           subpicture_t *, mtime_t );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 
 vlc_module_begin();
     set_shortname( N_("Subtitles (advanced)"));
@@ -73,13 +63,25 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * decoder_sys_t: filter data
+ * Local prototypes
+ *****************************************************************************/
+static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
+static void DestroySubpicture( subpicture_t * );
+static void PreRender( video_format_t *, spu_t *, subpicture_t *, mtime_t );
+static subpicture_region_t *UpdateRegions( video_format_t *, spu_t *,
+                                           subpicture_t *, mtime_t );
+
+/*****************************************************************************
+ * decoder_sys_t: decoder data
  *****************************************************************************/
 struct decoder_sys_t
 {
     subpicture_t *p_spu_final;
     video_format_t fmt_cached;
     csri_inst *p_instance;
+
+    struct csri_stream_ext *p_stream_ext;
+
     void (*pf_push_packet)(csri_inst *inst, const void *packet,
                            size_t packetlen, double pts_start,
                            double pts_end);
@@ -102,12 +104,10 @@ static int Create( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
     csri_rend *p_render;
-    struct csri_stream_ext *p_streamext;
+    struct csri_stream_ext *p_stream_ext;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
-    {
         return VLC_EGENERIC;
-    }
 
     p_render = csri_renderer_default();
     if (!p_render)
@@ -115,8 +115,8 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_dec, "can't load csri renderer" );
         return VLC_EGENERIC;
     }
-    p_streamext = csri_query_ext(p_render, CSRI_EXT_STREAM_ASS);
-    if (!p_streamext)
+    p_stream_ext = csri_query_ext(p_render, CSRI_EXT_STREAM_ASS);
+    if (!p_stream_ext)
     {
         msg_Err( p_dec, "csri renderer does not support ASS streaming" );
         return VLC_EGENERIC;
@@ -127,13 +127,14 @@ static int Create( vlc_object_t *p_this )
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    memset( &p_dec->p_sys->fmt_cached, 0, sizeof( p_dec->p_sys->fmt_cached ) );
+    memset( &p_sys->fmt_cached, 0, sizeof( p_sys->fmt_cached ) );
 
-    p_sys->pf_push_packet = p_streamext->push_packet;
-    p_sys->p_instance = p_streamext->init_stream(p_render,
-                                                 p_dec->fmt_in.p_extra,
-                                                 p_dec->fmt_in.i_extra - 1,
-                                                 NULL);
+    p_sys->p_stream_ext = p_stream_ext;
+    p_sys->pf_push_packet = p_stream_ext->push_packet;
+    p_sys->p_instance = p_stream_ext->init_stream( p_render,
+                                                   p_dec->fmt_in.p_extra,
+                                                   p_dec->fmt_in.p_extra ? strnlen( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra ) : 0,
+                                                   NULL);
     return VLC_SUCCESS;
 }
 
@@ -144,9 +145,11 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
+    decoder_t *p_dec = (decoder_t *)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
+    if( p_sys->p_stream_ext->discard )
+        p_sys->p_stream_ext->discard( p_sys->p_instance, true );
     free( p_sys );
 }
 
@@ -157,20 +160,29 @@ static void Destroy( vlc_object_t *p_this )
  ****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     subpicture_t *p_spu = NULL;
     block_t *p_block;
 
-    msg_Dbg( p_dec, "DecodeBlock %p", (void *)pp_block);
-    if( !pp_block || *pp_block == NULL ) return NULL;
+    //msg_Dbg( p_dec, "DecodeBlock %p", (void *)pp_block);
+    if( !pp_block || *pp_block == NULL )
+        return NULL;
+
     p_block = *pp_block;
-    if( p_block->i_buffer == 0 || p_block->p_buffer[0] == '\0' ) return NULL;
+    *pp_block = NULL;
+
+    if( p_block->i_buffer == 0 || p_block->p_buffer[0] == '\0' )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
 
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );
-        block_Release( *pp_block );
-        *pp_block = NULL;
+        block_Release( p_block );
         return NULL;
     }
 
@@ -178,8 +190,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !p_spu->p_sys )
     {
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
-        block_Release( *pp_block );
-        *pp_block = NULL;
+        block_Release( p_block );
         return NULL;
     }
     p_spu->p_sys->p_dec = p_dec;
@@ -190,8 +201,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         free( p_spu->p_sys );
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
-        block_Release( *pp_block );
-        *pp_block = NULL;
+        block_Release( p_block );
         return NULL;
     }
     memcpy( p_spu->p_sys->p_subs_data, p_block->p_buffer,
@@ -205,25 +215,24 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->b_absolute = false;
     p_spu->b_pausable = true;
 
-    msg_Dbg( p_dec, "BS %lf..%lf", p_spu->i_start * 0.000001, p_spu->i_stop * 0.000001);
-    p_dec->p_sys->pf_push_packet(p_dec->p_sys->p_instance,
-                                 p_spu->p_sys->p_subs_data, p_block->i_buffer,
-                                 p_spu->i_start * 0.000001,
-                                 p_spu->i_stop * 0.000001);
+    //msg_Dbg( p_dec, "BS %lf..%lf", p_spu->i_start * 0.000001, p_spu->i_stop * 0.000001);
+    p_sys->pf_push_packet( p_sys->p_instance,
+                           p_spu->p_sys->p_subs_data, p_spu->p_sys->i_subs_len,
+                           p_spu->i_start * 0.000001,
+                           p_spu->i_stop * 0.000001);
 
     p_spu->pf_pre_render = PreRender;
     p_spu->pf_update_regions = UpdateRegions;
     p_spu->pf_destroy = DestroySubpicture;
 
-    block_Release( *pp_block );
-    *pp_block = NULL;
+    block_Release( p_block );
 
     return p_spu;
 }
 
 static void DestroySubpicture( subpicture_t *p_subpic )
 {
-    msg_Dbg( p_subpic->p_sys->p_dec, "drop spu %p", (void *)p_subpic );
+    //msg_Dbg( p_subpic->p_sys->p_dec, "drop spu %p", (void *)p_subpic );
     free( p_subpic->p_sys->p_subs_data );
     free( p_subpic->p_sys );
 }
@@ -239,49 +248,66 @@ static subpicture_region_t *UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
                                            subpicture_t *p_subpic, mtime_t ts )
 {
     decoder_t *p_dec = p_subpic->p_sys->p_dec;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     subpicture_region_t *p_spu_region;
     video_format_t fmt;
-    struct csri_frame csri_frame;
 
-    if (p_subpic != p_dec->p_sys->p_spu_final)
-    {
+    if( p_subpic != p_sys->p_spu_final )
         return NULL;
-    }
 
-    memcpy( &fmt, p_fmt, sizeof( fmt ) );
+#if 0
+    msg_Warn( p_dec, "---- fmt: %dx%d %dx%d chroma=%4.4s",
+            p_fmt->i_width, p_fmt->i_height,
+            p_fmt->i_visible_width, p_fmt->i_visible_height,
+            (const char*)&p_fmt->i_chroma );
+#endif
+
+    fmt = *p_fmt;
     fmt.i_chroma = VLC_FOURCC('R','G','B','A');
     fmt.i_width = fmt.i_visible_width;
     fmt.i_height = fmt.i_visible_height;
     fmt.i_bits_per_pixel = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_sar_num = 1;
+    fmt.i_sar_den = 1;
 
-    if (memcmp(&fmt, &p_dec->p_sys->fmt_cached, sizeof(fmt)))
+    if( memcmp(&fmt, &p_sys->fmt_cached, sizeof(fmt)) )
     {
+        //msg_Warn( p_dec, "---- fmt: new %dx%d", fmt.i_width, fmt.i_height );
+
         struct csri_fmt csri_fmt;
         memset(&csri_fmt, 0, sizeof(csri_fmt));
         csri_fmt.pixfmt = CSRI_F_RGBA;
         csri_fmt.width = fmt.i_width;
         csri_fmt.height = fmt.i_height;
-        if( csri_request_fmt(p_dec->p_sys->p_instance, &csri_fmt) )
+        if( csri_request_fmt( p_sys->p_instance, &csri_fmt ) )
             msg_Dbg( p_dec, "csri error: format not supported" );
 
-        memcpy(&p_dec->p_sys->fmt_cached, &fmt, sizeof(fmt));
+        p_sys->fmt_cached = fmt;
     }
 
+    p_subpic->i_original_picture_height = fmt.i_height;
+    p_subpic->i_original_picture_width = fmt.i_width;
+
     p_spu_region = p_subpic->pf_create_region( VLC_OBJECT(p_dec), &fmt );
-    p_spu_region->i_align = SUBPICTURE_ALIGN_TOP;
 
-    csri_frame.pixfmt = CSRI_F_RGBA;
-    csri_frame.planes[0] = (unsigned char*)p_spu_region->picture.Y_PIXELS;
-    csri_frame.strides[0] = p_spu_region->picture.Y_PITCH;
+    if( p_spu_region )
+    {
+        struct csri_frame csri_frame;
 
-    msg_Dbg( p_dec, "TS %lf", ts * 0.000001 );
-    csri_render( p_dec->p_sys->p_instance, &csri_frame, ts * 0.000001 );
-    memset(p_spu_region->picture.Y_PIXELS, 0xff, fmt.i_width);
-    memset(p_spu_region->picture.Y_PIXELS + p_spu_region->picture.Y_PITCH
-                    * (fmt.i_height - 1), 0x88, fmt.i_width);
+        /* */
+        p_spu_region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+        memset( p_spu_region->picture.Y_PIXELS, 0x00, p_spu_region->picture.Y_PITCH * p_sys->fmt_cached.i_height );
 
-    p_subpic->p_region = p_spu_region;
+        /* */
+        //msg_Dbg( p_dec, "TS %lf", ts * 0.000001 );
+        memset( &csri_frame, 0, sizeof(csri_frame) );
+        csri_frame.pixfmt = CSRI_F_RGBA;
+        csri_frame.planes[0] = (unsigned char*)p_spu_region->picture.Y_PIXELS;
+        csri_frame.strides[0] = p_spu_region->picture.Y_PITCH;
+        csri_render( p_sys->p_instance, &csri_frame, ts * 0.000001 );
+    }
     return p_spu_region;
 }
 
