@@ -517,7 +517,17 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             if ( p_subpic->p_region ) {
                 spu_DestroyRegion( p_spu, p_subpic->p_region );
             }
-            p_subpic->p_region = p_region = p_subpic->pf_update_regions( p_fmt, p_spu, p_subpic, mdate() );
+
+            /* TODO do not reverse the scaling that was done before calling
+             * spu_RenderSubpictures, just pass it along (or do it inside
+             * spu_RenderSubpictures) */
+            video_format_t fmt_org = *p_fmt;
+            fmt_org.i_width =
+            fmt_org.i_visible_width = i_source_video_width;
+            fmt_org.i_height =
+            fmt_org.i_visible_height = i_source_video_height;
+
+            p_subpic->p_region = p_region = p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, mdate() );
         }
         else
         {
