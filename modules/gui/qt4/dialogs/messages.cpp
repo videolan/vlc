@@ -244,7 +244,7 @@ void MessagesDialog::clear()
 bool MessagesDialog::save()
 {
     QString saveLogFileName = QFileDialog::getSaveFileName(
-            this, qtr( "Choose a filename to save the logs under..." ),
+            this, qtr( "Select a name for the logs file" ),
             qfu( config_GetHomeDir() ),
             qtr( "Texts / Logs (*.log *.txt);; All (*.*) ") );
 

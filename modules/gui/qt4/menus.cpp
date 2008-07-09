@@ -328,7 +328,7 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
     addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", "", SLOT( saveAPlaylist() ),
         "Ctrl+Y" );
     menu->addSeparator();
-    menu->addAction( qtr( "Undock from interface" ), mi,
+    menu->addAction( qtr( "Undock from Interface" ), mi,
                      SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );
     return menu;
 }
@@ -382,7 +382,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
                                   SLOT( toggleFullScreen() ), QString( "F11" ) );
 
         /* Advanced Controls */
-        action = menu->addAction( qtr( "Advanced controls" ), mi,
+        action = menu->addAction( qtr( "Advanced Controls" ), mi,
                                   SLOT( toggleAdvanced() ) );
         action->setCheckable( true );
         if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
@@ -612,7 +612,7 @@ QMenu *QVLCMenu::HelpMenu( QMenu *current )
     addDPStaticEntry( menu, qtr( "Help..." ) , "",
         ":/pixmaps/menus_help_16px.png", SLOT( helpDialog() ), "F1" );
 #ifdef UPDATE_CHECK
-    addDPStaticEntry( menu, qtr( "Check for updates..." ) , "", "",
+    addDPStaticEntry( menu, qtr( "Check for Updates..." ) , "", "",
                       SLOT( updateDialog() ), "");
 #endif
     menu->addSeparator();

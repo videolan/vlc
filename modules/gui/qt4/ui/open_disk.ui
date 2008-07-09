@@ -17,7 +17,7 @@
    <item>
     <widget class="QGroupBox" name="diskGroupBox" >
      <property name="title" >
-      <string>_("Disc selection")</string>
+      <string>_("Disc Selection")</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
@@ -105,7 +105,7 @@
          <string>_("Disable DVD Menus (for compatibility)")</string>
         </property>
         <property name="text" >
-         <string>_("No DVD Menus")</string>
+         <string>_("No DVD menus")</string>
         </property>
        </widget>
       </item>
@@ -168,7 +168,7 @@
    <item>
     <widget class="QGroupBox" name="diskOptionBox" >
      <property name="title" >
-      <string>_("Starting position")</string>
+      <string>_("Starting Position")</string>
      </property>
      <layout class="QGridLayout" >
       <item row="1" column="0" >

@@ -63,7 +63,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ADVANCED_PREFS_TEXT N_( "Show advanced prefs over simple ones" )
+#define ADVANCED_PREFS_TEXT N_( "Show advanced preferences over simple ones" )
 #define ADVANCED_PREFS_LONGTEXT N_( "Show advanced preferences and not simple "\
                                     "preferences when opening the preferences "\
                                     "dialog." )
@@ -74,9 +74,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                              "for basic actions." )
 
 #define MINIMIZED_TEXT N_( "Start VLC with only a systray icon" )
-#define MINIMIZED_LONGTEXT N_( "When you launch VLC with that option, " \
-                               "VLC will start with just an icon in " \
-                               "your taskbar." )
+#define MINIMIZED_LONGTEXT N_( "VLC will start with just an icon in " \
+                               "your taskbar" )
 
 #define TITLE_TEXT N_( "Show playing item name in window title" )
 #define TITLE_LONGTEXT N_( "Show the name of the song or video in the " \
@@ -103,7 +102,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define UPDATER_TEXT N_( "Activate the updates availability notification" )
 #define UPDATER_LONGTEXT N_( "Activate the automatic notification of new " \
-                            "versions of the software. It runs once a week." )
+                            "versions of the software. It runs once every " \
+                            "two weeks." )
 #define UPDATER_DAYS_TEXT N_("Number of days between two update checks")
 
 #define COMPLETEVOL_TEXT N_( "Allow the volume to be set to 400%" )

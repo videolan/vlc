@@ -72,7 +72,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     art->setMaximumWidth( 128 );
     art->setScaledContents( true );
     art->setPixmap( QPixmap( ":/noart.png" ) );
-    art->setToolTip( qtr( "Double click to get media informations" ) );
+    art->setToolTip( qtr( "Double click to get media information" ) );
 
     artContLay->addWidget( art, 1 );
 

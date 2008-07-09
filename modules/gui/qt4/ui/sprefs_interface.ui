@@ -32,7 +32,7 @@
    <item row="1" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>_("Native or Skins")</string>
+      <string>_("Interface Type")</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
@@ -70,7 +70,7 @@
          </sizepolicy>
         </property>
         <property name="text" >
-         <string>_("Display Mode")</string>
+         <string>_("Display mode")</string>
         </property>
        </widget>
       </item>
@@ -155,7 +155,7 @@
       <item row="6" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>_("Skin File")</string>
+         <string>_("Skin file")</string>
         </property>
         <property name="buddy" >
          <cstring>fileSkin</cstring>

@@ -251,7 +251,7 @@ VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
 
     layout->addItem( new QSpacerItem( 40,20,
                               QSizePolicy::Expanding, QSizePolicy::Minimum ) );
-    layout->addWidget( new QLabel( qtr( "Current visualization:" ) ) );
+    layout->addWidget( new QLabel( qtr( "Current visualization" ) ) );
 
     current = new QLabel( qtr( "None" ) );
     layout->addWidget( current );
@@ -316,7 +316,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     frameButton->setMaximumSize( QSize( 26, 26 ) );
     frameButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( frameButton );
-    BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by Frame" ), frame() );
+    BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by frame" ), frame() );
 #endif
 
     recordButton = new QPushButton( "R" );
@@ -616,7 +616,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     /** extended Settings **/
     extSettingsButton = new QPushButton;
-    BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended Settings" ),
+    BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended settings" ),
             extSettings() );
     setupSmallButton( extSettingsButton );
     controlLayout->addWidget( extSettingsButton, 3, 12, Qt::AlignBottom );

@@ -98,7 +98,7 @@
       <item row="2" column="0" colspan="2" >
        <widget class="QCheckBox" name="skipFrames" >
         <property name="text" >
-         <string>_("Skip Frames")</string>
+         <string>_("Skip frames")</string>
         </property>
         <property name="checked" >
          <bool>true</bool>
@@ -126,7 +126,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="label_5" >
         <property name="text" >
-         <string>_("Display Device")</string>
+         <string>_("Display device")</string>
         </property>
         <property name="buddy" >
          <cstring>dXdisplayDevice</cstring>
@@ -136,7 +136,7 @@
       <item row="0" column="0" colspan="2" >
        <widget class="QCheckBox" name="wallpaperMode" >
         <property name="text" >
-         <string>_("Enable Wallpaper Mode")</string>
+         <string>_("Enable wallpaper mode")</string>
         </property>
        </widget>
       </item>

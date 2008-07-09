@@ -117,7 +117,8 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
             qtr( "VLC media player is a free media player, "
                 "encoder and streamer that can read from files, "
                 "CDs, DVDs, network streams, capture cards and even more!\n"
-                "Also, VLC works on essentially every popular platform.\n\n" )
+                "VLC uses its internal codecs and works on essentially every "
+                "popular platform.\n\n" )
             + qtr( "This version of VLC was compiled by:\n " )
             + qfu( VLC_CompileBy() )+ "@" + qfu( VLC_CompileHost() ) + "."
             + qfu( VLC_CompileDomain() ) + ".\n"
@@ -146,9 +147,9 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
     QVBoxLayout *thanksLayout = new QVBoxLayout( thanksWidget );
 
     QLabel *thanksLabel = new QLabel( qtr( "We would like to thank the whole "
-                "community, the testers, our users and the following people "
+                "VLC community, the testers, our users and the following people "
                 "(and the missing ones...) for their collaboration to "
-                "provide the best software." ) );
+                "create the best free software." ) );
     thanksLabel->setWordWrap( true );
     thanksLayout->addWidget( thanksLabel );
     QTextEdit *thanksEdit = new QTextEdit( this );

@@ -37,8 +37,8 @@
 #define I_MENU_INFO  N_("Media Information...")
 #define I_MENU_CODECINFO  N_("Codec Information...")
 #define I_MENU_MSG   N_("Messages...")
-#define I_MENU_EXT   N_("Extended settings...")
-#define I_MENU_GOTOTIME N_("Go to specific time...")
+#define I_MENU_EXT   N_("Extended Settings...")
+#define I_MENU_GOTOTIME N_("Go to Specific Time...")
 #define I_MENU_BOOKMARK N_("Bookmarks...")
 #define I_MENU_VLM N_("VLM Configuration...")
 
@@ -46,11 +46,11 @@
 
 /* Playlist popup */
 #define I_POP_PLAY N_("Play")
-#define I_POP_PREPARSE N_("Fetch information")
+#define I_POP_PREPARSE N_("Fetch Information")
 #define I_POP_DEL N_("Delete")
 #define I_POP_INFO N_("Information...")
 #define I_POP_SORT N_("Sort")
-#define I_POP_ADD N_("Add node")
+#define I_POP_ADD N_("Add Node")
 #define I_POP_STREAM N_("Stream...")
 #define I_POP_SAVE N_("Save...")
 #define I_POP_EXPLORE N_("Open Folder...")
@@ -71,13 +71,13 @@
 #define I_PL_ADVADD     N_("Advanced open...")
 #define I_PL_ADDDIR     N_("Add directory...")
 
-#define I_PL_SAVE       N_("Save playlist to file...")
-#define I_PL_LOAD       N_("Load playlist file...")
+#define I_PL_SAVE       N_("Save Playlist to File...")
+#define I_PL_LOAD       N_("Load Playlist File...")
 
 #define I_PL_SEARCH     N_("Search")
-#define I_PL_FILTER     N_("Search filter")
+#define I_PL_FILTER     N_("Search Filter")
 
-#define I_PL_SD         N_("Additional sources")
+#define I_PL_SD         N_("Additional Sources")
 
 /*************** Preferences *************/
 

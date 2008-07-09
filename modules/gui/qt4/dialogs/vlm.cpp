@@ -136,7 +136,7 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
     QPushButton *exportButton = new QPushButton( qtr( "Export" ) );
     ui.buttonBox->addButton( exportButton, QDialogButtonBox::ActionRole );
 
-    QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     ui.buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
 
 

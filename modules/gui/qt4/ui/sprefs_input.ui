@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>508</width>
-    <height>514</height>
+    <width>512</width>
+    <height>516</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -23,7 +23,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>_("Disk Device")</string>
+         <string>_("Default disc device")</string>
         </property>
         <property name="buddy" >
          <cstring>DVDDevice</cstring>
@@ -52,7 +52,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>_("Server Default Port")</string>
+         <string>_("Server default port")</string>
         </property>
         <property name="buddy" >
          <cstring>UDPPort</cstring>
@@ -78,7 +78,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="label_7" >
         <property name="text" >
-         <string>_("HTTP Proxy")</string>
+         <string>_("HTTP proxy")</string>
         </property>
         <property name="buddy" >
          <cstring>proxy</cstring>
@@ -122,7 +122,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_5" >
         <property name="text" >
-         <string>_("Post-Processing Quality")</string>
+         <string>_("Post-Processing quality")</string>
         </property>
         <property name="buddy" >
          <cstring>PostProcLevel</cstring>
