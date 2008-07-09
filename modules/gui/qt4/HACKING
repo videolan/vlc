@@ -42,3 +42,18 @@ So if your dialog is a dialog you are used to keep during a playing of a video, 
 
 QVLCFrame: extended panel, messages...
 QVLCDialog: preferences, open...
+
+** HIG for Qt4 **
+We tend to use GNOME/KDE specs over Vista ones for capitalizations:
+We use Header for:
+ - Menu
+ - Menu items
+ - GroupBox Titles
+ - Windows and dialog Titles
+We use Sentence for:
+ - CheckBoxes
+ - ComboBox list
+ - ComboBox labels
+ - Tooltips
+
+We use "..." after a menu item if it opens another dialog.
