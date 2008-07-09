@@ -143,10 +143,7 @@ static int Open( vlc_object_t *p_this )
     /* Allocate structure */
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_demux, "out of memory, cannot allocate structure" );
         return VLC_ENOMEM;
-    }
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
     /* Parse MRL */
@@ -188,7 +185,8 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_channels * sizeof( jack_port_t* ) );
     if( p_sys->pp_jack_port_input == NULL )
     {
-        msg_Err( p_demux, "out of memory, cannot allocate input ports" );
+        jack_client_close( p_sys->p_jack_client );
+        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -200,7 +198,9 @@ static int Open( vlc_object_t *p_this )
          * sizeof( jack_default_audio_sample_t ) );
     if( p_sys->p_jack_ringbuffer == NULL )
     {
-        msg_Err( p_demux, "out of memory, cannot allocate ringbuffer" );
+        free( p_sys->pp_jack_port_input );
+        jack_client_close( p_sys->p_jack_client );
+        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -215,10 +215,9 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->pp_jack_port_input[i] == NULL )
         {
             msg_Err( p_demux, "failed to register a JACK port" );
-            if( p_sys->p_jack_client) jack_client_close( p_sys->p_jack_client );
+            jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
             free( p_sys->pp_jack_port_input );
-            if( p_sys->p_jack_ringbuffer ) jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
-            free( p_sys->pp_jack_buffer );
+            jack_client_close( p_sys->p_jack_client );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -229,7 +228,12 @@ static int Open( vlc_object_t *p_this )
         * sizeof( jack_default_audio_sample_t * ) );
     if( p_sys->pp_jack_buffer == NULL )
     {
-        msg_Err( p_demux, "out of memory, cannot allocate input buffer" );
+        for( i = 0; i < p_sys->i_channels; i++ )
+            jack_port_unregister( p_sys->p_jack_client, p_sys->pp_jack_port_input[i] );
+        jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
+        free( p_sys->pp_jack_port_input );
+        jack_client_close( p_sys->p_jack_client );
+        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -240,10 +244,12 @@ static int Open( vlc_object_t *p_this )
     if ( jack_activate( p_sys->p_jack_client ) )
     {
         msg_Err( p_demux, "failed to activate JACK client" );
-        if( p_sys->p_jack_client) jack_client_close( p_sys->p_jack_client );
-        free( p_sys->pp_jack_port_input );
-        if( p_sys->p_jack_ringbuffer ) jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
         free( p_sys->pp_jack_buffer );
+        for( i = 0; i < p_sys->i_channels; i++ )
+            jack_port_unregister( p_sys->p_jack_client, p_sys->pp_jack_port_input[i] );
+        jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
+        free( p_sys->pp_jack_port_input );
+        jack_client_close( p_sys->p_jack_client );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -288,7 +294,7 @@ static int Open( vlc_object_t *p_this )
                     jack_port_name( p_sys->pp_jack_port_input[i_input_ports] ) );
             }
         }
-    free( pp_jack_port_output );
+        free( pp_jack_port_output );
     }
 
     /* info about jack server */
