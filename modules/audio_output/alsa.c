@@ -730,12 +730,15 @@ static void Close( vlc_object_t *p_this )
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     int i_snd_rc;
 
+    /* Make sure that the thread will stop once it is waken up */
+    vlc_object_kill( p_aout );
+
     /* make sure the audio output thread is waken up */
     vlc_mutex_lock( &p_aout->output.p_sys->lock );
     vlc_cond_signal( &p_aout->output.p_sys->wait );
     vlc_mutex_unlock( &p_aout->output.p_sys->lock );
 
-    vlc_object_kill( p_aout );
+    /* */
     vlc_thread_join( p_aout );
     p_aout->b_die = false;
 
