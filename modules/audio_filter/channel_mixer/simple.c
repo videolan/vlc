@@ -282,13 +282,13 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
  *****************************************************************************/
 static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output )
 {
-    if ( (p_input->i_physical_channels
-           == p_output->i_physical_channels
-           && p_input->i_original_channels
-               == p_output->i_original_channels)
-          || p_input->i_format != p_output->i_format
-          || p_input->i_rate != p_output->i_rate
-          || p_input->i_format != VLC_FOURCC('f','l','3','2') )
+    if( p_input->i_format != VLC_FOURCC('f','l','3','2') ||
+          p_input->i_format != p_output->i_format ||
+          p_input->i_rate != p_output->i_rate )
+        return false;
+
+    if( p_input->i_physical_channels == p_output->i_physical_channels &&
+        p_input->i_original_channels == p_output->i_original_channels )
     {
         return false;
     }
@@ -308,5 +308,11 @@ static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_
     {
         return false;
     }
+
+    /* Only if we downmix */
+    if( aout_FormatNbChannels( p_input ) <= aout_FormatNbChannels( p_output ) )
+        return false;
+
     return true;
 }
+
