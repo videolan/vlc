@@ -262,7 +262,8 @@ static subpicture_region_t *UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
             p_fmt->i_visible_width, p_fmt->i_visible_height,
             (const char*)&p_fmt->i_chroma );
 #endif
-
+    /* XXX On x86 at least our RGBA is mapped to their BGRA
+     * TODO confirm that is the same on big endian cpu */
     fmt = *p_fmt;
     fmt.i_chroma = VLC_FOURCC('R','G','B','A');
     fmt.i_width = fmt.i_visible_width;
@@ -278,7 +279,7 @@ static subpicture_region_t *UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
 
         struct csri_fmt csri_fmt;
         memset(&csri_fmt, 0, sizeof(csri_fmt));
-        csri_fmt.pixfmt = CSRI_F_RGBA;
+        csri_fmt.pixfmt = CSRI_F_BGRA;
         csri_fmt.width = fmt.i_width;
         csri_fmt.height = fmt.i_height;
         if( csri_request_fmt( p_sys->p_instance, &csri_fmt ) )
@@ -303,7 +304,7 @@ static subpicture_region_t *UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
         /* */
         //msg_Dbg( p_dec, "TS %lf", ts * 0.000001 );
         memset( &csri_frame, 0, sizeof(csri_frame) );
-        csri_frame.pixfmt = CSRI_F_RGBA;
+        csri_frame.pixfmt = CSRI_F_BGRA;
         csri_frame.planes[0] = (unsigned char*)p_spu_region->picture.Y_PIXELS;
         csri_frame.strides[0] = p_spu_region->picture.Y_PITCH;
         csri_render( p_sys->p_instance, &csri_frame, ts * 0.000001 );
