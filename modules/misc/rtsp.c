@@ -44,6 +44,9 @@
 #include <vlc_strings.h>
 
 #include <errno.h>
+#ifndef WIN32
+# include <locale.h>
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -919,6 +922,29 @@ static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
     free( p_rtsp );
 }
 
+
+static float ParseNPT (const char *str)
+{
+     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+     locale_t oldloc = uselocale (loc);
+     unsigned hour, min;
+     float sec;
+
+     if (sscanf (str, "%u:%u:%f", &hour, &min, &sec) == 3)
+         sec += ((hour * 60) + min) * 60;
+     else
+     if (sscanf (str, "%f", &sec) != 1)
+         sec = 0.;
+
+     if (loc != (locale_t)0)
+     {
+         uselocale (oldloc);
+         freelocale (loc);
+     }
+     return sec;
+}
+
+
 static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                          httpd_message_t *answer, const httpd_message_t *query )
 {
@@ -1090,19 +1116,11 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     psz_position = strstr( psz_position, "npt=" );
                 if( psz_position && !psz_scale )
                 {
-                    double f_pos;
-                    char *end;
-
+                    double f_pos = ParseNPT (psz_position + 4);
                     msg_Dbg( p_vod, "seeking request: %s", psz_position );
-                    psz_position += 4;
-                    /* FIXME: npt= is not necessarily formatted as a float */
-                    f_pos = us_strtod( psz_position, &end );
-                    if( end > psz_position )
-                    {
-                        f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
-                        CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
-                                     psz_session, f_pos, NULL );
-                    }
+                    f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
+                    CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
+                                 psz_session, f_pos, NULL );
                     break;
                 }
                 if( psz_scale )
@@ -1423,20 +1441,11 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( psz_position ) psz_position = strstr( psz_position, "npt=" );
             if( psz_position )
             {
-                double f_pos;
-                char *end;
-
+                double f_pos = ParseNPT (psz_position + 4);
                 msg_Dbg( p_vod, "seeking request: %s", psz_position );
-
-                psz_position += 4;
-                /* FIXME: npt= is not necessarily formatted as a float */
-                f_pos = us_strtod( psz_position, &end );
-                if( end > psz_position )
-                {
-                    f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
-                    CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
-                                 psz_session, f_pos, NULL );
-                }
+                f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
+                CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
+                             psz_session, f_pos, NULL );
             }
 
             if( !psz_playnow )
