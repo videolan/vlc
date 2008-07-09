@@ -467,7 +467,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
 {
     QDialog *privacy = new QDialog();
 
-    privacy->setWindowTitle( qtr( "Privacy and Network policies" ) );
+    privacy->setWindowTitle( qtr( "Privacy and Network Policies" ) );
 
     QGridLayout *gLayout = new QGridLayout( privacy );
 

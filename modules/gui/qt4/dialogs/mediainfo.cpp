@@ -52,7 +52,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     b_cleaned = true;
     i_runs = 0;
 
-    setWindowTitle( qtr( "Media information" ) );
+    setWindowTitle( qtr( "Media Information" ) );
     resize( 600 , 480 );
 
     /* TabWidgets and Tabs creation */

@@ -43,7 +43,7 @@ GotoTimeDialog::GotoTimeDialog( QWidget *parent, intf_thread_t *_p_intf)
                : QVLCDialog( parent, _p_intf )
 {
     setWindowFlags( Qt::Tool );
-    setWindowTitle( qtr( "Go to time" ) );
+    setWindowTitle( qtr( "Go to Time" ) );
 
     QGridLayout *mainLayout = new QGridLayout( this );
     mainLayout->setSizeConstraint( QLayout::SetFixedSize );

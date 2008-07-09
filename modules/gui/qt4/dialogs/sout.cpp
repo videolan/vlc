@@ -96,7 +96,7 @@ SoutDialog* SoutDialog::instance = NULL;
 SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
                      bool _transcode_only ) : QVLCDialog( parent,  _p_intf )
 {
-    setWindowTitle( qtr( "Stream output" ) );
+    setWindowTitle( qtr( "Stream Output" ) );
 
     b_transcode_only = _transcode_only;
 

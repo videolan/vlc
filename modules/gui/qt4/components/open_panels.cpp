@@ -1102,7 +1102,7 @@ void CaptureOpenPanel::advancedDialog()
 
     /* New Adv Prop dialog */
     adv = new QDialog( this );
-    adv->setWindowTitle( qtr( "Advanced options..." ) );
+    adv->setWindowTitle( qtr( "Advanced Options" ) );
 
     /* A main Layout with a Frame */
     QVBoxLayout *mainLayout = new QVBoxLayout( adv );
