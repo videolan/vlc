@@ -276,7 +276,7 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
     p_new->i_type = INTERACT_DIALOG_TWOWAY;
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_description );
-    p_new->psz_default_button = strdup( _("Ok" ) );
+    p_new->psz_default_button = strdup( _("OK" ) );
     p_new->psz_alternate_button = strdup( _("Cancel" ) );
 
     p_new->i_flags = DIALOG_LOGIN_PW_OK_CANCEL;

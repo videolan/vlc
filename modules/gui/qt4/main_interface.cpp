@@ -521,7 +521,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
     CONFIG_GENERIC_NOBOOL( "qt-updates-days", Integer ); line++;
 #endif
 
-    QPushButton *ok = new QPushButton( qtr( "Ok" ) );
+    QPushButton *ok = new QPushButton( qtr( "OK" ) );
 
     gLayout->addWidget( ok, 2, 2 );
 

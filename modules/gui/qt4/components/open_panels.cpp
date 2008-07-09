@@ -1129,7 +1129,7 @@ void CaptureOpenPanel::advancedDialog()
 
     /* Button stuffs */
     QDialogButtonBox *advButtonBox = new QDialogButtonBox( adv );
-    QPushButton *closeButton = new QPushButton( qtr( "Ok" ) );
+    QPushButton *closeButton = new QPushButton( qtr( "OK" ) );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
 
     CONNECT( closeButton, clicked(), adv, accept() );
