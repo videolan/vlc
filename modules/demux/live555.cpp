@@ -189,7 +189,6 @@ struct demux_sys_t
 
     /* */
     int64_t          i_pcr; /* The clock */
-    int64_t          i_npt; /* The current time in the stream */
     int64_t          i_npt_length;
     int64_t          i_npt_start;
 
@@ -271,7 +270,6 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_track = 0;
     p_sys->track   = NULL;
     p_sys->i_pcr = 0;
-    p_sys->i_npt = 0;
     p_sys->i_npt_start = 0;
     p_sys->i_npt_length = 0;
     p_sys->p_out_asf = NULL;
@@ -1088,12 +1086,7 @@ static int Play( demux_t *p_demux )
     p_sys->i_npt_start = -1;
 #endif
     if( p_sys->i_npt_start < 0 )
-    {
         p_sys->i_npt_start = -1;
-        p_sys->i_npt = 0;
-    }
-    else
-        p_sys->i_npt = p_sys->i_npt_start;
 
 #if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
     /* Retrieve the duration if possible */
@@ -1243,12 +1236,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_npt > 0 )
-            {
-                *pi64 = p_sys->i_npt;
-                return VLC_SUCCESS;
-            }
             return VLC_EGENERIC;
 
         case DEMUX_GET_LENGTH:
@@ -1261,12 +1248,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double* );
-            if( p_sys->i_npt_length > 0 && p_sys->i_npt > 0 )
-            {
-                *pf = (double)p_sys->i_npt / (double)p_sys->i_npt_length;
-                return VLC_SUCCESS;
-            }
             return VLC_EGENERIC;
 
         case DEMUX_SET_POSITION:
@@ -1304,12 +1285,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_npt_start = -1;
 #endif
                 if( p_sys->i_npt_start < 0 )
-                {
                     p_sys->i_npt_start = -1;
-                    p_sys->i_npt = 0;
-                }
-                else
-                    p_sys->i_npt = p_sys->i_npt_start;
 
 #if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
                 /* Retrieve the duration if possible */
@@ -1398,7 +1374,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_PAUSE_STATE:
         {
-            double d_npt = (double) p_sys->i_npt / INT64_C(1000000);
             int i;
 
             b_bool = (bool)va_arg( args, int );
@@ -1408,7 +1383,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* FIXME */
             if( ( b_bool && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
                     ( !b_bool && !p_sys->rtsp->playMediaSession( *p_sys->ms,
-                      d_npt > 0 ? d_npt : -1 ) ) )
+                       -1 ) ) )
             {
                     msg_Err( p_demux, "PLAY or PAUSE failed %s", p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
@@ -1445,12 +1420,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_npt_start = -1;
 #endif
             if( p_sys->i_npt_start < 0 )
-            {
                 p_sys->i_npt_start = -1;
-                p_sys->i_npt = 0;
-            }
-            else
-                p_sys->i_npt = p_sys->i_npt_start;
 
 #if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
             /* Retrieve the duration if possible */
@@ -1703,20 +1673,10 @@ static void StreamRead( void *p_private, unsigned int i_size,
         memcpy( p_block->p_buffer, tk->p_buffer, i_size );
     }
 
-    /* Update NPT */
-    //msg_Dbg( p_demux, "current %d, start_seq %u", (int)tk->sub->rtpSource()->curPacketRTPSeqNum(), tk->i_start_seq );
-    if( (tk->fmt.i_cat == VIDEO_ES) && (p_sys->i_pcr < i_pts) &&
-        (i_pts > 0) && (p_sys->i_pcr > 0) )
-    {
-        p_sys->i_npt += __MAX( 0, i_pts - p_sys->i_pcr );
-        p_sys->i_pcr = i_pts;
-        //msg_Dbg( p_demux, "npt update" );
-    }
-    else if( /*tk->fmt.i_cat == VIDEO_ES &&*/ p_sys->i_pcr < i_pts )
+    if( p_sys->i_pcr < i_pts )
     {
         p_sys->i_pcr = i_pts;
     }
-    //msg_Dbg( p_demux, "npt %lld", p_sys->i_npt );
 
     if( (i_pts != tk->i_pts) && (!tk->b_muxed) )
     {
