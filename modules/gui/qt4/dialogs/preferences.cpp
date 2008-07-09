@@ -62,7 +62,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     types->setAlignment( Qt::AlignHCenter );
     QHBoxLayout *types_l = new QHBoxLayout;
     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
-    small = new QRadioButton( qtr("Basic"), types );
+    small = new QRadioButton( qtr( "Simple" ), types );
     types_l->addWidget( small );
     all = new QRadioButton( qtr("All"), types ); types_l->addWidget( all );
     types->setLayout( types_l );

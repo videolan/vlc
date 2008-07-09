@@ -35,7 +35,7 @@ PodcastConfigDialog::PodcastConfigDialog( QWidget *parent, intf_thread_t *_p_int
     ui.setupUi( this );
 
     QPushButton *okButton = new QPushButton( qtr( "OK" ), this );
-    QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ), this );
+    QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ), this );
     ui.okCancel->addButton( okButton, QDialogButtonBox::AcceptRole );
     ui.okCancel->addButton( cancelButton, QDialogButtonBox::RejectRole );
     CONNECT( ui.podcastAdd, clicked(), this, add() );

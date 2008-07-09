@@ -99,7 +99,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     cancelButton = new QPushButton( qtr( "&Cancel" ) );
 
     /* Select Button */
-    selectButton = new QPushButton( qtr( "Select" ) );
+    selectButton = new QPushButton( qtr( "&Select" ) );
 
     /* Menu for the Play button */
     QMenu * openButtonMenu = new QMenu( "Open" );
