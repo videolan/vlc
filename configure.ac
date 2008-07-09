@@ -3769,6 +3769,9 @@ AS_IF( [test "${enable_asademux}" = "yes"], [
       [
         VLC_ADD_LDFLAGS([asademux],[$PCRE_LIBS])
         VLC_ADD_CFLAGS([asademux],[$PCRE_CFLAGS])
+	if test "${SYS}" = "mingw32"; then
+	        VLC_ADD_CPPFLAGS([asademux],[-DPCRE_STATIC])
+        fi
         VLC_ADD_PLUGIN([asademux])
       ],[
         AC_MSG_WARN([PCRE library not found (required for asademux)])
