@@ -325,25 +325,16 @@ static int Demux ( demux_t *p_demux )
     {
         /* Definetly schedules multicast session */
         /* We don't care if it's live or not */
-        char *temp;
-
-        asprintf( &temp, "udp://@" "%s:%i", p_sys->psz_mcast_ip, p_sys->i_mcast_port );
         free( p_sys->psz_uri );
-        p_sys->psz_uri = strdup( temp );
-        free( temp );
+        asprintf( &p_sys->psz_uri, "udp://@" "%s:%i", p_sys->psz_mcast_ip, p_sys->i_mcast_port );
     }
 
     if( p_sys->psz_uri == NULL )
     {
         if( p_sys->psz_server && p_sys->psz_location )
         {
-            char *temp;
-
-            asprintf( &temp, "rtsp://" "%s:%i%s",
+            asprintf( &p_sys->psz_uri, "rtsp://" "%s:%i%s",
                      p_sys->psz_server, p_sys->i_port > 0 ? p_sys->i_port : 554, p_sys->psz_location );
-
-            p_sys->psz_uri = strdup( temp );
-            free( temp );
         }
     }
 
@@ -351,20 +342,15 @@ static int Demux ( demux_t *p_demux )
     {
         /* It's definetly a simulcasted scheduled stream */
         /* We don't care if it's live or not */
-        char *temp;
-
         if( p_sys->psz_uri == NULL )
         {
             msg_Err( p_demux, "no URI was found" );
             return -1;
         }
 
-        asprintf( &temp, "%s%%3FMeDiAbAsEshowingId=%d%%26MeDiAbAsEconcert%%3FMeDiAbAsE",
-                p_sys->psz_uri, p_sys->i_sid );
-
         free( p_sys->psz_uri );
-        p_sys->psz_uri = strdup( temp );
-        free( temp );
+        asprintf( &p_sys->psz_uri, "%s%%3FMeDiAbAsEshowingId=%d%%26MeDiAbAsEconcert%%3FMeDiAbAsE",
+                p_sys->psz_uri, p_sys->i_sid );
     }
 
     p_child = input_ItemNewWithType( VLC_OBJECT(p_demux), p_sys->psz_uri,
