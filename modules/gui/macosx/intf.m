@@ -1157,11 +1157,10 @@ static VLCMain *_o_sharedMainInstance = nil;
         if( !p_input )
         {
             p_input = playlist_CurrentInput( p_playlist );
+
             /* Refresh the interface */
             if( p_input )
             {
-                printf("yield\n");
-
                 msg_Dbg( p_intf, "input has changed, refreshing interface" );
                 p_intf->p_sys->b_input_update = true;
             }
@@ -1172,7 +1171,6 @@ static VLCMain *_o_sharedMainInstance = nil;
             p_intf->p_sys->b_intf_update = true;
             p_intf->p_sys->i_play_status = END_S;
             msg_Dbg( p_intf, "input has stopped, refreshing interface" );
-            printf("release\n");
             vlc_object_release( p_input );
             p_input = NULL;
         }

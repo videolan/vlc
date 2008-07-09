@@ -94,7 +94,6 @@
 #include "playlist/playlist_internal.h"
 
 #include <vlc_vlm.h>
-#include <vlc_input.h>
 
 #include <assert.h>
 
@@ -113,9 +112,6 @@ void __vlc_gc_incref( gc_object_t * p_gc )
 {
     assert( p_gc->i_gc_refcount > 0 );
 
-    char * name = input_item_GetName((input_item_t *)p_gc);
-    printf("--- %s++ (%d)\n", name, p_gc->i_gc_refcount+1);
-    free(name);
     /* FIXME: atomic version needed! */
     p_gc->i_gc_refcount ++;
 }
@@ -124,9 +120,6 @@ void __vlc_gc_decref( gc_object_t *p_gc )
 {
     assert( p_gc );
     assert( p_gc->i_gc_refcount > 0 );
-    char * name = input_item_GetName((input_item_t *)p_gc);
-    printf("--- %s-- (%d)\n", name, p_gc->i_gc_refcount-1);
-    free(name);
 
     /* FIXME: atomic version needed! */
     p_gc->i_gc_refcount -- ;
@@ -1060,7 +1053,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     FOREACH_ARRAY( input_item_t *p_del, priv->input_items )
         msg_Err( p_libvlc, "input item %p has not been deleted properly: refcount %d, name %s",
             p_del, p_del->i_gc_refcount, p_del->psz_name ? p_del->psz_name : "(null)" );
-        //b_clean = false;
+        b_clean = false;
     FOREACH_END();
     assert( b_clean );
     ARRAY_RESET( priv->input_items );

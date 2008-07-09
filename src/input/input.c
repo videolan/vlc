@@ -140,7 +140,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
               "input launching for '%s'", psz_name );
 
     msg_Dbg( p_input, "Creating an input for '%s'", psz_name);
-    printf("Creating an input for '%s'", psz_name);
 
     free( psz_name );
 
@@ -318,7 +317,6 @@ static void Destructor( input_thread_t * p_input )
 #ifndef NDEBUG
     char * psz_name = input_item_GetName( p_input->p->input.p_item );
     msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
-    printf("Destroying the input for '%s'", psz_name);
     free( psz_name );
 #endif
 
