@@ -619,15 +619,19 @@ static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
 }
 static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 {
-    input_thread_t *p_input = p_dec->p_owner->p_input;
-    const int i_rate = p_block->i_rate;
-    aout_buffer_t *p_aout_buf;
+    input_thread_t  *p_input = p_dec->p_owner->p_input;
+    const int       i_rate = p_block->i_rate;
+    aout_buffer_t   *p_aout_buf;
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
+        aout_instance_t *p_aout = p_dec->p_owner->p_aout;
+        aout_input_t    *p_aout_input = p_dec->p_owner->p_aout_input;
+
         if( p_dec->b_die )
         {
             /* It prevent freezing VLC in case of broken decoder */
+            aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
             if( p_block )
                 block_Release( p_block );
             break;
@@ -638,8 +642,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 
         if( p_aout_buf->start_date < p_dec->p_owner->i_preroll_end )
         {
-            aout_DecDeleteBuffer( p_dec->p_owner->p_aout,
-                                  p_dec->p_owner->p_aout_input, p_aout_buf );
+            aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
             continue;
         }
 
@@ -649,9 +652,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
             msg_Dbg( p_dec, "End of audio preroll" );
             p_dec->p_owner->i_preroll_end = -1;
         }
-        aout_DecPlay( p_dec->p_owner->p_aout,
-                      p_dec->p_owner->p_aout_input,
-                      p_aout_buf, i_rate );
+        aout_DecPlay( p_aout, p_aout_input, p_aout_buf, i_rate );
     }
 }
 static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
@@ -832,13 +833,15 @@ static void optimize_video_pts( decoder_t *p_dec )
 static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 {
     input_thread_t *p_input = p_dec->p_owner->p_input;
-    picture_t *p_pic;
+    picture_t      *p_pic;
 
     while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
     {
+        vout_thread_t  *p_vout = p_dec->p_owner->p_vout;
         if( p_dec->b_die )
         {
             /* It prevent freezing VLC in case of broken decoder */
+            VoutDisplayedPicture( p_vout, p_pic );
             if( p_block )
                 block_Release( p_block );
             break;
@@ -850,15 +853,15 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         if( p_pic->date < p_dec->p_owner->i_preroll_end )
         {
-            VoutDisplayedPicture( p_dec->p_owner->p_vout, p_pic );
+            VoutDisplayedPicture( p_vout, p_pic );
             continue;
         }
 
         if( p_dec->p_owner->i_preroll_end > 0 )
         {
             msg_Dbg( p_dec, "End of video preroll" );
-            if( p_dec->p_owner->p_vout )
-                VoutFlushPicture( p_dec->p_owner->p_vout );
+            if( p_vout )
+                VoutFlushPicture( p_vout );
             /* */
             p_dec->p_owner->i_preroll_end = -1;
         }
@@ -866,12 +869,11 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
         if( ( !p_dec->p_owner->p_packetizer || !p_dec->p_owner->p_packetizer->pf_get_cc ) && p_dec->pf_get_cc )
             DecoderGetCc( p_dec, p_dec );
 
-        vout_DatePicture( p_dec->p_owner->p_vout, p_pic,
-                          p_pic->date );
+        vout_DatePicture( p_vout, p_pic, p_pic->date );
 
         optimize_video_pts( p_dec );
 
-        vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+        vout_DisplayPicture( p_vout, p_pic );
     }
 }
 
