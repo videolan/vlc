@@ -142,12 +142,6 @@ AC_ARG_WITH(contrib,
     if test -z $with_cyberlink_tree; then
        with_cyberlink_tree=${topdir}/extras/contrib/src/clinkcc
     fi
-    if test -z $with_libmpeg2_tree; then
-       with_libmpeg2_tree=${topdir}/extras/contrib/src/mpeg2dec
-    fi
-    if test -z $with_a52_tree; then
-       with_a52_tree=${topdir}/extras/contrib/src/a52dec
-    fi
 
     if test ".`uname -s`" = ".Darwin"; then
       export LD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$LD_LIBRARY_PATH
