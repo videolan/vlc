@@ -45,6 +45,7 @@
 #endif
 
 #include "avcodec.h"
+#include "chroma.h"
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -150,9 +151,11 @@ static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
     case PIX_FMT_GRAY8:
         return VLC_FOURCC('G','R','E','Y');
 
-    case PIX_FMT_YUV410P:
-    case PIX_FMT_YUV411P:
     default:
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H)
+        if( GetVlcChroma( i_ff_chroma ) )
+            return GetVlcChroma( i_ff_chroma );
+#endif
         return 0;
     }
 }

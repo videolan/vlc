@@ -25,7 +25,7 @@
 /*****************************************************************************
  * Chroma fourcc -> ffmpeg_id mapping
  *****************************************************************************/
-static struct
+static const struct
 {
     vlc_fourcc_t  i_chroma;
     int  i_chroma_id;
@@ -74,7 +74,7 @@ static struct
     { 0, 0 }
 };
 
-static int GetFfmpegChroma( vlc_fourcc_t i_chroma )
+static inline int GetFfmpegChroma( vlc_fourcc_t i_chroma )
 {
     int i;
 
@@ -86,7 +86,7 @@ static int GetFfmpegChroma( vlc_fourcc_t i_chroma )
     return -1;
 }
 
-static vlc_fourcc_t GetVlcChroma( int i_ffmpeg_chroma )
+static inline vlc_fourcc_t GetVlcChroma( int i_ffmpeg_chroma )
 {
     int i;
 
