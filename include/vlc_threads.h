@@ -171,8 +171,9 @@ VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) 
 VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( void * ), int, bool ) );
 VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
-VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
+
+#define vlc_thread_ready vlc_object_signal
 
 /*****************************************************************************
  * vlc_mutex_lock: lock a mutex
@@ -595,12 +596,6 @@ static inline void barrier (void)
  *****************************************************************************/
 #define vlc_thread_set_priority( P_THIS, PRIORITY )                         \
     __vlc_thread_set_priority( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PRIORITY )
-
-/*****************************************************************************
- * vlc_thread_ready: tell the parent thread we were successfully spawned
- *****************************************************************************/
-#define vlc_thread_ready( P_THIS )                                          \
-    __vlc_thread_ready( VLC_OBJECT(P_THIS) )
 
 /*****************************************************************************
  * vlc_thread_join: wait until a thread exits
