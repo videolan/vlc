@@ -329,7 +329,7 @@ static int Open( vlc_object_t *p_this )
     i_posy = val.i_int;
 
     /* Check if subpicture position was overridden */
-    p_sys->b_absolute = false;
+    p_sys->b_absolute = true;
     p_sys->i_spu_x = p_sys->i_spu_y = 0;
 
     if( ( i_posx >= 0 ) && ( i_posy >= 0 ) )
@@ -1592,7 +1592,6 @@ static subpicture_t *render( decoder_t *p_dec )
 
     /* Correct positioning of SPU */
     p_spu->b_absolute = p_sys->b_absolute;
-    p_spu->i_flags = p_sys->i_spu_position;
     p_spu->i_x = p_sys->i_spu_x;
     p_spu->i_y = p_sys->i_spu_y;
     p_spu->i_original_picture_width = 720;
