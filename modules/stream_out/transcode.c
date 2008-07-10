@@ -1980,7 +1980,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 }
             }
 
-            fmt = filter_chain_GetFmtOut( id->p_f_chain )->video;
+            if( filter_chain_GetLength( id->p_f_chain ) > 0 )
+                fmt = filter_chain_GetFmtOut( id->p_f_chain )->video;
+            else
+                fmt = id->p_decoder->fmt_out.video;
 
             /* FIXME (shouldn't have to be done here) */
             fmt.i_sar_num = fmt.i_aspect * fmt.i_height / fmt.i_width;
