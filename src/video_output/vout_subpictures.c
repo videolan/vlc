@@ -37,6 +37,8 @@
 #include <vlc_osd.h>
 #include "../libvlc.h"
 
+#include <assert.h>
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -459,6 +461,127 @@ void spu_DestroySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
  *****************************************************************************
  * This function renders all sub picture units in the list.
  *****************************************************************************/
+static void SpuRenderCreateBlend( spu_t *p_spu, vlc_fourcc_t i_chroma, int i_aspect )
+{
+    filter_t *p_blend;
+
+    assert( !p_spu->p_blend );
+
+    p_spu->p_blend =
+    p_blend        = vlc_custom_create( p_spu, sizeof(filter_t),
+                                        VLC_OBJECT_GENERIC, "blend" );
+    if( !p_blend )
+        return;
+
+    es_format_Init( &p_blend->fmt_in, VIDEO_ES, 0 );
+
+    es_format_Init( &p_blend->fmt_out, VIDEO_ES, 0 );
+    p_blend->fmt_out.video.i_x_offset = 0;
+    p_blend->fmt_out.video.i_y_offset = 0;
+    p_blend->fmt_out.video.i_chroma = i_chroma;
+    p_blend->fmt_out.video.i_aspect = i_aspect;
+
+    /* The blend module will be loaded when needed with the real
+    * input format */
+    p_blend->p_module = NULL;
+
+    /* */
+    vlc_object_attach( p_blend, p_spu );
+}
+static void SpuRenderUpdateBlend( spu_t *p_spu, const video_format_t *p_vfmt )
+{
+    filter_t *p_blend = p_spu->p_blend;
+
+    assert( p_blend );
+
+    /* */
+    if( p_blend->p_module && p_blend->fmt_in.video.i_chroma != p_vfmt->i_chroma )
+    {
+        /* The chroma is not the same, we need to reload the blend module
+         * XXX to match the old behaviour just test !p_blend->fmt_in.video.i_chroma */
+        module_Unneed( p_blend, p_blend->p_module );
+        p_blend->p_module = NULL;
+    }
+
+    /* */
+    p_blend->fmt_in.video = *p_vfmt;
+
+    /* */
+    if( !p_blend->p_module )
+        p_blend->p_module = module_Need( p_blend, "video blending", 0, 0 );
+}
+static void SpuRenderCreateAndLoadText( spu_t *p_spu, int i_width, int i_height )
+{
+    filter_t *p_text;
+
+    assert( !p_spu->p_text );
+
+    p_spu->p_text =
+    p_text        = vlc_custom_create( p_spu, sizeof(filter_t),
+                                       VLC_OBJECT_GENERIC, "spu text" );
+    if( !p_text )
+        return;
+
+    es_format_Init( &p_text->fmt_in, VIDEO_ES, 0 );
+
+    es_format_Init( &p_text->fmt_out, VIDEO_ES, 0 );
+    p_text->fmt_out.video.i_width =
+    p_text->fmt_out.video.i_visible_width = i_width;
+    p_text->fmt_out.video.i_height =
+    p_text->fmt_out.video.i_visible_height = i_height;
+
+    p_text->pf_sub_buffer_new = spu_new_buffer;
+    p_text->pf_sub_buffer_del = spu_del_buffer;
+
+    vlc_object_attach( p_text, p_spu );
+
+    /* FIXME TOCHECK shouldn't module_Need( , , psz_modulename, false ) do the
+     * same than these 2 calls ? */
+    char *psz_modulename = var_CreateGetString( p_spu, "text-renderer" );
+    if( psz_modulename && *psz_modulename )
+    {
+        p_text->p_module = module_Need( p_text, "text renderer",
+                                        psz_modulename, true );
+    }
+    free( psz_modulename );
+
+    if( !p_text->p_module )
+        p_text->p_module = module_Need( p_text, "text renderer", NULL, false );
+}
+
+static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
+{
+    /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
+    const vlc_fourcc_t i_dummy_chroma = VLC_FOURCC('Y','U','V','P');
+
+    filter_t *p_scale;
+
+    assert( !p_spu->p_scale );
+
+    p_spu->p_scale =
+    p_scale        = vlc_custom_create( p_spu, sizeof(filter_t),
+                                        VLC_OBJECT_GENERIC, "scale" );
+    if( !p_scale )
+        return;
+
+    es_format_Init( &p_scale->fmt_in, VIDEO_ES, 0 );
+    p_scale->fmt_in.video.i_chroma = i_dummy_chroma;
+    p_scale->fmt_in.video.i_width =
+    p_scale->fmt_in.video.i_height = 32;
+
+    es_format_Init( &p_scale->fmt_out, VIDEO_ES, 0 );
+    p_scale->fmt_out.video.i_chroma = i_dummy_chroma;
+    p_scale->fmt_out.video.i_width =
+    p_scale->fmt_out.video.i_height = 16;
+
+    p_scale->pf_vout_buffer_new = spu_new_video_buffer;
+    p_scale->pf_vout_buffer_del = spu_del_video_buffer;
+
+    vlc_object_attach( p_scale, p_spu );
+    p_scale->p_module = module_Need( p_spu->p_scale, "video filter2", 0, 0 );
+}
+
+
 void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             picture_t *p_pic_dst, picture_t *p_pic_src,
                             subpicture_t *p_subpic,
@@ -534,63 +657,16 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_region = p_subpic->p_region;
         }
 
-        /* Load the blending module */
+        /* Create the blending module */
         if( !p_spu->p_blend && p_region )
-        {
-            static const char typename[] = "blend";
-            p_spu->p_blend =
-                vlc_custom_create( p_spu, sizeof(filter_t), VLC_OBJECT_GENERIC,
-                                   typename );
-            vlc_object_attach( p_spu->p_blend, p_spu );
-            p_spu->p_blend->fmt_out.video.i_x_offset =
-                p_spu->p_blend->fmt_out.video.i_y_offset = 0;
-            p_spu->p_blend->fmt_out.video.i_aspect = p_fmt->i_aspect;
-            p_spu->p_blend->fmt_out.video.i_chroma = p_fmt->i_chroma;
-
-            /* The blend module will be loaded when needed with the real
-            * input format */
-            memset( &p_spu->p_blend->fmt_in, 0, sizeof(p_spu->p_blend->fmt_in) );
-            p_spu->p_blend->p_module = NULL;
-        }
+            SpuRenderCreateBlend( p_spu, p_fmt->i_chroma, p_fmt->i_aspect );
 
         /* Load the text rendering module; it is possible there is a
          * text region somewhere in the subpicture other than the first
          * element in the region list, so just load it anyway as we'll
          * probably want it sooner or later. */
         if( !p_spu->p_text && p_region )
-        {
-            static const char typename[] = "spu text";
-            char *psz_modulename = NULL;
-
-            p_spu->p_text =
-                vlc_custom_create( p_spu, sizeof(filter_t), VLC_OBJECT_GENERIC,
-                                   typename );
-            vlc_object_attach( p_spu->p_text, p_spu );
-
-            p_spu->p_text->fmt_out.video.i_width =
-                p_spu->p_text->fmt_out.video.i_visible_width =
-                p_fmt->i_width;
-            p_spu->p_text->fmt_out.video.i_height =
-                p_spu->p_text->fmt_out.video.i_visible_height =
-                p_fmt->i_height;
-
-            p_spu->p_text->pf_sub_buffer_new = spu_new_buffer;
-            p_spu->p_text->pf_sub_buffer_del = spu_del_buffer;
-
-            psz_modulename = var_CreateGetString( p_spu, "text-renderer" );
-            if( psz_modulename && *psz_modulename )
-            {
-                p_spu->p_text->p_module =
-                    module_Need( p_spu->p_text, "text renderer",
-                                 psz_modulename, true );
-            }
-            if( !p_spu->p_text->p_module )
-            {
-                p_spu->p_text->p_module =
-                    module_Need( p_spu->p_text, "text renderer", 0, 0 );
-            }
-            free( psz_modulename );
-        }
+            SpuRenderCreateAndLoadText( p_spu, p_fmt->i_width, p_fmt->i_height );
 
         if( p_spu->p_text )
         {
@@ -706,25 +782,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             (((pi_scale_width[ SCALE_DEFAULT ] > 0)     || (pi_scale_height[ SCALE_DEFAULT ] > 0)) &&
              ((pi_scale_width[ SCALE_DEFAULT ] != 1000) || (pi_scale_height[ SCALE_DEFAULT ] != 1000)))) )
         {
-            static const char typename[] = "scale";
-            p_spu->p_scale =
-                vlc_custom_create( p_spu, sizeof(filter_t), VLC_OBJECT_GENERIC,
-                                   typename );
-            vlc_object_attach( p_spu->p_scale, p_spu );
-            p_spu->p_scale->fmt_out.video.i_chroma =
-                p_spu->p_scale->fmt_in.video.i_chroma =
-                    VLC_FOURCC('Y','U','V','P');
-            /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
-
-            p_spu->p_scale->fmt_in.video.i_width =
-                p_spu->p_scale->fmt_in.video.i_height = 32;
-            p_spu->p_scale->fmt_out.video.i_width =
-                p_spu->p_scale->fmt_out.video.i_height = 16;
-
-            p_spu->p_scale->pf_vout_buffer_new = spu_new_video_buffer;
-            p_spu->p_scale->pf_vout_buffer_del = spu_del_video_buffer;
-            p_spu->p_scale->p_module =
-                module_Need( p_spu->p_scale, "video filter2", 0, 0 );
+            SpuRenderCreateAndLoadScale( p_spu );
         }
 
         while( p_region )
@@ -955,20 +1013,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
             if( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )
             {
-                if( p_spu->p_blend->fmt_in.video.i_chroma != p_region->fmt.i_chroma )
-                {
-                    /* The chroma is not the same, we need to reload the blend module
-                     * XXX to match the old behaviour just test !p_spu->p_blend->fmt_in.video.i_chroma */
-                    if( p_spu->p_blend->p_module )
-                        module_Unneed( p_spu->p_blend, p_spu->p_blend->p_module );
-
-                    p_spu->p_blend->fmt_in.video = p_region->fmt;
-                    p_spu->p_blend->p_module = module_Need( p_spu->p_blend, "video blending", 0, 0 );
-                }
-                else
-                {
-                    p_spu->p_blend->fmt_in.video = p_region->fmt;
-                }
+                /* */
+                SpuRenderUpdateBlend( p_spu, &p_region->fmt );
 
                 /* Force cropping if requested */
                 if( p_spu->b_force_crop )
