@@ -213,7 +213,7 @@ static inline void BlockXOR( uint32_t *p_dest, uint32_t *p_s1, uint32_t *p_s2 )
 /*****************************************************************************
  * drms_alloc: allocate a DRMS structure
  *****************************************************************************/
-void *drms_alloc( char *psz_homedir )
+void *drms_alloc( const char *psz_homedir )
 {
     struct drms_s *p_drms;
 
