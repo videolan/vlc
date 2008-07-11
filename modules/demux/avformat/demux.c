@@ -51,6 +51,10 @@
 /* Version checking */
 #if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
 
+#if (LIBAVCODEC_VERSION_INT >= ((51<<16)+(50<<8)+0) )
+#   define HAVE_FFMPEG_CODEC_ATTACHMENT 1
+#endif
+
 /*****************************************************************************
  * demux_sys_t: demux descriptor
  *****************************************************************************/
@@ -244,9 +248,10 @@ int OpenDemux( vlc_object_t *p_this )
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
             if( cc->codec_type == CODEC_TYPE_DATA )
                 psz_type = "data";
+#ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
             else if( cc->codec_type == CODEC_TYPE_ATTACHMENT )
                 psz_type = "attachment";
-
+#endif
             msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
             break;
         }
