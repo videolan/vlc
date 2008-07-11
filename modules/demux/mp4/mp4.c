@@ -167,7 +167,7 @@ struct demux_sys_t
  * Declaration of local function
  *****************************************************************************/
 static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *);
-static void MP4_TrackDestroy( demux_t *, mp4_track_t * );
+static void MP4_TrackDestroy(  mp4_track_t * );
 
 static int  MP4_TrackSelect ( demux_t *, mp4_track_t *, mtime_t );
 static void MP4_TrackUnselect(demux_t *, mp4_track_t * );
@@ -233,7 +233,7 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
     return INT64_C(1000000) * i_dts / p_track->i_timescale;
 }
 
-static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track )
+static inline int64_t MP4_TrackGetPTSDelta( mp4_track_t *p_track )
 {
     mp4_chunk_t *ck = &p_track->chunk[p_track->i_chunk];
     unsigned int i_index = 0;
@@ -688,7 +688,7 @@ static int Demux( demux_t *p_demux )
                 /* dts */
                 p_block->i_dts = MP4_TrackGetDTS( p_demux, tk ) + 1;
                 /* pts */
-                i_delta = MP4_TrackGetPTSDelta( p_demux, tk );
+                i_delta = MP4_TrackGetPTSDelta( tk );
                 if( i_delta != -1 )
                     p_block->i_pts = p_block->i_dts + i_delta;
                 else if( tk->fmt.i_cat != VIDEO_ES )
@@ -974,7 +974,7 @@ static void Close ( vlc_object_t * p_this )
     MP4_BoxFree( p_demux->s, p_sys->p_root );
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
-        MP4_TrackDestroy( p_demux, &p_sys->track[i_track] );
+        MP4_TrackDestroy(  &p_sys->track[i_track] );
     }
     FREENULL( p_sys->track );
 
@@ -1013,7 +1013,7 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
     for( tk->i_sample = 0; tk->i_sample < tk->i_sample_count; tk->i_sample++ )
     {
         const int64_t i_dts = MP4_TrackGetDTS( p_demux, tk );
-        const int64_t i_pts_delta = MP4_TrackGetPTSDelta( p_demux, tk );
+        const int64_t i_pts_delta = MP4_TrackGetPTSDelta( tk );
         const unsigned int i_size = MP4_TrackSampleSize( tk );
 
         if( i_size > 0 && !stream_Seek( p_demux->s, MP4_TrackGetPos( tk ) ) )
@@ -2160,7 +2160,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
  ****************************************************************************
  * Destroy a track created by MP4_TrackCreate.
  ****************************************************************************/
-static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
+static void MP4_TrackDestroy( mp4_track_t *p_track )
 {
     unsigned int i_chunk;
 
