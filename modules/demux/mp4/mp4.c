@@ -403,8 +403,9 @@ static int Open( vlc_object_t * p_this )
                     if( end ) end[1] = '\0';
                     else *psz_path = '\0';
 
-                    asprintf( &psz_absolute, "%s://%s%s",
-                                  p_demux->psz_access, psz_path, psz_ref );
+                    if( asprintf( &psz_absolute, "%s://%s%s",
+                                  p_demux->psz_access, psz_path, psz_ref ) < 0 )
+                        return VLC_ENOMEM;
 
                     free( psz_ref );
                     psz_ref = psz_absolute;
