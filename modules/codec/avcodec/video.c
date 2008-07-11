@@ -104,61 +104,6 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 /*****************************************************************************
  * Local Functions
  *****************************************************************************/
-static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
-{
-    switch( i_ff_chroma )
-    {
-    case PIX_FMT_YUV420P:
-    case PIX_FMT_YUVJ420P: /* Hacky but better then chroma conversion */
-        return VLC_FOURCC('I','4','2','0');
-    case PIX_FMT_YUV422P:
-    case PIX_FMT_YUVJ422P: /* Hacky but better then chroma conversion */
-        return VLC_FOURCC('I','4','2','2');
-    case PIX_FMT_YUV444P:
-    case PIX_FMT_YUVJ444P: /* Hacky but better then chroma conversion */
-        return VLC_FOURCC('I','4','4','4');
-
-    case PIX_FMT_YUV422:
-        return VLC_FOURCC('Y','U','Y','2');
-
-#if defined(WORDS_BIGENDIAN)
-    case PIX_FMT_BGR8:
-        return VLC_FOURCC('R','G','B','8');
-    case PIX_FMT_BGR555:
-        return VLC_FOURCC('R','V','1','5');
-    case PIX_FMT_BGR565:
-        return VLC_FOURCC('R','V','1','6');
-    case PIX_FMT_BGR24:
-        return VLC_FOURCC('R','V','2','4');
-#else
-#if defined(PIX_FMT_RGB8)
-    case PIX_FMT_RGB8:
-        return VLC_FOURCC('R','G','B','8');
-#endif
-    case PIX_FMT_RGB555:
-        return VLC_FOURCC('R','V','1','5');
-    case PIX_FMT_RGB565:
-        return VLC_FOURCC('R','V','1','6');
-    case PIX_FMT_RGB24:
-        return VLC_FOURCC('R','V','2','4');
-#endif
-    case PIX_FMT_RGBA32:
-        return VLC_FOURCC('R','V','3','2');
-#ifdef PIX_FMT_RGBA
-    case PIX_FMT_RGBA:
-        return VLC_FOURCC('R','G','B','A');
-#endif
-    case PIX_FMT_GRAY8:
-        return VLC_FOURCC('G','R','E','Y');
-
-    default:
-#if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H)
-        if( GetVlcChroma( i_ff_chroma ) )
-            return GetVlcChroma( i_ff_chroma );
-#endif
-        return 0;
-    }
-}
 
 /* Returns a new picture buffer */
 static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
@@ -168,7 +113,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 
     p_dec->fmt_out.video.i_width = p_context->width;
     p_dec->fmt_out.video.i_height = p_context->height;
-    p_dec->fmt_out.i_codec = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
+    p_dec->fmt_out.i_codec = GetVlcChroma( p_context->pix_fmt );
 
     if( !p_context->width || !p_context->height )
     {
@@ -177,7 +122,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 
     if( !p_dec->fmt_out.i_codec )
     {
-        /* we make conversion if possible*/
+        /* we are doomed */
         p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
     }
 
@@ -384,7 +329,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
+    p_dec->fmt_out.i_codec = GetVlcChroma( p_context->pix_fmt );
 
     /* Setup palette */
     if( p_dec->fmt_in.video.p_palette )
@@ -815,7 +760,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( ffmpeg_PixFmtToChroma( p_sys->p_context->pix_fmt ) )
+    if( GetVlcChroma( p_sys->p_context->pix_fmt ) )
     {
         int i_plane, i_size, i_line;
         uint8_t *p_dst, *p_src;
@@ -840,46 +785,9 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
     }
     else
     {
-        AVPicture dest_pic;
-        int i;
-
-        /* we need to convert to I420 */
-        switch( p_sys->p_context->pix_fmt )
-        {
-        case PIX_FMT_YUV410P:
-        case PIX_FMT_YUV411P:
-        case PIX_FMT_RGB32:
-        case PIX_FMT_RGB24:
-#if defined(PIX_FMT_RGB8)
-        case PIX_FMT_RGB8:
-#endif
-#if defined(PIX_FMT_BRG32)
-        case PIX_FMT_BGR32:
-#endif
-        case PIX_FMT_BGR24:
-#if defined(PIX_FMT_BGR8)
-        case PIX_FMT_BGR8:
-#endif
-        case PIX_FMT_PAL8:
-            for( i = 0; i < p_pic->i_planes; i++ )
-            {
-                dest_pic.data[i] = p_pic->p[i].p_pixels;
-                dest_pic.linesize[i] = p_pic->p[i].i_pitch;
-            }
-#if !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H)
-            img_convert( &dest_pic, PIX_FMT_YUV420P,
-                         (AVPicture *)p_ff_pic,
-                         p_sys->p_context->pix_fmt,
-                         p_sys->p_context->width,
-                         p_sys->p_context->height );
-#endif
-            break;
-        default:
-            msg_Err( p_dec, "don't know how to convert chroma %i",
-                     p_sys->p_context->pix_fmt );
-            p_dec->b_error = 1;
-            break;
-        }
+        msg_Err( p_dec, "don't know how to convert chroma %i",
+                 p_sys->p_context->pix_fmt );
+        p_dec->b_error = 1;
     }
 }
 
@@ -912,7 +820,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so this check is necessary. */
-    if( !ffmpeg_PixFmtToChroma( p_context->pix_fmt ) ||
+    if( !GetVlcChroma( p_context->pix_fmt ) ||
         p_sys->p_context->width % 16 || p_sys->p_context->height % 16 )
     {
         msg_Dbg( p_dec, "disabling direct rendering" );

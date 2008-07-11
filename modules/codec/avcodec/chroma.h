@@ -90,6 +90,7 @@ static inline vlc_fourcc_t GetVlcChroma( int i_ffmpeg_chroma )
 {
     int i;
 
+    /* TODO FIXME for rgb format we HAVE to set rgb mask/shift */
     for( i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
         if( chroma_table[i].i_chroma_id == i_ffmpeg_chroma )
