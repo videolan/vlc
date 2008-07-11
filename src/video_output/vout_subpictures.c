@@ -488,14 +488,14 @@ static void SpuRenderCreateBlend( spu_t *p_spu, vlc_fourcc_t i_chroma, int i_asp
     /* */
     vlc_object_attach( p_blend, p_spu );
 }
-static void SpuRenderUpdateBlend( spu_t *p_spu, const video_format_t *p_vfmt )
+static void SpuRenderUpdateBlend( spu_t *p_spu, int i_out_width, int i_out_height, const video_format_t *p_in_fmt )
 {
     filter_t *p_blend = p_spu->p_blend;
 
     assert( p_blend );
 
     /* */
-    if( p_blend->p_module && p_blend->fmt_in.video.i_chroma != p_vfmt->i_chroma )
+    if( p_blend->p_module && p_blend->fmt_in.video.i_chroma != p_in_fmt->i_chroma )
     {
         /* The chroma is not the same, we need to reload the blend module
          * XXX to match the old behaviour just test !p_blend->fmt_in.video.i_chroma */
@@ -504,7 +504,13 @@ static void SpuRenderUpdateBlend( spu_t *p_spu, const video_format_t *p_vfmt )
     }
 
     /* */
-    p_blend->fmt_in.video = *p_vfmt;
+    p_blend->fmt_in.video = *p_in_fmt;
+
+    /* */
+    p_blend->fmt_out.video.i_width =
+    p_blend->fmt_out.video.i_visible_width = i_out_width;
+    p_blend->fmt_out.video.i_height =
+    p_blend->fmt_out.video.i_visible_height = i_out_height;
 
     /* */
     if( !p_blend->p_module )
@@ -581,7 +587,6 @@ static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
     p_scale->p_module = module_Need( p_spu->p_scale, "video filter2", 0, 0 );
 }
 
-//__MIN(i_scale_width_orig, i_scale_height_orig) );
 static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
                            subpicture_t *p_subpic, subpicture_region_t *p_region, int i_min_scale_ratio )
 {
@@ -664,11 +669,13 @@ static void SpuRenderRegion( spu_t *p_spu,
     orig_fmt = p_region->fmt;
     b_rerender_text = false;
     if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
+    {
         SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, __MIN(i_scale_width_orig, i_scale_height_orig) );
 
-    /* From now on, we can only process non text data */
-    if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
-        goto exit;
+        /* Check if the rendering has failed ... */
+        if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
+            goto exit;
+    }
 
     if( p_region->i_align & SUBPICTURE_RENDERED )
     {
@@ -698,24 +705,26 @@ static void SpuRenderRegion( spu_t *p_spu,
         memcpy( p_region->fmt.p_palette->palette, p_spu->palette, 16 );
     }
 
-    /* Scale SPU if necessary */
-    if( p_region->p_cache )
-    {
-        if( pi_scale_width[ i_scale_idx ] * p_region->fmt.i_width / 1000 !=
-            p_region->p_cache->fmt.i_width ||
-            pi_scale_height[ i_scale_idx ] * p_region->fmt.i_height / 1000 !=
-            p_region->p_cache->fmt.i_height )
-        {
-            p_subpic->pf_destroy_region( VLC_OBJECT(p_spu),
-                                         p_region->p_cache );
-            p_region->p_cache = NULL;
-        }
-    }
-
     if( p_spu->p_scale &&
         ( ( pi_scale_width[i_scale_idx]  > 0 && pi_scale_width[i_scale_idx]  != 1000 ) ||
           ( pi_scale_height[i_scale_idx] > 0 && pi_scale_height[i_scale_idx] != 1000 ) ) )
     {
+        const int i_dst_width  = p_region->fmt.i_width  * pi_scale_width[i_scale_idx] / 1000;
+        const int i_dst_height = p_region->fmt.i_height * pi_scale_height[i_scale_idx] / 1000;
+
+        /* Destroy if cache is unusable */
+        if( p_region->p_cache )
+        {
+            if( p_region->p_cache->fmt.i_width  != i_dst_width ||
+                p_region->p_cache->fmt.i_height != i_dst_height )
+            {
+                p_subpic->pf_destroy_region( VLC_OBJECT(p_spu),
+                                             p_region->p_cache );
+                p_region->p_cache = NULL;
+            }
+        }
+
+        /* Scale if needed into cache */
         if( !p_region->p_cache )
         {
             picture_t *p_pic;
@@ -725,23 +734,24 @@ static void SpuRenderRegion( spu_t *p_spu,
 
             p_region->p_cache =
                 p_subpic->pf_create_region( VLC_OBJECT(p_spu),
-                    &p_spu->p_scale->fmt_out.video );
+                                            &p_spu->p_scale->fmt_out.video );
+            p_region->p_cache->p_next = p_region->p_next;
+
             if( p_spu->p_scale->fmt_out.video.p_palette )
                 *p_spu->p_scale->fmt_out.video.p_palette =
                     *p_region->fmt.p_palette;
-            p_region->p_cache->p_next = p_region->p_next;
 
             vout_CopyPicture( p_spu, &p_region->p_cache->picture,
                               &p_region->picture );
 
-            p_spu->p_scale->fmt_out.video.i_width =
-                p_region->fmt.i_width * pi_scale_width[ i_scale_idx ] / 1000;
+            p_spu->p_scale->fmt_out.video.i_width = i_dst_width;
+            p_spu->p_scale->fmt_out.video.i_height = i_dst_height;
+
             p_spu->p_scale->fmt_out.video.i_visible_width =
                 p_region->fmt.i_visible_width * pi_scale_width[ i_scale_idx ] / 1000;
-            p_spu->p_scale->fmt_out.video.i_height =
-                p_region->fmt.i_height * pi_scale_height[ i_scale_idx ] / 1000;
             p_spu->p_scale->fmt_out.video.i_visible_height =
                 p_region->fmt.i_visible_height * pi_scale_height[ i_scale_idx ] / 1000;
+
             p_region->p_cache->fmt = p_spu->p_scale->fmt_out.video;
             p_region->p_cache->i_x = p_region->i_x * pi_scale_width[ i_scale_idx ] / 1000;
             p_region->p_cache->i_y = p_region->i_y * pi_scale_height[ i_scale_idx ] / 1000;
@@ -752,13 +762,12 @@ static void SpuRenderRegion( spu_t *p_spu,
                              p_spu->p_scale, &p_region->p_cache->picture );
             if( p_pic )
             {
-                picture_t p_pic_tmp = p_region->p_cache->picture;
                 p_region->p_cache->picture = *p_pic;
-                *p_pic = p_pic_tmp;
                 free( p_pic );
             }
         }
 
+        /* And the use the scale picture */
         if( p_region->p_cache )
             p_region = p_region->p_cache;
     }
@@ -813,26 +822,10 @@ static void SpuRenderRegion( spu_t *p_spu,
         i_y_offset -= ( p_spu->i_margin * i_inv_scale_y / 1000 + i_diff );
     }
 
-    i_fade_alpha = 255;
-    if( p_subpic->b_fade )
-    {
-        mtime_t i_fade_start = ( p_subpic->i_stop +
-                                 p_subpic->i_start ) / 2;
-        mtime_t i_now = mdate();
-        if( i_now >= i_fade_start && p_subpic->i_stop > i_fade_start )
-        {
-            i_fade_alpha = 255 * ( p_subpic->i_stop - i_now ) /
-                           ( p_subpic->i_stop - i_fade_start );
-        }
-    }
-
-    /* */
-    SpuRenderUpdateBlend( p_spu, &p_region->fmt );
-
     /* Force cropping if requested */
     if( p_spu->b_force_crop )
     {
-        video_format_t *p_fmt = &p_spu->p_blend->fmt_in.video;
+        video_format_t *p_fmt = &p_region->fmt;
         int i_crop_x = p_spu->i_crop_x * pi_scale_width[ i_scale_idx ] / 1000
                             * i_inv_scale_x / 1000;
         int i_crop_y = p_spu->i_crop_y * pi_scale_height[ i_scale_idx ] / 1000
@@ -874,11 +867,22 @@ static void SpuRenderRegion( spu_t *p_spu,
     i_x_offset = __MAX( i_x_offset, 0 );
     i_y_offset = __MAX( i_y_offset, 0 );
 
-    /* Update the output picture size */
-    p_spu->p_blend->fmt_out.video.i_width =
-    p_spu->p_blend->fmt_out.video.i_visible_width = p_fmt->i_width;
-    p_spu->p_blend->fmt_out.video.i_height =
-    p_spu->p_blend->fmt_out.video.i_visible_height = p_fmt->i_height;
+    /* Compute alpha blend value */
+    i_fade_alpha = 255;
+    if( p_subpic->b_fade )
+    {
+        mtime_t i_fade_start = ( p_subpic->i_stop +
+                                 p_subpic->i_start ) / 2;
+        mtime_t i_now = mdate();
+        if( i_now >= i_fade_start && p_subpic->i_stop > i_fade_start )
+        {
+            i_fade_alpha = 255 * ( p_subpic->i_stop - i_now ) /
+                           ( p_subpic->i_stop - i_fade_start );
+        }
+    }
+
+    /* Update the blender */
+    SpuRenderUpdateBlend( p_spu, p_fmt->i_width, p_fmt->i_height, &p_region->fmt );
 
     if( p_spu->p_blend->p_module )
     {
