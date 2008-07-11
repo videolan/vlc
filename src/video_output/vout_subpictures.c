@@ -767,7 +767,7 @@ static void SpuRenderRegion( spu_t *p_spu,
             }
         }
 
-        /* And the use the scale picture */
+        /* And use the scaled picture */
         if( p_region->p_cache )
             p_region = p_region->p_cache;
     }
@@ -958,6 +958,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         if( ( i_source_video_height == p_subpic->i_original_picture_height ) &&
             ( i_source_video_width  == p_subpic->i_original_picture_width ) )
         {
+            /* FIXME this looks wrong */
             p_subpic->i_original_picture_height = 0;
             p_subpic->i_original_picture_width = 0;
         }
@@ -1021,52 +1022,54 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             if( p_text_region &&
                 ( ( p_text_region->i_align & SUBPICTURE_RENDERED ) == 0 ) )
             {
-                if( (p_subpic->i_original_picture_height > 0) &&
-                    (p_subpic->i_original_picture_width  > 0) )
+                if( p_subpic->i_original_picture_height > 0 &&
+                    p_subpic->i_original_picture_width  > 0 )
                 {
                     p_spu->p_text->fmt_out.video.i_width =
-                        p_spu->p_text->fmt_out.video.i_visible_width =
+                    p_spu->p_text->fmt_out.video.i_visible_width =
                         p_subpic->i_original_picture_width;
                     p_spu->p_text->fmt_out.video.i_height =
-                        p_spu->p_text->fmt_out.video.i_visible_height =
+                    p_spu->p_text->fmt_out.video.i_visible_height =
                         p_subpic->i_original_picture_height;
                 }
                 else
                 {
                     p_spu->p_text->fmt_out.video.i_width =
-                        p_spu->p_text->fmt_out.video.i_visible_width =
+                    p_spu->p_text->fmt_out.video.i_visible_width =
                         p_fmt->i_width;
                     p_spu->p_text->fmt_out.video.i_height =
-                        p_spu->p_text->fmt_out.video.i_visible_height =
+                    p_spu->p_text->fmt_out.video.i_visible_height =
                         p_fmt->i_height;
                 }
             }
 
-            /* */
+            /* XXX for text:
+             *  scale[] allows to pass from rendered size (by text module) to video output size */
             pi_scale_width[SCALE_TEXT] = p_fmt->i_width * 1000 /
                                           p_spu->p_text->fmt_out.video.i_width;
             pi_scale_height[SCALE_TEXT]= p_fmt->i_height * 1000 /
                                           p_spu->p_text->fmt_out.video.i_height;
         }
-
-        pi_scale_width[ SCALE_DEFAULT ]  = i_scale_width_orig;
-        pi_scale_height[ SCALE_DEFAULT ] = i_scale_height_orig;
-
-        /* If we have an explicit size plane to render to, then turn off
-         * the fontsize rescaling.
-         */
-        if( (p_subpic->i_original_picture_height > 0) &&
-            (p_subpic->i_original_picture_width  > 0) )
+        else
         {
-#if 1
-            /* FIXME That seems so wrong */
-            i_scale_width_orig  = 1000;
-            i_scale_height_orig = 1000;
-#else
-            /* It is probably that :*/
-            pi_scale_width[ SCALE_DEFAULT ]  = i_scale_width_orig * i_source_video_width / p_subpic->i_original_picture_width;
-            pi_scale_height[ SCALE_DEFAULT ] = i_scale_height_orig * i_source_video_height / p_subpic->i_original_picture_height;
-#endif
+            /* Just set a value to avoid using invalid memory while looping over the array */
+            pi_scale_width[SCALE_TEXT] =
+            pi_scale_height[SCALE_TEXT]= 1000;
+        }
+
+        /* XXX for default:
+         *  scale[] allows to pass from native (either video or original) size to output size */
+
+        if( p_subpic->i_original_picture_height > 0 &&
+            p_subpic->i_original_picture_width  > 0 )
+        {
+            pi_scale_width[SCALE_DEFAULT]  = p_fmt->i_width  * 1000 / p_subpic->i_original_picture_width;
+            pi_scale_height[SCALE_DEFAULT] = p_fmt->i_height * 1000 / p_subpic->i_original_picture_height;
+        }
+        else
+        {
+            pi_scale_width[ SCALE_DEFAULT ]  = i_scale_width_orig;
+            pi_scale_height[ SCALE_DEFAULT ] = i_scale_height_orig;
         }
 
         for( k = 0; k < SCALE_SIZE ; k++ )
@@ -1075,8 +1078,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
              * with above by instead rendering to an output pane of the
              * explicit dimensions specified - we don't need to scale it.
              */
-            if( (p_subpic->i_original_picture_height > 0) &&
-                (p_subpic->i_original_picture_width <= 0) )
+            if( p_subpic->i_original_picture_height > 0 &&
+                p_subpic->i_original_picture_width <= 0 )
             {
                 pi_scale_height[ k ] = pi_scale_height[ k ] * i_source_video_height /
                                  p_subpic->i_original_picture_height;
@@ -1086,27 +1089,31 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Set default subpicture aspect ratio */
-        if( p_region->fmt.i_aspect && ( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den ) )
-        {
-            p_region->fmt.i_sar_den = p_region->fmt.i_aspect;
-            p_region->fmt.i_sar_num = VOUT_ASPECT_FACTOR;
-        }
         if( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den )
         {
-            p_region->fmt.i_sar_den = p_fmt->i_sar_den;
-            p_region->fmt.i_sar_num = p_fmt->i_sar_num;
+            if( p_region->fmt.i_aspect != 0 )
+            {
+                p_region->fmt.i_sar_den = p_region->fmt.i_aspect;
+                p_region->fmt.i_sar_num = VOUT_ASPECT_FACTOR;
+            }
+            else
+            {
+                p_region->fmt.i_sar_den = p_fmt->i_sar_den;
+                p_region->fmt.i_sar_num = p_fmt->i_sar_num;
+            }
         }
 
         /* Take care of the aspect ratio */
         if( ( p_region->fmt.i_sar_num * p_fmt->i_sar_den ) !=
             ( p_region->fmt.i_sar_den * p_fmt->i_sar_num ) )
         {
-            for( k = 0; k < SCALE_SIZE ; k++ )
+            for( k = 0; k < SCALE_SIZE; k++ )
             {
-                pi_scale_width[ k ] = pi_scale_width[ k ] *
+                pi_scale_width[k] = pi_scale_width[ k ] *
                     (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
                     p_region->fmt.i_sar_den / p_fmt->i_sar_num;
-                pi_subpic_x[ k ] = p_subpic->i_x * pi_scale_width[ k ] / 1000;
+
+                pi_subpic_x[k] = p_subpic->i_x * pi_scale_width[ k ] / 1000;
             }
         }
 
@@ -1115,7 +1122,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         {
             bool b_scale_used = false;
 
-            for( k = 0; k < SCALE_SIZE ; k++ )
+            for( k = 0; k < SCALE_SIZE; k++ )
             {
                 const int i_scale_w = pi_scale_width[k];
                 const int i_scale_h = pi_scale_height[k];
