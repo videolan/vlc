@@ -676,14 +676,6 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 }
 
 /*****************************************************************************
- * vlc_thread_ready: tell the parent thread we were successfully spawned
- *****************************************************************************/
-void __vlc_thread_ready( vlc_object_t *p_this )
-{
-    vlc_object_signal( p_this );
-}
-
-/*****************************************************************************
  * vlc_thread_join: wait until a thread exits, inner version
  *****************************************************************************/
 void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line )
