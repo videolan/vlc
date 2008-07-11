@@ -102,7 +102,7 @@
 #define SAP_PARSE_TEXT N_( "Try to parse the announce" )
 #define SAP_PARSE_LONGTEXT N_( \
        "This enables actual parsing of the announces by the SAP module. " \
-       "Otherwise, all announcements are parsed by the \"livedotcom\" " \
+       "Otherwise, all announcements are parsed by the \"live555\" " \
        "(RTP/RTSP) module." )
 #define SAP_STRICT_TEXT N_( "SAP Strict mode" )
 #define SAP_STRICT_LONGTEXT N_( \
