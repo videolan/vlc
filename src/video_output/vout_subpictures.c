@@ -955,9 +955,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         if( p_subpic->pf_update_regions )
         {
-            if ( p_subpic->p_region ) {
+            /* FIXME that part look like crap too if there is more than 1 region */
+
+            if( p_subpic->p_region )
                 spu_DestroyRegion( p_spu, p_subpic->p_region );
-            }
 
             /* TODO do not reverse the scaling that was done before calling
              * spu_RenderSubpictures, just pass it along (or do it inside
@@ -968,22 +969,23 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             fmt_org.i_height =
             fmt_org.i_visible_height = i_source_video_height;
 
-            p_subpic->p_region = p_region = p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, mdate() );
-        }
-        else
-        {
-            p_region = p_subpic->p_region;
+            p_subpic->p_region = p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, mdate() );
         }
 
+        /* */
+        p_region = p_subpic->p_region;
+        if( !p_region )
+            continue;
+
         /* Create the blending module */
-        if( !p_spu->p_blend && p_region )
+        if( !p_spu->p_blend )
             SpuRenderCreateBlend( p_spu, p_fmt->i_chroma, p_fmt->i_aspect );
 
         /* Load the text rendering module; it is possible there is a
          * text region somewhere in the subpicture other than the first
          * element in the region list, so just load it anyway as we'll
          * probably want it sooner or later. */
-        if( !p_spu->p_text && p_region )
+        if( !p_spu->p_text )
             SpuRenderCreateAndLoadText( p_spu, p_fmt->i_width, p_fmt->i_height );
 
         if( p_spu->p_text )
@@ -999,7 +1001,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
              * resolution, rather than video resolution.
              */
             while( p_text_region &&
-                   ( p_text_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
+                   p_text_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )
             {
                 p_text_region = p_text_region->p_next;
             }
@@ -1045,14 +1047,15 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         if( (p_subpic->i_original_picture_height > 0) &&
             (p_subpic->i_original_picture_width  > 0) )
         {
+#if 1
             /* FIXME That seems so wrong */
             i_scale_width_orig  = 1000;
             i_scale_height_orig = 1000;
-
-            /* It is probably that :
+#else
+            /* It is probably that :*/
             pi_scale_width[ SCALE_DEFAULT ]  = i_scale_width_orig * i_source_video_width / p_subpic->i_original_picture_width;
             pi_scale_height[ SCALE_DEFAULT ] = i_scale_height_orig * i_source_video_height / p_subpic->i_original_picture_height;
-            */
+#endif
         }
 
         for( k = 0; k < SCALE_SIZE ; k++ )
@@ -1072,23 +1075,20 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Set default subpicture aspect ratio */
-        if( p_region && p_region->fmt.i_aspect &&
-            ( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den ) )
+        if( p_region->fmt.i_aspect && ( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den ) )
         {
             p_region->fmt.i_sar_den = p_region->fmt.i_aspect;
             p_region->fmt.i_sar_num = VOUT_ASPECT_FACTOR;
         }
-        if( p_region &&
-            ( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den ) )
+        if( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den )
         {
             p_region->fmt.i_sar_den = p_fmt->i_sar_den;
             p_region->fmt.i_sar_num = p_fmt->i_sar_num;
         }
 
         /* Take care of the aspect ratio */
-        if( p_region &&
-            ( ( p_region->fmt.i_sar_num * p_fmt->i_sar_den ) !=
-              ( p_region->fmt.i_sar_den * p_fmt->i_sar_num ) ) )
+        if( ( p_region->fmt.i_sar_num * p_fmt->i_sar_den ) !=
+            ( p_region->fmt.i_sar_den * p_fmt->i_sar_num ) )
         {
             for( k = 0; k < SCALE_SIZE ; k++ )
             {
@@ -1099,14 +1099,21 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
         }
 
-        /* Load the scaling module */
-        if( !p_spu->p_scale &&
-           ((((pi_scale_width[ SCALE_TEXT ]    > 0)     || (pi_scale_height[ SCALE_TEXT ]    > 0)) &&
-             ((pi_scale_width[ SCALE_TEXT ]    != 1000) || (pi_scale_height[ SCALE_TEXT ]    != 1000))) ||
-            (((pi_scale_width[ SCALE_DEFAULT ] > 0)     || (pi_scale_height[ SCALE_DEFAULT ] > 0)) &&
-             ((pi_scale_width[ SCALE_DEFAULT ] != 1000) || (pi_scale_height[ SCALE_DEFAULT ] != 1000)))) )
+        /* Load the scaling module when needed */
+        if( !p_spu->p_scale )
         {
-            SpuRenderCreateAndLoadScale( p_spu );
+            bool b_scale_used = false;
+
+            for( k = 0; k < SCALE_SIZE ; k++ )
+            {
+                const int i_scale_w = pi_scale_width[k];
+                const int i_scale_h = pi_scale_height[k];
+                if( ( i_scale_w > 0 && i_scale_w != 1000 ) || ( i_scale_h > 0 && i_scale_h != 1000 ) )
+                    b_scale_used = true;
+            }
+
+            if( b_scale_used )
+                SpuRenderCreateAndLoadScale( p_spu );
         }
 
         for( ; p_region != NULL; p_region = p_region->p_next )
