@@ -589,6 +589,16 @@ static inline void barrier (void)
 #endif
 }
 
+#ifndef LIBVLC_USE_PTHREAD
+enum {
+    VLC_SAVE_CANCEL,
+    VLC_RESTORE_CANCEL,
+    VLC_TEST_CANCEL,
+};
+#endif
+
+VLC_EXPORT (void, vlc_control_cancel, (int cmd, ...));
+
 /**
  * Save the cancellation state and disable cancellation for the calling thread.
  * This function must be called before entering a piece of code that is not
@@ -600,6 +610,8 @@ static inline void vlc_savecancel (int *p_state)
 {
 #if defined (LIBVLC_USE_PTHREAD)
     (void) pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, p_state);
+#else
+    vlc_control_cancel (VLC_SAVE_CANCEL, p_state);
 #endif
 }
 
@@ -612,6 +624,8 @@ static inline void vlc_restorecancel (int state)
 {
 #if defined (LIBVLC_USE_PTHREAD)
     (void) pthread_setcancelstate (state, NULL);
+#else
+    vlc_control_cancel (VLC_RESTORE_CANCEL, state);
 #endif
 }
 
@@ -624,6 +638,8 @@ static inline void vlc_testcancel (void)
 {
 #if defined (LIBVLC_USE_PTHREAD)
     pthread_testcancel ();
+#else
+    vlc_control_cancel (VLC_TEST_CANCEL);
 #endif
 }
 

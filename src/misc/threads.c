@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 
 #include "libvlc.h"
+#include <stdarg.h>
 #include <assert.h>
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
@@ -835,4 +836,46 @@ void vlc_thread_cancel (vlc_object_t *obj)
 
     if (priv->b_thread)
         vlc_cancel (priv->thread_id);
+}
+
+void vlc_control_cancel (int cmd, ...)
+{
+#ifdef LIBVLC_USE_PTHREAD
+    (void) cmd;
+    abort();
+#else
+    static __thread struct vlc_cancel_t *stack = NULL;
+    static __thread bool killed = false, killable = true;
+    va_list ap;
+
+    va_start (ap, cmd);
+
+    switch (cmd)
+    {
+        case VLC_SAVE_CANCEL:
+        {
+            int *p_state = va_arg (ap, int *);
+            *p_state = killable;
+            killable = false;
+            break;
+        }
+
+        case VLC_RESTORE_CANCEL:
+        {
+            int state = va_arg (ap, int);
+            killable = state != 0;
+            break;
+        }
+
+        case VLC_TEST_CANCEL:
+            if (killable)
+#ifdef WIN32
+                _endthread ();
+#else
+# error Not implemented!
+#endif
+            break;
+    }
+    va_end (ap);
+#endif
 }

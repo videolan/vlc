@@ -426,6 +426,7 @@ __vlc_cond_destroy
 __vlc_cond_init
 vlc_config_create
 vlc_config_set
+vlc_control_cancel
 vlc_CPU
 vlc_error
 __vlc_event_attach
