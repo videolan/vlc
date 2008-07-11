@@ -595,9 +595,9 @@ static void SpuRenderRegion( spu_t *p_spu,
     int i_fade_alpha = 255;
     int i_x_offset;
     int i_y_offset;
-    int i_scale_idx   = SCALE_DEFAULT;
-    int i_inv_scale_x = 1000;
-    int i_inv_scale_y = 1000;
+    int i_scale_idx;
+    int i_inv_scale_x;
+    int i_inv_scale_y;
 
     if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
     {
@@ -626,19 +626,17 @@ static void SpuRenderRegion( spu_t *p_spu,
              */
 
             var_Create( p_spu->p_text, "spu-duration", VLC_VAR_TIME );
-            val.i_time = p_subpic->i_stop - p_subpic->i_start;
-            var_Set( p_spu->p_text, "spu-duration", val );
+            var_SetTime( p_spu->p_text, "spu-duration", p_subpic->i_stop - p_subpic->i_start );
 
             var_Create( p_spu->p_text, "spu-elapsed", VLC_VAR_TIME );
-            val.i_time = mdate() - p_subpic->i_start;
-            var_Set( p_spu->p_text, "spu-elapsed", val );
+            var_SetTime( p_spu->p_text, "spu-elapsed", mdate() - p_subpic->i_start );
 
             var_Create( p_spu->p_text, "text-rerender", VLC_VAR_BOOL );
             var_SetBool( p_spu->p_text, "text-rerender", false );
 
             var_Create( p_spu->p_text, "scale", VLC_VAR_INTEGER );
             var_SetInteger( p_spu->p_text, "scale",
-                      __MIN(i_scale_width_orig, i_scale_height_orig) );
+                            __MIN(i_scale_width_orig, i_scale_height_orig) );
 
             if( p_spu->p_text->pf_render_html && p_region->psz_html )
             {
@@ -660,11 +658,22 @@ static void SpuRenderRegion( spu_t *p_spu,
         p_region->i_align |= SUBPICTURE_RENDERED;
     }
 
+    /* From now on, we can only process non text data */
+    if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
+        goto exit;
+
     if( p_region->i_align & SUBPICTURE_RENDERED )
     {
+        /* We are using a region which come from rendered text */
         i_scale_idx   = SCALE_TEXT;
         i_inv_scale_x = i_scale_width_orig;
         i_inv_scale_y = i_scale_height_orig;
+    }
+    else
+    {
+        i_scale_idx   = SCALE_DEFAULT;
+        i_inv_scale_x = 1000;
+        i_inv_scale_y = 1000;
     }
 
     i_x_offset = (p_region->i_x + pi_subpic_x[ i_scale_idx ]) * i_inv_scale_x / 1000;
@@ -674,13 +683,15 @@ static void SpuRenderRegion( spu_t *p_spu,
     if( p_spu->b_force_palette &&
         ( VLC_FOURCC('Y','U','V','P') == p_region->fmt.i_chroma ) )
     {
-        memcpy( p_region->fmt.p_palette->palette,
-                p_spu->palette, 16 );
+        /* It look so wrong I won't comment
+         * p_palette->palette is [256][4] with a int i_entries
+         * p_spu->palette is [4][4]
+         * */
+        memcpy( p_region->fmt.p_palette->palette, p_spu->palette, 16 );
     }
 
     /* Scale SPU if necessary */
-    if( p_region->p_cache &&
-        ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
+    if( p_region->p_cache )
     {
         if( pi_scale_width[ i_scale_idx ] * p_region->fmt.i_width / 1000 !=
             p_region->p_cache->fmt.i_width ||
@@ -697,8 +708,7 @@ static void SpuRenderRegion( spu_t *p_spu,
           ( pi_scale_height[ i_scale_idx ] != 1000 ) ) &&
         ( ( pi_scale_width[ i_scale_idx ] > 0 ) ||
           ( pi_scale_height[ i_scale_idx ] > 0 ) ) &&
-        p_spu->p_scale && !p_region->p_cache &&
-        ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
+        p_spu->p_scale && !p_region->p_cache )
     {
         picture_t *p_pic;
 
@@ -745,8 +755,7 @@ static void SpuRenderRegion( spu_t *p_spu,
           ( pi_scale_height[ i_scale_idx ] != 1000 ) ) &&
         ( ( pi_scale_width[ i_scale_idx ] > 0 ) ||
           ( pi_scale_height[ i_scale_idx ] > 0 ) ) &&
-        p_spu->p_scale && p_region->p_cache &&
-        ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )  )
+        p_spu->p_scale && p_region->p_cache )
     {
         p_region = p_region->p_cache;
     }
@@ -814,78 +823,76 @@ static void SpuRenderRegion( spu_t *p_spu,
         }
     }
 
-    if( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )
+    /* */
+    SpuRenderUpdateBlend( p_spu, &p_region->fmt );
+
+    /* Force cropping if requested */
+    if( p_spu->b_force_crop )
     {
-        /* */
-        SpuRenderUpdateBlend( p_spu, &p_region->fmt );
+        video_format_t *p_fmt = &p_spu->p_blend->fmt_in.video;
+        int i_crop_x = p_spu->i_crop_x * pi_scale_width[ i_scale_idx ] / 1000
+                            * i_inv_scale_x / 1000;
+        int i_crop_y = p_spu->i_crop_y * pi_scale_height[ i_scale_idx ] / 1000
+                            * i_inv_scale_y / 1000;
+        int i_crop_width = p_spu->i_crop_width * pi_scale_width[ i_scale_idx ] / 1000
+                            * i_inv_scale_x / 1000;
+        int i_crop_height = p_spu->i_crop_height * pi_scale_height[ i_scale_idx ] / 1000
+                            * i_inv_scale_y / 1000;
 
-        /* Force cropping if requested */
-        if( p_spu->b_force_crop )
+        /* Find the intersection */
+        if( i_crop_x + i_crop_width <= i_x_offset ||
+            i_x_offset + (int)p_fmt->i_visible_width < i_crop_x ||
+            i_crop_y + i_crop_height <= i_y_offset ||
+            i_y_offset + (int)p_fmt->i_visible_height < i_crop_y )
         {
-            video_format_t *p_fmt = &p_spu->p_blend->fmt_in.video;
-            int i_crop_x = p_spu->i_crop_x * pi_scale_width[ i_scale_idx ] / 1000
-                                * i_inv_scale_x / 1000;
-            int i_crop_y = p_spu->i_crop_y * pi_scale_height[ i_scale_idx ] / 1000
-                                * i_inv_scale_y / 1000;
-            int i_crop_width = p_spu->i_crop_width * pi_scale_width[ i_scale_idx ] / 1000
-                                * i_inv_scale_x / 1000;
-            int i_crop_height = p_spu->i_crop_height * pi_scale_height[ i_scale_idx ] / 1000
-                                * i_inv_scale_y / 1000;
-
-            /* Find the intersection */
-            if( i_crop_x + i_crop_width <= i_x_offset ||
-                i_x_offset + (int)p_fmt->i_visible_width < i_crop_x ||
-                i_crop_y + i_crop_height <= i_y_offset ||
-                i_y_offset + (int)p_fmt->i_visible_height < i_crop_y )
-            {
-                /* No intersection */
-                p_fmt->i_visible_width = p_fmt->i_visible_height = 0;
-            }
-            else
-            {
-                int i_x, i_y, i_x_end, i_y_end;
-                i_x = __MAX( i_crop_x, i_x_offset );
-                i_y = __MAX( i_crop_y, i_y_offset );
-                i_x_end = __MIN( i_crop_x + i_crop_width,
-                               i_x_offset + (int)p_fmt->i_visible_width );
-                i_y_end = __MIN( i_crop_y + i_crop_height,
-                               i_y_offset + (int)p_fmt->i_visible_height );
-
-                p_fmt->i_x_offset = i_x - i_x_offset;
-                p_fmt->i_y_offset = i_y - i_y_offset;
-                p_fmt->i_visible_width = i_x_end - i_x;
-                p_fmt->i_visible_height = i_y_end - i_y;
-
-                i_x_offset = i_x;
-                i_y_offset = i_y;
-            }
-        }
-
-        i_x_offset = __MAX( i_x_offset, 0 );
-        i_y_offset = __MAX( i_y_offset, 0 );
-
-        /* Update the output picture size */
-        p_spu->p_blend->fmt_out.video.i_width =
-            p_spu->p_blend->fmt_out.video.i_visible_width =
-                p_fmt->i_width;
-        p_spu->p_blend->fmt_out.video.i_height =
-            p_spu->p_blend->fmt_out.video.i_visible_height =
-                p_fmt->i_height;
-
-        if( p_spu->p_blend->p_module )
-        {
-            p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
-                p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
-                i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025 );
+            /* No intersection */
+            p_fmt->i_visible_width = p_fmt->i_visible_height = 0;
         }
         else
         {
-            msg_Err( p_spu, "blending %4.4s to %4.4s failed",
-                     (char *)&p_spu->p_blend->fmt_out.video.i_chroma,
-                     (char *)&p_spu->p_blend->fmt_out.video.i_chroma );
+            int i_x, i_y, i_x_end, i_y_end;
+            i_x = __MAX( i_crop_x, i_x_offset );
+            i_y = __MAX( i_crop_y, i_y_offset );
+            i_x_end = __MIN( i_crop_x + i_crop_width,
+                           i_x_offset + (int)p_fmt->i_visible_width );
+            i_y_end = __MIN( i_crop_y + i_crop_height,
+                           i_y_offset + (int)p_fmt->i_visible_height );
+
+            p_fmt->i_x_offset = i_x - i_x_offset;
+            p_fmt->i_y_offset = i_y - i_y_offset;
+            p_fmt->i_visible_width = i_x_end - i_x;
+            p_fmt->i_visible_height = i_y_end - i_y;
+
+            i_x_offset = i_x;
+            i_y_offset = i_y;
         }
     }
 
+    i_x_offset = __MAX( i_x_offset, 0 );
+    i_y_offset = __MAX( i_y_offset, 0 );
+
+    /* Update the output picture size */
+    p_spu->p_blend->fmt_out.video.i_width =
+        p_spu->p_blend->fmt_out.video.i_visible_width =
+            p_fmt->i_width;
+    p_spu->p_blend->fmt_out.video.i_height =
+        p_spu->p_blend->fmt_out.video.i_visible_height =
+            p_fmt->i_height;
+
+    if( p_spu->p_blend->p_module )
+    {
+        p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
+            p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
+            i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025 );
+    }
+    else
+    {
+        msg_Err( p_spu, "blending %4.4s to %4.4s failed",
+                 (char *)&p_spu->p_blend->fmt_out.video.i_chroma,
+                 (char *)&p_spu->p_blend->fmt_out.video.i_chroma );
+    }
+
+exit:
     if( b_rerender_text )
     {
         /* Some forms of subtitles need to be re-rendered more than
@@ -923,9 +930,9 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     }
 
     if( i_scale_width_orig <= 0 )
-        i_scale_width_orig = 1;
+        i_scale_width_orig = 1000;
     if( i_scale_height_orig <= 0 )
-        i_scale_height_orig = 1;
+        i_scale_height_orig = 1000;
 
     i_source_video_width  = p_fmt->i_width  * 1000 / i_scale_width_orig;
     i_source_video_height = p_fmt->i_height * 1000 / i_scale_height_orig;
