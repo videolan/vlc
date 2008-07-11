@@ -469,11 +469,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( b_bail )
                 break;
         }
-
-        if( (i_bufused > 0) && (i_bufused < p_block->i_buffer) )
-            msg_Err( p_dec, "not submitted everything in p_buffer");
-
-
     } while( 0 );
 
     while( 1 )
