@@ -127,10 +127,10 @@
 
 - (id) initWithVout: (vout_thread_t *) p_vout view: (VLCVoutView *) view
                      frame: (NSRect *) s_frame;
-- (id)initReal: (id) sender;
+- (id)initMainThread: (id) sender;
 - (void)close;
 - (void)closeWindow;
-- (id)closeReal: (id) sender;
+- (id)closeMainThread: (id) sender;
 - (id)getVoutView;
 
 - (BOOL)windowShouldClose:(id)sender;

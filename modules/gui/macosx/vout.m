@@ -1009,7 +1009,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     o_view  = view;
     s_frame = frame;
 
-    [self performSelectorOnMainThread: @selector(initReal:)
+    [self performSelectorOnMainThread: @selector(initMainThread:)
         withObject: NULL waitUntilDone: YES];
 
     if( !b_init_ok )
@@ -1020,7 +1020,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     return self;
 }
 
-- (id)initReal: (id) sender
+- (id)initMainThread: (id) sender
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     NSArray *o_screens = [NSScreen screens];
@@ -1149,11 +1149,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     /* XXX waitUntilDone = NO to avoid a possible deadlock when hitting
        Command-Q */
-    [self performSelectorOnMainThread: @selector(closeReal:)
+    [self performSelectorOnMainThread: @selector(closeMainThread:)
         withObject: NULL waitUntilDone: NO];
 }
 
-- (id)closeReal:(id)sender
+- (id)closeMainThread:(id)sender
 {
     if( b_black == true )
     {
