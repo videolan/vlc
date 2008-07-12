@@ -728,7 +728,7 @@ osd_button_t *__osd_ButtonFind( vlc_object_t *p_this, int i_x, int i_y,
 
     if( osd_isVisible( p_osd ) == false )
     {
-        vlc_object_release( (vlc_object_t*) p_osd );
+        vlc_object_release( p_osd );
         return NULL;
     }
 
@@ -781,13 +781,13 @@ osd_button_t *__osd_ButtonFind( vlc_object_t *p_this, int i_x, int i_y,
         if( ( i_x >= i_x_offset ) && ( i_x <= i_x_offset + i_width ) &&
             ( i_y >= i_y_offset ) && ( i_y <= i_y_offset + i_height ) )
         {
-            vlc_object_release( (vlc_object_t*) p_osd );
+            vlc_object_release( p_osd );
             vlc_mutex_unlock( lockval.p_address );
             return p_button;
         }
     }
 
-    vlc_object_release( (vlc_object_t*) p_osd );
+    vlc_object_release( p_osd );
     vlc_mutex_unlock( lockval.p_address );
     return NULL;
 }
@@ -839,6 +839,6 @@ void __osd_ButtonSelect( vlc_object_t *p_this, osd_button_t *p_button )
     msg_Dbg( p_osd, "button selected is [button %s]", p_osd->p_state->p_visible->psz_action );
 #endif
 
-    vlc_object_release( (vlc_object_t*) p_osd );
+    vlc_object_release( p_osd );
     vlc_mutex_unlock( lockval.p_address );
 }
