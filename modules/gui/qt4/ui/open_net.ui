@@ -111,13 +111,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QCheckBox" name="ipv6" >
-        <property name="text" >
-         <string>_("Force IPv6")</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -144,7 +137,6 @@
   <tabstop>addressText</tabstop>
   <tabstop>portSpin</tabstop>
   <tabstop>timeShift</tabstop>
-  <tabstop>ipv6</tabstop>
  </tabstops>
  <resources/>
  <connections/>

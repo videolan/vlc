@@ -418,7 +418,6 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.portSpin, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.addressText, textChanged( QString ), this, updateMRL());
     CONNECT( ui.timeShift, clicked(), this, updateMRL());
-    CONNECT( ui.ipv6, clicked(), this, updateMRL());
 
     ui.protocolCombo->addItem( "" );
     ui.protocolCombo->addItem("HTTP", QVariant("http"));
@@ -446,7 +445,6 @@ void NetOpenPanel::updateProtocol( int idx_proto ) {
 
     ui.timeShift->setEnabled( idx_proto == UDP_PROTO ||
                               idx_proto == UDPM_PROTO );
-    ui.ipv6->setEnabled( idx_proto == UDP_PROTO );
     ui.addressText->setEnabled( idx_proto != UDP_PROTO );
     ui.portSpin->setEnabled( idx_proto == UDP_PROTO ||
                              idx_proto == UDPM_PROTO );
@@ -505,10 +503,6 @@ void NetOpenPanel::updateMRL() {
             break;
         case UDP_PROTO:
             mrl = "udp://@";
-            if( ui.ipv6->isEnabled() && ui.ipv6->isChecked() )
-            {
-                mrl += "[::]";
-            }
             mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
             break;
