@@ -249,6 +249,14 @@ Changes between 0.8.6h and 0.8.6i:
 Security updates:
  * Fixed integer overflow in WAV demuxer (CVE-2008-2430)
 
+Various bugfixes:
+ * Fixed option to use shared memory within the GLX video output module
+ * Improved galaktos-based audio visualizations on FreeBSD 
+ * Miscellaneous bugfixes in multiple modules and in libvlc
+   (transcode stream output, OSD menu video filter, VCD input, 
+    SAP services discovery, http control interface)
+ * Updated Polish translation
+
 
 Changes between 0.8.6g and 0.8.6h:
 ----------------------------------
