@@ -1363,6 +1363,10 @@ static VLCMain *_o_sharedMainInstance = nil;
         }
         vlc_object_release( p_input );
     }
+    else if( p_input )
+    {
+        vlc_object_release( p_input );
+    }
     else
     {
         p_intf->p_sys->i_play_status = END_S;
