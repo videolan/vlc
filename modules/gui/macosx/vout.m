@@ -298,9 +298,9 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( psz_uri != NULL )
         o_mrl = [NSMutableString stringWithUTF8String: psz_uri];
 
-    FREENULL( psz_nowPlaying );
-    FREENULL( psz_name );
-    FREENULL( psz_uri );
+    free( psz_nowPlaying );
+    free( psz_name );
+    free( psz_uri );
 
     if( o_title == nil )
         o_title = o_mrl;
