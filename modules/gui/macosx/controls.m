@@ -887,8 +887,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
-
-#define p_input p_playlist->p_input
+    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
     if( [[o_mi title] isEqualToString: _NS("Faster")] ||
         [[o_mi title] isEqualToString: _NS("Slower")] )
@@ -908,6 +907,7 @@
         {
             bEnabled = FALSE;
         }
+        [o_main setupMenus]; /* Make sure input menu is up to date */
     }
     else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )
@@ -998,6 +998,7 @@
         [o_main setupMenus]; /* Make sure video menu is up to date */
     }
 
+    if( p_input ) vlc_object_release( p_input );
     vlc_object_release( p_playlist );
 
     return( bEnabled );
