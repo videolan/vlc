@@ -99,6 +99,7 @@
 @interface VLCEmbeddedVoutView : VLCVoutView
 {
     BOOL b_used;
+    id o_embeddedwindow;
 }
 
 - (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
@@ -106,17 +107,6 @@
 
 - (void)setUsed: (BOOL)b_new_used;
 - (BOOL)isUsed;
-
-@end
-
-/*****************************************************************************
- * VLCDetachedEmbeddedView interface
- *****************************************************************************/
-
-@interface VLCDetachedEmbeddedVoutView : VLCEmbeddedVoutView
-{
-    id o_embeddedwindow;
-}
 
 @end
 

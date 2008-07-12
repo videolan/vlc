@@ -819,7 +819,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [o_window setLevel: NSStatusWindowLevel];
     }
 
-
     [o_window setAcceptsMouseMovedEvents: TRUE];
     return b_return;
 }
@@ -884,11 +883,19 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 @implementation VLCEmbeddedVoutView
 
+- (void)awakeFromNib
+{
+    o_embeddedwindow = [self window];
+}
+
 - (id)initWithFrame: (NSRect)frameRect
 {
-    [super initWithFrame: frameRect];
-    b_used = NO;
-    [[[VLCMain sharedInstance] getEmbeddedList] addEmbeddedVout: self];
+    if(self = [super initWithFrame: frameRect])
+    {
+        b_used = NO;
+        [[[VLCMain sharedInstance] getEmbeddedList] addEmbeddedVout: self];
+        o_embeddedwindow = nil; /* Filled later on in -awakeFromNib */
+    }
     return self;
 }
 
@@ -914,46 +921,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         [view setFrameSize: [self frame].size];
     }
-    return b_return;
-}
-
-- (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
-                     frame: (NSRect *) s_arg_frame
-
-{
-    return [self setVout: p_arg_vout subView: view frame:s_arg_frame showWindow: YES];
-}
-
-- (void)setUsed: (BOOL)b_new_used
-{
-    b_used = b_new_used;
-}
-
-- (BOOL)isUsed
-{
-    return b_used;
-}
-
-- (void)closeVout
-{
-    [super closeVout];
-    [o_window setAcceptsMouseMovedEvents: NO];
-    [[[VLCMain sharedInstance] getEmbeddedList] releaseEmbeddedVout: self];
-}
-
-
-@end
-
-@implementation VLCDetachedEmbeddedVoutView
-- (void)awakeFromNib
-{
-    o_embeddedwindow = [self window];
-}
-
-- (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
-                     frame: (NSRect *) s_arg_frame
-{
-    BOOL b_return = [super setVout: p_arg_vout subView: view frame: s_arg_frame showWindow: NO];
 
     /* o_window needs to point to our o_embeddedwindow, super might have set it
      * to the fullscreen window that o_embeddedwindow setups during fullscreen */
@@ -983,7 +950,25 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [o_window unlockFullscreenAnimation];
 
     }
+
     return b_return;
+}
+
+- (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
+                     frame: (NSRect *) s_arg_frame
+
+{
+    return [self setVout: p_arg_vout subView: view frame:s_arg_frame showWindow: YES];
+}
+
+- (void)setUsed: (BOOL)b_new_used
+{
+    b_used = b_new_used;
+}
+
+- (BOOL)isUsed
+{
+    return b_used;
 }
 
 - (void)closeVout
@@ -995,6 +980,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [o_window performSelector:@selector(orderOut:) withObject:nil afterDelay:1.5];
 
     [super closeVout];
+    [o_window setAcceptsMouseMovedEvents: NO];
+    [[[VLCMain sharedInstance] getEmbeddedList] releaseEmbeddedVout: self];
 }
 
 - (void)enterFullscreen
