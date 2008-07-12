@@ -664,12 +664,11 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
     int d = 0;
 
     playlist_t *p_playlist = pl_Yield( p_object );
-    input_thread_t *p_input = p_playlist->p_input;
+    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
     input_item_t *p_item = NULL;
     pl_Release( p_object );
     if( p_input )
     {
-        vlc_object_yield( p_input );
         p_item = input_GetItem(p_input);
     }
 
