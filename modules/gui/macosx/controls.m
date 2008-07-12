@@ -499,7 +499,6 @@
             }
             else
             {
-                playlist_t * p_playlist = pl_Yield( VLCIntf );
                 /* Fullscreen state for next time will be saved here too */
                 [o_vout_view toggleFullscreen];
             }
