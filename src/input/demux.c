@@ -54,7 +54,7 @@ demux_t *__demux_New( vlc_object_t *p_obj,
     p_demux->psz_path   = strdup( psz_path );
 
     /* Take into account "demux" to be able to do :demux=dump */
-    if( *p_demux->psz_demux == '\0' )
+    if( p_demux->psz_demux && *p_demux->psz_demux == '\0' )
     {
         free( p_demux->psz_demux );
         p_demux->psz_demux = var_GetNonEmptyString( p_obj, "demux" );
@@ -358,6 +358,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
                            VLC_THREAD_PRIORITY_INPUT, false ) )
     {
         vlc_object_release( s );
+        free( p_sys->psz_name );
         free( p_sys );
         return NULL;
     }
