@@ -73,7 +73,7 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
                                 osdmenu_name );
     if( !p_menu )
         return NULL;
-    vlc_object_yield( p_menu );
+
     vlc_object_attach( p_menu, p_this->p_libvlc );
 
     /* Stuff needed for Parser */
