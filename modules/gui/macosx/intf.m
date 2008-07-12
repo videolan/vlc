@@ -1296,22 +1296,19 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         if( p_intf->p_sys->b_current_title_update )
         {
-            NSString *o_temp;
+            NSString *aString;
+            input_item_t * p_item = input_GetItem( p_input );
+            char * name = input_item_GetNowPlaying( p_item );
 
-            if( p_playlist->status.p_item == NULL )
-            {
-                vlc_object_release( p_input );
-                pl_Release( p_intf );
-                goto end;
-            }
-            if( input_item_GetNowPlaying ( p_playlist->status.p_item->p_input ) )
-                o_temp = [NSString stringWithUTF8String: 
-                    input_item_GetNowPlaying ( p_playlist->status.p_item->p_input )];
-            else
-                o_temp = [NSString stringWithUTF8String:
-                    p_playlist->status.p_item->p_input->psz_name];
-            [self setScrollField: o_temp stopAfter:-1];
-            [[[self getControls] getFSPanel] setStreamTitle: o_temp];
+            if( !name )
+                name = input_item_GetName( p_item );
+
+            aString = [NSString stringWithUTF8String:name];
+
+            free(name);
+
+            [self setScrollField: aString stopAfter:-1];
+            [[[self getControls] getFSPanel] setStreamTitle: aString];
 
             [[o_controls getVoutView] updateTitle];
  
