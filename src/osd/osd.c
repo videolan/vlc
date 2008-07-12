@@ -706,9 +706,9 @@ void __osd_Volume( vlc_object_t *p_this )
             osd_SetMenuUpdate( p_osd, true );
             osd_SetMenuVisible( p_osd, true );
         }
-        vlc_object_release( (vlc_object_t*) p_osd );
         vlc_mutex_unlock( lockval.p_address );
     }
+    vlc_object_release( p_osd );
 }
 
 osd_button_t *__osd_ButtonFind( vlc_object_t *p_this, int i_x, int i_y,
