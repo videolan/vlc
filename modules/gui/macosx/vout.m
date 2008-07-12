@@ -896,7 +896,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 }
 
 - (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
-                 frame: (NSRect *)s_arg_frame showWindow: (BOOL)b_show_window
+                 frame: (NSRect *)s_arg_frame
 {
     BOOL b_return;
 
@@ -906,8 +906,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( b_return )
     {
         o_window = [self window];
-        if (b_show_window)
-            [o_window makeKeyAndOrderFront: self];
+
         [o_window setAcceptsMouseMovedEvents: TRUE];
 
         if( var_GetBool( p_real_vout, "video-on-top" ) )
@@ -948,13 +947,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     }
 
     return b_return;
-}
-
-- (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
-                     frame: (NSRect *) s_arg_frame
-
-{
-    return [self setVout: p_arg_vout subView: view frame:s_arg_frame showWindow: YES];
 }
 
 - (void)setUsed: (BOOL)b_new_used
