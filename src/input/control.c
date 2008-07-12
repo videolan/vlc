@@ -611,30 +611,33 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     char *psz_value = NULL, *psz_next = NULL;
 
     vlc_mutex_lock( &p_input->p->input.p_item->lock );
-    for( i = 0; i < p_input->p->i_bookmark; i++ )
+    if( p_input->p->i_bookmark > 0 )
     {
-        i_len += snprintf( NULL, 0, "{name=%s,bytes=%"PRId64",time=%"PRId64"}",
-                           p_input->p->bookmark[i]->psz_name,
-                           p_input->p->bookmark[i]->i_byte_offset,
-                           p_input->p->bookmark[i]->i_time_offset/1000000 );
-    }
-    for( i = 0; i < p_input->p->i_bookmark; i++ )
-    {
-        if( !i ) psz_value = psz_next = malloc( i_len + p_input->p->i_bookmark );
-
-        sprintf( psz_next, "{name=%s,bytes=%"PRId64",time=%"PRId64"}",
-                 p_input->p->bookmark[i]->psz_name,
-                 p_input->p->bookmark[i]->i_byte_offset,
-                 p_input->p->bookmark[i]->i_time_offset/1000000 );
-
-        psz_next += strlen( psz_next );
-        if( i < p_input->p->i_bookmark - 1)
+        for( i = 0; i < p_input->p->i_bookmark; i++ )
         {
-            *psz_next = ','; psz_next++;
+            i_len += snprintf( NULL, 0, "{name=%s,bytes=%"PRId64",time=%"PRId64"}",
+                               p_input->p->bookmark[i]->psz_name,
+                               p_input->p->bookmark[i]->i_byte_offset,
+                               p_input->p->bookmark[i]->i_time_offset/1000000 );
+        }
+        psz_value = psz_next = malloc( i_len + p_input->p->i_bookmark );
+
+        for( i = 0; i < p_input->p->i_bookmark; i++ )
+        {
+            sprintf( psz_next, "{name=%s,bytes=%"PRId64",time=%"PRId64"}",
+                     p_input->p->bookmark[i]->psz_name,
+                     p_input->p->bookmark[i]->i_byte_offset,
+                     p_input->p->bookmark[i]->i_time_offset/1000000 );
+
+            psz_next += strlen( psz_next );
+            if( i < p_input->p->i_bookmark - 1)
+                *psz_next = ','; psz_next++;
         }
     }
     vlc_mutex_unlock( &p_input->p->input.p_item->lock );
 
     input_Control( p_input, INPUT_ADD_OPTION, "bookmarks",
                    psz_value ? psz_value : "" );
+    free( psz_value );
 }
+
