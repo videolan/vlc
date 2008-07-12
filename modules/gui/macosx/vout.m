@@ -987,7 +987,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     /* Don't close the window yet, wait a bit to see if a new input is poping up */
     /* FIXME: Probably fade the window In and Out */
     /* FIXME: fix core */
-    [o_embeddedwindow performSelector:@selector(orderOut:) withObject:nil afterDelay:1.5];
+    [o_embeddedwindow performSelector:@selector(orderOut:) withObject:nil afterDelay:3.];
 
     [o_window setAcceptsMouseMovedEvents: NO];
     [[[VLCMain sharedInstance] getEmbeddedList] releaseEmbeddedVout: self];
