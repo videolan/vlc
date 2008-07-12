@@ -69,6 +69,9 @@
     /* Not fullscreen when we wake up */
     [o_btn_fullscreen setState: NO];
     b_fullscreen = NO;
+
+    /* Make sure setVisible: returns NO */
+    [self orderOut:self];
 }
 
 - (void)controlTintChanged
@@ -200,7 +203,12 @@
         msg_Dbg( p_vout, "chosen screen isn't present, using current screen for fullscreen mode" );
         screen = [self screen];
     }
-    
+    if (!screen)
+    {
+        msg_Dbg( p_vout, "Using deepest screen" );
+        screen = [NSScreen deepestScreen];
+    }
+
     vlc_object_release( p_vout );
 
     screen_rect = [screen frame];
@@ -231,10 +239,8 @@
              * simply fade the display */
             CGDisplayFadeReservationToken token;
  
-            [o_fullscreen_window setFrame:screen_rect display:NO];
- 
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
-            CGDisplayFade( token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
+            CGDisplayFade( token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
  
             if ([screen isMainScreen])
                 SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
@@ -242,10 +248,15 @@
             [[self contentView] replaceSubview:o_view with:o_temp_view];
             [o_temp_view setFrame:[o_view frame]];
             [o_fullscreen_window setContentView:o_view];
-            [o_fullscreen_window makeKeyAndOrderFront:self];
-            [self orderOut: self];
 
-            CGDisplayFade( token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
+            [o_fullscreen_window makeKeyAndOrderFront:self];
+
+            [o_fullscreen_window makeKeyAndOrderFront:self];
+            [o_fullscreen_window orderFront:self animate:YES];
+
+            [o_fullscreen_window setFrame:screen_rect display:YES];
+
+            CGDisplayFade( token, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
             CGReleaseDisplayFadeReservation( token);
 
             /* Will release the lock */
@@ -337,10 +348,12 @@
 
     /* tell the fspanel to move itself to front next time it's triggered */
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
- 
-    [super orderOut: self];
+
+    if([self isVisible])
+        [super orderOut: self];
 
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
+
     b_fullscreen = YES;
     [self unlockFullscreenAnimation];
 }
@@ -458,7 +471,7 @@
     [o_view setFrame:[o_temp_view frame]];
     [self makeFirstResponder: o_view];
     if ([self isVisible])
-        [self makeKeyAndOrderFront:self];
+        [super makeKeyAndOrderFront:self]; /* our version contains a workaround */
     [o_fullscreen_window orderOut: self];
     EnableScreenUpdates();
 
@@ -496,6 +509,32 @@
     /* Make sure we leave fullscreen */
     [self leaveFullscreenAndFadeOut: YES];
 }
+
+- (void)makeKeyAndOrderFront: (id)sender
+{
+    /* Hack
+     * when we exit fullscreen and fade out, we may endup in
+     * having a window that is faded. We can't have it fade in unless we
+     * animate again. */
+
+    [super setAlphaValue:0.0f];
+    [super makeKeyAndOrderFront: sender];
+
+    NSMutableDictionary * dict = [[[NSMutableDictionary alloc] initWithCapacity:2] autorelease];
+    [dict setObject:self forKey:NSViewAnimationTargetKey];
+    [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+
+    NSViewAnimation * anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
+
+    [anim setAnimationBlockingMode: NSAnimationNonblocking];
+    [anim setDuration: 0.1];
+    [anim setFrameRate: 30];
+
+    [anim startAnimation];
+    /* fullscreenAnimation will be unlocked when animation ends */
+}
+
+
 
 /* Make sure setFrame gets executed on main thread especially if we are animating.
  * (Thus we won't block the video output thread) */
