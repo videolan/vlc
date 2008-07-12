@@ -766,24 +766,18 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)enterFullscreen
 {
-    if( var_GetBool( p_real_vout, "video-on-top" ) )
-    {
-        [o_window setLevel: NSNormalWindowLevel];
-    }
-
-    [[o_view class] performSelectorOnMainThread:@selector(resetVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
+    /* Save the settings for next playing item */
+    playlist_t * p_playlist = pl_Yield( p_real_vout );
+    var_SetBool( p_playlist, "fullscreen", true );
+    pl_Release( p_real_vout );
 }
 
 - (void)leaveFullscreen
 {
-    if( var_GetBool( p_real_vout, "video-on-top" ) )
-    {
-        [o_window setLevel: NSStatusWindowLevel];
-    }
-
-    [[o_view class] performSelectorOnMainThread:@selector(resetVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
+    /* Save the settings for next playing item */
+    playlist_t * p_playlist = pl_Yield( p_real_vout );
+    var_SetBool( p_playlist, "fullscreen", false );
+    pl_Release( p_real_vout );
 }
 
 @end
@@ -869,6 +863,33 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     {
         [self hideMouse: NO];
     }
+}
+
+
+- (void)enterFullscreen
+{
+    [super enterFullscreen];
+
+    if( var_GetBool( p_real_vout, "video-on-top" ) )
+    {
+        [o_window setLevel: NSNormalWindowLevel];
+    }
+
+    [[o_view class] performSelectorOnMainThread:@selector(resetVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
+}
+
+- (void)leaveFullscreen
+{
+    [super leaveFullscreen];
+
+    if( var_GetBool( p_real_vout, "video-on-top" ) )
+    {
+        [o_window setLevel: NSStatusWindowLevel];
+    }
+
+    [[o_view class] performSelectorOnMainThread:@selector(resetVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
 }
 
 @end
@@ -974,12 +995,18 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)enterFullscreen
 {
+    /* Save settings */
+    [super enterFullscreen];
+
     /* We are in a VLCEmbeddedWindow */
     [o_embeddedwindow performSelectorOnMainThread: @selector(enterFullscreen) withObject: NULL waitUntilDone: YES];
 }
 
 - (void)leaveFullscreen
 {
+    /* Save settings */
+    [super leaveFullscreen];
+
     /* We are in a VLCEmbeddedWindow */
     [o_embeddedwindow performSelectorOnMainThread: @selector(leaveFullscreen) withObject: NULL waitUntilDone: YES];
 }
@@ -1199,6 +1226,5 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     /* The window will be closed by the intf later. */
     return NO;
 }
-
 
 @end

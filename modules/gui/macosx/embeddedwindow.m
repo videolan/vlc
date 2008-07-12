@@ -492,6 +492,7 @@
 - (void)orderOut: (id)sender
 {
     [super orderOut: sender];
+
     /* Make sure we leave fullscreen */
     [self leaveFullscreenAndFadeOut: YES];
 }

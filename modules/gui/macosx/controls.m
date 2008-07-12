@@ -499,6 +499,8 @@
             }
             else
             {
+                playlist_t * p_playlist = pl_Yield( VLCIntf );
+                /* Fullscreen state for next time will be saved here too */
                 [o_vout_view toggleFullscreen];
             }
         }
@@ -516,7 +518,7 @@
             var_Set( p_playlist, "fullscreen", (vlc_value_t)!val.b_bool );
         }
 
-        vlc_object_release( p_playlist );
+        pl_Release( VLCIntf );
     }
 
 }
@@ -987,9 +989,10 @@
                     break;
                 }
             }
+
             vlc_object_release( (vlc_object_t *)p_vout );
         }
-        else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )
+        if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )
         {
             var_Get( p_playlist, "fullscreen", &val );
             [o_mi setState: val.b_bool];
