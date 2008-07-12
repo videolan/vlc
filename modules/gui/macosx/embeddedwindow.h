@@ -49,6 +49,8 @@
     /* set to yes if we are fullscreen and all animations are over */
     BOOL              b_fullscreen;
     NSRecursiveLock * o_animation_lock;
+
+    BOOL              b_window_is_invisible;
 }
 
 - (void)controlTintChanged;

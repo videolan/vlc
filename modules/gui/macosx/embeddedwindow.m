@@ -72,6 +72,7 @@
 
     /* Make sure setVisible: returns NO */
     [self orderOut:self];
+    b_window_is_invisible = YES;
 }
 
 - (void)controlTintChanged
@@ -399,6 +400,10 @@
         /* Will release the lock */
         [self hasEndedFullscreen];
 
+        /* Our window is hidden, and might be faded. We need to workaround that, so note it
+         * here */
+        b_window_is_invisible = YES;
+
         CGDisplayFade( token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
         CGReleaseDisplayFadeReservation( token);
         return;
@@ -517,6 +522,13 @@
      * having a window that is faded. We can't have it fade in unless we
      * animate again. */
 
+    if(!b_window_is_invisible)
+    {
+        /* Make sure we don't do it too much */
+        [super makeKeyAndOrderFront: sender];
+        return;
+    }
+
     [super setAlphaValue:0.0f];
     [super makeKeyAndOrderFront: sender];
 
@@ -531,6 +543,8 @@
     [anim setFrameRate: 30];
 
     [anim startAnimation];
+    b_window_is_invisible = NO;
+
     /* fullscreenAnimation will be unlocked when animation ends */
 }
 
