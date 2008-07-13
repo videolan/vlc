@@ -70,6 +70,8 @@
     [o_btn_fullscreen setState: NO];
     b_fullscreen = NO;
 
+    [self setMovableByWindowBackground:YES];
+
     [self setDelegate:self];
 
     /* Make sure setVisible: returns NO */

@@ -912,6 +912,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     o_embeddedwindow = [self window];
 }
 
+- (BOOL)mouseDownCanMoveWindow
+{
+    return YES;
+}
+
 - (id)initWithFrame: (NSRect)frameRect
 {
     if(self = [super initWithFrame: frameRect])

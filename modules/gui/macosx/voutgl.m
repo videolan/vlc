@@ -404,6 +404,11 @@ static void Unlock( vout_thread_t * p_vout )
     return self;
 }
 
+- (BOOL)mouseDownCanMoveWindow
+{
+    return YES;
+}
+
 - (void) reshape
 {
     int x, y;
