@@ -115,6 +115,7 @@
     [o_outline_view setTarget: self];
     [o_outline_view setDelegate: self];
     [o_outline_view setDataSource: self];
+    [o_outline_view setAllowsEmptySelection: NO];
 
     vlc_object_release( p_playlist );
     [self initStrings];
@@ -1201,8 +1202,11 @@
 
     pt = [o_outline_view convertPoint: [o_event locationInWindow]
                                                  fromView: nil];
-    b_item_sel = ( [o_outline_view rowAtPoint: pt] != -1 &&
-                   [o_outline_view selectedRow] != -1 );
+    NSInteger row = [o_outline_view rowAtPoint:pt];
+    if( row != -1 )
+        [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+
+    b_item_sel = ( row != -1 && [o_outline_view selectedRow] != -1 );
     b_rows = [o_outline_view numberOfRows] != 0;
 
     [o_mi_play setEnabled: b_item_sel];
