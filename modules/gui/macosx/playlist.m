@@ -430,7 +430,7 @@
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_recursive_expand setTitle: _NS("Expand Node")];
     [o_mi_selectall setTitle: _NS("Select All")];
-    [o_mi_info setTitle: _NS("Information")];
+    [o_mi_info setTitle: _NS("Information...")];
     [o_mi_preparse setTitle: _NS("Get Stream Information")];
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
