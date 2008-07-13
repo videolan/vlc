@@ -1038,17 +1038,16 @@
         /* Get the item */
         o_one_item = [o_array objectAtIndex: i_item];
         p_input = [self createItem: o_one_item];
-        if( !p_input )
-        {
-            continue;
-        }
+
+        if( !p_input ) continue;
 
         /* Add the item */
-        /* FIXME: playlist_NodeAddInput() can fail */
-       playlist_NodeAddInput( p_playlist, p_input, p_node,
+        /* FIXME: playlist_BothAddInput() can fail */
+       playlist_BothAddInput( p_playlist, p_input, p_node,
                                       PLAYLIST_INSERT,
                                       i_position == -1 ?
-                                      PLAYLIST_END : i_position + i_item, false );
+                                      PLAYLIST_END : i_position + i_item,
+                                      NULL, NULL, false );
 
 
         if( i_item == 0 && !b_enqueue )
@@ -1615,13 +1614,13 @@
 
         if ( item == nil )
         {
-            [self appendArray: o_array atPos: index enqueue: YES];
+            [self appendArray:o_array atPos:index enqueue: YES];
         }
         else
         {
             assert( p_node->i_children != -1 );
-            [self appendNodeArray: o_array inNode: p_node
-                atPos: index enqueue: YES];
+            [self appendNodeArray:o_array inNode: p_node
+                atPos:index enqueue:YES];
         }
         vlc_object_release( p_playlist );
         return YES;
