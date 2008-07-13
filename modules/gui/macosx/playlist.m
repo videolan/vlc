@@ -1617,14 +1617,9 @@
         {
             [self appendArray: o_array atPos: index enqueue: YES];
         }
-        /* This should never occur */
-        else if( p_node->i_children == -1 )
-        {
-            vlc_object_release( p_playlist );
-            return NO;
-        }
         else
         {
+            assert( p_node->i_children != -1 );
             [self appendNodeArray: o_array inNode: p_node
                 atPos: index enqueue: YES];
         }
