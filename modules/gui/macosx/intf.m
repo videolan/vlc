@@ -1751,9 +1751,9 @@ end:
     if( nib_bookmarks_loaded )
         [o_bookmarks release];
 
-    if( nib_info_loaded )
+    if( o_info )
     {
-        [o_info stop];
+        [o_info stopTimers];
         [o_info release];
     }
 

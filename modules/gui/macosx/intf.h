@@ -93,6 +93,7 @@ struct intf_sys_t
  * VLCMain interface
  *****************************************************************************/
 @class AppleRemote;
+@class VLCInformation;
 @interface VLCMain : NSObject
 {
     intf_thread_t *p_intf;      /* The main intf object */
@@ -105,7 +106,7 @@ struct intf_sys_t
     id o_bookmarks;             /* VLCBookmarks   */
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_interaction_list;      /* VLCInteractionList*/
-    id o_info;                  /* VLCInformation */
+    VLCInformation * o_info;                  /* VLCInformation */
 #ifdef UPDATE_CHECK
     id o_update;                /* VLCUpdate      */
 #endif

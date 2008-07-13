@@ -119,7 +119,7 @@ static VLCInfo *_o_sharedInstance = nil;
     [self updatePanelWithItem:p_item];
 }
 
-- (void)stop
+- (void)stopTimers
 {
     /* make sure that the timer is released in any case */
     if( o_statUpdateTimer && [o_statUpdateTimer isValid] )

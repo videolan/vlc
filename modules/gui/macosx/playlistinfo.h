@@ -102,6 +102,8 @@
 }
 
 - (void)initPanel;
+- (void)stopTimers;
+
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
 - (void)initMediaPanelStats;
