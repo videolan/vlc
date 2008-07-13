@@ -59,7 +59,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
                                        playlist_item_t *p_parent, int i_flags,
                                        input_item_t *p_input )
 {
-    input_item_t *p_new_input;
+    input_item_t *p_new_input = NULL;
     playlist_item_t *p_item;
 
     if( !psz_name ) psz_name = _("Undefined");
@@ -69,7 +69,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
                                         psz_name, 0, NULL, -1, ITEM_TYPE_NODE );
     p_item = playlist_ItemNewFromInput( VLC_OBJECT(p_playlist),
                                         p_input ? p_input : p_new_input );
-    if( !p_input )
+    if( p_new_input )
         vlc_gc_decref( p_new_input );
 
     if( p_item == NULL )  return NULL;
