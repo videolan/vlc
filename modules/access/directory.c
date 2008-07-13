@@ -524,7 +524,6 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                 p_input = input_ItemNewWithType( p_playlist,
                                                  psz_uri, entry, 0, NULL,
                                                  -1, ITEM_TYPE_FILE );
-                msg_Dbg( p_playlist, "dir: created %s", p_input->psz_name );
                 if (p_input != NULL)
                 {
                     if( p_current_input )
@@ -535,7 +534,6 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                                            PLAYLIST_NO_REBUILD,
                                            PLAYLIST_END, NULL, NULL,
                                            false );
-                    msg_Dbg( p_playlist, "dir: Deleting %s", p_input->psz_name );
                     vlc_gc_decref( p_input );
                     if( i_ret != VLC_SUCCESS )
                         return VLC_EGENERIC;
