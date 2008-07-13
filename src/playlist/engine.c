@@ -582,10 +582,15 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             {
                 PL_DEBUG("meta ok for %s, need to fetch art", psz_name );
                 vlc_object_lock( p_playlist->p_fetcher );
-                INSERT_ELEM( p_playlist->p_fetcher->pp_waiting,
-                             p_playlist->p_fetcher->i_waiting,
-                             p_playlist->p_fetcher->i_waiting, p_current);
-                vlc_object_signal_unlocked( p_playlist->p_fetcher );
+                if( vlc_object_alive( p_playlist->p_fetcher ) )
+                {
+                    INSERT_ELEM( p_playlist->p_fetcher->pp_waiting,
+                        p_playlist->p_fetcher->i_waiting,
+                        p_playlist->p_fetcher->i_waiting, p_current);
+                    vlc_object_signal_unlocked( p_playlist->p_fetcher );
+                }
+                else
+                    vlc_gc_decref( p_current );
                 vlc_object_unlock( p_playlist->p_fetcher );
             }
             else
@@ -610,9 +615,9 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         vlc_object_lock( p_obj );
     }
 
-    for( int i = 0; i < p_obj->i_waiting; i++ )
+    while( p_obj->i_waiting > 0 )
     {
-        vlc_gc_decref( p_obj->pp_waiting[i] );
+        vlc_gc_decref( p_obj->pp_waiting[0] );
         REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
     }
 
@@ -698,9 +703,9 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
         vlc_object_lock( p_obj );
     }
 
-    for( int i = 0; i < p_obj->i_waiting; i++ )
+    while( p_obj->i_waiting > 0 )
     {
-        vlc_gc_decref( p_obj->pp_waiting[i] );
+        vlc_gc_decref( p_obj->pp_waiting[0] );
         REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
     }
 
