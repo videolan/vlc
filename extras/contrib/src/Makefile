@@ -1252,6 +1252,7 @@ live555-$(LIVEDOTCOM_VERSION).tar.gz:
 live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/live-noapps.patch
+	patch -p0 < Patches/live-uselocale.patch
 
 .live: live
 ifdef HAVE_WIN32  
