@@ -181,6 +181,11 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
                               input_item_t *p_item )
 {
     vlc_object_lock( p_playlist->p_preparse );
+    if( !vlc_object_alive( p_playlist->p_preparse ) )
+    {
+        vlc_object_unlock( p_playlist->p_preparse );
+        return VLC_EGENERIC;
+    }
     vlc_gc_incref( p_item );
     INSERT_ELEM( p_playlist->p_preparse->pp_waiting,
                  p_playlist->p_preparse->i_waiting,
@@ -198,6 +203,12 @@ int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
 {
     vlc_object_lock( p_playlist );
     vlc_object_lock( p_playlist->p_preparse );
+    if( !vlc_object_alive( p_playlist->p_preparse ) )
+    {
+        vlc_object_unlock( p_playlist->p_preparse );
+        vlc_object_unlock( p_playlist );
+        return VLC_EGENERIC;
+    }
     PreparseEnqueueItemSub( p_playlist, p_item );
     vlc_object_unlock( p_playlist->p_preparse );
     vlc_object_unlock( p_playlist );
@@ -210,6 +221,12 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
     int i;
 
     vlc_object_lock( p_playlist->p_fetcher );
+    if( !vlc_object_alive( p_playlist->p_fetcher ) )
+    {
+        vlc_object_unlock( p_playlist->p_fetcher );
+        return VLC_EGENERIC;
+    }
+
     for( i = 0; i < p_playlist->p_fetcher->i_waiting ; i++ );
     vlc_gc_incref( p_item );
     INSERT_ELEM( p_playlist->p_fetcher->pp_waiting,
