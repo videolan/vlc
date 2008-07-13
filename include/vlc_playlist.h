@@ -415,6 +415,16 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
     return VLC_SUCCESS;
 }
 
+/** Small helper tp get current playing input or NULL. Release the input after use. */
+#define pl_CurrentInput(a) __pl_CurrentInput( VLC_OBJECT(a) )
+static  inline input_thread_t * __pl_CurrentInput( vlc_object_t * p_this )
+{
+    playlist_t * p_playlist = pl_Yield( p_this );
+    if( !p_playlist ) return NULL;
+    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
+    pl_Release( p_this );
+    return p_input;
+}
 
 /** Tell if the playlist is currently running */
 #define playlist_IsPlaying( pl ) ( pl->status.i_status == PLAYLIST_RUNNING && \
