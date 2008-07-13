@@ -56,8 +56,8 @@ enum
     MMS_PROTO,
     FTP_PROTO,
     RTSP_PROTO,
+    RTP_PROTO,
     UDP_PROTO,
-    UDPM_PROTO,
     RTMP_PROTO
 };
 

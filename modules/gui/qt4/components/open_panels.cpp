@@ -425,8 +425,8 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.protocolCombo->addItem("MMS", QVariant("mms"));
     ui.protocolCombo->addItem("FTP", QVariant("ftp"));
     ui.protocolCombo->addItem("RTSP", QVariant("rtsp"));
-    ui.protocolCombo->addItem("UDP/RTP (unicast)", QVariant("udp"));
-    ui.protocolCombo->addItem("UDP/RTP (multicast)", QVariant("udp"));
+    ui.protocolCombo->addItem("RTP", QVariant("rtp"));
+    ui.protocolCombo->addItem("UDP", QVariant("udp"));
     ui.protocolCombo->addItem("RTMP", QVariant("rtmp"));
 
     updateProtocol( ui.protocolCombo->currentIndex() );
@@ -443,18 +443,16 @@ void NetOpenPanel::updateProtocol( int idx_proto ) {
     QString addr = ui.addressText->text();
     QString proto = ui.protocolCombo->itemData( idx_proto ).toString();
 
-    ui.timeShift->setEnabled( idx_proto == UDP_PROTO ||
-                              idx_proto == UDPM_PROTO );
-    ui.addressText->setEnabled( idx_proto != UDP_PROTO );
+    ui.timeShift->setEnabled( idx_proto == UDP_PROTO );
     ui.portSpin->setEnabled( idx_proto == UDP_PROTO ||
-                             idx_proto == UDPM_PROTO );
+                             idx_proto == RTP_PROTO );
 
     if( idx_proto == NO_PROTO ) return;
 
     /* If we already have a protocol in the address, replace it */
     if( addr.contains( "://"))
     {
-        if( idx_proto != UDPM_PROTO )
+        if( idx_proto != UDP_PROTO && idx_proto != RTP_PROTO )
             addr.replace( QRegExp("^.*://@*"), proto + "://");
         else
              addr.replace( QRegExp("^.*://"), proto + "://@");
@@ -475,7 +473,7 @@ void NetOpenPanel::updateMRL() {
         ui.protocolCombo->setCurrentIndex(
                 ui.protocolCombo->findData( addr.section( ':', 0, 0 ) ) );
 
-        if( idx_proto != UDP_PROTO || idx_proto != UDPM_PROTO )
+        if( idx_proto != UDP_PROTO || idx_proto != RTP_PROTO )
             mrl = addr;
     }
     else
@@ -503,11 +501,6 @@ void NetOpenPanel::updateMRL() {
             break;
         case UDP_PROTO:
             mrl = "udp://@";
-            mrl += QString(":%1").arg( ui.portSpin->value() );
-            emit methodChanged("udp-caching");
-            break;
-        case UDPM_PROTO: /* UDP multicast */
-            mrl = "udp://@";
             /* Add [] to IPv6 */
             if ( addr.contains(':') && !addr.contains('[') )
             {
@@ -516,6 +509,15 @@ void NetOpenPanel::updateMRL() {
             else mrl += addr;
             mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
+            break;
+        case RTP_PROTO:
+            mrl = "rtp://@";
+            if ( addr.contains(':') && !addr.contains('[') )
+                mrl += "[" + addr + "]"; /* Add [] to IPv6 */
+            else
+                mrl += addr;
+            mrl += QString(":%1").arg( ui.portSpin->value() );
+            emit methodChanged("rtp-caching");
             break;
         case RTMP_PROTO:
             mrl = "rtmp://" + addr;
