@@ -422,6 +422,7 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
+    const  bool b_teletext = fmt->i_cat == SPU_ES && fmt->i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' );
     vlc_value_t       val, text;
 
     const char *psz_var;
@@ -437,8 +438,12 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
 
     if( b_delete )
     {
+        if( b_teletext )
+            var_SetInteger( p_sys->p_input, "teletext-es", -1 );
+
         val.i_int = i_id;
         var_Change( p_input, psz_var, VLC_VAR_DELCHOICE, &val, NULL );
+
         var_SetBool( p_sys->p_input, "intf-change", true );
         return;
     }
@@ -489,6 +494,9 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
     var_Change( p_input, psz_var, VLC_VAR_ADDCHOICE, &val, &text );
 
     free( text.psz_string );
+
+    if( b_teletext )
+        var_SetInteger( p_sys->p_input, "teletext-es", i_id );
 
     var_SetBool( p_sys->p_input, "intf-change", true );
 }
@@ -550,6 +558,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     var_Change( p_input, "audio-es", VLC_VAR_CLEARCHOICES, NULL, NULL );
     var_Change( p_input, "video-es", VLC_VAR_CLEARCHOICES, NULL, NULL );
     var_Change( p_input, "spu-es",   VLC_VAR_CLEARCHOICES, NULL, NULL );
+    var_SetInteger( p_input, "teletext-es", -1 );
     for( i = 0; i < p_sys->i_es; i++ )
     {
         if( p_sys->es[i]->p_pgrm == p_sys->p_pgrm )

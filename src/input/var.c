@@ -462,6 +462,8 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "can-pause", VLC_VAR_BOOL );
     val.b_bool = true; /* Fixed later*/
     var_Change( p_input, "can-pause", VLC_VAR_SETVALUE, &val, NULL );
+    var_Create( p_input, "teletext-es", VLC_VAR_INTEGER );
+    var_SetInteger( p_input, "teletext-es", -1 );
 
     /* */
     var_Create( p_input, "access-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );

@@ -112,6 +112,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown
  *    or not, for that check position != 0.0)
  *  - can-pause
+ *  - teletext-es to get the index of spu track that is teletext --1 if no teletext)
  * * For intf callback upon changes
  *  - intf-change
  *  - rate-change for when playback rate changes
