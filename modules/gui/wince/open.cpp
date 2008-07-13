@@ -618,7 +618,7 @@ void OpenDialog::OnOk()
     {
         bool b_start = !i && i_open_arg;
         playlist_item_t *p_item =
-            playlist_ItemNew( p_intf, pp_args[i], pp_args[i] );
+            playlist_ItemNew( p_playlist, pp_args[i], pp_args[i] );
 
         /* Insert options */
         while( i + 1 < i_args && pp_args[i + 1][0] == ':' )

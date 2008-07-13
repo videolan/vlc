@@ -153,26 +153,10 @@ static void uninstall_input_item_observer( playlist_item_t * p_item )
 /*****************************************************************************
  * Playlist item creation
  *****************************************************************************/
-playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
-                                            const char *psz_uri,
-                                            const char *psz_name,
-                                            int i_options,
-                                            const char *const *ppsz_options,
-                                            int i_duration, int i_type )
-{
-    input_item_t *p_input;
-    if( psz_uri == NULL ) return NULL;
-    p_input = input_ItemNewWithType( p_obj, psz_uri,
-                                     psz_name, i_options, ppsz_options,
-                                     i_duration, i_type );
-    return playlist_ItemNewFromInput( p_obj, p_input );
-}
-
-playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
+playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
                                               input_item_t *p_input )
 {
     DECMALLOC_NULL( p_item, playlist_item_t );
-    playlist_t *p_playlist = pl_Yield( p_obj );
 
     p_item->p_input = p_input;
     vlc_gc_incref( p_item->p_input );
@@ -187,9 +171,22 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
 
     install_input_item_observer( p_item );
 
-    pl_Release( p_item->p_playlist );
-
     return p_item;
+}
+
+playlist_item_t * playlist_ItemNewWithType( playlist_t *p_playlist,
+                                            const char *psz_uri,
+                                            const char *psz_name,
+                                            int i_options,
+                                            const char *const *ppsz_options,
+                                            int i_duration, int i_type )
+{
+    input_item_t *p_input;
+    if( psz_uri == NULL ) return NULL;
+    p_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), psz_uri,
+                                     psz_name, i_options, ppsz_options,
+                                     i_duration, i_type );
+    return playlist_ItemNewFromInput( p_playlist, p_input );
 }
 
 /***************************************************************************
@@ -453,8 +450,14 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     playlist_item_t *p_item_cat, *p_item_one, *p_up;
     int i_top;
     assert( p_input );
-    if( p_playlist->b_die ) return VLC_EGENERIC;
+
     if( !b_locked ) PL_LOCK;
+
+    if( !vlc_object_alive( p_playlist ) )
+    {
+        if( !b_locked ) PL_UNLOCK;
+        return VLC_EGENERIC;
+    }
 
     /* Add to category */
     p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );

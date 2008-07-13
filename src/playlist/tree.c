@@ -67,7 +67,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     if( !p_input )
         p_new_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), NULL,
                                         psz_name, 0, NULL, -1, ITEM_TYPE_NODE );
-    p_item = playlist_ItemNewFromInput( VLC_OBJECT(p_playlist),
+    p_item = playlist_ItemNewFromInput( p_playlist,
                                         p_input ? p_input : p_new_input );
     if( p_new_input )
         vlc_gc_decref( p_new_input );

@@ -340,7 +340,7 @@ VLC_EXPORT( int,  playlist_Export, ( playlist_t *p_playlist, const char *psz_nam
 
 /*************************** Item creation **************************/
 
-VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( vlc_object_t *,const char *,const char *, int , const char *const *, int, int) );
+VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( playlist_t *,const char *,const char *, int , const char *const *, int, int) );
 
 /** Create a new item, without adding it to the playlist
  * \param p_obj a vlc object (anyone will do)
@@ -351,8 +351,6 @@ VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( vlc_object_t *,const 
 #define playlist_ItemNew( a , b, c ) \
     playlist_ItemNewWithType( VLC_OBJECT(a) , b , c, 0, NULL, -1, 0 )
 
-#define playlist_ItemNewFromInput(a,b) __playlist_ItemNewFromInput(VLC_OBJECT(a),b)
-VLC_EXPORT( playlist_item_t *, __playlist_ItemNewFromInput, ( vlc_object_t *p_obj,input_item_t *p_input ) );
 
 /*************************** Item deletion **************************/
 VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, bool ) );

@@ -64,6 +64,9 @@ struct playlist_fetcher_t
 #define playlist_ThreadCreate(a) __playlist_ThreadCreate(VLC_OBJECT(a))
 void        __playlist_ThreadCreate   ( vlc_object_t * );
 
+playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
+                                              input_item_t *p_input );
+
 /* Creation/Deletion */
 playlist_t *playlist_Create   ( vlc_object_t * );
 
