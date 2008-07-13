@@ -23,3 +23,5 @@ shout.m4
 signed.m4
 speex.m4
 vorbis.m4
+
+longdouble.m4
