@@ -449,6 +449,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_Create( p_intf, "intf-change", VLC_VAR_BOOL );
 
     [self setSubmenusEnabled: FALSE];
+    [o_volumeslider setEnabled: YES];
     [self manageVolumeSlider];
     [o_window setDelegate: self];
  
@@ -1286,10 +1287,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         p_intf->p_sys->b_intf_show = false;
     }
 
-    p_playlist = pl_Yield( p_intf );
-    p_input = vlc_object_find( p_playlist, VLC_OBJECT_INPUT,
-                               FIND_CHILD );
-
+    p_input = pl_CurrentInput( p_intf );
     if( p_input && vlc_object_alive (p_input) )
     {
         vlc_value_t val;
@@ -1338,21 +1336,6 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_embedded_window setTime: o_time position: f_updated];
         }
 
-        if( p_intf->p_sys->b_volume_update )
-        {
-            NSString *o_text;
-            int i_volume_step = 0;
-            o_text = [NSString stringWithFormat: _NS("Volume: %d%%"), i_lastShownVolume * 400 / AOUT_VOLUME_MAX];
-            if( i_lastShownVolume != -1 )
-            [self setScrollField:o_text stopAfter:1000000];
-            i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
-            [o_volumeslider setFloatValue: (float)i_lastShownVolume / i_volume_step];
-            [o_volumeslider setEnabled: TRUE];
-            [[[self getControls] getFSPanel] setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
-            p_intf->p_sys->b_mute = ( i_lastShownVolume == 0 );
-            p_intf->p_sys->b_volume_update = FALSE;
-        }
-
         /* Manage Playing status */
         var_Get( p_input, "state", &val );
         if( p_intf->p_sys->i_play_status != val.i_int )
@@ -1374,7 +1357,21 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_embedded_window playStatusUpdated: p_intf->p_sys->i_play_status];
         [self setSubmenusEnabled: FALSE];
     }
-    pl_Release( p_intf );
+
+    if( p_intf->p_sys->b_volume_update )
+    {
+        NSString *o_text;
+        int i_volume_step = 0;
+        o_text = [NSString stringWithFormat: _NS("Volume: %d%%"), i_lastShownVolume * 400 / AOUT_VOLUME_MAX];
+        if( i_lastShownVolume != -1 )
+        [self setScrollField:o_text stopAfter:1000000];
+        i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
+        [o_volumeslider setFloatValue: (float)i_lastShownVolume / i_volume_step];
+        [o_volumeslider setEnabled: TRUE];
+        [[[self getControls] getFSPanel] setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
+        p_intf->p_sys->b_mute = ( i_lastShownVolume == 0 );
+        p_intf->p_sys->b_volume_update = FALSE;
+    }
 
 end:
     [self updateMessageArray];
