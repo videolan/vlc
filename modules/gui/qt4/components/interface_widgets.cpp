@@ -539,7 +539,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     CONNECT( THEMIM->getIM(), toggleTelexTransparency(),
               this, toggleTeletextTransparency() );
     CONNECT( THEMIM->getIM(), teletextEnabled( bool ),
-             telexFrame, setVisible( bool ) );
+             this, enableTeletext( bool ) );
 
     /** Play Buttons **/
     QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
@@ -683,6 +683,16 @@ void ControlsWidget::toggleTeletext()
         telexPage->setEnabled( true );
         b_telexEnabled = true;
     }
+}
+void ControlsWidget::enableTeletext( bool b_enable )
+{
+    telexFrame->setVisible( b_enable );
+    bool b_on = THEMIM->teletextState();
+
+    telexOn->setChecked( b_on );
+    telexTransparent->setEnabled( b_on );
+    telexPage->setEnabled( b_on );
+    b_telexEnabled = b_on;
 }
 
 void ControlsWidget::toggleTeletextTransparency()

@@ -228,6 +228,7 @@ protected slots:
     void toggleAdvanced();
     void toggleTeletext();
     void toggleTeletextTransparency();
+    void enableTeletext( bool );
 signals:
     void advancedControlsToggled( bool );
 };

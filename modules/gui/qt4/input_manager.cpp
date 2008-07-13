@@ -32,6 +32,10 @@
 
 static int ChangeSPU( vlc_object_t *p_this, const char *var, vlc_value_t o,
                       vlc_value_t n, void *param );
+
+static int ChangeTeletext( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                           vlc_value_t n, void *param );
+
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int PLItemChanged( vlc_object_t *, const char *,
@@ -85,6 +89,7 @@ void InputManager::setInput( input_thread_t *_p_input )
         UpdateMeta();
         UpdateArt();
         UpdateSPU();
+        UpdateTeletext();
         UpdateNavigation();
         addCallbacks();
         i_input_id = input_GetItem( p_input )->i_id;
@@ -118,6 +123,7 @@ void InputManager::delInput()
         vlc_object_release( p_input );
         p_input = NULL;
         UpdateSPU();
+        UpdateTeletext();
     }
 }
 
@@ -136,6 +142,8 @@ void InputManager::addCallbacks()
     var_AddCallback( p_input, "state", ItemStateChanged, this );
     /* src/input/es-out.c:552 */
     var_AddCallback( p_input, "spu-es", ChangeSPU, this );
+    /* src/input/es-out.c: */
+    var_AddCallback( p_input, "teletext-es", ChangeTeletext, this );
     /* src/input/input.c:1765 */
     var_AddCallback( p_input, "rate-change", ItemRateChanged, this );
     /* src/input/input.c:2003 */
@@ -148,6 +156,7 @@ void InputManager::addCallbacks()
 void InputManager::delCallbacks()
 {
     var_DelCallback( p_input, "spu-es", ChangeSPU, this );
+    var_DelCallback( p_input, "teletext-es", ChangeTeletext, this );
     var_DelCallback( p_input, "state", ItemStateChanged, this );
     var_DelCallback( p_input, "rate-change", ItemRateChanged, this );
     var_DelCallback( p_input, "title", ItemTitleChanged, this );
@@ -165,6 +174,7 @@ void InputManager::customEvent( QEvent *event )
          type != ItemRateChanged_Type &&
          type != ItemTitleChanged_Type &&
          type != ItemSpuChanged_Type &&
+         type != ItemTeletextChanged_Type &&
          type != ItemStateChanged_Type )
         return;
 
@@ -173,6 +183,7 @@ void InputManager::customEvent( QEvent *event )
     if( ( type != PositionUpdate_Type  &&
           type != ItemRateChanged_Type &&
           type != ItemSpuChanged_Type &&
+          type != ItemTeletextChanged_Type &&
           type != ItemStateChanged_Type
         )
         && ( i_input_id != ple->i_id ) )
@@ -206,6 +217,9 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemSpuChanged_Type:
         UpdateSPU();
+        break;
+    case ItemTeletextChanged_Type:
+        UpdateTeletext();
         break;
     }
 }
@@ -328,17 +342,18 @@ bool InputManager::hasVideo()
 
 void InputManager::UpdateSPU()
 {
-    if( hasInput() )
-    {
-        vlc_value_t val;
-        var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        telexToggle( val.i_int > 0 );
-    }
-    else
-    {
-        telexToggle( false );
-    }
+    UpdateTeletext();
 }
+
+void InputManager::UpdateTeletext()
+{
+    if( hasInput() )
+        telexToggle( var_GetInteger( p_input, "teletext-es" ) >= 0 );
+    else
+        telexToggle( false );
+}
+
+
 
 void InputManager::UpdateArt()
 {
@@ -409,13 +424,19 @@ void InputManager::telexGotoPage( int page )
 {
     if( hasInput() )
     {
-        vlc_object_t *p_vbi;
-        p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
-                    "zvbi", FIND_ANYWHERE );
-        if( p_vbi )
+        const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+        const int i_spu_es = var_GetInteger( p_input, "spu-es" );
+
+        if( i_teletext_es >= 0 && i_teletext_es == i_spu_es )
         {
-            var_SetInteger( p_vbi, "vbi-page", page );
-            vlc_object_release( p_vbi );
+            vlc_object_t *p_vbi;
+            p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
+                        "zvbi", FIND_ANYWHERE );
+            if( p_vbi )
+            {
+                var_SetInteger( p_vbi, "vbi-page", page );
+                vlc_object_release( p_vbi );
+            }
         }
     }
     emit setNewTelexPage( page );
@@ -427,18 +448,22 @@ void InputManager::telexToggle( bool b_enabled )
 
     if( hasInput() )
     {
-        vlc_value_t val;
-        vlc_object_t *p_vbi;
-        var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        b_enabled = (val.i_int > 0);
-        p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
-                    "zvbi", FIND_ANYWHERE );
-        if( p_vbi )
+        const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+        const int i_spu_es = var_GetInteger( p_input, "spu-es" );
+
+        b_enabled = i_teletext_es >= 0;
+        if( b_enabled && i_teletext_es == i_spu_es )
         {
-            i_page = var_GetInteger( p_vbi, "vbi-page" );
-            vlc_object_release( p_vbi );
-            i_page = b_enabled ? i_page : 0;
-            telexGotoPage( i_page );
+            vlc_object_t *p_vbi;
+            p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
+                        "zvbi", FIND_ANYWHERE );
+            if( p_vbi )
+            {
+                i_page = var_GetInteger( p_vbi, "vbi-page" );
+                vlc_object_release( p_vbi );
+                i_page = b_enabled ? i_page : 0;
+                telexGotoPage( i_page );
+            }
         }
     }
     emit teletextEnabled( b_enabled );
@@ -446,7 +471,21 @@ void InputManager::telexToggle( bool b_enabled )
 
 void InputManager::telexToggleButtons()
 {
-    emit toggleTelexButtons();
+    if( hasInput() )
+    {
+        const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+        if( i_teletext_es >= 0 )
+        {
+            const int i_spu_es = var_GetInteger( p_input, "spu-es" );
+
+            if( i_teletext_es == i_spu_es )
+                var_SetInteger( p_input, "spu-es", -1 );
+            else
+                var_SetInteger( p_input, "spu-es", i_teletext_es );
+
+            emit toggleTelexButtons();
+        }
+    }
 }
 
 void InputManager::telexSetTransparency()
@@ -628,17 +667,10 @@ bool MainInputManager::teletextState()
     im = getIM();
     if( im->hasInput() )
     {
-        vlc_value_t val;
-        vlc_object_t *p_vbi;
-        p_vbi = (vlc_object_t *) vlc_object_find_name( getInput(),
-                    "zvbi", FIND_ANYWHERE );
-        if( p_vbi )
-        {
-            vlc_object_release( p_vbi );
-            return true;
-        }
-        var_Change( getInput(), "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        return (val.i_int > 0);
+        const int i_teletext_es = var_GetInteger( getInput(), "teletext-es" );
+        const int i_spu_es = var_GetInteger( getInput(), "spu-es" );
+
+        return i_teletext_es >= 0 && i_teletext_es == i_spu_es;
     }
     return false;
 }
@@ -707,7 +739,16 @@ static int ChangeSPU( vlc_object_t *p_this, const char *var, vlc_value_t o,
     IMEvent *event = new IMEvent( ItemSpuChanged_Type, 0 );
     QApplication::postEvent( im, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
+}
 
+static int ChangeTeletext( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                           vlc_value_t n, void *param )
+{
+
+    InputManager *im = (InputManager*)param;
+    IMEvent *event = new IMEvent( ItemTeletextChanged_Type, 0 );
+    QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    return VLC_SUCCESS;
 }
 
 /* MIM */

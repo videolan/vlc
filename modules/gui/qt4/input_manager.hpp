@@ -36,13 +36,14 @@
 #include <QObject>
 #include <QEvent>
 
-static int const PositionUpdate_Type   = QEvent::User + IMEventType + 1;
-static int const ItemChanged_Type      = QEvent::User + IMEventType + 2;
-static int const ItemStateChanged_Type = QEvent::User + IMEventType + 3;
-static int const ItemTitleChanged_Type = QEvent::User + IMEventType + 4;
-static int const ItemRateChanged_Type  = QEvent::User + IMEventType + 5;
-static int const VolumeChanged_Type    = QEvent::User + IMEventType + 6;
-static int const ItemSpuChanged_Type   = QEvent::User + IMEventType + 7;
+static int const PositionUpdate_Type     = QEvent::User + IMEventType + 1;
+static int const ItemChanged_Type        = QEvent::User + IMEventType + 2;
+static int const ItemStateChanged_Type   = QEvent::User + IMEventType + 3;
+static int const ItemTitleChanged_Type   = QEvent::User + IMEventType + 4;
+static int const ItemRateChanged_Type    = QEvent::User + IMEventType + 5;
+static int const VolumeChanged_Type      = QEvent::User + IMEventType + 6;
+static int const ItemSpuChanged_Type     = QEvent::User + IMEventType + 7;
+static int const ItemTeletextChanged_Type= QEvent::User + IMEventType + 8;
 
 static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 10;
 static int const FullscreenControlHide_Type = QEvent::User + IMEventType + 11;
@@ -89,6 +90,7 @@ private:
     void UpdateNavigation();
     void UpdatePosition();
     void UpdateSPU();
+    void UpdateTeletext();
     void UpdateArt();
 
 public slots:
