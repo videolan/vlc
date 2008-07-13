@@ -218,6 +218,7 @@ static VLCInfo *_o_sharedInstance = nil;
     if( _p_item != p_item )
     {
         if( p_item ) vlc_gc_decref( p_item );
+        [o_saveMetaData_btn setEnabled: NO];
         if( _p_item ) vlc_gc_incref( _p_item );
         p_item = _p_item;
     }
@@ -244,10 +245,6 @@ static VLCInfo *_o_sharedInstance = nil;
     }
     else
     {
-        /* fill uri info */
-        char * psz_url = input_item_GetURI( p_item );
-        [o_uri_txt setStringValue: [NSString stringWithUTF8String: psz_url ? psz_url : ""  ]];
-
         if( !input_item_IsPreparsed( p_item ) )
         {
             playlist_t * p_playlist = pl_Yield( VLCIntf );
@@ -255,7 +252,17 @@ static VLCInfo *_o_sharedInstance = nil;
             pl_Release( VLCIntf );
         }
 
+        /* fill uri info */
+        char * psz_url = input_item_GetURI( p_item );
+        [o_uri_txt setStringValue: [NSString stringWithUTF8String: psz_url ? psz_url : ""  ]];
         free( psz_url );
+
+        /* fill title info */
+        char * psz_title = input_item_GetTitle( p_item );
+        if( !psz_title )
+            psz_title = input_item_GetName( p_item );
+        [o_title_txt setStringValue: [NSString stringWithUTF8String: psz_title ? : ""  ]];
+        free( psz_title );
 
     #define SET( foo, bar ) \
         char *psz_##foo = input_item_Get##bar ( p_item ); \
@@ -263,7 +270,6 @@ static VLCInfo *_o_sharedInstance = nil;
         FREENULL( psz_##foo );
 
         /* fill the other fields */
-        SET( title, Title );
         SET( author, Artist );
         SET( collection, Album );
         SET( seqNum, TrackNum );
