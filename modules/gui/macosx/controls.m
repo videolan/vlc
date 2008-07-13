@@ -811,8 +811,7 @@
     }
     else if( sender == o_specificTime_ok_btn )
     {
-        input_thread_t * p_input = (input_thread_t *)vlc_object_find( VLCIntf, \
-            VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
         if( p_input )
         {
             unsigned int timeInSec = 0;
@@ -841,14 +840,13 @@
             input_Control( p_input, INPUT_SET_TIME, (int64_t)(timeInSec * 1000000));
             vlc_object_release( p_input );
         }
- 
+
         [NSApp endSheet: o_specificTime_win];
         [o_specificTime_win close];
     }
     else
     {
-        input_thread_t * p_input = (input_thread_t *)vlc_object_find( VLCIntf, \
-            VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
         if( p_input )
         {
             /* we can obviously only do that if an input is available */
