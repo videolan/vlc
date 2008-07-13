@@ -375,7 +375,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     playlist_item_t *p_node;
 
     if( !vlc_object_alive( p_playlist ) )
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
 
     char **ppsz_extensions = NULL;
     int i_extensions = 0;
