@@ -123,6 +123,8 @@
 - (void)sortNode:(int)i_mode;
 - (void)updateRowSelection;
 
+- (BOOL)isSelectionEmpty;
+
 - (IBAction)servicesChange:(id)sender;
 - (IBAction)playItem:(id)sender;
 - (IBAction)preparseItem:(id)sender;

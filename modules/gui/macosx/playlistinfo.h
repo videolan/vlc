@@ -26,6 +26,7 @@
  * VLCPlaylistInfo interface
  *****************************************************************************/
 
+@class VLCInfoTreeItem;
 
 @interface VLCInfo : NSObject
 {
@@ -94,7 +95,9 @@
 	IBOutlet id o_fps_lbl;
 	IBOutlet id o_fps_txt;
 
-    playlist_item_t * p_item;
+    VLCInfoTreeItem * rootItem;
+
+    input_item_t * p_item;
     NSTimer * o_statUpdateTimer;
 }
 
@@ -102,10 +105,8 @@
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
 - (void)initMediaPanelStats;
-- (void)updatePanel;
-- (playlist_item_t *)getItem;
-- (BOOL)isItemInPlaylist:(playlist_item_t *)p_item;
-
+- (void)updatePanelWithItem:(input_item_t *)_p_item;
+- (input_item_t *)item;
 - (void)setMeta: (char *)meta forLabel: (id)theItem;
 - (void)updateStatistics: (NSTimer*)theTimer;
 
@@ -117,16 +118,15 @@
     NSString *o_name;
     NSString *o_value;
     int i_object_id;
-    playlist_item_t * p_item;
+    input_item_t * p_item;
     VLCInfoTreeItem *o_parent;
     NSMutableArray *o_children;
 }
 
-+ (VLCInfoTreeItem *)rootItem;
 - (int)numberOfChildren;
 - (VLCInfoTreeItem *)childAtIndex:(int)i_index;
-- (NSString *)getName;
-- (NSString *)getValue;
+- (NSString *)name;
+- (NSString *)value;
 - (void)refresh;
 
 @end

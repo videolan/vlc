@@ -497,11 +497,29 @@
     vlc_object_release( p_playlist );
 }
 
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+    // FIXME: unsafe
+    playlist_item_t * p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
+
+    if( p_item )
+    {
+        /* update our info-panel to reflect the new item */
+        [[[VLCMain sharedInstance] getInfo] updatePanelWithItem:p_item->p_input];
+    }
+}
+
+- (BOOL)isSelectionEmpty
+{
+    return [o_outline_view selectedRow] == -1;
+}
+
 - (void)updateRowSelection
 {
     int i_row;
     unsigned int j;
 
+    // FIXME: unsafe
     playlist_t *p_playlist = pl_Yield( VLCIntf );
     playlist_item_t *p_item, *p_temp_item;
     NSMutableArray *o_array = [NSMutableArray array];
@@ -532,10 +550,11 @@
 
     }
 
+    /* update our info-panel to reflect the new item */
+    [[[VLCMain sharedInstance] getInfo] updatePanelWithItem:p_item->p_input];
+
     vlc_object_release( p_playlist );
 
-    /* update our info-panel to reflect the new item */
-    [[[VLCMain sharedInstance] getInfo] updatePanel];
 }
 
 /* Check if p_item is a child of p_node recursively. We need to check the item

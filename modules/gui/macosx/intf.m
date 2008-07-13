@@ -1752,8 +1752,11 @@ end:
         [o_bookmarks release];
 
     if( nib_info_loaded )
+    {
+        [o_info stop];
         [o_info release];
-    
+    }
+
     if( nib_wizard_loaded )
         [o_wizard release];
  
