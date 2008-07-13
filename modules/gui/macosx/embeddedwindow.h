@@ -51,6 +51,8 @@
     NSRecursiveLock * o_animation_lock;
 
     BOOL              b_window_is_invisible;
+
+    NSSize videoRatio;
 }
 
 - (void)controlTintChanged;
@@ -58,6 +60,8 @@
 - (void)setTime: (NSString *)o_arg_ime position: (float)f_position;
 - (void)playStatusUpdated: (int)i_status;
 - (void)setSeekable: (BOOL)b_seekable;
+
+- (void)setVideoRatio:(NSSize)ratio;
 
 - (NSView *)mainView;
 

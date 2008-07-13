@@ -343,36 +343,44 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     }
 }
 
+- (NSSize)voutSizeForFactor: (float)factor
+{
+    int i_corrected_height, i_corrected_width;
+    NSSize newsize;
+
+    if( p_vout->render.i_height * p_vout->render.i_aspect >
+                    p_vout->render.i_width * VOUT_ASPECT_FACTOR )
+    {
+        i_corrected_width = p_vout->render.i_height * p_vout->render.i_aspect /
+                                        VOUT_ASPECT_FACTOR;
+        newsize.width = (int) ( i_corrected_width * factor );
+        newsize.height = (int) ( p_vout->render.i_height * factor );
+    }
+    else
+    {
+        i_corrected_height = p_vout->render.i_width * VOUT_ASPECT_FACTOR /
+                                        p_vout->render.i_aspect;
+        newsize.width = (int) ( p_vout->render.i_width * factor );
+        newsize.height = (int) ( i_corrected_height * factor );
+    }
+
+    return newsize;
+}
+
 - (void)scaleWindowWithFactor: (float)factor animate: (BOOL)animate
 {
-    NSSize newsize;
-    int i_corrected_height, i_corrected_width;
-    NSPoint topleftbase;
-    NSPoint topleftscreen;
-
     if ( !p_vout->b_fullscreen )
     {
+        NSSize newsize;
+        NSPoint topleftbase;
+        NSPoint topleftscreen;
         NSView *mainView;
         NSRect new_frame;
         topleftbase.x = 0;
         topleftbase.y = [o_window frame].size.height;
         topleftscreen = [o_window convertBaseToScreen: topleftbase];
 
-        if( p_vout->render.i_height * p_vout->render.i_aspect >
-                        p_vout->render.i_width * VOUT_ASPECT_FACTOR )
-        {
-            i_corrected_width = p_vout->render.i_height * p_vout->render.i_aspect /
-                                            VOUT_ASPECT_FACTOR;
-            newsize.width = (int) ( i_corrected_width * factor );
-            newsize.height = (int) ( p_vout->render.i_height * factor );
-        }
-        else
-        {
-            i_corrected_height = p_vout->render.i_width * VOUT_ASPECT_FACTOR /
-                                            p_vout->render.i_aspect;
-            newsize.width = (int) ( p_vout->render.i_width * factor );
-            newsize.height = (int) ( i_corrected_height * factor );
-        }
+        newsize = [self voutSizeForFactor:factor];
 
         /* In fullscreen mode we need to use a view that is different from
          * ourselves, with the VLCEmbeddedWindow */
@@ -390,8 +398,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         new_frame.origin.x = topleftscreen.x;
         new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
-        [o_window setFrame: new_frame display: animate animate: animate];
-
+        [o_window setFrame:new_frame display:animate animate:animate];
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
 }
@@ -958,7 +965,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         [self scaleWindowWithFactor: 1.0 animate: [o_window isVisible] && (![o_window isFullscreen])];
 
-        [o_window setAspectRatio:NSMakeSize([o_window frame].size.width, [o_window frame].size.height)];
+        [o_embeddedwindow setVideoRatio:[self voutSizeForFactor:1.0]];
 
         /* Make sure our window is visible, if we are not in fullscreen */
         if (![o_window isFullscreen])

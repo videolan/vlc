@@ -70,9 +70,12 @@
     [o_btn_fullscreen setState: NO];
     b_fullscreen = NO;
 
+    [self setDelegate:self];
+
     /* Make sure setVisible: returns NO */
     [self orderOut:self];
     b_window_is_invisible = YES;
+    videoRatio = NSMakeSize( 0., 0. );
 }
 
 - (void)controlTintChanged
@@ -165,6 +168,25 @@
         return o_temp_view;
     else
         return o_view;
+}
+
+- (void)setVideoRatio:(NSSize)ratio
+{
+    videoRatio = ratio;
+}
+
+- (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
+{
+    if( videoRatio.height == 0. || videoRatio.width == 0. )
+        return proposedFrameSize;
+
+    NSRect viewRect = [o_view convertRect:[o_view bounds] toView: nil];
+    NSRect contentRect = [self contentRectForFrameRect:[self frame]];
+    float marginy = viewRect.origin.y + [self frame].size.height - contentRect.size.height;
+    float marginx = contentRect.size.width - viewRect.size.width;
+    proposedFrameSize.height = (proposedFrameSize.width - marginx) * videoRatio.height / videoRatio.width + marginy;
+
+    return proposedFrameSize;
 }
 
 /*****************************************************************************
