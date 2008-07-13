@@ -136,7 +136,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args );
 
 
 static int ReadDir( playlist_t *, const char *psz_name, int i_mode,
-                    playlist_item_t *, playlist_item_t *, input_item_t *,
+                    playlist_item_t *, input_item_t *,
                     DIR *handle, stat_list_t *stats );
 
 static DIR *OpenDir (vlc_object_t *obj, const char *psz_name);
@@ -256,7 +256,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
                                               false );
 
-    ReadDir( p_playlist, psz_name, i_mode, p_current, p_item_in_category,
+    ReadDir( p_playlist, psz_name, i_mode, p_item_in_category,
              p_current_input, (DIR *)p_access->p_sys, NULL );
 
     playlist_Signal( p_playlist );
@@ -365,7 +365,7 @@ struct stat_list_t
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
 static int ReadDir( playlist_t *p_playlist, const char *psz_name,
-                    int i_mode, playlist_item_t *p_parent,
+                    int i_mode,
                     playlist_item_t *p_parent_category,
                     input_item_t *p_current_input,
                     DIR *handle, stat_list_t *stparent )
@@ -373,6 +373,9 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     char **pp_dir_content = NULL;
     int             i_dir_content, i, i_return = VLC_SUCCESS;
     playlist_item_t *p_node;
+
+    if( !vlc_object_alive( p_playlist ) )
+        return VLC_SUCCESS;
 
     char **ppsz_extensions = NULL;
     int i_extensions = 0;
@@ -487,7 +490,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                 /* If we had the parent in category, the it is now node.
                  * Else, we still don't have  */
                 i_return = ReadDir( p_playlist, psz_uri , MODE_EXPAND,
-                                    p_node, p_parent_category ? p_node : NULL,
+                                    p_parent_category ? p_node : NULL,
                                     p_current_input, subdir, &stself );
                 closedir (subdir);
                 if (i_return)
@@ -518,9 +521,10 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
 
                 memmove (psz_uri + 7, psz_uri, sizeof (psz_uri) - 7);
                 memcpy (psz_uri, "file://", 7);
-                p_input = input_ItemNewWithType( VLC_OBJECT(p_playlist),
+                p_input = input_ItemNewWithType( p_playlist,
                                                  psz_uri, entry, 0, NULL,
                                                  -1, ITEM_TYPE_FILE );
+                msg_Dbg( p_playlist, "dir: created %s", p_input->psz_name );
                 if (p_input != NULL)
                 {
                     if( p_current_input )
@@ -531,6 +535,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                                            PLAYLIST_NO_REBUILD,
                                            PLAYLIST_END, NULL, NULL,
                                            false );
+                    msg_Dbg( p_playlist, "dir: Deleting %s", p_input->psz_name );
                     vlc_gc_decref( p_input );
                     if( i_ret != VLC_SUCCESS )
                         return VLC_EGENERIC;
