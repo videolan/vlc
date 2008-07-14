@@ -25,6 +25,16 @@
 /*****************************************************************************
  * Chroma fourcc -> ffmpeg_id mapping
  *****************************************************************************/
+
+#define VLC_FF( fcc, fav ) \
+    { VLC_FOURCC fcc, fav }
+
+#if defined(WORDS_BIGENDIAN)
+#   define VLC_FF_RGB_DEFAULT( fcc, le, be ) VLC_FF( fcc, be )
+#else
+#   define VLC_FF_RGB_DEFAULT( fcc, le, be ) VLC_FF( fcc, le )
+#endif
+
 static const struct
 {
     vlc_fourcc_t  i_chroma;
@@ -33,43 +43,39 @@ static const struct
 } chroma_table[] =
 {
     /* Planar YUV formats */
-    { VLC_FOURCC('Y','U','V','A'), PIX_FMT_YUV444P }, /* Hack */
-    { VLC_FOURCC('I','4','4','4'), PIX_FMT_YUV444P },
-    { VLC_FOURCC('J','4','4','4'), PIX_FMT_YUVJ444P },
-    { VLC_FOURCC('I','4','2','2'), PIX_FMT_YUV422P },
-    { VLC_FOURCC('J','4','2','2'), PIX_FMT_YUVJ422P },
-    { VLC_FOURCC('I','4','2','0'), PIX_FMT_YUV420P },
-    { VLC_FOURCC('Y','V','1','2'), PIX_FMT_YUV420P },
-    { VLC_FOURCC('I','Y','U','V'), PIX_FMT_YUV420P },
-    { VLC_FOURCC('J','4','2','0'), PIX_FMT_YUVJ420P },
-    { VLC_FOURCC('I','4','1','1'), PIX_FMT_YUV411P },
-    { VLC_FOURCC('I','4','1','0'), PIX_FMT_YUV410P },
-    { VLC_FOURCC('Y','V','U','9'), PIX_FMT_YUV410P },
+    VLC_FF( ('Y','U','V','A'), PIX_FMT_YUV444P ), /* Hack */
+
+    VLC_FF( ('I','4','4','4'), PIX_FMT_YUV444P ),
+    VLC_FF( ('J','4','4','4'), PIX_FMT_YUVJ444P ),
+
+    VLC_FF( ('I','4','2','2'), PIX_FMT_YUV422P ),
+    VLC_FF( ('J','4','2','2'), PIX_FMT_YUVJ422P ),
+
+    VLC_FF( ('I','4','2','0'), PIX_FMT_YUV420P ),
+    VLC_FF( ('Y','V','1','2'), PIX_FMT_YUV420P ),
+    VLC_FF( ('I','Y','U','V'), PIX_FMT_YUV420P ),
+    VLC_FF( ('J','4','2','0'), PIX_FMT_YUVJ420P ),
+    VLC_FF( ('I','4','1','1'), PIX_FMT_YUV411P ),
+    VLC_FF( ('I','4','1','0'), PIX_FMT_YUV410P ),
+    VLC_FF( ('Y','V','U','9'), PIX_FMT_YUV410P ),
 
     /* Packed YUV formats */
-    { VLC_FOURCC('Y','U','Y','2'), PIX_FMT_YUV422 },
-    { VLC_FOURCC('Y','U','Y','V'), PIX_FMT_YUV422 },
-    { VLC_FOURCC('U','Y','V','Y'), PIX_FMT_UYVY422 },
+    VLC_FF( ('Y','U','Y','2'), PIX_FMT_YUV422 ),
+    VLC_FF( ('Y','U','Y','V'), PIX_FMT_YUV422 ),
+    VLC_FF( ('U','Y','V','Y'), PIX_FMT_UYVY422 ),
 
     /* Packed RGB formats */
-#if defined(WORDS_BIGENDIAN)
-    { VLC_FOURCC('R','G','B','8'), PIX_FMT_BGR8 },
-    { VLC_FOURCC('R','V','1','5'), PIX_FMT_BGR555 },
-    { VLC_FOURCC('R','V','1','6'), PIX_FMT_BGR565 },
-    { VLC_FOURCC('R','V','2','4'), PIX_FMT_BGR24 },
-#else
-#if defined(PIX_FMT_RGB8)
-    { VLC_FOURCC('R','G','B','8'), PIX_FMT_RGB8 },
-#endif
-    { VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555 },
-    { VLC_FOURCC('R','V','1','6'), PIX_FMT_RGB565 },
-    { VLC_FOURCC('R','V','2','4'), PIX_FMT_RGB24 },
-#endif
-    { VLC_FOURCC('R','V','3','2'), PIX_FMT_RGBA32 },
+    VLC_FF_RGB_DEFAULT( ('R','G','B','8'), PIX_FMT_RGB8,    PIX_FMT_BGR8 ),
+    VLC_FF_RGB_DEFAULT( ('R','V','1','5'), PIX_FMT_RGB555,  PIX_FMT_BGR555 ),
+    VLC_FF_RGB_DEFAULT( ('R','V','1','6'), PIX_FMT_RGB565,  PIX_FMT_BGR565 ),
+    VLC_FF_RGB_DEFAULT( ('R','V','2','4'), PIX_FMT_RGB24,   PIX_FMT_BGR24 ),
+
+    VLC_FF( ('R','V','3','2'), PIX_FMT_RGBA32 ),    // FIXME is that wanted
+
 #if defined(PIX_FMT_RGBA)
-    { VLC_FOURCC('R','G','B','A'), PIX_FMT_RGBA },
+    VLC_FF( ('R','G','B','A'), PIX_FMT_RGBA ),
 #endif
-    { VLC_FOURCC('G','R','E','Y'), PIX_FMT_GRAY8 },
+    VLC_FF( ('G','R','E','Y'), PIX_FMT_GRAY8 ),
 
     { 0, 0 }
 };
