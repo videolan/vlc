@@ -503,13 +503,19 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 p_cfg->psz_name );
 
             if( p_cfg->psz_output )
-                asprintf( &psz_output, "%s:description", p_cfg->psz_output );
+            {
+                if( asprintf( &psz_output, "%s:description", p_cfg->psz_output )  == -1 )
+                    psz_output = NULL;
+            }
             else
-                asprintf( &psz_output, "#description" );
+                psz_output = strdup( "#description" );
 
-            asprintf( &psz_dup, "sout=%s", psz_output);
-            input_ItemAddOption( p_media->vod.p_item, psz_dup );
-            free( psz_dup );
+            if( psz_output && asprintf( &psz_dup, "sout=%s", psz_output) != -1 )
+            {
+                input_ItemAddOption( p_media->vod.p_item, psz_dup );
+                free( psz_output );
+                free( psz_dup );
+            }
             for( i = 0; i < p_cfg->i_option; i++ )
                 input_ItemAddOption( p_media->vod.p_item,
                                      p_cfg->ppsz_option[i] );
@@ -524,7 +530,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 input_StopThread( p_input );
                 vlc_object_release( p_input );
             }
-            free( psz_output );
             free( psz_header );
 
             if( p_cfg->vod.psz_mux )
