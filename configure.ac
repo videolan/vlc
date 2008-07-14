@@ -1,6 +1,6 @@
 dnl Autoconf settings for vlc
 
-AC_INIT(vlc, 0.9.0-test2)
+AC_INIT(vlc, 0.9.0-test3)
 VERSION_MAJOR="0"
 VERSION_MINOR="9"
 VERSION_REVISION="0"
