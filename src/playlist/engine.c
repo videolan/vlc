@@ -482,6 +482,18 @@ void playlist_LastLoop( playlist_t *p_playlist )
         sout_DeleteInstance( p_sout );
 #endif
 
+    /* Core should have terminated all SDs before the playlist */
+    /* TODO: It fails to do so when not playing anything -- Courmisch */
+    playlist_ServicesDiscoveryKillAll( p_playlist );
+    playlist_MLDump( p_playlist );
+
+    vlc_object_kill( p_playlist->p_preparse );
+    vlc_thread_join( p_playlist->p_preparse );
+    vlc_object_kill( p_playlist->p_fetcher );
+    vlc_thread_join( p_playlist->p_fetcher );
+
+    PL_LOCK;
+
     if( p_playlist->status.p_node &&
         p_playlist->status.p_node->i_flags & PLAYLIST_REMOVE_FLAG )
     {
@@ -499,17 +511,6 @@ void playlist_LastLoop( playlist_t *p_playlist )
          p_playlist->status.p_item = NULL;
     }
 
-    /* Core should have terminated all SDs before the playlist */
-    /* TODO: It fails to do so when not playing anything -- Courmisch */
-    playlist_ServicesDiscoveryKillAll( p_playlist );
-    playlist_MLDump( p_playlist );
-
-    vlc_object_kill( p_playlist->p_preparse );
-    vlc_thread_join( p_playlist->p_preparse );
-    vlc_object_kill( p_playlist->p_fetcher );
-    vlc_thread_join( p_playlist->p_fetcher );
-
-    PL_LOCK;
     FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
         free( p_del->pp_children );
         vlc_gc_decref( p_del->p_input );
