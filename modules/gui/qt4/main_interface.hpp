@@ -73,8 +73,9 @@ public:
     void *requestVideo( vout_thread_t *p_nvout, int *pi_x,
                         int *pi_y, unsigned int *pi_width,
                         unsigned int *pi_height );
-    void releaseVideo( void * );
+    void releaseVideo( vout_thread_t *, void * );
     int controlVideo( void *p_window, int i_query, va_list args );
+
     void requestLayoutUpdate();
 
     /* Getters */

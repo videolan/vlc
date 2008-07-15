@@ -523,6 +523,6 @@ static void WindowClose (vlc_object_t *obj)
     QMutexLocker locker (&windowLock);
 
     if (!miP->isNull ())
-        (*miP)->releaseVideo (wnd->handle);
+        (*miP)->releaseVideo( wnd->vout, wnd->handle );
     delete miP;
 }

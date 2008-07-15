@@ -686,7 +686,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
     return ret;
 }
 
-void MainInterface::releaseVideo( void *p_win )
+void MainInterface::releaseVideo( vout_thread_t *p_vout, void *p_win )
 {
     emit askReleaseVideo( p_win );
 }
