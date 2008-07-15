@@ -99,15 +99,6 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
                              int i_node_id, bool b_signal );
 
 /* Tree walking */
-playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
-                                    playlist_item_t *p_root,
-                                    playlist_item_t *, bool, bool );
-playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
-                                    playlist_item_t *p_root,
-                                    playlist_item_t *, bool, bool );
-playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
-                                    playlist_item_t *p_root );
-
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
                                    int i_input_id, playlist_item_t *p_root,
                                    bool );
