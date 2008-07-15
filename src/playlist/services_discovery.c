@@ -214,34 +214,37 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
     input_item_t * p_input = p_event->u.services_discovery_item_added.p_new_item;
     const char * psz_cat = p_event->u.services_discovery_item_added.psz_category;
     playlist_item_t *p_new_item, * p_parent = user_data;
+    playlist_t * p_playlist = p_parent->p_playlist;
 
-    msg_Dbg( p_parent->p_playlist, "Adding %s in %s",
+    msg_Dbg( p_playlist, "Adding %s in %s",
                 p_input->psz_name ? p_input->psz_name : "(null)",
                 psz_cat ? psz_cat : "(null)" );
 
+    PL_LOCK;
     /* If p_parent is in root category (this is clearly a hack) and we have a cat */
     if( !EMPTY_STR(psz_cat) &&
-        p_parent->p_parent == p_parent->p_playlist->p_root_category )
+        p_parent->p_parent == p_playlist->p_root_category )
     {
         /* */
         playlist_item_t * p_cat;
         p_cat = playlist_ChildSearchName( p_parent, psz_cat );
         if( !p_cat )
         {
-            p_cat = playlist_NodeCreate( p_parent->p_playlist, psz_cat,
+            p_cat = playlist_NodeCreate( p_playlist, psz_cat,
                                          p_parent, 0, NULL );
             p_cat->i_flags &= ~PLAYLIST_SKIP_FLAG;
         }
         p_parent = p_cat;
     }
 
-    p_new_item = playlist_NodeAddInput( p_parent->p_playlist, p_input, p_parent,
-                                        PLAYLIST_APPEND, PLAYLIST_END, false );
+    p_new_item = playlist_NodeAddInput( p_playlist, p_input, p_parent,
+                                        PLAYLIST_APPEND, PLAYLIST_END, pl_Locked );
     if( p_new_item )
     {
         p_new_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
         p_new_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
     }
+    PL_UNLOCK;
 }
 
  /* A new item has been removed from a certain sd */
