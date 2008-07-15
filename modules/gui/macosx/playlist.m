@@ -565,6 +565,14 @@
 - (BOOL)isItem: (playlist_item_t *)p_item
                     inNode: (playlist_item_t *)p_node
                     checkItemExistence:(BOOL)b_check
+{
+    [self isItem:p_item inNode:p_node checkItemExistence:b_check locked:NO];
+}
+
+- (BOOL)isItem: (playlist_item_t *)p_item
+                    inNode: (playlist_item_t *)p_node
+                    checkItemExistence:(BOOL)b_check
+                    locked:(BOOL)b_locked
 
 {
     playlist_t * p_playlist = pl_Yield( VLCIntf );
@@ -585,7 +593,7 @@
     if ( p_temp_item )
     {
         int i;
-        PL_LOCK;
+        if(!b_locked) PL_LOCK;
 
         if( b_check )
         {
@@ -597,8 +605,8 @@
                 if( ARRAY_VAL( p_playlist->all_items, i) == p_item ) break;
                 else if ( i == p_playlist->all_items.i_size - 1 )
                 {
+                    if(!b_locked) PL_UNLOCK;
                     vlc_object_release( p_playlist );
-                    PL_UNLOCK;
                     return NO;
                 }
             }
@@ -609,12 +617,12 @@
             p_temp_item = p_temp_item->p_parent;
             if( p_temp_item == p_node )
             {
-                PL_UNLOCK;
+                if(!b_locked) PL_UNLOCK;
                 vlc_object_release( p_playlist );
                 return YES;
             }
         }
-        PL_UNLOCK;
+        if(!b_locked) PL_UNLOCK;
     }
 
     vlc_object_release( p_playlist );
@@ -636,7 +644,7 @@
             }
             if( [self isItem: [[o_items objectAtIndex:i] pointerValue]
                     inNode: [[o_nodes objectAtIndex:j] pointerValue]
-                    checkItemExistence: NO] )
+                    checkItemExistence: NO locked:NO] )
             {
                 [o_items removeObjectAtIndex:i];
                 /* We need to execute the next iteration with the same index
@@ -841,7 +849,7 @@
             if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
                 [self isItem: p_playlist->status.p_item inNode:
                         ((playlist_item_t *)[o_item pointerValue])
-                        checkItemExistence: NO] == YES )
+                        checkItemExistence: NO locked:YES] == YES )
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Stop( p_playlist );
     
