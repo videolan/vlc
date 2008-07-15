@@ -135,8 +135,8 @@ static int Demux( demux_t *p_demux );
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args );
 
 
-static int ReadDir( playlist_t *, const char *psz_name, int i_mode,
-                    playlist_item_t *, input_item_t *,
+static int ReadDir( access_t *, playlist_t *, const char *psz_name,
+                    int i_mode, playlist_item_t *, input_item_t *,
                     DIR *handle, stat_list_t *stats );
 
 static DIR *OpenDir (vlc_object_t *obj, const char *psz_name);
@@ -256,7 +256,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
                                               false );
 
-    ReadDir( p_playlist, psz_name, i_mode, p_item_in_category,
+    ReadDir( p_access, p_playlist, psz_name, i_mode,
+             p_item_in_category,
              p_current_input, (DIR *)p_access->p_sys, NULL );
 
     playlist_Signal( p_playlist );
@@ -364,7 +365,8 @@ struct stat_list_t
 /*****************************************************************************
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
-static int ReadDir( playlist_t *p_playlist, const char *psz_name,
+static int ReadDir( access_t *p_access, playlist_t *p_playlist,
+                    const char *psz_name,
                     int i_mode,
                     playlist_item_t *p_parent_category,
                     input_item_t *p_current_input,
@@ -373,6 +375,9 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     char **pp_dir_content = NULL;
     int             i_dir_content, i, i_return = VLC_SUCCESS;
     playlist_item_t *p_node;
+
+    if( !vlc_object_alive( p_access ) )
+        return VLC_EGENERIC;
 
     if( !vlc_object_alive( p_playlist ) )
         return VLC_EGENERIC;
@@ -491,7 +496,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
 
                 /* If we had the parent in category, the it is now node.
                  * Else, we still don't have  */
-                i_return = ReadDir( p_playlist, psz_uri , MODE_EXPAND,
+                i_return = ReadDir( p_access, p_playlist, psz_uri , MODE_EXPAND,
                                     p_parent_category ? p_node : NULL,
                                     p_current_input, subdir, &stself );
                 closedir (subdir);

@@ -452,13 +452,10 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     int i_top;
     assert( p_input );
 
-    PL_LOCK_IF( !b_locked );
-
     if( !vlc_object_alive( p_playlist ) )
-    {
-        PL_UNLOCK_IF( !b_locked );
         return VLC_EGENERIC;
-    }
+
+    PL_LOCK_IF( !b_locked );
 
     /* Add to category */
     p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
