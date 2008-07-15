@@ -80,7 +80,8 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
             return;
         }
 
-        b_play = b_play && p_item_in_category == p_playlist->status.p_item;
+        b_play = b_play &&
+            p_item_in_category == get_current_status_item( p_playlist );
 
         /* If this item is already a node don't transform it */
         if( p_item_in_category->i_children == -1 )
@@ -884,7 +885,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
         ARRAY_REMOVE( p_playlist->items, i );
 
     /* Check if it is the current item */
-    if( p_playlist->status.p_item == p_item )
+    if( get_current_status_item( p_playlist ) == p_item )
     {
         /* Hack we don't call playlist_Control for lock reasons */
         if( b_stop )

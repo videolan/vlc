@@ -78,6 +78,11 @@ void playlist_FetcherLoop( playlist_fetcher_t * );
 
 void ResetCurrentlyPlaying( playlist_t *, bool, playlist_item_t * );
 
+playlist_item_t * get_current_status_item( playlist_t * p_playlist);
+playlist_item_t * get_current_status_node( playlist_t * p_playlist );
+void set_current_status_item( playlist_t *, playlist_item_t * );
+void set_current_status_node( playlist_t *, playlist_item_t * );
+
 /* Control */
 playlist_item_t * playlist_NextItem  ( playlist_t * );
 int playlist_PlayItem  ( playlist_t *, playlist_item_t * );
@@ -137,4 +142,8 @@ void playlist_set_current_input(
 #endif
 
 #define PLI_NAME( p ) p && p->p_input ? p->p_input->psz_name : "null"
+
+#define PL_ASSERT_LOCKED vlc_assert_locked( &(vlc_internals(p_playlist)->lock) );
+
+
 #endif /* !__LIBVLC_PLAYLIST_INTERNAL_H */

@@ -122,8 +122,8 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         {
             p_playlist->request.i_status = PLAYLIST_RUNNING;
             p_playlist->request.b_request = true;
-            p_playlist->request.p_node = p_playlist->status.p_node;
-            p_playlist->request.p_item = p_playlist->status.p_item;
+            p_playlist->request.p_node = get_current_status_node( p_playlist );
+            p_playlist->request.p_item = get_current_status_item( p_playlist );
             p_playlist->request.i_skip = 0;
         }
         break;
@@ -154,8 +154,8 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         break;
 
     case PLAYLIST_SKIP:
-        p_playlist->request.p_node = p_playlist->status.p_node;
-        p_playlist->request.p_item = p_playlist->status.p_item;
+        p_playlist->request.p_node = get_current_status_node( p_playlist );
+        p_playlist->request.p_item = get_current_status_item( p_playlist );
         p_playlist->request.i_skip = (int) va_arg( args, int );
         /* if already running, keep running */
         if( p_playlist->status.i_status != PLAYLIST_STOPPED )
@@ -356,10 +356,10 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 
     /* Repeat and play/stop */
     if( !p_playlist->request.b_request && b_repeat == true &&
-         p_playlist->status.p_item )
+         get_current_status_item( p_playlist ) )
     {
         msg_Dbg( p_playlist,"repeating item" );
-        return p_playlist->status.p_item;
+        return get_current_status_item( p_playlist );
     }
     if( !p_playlist->request.b_request && b_playstop == true )
     {
@@ -367,9 +367,10 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
         return NULL;
     }
 
-    if( !p_playlist->request.b_request && p_playlist->status.p_item )
+    if( !p_playlist->request.b_request &&
+        get_current_status_item( p_playlist ) )
     {
-        playlist_item_t *p_parent = p_playlist->status.p_item;
+        playlist_item_t *p_parent = get_current_status_item( p_playlist );
         while( p_parent )
         {
             if( p_parent->i_flags & PLAYLIST_SKIP_FLAG )
@@ -390,24 +391,12 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
                         PLI_NAME( p_playlist->request.p_item ),
                         PLI_NAME( p_playlist->request.p_node ), i_skip );
 
-        /* Make sure the node wasn't deleted */
-        if( p_playlist->status.p_node &&
-            p_playlist->status.p_node->i_flags & PLAYLIST_REMOVE_FLAG )
-        {
-             PL_DEBUG( "%s was marked for deletion, deleting",
-                             PLI_NAME( p_playlist->status.p_node  ) );
-             playlist_ItemDelete( p_playlist->status.p_node );
-             /* Don't attempt to reuse that node */
-             if( p_playlist->status.p_node == p_playlist->request.p_node )
-                p_playlist->request.p_node = NULL;
-             p_playlist->status.p_node = NULL;
-        }
-
         if( p_playlist->request.p_node &&
-            p_playlist->request.p_node != p_playlist->status.p_node )
+            p_playlist->request.p_node != get_current_status_node( p_playlist ) )
         {
 
-            p_playlist->status.p_node = p_playlist->request.p_node;
+            set_current_status_node( p_playlist, p_playlist->request.p_node );
+            p_playlist->request.p_node = NULL;
             p_playlist->b_reset_currently_playing = true;
         }
 
@@ -462,13 +451,13 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
         PL_DEBUG( "changing item without a request (current %i/%i)",
                   p_playlist->i_current_index, p_playlist->current.i_size );
         /* Cant go to next from current item */
-        if( p_playlist->status.p_item &&
-            p_playlist->status.p_item->i_flags & PLAYLIST_SKIP_FLAG )
+        if( get_current_status_item( p_playlist ) &&
+            get_current_status_item( p_playlist )->i_flags & PLAYLIST_SKIP_FLAG )
             return NULL;
 
         if( p_playlist->b_reset_currently_playing )
             ResetCurrentlyPlaying( p_playlist, b_random,
-                                   p_playlist->status.p_item );
+                                   get_current_status_item( p_playlist ) );
 
         p_playlist->i_current_index++;
         assert( p_playlist->i_current_index <= p_playlist->current.i_size );
@@ -504,7 +493,7 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     msg_Dbg( p_playlist, "creating new input thread" );
 
     p_input->i_nb_played++;
-    p_playlist->status.p_item = p_item;
+    set_current_status_item( p_playlist, p_item );
 
     p_playlist->status.i_status = PLAYLIST_RUNNING;
 

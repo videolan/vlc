@@ -68,11 +68,11 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
 {
     int i;
     if( !b_locked ) PL_LOCK;
-    if( p_playlist->status.p_item &&
-        p_playlist->status.p_item->p_input == p_item )
+    if( get_current_status_item( p_playlist ) &&
+        get_current_status_item( p_playlist )->p_input == p_item )
     {
         if( !b_locked ) PL_UNLOCK;
-        return p_playlist->status.p_item;
+        return get_current_status_item( p_playlist );
     }
     /** \todo Check if this is always incremental and whether we can bsearch */
     for( i =  0 ; i < p_playlist->all_items.i_size; i++ )

@@ -277,6 +277,54 @@ input_thread_t * playlist_CurrentInput( playlist_t * p_playlist )
  * @}
  */
 
+/** Accessor for status item and status nodes.
+ */
+playlist_item_t * get_current_status_item( playlist_t * p_playlist )
+{
+    PL_ASSERT_LOCKED;
+
+    return p_playlist->status.p_item;
+}
+
+playlist_item_t * get_current_status_node( playlist_t * p_playlist )
+{
+    PL_ASSERT_LOCKED;
+
+    return p_playlist->status.p_node;
+}
+
+void set_current_status_item( playlist_t * p_playlist,
+    playlist_item_t * p_item )
+{
+    PL_ASSERT_LOCKED;
+
+    if( p_playlist->status.p_item &&
+        p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG &&
+        p_playlist->status.p_item != p_item )
+    {
+         PL_DEBUG( "%s was marked for deletion, deleting",
+                         PLI_NAME( p_playlist->status.p_item  ) );
+         playlist_ItemDelete( p_playlist->status.p_item );
+    }
+    p_playlist->status.p_item = p_item;
+}
+
+void set_current_status_node( playlist_t * p_playlist,
+    playlist_item_t * p_node )
+{
+    PL_ASSERT_LOCKED;
+
+    if( p_playlist->status.p_node &&
+        p_playlist->status.p_node->i_flags & PLAYLIST_REMOVE_FLAG &&
+        p_playlist->status.p_node != p_node )
+    {
+         PL_DEBUG( "%s was marked for deletion, deleting",
+                         PLI_NAME( p_playlist->status.p_node  ) );
+         playlist_ItemDelete( p_playlist->status.p_node );
+    }
+    p_playlist->status.p_node = p_node;
+}
+
 /**
  * Main loop
  *
@@ -294,7 +342,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
         mdate() - p_playlist->last_rebuild_date > 30000 ) // 30 ms
     {
         ResetCurrentlyPlaying( p_playlist, var_GetBool( p_playlist, "random" ),
-                             p_playlist->status.p_item );
+                               get_current_status_item( p_playlist ) );
         p_playlist->last_rebuild_date = mdate();
     }
 
@@ -330,16 +378,7 @@ check_input:
             p_playlist->gc_date = mdate();
             p_playlist->b_cant_sleep = true;
 
-            if( p_playlist->status.p_item->i_flags
-                & PLAYLIST_REMOVE_FLAG )
-            {
-                 PL_DEBUG( "%s was marked for deletion, deleting",
-                                 PLI_NAME( p_playlist->status.p_item  ) );
-                 playlist_ItemDelete( p_playlist->status.p_item );
-                 if( p_playlist->request.p_item == p_playlist->status.p_item )
-                     p_playlist->request.p_item = NULL;
-                 p_playlist->status.p_item = NULL;
-            }
+            set_current_status_item( p_playlist, NULL );
 
             i_activity= var_GetInteger( p_playlist, "activity" );
             var_SetInteger( p_playlist, "activity", i_activity -
@@ -408,13 +447,7 @@ check_input:
             const bool b_gc_forced = p_playlist->status.i_status != PLAYLIST_STOPPED;
 
             p_playlist->status.i_status = PLAYLIST_STOPPED;
-            if( p_playlist->status.p_item &&
-                p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
-            {
-                PL_DEBUG( "deleting item marked for deletion" );
-                playlist_ItemDelete( p_playlist->status.p_item );
-                p_playlist->status.p_item = NULL;
-            }
+            set_current_status_item( p_playlist, NULL );
 
             /* Collect garbage */
             PL_UNLOCK;
@@ -494,22 +527,11 @@ void playlist_LastLoop( playlist_t *p_playlist )
 
     PL_LOCK;
 
-    if( p_playlist->status.p_node &&
-        p_playlist->status.p_node->i_flags & PLAYLIST_REMOVE_FLAG )
-    {
-         PL_DEBUG( "%s was marked for deletion, deleting",
-                         PLI_NAME( p_playlist->status.p_node  ) );
-         playlist_ItemDelete( p_playlist->status.p_node );
-         p_playlist->status.p_node = NULL;
-    }
-    if( p_playlist->status.p_item &&
-        p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
-    {
-         PL_DEBUG( "%s was marked for deletion, deleting",
-                         PLI_NAME( p_playlist->status.p_item  ) );
-         playlist_ItemDelete( p_playlist->status.p_item );
-         p_playlist->status.p_item = NULL;
-    }
+    /* Release the current node */
+    set_current_status_node( p_playlist, NULL );
+
+    /* Release the current item */
+    set_current_status_item( p_playlist, NULL );
 
     FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
         free( p_del->pp_children );
