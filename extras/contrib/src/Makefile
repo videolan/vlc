@@ -2428,7 +2428,7 @@ liboil: liboil-$(OIL_VERSION).tar.gz
 	patch -d liboil -p1 < Patches/liboil-noshared.patch
 
 .liboil: liboil
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O2" && make && make install)
 	touch $@
 
 CLEAN_FILE += .liboil
