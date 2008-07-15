@@ -260,6 +260,12 @@ struct playlist_add_t
 
 #define PLAYLIST_END           -666
 
+enum pl_locked_state
+{
+    pl_Locked = true,
+    pl_Unlocked = false
+};
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
