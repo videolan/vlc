@@ -177,12 +177,13 @@ static inline int EsOutGetClosedCaptionsChannel( vlc_fourcc_t fcc )
  *****************************************************************************/
 es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 {
-    es_out_t     *out = malloc( sizeof( es_out_t ) );
-    es_out_sys_t *p_sys = malloc( sizeof( es_out_sys_t ) );
     vlc_value_t  val;
     int i;
 
+    es_out_t     *out = malloc( sizeof( es_out_t ) );
     if( !out ) return NULL;
+
+    es_out_sys_t *p_sys = malloc( sizeof( es_out_sys_t ) );
     if( !p_sys )
     {
         free( out );
@@ -476,17 +477,13 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
     {
         if( psz_language && *psz_language )
         {
-            char *temp;
-            text.psz_string = malloc( strlen( _("Track %i") )+
-                                      strlen( psz_language ) + 30 );
-            asprintf( &temp,  _("Track %i"), val.i_int );
-            sprintf( text.psz_string, "%s - [%s]", temp, psz_language );
-            free( temp );
+            if( asprintf( &text.psz_string, "%s %i - [%s]", _( "Track" ), val.i_int, psz_language ) == -1 )
+                text.psz_string = NULL;
         }
         else
         {
-            text.psz_string = malloc( strlen( _("Track %i") ) + 20 );
-            sprintf( text.psz_string, _("Track %i"), val.i_int );
+            if( asprintf( &text.psz_string, "%s %i", _( "Track" ), val.i_int ) == -1 )
+                text.psz_string = NULL;
         }
     }
 
