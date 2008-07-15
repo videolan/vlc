@@ -852,7 +852,7 @@
                         ((playlist_item_t *)[o_item pointerValue])
                         checkItemExistence: NO locked:YES] == YES )
                 // if current item is in selected node and is playing then stop playlist
-                playlist_Stop( p_playlist );
+                playlist_Control(p_playlist, PLAYLIST_STOP, pl_Locked );
     
             playlist_NodeDelete( p_playlist, p_item, true, false );
         }
