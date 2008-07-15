@@ -474,7 +474,11 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
     if( p_dialog->i_id == 0 )
         p_dialog->i_id = ++p_interaction->i_last_id;
 
-    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT ) return VLC_EGENERIC;
+    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
+    {
+        vlc_object_release( p_interaction );
+        return VLC_EGENERIC;
+    }
 
     if( config_GetInt( p_this, "interact" ) ||
         p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
