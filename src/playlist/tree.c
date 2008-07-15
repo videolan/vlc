@@ -98,6 +98,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
 int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
                         bool b_delete_items )
 {
+    PL_ASSERT_LOCKED;
     int i;
     if( p_root->i_children == -1 )
     {
@@ -133,6 +134,7 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
 int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
                          bool b_delete_items, bool b_force )
 {
+    PL_ASSERT_LOCKED;
     int i;
 
     if( p_root->i_children == -1 )
@@ -214,6 +216,7 @@ int playlist_NodeInsert( playlist_t *p_playlist,
                          playlist_item_t *p_parent,
                          int i_position )
 {
+    PL_ASSERT_LOCKED;
    (void)p_playlist;
    assert( p_parent && p_parent->i_children != -1 );
    if( i_position == -1 ) i_position = p_parent->i_children ;
@@ -238,6 +241,7 @@ int playlist_NodeRemoveItem( playlist_t *p_playlist,
                         playlist_item_t *p_item,
                         playlist_item_t *p_parent )
 {
+    PL_ASSERT_LOCKED;
    (void)p_playlist;
 
    for(int i= 0; i< p_parent->i_children ; i++ )
@@ -261,6 +265,7 @@ int playlist_NodeRemoveItem( playlist_t *p_playlist,
  */
 int playlist_NodeChildrenCount( playlist_t *p_playlist, playlist_item_t*p_node)
 {
+    PL_ASSERT_LOCKED;
     int i;
     int i_nb = 0;
 
@@ -289,6 +294,8 @@ int playlist_NodeChildrenCount( playlist_t *p_playlist, playlist_item_t*p_node)
 playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
                                            const char *psz_search )
 {
+    playlist_t * p_playlist = p_node->p_playlist; /* For assert_locked */
+    PL_ASSERT_LOCKED;
     int i;
 
     if( p_node->i_children < 0 )
@@ -319,6 +326,7 @@ void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
                                playlist_item_t **pp_node_one,
                                bool b_for_sd )
 {
+    PL_ASSERT_LOCKED;
     *pp_node_cat = playlist_NodeCreate( p_playlist, psz_name,
                                         p_playlist->p_root_category, 0, NULL );
     *pp_node_one = playlist_NodeCreate( p_playlist, psz_name,
@@ -340,6 +348,7 @@ void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
 playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
                                              playlist_item_t *p_node )
 {
+    PL_ASSERT_LOCKED;
     int i;
     if( p_node->p_parent == p_playlist->p_root_category )
     {
@@ -373,6 +382,7 @@ playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
 playlist_item_t *playlist_GetLastLeaf(playlist_t *p_playlist,
                                       playlist_item_t *p_root )
 {
+    PL_ASSERT_LOCKED;
     int i;
     playlist_item_t *p_item;
     for ( i = p_root->i_children - 1; i >= 0; i-- )
@@ -423,6 +433,7 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                                        playlist_item_t *p_item,
                                        bool b_ena, bool b_unplayed )
 {
+    PL_ASSERT_LOCKED;
     playlist_item_t *p_next;
 
     assert( p_root && p_root->i_children != -1 );
@@ -464,6 +475,7 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
                                        playlist_item_t *p_item,
                                        bool b_ena, bool b_unplayed )
 {
+    PL_ASSERT_LOCKED;
     playlist_item_t *p_prev;
 
     PL_DEBUG2( "finding previous os %s within %s", PLI_NAME( p_item ),

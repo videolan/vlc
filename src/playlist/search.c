@@ -104,6 +104,7 @@ playlist_item_t * playlist_ItemGetByInputId( playlist_t *p_playlist,
                                              playlist_item_t *p_root )
 {
     int i;
+    PL_ASSERT_LOCKED;
     assert( p_root != NULL );
     for( i = 0 ; i< p_root->i_children ; i++ )
     {
@@ -168,6 +169,7 @@ static bool playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
 int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
                                const char *psz_string )
 {
+    PL_ASSERT_LOCKED;
     p_playlist->b_reset_currently_playing = true;
     playlist_LiveSearchUpdateInternal( p_playlist, p_root, psz_string );
     vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
