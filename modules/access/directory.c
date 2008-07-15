@@ -483,9 +483,11 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
 
                 msg_Dbg (p_playlist, "creating subdirectory %s", psz_uri);
 
+                PL_LOCK;
                 p_node = playlist_NodeCreate( p_playlist, entry,
                                               p_parent_category,
                                               PLAYLIST_NO_REBUILD, NULL );
+                PL_UNLOCK;
 
                 /* If we had the parent in category, the it is now node.
                  * Else, we still don't have  */
