@@ -73,7 +73,7 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
     {
         /* FIXME: this is potentially dangerous, we could destroy
          * p_ret any time soon */
-        input_item_t *p_ret = get_current_status_item( p_playlist );
+        playlist_item_t *p_ret = get_current_status_item( p_playlist );
         PL_UNLOCK_IF( !b_locked );
         return p_ret;
     }
