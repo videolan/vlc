@@ -107,9 +107,11 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         return NULL;
 
     /* Create playlist and media library */
+    PL_LOCK; /* playlist_NodesPairCreate will check for it */
     playlist_NodesPairCreate( p_playlist, _( "Playlist" ),
                             &p_playlist->p_local_category,
                             &p_playlist->p_local_onelevel, false );
+    PL_UNLOCK;
 
     p_playlist->p_local_category->i_flags |= PLAYLIST_RO_FLAG;
     p_playlist->p_local_onelevel->i_flags |= PLAYLIST_RO_FLAG;
@@ -121,9 +123,11 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     if( config_GetInt( p_playlist, "media-library") )
     {
+        PL_LOCK; /* playlist_NodesPairCreate will check for it */
         playlist_NodesPairCreate( p_playlist, _( "Media Library" ),
                             &p_playlist->p_ml_category,
                             &p_playlist->p_ml_onelevel, false );
+        PL_UNLOCK;
 
         if(!p_playlist->p_ml_category || !p_playlist->p_ml_onelevel)
             return NULL;
