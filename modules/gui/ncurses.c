@@ -711,7 +711,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     while( p_parent->p_parent )
                         p_parent = p_parent->p_parent;
                     playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                                      true, p_parent, p_item );
+                                      false, p_parent, p_item );
                 }
                 else if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
                         == 0 )
@@ -722,7 +722,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 else
                 {
                     p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
+                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, false,
                         p_sys->pp_plist[p_sys->i_box_plidx]->p_item, NULL );
                 }
                 b_box_plidx_follow = true;
