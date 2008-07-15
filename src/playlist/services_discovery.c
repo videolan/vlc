@@ -306,8 +306,10 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 
         char * psz = services_discovery_GetLocalizedName( p_sd );
         assert( psz );
+        PL_LOCK;
         playlist_NodesPairCreate( p_playlist, psz,
                 &p_cat, &p_one, false );
+        PL_UNLOCK;
         free( psz );
 
         vlc_event_attach( services_discovery_EventManager( p_sd ),
