@@ -2144,7 +2144,7 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
         {
             /* Standard input closed: exit */
             vlc_value_t empty;
-            Quit( p_intf, NULL, empty, empty, NULL );
+            Quit( VLC_OBJECT(p_intf), NULL, empty, empty, NULL );
         }
 
         p_buffer[ *pi_size ] = 0;
