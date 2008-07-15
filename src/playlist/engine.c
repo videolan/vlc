@@ -272,7 +272,6 @@ input_thread_t * playlist_CurrentInput( playlist_t * p_playlist )
     return p_input;
 }
 
-
 /**
  * @}
  */

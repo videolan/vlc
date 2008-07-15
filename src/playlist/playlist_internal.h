@@ -143,7 +143,18 @@ void playlist_set_current_input(
 
 #define PLI_NAME( p ) p && p->p_input ? p->p_input->psz_name : "null"
 
-#define PL_ASSERT_LOCKED vlc_assert_locked( &(vlc_internals(p_playlist)->lock) );
+#define PL_ASSERT_LOCKED vlc_assert_locked( &(vlc_internals(p_playlist)->lock) )
 
+#define PL_LOCK_IF( cond ) pl_lock_if( p_playlist, cond )
+static inline void pl_lock_if( playlist_t * p_playlist, bool cond )
+{
+    if( cond ) PL_LOCK; else PL_ASSERT_LOCKED;
+}
+
+#define PL_UNLOCK_IF( cond ) pl_unlock_if( p_playlist, cond )
+static inline void pl_unlock_if( playlist_t * p_playlist, bool cond )
+{
+    if( cond ) PL_UNLOCK;
+}
 
 #endif /* !__LIBVLC_PLAYLIST_INTERNAL_H */

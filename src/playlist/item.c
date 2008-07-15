@@ -256,10 +256,10 @@ int playlist_DeleteInputInParent( playlist_t *p_playlist, int i_input_id,
                                   playlist_item_t *p_root, bool b_locked )
 {
     int i_ret;
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
     i_ret = DeleteFromInput( p_playlist, i_input_id,
                              p_root, true );
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
     return i_ret;
 }
 
@@ -276,12 +276,12 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
                               bool b_locked )
 {
     int i_ret1, i_ret2;
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
     i_ret1 = DeleteFromInput( p_playlist, i_input_id,
                              p_playlist->p_root_category, true );
     i_ret2 = DeleteFromInput( p_playlist, i_input_id,
                      p_playlist->p_root_onelevel, true );
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
     return ( i_ret1 == VLC_SUCCESS || i_ret2 == VLC_SUCCESS ) ?
                             VLC_SUCCESS : VLC_ENOITEM;
 }
@@ -295,10 +295,10 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
  */
 void playlist_Clear( playlist_t * p_playlist, bool b_locked )
 {
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
     playlist_NodeEmpty( p_playlist, p_playlist->p_local_category, true );
     playlist_NodeEmpty( p_playlist, p_playlist->p_local_onelevel, true );
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
 }
 
 /**
@@ -403,7 +403,7 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
         PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name,
                                              p_input->psz_uri );
 
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
 
     /* Add to ONELEVEL */
     p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
@@ -421,7 +421,7 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
 
     GoAndPreparse( p_playlist, i_mode, p_item_cat, p_item_one );
 
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
     return VLC_SUCCESS;
 }
 
@@ -452,11 +452,11 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     int i_top;
     assert( p_input );
 
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
 
     if( !vlc_object_alive( p_playlist ) )
     {
-        if( !b_locked ) PL_UNLOCK;
+        PL_UNLOCK_IF( !b_locked );
         return VLC_EGENERIC;
     }
 
@@ -491,7 +491,7 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     if( i_cat ) *i_cat = p_item_cat->i_id;
     if( i_one ) *i_one = p_item_one->i_id;
 
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
     return VLC_SUCCESS;
 }
 
@@ -520,13 +520,13 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
 
     if( p_playlist->b_die )
         return NULL;
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
 
     p_item = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item == NULL ) return NULL;
     AddItem( p_playlist, p_item, p_parent, i_mode, i_pos );
 
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
 
     return p_item;
 }
@@ -566,11 +566,11 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
      * useful for later BothAddInput )
      */
 
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
 
     /* Fast track the media library, no time to loose */
     if( p_item == p_playlist->p_ml_category ) {
-        if( !b_locked ) PL_UNLOCK;
+        PL_UNLOCK_IF( !b_locked );
         return p_item;
     }
 
@@ -603,13 +603,13 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
         vlc_object_signal_unlocked( p_playlist );
         var_SetInteger( p_playlist, "item-change", p_item_in_category->
                                                         p_input->i_id );
-        if( !b_locked ) PL_UNLOCK;
+        PL_UNLOCK_IF( !b_locked );
         return p_item_in_category;
     }
     else
     {
         ChangeToNode( p_playlist, p_item );
-        if( !b_locked ) PL_UNLOCK;
+        PL_UNLOCK_IF( !b_locked );
         return NULL;
     }
 }

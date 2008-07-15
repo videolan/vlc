@@ -44,14 +44,14 @@ playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id,
                                         bool b_locked )
 {
     int i;
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
     ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
     if( i != -1 )
     {
-        if( !b_locked ) PL_UNLOCK;
+        PL_UNLOCK_IF( !b_locked );
         return ARRAY_VAL( p_playlist->all_items, i );
     }
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
     return NULL;
 }
 
@@ -67,23 +67,26 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
                                            bool b_locked )
 {
     int i;
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
     if( get_current_status_item( p_playlist ) &&
         get_current_status_item( p_playlist )->p_input == p_item )
     {
-        if( !b_locked ) PL_UNLOCK;
-        return get_current_status_item( p_playlist );
+        /* FIXME: this is potentially dangerous, we could destroy
+         * p_ret any time soon */
+        input_item_t *p_ret = get_current_status_item( p_playlist );
+        PL_UNLOCK_IF( !b_locked );
+        return p_ret;
     }
     /** \todo Check if this is always incremental and whether we can bsearch */
     for( i =  0 ; i < p_playlist->all_items.i_size; i++ )
     {
         if( ARRAY_VAL(p_playlist->all_items, i)->p_input->i_id == p_item->i_id )
         {
-            if( !b_locked ) PL_UNLOCK;
+            PL_UNLOCK_IF( !b_locked );
             return ARRAY_VAL(p_playlist->all_items, i);
         }
     }
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
     return NULL;
 }
 

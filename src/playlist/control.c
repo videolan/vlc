@@ -65,10 +65,10 @@ int playlist_Control( playlist_t * p_playlist, int i_query,
     va_list args;
     int i_result;
     va_start( args, b_locked );
-    if( !b_locked ) PL_LOCK;
+    PL_LOCK_IF( !b_locked );
     i_result = PlaylistVAControl( p_playlist, i_query, args );
     va_end( args );
-    if( !b_locked ) PL_UNLOCK;
+    PL_UNLOCK_IF( !b_locked );
 
     return i_result;
 }
