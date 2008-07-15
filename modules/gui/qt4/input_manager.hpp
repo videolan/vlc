@@ -119,8 +119,6 @@ signals:
     /// Play/pause status
     void statusChanged( int );
     void artChanged( QString );
-    /// Controll of fullscreen controller
-    void inputUnset();
     /// Teletext
     void teletextEnabled( bool );
     void toggleTelexButtons();

@@ -236,13 +236,6 @@ signals:
 /***********************************
  * Fullscreen controller
  ***********************************/
-
-static int showFullscreenControllCallback(vlc_object_t *vlc_object, const char *variable, vlc_value_t old_val,
-    vlc_value_t new_val, void *data);
-
-static int regMouseMoveCallback(vlc_object_t *vlc_object, const char *variable, vlc_value_t old_val,
-    vlc_value_t new_val, void *data);
-
 class FullscreenControllerWidget : public ControlsWidget
 {
     Q_OBJECT
@@ -250,14 +243,10 @@ public:
     FullscreenControllerWidget( intf_thread_t *, MainInterface*, bool, bool );
     virtual ~FullscreenControllerWidget();
 
-    void setHideTimeout( int hideTimeout ) { i_hideTimeout = hideTimeout; }
-    void setIsFullscreen( bool isFS ) { b_isFullscreen = isFS; }
-    void regFullscreenCallback( vout_thread_t *p_vout );
-
-    bool isFSCHidden();
-
-public slots:
-    void unregFullscreenCallback();
+    /* */
+    void attachVout( vout_thread_t *p_vout );
+    void detachVout( vout_thread_t *p_vout );
+    void fullscreenChanged( vout_thread_t *, bool b_fs, int i_timeout );
 
 protected:
     friend class MainInterface;
@@ -270,27 +259,37 @@ protected:
     virtual void keyPressEvent( QKeyEvent *event );
 
 private slots:
-    void hideFSControllerWidget();
+    void showFSC();
+    void planHideFSC();
+    void hideFSC();
+
     void slowHideFSC();
+
 
 private:
     QTimer *p_hideTimer;
-
 #if HAVE_TRANSPARENCY
     QTimer *p_slowHideTimer;
 #endif
 
-    int i_lastPosX;
-    int i_lastPosY;
-    int i_hideTimeout;  /* FSC hiding timeout, same as mouse hiding timeout */
-    bool b_mouseIsOver;
-    bool b_isFullscreen;
+    int i_mouse_last_x;
+    int i_mouse_last_y;
+
+    bool b_mouse_over;
+
+    bool b_slow_hide_begin;
+    int  i_slow_hide_timeout;
 
 #ifdef WIN32TRICK
     bool fscHidden;
 #endif
 
     virtual void customEvent( QEvent *event );
+
+    /* Shared variable between FSC and VLC (protected by a lock) */
+    vlc_mutex_t lock;
+    bool        b_fullscreen;
+    int         i_hide_timeout;  /* FSC hiding timeout, same as mouse hiding timeout */
 };
 
 

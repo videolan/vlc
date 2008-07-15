@@ -228,10 +228,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( fullscreenControls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
 
-    CONNECT( THEMIM->getIM(), inputUnset(),
-            fullscreenControls, unregFullscreenCallback() );
-
-
     /* Size and placement of interface */
     QVLCTools::restoreWidgetPosition(settings,this,QSize(350,60));
 
@@ -682,12 +678,17 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 
 //        emit askVideoToResize( *pi_width, *pi_height );
         emit askUpdate();
+
+        //XXX uncomment for fullscreen controler
+        //fullscreenControls->attachVout( p_nvout );
     }
     return ret;
 }
 
 void MainInterface::releaseVideo( vout_thread_t *p_vout, void *p_win )
 {
+    //XXX uncomment for fullscreen controler
+    //fullscreenControls->detachVout( p_vout );
     emit askReleaseVideo( p_win );
 }
 

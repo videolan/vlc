@@ -887,8 +887,9 @@ void ControlsWidget::toggleAdvanced()
 FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
         MainInterface *_p_mi, bool b_advControls, bool b_shiny )
         : ControlsWidget( _p_i, _p_mi, b_advControls, b_shiny, true ),
-        i_lastPosX( -1 ), i_lastPosY( -1 ), i_hideTimeout( 1 ),
-        b_mouseIsOver( false ), b_isFullscreen( false )
+          i_mouse_last_x( -1 ), i_mouse_last_y( -1 ), b_mouse_over(false),
+          b_slow_hide_begin(false), i_slow_hide_timeout(1),
+          b_fullscreen( false ), i_hide_timeout( 1 )
 {
     setWindowFlags( Qt::ToolTip );
 
@@ -922,7 +923,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
-    CONNECT( p_hideTimer, timeout(), this, hideFSControllerWidget() );
+    CONNECT( p_hideTimer, timeout(), this, hideFSC() );
     p_hideTimer->setSingleShot( true );
 
     /* slow hiding timer */
@@ -939,15 +940,42 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     move( p_desktop->width() / 2 - width() / 2,
           p_desktop->height() - height() );
 
-    #ifdef WIN32TRICK
+#ifdef WIN32TRICK
     setWindowOpacity( 0.0 );
     fscHidden = true;
     show();
-    #endif
+#endif
+
+    vlc_mutex_init_recursive( &lock );
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
 {
+    vlc_mutex_destroy( &lock );
+}
+
+/**
+ * Show fullscreen controller
+ */
+void FullscreenControllerWidget::showFSC()
+{
+#ifdef WIN32TRICK
+    // after quiting and going to fs, we need to call show()
+    if( isHidden() )
+        show();
+
+    if( fscHidden )
+    {
+        fscHidden = false;
+        setWindowOpacity( 1.0 );
+    }
+#else
+    show();
+#endif
+
+#if HAVE_TRANSPARENCY
+    setWindowOpacity( DEFAULT_OPACITY );
+#endif
 }
 
 /**
@@ -955,14 +983,32 @@ FullscreenControllerWidget::~FullscreenControllerWidget()
  * FIXME: under windows it have to be done by moving out of screen
  *        because hide() doesnt work
  */
-void FullscreenControllerWidget::hideFSControllerWidget()
+void FullscreenControllerWidget::hideFSC()
 {
-    #ifdef WIN32TRICK
+#ifdef WIN32TRICK
     fscHidden = true;
     setWindowOpacity( 0.0 );    // simulate hidding
-    #else
+#else
     hide();
-    #endif
+#endif
+}
+
+/**
+ * Plane to hide fullscreen controller
+ */
+void FullscreenControllerWidget::planHideFSC()
+{
+    vlc_mutex_lock( &lock );
+    int i_timeout = i_hide_timeout;
+    vlc_mutex_unlock( &lock );
+
+    p_hideTimer->start( i_timeout );
+
+#if HAVE_TRANSPARENCY
+    b_slow_hide_begin = true;
+    i_slow_hide_timeout = i_timeout;
+    p_slowHideTimer->start( i_slow_hide_timeout / 2 );
+#endif
 }
 
 /**
@@ -973,16 +1019,14 @@ void FullscreenControllerWidget::hideFSControllerWidget()
 void FullscreenControllerWidget::slowHideFSC()
 {
 #if HAVE_TRANSPARENCY
-    static bool first_call = true;
-
-    if ( first_call )
+    if( b_slow_hide_begin )
     {
-        first_call = false;
+        b_slow_hide_begin = false;
 
         p_slowHideTimer->stop();
         /* the last part of time divided to 100 pieces */
-        p_slowHideTimer->start(
-            (int) ( i_hideTimeout / 2 / ( windowOpacity() * 100 ) ) );
+        p_slowHideTimer->start( (int)( i_slow_hide_timeout / 2 / ( windowOpacity() * 100 ) ) );
+
     }
     else
     {
@@ -997,26 +1041,10 @@ void FullscreenControllerWidget::slowHideFSC()
              setWindowOpacity( windowOpacity() - 0.02 );
          }
 
-         if ( windowOpacity() == 0.0 )
-         {
-             first_call = true;
+         if ( windowOpacity() <= 0.0 )
              p_slowHideTimer->stop();
-         }
     }
 #endif
-}
-
-/**
- * Get state of visibility of FS controller on screen
- * On windows control if it is on hidden position
- */
-bool FullscreenControllerWidget::isFSCHidden()
-{
-    #ifdef WIN32TRICK
-    return fscHidden;
-    #endif
-
-    return isHidden();
 }
 
 /**
@@ -1025,38 +1053,25 @@ bool FullscreenControllerWidget::isFSCHidden()
  */
 void FullscreenControllerWidget::customEvent( QEvent *event )
 {
-    int type = event->type();
+    bool b_fs;
 
-    if ( type == FullscreenControlShow_Type && b_isFullscreen )
+    switch( event->type() )
     {
-        #ifdef WIN32TRICK
-        // after quiting and going to fs, we need to call show()
-        if ( isHidden() )
-            show();
+    case FullscreenControlShow_Type:
+        vlc_mutex_lock( &lock );
+        b_fs = b_fullscreen;
+        vlc_mutex_unlock( &lock );
 
-        if ( fscHidden )
-        {
-            fscHidden = false;
-            setWindowOpacity( 1.0 );
-        }
-        #else
-        show();
-        #endif
-
-#if HAVE_TRANSPARENCY
-        setWindowOpacity( DEFAULT_OPACITY );
-#endif
-    }
-    else if ( type == FullscreenControlHide_Type )
-    {
-        hideFSControllerWidget();
-    }
-    else if ( type == FullscreenControlPlanHide_Type && !b_mouseIsOver )
-    {
-        p_hideTimer->start( i_hideTimeout );
-#if HAVE_TRANSPARENCY
-        p_slowHideTimer->start( i_hideTimeout / 2 );
-#endif
+        if( b_fs )  // FIXME I am not sure about that one
+            showFSC();
+        break;
+    case FullscreenControlHide_Type:
+        hideFSC();
+        break;
+    case FullscreenControlPlanHide_Type:
+        if( !b_mouse_over ) // Only if the mouse is not over FSC
+            planHideFSC();
+        break;
     }
 }
 
@@ -1068,13 +1083,13 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
 {
     if ( event->buttons() == Qt::LeftButton )
     {
-        int i_moveX = event->globalX() - i_lastPosX;
-        int i_moveY = event->globalY() - i_lastPosY;
+        int i_moveX = event->globalX() - i_mouse_last_x;
+        int i_moveY = event->globalY() - i_mouse_last_y;
 
         move( x() + i_moveX, y() + i_moveY );
 
-        i_lastPosX = event->globalX();
-        i_lastPosY = event->globalY();
+        i_mouse_last_x = event->globalX();
+        i_mouse_last_y = event->globalY();
     }
 }
 
@@ -1084,8 +1099,8 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
  */
 void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
 {
-    i_lastPosX = event->globalX();
-    i_lastPosY = event->globalY();
+    i_mouse_last_x = event->globalX();
+    i_mouse_last_y = event->globalY();
 }
 
 /**
@@ -1093,11 +1108,12 @@ void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
  */
 void FullscreenControllerWidget::enterEvent( QEvent *event )
 {
+    b_mouse_over = true;
+
     p_hideTimer->stop();
 #if HAVE_TRANSPARENCY
     p_slowHideTimer->stop();
 #endif
-    b_mouseIsOver = true;
 }
 
 /**
@@ -1105,11 +1121,9 @@ void FullscreenControllerWidget::enterEvent( QEvent *event )
  */
 void FullscreenControllerWidget::leaveEvent( QEvent *event )
 {
-    p_hideTimer->start( i_hideTimeout );
-#if HAVE_TRANSPARENCY
-    p_slowHideTimer->start( i_hideTimeout / 2 );
-#endif
-    b_mouseIsOver = false;
+    planHideFSC();
+
+    b_mouse_over = false;
 }
 
 /**
@@ -1129,80 +1143,85 @@ void FullscreenControllerWidget::keyPressEvent( QKeyEvent *event )
         event->ignore();
 }
 
+/* */
+static int FullscreenControllerWidgetFullscreenChanged( vlc_object_t *vlc_object, const char *variable,
+                                                        vlc_value_t old_val, vlc_value_t new_val,
+                                                        void *data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *) vlc_object;
+    FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
+
+    p_fs->fullscreenChanged( p_vout, new_val.b_bool, var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+
+    return VLC_SUCCESS;
+}
+/* */
+static int FullscreenControllerWidgetMouseMoved( vlc_object_t *vlc_object, const char *variable,
+                                                 vlc_value_t old_val, vlc_value_t new_val,
+                                                 void *data )
+{
+    FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
+
+    /* Show event */
+    IMEvent *eShow = new IMEvent( FullscreenControlShow_Type, 0 );
+    QApplication::postEvent( p_fs, static_cast<QEvent *>(eShow) );
+
+    /* Plan hide event */
+    IMEvent *eHide = new IMEvent( FullscreenControlPlanHide_Type, 0 );
+    QApplication::postEvent( p_fs, static_cast<QEvent *>(eHide) );
+
+    return VLC_SUCCESS;
+}
+
+
 /**
  * It is called when video start
  */
-void FullscreenControllerWidget::regFullscreenCallback( vout_thread_t *p_vout )
+void FullscreenControllerWidget::attachVout( vout_thread_t *p_vout )
 {
-    if ( p_vout )
-    {
-        var_AddCallback( p_vout, "fullscreen", regMouseMoveCallback, this );
-    }
-}
+    assert( p_vout );
 
+    vlc_mutex_lock( &lock );
+    var_AddCallback( p_vout, "fullscreen", FullscreenControllerWidgetFullscreenChanged, this ); /* I miss a add and fire */
+    fullscreenChanged( p_vout, var_GetBool( p_vout, "fullscreen" ), var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+    vlc_mutex_unlock( &lock );
+}
 /**
- * It is called after turn off video, because p_vout is NULL now
- * we cannt delete callback, just hide if FScontroller is visible
+ * It is called after turn off video.
  */
-void FullscreenControllerWidget::unregFullscreenCallback()
+void FullscreenControllerWidget::detachVout( vout_thread_t *p_vout )
 {
-    if ( isVisible() )
-        hide();
+    assert( p_vout );
+
+    var_DelCallback( p_vout, "fullscreen", FullscreenControllerWidgetFullscreenChanged, this );
+    vlc_mutex_lock( &lock );
+    fullscreenChanged( p_vout, false, 0 );
+    vlc_mutex_unlock( &lock );
 }
 
 /**
  * Register and unregister callback for mouse moving
  */
-static int regMouseMoveCallback( vlc_object_t *vlc_object, const char *variable,
-                                 vlc_value_t old_val, vlc_value_t new_val,
-                                 void *data )
+void FullscreenControllerWidget::fullscreenChanged( vout_thread_t *p_vout, bool b_fs, int i_timeout )
 {
-    vout_thread_t *p_vout = (vout_thread_t *) vlc_object;
-
-    static bool b_registered = false;
-    FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *) data;
-
-    if ( var_GetBool( p_vout, "fullscreen" ) && !b_registered )
+    vlc_mutex_lock( &lock );
+    if( b_fs && !b_fullscreen )
     {
-        p_fs->setHideTimeout( var_GetInteger( p_vout, "mouse-hide-timeout" ) );
-        p_fs->setIsFullscreen( true );
-        var_AddCallback( p_vout, "mouse-moved",
-                        showFullscreenControllCallback, (void *) p_fs );
-        b_registered = true;
+        b_fullscreen = true;
+        i_hide_timeout = i_timeout;
+        var_AddCallback( p_vout, "mouse-moved", FullscreenControllerWidgetMouseMoved, this );
     }
-
-    if ( !var_GetBool( p_vout, "fullscreen" ) && b_registered )
+    else if( !b_fs && b_fullscreen )
     {
-        p_fs->setIsFullscreen( false );
-        p_fs->hide();
-        var_DelCallback( p_vout, "mouse-moved",
-                        showFullscreenControllCallback, (void *) p_fs );
-        b_registered = false;
+        b_fullscreen = false;
+        i_hide_timeout = i_timeout;
+        var_DelCallback( p_vout, "mouse-moved", FullscreenControllerWidgetMouseMoved, this );
+
+        /* Force fs hidding */
+        IMEvent *eHide = new IMEvent( FullscreenControlHide_Type, 0 );
+        QApplication::postEvent( this, static_cast<QEvent *>(eHide) );
     }
-
-    return VLC_SUCCESS;
-}
-
-/**
- * Show fullscreen controller after mouse move
- * after show immediately plan hide event
- */
-static int showFullscreenControllCallback( vlc_object_t *vlc_object, const char *variable,
-                                           vlc_value_t old_val, vlc_value_t new_val,
-                                           void *data )
-{
-    FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *) data;
-
-    if ( p_fs->isFSCHidden() || p_fs->windowOpacity() < DEFAULT_OPACITY )
-    {
-        IMEvent *event = new IMEvent( FullscreenControlShow_Type, 0 );
-        QApplication::postEvent( p_fs, static_cast<QEvent *>(event) );
-    }
-
-    IMEvent *e = new IMEvent( FullscreenControlPlanHide_Type, 0 );
-    QApplication::postEvent( p_fs, static_cast<QEvent *>(e) );
-
-    return VLC_SUCCESS;
+    vlc_mutex_unlock( &lock );
 }
 
 /**********************************************************************
