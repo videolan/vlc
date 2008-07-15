@@ -2762,8 +2762,8 @@ static char* FontConfig_Select( FcConfig* priv, const char* family,
 
     FcPatternAddString( pat, FC_FAMILY, (const FcChar8*)family );
     FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
-    FcPatternAddInteger( pat, FC_SLANT, b_italic ? 1000 : 0 );
-    FcPatternAddInteger( pat, FC_WEIGHT, b_bold ? 1000 : 0 );
+    FcPatternAddInteger( pat, FC_SLANT, b_italic ? FC_SLANT_ITALIC : FC_SLANT_ROMAN );
+    FcPatternAddInteger( pat, FC_WEIGHT, b_bold ? FC_WEIGHT_EXTRABOLD : FC_WEIGHT_NORMAL );
 
     FcDefaultSubstitute( pat );
 
