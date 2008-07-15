@@ -560,25 +560,25 @@ DISTCLEAN_PKG += a52dec-$(A52DEC_VERSION).tar.gz
 #	cvs -d $(MPEG2DEC_CVSROOT) co mpeg2dec
 #	(cd $@; ./bootstrap)
 
-mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
-	$(WGET) $(MPEG2DEC_URL)
+libmpeg2-$(LIBMPEG2_VERSION).tar.gz:
+	$(WGET) $(LIBMPEG2_URL)
 
 # It is easier to use bootstrapped versions...
 #mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
 #	$(WGET) $(MPEG2DEC_SNAPSHOT)
 #	mv mpeg2dec-$(MPEG2DEC_DATE).tar.gz $@
 
-mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
+libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.mpeg2: mpeg2dec
+.mpeg2: libmpeg2
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && cd libmpeg2 && make && make install && cd ../include && make && make install)
 	touch $@
 
 CLEAN_FILE += .mpeg2
-CLEAN_PKG += mpeg2dec
+CLEAN_PKG += libmpeg2
 #DISTCLEAN_PKG += mpeg2dec-$(MPEG2DEC_VERSION)-cvs.tar.gz
-DISTCLEAN_PKG += mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
+DISTCLEAN_PKG += libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 
 # ***************************************************************************
 # libid3tag

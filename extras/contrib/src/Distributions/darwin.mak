@@ -1,6 +1,6 @@
 # Darwin rules
 download-all: autoconf gnumake automake libtool gettext pkgconfig freetype2 \
-    fribidi a52dec mpeg2dec libid3tag libmad libogg libvorbis libtheora flac \
+    fribidi a52dec libmpeg2 libid3tag libmad libogg libvorbis libtheora flac \
     speex libshout faad2 faac lame twolame libebml libmatroska ffmpeg libdca \
     libdvdcss libdvdread libdvdnav libdvbpsi live libcaca libmodplug xml asa \
     jpeg tiff SDL zlib libpng libgpg-error libgcrypt opencdk gnutls \
