@@ -281,12 +281,12 @@ VLC_EXPORT( void, __pl_Release, ( vlc_object_t * ) );
 #define pl_Release(a) __pl_Release( VLC_OBJECT(a) )
 
 /* Playlist control */
-#define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, false )
-#define playlist_Pause(p) playlist_Control(p,PLAYLIST_PAUSE, false )
-#define playlist_Stop(p) playlist_Control(p,PLAYLIST_STOP, false )
-#define playlist_Next(p) playlist_Control(p,PLAYLIST_SKIP, false, 1)
-#define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, false, -1)
-#define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, false,  i)
+#define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, pl_Unlocked )
+#define playlist_Pause(p) playlist_Control(p,PLAYLIST_PAUSE, pl_Unlocked )
+#define playlist_Stop(p) playlist_Control(p,PLAYLIST_STOP, pl_Unlocked )
+#define playlist_Next(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, 1)
+#define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, -1)
+#define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked,  i)
 
 /**
  * Do a playlist action.
