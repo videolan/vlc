@@ -99,9 +99,6 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
                              int i_node_id, bool b_signal );
 
 /* Tree walking */
-int playlist_GetAllEnabledChildren( playlist_t *p_playlist,
-                                    playlist_item_t *p_node,
-                                    playlist_item_t ***ppp_items );
 playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                                     playlist_item_t *p_root,
                                     playlist_item_t *, bool, bool );
