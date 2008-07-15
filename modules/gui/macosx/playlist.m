@@ -562,12 +562,6 @@
    existence first since OSX sometimes tries to redraw items that have been
    deleted. We don't do it when not required  since this verification takes
    quite a long time on big playlists (yes, pretty hacky). */
-- (BOOL)isItem: (playlist_item_t *)p_item
-                    inNode: (playlist_item_t *)p_node
-                    checkItemExistence:(BOOL)b_check
-{
-    [self isItem:p_item inNode:p_node checkItemExistence:b_check locked:NO];
-}
 
 - (BOOL)isItem: (playlist_item_t *)p_item
                     inNode: (playlist_item_t *)p_node
@@ -627,6 +621,13 @@
 
     vlc_object_release( p_playlist );
     return NO;
+}
+
+- (BOOL)isItem: (playlist_item_t *)p_item
+                    inNode: (playlist_item_t *)p_node
+                    checkItemExistence:(BOOL)b_check
+{
+    [self isItem:p_item inNode:p_node checkItemExistence:b_check locked:NO];
 }
 
 /* This method is usefull for instance to remove the selected children of an
@@ -748,7 +749,7 @@
                 p_item = NULL;
             }
         }
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, false, p_node, p_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked, p_node, p_item );
     }
     vlc_object_release( p_playlist );
 }
@@ -856,7 +857,7 @@
             playlist_NodeDelete( p_playlist, p_item, true, false );
         }
         else
-            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id, true );
+            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id, pl_Locked );
     }
     PL_UNLOCK;
 
@@ -1017,13 +1018,13 @@
         
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
              i_position == -1 ? PLAYLIST_END : i_position + i_item, true,
-         true );
+         pl_Locked );
 
         if( i_item == 0 && !b_enqueue )
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, NULL, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, pl_Locked );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, NULL, p_item );
         }
         vlc_gc_decref( p_input );
     }
@@ -1051,19 +1052,21 @@
 
         /* Add the item */
         /* FIXME: playlist_BothAddInput() can fail */
-       playlist_BothAddInput( p_playlist, p_input, p_node,
+        PL_LOCK;
+        playlist_BothAddInput( p_playlist, p_input, p_node,
                                       PLAYLIST_INSERT,
                                       i_position == -1 ?
                                       PLAYLIST_END : i_position + i_item,
-                                      NULL, NULL, false );
+                                      NULL, NULL, pl_Locked );
 
 
         if( i_item == 0 && !b_enqueue )
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, NULL, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, pl_Locked );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, NULL, p_item );
         }
+        PL_UNLOCK;
         vlc_gc_decref( p_input );
     }
     [self playlistUpdated];
