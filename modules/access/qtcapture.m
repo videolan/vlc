@@ -107,7 +107,7 @@ vlc_module_end();
     {
         imageBufferToRelease = currentImageBuffer;
         currentImageBuffer = videoFrame;
-        currentPts = [sampleBuffer presentationTime].timeValue;
+        currentPts = 1000000L / [sampleBuffer presentationTime].timeScale * [sampleBuffer presentationTime].timeValue;
     }
     CVBufferRelease(imageBufferToRelease);
 }
@@ -356,9 +356,6 @@ static int Demux( demux_t *p_demux )
         return 1;
     }
 
-    /* FIXME */
-    p_block->i_pts = mdate();
-
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
     es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
 
@@ -390,12 +387,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
            *pi64 = (int64_t)DEFAULT_PTS_DELAY;
            return VLC_SUCCESS;
 
-        case DEMUX_GET_TIME:
-           pi64 = (int64_t*)va_arg( args, int64_t * );
-           *pi64 = mdate();
-           return VLC_SUCCESS;
-
-        /* TODO implement others */
         default:
            return VLC_EGENERIC;
     }
