@@ -513,7 +513,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)mouseDown:(NSEvent *)o_event
 {
     vlc_value_t val;
-NSLog(@"Down");
     if( p_vout )
     {
         if( ( [o_event type] == NSLeftMouseDown ) &&
