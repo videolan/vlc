@@ -887,6 +887,15 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     [o_window performSelectorOnMainThread: @selector(leaveFullscreen) withObject: NULL waitUntilDone: NO];
 }
 
+
+- (void)scaleWindowWithFactor: (float)factor animate: (BOOL)animate
+{
+    if( p_vout->b_fullscreen )
+        return;
+    [o_window setMovableByWindowBackground: NO];
+    [super scaleWindowWithFactor: factor animate: animate];
+    [o_window setMovableByWindowBackground: YES];
+}
 @end
 
 /*****************************************************************************
@@ -989,7 +998,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     /* FIXME: fix core */
     [o_embeddedwindow performSelector:@selector(orderOut:) withObject:nil afterDelay:3.];
 
-    [o_window setAcceptsMouseMovedEvents: NO];
     [[[VLCMain sharedInstance] getEmbeddedList] releaseEmbeddedVout: self];
 }
 
