@@ -25,6 +25,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "misc.h"
 /*****************************************************************************
  * VLCEmbeddedList interface
  *****************************************************************************/
@@ -110,26 +111,21 @@
 /*****************************************************************************
  * VLCVoutWindow interface
  *****************************************************************************/
-@interface VLCVoutWindow : NSWindow
+@interface VLCVoutWindow : VLCWindow
 {
     vout_thread_t * p_vout;
     VLCVoutView   * o_view;
     NSRect        * s_frame;
 
-    vout_thread_t * p_real_vout;
     bool      b_init_ok;
-    bool      b_black;
-    bool      b_embedded;
+    BOOL      fullscreen;
+    NSRect    initialFrame;
 }
 
 - (id) initWithVout: (vout_thread_t *) p_vout view: (VLCVoutView *) view
                      frame: (NSRect *) s_frame;
 - (id)initMainThread: (id) sender;
-- (void)close;
-- (void)closeWindow;
-- (id)closeMainThread: (id) sender;
+- (void)leaveFullscreen;
+- (void)enterFullscreen;
 - (id)getVoutView;
-
-- (BOOL)windowShouldClose:(id)sender;
-
 @end

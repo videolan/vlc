@@ -513,7 +513,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)mouseDown:(NSEvent *)o_event
 {
     vlc_value_t val;
-
+NSLog(@"Down");
     if( p_vout )
     {
         if( ( [o_event type] == NSLeftMouseDown ) &&
@@ -801,6 +801,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     return self;
 }
 
+- (BOOL)mouseDownCanMoveWindow
+{
+    return YES;
+}
+
 - (bool)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
                      frame: (NSRect *) s_arg_frame
 {
@@ -808,22 +813,19 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     i_time_mouse_last_moved = mdate();
     o_window = [[VLCVoutWindow alloc] initWithVout: p_arg_vout view: self
                                                     frame: s_arg_frame];
+    
     [self updateTitle];
-    [view setFrame: [self frame]];
+    if([self isFullscreen])
+        [o_window performSelectorOnMainThread: @selector(enterFullscreen) withObject: NULL waitUntilDone: YES];
+    else
+        [view setFrame: [self frame]];
 
-    if( var_GetBool( p_real_vout, "video-on-top" ) )
-    {
-        [o_window setLevel: NSStatusWindowLevel];
-    }
-
-    [o_window setAcceptsMouseMovedEvents: TRUE];
     return b_return;
 }
 
 - (void)closeVout
 {
-    [o_window closeWindow];
-    [o_window setAcceptsMouseMovedEvents: NO];
+    [o_window performSelectorOnMainThread: @selector(close) withObject: NULL waitUntilDone: YES];
     i_time_mouse_last_moved = 0;
     [super closeVout];
 }
@@ -876,27 +878,14 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)enterFullscreen
 {
     [super enterFullscreen];
+    [o_window performSelectorOnMainThread: @selector(enterFullscreen) withObject: NULL waitUntilDone: NO];
 
-    if( var_GetBool( p_real_vout, "video-on-top" ) )
-    {
-        [o_window setLevel: NSNormalWindowLevel];
-    }
-
-    [[o_view class] performSelectorOnMainThread:@selector(resetVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
 }
 
 - (void)leaveFullscreen
 {
     [super leaveFullscreen];
-
-    if( var_GetBool( p_real_vout, "video-on-top" ) )
-    {
-        [o_window setLevel: NSStatusWindowLevel];
-    }
-
-    [[o_view class] performSelectorOnMainThread:@selector(resetVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
+    [o_window performSelectorOnMainThread: @selector(leaveFullscreen) withObject: NULL waitUntilDone: NO];
 }
 
 @end
@@ -1035,208 +1024,123 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     p_vout  = vout;
     o_view  = view;
     s_frame = frame;
-
+    b_init_ok = NO;
     [self performSelectorOnMainThread: @selector(initMainThread:)
         withObject: NULL waitUntilDone: YES];
 
-    if( !b_init_ok )
-    {
-        return NULL;
-    }
-
-    return self;
+    return b_init_ok ? self : nil;
 }
 
 - (id)initMainThread: (id) sender
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    NSArray *o_screens = [NSScreen screens];
-    NSScreen *o_screen;
-    bool b_menubar_screen = false;
-    int i_device;
+    NSRect rect;
+    rect.size.height = p_vout->i_window_height;
+    rect.size.width  = p_vout->i_window_width;
+    rect.origin.x = rect.origin.y = 70.;
 
-    b_init_ok = false;
-
-    p_real_vout = [VLCVoutView getRealVout: p_vout];
-    i_device = var_GetInteger( p_real_vout->p_libvlc, "video-device" );
-    b_black = NO;
-    b_embedded = var_GetBool( p_vout, "embedded-video" );
-
-    /* Find out on which screen to open the window */
-    o_screen = [NSScreen screenWithDisplayID: (CGDirectDisplayID)i_device];
-
-    if( !o_screen )
-        o_screen = [NSScreen mainScreen];
-
-    if( [o_screen isMainScreen] )
-        b_menubar_screen = true;
-
-    if( p_vout->b_fullscreen )
+    if( self = [super initWithContentRect:rect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO])
     {
-        CGDisplayFadeReservationToken token;
-        NSRect screen_rect = [o_screen frame];
-        screen_rect.origin.x = screen_rect.origin.y = 0;
+        [self setBackgroundColor:[NSColor blackColor]];
+        [self setHasShadow:YES];
+        [self setMovableByWindowBackground: YES];
+        [self center];
+        [self makeKeyAndOrderFront: self];
+        [self setReleasedWhenClosed: YES];
 
-        b_black = var_GetBool( p_vout, "macosx-black" );
+        /* We'll catch mouse events */
+        [self makeFirstResponder: o_view];
+        [self setCanBecomeKeyWindow: YES];
 
-        /* move the FSPanel to front in case that it is currently shown
-         * this won't and is not supposed to work when it's fading right now */
-        if( [[[[VLCMain sharedInstance] getControls] getFSPanel] isDisplayed] )
-            [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
- 
-        /* tell the fspanel to move itself to front next time it's triggered */
-        [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: i_device];
-
-        /* Creates a window with size: screen_rect on o_screen */
-        [self initWithContentRect: screen_rect
-              styleMask: NSBorderlessWindowMask
-              backing: NSBackingStoreBuffered
-              defer: YES screen: o_screen];
- 
-        if( b_menubar_screen )
+        if( var_GetBool( p_vout, "macosx-background" ) )
         {
-            SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+            int i_device = var_GetInteger( p_vout->p_libvlc, "video-device" );
+
+            /* Find out on which screen to open the window */
+            NSScreen * screen = [NSScreen screenWithDisplayID: (CGDirectDisplayID)i_device];
+            if( !screen ) screen = [NSScreen mainScreen];
+
+            NSRect screen_rect = [screen frame];
+            screen_rect.origin.x = screen_rect.origin.y = 0;
+
+            /* Creates a window with size: screen_rect on o_screen */
+            [self setFrame: screen_rect display: NO];
+
+            [self setLevel: CGWindowLevelForKey(kCGDesktopWindowLevelKey)];
+            [self setMovableByWindowBackground: NO];
         }
-        if( b_black == true )
+        if( var_GetBool( p_vout, "video-on-top" ) )
         {
-            CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
-            CGDisplayFade( token, 0.6 , kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
-
-            [o_screen blackoutOtherScreens];
-
-            CGDisplayFade( token, 0.3 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
-            CGReleaseDisplayFadeReservation( token);
+            [self setLevel: NSStatusWindowLevel];
         }
-    }
-    else if( var_GetBool( p_vout, "macosx-background" ) )
-    {
-        NSRect screen_rect = [o_screen frame];
-        screen_rect.origin.x = screen_rect.origin.y = 0;
-
-        /* Creates a window with size: screen_rect on o_screen */
-        [self initWithContentRect: screen_rect
-              styleMask: NSBorderlessWindowMask
-              backing: NSBackingStoreBuffered
-              defer: YES screen: o_screen];
-
-        [self setLevel: CGWindowLevelForKey(kCGDesktopWindowLevelKey)];
-    }
-    else
-    {
-        unsigned int i_stylemask = NSTitledWindowMask |
-                                   NSMiniaturizableWindowMask |
-                                   NSClosableWindowMask |
-                                   NSResizableWindowMask;
-
-        NSRect s_rect;
-        if( !s_frame )
-        {
-            s_rect.size.width  = p_vout->i_window_width;
-            s_rect.size.height = p_vout->i_window_height;
-        }
-        else
-        {
-            s_rect = *s_frame;
-        }
-
-        [self initWithContentRect: s_rect
-              styleMask: i_stylemask
-              backing: NSBackingStoreBuffered
-              defer: YES screen: o_screen];
 
         [self setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
 
-        if( !s_frame )
-        {
-            [self center];
-        }
+        /* Add the view. It's automatically resized to fit the window */
+        [self setContentView: o_view];
+
+        b_init_ok = YES;
     }
-
-    [self makeKeyAndOrderFront: nil];
-    [self setReleasedWhenClosed: YES];
-
-    /* We'll catch mouse events */
-    [self makeFirstResponder: o_view];
-
-    /* Add the view. It's automatically resized to fit the window */
-    [self setContentView: o_view];
-
-    [o_pool release];
-
-    b_init_ok = true;
     return self;
 }
 
-- (void)close
+- (void)enterFullscreen
 {
-    [o_view closeVout];
-}
+    if( fullscreen ) return;
 
-- (void)closeWindow
-{
-    /* XXX waitUntilDone = NO to avoid a possible deadlock when hitting
-       Command-Q */
-    [self performSelectorOnMainThread: @selector(closeMainThread:)
-        withObject: NULL waitUntilDone: NO];
-}
+    NSScreen *screen;
+    int i_device;
+    BOOL b_black = NO;
 
-- (id)closeMainThread:(id)sender
-{
-    if( b_black == true )
+    i_device = var_GetInteger( p_vout->p_libvlc, "video-device" );
+    b_black = var_GetBool( p_vout, "macosx-black" );
+
+    /* Find out on which screen to open the window */
+    screen = [NSScreen screenWithDisplayID: (CGDirectDisplayID)i_device];
+    if( !screen ) screen = [self screen];
+
+    if( b_black && [[NSScreen screens] count] > 1)
     {
         CGDisplayFadeReservationToken token;
         CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
-        CGDisplayFade( token, 0.3 , kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
- 
-        [self disableScreenUpdatesUntilFlush];
-        [self orderOut: self];
+        CGDisplayFade( token, 0.2 , kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
 
-        CGDisplayFade( token, 0.6 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, YES );
+        [screen blackoutOtherScreens];
+
+        CGDisplayFade( token, 0.1 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
         CGReleaseDisplayFadeReservation( token);
-        CGDisplayRestoreColorSyncSettings();
     }
-    [NSScreen unblackoutScreens];
 
-    SetSystemUIMode( kUIModeNormal, 0);
-    [super close];
-    /* this does only work in embedded mode */
-    if( b_embedded == true )
-        [[[[VLCMain sharedInstance] getControls] getFSPanel] orderOut: self];
+    [self setMovableByWindowBackground: NO];
 
-    return NULL;
+    /* tell the fspanel to move itself to front next time it's triggered */
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: i_device];
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
+
+    if( [screen isMainScreen] )
+        SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+
+    initialFrame = [self frame];
+    [self setFrame:[screen frame] display:YES animate:YES];
+    fullscreen = YES;
 }
 
-- (id)getVoutView
+- (void)leaveFullscreen
+{
+    if( !fullscreen ) return;
+    fullscreen = NO;
+
+    [NSScreen unblackoutScreens];
+
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
+    SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+    [self setFrame:initialFrame display:YES animate:YES];
+    [self setMovableByWindowBackground: YES];
+}
+
+- (id)getVoutView // FIXME Naming scheme!
 {
     return o_view;
 }
 
-- (BOOL)canBecomeKeyWindow
-{
-    return YES;
-}
-
-/* Sometimes crashes VLC....
-- (BOOL)performKeyEquivalent:(NSEvent *)o_event
-{
-        return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event];
-}*/
-
-/* This is actually the same as VLCControls::stop. */
-
-- (BOOL)windowShouldClose:(id)sender
-{
-    playlist_t * p_playlist = pl_Yield( p_vout );
-    if( p_playlist == NULL )
-    {
-        return NO;
-    }
-
-    playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
-
-    /* The window will be closed by the intf later. */
-    return NO;
-}
-
 @end
+
