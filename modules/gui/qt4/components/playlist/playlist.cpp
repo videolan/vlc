@@ -79,6 +79,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     leftW->addWidget( artContainer );
 
     /* Initialisation of the playlist */
+    playlist_t * p_playlist = THEPL;
     PL_LOCK;
     playlist_item_t *p_root =
                   playlist_GetPreferredNode( THEPL, THEPL->p_local_category );
