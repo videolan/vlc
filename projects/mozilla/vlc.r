@@ -114,6 +114,9 @@ resource 'STR#' (128,"MIME Type")
         /* FLV */
         "video/flv", "flv",
         "video/x-flv", "flv",
+        /* MKV */
+        "video/x-matroska", "mkv",
+        "audio/x-matroska", "mka",
 
     };
 };

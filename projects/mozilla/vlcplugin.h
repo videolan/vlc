@@ -223,7 +223,10 @@ private:
     "video/divx:divx:DivX video;" \
     /* FLV */ \
     "video/flv:flv:FLV video;" \
-    "video/x-flv:flv:FLV video;"
+    "video/x-flv:flv:FLV video;" \
+    /* Matroska */ \
+    "video/x-matroska:mkv:Matroska video;" \
+    "audio/x-matroska:mka:Matroska audio;"
 
 
 
