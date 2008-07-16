@@ -34,7 +34,7 @@
 #include <vlc_vout.h>
 #include <vlc_codec.h>
 
-#include <mpeg2dec/mpeg2.h>
+#include <mpeg2.h>
 
 #include <vlc_codec_synchro.h>
 

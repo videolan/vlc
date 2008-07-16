@@ -3395,8 +3395,7 @@ if test "${enable_libmpeg2}" != "no"
 then
   AC_ARG_WITH(libmpeg2-tree,
   [    --with-libmpeg2-tree=PATH libmpeg2 tree for static linking])
-  if test -n "${with_libmpeg2_tree}"
-  then
+  AS_IF([test -n "${with_libmpeg2_tree}"],[
     AC_MSG_CHECKING(for libmpeg2.a in ${with_libmpeg2_tree})
     real_libmpeg2_tree="`cd ${with_libmpeg2_tree} 2>/dev/null && pwd`"
     if test -z "${real_libmpeg2_tree}"
@@ -3409,34 +3408,22 @@ then
     then
       dnl  Use a custom libmpeg2
       AC_MSG_RESULT(${real_libmpeg2_tree}/libmpeg2/.libs/libmpeg2.a)
-      VLC_ADD_BUILTINS([libmpeg2])
+      VLC_ADD_PLUGIN([libmpeg2])
       VLC_ADD_LIBS([libmpeg2],[-L${real_libmpeg2_tree}/libmpeg2/.libs -lmpeg2])
       VLC_ADD_CFLAGS([libmpeg2],[-I${real_libmpeg2_tree}/include])
-      eval "`cd ${real_libmpeg2_tree}/include && ln -sf . mpeg2dec 2>/dev/null`"
     else
       dnl  The given libmpeg2 wasn't built
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_libmpeg2_tree}/libmpeg2/.libs/libmpeg2.a, make sure you compiled libmpeg2 in ${with_libmpeg2_tree}])
     fi
-  else
-    AC_CHECK_HEADERS(mpeg2dec/mpeg2.h, [
-      AC_MSG_CHECKING(for libmpeg2 version >= 0.3.2)
-      AC_EGREP_CPP(yes,
-        [#include <mpeg2dec/mpeg2.h>
-         #ifdef MPEG2_RELEASE
-         #if MPEG2_RELEASE >= MPEG2_VERSION(0,3,2)
-         yes
-         #endif
-         #endif],
-        [AC_MSG_RESULT([yes])
+  ],[
+   PKG_CHECK_MODULES(LIBMPEG2,[libmpeg2 > 0.3.2],[ 
           VLC_ADD_PLUGIN([libmpeg2])
-          VLC_ADD_LIBS([libmpeg2],[-lmpeg2])],
-        [AC_MSG_RESULT([no])
-          AC_MSG_ERROR([Your libmpeg2 is too old (you need the cvs version): you may get a more recent one from http://libmpeg2.sf.net/. Alternatively you can use --disable-libmpeg2 to disable the libmpeg2 plugin.])])],
-
-      [AC_MSG_ERROR([Could not find libmpeg2 on your system: you may get it from http://libmpeg2.sf.net/ (you need the cvs version). Alternatively you can use --disable-libmpeg2 to disable the libmpeg2 plugin.])]
-    )
-  fi
+          VLC_ADD_LIBS([libmpeg2], $LIBMPEG2_LIBS),
+          VLC_ADD_CFLAGS([libmpeg2], $LIBMPEG2_CFLAGS)
+       ], 
+      AC_MSG_WARN([Could not find libmpeg2 on your system: you may get it from http://libmpeg2.sf.net/ . Alternatively you can use --disable-libmpeg2 to disable the libmpeg2 plugin.]))
+  ])
 fi
 
 dnl
