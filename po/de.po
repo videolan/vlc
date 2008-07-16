@@ -495,25 +495,23 @@ msgid "There is no help available for these modules."
 msgstr "Für diese Module ist keine Hilfe verfügbar."
 
 #: include/vlc_interface.h:134
-#, fuzzy
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a command-line window, go "
 "to the directory where you installed VLC and run \"vlc -I qt\"\n"
 msgstr ""
 "\n"
-"Warnung: Falls Sie das graphische Interface nicht mehr benutzen können, "
-"öffnen Sie die DOS-Eingabe, gehen in den Ordner von VLC und führen \"vlc -I "
-"wx\" aus.\n"
+"Warnung: Wenn Sie auf das graphische Interface nicht mehr zugreifen können, "
+"öffnen Sie die Befehlszeile, gehen Sie in den Ordner von VLC und führen "
+"\"vlc -I qt\" aus.\n"
 
 #: include/vlc_intf_strings.h:29
 msgid "Quick &Open File..."
-msgstr "Einfaches Datei &öffnen..."
+msgstr "Schnelles Datei &öffnen..."
 
 #: include/vlc_intf_strings.h:30
-#, fuzzy
 msgid "&Advanced Open..."
-msgstr "Erweitertes Öffnen..."
+msgstr "&Erweitertes Öffnen..."
 
 #: include/vlc_intf_strings.h:31
 msgid "Open &Directory..."
@@ -536,12 +534,10 @@ msgid "Messages..."
 msgstr "Meldungen..."
 
 #: include/vlc_intf_strings.h:40
-#, fuzzy
 msgid "Extended Settings..."
 msgstr "Erweiterte Einstellungen..."
 
 #: include/vlc_intf_strings.h:41
-#, fuzzy
 msgid "Go to Specific Time..."
 msgstr "Zu genauer Position springen..."
 
@@ -573,7 +569,6 @@ msgid "Play"
 msgstr "Wiedergabe"
 
 #: include/vlc_intf_strings.h:49
-#, fuzzy
 msgid "Fetch Information"
 msgstr "Informationen abrufen"
 
@@ -614,7 +609,6 @@ msgid "Repeat all"
 msgstr "Alle wiederholen"
 
 #: include/vlc_intf_strings.h:61
-#, fuzzy
 msgid "Repeat one"
 msgstr "Eines wiederholen"
 
@@ -628,7 +622,6 @@ msgid "Random"
 msgstr "Zufällig"
 
 #: include/vlc_intf_strings.h:65
-#, fuzzy
 msgid "Random off"
 msgstr "Zufällig aus"
 
@@ -653,12 +646,10 @@ msgid "Add directory..."
 msgstr "Verzeichnis hinzufügen..."
 
 #: include/vlc_intf_strings.h:74
-#, fuzzy
 msgid "Save Playlist to File..."
 msgstr "Wiedergabeliste in Datei speichern..."
 
 #: include/vlc_intf_strings.h:75
-#, fuzzy
 msgid "Load Playlist File..."
 msgstr "Wiedergabeliste öffnen..."
 
@@ -667,18 +658,15 @@ msgid "Search"
 msgstr "Suchen"
 
 #: include/vlc_intf_strings.h:78
-#, fuzzy
 msgid "Search Filter"
 msgstr "Suchfilter"
 
 #: include/vlc_intf_strings.h:80
-#, fuzzy
 msgid "Additional Sources"
-msgstr "Zusätzliche Fehlersuche"
+msgstr "Zusätzliche Quellen"
 
 # Erweiterte Optionen gibt es nicht mehr...
 #: include/vlc_intf_strings.h:84
-#, fuzzy
 msgid ""
 "Some options are available but hidden. Check \"Advanced options\" to see "
 "them."
@@ -691,9 +679,8 @@ msgid "Image clone"
 msgstr "Bild klonen"
 
 #: include/vlc_intf_strings.h:90
-#, fuzzy
 msgid "Clone the image"
-msgstr "Eingabebilder (Feeds)"
+msgstr "Das Bild klonen."
 
 #: include/vlc_intf_strings.h:92 modules/gui/qt4/ui/video_effects.ui:440
 #, fuzzy
@@ -709,24 +696,20 @@ msgstr ""
 "festlegen."
 
 #: include/vlc_intf_strings.h:96 modules/gui/qt4/ui/video_effects.ui:545
-#, fuzzy
 msgid "Waves"
-msgstr "Welle"
+msgstr "Wellen"
 
 #: include/vlc_intf_strings.h:97
-#, fuzzy
 msgid "\"Waves\" video distortion effect"
-msgstr "Fügt Verzerrungseffekte hinzu"
+msgstr "Wellenförmiger Videoverzerrungseffekt"
 
 #: include/vlc_intf_strings.h:99
-#, fuzzy
 msgid "\"Water surface\" video distortion effect"
-msgstr "Fügt Verzerrungseffekte hinzu"
+msgstr "Videoverzerrungseffekt in Form einer Wasseroberfläche"
 
 #: include/vlc_intf_strings.h:101
-#, fuzzy
 msgid "Image colors inversion"
-msgstr "Bildumkehrung"
+msgstr "Umkehrung der Bildfarben"
 
 #: include/vlc_intf_strings.h:103
 msgid "Split the image to make an image wall"
@@ -760,7 +743,6 @@ msgstr ""
 "Einstellungen festgelegten, werden durch Schwarz und Weiß ersetzt."
 
 #: include/vlc_intf_strings.h:115
-#, fuzzy
 msgid ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
@@ -793,37 +775,37 @@ msgstr ""
 "charset=utf-8\" /></head><body><h2>Willkommen zur VLC media player Hilfe!</"
 "h2><h3>Dokumentation</h3><p>Die VLC Dokumentation ist auf VideoLANs <a href="
 "\"http://wiki.videolan.org\">Wiki</a> zu finden.</p><p>Wenn Sie neu beim VLC "
-"media player sind, dann lesen sie bitte die Einführung <br><a href=\"http://"
+"media player sind, lesen sie bitte die Einführung <br><a href=\"http://"
 "wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>Wie Sie den Player benutzen, finden Sie im "
-"Dokument <br>\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo"
+"media player</em></a>.</p><p>Einige Informationen zur Benutzung des Players "
+"finden Sie im Dokument "
+"<br>\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo"
 "\"><em>How to play files with VLC media player</em></a>\".</"
-"p><p>Informationen zum Speichern, Konvertieren, Transkodieren, Enkodieren, "
-"Muxing und Streaming finden sich in der Dokumentation zum <a href=\"http://"
-"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming</a>.</p><p>Wenn "
-"Sie mit den Begriffen noch nicht ganz zurecht kommen, konsultieren Sie bitte "
-"die <a href=\"http://wiki.videolan.org/Knowledge_Base\">Knowledge Base</a>.</"
-"p><p>Für die grundlegensten Tastenkürzel, gehen Sie auf die <a href=\"http://"
-"wiki.videolan.org/Hotkeys\">Hotkeys</a>-Seite.</p><h3>Hilfe</h3><p>Bevor Sie "
-"Fragen stellen, werfen Sie bitte einen Blick auf die <a href=\"http://wiki."
-"videolan.org/Frequently_Asked_Questions\">Liste der häufig gestellten Fragen "
-"(FAQ)</a>.</p><p>Danach können Sie mit uns gerne im <a href=\"http://forum."
-"videolan.org\">Forum</a>, der <a href=\"http://www.videolan.org/vlc/lists."
-"html\">Mailingliste</a> oder unserem IRC-Channel (<a href=\"http://www."
-"videolan.org/webirc/\"><em>#videolan</em></a> auf irc.freenode.net) Kontakt "
-"aufnehmen, um weitere Hilfestellungen zu erhalten bzw. auch zu geben.</"
+"p><p>Für all die Funktionen zum Speichern, Konvertieren, Transkodieren, "
+"Enkodieren, Muxing und Streaming finden Sie nützliche Informationen in der "
+"<a href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
+"Documentation</a>.</p><p>Wenn Sie mit der Terminologie unsicher sind, "
+"durchsuchen Sie bitte die <a href=\"http://wiki.videolan.org/Knowledge_Base\">"
+"Knowledge Base</a>.</p><p>Für die grundlegenden Tastenkürzel, lesen Sie die "
+"Seite <a href=\"http://wiki.videolan.org/Hotkeys\">Shortcuts</a>.</p>"
+"<h3>Hilfe</h3><p>Bevor Sie Fragen stellen, werfen Sie bitte einen Blick auf "
+"die <a href=\"http://wiki.videolan.org/Frequently_Asked_Questions\">Liste "
+"der häufig gestellten Fragen (FAQ)</a>.</p><p>Dann können Sie im <a href"
+"=\"http://forum.videolan.org\">Forum</a>, auf den <a href=\"http://www."
+"videolan.org/vlc/lists.html\">Mailinglisten</a> oder in unserem IRC-Channel "
+"(<a href=\"http://www.videolan.org/webirc/\"><em>#videolan</em></a> auf "
+"irc.freenode.net) Hilfestellungen erhalten und geben.</"
 "p><h3>Zum Projekt beitragen</h3><p>Sie können dem VideoLAN-Projekt helfen, "
 "indem Sie etwas Zeit für Hilfe in der VideoLAN Community aufwenden, Skins "
 "entwerfen, die Dokumentation übersetzen, Testen und natürlich Programmieren. "
-"Sie können uns auch mit Spenden (sei es Geld oder etwas zum \"Anfassen\") "
+"Sie können uns auch materiell oder finanziell mit Spenden "
 "unterstützen. Und natürlich, können Sie den VLC media player auch einfach "
 "<b>bekannt machen</b>.</p></body></html>"
 
 #: src/audio_output/filters.c:159 src/audio_output/filters.c:206
 #: src/audio_output/filters.c:229
-#, fuzzy
 msgid "Audio filtering failed"
-msgstr "Audiofilter"
+msgstr "Audiofiltern fehlgeschlagen"
 
 #: src/audio_output/filters.c:160 src/audio_output/filters.c:207
 #: src/audio_output/filters.c:230
@@ -961,9 +943,9 @@ msgid "%s: option `%s' requires an argument\n"
 msgstr "%s: Option `%s' benötigt ein Argument\n"
 
 #: src/extras/getopt.c:710 src/extras/getopt.c:716
-#, fuzzy, c-format
+#, c-format
 msgid "%s: unrecognized option `%s%s'\n"
-msgstr "%s: unerkannte Option `%c%s'\n"
+msgstr "%s: unbekannte Option `%s%s'\n"
 
 #: src/extras/getopt.c:743
 #, c-format
@@ -983,7 +965,7 @@ msgstr "%s: Option benötigt ein Argument -- %c\n"
 #: src/extras/getopt.c:823
 #, c-format
 msgid "%s: option `-W %s' is ambiguous\n"
-msgstr "%s: Option `-W %s' ist doppeldeutig\n"
+msgstr "%s: Option `-W %s' ist mehrdeutig\n"
 
 #: src/extras/getopt.c:841
 #, c-format
@@ -1364,13 +1346,13 @@ msgid " (default disabled)"
 msgstr " (standardmäßig aus)"
 
 #: src/libvlc.c:1805 src/libvlc.c:1808
-#, fuzzy
 msgid "Note:"
-msgstr "Kein"
+msgstr "Beachten Sie:"
 
 #: src/libvlc.c:1806 src/libvlc.c:1809
 msgid "add --advanced to your command line to see advanced options."
-msgstr ""
+msgstr "Fügen Sie Ihr Befehlszeile --advanced hinzu, um alle erweiteren "
+"Optionen zu sehen."
 
 #: src/libvlc.c:1913
 #, c-format
@@ -1388,9 +1370,9 @@ msgid "Compiler: %s\n"
 msgstr "Compiler: %s\n"
 
 #: src/libvlc.c:1918
-#, fuzzy, c-format
+#, c-format
 msgid "Based upon Git commit [%s]\n"
-msgstr "Basiert auf SVN Revision [%s]\n"
+msgstr "Basiert auf Git commit [%s]\n"
 
 #: src/libvlc.c:1954
 msgid ""
@@ -1398,7 +1380,7 @@ msgid ""
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 "\n"
-"Inhalt nach  vlc-help.txt gespeichert.\n"
+"Inhalt in vlc-help.txt Datei gespeichert.\n"
 
 #: src/libvlc.c:1974
 msgid ""
@@ -2135,9 +2117,8 @@ msgid "Embedded video"
 msgstr "Eingebettetes Video"
 
 #: src/libvlc-module.c:385
-#, fuzzy
 msgid "Embed the video output in the main interface."
-msgstr "Videoausgabe in Interface integrieren"
+msgstr "Videoausgabe in Haupt-Interface integrieren"
 
 #: src/libvlc-module.c:387
 msgid "Fullscreen video output"
@@ -2170,14 +2151,12 @@ msgid "Always place the video window on top of other windows."
 msgstr "Platziert das Videofenster immer über allen anderen Fenstern."
 
 #: src/libvlc-module.c:400
-#, fuzzy
 msgid "Show media title on video."
-msgstr "Einblendungen/Untertitel"
+msgstr "Medientitel im Video einblenden."
 
 #: src/libvlc-module.c:402
-#, fuzzy
 msgid "Display the title of the video on top of the movie."
-msgstr "Platziert das Videofenster immer über allen anderen Fenstern."
+msgstr "Blendet den Namen des Videos im Bild ein."
 
 #: src/libvlc-module.c:404
 msgid "Show video title for x miliseconds."
@@ -2190,26 +2169,25 @@ msgstr ""
 "Sek.)."
 
 #: src/libvlc-module.c:408
-#, fuzzy
 msgid "Position of video title."
-msgstr "Bewegungserkennungs-Videofilter"
+msgstr "Position des Videotitels"
 
 #: src/libvlc-module.c:410
 msgid "Place on video where to display the title (default bottom center)."
-msgstr ""
+msgstr "Die Stelle im Bild an der der Titel eingeblendet wird (standardmäßig "
+"unten-mitte)."
 
 #: src/libvlc-module.c:412
 msgid "Hide cursor and fullscreen controller after x miliseconds."
 msgstr ""
 
 #: src/libvlc-module.c:415
-#, fuzzy
 msgid ""
 "Hide mouse cursor and fullscreen controller after n miliseconds, default is "
 "3000 ms (3 sec.)"
 msgstr ""
-"Videotitel für n Millisekunden anzeigen. Der Standardwert ist 5000 ms (5 "
-"Sek.)."
+"Mauscursor und Vollbildsteuerung nach n Millisekunden ausblenden. "
+"Standardmäßig 3000 ms (3 sec.)."
 
 #: src/libvlc-module.c:423
 msgid "Disable screensaver"
@@ -2244,9 +2222,8 @@ msgstr ""
 "verhindern, um ein \"minimales\" Fenster zu zeigen."
 
 #: src/libvlc-module.c:435
-#, fuzzy
 msgid "Video output filter module"
-msgstr "Videoausgabe-Modul"
+msgstr "Videoausgabe-Filtermodul"
 
 #: src/libvlc-module.c:437
 msgid ""
@@ -2295,7 +2272,7 @@ msgstr "Videoschnappschuss-Vorschau anzeigen"
 
 #: src/libvlc-module.c:461
 msgid "Display the snapshot preview in the screen's top-left corner."
-msgstr ""
+msgstr "" 
 "Zeit die Schnappschussvorschau in der linken oberen Ecke des Bildschirms an."
 
 #: src/libvlc-module.c:463
@@ -2309,31 +2286,30 @@ msgstr ""
 "kennzeichnen"
 
 #: src/libvlc-module.c:467
-#, fuzzy
 msgid "Video snapshot width"
-msgstr "Videoschnappschuss-Format"
+msgstr "Breites des Videoschnappschusses"
 
 #: src/libvlc-module.c:469
-#, fuzzy
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
-"Sie können die Videohöhe erzwingen. Standardmäßig (-1) wird VLC die "
-"Filmeigenschaften übernehmen."
+"Sie können die Breite des Videoschnappschusses erzwingen. Standardmäßig wird "
+"die Originalbreite (-1) beibehalten. 0 skaliert die Breite, um das "
+"Seitenverhältnis beizubehalten."
 
 #: src/libvlc-module.c:473
-#, fuzzy
 msgid "Video snapshot height"
-msgstr "Videoleinwandhöhe"
+msgstr "Höhe des Videoschnappschusses"
 
 #: src/libvlc-module.c:475
-#, fuzzy
 msgid ""
 "You can enforce the height of the video snapshot. By default it will keep "
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
-msgstr "Sie können die Höhe des Schnappschusses einstellen."
+msgstr "Sie können die Höhe des Schnappschusses erzwingen. Standardmäßig wird "
+"die Originalbreite (-1) beibehalten. 0 skaliert die Höhe, um das "
+"Seitenverhältnis beizubehalten."
 
 #: src/libvlc-module.c:479
 msgid "Video cropping"
@@ -2697,14 +2673,12 @@ msgid "The stream will stop at this position (in seconds)."
 msgstr "Beendet den Stream an dieser Position (in Sekunden)."
 
 #: src/libvlc-module.c:648
-#, fuzzy
 msgid "Run time"
-msgstr "Rundi"
+msgstr "Laufzeit"
 
 #: src/libvlc-module.c:650
-#, fuzzy
 msgid "The stream will run this duration (in seconds)."
-msgstr "Startet den Stream an dieser Position (in Sekunden)."
+msgstr "Der Stream wird für diese Zeit laufen (in Sekunden)."
 
 #: src/libvlc-module.c:652
 msgid "Input list"
@@ -3087,16 +3061,15 @@ msgstr ""
 
 #: src/libvlc-module.c:830
 msgid "Prefer system plugins over vlc"
-msgstr "System Plugins gegenüber denen von VLC vorziehen."
+msgstr "System Plugins den VLC-eigenen vorziehen"
 
 #: src/libvlc-module.c:832
-#, fuzzy
 msgid ""
 "Indicates whether VLC will prefer native plugins installed on system over "
 "VLC owns plugins whenever a choice is available."
 msgstr ""
-"Dies gibt an, so vorhanden, ob VLC native System-Plugins, oder seine eigenen "
-"verwendet."
+"Dies gibt an ob VLC native System-Plugins oder seine eigenen verwendet, "
+"falls eine Wahlmöglichkeit besteht."
 
 #: src/libvlc-module.c:841
 msgid ""
@@ -3506,7 +3479,6 @@ msgid "Write process id to file"
 msgstr "Prozess-ID in Datei schreiben"
 
 #: src/libvlc-module.c:1032
-#, fuzzy
 msgid "Writes process id into specified file."
 msgstr "Schreibt die Prozess-ID in die angegebene Datei."
 
@@ -3516,7 +3488,7 @@ msgstr "Protokoll in Datei schreiben"
 
 #: src/libvlc-module.c:1036
 msgid "Log all VLC messages to a text file."
-msgstr "Alle VLC Meldungen in eine Textdatei speichern"
+msgstr "Speichert alle VLC Meldungen in eine Textdatei."
 
 #: src/libvlc-module.c:1038
 msgid "Log to syslog"
@@ -3545,7 +3517,6 @@ msgstr ""
 "bereits laufenden Instanz abzuspielen oder sie der Reihe anzuhängen."
 
 #: src/libvlc-module.c:1052
-#, fuzzy
 msgid ""
 "Allowing only one running instance of VLC can sometimes be useful, for "
 "example if you associated VLC with some media types and you don't want a new "
@@ -3556,9 +3527,11 @@ msgid ""
 msgstr ""
 "Nur eine laufende Instanz von VLC zu erlauben, kann manchmal nützlich sein, "
 "z.B. wenn Sie einige Medientypen mit VLC verknüpft haben und nicht jedes Mal "
-"eine neue  Instanz von VLC möchten, wenn Sie auf eine Datei im Explorer "
-"einen  Doppelklick gemachen. Diese Option wird Ihnen erlauben, die Datei mit "
+"eine neue Instanz von VLC möchten, wenn Sie auf eine Datei in ihrem Dateimanager "
+"einen Doppelklick gemachen. Diese Option wird Ihnen erlauben, die Datei mit "
 "der bereits laufenden Instanz abzuspielen oder sie der Reihe anzuhängen."
+"Für diese Option muss der laufende D-Bus Sessiondaemon aktiviert sein und "
+"VLC das D-Bus Control-Interface benutzen."
 
 #: src/libvlc-module.c:1060
 msgid "VLC is started from file association"
@@ -3696,14 +3669,12 @@ msgid "Stop the playlist after each played playlist item."
 msgstr "Stoppt die Wiedergabeliste nach jedem gespielten Objekt."
 
 #: src/libvlc-module.c:1131
-#, fuzzy
 msgid "Play and exit"
-msgstr "Abspielen und Stoppen"
+msgstr "Abspielen und Beenden"
 
 #: src/libvlc-module.c:1133
-#, fuzzy
 msgid "Exit if there are no more items in the playlist."
-msgstr "Keine Objekte in der Wiedergabeliste"
+msgstr "Beenden, falls keine weiteren Objekte in der Wiedergabeliste sind."
 
 #: src/libvlc-module.c:1135
 msgid "Use media library"
@@ -3718,19 +3689,16 @@ msgstr ""
 "geladen, wenn VLC gestartet wird."
 
 #: src/libvlc-module.c:1140
-#, fuzzy
 msgid "Display playlist tree"
-msgstr "Wiedergabelistenbaum benutzen"
+msgstr "Wiedergabelistenbaum anzeigen"
 
 #: src/libvlc-module.c:1142
-#, fuzzy
 msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
 msgstr ""
 "Die Wiedergabeliste kann einen Baum zur Ordnung von Objekten benutzten, wie "
-"z.B. die Inhalte eines Ordners. \"Standard\" bedeutet, dass der Baum nur "
-"benutzt wird, wenn er wirklich gebraucht wird."
+"z.B. die Inhalte eines Ordners."
 
 #: src/libvlc-module.c:1151
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
@@ -3754,14 +3722,12 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "Wählen Sie den Hotkey zum Umschalten des Vollbildstatus."
 
 #: src/libvlc-module.c:1156
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Vollbild ausfüllen"
+msgstr "Vollbildmodus verlassen"
 
 #: src/libvlc-module.c:1157
-#, fuzzy
 msgid "Select the hotkey to use to leave fullscreen state."
-msgstr "Wählen Sie den Hotkey zum Umschalten des Vollbildstatus."
+msgstr "Wählen Sie den Hotkey zum Verlassen des Vollbildmodus."
 
 #: src/libvlc-module.c:1158
 msgid "Play/Pause"
@@ -4420,14 +4386,12 @@ msgid "Display OSD menu on top of video output"
 msgstr ""
 
 #: src/libvlc-module.c:1356
-#, fuzzy
 msgid "Do not display OSD menu on video output"
-msgstr "Weitere Fehler unterdrücken"
+msgstr "OSD Menü nicht im in der Videoausgabe zeigen"
 
 #: src/libvlc-module.c:1357
-#, fuzzy
 msgid "Do not display OSD menu on top of video output"
-msgstr "Weitere Fehler unterdrücken"
+msgstr "OSD Menü nicht oberhalb der Videoausgabe zeigen"
 
 #: src/libvlc-module.c:1358
 msgid "Highlight widget on the right"
@@ -4462,13 +4426,13 @@ msgid "Move OSD menu highlight to the widget below"
 msgstr ""
 
 #: src/libvlc-module.c:1370
-#, fuzzy
 msgid "Select current widget"
-msgstr "Aktuelles Objekt wiederholen"
+msgstr "Aktuelles Widget auswählen"
 
 #: src/libvlc-module.c:1372
 msgid "Selecting current widget performs the associated action."
-msgstr ""
+msgstr "Die Auswahl des aktuellen Widgets für die assoziierte "
+"Aktion aus."
 
 #: src/libvlc-module.c:1374
 #, fuzzy
@@ -4637,22 +4601,21 @@ msgid "Jump sizes"
 msgstr "Sprunggrößen"
 
 #: src/libvlc-module.c:2471
-#, fuzzy
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
-msgstr "Hilfe für VLC ausgeben (kann mit --advanced kombiniert werden)"
+msgstr "Hilfe für VLC ausgeben (kann mit --advanced und --help-verbose "
+"kombiniert werden)"
 
 #: src/libvlc-module.c:2474
 msgid "Exhaustive help for VLC and its modules"
-msgstr ""
+msgstr "Ausführliche Hilfe für VLC und dessen Module"
 
 #: src/libvlc-module.c:2476
-#, fuzzy
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
-"Hilfe für VLC und alle Module ausgeben (kann mit --advanced kombiniert "
-"werden)."
+"Hilfe für VLC und alle Module ausgeben (kann mit --advanced und "
+"--help-verbose kombiniert werden)."
 
 #: src/libvlc-module.c:2479
 msgid "ask for extra verbosity when displaying help"
@@ -4660,12 +4623,11 @@ msgstr "Nach besonderer Ausführlichkeit fragen, wenn Hilfe angezeigt wird"
 
 #: src/libvlc-module.c:2481
 msgid "print a list of available modules"
-msgstr "Liste aller verfügbaren Plugins ausgeben"
+msgstr "Liste aller verfügbaren Module ausgeben"
 
 #: src/libvlc-module.c:2483
-#, fuzzy
 msgid "print a list of available modules with extra detail"
-msgstr "Liste aller verfügbaren Plugins ausgeben"
+msgstr "Liste aller verfügbaren Module mit zusätzlichen Details ausgeben"
 
 #: src/libvlc-module.c:2485
 #, fuzzy
@@ -4678,23 +4640,24 @@ msgstr ""
 
 #: src/libvlc-module.c:2488
 msgid "no configuration option will be loaded nor saved to config file"
-msgstr ""
+msgstr "Keine Konfigurationsoption wird geladen oder in der Einstellungsdatei "
+"gespeichert"
 
 #: src/libvlc-module.c:2490
 msgid "save the current command line options in the config"
-msgstr "Die derzeitigen Befehlszeilenoptionen in den Einstellungen speichern"
+msgstr "Die aktuellen Befehlszeilenoptionen in den Einstellungen speichern"
 
 #: src/libvlc-module.c:2492
 msgid "reset the current config to the default values"
-msgstr "Die derzeitigen Einstellungen auf die Standardwerte zurücksetzen"
+msgstr "Die aktuellen Einstellungen auf die Standardwerte zurücksetzen"
 
 #: src/libvlc-module.c:2494
 msgid "use alternate config file"
-msgstr "alternative Einstellungsdatei benutzen"
+msgstr "Alternative Einstellungsdatei benutzen"
 
 #: src/libvlc-module.c:2496
 msgid "resets the current plugins cache"
-msgstr "Den derzeitigen Plugin-Cache zurücksetzen"
+msgstr "Zurücksetzen des aktuellen Plugin-Caches"
 
 #: src/libvlc-module.c:2498
 msgid "print version information"
@@ -4705,9 +4668,8 @@ msgid "main program"
 msgstr "Hauptprogramm"
 
 #: src/misc/update.c:1582
-#, fuzzy
 msgid "File could not be verified"
-msgstr "Interface ausblenden"
+msgstr "Datei konnte nicht überprüft werden"
 
 #: src/misc/update.c:1583
 #, c-format
@@ -4715,11 +4677,12 @@ msgid ""
 "It was not possible to download a cryptographic signature for the downloaded "
 "file \"%s\". Thus, it was deleted."
 msgstr ""
+"Es war nicht möglich, eine kryptographische Signatur für die geladene Datei "
+"\"%s\" herunter zu laden. Sie wurde deshalb gelöscht."
 
 #: src/misc/update.c:1594 src/misc/update.c:1606
-#, fuzzy
 msgid "Invalid signature"
-msgstr "Ungültige Auswahl"
+msgstr "Ungültige Signatur"
 
 #: src/misc/update.c:1595 src/misc/update.c:1607
 #, c-format
@@ -4727,11 +4690,13 @@ msgid ""
 "The cryptographic signature for the downloaded file \"%s\" was invalid and "
 "could not be used to securely verify it. Thus, the file was deleted."
 msgstr ""
+"Die kryptographische Signatur für die geladene Datei \"%s\" war ungültig und "
+"konnte nicht zur sicheren Überprüfung verwendet werden. Die Datei wurde "
+"deshalb gelöscht."
 
 #: src/misc/update.c:1619
-#, fuzzy
 msgid "File not verifiable"
-msgstr "Interface ausblenden"
+msgstr "Datei nicht überprüfbar"
 
 #: src/misc/update.c:1620
 #, c-format
@@ -4739,16 +4704,17 @@ msgid ""
 "It was not possible to securely verify the downloaded file \"%s\". Thus, it "
 "was VLC deleted."
 msgstr ""
+"Es war nicht möglich, die geladene Datei \"%s\" sicher zu überprüfen. Sie "
+"wurde deshalb gelöscht."
 
 #: src/misc/update.c:1631 src/misc/update.c:1643
-#, fuzzy
 msgid "File corrupted"
-msgstr "Datei-Dumper"
+msgstr "Datei verändert"
 
 #: src/misc/update.c:1632 src/misc/update.c:1644
 #, c-format
 msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
-msgstr ""
+msgstr "Die geladene Datei \"%s\" war verändert. Sie wurde deshalb gelöscht."
 
 #: src/playlist/tree.c:65 modules/access/bda/bda.c:62
 #: modules/access/bda/bda.c:115 modules/access/bda/bda.c:123
@@ -5139,9 +5105,8 @@ msgid "Quechua"
 msgstr "Quechua"
 
 #: src/text/iso-639_def.h:152
-#, fuzzy
 msgid "Original audio"
-msgstr "Audio aktivieren"
+msgstr "Originalton"
 
 #: src/text/iso-639_def.h:153
 msgid "Raeto-Romance"
@@ -5400,9 +5365,8 @@ msgid "In kHz for DVB-S or Hz for DVB-C/T"
 msgstr "In kHz für DVB-S oder Hz für DVB-C/T"
 
 #: modules/access/bda/bda.c:56
-#, fuzzy
 msgid "In kHz for DVB-C/S/T"
-msgstr "In kHz für DVB-S oder Hz für DVB-C/T"
+msgstr "In kHz für DVB-C/S/T"
 
 #: modules/access/bda/bda.c:59 modules/access/dvb/access.c:92
 msgid "Inversion mode"
@@ -5435,9 +5399,8 @@ msgstr ""
 "streamen."
 
 #: modules/access/bda/bda.c:76
-#, fuzzy
 msgid "Network Identifier"
-msgstr "Netzwerkeinstellungen"
+msgstr "Netzwerkidentifizierung"
 
 #: modules/access/bda/bda.c:79 modules/access/dvb/access.c:102
 msgid "Satellite number in the Diseqc system"
@@ -5715,19 +5678,17 @@ msgid "DVB"
 msgstr "DVB"
 
 #: modules/access/bda/bda.c:173
-#, fuzzy
 msgid "DirectShow DVB input"
-msgstr "DirectShow-Input"
+msgstr "DirectShow-DVB-Input"
 
 #: modules/access/cdda/access.c:285
-#, fuzzy
 msgid "CD reading failed"
-msgstr "Videoskalierungsfilter"
+msgstr "CD konnte nicht gelesen werden"
 
 #: modules/access/cdda/access.c:286
 #, c-format
 msgid "VLC could not get a new block of size: %i."
-msgstr "VLC konnte keinen neuen Block der Größe %i bekommen."
+msgstr "VLC konnte keinen neuen Block der Größe %i abfragen."
 
 #: modules/access/cdda.c:68
 msgid ""
@@ -6073,9 +6034,8 @@ msgid "MRL"
 msgstr "MRL"
 
 #: modules/access/dc1394.c:67
-#, fuzzy
 msgid "dc1394 input"
-msgstr "Kein Input"
+msgstr "dc1394 Input"
 
 #: modules/access/directory.c:76
 msgid "Subdirectory behavior"
@@ -6180,12 +6140,11 @@ msgid "Audio device name"
 msgstr "Audio-Gerätename"
 
 #: modules/access/dshow/dshow.cpp:109
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used. "
 msgstr ""
-"Name des Video-Devices, das vom DirectShow-Plugin benutzt werden soll. Falls "
+"Name des Audiogeräts, das vom DirectShow-Plugin benutzt werden soll. Falls "
 "Sie nichts angeben, wird das Standard-Device benutzt."
 
 #: modules/access/dshow/dshow.cpp:112
@@ -6194,15 +6153,14 @@ msgid "Video size"
 msgstr "Bildgröße"
 
 #: modules/access/dshow/dshow.cpp:114
-#, fuzzy
 msgid ""
 "Size of the video that will be displayed by the DirectShow plugin. If you "
 "don't specify anything the default size for your device will be used. You "
 "can specify a standard size (cif, d1, ...) or <width>x<height>."
 msgstr ""
-"Name des Audio-Devices, das vom DirectShow-Plugin benutzt werden soll. Falls "
-"Sie nichts angeben, wird das Standard-Device benutzt. SIe können eine "
-"Standardgröße (cif, d1, ...) oder <Breite>x<Höhe>"
+"Größe des vom DirectShow-Plugins dargestellten Videos. Falls "
+"Sie nichts angeben, wird die Standardgröße Ihres Geräts benutzt. Sie können "
+"eine Standardgröße (cif, d1, ...) oder <Breite>x<Höhe> angeben."
 
 #: modules/access/dshow/dshow.cpp:117 modules/access/v4l2/v4l2.c:86
 #: modules/access/v4l.c:89
@@ -12106,13 +12064,12 @@ msgid "ASF v1.0 demuxer"
 msgstr "ASF v1.0 Demuxer"
 
 #: modules/demux/asf/asf.c:178
-#, fuzzy
 msgid "Could not demux ASF stream"
-msgstr "ASF-Stream konnte demultiplexed werden."
+msgstr "Demuxing des ASF-Streams fehlgeschlagen"
 
 #: modules/demux/asf/asf.c:179
 msgid "VLC failed to load the ASF header."
-msgstr "VLC konnte den ASF-Header noch laden."
+msgstr "VLC konnte den ASF-Header nicht laden."
 
 #: modules/demux/au.c:50
 msgid "AU demuxer"
@@ -12127,14 +12084,12 @@ msgid "FFmpeg muxer"
 msgstr "FFmpeg Muxer"
 
 #: modules/demux/avformat/avformat.h:35
-#, fuzzy
 msgid "Ffmpeg mux"
 msgstr "FFmpeg Muxer"
 
 #: modules/demux/avformat/avformat.h:36
-#, fuzzy
 msgid "Force use of ffmpeg muxer."
-msgstr "Benutzung des Timeshift-Moduls erzwingen."
+msgstr "Benutzung des FFmpeg-Muxers erzwingen."
 
 #: modules/demux/avi/avi.c:47
 msgid "Force interleaved method"
@@ -12177,7 +12132,6 @@ msgid "AVI Index"
 msgstr "AVI-Index"
 
 #: modules/demux/avi/avi.c:670
-#, fuzzy
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to repair it?\n"
@@ -12185,9 +12139,9 @@ msgid ""
 "This might take a long time."
 msgstr ""
 "Diese AVI Datei ist beschädigt. Vorspulen wird nicht korrekt funktionieren.\n"
-"Möchten Sie versuchen diese Datei zu reparieren?\n"
+"Möchten Sie versuchen, diese Datei zu reparieren?\n"
 "\n"
-"Dies kann einige Zeit dauern."
+"Dies kann längere Zeit dauern."
 
 #: modules/demux/avi/avi.c:673
 msgid "Repair"
@@ -12202,9 +12156,8 @@ msgid "Fixing AVI Index..."
 msgstr "Repariere AVI Index..."
 
 #: modules/demux/cdg.c:45
-#, fuzzy
 msgid "CDG demuxer"
-msgstr "OGG Demuxer"
+msgstr "CDG Demuxer"
 
 #: modules/demux/demuxdump.c:42
 msgid "Dump filename"
@@ -12223,7 +12176,6 @@ msgid "If the file already exists, it will not be overwritten."
 msgstr "Wenn die Datei bereits existiert, wird sie nicht überschrieben."
 
 #: modules/demux/demuxdump.c:56
-#, fuzzy
 msgid "File dumper"
 msgstr "Datei-Dumper"
 
@@ -12322,9 +12274,8 @@ msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "Zu benutzender Port, um RTSP/RTP über HTTP zu tunneln."
 
 #: modules/demux/live555.cpp:591
-#, fuzzy
 msgid "RTSP authentication"
-msgstr "HTTP Authentifizierung"
+msgstr "RTSP Authentifizierung"
 
 #: modules/demux/live555.cpp:592
 msgid "Please enter a valid login name and a password."
@@ -12565,9 +12516,8 @@ msgid "Auto start"
 msgstr "Autostart"
 
 #: modules/demux/playlist/playlist.c:41
-#, fuzzy
 msgid "Automatically start playing the playlist content once it's loaded."
-msgstr "Playlist automatisch abspielen, sobald deren Inhalt geladen ist.\n"
+msgstr "Inhalte der Wiedergabeliste automatisch abspielen, sobald sie geladen ist."
 
 #: modules/demux/playlist/playlist.c:44
 msgid "Show shoutcast adult content"
@@ -12580,9 +12530,8 @@ msgstr ""
 "Wiedergabelisten benutzt werden."
 
 #: modules/demux/playlist/playlist.c:48
-#, fuzzy
 msgid "Skip ads"
-msgstr "Frames überspringen"
+msgstr "Werbung überspringen"
 
 #: modules/demux/playlist/playlist.c:49
 msgid ""
@@ -12635,14 +12584,12 @@ msgid "Google Video Playlist importer"
 msgstr "Wiedergabelistenimporter für Google Video Playlists"
 
 #: modules/demux/playlist/playlist.c:127
-#, fuzzy
 msgid "Dummy ifo demux"
-msgstr "Dummy Decoder"
+msgstr "Dummy ifo Demuxer"
 
 #: modules/demux/playlist/playlist.c:131
-#, fuzzy
 msgid "iTunes Music Library importer"
-msgstr "Importierer für QuickTime Media Links"
+msgstr "Importierer für iTunes-Medienbibliotheken"
 
 #: modules/demux/playlist/podcast.c:236 modules/demux/playlist/podcast.c:250
 #: modules/demux/playlist/podcast.c:280 modules/demux/playlist/podcast.c:292
@@ -12662,7 +12609,6 @@ msgid "Shoutcast"
 msgstr "Shoutcast"
 
 #: modules/demux/ps.c:43
-#, fuzzy
 msgid "Trust MPEG timestamps"
 msgstr "MPEG timestamps vertrauen"
 
@@ -12672,6 +12618,9 @@ msgid ""
 "duration. However sometimes this might not be usable. Disable this option to "
 "calculate from the bitrate instead."
 msgstr ""
+"Normalerweise benutzen wir die Timestamps der MPEG-Dateien zur Positions- und "
+"Längenberechnung. Manchmal ist dies jedoch nicht nutzbar. Deaktivieren Sie "
+"diese Option, um die Bitrate zur Berechnung zu verwenden."
 
 #: modules/demux/ps.c:56 modules/demux/ps.c:67
 msgid "MPEG-PS demuxer"
@@ -12682,12 +12631,11 @@ msgid "PVA demuxer"
 msgstr "PVA Demuxer"
 
 #: modules/demux/rawdv.c:41
-#, fuzzy
 msgid ""
 "The demuxer will advance timestamps if the input can't keep up with the rate."
 msgstr ""
-"Der Transcoder wird Frames fallenlassen, wenn Ihre CPU nicht mit der "
-"Encodierungsrate mithalten kann."
+"Der Demuxer wird Timestamps verzögern, wenn der Input nicht mit der "
+"Datenrate mithalten kann."
 
 #: modules/demux/rawdv.c:49
 msgid "DV (Digital Video) demuxer"
@@ -12836,9 +12784,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/subtitle_asa.c:64
-#, fuzzy
 msgid "Subtitles (asa demuxer)"
-msgstr "Untertitel-Demuxer-Einstellungen"
+msgstr "Untertitel (asa Demuxer)"
 
 #: modules/demux/subtitle_asa.c:65 modules/demux/subtitle.c:75
 msgid "Text subtitles parser"
@@ -12924,18 +12871,16 @@ msgid "Control word for the CSA encryption algorithm"
 msgstr "Kontrollwort für den CSA Verschlüsselungsalgorithmus"
 
 #: modules/demux/ts.c:130 modules/mux/mpeg/ts.c:170
-#, fuzzy
 msgid "Second CSA Key"
-msgstr "CSA-Schlüssel"
+msgstr "Zweiter CSA-Schlüssel"
 
 #: modules/demux/ts.c:131 modules/mux/mpeg/ts.c:171
-#, fuzzy
 msgid ""
 "The even CSA encryption key. This must be a 16 char string (8 hexadecimal "
 "bytes)."
 msgstr ""
-"CSA-Verschlüsselungsschlüssel. Dies muss ein String mit 16 Zeichen sein (8 "
-"hexadezimale Bytes)."
+"Der gerade CSA-Verschlüsselungsschlüssel. Dies muss ein String mit 16 Zeichen "
+"sein (8 hexadezimale Bytes)."
 
 #: modules/demux/ts.c:134
 msgid "Silent mode"
@@ -13003,49 +12948,44 @@ msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG Transport-Stream Demuxer"
 
 #: modules/demux/ts.c:3418
-#, fuzzy
 msgid "Teletext subtitles"
-msgstr "Textuntertitel-Dekoder"
+msgstr "Teletextuntertitel"
 
 #: modules/demux/ts.c:3428
-#, fuzzy
 msgid "Teletext hearing impaired subtitles"
-msgstr "Textuntertitel-Dekoder"
+msgstr "Teletextuntertitel für Gehörgeschädigte"
 
 #: modules/demux/ts.c:3523
 msgid "subtitles"
 msgstr "Untertitel"
 
 #: modules/demux/ts.c:3527
-#, fuzzy
 msgid "4:3 subtitles"
-msgstr "Untertitel"
+msgstr "4:3 Untertitel"
 
 #: modules/demux/ts.c:3531
-#, fuzzy
 msgid "16:9 subtitles"
-msgstr "Untertitel"
+msgstr "16:9 Untertitel"
 
 #: modules/demux/ts.c:3535
-#, fuzzy
 msgid "2.21:1 subtitles"
-msgstr "Untertitel"
+msgstr "2.21:1 Untertitel"
 
 #: modules/demux/ts.c:3539 modules/demux/ts.c:3720 modules/demux/ts.c:3761
 msgid "hearing impaired"
-msgstr ""
+msgstr "Gehörgeschädigte"
 
 #: modules/demux/ts.c:3543
 msgid "4:3 hearing impaired"
-msgstr ""
+msgstr "4:3 Gehörgeschädigte"
 
 #: modules/demux/ts.c:3547
 msgid "16:9 hearing impaired"
-msgstr ""
+msgstr "16:9 Gehörgeschädigte"
 
 #: modules/demux/ts.c:3551
 msgid "2.21:1 hearing impaired"
-msgstr ""
+msgstr "2.21:1 Gehörgeschädigte"
 
 #: modules/demux/ts.c:3716 modules/demux/ts.c:3757
 #, fuzzy
@@ -13070,14 +13010,12 @@ msgid "TY Stream audio/video demux"
 msgstr "TY-Stream Audio/Video Demux"
 
 #: modules/demux/vc1.c:44
-#, fuzzy
 msgid "Desired frame rate for the VC-1 stream."
-msgstr "Gewünschte Framerate für den H.264-Stream."
+msgstr "Gewünschte Framerate für den VC-1-Stream."
 
 #: modules/demux/vc1.c:50
-#, fuzzy
 msgid "VC1 video demuxer"
-msgstr "H264 Videodemuxer"
+msgstr "VC1 Videodemuxer"
 
 #: modules/demux/vobsub.c:52
 msgid "Vobsub subtitles parser"
@@ -13303,9 +13241,8 @@ msgstr ""
 "dev/fb0)."
 
 #: modules/gui/fbosd.c:107 modules/video_output/fb.c:91
-#, fuzzy
 msgid "Video aspect ratio"
-msgstr "Seitenverhältnis der Videoleinwand"
+msgstr "Video-Seitenverhältnis"
 
 #: modules/gui/fbosd.c:109 modules/video_output/fb.c:93
 #, fuzzy
