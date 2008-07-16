@@ -79,8 +79,10 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     leftW->addWidget( artContainer );
 
     /* Initialisation of the playlist */
+    PL_LOCK;
     playlist_item_t *p_root =
                   playlist_GetPreferredNode( THEPL, THEPL->p_local_category );
+    PL_UNLOCK;
 
     rightPanel = new StandardPLPanel( this, p_intf, THEPL, p_root );
 
