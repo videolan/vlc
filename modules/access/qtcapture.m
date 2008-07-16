@@ -68,6 +68,7 @@ vlc_module_end();
 {
     CVImageBufferRef currentImageBuffer;
     mtime_t currentPts;
+    mtime_t previousPts;
 }
 - (id)init;
 - (void)outputVideoFrame:(CVImageBufferRef)videoFrame withSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection;
@@ -82,6 +83,7 @@ vlc_module_end();
     {
         currentImageBuffer = nil;
         currentPts = 0;
+        previousPts = 0;
     }
     return self;
 }
@@ -117,13 +119,13 @@ vlc_module_end();
     CVImageBufferRef imageBuffer;
     mtime_t pts;
 
-    if(!currentImageBuffer)
+    if(!currentImageBuffer || currentPts == previousPts )
         return 0;
 
     @synchronized (self)
     {
         imageBuffer = CVBufferRetain(currentImageBuffer);
-        pts = currentPts;
+        pts = previousPts = currentPts;
 
         CVPixelBufferLockBaseAddress(imageBuffer, 0);
         void * pixels = CVPixelBufferGetBaseAddress(imageBuffer);
@@ -353,6 +355,7 @@ static int Demux( demux_t *p_demux )
         /* Nothing to display yet, just forget */
         block_Release( p_block );
         [pool release];
+        msleep( 10000 );
         return 1;
     }
 
