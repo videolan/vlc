@@ -397,20 +397,20 @@ static const char *const ppsz_align_descriptions[] =
 #define VIDEO_ON_TOP_LONGTEXT N_( \
     "Always place the video window on top of other windows." )
 
-#define VIDEO_TITLE_SHOW_TEXT N_("Show media title on video.")
+#define VIDEO_TITLE_SHOW_TEXT N_("Show media title on video")
 #define VIDEO_TITLE_SHOW_LONGTEXT N_( \
     "Display the title of the video on top of the movie.")
 
-#define VIDEO_TITLE_TIMEOUT_TEXT N_("Show video title for x miliseconds.")
+#define VIDEO_TITLE_TIMEOUT_TEXT N_("Show video title for x miliseconds")
 #define VIDEO_TITLE_TIMEOUT_LONGTEXT N_( \
     "Show the video title for n miliseconds, default is 5000 ms (5 sec.)")
 
-#define VIDEO_TITLE_POSITION_TEXT N_("Position of video title.")
+#define VIDEO_TITLE_POSITION_TEXT N_("Position of video title")
 #define VIDEO_TITLE_POSITION_LONGTEXT N_( \
     "Place on video where to display the title (default bottom center).")
 
 #define MOUSE_HIDE_TIMEOUT_TEXT N_("Hide cursor and fullscreen " \
-                                   "controller after x miliseconds.")
+                                   "controller after x miliseconds")
 #define MOUSE_HIDE_TIMEOUT_LONGTEXT N_( \
     "Hide mouse cursor and fullscreen controller after " \
     "n miliseconds, default is 3000 ms (3 sec.)")
@@ -423,7 +423,7 @@ static const char *const ppsz_pos_descriptions[] =
 #define SS_TEXT N_("Disable screensaver")
 #define SS_LONGTEXT N_("Disable the screensaver during video playback." )
 
-#define INHIBIT_TEXT N_("Inhibits the power management daemon during playback.")
+#define INHIBIT_TEXT N_("Inhibit the power management daemon during playback")
 #define INHIBIT_LONGTEXT N_("Inhibits the power management daemon during any " \
     "playback, to avoid the computer being suspended because of inactivity.")
 
