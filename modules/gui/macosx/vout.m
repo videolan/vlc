@@ -1058,7 +1058,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [self makeFirstResponder: o_view];
         [self setCanBecomeKeyWindow: YES];
 
-        if( var_GetBool( p_vout, "macosx-background" ) )
+        if( var_CreateGetBool( p_vout, "macosx-background" ) )
         {
             int i_device = var_GetInteger( p_vout->p_libvlc, "video-device" );
 
@@ -1075,12 +1075,12 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             [self setLevel: CGWindowLevelForKey(kCGDesktopWindowLevelKey)];
             [self setMovableByWindowBackground: NO];
         }
-        if( var_GetBool( p_vout, "video-on-top" ) )
+        if( var_CreateGetBool( p_vout, "video-on-top" ) )
         {
             [self setLevel: NSStatusWindowLevel];
         }
 
-        [self setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
+        [self setAlphaValue: var_CreateGetFloat( p_vout, "macosx-opaqueness" )];
 
         /* Add the view. It's automatically resized to fit the window */
         [self setContentView: o_view];
@@ -1099,7 +1099,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     BOOL b_black = NO;
 
     i_device = var_GetInteger( p_vout->p_libvlc, "video-device" );
-    b_black = var_GetBool( p_vout, "macosx-black" );
+    b_black = var_CreateGetBool( p_vout, "macosx-black" );
 
     /* Find out on which screen to open the window */
     screen = [NSScreen screenWithDisplayID: (CGDirectDisplayID)i_device];
