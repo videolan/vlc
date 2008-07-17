@@ -70,6 +70,9 @@ static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
 static void DeleteFilter( filter_t * );
 
 static vlc_fourcc_t Ext2Fourcc( const char * );
+
+static void video_release_buffer_dummy( picture_t *p_pic );
+
 /*static const char *Fourcc2Ext( vlc_fourcc_t );*/
 
 /**
@@ -445,8 +448,14 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt_out;
     }
 
-    p_pic->i_refcount++; /* pf_video_filter() will call pf_release() */
+    /* We have to override the current release scheme for p_pic.
+     * (You cannot suppose what pf_release will do or even if it
+     * is defined) */
+    void (*pf_sav_release)( picture_t * ) = p_pic->pf_release;
+
+    p_pic->pf_release = video_release_buffer_dummy;
     p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
+    p_pic->pf_release = pf_sav_release;
 
     if( p_fmt_in->i_chroma == p_fmt_out->i_chroma &&
         p_fmt_in->i_width == p_fmt_out->i_width &&
@@ -563,6 +572,10 @@ static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
 }
 */
 
+static void video_release_buffer_dummy( picture_t *p_pic )
+{
+    VLC_UNUSED( p_pic );
+}
 static void video_release_buffer( picture_t *p_pic )
 {
     if( --p_pic->i_refcount > 0 ) return;
