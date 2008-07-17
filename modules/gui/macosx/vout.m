@@ -1053,6 +1053,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [self center];
         [self makeKeyAndOrderFront: self];
         [self setReleasedWhenClosed: YES];
+        [self setFrameUsingName:@"VLCVoutWindowDetached"];
+        [self setFrameAutosaveName:@"VLCVoutWindowDetached"];
 
         /* We'll catch mouse events */
         [self makeFirstResponder: o_view];
