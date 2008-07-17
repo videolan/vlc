@@ -795,7 +795,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
     free( psz_modules );
 
-#ifdef ENABLE_SOUT
+#ifdef ENABLE_VLM
     /* Initialize VLM if vlm-conf is specified */
     psz_parser = config_GetPsz( p_libvlc, "vlm-conf" );
     if( psz_parser && *psz_parser )
@@ -989,7 +989,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         vlc_object_release( p_intf ); /* for vlc_object_find() */
     }
 
-#ifdef ENABLE_SOUT
+#ifdef ENABLE_VLM
     /* Destroy VLM if created in libvlc_InternalInit */
     if( priv->p_vlm )
     {
