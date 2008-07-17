@@ -117,6 +117,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_ckb_imgClone setState: (int)strstr( psz_vfilters, "clone")];
         [o_ckb_imgCrop setState: (int)strstr( psz_vfilters, "crop")];
         [o_ckb_trnsform setState: (int)strstr( psz_vfilters, "transform")];
+        [o_ckb_intZoom setState: (int)strstr( psz_vfilters, "magnify")];
 
         free( psz_vfilters );
     }
@@ -478,7 +479,7 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* en-/disable video filters */
     if (sender == o_ckb_blur)
-        [self changeVoutFiltersString: "motionblur" onOrOff: [o_ckb_blur state]];
+        [self changeVideoFiltersString: "motionblur" onOrOff: [o_ckb_blur state]];
 
     else if (sender == o_ckb_imgClone)
         [self changeVoutFiltersString: "clone" onOrOff: [o_ckb_imgClone state]];
