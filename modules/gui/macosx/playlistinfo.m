@@ -64,7 +64,8 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    [o_info_window setExcludedFromWindowsMenu: TRUE];
+    [o_info_window setExcludedFromWindowsMenu: YES];
+    [o_info_window setFloatingPanel: NO];
 
     [o_info_window setTitle: _NS("Media Information")];
     [o_uri_lbl setStringValue: _NS("Location")];
@@ -114,7 +115,7 @@ static VLCInfo *_o_sharedInstance = nil;
     [o_info_window setInitialFirstResponder: o_uri_txt];
     [o_info_window setDelegate: self];
 
-    /* We may be awoken from nib way after initialiwation
+    /* We may be awoken from nib way after initialisation
      * Update ourselves */
     [self updatePanelWithItem:p_item];
 }
@@ -420,7 +421,7 @@ static VLCInfo *_o_sharedInstance = nil;
 error:
     pl_Release( VLCIntf );
     NSRunAlertPanel(_NS("Error while saving meta"),
-        _NS("Impossible to save the meta data."),
+        _NS("VLC was unable to save the meta data."),
         _NS("OK"), nil, nil);
 }
 
