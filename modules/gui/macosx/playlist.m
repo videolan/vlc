@@ -478,6 +478,8 @@
             [o_status_field setStringValue: _NS("1 item")];
     }
     vlc_object_release( p_playlist );
+
+    [self outlineViewSelectionDidChange: nil];
 }
 
 - (void)playModeUpdated
@@ -560,7 +562,7 @@
 
 /* Check if p_item is a child of p_node recursively. We need to check the item
    existence first since OSX sometimes tries to redraw items that have been
-   deleted. We don't do it when not required  since this verification takes
+   deleted. We don't do it when not required since this verification takes
    quite a long time on big playlists (yes, pretty hacky). */
 
 - (BOOL)isItem: (playlist_item_t *)p_item
@@ -655,7 +657,6 @@
             }
         }
     }
-
 }
 
 - (IBAction)savePlaylist:(id)sender
