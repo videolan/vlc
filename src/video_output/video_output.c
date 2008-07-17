@@ -463,12 +463,16 @@ void vout_Close( vout_thread_t *p_vout )
     vlc_object_kill( p_vout );
     vlc_thread_join( p_vout );
     module_Unneed( p_vout, p_vout->p_module );
+    p_vout->p_module = NULL;
 }
 
 /* */
 static void vout_Destructor( vlc_object_t * p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    /* Make sure the vout was stopped first */
+    assert( !p_vout->p_module );
 
     /* Destroy the locks */
     vlc_mutex_destroy( &p_vout->picture_lock );
