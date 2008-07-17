@@ -47,6 +47,40 @@ static void Close( vlc_object_t *p_this );
 static int Demux( demux_t *p_demux );
 static int Control( demux_t *, int, va_list );
 
+typedef struct qtcapture_block_t
+{
+    block_t block;
+    CVImageBufferRef imageBuffer;
+    block_free_t pf_original_release;
+} qtcapture_block_t;
+
+static void qtcapture_block_release( block_t *p_block )
+{
+    qtcapture_block_t * p_qtblock = (qtcapture_block_t *)p_block;
+    CVBufferRelease(p_qtblock->imageBuffer);
+    CVPixelBufferUnlockBaseAddress(p_qtblock->imageBuffer, 0);
+    p_qtblock->pf_original_release( &p_qtblock->block );
+}
+
+static block_t * qtcapture_block_new( void * p_buffer,
+    int i_buffer,
+    CVImageBufferRef imageBufferToRelease )
+{
+    qtcapture_block_t * p_qtblock;
+
+    /* Build block */
+    p_qtblock = malloc( sizeof( qtcapture_block_t ) );
+    if(!p_qtblock) return NULL;
+
+    /* Fill all fields */
+    block_Init( &p_qtblock->block, p_buffer, i_buffer );
+    p_qtblock->block.pf_release = qtcapture_block_release;
+    p_qtblock->imageBuffer = imageBufferToRelease;
+
+    return (block_t *)p_qtblock;
+}
+
+
 /*****************************************************************************
 * Module descriptor
 *****************************************************************************/
@@ -72,7 +106,7 @@ vlc_module_end();
 }
 - (id)init;
 - (void)outputVideoFrame:(CVImageBufferRef)videoFrame withSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection;
-- (mtime_t)copyCurrentFrameToBuffer:(void *)buffer;
+- (block_t *)blockWithCurrentFrame;
 @end
 
 /* Apple sample code */
@@ -111,31 +145,35 @@ vlc_module_end();
         currentImageBuffer = videoFrame;
         currentPts = 1000000L / [sampleBuffer presentationTime].timeScale * [sampleBuffer presentationTime].timeValue;
     }
+
     CVBufferRelease(imageBufferToRelease);
 }
 
-- (mtime_t)copyCurrentFrameToBuffer:(void *)buffer
+- (block_t *)blockWithCurrentFrame
 {
     CVImageBufferRef imageBuffer;
     mtime_t pts;
+    block_t * p_block = NULL;
 
     if(!currentImageBuffer || currentPts == previousPts )
-        return 0;
+        return NULL;
 
     @synchronized (self)
     {
+        // Released in the p_block release method.
         imageBuffer = CVBufferRetain(currentImageBuffer);
         pts = previousPts = currentPts;
 
+
+        // Unlocked in the p_block release method.
         CVPixelBufferLockBaseAddress(imageBuffer, 0);
         void * pixels = CVPixelBufferGetBaseAddress(imageBuffer);
-        memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer) );
-        CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+        p_block = qtcapture_block_new( imageBuffer, CVPixelBufferGetDataSize( imageBuffer ),
+                imageBuffer );
+        p_block->i_pts = currentPts;
     }
 
-    CVBufferRelease(imageBuffer);
-
-    return currentPts;
+    return p_block;
 }
 
 @end
@@ -341,25 +379,16 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
 
-    p_block = block_New( p_demux, p_sys->width *
-                            p_sys->height * 2 /* FIXME */ );
-    if( !p_block )
-    {
-        msg_Err( p_demux, "cannot get block" );
-        return 0;
-    }
-
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
     @synchronized (p_sys->output)
     {
-    p_block->i_pts = [p_sys->output copyCurrentFrameToBuffer: p_block->p_buffer];
+        p_block = [p_sys->output blockWithCurrentFrame];
     }
 
-    if( !p_block->i_pts )
+    if( !p_block )
     {
         /* Nothing to display yet, just forget */
-        block_Release( p_block );
         [pool release];
         msleep( 10000 );
         return 1;
