@@ -1417,7 +1417,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             p_item = p_parent = p_playlist->items.p_elems[i_pos*2-1];
             while( p_parent->p_parent )
                 p_parent = p_parent->p_parent;
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, false,
                     p_parent, p_item );
         }
         else
