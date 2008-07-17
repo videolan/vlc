@@ -293,7 +293,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
     [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
     [o_sprefs_cancel_btn setTitle: _NS("Cancel")];
-    [o_sprefs_reset_btn setTitle: _NS("Reset Preferences")];
+    [o_sprefs_reset_btn setTitle: _NS("Reset All")];
     [o_sprefs_save_btn setTitle: _NS("Save")];
     [o_sprefs_win setTitle: _NS("Preferences")];
 }
