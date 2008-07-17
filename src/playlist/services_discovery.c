@@ -266,11 +266,12 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
         vlc_object_unlock( p_parent->p_playlist );
         return;
     }
-    vlc_object_unlock( p_parent->p_playlist );
 
     /* Delete the non-node item normally */
     playlist_DeleteInputInParent( p_parent->p_playlist, p_input->i_id,
-                                  p_parent, false );
+                                  p_parent, true );
+
+    vlc_object_unlock( p_parent->p_playlist );
 }
 
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modules )
