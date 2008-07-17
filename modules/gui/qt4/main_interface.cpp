@@ -679,16 +679,14 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 //        emit askVideoToResize( *pi_width, *pi_height );
         emit askUpdate();
 
-        //XXX uncomment for fullscreen controler
-        //fullscreenControls->attachVout( p_nvout );
+        fullscreenControls->attachVout( p_nvout );
     }
     return ret;
 }
 
 void MainInterface::releaseVideo( vout_thread_t *p_vout, void *p_win )
 {
-    //XXX uncomment for fullscreen controler
-    //fullscreenControls->detachVout( p_vout );
+    fullscreenControls->detachVout( p_vout );
     emit askReleaseVideo( p_win );
 }
 
