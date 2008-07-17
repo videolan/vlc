@@ -129,7 +129,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
          * TODO: support for reusing video outputs with proper _thread-safe_
          * reference handling. */
         if( p_vout )
-            vout_Destroy( p_vout );
+            vout_CloseAndRelease( p_vout );
         return NULL;
     }
 
@@ -441,7 +441,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( p_vout->b_error )
     {
         msg_Err( p_vout, "video output creation failed" );
-        vout_Destroy( p_vout );
+        vout_CloseAndRelease( p_vout );
         return NULL;
     }
 
@@ -449,20 +449,20 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroys a vout created by vout_Create.
+ * vout_Close: Close a vout created by vout_Create.
  *****************************************************************************
- * You HAVE to call it on vout created by vout_Create. You should NEVER call
- * it on vout not obtained though vout_Create (like with vout_Request or
- * vlc_object_find.)
+ * You HAVE to call it on vout created by vout_Create before vlc_object_release.
+ * You should NEVER call it on vout not obtained though vout_Create
+ * (like with vout_Request or vlc_object_find.)
+ * You can use vout_CloseAndRelease() as a convenient method.
  *****************************************************************************/
-void vout_Destroy( vout_thread_t *p_vout )
+void vout_Close( vout_thread_t *p_vout )
 {
     assert( p_vout );
 
     vlc_object_kill( p_vout );
     vlc_thread_join( p_vout );
     module_Unneed( p_vout, p_vout->p_module );
-    vlc_object_release( p_vout );
 }
 
 /* */

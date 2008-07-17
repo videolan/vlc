@@ -536,7 +536,8 @@ struct vout_thread_t
  *
  * You can call vout_Request on a vout created by vout_Create or by a previous
  * call to vout_Request.
- * You can release the returned value either by vout_Request or vout_Destroy.
+ * You can release the returned value either by vout_Request or vout_Close()
+ * followed by a vlc_object_release() or shorter vout_CloseAndRelease()
  *
  * \param p_this a vlc object
  * \param p_vout a vout candidate
@@ -560,11 +561,26 @@ VLC_EXPORT( vout_thread_t *, __vout_Request,    ( vlc_object_t *p_this, vout_thr
 VLC_EXPORT( vout_thread_t *, __vout_Create,       ( vlc_object_t *p_this, video_format_t *p_fmt ) );
 
 /**
- * This function will destroy a vout created by vout_Create or vout_Request.
+ * This function will close a vout created by vout_Create or vout_Request.
+ * The associated vout module is closed.
+ * Note: It is not released yet, you'll have to call vlc_object_release()
+ * or use the convenient vout_CloseAndRelease().
  *
- * \param p_vout the vout to destroy
+ * \param p_vout the vout to close
  */
-VLC_EXPORT( void,            vout_Destroy,        ( vout_thread_t *p_vout ) );
+VLC_EXPORT( void,            vout_Close,        ( vout_thread_t *p_vout ) );
+
+/**
+ * This function will close a vout created by vout_Create
+ * and then release it.
+ *
+ * \param p_vout the vout to close and release
+ */
+static inline void vout_CloseAndRelease( vout_thread_t *p_vout )
+{
+    vout_Close( p_vout );
+    vlc_object_release( p_vout );
+}
 
 /* */
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );

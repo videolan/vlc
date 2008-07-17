@@ -412,7 +412,7 @@ static void End( vout_thread_t *p_vout )
     }
 
     if( p_vout->p_sys->p_vout )
-        vout_Destroy( p_vout->p_sys->p_vout );
+        vout_CloseAndRelease( p_vout->p_sys->p_vout );
 }
 
 /*****************************************************************************
@@ -456,7 +456,7 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout )
     {
         DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vout_Destroy( p_vout->p_sys->p_vout );
+        vout_CloseAndRelease( p_vout->p_sys->p_vout );
     }
 
     fmt.i_width = fmt.i_visible_width = p_vout->p_sys->i_width;

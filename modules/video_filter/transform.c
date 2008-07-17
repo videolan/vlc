@@ -287,7 +287,7 @@ static void End( vout_thread_t *p_vout )
         free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
     }
 
-    vout_Destroy( p_vout->p_sys->p_vout );
+    vout_CloseAndRelease( p_vout->p_sys->p_vout );
 }
 
 /*****************************************************************************

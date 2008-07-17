@@ -304,7 +304,7 @@ static void End( vout_thread_t *p_vout )
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-clicked", MouseEvent, p_vout);
 
-    vout_Destroy( p_vout->p_sys->p_vout );
+    vout_CloseAndRelease( p_vout->p_sys->p_vout );
 }
 
 #define SHUFFLE_WIDTH 81

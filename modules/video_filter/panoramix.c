@@ -1903,7 +1903,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
              DEL_CALLBACKS(
                  p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout,
                  SendEvents );
-             vout_Destroy( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
+             vout_CloseAndRelease( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
          }
     }
 }

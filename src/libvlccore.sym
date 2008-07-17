@@ -478,10 +478,10 @@ vlm_MessageNew
 __vlm_New
 __vout_AllocatePicture
 vout_ChromaCmp
+vout_Close
 vout_ControlWindow
 __vout_CopyPicture
 __vout_Create
-vout_Destroy
 vout_CreatePicture
 vout_DatePicture
 vout_DestroyPicture

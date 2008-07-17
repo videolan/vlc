@@ -433,7 +433,7 @@ static void End( vout_thread_t *p_vout )
     }
 
     if( p_vout->p_sys->p_vout )
-        vout_Destroy( p_vout->p_sys->p_vout );
+        vout_CloseAndRelease( p_vout->p_sys->p_vout );
 }
 
 /*****************************************************************************
@@ -2063,7 +2063,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( p_vout->p_sys->p_vout )
     {
         DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vout_Destroy( p_vout->p_sys->p_vout );
+        vout_CloseAndRelease( p_vout->p_sys->p_vout );
     }
 
     /* Try to open a new video output */

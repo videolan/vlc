@@ -387,7 +387,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
          --p_vout->p_sys->i_clones;
          DEL_CALLBACKS( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones],
                         SendEvents );
-         vout_Destroy( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
+         vout_CloseAndRelease( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
     }
 }
 
