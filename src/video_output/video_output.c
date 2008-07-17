@@ -129,13 +129,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
          * TODO: support for reusing video outputs with proper _thread-safe_
          * reference handling. */
         if( p_vout )
-        {
-            spu_Attach( p_vout->p_spu, p_this, false );
-            vlc_object_kill( p_vout );
-            vlc_thread_join( p_vout );
-            module_Unneed( p_vout, p_vout->p_module );
-            vlc_object_release( p_vout );
-        }
+            vout_Destroy( p_vout );
         return NULL;
     }
 
@@ -447,18 +441,31 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( p_vout->b_error )
     {
         msg_Err( p_vout, "video output creation failed" );
-
-        /* Make sure the thread is destroyed and data released */
-        vlc_object_kill( p_vout );
-        vlc_thread_join( p_vout );
-        module_Unneed( p_vout, p_vout->p_module );
-        vlc_object_release( p_vout );
+        vout_Destroy( p_vout );
         return NULL;
     }
 
     return p_vout;
 }
 
+/*****************************************************************************
+ * vout_Destroy: destroys a vout created by vout_Create.
+ *****************************************************************************
+ * You HAVE to call it on vout created by vout_Create. You should NEVER call
+ * it on vout not obtained though vout_Create (like with vout_Request or
+ * vlc_object_find.)
+ *****************************************************************************/
+void vout_Destroy( vout_thread_t *p_vout )
+{
+    assert( p_vout );
+
+    vlc_object_kill( p_vout );
+    vlc_thread_join( p_vout );
+    module_Unneed( p_vout, p_vout->p_module );
+    vlc_object_release( p_vout );
+}
+
+/* */
 static void vout_Destructor( vlc_object_t * p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
@@ -1384,21 +1391,6 @@ static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
     /* Update pointers and return */
     *pi_left =   i_low;
     *pi_right = (8 - i_high + i_low);
-}
-
-/*****************************************************************************
- * vout_VarCallback: generic callback for intf variables
- *****************************************************************************/
-int vout_VarCallback( vlc_object_t * p_this, const char * psz_variable,
-                      vlc_value_t oldval, vlc_value_t newval,
-                      void *p_data )
-{
-    vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val;
-    (void)psz_variable; (void)newval; (void)oldval; (void)p_data;
-    val.b_bool = true;
-    var_Set( p_vout, "intf-change", val );
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

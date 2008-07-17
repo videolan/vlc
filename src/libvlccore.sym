@@ -481,6 +481,7 @@ vout_ChromaCmp
 vout_ControlWindow
 __vout_CopyPicture
 __vout_Create
+vout_Destroy
 vout_CreatePicture
 vout_DatePicture
 vout_DestroyPicture
@@ -501,6 +502,5 @@ vout_ShowTextRelative
 vout_Snapshot
 vout_UnlinkPicture
 vout_vaControlDefault
-vout_VarCallback
 __xml_Create
 xml_Delete

@@ -524,12 +524,49 @@ struct vout_thread_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define vout_Request(a,b,c) __vout_Request(VLC_OBJECT(a),b,c)
-VLC_EXPORT( vout_thread_t *, __vout_Request,    ( vlc_object_t *, vout_thread_t *, video_format_t * ) );
-#define vout_Create(a,b) __vout_Create(VLC_OBJECT(a),b)
-VLC_EXPORT( vout_thread_t *, __vout_Create,       ( vlc_object_t *, video_format_t * ) );
-VLC_EXPORT( int, vout_VarCallback, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 
+/**
+ * This function will
+ *  - returns a suitable vout (if requested by a non NULL p_fmt)
+ *  - recycles an old vout (if given) by either destroying it or by saving it
+ *  for latter usage.
+ *
+ * The purpose of this function is to avoid unnecessary creation/destruction of
+ * vout (and to allow optional vout reusing).
+ *
+ * You can call vout_Request on a vout created by vout_Create or by a previous
+ * call to vout_Request.
+ * You can release the returned value either by vout_Request or vout_Destroy.
+ *
+ * \param p_this a vlc object
+ * \param p_vout a vout candidate
+ * \param p_fmt the video format requested or NULL
+ * \return a vout if p_fmt is non NULL and the request is successfull, NULL
+ * otherwise
+ */
+#define vout_Request(a,b,c) __vout_Request(VLC_OBJECT(a),b,c)
+VLC_EXPORT( vout_thread_t *, __vout_Request,    ( vlc_object_t *p_this, vout_thread_t *p_vout, video_format_t *p_fmt ) );
+
+/**
+ * This function will create a suitable vout for a given p_fmt. It will never
+ * reuse an already existing unused vout.
+ *
+ * You have to call either vout_Destroy or vout_Request on the returned value
+ * \param p_this a vlc object to which the returned vout will be attached
+ * \param p_fmt the video format requested
+ * \return a vout if the request is successfull, NULL otherwise
+ */
+#define vout_Create(a,b) __vout_Create(VLC_OBJECT(a),b)
+VLC_EXPORT( vout_thread_t *, __vout_Create,       ( vlc_object_t *p_this, video_format_t *p_fmt ) );
+
+/**
+ * This function will destroy a vout created by vout_Create or vout_Request.
+ *
+ * \param p_vout the vout to destroy
+ */
+VLC_EXPORT( void,            vout_Destroy,        ( vout_thread_t *p_vout ) );
+
+/* */
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
 
 VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, bool, bool, unsigned int ) );
