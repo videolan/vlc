@@ -316,7 +316,8 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
             p_image->p_filter->fmt_out.video = p_image->p_enc->fmt_in.video;
         }
 
-        p_pic->i_refcount++; /* pf_video_filter() will call pf_release() */
+        if( p_pic->pf_release )
+            p_pic->i_refcount++;
         p_tmp_pic =
             p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 
@@ -445,7 +446,8 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt_out;
     }
 
-    p_pic->i_refcount++; /* pf_video_filter() will call pf_release() */
+    if( p_pic->pf_release )
+        p_pic->i_refcount++;
     p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 
     if( p_fmt_in->i_chroma == p_fmt_out->i_chroma &&
@@ -491,7 +493,8 @@ static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt;
     }
 
-    p_pic->i_refcount++; /* pf_video_filter() will call pf_release() */
+    if( p_pic->pf_release )
+        p_pic->i_refcount++;
     return p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 }
 
