@@ -380,13 +380,13 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
 #ifdef BEST_AUTOCROP
     var_AddCallback( p_vout, "ratio-crop", FilterCallback, NULL );
 #endif
+
+    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
+
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
 
     ADD_PARENT_CALLBACKS( SendEventsToChild );
 
@@ -400,12 +400,19 @@ static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
+    DEL_PARENT_CALLBACKS( SendEventsToChild );
+    if( p_vout->p_sys->p_vout )
+        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
     /* Free the fake output buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
         free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
     }
+
+    if( p_vout->p_sys->p_vout )
+        vout_Destroy( p_vout->p_sys->p_vout );
 }
 
 /*****************************************************************************
@@ -416,15 +423,6 @@ static void End( vout_thread_t *p_vout )
 static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
-    if( p_vout->p_sys->p_vout )
-    {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vlc_object_detach( p_vout->p_sys->p_vout );
-        vlc_object_release( p_vout->p_sys->p_vout );
-    }
-
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
 
     free( p_vout->p_sys );
 }
@@ -455,7 +453,11 @@ static int Manage( vout_thread_t *p_vout )
     msg_Info( p_vout, "ratio %d",  p_vout->p_sys->i_aspect / 432);
 #endif
 
-    vlc_object_release( p_vout->p_sys->p_vout );
+    if( p_vout->p_sys->p_vout )
+    {
+        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+        vout_Destroy( p_vout->p_sys->p_vout );
+    }
 
     fmt.i_width = fmt.i_visible_width = p_vout->p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_vout->p_sys->i_height;
@@ -473,6 +475,7 @@ static int Manage( vout_thread_t *p_vout )
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
 
     p_vout->p_sys->b_changed = false;
     p_vout->p_sys->i_lastchange = 0;

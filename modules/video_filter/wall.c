@@ -451,12 +451,16 @@ static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
+    DEL_PARENT_CALLBACKS( SendEventsToChild );
+
     /* Free the fake output buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
         free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
     }
+
+    RemoveAllVout( p_vout );
 }
 
 /*****************************************************************************
@@ -468,9 +472,6 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    RemoveAllVout( p_vout );
-
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
 
     free( p_vout->p_sys->pp_vout );
     free( p_vout->p_sys );
@@ -583,10 +584,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
              DEL_CALLBACKS(
                  p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout,
                  SendEvents );
-             vlc_object_detach(
-                 p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
-             vlc_object_release(
-                 p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
+             vout_Destroy( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
          }
     }
 }

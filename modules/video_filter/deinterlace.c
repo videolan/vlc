@@ -420,6 +420,11 @@ static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
+    DEL_PARENT_CALLBACKS( SendEventsToChild );
+
+    if( p_vout->p_sys->p_vout )
+        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
     /* Free the fake output buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
@@ -428,13 +433,7 @@ static void End( vout_thread_t *p_vout )
     }
 
     if( p_vout->p_sys->p_vout )
-    {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vlc_object_detach( p_vout->p_sys->p_vout );
-        vlc_object_release( p_vout->p_sys->p_vout );
-    }
-
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
+        vout_Destroy( p_vout->p_sys->p_vout );
 }
 
 /*****************************************************************************
@@ -2061,11 +2060,11 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     /* We need to kill the old vout */
-
-    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    vlc_object_detach( p_vout->p_sys->p_vout );
-    vlc_object_release( p_vout->p_sys->p_vout );
+    if( p_vout->p_sys->p_vout )
+    {
+        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+        vout_Destroy( p_vout->p_sys->p_vout );
+    }
 
     /* Try to open a new video output */
     p_vout->p_sys->p_vout = SpawnRealVout( p_vout );

@@ -475,6 +475,10 @@ static void End( vout_thread_t *p_vout )
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_index;
 
+    DEL_PARENT_CALLBACKS( SendEventsToChild );
+
+    DEL_CALLBACKS( p_sys->p_vout, SendEvents );
+
     /* Free the fake output buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
@@ -485,9 +489,7 @@ static void End( vout_thread_t *p_vout )
     var_DelCallback( p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
     var_DelCallback( p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
 
-    DEL_CALLBACKS( p_sys->p_vout, SendEvents );
-    vlc_object_detach( p_sys->p_vout );
-    vlc_object_release( p_sys->p_vout );
+    vout_Destroy( p_sys->p_vout );
 
     if( p_sys->p_blend->p_module )
         module_Unneed( p_sys->p_blend, p_sys->p_blend->p_module );
@@ -503,7 +505,6 @@ static void Destroy( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
 
     FreeLogoList( p_sys->p_logo_list );
     free( p_sys->p_logo_list );

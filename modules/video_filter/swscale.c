@@ -191,6 +191,8 @@ static int OpenScaler( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
+    if( p_sys->ctx ) sws_freeContext( p_sys->ctx );
+    p_sys->ctx = NULL;
 
     msg_Dbg( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s",
              p_filter->fmt_in.video.i_width, p_filter->fmt_in.video.i_height,
@@ -231,7 +233,8 @@ static int CheckInit( filter_t *p_filter )
     if( ( p_filter->fmt_in.video.i_width != p_sys->fmt_in.video.i_width ) ||
         ( p_filter->fmt_in.video.i_height != p_sys->fmt_in.video.i_height ) ||
         ( p_filter->fmt_out.video.i_width != p_sys->fmt_out.video.i_width ) ||
-        ( p_filter->fmt_out.video.i_height != p_sys->fmt_out.video.i_height ) )
+        ( p_filter->fmt_out.video.i_height != p_sys->fmt_out.video.i_height ) ||
+        !p_sys->ctx )
     {
         int i_fmt_in, i_fmt_out;
 

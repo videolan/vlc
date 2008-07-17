@@ -186,6 +186,10 @@ static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
+    DEL_PARENT_CALLBACKS( SendEventsToChild );
+
+    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
     /* Free the fake output buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
@@ -196,6 +200,8 @@ static void End( vout_thread_t *p_vout )
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-clicked", MouseEvent, p_vout);
+
+    vout_Destroy( p_vout->p_sys->p_vout );
 }
 
 /*****************************************************************************
@@ -205,16 +211,8 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    if( p_vout->p_sys->p_vout )
-    {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vlc_object_detach( p_vout->p_sys->p_vout );
-        vlc_object_release( p_vout->p_sys->p_vout );
-    }
-
     image_HandlerDelete( p_vout->p_sys->p_image );
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
 
     free( p_vout->p_sys );
 }
