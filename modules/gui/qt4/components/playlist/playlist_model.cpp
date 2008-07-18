@@ -876,7 +876,7 @@ void PLModel::popupInfo()
 {
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
                                                     i_popup_item,
-                                                    true );
+                                                    false );
     if( p_item )
     {
         MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_item->p_input );
