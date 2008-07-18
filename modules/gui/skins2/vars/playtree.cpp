@@ -198,7 +198,7 @@ void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
     {
         UString *pName = new UString( getIntf(),
                                    pNode->pp_children[i]->p_input->psz_name );
-        rTree.add( pNode->pp_children[i]->p_input->i_id, UStringPtr( pName ),
+        rTree.add( pNode->pp_children[i]->i_id, UStringPtr( pName ),
                      false,
                      m_pPlaylist->status.p_item == pNode->pp_children[i],
                      false, pNode->pp_children[i]->i_flags & PLAYLIST_RO_FLAG,
