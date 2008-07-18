@@ -39,12 +39,10 @@
 #include <math.h>                                          /* exp(), sqrt() */
 
 /*****************************************************************************
- * Local prototypes
+ * Module descriptor
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
-
-static picture_t *Filter( filter_t *, picture_t * );
 
 #define SIGMA_TEXT N_("Gaussian's std deviation")
 #define SIGMA_LONGTEXT N_( \
@@ -53,9 +51,6 @@ static picture_t *Filter( filter_t *, picture_t * );
 
 #define FILTER_PREFIX "gaussianblur-"
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 vlc_module_begin();
     set_description( N_("Gaussian blur video filter") );
     set_shortname( N_( "Gaussian Blur" ));
@@ -69,6 +64,11 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static picture_t *Filter( filter_t *, picture_t * );
+
 static const char *const ppsz_filter_options[] = {
     "sigma", NULL
 };
@@ -79,50 +79,44 @@ static const char *const ppsz_filter_options[] = {
  * For sigma = 4 floats are faster
  */
 #define DONT_USE_FLOATS
+
+#ifdef DONT_USE_FLOATS
+#   define type_t int
+#else
+#   define type_t float
+#endif
+
 struct filter_sys_t
 {
     double f_sigma;
     int i_dim;
-#ifdef DONT_USE_FLOATS
-    int *pi_distribution;
-    int *pi_buffer;
-    int *pi_scale;
-#else
-    float *pf_distribution;
-    float *pf_buffer;
-    float *pf_scale;
-#endif
+
+    type_t *pt_distribution;
+    type_t *pt_buffer;
+    type_t *pt_scale;
 };
 
 static void gaussianblur_InitDistribution( filter_sys_t *p_sys )
 {
     double f_sigma = p_sys->f_sigma;
     int i_dim = (int)(3.*f_sigma);
-#ifdef DONT_USE_FLOATS
-    int *pi_distribution = (int*)malloc( (2*i_dim+1) * sizeof( int ) );
-#else
-    float *pf_distribution = (float*)malloc( (2*i_dim+1) * sizeof( float ) );
-#endif
+    type_t *pt_distribution = malloc( (2*i_dim+1) * sizeof( type_t ) );
     int x;
+
     for( x = -i_dim; x <= i_dim; x++ )
     {
+        const float f_distribution = sqrt( exp(-(x*x)/(f_sigma*f_sigma) ) / (2.*M_PI*f_sigma*f_sigma) );
 #ifdef DONT_USE_FLOATS
-        pi_distribution[i_dim+x] =
-            (int)( sqrt( exp(-(x*x)/(f_sigma*f_sigma) )
-                 / (2.*M_PI*f_sigma*f_sigma) )  * (double)(1<<8) );
-        printf("%d\n",pi_distribution[i_dim+x]);
+        const float f_factor = 1 << 8;
 #else
-        pf_distribution[i_dim+x] = (float)
-            sqrt( exp(-(x*x)/(f_sigma*f_sigma) ) / (2.*M_PI*f_sigma*f_sigma) );
-        printf("%f\n",pf_distribution[i_dim+x]);
+        const float f_factor = 1;
 #endif
+
+        pt_distribution[i_dim+x] = (type_t)( f_distribution * f_factor );
+        //printf("%f\n",(float)pt_distribution[i_dim+x]);
     }
     p_sys->i_dim = i_dim;
-#ifdef DONT_USE_FLOATS
-    p_sys->pi_distribution = pi_distribution;
-#else
-    p_sys->pf_distribution = pf_distribution;
-#endif
+    p_sys->pt_distribution = pt_distribution;
 }
 
 static int Create( vlc_object_t *p_this )
@@ -169,13 +163,9 @@ static int Create( vlc_object_t *p_this )
     gaussianblur_InitDistribution( p_filter->p_sys );
     msg_Dbg( p_filter, "gaussian distribution is %d pixels wide",
              p_filter->p_sys->i_dim*2+1 );
-#ifdef DONT_USE_FLOATS
-    p_filter->p_sys->pi_buffer = NULL;
-    p_filter->p_sys->pi_scale = NULL;
-#else
-    p_filter->p_sys->pf_buffer = NULL;
-    p_filter->p_sys->pf_scale = NULL;
-#endif
+
+    p_filter->p_sys->pt_buffer = NULL;
+    p_filter->p_sys->pt_scale = NULL;
 
     return VLC_SUCCESS;
 }
@@ -183,15 +173,11 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-#ifdef DONT_USE_FLOATS
-    free( p_filter->p_sys->pi_distribution );
-    free( p_filter->p_sys->pi_buffer );
-    free( p_filter->p_sys->pi_scale );
-#else
-    free( p_filter->p_sys->pf_distribution );
-    free( p_filter->p_sys->pf_buffer );
-    free( p_filter->p_sys->pf_scale );
-#endif
+
+    free( p_filter->p_sys->pt_distribution );
+    free( p_filter->p_sys->pt_buffer );
+    free( p_filter->p_sys->pt_scale );
+
     free( p_filter->p_sys );
 }
 
@@ -201,15 +187,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     filter_sys_t *p_sys = p_filter->p_sys;
     int i_plane;
     const int i_dim = p_sys->i_dim;
-#ifdef DONT_USE_FLOATS
-    int *pi_buffer;
-    int *pi_scale;
-    const int *pi_distribution = p_sys->pi_distribution;
-#else
-    float *pf_buffer;
-    float *pf_scale;
-    const float *pf_distribution = p_sys->pf_distribution;
-#endif
+    type_t *pt_buffer;
+    type_t *pt_scale;
+    const type_t *pt_distribution = p_sys->pt_distribution;
+
     if( !p_pic ) return NULL;
 
     p_outpic = p_filter->pf_vout_buffer_new( p_filter );
@@ -219,54 +200,32 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         picture_Release( p_pic );
         return NULL;
     }
-#ifdef DONT_USE_FLOATS
-    if( !p_sys->pi_buffer )
+    if( !p_sys->pt_buffer )
     {
-        p_sys->pi_buffer = (int*)realloc( p_sys->pi_buffer,
-                                          p_pic->p[Y_PLANE].i_visible_lines
-                                          * p_pic->p[Y_PLANE].i_pitch
-                                          * sizeof( int ) );
+        p_sys->pt_buffer = realloc( p_sys->pt_buffer,
+                                    p_pic->p[Y_PLANE].i_visible_lines *
+                                        p_pic->p[Y_PLANE].i_pitch *
+                                        sizeof( type_t ) );
     }
-    pi_buffer = p_sys->pi_buffer;
-#else
-    if( !p_sys->pf_buffer )
-    {
-        p_sys->pf_buffer = (float*)realloc( p_sys->pf_buffer,
-                                            p_pic->p[Y_PLANE].i_visible_lines
-                                            * p_pic->p[Y_PLANE].i_pitch
-                                            * sizeof( float ) );
-    }
-    pf_buffer = p_sys->pf_buffer;
-#endif
-#ifdef DONT_USE_FLOATS
-    if( !p_sys->pi_scale )
-#else
-    if( !p_sys->pf_scale )
-#endif
+
+    pt_buffer = p_sys->pt_buffer;
+    if( !p_sys->pt_scale )
     {
         const int i_visible_lines = p_pic->p[Y_PLANE].i_visible_lines;
         const int i_visible_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
         const int i_pitch = p_pic->p[Y_PLANE].i_pitch;
         int i_col, i_line;
-#ifdef DONT_USE_FLOATS
-        p_sys->pi_scale = (int*)malloc( i_visible_lines * i_pitch
-                                        * sizeof( int ) );
-        pi_scale = p_sys->pi_scale;
-#else
-        p_sys->pf_scale = (float*)malloc( i_visible_lines * i_pitch
-                                          * sizeof( float ) );
-        pf_scale = p_sys->pf_scale;
-#endif
+
+        p_sys->pt_scale = malloc( i_visible_lines * i_pitch * sizeof( type_t ) );
+        pt_scale = p_sys->pt_scale;
+
         for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
         {
             for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
             {
                 int x, y;
-#ifdef DONT_USE_FLOATS
-                int value = 0;
-#else
-                double value = 0.;
-#endif
+                type_t t_value = 0;
+
                 for( y = __MAX( -i_dim, -i_line );
                      y <= __MIN( i_dim, i_visible_lines - i_line - 1 );
                      y++ )
@@ -275,29 +234,16 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                          x <= __MIN( i_dim, i_visible_pitch - i_col + 1 );
                          x++ )
                     {
-#ifdef DONT_USE_FLOATS
-                        value += pi_distribution[y+i_dim]
-                               * pi_distribution[x+i_dim];
-#else
-                        value += ((double)pf_distribution[y+i_dim])
-                               * ((double)pf_distribution[x+i_dim]);
-#endif
+                        t_value += pt_distribution[y+i_dim] *
+                                   pt_distribution[x+i_dim];
                     }
                 }
-#ifdef DONT_USE_FLOATS
-                pi_scale[i_line*i_pitch+i_col] = value;
-#else
-                pf_scale[i_line*i_pitch+i_col] = (float)(1./value);
-#endif
+                pt_scale[i_line*i_pitch+i_col] = t_value;
             }
         }
     }
-#ifdef DONT_USE_FLOATS
-    pi_scale = p_sys->pi_scale;
-#else
-    pf_scale = p_sys->pf_scale;
-#endif
 
+    pt_scale = p_sys->pt_scale;
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
 
@@ -316,60 +262,36 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         {
             for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
             {
-#ifdef DONT_USE_FLOATS
-                int value = 0;
-#else
-                float value = 0.;
-#endif
+                type_t t_value = 0;
                 int x;
                 const int c = i_line*i_pitch+i_col;
                 for( x = __MAX( -i_dim, -i_col*(x_factor+1) );
                      x <= __MIN( i_dim, (i_visible_pitch - i_col)*(x_factor+1) + 1 );
                      x++ )
                 {
-#ifdef DONT_USE_FLOATS
-                    value += pi_distribution[x+i_dim]
-                           * p_in[c+(x>>x_factor)];
-#else
-                    value += pf_distribution[x+i_dim]
-                           * (float)p_in[c+(x>>x_factor)];
-#endif
+                    t_value += pt_distribution[x+i_dim] *
+                               p_in[c+(x>>x_factor)];
                 }
-#ifdef DONT_USE_FLOATS
-                pi_buffer[c] = value;
-#else
-                pf_buffer[c] = value;
-#endif
+                pt_buffer[c] = t_value;
             }
         }
         for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
         {
             for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
             {
-#ifdef DONT_USE_FLOATS
-                int value = 0;
-#else
-                float value = 0.;
-#endif
+                type_t t_value = 0;
                 int y;
                 const int c = i_line*i_pitch+i_col;
                 for( y = __MAX( -i_dim, (-i_line)*(y_factor+1) );
                      y <= __MIN( i_dim, (i_visible_lines - i_line)*(y_factor+1) - 1 );
                      y++ )
                 {
-#ifdef DONT_USE_FLOATS
-                    value += pi_distribution[y+i_dim]
-                           * pi_buffer[c+(y>>y_factor)*i_pitch];
-#else
-                    value += pf_distribution[y+i_dim]
-                           * pf_buffer[c+(y>>y_factor)*i_pitch];
-#endif
+                    t_value += pt_distribution[y+i_dim] *
+                               pt_buffer[c+(y>>y_factor)*i_pitch];
                 }
-#ifdef DONT_USE_FLOATS
-                p_out[c] = (uint8_t)(value/pi_scale[(i_line<<y_factor)*(i_pitch<<x_factor)+(i_col<<x_factor)]);
-#else
-                p_out[c] = (uint8_t)(value*pf_scale[(i_line<<y_factor)*(i_pitch<<x_factor)+(i_col<<x_factor)]);
-#endif
+
+                const type_t t_scale = pt_scale[(i_line<<y_factor)*(i_pitch<<x_factor)+(i_col<<x_factor)];
+                p_out[c] = (uint8_t)(t_value / t_scale); // FIXME wouldn't it be better to round instead of trunc ?
             }
         }
     }
