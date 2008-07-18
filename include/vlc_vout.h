@@ -116,6 +116,39 @@ struct picture_t
 };
 
 /**
+ * This function will increase the picture reference count.
+ * It will not have any effect on picture obtained from vout
+ */
+static inline void picture_Yield( picture_t *p_picture )
+{
+    if( p_picture->pf_release )
+        p_picture->i_refcount++;
+}
+/**
+ * This function will release a picture.
+ * It will not have any effect on picture obtained from vout
+ */
+static inline void picture_Release( picture_t *p_picture )
+{
+    /* FIXME why do we let pf_release handle the i_refcount ? */
+    if( p_picture->pf_release )
+        p_picture->pf_release( p_picture );
+}
+
+/**
+ * This function will copy all picture dynamic properties.
+ */
+static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
+{
+    p_dst->date = p_src->date;
+    p_dst->b_force = p_src->b_force;
+
+    p_dst->b_progressive = p_src->b_progressive;
+    p_dst->i_nb_fields = p_src->i_nb_fields;
+    p_dst->b_top_field_first = p_src->b_top_field_first;
+}
+
+/**
  * Video picture heap, either render (to store pictures used
  * by the decoder) or output (to store pictures displayed by the vout plugin)
  */

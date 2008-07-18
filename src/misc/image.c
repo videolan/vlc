@@ -139,8 +139,8 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
     while( (p_tmp = p_image->p_dec->pf_decode_video( p_image->p_dec, &p_block ))
              != NULL )
     {
-        if ( p_pic != NULL )
-            p_pic->pf_release( p_pic );
+        if( p_pic != NULL )
+            picture_Release( p_pic );
         p_pic = p_tmp;
     }
 
@@ -188,7 +188,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
 
             if( !p_image->p_filter )
             {
-                p_pic->pf_release( p_pic );
+                picture_Release( p_pic );
                 return NULL;
             }
         }
@@ -316,8 +316,8 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
             p_image->p_filter->fmt_out.video = p_image->p_enc->fmt_in.video;
         }
 
-        if( p_pic->pf_release )
-            p_pic->i_refcount++;
+        picture_Yield( p_pic );
+
         p_tmp_pic =
             p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 
@@ -446,8 +446,8 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt_out;
     }
 
-    if( p_pic->pf_release )
-        p_pic->i_refcount++;
+    picture_Yield( p_pic );
+
     p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 
     if( p_fmt_in->i_chroma == p_fmt_out->i_chroma &&
@@ -455,7 +455,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         p_fmt_in->i_height == p_fmt_out->i_height )
     {
         /* Duplicate image */
-        p_pif->pf_release( p_pif ); /* XXX: Better fix must be possible */
+        picture_Release( p_pif ); /* XXX: Better fix must be possible */
         p_pif = p_image->p_filter->pf_vout_buffer_new( p_image->p_filter );
         if( p_pif ) vout_CopyPicture( p_image->p_parent, p_pif, p_pic );
     }
@@ -493,8 +493,8 @@ static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt;
     }
 
-    if( p_pic->pf_release )
-        p_pic->i_refcount++;
+    picture_Yield( p_pic );
+
     return p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 }
 
@@ -611,13 +611,13 @@ static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 static void video_link_picture( decoder_t *p_dec, picture_t *p_pic )
 {
     (void)p_dec;
-    p_pic->i_refcount++;
+    picture_Yield( p_pic );
 }
 
 static void video_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 {
-    (void)p_dec; (void)p_pic;
-    video_release_buffer( p_pic );
+    (void)p_dec;
+    picture_Release( p_pic );
 }
 
 static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
