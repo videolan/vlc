@@ -77,7 +77,7 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
         pSrc += pPic->p->i_pitch - m_width * 4;
     }
 
-    pPic->pf_release( pPic );
+    picture_Release( pPic );
     return;
 }
 

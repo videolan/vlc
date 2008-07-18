@@ -521,7 +521,7 @@ static void Destroy( vlc_object_t *p_this )
     if( p_sys->p_image )
         image_HandlerDelete( p_sys->p_image );
     if( p_sys->p_overlay )
-        p_sys->p_overlay->pf_release( p_sys->p_overlay );
+        picture_Release( p_sys->p_overlay );
 
     free( p_sys->p_style );
     free( p_sys );
@@ -1207,7 +1207,7 @@ static void Render( intf_thread_t *p_intf, struct fbosd_render_t *render )
         {
             RenderPicture( p_intf, render->i_x, render->i_y,
                            p_pic, p_sys->p_overlay );
-            p_pic->pf_release( p_pic );
+            picture_Release( p_pic );
         }
     }
     else if( render->i_type == FBOSD_RENDER_TEXT )
@@ -1232,7 +1232,7 @@ static void Render( intf_thread_t *p_intf, struct fbosd_render_t *render )
         {
             RenderPicture( p_intf, render->i_x, render->i_y,
                            p_text, p_sys->p_overlay );
-            p_text->pf_release( p_text );
+            picture_Release( p_text );
         }
 #endif
     }
