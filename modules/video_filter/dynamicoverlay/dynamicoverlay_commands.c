@@ -512,7 +512,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
             msg_Err( p_filter,
                      "Insufficient data in shared memory. need %zu, got %zu",
                      i_neededsize, i_size );
-            p_ovl->data.p_pic->pf_release( p_ovl->data.p_pic );
+            picture_Release( p_ovl->data.p_pic );
             free( p_ovl->data.p_pic );
             p_ovl->data.p_pic = NULL;
             return VLC_EGENERIC;
@@ -522,7 +522,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
         if( p_data == NULL )
         {
             msg_Err( p_filter, "Unable to attach to shared memory" );
-            p_ovl->data.p_pic->pf_release( p_ovl->data.p_pic );
+            picture_Release( p_ovl->data.p_pic );
             free( p_ovl->data.p_pic );
             p_ovl->data.p_pic = NULL;
             return VLC_ENOMEM;

@@ -279,7 +279,7 @@ static void FreeLogoList( logo_list_t *p_logo_list )
         FREENULL( p_logo->psz_file );
         if( p_logo->p_pic )
         {
-            p_logo->p_pic->pf_release( p_logo->p_pic );
+            picture_Release( p_logo->p_pic );
             p_logo->p_pic = NULL;
         }
     }

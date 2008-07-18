@@ -435,7 +435,7 @@ static void ReleaseImages(vout_thread_t *p_vout)
     /* Release temp picture_t if it exists */
     if (p_vout->p_sys->p_to_be_freed)
     {
-        p_vout->p_sys->p_to_be_freed->pf_release( p_vout->p_sys->p_to_be_freed );
+        picture_Release( p_vout->p_sys->p_to_be_freed );
         p_vout->p_sys->p_to_be_freed = NULL;
     }
     if (p_vout->p_sys->i_verbosity > VERB_WARN)

@@ -380,7 +380,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 p_converted->p[i_plane].i_visible_pitch );
             }
         }
-        p_converted->pf_release( p_converted );
+        picture_Release( p_converted );
 
         /* white rectangle on visualization */
         v_w = p_oyp->i_pitch*ZOOM_FACTOR/(VIS_ZOOM*o_zoom);
@@ -461,7 +461,6 @@ o o X o o o X X X X X o o X X X X o o o X X X X X o o X X X o o o X X X o o X o 
             }
         }
     }
-
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 }
 

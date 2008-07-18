@@ -2120,7 +2120,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             RenderDiscard( p_vout, p_pic_dst, p_pic, 0 );
 #endif
             msg_Err( p_vout, "discarding lines is not supported yet" );
-            p_pic_dst->pf_release( p_pic_dst );
+            picture_Release( p_pic_dst );
             return p_pic;
             break;
 
@@ -2137,7 +2137,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             RenderLinear( p_vout, pp_outpic[1], p_pic, 1 );
 #endif
             msg_Err( p_vout, "doubling the frame rate is not supported yet" );
-            p_pic_dst->pf_release( p_pic_dst );
+            picture_Release( p_pic_dst );
             return p_pic;
             break;
 
@@ -2154,13 +2154,10 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
     }
 
-    p_pic_dst->date = p_pic->date;
-    p_pic_dst->b_force = p_pic->b_force;
-    p_pic_dst->i_nb_fields = p_pic->i_nb_fields;
+    picture_CopyProperties( p_pic_dst, p_pic );
     p_pic_dst->b_progressive = true;
-    p_pic_dst->b_top_field_first = p_pic->b_top_field_first;
 
-    p_pic->pf_release( p_pic );
+    picture_Release( p_pic );
     return p_pic_dst;
 }
 

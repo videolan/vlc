@@ -135,7 +135,7 @@ static void Destroy( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_sys->mask_lock );
     if( p_filter->p_sys->p_mask )
-        p_filter->p_sys->p_mask->pf_release( p_filter->p_sys->p_mask );
+        picture_Release( p_filter->p_sys->p_mask );
 
     free( p_filter->p_sys );
 }
@@ -201,7 +201,7 @@ static void LoadMask( filter_t *p_filter, const char *psz_filename )
     memset( &fmt_out, 0, sizeof( video_format_t ) );
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
     if( p_filter->p_sys->p_mask )
-        p_filter->p_sys->p_mask->pf_release( p_filter->p_sys->p_mask );
+        picture_Release( p_filter->p_sys->p_mask );
     p_image = image_HandlerCreate( p_filter );
     p_filter->p_sys->p_mask =
         image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
@@ -236,7 +236,7 @@ static int MaskCallback( vlc_object_t *p_this, char const *psz_var,
         }
         else if( p_sys->p_mask )
         {
-            p_sys->p_mask->pf_release( p_sys->p_mask );
+            picture_Release( p_sys->p_mask );
             p_sys->p_mask = NULL;
         }
         vlc_mutex_unlock( &p_sys->mask_lock );

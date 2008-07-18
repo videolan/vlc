@@ -107,7 +107,7 @@ static void LoadMask( filter_t *p_filter, const char *psz_filename )
     if( p_filter->p_sys->p_mask )
     {
         if( p_old_mask )
-            p_old_mask->pf_release( p_old_mask );
+            picture_Release( p_old_mask );
     }
     else if( p_old_mask )
     {
@@ -186,7 +186,7 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     if( p_sys->p_mask )
-        p_sys->p_mask->pf_release( p_sys->p_mask );
+        picture_Release( p_sys->p_mask );
 
     vlc_mutex_destroy( &p_sys->lock );
 
@@ -206,8 +206,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( !p_outpic )
     {
         msg_Warn( p_filter, "can't get output picture" );
-        if( p_pic->pf_release )
-            p_pic->pf_release( p_pic );
+        picture_Release( p_pic );
         return NULL;
     }
 

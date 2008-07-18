@@ -426,7 +426,7 @@ static void MosaicReleasePicture( picture_t *p_picture )
 {
     picture_t *p_original_pic = (picture_t *)p_picture->p_sys;
 
-    p_original_pic->pf_release( p_original_pic );
+    picture_Release( p_original_pic );
 }
 
 /*****************************************************************************
@@ -546,14 +546,14 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             if ( p_es->p_picture->p_next != NULL )
             {
                 picture_t *p_next = p_es->p_picture->p_next;
-                p_es->p_picture->pf_release( p_es->p_picture );
+                p_original_pic( p_es->p_picture );
                 p_es->p_picture = p_next;
             }
             else if ( p_es->p_picture->date + p_sys->i_delay + BLANK_DELAY <
                         date )
             {
                 /* Display blank */
-                p_es->p_picture->pf_release( p_es->p_picture );
+                picture_Release( p_es->p_picture );
                 p_es->p_picture = NULL;
                 p_es->pp_last = &p_es->p_picture;
                 break;
@@ -633,7 +633,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         else
         {
             p_converted = p_es->p_picture;
-            p_converted->i_refcount++;
+            picture_Yield( p_converted );
             fmt_in.i_width = fmt_out.i_width = p_converted->format.i_width;
             fmt_in.i_height = fmt_out.i_height = p_converted->format.i_height;
             fmt_in.i_chroma = fmt_out.i_chroma = p_converted->format.i_chroma;

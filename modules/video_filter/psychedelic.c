@@ -146,8 +146,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( !p_outpic )
     {
         msg_Warn( p_filter, "can't get output picture" );
-        if( p_pic->pf_release )
-            p_pic->pf_release( p_pic );
+        picture_Release( p_pic );
         return NULL;
     }
 
@@ -189,25 +188,25 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( p_converted )
     {
 #define copyimage( plane, b ) \
-    for( y=0; y<p_converted->p[plane].i_visible_lines; y++) { \
-    for( x=0; x<p_converted->p[plane].i_visible_pitch; x++) { \
-        int nx, ny; \
-        if( p_filter->p_sys->yinc == 1 ) \
-            ny= y; \
-        else \
-            ny = p_converted->p[plane].i_visible_lines-y; \
-        if( p_filter->p_sys->xinc == 1 ) \
-            nx = x; \
-        else \
-            nx = p_converted->p[plane].i_visible_pitch-x; \
-        p_outpic->p[plane].p_pixels[(p_filter->p_sys->x*b+nx)+(ny+p_filter->p_sys->y*b)*p_outpic->p[plane].i_pitch ] = p_converted->p[plane].p_pixels[y*p_converted->p[plane].i_pitch+x]; \
-    } }
-    copyimage( Y_PLANE, 2 );
-    copyimage( U_PLANE, 1 );
-    copyimage( V_PLANE, 1 );
+        for( y=0; y<p_converted->p[plane].i_visible_lines; y++) { \
+        for( x=0; x<p_converted->p[plane].i_visible_pitch; x++) { \
+            int nx, ny; \
+            if( p_filter->p_sys->yinc == 1 ) \
+                ny= y; \
+            else \
+                ny = p_converted->p[plane].i_visible_lines-y; \
+            if( p_filter->p_sys->xinc == 1 ) \
+                nx = x; \
+            else \
+                nx = p_converted->p[plane].i_visible_pitch-x; \
+            p_outpic->p[plane].p_pixels[(p_filter->p_sys->x*b+nx)+(ny+p_filter->p_sys->y*b)*p_outpic->p[plane].i_pitch ] = p_converted->p[plane].p_pixels[y*p_converted->p[plane].i_pitch+x]; \
+        } }
+        copyimage( Y_PLANE, 2 );
+        copyimage( U_PLANE, 1 );
+        copyimage( V_PLANE, 1 );
 #undef copyimage
 
-    p_converted->pf_release( p_converted );
+        picture_Release( p_converted );
     }
     else
     {

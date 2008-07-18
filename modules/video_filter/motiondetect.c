@@ -184,8 +184,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     if( !p_outpic )
     {
         msg_Warn( p_filter, "can't get output picture" );
-        if( p_inpic->pf_release )
-            p_inpic->pf_release( p_inpic );
+        picture_Release( p_inpic );
         return NULL;
     }
 
@@ -372,8 +371,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
     {
         msg_Warn( p_filter, "Unsupported input chroma (%4s)",
                   (char*)&(p_inpic->format.i_chroma) );
-        if( p_inpic->pf_release )
-            p_inpic->pf_release( p_inpic );
+        picture_Release( p_inpic );
         return NULL;
     }
 
@@ -401,8 +399,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
     if( !p_outpic )
     {
         msg_Warn( p_filter, "can't get output picture" );
-        if( p_inpic->pf_release )
-            p_inpic->pf_release( p_inpic );
+        picture_Release( p_inpic );
         return NULL;
     }
 

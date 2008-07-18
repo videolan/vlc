@@ -608,7 +608,7 @@ static picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
         fmt_out.i_height = p_sys->p_style->i_font_size;
 
         p_pic = image_Convert( p_handler, p_orig, &fmt_in, &fmt_out );
-        p_orig->pf_release( p_orig );
+        picture_Release( p_orig );
         if( !p_pic )
         {
             msg_Warn( p_filter, "Error while converting %s", psz_url );
@@ -976,7 +976,7 @@ static void FreeRSS( filter_t *p_filter)
         free( p_feed->psz_description );
         free( p_feed->psz_image );
         if( p_feed->p_pic != NULL )
-            p_feed->p_pic->pf_release( p_feed->p_pic );
+            picture_Release( p_feed->p_pic );
     }
     free( p_sys->p_feeds );
     p_sys->i_feeds = 0;

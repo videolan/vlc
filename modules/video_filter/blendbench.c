@@ -200,8 +200,8 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    p_sys->p_base_image->pf_release( p_sys->p_base_image );
-    p_sys->p_blend_image->pf_release( p_sys->p_blend_image );
+    picture_Release( p_sys->p_base_image );
+    picture_Release( p_sys->p_blend_image );
 }
 
 /*****************************************************************************
@@ -218,7 +218,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_blend = vlc_object_create( p_filter, sizeof(filter_t) );
     if( !p_blend )
     {
-        p_pic->pf_release( p_pic );
+        picture_Release( p_pic );
         return NULL;
     }
     vlc_object_attach( p_blend, p_filter );
@@ -227,7 +227,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_blend->p_module = module_Need( p_blend, "video blending", 0, 0 );
     if( !p_blend->p_module )
     {
-        p_pic->pf_release( p_pic );
+        picture_Release( p_pic );
         vlc_object_detach( p_blend );
         vlc_object_release( p_blend );
         return NULL;
