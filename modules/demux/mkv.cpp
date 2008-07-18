@@ -1686,7 +1686,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:
-            if( p_sys->titles.size() )
+            if( p_sys->titles.size() > 1 || ( p_sys->titles.size() == 1 && p_sys->titles[0]->i_seekpoint > 0 ) )
             {
                 input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
                 int *pi_int    = (int*)va_arg( args, int* );
@@ -1698,7 +1698,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->titles[i] );
                 }
-
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
