@@ -546,7 +546,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             if ( p_es->p_picture->p_next != NULL )
             {
                 picture_t *p_next = p_es->p_picture->p_next;
-                p_original_pic( p_es->p_picture );
+                picture_Release( p_es->p_picture );
                 p_es->p_picture = p_next;
             }
             else if ( p_es->p_picture->date + p_sys->i_delay + BLANK_DELAY <
