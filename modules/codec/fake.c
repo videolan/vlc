@@ -277,7 +277,7 @@ static int OpenDecoder( vlc_object_t *p_this )
             }
             else
             {
-                p_old->pf_release( p_old );
+                picture_Release( p_old );
             }
         }
     }
@@ -314,7 +314,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
         else
         {
-            p_old->pf_release( p_old );
+            picture_Release( p_old );
         }
     }
 
@@ -376,7 +376,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     picture_t *p_image = p_dec->p_sys->p_image;
 
     if( p_image != NULL )
-        p_image->pf_release( p_image );
+        picture_Release( p_image );
 
     vlc_mutex_destroy( &p_dec->p_sys->lock );
     free( p_dec->p_sys );
@@ -425,7 +425,7 @@ static int FakeCallback( vlc_object_t *p_this, char const *psz_var,
         }
 
         p_dec->p_sys->p_image = p_new_image;
-        p_image->pf_release( p_image );
+        picture_Release( p_image );
         vlc_mutex_unlock( &p_dec->p_sys->lock );
     }
     else if( !strcmp( psz_var, "fake-file-reload" ) )

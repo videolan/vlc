@@ -298,7 +298,7 @@ static void CloseDecoder( vlc_object_t *p_this )
                 continue;
 
             if( p_sys->pp_images[i]->p_pic )
-                p_sys->pp_images[i]->p_pic->pf_release( p_sys->pp_images[i]->p_pic );
+                picture_Release( p_sys->pp_images[i]->p_pic );
             free( p_sys->pp_images[i]->psz_filename );
 
             free( p_sys->pp_images[i] );
