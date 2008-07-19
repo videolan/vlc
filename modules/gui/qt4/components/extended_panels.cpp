@@ -443,7 +443,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
         else if( lineedit )
         {
             char str[30];
-            sprintf( str, "%06X", val.i_int );
+            snprintf( str, sizeof(str), "%06X", val.i_int );
             lineedit->setText( str );
         }
         else if( combobox ) combobox->setCurrentIndex(
@@ -915,13 +915,11 @@ void Equalizer::set2Pass()
 
 void Equalizer::setPreamp()
 {
-    float f= ( float )(  ui.preampSlider->value() ) /10 - 20;
-    char psz_val[5];
+    const float f = ( float )(  ui.preampSlider->value() ) /10 - 20;
     aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
                                        VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
-    sprintf( psz_val, "%.1f", f );
-    ui.preampLabel->setText( qtr( "Preamp\n" ) + psz_val + qtr( "dB" ) );
+    ui.preampLabel->setText( qtr( "Preamp\n" ) + QString::number( f, 'f', 1 ) + qtr( "dB" ) );
     if( p_aout )
     {
         delCallbacks( p_aout );
@@ -934,18 +932,19 @@ void Equalizer::setPreamp()
 
 void Equalizer::setBand()
 {
-    char psz_values[102]; memset( psz_values, 0, 102 );
-
     /**\todo smoothing */
 
-    for( int i = 0 ; i< BANDS ; i++ )
+    QString values;
+    for( int i = 0; i < BANDS; i++ )
     {
-        char psz_val[8];
-        float f_val = ( float )(  bands[i]->value() ) / 10 - 20 ;
-        sprintf( psz_values, "%s %f", psz_values, f_val );
-        sprintf( psz_val, "% 5.1f", f_val );
-        band_texts[i]->setText( band_frequencies[i] + "\n" + psz_val + "dB" );
+        const float f_val = (float)(  bands[i]->value() ) / 10 - 20;
+        QString val = QString("%1").arg( f_val, 5, 'f', 1 );
+
+        band_texts[i]->setText( band_frequencies[i] + "\n" + val + "dB" );
+        values += " " + val;
     }
+    const char *psz_values = values.toAscii().constData();
+
     aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
                                           VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_aout )
@@ -963,23 +962,20 @@ void Equalizer::setValues( char *psz_bands, float f_preamp )
     {
         for( int i = 0; i < BANDS; i++ )
         {
-            char psz_val[8];
-            float f = strtof( p, &p );
-            int  i_val= ( int )( ( f + 20 ) * 10 );
-            bands[i]->setValue(  i_val );
-            sprintf( psz_val, "% 5.1f", f );
-            band_texts[i]->setText( band_frequencies[i] + "\n" + psz_val +
-                                    "dB" );
-            if( p == NULL || *p == '\0' ) break;
+            const float f = strtof( p, &p );
+
+            bands[i]->setValue( (int)( ( f + 20 ) * 10 )  );
+
+            band_texts[i]->setText( band_frequencies[i] + "\n" + QString("%1").arg( f, 5, 'f', 1 ) + "dB" );
+            if( p == NULL || *p == '\0' )
+                break;
             p++;
-            if( *p == '\0' )  break;
+            if( *p == '\0' )
+                break;
         }
     }
-    char psz_val[5];
-    int i_val = ( int )( ( f_preamp + 20 ) * 10 );
-    sprintf( psz_val, "%.1f", f_preamp );
-    ui.preampSlider->setValue( i_val );
-    ui.preampLabel->setText( qtr( "Preamp\n" ) + psz_val + qtr( "dB" ) );
+    ui.preampSlider->setValue( (int)( ( f_preamp + 20 ) * 10 ) );
+    ui.preampLabel->setText( qtr( "Preamp\n" ) + QString::number( f_preamp, 'f', 1 ) + qtr( "dB" ) );
 }
 
 void Equalizer::setPreset( int preset )
@@ -987,15 +983,13 @@ void Equalizer::setPreset( int preset )
     aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
                                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
-    char psz_values[102]; memset( psz_values, 0, 102 );
-    char psz_values2[102];memset( psz_values2, 0, 102 );
+    QString values;
     for( int i = 0 ; i< BANDS ;i++ )
-    {
-        strcpy( psz_values2, psz_values );
+        values += QString( " %1" ).arg( eqz_preset_10b[preset]->f_amp[i] );
 
-        sprintf( psz_values, "%s %5.1f",
-                 psz_values2, eqz_preset_10b[preset]->f_amp[i] );
-    }
+    /* XXX Only needed because of setValues */
+    char psz_values[256];
+    snprintf( psz_values, sizeof(psz_values), "%s", values.toAscii().constData() );
 
     if( p_aout )
     {
@@ -1144,16 +1138,13 @@ void Spatializer::setInitValues()
 
 void Spatializer::setValues( float *controlVars )
 {
-    char psz_val[5];
-    char var_name[5];
     aout_instance_t *p_aout= ( aout_instance_t * )
         vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
     for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
     {
-        float f= ( float )(  spatCtrl[i]->value() );
-        sprintf( psz_val, "%.1f", f );
-        ctrl_readout[i]->setText( psz_val );
+        float f = (float)(  spatCtrl[i]->value() );
+        ctrl_readout[i]->setText( QString::number( f, 'f',  1 ) );
     }
     if( p_aout )
     {
