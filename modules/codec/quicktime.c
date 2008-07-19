@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
- *          Derk-Jan Hartman <thedj at users.sf.net>
+ *          Derk-Jan Hartman <hartman at videolan.org>>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( N_("QuickTime library decoder") );
-    set_capability( "decoder", 100 );
+    set_capability( "decoder", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_callbacks( Open, Close );
