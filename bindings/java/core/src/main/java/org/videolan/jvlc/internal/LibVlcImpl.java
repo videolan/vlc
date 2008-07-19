@@ -26,7 +26,6 @@
 package org.videolan.jvlc.internal;
 
 import java.awt.Canvas;
-import java.awt.Component;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -56,14 +55,18 @@ public class LibVlcImpl
         final Object lock = new Object();
 
         System.out.println("Starting vlc");
+        System.out.println("version: " + libVlc.libvlc_get_version());
+        System.out.println("changeset: " + libVlc.libvlc_get_changeset());
+        System.out.println("compiler: " + libVlc.libvlc_get_compiler());
+        
         LibVlcInstance libvlc_instance_t = libVlc.libvlc_new(0, new String[] {"/usr/local/bin/vlc"}, exception);
 
         LibVlcMediaDescriptor mediaDescriptor = libVlc
             .libvlc_media_new(libvlc_instance_t, "/home/carone/a.avi", exception);
 
-        LibVlcMediaInstance mediaInstance = libVlc.libvlc_media_player_new_from_media(mediaDescriptor, exception);
+        LibVlcMediaInstance mediaPlayer = libVlc.libvlc_media_player_new_from_media(mediaDescriptor, exception);
 
-        LibVlcEventManager mediaInstanceEventManager = libVlc.libvlc_media_player_event_manager(mediaInstance, exception);
+        LibVlcEventManager mediaInstanceEventManager = libVlc.libvlc_media_player_event_manager(mediaPlayer, exception);
 
         LibVlcCallback played = new LibVlcCallback()
         {
@@ -115,9 +118,9 @@ public class LibVlcImpl
         frame.pack();
         
         long drawable = com.sun.jna.Native.getComponentID(canvas);
-        
-        libVlc.libvlc_video_set_parent(libvlc_instance_t, drawable, exception);
 
-        libVlc.libvlc_media_player_play(mediaInstance, exception);
+        libVlc.libvlc_media_player_play(mediaPlayer, exception);
+
+        libVlc.libvlc_media_player_set_drawable(mediaPlayer, drawable, exception);
     }
 }

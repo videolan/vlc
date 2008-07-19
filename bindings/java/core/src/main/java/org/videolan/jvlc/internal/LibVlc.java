@@ -293,6 +293,12 @@ public interface LibVlc extends Library
     LibVlcInstance libvlc_new(int argc, String[] argv, libvlc_exception_t exception);
 
     void libvlc_release(LibVlcInstance libvlc_instance_t);
+    
+    String libvlc_get_version();
+    
+    String libvlc_get_compiler();
+    
+    String libvlc_get_changeset();
 
     // video
 
