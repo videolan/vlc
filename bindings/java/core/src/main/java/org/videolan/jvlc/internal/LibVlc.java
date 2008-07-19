@@ -41,7 +41,7 @@ public interface LibVlc extends Library
     LibVlc INSTANCE = (LibVlc) Native.loadLibrary("vlc", LibVlc.class);
 
     LibVlc SYNC_INSTANCE = (LibVlc) Native.synchronizedLibrary(INSTANCE);
-
+    
     public static class libvlc_exception_t extends Structure
     {
 
@@ -414,7 +414,7 @@ public interface LibVlc extends Library
 
     void libvlc_media_player_stop(LibVlcMediaInstance media_player, libvlc_exception_t exception);
 
-    void libvlc_media_player_set_drawable(LibVlcMediaInstance libvlc_media_player, long drawable,
+    void libvlc_media_player_set_drawable(LibVlcMediaInstance libvlc_media_player, int drawable,
         libvlc_exception_t exception);
 
     long libvlc_media_player_get_length(LibVlcMediaInstance instance, libvlc_exception_t exception);
