@@ -523,7 +523,11 @@ void PLModel::ProcessInputItemUpdate( int i_input_id )
     if( i_input_id <= 0 ) return;
     PLItem *item = FindByInput( rootItem, i_input_id );
     if( item )
+    {
+        QPL_LOCK;
         UpdateTreeItem( item, true );
+        QPL_UNLOCK;
+    }
 }
 
 void PLModel::ProcessItemRemoval( int i_id )
