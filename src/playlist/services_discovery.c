@@ -268,8 +268,8 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
     }
 
     /* Delete the non-node item normally */
-    playlist_DeleteInputInParent( p_parent->p_playlist, p_input->i_id,
-                                  p_parent, true );
+    playlist_DeleteFromInputInParent( p_parent->p_playlist, p_input->i_id,
+                                      p_parent, true );
 
     vlc_object_unlock( p_parent->p_playlist );
 }

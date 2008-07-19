@@ -360,7 +360,7 @@ VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( playlist_t *,const ch
 
 /*************************** Item deletion **************************/
 VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, bool ) );
-VLC_EXPORT( int,  playlist_DeleteInputInParent, ( playlist_t *, int, playlist_item_t *, bool ) );
+VLC_EXPORT( int,  playlist_DeleteFromInputInParent, ( playlist_t *, int, playlist_item_t *, bool ) );
 
 /*************************** Item fields accessors **************************/
 VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *, const char * ) );

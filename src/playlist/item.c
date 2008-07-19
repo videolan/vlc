@@ -252,8 +252,8 @@ static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
  * \param b_locked TRUE if the playlist is locked
  * \return VLC_SUCCESS or VLC_EGENERIC
  */
-int playlist_DeleteInputInParent( playlist_t *p_playlist, int i_input_id,
-                                  playlist_item_t *p_root, bool b_locked )
+int playlist_DeleteFromInputInParent( playlist_t *p_playlist, int i_input_id,
+                                      playlist_item_t *p_root, bool b_locked )
 {
     int i_ret;
     PL_LOCK_IF( !b_locked );
