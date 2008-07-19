@@ -90,6 +90,66 @@ struct filter_t
     filter_owner_sys_t *p_owner;
 };
 
+/**
+ * This function will return a new picture usable by p_filter as an output
+ * buffer. You have to release it using filter_DeletePicture or by returning
+ * it to the caller as a pf_video_filter return value.
+ * Provided for convenience.
+ */
+static inline picture_t *filter_NewPicture( filter_t *p_filter )
+{
+    picture_t *p_picture = p_filter->pf_vout_buffer_new( p_filter );
+    if( !p_picture )
+        msg_Warn( p_filter, "can't get output picture" );
+    return p_picture;
+}
+
+/**
+ * This function will release a picture create by filter_NewPicture.
+ * Provided for convenience.
+ */
+static inline void filter_DeletePicture( filter_t *p_filter, picture_t *p_picture )
+{
+    p_filter->pf_vout_buffer_del( p_filter, p_picture );
+}
+
+/**
+ * This function will return a new subpicture usable by p_filter as an output
+ * buffer. You have to release it using filter_DeleteSubpicture or by returning
+ * it to the caller as a pf_sub_filter return value.
+ * Provided for convenience.
+ */
+static inline subpicture_t *filter_NewSubpicture( filter_t *p_filter )
+{
+    subpicture_t *p_subpicture = p_filter->pf_sub_buffer_new( p_filter );
+    if( !p_subpicture )
+        msg_Warn( p_filter, "can't get output subpicture" );
+    return p_subpicture;
+}
+
+/**
+ * This function will release a subpicture create by filter_NewSubicture.
+ * Provided for convenience.
+ */
+static inline void filter_DeleteSubpicture( filter_t *p_filter, subpicture_t *p_subpicture )
+{
+    p_filter->pf_sub_buffer_del( p_filter, p_subpicture );
+}
+
+/**
+ * This function will return a new audio buffer usable by p_filter as an
+ * output buffer. You have to release it using block_Release or by returning
+ * it to the caller as a pf_audio_filter return value.
+ * Provided for convenience.
+ */
+static inline block_t *filter_NewAudioBuffer( filter_t *p_filter, int i_size )
+{
+    block_t *p_block = p_filter->pf_audio_buffer_new( p_filter, i_size );
+    if( !p_block )
+        msg_Warn( p_filter, "can't get output block" );
+    return p_block;
+}
+
 
 /**
  * Create a picture_t *(*)( filter_t *, picture_t * ) compatible wrapper
@@ -101,25 +161,18 @@ struct filter_t
     static picture_t *name ## _Filter ( filter_t *p_filter,             \
                                         picture_t *p_pic )              \
     {                                                                   \
-        picture_t *p_outpic = p_filter->pf_vout_buffer_new( p_filter ); \
+        picture_t *p_outpic = filter_NewPicture( p_filter );            \
         if( !p_outpic )                                                 \
         {                                                               \
-            msg_Warn( p_filter, "can't get output picture" );           \
-            if( p_pic->pf_release )                                     \
-                p_pic->pf_release( p_pic );                             \
+            picture_Release( p_pic );                                   \
             return NULL;                                                \
         }                                                               \
                                                                         \
         name( p_filter, p_pic, p_outpic );                              \
                                                                         \
-        p_outpic->date = p_pic->date;                                   \
-        p_outpic->b_force = p_pic->b_force;                             \
-        p_outpic->i_nb_fields = p_pic->i_nb_fields;                     \
-        p_outpic->b_progressive = p_pic->b_progressive;                 \
-        p_outpic->b_top_field_first = p_pic->b_top_field_first;         \
+        picture_CopyProperties( p_outpic, p_pic );                      \
+        picture_Release( p_pic );                                       \
                                                                         \
-        if( p_pic->pf_release )                                         \
-            p_pic->pf_release( p_pic );                                 \
         return p_outpic;                                                \
     }
 
