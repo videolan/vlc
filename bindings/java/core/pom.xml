@@ -23,6 +23,10 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <ciManagement>
+  	<system>Hudson</system>
+  	<url>http://hudson.videolan.org/</url>
+  </ciManagement>
   <repositories>
     <repository>
       <id>jvlc</id>
