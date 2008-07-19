@@ -259,7 +259,6 @@ playlist_ItemNewWithType
 playlist_ItemSetName
 playlist_ItemToNode
 playlist_LiveSearchUpdate
-playlist_NodeAddInput
 playlist_NodeAppend
 playlist_NodeChildrenCount
 playlist_NodeCreate
