@@ -355,7 +355,7 @@ static block_t *S24toFloat32( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
     return p_block_out;
 }
 
@@ -424,7 +424,7 @@ static block_t *S16toFloat32( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
     return p_block_out;
 }
 
@@ -457,7 +457,7 @@ static block_t *U16toFloat32( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
     return p_block_out;
 }
 
@@ -497,7 +497,7 @@ static block_t *S16toS24( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
     return p_block_out;
 }
 
@@ -632,7 +632,7 @@ static block_t *S8toU16( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
     return p_block_out;
 }
 
@@ -663,7 +663,7 @@ static block_t *U8toS16( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
     return p_block_out;
 }
 
@@ -695,7 +695,7 @@ static block_t *S8toS16( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
     return p_block_out;
 }
 
@@ -726,7 +726,7 @@ static block_t *U8toU16( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
     return p_block_out;
 }
 
