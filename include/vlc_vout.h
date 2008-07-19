@@ -585,7 +585,7 @@ VLC_EXPORT( vout_thread_t *, __vout_Request,    ( vlc_object_t *p_this, vout_thr
  * This function will create a suitable vout for a given p_fmt. It will never
  * reuse an already existing unused vout.
  *
- * You have to call either vout_Destroy or vout_Request on the returned value
+ * You have to call either vout_Close or vout_Request on the returned value
  * \param p_this a vlc object to which the returned vout will be attached
  * \param p_fmt the video format requested
  * \return a vout if the request is successfull, NULL otherwise
