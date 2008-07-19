@@ -465,6 +465,7 @@ void InputManager::telexToggle( bool b_enabled )
             }
         }
     }
+    emit teletextEnabled( b_enabled );
 }
 
 void InputManager::telexToggleButtons()
