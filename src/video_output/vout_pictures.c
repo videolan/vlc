@@ -973,9 +973,6 @@ void __vout_CopyPicture( vlc_object_t *p_this,
         }
     }
 
-    p_dest->date = p_src->date;
-    p_dest->b_force = p_src->b_force;
-    p_dest->i_nb_fields = p_src->i_nb_fields;
-    p_dest->b_progressive = p_src->b_progressive;
-    p_dest->b_top_field_first = p_src->b_top_field_first;
+    picture_CopyProperties( p_dest, p_src );
 }
+
