@@ -246,7 +246,6 @@ playlist_Clear
 playlist_Control
 playlist_CurrentInput
 playlist_DeleteFromInput
-playlist_DeleteFromInputInParent
 playlist_Export
 playlist_GetLastLeaf
 playlist_GetNextLeaf

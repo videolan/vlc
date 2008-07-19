@@ -103,6 +103,7 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
                                    int i_input_id, playlist_item_t *p_root,
                                    bool );
 
+int playlist_DeleteFromInputInParent( playlist_t *, int, playlist_item_t *, bool );
 int playlist_DeleteFromItemId( playlist_t*, int );
 int playlist_ItemDelete ( playlist_item_t * );
 
