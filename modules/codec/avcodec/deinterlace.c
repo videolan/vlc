@@ -122,9 +122,12 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     int i, i_res = -1;
 
     /* Request output picture */
-    p_pic_dst = p_filter->pf_vout_buffer_new( p_filter );
+    p_pic_dst = filter_NewPicture( p_filter );
     if( !p_pic_dst )
+    {
+        picture_Release( p_pic );
         return NULL;
+    }
 
     /* Prepare the AVPictures for the conversion */
     for( i = 0; i < p_pic->i_planes; i++ )
@@ -144,7 +147,8 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     if( i_res == -1 )
     {
         msg_Err( p_filter, "deinterlacing picture failed" );
-        p_filter->pf_vout_buffer_del( p_filter, p_pic_dst );
+        filter_DeletePicture( p_filter, p_pic_dst );
+        picture_Release( p_pic );
         return NULL;
     }
 

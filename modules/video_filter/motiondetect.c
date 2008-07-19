@@ -151,7 +151,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     uint8_t *p_oldpix;
     uint8_t *p_oldpix_u;
     uint8_t *p_oldpix_v;
-    uint8_t *p_outpix;
     uint32_t *p_buf;
     uint32_t *p_buf2;
 
@@ -180,22 +179,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     p_buf = p_sys->p_buf;
     p_buf2 = p_sys->p_buf2;
 
-    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
-        msg_Warn( p_filter, "can't get output picture" );
         picture_Release( p_inpic );
         return NULL;
     }
 
-    p_outpix = p_outpic->p[Y_PLANE].p_pixels;
-    vlc_memcpy( p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
-        p_inpic->p[Y_PLANE].i_pitch * p_inpic->p[Y_PLANE].i_visible_lines );
-    vlc_memcpy( p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
-        p_inpic->p[U_PLANE].i_pitch * p_inpic->p[U_PLANE].i_visible_lines );
-    vlc_memcpy( p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
-        p_inpic->p[V_PLANE].i_pitch * p_inpic->p[V_PLANE].i_visible_lines );
-
+    vout_CopyPicture( p_filter, p_outpic, p_inpic );
     vlc_mutex_lock( &p_filter->p_sys->lock );
 
     /**
@@ -293,33 +284,36 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
      * Count final number of shapes
      * Draw rectangles (there can be more than 1 moving shape in 1 rectangle)
      */
+    uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
+    const int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
     j = 0;
     for( i = 1; i < last; i++ )
     {
         if( colors[i] == i && color_x_min[i] != -1 )
         {
-            if( ( color_y_max[i] - color_y_min[i] ) * ( color_x_max[i] - color_x_min[i] ) < 16 ) continue;
+            if( ( color_y_max[i] - color_y_min[i] ) * ( color_x_max[i] - color_x_min[i] ) < 16 )
+                continue;
             j++;
             int x, y;
             y = color_y_min[i];
             for( x = color_x_min[i]; x <= color_x_max[i]; x++ )
             {
-                p_outpix[y*i_src_pitch+x] = 0xff;
+                p_outpix[y*i_dst_pitch+x] = 0xff;
             }
             y = color_y_max[i];
             for( x = color_x_min[i]; x <= color_x_max[i]; x++ )
             {
-                p_outpix[y*i_src_pitch+x] = 0xff;
+                p_outpix[y*i_dst_pitch+x] = 0xff;
             }
             x = color_x_min[i];
             for( y = color_y_min[i]; y <= color_y_max[i]; y++ )
             {
-                p_outpix[y*i_src_pitch+x] = 0xff;
+                p_outpix[y*i_dst_pitch+x] = 0xff;
             }
             x = color_x_max[i];
             for( y = color_y_min[i]; y <= color_y_max[i]; y++ )
             {
-                p_outpix[y*i_src_pitch+x] = 0xff;
+                p_outpix[y*i_dst_pitch+x] = 0xff;
             }
         }
     }
@@ -395,10 +389,9 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
         return p_inpic;
     }
 
-    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
-        msg_Warn( p_filter, "can't get output picture" );
         picture_Release( p_inpic );
         return NULL;
     }

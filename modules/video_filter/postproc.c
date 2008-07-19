@@ -274,10 +274,9 @@ static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
         return p_pic;
     }
 
-    picture_t *p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    picture_t *p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
-        msg_Warn( p_filter, "can't get output picture" );
         picture_Release( p_pic );
         vlc_mutex_unlock( &p_sys->lock );
         return NULL;

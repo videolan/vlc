@@ -215,10 +215,9 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
 
     if( !p_pic ) return NULL;
 
-    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
-        msg_Warn( p_filter, "can't get output picture" );
         picture_Release( p_pic );
         return NULL;
     }
