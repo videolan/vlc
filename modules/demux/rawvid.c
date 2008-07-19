@@ -182,7 +182,8 @@ static int Open( vlc_object_t * p_this )
     {
         char *psz;
         char *buf;
-        int a, b = 1;
+        int a = 1;
+        int b = 1;
         psz = stream_ReadLine( p_demux->s );
 
         /* TODO: handle interlacing */
