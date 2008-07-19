@@ -24,6 +24,7 @@
 #import "simple_prefs.h"
 #import "prefs.h"
 #import <vlc_keys.h>
+#import <vlc_interface.h>
 #import "misc.h"
 
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
@@ -616,7 +617,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [[[VLCMain sharedInstance] getPreferences] showPrefs];
     }
     else
-        msg_Err( p_intf, "unknown buttonAction sender" );
+        msg_Warn( p_intf, "unknown buttonAction sender" );
 }
 
 - (void)sheetDidEnd:(NSWindow *)o_sheet 
@@ -692,6 +693,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Interface settings using SimplePrefs (%i)", i );
+            intf_UserFatal( p_intf, false, _("Interface Settings not saved"),
+                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
 
@@ -755,6 +758,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Audio settings using SimplePrefs (%i)", i );
+            intf_UserFatal( p_intf, false, _("Audio Settings not saved"),
+                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
+            
             i = 0;
         }
         b_audioSettingChanged = NO;
@@ -787,6 +793,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Video settings using SimplePrefs (%i)", i );
+            intf_UserFatal( p_intf, false, _("Video Settings not saved"),
+                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
         b_videoSettingChanged = NO;
@@ -808,7 +816,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         #define CaCi( name, int ) config_PutInt( p_intf, name, int * [[o_input_cachelevel_pop selectedItem] tag] )
         #define CaC( name ) CaCi( name, 1 )
-        msg_Dbg( p_intf, "Adjusting all cache values at: %i", [[o_input_cachelevel_pop selectedItem] tag] );
+        msg_Dbg( p_intf, "Adjusting all cache values to: %i", [[o_input_cachelevel_pop selectedItem] tag] );
         CaC( "udp-caching" );
         if( module_Exists (p_intf, "dvdread" ) )
         {
@@ -869,6 +877,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Input settings using SimplePrefs (%i)", i );
+            intf_UserFatal( p_intf, false, _("Input Settings not saved"),
+                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
         b_inputSettingChanged = NO;
@@ -896,6 +906,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the OSD/Subtitle settings using SimplePrefs (%i)", i );
+            intf_UserFatal( p_intf, false, _("OSD/Subtitle Settings not saved"),
+                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
         b_osdSettingChanged = NO;
@@ -919,6 +931,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Hotkey settings using SimplePrefs (%i)", i );
+            intf_UserFatal( p_intf, false, _("Hotkeys not saved"),
+                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
         b_hotkeyChanged = NO;
@@ -968,7 +982,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (void)showInterfaceSettings
 {
-    msg_Dbg( p_intf, "showing interface settings" );
     [self showSettingsForCategory: o_intf_view];
 }
 
@@ -999,7 +1012,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (void)showAudioSettings
 {
-    msg_Dbg( p_intf, "showing audio settings" );
     [self showSettingsForCategory: o_audio_view];
 }
 
@@ -1045,7 +1057,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (void)showVideoSettings
 {
-    msg_Dbg( p_intf, "showing video settings" );
     [self showSettingsForCategory: o_video_view];
 }
 
@@ -1073,7 +1084,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (void)showOSDSettings
 {
-    msg_Dbg( p_intf, "showing OSD settings" );
     [self showSettingsForCategory: o_osd_view];
 }
 
@@ -1092,7 +1102,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (void)showInputSettings
 {
-    msg_Dbg( p_intf, "showing Input Settings" );
     [self showSettingsForCategory: o_input_view];
 }
 
@@ -1147,7 +1156,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (void)showHotkeySettings
 {
-    msg_Dbg( p_intf, "showing HotKey Settings" );
     [self showSettingsForCategory: o_hotkeys_view];
 }
 
