@@ -442,11 +442,11 @@ check_input:
                 }
                 ObjectGarbageCollector( p_playlist, true );
                 return;
-             }
-             playlist_PlayItem( p_playlist, p_item );
-         }
-         else
-         {
+            }
+            playlist_PlayItem( p_playlist, p_item );
+        }
+        else
+        {
             const bool b_gc_forced = p_playlist->status.i_status != PLAYLIST_STOPPED;
 
             p_playlist->status.i_status = PLAYLIST_STOPPED;
