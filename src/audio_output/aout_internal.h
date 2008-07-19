@@ -138,4 +138,77 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t *, size_t );
 void aout_DecDeleteBuffer( aout_instance_t *, aout_input_t *, aout_buffer_t * );
 int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t *, int i_input_rate );
 
+/* Helpers */
+
+/**
+ * This function will safely mark aout input to be restarted as soon as
+ * possible to take configuration changes into account */
+static inline void AoutInputsMarkToRestart( aout_instance_t *p_aout )
+{
+    int i;
+    vlc_mutex_lock( &p_aout->mixer_lock );
+    for( i = 0; i < p_aout->i_nb_inputs; i++ )
+        p_aout->pp_inputs[i]->b_restart = true;
+    vlc_mutex_unlock( &p_aout->mixer_lock );
+}
+
+/* This function will add or remove a a module from a string list (comma
+ * separated). It will return true if there is a modification
+ * In case p_aout is NULL, we will use configuration instead of variable */
+static inline bool AoutChangeFilterString( vlc_object_t *p_obj, aout_instance_t * p_aout,
+                                           const char* psz_variable,
+                                           const char *psz_name, bool b_add )
+{
+    vlc_value_t val;
+    char *psz_parser;
+
+    if( *psz_name == '\0' )
+        return false;
+
+    if( p_aout )
+        var_Get( p_aout, psz_variable, &val );
+    else
+        val.psz_string = config_GetPsz( p_obj, "audio-filter" );
+
+    if( !val.psz_string )
+        val.psz_string = strdup("");
+
+    psz_parser = strstr( val.psz_string, psz_name );
+
+    if( ( b_add && psz_parser ) || ( !b_add && !psz_parser ) )
+    {
+        /* Nothing to do */
+        free( val.psz_string );
+        return false;
+    }
+
+    if( b_add )
+    {
+        char *psz_old = val.psz_string;
+        if( *psz_old )
+            asprintf( &val.psz_string, "%s:%s", psz_old, psz_name );
+        else
+            val.psz_string = strdup( psz_name );
+        free( psz_old );
+    }
+    else
+    {
+        const int i_name = strlen( psz_name );
+        const char *psz_next;
+
+        psz_next = &psz_parser[i_name];
+        if( *psz_next == ':' )
+            psz_next++;
+
+        memmove( psz_parser, psz_next, strlen(psz_next)+1 );
+    }
+
+    if( p_aout )
+        var_Set( p_aout, psz_variable, val );
+    else
+        config_PutPsz( p_obj, psz_variable, val.psz_string );
+    free( val.psz_string );
+    return true;
+}
+
 #endif /* !__LIBVLC_AOUT_INTERNAL_H */

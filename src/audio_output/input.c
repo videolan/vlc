@@ -766,47 +766,8 @@ static void inputResamplingStop( aout_input_t *p_input )
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,
                                  const char *psz_name, bool b_add )
 {
-    vlc_value_t val;
-    char *psz_parser;
-
-    var_Get( p_aout, psz_variable, &val );
-
-    if( !val.psz_string ) val.psz_string = strdup("");
-
-    psz_parser = strstr( val.psz_string, psz_name );
-
-    if( b_add )
-    {
-        if( !psz_parser )
-        {
-            psz_parser = val.psz_string;
-            asprintf( &val.psz_string, (*val.psz_string) ? "%s:%s" : "%s%s",
-                      val.psz_string, psz_name );
-            free( psz_parser );
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        if( psz_parser )
-        {
-            memmove( psz_parser, psz_parser + strlen(psz_name) +
-                     (*(psz_parser + strlen(psz_name)) == ':' ? 1 : 0 ),
-                     strlen(psz_parser + strlen(psz_name)) + 1 );
-        }
-        else
-        {
-            free( val.psz_string );
-            return 0;
-        }
-    }
-
-    var_Set( p_aout, psz_variable, val );
-    free( val.psz_string );
-    return 1;
+    return AoutChangeFilterString( VLC_OBJECT(p_aout), p_aout,
+                                   psz_variable, psz_name, b_add ) ? 1 : 0;
 }
 
 static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -815,7 +776,6 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     char *psz_mode = newval.psz_string;
     vlc_value_t val;
-    int i;
     (void)psz_cmd; (void)oldval; (void)p_data;
 
     if( !psz_mode || !*psz_mode )
@@ -851,10 +811,7 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     /* That sucks */
-    for( i = 0; i < p_aout->i_nb_inputs; i++ )
-    {
-        p_aout->pp_inputs[i]->b_restart = true;
-    }
+    AoutInputsMarkToRestart( p_aout );
 
     return VLC_SUCCESS;
 }
@@ -865,7 +822,6 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     char *psz_mode = newval.psz_string;
     vlc_value_t val;
-    int i;
     int i_ret;
     (void)psz_cmd; (void)oldval; (void)p_data;
 
@@ -886,13 +842,7 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* That sucks */
     if( i_ret == 1 )
-    {
-        for( i = 0; i < p_aout->i_nb_inputs; i++ )
-        {
-            p_aout->pp_inputs[i]->b_restart = true;
-        }
-    }
-
+        AoutInputsMarkToRestart( p_aout );
     return VLC_SUCCESS;
 }
 
