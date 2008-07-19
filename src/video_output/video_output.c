@@ -1548,6 +1548,8 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
     input_thread_t *p_input;
     mtime_t i_now, i_stop;
 
+    if( !config_GetInt( p_vout, "osd" ) ) return;
+
     p_input = (input_thread_t *)vlc_object_find( p_vout,
               VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
