@@ -546,29 +546,33 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
     char *psz_bands = newval.psz_string;
+    char *psz_next;
+    char *p = psz_bands;
+    int i;
 
     /* Same thing for bands */
-    if( *psz_bands )
+    for( i = 0; i < p_sys->i_band; i++ )
     {
-        char *p = psz_bands, *p_next;
-        int i;
+        float f;
 
-        for( i = 0; i < p_sys->i_band; i++ )
-        {
-            /* Read dB -20/20 */
+        if( *psz_bands == '\0' )
+            break;
+
+        /* Read dB -20/20 */
 #ifdef HAVE_STRTOF
-            float f = strtof( p, &p_next );
+        f = strtof( p, &psz_next );
 #else
-            float f = (float) strtod( p, &p_next );
+        f = (float)strtod( p, &psz_next );
 #endif
-            if( !p_next || p_next == p ) break; /* strtof() failed */
+        if( psz_next == p )
+            break; /* no conversion */
 
-            p_sys->f_amp[i] = EqzConvertdB( f );
+        p_sys->f_amp[i] = EqzConvertdB( f );
 
-            if( !*p ) break; /* end of line */
-            p=p_next+1;
-        }
+        if( *psz_next == '\0' )
+            break; /* end of line */
+        p = &psz_next[1];
     }
-
     return VLC_SUCCESS;
 }
+
