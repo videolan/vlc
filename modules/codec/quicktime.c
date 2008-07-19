@@ -911,7 +911,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     if( p_sys->i_late > 10 )
     {
-        msg_Dbg( p_dec, "late buffer dropped (%i)", i_pts );
+        msg_Dbg( p_dec, "late buffer dropped (%"PRId64")", i_pts );
         block_Release( p_block );
         return NULL;
     }
