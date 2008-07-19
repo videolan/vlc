@@ -112,7 +112,7 @@ void Playtree::action( VarTree *pItem )
 
     if( p_parent )
     {
-        playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY, true, p_parent, p_item );
+        playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY, pl_Locked, p_parent, p_item );
     }
     vlc_object_unlock( m_pPlaylist );
 }

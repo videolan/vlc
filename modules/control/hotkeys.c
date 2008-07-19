@@ -925,7 +925,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
         if( !strcmp( psz_bookmark, psz_uri ) )
         {
             free( psz_uri );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked,
                               NULL, p_item );
             break;
         }

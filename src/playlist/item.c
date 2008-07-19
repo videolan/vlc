@@ -99,7 +99,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
         if( i_ret == VLC_SUCCESS && b_play )
         {
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          true, p_item_in_category, NULL );
+                          pl_Locked, p_item_in_category, NULL );
         }
     }
 
