@@ -8,8 +8,16 @@
 #ifndef _denormals_
 #define _denormals_
 
-#define undenormalise(sample) if(((*(unsigned int*)&sample)&0x7f800000)==0) sample=0.0f
+#include <stdint.h>
+
+static inline float undenormalise( float f )
+{
+    union { float f; uint32_t u; } data;
+    data.f = f;
+    if( (data.u & 0x7f800000) == 0 )
+        return 0.0;
+    return f;
+}
 
 #endif//_denormals_
 
-//ends
