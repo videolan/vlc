@@ -116,6 +116,23 @@ struct picture_t
 };
 
 /**
+ * This function will create a new picture.
+ * The picture created will implement a default release management compatible
+ * with picture_Yield and picture_Release. This default management will release
+ * picture_sys_t *p_sys field if non NULL.
+ */
+VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
+
+/**
+ * This function will force the destruction a picture.
+ * The value of the picture reference count should be 0 before entering this
+ * function.
+ * Unless used for reimplementing pf_release, you should not use this
+ * function but picture_Release.
+ */
+VLC_EXPORT( void, picture_Delete, ( picture_t * ) );
+
+/**
  * This function will increase the picture reference count.
  * It will not have any effect on picture obtained from vout
  */
@@ -146,6 +163,23 @@ static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_
     p_dst->b_progressive = p_src->b_progressive;
     p_dst->i_nb_fields = p_src->i_nb_fields;
     p_dst->b_top_field_first = p_src->b_top_field_first;
+}
+
+/**
+ * This function will copy the picture pixels.
+ */
+VLC_EXPORT( void, picture_CopyPixels, ( picture_t *p_dst, const picture_t *p_src ) );
+
+/**
+ * This function will copy both picture dynamic properties and pixels.
+ * You have to notice that sometime a simple picture_Yield may do what
+ * you want without the copy overhead.
+ * Provided for convenience.
+ */
+static inline void picture_Copy( picture_t *p_dst, const picture_t *p_src )
+{
+    picture_CopyPixels( p_dst, p_src );
+    picture_CopyProperties( p_dst, p_src );
 }
 
 /**
