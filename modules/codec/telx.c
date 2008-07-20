@@ -28,11 +28,12 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
+#include <stdint.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <assert.h>
-#include <stdint.h>
+#include <vlc_input.h>
 
 #include "vlc_vout.h"
 #include "vlc_bits.h"
