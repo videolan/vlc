@@ -29,22 +29,11 @@ import java.util.Iterator;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 
 
-public class LoggerTest
+public class LoggerTest extends AbstractJVLCTest
 {
-
-    private JVLC jvlc;
-    
-    private String mrl = getClass().getResource("/raffa_voice.ogg").getFile();
-    
-    @Before
-    public void setup()
-    {
-        jvlc = new JVLC("-I dummy --aout=dummy --vout=dummy");
-    }
     
     @Test
     public void testLogDebug()

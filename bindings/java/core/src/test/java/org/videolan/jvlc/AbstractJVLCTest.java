@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLMInternalTest.java: VLC Java Bindings
+ * AbstractJVLCTest.java: VLC Java Bindings
  *****************************************************************************
  * Copyright (C) 1998-2008 the VideoLAN team
  *
@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-package org.videolan.jvlc.internal;
+package org.videolan.jvlc;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -32,27 +32,20 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
-import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
+import org.videolan.jvlc.internal.AbstractVLCInternalTest;
 
 
-public abstract class AbstractVLCInternalTest
+public abstract class AbstractJVLCTest
 {
-
-    protected LibVlc libvlc = LibVlc.SYNC_INSTANCE;
-
-    protected LibVlcInstance libvlcInstance;
+    
+    protected JVLC jvlc;
 
     protected String mrl;
-
-    protected libvlc_exception_t exception;
 
     private String address = "http://streams.videolan.org/streams-videolan/reference/avi/Hero-Div3.avi";
 
@@ -64,30 +57,14 @@ public abstract class AbstractVLCInternalTest
     @Before
     public void testSetup()
     {
-        exception = new libvlc_exception_t();
-        libvlcInstance = libvlc.libvlc_new(0, new String[]{
-            "-vvv",
-            "--ignore-config",
-            "--no-media-library",
-            "-I",
-            "dummy",
-            "--aout=dummy",
-            "--vout=dummy" }, exception);
-        libvlc.libvlc_exception_clear(exception);
+        jvlc = new JVLC("-vvv --ignore-config --no-media-library -I dummy --aout=dummy --vout=dummy");
         downloadSample();
     }
 
     @After
     public void tearDown()
     {
-        libvlc.libvlc_release(libvlcInstance);
-        libvlc.libvlc_exception_clear(exception);
-    }
-
-    protected void catchException(libvlc_exception_t exception)
-    {
-        Assert.assertEquals(libvlc.libvlc_exception_get_message(exception), 0, libvlc
-            .libvlc_exception_raised(exception));
+        jvlc.release();
     }
 
     private void downloadSample()

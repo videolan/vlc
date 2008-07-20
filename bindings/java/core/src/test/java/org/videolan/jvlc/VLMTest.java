@@ -27,31 +27,12 @@ package org.videolan.jvlc;
 
 import junit.framework.Assert;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 
-public class VLMTest
+public class VLMTest extends AbstractJVLCTest
 {
-    private JVLC jvlc;
-    
-    private String mrl = getClass().getResource("/raffa_voice.ogg").getFile();
-    
     private String mediaName = "test";
-    
-    @Before
-    public void setup()
-    {
-        jvlc = new JVLC("--ignore-config --no-media-library -I dummy --aout=dummy --vout=dummy");
-        jvlc.setLogVerbosity(LoggerVerbosityLevel.DEBUG);
-    }
-
-    @After
-    public void tearDown()
-    {
-        jvlc.release();
-    }
     
     @Test
     public void testVLMInit()
@@ -82,14 +63,7 @@ public class VLMTest
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
         vlm.disableMedia(mediaName);
     }
-    
-    @Test
-    public void testPlayMedia()
-    {
-        VLM vlm = jvlc.getVLM();
-        vlm.addBroadcast(mediaName, mrl, "", null, true, false);
-        vlm.playMedia(mediaName);
-    }
+
     
     @Test
     public void testPauseMedia()
@@ -98,17 +72,16 @@ public class VLMTest
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
         vlm.playMedia(mediaName);
         vlm.pauseMedia(mediaName);
+        vlm.stopMedia(mediaName);
     }
 
     @Test
-    public void testStopMedia() throws Exception
+    public void testStopMedia()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
         vlm.playMedia(mediaName);
-        Thread.sleep(2000);
         vlm.stopMedia(mediaName);
-        jvlc.release();
     }
 
     @Test
@@ -118,6 +91,7 @@ public class VLMTest
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
         vlm.playMedia(mediaName);
         vlm.seekMedia(mediaName, 0.3f);
+        vlm.stopMedia(mediaName);
     }
     
     @Test

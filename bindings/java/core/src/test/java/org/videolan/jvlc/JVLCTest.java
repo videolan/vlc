@@ -30,7 +30,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 
-public class JVLCTest
+public class JVLCTest extends AbstractJVLCTest
 {
     
     String mrl = getClass().getResource("/raffa_voice.ogg").getFile();
@@ -45,7 +45,6 @@ public class JVLCTest
     @Test
     public void jvlcPlay()
     {
-        JVLC jvlc = new JVLC();
         MediaPlayer instance = jvlc.play(mrl);
         Assert.assertNotNull(instance);
     }
@@ -54,7 +53,6 @@ public class JVLCTest
     public void jvlcRelease()
     {
         JVLC jvlc = new JVLC();
-        jvlc.release();
         jvlc.release();
     }
     
