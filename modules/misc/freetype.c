@@ -178,8 +178,6 @@ static int RenderHtml( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
 static char *FontConfig_Select( FcConfig *, const char *,
                                 bool, bool, int * );
-static int BuildDone( vlc_object_t*, const char *, vlc_value_t, vlc_value_t,
-                        void* );
 #endif
 
 
@@ -249,6 +247,8 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_loc
 static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder );
 static void FontBuilderThread( vlc_object_t *p_this);
 static void FontBuilderDestructor( vlc_object_t *p_this );
+static int FontBuilderDone( vlc_object_t*, const char *, vlc_value_t, vlc_value_t,
+                        void* );
 #endif
 
 /*****************************************************************************
@@ -482,7 +482,7 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_loc
     }
     if( p_fontbuilder )
     {
-        var_AddCallback( p_fontbuilder, "build-done", BuildDone, p_filter );
+        var_AddCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
         var_TriggerCallback( p_fontbuilder, "build-done" );
     }
     vlc_mutex_unlock( p_lock );
@@ -494,7 +494,7 @@ static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder )
     vlc_mutex_t *lock = var_AcquireMutex( "fontbuilder" );
     if( p_fontbuilder )
     {
-        var_DelCallback( p_fontbuilder, "build-done", BuildDone, p_filter );
+        var_DelCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
 
         /* We wait for the thread on the first FontBuilderDetach */
         if( vlc_object_alive( p_fontbuilder ) )
@@ -546,6 +546,26 @@ static void FontBuilderDestructor( vlc_object_t *p_this )
 
     if( p_fontconfig )
         FcConfigDestroy( p_fontconfig );
+}
+static int FontBuilderDone( vlc_object_t *p_this, const char *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    filter_t *p_filter = param;
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( newval.b_bool )
+    {
+        vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
+
+        p_sys->b_fontconfig_ok = true;
+        p_sys->p_fontconfig = p_this->p_private;
+
+        vlc_mutex_unlock( p_lock );
+    }
+
+    VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval);
+    return VLC_SUCCESS;
 }
 #endif
 
@@ -2194,27 +2214,6 @@ static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, ft_style
         }
     }
     return VLC_EGENERIC;
-}
-
-static int BuildDone( vlc_object_t *p_this, const char *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *param )
-{
-    filter_t *p_filter = param;
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( newval.b_bool )
-    {
-        vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
-
-        p_sys->b_fontconfig_ok = true;
-        p_sys->p_fontconfig = p_this->p_private;
-
-        vlc_mutex_unlock( p_lock );
-    }
-
-    VLC_UNUSED(psz_var);
-    VLC_UNUSED(oldval);
-    return VLC_SUCCESS;
 }
 
 static int ProcessLines( filter_t *p_filter,
