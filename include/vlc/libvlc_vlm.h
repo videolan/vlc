@@ -72,7 +72,7 @@ VLC_PUBLIC_API void libvlc_vlm_add_broadcast( libvlc_instance_t *, char *, char 
  * \param i_options number of additional options
  * \param ppsz_options additional options
  * \param b_enabled boolean for enabling the new vod
- * \param the muxer of the vod media
+ * \param psz_mux the muxer of the vod media
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_vlm_add_vod( libvlc_instance_t *, char *, char *, int, char **,
