@@ -47,26 +47,48 @@ public class VLMTest extends AbstractJVLCTest
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
     }
+
+    @Test
+    public void testAddVod()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+    }
     
     @Test
-    public void testShowMedia()
+    public void testShowBroadcastMedia()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
         vlm.showMedia(mediaName);
     }
+
+    @Test
+    public void testShowVodMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.showMedia(mediaName);
+    }
     
     @Test
-    public void testDisableMedia()
+    public void testDisableBroadcastMedia()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
         vlm.disableMedia(mediaName);
     }
 
+    @Test
+    public void testDisableVodMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.disableMedia(mediaName);
+    }
     
     @Test
-    public void testPauseMedia()
+    public void testPauseBroadcastMedia()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
@@ -76,7 +98,18 @@ public class VLMTest extends AbstractJVLCTest
     }
 
     @Test
-    public void testStopMedia()
+    public void testPauseVodMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.playMedia(mediaName);
+        vlm.pauseMedia(mediaName);
+        vlm.stopMedia(mediaName);
+    }
+
+
+    @Test
+    public void testStopBroadcastMedia()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
@@ -85,7 +118,16 @@ public class VLMTest extends AbstractJVLCTest
     }
 
     @Test
-    public void testSeekMedia()
+    public void testStopVodMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.playMedia(mediaName);
+        vlm.stopMedia(mediaName);
+    }
+
+    @Test
+    public void testSeekBroadcastMedia()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
@@ -93,31 +135,65 @@ public class VLMTest extends AbstractJVLCTest
         vlm.seekMedia(mediaName, 0.3f);
         vlm.stopMedia(mediaName);
     }
-    
+
     @Test
-    public void testAddMediaInput()
+    public void testSeekVodMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.playMedia(mediaName);
+        vlm.seekMedia(mediaName, 0.3f);
+        vlm.stopMedia(mediaName);
+    }
+
+    @Test
+    public void testAddMediaInputToBroadcast()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
         vlm.addMediaInput(mediaName, "file://" + mrl);
     }
-    
+
     @Test
-    public void testEnableMedia()
+    public void testAddMediaInputToVod()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.addMediaInput(mediaName, "file://" + mrl);
+    }
+
+    @Test
+    public void testEnableBroadcastMedia()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, false, false);
         vlm.enableMedia(mediaName);
     }
+
+    @Test
+    public void testEnableVodMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.enableMedia(mediaName);
+    }
     
     @Test
-    public void testDeleteMedia()
+    public void testDeleteBroadcastMedia()
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, false, false);
         vlm.deleteMedia(mediaName);
     }
-    
+
+    @Test
+    public void testDeleteVodMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.deleteMedia(mediaName);
+    }
+
     @Test
     public void testMediaLoop()
     {
@@ -125,4 +201,13 @@ public class VLMTest extends AbstractJVLCTest
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, false, false);
         vlm.setMediaLoop(mediaName, true);
     }
+
+    @Test
+    public void testSetMux()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addVod(mediaName, "file://" + mrl, null, true, null);
+        vlm.setMux(mediaName, "ts");
+    }
+
 }

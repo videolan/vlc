@@ -47,7 +47,7 @@ public abstract class AbstractJVLCTest
 
     protected String mrl;
 
-    private String address = "http://streams.videolan.org/streams-videolan/reference/avi/Hero-Div3.avi";
+    private String address = "http://streams.videolan.org/streams-videolan/reference/mp4/bl.mp4";
 
     /**
      * Logger.
@@ -57,7 +57,7 @@ public abstract class AbstractJVLCTest
     @Before
     public void testSetup()
     {
-        jvlc = new JVLC("-vvv --ignore-config --no-media-library -I dummy --aout=dummy --vout=dummy");
+        jvlc = new JVLC("-vvv --ignore-config --no-media-library -I dummy --aout=dummy --vout=dummy --rtsp-host 127.0.0.1:5554");
         downloadSample();
     }
 
