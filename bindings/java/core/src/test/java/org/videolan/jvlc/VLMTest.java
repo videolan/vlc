@@ -43,8 +43,8 @@ public class VLMTest
     @Before
     public void setup()
     {
-        jvlc = new JVLC("-I dummy --aout=dummy --vout=dummy");
-        jvlc.setLogVerbosity(LoggerVerbosityLevel.INFO);
+        jvlc = new JVLC("--ignore-config --no-media-library -I dummy --aout=dummy --vout=dummy");
+        jvlc.setLogVerbosity(LoggerVerbosityLevel.DEBUG);
     }
 
     @After
@@ -87,7 +87,7 @@ public class VLMTest
     public void testPlayMedia()
     {
         VLM vlm = jvlc.getVLM();
-        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
+        vlm.addBroadcast(mediaName, mrl, "", null, true, false);
         vlm.playMedia(mediaName);
     }
     
@@ -101,12 +101,14 @@ public class VLMTest
     }
 
     @Test
-    public void testStopMedia()
+    public void testStopMedia() throws Exception
     {
         VLM vlm = jvlc.getVLM();
         vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
         vlm.playMedia(mediaName);
+        Thread.sleep(2000);
         vlm.stopMedia(mediaName);
+        jvlc.release();
     }
 
     @Test

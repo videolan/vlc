@@ -1,5 +1,5 @@
 /*****************************************************************************
- * MediaDescriptorTest.java: VLC Java Bindings
+ * VLMInternalTest.java: VLC Java Bindings
  *****************************************************************************
  * Copyright (C) 1998-2008 the VideoLAN team
  *
@@ -25,32 +25,21 @@
 
 package org.videolan.jvlc.internal;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class MediaDescriptorTest extends AbstractVLCInternalTest
+public class VLMInternalTest extends AbstractVLCInternalTest
 {
-    
+
     @Test
-    public void mediaDescriptorNew() throws Exception
+    public void testVLMPlay()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        Assert.assertNotNull(md);
-        Assert.assertEquals(0, exception.raised);
-    }
-    
-    @Test
-    public void mediaDescriptorGetMrl()
-    {
-        libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        String mdMrl = libvlc.libvlc_media_get_mrl(md);
-        Assert.assertEquals(mrl, mdMrl);
+        libvlc.libvlc_vlm_add_broadcast(libvlcInstance, "test", "file://" + mrl, "", 0, null, 1, 0, exception);
+        libvlc.libvlc_vlm_play_media(libvlcInstance, mrl, exception);
+        catchException(exception);
+        libvlc.libvlc_vlm_stop_media(libvlcInstance, mrl, exception);
     }
 
 }

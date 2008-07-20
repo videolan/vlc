@@ -27,34 +27,14 @@ package org.videolan.jvlc.internal;
 
 import junit.framework.Assert;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaList;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class MediaListTest
+public class MediaListTest extends AbstractVLCInternalTest
 {
-
-    private LibVlc libvlc = LibVlc.SYNC_INSTANCE;
-
-    private LibVlcInstance libvlcInstance;
-
-    @Before
-    public void testSetup()
-    {
-        libvlc_exception_t exception = new libvlc_exception_t();
-        libvlcInstance = libvlc.libvlc_new(0, new String[]{"-I","dummy","--aout=dummy","--vout=dummy"}, exception);
-    }
-
-    @After
-    public void tearDown()
-    {
-        libvlc.libvlc_release(libvlcInstance);
-    }
 
     @Test
     public void mediaListNew()

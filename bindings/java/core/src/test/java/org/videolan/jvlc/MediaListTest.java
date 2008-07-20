@@ -40,7 +40,7 @@ public class MediaListTest
     @Before
     public void setup()
     {
-        jvlc = new JVLC("-vvv -I dummy --aout=dummy --vout=dummy");
+        jvlc = new JVLC("-vvv --ignore-config --no-media-library -I dummy --aout=dummy --vout=dummy");
     }
     
     @Test
