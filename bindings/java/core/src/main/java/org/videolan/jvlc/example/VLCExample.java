@@ -3,7 +3,7 @@ package org.videolan.jvlc.example;
 import org.videolan.jvlc.Audio;
 import org.videolan.jvlc.JVLC;
 import org.videolan.jvlc.MediaDescriptor;
-import org.videolan.jvlc.MediaInstance;
+import org.videolan.jvlc.MediaPlayer;
 import org.videolan.jvlc.VLCException;
 import org.videolan.jvlc.Video;
 import org.videolan.jvlc.event.MediaInstanceListener;
@@ -31,32 +31,32 @@ public class VLCExample
         System.out.println("... done.");
 
         MediaDescriptor mediaDescriptor = new MediaDescriptor(jvlc, "/home/carone/apps/a.avi");
-        MediaInstance mediaInstance = mediaDescriptor.getMediaInstance();
+        MediaPlayer mediaInstance = mediaDescriptor.getMediaInstance();
 
         mediaInstance.addListener(new MediaInstanceListener()
         {
 
-            public void endReached(MediaInstance mediaInstance)
+            public void endReached(MediaPlayer mediaInstance)
             {
                 System.out.println("Media instance end reached. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
             }
 
-            public void paused(MediaInstance mediaInstance)
+            public void paused(MediaPlayer mediaInstance)
             {
                 System.out.println("Media instance paused. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
             }
 
-            public void played(MediaInstance mediaInstance)
+            public void played(MediaPlayer mediaInstance)
             {
                 System.out.println("Media instance played. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
             }
 
-            public void positionChanged(MediaInstance mediaInstance)
+            public void positionChanged(MediaPlayer mediaInstance)
             {
                 // TODO Auto-generated method stub
             }
 
-            public void timeChanged(MediaInstance mediaInstance, long newTime)
+            public void timeChanged(MediaPlayer mediaInstance, long newTime)
             {
                 System.out.println("new time: " + newTime);
             }

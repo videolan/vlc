@@ -25,7 +25,7 @@
 
 package org.videolan.jvlc.event;
 
-import org.videolan.jvlc.MediaInstance;
+import org.videolan.jvlc.MediaPlayer;
 import org.videolan.jvlc.internal.LibVlc;
 import org.videolan.jvlc.internal.LibVlcEventType;
 import org.videolan.jvlc.internal.LibVlc.LibVlcCallback;
@@ -39,9 +39,9 @@ public class MediaInstanceCallback implements LibVlcCallback
 {
 
     private MediaInstanceListener listener;
-    private MediaInstance mediaInstance;
+    private MediaPlayer mediaInstance;
 
-    public MediaInstanceCallback(MediaInstance mediaInstance, MediaInstanceListener listener)
+    public MediaInstanceCallback(MediaPlayer mediaInstance, MediaInstanceListener listener)
     {
         this.mediaInstance = mediaInstance;
         this.listener = listener;

@@ -25,20 +25,20 @@
 
 package org.videolan.jvlc.event;
 
-import org.videolan.jvlc.MediaInstance;
+import org.videolan.jvlc.MediaPlayer;
 
 
 public interface MediaInstanceListener
 {
 
-    void played(MediaInstance mediaInstance);
+    void played(MediaPlayer mediaInstance);
     
-    void paused(MediaInstance mediaInstance);
+    void paused(MediaPlayer mediaInstance);
     
-    void endReached(MediaInstance mediaInstance);
+    void endReached(MediaPlayer mediaInstance);
     
-    void timeChanged(MediaInstance mediaInstance, long newTime);
+    void timeChanged(MediaPlayer mediaInstance, long newTime);
     
-    void positionChanged(MediaInstance mediaInstance);
+    void positionChanged(MediaPlayer mediaInstance);
     
 }

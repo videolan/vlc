@@ -46,7 +46,7 @@ public class JVLCTest
     public void jvlcPlay()
     {
         JVLC jvlc = new JVLC();
-        MediaInstance instance = jvlc.play(mrl);
+        MediaPlayer instance = jvlc.play(mrl);
         Assert.assertNotNull(instance);
     }
     

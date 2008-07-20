@@ -69,9 +69,9 @@ public class MediaDescriptor
         return libvlc.libvlc_media_get_mrl(instance);
     }
     
-    public MediaInstance getMediaInstance()
+    public MediaPlayer getMediaInstance()
     {
-        return new MediaInstance(this);
+        return new MediaPlayer(this);
     }
     
     /**
