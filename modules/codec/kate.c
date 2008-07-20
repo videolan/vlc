@@ -210,9 +210,12 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     block_t *p_block;
     kate_packet kp;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    if( !pp_block || !*pp_block )
+        return NULL;
 
     p_block = *pp_block;
+    if( p_block->i_rate != 0 )
+        p_block->i_length = p_block->i_length * p_block->i_rate / INPUT_RATE_DEFAULT;
 
     /* Block to Kate packet */
     kate_packet_wrap(&kp, p_block->i_buffer, p_block->p_buffer);
