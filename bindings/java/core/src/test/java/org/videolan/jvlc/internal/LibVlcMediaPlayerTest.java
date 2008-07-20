@@ -35,7 +35,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class LibVlcMediaInstanceTest
+public class LibVlcMediaPlayerTest
 {
     
     private LibVlc libvlc = LibVlc.SYNC_INSTANCE;
@@ -127,11 +127,12 @@ public class LibVlcMediaInstanceTest
     }
     
     @Test
-    public void mediaInstanceStop2()
+    public void mediaInstanceStop2() throws Exception
     {
         LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_player_play(mi, exception);
+        Thread.sleep(100);
         libvlc.libvlc_media_player_stop(mi, exception);
         Assert.assertEquals(0, exception.raised);
     }
