@@ -486,7 +486,6 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_loc
         var_TriggerCallback( p_fontbuilder, "build-done" );
     }
     vlc_mutex_unlock( p_lock );
-
     *pp_lock = p_lock;
     return p_fontbuilder;
 }
@@ -2205,10 +2204,12 @@ static int BuildDone( vlc_object_t *p_this, const char *psz_var,
 
     if( newval.b_bool )
     {
-        vlc_mutex_lock( p_sys->p_fontconfig_lock );
+        vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
+
         p_sys->b_fontconfig_ok = true;
         p_sys->p_fontconfig = p_this->p_private;
-        vlc_mutex_unlock( p_sys->p_fontconfig_lock );
+
+        vlc_mutex_unlock( p_lock );
     }
 
     VLC_UNUSED(psz_var);
