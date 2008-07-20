@@ -156,7 +156,7 @@ public class MediaPlayer
         MediaInstanceCallback callback = new MediaInstanceCallback(this, listener);
         libvlc_exception_t exception = new libvlc_exception_t();
         for (LibVlcEventType event : EnumSet.range(
-            LibVlcEventType.libvlc_MediaPlayerPlayed,
+            LibVlcEventType.libvlc_MediaPlayerPlaying,
             LibVlcEventType.libvlc_MediaPlayerTimeChanged))
         {
             libvlc.libvlc_event_attach(eventManager, event.ordinal(), callback, null, exception);
@@ -174,7 +174,7 @@ public class MediaPlayer
         for (MediaInstanceCallback callback : callbacks)
         {
             for (LibVlcEventType event : EnumSet.range(
-                LibVlcEventType.libvlc_MediaPlayerPlayed,
+                LibVlcEventType.libvlc_MediaPlayerPlaying,
                 LibVlcEventType.libvlc_MediaPlayerPositionChanged))
             {
                 libvlc.libvlc_event_detach(eventManager, event.ordinal(), callback, null, exception);

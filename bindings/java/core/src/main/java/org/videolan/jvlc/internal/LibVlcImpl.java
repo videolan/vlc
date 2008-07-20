@@ -92,7 +92,7 @@ public class LibVlcImpl
 
         libVlc.libvlc_event_attach(
             mediaInstanceEventManager,
-            LibVlcEventType.libvlc_MediaPlayerPlayed.ordinal(),
+            LibVlcEventType.libvlc_MediaPlayerPlaying.ordinal(),
             played,
             null,
             exception);

@@ -51,7 +51,7 @@ public class MediaInstanceCallback implements LibVlcCallback
      */
     public void callback(libvlc_event_t libvlc_event, Pointer userData)
     {
-        if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPlayed.ordinal())
+        if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPlaying.ordinal())
         {
             listener.played(mediaInstance);
         }
