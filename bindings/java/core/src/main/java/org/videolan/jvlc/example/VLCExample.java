@@ -4,9 +4,8 @@ import org.videolan.jvlc.Audio;
 import org.videolan.jvlc.JVLC;
 import org.videolan.jvlc.MediaDescriptor;
 import org.videolan.jvlc.MediaPlayer;
-import org.videolan.jvlc.VLCException;
 import org.videolan.jvlc.Video;
-import org.videolan.jvlc.event.MediaInstanceListener;
+import org.videolan.jvlc.event.MediaPlayerListener;
 
 
 public class VLCExample
@@ -33,7 +32,7 @@ public class VLCExample
         MediaDescriptor mediaDescriptor = new MediaDescriptor(jvlc, "/home/carone/apps/a.avi");
         MediaPlayer mediaInstance = mediaDescriptor.getMediaInstance();
 
-        mediaInstance.addListener(new MediaInstanceListener()
+        mediaInstance.addListener(new MediaPlayerListener()
         {
 
             public void endReached(MediaPlayer mediaInstance)
