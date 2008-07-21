@@ -1294,7 +1294,7 @@ static VLCWizard *_o_sharedInstance = nil;
 
             /* FIXME: playlist_AddInput() can fail */
             playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP,
-                PLAYLIST_END, true, false );
+                PLAYLIST_END, true, pl_Unlocked );
 
             if( x == 0 )
             {

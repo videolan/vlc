@@ -684,7 +684,7 @@ static int Demux( demux_t *p_demux )
     if( p_playlist->status.p_item &&
              p_playlist->status.p_item->p_input == p_parent_input )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked,
                           p_playlist->status.p_node, p_playlist->status.p_item );
     }
 
@@ -1540,7 +1540,7 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     if( p_announce->i_input_id > -1 )
     {
         playlist_DeleteFromInput( pl_Yield( p_sd ),
-                                  p_announce->i_input_id, false );
+                                  p_announce->i_input_id, pl_Unlocked );
         pl_Release( p_sd );
     }
 

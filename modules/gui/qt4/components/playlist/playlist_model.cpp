@@ -705,7 +705,7 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
         PL_UNLOCK; return;
     }
     if( p_item->i_children == -1 )
-        playlist_DeleteFromInput( p_playlist, item->i_input_id, true );
+        playlist_DeleteFromInput( p_playlist, item->i_input_id, pl_Locked );
     else
         playlist_NodeDelete( p_playlist, p_item, true, false );
     /* And finally, remove it from the tree */

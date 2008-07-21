@@ -1430,7 +1430,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "clear" ) )
     {
         playlist_Stop( p_playlist );
-        playlist_Clear( p_playlist, false );
+        playlist_Clear( p_playlist, pl_Unlocked );
     }
     else if( !strcmp( psz_cmd, "add" ) &&
              newval.psz_string && *newval.psz_string )
@@ -1442,7 +1442,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             msg_rc( "Trying to add %s to playlist.", newval.psz_string );
             int i_ret =playlist_AddInput( p_playlist, p_item,
                      PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END, true,
-                     false );
+                     pl_Unlocked );
             vlc_gc_decref( p_item );
             if( i_ret != VLC_SUCCESS )
             {
@@ -1460,7 +1460,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             msg_rc( "trying to enqueue %s to playlist", newval.psz_string );
             if( playlist_AddInput( p_playlist, p_item,
                                PLAYLIST_APPEND, PLAYLIST_END, true,
-                               false ) != VLC_SUCCESS )
+                               pl_Unlocked ) != VLC_SUCCESS )
             {
                 return VLC_EGENERIC;
             }

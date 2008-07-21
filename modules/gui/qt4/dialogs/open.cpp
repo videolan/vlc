@@ -313,7 +313,7 @@ void OpenDialog::finish( bool b_enqueue = false )
             /* FIXME: playlist_AddInput() can fail */
             playlist_AddInput( THEPL, p_input,
                 PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
-                PLAYLIST_END, true, false );
+                PLAYLIST_END, true, pl_Unlocked );
             vlc_gc_decref( p_input );
         }
     }

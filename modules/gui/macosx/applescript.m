@@ -58,7 +58,7 @@
                                     displayNameAtPath: o_urlString] UTF8String] );
             /* FIXME: playlist_AddInput() can fail */
             playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
-                               PLAYLIST_END, true, false );
+                               PLAYLIST_END, true, pl_Unlocked );
 
             vlc_gc_decref( p_input );
 

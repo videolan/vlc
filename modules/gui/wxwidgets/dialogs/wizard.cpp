@@ -1631,7 +1631,7 @@ void WizardDialog::Run()
 
             /* FIXME: playlist_AddInput() can fail */
             playlist_AddInput( p_playlist, p_input,
-                               PLAYLIST_GO, PLAYLIST_END, true, false );
+                               PLAYLIST_GO, PLAYLIST_END, true, pl_Unlocked );
             vlc_gc_decref( p_input );
             pl_Release( p_playlist );
         }

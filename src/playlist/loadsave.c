@@ -100,7 +100,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     /* playlist_AddInput() can fail, but we have no way to report that ..
      * Any way when it has failed, either the playlist is dying, either OOM */
     playlist_AddInput( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END,
-            false, false );
+            false, pl_Unlocked );
 }
 
 int playlist_MLLoad( playlist_t *p_playlist )
