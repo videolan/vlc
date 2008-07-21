@@ -1299,7 +1299,7 @@ static VLCWizard *_o_sharedInstance = nil;
             if( x == 0 )
             {
                 /* play the first item and add the others afterwards */
-                playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
+                playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input, pl_Locked );
                 playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, NULL,
                           p_item );
             }

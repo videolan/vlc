@@ -317,7 +317,7 @@ void StandardPLPanel::setRoot( int i_root_id )
 {
     QPL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( THEPL, i_root_id,
-                                                    true );
+                                                    pl_Locked );
     assert( p_item );
     p_item = playlist_GetPreferredNode( THEPL, p_item );
     assert( p_item );

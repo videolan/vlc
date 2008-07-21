@@ -447,7 +447,7 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
 
         playlist_AddExt( THEPL, qtu( mrl ), "Streaming",
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
-                        -1, &psz_option, 1, true, false );
+                        -1, &psz_option, 1, true, pl_Unlocked );
     }
 }
 

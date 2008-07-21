@@ -201,7 +201,7 @@ static int Open( vlc_object_t *p_this )
                 if( p_playlist->status.p_item->p_input == p_current )
                     p_item = p_playlist->status.p_item;
                 else
-                    p_item = playlist_ItemGetByInput( p_playlist, p_current, false );
+                    p_item = playlist_ItemGetByInput( p_playlist, p_current, pl_Unlocked );
 
                 if( p_item )
                     i_ret = GetTracks( p_access, p_playlist, p_item );
@@ -420,7 +420,7 @@ static int GetTracks( access_t *p_access,
         return VLC_EGENERIC;
     }
 
-    p_item_in_category = playlist_ItemToNode( p_playlist, p_parent, false );
+    p_item_in_category = playlist_ItemToNode( p_playlist, p_parent, pl_Unlocked );
     playlist_ItemSetName( p_parent, "Audio CD" );
     var_SetInteger( p_playlist, "item-change", p_parent->p_input->i_id );
 
@@ -495,7 +495,7 @@ static int GetTracks( access_t *p_access,
         int i_ret = playlist_BothAddInput( p_playlist, p_input_item,
                                p_item_in_category,
                                PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL,
-                               false );
+                               pl_Unlocked );
         vlc_gc_decref( p_input_item );
         free( psz_uri ); free( psz_opt ); free( psz_name );
         free( psz_first ); free( psz_last );

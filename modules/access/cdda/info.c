@@ -882,7 +882,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
         if( p_input )
         {
-            p_item = playlist_ItemGetByInput( p_playlist, input_GetItem(p_input), false );
+            p_item = playlist_ItemGetByInput( p_playlist, input_GetItem(p_input), pl_Unlocked );
 
             if( p_item == p_playlist->status.p_item && !b_single_track )
                 b_play = true;
@@ -924,7 +924,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         input_title_t *t;
 
         if( !p_cdda->b_nav_mode )
-            playlist_ItemToNode( p_playlist, p_item, false );
+            playlist_ItemToNode( p_playlist, p_item, pl_Unlocked );
 
         for( i = 0 ; i < p_cdda->i_tracks ; i++ )
         {

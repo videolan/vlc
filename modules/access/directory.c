@@ -220,7 +220,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     }
 
     p_current_input = input_GetItem( p_input );
-    p_current = playlist_ItemGetByInput( p_playlist, p_current_input, false );
+    p_current = playlist_ItemGetByInput( p_playlist, p_current_input, pl_Unlocked );
 
     if( !p_current )
     {
@@ -254,7 +254,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 
     p_current->p_input->i_type = ITEM_TYPE_DIRECTORY;
     p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
-                                              false );
+                                              pl_Unlocked );
 
     ReadDir( p_access, p_playlist, psz_name, i_mode,
              p_item_in_category,
@@ -540,7 +540,7 @@ static int ReadDir( access_t *p_access, playlist_t *p_playlist,
                                            PLAYLIST_APPEND|PLAYLIST_PREPARSE|
                                            PLAYLIST_NO_REBUILD,
                                            PLAYLIST_END, NULL, NULL,
-                                           false );
+                                           pl_Unlocked );
                     vlc_gc_decref( p_input );
                     if( i_ret != VLC_SUCCESS )
                         return VLC_EGENERIC;

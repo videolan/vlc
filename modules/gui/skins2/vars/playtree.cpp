@@ -175,7 +175,7 @@ void Playtree::onAppend( playlist_add_t *p_add )
         if( item == end() )
         {
             playlist_item_t *p_item = playlist_ItemGetById(
-                                        m_pPlaylist, p_add->i_item, false );
+                                        m_pPlaylist, p_add->i_item, pl_Unlocked );
             if( !p_item ) return;
             UString *pName = new UString( getIntf(),
                                           p_item->p_input->psz_name );

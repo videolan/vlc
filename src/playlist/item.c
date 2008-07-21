@@ -87,14 +87,14 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
         if( p_item_in_category->i_children == -1 )
         {
             p_item_in_category = playlist_ItemToNode( p_playlist,
-                    p_item_in_category, true );
+                    p_item_in_category, pl_Locked );
             p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
         }
 
         int i_ret = playlist_BothAddInput( p_playlist, p_child,
                 p_item_in_category,
                 PLAYLIST_APPEND | PLAYLIST_SPREPARSE , PLAYLIST_END,
-                NULL, NULL,  true );
+                NULL, NULL, pl_Locked );
 
         if( i_ret == VLC_SUCCESS && b_play )
         {
@@ -313,7 +313,7 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
 int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
 {
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id,
-                                                    true );
+                                                    pl_Locked );
     if( !p_item ) return VLC_EGENERIC;
     return DeleteInner( p_playlist, p_item, true );
 }
