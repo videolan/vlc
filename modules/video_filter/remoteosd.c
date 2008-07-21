@@ -1172,12 +1172,14 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     vlc_mutex_unlock( &p_sys->lock );
 
     /* set to one of the 9 relative locations */
-    p_region->i_align = 0; //=CENTER
+    p_region->i_align = 0; /* Center */
     p_spu->b_absolute = false;
 
 
     p_spu->i_x = 0;
     p_spu->i_y = 0;
+    p_spu->i_original_picture_width = 0; /*Let vout core do the horizontal scaling */
+    p_spu->i_original_picture_height = fmt.i_height;
 
     p_spu->p_region = p_region;
 
@@ -1338,30 +1340,38 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     int i_x, i_y;
     int i_v;
 
-    int v_h = p_vout->output.i_height;
-    int v_w = p_vout->output.i_width;
 
     i_v = var_GetInteger( p_sys->p_vout, "mouse-button-down" );
     i_y = var_GetInteger( p_sys->p_vout, "mouse-y" );
     i_x = var_GetInteger( p_sys->p_vout, "mouse-x" );
 
+    vlc_mutex_lock( &p_sys->lock );
+
+    const int v_h = p_vout->fmt_in.i_visible_height;
+    const int v_w = p_sys->i_vnc_width * v_h / p_sys->i_vnc_height;
+    const int v_x = (p_vout->fmt_in.i_visible_width-v_w)/2;
+
+    i_x -= v_x;
+
     if( i_y < 0 || i_x < 0 || i_y >= v_h || i_x >= v_w )
     {
-       msg_Dbg( p_this, "invalid mouse event? x=%d y=%d btn=%x", i_x, i_y, i_v );
-       return VLC_SUCCESS;
+        vlc_mutex_unlock( &p_sys->lock );
+        msg_Dbg( p_this, "invalid mouse event? x=%d y=%d btn=%x", i_x, i_y, i_v );
+        return VLC_SUCCESS;
     }
-#ifdef VNC_DEBUG
-    msg_Dbg( p_this, "mouse event x=%d y=%d btn=%x", i_x, i_y, i_v );
-#endif
-
-    /* FIXME: calculate x and y coordinates for scaled output */
-
-    vlc_mutex_lock( &p_sys->lock );
     if( !p_sys->b_connection_active )
     {
         vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
+
+#ifdef VNC_DEBUG
+    msg_Dbg( p_this, "mouse event x=%d y=%d btn=%x", i_x, i_y, i_v );
+#endif
+
+    /* */
+    i_x = i_x * p_sys->i_vnc_width / v_w;
+    i_y = i_y * p_sys->i_vnc_height / v_h;
 
     /* buttonMask bits 0-7 are buttons 1-8, 0=up, 1=down */
     rfbPointerEventMsg ev;
