@@ -1206,6 +1206,7 @@ static int Demux( demux_t *p_demux )
                 msg_Err( p_demux, "TCP rollover failed, aborting" );
                 return 0;
             }
+            return 1;
         }
         msg_Err( p_demux, "no data received in 10s, aborting" );
         return 0;
@@ -1464,6 +1465,7 @@ static int RollOverTcp( demux_t *p_demux )
         live_track_t *tk = p_sys->track[i];
 
         if( tk->b_muxed ) stream_DemuxDelete( tk->p_out_muxed );
+        if( tk->p_es ) es_out_Del( p_demux->out, tk->p_es );
         es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
@@ -1481,8 +1483,7 @@ static int RollOverTcp( demux_t *p_demux )
     p_sys->i_track = 0;
 
     /* Reopen rtsp client */
-    if( ( p_demux->s != NULL ) &&
-        ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
+    if( ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
     {
         msg_Err( p_demux, "Failed to connect with rtsp://%s",
                  p_sys->psz_path );
