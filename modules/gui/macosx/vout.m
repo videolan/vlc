@@ -1059,6 +1059,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         /* We'll catch mouse events */
         [self makeFirstResponder: o_view];
         [self setCanBecomeKeyWindow: YES];
+        [self setAcceptsMouseMovedEvents: YES];
+        [self setIgnoresMouseEvents: NO];
 
         if( var_CreateGetBool( p_vout, "macosx-background" ) )
         {
