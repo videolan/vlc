@@ -143,7 +143,7 @@ static int Demux( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static int HeaderRead( demux_t *p_demux );
-static uint8_t * MetaRead( demux_t *p_demux, const uint8_t *p_peek );
+static const uint8_t * MetaRead( demux_t *p_demux, const uint8_t *p_peek );
 static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num );
 
 /*****************************************************************************
@@ -1185,7 +1185,7 @@ static int HeaderRead( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
-static uint8_t * MetaRead( demux_t *p_demux, const uint8_t *p_peek )
+static const uint8_t * MetaRead( demux_t *p_demux, const uint8_t *p_peek )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
