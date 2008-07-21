@@ -861,12 +861,11 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     /* the user wants to close the window */
     case WM_CLOSE:
     {
-        playlist_t * p_playlist = vlc_object_find( p_vout,
-                                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_vout );
         if( p_playlist )
         {
             playlist_Stop( p_playlist );
-            vlc_object_release( p_playlist );
+            pl_Release( p_playlist );
         }
         return 0;
     }
