@@ -180,6 +180,11 @@ static inline bool fill_rect( filter_sys_t* p_sys,
                               uint16_t i_x, uint16_t i_y,
                               uint16_t i_w, uint16_t i_h,
                               uint8_t i_color );
+static inline bool copy_rect( filter_sys_t* p_sys,
+                              uint16_t i_x, uint16_t i_y,
+                              uint16_t i_w, uint16_t i_h,
+                              uint16_t i_sx, uint16_t i_sy );
+
 
 static inline bool raw_line(  filter_sys_t* p_sys,
                               uint16_t i_x, uint16_t i_y,
@@ -600,6 +605,7 @@ static bool handshaking ( filter_t *p_filter )
 
     rfbSetPixelFormatMsg sp;
     sp.type = rfbSetPixelFormat;
+    sp.pad1 = sp.pad2 = 0;
     sp.format.bitsPerPixel = 8;
     sp.format.depth = 8 ;
     sp.format.bigEndian = 1;
@@ -610,6 +616,7 @@ static bool handshaking ( filter_t *p_filter )
     sp.format.redShift = 10;
     sp.format.greenShift = 5;
     sp.format.blueShift = 0;
+    sp.format.pad1 = sp.format.pad2 = 0;
 
     if( !write_exact( p_filter, p_sys->i_socket,
                       (char*)&sp, sz_rfbSetPixelFormatMsg) )
@@ -622,6 +629,7 @@ static bool handshaking ( filter_t *p_filter )
 
     rfbSetEncodingsMsg se;
     se.type = rfbSetEncodings;
+    se.pad = 0;
     se.nEncodings = htons( p_sys->b_alpha_from_vnc ? 3 : 2 );
 
     if( !write_exact( p_filter, p_sys->i_socket,
@@ -897,10 +905,31 @@ static bool process_server_message ( filter_t *p_filter,
 
                 case rfbEncodingCopyRect:
                     {
-                        msg_Err( p_filter,
-                          "Rect in unsupported encoding rfbEncodingCopyRect" );
-                        return false;
+                        rfbCopyRect rect;
+
+                        if ( !read_exact( p_filter, p_sys->i_socket,
+                                          (char*)&rect,
+                                          sz_rfbCopyRect ) )
+                        {
+                            msg_Err( p_filter, "Could not read rfbCopyRect" );
+                            return false;
+                        }
+                        rect.srcX = htons( rect.srcX );
+                        rect.srcY = htons( rect.srcY );
+
+                        vlc_mutex_lock( &p_sys->lock );
+                        if ( !copy_rect( p_sys,
+                                         hdr.r.x,   hdr.r.y,
+                                         hdr.r.w,   hdr.r.h,
+                                         rect.srcX, rect.srcY ) )
+                        {
+                            msg_Err( p_filter, "copy_rect failed." );
+                            vlc_mutex_unlock( &p_sys->lock );
+                            return false;
+                        }
+                        vlc_mutex_unlock( &p_sys->lock );
                     }
+                    break;
 
                 case rfbEncodingRRE:
                     {
@@ -1201,6 +1230,65 @@ static inline bool fill_rect( filter_sys_t* p_sys,
     return true;
 }
 
+static inline bool copy_rect( filter_sys_t* p_sys,
+                              uint16_t i_x, uint16_t i_y,
+                              uint16_t i_w, uint16_t i_h,
+                              uint16_t i_sx, uint16_t i_sy )
+{
+    plane_t *p_Y = p_sys->p_pic->p+Y_PLANE;
+    plane_t *p_U = p_sys->p_pic->p+U_PLANE;
+    plane_t *p_V = p_sys->p_pic->p+V_PLANE;
+    plane_t *p_A = p_sys->p_pic->p+A_PLANE;
+
+    int i_pitch = p_Y->i_pitch;
+    int i_lines = p_Y->i_lines;
+
+    fprintf( stderr, "copy_rect: (%d,%d)+(%d,%d) -> (%d,%d)\n", i_x, i_y, i_w, i_h, i_sx, i_sy );
+
+    if( i_x + i_w > i_pitch || i_sx + i_w > i_pitch )
+        return false;
+    if( i_y + i_h > i_lines || i_sy + i_h > i_lines)
+        return false;
+
+    if( i_w <= 0 || i_h <= 0 )
+        return true;
+
+    uint8_t *pb_buffer = calloc( i_w * i_h, 4 );
+    if( !pb_buffer )
+        return false;
+
+    for( int i_line = 0; i_line < i_h; i_line++ )
+    {
+        for( int i_column = 0; i_column < i_w; i_column++ )
+        {
+            const int i_src_offset = ( i_sy + i_line ) * i_pitch + i_sx + i_column;
+            const int i_tmp_offset = (    0 + i_line ) *     i_w +    0 + i_column;
+
+            pb_buffer[4*i_tmp_offset + 0] = p_Y->p_pixels[i_src_offset];
+            pb_buffer[4*i_tmp_offset + 1] = p_U->p_pixels[i_src_offset];
+            pb_buffer[4*i_tmp_offset + 2] = p_V->p_pixels[i_src_offset];
+            pb_buffer[4*i_tmp_offset + 3] = p_A->p_pixels[i_src_offset];
+        }
+    }
+
+    for( int i_line = 0; i_line < i_h; i_line++ )
+    {
+        for( int i_column = 0; i_column < i_w; i_column++ )
+        {
+            const int i_tmp_offset = (   0 + i_line ) *     i_w +   0 + i_column;
+            const int i_dst_offset = ( i_y + i_line ) * i_pitch + i_x + i_column;
+
+            p_Y->p_pixels[i_dst_offset] = pb_buffer[4*i_tmp_offset + 0];
+            p_U->p_pixels[i_dst_offset] = pb_buffer[4*i_tmp_offset + 1];
+            p_V->p_pixels[i_dst_offset] = pb_buffer[4*i_tmp_offset + 2];
+            p_A->p_pixels[i_dst_offset] = pb_buffer[4*i_tmp_offset + 3];
+        }
+    }
+    free( pb_buffer );
+    return true;
+
+}
+
 static inline bool raw_line(  filter_sys_t* p_sys,
                               uint16_t i_x, uint16_t i_y,
                               uint16_t i_w )
@@ -1322,8 +1410,10 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     uint32_t i_key32 = newval.i_int;
     i_key32 = htonl(i_key32);
     rfbKeyEventMsg ev;
+
     ev.type = rfbKeyEvent;
     ev.down = 1;
+    ev.pad = 0;
 
     /* first key-down for modifier-keys */
     if (newval.i_int & KEY_MODIFIER_CTRL)
