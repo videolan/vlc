@@ -849,8 +849,9 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         default:
-            msg_Err( p_this, "unknown chroma type 0x%.8x (%4.4s)",
-                             i_chroma, (char*)&i_chroma );
+            if( p_this )
+                msg_Err( p_this, "unknown chroma type 0x%.8x (%4.4s)",
+                                 i_chroma, (char*)&i_chroma );
             p_pic->i_planes = 0;
             return VLC_EGENERIC;
     }
@@ -944,38 +945,93 @@ int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
 void __vout_CopyPicture( vlc_object_t *p_this,
                          picture_t *p_dest, picture_t *p_src )
 {
-    VLC_UNUSED( p_this );
+    VLC_UNUSED(p_this);
+    picture_Copy( p_dest, p_src );
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static void PictureReleaseCallback( picture_t *p_picture )
+{
+    if( --p_picture->i_refcount > 0 )
+        return;
+    picture_Delete( p_picture );
+}
+/*****************************************************************************
+ *
+ *****************************************************************************/
+picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect )
+{
+    picture_t *p_picture = malloc( sizeof(*p_picture) );
+
+    if( !p_picture )
+        return NULL;
+
+    memset( p_picture, 0, sizeof(*p_picture) );
+    if( __vout_AllocatePicture( NULL, p_picture,
+                                i_chroma, i_width, i_height, i_aspect ) )
+    {
+        free( p_picture );
+        return NULL;
+    }
+
+    p_picture->i_refcount = 1;
+    p_picture->pf_release = PictureReleaseCallback;
+    p_picture->i_status = RESERVED_PICTURE;
+
+    return p_picture;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+void picture_Delete( picture_t *p_picture )
+{
+    assert( p_picture && p_picture->i_refcount == 0 );
+
+    free( p_picture->p_data_orig );
+    free( p_picture->p_sys );
+    free( p_picture );
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
+{
     int i;
 
     for( i = 0; i < p_src->i_planes ; i++ )
     {
-        if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
+        if( p_src->p[i].i_pitch == p_dst->p[i].i_pitch )
         {
             /* There are margins, but with the same width : perfect ! */
-            vlc_memcpy( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+            vlc_memcpy( p_dst->p[i].p_pixels, p_src->p[i].p_pixels,
                         p_src->p[i].i_pitch * p_src->p[i].i_visible_lines );
         }
         else
         {
             /* We need to proceed line by line */
             uint8_t *p_in = p_src->p[i].p_pixels;
-            assert( p_in );
-            uint8_t *p_out = p_dest->p[i].p_pixels;
-            assert( p_out );
+            uint8_t *p_out = p_dst->p[i].p_pixels;
             int i_line;
+
+            assert( p_in );
+            assert( p_out );
 
             for( i_line = p_src->p[i].i_visible_lines; i_line--; )
             {
                 vlc_memcpy( p_out, p_in, p_src->p[i].i_visible_pitch );
                 p_in += p_src->p[i].i_pitch;
-                p_out += p_dest->p[i].i_pitch;
+                p_out += p_dst->p[i].i_pitch;
             }
         }
     }
-
-    p_dest->date = p_src->date;
-    p_dest->b_force = p_src->b_force;
-    p_dest->i_nb_fields = p_src->i_nb_fields;
-    p_dest->b_progressive = p_src->b_progressive;
-    p_dest->b_top_field_first = p_src->b_top_field_first;
 }
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+
+

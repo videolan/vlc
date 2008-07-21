@@ -435,7 +435,10 @@ void libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp,
 {
     if ( p_mlp->p_mi )
     {
+        /* We are not interested in getting media stop event now */
+        uninstall_media_player_observer( p_mlp );
         libvlc_media_player_stop( p_mlp->p_mi, p_e );
+        install_media_player_observer( p_mlp );
     }
 
     vlc_mutex_lock( &p_mlp->object_lock );

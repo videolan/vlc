@@ -75,37 +75,12 @@
 
 #include <assert.h>
 
-typedef struct line_desc_t line_desc_t;
-
 /*****************************************************************************
- * Local prototypes
+ * Module descriptor
  *****************************************************************************/
 static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 
-static int LoadFontsFromAttachments( filter_t *p_filter );
-
-/* The RenderText call maps to pf_render_string, defined in vlc_filter.h */
-static int RenderText( filter_t *, subpicture_region_t *,
-                       subpicture_region_t * );
-#ifdef HAVE_FONTCONFIG
-static int RenderHtml( filter_t *, subpicture_region_t *,
-                       subpicture_region_t * );
-static char *FontConfig_Select( FcConfig *, const char *,
-                                bool, bool, int * );
-static int BuildDone( vlc_object_t*, const char *, vlc_value_t, vlc_value_t,
-                        void* );
-#endif
-static line_desc_t *NewLine( int );
-
-static int GetFontSize( filter_t *p_filter );
-static int SetFontSize( filter_t *, int );
-static void YUVFromRGB( uint32_t i_argb,
-                        uint8_t *pi_y, uint8_t *pi_u, uint8_t *pi_v );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 #define FONT_TEXT N_("Font")
 #define FONT_LONGTEXT N_("Filename for the font you want to use")
 #define FONTSIZE_TEXT N_("Font size in pixels")
@@ -189,6 +164,31 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
+
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+
+/* The RenderText call maps to pf_render_string, defined in vlc_filter.h */
+static int RenderText( filter_t *, subpicture_region_t *,
+                       subpicture_region_t * );
+#ifdef HAVE_FONTCONFIG
+static int RenderHtml( filter_t *, subpicture_region_t *,
+                       subpicture_region_t * );
+static char *FontConfig_Select( FcConfig *, const char *,
+                                bool, bool, int * );
+#endif
+
+
+static int LoadFontsFromAttachments( filter_t *p_filter );
+
+static int GetFontSize( filter_t *p_filter );
+static int SetFontSize( filter_t *, int );
+static void YUVFromRGB( uint32_t i_argb,
+                        uint8_t *pi_y, uint8_t *pi_u, uint8_t *pi_v );
+
+typedef struct line_desc_t line_desc_t;
 struct line_desc_t
 {
     /** NULL-terminated list of glyphs making the string */
@@ -214,6 +214,7 @@ struct line_desc_t
 
     line_desc_t    *p_next;
 };
+static line_desc_t *NewLine( int );
 
 typedef struct font_stack_t font_stack_t;
 struct font_stack_t
@@ -240,8 +241,14 @@ typedef struct
 static int Render( filter_t *, subpicture_region_t *, line_desc_t *, int, int);
 static void FreeLines( line_desc_t * );
 static void FreeLine( line_desc_t * );
+
 #ifdef HAVE_FONTCONFIG
-static void FontBuilder( vlc_object_t *p_this);
+static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_lock  );
+static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder );
+static void FontBuilderThread( vlc_object_t *p_this);
+static void FontBuilderDestructor( vlc_object_t *p_this );
+static int FontBuilderDone( vlc_object_t*, const char *, vlc_value_t, vlc_value_t,
+                        void* );
 #endif
 
 /*****************************************************************************
@@ -263,13 +270,15 @@ struct filter_sys_t
     int            i_default_font_size;
     int            i_display_height;
 #ifdef HAVE_FONTCONFIG
+    vlc_mutex_t   *p_fontconfig_lock;
+    bool           b_fontconfig_ok;
     FcConfig      *p_fontconfig;
-    bool     b_fontconfig_ok;
-    vlc_mutex_t    fontconfig_lock;
 #endif
 
     input_attachment_t **pp_font_attachments;
     int                  i_font_attachments;
+
+    vlc_object_t  *p_fontbuilder;
 };
 
 /*****************************************************************************
@@ -284,7 +293,6 @@ static int Create( vlc_object_t *p_this )
     char          *psz_fontfile = NULL;
     int            i_error;
     vlc_value_t    val;
-    vlc_object_t  *p_fontbuilder;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
@@ -360,61 +368,9 @@ static int Create( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    vlc_mutex_init( &p_sys->fontconfig_lock );
     p_sys->b_fontconfig_ok = false;
     p_sys->p_fontconfig    = NULL;
-
-    /* Check for an existing Fontbuilder thread */
-    vlc_mutex_t *lock = var_AcquireMutex( "fontbuilder" );
-    p_fontbuilder = vlc_object_find_name( p_filter->p_libvlc,
-                                          "fontlist builder",
-                                          FIND_CHILD );
-
-    if( ! p_fontbuilder )
-    {
-        /* Create the FontBuilder thread as a child of a top-level
-         * object, so that it can survive the destruction of the
-         * freetype object - the fontlist only needs to be built once,
-         * and calling the fontbuild a second time while the first is
-         * still in progress can cause thread instabilities.
-         */
-
-        p_fontbuilder = vlc_object_create( p_filter->p_libvlc,
-                                           sizeof(vlc_object_t) );
-        if( p_fontbuilder )
-        {
-            p_fontbuilder->psz_object_name = strdup( "fontlist builder" );
-            vlc_object_attach( p_fontbuilder, p_filter->p_libvlc );
-
-            var_Create( p_fontbuilder, "build-done", VLC_VAR_BOOL );
-            var_SetBool( p_fontbuilder, "build-done", false );
-            var_AddCallback( p_fontbuilder, "build-done", BuildDone, p_sys );
-
-            if( vlc_thread_create( p_fontbuilder,
-                                   "fontlist builder",
-                                   FontBuilder,
-                                   VLC_THREAD_PRIORITY_LOW,
-                                   false ) )
-            {
-                /* Don't destroy the fontconfig object - we won't be able to do
-                 * italics or bold or change the font face, but we will still
-                 * be able to do underline and change the font size.
-                 */
-                msg_Warn( p_filter, "fontconfig database builder thread can't "
-                        "be launched. Font styling support will be limited." );
-            }
-        }
-        else
-        {
-            vlc_object_release( p_fontbuilder );
-        }
-    }
-    else
-    {
-        vlc_object_release( p_fontbuilder );
-    }
-    vlc_mutex_unlock( lock );
-
+    p_sys->p_fontbuilder   = FontBuilderAttach( p_filter, &p_sys->p_fontconfig_lock );
 #endif
 
     p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
@@ -462,46 +418,97 @@ static void Destroy( vlc_object_t *p_this )
         int   k;
 
         for( k = 0; k < p_sys->i_font_attachments; k++ )
-        {
             vlc_input_attachment_Delete( p_sys->pp_font_attachments[k] );
-        }
 
         free( p_sys->pp_font_attachments );
     }
 
 #ifdef HAVE_FONTCONFIG
-    vlc_mutex_t *lock = var_AcquireMutex( "fontbuilder" );
-    vlc_object_t *p_fontbuilder = vlc_object_find_name( p_filter->p_libvlc,
-                                    "fontlist builder", FIND_CHILD );
-    if( p_fontbuilder )
-    {
-        var_DelCallback( p_fontbuilder, "build-done", BuildDone, p_sys );
-        vlc_object_release( p_fontbuilder );
-    }
-    vlc_mutex_unlock( lock );
+    FontBuilderDetach( p_filter, p_sys->p_fontbuilder );
+#endif
 
-    vlc_mutex_destroy( &p_sys->fontconfig_lock );
-
-    if( p_sys->p_fontconfig )
-    {
-        FcConfigDestroy( p_sys->p_fontconfig );
-        p_sys->p_fontconfig = NULL;
-    }
     /* FcFini asserts calling the subfunction FcCacheFini()
      * even if no other library functions have been made since FcInit(),
      * so don't call it. */
-#endif
+
     FT_Done_Face( p_sys->p_face );
     FT_Done_FreeType( p_sys->p_library );
     free( p_sys );
 }
 
 #ifdef HAVE_FONTCONFIG
+static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_lock )
+{
+    /* Check for an existing Fontbuilder thread */
+    vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
+    vlc_object_t *p_fontbuilder =
+        vlc_object_find_name( p_filter->p_libvlc,
+                              "fontlist builder", FIND_CHILD );
 
-static void FontBuilder( vlc_object_t *p_this )
+    if( !p_fontbuilder )
+    {
+        /* Create the FontBuilderThread thread as a child of a top-level
+         * object, so that it can survive the destruction of the
+         * freetype object - the fontlist only needs to be built once,
+         * and calling the fontbuild a second time while the first is
+         * still in progress can cause thread instabilities.
+         *
+         * XXX The fontbuilder will be destroy as soon as it is unused.
+         */
+
+        p_fontbuilder = vlc_object_create( p_filter->p_libvlc,
+                                           sizeof(vlc_object_t) );
+        if( p_fontbuilder )
+        {
+            p_fontbuilder->psz_object_name = strdup( "fontlist builder" );
+            p_fontbuilder->p_private = NULL;
+            vlc_object_set_destructor( p_fontbuilder, FontBuilderDestructor );
+
+            vlc_object_attach( p_fontbuilder, p_filter->p_libvlc );
+
+            var_Create( p_fontbuilder, "build-done", VLC_VAR_BOOL );
+            var_SetBool( p_fontbuilder, "build-done", false );
+
+            if( vlc_thread_create( p_fontbuilder,
+                                   "fontlist builder",
+                                   FontBuilderThread,
+                                   VLC_THREAD_PRIORITY_LOW,
+                                   false ) )
+            {
+                msg_Warn( p_filter, "fontconfig database builder thread can't "
+                        "be launched. Font styling support will be limited." );
+            }
+        }
+    }
+    if( p_fontbuilder )
+    {
+        var_AddCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
+        var_TriggerCallback( p_fontbuilder, "build-done" );
+    }
+    vlc_mutex_unlock( p_lock );
+    *pp_lock = p_lock;
+    return p_fontbuilder;
+}
+static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder )
+{
+    vlc_mutex_t *lock = var_AcquireMutex( "fontbuilder" );
+    if( p_fontbuilder )
+    {
+        var_DelCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
+
+        /* We wait for the thread on the first FontBuilderDetach */
+        if( vlc_object_alive( p_fontbuilder ) )
+        {
+            vlc_object_kill( p_fontbuilder );
+            vlc_thread_join( p_fontbuilder );
+        }
+        vlc_object_release( p_fontbuilder );
+    }
+    vlc_mutex_unlock( lock );
+}
+static void FontBuilderThread( vlc_object_t *p_this )
 {
     FcConfig      *p_fontconfig = FcInitLoadConfig();
-    vlc_mutex_t   *lock;
 
     vlc_thread_ready( p_this );
 
@@ -509,6 +516,7 @@ static void FontBuilder( vlc_object_t *p_this )
     {
         mtime_t    t1, t2;
 
+        //msg_Dbg( p_this, "Building font database..." );
         msg_Dbg( p_this, "Building font database..." );
         t1 = mdate();
         if(! FcConfigBuildFonts( p_fontconfig ))
@@ -525,17 +533,40 @@ static void FontBuilder( vlc_object_t *p_this )
         msg_Dbg( p_this, "Finished building font database." );
         msg_Dbg( p_this, "Took %ld seconds", (long)((t2 - t1)/1000000) );
 
-        lock = var_AcquireMutex( "fontbuilder" );
+        vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
+        p_this->p_private = p_fontconfig;
+        vlc_mutex_unlock( p_lock );
 
         var_SetBool( p_this, "build-done", true );
-
-        FcConfigDestroy( p_fontconfig );
-        vlc_mutex_unlock( lock );
     }
-    vlc_object_detach( p_this );
-    vlc_object_release( p_this );
 }
+static void FontBuilderDestructor( vlc_object_t *p_this )
+{
+    FcConfig *p_fontconfig = p_this->p_private;
 
+    if( p_fontconfig )
+        FcConfigDestroy( p_fontconfig );
+}
+static int FontBuilderDone( vlc_object_t *p_this, const char *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    filter_t *p_filter = param;
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( newval.b_bool )
+    {
+        vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
+
+        p_sys->b_fontconfig_ok = true;
+        p_sys->p_fontconfig = p_this->p_private;
+
+        vlc_mutex_unlock( p_lock );
+    }
+
+    VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval);
+    return VLC_SUCCESS;
+}
 #endif
 
 /*****************************************************************************
@@ -2185,17 +2216,6 @@ static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, ft_style
     return VLC_EGENERIC;
 }
 
-static int BuildDone( vlc_object_t *p_this, const char *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *param )
-{
-    (void)p_this;
-    (void)psz_var;
-    (void)oldval;
-    ((filter_sys_t*)param)->b_fontconfig_ok = newval.b_bool;
-    assert( newval.b_bool );
-    return VLC_SUCCESS;
-}
-
 static int ProcessLines( filter_t *p_filter,
                          uint32_t *psz_text,
                          int i_len,
@@ -2411,17 +2431,22 @@ static int ProcessLines( filter_t *p_filter,
             /* Look for a match amongst our attachments first */
             CheckForEmbeddedFont( p_sys, &p_face, p_style );
 
-            if( ! p_face && p_sys->b_fontconfig_ok )
+            if( ! p_face )
             {
-                char *psz_fontfile;
-                vlc_mutex_lock( &p_sys->fontconfig_lock );
+                char *psz_fontfile = NULL;
 
-                psz_fontfile = FontConfig_Select( p_sys->p_fontconfig,
-                                                  p_style->psz_fontname,
-                                                  p_style->b_bold,
-                                                  p_style->b_italic,
-                                                  &i_idx );
-                vlc_mutex_unlock( &p_sys->fontconfig_lock );
+                vlc_mutex_lock( p_sys->p_fontconfig_lock );
+                if( p_sys->b_fontconfig_ok )
+                {
+                    /* FIXME Is there really a race condition between FontConfig_Select with default fontconfig(NULL)
+                     * and FcConfigBuildFonts ? If not it would be better to remove the check on b_fontconfig_ok */
+                    psz_fontfile = FontConfig_Select( p_sys->p_fontconfig,
+                                                      p_style->psz_fontname,
+                                                      p_style->b_bold,
+                                                      p_style->b_italic,
+                                                      &i_idx );
+                }
+                vlc_mutex_unlock( p_sys->p_fontconfig_lock );
 
                 if( psz_fontfile && ! *psz_fontfile )
                 {

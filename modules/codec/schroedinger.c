@@ -250,6 +250,7 @@ static void SchroFrameFree( SchroFrame *frame, void *priv)
     if( !p_pic )
         return;
 
+    /* FIXME it is wrong, you should call pf_vout_buffer_del */
     if( p_pic->pf_release ) p_pic->pf_release( p_pic );
     (void)frame;
 }
@@ -449,7 +450,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 b_bail = 1;
             }
 
-            msg_Dbg( p_dec, "Inserting bytes into decoder len=%d of %d pts=%"PRId64,
+            msg_Dbg( p_dec, "Inserting bytes into decoder len=%zu of %zu pts=%"PRId64,
                      i_pulen, p_block->i_buffer, p_block->i_pts);
             /* this stops the same block being fed back into this function if
              * we were on the next iteration of this loop to output a picture */

@@ -37,13 +37,11 @@ inline float comb::process(float input)
 {
     float output;
 
-    output = buffer[bufidx];
-    undenormalise(output);
+    output = undenormalise( buffer[bufidx] );
 
-    filterstore = (output*damp2) + (filterstore*damp1);
-    undenormalise(filterstore);
+    filterstore = undenormalise( output*damp2 + filterstore*damp1 );
 
-    buffer[bufidx] = input + (filterstore*feedback);
+    buffer[bufidx] = input + filterstore*feedback;
 
     if(++bufidx>=bufsize) bufidx = 0;
 

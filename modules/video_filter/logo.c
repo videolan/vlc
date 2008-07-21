@@ -819,7 +819,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_pic = p_logo->p_pic;
 
     /* Allocate the subpicture internal data. */
-    p_spu = p_filter->pf_sub_buffer_new( p_filter );
+    p_spu = filter_NewSubpicture( p_filter );
     if( !p_spu )
     {
         vlc_mutex_unlock( &p_logo_list->lock );

@@ -236,6 +236,9 @@ osd_ShowTextRelative
 osd_Slider
 __osd_Volume
 path_sanitize
+picture_CopyPixels
+picture_Delete
+picture_New
 playlist_Add
 playlist_AddExt
 playlist_AddInput

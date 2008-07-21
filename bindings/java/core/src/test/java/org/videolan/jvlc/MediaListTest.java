@@ -26,23 +26,12 @@
 package org.videolan.jvlc;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 
-public class MediaListTest
+public class MediaListTest extends AbstractJVLCTest
 {
 
-    private JVLC jvlc;
-    
-    private String mrl = getClass().getResource("/raffa_voice.ogg").getFile();
-    
-    @Before
-    public void setup()
-    {
-        jvlc = new JVLC("-vvv -I dummy --aout=dummy --vout=dummy");
-    }
-    
     @Test
     public void mediaListAddMedia()
     {

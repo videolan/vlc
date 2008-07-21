@@ -25,42 +25,14 @@
 
 package org.videolan.jvlc.internal;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
-import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class LibVlcMediaInstanceTest
+public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
 {
-    
-    private LibVlc libvlc = LibVlc.SYNC_INSTANCE;
-
-    private LibVlcInstance libvlcInstance;
-
-    private String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
-
-    private libvlc_exception_t exception;
-
-    @Before
-    public void testSetup()
-    {
-        exception = new libvlc_exception_t();
-        libvlcInstance = libvlc.libvlc_new(0, new String[]{"-vvv","-I","dummy","-aout=dummy","-vout=dummy"}, exception);
-        libvlc.libvlc_exception_clear(exception);
-    }
-    
-    @After
-    public void tearDown()
-    {
-        libvlc.libvlc_release(libvlcInstance);
-        libvlc.libvlc_exception_clear(exception);
-    }
-    
     @Test
     public void mediaInstanceNew()
     {
@@ -127,11 +99,12 @@ public class LibVlcMediaInstanceTest
     }
     
     @Test
-    public void mediaInstanceStop2()
+    public void mediaInstanceStop2() throws Exception
     {
         LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_player_play(mi, exception);
+        Thread.sleep(100);
         libvlc.libvlc_media_player_stop(mi, exception);
         Assert.assertEquals(0, exception.raised);
     }

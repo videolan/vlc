@@ -38,22 +38,10 @@
 #include "filter_picture.h"
 
 /*****************************************************************************
- * Local prototypes
+ * Module descriptor
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
-
-static picture_t *Filter( filter_t *, picture_t * );
-static picture_t *FilterPacked( filter_t *, picture_t * );
-static void GaussianConvolution( uint32_t *, uint32_t *, int, int, int );
-static int FindShapes( uint32_t *, uint32_t *, int, int, int,
-                       int *, int *, int *, int *, int *);
-
-#define NUM_COLORS 5000
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 
 #define FILTER_PREFIX "motiondetect-"
 
@@ -68,14 +56,32 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static picture_t *Filter( filter_t *, picture_t * );
+static picture_t *FilterPacked( filter_t *, picture_t * );
+static void GaussianConvolution( uint32_t *, uint32_t *, int, int, int );
+static int FindShapes( uint32_t *, uint32_t *, int, int, int,
+                       int *, int *, int *, int *, int *);
+static void Draw( filter_t *p_filter, uint8_t *p_pix, int i_pix_pitch, int i_pix_size );
+#define NUM_COLORS (5000)
+
 struct filter_sys_t
 {
-    uint8_t *p_oldpix;
-    uint8_t *p_oldpix_u;
-    uint8_t *p_oldpix_v;
+    bool b_old;
+    picture_t *p_old;
     uint32_t *p_buf;
     uint32_t *p_buf2;
-    vlc_mutex_t lock;
+
+    /* */
+    int i_colors;
+    int colors[NUM_COLORS];
+    int color_x_min[NUM_COLORS];
+    int color_x_max[NUM_COLORS];
+    int color_y_min[NUM_COLORS];
+    int color_y_max[NUM_COLORS];
 };
 
 /*****************************************************************************
@@ -84,8 +90,10 @@ struct filter_sys_t
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    const video_format_t *p_fmt = &p_filter->fmt_in.video;
+    filter_sys_t *p_sys;
 
-    switch( p_filter->fmt_in.video.i_chroma )
+    switch( p_fmt->i_chroma )
     {
         CASE_PLANAR_YUV
             p_filter->pf_video_filter = Filter;
@@ -97,19 +105,29 @@ static int Create( vlc_object_t *p_this )
 
         default:
             msg_Err( p_filter, "Unsupported input chroma (%4s)",
-                     (char*)&(p_filter->fmt_in.video.i_chroma) );
+                     (char*)&(p_fmt->i_chroma) );
             return VLC_EGENERIC;
     }
 
     /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
+    p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_filter->p_sys->p_oldpix = NULL;
-    p_filter->p_sys->p_buf = NULL;
+    p_sys->b_old = false;
+    p_sys->p_old = picture_New( p_fmt->i_chroma,
+                                p_fmt->i_width, p_fmt->i_height, 0 );
+    p_sys->p_buf  = calloc( p_fmt->i_width * p_fmt->i_height, sizeof(*p_sys->p_buf) );
+    p_sys->p_buf2 = calloc( p_fmt->i_width * p_fmt->i_height, sizeof(*p_sys->p_buf) );
 
-    vlc_mutex_init( &p_filter->p_sys->lock );
+    if( !p_sys->p_old || !p_sys->p_buf || !p_sys->p_buf2 )
+    {
+        free( p_sys->p_buf2 );
+        free( p_sys->p_buf );
+        if( p_sys->p_old )
+            picture_Release( p_sys->p_old );
+        return VLC_ENOMEM;
+    }
 
     return VLC_SUCCESS;
 }
@@ -120,13 +138,12 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    free( p_filter->p_sys->p_oldpix );
-    free( p_filter->p_sys->p_buf );
-
-    vlc_mutex_destroy( &p_filter->p_sys->lock );
-
-    free( p_filter->p_sys );
+    free( p_sys->p_buf2 );
+    free( p_sys->p_buf );
+    picture_Release( p_sys->p_old );
+    free( p_sys );
 }
 
 
@@ -135,143 +152,97 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
 {
-    picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
+    const video_format_t *p_fmt = &p_filter->fmt_in.video;
+
+    picture_t *p_outpic;
 
     const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
-    const int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
-    const int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
 
-    const uint8_t *p_inpix_u = p_inpic->p[U_PLANE].p_pixels;
-    const uint8_t *p_inpix_v = p_inpic->p[V_PLANE].p_pixels;
-    const int i_src_pitch_u = p_inpic->p[U_PLANE].i_pitch;
-    const int i_num_lines_u = p_inpic->p[U_PLANE].i_visible_lines;
+    uint8_t *p_oldpix   = p_sys->p_old->p[Y_PLANE].p_pixels;
+    const int i_old_pitch = p_sys->p_old->p[Y_PLANE].i_pitch;
+    uint32_t *p_buf = p_sys->p_buf;
+    uint32_t *p_buf2= p_sys->p_buf2;
 
-    uint8_t *p_oldpix;
-    uint8_t *p_oldpix_u;
-    uint8_t *p_oldpix_v;
-    uint8_t *p_outpix;
-    uint32_t *p_buf;
-    uint32_t *p_buf2;
+    unsigned x, y;
 
-    int i,j;
-    int last;
+    if( !p_inpic )
+        return NULL;
 
-    if( !p_inpic ) return NULL;
-
-    if( !p_sys->p_oldpix || !p_sys->p_buf )
+    if( !p_sys->b_old )
     {
-        free( p_sys->p_oldpix );
-        free( p_sys->p_buf );
-        p_sys->p_oldpix = malloc( i_src_pitch * i_num_lines );
-        p_sys->p_oldpix_u = malloc( i_src_pitch_u * i_num_lines_u );
-        p_sys->p_oldpix_v = malloc( i_src_pitch_u * i_num_lines_u );
-        p_sys->p_buf = malloc( sizeof( uint32_t ) * i_src_pitch * i_num_lines );
-        p_sys->p_buf2 = malloc( sizeof( uint32_t ) * i_src_pitch * i_num_lines);
-        vlc_memcpy( p_sys->p_oldpix, p_inpix, i_src_pitch * i_num_lines );
-        vlc_memcpy( p_sys->p_oldpix_u, p_inpix_u, i_src_pitch_u * i_num_lines_u );
-        vlc_memcpy( p_sys->p_oldpix_v, p_inpix_v, i_src_pitch_u * i_num_lines_u );
+        picture_Copy( p_sys->p_old, p_inpic );
+        p_sys->b_old = true;
         return p_inpic;
     }
-    p_oldpix = p_sys->p_oldpix;
-    p_oldpix_u = p_sys->p_oldpix_u;
-    p_oldpix_v = p_sys->p_oldpix_v;
-    p_buf = p_sys->p_buf;
-    p_buf2 = p_sys->p_buf2;
 
-    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
-        msg_Warn( p_filter, "can't get output picture" );
         picture_Release( p_inpic );
         return NULL;
     }
-
-    p_outpix = p_outpic->p[Y_PLANE].p_pixels;
-    vlc_memcpy( p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
-        p_inpic->p[Y_PLANE].i_pitch * p_inpic->p[Y_PLANE].i_visible_lines );
-    vlc_memcpy( p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
-        p_inpic->p[U_PLANE].i_pitch * p_inpic->p[U_PLANE].i_visible_lines );
-    vlc_memcpy( p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
-        p_inpic->p[V_PLANE].i_pitch * p_inpic->p[V_PLANE].i_visible_lines );
-
-    vlc_mutex_lock( &p_filter->p_sys->lock );
+    picture_Copy( p_outpic, p_inpic );
 
     /**
      * Substract Y planes
      */
-    for( i = 0; i < i_src_pitch * i_num_lines; i++ )
+    for( y = 0; y < p_fmt->i_height; y++ )
     {
-        if( p_inpix[i] > p_oldpix[i] )
-        {
-            p_buf2[i] = p_inpix[i] - p_oldpix[i];
-        }
-        else
-        {
-            p_buf2[i] = p_oldpix[i] - p_inpix[i];
-        }
+        for( x = 0; x < p_fmt->i_width; x++ )
+            p_buf2[y*p_fmt->i_width+x] = abs( p_inpix[y*i_src_pitch+x] - p_oldpix[y*i_old_pitch+x] );
     }
-    int line;
-    int col;
-    int format;
+
+    int i_chroma_dx;
+    int i_chroma_dy;
     switch( p_inpic->format.i_chroma )
     {
         case VLC_FOURCC('I','4','2','0'):
         case VLC_FOURCC('I','Y','U','V'):
         case VLC_FOURCC('J','4','2','0'):
         case VLC_FOURCC('Y','V','1','2'):
-            format = 1;
+            i_chroma_dx = 2;
+            i_chroma_dy = 2;
             break;
 
         case VLC_FOURCC('I','4','2','2'):
         case VLC_FOURCC('J','4','2','2'):
-            format = 2;
+            i_chroma_dx = 2;
+            i_chroma_dy = 1;
             break;
 
         default:
-            format = 0;
             msg_Warn( p_filter, "Not taking chroma into account" );
+            i_chroma_dx = 0;
+            i_chroma_dy = 0;
             break;
     }
 
-    if( format )
+    if( i_chroma_dx != 0 && i_chroma_dy != 0 )
     {
-        for( line = 0; line < i_num_lines_u; line++ )
-        {
-            for( col = 0; col < i_src_pitch_u; col ++ )
-            {
-                int diff;
-                i = line * i_src_pitch_u + col;
-                if( p_inpix_u[i] > p_oldpix_u[i] )
-                {
-                    diff = p_inpix_u[i] - p_oldpix_u[i];
-                }
-                else
-                {
-                    diff = p_oldpix_u[i] - p_inpix_u[i];
-                }
-                if( p_inpix_v[i] > p_oldpix_v[i] )
-                {
-                    diff += p_inpix_v[i] - p_oldpix_v[i];
-                }
-                else
-                {
-                    diff += p_oldpix_v[i] - p_inpix_v[i];
-                }
-                switch( format )
-                {
-                    case 1:
-                        p_buf2[2*line*i_src_pitch+2*col] += diff;
-                        p_buf2[2*line*i_src_pitch+2*col+1] += diff;
-                        p_buf2[(2*line+1)*i_src_pitch+2*col] += diff;
-                        p_buf2[(2*line+1)*i_src_pitch+2*col+1] += diff;
-                        break;
+        const uint8_t *p_inpix_u = p_inpic->p[U_PLANE].p_pixels;
+        const uint8_t *p_inpix_v = p_inpic->p[V_PLANE].p_pixels;
+        const int i_src_pitch_u = p_inpic->p[U_PLANE].i_pitch;
+        const int i_src_pitch_v = p_inpic->p[V_PLANE].i_pitch;
 
-                    case 2:
-                        p_buf2[line*i_src_pitch+2*col] += diff;
-                        p_buf2[line*i_src_pitch+2*col+1] += diff;
-                        break;
+        const uint8_t *p_oldpix_u = p_sys->p_old->p[U_PLANE].p_pixels;
+        const uint8_t *p_oldpix_v = p_sys->p_old->p[V_PLANE].p_pixels;
+        const int i_old_pitch_u = p_sys->p_old->p[U_PLANE].i_pitch;
+        const int i_old_pitch_v = p_sys->p_old->p[V_PLANE].i_pitch;
+
+        for( y = 0; y < p_fmt->i_height/i_chroma_dy; y++ )
+        {
+            for( x = 0; x < p_fmt->i_width/i_chroma_dx; x ++ )
+            {
+                const int d = abs( p_inpix_u[y*i_src_pitch_u+x] - p_oldpix_u[y*i_old_pitch_u+x] ) +
+                              abs( p_inpix_v[y*i_src_pitch_v+x] - p_oldpix_v[y*i_old_pitch_v+x] );
+                int i, j;
+
+                for( j = 0; j < i_chroma_dy; j++ )
+                {
+                    for( i = 0; i < i_chroma_dx; i++ )
+                        p_buf2[i_chroma_dy*p_fmt->i_width*j + i_chroma_dx*i] = d;
                 }
             }
         }
@@ -280,61 +251,23 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     /**
      * Get the areas where movement was detected
      */
-    int colors[NUM_COLORS];
-    int color_x_min[NUM_COLORS];
-    int color_x_max[NUM_COLORS];
-    int color_y_min[NUM_COLORS];
-    int color_y_max[NUM_COLORS];
-
-    last = FindShapes( p_buf2, p_buf, i_src_pitch, i_src_visible, i_num_lines,
-                   colors, color_x_min, color_x_max, color_y_min, color_y_max );
+    p_sys->i_colors = FindShapes( p_buf2, p_buf, p_fmt->i_width, p_fmt->i_width, p_fmt->i_height,
+                                  p_sys->colors, p_sys->color_x_min, p_sys->color_x_max, p_sys->color_y_min, p_sys->color_y_max );
 
     /**
      * Count final number of shapes
      * Draw rectangles (there can be more than 1 moving shape in 1 rectangle)
      */
-    j = 0;
-    for( i = 1; i < last; i++ )
-    {
-        if( colors[i] == i && color_x_min[i] != -1 )
-        {
-            if( ( color_y_max[i] - color_y_min[i] ) * ( color_x_max[i] - color_x_min[i] ) < 16 ) continue;
-            j++;
-            int x, y;
-            y = color_y_min[i];
-            for( x = color_x_min[i]; x <= color_x_max[i]; x++ )
-            {
-                p_outpix[y*i_src_pitch+x] = 0xff;
-            }
-            y = color_y_max[i];
-            for( x = color_x_min[i]; x <= color_x_max[i]; x++ )
-            {
-                p_outpix[y*i_src_pitch+x] = 0xff;
-            }
-            x = color_x_min[i];
-            for( y = color_y_min[i]; y <= color_y_max[i]; y++ )
-            {
-                p_outpix[y*i_src_pitch+x] = 0xff;
-            }
-            x = color_x_max[i];
-            for( y = color_y_min[i]; y <= color_y_max[i]; y++ )
-            {
-                p_outpix[y*i_src_pitch+x] = 0xff;
-            }
-        }
-    }
-    msg_Dbg( p_filter, "Counted %d moving shapes.", j);
+    Draw( p_filter, p_outpic->p[Y_PLANE].p_pixels, p_outpic->p[Y_PLANE].i_pitch, 1 );
 
     /**
      * We're done. Lets keep a copy of the picture
-     */
-    vlc_memcpy( p_oldpix, p_inpix, i_src_pitch * i_num_lines );
-    vlc_memcpy( p_oldpix_u, p_inpix_u, i_src_pitch_u * i_num_lines_u );
-    vlc_memcpy( p_oldpix_v, p_inpix_v, i_src_pitch_u * i_num_lines_u );
+     * TODO we may just picture_Release with a latency of 1 if the filters/vout
+     * handle it correctly */
+    picture_Copy( p_sys->p_old, p_inpic );
 
-    vlc_mutex_unlock( &p_filter->p_sys->lock );
-
-    return CopyInfoAndRelease( p_outpic, p_inpic );
+    picture_Release( p_inpic );
+    return p_outpic;
 }
 
 /*****************************************************************************
@@ -342,179 +275,85 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
  *****************************************************************************/
 static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
 {
-    picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
+    const video_format_t *p_fmt = &p_filter->fmt_in.video;
+    picture_t *p_outpic;
+
+    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
+    const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
+
+    uint8_t *p_oldpix   = p_sys->p_old->p[Y_PLANE].p_pixels;
+    const int i_old_pitch = p_sys->p_old->p[Y_PLANE].i_pitch;
+    uint32_t *p_buf = p_sys->p_buf;
+    uint32_t *p_buf2= p_sys->p_buf2;
 
     int i_y_offset, i_u_offset, i_v_offset;
 
-    const uint8_t *p_inpix;
-    const uint8_t *p_inpix_u;
-    const uint8_t *p_inpix_v;
+    unsigned x, y;
 
-    int i_src_pitch;
-    int i_src_visible;
-    int i_num_lines;
-
-    uint8_t *p_oldpix;
-    uint8_t *p_oldpix_u;
-    uint8_t *p_oldpix_v;
-    uint8_t *p_outpix;
-
-    uint32_t *p_buf;
-    uint32_t *p_buf2;
-
-    int i,j;
-    int last;
-
-    if( GetPackedYuvOffsets( p_inpic->format.i_chroma, &i_y_offset,
-                             &i_u_offset, &i_v_offset ) != VLC_SUCCESS )
+    if( GetPackedYuvOffsets( p_fmt->i_chroma,
+                             &i_y_offset, &i_u_offset, &i_v_offset ) )
     {
         msg_Warn( p_filter, "Unsupported input chroma (%4s)",
-                  (char*)&(p_inpic->format.i_chroma) );
-        picture_Release( p_inpic );
-        return NULL;
-    }
-
-    p_inpix = p_inpic->p->p_pixels+i_y_offset;
-    p_inpix_u = p_inpic->p->p_pixels+i_u_offset;
-    p_inpix_v = p_inpic->p->p_pixels+i_v_offset;
-
-    i_src_pitch = p_inpic->p->i_pitch;
-    i_src_visible = p_inpic->p->i_visible_pitch;
-    i_num_lines = p_inpic->p->i_visible_lines;
-
-    if( !p_sys->p_oldpix || !p_sys->p_buf )
-    {
-        free( p_sys->p_oldpix );
-        free( p_sys->p_buf );
-        p_sys->p_oldpix = malloc( i_src_pitch * i_num_lines );
-        p_sys->p_buf = malloc( sizeof( uint32_t ) * i_src_pitch * i_num_lines / 2 );
-        p_sys->p_buf2 = malloc( sizeof( uint32_t ) * i_src_pitch * i_num_lines / 2 );
-        vlc_memcpy( p_sys->p_oldpix, p_inpic->p->p_pixels,
-                    i_src_pitch * i_num_lines );
+                  (char*)&p_fmt->i_chroma );
         return p_inpic;
     }
 
-    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    if( !p_sys->b_old )
+    {
+        picture_Copy( p_sys->p_old, p_inpic );
+        p_sys->b_old = true;
+        return p_inpic;
+    }
+
+    p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
-        msg_Warn( p_filter, "can't get output picture" );
         picture_Release( p_inpic );
         return NULL;
     }
+    picture_Copy( p_outpic, p_inpic );
 
-    p_outpix = p_outpic->p->p_pixels+i_y_offset;
-    vlc_memcpy( p_outpic->p->p_pixels, p_inpic->p->p_pixels,
-                p_inpic->p->i_pitch * p_inpic->p->i_visible_lines );
+    /* Substract all planes at once */
 
-    p_oldpix = p_sys->p_oldpix+i_y_offset;
-    p_oldpix_u = p_sys->p_oldpix+i_u_offset;
-    p_oldpix_v = p_sys->p_oldpix+i_v_offset;
-    p_buf = p_sys->p_buf;
-    p_buf2 = p_sys->p_buf2;
-
-    vlc_mutex_lock( &p_filter->p_sys->lock );
-
-    /**
-     * Substract Y planes
-     */
-    for( i = 0; i < i_src_pitch * i_num_lines; i+=2 )
+    for( y = 0; y < p_fmt->i_height; y++ )
     {
-        if( p_inpix[i] > p_oldpix[i] )
+        for( x = 0; x < p_fmt->i_width; x+=2 )
         {
-            p_buf2[i>>1] = p_inpix[i] - p_oldpix[i];
-        }
-        else
-        {
-            p_buf2[i>>1] = p_oldpix[i] - p_inpix[i];
+            int i;
+            int d;
+
+            d = abs( p_inpix[y*i_src_pitch+2*x+i_u_offset] - p_oldpix[y*i_old_pitch+2*x+i_u_offset] ) +
+                abs( p_inpix[y*i_src_pitch+2*x+i_v_offset] - p_oldpix[y*i_old_pitch+2*x+i_v_offset] );
+
+            for( i = 0; i < 2; i++ )
+                p_buf2[y*p_fmt->i_width+x+i] =
+                    abs( p_inpix[y*i_src_pitch+2*(x+i)+i_y_offset] - p_oldpix[y*i_old_pitch+2*(x+i)+i_y_offset] ) + d;
         }
     }
-
-#if 0
-    for( i = 0; i < i_src_pitch * i_num_lines; i+=4 )
-    {
-        int diff;
-        if( p_inpix_u[i] > p_oldpix_u[i] )
-        {
-            diff = p_inpix_u[i] - p_oldpix_u[i];
-        }
-        else
-        {
-            diff = p_oldpix_u[i] - p_inpix_u[i];
-        }
-        if( p_inpix_v[i] > p_oldpix_v[i] )
-        {
-            diff += p_inpix_v[i] - p_oldpix_v[i];
-        }
-        else
-        {
-            diff += p_oldpix_v[i] - p_inpix_v[i];
-        }
-
-        p_buf2[(i>>2)<<1] += diff;
-        p_buf2[((i>>2)<<1)+1] += diff;
-    }
-#endif
 
     /**
      * Get the areas where movement was detected
      */
-    int colors[5000];
-    int color_x_min[5000];
-    int color_x_max[5000];
-    int color_y_min[5000];
-    int color_y_max[5000];
-
-    last = FindShapes( p_buf2, p_buf, i_src_pitch/2, i_src_visible/2,
-                       i_num_lines, colors, color_x_min, color_x_max,
-                       color_y_min, color_y_max );
+    p_sys->i_colors = FindShapes( p_buf2, p_buf, p_fmt->i_width, p_fmt->i_width, p_fmt->i_height,
+                                  p_sys->colors, p_sys->color_x_min, p_sys->color_x_max, p_sys->color_y_min, p_sys->color_y_max );
 
     /**
      * Count final number of shapes
      * Draw rectangles (there can be more than 1 moving shape in 1 rectangle)
      */
-    j = 0;
-    for( i = 1; i < last; i++ )
-    {
-        if( colors[i] == i && color_x_min[i] != -1 )
-        {
-            if( ( color_y_max[i] - color_y_min[i] ) * ( color_x_max[i] - color_x_min[i] ) < 16 ) continue;
-            j++;
-            printf("Shape: (%d,%d) (%d,%d)\n", color_y_max[i], color_y_min[i], color_x_max[i], color_x_min[i] );
-            int x, y;
-            y = color_y_min[i];
-            for( x = color_x_min[i]*2; x <= color_x_max[i]*2; x+=2 )
-            {
-                p_outpix[y*i_src_pitch+x] = 0xff;
-            }
-            y = color_y_max[i];
-            for( x = color_x_min[i]*2; x <= color_x_max[i]*2; x+=2 )
-            {
-                p_outpix[y*i_src_pitch+x] = 0xff;
-            }
-            x = color_x_min[i]*2;
-            for( y = color_y_min[i]; y <= color_y_max[i]; y++ )
-            {
-                p_outpix[y*i_src_pitch+x] = 0xff;
-            }
-            x = color_x_max[i]*2;
-            for( y = color_y_min[i]; y <= color_y_max[i]; y++ )
-            {
-                p_outpix[y*i_src_pitch+x] = 0xff;
-            }
-        }
-    }
-    msg_Dbg( p_filter, "Counted %d moving shapes.", j);
+    Draw( p_filter, &p_outpic->p[Y_PLANE].p_pixels[i_y_offset], p_outpic->p[Y_PLANE].i_pitch, 2 );
 
     /**
      * We're done. Lets keep a copy of the picture
-     */
-    vlc_memcpy( p_sys->p_oldpix, p_inpic->p->p_pixels, i_src_pitch * i_num_lines );
+     * TODO we may just picture_Release with a latency of 1 if the filters/vout
+     * handle it correctly */
+    picture_Copy( p_sys->p_old, p_inpic );
 
-    vlc_mutex_unlock( &p_filter->p_sys->lock );
-
-    return CopyInfoAndRelease( p_outpic, p_inpic );
+    picture_Release( p_inpic );
+    return p_outpic;
 }
+
 
 
 /*****************************************************************************
@@ -533,6 +372,10 @@ static void GaussianConvolution( uint32_t *p_inpix, uint32_t *p_smooth,
                                  int i_src_visible )
 {
     int x,y;
+
+    /* A bit overkill but ... simpler */
+    memset( p_smooth, 0, sizeof(*p_smooth) * i_src_pitch * i_num_lines );
+
     for( y = 2; y < i_num_lines - 2; y++ )
     {
         for( x = 2; x < i_src_visible - 2; x++ )
@@ -588,7 +431,7 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
     /**
      * Apply some smoothing to remove noise
      */
-    GaussianConvolution( p_diff, p_smooth, i_pitch, i_visible, i_lines );
+    GaussianConvolution( p_diff, p_smooth, i_pitch, i_lines, i_visible );
 
     /**
      * Label the shapes and build the labels dependencies list
@@ -615,7 +458,7 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
                     p_smooth[i*i_pitch+j] = p_smooth[i*i_pitch+j-1];
                 else
                 {
-                    if( last < 5000 )
+                    if( last < NUM_COLORS )
                     {
                         p_smooth[i*i_pitch+j] = last;
                         colors[last] = last;
@@ -711,4 +554,47 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
     }
 
     return last;
+}
+
+static void Draw( filter_t *p_filter, uint8_t *p_pix, int i_pix_pitch, int i_pix_size )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    int i, j;
+
+    for( i = 1, j = 0; i < p_sys->i_colors; i++ )
+    {
+        int x, y;
+
+        if( p_sys->colors[i] != i )
+            continue;
+
+        const int color_x_min = p_sys->color_x_min[i];
+        const int color_x_max = p_sys->color_x_max[i];
+        const int color_y_min = p_sys->color_y_min[i];
+        const int color_y_max = p_sys->color_y_max[i];
+
+        if( color_x_min == -1 )
+            continue;
+        if( ( color_y_max - color_y_min ) * ( color_x_max - color_x_min ) < 16 )
+            continue;
+
+        j++;
+
+        y = color_y_min;
+        for( x = color_x_min; x <= color_x_max; x++ )
+            p_pix[y*i_pix_pitch+x*i_pix_size] = 0xff;
+
+        y = color_y_max;
+        for( x = color_x_min; x <= color_x_max; x++ )
+            p_pix[y*i_pix_pitch+x*i_pix_size] = 0xff;
+
+        x = color_x_min;
+        for( y = color_y_min; y <= color_y_max; y++ )
+            p_pix[y*i_pix_pitch+x*i_pix_size] = 0xff;
+
+        x = color_x_max;
+        for( y = color_y_min; y <= color_y_max; y++ )
+            p_pix[y*i_pix_pitch+x*i_pix_size] = 0xff;
+    }
+    msg_Dbg( p_filter, "Counted %d moving shapes.", j );
 }

@@ -2389,7 +2389,7 @@ asa: asa.git.tar.gz
 
 .asa: asa .fontconfig .pcre .iconv
 	(cd $<; ./bootstrap; $(HOSTCC) CFLAGS="$(CFLAGS) -DPCRE_STATIC" ./configure $(HOSTCONF) --prefix=$(PREFIX))
-	(cd $</lib/import; make || (echo "Please copy a ./prepare file you built for your host into asa/lib/import"; echo "When you are finished, press enter." ; echo "If you are building natively, press enter." ; read i ; make) )
+	(cd $</lib/import; make || (echo "Please copy a ./preparse file you built for your host into asa/lib/import"; echo "When you are finished, press enter." ; echo "If you are building natively, press enter." ; read i ; make) )
 	(cd $<; make && make install)
 	$(INSTALL_NAME)
 	touch $@

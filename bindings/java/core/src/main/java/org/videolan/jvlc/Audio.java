@@ -66,13 +66,13 @@ public class Audio
         this.jvlc = jvlc;
     }
 
-    public int getTrack(MediaInstance mediaInstance)
+    public int getTrack(MediaPlayer mediaInstance)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         return jvlc.getLibvlc().libvlc_audio_get_track(mediaInstance.getInstance(), exception);
     }
 
-    public void setTrack(MediaInstance mediaInstance, int track)
+    public void setTrack(MediaPlayer mediaInstance, int track)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_audio_set_track(mediaInstance.getInstance(), track, exception);

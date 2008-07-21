@@ -38,7 +38,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class MediaInstance
+public class MediaPlayer
 {
 
     private final LibVlcMediaInstance instance;
@@ -51,7 +51,7 @@ public class MediaInstance
 
     private MediaDescriptor mediaDescriptor;
 
-    MediaInstance(JVLC jvlc, LibVlcMediaInstance instance)
+    MediaPlayer(JVLC jvlc, LibVlcMediaInstance instance)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         this.instance = instance;
@@ -59,7 +59,7 @@ public class MediaInstance
         eventManager = libvlc.libvlc_media_player_event_manager(instance, exception);
     }
 
-    public MediaInstance(MediaDescriptor mediaDescriptor)
+    public MediaPlayer(MediaDescriptor mediaDescriptor)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         libvlc = mediaDescriptor.getLibvlc();
@@ -156,7 +156,7 @@ public class MediaInstance
         MediaInstanceCallback callback = new MediaInstanceCallback(this, listener);
         libvlc_exception_t exception = new libvlc_exception_t();
         for (LibVlcEventType event : EnumSet.range(
-            LibVlcEventType.libvlc_MediaPlayerPlayed,
+            LibVlcEventType.libvlc_MediaPlayerPlaying,
             LibVlcEventType.libvlc_MediaPlayerTimeChanged))
         {
             libvlc.libvlc_event_attach(eventManager, event.ordinal(), callback, null, exception);
@@ -174,7 +174,7 @@ public class MediaInstance
         for (MediaInstanceCallback callback : callbacks)
         {
             for (LibVlcEventType event : EnumSet.range(
-                LibVlcEventType.libvlc_MediaPlayerPlayed,
+                LibVlcEventType.libvlc_MediaPlayerPlaying,
                 LibVlcEventType.libvlc_MediaPlayerPositionChanged))
             {
                 libvlc.libvlc_event_detach(eventManager, event.ordinal(), callback, null, exception);

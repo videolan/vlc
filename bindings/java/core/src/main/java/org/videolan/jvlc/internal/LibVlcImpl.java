@@ -48,7 +48,7 @@ public class LibVlcImpl
 
     public static void main(String[] args) throws InterruptedException
     {
-        LibVlc libVlc = LibVlc.INSTANCE;
+        LibVlc libVlc = LibVlc.SYNC_INSTANCE;
         libvlc_exception_t exception = new libvlc_exception_t();
         libVlc.libvlc_exception_init(exception);
 
@@ -92,7 +92,7 @@ public class LibVlcImpl
 
         libVlc.libvlc_event_attach(
             mediaInstanceEventManager,
-            LibVlcEventType.libvlc_MediaPlayerPlayed.ordinal(),
+            LibVlcEventType.libvlc_MediaPlayerPlaying.ordinal(),
             played,
             null,
             exception);
@@ -117,10 +117,9 @@ public class LibVlcImpl
         frame.getContentPane().add(panel);
         frame.pack();
         
-        long drawable = com.sun.jna.Native.getComponentID(canvas);
+        int drawable = (int) com.sun.jna.Native.getComponentID(canvas);
 
+        libVlc.libvlc_video_set_parent(libvlc_instance_t, drawable, exception);
         libVlc.libvlc_media_player_play(mediaPlayer, exception);
-
-        libVlc.libvlc_media_player_set_drawable(mediaPlayer, drawable, exception);
     }
 }

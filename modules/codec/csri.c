@@ -24,25 +24,20 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
-#include <string.h>
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
+#include <string.h>
+#include <math.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include <vlc_codec.h>
 #include <vlc_osd.h>
-#include <vlc_block.h>
-#include <vlc_filter.h>
-#include <vlc_stream.h>
-#include <vlc_xml.h>
-
-#include <math.h>
-
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
-#endif
+#include <vlc_input.h>
 
 #include <csri/csri.h>
 #include <csri/stream.h>
@@ -170,6 +165,8 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
 
     p_block = *pp_block;
+    if( p_block->i_rate != 0 )
+        p_block->i_length = p_block->i_length * p_block->i_rate / INPUT_RATE_DEFAULT;
     *pp_block = NULL;
 
     if( p_block->i_buffer == 0 || p_block->p_buffer[0] == '\0' )

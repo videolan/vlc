@@ -116,11 +116,11 @@ public class Playlist {
         libvlc.libvlc_playlist_loop(libvlcInstance, loop? 1 : 0, exception);
     }
     
-    public MediaInstance getMediaInstance()
+    public MediaPlayer getMediaInstance()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaInstance mi = libvlc.libvlc_playlist_get_media_player(libvlcInstance, exception);
-        return new MediaInstance(jvlc, mi);
+        return new MediaPlayer(jvlc, mi);
         
     }
 }

@@ -684,6 +684,7 @@ void ControlsWidget::toggleTeletext()
         b_telexEnabled = true;
     }
 }
+
 void ControlsWidget::enableTeletext( bool b_enable )
 {
     telexFrame->setVisible( b_enable );

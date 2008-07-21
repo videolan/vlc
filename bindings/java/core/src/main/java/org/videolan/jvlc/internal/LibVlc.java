@@ -41,7 +41,7 @@ public interface LibVlc extends Library
     LibVlc INSTANCE = (LibVlc) Native.loadLibrary("vlc", LibVlc.class);
 
     LibVlc SYNC_INSTANCE = (LibVlc) Native.synchronizedLibrary(INSTANCE);
-
+    
     public static class libvlc_exception_t extends Structure
     {
 
@@ -414,7 +414,7 @@ public interface LibVlc extends Library
 
     void libvlc_media_player_stop(LibVlcMediaInstance media_player, libvlc_exception_t exception);
 
-    void libvlc_media_player_set_drawable(LibVlcMediaInstance libvlc_media_player, long drawable,
+    void libvlc_media_player_set_drawable(LibVlcMediaInstance libvlc_media_player, int drawable,
         libvlc_exception_t exception);
 
     long libvlc_media_player_get_length(LibVlcMediaInstance instance, libvlc_exception_t exception);
@@ -510,6 +510,9 @@ public interface LibVlc extends Library
     void libvlc_vlm_add_broadcast(LibVlcInstance p_instance, String psz_name, String psz_input, String psz_output,
         int i_options, String[] ppsz_options, int b_enabled, int b_loop, libvlc_exception_t p_e);
 
+    void libvlc_vlm_add_vod(LibVlcInstance p_instance, String psz_name, String psz_input, int i_options,
+        String[] ppsz_options, int b_enabled, String psz_mux, libvlc_exception_t p_e);
+
     void libvlc_vlm_del_media(LibVlcInstance p_instance, String psz_name, libvlc_exception_t p_e);
 
     void libvlc_vlm_set_enabled(LibVlcInstance p_instance, String psz_name, int b_enabled, libvlc_exception_t p_e);
@@ -521,6 +524,8 @@ public interface LibVlc extends Library
     void libvlc_vlm_add_input(LibVlcInstance p_instance, String psz_name, String psz_input, libvlc_exception_t p_e);
 
     void libvlc_vlm_set_loop(LibVlcInstance p_instance, String psz_name, int b_loop, libvlc_exception_t p_e);
+
+    void libvlc_vlm_set_mux(LibVlcInstance p_instance, String psz_name, String psz_mux, libvlc_exception_t p_e);
 
     void libvlc_vlm_change_media(LibVlcInstance p_instance, String psz_name, String psz_input, String psz_output,
         int i_options, String[] ppsz_options, int b_enabled, int b_loop, libvlc_exception_t p_e);
@@ -536,7 +541,7 @@ public interface LibVlc extends Library
     String libvlc_vlm_show_media(LibVlcInstance p_instance, String psz_name, libvlc_exception_t p_e);
 
     void libvlc_vlm_release(LibVlcInstance p_instance, libvlc_exception_t p_e);
-    
+
     // event manager
 
     public static interface LibVlcCallback extends Callback

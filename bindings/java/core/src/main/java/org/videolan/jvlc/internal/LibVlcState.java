@@ -29,11 +29,13 @@ package org.videolan.jvlc.internal;
 public enum LibVlcState
 {
     libvlc_NothingSpecial,
-    libvlc_Stopped,
     libvlc_Opening,
     libvlc_Buffering,
-    libvlc_Ended,
-    libvlc_Error,
     libvlc_Playing,
-    libvlc_Paused
+    libvlc_Paused,
+    libvlc_Stopped,
+    libvlc_Forward,
+    libvlc_Backward,
+    libvlc_Ended,
+    libvlc_Error;
 }

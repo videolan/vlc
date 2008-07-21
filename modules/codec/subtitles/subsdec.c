@@ -252,13 +252,19 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
-    subpicture_t *p_spu = NULL;
+    subpicture_t *p_spu;
+    block_t *p_block;
 
-    if( !pp_block || *pp_block == NULL ) return NULL;
+    if( !pp_block || *pp_block == NULL )
+        return NULL;
 
-    p_spu = ParseText( p_dec, *pp_block );
+    p_block = *pp_block;
+    if( p_block->i_rate != 0 )
+        p_block->i_length = p_block->i_length * p_block->i_rate / INPUT_RATE_DEFAULT;
 
-    block_Release( *pp_block );
+    p_spu = ParseText( p_dec, p_block );
+
+    block_Release( p_block );
     *pp_block = NULL;
 
     return p_spu;

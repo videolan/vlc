@@ -462,8 +462,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
         return NULL; /* we are too early, so wait */
 
     /* Allocate the subpicture internal data. */
-    p_spu = p_filter->pf_sub_buffer_new( p_filter );
-    if( !p_spu ) return NULL;
+    p_spu = filter_NewSubpicture( p_filter );
+    if( !p_spu )
+        return NULL;
 
     p_spu->b_ephemer = true;
     p_spu->b_fade = true;

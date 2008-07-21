@@ -76,10 +76,10 @@ public class JVLC
         return libvlc.libvlc_new(args.length, args, exception);
     }
 
-    public MediaInstance play(String media)
+    public MediaPlayer play(String media)
     {
         MediaDescriptor mediaDescriptor = new MediaDescriptor(this, media);
-        MediaInstance mediaInstance = new MediaInstance(mediaDescriptor);
+        MediaPlayer mediaInstance = new MediaPlayer(mediaDescriptor);
         mediaInstance.play();
         mediaDescriptor.release();
         return mediaInstance;

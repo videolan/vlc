@@ -32,7 +32,7 @@ public class VLM
 {
 
     private JVLC jvlc;
-    
+
     private volatile boolean released;
 
     public VLM(JVLC jvlc)
@@ -52,6 +52,20 @@ public class VLM
             options,
             enabled ? 1 : 0,
             loop ? 1 : 0,
+            exception);
+    }
+
+    public void addVod(String name, String input, String[] options, boolean enabled, String muxer)
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        jvlc.getLibvlc().libvlc_vlm_add_vod(
+            jvlc.getInstance(),
+            name,
+            input,
+            options == null ? 0 : options.length,
+            options,
+            enabled ? 1 : 0,
+            muxer,
             exception);
     }
 
@@ -89,6 +103,12 @@ public class VLM
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_vlm_add_input(jvlc.getInstance(), name, input, exception);
+    }
+
+    public void setMux(String name, String muxer)
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        jvlc.getLibvlc().libvlc_vlm_set_mux(jvlc.getInstance(), name, muxer, exception);
     }
 
     public void setMediaLoop(String media, boolean loop)
@@ -165,7 +185,5 @@ public class VLM
         release();
         super.finalize();
     }
-    
-    
 
 }

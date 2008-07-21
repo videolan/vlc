@@ -276,7 +276,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     if( p_sys->b_need_update == false )
         goto out;
 
-    p_spu = p_filter->pf_sub_buffer_new( p_filter );
+    p_spu = filter_NewSubpicture( p_filter );
     if( !p_spu )
         goto out;
 

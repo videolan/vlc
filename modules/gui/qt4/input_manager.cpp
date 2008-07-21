@@ -443,17 +443,17 @@ void InputManager::telexGotoPage( int page )
 
 void InputManager::telexToggle( bool b_enabled )
 {
-    int i_page = 100;
-
     if( hasInput() )
     {
         const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
         const int i_spu_es = var_GetInteger( p_input, "spu-es" );
 
-        b_enabled = i_teletext_es >= 0;
-        if( b_enabled && i_teletext_es == i_spu_es )
+        b_enabled = (i_teletext_es >= 0);
+        emit teletextEnabled( b_enabled );
+        if( b_enabled && (i_teletext_es == i_spu_es) )
         {
             vlc_object_t *p_vbi;
+            int i_page = 100;
             p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
                         "zvbi", FIND_ANYWHERE );
             if( p_vbi )
@@ -465,7 +465,7 @@ void InputManager::telexToggle( bool b_enabled )
             }
         }
     }
-    emit teletextEnabled( b_enabled );
+    else emit teletextEnabled( b_enabled );
 }
 
 void InputManager::telexToggleButtons()
