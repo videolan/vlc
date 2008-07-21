@@ -35,13 +35,13 @@ import org.videolan.jvlc.internal.LibVlc.media_player_time_changed;
 import com.sun.jna.Pointer;
 
 
-public class MediaInstanceCallback implements LibVlcCallback
+public class MediaPlayerCallback implements LibVlcCallback
 {
 
-    private MediaInstanceListener listener;
+    private MediaPlayerListener listener;
     private MediaPlayer mediaInstance;
 
-    public MediaInstanceCallback(MediaPlayer mediaInstance, MediaInstanceListener listener)
+    public MediaPlayerCallback(MediaPlayer mediaInstance, MediaPlayerListener listener)
     {
         this.mediaInstance = mediaInstance;
         this.listener = listener;

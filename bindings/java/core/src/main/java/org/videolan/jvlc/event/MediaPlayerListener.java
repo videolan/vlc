@@ -28,7 +28,7 @@ package org.videolan.jvlc.event;
 import org.videolan.jvlc.MediaPlayer;
 
 
-public interface MediaInstanceListener
+public interface MediaPlayerListener
 {
 
     void played(MediaPlayer mediaInstance);

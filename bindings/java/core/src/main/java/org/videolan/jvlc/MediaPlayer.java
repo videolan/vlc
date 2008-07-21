@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.videolan.jvlc.event.MediaInstanceCallback;
-import org.videolan.jvlc.event.MediaInstanceListener;
+import org.videolan.jvlc.event.MediaPlayerCallback;
+import org.videolan.jvlc.event.MediaPlayerListener;
 import org.videolan.jvlc.internal.LibVlc;
 import org.videolan.jvlc.internal.LibVlcEventType;
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
@@ -47,7 +47,7 @@ public class MediaPlayer
 
     private final LibVlcEventManager eventManager;
 
-    private List<MediaInstanceCallback> callbacks = new ArrayList<MediaInstanceCallback>();
+    private List<MediaPlayerCallback> callbacks = new ArrayList<MediaPlayerCallback>();
 
     private MediaDescriptor mediaDescriptor;
 
@@ -151,9 +151,9 @@ public class MediaPlayer
         return libvlc.libvlc_media_player_get_fps(instance, exception);
     }
 
-    public void addListener(final MediaInstanceListener listener)
+    public void addListener(final MediaPlayerListener listener)
     {
-        MediaInstanceCallback callback = new MediaInstanceCallback(this, listener);
+        MediaPlayerCallback callback = new MediaPlayerCallback(this, listener);
         libvlc_exception_t exception = new libvlc_exception_t();
         for (LibVlcEventType event : EnumSet.range(
             LibVlcEventType.libvlc_MediaPlayerPlaying,
@@ -171,7 +171,7 @@ public class MediaPlayer
     protected void finalize() throws Throwable
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        for (MediaInstanceCallback callback : callbacks)
+        for (MediaPlayerCallback callback : callbacks)  
         {
             for (LibVlcEventType event : EnumSet.range(
                 LibVlcEventType.libvlc_MediaPlayerPlaying,
