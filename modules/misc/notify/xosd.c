@@ -220,7 +220,7 @@ static void Run( intf_thread_t *p_intf )
 
             if( playlist_IsEmpty( p_playlist ) )
             {
-                vlc_object_release( p_playlist );
+                pl_Release( p_playlist );
                 continue;
             }
             free( psz_display );
@@ -228,24 +228,21 @@ static void Run( intf_thread_t *p_intf )
             if( p_playlist->status.i_status == PLAYLIST_STOPPED )
             {
                 psz_display = strdup(_("Stop"));
-                vlc_object_release( p_playlist );
+                pl_Release( p_playlist );
             }
             else if( p_playlist->status.i_status == PLAYLIST_PAUSED )
             {
                 psz_display = strdup(_("Pause"));
-                vlc_object_release( p_playlist );
+                pl_Release( p_playlist );
             }
             else
             {
                 p_item = p_playlist->status.p_item;
                 p_input = p_item->p_input;
-                if( !p_item )
-                {
-                    vlc_object_release( p_playlist );
-                    continue;
-                }
 
-                vlc_object_release( p_playlist );
+                pl_Release( p_playlist );
+                if( !p_item )
+                    continue;
 
                 mtime_t i_duration = input_item_GetDuration( p_input );
                 if( i_duration != -1 )

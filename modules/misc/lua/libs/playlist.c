@@ -58,7 +58,7 @@ static int vlclua_playlist_prev( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Prev( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 0;
 }
 
@@ -66,7 +66,7 @@ static int vlclua_playlist_next( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Next( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 0;
 }
 
@@ -75,7 +75,7 @@ static int vlclua_playlist_skip( lua_State * L )
     int i_skip = luaL_checkint( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Skip( p_playlist, i_skip );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 0;
 }
 
@@ -83,7 +83,7 @@ static int vlclua_playlist_play( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Play( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 0;
 }
 
@@ -91,7 +91,7 @@ static int vlclua_playlist_pause( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Pause( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 0;
 }
 
@@ -99,7 +99,7 @@ static int vlclua_playlist_stop( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 0;
 }
 
@@ -108,7 +108,7 @@ static int vlclua_playlist_clear( lua_State * L )
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Stop( p_playlist ); /* Isn't this already implied by Clear? */
     playlist_Clear( p_playlist, pl_Unlocked );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 0;
 }
 
@@ -116,7 +116,7 @@ static int vlclua_playlist_repeat( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     int i_ret = vlclua_var_toggle_or_set( L, p_playlist, "repeat" );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return i_ret;
 }
 
@@ -124,7 +124,7 @@ static int vlclua_playlist_loop( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     int i_ret = vlclua_var_toggle_or_set( L, p_playlist, "loop" );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return i_ret;
 }
 
@@ -132,7 +132,7 @@ static int vlclua_playlist_random( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     int i_ret = vlclua_var_toggle_or_set( L, p_playlist, "random" );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return i_ret;
 }
 
@@ -144,7 +144,7 @@ static int vlclua_playlist_goto( lua_State * L )
                                   true, NULL,
                                   playlist_ItemGetById( p_playlist, i_id,
                                                         true ) );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return vlclua_push_ret( L, i_ret );
 }
 
@@ -155,7 +155,7 @@ static int vlclua_playlist_add( lua_State *L )
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     i_count = vlclua_playlist_add_internal( p_this, L, p_playlist,
                                             NULL, true );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     lua_pushinteger( L, i_count );
     return 1;
 }
@@ -167,7 +167,7 @@ static int vlclua_playlist_enqueue( lua_State *L )
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     i_count = vlclua_playlist_add_internal( p_this, L, p_playlist,
                                             NULL, false );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     lua_pushinteger( L, i_count );
     return 1;
 }
@@ -235,7 +235,7 @@ static int vlclua_playlist_get( lua_State *L )
         p_item = playlist_ItemGetById( p_playlist, i_id, true );
         if( !p_item )
         {
-            vlc_object_release( p_playlist );
+            pl_Release( p_playlist );
             return 0; /* Should we return an error instead? */
         }
     }
@@ -268,7 +268,7 @@ static int vlclua_playlist_get( lua_State *L )
             }
             if( !p_item )
             {
-                vlc_object_release( p_playlist );
+                pl_Release( p_playlist );
                 return 0; /* Should we return an error instead? */
             }
         }
@@ -279,7 +279,7 @@ static int vlclua_playlist_get( lua_State *L )
                             : p_playlist->p_root_onelevel;
     }
     push_playlist_item( L, p_item );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 1;
 }
 
@@ -292,7 +292,7 @@ static int vlclua_playlist_search( lua_State *L )
                                          : p_playlist->p_root_onelevel;
     playlist_LiveSearchUpdate( p_playlist, p_item, psz_string );
     push_playlist_item( L, p_item );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 1;
 }
 
@@ -300,7 +300,7 @@ static int vlclua_playlist_current( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     lua_pushinteger( L, var_GetInteger( p_playlist, "playlist-current" ) );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 1;
 }
 
@@ -343,7 +343,7 @@ static int vlclua_playlist_sort( lua_State *L )
                                          : p_playlist->p_local_onelevel;
     int i_ret = playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
                                             i_type );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return vlclua_push_ret( L, i_ret );
 }
 
@@ -385,7 +385,7 @@ static int vlclua_playlist_status( lua_State *L )
     {
         lua_pushstring( L, "stopped" );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return 1;
 }
 
