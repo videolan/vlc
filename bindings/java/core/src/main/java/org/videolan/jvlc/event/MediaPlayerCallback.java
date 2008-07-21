@@ -53,7 +53,7 @@ public class MediaPlayerCallback implements LibVlcCallback
     {
         if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPlaying.ordinal())
         {
-            listener.played(mediaInstance);
+            listener.playing(mediaInstance);
         }
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPaused.ordinal())
         {
@@ -66,6 +66,10 @@ public class MediaPlayerCallback implements LibVlcCallback
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPositionChanged.ordinal())
         {
             listener.positionChanged(mediaInstance);
+        }
+        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerStopped.ordinal())
+        {
+            listener.stopped(mediaInstance);
         }
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerTimeChanged.ordinal())
         {

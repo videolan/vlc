@@ -30,54 +30,59 @@ public class VLCExample
         System.out.println("... done.");
 
         MediaDescriptor mediaDescriptor = new MediaDescriptor(jvlc, "/home/carone/apps/a.avi");
-        MediaPlayer mediaInstance = mediaDescriptor.getMediaInstance();
+        MediaPlayer mediaPlayer = mediaDescriptor.getMediaPlayer();
 
-        mediaInstance.addListener(new MediaPlayerListener()
+        mediaPlayer.addListener(new MediaPlayerListener()
         {
 
-            public void endReached(MediaPlayer mediaInstance)
+            public void endReached(MediaPlayer mediaPlayer)
             {
-                System.out.println("Media instance end reached. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
+                System.out.println("Media instance end reached. MRL: " + mediaPlayer.getMediaDescriptor().getMrl());
             }
 
-            public void paused(MediaPlayer mediaInstance)
+            public void paused(MediaPlayer mediaPlayer)
             {
-                System.out.println("Media instance paused. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
+                System.out.println("Media instance paused. MRL: " + mediaPlayer.getMediaDescriptor().getMrl());
             }
 
-            public void played(MediaPlayer mediaInstance)
+            public void playing(MediaPlayer mediaPlayer)
             {
-                System.out.println("Media instance played. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
+                System.out.println("Media instance played. MRL: " + mediaPlayer.getMediaDescriptor().getMrl());
             }
 
-            public void positionChanged(MediaPlayer mediaInstance)
+            public void positionChanged(MediaPlayer mediaPlayer)
             {
                 // TODO Auto-generated method stub
             }
 
-            public void timeChanged(MediaPlayer mediaInstance, long newTime)
+            public void timeChanged(MediaPlayer mediaPlayer, long newTime)
             {
                 System.out.println("new time: " + newTime);
             }
-        });
-        mediaInstance.play();
 
-        while (!mediaInstance.hasVideoOutput())
+            public void stopped(MediaPlayer mediaPlayer)
+            {
+                System.out.println("Media player stopped. MRL: " + mediaPlayer.getMediaDescriptor().getMrl());
+            }
+        });
+        mediaPlayer.play();
+
+        while (!mediaPlayer.hasVideoOutput())
         {
             Thread.sleep(100);
         }
 
         Video video = new Video(jvlc);
-        System.out.print(video.getWidth(mediaInstance));
+        System.out.print(video.getWidth(mediaPlayer));
         System.out.print("x");
-        System.out.println(video.getHeight(mediaInstance));
+        System.out.println(video.getHeight(mediaPlayer));
         System.out.print("Fullscreen... ");
-        video.setFullscreen(mediaInstance, true);
+        video.setFullscreen(mediaPlayer, true);
         Thread.sleep(3000);
         System.out.println("real size.");
-        video.setFullscreen(mediaInstance, false);
+        video.setFullscreen(mediaPlayer, false);
         System.out.print("Taking snapshot... ");
-        video.getSnapshot(mediaInstance, System.getProperty("user.dir") + "/snap.png", 0, 0);
+        video.getSnapshot(mediaPlayer, System.getProperty("user.dir") + "/snap.png", 0, 0);
         System.out.println("taken. (see " + System.getProperty("user.dir") + "/snap.png )");
         Thread.sleep(2000);
         System.out.println("Resizing to 300x300");
@@ -95,15 +100,15 @@ public class VLCExample
         audio.setVolume(150);
         System.out.println("done");
         System.out.println("== AUDIO INFO ==");
-        System.out.println("Audio track number: " + audio.getTrack(mediaInstance));
+        System.out.println("Audio track number: " + audio.getTrack(mediaPlayer));
         System.out.println("Audio channel info: " + audio.getChannel());
         Thread.sleep(3000);
-        System.out.println("MEDIA INSTANCE INFORMATION");
+        System.out.println("MEDIA PLAYER INFORMATION");
         System.out.println("--------------------------");
-        System.out.println("Total length (ms) :\t" + mediaInstance.getLength());
-        System.out.println("Input time (ms) :\t" + mediaInstance.getTime());
-        System.out.println("Input position [0-1]:\t" + mediaInstance.getPosition());
-        System.out.println("Input FPS :\t" + mediaInstance.getFPS());
+        System.out.println("Total length (ms) :\t" + mediaPlayer.getLength());
+        System.out.println("Input time (ms) :\t" + mediaPlayer.getTime());
+        System.out.println("Input position [0-1]:\t" + mediaPlayer.getPosition());
+        System.out.println("Input FPS :\t" + mediaPlayer.getFPS());
 
         System.out.println("Everything fine ;)");
         return;

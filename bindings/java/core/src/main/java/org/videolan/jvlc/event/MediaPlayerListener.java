@@ -1,5 +1,5 @@
 /*****************************************************************************
- * MediaInstancePlayListener.java: VLC Java Bindings
+ * mediaPlayerPlayListener.java: VLC Java Bindings
  *****************************************************************************
  * Copyright (C) 1998-2008 the VideoLAN team
  *
@@ -31,14 +31,16 @@ import org.videolan.jvlc.MediaPlayer;
 public interface MediaPlayerListener
 {
 
-    void played(MediaPlayer mediaInstance);
+    void playing(MediaPlayer mediaPlayer);
     
-    void paused(MediaPlayer mediaInstance);
+    void paused(MediaPlayer mediaPlayer);
     
-    void endReached(MediaPlayer mediaInstance);
+    void stopped(MediaPlayer mediaPlayer);
     
-    void timeChanged(MediaPlayer mediaInstance, long newTime);
+    void endReached(MediaPlayer mediaPlayer);
     
-    void positionChanged(MediaPlayer mediaInstance);
+    void timeChanged(MediaPlayer mediaPlayer, long newTime);
+    
+    void positionChanged(MediaPlayer mediaPlayer);
     
 }
