@@ -130,12 +130,6 @@ AC_ARG_WITH(contrib,
     LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
     LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
 
-    if test -z $with_live555_tree; then
-       with_live555_tree=${topdir}/extras/contrib/src/live
-    fi
-    if test -z $with_goom_tree; then
-       with_goom_tree=${topdir}/extras/contrib/src/goom
-    fi
     if test -z $with_mozilla_sdk_path; then
        with_mozilla_sdk_path=${topdir}/extras/contrib/gecko-sdk
     fi
