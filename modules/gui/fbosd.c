@@ -628,8 +628,11 @@ static void CloseTextRenderer( intf_thread_t *p_intf )
 static picture_t *AllocatePicture( vlc_object_t *p_this,
                                    video_format_t *p_fmt )
 {
-    picture_t *p_pic = malloc( sizeof( picture_t ) );
-    if( !p_pic ) return NULL;
+    picture_t *p_picture = picture_New( p_fmt->i_chroma,
+                                        p_fmt->i_width, p_fmt->i_height,
+                                        p_fmt->i_aspect );
+    if( !p_picture )
+        return NULL;
 
     if( !p_fmt->p_palette &&
         ( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') ) )
@@ -637,24 +640,16 @@ static picture_t *AllocatePicture( vlc_object_t *p_this,
         p_fmt->p_palette = malloc( sizeof(video_palette_t) );
         if( !p_fmt->p_palette )
         {
-            free( p_pic );
+            picture_Release( p_picture );
             return NULL;
         }
     }
-    else p_fmt->p_palette = NULL;
-
-    p_pic->p_data_orig = NULL;
-
-    vout_AllocatePicture( p_this, p_pic, p_fmt->i_chroma,
-                          p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
-
-    if( !p_pic->i_planes )
+    else
     {
-        free( p_pic );
-        free( p_fmt->p_palette );
-        return NULL;
+        p_fmt->p_palette = NULL;
     }
-    return p_pic;
+
+    return p_picture;
 }
 
 /*****************************************************************************
@@ -665,18 +660,15 @@ static void DeAllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
                                video_format_t *p_fmt )
 {
     VLC_UNUSED(p_this);
-    if( p_pic )
-    {
-        free( p_pic->p_data_orig );
-        if( p_pic->pf_release ) p_pic->pf_release( p_pic );
-        else free( p_pic );
-    }
+
     if( p_fmt )
     {
         free( p_fmt->p_palette );
         p_fmt->p_palette = NULL;
     }
-    p_pic = NULL;
+
+    if( p_pic )
+        picture_Release( p_pic );
 }
 
 /*****************************************************************************
