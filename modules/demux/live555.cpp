@@ -723,18 +723,15 @@ static int SessionsSetup( demux_t *p_demux )
             /* Issue the SETUP */
             if( p_sys->rtsp )
             {
-                bool tcp = b_rtsp_tcp;
-                bool mcast = p_sys->b_force_mcast;
                 if( !p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                           tcp ? True : False,
-                                           ( mcast && !tcp ) ? True : False ) )
+                                           b_rtsp_tcp ? True : False,
+                                           ( p_sys->b_force_mcast && !b_rtsp_tcp ) ? True : False ) )
                 {
-                    tcp = !tcp;
                     /* if we get an unsupported transport error, toggle TCP use and try again */
                     if( !strstr(p_sys->env->getResultMsg(), "461 Unsupported Transport")
                      || !p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                           tcp ? False : True,
-                                           ( mcast && !tcp ) ? True : False ) )
+                                           !b_rtsp_tcp ? False : True,
+                                           False ) )
                     {
                         msg_Err( p_demux, "SETUP of'%s/%s' failed %s", sub->mediumName(),
                                  sub->codecName(), p_sys->env->getResultMsg() );
