@@ -209,7 +209,7 @@ static int Open( vlc_object_t *p_this )
                     msg_Dbg( p_playlist, "unable to find item in playlist");
                 vlc_object_release( p_input );
             }
-            vlc_object_release( p_playlist );
+            pl_Release( p_access );
         }
         if( i_ret < 0 )
             goto error;

@@ -215,7 +215,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     if( !p_input )
     {
         msg_Err( p_access, "unable to find input (internal error)" );
-        vlc_object_release( p_playlist );
+        pl_Release( p_access );
         return VLC_ENOOBJ;
     }
 
@@ -226,7 +226,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     {
         msg_Err( p_access, "unable to find item in playlist" );
         vlc_object_release( p_input );
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
         return VLC_ENOOBJ;
     }
 
@@ -264,7 +264,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 
     free( psz_name );
     vlc_object_release( p_input );
-    vlc_object_release( p_playlist );
+    pl_Release( p_access );
 
     /* Return fake data forever */
     p_access->pf_read = ReadNull;

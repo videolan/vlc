@@ -965,7 +965,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
                           p_playlist->status.p_item, NULL );
     }
 
-    if (p_playlist) vlc_object_release( p_playlist );
+    if (p_playlist) pl_Release( p_access );
     return VLC_SUCCESS;
 }
 
