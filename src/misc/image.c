@@ -568,44 +568,24 @@ static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
 
 static void video_release_buffer( picture_t *p_pic )
 {
-    if( --p_pic->i_refcount > 0 ) return;
-
-    free( p_pic->p_data_orig );
-    free( p_pic->p_sys );
-    free( p_pic );
+    picture_Release( p_pic );
 }
 
 static picture_t *video_new_buffer( decoder_t *p_dec )
 {
-    picture_t *p_pic = malloc( sizeof(picture_t) );
-
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-    vout_AllocatePicture( VLC_OBJECT(p_dec), p_pic,
-                          p_dec->fmt_out.video.i_chroma,
-                          p_dec->fmt_out.video.i_width,
-                          p_dec->fmt_out.video.i_height,
-                          p_dec->fmt_out.video.i_aspect );
-
-    if( !p_pic->i_planes )
-    {
-        free( p_pic );
-        return 0;
-    }
-
-    p_pic->i_refcount = 1;
-    p_pic->pf_release = video_release_buffer;
-    p_pic->i_status = RESERVED_PICTURE;
-    p_pic->p_sys = NULL;
-
-    return p_pic;
+    return picture_New( p_dec->fmt_out.video.i_chroma,
+                        p_dec->fmt_out.video.i_width,
+                        p_dec->fmt_out.video.i_height,
+                        p_dec->fmt_out.video.i_aspect );
 }
 
 static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 {
-    (void)p_dec;
-    free( p_pic->p_data_orig );
-    free( p_pic->p_sys );
-    free( p_pic );
+    if( p_pic->i_refcount != 1 )
+        msg_Err( p_dec, "invalid picture reference count" );
+
+    p_pic->i_refcount = 0;
+    picture_Delete( p_pic );
 }
 
 static void video_link_picture( decoder_t *p_dec, picture_t *p_pic )
