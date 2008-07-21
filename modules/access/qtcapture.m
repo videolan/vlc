@@ -38,6 +38,7 @@
 #include <vlc_interface.h>
 
 #import <QTKit/QTKit.h>
+#import <CoreAudio/CoreAudio.h>
 
 /*****************************************************************************
 * Local prototypes
@@ -109,7 +110,11 @@ vlc_module_end();
     {
         imageBufferToRelease = currentImageBuffer;
         currentImageBuffer = videoFrame;
-        currentPts = 1000000L / [sampleBuffer presentationTime].timeScale * [sampleBuffer presentationTime].timeValue;
+        currentPts = (mtime_t)(1000000L / [sampleBuffer presentationTime].timeScale * [sampleBuffer presentationTime].timeValue);
+        
+        /* Try to use hosttime of the sample if available, because iSight Pts seems broken */
+        NSNumber *hosttime = (NSNumber *)[sampleBuffer attributeForKey:QTSampleBufferHostTimeAttribute];
+        if( hosttime ) currentPts = (mtime_t)AudioConvertHostTimeToNanos([hosttime unsignedLongLongValue])/1000;
     }
     CVBufferRelease(imageBufferToRelease);
 }
