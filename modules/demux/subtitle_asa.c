@@ -212,7 +212,7 @@ static int Open ( vlc_object_t *p_this )
     }
     if( !p_detect->fmt )
     {
-        msg_Err( p_demux, "detected %s subtitle format, no asa support" );
+        msg_Err( p_demux, "detected %s subtitle format, no asa support", p_detect->name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -275,6 +275,8 @@ static int ProcessLine( demux_t *p_demux, void *p_arg,
     demux_sys_t *p_sys = p_demux->p_sys;
     subtitle_t *p_subtitle;
     char *psz_text;
+
+    VLC_UNUSED(p_arg);
 
     if( p_sys->i_subtitles >= p_sys->i_subs_alloc )
     {
