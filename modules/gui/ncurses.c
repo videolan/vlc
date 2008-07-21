@@ -1252,6 +1252,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         default:
             ReturnFalse;
     }
+#undef ReturnFalse
+#undef ReturnTrue
 }
 
 static void ManageSlider( intf_thread_t *p_intf )
