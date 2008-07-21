@@ -54,7 +54,6 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *, filter_t * );
 
 static int UpdateBufferFunctions( filter_chain_t * );
 static picture_t *VideoBufferNew( filter_t * );
-static void VideoBufferRelease( picture_t * );
 
 /**
  * Filter chain initialisation
@@ -445,29 +444,13 @@ static int UpdateBufferFunctions( filter_chain_t *p_chain )
 
 static picture_t *VideoBufferNew( filter_t *p_filter )
 {
-    picture_t *p_pic = malloc( sizeof( picture_t ) );
-    if( !p_pic ) return NULL;
-    memset( p_pic, 0, sizeof( picture_t * ) );
-    int i_ret = vout_AllocatePicture( VLC_OBJECT( p_filter ), p_pic,
-                                      p_filter->fmt_out.video.i_chroma,
-                                      p_filter->fmt_out.video.i_width,
-                                      p_filter->fmt_out.video.i_height,
-                                      p_filter->fmt_out.video.i_aspect );
-    if( i_ret != VLC_SUCCESS )
-    {
-        msg_Err( p_filter, "Failed to allocate picture: %s",
-                 vlc_error( i_ret ) );
-        free( p_pic );
-        return NULL;
-    }
-    p_pic->pf_release = VideoBufferRelease;
-    p_pic->i_type = MEMORY_PICTURE;
-    p_pic->i_status = RESERVED_PICTURE;
-    return p_pic;
+    const video_format_t *p_fmt = &p_filter->fmt_out.video;
+
+    picture_t *p_picture = picture_New( p_fmt->i_chroma,
+                                        p_fmt->i_width, p_fmt->i_height,
+                                        p_fmt->i_aspect );
+    if( !p_picture )
+        msg_Err( p_filter, "Failed to allocate picture\n" );
+    return p_picture;
 }
 
-static void VideoBufferRelease( picture_t *p_pic )
-{
-    free( p_pic->p_data_orig );
-    free( p_pic );
-}
