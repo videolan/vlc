@@ -568,6 +568,8 @@ static void Run( intf_thread_t *p_intf )
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Aspect ratio: %s"),
                                      text_list.p_list->p_values[i].psz_string );
+
+                    var_Change( p_vout, "aspect-ratio", VLC_VAR_FREELIST, &val_list, &text_list );
                 }
                 free( val.psz_string );
             }
@@ -594,6 +596,8 @@ static void Run( intf_thread_t *p_intf )
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Crop: %s"),
                                      text_list.p_list->p_values[i].psz_string );
+
+                    var_Change( p_vout, "crop", VLC_VAR_FREELIST, &val_list, &text_list );
                 }
                 free( val.psz_string );
             }
@@ -620,6 +624,8 @@ static void Run( intf_thread_t *p_intf )
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Deinterlace mode: %s"),
                                      text_list.p_list->p_values[i].psz_string );
+
+                    var_Change( p_vout, "deinterlace", VLC_VAR_FREELIST, &val_list, &text_list );
                 }
                 free( val.psz_string );
             }
@@ -650,6 +656,8 @@ static void Run( intf_thread_t *p_intf )
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Zoom mode: %s"),
                                 text_list.p_list->p_values[i].var.psz_name );
+
+                    var_Change( p_vout, "zoom", VLC_VAR_FREELIST, &val_list, &text_list );
                 }
             }
             else if( i_action == ACTIONID_CROP_TOP && p_vout )
