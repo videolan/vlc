@@ -64,62 +64,7 @@
 #include <gcrypt.h>              /* to encrypt password */
 #include <vlc_gcrypt.h>
 
-#define CHALLENGESIZE 16
-#define MAX_VNC_SERVER_NAME_LENGTH 255
-
 #include "remoteosd_rfbproto.h" /* type definitions of the RFB protocol for VNC */
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-/* subfilter functions */
-static int  CreateFilter ( vlc_object_t * );
-static void DestroyFilter( vlc_object_t * );
-static subpicture_t *Filter( filter_t *, mtime_t );
-
-static int MouseEvent ( vlc_object_t *p_this, char const *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
-
-static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
-
-static void stop_osdvnc ( filter_t *p_filter );
-
-static void vnc_worker_thread ( vlc_object_t *p_thread_obj );
-
-static void update_request_thread( vlc_object_t *p_thread_obj );
-
-static bool open_vnc_connection ( filter_t *p_filter );
-
-static bool handshaking ( filter_t *p_filter );
-
-static bool process_server_message ( filter_t *p_filter,
-                                     rfbServerToClientMsg *msg );
-
-static bool read_exact( filter_t *p_filter,
-                        int i_socket,
-                        char* p_readbuf,
-                        int i_bytes );
-
-static bool write_exact( filter_t *p_filter,
-                         int i_socket,
-                         char* p_writebuf,
-                         int i_bytes );
-
-static inline void rgb_to_yuv( uint8_t *y, uint8_t *u, uint8_t *v,
-                               int r, int g, int b );
-
-static inline bool fill_rect( filter_sys_t* p_sys,
-                              uint16_t i_x, uint16_t i_y,
-                              uint16_t i_w, uint16_t i_h,
-                              uint8_t i_color );
-
-static inline bool raw_line(  filter_sys_t* p_sys,
-                              uint16_t i_x, uint16_t i_y,
-                              uint16_t i_w );
-
-static void vnc_encrypt_bytes( unsigned char *bytes, char *passwd );
-
 
 /*****************************************************************************
  * Module descriptor
@@ -167,6 +112,8 @@ static void vnc_encrypt_bytes( unsigned char *bytes, char *passwd );
 #define RMTOSD_UPDATE_DEFAULT 1000
 #define RMTOSD_UPDATE_MAX     300
 
+static int  CreateFilter ( vlc_object_t * );
+static void DestroyFilter( vlc_object_t * );
 
 vlc_module_begin();
     set_description( N_("Remote-OSD over VNC") );
@@ -196,6 +143,50 @@ vlc_module_begin();
         RMTOSD_ALPHA_TEXT, RMTOSD_ALPHA_LONGTEXT, true );
 
 vlc_module_end();
+
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+#define CHALLENGESIZE 16
+#define MAX_VNC_SERVER_NAME_LENGTH 255
+
+/* subfilter functions */
+static subpicture_t *Filter( filter_t *, mtime_t );
+
+static int MouseEvent ( vlc_object_t *p_this, char const *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
+
+static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
+
+static void stop_osdvnc ( filter_t *p_filter );
+
+static void vnc_worker_thread ( vlc_object_t *p_thread_obj );
+
+static void update_request_thread( vlc_object_t *p_thread_obj );
+
+static bool open_vnc_connection ( filter_t *p_filter );
+
+static bool handshaking ( filter_t *p_filter );
+
+static bool process_server_message ( filter_t *p_filter,
+                                     rfbServerToClientMsg *msg );
+
+static inline void rgb_to_yuv( uint8_t *y, uint8_t *u, uint8_t *v,
+                               int r, int g, int b );
+
+static inline bool fill_rect( filter_sys_t* p_sys,
+                              uint16_t i_x, uint16_t i_y,
+                              uint16_t i_w, uint16_t i_h,
+                              uint8_t i_color );
+
+static inline bool raw_line(  filter_sys_t* p_sys,
+                              uint16_t i_x, uint16_t i_y,
+                              uint16_t i_w );
+
+static void vnc_encrypt_bytes( unsigned char *bytes, char *passwd );
+
 
 /*****************************************************************************
  * Sub filter code
@@ -243,7 +234,6 @@ struct filter_sys_t
     bool          b_continue;
 
     vlc_object_t* p_worker_thread;
-    vlc_object_t* p_update_request_thread;
 
     uint8_t       ar_color_table_yuv[256][4];
 };
@@ -258,15 +248,16 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     msg_Dbg( p_filter, "Creating vnc osd filter..." );
 
-    p_filter->p_sys = p_sys = (filter_sys_t *) malloc( sizeof(filter_sys_t) );
+    p_filter->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( !p_filter->p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(filter_sys_t) );
+    memset( p_sys, 0, sizeof(*p_sys) );
 
     /* Populating struct */
     vlc_mutex_init( &p_sys->lock );
     p_sys->b_continue = true;
     p_sys->i_socket = -1;
+    p_sys->p_pic = NULL;
 
     p_sys->psz_host = var_CreateGetString( p_this, RMTOSD_CFG "host" );
     if( EMPTY_STR(p_sys->psz_host) )
@@ -342,7 +333,6 @@ static int CreateFilter ( vlc_object_t *p_this )
     {
         vlc_object_detach( p_sys->p_worker_thread );
         vlc_object_release( p_sys->p_worker_thread );
-        p_sys->p_worker_thread = NULL;
         msg_Err( p_filter, "cannot spawn vnc message reader thread" );
         goto error;
     }
@@ -354,10 +344,9 @@ static int CreateFilter ( vlc_object_t *p_this )
 error:
     msg_Err( p_filter, "osdvnc filter discarded" );
 
-    p_sys->b_continue = false;
-
     stop_osdvnc( p_filter );
 
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_host );
     free( p_sys->psz_passwd );
     free( p_sys );
@@ -387,7 +376,6 @@ static void DestroyFilter( vlc_object_t *p_this )
                          KeyEvent, p_this );
 
         vlc_object_release( p_sys->p_vout );
-        p_sys->p_vout = NULL;
     }
 
     var_Destroy( p_this, RMTOSD_CFG "host" );
@@ -399,6 +387,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_this, RMTOSD_CFG "key-events" );
     var_Destroy( p_this, RMTOSD_CFG "alpha" );
 
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_host );
     free( p_sys->psz_passwd );
     free( p_sys );
@@ -408,28 +397,18 @@ static void stop_osdvnc ( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if (p_sys->i_socket >= 0)
-    {
-        net_Close(p_sys->i_socket);
-    }
-    p_sys->b_continue = false; /* this causes the threads to stop */
+    /* It will unlock socket reading */
+    vlc_object_kill( p_filter );
 
-    if ( p_sys->p_worker_thread )
+    /* */
+    if( p_sys->p_worker_thread )
     {
         msg_Dbg( p_filter, "joining worker_thread" );
+        vlc_object_kill( p_sys->p_worker_thread );
         vlc_thread_join( p_sys->p_worker_thread );
         vlc_object_detach( p_sys->p_worker_thread );
         vlc_object_release( p_sys->p_worker_thread );
         msg_Dbg( p_filter, "released worker_thread" );
-    }
-
-    if ( p_sys->p_update_request_thread )
-    {
-        msg_Dbg( p_filter, "joining update_request_thread" );
-        vlc_thread_join( p_sys->p_update_request_thread );
-        vlc_object_detach( p_sys->p_update_request_thread );
-        vlc_object_release( p_sys->p_update_request_thread );
-        msg_Dbg( p_filter, "released update_request_thread" );
     }
 
     msg_Dbg( p_filter, "osdvnc stopped" );
@@ -689,19 +668,20 @@ static void vnc_worker_thread( vlc_object_t *p_thread_obj )
 {
     filter_t* p_filter = (filter_t*)(p_thread_obj->p_parent);
     filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_object_t *p_update_request_thread;
 
     msg_Dbg( p_filter, "VNC worker thread started" );
 
-    if ( open_vnc_connection ( p_filter ) == false )
+    if( !open_vnc_connection ( p_filter ) )
     {
         msg_Err( p_filter, "Could not connect to vnc host" );
-        return;
+        goto exit;
     }
 
-    if ( handshaking ( p_filter ) == false )
+    if( !handshaking ( p_filter ) )
     {
         msg_Err( p_filter, "Error occured while handshaking vnc host" );
-        return;
+        goto exit;
     }
 
     p_sys->b_connection_active = true; /* to enable sending key
@@ -709,116 +689,108 @@ static void vnc_worker_thread( vlc_object_t *p_thread_obj )
 
     /* Create an empty picture for VNC the data */
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->p_pic = malloc( sizeof(picture_t) );
+    p_sys->p_pic = picture_New( VLC_FOURCC('Y','U','V','A'),
+                                p_sys->i_vnc_width, p_sys->i_vnc_height, VOUT_ASPECT_FACTOR );
     if( !p_sys->p_pic )
     {
         vlc_mutex_unlock( &p_sys->lock );
-        return;
-    }
-    vout_AllocatePicture( VLC_OBJECT(p_filter), p_sys->p_pic,
-                          VLC_FOURCC('Y','U','V','A'),
-                          p_sys->i_vnc_width,
-                          p_sys->i_vnc_height,
-                          VOUT_ASPECT_FACTOR );
-    if( !p_sys->p_pic->i_planes )
-    {
-        free( p_sys->p_pic );
-        p_sys->p_pic = NULL;
-        vlc_mutex_unlock( &p_sys->lock );
-        return;
+        goto exit;
     }
 	p_sys->i_vnc_pixels = p_sys->i_vnc_width * p_sys->i_vnc_height;
 
     vlc_mutex_unlock( &p_sys->lock );
 
     /* create the update request thread */
-    p_sys->p_update_request_thread = vlc_object_create( p_filter,
-                                                     sizeof( vlc_object_t ) );
-    vlc_object_attach( p_sys->p_update_request_thread, p_filter );
-    if( vlc_thread_create( p_sys->p_update_request_thread,
+    p_update_request_thread = vlc_object_create( p_filter,
+                                                 sizeof( vlc_object_t ) );
+    vlc_object_attach( p_update_request_thread, p_filter );
+    if( vlc_thread_create( p_update_request_thread,
                            "vnc update request thread",
                            update_request_thread,
                            VLC_THREAD_PRIORITY_LOW, false ) )
     {
-        vlc_object_detach( p_sys->p_update_request_thread );
-        vlc_object_release( p_sys->p_update_request_thread );
-        p_sys->p_update_request_thread = NULL;
+        vlc_object_detach( p_update_request_thread );
+        vlc_object_release( p_update_request_thread );
         msg_Err( p_filter, "cannot spawn vnc update request thread" );
-        return;
+        goto exit;
     }
 
     /* connection is initialized, now read and handle server messages */
-
-    int i_msgSize;
-
-    rfbServerToClientMsg msg;
-
-    while (p_sys->b_continue)
+    while( vlc_object_alive( p_thread_obj ) )
     {
-       msg.type = 0;
-       if ( !read_exact(p_filter, p_sys->i_socket, (char*)&msg, 1 ) )
-       {
-           msg_Err( p_filter, "Error while waiting for next server message");
-           p_sys->b_continue = false;
-       }
-       else
-       {
-           switch (msg.type)
-           {
-              case rfbFramebufferUpdate:
-                i_msgSize = sz_rfbFramebufferUpdateMsg;
-                break;
-              case rfbSetColourMapEntries:
-                i_msgSize = sz_rfbSetColourMapEntriesMsg;
-                break;
-              case rfbBell:
-                i_msgSize = sz_rfbBellMsg;
-                break;
-              case rfbServerCutText:
-                i_msgSize = sz_rfbServerCutTextMsg;
-                break;
-              case rfbReSizeFrameBuffer:
-                i_msgSize = sz_rfbReSizeFrameBufferMsg;
-                break;
-              default:
-                i_msgSize = 0;
-                msg_Err( p_filter, "Invalid message %u received", msg.type );
-                p_sys->b_continue = false;
-           }
-           if (p_sys->b_continue == true)
-           {
-               if (--i_msgSize > 0)
-               {
-                   if ( !read_exact( p_filter, p_sys->i_socket,
-                                     ((char*)&msg)+1, i_msgSize ) )
-                   {
-                       msg_Err( p_filter, "Error while reading message of type %u",
-                                msg.type );
-                       p_sys->b_continue = false;
-                   }
-                   else
-                   {
-                       process_server_message( p_filter, &msg);
-                   }
-               }
-               else
-               {
-                   process_server_message( p_filter, &msg);
-               }
-           }
+        rfbServerToClientMsg msg;
+        int i_msgSize;
 
-       }
+        memset( &msg, 0, sizeof(msg) );
 
-       if (!vlc_object_alive (p_sys->p_worker_thread) ||
-           p_sys->p_worker_thread->b_error)
-       {
-           p_sys->b_continue = false;
-       }
+        if( !read_exact(p_filter, p_sys->i_socket, (char*)&msg, 1 ) )
+        {
+            msg_Err( p_filter, "Error while waiting for next server message");
+            break;
+        }
+        switch (msg.type)
+        {
+        case rfbFramebufferUpdate:
+            i_msgSize = sz_rfbFramebufferUpdateMsg;
+            break;
+        case rfbSetColourMapEntries:
+            i_msgSize = sz_rfbSetColourMapEntriesMsg;
+            break;
+        case rfbBell:
+            i_msgSize = sz_rfbBellMsg;
+            break;
+        case rfbServerCutText:
+            i_msgSize = sz_rfbServerCutTextMsg;
+            break;
+        case rfbReSizeFrameBuffer:
+            i_msgSize = sz_rfbReSizeFrameBufferMsg;
+            break;
+        default:
+            i_msgSize = 0;
+            msg_Err( p_filter, "Invalid message %u received", msg.type );
+            break;
+        }
 
+        if( i_msgSize <= 0 )
+            break;
+
+        if( --i_msgSize > 0 )
+        {
+            if ( !read_exact( p_filter, p_sys->i_socket,
+                              ((char*)&msg)+1, i_msgSize ) )
+            {
+                msg_Err( p_filter, "Error while reading message of type %u",
+                         msg.type );
+                break;
+            }
+        }
+        process_server_message( p_filter, &msg);
     }
 
-    msg_Dbg( p_filter, "VNC message reader thread ended" );
+    msg_Dbg( p_filter, "joining update_request_thread" );
+    vlc_object_kill( p_update_request_thread );
+    vlc_thread_join( p_update_request_thread );
+    vlc_object_detach( p_update_request_thread );
+    vlc_object_release( p_update_request_thread );
+    msg_Dbg( p_filter, "released update_request_thread" );
 
+exit:
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->b_connection_active = false;
+
+    if (p_sys->i_socket >= 0)
+        net_Close(p_sys->i_socket);
+
+    if( p_sys->p_pic )
+        picture_Release( p_sys->p_pic );
+
+    /* It will hide the subtitle */
+    p_sys->b_continue = false;
+    p_sys->b_need_update = true;
+    vlc_mutex_unlock( &p_sys->lock );
+
+    msg_Dbg( p_filter, "VNC message reader thread ended" );
 }
 
 static void update_request_thread( vlc_object_t *p_thread_obj )
@@ -841,33 +813,31 @@ static void update_request_thread( vlc_object_t *p_thread_obj )
     {
         msg_Err( p_filter, "Could not write rfbFramebufferUpdateRequestMsg." );
         p_sys->b_continue = false;
+        return;
     }
 
     udr.incremental = 1;
     mtime_t i_poll_interval_microsec = p_sys->i_vnc_poll_interval * 1000;
 
-    if (p_sys->b_vnc_poll)
+    if( p_sys->b_vnc_poll)
     {
-        while ( p_sys->b_continue == true )
+        while( vlc_object_alive( p_thread_obj ) )
         {
             msleep( i_poll_interval_microsec );
             if( write_exact(p_filter, p_sys->i_socket, (char*)&udr,
                    sz_rfbFramebufferUpdateRequestMsg) == false)
             {
                 msg_Err( p_filter, "Could not write rfbFramebufferUpdateRequestMsg." );
-                p_sys->b_continue = false;
-            }
-            if (!vlc_object_alive (p_sys->p_update_request_thread) ||
-                p_sys->p_update_request_thread->b_error)
-            {
-                p_sys->b_continue = false;
+                break;
             }
         }
+        p_sys->b_continue = false;
     }
     else
     {
         msg_Dbg( p_filter, "VNC polling disabled." );
     }
+
     msg_Dbg( p_filter, "VNC update request thread ended" );
 }
 
@@ -1146,6 +1116,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
 
+    if( !p_sys->b_continue )
+        p_spu->i_stop = p_spu->i_start + 1;
+
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
@@ -1270,9 +1243,6 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     filter_t *p_filter = (filter_t *)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( !p_sys->b_connection_active )
-        return VLC_SUCCESS;
-
     if( !p_sys->b_vnc_mouse_events )
         return VLC_SUCCESS;
 
@@ -1298,6 +1268,13 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 
     /* FIXME: calculate x and y coordinates for scaled output */
 
+    vlc_mutex_lock( &p_sys->lock );
+    if( !p_sys->b_connection_active )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        return VLC_SUCCESS;
+    }
+
     /* buttonMask bits 0-7 are buttons 1-8, 0=up, 1=down */
     rfbPointerEventMsg ev;
     ev.type = rfbPointerEvent;
@@ -1307,6 +1284,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 
     write_exact( p_filter, p_sys->i_socket,
                  (char*)&ev, sz_rfbPointerEventMsg);
+
+    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -1322,9 +1301,6 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     filter_t *p_filter = (filter_t *)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( !p_sys->b_connection_active )
-        return VLC_SUCCESS;
-
     if( !p_sys->b_vnc_key_events )
         return VLC_SUCCESS;
 
@@ -1334,6 +1310,13 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     {
         msg_Err( p_this, "Received invalid key event %d", newval.i_int );
         return VLC_EGENERIC;
+    }
+
+    vlc_mutex_lock( &p_sys->lock );
+    if( !p_sys->b_connection_active )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        return VLC_SUCCESS;
     }
 
     uint32_t i_key32 = newval.i_int;
@@ -1392,6 +1375,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
        write_exact( p_filter, p_sys->i_socket,
                     (char*)&ev, sz_rfbKeyEventMsg);
     }
+    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -1423,3 +1407,4 @@ static void vnc_encrypt_bytes( unsigned char *bytes, char *passwd )
     gcry_cipher_encrypt( ctx, bytes, CHALLENGESIZE, bytes, CHALLENGESIZE );
     gcry_cipher_close( ctx );
 }
+
