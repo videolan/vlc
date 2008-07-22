@@ -881,15 +881,15 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)enterFullscreen
 {
-    [super enterFullscreen];
     [o_window performSelectorOnMainThread: @selector(enterFullscreen) withObject: NULL waitUntilDone: NO];
+    [super enterFullscreen];
 
 }
 
 - (void)leaveFullscreen
 {
-    [super leaveFullscreen];
     [o_window performSelectorOnMainThread: @selector(leaveFullscreen) withObject: NULL waitUntilDone: NO];
+    [super leaveFullscreen];
 }
 
 
@@ -1128,15 +1128,17 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     [self setMovableByWindowBackground: NO];
 
-    /* tell the fspanel to move itself to front next time it's triggered */
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: i_device];
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
-
     if( [screen isMainScreen] )
         SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
 
     initialFrame = [self frame];
     [self setFrame:[screen frame] display:YES animate:YES];
+    [self setLevel:NSNormalWindowLevel];
+
+    /* tell the fspanel to move itself to front next time it's triggered */
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: i_device];
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
+
     fullscreen = YES;
 }
 
@@ -1151,6 +1153,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
     [self setFrame:initialFrame display:YES animate:YES];
     [self setMovableByWindowBackground: YES];
+    if( var_GetBool( p_vout, "video-on-top" ) )
+        [self setLevel: NSStatusWindowLevel];
 }
 
 - (id)getVoutView // FIXME Naming scheme!
