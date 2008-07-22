@@ -163,25 +163,22 @@ static block_t *Block (access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
 
+    /* Check if file size changed... */
+    struct stat st;
+
+    if ((fstat (p_sys->fd, &st) == 0)
+     && (st.st_size != p_access->info.i_size))
+    {
+        p_access->info.i_size = st.st_size;
+        p_access->info.i_update |= INPUT_UPDATE_SIZE;
+    }
+
     if ((uint64_t)p_access->info.i_pos >= (uint64_t)p_access->info.i_size)
     {
-        /* End of file - check if file size changed... */
-        struct stat st;
-
-        if ((fstat (p_sys->fd, &st) == 0)
-         && (st.st_size != p_access->info.i_size))
-        {
-            p_access->info.i_size = st.st_size;
-            p_access->info.i_update |= INPUT_UPDATE_SIZE;
-        }
-
-        /* Really at end of file then */
-        if ((uint64_t)p_access->info.i_pos >= (uint64_t)p_access->info.i_size)
-        {
-            p_access->info.b_eof = true;
-            msg_Dbg (p_access, "at end of memory mapped file");
-            return NULL;
-        }
+        /* We are at end of file */
+        p_access->info.b_eof = true;
+        msg_Dbg (p_access, "at end of memory mapped file");
+        return NULL;
     }
 
 #ifdef MMAP_DEBUG
