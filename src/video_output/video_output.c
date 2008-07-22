@@ -179,7 +179,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             p_vout->b_filter_change )
         {
             /* We are not interested in this format, close this vout */
-            vlc_object_release( p_vout );
+            vout_CloseAndRelease( p_vout );
             vlc_object_release( p_vout );
             p_vout = NULL;
         }
