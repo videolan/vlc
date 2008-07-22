@@ -186,6 +186,7 @@ void MetaPanel::update( input_item_t *p_item )
 
     /* Name / Title */
     psz_meta = input_item_GetTitle( p_item );
+    psz_meta = input_item_GetTitle( p_item );
     char *psz_name = input_item_GetName( p_item );
     if( !EMPTY_STR( psz_meta ) )
         title_text->setText( qfu( psz_meta ) );
@@ -377,7 +378,10 @@ void ExtraMetaPanel::update( input_item_t *p_item )
     vlc_mutex_lock( &p_item->lock );
     vlc_meta_t *p_meta = p_item->p_meta;
     if( !p_meta )
+    {
+        vlc_mutex_unlock( &p_item->lock );
         return;
+    }
 
     vlc_dictionary_t * p_dict = &p_meta->extra_tags;
     char ** ppsz_allkey = vlc_dictionary_all_keys( p_dict );
