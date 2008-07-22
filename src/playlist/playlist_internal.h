@@ -108,7 +108,7 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
 
 int playlist_DeleteFromInputInParent( playlist_t *, int, playlist_item_t *, bool );
 int playlist_DeleteFromItemId( playlist_t*, int );
-int playlist_ItemDelete ( playlist_item_t * );
+int playlist_ItemRelease( playlist_item_t * );
 
 void playlist_release_current_input( playlist_t * p_playlist );
 void playlist_set_current_input(

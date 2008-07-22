@@ -195,18 +195,21 @@ playlist_item_t * playlist_ItemNewWithType( playlist_t *p_playlist,
  ***************************************************************************/
 
 /**
- * Delete item
+ * Release an item
  *
- * Delete a playlist item and detach its input item
  * \param p_item item to delete
  * \return VLC_SUCCESS
 */
-int playlist_ItemDelete( playlist_item_t *p_item )
+int playlist_ItemRelease( playlist_item_t *p_item )
 {
-    uninstall_input_item_observer( p_item );
-
-    vlc_gc_decref( p_item->p_input );
-    free( p_item );
+    /* Surprise, we can't actually do more because we
+     * don't do refcounting, or eauivalent.
+     * Because item are not only accessed by their id
+     * using playlist_item outside the PL_LOCK isn't safe.
+     * Most of the modules does that.
+     *
+     * Who wants to add proper memory management? */
+    ARRAY_APPEND( p_item->p_playlist->items_to_delete, p_item);
     return VLC_SUCCESS;
 }
 
@@ -863,7 +866,6 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
 {
     int i;
     int i_id = p_item->i_id;
-    bool b_delay_deletion = false;
 
     if( p_item->i_children > -1 )
     {
@@ -893,7 +895,6 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
             msg_Info( p_playlist, "stopping playback" );
             vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
         }
-        b_delay_deletion = true;
     }
 
     PL_DEBUG( "deleting item `%s'", p_item->p_input->psz_name );
@@ -901,13 +902,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     /* Remove the item from its parent */
     playlist_NodeRemoveItem( p_playlist, p_item, p_item->p_parent );
 
-    if( !b_delay_deletion )
-        playlist_ItemDelete( p_item );
-    else
-    {
-        PL_DEBUG( "marking %s for further deletion", PLI_NAME( p_item ) );
-        p_item->i_flags |= PLAYLIST_REMOVE_FLAG;
-    }
+    playlist_ItemRelease( p_item );
 
     return VLC_SUCCESS;
 }
