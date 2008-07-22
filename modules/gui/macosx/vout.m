@@ -857,13 +857,18 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)manage
 {
+    /* Dooh, why do we spend processor time doing this kind of stuff? */
     [super manage];
     unsigned int i_mouse_hide_timeout =
         var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
+
+    if( i_mouse_hide_timeout < 100000 )
+        i_mouse_hide_timeout = 100000;
     if( p_vout->b_fullscreen )
     {
         if( mdate() - i_time_mouse_last_moved > i_mouse_hide_timeout )
         {
+            i_time_mouse_last_moved = mdate();
             [self hideMouse: YES];
         }
     }
