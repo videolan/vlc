@@ -245,6 +245,10 @@
     if( blackout_other_displays )        
         [screen blackoutOtherScreens];
 
+    /* Make sure we don't see the window flashes in float-on-top mode */
+    originalLevel = [self level];
+    [self setLevel:NSNormalWindowLevel];
+
     /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
     if (!o_fullscreen_window)
     {
@@ -506,6 +510,8 @@
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
+    [self setLevel:originalLevel];
+
     [self unlockFullscreenAnimation];
 }
 
