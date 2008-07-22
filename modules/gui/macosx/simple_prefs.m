@@ -547,12 +547,12 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_osd_encoding_pop selectItemAtIndex: y];
     
     [o_osd_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "sub-language" ) ?: ""]];
-    if( config_GetPsz( p_intf, "freetype-font" ) != NULL )
-        [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "freetype-font" ) ?: ""]];
+    if( config_GetPsz( p_intf, "quartztext-font" ) != NULL )
+        [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "quartztext-font" ) ?: ""]];
 
-    SetupIntList( o_osd_font_color_pop, "freetype-color" );
-    SetupIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
-    SetupIntList( o_osd_font_effect_pop, "freetype-effect" );
+    SetupIntList( o_osd_font_color_pop, "quartztext-color" );
+    SetupIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
+    //SetupIntList( o_osd_font_effect_pop, "quartztext-effect" );
 
     /********************
      * hotkeys settings *
@@ -894,11 +894,11 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
             config_PutPsz( p_intf, "subsdec-encoding", [[[o_osd_encoding_pop selectedItem] title] UTF8String] );
 
         config_PutPsz( p_intf, "sub-language", [[o_osd_lang_fld stringValue] UTF8String] );
-        config_PutPsz( p_intf, "freetype-font", [[o_osd_font_fld stringValue] UTF8String] );
+        config_PutPsz( p_intf, "quartztext-font", [[o_osd_font_fld stringValue] UTF8String] );
 
-        SaveIntList( o_osd_font_color_pop, "freetype-color" );
-        SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
-        SaveIntList( o_osd_font_effect_pop, "freetype-effect" );
+        SaveIntList( o_osd_font_color_pop, "quartztext-color" );
+        SaveIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
+        //SaveIntList( o_osd_font_effect_pop, "freetype-effect" );
 
         i = config_SaveConfigFile( p_intf, NULL );
 
