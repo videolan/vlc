@@ -123,9 +123,21 @@ int services_discovery_Start ( services_discovery_t * p_sd )
 /***********************************************************************
  * Stop
  ***********************************************************************/
+static void ObjectKillChildrens( vlc_object_t *p_obj )
+{
+    vlc_list_t *p_list;
+    int i;
+    vlc_object_kill( p_obj );
+
+    p_list = vlc_list_children( p_obj );
+    for( i = 0; i < p_list->i_count; i++ )
+        ObjectKillChildrens( p_list->p_values[i].p_object );
+    vlc_list_release( p_list );
+}
+
 void services_discovery_Stop ( services_discovery_t * p_sd )
 {
-    vlc_object_kill( p_sd );
+    ObjectKillChildrens( p_sd );
     if( p_sd->pf_run ) vlc_thread_join( p_sd );
 
     module_Unneed( p_sd, p_sd->p_module );
