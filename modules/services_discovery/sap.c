@@ -671,6 +671,8 @@ static int Demux( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
+    /* This item hasn't been yield by input_GetItem
+     * don't release it */
     p_parent_input = input_GetItem( p_input );
 
     input_item_SetURI( p_parent_input, p_sdp->psz_uri );
@@ -681,7 +683,6 @@ static int Demux( demux_t *p_demux )
     p_parent_input->i_type = ITEM_TYPE_NET;
 
     vlc_mutex_unlock( &p_parent_input->lock );
-    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
 
