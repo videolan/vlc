@@ -30,6 +30,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #warning playlist code must not be used here.
@@ -255,6 +256,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     p_current->p_input->i_type = ITEM_TYPE_DIRECTORY;
     p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
                                               pl_Unlocked );
+    assert( p_item_in_category );
 
     ReadDir( p_access, p_playlist, psz_name, i_mode,
              p_item_in_category,
@@ -493,7 +495,7 @@ static int ReadDir( access_t *p_access, playlist_t *p_playlist,
                                               p_parent_category,
                                               PLAYLIST_NO_REBUILD, NULL );
                 PL_UNLOCK;
-
+                assert( p_node );
                 /* If we had the parent in category, the it is now node.
                  * Else, we still don't have  */
                 i_return = ReadDir( p_access, p_playlist, psz_uri , MODE_EXPAND,
@@ -535,6 +537,7 @@ static int ReadDir( access_t *p_access, playlist_t *p_playlist,
                 {
                     if( p_current_input )
                         input_ItemCopyOptions( p_current_input, p_input );
+                    assert( p_parent_category );
                     int i_ret = playlist_BothAddInput( p_playlist, p_input,
                                            p_parent_category,
                                            PLAYLIST_APPEND|PLAYLIST_PREPARSE|
