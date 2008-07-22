@@ -34,8 +34,8 @@
 #include <vlc_plugin.h>
 #include <assert.h>
 
-#include <vlc_playlist.h>
 #include <vlc_demux.h>
+#include <vlc_services_discovery.h>
 
 #include <vlc_network.h>
 #include <vlc_charset.h>
@@ -227,7 +227,7 @@ struct sap_announce_t
     /* SAP annnounces must only contain one SDP */
     sdp_t       *p_sdp;
 
-    int i_input_id;
+    input_item_t * p_item;
 };
 
 struct services_discovery_sys_t
@@ -662,7 +662,6 @@ static int Demux( demux_t *p_demux )
     input_thread_t *p_input;
     input_item_t *p_parent_input;
 
-    playlist_t *p_playlist = pl_Yield( p_demux );
     p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT,
                                                  FIND_PARENT );
     assert( p_input );
@@ -681,17 +680,8 @@ static int Demux( demux_t *p_demux )
 
     p_parent_input->i_type = ITEM_TYPE_NET;
 
-    if( p_playlist->status.p_item &&
-             p_playlist->status.p_item->p_input == p_parent_input )
-    {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked,
-                          p_playlist->status.p_node, p_playlist->status.p_item );
-    }
-
     vlc_mutex_unlock( &p_parent_input->lock );
     vlc_object_release( p_input );
-    vlc_object_release( p_playlist );
-
     return VLC_SUCCESS;
 }
 
@@ -880,12 +870,12 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->i_hash = i_hash;
     p_sap->p_sdp = p_sdp;
 
-    /* Create the actual playlist item here */
+    /* Released in RemoveAnnounce */
     p_input = input_ItemNewWithType( VLC_OBJECT(p_sd),
                                      p_sap->p_sdp->psz_uri,
                                      p_sdp->psz_sessionname,
                                      0, NULL, -1, ITEM_TYPE_NET );
-    p_sap->i_input_id = p_input->i_id;
+    p_sap->p_item = p_input;
     if( !p_input )
     {
         free( p_sap );
@@ -915,7 +905,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     services_discovery_AddItem( p_sd, p_input, psz_value /* category name */ );
 
     TAB_APPEND( p_sys->i_announces, p_sys->pp_announces, p_sap );
-    vlc_gc_decref( p_input );
+
     return p_sap;
 }
 
@@ -1537,11 +1527,11 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
         p_announce->p_sdp = NULL;
     }
 
-    if( p_announce->i_input_id > -1 )
+    if( p_announce->p_item )
     {
-        playlist_DeleteFromInput( pl_Yield( p_sd ),
-                                  p_announce->i_input_id, pl_Unlocked );
-        pl_Release( p_sd );
+        services_discovery_RemoveItem( p_sd, p_announce->p_item );
+        vlc_gc_decref( p_announce->p_item );
+        p_announce->p_item = NULL;
     }
 
     for( i = 0; i< p_sd->p_sys->i_announces; i++)
