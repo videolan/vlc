@@ -39,27 +39,13 @@
 #include "filter_picture.h"
 
 #include "vlc_image.h"
-#include "vlc_input.h"
-#include "vlc_playlist.h"
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
-
-static int  SendEvents   ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  MouseEvent   ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
+
 vlc_module_begin();
     set_description( N_("Magnify/Zoom interactive video filter") );
     set_shortname( N_( "Magnify" ));
@@ -70,6 +56,24 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static void Render    ( vout_thread_t *, picture_t * );
+
+static int  SendEvents   ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+static int  MouseEvent   ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+
+static void DrawZoomStatus( uint8_t *, int i_pitch, int i_width, int i_height,
+                            int i_offset_x, int i_offset_y, bool b_visible );
+static void DrawRectangle( uint8_t *, int i_pitch, int i_width, int i_height,
+                           int x, int y, int i_w, int i_h );
+
 /*****************************************************************************
  * vout_sys_t: Magnify video output method descriptor
  *****************************************************************************/
@@ -79,11 +83,15 @@ struct vout_sys_t
 
     image_handler_t *p_image;
 
+    vlc_mutex_t lock;
     int i_zoom; /* zoom level in percent */
     int i_x, i_y; /* top left corner coordinates in original image */
 
     bool b_visible; /* is "interface" visible ? */
 };
+
+#define VIS_ZOOM 4
+#define ZOOM_FACTOR 8
 
 /*****************************************************************************
  * Control: control facility for the vout (forwards to child vout)
@@ -160,10 +168,9 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-#define VIS_ZOOM 4
+    vlc_mutex_init( &p_vout->p_sys->lock );
     p_vout->p_sys->i_x = 0;
     p_vout->p_sys->i_y = 0;
-#define ZOOM_FACTOR 8
     p_vout->p_sys->i_zoom = 2*ZOOM_FACTOR;
     p_vout->p_sys->b_visible = true;
 
@@ -201,6 +208,8 @@ static void End( vout_thread_t *p_vout )
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-clicked", MouseEvent, p_vout);
 
+    vlc_mutex_destroy( &p_vout->p_sys->lock );
+
     vout_CloseAndRelease( p_vout->p_sys->p_vout );
 }
 
@@ -222,21 +231,16 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
     picture_t *p_outpic;
 
-    int o_x = p_vout->p_sys->i_x;
-    int o_y = p_vout->p_sys->i_y;
-    int o_zoom = p_vout->p_sys->i_zoom;
-    int x,y,o_yp,o_xp;
     int v_w, v_h;
-    video_format_t fmt_out;
     picture_t *p_converted;
-    plane_t *p_oyp=NULL;
+    plane_t *p_oyp;
     int i_plane;
 
-    memset( &fmt_out, 0, sizeof(video_format_t) );
     /* This is a new frame. Get a structure from the video_output. */
-    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
+    while( ( p_outpic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) )
               == NULL )
     {
         if( !vlc_object_alive (p_vout) || p_vout->b_error )
@@ -246,204 +250,101 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
-    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
+    vout_DatePicture( p_sys->p_vout, p_outpic, p_pic->date );
 
-    p_oyp = &(p_outpic->p[Y_PLANE]);
+
+    vlc_mutex_lock( &p_sys->lock );
+    const bool b_visible = p_sys->b_visible;
+    const int o_x = p_sys->i_x;
+    const int o_y = p_sys->i_y;
+    const int o_zoom = p_sys->i_zoom;
+    vlc_mutex_unlock( &p_sys->lock );
 
     /* background magnified image */
     if( o_zoom != ZOOM_FACTOR )
     {
+        video_format_t fmt_in;
+        video_format_t fmt_out;
+        picture_t crop;
+
+        crop = *p_pic;
         for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            o_yp = o_y*p_outpic->p[i_plane].i_lines
-                   /p_outpic->p[Y_PLANE].i_lines;
-            o_xp = o_x*p_outpic->p[i_plane].i_pitch
-                   /p_outpic->p[Y_PLANE].i_pitch;
-            int i_pitch = p_outpic->p[i_plane].i_pitch;
-#if 0
-            int o_zoom2 = o_zoom*o_zoom;
-            int o_zoom3 = o_zoom*o_zoom*o_zoom;
-            int o_zoom4 = o_zoom*o_zoom*o_zoom*o_zoom;
-            int o_zoom6 = o_zoom*o_zoom*o_zoom * o_zoom*o_zoom*o_zoom;
-#endif
-            for( y=0; y<p_outpic->p[i_plane].i_visible_lines; y++ )
-            {
-                for( x=0; x<p_outpic->p[i_plane].i_visible_pitch; x++ )
-                {
-#if 0
-                    /* Nearest neighbor */
-                    int nx = o_xp + x*ZOOM_FACTOR/o_zoom;
-                    int ny = o_yp + y*ZOOM_FACTOR/o_zoom;
-                    p_outpic->p[i_plane].p_pixels[y*i_pitch+x] =
-                        p_pic->p[i_plane].p_pixels[ny*i_pitch+nx];
-#elif 1
-                    /* Bi-linear */
-                    int nx_real = o_xp*o_zoom + x*ZOOM_FACTOR;
-                    int ny_real = o_yp*o_zoom + y*ZOOM_FACTOR;
-                    int nx = nx_real/o_zoom;
-                    int ny = ny_real/o_zoom;
-                    int wtl = ((nx+1)*o_zoom-nx_real)*((ny+1)*o_zoom-ny_real);
-                    int wtr = (nx_real-nx*o_zoom)*((ny+1)*o_zoom-ny_real);
-                    int wbl = ((nx+1)*o_zoom-nx_real)*(ny_real-ny*o_zoom);
-                    int wbr = (nx_real-nx*o_zoom)*(ny_real-ny*o_zoom);
-                    p_outpic->p[i_plane].p_pixels[y*i_pitch+x] =
-                        ( wtl*p_pic->p[i_plane].p_pixels[ny*i_pitch+nx]
-                        + wtr*p_pic->p[i_plane].p_pixels[ny*i_pitch+(nx+1)]
-                        + wbl*p_pic->p[i_plane].p_pixels[(ny+1)*i_pitch+nx]
-                        + wbr*p_pic->p[i_plane].p_pixels[(ny+1)*i_pitch+(nx+1)]
-                        ) / (o_zoom*o_zoom);
-#else
-                    /* Bi-cubic */
-                    /* FIXME: doesn't work */
-                    /* \Sigma_{i=0..3} \Sigma_{j=0..3} \alpha_{i,j} x^i y^j
-                     * 16 \alpha_{i,j} so we need to use the 16 nearest pixels
-                     *
-                     * In fact we should be able to write it as:
-                     * \Pi_{i=1..16} [ \Pi_{j!=i} ( x - x_j ) * ( y - y_j ) ]
-                     *   * z_i / [ \Pi_{j!=i} ( x_i - x_j ) * ( y_i - y_j ) ]
-                     * We also have to make sure that we don't use any
-                     * x_j == x_i or y_j == y_i in the \Pi on j (else we get
-                     * a 0/0 which kind of sucks) .
-                     */
-                    uint8_t *p = p_pic->p[i_plane].p_pixels;
-                    int nx_real = o_xp*o_zoom + x*ZOOM_FACTOR;
-                    int ny_real = o_yp*o_zoom + y*ZOOM_FACTOR;
+            const int o_yp = o_y * p_outpic->p[i_plane].i_lines / p_outpic->p[Y_PLANE].i_lines;
+            const int o_xp = o_x * p_outpic->p[i_plane].i_pitch / p_outpic->p[Y_PLANE].i_pitch;
 
-                    int nx = nx_real/o_zoom;
-                    int ny = ny_real/o_zoom;
-
-                    int xi, yi, xj, yj;
-                    int my = __MAX( ny-1, 0 );
-                    int mx = __MAX( nx-1, 0 );
-                    //p_outpic->p[i_plane].i_visible_lines - 4
-                    //p_outpic->p[i_plane].i_visible_pitch - 4
-                    int v = 1;
-                    for( yi = my; yi <= my+3; yi++ )
-                    {
-                        int numy = 1;
-                        int deny = 1;
-                        /*
-                        for( yj = my; yj <= my+3; yj++ )
-                        {
-                            if( yj != yi )
-                            {
-                                numy *= (ny_real-yj*o_zoom);
-                                deny *= (yi - yj);
-                            }
-                        }
-                        numy /= o_zoom2;*/
-                        for( xi = mx; xi <= mx+3; xi++ )
-                        {
-                            int num = numy;
-                            int den = deny;
-                            for( xj = mx; xj <= mx+3; xj++ )
-                            {
-                                if( xj != xi )
-                                {
-                                    num *= (nx_real-xj*o_zoom);
-                                    den *= (xi - xj);
-                                }
-                            }
-                            v = ( v * (p[yi*i_pitch+xi] * num) ) / ( den * o_zoom3 );
-                        }
-                    }
-                    p_outpic->p[i_plane].p_pixels[y*i_pitch+x] = v;
-#endif
-                }
-            }
+            crop.p[i_plane].p_pixels += o_yp * p_outpic->p[i_plane].i_pitch + o_xp;
         }
+
+        /* */
+        fmt_in = p_vout->fmt_out;
+        fmt_in.i_width  = (fmt_in.i_width  * ZOOM_FACTOR / o_zoom) & ~1;
+        fmt_in.i_height = (fmt_in.i_height * ZOOM_FACTOR / o_zoom) & ~1;
+
+        /* */
+        fmt_out = p_vout->fmt_out;
+
+        p_converted = image_Convert( p_sys->p_image, &crop, &fmt_in, &fmt_out );
+
+        picture_CopyPixels( p_outpic, p_converted );
+
+        picture_Release( p_converted );
     }
     else
     {
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-        {
-        vlc_memcpy( p_outpic->p[i_plane].p_pixels, p_pic->p[i_plane].p_pixels,
-            p_outpic->p[i_plane].i_lines * p_outpic->p[i_plane].i_pitch );
-        }
+        picture_CopyPixels( p_outpic, p_pic );
     }
 
-    if( p_vout->p_sys->b_visible )
+    /* */
+    p_oyp = &p_outpic->p[Y_PLANE];
+    if( b_visible )
     {
+        video_format_t fmt_out;
+
         /* image visualization */
         fmt_out = p_vout->fmt_out;
-        fmt_out.i_width = p_vout->render.i_width/VIS_ZOOM;
-        fmt_out.i_height = p_vout->render.i_height/VIS_ZOOM;
-        p_converted = image_Convert( p_vout->p_sys->p_image, p_pic,
-                                     &(p_pic->format), &fmt_out );
+        fmt_out.i_width  = (p_vout->render.i_width/VIS_ZOOM ) & ~1;
+        fmt_out.i_height = (p_vout->render.i_height/VIS_ZOOM) & ~1;
+        p_converted = image_Convert( p_sys->p_image, p_pic,
+                                     &p_pic->format, &fmt_out );
         for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            for( y=0; y<p_converted->p[i_plane].i_visible_lines; y++)
+            int y;
+            for( y = 0; y < p_converted->p[i_plane].i_visible_lines; y++)
             {
                 vlc_memcpy(
-                p_outpic->p[i_plane].p_pixels+y*p_outpic->p[i_plane].i_pitch,
-                p_converted->p[i_plane].p_pixels+y*p_converted->p[i_plane].i_pitch,
-                p_converted->p[i_plane].i_visible_pitch );
+                    &p_outpic->p[i_plane].p_pixels[y*p_outpic->p[i_plane].i_pitch],
+                    p_converted->p[i_plane].p_pixels+y*p_converted->p[i_plane].i_pitch,
+                    p_converted->p[i_plane].i_visible_pitch );
             }
         }
         picture_Release( p_converted );
 
         /* white rectangle on visualization */
-        v_w = p_oyp->i_pitch*ZOOM_FACTOR/(VIS_ZOOM*o_zoom);
-        v_h = (o_y+p_oyp->i_lines*ZOOM_FACTOR/o_zoom)/VIS_ZOOM;
-        /* top line */
-        vlc_memset( p_oyp->p_pixels
-                                     + o_y/VIS_ZOOM*p_oyp->i_pitch
-                                     + o_x/VIS_ZOOM, 0xff, v_w+1 );
+        v_w = __MIN( fmt_out.i_width  * ZOOM_FACTOR / o_zoom, fmt_out.i_width - 1 );
+        v_h = __MIN( fmt_out.i_height * ZOOM_FACTOR / o_zoom, fmt_out.i_height - 1 );
 
-        for( y = o_y/VIS_ZOOM+1; y < v_h; y++ )
-        {
-            /* left line */
-            p_oyp->p_pixels[
-                y*p_oyp->i_pitch+o_x/VIS_ZOOM
-            ] = 0xff;
-            /* right line */
-            p_oyp->p_pixels[
-                y*p_oyp->i_pitch+o_x/VIS_ZOOM + v_w
-            ] = 0xff;
-        }
-        /* bottom line */
-        vlc_memset( p_oyp->p_pixels
-                                     + v_h*p_oyp->i_pitch
-                                     + o_x/VIS_ZOOM, 0xff, v_w+1 );
+        DrawRectangle( p_oyp->p_pixels, p_oyp->i_pitch,
+                       p_oyp->i_pitch, p_oyp->i_lines,
+                       o_x/VIS_ZOOM, o_y/VIS_ZOOM,
+                       v_w, v_h );
 
         /* */
-        v_h = p_oyp->i_lines/VIS_ZOOM;
+        v_h = fmt_out.i_height + 1;
     }
     else
     {
         v_h = 1;
     }
 
-    /* print a small "VLC ZOOM" ... gruikkkkkkkkk */
-#define DRAW(a) {int c,l=1;L a;}
-#define L ;l++,c=1
-#define X ;draw(l,c);c+=1
-#define o +1
-#define draw(y,x) p_oyp->p_pixels[(v_h+y)*p_oyp->i_pitch+x] = 0xff;
-if( p_vout->p_sys->b_visible )
-DRAW(
-X o o o X o X o o o o o o X X X X o o o X X X X X o o X X X o o o X X X o o X X o X X o o o X o o o X o X X X X X o X X X X o o X X X X X L
-X o o o X o X o o o o o X o o o o o o o o o o X o o X o o o X o X o o o X o X o X o X o o o X o o o X o o o X o o o X o o o X o X o o o o L
-o X o X o o X o o o o o X o o o o o o o o o X o o o X o o o X o X o o o X o X o o o X o o o X X X X X o o o X o o o X o o o X o X X X X o L
-o X o X o o X o o o o o X o o o o o o o o X o o o o X o o o X o X o o o X o X o o o X o o o X o o o X o o o X o o o X o o o X o X o o o o L
-o o X o o o X X X X X o o X X X X o o o X X X X X o o X X X o o o X X X o o X o o o X o o o X o o o X o X X X X X o X X X X o o X X X X X L
-)
-else
-DRAW(
-X o o o X o X o o o o o o X X X X o o o X X X X X o o X X X o o o X X X o o X X o X X o o o o X X X X o X o o o X o o X X X o o X o o o X L
-X o o o X o X o o o o o X o o o o o o o o o o X o o X o o o X o X o o o X o X o X o X o o o X o o o o o X o o o X o X o o o X o X o o o X L
-o X o X o o X o o o o o X o o o o o o o o o X o o o X o o o X o X o o o X o X o o o X o o o o X X X o o X X X X X o X o o o X o X o X o X L
-o X o X o o X o o o o o X o o o o o o o o X o o o o X o o o X o X o o o X o X o o o X o o o o o o o X o X o o o X o X o o o X o X o X o X L
-o o X o o o X X X X X o o X X X X o o o X X X X X o o X X X o o o X X X o o X o o o X o o o X X X X o o X o o o X o o X X X o o o X o X o L
-)
-#undef DRAW
-#undef L
-#undef X
-#undef O
-#undef draw
+    /* print a small "VLC ZOOM" */
+    DrawZoomStatus( p_oyp->p_pixels, p_oyp->i_pitch, p_oyp->i_pitch, p_oyp->i_lines,
+                    1, v_h, b_visible );
 
-    if( p_vout->p_sys->b_visible )
+    if( b_visible )
     {
+        int y;
+
         /* zoom gauge */
         vlc_memset( p_oyp->p_pixels + (v_h+9)*p_oyp->i_pitch, 0xff, 41 );
         for( y = v_h + 10; y < v_h + 90; y++ )
@@ -461,7 +362,67 @@ o o X o o o X X X X X o o X X X X o o o X X X X X o o X X X o o o X X X o o X o 
             }
         }
     }
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+
+    vout_DisplayPicture( p_sys->p_vout, p_outpic );
+}
+
+static void DrawZoomStatus( uint8_t *pb_dst, int i_pitch, int i_width, int i_height,
+                            int i_offset_x, int i_offset_y, bool b_visible )
+{
+    static const char *p_hide =
+        "X   X X      XXXX   XXXXX  XXX   XXX  XX XX   X   X XXXXX XXXX  XXXXXL"
+        "X   X X     X          X  X   X X   X X X X   X   X   X   X   X X    L"
+        " X X  X     X         X   X   X X   X X   X   XXXXX   X   X   X XXXX L"
+        " X X  X     X        X    X   X X   X X   X   X   X   X   X   X X    L"
+        "  X   XXXXX  XXXX   XXXXX  XXX   XXX  X   X   X   X XXXXX XXXX  XXXXXL";
+    static const char *p_show = 
+        "X   X X      XXXX   XXXXX  XXX   XXX  XX XX    XXXX X   X  XXX  X   XL"
+        "X   X X     X          X  X   X X   X X X X   X     X   X X   X X   XL"
+        " X X  X     X         X   X   X X   X X   X    XXX  XXXXX X   X X X XL"
+        " X X  X     X        X    X   X X   X X   X       X X   X X   X X X XL"
+        "  X   XXXXX  XXXX   XXXXX  XXX   XXX  X   X   XXXX  X   X  XXX   X X L";
+    const char *p_draw = b_visible ? p_hide : p_show;
+    int i, y, x;
+
+    for( i = 0, x = i_offset_x, y = i_offset_y; p_draw[i] != '\0'; i++ )
+    {
+        if( p_draw[i] == 'X' )
+        {
+            if( x < i_width && y < i_height )
+                pb_dst[y*i_pitch + x] = 0xff;
+            x++;
+        }
+        else if( p_draw[i] == ' ' )
+        {
+            x++;
+        }
+        else if( p_draw[i] == 'L' )
+        {
+            x = i_offset_x;
+            y++;
+        }
+    }
+}
+static void DrawRectangle( uint8_t *pb_dst, int i_pitch, int i_width, int i_height,
+                           int x, int y, int i_w, int i_h )
+{
+    int dy;
+
+    if( x + i_w > i_width || y + i_h > i_height )
+        return;
+
+    /* top line */
+    vlc_memset( &pb_dst[y * i_pitch + x], 0xff, i_w );
+
+    /* left and right */
+    for( dy = 1; dy < i_h-1; dy++ )
+    {
+        pb_dst[(y+dy) * i_pitch + x +     0] = 0xff;
+        pb_dst[(y+dy) * i_pitch + x + i_w-1] = 0xff;
+    }
+
+    /* bottom line */
+    vlc_memset( &pb_dst[(y+i_h-1) * i_pitch + x], 0xff, i_w );
 }
 
 /*****************************************************************************
@@ -494,9 +455,10 @@ static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(p_this);
     vout_thread_t *p_vout = (vout_thread_t*)p_data;
     vlc_value_t vald,valx,valy;
+
+    VLC_UNUSED(p_this);
 
 #define MOUSE_DOWN    1
 #define MOUSE_CLICKED 2
@@ -504,9 +466,6 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 #define MOUSE_MOVE_Y  8
 #define MOUSE_MOVE    12
     uint8_t mouse= 0;
-
-    int v_h = p_vout->output.i_height*ZOOM_FACTOR/p_vout->p_sys->i_zoom;
-    int v_w = p_vout->output.i_width*ZOOM_FACTOR/p_vout->p_sys->i_zoom;
 
     if( psz_var[6] == 'x' ) mouse |= MOUSE_MOVE_X;
     if( psz_var[6] == 'y' ) mouse |= MOUSE_MOVE_Y;
@@ -516,6 +475,11 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     if( vald.i_int & 0x1 ) mouse |= MOUSE_DOWN;
     var_Get( p_vout->p_sys->p_vout, "mouse-y", &valy );
     var_Get( p_vout->p_sys->p_vout, "mouse-x", &valx );
+
+    vlc_mutex_lock( &p_vout->p_sys->lock );
+
+    const int v_h = p_vout->output.i_height*ZOOM_FACTOR/p_vout->p_sys->i_zoom;
+    const int v_w = p_vout->output.i_width*ZOOM_FACTOR/p_vout->p_sys->i_zoom;
 
     if( ( mouse&MOUSE_MOVE && mouse&MOUSE_DOWN)
         || mouse&MOUSE_CLICKED )
@@ -593,6 +557,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
          __MAX( 0, __MIN( p_vout->p_sys->i_y, (int)p_vout->output.i_height
         - (int)p_vout->output.i_height*ZOOM_FACTOR/p_vout->p_sys->i_zoom - 1 ));
 
+    vlc_mutex_unlock( &p_vout->p_sys->lock );
 
     return VLC_SUCCESS;
 }
