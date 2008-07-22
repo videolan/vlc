@@ -48,7 +48,6 @@ static access_t *access_InternalNew( vlc_object_t *p_obj, const char *psz_access
     if( p_source )
     {
         msg_Dbg( p_obj, "creating access filter '%s'", psz_access );
-        p_access->psz_access = strdup( p_source->psz_access );
     }
     else
     {
