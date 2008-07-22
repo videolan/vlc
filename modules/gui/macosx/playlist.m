@@ -189,7 +189,9 @@
 
     if( o_value == nil )
     {
-        msg_Warn( VLCIntf, "playlist item misses pointer value, adding one" );
+        /* Why is there a warning if that happens all the time and seems
+         * to be normal? Add an assert and fix it. 
+         * msg_Warn( VLCIntf, "playlist item misses pointer value, adding one" ); */
         o_value = [[NSValue valueWithPointer: p_return] retain];
     }
     return o_value;
