@@ -83,11 +83,15 @@ struct vout_sys_t
 
     image_handler_t *p_image;
 
+    int64_t i_hide_timeout;
+
     vlc_mutex_t lock;
     int i_zoom; /* zoom level in percent */
     int i_x, i_y; /* top left corner coordinates in original image */
 
     bool b_visible; /* is "interface" visible ? */
+
+    int64_t i_last_activity;
 };
 
 #define VIS_ZOOM 4
@@ -173,6 +177,8 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_sys->i_y = 0;
     p_vout->p_sys->i_zoom = 2*ZOOM_FACTOR;
     p_vout->p_sys->b_visible = true;
+    p_vout->p_sys->i_last_activity = mdate();
+    p_vout->p_sys->i_hide_timeout = 1000 * var_GetInteger( p_vout, "mouse-hide-timeout" );
 
     var_AddCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout );
     var_AddCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout );
@@ -258,6 +264,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     const int o_x = p_sys->i_x;
     const int o_y = p_sys->i_y;
     const int o_zoom = p_sys->i_zoom;
+    const int64_t i_last_activity = p_sys->i_last_activity;
     vlc_mutex_unlock( &p_sys->lock );
 
     /* background magnified image */
@@ -338,8 +345,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* print a small "VLC ZOOM" */
-    DrawZoomStatus( p_oyp->p_pixels, p_oyp->i_pitch, p_oyp->i_pitch, p_oyp->i_lines,
-                    1, v_h, b_visible );
+    if( b_visible || i_last_activity + p_sys->i_hide_timeout > mdate() )
+        DrawZoomStatus( p_oyp->p_pixels, p_oyp->i_pitch, p_oyp->i_pitch, p_oyp->i_lines,
+                        1, v_h, b_visible );
 
     if( b_visible )
     {
@@ -557,6 +565,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
          __MAX( 0, __MIN( p_vout->p_sys->i_y, (int)p_vout->output.i_height
         - (int)p_vout->output.i_height*ZOOM_FACTOR/p_vout->p_sys->i_zoom - 1 ));
 
+    p_vout->p_sys->i_last_activity = mdate();
     vlc_mutex_unlock( &p_vout->p_sys->lock );
 
     return VLC_SUCCESS;
