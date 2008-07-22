@@ -81,12 +81,46 @@ static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size,
 // RenderText. This module, unlike Freetype, doesn't provide any options to
 // override the fallback font selection used when this style information is
 // absent.
+#define FONT_TEXT N_("Font")
+#define FONT_LONGTEXT N_("Name for the font you want to use")
+#define FONTSIZER_TEXT N_("Relative font size")
+#define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
+    "fonts that will be rendered on the video. If absolute font size is set, "\
+    "relative size will be overriden." )
+#define COLOR_TEXT N_("Text default color")
+#define COLOR_LONGTEXT N_("The color of the text that will be rendered on "\
+    "the video. This must be an hexadecimal (like HTML colors). The first two "\
+    "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
+    " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
+
+static const int pi_color_values[] = {
+  0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
+  0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00808000, 0x00008000, 0x00008080,
+  0x0000FF00, 0x00800080, 0x00000080, 0x000000FF, 0x0000FFFF };
+
+static const char *const ppsz_color_descriptions[] = {
+  N_("Black"), N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"),
+  N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"), N_("Teal"),
+  N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), N_("Aqua") };
+
+static const int pi_sizes[] = { 20, 18, 16, 12, 6 };
+static const char *const ppsz_sizes_text[] = {
+    N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
+
 vlc_module_begin();
     set_shortname( N_("Mac Text renderer"));
     set_description( N_("Quartz font renderer") );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
 
+    add_string( "quartztext-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
+              false );
+    add_integer( "quartztext-rel-fontsize", DEFAULT_REL_FONT_SIZE, NULL, FONTSIZER_TEXT,
+                 FONTSIZER_LONGTEXT, false );
+        change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
+    add_integer( "quartztext-color", 0x00FFFFFF, NULL, COLOR_TEXT,
+                 COLOR_LONGTEXT, false );
+        change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     set_capability( "text renderer", 120 );
     add_shortcut( "text" );
     set_callbacks( Create, Destroy );
@@ -143,9 +177,9 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    p_sys->psz_font_name  = strdup( DEFAULT_FONT );
+    p_sys->psz_font_name  = var_CreateGetString( p_this, "quartztext-font" );
     p_sys->i_font_opacity = 255;
-    p_sys->i_font_color   = DEFAULT_FONT_COLOR;
+    p_sys->i_font_color = __MAX( __MIN( var_CreateGetInteger( p_this, "quartztext-color" ) , 0xFFFFFF ), 0 );
     p_sys->i_font_size    = GetFontSize( p_filter );
 
     p_filter->pf_render_text = RenderText;
@@ -1064,7 +1098,7 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
 
 static int GetFontSize( filter_t *p_filter )
 {
-    return p_filter->fmt_out.video.i_height / DEFAULT_REL_FONT_SIZE;
+    return p_filter->fmt_out.video.i_height / __MAX(1, var_CreateGetInteger( p_filter, "quartztext-rel-fontsize" ));
 }
 
 static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniChar *psz_utf16_str,
