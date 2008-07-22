@@ -553,9 +553,6 @@
 
     }
 
-    /* update our info-panel to reflect the new item */
-    [[[VLCMain sharedInstance] getInfo] updatePanelWithItem:p_item->p_input];
-
     vlc_object_release( p_playlist );
 
 }
