@@ -315,7 +315,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( p_item->ppsz_list_text[i] != NULL) \
             [object addItemWithTitle: _NS( p_item->ppsz_list_text[i] )]; \
         else \
-            [object addItemWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i]]]; \
+            [object addItemWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i] ?: ""]]; \
     } \
     if( p_item->value.i < [object numberOfItems] ) \
         [object selectItemAtIndex: p_item->value.i]; \
@@ -347,7 +347,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         \
         if( module_IsCapable( p_parser, p_item->psz_type ) ) \
         { \
-            [object addItemWithTitle: [NSString stringWithUTF8String: module_GetLongName( p_parser )]]; \
+            [object addItemWithTitle: [NSString stringWithUTF8String: module_GetLongName( p_parser ) ?: ""]]; \
             \
             if( p_item->value.psz && !strcmp( p_item->value.psz, module_GetObjName( p_parser ) ) ) \
                 [object selectItem: [object lastItem]]; \
@@ -379,7 +379,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     SetupIntList( o_audio_dolby_pop, "force-dolby-surround" );
 
-    [o_audio_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "audio-language" )]];
+    [o_audio_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "audio-language" ) ?: ""]];
 
     [o_audio_headphone_ckb setState: config_GetInt( p_intf, "headphone-dolby" )];
     
@@ -393,8 +393,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     /* Last.FM is optional */
     if( module_Exists( p_intf, "audioscrobbler" ) )
     {
-        [o_audio_lastuser_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-username" )]];
-        [o_audio_lastpwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" )]];
+        [o_audio_lastuser_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-username" ) ?: ""]];
+        [o_audio_lastpwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" ) ?: ""]];
 
         if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
         {
@@ -440,15 +440,14 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_video_device_pop selectItemAtIndex: 0];
     [o_video_device_pop selectItemWithTag: config_GetInt( p_intf, "macosx-vdev" )];
 
-    if( config_GetPsz( p_intf, "snapshot-path" ) != NULL )
-        [o_video_snap_folder_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-path" )]];
-    [o_video_snap_prefix_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-prefix" )]];
+    [o_video_snap_folder_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-path" ) ?: ""]];
+    [o_video_snap_prefix_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-prefix" ) ?: ""]];
     [o_video_snap_seqnum_ckb setState: config_GetInt( p_intf, "snapshot-sequential" )];
     
     p_item = config_FindConfig( VLC_OBJECT(p_intf), "snapshot-format" );
     for( i = 0; p_item->ppsz_list[i] != nil; i++ )
     {
-        [o_video_snap_format_pop addItemWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i]]];
+        [o_video_snap_format_pop addItemWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i] ?: ""]];
         if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
             y = i;
     }
@@ -459,9 +458,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
      ***************************/
     [o_input_serverport_fld setIntValue: config_GetInt( p_intf, "server-port" )];
     if( config_GetPsz( p_intf, "http-proxy" ) != NULL )
-        [o_input_httpproxy_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy" )]];
+        [o_input_httpproxy_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy" ) ?: ""]];
     if( config_GetPsz( p_intf, "http-proxy" ) != NULL )
-        [o_input_httpproxypwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy-pwd" )]];
+        [o_input_httpproxypwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy-pwd" ) ?: ""]];
     [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "ffmpeg-pp-q" )];
 
     SetupIntList( o_input_avi_pop, "avi-index" );
@@ -547,9 +546,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     }
     [o_osd_encoding_pop selectItemAtIndex: y];
     
-    [o_osd_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "sub-language" )]];
+    [o_osd_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "sub-language" ) ?: ""]];
     if( config_GetPsz( p_intf, "freetype-font" ) != NULL )
-        [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "freetype-font" )]];
+        [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "freetype-font" ) ?: ""]];
 
     SetupIntList( o_osd_font_color_pop, "freetype-color" );
     SetupIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
