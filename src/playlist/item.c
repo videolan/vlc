@@ -610,7 +610,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
     {
         ChangeToNode( p_playlist, p_item );
         PL_UNLOCK_IF( !b_locked );
-        return NULL;
+        return p_item;
     }
 }
 
