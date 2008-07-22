@@ -1,7 +1,7 @@
 --[[
  $Id: $
 
- Copyright © 2007 the VideoLAN team
+ Copyright (c) 2007 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -37,12 +37,12 @@ function parse()
             -- vlc.msg.dbg( line )
             if string.match( line, "aVideos" ) then
                 if string.match( line, "CONTENT_ID.*=" ) then
-                    id = string.gsub( line, "^.*\"(.-)\".*$", "%1" )
+                    id = string.gsub( line, "^.*\"(.*)\".*$", "%1" )
                 elseif string.match( line, "CONTENT_VNC_TITRE" ) then
-                    arturl = string.gsub( line, "^.*src=\"(.-)\".*$", "%1" )
-                    name = string.gsub( line, "^.*alt=\"(.-)\".*$", "%1" )
+                    arturl = string.gsub( line, "^.*src=\"(.*)\".*$", "%1" )
+                    name = string.gsub( line, "^.*title=\"(.*)\".*$", "%1" )
                 elseif string.match( line, "CONTENT_VNC_DESCRIPTION" ) then
-                    description = string.gsub( line, "^.*\"(.-)\".*$", "%1" )
+                    description = string.gsub( line, "^.*\"(.*)\".*$", "%1" )
                 end
                 if id and string.match( line, "new Array" ) then
                     add_item( p, id, name, description, arturl )
@@ -62,12 +62,12 @@ function parse()
             local line = vlc.readline()
             if not line then break end
             --vlc.msg.dbg( line )
-            if string.match( line, "<hi>" ) then
+            if string.match( line, "<hi" ) then
                 local path = string.gsub( line, "^.*%[(.-)%].*$", "%1" )
-                vlc.msg.err("Path is: " .. tostring( path ) )
                 return { { path = path } }
             end
         end
+        vlc.msg.err( "canalplus: can't find video in page" )
     end
 end
 
