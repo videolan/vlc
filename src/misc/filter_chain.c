@@ -346,19 +346,32 @@ picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
     {
         filter_t *p_filter = pp_filter[i];
         picture_t *p_newpic = p_filter->pf_video_filter( p_filter, p_pic );
-        if( !p_newpic )
-            return NULL;
+
         /* FIXME Ugly hack to make it work in picture core.
          * FIXME Remove this code when the picture release API has been
          * FIXME cleaned up (a git revert of the commit should work) */
         if( p_chain->p_this->i_object_type == VLC_OBJECT_VOUT )
         {
+            vout_thread_t *p_vout = (vout_thread_t*)p_chain->p_this;
+
+            vlc_mutex_lock( &p_vout->picture_lock );
             if( p_pic->i_refcount )
+            {
                 p_pic->i_status = DISPLAYED_PICTURE;
+            }
             else
+            {
                 p_pic->i_status = DESTROYED_PICTURE;
-            p_newpic->i_status = READY_PICTURE;
+                p_vout->i_heap_size--;
+            }
+            vlc_mutex_unlock( &p_vout->picture_lock );
+
+            if( p_newpic )
+                p_newpic->i_status = READY_PICTURE;
         }
+        if( !p_newpic )
+            return NULL;
+
         p_pic = p_newpic;
     }
     return p_pic;
