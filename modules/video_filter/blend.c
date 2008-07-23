@@ -312,6 +312,15 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
 /***********************************************************************
  * Utils
  ***********************************************************************/
+static inline uint8_t vlc_uint8( int v )
+{
+    if( v > 255 )
+        return 255;
+    else if( v < 0 )
+        return 0;
+    return v;
+}
+
 static inline void yuv_to_rgb( int *r, int *g, int *b,
                                uint8_t y1, uint8_t u1, uint8_t v1 )
 {
@@ -319,7 +328,6 @@ static inline void yuv_to_rgb( int *r, int *g, int *b,
 #   define SCALEBITS 10
 #   define ONE_HALF  (1 << (SCALEBITS - 1))
 #   define FIX(x)    ((int) ((x) * (1<<SCALEBITS) + 0.5))
-#   define CLAMP( x ) (((x) > 255) ? 255 : ((x) < 0) ? 0 : (x));
 
     int y, cb, cr, r_add, g_add, b_add;
 
@@ -330,9 +338,12 @@ static inline void yuv_to_rgb( int *r, int *g, int *b,
             - FIX(0.71414*255.0/224.0) * cr + ONE_HALF;
     b_add = FIX(1.77200*255.0/224.0) * cb + ONE_HALF;
     y = (y1 - 16) * FIX(255.0/219.0);
-    *r = CLAMP((y + r_add) >> SCALEBITS);
-    *g = CLAMP((y + g_add) >> SCALEBITS);
-    *b = CLAMP((y + b_add) >> SCALEBITS);
+    *r = vlc_uint8( (y + r_add) >> SCALEBITS );
+    *g = vlc_uint8( (y + g_add) >> SCALEBITS );
+    *b = vlc_uint8( (y + b_add) >> SCALEBITS );
+#undef FIX
+#undef ONE_HALF
+#undef SCALEBITS
 }
 
 static inline void rgb_to_yuv( uint8_t *y, uint8_t *u, uint8_t *v,
