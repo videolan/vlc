@@ -473,22 +473,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             }
             break;
         case VLC_VAR_ADDCHOICE:
-            /* FIXME: the list is sorted, dude. Use something cleverer. */
-            for( i = p_var->choices.i_count ; i-- ; )
-            {
-                if( p_var->pf_cmp( p_var->choices.p_values[i], *p_val ) < 0 )
-                {
-                    break;
-                }
-            }
-
-            /* The new place is i+1 */
-            i++;
-
-            if( p_var->i_default >= i )
-            {
-                p_var->i_default++;
-            }
+            i = p_var->choices.i_count;
 
             INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
                          i, *p_val );
@@ -502,7 +487,6 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_DELCHOICE:
-            /* FIXME: the list is sorted, dude. Use something cleverer. */
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
                 if( p_var->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
