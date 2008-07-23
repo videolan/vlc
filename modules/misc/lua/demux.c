@@ -276,7 +276,7 @@ static int Demux( demux_t *p_demux )
         msg_Err( p_demux, "Script went completely foobar" );
 
     vlc_object_release( p_input_thread );
-    pl_Release( p_playlist );
+    vlclua_release_playlist_internal( p_playlist );
 
     return -1; /* Needed for correct operation of go back */
 }

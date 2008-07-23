@@ -207,6 +207,7 @@ static int vlclua_get_playlist( lua_State *L )
         vlclua_push_vlc_object( L, p_playlist, vlclua_gc_release );
     }
     else lua_pushnil( L );
+    //vlclua_release_playlist_internal( p_playlist );
     return 1;
 }
 

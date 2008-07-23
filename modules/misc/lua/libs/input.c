@@ -49,15 +49,18 @@
 input_thread_t * vlclua_get_input_internal( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    vlc_object_lock( p_playlist );
     input_thread_t *p_input = p_playlist->p_input;
     if( p_input ) vlc_object_yield( p_input );
-    pl_Release( p_playlist );
+    vlc_object_unlock( p_playlist );
+    vlclua_release_playlist_internal( p_playlist );
     return p_input;
 }
 
 static int vlclua_input_info( lua_State *L )
 {
     input_thread_t * p_input = vlclua_get_input_internal( L );
+    vlc_object_lock( p_input );
     int i_cat;
     int i;
     if( !p_input ) return vlclua_error( L );
@@ -80,7 +83,8 @@ static int vlclua_input_info( lua_State *L )
         }
         lua_settable( L, -3 );
     }
-    //vlc_object_release( p_input );
+    vlc_object_unlock( p_input );
+    vlc_object_release( p_input );
     return 1;
 }
 
