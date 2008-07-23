@@ -283,6 +283,22 @@ static int ProcessHeaders( decoder_t *p_dec )
     }
 
     /* Set output properties */
+    switch( p_sys->ti.pixelformat )
+    {
+      case OC_PF_420:
+        p_dec->fmt_out.i_codec = VLC_FOURCC( 'I','4','2','0' );
+        break;
+      case OC_PF_422:
+        p_dec->fmt_out.i_codec = VLC_FOURCC( 'I','4','2','2' );
+        break;
+      case OC_PF_444:
+        p_dec->fmt_out.i_codec = VLC_FOURCC( 'I','4','4','4' );
+        break;
+      case OC_PF_RSVD:
+      default:
+        msg_Err( p_dec, "unknown chroma in theora sample" );
+        break;
+    }
     p_dec->fmt_out.video.i_width = p_sys->ti.width;
     p_dec->fmt_out.video.i_height = p_sys->ti.height;
     if( p_sys->ti.frame_width && p_sys->ti.frame_height )
