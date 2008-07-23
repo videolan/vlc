@@ -287,8 +287,8 @@ static int ProcessHeaders( decoder_t *p_dec )
     p_dec->fmt_out.video.i_height = p_sys->ti.height;
     if( p_sys->ti.frame_width && p_sys->ti.frame_height )
     {
-        p_dec->fmt_out.video.i_width = p_sys->ti.frame_width;
-        p_dec->fmt_out.video.i_height = p_sys->ti.frame_height;
+        p_dec->fmt_out.video.i_visible_width = p_sys->ti.frame_width;
+        p_dec->fmt_out.video.i_visible_height = p_sys->ti.frame_height;
     }
 
     if( p_sys->ti.aspect_denominator && p_sys->ti.aspect_numerator )
