@@ -118,7 +118,7 @@ local vout = input and vlc.object.find(input,'vout','child')
   <information>
   <?vlc
     if input then
-      local info = vlc.input_info()
+      local info = vlc.input.info()
       for k, v in pairs(info) do
         print("<category name='"..k.."'>")
           for k2, v2 in pairs(v) do
