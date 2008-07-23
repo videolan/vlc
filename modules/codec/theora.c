@@ -305,6 +305,11 @@ static int ProcessHeaders( decoder_t *p_dec )
     {
         p_dec->fmt_out.video.i_visible_width = p_sys->ti.frame_width;
         p_dec->fmt_out.video.i_visible_height = p_sys->ti.frame_height;
+        if( p_sys->ti.offset_x || p_sys->ti.offset_y )
+        {
+            p_dec->fmt_out.video.i_x_offset = p_sys->ti.offset_x;
+            p_dec->fmt_out.video.i_y_offset = p_sys->ti.offset_y;
+        }
     }
 
     if( p_sys->ti.aspect_denominator && p_sys->ti.aspect_numerator )
@@ -554,30 +559,19 @@ static void CloseDecoder( vlc_object_t *p_this )
 static void theora_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
                                 yuv_buffer *yuv )
 {
-    int i_plane, i_line, i_width, i_dst_stride, i_src_stride;
-    int i_src_xoffset, i_src_yoffset;
+    int i_plane, i_line, i_dst_stride, i_src_stride;
     uint8_t *p_dst, *p_src;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
         p_dst = p_pic->p[i_plane].p_pixels;
         p_src = i_plane ? (i_plane - 1 ? yuv->v : yuv->u ) : yuv->y;
-        i_width = p_pic->p[i_plane].i_visible_pitch;
         i_dst_stride  = p_pic->p[i_plane].i_pitch;
         i_src_stride  = i_plane ? yuv->uv_stride : yuv->y_stride;
-        i_src_xoffset = p_dec->p_sys->ti.offset_x;
-        i_src_yoffset = p_dec->p_sys->ti.offset_y;
-        if( i_plane )
-        {
-            i_src_xoffset /= 2;
-            i_src_yoffset /= 2;
-        }
 
-        p_src += (i_src_yoffset * i_src_stride + i_src_xoffset);
-
-        for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
+        for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
         {
-            vlc_memcpy( p_dst, p_src + i_src_xoffset,
+            vlc_memcpy( p_dst, p_src,
                         i_plane ? yuv->uv_width : yuv->y_width );
             p_src += i_src_stride;
             p_dst += i_dst_stride;
