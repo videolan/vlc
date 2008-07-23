@@ -186,7 +186,6 @@ void MetaPanel::update( input_item_t *p_item )
 
     /* Name / Title */
     psz_meta = input_item_GetTitle( p_item );
-    psz_meta = input_item_GetTitle( p_item );
     char *psz_name = input_item_GetName( p_item );
     if( !EMPTY_STR( psz_meta ) )
         title_text->setText( qfu( psz_meta ) );
