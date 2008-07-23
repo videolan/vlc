@@ -346,7 +346,7 @@ void DialogsProvider::simpleMLAppendDialog()
  **/
 static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 {
-    QString dir = QFileDialog::getExistingDirectory( 0, qtr(I_OP_OPDIR) );
+    QString dir = QFileDialog::getExistingDirectory( 0, qtr("Open Directory") );
     if (!dir.isEmpty()) {
         input_item_t *p_input = input_ItemNewExt( THEPL,
                                         qtu( "directory://" + dir ), NULL,
