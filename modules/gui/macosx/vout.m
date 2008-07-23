@@ -860,7 +860,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     /* Dooh, why do we spend processor time doing this kind of stuff? */
     [super manage];
     unsigned int i_mouse_hide_timeout =
-        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
+        var_CreateGetInteger(p_vout, "mouse-hide-timeout") * 1000;
 
     if( i_mouse_hide_timeout < 100000 )
         i_mouse_hide_timeout = 100000;
@@ -944,7 +944,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         [o_window setAcceptsMouseMovedEvents: TRUE];
 
-        if( var_GetBool( p_real_vout, "video-on-top" ) )
+        if( var_CreateGetBool( p_real_vout, "video-on-top" ) )
         {
             [o_window setLevel: NSStatusWindowLevel];
         }
