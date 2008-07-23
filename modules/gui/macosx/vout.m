@@ -1114,17 +1114,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     screen = [NSScreen screenWithDisplayID: (CGDirectDisplayID)i_device];
     if( !screen ) screen = [self screen];
 
-    if( b_black && [[NSScreen screens] count] > 1)
-    {
-        CGDisplayFadeReservationToken token;
-        CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
-        CGDisplayFade( token, 0.2 , kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
-
+    if( b_black )
         [screen blackoutOtherScreens];
-
-        CGDisplayFade( token, 0.1 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
-        CGReleaseDisplayFadeReservation( token);
-    }
 
     [self setMovableByWindowBackground: NO];
 
