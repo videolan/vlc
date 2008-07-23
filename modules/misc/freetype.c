@@ -494,13 +494,22 @@ static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder )
     vlc_mutex_t *lock = var_AcquireMutex( "fontbuilder" );
     if( p_fontbuilder )
     {
+        const bool b_alive = vlc_object_alive( p_fontbuilder );
+
         var_DelCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
 
         /* We wait for the thread on the first FontBuilderDetach */
-        if( vlc_object_alive( p_fontbuilder ) )
+        if( b_alive )
         {
             vlc_object_kill( p_fontbuilder );
+            vlc_mutex_unlock( lock );
+
+            /* We need to unlock otherwise we may not join (the thread waiting
+             * for the lock). It is safe to unlock as no one else will try a
+             * join and we have a reference on the object) */
             vlc_thread_join( p_fontbuilder );
+
+            vlc_mutex_lock( lock );
         }
         vlc_object_release( p_fontbuilder );
     }
