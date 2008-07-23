@@ -246,8 +246,8 @@ static int vlclua_playlist_get( lua_State *L )
         p_item = playlist_ItemGetById( p_playlist, i_id, true );
         if( !p_item )
         {
-            vlclua_release_playlist_internal( p_playlist );
             vlc_object_unlock( p_playlist );
+            vlclua_release_playlist_internal( p_playlist );
             return 0; /* Should we return an error instead? */
         }
     }
