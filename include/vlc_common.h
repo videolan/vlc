@@ -621,9 +621,7 @@ VLC_EXPORT( char const *, vlc_error, ( int ) );
 #include <vlc_arrays.h>
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
- * MSB, and should be used for both network communications and files. Note that
- * byte orders other than little and big endians are not supported, but only
- * the VAX seems to have such exotic properties. */
+ * MSB, and should be used for both network communications and files. */
 static inline uint16_t U16_AT( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
