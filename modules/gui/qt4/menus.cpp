@@ -327,9 +327,9 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
         "Ctrl+X" );
     addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", "", SLOT( saveAPlaylist() ),
         "Ctrl+Y" );
-    menu->addSeparator();
+    /*menu->addSeparator();
     menu->addAction( qtr( "Undock from Interface" ), mi,
-                     SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );
+                     SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );*/
     return menu;
 }
 
