@@ -521,6 +521,9 @@ a52dec-$(A52DEC_VERSION).tar.gz:
 
 a52dec: a52dec-$(A52DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_ARM_LINUX
+	(cd $@ ; patch -p0 < ../Patches/liba52-fixed.diff)
+endif
 
 .a52: a52dec
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd liba52 && make && make install && cd ../include && make && make install)
