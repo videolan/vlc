@@ -1235,6 +1235,9 @@ static void aout_del_buffer( decoder_t *p_dec, aout_buffer_t *p_buffer )
                           p_dec->p_owner->p_aout_input, p_buffer );
 }
 
+
+int vout_CountPictureAvailable( vout_thread_t *p_vout );
+
 static picture_t *vout_new_buffer( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
@@ -1317,14 +1320,25 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             p_sys->p_vout->render.i_bmask = p_sys->video.i_bmask;
     }
 
-    /* Get a new picture */
-    while( !(p_pic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) ) )
+    /* Get a new picture
+     */
+    for( p_pic = NULL; ; )
     {
         int i_pic, i_ready_pic = 0;
 
         if( p_dec->b_die || p_dec->b_error )
-        {
             return NULL;
+
+        /* The video filter chain required that there is always 1 free buffer
+         * that it will use as temporary one. It will release the temporary
+         * buffer once its work is done, so this check is safe even if we don't
+         * lock around both count() and create().
+         */
+        if( vout_CountPictureAvailable( p_sys->p_vout ) >= 2 )
+        {
+            p_pic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 );
+            if( p_pic )
+                break;
         }
 
 #define p_pic p_dec->p_owner->p_vout->render.pp_picture[i_pic]

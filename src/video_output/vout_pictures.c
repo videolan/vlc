@@ -106,6 +106,35 @@ void vout_DatePicture( vout_thread_t *p_vout,
  * It needs locking since several pictures can be created by several producers
  * threads.
  */
+int vout_CountPictureAvailable( vout_thread_t *p_vout )
+{
+    int i_free = 0;
+    int i_pic;
+
+    vlc_mutex_lock( &p_vout->picture_lock );
+    for( i_pic = 0; i_pic < I_RENDERPICTURES; i_pic++ )
+    {
+        picture_t *p_pic = PP_RENDERPICTURE[(p_vout->render.i_last_used_pic + i_pic + 1) % I_RENDERPICTURES];
+
+        switch( p_pic->i_status )
+        {
+            case DESTROYED_PICTURE:
+                i_free++;
+                break;
+
+            case FREE_PICTURE:
+                i_free++;
+                break;
+
+            default:
+                break;
+        }
+    }
+    vlc_mutex_unlock( &p_vout->picture_lock );
+
+    return i_free;
+}
+
 picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                                bool b_progressive,
                                bool b_top_field_first,

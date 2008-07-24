@@ -660,8 +660,13 @@ VLC_EXPORT( void,            vout_DatePicture,    ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );
+
+/* DO NOT use vout_RenderPicture unless you are in src/video_ouput */
 picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
+
+/* DO NOT use vout_CountPictureAvailable unless your are in src/input/dec.c (no exception) */
+int vout_CountPictureAvailable( vout_thread_t * );
 
 VLC_EXPORT( int, vout_vaControlDefault, ( vout_thread_t *, int, va_list ) );
 VLC_EXPORT( void *, vout_RequestWindow, ( vout_thread_t *, int *, int *, unsigned int *, unsigned int * ) );
