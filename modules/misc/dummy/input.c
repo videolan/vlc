@@ -1,5 +1,5 @@
 /*****************************************************************************
- * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
+ * input_dummy.c: dummy input plugin, to manage "vlc://***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 the VideoLAN team
  * $Id$
@@ -154,7 +154,7 @@ int OpenDemux ( vlc_object_t *p_this )
     p_demux->pf_control = DemuxControl;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
 
-    /* Check for a "vlc:nop" command */
+    /* Check for a "vlc://nop" command */
     if( i_len == 3 && !strncasecmp( psz_name, "nop", 3 ) )
     {
         msg_Info( p_demux, "command `nop'" );
@@ -162,7 +162,7 @@ int OpenDemux ( vlc_object_t *p_this )
         return VLC_SUCCESS;
     }
 
-    /* Check for a "vlc:quit" command */
+    /* Check for a "vlc://quit" command */
     if( i_len == 4 && !strncasecmp( psz_name, "quit", 4 ) )
     {
         msg_Info( p_demux, "command `quit'" );
@@ -170,7 +170,7 @@ int OpenDemux ( vlc_object_t *p_this )
         return VLC_SUCCESS;
     }
 
-    /* Check for a "vlc:pause:***" command */
+    /* Check for a "vlc://pause:***" command */
     if( i_len > 6 && !strncasecmp( psz_name, "pause:", 6 ) )
     {
         i_arg = atoi( psz_name + 6 );
