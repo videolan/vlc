@@ -657,7 +657,7 @@ static void SpuRenderRegion( spu_t *p_spu,
                              const int pi_scale_height[SCALE_SIZE],
                              const video_format_t *p_fmt )
 {
-    video_format_t orig_fmt;
+    video_format_t fmt_original;
     bool b_rerender_text;
     int i_fade_alpha;
     int i_x_offset;
@@ -666,7 +666,9 @@ static void SpuRenderRegion( spu_t *p_spu,
     int i_inv_scale_x;
     int i_inv_scale_y;
 
-    orig_fmt = p_region->fmt;
+    vlc_assert_locked( &p_spu->subpicture_lock );
+
+    fmt_original = p_region->fmt;
     b_rerender_text = false;
     if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
     {
@@ -707,7 +709,8 @@ static void SpuRenderRegion( spu_t *p_spu,
 
     if( p_spu->p_scale &&
         ( ( pi_scale_width[i_scale_idx]  > 0 && pi_scale_width[i_scale_idx]  != 1000 ) ||
-          ( pi_scale_height[i_scale_idx] > 0 && pi_scale_height[i_scale_idx] != 1000 ) ) )
+          ( pi_scale_height[i_scale_idx] > 0 && pi_scale_height[i_scale_idx] != 1000 ) ||
+          p_spu->b_force_palette ) )
     {
         const int i_dst_width  = p_region->fmt.i_width  * pi_scale_width[i_scale_idx] / 1000;
         const int i_dst_height = p_region->fmt.i_height * pi_scale_height[i_scale_idx] / 1000;
@@ -716,7 +719,8 @@ static void SpuRenderRegion( spu_t *p_spu,
         if( p_region->p_cache )
         {
             if( p_region->p_cache->fmt.i_width  != i_dst_width ||
-                p_region->p_cache->fmt.i_height != i_dst_height )
+                p_region->p_cache->fmt.i_height != i_dst_height ||
+                p_spu->b_force_palette )
             {
                 p_subpic->pf_destroy_region( VLC_OBJECT(p_spu),
                                              p_region->p_cache );
@@ -769,7 +773,10 @@ static void SpuRenderRegion( spu_t *p_spu,
 
         /* And use the scaled picture */
         if( p_region->p_cache )
+        {
             p_region = p_region->p_cache;
+            fmt_original = p_region->fmt;
+        }
     }
 
     if( p_region->i_align & SUBPICTURE_ALIGN_BOTTOM )
@@ -907,9 +914,14 @@ exit:
          */
         p_region->picture.pf_release( &p_region->picture );
         memset( &p_region->picture, 0, sizeof( picture_t ) );
-        p_region->fmt = orig_fmt;
+        p_region->fmt = fmt_original;
         p_region->i_align &= ~SUBPICTURE_RENDERED;
     }
+    else if( p_spu->b_force_crop )
+    {
+        p_region->fmt = fmt_original;
+    }
+
 }
 
 void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
@@ -1322,10 +1334,16 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
 {
     vlc_value_t val;
 
+    vlc_mutex_lock( &p_spu->subpicture_lock );
+
     p_spu->b_force_palette = false;
     p_spu->b_force_crop = false;
 
-    if( var_Get( p_object, "highlight", &val ) || !val.b_bool ) return;
+    if( var_Get( p_object, "highlight", &val ) || !val.b_bool )
+    {
+        vlc_mutex_unlock( &p_spu->subpicture_lock );
+        return;
+    }
 
     p_spu->b_force_crop = true;
     var_Get( p_object, "x-start", &val );
@@ -1342,6 +1360,7 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
         memcpy( p_spu->palette, val.p_address, 16 );
         p_spu->b_force_palette = true;
     }
+    vlc_mutex_unlock( &p_spu->subpicture_lock );
 
     msg_Dbg( p_object, "crop: %i,%i,%i,%i, palette forced: %i",
              p_spu->i_crop_x, p_spu->i_crop_y,
