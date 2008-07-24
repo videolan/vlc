@@ -188,7 +188,7 @@ VLC_EXPORT(void, vlc_pthread_fatal, (const char *action, int error, const char *
     if (val) \
         vlc_pthread_fatal (action, val, psz_file, i_line)
 #else
-# define VLC_THREAD_ASSERT (void)0
+# define VLC_THREAD_ASSERT ((void)(val))
 #endif
 
 static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
