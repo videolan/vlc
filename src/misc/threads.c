@@ -622,6 +622,17 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
+    if( !p_priv->b_thread )
+    {
+#ifndef __APPLE__
+        msg_Err( p_this, "couldn't set priority of non-existent thread" );
+        return ESRCH;
+#else
+# warning FIXME: this is wrong
+        p_priv->b_thread = pthread_self();
+#endif
+    }
+
 #if defined( LIBVLC_USE_PTHREAD )
 # ifndef __APPLE__
     if( config_GetInt( p_this, "rt-priority" ) > 0 )
@@ -643,10 +654,8 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
             param.sched_priority = i_priority;
             i_policy = SCHED_RR;
         }
-        if( !p_priv->thread_id )
-            p_priv->thread_id = pthread_self();
         if( (i_error = pthread_setschedparam( p_priv->thread_id,
-                                               i_policy, &param )) )
+                                              i_policy, &param )) )
         {
             errno = i_error;
             msg_Warn( p_this, "couldn't set thread priority (%s:%d): %m",
@@ -658,8 +667,6 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 #elif defined( WIN32 ) || defined( UNDER_CE )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( !p_priv->thread_id )
-        p_priv->thread_id = GetCurrentThread();
     if( !SetThreadPriority(p_priv->thread_id, i_priority) )
     {
         msg_Warn( p_this, "couldn't set a faster priority" );
