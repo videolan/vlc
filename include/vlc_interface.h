@@ -50,7 +50,9 @@ struct intf_thread_t
     VLC_COMMON_MEMBERS
 
     /* Thread properties and locks */
+#ifdef __APPLE__
     bool          b_should_run_on_first_thread;
+#endif
 
     /* Specific interfaces */
     intf_console_t *    p_console;                               /** console */
