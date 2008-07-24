@@ -55,7 +55,7 @@ struct shout_item_t
 #define endItem( ) { NULL, NULL, { NULL }, NULL }
 #define item( title, url ) { url, title, { NULL }, NULL }
 #define itemWithOption( title, url, option ) { url, title, { option, NULL }, NULL }
-#define itemWithChildren( title, children ) { "vlc:skip", title, { NULL }, children }
+#define itemWithChildren( title, children ) { "vlc://nop", title, { NULL }, children }
 
 /* WARN: We support only two levels */
 
