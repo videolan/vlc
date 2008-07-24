@@ -468,7 +468,7 @@ Section "Start Menu Shortcut" SEC02a
   CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to OpenGL.lnk" \
     "$INSTDIR\vlc.exe" "--vout opengl --overlay --save-config vlc://quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Reset VLC media player preferences and cache files.lnk" \
-    "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache --save-config --no-qt-privacy-ask vlc://quit"
+    "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache vlc://quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Documentation.lnk" \
     "$INSTDIR\Documentation.url"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Release Notes.lnk" \
