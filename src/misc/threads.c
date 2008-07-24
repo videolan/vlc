@@ -549,34 +549,30 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     pthread_attr_destroy (&attr);
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-    {
-        /* When using the MSVCRT C library you have to use the _beginthreadex
-         * function instead of CreateThread, otherwise you'll end up with
-         * memory leaks and the signal functions not working (see Microsoft
-         * Knowledge Base, article 104641) */
+    /* When using the MSVCRT C library you have to use the _beginthreadex
+     * function instead of CreateThread, otherwise you'll end up with
+     * memory leaks and the signal functions not working (see Microsoft
+     * Knowledge Base, article 104641) */
 #if defined( UNDER_CE )
-        HANDLE hThread = CreateThread( NULL, 0, thread_entry,
-                                       (LPVOID)boot, CREATE_SUSPENDED,
-                                        NULL );
+    HANDLE hThread = CreateThread( NULL, 0, thread_entry,
+                                  (LPVOID)boot, CREATE_SUSPENDED, NULL );
 #else
-        HANDLE hThread = (HANDLE)(uintptr_t)
-            _beginthreadex( NULL, 0, thread_entry, boot,
-                            CREATE_SUSPENDED, NULL );
+    HANDLE hThread = (HANDLE)(uintptr_t)
+        _beginthreadex( NULL, 0, thread_entry, boot, CREATE_SUSPENDED, NULL );
 #endif
-        p_priv->thread_id = hThread;
-        ResumeThread(hThread);
-    }
-
-    i_ret = ( p_priv->thread_id ? 0 : errno );
-
-    if( !i_ret && i_priority )
+    if( hThread )
     {
-        if( !SetThreadPriority(p_priv->thread_id, i_priority) )
+        p_priv->thread_id = hThread;
+        ResumeThread (hThread);
+        i_ret = 0;
+        if( i_priority && !SetThreadPriority (hThread, i_priority) )
         {
             msg_Warn( p_this, "couldn't set a faster priority" );
             i_priority = 0;
         }
     }
+    else
+        i_ret = errno;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_priv->thread_id = spawn_thread( (thread_func)thread_entry, psz_name,
