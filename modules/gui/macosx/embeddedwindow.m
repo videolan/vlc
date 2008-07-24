@@ -601,6 +601,24 @@
 {
     struct args { NSRect frame; BOOL display; BOOL animate; } * args = (struct args*)[packedargs bytes];
 
-    [super setFrame: args->frame display: args->display animate:args->animate];
+    if( args->animate )
+    {
+        /* Make sure we don't block too long and set up a non blocking animation */
+        NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:
+            self, NSViewAnimationTargetKey,
+            [NSValue valueWithRect:[self frame]], NSViewAnimationStartFrameKey,
+            [NSValue valueWithRect:args->frame], NSViewAnimationEndFrameKey, nil];
+
+        NSViewAnimation * anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict, nil]];
+
+        [anim setAnimationBlockingMode: NSAnimationNonblocking];
+        [anim setDuration: 0.4];
+        [anim setFrameRate: 30];
+        [anim startAnimation];
+    }
+    else {
+        [super setFrame:args->frame display:args->display animate:args->animate];
+    }
+
 }
 @end
