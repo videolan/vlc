@@ -929,6 +929,7 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
         vlc_mutex_t *p_mutex = val.p_address;
         dvdnav_highlight_area_t hl;
         int32_t i_button;
+        bool    b_button_ok;
 
         if( dvdnav_get_current_highlight( p_sys->dvdnav, &i_button )
             != DVDNAV_STATUS_OK )
@@ -937,18 +938,20 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
             return;
         }
 
+        b_button_ok = false;
         if( i_button > 0 && i_title ==  0 )
         {
-            int i;
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            dvdnav_get_highlight_area( pci, i_button, b_mode, &hl );
-
+            b_button_ok = dvdnav_get_highlight_area( pci, i_button, b_mode, &hl ) == DVDNAV_STATUS_OK;
+        }
+        if( b_button_ok )
+        {
+            int i;
             for( i = 0; i < 4; i++ )
             {
                 uint32_t i_yuv = p_sys->clut[(hl.palette>>(16+i*4))&0x0f];
-                uint8_t i_alpha = (hl.palette>>(i*4))&0x0f;
-                i_alpha = i_alpha == 0xf ? 0xff : i_alpha << 4;
+                uint8_t i_alpha = ( (hl.palette>>(i*4))&0x0f ) * 0xff / 0xf;
 
                 p_sys->palette[i][0] = (i_yuv >> 16) & 0xff;
                 p_sys->palette[i][1] = (i_yuv >> 0) & 0xff;
