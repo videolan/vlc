@@ -269,12 +269,11 @@ void ItemInfoDialog::OnOk()
     vlc_mutex_lock( &p_item->input.lock );
     bool b_old_enabled = p_item->b_enabled;
 
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist != NULL )
     {
         b_state = SendMessage( enabled_checkbox, BM_GETCHECK, 0, 0 );
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
     }
 
     p_item->b_enabled = (b_state & BST_CHECKED) ? true : false ;

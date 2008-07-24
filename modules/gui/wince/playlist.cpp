@@ -288,8 +288,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
         // random, loop, repeat buttons states
         vlc_value_t val;
-        p_playlist = (playlist_t *)
-            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_playlist = pl_Yield( p_intf );
         if( !p_playlist ) break;
 
         var_Get( p_playlist , "random", &val );
@@ -304,7 +303,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         bState = val.b_bool ? TBSTATE_CHECKED : 0;
         SendMessage( hwndTB, TB_SETSTATE, Repeat_Event,
                      MAKELONG(bState | TBSTATE_ENABLED, 0) );
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
 
         GetClientRect( hwnd, &rect );
         hListView = CreateWindow( WC_LISTVIEW, NULL, WS_VISIBLE | WS_CHILD |
@@ -517,13 +516,12 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
         return CDRF_NOTIFYITEMDRAW;
 
     case CDDS_ITEMPREPAINT: //Before an item is drawn
-        playlist_t *p_playlist = (playlist_t *)
-            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        playlist_t *p_playlist = pl_Yield( p_intf );
         if( p_playlist == NULL ) return CDRF_DODEFAULT;
         if( (int)lplvcd->nmcd.dwItemSpec == p_playlist->i_index )
         {
             lplvcd->clrText = RGB(255,0,0);
-            vlc_object_release(p_playlist);
+            pl_Release( p_playlist );
             return CDRF_NEWFONT;
         }
  
@@ -531,15 +529,16 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
                                         (int)lplvcd->nmcd.dwItemSpec );
         if( !p_item )
         {
-            vlc_object_release(p_playlist);
+            pl_Release( p_playlist );
             return CDRF_DODEFAULT;
         }
         if( p_item->b_enabled == false )
         {
             lplvcd->clrText = RGB(192,192,192);
-            vlc_object_release(p_playlist);
+            pl_Release( p_playlist );
             return CDRF_NEWFONT;
         }
+        pl_Release( p_playlist );
     }
 
     return CDRF_DODEFAULT;
@@ -589,8 +588,7 @@ void Playlist::UpdatePlaylist()
         b_need_update = false;
     }
  
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
  
     /* Update the colour of items */
@@ -606,7 +604,7 @@ void Playlist::UpdatePlaylist()
     }
     vlc_object_unlock( p_playlist );
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 /**********************************************************************
@@ -614,8 +612,7 @@ void Playlist::UpdatePlaylist()
  **********************************************************************/
 void Playlist::Rebuild()
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     int i_focused =
@@ -648,7 +645,7 @@ void Playlist::Rebuild()
         ListView_SetItemState( hListView, i_focused, LVIS_FOCUSED,
                                LVIS_STATEIMAGEMASK );
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 /**********************************************************************
@@ -656,8 +653,7 @@ void Playlist::Rebuild()
  **********************************************************************/
 void Playlist::UpdateItem( int i )
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
 
     if( p_playlist == NULL ) return;
 
@@ -665,7 +661,7 @@ void Playlist::UpdateItem( int i )
 
     if( !p_item )
     {
-        vlc_object_release(p_playlist);
+        pl_Release(p_playlist);
         return;
     }
 
@@ -681,7 +677,7 @@ void Playlist::UpdateItem( int i )
 
     ListView_SetItemText( hListView, i, 3, _FROMMB(psz_duration) );
 
-    vlc_object_release(p_playlist);
+    pl_Release(p_playlist);
 }
 
 /**********************************************************************
@@ -689,14 +685,13 @@ void Playlist::UpdateItem( int i )
  **********************************************************************/
 void Playlist::DeleteItem( int item )
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Delete( p_playlist, item );
     ListView_DeleteItem( hListView, item );
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 /**********************************************************************
@@ -708,15 +703,13 @@ static void OnOpenCB( intf_dialog_args_t *p_arg )
 
     if( p_arg->i_results && p_arg->psz_results[0] )
     {
-        playlist_t * p_playlist = (playlist_t *)
-            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
 
         if( p_playlist )
         {
             playlist_Import( p_playlist, p_arg->psz_results[0] );
+            pl_Release( p_playlist );
         }
-
-        if( p_playlist ) vlc_object_release( p_playlist );
     }
 }
 
@@ -742,8 +735,7 @@ static void OnSaveCB( intf_dialog_args_t *p_arg )
 
     if( p_arg->i_results && p_arg->psz_results[0] )
     {
-        playlist_t * p_playlist = (playlist_t *)
-            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
 
         if( p_playlist )
         {
@@ -755,9 +747,8 @@ static void OnSaveCB( intf_dialog_args_t *p_arg )
             else psz_export = "export-m3u";
 
             playlist_Export( p_playlist, p_arg->psz_results[0], psz_export );
+            pl_Release( p_playlist );
         }
-
-        if( p_playlist ) vlc_object_release( p_playlist );
     }
 }
 
@@ -809,8 +800,7 @@ void Playlist::OnInvertSelection()
 
 void Playlist::OnEnableSelection()
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     for( long item = ListView_GetItemCount( hListView ) - 1;
@@ -824,13 +814,12 @@ void Playlist::OnEnableSelection()
             UpdateItem( item );
         }
     }
-    vlc_object_release( p_playlist);
+    pl_Release( p_playlist);
 }
 
 void Playlist::OnDisableSelection()
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     for( long item = ListView_GetItemCount( hListView ) - 1;
@@ -845,7 +834,7 @@ void Playlist::OnDisableSelection()
             UpdateItem( item );
         }
     }
-    vlc_object_release( p_playlist);
+    pl_Release( p_playlist);
 }
 
 void Playlist::OnSelectAll()
@@ -859,19 +848,17 @@ void Playlist::OnSelectAll()
 
 void Playlist::OnActivateItem( int i_item )
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Goto( p_playlist, i_item );
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Playlist::ShowInfos( HWND hwnd, int i_item )
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     vlc_object_lock( p_playlist);
@@ -887,7 +874,7 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
         delete iteminfo_dialog;
     }
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 /********************************************************************
@@ -895,8 +882,7 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
  ********************************************************************/
 void Playlist::OnUp()
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     /* We use the first selected item, so find it */
@@ -917,15 +903,14 @@ void Playlist::OnUp()
                                    LVIS_STATEIMAGEMASK );
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 
     return;
 }
 
 void Playlist::OnDown()
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     /* We use the first selected item, so find it */
@@ -938,7 +923,7 @@ void Playlist::OnDown()
         ListView_SetItemState( hListView, i_item + 1, LVIS_FOCUSED,
                                LVIS_STATEIMAGEMASK );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 
     return;
 }
@@ -952,12 +937,11 @@ void Playlist::OnRandom()
     int bState = SendMessage( hwndTB, TB_GETSTATE, Random_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "random", val );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Playlist::OnLoop ()
@@ -966,12 +950,11 @@ void Playlist::OnLoop ()
     int bState = SendMessage( hwndTB, TB_GETSTATE, Loop_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "loop", val );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Playlist::OnRepeat ()
@@ -980,12 +963,11 @@ void Playlist::OnRepeat ()
     int bState = SendMessage( hwndTB, TB_GETSTATE, Repeat_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "repeat", val );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 /********************************************************************
@@ -993,8 +975,7 @@ void Playlist::OnRepeat ()
  ********************************************************************/
 void Playlist::OnSort( UINT event )
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     switch( event )
@@ -1016,7 +997,7 @@ void Playlist::OnSort( UINT event )
         break;
     }
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 
     b_need_update = true;
 
@@ -1025,8 +1006,7 @@ void Playlist::OnSort( UINT event )
 
 void Playlist::OnColSelect( int iSubItem )
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     switch( iSubItem )
@@ -1059,7 +1039,7 @@ void Playlist::OnColSelect( int iSubItem )
         break;
     }
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 
     b_need_update = true;
 
@@ -1074,8 +1054,7 @@ void Playlist::OnPopupPlay()
     int i_popup_item =
         ListView_GetNextItem( hListView, -1, LVIS_SELECTED | LVNI_ALL );
 
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     if( i_popup_item != -1 )
@@ -1083,7 +1062,7 @@ void Playlist::OnPopupPlay()
         playlist_Goto( p_playlist, i_popup_item );
     }
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Playlist::OnPopupDel()
@@ -1099,8 +1078,7 @@ void Playlist::OnPopupEna()
     int i_popup_item =
         ListView_GetNextItem( hListView, -1, LVIS_SELECTED | LVNI_ALL );
 
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_item_t *p_item =
@@ -1116,7 +1094,7 @@ void Playlist::OnPopupEna()
         playlist_Enable( p_playlist, p_item );
     }
 
-    vlc_object_release( p_playlist);
+    pl_Release( p_playlist);
     UpdateItem( i_popup_item );
 }
 

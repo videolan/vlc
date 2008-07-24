@@ -609,9 +609,7 @@ void OpenDialog::OnOk()
     ComboBox_SetCurSel( mrl_combo, ComboBox_GetCount( mrl_combo ) - 1 );
 
     /* Update the playlist */
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     for( int i = 0; i < i_args; i++ )
@@ -657,7 +655,7 @@ void OpenDialog::OnOk()
         free( pp_args[i_args] );
         if( !i_args ) free( pp_args );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 /*****************************************************************************

@@ -203,8 +203,7 @@ InterfaceWindow::InterfaceWindow( intf_thread_t * _p_intf, BRect frame,
       fLastUpdateTime( system_time() ),
       fSettings( new BMessage( 'sett' ) )
 {
-    p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    p_playlist = pl_Yield( p_intf );
 
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, this );
@@ -355,7 +354,7 @@ InterfaceWindow::~InterfaceWindow()
     }
     if( p_playlist )
     {
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
     }
 #if 0
     if( fPlaylistWindow )

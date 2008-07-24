@@ -221,15 +221,13 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
     }
     else
     {
-        playlist_t * p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
         if( p_playlist && p_playlist->i_size )
         {
             AppendMenu( hmenu, MF_SEPARATOR, 0, _T("") );
             AppendMenu( hmenu, MF_STRING, PlayStream_Event, _T("Play") );
         }
-        if( p_playlist ) vlc_object_release( p_playlist );
+        if( p_playlist ) pl_Release( p_playlist );
     }
 
     AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)MiscMenu( p_intf ),

@@ -637,8 +637,7 @@ void Interface::OnShowDialog( int i_dialog_event )
 
 void Interface::OnPlayStream( void )
 {
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     if( p_playlist->i_size )
@@ -653,7 +652,7 @@ void Interface::OnPlayStream( void )
             /* No stream was playing, start one */
             playlist_Play( p_playlist );
             TogglePlayButton( PLAYING_S );
-            vlc_object_release( p_playlist );
+            pl_Release( p_playlist );
             return;
         }
 
@@ -673,14 +672,13 @@ void Interface::OnPlayStream( void )
 
         TogglePlayButton( state.i_int );
         vlc_object_release( p_input );
-        vlc_object_release( p_playlist );
     }
     else
     {
         /* If the playlist is empty, open a file requester instead */
-        vlc_object_release( p_playlist );
         OnShowDialog( ID_FILE_QUICKOPEN );
     }
+    pl_Release( p_playlist );
 }
 
 void Interface::TogglePlayButton( int i_playing_status )
@@ -812,33 +810,30 @@ void Interface::VolumeUpdate()
 
 void Interface::OnStopStream( void )
 {
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Stop( p_playlist );
     TogglePlayButton( PAUSE_S );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Interface::OnPrevStream( void )
 {
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Prev( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Interface::OnNextStream( void )
 {
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Next( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void Interface::OnSlowStream( void )

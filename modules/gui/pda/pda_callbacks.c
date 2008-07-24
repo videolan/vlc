@@ -94,8 +94,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
     int           i_id , i_pos=0;
     GtkTreeView   *p_tvplaylist = NULL;
 
-    p_playlist = (playlist_t *)
-             vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    p_playlist = pl_Yield( p_intf );
 
     if( p_playlist ==  NULL)
     {   /* Bail out when VLC's playlist object is not found. */
@@ -147,7 +146,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
             free(ppsz_options);
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 void PlaylistRebuildListStore( intf_thread_t *p_intf,
@@ -379,7 +378,7 @@ void onPause(GtkButton *button, gpointer user_data)
 void onPlay(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET( button ) );
-    playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
 
     if (p_playlist)
     {
@@ -394,19 +393,18 @@ void onPlay(GtkButton *button, gpointer user_data)
         {
             vlc_object_unlock( p_playlist );
         }
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
     }
 }
 
 void onStop(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET( button ) );
-    playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if (p_playlist)
     {
         playlist_Stop( p_playlist );
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
         gdk_window_raise( p_intf->p_sys->p_window->window );
     }
 }
@@ -773,8 +771,7 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET(treeview) );
     GtkTreeSelection *p_selection = gtk_tree_view_get_selection(treeview);
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
     if( p_playlist == NULL )
     {
@@ -805,15 +802,14 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
         i_skip = i_row - p_playlist->i_current_index;
         playlist_Skip( p_playlist, i_skip );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 
 void onUpdatePlaylist(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *  p_intf = GtkGetIntf( button );
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     GtkTreeView *p_tvplaylist = NULL;
 
     if( p_playlist == NULL )
@@ -838,7 +834,7 @@ void onUpdatePlaylist(GtkButton *button, gpointer user_data)
             g_object_unref(p_model);
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 static void deleteItemFromPlaylist(gpointer data, gpointer user_data)
@@ -849,8 +845,7 @@ static void deleteItemFromPlaylist(gpointer data, gpointer user_data)
 void onDeletePlaylist(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     GtkTreeView    *p_tvplaylist;
 
     /* Delete an arbitrary item from the playlist */
@@ -912,15 +907,14 @@ void onDeletePlaylist(GtkButton *button, gpointer user_data)
             g_object_unref(p_store);
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 
 
 void onClearPlaylist(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     GtkTreeView    *p_tvplaylist;
     int item;
 
@@ -933,7 +927,7 @@ void onClearPlaylist(GtkButton *button, gpointer user_data)
     {
         msg_Err( p_playlist, "fix pda delete" );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 
     // Remove all entries from the Playlist widget.
     p_tvplaylist = (GtkTreeView*) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
@@ -1045,7 +1039,7 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
     }
 
     /* Update the playlist */
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
     /* Get all the options. */

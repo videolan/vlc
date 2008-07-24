@@ -690,13 +690,11 @@ PlaylistView::MouseDown( BPoint where )
                 // only do something if user clicked the same item twice
                 if ( fLastClickedItem == item )
                 {
-                    playlist_t * p_playlist;
-                    p_playlist = (playlist_t *) vlc_object_find( p_intf,
-                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+                    playlist_t * p_playlist = pl_Yield( p_intf );
                     if( p_playlist )
                     {
                         playlist_Goto( p_playlist, i );
-                        vlc_object_release( p_playlist );
+                        pl_Release( p_playlist );
                     }
                     handled = true;
                 }
@@ -1079,9 +1077,7 @@ PlaylistView::SetDisplayMode( uint32 mode )
 BListItem*
 PlaylistView::_PlayingItem() const
 {
-    playlist_t * p_playlist;
-    p_playlist = (playlist_t *) vlc_object_find( p_intf,
-        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
     if( !p_playlist )
     {
@@ -1089,7 +1085,7 @@ PlaylistView::_PlayingItem() const
     }
 
     BListItem * item = ItemAt( p_playlist->i_index );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
     return item;
 }
 
@@ -1103,9 +1099,7 @@ PlaylistView::_SetPlayingIndex( BListItem* playingItem )
     {
         if ( item == playingItem )
         {
-            playlist_t * p_playlist;
-            p_playlist = (playlist_t *) vlc_object_find( p_intf,
-                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+            playlist_t * p_playlist = pl_Yield( p_intf );
  
             if( !p_playlist )
             {
@@ -1115,7 +1109,7 @@ PlaylistView::_SetPlayingIndex( BListItem* playingItem )
             playlist_Goto( p_playlist, i );
             SetCurrent( i );
 
-            vlc_object_release( p_playlist );
+            pl_Release( p_playlist );
             break;
         }
     }

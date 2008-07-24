@@ -291,11 +291,10 @@ PlayListWindow::UpdatePlaylist( bool rebuild )
     if( rebuild )
         fListView->RebuildList();
 
-    p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    p_playlist = pl_Yield( p_intf );
     fListView->SetCurrent( p_playlist->i_index );
     fListView->SetPlaying( p_playlist->status.i_status == PLAYLIST_RUNNING );
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 
     _CheckItemsEnableState();
 }
