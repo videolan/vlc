@@ -591,7 +591,7 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 
         if( !strcmp( *ppsz_name, "podcast" ) )
         {
-            QAction *b = new QAction( qfu( "Configure podcasts..." ), menu );
+            QAction *b = new QAction( qtr( "Configure podcasts..." ), menu );
             //b->setEnabled( a->isChecked() );
             menu->addAction( b );
             CONNECT( b, triggered(), THEDP, podcastConfigureDialog() );
