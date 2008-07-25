@@ -137,7 +137,7 @@ static void ObjectKillChildrens( vlc_object_t *p_obj )
 
 void services_discovery_Stop ( services_discovery_t * p_sd )
 {
-    ObjectKillChildrens( p_sd );
+    ObjectKillChildrens( VLC_OBJECT(p_sd) );
     if( p_sd->pf_run ) vlc_thread_join( p_sd );
 
     module_Unneed( p_sd, p_sd->p_module );
