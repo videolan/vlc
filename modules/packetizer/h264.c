@@ -765,25 +765,31 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         i_tmp = bs_read( &s, 1 );
         if( i_tmp )
         {
-            static const struct { int w, h; } sar[14] =
+            static const struct { int w, h; } sar[17] =
             {
                 { 0,   0 }, { 1,   1 }, { 12, 11 }, { 10, 11 },
                 { 16, 11 }, { 40, 33 }, { 24, 11 }, { 20, 11 },
                 { 32, 11 }, { 80, 33 }, { 18, 11 }, { 15, 11 },
-                { 64, 33 }, { 160,99 },
+                { 64, 33 }, { 160,99 }, {  4,  3 }, {  3,  2 },
+                {  2,  1 },
             };
             int i_sar = bs_read( &s, 8 );
             int w, h;
 
-            if( i_sar < 14 )
+            if( i_sar < 17 )
             {
                 w = sar[i_sar].w;
                 h = sar[i_sar].h;
             }
-            else
+            else if( i_sar == 255 )
             {
                 w = bs_read( &s, 16 );
                 h = bs_read( &s, 16 );
+            }
+            else
+            {
+                w = 0;
+                h = 0;
             }
             if( h != 0 )
                 p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * w /
