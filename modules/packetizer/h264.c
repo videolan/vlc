@@ -148,7 +148,7 @@ enum nal_priority_e
 
 static block_t *ParseNALBlock( decoder_t *, block_t * );
 
-static block_t *CreateAnnexbNAL( decoder_t *, uint8_t *p, int );
+static block_t *CreateAnnexbNAL( decoder_t *, const uint8_t *p, int );
 
 static block_t *OutputPicture( decoder_t *p_dec );
 static void PutSPS( decoder_t *p_dec, block_t *p_frag );
@@ -496,7 +496,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 /****************************************************************************
  * Helpers
  ****************************************************************************/
-static block_t *CreateAnnexbNAL( decoder_t *p_dec, uint8_t *p, int i_size )
+static block_t *CreateAnnexbNAL( decoder_t *p_dec, const uint8_t *p, int i_size )
 {
     block_t *p_nal;
 
@@ -517,9 +517,9 @@ static block_t *CreateAnnexbNAL( decoder_t *p_dec, uint8_t *p, int i_size )
 }
 
 static void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
-                             uint8_t *src, int i_src )
+                              const uint8_t *src, int i_src )
 {
-    uint8_t *end = &src[i_src];
+    const uint8_t *end = &src[i_src];
     uint8_t *dst = malloc( i_src );
 
     *pp_ret = dst;
@@ -631,6 +631,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     {
         if( p_sys->b_slice )
             p_pic = OutputPicture( p_dec );
+
+        /* TODO parse SEI for CC support */
     }
 
     /* Append the block */
