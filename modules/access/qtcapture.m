@@ -328,7 +328,6 @@ static void Close( vlc_object_t *p_this )
     if( vlc_object_alive(p_this->p_libvlc))
     {
         [p_sys->session stopRunning];
-        [p_sys->device release];
         [p_sys->output release];
         [p_sys->session release];
     }
