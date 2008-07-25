@@ -232,8 +232,6 @@ static int Open( vlc_object_t *p_this )
             block_t *p_sps = nal_get_annexeb( p_dec, p, i_length );
             if( !p_sps )
                 return VLC_EGENERIC;
-            p_sys->p_sps = block_Duplicate( p_sps );
-            p_sps->i_pts = p_sps->i_dts = mdate();
             ParseNALBlock( p_dec, p_sps );
             p += i_length;
         }
@@ -250,13 +248,14 @@ static int Open( vlc_object_t *p_this )
             block_t *p_pps = nal_get_annexeb( p_dec, p, i_length );
             if( !p_pps )
                 return VLC_EGENERIC;
-            p_sys->p_pps = block_Duplicate( p_pps );
-            p_pps->i_pts = p_pps->i_dts = mdate();
             ParseNALBlock( p_dec, p_pps );
             p += i_length;
         }
         msg_Dbg( p_dec, "avcC length size=%d, sps=%d, pps=%d",
                  p_sys->i_avcC_length_size, i_sps, i_pps );
+
+        if( !p_sys->p_sps || p_sys->p_pps )
+            return VLC_EGENERIC;
 
         /* FIXME: FFMPEG isn't happy at all if you leave this */
         if( p_dec->fmt_out.i_extra > 0 ) free( p_dec->fmt_out.p_extra );
