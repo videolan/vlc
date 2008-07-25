@@ -510,6 +510,7 @@ static void vout_Destructor( vlc_object_t * p_this )
  *****************************************************************************/
 static int ChromaCreate( vout_thread_t *p_vout );
 static void ChromaDestroy( vout_thread_t *p_vout );
+static void DropPicture( vout_thread_t *p_vout, picture_t *p_picture );
 
 static int InitThread( vout_thread_t *p_vout )
 {
@@ -744,7 +745,7 @@ static void RunThread( vout_thread_t *p_vout)
      * Main loop - it is not executed if an error occurred during
      * initialization
      */
-    while( (vlc_object_alive( p_vout )) && (!p_vout->b_error) )
+    while( vlc_object_alive( p_vout ) && !p_vout->b_error )
     {
         /* Initialize loop variables */
         p_picture = NULL;
@@ -752,24 +753,24 @@ static void RunThread( vout_thread_t *p_vout)
         current_date = mdate();
 
         i_loops++;
-            if( !p_input )
-            {
-                p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
-                                           FIND_PARENT );
-            }
-            if( p_input )
-            {
-                vlc_mutex_lock( &p_input->p->counters.counters_lock );
-                stats_UpdateInteger( p_vout, p_input->p->counters.p_lost_pictures,
-                                     i_lost , NULL);
-                stats_UpdateInteger( p_vout,
-                                     p_input->p->counters.p_displayed_pictures,
-                                     i_displayed , NULL);
-                i_displayed = i_lost = 0;
-                vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-                vlc_object_release( p_input );
-                p_input = NULL;
-            }
+        if( !p_input )
+        {
+            p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
+                                       FIND_PARENT );
+        }
+        if( p_input )
+        {
+            vlc_mutex_lock( &p_input->p->counters.counters_lock );
+            stats_UpdateInteger( p_vout, p_input->p->counters.p_lost_pictures,
+                                 i_lost , NULL);
+            stats_UpdateInteger( p_vout,
+                                 p_input->p->counters.p_displayed_pictures,
+                                 i_displayed , NULL);
+            i_displayed = i_lost = 0;
+            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+            vlc_object_release( p_input );
+            p_input = NULL;
+        }
 #if 0
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
@@ -816,17 +817,7 @@ static void RunThread( vout_thread_t *p_vout)
             /* If we found better than the last picture, destroy it */
             if( p_last_picture && p_picture != p_last_picture )
             {
-                vlc_mutex_lock( &p_vout->picture_lock );
-                if( p_last_picture->i_refcount )
-                {
-                    p_last_picture->i_status = DISPLAYED_PICTURE;
-                }
-                else
-                {
-                    p_last_picture->i_status = DESTROYED_PICTURE;
-                    p_vout->i_heap_size--;
-                }
-                vlc_mutex_unlock( &p_vout->picture_lock );
+                DropPicture( p_vout, p_last_picture );
                 p_last_picture = NULL;
             }
 
@@ -841,24 +832,10 @@ static void RunThread( vout_thread_t *p_vout)
             {
                 /* Picture is late: it will be destroyed and the thread
                  * will directly choose the next picture */
-                vlc_mutex_lock( &p_vout->picture_lock );
-                if( p_picture->i_refcount )
-                {
-                    /* Pretend we displayed the picture, but don't destroy
-                     * it since the decoder might still need it. */
-                    p_picture->i_status = DISPLAYED_PICTURE;
-                }
-                else
-                {
-                    /* Destroy the picture without displaying it */
-                    p_picture->i_status = DESTROYED_PICTURE;
-                    p_vout->i_heap_size--;
-                }
+                DropPicture( p_vout, p_picture );
+                i_lost++;
                 msg_Warn( p_vout, "late picture skipped (%"PRId64")",
                                   current_date - display_date );
-                i_lost++;
-                vlc_mutex_unlock( &p_vout->picture_lock );
-
                 continue;
             }
 
@@ -866,25 +843,11 @@ static void RunThread( vout_thread_t *p_vout)
                 current_date + p_vout->i_pts_delay + VOUT_BOGUS_DELAY )
             {
                 /* Picture is waaay too early: it will be destroyed */
-                vlc_mutex_lock( &p_vout->picture_lock );
-                if( p_picture->i_refcount )
-                {
-                    /* Pretend we displayed the picture, but don't destroy
-                     * it since the decoder might still need it. */
-                    p_picture->i_status = DISPLAYED_PICTURE;
-                }
-                else
-                {
-                    /* Destroy the picture without displaying it */
-                    p_picture->i_status = DESTROYED_PICTURE;
-                    p_vout->i_heap_size--;
-                }
+                DropPicture( p_vout, p_picture );
                 i_lost++;
                 msg_Warn( p_vout, "vout warning: early picture skipped "
                           "(%"PRId64")", display_date - current_date
                           - p_vout->i_pts_delay );
-                vlc_mutex_unlock( &p_vout->picture_lock );
-
                 continue;
             }
 
@@ -1297,6 +1260,24 @@ static void ChromaDestroy( vout_thread_t *p_vout )
     module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
     vlc_object_release( p_vout->p_chroma );
     p_vout->p_chroma = NULL;
+}
+
+static void DropPicture( vout_thread_t *p_vout, picture_t *p_picture )
+{
+    vlc_mutex_lock( &p_vout->picture_lock );
+    if( p_picture->i_refcount )
+    {
+        /* Pretend we displayed the picture, but don't destroy
+         * it since the decoder might still need it. */
+        p_picture->i_status = DISPLAYED_PICTURE;
+    }
+    else
+    {
+        /* Destroy the picture without displaying it */
+        p_picture->i_status = DESTROYED_PICTURE;
+        p_vout->i_heap_size--;
+    }
+    vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
 
