@@ -867,7 +867,7 @@ package-win32-base-exe: package-win32-base
 	if makensis -VERSION >/dev/null 2>&1; then \
 	    MAKENSIS="makensis"; \
 	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
-	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis)"; \
+	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis"; \
 	elif [ -x "$(PROGRAMFILES)/NSIS/makensis" ]; then \
 	    MAKENSIS="$(PROGRAMFILES)/NSIS/makensis"; \
 	elif wine --version >/dev/null 2>&1; then \
