@@ -503,6 +503,7 @@ static block_t *nal_get_annexeb( decoder_t *p_dec, uint8_t *p, int i_size )
     /* Copy nalu */
     memcpy( &p_nal->p_buffer[4], p, i_size );
 
+    VLC_UNUSED(p_dec);
     return p_nal;
 }
 
@@ -555,6 +556,39 @@ static inline int bs_read_se( bs_t *s )
  * ParseNALBlock: parses annexB type NALs
  * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode
  *****************************************************************************/
+static block_t *OutputPicture( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_pic;
+
+    if( !p_sys->b_header && p_sys->slice.i_frame_type != BLOCK_FLAG_TYPE_I)
+        return NULL;
+
+    if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I && p_sys->p_sps && p_sys->p_pps )
+    {
+        block_t *p_sps = block_Duplicate( p_sys->p_sps );
+        block_t *p_pps = block_Duplicate( p_sys->p_pps );
+        p_sps->i_dts = p_sys->p_frame->i_dts;
+        p_sps->i_pts = p_sys->p_frame->i_pts;
+        block_ChainAppend( &p_sps, p_pps );
+        block_ChainAppend( &p_sps, p_sys->p_frame );
+        p_sys->b_header = true;
+        p_pic = block_ChainGather( p_sps );
+    }
+    else
+    {
+        p_pic = block_ChainGather( p_sys->p_frame );
+    }
+    p_pic->i_length = 0;    /* FIXME */
+    p_pic->i_flags |= p_sys->slice.i_frame_type;
+
+    p_sys->slice.i_frame_type = 0;
+    p_sys->p_frame = NULL;
+    p_sys->b_slice = false;
+
+    return p_pic;
+}
+
 static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -562,32 +596,6 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
     const int i_nal_ref_idc = (p_frag->p_buffer[4] >> 5)&0x03;
     const int i_nal_type = p_frag->p_buffer[4]&0x1f;
-
-#define OUTPUT \
-    do {                                                      \
-        if( !p_sys->b_header && p_sys->slice.i_frame_type != BLOCK_FLAG_TYPE_I) \
-            break;                                            \
-                                                              \
-        if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I && p_sys->p_sps && p_sys->p_pps ) \
-        { \
-            block_t *p_sps = block_Duplicate( p_sys->p_sps ); \
-            block_t *p_pps = block_Duplicate( p_sys->p_pps ); \
-            p_sps->i_dts = p_sys->p_frame->i_dts;           \
-            p_sps->i_pts = p_sys->p_frame->i_pts;           \
-            block_ChainAppend( &p_sps, p_pps );               \
-            block_ChainAppend( &p_sps, p_sys->p_frame );      \
-            p_sys->b_header = true;                       \
-            p_pic = block_ChainGather( p_sps );               \
-        } else { \
-            p_pic = block_ChainGather( p_sys->p_frame ); \
-        } \
-        p_pic->i_length = 0;    /* FIXME */                   \
-        p_pic->i_flags |= p_sys->slice.i_frame_type;          \
-            \
-        p_sys->slice.i_frame_type = 0;                        \
-        p_sys->p_frame = NULL;                                \
-        p_sys->b_slice = false;                           \
-    } while(0)
 
     if( p_sys->b_slice && ( !p_sys->b_sps || !p_sys->b_pps ) )
     {
@@ -712,7 +720,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->slice = slice;
 
         if( b_pic && p_sys->b_slice )
-            OUTPUT;
+            p_pic = OutputPicture( p_dec );
 
         p_sys->b_slice = true;
 
@@ -839,7 +847,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         free( dec );
 
-        if( p_sys->b_slice ) OUTPUT;
+        if( p_sys->b_slice )
+            p_pic = OutputPicture( p_dec );
 
         /* We have a new SPS */
         if( p_sys->p_sps ) block_Release( p_sys->p_sps );
@@ -863,7 +872,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         /* TODO */
 
-        if( p_sys->b_slice ) OUTPUT;
+        if( p_sys->b_slice )
+            p_pic = OutputPicture( p_dec );
 
         /* We have a new PPS */
         if( p_sys->p_pps ) block_Release( p_sys->p_pps );
@@ -876,10 +886,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
              i_nal_type == NAL_SEI ||
              ( i_nal_type >= 13 && i_nal_type <= 18 ) )
     {
-        if( p_sys->b_slice ) OUTPUT;
+        if( p_sys->b_slice )
+            p_pic = OutputPicture( p_dec );
     }
-
-#undef OUTPUT
 
     /* Append the block */
     block_ChainAppend( &p_sys->p_frame, p_frag );
