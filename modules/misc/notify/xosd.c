@@ -220,7 +220,7 @@ static void Run( intf_thread_t *p_intf )
 
             if( playlist_IsEmpty( p_playlist ) )
             {
-                pl_Release( p_playlist );
+                pl_Release( p_intf );
                 continue;
             }
             free( psz_display );
@@ -228,19 +228,19 @@ static void Run( intf_thread_t *p_intf )
             if( p_playlist->status.i_status == PLAYLIST_STOPPED )
             {
                 psz_display = strdup(_("Stop"));
-                pl_Release( p_playlist );
+                pl_Release( p_intf );
             }
             else if( p_playlist->status.i_status == PLAYLIST_PAUSED )
             {
                 psz_display = strdup(_("Pause"));
-                pl_Release( p_playlist );
+                pl_Release( p_intf );
             }
             else
             {
                 p_item = p_playlist->status.p_item;
                 p_input = p_item->p_input;
 
-                pl_Release( p_playlist );
+                pl_Release( p_intf );
                 if( !p_item )
                     continue;
 

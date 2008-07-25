@@ -694,7 +694,7 @@ PlaylistView::MouseDown( BPoint where )
                     if( p_playlist )
                     {
                         playlist_Goto( p_playlist, i );
-                        pl_Release( p_playlist );
+                        pl_Release( p_intf );
                     }
                     handled = true;
                 }
@@ -1085,7 +1085,7 @@ PlaylistView::_PlayingItem() const
     }
 
     BListItem * item = ItemAt( p_playlist->i_index );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
     return item;
 }
 
@@ -1109,7 +1109,7 @@ PlaylistView::_SetPlayingIndex( BListItem* playingItem )
             playlist_Goto( p_playlist, i );
             SetCurrent( i );
 
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
             break;
         }
     }

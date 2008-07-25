@@ -291,7 +291,7 @@ void MetaPanel::saveMeta()
     if( p_mod )
         module_Unneed( p_playlist, p_mod );
     PL_UNLOCK;
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     /* Reset the status of the mode. No need to emit any signal because parent
        is the only caller */

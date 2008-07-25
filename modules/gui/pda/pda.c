@@ -296,7 +296,7 @@ static void Run( intf_thread_t *p_intf )
     PlaylistRebuildListStore(p_intf,p_playlist_store, p_playlist);
     gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist), GTK_TREE_MODEL(p_playlist_store));
     g_object_unref(p_playlist_store);
-    pl_Release(p_playlist); /* Free the playlist */
+    pl_Release( p_intf ); /* Free the playlist */
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist)),GTK_SELECTION_MULTIPLE);
 
     /* Column properties */
@@ -436,7 +436,7 @@ static int Manage( intf_thread_t *p_intf )
                 PlaylistRebuildListStore(p_intf, p_liststore, p_playlist);
                 gtk_tree_view_set_model(p_intf->p_sys->p_tvplaylist, (GtkTreeModel*) p_liststore);
                 g_object_unref(p_liststore);
-                pl_Release( p_playlist );
+                pl_Release( p_intf );
             }
 
             /* Manage the slider */

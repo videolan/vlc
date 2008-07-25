@@ -309,7 +309,7 @@ static int Open( vlc_object_t *p_this )
         if( psz_file_name &&
             asprintf( &psz_txt, "path=%s", psz_file_name ) == -1 )
             {
-                pl_Release( p_playlist );
+                pl_Release( p_access );
                 free( psz_uri );
                 return VLC_ENOMEM;
             }
@@ -323,7 +323,7 @@ static int Open( vlc_object_t *p_this )
 
         if( p_sys->p_bonjour == NULL )
             msg_Err( p_access, "unable to start requested Bonjour announce" );
-        pl_Release( p_playlist );
+        pl_Release( p_access );
     }
     else
         p_sys->p_bonjour = NULL;

@@ -303,7 +303,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         bState = val.b_bool ? TBSTATE_CHECKED : 0;
         SendMessage( hwndTB, TB_SETSTATE, Repeat_Event,
                      MAKELONG(bState | TBSTATE_ENABLED, 0) );
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
 
         GetClientRect( hwnd, &rect );
         hListView = CreateWindow( WC_LISTVIEW, NULL, WS_VISIBLE | WS_CHILD |
@@ -521,7 +521,7 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
         if( (int)lplvcd->nmcd.dwItemSpec == p_playlist->i_index )
         {
             lplvcd->clrText = RGB(255,0,0);
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
             return CDRF_NEWFONT;
         }
  
@@ -529,16 +529,16 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
                                         (int)lplvcd->nmcd.dwItemSpec );
         if( !p_item )
         {
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
             return CDRF_DODEFAULT;
         }
         if( p_item->b_enabled == false )
         {
             lplvcd->clrText = RGB(192,192,192);
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
             return CDRF_NEWFONT;
         }
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
     }
 
     return CDRF_DODEFAULT;
@@ -604,7 +604,7 @@ void Playlist::UpdatePlaylist()
     }
     vlc_object_unlock( p_playlist );
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /**********************************************************************
@@ -645,7 +645,7 @@ void Playlist::Rebuild()
         ListView_SetItemState( hListView, i_focused, LVIS_FOCUSED,
                                LVIS_STATEIMAGEMASK );
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /**********************************************************************
@@ -661,7 +661,7 @@ void Playlist::UpdateItem( int i )
 
     if( !p_item )
     {
-        pl_Release(p_playlist);
+        pl_Release( p_intf );
         return;
     }
 
@@ -677,7 +677,7 @@ void Playlist::UpdateItem( int i )
 
     ListView_SetItemText( hListView, i, 3, _FROMMB(psz_duration) );
 
-    pl_Release(p_playlist);
+    pl_Release( p_intf );
 }
 
 /**********************************************************************
@@ -691,7 +691,7 @@ void Playlist::DeleteItem( int item )
     playlist_Delete( p_playlist, item );
     ListView_DeleteItem( hListView, item );
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /**********************************************************************
@@ -708,7 +708,7 @@ static void OnOpenCB( intf_dialog_args_t *p_arg )
         if( p_playlist )
         {
             playlist_Import( p_playlist, p_arg->psz_results[0] );
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
         }
     }
 }
@@ -747,7 +747,7 @@ static void OnSaveCB( intf_dialog_args_t *p_arg )
             else psz_export = "export-m3u";
 
             playlist_Export( p_playlist, p_arg->psz_results[0], psz_export );
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
         }
     }
 }
@@ -814,7 +814,7 @@ void Playlist::OnEnableSelection()
             UpdateItem( item );
         }
     }
-    pl_Release( p_playlist);
+    pl_Release( p_intf );
 }
 
 void Playlist::OnDisableSelection()
@@ -834,7 +834,7 @@ void Playlist::OnDisableSelection()
             UpdateItem( item );
         }
     }
-    pl_Release( p_playlist);
+    pl_Release( p_intf );
 }
 
 void Playlist::OnSelectAll()
@@ -853,7 +853,7 @@ void Playlist::OnActivateItem( int i_item )
 
     playlist_Goto( p_playlist, i_item );
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Playlist::ShowInfos( HWND hwnd, int i_item )
@@ -874,7 +874,7 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
         delete iteminfo_dialog;
     }
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /********************************************************************
@@ -903,7 +903,7 @@ void Playlist::OnUp()
                                    LVIS_STATEIMAGEMASK );
         }
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     return;
 }
@@ -923,7 +923,7 @@ void Playlist::OnDown()
         ListView_SetItemState( hListView, i_item + 1, LVIS_FOCUSED,
                                LVIS_STATEIMAGEMASK );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     return;
 }
@@ -941,7 +941,7 @@ void Playlist::OnRandom()
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "random", val );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Playlist::OnLoop ()
@@ -954,7 +954,7 @@ void Playlist::OnLoop ()
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "loop", val );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Playlist::OnRepeat ()
@@ -967,7 +967,7 @@ void Playlist::OnRepeat ()
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "repeat", val );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /********************************************************************
@@ -997,7 +997,7 @@ void Playlist::OnSort( UINT event )
         break;
     }
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     b_need_update = true;
 
@@ -1039,7 +1039,7 @@ void Playlist::OnColSelect( int iSubItem )
         break;
     }
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     b_need_update = true;
 
@@ -1062,7 +1062,7 @@ void Playlist::OnPopupPlay()
         playlist_Goto( p_playlist, i_popup_item );
     }
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Playlist::OnPopupDel()
@@ -1094,7 +1094,7 @@ void Playlist::OnPopupEna()
         playlist_Enable( p_playlist, p_item );
     }
 
-    pl_Release( p_playlist);
+    pl_Release( p_intf );
     UpdateItem( i_popup_item );
 }
 

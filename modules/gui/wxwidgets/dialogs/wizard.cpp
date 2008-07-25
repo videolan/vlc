@@ -599,7 +599,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
         {
             input_radios[1]->Disable();
         }
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
     }
     else
     {
@@ -727,7 +727,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
                 }
                 else
                     event.Veto();
-                pl_Release( p_playlist );
+                pl_Release( p_intf );
             }
             else
                 event.Veto();
@@ -1633,7 +1633,7 @@ void WizardDialog::Run()
             playlist_AddInput( p_playlist, p_input,
                                PLAYLIST_GO, PLAYLIST_END, true, pl_Unlocked );
             vlc_gc_decref( p_input );
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
         }
         else
         {

@@ -655,7 +655,7 @@ void OpenDialog::OnOk()
         free( pp_args[i_args] );
         if( !i_args ) free( pp_args );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /*****************************************************************************

@@ -162,7 +162,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     playlist_t *p_playlist = pl_Yield( p_this );
 
     p_input = p_playlist->p_input;
-    pl_Release( p_playlist );
+    pl_Release( p_this );
 
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_yield( p_input );

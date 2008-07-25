@@ -269,7 +269,7 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf, ArrayOfInts &ri_objects,
             popupmenu.InsertSeparator( 0 ); \
             popupmenu.Insert( 0, Play_Event, wxU(_("Play")) ); \
         } \
-        if( p_playlist ) pl_Release( p_playlist ); \
+        if( p_playlist ) pl_Release( p_intf ); \
     } \
     \
     popupmenu.Append( MenuDummy_Event, wxU(_("Miscellaneous")), \
@@ -296,7 +296,7 @@ void VideoPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         }
         vlc_object_release( p_input );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
     CREATE_POPUP;
 }
 
@@ -318,7 +318,7 @@ void AudioPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         }
         vlc_object_release( p_input );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
     CREATE_POPUP;
 }
 
@@ -347,7 +347,7 @@ void MiscPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     p_intf->p_sys->p_popup_menu = &popupmenu;
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
     p_intf->p_sys->p_popup_menu = NULL;
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
@@ -403,7 +403,7 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     p_intf->p_sys->p_popup_menu = &popupmenu;
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
     p_intf->p_sys->p_popup_menu = NULL;
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /*****************************************************************************
@@ -967,7 +967,7 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
             playlist_Next( p_playlist );
             break;
         }
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
 

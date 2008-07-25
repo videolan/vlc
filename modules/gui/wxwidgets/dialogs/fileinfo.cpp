@@ -101,7 +101,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     if( p_playlist )
     {
         var_AddCallback( p_playlist, "item-change", ItemChanged, this );
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
     }
 
     last_update = 0L;
@@ -124,10 +124,10 @@ void FileInfo::Update()
         advanced_info->Clear();
         if( b_stats )
             stats_info->Clear();
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     vlc_object_yield( p_input );
     vlc_mutex_lock( &input_GetItem(p_input)->lock );
@@ -143,7 +143,7 @@ void FileInfo::Update()
     vlc_mutex_unlock( &input_GetItem(p_input)->lock );
 
     vlc_object_release(p_input);
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
     b_need_update = false;
     panel_sizer->Layout();
 

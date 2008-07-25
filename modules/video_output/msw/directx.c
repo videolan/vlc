@@ -2131,7 +2131,7 @@ static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
              * restarted */
             var_Create( p_playlist, "directx-wallpaper", VLC_VAR_BOOL );
             var_Set( p_playlist, "directx-wallpaper", newval );
-            pl_Release( p_playlist );
+            pl_Release( p_vout );
         }
 
         p_vout->p_sys->i_changes |= DX_WALLPAPER_CHANGE;

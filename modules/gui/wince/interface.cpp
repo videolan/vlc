@@ -652,7 +652,7 @@ void Interface::OnPlayStream( void )
             /* No stream was playing, start one */
             playlist_Play( p_playlist );
             TogglePlayButton( PLAYING_S );
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
             return;
         }
 
@@ -678,7 +678,7 @@ void Interface::OnPlayStream( void )
         /* If the playlist is empty, open a file requester instead */
         OnShowDialog( ID_FILE_QUICKOPEN );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Interface::TogglePlayButton( int i_playing_status )
@@ -815,7 +815,7 @@ void Interface::OnStopStream( void )
 
     playlist_Stop( p_playlist );
     TogglePlayButton( PAUSE_S );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Interface::OnPrevStream( void )
@@ -824,7 +824,7 @@ void Interface::OnPrevStream( void )
     if( p_playlist == NULL ) return;
 
     playlist_Prev( p_playlist );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Interface::OnNextStream( void )
@@ -833,7 +833,7 @@ void Interface::OnNextStream( void )
     if( p_playlist == NULL ) return;
 
     playlist_Next( p_playlist );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Interface::OnSlowStream( void )

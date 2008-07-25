@@ -227,7 +227,7 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
             AppendMenu( hmenu, MF_SEPARATOR, 0, _T("") );
             AppendMenu( hmenu, MF_STRING, PlayStream_Event, _T("Play") );
         }
-        if( p_playlist ) pl_Release( p_playlist );
+        if( p_playlist ) pl_Release( p_intf );
     }
 
     AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)MiscMenu( p_intf ),

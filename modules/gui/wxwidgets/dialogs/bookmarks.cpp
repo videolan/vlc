@@ -210,7 +210,7 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
        /* Some global changes happened -> Rebuild all */
        var_AddCallback( p_playlist, "playlist-current",
                         PlaylistChanged, this );
-       pl_Release( p_playlist );
+       pl_Release( p_intf );
     }
 }
 
@@ -221,7 +221,7 @@ BookmarksDialog::~BookmarksDialog()
     {
        var_DelCallback( p_playlist, "playlist-current",
                         PlaylistChanged, this );
-       pl_Release( p_playlist );
+       pl_Release( p_intf );
     }
 }
 

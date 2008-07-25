@@ -517,7 +517,7 @@ static int Manage( vout_thread_t *p_vout )
                 if( p_playlist != NULL )
                 {
                     playlist_Stop( p_playlist );
-                    pl_Release( p_playlist );
+                    pl_Release( p_vout );
                 }
 #else
 #warning FIXME FIXME ?

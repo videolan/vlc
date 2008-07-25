@@ -273,7 +273,7 @@ void ItemInfoDialog::OnOk()
     if( p_playlist != NULL )
     {
         b_state = SendMessage( enabled_checkbox, BM_GETCHECK, 0, 0 );
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
     }
 
     p_item->b_enabled = (b_state & BST_CHECKED) ? true : false ;

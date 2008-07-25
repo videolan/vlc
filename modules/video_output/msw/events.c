@@ -865,7 +865,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         if( p_playlist )
         {
             playlist_Stop( p_playlist );
-            pl_Release( p_playlist );
+            pl_Release( p_vout );
         }
         return 0;
     }

@@ -146,7 +146,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
             free(ppsz_options);
         }
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void PlaylistRebuildListStore( intf_thread_t *p_intf,
@@ -393,7 +393,7 @@ void onPlay(GtkButton *button, gpointer user_data)
         {
             vlc_object_unlock( p_playlist );
         }
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
     }
 }
 
@@ -404,7 +404,7 @@ void onStop(GtkButton *button, gpointer user_data)
     if (p_playlist)
     {
         playlist_Stop( p_playlist );
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
         gdk_window_raise( p_intf->p_sys->p_window->window );
     }
 }
@@ -802,7 +802,7 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
         i_skip = i_row - p_playlist->i_current_index;
         playlist_Skip( p_playlist, i_skip );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 
@@ -834,7 +834,7 @@ void onUpdatePlaylist(GtkButton *button, gpointer user_data)
             g_object_unref(p_model);
         }
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 static void deleteItemFromPlaylist(gpointer data, gpointer user_data)
@@ -907,7 +907,7 @@ void onDeletePlaylist(GtkButton *button, gpointer user_data)
             g_object_unref(p_store);
         }
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 
@@ -927,7 +927,7 @@ void onClearPlaylist(GtkButton *button, gpointer user_data)
     {
         msg_Err( p_playlist, "fix pda delete" );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     // Remove all entries from the Playlist widget.
     p_tvplaylist = (GtkTreeView*) lookup_widget( GTK_WIDGET(button), "tvPlaylist");

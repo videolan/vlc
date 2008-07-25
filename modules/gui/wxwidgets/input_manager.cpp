@@ -202,7 +202,7 @@ void InputManager::UpdateInput()
         if( p_intf->p_sys->p_input )
              vlc_object_yield( p_intf->p_sys->p_input );
         UnlockPlaylist( p_intf->p_sys, p_playlist );
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
     }
 }
 

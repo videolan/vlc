@@ -471,7 +471,7 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
             wxLocaleFree( psz_utf8 );
         }
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
@@ -494,7 +494,7 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
                       PLAYLIST_END, true, false );
         wxLocaleFree( psz_utf8 );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void DialogsProvider::OnOpenFile( wxCommandEvent& event )

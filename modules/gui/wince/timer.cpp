@@ -56,7 +56,7 @@ Timer::Timer( intf_thread_t *_p_intf, HWND hwnd, Interface *_p_main_interface)
     if( p_playlist != NULL )
     {
         var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
     }
 
     SetTimer( hwnd, 1, 200 /*milliseconds*/, NULL );
@@ -69,7 +69,7 @@ Timer::~Timer()
     if( p_playlist != NULL )
     {
         var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
     }
 }
 

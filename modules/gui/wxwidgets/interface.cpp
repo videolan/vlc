@@ -1089,7 +1089,7 @@ void Interface::PlayStream()
         {
             /* No stream was playing, start one */
             playlist_Play( p_playlist );
-            pl_Release( p_playlist );
+            pl_Release( p_intf );
             input_manager->Update();
             return;
         }
@@ -1108,13 +1108,13 @@ void Interface::PlayStream()
         var_Set( p_input, "state", state );
 
         vlc_object_release( p_input );
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
         input_manager->Update();
     }
     else
     {
         /* If the playlist is empty, open a file requester instead */
-        pl_Release( p_playlist );
+        pl_Release( p_intf );
         OnShowDialog( dummy );
         GetToolBar()->ToggleTool( PlayStream_Event, false );
     }
@@ -1133,7 +1133,7 @@ void Interface::StopStream()
     }
 
     playlist_Stop( p_playlist );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
     input_manager->Update();
 }
 
@@ -1151,7 +1151,7 @@ void Interface::PrevStream()
     }
 
     playlist_Prev( p_playlist );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
@@ -1167,7 +1167,7 @@ void Interface::NextStream()
         return;
     }
     playlist_Next( p_playlist );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void Interface::OnSlowStream( wxCommandEvent& WXUNUSED(event) )
@@ -1333,7 +1333,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
             {
                 vlc_object_release( p_input );
                 wxDnDLocaleFree( psz_utf8 );
-                pl_Release( p_playlist );
+                pl_Release( p_intf );
                 return TRUE;
             }
             vlc_object_release( p_input );
@@ -1351,7 +1351,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
         wxDnDLocaleFree( psz_utf8 );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     return TRUE;
 }

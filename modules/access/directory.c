@@ -227,7 +227,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     {
         msg_Err( p_access, "unable to find item in playlist" );
         vlc_object_release( p_input );
-        pl_Release( p_playlist );
+        pl_Release( p_access );
         return VLC_ENOOBJ;
     }
 

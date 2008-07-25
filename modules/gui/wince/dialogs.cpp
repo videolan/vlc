@@ -366,7 +366,7 @@ void DialogsProvider::OnOpenFileSimple( int i_arg )
                       PLAYLIST_APPEND | (i_arg?PLAYLIST_GO:0), PLAYLIST_END );
     }
 
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 }
 
 void DialogsProvider::OnOpenDirectory( int i_arg )
@@ -431,7 +431,7 @@ void DialogsProvider::OnOpenDirectory( int i_arg )
  error:
 
     if( p_malloc) p_malloc->Release();
-    if( p_playlist ) pl_Release( p_playlist );
+    if( p_playlist ) pl_Release( p_intf );
 
 #ifdef UNDER_CE
     FreeLibrary( ceshell_dll );

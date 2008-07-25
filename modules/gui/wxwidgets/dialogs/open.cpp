@@ -1209,7 +1209,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
                PLAYLIST_END, true, pl_Unlocked );
         vlc_gc_decref( p_input );
     }
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
 
     Hide();
 
