@@ -93,17 +93,17 @@ struct decoder_sys_t
     size_t  i_offset;
     uint8_t startcode[4];
 
-    bool b_slice;
-    block_t    *p_frame;
+    bool    b_slice;
+    block_t *p_frame;
 
+    bool   b_header;
     bool   b_sps;
     bool   b_pps;
-    bool   b_header;
+    block_t *pp_sps[SPS_MAX];
+    block_t *pp_pps[PPS_MAX];
 
     /* avcC data */
     int i_avcC_length_size;
-    block_t *p_sps;
-    block_t *p_pps;
 
     /* Useful values of the Sequence Parameter Set */
     int i_log2_max_frame_num;
@@ -168,6 +168,7 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
+    int i;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'h', '2', '6', '4') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'H', '2', '6', '4') &&
@@ -194,11 +195,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->bytestream = block_BytestreamInit();
     p_sys->b_slice = false;
     p_sys->p_frame = NULL;
+    p_sys->b_header= false;
     p_sys->b_sps   = false;
     p_sys->b_pps   = false;
-    p_sys->p_sps   = 0;
-    p_sys->p_pps   = 0;
-    p_sys->b_header= false;
+    for( i = 0; i < SPS_MAX; i++ )
+        p_sys->pp_sps[i] = NULL;
+    for( i = 0; i < PPS_MAX; i++ )
+        p_sys->pp_pps[i] = NULL;
 
     p_sys->slice.i_nal_type = -1;
     p_sys->slice.i_nal_ref_idc = -1;
@@ -263,26 +266,53 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_dec, "avcC length size=%d, sps=%d, pps=%d",
                  p_sys->i_avcC_length_size, i_sps, i_pps );
 
-        if( !p_sys->p_sps || p_sys->p_pps )
+        if( !p_sys->b_sps || !p_sys->b_pps )
             return VLC_EGENERIC;
 
         /* FIXME: FFMPEG isn't happy at all if you leave this */
-        if( p_dec->fmt_out.i_extra > 0 ) free( p_dec->fmt_out.p_extra );
+        if( p_dec->fmt_out.i_extra > 0 )
+            free( p_dec->fmt_out.p_extra );
         p_dec->fmt_out.i_extra = 0;
         p_dec->fmt_out.p_extra = NULL;
 
         /* Set the new extradata */
-        p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
+        for( i = 0; i < SPS_MAX; i++ )
+        {
+            if( p_sys->pp_sps[i] )
+                p_dec->fmt_out.i_extra += p_sys->pp_sps[i]->i_buffer;
+        }
+        for( i = 0; i < PPS_MAX; i++ )
+        {
+            if( p_sys->pp_pps[i] )
+                p_dec->fmt_out.i_extra += p_sys->pp_pps[i]->i_buffer;
+        }
         p_dec->fmt_out.p_extra = malloc( p_dec->fmt_out.i_extra );
         if( p_dec->fmt_out.p_extra )
         {
-            memcpy( (uint8_t*)p_dec->fmt_out.p_extra,
-                    p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
-            memcpy( (uint8_t*)p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer,
-                    p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
+            uint8_t *p_dst = p_dec->fmt_out.p_extra;
+
+            for( i = 0; i < SPS_MAX; i++ )
+            {
+                if( p_sys->pp_sps[i] )
+                {
+                    memcpy( p_dst, p_sys->pp_sps[i]->p_buffer, p_sys->pp_sps[i]->i_buffer );
+                    p_dst += p_sys->pp_sps[i]->i_buffer;
+                }
+            }
+            for( i = 0; i < PPS_MAX; i++ )
+            {
+                if( p_sys->pp_pps[i] )
+                {
+                    memcpy( p_dst, p_sys->pp_pps[i]->p_buffer, p_sys->pp_pps[i]->i_buffer );
+                    p_dst += p_sys->pp_pps[i]->i_buffer;
+                }
+            }
             p_sys->b_header = true;
         }
-        else p_dec->fmt_out.i_extra = 0;
+        else
+        {
+            p_dec->fmt_out.i_extra = 0;
+        }
 
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
@@ -323,10 +353,19 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
+    int i;
 
     if( p_sys->p_frame ) block_ChainRelease( p_sys->p_frame );
-    if( p_sys->p_sps ) block_Release( p_sys->p_sps );
-    if( p_sys->p_pps ) block_Release( p_sys->p_pps );
+    for( i = 0; i < SPS_MAX; i++ )
+    {
+        if( p_sys->pp_sps[i] )
+            block_Release( p_sys->pp_sps[i] );
+    }
+    for( i = 0; i < PPS_MAX; i++ )
+    {
+        if( p_sys->pp_pps[i] )
+            block_Release( p_sys->pp_pps[i] );
+    }
     block_BytestreamRelease( &p_sys->bytestream );
     free( p_sys );
 }
@@ -651,16 +690,29 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( !p_sys->b_header && p_sys->slice.i_frame_type != BLOCK_FLAG_TYPE_I)
         return NULL;
 
-    if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I && p_sys->p_sps && p_sys->p_pps )
+    if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I && p_sys->b_sps && p_sys->b_pps )
     {
-        block_t *p_sps = block_Duplicate( p_sys->p_sps );
-        block_t *p_pps = block_Duplicate( p_sys->p_pps );
-        p_sps->i_dts = p_sys->p_frame->i_dts;
-        p_sps->i_pts = p_sys->p_frame->i_pts;
-        block_ChainAppend( &p_sps, p_pps );
-        block_ChainAppend( &p_sps, p_sys->p_frame );
-        p_sys->b_header = true;
-        p_pic = block_ChainGather( p_sps );
+        block_t *p_list = NULL;
+        int i;
+
+        for( i = 0; i < SPS_MAX; i++ )
+        {
+            if( p_sys->pp_sps[i] )
+                block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_sps[i] ) );
+        }
+        for( i = 0; i < PPS_MAX; i++ )
+        {
+            if( p_sys->pp_pps[i] )
+                block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_pps[i] ) );
+        }
+        if( p_list )
+        {
+            p_list->i_dts = p_sys->p_frame->i_dts;
+            p_list->i_pts = p_sys->p_frame->i_pts;
+            p_sys->b_header = true;
+        }
+        block_ChainAppend( &p_list, p_sys->p_frame );
+        p_pic = block_ChainGather( p_list );
     }
     else
     {
@@ -815,9 +867,9 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         msg_Dbg( p_dec, "found NAL_SPS (sps_id=%d)", i_sps_id );
     p_sys->b_sps = true;
 
-    if( p_sys->p_sps )
-        block_Release( p_sys->p_sps );
-    p_sys->p_sps = p_frag;
+    if( p_sys->pp_sps[i_sps_id] )
+        block_Release( p_sys->pp_sps[i_sps_id] );
+    p_sys->pp_sps[i_sps_id] = p_frag;
 }
 
 static void PutPPS( decoder_t *p_dec, block_t *p_frag )
@@ -845,9 +897,9 @@ static void PutPPS( decoder_t *p_dec, block_t *p_frag )
         msg_Dbg( p_dec, "found NAL_PPS (pps_id=%d sps_id=%d)", i_pps_id, i_sps_id );
     p_sys->b_pps = true;
 
-    if( p_sys->p_pps )
-        block_Release( p_sys->p_pps );
-    p_sys->p_pps = p_frag;
+    if( p_sys->pp_pps[i_pps_id] )
+        block_Release( p_sys->pp_pps[i_pps_id] );
+    p_sys->pp_pps[i_pps_id] = p_frag;
 }
 
 static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
