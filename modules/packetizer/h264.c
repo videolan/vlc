@@ -148,7 +148,7 @@ enum nal_priority_e
 
 static block_t *ParseNALBlock( decoder_t *, block_t * );
 
-static block_t *nal_get_annexeb( decoder_t *, uint8_t *p, int );
+static block_t *CreateAnnexbNAL( decoder_t *, uint8_t *p, int );
 
 static block_t *OutputPicture( decoder_t *p_dec );
 static void PutSPS( decoder_t *p_dec, block_t *p_frag );
@@ -236,7 +236,7 @@ static int Open( vlc_object_t *p_this )
             {
                 return VLC_EGENERIC;
             }
-            block_t *p_sps = nal_get_annexeb( p_dec, p, i_length );
+            block_t *p_sps = CreateAnnexbNAL( p_dec, p, i_length );
             if( !p_sps )
                 return VLC_EGENERIC;
             ParseNALBlock( p_dec, p_sps );
@@ -252,7 +252,7 @@ static int Open( vlc_object_t *p_this )
             {
                 return VLC_EGENERIC;
             }
-            block_t *p_pps = nal_get_annexeb( p_dec, p, i_length );
+            block_t *p_pps = CreateAnnexbNAL( p_dec, p, i_length );
             if( !p_pps )
                 return VLC_EGENERIC;
             ParseNALBlock( p_dec, p_pps );
@@ -475,7 +475,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
             break;
         }
 
-        block_t *p_part = nal_get_annexeb( p_dec, p, i_size );
+        block_t *p_part = CreateAnnexbNAL( p_dec, p, i_size );
         if( !p_part )
             break;
         p_part->i_dts = p_block->i_dts;
@@ -493,7 +493,10 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
     return p_ret;
 }
 
-static block_t *nal_get_annexeb( decoder_t *p_dec, uint8_t *p, int i_size )
+/****************************************************************************
+ * Helpers
+ ****************************************************************************/
+static block_t *CreateAnnexbNAL( decoder_t *p_dec, uint8_t *p, int i_size )
 {
     block_t *p_nal;
 
@@ -513,7 +516,7 @@ static block_t *nal_get_annexeb( decoder_t *p_dec, uint8_t *p, int i_size )
     return p_nal;
 }
 
-static void nal_get_decoded( uint8_t **pp_ret, int *pi_ret,
+static void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
                              uint8_t *src, int i_src )
 {
     uint8_t *end = &src[i_src];
@@ -683,7 +686,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
 
     p_sys->b_sps = true;
 
-    nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5],
+    CreateDecodedNAL( &dec, &i_dec, &p_frag->p_buffer[5],
                      p_frag->i_buffer - 5 );
 
     bs_init( &s, dec, i_dec );
@@ -833,7 +836,7 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     bs_t s;
 
     /* do not convert the whole frame */
-    nal_get_decoded( &pb_dec, &i_dec, &p_frag->p_buffer[5],
+    CreateDecodedNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5],
                      __MIN( p_frag->i_buffer - 5, 60 ) );
     bs_init( &s, pb_dec, i_dec );
 
