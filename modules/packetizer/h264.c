@@ -83,6 +83,8 @@ typedef struct
     int i_delta_pic_order_cnt1;
 } slice_t;
 
+#define SPS_MAX (32)
+#define PPS_MAX (256)
 struct decoder_sys_t
 {
     block_bytestream_t bytestream;
@@ -678,24 +680,28 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    uint8_t *dec = NULL;
+    uint8_t *pb_dec = NULL;
     int     i_dec = 0;
     bs_t s;
     int i_tmp;
+    int i_sps_id;
 
-    if( !p_sys->b_sps )
-        msg_Dbg( p_dec, "found NAL_SPS" );
-
-    p_sys->b_sps = true;
-
-    CreateDecodedNAL( &dec, &i_dec, &p_frag->p_buffer[5],
+    CreateDecodedNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5],
                      p_frag->i_buffer - 5 );
 
-    bs_init( &s, dec, i_dec );
+    bs_init( &s, pb_dec, i_dec );
     /* Skip profile(8), constraint_set012, reserver(5), level(8) */
     bs_skip( &s, 8 + 1+1+1 + 5 + 8 );
     /* sps id */
-    bs_read_ue( &s );
+    i_sps_id = bs_read_ue( &s );
+    if( i_sps_id >= SPS_MAX )
+    {
+        msg_Warn( p_dec, "invalid SPS (sps_id=%d)", i_sps_id );
+        free( pb_dec );
+        block_Release( p_frag );
+        return;
+    }
+
     /* Skip i_log2_max_frame_num */
     p_sys->i_log2_max_frame_num = bs_read_ue( &s );
     if( p_sys->i_log2_max_frame_num > 12)
@@ -802,9 +808,13 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         }
     }
 
-    free( dec );
+    free( pb_dec );
 
     /* We have a new SPS */
+    if( !p_sys->b_sps )
+        msg_Dbg( p_dec, "found NAL_SPS (sps_id=%d)", i_sps_id );
+    p_sys->b_sps = true;
+
     if( p_sys->p_sps )
         block_Release( p_sys->p_sps );
     p_sys->p_sps = p_frag;
@@ -814,20 +824,27 @@ static void PutPPS( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     bs_t s;
+    int i_pps_id;
+    int i_sps_id;
 
     bs_init( &s, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
-    bs_read_ue( &s ); // pps id
-    bs_read_ue( &s ); // sps id
+    i_pps_id = bs_read_ue( &s ); // pps id
+    i_sps_id = bs_read_ue( &s ); // sps id
+    if( i_pps_id >= PPS_MAX || i_sps_id >= SPS_MAX )
+    {
+        msg_Warn( p_dec, "invalid PPS (pps_id=%d sps_id=%d)", i_pps_id, i_sps_id );
+        block_Release( p_frag );
+        return;
+    }
     bs_skip( &s, 1 ); // entropy coding mode flag
     p_sys->i_pic_order_present_flag = bs_read( &s, 1 );
-
-    if( !p_sys->b_pps )
-        msg_Dbg( p_dec, "found NAL_PPS" );
-    p_sys->b_pps = true;
-
     /* TODO */
 
     /* We have a new PPS */
+    if( !p_sys->b_pps )
+        msg_Dbg( p_dec, "found NAL_PPS (pps_id=%d sps_id=%d)", i_pps_id, i_sps_id );
+    p_sys->b_pps = true;
+
     if( p_sys->p_pps )
         block_Release( p_sys->p_pps );
     p_sys->p_pps = p_frag;
