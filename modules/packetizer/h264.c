@@ -732,6 +732,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         bs_t s;
         int i_tmp;
 
+        if( p_sys->b_slice )
+            p_pic = OutputPicture( p_dec );
+
         if( !p_sys->b_sps ) msg_Dbg( p_dec, "found NAL_SPS" );
 
         p_sys->b_sps = true;
@@ -846,9 +849,6 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         free( dec );
 
-        if( p_sys->b_slice )
-            p_pic = OutputPicture( p_dec );
-
         /* We have a new SPS */
         if( p_sys->p_sps ) block_Release( p_sys->p_sps );
         p_sys->p_sps = p_frag;
@@ -860,6 +860,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     {
         bs_t s;
 
+        if( p_sys->b_slice )
+            p_pic = OutputPicture( p_dec );
+
         bs_init( &s, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
         bs_read_ue( &s ); // pps id
         bs_read_ue( &s ); // sps id
@@ -870,9 +873,6 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->b_pps = true;
 
         /* TODO */
-
-        if( p_sys->b_slice )
-            p_pic = OutputPicture( p_dec );
 
         /* We have a new PPS */
         if( p_sys->p_pps ) block_Release( p_sys->p_pps );
