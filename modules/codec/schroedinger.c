@@ -435,6 +435,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             size_t i_pulen = GetDWBE( p_block->p_buffer + i_bufused + 5 );
             uint8_t *p_pu = p_block->p_buffer + i_bufused;
 
+            if( 0 == i_pulen ) {
+                i_pulen = 13;
+            }
+
             /* blocks that do not start with the parse info prefix are invalid */
             if( p_pu[0] != 'B' || p_pu[1] != 'B' ||
                 p_pu[2] != 'C' || p_pu[3] != 'D')

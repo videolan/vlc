@@ -1556,18 +1556,19 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 static uint32_t Ogg_ReadDiracPictureNumber( ogg_packet *p_oggpacket )
 {
     uint32_t u_pos = 4;
-    /* find the picture startcode */
-    while ( (p_oggpacket->packet[u_pos] & 0x08) == 0) {
+    /* protect against falling off the edge */
+    while ( u_pos + 13 < p_oggpacket->bytes ) {
+        /* find the picture startcode */
+        if ( p_oggpacket->packet[u_pos] & 0x08 ) {
+            return GetDWBE( p_oggpacket->packet + u_pos + 9 );
+        }
         /* skip to the next dirac parse unit */
-        u_pos += GetDWBE( p_oggpacket->packet + u_pos + 1 );
-        /* protect against falling off the edge */
-        if ( u_pos > p_oggpacket->bytes )
-             return -1;
+        uint32_t u_npo = GetDWBE( p_oggpacket->packet + u_pos + 1 );
+        if (u_npo == 0)
+            u_npo = 13;
+        u_pos += u_npo;
     }
-
-    uint32_t u_pnum = GetDWBE( p_oggpacket->packet + u_pos + 9 );
-
-    return u_pnum;
+    return -1;
 }
 
 static uint32_t dirac_uint( bs_t *p_bs )
