@@ -383,16 +383,16 @@ void MainInterface::handleMainUi( QSettings *settings )
     mainLayout->setMargin( 0 );
 
     /* Create the CONTROLS Widget */
-    /* bool b_shiny = config_GetInt( p_intf, "qt-blingbling" ); */
+    bool b_shiny = config_GetInt( p_intf, "qt-blingbling" );
     controls = new ControlsWidget( p_intf, this,
                    settings->value( "adv-controls", false ).toBool(),
-                   config_GetInt( p_intf, "qt-blingbling" ) );
+                   b_shiny );
 
     /* Create the FULLSCREEN CONTROLS Widget */
     /* bool b_shiny = config_GetInt( p_intf, "qt-blingbling" ); */
     fullscreenControls = new FullscreenControllerWidget( p_intf, this,
                    settings->value( "adv-controls", false ).toBool(),
-                   config_GetInt( p_intf, "qt-blingbling" ) );
+                   b_shiny );
 
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
