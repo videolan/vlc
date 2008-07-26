@@ -43,15 +43,11 @@
 /* Gruikkkkkkkkkk!!!!! */
 #include "../codec/avcodec/chroma.h"
 
-/****************************************************************************
- * Local prototypes
- ****************************************************************************/
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
 static int  OpenScaler( vlc_object_t * );
 static void CloseScaler( vlc_object_t * );
-
-void *( *swscale_fast_memcpy )( void *, const void *, size_t );
-static picture_t *Filter( filter_t *, picture_t * );
-static int CheckInit( filter_t * );
 
 #define SCALEMODE_TEXT N_("Scaling mode")
 #define SCALEMODE_LONGTEXT N_("Scaling mode to use.")
@@ -63,10 +59,6 @@ const char *const ppsz_mode_descriptions[] =
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),
   N_("SincR"), N_("Lanczos"), N_("Bicubic spline") };
 
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 vlc_module_begin();
     set_description( N_("Video scaling filter") );
     set_capability( "video filter2", 1000 );
@@ -79,6 +71,18 @@ vlc_module_end();
 
 /* Version checking */
 #if LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)
+/****************************************************************************
+ * Local prototypes
+ ****************************************************************************/
+
+void *( *swscale_fast_memcpy )( void *, const void *, size_t );
+static picture_t *Filter( filter_t *, picture_t * );
+static int CheckInit( filter_t * );
+
+static int GetParameters( int *pi_fmti, int *pi_fmto,
+                          const video_format_t *p_fmti, 
+                          const video_format_t *p_fmto  );
+
 /*****************************************************************************
  * filter_sys_t : filter descriptor
  *****************************************************************************/
@@ -93,6 +97,7 @@ struct filter_sys_t
     es_format_t fmt_out;
 };
 
+
 /*****************************************************************************
  * OpenScaler: probe the filter and return score
  *****************************************************************************/
@@ -100,9 +105,7 @@ static int OpenScaler( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
-    vlc_value_t val;
 
-    int i_fmt_in, i_fmt_out;
     unsigned int i_cpu;
     int i_sws_mode;
 
@@ -110,25 +113,20 @@ static int OpenScaler( vlc_object_t *p_this )
     int sws_chr_vshift = 0, sws_chr_hshift = 0;
     float sws_chr_sharpen = 0.0, sws_lum_sharpen = 0.0;
 
-    /* Supported Input formats: YV12, I420/IYUV, YUY2, UYVY, BGR32, BGR24,
-     * BGR16, BGR15, RGB32, RGB24, Y8/Y800, YVU9/IF09 */
-    i_fmt_in = GetFfmpegChroma(p_filter->fmt_in.video.i_chroma);
-    /* Supported output formats: YV12, I420/IYUV, YUY2, UYVY,
-     * {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09 */
-    i_fmt_out = GetFfmpegChroma(p_filter->fmt_out.video.i_chroma);
-    if( ( i_fmt_in < 0 ) || ( i_fmt_out < 0 ) )
+    if( GetParameters( NULL, NULL, 
+                       &p_filter->fmt_in.video,
+                       &p_filter->fmt_out.video ) )
     {
         return VLC_EGENERIC;
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_filter->p_sys = p_sys =
-          (filter_sys_t *)malloc(sizeof(filter_sys_t)) ) == NULL )
+    if( ( p_filter->p_sys = p_sys = malloc(sizeof(filter_sys_t)) ) == NULL )
     {
         return VLC_ENOMEM;
     }
 
-    swscale_fast_memcpy = vlc_memcpy;
+    swscale_fast_memcpy = vlc_memcpy;   /* FIXME pointer assignment may not be atomic */
 
     /* Set CPU capabilities */
     i_cpu = vlc_CPU();
@@ -152,9 +150,7 @@ static int OpenScaler( vlc_object_t *p_this )
         p_sys->i_cpu_mask |= SWS_CPU_CAPS_ALTIVEC;
     }
 
-    var_Create( p_filter, "swscale-mode", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "swscale-mode", &val );
-    i_sws_mode = val.i_int;
+    i_sws_mode = var_CreateGetInteger( p_filter, "swscale-mode" );
 
     switch( i_sws_mode )
     {
@@ -169,15 +165,14 @@ static int OpenScaler( vlc_object_t *p_this )
     case 8:  p_sys->i_sws_flags = SWS_SINC; break;
     case 9:  p_sys->i_sws_flags = SWS_LANCZOS; break;
     case 10: p_sys->i_sws_flags = SWS_SPLINE; break;
-    default: p_sys->i_sws_flags = SWS_FAST_BILINEAR; i_sws_mode = 0; break;
+    default: p_sys->i_sws_flags = SWS_BICUBIC; i_sws_mode = 2; break;
     }
 
-    p_sys->p_src_filter = NULL;
-    p_sys->p_dst_filter = NULL;
     p_sys->p_src_filter =
         sws_getDefaultFilter( sws_lum_gblur, sws_chr_gblur,
                               sws_lum_sharpen, sws_chr_sharpen,
                               sws_chr_hshift, sws_chr_vshift, 0 );
+    p_sys->p_dst_filter = NULL;
 
     /* Misc init */
     p_sys->ctx = NULL;
@@ -185,27 +180,20 @@ static int OpenScaler( vlc_object_t *p_this )
     es_format_Init( &p_sys->fmt_in, 0, 0 );
     es_format_Init( &p_sys->fmt_out, 0, 0 );
 
-    if( CheckInit( p_filter ) != VLC_SUCCESS )
+    if( CheckInit( p_filter ) )
     {
-        if( p_sys->p_src_filter ) sws_freeFilter( p_sys->p_src_filter );
+        if( p_sys->p_src_filter )
+            sws_freeFilter( p_sys->p_src_filter );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    if( p_sys->ctx ) sws_freeContext( p_sys->ctx );
-    p_sys->ctx = NULL;
 
-    msg_Dbg( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s",
+    msg_Dbg( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s with scaling using %s",
              p_filter->fmt_in.video.i_width, p_filter->fmt_in.video.i_height,
              (char *)&p_filter->fmt_in.video.i_chroma,
              p_filter->fmt_out.video.i_width, p_filter->fmt_out.video.i_height,
-             (char *)&p_filter->fmt_out.video.i_chroma );
-
-    if( p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width ||
-        p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height )
-    {
-        msg_Dbg( p_filter, "scaling mode: %s",
-                 ppsz_mode_descriptions[i_sws_mode] );
-    }
+             (char *)&p_filter->fmt_out.video.i_chroma,
+             ppsz_mode_descriptions[i_sws_mode] );
 
     return VLC_SUCCESS;
 }
@@ -218,54 +206,94 @@ static void CloseScaler( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys->ctx ) sws_freeContext( p_sys->ctx );
-    if( p_sys->p_src_filter ) sws_freeFilter( p_sys->p_src_filter );
+    if( p_sys->ctx )
+        sws_freeContext( p_sys->ctx );
+    if( p_sys->p_src_filter )
+        sws_freeFilter( p_sys->p_src_filter );
     free( p_sys );
 }
 
 /*****************************************************************************
  * CheckInit: Initialise filter when necessary
  *****************************************************************************/
+static bool IsFmtSimilar( const video_format_t *p_fmt1, const video_format_t *p_fmt2 )
+{
+    return p_fmt1->i_width == p_fmt2->i_width &&
+           p_fmt1->i_height == p_fmt2->i_height;
+}
+
+static int GetParameters( int *pi_fmti, int *pi_fmto,
+                          const video_format_t *p_fmti, 
+                          const video_format_t *p_fmto  )
+{
+    /* Supported Input formats: YV12, I420/IYUV, YUY2, UYVY, BGR32, BGR24,
+     * BGR16, BGR15, RGB32, RGB24, Y8/Y800, YVU9/IF09 */
+    const int i_fmti = GetFfmpegChroma( p_fmti->i_chroma );
+
+    /* Supported output formats: YV12, I420/IYUV, YUY2, UYVY,
+     * {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09 */
+    const int i_fmto = GetFfmpegChroma( p_fmto->i_chroma );
+
+    if( pi_fmti )
+        *pi_fmti = i_fmti;
+    if( pi_fmto )
+        *pi_fmto = i_fmto;
+
+    if( i_fmti < 0 || i_fmto < 0 )
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
 static int CheckInit( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( ( p_filter->fmt_in.video.i_width != p_sys->fmt_in.video.i_width ) ||
-        ( p_filter->fmt_in.video.i_height != p_sys->fmt_in.video.i_height ) ||
-        ( p_filter->fmt_out.video.i_width != p_sys->fmt_out.video.i_width ) ||
-        ( p_filter->fmt_out.video.i_height != p_sys->fmt_out.video.i_height ) ||
-        !p_sys->ctx )
+    if( IsFmtSimilar( &p_filter->fmt_in.video,  &p_sys->fmt_in.video ) &&
+        IsFmtSimilar( &p_filter->fmt_out.video, &p_sys->fmt_out.video ) &&
+        p_sys->ctx )
     {
-        int i_fmt_in, i_fmt_out;
-
-        i_fmt_in = GetFfmpegChroma(p_filter->fmt_in.video.i_chroma);
-        i_fmt_out = GetFfmpegChroma(p_filter->fmt_out.video.i_chroma);
-        if( (i_fmt_in < 0) || (i_fmt_out < 0) )
-        {
-            msg_Err( p_filter, "format not supported" );
-            return VLC_EGENERIC;
-        }
-
-        if( p_sys->ctx ) sws_freeContext( p_sys->ctx );
-
-        p_sys->ctx =
-            sws_getContext( p_filter->fmt_in.video.i_width,
-                            p_filter->fmt_in.video.i_height, i_fmt_in,
-                            p_filter->fmt_out.video.i_width,
-                            p_filter->fmt_out.video.i_height, i_fmt_out,
-                            p_sys->i_sws_flags | p_sys->i_cpu_mask,
-                            p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
-        if( !p_sys->ctx )
-        {
-            msg_Err( p_filter, "could not init SwScaler" );
-            return VLC_EGENERIC;
-        }
-
-        p_sys->fmt_in = p_filter->fmt_in;
-        p_sys->fmt_out = p_filter->fmt_out;
+        return VLC_SUCCESS;
     }
 
+    /* */
+    int i_fmt_in, i_fmt_out;
+    if( GetParameters( &i_fmt_in, &i_fmt_out, &p_filter->fmt_in.video, &p_filter->fmt_out.video ) )
+    {
+        msg_Err( p_filter, "format not supported" );
+        return VLC_EGENERIC;
+    }
+
+    if( p_sys->ctx )
+        sws_freeContext( p_sys->ctx );
+
+    p_sys->ctx =
+        sws_getContext( p_filter->fmt_in.video.i_width,
+                        p_filter->fmt_in.video.i_height, i_fmt_in,
+                        p_filter->fmt_out.video.i_width,
+                        p_filter->fmt_out.video.i_height, i_fmt_out,
+                        p_sys->i_sws_flags | p_sys->i_cpu_mask,
+                        p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
+    if( !p_sys->ctx )
+    {
+        msg_Err( p_filter, "could not init SwScaler" );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->fmt_in = p_filter->fmt_in;
+    p_sys->fmt_out = p_filter->fmt_out;
+
     return VLC_SUCCESS;
+}
+
+static void GetPixels( uint8_t *pp_pixel[3], int pi_pitch[3], picture_t *p_picture )
+{
+    int n;
+    for( n = 0; n < __MIN(3 , p_picture->i_planes ); n++ )
+    {
+        pp_pixel[n] = p_picture->p[n].p_pixels;
+        pi_pitch[n] = p_picture->p[n].i_pitch;
+    }
 }
 
 /****************************************************************************
@@ -279,8 +307,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     uint8_t *src[3]; int src_stride[3];
     uint8_t *dst[3]; int dst_stride[3];
     picture_t *p_pic_dst;
-    int i_plane;
-    int i_nb_planes = p_pic->i_planes;
 
     /* Check if format properties changed */
     if( CheckInit( p_filter ) != VLC_SUCCESS )
@@ -299,21 +325,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','V','A') )
     {
-        i_nb_planes = 3;
         memset( p_pic_dst->p[3].p_pixels, 0xff, p_filter->fmt_out.video.i_height
                                                  * p_pic_dst->p[3].i_pitch );
     }
 
-    for( i_plane = 0; i_plane < __MIN(3, p_pic->i_planes); i_plane++ )
-    {
-        src[i_plane] = p_pic->p[i_plane].p_pixels;
-        src_stride[i_plane] = p_pic->p[i_plane].i_pitch;
-    }
-    for( i_plane = 0; i_plane < __MIN(3, i_nb_planes); i_plane++ )
-    {
-        dst[i_plane] = p_pic_dst->p[i_plane].p_pixels;
-        dst_stride[i_plane] = p_pic_dst->p[i_plane].i_pitch;
-    }
+    GetPixels( src, src_stride, p_pic );
+    GetPixels( dst, dst_stride, p_pic_dst );
 
 #if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
     sws_scale( p_sys->ctx, src, src_stride,
