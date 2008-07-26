@@ -75,9 +75,9 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
                   spref_cone_Interface_64.png, 0 );
     ADD_CATEGORY( SPrefsAudio, qtr("Audio"), spref_cone_Audio_64.png, 1 );
     ADD_CATEGORY( SPrefsVideo, qtr("Video"), spref_cone_Video_64.png, 2 );
-    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles & OSD"),
+    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles && OSD"),
                   spref_cone_Subtitles_64.png, 3 );
-    ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input & Codecs"),
+    ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input && Codecs"),
                   spref_cone_Input_64.png, 4 );
     ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png, 5 );
 
@@ -505,7 +505,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Subtitles, qtr("Subtitles & OSD Settings") );
+        START_SPREFS_CAT( Subtitles, qtr("Subtitles & On Screen Display Settings") );
             CONFIG_GENERIC( "osd", Bool, NULL, OSDBox);
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
