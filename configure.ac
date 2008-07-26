@@ -4376,6 +4376,20 @@ AC_ARG_ENABLE(mga,
     fi ])
 
 dnl
+dnl  OMAP Framebuffer module
+dnl
+AC_ARG_ENABLE(omapfb,
+  [  --enable-omapfb         OMAP framebuffer support (default disabled)])
+    if test "${enable_omapfb}" = "yes"
+    then
+      AC_CHECK_HEADERS(asm/arch-omap/omapfb.h, [
+        VLC_ADD_PLUGIN([omapfb])
+        AC_CHECK_HEADERS(X11/Xlib.h, [
+          VLC_ADD_LIBS([omapfb],[${X_LIBS} ${X_PRE_LIBS} -lX11]) ])
+      ])
+    fi
+
+dnl
 dnl  SVGAlib module
 dnl
 AC_ARG_ENABLE(svgalib,
@@ -5564,8 +5578,8 @@ AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 dnl Tests for Osso and Xsp
 AC_CHECK_LIB(osso, osso_display_blanking_pause, [
   PKG_CHECK_MODULES(GLIB2, glib-2.0, [
-    VLC_ADD_CPPFLAGS([x11 xvideo xvmc glx],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
-    VLC_ADD_LIBS([x11 xvideo xvmc glx],[-losso])
+    VLC_ADD_CPPFLAGS([x11 xvideo xvmc glx omapfb],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
+    VLC_ADD_LIBS([x11 xvideo xvmc glx omapfb],[-losso])
  ])
 ])
 AC_CHECK_LIB(Xsp, XSPSetPixelDoubling,[

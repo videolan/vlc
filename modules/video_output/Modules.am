@@ -7,6 +7,7 @@ LIBTOOL=@LIBTOOL@ --tag=CC
 SOURCES_aa = aa.c
 SOURCES_caca = caca.c
 SOURCES_fb = fb.c
+SOURCES_omapfb = omapfb.c
 SOURCES_ggi = ggi.c
 SOURCES_vout_sdl = sdl.c
 SOURCES_svgalib = svgalib.c
