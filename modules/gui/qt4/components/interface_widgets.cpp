@@ -404,7 +404,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                                 bool b_fsCreation) :
                                 QFrame( _p_mi ), p_intf( _p_i )
 {
-        setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
+    setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
@@ -537,7 +537,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     playButton->setIconSize( QSize( 30, 30 ) );
 
 
-        /** Prev + Stop + Next Block **/
+    /** Prev + Stop + Next Block **/
     controlButLayout = new QHBoxLayout;
     controlButLayout->setSpacing( 0 ); /* Don't remove that, will be useful */
 
@@ -578,18 +578,20 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
     setupSmallButton( fullscreenButton );
 
-    /** Playlist Button **/
-    playlistButton = new QPushButton;
-    setupSmallButton( playlistButton );
-    BUTTON_SET_IMG( playlistButton, "" , playlist.png, qtr( "Show playlist" ) );
-    CONNECT( playlistButton, clicked(), _p_mi, togglePlaylist() );
+    if( !b_fsCreation )
+    {
+        /** Playlist Button **/
+        playlistButton = new QPushButton;
+        setupSmallButton( playlistButton );
+        BUTTON_SET_IMG( playlistButton, "" , playlist.png, qtr( "Show playlist" ) );
+        CONNECT( playlistButton, clicked(), _p_mi, togglePlaylist() );
 
-    /** extended Settings **/
-    extSettingsButton = new QPushButton;
-    BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended settings" ),
-            extSettings() );
-    setupSmallButton( extSettingsButton );
-
+        /** extended Settings **/
+        extSettingsButton = new QPushButton;
+        BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended settings" ),
+                extSettings() );
+        setupSmallButton( extSettingsButton );
+    }
 
     /* Volume */
     hVolLabel = new VolumeClickHandler( p_intf, this );
