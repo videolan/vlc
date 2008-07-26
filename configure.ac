@@ -3444,7 +3444,7 @@ then
   ],[
    PKG_CHECK_MODULES(LIBMPEG2,[libmpeg2 > 0.3.2],[ 
           VLC_ADD_PLUGIN([libmpeg2])
-          VLC_ADD_LIBS([libmpeg2], $LIBMPEG2_LIBS),
+          VLC_ADD_LIBS([libmpeg2], $LIBMPEG2_LIBS)
           VLC_ADD_CFLAGS([libmpeg2], $LIBMPEG2_CFLAGS)
        ], 
       AC_MSG_WARN([Could not find libmpeg2 on your system: you may get it from http://libmpeg2.sf.net/ . Alternatively you can use --disable-libmpeg2 to disable the libmpeg2 plugin.]))
