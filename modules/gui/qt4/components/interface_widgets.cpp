@@ -249,8 +249,7 @@ VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
     layout->addWidget( prevButton );
     layout->addWidget( nextButton );
 
-    layout->addItem( new QSpacerItem( 40,20,
-                              QSizePolicy::Expanding, QSizePolicy::Minimum ) );
+    layout->addStretch( 10 );
     layout->addWidget( new QLabel( qtr( "Current visualization" ) ) );
 
     current = new QLabel( qtr( "None" ) );
@@ -405,19 +404,10 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                                 bool b_fsCreation) :
                                 QFrame( _p_mi ), p_intf( _p_i )
 {
-    controlLayout = new QGridLayout( );
-
-    controlLayout->setSpacing( 0 );
-    controlLayout->setLayoutMargins( 7, 5, 7, 3, 6 );
-
-    if( !b_fsCreation )
-        setLayout( controlLayout );
-
-    setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
+        setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
-    controlLayout->addWidget( slider, 0, 1, 1, 16 );
     /* Update the position when the IM has changed */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              slider, setPosition( float, int, int ) );
@@ -431,20 +421,17 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     slowerButton->setMaximumSize( QSize( 26, 20 ) );
 
     BUTTON_SET_ACT( slowerButton, "-", qtr( "Slower" ), slower() );
-    controlLayout->addWidget( slowerButton, 0, 0 );
 
     fasterButton = new QToolButton;
     fasterButton->setAutoRaise( true );
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
 
     BUTTON_SET_ACT( fasterButton, "+", qtr( "Faster" ), faster() );
-    controlLayout->addWidget( fasterButton, 0, 17 );
 
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
 
     advControls = new AdvControlsWidget( p_intf );
-    controlLayout->addWidget( advControls, 1, 3, 2, 4, Qt::AlignBottom );
     if( !b_advancedVisible ) advControls->hide();
 
     /** Disc and Menus handling */
@@ -465,8 +452,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     nextSectionButton = new QPushButton( discFrame );
     setupSmallButton( nextSectionButton );
     discLayout->addWidget( nextSectionButton );
-
-    controlLayout->addWidget( discFrame, 1, 10, 2, 3, Qt::AlignBottom );
 
     BUTTON_SET_IMG( prevSectionButton, "", previous.png, "" );
     BUTTON_SET_IMG( nextSectionButton, "", next.png, "" );
@@ -512,8 +497,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     telexPage->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
     telexLayout->addWidget( telexPage );
 
-    if( !b_fsCreation )
-        controlLayout->addWidget( telexFrame, 1, 10, 2, 4, Qt::AlignBottom );
     telexFrame->hide(); /* default hidden */
 
     CONNECT( telexPage, valueChanged( int ), THEMIM->getIM(),
@@ -553,12 +536,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     playButton->setMinimumSize( QSize( 36, 36 ) );
     playButton->setIconSize( QSize( 30, 30 ) );
 
-    controlLayout->addWidget( playButton, 2, 0, 2, 2 );
 
-    controlLayout->setColumnMinimumWidth( 2, 20 );
-    controlLayout->setColumnStretch( 2, 0 );
-
-    /** Prev + Stop + Next Block **/
+        /** Prev + Stop + Next Block **/
     controlButLayout = new QHBoxLayout;
     controlButLayout->setSpacing( 0 ); /* Don't remove that, will be useful */
 
@@ -584,19 +563,12 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlButLayout->addWidget( nextButton );
 
     /* Add this block to the main layout */
-    if( !b_fsCreation )
-        controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
 
     BUTTON_SET_ACT_I( playButton, "", play.png, qtr( "Play" ), play() );
     BUTTON_SET_ACT_I( prevButton, "" , previous.png,
                       qtr( "Previous" ), prev() );
     BUTTON_SET_ACT_I( nextButton, "", next.png, qtr( "Next" ), next() );
     BUTTON_SET_ACT_I( stopButton, "", stop.png, qtr( "Stop" ), stop() );
-
-    controlLayout->setColumnMinimumWidth( 7, 20 );
-    controlLayout->setColumnStretch( 7, 0 );
-    controlLayout->setColumnStretch( 8, 0 );
-    controlLayout->setColumnStretch( 9, 0 );
 
     /*
      * Other first Line buttons
@@ -605,12 +577,10 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     fullscreenButton = new QPushButton( "F" );
     BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
     setupSmallButton( fullscreenButton );
-    controlLayout->addWidget( fullscreenButton, 3, 10, Qt::AlignBottom );
 
     /** Playlist Button **/
     playlistButton = new QPushButton;
     setupSmallButton( playlistButton );
-    controlLayout->addWidget( playlistButton, 3, 11, Qt::AlignBottom );
     BUTTON_SET_IMG( playlistButton, "" , playlist.png, qtr( "Show playlist" ) );
     CONNECT( playlistButton, clicked(), _p_mi, togglePlaylist() );
 
@@ -619,11 +589,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended settings" ),
             extSettings() );
     setupSmallButton( extSettingsButton );
-    controlLayout->addWidget( extSettingsButton, 3, 12, Qt::AlignBottom );
 
-    controlLayout->setColumnStretch( 13, 0 );
-    controlLayout->setColumnMinimumWidth( 13, 24 );
-    controlLayout->setColumnStretch( 14, 5 );
 
     /* Volume */
     hVolLabel = new VolumeClickHandler( p_intf, this );
@@ -632,7 +598,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-medium.png" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
     volMuteLabel->installEventFilter( hVolLabel );
-    controlLayout->addWidget( volMuteLabel, 3, 15, Qt::AlignBottom );
 
     if( b_shiny )
     {
@@ -649,7 +614,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     volumeSlider->setMaximumSize( QSize( 200, 40 ) );
     volumeSlider->setMinimumSize( QSize( 106, 30 ) );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
-    controlLayout->addWidget( volumeSlider, 2, 16, 2 , 2, Qt::AlignBottom );
 
     /* Set the volume from the config */
     volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
@@ -661,6 +625,43 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
+
+    if( !b_fsCreation )
+    {
+        controlLayout = new QGridLayout( this );
+
+        controlLayout->setSpacing( 0 );
+        controlLayout->setLayoutMargins( 7, 5, 7, 3, 6 );
+
+        controlLayout->addWidget( slider, 0, 1, 1, 16 );
+        controlLayout->addWidget( slowerButton, 0, 0 );
+        controlLayout->addWidget( fasterButton, 0, 17 );
+
+        controlLayout->addWidget( advControls, 1, 3, 2, 4, Qt::AlignBottom );
+        controlLayout->addWidget( discFrame, 1, 10, 2, 3, Qt::AlignBottom );
+        controlLayout->addWidget( telexFrame, 1, 10, 2, 4, Qt::AlignBottom );
+
+        controlLayout->addWidget( playButton, 2, 0, 2, 2 );
+        controlLayout->setColumnMinimumWidth( 2, 20 );
+        controlLayout->setColumnStretch( 2, 0 );
+
+        controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
+        controlLayout->setColumnMinimumWidth( 7, 20 );
+        controlLayout->setColumnStretch( 7, 0 );
+        controlLayout->setColumnStretch( 8, 0 );
+        controlLayout->setColumnStretch( 9, 0 );
+
+        controlLayout->addWidget( fullscreenButton, 3, 10, Qt::AlignBottom );
+        controlLayout->addWidget( playlistButton, 3, 11, Qt::AlignBottom );
+        controlLayout->addWidget( extSettingsButton, 3, 12, Qt::AlignBottom );
+
+        controlLayout->setColumnStretch( 13, 0 );
+        controlLayout->setColumnMinimumWidth( 13, 24 );
+        controlLayout->setColumnStretch( 14, 5 );
+
+        controlLayout->addWidget( volMuteLabel, 3, 15, Qt::AlignBottom );
+        controlLayout->addWidget( volumeSlider, 2, 16, 2 , 2, Qt::AlignBottom );
+    }
 
     updateInput();
 }
@@ -899,8 +900,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
 
     QGridLayout *fsLayout = new QGridLayout( this );
-    controlLayout->setSpacing( 0 );
-    controlLayout->setLayoutMargins( 5, 1, 5, 1, 5 );
+    fsLayout->setLayoutMargins( 5, 1, 5, 1, 5 );
 
     fsLayout->addWidget( slowerButton, 0, 0 );
     slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);
