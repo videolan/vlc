@@ -70,6 +70,12 @@ struct picture_pts_t
    mtime_t i_pts;    //pts for this picture
 };
 
+struct picture_free_t
+{
+   picture_t *p_pic;
+   decoder_t *p_dec;
+};
+
 /*****************************************************************************
  * decoder_sys_t : Schroedinger decoder descriptor
  *****************************************************************************/
@@ -247,13 +253,13 @@ static mtime_t GetPicturePTS( decoder_t *p_dec, uint32_t u_pnum )
  *****************************************************************************/
 static void SchroFrameFree( SchroFrame *frame, void *priv)
 {
-    picture_t *p_pic = priv;
+    struct picture_free_t *p_free = priv;
 
-    if( !p_pic )
+    if( !p_free )
         return;
 
-    /* FIXME it is wrong, you should call pf_vout_buffer_del */
-    if( p_pic->pf_release ) p_pic->pf_release( p_pic );
+    p_free->p_dec->pf_vout_buffer_del( p_free->p_dec, p_free->p_pic );
+    free(p_free);
     (void)frame;
 }
 
@@ -265,6 +271,7 @@ static SchroFrame *CreateSchroFrameFromPic( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     SchroFrame *p_schroframe = schro_frame_new();
     picture_t *p_pic = NULL;
+    struct picture_free_t *p_free;
 
     if( !p_schroframe )
         return NULL;
@@ -286,7 +293,11 @@ static SchroFrame *CreateSchroFrameFromPic( decoder_t *p_dec )
 
     p_schroframe->width = p_sys->p_format->width;
     p_schroframe->height = p_sys->p_format->height;
-    schro_frame_set_free_callback( p_schroframe, SchroFrameFree, p_pic );
+
+    p_free = malloc( sizeof( *p_free ) );
+    p_free->p_pic = p_pic;
+    p_free->p_dec = p_dec;
+    schro_frame_set_free_callback( p_schroframe, SchroFrameFree, p_free );
 
     for( int i=0; i<3; i++ )
     {
@@ -510,7 +521,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case SCHRO_DECODER_OK:
             u_pnum = schro_decoder_get_picture_number( p_sys->p_schro );
             p_schroframe = schro_decoder_pull( p_sys->p_schro );
-            p_pic = p_schroframe->priv;
+            p_pic = ((struct picture_free_t*) p_schroframe->priv)->p_pic;
             p_schroframe->priv = NULL;
             schro_frame_unref( p_schroframe );
 
