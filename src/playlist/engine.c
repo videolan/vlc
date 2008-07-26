@@ -380,8 +380,6 @@ check_input:
             p_playlist->gc_date = mdate();
             p_playlist->b_cant_sleep = true;
 
-            set_current_status_item( p_playlist, NULL );
-
             i_activity= var_GetInteger( p_playlist, "activity" );
             var_SetInteger( p_playlist, "activity", i_activity -
                             DEFAULT_INPUT_ACTIVITY );
@@ -449,7 +447,6 @@ check_input:
             const bool b_gc_forced = p_playlist->status.i_status != PLAYLIST_STOPPED;
 
             p_playlist->status.i_status = PLAYLIST_STOPPED;
-            set_current_status_item( p_playlist, NULL );
 
             /* Collect garbage */
             PL_UNLOCK;
