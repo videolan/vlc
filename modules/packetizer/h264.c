@@ -117,6 +117,10 @@ struct decoder_sys_t
 
     /* Useful values of the Slice Header */
     slice_t slice;
+
+    /* */
+    mtime_t i_frame_pts;
+    mtime_t i_frame_dts;
 };
 
 enum
@@ -148,7 +152,7 @@ enum nal_priority_e
     NAL_PRIORITY_HIGHEST    = 3,
 };
 
-static block_t *ParseNALBlock( decoder_t *, block_t * );
+static block_t *ParseNALBlock( decoder_t *, bool *pb_used_ts, block_t * );
 
 static block_t *CreateAnnexbNAL( decoder_t *, const uint8_t *p, int );
 
@@ -214,6 +218,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->slice.i_pic_order_cnt_lsb = -1;
     p_sys->slice.i_delta_pic_order_cnt_bottom = -1;
 
+    p_sys->i_frame_dts = -1;
+    p_sys->i_frame_pts = -1;
+
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
@@ -226,6 +233,7 @@ static int Open( vlc_object_t *p_this )
          * The fmt_out.p_extra should contain all the SPS and PPS with 4 byte startcodes */
         uint8_t *p = &((uint8_t*)p_dec->fmt_in.p_extra)[4];
         int i_sps, i_pps;
+        bool b_dummy;
         int i;
 
         /* Parse avcC */
@@ -244,7 +252,7 @@ static int Open( vlc_object_t *p_this )
             block_t *p_sps = CreateAnnexbNAL( p_dec, p, i_length );
             if( !p_sps )
                 return VLC_EGENERIC;
-            ParseNALBlock( p_dec, p_sps );
+            ParseNALBlock( p_dec, &b_dummy, p_sps );
             p += i_length;
         }
         /* Read PPS */
@@ -260,7 +268,7 @@ static int Open( vlc_object_t *p_this )
             block_t *p_pps = CreateAnnexbNAL( p_dec, p, i_length );
             if( !p_pps )
                 return VLC_EGENERIC;
-            ParseNALBlock( p_dec, p_pps );
+            ParseNALBlock( p_dec, &b_dummy, p_pps );
             p += i_length;
         }
         msg_Dbg( p_dec, "avcC length size=%d, sps=%d, pps=%d",
@@ -404,6 +412,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
     for( ;; )
     {
+        bool b_used_ts;
+
         switch( p_sys->i_state )
         {
             case STATE_NOSYNC:
@@ -438,11 +448,15 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                     /* Need more data */
                     return NULL;
                 }
+                block_BytestreamFlush( &p_sys->bytestream );
 
                 /* Get the new fragment and set the pts/dts */
+                block_t *p_block_bytestream = p_sys->bytestream.p_block;
+
                 p_pic = block_New( p_dec, p_sys->i_offset +1 );
-                p_pic->i_pts = p_sys->bytestream.p_block->i_pts;
-                p_pic->i_dts = p_sys->bytestream.p_block->i_dts;
+                p_pic->i_pts = p_block_bytestream->i_pts;
+                p_pic->i_dts = p_block_bytestream->i_dts;
+
                 /* Force 4 byte startcode 0 0 0 1 */
                 p_pic->p_buffer[0] = 0;
 
@@ -455,7 +469,14 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_offset = 0;
 
                 /* Parse the NAL */
-                if( !( p_pic = ParseNALBlock( p_dec, p_pic ) ) )
+                p_pic = ParseNALBlock( p_dec, &b_used_ts, p_pic );
+                if( b_used_ts )
+                {
+                    p_block_bytestream->i_dts = -1;
+                    p_block_bytestream->i_pts = -1;
+                }
+
+                if( !p_pic )
                 {
                     p_sys->i_state = STATE_NOSYNC;
                     break;
@@ -501,6 +522,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
     for( p = p_block->p_buffer; p < &p_block->p_buffer[p_block->i_buffer]; )
     {
         block_t *p_pic;
+        bool b_dummy;
         int i_size = 0;
         int i;
 
@@ -519,11 +541,12 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
         block_t *p_part = CreateAnnexbNAL( p_dec, p, i_size );
         if( !p_part )
             break;
+
         p_part->i_dts = p_block->i_dts;
         p_part->i_pts = p_block->i_pts;
 
         /* Parse the NAL */
-        if( ( p_pic = ParseNALBlock( p_dec, p_part ) ) )
+        if( ( p_pic = ParseNALBlock( p_dec, &b_dummy, p_part ) ) )
         {
             block_ChainAppend( &p_ret, p_pic );
         }
@@ -606,13 +629,15 @@ static inline int bs_read_se( bs_t *s )
  * ParseNALBlock: parses annexB type NALs
  * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode
  *****************************************************************************/
-static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
+static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
     const int i_nal_ref_idc = (p_frag->p_buffer[4] >> 5)&0x03;
     const int i_nal_type = p_frag->p_buffer[4]&0x1f;
+    const mtime_t i_frag_dts = p_frag->i_dts;
+    const mtime_t i_frag_pts = p_frag->i_pts;
 
     if( p_sys->b_slice && ( !p_sys->b_sps || !p_sys->b_pps ) )
     {
@@ -634,7 +659,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     else if( i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
     {
         slice_t slice;
-        bool b_new_picture;
+        bool  b_new_picture;
 
         ParseSlice( p_dec, &b_new_picture, &slice, i_nal_ref_idc, i_nal_type, p_frag );
 
@@ -654,7 +679,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         PutSPS( p_dec, p_frag );
 
         /* Do not append the SPS because we will insert it on keyframes */
-        return p_pic;
+        p_frag = NULL;
     }
     else if( i_nal_type == NAL_PPS )
     {
@@ -664,7 +689,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         PutPPS( p_dec, p_frag );
 
         /* Do not append the PPS because we will insert it on keyframes */
-        return p_pic;
+        p_frag = NULL;
     }
     else if( i_nal_type == NAL_AU_DELIMITER ||
              i_nal_type == NAL_SEI ||
@@ -677,8 +702,16 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     }
 
     /* Append the block */
-    block_ChainAppend( &p_sys->p_frame, p_frag );
+    if( p_frag )
+        block_ChainAppend( &p_sys->p_frame, p_frag );
 
+    *pb_used_ts = false;
+    if( p_sys->i_frame_dts < 0 && p_sys->i_frame_pts < 0 )
+    {
+        p_sys->i_frame_dts = i_frag_dts;
+        p_sys->i_frame_pts = i_frag_pts;
+        *pb_used_ts = true;
+    }
     return p_pic;
 }
 
@@ -706,11 +739,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
                 block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_pps[i] ) );
         }
         if( p_list )
-        {
-            p_list->i_dts = p_sys->p_frame->i_dts;
-            p_list->i_pts = p_sys->p_frame->i_pts;
             p_sys->b_header = true;
-        }
+
         block_ChainAppend( &p_list, p_sys->p_frame );
         p_pic = block_ChainGather( p_list );
     }
@@ -718,11 +748,15 @@ static block_t *OutputPicture( decoder_t *p_dec )
     {
         p_pic = block_ChainGather( p_sys->p_frame );
     }
+    p_pic->i_dts = p_sys->i_frame_dts;
+    p_pic->i_pts = p_sys->i_frame_pts;
     p_pic->i_length = 0;    /* FIXME */
     p_pic->i_flags |= p_sys->slice.i_frame_type;
 
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
+    p_sys->i_frame_dts = -1;
+    p_sys->i_frame_pts = -1;
     p_sys->b_slice = false;
 
     return p_pic;
@@ -783,6 +817,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         {
             /* skip i_offset_for_ref_frame */
             bs_read_se(&s );
+            i_cycle--;
         }
     }
     /* i_num_ref_frames */
@@ -852,9 +887,9 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
                 h = 0;
             }
             if( h != 0 )
-                p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * w /
-                    h * p_dec->fmt_out.video.i_width /
-                    p_dec->fmt_out.video.i_height;
+                p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
+                        ( w * p_dec->fmt_out.video.i_width ) /
+                        ( h * p_dec->fmt_out.video.i_height);
             else
                 p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;
         }
