@@ -378,8 +378,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
             action->setChecked( true );
 
         /* FullScreen View */
-        action = menu->addAction( qtr( "Toggle Fullscreen Interface" ), mi,
+        action = menu->addAction( qtr( "Fullscreen Interface" ), mi,
                                   SLOT( toggleFullScreen() ), QString( "F11" ) );
+        action->setCheckable( true );
 
         /* Advanced Controls */
         action = menu->addAction( qtr( "Advanced Controls" ), mi,
