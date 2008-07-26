@@ -4853,12 +4853,13 @@ dnl Maemo
 dnl
 AC_ARG_ENABLE(maemo,
   [  --enable-maemo          Internet tablets based on Maemo SDK (default disabled)])
-if test "${enable_maemo}" != "no"
+if test "${enable_maemo}" = "yes"
 then
   PKG_CHECK_MODULES(HILDON, [hildon-1 hildon-fm-2], [
     VLC_ADD_CFLAGS([maemo],[${HILDON_CFLAGS}])
     VLC_ADD_LIBS([maemo],[${HILDON_LIBS}])
     VLC_ADD_PLUGIN([maemo])
+    VLC_ADD_PLUGIN([swscale_maemo])
     AC_DEFINE([BUILD_MAEMO], 1, [Define if you're using Maemo interfaces])
     ALIASES="${ALIASES} mvlc"
   ], [
