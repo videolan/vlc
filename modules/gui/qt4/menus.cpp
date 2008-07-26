@@ -72,6 +72,10 @@ enum
 
 static QActionGroup *currentGroup;
 
+/* HACK for minimalView to go around a Qt bug/feature
+ * that doesn't update the QAction checked state when QMenu is hidden */
+QAction *QVLCMenu::minimalViewAction = NULL;
+
 // Add static entries to menus
 void addDPStaticEntry( QMenu *menu,
                        const QString text,
@@ -376,6 +380,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
         action->setCheckable( true );
         if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE )
             action->setChecked( true );
+        minimalViewAction = action; /* HACK for minimalView */
 
         /* FullScreen View */
         action = menu->addAction( qtr( "Fullscreen Interface" ), mi,

@@ -28,6 +28,7 @@
 #include "qt4.hpp"
 
 #include <QObject>
+#include <QAction>
 #include <vector>
 
 /* Folder vs. Directory */
@@ -100,6 +101,9 @@ public:
 
     /* Actions */
     static void DoAction( intf_thread_t *, QObject * );
+
+    /* HACK for minimalView */
+    static QAction *minimalViewAction;
 private:
     /* Generic automenu methods */
     static QMenu * Populate( intf_thread_t *, QMenu *current,

@@ -796,6 +796,8 @@ void MainInterface::undockPlaylist()
 
 void MainInterface::toggleMinimalView()
 {
+    /* HACK for minimalView, see menus.cpp */
+    if( !menuBar()->isVisible() ) QVLCMenu::minimalViewAction->toggle();
     TOGGLEV( menuBar() );
     TOGGLEV( controls );
     TOGGLEV( statusBar() );
