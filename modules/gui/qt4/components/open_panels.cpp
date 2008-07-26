@@ -183,7 +183,7 @@ void FileOpenPanel::accept()
 
 void FileOpenBox::accept()
 {
-    OpenDialog::getInstance( NULL, NULL )->play();
+    OpenDialog::getInstance( NULL, NULL, true )->selectSlots();
 }
 
 /* Function called by Open Dialog when clicked on cancel */

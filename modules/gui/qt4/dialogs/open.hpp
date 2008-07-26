@@ -35,6 +35,23 @@
 #include "ui/open.h"
 #include "components/open_panels.hpp"
 
+enum {
+    OPEN_FILE_TAB,
+    OPEN_DISC_TAB,
+    OPEN_NETWORK_TAB,
+    OPEN_CAPTURE_TAB,
+    OPEN_TAB_MAX
+};
+
+enum {
+    OPEN_AND_PLAY,
+    OPEN_AND_ENQUEUE,
+    OPEN_AND_STREAM,
+    OPEN_AND_SAVE,
+    SELECT              /* Special mode to select a MRL (for VLM or similar */
+};
+
+
 class QString;
 class QTabWidget;
 
@@ -43,7 +60,7 @@ class OpenDialog : public QVLCDialog
     Q_OBJECT;
 public:
     static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf,
-                                     int _action_flag = 0, bool modal = false  );
+                                     bool b_rawInstance = false, int _action_flag = 0, bool b_selectMode = false  );
 
     static void killInstance()
     {
@@ -52,7 +69,7 @@ public:
     }
     virtual ~OpenDialog();
 
-    void showTab( int );
+    void showTab( int = OPEN_FILE_TAB );
     QString getMRL(){ return mrl; }
 
 public slots:
@@ -63,7 +80,7 @@ public slots:
     void transcode();
 
 private:
-    OpenDialog( QWidget *parent, intf_thread_t *, bool modal,
+    OpenDialog( QWidget *parent, intf_thread_t *, bool b_selectMode,
                 int _action_flag = 0 );
 
     static OpenDialog *instance;

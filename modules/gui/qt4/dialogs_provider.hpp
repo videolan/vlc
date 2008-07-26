@@ -35,6 +35,7 @@
 
 #include "qt4.hpp"
 #include "dialogs/interaction.hpp"
+#include "dialogs/open.hpp"
 
 #include <QObject>
 #include <QTimer>
@@ -75,22 +76,6 @@ enum {
     EXT_FILTER_AUDIO     =  0x04,
     EXT_FILTER_PLAYLIST  =  0x08,
     EXT_FILTER_SUBTITLE  =  0x10,
-};
-
-enum {
-    OPEN_FILE_TAB,
-    OPEN_DISC_TAB,
-    OPEN_NETWORK_TAB,
-    OPEN_CAPTURE_TAB,
-    OPEN_TAB_MAX
-};
-
-enum {
-    OPEN_AND_PLAY,
-    OPEN_AND_STREAM,
-    OPEN_AND_SAVE,
-    OPEN_AND_ENQUEUE,
-    SELECT
 };
 
 class QEvent;

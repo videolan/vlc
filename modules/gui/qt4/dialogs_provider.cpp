@@ -260,7 +260,7 @@ void DialogsProvider::openCaptureDialog()
 /* Same as the open one, but force the enqueue */
 void DialogsProvider::PLAppendDialog()
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, OPEN_AND_ENQUEUE)
+    OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false, OPEN_AND_ENQUEUE)
                             ->showTab( OPEN_FILE_TAB );
 }
 
@@ -453,14 +453,14 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
 
 void DialogsProvider::openThenStreamingDialogs()
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, OPEN_AND_STREAM )
-                                ->showTab( 0 );
+    OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false, OPEN_AND_STREAM )
+                                ->showTab( OPEN_FILE_TAB );
 }
 
 void DialogsProvider::openThenTranscodingDialogs()
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, OPEN_AND_SAVE )
-                                ->showTab( 0 );
+    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, false, OPEN_AND_SAVE )
+                                ->showTab( OPEN_FILE_TAB );
 }
 
 /****************************************************************************

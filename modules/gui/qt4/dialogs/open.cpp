@@ -37,31 +37,36 @@
 OpenDialog *OpenDialog::instance = NULL;
 
 OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
-        int _action_flag, bool modal )
+        bool b_rawInstance, int _action_flag, bool b_selectMode )
 {
     /* Creation */
     if( !instance )
-        instance = new OpenDialog( parent, p_intf, modal, _action_flag );
-    else
+        instance = new OpenDialog( parent, p_intf, b_selectMode, _action_flag );
+    else if( !b_rawInstance )
     {
         /* Request the instance but change small details:
            - Button menu
            - Modality on top of the parent dialog */
+        if( b_selectMode )
+        {
+            instance->setWindowModality( Qt::WindowModal );
+            _action_flag = SELECT; /* This should be useless, but we never know
+                                      if the call is correct */
+        }
         instance->i_action_flag = _action_flag;
         instance->setMenuAction();
-        if( modal ) instance->setWindowModality( Qt::WindowModal );
     }
     return instance;
 }
 
 OpenDialog::OpenDialog( QWidget *parent,
                         intf_thread_t *_p_intf,
-                        bool modal,
+                        bool b_selectMode,
                         int _action_flag )  :  QVLCDialog( parent, _p_intf )
 {
     i_action_flag = _action_flag;
 
-    if( modal ) /* Select mode */
+    if( b_selectMode ) /* Select mode */
     {
         setWindowModality( Qt::WindowModal );
         i_action_flag = SELECT;
@@ -142,7 +147,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     CONNECT( ui.slaveText, textChanged( QString ), this, updateMRL() );
     CONNECT( ui.cacheSpinBox, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.startTimeSpinBox, valueChanged( int ), this, updateMRL() );
-    BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
+    BUTTONACT( ui.advancedCheckBox, toggleAdvancedPanel() );
 
     /* Buttons action */
     BUTTONACT( playButton, selectSlots() );
@@ -190,12 +195,12 @@ void OpenDialog::setMenuAction()
             playButton->setText( qtr( "&Play" ) );
         }
         playButton->show();
-        playButton->setDefault( true );
         selectButton->hide();
+        playButton->setDefault( true );
     }
 }
 
-void OpenDialog::showTab( int i_tab=0 )
+void OpenDialog::showTab( int i_tab )
 {
     ui.Tab->setCurrentIndex( i_tab );
     show();
@@ -243,14 +248,15 @@ void OpenDialog::cancel()
     mainMRL.clear();
 
     /* If in Select Mode, reject instead of hiding */
-    if( windowModality() != Qt::NonModal ) reject();
+    if( i_action_flag == SELECT ) reject();
     else hide();
 }
 
 /* If EnterKey is pressed */
 void OpenDialog::close()
 {
-    if( windowModality() != Qt::NonModal )
+    /* If in Select Mode, accept instead of selecting a Slot */
+    if( i_action_flag == SELECT )
         accept();
     else
         selectSlots();
@@ -292,7 +298,7 @@ void OpenDialog::finish( bool b_enqueue = false )
     toggleVisible();
     mrl = ui.advancedLineInput->text();
 
-    if( windowModality() == Qt::NonModal )
+    if( i_action_flag != SELECT )
     {
         QStringList tempMRL = SeparateEntries( mrl );
         for( size_t i = 0; i < tempMRL.size(); i++ )
