@@ -205,6 +205,7 @@ vlc_module_begin();
 
         add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
                 false );
+            change_internal();
 
         set_callbacks( OpenDialogs, Close );
 
