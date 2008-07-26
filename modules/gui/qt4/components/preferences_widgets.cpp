@@ -1196,7 +1196,7 @@ void KeySelectorControl::finish()
     CONNECT( table, itemDoubleClicked( QTreeWidgetItem *, int ),
              this, selectKey( QTreeWidgetItem * ) );
     CONNECT( table, itemSelectionChanged (),
-             this, select1Key() );       
+             this, select1Key() );
 
     CONNECT( shortcutValue, pressed(), this, selectKey() );
 }
