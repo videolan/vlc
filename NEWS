@@ -112,6 +112,7 @@ Decoders:
  * DosBox Capture support
  * Karl Morton's Video support
  * limited atrac3 support
+ * Fraps support
  * Fluidsynth MIDI software synthesis (with external sound fonts)
  * New codec FOURCCs to support more specific files:
    Avid, FCP, Sony, Samsung, ...
