@@ -356,15 +356,14 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
         playlist_AddInput( THEPL, p_input,
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
                        PLAYLIST_END, pl, pl_Unlocked );
-        /* Why this ?
-         * input_Read( THEPL, p_input, false ); */
+        input_Read( THEPL, p_input, false );
         vlc_gc_decref( p_input );
     }
 }
 
 void DialogsProvider::PLAppendDir()
 {
-    openDirectory( p_intf, true, true );
+    openDirectory( p_intf, true, false );
 }
 
 void DialogsProvider::MLAppendDir()
