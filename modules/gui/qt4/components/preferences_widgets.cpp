@@ -1193,16 +1193,18 @@ void KeySelectorControl::finish()
 
     table->resizeColumnToContents( 0 );
 
-    CONNECT( table, itemClicked( QTreeWidgetItem *, int ),
-             this, select1Key( QTreeWidgetItem * ) );
     CONNECT( table, itemDoubleClicked( QTreeWidgetItem *, int ),
              this, selectKey( QTreeWidgetItem * ) );
+    CONNECT( table, itemSelectionChanged (),
+             this, select1Key() );       
+
     CONNECT( shortcutValue, pressed(), this, selectKey() );
 }
 
 /* Show the key selected from the table in the keySelector */
-void KeySelectorControl::select1Key( QTreeWidgetItem *keyItem )
+void KeySelectorControl::select1Key()
 {
+    QTreeWidgetItem *keyItem = table->currentItem();
     shortcutValue->setText( keyItem->text( 1 ) );
     shortcutValue->setValue( keyItem->data( 1, Qt::UserRole ).toInt() );
 }

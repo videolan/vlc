@@ -457,7 +457,7 @@ private:
 private slots:
     void setTheKey();
     void selectKey( QTreeWidgetItem * = NULL );
-    void select1Key( QTreeWidgetItem *);
+    void select1Key();
 };
 
 class KeyInputDialog : public QDialog
