@@ -40,6 +40,26 @@
 #include <schroedinger/schro.h>
 
 /*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int        OpenDecoder  ( vlc_object_t * );
+static void       CloseDecoder ( vlc_object_t * );
+
+vlc_module_begin();
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_VCODEC );
+    set_description( N_("Schroedinger video decoder") );
+    set_capability( "decoder", 200 );
+    set_callbacks( OpenDecoder, CloseDecoder );
+    add_shortcut( "schroedinger" );
+vlc_module_end();
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static picture_t *DecodeBlock  ( decoder_t *p_dec, block_t **pp_block );
+
+/*****************************************************************************
  * picture_pts_t : store pts alongside picture number, not carried through
  * decoder
  *****************************************************************************/
@@ -67,25 +87,7 @@ struct decoder_sys_t
     int i_ts_resync_hack;
 };
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int        OpenDecoder  ( vlc_object_t * );
-static void       CloseDecoder ( vlc_object_t * );
-static picture_t *DecodeBlock  ( decoder_t *p_dec, block_t **pp_block );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_description( N_("Schroedinger video decoder") );
-    set_capability( "decoder", 200 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    add_shortcut( "schroedinger" );
-vlc_module_end();
+//#define TRACE
 
 /*****************************************************************************
  * ResetPTStlb: Purge all entries in @p_dec@'s PTS-tlb
@@ -384,7 +386,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* reset the decoder when seeking as the decode in progress is invalid */
         /* discard the block as it is just a null magic block */
         if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) {
+#ifdef TRACE
             msg_Dbg( p_dec, "SCHRO_DECODER_RESET" );
+#endif
             schro_decoder_reset( p_sys->p_schro );
 
             ResetPTStlb( p_dec );
@@ -450,8 +454,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 b_bail = 1;
             }
 
+#ifdef TRACE
             msg_Dbg( p_dec, "Inserting bytes into decoder len=%zu of %zu pts=%"PRId64,
                      i_pulen, p_block->i_buffer, p_block->i_pts);
+#endif
             /* this stops the same block being fed back into this function if
              * we were on the next iteration of this loop to output a picture */
             *pp_block = NULL;
@@ -462,7 +468,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             i_bufused += i_pulen;
 
             if( state == SCHRO_DECODER_FIRST_ACCESS_UNIT ) {
+#ifdef TRACE
                 msg_Dbg( p_dec, "SCHRO_DECODER_FIRST_ACCESS_UNIT");
+#endif
                 SetVideoFormat( p_dec );
                 ResetPTStlb( p_dec );
             }
@@ -479,11 +487,15 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         switch( state )
         {
         case SCHRO_DECODER_NEED_BITS:
+#ifdef TRACE
             msg_Dbg( p_dec, "SCHRO_DECODER_NEED_BITS" );
+#endif
             return NULL;
 
         case SCHRO_DECODER_NEED_FRAME:
+#ifdef TRACE
             msg_Dbg( p_dec, "SCHRO_DECODER_NEED_FRAME" );
+#endif
             p_schroframe = CreateSchroFrameFromPic( p_dec );
 
             if( !p_schroframe )
@@ -512,24 +524,27 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_pic->date = p_sys->i_lastpts + p_sys->i_frame_pts_delta;
             p_sys->i_lastpts = p_pic->date;
 
+#ifdef TRACE
             msg_Dbg( p_dec, "SCHRO_DECODER_OK num=%u date=%"PRId64,
                      u_pnum, p_pic->date);
-
+#endif
             return p_pic;
 
         case SCHRO_DECODER_EOS:
+#ifdef TRACE
             msg_Dbg( p_dec, "SCHRO_DECODER_EOS");
+#endif
             /* reset the decoder -- schro doesn't do this itself automatically */
             /* there are no more pictures in the output buffer at this point */
             schro_decoder_reset( p_sys->p_schro );
             break;
 
         case SCHRO_DECODER_ERROR:
+#ifdef TRACE
             msg_Dbg( p_dec, "SCHRO_DECODER_ERROR");
+#endif
             return NULL;
         }
     }
-
-    /* Never reached */
-    return NULL;
 }
+
