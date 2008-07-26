@@ -177,7 +177,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     }
     else if( [o_itemIdent isEqual: VLCOSDSettingToolbarIdentifier] )
     {
-        CreateToolbarItem( _NS("Subtitles & OSD"), _NS("Subtitles & OSD Settings"), @"spref_cone_Subtitles_64", showOSDSettings );
+        CreateToolbarItem( _NS("Subtitles & OSD"), _NS("Subtitles & On Screen Display Settings"), @"spref_cone_Subtitles_64", showOSDSettings );
     }
     else if( [o_itemIdent isEqual: VLCInputSettingToolbarIdentifier] )
     {
@@ -905,7 +905,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the OSD/Subtitle settings using SimplePrefs (%i)", i );
-            intf_UserFatal( p_intf, false, _("OSD/Subtitle Settings not saved"),
+            intf_UserFatal( p_intf, false, _("On Screen Display/Subtitle Settings not saved"),
                         _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
