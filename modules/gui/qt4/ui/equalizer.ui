@@ -49,7 +49,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label" >
+      <widget class="QLabel" name="presetLabel" >
        <property name="text" >
         <string>_("Preset")</string>
        </property>

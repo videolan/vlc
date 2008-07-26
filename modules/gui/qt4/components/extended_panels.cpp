@@ -885,6 +885,8 @@ void Equalizer::enable()
 void Equalizer::enable( bool en )
 {
     ui.eq2PassCheck->setEnabled( en );
+    ui.presetsCombo->setEnabled( en );
+    ui.presetLabel->setEnabled( en );
     ui.preampLabel->setEnabled( en );
     ui.preampSlider->setEnabled( en  );
     for( int i = 0 ; i< BANDS; i++ )
