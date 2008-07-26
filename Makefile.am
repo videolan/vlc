@@ -1137,6 +1137,9 @@ update-po:
 	    | grep -v 'mux/rtp/' \
 	    | grep -v 'demux/rtpxiph.c' \
 	    | sort ; \
+	  echo "#bindings" ; \
+	     find bindings -name '*.[chm]' -o -name '*.[ch]pp' \
+	     |sort ; \
 	} > $(top_srcdir)/po/POTFILES.in
 	rm -f $(top_srcdir)/po/vlc.pot
 	cd po && $(MAKE) POTFILES vlc.pot update-po
