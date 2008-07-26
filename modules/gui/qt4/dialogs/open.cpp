@@ -148,6 +148,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     CONNECT( ui.cacheSpinBox, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.startTimeSpinBox, valueChanged( int ), this, updateMRL() );
     BUTTONACT( ui.advancedCheckBox, toggleAdvancedPanel() );
+    BUTTONACT( ui.slaveBrowseButton, browseInputSlave() );
 
     /* Buttons action */
     BUTTONACT( playButton, selectSlots() );
@@ -418,4 +419,12 @@ QStringList OpenDialog::SeparateEntries( QString entries )
     if( !entry.isEmpty() ) entries_array.append( entry );
 
     return entries_array;
+}
+
+void OpenDialog::browseInputSlave()
+{
+    OpenDialog *od = new OpenDialog( this, p_intf, true, SELECT );
+    od->exec();
+    ui.slaveText->setText( od->getMRL() );
+    delete od;
 }

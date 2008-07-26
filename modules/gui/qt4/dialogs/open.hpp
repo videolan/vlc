@@ -113,6 +113,7 @@ private slots:
     void updateMRL();
     void newCachingMethod( QString );
     void signalCurrent();
+    void browseInputSlave();
 };
 
 #endif
