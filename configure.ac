@@ -1808,6 +1808,22 @@ if test "${enable_live555}" != "no"; then
       CPPFLAGS_live555="${CPPFLAGS_live555} -DSOLARIS"
     fi
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
+
+    AC_CHECK_HEADERS(liveMedia_version.hh, [
+      AC_MSG_CHECKING(for liveMedia version >= 1214895600 )
+      AC_EGREP_CPP(yes,
+        [#include <liveMedia_version.hh>
+         #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
+         #if LIVEMEDIA_LIBRARY_VERSION_INT < 1214895600
+         yes
+         #endif
+         #endif],
+        [AC_MSG_RESULT([yes])
+         AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia. 
+lternatively you can use --disable-live555 to disable the liveMedia plugin.])
+      ])
+    ])
+
     AC_CHECK_HEADERS(liveMedia.hh, [
       VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
       AC_CHECK_LIB(liveMedia_pic, main, [
@@ -1838,6 +1854,21 @@ if test "${enable_live555}" != "no"; then
     fi
     if test -f "${real_live555_tree}/liveMedia/libliveMedia.a"; then
       AC_MSG_RESULT(${real_live555_tree}/liveMedia/libliveMedia.a)
+
+      AC_CHECK_HEADERS(${real_live555_tree}/liveMedia/include/liveMedia_version.hh,[
+        AC_MSG_CHECKING(for liveMedia version >= 1214895600 )
+        AC_EGREP_CPP(yes,
+          [#include "${real_live555_tree}/liveMedia/include/liveMedia_version.hh"
+           #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
+           #if LIVEMEDIA_LIBRARY_VERSION_INT < 1214895600
+           yes
+           #endif
+           #endif],
+          [AC_MSG_RESULT([yes])
+           AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia. 
+lternatively you can use --disable-live555 to disable the liveMedia plugin.])
+        ])
+      ])
 
       VLC_ADD_PLUGIN([live555])
 
