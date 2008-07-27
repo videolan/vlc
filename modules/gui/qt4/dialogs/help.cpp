@@ -262,10 +262,12 @@ void UpdateDialog::UpdateOrDownload()
 
         if( dest_dir != "" )
         {
+            /*HACK: Qt4 isn't able to change the way OS deals with diretories names.
+                    Windows doesn't add an ending separtor so we might add it. */
             #if defined( WIN32 ) || defined( UNDER_CE )
             dest_dir += DIR_SEP;
             #endif
-            msg_Dbg( p_intf, "Downloading to folder: %s", dest_dir );
+            msg_Dbg( p_intf, "Downloading to folder: %s", qtu( dest_dir ) );
             toggleVisible();
             update_Download( p_update, qtu( dest_dir ) );
         }
