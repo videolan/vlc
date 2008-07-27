@@ -225,6 +225,8 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
 static void RegionPictureRelease( picture_t *p_pic )
 {
     free( p_pic->p_data_orig );
+    /* We use pf_release nullity to know if the picture has already been released. */
+    p_pic->pf_release = NULL;
 }
 subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
                                          video_format_t *p_fmt )
