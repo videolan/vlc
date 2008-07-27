@@ -423,6 +423,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     PL_UNLOCK;
 
     services_discovery_Destroy( p_sds->p_sd );
+    free( p_sds );
 
     return VLC_SUCCESS;
 }
