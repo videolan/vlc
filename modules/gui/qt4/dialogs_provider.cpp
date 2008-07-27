@@ -335,8 +335,6 @@ void DialogsProvider::MLAppendDialog()
 
 /**
  * Simple open
- * Not used anymore. Let the code until we are sure we don't want it
- * Two opens make it confusing for the user.
  ***/
 QStringList DialogsProvider::showSimpleOpen( QString help,
                                              int filters,
