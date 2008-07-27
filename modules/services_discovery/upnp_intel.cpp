@@ -295,9 +295,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_playlist = pl_Yield( p_sd );
 
     /* Create our playlist node */
+    vlc_object_lock( p_sys->p_playlist );
     playlist_NodesPairCreate( pl_Get( p_sd ), _("Devices"),
                               &p_sys->p_node_cat, &p_sys->p_node_one,
                               true );
+    vlc_object_unlock( p_sys->p_playlist );
 
     return VLC_SUCCESS;
 }
