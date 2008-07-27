@@ -998,10 +998,12 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         if( p_subpic->pf_update_regions )
         {
-            /* FIXME that part look like crap too if there is more than 1 region */
-
-            if( p_subpic->p_region )
-                spu_DestroyRegion( p_spu, p_subpic->p_region );
+            while( p_subpic->p_region )
+            {
+                subpicture_region_t *p_region = p_subpic->p_region;
+                p_subpic->p_region = p_region->p_next;
+                spu_DestroyRegion( p_spu, p_region );
+            }
 
             /* TODO do not reverse the scaling that was done before calling
              * spu_RenderSubpictures, just pass it along (or do it inside
