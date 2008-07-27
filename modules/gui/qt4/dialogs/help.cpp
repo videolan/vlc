@@ -262,8 +262,9 @@ void UpdateDialog::UpdateOrDownload()
 
         if( dest_dir != "" )
         {
-            /*HACK: Qt4 isn't able to change the way OS deals with diretories names.
-                    Windows doesn't add an ending separtor so we might add it. */
+            /*HACK: Qt4 isn't able to change the way OS deals with directories
+              names. Windows doesn't add an ending separator so we might add it.
+             */
             #if defined( WIN32 ) || defined( UNDER_CE )
             dest_dir += DIR_SEP;
             #endif
