@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.cpp : Panels for the open dialogs
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques
  * Copyright (C) 2007 Savoir-faire Linux
  *
@@ -44,6 +44,7 @@
 #include <QDirModel>
 #include <QScrollArea>
 #include <QUrl>
+#include <QSettings>
 
 /**************************************************************************
  * Open Files and subtitles                                               *
@@ -74,6 +75,11 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
+#if HAS_QT43
+    QSettings settings( "vlc", "vlc-qt-interface" );
+    dialogBox->restoreState(
+            settings.value( "file-dialog-state" ).toByteArray() );
+#endif
     dialogBox->setViewMode( config_GetInt( p_intf, "qt-open-detail" ) ?
             QFileDialog::Detail : QFileDialog::List );
 
@@ -138,6 +144,10 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 FileOpenPanel::~FileOpenPanel()
 {
+#if HAS_QT43
+    QSettings settings( "vlc", "vlc-qt-interface" );
+    settings.setValue( "file-dialog-state", dialogBox->saveState() );
+#endif
 }
 
 /* Show a fileBrowser to select a subtitle */
