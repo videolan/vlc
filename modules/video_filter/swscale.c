@@ -252,7 +252,7 @@ static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, int *pi_sw
     bool b_has_a = false;
     int i_sws_flags = i_sws_flags_default;
 
-    if( p_fmti->i_chroma == p_fmto->i_chroma &&  0 )
+    if( p_fmti->i_chroma == p_fmto->i_chroma )
     {
         if( p_fmti->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'P' ) && ALLOW_YUVP )
         {
