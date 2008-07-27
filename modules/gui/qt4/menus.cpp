@@ -352,9 +352,11 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     QMenu *menu = new QMenu( current );
     if( mi )
     {
-        menu->addAction( QIcon( ":/pixmaps/playlist_16px.png" ),
-                         qtr( "Playlist..." ), mi, SLOT( togglePlaylist() ),
-                         qtr( "Ctrl+L" ) );
+        QAction *act=
+            menu->addAction( QIcon( ":/pixmaps/playlist_16px.png" ),
+                             qtr( "Playlist..." ), mi, SLOT( togglePlaylist() ),
+                             qtr( "Ctrl+L" ) );
+        act->setData( "_static_" );
     }
     addDPStaticEntry( menu, qtr( I_MENU_EXT ), "",
         ":/pixmaps/menus_settings_16px.png", SLOT( extendedDialog() ),
@@ -365,11 +367,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     if( with_intf )
     {
         QMenu *intfmenu = InterfacesMenu( p_intf, menu );
-        intfmenu->setTitle( qtr( "Add Interfaces" ) );
         MenuFunc *f = new MenuFunc( intfmenu, 4 );
         CONNECT( intfmenu, aboutToShow(), THEDP->menusUpdateMapper, map() );
         THEDP->menusUpdateMapper->setMapping( intfmenu, f );
-        menu->addMenu( intfmenu );
         menu->addSeparator();
     }
     if( mi )
@@ -378,6 +378,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
         QAction *action = menu->addAction( qtr( "Minimal View..." ), mi,
                                 SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
         action->setCheckable( true );
+        action->setData( "_static_" );
         if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE )
             action->setChecked( true );
         minimalViewAction = action; /* HACK for minimalView */
@@ -386,11 +387,13 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
         action = menu->addAction( qtr( "Fullscreen Interface" ), mi,
                                   SLOT( toggleFullScreen() ), QString( "F11" ) );
         action->setCheckable( true );
+        action->setData( "_static_" );
 
         /* Advanced Controls */
         action = menu->addAction( qtr( "Advanced Controls" ), mi,
                                   SLOT( toggleAdvanced() ) );
         action->setCheckable( true );
+        action->setData( "_static_" );
         if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
             action->setChecked( true );
 #if 0 /* For Visualisations. Not yet working */
@@ -434,10 +437,7 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     varnames.push_back( "intf-add" );
     objects.push_back( p_intf->i_object_id );
 
-    QMenu *submenu = new QMenu( current );
-    QMenu *menu = Populate( p_intf, submenu, varnames, objects );
-
-    return menu;
+    return Populate( p_intf, current, varnames, objects );
 }
 
 /**
@@ -964,11 +964,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
             }
         }
 
-        /* Ugly specific stuff */
-        if( strstr( varnames[i], "intf-add" ) )
-            UpdateItem( p_intf, menu, varnames[i], p_object, false );
-        else
-            UpdateItem( p_intf, menu, varnames[i], p_object, true );
+        UpdateItem( p_intf, menu, varnames[i], p_object, true );
         if( p_object )
             vlc_object_release( p_object );
     }
