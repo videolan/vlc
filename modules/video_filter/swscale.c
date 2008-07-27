@@ -463,7 +463,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
         else
         {
-            Convert( p_sys->ctx, p_pic_dst, p_pic, p_fmti, 3, 1 );
+            Convert( p_sys->ctxA, p_pic_dst, p_pic, p_fmti, 3, 1 );
         }
     }
 
