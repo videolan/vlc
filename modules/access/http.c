@@ -184,6 +184,7 @@ struct access_sys_t
     int64_t    i_chunk;
 
     int        i_icy_meta;
+    int64_t    i_icy_offset;
     char       *psz_icy_name;
     char       *psz_icy_genre;
     char       *psz_icy_title;
@@ -276,6 +277,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
     p_sys->p_tls = NULL;
     p_sys->p_vs = NULL;
     p_sys->i_icy_meta = 0;
+    p_sys->i_icy_offset = 0;
     p_sys->psz_icy_name = NULL;
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
@@ -697,10 +699,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
 
 
-    if( p_sys->i_icy_meta > 0 && p_access->info.i_pos > 0 )
+    if( p_sys->i_icy_meta > 0 && p_access->info.i_pos-p_sys->i_icy_offset > 0 )
     {
         int64_t i_next = p_sys->i_icy_meta -
-                                    p_access->info.i_pos % p_sys->i_icy_meta;
+                                    (p_access->info.i_pos - p_sys->i_icy_offset ) % p_sys->i_icy_meta;
 
         if( i_next == p_sys->i_icy_meta )
         {
@@ -1005,6 +1007,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
     p_sys->b_chunked = false;
     p_sys->i_chunk = 0;
     p_sys->i_icy_meta = 0;
+    p_sys->i_icy_offset = i_tell;
     p_sys->psz_icy_name = NULL;
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
