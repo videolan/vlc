@@ -113,7 +113,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/InfoPlist.strings \
+	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
 	extras/package/macosx/Resources/a52.icns \
 	extras/package/macosx/Resources/aac.icns \
 	extras/package/macosx/Resources/asf.icns \
@@ -255,11 +255,11 @@ EXTRA_DIST += \
 	extras/package/macosx/Delete_Preferences.app/Contents/Resources/applet.icns \
 	extras/package/macosx/Delete_Preferences.app/Contents/Resources/applet.rsrc \
 	extras/package/macosx/Delete_Preferences.app/Contents/Resources/Scripts/main.scpt \
-	extras/package/macosx/plugin/Info.plist \
-	extras/package/macosx/plugin/InstallerInfo.plist \
+	extras/package/macosx/plugin/Info.plist.in \
+	extras/package/macosx/plugin/InstallerInfo.plist.in \
 	extras/package/macosx/plugin/InstallerDescription.plist \
 	extras/package/macosx/plugin/pbdevelopment.plist \
-	extras/package/macosx/plugin/English.lproj/InfoPlist.strings \
+	extras/package/macosx/plugin/English.lproj/InfoPlist.strings.in \
 	extras/package/macosx/eyetvplugin/EyeTVPluginDefs.h \
 	extras/package/macosx/eyetvplugin/Info.plist \
 	extras/package/macosx/eyetvplugin/eyetvplugin.c \
@@ -267,7 +267,7 @@ EXTRA_DIST += \
 	extras/package/macosx/eyetvplugin/English.lproj/InfoPlist.strings \
 	extras/package/macosx/eyetvplugin/eyetvplugin.xcodeproj/project.pbxproj \
 	extras/package/macosx/README.MacOSX.rtf \
-	extras/package/macosx/Info.plist
+	extras/package/macosx/Info.plist.in
 
 
 ###############################################################################
@@ -400,8 +400,11 @@ VLC-release.app: vlc
 	rm -Rf "$(top_builddir)/tmp"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC-release.app
-	for i in vlc.xcodeproj Resources README.MacOSX.rtf Info.plist; do \
+	for i in vlc.xcodeproj Resources README.MacOSX.rtf ; do \
 	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
+	done
+	for i in  Resources Info.plist; do \
+	  cp -R $(top_builddir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
 	done
 	for i in AUTHORS COPYING THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
@@ -558,8 +561,11 @@ VLC.app: vlc
 	rm -Rf $(top_builddir)/tmp
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC.app
-	for i in vlc.xcodeproj Resources README.MacOSX.rtf Info.plist; do \
+	for i in vlc.xcodeproj Resources README.MacOSX.rtf; do \
 	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
+	done
+	for i in  Resources Info.plist; do \
+	  cp -R $(top_builddir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
 	done
 	for i in AUTHORS COPYING THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \

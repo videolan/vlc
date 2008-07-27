@@ -128,7 +128,8 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	$(INSTALL) -d "$@/Contents/Resources"
 	$(INSTALL) npvlc.rsrc "$@/Contents/Resources/VLC Plugin.rsrc"
 	cp -r "$(top_srcdir)/extras/package/macosx/plugin/English.lproj" "$@/Contents/Resources/"
-	$(INSTALL) "$(top_srcdir)/extras/package/macosx/plugin/Info.plist" "$@/Contents/Info.plist"
+	cp -r "$(top_builddir)/extras/package/macosx/plugin/English.lproj" "$@/Contents/Resources/"
+	$(INSTALL) "$(top_builddir)/extras/package/macosx/plugin/Info.plist" "$@/Contents/Info.plist"
 	$(INSTALL) -d "$@/Contents/MacOS/modules"
 	find $(top_srcdir)/modules/ -name '*_plugin.$(LIBEXT)' | \
 	while read i; do \
