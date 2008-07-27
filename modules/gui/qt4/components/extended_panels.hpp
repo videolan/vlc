@@ -101,7 +101,8 @@ private:
 
     void delCallbacks( aout_instance_t * );
     void addCallbacks( aout_instance_t * );
-    void setValues( char *, float );
+    void updateUIValues( char *, float );
+    char * createValuesFromPreset( int i_preset );
 
     intf_thread_t *p_intf;
 private slots:
@@ -109,7 +110,7 @@ private slots:
     void enable();
     void set2Pass();
     void setPreamp();
-    void setBand();
+    void changeCoreBands();
     void setPreset(int);
 };
 

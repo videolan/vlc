@@ -828,7 +828,7 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
         bands[i] = new QSlider( Qt::Vertical );
         bands[i]->setMaximum( 400 );
         bands[i]->setValue( 200 );
-        CONNECT( bands[i], valueChanged( int ), this, setBand() );
+        CONNECT( bands[i], valueChanged( int ), this, changeCoreBands() );
         band_texts[i] = new QLabel( band_frequencies[i] + "\n0.0dB" );
         band_texts[i]->setFont( smallFont );
         grid->addWidget( bands[i], 0, i );
@@ -863,7 +863,7 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     free( psz_af );
     enable( ui.enableCheck->isChecked() );
 
-    setValues( psz_bands, f_preamp );
+    updateUIValues( psz_bands, f_preamp );
 }
 
 Equalizer::~Equalizer()
@@ -921,7 +921,8 @@ void Equalizer::setPreamp()
     aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
                                        VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
-    ui.preampLabel->setText( qtr( "Preamp\n" ) + QString::number( f, 'f', 1 ) + qtr( "dB" ) );
+    ui.preampLabel->setText( qtr( "Preamp\n" ) + QString::number( f, 'f', 1 )
+                                               + qtr( "dB" ) );
     if( p_aout )
     {
         delCallbacks( p_aout );
@@ -932,14 +933,14 @@ void Equalizer::setPreamp()
     config_PutFloat( p_intf, "equalizer-preamp", f );
 }
 
-void Equalizer::setBand()
+void Equalizer::changeCoreBands()
 {
     /**\todo smoothing */
 
     QString values;
     for( int i = 0; i < BANDS; i++ )
     {
-        const float f_val = (float)(  bands[i]->value() ) / 10 - 20;
+        const float f_val = (float)( bands[i]->value() ) / 10 - 20;
         QString val = QString("%1").arg( f_val, 5, 'f', 1 );
 
         band_texts[i]->setText( band_frequencies[i] + "\n" + val + "dB" );
@@ -957,14 +958,15 @@ void Equalizer::setBand()
         vlc_object_release( p_aout );
     }
 }
-void Equalizer::setValues( char *psz_bands, float f_preamp )
+
+void Equalizer::updateUIValues( char *psz_bands, float f_preamp )
 {
     char *p = psz_bands;
     if ( p )
     {
         for( int i = 0; i < BANDS; i++ )
         {
-            const float f = strtof( p, &p );
+            const float f = us_strtod(p, &p );
 
             bands[i]->setValue( (int)( ( f + 20 ) * 10 )  );
 
@@ -977,36 +979,47 @@ void Equalizer::setValues( char *psz_bands, float f_preamp )
         }
     }
     ui.preampSlider->setValue( (int)( ( f_preamp + 20 ) * 10 ) );
-    ui.preampLabel->setText( qtr( "Preamp\n" ) + QString::number( f_preamp, 'f', 1 ) + qtr( "dB" ) );
+    ui.preampLabel->setText( qtr( "Preamp\n" )
+                   + QString::number( f_preamp, 'f', 1 ) + qtr( "dB" ) );
 }
 
-void Equalizer::setPreset( int preset )
+char * Equalizer::createValuesFromPreset( int i_preset )
 {
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
-                                                VLC_OBJECT_AOUT, FIND_ANYWHERE );
-
     QString values;
+    char *psz_values;
+
+    /* Create the QString in Qt */
     for( int i = 0 ; i< BANDS ;i++ )
-        values += QString( " %1" ).arg( eqz_preset_10b[preset]->f_amp[i] );
+        values += QString( " %1" ).arg( eqz_preset_10b[i_preset]->f_amp[i] );
 
-    /* XXX Only needed because of setValues */
-    char psz_values[256];
-    snprintf( psz_values, sizeof(psz_values), "%s", values.toAscii().constData() );
+    /* Convert it to char * */
+    if( !asprintf( &psz_values, "%s", values.toAscii().constData() ) )
+        return NULL;
 
+    /* Update the UI */
+    updateUIValues( psz_values, eqz_preset_10b[i_preset]->f_preamp );
+    return psz_values;
+}
+
+void Equalizer::setPreset( int i_preset )
+{
+    char *psz_values = createValuesFromPreset( i_preset );
+    if( !psz_values ) return ;
+
+    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
+                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_aout )
     {
         delCallbacks( p_aout );
         var_SetString( p_aout, "equalizer-bands", psz_values );
         var_SetFloat( p_aout, "equalizer-preamp",
-                      eqz_preset_10b[preset]->f_preamp );
+                      eqz_preset_10b[i_preset]->f_preamp );
         addCallbacks( p_aout );
         vlc_object_release( p_aout );
     }
     config_PutPsz( p_intf, "equalizer-bands", psz_values );
     config_PutFloat( p_intf, "equalizer-preamp",
-                    eqz_preset_10b[preset]->f_preamp );
-
-    setValues( psz_values, eqz_preset_10b[preset]->f_preamp );
+                    eqz_preset_10b[i_preset]->f_preamp );
 }
 
 static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
