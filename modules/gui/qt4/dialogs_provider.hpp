@@ -154,6 +154,7 @@ public slots:
 
     void openDialog();
     void openDialog( int );
+    void openFileGenericDialog( intf_dialog_args_t * );
     void openDiscDialog();
     void openFileDialog();
     void openNetDialog();

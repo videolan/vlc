@@ -104,6 +104,8 @@ void DialogsProvider::customEvent( QEvent *event )
         case INTF_DIALOG_FILE_SIMPLE:
         case INTF_DIALOG_FILE:
             openDialog(); break;
+        case INTF_DIALOG_FILE_GENERIC:
+            openFileGenericDialog( de->p_arg ); break;
         case INTF_DIALOG_DISC:
             openDiscDialog(); break;
         case INTF_DIALOG_NET:
@@ -239,6 +241,57 @@ void DialogsProvider::openDialog( int i_tab )
 void DialogsProvider::openDialog()
 {
     openDialog( OPEN_FILE_TAB );
+}
+void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
+{
+    if( p_arg == NULL )
+    {
+        msg_Dbg( p_intf, "openFileGenericDialog() called with NULL arg" );
+        return;
+    }
+    int i = 0;
+    QString extensions = qfu( p_arg->psz_extensions );
+    while ( ( i = extensions.indexOf( "|", i ) ) != -1 )
+    {
+        if( ( extensions.count( "|" ) % 2 ) == 0 )
+            extensions.replace( i, 1, ");;" );
+        else
+            extensions.replace( i, 1, "(" );
+    }
+    extensions.replace(QString(";*"), QString(" *"));
+    extensions.append( ")" );
+    if( p_arg->b_save )
+    {
+        QString file = QFileDialog::getSaveFileName( NULL, p_arg->psz_title, qfu( p_intf->p_sys->psz_filepath ), extensions );
+        if( !file.isEmpty() )
+        {
+            p_arg->i_results = 1;
+            p_arg->psz_results = ( char ** )malloc( p_arg->i_results * sizeof( char * ) );
+            p_arg->psz_results[0] = strdup( qtu( file ) );
+        }
+        else
+            p_arg->i_results = 0;
+    }
+    else
+    {
+        QStringList files = QFileDialog::getOpenFileNames( NULL, p_arg->psz_title, qfu( p_intf->p_sys->psz_filepath ), extensions );
+        p_arg->i_results = files.count();
+        p_arg->psz_results = ( char ** )malloc( p_arg->i_results * sizeof( char * ) );
+        i = 0;
+        foreach( QString file, files )
+            p_arg->psz_results[i++] = strdup( qtu( file ) );
+    }
+    if( p_arg->pf_callback )
+        p_arg->pf_callback( p_arg );
+    if( p_arg->psz_results )
+    {
+        for( i = 0; i < p_arg->i_results; i++ )
+            free( p_arg->psz_results[i] );
+        free( p_arg->psz_results );
+    }
+    free( p_arg->psz_title );
+    free( p_arg->psz_extensions );
+    free( p_arg );
 }
 void DialogsProvider::openFileDialog()
 {
