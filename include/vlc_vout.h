@@ -167,6 +167,8 @@ static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_
 
 /**
  * This function will copy the picture pixels.
+ * You can safely copy between pictures that do not have the same size,
+ * only the compatible(smaller) part will be copied.
  */
 VLC_EXPORT( void, picture_CopyPixels, ( picture_t *p_dst, const picture_t *p_src ) );
 

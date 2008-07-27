@@ -1033,11 +1033,16 @@ void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
 
     for( i = 0; i < p_src->i_planes ; i++ )
     {
+        const unsigned i_width  = __MIN( p_dst->p[i].i_visible_pitch,
+                                         p_src->p[i].i_visible_pitch );
+        const unsigned i_height = __MIN( p_dst->p[i].i_visible_lines,
+                                         p_src->p[i].i_visible_lines );
+
         if( p_src->p[i].i_pitch == p_dst->p[i].i_pitch )
         {
             /* There are margins, but with the same width : perfect ! */
             vlc_memcpy( p_dst->p[i].p_pixels, p_src->p[i].p_pixels,
-                        p_src->p[i].i_pitch * p_src->p[i].i_visible_lines );
+                        p_src->p[i].i_pitch * i_height );
         }
         else
         {
@@ -1049,9 +1054,9 @@ void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
             assert( p_in );
             assert( p_out );
 
-            for( i_line = p_src->p[i].i_visible_lines; i_line--; )
+            for( i_line = i_height; i_line--; )
             {
-                vlc_memcpy( p_out, p_in, p_src->p[i].i_visible_pitch );
+                vlc_memcpy( p_out, p_in, i_width );
                 p_in += p_src->p[i].i_pitch;
                 p_out += p_dst->p[i].i_pitch;
             }
