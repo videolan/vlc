@@ -1435,7 +1435,6 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
         mvhline( y, x + i_width, ' ', w - i_width );
     }
 
-    free( p_buf );
 #else
     if( i_len > w )
     {
@@ -1466,6 +1465,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
         mvhline( y, x + i_len, ' ', w - i_len );
     }
 #endif
+    free( p_buf );
 }
 static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt, ... )
 {
