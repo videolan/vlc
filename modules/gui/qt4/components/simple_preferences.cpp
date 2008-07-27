@@ -478,6 +478,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "qt-display-mode", IntegerList, NULL,
                             displayModeBox );
             CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
+            CONFIG_GENERIC( "qt-fs-controller", Bool, NULL, fsController );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, ui.fileSkin,
                     ui.skinBrowse );
 

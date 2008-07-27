@@ -81,13 +81,14 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     /* Variables initialisation */
     // need_components_update = false;
-    bgWidget         = NULL;
-    videoWidget      = NULL;
-    playlistWidget   = NULL;
-    sysTray          = NULL;
-    videoIsActive    = false;
-    playlistVisible  = false;
-    input_name       = "";
+    bgWidget             = NULL;
+    videoWidget          = NULL;
+    playlistWidget       = NULL;
+    sysTray              = NULL;
+    videoIsActive        = false;
+    playlistVisible      = false;
+    input_name           = "";
+    fullscreenControls   = NULL;
 
     /* Ask for privacy */
     askForPrivacy();
@@ -221,12 +222,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                  videoWidget, SetSizing( unsigned int, unsigned int ) );
 
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
-
-    CONNECT( controls, advancedControlsToggled( bool ),
-             this, doComponentsUpdate() );
-
-    CONNECT( fullscreenControls, advancedControlsToggled( bool ),
-             this, doComponentsUpdate() );
 
     /* Size and placement of interface */
     QVLCTools::restoreWidgetPosition(settings,this,QSize(350,60));
@@ -387,12 +382,18 @@ void MainInterface::handleMainUi( QSettings *settings )
     controls = new ControlsWidget( p_intf, this,
                    settings->value( "adv-controls", false ).toBool(),
                    b_shiny );
+    CONNECT( controls, advancedControlsToggled( bool ),
+             this, doComponentsUpdate() );
 
     /* Create the FULLSCREEN CONTROLS Widget */
-    /* bool b_shiny = config_GetInt( p_intf, "qt-blingbling" ); */
-    fullscreenControls = new FullscreenControllerWidget( p_intf, this,
-                   settings->value( "adv-controls", false ).toBool(),
-                   b_shiny );
+    if( config_GetInt( p_intf, "qt-fs-controller" ) )
+    {
+        fullscreenControls = new FullscreenControllerWidget( p_intf, this,
+                settings->value( "adv-controls", false ).toBool(),
+                b_shiny );
+        CONNECT( fullscreenControls, advancedControlsToggled( bool ),
+                this, doComponentsUpdate() );
+    }
 
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
@@ -679,14 +680,14 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 //        emit askVideoToResize( *pi_width, *pi_height );
         emit askUpdate();
 
-        fullscreenControls->attachVout( p_nvout );
+        if( fullscreenControls ) fullscreenControls->attachVout( p_nvout );
     }
     return ret;
 }
 
 void MainInterface::releaseVideo( vout_thread_t *p_vout, void *p_win )
 {
-    fullscreenControls->detachVout( p_vout );
+    if( fullscreenControls ) fullscreenControls->detachVout( p_vout );
     emit askReleaseVideo( p_win );
 }
 
@@ -884,12 +885,17 @@ void MainInterface::setName( QString name )
 void MainInterface::setStatus( int status )
 {
     msg_Dbg( p_intf, "I was here, updating your status" );
+
     /* Forward the status to the controls to toggle Play/Pause */
     controls->setStatus( status );
-    fullscreenControls->setStatus( status );
-
     controls->updateInput();
-    fullscreenControls->updateInput();
+
+    if( fullscreenControls )
+    {
+        fullscreenControls->setStatus( status );
+        fullscreenControls->updateInput();
+    }
+
     speedControl->setEnable( THEMIM->getIM()->hasInput() );
 
     /* And in the systray for the menu */

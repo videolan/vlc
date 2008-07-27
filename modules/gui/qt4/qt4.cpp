@@ -135,6 +135,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_ALWAYS_VIDEO_MODE_TEXT N_( "Complete look with information area" )
 #define QT_MINIMAL_MODE_TEXT N_( "Minimal look with no menus" )
 
+#define QT_FULLSCREEN_TEXT N_( "Show a controller in fullscreen mode" )
+
 static const int i_mode_list[] =
     { QT_NORMAL_MODE, QT_ALWAYS_VIDEO_MODE, QT_MINIMAL_MODE };
 static const char *const psz_mode_list_text[] =
@@ -172,6 +174,8 @@ vlc_module_begin();
                 MINIMIZED_LONGTEXT, true);
         add_bool( "qt-name-in-title", true, NULL, TITLE_TEXT,
                   TITLE_LONGTEXT, false );
+        add_bool( "qt-fs-controller", true, NULL, QT_FULLSCREEN_TEXT,
+                  QT_FULLSCREEN_TEXT, false );
 
         add_bool( "qt-volume-complete", false, NULL, COMPLETEVOL_TEXT,
                 COMPLETEVOL_LONGTEXT, true );

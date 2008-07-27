@@ -91,21 +91,21 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="4" >
+      <item row="4" column="0" colspan="4" >
        <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="4" column="0" >
+      <item row="5" column="0" >
        <widget class="QRadioButton" name="skins" >
         <property name="text" >
          <string>_("Skins")</string>
         </property>
        </widget>
       </item>
-      <item rowspan="2" row="4" column="1" colspan="3" >
+      <item rowspan="2" row="5" column="1" colspan="3" >
        <widget class="QLabel" name="skinsLabel" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
@@ -139,7 +139,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0" >
+      <item row="6" column="0" >
        <spacer>
         <property name="orientation" >
          <enum>Qt::Vertical</enum>
@@ -152,7 +152,7 @@
         </property>
        </spacer>
       </item>
-      <item row="6" column="0" >
+      <item row="7" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
          <string>_("Skin file")</string>
@@ -162,13 +162,33 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1" colspan="2" >
-       <widget class="QLineEdit" name="fileSkin" />
+      <item row="7" column="1" colspan="2" >
+       <widget class="QLineEdit" name="fileSkin" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
-      <item row="6" column="3" >
+      <item row="7" column="3" >
        <widget class="QPushButton" name="skinBrowse" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text" >
          <string>_("Browse...")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="3" >
+       <widget class="QCheckBox" name="fsController" >
+        <property name="text" >
+         <string>_("Show a controller in fullscreen")</string>
         </property>
        </widget>
       </item>
