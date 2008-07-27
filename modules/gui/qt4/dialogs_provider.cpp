@@ -601,12 +601,24 @@ void DialogsProvider::loadSubtitlesFile()
     input_thread_t *p_input = THEMIM->getInput();
     if( !p_input )
         return;
-    QString qsFile = QFileDialog::getOpenFileName(
-             NULL,
-             qtr( "Choose subtitles file" ),
-             "",
-             qtr( "Subtitles files (*.cdg *.idx *.srt *.sub *.utf);;"
-                  "All files (*)" ) );
-    if( !input_AddSubtitles( p_input, qtu( qsFile ), true ) )
-        msg_Warn( p_intf, "unable to load subtitles file..." );
+    input_item_t *p_item = input_GetItem( p_input );
+    if( !p_item )
+        return;
+    char *path = input_item_GetURI( p_item );
+    if( !path )
+        path = strdup( "" );
+    char *sep = strrchr( path, DIR_SEP_CHAR );
+    if( sep )
+        *sep = '\0';
+    QStringList qsl = showSimpleOpen( qtr( "Open subtitles file" ),
+                                      EXT_FILTER_SUBTITLE,
+                                      path );
+    free( path );
+    QString qsFile;
+    foreach( qsFile, qsl )
+    {
+        if( !input_AddSubtitles( p_input, qtu( qsFile ), true ) )
+            msg_Warn( p_intf, "unable to load subtitles from '%s'",
+                      qtu( qsFile ) );
+    }
 }
