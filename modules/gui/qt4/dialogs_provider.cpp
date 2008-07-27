@@ -246,9 +246,11 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
 {
     if( p_arg == NULL )
     {
-        msg_Dbg( p_intf, "openFileGenericDialog() called with NULL arg" );
+        msg_Warn( p_intf, "openFileGenericDialog() called with NULL arg" );
         return;
     }
+
+    /* Replace the extensions to a Qt format */
     int i = 0;
     QString extensions = qfu( p_arg->psz_extensions );
     while ( ( i = extensions.indexOf( "|", i ) ) != -1 )
@@ -260,29 +262,38 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     }
     extensions.replace(QString(";*"), QString(" *"));
     extensions.append( ")" );
+
+    /* Save */
     if( p_arg->b_save )
     {
-        QString file = QFileDialog::getSaveFileName( NULL, p_arg->psz_title, qfu( p_intf->p_sys->psz_filepath ), extensions );
+        QString file = QFileDialog::getSaveFileName( NULL, p_arg->psz_title,
+                            qfu( p_intf->p_sys->psz_filepath ), extensions );
         if( !file.isEmpty() )
         {
             p_arg->i_results = 1;
-            p_arg->psz_results = ( char ** )malloc( p_arg->i_results * sizeof( char * ) );
+            p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
             p_arg->psz_results[0] = strdup( qtu( file ) );
         }
         else
             p_arg->i_results = 0;
     }
-    else
+    else /* non-save mode */
     {
-        QStringList files = QFileDialog::getOpenFileNames( NULL, p_arg->psz_title, qfu( p_intf->p_sys->psz_filepath ), extensions );
+        QStringList files = QFileDialog::getOpenFileNames( NULL,
+                p_arg->psz_title, qfu( p_intf->p_sys->psz_filepath ),
+                extensions );
         p_arg->i_results = files.count();
-        p_arg->psz_results = ( char ** )malloc( p_arg->i_results * sizeof( char * ) );
+        p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
         i = 0;
         foreach( QString file, files )
             p_arg->psz_results[i++] = strdup( qtu( file ) );
     }
+
+    /* Callback */
     if( p_arg->pf_callback )
         p_arg->pf_callback( p_arg );
+
+    /* Clean afterwards */
     if( p_arg->psz_results )
     {
         for( i = 0; i < p_arg->i_results; i++ )
@@ -293,6 +304,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     free( p_arg->psz_extensions );
     free( p_arg );
 }
+
 void DialogsProvider::openFileDialog()
 {
     openDialog( OPEN_FILE_TAB );
