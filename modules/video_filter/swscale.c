@@ -52,7 +52,7 @@ static void CloseScaler( vlc_object_t * );
 #define SCALEMODE_TEXT N_("Scaling mode")
 #define SCALEMODE_LONGTEXT N_("Scaling mode to use.")
 
-static const int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const int pi_mode_values[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 const char *const ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
   N_("Experimental"), N_("Nearest neighbour (bad quality)"),
@@ -76,27 +76,39 @@ vlc_module_end();
  ****************************************************************************/
 
 void *( *swscale_fast_memcpy )( void *, const void *, size_t );
-static picture_t *Filter( filter_t *, picture_t * );
-static int CheckInit( filter_t * );
 
-static int GetParameters( int *pi_fmti, int *pi_fmto,
-                          const video_format_t *p_fmti, 
-                          const video_format_t *p_fmto  );
-
-/*****************************************************************************
- * filter_sys_t : filter descriptor
- *****************************************************************************/
+/**
+ * Internal swscale filter structure.
+ */
 struct filter_sys_t
 {
-    struct SwsContext *ctx;
     SwsFilter *p_src_filter;
     SwsFilter *p_dst_filter;
     int i_cpu_mask, i_sws_flags;
 
-    es_format_t fmt_in;
-    es_format_t fmt_out;
+    video_format_t fmt_in;
+    video_format_t fmt_out;
+
+    struct SwsContext *ctx;
+    struct SwsContext *ctxA;
+    picture_t *p_src_a;
+    picture_t *p_dst_a;
 };
 
+static picture_t *Filter( filter_t *, picture_t * );
+static int  Init( filter_t * );
+static void Clean( filter_t * );
+
+static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, int *pi_sws_flags,
+                          const video_format_t *p_fmti, 
+                          const video_format_t *p_fmto,
+                          int i_sws_flags_default );
+
+static int GetSwsCpuMask(void);
+
+/* FFmpeg point resize quality seems really bad, let our scale module do it
+ * (change it to true to try) */
+#define ALLOW_YUVP (false)
 
 /*****************************************************************************
  * OpenScaler: probe the filter and return score
@@ -106,52 +118,33 @@ static int OpenScaler( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
 
-    unsigned int i_cpu;
     int i_sws_mode;
 
     float sws_lum_gblur = 0.0, sws_chr_gblur = 0.0;
     int sws_chr_vshift = 0, sws_chr_hshift = 0;
     float sws_chr_sharpen = 0.0, sws_lum_sharpen = 0.0;
 
-    if( GetParameters( NULL, NULL, 
+    if( GetParameters( NULL, NULL, NULL, NULL,
                        &p_filter->fmt_in.video,
-                       &p_filter->fmt_out.video ) )
+                       &p_filter->fmt_out.video, 0 ) )
     {
         return VLC_EGENERIC;
     }
 
+    /* */
+    p_filter->pf_video_filter = Filter;
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_filter->p_sys = p_sys = malloc(sizeof(filter_sys_t)) ) == NULL )
-    {
         return VLC_ENOMEM;
-    }
 
-    swscale_fast_memcpy = vlc_memcpy;   /* FIXME pointer assignment may not be atomic */
+    /* FIXME pointer assignment may not be atomic */
+    swscale_fast_memcpy = vlc_memcpy;
 
     /* Set CPU capabilities */
-    i_cpu = vlc_CPU();
-    p_sys->i_cpu_mask = 0;
-    if( i_cpu & CPU_CAPABILITY_MMX )
-    {
-        p_sys->i_cpu_mask |= SWS_CPU_CAPS_MMX;
-    }
-#if (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0))
-    if( i_cpu & CPU_CAPABILITY_MMXEXT )
-    {
-        p_sys->i_cpu_mask |= SWS_CPU_CAPS_MMX2;
-    }
-#endif
-    if( i_cpu & CPU_CAPABILITY_3DNOW )
-    {
-        p_sys->i_cpu_mask |= SWS_CPU_CAPS_3DNOW;
-    }
-    if( i_cpu & CPU_CAPABILITY_ALTIVEC )
-    {
-        p_sys->i_cpu_mask |= SWS_CPU_CAPS_ALTIVEC;
-    }
+    p_sys->i_cpu_mask = GetSwsCpuMask();
 
+    /* */
     i_sws_mode = var_CreateGetInteger( p_filter, "swscale-mode" );
-
     switch( i_sws_mode )
     {
     case 0:  p_sys->i_sws_flags = SWS_FAST_BILINEAR; break;
@@ -176,11 +169,13 @@ static int OpenScaler( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->ctx = NULL;
-    p_filter->pf_video_filter = Filter;
-    es_format_Init( &p_sys->fmt_in, 0, 0 );
-    es_format_Init( &p_sys->fmt_out, 0, 0 );
+    p_sys->ctxA = NULL;
+    p_sys->p_src_a = NULL;
+    p_sys->p_dst_a = NULL;
+    memset( &p_sys->fmt_in,  0, sizeof(p_sys->fmt_in) );
+    memset( &p_sys->fmt_out, 0, sizeof(p_sys->fmt_out) );
 
-    if( CheckInit( p_filter ) )
+    if( Init( p_filter ) )
     {
         if( p_sys->p_src_filter )
             sws_freeFilter( p_sys->p_src_filter );
@@ -206,38 +201,84 @@ static void CloseScaler( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys->ctx )
-        sws_freeContext( p_sys->ctx );
+    Clean( p_filter );
     if( p_sys->p_src_filter )
         sws_freeFilter( p_sys->p_src_filter );
     free( p_sys );
 }
 
 /*****************************************************************************
- * CheckInit: Initialise filter when necessary
+ * Helpers
  *****************************************************************************/
+static int GetSwsCpuMask(void)
+{
+    const unsigned int i_cpu = vlc_CPU();
+    int i_sws_cpu = 0;
+
+    if( i_cpu & CPU_CAPABILITY_MMX )
+        i_sws_cpu |= SWS_CPU_CAPS_MMX;
+#if (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0))
+    if( i_cpu & CPU_CAPABILITY_MMXEXT )
+        i_sws_cpu |= SWS_CPU_CAPS_MMX2;
+#endif
+    if( i_cpu & CPU_CAPABILITY_3DNOW )
+        i_sws_cpu |= SWS_CPU_CAPS_3DNOW;
+
+    if( i_cpu & CPU_CAPABILITY_ALTIVEC )
+        i_sws_cpu |= SWS_CPU_CAPS_ALTIVEC;
+
+    return i_sws_cpu;
+}
 static bool IsFmtSimilar( const video_format_t *p_fmt1, const video_format_t *p_fmt2 )
 {
-    return p_fmt1->i_width == p_fmt2->i_width &&
+    return p_fmt1->i_chroma == p_fmt2->i_chroma &&
+           p_fmt1->i_width  == p_fmt2->i_width &&
            p_fmt1->i_height == p_fmt2->i_height;
 }
 
-static int GetParameters( int *pi_fmti, int *pi_fmto,
+static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, int *pi_sws_flags,
                           const video_format_t *p_fmti, 
-                          const video_format_t *p_fmto  )
+                          const video_format_t *p_fmto,
+                          int i_sws_flags_default )
 {
     /* Supported Input formats: YV12, I420/IYUV, YUY2, UYVY, BGR32, BGR24,
      * BGR16, BGR15, RGB32, RGB24, Y8/Y800, YVU9/IF09 */
-    const int i_fmti = GetFfmpegChroma( p_fmti->i_chroma );
+    int i_fmti = GetFfmpegChroma( p_fmti->i_chroma );
 
     /* Supported output formats: YV12, I420/IYUV, YUY2, UYVY,
      * {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09 */
-    const int i_fmto = GetFfmpegChroma( p_fmto->i_chroma );
+    int i_fmto = GetFfmpegChroma( p_fmto->i_chroma );
+
+    bool b_has_a = false;
+    int i_sws_flags = i_sws_flags_default;
+
+    if( p_fmti->i_chroma == p_fmto->i_chroma &&  0 )
+    {
+        if( p_fmti->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'P' ) && ALLOW_YUVP )
+        {
+            i_fmti = i_fmto = PIX_FMT_GRAY8;
+            i_sws_flags = SWS_POINT;
+        }
+        else if( p_fmti->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'A' ) )
+        {
+            i_fmti = i_fmto = PIX_FMT_YUV444P;
+            b_has_a = true;
+        }
+        else if( p_fmti->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+        {
+            i_fmti = i_fmto = PIX_FMT_RGBA32;
+            b_has_a = true;
+        }
+    }
 
     if( pi_fmti )
         *pi_fmti = i_fmti;
     if( pi_fmto )
         *pi_fmto = i_fmto;
+    if( pb_has_a )
+        *pb_has_a = b_has_a;
+    if( pi_sws_flags )
+        *pi_sws_flags = i_sws_flags;
 
     if( i_fmti < 0 || i_fmto < 0 )
         return VLC_EGENERIC;
@@ -245,55 +286,140 @@ static int GetParameters( int *pi_fmti, int *pi_fmto,
     return VLC_SUCCESS;
 }
 
-static int CheckInit( filter_t *p_filter )
+static int Init( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+    const video_format_t *p_fmti = &p_filter->fmt_in.video;
+    const video_format_t *p_fmto = &p_filter->fmt_out.video;
 
-    if( IsFmtSimilar( &p_filter->fmt_in.video,  &p_sys->fmt_in.video ) &&
-        IsFmtSimilar( &p_filter->fmt_out.video, &p_sys->fmt_out.video ) &&
+    if( IsFmtSimilar( p_fmti, &p_sys->fmt_in ) &&
+        IsFmtSimilar( p_fmto, &p_sys->fmt_out ) &&
         p_sys->ctx )
     {
         return VLC_SUCCESS;
     }
+    Clean( p_filter );
 
-    /* */
+    /* Init with new parameters */
     int i_fmt_in, i_fmt_out;
-    if( GetParameters( &i_fmt_in, &i_fmt_out, &p_filter->fmt_in.video, &p_filter->fmt_out.video ) )
+    bool b_has_a;
+    int i_sws_flags;
+    if( GetParameters( &i_fmt_in, &i_fmt_out, &b_has_a, &i_sws_flags,
+                       p_fmti, p_fmto, p_sys->i_sws_flags ) )
     {
         msg_Err( p_filter, "format not supported" );
         return VLC_EGENERIC;
     }
 
-    if( p_sys->ctx )
-        sws_freeContext( p_sys->ctx );
-
-    p_sys->ctx =
-        sws_getContext( p_filter->fmt_in.video.i_width,
-                        p_filter->fmt_in.video.i_height, i_fmt_in,
-                        p_filter->fmt_out.video.i_width,
-                        p_filter->fmt_out.video.i_height, i_fmt_out,
-                        p_sys->i_sws_flags | p_sys->i_cpu_mask,
-                        p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
-    if( !p_sys->ctx )
+    for( int n = 0; n < (b_has_a ? 2 : 1); n++ )
     {
-        msg_Err( p_filter, "could not init SwScaler" );
+        const int i_fmti = n == 0 ? i_fmt_in  : PIX_FMT_GRAY8;
+        const int i_fmto = n == 0 ? i_fmt_out : PIX_FMT_GRAY8;
+        struct SwsContext *ctx;
+
+        ctx = sws_getContext( p_fmti->i_width, p_fmti->i_height, i_fmti,
+                              p_fmto->i_width, p_fmto->i_height, i_fmto,
+                              i_sws_flags | p_sys->i_cpu_mask,
+                              p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
+        if( n == 0 )
+            p_sys->ctx = ctx;
+        else
+            p_sys->ctxA = ctx;
+    }
+    if( p_sys->ctxA )
+    {
+        p_sys->p_src_a = picture_New( VLC_FOURCC( 'G', 'R', 'E', 'Y' ), p_fmti->i_width, p_fmti->i_height, 0 );
+        p_sys->p_dst_a = picture_New( VLC_FOURCC( 'G', 'R', 'E', 'Y' ), p_fmto->i_width, p_fmto->i_height, 0 );
+    }
+
+    if( !p_sys->ctx ||
+        ( b_has_a && ( !p_sys->ctxA || !p_sys->p_src_a || !p_sys->p_dst_a ) ) )
+    {
+        msg_Err( p_filter, "could not init SwScaler and/or allocate memory" );
+        Clean( p_filter );
         return VLC_EGENERIC;
     }
 
-    p_sys->fmt_in = p_filter->fmt_in;
-    p_sys->fmt_out = p_filter->fmt_out;
+    p_sys->fmt_in  = *p_fmti;
+    p_sys->fmt_out = *p_fmto;
+
+    msg_Err( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s",
+             p_fmti->i_width, p_fmti->i_height, (char *)&p_fmti->i_chroma,
+             p_fmto->i_width, p_fmto->i_height, (char *)&p_fmto->i_chroma );
+
 
     return VLC_SUCCESS;
 }
-
-static void GetPixels( uint8_t *pp_pixel[3], int pi_pitch[3], picture_t *p_picture )
+static void Clean( filter_t *p_filter )
 {
-    int n;
-    for( n = 0; n < __MIN(3 , p_picture->i_planes ); n++ )
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( p_sys->p_src_a )
+        picture_Release( p_sys->p_src_a );
+    if( p_sys->p_dst_a )
+        picture_Release( p_sys->p_dst_a );
+    if( p_sys->ctxA )
+        sws_freeContext( p_sys->ctxA );
+
+    if( p_sys->ctx )
+        sws_freeContext( p_sys->ctx );
+
+    /* We have to set it to null has we call be called again :( */
+    p_sys->ctx = NULL;
+    p_sys->ctxA = NULL;
+    p_sys->p_src_a = NULL;
+    p_sys->p_dst_a = NULL;
+}
+
+static void GetPixels( uint8_t *pp_pixel[3], int pi_pitch[3],
+                       const picture_t *p_picture,
+                       int i_plane_start, int i_plane_count )
+{
+    for( int n = 0; n < __MIN(i_plane_count, p_picture->i_planes-i_plane_start ); n++ )
     {
-        pp_pixel[n] = p_picture->p[n].p_pixels;
-        pi_pitch[n] = p_picture->p[n].i_pitch;
+        pp_pixel[n] = p_picture->p[i_plane_start+n].p_pixels;
+        pi_pitch[n] = p_picture->p[i_plane_start+n].i_pitch;
     }
+}
+
+/* XXX is it always 3 even for BIG_ENDIAN (blend.c seems to think so) ? */
+#define OFFSET_A (3)
+static void ExtractA( picture_t *p_dst, const picture_t *p_src, const video_format_t *p_fmt )
+{
+    plane_t *d = &p_dst->p[0];
+    const plane_t *s = &p_src->p[0];
+    
+    for( unsigned y = 0; y < p_fmt->i_height; y++ )
+        for( unsigned x = 0; x < p_fmt->i_width; x++ )
+            d->p_pixels[y*d->i_pitch+x] = s->p_pixels[y*s->i_pitch+4*x+OFFSET_A];
+}
+static void InjectA( picture_t *p_dst, const picture_t *p_src, const video_format_t *p_fmt )
+{
+    plane_t *d = &p_dst->p[0];
+    const plane_t *s = &p_src->p[0];
+    
+    for( unsigned y = 0; y < p_fmt->i_height; y++ )
+        for( unsigned x = 0; x < p_fmt->i_width; x++ )
+            d->p_pixels[y*d->i_pitch+4*x+OFFSET_A] = s->p_pixels[y*s->i_pitch+x];
+}
+#undef OFFSET_A
+
+static void Convert( struct SwsContext *ctx,
+                     picture_t *p_dst, picture_t *p_src, const video_format_t *p_fmti, int i_plane_start, int i_plane_count )
+{
+    uint8_t *src[3]; int src_stride[3];
+    uint8_t *dst[3]; int dst_stride[3];
+
+    GetPixels( src, src_stride, p_src, i_plane_start, i_plane_count );
+    GetPixels( dst, dst_stride, p_dst, i_plane_start, i_plane_count );
+
+#if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
+    sws_scale( ctx, src, src_stride, 0, p_fmti->i_height,
+               dst, dst_stride );
+#else
+    sws_scale_ordered( ctx, src, src_stride, 0, p_fmti->i_height,
+                       dst, dst_stride );
+#endif
 }
 
 /****************************************************************************
@@ -304,12 +430,12 @@ static void GetPixels( uint8_t *pp_pixel[3], int pi_pitch[3], picture_t *p_pictu
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    uint8_t *src[3]; int src_stride[3];
-    uint8_t *dst[3]; int dst_stride[3];
+    const video_format_t *p_fmti = &p_filter->fmt_in.video;
+    const video_format_t *p_fmto = &p_filter->fmt_out.video;
     picture_t *p_pic_dst;
 
     /* Check if format properties changed */
-    if( CheckInit( p_filter ) != VLC_SUCCESS )
+    if( Init( p_filter ) )
     {
         picture_Release( p_pic );
         return NULL;
@@ -323,24 +449,23 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','V','A') )
+    Convert( p_sys->ctx, p_pic_dst, p_pic, p_fmti, 0, 3 );
+    if( p_sys->ctxA )
     {
-        memset( p_pic_dst->p[3].p_pixels, 0xff, p_filter->fmt_out.video.i_height
-                                                 * p_pic_dst->p[3].i_pitch );
+        if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+        {
+            /* We extract the A plane to rescale it, and then we reinject it. */
+            ExtractA( p_sys->p_src_a, p_pic, p_fmti );
+
+            Convert( p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti, 0, 1 );
+
+            InjectA( p_pic_dst, p_sys->p_dst_a, p_fmto );
+        }
+        else
+        {
+            Convert( p_sys->ctx, p_pic_dst, p_pic, p_fmti, 3, 1 );
+        }
     }
-
-    GetPixels( src, src_stride, p_pic );
-    GetPixels( dst, dst_stride, p_pic_dst );
-
-#if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
-    sws_scale( p_sys->ctx, src, src_stride,
-               0, p_filter->fmt_in.video.i_height,
-               dst, dst_stride );
-#else
-    sws_scale_ordered( p_sys->ctx, src, src_stride,
-               0, p_filter->fmt_in.video.i_height,
-               dst, dst_stride );
-#endif
 
     picture_CopyProperties( p_pic_dst, p_pic );
     picture_Release( p_pic );
