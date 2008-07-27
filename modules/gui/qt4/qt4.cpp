@@ -124,8 +124,6 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
             "Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n" \
             "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255' ")
 
-#define VIEWDETAIL_TEXT N_( "Show the opening dialog view in detail mode" )
-
 #define QT_MODE_TEXT N_( "Selection of the starting mode and look " )
 #define QT_MODE_LONGTEXT N_( "Start VLC with:\n" \
                              " - normal mode\n"  \
@@ -199,9 +197,6 @@ vlc_module_begin();
         add_string( "qt-slider-colours",
                 "255;255;255;20;226;20;255;176;15;235;30;20",
                 NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false );
-
-        add_bool( "qt-open-detail", false, NULL, VIEWDETAIL_TEXT,
-                VIEWDETAIL_TEXT, false );
 
         add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
                 false );

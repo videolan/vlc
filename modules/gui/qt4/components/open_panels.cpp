@@ -80,8 +80,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox->restoreState(
             settings.value( "file-dialog-state" ).toByteArray() );
 #endif
-    dialogBox->setViewMode( config_GetInt( p_intf, "qt-open-detail" ) ?
-            QFileDialog::Detail : QFileDialog::List );
 
     /* We don't want to see a grip in the middle of the window, do we? */
     dialogBox->setSizeGripEnabled( false );
