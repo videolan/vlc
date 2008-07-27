@@ -93,6 +93,9 @@ struct filter_sys_t
     struct SwsContext *ctxA;
     picture_t *p_src_a;
     picture_t *p_dst_a;
+    int i_extend_factor;
+    picture_t *p_src_e;
+    picture_t *p_dst_e;
 };
 
 static picture_t *Filter( filter_t *, picture_t * );
@@ -106,9 +109,11 @@ static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, int *pi_sw
 
 static int GetSwsCpuMask(void);
 
-/* FFmpeg point resize quality seems really bad, let our scale module do it
+/* SwScaler point resize quality seems really bad, let our scale module do it
  * (change it to true to try) */
 #define ALLOW_YUVP (false)
+/* SwScaler does not like too small picture */
+#define MINIMUM_WIDTH (16)
 
 /*****************************************************************************
  * OpenScaler: probe the filter and return score
@@ -172,6 +177,8 @@ static int OpenScaler( vlc_object_t *p_this )
     p_sys->ctxA = NULL;
     p_sys->p_src_a = NULL;
     p_sys->p_dst_a = NULL;
+    p_sys->p_src_e = NULL;
+    p_sys->p_dst_e = NULL;
     memset( &p_sys->fmt_in,  0, sizeof(p_sys->fmt_in) );
     memset( &p_sys->fmt_out, 0, sizeof(p_sys->fmt_out) );
 
@@ -310,15 +317,27 @@ static int Init( filter_t *p_filter )
         msg_Err( p_filter, "format not supported" );
         return VLC_EGENERIC;
     }
+    if( p_fmti->i_width <= 0 || p_fmto->i_width <= 0 )
+    {
+        msg_Err( p_filter, "0 width not supported" );
+        return VLC_EGENERIC;
+    }
 
+    /* swscale does not like too small width */
+    p_sys->i_extend_factor = 1;
+    while( __MIN( p_fmti->i_width, p_fmto->i_width ) * p_sys->i_extend_factor < MINIMUM_WIDTH)
+        p_sys->i_extend_factor++;
+
+    const unsigned i_fmti_width = p_fmti->i_width * p_sys->i_extend_factor;
+    const unsigned i_fmto_width = p_fmto->i_width * p_sys->i_extend_factor;
     for( int n = 0; n < (b_has_a ? 2 : 1); n++ )
     {
         const int i_fmti = n == 0 ? i_fmt_in  : PIX_FMT_GRAY8;
         const int i_fmto = n == 0 ? i_fmt_out : PIX_FMT_GRAY8;
         struct SwsContext *ctx;
 
-        ctx = sws_getContext( p_fmti->i_width, p_fmti->i_height, i_fmti,
-                              p_fmto->i_width, p_fmto->i_height, i_fmto,
+        ctx = sws_getContext( i_fmti_width, p_fmti->i_height, i_fmti,
+                              i_fmto_width, p_fmto->i_height, i_fmto,
                               i_sws_flags | p_sys->i_cpu_mask,
                               p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
         if( n == 0 )
@@ -328,12 +347,21 @@ static int Init( filter_t *p_filter )
     }
     if( p_sys->ctxA )
     {
-        p_sys->p_src_a = picture_New( VLC_FOURCC( 'G', 'R', 'E', 'Y' ), p_fmti->i_width, p_fmti->i_height, 0 );
-        p_sys->p_dst_a = picture_New( VLC_FOURCC( 'G', 'R', 'E', 'Y' ), p_fmto->i_width, p_fmto->i_height, 0 );
+        p_sys->p_src_a = picture_New( VLC_FOURCC( 'G', 'R', 'E', 'Y' ), i_fmti_width, p_fmti->i_height, 0 );
+        p_sys->p_dst_a = picture_New( VLC_FOURCC( 'G', 'R', 'E', 'Y' ), i_fmto_width, p_fmto->i_height, 0 );
+    }
+    if( p_sys->i_extend_factor != 1 )
+    {
+        p_sys->p_src_e = picture_New( p_fmti->i_chroma, i_fmti_width, p_fmti->i_height, 0 );
+        p_sys->p_dst_e = picture_New( p_fmto->i_chroma, i_fmto_width, p_fmto->i_height, 0 );
+
+        memset( p_sys->p_src_e->p[0].p_pixels, 0, p_sys->p_src_e->p[0].i_pitch * p_sys->p_src_e->p[0].i_lines );
+        memset( p_sys->p_dst_e->p[0].p_pixels, 0, p_sys->p_dst_e->p[0].i_pitch * p_sys->p_dst_e->p[0].i_lines );
     }
 
     if( !p_sys->ctx ||
-        ( b_has_a && ( !p_sys->ctxA || !p_sys->p_src_a || !p_sys->p_dst_a ) ) )
+        ( b_has_a && ( !p_sys->ctxA || !p_sys->p_src_a || !p_sys->p_dst_a ) ) ||
+        ( p_sys->i_extend_factor != 1 && ( !p_sys->p_src_e || !p_sys->p_dst_e ) ) )
     {
         msg_Err( p_filter, "could not init SwScaler and/or allocate memory" );
         Clean( p_filter );
@@ -343,21 +371,28 @@ static int Init( filter_t *p_filter )
     p_sys->fmt_in  = *p_fmti;
     p_sys->fmt_out = *p_fmto;
 
-    msg_Err( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s",
+#if 0
+    msg_Dbg( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s extend by %d",
              p_fmti->i_width, p_fmti->i_height, (char *)&p_fmti->i_chroma,
-             p_fmto->i_width, p_fmto->i_height, (char *)&p_fmto->i_chroma );
-
-
+             p_fmto->i_width, p_fmto->i_height, (char *)&p_fmto->i_chroma,
+             p_sys->i_extend_factor );
+#endif
     return VLC_SUCCESS;
 }
 static void Clean( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    if( p_sys->p_src_e )
+        picture_Release( p_sys->p_src_e );
+    if( p_sys->p_dst_e )
+        picture_Release( p_sys->p_dst_e );
+
     if( p_sys->p_src_a )
         picture_Release( p_sys->p_src_a );
     if( p_sys->p_dst_a )
         picture_Release( p_sys->p_dst_a );
+
     if( p_sys->ctxA )
         sws_freeContext( p_sys->ctxA );
 
@@ -369,43 +404,67 @@ static void Clean( filter_t *p_filter )
     p_sys->ctxA = NULL;
     p_sys->p_src_a = NULL;
     p_sys->p_dst_a = NULL;
+    p_sys->p_src_e = NULL;
+    p_sys->p_dst_e = NULL;
 }
 
 static void GetPixels( uint8_t *pp_pixel[3], int pi_pitch[3],
                        const picture_t *p_picture,
                        int i_plane_start, int i_plane_count )
 {
-    for( int n = 0; n < __MIN(i_plane_count, p_picture->i_planes-i_plane_start ); n++ )
+    int n;
+    for( n = 0; n < __MIN(i_plane_count, p_picture->i_planes-i_plane_start ); n++ )
     {
         pp_pixel[n] = p_picture->p[i_plane_start+n].p_pixels;
         pi_pitch[n] = p_picture->p[i_plane_start+n].i_pitch;
+    }
+    for( ; n < 3; n++ )
+    {
+        pp_pixel[n] = NULL;
+        pi_pitch[n] = 0;
     }
 }
 
 /* XXX is it always 3 even for BIG_ENDIAN (blend.c seems to think so) ? */
 #define OFFSET_A (3)
-static void ExtractA( picture_t *p_dst, const picture_t *p_src, const video_format_t *p_fmt )
+static void ExtractA( picture_t *p_dst, const picture_t *p_src, unsigned i_width, unsigned i_height )
 {
     plane_t *d = &p_dst->p[0];
     const plane_t *s = &p_src->p[0];
     
-    for( unsigned y = 0; y < p_fmt->i_height; y++ )
-        for( unsigned x = 0; x < p_fmt->i_width; x++ )
+    for( unsigned y = 0; y < i_height; y++ )
+        for( unsigned x = 0; x < i_width; x++ )
             d->p_pixels[y*d->i_pitch+x] = s->p_pixels[y*s->i_pitch+4*x+OFFSET_A];
 }
-static void InjectA( picture_t *p_dst, const picture_t *p_src, const video_format_t *p_fmt )
+static void InjectA( picture_t *p_dst, const picture_t *p_src, unsigned i_width, unsigned i_height )
 {
     plane_t *d = &p_dst->p[0];
     const plane_t *s = &p_src->p[0];
     
-    for( unsigned y = 0; y < p_fmt->i_height; y++ )
-        for( unsigned x = 0; x < p_fmt->i_width; x++ )
+    for( unsigned y = 0; y < i_height; y++ )
+        for( unsigned x = 0; x < i_width; x++ )
             d->p_pixels[y*d->i_pitch+4*x+OFFSET_A] = s->p_pixels[y*s->i_pitch+x];
 }
 #undef OFFSET_A
 
+static void CopyPad( picture_t *p_dst, const picture_t *p_src )
+{
+    picture_Copy( p_dst, p_src );
+    for( int n = 0; n < p_dst->i_planes; n++ )
+    {
+        const plane_t *s = &p_src->p[n];
+        plane_t *d = &p_dst->p[n];
+
+        for( int y = 0; y < s->i_lines; y++ )
+        {
+            for( int x = s->i_visible_pitch; x < d->i_visible_pitch; x += s->i_pixel_pitch )
+                memcpy( &d->p_pixels[y*d->i_pitch + x], &d->p_pixels[y*d->i_pitch + s->i_visible_pitch - s->i_pixel_pitch], s->i_pixel_pitch );
+        }
+    }
+}
+
 static void Convert( struct SwsContext *ctx,
-                     picture_t *p_dst, picture_t *p_src, const video_format_t *p_fmti, int i_plane_start, int i_plane_count )
+                     picture_t *p_dst, picture_t *p_src, int i_height, int i_plane_start, int i_plane_count )
 {
     uint8_t *src[3]; int src_stride[3];
     uint8_t *dst[3]; int dst_stride[3];
@@ -414,10 +473,10 @@ static void Convert( struct SwsContext *ctx,
     GetPixels( dst, dst_stride, p_dst, i_plane_start, i_plane_count );
 
 #if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
-    sws_scale( ctx, src, src_stride, 0, p_fmti->i_height,
+    sws_scale( ctx, src, src_stride, 0, i_height,
                dst, dst_stride );
 #else
-    sws_scale_ordered( ctx, src, src_stride, 0, p_fmti->i_height,
+    sws_scale_ordered( ctx, src, src_stride, 0, i_height,
                        dst, dst_stride );
 #endif
 }
@@ -449,22 +508,38 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    Convert( p_sys->ctx, p_pic_dst, p_pic, p_fmti, 0, 3 );
+    /* */
+    picture_t *p_src = p_pic;
+    picture_t *p_dst = p_pic_dst;
+    if( p_sys->i_extend_factor != 1 )
+    {
+        p_src = p_sys->p_src_e;
+        p_dst = p_sys->p_dst_e;
+
+        CopyPad( p_src, p_pic );
+    }
+
+    Convert( p_sys->ctx, p_dst, p_src, p_fmti->i_height, 0, 3 );
     if( p_sys->ctxA )
     {
         if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
         {
             /* We extract the A plane to rescale it, and then we reinject it. */
-            ExtractA( p_sys->p_src_a, p_pic, p_fmti );
+            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_width * p_sys->i_extend_factor, p_fmti->i_height );
 
-            Convert( p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti, 0, 1 );
+            Convert( p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_height, 0, 1 );
 
-            InjectA( p_pic_dst, p_sys->p_dst_a, p_fmto );
+            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height );
         }
         else
         {
-            Convert( p_sys->ctxA, p_pic_dst, p_pic, p_fmti, 3, 1 );
+            Convert( p_sys->ctxA, p_dst, p_src, p_fmti->i_height, 3, 1 );
         }
+    }
+
+    if( p_sys->i_extend_factor != 1 )
+    {
+        picture_CopyPixels( p_pic_dst, p_dst );
     }
 
     picture_CopyProperties( p_pic_dst, p_pic );
