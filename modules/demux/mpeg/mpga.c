@@ -356,10 +356,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pi64 = p_sys->i_pts + p_sys->i_time_offset;
             return VLC_SUCCESS;
 
-        case DEMUX_SET_TIME:
-            /* FIXME TODO: implement a high precision seek (with mp3 parsing)
-             * needed for multi-input */
-
         case DEMUX_GET_LENGTH:
             i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
@@ -383,6 +379,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             va_end( args_save );
             return i_ret;
 
+        case DEMUX_SET_TIME:
+            /* FIXME TODO: implement a high precision seek (with mp3 parsing)
+             * needed for multi-input */
         default:
             i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
