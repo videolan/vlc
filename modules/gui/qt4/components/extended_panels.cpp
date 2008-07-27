@@ -808,7 +808,7 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     presetsComboBox = ui.presetsCombo;
 
     ui.preampLabel->setFont( smallFont );
-    ui.preampSlider->setMaximum( 400 );
+
     for( int i = 0 ; i < NB_PRESETS ; i ++ )
     {
         ui.presetsCombo->addItem( qtr( preset_list_text[i] ),

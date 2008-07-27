@@ -81,6 +81,9 @@
      </item>
      <item row="0" column="0" >
       <widget class="QSlider" name="preampSlider" >
+       <property name="maximum" >
+        <number>400</number>
+       </property>
        <property name="orientation" >
         <enum>Qt::Vertical</enum>
        </property>
