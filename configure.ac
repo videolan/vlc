@@ -5763,7 +5763,6 @@ VLC_OUTPUT_VLC_CONFIG_IN
 AC_CONFIG_FILES([
   extras/package/win32/vlc.win32.nsi
   extras/package/macosx/Info.plist
-  extras/package/macosx/Resources/English.lproj/About.nib/keyedobjects.nib
   extras/package/macosx/Resources/English.lproj/InfoPlist.strings
   extras/package/macosx/plugin/Info.plist
   extras/package/macosx/plugin/InstallerInfo.plist
