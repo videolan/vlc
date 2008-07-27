@@ -29,6 +29,7 @@ import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.Structure;
@@ -37,8 +38,7 @@ import com.sun.jna.Union;
 
 public interface LibVlc extends Library
 {
-
-    LibVlc INSTANCE = (LibVlc) Native.loadLibrary("vlc", LibVlc.class);
+    LibVlc INSTANCE = (LibVlc) Native.loadLibrary(Platform.isLinux()? "vlc" : "libvlc", LibVlc.class);
 
     LibVlc SYNC_INSTANCE = (LibVlc) Native.synchronizedLibrary(INSTANCE);
     
