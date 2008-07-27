@@ -5695,17 +5695,22 @@ AS_IF([test "${SYS}" = "mingw32"], [
 dnl
 dnl  Stuff used by the program
 dnl
-AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION} ${CODENAME}", [Simple version string])
-AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VLC media player - version ${VERSION} ${CODENAME} - (c) ${COPYRIGHT_YEARS} the VideoLAN team", [Copyright string])
+VERSION_MESSAGE="${VERSION} ${CODENAME}"
+COPYRIGHT_MESSAGE="VLC media player - version ${VERSION_MESSAGE} - (c) ${COPYRIGHT_YEARS} the VideoLAN team"
+AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION_MESSAGE}", [Simple version string])
+AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "${COPYRIGHT_MESSAGE}", [Copyright string])
 AC_DEFINE_UNQUOTED(COPYRIGHT_YEARS, "${COPYRIGHT_YEARS}", [The copyright years])
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
 AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MAJOR,"${VERSION_MAJOR}", [version major number])
 AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MINOR,"${VERSION_MINOR}", [version minor number])
 AC_DEFINE_UNQUOTED(PACKAGE_VERSION_REVISION,"${VERSION_REVISION}", [version minor number])
 AC_DEFINE_UNQUOTED(PACKAGE_VERSION_EXTRA,"${VERSION_EXTRA}", [version minor number])
+AC_SUBST(COPYRIGHT_MESSAGE)
+AC_SUBST(VERSION_MESSAGE)
 AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION_MINOR)
 AC_SUBST(VERSION_REVISION)
+AC_SUBST(COPYRIGHT_YEARS)
 AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami`", [user who ran configure]) 
 if test "${build_os}" = "cygwin"
 then
@@ -5757,6 +5762,11 @@ VLC_OUTPUT_VLC_CONFIG_IN
 
 AC_CONFIG_FILES([
   extras/package/win32/vlc.win32.nsi
+  extras/package/macosx/Info.plist
+  extras/package/macosx/Resources/English.lproj/About.nib/keyedobjects.nib
+  extras/package/macosx/Resources/English.lproj/InfoPlist.strings
+  extras/package/macosx/plugin/Info.plist
+  extras/package/macosx/plugin/InstallerInfo.plist
   Makefile
   projects/activex/Makefile
   projects/activex/axvlc.inf

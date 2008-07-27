@@ -1,0 +1,6 @@
+/* Localized versions of Info.plist keys */
+
+CFBundleName = "VLC";
+CFBundleShortVersionString = "@VERSION@";
+CFBundleGetInfoString = "@COPYRIGHT_MESSAGE@";
+NSHumanReadableCopyright = "Copyright (c) @COPYRIGHT_YEARS@ the VideoLAN Team";
