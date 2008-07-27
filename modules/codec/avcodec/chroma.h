@@ -43,8 +43,6 @@ static const struct
 } chroma_table[] =
 {
     /* Planar YUV formats */
-    VLC_FF( ('Y','U','V','A'), PIX_FMT_YUV444P ), /* Hack */
-
     VLC_FF( ('I','4','4','4'), PIX_FMT_YUV444P ),
     VLC_FF( ('J','4','4','4'), PIX_FMT_YUVJ444P ),
 
