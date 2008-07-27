@@ -1819,8 +1819,8 @@ if test "${enable_live555}" != "no"; then
           # We only have -lliveMedia, do builtins
           VLC_ADD_PLUGIN([live555])
           VLC_ADD_LIBS([live555], [-lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment])
-        ])
-      ])
+        ],[],[-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment])
+      ],[-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic] )
       if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
         VLC_ADD_LIBS([live555],[-lws2_32])
