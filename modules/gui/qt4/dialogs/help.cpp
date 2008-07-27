@@ -262,6 +262,10 @@ void UpdateDialog::UpdateOrDownload()
 
         if( dest_dir != "" )
         {
+            #if defined( WIN32 ) || defined( UNDER_CE )
+            dest_dir += DIR_SEP;
+            #endif
+            msg_Dbg( p_intf, "Downloading to folder: %s", dest_dir );
             toggleVisible();
             update_Download( p_update, qtu( dest_dir ) );
         }
