@@ -41,7 +41,7 @@ public class MediaPlayerCallback implements LibVlcCallback
 {
 
     private MediaPlayerListener listener;
-    private MediaPlayer mediaInstance;
+    private MediaPlayer mediaPlayer;
 
     /**
      * Logger.
@@ -50,7 +50,7 @@ public class MediaPlayerCallback implements LibVlcCallback
 
     public MediaPlayerCallback(MediaPlayer mediaInstance, MediaPlayerListener listener)
     {
-        this.mediaInstance = mediaInstance;
+        this.mediaPlayer = mediaInstance;
         this.listener = listener;
     }
     /**
@@ -60,30 +60,35 @@ public class MediaPlayerCallback implements LibVlcCallback
     {
         if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPlaying.ordinal())
         {
-            listener.playing(mediaInstance);
+            listener.playing(mediaPlayer);
         }
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPaused.ordinal())
         {
-            listener.paused(mediaInstance);
+            listener.paused(mediaPlayer);
         }
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerEndReached.ordinal())
         {
-            listener.endReached(mediaInstance);
+            listener.endReached(mediaPlayer);
         }
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPositionChanged.ordinal())
         {
-            listener.positionChanged(mediaInstance);
+            listener.positionChanged(mediaPlayer);
         }
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerStopped.ordinal())
         {
-            listener.stopped(mediaInstance);
+            listener.stopped(mediaPlayer);
         }
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerTimeChanged.ordinal())
         {
             libvlc_event.event_type_specific.setType(LibVlc.media_player_time_changed.class);
             LibVlc.media_player_time_changed timeChanged = (media_player_time_changed) libvlc_event.event_type_specific
                 .readField("media_player_time_changed");
-            listener.timeChanged(mediaInstance, timeChanged.new_time);
+            listener.timeChanged(mediaPlayer, timeChanged.new_time);
+        }
+        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerEncounteredError.ordinal())
+        {
+            log.warn("Media player encountered error.");
+            listener.errorOccurred(mediaPlayer);
         }
         else
         {

@@ -43,4 +43,6 @@ public interface MediaPlayerListener
     
     void positionChanged(MediaPlayer mediaPlayer);
     
+    void errorOccurred(MediaPlayer mediaPlayer);
+    
 }

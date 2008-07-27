@@ -64,6 +64,11 @@ public class VLCExample
             {
                 System.out.println("Media player stopped. MRL: " + mediaPlayer.getMediaDescriptor().getMrl());
             }
+
+            public void errorOccurred(MediaPlayer mediaPlayer)
+            {
+                System.out.println("An error has occurred.");
+            }
         });
         mediaPlayer.play();
 
