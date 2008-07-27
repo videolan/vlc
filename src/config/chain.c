@@ -120,7 +120,7 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, const char 
             /* fprintf( stderr, "name=%s - rest=%s\n", psz_name, p ); */
             if( p == psz_name )
             {
-                fprintf( stderr, "invalid options (empty)" );
+                fprintf( stderr, "config_ChainCreate: invalid options (empty) \n" );
                 break;
             }
 
