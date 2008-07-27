@@ -821,6 +821,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     char *psz_cuefile = NULL;
     FILE *cuefile     = NULL;
     char line[1024];
+    bool b_found      = false;
 
     /* Check if we are dealing with a .cue file */
     p_pos = strrchr( psz_dev, '.' );
@@ -862,35 +863,44 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
         goto error;
     }
 
-    msg_Dbg( p_this,"using vcd image file: %s", psz_vcdfile );
+    msg_Dbg( p_this,"guessing vcd image file: %s", psz_vcdfile );
     p_vcddev->i_vcdimage_handle = utf8_open( psz_vcdfile,
                                     O_RDONLY | O_NONBLOCK | O_BINARY, 0666 );
  
-    if( p_vcddev->i_vcdimage_handle == -1 &&
-        fscanf( cuefile, "FILE %c", line ) &&
-        fgets( line, 1024, cuefile ) )
+    while( fgets( line, 1024, cuefile ) && !b_found )
     {
         /* We have a cue file, but no valid vcd file yet */
-        free( psz_vcdfile );
-        p_pos = strchr( line, '"' );
-        if( p_pos )
+        char filename[1024];
+        char type[16];
+        int i_temp = sscanf( line, "FILE \"%1023[^\"]\" %15s", filename, type );
+        *p_pos = 0;
+        switch( i_temp )
         {
-            *p_pos = 0;
-
-            /* Take care of path standardization */
-            if( *line != '/' && ((p_pos = strrchr( psz_cuefile, '/' ))
-                || (p_pos = strrchr( psz_cuefile, '\\' ) )) )
-            {
-                psz_vcdfile = malloc( strlen(line) +
+            case 2:
+                msg_Dbg( p_this, "the cue file says the data file is %s", type );
+                if( strcasecmp( type, "BINARY" ) )
+                    goto error; /* Error if not binary, otherwise treat as case 1 */
+            case 1:
+                if( p_vcddev->i_vcdimage_handle == -1 )
+                {
+                    msg_Dbg( p_this, "we could not find the data file, but we found a new path" );
+                    free( psz_vcdfile);
+                    if( *filename != '/' && ((p_pos = strrchr( psz_cuefile, '/' ))
+                        || (p_pos = strrchr( psz_cuefile, '\\' ) )) )
+                    {
+                        psz_vcdfile = malloc( strlen(filename) +
                                       (p_pos - psz_cuefile + 1) + 1 );
-                strncpy( psz_vcdfile, psz_cuefile, (p_pos - psz_cuefile + 1) );
-                strcpy( psz_vcdfile + (p_pos - psz_cuefile + 1), line );
-            }
-            else psz_vcdfile = strdup( line );
-        }
-        msg_Dbg( p_this,"using vcd image file: %s", psz_vcdfile );
-        p_vcddev->i_vcdimage_handle = utf8_open( psz_vcdfile,
+                        strncpy( psz_vcdfile, psz_cuefile, (p_pos - psz_cuefile + 1) );
+                        strcpy( psz_vcdfile + (p_pos - psz_cuefile + 1), filename );
+                    } else psz_vcdfile = strdup( filename );
+                    msg_Dbg( p_this,"using vcd image file: %s", psz_vcdfile );
+                    p_vcddev->i_vcdimage_handle = utf8_open( psz_vcdfile,
                                         O_RDONLY | O_NONBLOCK | O_BINARY, 0666 );
+                }
+                b_found = true;
+            default:
+                break;
+        }
     }
 
     if( p_vcddev->i_vcdimage_handle == -1)
