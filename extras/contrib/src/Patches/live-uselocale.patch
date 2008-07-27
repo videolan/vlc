@@ -113,3 +113,11 @@ diff -ru live.old/liveMedia/RTSPCommon.cpp live/liveMedia/RTSPCommon.cpp
    if (sscanf(fields, "npt = %f - %f", &start, &end) == 2) {
      rangeStart = start;
      rangeEnd = end;
+--- live/config.mingw.old	2008-07-27 17:13:52.000000000 +0100
++++ live/config.mingw	2008-07-27 17:19:04.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =         $(INCLUDES) -I. -O -DSOCKLEN_T=int
++COMPILE_OPTS =         $(INCLUDES) -I. -O -DSOCKLEN_T=int -DLOCALE_NOT_USED
+ C =                    c
+ C_COMPILER =           $(CC)
+ C_FLAGS =              $(COMPILE_OPTS) -DUSE_OUR_BZERO=1 -D__MINGW32__
