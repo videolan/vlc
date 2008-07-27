@@ -73,6 +73,15 @@ enum {
     SCALE_SIZE
 };
 
+static void FilterRelease( filter_t *p_filter )
+{
+    if( p_filter->p_module )
+        module_Unneed( p_filter, p_filter->p_module );
+
+    vlc_object_detach( p_filter );
+    vlc_object_release( p_filter );
+}
+
 /**
  * Creates the subpicture unit
  *
@@ -92,6 +101,7 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     p_spu->p_blend = NULL;
     p_spu->p_text = NULL;
     p_spu->p_scale = NULL;
+    p_spu->p_scale_yuvp = NULL;
     p_spu->pf_control = spu_vaControlDefault;
 
     /* Register the default subpicture channel */
@@ -162,31 +172,16 @@ void spu_Destroy( spu_t *p_spu )
     }
 
     if( p_spu->p_blend )
-    {
-        if( p_spu->p_blend->p_module )
-            module_Unneed( p_spu->p_blend, p_spu->p_blend->p_module );
-
-        vlc_object_detach( p_spu->p_blend );
-        vlc_object_release( p_spu->p_blend );
-    }
+        FilterRelease( p_spu->p_blend );
 
     if( p_spu->p_text )
-    {
-        if( p_spu->p_text->p_module )
-            module_Unneed( p_spu->p_text, p_spu->p_text->p_module );
+        FilterRelease( p_spu->p_text );
 
-        vlc_object_detach( p_spu->p_text );
-        vlc_object_release( p_spu->p_text );
-    }
+    if( p_spu->p_scale_yuvp )
+        FilterRelease( p_spu->p_scale_yuvp );
 
     if( p_spu->p_scale )
-    {
-        if( p_spu->p_scale->p_module )
-            module_Unneed( p_spu->p_scale, p_spu->p_scale->p_module );
-
-        vlc_object_detach( p_spu->p_scale );
-        vlc_object_release( p_spu->p_scale );
-    }
+        FilterRelease( p_spu->p_scale );
 
     filter_chain_Delete( p_spu->p_chain );
 
@@ -555,36 +550,42 @@ static void SpuRenderCreateAndLoadText( spu_t *p_spu, int i_width, int i_height 
         p_text->p_module = module_Need( p_text, "text renderer", NULL, false );
 }
 
-static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
+static filter_t *CreateAndLoadScale( vlc_object_t *p_obj, vlc_fourcc_t i_chroma )
 {
-    /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
-    const vlc_fourcc_t i_dummy_chroma = VLC_FOURCC('Y','U','V','P');
-
     filter_t *p_scale;
 
-    assert( !p_spu->p_scale );
-
-    p_spu->p_scale =
-    p_scale        = vlc_custom_create( p_spu, sizeof(filter_t),
-                                        VLC_OBJECT_GENERIC, "scale" );
+    p_scale = vlc_custom_create( p_obj, sizeof(filter_t),
+                                 VLC_OBJECT_GENERIC, "scale" );
     if( !p_scale )
-        return;
+        return NULL;
 
     es_format_Init( &p_scale->fmt_in, VIDEO_ES, 0 );
-    p_scale->fmt_in.video.i_chroma = i_dummy_chroma;
+    p_scale->fmt_in.video.i_chroma = i_chroma;
     p_scale->fmt_in.video.i_width =
     p_scale->fmt_in.video.i_height = 32;
 
     es_format_Init( &p_scale->fmt_out, VIDEO_ES, 0 );
-    p_scale->fmt_out.video.i_chroma = i_dummy_chroma;
+    p_scale->fmt_out.video.i_chroma = i_chroma;
     p_scale->fmt_out.video.i_width =
     p_scale->fmt_out.video.i_height = 16;
 
     p_scale->pf_vout_buffer_new = spu_new_video_buffer;
     p_scale->pf_vout_buffer_del = spu_del_video_buffer;
 
-    vlc_object_attach( p_scale, p_spu );
-    p_scale->p_module = module_Need( p_spu->p_scale, "video filter2", 0, 0 );
+    vlc_object_attach( p_scale, p_obj );
+    p_scale->p_module = module_Need( p_scale, "video filter2", 0, 0 );
+
+    return p_scale;
+}
+
+static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
+{
+    /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
+
+    assert( !p_spu->p_scale );
+    assert( !p_spu->p_scale_yuvp );
+    p_spu->p_scale = CreateAndLoadScale( VLC_OBJECT(p_spu), VLC_FOURCC('Y','U','V','A') );
+    p_spu->p_scale_yuvp = p_spu->p_scale_yuvp = CreateAndLoadScale( VLC_OBJECT(p_spu), VLC_FOURCC('Y','U','V','P') );
 }
 
 static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
@@ -659,12 +660,14 @@ static void SpuRenderRegion( spu_t *p_spu,
 {
     video_format_t fmt_original;
     bool b_rerender_text;
+    bool b_restore_format = false;
     int i_fade_alpha;
     int i_x_offset;
     int i_y_offset;
     int i_scale_idx;
     int i_inv_scale_x;
     int i_inv_scale_y;
+    filter_t *p_scale;
 
     vlc_assert_locked( &p_spu->subpicture_lock );
 
@@ -673,6 +676,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
     {
         SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, __MIN(i_scale_width_orig, i_scale_height_orig) );
+        b_restore_format = b_rerender_text;
 
         /* Check if the rendering has failed ... */
         if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
@@ -696,31 +700,43 @@ static void SpuRenderRegion( spu_t *p_spu,
     i_x_offset = (p_region->i_x + pi_subpic_x[ i_scale_idx ]) * i_inv_scale_x / 1000;
     i_y_offset = (p_region->i_y + p_subpic->i_y) * i_inv_scale_y / 1000;
 
-    /* Force palette if requested */
-    if( p_spu->b_force_palette &&
-        p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','P') )
+    /* Force palette if requested
+     * FIXME b_force_palette and b_force_crop are applied to all subpictures using palette
+     * instead of only the right one (being the dvd spu).
+     */
+    const bool b_using_palette = p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','P');
+    const bool b_force_palette = b_using_palette && p_spu->b_force_palette;
+    const bool b_force_crop    = b_force_palette && p_spu->b_force_crop;
+
+    if( b_force_palette )
     {
         /* It looks so wrong I won't comment
          * p_palette->palette is [256][4] with a int i_entries
          * p_spu->palette is [4][4]
          * */
-        memcpy( p_region->fmt.p_palette->palette, p_spu->palette, 16 );
+        p_region->fmt.p_palette->i_entries = 4;
+        memcpy( p_region->fmt.p_palette->palette, p_spu->palette, 4*sizeof(uint32_t) );
     }
 
-    if( p_spu->p_scale &&
+    if( b_using_palette )
+        p_scale = p_spu->p_scale_yuvp;
+    else
+        p_scale = p_spu->p_scale;
+
+    if( p_scale &&
         ( ( pi_scale_width[i_scale_idx]  > 0 && pi_scale_width[i_scale_idx]  != 1000 ) ||
           ( pi_scale_height[i_scale_idx] > 0 && pi_scale_height[i_scale_idx] != 1000 ) ||
-          p_spu->b_force_palette ) )
+          ( b_force_palette ) ) )
     {
-        const int i_dst_width  = p_region->fmt.i_width  * pi_scale_width[i_scale_idx] / 1000;
-        const int i_dst_height = p_region->fmt.i_height * pi_scale_height[i_scale_idx] / 1000;
+        const unsigned i_dst_width  = p_region->fmt.i_width  * pi_scale_width[i_scale_idx] / 1000;
+        const unsigned i_dst_height = p_region->fmt.i_height * pi_scale_height[i_scale_idx] / 1000;
 
         /* Destroy if cache is unusable */
         if( p_region->p_cache )
         {
             if( p_region->p_cache->fmt.i_width  != i_dst_width ||
                 p_region->p_cache->fmt.i_height != i_dst_height ||
-                p_spu->b_force_palette )
+                b_force_palette )
             {
                 p_subpic->pf_destroy_region( VLC_OBJECT(p_spu),
                                              p_region->p_cache );
@@ -733,37 +749,40 @@ static void SpuRenderRegion( spu_t *p_spu,
         {
             picture_t *p_pic;
 
-            p_spu->p_scale->fmt_in.video = p_region->fmt;
-            p_spu->p_scale->fmt_out.video = p_region->fmt;
+            p_scale->fmt_in.video = p_region->fmt;
+            p_scale->fmt_out.video = p_region->fmt;
 
             p_region->p_cache =
                 p_subpic->pf_create_region( VLC_OBJECT(p_spu),
-                                            &p_spu->p_scale->fmt_out.video );
+                                            &p_scale->fmt_out.video );
             p_region->p_cache->p_next = p_region->p_next;
 
-            if( p_spu->p_scale->fmt_out.video.p_palette )
-                *p_spu->p_scale->fmt_out.video.p_palette =
+            if( p_scale->fmt_out.video.p_palette )
+                *p_scale->fmt_out.video.p_palette =
                     *p_region->fmt.p_palette;
 
             vout_CopyPicture( p_spu, &p_region->p_cache->picture,
                               &p_region->picture );
 
-            p_spu->p_scale->fmt_out.video.i_width = i_dst_width;
-            p_spu->p_scale->fmt_out.video.i_height = i_dst_height;
+            p_scale->fmt_out.video.i_width = i_dst_width;
+            p_scale->fmt_out.video.i_height = i_dst_height;
 
-            p_spu->p_scale->fmt_out.video.i_visible_width =
+            p_scale->fmt_out.video.i_visible_width =
                 p_region->fmt.i_visible_width * pi_scale_width[ i_scale_idx ] / 1000;
-            p_spu->p_scale->fmt_out.video.i_visible_height =
+            p_scale->fmt_out.video.i_visible_height =
                 p_region->fmt.i_visible_height * pi_scale_height[ i_scale_idx ] / 1000;
 
-            p_region->p_cache->fmt = p_spu->p_scale->fmt_out.video;
+            p_region->p_cache->fmt = p_scale->fmt_out.video;
             p_region->p_cache->i_x = p_region->i_x * pi_scale_width[ i_scale_idx ] / 1000;
             p_region->p_cache->i_y = p_region->i_y * pi_scale_height[ i_scale_idx ] / 1000;
             p_region->p_cache->i_align = p_region->i_align;
             p_region->p_cache->i_alpha = p_region->i_alpha;
 
-            p_pic = p_spu->p_scale->pf_video_filter(
-                             p_spu->p_scale, &p_region->p_cache->picture );
+            p_pic = NULL;
+            if( p_scale->p_module )
+                p_pic = p_scale->pf_video_filter( p_scale, &p_region->p_cache->picture );
+            else
+                msg_Err( p_spu, "scaling failed (module not loaded)" );
             if( p_pic )
             {
                 p_region->p_cache->picture = *p_pic;
@@ -815,7 +834,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     i_x_offset = __MAX( i_x_offset, 0 );
     i_y_offset = __MAX( i_y_offset, 0 );
 
-    if( p_spu->i_margin != 0 && !p_spu->b_force_crop )
+    if( p_spu->i_margin != 0 && !b_force_crop )
     {
         int i_diff = 0;
         int i_low = (i_y_offset - p_spu->i_margin) * i_inv_scale_y / 1000;
@@ -830,7 +849,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     }
 
     /* Force cropping if requested */
-    if( p_spu->b_force_crop )
+    if( b_force_crop )
     {
         video_format_t *p_fmt = &p_region->fmt;
         int i_crop_x = p_spu->i_crop_x * pi_scale_width[ i_scale_idx ] / 1000
@@ -869,6 +888,7 @@ static void SpuRenderRegion( spu_t *p_spu,
             i_x_offset = i_x;
             i_y_offset = i_y;
         }
+        b_restore_format = true;
     }
 
     i_x_offset = __MAX( i_x_offset, 0 );
@@ -914,14 +934,10 @@ exit:
          */
         p_region->picture.pf_release( &p_region->picture );
         memset( &p_region->picture, 0, sizeof( picture_t ) );
-        p_region->fmt = fmt_original;
         p_region->i_align &= ~SUBPICTURE_RENDERED;
     }
-    else if( p_spu->b_force_crop )
-    {
+    if( b_restore_format )
         p_region->fmt = fmt_original;
-    }
-
 }
 
 void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,

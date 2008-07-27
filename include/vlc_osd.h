@@ -62,8 +62,9 @@ struct spu_t
 
     filter_t *p_blend;                            /**< alpha blending module */
     filter_t *p_text;                              /**< text renderer module */
-    filter_t *p_scale;                                   /**< scaling module */
-    bool b_force_crop;               /**< force cropping of subpicture */
+    filter_t *p_scale_yuvp;                     /**< scaling module for YUVP */
+    filter_t *p_scale;                    /**< scaling module (all but YUVP) */
+    bool b_force_crop;                     /**< force cropping of subpicture */
     int i_crop_x, i_crop_y, i_crop_width, i_crop_height;       /**< cropping */
 
     int i_margin;                        /**< force position of a subpicture */
