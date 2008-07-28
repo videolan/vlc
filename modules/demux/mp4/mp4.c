@@ -1562,6 +1562,15 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             case( 0x6c ): /* jpeg */
                 p_track->fmt.i_codec = VLC_FOURCC( 'j','p','e','g' );
                 break;
+            case( 0x6d ): /* png */
+                p_track->fmt.i_codec = VLC_FOURCC( 'p','n','g',' ' );
+                break;
+            case( 0x6e ): /* jpeg200 */
+                p_track->fmt.i_codec = VLC_FOURCC( 'M','J','2','C' );
+                break;
+            case( 0xa3 ): /* vc1 */
+                p_track->fmt.i_codec = VLC_FOURCC( 'W','V','C','1' );
+                break;
 
             /* Private ID */
             case( 0xe0 ): /* NeroDigital: dvd subs */
@@ -1574,6 +1583,13 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                         p_track->fmt.subs.spu.i_original_frame_height = p_track->i_height;
                     break;
                 }
+            case( 0xe1 ): /* QCelp for 3gp */
+                if( p_track->fmt.i_cat == AUDIO_ES )
+                {
+                    p_track->fmt.i_codec = VLC_FOURCC( 'Q','c','l','p' );
+                }
+                break;
+
             /* Fallback */
             default:
                 /* Unknown entry, but don't touch i_fourcc */
