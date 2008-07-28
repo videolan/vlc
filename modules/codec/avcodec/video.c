@@ -94,6 +94,7 @@ static void ffmpeg_CopyPicture    ( decoder_t *, picture_t *, AVFrame * );
 static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
+static void ffmpeg_NextPts( decoder_t *, int i_block_rate );
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
@@ -431,7 +432,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         (p_sys->i_late_frames > 4) )
     {
         b_drawpicture = 0;
-        if( p_sys->i_late_frames < 8 )
+        if( p_sys->i_late_frames < 12 )
         {
             p_sys->p_context->skip_frame =
                     (p_sys->i_skip_frame <= AVDISCARD_BIDIR) ?
@@ -538,6 +539,10 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             continue;
         }
 
+        /* Set the PTS */
+        if( p_sys->p_ff_pic->pts )
+            p_sys->i_pts = p_sys->p_ff_pic->pts;
+
         /* Update frame late count (except when doing preroll) */
         if( p_sys->i_pts && decoder_GetDisplayDate(p_dec, p_sys->i_pts) <= mdate() &&
             !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
@@ -557,6 +562,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
             if( !b_drawpicture && p_pic )
                 p_dec->pf_vout_buffer_del( p_dec, p_pic );
+
+            ffmpeg_NextPts( p_dec, p_block->i_rate );
             continue;
         }
 
@@ -578,9 +585,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         {
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
         }
-
-        /* Set the PTS */
-        if( p_sys->p_ff_pic->pts ) p_sys->i_pts = p_sys->p_ff_pic->pts;
 
         /* Sanity check (seems to be needed for some streams) */
         if( p_sys->p_ff_pic->pict_type == FF_B_TYPE )
@@ -612,24 +616,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         {
             p_pic->date = p_sys->i_pts;
 
-            /* interpolate the next PTS */
-            if( p_dec->fmt_in.video.i_frame_rate > 0 &&
-                p_dec->fmt_in.video.i_frame_rate_base > 0 )
-            {
-                p_sys->i_pts += INT64_C(1000000) *
-                    (2 + p_sys->p_ff_pic->repeat_pict) *
-                    p_dec->fmt_in.video.i_frame_rate_base *
-                    p_block->i_rate / INPUT_RATE_DEFAULT /
-                    (2 * p_dec->fmt_in.video.i_frame_rate);
-            }
-            else if( p_sys->p_context->time_base.den > 0 )
-            {
-                p_sys->i_pts += INT64_C(1000000) *
-                    (2 + p_sys->p_ff_pic->repeat_pict) *
-                    p_sys->p_context->time_base.num *
-                    p_block->i_rate / INPUT_RATE_DEFAULT /
-                    (2 * p_sys->p_context->time_base.den);
-            }
+            ffmpeg_NextPts( p_dec, p_block->i_rate );
 
             if( p_sys->b_first_frame )
             {
@@ -921,5 +908,32 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     if( p_ff_pic->reference != 0 )
     {
         p_dec->pf_picture_unlink( p_dec, p_pic );
+    }
+}
+
+static void ffmpeg_NextPts( decoder_t *p_dec, int i_block_rate )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->i_pts <= 0 )
+        return;
+
+    /* interpolate the next PTS */
+    if( p_dec->fmt_in.video.i_frame_rate > 0 &&
+        p_dec->fmt_in.video.i_frame_rate_base > 0 )
+    {
+        p_sys->i_pts += INT64_C(1000000) *
+            (2 + p_sys->p_ff_pic->repeat_pict) *
+            p_dec->fmt_in.video.i_frame_rate_base *
+            i_block_rate / INPUT_RATE_DEFAULT /
+            (2 * p_dec->fmt_in.video.i_frame_rate);
+    }
+    else if( p_sys->p_context->time_base.den > 0 )
+    {
+        p_sys->i_pts += INT64_C(1000000) *
+            (2 + p_sys->p_ff_pic->repeat_pict) *
+            p_sys->p_context->time_base.num *
+            i_block_rate / INPUT_RATE_DEFAULT /
+            (2 * p_sys->p_context->time_base.den);
     }
 }
