@@ -1332,8 +1332,6 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     updateButton = new QToolButton;
     updateButton->setAutoRaise( true );
-    updateButton->setText( "u" );
-    updateButton->setToolTip( qtr( "Force update of this dialog's values" ) );
     mainLayout->addWidget( updateButton, 0, 4, 1, 1 );
 
 
@@ -1348,7 +1346,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     CONNECT( subsSpin, valueChanged ( double ), this, advanceSubs( double ) ) ;
     CONNECT( subSpeedSpin, valueChanged ( double ),
              this, adjustSubsSpeed( double ) );
-    BUTTONACT( updateButton, update() );
+    BUTTON_SET_ACT_I( updateButton, "", update,
+            qtr( "Force update of this dialog's values" ), update() );
 
     /* Set it */
     update();

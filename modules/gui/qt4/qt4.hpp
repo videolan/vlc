@@ -89,7 +89,7 @@ struct intf_sys_t
 
 #define BUTTON_SET_IMG( button, text, image, tooltip )    \
     BUTTON_SET( button, text, tooltip );                  \
-    button->setIcon( QIcon( ":/pixmaps/"#image ) );
+    button->setIcon( QIcon( ":/"#image ) );
 
 #define BUTTON_SET_ACT_I( button, text, image, tooltip, thisslot ) \
     BUTTON_SET_IMG( button, text, image, tooltip );                \

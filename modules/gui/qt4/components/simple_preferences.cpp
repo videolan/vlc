@@ -60,7 +60,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
 
 #define ADD_CATEGORY( button, label, icon, numb )                           \
     QToolButton * button = new QToolButton( this );                         \
-    button->setIcon( QIcon( ":/pixmaps/" #icon ) );                         \
+    button->setIcon( QIcon( ":/pixmaps/prefs/" #icon ) );                   \
     button->setIconSize( QSize( ICON_HEIGHT , ICON_HEIGHT ) );              \
     button->setText( label );                                               \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \

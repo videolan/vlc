@@ -126,9 +126,9 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     setMouseTracking( true );
     b_sliding = false;
 
-    pixOutside = QPixmap( ":/pixmaps/volume-slider-outside.png" );
+    pixOutside = QPixmap( ":/volslide-outside" );
 
-    const QPixmap temp( ":/pixmaps/volume-slider-inside.png" );
+    const QPixmap temp( ":/volslide-inside" );
     const QBitmap mask( temp.createHeuristicMask() );
 
     setMinimumSize( pixOutside.size() );

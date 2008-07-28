@@ -30,7 +30,7 @@
 #include "dialogs/mediainfo.hpp"
 #include <vlc_intf_strings.h>
 
-#include "pixmaps/type_unknown.xpm"
+#include "pixmaps/types/type_unknown.xpm"
 
 #include <assert.h>
 #include <QIcon>
@@ -83,14 +83,14 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     /* Icons initialization */
 #define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( x ) )
     ADD_ICON( UNKNOWN , type_unknown_xpm );
-    ADD_ICON( FILE, ":/pixmaps/type_file.png" );
-    ADD_ICON( DIRECTORY, ":/pixmaps/type_directory.png" );
-    ADD_ICON( DISC, ":/pixmaps/disc_16px.png" );
-    ADD_ICON( CDDA, ":/pixmaps/cdda_16px.png" );
-    ADD_ICON( CARD, ":/pixmaps/capture-card_16px.png" );
-    ADD_ICON( NET, ":/pixmaps/type_net.png" );
-    ADD_ICON( PLAYLIST, ":/pixmaps/type_playlist.png" );
-    ADD_ICON( NODE, ":/pixmaps/type_node.png" );
+    ADD_ICON( FILE, ":/type_file" );
+    ADD_ICON( DIRECTORY, ":/type_directory" );
+    ADD_ICON( DISC, ":/disc" );
+    ADD_ICON( CDDA, ":/cdda" );
+    ADD_ICON( CARD, ":/capture-card" );
+    ADD_ICON( NET, ":/type_net" );
+    ADD_ICON( PLAYLIST, ":/type_playlist" );
+    ADD_ICON( NODE, ":/type_node" );
 #undef ADD_ICON
 
     rebuild( p_root );

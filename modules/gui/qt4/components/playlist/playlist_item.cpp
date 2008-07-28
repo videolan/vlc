@@ -32,8 +32,6 @@
 #include "components/playlist/playlist_model.hpp"
 #include <vlc_intf_strings.h>
 
-#include "pixmaps/type_unknown.xpm"
-
 #include <QSettings>
 
 #include "sorting.h"

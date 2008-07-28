@@ -167,7 +167,6 @@ protected:
     bool b_enabled;
     int type;
     VLMDialog *parent;
-    virtual void enterEvent( QEvent * );
     QGridLayout *objLayout;
 private slots:
     virtual void modify();

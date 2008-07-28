@@ -492,11 +492,11 @@ VLMAWidget::VLMAWidget( QString _name,
     objLayout->addWidget( time, 1, 3, 1, 2 );*/
 
     QToolButton *modifyButton = new QToolButton;
-    modifyButton->setIcon( QIcon( QPixmap( ":/pixmaps/menus_settings_16px.png" ) ) );
+    modifyButton->setIcon( QIcon( QPixmap( ":/settings" ) ) );
     objLayout->addWidget( modifyButton, 0, 5 );
 
     QToolButton *deleteButton = new QToolButton;
-    deleteButton->setIcon( QIcon( QPixmap( ":/pixmaps/menus_quit_16px.png" ) ) );
+    deleteButton->setIcon( QIcon( QPixmap( ":/quit" ) ) );
     objLayout->addWidget( deleteButton, 0, 6 );
 
     BUTTONACT( modifyButton, modify() );
@@ -512,12 +512,6 @@ void VLMAWidget::modify()
 void VLMAWidget::del()
 {
     parent->removeVLMItem( this );
-}
-
-//FIXME, remove me before release
-void VLMAWidget::enterEvent( QEvent *event )
-{
-    printf( "test" );
 }
 
 void VLMAWidget::toggleEnabled( bool b_enable )
@@ -538,12 +532,12 @@ VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
     b_looped = _looped;
 
     playButton = new QToolButton;
-    playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
+    playButton->setIcon( QIcon( QPixmap( ":/play_16px" ) ) );
     objLayout->addWidget( playButton, 1, 0 );
     b_playing = true;
 
     QToolButton *stopButton = new QToolButton;
-    stopButton->setIcon( QIcon( QPixmap( ":/pixmaps/stop_16px.png" ) ) );
+    stopButton->setIcon( QIcon( QPixmap( ":/stop_16px" ) ) );
     objLayout->addWidget( stopButton, 1, 1 );
 
     loopButton = new QToolButton;
@@ -560,9 +554,9 @@ void VLMBroadcast::update()
 {
     VLMWrapper::EditBroadcast( name, input, output, b_enabled, b_looped );
     if( b_looped )
-        loopButton->setIcon( QIcon( QPixmap( ":/pixmaps/playlist_repeat_all.png" ) ) );
+        loopButton->setIcon( QIcon( QPixmap( ":/repeat_all" ) ) );
     else
-        loopButton->setIcon( QIcon( QPixmap( ":/pixmaps/playlist_repeat_off.png" ) ) );
+        loopButton->setIcon( QIcon( QPixmap( ":/repeat_off" ) ) );
 }
 
 void VLMBroadcast::togglePlayPause()
@@ -570,12 +564,12 @@ void VLMBroadcast::togglePlayPause()
     if( b_playing = true )
     {
         VLMWrapper::ControlBroadcast( name, ControlBroadcastPause );
-        playButton->setIcon( QIcon( QPixmap( ":/pixmaps/pause_16px.png" ) ) );
+        playButton->setIcon( QIcon( QPixmap( ":/pause_16px" ) ) );
     }
     else
     {
         VLMWrapper::ControlBroadcast( name, ControlBroadcastPlay );
-        playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
+        playButton->setIcon( QIcon( QPixmap( ":/play_16px" ) ) );
     }
     b_playing = !b_playing;
 }
@@ -589,7 +583,7 @@ void VLMBroadcast::toggleLoop()
 void VLMBroadcast::stop()
 {
     VLMWrapper::ControlBroadcast( name, ControlBroadcastStop );
-    playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
+    playButton->setIcon( QIcon( QPixmap( ":/play_16px" ) ) );
 }
 
 /****************

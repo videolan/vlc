@@ -306,7 +306,8 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     ABButton = new QPushButton( "AB" );
     setupSmallButton( ABButton );
     advLayout->addWidget( ABButton );
-    BUTTON_SET_ACT( ABButton, "AB", qtr( "A to B" ), fromAtoB() );
+    BUTTON_SET_ACT_I( ABButton, "", atob_nob,
+        qtr( "Loop from point A to point B continuously\nClick to set point A" ), fromAtoB() );
     timeA = timeB = 0;
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, AtoBLoop( float, int, int ) );
@@ -321,14 +322,15 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     recordButton = new QPushButton( "R" );
     setupSmallButton( recordButton );
     advLayout->addWidget( recordButton );
-    BUTTON_SET_ACT_I( recordButton, "", record_16px.png,
+    BUTTON_SET_ACT_I( recordButton, "", record,
             qtr( "Record" ), record() );
 
     /* Snapshot Button */
     snapshotButton = new QPushButton( "S" );
     setupSmallButton( snapshotButton );
     advLayout->addWidget( snapshotButton );
-    BUTTON_SET_ACT( snapshotButton, "S", qtr( "Take a snapshot" ), snapshot() );
+    BUTTON_SET_ACT_I( snapshotButton, "", snapshot,
+            qtr( "Take a snapshot" ), snapshot() );
 }
 
 AdvControlsWidget::~AdvControlsWidget()
@@ -361,19 +363,22 @@ void AdvControlsWidget::fromAtoB()
     if( !timeA )
     {
         timeA = var_GetTime( THEMIM->getInput(), "time"  );
-        ABButton->setText( "A->..." );
+        ABButton->setToolTip( "Click to set point B" );
+        ABButton->setIcon( QIcon( ":/atob_noa" ) );
         return;
     }
     if( !timeB )
     {
         timeB = var_GetTime( THEMIM->getInput(), "time"  );
         var_SetTime( THEMIM->getInput(), "time" , timeA );
-        ABButton->setText( "A<=>B" );
+        ABButton->setIcon( QIcon( ":/atob" ) );
+        ABButton->setToolTip( "Stop the A to B loop" );
         return;
     }
     timeA = 0;
     timeB = 0;
-    ABButton->setText( "AB" );
+    ABButton->setToolTip( qtr( "Loop from point A to point B continuously\nClick to set point A" ) );
+    ABButton->setIcon( QIcon( ":/atob_nob" ) );
 }
 
 /* Function called regularly when in an AtoB loop */
@@ -453,9 +458,9 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     setupSmallButton( nextSectionButton );
     discLayout->addWidget( nextSectionButton );
 
-    BUTTON_SET_IMG( prevSectionButton, "", previous.png, "" );
-    BUTTON_SET_IMG( nextSectionButton, "", next.png, "" );
-    BUTTON_SET_IMG( menuButton, "", previous.png, qtr( "Menu" ) );
+    BUTTON_SET_IMG( prevSectionButton, "", dvd_prev, "" );
+    BUTTON_SET_IMG( nextSectionButton, "", dvd_next, "" );
+    BUTTON_SET_IMG( menuButton, "", dvd_menu, qtr( "Menu" ) );
 
     discFrame->hide();
 
@@ -504,7 +509,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     CONNECT( THEMIM->getIM(), setNewTelexPage( int ),
               telexPage, setValue( int ) );
 
-    BUTTON_SET_IMG( telexOn, "", tv.png, qtr( "Teletext on" ) );
+    BUTTON_SET_IMG( telexOn, "", tv, qtr( "Teletext on" ) );
 
     CONNECT( telexOn, clicked(), THEMIM->getIM(),
              telexToggleButtons() );
@@ -516,7 +521,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     telexTransparent->setEnabled( false );
     telexPage->setEnabled( false );
 
-    BUTTON_SET_IMG( telexTransparent, "", tvtelx.png, qtr( "Teletext" ) );
+    BUTTON_SET_IMG( telexTransparent, "", tvtelx, qtr( "Teletext" ) );
     CONNECT( telexTransparent, clicked( bool ),
              THEMIM->getIM(), telexSetTransparency() );
     CONNECT( THEMIM->getIM(), toggleTelexTransparency(),
@@ -564,18 +569,19 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     /* Add this block to the main layout */
 
-    BUTTON_SET_ACT_I( playButton, "", play.png, qtr( "Play" ), play() );
-    BUTTON_SET_ACT_I( prevButton, "" , previous.png,
+    BUTTON_SET_ACT_I( playButton, "", play_b, qtr( "Play" ), play() );
+    BUTTON_SET_ACT_I( prevButton, "" , previous_b,
                       qtr( "Previous" ), prev() );
-    BUTTON_SET_ACT_I( nextButton, "", next.png, qtr( "Next" ), next() );
-    BUTTON_SET_ACT_I( stopButton, "", stop.png, qtr( "Stop" ), stop() );
+    BUTTON_SET_ACT_I( nextButton, "", next_b, qtr( "Next" ), next() );
+    BUTTON_SET_ACT_I( stopButton, "", stop_b, qtr( "Stop" ), stop() );
 
     /*
      * Other first Line buttons
      */
     /** Fullscreen/Visualisation **/
-    fullscreenButton = new QPushButton( "F" );
-    BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
+    fullscreenButton = new QPushButton;
+    BUTTON_SET_ACT_I( fullscreenButton, "", fullscreen, qtr( "Fullscreen" ),
+            fullscreen() );
     setupSmallButton( fullscreenButton );
 
     if( !b_fsCreation )
@@ -583,13 +589,13 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
         /** Playlist Button **/
         playlistButton = new QPushButton;
         setupSmallButton( playlistButton );
-        BUTTON_SET_IMG( playlistButton, "" , playlist.png, qtr( "Show playlist" ) );
+        BUTTON_SET_IMG( playlistButton, "" , playlist, qtr( "Show playlist" ) );
         CONNECT( playlistButton, clicked(), _p_mi, togglePlaylist() );
 
         /** extended Settings **/
         extSettingsButton = new QPushButton;
-        BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended settings" ),
-                extSettings() );
+        BUTTON_SET_ACT_I( extSettingsButton, "", extended,
+                qtr( "Extended settings" ), extSettings() );
         setupSmallButton( extSettingsButton );
     }
 
@@ -597,7 +603,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     hVolLabel = new VolumeClickHandler( p_intf, this );
 
     volMuteLabel = new QLabel;
-    volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-medium.png" ) );
+    volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
     volMuteLabel->installEventFilter( hVolLabel );
 
@@ -703,13 +709,13 @@ void ControlsWidget::toggleTeletextTransparency()
 {
     if( b_telexTransparent )
     {
-        telexTransparent->setIcon( QIcon( ":/pixmaps/tvtelx.png" ) );
+        telexTransparent->setIcon( QIcon( ":/tvtelx" ) );
         telexTransparent->setToolTip( qtr( "Teletext" ) );
         b_telexTransparent = false;
     }
     else
     {
-        telexTransparent->setIcon( QIcon( ":/pixmaps/tvtelx-transparent.png" ) );
+        telexTransparent->setIcon( QIcon( ":/tvtelx-transparent" ) );
         telexTransparent->setToolTip( qtr( "Transparent" ) );
         b_telexTransparent = true;
     }
@@ -773,12 +779,12 @@ void ControlsWidget::updateVolume( int i_sliderVolume )
         aout_VolumeSet( p_intf, i_res );
     }
     if( i_sliderVolume == 0 )
-        volMuteLabel->setPixmap( QPixmap(":/pixmaps/volume-muted.png" ) );
+        volMuteLabel->setPixmap( QPixmap(":/volume-muted" ) );
     else if( i_sliderVolume < VOLUME_MAX / 3 )
-        volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
+        volMuteLabel->setPixmap( QPixmap( ":/volume-low" ) );
     else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
-        volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
-    else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-medium.png" ) );
+        volMuteLabel->setPixmap( QPixmap( ":/volume-high" ) );
+    else volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
 }
 
 void ControlsWidget::updateVolume()
@@ -808,12 +814,12 @@ void ControlsWidget::setStatus( int status )
 {
     if( status == PLAYING_S ) /* Playing */
     {
-        playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
+        playButton->setIcon( QIcon( ":/pause_b" ) );
         playButton->setToolTip( qtr( "Pause" ) );
     }
     else
     {
-        playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
+        playButton->setIcon( QIcon( ":/play_b" ) );
         playButton->setToolTip( qtr( "Play" ) );
     }
 }
