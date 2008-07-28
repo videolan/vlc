@@ -694,6 +694,8 @@ package-win-common:
 	    "$(top_builddir)/vlc-$(VERSION)/share/locale/$${i}/LC_MESSAGES/vlc.mo" \
             || true ; \
 	done
+	mkdir -p $(top_builddir)/vlc-$(VERSION)/share/locale/qt4/
+	cp $(QT4LOCALEDIR)/*.qm $(top_builddir)/vlc-$(VERSION)/share/locale/qt4/ || true
 
 #  Mozilla plugin
 if BUILD_MOZILLA
