@@ -76,7 +76,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     VariablesInit( p_playlist );
 
     /* Initialise data structures */
-    vlc_mutex_init( &p_playlist->gc_lock );
     p_playlist->i_last_playlist_id = 0;
     p_playlist->p_input = NULL;
 
@@ -199,9 +198,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
             return;
     }
 
-    vlc_mutex_lock( &p_playlist->gc_lock );
     p_playlist->b_cant_sleep = false;
-    vlc_mutex_unlock( &p_playlist->gc_lock );
 }
 
 /* Input Callback */
@@ -330,7 +327,8 @@ void set_current_status_node( playlist_t * p_playlist,
 /**
  * Main loop
  *
- * Main loop for the playlist
+ * Main loop for the playlist. It should be entered with the
+ * playlist lock (otherwise input event may be lost)
  * \param p_playlist the playlist object
  * \return nothing
  */
@@ -338,7 +336,8 @@ void playlist_MainLoop( playlist_t *p_playlist )
 {
     playlist_item_t *p_item = NULL;
     bool b_playexit = var_GetBool( p_playlist, "play-and-exit" );
-    PL_LOCK;
+
+    PL_ASSERT_LOCKED;
 
     if( p_playlist->b_reset_currently_playing &&
         mdate() - p_playlist->last_rebuild_date > 30000 ) // 30 ms
@@ -406,9 +405,7 @@ check_input:
         }
         else if( p_playlist->p_input->i_state != INIT_S )
         {
-            PL_UNLOCK;
             ObjectGarbageCollector( p_playlist, false );
-            PL_LOCK;
         }
     }
     else
@@ -430,7 +427,6 @@ check_input:
             {
                 msg_Dbg( p_playlist, "nothing to play" );
                 p_playlist->status.i_status = PLAYLIST_STOPPED;
-                PL_UNLOCK;
 
                 if( b_playexit == true )
                 {
@@ -441,6 +437,9 @@ check_input:
                 return;
             }
             playlist_PlayItem( p_playlist, p_item );
+            /* playlist_PlayItem loose input event, we need to recheck */
+            //if( !p_playlist->b_cant_sleep )
+                goto check_input;
         }
         else
         {
@@ -449,12 +448,9 @@ check_input:
             p_playlist->status.i_status = PLAYLIST_STOPPED;
 
             /* Collect garbage */
-            PL_UNLOCK;
             ObjectGarbageCollector( p_playlist, b_gc_forced );
-            PL_LOCK;
         }
     }
-    PL_UNLOCK;
 }
 
 /**

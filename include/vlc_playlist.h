@@ -203,8 +203,6 @@ struct playlist_t
     playlist_preparse_t  *p_preparse; /**< Preparser object */
     playlist_fetcher_t   *p_fetcher;/**< Meta and art fetcher object */
 
-    vlc_mutex_t gc_lock;         /**< Lock to protect the garbage collection */
-
     struct {
         /* Current status. These fields are readonly, only the playlist
          * main loop can touch it*/

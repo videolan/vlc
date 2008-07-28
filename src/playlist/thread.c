@@ -140,9 +140,7 @@ static void RunControlThread ( playlist_t *p_playlist )
     vlc_object_lock( p_playlist );
     while( vlc_object_alive( p_playlist ) )
     {
-        PL_UNLOCK;
         playlist_MainLoop( p_playlist );
-        PL_LOCK;
 
         /* The playlist lock has been unlocked, so we can't tell if
          * someone has killed us in the meantime. Check now. */
@@ -152,9 +150,11 @@ static void RunControlThread ( playlist_t *p_playlist )
         if( p_playlist->b_cant_sleep )
         {
             /* 100 ms is an acceptable delay for playlist operations */
-            PL_UNLOCK;
+            vlc_object_unlock( p_playlist );
+
             msleep( INTF_IDLE_SLEEP*2 );
-            PL_LOCK;
+
+            vlc_object_lock( p_playlist );
         }
         else
         {
