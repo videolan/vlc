@@ -59,7 +59,7 @@ static  int RunAndDestroy  ( input_thread_t *p_input );
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
                                   const char *, bool, sout_instance_t * );
 static  int             Init    ( input_thread_t *p_input );
-static void             Error   ( input_thread_t *p_input );
+static void             WaitDie   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input );
 
@@ -494,7 +494,7 @@ static int Run( input_thread_t *p_input )
         /* If we failed, wait before we are killed, and exit */
         p_input->b_error = true;
 
-        Error( p_input );
+        WaitDie( p_input );
 
         /* Tell we're dead */
         p_input->b_dead = true;
@@ -525,7 +525,7 @@ static int Run( input_thread_t *p_input )
     /* Wait until we are asked to die */
     if( !p_input->b_die )
     {
-        Error( p_input );
+        WaitDie( p_input );
     }
 
     /* Clean up */
@@ -1262,13 +1262,13 @@ error:
 }
 
 /*****************************************************************************
- * Error: RunThread() error loop
+ * WaitDie: Wait until we are asked to die.
  *****************************************************************************
  * This function is called when an error occurred during thread main's loop.
  *****************************************************************************/
-static void Error( input_thread_t *p_input )
+static void WaitDie( input_thread_t *p_input )
 {
-    input_ChangeState( p_input, ERROR_S );
+    input_ChangeState( p_input, p_input->b_error ? ERROR_S : END_S );
     while( !p_input->b_die )
     {
         /* Sleep a while */

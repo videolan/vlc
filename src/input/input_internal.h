@@ -386,13 +386,18 @@ void MRLSplit( char *, const char **, const char **, char ** );
 
 static inline void input_ChangeStateWithVarCallback( input_thread_t *p_input, int state, bool callback )
 {
-    bool changed = (p_input->i_state != state);
+    const bool changed = p_input->i_state != state;
+
+    p_input->i_state = state;
+
     if( callback )
-        var_SetInteger( p_input, "state", p_input->i_state = state );
+    {
+        var_SetInteger( p_input, "state", state );
+    }
     else
     {
         vlc_value_t val;
-        p_input->i_state = val.i_int = state;
+        val.i_int = state;
         var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
     }
     if( changed )
