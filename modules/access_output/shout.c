@@ -527,6 +527,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             else
             {
                 msg_Err( p_access, "failed to reconnect to server" );
+                return VLC_EGENERIC;
             }
 
         }
