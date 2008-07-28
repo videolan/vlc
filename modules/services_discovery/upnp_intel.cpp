@@ -309,10 +309,12 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
+    vlc_object_lock( p_sys->p_playlist );
     playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_one, true,
                          true );
     playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, true,
                          true );
+    vlc_object_unlock( p_sys->p_playlist );
     pl_Release( p_sd );
     free( p_sys );
 }
@@ -629,8 +631,10 @@ MediaServer::~MediaServer()
 {
     if ( _contents )
     {
+        vlc_object_lock( _cookie->serviceDiscovery->p_sys->p_playlist );
         playlist_NodeDelete( pl_Get( _cookie->serviceDiscovery ) ,
                              _playlistNode, true, true );
+        vlc_object_unlock( _cookie->serviceDiscovery->p_sys->p_playlist );
     }
 
     delete _contents;
@@ -927,9 +931,12 @@ bool MediaServerList::addServer( MediaServer* s )
     _list.push_back( s );
 
     char* name = strdup( s->getFriendlyName() );
-    playlist_item_t* node = playlist_NodeCreate( pl_Get( _cookie->serviceDiscovery ),
-                                                 name,
-                                          _cookie->serviceDiscovery->p_sys->p_node_cat, 0, NULL );
+    vlc_object_lock( _cookie->serviceDiscovery->p_sys->p_playlist );
+    playlist_item_t* node = playlist_NodeCreate(
+                                pl_Get( _cookie->serviceDiscovery ), name,
+                                _cookie->serviceDiscovery->p_sys->p_node_cat,
+                                0, NULL );
+    vlc_object_unlock( _cookie->serviceDiscovery->p_sys->p_playlist );
     free( name );
     s->setPlaylistNode( node );
 
