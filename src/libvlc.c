@@ -1232,8 +1232,8 @@ static inline int LoadMessages (void)
     static const char psz_path[] = LOCALEDIR;
 #else
     char psz_path[1024];
-    if (snprintf (psz_path, sizeof (psz_path), "%s/%s",
-                  vlc_global()->psz_vlcpath, "locale")
+    if (snprintf (psz_path, sizeof (psz_path), "%s" DIR_SEP "%s",
+                  config_GetDataDir(), "locale")
                      >= (int)sizeof (psz_path))
         return -1;
 

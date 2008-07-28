@@ -337,9 +337,9 @@ vlc-bundle: vlc
 	  done ; \
 	fi
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
-	  mkdir -p "$(top_builddir)/vlc-bundle/locale/$$i/LC_MESSAGES" ; \
+	  mkdir -p "$(top_builddir)/vlc-bundle/share/locale/$$i/LC_MESSAGES" ; \
 	  cp "$(top_builddir)/po/$$i.gmo" \
-	    "$(top_builddir)/vlc-bundle/locale/$$i/LC_MESSAGES/vlc.mo" || true ; \
+	    "$(top_builddir)/vlc-bundle/share/locale/$$i/LC_MESSAGES/vlc.mo" || true ; \
 	done
 	find $(top_builddir)/vlc-bundle -type f -exec mimeset -f "{}" \;
 endif
@@ -540,9 +540,9 @@ VLC-release.app: vlc
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/`basename $${i}` ; \
 	done
 	$(INSTALL) -m 644 $(srcdir)/share/http/requests/readme $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/readme.txt
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/locale
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
-	  mkdir -p $(top_builddir)/VLC-release.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
+	  mkdir -p $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
 	  cp $(srcdir)/po/$${i}.gmo $(top_builddir)/VLC-release.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	  mkdir -p $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	  ln -sf ../English.lproj/InfoPlist.strings \
@@ -639,10 +639,10 @@ VLC.app: vlc
 				   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done && \
 	ln -sfn `pwd`/$(srcdir)/share $(top_builddir)/VLC.app/Contents/MacOS/
-	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/locale
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
-	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
-	  ln -sfn `pwd`/$(srcdir)/po/$${i}.gmo $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
+	  ln -sfn `pwd`/$(srcdir)/po/$${i}.gmo $(top_builddir)/VLC.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	  ln -sf ../English.lproj/InfoPlist.strings \
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
@@ -687,11 +687,11 @@ package-win-common:
 	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-$(VERSION)/
 
 # Copy the locales
-	mkdir -p $(top_builddir)/vlc-$(VERSION)/locale
+	mkdir -p $(top_builddir)/vlc-$(VERSION)/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
-	  mkdir -p "$(top_builddir)/vlc-$(VERSION)/locale/$${i}/LC_MESSAGES" ; \
+	  mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/locale/$${i}/LC_MESSAGES" ; \
 	  cp "$(srcdir)/po/$${i}.gmo" \
-	    "$(top_builddir)/vlc-$(VERSION)/locale/$${i}/LC_MESSAGES/vlc.mo" \
+	    "$(top_builddir)/vlc-$(VERSION)/share/locale/$${i}/LC_MESSAGES/vlc.mo" \
             || true ; \
 	done
 
