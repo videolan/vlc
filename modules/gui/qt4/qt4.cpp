@@ -368,7 +368,7 @@ static void Init( intf_thread_t *p_intf )
     QString path =  QString( QT4LOCALEDIR );
 #else
     QString path = QString( QString(config_GetDataDir()) + DIR_SEP +
-                            "locale" + DIR_SEP );
+                            "locale" + DIR_SEP + "qt4" + DIR_SEP );
 #endif
     // files depending on locale
     bool b_loaded = qtTranslator.load( path + "qt_" + ql.name());
