@@ -166,7 +166,7 @@ struct demux_sys_t
 /*****************************************************************************
  * Declaration of local function
  *****************************************************************************/
-static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *);
+static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *, bool b_force_enable );
 static void MP4_TrackDestroy(  mp4_track_t * );
 
 static int  MP4_TrackSelect ( demux_t *, mp4_track_t *, mtime_t );
@@ -276,6 +276,7 @@ static int Open( vlc_object_t * p_this )
 
     unsigned int    i;
     bool      b_seekable;
+    bool      b_enabled_es;
 
     /* A little test to see if it could be a mp4 */
     if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 ) return VLC_EGENERIC;
@@ -469,24 +470,29 @@ static int Open( vlc_object_t * p_this )
         goto error;
     memset( p_sys->track, 0, p_sys->i_tracks * sizeof( mp4_track_t ) );
 
-    /* Search the first chap reference (like quicktime) */
+    /* Search the first chap reference (like quicktime) and
+     * check that at least 1 stream is enabled */
     p_sys->p_tref_chap = NULL;
+    b_enabled_es = false;
     for( i = 0; i < p_sys->i_tracks; i++ )
     {
         MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );
-        MP4_Box_t *p_chap = MP4_BoxGet( p_trak, "tref/chap", i );
-        if( !p_chap || p_chap->data.p_tref_generic->i_entry_count <= 0 )
-            continue;
 
-        p_sys->p_tref_chap = p_chap;
-        break;
+
+        MP4_Box_t *p_tkhd = MP4_BoxGet( p_trak, "tkhd" );
+        if( p_tkhd && (p_tkhd->data.p_tkhd->i_flags&MP4_TRACK_ENABLED) )
+            b_enabled_es = true;
+
+        MP4_Box_t *p_chap = MP4_BoxGet( p_trak, "tref/chap", i );
+        if( p_chap && p_chap->data.p_tref_generic->i_entry_count > 0 && !p_sys->p_tref_chap )
+            p_sys->p_tref_chap = p_chap;
     }
 
     /* now process each track and extract all usefull information */
     for( i = 0; i < p_sys->i_tracks; i++ )
     {
         p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );
-        MP4_TrackCreate( p_demux, &p_sys->track[i], p_trak );
+        MP4_TrackCreate( p_demux, &p_sys->track[i], p_trak, !b_enabled_es );
 
         if( p_sys->track[i].b_ok && !p_sys->track[i].b_chapter )
         {
@@ -1967,7 +1973,8 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
  * If it succeed b_ok is set to 1 else to 0
  ****************************************************************************/
 static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
-                             MP4_Box_t *p_box_trak )
+                             MP4_Box_t *p_box_trak,
+                             bool b_force_enable )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -2150,6 +2157,15 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     }
 
     /* now create es */
+    if( b_force_enable &&
+        ( p_track->fmt.i_cat == VIDEO_ES || p_track->fmt.i_cat == AUDIO_ES ) )
+    {
+        msg_Warn( p_demux, "Enabling track[Id 0x%x] (buggy file without enabled track)",
+                  p_track->i_track_ID );
+        p_track->b_enable = true;
+        p_track->fmt.i_priority = 0;
+    }
+
     p_track->p_es = NULL;
     if( TrackCreateES( p_demux,
                        p_track, p_track->i_chunk,
