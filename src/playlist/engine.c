@@ -438,8 +438,7 @@ check_input:
             }
             playlist_PlayItem( p_playlist, p_item );
             /* playlist_PlayItem loose input event, we need to recheck */
-            //if( !p_playlist->b_cant_sleep )
-                goto check_input;
+            goto check_input;
         }
         else
         {
