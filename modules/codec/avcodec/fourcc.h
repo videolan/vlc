@@ -161,10 +161,14 @@ static struct
       VIDEO_ES, "Jomigo HDX4 (MPEG-4 Video)" },
     { VLC_FOURCC('S','M','P','4'), CODEC_ID_MPEG4,
       VIDEO_ES, "Samsung SMP4 (MPEG-4 Video)" },
+    { VLC_FOURCC('s','m','p','4'), CODEC_ID_MPEG4,
+      VIDEO_ES, "Samsung SMP4 (MPEG-4 Video)" },
     { VLC_FOURCC('f','v','f','w'), CODEC_ID_MPEG4,
       VIDEO_ES, "FFmpeg MPEG-4" },
     { VLC_FOURCC('F','V','F','W'), CODEC_ID_MPEG4,
       VIDEO_ES, "FFmpeg MPEG-4" },
+    { VLC_FOURCC('V','I','D','M'), CODEC_ID_MPEG4,
+      VIDEO_ES, "vidm 4.01 codec" },
 
     /* MSMPEG4 v1 */
     { VLC_FOURCC('D','I','V','1'), CODEC_ID_MSMPEG4V1,
