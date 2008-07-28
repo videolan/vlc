@@ -360,5 +360,6 @@ void PrefsDialog::reset()
 
         instance = NULL;
         close();
+        PrefsDialog::getInstance( p_intf )->show();
     }
 }
