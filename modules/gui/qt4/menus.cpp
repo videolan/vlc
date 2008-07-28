@@ -408,7 +408,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     addDPStaticEntry( menu, qtr( I_MENU_MSG ), "",
         ":/messages", SLOT( messagesDialog() ),
         "Ctrl+M" );
-    addDPStaticEntry( menu, qtr( I_MENU_INFO ) , "", "",
+    addDPStaticEntry( menu, qtr( I_MENU_INFO ) , "", ":/info",
         SLOT( mediaInfoDialog() ), "Ctrl+I" );
     addDPStaticEntry( menu, qtr( I_MENU_CODECINFO ) , "",
         ":/info", SLOT( mediaCodecDialog() ), "Ctrl+J" );
