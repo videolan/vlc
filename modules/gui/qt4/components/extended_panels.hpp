@@ -94,6 +94,8 @@ public:
     virtual ~Equalizer();
     QComboBox *presetsComboBox;
 
+    char * createValuesFromPreset( int i_preset );
+    void updateUIFromCore();
 private:
     Ui::EqualizerWidget ui;
     QSlider *bands[BANDS];
@@ -101,8 +103,6 @@ private:
 
     void delCallbacks( aout_instance_t * );
     void addCallbacks( aout_instance_t * );
-    void updateUIValues( char *, float );
-    char * createValuesFromPreset( int i_preset );
 
     intf_thread_t *p_intf;
 private slots:
@@ -110,8 +110,9 @@ private slots:
     void enable();
     void set2Pass();
     void setPreamp();
-    void changeCoreBands();
-    void setPreset(int);
+    void setCoreBands();
+    void setCorePreset(int);
+    void updateUISliderValues( int );
 };
 
 class Spatializer: public QWidget
