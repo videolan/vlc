@@ -21,6 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -48,6 +49,10 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 {
     QGridLayout *main_layout = new QGridLayout( this );
     setWindowTitle( qtr( "Preferences" ) );
+
+    /* Whether we want it or not, we need to destroy on close to get
+       consistency when reset */
+    setAttribute( Qt::WA_DeleteOnClose );
 
     /* Create Panels */
     tree_panel = new QWidget;
@@ -352,7 +357,8 @@ void PrefsDialog::reset()
     {
         config_ResetAll( p_intf );
         config_SaveConfigFile( p_intf, NULL );
-        /* FIXME reset the panels */
-        destroyPanels();
+
+        instance = NULL;
+        close();
     }
 }

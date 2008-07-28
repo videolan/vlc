@@ -91,7 +91,6 @@ private slots:
     void save();
     void cancel();
     void reset();
-    void close(){ save(); }; /* Needed for any generic CloseEvent*/
 };
 
 #endif
