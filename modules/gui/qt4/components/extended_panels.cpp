@@ -917,18 +917,6 @@ void Equalizer::enable( bool en )
     {
         bands[i]->setEnabled( en ); band_texts[i]->setEnabled( en );
     }
-
-#if 0
-    msleep( 10000 );
-
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    if( en )
-        addCallbacks( p_aout );
-    else
-        delCallbacks( p_aout );
-#endif
-
 }
 
 /* Function called when the set2Pass button is activated */
