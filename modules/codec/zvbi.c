@@ -138,12 +138,18 @@ struct decoder_sys_t
 
 static subpicture_t *Decode( decoder_t *, block_t ** );
 
+static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
+                                 bool b_text,
+                                 int i_columns, int i_rows,
+                                 int i_align, mtime_t i_pts );
+
 static void EventHandler( vbi_event *ev, void *user_data );
+static int OpaquePage( picture_t *p_src, const vbi_page p_page,
+                       const video_format_t fmt, bool b_opaque );
+
+/* Properties callbacks */
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data );
-static int OpaquePage( decoder_t *p_dec, vbi_page p_page, video_format_t fmt,
-                        picture_t *p_src, bool b_opaque );
-
 static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int Position( vlc_object_t *p_this, char const *psz_cmd,
@@ -243,7 +249,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
-    decoder_sys_t   *p_sys = (decoder_sys_t *) p_dec->p_sys;
+    decoder_sys_t   *p_sys = p_dec->p_sys;
     block_t         *p_block;
     subpicture_t    *p_spu = NULL;
     video_format_t  fmt;
@@ -288,12 +294,27 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                                   VBI_ANY_SUBNO, VBI_WST_LEVEL_3p5,
                                   25, FALSE );
 
-    if( !b_cached )
+    if( i_wanted_page == p_sys->i_last_page && !p_sys->b_update )
         goto error;
 
-    if( ( i_wanted_page == p_sys->i_last_page ) &&
-        ( p_sys->b_update != true ) )
+    if( !b_cached )
+    {
+        if( p_sys->i_last_page != i_wanted_page )
+        {
+            /* We need to reset the subtitle */
+            p_spu = Subpicture( p_dec, &fmt, true,
+                                p_page.columns, p_page.rows,
+                                i_align, p_block->i_pts );
+            if( !p_spu )
+                goto error;
+            p_spu->p_region->psz_text = strdup("");
+
+            p_sys->b_update = true;
+            p_sys->i_last_page = i_wanted_page;
+            goto exit;
+        }
         goto error;
+    }
 
     p_sys->b_update = false;
     p_sys->i_last_page = i_wanted_page;
@@ -303,56 +324,17 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 #endif
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = Subpicture( p_dec, &fmt, p_sys->b_text,
+                        p_page.columns, p_page.rows,
+                        i_align, p_block->i_pts );
     if( !p_spu )
-    {
-        msg_Warn( p_dec, "can't get spu buffer" );
         goto error;
-    }
-
-    /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = p_sys->b_text ? VLC_FOURCC('T','E','X','T') :
-                                   VLC_FOURCC('R','G','B','A');
-    fmt.i_aspect = p_sys->b_text ? 0 : VOUT_ASPECT_FACTOR;
-    if( p_sys->b_text )
-    {
-        fmt.i_bits_per_pixel = 0;
-    }
-    else
-    {
-        fmt.i_sar_num = fmt.i_sar_den = 1;
-        fmt.i_width = fmt.i_visible_width = p_page.columns * 12;
-        fmt.i_height = fmt.i_visible_height = p_page.rows * 10;
-        fmt.i_bits_per_pixel = 32;
-    }
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-
-    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
-    if( p_spu->p_region == NULL )
-    {
-        msg_Err( p_dec, "cannot allocate SPU region" );
-        goto error;
-    }
-
-    p_spu->p_region->i_x = 0;
-    p_spu->p_region->i_y = 0;
-    p_spu->p_region->i_align = i_align;
-
-    /* Normal text subs, easy markup */
-    p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM;
-
-    p_spu->i_start = (mtime_t) p_block->i_pts;
-    p_spu->i_stop = (mtime_t) 0;
-    p_spu->b_ephemer = true;
-    p_spu->b_absolute = false;
-    p_spu->b_pausable = true;
 
     if( p_sys->b_text )
     {
         unsigned int i_textsize = 7000;
         int i_total;
-        char p_text[7000];
+        char p_text[i_textsize+1];
 
         i_total = vbi_print_page_region( &p_page, p_text, i_textsize,
                         "UTF-8", 0, 0, 0, 0, p_page.columns, p_page.rows );
@@ -375,15 +357,10 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
                           p_spu->p_region->picture.p->p_pixels, 1, 1 );
 
-        OpaquePage( p_dec, p_page, fmt, &p_spu->p_region->picture, b_opaque );
-
-        /* */
-        p_spu->i_width =
-        p_spu->i_original_picture_width = fmt.i_width;
-        p_spu->i_height =
-        p_spu->i_original_picture_height = fmt.i_height;
+        OpaquePage( p_pic, p_page, fmt, b_opaque );
     }
 
+exit:
     vbi_unref_page( &p_page );
     block_Release( p_block );
     return p_spu;
@@ -398,6 +375,75 @@ error:
 
     block_Release( p_block );
     return NULL;
+}
+
+static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
+                                 bool b_text,
+                                 int i_columns, int i_rows, int i_align,
+                                 mtime_t i_pts )
+{
+    video_format_t fmt;
+    subpicture_t *p_spu;
+
+    /* If there is a page or sub to render, then we do that here */
+    /* Create the subpicture unit */
+    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    if( !p_spu )
+    {
+        msg_Warn( p_dec, "can't get spu buffer" );
+        return NULL;
+    }
+
+    memset( &fmt, 0, sizeof(video_format_t) );
+    fmt.i_chroma = b_text ? VLC_FOURCC('T','E','X','T') :
+                                   VLC_FOURCC('R','G','B','A');
+    fmt.i_aspect = b_text ? 0 : VOUT_ASPECT_FACTOR;
+    if( b_text )
+    {
+        fmt.i_bits_per_pixel = 0;
+    }
+    else
+    {
+        fmt.i_sar_num = fmt.i_sar_den = 1;
+        fmt.i_width = fmt.i_visible_width = i_columns * 12;
+        fmt.i_height = fmt.i_visible_height = i_rows * 10;
+        fmt.i_bits_per_pixel = 32;
+    }
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+
+    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+    if( p_spu->p_region == NULL )
+    {
+        msg_Err( p_dec, "cannot allocate SPU region" );
+        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        return NULL;
+    }
+
+    p_spu->p_region->i_x = 0;
+    p_spu->p_region->i_y = 0;
+    p_spu->p_region->i_align = i_align;
+
+    /* Normal text subs, easy markup */
+    p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM;
+
+    p_spu->i_start = i_pts;
+    p_spu->i_stop = 0;
+    p_spu->b_ephemer = true;
+    p_spu->b_absolute = false;
+    p_spu->b_pausable = true;
+
+
+    if( !b_text )
+    {
+        p_spu->i_width =
+        p_spu->i_original_picture_width = fmt.i_width;
+        p_spu->i_height =
+        p_spu->i_original_picture_height = fmt.i_height;
+    }
+
+    /* */
+    *p_fmt = fmt;
+    return p_spu;
 }
 
 static void EventHandler( vbi_event *ev, void *user_data )
@@ -432,10 +478,9 @@ static void EventHandler( vbi_event *ev, void *user_data )
         msg_Dbg( p_dec, "Program info received" );
 }
 
-static int OpaquePage( decoder_t *p_dec, vbi_page p_page,
-                       video_format_t fmt, picture_t *p_src, bool b_opaque )
+static int OpaquePage( picture_t *p_src, const vbi_page p_page,
+                       const video_format_t fmt, bool b_opaque )
 {
-    decoder_sys_t   *p_sys = (decoder_sys_t *) p_dec->p_sys;
     unsigned int    x, y;
 
     assert( fmt.i_chroma == VLC_FOURCC('R','G','B','A' ) );
@@ -479,7 +524,7 @@ static int OpaquePage( decoder_t *p_dec, vbi_page p_page,
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    decoder_sys_t   *p_sys = p_data;
+    decoder_sys_t *p_sys = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
     vlc_mutex_lock( &p_sys->lock );
