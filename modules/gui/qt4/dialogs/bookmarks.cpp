@@ -41,10 +41,17 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
 
     QGridLayout *layout = new QGridLayout( this );
 
-    QPushButton *addButton = new QPushButton( qtr( "Add" ) );
+    QPushButton *addButton = new QPushButton( qtr( "Create" ) );
+    addButton->setToolTip( qtr( "Create a new bookmark" ) );
     QPushButton *delButton = new QPushButton( qtr( "Delete" ) );
+    delButton->setToolTip( qtr( "Delete the selected item" ) );
     QPushButton *clearButton = new QPushButton( qtr( "Clear" ) );
+    clearButton->setToolTip( qtr( "Delete all the bookmarks" ) );
+#if 0
     QPushButton *extractButton = new QPushButton( qtr( "Extract" ) );
+    extractButton->setToolTip( qtr() );
+#endif
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
 
     bookmarksList = new QTreeWidget( this );
     bookmarksList->setRootIsDecorated( false );
@@ -53,6 +60,8 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
     bookmarksList->setSelectionBehavior( QAbstractItemView::SelectRows );
     bookmarksList->setEditTriggers( QAbstractItemView::SelectedClicked );
     bookmarksList->setColumnCount( 3 );
+    bookmarksList->resize( sizeHint() );
+
     QStringList headerLabels;
     headerLabels << qtr( "Description" );
     headerLabels << qtr( "Bytes" );
@@ -64,18 +73,25 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
     layout->addWidget( delButton, 1, 0 );
     layout->addWidget( clearButton, 2, 0 );
     layout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ), 4, 0 );
+#if 0
     layout->addWidget( extractButton, 5, 0 );
-    layout->addWidget( bookmarksList, 0, 1, 6, 1);
+#endif
+    layout->addWidget( bookmarksList, 0, 1, 6, 2);
     layout->setColumnStretch( 1, 1 );
+    layout->addWidget( closeButton, 7, 2 );
 
     CONNECT( bookmarksList, activated( QModelIndex ), this,
              activateItem( QModelIndex ) );
-    CONNECT( bookmarksList, itemChanged( QTreeWidgetItem*, int ), this, edit( QTreeWidgetItem*, int ) );
+    CONNECT( bookmarksList, itemChanged( QTreeWidgetItem*, int ),
+             this, edit( QTreeWidgetItem*, int ) );
 
     BUTTONACT( addButton, add() );
     BUTTONACT( delButton, del() );
     BUTTONACT( clearButton, clear() );
+#if 0
     BUTTONACT( extractButton, extract() );
+#endif
+    BUTTONACT( closeButton, close() );
 
     readSettings( "Bookmarks" );
     updateGeometry();
