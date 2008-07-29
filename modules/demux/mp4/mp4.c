@@ -102,6 +102,8 @@ typedef struct
     bool b_selected;  /* is the trak being played */
     bool b_chapter;   /* True when used for chapter only */
 
+    bool b_mac_encoding;
+
     es_format_t fmt;
     es_out_id_t *p_es;
 
@@ -180,6 +182,7 @@ static int      MP4_TrackNextSample( demux_t *, mp4_track_t * );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 
 static void     MP4_UpdateSeekpoint( demux_t * );
+static const char *MP4_ConvertMacCode( uint16_t );
 
 /* Return time in s of a track */
 static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
@@ -1498,7 +1501,10 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
             /* FIXME: Not true, could be UTF-16 with a Byte Order Mark (0xfeff) */
             /* FIXME UTF-8 doesn't work here ? */
-            p_track->fmt.subs.psz_encoding = strdup( "UTF-8" );
+            if( p_track->b_mac_encoding )
+                p_track->fmt.subs.psz_encoding = strdup( "MAC" );
+            else
+                p_track->fmt.subs.psz_encoding = strdup( "UTF-8" );
             break;
 
         case VLC_FOURCC('y','v','1','2'):
@@ -2001,6 +2007,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     p_track->b_enable   = false;
     p_track->b_selected = false;
     p_track->b_chapter  = false;
+    p_track->b_mac_encoding = false;
 
     es_format_Init( &p_track->fmt, UNKNOWN_ES, 0 );
 
@@ -2036,11 +2043,19 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     if( !p_track->i_timescale )
         return;
 
-    for( i = 0; i < 3; i++ )
+    if( p_mdhd->data.p_mdhd->i_language_code < 0x800 )
     {
-        language[i] = p_mdhd->data.p_mdhd->i_language[i];
+        /* We can convert i_language_code into iso 639 code,
+         * I won't */
+        strcpy( language, MP4_ConvertMacCode( p_mdhd->data.p_mdhd->i_language_code ) );
+        p_track->b_mac_encoding = true;
     }
-    language[3] = '\0';
+    else
+    {
+        for( i = 0; i < 3; i++ )
+            language[i] = p_mdhd->data.p_mdhd->i_language[i];
+        language[3] = '\0';
+    }
 
     switch( p_hdlr->data.p_hdlr->i_handler_type )
     {
@@ -2108,7 +2123,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         p_drms->data.p_sample_soun->p_drms : NULL;
 
     /* Set language */
-    if( strcmp( language, "```" ) && strcmp( language, "und" ) )
+    if( *language && strcmp( language, "```" ) && strcmp( language, "und" ) )
     {
         p_track->fmt.psz_language = strdup( language );
     }
@@ -2502,4 +2517,45 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
     {
         msg_Warn( p_demux, "elst old=%d new=%d", i_elst_last, tk->i_elst );
     }
+}
+
+/* */
+static const char *MP4_ConvertMacCode( uint16_t i_code )
+{
+    static const struct { const char *psz_iso639_1; uint16_t i_code; } p_cvt[] = {
+        { "en",   0 }, { "fr",   1 }, { "de",   2 }, { "it",   3 }, { "nl",   4 },
+        { "sv",   5 }, { "es",   6 }, { "da",   7 }, { "pt",   8 }, { "no",   9 },
+        { "he",  10 }, { "ja",  11 }, { "ar",  12 }, { "fi",  13 }, { "el",  14 },
+        { "is",  15 }, { "mt",  16 }, { "tr",  17 }, { "hr",  18 }, { "zh",  19 },
+        { "ur",  20 }, { "hi",  21 }, { "th",  22 }, { "ko",  23 }, { "lt",  24 },
+        { "pl",  25 }, { "hu",  26 }, { "et",  27 }, { "lv",  28 }, //{ "??",  29 },
+        { "fo",  30 }, { "fa",  31 }, { "ru",  32 }, { "zh",  33 }, { "nl",  34 },
+        { "ga",  35 }, { "sq",  36 }, { "ro",  37 }, { "cs",  38 }, { "sk",  39 },
+        { "sl",  40 }, { "yi",  41 }, { "sr",  42 }, { "mk",  43 }, { "bg",  44 },
+        { "uk",  45 }, { "be",  46 }, { "uz",  47 }, { "az",  48 }, { "kk",  48 },
+        { "az",  50 }, { "hy",  51 }, { "ka",  52 }, { "mo",  53 }, { "ky",  54 },
+        { "tg",  55 }, { "tk",  56 }, { "mn",  57 }, { "mn",  58 }, { "ps",  59 },
+        { "ku",  60 }, { "ks",  61 }, { "sd",  62 }, { "bo",  63 }, { "ne",  64 },
+        { "sa",  65 }, { "mr",  66 }, { "bn",  67 }, { "as",  68 }, { "gu",  69 },
+        { "pa",  70 }, { "or",  71 }, { "ml",  72 }, { "kn",  73 }, { "ta",  74 },
+        { "te",  75 }, { "si",  76 }, { "my",  77 }, { "km",  78 }, { "lo",  79 },
+        { "vi",  80 }, { "id",  81 }, { "tl",  82 }, { "ms",  83 }, { "ms",  84 },
+        { "am",  85 }, { "ti",  86 }, { "om",  87 }, { "so",  88 }, { "sw",  89 },
+        { "rw",  90 }, { "rn",  91 }, { "ny",  92 }, { "mg",  93 }, { "eo",  94 },
+
+                                                     { "cy", 128 }, { "eu", 129 },
+        { "ca", 130 }, { "la", 131 }, { "qu", 132 }, { "gn", 133 }, { "ay", 134 },
+        { "tt", 135 }, { "ug", 136 }, { "dz", 137 }, { "jv", 138 }, { "su", 139 },
+        { "gl", 140 }, { "af", 141 }, { "br", 142 }, { "iu", 143 }, { "gd", 144 },
+        { "gv", 145 }, { "ga", 146 }, { "to", 147 }, { "el", 148 },
+        /* */
+        { NULL, 0 }
+    };
+    int i;
+    for( i = 0; p_cvt[i].psz_iso639_1 != NULL; i++ )
+    {
+        if( p_cvt[i].i_code == i_code )
+            return p_cvt[i].psz_iso639_1;
+    }
+    return "";
 }

@@ -301,6 +301,7 @@ typedef struct MP4_Box_data_mdhd_s
     uint64_t i_duration;
 
     /* one bit for pad */
+    uint16_t      i_language_code;
     /* unsigned int(5)[3] language difference with 0x60*/
     unsigned char i_language[3];
     uint16_t i_predefined;
