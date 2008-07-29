@@ -37,6 +37,7 @@ class QTextBrowser;
 class QLabel;
 class QEvent;
 class QPushButton;
+class QTextEdit;
 
 class HelpDialog : public QVLCFrame
 {
@@ -110,7 +111,9 @@ private:
 
     update_t *p_update;
     QPushButton *updateButton;
-    QLabel *updateLabel;
+    QLabel *updateLabelTop;
+    QLabel *updateLabelDown;
+    QTextEdit *updateText;
     void customEvent( QEvent * );
     bool b_checked;
 

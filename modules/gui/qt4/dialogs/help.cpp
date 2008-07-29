@@ -215,11 +215,24 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     buttonBox->addButton( updateButton, QDialogButtonBox::ActionRole );
     buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
 
-    updateLabel = new QLabel( qtr( "Checking for an update..." ) );
-    updateLabel->setWordWrap( true );
+    updateLabelTop = new QLabel( qtr( "Checking for an update..." ) );
+    updateLabelTop->setWordWrap( true );
+    updateLabelTop->setMargin( 8 );
 
-    layout->addWidget( updateLabel, 0, 0, Qt::AlignTop );
-    layout->addWidget( buttonBox, 1, 0 );
+    updateLabelDown = new QLabel( qtr( "\nDo you want to download it?\n" ) );
+    updateLabelDown->setWordWrap( true );
+    updateLabelDown->hide();
+
+    updateText = new QTextEdit;
+    updateText->setAcceptRichText(false);
+    updateText->setTextInteractionFlags( Qt::TextSelectableByKeyboard|
+                                         Qt::TextSelectableByMouse);
+    updateText->setEnabled( false );
+
+    layout->addWidget( updateLabelTop, 0, 0 );
+    layout->addWidget( updateText, 1, 0 );
+    layout->addWidget( updateLabelDown, 2, 0 );
+    layout->addWidget( buttonBox, 3, 0 );
 
     BUTTONACT( updateButton, UpdateOrDownload() );
     BUTTONACT( closeButton, close() );
@@ -228,8 +241,10 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     p_update = update_New( p_intf );
     b_checked = false;
 
-    setMinimumSize( 200, 100 );
-    readSettings( "Update", QSize( 200, 100 ) );
+    setMinimumSize( 300, 100 );
+    setMaximumSize( 400, 300 );
+
+    readSettings( "Update", QSize( 300, 100 ) );
 
     /* Check for updates */
     UpdateOrDownload();
@@ -252,7 +267,7 @@ void UpdateDialog::UpdateOrDownload()
     if( !b_checked )
     {
         updateButton->setEnabled( false );
-        updateLabel->setText( qtr( "Launching an update request..." ) );
+        updateLabelTop->setText( qtr( "Launching an update request..." ) );
         update_Check( p_update, UpdateCallback, this );
     }
     else
@@ -296,30 +311,32 @@ void UpdateDialog::updateNotify( bool b_result )
             update_release_t *p_release = update_GetRelease( p_update );
             assert( p_release );
             b_checked = true;
-            updateButton->setText( "Ok" );
+            updateButton->setText( "Yes" );
             QString message = qtr( "A new version of VLC(" )
                               + QString::number( p_release->i_major ) + "."
                               + QString::number( p_release->i_minor ) + "."
                               + QString::number( p_release->i_revision );
             if( p_release->extra )
                 message += p_release->extra;
-            message += qtr( ") is available.\nDo you want to download it?\n" )
-                    + qfu( p_release->psz_desc );
+            message += qtr( ") is available.");
+            updateLabelTop->setText( message );
 
-            updateLabel->setText( message );
+            updateText->setText( qfu( p_release->psz_desc ) );
+            updateText->setEnabled( true );
+
+            updateLabelDown->show();
 
             /* Force the dialog to be shown */
             this->show();
         }
         else
-            updateLabel->setText(
+            updateLabelTop->setText(
                     qtr( "You have the latest version of VLC media player." ) );
     }
     else
-        updateLabel->setText(
+        updateLabelTop->setText(
                     qtr( "An error occurred while checking for updates..." ) );
 
-    adjustSize();
     updateButton->setEnabled( true );
 }
 
