@@ -293,10 +293,13 @@ inline void MainInterface::createStatusBar()
     timeLabel = new TimeLabel;
     timeLabel->setText( " --:--/--:-- " );
     timeLabel->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
+    timeLabel->setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
     nameLabel = new QLabel;
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
     speedLabel = new SpeedLabel( p_intf, "1.00x" );
+    speedLabel->setToolTip(
+            qtr( "Current playback speed.\nRight click to adjust" ) );
     speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
 
     /* Styling those labels */

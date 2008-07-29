@@ -352,14 +352,12 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     if( mi )
     {
         QAction *act=
-            menu->addAction( QIcon( ":/playlist_menu" ),
-                             qtr( "Playlist..." ), mi, SLOT( togglePlaylist() ),
-                             qtr( "Ctrl+L" ) );
+            menu->addAction( QIcon( ":/playlist_menu" ), qtr( "Play&list..." ),
+                    mi, SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
         act->setData( "_static_" );
     }
-    addDPStaticEntry( menu, qtr( I_MENU_EXT ), "",
-        ":/settings", SLOT( extendedDialog() ),
-        "Ctrl+E" );
+    addDPStaticEntry( menu, qtr( I_MENU_EXT ), "", ":/settings",
+            SLOT( extendedDialog() ), "Ctrl+E" );
 
     menu->addSeparator();
 
@@ -374,7 +372,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     if( mi )
     {
         /* Minimal View */
-        QAction *action = menu->addAction( qtr( "Minimal View..." ), mi,
+        QAction *action = menu->addAction( qtr( "Mi&nimal View..." ), mi,
                                 SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
         action->setCheckable( true );
         action->setData( "_static_" );
@@ -383,13 +381,13 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
         minimalViewAction = action; /* HACK for minimalView */
 
         /* FullScreen View */
-        action = menu->addAction( qtr( "Fullscreen Interface" ), mi,
+        action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,
                                   SLOT( toggleFullScreen() ), QString( "F11" ) );
         action->setCheckable( true );
         action->setData( "_static_" );
 
         /* Advanced Controls */
-        action = menu->addAction( qtr( "Advanced Controls" ), mi,
+        action = menu->addAction( qtr( "&Advanced Controls" ), mi,
                                   SLOT( toggleAdvanced() ) );
         action->setCheckable( true );
         action->setData( "_static_" );
@@ -420,7 +418,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
 #endif
 
     menu->addSeparator();
-    addDPStaticEntry( menu, qtr( "Preferences..." ), "",
+    addDPStaticEntry( menu, qtr( "&Preferences..." ), "",
         ":/preferences", SLOT( prefsDialog() ), "Ctrl+P" );
     return menu;
 }
@@ -509,7 +507,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         ACT_ADD( current, "crop", qtr( "&Crop" ) );
         ACT_ADD( current, "video-on-top", qtr( "Always &On Top" ) );
         /* ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) ); */
-        ACT_ADD( current, "video-snapshot", qtr( "Snapshot" ) );
+        ACT_ADD( current, "video-snapshot", qtr( "Snapsh&ot" ) );
         /* ACT_ADD( current, "ffmpeg-pp-q", qtr( "Decoder" ) ); */
     }
 
@@ -548,7 +546,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
         menu->addSeparator();
 
         ACT_ADD( menu, "bookmark", qtr( "&Bookmarks" ) );
-        ACT_ADD( menu, "title", qtr( "&Title" ) );
+        ACT_ADD( menu, "title", qtr( "T&itle" ) );
         ACT_ADD( menu, "chapter", qtr( "&Chapter" ) );
         ACT_ADD( menu, "program", qtr( "&Program" ) );
         ACT_ADD( menu, "navigation", qtr( "&Navigation" ) );
@@ -613,10 +611,10 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 QMenu *QVLCMenu::HelpMenu( QMenu *current )
 {
     QMenu *menu = new QMenu( current );
-    addDPStaticEntry( menu, qtr( "Help..." ) , "",
+    addDPStaticEntry( menu, qtr( "&Help..." ) , "",
         ":/help", SLOT( helpDialog() ), "F1" );
 #ifdef UPDATE_CHECK
-    addDPStaticEntry( menu, qtr( "Check for Updates..." ) , "", "",
+    addDPStaticEntry( menu, qtr( "Check for &Updates..." ) , "", "",
                       SLOT( updateDialog() ), "");
 #endif
     menu->addSeparator();
