@@ -244,6 +244,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_playlist = pl_Yield( p_intf );
     /* Listen to the messages */
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    /* one settings to rule them all */
 
     var_Create( p_this, "window_widget", VLC_VAR_ADDRESS );
     return VLC_SUCCESS;
@@ -323,6 +324,7 @@ static void Init( intf_thread_t *p_intf )
     QApplication *app = new QApplication( argc, argv , true );
     p_intf->p_sys->p_app = app;
 
+    p_intf->p_sys->mainSettings = new QSettings( "vlc", "vlc-qt-interface" );
     /* Icon setting
        FIXME: use a bigger icon ? */
     if( QDate::currentDate().dayOfYear() >= 354 )
@@ -390,13 +392,12 @@ static void Init( intf_thread_t *p_intf )
     if( config_GetInt( p_intf, "qt-updates-notif" ) )
     {
         int interval = config_GetInt( p_intf, "qt-updates-days" );
-        QSettings settings( "vlc", "vlc-qt-interface" );
         if( QDate::currentDate() >
-                settings.value( "updatedate" ).toDate().addDays( interval ) )
+             getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
         {
             /* The constructor of the update Dialog will do the 1st request */
             UpdateDialog::getInstance( p_intf );
-            settings.setValue( "updatedate", QDate::currentDate() );
+            getSettings()->setValue( "updatedate", QDate::currentDate() );
         }
     }
 #endif

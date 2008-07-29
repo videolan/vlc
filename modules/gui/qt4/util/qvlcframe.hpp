@@ -29,11 +29,11 @@
 #include <QSpacerItem>
 #include <QHBoxLayout>
 #include <QApplication>
-#include <QSettings>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QKeyEvent>
 #include <QDesktopWidget>
+#include <QSettings>
 
 #include "qt4.hpp"
 #include <vlc_common.h>
@@ -48,17 +48,17 @@ class QVLCTools
         window is docked into an other - don't all this function
         or it may write garbage to position info!
        */
-       static void saveWidgetPosition(QSettings *settings, QWidget *widget)
+       static void saveWidgetPosition( QSettings *settings, QWidget *widget)
        {
          settings->setValue("geometry", widget->saveGeometry());
        }
-       static void saveWidgetPosition(QString configName, QWidget *widget)
+       static void saveWidgetPosition( intf_thread_t *p_intf,
+                                       QString configName,
+                                       QWidget *widget)
        {
-         QSettings *settings = new QSettings("vlc", "vlc-qt-interface");
-         settings->beginGroup( configName );
-         QVLCTools::saveWidgetPosition(settings, widget);
-         settings->endGroup();
-         delete settings;
+         getSettings()->beginGroup( configName );
+         QVLCTools::saveWidgetPosition(getSettings(), widget);
+         getSettings()->endGroup();
        }
 
 
@@ -84,19 +84,18 @@ class QVLCTools
           return false;
        }
 
-       static bool restoreWidgetPosition(QString configName,
+       static bool restoreWidgetPosition( intf_thread_t *p_intf,
+                                           QString configName,
                                            QWidget *widget,
                                            QSize defSize = QSize( 0, 0 ),
                                            QPoint defPos = QPoint( 0, 0 ) )
        {
-         QSettings *settings = new QSettings( "vlc", "vlc-qt-interface" );
-         settings->beginGroup( configName );
-         bool defaultUsed = QVLCTools::restoreWidgetPosition(settings,
+         getSettings()->beginGroup( configName );
+         bool defaultUsed = QVLCTools::restoreWidgetPosition( getSettings(),
                                                                    widget,
                                                                    defSize,
                                                                    defPos);
-         settings->endGroup();
-         delete settings;
+         getSettings()->endGroup();
 
          return defaultUsed;
        }
@@ -138,12 +137,12 @@ protected:
                        QSize defSize = QSize( 0, 0 ),
                        QPoint defPos = QPoint( 0, 0 ) )
     {
-        QVLCTools::restoreWidgetPosition(name, this, defSize, defPos);
+        QVLCTools::restoreWidgetPosition(p_intf, name, this, defSize, defPos);
     }
 
     void writeSettings( QString name )
     {
-        QVLCTools::saveWidgetPosition(name, this);
+        QVLCTools::saveWidgetPosition( p_intf, name, this);
     }
 
     virtual void cancel()
@@ -225,14 +224,13 @@ protected:
 
     void readSettings( QString name, QSize defSize )
     {
-        QVLCTools::restoreWidgetPosition(name, this, defSize);
+        QVLCTools::restoreWidgetPosition( p_intf, name, this, defSize);
     }
 
     void readSettings( QString name )
     {
-        QVLCTools::restoreWidgetPosition(name, this);
+        QVLCTools::restoreWidgetPosition( p_intf, name, this);
     }
-
     void readSettings( QSettings *settings )
     {
         QVLCTools::restoreWidgetPosition(settings, this);
@@ -245,14 +243,12 @@ protected:
 
     void writeSettings(QString name )
     {
-        QVLCTools::saveWidgetPosition(name, this);
+        QVLCTools::saveWidgetPosition( p_intf, name, this);
     }
-
     void writeSettings(QSettings *settings )
     {
         QVLCTools::saveWidgetPosition(settings, this);
     }
-
 };
 
 #endif

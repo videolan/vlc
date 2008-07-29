@@ -36,6 +36,7 @@
 #include <QString>
 #include <QList>
 
+class QSettings;
 class PLModel;
 
 class PLItem
@@ -44,6 +45,7 @@ class PLItem
 public:
     PLItem( int, int, PLItem *parent , PLModel * );
     PLItem( playlist_item_t *, PLItem *parent, PLModel * );
+    PLItem( playlist_item_t *, QSettings *, PLModel * );
     ~PLItem();
 
     int row() const;
@@ -75,7 +77,7 @@ protected:
     int i_showflags;
 
 private:
-    void init( int, int, PLItem *, PLModel * );
+    void init( int, int, PLItem *, PLModel *, QSettings * );
     void updateColumnHeaders();
     PLItem *parentItem;
     PLModel *model;

@@ -39,7 +39,6 @@ class PlaylistDialog : public QVLCMW
     Q_OBJECT;
 private:
     PlaylistWidget *playlistWidget;
-    QSettings *settings;
 
 public:
     static PlaylistDialog * getInstance( intf_thread_t *p_intf )

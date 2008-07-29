@@ -46,11 +46,14 @@ class QMenu;
 class MainInterface;
 class DialogsProvider;
 class VideoWidget;
+class QSettings;
 
 struct intf_sys_t
 {
     QApplication *p_app;
     MainInterface *p_mi;
+
+    QSettings *mainSettings;
 
     bool b_isDialogProvider;
 
@@ -105,6 +108,8 @@ struct intf_sys_t
 #else
     #define setLayoutMargins( a, b, c, d, e) setMargin( e )
 #endif
+
+#define getSettings() p_intf->p_sys->mainSettings
 
 enum {
     DialogEventType = 0,

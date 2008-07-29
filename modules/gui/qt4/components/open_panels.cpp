@@ -44,7 +44,6 @@
 #include <QDirModel>
 #include <QScrollArea>
 #include <QUrl>
-#include <QSettings>
 
 #define I_DEVICE_TOOLTIP "Select the device or the VIDEO_TS directory"
 
@@ -78,9 +77,8 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
 #if HAS_QT43
-    QSettings settings( "vlc", "vlc-qt-interface" );
     dialogBox->restoreState(
-            settings.value( "file-dialog-state" ).toByteArray() );
+            getSettings()->value( "file-dialog-state" ).toByteArray() );
 #endif
 
     /* We don't want to see a grip in the middle of the window, do we? */
@@ -145,8 +143,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 FileOpenPanel::~FileOpenPanel()
 {
 #if HAS_QT43
-    QSettings settings( "vlc", "vlc-qt-interface" );
-    settings.setValue( "file-dialog-state", dialogBox->saveState() );
+    getSettings()->setValue( "file-dialog-state", dialogBox->saveState() );
 #endif
 }
 

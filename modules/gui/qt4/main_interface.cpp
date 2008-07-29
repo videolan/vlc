@@ -110,7 +110,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     i_visualmode = config_GetInt( p_intf, "qt-display-mode" );
 
     /* Set the other interface settings */
-    settings = new QSettings( "vlc", "vlc-qt-interface" );
+    settings = getSettings();
     settings->beginGroup( "MainWindow" );
 
     //TODO: I don't like that code
@@ -224,7 +224,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
 
     /* Size and placement of interface */
-    QVLCTools::restoreWidgetPosition(settings,this,QSize(350,60));
+    QVLCTools::restoreWidgetPosition( settings, this, QSize(380, 60) );
 
 
     /* Playlist */
@@ -250,7 +250,7 @@ MainInterface::~MainInterface()
     msg_Dbg( p_intf, "Destroying the main interface" );
 
     if( playlistWidget )
-        playlistWidget->savingSettings( settings );
+        playlistWidget->savingSettings();
 
     settings->beginGroup( "MainWindow" );
 
@@ -266,7 +266,6 @@ MainInterface::~MainInterface()
         settings->setValue( "backgroundSize", bgWidget->size() );
 
     settings->endGroup();
-    delete settings;
 
     var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
 

@@ -43,7 +43,6 @@
  **********************************************************************/
 
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
-                                QSettings *settings,
                                 QWidget *_parent )
                : p_intf ( _p_i ), parent( _parent )
 {
@@ -122,8 +121,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     /* In case we want to keep the splitter informations */
     // components shall never write there setting to a fixed location, may infer
     // with other uses of the same component...
-    // settings->beginGroup( "playlist" );
-    restoreState( settings->value("splitterSizes").toByteArray());
+    // getSettings()->beginGroup( "playlist" );
+    restoreState( getSettings()->value("splitterSizes").toByteArray());
 }
 
 void PlaylistWidget::setArt( QString url )
@@ -143,8 +142,8 @@ QSize PlaylistWidget::sizeHint() const
 PlaylistWidget::~PlaylistWidget()
 {}
 
-void PlaylistWidget::savingSettings( QSettings *settings )
+void PlaylistWidget::savingSettings()
 {
-    settings->setValue( "splitterSizes", saveState() );
+    getSettings()->setValue( "splitterSizes", saveState() );
 }
 

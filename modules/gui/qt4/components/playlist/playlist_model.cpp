@@ -98,8 +98,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 
 PLModel::~PLModel()
 {
-    QSettings settings( "vlc", "vlc-qt-interface" );
-    settings.setValue( "qt-pl-showflags", rootItem->i_showflags );
+    getSettings()->setValue( "qt-pl-showflags", rootItem->i_showflags );
     delCallbacks();
     delete rootItem;
 }
@@ -591,7 +590,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     if( p_root )
     {
         delete rootItem;
-        rootItem = new PLItem( p_root, NULL, this );
+        rootItem = new PLItem( p_root, getSettings(), this );
     }
     assert( rootItem );
     /* Recreate from root */

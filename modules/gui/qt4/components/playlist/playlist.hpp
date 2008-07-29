@@ -40,16 +40,15 @@
 class PLSelector;
 class PLPanel;
 class QPushButton;
-class QSettings;
 
 class PlaylistWidget : public QSplitter
 {
     Q_OBJECT;
 public:
-    PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidget *parent ) ;
+    PlaylistWidget( intf_thread_t *_p_i, QWidget *parent ) ;
     virtual ~PlaylistWidget();
     QSize sizeHint() const;
-    void savingSettings( QSettings *settings );
+    void savingSettings();
 private:
     PLSelector *selector;
     PLPanel *rightPanel;

@@ -50,26 +50,24 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
 
     QHBoxLayout *l = new QHBoxLayout( centralWidget() );
 
-    settings = new QSettings( "vlc", "vlc-qt-interface" );
-    settings->beginGroup("playlistdialog");
+    getSettings()->beginGroup("playlistdialog");
 
-    playlistWidget = new PlaylistWidget( p_intf, settings, this );
+    playlistWidget = new PlaylistWidget( p_intf, this );
     l->addWidget( playlistWidget );
 
-    readSettings( settings, QSize( 600,700 ) );
+    readSettings( getSettings(), QSize( 600,700 ) );
 
-    settings->endGroup();
+    getSettings()->endGroup();
 }
 
 PlaylistDialog::~PlaylistDialog()
 {
-    settings->beginGroup("playlistdialog");
+    getSettings()->beginGroup("playlistdialog");
 
-    writeSettings(settings);
-    playlistWidget->savingSettings(settings);
+    writeSettings( getSettings() );
+    playlistWidget->savingSettings();
 
-    settings->endGroup();
-    delete settings;
+    getSettings()->endGroup();
 }
 
 void PlaylistDialog::dropEvent( QDropEvent *event )

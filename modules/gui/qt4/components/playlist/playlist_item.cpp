@@ -48,7 +48,7 @@
 */
 
 
-void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
+void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m, QSettings *settings )
 {
     parentItem = parent;          /* Can be NULL, but only for the rootItem */
     i_id       = _i_id;           /* Playlist item specific id */
@@ -68,8 +68,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
         }
         else
         {
-            QSettings settings( "vlc", "vlc-qt-interface" );
-            i_showflags = settings.value( "qt-pl-showflags", 39 ).toInt();
+            i_showflags = settings->value( "qt-pl-showflags", 39 ).toInt();
             if( i_showflags < 1)
                 i_showflags = 39; /* reasonable default to show something; */
             else if ( i_showflags >= COLUMN_END )
@@ -93,12 +92,17 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
    */
 PLItem::PLItem( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
 {
-    init( _i_id, _i_input_id, parent, m );
+    init( _i_id, _i_input_id, parent, m, NULL );
 }
 
 PLItem::PLItem( playlist_item_t * p_item, PLItem *parent, PLModel *m )
 {
-    init( p_item->i_id, p_item->p_input->i_id, parent, m );
+    init( p_item->i_id, p_item->p_input->i_id, parent, m, NULL );
+}
+
+PLItem::PLItem( playlist_item_t * p_item, QSettings *settings, PLModel *m )
+{
+    init( p_item->i_id, p_item->p_input->i_id, NULL, m, settings );
 }
 
 PLItem::~PLItem()
