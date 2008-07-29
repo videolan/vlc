@@ -295,8 +295,15 @@ void UpdateDialog::updateNotify( bool b_result )
             assert( p_release );
             b_checked = true;
             updateButton->setText( "Ok" );
-            updateLabel->setText( qtr( "There is a new version of VLC :\n" )
-                                + qfu( p_release->psz_desc )  );
+            QString message = qtr( "A new version of VLC(" )
+                              + QString::number( p_release->i_major ) + "."
+                              + QString::number( p_release->i_minor ) + "."
+                              + QString::number( p_release->i_revision );
+            if( p_release->extra )
+                message += p_release->extra;
+            message += qtr( ") is available.\nDo you want to download it?\n" ) + qfu( p_release->psz_desc );
+
+            updateLabel->setText( message );
 
             /* Force the dialog to be shown */
             this->show();
