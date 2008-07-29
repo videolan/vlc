@@ -56,6 +56,8 @@
 
 #include <math.h>
 
+#define I_PLAY_TOOLTIP "Play\nIf the playlist is empty, open a media"
+
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
  * This class handles resize issues
@@ -303,11 +305,12 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     advLayout->setAlignment( Qt::AlignBottom );
 
     /* A to B Button */
-    ABButton = new QPushButton( "AB" );
+    ABButton = new QPushButton;
     setupSmallButton( ABButton );
     advLayout->addWidget( ABButton );
     BUTTON_SET_ACT_I( ABButton, "", atob_nob,
-        qtr( "Loop from point A to point B continuously\nClick to set point A" ), fromAtoB() );
+      qtr( "Loop from point A to point B continuously.\nClick to set point A" ),
+      fromAtoB() );
     timeA = timeB = 0;
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, AtoBLoop( float, int, int ) );
@@ -319,14 +322,14 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by frame" ), frame() );
 #endif
 
-    recordButton = new QPushButton( "R" );
+    recordButton = new QPushButton;
     setupSmallButton( recordButton );
     advLayout->addWidget( recordButton );
     BUTTON_SET_ACT_I( recordButton, "", record,
             qtr( "Record" ), record() );
 
     /* Snapshot Button */
-    snapshotButton = new QPushButton( "S" );
+    snapshotButton = new QPushButton;
     setupSmallButton( snapshotButton );
     advLayout->addWidget( snapshotButton );
     BUTTON_SET_ACT_I( snapshotButton, "", snapshot,
@@ -569,19 +572,20 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     /* Add this block to the main layout */
 
-    BUTTON_SET_ACT_I( playButton, "", play_b, qtr( "Play" ), play() );
+    BUTTON_SET_ACT_I( playButton, "", play_b, qtr( I_PLAY_TOOLTIP ), play() );
     BUTTON_SET_ACT_I( prevButton, "" , previous_b,
-                      qtr( "Previous" ), prev() );
-    BUTTON_SET_ACT_I( nextButton, "", next_b, qtr( "Next" ), next() );
-    BUTTON_SET_ACT_I( stopButton, "", stop_b, qtr( "Stop" ), stop() );
+                      qtr( "Previous media in the playlist" ), prev() );
+    BUTTON_SET_ACT_I( nextButton, "", next_b,
+                      qtr( "Next media in the playlist" ), next() );
+    BUTTON_SET_ACT_I( stopButton, "", stop_b, qtr( "Stop playback" ), stop() );
 
     /*
      * Other first Line buttons
      */
     /** Fullscreen/Visualisation **/
     fullscreenButton = new QPushButton;
-    BUTTON_SET_ACT_I( fullscreenButton, "", fullscreen, qtr( "Fullscreen" ),
-            fullscreen() );
+    BUTTON_SET_ACT_I( fullscreenButton, "", fullscreen,
+            qtr( "Toggle the video in fullscreen" ), fullscreen() );
     setupSmallButton( fullscreenButton );
 
     if( !b_fsCreation )
@@ -595,7 +599,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
         /** extended Settings **/
         extSettingsButton = new QPushButton;
         BUTTON_SET_ACT_I( extSettingsButton, "", extended,
-                qtr( "Extended settings" ), extSettings() );
+                qtr( "Show extended settings" ), extSettings() );
         setupSmallButton( extSettingsButton );
     }
 
@@ -604,7 +608,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     volMuteLabel = new QLabel;
     volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
-    volMuteLabel->setToolTip( qtr( "Mute" ) );
     volMuteLabel->installEventFilter( hVolLabel );
 
     if( b_shiny )
@@ -779,12 +782,18 @@ void ControlsWidget::updateVolume( int i_sliderVolume )
         aout_VolumeSet( p_intf, i_res );
     }
     if( i_sliderVolume == 0 )
+    {
         volMuteLabel->setPixmap( QPixmap(":/volume-muted" ) );
-    else if( i_sliderVolume < VOLUME_MAX / 3 )
+        volMuteLabel->setToolTip( qtr( "Unmute" ) );
+        return;
+    }
+
+    if( i_sliderVolume < VOLUME_MAX / 3 )
         volMuteLabel->setPixmap( QPixmap( ":/volume-low" ) );
     else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
         volMuteLabel->setPixmap( QPixmap( ":/volume-high" ) );
     else volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
+    volMuteLabel->setToolTip( qtr( "Mute" ) );
 }
 
 void ControlsWidget::updateVolume()
@@ -815,12 +824,12 @@ void ControlsWidget::setStatus( int status )
     if( status == PLAYING_S ) /* Playing */
     {
         playButton->setIcon( QIcon( ":/pause_b" ) );
-        playButton->setToolTip( qtr( "Pause" ) );
+        playButton->setToolTip( qtr( "Pause the playback" ) );
     }
     else
     {
         playButton->setIcon( QIcon( ":/play_b" ) );
-        playButton->setToolTip( qtr( "Play" ) );
+        playButton->setToolTip( qtr( I_PLAY_TOOLTIP ) );
     }
 }
 

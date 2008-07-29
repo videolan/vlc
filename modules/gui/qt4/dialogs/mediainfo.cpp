@@ -89,7 +89,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     BUTTONACT( closeButton, close() );
 
     /* The tabs buttons are shown in the main dialog for space and cosmetics */
-    CONNECT( saveMetaButton, clicked(), this, saveMeta() );
+    BUTTONACT( saveMetaButton, saveMeta() );
 
     /* Let the MetaData Panel update the URI */
     CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );

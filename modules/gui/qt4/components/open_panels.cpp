@@ -46,6 +46,8 @@
 #include <QUrl>
 #include <QSettings>
 
+#define I_DEVICE_TOOLTIP "Select the device or the VIDEO_TS directory"
+
 /**************************************************************************
  * Open Files and subtitles                                               *
  **************************************************************************/
@@ -227,6 +229,9 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     b_firstvcd = true;
     b_firstcdda = true;
 
+    ui.browseDiscButton->setToolTip( I_DEVICE_TOOLTIP );
+    ui.deviceCombo->setToolTip( I_DEVICE_TOOLTIP );
+
 #if WIN32 /* Disc drives probing for Windows */
     char szDrives[512];
     szDrives[0] = '\0';
@@ -398,7 +403,7 @@ void DiscOpenPanel::updateMRL()
 void DiscOpenPanel::browseDevice()
 {
     QString dir = QFileDialog::getExistingDirectory( 0,
-            qtr("Open a device or a VIDEO_TS directory") );
+            qtr( I_DEVICE_TOOLTIP ) );
     if (!dir.isEmpty()) {
         ui.deviceCombo->setEditText( dir );
     }

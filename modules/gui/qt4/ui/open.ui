@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>520</width>
-    <height>665</height>
+    <height>668</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -229,6 +229,9 @@
        </property>
        <property name="contextMenuPolicy" >
         <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="toolTip" >
+        <string>_("Select play mode")</string>
        </property>
       </widget>
      </item>

@@ -59,14 +59,7 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="4" >
-       <widget class="QRadioButton" name="vcdRadioButton" >
-        <property name="text" >
-         <string>SVCD/VCD</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5" >
+      <item row="0" column="6" >
        <spacer>
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
@@ -79,14 +72,7 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="6" colspan="2" >
-       <widget class="QRadioButton" name="audioCDRadioButton" >
-        <property name="text" >
-         <string>_("Audio CD")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8" >
+      <item row="0" column="9" >
        <spacer>
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
@@ -109,7 +95,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="2" colspan="7" >
+      <item row="2" column="2" colspan="8" >
        <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
@@ -126,14 +112,14 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="3" colspan="3" >
+      <item row="3" column="3" colspan="4" >
        <widget class="QComboBox" name="deviceCombo" >
         <property name="editable" >
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="3" column="6" >
+      <item row="3" column="7" >
        <widget class="QToolButton" name="ejectButton" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
@@ -141,12 +127,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
-         <string>E</string>
-        </property>
        </widget>
       </item>
-      <item row="3" column="7" colspan="2" >
+      <item row="3" column="8" colspan="2" >
        <widget class="QPushButton" name="browseDiscButton" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
@@ -154,11 +137,22 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>_("Select the device or the VIDEO_TS directory")</string>
-        </property>
         <property name="text" >
          <string>_("Browse...")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4" >
+       <widget class="QRadioButton" name="audioCDRadioButton" >
+        <property name="text" >
+         <string>_("Audio CD")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="8" >
+       <widget class="QRadioButton" name="vcdRadioButton" >
+        <property name="text" >
+         <string>SVCD/VCD</string>
         </property>
        </widget>
       </item>
@@ -325,8 +319,6 @@
  </widget>
  <tabstops>
   <tabstop>dvdRadioButton</tabstop>
-  <tabstop>vcdRadioButton</tabstop>
-  <tabstop>audioCDRadioButton</tabstop>
   <tabstop>dvdsimple</tabstop>
   <tabstop>deviceCombo</tabstop>
   <tabstop>ejectButton</tabstop>

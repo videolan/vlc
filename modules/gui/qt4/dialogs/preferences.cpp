@@ -68,8 +68,10 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     QHBoxLayout *types_l = new QHBoxLayout;
     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
     small = new QRadioButton( qtr( "Simple" ), types );
+    small->setToolTip( qtr( "Switch to simple preferences" ) );
     types_l->addWidget( small );
     all = new QRadioButton( qtr("All"), types ); types_l->addWidget( all );
+    all->setToolTip( qtr( "Switch to complete preferences" ) );
     types->setLayout( types_l );
     small->setChecked( true );
 
