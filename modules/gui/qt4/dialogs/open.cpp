@@ -337,7 +337,7 @@ void OpenDialog::stream( bool b_transcode_only )
 {
     mrl = ui.advancedLineInput->text();
     toggleVisible();
-    THEDP->streamingDialog( this, mrl, b_transcode_only );
+    THEDP->streamingDialog( this, SeparateEntries( mrl )[0], b_transcode_only );
 }
 
 /* Update the MRL */
