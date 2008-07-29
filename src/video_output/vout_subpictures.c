@@ -959,9 +959,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_subpic_v = p_subpic_v->p_next )
     {
         if( p_subpic_v->pf_pre_render )
-        {
-            p_subpic_v->pf_pre_render( p_fmt, p_spu, p_subpic_v, mdate() );
-        }
+            p_subpic_v->pf_pre_render( p_fmt, p_spu, p_subpic_v );
     }
 
     if( i_scale_width_orig <= 0 )
@@ -998,13 +996,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         if( p_subpic->pf_update_regions )
         {
-            while( p_subpic->p_region )
-            {
-                subpicture_region_t *p_region = p_subpic->p_region;
-                p_subpic->p_region = p_region->p_next;
-                spu_DestroyRegion( p_spu, p_region );
-            }
-
             /* TODO do not reverse the scaling that was done before calling
              * spu_RenderSubpictures, just pass it along (or do it inside
              * spu_RenderSubpictures) */
@@ -1014,7 +1005,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             fmt_org.i_height =
             fmt_org.i_visible_height = i_source_video_height;
 
-            p_subpic->p_region = p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, mdate() );
+            p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, mdate() );
         }
 
         /* */

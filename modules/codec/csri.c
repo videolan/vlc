@@ -62,9 +62,9 @@ vlc_module_end();
  *****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
 static void DestroySubpicture( subpicture_t * );
-static void PreRender( video_format_t *, spu_t *, subpicture_t *, mtime_t );
-static subpicture_region_t *UpdateRegions( video_format_t *, spu_t *,
-                                           subpicture_t *, mtime_t );
+static void PreRender( video_format_t *, spu_t *, subpicture_t * );
+static void UpdateRegions( video_format_t *, spu_t *,
+                           subpicture_t *, mtime_t );
 
 /*****************************************************************************
  * decoder_sys_t: decoder data
@@ -235,14 +235,14 @@ static void DestroySubpicture( subpicture_t *p_subpic )
 }
 
 static void PreRender( video_format_t *p_fmt, spu_t *p_spu,
-                       subpicture_t *p_subpic, mtime_t ts )
+                       subpicture_t *p_subpic )
 {
     decoder_t *p_dec = p_subpic->p_sys->p_dec;
     p_dec->p_sys->p_spu_final = p_subpic;
 }
 
-static subpicture_region_t *UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
-                                           subpicture_t *p_subpic, mtime_t ts )
+static void UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
+                           subpicture_t *p_subpic, mtime_t ts )
 {
     decoder_t *p_dec = p_subpic->p_sys->p_dec;
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -250,8 +250,18 @@ static subpicture_region_t *UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
     subpicture_region_t *p_spu_region;
     video_format_t fmt;
 
+    /* TODO maybe checking if we really need redrawing */
+    while( p_subpic->p_region )
+    {
+        subpicture_region_t *p_region = p_subpic->p_region;
+        p_subpic->p_region = p_region->p_next;
+        spu_DestroyRegion( p_spu, p_region );
+    }
+    p_subpic->p_region = NULL;
+
+    /* FIXME check why this is needed */
     if( p_subpic != p_sys->p_spu_final )
-        return NULL;
+        return;
 
 #if 0
     msg_Warn( p_dec, "---- fmt: %dx%d %dx%d chroma=%4.4s",
@@ -288,7 +298,7 @@ static subpicture_region_t *UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
     p_subpic->i_original_picture_height = fmt.i_height;
     p_subpic->i_original_picture_width = fmt.i_width;
 
-    p_spu_region = p_subpic->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+    p_spu_region = p_subpic->p_region = p_subpic->pf_create_region( VLC_OBJECT(p_dec), &fmt );
 
     if( p_spu_region )
     {
@@ -306,6 +316,5 @@ static subpicture_region_t *UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
         csri_frame.strides[0] = p_spu_region->picture.Y_PITCH;
         csri_render( p_sys->p_instance, &csri_frame, ts * 0.000001 );
     }
-    return p_spu_region;
 }
 
