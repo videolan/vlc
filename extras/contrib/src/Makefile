@@ -1287,24 +1287,6 @@ CLEAN_PKG += live
 DISTCLEAN_PKG += live555-$(LIVEDOTCOM_VERSION).tar.gz
 
 # ***************************************************************************
-# goom
-# ***************************************************************************
-
-#goom-macosx-altivec-bin.tar.gz:
-#	$(WGET) $(GOOM_URL)
-
-#goom: goom-macosx-altivec-bin.tar.gz
-#	$(EXTRACT_GZ)
-
-#.goom: goom
-#	(cd $<;)
-#	touch $@
-
-#CLEAN_FILE += .goom
-#CLEAN_PKG += goom
-#DISTCLEAN_PKG += goom-macosx-altivec-bin.tar.gz
-
-# ***************************************************************************
 # goom2k4
 # ***************************************************************************
 
@@ -1814,7 +1796,7 @@ libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
 #endif
 
 .raw1394: libraw1394
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make DESTDIR=$(PRFIX) install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make DESTDIR=$(PREFIX) install)
 #	sed 's/^typedef u_int8_t  byte_t;/\/* typedef u_int8_t  byte_t;\*\//'
 	touch $@
 	
@@ -1847,7 +1829,7 @@ libdc1394: libdc1394-$(LIBDC1394_VERSION).tar.gz
 .dc1394: libdc1394
 	(cd $<; ./configure --prefix=$(PREFIX) && \
 	 patch -p1 < ../Patches/libdc1394-noexamples.patch && \
-	 make && make DESTDIR=$(PRFIX) install)
+	 make && make DESTDIR=$(PREFIX) install)
 	touch $@
 	
 CLEAN_FILE += .dc1394
