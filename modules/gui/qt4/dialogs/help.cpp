@@ -207,7 +207,7 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     QGridLayout *layout = new QGridLayout( this );
 
-    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    QPushButton *closeButton = new QPushButton( qtr( "&Cancel" ) );
     updateButton = new QPushButton( qtr( "&Update List" ) );
     updateButton->setDefault( true );
     QDialogButtonBox *buttonBox = new QDialogButtonBox( Qt::Horizontal );
@@ -255,7 +255,6 @@ void UpdateDialog::UpdateOrDownload()
     }
     else
     {
-        updateButton->setEnabled( false );
         QString dest_dir = QFileDialog::getExistingDirectory( this,
                                  qtr( "Select a directory..." ),
                                  qfu( config_GetHomeDir() ) );
@@ -272,8 +271,6 @@ void UpdateDialog::UpdateOrDownload()
             toggleVisible();
             update_Download( p_update, qtu( dest_dir ) );
         }
-        else
-            updateButton->setEnabled( true );
     }
 }
 
@@ -297,7 +294,7 @@ void UpdateDialog::updateNotify( bool b_result )
             update_release_t *p_release = update_GetRelease( p_update );
             assert( p_release );
             b_checked = true;
-            updateButton->setText( "Download" );
+            updateButton->setText( "Ok" );
             updateLabel->setText( qtr( "There is a new version of VLC :\n" )
                                 + qfu( p_release->psz_desc )  );
 
