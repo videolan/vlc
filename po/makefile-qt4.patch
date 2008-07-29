@@ -1,0 +1,22 @@
+commit 8e13f257224e02c91c3b40db99ba5cf9ef52f542
+Author: Christophe Mutricy <xtophe@videolan.org>
+Date:   Sun Jul 27 00:10:51 2008 +0100
+
+    Hack to take care of qt strings with ampersand
+    
+    We will need to reapply this diff when we upgrade Makefile.in.in from a
+    newer gettext
+
+diff --git a/po/Makefile.in.in b/po/Makefile.in.in
+index fecf500..13256d8 100644
+--- a/po/Makefile.in.in
++++ b/po/Makefile.in.in
+@@ -166,6 +166,8 @@ $(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
+ 	      --msgid-bugs-address="$$msgid_bugs_address" \
+ 	    ;; \
+ 	esac
++	sed 's/&amp;/\&/' $(DOMAIN).po > $(DOMAIN).po1  && \
++	mv $(DOMAIN).po1 $(DOMAIN).po;
+ 	test ! -f $(DOMAIN).po || { \
+ 	  if test -f $(srcdir)/$(DOMAIN).pot; then \
+ 	    sed -f remove-potcdate.sed < $(srcdir)/$(DOMAIN).pot > $(DOMAIN).1po && \
