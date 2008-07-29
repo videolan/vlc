@@ -123,25 +123,26 @@ struct decoder_sys_t
 {
     vbi_decoder *     p_vbi_dec;
     vbi_dvb_demux *   p_dvb_demux;
-    unsigned int      i_wanted_page;
     unsigned int      i_last_page;
     bool              b_update;
-    bool              b_opaque;
+    bool              b_text;   /* Subtitles as text */
 
-    /* Subtitles as text */
-    bool              b_text;
-
+    vlc_mutex_t       lock; /* Lock to protect the following variables */
     /* Positioning of Teletext images */
     int               i_align;
+    /* */
+    unsigned int      i_wanted_page;
+    /* */
+    bool              b_opaque;
 };
 
 static subpicture_t *Decode( decoder_t *, block_t ** );
 
-static void event_handler( vbi_event *ev, void *user_data );
+static void EventHandler( vbi_event *ev, void *user_data );
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int OpaquePage( decoder_t *p_dec, vbi_page p_page, video_format_t fmt,
-                        picture_t **p_src );
+                        picture_t *p_src, bool b_opaque );
 
 static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
@@ -171,6 +172,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_update = false;
     p_sys->p_vbi_dec = vbi_decoder_new();
     p_sys->p_dvb_demux = vbi_dvb_pes_demux_new( NULL, NULL );
+    vlc_mutex_init( &p_sys->lock );
 
     if( (p_sys->p_vbi_dec == NULL) || (p_sys->p_dvb_demux == NULL) )
     {
@@ -182,7 +184,7 @@ static int Open( vlc_object_t *p_this )
     vbi_event_handler_register( p_sys->p_vbi_dec, VBI_EVENT_TTX_PAGE |
                                 VBI_EVENT_CAPTION | VBI_EVENT_NETWORK |
                                 VBI_EVENT_ASPECT | VBI_EVENT_PROG_INFO,
-                                event_handler, p_dec );
+                                EventHandler, p_dec );
 
     /* Create the var on vlc_global. */
     p_sys->i_wanted_page = var_CreateGetInteger( p_dec, "vbi-page" );
@@ -214,17 +216,27 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*) p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    var_Destroy( p_dec, "vbi-opaque" );
-    var_Destroy( p_dec, "vbi-page" );
-    var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
+    var_DelCallback( p_dec, "vbi-position", Position, p_sys );
     var_DelCallback( p_dec, "vbi-opaque", Opaque, p_sys );
+    var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
 
-    if( p_sys->p_vbi_dec ) vbi_decoder_delete( p_sys->p_vbi_dec );
-    if( p_sys->p_dvb_demux ) vbi_dvb_demux_delete( p_sys->p_dvb_demux );
+    vlc_mutex_destroy( &p_sys->lock );
+
+    if( p_sys->p_vbi_dec )
+        vbi_decoder_delete( p_sys->p_vbi_dec );
+    if( p_sys->p_dvb_demux )
+        vbi_dvb_demux_delete( p_sys->p_dvb_demux );
     free( p_sys );
 }
 
 #define MAX_SLICES 32
+
+#ifdef WORDS_BIGENDIAN
+# define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_BE
+#else
+# define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_LE
+#endif
+
 
 /*****************************************************************************
  * Decode:
@@ -262,24 +274,32 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             vbi_decode( p_sys->p_vbi_dec, p_sliced, i_lines, i_pts / 90000.0 );
     }
 
+    /* */
+    vlc_mutex_lock( &p_sys->lock );
+    const int i_align = p_sys->i_align;
+    const unsigned int i_wanted_page = p_sys->i_wanted_page;
+    const bool b_opaque = p_sys->b_opaque;
+    vlc_mutex_unlock( &p_sys->lock );
+
+
     /* Try to see if the page we want is in the cache yet */
     b_cached = vbi_fetch_vt_page( p_sys->p_vbi_dec, &p_page,
-                                  vbi_dec2bcd( p_sys->i_wanted_page ),
+                                  vbi_dec2bcd( i_wanted_page ),
                                   VBI_ANY_SUBNO, VBI_WST_LEVEL_3p5,
                                   25, FALSE );
 
     if( !b_cached )
         goto error;
 
-    if( ( p_sys->i_wanted_page == p_sys->i_last_page ) &&
+    if( ( i_wanted_page == p_sys->i_last_page ) &&
         ( p_sys->b_update != true ) )
         goto error;
 
     p_sys->b_update = false;
-    p_sys->i_last_page = p_sys->i_wanted_page;
+    p_sys->i_last_page = i_wanted_page;
 #ifdef ZVBI_DEBUG
     msg_Dbg( p_dec, "we now have page: %d ready for display",
-              p_sys->i_wanted_page );
+             i_wanted_page );
 #endif
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
@@ -295,13 +315,17 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     fmt.i_chroma = p_sys->b_text ? VLC_FOURCC('T','E','X','T') :
                                    VLC_FOURCC('R','G','B','A');
     fmt.i_aspect = p_sys->b_text ? 0 : VOUT_ASPECT_FACTOR;
-    if( !p_sys->b_text )
+    if( p_sys->b_text )
+    {
+        fmt.i_bits_per_pixel = 0;
+    }
+    else
     {
         fmt.i_sar_num = fmt.i_sar_den = 1;
         fmt.i_width = fmt.i_visible_width = p_page.columns * 12;
         fmt.i_height = fmt.i_visible_height = p_page.rows * 10;
+        fmt.i_bits_per_pixel = 32;
     }
-    fmt.i_bits_per_pixel = p_sys->b_text ? 0 : 32;
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
@@ -313,7 +337,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_spu->p_region->i_x = 0;
     p_spu->p_region->i_y = 0;
-    p_spu->p_region->i_align = p_sys->i_align;
+    p_spu->p_region->i_align = i_align;
 
     /* Normal text subs, easy markup */
     p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM;
@@ -323,19 +347,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->b_ephemer = true;
     p_spu->b_absolute = false;
     p_spu->b_pausable = true;
-    if( !p_sys->b_text )
-    {
-        p_spu->i_width = fmt.i_width;
-        p_spu->i_height = fmt.i_height;
-        p_spu->i_original_picture_width = p_page.columns * 12;
-        p_spu->i_original_picture_height = p_page.rows * 10;
-    }
-
-#ifdef WORDS_BIGENDIAN
-# define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_BE
-#else
-# define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_LE
-#endif
 
     if( p_sys->b_text )
     {
@@ -347,7 +358,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                         "UTF-8", 0, 0, 0, 0, p_page.columns, p_page.rows );
         p_text[i_total] = '\0';
         /* Strip off the pagenumber */
-        if( i_total <= 40 ) goto error;
+        if( i_total <= 40 )
+            goto error;
         p_spu->p_region->psz_text = strdup( &p_text[8] );
 
 #ifdef ZVBI_DEBUG
@@ -356,19 +368,21 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-        picture_t *p_pic;
+        picture_t *p_pic = &p_spu->p_region->picture;
 
+        /* ZVBI is stupid enough to assume pitch == width */
+        p_pic->p->i_pitch = 4 * fmt.i_width;
         vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
                           p_spu->p_region->picture.p->p_pixels, 1, 1 );
 
-        p_spu->p_region->picture.p->i_lines = p_page.rows * 10;
-        p_spu->p_region->picture.p->i_pitch = p_page.columns * 12 * 4;
+        OpaquePage( p_dec, p_page, fmt, &p_spu->p_region->picture, b_opaque );
 
-        p_pic = &(p_spu->p_region->picture);
-        OpaquePage( p_dec, p_page, fmt, &p_pic );
+        /* */
+        p_spu->i_width =
+        p_spu->i_original_picture_width = fmt.i_width;
+        p_spu->i_height =
+        p_spu->i_original_picture_height = fmt.i_height;
     }
-
-#undef ZVBI_PIXFMT_RGBA32
 
     vbi_unref_page( &p_page );
     block_Release( p_block );
@@ -386,7 +400,7 @@ error:
     return NULL;
 }
 
-static void event_handler( vbi_event *ev, void *user_data )
+static void EventHandler( vbi_event *ev, void *user_data )
 {
     decoder_t *p_dec        = (decoder_t *)user_data;
     decoder_sys_t *p_sys    = p_dec->p_sys;
@@ -419,73 +433,59 @@ static void event_handler( vbi_event *ev, void *user_data )
 }
 
 static int OpaquePage( decoder_t *p_dec, vbi_page p_page,
-                       video_format_t fmt, picture_t **p_src )
+                       video_format_t fmt, picture_t *p_src, bool b_opaque )
 {
     decoder_sys_t   *p_sys = (decoder_sys_t *) p_dec->p_sys;
-    uint32_t        *p_begin, *p_end;
-    unsigned int    x = 0, y = 0;
-    vbi_opacity     opacity;
+    unsigned int    x, y;
 
     assert( fmt.i_chroma == VLC_FOURCC('R','G','B','A' ) );
 
     /* Kludge since zvbi doesn't provide an option to specify opacity. */
-    switch( fmt.i_chroma )
+    for( y = 0; y < fmt.i_height; y++ )
     {
-        case VLC_FOURCC('R','G','B','A' ):
-            p_begin = (uint32_t *)(*p_src)->p->p_pixels;
-            p_end   = (uint32_t *)(*p_src)->p->p_pixels +
-                    ( fmt.i_width * fmt.i_height );
-            break;
-        default:
-            msg_Err( p_dec, "chroma not supported %4.4s", (char *)&fmt.i_chroma );
-            return VLC_EGENERIC;
-    }
-
-    for( ; p_begin < p_end; p_begin++ )
-    {
-        opacity = p_page.text[ y / 10 * p_page.columns + x / 12 ].opacity;
-        switch( opacity )
+        for( x = 0; x < fmt.i_width; x++ )
         {
-        /* Show video instead of this character */
-        case VBI_TRANSPARENT_SPACE:
-            *p_begin = 0;
-            break;
-        /* To make the boxed text "closed captioning" transparent
-         * change true to false.
-         */
-        case VBI_OPAQUE:
-            if( p_sys->b_opaque )
+            const vbi_opacity opacity = p_page.text[ y/10 * p_page.columns + x/12 ].opacity;
+            uint32_t *p_pixel = (uint32_t*)&p_src->p->p_pixels[y * p_src->p->i_pitch + 4*x];
+            switch( opacity )
+            {
+            /* Show video instead of this character */
+            case VBI_TRANSPARENT_SPACE:
+                *p_pixel = 0;
                 break;
-        /* Full text transparency. only foreground color is show */
-        case VBI_TRANSPARENT_FULL:
-            *p_begin = 0;
-            break;
-        /* Transparency for boxed text */
-        case VBI_SEMI_TRANSPARENT:
-            if( (*p_begin & 0xffffff00) == 0xff )
-                *p_begin = 0;
-            break;
-        }
-        x++;
-        if( x >= fmt.i_width )
-        {
-            x = 0;
-            y++;
+            /* To make the boxed text "closed captioning" transparent
+             * change true to false.
+             */
+            case VBI_OPAQUE:
+                if( b_opaque )
+                    break;
+            /* Full text transparency. only foreground color is show */
+            case VBI_TRANSPARENT_FULL:
+                *p_pixel = 0;
+                break;
+            /* Transparency for boxed text */
+            case VBI_SEMI_TRANSPARENT:
+                if( (*p_pixel & 0xffffff00) == 0xff ) /* FIXME cannot be true ? */
+                    *p_pixel = 0;
+                break;
+            }
         }
     }
     /* end of kludge */
     return VLC_SUCCESS;
-
 }
 
+/* Callbacks */
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     decoder_sys_t   *p_sys = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
-    if( (newval.i_int > 0) && (newval.i_int < 999) )
+    vlc_mutex_lock( &p_sys->lock );
+    if( newval.i_int > 0 && newval.i_int < 999 )
         p_sys->i_wanted_page = newval.i_int;
+    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -496,8 +496,10 @@ static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
     decoder_sys_t *p_sys = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
-    if( p_sys )
-        p_sys->b_opaque = newval.b_bool;
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->b_opaque = newval.b_bool;
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
 
@@ -507,7 +509,9 @@ static int Position( vlc_object_t *p_this, char const *psz_cmd,
     decoder_sys_t *p_sys = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
-    if( p_sys )
-        p_sys->i_align = newval.i_int;
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->i_align = newval.i_int;
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
