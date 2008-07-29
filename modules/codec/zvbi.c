@@ -44,37 +44,16 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <assert.h>
-#include <stdint.h>
 #include <libzvbi.h>
 
 #include "vlc_vout.h"
-#include "vlc_bits.h"
 #include "vlc_codec.h"
-#include "vlc_image.h"
-
-typedef enum {
-    DATA_UNIT_EBU_TELETEXT_NON_SUBTITLE     = 0x02,
-    DATA_UNIT_EBU_TELETEXT_SUBTITLE         = 0x03,
-    DATA_UNIT_EBU_TELETEXT_INVERTED         = 0x0C,
-
-    DATA_UNIT_ZVBI_WSS_CPR1204              = 0xB4,
-    DATA_UNIT_ZVBI_CLOSED_CAPTION_525       = 0xB5,
-    DATA_UNIT_ZVBI_MONOCHROME_SAMPLES_525   = 0xB6,
-
-    DATA_UNIT_VPS                           = 0xC3,
-    DATA_UNIT_WSS                           = 0xC4,
-    DATA_UNIT_CLOSED_CAPTION                = 0xC5,
-    DATA_UNIT_MONOCHROME_SAMPLES            = 0xC6,
-
-    DATA_UNIT_STUFFING                      = 0xFF,
-} data_unit_id;
 
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
-static subpicture_t *Decode( decoder_t *, block_t ** );
 
 #define PAGE_TEXT N_("Teletext page")
 #define PAGE_LONGTEXT N_("Open the indicated Teletext page." \
@@ -93,8 +72,6 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 #define TELX_TEXT N_("Teletext text subtitles")
 #define TELX_LONGTEXT N_( "Output teletext subtitles as text " \
   "instead of as RGBA" )
-
-// #define ZVBI_DEBUG
 
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *const ppsz_pos_descriptions[] =
@@ -123,6 +100,25 @@ vlc_module_end();
  * Local structures
  ****************************************************************************/
 
+// #define ZVBI_DEBUG
+
+typedef enum {
+    DATA_UNIT_EBU_TELETEXT_NON_SUBTITLE     = 0x02,
+    DATA_UNIT_EBU_TELETEXT_SUBTITLE         = 0x03,
+    DATA_UNIT_EBU_TELETEXT_INVERTED         = 0x0C,
+
+    DATA_UNIT_ZVBI_WSS_CPR1204              = 0xB4,
+    DATA_UNIT_ZVBI_CLOSED_CAPTION_525       = 0xB5,
+    DATA_UNIT_ZVBI_MONOCHROME_SAMPLES_525   = 0xB6,
+
+    DATA_UNIT_VPS                           = 0xC3,
+    DATA_UNIT_WSS                           = 0xC4,
+    DATA_UNIT_CLOSED_CAPTION                = 0xC5,
+    DATA_UNIT_MONOCHROME_SAMPLES            = 0xC6,
+
+    DATA_UNIT_STUFFING                      = 0xFF,
+} data_unit_id;
+
 struct decoder_sys_t
 {
     vbi_decoder *     p_vbi_dec;
@@ -137,21 +133,14 @@ struct decoder_sys_t
 
     /* Positioning of Teletext images */
     int               i_align;
-
-    /* Misc */
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
-    image_handler_t   *p_image;
-#endif
 };
+
+static subpicture_t *Decode( decoder_t *, block_t ** );
 
 static void event_handler( vbi_event *ev, void *user_data );
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int OpaquePage( decoder_t *p_dec, vbi_page p_page, video_format_t fmt,
-                        picture_t **p_src );
-static int Opaque_32bpp( decoder_t *p_dec, vbi_page p_page, video_format_t fmt,
-                        picture_t **p_src );
-static int Opaque_8bpp( decoder_t *p_dec, vbi_page p_page, video_format_t fmt,
                         picture_t **p_src );
 
 static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
@@ -178,15 +167,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
     memset( p_sys, 0, sizeof(decoder_sys_t) );
-
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
-    p_sys->p_image = image_HandlerCreate( VLC_OBJECT(p_dec) );
-    if( !p_sys->p_image )
-    {
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
-#endif
 
     p_sys->b_update = false;
     p_sys->p_vbi_dec = vbi_decoder_new();
@@ -222,11 +202,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->b_text )
         p_dec->fmt_out.video.i_chroma = VLC_FOURCC('T','E','X','T');
     else
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
-        p_dec->fmt_out.video.i_chroma = VLC_FOURCC('Y','U','V','A');
-#else
         p_dec->fmt_out.video.i_chroma = VLC_FOURCC('R','G','B','A');
-#endif
     return VLC_SUCCESS;
 }
 
@@ -243,9 +219,6 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
     var_DelCallback( p_dec, "vbi-opaque", Opaque, p_sys );
 
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
-    if( p_sys->p_image ) image_HandlerDelete( p_sys->p_image );
-#endif
     if( p_sys->p_vbi_dec ) vbi_decoder_delete( p_sys->p_vbi_dec );
     if( p_sys->p_dvb_demux ) vbi_dvb_demux_delete( p_sys->p_dvb_demux );
     free( p_sys );
@@ -320,11 +293,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = p_sys->b_text ? VLC_FOURCC('T','E','X','T') :
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
-                                   VLC_FOURCC('Y','U','V','A');
-#else
                                    VLC_FOURCC('R','G','B','A');
-#endif
     fmt.i_aspect = p_sys->b_text ? 0 : VOUT_ASPECT_FACTOR;
     if( !p_sys->b_text )
     {
@@ -387,59 +356,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
-        video_format_t fmt_in;
-        picture_t *p_pic, *p_dest;
-
-        p_pic = ( picture_t * ) malloc( sizeof( picture_t ) );
-        if( !p_pic )
-            goto error;
-
-        memset( &fmt_in, 0, sizeof( video_format_t ) );
-        memset( p_pic, 0, sizeof( picture_t ) );
-
-        fmt_in = fmt;
-        fmt_in.i_chroma = VLC_FOURCC('R','G','B','A');
-
-        vout_AllocatePicture( VLC_OBJECT(p_dec), p_pic, fmt_in.i_chroma,
-                        fmt_in.i_width, fmt_in.i_height, fmt_in.i_aspect );
-        if( !p_pic->i_planes )
-        {
-            free( p_pic->p_data_orig );
-            free( p_pic );
-            goto error;
-        }
-
-        vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
-                          p_pic->p->p_pixels, 1, 1 );
-
-        p_pic->p->i_lines = p_page.rows * 10;
-        p_pic->p->i_pitch = p_page.columns * 12 * 4;
-
-#ifdef ZVBI_DEBUG
-        msg_Dbg( p_dec, "page %x-%x(%d,%d)",
-                 p_page.pgno, p_page.subno,
-                 p_page.rows, p_page.columns );
-#endif
-        p_dest = image_Convert( p_sys->p_image, p_pic, &fmt_in,
-                                &p_spu->p_region->fmt );
-        if( !p_dest )
-        {
-            free( p_pic->p_data_orig );
-            free( p_pic );
-            msg_Err( p_dec, "chroma conversion failed" );
-            goto error;
-        }
-        OpaquePage( p_dec, p_page, p_spu->p_region->fmt, &p_dest );
-        vout_CopyPicture( VLC_OBJECT(p_dec), &(p_spu->p_region->picture),
-                          p_dest );
-
-        free( p_pic->p_data_orig );
-        free( p_pic );
-
-        free( p_dest->p_data_orig );
-        free( p_dest );
-#else
         picture_t *p_pic;
 
         vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
@@ -450,7 +366,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
         p_pic = &(p_spu->p_region->picture);
         OpaquePage( p_dec, p_page, fmt, &p_pic );
-#endif
     }
 
 #undef ZVBI_PIXFMT_RGBA32
@@ -506,31 +421,12 @@ static void event_handler( vbi_event *ev, void *user_data )
 static int OpaquePage( decoder_t *p_dec, vbi_page p_page,
                        video_format_t fmt, picture_t **p_src )
 {
-    int result = VLC_EGENERIC;
-
-    /* Kludge since zvbi doesn't provide an option to specify opacity. */
-    switch( fmt.i_chroma )
-    {
-        case VLC_FOURCC('R','G','B','A' ):
-            result = Opaque_32bpp( p_dec, p_page, fmt, p_src );
-            break;
-        case VLC_FOURCC('Y','U','V','A' ):
-            result = Opaque_8bpp( p_dec, p_page, fmt, p_src );
-            break;
-        default:
-            msg_Err( p_dec, "chroma not supported %4.4s", (char *)&fmt.i_chroma );
-            return VLC_EGENERIC;
-    }
-    return result;
-}
-
-static int Opaque_32bpp( decoder_t *p_dec, vbi_page p_page,
-                         video_format_t fmt, picture_t **p_src )
-{
     decoder_sys_t   *p_sys = (decoder_sys_t *) p_dec->p_sys;
     uint32_t        *p_begin, *p_end;
     unsigned int    x = 0, y = 0;
     vbi_opacity     opacity;
+
+    assert( fmt.i_chroma == VLC_FOURCC('R','G','B','A' ) );
 
     /* Kludge since zvbi doesn't provide an option to specify opacity. */
     switch( fmt.i_chroma )
@@ -579,65 +475,7 @@ static int Opaque_32bpp( decoder_t *p_dec, vbi_page p_page,
     }
     /* end of kludge */
     return VLC_SUCCESS;
-}
 
-static int Opaque_8bpp( decoder_t *p_dec, vbi_page p_page,
-                        video_format_t fmt, picture_t **p_src )
-{
-    decoder_sys_t   *p_sys = (decoder_sys_t *) p_dec->p_sys;
-    uint8_t         *p_begin, *p_end;
-    uint32_t        i_width = 0;
-    unsigned int    x = 0, y = 0;
-    vbi_opacity     opacity;
-
-    /* Kludge since zvbi doesn't provide an option to specify opacity. */
-    switch( fmt.i_chroma )
-    {
-        case VLC_FOURCC('Y','U','V','A' ):
-            p_begin = (uint8_t *)(*p_src)->p[A_PLANE].p_pixels;
-            p_end   = (uint8_t *)(*p_src)->p[A_PLANE].p_pixels +
-                      ( fmt.i_height * (*p_src)->p[A_PLANE].i_pitch );
-            i_width = (*p_src)->p[A_PLANE].i_pitch;
-            break;
-        default:
-            msg_Err( p_dec, "chroma not supported %4.4s", (char *)&fmt.i_chroma );
-            return VLC_EGENERIC;
-    }
-
-    for( ; p_begin < p_end; p_begin++ )
-    {
-        opacity = p_page.text[ y / 10 * p_page.columns + x / 12 ].opacity;
-        switch( opacity )
-        {
-        /* Show video instead of this character */
-        case VBI_TRANSPARENT_SPACE:
-            *p_begin = 0;
-            break;
-        /* To make the boxed text "closed captioning" transparent
-         * change true to false.
-         */
-        case VBI_OPAQUE:
-            if( p_sys->b_opaque )
-                break;
-        /* Full text transparency. only foreground color is show */
-        case VBI_TRANSPARENT_FULL:
-            *p_begin = 0;
-            break;
-        /* Transparency for boxed text */
-        case VBI_SEMI_TRANSPARENT:
-            if( (*p_begin & 0xffffff00) == 0xff )
-                *p_begin = 0;
-            break;
-        }
-        x++;
-        if( x >= i_width )
-        {
-            x = 0;
-            y++;
-        }
-    }
-    /* end of kludge */
-    return VLC_SUCCESS;
 }
 
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
