@@ -123,6 +123,7 @@ public slots:
     void updateArt( QString );
 };
 
+#if 0
 class VisualSelector : public QFrame
 {
     Q_OBJECT
@@ -136,6 +137,7 @@ private slots:
     void prev();
     void next();
 };
+#endif
 
 /* Advanced Button Bar */
 class QPushButton;

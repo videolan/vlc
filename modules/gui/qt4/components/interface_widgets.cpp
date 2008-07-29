@@ -238,6 +238,7 @@ void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
     QVLCMenu::PopupMenu( p_intf, true );
 }
 
+#if 0
 /**********************************************************************
  * Visualization selector panel
  **********************************************************************/
@@ -286,6 +287,7 @@ void VisualSelector::next()
         free( psz_new );
     }
 }
+#endif
 
 /**********************************************************************
  * TEH controls
