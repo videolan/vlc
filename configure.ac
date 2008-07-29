@@ -1986,7 +1986,7 @@ then
     then
       dnl  Use a custom libraw1394
       AC_MSG_RESULT(${real_dv_raw1394_tree}/src/.libs/libraw1394.a)
-      VLC_ADD_BUILTINS([access_dv])
+      VLC_ADD_PLUGIN([access_dv])
       VLC_ADD_LIBS([access_dv],[-L${real_dv_raw1394_tree}/src/.libs -lraw1394])
       VLC_ADD_CPPFLAGS([access_dv],[-I${real_dv_raw1394_tree}])
     else
@@ -2103,7 +2103,7 @@ then
       then
         dnl  Use a custom libdvdread
         AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
-        VLC_ADD_BUILTINS([dvdread])
+        VLC_ADD_PLUGIN([dvdread])
         VLC_ADD_LIBS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LIBS_dvdcss}])
         VLC_ADD_CPPFLAGS([dvdread],[-I${real_dvdread_tree}])
       else
@@ -2299,9 +2299,9 @@ then
       then
         dnl  Use a custom libdvbpsi
         AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
-        VLC_ADD_BUILTINS([ts])
+        VLC_ADD_PLUGIN([ts])
         if test "${enable_sout}" != "no"; then
-          VLC_ADD_BUILTINS([mux_ts])
+          VLC_ADD_PLUGIN([mux_ts])
         fi
         VLC_ADD_CPPFLAGS([mux_ts ts dvb],[-I${real_dvbpsi_tree}/src])
         VLC_ADD_LIBS([mux_ts ts dvb],[${real_dvbpsi_tree}/src/.libs/libdvbpsi.a])
@@ -2630,12 +2630,7 @@ then
   fi
   CPPFLAGS="${CPPFLAGS_save} -I${with_dvb}/include"
   AC_CHECK_HEADERS(linux/dvb/version.h linux/dvb/frontend.h, [
-    if test -z "${with_dvbpsi_tree}"
-    then
-      VLC_ADD_PLUGIN([dvb])
-    else
-      VLC_ADD_BUILTINS([dvb])
-    fi
+  VLC_ADD_PLUGIN([dvb])
   ],[AC_MSG_WARN(linux-dvb headers not found, dvb disabled)])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
@@ -2919,7 +2914,7 @@ then
       VLC_ADD_LIBS([mpgatofixed32],[-L${real_mad_tree}/.libs])
       LDFLAGS="${LDFLAGS_save} ${LIBS_mpgatofixed32}"
       AC_CHECK_LIB(mad, mad_bit_init, [
-        VLC_ADD_BUILTINS([mpgatofixed32])
+        VLC_ADD_PLUGIN([mpgatofixed32])
         VLC_ADD_LIBS([mpgatofixed32],[-lmad])
         ],[ AC_MSG_ERROR([the specified tree hasn't been compiled ])
       ],[])
@@ -3116,7 +3111,7 @@ then
     then
       dnl  Use a custom faad
       AC_MSG_RESULT(${real_faad_tree}/libfaad/.libs/libfaad.a)
-      VLC_ADD_BUILTINS([faad])
+      VLC_ADD_PLUGIN([faad])
       VLC_ADD_LIBS([faad],[${real_faad_tree}/libfaad/.libs/libfaad.a])
       VLC_ADD_CPPFLAGS([faad],[-I${real_faad_tree}/include])
     else
@@ -3164,7 +3159,7 @@ then
     then
       dnl  Use a custom twolame
       AC_MSG_RESULT(${real_twolame_tree}/libtwolame/.libs/libtwolame.a)
-      VLC_ADD_BUILTINS([twolame])
+      VLC_ADD_PLUGIN([twolame])
       VLC_ADD_LIBS([twolame],[${real_twolame_tree}/libtwolame/.libs/libtwolame.a])
       VLC_ADD_CPPFLAGS([twolame],[-I${real_twolame_tree}/libtwolame -DLIBTWOLAME_STATIC])
     else
@@ -3196,7 +3191,7 @@ if test "${enable_quicktime}" != "no" &&
   (test "${SYS}" = "darwin" || test "${enable_quicktime}" = "yes")
 then
   if test "${SYS}" = "mingw32"; then
-    VLC_ADD_BUILTINS([quicktime])
+    VLC_ADD_PLUGIN([quicktime])
   else
   AC_CHECK_HEADERS(QuickTime/QuickTime.h,
     [ VLC_ADD_PLUGIN([quicktime])
@@ -3276,7 +3271,7 @@ then
       VLC_ADD_LIBS([a52tofloat32],[-L${real_a52_tree}/liba52/.libs])
       LDFLAGS="${LDFLAGS_save} ${LIBS_a52tofloat32}"
       AC_CHECK_LIB(a52, a52_free, [
-        VLC_ADD_BUILTINS([a52tofloat32])
+        VLC_ADD_PLUGIN([a52tofloat32])
         VLC_ADD_CPPFLAGS([a52tofloat32],[-DUSE_A52DEC_TREE])
         VLC_ADD_LIBS([a52tofloat32],[-la52])
         ],[
@@ -3567,7 +3562,7 @@ then
     real_tarkin_tree="`cd ${with_tarkin_tree} 2>/dev/null && pwd`"
     if test -f "${real_tarkin_tree}/tarkin.o"
     then
-      VLC_ADD_BUILTINS([tarkin])
+      VLC_ADD_PLUGIN([tarkin])
       VLC_ADD_CPPFLAGS([tarkin],[-I${real_tarkin_tree}])
       VLC_ADD_LIBS([tarkin],[${real_tarkin_tree}/mem.o ${real_tarkin_tree}/pnm.o ${real_tarkin_tree}/wavelet.o ${real_tarkin_tree}/wavelet_xform.o ${real_tarkin_tree}/wavelet_coeff.o ${real_tarkin_tree}/yuv.o ${real_tarkin_tree}/tarkin.o ${real_tarkin_tree}/info.o -logg])
       AC_MSG_RESULT(yes)
@@ -3886,23 +3881,9 @@ if test "${enable_xvideo}" != "no" &&
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
     CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
     AC_CHECK_LIB(Xv,XvPutImage,[
-      # If libXv.so is available, xvideo can be a plugin. Otherwise, we
-      # test for libXv_pic.
-      if test -f /usr/X11R6/lib/libXv.so -o -f /usr/lib/libXv.so -o -f "${x_libraries}"/libXv.so; then
         VLC_ADD_PLUGIN([xvideo])
         VLC_ADD_CPPFLAGS([xvideo],[${X_CFLAGS}])
         VLC_ADD_LIBS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv])
-      else
-        AC_CHECK_LIB(Xv_pic,XvPutImage,[
-          VLC_ADD_PLUGIN([xvideo])
-          VLC_ADD_CPPFLAGS([xvideo],[${X_CFLAGS}])
-          VLC_ADD_LIBS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv_pic])
-        ],[
-          VLC_ADD_BUILTINS([xvideo])
-          VLC_ADD_LIBS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv])
-          VLC_ADD_CPPFLAGS([xvideo],[${X_CFLAGS}])
-        ])
-      fi
     ])
     CFLAGS="${CFLAGS_save}"
   ]
@@ -4801,7 +4782,7 @@ AC_ARG_WITH(,[Interface plugins:])
 dnl special case for BeOS
 if test "${SYS}" = "beos"
 then
-    VLC_ADD_BUILTINS([beos])
+    VLC_ADD_PLUGIN([beos])
 fi
 
 dnl
@@ -4914,7 +4895,7 @@ AC_ARG_ENABLE(wince,
   [  --enable-wince          Windows CE interface (default enabled with MinGW)])
 if test "${enable_wince}" != "no"; then
   if test "${SYS}" = "mingwce"; then
-    VLC_ADD_BUILTINS([wince])
+    VLC_ADD_PLUGIN([wince])
     VLC_ADD_CXXFLAGS([wince],[])
     VLC_ADD_LIBS([wince],[-lcommctrl -lcommdlg -laygshell])
     dnl Gross hack
