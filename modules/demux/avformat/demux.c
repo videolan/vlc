@@ -496,6 +496,10 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
 
     switch( whence )
     {
+#ifdef AVSEEK_SIZE
+        case AVSEEK_SIZE:
+            return i_size;
+#endif
         case SEEK_SET:
             break;
         case SEEK_CUR:
