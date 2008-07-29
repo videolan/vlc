@@ -83,6 +83,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     closeButton->setDefault( true );
     clearUpdateButton = new QPushButton( qtr( "&Clear" ) );
     saveLogButton = new QPushButton( qtr( "&Save as..." ) );
+    saveLogButton->setToolTip( qtr( "Save all the displayed logs to a file" ) );
 
     verbosityBox = new QSpinBox();
     verbosityBox->setRange( 0, 2 );
@@ -95,6 +96,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
     mainLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
     mainLayout->addWidget( verbosityBox, 1, 1 );
+    mainLayout->setColumnStretch( 2, 10 );
     mainLayout->addWidget( saveLogButton, 1, 3 );
     mainLayout->addWidget( clearUpdateButton, 1, 4 );
     mainLayout->addWidget( closeButton, 1, 5 );
