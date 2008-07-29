@@ -851,7 +851,9 @@ dnl Find where are the X headers and libraries
 AC_PATH_XTRA()
 
 dnl it seems that autoconf do the pkg-config detection only for the first PKG_CHECK_MODULES in the configure.ac ( which is logical) but in our case it is nested in a if so it was not working if you're not on linux or have disable hal.
-
+dnl Make PKG_CONFIG_PATH precious so that it appears in the help and get saved
+AC_ARG_VAR(PKG_CONFIG_PATH, 
+	   [Paths where to find .pc not at the default location])
 PKG_PROG_PKG_CONFIG()
 
 dnl Check for hal
