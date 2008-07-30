@@ -278,7 +278,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
              qtr( "&Tools" ) );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 1 );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 2 );
-    BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "&Playback" ), 3 );
+    BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "P&layback" ), 3 );
     BAR_ADD( HelpMenu( NULL ), qtr( "&Help" ) );
 }
 #undef BAR_ADD
@@ -323,7 +323,7 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
     menu->addAction( QIcon( ":/playlist_menu" ),
-                     qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
+                     qtr( "Show P&laylist" ), mi, SLOT( togglePlaylist() ) );
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( I_PL_LOAD ), "", "", SLOT( openAPlaylist() ),
@@ -500,14 +500,14 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
                           SLOT( loadSubtitlesFile() ) );
         submenu->addSeparator();
 
-        ACT_ADD( current, "fullscreen", qtr( "Toggle &Fullscreen" ) );
+        ACT_ADD( current, "fullscreen", qtr( "&Fullscreen" ) );
         ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
         ACT_ADD( current, "deinterlace", qtr( "&Deinterlace" ) );
         ACT_ADD( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
         ACT_ADD( current, "crop", qtr( "&Crop" ) );
         ACT_ADD( current, "video-on-top", qtr( "Always &On Top" ) );
         /* ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) ); */
-        ACT_ADD( current, "video-snapshot", qtr( "Snapsh&ot" ) );
+        ACT_ADD( current, "video-snapshot", qtr( "Sna&pshot" ) );
         /* ACT_ADD( current, "ffmpeg-pp-q", qtr( "Decoder" ) ); */
     }
 
