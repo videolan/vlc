@@ -878,7 +878,7 @@ package-win32-base: package-win-common-strip
 
 package-win32-base-exe: package-win32-base
 # Create package
-    rm -Rf $(win32_destdir)/sdk
+	rm -Rf $(win32_destdir)/sdk
 	if makensis -VERSION >/dev/null 2>&1; then \
 	    MAKENSIS="makensis"; \
 	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
