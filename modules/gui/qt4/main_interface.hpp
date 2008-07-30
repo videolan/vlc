@@ -131,7 +131,8 @@ private:
     bool                 playlistVisible; ///< Is the playlist visible ?
     bool                 visualSelectorEnabled;
     bool                 notificationEnabled; /// Systray Notifications
-    bool                 b_remainingTime; /* showing elapsed or remaining time */
+    bool                 b_remainingTime; /* Show elapsed or remaining time */
+    bool                 bgWasVisible;
     int                  i_visualmode; ///< Visual Mode
 
     input_thread_t      *p_input;    ///< Main input associated to the playlist

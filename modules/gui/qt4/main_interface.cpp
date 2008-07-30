@@ -416,18 +416,21 @@ void MainInterface::handleMainUi( QSettings *settings )
     visualSelector->hide();
     #endif
 
-    /* And video Outputs */
-    if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
-        i_visualmode == QT_MINIMAL_MODE )
+    /* Bg Cone */
+    bgWidget = new BackgroundWidget( p_intf );
+    bgWidget->resize(
+            settings->value( "backgroundSize", QSize( 300, 200 ) ).toSize() );
+    bgWidget->updateGeometry();
+    mainLayout->insertWidget( 0, bgWidget );
+    CONNECT( this, askBgWidgetToToggle(), bgWidget, toggle() );
+
+    if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
+        i_visualmode != QT_MINIMAL_MODE )
     {
-        bgWidget = new BackgroundWidget( p_intf );
-        bgWidget->resize(
-             settings->value( "backgroundSize", QSize( 300, 150 ) ).toSize() );
-        bgWidget->updateGeometry();
-        mainLayout->insertWidget( 0, bgWidget );
-        CONNECT( this, askBgWidgetToToggle(), bgWidget, toggle() );
+        bgWidget->hide();
     }
 
+    /* And video Outputs */
     if( videoEmbeddedFlag )
     {
         videoWidget = new VideoWidget( p_intf );
@@ -652,7 +655,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
                                    unsigned int *pi_height )
 {
-    bool bgWasVisible = false;
+    bgWasVisible = false;
 
     /* Request the videoWidget */
     void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
@@ -698,8 +701,11 @@ void MainInterface::releaseVideoSlot( void *p_win )
     videoWidget->release( p_win );
     videoWidget->hide();
 
-    if( bgWidget )// WRONG
+    if( bgWasVisible )
+    {
+        bgWasVisible = false;
         bgWidget->show();
+    }
 
     adjustSize();
     videoIsActive = false;
@@ -801,6 +807,12 @@ void MainInterface::toggleMinimalView()
 {
     /* HACK for minimalView, see menus.cpp */
     if( !menuBar()->isVisible() ) QVLCMenu::minimalViewAction->toggle();
+    if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
+        i_visualmode != QT_MINIMAL_MODE )
+    {
+        emit askBgWidgetToToggle();
+    }
+
     TOGGLEV( menuBar() );
     TOGGLEV( controls );
     TOGGLEV( statusBar() );
