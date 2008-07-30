@@ -621,7 +621,8 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
         if( !strcmp( ppsz_property[i], "enabled" ) ||
             !strcmp( ppsz_property[i], "disabled" ) )
         {
-            vlm_ScheduleSetup( p_schedule, ppsz_property[i], NULL );
+            if ( vlm_ScheduleSetup( p_schedule, ppsz_property[i], NULL ) )
+                goto error;
         }
         else if( !strcmp( ppsz_property[i], "append" ) )
         {
@@ -641,7 +642,8 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
                 strcat( psz_line, ppsz_property[j] );
             }
 
-            vlm_ScheduleSetup( p_schedule, "append", psz_line );
+            if( vlm_ScheduleSetup( p_schedule, "append", psz_line ) )
+                goto error;
             break;
         }
         else
@@ -653,12 +655,18 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
                 return ExecuteSyntaxError( psz_cmd, pp_status );
             }
 
-            vlm_ScheduleSetup( p_schedule, ppsz_property[i], ppsz_property[i+1] );
+            if( vlm_ScheduleSetup( p_schedule, ppsz_property[i], ppsz_property[i+1] ) )
+                goto error;
             i++;
         }
     }
     *pp_status = vlm_MessageNew( psz_cmd, vlm_NULL );
     return VLC_SUCCESS;
+
+error:
+    *pp_status = vlm_MessageNew( psz_cmd, "Error while setting the property '%s' to the schedule",
+                                 ppsz_property[i] );
+    return VLC_EGENERIC;
 }
 
 static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, bool b_new,
@@ -1056,9 +1064,7 @@ static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
         {
             schedule->i_date = 0;
         }
-        else if( (p == NULL) && sscanf( psz_value, "%d:%d:%d", &time.tm_hour,
-                                        &time.tm_min, &time.tm_sec ) != 3 )
-                                        /* it must be a hour:minutes:seconds */
+        else if(p == NULL)
         {
             return 1;
         }
