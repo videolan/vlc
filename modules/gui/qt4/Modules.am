@@ -236,6 +236,8 @@ EXTRA_DIST += \
 	pixmaps/toolbar/record_16px.png \
 	pixmaps/toolbar/snapshot.png \
 	pixmaps/toolbar/atob.png \
+	pixmaps/toolbar/atob-noa.png \
+	pixmaps/toolbar/atob-nob.png \
 	pixmaps/toolbar/dvd_menu.png \
 	pixmaps/toolbar/dvd_next.png \
 	pixmaps/toolbar/dvd_prev.png \
