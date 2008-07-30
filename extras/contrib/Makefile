@@ -67,7 +67,7 @@ package-win32:
 	fi
 	mkdir -p tmp/$(DISTDIR)
 	tar cf - --dereference bin sbin include lib share/aclocal*\
-		share/autoconf* \
+		share/autoconf* share/qt4* \
 		share/automake* share/gettext* gecko-sdk\
 		| (cd tmp/$(DISTDIR); tar xpf -)
 #kludge for live.com
