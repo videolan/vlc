@@ -32,13 +32,12 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_codec.h>
+#include <vlc_osd.h>
 
 #include <kate/kate.h>
 
-#include "vlc_osd.h"
-
 /* #define ENABLE_PACKETIZER */
-/* #define ENABLE_FORMATTING */
+#define ENABLE_FORMATTING
 #define ENABLE_BITMAPS
 
 /*****************************************************************************
@@ -128,7 +127,7 @@ vlc_module_begin();
 
 #ifdef ENABLE_FORMATTING
     add_bool( "kate-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
-                 false );
+              true );
 #endif
 vlc_module_end();
 
@@ -306,9 +305,6 @@ static int ProcessHeaders( decoder_t *p_dec )
              (double)p_sys->ki.gps_numerator/p_sys->ki.gps_denominator,
              p_sys->ki.granule_shift);
 
-    /* we want markup to be removed for now */
-    kate_info_remove_markup( &p_sys->ki, 1 );
-
     /* parse all remaining header packets */
     for (headeridx=1; headeridx<p_sys->ki.num_headers; ++headeridx)
     {
@@ -421,20 +417,140 @@ static inline void rgb_to_yuv( uint8_t *y, uint8_t *u, uint8_t *v,
 }
 #endif
 
+/*
+  This retrieves the size of the video.
+  The best case is when the original video size is known, as we can then
+  scale images to match. In this case, since VLC autoscales, we want to
+  return the original size and let VLC scale everything.
+  if the original size is not known, then VLC can't resize, so we return
+  the size of the incoming video. If sizes in the Kate stream are in
+  relative units, it works fine. If they are absolute, you get what you
+  ask for. Images aren't rescaled.
+*/
+static void GetVideoSize( decoder_t *p_dec, int *w, int *h )
+{
+    /* searching for vout to get its size is frowned upon, so we don't and
+       use a default size if the original canvas size is not specified. */
+#if 1
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    if( p_sys->ki.original_canvas_width > 0 && p_sys->ki.original_canvas_height > 0 )
+    {
+        *w = p_sys->ki.original_canvas_width;
+        *h = p_sys->ki.original_canvas_height;
+        msg_Dbg( p_dec, "original canvas %zu %zu\n",
+	         p_sys->ki.original_canvas_width, p_sys->ki.original_canvas_height );
+    }
+    else
+    {
+        /* nothing, leave defaults */
+        msg_Dbg( p_dec, "original canvas size unknown\n");
+    }
+#else
+    /* keep this just in case it might be allowed one day ;) */
+    vout_thread_t *p_vout;
+    p_vout = vlc_object_find( (vlc_object_t*)p_dec, VLC_OBJECT_VOUT, FIND_CHILD );
+    if( p_vout )
+    {
+        decoder_sys_t *p_sys = p_dec->p_sys;
+        if( p_sys->ki.original_canvas_width > 0 && p_sys->ki.original_canvas_height > 0 )
+        {
+            *w = p_sys->ki.original_canvas_width;
+            *h = p_sys->ki.original_canvas_height;
+        }
+        else
+        {
+            *w = p_vout->fmt_in.i_width;
+            *h = p_vout->fmt_in.i_height;
+        }
+        msg_Dbg( p_dec, "video: in %d %d, out %d %d, original canvas %zu %zu\n",
+                 p_vout->fmt_in.i_width, p_vout->fmt_in.i_height,
+                 p_vout->fmt_out.i_width, p_vout->fmt_out.i_height,
+                 p_sys->ki.original_canvas_width, p_sys->ki.original_canvas_height );
+        vlc_object_release( p_vout );
+    }
+#endif
+}
+
+#ifdef ENABLE_BITMAPS
+
+static void CreateBitmap( picture_t *pic, const kate_bitmap *bitmap )
+{
+    size_t y;
+
+    for( y=0; y<bitmap->height; ++y )
+    {
+        uint8_t *dest = pic->Y_PIXELS+pic->Y_PITCH*y;
+        const uint8_t *src = bitmap->pixels+y*bitmap->width;
+        memcpy( dest, src, bitmap->width );
+    }
+}
+
+static void CreatePalette( video_palette_t *fmt_palette, const kate_palette *palette )
+{
+    size_t n;
+
+    fmt_palette->i_entries = palette->ncolors;
+    for( n=0; n<palette->ncolors; ++n )
+    {
+        rgb_to_yuv(
+            &fmt_palette->palette[n][0], &fmt_palette->palette[n][1], &fmt_palette->palette[n][2],
+            palette->colors[n].r, palette->colors[n].g, palette->colors[n].b
+        );
+        fmt_palette->palette[n][3] = palette->colors[n].a;
+    }
+}
+
+#endif
+
+static void SetupText( decoder_t *p_dec, subpicture_t *p_spu, const kate_event *ev )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( ev->text_encoding != kate_utf8 )
+    {
+        msg_Warn( p_dec, "Text isn't UTF-8, unsupported, ignored" );
+        return;
+    }
+
+    switch( ev->text_markup_type )
+    {
+        case kate_markup_none:
+            p_spu->p_region->psz_text = strdup( ev->text ); /* no leak, this actually gets killed by the core */
+            break;
+        case kate_markup_simple:
+            if( p_sys->b_formatted )
+            {
+                /* the HTML renderer expects a top level text tag pair */
+                char *buffer = NULL;
+                if( asprintf( &buffer, "<text>%s</text>", ev->text ) >= 0 )
+                {
+                    p_spu->p_region->psz_html = buffer;
+                }
+                break;
+            }
+            /* if not formatted, we fall through */
+        default:
+            /* we don't know about this one, so remove markup and display as text */
+            {
+                char *copy = strdup( ev->text );
+                size_t len0 = strlen( copy ) + 1;
+                kate_text_remove_markup( ev->text_encoding, copy, &len0 );
+                p_spu->p_region->psz_text = copy;
+            }
+            break;
+    }
+}
+
 /*****************************************************************************
  * DecodePacket: decodes a Kate packet.
  *****************************************************************************/
 static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    const kate_event *ev=NULL;
+    const kate_event *ev = NULL;
     subpicture_t *p_spu = NULL;
     subpicture_region_t *p_bitmap_region = NULL;
     int ret;
-#ifdef ENABLE_BITMAPS
-    size_t n, y;
-    picture_t *pic = NULL;
-#endif
     video_format_t fmt;
     kate_tracker kin;
     bool tracker_valid = false;
@@ -470,6 +586,40 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
 
     p_spu->b_pausable = true;
 
+    /* these may be 0 for "not specified" */
+    p_spu->i_original_picture_width = p_sys->ki.original_canvas_width;
+    p_spu->i_original_picture_height = p_sys->ki.original_canvas_height;
+
+    /* Create a new subpicture region */
+    memset( &fmt, 0, sizeof(video_format_t) );
+
+#ifdef ENABLE_FORMATTING
+    if (p_sys->b_formatted)
+    {
+        ret = kate_tracker_init( &kin, &p_sys->ki, ev );
+        if( ret < 0)
+        {
+            msg_Err( p_dec, "failed to initialize kate tracker, event will be unformatted: %d", ret );
+        }
+        else
+        {
+            int w = 720, h = 576; /* give sensible defaults just in case we fail to get the actual size */
+            GetVideoSize(p_dec, &w, &h);
+            ret = kate_tracker_update(&kin, 0, w, h, 0, 0, w, h);
+            if( ret < 0)
+            {
+                kate_tracker_clear(&kin);
+                msg_Err( p_dec, "failed to update kate tracker, event will be unformatted: %d", ret );
+            }
+            else
+            {
+                // TODO: parse tracker and set style, init fmt
+                tracker_valid = true;
+            }
+        }
+    }
+#endif
+
 #ifdef ENABLE_BITMAPS
     if (ev->bitmap && ev->bitmap->type==kate_bitmap_type_paletted && ev->palette) {
         /* create a separate region for the bitmap */
@@ -489,71 +639,20 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         }
 
         /* create the palette */
-        fmt.p_palette->i_entries = ev->palette->ncolors;
-        for (n=0; n<ev->palette->ncolors; ++n)
-        {
-            rgb_to_yuv(
-                &fmt.p_palette->palette[n][0], &fmt.p_palette->palette[n][1], &fmt.p_palette->palette[n][2],
-                ev->palette->colors[n].r, ev->palette->colors[n].g, ev->palette->colors[n].b
-            );
-            fmt.p_palette->palette[n][3] = ev->palette->colors[n].a;
-        }
+        CreatePalette( fmt.p_palette, ev->palette );
 
         /* create the bitmap */
-        pic = &p_bitmap_region->picture;
-        for (y=0; y<ev->bitmap->height; ++y) {
-          uint8_t *dest=pic->Y_PIXELS+pic->Y_PITCH*y;
-          const uint8_t *src=ev->bitmap->pixels+y*ev->bitmap->width;
-          memcpy(dest, src, ev->bitmap->width);
-        }
+        CreateBitmap( &p_bitmap_region->picture, ev->bitmap );
 
         msg_Dbg(p_dec, "Created bitmap, %zux%zu, %zu colors\n", ev->bitmap->width, ev->bitmap->height, ev->palette->ncolors);
     }
 #endif
 
-    /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
+    /* text region */
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-
-#ifdef ENABLE_FORMATTING
-    if (p_sys->b_formatted)
-    {
-        ret = kate_tracker_init( &kin, &p_sys->ki, ev);
-        if( ret < 0)
-        {
-            msg_Err( p_dec, "failed to initialize kate tracker, event will be unformatted: %d", ret );
-        }
-        else
-        {
-            // TODO: get window/video sizes/pos - can't find where to get those !
-            int w = 640;
-            int h = 480;
-            ret = kate_tracker_update(&kin, 0, w, h, 0, 0, w, h);
-            if( ret < 0)
-            {
-                kate_tracker_clear(&kin);
-                msg_Err( p_dec, "failed to update kate tracker, event will be unformatted: %d", ret );
-            }
-            else
-            {
-                if (kin.has.region)
-                {
-                    fmt.i_width = kin.region_w;
-                    fmt.i_height = kin.region_h;
-                }
-
-                // TODO: parse tracker and set style, init fmt
-                tracker_valid = true;
-            }
-        }
-    }
-#endif
-
-
-
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
     if( !p_spu->p_region )
     {
@@ -562,36 +661,34 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         return NULL;
     }
 
-    p_spu->p_region->psz_text = strdup(ev->text); /* no leak, this actually gets killed by the core */
+    SetupText( p_dec, p_spu, ev );
+
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + INT64_C(1000000)*ev->duration*p_sys->ki.gps_denominator/p_sys->ki.gps_numerator;
     p_spu->b_ephemer = (p_block->i_length == 0);
     p_spu->b_absolute = false;
 
+    /* default positioning */
+    p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
+    if (p_bitmap_region)
+    {
+        p_bitmap_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
+    }
+    p_spu->i_x = 0;
+    p_spu->i_y = 10;
+
+    /* override if tracker info present */
     if (tracker_valid)
     {
         p_spu->i_flags = 0;
         if (kin.has.region)
         {
-            p_spu->p_region->i_x = kin.region_x;
-            p_spu->p_region->i_y = kin.region_y;
-            if (p_bitmap_region) {
-                p_bitmap_region->i_x = kin.region_x;
-                p_bitmap_region->i_y = kin.region_y;
-            }
+            p_spu->i_x = kin.region_x;
+            p_spu->i_y = kin.region_y;
+            p_spu->b_absolute = true;
         }
 
         kate_tracker_clear(&kin);
-    }
-    else
-    {
-        /* Normal text subs, easy markup */
-        p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
-        if (p_bitmap_region) {
-            p_bitmap_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
-        }
-        p_spu->i_x = 0;
-        p_spu->i_y = 10;
     }
 
 #ifdef ENABLE_BITMAPS
