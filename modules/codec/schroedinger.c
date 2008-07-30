@@ -488,6 +488,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 #endif
                 SetVideoFormat( p_dec );
                 ResetPTStlb( p_dec );
+
+                p_schroframe = CreateSchroFrameFromPic( p_dec );
+                if( p_schroframe ) {
+                    schro_decoder_add_output_picture( p_sys->p_schro, p_schroframe);
+                }
             }
 
             if( b_bail )
