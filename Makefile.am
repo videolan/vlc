@@ -659,72 +659,76 @@ VLC.app: vlc
 # the same setup as the maintaner(s).
 #
 
+win32_destdir=$(top_builddir)/vlc-$(VERSION)
+win32_lua_destdir=$(win32_destdir)/lua
+win32_http_destdir=$(win32_destdir)/http
+
 #Win-common if for win32 and wince
 package-win-common:
 # Check that tmp isn't in the way
-	@if test -e "$(top_builddir)/vlc-$(VERSION)"; then \
-	  echo "Error: please remove $(top_builddir)/vlc-$(VERSION), it is in the way"; \
+	@if test -e "$(win32_destdir)"; then \
+	  echo "Error: please remove $(win32_destdir), it is in the way"; \
 	  false; \
 	else \
-	  echo "OK."; mkdir -p "$(top_builddir)/vlc-$(VERSION)"; \
+	  echo "OK."; mkdir -p "$(win32_destdir)"; \
 	fi
 
 # Copy relevant files
 # Copy executables and libs
-	cp "$(top_builddir)/src/.libs/vlc$(EXEEXT)" "$(top_builddir)/vlc-$(VERSION)/"
-	cp "$(top_srcdir)/extras/package/win32/vlc.exe.manifest" "$(top_builddir)/vlc-$(VERSION)/"
-	cp "$(top_builddir)/src/.libs/libvlccore$(LIBEXT)" "vlc-$(VERSION)/"
-	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "vlc-$(VERSION)/"
+	cp "$(top_builddir)/src/.libs/vlc$(EXEEXT)" "$(win32_destdir)/"
+	cp "$(top_srcdir)/extras/package/win32/vlc.exe.manifest" "$(win32_destdir)/"
+	cp "$(top_builddir)/src/.libs/libvlccore$(LIBEXT)" "$(win32_destdir)/"
+	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "$(win32_destdir)/"
 
 # Copy Text files
 	for file in AUTHORS MAINTAINERS THANKS ; \
-	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-$(VERSION)/$${file}.txt" ; done;
+	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(win32_destdir)/$${file}.txt" ; done;
 	for file in NEWS COPYING README; \
-	  do cp "$(srcdir)/$$file" "$(top_builddir)/vlc-$(VERSION)/$${file}.txt"; done
-	unix2dos "$(top_builddir)/vlc-$(VERSION)/"*.txt
+	  do cp "$(srcdir)/$$file" "$(win32_destdir)/$${file}.txt"; done
+	unix2dos "$(win32_destdir)/"*.txt
 
 # Necessary icons
-	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-$(VERSION)/
+	cp $(srcdir)/share/vlc48x48.ico $(win32_destdir)/
 
 # Copy the locales
-	mkdir -p $(top_builddir)/vlc-$(VERSION)/share/locale
+	mkdir -p $(win32_destdir)/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
-	  mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/locale/$${i}/LC_MESSAGES" ; \
+	  mkdir -p "$(win32_destdir)/locale/$${i}/LC_MESSAGES" ; \
 	  cp "$(srcdir)/po/$${i}.gmo" \
-	    "$(top_builddir)/vlc-$(VERSION)/share/locale/$${i}/LC_MESSAGES/vlc.mo" \
+	    "$(win32_destdir)/locale/$${i}/LC_MESSAGES/vlc.mo" \
             || true ; \
 	done
-	mkdir -p $(top_builddir)/vlc-$(VERSION)/share/locale/qt4/
-	cp $(QT4LOCALEDIR)/*.qm $(top_builddir)/vlc-$(VERSION)/share/locale/qt4/ || true
+	mkdir -p $(win32_destdir)/locale/qt4/
+	cp $(QT4LOCALEDIR)/*.qm $(win32_destdir)/locale/qt4/ || true
 
 #  Mozilla plugin
 if BUILD_MOZILLA
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/mozilla"
-	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/mozilla/
+	mkdir -p "$(win32_destdir)/mozilla"
+	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(win32_destdir)/mozilla/
 endif
 
 # ActiveX plugin
 if BUILD_ACTIVEX
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/activex"
-	cp $(srcdir)/projects/activex/README.TXT  $(top_builddir)/vlc-$(VERSION)/activex/
-	cp $(srcdir)/projects/activex/test.html  $(top_builddir)/vlc-$(VERSION)/activex/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/activex/*
+	mkdir -p "$(win32_destdir)/activex"
+	cp $(srcdir)/projects/activex/README.TXT  $(win32_destdir)/activex/
+	cp $(srcdir)/projects/activex/test.html  $(win32_destdir)/activex/
+	unix2dos $(win32_destdir)/activex/*
 
-	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/activex/
+	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)/activex/
 endif
 
 # Rebase all those DLLs to speed up loading (need cygwin rebase)
 	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
-		find $(top_builddir)/vlc-$(VERSION) -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
+		find $(win32_destdir) -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
 	fi
 
 package-win32-base-debug: package-win-common
 # Copy relevant files
 # Script installer
-	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(top_builddir)/vlc-$(VERSION)/"
+	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
 
 # Plugins
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/plugins"
+	mkdir -p "$(win32_destdir)/plugins"
 	find modules/ -name '*_plugin$(LIBEXT)' | while read i; do \
 	  if test -n "$$i" ; then \
 	    $(INSTALL) "$$i" "vlc-$(VERSION)/plugins/" ; \
@@ -732,113 +736,113 @@ package-win32-base-debug: package-win-common
 
 # Copy the lua scripts (HTTP)
 if BUILD_LUA
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/lua/http/images"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/lua/http/requests"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/lua/http/js"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs"
-	cp $(srcdir)/share/lua/http/*.html $(top_builddir)/vlc-$(VERSION)/share/lua/http/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/*.html
-	cp $(srcdir)/share/lua/http/.hosts $(top_builddir)/vlc-$(VERSION)/share/lua/http/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/.hosts
-	cp $(srcdir)/share/lua/http/*.css $(top_builddir)/vlc-$(VERSION)/share/lua/http/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/*.css
-	cp $(srcdir)/share/lua/http/js/*.js $(top_builddir)/vlc-$(VERSION)/share/lua/http/js/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/js/*.js
-	cp $(srcdir)/share/lua/http/dialogs/* $(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs/*
-	cp $(srcdir)/share/lua/http/dialogs/.hosts $(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/dialogs/.hosts
-	cp $(srcdir)/share/lua/http/*.ico $(top_builddir)/vlc-$(VERSION)/share/lua/http/
-	cp $(srcdir)/share/lua/http/images/*.png $(top_builddir)/vlc-$(VERSION)/share/lua/http/images/
-	cp $(srcdir)/share/lua/http/requests/*.xml $(top_builddir)/vlc-$(VERSION)/share/lua/http/requests/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/requests/*.xml
-	cp $(srcdir)/share/lua/http/requests/readme $(top_builddir)/vlc-$(VERSION)/share/lua/http/requests/readme.txt
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/lua/http/requests/readme.txt
+	mkdir -p "$(win32_lua_destdir)/http/images"
+	mkdir -p "$(win32_lua_destdir)/http/requests"
+	mkdir -p "$(win32_lua_destdir)/http/js"
+	mkdir -p "$(win32_lua_destdir)/http/dialogs"
+	cp $(srcdir)/share/lua/http/*.html $(win32_lua_destdir)/http/
+	unix2dos $(win32_lua_destdir)/http/*.html
+	cp $(srcdir)/share/lua/http/.hosts $(win32_lua_destdir)/http/
+	unix2dos $(win32_lua_destdir)/http/.hosts
+	cp $(srcdir)/share/lua/http/*.css $(win32_lua_destdir)/http/
+	unix2dos $(win32_lua_destdir)/http/*.css
+	cp $(srcdir)/share/lua/http/js/*.js $(win32_lua_destdir)/http/js/
+	unix2dos $(win32_lua_destdir)/http/js/*.js
+	cp $(srcdir)/share/lua/http/dialogs/* $(win32_lua_destdir)/http/dialogs/
+	unix2dos $(win32_lua_destdir)/http/dialogs/*
+	cp $(srcdir)/share/lua/http/dialogs/.hosts $(win32_lua_destdir)/http/dialogs/
+	unix2dos $(win32_lua_destdir)/http/dialogs/.hosts
+	cp $(srcdir)/share/lua/http/*.ico $(win32_lua_destdir)/http/
+	cp $(srcdir)/share/lua/http/images/*.png $(win32_lua_destdir)/http/images/
+	cp $(srcdir)/share/lua/http/requests/*.xml $(win32_lua_destdir)/http/requests/
+	unix2dos $(win32_lua_destdir)/http/requests/*.xml
+	cp $(srcdir)/share/lua/http/requests/readme $(win32_lua_destdir)/http/requests/readme.txt
+	unix2dos $(win32_lua_destdir)/http/requests/readme.txt
 endif
 
 if BUILD_LUA
 #Lua Scripts
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/playlist
+	$(INSTALL) -d $(win32_lua_destdir)/playlist
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(top_builddir)/vlc-$(VERSION)/share/lua/playlist/`basename $${i}` ; \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/playlist/`basename $${i}` ; \
 	done
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/meta
+	$(INSTALL) -d $(win32_lua_destdir)/meta
 	for i in $(srcdir)/share/lua/meta/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(top_builddir)/vlc-$(VERSION)/share/lua/meta/`basename $${i}` ; \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/`basename $${i}` ; \
 	done
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/intf
+	$(INSTALL) -d $(win32_lua_destdir)/intf
 	for i in $(srcdir)/share/lua/intf/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(top_builddir)/vlc-$(VERSION)/share/lua/intf/`basename $${i}` ; \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/intf/`basename $${i}` ; \
 	done
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/intf/modules
+	$(INSTALL) -d $(win32_lua_destdir)/intf/modules
 	for i in $(srcdir)/share/lua/intf/modules/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(top_builddir)/vlc-$(VERSION)/share/lua/intf/modules/`basename $${i}` ; \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/intf/modules/`basename $${i}` ; \
 	done
 endif
 
 # Copy the http files
 if BUILD_HTTPD
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/http/images"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/http/requests"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/http/js"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/http/dialogs"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/http/old"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/http/old/vlm"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/share/http/old/admin"
-	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-$(VERSION)/share/http/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/*.html
-	cp $(srcdir)/share/http/.hosts $(top_builddir)/vlc-$(VERSION)/share/http/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/.hosts
-	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-$(VERSION)/share/http/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/*.css
-	cp $(srcdir)/share/http/js/*.js $(top_builddir)/vlc-$(VERSION)/share/http/js/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/js/*.js
-	cp $(srcdir)/share/http/dialogs/* $(top_builddir)/vlc-$(VERSION)/share/http/dialogs/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/dialogs/*
-	cp $(srcdir)/share/http/dialogs/.hosts $(top_builddir)/vlc-$(VERSION)/share/http/dialogs/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/dialogs/.hosts
-	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-$(VERSION)/share/http/
-	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-$(VERSION)/share/http/images/
-	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-$(VERSION)/share/http/requests/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/requests/*.xml
-	cp $(srcdir)/share/http/requests/readme $(top_builddir)/vlc-$(VERSION)/share/http/requests/readme.txt
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/requests/readme.txt
+	mkdir -p "$(win32_http_destdir)/images"
+	mkdir -p "$(win32_http_destdir)/requests"
+	mkdir -p "$(win32_http_destdir)/js"
+	mkdir -p "$(win32_http_destdir)/dialogs"
+	mkdir -p "$(win32_http_destdir)/old"
+	mkdir -p "$(win32_http_destdir)/old/vlm"
+	mkdir -p "$(win32_http_destdir)/old/admin"
+	cp $(srcdir)/share/http/*.html $(win32_http_destdir)/
+	unix2dos $(win32_http_destdir)/*.html
+	cp $(srcdir)/share/http/.hosts $(win32_http_destdir)/
+	unix2dos $(win32_http_destdir)/.hosts
+	cp $(srcdir)/share/http/*.css $(win32_http_destdir)/
+	unix2dos $(win32_http_destdir)/*.css
+	cp $(srcdir)/share/http/js/*.js $(win32_http_destdir)/js/
+	unix2dos $(win32_http_destdir)/js/*.js
+	cp $(srcdir)/share/http/dialogs/* $(win32_http_destdir)/dialogs/
+	unix2dos $(win32_http_destdir)/dialogs/*
+	cp $(srcdir)/share/http/dialogs/.hosts $(win32_http_destdir)/dialogs/
+	unix2dos $(win32_http_destdir)/dialogs/.hosts
+	cp $(srcdir)/share/http/*.ico $(win32_http_destdir)/
+	cp $(srcdir)/share/http/images/*.png $(win32_http_destdir)/images/
+	cp $(srcdir)/share/http/requests/*.xml $(win32_http_destdir)/requests/
+	unix2dos $(win32_http_destdir)/requests/*.xml
+	cp $(srcdir)/share/http/requests/readme $(win32_http_destdir)/requests/readme.txt
+	unix2dos $(win32_http_destdir)/requests/readme.txt
 
-	cp $(srcdir)/share/http/old/*.html $(top_builddir)/vlc-$(VERSION)/share/http/old/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/old/*.html
-	cp $(srcdir)/share/http/old/*.css $(top_builddir)/vlc-$(VERSION)/share/http/old/
-	cp $(srcdir)/share/http/old/.hosts $(top_builddir)/vlc-$(VERSION)/share/http/old/
-	cp $(srcdir)/share/http/old/*.png $(top_builddir)/vlc-$(VERSION)/share/http/old/
-	cp $(srcdir)/share/http/old/vlm/*.html $(top_builddir)/vlc-$(VERSION)/share/http/old/vlm/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/old/vlm/*.html
-	cp $(srcdir)/share/http/old/admin/*.html $(top_builddir)/vlc-$(VERSION)/share/http/old/admin/
-	unix2dos $(top_builddir)/vlc-$(VERSION)/share/http/old/admin/*.html
-	cp $(srcdir)/share/http/old/admin/.access $(top_builddir)/vlc-$(VERSION)/share/http/old/admin/
+	cp $(srcdir)/share/http/old/*.html $(win32_http_destdir)/old/
+	unix2dos $(win32_http_destdir)/old/*.html
+	cp $(srcdir)/share/http/old/*.css $(win32_http_destdir)/old/
+	cp $(srcdir)/share/http/old/.hosts $(win32_http_destdir)/old/
+	cp $(srcdir)/share/http/old/*.png $(win32_http_destdir)/old/
+	cp $(srcdir)/share/http/old/vlm/*.html $(win32_http_destdir)/old/vlm/
+	unix2dos $(win32_http_destdir)/old/vlm/*.html
+	cp $(srcdir)/share/http/old/admin/*.html $(win32_http_destdir)/old/admin/
+	unix2dos $(win32_http_destdir)/old/admin/*.html
+	cp $(srcdir)/share/http/old/admin/.access $(win32_http_destdir)/old/admin/
 endif
 
 if BUILD_SKINS
 # Skins
-	mkdir -p $(top_builddir)/vlc-$(VERSION)/skins/fonts
+	mkdir -p $(win32_destdir)/skins/fonts
 	for i in $(srcdir)/share/skins2/fonts/*.*; do \
-	  cp -- "$$i" $(top_builddir)/vlc-$(VERSION)/skins/fonts/ || true ; \
+	  cp -- "$$i" $(win32_destdir)/skins/fonts/ || true ; \
 	done
 	for i in $(srcdir)/share/skins2/*.*; do \
-	  cp -- "$$i" $(top_builddir)/vlc-$(VERSION)/skins/ || true ; \
+	  cp -- "$$i" $(win32_destdir)/skins/ || true ; \
 	done
 endif
 
 if BUILD_OSDMENU
 #OSD Menu
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/osdmenu"
-	cp $(srcdir)/share/osdmenu/*.* "$(top_builddir)/vlc-$(VERSION)/osdmenu"
+	mkdir -p "$(win32_destdir)/osdmenu"
+	cp $(srcdir)/share/osdmenu/*.* "$(win32_destdir)/osdmenu"
 	for dir in dvd dvd/selected dvd/unselect dvd/selection dvd/volume default default/selected default/selection default/volume minimal;do \
-		mkdir -p "$(top_builddir)/vlc-$(VERSION)/osdmenu/$$dir"; \
-		for file in $(srcdir)/share/osdmenu/$${dir}/* ;do \
-			 cp -- "$$file" "$(top_builddir)/vlc-$(VERSION)/osdmenu/$$dir"; \
+		mkdir -p "$(win32_destdir)/osdmenu/$$dir"; \
+		for file in $(srcdir)/share/osdmenu/$${dir}/*.png ;do \
+			 cp -- "$$file" "$(win32_destdir)/osdmenu/$$dir"; \
 		done; \
 	done
-	unix2dos $(top_builddir)/vlc-$(VERSION)/osdmenu/*.cfg;
-	for file in $(top_builddir)/vlc-$(VERSION)/osdmenu/*.cfg; do \
+	unix2dos $(win32_destdir)/osdmenu/*.cfg;
+	for file in $(win32_destdir)/osdmenu/*.cfg; do \
 		sed 's%share/osdmenu%osdmenu%g' "$$file" > "$$file.tmp" || exit $$? ; \
 		sed 's%/%\\%g' "$$file.tmp" > "$$file" || exit$$? ; \
 		rm -f -- "$$file.tmp"; \
@@ -846,8 +850,8 @@ if BUILD_OSDMENU
 endif
 
 # SDK
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/sdk.tmp"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/sdk"
+	mkdir -p "$(win32_destdir)/sdk.tmp"
+	mkdir -p "$(win32_destdir)/sdk"
 	d=$$(pwd) && \
 	cd src && \
 	make install DESTDIR="$$d/vlc-$(VERSION)/sdk.tmp"
@@ -855,6 +859,7 @@ endif
 	find vlc-$(VERSION)/sdk.tmp -type d | sort -r | xargs rmdir
 	rm -Rf vlc-$(VERSION)/sdk/bin
 
+#strip exe and main dll
 package-win-common-strip: package-win32-base-debug
 	$(STRIP) "vlc-$(VERSION)/vlc$(EXEEXT)"
 	$(STRIP) "vlc-$(VERSION)/libvlccore$(LIBEXT)"
@@ -866,12 +871,14 @@ if BUILD_ACTIVEX
 	$(STRIP) "vlc-$(VERSION)/activex/axvlc$(LIBEXT)"
 endif
 
+#strip all plugins dll
 package-win32-base: package-win-common-strip
-	for i in "" $(top_builddir)/vlc-$(VERSION)/plugins/*$(LIBEXT) ; \
+	for i in "" $(win32_destdir)/plugins/*$(LIBEXT) ; \
 	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
 
 package-win32-base-exe: package-win32-base
 # Create package
+    rm -Rf $(win32_destdir)/sdk
 	if makensis -VERSION >/dev/null 2>&1; then \
 	    MAKENSIS="makensis"; \
 	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
@@ -883,14 +890,7 @@ package-win32-base-exe: package-win32-base
 	else \
 	    echo 'Error: cannot locate makensis tool'; exit 1; \
 	fi; \
-	eval "$$MAKENSIS $(top_builddir)/vlc-$(VERSION)/vlc.win32.nsi"
-
-package-win32-base-exe-cygwin: package-win32-base-exe
-# Create package
-
-package-win32-base-exe-linux:
-# Create package
-	makensis $(top_builddir)/vlc-$(VERSION)/vlc.win32.nsi
+	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
 
 package-win32-base-zip: package-win32-base
 # Create package 
@@ -903,25 +903,21 @@ package-win32-base-7zip: package-win32-base
 
 package-win32-exe: package-win32-base package-win32-base-exe
 # Clean up
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
-
-package-win32-exe-linux: package-win32-base package-win32-base-exe-linux
-# Clean up
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
+	rm -Rf $(win32_destdir)
 
 package-win32-zip: package-win32-base-zip
 # Clean up
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
+	rm -Rf $(win32_destdir)
 
 package-win32-7zip: package-win32-base-7zip
 # Clean up
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
+	rm -Rf $(win32_destdir)
 
-package-win32-no-clean: package-win32-base-exe package-win32-base-zip package-win32-base-7zip
+package-win32-no-clean: package-win32-base-zip package-win32-base-7zip package-win32-base-exe 
 
 package-win32: package-win32-no-clean
 # Clean up
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
+	rm -Rf $(win32_destdir)
 
 package-wince-base: package-win-common package-win-common-strip
 
@@ -931,7 +927,7 @@ package-wince-base-zip:
 
 package-wince: package-wince-base  package-wince-base-zip
 # Clean up
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
+	rm -Rf $(win32_destdir)
 
 
 package-beos:
