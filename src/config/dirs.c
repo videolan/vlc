@@ -74,29 +74,7 @@ const char *config_GetDataDir( void )
 #endif
 }
 
-/**
- * Determines the system configuration directory.
- *
- * @return a string (always succeeds).
- */
-const char *config_GetConfDir( void )
-{
-#if defined (WIN32) || defined(__APPLE__) || defined (SYS_BEOS)
-    static char path[PATH_MAX] = "";
-
-    if( *path == '\0' )
-    {
-        snprintf( path, sizeof( path ), "%s"DIR_SEP DIR_SHARE, /* FIXME: Duh? */
-                  vlc_global()->psz_vlcpath );
-        path[sizeof( path ) - 1] = '\0';
-    }
-    return path;
-#else
-    return SYSCONFDIR;
-#endif
-}
-
-static const char *GetDir( bool b_appdata )
+static const char *GetDir( bool b_appdata, bool b_common_appdata )
 {
     /* FIXME: a full memory page here - quite a waste... */
     static char homedir[PATH_MAX] = "";
@@ -109,18 +87,23 @@ static const char *GetDir( bool b_appdata )
 # else
     /* Get the "Application Data" folder for the current user */
     if( S_OK == SHGetFolderPathW( NULL,
-              (b_appdata ? CSIDL_APPDATA : CSIDL_PERSONAL) | CSIDL_FLAG_CREATE,
+              (b_appdata ? CSIDL_APPDATA :
+               (b_common_appdata ? CSIDL_PERSONAL : CSIDL_COMMON_APPDATA))
+              | CSIDL_FLAG_CREATE,
                                   NULL, SHGFP_TYPE_CURRENT, wdir ) )
 # endif
     {
         static char appdir[PATH_MAX] = "";
+        static char comappdir[PATH_MAX] = "";
         WideCharToMultiByte (CP_UTF8, 0, wdir, -1,
-                             b_appdata ? appdir : homedir, PATH_MAX,
-                             NULL, NULL);
-        return b_appdata ? appdir : homedir;
+                             b_appdata ? appdir :
+                             (b_common_appdata ? comappdir :homedir),
+                              PATH_MAX, NULL, NULL);
+        return b_appdata ? appdir : (b_common_appdata ? comappdir :homedir);
     }
 #else
     (void)b_appdata;
+    (void)b_common_appdata;
 #endif
 
 #ifdef LIBVLC_USE_PTHREAD
@@ -158,18 +141,42 @@ static const char *GetDir( bool b_appdata )
 }
 
 /**
+ * Determines the system configuration directory.
+ *
+ * @return a string (always succeeds).
+ */
+const char *config_GetConfDir( void )
+{
+#if defined (WIN32)
+    return GetDir( false, true );
+#elif defined(__APPLE__) || defined (SYS_BEOS)
+    static char path[PATH_MAX] = "";
+
+    if( *path == '\0' )
+    {
+        snprintf( path, sizeof( path ), "%s"DIR_SEP DIR_SHARE, /* FIXME: Duh? */
+                  vlc_global()->psz_vlcpath );
+        path[sizeof( path ) - 1] = '\0';
+    }
+    return path;
+#else
+    return SYSCONFDIR;
+#endif
+}
+
+/**
  * Get the user's home directory
  */
 const char *config_GetHomeDir( void )
 {
-    return GetDir (false);
+    return GetDir (false, false);
 }
 
 static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
 {
     char *psz_dir;
 #if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
-    const char *psz_parent = GetDir (true);
+    const char *psz_parent = GetDir (true, false);
 
     if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
         psz_dir = NULL;
