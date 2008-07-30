@@ -5,7 +5,7 @@
 
 !define PRODUCT_NAME "VLC media player"
 !define VERSION @VERSION@
-!define PRODUCT_VERSION @VERSION@ 
+!define PRODUCT_VERSION @VERSION@
 !define PRODUCT_GROUP "VideoLAN"
 !define PRODUCT_PUBLISHER "VideoLAN Team"
 !define PRODUCT_WEB_SITE "http://www.videolan.org"
@@ -424,7 +424,7 @@ Section "Media player (required)" SEC01
   WriteRegStr HKCR Applications\vlc.exe\shell\Play\command "" \
     '$INSTDIR\vlc.exe --started-from-file "%1"'
   !insertmacro MacroAllExtensions WriteRegStrSupportedTypes
-  
+
 ; Vista Registration
   ; Vista detection
   ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
@@ -500,7 +500,7 @@ Section /o "Mozilla plugin" SEC03
   WriteRegStr HKLM ${Moz} "Vendor" "VideoLAN"
   WriteRegStr HKLM ${Moz} "Version" "${VERSION}"
 
- ; for very old version of mozilla, these lines may be needed 
+ ; for very old version of mozilla, these lines may be needed
  ;Push $R0
  ;Push $R1
  ;Push $R2
@@ -544,10 +544,10 @@ Section "Discs Playback" SEC05
   SectionIn 1 2 3
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" "Play with VLC media player"
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
-    "$INSTDIR\vlc.exe --started-from-file cdda:%1"
+    "$INSTDIR\vlc.exe --started-from-file cdda://%1"
   WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" "Play with VLC media player"
   WriteRegStr HKCR "DVD\shell\PlayWithVLC\command" "" \
-    "$INSTDIR\vlc.exe --started-from-file dvd:%1"
+    "$INSTDIR\vlc.exe --started-from-file dvd://%1"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" "VLCPlayDVDMovieOnArrival" ""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" "Play DVD movie"
@@ -565,12 +565,12 @@ Section "Discs Playback" SEC05
   WriteRegStr HKCR "VLC.DVDMovie" "" "VLC DVD Movie"
   WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Play"
   WriteRegStr HKCR "VLC.DVDMovie\shell\Play\command" "" \
-    '$INSTDIR\vlc.exe --started-from-file dvd:%1'
+    '$INSTDIR\vlc.exe --started-from-file dvd://%1'
   WriteRegStr HKCR "VLC.DVDMovie\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKCR "VLC.CDAudio" "" "VLC CD Audio"
   WriteRegStr HKCR "VLC.CDAudio\shell" "" "Play"
   WriteRegStr HKCR "VLC.CDAudio\shell\Play\command" "" \
-    '$INSTDIR\vlc.exe --started-from-file cdda:%1'
+    '$INSTDIR\vlc.exe --started-from-file cdda://%1'
   WriteRegStr HKCR "VLC.CDAudio\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 SectionEnd
@@ -674,7 +674,7 @@ Function un.TrimNewlines
  Push $R1
  Push $R2
  StrCpy $R1 0
- 
+
  loop:
    IntOp $R1 $R1 - 1
    StrCpy $R2 $R0 1 $R1
@@ -683,7 +683,7 @@ Function un.TrimNewlines
    IntOp $R1 $R1 + 1
    IntCmp $R1 0 no_trim_needed
    StrCpy $R0 $R0 $R1
- 
+
  no_trim_needed:
    Pop $R2
    Pop $R1
