@@ -311,7 +311,7 @@ void UpdateDialog::updateNotify( bool b_result )
             update_release_t *p_release = update_GetRelease( p_update );
             assert( p_release );
             b_checked = true;
-            updateButton->setText( "Yes" );
+            updateButton->setText( qtr( "&Yes" ) );
             QString message = qtr( "A new version of VLC(" )
                               + QString::number( p_release->i_major ) + "."
                               + QString::number( p_release->i_minor ) + "."
