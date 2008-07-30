@@ -512,6 +512,7 @@ static void AStreamDestroy( stream_t *s )
     vlc_object_detach( s );
 
     if( p_sys->method == Block ) block_ChainRelease( p_sys->block.p_first );
+    else if ( p_sys->method == Immediate ) free( p_sys->immediate.p_buffer );
     else free( p_sys->stream.p_buffer );
 
     free( p_sys->p_peek );
