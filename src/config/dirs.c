@@ -46,6 +46,12 @@
 #include <assert.h>
 #include <limits.h>
 
+#if defined( WIN32 )
+# define DIR_SHARE ""
+#else
+# define DIR_SHARE "share"
+#endif
+
 /**
  * config_GetDataDir: find directory where shared data is installed
  *
@@ -58,7 +64,7 @@ const char *config_GetDataDir( void )
 
     if( *path == '\0' )
     {
-        snprintf( path, sizeof( path ), "%s/share",
+        snprintf( path, sizeof( path ), "%s" DIR_SEP DIR_SHARE,
                   vlc_global()->psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
@@ -80,7 +86,7 @@ const char *config_GetConfDir( void )
 
     if( *path == '\0' )
     {
-        snprintf( path, sizeof( path ), "%s"DIR_SEP"share", /* FIXME: Duh? */
+        snprintf( path, sizeof( path ), "%s"DIR_SEP DIR_SHARE, /* FIXME: Duh? */
                   vlc_global()->psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
@@ -103,7 +109,7 @@ static const char *GetDir( bool b_appdata )
 # else
     /* Get the "Application Data" folder for the current user */
     if( S_OK == SHGetFolderPathW( NULL,
-              (b_appdata ? CSIDL_APPDATA : CSIDL_PROFILE) | CSIDL_FLAG_CREATE,
+              (b_appdata ? CSIDL_APPDATA : CSIDL_PERSONAL) | CSIDL_FLAG_CREATE,
                                   NULL, SHGFP_TYPE_CURRENT, wdir ) )
 # endif
     {
