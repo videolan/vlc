@@ -1311,13 +1311,3 @@ modules/visualization/visual/fft.c
 modules/visualization/visual/fft.h
 modules/visualization/visual/visual.c
 modules/visualization/visual/visual.h
-#bindings
-bindings/python/vlcglue.h
-bindings/python/vlc_instance.c
-bindings/python/vlc_internal.c
-bindings/python/vlc_internal.h
-bindings/python/vlc_media.c
-bindings/python/vlc_mediacontrol.c
-bindings/python/vlc_mediaplayer.c
-bindings/python/vlc_module.c
-bindings/python/vlc_position.c

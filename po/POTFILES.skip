@@ -1,6 +1,8 @@
+bindings/python/vlcwidget.py
 extras/misc/mpris.glade
 libs/loader/driver.c
 libs/loader/ldt_keeper.c
+modules/gui/pda/pda.glade
 modules/gui/wxwidgets/dialogs/bookmarks.cpp
 modules/gui/wxwidgets/dialogs/fileinfo.cpp
 modules/gui/wxwidgets/dialogs/infopanels.cpp
@@ -17,6 +19,7 @@ modules/gui/wxwidgets/dialogs/updatevlc.cpp
 modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp
 modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp
 modules/gui/wxwidgets/dialogs/wizard.cpp
+modules/gui/wxwidgets/dialogs.cpp
 modules/gui/wxwidgets/extrapanel.cpp
 modules/gui/wxwidgets/input_manager.cpp
 modules/gui/wxwidgets/interface.cpp
@@ -24,3 +27,4 @@ modules/gui/wxwidgets/menus.cpp
 modules/gui/wxwidgets/playlist_manager.cpp
 modules/gui/wxwidgets/streamdata.cpp
 modules/gui/wxwidgets/wxwidgets.cpp
+
