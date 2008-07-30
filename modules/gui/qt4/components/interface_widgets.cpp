@@ -925,19 +925,19 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     /* First line */
     slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);
     fsLayout->addWidget( slowerButton, 0, 0 );
-    fsLayout->addWidget( slider, 0, 1, 1, 6 );
-    fsLayout->addWidget( fasterButton, 0, 7 );
+    fsLayout->addWidget( slider, 0, 1, 1, 8 );
+    fsLayout->addWidget( fasterButton, 0, 9 );
 
-    fsLayout->addWidget( playButton, 1, 0 );
-    fsLayout->addLayout( controlButLayout, 1, 1 );
+    fsLayout->addWidget( playButton, 1, 0, 1, 2 );
+    fsLayout->addLayout( controlButLayout, 1, 2 );
 
-    fsLayout->addWidget( discFrame, 1, 2 );
-    fsLayout->addWidget( telexFrame, 1, 3 );
-    fsLayout->addWidget( advControls, 1, 4, Qt::AlignVCenter );
-    fsLayout->addWidget( fullscreenButton, 1, 5 );
+    fsLayout->addWidget( discFrame, 1, 3 );
+    fsLayout->addWidget( telexFrame, 1, 4 );
+    fsLayout->addWidget( advControls, 1, 5, Qt::AlignVCenter );
+    fsLayout->addWidget( fullscreenButton, 1, 6 );
 
-    fsLayout->addWidget( volMuteLabel, 1, 6);
-    fsLayout->addWidget( volumeSlider, 1, 7 );
+    fsLayout->addWidget( volMuteLabel, 1, 7 );
+    fsLayout->addWidget( volumeSlider, 1, 8, 1, 2 );
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
