@@ -1628,6 +1628,7 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     static const struct {
         uint32_t u_n /* numerator */, u_d /* denominator */;
     } dirac_frate_tbl[] = { /* table 10.3 */
+        {1,1}, /* this first value is never used */
         {24000,1001}, {24,1}, {25,1}, {30000,1001}, {30,1},
         {50,1}, {60000,1001}, {60,1}, {15000,1001}, {25,2},
     };
