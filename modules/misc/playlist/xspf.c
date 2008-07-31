@@ -77,8 +77,8 @@ int xspf_export_playlist( vlc_object_t *p_this )
     if( psz_temp && *psz_temp )
     {
         fprintf( p_export->p_file, "\t<location>%s</location>\n", psz_temp );
-        free( psz_temp );
     }
+    free( psz_temp );
 
     /* export all items in a flat format */
     fprintf( p_export->p_file, "\t<trackList>\n" );
