@@ -82,7 +82,7 @@ vlc_module_begin();
      add_bool( "jack-input-use-vlc-pace", false, NULL,
          PACE_TEXT, PACE_LONGTEXT, true );
      add_bool( "jack-input-auto-connect", false, NULL,
-         PACE_TEXT, PACE_LONGTEXT, true );
+         AUTO_CONNECT_TEXT, AUTO_CONNECT_LONGTEXT, true );
 
      add_shortcut( "jack" );
      set_callbacks( Open, Close );
