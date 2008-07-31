@@ -501,6 +501,9 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 
     vlc_object_lock( p_this );
 
+    /* Make sure we don't re-create a thread if the object has already one */
+    assert( !p_priv->b_thread );
+
 #if defined( LIBVLC_USE_PTHREAD )
     pthread_attr_t attr;
     pthread_attr_init (&attr);
