@@ -624,13 +624,8 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 
     if( !p_priv->b_thread )
     {
-#ifndef __APPLE__
         msg_Err( p_this, "couldn't set priority of non-existent thread" );
         return ESRCH;
-#else
-# warning FIXME: this is wrong
-        p_priv->b_thread = pthread_self();
-#endif
     }
 
 #if defined( LIBVLC_USE_PTHREAD )

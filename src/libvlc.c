@@ -306,12 +306,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         return VLC_EGENERIC;
     }
 
-#ifdef __APPLE__
-    /* vlc_thread_set_priority needs to query the config,
-     * so this is the earliest moment where we can set this */
-    vlc_thread_set_priority( p_libvlc, VLC_THREAD_PRIORITY_LOW );
-#endif
-
     /* Check for short help option */
     if( config_GetInt( p_libvlc, "help" ) > 0 )
     {
