@@ -266,6 +266,7 @@ static int CreateFilter( vlc_object_t *p_this )
     {
         vlc_mutex_unlock( &p_sys->lock );
         vlc_mutex_destroy( &p_sys->lock );
+        free( p_sys->psz_urls );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -277,6 +278,7 @@ static int CreateFilter( vlc_object_t *p_this )
         free( p_sys->psz_marquee );
         vlc_mutex_unlock( &p_sys->lock );
         vlc_mutex_destroy( &p_sys->lock );
+        free( p_sys->psz_urls );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -301,6 +303,7 @@ static int CreateFilter( vlc_object_t *p_this )
         free( p_sys->psz_marquee );
         vlc_mutex_unlock( &p_sys->lock );
         vlc_mutex_destroy( &p_sys->lock );
+        free( p_sys->psz_urls );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -312,6 +315,7 @@ static int CreateFilter( vlc_object_t *p_this )
         free( p_sys->psz_marquee );
         vlc_mutex_unlock( &p_sys->lock );
         vlc_mutex_destroy( &p_sys->lock );
+        free( p_sys->psz_urls );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -324,6 +328,7 @@ static int CreateFilter( vlc_object_t *p_this )
             FreeRSS( p_filter );
             vlc_mutex_unlock( &p_sys->lock );
             vlc_mutex_destroy( &p_sys->lock );
+            free( p_sys->psz_urls );
             free( p_sys );
             return VLC_EGENERIC;
         }

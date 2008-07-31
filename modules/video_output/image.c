@@ -174,6 +174,7 @@ static int Create( vlc_object_t *p_this )
     {
         msg_Err( p_this, "unable to create image handler") ;
         FREENULL( p_vout->p_sys->psz_prefix );
+        FREENULL( p_vout->p_sys->psz_format );
         FREENULL( p_vout->p_sys );
         return VLC_EGENERIC;
     }

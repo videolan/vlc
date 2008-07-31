@@ -331,6 +331,8 @@ static int Create( vlc_object_t *p_this )
     if( !p_logo_list->psz_filename || !*p_logo_list->psz_filename )
     {
         msg_Err( p_vout, "logo file not specified" );
+        free( p_logo_list->psz_filename );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
