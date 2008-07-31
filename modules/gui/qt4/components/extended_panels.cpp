@@ -1101,7 +1101,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
     QGridLayout *layout = new QGridLayout( this );
     layout->setMargin( 0 );
 
-    enableCheck = new QCheckBox( qfu( "Enable spatializer" ) );
+    enableCheck = new QCheckBox( qtr( "Enable spatializer" ) );
     layout->addWidget( enableCheck, 0, 0, 1, NUM_SP_CTRL );
 
     for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
