@@ -146,6 +146,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "cannot open esound socket (format 0x%08x at %d Hz)",
                          p_sys->esd_format, p_aout->output.output.i_rate );
+        free( psz_server );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -180,6 +181,7 @@ static int Open( vlc_object_t *p_this )
       / p_aout->output.output.i_bytes_per_frame
       / p_aout->output.output.i_rate;
 
+    free( psz_server );
     close( i_newfd );
     return VLC_SUCCESS;
 }
