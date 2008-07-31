@@ -338,8 +338,10 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
         }
     }
 
-    var_CreateGetString( p_aout,"equalizer-bands" );
-    var_CreateGetString( p_aout, "equalizer-preset" );
+    char *psz_tmp = var_CreateGetString( p_aout,"equalizer-bands" );
+    free( psz_tmp );
+    psz_tmp = var_CreateGetString( p_aout, "equalizer-preset" );
+    free( psz_tmp );
 
     p_sys->b_2eqz = var_CreateGetBool( p_aout, "equalizer-2pass" );
 
