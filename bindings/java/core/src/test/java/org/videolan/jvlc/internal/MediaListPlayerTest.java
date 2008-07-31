@@ -27,6 +27,7 @@ package org.videolan.jvlc.internal;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Test;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
@@ -37,6 +38,8 @@ import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 public class MediaListPlayerTest extends AbstractVLCInternalTest
 {
+
+    private LibVlcMediaListPlayer current;
 
     @Test
     public void mediaListPlayerNewTest()
@@ -103,6 +106,7 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
+        current = mediaListPlayer;
         LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
         LibVlcMediaDescriptor mediaDescriptor = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         libvlc.libvlc_media_list_add_media(mediaList, mediaDescriptor, exception);
@@ -138,6 +142,11 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
             Thread.sleep(150);
         }
         libvlc.libvlc_media_list_player_stop(mediaListPlayer, exception);
+        while (libvlc.libvlc_media_list_player_get_state(mediaListPlayer, exception) != LibVlcState.libvlc_Ended
+            .ordinal())
+        {
+            Thread.sleep(100);
+        }
         libvlc.libvlc_media_release(mediaDescriptor);
         libvlc.libvlc_media_list_release(mediaList);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
@@ -296,6 +305,29 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
             mediaListPlayer,
             exception));
         libvlc.libvlc_media_list_release(mediaList);
+    }
+
+    @Override
+    @After
+    public void tearDown()
+    {
+        if (current != null)
+        {
+            libvlc.libvlc_media_list_player_stop(current, exception);
+            while (libvlc.libvlc_media_list_player_get_state(current, exception) != LibVlcState.libvlc_Ended.ordinal())
+            {
+                try
+                {
+                    Thread.sleep(100);
+                }
+                catch (InterruptedException e)
+                {
+                    //
+                }
+            }
+        }
+        current = null;
+        super.tearDown();
     }
 
 }

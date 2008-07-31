@@ -106,6 +106,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
         libvlc.libvlc_media_player_play(mi, exception);
         Thread.sleep(100);
         libvlc.libvlc_media_player_stop(mi, exception);
+        Thread.sleep(500);
         Assert.assertEquals(0, exception.raised);
     }
     
