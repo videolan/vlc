@@ -362,6 +362,8 @@ static struct
       VIDEO_ES, "Avid Motion JPEG" },
     { VLC_FOURCC( 'd','m','b','1' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG OpenDML Video" },
+    { VLC_FOURCC( 'I','J','P','G' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Intergraph JPEG Video" },
 
     /* SP5x */
     { VLC_FOURCC( 'S','P','5','X' ), CODEC_ID_SP5X,
