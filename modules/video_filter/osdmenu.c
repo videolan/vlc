@@ -272,6 +272,7 @@ error:
 
     osd_MenuDelete( p_this, p_sys->p_menu );
     p_sys->p_menu = NULL;
+    free( p_sys->psz_path );
     free( p_sys->psz_file );
     free( p_sys );
     return VLC_EGENERIC;
@@ -324,6 +325,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     {
         osd_MenuDelete( p_filter, p_sys->p_menu );
 
+        free( p_sys->psz_path );
         free( p_sys->psz_file );
         free( p_sys );
     }
