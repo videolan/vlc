@@ -156,8 +156,7 @@ static void Run( services_discovery_t *p_sd )
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
 
     /* Launch the callback associated with this variable */
-    char *psz_urls = var_CreateGetString( p_sd, "podcast-urls" );
-    free( psz_urls );
+    var_Create( p_sd, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
 
     while( vlc_object_alive (p_sd) )
@@ -166,7 +165,7 @@ static void Run( services_discovery_t *p_sd )
         if( p_sys->b_update == true )
         {
             msg_Dbg( p_sd, "Update required" );
-            psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
+            char* psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
             if( psz_urls != NULL )
                 ParseUrls( p_sd, psz_urls );
             free( psz_urls );
