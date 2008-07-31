@@ -186,7 +186,10 @@ static inline bool AoutChangeFilterString( vlc_object_t *p_obj, aout_instance_t 
     {
         char *psz_old = val.psz_string;
         if( *psz_old )
-            asprintf( &val.psz_string, "%s:%s", psz_old, psz_name );
+        {
+            if( asprintf( &val.psz_string, "%s:%s", psz_old, psz_name ) == -1 )
+                val.psz_string = NULL;
+        }
         else
             val.psz_string = strdup( psz_name );
         free( psz_old );
