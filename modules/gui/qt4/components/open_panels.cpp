@@ -273,9 +273,9 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 DiscOpenPanel::~DiscOpenPanel()
 {
-    delete psz_dvddiscpath;
-    delete psz_vcddiscpath;
-    delete psz_cddadiscpath;
+    free( psz_dvddiscpath );
+    free( psz_vcddiscpath );
+    free( psz_cddadiscpath );
 }
 
 void DiscOpenPanel::clear()

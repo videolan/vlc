@@ -365,8 +365,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 {
                     ui.DVDDevice->setText( qfu( psz_dvddiscpath ) );
                 }
-                delete psz_cddadiscpath; delete psz_dvddiscpath;
-                delete psz_vcddiscpath;
+                free( psz_cddadiscpath );
+                free( psz_dvddiscpath );
+                free( psz_vcddiscpath );
             }
 
             CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
