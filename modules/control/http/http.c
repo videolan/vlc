@@ -142,6 +142,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
     {
+        free( psz_address );
         return( VLC_ENOMEM );
     }
 

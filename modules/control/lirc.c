@@ -98,6 +98,7 @@ static int Open( vlc_object_t *p_this )
     if( i_fd == -1 )
     {
         msg_Err( p_intf, "lirc initialisation failed" );
+        free( p_intf->p_sys->psz_file );
         free( p_intf->p_sys );
         return 1;
     }
@@ -109,6 +110,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_intf, "failure while reading lirc config" );
         lirc_deinit();
+        free( p_intf->p_sys->psz_file );
         free( p_intf->p_sys );
         return 1;
     }

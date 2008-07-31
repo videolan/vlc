@@ -154,6 +154,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( !psz_file )
     {
         msg_Err( p_dec, "specify a file with --fake-file=..." );
+        free( p_dec->p_sys );
         return VLC_EGENERIC;
     }
     var_AddCallback( p_dec, "fake-file", FakeCallback, p_dec );
@@ -222,6 +223,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     if ( p_image == NULL )
     {
         msg_Err( p_dec, "unable to read image file %s", psz_file );
+        free( psz_file );
+        free( p_dec->p_sys );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_dec, "file %s loaded successfully", psz_file );
