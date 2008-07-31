@@ -547,10 +547,8 @@ static void Run( services_discovery_t *p_sd )
 
     psz_addr = var_CreateGetString( p_sd, "sap-addr" );
     if( psz_addr && *psz_addr )
-    {
         InitSocket( p_sd, psz_addr, SAP_PORT );
-        free( psz_addr );
-    }
+    free( psz_addr );
 
     if( p_sd->p_sys->i_fd == 0 )
     {
