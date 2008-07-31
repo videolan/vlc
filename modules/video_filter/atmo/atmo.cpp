@@ -1176,7 +1176,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
                                           "error %d",psz_gradient_file,i_res);
                     }
                 }
-                delete psz_gradient_file;
+                free( psz_gradient_file );
             }
 
             p_sys->p_atmo_dyndata = new CAtmoDynData((vlc_object_t *)p_filter,
