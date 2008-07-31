@@ -266,8 +266,8 @@ static int Init( vout_thread_t *p_vout )
         {
             msg_Warn( p_vout, "invalid aspect ratio specification" );
         }
-        free( psz_aspect );
     }
+    free( psz_aspect );
 
     i_xpos = var_CreateGetInteger( p_vout, "video-x" );
     i_ypos = var_CreateGetInteger( p_vout, "video-y" );
