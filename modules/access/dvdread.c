@@ -222,25 +222,10 @@ static int Open( vlc_object_t *p_this )
         psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
 #endif
 
-    /* Override environment variable DVDCSS_METHOD with config option
-     * (FIXME: this creates a small memory leak) */
+    /* Override environment variable DVDCSS_METHOD with config option */
     psz_dvdcss_env = config_GetPsz( p_demux, "dvdread-css-method" );
     if( psz_dvdcss_env && *psz_dvdcss_env )
-    {
-        char *psz_env;
-
-        psz_env = malloc( strlen("DVDCSS_METHOD=") +
-                          strlen( psz_dvdcss_env ) + 1 );
-        if( !psz_env )
-        {
-            free( psz_dvdcss_env );
-            return VLC_ENOMEM;
-        }
-
-        sprintf( psz_env, "%s%s", "DVDCSS_METHOD=", psz_dvdcss_env );
-
-        putenv( psz_env );
-    }
+        setenv( "DVDCSS_METHOD", psz_dvdcss_env, 1 );
     free( psz_dvdcss_env );
 
     /* Open dvdread */
