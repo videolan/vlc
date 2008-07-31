@@ -597,6 +597,7 @@ int CDDAOpen( vlc_object_t *p_this )
 
     if( !psz_source || !*psz_source )
     {
+        free( psz_source );
         /* No device/track given. Continue only when this plugin was
            selected */
         if( !p_this->b_force )
@@ -804,6 +805,7 @@ int CDDAOpen( vlc_object_t *p_this )
     var_Create( p_access, MODULE_STRING "-caching",
                 VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     vlc_object_release( p_cdda->p_input );
+    free( psz_source );
     return VLC_SUCCESS;
 
  error:
