@@ -155,8 +155,9 @@ static void Run( services_discovery_t *p_sd )
 {
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
 
+    /* Launch the callback associated with this variable */
     char *psz_urls = var_CreateGetString( p_sd, "podcast-urls" );
-    free( psz_urls ); /* Gruik ? */
+    free( psz_urls );
     var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
 
     while( vlc_object_alive (p_sd) )
