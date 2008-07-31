@@ -295,7 +295,7 @@ int input_ItemAddInfo( input_item_t *p_i,
     }
 
     va_start( args, psz_format );
-    if( vasprintf( &p_info->psz_value, psz_format, args) )
+    if( vasprintf( &p_info->psz_value, psz_format, args) == -1 )
         p_info->psz_value = NULL;
     va_end( args );
 
