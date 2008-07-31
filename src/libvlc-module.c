@@ -1000,8 +1000,8 @@ static const char *const ppsz_clock_descriptions[] =
      "This option is useful if you want to lower the latency when " \
      "reading a stream")
 
-#define AUTO_ADJUST_PTS_DELAY N_("(Experimental) Auto adjust the caching done "\
-    "to minimize latency when reading live stream.")
+#define AUTO_ADJUST_PTS_DELAY N_("(Experimental) Minimize latency when
+     reading live stream.")
 #define AUTO_ADJUST_PTS_DELAY_LONGTEXT N_( \
      "This option is useful if you want to lower the latency when " \
      "reading a stream")
