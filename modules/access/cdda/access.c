@@ -771,6 +771,7 @@ int CDDAOpen( vlc_object_t *p_this )
                 }
             }
         }
+        free( psz_paranoia );
     }
 #endif
 
