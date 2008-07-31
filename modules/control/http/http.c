@@ -121,7 +121,7 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t    *p_sys;
     char          *psz_address;
-    const char    *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
+    char          *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
                   *psz_crl = NULL;
     int           i_port       = 0;
     char          *psz_src = NULL;
@@ -219,6 +219,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_httpd_host = httpd_TLSHostNew( VLC_OBJECT(p_intf), psz_address,
                                             i_port, psz_cert, psz_key, psz_ca,
                                             psz_crl );
+    free( psz_cert );
+    free( psz_key );
+    free( psz_ca );
+    free( psz_crl );
+
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
