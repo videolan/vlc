@@ -37,6 +37,7 @@ import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 public class MediaListPlayerTest extends AbstractVLCInternalTest
 {
+
     @Test
     public void mediaListPlayerNewTest()
     {
@@ -97,7 +98,7 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
     /**
      * this fails: see https://trac.videolan.org/vlc/ticket/1527
      */
-    // @Test
+    @Test
     public void mediaListPlayerPlay()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
@@ -166,9 +167,7 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
             }
             Thread.sleep(150);
         }
-        // FIXME give stats the time to run... there's probably a race condition in misc/stats.c:259 that
-        // needs to be fixed
-        // Thread.sleep(400);
+        Thread.sleep(400);
         libvlc.libvlc_media_list_player_stop(mediaListPlayer, exception);
         libvlc.libvlc_media_list_release(mediaList);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
@@ -208,20 +207,7 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
             Thread.sleep(150);
         }
         libvlc.libvlc_media_list_player_pause(mediaListPlayer, exception);
-        Assert.assertEquals(exception.message, 0, exception.raised);
-        while (true)
-        {
-            int playing = libvlc.libvlc_media_list_player_is_playing(mediaListPlayer, exception);
-            if (exception.raised == 1)
-            {
-                throw new RuntimeException("Native exception thrown");
-            }
-            if (playing == 0)
-            {
-                break;
-            }
-            Thread.sleep(150);
-        }
+
         int state = libvlc.libvlc_media_list_player_get_state(mediaListPlayer, exception);
         Assert.assertEquals(exception.message, 0, exception.raised);
         Assert.assertEquals(

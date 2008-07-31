@@ -57,7 +57,8 @@ public abstract class AbstractJVLCTest
     @Before
     public void testSetup()
     {
-        jvlc = new JVLC("-vvv --ignore-config --no-media-library -I dummy --aout=dummy --vout=dummy --rtsp-host 127.0.0.1:5554");
+        jvlc = new JVLC("-vvv --ignore-config --no-media-library -I dummy -A dummy -V dummy --rtsp-host 127.0.0.1:5554");
+        jvlc.setLogVerbosity(LoggerVerbosityLevel.DEBUG);
         downloadSample();
     }
 

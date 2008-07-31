@@ -65,15 +65,20 @@ public abstract class AbstractVLCInternalTest
     public void testSetup()
     {
         exception = new libvlc_exception_t();
-        libvlcInstance = libvlc.libvlc_new(0, new String[]{
+        String[] args = new String[]{
             "-vvv",
             "--ignore-config",
+            "--reset-plugins-cache",
             "--no-media-library",
             "-I",
             "dummy",
-            "--aout=dummy",
-            "--vout=dummy" }, exception);
+            "-A",
+            "dummy",
+            "-V",
+            "dummy" };
+        libvlcInstance = libvlc.libvlc_new(args.length, args, exception);
         libvlc.libvlc_exception_clear(exception);
+
         downloadSample();
     }
 
