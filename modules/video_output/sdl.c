@@ -181,7 +181,7 @@ static int Open ( vlc_object_t *p_this )
     p_vout->pf_control = NULL;
 
 #ifdef HAVE_SETENV
-    psz_method = config_GetPsz( p_vout, "vout" );
+    char* psz = psz_method = config_GetPsz( p_vout, "vout" );
     if( psz_method )
     {
         while( *psz_method && *psz_method != ':' )
@@ -194,6 +194,7 @@ static int Open ( vlc_object_t *p_this )
             setenv( "SDL_VIDEODRIVER", psz_method + 1, 1 );
         }
     }
+    free( psz );
 #endif
 
     /* Initialize library */
