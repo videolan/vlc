@@ -5217,7 +5217,7 @@ void matroska_segment_c::InformationCreate( )
 
 
 /*****************************************************************************
- * Divers
+ * Misc
  *****************************************************************************/
 
 void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
