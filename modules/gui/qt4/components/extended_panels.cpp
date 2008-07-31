@@ -990,6 +990,7 @@ void Equalizer::updateUISliderValues( int i_preset )
     if( i_preset < 0 ) return;
 
     char *p = createValuesFromPreset( i_preset );
+    char *psz = p;
     float f_preamp = eqz_preset_10b[i_preset]->f_preamp;
 
     if ( p )
@@ -1008,6 +1009,7 @@ void Equalizer::updateUISliderValues( int i_preset )
             if( *p == '\0' )
                 break;
         }
+        free( psz );
     }
     ui.preampSlider->setValue( (int)( ( f_preamp + 20 ) * 10 ) );
     ui.preampLabel->setText( qtr( "Preamp\n" )
