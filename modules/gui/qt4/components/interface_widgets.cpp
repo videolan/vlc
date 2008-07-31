@@ -56,7 +56,7 @@
 
 #include <math.h>
 
-#define I_PLAY_TOOLTIP "Play\nIf the playlist is empty, open a media"
+#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
@@ -368,7 +368,7 @@ void AdvControlsWidget::fromAtoB()
     if( !timeA )
     {
         timeA = var_GetTime( THEMIM->getInput(), "time"  );
-        ABButton->setToolTip( "Click to set point B" );
+        ABButton->setToolTip( qtr( "Click to set point B" ) );
         ABButton->setIcon( QIcon( ":/atob_noa" ) );
         return;
     }
@@ -377,7 +377,7 @@ void AdvControlsWidget::fromAtoB()
         timeB = var_GetTime( THEMIM->getInput(), "time"  );
         var_SetTime( THEMIM->getInput(), "time" , timeA );
         ABButton->setIcon( QIcon( ":/atob" ) );
-        ABButton->setToolTip( "Stop the A to B loop" );
+        ABButton->setToolTip( qtr( "Stop the A to B loop" ) );
         return;
     }
     timeA = 0;
