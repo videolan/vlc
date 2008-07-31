@@ -1782,11 +1782,11 @@ if test "${enable_livedotcom}"
 then
   AC_MSG_WARN(--{en|dis}able-livedotcom is deprecated. Use --{en|dis}able-live555 instead.)
 fi
-
 if test "${enable_livedotcom}" = "no"
 then
   enable_live555="no"
 fi
+
 AC_ARG_ENABLE(live555,
 [  --enable-live555        live555 RTSP input plugin (default enabled)])
 if test "${enable_live555}" != "no"; then
@@ -1812,7 +1812,7 @@ if test "${enable_live555}" != "no"; then
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
 
     AC_CHECK_HEADERS(liveMedia_version.hh, [
-      AC_MSG_CHECKING(for liveMedia version < 1214895600 )
+      AC_MSG_CHECKING(for liveMedia version >= 1214895600 )
       AC_EGREP_CPP(yes,
         [#include <liveMedia_version.hh>
          #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
@@ -1820,29 +1820,24 @@ if test "${enable_live555}" != "no"; then
          yes
          #endif
          #endif],
-        [AC_MSG_RESULT([yes])
+        [AC_MSG_RESULT([no])
          AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia. 
 lternatively you can use --disable-live555 to disable the liveMedia plugin.])
-      ])
+      ],[
+	 AC_MSG_RESULT([yes])
+	 ])
     ])
-
-    AC_CHECK_HEADERS(liveMedia.hh, [
-      VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
-      AC_CHECK_LIB(liveMedia_pic, main, [
-        # We have -lliveMedia_pic, build plugins
-        VLC_ADD_PLUGIN([live555])
-        VLC_ADD_LIBS([live555], [-lliveMedia_pic -lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic])
-      ], [
-        AC_CHECK_LIB(liveMedia, main, [
-          # We only have -lliveMedia, do builtins
-          VLC_ADD_PLUGIN([live555])
-          VLC_ADD_LIBS([live555], [-lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment])
-        ],[],[-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment])
-      ],[-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic] )
+     other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
       if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
-        VLC_ADD_LIBS([live555],[-lws2_32])
+        other_libs="$other_libs -lws2_32"
       fi
+    AC_CHECK_HEADERS(liveMedia.hh, [
+      VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
+        AC_CHECK_LIB(liveMedia, main, [
+          VLC_ADD_PLUGIN([live555])
+          VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
+        ],[],[${other_libs}])
     ])
     CPPFLAGS="${CPPFLAGS_save}"
     AC_LANG_POP(C++)
@@ -1858,7 +1853,7 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
       AC_MSG_RESULT(${real_live555_tree}/liveMedia/libliveMedia.a)
 
       AC_CHECK_HEADERS(${real_live555_tree}/liveMedia/include/liveMedia_version.hh,[
-        AC_MSG_CHECKING(for liveMedia version < 1214895600 )
+        AC_MSG_CHECKING(for liveMedia version >= 1214895600 )
         AC_EGREP_CPP(yes,
           [#include "${real_live555_tree}/liveMedia/include/liveMedia_version.hh"
            #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
@@ -1866,10 +1861,12 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
            yes
            #endif
            #endif],
-          [AC_MSG_RESULT([yes])
+          [AC_MSG_RESULT([no])
            AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia. 
 lternatively you can use --disable-live555 to disable the liveMedia plugin.])
-        ])
+        ],[
+	   AC_MSG_RESULT([yes])
+	   ])
       ])
 
       VLC_ADD_PLUGIN([live555])
