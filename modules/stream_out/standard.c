@@ -217,7 +217,11 @@ static int Open( vlc_object_t *p_this )
         free( val.psz_string );
 
     p_sys = p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
-    if( !p_sys ) return VLC_ENOMEM;
+    if( !p_sys )
+    {
+        free( psz_url );
+        return VLC_ENOMEM;
+    }
     p_stream->p_sys->p_session = NULL;
 
     msg_Dbg( p_this, "creating `%s/%s://%s'", psz_access, psz_mux, psz_url );
@@ -278,6 +282,7 @@ static int Open( vlc_object_t *p_this )
         else
         {
             msg_Err( p_stream, "no access _and_ no muxer (fatal error)" );
+            free( psz_url );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -370,6 +375,7 @@ static int Open( vlc_object_t *p_this )
                  psz_access, psz_mux, psz_url );
         free( psz_access );
         free( psz_mux );
+        free( psz_url );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -385,6 +391,7 @@ static int Open( vlc_object_t *p_this )
         sout_AccessOutDelete( p_access );
         free( psz_access );
         free( psz_mux );
+        free( psz_url );
         free( p_sys );
         return VLC_EGENERIC;
     }
