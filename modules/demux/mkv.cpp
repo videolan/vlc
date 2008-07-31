@@ -1051,10 +1051,7 @@ public:
     {
         for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
         {
-            if ( tracks[i_track]->p_compression_data )
-            {
-                delete tracks[i_track]->p_compression_data;
-            }
+            delete tracks[i_track]->p_compression_data;
             es_format_Clean( &tracks[i_track]->fmt );
             free( tracks[i_track]->p_extra_data );
             free( tracks[i_track]->psz_codec );
