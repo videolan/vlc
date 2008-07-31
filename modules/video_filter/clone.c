@@ -160,7 +160,7 @@ static int Create( vlc_object_t *p_this )
                                                 * sizeof(char *) );
         if( !p_vout->p_sys->ppsz_vout_list )
         {
-            msg_Err( p_vout, "out of memory" );
+            free( psz_clonelist );
             free( p_vout->p_sys );
             return VLC_ENOMEM;
         }
