@@ -43,6 +43,7 @@
 #include <vlc_url.h>
 #include <vlc_tls.h>
 #include <vlc_strings.h>
+#include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_md5.h>
 
@@ -828,7 +829,7 @@ static int ReadICYMeta( access_t *p_access )
             strcmp( p_sys->psz_icy_title, &p[1] ) )
         {
             free( p_sys->psz_icy_title );
-            p_sys->psz_icy_title = strdup( &p[1] );
+            p_sys->psz_icy_title = EnsureUTF8( strdup( &p[1] ));
             p_access->info.i_update |= INPUT_UPDATE_META;
 
             msg_Dbg( p_access, "New Title=%s", p_sys->psz_icy_title );
@@ -1413,7 +1414,7 @@ static int Request( access_t *p_access, int64_t i_tell )
         else if( !strcasecmp( psz, "Icy-Name" ) )
         {
             free( p_sys->psz_icy_name );
-            p_sys->psz_icy_name = strdup( p );
+            p_sys->psz_icy_name = EnsureUTF8( strdup( p ));
             msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
 
             p_sys->b_icecast = true; /* be on the safeside. set it here as well. */
@@ -1423,7 +1424,7 @@ static int Request( access_t *p_access, int64_t i_tell )
         else if( !strcasecmp( psz, "Icy-Genre" ) )
         {
             free( p_sys->psz_icy_genre );
-            p_sys->psz_icy_genre = strdup( p );
+            p_sys->psz_icy_genre = EnsureUTF8( strdup( p ));
             msg_Dbg( p_access, "Icy-Genre: %s", p_sys->psz_icy_genre );
         }
         else if( !strncasecmp( psz, "Icy-Notice", 10 ) )
