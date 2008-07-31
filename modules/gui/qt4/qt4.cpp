@@ -426,6 +426,9 @@ static void Init( intf_thread_t *p_intf )
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
 
+    /* Delete the configuration */
+    delete p_intf->p_sys->mainSettings;
+
     /* Delete the application */
     delete app;
 
