@@ -471,7 +471,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 else if( strstr( psz_intf, "qt" ) )
                     ui.qt4->setChecked( true );
             }
-            delete psz_intf;
+            free( psz_intf );
 
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
