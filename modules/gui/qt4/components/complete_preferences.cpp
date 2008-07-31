@@ -461,6 +461,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 i_line++;
             }
             box = new QGroupBox( qtr( p_item->psz_text ) );
+            box->hide();
             boxlayout = new QGridLayout();
         }
         /* Only one hotkey control */
@@ -494,6 +495,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( box )
     {
         box->setLayout( boxlayout );
+        box->show();
         layout->addWidget( box, i_line, 0, 1, -1 );
     }
 
