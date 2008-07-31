@@ -605,6 +605,7 @@ int CDDAOpen( vlc_object_t *p_this )
         psz_source = var_CreateGetString( p_this, "cd-audio" );
         if( !psz_source || !*psz_source )
         {
+            free( psz_source );
             /* Scan for a CD-ROM drive with a CD-DA in it. */
             char **ppsz_drives =
                     cdio_get_devices_with_cap( NULL,  CDIO_FS_AUDIO, false );
