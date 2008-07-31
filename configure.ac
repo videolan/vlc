@@ -5747,6 +5747,11 @@ dnl
 VLC_RESTORE_FLAGS
 
 dnl
+dnl Sort the modules list
+dnl 
+PLUGINS=$( (for i in `echo $PLUGINS`; do echo $i; done)|sort|xargs )
+
+dnl
 dnl  Create the vlc-config script
 dnl
 LDFLAGS_libvlc="${LDFLAGS_libvlc} ${LDFLAGS_builtin}"
@@ -5882,7 +5887,7 @@ AC_OUTPUT
 ${SHELL} ./config.status --file=vlc-config
 chmod 0755 vlc-config
 
-/bin/echo -n "Enabled modules :"
+/bin/echo -n "Enabled modules: "
 ./vlc-config --list plugin
 
 dnl Shortcut to nice compile message
