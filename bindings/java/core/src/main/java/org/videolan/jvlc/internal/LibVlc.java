@@ -402,7 +402,7 @@ public interface LibVlc extends Library
 
     LibVlcEventManager libvlc_media_event_manager(LibVlcMediaDescriptor media, libvlc_exception_t exception);
 
-    // media instance
+    // media player
 
     LibVlcMediaInstance libvlc_media_player_new(LibVlcInstance instance, libvlc_exception_t exception);
 
