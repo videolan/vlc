@@ -278,6 +278,7 @@ static int Open( vlc_object_t *p_this )
         else
         {
             msg_Err( p_stream, "no access _and_ no muxer (fatal error)" );
+            free( p_sys );
             return VLC_EGENERIC;
         }
     }
@@ -300,6 +301,7 @@ static int Open( vlc_object_t *p_this )
         else
         {
             msg_Err( p_stream, "no mux specified or found by extension" );
+            free( p_sys );
             return VLC_EGENERIC;
         }
     }
@@ -368,6 +370,7 @@ static int Open( vlc_object_t *p_this )
                  psz_access, psz_mux, psz_url );
         free( psz_access );
         free( psz_mux );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_stream, "access opened" );
@@ -382,6 +385,7 @@ static int Open( vlc_object_t *p_this )
         sout_AccessOutDelete( p_access );
         free( psz_access );
         free( psz_mux );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_stream, "mux opened" );
