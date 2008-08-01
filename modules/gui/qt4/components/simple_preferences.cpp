@@ -101,7 +101,6 @@ void SPrefsCatList::switchPanel( int i )
 SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                           int _number ) : QWidget( _parent ), p_intf( _p_intf )
 {
-printf( "SPrefsPanel::SPrefsPanel\n" );
     module_config_t *p_config;
     ConfigControl *control;
     number = _number;
