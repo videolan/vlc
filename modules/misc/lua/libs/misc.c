@@ -162,6 +162,7 @@ static int vlclua_datadir_list( lua_State *L )
         lua_rawseti( L, -2, i );
         i ++;
     }
+    vlclua_dir_list_free( ppsz_dir_list );
     return 1;
 }
 /*****************************************************************************

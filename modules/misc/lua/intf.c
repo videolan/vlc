@@ -73,16 +73,19 @@ static char *FindFile( const char *psz_name )
         if( asprintf( &psz_filename, "%s"DIR_SEP"%s.lua", *ppsz_dir,
                       psz_name ) < 0 )
         {
+            vlclua_dir_list_free( ppsz_dir_list );
             return NULL;
         }
         fp = fopen( psz_filename, "r" );
         if( fp )
         {
             fclose( fp );
+            vlclua_dir_list_free( ppsz_dir_list );
             return psz_filename;
         }
         free( psz_filename );
     }
+    vlclua_dir_list_free( ppsz_dir_list );
     return NULL;
 }
 
