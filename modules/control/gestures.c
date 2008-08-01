@@ -485,6 +485,7 @@ static int InitThread( intf_thread_t * p_intf )
         {
             p_intf->p_sys->i_button_mask = 4;
         }
+        free( psz_button );
 
         p_intf->p_sys->i_pattern = 0;
         p_intf->p_sys->i_num_gestures = 0;
