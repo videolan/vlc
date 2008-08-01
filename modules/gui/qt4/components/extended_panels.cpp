@@ -279,7 +279,10 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
             psz_parser = psz_string;
             if( asprintf( &psz_string, ( *psz_string ) ? "%s:%s" : "%s%s",
                             psz_string, psz_name ) == -1 )
+            {
+                free( psz_parser );
                 return;
+            }
             free( psz_parser );
         }
         else

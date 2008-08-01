@@ -299,6 +299,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_fd < 0 )
     {
         msg_Err( p_aout, "cannot open audio device (%s)", psz_device );
+        free( psz_device );
         free( p_sys );
         return VLC_EGENERIC;
     }
