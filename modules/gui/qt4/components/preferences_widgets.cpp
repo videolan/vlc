@@ -644,7 +644,7 @@ ModuleListConfigControl::~ModuleListConfigControl()
     {
         delete *it;
     }
-    if( groupBox ) delete groupBox;
+    delete groupBox;
 }
 
 #define CHECKBOX_LISTS \
