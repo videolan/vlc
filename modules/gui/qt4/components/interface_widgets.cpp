@@ -889,7 +889,7 @@ void ControlsWidget::enableVideo( bool enable )
 
 void ControlsWidget::toggleAdvanced()
 {
-    if( !VISIBLE( advControls ) )
+    if( advControls && !b_advancedVisible )
     {
         advControls->show();
         b_advancedVisible = true;
@@ -961,6 +961,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 #ifdef WIN32TRICK
     setWindowOpacity( 0.0 );
     fscHidden = true;
+    adjustSize();
     show();
 #endif
 
@@ -977,6 +978,7 @@ FullscreenControllerWidget::~FullscreenControllerWidget()
  */
 void FullscreenControllerWidget::showFSC()
 {
+    adjustSize();
 #ifdef WIN32TRICK
     // after quiting and going to fs, we need to call show()
     if( isHidden() )
