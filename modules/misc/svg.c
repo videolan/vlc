@@ -202,6 +202,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
                 if( !psz_template )
                 {
                     fclose( file );
+                    free( psz_filename );
                     return NULL;
                 }
                 memset( psz_template, 0, s.st_size + 1 );
@@ -210,6 +211,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
             fclose( file );
         }
     }
+    free( psz_filename );
     if( !psz_template )
     {
         /* Either there was no file, or there was an error.
