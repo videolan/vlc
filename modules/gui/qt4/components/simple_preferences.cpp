@@ -40,6 +40,8 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include <QtAlgorithms>
+
 #include <string>
 
 #define ICON_HEIGHT 64
@@ -571,13 +573,7 @@ void SPrefsPanel::updateAudioOptions( int number)
 
 SPrefsPanel::~SPrefsPanel()
 {
-    QList<ConfigControl *>::Iterator conf_it;
-    for( conf_it = controls.begin() ; conf_it != controls.end() ; conf_it++ )
-    {
-        ConfigControl *c = qobject_cast<ConfigControl *>(*conf_it);
-        delete c;
-    }
-    controls.clear();
+    qDeleteAll( controls ); controls.clear();
 }
 
 void SPrefsPanel::updateAudioVolume( int volume )

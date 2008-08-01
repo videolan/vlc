@@ -518,5 +518,12 @@ void AdvPrefsPanel::apply()
         c->doApply( p_intf );
     }
 }
+
 void AdvPrefsPanel::clean()
 {}
+
+AdvPrefsPanel::~AdvPrefsPanel()
+{
+    qDeleteAll( controls ); controls.clear();
+}
+

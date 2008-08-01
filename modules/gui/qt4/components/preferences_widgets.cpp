@@ -606,8 +606,11 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
         QGridLayout *l, int &line) :
     VStringConfigControl( _p_this, _p_item, _parent )
 {
+    groupBox = NULL;
+    if( !p_item->psz_text ) return;
+
     groupBox = new QGroupBox ( qtr(p_item->psz_text) );
-    text = new QLineEdit();
+    text = new QLineEdit;
     QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
 
     finish( bycat );
@@ -641,8 +644,7 @@ ModuleListConfigControl::~ModuleListConfigControl()
     {
         delete *it;
     }
-    delete groupBox;
-    delete text;
+    if( groupBox ) delete groupBox;
 }
 
 #define CHECKBOX_LISTS \
