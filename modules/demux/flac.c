@@ -620,7 +620,8 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
         if( oldval ) \
         { \
             char * newval; \
-            asprintf( &newval, "%s,%s", oldval, &psz[strlen(txt)] ); \
+            if( asprintf( &newval, "%s,%s", oldval, &psz[strlen(txt)] ) == -1 ) \
+                newval = NULL; \
             vlc_meta_Set( p_sys->p_meta, vlc_meta_ ## var, newval ); \
             free( newval ); \
         } \
