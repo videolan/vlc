@@ -853,7 +853,7 @@ Equalizer::~Equalizer()
 /* Write down initial values */
 void Equalizer::updateUIFromCore()
 {
-    char *psz_af, *psz_bands;
+    char *psz_af;//, *psz_bands; Don't use it ?
     float f_preamp;
     int i_preset;
 
@@ -864,7 +864,7 @@ void Equalizer::updateUIFromCore()
         psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
         if( var_GetBool( p_aout, "equalizer-2pass" ) )
             ui.eq2PassCheck->setChecked( true );
-        psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
+//        psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
         f_preamp = var_GetFloat( p_aout, "equalizer-preamp" );
         i_preset = presetsComboBox->findData( QVariant(
                     var_GetString( p_aout, "equalizer-preset" ) ) );
@@ -875,7 +875,7 @@ void Equalizer::updateUIFromCore()
         psz_af = config_GetPsz( p_intf, "audio-filter" );
         if( config_GetInt( p_intf, "equalizer-2pass" ) )
             ui.eq2PassCheck->setChecked( true );
-        psz_bands = config_GetPsz( p_intf, "equalizer-bands" );
+//        psz_bands = config_GetPsz( p_intf, "equalizer-bands" );
         f_preamp = config_GetFloat( p_intf, "equalizer-preamp" );
         i_preset = presetsComboBox->findData( QVariant(
                     config_GetPsz( p_intf, "equalizer-preset" ) ) );
