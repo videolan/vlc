@@ -568,6 +568,18 @@ void SPrefsPanel::updateAudioOptions( int number)
     optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
 }
 
+
+SPrefsPanel::~SPrefsPanel()
+{
+    QList<ConfigControl *>::Iterator conf_it;
+    for( conf_it = controls.begin() ; conf_it != controls.end() ; conf_it++ )
+    {
+        ConfigControl *c = qobject_cast<ConfigControl *>(*conf_it);
+        delete c;
+    }
+    controls.clear();
+}
+
 void SPrefsPanel::updateAudioVolume( int volume )
 {
     qobject_cast<QSpinBox *>(optionWidgets[volLW])

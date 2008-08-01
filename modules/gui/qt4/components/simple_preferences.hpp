@@ -105,7 +105,7 @@ class SPrefsPanel : public QWidget
     Q_OBJECT
 public:
     SPrefsPanel( intf_thread_t *, QWidget *, int );
-    virtual ~SPrefsPanel() {};
+    virtual ~SPrefsPanel();
     void apply();
     void clean();
 private:
