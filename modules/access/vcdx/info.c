@@ -386,7 +386,7 @@ VCDUpdateTitle( access_t *p_access )
     if( psz_mrl )
     {
         char *psz_name;
-        char* psz_title_format = config_GetPsz( p_access, MODULE_STRING "-title-format" )
+        char* psz_title_format = config_GetPsz( p_access, MODULE_STRING "-title-format" );
         snprintf( psz_mrl, psz_mrl_max, "%s%s",
                   VCD_MRL_PREFIX, p_vcdplayer->psz_source );
         psz_name = VCDFormatStr( p_access, p_vcdplayer, psz_title_format, psz_mrl,
