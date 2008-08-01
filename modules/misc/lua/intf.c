@@ -125,7 +125,7 @@ static bool WordInList( const char *psz_list, const char *psz_word )
     return false;
 }
 
-static const char *GetModuleName( intf_thread_t *p_intf )
+static char *GetModuleName( intf_thread_t *p_intf )
 {
     int i;
     const char *psz_intf;
@@ -136,7 +136,7 @@ static const char *GetModuleName( intf_thread_t *p_intf )
     for( i = 0; pp_shortcuts[i].psz_name; i++ )
     {
         if( WordInList( psz_intf, pp_shortcuts[i].psz_shortcut ) )
-            return pp_shortcuts[i].psz_name;
+            return strdup( pp_shortcuts[i].psz_name );
     }
 
     return config_GetPsz( p_intf, "lua-intf" );
@@ -150,14 +150,15 @@ int Open_LuaIntf( vlc_object_t *p_this )
     intf_sys_t *p_sys;
     lua_State *L;
 
-    const char *psz_name = GetModuleName( p_intf );
+    char *psz_name = GetModuleName( p_intf );
     const char *psz_config;
     bool b_config_set = false;
-    if( !psz_name ) psz_name = "dummy";
+    if( !psz_name ) psz_name = strdup( "dummy" );
 
     p_intf->p_sys = (intf_sys_t*)malloc( sizeof(intf_sys_t*) );
     if( !p_intf->p_sys )
     {
+        free( psz_name );
         return VLC_ENOMEM;
     }
     p_sys = p_intf->p_sys;
@@ -166,6 +167,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     {
         msg_Err( p_intf, "Couldn't find lua interface script \"%s\".",
                  psz_name );
+        free( psz_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -175,6 +177,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     if( !L )
     {
         msg_Err( p_intf, "Could not create new Lua State" );
+        free( psz_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -261,6 +264,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     p_intf->pf_run = Run;
     p_intf->psz_header = strdup( psz_name ); /* Do I need to clean that up myself in Close_LuaIntf? */
 
+    free( psz_name );
     return VLC_SUCCESS;
 }
 
