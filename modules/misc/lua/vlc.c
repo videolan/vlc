@@ -143,6 +143,13 @@ int vlclua_dir_list( const char *luadirname, char **ppsz_dir_list )
     return VLC_SUCCESS;
 }
 
+void vlclua_dir_list_free( char **ppsz_dir_list )
+{
+    char **ppsz_dir;
+    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
+        free( *ppsz_dir );
+}
+
 /*****************************************************************************
  * Will execute func on all scripts in luadirname, and stop if func returns
  * success.
@@ -192,7 +199,10 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
             char  *psz_filename;
             if( asprintf( &psz_filename,
                           "%s" DIR_SEP "%s", *ppsz_dir, *ppsz_file ) < 0)
+            {
+                vlclua_dir_list_free( ppsz_dir_list );
                 return VLC_ENOMEM;
+            }
             msg_Dbg( p_this, "Trying Lua playlist script %s", psz_filename );
 
             i_ret = func( p_this, psz_filename, L, user_data );
@@ -211,8 +221,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
             free( *ppsz_file );
         free( ppsz_filelist );
     }
-    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
-        free( *ppsz_dir );
+    vlclua_dir_list_free( ppsz_dir_list );
 
     return i_ret;
 }

@@ -106,6 +106,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this, const char * luadirname,
         int (*func)(vlc_object_t *, const char *, lua_State *, void *),
         lua_State * L, void * user_data );
 int vlclua_dir_list( const char *luadirname, char **ppsz_dir_list );
+void vlclua_dir_list_free( char **ppsz_dir_list );
 
 /*****************************************************************************
  * Playlist and meta data internal utilities.
