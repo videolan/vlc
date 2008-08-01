@@ -651,6 +651,7 @@ VCDParse( access_t * p_access, /*out*/ vcdinfo_itemid_t * p_itemid,
       psz_source = config_GetPsz( p_access, "vcd" );
 
       if( !psz_source || 0==strlen(psz_source) ) {
+        free( psz_source );
         /* Scan for a CD-ROM drive with a VCD in it. */
         char **cd_drives = cdio_get_devices_with_cap( NULL,
                             ( CDIO_FS_ANAL_SVCD | CDIO_FS_ANAL_CVD
