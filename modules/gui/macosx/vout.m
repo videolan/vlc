@@ -492,17 +492,16 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                  [self toggleFullscreen];
              }
         }
-        else if ( key == ' ' )
+        else if ( p_vout )
         {
             vlc_value_t val;
-            val.i_int = config_GetInt( p_vout, "key-play-pause" );
+            if( key == ' ')
+                val.i_int = config_GetInt( p_vout, "key-play-pause" );
+            else
+                val.i_int |= CocoaKeyToVLC( key );
             var_Set( p_vout->p_libvlc, "key-pressed", val );
         }
-        else
-        {
-            val.i_int |= CocoaKeyToVLC( key );
-            var_Set( p_vout->p_libvlc, "key-pressed", val );
-        }
+        else NSLog( @"Could not send keyevent to VLC core" );
     }
     else
     {
