@@ -792,6 +792,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* Handle sleep notification */
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
            name:NSWorkspaceWillSleepNotification object:nil];
+
+    [self performSelectorInBackground:@selector(lookForCrashLog) withObject:NULL];
 }
 
 /* Listen to the remote in exclusive mode, only when VLC is the active
@@ -1989,17 +1991,46 @@ end:
     [[NSWorkspace sharedWorkspace] openURL: o_url];
 }
 
-- (IBAction)openCrashLog:(id)sender
+#pragma mark Crash Log
+- (void)mailCrashLog:(NSString *)crashLog withUserComment:(NSString *)userComment
+{
+    static char mail[] =
+        "From: vlcuser <vlcuser@videolan.org>\n"
+        "To: videolan <apple-bugreport@videolan.org>\n"
+        "Subject: Crash Report (Type Ctrl-shift-D and hit send)\n"
+        "Content-Type: text/plain; charset=ISO-8859-1; format=flowed\n"
+        "Content-Transfer-Encoding: 7bit\n"
+        "\n"
+        "(Type Ctrl-shift-D and hit send)\n\n"
+        "User Comment:\n%@\n--------------\n"
+        "\n"
+        "Crash log:\n%@\n--------------\n"
+        "\n"
+        "\n";
+    NSString * mailPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"vlc_crash_mail.eml"];
+    NSString * mailContent = [NSString stringWithFormat:[NSString stringWithUTF8String:mail], userComment, crashLog];
+    BOOL ret = [mailContent writeToFile:mailPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    if( !ret )
+    {
+        NSRunAlertPanel(_NS("Error when generating crash report mail."), _NS("Can't prepare crash log mail"), _NS("OK"), nil, nil, nil );
+        return;
+    }
+
+    [[NSWorkspace sharedWorkspace] openFile:mailPath];
+}
+
+
+- (NSString *)latestCrashLogPathPreviouslySeen:(BOOL)previouslySeen
 {
     NSString * crashReporter = [@"~/Library/Logs/CrashReporter" stringByExpandingTildeInPath];
     NSDirectoryEnumerator *direnum = [[NSFileManager defaultManager] enumeratorAtPath:crashReporter];
     NSString *fname;
     BOOL found = NO;
     NSString * latestLog = nil;
-    int year = 0;
-    int month = 0;
-    int day = 0;
-    int hours = 0;
+    NSInteger year  = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportYear"] : 0;
+    NSInteger month = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportMonth"]: 0;
+    NSInteger day   = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportDay"]  : 0;
+    NSInteger hours = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportHours"]: 0;
 
     while (fname = [direnum nextObject])
     {
@@ -2019,22 +2050,68 @@ end:
                 month = [[compo objectAtIndex:1] intValue];
                 day   = [[compo objectAtIndex:2] intValue];
                 hours = [[compo objectAtIndex:3] intValue];
-                latestLog = [NSString stringWithFormat:@"%@/%@",crashReporter, fname];
+                latestLog = [crashReporter stringByAppendingPathComponent:fname];
                 found = YES;
             }
         }
     }
 
-    if( found && latestLog && [[NSFileManager defaultManager] fileExistsAtPath: latestLog ] )
+    if(!(found && [[NSFileManager defaultManager] fileExistsAtPath: latestLog]))
+        return nil;
+
+    if( !previouslySeen )
+    {
+        [[NSUserDefaults standardUserDefaults] setInteger:year  forKey:@"LatestCrashReportYear"];
+        [[NSUserDefaults standardUserDefaults] setInteger:month forKey:@"LatestCrashReportMonth"];
+        [[NSUserDefaults standardUserDefaults] setInteger:day   forKey:@"LatestCrashReportDay"];
+        [[NSUserDefaults standardUserDefaults] setInteger:hours forKey:@"LatestCrashReportHours"];
+    }
+    return latestLog;
+}
+
+- (NSString *)latestCrashLogPath
+{
+    return [self latestCrashLogPathPreviouslySeen:YES];
+}
+
+- (void)lookForCrashLog
+{
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
+    // This pref key doesn't exists? this VLC is an upgrade, and this crash log come from previous version
+    BOOL areCrashLogsTooOld = ![[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportYear"];
+    NSString * latestLog = [self latestCrashLogPathPreviouslySeen:NO];
+    if( latestLog && !areCrashLogsTooOld )
+        [self performSelectorOnMainThread:@selector(notifyCrashLogToUser:) withObject:latestLog waitUntilDone:NO];
+
+    [pool release];
+}
+
+- (void)notifyCrashLogToUser:(NSString *)crashLog
+{
+    int ret = NSRunInformationalAlertPanel(_NS("VLC has previously crashed"),
+                _NS("VLC has previously crashed, do you want to send an email with the crash to VLC's team?"),
+                _NS("Send"), _NS("Don't Send"), nil, nil);
+    if( ret == NSAlertDefaultReturn )
+    {
+        [self mailCrashLog:crashLog withUserComment:@"<Explain here what you were doing when VLC crashed>"];
+    }
+}
+
+- (IBAction)openCrashLog:(id)sender
+{
+    NSString * latestLog = [self latestCrashLogPath];
+    if( latestLog )
     {
         [[NSWorkspace sharedWorkspace] openFile: latestLog withApplication: @"Console"];
     }
     else
     {
         NSBeginInformationalAlertSheet(_NS("No CrashLog found"), _NS("Continue"), nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("Couldn't find any trace of a previous crash.") );
-
     }
 }
+
+#pragma mark -
 
 - (IBAction)viewErrorsAndWarnings:(id)sender
 {
