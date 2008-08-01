@@ -31,6 +31,10 @@
 #import "misc.h"
 #import "fspanel.h"
 
+@interface VLCFSPanel ()
+- (void)hideMouse;
+@end
+
 /*****************************************************************************
  * VLCFSPanel
  *****************************************************************************/
@@ -244,10 +248,23 @@
         [[[[[VLCMain sharedInstance] getControls] getVoutView] window] makeKeyWindow];
 }
 
+- (void)hideMouse
+{
+    [NSCursor setHiddenUntilMouseMoves: YES];
+}
+
 - (void)fadeIn
 {
-    /* in case that the user don't want us to appear, just return here */
-    if(! config_GetInt( VLCIntf, "macosx-fspanel" ) || b_nonActive )
+    /* in case that the user don't want us to appear, make sure we hide the mouse */
+
+    if( !config_GetInt( VLCIntf, "macosx-fspanel" ) )
+    {
+        float time = (float)var_CreateGetInteger( VLCIntf, "mouse-hide-timeout" ) / 1000.;
+        [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:time target:self selector:@selector(hideMouse) userInfo:nil repeats:NO]];
+        return;
+    }
+
+    if( b_nonActive )
         return;
 
     [self orderFront: nil];
@@ -310,7 +327,7 @@
     /* count down until we hide ourselfes again and do so if necessary */
     if( --i_timeToKeepVisibleInSec < 1 )
     {
-        [NSCursor setHiddenUntilMouseMoves: YES];
+        [self hideMouse];
         [self fadeOut];
         [hideAgainTimer invalidate]; /* released in -autoHide and -dealloc */
         b_alreadyCounting = NO;
