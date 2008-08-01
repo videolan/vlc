@@ -324,7 +324,14 @@ static void Init( intf_thread_t *p_intf )
     QApplication *app = new QApplication( argc, argv , true );
     p_intf->p_sys->p_app = app;
 
-    p_intf->p_sys->mainSettings = new QSettings( "vlc", "vlc-qt-interface" );
+    p_intf->p_sys->mainSettings = new QSettings(
+#ifdef WIN32
+            QSettings::IniFormat,
+#else
+            QSettings::NativeFormat,
+#endif
+            QSettings::UserScope, "vlc", "vlc-qt-interface" );
+
     /* Icon setting
        FIXME: use a bigger icon ? */
     if( QDate::currentDate().dayOfYear() >= 354 )
