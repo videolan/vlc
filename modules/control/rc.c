@@ -324,10 +324,7 @@ static int Activate( vlc_object_t *p_this )
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
-    {
-        msg_Err( p_intf, "no memory" );
         return VLC_ENOMEM;
-    }
 
     p_intf->p_sys->pi_socket_listen = pi_socket;
     p_intf->p_sys->i_socket = -1;
