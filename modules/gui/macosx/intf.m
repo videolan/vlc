@@ -1991,14 +1991,43 @@ end:
 
 - (IBAction)openCrashLog:(id)sender
 {
-    NSString * o_path = [@"~/Library/Logs/CrashReporter/VLC.crash.log"
-                                    stringByExpandingTildeInPath];
+    NSString * crashReporter = [@"~/Library/Logs/CrashReporter" stringByExpandingTildeInPath];
+    NSDirectoryEnumerator *direnum = [[NSFileManager defaultManager] enumeratorAtPath:crashReporter];
+    NSString *fname;
+    BOOL found = NO;
+    NSString * latestLog = nil;
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int hours = 0;
 
-
-    if( [[NSFileManager defaultManager] fileExistsAtPath: o_path ] )
+    while (fname = [direnum nextObject])
     {
-        [[NSWorkspace sharedWorkspace] openFile: o_path
-                                    withApplication: @"Console"];
+        [direnum skipDescendents];
+        if([fname hasPrefix:@"VLC"] && [fname hasSuffix:@"crash"])
+        {
+            NSArray * compo = [fname componentsSeparatedByString:@"_"];
+            if( [compo count] < 3 ) { found = NO; break; }
+            compo = [[compo objectAtIndex:1] componentsSeparatedByString:@"-"];
+            if( [compo count] < 4 ) { found = NO; break; }
+            if( year  < [[compo objectAtIndex:0] intValue] &&
+                month < [[compo objectAtIndex:1] intValue] &&
+                day   < [[compo objectAtIndex:2] intValue] &&
+                hours < [[compo objectAtIndex:3] intValue] )
+            {
+                year  = [[compo objectAtIndex:0] intValue];
+                month = [[compo objectAtIndex:1] intValue];
+                day   = [[compo objectAtIndex:2] intValue];
+                hours = [[compo objectAtIndex:3] intValue];
+                latestLog = [NSString stringWithFormat:@"%@/%@",crashReporter, fname];
+                found = YES;
+            }
+        }
+    }
+
+    if( found && latestLog && [[NSFileManager defaultManager] fileExistsAtPath: latestLog ] )
+    {
+        [[NSWorkspace sharedWorkspace] openFile: latestLog withApplication: @"Console"];
     }
     else
     {
