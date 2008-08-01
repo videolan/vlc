@@ -774,8 +774,8 @@ void SPrefsPanel::assoDialog()
 
     aTa( ".a52" ); aTa( ".aac" ); aTa( ".ac3" ); aTa( ".dts" ); aTa( ".flac" );
     aTa( ".m4a" ); aTa( ".m4p" ); aTa( ".mka" ); aTa( ".mod" ); aTa( ".mp1" );
-    aTa( ".mp2" ); aTa( ".mp3" ); aTa( ".ogg" ); aTa( ".spx" ); aTa( ".wav" );
-    aTa( ".wma" ); aTa( ".xm" );
+    aTa( ".mp2" ); aTa( ".mp3" ); aTa( ".oma" ); aTa( ".ogg" ); aTa( ".spx" );
+    aTa( ".wav" ); aTa( ".wma" ); aTa( ".xm" );
     audioType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
@@ -783,10 +783,10 @@ void SPrefsPanel::assoDialog()
 
     i_temp = 0;
     aTv( ".asf" ); aTv( ".avi" ); aTv( ".divx" ); aTv( ".dv" ); aTv( ".flv" );
-    aTv( ".gxf" ); aTv( ".m1v" ); aTv( ".m2v" ); aTv( ".m4v" ); aTv( ".mkv" );
-    aTv( ".mov" ); aTv( ".mp2" ); aTv( ".mp4" ); aTv( ".mpeg" );
+    aTv( ".gxf" ); aTv( ".m1v" ); aTv( ".m2v" ); aTv( ".m2ts" ); aTv( ".m4v" );
+    aTv( ".mkv" ); aTv( ".mov" ); aTv( ".mp2" ); aTv( ".mp4" ); aTv( ".mpeg" );
     aTv( ".mpeg1" ); aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" );
-    aTv( ".mxf" ); aTv( ".ogm" ); aTv( ".ps" ); aTv( ".ts" );
+    aTv( ".mts" ); aTv( ".mxf" ); aTv( ".ogm" ); aTv( ".ps" ); aTv( ".ts" );
     aTv( ".vob" ); aTv( ".wmv" );
     videoType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
