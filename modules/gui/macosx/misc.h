@@ -25,6 +25,15 @@
 #import <ApplicationServices/ApplicationServices.h>
 
 /*****************************************************************************
+ * NSImage (VLCAddition)
+ *****************************************************************************/
+
+@interface NSImage (VLCAdditions)
++ (id)imageWithWarningIcon;
++ (id)imageWithErrorIcon;
+@end
+
+/*****************************************************************************
  * NSAnimation (VLCAddition)
  *****************************************************************************/
 

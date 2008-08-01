@@ -258,7 +258,7 @@
  
     attempted_reload = NO;
 
-    if( [[o_tc identifier] isEqualToString:@"1"] )
+    if( [[o_tc identifier] isEqualToString:@"name"] )
     {
         /* sanity check to prevent the NSString class from crashing */
         char *psz_title =  input_item_GetTitle( p_item->p_input );
@@ -269,36 +269,37 @@
         else
         {
             char *psz_name = input_item_GetName( p_item->p_input );
-            if( !EMPTY_STR( psz_name ) )
-            {
+            if( psz_name )
                 o_value = [NSString stringWithUTF8String: psz_name];
-            }
             free( psz_name );
         }
         free( psz_title );
     }
-    else
+    else if( [[o_tc identifier] isEqualToString:@"artist"] )
     {
         char *psz_artist = input_item_GetArtist( p_item->p_input );
-        if( [[o_tc identifier] isEqualToString:@"2"] && !EMPTY_STR( psz_artist ) )
-        {
+        if( psz_artist )
             o_value = [NSString stringWithUTF8String: psz_artist];
-        }
-        else if( [[o_tc identifier] isEqualToString:@"3"] )
-        {
-            char psz_duration[MSTRTIME_MAX_SIZE];
-            mtime_t dur = input_item_GetDuration( p_item->p_input );
-            if( dur != -1 )
-            {
-                secstotimestr( psz_duration, dur/1000000 );
-                o_value = [NSString stringWithUTF8String: psz_duration];
-            }
-            else
-            {
-                o_value = @"--:--";
-            }
-        }
         free( psz_artist );
+    }
+    else if( [[o_tc identifier] isEqualToString:@"duration"] )
+    {
+        char psz_duration[MSTRTIME_MAX_SIZE];
+        mtime_t dur = input_item_GetDuration( p_item->p_input );
+        if( dur != -1 )
+        {
+            secstotimestr( psz_duration, dur/1000000 );
+            o_value = [NSString stringWithUTF8String: psz_duration];
+        }
+        else
+            o_value = @"--:--";
+    }
+    else if( [[o_tc identifier] isEqualToString:@"status"] )
+    {
+        if( input_ItemHasErrorWhenReading( p_item->p_input ) )
+        {
+            o_value = [NSImage imageWithWarningIcon];
+        }
     }
     return o_value;
 }
@@ -349,6 +350,13 @@
         o_items_array = [[NSMutableArray alloc] init];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [o_nodes_array release];
+    [o_items_array release];
+    [super dealloc];
 }
 
 - (void)awakeFromNib

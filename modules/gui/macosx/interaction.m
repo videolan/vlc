@@ -24,6 +24,7 @@
 
 #import "intf.h"
 #import "interaction.h"
+#import "misc.h"
 
 /* for the icons in our custom error panel */
 #import <ApplicationServices/ApplicationServices.h>
@@ -403,49 +404,11 @@
     o_errors = [[NSMutableArray alloc] init];
     o_icons = [[NSMutableArray alloc] init];
 
-    /* ugly Carbon stuff following...
-     * regrettably, you can't get the icons through clean Cocoa */
-
-    /* retrieve our error icon */
-    IconRef ourIconRef;
-    int returnValue;
-    returnValue = GetIconRef(kOnSystemDisk, 'macs', 'stop', &ourIconRef);
-    errorIcon = [[NSImage alloc] initWithSize:NSMakeSize(32,32)];
-    [errorIcon lockFocus];
-    CGRect rect = CGRectMake(0,0,32,32);
-    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext]
-        graphicsPort],
-        &rect,
-        kAlignNone,
-        kTransformNone,
-        NULL /*inLabelColor*/,
-        kPlotIconRefNormalFlags,
-        (IconRef)ourIconRef);
-    [errorIcon unlockFocus];
-    returnValue = ReleaseIconRef(ourIconRef);
-
-    /* retrieve our caution icon */
-    returnValue = GetIconRef(kOnSystemDisk, 'macs', 'caut', &ourIconRef);
-    warnIcon = [[NSImage alloc] initWithSize:NSMakeSize(32,32)];
-    [warnIcon lockFocus];
-    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext]
-        graphicsPort],
-        &rect,
-        kAlignNone,
-        kTransformNone,
-        NULL /*inLabelColor*/,
-        kPlotIconRefNormalFlags,
-        (IconRef)ourIconRef);
-    [warnIcon unlockFocus];
-    returnValue = ReleaseIconRef(ourIconRef);
-
     return self;
 }
 
 -(void)dealloc
 {
-    [errorIcon release];
-    [warnIcon release];
     [o_errors release];
     [o_icons release];
     [super dealloc];
@@ -471,10 +434,9 @@
     [o_errors addObject: ourError];
     [ourError release];
 
-    [o_icons addObject: errorIcon];
+    [o_icons addObject: [NSImage imageWithErrorIcon]];
 
     [o_error_table reloadData];
-    [self showPanel];
 }
 
 -(void)addWarning: (NSString *)o_warning withMsg:(NSString *)o_msg
@@ -492,11 +454,9 @@
     [o_errors addObject: ourWarning];
     [ourWarning release];
 
-    [o_icons addObject: warnIcon];
+    [o_icons addObject: [NSImage imageWithWarningIcon]];
  
     [o_error_table reloadData];
-
-    [self showPanel];
 }
 
 -(IBAction)cleanupTable:(id)sender

@@ -86,9 +86,6 @@
     NSMutableArray * o_errors;
     NSMutableArray * o_icons;
 
-    NSImage * warnIcon;
-    NSImage * errorIcon;
-
     BOOL nib_interact_errpanel_loaded;
 }
 - (IBAction)cleanupTable:(id)sender;
