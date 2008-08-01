@@ -537,9 +537,7 @@ createnew:
      */
     if( var_CreateGetBool( p_demux, "rtsp-kasenna" ))
     {
-#if LIVEMEDIA_LIBRARY_VERSION_INT > 1130457500
         p_sys->rtsp->setUserAgentString( "VLC_MEDIA_PLAYER_KA" );
-#endif
     }
 
 describe:
@@ -1002,21 +1000,13 @@ static int SessionsSetup( demux_t *p_demux )
     delete iter;
     if( p_sys->i_track <= 0 ) i_return = VLC_EGENERIC;
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
     /* Retrieve the starttime if possible */
     p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
-#else
-    p_sys->i_npt_start = (int64_t) -1;
-#endif
     if( p_sys->i_npt_start < 0 )
         p_sys->i_npt_start = -1;
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
     /* Retrieve the duration if possible */
     p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
-#else
-    p_sys->i_npt_length = (int64_t) -1;
-#endif
     if( p_sys->i_npt_length < 0 )
         p_sys->i_npt_length = -1;
 
@@ -1066,7 +1056,6 @@ static int Play( demux_t *p_demux )
     }
     p_sys->i_pcr = 0;
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1195257600)
     for( i = 0; i < p_sys->i_track; i++ )
     {
         if( !p_sys->track[i]->b_rtcp_sync )
@@ -1074,23 +1063,13 @@ static int Play( demux_t *p_demux )
         p_sys->track[i]->i_start_seq = (int)p_sys->track[i]->sub->rtpInfo.seqNum;
         msg_Info( p_demux, "set startseq: %u", p_sys->track[i]->i_start_seq );
     }
-#endif
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
     /* Retrieve the starttime if possible */
     p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
-#else
-    p_sys->i_npt_start = -1;
-#endif
     if( p_sys->i_npt_start < 0 )
         p_sys->i_npt_start = -1;
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
-    /* Retrieve the duration if possible */
     p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
-#else
-    p_sys->i_npt_length = -1;
-#endif
     if( p_sys->i_npt_length < 0 )
         p_sys->i_npt_length = -1;
 
@@ -1265,32 +1244,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 p_sys->i_pcr = 0;
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1195257600)
+
                 /* Retrieve RTP-Info values */
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
-                    //if( !p_sys->track[i]->b_rtcp_sync )
                     p_sys->track[i]->b_rtcp_sync = false;
                     p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
                     p_sys->track[i]->i_start_seq = p_sys->track[i]->sub->rtpInfo.seqNum;
                     msg_Info( p_demux, "set pos startseq: %u", p_sys->track[i]->i_start_seq );
                 }
-#endif
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
+
                 /* Retrieve the starttime if possible */
                 p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
-#else
-                p_sys->i_npt_start = -1;
-#endif
                 if( p_sys->i_npt_start < 0 )
                     p_sys->i_npt_start = -1;
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
                 /* Retrieve the duration if possible */
                 p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
-#else
-                p_sys->i_npt_length = -1;
-#endif
                 if( p_sys->i_npt_length < 0 )
                     p_sys->i_npt_length = -1;
 
@@ -1402,7 +1372,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             p_sys->i_pcr = 0;
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1195257600)
+
             for( i = 0; i < p_sys->i_track; i++ )
             {
                 if( !p_sys->track[i]->b_rtcp_sync )
@@ -1410,22 +1380,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->track[i]->i_start_seq = p_sys->track[i]->sub->rtpInfo.seqNum;
                 msg_Info( p_demux, "set pause startseq: %u", p_sys->track[i]->i_start_seq );
             }
-#endif
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
+
             /* Retrieve the starttime if possible */
             p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
-#else
-            p_sys->i_npt_start = -1;
-#endif
             if( p_sys->i_npt_start < 0 )
                 p_sys->i_npt_start = -1;
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1199404800)
             /* Retrieve the duration if possible */
             p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
-#else
-            p_sys->i_npt_length = -1;
-#endif
             if( p_sys->i_npt_length < 0 )
                 p_sys->i_npt_length = -1;
 
@@ -1631,13 +1593,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
     }
     else if( tk->fmt.i_codec == VLC_FOURCC('H','2','6','1') )
     {
-#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1081468800
         H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->sub->rtpSource();
         uint32_t header = h261Source->lastSpecialHeader();
-#else
-        uint32_t header = 0;
-        msg_Warn( p_demux, "need livemedia library >= \"2004.04.09\"" );
-#endif
         p_block = block_New( p_demux, i_size + 4 );
         memcpy( p_block->p_buffer, &header, 4 );
         memcpy( p_block->p_buffer + 4, tk->p_buffer, i_size );
@@ -1764,9 +1721,7 @@ static void TimeoutPrevention( timeout_thread_t *p_timeout )
             msg_Dbg( p_timeout, "reset the timeout timer" );
             if( p_timeout->b_handle_keep_alive == true )
             {
-#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1138089600
                 p_timeout->p_sys->rtsp->getMediaSessionParameter( *p_timeout->p_sys->ms, NULL, psz_bye );
-#endif
                 p_timeout->p_sys->b_timeout_call = false;
             }
             else
