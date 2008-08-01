@@ -30,7 +30,6 @@
 #include "customwidgets.hpp"
 #include <QPainter>
 #include <QLineEdit>
-#include <QPainter>
 #include <QColorGroup>
 #include <QRect>
 #include <QKeyEvent>
@@ -60,9 +59,9 @@ void ClickLineEdit::setText( const QString &txt )
 
 void ClickLineEdit::paintEvent( QPaintEvent *pe )
 {
-    QPainter p( this );
     QLineEdit::paintEvent( pe );
     if ( mDrawClickMsg == true && !hasFocus() ) {
+        QPainter p( this );
         QPen tmp = p.pen();
         p.setPen( palette().color( QPalette::Disabled, QPalette::Text ) );
         QRect cr = contentsRect();
@@ -70,6 +69,7 @@ void ClickLineEdit::paintEvent( QPaintEvent *pe )
         cr.setLeft( cr.left() + 3 );
         p.drawText( cr, Qt::AlignLeft | Qt::AlignVCenter, mClickMessage );
         p.setPen( tmp );
+        p.end();
     }
 }
 
