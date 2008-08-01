@@ -43,4 +43,5 @@ SOURCES_chain = chain.c
 SOURCES_postproc = postproc.c
 SOURCES_swscale = swscale.c ../codec/avcodec/chroma.h
 SOURCES_imgresample = imgresample.c ../codec/avcodec/chroma.h
+SOURCES_scene = scene.c
 noinst_HEADERS = filter_common.h filter_picture.h
