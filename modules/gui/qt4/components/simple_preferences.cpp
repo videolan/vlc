@@ -101,6 +101,7 @@ void SPrefsCatList::switchPanel( int i )
 SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                           int _number ) : QWidget( _parent ), p_intf( _p_intf )
 {
+printf( "SPrefsPanel::SPrefsPanel\n" );
     module_config_t *p_config;
     ConfigControl *control;
     number = _number;
@@ -334,7 +335,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONNECT( ui.volNormBox, toggled( bool ), ui.volNormSpin,
                      setEnabled( bool ) );
-            qs_filter = qfu( config_GetPsz( p_intf, "audio-filter" ) );
+            char* psz = config_GetPsz( p_intf, "audio-filter" );
+            qs_filter = qfu( psz );
+            free( psz );
             bool b_normalizer = ( qs_filter.contains( "volnorm" ) );
             {
                 ui.volNormBox->setChecked( b_normalizer );
@@ -381,7 +384,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.systemCodecBox->hide();
 #endif
             /* Access Filters */
-            qs_filter = qfu( config_GetPsz( p_intf, "access-filter" ) );
+            char* psz = config_GetPsz( p_intf, "access-filter" );
+            qs_filter = qfu( psz );
+            free( psz );
             ui.timeshiftBox->setChecked( qs_filter.contains( "timeshift" ) );
             ui.dumpBox->setChecked( qs_filter.contains( "dump" ) );
             ui.recordBox->setChecked( qs_filter.contains( "record" ) );
