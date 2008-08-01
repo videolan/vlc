@@ -633,10 +633,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
     {
         psz_comment = strdup( p_dec->p_sys->vc.user_comments[i] );
         if( !psz_comment )
-        {
-            msg_Warn( p_dec, "out of memory" );
             break;
-        }
         psz_name = psz_comment;
         psz_value = strchr( psz_comment, '=' );
         if( psz_value )
@@ -645,52 +642,30 @@ static void ParseVorbisComments( decoder_t *p_dec )
             psz_value++;
             input_Control( p_input, INPUT_ADD_INFO, _("Vorbis comment"),
                            psz_name, "%s", psz_value );
+/*TODO: dot he test at the beginning and save time !! */
 #ifndef HAVE_TAGLIB
-            if( !strcasecmp( psz_name, "artist" ) )
+            if( psz_value && ( *psz_value != '\0' ) )
             {
-                if( psz_value && ( *psz_value != '\0' ) )
-                {
+                if( !strcasecmp( psz_name, "artist" ) )
                     input_item_SetArtist( p_item, psz_value );
-                }
-            }
-            else if( !strcasecmp( psz_name, "title" ) )
-            {
-                if( psz_value && ( *psz_value != '\0' ) )
+                else if( !strcasecmp( psz_name, "title" ) )
                 {
                     input_item_SetTitle( p_item, psz_value );
                     p_item->psz_name = strdup( psz_value );
                 }
-            }
-            else if( !strcasecmp( psz_name, "album" ) )
-            {
-                if( psz_value && ( *psz_value != '\0' ) )
+                else if( !strcasecmp( psz_name, "album" ) )
                 {
                     input_item_SetAlbum( p_item, psz_value );
                 }
-            }
-            else if( !strcasecmp( psz_name, "musicbrainz_trackid" ) )
-            {
-                if( psz_value && ( *psz_value != '\0' ) )
-                {
+                else if( !strcasecmp( psz_name, "musicbrainz_trackid" ) )
                     input_item_SetTrackID( p_item, psz_value );
-                }
-            }
 #if 0 //not used
-            else if( !strcasecmp( psz_name, "musicbrainz_artistid" ) )
-            {
-                if( psz_value && ( *psz_value != '\0' ) )
-                {
+                else if( !strcasecmp( psz_name, "musicbrainz_artistid" ) )
                     vlc_meta_SetArtistID( p_item, psz_value );
-                }
-            }
-            else if( !strcasecmp( psz_name, "musicbrainz_albumid" ) )
-            {
-                if( psz_value && ( *psz_value != '\0' ) )
-                {
+                else if( !strcasecmp( psz_name, "musicbrainz_albumid" ) )
                     input_item_SetAlbumID( p_item, psz_value );
-                }
-            }
 #endif
+            }
 #endif
             if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
                      !strcasecmp( psz_name, "RG_RADIO" ) )
