@@ -45,7 +45,7 @@
 #include <QScrollArea>
 #include <QUrl>
 
-#define I_DEVICE_TOOLTIP "Select the device or the VIDEO_TS directory"
+#define I_DEVICE_TOOLTIP N_("Select the device or the VIDEO_TS directory")
 
 /**************************************************************************
  * Open Files and subtitles                                               *
