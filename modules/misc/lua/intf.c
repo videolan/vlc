@@ -166,6 +166,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     {
         msg_Err( p_intf, "Couldn't find lua interface script \"%s\".",
                  psz_name );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_intf, "Found lua interface script: %s", p_sys->psz_filename );
