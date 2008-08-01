@@ -165,7 +165,7 @@ static int Open( vlc_object_t *p_this )
     char                *psz_user = NULL;
     char                *psz_pwd = NULL;
     char                *psz_mime = NULL;
-    const char          *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
+    char                *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
                         *psz_crl = NULL;
     vlc_value_t         val;
 
@@ -241,6 +241,11 @@ static int Open( vlc_object_t *p_this )
                                             psz_bind_addr, i_bind_port,
                                             psz_cert, psz_key, psz_ca,
                                             psz_crl );
+    free( psz_cert );
+    free( psz_key );
+    free( psz_ca );
+    free( psz_crl );
+
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_access, "cannot listen on %s:%d",
