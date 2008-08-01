@@ -518,9 +518,11 @@ static void GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
         goto cddb_destroy;
     }
 
+    char* psz_tmp = config_GetPsz( p_access, "cddb-server" );
     cddb_set_email_address( p_cddb, "vlc@videolan.org" );
-    cddb_set_server_name( p_cddb, config_GetPsz( p_access, "cddb-server" ) );
+    cddb_set_server_name( p_cddb, psz_tmp );
     cddb_set_server_port( p_cddb, config_GetInt( p_access, "cddb-port" ) );
+    free( psz_tmp );
 
     /// \todo
     cddb_cache_disable( p_cddb );
