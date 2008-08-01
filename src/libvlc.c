@@ -1206,7 +1206,10 @@ static void SetLanguage ( const char *psz_lang )
      * the language at runtime under eg. Windows. Beware that this
      * makes the environment unconsistent when libvlc is unloaded and
      * should probably be moved to a safer place like vlc.c. */
-    setenv( "LC_ALL", psz_lang, 1 );
+    static char psz_lcall[20];
+    snprintf( psz_lcall, 19, "LC_ALL=%s", psz_lang );
+    psz_lcall[19] = '\0';
+    putenv( psz_lcall );
 #endif
 
     setlocale( LC_ALL, psz_lang );
