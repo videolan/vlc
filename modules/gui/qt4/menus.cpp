@@ -1239,7 +1239,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
         }
     }
 
-    action->setText( text );
+    /* FIXME action->setText( text ); */
     action->setToolTip( help );
 
     action->setEnabled( i_object_id != 0 );
