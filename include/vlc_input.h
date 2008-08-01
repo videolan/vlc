@@ -78,6 +78,8 @@ struct input_item_t
     input_stats_t *p_stats;          /**< Statistics */
     int           i_nb_played;       /**< Number of times played */
 
+    bool          b_error_when_reading;       /**< Error When Reading */
+
     vlc_meta_t *p_meta;
 
     vlc_event_manager_t event_manager;
@@ -155,6 +157,12 @@ static inline
 int input_ItemAddOption (input_item_t *item, const char *str)
 {
     return input_ItemAddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
+}
+
+static inline
+int input_ItemHasErrorWhenReading (input_item_t *item)
+{
+    return item->b_error_when_reading;
 }
 
 

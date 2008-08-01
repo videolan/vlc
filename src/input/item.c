@@ -53,19 +53,15 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
     p_i->p_meta = NULL;
 
     vlc_mutex_init( &p_i->lock );
-    vlc_event_manager_init( &p_i->event_manager, p_i, p_o );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemMetaChanged );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemSubItemAdded );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemDurationChanged );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemPreparsedChanged );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemNameChanged );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemInfoChanged );
+    vlc_event_manager_t * p_em = &p_i->event_manager;
+    vlc_event_manager_init( p_em, p_i, p_o );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemAdded );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemDurationChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemPreparsedChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemNameChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemInfoChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemErrorWhenReadingChanged );
 }
 
 static inline void input_ItemClean( input_item_t *p_i )
@@ -118,6 +114,21 @@ static inline void input_ItemClean( input_item_t *p_i )
     TAB_CLEAN( p_i->i_categories, p_i->pp_categories );
 
     vlc_mutex_destroy( &p_i->lock );
+}
+
+void input_item_SetHasErrorWhenReading( input_item_t *p_i, bool error )
+{
+    vlc_event_t event;
+
+    if( p_i->b_error_when_reading == error )
+        return;
+
+    p_i->b_error_when_reading = error;
+
+    /* Notify interested third parties */
+    event.type = vlc_InputItemErrorWhenReadingChanged;
+    event.u.input_item_error_when_reading_changed.new_value = error;
+    vlc_event_send( &p_i->event_manager, &event );
 }
 
 void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val )

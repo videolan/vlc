@@ -123,6 +123,7 @@ typedef enum vlc_event_type_t {
     vlc_InputItemPreparsedChanged,
     vlc_InputItemNameChanged,
     vlc_InputItemInfoChanged,
+    vlc_InputItemErrorWhenReadingChanged,
 
     /* Service Discovery event */
     vlc_ServicesDiscoveryItemAdded,
@@ -173,6 +174,10 @@ typedef struct vlc_event_t
         {
             void * unused;
         } input_item_info_changed;
+        struct input_item_error_when_reading_changed
+        {
+            bool new_value;
+        } input_item_error_when_reading_changed;
 
         /* Service discovery events */
         struct vlc_services_discovery_item_added

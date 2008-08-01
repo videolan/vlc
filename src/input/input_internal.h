@@ -281,6 +281,7 @@ static inline void input_item_SetArtFetched( input_item_t *p_i, bool artfetched 
         p_i->p_meta->i_status &= ~ITEM_ART_FETCHED;
 }
 
+void input_item_SetHasErrorWhenReading( input_item_t *p_i, bool error );
 
 /**********************************************************************
  * Item metadata
@@ -389,6 +390,8 @@ static inline void input_ChangeStateWithVarCallback( input_thread_t *p_input, in
     const bool changed = p_input->i_state != state;
 
     p_input->i_state = state;
+
+    input_item_SetHasErrorWhenReading( p_input->p->input.p_item, (state == ERROR_S) );
 
     if( callback )
     {
