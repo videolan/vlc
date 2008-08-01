@@ -54,8 +54,12 @@ static int vlclua_config_get( lua_State *L )
         case VLC_VAR_STRING:
         case VLC_VAR_FILE:
         case VLC_VAR_DIRECTORY:
-            lua_pushstring( L, config_GetPsz( p_this, psz_name ) );
+        {
+            char *psz = config_GetPsz( p_this, psz_name );
+            lua_pushstring( L, psz );
+            free( psz );
             break;
+        }
 
         case VLC_VAR_INTEGER:
             lua_pushinteger( L, config_GetInt( p_this, psz_name ) );
