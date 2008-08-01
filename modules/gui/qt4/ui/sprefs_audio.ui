@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>541</width>
-    <height>607</height>
+    <height>609</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -326,7 +326,7 @@
       <item row="2" column="1" colspan="2" >
        <widget class="QLineEdit" name="lastfm_pass_edit" >
         <property name="echoMode" >
-         <enum>QLineEdit::PasswordEchoOnEdit</enum>
+         <enum>QLineEdit::Password</enum>
         </property>
        </widget>
       </item>
