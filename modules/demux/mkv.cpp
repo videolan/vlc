@@ -113,6 +113,46 @@ extern "C" {
 #   include <zlib.h>
 #endif
 
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
+vlc_module_begin();
+    set_shortname( "Matroska" );
+    set_description( N_("Matroska stream demuxer" ) );
+    set_capability( "demux", 50 );
+    set_callbacks( Open, Close );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
+
+    add_bool( "mkv-use-ordered-chapters", 1, NULL,
+            N_("Ordered chapters"),
+            N_("Play ordered chapters as specified in the segment."), true );
+
+    add_bool( "mkv-use-chapter-codec", 1, NULL,
+            N_("Chapter codecs"),
+            N_("Use chapter codecs found in the segment."), true );
+
+    add_bool( "mkv-preload-local-dir", 1, NULL,
+            N_("Preload Directory"),
+            N_("Preload matroska files from the same family in the same directory (not good for broken files)."), true );
+
+    add_bool( "mkv-seek-percent", 0, NULL,
+            N_("Seek based on percent not time"),
+            N_("Seek based on percent not time."), true );
+
+    add_bool( "mkv-use-dummy", 0, NULL,
+            N_("Dummy Elements"),
+            N_("Read and discard unknown EBML elements (not good for broken files)."), true );
+
+    add_shortcut( "mka" );
+    add_shortcut( "mkv" );
+vlc_module_end();
+
+
+
 #define MATROSKA_COMPRESSION_NONE  -1
 #define MATROSKA_COMPRESSION_ZLIB   0
 #define MATROSKA_COMPRESSION_BLIB   1
@@ -398,44 +438,6 @@ using namespace LIBMATROSKA_NAMESPACE;
 using namespace std;
 
 /*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
-
-vlc_module_begin();
-    set_shortname( "Matroska" );
-    set_description( N_("Matroska stream demuxer" ) );
-    set_capability( "demux", 50 );
-    set_callbacks( Open, Close );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-
-    add_bool( "mkv-use-ordered-chapters", 1, NULL,
-            N_("Ordered chapters"),
-            N_("Play ordered chapters as specified in the segment."), true );
-
-    add_bool( "mkv-use-chapter-codec", 1, NULL,
-            N_("Chapter codecs"),
-            N_("Use chapter codecs found in the segment."), true );
-
-    add_bool( "mkv-preload-local-dir", 1, NULL,
-            N_("Preload Directory"),
-            N_("Preload matroska files from the same family in the same directory (not good for broken files)."), true );
-
-    add_bool( "mkv-seek-percent", 0, NULL,
-            N_("Seek based on percent not time"),
-            N_("Seek based on percent not time."), true );
-
-    add_bool( "mkv-use-dummy", 0, NULL,
-            N_("Dummy Elements"),
-            N_("Read and discard unknown EBML elements (not good for broken files)."), true );
-
-    add_shortcut( "mka" );
-    add_shortcut( "mkv" );
-vlc_module_end();
-
-/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_ZLIB_H
@@ -553,7 +555,10 @@ class EbmlParser
     void        Keep( void );
     EbmlElement *UnGet( uint64 i_block_pos, uint64 i_cluster_pos );
 
-    int GetLevel( void );
+    int  GetLevel( void );
+
+    /* Is the provided element presents in our upper elements */
+    bool IsTopPresent( EbmlElement * );
 
   private:
     EbmlStream  *m_es;
@@ -1783,6 +1788,20 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
             }
             msg_Warn( &sys.demuxer, "EOF" );
             return VLC_EGENERIC;
+        }
+
+        /* Verify that we are still inside our cluster
+         * It can happens whith broken files and when seeking
+         * without index */
+        if( i_level > 1 )
+        {
+            if( cluster && !ep->IsTopPresent( cluster ) )
+            {
+                msg_Warn( &sys.demuxer, "Unexpected escape from current cluster" );
+                cluster = NULL;
+            }
+            if( !cluster )
+                continue;
         }
 
         /* do parsing */
@@ -3892,6 +3911,15 @@ EbmlElement *EbmlParser::Get( void )
     return m_el[mi_level];
 }
 
+bool EbmlParser::IsTopPresent( EbmlElement *el )
+{
+    for( int i = 0; i < mi_level; i++ )
+    {
+        if( m_el[i] && m_el[i] == el )
+            return true;
+    }
+    return false;
+}
 
 /*****************************************************************************
  * Tools
