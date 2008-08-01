@@ -187,6 +187,7 @@ static int Open( vlc_object_t *p_this )
         const char **pp_in_ports = jack_get_ports( p_sys->p_jack_client,
                                                    psz_regex, NULL,
                                                    JackPortIsInput );
+        free( psz_regex );
         /* Count the number of returned ports */
         i_in_ports = 0;
         while( pp_in_ports && pp_in_ports[i_in_ports] )
