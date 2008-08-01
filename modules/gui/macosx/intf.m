@@ -1996,19 +1996,22 @@ end:
 {
     static char mail[] =
         "From: vlcuser <vlcuser@videolan.org>\n"
-        "To: videolan <apple-bugreport@videolan.org>\n"
-        "Subject: Crash Report (Type Ctrl-shift-D and hit send)\n"
+        "To: VideoLAN Crash Report <apple-bugreport@videolan.org>\n"
+        "Subject: %@\n"
         "Content-Type: text/plain; charset=ISO-8859-1; format=flowed\n"
         "Content-Transfer-Encoding: 7bit\n"
         "\n"
-        "(Type Ctrl-shift-D and hit send)\n\n"
+        "%@\n\n"
         "User Comment:\n%@\n--------------\n"
         "\n"
         "Crash log:\n%@\n--------------\n"
         "\n"
         "\n";
     NSString * mailPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"vlc_crash_mail.eml"];
-    NSString * mailContent = [NSString stringWithFormat:[NSString stringWithUTF8String:mail], userComment, crashLog];
+    NSString * mailContent = [NSString stringWithFormat:[NSString stringWithUTF8String:mail],
+        _NS("Crash Report (Type Ctrl-shift-D and hit send)"),
+        _NS("(Type Command-shift-D (Menu 'Message'>'Send Again' and hit send)"),
+        userComment, crashLog];
     BOOL ret = [mailContent writeToFile:mailPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
     if( !ret )
     {
@@ -2094,7 +2097,7 @@ end:
                 _NS("Send"), _NS("Don't Send"), nil, nil);
     if( ret == NSAlertDefaultReturn )
     {
-        [self mailCrashLog:crashLog withUserComment:@"<Explain here what you were doing when VLC crashed>"];
+        [self mailCrashLog:crashLog withUserComment:_NS("<Explain here what you were doing when VLC crashed, with possibly a link to the failing video>")];
     }
 }
 
