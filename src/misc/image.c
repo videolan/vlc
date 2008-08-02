@@ -573,6 +573,7 @@ static void video_release_buffer( picture_t *p_pic )
 
 static picture_t *video_new_buffer( decoder_t *p_dec )
 {
+    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     return picture_New( p_dec->fmt_out.video.i_chroma,
                         p_dec->fmt_out.video.i_width,
                         p_dec->fmt_out.video.i_height,
