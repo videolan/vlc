@@ -59,6 +59,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-dbus \
 	--disable-dvd --disable-mad --disable-libmpeg2 \
 	--disable-ffmpeg --disable-faad --disable-wxwidgets --disable-skins2 \
+	--disable-live555 \
 	--disable-fribidi --disable-glx
 
 ACLOCAL_AMFLAGS = -I m4
