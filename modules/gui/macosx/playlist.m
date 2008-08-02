@@ -217,9 +217,9 @@
         if( p_item )
             i_return = p_item->i_children;
     }
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 
-    return (i_return > 0);
+    return (i_return >= 0);
 }
 
 /* retrieve the string values for the cells */
