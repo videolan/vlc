@@ -1460,8 +1460,13 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     {
         case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
         case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
+        {
+            MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
             p_track->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+            if( p_track->i_sample_size > 1 )
+                p_soun->i_qt_version = 0;
             break;
+        }
 
         case( VLC_FOURCC( 'r', 'a', 'w', ' ' ) ):
         case( VLC_FOURCC( 'N', 'O', 'N', 'E' ) ):
