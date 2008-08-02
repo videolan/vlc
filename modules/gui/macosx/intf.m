@@ -854,14 +854,14 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
 
     if([o_update shouldCheckForUpdate])
-        [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
+        [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:nil];
 #endif
 
     /* Handle sleep notification */
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
            name:NSWorkspaceWillSleepNotification object:nil];
 
-    [self performSelectorInBackground:@selector(lookForCrashLog) withObject:NULL];
+    [NSThread detachNewThreadSelector:@selector(lookForCrashLog) toTarget:self withObject:nil];
 }
 
 /* Listen to the remote in exclusive mode, only when VLC is the active
