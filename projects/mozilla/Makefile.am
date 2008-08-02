@@ -4,7 +4,7 @@
 
 MOSTLYCLEANFILES = 
 CLEANFILES = $(BUILT_SOURCES)
-EXTRA_DIST = $(DIST_sources) install.js npvlc_rc.rc vlc.r
+EXTRA_DIST = $(DIST_sources) install.js npvlc_rc.rc.in vlc.r
 
 SOURCES_mozilla_common = \
 	vlcshell.cpp \
@@ -49,9 +49,7 @@ noinst_npvlc_rc_DATA = npvlc_rc.$(OBJEXT)
 noinst_npvlc_rcdir =
 
 npvlc_rc.$(OBJEXT): npvlc_rc.rc
-	$(WINDRES) -DVERSION=$(VERSION) \
-		-DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` \
-		--include-dir $(srcdir) -i $< -o $@
+	$(WINDRES) --include-dir $(srcdir) -i $< -o $@
 
 else
 if HAVE_DARWIN

@@ -48,7 +48,7 @@ SOURCES_activex = \
     $(NULL)
 
 DIST_rsrc = \
-    axvlc_rc.rc \
+    axvlc_rc.rc.in \
     $(NULL)
 
 DIST_misc = \
@@ -83,7 +83,7 @@ DATA_axvlc_rc = $(noinst_axvlc_rc_DATA)
 noinst_axvlc_rc_DATA = axvlc_rc.$(OBJEXT)
 noinst_axvlc_rcdir = 
 axvlc_rc.$(OBJEXT): axvlc_rc.rc inplace.bmp axvlc.tlb
-	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/[^0-9]*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir) -i $< -o $@
+	$(WINDRES) --include-dir $(srcdir) -i $< -o $@
 
 DATA_axvlc_tlb = $(axvlc_tlb_DATA)
 noinst_axvlc_tlb_DATA = axvlc.tlb

@@ -1,12 +1,4 @@
-#ifndef VERSION_NUMBER
-#define VERSION_NUMBER 0,0,0,0
-#endif
-#ifndef VERSION
-#define VERSION 0.0.0
-#endif
-
-#define STRINGIFY( z ) UGLY_KLUDGE( z )
-#define UGLY_KLUDGE( z ) #z
+#define VERSION_NUMBER @VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,@VERSION_EXTRA_RC@
 
 1 BITMAP "vlc16x16.bmp"
 1 VERSIONINFO
@@ -19,10 +11,10 @@ BEGIN
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "CompanyName", "VideoLAN Team"
-      VALUE "FileVersion", STRINGIFY( VERSION )
-      VALUE "FileDescription", "VLC media player"
-      VALUE "LegalCopyright", "(c) 1996-2007 VideoLAN"
+      VALUE "CompanyName", "the VideoLAN Team"
+      VALUE "FileVersion", "@VERSION@"
+      VALUE "FileDescription", "VLC media player (Activex Plugin)"
+      VALUE "LegalCopyright", "(c) @COPYRIGHT_YEARS@ the VideoLAN Team"
       VALUE "OLESelfRegister", "\0"
     END
   END

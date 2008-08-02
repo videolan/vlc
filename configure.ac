@@ -5733,7 +5733,13 @@ else
 fi
 AC_DEFINE_UNQUOTED(VLC_COMPILE_DOMAIN, "`dnsdomainname 2>/dev/null || domainname 2>/dev/null || echo unknown`", [domain of the host which ran configure]) 
 AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler]) 
-
+dnl Win32 need s a numerical version_extra.
+case $( echo ${VERSION_EXTRA}|wc -m ) in 
+       "1") VERSION_EXTRA_RC="0";;
+       "2") VERSION_EXTRA_RC=$( echo ${VERSION_EXTRA}|tr "abcdefghi" "123456789") ;;
+       *) VERSION_EXTRA_RC="99"
+esac
+AC_SUBST(VERSION_EXTRA_RC)
 dnl
 dnl  Handle substvars that use $(top_srcdir)
 dnl
@@ -5796,7 +5802,10 @@ AC_CONFIG_FILES([
   projects/mozilla/Makefile
   m4/Makefile
   po/Makefile.in
+  projects/activex/axvlc_rc.rc
+  projects/mozilla/npvlc_rc.rc
   share/Makefile
+  share/vlc_win32_rc.rc
   src/Makefile
   test/Makefile
 ])
