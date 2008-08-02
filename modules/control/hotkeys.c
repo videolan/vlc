@@ -397,11 +397,7 @@ static void Run( intf_thread_t *p_intf )
         /* Input options */
         else if( p_input )
         {
-            /* FIXME --fenrir
-             * How to get a valid value ?
-             * That's not that easy with some special stream
-             */
-            bool b_seekable = true;
+            bool b_seekable = var_GetBool( p_input, "seekable" );
             int i_interval =0;
 
             if( i_action == ACTIONID_PAUSE )
