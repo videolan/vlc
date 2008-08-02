@@ -65,6 +65,7 @@ typedef struct logical_stream_s
     ogg_stream_state os;                        /* logical stream of packets */
 
     es_format_t      fmt;
+    es_format_t      fmt_old;                  /* format of old ES is reused */
     es_out_id_t      *p_es;
     double           f_rate;
 
@@ -102,6 +103,8 @@ struct demux_sys_t
 
     int i_streams;                           /* number of logical bitstreams */
     logical_stream_t **pp_stream;  /* pointer to an array of logical streams */
+
+    logical_stream_t *p_old_stream; /* pointer to a old logical stream to avoid recreating it */
 
     /* program clock reference (in units of 90kHz) derived from the pcr of
      * the sub-streams */
@@ -175,6 +178,10 @@ static int Ogg_BeginningOfStream( demux_t *p_demux );
 static int Ogg_FindLogicalStreams( demux_t *p_demux );
 static void Ogg_EndOfStream( demux_t *p_demux );
 
+/* */
+static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_stream );
+static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *p_stream );
+
 /* Logical bitstream headers */
 static void Ogg_ReadTheoraHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
@@ -210,6 +217,7 @@ static int Open( vlc_object_t * p_this )
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_bitrate = 0;
     p_sys->pp_stream = NULL;
+    p_sys->p_old_stream = NULL;
 
     /* Begnning of stream, tell the demux to look for elementary streams. */
     p_sys->i_eos = 0;
@@ -233,6 +241,9 @@ static void Close( vlc_object_t *p_this )
 
     Ogg_EndOfStream( p_demux );
 
+    if( p_sys->p_old_stream )
+        Ogg_LogicalStreamDelete( p_demux, p_sys->p_old_stream );
+
     free( p_sys );
 }
 
@@ -254,11 +265,19 @@ static int Demux( demux_t * p_demux )
         if( p_sys->i_eos )
         {
             msg_Dbg( p_demux, "end of a group of logical streams" );
+            /* We keep the ES to try reusing it in Ogg_BeginningOfStream
+             * only 1 ES is supported (common case for ogg web radio) */
+            if( p_sys->i_streams == 1 )
+            {
+                p_sys->p_old_stream = p_sys->pp_stream[0];
+                TAB_CLEAN( p_sys->i_streams, p_sys->pp_stream );
+            }
             Ogg_EndOfStream( p_demux );
         }
 
         p_sys->i_eos = 0;
-        if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS ) return 0;
+        if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
+            return 0;
 
         msg_Dbg( p_demux, "beginning of a group of logical streams" );
         es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
@@ -595,8 +614,10 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 realloc( p_stream->fmt.p_extra, p_stream->i_headers );
             memcpy( p_stream->fmt.p_extra, p_stream->p_headers,
                     p_stream->i_headers );
-            es_out_Control( p_demux->out, ES_OUT_SET_FMT,
-                            p_stream->p_es, &p_stream->fmt );
+
+            if( Ogg_LogicalStreamResetEsFormat( p_demux, p_stream ) )
+                es_out_Control( p_demux->out, ES_OUT_SET_FMT,
+                                p_stream->p_es, &p_stream->fmt );
         }
 
         b_selected = false; /* Discard the header packet */
@@ -797,6 +818,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 p_stream->secondary_header_packets = 0;
 
                 es_format_Init( &p_stream->fmt, 0, 0 );
+                es_format_Init( &p_stream->fmt_old, 0, 0 );
 
                 /* Setup the logical stream */
                 p_stream->i_serial_no = ogg_page_serialno( &oggpage );
@@ -1189,6 +1211,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 static int Ogg_BeginningOfStream( demux_t *p_demux )
 {
     demux_sys_t *p_ogg = p_demux->p_sys  ;
+    logical_stream_t *p_old_stream = p_ogg->p_old_stream;
     int i_stream;
 
     /* Find the logical streams embedded in the physical stream and
@@ -1203,8 +1226,26 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
 
     for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
     {
-#define p_stream p_ogg->pp_stream[i_stream]
-        p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
+        logical_stream_t *p_stream = p_ogg->pp_stream[i_stream];
+
+        p_stream->p_es = NULL;
+
+        /* Try first to reuse an old ES */
+        if( p_old_stream &&
+            p_old_stream->fmt.i_cat == p_stream->fmt.i_cat &&
+            p_old_stream->fmt.i_codec == p_stream->fmt.i_codec )
+        {
+            msg_Dbg( p_demux, "will reuse old stream to avoid glitch" );
+
+            p_stream->p_es = p_old_stream->p_es;
+            es_format_Copy( &p_stream->fmt_old, &p_old_stream->fmt );
+
+            p_old_stream->p_es = NULL;
+            p_old_stream = NULL;
+        }
+
+        if( !p_stream->p_es )
+            p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
 
         // TODO: something to do here ?
         if( p_stream->fmt.i_codec == VLC_FOURCC('c','m','m','l') )
@@ -1218,9 +1259,15 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
         p_stream->i_pcr = p_stream->i_previous_pcr =
             p_stream->i_interpolated_pcr = -1;
         p_stream->b_reinit = 0;
-#undef p_stream
     }
 
+    if( p_ogg->p_old_stream )
+    {
+        if( p_ogg->p_old_stream->p_es )
+            msg_Dbg( p_demux, "old stream not reused" );
+        Ogg_LogicalStreamDelete( p_demux, p_ogg->p_old_stream );
+        p_ogg->p_old_stream = NULL;
+    }
     return VLC_SUCCESS;
 }
 
@@ -1232,27 +1279,80 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     demux_sys_t *p_ogg = p_demux->p_sys  ;
     int i_stream;
 
-#define p_stream p_ogg->pp_stream[i_stream]
     for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
-    {
-        if( p_stream->p_es )
-            es_out_Del( p_demux->out, p_stream->p_es );
-
-        p_ogg->i_bitrate -= p_stream->fmt.i_bitrate;
-
-        ogg_stream_clear( &p_ogg->pp_stream[i_stream]->os );
-        free( p_ogg->pp_stream[i_stream]->p_headers );
-
-        es_format_Clean( &p_stream->fmt );
-
-        free( p_ogg->pp_stream[i_stream] );
-    }
-#undef p_stream
+        Ogg_LogicalStreamDelete( p_demux, p_ogg->pp_stream[i_stream] );
+    free( p_ogg->pp_stream );
 
     /* Reinit p_ogg */
-    free( p_ogg->pp_stream );
-    p_ogg->pp_stream = NULL;
+    p_ogg->i_bitrate = 0;
     p_ogg->i_streams = 0;
+    p_ogg->pp_stream = NULL;
+}
+
+/**
+ * This function delete and release all data associated to a logical_stream_t
+ */
+static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_stream )
+{
+    if( p_stream->p_es )
+        es_out_Del( p_demux->out, p_stream->p_es );
+
+    ogg_stream_clear( &p_stream->os );
+    free( p_stream->p_headers );
+
+    es_format_Clean( &p_stream->fmt_old );
+    es_format_Clean( &p_stream->fmt );
+
+    free( p_stream );
+}
+/**
+ * This function check if a we need to reset a decoder in case we are
+ * reusing an old ES
+ */
+static bool Ogg_IsVorbisFormatCompatible( const es_format_t *p_new, const es_format_t *p_old )
+{
+    int i_new = 0;
+    int i_old = 0;
+    int i;
+
+    for( i = 0; i < 3; i++ )
+    {
+        const uint8_t *p_new_extra = ( const uint8_t*)p_new->p_extra + i_new;
+        const uint8_t *p_old_extra = ( const uint8_t*)p_old->p_extra + i_old;
+
+        if( p_new->i_extra < i_new+2 || p_old->i_extra < i_old+2 )
+            return false;
+
+        const int i_new_size = GetWBE( &p_new_extra[0] );
+        const int i_old_size = GetWBE( &p_old_extra[0] );
+
+        if( i != 1 ) /* Ignore vorbis comment */
+        {
+            if( i_new_size != i_old_size )
+                return false;
+            if( memcmp( &p_new_extra[2], &p_old_extra[2], i_new_size ) )
+                return false;
+        }
+
+        i_new += 2 + i_new_size;
+        i_old += 2 + i_old_size;
+    }
+    return true;
+}
+static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *p_stream )
+{
+    bool b_compatible;
+    if( !p_stream->fmt_old.i_cat || !p_stream->fmt_old.i_codec )
+        return true;
+
+    /* Only vorbis is supported */
+    if( p_stream->fmt.i_codec == VLC_FOURCC( 'v','o','r','b' ) )
+        b_compatible = Ogg_IsVorbisFormatCompatible( &p_stream->fmt, &p_stream->fmt_old );
+
+    if( !b_compatible )
+        msg_Warn( p_demux, "cannot reuse old stream, resetting the decoder" );
+
+    return !b_compatible;
 }
 
 static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
