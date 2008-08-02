@@ -174,7 +174,7 @@ vlc_module_begin();
                 MINIMIZED_LONGTEXT, true);
         add_bool( "qt-name-in-title", true, NULL, TITLE_TEXT,
                   TITLE_LONGTEXT, false );
-        add_bool( "qt-fs-controller", false, NULL, QT_FULLSCREEN_TEXT,
+        add_bool( "qt-fs-controller", true, NULL, QT_FULLSCREEN_TEXT,
                   QT_FULLSCREEN_TEXT, false );
 
         add_bool( "qt-volume-complete", false, NULL, COMPLETEVOL_TEXT,
