@@ -414,6 +414,7 @@ void InputManager::sectionMenu()
 {
     if( hasInput() )
     {
+        // FIXME we should not assume that but probably find the entry named "Root" in "title 0"
         vlc_value_t val; val.i_int = 2;
         var_Set( p_input, "title  0", val );
     }

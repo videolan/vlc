@@ -911,7 +911,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
         : ControlsWidget( _p_i, _p_mi, b_advControls, b_shiny, true ),
           i_mouse_last_x( -1 ), i_mouse_last_y( -1 ), b_mouse_over(false),
           b_slow_hide_begin(false), i_slow_hide_timeout(1),
-          b_fullscreen( false ), i_hide_timeout( 1 )
+          b_fullscreen( false ), i_hide_timeout( 1 ), p_vout(NULL)
 {
     setWindowFlags( Qt::ToolTip );
 
@@ -970,6 +970,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
 {
+    detachVout();
     vlc_mutex_destroy( &lock );
 }
 
@@ -1197,9 +1198,11 @@ static int FullscreenControllerWidgetMouseMoved( vlc_object_t *vlc_object, const
 /**
  * It is called when video start
  */
-void FullscreenControllerWidget::attachVout( vout_thread_t *p_vout )
+void FullscreenControllerWidget::attachVout( vout_thread_t *p_nvout )
 {
-    assert( p_vout );
+    assert( p_nvout && !p_vout );
+
+    p_vout = p_nvout;
 
     vlc_mutex_lock( &lock );
     var_AddCallback( p_vout, "fullscreen", FullscreenControllerWidgetFullscreenChanged, this ); /* I miss a add and fire */
@@ -1209,14 +1212,18 @@ void FullscreenControllerWidget::attachVout( vout_thread_t *p_vout )
 /**
  * It is called after turn off video.
  */
-void FullscreenControllerWidget::detachVout( vout_thread_t *p_vout )
+void FullscreenControllerWidget::detachVout()
 {
     assert( p_vout );
 
-    var_DelCallback( p_vout, "fullscreen", FullscreenControllerWidgetFullscreenChanged, this );
-    vlc_mutex_lock( &lock );
-    fullscreenChanged( p_vout, false, 0 );
-    vlc_mutex_unlock( &lock );
+    if( p_vout )
+    {
+        var_DelCallback( p_vout, "fullscreen", FullscreenControllerWidgetFullscreenChanged, this );
+        vlc_mutex_lock( &lock );
+        fullscreenChanged( p_vout, false, 0 );
+        vlc_mutex_unlock( &lock );
+        p_vout = NULL;
+    }
 }
 
 /**

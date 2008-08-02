@@ -692,7 +692,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 
 void MainInterface::releaseVideo( vout_thread_t *p_vout, void *p_win )
 {
-    if( fullscreenControls ) fullscreenControls->detachVout( p_vout );
+    if( fullscreenControls ) fullscreenControls->detachVout();
     emit askReleaseVideo( p_win );
 }
 
