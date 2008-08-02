@@ -424,7 +424,7 @@ Playlist::~Playlist()
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     var_DelCallback( p_playlist, "item-append", ItemAppended, this );
     var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
-    pl_Release( p_playlist );
+    vlc_object_release( p_playlist );
 }
 
 /**********************************************************************

@@ -56,7 +56,7 @@ playlist_t *vlclua_get_playlist_internal( lua_State *L )
 
 void vlclua_release_playlist_internal( playlist_t *p_playlist )
 {
-    pl_Release( p_playlist );
+    vlc_object_release( p_playlist );
 }
 
 static int vlclua_playlist_prev( lua_State * L )

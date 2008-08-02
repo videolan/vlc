@@ -354,7 +354,7 @@ InterfaceWindow::~InterfaceWindow()
     }
     if( p_playlist )
     {
-        pl_Release( p_playlist );
+        vlc_object_release( p_playlist );
     }
 #if 0
     if( fPlaylistWindow )
