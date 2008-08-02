@@ -337,6 +337,8 @@ void OpenDialog::stream( bool b_transcode_only )
 {
     mrl = ui.advancedLineInput->text();
     toggleVisible();
+    QStringList listMRL = SeparateEntries( mrl );
+    if( listMRL.size() > 0 )
     THEDP->streamingDialog( this, SeparateEntries( mrl )[0], b_transcode_only );
 }
 
