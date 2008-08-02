@@ -1,15 +1,15 @@
 # Turkish localisation file for VLC
-# Copyright (C) 2005 the VideoLAN team
+# Copyright (C) 2008 the VideoLAN team
 # This file is distributed under the same license as the VLC package.
-# Adem Gunes <xleopar@yahoo.com>, 2005.
+# Adem GUNES <xleopar@yahoo.com>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.8.2\n"
+"Project-Id-Version: 0.9.0\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-07-30 22:42+0100\n"
-"PO-Revision-Date: 2005-06-25 12:34+0200\n"
-"Last-Translator: xLeopar <xleopar@yahoo.com>\n"
+"POT-Creation-Date: 2008-08-02 00:37+0100\n"
+"PO-Revision-Date: 2008-07-31 08:04+0200\n"
+"Last-Translator: Adem GUNES <xleopar@yahoo.com>\n"
 "Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,7 +26,8 @@ msgstr ""
 "Bu programı GNU General Public License terimleri altında yeniden "
 "dağıtabilirsiniz;\n"
 "ayrıntılar için COPYGING adlı dosyaya bakınız.\n"
-"VideoLAN ekibi tarafından yazılmıştır; AUTHORS dosyasına bakınız.\n"
+"VideoLAN ekibi tarafından yazılmıştır; ayrıntılar için AUTHORS dosyasına "
+"bakınız.\n"
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -34,7 +35,7 @@ msgstr "VLC tercihleri"
 
 #: include/vlc_config_cat.h:34
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "Tüm seçenekleri görmek için \"Gelişmiş Seçenekler\"i tıklayın."
+msgstr "Tüm seçenekleri görmek için \"Gelişmiş Seçenekler\"i seçiniz."
 
 #: include/vlc_config_cat.h:36 include/vlc_config_cat.h:127
 #: modules/gui/macosx/playlistinfo.m:76 modules/gui/wince/playlist.cpp:671
@@ -43,7 +44,7 @@ msgid "General"
 msgstr "Genel"
 
 #: include/vlc_config_cat.h:39 modules/gui/macosx/simple_prefs.m:168
-#: modules/gui/qt4/components/simple_preferences.cpp:74
+#: modules/gui/qt4/components/simple_preferences.cpp:76
 #: modules/gui/qt4/menus.cpp:839 modules/misc/dummy/dummy.c:68
 msgid "Interface"
 msgstr "Arayüz"
@@ -53,7 +54,6 @@ msgid "Settings for VLC's interfaces"
 msgstr "VLC arayüzleri için ayarlar"
 
 #: include/vlc_config_cat.h:42
-#, fuzzy
 msgid "General interface settings"
 msgstr "Genel arayüz ayarları"
 
@@ -84,7 +84,7 @@ msgstr "Kestirme tuş ayarları"
 #: modules/gui/macosx/playlistinfo.m:110 modules/gui/macosx/simple_prefs.m:172
 #: modules/gui/macosx/wizard.m:378
 #: modules/gui/qt4/components/info_panels.cpp:522
-#: modules/gui/qt4/components/simple_preferences.cpp:76
+#: modules/gui/qt4/components/simple_preferences.cpp:78
 #: modules/gui/qt4/ui/sout.ui:631 modules/stream_out/transcode.c:199
 msgid "Audio"
 msgstr "Ses"
@@ -103,9 +103,8 @@ msgid "Filters"
 msgstr "Süzgeçler"
 
 #: include/vlc_config_cat.h:62
-#, fuzzy
 msgid "Audio filters are used to postprocess the audio stream."
-msgstr "Ses süzgeçleri, ses akışlarını son-işleme için kullanılırlar"
+msgstr "Ses süzgeçleri ses akışlarını son-işleme için kullanılırlar."
 
 #: include/vlc_config_cat.h:64 src/audio_output/input.c:92
 #: modules/gui/macosx/intf.m:635 modules/gui/macosx/intf.m:636
@@ -130,16 +129,15 @@ msgid "Miscellaneous"
 msgstr "Çeşitli"
 
 #: include/vlc_config_cat.h:72
-#, fuzzy
 msgid "Miscellaneous audio settings and modules."
-msgstr "Çeşitli ses ayarları ve modülleri"
+msgstr "Çeşitli ses ayarları ve modüller."
 
 #: include/vlc_config_cat.h:75 src/input/es_out.c:2079
 #: src/libvlc-module.c:1479 modules/gui/macosx/intf.m:638
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:99
 #: modules/gui/macosx/simple_prefs.m:176 modules/gui/macosx/wizard.m:379
 #: modules/gui/qt4/components/info_panels.cpp:523
-#: modules/gui/qt4/components/simple_preferences.cpp:77
+#: modules/gui/qt4/components/simple_preferences.cpp:79
 #: modules/gui/qt4/ui/sout.ui:542 modules/misc/dummy/dummy.c:98
 #: modules/stream_out/transcode.c:168
 msgid "Video"
@@ -158,54 +156,48 @@ msgid "Choose your preferred video output and configure it here."
 msgstr "Tercih ettiğiniz video çıktısını şeçiniz ve buradan yapılandırınız"
 
 #: include/vlc_config_cat.h:87
-#, fuzzy
 msgid "Video filters are used to postprocess the video stream."
-msgstr "Video süzgeçleri, video akışlarını son-işleme için kullanılırlar"
+msgstr "Video süzgeçleri video akışlarını son-işleme için kullanılırlar."
 
 #: include/vlc_config_cat.h:89
 msgid "Subtitles/OSD"
-msgstr "Altyazılar/OSD"
+msgstr "Altyazı/OSD"
 
 #: include/vlc_config_cat.h:90
-#, fuzzy
 msgid ""
 "Miscellaneous settings related to On-Screen-Display, subtitles and \"overlay "
 "subpictures\"."
 msgstr ""
-"Ekran Üstü Kumanda (On Screen Display), altyazılar ve bindirme altresimlere "
-"ilişkin çeşitli ayarlar"
+"Çeşitli Ekran-Üstü-Kumanda (On-Screen-Display), altyazılar ve \"bindirme "
+"altresim\" ayarlar."
 
 #: include/vlc_config_cat.h:99
 msgid "Input / Codecs"
 msgstr "Girdi / Codec'ler"
 
 #: include/vlc_config_cat.h:100
-#, fuzzy
 msgid ""
 "These are the settings for the input, demultiplexing and decoding parts of "
 "VLC. Encoder settings can also be found here."
 msgstr ""
-"Bunlar, VLC'nin girdi, ayrıştırma ve kod çözme kısımlarına ait ayarlardır. "
-"Kodlayıcı ayarları da bulunabilir burada."
+"Bunlar VLCnin girdi, ayrıştırma ve kod çözme kısımlarına ait ayarlardır. "
+"Burada Kodlayıcı ayarları da bulunabilir."
 
 #: include/vlc_config_cat.h:103
 msgid "Access modules"
 msgstr "Erişim modülleri"
 
 #: include/vlc_config_cat.h:105
-#, fuzzy
 msgid ""
 "Settings related to the various access methods used by VLC. Common settings "
 "you may want to alter are HTTP proxy or caching settings."
 msgstr ""
-"VLC tarafından kullanılan çeşitli erişim yöntemleri ile alakalı ayarlar.\n"
-"Değiştirmek isteyeceğiniz ortak ayarlar HTTP proxy veya arabellek "
-"ayarlarıdır."
+"VLC tarafından kullanılan çeşitli erişim yöntemleri ile ilgili ayarlar."
+"Değiştirmek isteyeceğiniz ortak ayarlar HTTP proxy veya arabellek ayarları."
 
 #: include/vlc_config_cat.h:109
-#, fuzzy
 msgid "Access filters"
-msgstr "Erişim Süzgeci modülleri"
+msgstr "Erişim filtreleri"
 
 #: include/vlc_config_cat.h:111
 msgid ""
@@ -219,41 +211,36 @@ msgid "Demuxers"
 msgstr "Ayırıcılar"
 
 #: include/vlc_config_cat.h:116
-#, fuzzy
 msgid "Demuxers are used to separate audio and video streams."
-msgstr "Ayırıcılar ses ve video akışlarını ayrıştırmak için kullanılırlar"
+msgstr "Ayırıcılar ses ve video akışlarını ayrıştırmak için kullanılırlar."
 
 #: include/vlc_config_cat.h:118
 msgid "Video codecs"
 msgstr "Video codec'leri"
 
 #: include/vlc_config_cat.h:119
-#, fuzzy
 msgid "Settings for the video-only decoders and encoders."
-msgstr "Salt-video kodlayıcılar ve kod çözücülere ilişkin ayarlar"
+msgstr "Salt-video kodlayıcılar ve kod çözücülere ilişkin ayarlar."
 
 #: include/vlc_config_cat.h:121
 msgid "Audio codecs"
 msgstr "Ses codec'leri"
 
 #: include/vlc_config_cat.h:122
-#, fuzzy
 msgid "Settings for the audio-only decoders and encoders."
-msgstr "Salt-ses kodlayıcılar ve kod çözücülere ilişkin ayarlar"
+msgstr "Salt-ses kodlayıcılar ve kod çözücülere ilişkin ayarlar."
 
 #: include/vlc_config_cat.h:124
 msgid "Other codecs"
 msgstr "Diğer codec'ler"
 
 #: include/vlc_config_cat.h:125
-#, fuzzy
 msgid "Settings for audio+video and miscellaneous decoders and encoders."
-msgstr "Ses+video ve çeşitli kodlayıcılar ve kod çözücüler için ayarlar"
+msgstr "Ses+video ve çeşitli kodlayıcılar ve kod çözücüler için ayarlar."
 
 #: include/vlc_config_cat.h:128
-#, fuzzy
 msgid "General input settings. Use with care."
-msgstr "Gelişmiş girdi ayarları. Dikkatli kullanın."
+msgstr "Genel girdi ayarları. Dikkatli kullanın."
 
 #: include/vlc_config_cat.h:131 src/libvlc-module.c:1759
 msgid "Stream output"
@@ -363,7 +350,7 @@ msgstr ""
 msgid "General playlist behaviour"
 msgstr "Genel oynatma listesi davranışı"
 
-#: include/vlc_config_cat.h:188 modules/gui/macosx/playlist.m:439
+#: include/vlc_config_cat.h:188 modules/gui/macosx/playlist.m:447
 msgid "Services discovery"
 msgstr ""
 
@@ -392,9 +379,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:200
-#, fuzzy
 msgid "Advanced settings"
-msgstr "Gelişmiş seçenekler..."
+msgstr "Gelişmiş ayarlar"
 
 #: include/vlc_config_cat.h:201
 msgid "Other advanced settings"
@@ -453,49 +439,44 @@ msgid "No help available"
 msgstr "Yardım yok"
 
 #: include/vlc_config_cat.h:235
-#, fuzzy
 msgid "There is no help available for these modules."
-msgstr "Bu modüller için yardım yok"
+msgstr "Bu modüller için kullanılabilecek yardım yok."
 
 #: include/vlc_interface.h:136
-#, fuzzy
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a command-line window, go "
 "to the directory where you installed VLC and run \"vlc -I qt\"\n"
 msgstr ""
 "\n"
-"Uyari: Eger bir daha GUI'ye erisemiyorsaniz, bir DOS komut penceresi acin, "
-"VLC'yi yuklediginiz klasore gidin ve \"vlc -I wxwin\"komutunu calistirin\n"
+"Uyarı: Eğer GUI'ye bir daha erişemiyorsanız, bir komut-satırı penceresi "
+"açın, VLC klasörüne gidin ve \"vlc -I qt\" komutunu çalıştırın\n"
 
 #: include/vlc_intf_strings.h:29
 msgid "Quick &Open File..."
-msgstr "&Hızlı Dosya Aç.."
+msgstr "Hızlı &Dosya Aç..."
 
 #: include/vlc_intf_strings.h:30
-#, fuzzy
 msgid "&Advanced Open..."
-msgstr "Gelişmiş seçenekler..."
+msgstr "&Gelişmiş Aç..."
 
 #: include/vlc_intf_strings.h:31
-#, fuzzy
 msgid "Open &Directory..."
-msgstr "&Klasör Aç...\tCtrl-E"
+msgstr "&Klasör Aç..."
 
 #: include/vlc_intf_strings.h:33
-#, fuzzy
 msgid "Select one or more files to open"
-msgstr "Duraklatma için kestirme tuş seçin"
+msgstr "Açmak istediğiniz bir veya daha çok dosya seçin"
 
 #: include/vlc_intf_strings.h:37
 #, fuzzy
 msgid "Media &Information..."
-msgstr "Üst-veri"
+msgstr "Medya Bilgisi..."
 
 #: include/vlc_intf_strings.h:38
 #, fuzzy
 msgid "&Codec Information..."
-msgstr "Dönüşümler"
+msgstr "Codec Bilgisi..."
 
 #: include/vlc_intf_strings.h:39
 msgid "&Messages..."
@@ -504,35 +485,35 @@ msgstr "&Mesajlar..."
 #: include/vlc_intf_strings.h:40
 #, fuzzy
 msgid "&Extended Settings..."
-msgstr "Kodlayıcı ayarları"
+msgstr "Detaylı Ayarlar..."
 
 #: include/vlc_intf_strings.h:41
 #, fuzzy
 msgid "Go to Specific &Time..."
-msgstr "Başlığa Git"
+msgstr "Zamana Git..."
 
 #: include/vlc_intf_strings.h:42
 #, fuzzy
 msgid "&Bookmarks..."
-msgstr "Yer imleri"
+msgstr "Yer imleri..."
 
 #: include/vlc_intf_strings.h:43
 #, fuzzy
 msgid "&VLM Configuration..."
-msgstr "VLM yapılandırma dosyası"
+msgstr "VLM Yapılandırması..."
 
 #: include/vlc_intf_strings.h:45
 #, fuzzy
 msgid "&About..."
-msgstr "_Hakkında..."
+msgstr "Hakkında..."
 
 #: include/vlc_intf_strings.h:48 modules/control/rc.c:75
 #: modules/gui/macosx/embeddedwindow.m:51
 #: modules/gui/macosx/embeddedwindow.m:141 modules/gui/macosx/intf.m:562
 #: modules/gui/macosx/intf.m:606 modules/gui/macosx/intf.m:685
-#: modules/gui/macosx/intf.m:692 modules/gui/macosx/intf.m:1608
-#: modules/gui/macosx/intf.m:1609 modules/gui/macosx/intf.m:1610
-#: modules/gui/macosx/intf.m:1611 modules/gui/macosx/playlist.m:431
+#: modules/gui/macosx/intf.m:692 modules/gui/macosx/intf.m:1610
+#: modules/gui/macosx/intf.m:1611 modules/gui/macosx/intf.m:1612
+#: modules/gui/macosx/intf.m:1613 modules/gui/macosx/playlist.m:439
 #: modules/gui/pda/pda_interface.c:260 modules/gui/pda/pda_interface.c:261
 #: modules/gui/qt4/menus.cpp:654 modules/gui/qt4/menus.cpp:658
 #: modules/gui/qt4/menus.cpp:661
@@ -540,11 +521,10 @@ msgid "Play"
 msgstr "Oynat"
 
 #: include/vlc_intf_strings.h:49
-#, fuzzy
 msgid "Fetch Information"
-msgstr "Üst-veri"
+msgstr "Bilgileri Getir"
 
-#: include/vlc_intf_strings.h:50 modules/gui/macosx/playlist.m:432
+#: include/vlc_intf_strings.h:50 modules/gui/macosx/playlist.m:440
 #: modules/gui/pda/pda_interface.c:1252
 #: modules/gui/qt4/dialogs/bookmarks.cpp:46
 #: modules/gui/qt4/ui/podcast_configuration.ui:59
@@ -552,48 +532,41 @@ msgstr "Üst-veri"
 msgid "Delete"
 msgstr "Sil"
 
-#: include/vlc_intf_strings.h:51 modules/gui/macosx/playlist.m:435
-#, fuzzy
+#: include/vlc_intf_strings.h:51 modules/gui/macosx/playlist.m:443
 msgid "Information..."
-msgstr "Dönüşümler"
+msgstr "Bilgiler..."
 
 #: include/vlc_intf_strings.h:52
-#, fuzzy
 msgid "Sort"
-msgstr "&Sırala"
+msgstr "Sırala"
 
 #: include/vlc_intf_strings.h:53
-#, fuzzy
 msgid "Add Node"
-msgstr "Ses kodlayıcısı"
+msgstr "Düğüm Ekle"
 
 #: include/vlc_intf_strings.h:54
-#, fuzzy
 msgid "Stream..."
-msgstr "Akış"
+msgstr "Akış..."
 
 #: include/vlc_intf_strings.h:55
-#, fuzzy
 msgid "Save..."
-msgstr "Farklı Kaydet..."
+msgstr "Kaydet..."
 
 #: include/vlc_intf_strings.h:56
-#, fuzzy
 msgid "Open Folder..."
-msgstr "&Dosya Aç.."
+msgstr "Klasör Aç..."
 
 #: include/vlc_intf_strings.h:60 src/libvlc-module.c:1119
 msgid "Repeat all"
 msgstr "Tümünü tekrarla"
 
 #: include/vlc_intf_strings.h:61
-#, fuzzy
 msgid "Repeat one"
-msgstr "Bir kez Tekrarla"
+msgstr "Birini tekrarla"
 
 #: include/vlc_intf_strings.h:62
 msgid "No repeat"
-msgstr ""
+msgstr "Tekrar yok"
 
 #: include/vlc_intf_strings.h:64 src/libvlc-module.c:1320
 #: modules/gui/macosx/controls.m:919 modules/gui/macosx/intf.m:612
@@ -601,58 +574,51 @@ msgid "Random"
 msgstr "Rastgele"
 
 #: include/vlc_intf_strings.h:65
-#, fuzzy
 msgid "Random off"
-msgstr "Rastgele Kapalı"
+msgstr "Rastgele kapalı"
 
 #: include/vlc_intf_strings.h:67
-#, fuzzy
 msgid "Add to playlist"
-msgstr "Oynatma Listesine Ekle"
+msgstr "Oynatma listesine ekle"
 
 #: include/vlc_intf_strings.h:68
-#, fuzzy
 msgid "Add to media library"
-msgstr "VLC medya oynatıcısı"
+msgstr "Medya kitaplığına ekle"
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Add file..."
-msgstr "Kayıt dosyası"
+msgstr "Dosya ekle..."
 
 #: include/vlc_intf_strings.h:71
-#, fuzzy
 msgid "Advanced open..."
-msgstr "Gelişmiş seçenekler..."
+msgstr "Gelişmiş aç..."
 
 #: include/vlc_intf_strings.h:72
-#, fuzzy
 msgid "Add directory..."
-msgstr "&Klasör Ekle..."
+msgstr "&Klasör ekle..."
 
 #: include/vlc_intf_strings.h:74
 #, fuzzy
 msgid "Save Playlist to &File..."
-msgstr "Listeyi Kaydet..."
+msgstr "Listeyi Dosyaya Kaydet..."
 
 #: include/vlc_intf_strings.h:75
 #, fuzzy
 msgid "&Load Playlist File..."
-msgstr "Listeyi Kaydet..."
+msgstr "Listeyi Dosyadan Yükle..."
 
 #: include/vlc_intf_strings.h:77
 msgid "Search"
 msgstr "Ara"
 
 #: include/vlc_intf_strings.h:78
-#, fuzzy
 msgid "Search Filter"
-msgstr "Oynatma Listesi Aç"
+msgstr "Arama Süzgeci"
 
 #: include/vlc_intf_strings.h:80
 #, fuzzy
 msgid "Additional &Sources"
-msgstr "Video etkin"
+msgstr "Ek Kaynaklar"
 
 #: include/vlc_intf_strings.h:84
 msgid ""
@@ -667,14 +633,12 @@ msgid "Image clone"
 msgstr "Resim çoğalt"
 
 #: include/vlc_intf_strings.h:90
-#, fuzzy
 msgid "Clone the image"
-msgstr "Pencereyi kapat"
+msgstr "Resmi çoğaltır"
 
 #: include/vlc_intf_strings.h:92 modules/gui/qt4/ui/video_effects.ui:440
-#, fuzzy
 msgid "Magnification"
-msgstr "Altyazı hizalama"
+msgstr "Büyütme"
 
 #: include/vlc_intf_strings.h:93
 msgid ""
@@ -683,9 +647,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_intf_strings.h:96 modules/gui/qt4/ui/video_effects.ui:545
-#, fuzzy
 msgid "Waves"
-msgstr "Kaydet"
+msgstr "Dalgalar"
 
 #: include/vlc_intf_strings.h:97
 msgid "\"Waves\" video distortion effect"
@@ -696,9 +659,8 @@ msgid "\"Water surface\" video distortion effect"
 msgstr ""
 
 #: include/vlc_intf_strings.h:101
-#, fuzzy
 msgid "Image colors inversion"
-msgstr "Resim evirme"
+msgstr "Resim renklerini evirme"
 
 #: include/vlc_intf_strings.h:103
 msgid "Split the image to make an image wall"
@@ -755,9 +717,8 @@ msgstr ""
 
 #: src/audio_output/filters.c:159 src/audio_output/filters.c:206
 #: src/audio_output/filters.c:229
-#, fuzzy
 msgid "Audio filtering failed"
-msgstr "Ses süzgeçleri"
+msgstr "Ses süzgeçleme hata verdi"
 
 #: src/audio_output/filters.c:160 src/audio_output/filters.c:207
 #: src/audio_output/filters.c:230
@@ -772,9 +733,8 @@ msgid "Disable"
 msgstr "Devredışı"
 
 #: src/audio_output/input.c:96 modules/visualization/visual/visual.c:132
-#, fuzzy
 msgid "Spectrometer"
-msgstr "Spektrum"
+msgstr "Spektrometre"
 
 #: src/audio_output/input.c:98
 msgid "Scope"
@@ -785,9 +745,8 @@ msgid "Spectrum"
 msgstr "Spektrum"
 
 #: src/audio_output/input.c:102
-#, fuzzy
 msgid "Vu meter"
-msgstr "Video Süzgeçleri"
+msgstr "VU metre"
 
 #: src/audio_output/input.c:137 modules/audio_filter/equalizer.c:74
 #: modules/gui/macosx/equalizer.m:156 modules/gui/macosx/equalizer.m:170
@@ -799,9 +758,8 @@ msgid "Audio filters"
 msgstr "Ses süzgeçleri"
 
 #: src/audio_output/input.c:181
-#, fuzzy
 msgid "Replay gain"
-msgstr "Oynat ve durdur"
+msgstr "Oynatma kazancı"
 
 #: src/audio_output/output.c:102 src/audio_output/output.c:129
 #: modules/access/vcdx/info.c:121 modules/gui/macosx/intf.m:631
@@ -852,30 +810,29 @@ msgid "Reverse stereo"
 msgstr "Ters stereo"
 
 #: src/config/file.c:584
-#, fuzzy
 msgid "key"
-msgstr "anahtar/kare"
+msgstr "anahtar"
 
 #: src/config/file.c:593
 msgid "boolean"
 msgstr "boolean"
 
-#: src/config/file.c:593 src/libvlc.c:1601
+#: src/config/file.c:593 src/libvlc.c:1595
 msgid "integer"
 msgstr "tamsayı"
 
-#: src/config/file.c:602 src/libvlc.c:1630
+#: src/config/file.c:602 src/libvlc.c:1624
 msgid "float"
 msgstr "ondalık sayı"
 
-#: src/config/file.c:625 src/libvlc.c:1580
+#: src/config/file.c:625 src/libvlc.c:1574
 msgid "string"
 msgstr "dizge"
 
 #: src/control/media_list.c:227 src/playlist/engine.c:127
 #: src/playlist/loadsave.c:144
 msgid "Media Library"
-msgstr ""
+msgstr "Medya Kitaplığı"
 
 #: src/extras/getopt.c:633
 #, c-format
@@ -898,9 +855,9 @@ msgid "%s: option `%s' requires an argument\n"
 msgstr "%s: `%s' seçeneği bir argüman gerektirir\n"
 
 #: src/extras/getopt.c:710 src/extras/getopt.c:716
-#, fuzzy, c-format
+#, c-format
 msgid "%s: unrecognized option `%s%s'\n"
-msgstr "%s: bilinmeyen seçenek `%c%s'\n"
+msgstr "%s: tanınmayan seçenek `%s%s'\n"
 
 #: src/extras/getopt.c:743
 #, c-format
@@ -933,9 +890,8 @@ msgid "Bookmark %i"
 msgstr "Yer imi %i"
 
 #: src/input/decoder.c:111
-#, fuzzy
 msgid "No suitable decoder module"
-msgstr "Video süzgeç modülü"
+msgstr "Uygun kod çözücü modülü yok"
 
 #: src/input/decoder.c:112
 #, c-format
@@ -949,9 +905,8 @@ msgstr ""
 #: modules/codec/avcodec/encoder.c:248 modules/codec/avcodec/encoder.c:660
 #: modules/codec/avcodec/encoder.c:669 modules/stream_out/es.c:373
 #: modules/stream_out/es.c:387
-#, fuzzy
 msgid "Streaming / Transcoding failed"
-msgstr "Akış/Transko Sihirbazı"
+msgstr "Akış / Transkodlama hata verdi"
 
 #: src/input/decoder.c:168
 msgid "VLC could not open the packetizer module."
@@ -963,7 +918,7 @@ msgstr ""
 
 #: src/input/es_out.c:480 src/input/es_out.c:485 src/libvlc-module.c:315
 #: modules/access/cdda/info.c:392 modules/access/vcdx/access.c:477
-#: modules/access/vcdx/info.c:289 modules/access/vcdx/info.c:290
+#: modules/access/vcdx/info.c:290 modules/access/vcdx/info.c:291
 #: modules/gui/qt4/components/open_panels.cpp:335
 msgid "Track"
 msgstr "İz"
@@ -971,7 +926,7 @@ msgstr "İz"
 #: src/input/es_out.c:672
 #, c-format
 msgid "%s [%s %d]"
-msgstr ""
+msgstr "%s [%s %d]"
 
 #: src/input/es_out.c:672 src/input/es_out.c:674 src/input/var.c:158
 #: src/libvlc-module.c:593 modules/gui/macosx/intf.m:618
@@ -981,19 +936,19 @@ msgstr "Program"
 
 #: src/input/es_out.c:1458 modules/demux/ty.c:771
 msgid "Closed captions 1"
-msgstr ""
+msgstr "Kapalı başlıklar 1"
 
 #: src/input/es_out.c:1459 modules/demux/ty.c:772
 msgid "Closed captions 2"
-msgstr ""
+msgstr "Kapalı başlıklar 2"
 
 #: src/input/es_out.c:1460 modules/demux/ty.c:773
 msgid "Closed captions 3"
-msgstr ""
+msgstr "Kapalı başlıklar 3"
 
 #: src/input/es_out.c:1461 modules/demux/ty.c:774
 msgid "Closed captions 4"
-msgstr ""
+msgstr "Kapalı başlıklar 4"
 
 #: src/input/es_out.c:2038 modules/codec/faad.c:386
 #, c-format
@@ -1027,9 +982,9 @@ msgid "Sample rate"
 msgstr "Örnekleme oranı"
 
 #: src/input/es_out.c:2060
-#, fuzzy, c-format
+#, c-format
 msgid "%u Hz"
-msgstr "%d Hz"
+msgstr "%u Hz"
 
 #: src/input/es_out.c:2066
 msgid "Bits per sample"
@@ -1041,9 +996,9 @@ msgid "Bitrate"
 msgstr "Bit oranı"
 
 #: src/input/es_out.c:2072
-#, fuzzy, c-format
+#, c-format
 msgid "%u kb/s"
-msgstr "%d kb/s"
+msgstr "%u kb/s"
 
 #: src/input/es_out.c:2083
 msgid "Resolution"
@@ -1089,7 +1044,7 @@ msgid "Title"
 msgstr "Başlık"
 
 #: src/input/meta.c:53 modules/gui/macosx/playlistinfo.m:73
-#: modules/gui/macosx/playlist.m:1098
+#: modules/gui/macosx/playlist.m:1106
 msgid "Artist"
 msgstr "Sanatçı"
 
@@ -1106,9 +1061,8 @@ msgid "Album"
 msgstr "Albüm"
 
 #: src/input/meta.c:57
-#, fuzzy
 msgid "Track number"
-msgstr "İz Numarası"
+msgstr "İz numarası"
 
 #: src/input/meta.c:58 modules/gui/macosx/bookmarks.m:96
 #: modules/gui/qt4/dialogs/bookmarks.cpp:66
@@ -1134,7 +1088,7 @@ msgstr "URL"
 
 #: src/input/meta.c:64 modules/misc/notify/notify.c:291
 msgid "Now Playing"
-msgstr "Şimdi oynatıyor"
+msgstr "Şimdi Oynatıyor"
 
 #: src/input/meta.c:65 modules/access/vcdx/info.c:101
 msgid "Publisher"
@@ -1142,17 +1096,15 @@ msgstr "Yayıncı"
 
 #: src/input/meta.c:66
 msgid "Encoded by"
-msgstr ""
+msgstr "Kodlandı "
 
 #: src/input/meta.c:67
-#, fuzzy
 msgid "Artwork URL"
-msgstr "URL"
+msgstr "Çizim URL"
 
 #: src/input/meta.c:68
-#, fuzzy
 msgid "Track ID"
-msgstr "İz"
+msgstr "İz ID"
 
 #: src/input/var.c:149
 msgid "Bookmark"
@@ -1168,8 +1120,8 @@ msgstr "Programlar"
 msgid "Chapter"
 msgstr "Bölüm"
 
-#: src/input/var.c:178 modules/access/vcdx/info.c:305
-#: modules/access/vcdx/info.c:306 modules/gui/beos/InterfaceWindow.cpp:294
+#: src/input/var.c:178 modules/access/vcdx/info.c:306
+#: modules/access/vcdx/info.c:307 modules/gui/beos/InterfaceWindow.cpp:294
 msgid "Navigation"
 msgstr "Gezinti"
 
@@ -1219,18 +1171,18 @@ msgstr "Önceki bölüm"
 #: src/input/vlm.c:523 src/input/vlm.c:852
 #, c-format
 msgid "Media: %s"
-msgstr ""
+msgstr "Medya: %s"
 
 #: src/interface/interaction.c:172 src/interface/interaction.c:280
 #: modules/demux/avi/avi.c:673 modules/gui/beos/InterfaceWindow.cpp:161
 #: modules/gui/macosx/bookmarks.m:104 modules/gui/macosx/controls.m:58
-#: modules/gui/macosx/interaction.m:128 modules/gui/macosx/interaction.m:132
-#: modules/gui/macosx/interaction.m:135 modules/gui/macosx/open.m:168
+#: modules/gui/macosx/interaction.m:129 modules/gui/macosx/interaction.m:133
+#: modules/gui/macosx/interaction.m:136 modules/gui/macosx/open.m:168
 #: modules/gui/macosx/prefs.m:126 modules/gui/macosx/prefs.m:147
 #: modules/gui/macosx/simple_prefs.m:232 modules/gui/macosx/simple_prefs.m:296
 #: modules/gui/macosx/simple_prefs.m:606 modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1140
-#: modules/gui/qt4/components/preferences_widgets.cpp:1287
+#: modules/gui/qt4/components/preferences_widgets.cpp:1289
 msgid "Cancel"
 msgstr "İptal"
 
@@ -1238,18 +1190,19 @@ msgstr "İptal"
 #: modules/gui/macosx/bookmarks.m:103 modules/gui/macosx/bookmarks.m:217
 #: modules/gui/macosx/bookmarks.m:225 modules/gui/macosx/bookmarks.m:270
 #: modules/gui/macosx/bookmarks.m:278 modules/gui/macosx/controls.m:59
-#: modules/gui/macosx/extended.m:519 modules/gui/macosx/interaction.m:133
-#: modules/gui/macosx/interaction.m:134 modules/gui/macosx/interaction.m:174
-#: modules/gui/macosx/open.m:167 modules/gui/macosx/open.m:299
-#: modules/gui/macosx/output.m:138 modules/gui/macosx/playlistinfo.m:425
-#: modules/gui/macosx/simple_prefs.m:233 modules/gui/macosx/update.m:65
-#: modules/gui/macosx/wizard.m:599 modules/gui/macosx/wizard.m:663
-#: modules/gui/macosx/wizard.m:1055 modules/gui/macosx/wizard.m:1140
-#: modules/gui/macosx/wizard.m:1147 modules/gui/macosx/wizard.m:1674
-#: modules/gui/macosx/wizard.m:1682 modules/gui/macosx/wizard.m:1863
-#: modules/gui/macosx/wizard.m:1874 modules/gui/macosx/wizard.m:1887
+#: modules/gui/macosx/extended.m:519 modules/gui/macosx/interaction.m:134
+#: modules/gui/macosx/interaction.m:135 modules/gui/macosx/interaction.m:175
+#: modules/gui/macosx/intf.m:2018 modules/gui/macosx/open.m:167
+#: modules/gui/macosx/open.m:299 modules/gui/macosx/output.m:138
+#: modules/gui/macosx/playlistinfo.m:425 modules/gui/macosx/simple_prefs.m:233
+#: modules/gui/macosx/update.m:65 modules/gui/macosx/wizard.m:599
+#: modules/gui/macosx/wizard.m:663 modules/gui/macosx/wizard.m:1055
+#: modules/gui/macosx/wizard.m:1140 modules/gui/macosx/wizard.m:1147
+#: modules/gui/macosx/wizard.m:1676 modules/gui/macosx/wizard.m:1684
+#: modules/gui/macosx/wizard.m:1865 modules/gui/macosx/wizard.m:1876
+#: modules/gui/macosx/wizard.m:1889
 #: modules/gui/qt4/components/open_panels.cpp:1139
-#: modules/gui/qt4/components/preferences_widgets.cpp:1286
+#: modules/gui/qt4/components/preferences_widgets.cpp:1288
 #: modules/gui/qt4/main_interface.cpp:526
 msgid "OK"
 msgstr "Tamam"
@@ -1257,7 +1210,7 @@ msgstr "Tamam"
 #: src/interface/interface.c:204 modules/gui/macosx/intf.m:580
 #: modules/gui/macosx/intf.m:581
 msgid "Add Interface"
-msgstr "Arayüz ekle"
+msgstr "Arayüz Ekle"
 
 #: src/interface/interface.c:208
 #, fuzzy
@@ -1265,83 +1218,80 @@ msgid "Console"
 msgstr "Denetim"
 
 #: src/interface/interface.c:211
-#, fuzzy
 msgid "Telnet Interface"
-msgstr "Telnet Arayüzü portu"
+msgstr "Telnet Arayüzü"
 
 #: src/interface/interface.c:214
-#, fuzzy
 msgid "Web Interface"
-msgstr "Arayüz"
+msgstr "Web Arayüzü"
 
 #: src/interface/interface.c:217
 msgid "Debug logging"
-msgstr ""
+msgstr "Hata ayıklama çetelesi"
 
 #: src/interface/interface.c:220
-#, fuzzy
 msgid "Mouse Gestures"
-msgstr "Akışı duraklat"
+msgstr "Fare Hareketleri"
 
-#: src/libvlc.c:295 src/libvlc.c:434 src/modules/cache.c:206
+#: src/libvlc.c:295 src/libvlc.c:428 src/modules/cache.c:206
 #: src/modules/cache.c:525
+#, fuzzy
 msgid "C"
 msgstr "tr"
 
-#: src/libvlc.c:1168
+#: src/libvlc.c:1162
 msgid ""
 "Running vlc with the default interface. Use 'cvlc' to use vlc without "
 "interface."
 msgstr ""
 
-#: src/libvlc.c:1313
+#: src/libvlc.c:1307
 msgid "To get exhaustive help, use '-H'."
 msgstr ""
 
-#: src/libvlc.c:1645
+#: src/libvlc.c:1639
 msgid " (default enabled)"
 msgstr "(varsayılan etkin)"
 
-#: src/libvlc.c:1646
+#: src/libvlc.c:1640
 msgid " (default disabled)"
 msgstr " (varsayılan devredışı)"
 
-#: src/libvlc.c:1805 src/libvlc.c:1808
-#, fuzzy
+#: src/libvlc.c:1799 src/libvlc.c:1802
 msgid "Note:"
-msgstr "Hiçbiri"
+msgstr "Not:"
 
-#: src/libvlc.c:1806 src/libvlc.c:1809
+#: src/libvlc.c:1800 src/libvlc.c:1803
 msgid "add --advanced to your command line to see advanced options."
 msgstr ""
 
-#: src/libvlc.c:1913
+#: src/libvlc.c:1907
 #, c-format
 msgid "VLC version %s\n"
-msgstr ""
+msgstr "VLC sürüm %s\n"
 
-#: src/libvlc.c:1914
+#: src/libvlc.c:1908
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
-msgstr ""
+msgstr "%s@%s.%s tarafından derlendi\n"
 
-#: src/libvlc.c:1916
+#: src/libvlc.c:1910
 #, c-format
 msgid "Compiler: %s\n"
-msgstr ""
+msgstr "Derleyici: %s\n"
 
-#: src/libvlc.c:1918
+#: src/libvlc.c:1912
 #, c-format
 msgid "Based upon Git commit [%s]\n"
 msgstr ""
 
-#: src/libvlc.c:1954
+#: src/libvlc.c:1948
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 
-#: src/libvlc.c:1974
+#: src/libvlc.c:1968
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1375,56 +1325,52 @@ msgid "Auto"
 msgstr "Otomatik"
 
 #: src/libvlc-module.c:87
-#, fuzzy
 msgid "American English"
-msgstr "English"
+msgstr "Amerikan İngilizcesi"
 
 #: src/libvlc-module.c:88 src/text/iso-639_def.h:43
 msgid "Arabic"
-msgstr "Arabic"
+msgstr "Arapça"
 
 #: src/libvlc-module.c:89
-#, fuzzy
 msgid "Brazilian Portuguese"
-msgstr "Portuguese"
+msgstr "Brezilya Portekizcesi"
 
 #: src/libvlc-module.c:90
-#, fuzzy
 msgid "British English"
-msgstr "English"
+msgstr "İngiltere İngilizcesi"
 
 #: src/libvlc-module.c:91 src/text/iso-639_def.h:59
 msgid "Catalan"
-msgstr ""
+msgstr "Katalan"
 
 #: src/libvlc-module.c:92
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Geleneksel Çince"
 
 #: src/libvlc-module.c:93 src/text/iso-639_def.h:67
 msgid "Czech"
-msgstr "Czech"
+msgstr "Çekce"
 
 #: src/libvlc-module.c:94 src/text/iso-639_def.h:68
 msgid "Danish"
-msgstr ""
+msgstr "Danimarkaca"
 
 #: src/libvlc-module.c:95 src/text/iso-639_def.h:69
 msgid "Dutch"
-msgstr ""
+msgstr "Hollandaca"
 
 #: src/libvlc-module.c:96 src/text/iso-639_def.h:76
 msgid "Finnish"
-msgstr "Finnish"
+msgstr "Fince"
 
 #: src/libvlc-module.c:97 src/text/iso-639_def.h:77
 msgid "French"
-msgstr ""
+msgstr "Fransızca"
 
 #: src/libvlc-module.c:98
-#, fuzzy
 msgid "Galician"
-msgstr "Gallegan"
+msgstr "Galician"
 
 #: src/libvlc-module.c:99 src/text/iso-639_def.h:79
 msgid "Georgian"
@@ -1432,27 +1378,27 @@ msgstr "Georgian"
 
 #: src/libvlc-module.c:100 src/text/iso-639_def.h:80
 msgid "German"
-msgstr ""
+msgstr "Almanca"
 
 #: src/libvlc-module.c:101 src/text/iso-639_def.h:88
 msgid "Hebrew"
-msgstr "Hebrew"
+msgstr "İbranice"
 
 #: src/libvlc-module.c:102 src/text/iso-639_def.h:92
 msgid "Hungarian"
-msgstr ""
+msgstr "Macarca"
 
 #: src/libvlc-module.c:103 src/text/iso-639_def.h:99
 msgid "Italian"
-msgstr ""
+msgstr "İtalyanca"
 
 #: src/libvlc-module.c:104 src/text/iso-639_def.h:101
 msgid "Japanese"
-msgstr ""
+msgstr "Japonca"
 
 #: src/libvlc-module.c:105 src/text/iso-639_def.h:111
 msgid "Korean"
-msgstr "Korean"
+msgstr "Korece"
 
 #: src/libvlc-module.c:106 src/text/iso-639_def.h:125
 msgid "Malay"
@@ -1460,35 +1406,35 @@ msgstr "Malay"
 
 #: src/libvlc-module.c:107
 msgid "Occitan"
-msgstr ""
+msgstr "Occitan"
 
 #: src/libvlc-module.c:108 src/text/iso-639_def.h:146
 msgid "Persian"
-msgstr "Persian"
+msgstr "Farsça"
 
 #: src/libvlc-module.c:109 src/text/iso-639_def.h:148
 msgid "Polish"
-msgstr ""
+msgstr "Polonyaca"
 
 #: src/libvlc-module.c:110 src/text/iso-639_def.h:149
 msgid "Portuguese"
-msgstr "Portuguese"
+msgstr "Portekizce"
 
 #: src/libvlc-module.c:111 src/text/iso-639_def.h:154
 msgid "Romanian"
-msgstr "Romanian"
+msgstr "Rumence"
 
 #: src/libvlc-module.c:112 src/text/iso-639_def.h:156
 msgid "Russian"
-msgstr ""
+msgstr "Rusça"
 
 #: src/libvlc-module.c:113
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Basitleştirilmiş Çince"
 
 #: src/libvlc-module.c:114 src/text/iso-639_def.h:159
 msgid "Serbian"
-msgstr "Serbian"
+msgstr "Sırpça"
 
 #: src/libvlc-module.c:115 src/text/iso-639_def.h:162
 msgid "Slovak"
@@ -1500,11 +1446,11 @@ msgstr "Slovenian"
 
 #: src/libvlc-module.c:117 src/text/iso-639_def.h:170
 msgid "Spanish"
-msgstr ""
+msgstr "İspanyolca"
 
 #: src/libvlc-module.c:118 src/text/iso-639_def.h:175
 msgid "Swedish"
-msgstr ""
+msgstr "İsveççe"
 
 #: src/libvlc-module.c:119 src/text/iso-639_def.h:188
 msgid "Turkish"
@@ -1529,7 +1475,7 @@ msgstr ""
 
 #: src/libvlc-module.c:149 modules/control/ntservice.c:57
 msgid "Extra interface modules"
-msgstr "Ekstra arayüz modülleri"
+msgstr "Ek arayüz modülleri"
 
 #: src/libvlc-module.c:151
 msgid ""
@@ -1540,9 +1486,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:158
-#, fuzzy
 msgid "You can select control interfaces for VLC."
-msgstr "Joystick kumanda arayüzü"
+msgstr "VLC için kontrol arayüzleri seçebilirsiniz."
 
 #: src/libvlc-module.c:160
 msgid "Verbosity (0,1,2)"
@@ -1563,9 +1508,8 @@ msgid "Turn off all warning and information messages."
 msgstr ""
 
 #: src/libvlc-module.c:169
-#, fuzzy
 msgid "Default stream"
-msgstr "Varsayılan admin"
+msgstr "Varsayılan akış"
 
 #: src/libvlc-module.c:171
 msgid "This stream will always be opened at VLC startup."
@@ -1598,9 +1542,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:189 modules/control/showintf.c:72
-#, fuzzy
 msgid "Show interface with mouse"
-msgstr "Arayüzü Göster"
+msgstr "Fare arayüzünü göster"
 
 #: src/libvlc-module.c:191
 msgid ""
@@ -1609,9 +1552,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:194
-#, fuzzy
 msgid "Interface interaction"
-msgstr "Geçmeli video kodlama etkin"
+msgstr "Arayüz etkileşimi"
 
 #: src/libvlc-module.c:196
 msgid ""
@@ -1657,9 +1599,8 @@ msgid "This will force a mono audio output."
 msgstr ""
 
 #: src/libvlc-module.c:228
-#, fuzzy
 msgid "Default audio volume"
-msgstr "Varsayılan aygıtlar"
+msgstr "Varsayılan ses seviyesi"
 
 #: src/libvlc-module.c:230
 msgid ""
@@ -1677,9 +1618,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:238
-#, fuzzy
 msgid "Audio output volume step"
-msgstr "Ses çıktı seviyesi"
+msgstr "Ses çıktı seviyesi adımı"
 
 #: src/libvlc-module.c:240
 msgid ""
@@ -1719,9 +1659,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:261
-#, fuzzy
 msgid "Audio output channels mode"
-msgstr "Tercih edilen ses çıktı kanalları modu"
+msgstr "Ses çıktı kanalları modu"
 
 #: src/libvlc-module.c:263
 msgid ""
@@ -1732,9 +1671,8 @@ msgstr ""
 
 #: src/libvlc-module.c:267 modules/gui/macosx/simple_prefs.m:225
 #: modules/gui/qt4/ui/sprefs_audio.ui:99
-#, fuzzy
 msgid "Use S/PDIF when available"
-msgstr "Eğer varsa S/PDIF ses çıktısı kullan"
+msgstr "Eğer varsa S/PDIF kullan"
 
 #: src/libvlc-module.c:269
 msgid ""
@@ -1756,9 +1694,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:281 modules/access/bda/bda.c:63
-#, fuzzy
 msgid "On"
-msgstr "Aç"
+msgstr "Açık"
 
 #: src/libvlc-module.c:281 modules/access/bda/bda.c:62
 msgid "Off"
@@ -1770,26 +1707,23 @@ msgstr ""
 
 #: src/libvlc-module.c:289
 msgid "Audio visualizations "
-msgstr "Ses görsel ögeleri"
+msgstr "Ses görsel ögeleri "
 
 #: src/libvlc-module.c:291
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
 msgstr ""
 
 #: src/libvlc-module.c:295
-#, fuzzy
 msgid "Replay gain mode"
-msgstr "Oynat ve durdur"
+msgstr "Oynatım kazancı modu"
 
 #: src/libvlc-module.c:297
-#, fuzzy
 msgid "Select the replay gain mode"
-msgstr "Bir dosya seçin"
+msgstr "Oynatım kazancı modunu seçin"
 
 #: src/libvlc-module.c:299
-#, fuzzy
 msgid "Replay preamp"
-msgstr "Akış Oynat"
+msgstr "Oynat preamp"
 
 #: src/libvlc-module.c:301
 msgid ""
@@ -1798,18 +1732,16 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:304
-#, fuzzy
 msgid "Default replay gain"
-msgstr "Varsayılan admin"
+msgstr "Varsayılan oynatım kazancı"
 
 #: src/libvlc-module.c:306
 msgid "This is the gain used for stream without replay gain information"
 msgstr ""
 
 #: src/libvlc-module.c:308
-#, fuzzy
 msgid "Peak protection"
-msgstr "Gürültü azaltma"
+msgstr "Patlama koruması"
 
 #: src/libvlc-module.c:310
 msgid "Protect against sound clipping"
@@ -1877,9 +1809,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:349
-#, fuzzy
 msgid "Video X coordinate"
-msgstr "Video y koordinatı"
+msgstr "Video X koordinatı"
 
 #: src/libvlc-module.c:351
 msgid ""
@@ -1888,9 +1819,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:354
-#, fuzzy
 msgid "Video Y coordinate"
-msgstr "Video y koordinatı"
+msgstr "Video Y koordinatı"
 
 #: src/libvlc-module.c:356
 msgid ""
@@ -1997,23 +1927,20 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:383
-#, fuzzy
 msgid "Embedded video"
-msgstr "Tam ekran video çıktısı"
+msgstr "Gömülü video"
 
 #: src/libvlc-module.c:385
-#, fuzzy
 msgid "Embed the video output in the main interface."
-msgstr "Videoyu arayüzde göster"
+msgstr "Video çıktısını ana arayüze gömer."
 
 #: src/libvlc-module.c:387
 msgid "Fullscreen video output"
-msgstr "Tam ekran video çıktısı"
+msgstr "Tam-ekran video çıktısı"
 
 #: src/libvlc-module.c:389
-#, fuzzy
 msgid "Start video in fullscreen mode"
-msgstr "Tam ekran modu geçiş"
+msgstr "Videoyu tam-ekran modunda başlat"
 
 #: src/libvlc-module.c:391
 msgid "Overlay video output"
@@ -2028,7 +1955,7 @@ msgstr ""
 #: src/libvlc-module.c:396 src/video_output/vout_intf.c:400
 #: modules/gui/macosx/simple_prefs.m:283 modules/gui/qt4/ui/sprefs_video.ui:68
 msgid "Always on top"
-msgstr "Her zaman üstte"
+msgstr "Her Zaman Üstte"
 
 #: src/libvlc-module.c:398
 msgid "Always place the video window on top of other windows."
@@ -2037,7 +1964,7 @@ msgstr ""
 #: src/libvlc-module.c:400
 #, fuzzy
 msgid "Show media title on video"
-msgstr "Bindirmeler/Altyazılar"
+msgstr "Medya başlığını video üstünde göster."
 
 #: src/libvlc-module.c:402
 msgid "Display the title of the video on top of the movie."
@@ -2046,7 +1973,7 @@ msgstr ""
 #: src/libvlc-module.c:404
 #, fuzzy
 msgid "Show video title for x miliseconds"
-msgstr "Bindirmeler/Altyazılar"
+msgstr "Medya başlığını video üstünde göster."
 
 #: src/libvlc-module.c:406
 msgid "Show the video title for n miliseconds, default is 5000 ms (5 sec.)"
@@ -2055,7 +1982,7 @@ msgstr ""
 #: src/libvlc-module.c:408
 #, fuzzy
 msgid "Position of video title"
-msgstr "Video x koordinatı"
+msgstr "Video başlığının konumu."
 
 #: src/libvlc-module.c:410
 msgid "Place on video where to display the title (default bottom center)."
@@ -2100,9 +2027,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:435
-#, fuzzy
 msgid "Video output filter module"
-msgstr "Video çıktı modülü"
+msgstr "Video çıktısı süzgeç modülü"
 
 #: src/libvlc-module.c:437
 msgid ""
@@ -2121,18 +2047,16 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:447
-#, fuzzy
 msgid "Video snapshot directory (or filename)"
-msgstr "Video enstantane klasörü"
+msgstr "Video enstantane klasörü (veya dosyaadı)"
 
 #: src/libvlc-module.c:449
 msgid "Directory where the video snapshots will be stored."
 msgstr ""
 
 #: src/libvlc-module.c:451 src/libvlc-module.c:453
-#, fuzzy
 msgid "Video snapshot file prefix"
-msgstr "Video enstantane formatı"
+msgstr "Video enstantane dosyası öneki"
 
 #: src/libvlc-module.c:455
 msgid "Video snapshot format"
@@ -2143,9 +2067,8 @@ msgid "Image format which will be used to store the video snapshots"
 msgstr ""
 
 #: src/libvlc-module.c:459
-#, fuzzy
 msgid "Display video snapshot preview"
-msgstr "Videodan enstantane çek"
+msgstr "Video enstantane önizlemesini göster"
 
 #: src/libvlc-module.c:461
 msgid "Display the snapshot preview in the screen's top-left corner."
@@ -2160,9 +2083,8 @@ msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
 
 #: src/libvlc-module.c:467
-#, fuzzy
 msgid "Video snapshot width"
-msgstr "Video enstantane formatı"
+msgstr "Video enstantane genişliği"
 
 #: src/libvlc-module.c:469
 msgid ""
@@ -2171,9 +2093,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:473
-#, fuzzy
 msgid "Video snapshot height"
-msgstr "Video yüksekliği"
+msgstr "Video enstantane yüksekliği"
 
 #: src/libvlc-module.c:475
 msgid ""
@@ -2183,9 +2104,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:479
-#, fuzzy
 msgid "Video cropping"
-msgstr "Resim kırpma"
+msgstr "Video kırpma"
 
 #: src/libvlc-module.c:481
 msgid ""
@@ -2217,9 +2137,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:499
-#, fuzzy
 msgid "Custom aspect ratios list"
-msgstr "Kaynak en-boy oranı"
+msgstr "Özel en-boy oranları listesi"
 
 #: src/libvlc-module.c:501
 msgid ""
@@ -2239,9 +2158,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:511
-#, fuzzy
 msgid "Monitor pixel aspect ratio"
-msgstr "Kaynak en-boy oranı"
+msgstr "Ekran piksel en-boy oranı"
 
 #: src/libvlc-module.c:513
 msgid ""
@@ -2262,9 +2180,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:522
-#, fuzzy
 msgid "Drop late frames"
-msgstr "Kareleri atla"
+msgstr "Geciken kareleri düşür"
 
 #: src/libvlc-module.c:524
 msgid ""
@@ -2274,7 +2191,7 @@ msgstr ""
 
 #: src/libvlc-module.c:527
 msgid "Quiet synchro"
-msgstr "Ses senkron"
+msgstr "Sessizlik senkron"
 
 #: src/libvlc-module.c:529
 msgid ""
@@ -2369,9 +2286,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:579
-#, fuzzy
 msgid "Multicast output interface"
-msgstr "Ağ arayüz adresi"
+msgstr "Multicast çıktı arayüzü"
 
 #: src/libvlc-module.c:581
 msgid "Default multicast interface. This overrides the routing table."
@@ -2412,9 +2328,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:607 modules/gui/qt4/ui/open_disk.ui:238
-#, fuzzy
 msgid "Audio track"
-msgstr "Ses İzi"
+msgstr "Ses izi"
 
 #: src/libvlc-module.c:609
 msgid "Stream number of the audio track to use (from 0 to n)."
@@ -2429,9 +2344,8 @@ msgid "Stream number of the subtitle track to use (from 0 to n)."
 msgstr ""
 
 #: src/libvlc-module.c:617
-#, fuzzy
 msgid "Audio language"
-msgstr "Ses dilini seçiniz"
+msgstr "Ses dilini"
 
 #: src/libvlc-module.c:619
 msgid ""
@@ -2440,9 +2354,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:622
-#, fuzzy
 msgid "Subtitle language"
-msgstr "Altyazı dilini seçiniz"
+msgstr "Altyazı dilini"
 
 #: src/libvlc-module.c:624
 msgid ""
@@ -2451,18 +2364,16 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:628
-#, fuzzy
 msgid "Audio track ID"
-msgstr "Ses İzi"
+msgstr "Ses iz ID"
 
 #: src/libvlc-module.c:630
 msgid "Stream ID of the audio track to use."
 msgstr ""
 
 #: src/libvlc-module.c:632
-#, fuzzy
 msgid "Subtitles track ID"
-msgstr "Altyazı izi"
+msgstr "Altyazı iz ID"
 
 #: src/libvlc-module.c:634
 msgid "Stream ID of the subtitle track to use."
@@ -2477,27 +2388,24 @@ msgid "Number of time the same input will be repeated"
 msgstr ""
 
 #: src/libvlc-module.c:640
-#, fuzzy
 msgid "Start time"
-msgstr "Doğrudan menüden başla"
+msgstr "Başlama zamanı"
 
 #: src/libvlc-module.c:642
 msgid "The stream will start at this position (in seconds)."
 msgstr ""
 
 #: src/libvlc-module.c:644
-#, fuzzy
 msgid "Stop time"
-msgstr "Akış Durdur"
+msgstr "Durma zamanı"
 
 #: src/libvlc-module.c:646
 msgid "The stream will stop at this position (in seconds)."
 msgstr ""
 
 #: src/libvlc-module.c:648
-#, fuzzy
 msgid "Run time"
-msgstr "Rundi"
+msgstr "Çalışma süresi"
 
 #: src/libvlc-module.c:650
 msgid "The stream will run this duration (in seconds)."
@@ -2554,9 +2462,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:682
-#, fuzzy
 msgid "Enable sub-pictures"
-msgstr "Altresimler"
+msgstr "Alt-resimler etkin"
 
 #: src/libvlc-module.c:684
 msgid "You can completely disable the sub-picture processing."
@@ -2576,9 +2483,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:691
-#, fuzzy
 msgid "Text rendering module"
-msgstr "Metin gösterimi"
+msgstr "Metin gösterim modülü"
 
 #: src/libvlc-module.c:693
 msgid ""
@@ -2701,7 +2607,7 @@ msgstr ""
 
 #: src/libvlc-module.c:763
 msgid "TCP connection timeout"
-msgstr ""
+msgstr "TCP bağlantısı zaman-aşımı"
 
 #: src/libvlc-module.c:765
 msgid "Default TCP connection timeout (in milliseconds). "
@@ -2805,9 +2711,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:818
-#, fuzzy
 msgid "Preferred decoders list"
-msgstr "Tercih edilen kodlayıcılar listesi"
+msgstr "Tercihli kod çözücüler listesi"
 
 #: src/libvlc-module.c:820
 msgid ""
@@ -2818,7 +2723,7 @@ msgstr ""
 
 #: src/libvlc-module.c:825
 msgid "Preferred encoders list"
-msgstr "Tercih edilen kodlayıcılar listesi"
+msgstr "Tercihli kodlayıcılar listesi"
 
 #: src/libvlc-module.c:827
 msgid ""
@@ -3132,9 +3037,7 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1003
-msgid ""
-"(Experimental) Auto adjust the caching done to minimize latency when reading "
-"live stream."
+msgid "(Experimental) Minimize latency whenreading live stream."
 msgstr ""
 
 #: src/libvlc-module.c:1009
@@ -3165,7 +3068,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1022
 msgid "Collect statistics"
-msgstr ""
+msgstr "İstatistik Biriktir"
 
 #: src/libvlc-module.c:1024
 msgid "Collect miscellaneous statistics."
@@ -3177,7 +3080,7 @@ msgstr "Arkaplan işlemi olarak çalışsın"
 
 #: src/libvlc-module.c:1028
 msgid "Runs VLC as a background daemon process."
-msgstr ""
+msgstr "Runs VLC as a background daemon process."
 
 #: src/libvlc-module.c:1030
 msgid "Write process id to file"
@@ -3188,9 +3091,8 @@ msgid "Writes process id into specified file."
 msgstr ""
 
 #: src/libvlc-module.c:1034
-#, fuzzy
 msgid "Log to file"
-msgstr "Başlığa Git"
+msgstr "Çeteleyi dosyaya tut"
 
 #: src/libvlc-module.c:1036
 msgid "Log all VLC messages to a text file."
@@ -3198,7 +3100,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1038
 msgid "Log to syslog"
-msgstr ""
+msgstr "Çeteleyi syslog tut"
 
 #: src/libvlc-module.c:1040
 msgid "Log all VLC messages to syslog (UNIX systems)."
@@ -3206,7 +3108,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1042
 msgid "Allow only one running instance"
-msgstr "Yalnızca bir kopya çalışsın"
+msgstr "Yalnızca tek kopya çalışsın"
 
 #: src/libvlc-module.c:1044
 msgid ""
@@ -3241,9 +3143,8 @@ msgid "One instance when started from file"
 msgstr "Yalnızca bir kopya çalışsın"
 
 #: src/libvlc-module.c:1067
-#, fuzzy
 msgid "Allow only one running instance when started from file."
-msgstr "Yalnızca bir kopya çalışsın"
+msgstr "Dosyadan başlatıldığında yalnızca tek kopya çalışsın."
 
 #: src/libvlc-module.c:1069
 msgid "Increase the priority of the process"
@@ -3303,7 +3204,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1108
 msgid "As soon as track is added"
-msgstr ""
+msgstr "İz eklenir eklenmez"
 
 #: src/libvlc-module.c:1110
 msgid "Services discovery modules"
@@ -3344,19 +3245,16 @@ msgid "Stop the playlist after each played playlist item."
 msgstr ""
 
 #: src/libvlc-module.c:1131
-#, fuzzy
 msgid "Play and exit"
-msgstr "Oynat ve durdur"
+msgstr "Oynat ve çık"
 
 #: src/libvlc-module.c:1133
-#, fuzzy
 msgid "Exit if there are no more items in the playlist."
-msgstr "Listede %i öge"
+msgstr "Listede çalınacak öge yoksa programdan çık."
 
 #: src/libvlc-module.c:1135
-#, fuzzy
 msgid "Use media library"
-msgstr "VLC medya oynatıcısı"
+msgstr "Medya kitaplığını kullan"
 
 #: src/libvlc-module.c:1137
 msgid ""
@@ -3365,9 +3263,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1140
-#, fuzzy
 msgid "Display playlist tree"
-msgstr "Sonraki liste ögesi"
+msgstr "Oynatım listesi ağacını göster"
 
 #: src/libvlc-module.c:1142
 msgid ""
@@ -3387,21 +3284,19 @@ msgstr ""
 #: modules/gui/macosx/intf.m:699 modules/gui/macosx/simple_prefs.m:282
 #: modules/gui/qt4/ui/sprefs_video.ui:61
 msgid "Fullscreen"
-msgstr "Tam ekran"
+msgstr "Tam-Ekran"
 
 #: src/libvlc-module.c:1155
 msgid "Select the hotkey to use to swap fullscreen state."
-msgstr "Tam ekran durumuna geçmek için kestirme tuş seçin"
+msgstr "Tam-ekran durumuna geçmek için kestirme tuş seçin"
 
 #: src/libvlc-module.c:1156
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Tam ekranı doldur"
+msgstr "Tam-Ekrandan Çık"
 
 #: src/libvlc-module.c:1157
-#, fuzzy
 msgid "Select the hotkey to use to leave fullscreen state."
-msgstr "Tam ekran durumuna geçmek için kestirme tuş seçin"
+msgstr "Tam-ekran durumundan çıkmak için kestirme tuş seçin."
 
 #: src/libvlc-module.c:1158
 msgid "Play/Pause"
@@ -3452,7 +3347,7 @@ msgstr "Ağır çekim oynatma  için kestirme tuş seçin"
 #: modules/gui/macosx/intf.m:565 modules/gui/macosx/intf.m:611
 #: modules/gui/macosx/intf.m:687 modules/gui/macosx/intf.m:695
 #: modules/gui/macosx/wizard.m:309 modules/gui/macosx/wizard.m:321
-#: modules/gui/macosx/wizard.m:1619 modules/gui/qt4/menus.cpp:668
+#: modules/gui/macosx/wizard.m:1621 modules/gui/qt4/menus.cpp:668
 #: modules/gui/qt4/ui/streampanel.ui:108 modules/misc/notify/notify.c:305
 msgid "Next"
 msgstr "Sonraki"
@@ -3478,14 +3373,13 @@ msgstr ""
 #: modules/gui/macosx/intf.m:607 modules/gui/macosx/intf.m:686
 #: modules/gui/macosx/intf.m:693 modules/gui/pda/pda_interface.c:272
 #: modules/gui/pda/pda_interface.c:273 modules/gui/qt4/menus.cpp:664
-#: modules/gui/qt4/ui/streampanel.ui:101 modules/misc/notify/xosd.c:230
+#: modules/gui/qt4/ui/streampanel.ui:101 modules/misc/notify/xosd.c:238
 msgid "Stop"
 msgstr "Durdur"
 
 #: src/libvlc-module.c:1173
-#, fuzzy
 msgid "Select the hotkey to stop playback."
-msgstr "Oynatma  için kestirme tuş seçin"
+msgstr "Durdurmak için kestirme tuş seçin."
 
 #: src/libvlc-module.c:1174 modules/gui/fbosd.c:129 modules/gui/fbosd.c:197
 #: modules/gui/macosx/bookmarks.m:98 modules/gui/macosx/bookmarks.m:107
@@ -3658,9 +3552,8 @@ msgid "Select the key to activate selected item in DVD menus."
 msgstr ""
 
 #: src/libvlc-module.c:1224
-#, fuzzy
 msgid "Go to the DVD menu"
-msgstr "DVD menülerini kullan"
+msgstr "DVD menüsüne git"
 
 #: src/libvlc-module.c:1225
 #, fuzzy
@@ -3970,9 +3863,8 @@ msgid "Raise the interface above all other windows."
 msgstr ""
 
 #: src/libvlc-module.c:1307
-#, fuzzy
 msgid "Hide interface"
-msgstr "Arayüzü Göster/Gizle"
+msgstr "Arayüzü gizle"
 
 #: src/libvlc-module.c:1308
 msgid "Lower the interface below all other windows."
@@ -4183,13 +4075,13 @@ msgstr "Pencere özellikleri"
 
 #: src/libvlc-module.c:1586
 msgid "Subpictures"
-msgstr "Altresimler"
+msgstr "Altresim"
 
 #: src/libvlc-module.c:1594 modules/codec/subtitles/subsdec.c:117
 #: modules/demux/subtitle.c:74 modules/gui/beos/InterfaceWindow.cpp:280
 #: modules/gui/qt4/ui/sout.ui:717 modules/gui/qt4/ui/sout.ui:723
 msgid "Subtitles"
-msgstr "Altyazılar"
+msgstr "Altyazı"
 
 #: src/libvlc-module.c:1611 modules/stream_out/transcode.c:122
 msgid "Overlays"
@@ -4231,7 +4123,7 @@ msgstr "Girdi"
 
 #: src/libvlc-module.c:1777
 msgid "VLM"
-msgstr ""
+msgstr "VLM"
 
 #: src/libvlc-module.c:1810
 msgid "CPU"
@@ -4331,9 +4223,8 @@ msgid ""
 msgstr ""
 
 #: src/misc/update.c:1594 src/misc/update.c:1606
-#, fuzzy
 msgid "Invalid signature"
-msgstr "Geçersiz seçim"
+msgstr "Geçersiz imza"
 
 #: src/misc/update.c:1595 src/misc/update.c:1607
 #, c-format
@@ -4963,16 +4854,15 @@ msgstr "Kırp"
 
 #: src/video_output/vout_intf.c:369 modules/gui/macosx/intf.m:648
 #: modules/gui/macosx/intf.m:649
-#, fuzzy
 msgid "Aspect-ratio"
-msgstr "En-boy Oranı"
+msgstr "En-boy oranı"
 
 #: modules/access/bda/bda.c:40 modules/access/cdda.c:66
 #: modules/access/dshow/dshow.cpp:98 modules/access/dvb/access.c:78
 #: modules/access/dv.c:71 modules/access/dvdnav.c:72
 #: modules/access/dvdread.c:76 modules/access/fake.c:43
 #: modules/access/file.c:84 modules/access/ftp.c:57
-#: modules/access/gnomevfs.c:47 modules/access/http.c:74
+#: modules/access/gnomevfs.c:47 modules/access/http.c:75
 #: modules/access/jack.c:62 modules/access/mms/mms.c:49
 #: modules/access/pvr.c:60 modules/access/rtmp/access.c:43
 #: modules/access/screen/screen.c:39 modules/access/smb.c:64
@@ -5133,23 +5023,23 @@ msgstr ""
 
 #: modules/access/bda/bda.c:115
 msgid "16"
-msgstr ""
+msgstr "16"
 
 #: modules/access/bda/bda.c:115
 msgid "32"
-msgstr ""
+msgstr "32"
 
 #: modules/access/bda/bda.c:115
 msgid "64"
-msgstr ""
+msgstr "64"
 
 #: modules/access/bda/bda.c:115
 msgid "128"
-msgstr ""
+msgstr "128"
 
 #: modules/access/bda/bda.c:115
 msgid "256"
-msgstr ""
+msgstr "256"
 
 #: modules/access/bda/bda.c:118 modules/access/dvb/access.c:135
 msgid "Terrestrial high priority stream code rate (FEC)"
@@ -5161,23 +5051,23 @@ msgstr ""
 
 #: modules/access/bda/bda.c:123 modules/access/bda/bda.c:130
 msgid "1/2"
-msgstr ""
+msgstr "1/2"
 
 #: modules/access/bda/bda.c:123 modules/access/bda/bda.c:130
 msgid "2/3"
-msgstr ""
+msgstr "2/3"
 
 #: modules/access/bda/bda.c:123 modules/access/bda/bda.c:130
 msgid "3/4"
-msgstr ""
+msgstr "3/4"
 
 #: modules/access/bda/bda.c:123 modules/access/bda/bda.c:130
 msgid "5/6"
-msgstr ""
+msgstr "5/6"
 
 #: modules/access/bda/bda.c:123 modules/access/bda/bda.c:130
 msgid "7/8"
-msgstr ""
+msgstr "7/8"
 
 #: modules/access/bda/bda.c:125 modules/access/dvb/access.c:138
 msgid "Terrestrial low priority stream code rate (FEC)"
@@ -5196,19 +5086,16 @@ msgid "Terrestrial bandwidth [0=auto,6,7,8 in MHz]"
 msgstr "Karasal band genişliği [0=otomatik,6,7,8 MHz]"
 
 #: modules/access/bda/bda.c:136
-#, fuzzy
 msgid "6 MHz"
-msgstr "%d Hz"
+msgstr "6 Hz"
 
 #: modules/access/bda/bda.c:136
-#, fuzzy
 msgid "7 MHz"
-msgstr "%d Hz"
+msgstr "7 Hz"
 
 #: modules/access/bda/bda.c:136
-#, fuzzy
 msgid "8 MHz"
-msgstr "%d Hz"
+msgstr "8 Hz"
 
 #: modules/access/bda/bda.c:138 modules/access/dvb/access.c:144
 #, fuzzy
@@ -5221,19 +5108,19 @@ msgstr ""
 
 #: modules/access/bda/bda.c:142
 msgid "1/4"
-msgstr ""
+msgstr "1/4"
 
 #: modules/access/bda/bda.c:142
 msgid "1/8"
-msgstr ""
+msgstr "1/8"
 
 #: modules/access/bda/bda.c:142
 msgid "1/16"
-msgstr ""
+msgstr "1/16"
 
 #: modules/access/bda/bda.c:142
 msgid "1/32"
-msgstr ""
+msgstr "1/32"
 
 #: modules/access/bda/bda.c:144 modules/access/dvb/access.c:147
 msgid "Terrestrial transmission mode"
@@ -5245,11 +5132,11 @@ msgstr ""
 
 #: modules/access/bda/bda.c:148
 msgid "2k"
-msgstr ""
+msgstr "2k"
 
 #: modules/access/bda/bda.c:148
 msgid "8k"
-msgstr ""
+msgstr "8k"
 
 #: modules/access/bda/bda.c:150 modules/access/dvb/access.c:150
 #, fuzzy
@@ -5262,15 +5149,15 @@ msgstr ""
 
 #: modules/access/bda/bda.c:154
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: modules/access/bda/bda.c:154
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: modules/access/bda/bda.c:154
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: modules/access/bda/bda.c:157
 #, fuzzy
@@ -5312,7 +5199,6 @@ msgid "Satellite Polarisation [H/V/L/R]"
 msgstr "Seviye normalize"
 
 #: modules/access/bda/bda.c:168
-#, fuzzy
 msgid "Horizontal"
 msgstr "Yatay"
 
@@ -5703,22 +5589,19 @@ msgstr "Anten"
 
 #: modules/access/dshow/dshow.cpp:93
 msgid "TV"
-msgstr ""
+msgstr "TV"
 
 #: modules/access/dshow/dshow.cpp:94
-#, fuzzy
 msgid "FM radio"
-msgstr "Ses etkin"
+msgstr "FM radyo"
 
 #: modules/access/dshow/dshow.cpp:95
-#, fuzzy
 msgid "AM radio"
-msgstr "Ses etkin"
+msgstr "AM radyo"
 
 #: modules/access/dshow/dshow.cpp:96
-#, fuzzy
 msgid "DSS"
-msgstr "DTS"
+msgstr "DSS"
 
 #: modules/access/dshow/dshow.cpp:100
 msgid ""
@@ -5872,65 +5755,67 @@ msgid "AM Tuner mode"
 msgstr "Analiz modu"
 
 #: modules/access/dshow/dshow.cpp:161
-msgid "AM Tuner mode. Can be one of DEFAULT, TV, AM_RADIO, FM_RADIO or DSS."
+msgid ""
+"AM Tuner mode. Can be one of Default (0), TV (1),AM Radio (2), FM Radio (3) "
+"or DSS (4)."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:163
+#: modules/access/dshow/dshow.cpp:164
 #, fuzzy
 msgid "Number of audio channels"
 msgstr "Tercih edilen ses çıktı kanalları modu"
 
-#: modules/access/dshow/dshow.cpp:165
+#: modules/access/dshow/dshow.cpp:166
 msgid ""
 "Select audio input format with the given number of audio channels (if non 0)"
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:167 modules/stream_out/transcode.c:103
+#: modules/access/dshow/dshow.cpp:168 modules/stream_out/transcode.c:103
 msgid "Audio sample rate"
 msgstr "Ses örnekleme oranı"
 
-#: modules/access/dshow/dshow.cpp:169
+#: modules/access/dshow/dshow.cpp:170
 msgid "Select audio input format with the given sample rate (if non 0)"
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:171
+#: modules/access/dshow/dshow.cpp:172
 #, fuzzy
 msgid "Audio bits per sample"
 msgstr "Örnek başına bit (bps)"
 
-#: modules/access/dshow/dshow.cpp:173
+#: modules/access/dshow/dshow.cpp:174
 msgid "Select audio input format with the given bits/sample (if non 0)"
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:185
+#: modules/access/dshow/dshow.cpp:186
 msgid "DirectShow"
 msgstr "DirectShow"
 
-#: modules/access/dshow/dshow.cpp:186 modules/access/dshow/dshow.cpp:254
+#: modules/access/dshow/dshow.cpp:187 modules/access/dshow/dshow.cpp:255
 msgid "DirectShow input"
 msgstr "DirectShow girdisi"
 
-#: modules/access/dshow/dshow.cpp:194 modules/access/dshow/dshow.cpp:199
+#: modules/access/dshow/dshow.cpp:195 modules/access/dshow/dshow.cpp:200
 #: modules/audio_output/alsa.c:114 modules/audio_output/waveout.c:177
 #: modules/video_output/msw/directx.c:177
 msgid "Refresh list"
 msgstr "Listeyi yenile"
 
-#: modules/access/dshow/dshow.cpp:195 modules/access/dshow/dshow.cpp:200
+#: modules/access/dshow/dshow.cpp:196 modules/access/dshow/dshow.cpp:201
 msgid "Configure"
 msgstr "Yapılandır"
 
-#: modules/access/dshow/dshow.cpp:920 modules/access/dshow/dshow.cpp:973
+#: modules/access/dshow/dshow.cpp:921 modules/access/dshow/dshow.cpp:974
 #, fuzzy
 msgid "Capturing failed"
 msgstr "VLM yapılandırma dosyası"
 
-#: modules/access/dshow/dshow.cpp:921
+#: modules/access/dshow/dshow.cpp:922
 #, c-format
 msgid "VLC cannot use the device \"%s\", because its type is not supported."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:974
+#: modules/access/dshow/dshow.cpp:975
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
@@ -6053,7 +5938,7 @@ msgstr ""
 
 #: modules/access/dv.c:78
 msgid "dv"
-msgstr ""
+msgstr "dv"
 
 #: modules/access/dvdnav.c:68 modules/access/dvdread.c:72
 msgid "DVD angle"
@@ -6086,8 +5971,8 @@ msgstr "DVD menülü"
 msgid "DVDnav Input"
 msgstr "DVDnav Girdisi"
 
-#: modules/access/dvdnav.c:304 modules/access/dvdread.c:250
-#: modules/access/dvdread.c:510 modules/access/dvdread.c:572
+#: modules/access/dvdnav.c:304 modules/access/dvdread.c:251
+#: modules/access/dvdread.c:511 modules/access/dvdread.c:573
 #, fuzzy
 msgid "Playback failure"
 msgstr "Oynatmayı duraklatır"
@@ -6122,9 +6007,8 @@ msgid "title"
 msgstr "başlık"
 
 #: modules/access/dvdread.c:99
-#, fuzzy
 msgid "Key"
-msgstr "Anahtar/Kare"
+msgstr "Anahtar"
 
 #: modules/access/dvdread.c:105
 msgid "DVD without menus"
@@ -6135,17 +6019,17 @@ msgstr "DVD menüsüz"
 msgid "DVDRead Input (DVD without menu support)"
 msgstr "DVB girdisi v4l2 destekli"
 
-#: modules/access/dvdread.c:251
+#: modules/access/dvdread.c:252
 #, fuzzy, c-format
 msgid "DVDRead could not open the disk \"%s\"."
 msgstr "Video çıktı modülü"
 
-#: modules/access/dvdread.c:511
+#: modules/access/dvdread.c:512
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr ""
 
-#: modules/access/dvdread.c:573
+#: modules/access/dvdread.c:574
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr ""
@@ -6182,9 +6066,8 @@ msgstr ""
 
 #: modules/access/fake.c:50 modules/gui/qt4/components/playlist/sorting.h:46
 #: modules/stream_out/bridge.c:40 modules/stream_out/mosaic_bridge.c:133
-#, fuzzy
 msgid "ID"
-msgstr "PBC LID"
+msgstr "ID"
 
 #: modules/access/fake.c:52
 msgid ""
@@ -6259,9 +6142,8 @@ msgstr ""
 
 #: modules/access_filter/bandwidth.c:45
 #: modules/gui/qt4/components/open_panels.cpp:654
-#, fuzzy
 msgid "Bandwidth"
-msgstr "Video genişliği"
+msgstr "Band genişliği"
 
 #: modules/access_filter/bandwidth.c:46 modules/gui/macosx/simple_prefs.m:242
 #: modules/gui/qt4/ui/sprefs_input.ui:208
@@ -6419,83 +6301,83 @@ msgstr ""
 msgid "GnomeVFS input"
 msgstr "Girdi yok"
 
-#: modules/access/http.c:64 modules/access/mms/mms.c:63
+#: modules/access/http.c:65 modules/access/mms/mms.c:63
 #: modules/gui/qt4/ui/sprefs_input.ui:81
 msgid "HTTP proxy"
 msgstr "HTTP proxy"
 
-#: modules/access/http.c:66
+#: modules/access/http.c:67
 msgid ""
 "HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
 "myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 
-#: modules/access/http.c:70
+#: modules/access/http.c:71
 #, fuzzy
 msgid "HTTP proxy password"
 msgstr "HTTP parolası"
 
-#: modules/access/http.c:72
+#: modules/access/http.c:73
 msgid "If your HTTP proxy requires a password, set it here."
 msgstr ""
 
-#: modules/access/http.c:76
+#: modules/access/http.c:77
 msgid ""
 "Caching value for HTTP streams. This value should be set in milliseconds."
 msgstr ""
 
-#: modules/access/http.c:79
+#: modules/access/http.c:80
 msgid "HTTP user agent"
 msgstr "HTTP kullanıcı ajanı"
 
-#: modules/access/http.c:80
+#: modules/access/http.c:81
 msgid "User agent that will be used for the connection."
 msgstr ""
 
-#: modules/access/http.c:83
+#: modules/access/http.c:84
 msgid "Auto re-connect"
 msgstr "Otomatik yeniden bağlan"
 
-#: modules/access/http.c:85
+#: modules/access/http.c:86
 msgid ""
 "Automatically try to reconnect to the stream in case of a sudden disconnect."
 msgstr ""
 
-#: modules/access/http.c:88
+#: modules/access/http.c:89
 msgid "Continuous stream"
 msgstr "Kesintisiz akış"
 
-#: modules/access/http.c:89
+#: modules/access/http.c:90
 msgid ""
 "Read a file that is being constantly updated (for example, a JPG file on a "
 "server). You should not globally enable this option as it will break all "
 "other types of HTTP streams."
 msgstr ""
 
-#: modules/access/http.c:94
+#: modules/access/http.c:95
 #, fuzzy
 msgid "Forward Cookies"
 msgstr "İleri"
 
-#: modules/access/http.c:95
+#: modules/access/http.c:96
 msgid "Forward Cookies Across http redirections "
 msgstr ""
 
-#: modules/access/http.c:98
+#: modules/access/http.c:99
 msgid "HTTP input"
 msgstr "HTTP girdisi"
 
-#: modules/access/http.c:100
+#: modules/access/http.c:101
 #, fuzzy
 msgid "HTTP(S)"
 msgstr "HTTP"
 
-#: modules/access/http.c:445
+#: modules/access/http.c:446
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr ""
 
-#: modules/access/http.c:449
+#: modules/access/http.c:450
 #, fuzzy
 msgid "HTTP authentication"
 msgstr "UDP/RTP Multicast"
@@ -6544,7 +6426,7 @@ msgstr ""
 
 #: modules/access/mmap.c:54
 msgid "MMap"
-msgstr ""
+msgstr "MMap"
 
 #: modules/access/mmap.c:55
 #, fuzzy
@@ -6583,9 +6465,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/mms/mms.c:69
-#, fuzzy
 msgid "TCP/UDP timeout (ms)"
-msgstr "Zaman"
+msgstr "TCP/UDP zaman-aşımı (ms)"
 
 #: modules/access/mms/mms.c:70
 msgid ""
@@ -6935,9 +6816,8 @@ msgid "Bitrate mode to use (VBR or CBR)."
 msgstr "Taramasız:"
 
 #: modules/access/pvr.c:106
-#, fuzzy
 msgid "Audio bitmask"
-msgstr "Ses bit oranı"
+msgstr "Ses bit-maskesi"
 
 #: modules/access/pvr.c:107
 msgid "Bitmask that will get used by the audio part of the card."
@@ -7109,9 +6989,8 @@ msgstr "Ekran Girdisi"
 #: modules/access/screen/screen.c:87 modules/gui/macosx/open.m:207
 #: modules/gui/macosx/open.m:863 modules/gui/macosx/simple_prefs.m:435
 #: modules/gui/macosx/vout.m:214
-#, fuzzy
 msgid "Screen"
-msgstr "Ekran Girdisi"
+msgstr "Ekran"
 
 #: modules/access/smb.c:66
 msgid ""
@@ -7161,9 +7040,8 @@ msgid "UDP"
 msgstr "UDP"
 
 #: modules/access/udp.c:59
-#, fuzzy
 msgid "UDP input"
-msgstr "UDP/RTP girdisi"
+msgstr "UDP girdisi"
 
 #: modules/access/v4l2/v4l2.c:79 modules/gui/macosx/open.m:178
 #: modules/gui/qt4/components/open_panels.cpp:820
@@ -7179,9 +7057,8 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:83
 #: modules/gui/qt4/components/open_panels.cpp:699
 #: modules/stream_out/standard.c:100
-#, fuzzy
 msgid "Standard"
-msgstr "Standard Oynat"
+msgstr "Standart"
 
 #: modules/access/v4l2/v4l2.c:85
 msgid "Video standard (Default, SECAM, PAL, or NTSC)."
@@ -7331,7 +7208,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:146
 msgid "Exposure"
-msgstr ""
+msgstr "Pozlandırma"
 
 #: modules/access/v4l2/v4l2.c:148
 msgid "Exposure of the video input (if supported by the v4L2 driver)."
@@ -7348,27 +7225,24 @@ msgid ""
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:153
-#, fuzzy
 msgid "Gain"
-msgstr "Guarani"
+msgstr "Kazanç"
 
 #: modules/access/v4l2/v4l2.c:155
 msgid "Video input's gain (if supported by the v4l2 driver)."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:156
-#, fuzzy
 msgid "Horizontal flip"
-msgstr "Yatay"
+msgstr "Yatay yansıt"
 
 #: modules/access/v4l2/v4l2.c:158
 msgid "Flip the video horizontally (if supported by the v4l2 driver)."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:159
-#, fuzzy
 msgid "Vertical flip"
-msgstr "Dikey"
+msgstr "Dikey yansıt"
 
 #: modules/access/v4l2/v4l2.c:161
 msgid "Flip the video vertically (if supported by the v4l2 driver)."
@@ -7406,9 +7280,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:180
-#, fuzzy
 msgid "Audio method"
-msgstr "Ses kodlayıcısı"
+msgstr "Ses yöntemi"
 
 #: modules/access/v4l2/v4l2.c:183
 msgid "Audio method to use: 0 to disable audio, 1 for OSS."
@@ -7520,17 +7393,16 @@ msgid "Tuner audio mono/stereo and track selection."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:251
-#, fuzzy
 msgid "READ"
-msgstr "RAW"
+msgstr "READ"
 
 #: modules/access/v4l2/v4l2.c:251
 msgid "MMAP"
-msgstr ""
+msgstr "MMAP"
 
 #: modules/access/v4l2/v4l2.c:251
 msgid "USERPTR"
-msgstr ""
+msgstr "USERPTR"
 
 #: modules/access/v4l2/v4l2.c:258 modules/audio_output/alsa.c:189
 #: modules/audio_output/directx.c:536 modules/audio_output/oss.c:227
@@ -7566,18 +7438,16 @@ msgid "Video4Linux2 input"
 msgstr "Video4Linux girdisi"
 
 #: modules/access/v4l2/v4l2.c:280
-#, fuzzy
 msgid "Video input"
-msgstr "Video Seçenekleri"
+msgstr "Video girdisi"
 
 #: modules/access/v4l2/v4l2.c:313 modules/access/v4l.c:124
 msgid "Tuner"
 msgstr "Tuner"
 
 #: modules/access/v4l2/v4l2.c:323
-#, fuzzy
 msgid "Controls"
-msgstr "Denetim"
+msgstr "Denetimler"
 
 #: modules/access/v4l2/v4l2.c:324
 msgid "v4l2 driver controls, if supported by your v4l2 driver."
@@ -7738,8 +7608,8 @@ msgid "The above message had unknown vcdimager log level"
 msgstr ""
 
 #: modules/access/vcdx/access.c:286 modules/access/vcdx/access.c:369
-#: modules/access/vcdx/access.c:695 modules/access/vcdx/info.c:293
-#: modules/access/vcdx/info.c:294
+#: modules/access/vcdx/access.c:696 modules/access/vcdx/info.c:294
+#: modules/access/vcdx/info.c:295
 #: modules/gui/qt4/components/open_panels.cpp:322
 msgid "Entry"
 msgstr "Giriş/Öge"
@@ -7748,16 +7618,15 @@ msgstr "Giriş/Öge"
 msgid "Segments"
 msgstr "Parçalar"
 
-#: modules/access/vcdx/access.c:433 modules/access/vcdx/access.c:714
-#: modules/access/vcdx/info.c:297 modules/access/vcdx/info.c:298
-#: modules/demux/mkv.cpp:5436
+#: modules/access/vcdx/access.c:433 modules/access/vcdx/access.c:715
+#: modules/access/vcdx/info.c:298 modules/access/vcdx/info.c:299
+#: modules/demux/mkv.cpp:5461
 msgid "Segment"
 msgstr "Parça"
 
 #: modules/access/vcdx/access.c:538
-#, fuzzy
 msgid "LID"
-msgstr "PBC LID"
+msgstr "LID"
 
 #: modules/access/vcdx/info.c:93
 msgid "VCD Format"
@@ -7833,8 +7702,8 @@ msgstr "&Seçim"
 msgid "unknown type"
 msgstr "bilinmeyen tür"
 
-#: modules/access/vcdx/info.c:301 modules/access/vcdx/info.c:302
-#: modules/access/vcdx/info.c:319
+#: modules/access/vcdx/info.c:302 modules/access/vcdx/info.c:303
+#: modules/access/vcdx/info.c:320
 msgid "List ID"
 msgstr "Liste ID"
 
@@ -8587,15 +8456,15 @@ msgid "PORTAUDIO audio output"
 msgstr "QNX RTOS video ve ses çıktısı"
 
 #: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:557
-#: modules/gui/macosx/intf.m:1524 modules/gui/pda/pda_interface.c:210
+#: modules/gui/macosx/intf.m:1526 modules/gui/pda/pda_interface.c:210
 #: modules/gui/pda/pda_interface.c:1353 modules/gui/qt4/main_interface.cpp:361
 #: modules/gui/qt4/main_interface.cpp:365
-#: modules/gui/qt4/main_interface.cpp:956
-#: modules/gui/qt4/main_interface.cpp:958
-#: modules/gui/qt4/main_interface.cpp:1022
-#: modules/gui/qt4/main_interface.cpp:1037
-#: modules/gui/qt4/main_interface.cpp:1044
-#: modules/gui/qt4/main_interface.cpp:1061
+#: modules/gui/qt4/main_interface.cpp:957
+#: modules/gui/qt4/main_interface.cpp:959
+#: modules/gui/qt4/main_interface.cpp:1023
+#: modules/gui/qt4/main_interface.cpp:1038
+#: modules/gui/qt4/main_interface.cpp:1045
+#: modules/gui/qt4/main_interface.cpp:1062
 msgid "VLC media player"
 msgstr "VLC medya oynatıcısı"
 
@@ -9030,7 +8899,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:209
 msgid "Motion masking"
-msgstr ""
+msgstr "Hareket maskeleme"
 
 #: modules/codec/avcodec/avcodec.h:210
 msgid ""
@@ -9104,7 +8973,7 @@ msgstr "Video çıktı modülü"
 
 #: modules/codec/cc.c:64
 msgid "CC 608/708"
-msgstr ""
+msgstr "CC 608/708"
 
 #: modules/codec/cc.c:65
 msgid "Closed Captions decoder"
@@ -9583,7 +9452,7 @@ msgstr "DVB altyazı kod çözücüsü"
 
 #: modules/codec/svcdsub.c:56
 msgid "SVCD subtitles"
-msgstr "SVCD altyazıları"
+msgstr "SVCD altyazısı"
 
 #: modules/codec/svcdsub.c:66
 #, fuzzy
@@ -9656,7 +9525,7 @@ msgstr "PVR video aygıtı"
 
 #: modules/codec/theora.c:533
 msgid "Theora comment"
-msgstr ""
+msgstr "Theora açıklama"
 
 #: modules/codec/twolame.c:57
 msgid ""
@@ -9747,9 +9616,9 @@ msgstr "DVB altyazı paketleyicisi"
 msgid "Vorbis audio encoder"
 msgstr "Ses kodlayıcısı"
 
-#: modules/codec/vorbis.c:646
+#: modules/codec/vorbis.c:643
 msgid "Vorbis comment"
-msgstr ""
+msgstr "Vorbis açıklama"
 
 #: modules/codec/x264.c:52
 #, fuzzy
@@ -9845,7 +9714,7 @@ msgstr ""
 
 #: modules/codec/x264.c:101
 msgid "CABAC"
-msgstr ""
+msgstr "CABAC"
 
 #: modules/codec/x264.c:102
 msgid ""
@@ -10393,11 +10262,11 @@ msgstr "Macedonian"
 
 #: modules/codec/x264.c:379 modules/codec/x264.c:386
 msgid "hex"
-msgstr ""
+msgstr "hex"
 
 #: modules/codec/x264.c:379 modules/codec/x264.c:386
 msgid "umh"
-msgstr ""
+msgstr "umh"
 
 #: modules/codec/x264.c:379 modules/codec/x264.c:386
 #, fuzzy
@@ -10499,7 +10368,7 @@ msgstr "DVB altyazı kod çözücüsü"
 
 #: modules/control/dbus.c:111
 msgid "dbus"
-msgstr ""
+msgstr "dbus"
 
 #: modules/control/dbus.c:114
 #, fuzzy
@@ -10544,7 +10413,7 @@ msgid "Define playlist bookmarks."
 msgstr "Yer imi 9 ayarla"
 
 #: modules/control/hotkeys.c:97 modules/gui/macosx/simple_prefs.m:188
-#: modules/gui/qt4/components/simple_preferences.cpp:82
+#: modules/gui/qt4/components/simple_preferences.cpp:84
 #, fuzzy
 msgid "Hotkeys"
 msgstr "Kestirme tuşlar"
@@ -10690,8 +10559,8 @@ msgstr ""
 msgid "Infrared remote control interface"
 msgstr "Kızılötesi uzaktan kumanda arayüzü"
 
-#: modules/control/lirc.c:187 modules/control/rc.c:1914
-#: modules/control/rc.c:1954
+#: modules/control/lirc.c:189 modules/control/rc.c:1911
+#: modules/control/rc.c:1951
 msgid "Please provide one of the following parameters:"
 msgstr ""
 
@@ -10794,9 +10663,8 @@ msgid "Initializing"
 msgstr "Interlingue"
 
 #: modules/control/rc.c:73
-#, fuzzy
 msgid "Opening"
-msgstr "Aç"
+msgstr "Açılıyor"
 
 #: modules/control/rc.c:74
 #, fuzzy
@@ -10804,10 +10672,10 @@ msgid "Buffer"
 msgstr "Boyut sapması"
 
 #: modules/control/rc.c:76 modules/gui/macosx/embeddedwindow.m:135
-#: modules/gui/macosx/intf.m:1598 modules/gui/macosx/intf.m:1599
 #: modules/gui/macosx/intf.m:1600 modules/gui/macosx/intf.m:1601
+#: modules/gui/macosx/intf.m:1602 modules/gui/macosx/intf.m:1603
 #: modules/gui/pda/pda_interface.c:248 modules/gui/pda/pda_interface.c:249
-#: modules/gui/qt4/menus.cpp:651 modules/misc/notify/xosd.c:235
+#: modules/gui/qt4/menus.cpp:651 modules/misc/notify/xosd.c:243
 msgid "Pause"
 msgstr "Duraklat"
 
@@ -10826,7 +10694,7 @@ msgstr "Geriye Git"
 msgid "End"
 msgstr "son"
 
-#: modules/control/rc.c:81 modules/gui/macosx/interaction.m:139
+#: modules/control/rc.c:81 modules/gui/macosx/interaction.m:140
 msgid "Error"
 msgstr "Hata"
 
@@ -10868,7 +10736,7 @@ msgstr ""
 
 #: modules/control/rc.c:186 modules/misc/dummy/dummy.c:52
 msgid "Do not open a DOS command box interface"
-msgstr "Bir DOS komut satırı arayüzü açmayın"
+msgstr "Bir DOS komut kutusu arayüzü açılmasın"
 
 #: modules/control/rc.c:188
 msgid ""
@@ -10885,447 +10753,447 @@ msgstr "RC"
 msgid "Remote control interface"
 msgstr "Uzaktan kontrol arayüzü"
 
-#: modules/control/rc.c:350
+#: modules/control/rc.c:347
 #, fuzzy
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr "Uzaktan kontrol arayuzu baslatildi, yardim icin `h' yazin\n"
 
-#: modules/control/rc.c:823
+#: modules/control/rc.c:820
 #, fuzzy, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "bilinmeyen komut `%s', yardım için `help' yazınız\n"
 
-#: modules/control/rc.c:856
+#: modules/control/rc.c:853
 msgid "+----[ Remote control commands ]"
 msgstr ""
 
-#: modules/control/rc.c:858
+#: modules/control/rc.c:855
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
 msgstr ""
 
-#: modules/control/rc.c:859
+#: modules/control/rc.c:856
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
 msgstr ""
 
-#: modules/control/rc.c:860
+#: modules/control/rc.c:857
 msgid "| playlist . . . . .  show items currently in playlist"
 msgstr ""
 
-#: modules/control/rc.c:861
+#: modules/control/rc.c:858
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
 msgstr ""
 
-#: modules/control/rc.c:862
+#: modules/control/rc.c:859
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
 msgstr ""
 
-#: modules/control/rc.c:863
+#: modules/control/rc.c:860
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
 msgstr ""
 
-#: modules/control/rc.c:864
+#: modules/control/rc.c:861
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
 msgstr ""
 
-#: modules/control/rc.c:865
+#: modules/control/rc.c:862
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
 msgstr ""
 
-#: modules/control/rc.c:866
+#: modules/control/rc.c:863
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
 msgstr ""
 
-#: modules/control/rc.c:867
+#: modules/control/rc.c:864
 msgid "| loop [on|off] . . . . . . . . . toggle playlist loop"
 msgstr ""
 
-#: modules/control/rc.c:868
+#: modules/control/rc.c:865
 msgid "| random [on|off] . . . . . . .  toggle random jumping"
 msgstr ""
 
-#: modules/control/rc.c:869
+#: modules/control/rc.c:866
 msgid "| clear . . . . . . . . . . . . . . clear the playlist"
 msgstr ""
 
-#: modules/control/rc.c:870
+#: modules/control/rc.c:867
 msgid "| status . . . . . . . . . . . current playlist status"
 msgstr ""
 
-#: modules/control/rc.c:871
+#: modules/control/rc.c:868
 msgid "| title [X]  . . . . . . set/get title in current item"
 msgstr ""
 
-#: modules/control/rc.c:872
+#: modules/control/rc.c:869
 msgid "| title_n  . . . . . . . .  next title in current item"
 msgstr ""
 
-#: modules/control/rc.c:873
+#: modules/control/rc.c:870
 msgid "| title_p  . . . . . .  previous title in current item"
 msgstr ""
 
-#: modules/control/rc.c:874
+#: modules/control/rc.c:871
 msgid "| chapter [X]  . . . . set/get chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:875
+#: modules/control/rc.c:872
 msgid "| chapter_n  . . . . . .  next chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:876
+#: modules/control/rc.c:873
 msgid "| chapter_p  . . . .  previous chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:878
+#: modules/control/rc.c:875
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
 msgstr ""
 
-#: modules/control/rc.c:879
+#: modules/control/rc.c:876
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
 msgstr ""
 
-#: modules/control/rc.c:880
+#: modules/control/rc.c:877
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
 msgstr ""
 
-#: modules/control/rc.c:881
+#: modules/control/rc.c:878
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
 msgstr ""
 
-#: modules/control/rc.c:882
+#: modules/control/rc.c:879
 msgid "| faster . . . . . . . . . .  faster playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:883
+#: modules/control/rc.c:880
 msgid "| slower . . . . . . . . . .  slower playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:884
+#: modules/control/rc.c:881
 msgid "| normal . . . . . . . . . .  normal playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:885
+#: modules/control/rc.c:882
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
 msgstr ""
 
-#: modules/control/rc.c:886
+#: modules/control/rc.c:883
 msgid "| info . . . . .  information about the current stream"
 msgstr ""
 
-#: modules/control/rc.c:887
+#: modules/control/rc.c:884
 msgid "| stats  . . . . . . . .  show statistical information"
 msgstr ""
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:885
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr ""
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:886
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
 msgstr ""
 
-#: modules/control/rc.c:890
+#: modules/control/rc.c:887
 msgid "| get_title . . . . .  the title of the current stream"
 msgstr ""
 
-#: modules/control/rc.c:891
+#: modules/control/rc.c:888
 msgid "| get_length . . . .  the length of the current stream"
 msgstr ""
 
-#: modules/control/rc.c:893
+#: modules/control/rc.c:890
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
 msgstr ""
 
-#: modules/control/rc.c:894
+#: modules/control/rc.c:891
 msgid "| volup [X]  . . . . . . .  raise audio volume X steps"
 msgstr ""
 
-#: modules/control/rc.c:895
+#: modules/control/rc.c:892
 msgid "| voldown [X]  . . . . . .  lower audio volume X steps"
 msgstr ""
 
-#: modules/control/rc.c:896
+#: modules/control/rc.c:893
 msgid "| adev [X] . . . . . . . . . . .  set/get audio device"
 msgstr ""
 
-#: modules/control/rc.c:897
+#: modules/control/rc.c:894
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
 msgstr ""
 
-#: modules/control/rc.c:898
+#: modules/control/rc.c:895
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
 msgstr ""
 
-#: modules/control/rc.c:899
+#: modules/control/rc.c:896
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
 msgstr ""
 
-#: modules/control/rc.c:900
+#: modules/control/rc.c:897
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
 msgstr ""
 
-#: modules/control/rc.c:901
+#: modules/control/rc.c:898
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
 msgstr ""
 
-#: modules/control/rc.c:902
+#: modules/control/rc.c:899
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
 msgstr ""
 
-#: modules/control/rc.c:903
+#: modules/control/rc.c:900
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
 msgstr ""
 
-#: modules/control/rc.c:904
+#: modules/control/rc.c:901
 msgid "| strack [X] . . . . . . . . . set/get subtitles track"
 msgstr ""
 
-#: modules/control/rc.c:905
+#: modules/control/rc.c:902
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
 msgstr ""
 
-#: modules/control/rc.c:906
+#: modules/control/rc.c:903
 msgid "| menu . . [on|off|up|down|left|right|select] use menu"
 msgstr ""
 
-#: modules/control/rc.c:911
+#: modules/control/rc.c:908
 msgid "| @name marq-marquee  STRING  . . overlay STRING in video"
 msgstr ""
 
-#: modules/control/rc.c:912
+#: modules/control/rc.c:909
 msgid "| @name marq-x X . . . . . . . . . . . .offset from left"
 msgstr ""
 
-#: modules/control/rc.c:913
+#: modules/control/rc.c:910
 msgid "| @name marq-y Y . . . . . . . . . . . . offset from top"
 msgstr ""
 
-#: modules/control/rc.c:914
+#: modules/control/rc.c:911
 msgid "| @name marq-position #. . .  .relative position control"
 msgstr ""
 
-#: modules/control/rc.c:915
+#: modules/control/rc.c:912
 msgid "| @name marq-color # . . . . . . . . . . font color, RGB"
 msgstr ""
 
-#: modules/control/rc.c:916
+#: modules/control/rc.c:913
 msgid "| @name marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr ""
 
-#: modules/control/rc.c:917
+#: modules/control/rc.c:914
 msgid "| @name marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr ""
 
-#: modules/control/rc.c:918
+#: modules/control/rc.c:915
 msgid "| @name marq-size # . . . . . . . . font size, in pixels"
 msgstr ""
 
-#: modules/control/rc.c:920
+#: modules/control/rc.c:917
 msgid "| @name logo-file STRING . . .the overlay file path/name"
 msgstr ""
 
-#: modules/control/rc.c:921
+#: modules/control/rc.c:918
 msgid "| @name logo-x X . . . . . . . . . . . .offset from left"
 msgstr ""
 
-#: modules/control/rc.c:922
+#: modules/control/rc.c:919
 msgid "| @name logo-y Y . . . . . . . . . . . . offset from top"
 msgstr ""
 
-#: modules/control/rc.c:923
+#: modules/control/rc.c:920
 msgid "| @name logo-position #. . . . . . . . relative position"
 msgstr ""
 
-#: modules/control/rc.c:924
+#: modules/control/rc.c:921
 msgid "| @name logo-transparency #. . . . . . . . .transparency"
 msgstr ""
 
-#: modules/control/rc.c:926
+#: modules/control/rc.c:923
 msgid "| @name mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr ""
 
-#: modules/control/rc.c:927
+#: modules/control/rc.c:924
 msgid "| @name mosaic-height #. . . . . . . . . . . . . .height"
 msgstr ""
 
-#: modules/control/rc.c:928
+#: modules/control/rc.c:925
 msgid "| @name mosaic-width # . . . . . . . . . . . . . . width"
 msgstr ""
 
-#: modules/control/rc.c:929
+#: modules/control/rc.c:926
 msgid "| @name mosaic-xoffset # . . . .top left corner position"
 msgstr ""
 
-#: modules/control/rc.c:930
+#: modules/control/rc.c:927
 msgid "| @name mosaic-yoffset # . . . .top left corner position"
 msgstr ""
 
-#: modules/control/rc.c:931
+#: modules/control/rc.c:928
 msgid "| @name mosaic-offsets x,y(,x,y)*. . . . list of offsets"
 msgstr ""
 
-#: modules/control/rc.c:932
+#: modules/control/rc.c:929
 msgid "| @name mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
 msgstr ""
 
-#: modules/control/rc.c:933
+#: modules/control/rc.c:930
 msgid "| @name mosaic-vborder # . . . . . . . . vertical border"
 msgstr ""
 
-#: modules/control/rc.c:934
+#: modules/control/rc.c:931
 msgid "| @name mosaic-hborder # . . . . . . . horizontal border"
 msgstr ""
 
-#: modules/control/rc.c:935
+#: modules/control/rc.c:932
 msgid "| @name mosaic-position {0=auto,1=fixed} . . . .position"
 msgstr ""
 
-#: modules/control/rc.c:936
+#: modules/control/rc.c:933
 msgid "| @name mosaic-rows #. . . . . . . . . . .number of rows"
 msgstr ""
 
-#: modules/control/rc.c:937
+#: modules/control/rc.c:934
 msgid "| @name mosaic-cols #. . . . . . . . . . .number of cols"
 msgstr ""
 
-#: modules/control/rc.c:938
+#: modules/control/rc.c:935
 msgid "| @name mosaic-order id(,id)* . . . . order of pictures "
 msgstr ""
 
-#: modules/control/rc.c:939
+#: modules/control/rc.c:936
 msgid "| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 msgstr ""
 
-#: modules/control/rc.c:942
+#: modules/control/rc.c:939
 msgid "| help . . . . . . . . . . . . . . . this help message"
 msgstr ""
 
-#: modules/control/rc.c:943
+#: modules/control/rc.c:940
 msgid "| longhelp . . . . . . . . . . . a longer help message"
 msgstr ""
 
-#: modules/control/rc.c:944
+#: modules/control/rc.c:941
 msgid "| logout . . . . . . .  exit (if in socket connection)"
 msgstr ""
 
-#: modules/control/rc.c:945
+#: modules/control/rc.c:942
 msgid "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr ""
 
-#: modules/control/rc.c:947
+#: modules/control/rc.c:944
 msgid "+----[ end of help ]"
 msgstr ""
 
-#: modules/control/rc.c:1062
+#: modules/control/rc.c:1059
 #, fuzzy
 msgid "Press menu select or pause to continue."
 msgstr ""
 "\n"
 "Devam etmek için ENTER tuşuna basınız...\n"
 
-#: modules/control/rc.c:1318 modules/control/rc.c:1578
-#: modules/control/rc.c:1649 modules/control/rc.c:1829
-#: modules/control/rc.c:1927
+#: modules/control/rc.c:1315 modules/control/rc.c:1575
+#: modules/control/rc.c:1646 modules/control/rc.c:1826
+#: modules/control/rc.c:1924
 #, fuzzy
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr ""
 "\n"
 "Devam etmek için ENTER tuşuna basınız...\n"
 
-#: modules/control/rc.c:1413
+#: modules/control/rc.c:1410
 msgid "Error: `goto' needs an argument greater than zero."
 msgstr ""
 
-#: modules/control/rc.c:1424
+#: modules/control/rc.c:1421
 #, fuzzy, c-format
 msgid "Playlist has only %d elements"
 msgstr "Oynatma listesi boş"
 
-#: modules/control/rc.c:1986
+#: modules/control/rc.c:1983
 #, fuzzy
 msgid "Unknown command!"
 msgstr "Bilinmeyen ses kartı"
 
-#: modules/control/rc.c:2002 modules/gui/ncurses.c:2039
+#: modules/control/rc.c:1999 modules/gui/ncurses.c:2039
 #, fuzzy
 msgid "+-[Incoming]"
 msgstr "Kodlama"
 
-#: modules/control/rc.c:2003 modules/gui/ncurses.c:2042
+#: modules/control/rc.c:2000 modules/gui/ncurses.c:2042
 #, c-format
 msgid "| input bytes read : %8.0f kB"
 msgstr ""
 
-#: modules/control/rc.c:2005 modules/gui/ncurses.c:2045
+#: modules/control/rc.c:2002 modules/gui/ncurses.c:2045
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
 msgstr ""
 
-#: modules/control/rc.c:2007 modules/gui/ncurses.c:2047
+#: modules/control/rc.c:2004 modules/gui/ncurses.c:2047
 #, c-format
 msgid "| demux bytes read : %8.0f kB"
 msgstr ""
 
-#: modules/control/rc.c:2009 modules/gui/ncurses.c:2050
+#: modules/control/rc.c:2006 modules/gui/ncurses.c:2050
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
 msgstr ""
 
-#: modules/control/rc.c:2013 modules/gui/ncurses.c:2058
+#: modules/control/rc.c:2010 modules/gui/ncurses.c:2058
 #, fuzzy
 msgid "+-[Video Decoding]"
 msgstr "Resim kırpma"
 
-#: modules/control/rc.c:2014 modules/gui/ncurses.c:2061
+#: modules/control/rc.c:2011 modules/gui/ncurses.c:2061
 #, c-format
 msgid "| video decoded    :    %5i"
 msgstr ""
 
-#: modules/control/rc.c:2016 modules/gui/ncurses.c:2064
+#: modules/control/rc.c:2013 modules/gui/ncurses.c:2064
 #, c-format
 msgid "| frames displayed :    %5i"
 msgstr ""
 
-#: modules/control/rc.c:2018 modules/gui/ncurses.c:2067
+#: modules/control/rc.c:2015 modules/gui/ncurses.c:2067
 #, c-format
 msgid "| frames lost      :    %5i"
 msgstr ""
 
-#: modules/control/rc.c:2022 modules/gui/ncurses.c:2075
+#: modules/control/rc.c:2019 modules/gui/ncurses.c:2075
 #, fuzzy
 msgid "+-[Audio Decoding]"
 msgstr "Ses kodlayıcısı"
 
-#: modules/control/rc.c:2023 modules/gui/ncurses.c:2078
+#: modules/control/rc.c:2020 modules/gui/ncurses.c:2078
 #, c-format
 msgid "| audio decoded    :    %5i"
 msgstr ""
 
-#: modules/control/rc.c:2025 modules/gui/ncurses.c:2081
+#: modules/control/rc.c:2022 modules/gui/ncurses.c:2081
 #, c-format
 msgid "| buffers played   :    %5i"
 msgstr ""
 
-#: modules/control/rc.c:2027 modules/gui/ncurses.c:2084
+#: modules/control/rc.c:2024 modules/gui/ncurses.c:2084
 #, c-format
 msgid "| buffers lost     :    %5i"
 msgstr ""
 
-#: modules/control/rc.c:2031 modules/gui/ncurses.c:2090
+#: modules/control/rc.c:2028 modules/gui/ncurses.c:2090
 #, fuzzy
 msgid "+-[Streaming]"
 msgstr "Akış"
 
-#: modules/control/rc.c:2032 modules/gui/ncurses.c:2093
+#: modules/control/rc.c:2029 modules/gui/ncurses.c:2093
 #, c-format
 msgid "| packets sent     :    %5i"
 msgstr ""
 
-#: modules/control/rc.c:2033 modules/gui/ncurses.c:2095
+#: modules/control/rc.c:2030 modules/gui/ncurses.c:2095
 #, c-format
 msgid "| bytes sent       : %8.0f kB"
 msgstr ""
 
-#: modules/control/rc.c:2035
+#: modules/control/rc.c:2032
 #, c-format
 msgid "| sending bitrate  :   %6.0f kb/s"
 msgstr ""
@@ -11615,12 +11483,12 @@ msgstr "HTTP girdisi"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr ""
 
-#: modules/demux/live555.cpp:591
+#: modules/demux/live555.cpp:589
 #, fuzzy
 msgid "RTSP authentication"
 msgstr "UDP/RTP Multicast"
 
-#: modules/demux/live555.cpp:592
+#: modules/demux/live555.cpp:590
 msgid "Please enter a valid login name and a password."
 msgstr ""
 
@@ -11641,68 +11509,68 @@ msgstr ""
 msgid "M-JPEG camera demuxer"
 msgstr "Ayırıcılar"
 
-#: modules/demux/mkv.cpp:408
+#: modules/demux/mkv.cpp:124
 #, fuzzy
 msgid "Matroska stream demuxer"
 msgstr "Ayırıcılar"
 
-#: modules/demux/mkv.cpp:415
+#: modules/demux/mkv.cpp:131
 #, fuzzy
 msgid "Ordered chapters"
 msgstr "Sonraki bölüm"
 
-#: modules/demux/mkv.cpp:416
+#: modules/demux/mkv.cpp:132
 msgid "Play ordered chapters as specified in the segment."
 msgstr ""
 
-#: modules/demux/mkv.cpp:419
+#: modules/demux/mkv.cpp:135
 msgid "Chapter codecs"
 msgstr "Bölüm codec'leri"
 
-#: modules/demux/mkv.cpp:420
+#: modules/demux/mkv.cpp:136
 msgid "Use chapter codecs found in the segment."
 msgstr ""
 
-#: modules/demux/mkv.cpp:423
+#: modules/demux/mkv.cpp:139
 #, fuzzy
 msgid "Preload Directory"
 msgstr "Klasör"
 
-#: modules/demux/mkv.cpp:424
+#: modules/demux/mkv.cpp:140
 msgid ""
 "Preload matroska files from the same family in the same directory (not good "
 "for broken files)."
 msgstr ""
 
-#: modules/demux/mkv.cpp:427
+#: modules/demux/mkv.cpp:143
 msgid "Seek based on percent not time"
 msgstr ""
 
-#: modules/demux/mkv.cpp:428
+#: modules/demux/mkv.cpp:144
 msgid "Seek based on percent not time."
 msgstr ""
 
-#: modules/demux/mkv.cpp:431
+#: modules/demux/mkv.cpp:147
 msgid "Dummy Elements"
 msgstr "Aptal Elemanlar"
 
-#: modules/demux/mkv.cpp:432
+#: modules/demux/mkv.cpp:148
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
-#: modules/demux/mkv.cpp:3368
+#: modules/demux/mkv.cpp:3384
 msgid "---  DVD Menu"
 msgstr "---  DVD Menüsü"
 
-#: modules/demux/mkv.cpp:3374
+#: modules/demux/mkv.cpp:3390
 msgid "First Played"
 msgstr "İlk Oynatılan"
 
-#: modules/demux/mkv.cpp:3376
+#: modules/demux/mkv.cpp:3392
 msgid "Video Manager"
 msgstr "Video Yöneticisi"
 
-#: modules/demux/mkv.cpp:3382
+#: modules/demux/mkv.cpp:3398
 msgid "----- Title"
 msgstr "----- Başlık"
 
@@ -12307,24 +12175,20 @@ msgid "Teletext hearing impaired subtitles"
 msgstr "DVB altyazı kod çözücüsü"
 
 #: modules/demux/ts.c:3523
-#, fuzzy
 msgid "subtitles"
-msgstr "Altyazılar"
+msgstr "altyazı"
 
 #: modules/demux/ts.c:3527
-#, fuzzy
 msgid "4:3 subtitles"
-msgstr "SVCD altyazıları"
+msgstr "4:3 altyazı"
 
 #: modules/demux/ts.c:3531
-#, fuzzy
 msgid "16:9 subtitles"
-msgstr "SVCD altyazıları"
+msgstr "16:9 altyazı"
 
 #: modules/demux/ts.c:3535
-#, fuzzy
 msgid "2.21:1 subtitles"
-msgstr "SVCD altyazıları"
+msgstr "2.21:1 altyazı"
 
 #: modules/demux/ts.c:3539 modules/demux/ts.c:3720 modules/demux/ts.c:3761
 msgid "hearing impaired"
@@ -12503,7 +12367,7 @@ msgid "Edit"
 msgstr "Düzenle"
 
 #: modules/gui/beos/PlayListWindow.cpp:106 modules/gui/macosx/intf.m:603
-#: modules/gui/macosx/playlist.m:434
+#: modules/gui/macosx/playlist.m:442
 msgid "Select All"
 msgstr "Tümünü Seç"
 
@@ -12553,7 +12417,7 @@ msgid "Apply"
 msgstr "Uygula"
 
 #: modules/gui/beos/PreferencesWindow.cpp:257 modules/gui/macosx/output.m:526
-#: modules/gui/macosx/playlist.m:670 modules/gui/macosx/prefs.m:125
+#: modules/gui/macosx/playlist.m:678 modules/gui/macosx/prefs.m:125
 #: modules/gui/macosx/simple_prefs.m:298 modules/gui/qt4/ui/vlm.ui:209
 msgid "Save"
 msgstr "Kaydet"
@@ -12847,14 +12711,12 @@ msgstr ""
 #: modules/misc/notify/xosd.c:81 modules/misc/quartztext.c:84
 #: modules/misc/win32text.c:57 modules/video_filter/marq.c:159
 #: modules/video_filter/rss.c:203
-#, fuzzy
 msgid "Font"
-msgstr "Yazıtipi boyutu"
+msgstr "Yazıtipi"
 
 #: modules/gui/fbosd.c:214
-#, fuzzy
 msgid "Commands"
-msgstr "Seviye"
+msgstr "Komutlar"
 
 #: modules/gui/fbosd.c:219
 msgid "GNU/Linux osd/overlay framebuffer interface"
@@ -12905,7 +12767,7 @@ msgstr "Ekle"
 #: modules/gui/macosx/bookmarks.m:91 modules/gui/macosx/intf.m:602
 #: modules/gui/macosx/simple_prefs.m:234
 #: modules/gui/qt4/components/playlist/standardpanel.cpp:162
-#: modules/gui/qt4/components/preferences_widgets.cpp:1126
+#: modules/gui/qt4/components/preferences_widgets.cpp:1128
 #: modules/gui/qt4/dialogs/bookmarks.cpp:48 modules/gui/qt4/ui/vlm.ui:202
 msgid "Clear"
 msgstr "Temizle"
@@ -12920,7 +12782,7 @@ msgstr "Çıkart/Kaldır"
 msgid "Time"
 msgstr "Zaman"
 
-#: modules/gui/macosx/bookmarks.m:131 modules/gui/macosx/playlist.m:666
+#: modules/gui/macosx/bookmarks.m:131 modules/gui/macosx/playlist.m:674
 msgid "Untitled"
 msgstr "Başlıksız"
 
@@ -12966,9 +12828,8 @@ msgid "Jump To Time"
 msgstr "Git:"
 
 #: modules/gui/macosx/controls.m:60
-#, fuzzy
 msgid "sec."
-msgstr "secam"
+msgstr "sn."
 
 #: modules/gui/macosx/controls.m:61
 #, fuzzy
@@ -13098,9 +12959,8 @@ msgid "Distortion filters"
 msgstr "Bozulma"
 
 #: modules/gui/macosx/extended.m:75
-#, fuzzy
 msgid "Blur"
-msgstr "Blues (hüzün)"
+msgstr "Bulanık"
 
 #: modules/gui/macosx/extended.m:76
 #, fuzzy
@@ -13170,9 +13030,8 @@ msgid "Maximum level"
 msgstr "Maksimum seviye"
 
 #: modules/gui/macosx/extended.m:95
-#, fuzzy
 msgid "Restore Defaults"
-msgstr "Varsayılanlar"
+msgstr "Varsayılanlara Dön"
 
 #: modules/gui/macosx/extended.m:102 modules/gui/macosx/macosx.m:60
 msgid "Opaqueness"
@@ -13183,14 +13042,12 @@ msgid "Adjust Image"
 msgstr ""
 
 #: modules/gui/macosx/extended.m:173 modules/gui/macosx/extended.m:238
-#, fuzzy
 msgid "Video Filter"
-msgstr "Video Süzgeçleri"
+msgstr "Video Süzgeci"
 
 #: modules/gui/macosx/extended.m:174 modules/gui/macosx/extended.m:236
-#, fuzzy
 msgid "Audio Filter"
-msgstr "Ses süzgeçleri"
+msgstr "Ses Süzgeci"
 
 #: modules/gui/macosx/extended.m:518
 #, fuzzy
@@ -13206,48 +13063,44 @@ msgid ""
 "can be set in the Preferences, Video / Filters section."
 msgstr ""
 
-#: modules/gui/macosx/fspanel.m:389
+#: modules/gui/macosx/fspanel.m:406
 #, fuzzy
 msgid "(no item is being played)"
 msgstr "Listede %i öge"
 
-#: modules/gui/macosx/interaction.m:130
-#, fuzzy
-msgid "Login:"
-msgstr "Georgian"
-
 #: modules/gui/macosx/interaction.m:131
-#, fuzzy
-msgid "Password:"
-msgstr "Parola"
+msgid "Login:"
+msgstr "Kullanıcı:"
 
-#: modules/gui/macosx/interaction.m:219 modules/gui/macosx/interaction.m:285
+#: modules/gui/macosx/interaction.m:132
+msgid "Password:"
+msgstr "Parola:"
+
+#: modules/gui/macosx/interaction.m:220 modules/gui/macosx/interaction.m:286
 #, c-format
 msgid "Remaining time: %i seconds"
 msgstr ""
 
-#: modules/gui/macosx/interaction.m:398
-msgid "Errors and Warnings"
-msgstr ""
-
 #: modules/gui/macosx/interaction.m:399
+msgid "Errors and Warnings"
+msgstr "Hatalar ve Uyarılar"
+
+#: modules/gui/macosx/interaction.m:400
 #, fuzzy
 msgid "Clean up"
 msgstr "Temizle"
 
-#: modules/gui/macosx/interaction.m:400
-#, fuzzy
+#: modules/gui/macosx/interaction.m:401
 msgid "Show Details"
-msgstr "İpuçlarını göster"
+msgstr "Ayrıntıları Göster"
 
 #: modules/gui/macosx/intf.m:556
 msgid "VLC - Controller"
 msgstr "VLC - Kontroller"
 
 #: modules/gui/macosx/intf.m:573
-#, fuzzy
 msgid "Open CrashLog..."
-msgstr "CrashLog bulunamadı"
+msgstr "CrashLog Aç..."
 
 #: modules/gui/macosx/intf.m:578
 #, fuzzy
@@ -13283,9 +13136,8 @@ msgid "1:File"
 msgstr "1:Dosya"
 
 #: modules/gui/macosx/intf.m:589
-#, fuzzy
 msgid "Open File..."
-msgstr "&Dosya Aç.."
+msgstr "Dosya Aç..."
 
 #: modules/gui/macosx/intf.m:590
 msgid "Quick Open File..."
@@ -13300,15 +13152,14 @@ msgid "Open Network..."
 msgstr "Ağ Aç..."
 
 #: modules/gui/macosx/intf.m:593
-#, fuzzy
 msgid "Open Capture Device..."
-msgstr "Yakalama Ay&gıtı Aç..."
+msgstr "Yakalama Aygıtı Aç..."
 
 #: modules/gui/macosx/intf.m:594
 msgid "Open Recent"
 msgstr "Sonuncuyu Aç"
 
-#: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:2176
+#: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:2285
 msgid "Clear Menu"
 msgstr "Menüyü Temizle"
 
@@ -13330,9 +13181,8 @@ msgid "Paste"
 msgstr "Yapıştır"
 
 #: modules/gui/macosx/intf.m:605
-#, fuzzy
 msgid "Playback"
-msgstr "Oynatmayı duraklatır"
+msgstr "Oynatım"
 
 #: modules/gui/macosx/intf.m:626 modules/gui/macosx/intf.m:696
 msgid "Volume Up"
@@ -13344,9 +13194,8 @@ msgstr "Seviye Azalt"
 
 #: modules/gui/macosx/intf.m:652 modules/gui/macosx/intf.m:653
 #: modules/gui/macosx/simple_prefs.m:279 modules/gui/macosx/vout.m:197
-#, fuzzy
 msgid "Fullscreen Video Device"
-msgstr "Tam ekran video çıktısı"
+msgstr "Tam-ekran Video Aygıtı"
 
 #: modules/gui/macosx/intf.m:658 modules/gui/macosx/intf.m:659
 #: modules/video_filter/postproc.c:186
@@ -13363,14 +13212,12 @@ msgid "Close Window"
 msgstr "Pencereyi Kapat"
 
 #: modules/gui/macosx/intf.m:664
-#, fuzzy
 msgid "Controller..."
-msgstr "Denetim"
+msgstr "Denetleyici..."
 
 #: modules/gui/macosx/intf.m:665
-#, fuzzy
 msgid "Equalizer..."
-msgstr "Ekolayzer"
+msgstr "Ekolayzer..."
 
 #: modules/gui/macosx/intf.m:666
 #, fuzzy
@@ -13378,18 +13225,16 @@ msgid "Extended Controls..."
 msgstr "Genişletilmiş denetimler"
 
 #: modules/gui/macosx/intf.m:667
-#, fuzzy
 msgid "Bookmarks..."
-msgstr "Yer imleri"
+msgstr "Yer imleri..."
 
 #: modules/gui/macosx/intf.m:668
 msgid "Playlist..."
 msgstr "Oynatma Listesi..."
 
 #: modules/gui/macosx/intf.m:669
-#, fuzzy
 msgid "Media Information..."
-msgstr "Üst-veri"
+msgstr "Medya Bilgisi..."
 
 #: modules/gui/macosx/intf.m:670
 msgid "Messages..."
@@ -13397,7 +13242,7 @@ msgstr "Mesajlar..."
 
 #: modules/gui/macosx/intf.m:671
 msgid "Errors and Warnings..."
-msgstr ""
+msgstr "Hatalar ve Uyarılar..."
 
 #: modules/gui/macosx/intf.m:673
 msgid "Bring All to Front"
@@ -13409,14 +13254,12 @@ msgid "Help"
 msgstr "Yardım"
 
 #: modules/gui/macosx/intf.m:676
-#, fuzzy
 msgid "VLC media player Help..."
-msgstr "VLC medya oynatıcısı"
+msgstr "VLC medya oynatıcısı Yardım..."
 
 #: modules/gui/macosx/intf.m:677
-#, fuzzy
 msgid "ReadMe / FAQ..."
-msgstr "BeniOku..."
+msgstr "BeniOku / SSS..."
 
 #: modules/gui/macosx/intf.m:679
 #, fuzzy
@@ -13424,9 +13267,8 @@ msgid "Online Documentation..."
 msgstr "Çevrimiçi Dokümantasyon"
 
 #: modules/gui/macosx/intf.m:680
-#, fuzzy
 msgid "VideoLAN Website..."
-msgstr "VideoLAN Web sitesi"
+msgstr "VideoLAN Web sitesi..."
 
 #: modules/gui/macosx/intf.m:681
 #, fuzzy
@@ -13434,9 +13276,8 @@ msgid "Make a donation..."
 msgstr "Macedonian"
 
 #: modules/gui/macosx/intf.m:682
-#, fuzzy
 msgid "Online Forum..."
-msgstr "Çevrimiçi Dokümantasyon"
+msgstr "Online Forum..."
 
 #: modules/gui/macosx/intf.m:724
 msgid "Your version of Mac OS X is not supported"
@@ -13446,29 +13287,71 @@ msgstr ""
 msgid "VLC media player requires Mac OS X 10.4 or higher."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1365
-#, fuzzy, c-format
+#: modules/gui/macosx/intf.m:1367
+#, c-format
 msgid "Volume: %d%%"
-msgstr "Seviye: %d"
+msgstr "Seviye: %d%%"
 
-#: modules/gui/macosx/intf.m:1939
+#: modules/gui/macosx/intf.m:1941
 msgid "Update check failed"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1939
+#: modules/gui/macosx/intf.m:1941
 msgid "Checking for updates was not enabled in this build."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:2005
+#: modules/gui/macosx/intf.m:2012
+msgid "Crash Report (Type Ctrl-shift-D and hit send)"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2013
+msgid "(Type Command-shift-D (Menu 'Message'>'Send Again' and hit send)"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2018
+msgid "Error when generating crash report mail."
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2018
+msgid "Can't prepare crash log mail"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2095
+msgid "VLC has previously crashed"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2096
+msgid ""
+"VLC has previously crashed, do you want to send an email with the crash to "
+"VLC's team?"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2097
+#, fuzzy
+msgid "Send"
+msgstr "son"
+
+#: modules/gui/macosx/intf.m:2097
+#, fuzzy
+msgid "Don't Send"
+msgstr "Yazıtipi Boyutu"
+
+#: modules/gui/macosx/intf.m:2100
+msgid ""
+"<Explain here what you were doing when VLC crashed, with possibly a link to "
+"the failing video>"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2113
 msgid "No CrashLog found"
 msgstr "CrashLog bulunamadı"
 
-#: modules/gui/macosx/intf.m:2005 modules/gui/macosx/prefs.m:148
+#: modules/gui/macosx/intf.m:2113 modules/gui/macosx/prefs.m:148
 #: modules/gui/macosx/simple_prefs.m:607
 msgid "Continue"
 msgstr "Devam"
 
-#: modules/gui/macosx/intf.m:2005
+#: modules/gui/macosx/intf.m:2113
 msgid "Couldn't find any trace of a previous crash."
 msgstr ""
 
@@ -13500,9 +13383,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:69
-#, fuzzy
 msgid "Black screens in fullscreen"
-msgstr "Tam ekran modu geçiş"
+msgstr "Tam-ekranda siyah ekranlar"
 
 #: modules/gui/macosx/macosx.m:70
 msgid "In fullscreen mode, keep screen where there is no video displayed black"
@@ -13525,7 +13407,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:78
 #, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Tam ekran modu geçiş"
+msgstr "Tam-ekran modu geçiş"
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Auto-playback of new items"
@@ -13587,16 +13469,15 @@ msgid "Media Resource Locator (MRL)"
 msgstr "Medya Kaynak Konumlandırıcı (MRL)"
 
 #: modules/gui/macosx/open.m:173 modules/gui/macosx/open.m:431
-#, fuzzy
 msgid "Capture"
-msgstr "Bölüm codec'leri"
+msgstr "Yakala"
 
 #: modules/gui/macosx/open.m:175 modules/gui/macosx/open.m:181
 #: modules/gui/macosx/open.m:287 modules/gui/macosx/output.m:145
 #: modules/gui/macosx/prefs_widgets.m:1174
 #: modules/gui/macosx/simple_prefs.m:267 modules/gui/macosx/simple_prefs.m:287
 #: modules/gui/qt4/components/preferences_widgets.cpp:257
-#: modules/gui/qt4/components/simple_preferences.cpp:236
+#: modules/gui/qt4/components/simple_preferences.cpp:238
 #: modules/gui/qt4/ui/open_disk.ui:141 modules/gui/qt4/ui/open_file.ui:181
 #: modules/gui/qt4/ui/open.ui:168 modules/gui/qt4/ui/sout.ui:77
 #: modules/gui/qt4/ui/sprefs_audio.ui:237
@@ -13613,14 +13494,12 @@ msgid "Treat as a pipe rather than as a file"
 msgstr ""
 
 #: modules/gui/macosx/open.m:182 modules/gui/qt4/ui/open_disk.ui:94
-#, fuzzy
 msgid "No DVD menus"
-msgstr "DVD Menüleri Kullan"
+msgstr "DVD menüleri kullanma"
 
 #: modules/gui/macosx/open.m:184 modules/gui/macosx/open.m:537
-#, fuzzy
 msgid "VIDEO_TS directory"
-msgstr "VIDEO_TS Klasörünü Aç"
+msgstr "VIDEO_TS Klasörü"
 
 #: modules/gui/macosx/open.m:185 modules/gui/macosx/open.m:650
 msgid "DVD"
@@ -13675,9 +13554,8 @@ msgid "Previous Channel"
 msgstr "Önceki bölüm"
 
 #: modules/gui/macosx/open.m:214
-#, fuzzy
 msgid "Next Channel"
-msgstr "Kanal"
+msgstr "Sonraki Kanal"
 
 #: modules/gui/macosx/open.m:215 modules/gui/macosx/open.m:962
 msgid "Retrieving Channel Info..."
@@ -13717,9 +13595,8 @@ msgstr "Gecikme"
 
 #: modules/gui/macosx/open.m:291
 #: modules/gui/qt4/components/info_panels.cpp:541
-#, fuzzy
 msgid "FPS"
-msgstr "PS"
+msgstr "FPS"
 
 #: modules/gui/macosx/open.m:293
 msgid "Subtitles encoding"
@@ -13958,102 +13835,97 @@ msgid "VLC was unable to save the meta data."
 msgstr ""
 
 #: modules/gui/macosx/playlistinfo.m:442
-#, fuzzy
 msgid "Information"
-msgstr "Dönüşümler"
+msgstr "Bilgi"
 
 #: modules/gui/macosx/playlist.m:127 modules/gui/macosx/wizard.m:350
 #: modules/gui/wince/playlist.cpp:671 modules/mux/asf.c:54
 msgid "Author"
 msgstr "Yazar"
 
-#: modules/gui/macosx/playlist.m:430
+#: modules/gui/macosx/playlist.m:438
 msgid "Save Playlist..."
 msgstr "Listeyi Kaydet..."
 
-#: modules/gui/macosx/playlist.m:433
+#: modules/gui/macosx/playlist.m:441
 #, fuzzy
 msgid "Expand Node"
 msgstr "Ses kodlayıcısı"
 
-#: modules/gui/macosx/playlist.m:436
+#: modules/gui/macosx/playlist.m:444
 #, fuzzy
 msgid "Fetch Meta Data"
 msgstr "Başlık üstverisi"
 
-#: modules/gui/macosx/playlist.m:437
+#: modules/gui/macosx/playlist.m:445
 #, fuzzy
 msgid "Sort Node by Name"
 msgstr "İsme göre Sırala"
 
-#: modules/gui/macosx/playlist.m:438
+#: modules/gui/macosx/playlist.m:446
 #, fuzzy
 msgid "Sort Node by Author"
 msgstr "İsme göre Sırala"
 
-#: modules/gui/macosx/playlist.m:440 modules/gui/macosx/playlist.m:478
-#: modules/gui/macosx/playlist.m:1385
+#: modules/gui/macosx/playlist.m:448 modules/gui/macosx/playlist.m:486
+#: modules/gui/macosx/playlist.m:1393
 #, fuzzy
 msgid "No items in the playlist"
 msgstr "Listede %i öge"
 
-#: modules/gui/macosx/playlist.m:442
+#: modules/gui/macosx/playlist.m:450
 #, fuzzy
 msgid "Search in Playlist"
 msgstr "Oynatma Listesi Aç"
 
-#: modules/gui/macosx/playlist.m:443
-#, fuzzy
+#: modules/gui/macosx/playlist.m:451
 msgid "Add Folder to Playlist"
-msgstr "Oynatma Listesine Ekle"
+msgstr "Listeye Klasör Ekle"
 
-#: modules/gui/macosx/playlist.m:445
-#, fuzzy
+#: modules/gui/macosx/playlist.m:453
 msgid "File Format:"
-msgstr "Altyazı bindirme"
+msgstr "Dosya Formatı:"
 
-#: modules/gui/macosx/playlist.m:446
+#: modules/gui/macosx/playlist.m:454
 #, fuzzy
 msgid "Extended M3U"
 msgstr "Geniş &GUI\tCtrl-G"
 
-#: modules/gui/macosx/playlist.m:447
+#: modules/gui/macosx/playlist.m:455
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr ""
 
-#: modules/gui/macosx/playlist.m:472 modules/gui/macosx/playlist.m:1378
-#: modules/gui/macosx/wizard.m:1354
+#: modules/gui/macosx/playlist.m:480 modules/gui/macosx/playlist.m:1386
+#: modules/gui/macosx/wizard.m:1356
 #, c-format
 msgid "%i items"
-msgstr ""
+msgstr "%i öge"
 
-#: modules/gui/macosx/playlist.m:480 modules/gui/macosx/playlist.m:1389
-#, fuzzy
+#: modules/gui/macosx/playlist.m:488 modules/gui/macosx/playlist.m:1397
 msgid "1 item"
-msgstr "Öge"
+msgstr "1 öge"
 
-#: modules/gui/macosx/playlist.m:669
+#: modules/gui/macosx/playlist.m:677
 msgid "Save Playlist"
 msgstr "Oynatma Listesini Kaydet"
 
-#: modules/gui/macosx/playlist.m:1098 modules/gui/ncurses.c:1808
+#: modules/gui/macosx/playlist.m:1106 modules/gui/ncurses.c:1808
 msgid "Meta-information"
 msgstr "Üst-veri"
 
-#: modules/gui/macosx/playlist.m:1346
+#: modules/gui/macosx/playlist.m:1354
 #, fuzzy
 msgid "New Node"
 msgstr "Ses kodlayıcısı"
 
-#: modules/gui/macosx/playlist.m:1347
+#: modules/gui/macosx/playlist.m:1355
 #, fuzzy
 msgid "Please enter a name for the new node."
 msgstr "Ağ arayüz adresi"
 
-#: modules/gui/macosx/playlist.m:1355
-#, fuzzy
+#: modules/gui/macosx/playlist.m:1363
 msgid "Empty Folder"
-msgstr "Süzgeçler"
+msgstr "Klasörü Boşalt"
 
 #: modules/gui/macosx/prefs.m:127 modules/gui/macosx/simple_prefs.m:297
 msgid "Reset All"
@@ -14061,9 +13933,8 @@ msgstr "Tümünü Sıfırla"
 
 #: modules/gui/macosx/prefs.m:128 modules/gui/macosx/simple_prefs.m:294
 #: modules/gui/qt4/ui/video_effects.ui:17
-#, fuzzy
 msgid "Basic"
-msgstr "Bashkir"
+msgstr "Temel"
 
 #: modules/gui/macosx/prefs.m:147 modules/gui/macosx/simple_prefs.m:606
 #: modules/gui/qt4/dialogs/preferences.cpp:352
@@ -14089,59 +13960,50 @@ msgid "Select"
 msgstr "Seç"
 
 #: modules/gui/macosx/simple_prefs.m:168
-#: modules/gui/qt4/components/simple_preferences.cpp:450
-#, fuzzy
+#: modules/gui/qt4/components/simple_preferences.cpp:457
 msgid "Interface Settings"
-msgstr "Genel arayüz ayarları"
+msgstr "Arayüz Ayarları"
 
 #: modules/gui/macosx/simple_prefs.m:172
-#: modules/gui/qt4/components/simple_preferences.cpp:211
-#, fuzzy
+#: modules/gui/qt4/components/simple_preferences.cpp:213
 msgid "General Audio Settings"
-msgstr "Genel ses ayarları"
+msgstr "Genel Ses Ayarları"
 
 #: modules/gui/macosx/simple_prefs.m:176
-#: modules/gui/qt4/components/simple_preferences.cpp:181
-#, fuzzy
+#: modules/gui/qt4/components/simple_preferences.cpp:183
 msgid "General Video Settings"
-msgstr "Genel video ayarları"
+msgstr "Genel Video Ayarları"
 
 #: modules/gui/macosx/simple_prefs.m:180
-#, fuzzy
 msgid "Subtitles & OSD"
-msgstr "Altyazılar/OSD"
+msgstr "Altyazı && OSD"
 
 #: modules/gui/macosx/simple_prefs.m:180
-#: modules/gui/qt4/components/simple_preferences.cpp:509
+#: modules/gui/qt4/components/simple_preferences.cpp:516
 #, fuzzy
 msgid "Subtitles & On Screen Display Settings"
-msgstr "Altyazı ayırıcı ayarları"
+msgstr "Altyazı & OSD Ayarları"
 
 #: modules/gui/macosx/simple_prefs.m:184
-#, fuzzy
 msgid "Input & Codecs"
-msgstr "Girdi / Codec'ler"
+msgstr "Girdi && Codec'ler"
 
 #: modules/gui/macosx/simple_prefs.m:184
-#, fuzzy
 msgid "Input & Codec settings"
-msgstr "Girdi / Codec'ler"
+msgstr "Girdi & Codec Ayarları"
 
 #: modules/gui/macosx/simple_prefs.m:216
 #: modules/gui/qt4/ui/sprefs_audio.ui:250
-#, fuzzy
 msgid "Effects"
-msgstr "Çıkart"
+msgstr "Efektler"
 
 #: modules/gui/macosx/simple_prefs.m:217
-#, fuzzy
 msgid "Enable Audio"
-msgstr "Ses etkin"
+msgstr "Ses Etkin"
 
 #: modules/gui/macosx/simple_prefs.m:218 modules/gui/qt4/ui/sprefs_audio.ui:30
-#, fuzzy
 msgid "General Audio"
-msgstr "Genel"
+msgstr "Genel Ses"
 
 #: modules/gui/macosx/simple_prefs.m:219
 #: modules/gui/qt4/ui/sprefs_audio.ui:259
@@ -14159,25 +14021,21 @@ msgid "Enable Last.fm submissions"
 msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:223
-#, fuzzy
 msgid "User name"
-msgstr "Kullanıcı"
+msgstr "Kullanıcı adı"
 
 #: modules/gui/macosx/simple_prefs.m:226
 #: modules/gui/qt4/ui/sprefs_audio.ui:273
-#, fuzzy
 msgid "Visualization"
 msgstr "Görsel Ögeler"
 
 #: modules/gui/macosx/simple_prefs.m:227
-#, fuzzy
 msgid "Default Volume"
-msgstr "Varsayılan aygıtlar"
+msgstr "Varsayılan Seviye"
 
 #: modules/gui/macosx/simple_prefs.m:230
-#, fuzzy
 msgid "Change"
-msgstr "Kanal"
+msgstr "Değiştir"
 
 #: modules/gui/macosx/simple_prefs.m:231
 #, fuzzy
@@ -14189,22 +14047,19 @@ msgid "Select an action to change the associated hotkey:"
 msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:236
-#: modules/gui/qt4/components/preferences_widgets.cpp:1120
-#, fuzzy
+#: modules/gui/qt4/components/preferences_widgets.cpp:1122
 msgid "Action"
-msgstr "Uygulama"
+msgstr "Eylem"
 
 #: modules/gui/macosx/simple_prefs.m:237
-#: modules/gui/qt4/components/preferences_widgets.cpp:1121
-#, fuzzy
+#: modules/gui/qt4/components/preferences_widgets.cpp:1123
 msgid "Shortcut"
-msgstr "sout"
+msgstr "Kısayol"
 
 #: modules/gui/macosx/simple_prefs.m:240
 #: modules/gui/qt4/ui/sprefs_input.ui:181
-#, fuzzy
 msgid "Access Filter"
-msgstr "Erişim Süzgeci modülleri"
+msgstr "Erişim Süzgeci"
 
 #: modules/gui/macosx/simple_prefs.m:241
 msgid "Repair AVI Files"
@@ -14227,14 +14082,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:247
-#, fuzzy
 msgid "HTTP Proxy"
-msgstr "HTTP proxy"
+msgstr "HTTP Proxy"
 
 #: modules/gui/macosx/simple_prefs.m:248
-#, fuzzy
 msgid "Password for HTTP Proxy"
-msgstr "HTTP proxy"
+msgstr "HTTP proxy için parola"
 
 #: modules/gui/macosx/simple_prefs.m:249
 #: modules/gui/qt4/ui/sprefs_input.ui:119
@@ -14247,9 +14100,8 @@ msgid "Post-Processing Quality"
 msgstr "Son işleme kalitesi"
 
 #: modules/gui/macosx/simple_prefs.m:254
-#, fuzzy
 msgid "Default Server Port"
-msgstr "Varsayılan aygıtlar"
+msgstr "Varsayılan Sunucu Portu"
 
 #: modules/gui/macosx/simple_prefs.m:258
 #: modules/gui/qt4/ui/sprefs_interface.ui:250
@@ -14273,53 +14125,45 @@ msgid "Privacy / Network Interaction"
 msgstr "Geçmeli video kodlama etkin"
 
 #: modules/gui/macosx/simple_prefs.m:265
-#, fuzzy
 msgid "Default Encoding"
-msgstr "Kod çözme"
+msgstr "Varsayılan Kodlama"
 
 #: modules/gui/macosx/simple_prefs.m:266
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:92
-#, fuzzy
 msgid "Display Settings"
-msgstr "Ekran çözünürlüğü"
+msgstr "Görüntü Ayarları"
 
 #: modules/gui/macosx/simple_prefs.m:268
-#, fuzzy
 msgid "Font Color"
-msgstr "Renk"
+msgstr "Yazıtipi Rengi"
 
 #: modules/gui/macosx/simple_prefs.m:269
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:101
 #: modules/video_output/opengl.c:174
-#, fuzzy
 msgid "Effect"
-msgstr "Çıkart"
+msgstr "Efekt"
 
 #: modules/gui/macosx/simple_prefs.m:270
-#, fuzzy
 msgid "Font Size"
-msgstr "Yazıtipi boyutu"
+msgstr "Yazıtipi Boyutu"
 
 #: modules/gui/macosx/simple_prefs.m:272
-#, fuzzy
 msgid "Subtitle Languages"
-msgstr "Altyazı dilini seçiniz"
+msgstr "Altyazı Dilleri"
 
 #: modules/gui/macosx/simple_prefs.m:273
-#, fuzzy
 msgid "Preferred Subtitle Language"
-msgstr "Ses dilini seçiniz"
+msgstr "Seçilen Altyazı Dili"
 
 #: modules/gui/macosx/simple_prefs.m:275
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:28
-#, fuzzy
 msgid "Enable OSD"
-msgstr "Etkin"
+msgstr "OSD etkin"
 
 #: modules/gui/macosx/simple_prefs.m:278
 #, fuzzy
 msgid "Black screens in Fullscreen mode"
-msgstr "Tam ekran modu geçiş"
+msgstr "Tam-ekran modu geçiş"
 
 #: modules/gui/macosx/simple_prefs.m:280 modules/gui/qt4/ui/sprefs_video.ui:36
 #: modules/stream_out/display.c:54 modules/video_filter/deinterlace.c:132
@@ -14327,48 +14171,41 @@ msgid "Display"
 msgstr "Ekranda göster"
 
 #: modules/gui/macosx/simple_prefs.m:281
-#, fuzzy
 msgid "Enable Video"
-msgstr "Video etkin"
+msgstr "Video Etkin"
 
 #: modules/gui/macosx/simple_prefs.m:284
-#, fuzzy
 msgid "Output module"
-msgstr "Çıktı modülleri"
+msgstr "Çıktı modülü"
 
 #: modules/gui/macosx/simple_prefs.m:286
 #: modules/gui/qt4/ui/sprefs_video.ui:149
-#, fuzzy
 msgid "Video snapshots"
-msgstr "Video enstantane formatı"
+msgstr "Video enstantaneleri"
 
 #: modules/gui/macosx/simple_prefs.m:288 modules/meta_engine/folder.c:58
-#, fuzzy
 msgid "Folder"
-msgstr "Süzgeçler"
+msgstr "Klasör"
 
 #: modules/gui/macosx/simple_prefs.m:289
 #: modules/gui/qt4/ui/sprefs_video.ui:198
-#, fuzzy
 msgid "Format"
-msgstr "Norm"
+msgstr "Format"
 
 #: modules/gui/macosx/simple_prefs.m:290
 #: modules/gui/qt4/ui/sprefs_video.ui:181
-#, fuzzy
 msgid "Prefix"
-msgstr "Önceki"
+msgstr "Önek"
 
 #: modules/gui/macosx/simple_prefs.m:291
 #: modules/gui/qt4/ui/sprefs_video.ui:211
 msgid "Sequential numbering"
-msgstr ""
+msgstr "Ardışıl numara ver"
 
 #: modules/gui/macosx/simple_prefs.m:481 modules/gui/macosx/simple_prefs.m:525
 #: modules/gui/macosx/simple_prefs.m:1093
-#, fuzzy
 msgid "Custom"
-msgstr "Pushto"
+msgstr "Özel"
 
 #: modules/gui/macosx/simple_prefs.m:481
 msgid "Lowest latency"
@@ -14394,14 +14231,14 @@ msgstr ""
 #: modules/gui/macosx/simple_prefs.m:695
 #, fuzzy
 msgid "Interface Settings not saved"
-msgstr "Genel arayüz ayarları"
+msgstr "Arayüz Ayarları"
 
 #: modules/gui/macosx/simple_prefs.m:696 modules/gui/macosx/simple_prefs.m:761
 #: modules/gui/macosx/simple_prefs.m:796 modules/gui/macosx/simple_prefs.m:880
 #: modules/gui/macosx/simple_prefs.m:909 modules/gui/macosx/simple_prefs.m:934
-#, c-format
+#, fuzzy, c-format
 msgid "An error occured while saving your settings via SimplePrefs (%i)."
-msgstr ""
+msgstr "Güncellemeleri denetlerken bir hata oluştu"
 
 #: modules/gui/macosx/simple_prefs.m:760
 #, fuzzy
@@ -14424,7 +14261,7 @@ msgstr ""
 #: modules/gui/macosx/simple_prefs.m:933
 #, fuzzy
 msgid "Hotkeys not saved"
-msgstr "Kestirme tuşlar"
+msgstr "Kısayol "
 
 #: modules/gui/macosx/simple_prefs.m:1026
 msgid "Choose the folder to save your video snapshots to."
@@ -14460,35 +14297,32 @@ msgid "This combination is already taken by \"%@\"."
 msgstr ""
 
 #: modules/gui/macosx/update.m:63
-#, fuzzy
 msgid "Check for Updates"
-msgstr "Dönüşümler"
+msgstr "Güncellemeleri Denetle"
 
 #: modules/gui/macosx/update.m:64
 msgid "Download now"
-msgstr ""
+msgstr "Şimdir indir"
 
 #: modules/gui/macosx/update.m:66
 msgid "Automatically check for updates"
-msgstr ""
+msgstr "Güncellemeleri otomatik denetle"
 
 #: modules/gui/macosx/update.m:93
 msgid "Do you want VLC to check for updates automatically?"
-msgstr ""
+msgstr "Güncellemeler VLC tarafından otomatik denetlesin ister misiniz?"
 
 #: modules/gui/macosx/update.m:94
 msgid "You can change this option in VLC's update window later on."
 msgstr ""
 
 #: modules/gui/macosx/update.m:94
-#, fuzzy
 msgid "Yes"
-msgstr "Byte"
+msgstr "Evet"
 
 #: modules/gui/macosx/update.m:94
-#, fuzzy
 msgid "No"
-msgstr "Norm"
+msgstr "Hayır"
 
 #: modules/gui/macosx/update.m:176
 msgid "This version of VLC is the latest available."
@@ -14692,9 +14526,8 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:328 modules/gui/macosx/wizard.m:329
 #: modules/gui/macosx/wizard.m:400 modules/gui/macosx/wizard.m:402
 #: modules/gui/macosx/wizard.m:404 modules/gui/macosx/wizard.m:419
-#, fuzzy
 msgid "More Info"
-msgstr "Daha fazla bilgi"
+msgstr "Daha fazla Bilgi"
 
 #: modules/gui/macosx/wizard.m:330
 msgid ""
@@ -14704,12 +14537,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:335 modules/gui/macosx/wizard.m:491
-#: modules/gui/macosx/wizard.m:1673
+#: modules/gui/macosx/wizard.m:1675
 #, fuzzy
 msgid "Stream to network"
 msgstr "Akış"
 
-#: modules/gui/macosx/wizard.m:337 modules/gui/macosx/wizard.m:1681
+#: modules/gui/macosx/wizard.m:337 modules/gui/macosx/wizard.m:1683
 #, fuzzy
 msgid "Transcode/Save to file"
 msgstr "Kayıt dosyası"
@@ -14724,7 +14557,7 @@ msgid "Choose here your input stream."
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:343 modules/gui/macosx/wizard.m:529
-#: modules/gui/macosx/wizard.m:1715
+#: modules/gui/macosx/wizard.m:1717
 #, fuzzy
 msgid "Select a stream"
 msgstr "Bir dosya seçin"
@@ -14809,13 +14642,13 @@ msgstr "Transkod"
 msgid "Transcode video"
 msgstr "Transkod"
 
-#: modules/gui/macosx/wizard.m:384 modules/gui/macosx/wizard.m:1817
+#: modules/gui/macosx/wizard.m:384 modules/gui/macosx/wizard.m:1819
 msgid ""
 "Enabling this allows to transcode the audio track if one is present in the "
 "stream."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:386 modules/gui/macosx/wizard.m:1834
+#: modules/gui/macosx/wizard.m:386 modules/gui/macosx/wizard.m:1836
 msgid ""
 "Enabling this allows to transcode the video track if one is present in the "
 "stream."
@@ -14840,20 +14673,19 @@ msgstr ""
 msgid "In this page, a few additional streaming parameters can be set."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:399 modules/gui/macosx/wizard.m:1862
+#: modules/gui/macosx/wizard.m:399 modules/gui/macosx/wizard.m:1864
 #: modules/gui/qt4/ui/sout.ui:820
 #, fuzzy
 msgid "Time-To-Live (TTL)"
 msgstr "Canlı Kalma Süresi (TTL):"
 
 #: modules/gui/macosx/wizard.m:401 modules/gui/macosx/wizard.m:433
-#: modules/gui/macosx/wizard.m:1873
-#, fuzzy
+#: modules/gui/macosx/wizard.m:1875
 msgid "SAP Announce"
-msgstr "SAP anonsu:"
+msgstr "SAP Anonsu"
 
 #: modules/gui/macosx/wizard.m:403 modules/gui/macosx/wizard.m:413
-#: modules/gui/macosx/wizard.m:445 modules/gui/macosx/wizard.m:1886
+#: modules/gui/macosx/wizard.m:445 modules/gui/macosx/wizard.m:1888
 #, fuzzy
 msgid "Local playback"
 msgstr "Oynatmayı duraklatır"
@@ -14890,9 +14722,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:424
-#, fuzzy
 msgid "Summary"
-msgstr "Boş/Aptal"
+msgstr "Özet"
 
 #: modules/gui/macosx/wizard.m:427
 #, fuzzy
@@ -14905,14 +14736,12 @@ msgid "Input stream"
 msgstr "Sout akışı"
 
 #: modules/gui/macosx/wizard.m:435
-#, fuzzy
 msgid "Save file to"
-msgstr "Kayıt dosyası"
+msgstr "Dosyaya kaydet"
 
 #: modules/gui/macosx/wizard.m:443
-#, fuzzy
 msgid "Include subtitles"
-msgstr "Altyazılar"
+msgstr "Altyazı ekle"
 
 #: modules/gui/macosx/wizard.m:598
 #, fuzzy
@@ -14954,9 +14783,8 @@ msgid "Select the directory to save to"
 msgstr "Oynatma  için kestirme tuş seçin"
 
 #: modules/gui/macosx/wizard.m:1139
-#, fuzzy
 msgid "No folder selected"
-msgstr "Girdi bulunamadı"
+msgstr "Klasör seçilmedi"
 
 #: modules/gui/macosx/wizard.m:1141
 msgid "A directory where to save the files has to be selected."
@@ -14969,9 +14797,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:1146
-#, fuzzy
 msgid "No file selected"
-msgstr "Girdi bulunamadı"
+msgstr "Dosya seçilmedi"
 
 #: modules/gui/macosx/wizard.m:1148
 msgid "A file where to save the stream has to be selected."
@@ -14982,37 +14809,35 @@ msgid ""
 "Enter either a valid path or use the \"Choose\" button to select a location."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1349
+#: modules/gui/macosx/wizard.m:1351
 #, fuzzy
 msgid "Finish"
 msgstr "Finnish"
 
-#: modules/gui/macosx/wizard.m:1362 modules/gui/macosx/wizard.m:1391
-#: modules/gui/macosx/wizard.m:1421
-#, fuzzy
+#: modules/gui/macosx/wizard.m:1364 modules/gui/macosx/wizard.m:1393
+#: modules/gui/macosx/wizard.m:1423
 msgid "yes"
-msgstr "Byte"
+msgstr "evet"
 
-#: modules/gui/macosx/wizard.m:1364 modules/gui/macosx/wizard.m:1374
-#: modules/gui/macosx/wizard.m:1387 modules/gui/macosx/wizard.m:1393
-#: modules/gui/macosx/wizard.m:1405 modules/gui/macosx/wizard.m:1424
-#, fuzzy
+#: modules/gui/macosx/wizard.m:1366 modules/gui/macosx/wizard.m:1376
+#: modules/gui/macosx/wizard.m:1389 modules/gui/macosx/wizard.m:1395
+#: modules/gui/macosx/wizard.m:1407 modules/gui/macosx/wizard.m:1426
 msgid "no"
-msgstr "hiçbiri"
+msgstr "hayır"
 
-#: modules/gui/macosx/wizard.m:1370
+#: modules/gui/macosx/wizard.m:1372
 msgid "yes: from %@ to %@ secs"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1380 modules/gui/macosx/wizard.m:1398
+#: modules/gui/macosx/wizard.m:1382 modules/gui/macosx/wizard.m:1400
 msgid "yes: %@ @ %@ kb/s"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1675
+#: modules/gui/macosx/wizard.m:1677
 msgid "This allows to stream on a network."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1683
+#: modules/gui/macosx/wizard.m:1685
 msgid ""
 "This allows to save a stream to a file. The can be reencoded on the fly. "
 "Whatever VLC can read can be saved.\n"
@@ -15020,15 +14845,15 @@ msgid ""
 "transcoding features are however useful to save network streams, for example."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1812
+#: modules/gui/macosx/wizard.m:1814
 msgid "Select your audio codec. Click one to get more information."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1829
+#: modules/gui/macosx/wizard.m:1831
 msgid "Select your video codec. Click one to get more information."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1864
+#: modules/gui/macosx/wizard.m:1866
 msgid ""
 "This allows to define the TTL (Time-To-Live) of the stream. This parameter "
 "is the maximum number of routers your stream can go through. If you don't "
@@ -15036,7 +14861,7 @@ msgid ""
 "leave this setting to 1."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1875
+#: modules/gui/macosx/wizard.m:1877
 msgid ""
 "When streaming using UDP, the streams can be announced using the SAP/SDP "
 "announcing protocol. This way, the clients won't have to type in the "
@@ -15046,7 +14871,7 @@ msgid ""
 "name will be used."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1888
+#: modules/gui/macosx/wizard.m:1890
 msgid ""
 "When this option is enabled, the stream will be both played and transcoded/"
 "streamed.\n"
@@ -15129,19 +14954,19 @@ msgid " Position : %s/%s (%.2f%%)"
 msgstr ""
 
 #: modules/gui/ncurses.c:1597
-#, fuzzy, c-format
+#, c-format
 msgid " Volume   : %i%%"
-msgstr "Seviye: %d"
+msgstr "Seviye  : %i%%"
 
 #: modules/gui/ncurses.c:1605
-#, fuzzy, c-format
+#, c-format
 msgid " Title    : %d/%d"
-msgstr "Başlık %d (%d)"
+msgstr " Başlık    : %d/%d"
 
 #: modules/gui/ncurses.c:1616
-#, fuzzy, c-format
+#, c-format
 msgid " Chapter  : %d/%d"
-msgstr "Bölüm %d"
+msgstr "Bölüm  : %d/%d"
 
 #: modules/gui/ncurses.c:1628
 #, c-format
@@ -15153,14 +14978,12 @@ msgid " [ h for help ]"
 msgstr ""
 
 #: modules/gui/ncurses.c:1652
-#, fuzzy
 msgid " Help "
-msgstr "Yardım"
+msgstr " Yardım "
 
 #: modules/gui/ncurses.c:1656
-#, fuzzy
 msgid "[Display]"
-msgstr "Ekranda göster"
+msgstr "[Display]"
 
 #: modules/gui/ncurses.c:1659
 msgid "     h,H         Show/Hide help box"
@@ -15352,19 +15175,18 @@ msgid "     Ctrl-l          Refresh the screen"
 msgstr ""
 
 #: modules/gui/ncurses.c:1760
-#, fuzzy
 msgid " Information "
-msgstr "Dönüşümler"
+msgstr "Bilgi"
 
 #: modules/gui/ncurses.c:1772
 #, c-format
 msgid "  [%s]"
-msgstr ""
+msgstr "  [%s]"
 
 #: modules/gui/ncurses.c:1779
 #, c-format
 msgid "      %s: %s"
-msgstr ""
+msgstr "      %s: %s"
 
 #: modules/gui/ncurses.c:1786 modules/gui/ncurses.c:1874
 #, fuzzy
@@ -15372,14 +15194,12 @@ msgid "No item currently playing"
 msgstr "Listede %i öge"
 
 #: modules/gui/ncurses.c:1897
-#, fuzzy
 msgid " Logs "
-msgstr "Georgian"
+msgstr "Log'lar "
 
 #: modules/gui/ncurses.c:1940
-#, fuzzy
 msgid " Browse "
-msgstr "Gözat..."
+msgstr " Gözat "
 
 #: modules/gui/ncurses.c:1995
 msgid " Objects "
@@ -15415,9 +15235,9 @@ msgid "Find: %s"
 msgstr ""
 
 #: modules/gui/ncurses.c:2238
-#, fuzzy, c-format
+#, c-format
 msgid "Open: %s"
-msgstr "Aç:"
+msgstr "Aç: %s"
 
 #: modules/gui/pda/pda.c:62
 msgid "Autoplay selected file"
@@ -15842,9 +15662,8 @@ msgid "Authors: the VideoLAN Team, http://www.videolan.org/team/"
 msgstr "Yazarlar: VideoLAN Ekibi, http://www.videolan.org/team/"
 
 #: modules/gui/pda/pda_interface.c:1347
-#, fuzzy
 msgid "(c) 1996-2004 the the VideoLAN team team"
-msgstr "(c) 1996-2004 VideoLAN Ekibi"
+msgstr "(c) 1996-2004 VideoLAN ekibi"
 
 #: modules/gui/pda/pda_support.c:88 modules/gui/pda/pda_support.c:112
 #, c-format
@@ -15855,54 +15674,57 @@ msgstr ""
 msgid "QNX RTOS video and audio output"
 msgstr "QNX RTOS video ve ses çıktısı"
 
-#: modules/gui/qt4/components/extended_panels.cpp:950
-#: modules/gui/qt4/components/extended_panels.cpp:1013
+#: modules/gui/qt4/components/extended_panels.cpp:951
+#: modules/gui/qt4/components/extended_panels.cpp:1016
 #, fuzzy
 msgid "Preamp\n"
 msgstr "Kuvvetlendirme"
 
-#: modules/gui/qt4/components/extended_panels.cpp:951
-#: modules/gui/qt4/components/extended_panels.cpp:1014
+#: modules/gui/qt4/components/extended_panels.cpp:952
+#: modules/gui/qt4/components/extended_panels.cpp:1017
 msgid "dB"
-msgstr ""
+msgstr "dB"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1243
+#: modules/gui/qt4/components/extended_panels.cpp:1105
 #, fuzzy
-msgid "Audio/Video"
-msgstr "Ses Codec:"
+msgid "Enable spatializer"
+msgstr "Ekolayzer"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1259
+#: modules/gui/qt4/components/extended_panels.cpp:1246
+msgid "Audio/Video"
+msgstr "Ses/Video"
+
+#: modules/gui/qt4/components/extended_panels.cpp:1262
 msgid "Advance of audio over video:"
 msgstr ""
 
-#: modules/gui/qt4/components/extended_panels.cpp:1268
+#: modules/gui/qt4/components/extended_panels.cpp:1271
 msgid ""
 "A positive value means that\n"
 "the audio is ahead of the video"
 msgstr ""
 
-#: modules/gui/qt4/components/extended_panels.cpp:1276
-#, fuzzy
+#: modules/gui/qt4/components/extended_panels.cpp:1279
 msgid "Subtitles/Video"
-msgstr "Altyazı dosyası"
+msgstr "Altyazı/Video"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1292
+#: modules/gui/qt4/components/extended_panels.cpp:1295
 #, fuzzy
 msgid "Advance of subtitles over video:"
 msgstr "Bindirmeler/Altyazılar"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1301
+#: modules/gui/qt4/components/extended_panels.cpp:1304
 msgid ""
 "A positive value means that\n"
 "the subtitles are ahead of the video"
 msgstr ""
 
-#: modules/gui/qt4/components/extended_panels.cpp:1320
+#: modules/gui/qt4/components/extended_panels.cpp:1323
 #, fuzzy
 msgid "Speed of the subtitles:"
 msgstr "DVB altyazı kod çözücüsü"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1350
+#: modules/gui/qt4/components/extended_panels.cpp:1353
 #, fuzzy
 msgid "Force update of this dialog's values"
 msgstr "Erişim çıktı modülü"
@@ -15922,9 +15744,14 @@ msgid "Statistics about the currently playing media or stream."
 msgstr ""
 
 #: modules/gui/qt4/components/info_panels.cpp:546
-#, fuzzy
 msgid "Sent bitrate"
-msgstr "Örnekleme oranı"
+msgstr "Gönderim bit-oranı"
+
+#: modules/gui/qt4/components/interface_widgets.cpp:59
+msgid ""
+"Play\n"
+"If the playlist is empty, open a media"
+msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:256
 #, fuzzy
@@ -15938,14 +15765,20 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:324
-#, fuzzy
 msgid "Frame by frame"
-msgstr "Çerçeve oranı"
+msgstr "Kare kare"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:338
-#, fuzzy
 msgid "Take a snapshot"
-msgstr "Videodan enstantane çek"
+msgstr "Bir enstantane çek"
+
+#: modules/gui/qt4/components/interface_widgets.cpp:371
+msgid "Click to set point B"
+msgstr ""
+
+#: modules/gui/qt4/components/interface_widgets.cpp:380
+msgid "Stop the A to B loop"
+msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:385
 msgid ""
@@ -15958,15 +15791,13 @@ msgid "Menu"
 msgstr "Menü"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:517
-#, fuzzy
 msgid "Teletext on"
-msgstr "DVB altyazı kod çözücüsü"
+msgstr "Teletext açık"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:529
 #: modules/gui/qt4/components/interface_widgets.cpp:718
-#, fuzzy
 msgid "Teletext"
-msgstr "DVB altyazı kod çözücüsü"
+msgstr "Teletext"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:579
 #, fuzzy
@@ -15986,12 +15817,11 @@ msgstr "Oynatmayı duraklatır"
 #: modules/gui/qt4/components/interface_widgets.cpp:590
 #, fuzzy
 msgid "Toggle the video in fullscreen"
-msgstr "Tam ekran modu geçiş"
+msgstr "Videoyu tam-ekran modunda başlat"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:598
-#, fuzzy
 msgid "Show playlist"
-msgstr "Oynatma Listesini kaydet"
+msgstr "Oynatma Listesini göster"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:604
 #, fuzzy
@@ -15999,9 +15829,8 @@ msgid "Show extended settings"
 msgstr "Gelişmiş seçenekleri göster"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:724
-#, fuzzy
 msgid "Transparent"
-msgstr "TCP girdisi"
+msgstr "Saydam"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:789
 #, fuzzy
@@ -16013,9 +15842,13 @@ msgstr "Sessiz"
 msgid "Pause the playback"
 msgstr "Oynatmayı duraklatır"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:1272
+#: modules/gui/qt4/components/interface_widgets.cpp:1274
 msgid "Revert to normal play speed"
 msgstr ""
+
+#: modules/gui/qt4/components/open_panels.cpp:48
+msgid "Select the device or the VIDEO_TS directory"
+msgstr "Aygıtı veya VIDEO_TS klasörünü seçiniz"
 
 #: modules/gui/qt4/components/open_panels.cpp:88
 #, fuzzy
@@ -16023,20 +15856,17 @@ msgid "Select one or multiple files"
 msgstr "Duraklatma için kestirme tuş seçin"
 
 #: modules/gui/qt4/components/open_panels.cpp:106
-#, fuzzy
 msgid "File names:"
-msgstr "Dosya adı"
+msgstr "Dosya adları:"
 
 #: modules/gui/qt4/components/open_panels.cpp:108
-#, fuzzy
 msgid "Filter:"
-msgstr "Süzgeçler"
+msgstr "Süzgeç:"
 
 #: modules/gui/qt4/components/open_panels.cpp:154
 #: modules/gui/qt4/dialogs_provider.cpp:611
-#, fuzzy
 msgid "Open subtitles file"
-msgstr "Altyazı dosyasını kullan"
+msgstr "Altyazı dosyalarını aç"
 
 #: modules/gui/qt4/components/open_panels.cpp:261
 #, fuzzy
@@ -16045,9 +15875,8 @@ msgstr "Bir dosya seçin"
 
 #: modules/gui/qt4/components/open_panels.cpp:621
 #: modules/gui/qt4/components/open_panels.cpp:877
-#, fuzzy
 msgid "DVB Type:"
-msgstr "Disc türü"
+msgstr "DVB Türü:"
 
 #: modules/gui/qt4/components/open_panels.cpp:645
 #: modules/gui/qt4/components/open_panels.cpp:907
@@ -16056,9 +15885,8 @@ msgid "Transponder symbol rate"
 msgstr "Transponder sembol oranı kHz"
 
 #: modules/gui/qt4/components/open_panels.cpp:767
-#, fuzzy
 msgid "Channels:"
-msgstr "Kanallar"
+msgstr "Kanallar:"
 
 #: modules/gui/qt4/components/open_panels.cpp:780
 #, fuzzy
@@ -16067,7 +15895,7 @@ msgstr "Seçilen:"
 
 #: modules/gui/qt4/components/open_panels.cpp:783
 msgid ".*"
-msgstr ""
+msgstr ".*"
 
 #: modules/gui/qt4/components/open_panels.cpp:788
 #, fuzzy
@@ -16084,14 +15912,12 @@ msgid "Auto connnection"
 msgstr "Otomatik yeniden bağlan"
 
 #: modules/gui/qt4/components/open_panels.cpp:826
-#, fuzzy
 msgid "Radio device name"
-msgstr "Ses aygıtı ismi"
+msgstr "Radyo aygıtı ismi"
 
 #: modules/gui/qt4/components/open_panels.cpp:1112
-#, fuzzy
 msgid "Advanced Options"
-msgstr "Gelişmiş seçenekler"
+msgstr "Gelişmiş Seçenekler"
 
 #: modules/gui/qt4/components/playlist/playlist.cpp:74
 msgid "Double click to get media information"
@@ -16107,64 +15933,58 @@ msgid "Select File"
 msgstr "Dosya Seç"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:331
-#, fuzzy
 msgid "Select Directory"
-msgstr "Bir klasör seçin"
+msgstr "Klasör Seç"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1112
+#: modules/gui/qt4/components/preferences_widgets.cpp:1114
 msgid "Select an action to change the associated hotkey"
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1127
-#, fuzzy
+#: modules/gui/qt4/components/preferences_widgets.cpp:1129
 msgid "Set"
-msgstr "Seç"
+msgstr "Ayarla"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1241
-#, fuzzy
+#: modules/gui/qt4/components/preferences_widgets.cpp:1243
 msgid "Unset"
-msgstr "Kullanıcı"
+msgstr "Ayarı gerial"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1279
-#, fuzzy
+#: modules/gui/qt4/components/preferences_widgets.cpp:1281
 msgid "Hotkey for "
-msgstr "Kestirme tuşlar"
+msgstr "Kısayol "
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1282
+#: modules/gui/qt4/components/preferences_widgets.cpp:1284
 msgid "Press the new keys for "
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1307
+#: modules/gui/qt4/components/preferences_widgets.cpp:1309
 msgid "Warning: the key is already assigned to \""
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1327
-#: modules/gui/qt4/components/preferences_widgets.cpp:1335
-#, fuzzy
+#: modules/gui/qt4/components/preferences_widgets.cpp:1329
+#: modules/gui/qt4/components/preferences_widgets.cpp:1337
 msgid "Key: "
-msgstr "Anahtar/Kare"
-
-#: modules/gui/qt4/components/simple_preferences.cpp:78
-#, fuzzy
-msgid "Subtitles && OSD"
-msgstr "Altyazılar/OSD"
+msgstr "Anahtar: "
 
 #: modules/gui/qt4/components/simple_preferences.cpp:80
 #, fuzzy
-msgid "Input && Codecs"
-msgstr "Girdi / Codec'ler"
+msgid "Subtitles && OSD"
+msgstr "Altyazı && OSD"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:220
+#: modules/gui/qt4/components/simple_preferences.cpp:82
 #, fuzzy
-msgid "Device:"
-msgstr "Aygıt"
+msgid "Input && Codecs"
+msgstr "Girdi && Codec'ler"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:350
+#: modules/gui/qt4/components/simple_preferences.cpp:222
+msgid "Device:"
+msgstr "Aygıt:"
+
+#: modules/gui/qt4/components/simple_preferences.cpp:354
 #, fuzzy
 msgid "Input & Codecs Settings"
 msgstr "Girdi / Codec'ler"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:355
+#: modules/gui/qt4/components/simple_preferences.cpp:359
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -16172,48 +15992,41 @@ msgid ""
 "individually in the advanced preferences."
 msgstr ""
 
-#: modules/gui/qt4/components/simple_preferences.cpp:534
-#, fuzzy
+#: modules/gui/qt4/components/simple_preferences.cpp:541
 msgid "Configure Hotkeys"
-msgstr "Yapılandır"
+msgstr "Kısayolları Yapılandır"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:743
+#: modules/gui/qt4/components/simple_preferences.cpp:756
 #: modules/gui/qt4/dialogs_provider.hpp:55
-#, fuzzy
 msgid "Audio Files"
-msgstr "Ses süzgeçleri"
+msgstr "Ses Dosyaları"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:744
+#: modules/gui/qt4/components/simple_preferences.cpp:757
 #: modules/gui/qt4/dialogs_provider.hpp:50
-#, fuzzy
 msgid "Video Files"
-msgstr "Video Süzgeçleri"
+msgstr "Video Dosyaları"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:745
+#: modules/gui/qt4/components/simple_preferences.cpp:758
 #: modules/gui/qt4/dialogs_provider.hpp:60
-#, fuzzy
 msgid "Playlist Files"
-msgstr "Oynatma Listesi"
+msgstr "Oynatma Listeleri"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:792
-#, fuzzy
+#: modules/gui/qt4/components/simple_preferences.cpp:805
 msgid "&Apply"
-msgstr "Uygula"
+msgstr "&Uygula"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:793
+#: modules/gui/qt4/components/simple_preferences.cpp:806
 #: modules/gui/qt4/dialogs/gototime.cpp:52
 #: modules/gui/qt4/dialogs/help.cpp:210 modules/gui/qt4/dialogs/open.cpp:104
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:39
 #: modules/gui/qt4/dialogs/preferences.cpp:87
 #: modules/gui/qt4/dialogs/sout.cpp:185
-#, fuzzy
 msgid "&Cancel"
-msgstr "İptal"
+msgstr "&İptal"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:40
-#, fuzzy
 msgid "Edit Bookmarks"
-msgstr "Yer imlerini düzenle"
+msgstr "Yer İmlerini Düzenle"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:44
 #, fuzzy
@@ -16249,34 +16062,29 @@ msgstr "&Kapat"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:67
 msgid "Bytes"
-msgstr "Byte"
+msgstr "Bytes"
 
 #: modules/gui/qt4/dialogs/errors.cpp:42
-#, fuzzy
 msgid "Errors"
-msgstr "Hata"
+msgstr "Hatalar"
 
 #: modules/gui/qt4/dialogs/errors.cpp:51
 #: modules/gui/qt4/dialogs/messages.cpp:84
 #: modules/gui/qt4/dialogs/messages.cpp:130
-#, fuzzy
 msgid "&Clear"
-msgstr "Temizle"
+msgstr "&Temizle"
 
 #: modules/gui/qt4/dialogs/errors.cpp:58
-#, fuzzy
 msgid "Hide future errors"
-msgstr "Fazla hataları bastır"
+msgstr "Sonraki hataları gizle"
 
 #: modules/gui/qt4/dialogs/extended.cpp:41
-#, fuzzy
 msgid "Adjustments and Effects"
-msgstr "Video codec'leri"
+msgstr "Ayarlamalar ve Efektler"
 
 #: modules/gui/qt4/dialogs/extended.cpp:55
-#, fuzzy
 msgid "Graphic Equalizer"
-msgstr "Ekolayzer"
+msgstr "Grafik Ekolayzer"
 
 #: modules/gui/qt4/dialogs/extended.cpp:58
 #, fuzzy
@@ -16284,44 +16092,36 @@ msgid "Spatializer"
 msgstr "Ekolayzer"
 
 #: modules/gui/qt4/dialogs/extended.cpp:61
-#, fuzzy
 msgid "Audio Effects"
-msgstr "Ses codec'leri"
+msgstr "Ses Efektleri"
 
 #: modules/gui/qt4/dialogs/extended.cpp:72
-#, fuzzy
 msgid "Video Effects"
-msgstr "Ses codec'leri"
+msgstr "Video Efektleri"
 
 #: modules/gui/qt4/dialogs/extended.cpp:75
-#, fuzzy
 msgid "Synchronization"
-msgstr "Saat senkronizasyonu"
+msgstr "Senkronizasyon"
 
 #: modules/gui/qt4/dialogs/extended.cpp:80
-#, fuzzy
 msgid "v4l2 controls"
-msgstr "Denetim"
+msgstr "v4l2 kontrolleri"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:46
-#, fuzzy
 msgid "Go to Time"
-msgstr "Başlığa Git"
+msgstr "Zamana Git"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:51
-#, fuzzy
 msgid "&Go"
-msgstr "Norm"
+msgstr "&Git"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:62
-#, fuzzy
 msgid "Go to time"
-msgstr "Başlığa Git"
+msgstr "Gidilecek zaman"
 
 #: modules/gui/qt4/dialogs/help.cpp:102
-#, fuzzy
 msgid "VLC media player "
-msgstr "VLC medya oynatıcısı"
+msgstr "VLC medya oynatıcısı "
 
 #: modules/gui/qt4/dialogs/help.cpp:117
 msgid ""
@@ -16331,6 +16131,11 @@ msgid ""
 "platform.\n"
 "\n"
 msgstr ""
+"VLC medya oynatıcısı; dosyalardan, CDlerden, DVDlerden, ağ akışlarından, "
+"yakalama kartlarından ve diğer başka kaynaklardan okuyan, onları gösteren/"
+"oynatan, kodlayan ve akış olarak ağda yayınlayan ücretsiz bir yazılımdır.\n"
+"VLC kendi codec'lerini kullanır ve popüler platformlarda çalışır.\n"
+"\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:122
 msgid ""
@@ -16349,9 +16154,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/dialogs/help.cpp:128
-#, fuzzy
 msgid "Copyright (C) "
-msgstr "Telif hakkı"
+msgstr "Telif hakkı (C) "
 
 #: modules/gui/qt4/dialogs/help.cpp:149
 msgid ""
@@ -16365,9 +16169,8 @@ msgid "Authors"
 msgstr "Yazarlar"
 
 #: modules/gui/qt4/dialogs/help.cpp:168
-#, fuzzy
 msgid "Thanks"
-msgstr "İzler"
+msgstr "Teşekkürler"
 
 #: modules/gui/qt4/dialogs/help.cpp:206
 #, fuzzy
@@ -16379,9 +16182,8 @@ msgid "&Recheck version"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/help.cpp:218
-#, fuzzy
 msgid "Checking for an update..."
-msgstr "Dönüşümler"
+msgstr "Güncelleme denetimi yapılıyor..."
 
 #: modules/gui/qt4/dialogs/help.cpp:222
 msgid ""
@@ -16392,12 +16194,11 @@ msgstr ""
 #: modules/gui/qt4/dialogs/help.cpp:270
 #, fuzzy
 msgid "Launching an update request..."
-msgstr "Dönüşümler"
+msgstr "Güncelleme denetimi yapılıyor..."
 
 #: modules/gui/qt4/dialogs/help.cpp:276
-#, fuzzy
 msgid "Select a directory..."
-msgstr "Bir klasör seçin"
+msgstr "Bir klasör seçin..."
 
 #: modules/gui/qt4/dialogs/help.cpp:314
 #, fuzzy
@@ -16421,66 +16222,55 @@ msgstr "VLC medya oynatıcısı hakkında"
 #: modules/gui/qt4/dialogs/help.cpp:338
 #, fuzzy
 msgid "An error occurred while checking for updates..."
-msgstr "Dönüşümler"
+msgstr "Güncellemeleri denetlerken bir hata oluştu"
 
 #: modules/gui/qt4/dialogs/interaction.cpp:93
-#, fuzzy
 msgid "Login"
-msgstr "Georgian"
+msgstr "Login"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:61
-#, fuzzy
 msgid "&General"
-msgstr "Genel"
+msgstr "&Genel"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:63
-#, fuzzy
 msgid "&Extra Metadata"
-msgstr "Üstveri"
+msgstr "&Ek Üstveriler"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:65
-#, fuzzy
 msgid "&Codec Details"
-msgstr "İpuçlarını göster"
+msgstr "&Codec Detayları"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:69
-#, fuzzy
 msgid "&Statistics"
-msgstr "&Ayarlar"
+msgstr "&İstatistik"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:75
-#, fuzzy
 msgid "&Save Metadata"
-msgstr "Üstveri"
+msgstr "Üstverileri &Kaydet"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:81
-#, fuzzy
 msgid "Location:"
-msgstr "Latin"
+msgstr "Konum:"
 
 #: modules/gui/qt4/dialogs/messages.cpp:78
-#, fuzzy
 msgid "Modules tree"
-msgstr "Akışı duraklat"
+msgstr "Modüller Ağacı"
 
 #: modules/gui/qt4/dialogs/messages.cpp:85
-#, fuzzy
 msgid "&Save as..."
-msgstr "Farklı Kaydet..."
+msgstr "&Farklı Kaydet..."
 
 #: modules/gui/qt4/dialogs/messages.cpp:86
 msgid "Save all the displayed logs to a file"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/messages.cpp:94
-#, fuzzy
 msgid "Verbosity Level"
-msgstr "Seslilik (0,1,2)"
+msgstr "Seslilik Seviyesi"
 
 #: modules/gui/qt4/dialogs/messages.cpp:121
-#, fuzzy
 msgid "&Update"
-msgstr "Güncelle"
+msgstr "&Güncelle"
 
 #: modules/gui/qt4/dialogs/messages.cpp:249
 #, fuzzy
@@ -16502,28 +16292,24 @@ msgid "&File"
 msgstr "&Dosya"
 
 #: modules/gui/qt4/dialogs/open.cpp:89
-#, fuzzy
 msgid "&Disc"
-msgstr "Disc"
+msgstr "&Disc"
 
 #: modules/gui/qt4/dialogs/open.cpp:90
-#, fuzzy
 msgid "&Network"
-msgstr "Ağ"
+msgstr "&Ağ"
 
 #: modules/gui/qt4/dialogs/open.cpp:92
-#, fuzzy
 msgid "Capture &Device"
-msgstr "Yakalama Ay&gıtı Aç..."
+msgstr "Yakalama &Aygıtı"
 
 #: modules/gui/qt4/dialogs/open.cpp:107
-#, fuzzy
 msgid "&Select"
-msgstr "Seç"
+msgstr "&Seç"
 
 #: modules/gui/qt4/dialogs/open.cpp:111 modules/gui/qt4/dialogs/open.cpp:192
 msgid "&Enqueue"
-msgstr ""
+msgstr "&Kuyruğa Sok"
 
 #: modules/gui/qt4/dialogs/open.cpp:113 modules/gui/qt4/dialogs/open.cpp:196
 msgid "&Play"
@@ -16531,24 +16317,20 @@ msgstr "&Oynat"
 
 #: modules/gui/qt4/dialogs/open.cpp:115 modules/gui/qt4/dialogs/open.cpp:186
 #: modules/gui/qt4/dialogs/sout.cpp:184
-#, fuzzy
 msgid "&Stream"
-msgstr "Akış"
+msgstr "&Akış"
 
 #: modules/gui/qt4/dialogs/open.cpp:117
-#, fuzzy
 msgid "&Convert"
-msgstr "Tersine Çevir"
+msgstr "&Çevir"
 
 #: modules/gui/qt4/dialogs/open.cpp:189
-#, fuzzy
 msgid "&Convert / Save"
-msgstr "Tersine Çevir"
+msgstr "&Çevir / Kaydet"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:70
-#, fuzzy
 msgid "Simple"
-msgstr "basit"
+msgstr "Basit"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:71
 #, fuzzy
@@ -16564,9 +16346,8 @@ msgid "&Save"
 msgstr "&Kaydet"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:88
-#, fuzzy
 msgid "&Reset Preferences"
-msgstr "Tercihleri Sıfırla"
+msgstr "Tercihleri &Sıfırla"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:353
 msgid ""
@@ -16580,43 +16361,36 @@ msgid "Open Directory"
 msgstr "&Klasör Aç...\tCtrl-E"
 
 #: modules/gui/qt4/dialogs_provider.cpp:442
-#, fuzzy
 msgid "Open playlist file"
-msgstr "Oynatma Listesi aç"
+msgstr "Oynatma listesini aç"
 
 #: modules/gui/qt4/dialogs_provider.cpp:453
-#, fuzzy
 msgid "Choose a filename to save playlist"
-msgstr "Listede %i öge"
+msgstr "Listeyi kaydetmek için bir dosyaadı seçiniz"
 
 #: modules/gui/qt4/dialogs_provider.cpp:455
-#, fuzzy
 msgid "XSPF playlist (*.xspf);; "
-msgstr "Oynatma listesi boş"
+msgstr "XSPF oynatma listesi (*.xspf);; "
 
 #: modules/gui/qt4/dialogs_provider.cpp:456
 msgid "M3U playlist (*.m3u);; Any (*.*) "
-msgstr ""
+msgstr "M3U oynatma listesi (*.m3u);; Tümü (*.*) "
 
 #: modules/gui/qt4/dialogs_provider.hpp:45
-#, fuzzy
 msgid "Media Files"
-msgstr "Dosya Aç"
+msgstr "Medya Dosyaları"
 
 #: modules/gui/qt4/dialogs_provider.hpp:65
-#, fuzzy
 msgid "Subtitles Files"
-msgstr "Altyazı Dosyası"
+msgstr "Altyazı Dosyaları"
 
 #: modules/gui/qt4/dialogs_provider.hpp:70
-#, fuzzy
 msgid "All Files"
-msgstr "Süzgeçler"
+msgstr "Tüm Dosyalar"
 
 #: modules/gui/qt4/dialogs/sout.cpp:99 modules/gui/qt4/ui/sout.ui:20
-#, fuzzy
 msgid "Stream Output"
-msgstr "Akış çıktısı"
+msgstr "Akış Çıktısı"
 
 #: modules/gui/qt4/dialogs/sout.cpp:152
 msgid ""
@@ -16635,50 +16409,44 @@ msgstr ""
 
 #: modules/gui/qt4/dialogs/vlm.cpp:83
 msgid "Hours / Minutes / Seconds:"
-msgstr ""
+msgstr "Saat / Dakika / Saniye:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:85
 msgid "Day / Month / Year:"
-msgstr ""
+msgstr "Gün / Ay / Yıl:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:87
-#, fuzzy
 msgid "Repeat:"
-msgstr "Tümünü tekrarla"
+msgstr "Tekrarla:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:89
-#, fuzzy
 msgid "Repeat delay:"
-msgstr "Tümünü tekrarla"
+msgstr "Tekrarlama gecikmesi:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:114
-#, fuzzy
 msgid " days"
-msgstr "gecikme"
+msgstr " günler"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:133
-#, fuzzy
 msgid "Import"
-msgstr "&Sırala"
+msgstr "İçeri Al"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:136
-#, fuzzy
 msgid "Export"
-msgstr "Çıkart/Kaldır"
+msgstr "Dışarı Ver"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:266
 #, fuzzy
 msgid "Choose a filename to save the VLM configuration..."
-msgstr "Listede %i öge"
+msgstr "VLM yapılandırmasını kaydetmek için bir dosyyaadı seçiniz..."
 
 #: modules/gui/qt4/dialogs/vlm.cpp:268 modules/gui/qt4/dialogs/vlm.cpp:338
 msgid "VLM conf (*.vlm) ;; All (*.*)"
-msgstr ""
+msgstr "VLM conf (*.vlm) ;; Tümü (*.*)"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:336
-#, fuzzy
 msgid "Open a VLM Configuration File"
-msgstr "VLM yapılandırma dosyası"
+msgstr "VLM Yapılandırma Dosyası Aç"
 
 #: modules/gui/qt4/main_interface.cpp:295
 msgid "Toggle between elapsed and remaining time"
@@ -16691,14 +16459,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/main_interface.cpp:472
-#, fuzzy
 msgid "Privacy and Network Policies"
-msgstr "Geçmeli video kodlama etkin"
+msgstr "Gizlilik ve Ağ Polisleri"
 
 #: modules/gui/qt4/main_interface.cpp:476
-#, fuzzy
 msgid "Privacy and Network Warning"
-msgstr "Geçmeli video kodlama etkin"
+msgstr "Gizlilik ve Ağ Uyarısı"
 
 #: modules/gui/qt4/main_interface.cpp:479
 msgid ""
@@ -16712,28 +16478,25 @@ msgid ""
 "access on the web.</p>\n"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:1023
+#: modules/gui/qt4/main_interface.cpp:1024
 msgid "Control menu for the player"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:1072
+#: modules/gui/qt4/main_interface.cpp:1073
 msgid "Paused"
 msgstr "Duraklatıldı"
 
 #: modules/gui/qt4/menus.cpp:275
-#, fuzzy
 msgid "&Media"
-msgstr "Macedonian"
+msgstr "&Medya"
 
 #: modules/gui/qt4/menus.cpp:276
-#, fuzzy
 msgid "&Playlist"
-msgstr "Oynatma Listesi"
+msgstr "&Oynatma Listesi"
 
 #: modules/gui/qt4/menus.cpp:278
-#, fuzzy
 msgid "&Tools"
-msgstr "Denetimler"
+msgstr "&Araçlar"
 
 #: modules/gui/qt4/menus.cpp:279 modules/gui/qt4/menus.cpp:817
 msgid "&Audio"
@@ -16746,48 +16509,44 @@ msgstr "&Video"
 #: modules/gui/qt4/menus.cpp:281
 #, fuzzy
 msgid "P&layback"
-msgstr "Oynatmayı duraklatır"
+msgstr "Oynatım"
 
 #: modules/gui/qt4/menus.cpp:282
 msgid "&Help"
 msgstr "&Yardım"
 
 #: modules/gui/qt4/menus.cpp:295 modules/gui/qt4/menus.cpp:681
-#, fuzzy
 msgid "&Open File..."
-msgstr "&Dosya Aç.."
+msgstr "&Dosya Aç..."
 
 #: modules/gui/qt4/menus.cpp:299 modules/gui/qt4/menus.cpp:685
 msgid "Open &Disc..."
-msgstr "Disc Aç.."
+msgstr "Disc Aç..."
 
 #: modules/gui/qt4/menus.cpp:301 modules/gui/qt4/menus.cpp:687
-#, fuzzy
 msgid "Open &Network..."
-msgstr "Ağ Aç..."
+msgstr "&Ağ Aç..."
 
 #: modules/gui/qt4/menus.cpp:303 modules/gui/qt4/menus.cpp:689
 msgid "Open &Capture Device..."
 msgstr "Yakalama Ay&gıtı Aç..."
 
 #: modules/gui/qt4/menus.cpp:308
-#, fuzzy
 msgid "&Streaming..."
-msgstr "Akış"
+msgstr "&Akış..."
 
 #: modules/gui/qt4/menus.cpp:311
 msgid "Conve&rt / Save..."
-msgstr ""
+msgstr "Çevi&r / Kaydet..."
 
 #: modules/gui/qt4/menus.cpp:315 modules/gui/qt4/menus.cpp:906
-#, fuzzy
 msgid "&Quit"
-msgstr "Çıkış"
+msgstr "&Çıkış"
 
 #: modules/gui/qt4/menus.cpp:326
 #, fuzzy
 msgid "Show P&laylist"
-msgstr "Oynatma Listesini kaydet"
+msgstr "Listeyi Göster"
 
 #: modules/gui/qt4/menus.cpp:355
 #, fuzzy
@@ -16795,103 +16554,88 @@ msgid "Play&list..."
 msgstr "Oynatma Listesi..."
 
 #: modules/gui/qt4/menus.cpp:356
-#, fuzzy
 msgid "Ctrl+L"
-msgstr "Ctrl"
+msgstr "Ctrl+L"
 
 #: modules/gui/qt4/menus.cpp:375
 #, fuzzy
 msgid "Mi&nimal View..."
-msgstr "Ana arayüzler"
+msgstr "Basit Görünüm..."
 
 #: modules/gui/qt4/menus.cpp:376
-#, fuzzy
 msgid "Ctrl+H"
-msgstr "Ctrl"
+msgstr "Ctrl+H"
 
 #: modules/gui/qt4/menus.cpp:384
 #, fuzzy
 msgid "&Fullscreen Interface"
-msgstr "Telnet Arayüzü portu"
+msgstr "Tam-Ekran Arayüzü"
 
 #: modules/gui/qt4/menus.cpp:390
 #, fuzzy
 msgid "&Advanced Controls"
-msgstr "Gelişmiş seçenekler"
+msgstr "Gelişmiş Denetimler"
 
 #: modules/gui/qt4/menus.cpp:397
-#, fuzzy
 msgid "Visualizations selector"
-msgstr "Görsel Ögeler"
+msgstr "Görselleme seçicisi"
 
 #: modules/gui/qt4/menus.cpp:421
 msgid "&Preferences..."
 msgstr "&Tercihler..."
 
 #: modules/gui/qt4/menus.cpp:454
-#, fuzzy
 msgid "Audio &Track"
-msgstr "Ses İzi"
+msgstr "Ses &İzi"
 
 #: modules/gui/qt4/menus.cpp:455
-#, fuzzy
 msgid "Audio &Device"
-msgstr "Ses Aygıtı"
+msgstr "Ses &Aygıtı"
 
 #: modules/gui/qt4/menus.cpp:456
-#, fuzzy
 msgid "Audio &Channels"
-msgstr "Ses Kanalları"
+msgstr "Ses &Kanalları"
 
 #: modules/gui/qt4/menus.cpp:458
-#, fuzzy
 msgid "&Visualizations"
-msgstr "Görsel Ögeler"
+msgstr "&Görsel Ögeler"
 
 #: modules/gui/qt4/menus.cpp:493
-#, fuzzy
 msgid "Video &Track"
-msgstr "Video İzi"
+msgstr "Video &İzi"
 
 #: modules/gui/qt4/menus.cpp:496
-#, fuzzy
 msgid "&Subtitles Track"
-msgstr "Altyazı İzi"
+msgstr "&Altyazı İzi"
 
 #: modules/gui/qt4/menus.cpp:499
-#, fuzzy
 msgid "Load File..."
-msgstr "Kayıt dosyası"
+msgstr "Dosyadan Yükle..."
 
 #: modules/gui/qt4/menus.cpp:503
 #, fuzzy
 msgid "&Fullscreen"
-msgstr "Tam ekran"
+msgstr "Tam-Ekran"
 
 #: modules/gui/qt4/menus.cpp:504
-#, fuzzy
 msgid "&Zoom"
-msgstr "Büyütme"
+msgstr "&Büyütme"
 
 #: modules/gui/qt4/menus.cpp:505
-#, fuzzy
 msgid "&Deinterlace"
-msgstr "Taramasız"
+msgstr "&Taramasız"
 
 #: modules/gui/qt4/menus.cpp:506
-#, fuzzy
 msgid "&Aspect Ratio"
-msgstr "En-boy Oranı"
+msgstr "&En-boy Oranı"
 
 #: modules/gui/qt4/menus.cpp:507
-#, fuzzy
 msgid "&Crop"
-msgstr "Kırp"
+msgstr "&Kırp"
 
 #: modules/gui/qt4/menus.cpp:508
-#, fuzzy
 msgid "Always &On Top"
-msgstr "Her zaman üstte"
+msgstr "Her Zaman &Üstte"
 
 #: modules/gui/qt4/menus.cpp:510
 #, fuzzy
@@ -16899,9 +16643,8 @@ msgid "Sna&pshot"
 msgstr "Enstantane"
 
 #: modules/gui/qt4/menus.cpp:548
-#, fuzzy
 msgid "&Bookmarks"
-msgstr "Yer imleri"
+msgstr "Yer &İmleri"
 
 #: modules/gui/qt4/menus.cpp:549
 #, fuzzy
@@ -16909,14 +16652,12 @@ msgid "T&itle"
 msgstr "Başlık"
 
 #: modules/gui/qt4/menus.cpp:550
-#, fuzzy
 msgid "&Chapter"
-msgstr "Bölüm"
+msgstr "&Bölüm"
 
 #: modules/gui/qt4/menus.cpp:551
-#, fuzzy
 msgid "&Program"
-msgstr "Program"
+msgstr "&Program"
 
 #: modules/gui/qt4/menus.cpp:552
 msgid "&Navigation"
@@ -16925,66 +16666,58 @@ msgstr "&Gezinti"
 #: modules/gui/qt4/menus.cpp:596
 #, fuzzy
 msgid "Configure podcasts..."
-msgstr "Yapılandır"
+msgstr "Kısayolları Yapılandır"
 
 #: modules/gui/qt4/menus.cpp:614
 #, fuzzy
 msgid "&Help..."
-msgstr "Yardım"
+msgstr "Yardım..."
 
 #: modules/gui/qt4/menus.cpp:617
 #, fuzzy
 msgid "Check for &Updates..."
-msgstr "Dönüşümler"
+msgstr "Güncellemeleri Denetle..."
 
 #: modules/gui/qt4/menus.cpp:676
-#, fuzzy
 msgid "Tools"
-msgstr "Denetimler"
+msgstr "Araçlar"
 
 #: modules/gui/qt4/menus.cpp:803
-#, fuzzy
 msgid "Leave Fullscreen"
-msgstr "Tam ekranı doldur"
+msgstr "Tam-Ekrandan Çık"
 
 #: modules/gui/qt4/menus.cpp:829
-#, fuzzy
 msgid "&Playback"
-msgstr "Oynatmayı duraklatır"
+msgstr "&Oynatım"
 
 #: modules/gui/qt4/menus.cpp:841
-#, fuzzy
 msgid "Show Playlist"
-msgstr "Oynatma Listesini kaydet"
+msgstr "Listeyi Göster"
 
 #: modules/gui/qt4/menus.cpp:845
 msgid "Minimal View..."
-msgstr ""
+msgstr "Basit Görünüm..."
 
 #: modules/gui/qt4/menus.cpp:850
-#, fuzzy
 msgid "Toggle Fullscreen Interface"
-msgstr "Telnet Arayüzü portu"
+msgstr "Tam-Ekran Arayüzü"
 
 #: modules/gui/qt4/menus.cpp:890
-#, fuzzy
 msgid "Hide VLC media player in taskbar"
-msgstr "VLC medya oynatıcısı"
+msgstr "VLC medya oynatıcısını gizle"
 
 #: modules/gui/qt4/menus.cpp:896
-#, fuzzy
 msgid "Show VLC media player"
-msgstr "VLC medya oynatıcısı"
+msgstr "VLC medya oynatıcısını göster"
 
 #: modules/gui/qt4/menus.cpp:904
-#, fuzzy
 msgid "&Open Media"
-msgstr "Disc Aç"
+msgstr "Medya &Aç"
 
 #: modules/gui/qt4/menus.hpp:36
 #, fuzzy
 msgid "Open &Folder..."
-msgstr "&Dosya Aç.."
+msgstr "Klasör Aç..."
 
 #: modules/gui/qt4/menus.hpp:38
 #, fuzzy
@@ -16992,9 +16725,8 @@ msgid "Open D&irectory..."
 msgstr "&Klasör Aç...\tCtrl-E"
 
 #: modules/gui/qt4/qt4.cpp:66
-#, fuzzy
 msgid "Show advanced preferences over simple ones"
-msgstr "Gelişmiş seçenekleri göster"
+msgstr "Basit olanların yerine gelişmiş seçenekleri göster"
 
 #: modules/gui/qt4/qt4.cpp:67
 msgid ""
@@ -17003,9 +16735,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:71 modules/gui/skins2/src/skin_main.cpp:437
-#, fuzzy
 msgid "Systray icon"
-msgstr "Doyma/Doygunluk"
+msgstr "Sistem alanı simgesi"
 
 #: modules/gui/qt4/qt4.cpp:72
 msgid ""
@@ -17051,7 +16782,7 @@ msgstr "Gelişmiş seçenekler"
 #: modules/gui/qt4/qt4.cpp:92
 #, fuzzy
 msgid "Show all the advanced options in the dialogs."
-msgstr "Gelişmiş seçenekleri göster"
+msgstr "Pencerelerde gelişmiş seçeneklerin tümünü göster."
 
 #: modules/gui/qt4/qt4.cpp:95
 msgid "Windows opacity between 0.1 and 1."
@@ -17130,9 +16861,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:134
-#, fuzzy
 msgid "Classic look"
-msgstr "Klasik rock"
+msgstr "Klasik görünüm"
 
 #: modules/gui/qt4/qt4.cpp:135
 msgid "Complete look with information area"
@@ -17145,36 +16875,32 @@ msgstr ""
 #: modules/gui/qt4/qt4.cpp:138
 #, fuzzy
 msgid "Show a controller in fullscreen mode"
-msgstr "Tam ekran modu geçiş"
+msgstr "Tam-ekran modu geçiş"
 
 #: modules/gui/qt4/qt4.cpp:147
 msgid "Qt interface"
 msgstr "Qt arayüzü"
 
 #: modules/gui/qt4/ui/equalizer.ui:54
-#, fuzzy
 msgid "Preset"
-msgstr "Portuguese"
+msgstr "Öntanımlar"
 
 #: modules/gui/qt4/ui/open_capture.ui:17
-#, fuzzy
 msgid "Capture mode"
-msgstr "Bölüm codec'leri"
+msgstr "Yakalama modu"
 
 #: modules/gui/qt4/ui/open_capture.ui:30
 #, fuzzy
 msgid "Select the capture device type"
-msgstr "Oynatma  için kestirme tuş seçin"
+msgstr "Yakalama aygıtı türünü seçiniz"
 
 #: modules/gui/qt4/ui/open_capture.ui:44
-#, fuzzy
 msgid "Card Selection"
-msgstr "&Seçim"
+msgstr "&Kart Seçimi"
 
 #: modules/gui/qt4/ui/open_capture.ui:51 modules/gui/qt4/ui/open_net.ui:101
-#, fuzzy
 msgid "Options"
-msgstr "Seçenekler:"
+msgstr "Seçenekler"
 
 #: modules/gui/qt4/ui/open_capture.ui:74
 msgid "Access advanced options to tweak the device"
@@ -17185,28 +16911,24 @@ msgid "Advanced options..."
 msgstr "Gelişmiş seçenekler..."
 
 #: modules/gui/qt4/ui/open_disk.ui:20
-#, fuzzy
 msgid "Disc Selection"
-msgstr "Geçersiz seçim"
+msgstr "Disc Seçimi"
 
 #: modules/gui/qt4/ui/open_disk.ui:91
 msgid "Disable DVD Menus (for compatibility)"
 msgstr ""
 
 #: modules/gui/qt4/ui/open_disk.ui:108
-#, fuzzy
 msgid "Disc device"
-msgstr "Aygıt"
+msgstr "Disc aygıtı"
 
 #: modules/gui/qt4/ui/open_disk.ui:165
-#, fuzzy
 msgid "Starting Position"
-msgstr "Altresimler"
+msgstr "Başlangıç Konumu"
 
 #: modules/gui/qt4/ui/open_disk.ui:232
-#, fuzzy
 msgid "Audio and Subtitles"
-msgstr "Altyazı"
+msgstr "Ses ve Altyazı"
 
 #: modules/gui/qt4/ui/open_file.ui:26
 #, fuzzy
@@ -17224,9 +16946,8 @@ msgid "Use a sub&titles file"
 msgstr "Altyazı dosyasını kullan"
 
 #: modules/gui/qt4/ui/open_file.ui:126
-#, fuzzy
 msgid "Alignment:"
-msgstr "Video hizalama"
+msgstr "Hizalama:"
 
 #: modules/gui/qt4/ui/open_file.ui:178
 #, fuzzy
@@ -17234,9 +16955,8 @@ msgid "Select the subtitles file"
 msgstr "Altyazı dosyalarını otomatik bul"
 
 #: modules/gui/qt4/ui/open_net.ui:20
-#, fuzzy
 msgid "Network Protocol"
-msgstr "Protokol"
+msgstr "Ağ Protokolü"
 
 #: modules/gui/qt4/ui/open_net.ui:26
 #, fuzzy
@@ -17284,9 +17004,8 @@ msgid "Play another media synchronously (extra audio file, ...)"
 msgstr ""
 
 #: modules/gui/qt4/ui/open.ui:152
-#, fuzzy
 msgid "Extra media"
-msgstr "Üstveri"
+msgstr "Ek üstveri"
 
 #: modules/gui/qt4/ui/open.ui:165
 #, fuzzy
@@ -17304,7 +17023,7 @@ msgstr ""
 #: modules/gui/qt4/ui/open.ui:234
 #, fuzzy
 msgid "Select play mode"
-msgstr "Bir dosya seçin"
+msgstr "Oynatım kazancı modunu seçin"
 
 #: modules/gui/qt4/ui/podcast_configuration.ui:19
 #: modules/services_discovery/podcast.c:58
@@ -17313,9 +17032,8 @@ msgid "Podcast URLs list"
 msgstr "Konum"
 
 #: modules/gui/qt4/ui/sout.ui:32
-#, fuzzy
 msgid "Outputs"
-msgstr "Çıktı dosyası"
+msgstr "Çıktılar"
 
 #: modules/gui/qt4/ui/sout.ui:40
 msgid "Play locally"
@@ -17335,19 +17053,16 @@ msgid "Mount Point"
 msgstr "Mongolian"
 
 #: modules/gui/qt4/ui/sout.ui:409
-#, fuzzy
 msgid "Login:pass:"
-msgstr "Georgian"
+msgstr "Kullanıcı:parola:"
 
 #: modules/gui/qt4/ui/sout.ui:435
-#, fuzzy
 msgid "Profile"
-msgstr "Önceki dosya"
+msgstr "Profil"
 
 #: modules/gui/qt4/ui/sout.ui:449
-#, fuzzy
 msgid "Encapsulation"
-msgstr "Kapsülleme Yöntemi"
+msgstr "Kapsülleme"
 
 #: modules/gui/qt4/ui/sout.ui:536
 msgid "Video codec"
@@ -17376,9 +17091,8 @@ msgid "Generated stream output string"
 msgstr "Genel akış çıktı ayarları"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:36
-#, fuzzy
 msgid "Default volume"
-msgstr "Varsayılan aygıtlar"
+msgstr "Varsayılan seviye"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:77
 msgid "256 corresponds to 100%, 1024 to 400%"
@@ -17389,27 +17103,24 @@ msgid "Save volume on exit"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:142
-#, fuzzy
 msgid "Preferred audio language"
-msgstr "Ses dilini seçiniz"
+msgstr "Seçilen ses dili"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:293
 msgid "last.fm"
-msgstr ""
+msgstr "last.fm"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:299
 msgid "Enable last.fm submission"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_input.ui:20
-#, fuzzy
 msgid "Disc Devices"
-msgstr "Aygıt"
+msgstr "Disc Aygıtları"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:26
-#, fuzzy
 msgid "Default disc device"
-msgstr "Varsayılan aygıtlar"
+msgstr "Varsayılan disc aygıtı"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:55
 msgid "Server default port"
@@ -17427,30 +17138,27 @@ msgstr "Son işleme kalitesi"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:151
 msgid "Repair AVI files"
-msgstr ""
+msgstr "AVI dosyalarını düzelt"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:164
 msgid "Use system codecs if available (better quality)"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:35
-#, fuzzy
 msgid "Interface Type"
-msgstr "Arayüz"
+msgstr "Arayüz Türü"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:41
-#, fuzzy
 msgid "Native"
-msgstr "Dosya Aç"
+msgstr "Doğal"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:51
 msgid "This is VLC's default interface, with a native look and feel."
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:73
-#, fuzzy
 msgid "Display mode"
-msgstr "Ekranda göster"
+msgstr "Görünüm modu"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:90
 #, fuzzy
@@ -17463,14 +17171,13 @@ msgid "Skins"
 msgstr "Dış görünümler"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:158
-#, fuzzy
 msgid "Skin file"
-msgstr "Surround seviyesi (0-100)"
+msgstr "Dış görünüm dosyası"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:191
 #, fuzzy
 msgid "Show a controller in fullscreen"
-msgstr "Tam ekran modu geçiş"
+msgstr "Tam-ekranda siyah ekranlar"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:201
 #, fuzzy
@@ -17509,9 +17216,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:50
-#, fuzzy
 msgid "Subtitles Language"
-msgstr "Altyazı dilini seçiniz"
+msgstr "Altyazı Dili"
 
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:56
 #, fuzzy
@@ -17519,19 +17225,16 @@ msgid "Preferred subtitles language"
 msgstr "Ses dilini seçiniz"
 
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:79
-#, fuzzy
 msgid "Default encoding"
-msgstr "Kod çözme"
+msgstr "Varsayılan kodlama"
 
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:114
-#, fuzzy
 msgid "Font color"
-msgstr "Renk"
+msgstr "Yazıtipi rengi"
 
 #: modules/gui/qt4/ui/sprefs_video.ui:78
-#, fuzzy
 msgid "Output"
-msgstr "Çıktı dosyası"
+msgstr "Çıktı"
 
 #: modules/gui/qt4/ui/sprefs_video.ui:88
 #, fuzzy
@@ -17539,14 +17242,12 @@ msgid "Accelerated video output"
 msgstr "Bindirmeli video çıktısı"
 
 #: modules/gui/qt4/ui/sprefs_video.ui:114
-#, fuzzy
 msgid "DirectX"
-msgstr "Klasör"
+msgstr "DirectX"
 
 #: modules/gui/qt4/ui/sprefs_video.ui:129
-#, fuzzy
 msgid "Display device"
-msgstr "Ekranda göster"
+msgstr "Ekran aygıtı"
 
 #: modules/gui/qt4/ui/sprefs_video.ui:139
 #, fuzzy
@@ -17554,12 +17255,10 @@ msgid "Enable wallpaper mode"
 msgstr "Duvarkağıdı modu etkin"
 
 #: modules/gui/qt4/ui/streampanel.ui:48
-#, fuzzy
 msgid "Edit settings"
-msgstr "Ses ayarları"
+msgstr "Ayarları düzenle"
 
 #: modules/gui/qt4/ui/streampanel.ui:58
-#, fuzzy
 msgid "Control"
 msgstr "Denetim"
 
@@ -17576,44 +17275,36 @@ msgid "Run on schedule"
 msgstr ""
 
 #: modules/gui/qt4/ui/streampanel.ui:88
-#, fuzzy
 msgid "Status"
-msgstr "&Ayarlar"
+msgstr "Durum"
 
 #: modules/gui/qt4/ui/streampanel.ui:94
-#, fuzzy
 msgid "P/P"
-msgstr "UDP/RTP"
+msgstr "P/P"
 
 #: modules/gui/qt4/ui/streampanel.ui:115
-#, fuzzy
 msgid "Prev"
 msgstr "Önceki"
 
 #: modules/gui/qt4/ui/streampanel.ui:132
-#, fuzzy
 msgid "Add Input"
-msgstr "Girdi yok"
+msgstr "Girdi Ekle"
 
 #: modules/gui/qt4/ui/streampanel.ui:139
-#, fuzzy
 msgid "Edit Input"
-msgstr "Sahte girdi"
+msgstr "Girdiyi Düzenle"
 
 #: modules/gui/qt4/ui/streampanel.ui:146
-#, fuzzy
 msgid "Clear List"
-msgstr "Temizle"
+msgstr "Listeyi Temizle"
 
 #: modules/gui/qt4/ui/video_effects.ui:23
-#, fuzzy
 msgid "Transform"
-msgstr "Dönüşümler"
+msgstr "Dönüşüm"
 
 #: modules/gui/qt4/ui/video_effects.ui:41
-#, fuzzy
 msgid "Sharpen"
-msgstr "Hız"
+msgstr "Keskin (sharpen)"
 
 #: modules/gui/qt4/ui/video_effects.ui:53
 msgid "Sigma"
@@ -17661,9 +17352,8 @@ msgid "Synchronize left and right"
 msgstr "Ses izi seçiniz"
 
 #: modules/gui/qt4/ui/video_effects.ui:434
-#, fuzzy
 msgid "Geometry"
-msgstr "Spektrum"
+msgstr "Geometri"
 
 #: modules/gui/qt4/ui/video_effects.ui:447
 msgid "Puzzle game"
@@ -17676,26 +17366,22 @@ msgstr ""
 #: modules/gui/qt4/ui/video_effects.ui:486
 #: modules/gui/qt4/ui/video_effects.ui:689
 #: modules/gui/qt4/ui/video_effects.ui:783
-#, fuzzy
 msgid "Columns"
-msgstr "Seviye"
+msgstr "Sütunlar"
 
 #: modules/gui/qt4/ui/video_effects.ui:493
 #: modules/gui/qt4/ui/video_effects.ui:682
 #: modules/gui/qt4/ui/video_effects.ui:766
-#, fuzzy
 msgid "Rows"
-msgstr "Gözat..."
+msgstr "Satırlar"
 
 #: modules/gui/qt4/ui/video_effects.ui:503 modules/video_filter/rotate.c:68
-#, fuzzy
 msgid "Rotate"
-msgstr "Bit oranı"
+msgstr "Döndür"
 
 #: modules/gui/qt4/ui/video_effects.ui:528
-#, fuzzy
 msgid "Angle"
-msgstr "Cıngıl"
+msgstr "Açı"
 
 #: modules/gui/qt4/ui/video_effects.ui:539
 #, fuzzy
@@ -17709,9 +17395,8 @@ msgstr "Kulaklık efekti"
 
 #: modules/gui/qt4/ui/video_effects.ui:566 modules/meta_engine/id3genres.h:67
 #: modules/video_filter/noise.c:54
-#, fuzzy
 msgid "Noise"
-msgstr "Hiçbiri"
+msgstr "Gürültü"
 
 #: modules/gui/qt4/ui/video_effects.ui:573
 #, fuzzy
@@ -17744,9 +17429,8 @@ msgid "Wall"
 msgstr "tümü"
 
 #: modules/gui/qt4/ui/video_effects.ui:719
-#, fuzzy
 msgid "Add text"
-msgstr "Sonraki"
+msgstr "Metin ekle"
 
 #: modules/gui/qt4/ui/video_effects.ui:754 modules/video_filter/panoramix.c:97
 #, fuzzy
@@ -17765,14 +17449,12 @@ msgstr "Tercih edilen ses çıktı kanalları modu"
 
 #: modules/gui/qt4/ui/video_effects.ui:836
 #: modules/gui/qt4/ui/video_effects.ui:897
-#, fuzzy
 msgid "Logo"
-msgstr "Georgian"
+msgstr "Logo"
 
 #: modules/gui/qt4/ui/video_effects.ui:842
-#, fuzzy
 msgid "Add logo"
-msgstr "Ses kodlayıcısı"
+msgstr "Logo ekle"
 
 #: modules/gui/qt4/ui/video_effects.ui:854
 #: modules/stream_out/mosaic_bridge.c:156 modules/video_filter/mosaic.c:89
@@ -17780,13 +17462,12 @@ msgid "Transparency"
 msgstr ""
 
 #: modules/gui/qt4/ui/video_effects.ui:910
-#, fuzzy
 msgid "Logo erase"
-msgstr "Başlığa Git"
+msgstr "Logo yoket"
 
 #: modules/gui/qt4/ui/video_effects.ui:945
 msgid "Mask"
-msgstr ""
+msgstr "Maske"
 
 #: modules/gui/qt4/ui/video_effects.ui:956
 #, fuzzy
@@ -17809,9 +17490,8 @@ msgid "Vout filters"
 msgstr "Video Süzgeçleri"
 
 #: modules/gui/qt4/ui/video_effects.ui:989
-#, fuzzy
 msgid "Reset"
-msgstr "Portuguese"
+msgstr "Sıfırla"
 
 #: modules/gui/qt4/ui/vlm.ui:22
 #, fuzzy
@@ -17824,14 +17504,12 @@ msgid "Media Manager Edition"
 msgstr "Üst-veri"
 
 #: modules/gui/qt4/ui/vlm.ui:57
-#, fuzzy
 msgid "Name:"
-msgstr "İsim"
+msgstr "İsim:"
 
 #: modules/gui/qt4/ui/vlm.ui:80
-#, fuzzy
 msgid "Input:"
-msgstr "Girdi"
+msgstr "Girdi:"
 
 #: modules/gui/qt4/ui/vlm.ui:93
 #, fuzzy
@@ -17839,9 +17517,8 @@ msgid "Select Input"
 msgstr "Ekran Girdisi"
 
 #: modules/gui/qt4/ui/vlm.ui:100
-#, fuzzy
 msgid "Output:"
-msgstr "Çıktı dosyası"
+msgstr "Çıktı:"
 
 #: modules/gui/qt4/ui/vlm.ui:113
 #, fuzzy
@@ -17859,9 +17536,8 @@ msgid "Mux Control"
 msgstr "Denetim"
 
 #: modules/gui/qt4/ui/vlm.ui:169
-#, fuzzy
 msgid "Loop"
-msgstr "Georgian"
+msgstr "Döngü"
 
 #: modules/gui/qt4/ui/vlm.ui:235
 msgid "Media Manager List"
@@ -17899,7 +17575,7 @@ msgstr "Oynatma listesi boş"
 #: modules/gui/skins2/src/skin_main.cpp:432
 #, fuzzy
 msgid "Skin to use"
-msgstr "Dış görünümler"
+msgstr "Kullanılacak Skin"
 
 #: modules/gui/skins2/src/skin_main.cpp:433
 msgid "Path to the skin to use."
@@ -17968,33 +17644,28 @@ msgstr ""
 "\n"
 
 #: modules/gui/wince/interface.cpp:504
-#, fuzzy
 msgid ""
 "(c) 1996-2006 - the VideoLAN Team\n"
 "\n"
 msgstr ""
-"(c) 1996-2005 - VideoLAN Ekibi\n"
+"(c) 1996-2006 - VideoLAN Ekibi\n"
 "\n"
 
 #: modules/gui/wince/interface.cpp:505
-#, fuzzy
 msgid "Compiled by "
-msgstr "Komedi"
+msgstr "Derleyen: "
 
 #: modules/gui/wince/interface.cpp:507
-#, fuzzy
 msgid "Compiler: "
-msgstr "Komedi"
+msgstr "Derleyici: "
 
 #: modules/gui/wince/interface.cpp:509
-#, fuzzy
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/"
 msgstr ""
 "VideoLAN Ekibi <videolan@videolan.org>\n"
-"http://www.videolan.org/\n"
-"\n"
+"http://www.videolan.org/"
 
 #: modules/gui/wince/open.cpp:135
 msgid "Open:"
@@ -18164,33 +17835,28 @@ msgid "House"
 msgstr "Renk tonu"
 
 #: modules/meta_engine/id3genres.h:64
-#, fuzzy
 msgid "Game"
-msgstr "İsim"
+msgstr "Oyun"
 
 #: modules/meta_engine/id3genres.h:65
-#, fuzzy
 msgid "Sound clip"
-msgstr "Ses:"
+msgstr "Ses klibi"
 
 #: modules/meta_engine/id3genres.h:66
 msgid "Gospel"
 msgstr ""
 
 #: modules/meta_engine/id3genres.h:68
-#, fuzzy
 msgid "Alternative rock"
-msgstr "Alternatif"
+msgstr "Alternatif rock"
 
 #: modules/meta_engine/id3genres.h:70
-#, fuzzy
 msgid "Soul"
-msgstr "sout"
+msgstr "Soul"
 
 #: modules/meta_engine/id3genres.h:71
-#, fuzzy
 msgid "Punk"
-msgstr "Korku"
+msgstr "Punk"
 
 #: modules/meta_engine/id3genres.h:72
 #, fuzzy
@@ -18212,7 +17878,7 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:76
 msgid "Ethnic"
-msgstr ""
+msgstr "Etnik"
 
 #: modules/meta_engine/id3genres.h:77
 msgid "Gothic"
@@ -18338,9 +18004,8 @@ msgid "Retro"
 msgstr "Portuguese"
 
 #: modules/meta_engine/id3genres.h:105
-#, fuzzy
 msgid "Musical"
-msgstr "Klasik"
+msgstr "Müzikal"
 
 #: modules/meta_engine/id3genres.h:106
 msgid "Rock & roll"
@@ -19446,9 +19111,8 @@ msgstr ""
 #: modules/services_discovery/hal.c:150
 #: modules/services_discovery/upnp_cc.cpp:87
 #: modules/services_discovery/upnp_intel.cpp:299
-#, fuzzy
 msgid "Devices"
-msgstr "Aygıt"
+msgstr "Aygıtlar"
 
 #: modules/services_discovery/podcast.c:59
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
@@ -19473,7 +19137,7 @@ msgstr ""
 
 #: modules/services_discovery/sap.c:89
 msgid "IPv4 SAP"
-msgstr ""
+msgstr "IPv4 SAP"
 
 #: modules/services_discovery/sap.c:91
 #, fuzzy
@@ -19482,7 +19146,7 @@ msgstr "SAP anons aralığı"
 
 #: modules/services_discovery/sap.c:92
 msgid "IPv6 SAP"
-msgstr ""
+msgstr "IPv6 SAP"
 
 #: modules/services_discovery/sap.c:94
 #, fuzzy
@@ -19491,7 +19155,7 @@ msgstr "SAP anons aralığı"
 
 #: modules/services_discovery/sap.c:95
 msgid "IPv6 SAP scope"
-msgstr ""
+msgstr "IPv6 SAP kapsamı"
 
 #: modules/services_discovery/sap.c:97
 msgid "Scope for IPv6 announcements (default is 8)."
@@ -19555,18 +19219,15 @@ msgstr "SAP anonsu:"
 msgid "SDP Descriptions parser"
 msgstr "Açıklama"
 
-#: modules/services_discovery/sap.c:892 modules/services_discovery/sap.c:896
-#, fuzzy
+#: modules/services_discovery/sap.c:890 modules/services_discovery/sap.c:894
 msgid "Session"
-msgstr "İzinler"
+msgstr "Oturum"
 
-#: modules/services_discovery/sap.c:892
-#, fuzzy
+#: modules/services_discovery/sap.c:890
 msgid "Tool"
-msgstr "Denetimler"
+msgstr "Araç"
 
-#: modules/services_discovery/sap.c:896
-#, fuzzy
+#: modules/services_discovery/sap.c:894
 msgid "User"
 msgstr "Kullanıcı"
 
@@ -19586,16 +19247,16 @@ msgstr "Kaynak en-boy oranı"
 
 #: modules/services_discovery/shout.c:74
 msgid "Shoutcast TV"
-msgstr ""
+msgstr "Shoutcast TV"
 
 #: modules/services_discovery/shout.c:75
 msgid "Freebox TV"
-msgstr ""
+msgstr "Freebox TV"
 
 #: modules/services_discovery/shout.c:76
 #: modules/services_discovery/shout.c:124
 msgid "French TV"
-msgstr ""
+msgstr "French TV"
 
 #: modules/services_discovery/shout.c:110
 #, fuzzy
@@ -19604,7 +19265,7 @@ msgstr "Kaynak en-boy oranı"
 
 #: modules/services_discovery/shout.c:117
 msgid "Shoutcast TV listings"
-msgstr ""
+msgstr "Shoutcast TV listelemesi"
 
 #: modules/services_discovery/shout.c:131
 msgid "Freebox TV listing (French ISP free.fr services)"
@@ -19808,9 +19469,8 @@ msgid "Sample aspect ratio of the destination (1:1, 3:4, 2:3)."
 msgstr ""
 
 #: modules/stream_out/mosaic_bridge.c:147 modules/stream_out/transcode.c:88
-#, fuzzy
 msgid "Video filter"
-msgstr "Video Süzgeçleri"
+msgstr "Video süzgeci"
 
 #: modules/stream_out/mosaic_bridge.c:149
 #, fuzzy
@@ -20115,9 +19775,8 @@ msgid "UDP port to listen to for commands."
 msgstr ""
 
 #: modules/stream_out/switcher.c:98
-#, fuzzy
 msgid "Command"
-msgstr "Komedi"
+msgstr "Komut"
 
 #: modules/stream_out/switcher.c:100
 msgid "Initial command to execute."
@@ -20322,9 +19981,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/transcode.c:129 modules/video_filter/osdmenu.c:135
-#, fuzzy
 msgid "OSD menu"
-msgstr "DVD (menüler)"
+msgstr "OSD menü"
 
 #: modules/stream_out/transcode.c:131
 msgid ""
@@ -20343,7 +20001,7 @@ msgstr "Ağır çekim oynatma  için kestirme tuş seçin"
 
 #: modules/stream_out/transcode.c:136
 msgid "High priority"
-msgstr ""
+msgstr "Yüksek öncelik"
 
 #: modules/stream_out/transcode.c:138
 msgid ""
@@ -20374,7 +20032,7 @@ msgstr "Dosya akış çıktısı"
 
 #: modules/stream_out/transcode.c:216
 msgid "Overlays/Subtitles"
-msgstr "Bindirmeler/Altyazılar"
+msgstr "Bindirmeler/Altyazı"
 
 #: modules/stream_out/transrate/transrate.c:61
 #, fuzzy
@@ -20474,7 +20132,7 @@ msgstr ""
 
 #: modules/video_filter/alphamask.c:42
 msgid "Transparency mask"
-msgstr ""
+msgstr "Saydamlık maskesi"
 
 #: modules/video_filter/alphamask.c:44
 msgid "Alpha blending transparency mask. Uses a png alpha channel."
@@ -20486,9 +20144,8 @@ msgid "Alpha mask video filter"
 msgstr "Video Süzgeçleri"
 
 #: modules/video_filter/alphamask.c:64
-#, fuzzy
 msgid "Alpha mask"
-msgstr "Video Süzgeçleri"
+msgstr "Alpha maskesi"
 
 #: modules/video_filter/atmo/atmo.cpp:120
 msgid ""
@@ -20803,34 +20460,28 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:254
-#, fuzzy
 msgid "disabled"
-msgstr "Devredışı"
+msgstr "devredışı"
 
 #: modules/video_filter/atmo/atmo.cpp:255
-#, fuzzy
 msgid "summary"
-msgstr "Boş/Aptal"
+msgstr "özet"
 
 #: modules/video_filter/atmo/atmo.cpp:256
-#, fuzzy
 msgid "left"
-msgstr "Sol"
+msgstr "sol"
 
 #: modules/video_filter/atmo/atmo.cpp:257
-#, fuzzy
 msgid "right"
-msgstr "Sağ"
+msgstr "sağ"
 
 #: modules/video_filter/atmo/atmo.cpp:258
-#, fuzzy
 msgid "top"
-msgstr "Durdur"
+msgstr "üst"
 
 #: modules/video_filter/atmo/atmo.cpp:259
-#, fuzzy
 msgid "bottom"
-msgstr "Alt"
+msgstr "alt"
 
 #: modules/video_filter/atmo/atmo.cpp:262
 #, fuzzy
@@ -21400,9 +21051,8 @@ msgid "Erase video filter"
 msgstr "Video Süzgeçleri"
 
 #: modules/video_filter/erase.c:67
-#, fuzzy
 msgid "Erase"
-msgstr "Duraklat"
+msgstr "Yoket"
 
 #: modules/video_filter/extract.c:63
 #, fuzzy
@@ -21557,9 +21207,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/logo.c:90
-#, fuzzy
 msgid "Logo position"
-msgstr "Konum"
+msgstr "Logo konumu"
 
 #: modules/video_filter/logo.c:92
 msgid ""
@@ -21573,9 +21222,8 @@ msgid "Logo video filter"
 msgstr "Video Süzgeçleri"
 
 #: modules/video_filter/logo.c:106
-#, fuzzy
 msgid "Logo overlay"
-msgstr "Başlığa Git"
+msgstr "Logo bindirme"
 
 #: modules/video_filter/logo.c:127
 #, fuzzy
@@ -21588,9 +21236,8 @@ msgid "Magnify/Zoom interactive video filter"
 msgstr "Video Süzgeçleri"
 
 #: modules/video_filter/magnify.c:51
-#, fuzzy
 msgid "Magnify"
-msgstr "Altyazı hizalama"
+msgstr "Büyütme"
 
 #: modules/video_filter/marq.c:88
 msgid ""
@@ -21653,9 +21300,8 @@ msgid "Marquee"
 msgstr "On Screen Display"
 
 #: modules/video_filter/marq.c:169 modules/video_filter/rss.c:212
-#, fuzzy
 msgid "Misc"
-msgstr "Disc"
+msgstr "Çeşitli"
 
 #: modules/video_filter/marq.c:175
 #, fuzzy
@@ -21766,7 +21412,7 @@ msgstr ""
 
 #: modules/video_filter/mosaic.c:140
 msgid "Keep original size"
-msgstr ""
+msgstr "Özgün boyutu koru"
 
 #: modules/video_filter/mosaic.c:142
 msgid "Keep the original size of mosaic elements."
@@ -21805,7 +21451,7 @@ msgstr ""
 
 #: modules/video_filter/mosaic.c:168
 msgid "fixed"
-msgstr ""
+msgstr "sabit"
 
 #: modules/video_filter/mosaic.c:168
 #, fuzzy
@@ -21819,7 +21465,7 @@ msgstr "Video Süzgeçleri"
 
 #: modules/video_filter/mosaic.c:179
 msgid "Mosaic"
-msgstr ""
+msgstr "Mozaik"
 
 #: modules/video_filter/motionblur.c:54
 msgid "Blur factor (1-127)"
@@ -21854,9 +21500,8 @@ msgid "OpenCV face detection example filter"
 msgstr ""
 
 #: modules/video_filter/opencv_example.cpp:68
-#, fuzzy
 msgid "OpenCV example"
-msgstr "Akış Aç"
+msgstr "OpenCV örneği"
 
 #: modules/video_filter/opencv_example.cpp:77
 msgid "Haar cascade filename"
@@ -21877,7 +21522,7 @@ msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:71
 msgid "RGB32"
-msgstr ""
+msgstr "RGB32"
 
 #: modules/video_filter/opencv_wrapper.c:74
 #, fuzzy
@@ -21896,15 +21541,15 @@ msgstr "Akarken ekranda göster"
 
 #: modules/video_filter/opencv_wrapper.c:78
 msgid "Show only errors"
-msgstr ""
+msgstr "Yalnızca hataları göster"
 
 #: modules/video_filter/opencv_wrapper.c:79
 msgid "Show errors and warnings"
-msgstr ""
+msgstr "Hataları ve uyarıları göster"
 
 #: modules/video_filter/opencv_wrapper.c:79
 msgid "Show everything including debug messages"
-msgstr ""
+msgstr "Hata ayıklama mesajları dahil herşeyi göster"
 
 #: modules/video_filter/opencv_wrapper.c:82
 #, fuzzy
@@ -21912,9 +21557,8 @@ msgid "OpenCV video filter wrapper"
 msgstr "Video Süzgeçleri"
 
 #: modules/video_filter/opencv_wrapper.c:83
-#, fuzzy
 msgid "OpenCV"
-msgstr "Aç"
+msgstr "OpenCV"
 
 #: modules/video_filter/opencv_wrapper.c:90
 msgid "Scale factor (0.1-2.0)"
@@ -22483,9 +22127,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/rss.c:160
-#, fuzzy
 msgid "Text position"
-msgstr "Altresimler"
+msgstr "Metin konumu"
 
 #: modules/video_filter/rss.c:162
 msgid ""
@@ -22597,19 +22240,16 @@ msgid "Luma bicubic / chroma bilinear"
 msgstr ""
 
 #: modules/video_filter/swscale.c:59
-#, fuzzy
 msgid "Gauss"
-msgstr "Duraklat"
+msgstr "Gauss"
 
 #: modules/video_filter/swscale.c:60
-#, fuzzy
 msgid "SincR"
-msgstr "Dış görünümler"
+msgstr "SincR"
 
 #: modules/video_filter/swscale.c:60
-#, fuzzy
 msgid "Lanczos"
-msgstr "Lao"
+msgstr "Lanczos"
 
 #: modules/video_filter/swscale.c:60
 msgid "Bicubic spline"
@@ -22634,22 +22274,19 @@ msgstr ""
 
 #: modules/video_filter/transform.c:70
 msgid "Rotate by 270 degrees"
-msgstr ""
+msgstr "270 derece döndür"
 
 #: modules/video_filter/transform.c:71
-#, fuzzy
 msgid "Flip horizontally"
-msgstr "Yatay"
+msgstr "Yatay simetrik"
 
 #: modules/video_filter/transform.c:71
-#, fuzzy
 msgid "Flip vertically"
-msgstr "Dikey"
+msgstr "Dikey yansıt"
 
 #: modules/video_filter/transform.c:76
-#, fuzzy
 msgid "Video transformation filter"
-msgstr "Video Süzgeçleri"
+msgstr "Video dönüşüm füzgeci"
 
 #: modules/video_filter/wall.c:57
 msgid "Number of horizontal windows in which to split the video."
@@ -22689,12 +22326,11 @@ msgstr "Video Süzgeçleri"
 
 #: modules/video_output/aa.c:58
 msgid "ASCII Art"
-msgstr ""
+msgstr "ASCII Sanatı"
 
 #: modules/video_output/aa.c:61
-#, fuzzy
 msgid "ASCII-art video output"
-msgstr "Bindirmeli video çıktısı"
+msgstr "ASCII-sanatı video çıktısı"
 
 #: modules/video_output/caca.c:83
 #, fuzzy
@@ -22888,9 +22524,8 @@ msgid "Wallpaper"
 msgstr "Duvarkağıdı"
 
 #: modules/video_output/msw/glwin32.c:69 modules/video_output/opengl.c:189
-#, fuzzy
 msgid "OpenGL video output"
-msgstr "Bindirmeli video çıktısı"
+msgstr "OpenGL video çıktısı"
 
 #: modules/video_output/msw/wingdi.c:140
 #, fuzzy
@@ -22903,28 +22538,24 @@ msgid "Windows GDI video output"
 msgstr "DirectX ses çıktısı"
 
 #: modules/video_output/opengl.c:126 modules/video_output/opengl.c:182
-#, fuzzy
 msgid "Cube"
-msgstr "Klüp"
+msgstr "Küp"
 
 #: modules/video_output/opengl.c:126 modules/video_output/opengl.c:182
 msgid "Transparent Cube"
 msgstr ""
 
 #: modules/video_output/opengl.c:127
-#, fuzzy
 msgid "Cylinder"
-msgstr "Temizle"
+msgstr "Silindir"
 
 #: modules/video_output/opengl.c:127
-#, fuzzy
 msgid "Torus"
-msgstr "Denetimler"
+msgstr "Halka"
 
 #: modules/video_output/opengl.c:127
-#, fuzzy
 msgid "Sphere"
-msgstr "Hız"
+msgstr "Küre"
 
 #: modules/video_output/opengl.c:127
 msgid "SQUAREXY"
@@ -22994,9 +22625,8 @@ msgid "Point of view (Z coordinate) of the cube/cylinder effect, if enabled."
 msgstr ""
 
 #: modules/video_output/opengl.c:169
-#, fuzzy
 msgid "OpenGL Provider"
-msgstr "&Dosya Aç.."
+msgstr "OpenGL Sağlayıcısı"
 
 #: modules/video_output/opengl.c:170
 msgid "Allows you to modify what OpenGL provider should be used"
@@ -23218,7 +22848,7 @@ msgstr ""
 
 #: modules/video_output/x11/glx.c:122
 msgid "OpenGL(GLX) provider"
-msgstr ""
+msgstr "OpenGL(GLX) sağlayıcısı"
 
 #: modules/video_output/x11/x11.c:81
 #, fuzzy
@@ -23483,53 +23113,41 @@ msgstr "Video Süzgeçleri"
 msgid "Spectrum analyser"
 msgstr "Spektrum analizörü"
 
-#, fuzzy
 #~ msgid "A to B"
-#~ msgstr "Otomatik"
+#~ msgstr "A - B"
 
-#, fuzzy
 #~ msgid "Extended settings"
-#~ msgstr "Kodlayıcı ayarları"
+#~ msgstr "Detaylı ayarlar"
 
-#, fuzzy
 #~ msgid "Open a device or a VIDEO_TS directory"
-#~ msgstr "VIDEO_TS Klasörünü Aç"
+#~ msgstr "Bir aygıt veya bir VIDEO_TS klasörünü aç"
 
-#, fuzzy
 #~ msgid "&Update List"
-#~ msgstr "Güncelle"
+#~ msgstr "&Güncelleme Listesi"
 
-#, fuzzy
 #~ msgid "Choose subtitles file"
-#~ msgstr "Altyazı dosyasını kullan"
+#~ msgstr "Altyazı dosyası seçiniz"
 
-#, fuzzy
-#~ msgid "&Equalizer"
-#~ msgstr "Ekolayzer"
+#~ msgid "Subtitles files (*.cdg *.idx *.srt *.sub *.utf);;All files (*)"
+#~ msgstr "Altyazı dosyaları (*.cdg *.idx *.srt *.sub *.utf);;Tüm dosyalar (*)"
 
-#, fuzzy
-#~ msgid "Toggle &Fullscreen"
-#~ msgstr "Telnet Arayüzü portu"
-
-#, fuzzy
-#~ msgid "&Title"
-#~ msgstr "Başlık"
-
-#, fuzzy
-#~ msgid "Select the device or the VIDEO_TS directory"
-#~ msgstr "VIDEO_TS Klasörünü Aç"
-
-#, fuzzy
 #~ msgid "Undock from Interface"
-#~ msgstr "Kontrol arayüzleri"
+#~ msgstr "Arayüzden Ayır"
 
-#, fuzzy
 #~ msgid "Ctrl+U"
-#~ msgstr "Ctrl"
+#~ msgstr "Ctrl+U"
 
-#, fuzzy
 #~ msgid "Add Interfaces"
-#~ msgstr "Arayüz ekle"
+#~ msgstr "Arayüz Ekle"
+
+#~ msgid "&Equalizer"
+#~ msgstr "&Ekolayzer"
+
+#~ msgid "Toggle &Fullscreen"
+#~ msgstr "&Tam-Ekrana Geç"
+
+#~ msgid "&Title"
+#~ msgstr "&Başlık"
 
 #, fuzzy
 #~ msgid "Use a sub&amp;titles file"
@@ -24169,6 +23787,10 @@ msgstr "Spektrum analizörü"
 #~ msgstr "Tatar"
 
 #, fuzzy
+#~ msgid "Minimal interface"
+#~ msgstr "Ana arayüzler"
+
+#, fuzzy
 #~ msgid "Size to video"
 #~ msgstr "Kayıt dosyası"
 
@@ -24295,6 +23917,10 @@ msgstr "Spektrum analizörü"
 #, fuzzy
 #~ msgid "Embedded video output"
 #~ msgstr "Tam ekran video çıktısı"
+
+#, fuzzy
+#~ msgid "Checking for Updates..."
+#~ msgstr "Dönüşümler"
 
 #, fuzzy
 #~ msgid "General Info"
