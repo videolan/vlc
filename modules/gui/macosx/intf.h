@@ -94,6 +94,10 @@ struct intf_sys_t
  *****************************************************************************/
 @class AppleRemote;
 @class VLCInformation;
+@class VLControllerWindow;
+@class VLCEmbeddedWindow;
+@class VLCControls;
+@class VLCPlaylist;
 @interface VLCMain : NSObject
 {
     intf_thread_t *p_intf;      /* The main intf object */
@@ -121,171 +125,173 @@ struct intf_sys_t
     BOOL nib_update_loaded;     /* update nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
 
-    IBOutlet id o_window;       /* main window    */
-    IBOutlet id o_playlist_view;/* playlist view  */
+    IBOutlet VLControllerWindow * o_window;       /* main window    */
+    IBOutlet NSView * o_playlist_view;/* playlist view  */
     IBOutlet id o_scrollfield;  /* info field     */
-    IBOutlet id o_timefield;    /* time field     */
-    IBOutlet id o_timeslider;   /* time slider    */
-    IBOutlet id o_embedded_window; /* Embedded Vout Window */
+    IBOutlet NSTextField * o_timefield;    /* time field     */
+    IBOutlet NSSlider * o_timeslider;   /* time slider    */
+    IBOutlet VLCEmbeddedWindow * o_embedded_window; /* Embedded Vout Window */
     float f_slider;             /* slider value   */
     float f_slider_old;         /* old slider val */
-    IBOutlet id o_volumeslider; /* volume slider  */
+    IBOutlet NSSlider * o_volumeslider; /* volume slider  */
 
-    IBOutlet id o_main_pgbar;   /* playlist window progress bar */
-    IBOutlet id o_btn_prev;     /* btn previous   */
-    IBOutlet id o_btn_rewind;   /* btn rewind     */
-    IBOutlet id o_btn_play;     /* btn play       */
-    IBOutlet id o_btn_stop;     /* btn stop       */
-    IBOutlet id o_btn_ff;       /* btn fast forward     */
-    IBOutlet id o_btn_next;     /* btn next       */
-    IBOutlet id o_btn_fullscreen;/* btn fullscreen (embedded vout window) */
-    IBOutlet id o_btn_playlist; /* btn playlist   */
-    IBOutlet id o_btn_equalizer; /* eq btn */
+    IBOutlet NSView * toolbarMediaControl;   /* view with the controls */
+
+    IBOutlet NSProgressIndicator * o_main_pgbar;   /* playlist window progress bar */
+    IBOutlet NSButton * o_btn_prev;     /* btn previous   */
+    IBOutlet NSButton * o_btn_rewind;   /* btn rewind     */
+    IBOutlet NSButton * o_btn_play;     /* btn play       */
+    IBOutlet NSButton * o_btn_stop;     /* btn stop       */
+    IBOutlet NSButton * o_btn_ff;       /* btn fast forward     */
+    IBOutlet NSButton * o_btn_next;     /* btn next       */
+    IBOutlet NSButton * o_btn_fullscreen;/* btn fullscreen (embedded vout window) */
+    IBOutlet NSButton * o_btn_playlist; /* btn playlist   */
+    IBOutlet NSButton * o_btn_equalizer; /* eq btn */
 
     NSImage * o_img_play;       /* btn play img   */
     NSImage * o_img_pause;      /* btn pause img  */
     NSImage * o_img_play_pressed;       /* btn play img   */
     NSImage * o_img_pause_pressed;      /* btn pause img  */
 
-    IBOutlet id o_controls;     /* VLCControls    */
-    IBOutlet id o_playlist;     /* VLCPlaylist    */
+    IBOutlet VLCControls * o_controls;     /* VLCControls    */
+    IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
 
     IBOutlet id o_messages;     /* messages tv    */
     IBOutlet id o_msgs_panel;   /* messages panel */
     NSMutableArray * o_msg_arr; /* messages array */
     NSLock * o_msg_lock;        /* messages lock  */
-    IBOutlet id o_msgs_btn_crashlog;    /* messages open crashlog */
+    IBOutlet NSButton * o_msgs_btn_crashlog;    /* messages open crashlog */
 
     /* main menu */
 
-    IBOutlet id o_mi_about;
-    IBOutlet id o_mi_prefs;
-    IBOutlet id o_mi_sprefs;
-    IBOutlet id o_mi_checkForUpdate;
-    IBOutlet id o_mi_add_intf;
-    IBOutlet id o_mu_add_intf;
-    IBOutlet id o_mi_services;
-    IBOutlet id o_mi_hide;
-    IBOutlet id o_mi_hide_others;
-    IBOutlet id o_mi_show_all;
-    IBOutlet id o_mi_quit;
+    IBOutlet NSMenuItem * o_mi_about;
+    IBOutlet NSMenuItem * o_mi_prefs;
+    IBOutlet NSMenuItem * o_mi_sprefs;
+    IBOutlet NSMenuItem * o_mi_checkForUpdate;
+    IBOutlet NSMenuItem * o_mi_add_intf;
+    IBOutlet NSMenu * o_mu_add_intf;
+    IBOutlet NSMenuItem * o_mi_services;
+    IBOutlet NSMenuItem * o_mi_hide;
+    IBOutlet NSMenuItem * o_mi_hide_others;
+    IBOutlet NSMenuItem * o_mi_show_all;
+    IBOutlet NSMenuItem * o_mi_quit;
 
-    IBOutlet id o_mu_file;
-    IBOutlet id o_mi_open_file;
-    IBOutlet id o_mi_open_generic;
-    IBOutlet id o_mi_open_disc;
-    IBOutlet id o_mi_open_net;
-    IBOutlet id o_mi_open_capture;
-    IBOutlet id o_mi_open_recent;
-    IBOutlet id o_mi_open_recent_cm;
-    IBOutlet id o_mi_open_wizard;
+    IBOutlet NSMenu * o_mu_file;
+    IBOutlet NSMenuItem * o_mi_open_file;
+    IBOutlet NSMenuItem * o_mi_open_generic;
+    IBOutlet NSMenuItem * o_mi_open_disc;
+    IBOutlet NSMenuItem * o_mi_open_net;
+    IBOutlet NSMenuItem * o_mi_open_capture;
+    IBOutlet NSMenuItem * o_mi_open_recent;
+    IBOutlet NSMenuItem * o_mi_open_recent_cm;
+    IBOutlet NSMenuItem * o_mi_open_wizard;
 
-    IBOutlet id o_mu_edit;
-    IBOutlet id o_mi_cut;
-    IBOutlet id o_mi_copy;
-    IBOutlet id o_mi_paste;
-    IBOutlet id o_mi_clear;
-    IBOutlet id o_mi_select_all;
+    IBOutlet NSMenu * o_mu_edit;
+    IBOutlet NSMenuItem * o_mi_cut;
+    IBOutlet NSMenuItem * o_mi_copy;
+    IBOutlet NSMenuItem * o_mi_paste;
+    IBOutlet NSMenuItem * o_mi_clear;
+    IBOutlet NSMenuItem * o_mi_select_all;
 
-    IBOutlet id o_mu_controls;
-    IBOutlet id o_mi_play;
-    IBOutlet id o_mi_stop;
-    IBOutlet id o_mi_faster;
-    IBOutlet id o_mi_slower;
-    IBOutlet id o_mi_previous;
-    IBOutlet id o_mi_next;
-    IBOutlet id o_mi_random;
-    IBOutlet id o_mi_repeat;
-    IBOutlet id o_mi_loop;
-    IBOutlet id o_mi_fwd;
-    IBOutlet id o_mi_bwd;
-    IBOutlet id o_mi_fwd1m;
-    IBOutlet id o_mi_bwd1m;
-    IBOutlet id o_mi_fwd5m;
-    IBOutlet id o_mi_bwd5m;
-    IBOutlet id o_mi_program;
-    IBOutlet id o_mu_program;
-    IBOutlet id o_mi_title;
-    IBOutlet id o_mu_title;
-    IBOutlet id o_mi_chapter;
-    IBOutlet id o_mu_chapter;
+    IBOutlet NSMenu * o_mu_controls;
+    IBOutlet NSMenuItem * o_mi_play;
+    IBOutlet NSMenuItem * o_mi_stop;
+    IBOutlet NSMenuItem * o_mi_faster;
+    IBOutlet NSMenuItem * o_mi_slower;
+    IBOutlet NSMenuItem * o_mi_previous;
+    IBOutlet NSMenuItem * o_mi_next;
+    IBOutlet NSMenuItem * o_mi_random;
+    IBOutlet NSMenuItem * o_mi_repeat;
+    IBOutlet NSMenuItem * o_mi_loop;
+    IBOutlet NSMenuItem * o_mi_fwd;
+    IBOutlet NSMenuItem * o_mi_bwd;
+    IBOutlet NSMenuItem * o_mi_fwd1m;
+    IBOutlet NSMenuItem * o_mi_bwd1m;
+    IBOutlet NSMenuItem * o_mi_fwd5m;
+    IBOutlet NSMenuItem * o_mi_bwd5m;
+    IBOutlet NSMenuItem * o_mi_program;
+    IBOutlet NSMenuItem * o_mu_program;
+    IBOutlet NSMenuItem * o_mi_title;
+    IBOutlet NSMenu * o_mu_title;
+    IBOutlet NSMenuItem * o_mi_chapter;
+    IBOutlet NSMenu * o_mu_chapter;
 
-    IBOutlet id o_mu_audio;
-    IBOutlet id o_mi_vol_up;
-    IBOutlet id o_mi_vol_down;
-    IBOutlet id o_mi_mute;
-    IBOutlet id o_mi_audiotrack;
-    IBOutlet id o_mu_audiotrack;
-    IBOutlet id o_mi_channels;
-    IBOutlet id o_mu_channels;
-    IBOutlet id o_mi_device;
-    IBOutlet id o_mu_device;
-    IBOutlet id o_mi_visual;
-    IBOutlet id o_mu_visual;
+    IBOutlet NSMenu * o_mu_audio;
+    IBOutlet NSMenuItem * o_mi_vol_up;
+    IBOutlet NSMenuItem * o_mi_vol_down;
+    IBOutlet NSMenuItem * o_mi_mute;
+    IBOutlet NSMenuItem * o_mi_audiotrack;
+    IBOutlet NSMenu * o_mu_audiotrack;
+    IBOutlet NSMenuItem * o_mi_channels;
+    IBOutlet NSMenu * o_mu_channels;
+    IBOutlet NSMenuItem * o_mi_device;
+    IBOutlet NSMenu * o_mu_device;
+    IBOutlet NSMenuItem * o_mi_visual;
+    IBOutlet NSMenu * o_mu_visual;
 
-    IBOutlet id o_mu_video;
-    IBOutlet id o_mi_half_window;
-    IBOutlet id o_mi_normal_window;
-    IBOutlet id o_mi_double_window;
-    IBOutlet id o_mi_fittoscreen;
-    IBOutlet id o_mi_fullscreen;
-    IBOutlet id o_mi_floatontop;
-    IBOutlet id o_mi_snapshot;
-    IBOutlet id o_mi_videotrack;
-    IBOutlet id o_mu_videotrack;
-    IBOutlet id o_mi_screen;
-    IBOutlet id o_mu_screen;
-    IBOutlet id o_mi_aspect_ratio;
-    IBOutlet id o_mu_aspect_ratio;
-    IBOutlet id o_mi_crop;
-    IBOutlet id o_mu_crop;
-    IBOutlet id o_mi_subtitle;
-    IBOutlet id o_mu_subtitle;
-    IBOutlet id o_mi_deinterlace;
-    IBOutlet id o_mu_deinterlace;
-    IBOutlet id o_mi_ffmpeg_pp;
-    IBOutlet id o_mu_ffmpeg_pp;
+    IBOutlet NSMenu * o_mu_video;
+    IBOutlet NSMenuItem * o_mi_half_window;
+    IBOutlet NSMenuItem * o_mi_normal_window;
+    IBOutlet NSMenuItem * o_mi_double_window;
+    IBOutlet NSMenuItem * o_mi_fittoscreen;
+    IBOutlet NSMenuItem * o_mi_fullscreen;
+    IBOutlet NSMenuItem * o_mi_floatontop;
+    IBOutlet NSMenuItem * o_mi_snapshot;
+    IBOutlet NSMenuItem * o_mi_videotrack;
+    IBOutlet NSMenu * o_mu_videotrack;
+    IBOutlet NSMenuItem * o_mi_screen;
+    IBOutlet NSMenu * o_mu_screen;
+    IBOutlet NSMenuItem * o_mi_aspect_ratio;
+    IBOutlet NSMenu * o_mu_aspect_ratio;
+    IBOutlet NSMenuItem * o_mi_crop;
+    IBOutlet NSMenu * o_mu_crop;
+    IBOutlet NSMenuItem * o_mi_subtitle;
+    IBOutlet NSMenu * o_mu_subtitle;
+    IBOutlet NSMenuItem * o_mi_deinterlace;
+    IBOutlet NSMenu * o_mu_deinterlace;
+    IBOutlet NSMenuItem * o_mi_ffmpeg_pp;
+    IBOutlet NSMenuItem * o_mu_ffmpeg_pp;
 
-    IBOutlet id o_mu_window;
-    IBOutlet id o_mi_minimize;
-    IBOutlet id o_mi_close_window;
-    IBOutlet id o_mi_controller;
-    IBOutlet id o_mi_equalizer;
-    IBOutlet id o_mi_extended;
-    IBOutlet id o_mi_bookmarks;
-    IBOutlet id o_mi_playlist;
-    IBOutlet id o_mi_info;
-    IBOutlet id o_mi_messages;
-    IBOutlet id o_mi_bring_atf;
+    IBOutlet NSMenu * o_mu_window;
+    IBOutlet NSMenuItem * o_mi_minimize;
+    IBOutlet NSMenuItem * o_mi_close_window;
+    IBOutlet NSMenuItem * o_mi_controller;
+    IBOutlet NSMenuItem * o_mi_equalizer;
+    IBOutlet NSMenuItem * o_mi_extended;
+    IBOutlet NSMenuItem * o_mi_bookmarks;
+    IBOutlet NSMenuItem * o_mi_playlist;
+    IBOutlet NSMenuItem * o_mi_info;
+    IBOutlet NSMenuItem * o_mi_messages;
+    IBOutlet NSMenuItem * o_mi_bring_atf;
 
-    IBOutlet id o_mu_help;
-    IBOutlet id o_mi_help;
-    IBOutlet id o_mi_readme;
-    IBOutlet id o_mi_documentation;
-    IBOutlet id o_mi_license;
-    IBOutlet id o_mi_website;
-    IBOutlet id o_mi_donation;
-    IBOutlet id o_mi_forum;
-    IBOutlet id o_mi_errorsAndWarnings;
+    IBOutlet NSMenu * o_mu_help;
+    IBOutlet NSMenuItem * o_mi_help;
+    IBOutlet NSMenuItem * o_mi_readme;
+    IBOutlet NSMenuItem * o_mi_documentation;
+    IBOutlet NSMenuItem * o_mi_license;
+    IBOutlet NSMenuItem * o_mi_website;
+    IBOutlet NSMenuItem * o_mi_donation;
+    IBOutlet NSMenuItem * o_mi_forum;
+    IBOutlet NSMenuItem * o_mi_errorsAndWarnings;
 
     /* dock menu */
-    IBOutlet id o_dmi_play;
-    IBOutlet id o_dmi_stop;
-    IBOutlet id o_dmi_next;
-    IBOutlet id o_dmi_previous;
-    IBOutlet id o_dmi_mute;
+    IBOutlet NSMenuItem * o_dmi_play;
+    IBOutlet NSMenuItem * o_dmi_stop;
+    IBOutlet NSMenuItem * o_dmi_next;
+    IBOutlet NSMenuItem * o_dmi_previous;
+    IBOutlet NSMenuItem * o_dmi_mute;
 
     /* vout menu */
-    IBOutlet id o_vout_menu;
-    IBOutlet id o_vmi_play;
-    IBOutlet id o_vmi_stop;
-    IBOutlet id o_vmi_prev;
-    IBOutlet id o_vmi_next;
-    IBOutlet id o_vmi_volup;
-    IBOutlet id o_vmi_voldown;
-    IBOutlet id o_vmi_mute;
-    IBOutlet id o_vmi_fullscreen;
-    IBOutlet id o_vmi_snapshot;
+    IBOutlet NSMenu * o_vout_menu;
+    IBOutlet NSMenuItem * o_vmi_play;
+    IBOutlet NSMenuItem * o_vmi_stop;
+    IBOutlet NSMenuItem * o_vmi_prev;
+    IBOutlet NSMenuItem * o_vmi_next;
+    IBOutlet NSMenuItem * o_vmi_volup;
+    IBOutlet NSMenuItem * o_vmi_voldown;
+    IBOutlet NSMenuItem * o_vmi_mute;
+    IBOutlet NSMenuItem * o_vmi_fullscreen;
+    IBOutlet NSMenuItem * o_vmi_snapshot;
 
     bool b_small_window;
 

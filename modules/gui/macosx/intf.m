@@ -387,8 +387,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( nib_main_loaded ) return;
 
     [self initStrings];
-    [o_window setExcludedFromWindowsMenu: TRUE];
-    [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
+
+    [o_window setExcludedFromWindowsMenu: YES];
+    [o_msgs_panel setExcludedFromWindowsMenu: YES];
     [o_msgs_panel setDelegate: self];
 
     i_key = config_GetInt( p_intf, "key-quit" );
@@ -509,6 +510,72 @@ static VLCMain *_o_sharedMainInstance = nil;
     nib_main_loaded = TRUE;
 }
 
+#pragma mark Toolbar delegate
+/* Our item identifiers */
+static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
+
+- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar
+{
+    NSLog(@"toolbarAllowedItemIdentifiers %s", __func__);
+
+    return [NSArray arrayWithObjects:
+//                        NSToolbarCustomizeToolbarItemIdentifier,
+//                        NSToolbarFlexibleSpaceItemIdentifier,
+//                        NSToolbarSpaceItemIdentifier,
+//                        NSToolbarSeparatorItemIdentifier,
+                        VLCToolbarMediaControl,
+                        nil ];
+}
+
+- (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
+{
+    NSLog(@"toolbarAllowedItemIdentifiers %s", __func__);
+
+    return [NSArray arrayWithObjects:
+                        VLCToolbarMediaControl,
+                        nil ];
+}
+
+- (NSToolbarItem *) toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
+{
+    NSLog(@"toolbarAllowedItemIdentifiers %s", __func__);
+    NSToolbarItem *toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: itemIdentifier] autorelease];
+
+ 
+    if( [itemIdentifier isEqual: VLCToolbarMediaControl] )
+    {
+        [toolbarItem setLabel:@"Media Controls"];
+        [toolbarItem setPaletteLabel:@"Media Controls"];
+
+        NSSize size = toolbarMediaControl.frame.size;
+        [toolbarItem setView:toolbarMediaControl];
+        [toolbarItem setMinSize:size];
+        size.width += 1000.;
+        [toolbarItem setMaxSize:size];
+
+        // Hack: For some reason we need to make sure
+        // that the those element are on top
+        // Add them again will put them frontmost
+        [toolbarMediaControl addSubview:o_scrollfield];
+        [toolbarMediaControl addSubview:o_timeslider];
+        [toolbarMediaControl addSubview:o_timefield];
+        [toolbarMediaControl addSubview:o_main_pgbar];
+
+        /* TODO: setup a menu */
+    }
+    else
+    {
+        /* itemIdentifier referred to a toolbar item that is not
+         * provided or supported by us or Cocoa
+         * Returning nil will inform the toolbar
+         * that this kind of item is not supported */
+        toolbarItem = nil;
+    }
+    return toolbarItem;
+}
+
+#pragma mark -
+
 - (void)controlTintChanged
 {
     BOOL b_playing = NO;
@@ -553,7 +620,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)initStrings
 {
-    [o_window setTitle: _NS("VLC - Controller")];
+    [o_window setTitle: _NS("VLC")];
     [self setScrollField:_NS("VLC media player") stopAfter:-1];
 
     /* button controls */
@@ -1230,11 +1297,20 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* TODO: fix i_size use */
         b_plmul = p_playlist->items.i_size > 1;
 
-        p_input = vlc_object_find( p_playlist, VLC_OBJECT_INPUT,
-                                   FIND_CHILD );
-
+        p_input = playlist_CurrentInput( p_playlist );
+        bool b_buffering = NO;
+    
         if( ( b_input = ( p_input != NULL ) ) )
         {
+            /* seekable streams */
+            int state = input_GetState( p_input );
+            if ( state == INIT_S ||
+                 state == OPENING_S ||
+                 state == BUFFERING_S )
+            {
+                b_buffering = YES;
+            }
+                 
             /* seekable streams */
             b_seekable = var_GetBool( p_input, "seekable" );
 
@@ -1247,12 +1323,25 @@ static VLCMain *_o_sharedMainInstance = nil;
         }
         pl_Release( p_intf );
 
+        if( b_buffering )
+        {
+            [o_main_pgbar startAnimation:self];
+            [o_main_pgbar setIndeterminate:YES];
+            [o_main_pgbar setHidden:NO];
+        }
+        else
+        {
+            [o_main_pgbar stopAnimation:self];
+            [o_main_pgbar setHidden:YES];
+        }
+
         [o_btn_stop setEnabled: b_input];
         [o_btn_ff setEnabled: b_seekable];
         [o_btn_rewind setEnabled: b_seekable];
         [o_btn_prev setEnabled: (b_plmul || b_chapters)];
         [o_btn_next setEnabled: (b_plmul || b_chapters)];
 
+        NSLog(@"seekable %d", b_seekable);
         [o_timeslider setFloatValue: 0.0];
         [o_timeslider setEnabled: b_seekable];
         [o_timefield setStringValue: @"00:00"];
