@@ -1214,8 +1214,6 @@ void FullscreenControllerWidget::attachVout( vout_thread_t *p_nvout )
  */
 void FullscreenControllerWidget::detachVout()
 {
-    assert( p_vout );
-
     if( p_vout )
     {
         var_DelCallback( p_vout, "fullscreen", FullscreenControllerWidgetFullscreenChanged, this );
