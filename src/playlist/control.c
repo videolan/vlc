@@ -47,6 +47,10 @@ playlist_t *__pl_Yield( vlc_object_t *p_this )
 
     barrier ();
     pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
+
+    assert( pl != p_this /* This does not make sense to yield the playlist
+    using pl_Yield. use vlc_object_yield in this case */ );
+
     if (pl)
         vlc_object_yield (pl);
     return pl;
@@ -56,6 +60,10 @@ void __pl_Release( vlc_object_t *p_this )
 {
     playlist_t *pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
     assert( pl != NULL );
+    
+    assert( pl != p_this /* The rule is that pl_Release() should act on
+    the same object than pl_Yield() */ );
+
     vlc_object_release( pl );
 }
 
