@@ -1077,7 +1077,7 @@ static void LoadChapter( demux_t  *p_demux )
             }
             if( j < p_sys->i_tracks )
             {
-                LoadChapterApple( p_demux, &p_sys->track[i] );
+                LoadChapterApple( p_demux, &p_sys->track[j] );
                 break;
             }
         }
@@ -2156,7 +2156,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     p_track->i_sample = 0;
 
     /* Mark chapter only track */
-    if( !p_track->b_enable && p_sys->p_tref_chap )
+    if( p_sys->p_tref_chap )
     {
         MP4_Box_data_tref_generic_t *p_chap = p_sys->p_tref_chap->data.p_tref_generic;
         unsigned int i;
@@ -2166,6 +2166,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             if( p_track->i_track_ID == p_chap->i_track_ID[i] )
             {
                 p_track->b_chapter = true;
+                p_track->b_enable = false;
                 break;
             }
         }
