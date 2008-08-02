@@ -113,7 +113,7 @@ echo > ABOUT-NLS
 mv -f INSTALL.git INSTALL
 
 # Patch po/Makefile.in.in but it's not a drama if it fails
-patch -p1 < po/makefile-qt4.patch || true
+patch -sfN -p1 < po/makefile-qt4.patch || true
 
 ##
 ##  files which need to be regenerated
