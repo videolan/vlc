@@ -535,7 +535,7 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
 /* "state" value */
 /* NOTE: you need to update ppsz_input_state in the RC interface
  * if you modify this list. */
-enum input_state_e
+typedef enum input_state_e
 {
     INIT_S = 0,
     OPENING_S,
@@ -547,7 +547,7 @@ enum input_state_e
     BACKWARD_S,
     END_S,
     ERROR_S,
-};
+} input_state_e;
 
 /* "rate" default, min/max
  * A rate below 1000 plays the movie faster,
@@ -672,6 +672,12 @@ enum input_query_e
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
 VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
 
+static inline input_state_e input_GetState( input_thread_t * p_input )
+{
+    input_state_e state = INIT_S;
+    input_Control( p_input, INPUT_GET_STATE, &state );
+    return state;
+}
 VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, bool b_force_decoder ) );
 VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
 VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
