@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-08-01 17:29+0100\n"
+"POT-Creation-Date: 2008-08-02 17:01+0300\n"
 "PO-Revision-Date: 2008-08-01 13:52+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -43,7 +43,7 @@ msgid "General"
 msgstr "Allmänt"
 
 #: include/vlc_config_cat.h:39 modules/gui/macosx/simple_prefs.m:168
-#: modules/gui/qt4/components/simple_preferences.cpp:74
+#: modules/gui/qt4/components/simple_preferences.cpp:76
 #: modules/gui/qt4/menus.cpp:839 modules/misc/dummy/dummy.c:68
 msgid "Interface"
 msgstr "Gränssnitt"
@@ -79,12 +79,12 @@ msgstr "Inställningar för snabbtangenter"
 
 #: include/vlc_config_cat.h:54 src/input/es_out.c:2051
 #: src/libvlc-module.c:1429 modules/gui/beos/InterfaceWindow.cpp:283
-#: modules/gui/macosx/intf.m:625 modules/gui/macosx/output.m:170
+#: modules/gui/macosx/intf.m:693 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:110 modules/gui/macosx/simple_prefs.m:172
 #: modules/gui/macosx/wizard.m:378
 #: modules/gui/qt4/components/info_panels.cpp:522
-#: modules/gui/qt4/components/simple_preferences.cpp:76
-#: modules/gui/qt4/ui/sout.ui:631 modules/stream_out/transcode.c:199
+#: modules/gui/qt4/components/simple_preferences.cpp:78
+#: modules/gui/qt4/ui/sout.ui:671 modules/stream_out/transcode.c:199
 msgid "Audio"
 msgstr "Ljud"
 
@@ -106,7 +106,7 @@ msgid "Audio filters are used to postprocess the audio stream."
 msgstr "Ljudfilter används för att efterbearbeta ljudströmmen."
 
 #: include/vlc_config_cat.h:64 src/audio_output/input.c:92
-#: modules/gui/macosx/intf.m:635 modules/gui/macosx/intf.m:636
+#: modules/gui/macosx/intf.m:703 modules/gui/macosx/intf.m:704
 msgid "Visualizations"
 msgstr "Visualiseringar"
 
@@ -123,7 +123,7 @@ msgid "These are general settings for audio output modules."
 msgstr "Dessa är allmänna inställningar för ljudutmatningsmoduler."
 
 #: include/vlc_config_cat.h:71 src/libvlc-module.c:1833
-#: modules/gui/qt4/ui/sout.ui:758 modules/stream_out/transcode.c:231
+#: modules/gui/qt4/ui/sout.ui:806 modules/stream_out/transcode.c:231
 msgid "Miscellaneous"
 msgstr "Diverse"
 
@@ -132,12 +132,12 @@ msgid "Miscellaneous audio settings and modules."
 msgstr "Diverse ljudinställningar och moduler."
 
 #: include/vlc_config_cat.h:75 src/input/es_out.c:2079
-#: src/libvlc-module.c:1479 modules/gui/macosx/intf.m:638
+#: src/libvlc-module.c:1479 modules/gui/macosx/intf.m:706
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:99
 #: modules/gui/macosx/simple_prefs.m:176 modules/gui/macosx/wizard.m:379
 #: modules/gui/qt4/components/info_panels.cpp:523
-#: modules/gui/qt4/components/simple_preferences.cpp:77
-#: modules/gui/qt4/ui/sout.ui:542 modules/misc/dummy/dummy.c:98
+#: modules/gui/qt4/components/simple_preferences.cpp:79
+#: modules/gui/qt4/ui/sout.ui:574 modules/misc/dummy/dummy.c:98
 #: modules/stream_out/transcode.c:168
 msgid "Video"
 msgstr "Video"
@@ -354,7 +354,7 @@ msgstr "VLC:s implementering av Video On Demand"
 #: src/playlist/engine.c:111 modules/demux/playlist/playlist.c:66
 #: modules/demux/playlist/playlist.c:67
 #: modules/gui/beos/InterfaceWindow.cpp:232
-#: modules/gui/beos/InterfaceWindow.cpp:326 modules/gui/macosx/intf.m:569
+#: modules/gui/beos/InterfaceWindow.cpp:326 modules/gui/macosx/intf.m:637
 #: modules/gui/pda/pda_interface.c:1262
 #: modules/gui/qt4/dialogs/playlist.cpp:48
 #: modules/gui/qt4/main_interface.cpp:128
@@ -374,7 +374,7 @@ msgstr ""
 msgid "General playlist behaviour"
 msgstr "Allmänt spellistbeteende"
 
-#: include/vlc_config_cat.h:188 modules/gui/macosx/playlist.m:439
+#: include/vlc_config_cat.h:188 modules/gui/macosx/playlist.m:447
 msgid "Services discovery"
 msgstr "Tjänsteidentifiering"
 
@@ -537,11 +537,11 @@ msgstr "Om VLC..."
 
 #: include/vlc_intf_strings.h:48 modules/control/rc.c:75
 #: modules/gui/macosx/embeddedwindow.m:51
-#: modules/gui/macosx/embeddedwindow.m:141 modules/gui/macosx/intf.m:562
-#: modules/gui/macosx/intf.m:606 modules/gui/macosx/intf.m:685
-#: modules/gui/macosx/intf.m:692 modules/gui/macosx/intf.m:1608
-#: modules/gui/macosx/intf.m:1609 modules/gui/macosx/intf.m:1610
-#: modules/gui/macosx/intf.m:1611 modules/gui/macosx/playlist.m:431
+#: modules/gui/macosx/embeddedwindow.m:141 modules/gui/macosx/intf.m:630
+#: modules/gui/macosx/intf.m:674 modules/gui/macosx/intf.m:753
+#: modules/gui/macosx/intf.m:760 modules/gui/macosx/intf.m:1699
+#: modules/gui/macosx/intf.m:1700 modules/gui/macosx/intf.m:1701
+#: modules/gui/macosx/intf.m:1702 modules/gui/macosx/playlist.m:439
 #: modules/gui/pda/pda_interface.c:260 modules/gui/pda/pda_interface.c:261
 #: modules/gui/qt4/menus.cpp:654 modules/gui/qt4/menus.cpp:658
 #: modules/gui/qt4/menus.cpp:661
@@ -552,7 +552,7 @@ msgstr "Spela upp"
 msgid "Fetch Information"
 msgstr "Hämta information"
 
-#: include/vlc_intf_strings.h:50 modules/gui/macosx/playlist.m:432
+#: include/vlc_intf_strings.h:50 modules/gui/macosx/playlist.m:440
 #: modules/gui/pda/pda_interface.c:1252
 #: modules/gui/qt4/dialogs/bookmarks.cpp:46
 #: modules/gui/qt4/ui/podcast_configuration.ui:59
@@ -560,7 +560,7 @@ msgstr "Hämta information"
 msgid "Delete"
 msgstr "Ta bort"
 
-#: include/vlc_intf_strings.h:51 modules/gui/macosx/playlist.m:435
+#: include/vlc_intf_strings.h:51 modules/gui/macosx/playlist.m:443
 msgid "Information..."
 msgstr "Information..."
 
@@ -597,7 +597,7 @@ msgid "No repeat"
 msgstr "Upprepa inte"
 
 #: include/vlc_intf_strings.h:64 src/libvlc-module.c:1320
-#: modules/gui/macosx/controls.m:919 modules/gui/macosx/intf.m:612
+#: modules/gui/macosx/controls.m:919 modules/gui/macosx/intf.m:680
 msgid "Random"
 msgstr "Slumpmässig"
 
@@ -823,8 +823,8 @@ msgid "Replay gain"
 msgstr "Uppspelningsförstärkning"
 
 #: src/audio_output/output.c:102 src/audio_output/output.c:129
-#: modules/access/vcdx/info.c:121 modules/gui/macosx/intf.m:631
-#: modules/gui/macosx/intf.m:632
+#: modules/access/vcdx/info.c:121 modules/gui/macosx/intf.m:699
+#: modules/gui/macosx/intf.m:700
 msgid "Audio Channels"
 msgstr "Ljudkanaler"
 
@@ -992,8 +992,8 @@ msgid "%s [%s %d]"
 msgstr "%s [%s %d]"
 
 #: src/input/es_out.c:672 src/input/es_out.c:674 src/input/var.c:158
-#: src/libvlc-module.c:593 modules/gui/macosx/intf.m:618
-#: modules/gui/macosx/intf.m:619
+#: src/libvlc-module.c:593 modules/gui/macosx/intf.m:686
+#: modules/gui/macosx/intf.m:687
 msgid "Program"
 msgstr "Program"
 
@@ -1019,7 +1019,7 @@ msgid "Stream %d"
 msgstr "Ström %d"
 
 #: src/input/es_out.c:2040 modules/gui/macosx/wizard.m:383
-#: modules/gui/qt4/ui/sout.ui:562 modules/gui/qt4/ui/sout.ui:641
+#: modules/gui/qt4/ui/sout.ui:594 modules/gui/qt4/ui/sout.ui:681
 msgid "Codec"
 msgstr "Kodek"
 
@@ -1036,7 +1036,7 @@ msgid "Type"
 msgstr "Typ"
 
 #: src/input/es_out.c:2054 modules/codec/faad.c:391
-#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/sout.ui:690
+#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/sout.ui:730
 msgid "Channels"
 msgstr "Kanaler"
 
@@ -1101,8 +1101,8 @@ msgstr ""
 "information."
 
 #: src/input/meta.c:52 src/input/var.c:168
-#: modules/gui/beos/MediaControlView.cpp:1237 modules/gui/macosx/intf.m:620
-#: modules/gui/macosx/intf.m:621 modules/gui/macosx/open.m:179
+#: modules/gui/beos/MediaControlView.cpp:1237 modules/gui/macosx/intf.m:688
+#: modules/gui/macosx/intf.m:689 modules/gui/macosx/open.m:179
 #: modules/gui/macosx/playlistinfo.m:72 modules/gui/macosx/wizard.m:348
 #: modules/gui/qt4/components/open_panels.cpp:309
 #: modules/gui/qt4/ui/open_disk.ui:200 modules/mux/asf.c:52
@@ -1110,7 +1110,7 @@ msgid "Title"
 msgstr "Titel"
 
 #: src/input/meta.c:53 modules/gui/macosx/playlistinfo.m:73
-#: modules/gui/macosx/playlist.m:1098
+#: modules/gui/macosx/playlist.m:1106
 msgid "Artist"
 msgstr "Artist"
 
@@ -1182,7 +1182,7 @@ msgid "Programs"
 msgstr "Program"
 
 #: src/input/var.c:173 modules/gui/beos/MediaControlView.cpp:1238
-#: modules/gui/macosx/intf.m:622 modules/gui/macosx/intf.m:623
+#: modules/gui/macosx/intf.m:690 modules/gui/macosx/intf.m:691
 #: modules/gui/macosx/open.m:180 modules/gui/qt4/ui/open_disk.ui:171
 msgid "Chapter"
 msgstr "Kapitel"
@@ -1192,18 +1192,18 @@ msgstr "Kapitel"
 msgid "Navigation"
 msgstr "Navigering"
 
-#: src/input/var.c:194 modules/gui/macosx/intf.m:646
-#: modules/gui/macosx/intf.m:647
+#: src/input/var.c:194 modules/gui/macosx/intf.m:714
+#: modules/gui/macosx/intf.m:715
 msgid "Video Track"
 msgstr "Videospår"
 
-#: src/input/var.c:199 modules/gui/macosx/intf.m:629
-#: modules/gui/macosx/intf.m:630
+#: src/input/var.c:199 modules/gui/macosx/intf.m:697
+#: modules/gui/macosx/intf.m:698
 msgid "Audio Track"
 msgstr "Ljudspår"
 
-#: src/input/var.c:204 modules/gui/macosx/intf.m:654
-#: modules/gui/macosx/intf.m:655
+#: src/input/var.c:204 modules/gui/macosx/intf.m:722
+#: modules/gui/macosx/intf.m:723
 msgid "Subtitles Track"
 msgstr "Undertextspår"
 
@@ -1243,13 +1243,13 @@ msgstr "Media: %s"
 #: src/interface/interaction.c:172 src/interface/interaction.c:280
 #: modules/demux/avi/avi.c:673 modules/gui/beos/InterfaceWindow.cpp:161
 #: modules/gui/macosx/bookmarks.m:104 modules/gui/macosx/controls.m:58
-#: modules/gui/macosx/interaction.m:128 modules/gui/macosx/interaction.m:132
-#: modules/gui/macosx/interaction.m:135 modules/gui/macosx/open.m:168
+#: modules/gui/macosx/interaction.m:129 modules/gui/macosx/interaction.m:133
+#: modules/gui/macosx/interaction.m:136 modules/gui/macosx/open.m:168
 #: modules/gui/macosx/prefs.m:126 modules/gui/macosx/prefs.m:147
 #: modules/gui/macosx/simple_prefs.m:232 modules/gui/macosx/simple_prefs.m:296
 #: modules/gui/macosx/simple_prefs.m:606 modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1140
-#: modules/gui/qt4/components/preferences_widgets.cpp:1287
+#: modules/gui/qt4/components/preferences_widgets.cpp:1289
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1257,24 +1257,25 @@ msgstr "Avbryt"
 #: modules/gui/macosx/bookmarks.m:103 modules/gui/macosx/bookmarks.m:217
 #: modules/gui/macosx/bookmarks.m:225 modules/gui/macosx/bookmarks.m:270
 #: modules/gui/macosx/bookmarks.m:278 modules/gui/macosx/controls.m:59
-#: modules/gui/macosx/extended.m:519 modules/gui/macosx/interaction.m:133
-#: modules/gui/macosx/interaction.m:134 modules/gui/macosx/interaction.m:174
-#: modules/gui/macosx/open.m:167 modules/gui/macosx/open.m:299
-#: modules/gui/macosx/output.m:138 modules/gui/macosx/playlistinfo.m:425
-#: modules/gui/macosx/simple_prefs.m:233 modules/gui/macosx/update.m:65
-#: modules/gui/macosx/wizard.m:599 modules/gui/macosx/wizard.m:663
-#: modules/gui/macosx/wizard.m:1055 modules/gui/macosx/wizard.m:1140
-#: modules/gui/macosx/wizard.m:1147 modules/gui/macosx/wizard.m:1676
-#: modules/gui/macosx/wizard.m:1684 modules/gui/macosx/wizard.m:1865
-#: modules/gui/macosx/wizard.m:1876 modules/gui/macosx/wizard.m:1889
+#: modules/gui/macosx/extended.m:519 modules/gui/macosx/interaction.m:134
+#: modules/gui/macosx/interaction.m:135 modules/gui/macosx/interaction.m:175
+#: modules/gui/macosx/intf.m:2107 modules/gui/macosx/open.m:167
+#: modules/gui/macosx/open.m:299 modules/gui/macosx/output.m:138
+#: modules/gui/macosx/playlistinfo.m:425 modules/gui/macosx/simple_prefs.m:233
+#: modules/gui/macosx/update.m:65 modules/gui/macosx/wizard.m:599
+#: modules/gui/macosx/wizard.m:663 modules/gui/macosx/wizard.m:1055
+#: modules/gui/macosx/wizard.m:1140 modules/gui/macosx/wizard.m:1147
+#: modules/gui/macosx/wizard.m:1676 modules/gui/macosx/wizard.m:1684
+#: modules/gui/macosx/wizard.m:1865 modules/gui/macosx/wizard.m:1876
+#: modules/gui/macosx/wizard.m:1889
 #: modules/gui/qt4/components/open_panels.cpp:1139
-#: modules/gui/qt4/components/preferences_widgets.cpp:1286
+#: modules/gui/qt4/components/preferences_widgets.cpp:1288
 #: modules/gui/qt4/main_interface.cpp:526
 msgid "OK"
 msgstr "OK"
 
-#: src/interface/interface.c:204 modules/gui/macosx/intf.m:580
-#: modules/gui/macosx/intf.m:581
+#: src/interface/interface.c:204 modules/gui/macosx/intf.m:648
+#: modules/gui/macosx/intf.m:649
 msgid "Add Interface"
 msgstr "Lägg till gränssnitt"
 
@@ -3573,8 +3574,8 @@ msgstr ""
 #: modules/gui/beos/VideoOutput.cpp:1058 modules/gui/macosx/controls.m:458
 #: modules/gui/macosx/controls.m:512 modules/gui/macosx/controls.m:961
 #: modules/gui/macosx/controls.m:992 modules/gui/macosx/embeddedwindow.m:50
-#: modules/gui/macosx/intf.m:566 modules/gui/macosx/intf.m:643
-#: modules/gui/macosx/intf.m:699 modules/gui/macosx/simple_prefs.m:282
+#: modules/gui/macosx/intf.m:634 modules/gui/macosx/intf.m:711
+#: modules/gui/macosx/intf.m:767 modules/gui/macosx/simple_prefs.m:282
 #: modules/gui/qt4/ui/sprefs_video.ui:61
 msgid "Fullscreen"
 msgstr "Helskärm"
@@ -3615,8 +3616,8 @@ msgstr "Spela endast"
 msgid "Select the hotkey to use to play."
 msgstr "Välj snabbtangent att använda för att spela upp."
 
-#: src/libvlc-module.c:1164 modules/control/hotkeys.c:699
-#: modules/gui/macosx/controls.m:891 modules/gui/macosx/intf.m:608
+#: src/libvlc-module.c:1164 modules/control/hotkeys.c:695
+#: modules/gui/macosx/controls.m:891 modules/gui/macosx/intf.m:676
 #: modules/gui/qt4/components/interface_widgets.cpp:439
 msgid "Faster"
 msgstr "Snabbare"
@@ -3625,8 +3626,8 @@ msgstr "Snabbare"
 msgid "Select the hotkey to use for fast forward playback."
 msgstr "Välj snabbtangent att använda för att spela upp snabbt."
 
-#: src/libvlc-module.c:1166 modules/control/hotkeys.c:705
-#: modules/gui/macosx/controls.m:892 modules/gui/macosx/intf.m:609
+#: src/libvlc-module.c:1166 modules/control/hotkeys.c:701
+#: modules/gui/macosx/controls.m:892 modules/gui/macosx/intf.m:677
 #: modules/gui/qt4/components/interface_widgets.cpp:433
 msgid "Slower"
 msgstr "Långsammare"
@@ -3635,10 +3636,10 @@ msgstr "Långsammare"
 msgid "Select the hotkey to use for slow motion playback."
 msgstr "Välj snabbtangent att använda för att spela upp långsamt."
 
-#: src/libvlc-module.c:1168 modules/control/hotkeys.c:682
+#: src/libvlc-module.c:1168 modules/control/hotkeys.c:678
 #: modules/gui/macosx/about.m:190 modules/gui/macosx/controls.m:912
-#: modules/gui/macosx/intf.m:565 modules/gui/macosx/intf.m:611
-#: modules/gui/macosx/intf.m:687 modules/gui/macosx/intf.m:695
+#: modules/gui/macosx/intf.m:633 modules/gui/macosx/intf.m:679
+#: modules/gui/macosx/intf.m:755 modules/gui/macosx/intf.m:763
 #: modules/gui/macosx/wizard.m:309 modules/gui/macosx/wizard.m:321
 #: modules/gui/macosx/wizard.m:1621 modules/gui/qt4/menus.cpp:668
 #: modules/gui/qt4/ui/streampanel.ui:108 modules/misc/notify/notify.c:305
@@ -3650,10 +3651,10 @@ msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
 "Välj snabbtangent att använda för att hoppa till nästa objekt i spellistan."
 
-#: src/libvlc-module.c:1170 modules/control/hotkeys.c:688
+#: src/libvlc-module.c:1170 modules/control/hotkeys.c:684
 #: modules/gui/macosx/about.m:191 modules/gui/macosx/controls.m:911
-#: modules/gui/macosx/intf.m:560 modules/gui/macosx/intf.m:610
-#: modules/gui/macosx/intf.m:688 modules/gui/macosx/intf.m:694
+#: modules/gui/macosx/intf.m:628 modules/gui/macosx/intf.m:678
+#: modules/gui/macosx/intf.m:756 modules/gui/macosx/intf.m:762
 #: modules/gui/qt4/menus.cpp:666 modules/misc/notify/notify.c:303
 msgid "Previous"
 msgstr "Föregående"
@@ -3665,9 +3666,9 @@ msgstr ""
 "spellistan."
 
 #: src/libvlc-module.c:1172 modules/control/rc.c:77
-#: modules/gui/macosx/controls.m:903 modules/gui/macosx/intf.m:563
-#: modules/gui/macosx/intf.m:607 modules/gui/macosx/intf.m:686
-#: modules/gui/macosx/intf.m:693 modules/gui/pda/pda_interface.c:272
+#: modules/gui/macosx/controls.m:903 modules/gui/macosx/intf.m:631
+#: modules/gui/macosx/intf.m:675 modules/gui/macosx/intf.m:754
+#: modules/gui/macosx/intf.m:761 modules/gui/pda/pda_interface.c:272
 #: modules/gui/pda/pda_interface.c:273 modules/gui/qt4/menus.cpp:664
 #: modules/gui/qt4/ui/streampanel.ui:101 modules/misc/notify/xosd.c:238
 msgid "Stop"
@@ -3679,7 +3680,7 @@ msgstr "Välj snabbtangent att använda för att stoppa uppspelning."
 
 #: src/libvlc-module.c:1174 modules/gui/fbosd.c:129 modules/gui/fbosd.c:197
 #: modules/gui/macosx/bookmarks.m:98 modules/gui/macosx/bookmarks.m:107
-#: modules/gui/macosx/embeddedwindow.m:52 modules/gui/macosx/intf.m:568
+#: modules/gui/macosx/embeddedwindow.m:52 modules/gui/macosx/intf.m:636
 #: modules/gui/qt4/ui/video_effects.ui:731 modules/video_filter/marq.c:153
 #: modules/video_filter/rss.c:197
 msgid "Position"
@@ -3787,7 +3788,7 @@ msgid "Long jump length, in seconds."
 msgstr "Lång hopplängd, i sekunder."
 
 #: src/libvlc-module.c:1212 modules/control/hotkeys.c:189
-#: modules/gui/beos/InterfaceWindow.cpp:277 modules/gui/macosx/intf.m:725
+#: modules/gui/beos/InterfaceWindow.cpp:277 modules/gui/macosx/intf.m:793
 #: modules/gui/qt4/menus.cpp:700
 msgid "Quit"
 msgstr "Avsluta"
@@ -3893,8 +3894,8 @@ msgid "Select the key to decrease audio volume."
 msgstr "Välj tangent för att sänka ljudvolymen."
 
 #: src/libvlc-module.c:1238 modules/access/v4l2/v4l2.c:195
-#: modules/gui/macosx/controls.m:951 modules/gui/macosx/intf.m:628
-#: modules/gui/macosx/intf.m:689 modules/gui/macosx/intf.m:698
+#: modules/gui/macosx/controls.m:951 modules/gui/macosx/intf.m:696
+#: modules/gui/macosx/intf.m:757 modules/gui/macosx/intf.m:766
 #: modules/gui/qt4/components/interface_widgets.cpp:798
 msgid "Mute"
 msgstr "Tyst"
@@ -4368,7 +4369,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1519 src/video_output/vout_intf.c:419
 #: modules/gui/macosx/controls.m:496 modules/gui/macosx/controls.m:960
-#: modules/gui/macosx/intf.m:645 modules/gui/macosx/intf.m:700
+#: modules/gui/macosx/intf.m:713 modules/gui/macosx/intf.m:768
 #: modules/video_output/snapshot.c:81
 msgid "Snapshot"
 msgstr "Skärmbild"
@@ -4383,7 +4384,7 @@ msgstr "Underbilder"
 
 #: src/libvlc-module.c:1594 modules/codec/subtitles/subsdec.c:117
 #: modules/demux/subtitle.c:74 modules/gui/beos/InterfaceWindow.cpp:280
-#: modules/gui/qt4/ui/sout.ui:717 modules/gui/qt4/ui/sout.ui:723
+#: modules/gui/qt4/ui/sout.ui:765 modules/gui/qt4/ui/sout.ui:771
 msgid "Subtitles"
 msgstr "Undertexter"
 
@@ -5133,8 +5134,8 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/video_output/video_output.c:389 modules/gui/macosx/intf.m:656
-#: modules/gui/macosx/intf.m:657 modules/video_filter/deinterlace.c:127
+#: src/video_output/video_output.c:389 modules/gui/macosx/intf.m:724
+#: modules/gui/macosx/intf.m:725 modules/video_filter/deinterlace.c:127
 msgid "Deinterlace"
 msgstr "Avfläta"
 
@@ -5158,15 +5159,15 @@ msgstr ""
 msgid "Linear"
 msgstr "Linjär"
 
-#: src/video_output/vout_intf.c:305 modules/gui/macosx/intf.m:650
-#: modules/gui/macosx/intf.m:651 modules/gui/qt4/ui/video_effects.ui:329
+#: src/video_output/vout_intf.c:305 modules/gui/macosx/intf.m:718
+#: modules/gui/macosx/intf.m:719 modules/gui/qt4/ui/video_effects.ui:329
 #: modules/video_filter/crop.c:105 modules/video_filter/croppadd.c:83
 #: modules/video_output/x11/xvmc.c:133
 msgid "Crop"
 msgstr "Beskär"
 
-#: src/video_output/vout_intf.c:369 modules/gui/macosx/intf.m:648
-#: modules/gui/macosx/intf.m:649
+#: src/video_output/vout_intf.c:369 modules/gui/macosx/intf.m:716
+#: modules/gui/macosx/intf.m:717
 msgid "Aspect-ratio"
 msgstr "Bildförhållande"
 
@@ -7130,7 +7131,7 @@ msgid "Bitmask that will get used by the audio part of the card."
 msgstr ""
 
 #: modules/access/pvr.c:110 modules/access/v4l2/v4l2.c:189
-#: modules/access/vcdx/info.c:100 modules/gui/macosx/intf.m:567
+#: modules/access/vcdx/info.c:100 modules/gui/macosx/intf.m:635
 msgid "Volume"
 msgstr "Volym"
 
@@ -7945,7 +7946,7 @@ msgstr "Segment"
 
 #: modules/access/vcdx/access.c:433 modules/access/vcdx/access.c:715
 #: modules/access/vcdx/info.c:298 modules/access/vcdx/info.c:299
-#: modules/demux/mkv.cpp:5433
+#: modules/demux/mkv.cpp:5461
 msgid "Segment"
 msgstr "Segment"
 
@@ -8547,8 +8548,8 @@ msgstr "ALSA-enhetsnamn"
 #: modules/audio_output/auhal.c:968 modules/audio_output/directx.c:421
 #: modules/audio_output/oss.c:134 modules/audio_output/portaudio.c:393
 #: modules/audio_output/sdl.c:179 modules/audio_output/sdl.c:197
-#: modules/audio_output/waveout.c:462 modules/gui/macosx/intf.m:633
-#: modules/gui/macosx/intf.m:634
+#: modules/audio_output/waveout.c:462 modules/gui/macosx/intf.m:701
+#: modules/gui/macosx/intf.m:702
 msgid "Audio Device"
 msgstr "Ljudenhet"
 
@@ -8765,16 +8766,16 @@ msgstr "Portaudio-identifierare för utmatningsenheten"
 msgid "PORTAUDIO audio output"
 msgstr "PORTAUDIO-ljudutmatning"
 
-#: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:557
-#: modules/gui/macosx/intf.m:1524 modules/gui/pda/pda_interface.c:210
+#: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:625
+#: modules/gui/macosx/intf.m:1615 modules/gui/pda/pda_interface.c:210
 #: modules/gui/pda/pda_interface.c:1353 modules/gui/qt4/main_interface.cpp:361
 #: modules/gui/qt4/main_interface.cpp:365
-#: modules/gui/qt4/main_interface.cpp:956
-#: modules/gui/qt4/main_interface.cpp:958
-#: modules/gui/qt4/main_interface.cpp:1022
-#: modules/gui/qt4/main_interface.cpp:1037
-#: modules/gui/qt4/main_interface.cpp:1044
-#: modules/gui/qt4/main_interface.cpp:1061
+#: modules/gui/qt4/main_interface.cpp:957
+#: modules/gui/qt4/main_interface.cpp:959
+#: modules/gui/qt4/main_interface.cpp:1023
+#: modules/gui/qt4/main_interface.cpp:1038
+#: modules/gui/qt4/main_interface.cpp:1045
+#: modules/gui/qt4/main_interface.cpp:1062
 msgid "VLC media player"
 msgstr "Mediaspelaren VLC"
 
@@ -10638,7 +10639,7 @@ msgid "Define playlist bookmarks."
 msgstr "Definiera spellistbokmärken."
 
 #: modules/control/hotkeys.c:97 modules/gui/macosx/simple_prefs.m:188
-#: modules/gui/qt4/components/simple_preferences.cpp:82
+#: modules/gui/qt4/components/simple_preferences.cpp:84
 msgid "Hotkeys"
 msgstr "Snabbtangenter"
 
@@ -10651,51 +10652,51 @@ msgstr "Hanteringsgränssnitt för snabbtangenter"
 msgid "Audio Device: %s"
 msgstr "Ljudenhet: %s"
 
-#: modules/control/hotkeys.c:501
+#: modules/control/hotkeys.c:497
 #, c-format
 msgid "Audio track: %s"
 msgstr "Ljudspår: %s"
 
-#: modules/control/hotkeys.c:516 modules/control/hotkeys.c:545
+#: modules/control/hotkeys.c:512 modules/control/hotkeys.c:541
 #, c-format
 msgid "Subtitle track: %s"
 msgstr "Undertextspår: %s"
 
-#: modules/control/hotkeys.c:516
+#: modules/control/hotkeys.c:512
 msgid "N/A"
 msgstr "-"
 
-#: modules/control/hotkeys.c:569
+#: modules/control/hotkeys.c:565
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Bildförhållande: %s"
 
-#: modules/control/hotkeys.c:597
+#: modules/control/hotkeys.c:593
 #, c-format
 msgid "Crop: %s"
 msgstr "Beskär: %s"
 
-#: modules/control/hotkeys.c:625
+#: modules/control/hotkeys.c:621
 #, c-format
 msgid "Deinterlace mode: %s"
 msgstr "Avflätningsläge: %s"
 
-#: modules/control/hotkeys.c:657
+#: modules/control/hotkeys.c:653
 #, c-format
 msgid "Zoom mode: %s"
 msgstr "Zoomläge: %s"
 
-#: modules/control/hotkeys.c:740 modules/control/hotkeys.c:750
+#: modules/control/hotkeys.c:736 modules/control/hotkeys.c:746
 #, c-format
 msgid "Subtitle delay %i ms"
 msgstr "Undertextfördröjning %i ms"
 
-#: modules/control/hotkeys.c:760 modules/control/hotkeys.c:770
+#: modules/control/hotkeys.c:756 modules/control/hotkeys.c:766
 #, c-format
 msgid "Audio delay %i ms"
 msgstr "Ljudfördröjning %i ms"
 
-#: modules/control/hotkeys.c:1017
+#: modules/control/hotkeys.c:1013
 #, c-format
 msgid "Volume %d%%"
 msgstr "Volym %d%%"
@@ -10895,8 +10896,8 @@ msgid "Buffer"
 msgstr "Buffert"
 
 #: modules/control/rc.c:76 modules/gui/macosx/embeddedwindow.m:135
-#: modules/gui/macosx/intf.m:1598 modules/gui/macosx/intf.m:1599
-#: modules/gui/macosx/intf.m:1600 modules/gui/macosx/intf.m:1601
+#: modules/gui/macosx/intf.m:1689 modules/gui/macosx/intf.m:1690
+#: modules/gui/macosx/intf.m:1691 modules/gui/macosx/intf.m:1692
 #: modules/gui/pda/pda_interface.c:248 modules/gui/pda/pda_interface.c:249
 #: modules/gui/qt4/menus.cpp:651 modules/misc/notify/xosd.c:243
 msgid "Pause"
@@ -10915,7 +10916,7 @@ msgstr "Bakåt"
 msgid "End"
 msgstr "Slut"
 
-#: modules/control/rc.c:81 modules/gui/macosx/interaction.m:139
+#: modules/control/rc.c:81 modules/gui/macosx/interaction.m:140
 msgid "Error"
 msgstr "Fel"
 
@@ -11458,7 +11459,7 @@ msgstr ""
 
 #: modules/control/telnet.c:83 modules/gui/macosx/open.m:189
 #: modules/gui/macosx/open.m:191 modules/gui/macosx/output.m:147
-#: modules/gui/qt4/ui/open_net.ui:75 modules/gui/qt4/ui/sout.ui:303
+#: modules/gui/qt4/ui/open_net.ui:75 modules/gui/qt4/ui/sout.ui:316
 #: modules/stream_out/rtp.c:108
 msgid "Port"
 msgstr "Port"
@@ -11728,65 +11729,65 @@ msgstr ""
 msgid "M-JPEG camera demuxer"
 msgstr "Demuxer för M-JPEG-kamera"
 
-#: modules/demux/mkv.cpp:408
+#: modules/demux/mkv.cpp:124
 msgid "Matroska stream demuxer"
 msgstr "Demuxer för Matroska-ström"
 
-#: modules/demux/mkv.cpp:415
+#: modules/demux/mkv.cpp:131
 msgid "Ordered chapters"
 msgstr "Sorterade kapitel"
 
-#: modules/demux/mkv.cpp:416
+#: modules/demux/mkv.cpp:132
 msgid "Play ordered chapters as specified in the segment."
 msgstr "Spela upp sorterade kapitel som angivna i segmentet."
 
-#: modules/demux/mkv.cpp:419
+#: modules/demux/mkv.cpp:135
 msgid "Chapter codecs"
 msgstr "Kapitelkodekar"
 
-#: modules/demux/mkv.cpp:420
+#: modules/demux/mkv.cpp:136
 msgid "Use chapter codecs found in the segment."
 msgstr "Använd kapitelkodekar som hittas i segmentet."
 
-#: modules/demux/mkv.cpp:423
+#: modules/demux/mkv.cpp:139
 msgid "Preload Directory"
 msgstr "Förinläsningskatalog"
 
-#: modules/demux/mkv.cpp:424
+#: modules/demux/mkv.cpp:140
 msgid ""
 "Preload matroska files from the same family in the same directory (not good "
 "for broken files)."
 msgstr ""
 
-#: modules/demux/mkv.cpp:427
+#: modules/demux/mkv.cpp:143
 msgid "Seek based on percent not time"
 msgstr "Sökning baserad på procent, inte tid"
 
-#: modules/demux/mkv.cpp:428
+#: modules/demux/mkv.cpp:144
 msgid "Seek based on percent not time."
 msgstr "Sökning baserad på procent, inte tid."
 
-#: modules/demux/mkv.cpp:431
+#: modules/demux/mkv.cpp:147
 msgid "Dummy Elements"
 msgstr "Dummyelement"
 
-#: modules/demux/mkv.cpp:432
+#: modules/demux/mkv.cpp:148
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr "Läs och förkasta okända EBML-element (inte bra för trasiga filer)."
 
-#: modules/demux/mkv.cpp:3365
+#: modules/demux/mkv.cpp:3384
 msgid "---  DVD Menu"
 msgstr "---  DVD-meny"
 
-#: modules/demux/mkv.cpp:3371
+#: modules/demux/mkv.cpp:3390
 msgid "First Played"
 msgstr "Först spelad"
 
-#: modules/demux/mkv.cpp:3373
+#: modules/demux/mkv.cpp:3392
 msgid "Video Manager"
 msgstr "Videohanterare"
 
-#: modules/demux/mkv.cpp:3379
+#: modules/demux/mkv.cpp:3398
 msgid "----- Title"
 msgstr "----- Titel"
 
@@ -12448,7 +12449,7 @@ msgid "Preferences"
 msgstr "Inställningar"
 
 #: modules/gui/beos/InterfaceWindow.cpp:238
-#: modules/gui/beos/InterfaceWindow.cpp:329 modules/gui/macosx/intf.m:572
+#: modules/gui/beos/InterfaceWindow.cpp:329 modules/gui/macosx/intf.m:640
 #: modules/gui/qt4/dialogs/messages.cpp:48
 #: modules/gui/qt4/dialogs/messages.cpp:66
 msgid "Messages"
@@ -12497,7 +12498,7 @@ msgstr "Gå till kapitel"
 msgid "Speed"
 msgstr "Hastighet"
 
-#: modules/gui/beos/InterfaceWindow.cpp:324 modules/gui/macosx/intf.m:661
+#: modules/gui/beos/InterfaceWindow.cpp:324 modules/gui/macosx/intf.m:729
 msgid "Window"
 msgstr "Fönster"
 
@@ -12522,12 +12523,12 @@ msgid "Close"
 msgstr "Stäng"
 
 #: modules/gui/beos/PlayListWindow.cpp:104 modules/gui/macosx/bookmarks.m:92
-#: modules/gui/macosx/intf.m:598
+#: modules/gui/macosx/intf.m:666
 msgid "Edit"
 msgstr "Redigera"
 
-#: modules/gui/beos/PlayListWindow.cpp:106 modules/gui/macosx/intf.m:603
-#: modules/gui/macosx/playlist.m:434
+#: modules/gui/beos/PlayListWindow.cpp:106 modules/gui/macosx/intf.m:671
+#: modules/gui/macosx/playlist.m:442
 msgid "Select All"
 msgstr "Markera allt"
 
@@ -12577,7 +12578,7 @@ msgid "Apply"
 msgstr "Tillämpa"
 
 #: modules/gui/beos/PreferencesWindow.cpp:257 modules/gui/macosx/output.m:526
-#: modules/gui/macosx/playlist.m:670 modules/gui/macosx/prefs.m:125
+#: modules/gui/macosx/playlist.m:678 modules/gui/macosx/prefs.m:125
 #: modules/gui/macosx/simple_prefs.m:298 modules/gui/qt4/ui/vlm.ui:209
 msgid "Save"
 msgstr "Spara"
@@ -12877,7 +12878,7 @@ msgstr "Kommandon"
 msgid "GNU/Linux osd/overlay framebuffer interface"
 msgstr "Videoutmatning med GNU/Linux-konsollens framebuffer"
 
-#: modules/gui/macosx/about.m:86 modules/gui/macosx/intf.m:576
+#: modules/gui/macosx/about.m:86 modules/gui/macosx/intf.m:644
 msgid "About VLC media player"
 msgstr "Om Mediaspelaren VLC"
 
@@ -12896,7 +12897,7 @@ msgid "VLC was brought to you by:"
 msgstr "VLC skapades för dig av:"
 
 #: modules/gui/macosx/about.m:113 modules/gui/macosx/about.m:176
-#: modules/gui/macosx/intf.m:678 modules/gui/qt4/dialogs/help.cpp:169
+#: modules/gui/macosx/intf.m:746 modules/gui/qt4/dialogs/help.cpp:169
 msgid "License"
 msgstr "Licens"
 
@@ -12918,10 +12919,10 @@ msgstr "Bokmärken"
 msgid "Add"
 msgstr "Lägg till"
 
-#: modules/gui/macosx/bookmarks.m:91 modules/gui/macosx/intf.m:602
+#: modules/gui/macosx/bookmarks.m:91 modules/gui/macosx/intf.m:670
 #: modules/gui/macosx/simple_prefs.m:234
 #: modules/gui/qt4/components/playlist/standardpanel.cpp:162
-#: modules/gui/qt4/components/preferences_widgets.cpp:1126
+#: modules/gui/qt4/components/preferences_widgets.cpp:1128
 #: modules/gui/qt4/dialogs/bookmarks.cpp:48 modules/gui/qt4/ui/vlm.ui:202
 msgid "Clear"
 msgstr "Töm"
@@ -12936,7 +12937,7 @@ msgstr "Extrahera"
 msgid "Time"
 msgstr "Tid"
 
-#: modules/gui/macosx/bookmarks.m:131 modules/gui/macosx/playlist.m:666
+#: modules/gui/macosx/bookmarks.m:131 modules/gui/macosx/playlist.m:674
 msgid "Untitled"
 msgstr "Namnlös"
 
@@ -12999,12 +13000,12 @@ msgid "Random Off"
 msgstr "Slumpmässig av"
 
 #: modules/gui/macosx/controls.m:282 modules/gui/macosx/controls.m:342
-#: modules/gui/macosx/controls.m:926 modules/gui/macosx/intf.m:613
+#: modules/gui/macosx/controls.m:926 modules/gui/macosx/intf.m:681
 msgid "Repeat One"
 msgstr "Repetera en gång"
 
 #: modules/gui/macosx/controls.m:298 modules/gui/macosx/controls.m:371
-#: modules/gui/macosx/controls.m:933 modules/gui/macosx/intf.m:614
+#: modules/gui/macosx/controls.m:933 modules/gui/macosx/intf.m:682
 msgid "Repeat All"
 msgstr "Upprepa alla"
 
@@ -13014,44 +13015,44 @@ msgid "Repeat Off"
 msgstr "Upprepning av"
 
 #: modules/gui/macosx/controls.m:482 modules/gui/macosx/controls.m:956
-#: modules/gui/macosx/intf.m:639
+#: modules/gui/macosx/intf.m:707
 msgid "Half Size"
 msgstr "Halv storlek"
 
 #: modules/gui/macosx/controls.m:484 modules/gui/macosx/controls.m:957
-#: modules/gui/macosx/intf.m:640
+#: modules/gui/macosx/intf.m:708
 msgid "Normal Size"
 msgstr "Normal storlek"
 
 #: modules/gui/macosx/controls.m:486 modules/gui/macosx/controls.m:958
-#: modules/gui/macosx/intf.m:641
+#: modules/gui/macosx/intf.m:709
 msgid "Double Size"
 msgstr "Dubbel storlek"
 
 #: modules/gui/macosx/controls.m:488 modules/gui/macosx/controls.m:962
-#: modules/gui/macosx/controls.m:973 modules/gui/macosx/intf.m:644
+#: modules/gui/macosx/controls.m:973 modules/gui/macosx/intf.m:712
 msgid "Float on Top"
 msgstr "Flyt överst"
 
 #: modules/gui/macosx/controls.m:490 modules/gui/macosx/controls.m:959
-#: modules/gui/macosx/intf.m:642
+#: modules/gui/macosx/intf.m:710
 msgid "Fit to Screen"
 msgstr "Anpassa till skärm"
 
-#: modules/gui/macosx/controls.m:940 modules/gui/macosx/intf.m:615
+#: modules/gui/macosx/controls.m:940 modules/gui/macosx/intf.m:683
 msgid "Step Forward"
 msgstr "Stega framåt"
 
-#: modules/gui/macosx/controls.m:941 modules/gui/macosx/intf.m:616
+#: modules/gui/macosx/controls.m:941 modules/gui/macosx/intf.m:684
 msgid "Step Backward"
 msgstr "Stega bakåt"
 
-#: modules/gui/macosx/embeddedwindow.m:48 modules/gui/macosx/intf.m:561
+#: modules/gui/macosx/embeddedwindow.m:48 modules/gui/macosx/intf.m:629
 #: modules/gui/pda/pda_interface.c:236 modules/gui/pda/pda_interface.c:237
 msgid "Rewind"
 msgstr "Snabbt bakåt"
 
-#: modules/gui/macosx/embeddedwindow.m:49 modules/gui/macosx/intf.m:564
+#: modules/gui/macosx/embeddedwindow.m:49 modules/gui/macosx/intf.m:632
 msgid "Fast Forward"
 msgstr "Snabbt framåt"
 
@@ -13205,245 +13206,290 @@ msgid ""
 "can be set in the Preferences, Video / Filters section."
 msgstr ""
 
-#: modules/gui/macosx/fspanel.m:389
+#: modules/gui/macosx/fspanel.m:406
 msgid "(no item is being played)"
 msgstr "(inget objekt spelas upp)"
 
-#: modules/gui/macosx/interaction.m:130
+#: modules/gui/macosx/interaction.m:131
 msgid "Login:"
 msgstr "Inloggning:"
 
-#: modules/gui/macosx/interaction.m:131
+#: modules/gui/macosx/interaction.m:132
 msgid "Password:"
 msgstr "Lösenord:"
 
-#: modules/gui/macosx/interaction.m:219 modules/gui/macosx/interaction.m:285
+#: modules/gui/macosx/interaction.m:220 modules/gui/macosx/interaction.m:286
 #, c-format
 msgid "Remaining time: %i seconds"
 msgstr "Återstående tid: %i sekunder"
 
-#: modules/gui/macosx/interaction.m:398
+#: modules/gui/macosx/interaction.m:399
 msgid "Errors and Warnings"
 msgstr "Fel och varningar"
 
-#: modules/gui/macosx/interaction.m:399
+#: modules/gui/macosx/interaction.m:400
 msgid "Clean up"
 msgstr "Rensa upp"
 
-#: modules/gui/macosx/interaction.m:400
+#: modules/gui/macosx/interaction.m:401
 msgid "Show Details"
 msgstr "Visa detaljer"
 
-#: modules/gui/macosx/intf.m:556
-msgid "VLC - Controller"
-msgstr "VLC - Kontroller"
+#: modules/gui/macosx/intf.m:624
+#, fuzzy
+msgid "VLC"
+msgstr "VLM"
 
-#: modules/gui/macosx/intf.m:573
+#: modules/gui/macosx/intf.m:641
 msgid "Open CrashLog..."
 msgstr "Öppna kraschlogg..."
 
-#: modules/gui/macosx/intf.m:578
+#: modules/gui/macosx/intf.m:646
 msgid "Check for Update..."
 msgstr "Leta efter uppdatering..."
 
-#: modules/gui/macosx/intf.m:579
+#: modules/gui/macosx/intf.m:647
 msgid "Preferences..."
 msgstr "Inställningar..."
 
-#: modules/gui/macosx/intf.m:582
+#: modules/gui/macosx/intf.m:650
 msgid "Services"
 msgstr "Tjänster"
 
-#: modules/gui/macosx/intf.m:583
+#: modules/gui/macosx/intf.m:651
 msgid "Hide VLC"
 msgstr "Dölj VLC"
 
-#: modules/gui/macosx/intf.m:584
+#: modules/gui/macosx/intf.m:652
 msgid "Hide Others"
 msgstr "Dölj andra"
 
-#: modules/gui/macosx/intf.m:585
+#: modules/gui/macosx/intf.m:653
 msgid "Show All"
 msgstr "Visa alla"
 
-#: modules/gui/macosx/intf.m:586
+#: modules/gui/macosx/intf.m:654
 msgid "Quit VLC"
 msgstr "Avsluta VLC"
 
-#: modules/gui/macosx/intf.m:588
+#: modules/gui/macosx/intf.m:656
 msgid "1:File"
 msgstr "1:Fil"
 
-#: modules/gui/macosx/intf.m:589
+#: modules/gui/macosx/intf.m:657
 msgid "Open File..."
 msgstr "Öppna fil..."
 
-#: modules/gui/macosx/intf.m:590
+#: modules/gui/macosx/intf.m:658
 msgid "Quick Open File..."
 msgstr "Snabböppna fil..."
 
-#: modules/gui/macosx/intf.m:591
+#: modules/gui/macosx/intf.m:659
 msgid "Open Disc..."
 msgstr "Öppna skiva..."
 
-#: modules/gui/macosx/intf.m:592
+#: modules/gui/macosx/intf.m:660
 msgid "Open Network..."
 msgstr "Öppna nätverk..."
 
-#: modules/gui/macosx/intf.m:593
+#: modules/gui/macosx/intf.m:661
 msgid "Open Capture Device..."
 msgstr "Öppna fångstenhet..."
 
-#: modules/gui/macosx/intf.m:594
+#: modules/gui/macosx/intf.m:662
 msgid "Open Recent"
 msgstr "Öppna tidigare"
 
-#: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:2176
+#: modules/gui/macosx/intf.m:663 modules/gui/macosx/intf.m:2393
 msgid "Clear Menu"
 msgstr "Töm meny"
 
-#: modules/gui/macosx/intf.m:596
+#: modules/gui/macosx/intf.m:664
 msgid "Streaming/Exporting Wizard..."
 msgstr "Strömning/Exporteringsguide..."
 
-#: modules/gui/macosx/intf.m:599
+#: modules/gui/macosx/intf.m:667
 msgid "Cut"
 msgstr "Klipp ut"
 
-#: modules/gui/macosx/intf.m:600
+#: modules/gui/macosx/intf.m:668
 msgid "Copy"
 msgstr "Kopiera"
 
-#: modules/gui/macosx/intf.m:601
+#: modules/gui/macosx/intf.m:669
 msgid "Paste"
 msgstr "Klistra in"
 
-#: modules/gui/macosx/intf.m:605
+#: modules/gui/macosx/intf.m:673
 msgid "Playback"
 msgstr "Uppspelning"
 
-#: modules/gui/macosx/intf.m:626 modules/gui/macosx/intf.m:696
+#: modules/gui/macosx/intf.m:694 modules/gui/macosx/intf.m:764
 msgid "Volume Up"
 msgstr "Volym upp"
 
-#: modules/gui/macosx/intf.m:627 modules/gui/macosx/intf.m:697
+#: modules/gui/macosx/intf.m:695 modules/gui/macosx/intf.m:765
 msgid "Volume Down"
 msgstr "Volym ned"
 
-#: modules/gui/macosx/intf.m:652 modules/gui/macosx/intf.m:653
+#: modules/gui/macosx/intf.m:720 modules/gui/macosx/intf.m:721
 #: modules/gui/macosx/simple_prefs.m:279 modules/gui/macosx/vout.m:197
 msgid "Fullscreen Video Device"
 msgstr "Enhet för helskärmsvideo"
 
-#: modules/gui/macosx/intf.m:658 modules/gui/macosx/intf.m:659
+#: modules/gui/macosx/intf.m:726 modules/gui/macosx/intf.m:727
 #: modules/video_filter/postproc.c:186
 msgid "Post processing"
 msgstr "Efterbehandling"
 
-#: modules/gui/macosx/intf.m:662
+#: modules/gui/macosx/intf.m:730
 msgid "Minimize Window"
 msgstr "Minimera fönster"
 
-#: modules/gui/macosx/intf.m:663
+#: modules/gui/macosx/intf.m:731
 msgid "Close Window"
 msgstr "Stäng fönster"
 
-#: modules/gui/macosx/intf.m:664
+#: modules/gui/macosx/intf.m:732
 msgid "Controller..."
 msgstr "Kontroller..."
 
-#: modules/gui/macosx/intf.m:665
+#: modules/gui/macosx/intf.m:733
 msgid "Equalizer..."
 msgstr "Equalizer..."
 
-#: modules/gui/macosx/intf.m:666
+#: modules/gui/macosx/intf.m:734
 msgid "Extended Controls..."
 msgstr "Utökade kontroller..."
 
-#: modules/gui/macosx/intf.m:667
+#: modules/gui/macosx/intf.m:735
 msgid "Bookmarks..."
 msgstr "Bokmärken..."
 
-#: modules/gui/macosx/intf.m:668
+#: modules/gui/macosx/intf.m:736
 msgid "Playlist..."
 msgstr "Spellista..."
 
-#: modules/gui/macosx/intf.m:669
+#: modules/gui/macosx/intf.m:737
 msgid "Media Information..."
 msgstr "Mediainformation..."
 
-#: modules/gui/macosx/intf.m:670
+#: modules/gui/macosx/intf.m:738
 msgid "Messages..."
 msgstr "Meddelanden..."
 
-#: modules/gui/macosx/intf.m:671
+#: modules/gui/macosx/intf.m:739
 msgid "Errors and Warnings..."
 msgstr "Fel och varningar..."
 
-#: modules/gui/macosx/intf.m:673
+#: modules/gui/macosx/intf.m:741
 msgid "Bring All to Front"
 msgstr "Ta fram alla"
 
-#: modules/gui/macosx/intf.m:675 modules/gui/qt4/dialogs/help.cpp:58
+#: modules/gui/macosx/intf.m:743 modules/gui/qt4/dialogs/help.cpp:58
 #: modules/gui/qt4/menus.cpp:696
 msgid "Help"
 msgstr "Hjälp"
 
-#: modules/gui/macosx/intf.m:676
+#: modules/gui/macosx/intf.m:744
 msgid "VLC media player Help..."
 msgstr "Hjälp för Mediaspelaren VLC..."
 
-#: modules/gui/macosx/intf.m:677
+#: modules/gui/macosx/intf.m:745
 msgid "ReadMe / FAQ..."
 msgstr "LäsMig / Frågor och svar..."
 
-#: modules/gui/macosx/intf.m:679
+#: modules/gui/macosx/intf.m:747
 msgid "Online Documentation..."
 msgstr "Onlinedokumentation..."
 
-#: modules/gui/macosx/intf.m:680
+#: modules/gui/macosx/intf.m:748
 msgid "VideoLAN Website..."
 msgstr "VideoLAN:s webbplats..."
 
-#: modules/gui/macosx/intf.m:681
+#: modules/gui/macosx/intf.m:749
 msgid "Make a donation..."
 msgstr "Donera..."
 
-#: modules/gui/macosx/intf.m:682
+#: modules/gui/macosx/intf.m:750
 msgid "Online Forum..."
 msgstr "Onlineforum..."
 
-#: modules/gui/macosx/intf.m:724
+#: modules/gui/macosx/intf.m:792
 msgid "Your version of Mac OS X is not supported"
 msgstr "Din version av Mac OS X stöds inte"
 
-#: modules/gui/macosx/intf.m:728
+#: modules/gui/macosx/intf.m:796
 msgid "VLC media player requires Mac OS X 10.4 or higher."
 msgstr "Mediaspelaren VLC kräver Mac OS X 10.4 eller senare."
 
-#: modules/gui/macosx/intf.m:1365
+#: modules/gui/macosx/intf.m:1456
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Volym: %d%%"
 
-#: modules/gui/macosx/intf.m:1939
+#: modules/gui/macosx/intf.m:2030
 msgid "Update check failed"
 msgstr "Uppdateringskontroll misslyckades"
 
-#: modules/gui/macosx/intf.m:1939
+#: modules/gui/macosx/intf.m:2030
 msgid "Checking for updates was not enabled in this build."
 msgstr "Uppdateringskontroll var inte aktiverad i detta bygge."
 
-#: modules/gui/macosx/intf.m:2005
+#: modules/gui/macosx/intf.m:2101
+msgid "Crash Report (Type Command-shift-D and hit send)"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2102
+msgid ""
+"Type Command-shift-D (or in Menu \"Message\">\"Send Again\") and hit the "
+"\"Send Mail\" button."
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2107
+msgid "Error when generating crash report mail."
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2107
+msgid "Can't prepare crash log mail"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2187
+msgid "VLC has previously crashed"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2188
+msgid ""
+"VLC has previously crashed, do you want to send an email with the crash to "
+"VLC's team?"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2189
+#, fuzzy
+msgid "Send"
+msgstr "slut"
+
+#: modules/gui/macosx/intf.m:2189
+#, fuzzy
+msgid "Don't Send"
+msgstr "Reparera inte"
+
+#: modules/gui/macosx/intf.m:2192
+msgid ""
+"<Explain here what you were doing when VLC crashed, with possibly a link to "
+"the failing video>"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:2205
 msgid "No CrashLog found"
 msgstr "Ingen kraschlogg hittad"
 
-#: modules/gui/macosx/intf.m:2005 modules/gui/macosx/prefs.m:148
+#: modules/gui/macosx/intf.m:2205 modules/gui/macosx/prefs.m:148
 #: modules/gui/macosx/simple_prefs.m:607
 msgid "Continue"
 msgstr "Fortsätt"
 
-#: modules/gui/macosx/intf.m:2005
+#: modules/gui/macosx/intf.m:2205
 msgid "Couldn't find any trace of a previous crash."
 msgstr "Kunde inte hitta några spår efter en tidigare krasch."
 
@@ -13569,7 +13615,7 @@ msgstr "Fånga"
 #: modules/gui/macosx/prefs_widgets.m:1174
 #: modules/gui/macosx/simple_prefs.m:267 modules/gui/macosx/simple_prefs.m:287
 #: modules/gui/qt4/components/preferences_widgets.cpp:257
-#: modules/gui/qt4/components/simple_preferences.cpp:236
+#: modules/gui/qt4/components/simple_preferences.cpp:238
 #: modules/gui/qt4/ui/open_disk.ui:141 modules/gui/qt4/ui/open_file.ui:181
 #: modules/gui/qt4/ui/open.ui:168 modules/gui/qt4/ui/sout.ui:77
 #: modules/gui/qt4/ui/sprefs_audio.ui:237
@@ -13600,7 +13646,7 @@ msgstr "Dvd"
 #: modules/gui/macosx/open.m:190 modules/gui/macosx/output.m:146
 #: modules/gui/qt4/ui/open_net.ui:65 modules/gui/qt4/ui/sout.ui:104
 #: modules/gui/qt4/ui/sout.ui:169 modules/gui/qt4/ui/sout.ui:231
-#: modules/gui/qt4/ui/sout.ui:293 modules/gui/qt4/ui/sout.ui:348
+#: modules/gui/qt4/ui/sout.ui:299 modules/gui/qt4/ui/sout.ui:364
 msgid "Address"
 msgstr "Adress"
 
@@ -13770,12 +13816,12 @@ msgid "Transcoding options"
 msgstr "Omkodningsalternativ"
 
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
-#: modules/gui/macosx/wizard.m:382 modules/gui/qt4/ui/sout.ui:572
-#: modules/gui/qt4/ui/sout.ui:658
+#: modules/gui/macosx/wizard.m:382 modules/gui/qt4/ui/sout.ui:604
+#: modules/gui/qt4/ui/sout.ui:698
 msgid "Bitrate (kb/s)"
 msgstr "Bitfrekvens (kb/s)"
 
-#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/sout.ui:607
+#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/sout.ui:639
 msgid "Scale"
 msgstr "Skala"
 
@@ -13783,7 +13829,7 @@ msgstr "Skala"
 msgid "Stream Announcing"
 msgstr "Strömannonsering"
 
-#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.ui:769
+#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.ui:817
 msgid "SAP announce"
 msgstr "SAP-annonsering"
 
@@ -13912,78 +13958,78 @@ msgstr "Information"
 msgid "Author"
 msgstr "Upphovsman"
 
-#: modules/gui/macosx/playlist.m:430
+#: modules/gui/macosx/playlist.m:438
 msgid "Save Playlist..."
 msgstr "Spara spellista..."
 
-#: modules/gui/macosx/playlist.m:433
+#: modules/gui/macosx/playlist.m:441
 msgid "Expand Node"
 msgstr "Expandera nod"
 
-#: modules/gui/macosx/playlist.m:436
+#: modules/gui/macosx/playlist.m:444
 msgid "Fetch Meta Data"
 msgstr "Hämta metadata"
 
-#: modules/gui/macosx/playlist.m:437
+#: modules/gui/macosx/playlist.m:445
 msgid "Sort Node by Name"
 msgstr "Sortera nod efter namn"
 
-#: modules/gui/macosx/playlist.m:438
+#: modules/gui/macosx/playlist.m:446
 msgid "Sort Node by Author"
 msgstr "Sortera nod efter upphovsman"
 
-#: modules/gui/macosx/playlist.m:440 modules/gui/macosx/playlist.m:478
-#: modules/gui/macosx/playlist.m:1385
+#: modules/gui/macosx/playlist.m:448 modules/gui/macosx/playlist.m:486
+#: modules/gui/macosx/playlist.m:1394
 msgid "No items in the playlist"
 msgstr "Inga objekt i spellistan"
 
-#: modules/gui/macosx/playlist.m:442
+#: modules/gui/macosx/playlist.m:450
 msgid "Search in Playlist"
 msgstr "Sök i spellista"
 
-#: modules/gui/macosx/playlist.m:443
+#: modules/gui/macosx/playlist.m:451
 msgid "Add Folder to Playlist"
 msgstr "Lägg till mapp i spellista"
 
-#: modules/gui/macosx/playlist.m:445
+#: modules/gui/macosx/playlist.m:453
 msgid "File Format:"
 msgstr "Filformat:"
 
-#: modules/gui/macosx/playlist.m:446
+#: modules/gui/macosx/playlist.m:454
 msgid "Extended M3U"
 msgstr "Utökad M3U"
 
-#: modules/gui/macosx/playlist.m:447
+#: modules/gui/macosx/playlist.m:455
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr "XML Shareable Playlist Format (XSPF)"
 
-#: modules/gui/macosx/playlist.m:472 modules/gui/macosx/playlist.m:1378
+#: modules/gui/macosx/playlist.m:480 modules/gui/macosx/playlist.m:1387
 #: modules/gui/macosx/wizard.m:1356
 #, c-format
 msgid "%i items"
 msgstr "%i objekt"
 
-#: modules/gui/macosx/playlist.m:480 modules/gui/macosx/playlist.m:1389
+#: modules/gui/macosx/playlist.m:488 modules/gui/macosx/playlist.m:1398
 msgid "1 item"
 msgstr "1 objekt"
 
-#: modules/gui/macosx/playlist.m:669
+#: modules/gui/macosx/playlist.m:677
 msgid "Save Playlist"
 msgstr "Spara spellista"
 
-#: modules/gui/macosx/playlist.m:1098 modules/gui/ncurses.c:1808
+#: modules/gui/macosx/playlist.m:1106 modules/gui/ncurses.c:1808
 msgid "Meta-information"
 msgstr "Meta-information"
 
-#: modules/gui/macosx/playlist.m:1346
+#: modules/gui/macosx/playlist.m:1353
 msgid "New Node"
 msgstr "Ny nod"
 
-#: modules/gui/macosx/playlist.m:1347
+#: modules/gui/macosx/playlist.m:1354
 msgid "Please enter a name for the new node."
 msgstr "Ange ett namn för den nya noden."
 
-#: modules/gui/macosx/playlist.m:1355
+#: modules/gui/macosx/playlist.m:1365
 msgid "Empty Folder"
 msgstr "Tom mapp"
 
@@ -14022,17 +14068,17 @@ msgid "Select"
 msgstr "Välj"
 
 #: modules/gui/macosx/simple_prefs.m:168
-#: modules/gui/qt4/components/simple_preferences.cpp:455
+#: modules/gui/qt4/components/simple_preferences.cpp:457
 msgid "Interface Settings"
 msgstr "Gränssnittsinställningar"
 
 #: modules/gui/macosx/simple_prefs.m:172
-#: modules/gui/qt4/components/simple_preferences.cpp:211
+#: modules/gui/qt4/components/simple_preferences.cpp:213
 msgid "General Audio Settings"
 msgstr "Allmänna ljudinställningar"
 
 #: modules/gui/macosx/simple_prefs.m:176
-#: modules/gui/qt4/components/simple_preferences.cpp:181
+#: modules/gui/qt4/components/simple_preferences.cpp:183
 msgid "General Video Settings"
 msgstr "Allmänna videoinställningar"
 
@@ -14041,7 +14087,7 @@ msgid "Subtitles & OSD"
 msgstr "Undertexter och skärmtext"
 
 #: modules/gui/macosx/simple_prefs.m:180
-#: modules/gui/qt4/components/simple_preferences.cpp:514
+#: modules/gui/qt4/components/simple_preferences.cpp:516
 #, fuzzy
 msgid "Subtitles & On Screen Display Settings"
 msgstr "Inställningar för undertexter och skärmtext"
@@ -14107,12 +14153,12 @@ msgid "Select an action to change the associated hotkey:"
 msgstr "Välj en åtgärd för att ändra den associerade snabbtangenten"
 
 #: modules/gui/macosx/simple_prefs.m:236
-#: modules/gui/qt4/components/preferences_widgets.cpp:1120
+#: modules/gui/qt4/components/preferences_widgets.cpp:1122
 msgid "Action"
 msgstr "Åtgärd"
 
 #: modules/gui/macosx/simple_prefs.m:237
-#: modules/gui/qt4/components/preferences_widgets.cpp:1121
+#: modules/gui/qt4/components/preferences_widgets.cpp:1123
 msgid "Shortcut"
 msgstr "Genväg"
 
@@ -14763,7 +14809,7 @@ msgstr ""
 "På denna sida kan ett antal ytterligare parametrar för strömmen ställas in."
 
 #: modules/gui/macosx/wizard.m:399 modules/gui/macosx/wizard.m:1864
-#: modules/gui/qt4/ui/sout.ui:820
+#: modules/gui/qt4/ui/sout.ui:868
 msgid "Time-To-Live (TTL)"
 msgstr "Livstid (TTL)"
 
@@ -15366,9 +15412,10 @@ msgstr "Lägg till i spellista"
 msgid "MRL:"
 msgstr "MRL:"
 
-#: modules/gui/pda/pda_interface.c:421 modules/gui/qt4/ui/sout.ui:121
+#: modules/gui/pda/pda_interface.c:421 modules/gui/qt4/dialogs/sout.cpp:306
+#: modules/gui/qt4/dialogs/sout.cpp:307 modules/gui/qt4/ui/sout.ui:121
 #: modules/gui/qt4/ui/sout.ui:186 modules/gui/qt4/ui/sout.ui:248
-#: modules/gui/qt4/ui/sout.ui:361
+#: modules/gui/qt4/ui/sout.ui:377
 msgid "Port:"
 msgstr "Port:"
 
@@ -15920,7 +15967,7 @@ msgstr "Inte tyst"
 msgid "Pause the playback"
 msgstr "Gör paus i uppspelningen"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:1272
+#: modules/gui/qt4/components/interface_widgets.cpp:1274
 msgid "Revert to normal play speed"
 msgstr "Återgå till normal uppspelningshastighet"
 
@@ -16010,53 +16057,53 @@ msgstr "Välj fil"
 msgid "Select Directory"
 msgstr "Välj katalog"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1112
+#: modules/gui/qt4/components/preferences_widgets.cpp:1114
 msgid "Select an action to change the associated hotkey"
 msgstr "Välj en åtgärd för att ändra den associerade snabbtangenten"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1127
+#: modules/gui/qt4/components/preferences_widgets.cpp:1129
 msgid "Set"
 msgstr "Ställ in"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1241
+#: modules/gui/qt4/components/preferences_widgets.cpp:1243
 #, fuzzy
 msgid "Unset"
 msgstr "Användare"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1279
+#: modules/gui/qt4/components/preferences_widgets.cpp:1281
 msgid "Hotkey for "
 msgstr "Snabbtangent för "
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1282
+#: modules/gui/qt4/components/preferences_widgets.cpp:1284
 msgid "Press the new keys for "
 msgstr "Tryck på de nya tangenterna för "
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1307
+#: modules/gui/qt4/components/preferences_widgets.cpp:1309
 msgid "Warning: the key is already assigned to \""
 msgstr "Varning: tangenten är redan tilldelad till \""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1327
-#: modules/gui/qt4/components/preferences_widgets.cpp:1335
+#: modules/gui/qt4/components/preferences_widgets.cpp:1329
+#: modules/gui/qt4/components/preferences_widgets.cpp:1337
 msgid "Key: "
 msgstr "Tangent: "
 
-#: modules/gui/qt4/components/simple_preferences.cpp:78
+#: modules/gui/qt4/components/simple_preferences.cpp:80
 msgid "Subtitles && OSD"
 msgstr "Undertexter och skärmtext"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:80
+#: modules/gui/qt4/components/simple_preferences.cpp:82
 msgid "Input && Codecs"
 msgstr "Inmatning och kodekar"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:220
+#: modules/gui/qt4/components/simple_preferences.cpp:222
 msgid "Device:"
 msgstr "Enhet:"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:352
+#: modules/gui/qt4/components/simple_preferences.cpp:354
 msgid "Input & Codecs Settings"
 msgstr "Inställningar för inmatning och kodekar"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:357
+#: modules/gui/qt4/components/simple_preferences.cpp:359
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -16064,35 +16111,35 @@ msgid ""
 "individually in the advanced preferences."
 msgstr ""
 
-#: modules/gui/qt4/components/simple_preferences.cpp:539
+#: modules/gui/qt4/components/simple_preferences.cpp:541
 msgid "Configure Hotkeys"
 msgstr "Konfigurera snabbtangenter"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:748
+#: modules/gui/qt4/components/simple_preferences.cpp:756
 #: modules/gui/qt4/dialogs_provider.hpp:55
 msgid "Audio Files"
 msgstr "Ljudfiler"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:749
+#: modules/gui/qt4/components/simple_preferences.cpp:757
 #: modules/gui/qt4/dialogs_provider.hpp:50
 msgid "Video Files"
 msgstr "Videofiler"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:750
+#: modules/gui/qt4/components/simple_preferences.cpp:758
 #: modules/gui/qt4/dialogs_provider.hpp:60
 msgid "Playlist Files"
 msgstr "Spellistfiler"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:797
+#: modules/gui/qt4/components/simple_preferences.cpp:805
 msgid "&Apply"
 msgstr "&Tillämpa"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:798
+#: modules/gui/qt4/components/simple_preferences.cpp:806
 #: modules/gui/qt4/dialogs/gototime.cpp:52
 #: modules/gui/qt4/dialogs/help.cpp:210 modules/gui/qt4/dialogs/open.cpp:104
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:39
 #: modules/gui/qt4/dialogs/preferences.cpp:87
-#: modules/gui/qt4/dialogs/sout.cpp:185
+#: modules/gui/qt4/dialogs/sout.cpp:188
 msgid "&Cancel"
 msgstr "&Avbryt"
 
@@ -16391,7 +16438,7 @@ msgid "&Play"
 msgstr "S&pela upp"
 
 #: modules/gui/qt4/dialogs/open.cpp:115 modules/gui/qt4/dialogs/open.cpp:186
-#: modules/gui/qt4/dialogs/sout.cpp:184
+#: modules/gui/qt4/dialogs/sout.cpp:187
 msgid "&Stream"
 msgstr "&Strömma"
 
@@ -16463,24 +16510,34 @@ msgstr "Undertextfiler"
 msgid "All Files"
 msgstr "Alla filer"
 
-#: modules/gui/qt4/dialogs/sout.cpp:99 modules/gui/qt4/ui/sout.ui:20
+#: modules/gui/qt4/dialogs/sout.cpp:100 modules/gui/qt4/ui/sout.ui:20
 msgid "Stream Output"
 msgstr "Strömutmatning"
 
-#: modules/gui/qt4/dialogs/sout.cpp:152
+#: modules/gui/qt4/dialogs/sout.cpp:153
 msgid ""
 "Stream output string.\n"
-" This is automatically generated when you change the above settings,\n"
-" but you can update it manually."
+"This is automatically generated when you change the above settings,\n"
+"but you can update it manually."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/sout.cpp:200
+#: modules/gui/qt4/dialogs/sout.cpp:203
 msgid "Save file"
 msgstr "Spara fil"
 
-#: modules/gui/qt4/dialogs/sout.cpp:201
+#: modules/gui/qt4/dialogs/sout.cpp:204
 msgid "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 msgstr "Behållare (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
+
+#: modules/gui/qt4/dialogs/sout.cpp:306
+#, fuzzy
+msgid "Video Port:"
+msgstr "Videoport"
+
+#: modules/gui/qt4/dialogs/sout.cpp:307
+#, fuzzy
+msgid "Audio Port:"
+msgstr "Ljudport"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:83
 msgid "Hours / Minutes / Seconds:"
@@ -16562,11 +16619,11 @@ msgstr ""
 "<p>Kryssa därför i följande alternativ. Standard är nästan ingen åtkomst "
 "alls till webben.</p>\n"
 
-#: modules/gui/qt4/main_interface.cpp:1023
+#: modules/gui/qt4/main_interface.cpp:1024
 msgid "Control menu for the player"
 msgstr "Kontrollmeny för spelaren"
 
-#: modules/gui/qt4/main_interface.cpp:1072
+#: modules/gui/qt4/main_interface.cpp:1073
 msgid "Paused"
 msgstr "Pausad"
 
@@ -17096,51 +17153,51 @@ msgstr "Utmatningar"
 msgid "Play locally"
 msgstr "Spela lokalt"
 
-#: modules/gui/qt4/ui/sout.ui:283
+#: modules/gui/qt4/ui/sout.ui:286
 msgid "Using this option is not recommended in most of the cases."
 msgstr ""
 
-#: modules/gui/qt4/ui/sout.ui:286
+#: modules/gui/qt4/ui/sout.ui:289
 msgid "Prefer UDP over RTP"
 msgstr "Föredra UDP framför RTP"
 
-#: modules/gui/qt4/ui/sout.ui:396
+#: modules/gui/qt4/ui/sout.ui:412
 msgid "Mount Point"
 msgstr "Monteringspunkt"
 
-#: modules/gui/qt4/ui/sout.ui:409
+#: modules/gui/qt4/ui/sout.ui:425
 msgid "Login:pass:"
 msgstr "Inloggningsnamn:lösenord:"
 
-#: modules/gui/qt4/ui/sout.ui:435
+#: modules/gui/qt4/ui/sout.ui:451
 msgid "Profile"
 msgstr "Profil"
 
-#: modules/gui/qt4/ui/sout.ui:449
+#: modules/gui/qt4/ui/sout.ui:473
 msgid "Encapsulation"
 msgstr "Inkapsling"
 
-#: modules/gui/qt4/ui/sout.ui:536
+#: modules/gui/qt4/ui/sout.ui:568
 msgid "Video codec"
 msgstr "Videokodek"
 
-#: modules/gui/qt4/ui/sout.ui:625
+#: modules/gui/qt4/ui/sout.ui:665
 msgid "Audio codec"
 msgstr "Ljudkodek"
 
-#: modules/gui/qt4/ui/sout.ui:740
+#: modules/gui/qt4/ui/sout.ui:788
 msgid "Overlay subtitles on the video"
 msgstr "Lägg undertexter över videon (overlay)"
 
-#: modules/gui/qt4/ui/sout.ui:779
+#: modules/gui/qt4/ui/sout.ui:827
 msgid "Group name"
 msgstr "Gruppnamn"
 
-#: modules/gui/qt4/ui/sout.ui:813
+#: modules/gui/qt4/ui/sout.ui:861
 msgid "Stream all elementary streams"
 msgstr "Strömma alla elementära strömmar"
 
-#: modules/gui/qt4/ui/sout.ui:838
+#: modules/gui/qt4/ui/sout.ui:886
 msgid "Generated stream output string"
 msgstr "Genererad sträng för strömutmatning"
 
@@ -22839,6 +22896,9 @@ msgstr "Visualiseringsfilter"
 #: modules/visualization/visual/visual.c:123
 msgid "Spectrum analyser"
 msgstr "Spektrumanalysator"
+
+#~ msgid "VLC - Controller"
+#~ msgstr "VLC - Kontroller"
 
 #~ msgid "About..."
 #~ msgstr "Om..."
