@@ -516,8 +516,6 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar
 {
-    NSLog(@"toolbarAllowedItemIdentifiers %s", __func__);
-
     return [NSArray arrayWithObjects:
 //                        NSToolbarCustomizeToolbarItemIdentifier,
 //                        NSToolbarFlexibleSpaceItemIdentifier,
@@ -529,8 +527,6 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
-    NSLog(@"toolbarAllowedItemIdentifiers %s", __func__);
-
     return [NSArray arrayWithObjects:
                         VLCToolbarMediaControl,
                         nil ];
@@ -538,7 +534,6 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 
 - (NSToolbarItem *) toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
-    NSLog(@"toolbarAllowedItemIdentifiers %s", __func__);
     NSToolbarItem *toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: itemIdentifier] autorelease];
 
  
@@ -1341,7 +1336,6 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
         [o_btn_prev setEnabled: (b_plmul || b_chapters)];
         [o_btn_next setEnabled: (b_plmul || b_chapters)];
 
-        NSLog(@"seekable %d", b_seekable);
         [o_timeslider setFloatValue: 0.0];
         [o_timeslider setEnabled: b_seekable];
         [o_timefield setStringValue: @"00:00"];
@@ -2098,8 +2092,8 @@ end:
         "\n";
     NSString * mailPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"vlc_crash_mail.eml"];
     NSString * mailContent = [NSString stringWithFormat:[NSString stringWithUTF8String:mail],
-        _NS("Crash Report (Type Ctrl-shift-D and hit send)"),
-        _NS("(Type Command-shift-D (Menu 'Message'>'Send Again' and hit send)"),
+        _NS("Crash Report (Type Command-shift-D and hit send)"),
+        _NS("Type Command-shift-D (or in Menu \"Message\">\"Send Again\") and hit the \"Send Mail\" button."),
         userComment, crashLog];
     BOOL ret = [mailContent writeToFile:mailPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
     if( !ret )
@@ -2117,7 +2111,6 @@ end:
     NSString * crashReporter = [@"~/Library/Logs/CrashReporter" stringByExpandingTildeInPath];
     NSDirectoryEnumerator *direnum = [[NSFileManager defaultManager] enumeratorAtPath:crashReporter];
     NSString *fname;
-    BOOL found = NO;
     NSString * latestLog = nil;
     NSInteger year  = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportYear"] : 0;
     NSInteger month = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportMonth"]: 0;
@@ -2130,25 +2123,29 @@ end:
         if([fname hasPrefix:@"VLC"] && [fname hasSuffix:@"crash"])
         {
             NSArray * compo = [fname componentsSeparatedByString:@"_"];
-            if( [compo count] < 3 ) { found = NO; break; }
+            if( [compo count] < 3 ) continue;
             compo = [[compo objectAtIndex:1] componentsSeparatedByString:@"-"];
-            if( [compo count] < 4 ) { found = NO; break; }
-            if( year  < [[compo objectAtIndex:0] intValue] &&
-                month < [[compo objectAtIndex:1] intValue] &&
-                day   < [[compo objectAtIndex:2] intValue] &&
-                hours < [[compo objectAtIndex:3] intValue] )
+            if( [compo count] < 4 ) continue;
+
+            // Dooh. ugly.
+            if( year < [[compo objectAtIndex:0] intValue] ||
+                (year ==[[compo objectAtIndex:0] intValue] && 
+                 (month < [[compo objectAtIndex:1] intValue] ||
+                  (month ==[[compo objectAtIndex:1] intValue] &&
+                   (day   < [[compo objectAtIndex:2] intValue] ||
+                    (day   ==[[compo objectAtIndex:2] intValue] &&
+                      hours < [[compo objectAtIndex:3] intValue] ))))))
             {
                 year  = [[compo objectAtIndex:0] intValue];
                 month = [[compo objectAtIndex:1] intValue];
                 day   = [[compo objectAtIndex:2] intValue];
                 hours = [[compo objectAtIndex:3] intValue];
                 latestLog = [crashReporter stringByAppendingPathComponent:fname];
-                found = YES;
             }
         }
     }
 
-    if(!(found && [[NSFileManager defaultManager] fileExistsAtPath: latestLog]))
+    if(!(latestLog && [[NSFileManager defaultManager] fileExistsAtPath:latestLog]))
         return nil;
 
     if( !previouslySeen )
@@ -2179,14 +2176,14 @@ end:
     [pool release];
 }
 
-- (void)notifyCrashLogToUser:(NSString *)crashLog
+- (void)notifyCrashLogToUser:(NSString *)crashLogPath
 {
     int ret = NSRunInformationalAlertPanel(_NS("VLC has previously crashed"),
                 _NS("VLC has previously crashed, do you want to send an email with the crash to VLC's team?"),
                 _NS("Send"), _NS("Don't Send"), nil, nil);
     if( ret == NSAlertDefaultReturn )
     {
-        [self mailCrashLog:crashLog withUserComment:_NS("<Explain here what you were doing when VLC crashed, with possibly a link to the failing video>")];
+        [self mailCrashLog:[NSString stringWithContentsOfFile:crashLogPath] withUserComment:_NS("<Explain here what you were doing when VLC crashed, with possibly a link to the failing video>")];
     }
 }
 
