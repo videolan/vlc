@@ -414,9 +414,22 @@ void InputManager::sectionMenu()
 {
     if( hasInput() )
     {
-        // FIXME we should not assume that but probably find the entry named "Root" in "title 0"
-        vlc_value_t val; val.i_int = 2;
-        var_Set( p_input, "title  0", val );
+        vlc_value_t val, text;
+        vlc_value_t root;
+
+        if( var_Change( p_input, "title  0", VLC_VAR_GETLIST, &val, &text ) < 0 )
+            return;
+
+        /* XXX is it "Root" or "Title" we want here ?" (set 0 by default) */
+        root.i_int = 0;
+        for( int i = 0; i < val.p_list->i_count; i++ )
+        {
+            if( !strcmp( text.p_list->p_values[i].psz_string, "Title" ) )
+                root.i_int = i;
+        }
+        var_Change( p_input, "title  0", VLC_VAR_FREELIST, &val, &text );
+
+        var_Set( p_input, "title  0", root );
     }
 }
 
