@@ -195,7 +195,7 @@ vlc_module_begin();
 #ifdef UPDATE_CHECK
         add_bool( "qt-updates-notif", true, NULL, UPDATER_TEXT,
                 UPDATER_LONGTEXT, false );
-        add_integer( "qt-updates-days", 14, NULL, UPDATER_DAYS_TEXT,
+        add_integer( "qt-updates-days", 7, NULL, UPDATER_DAYS_TEXT,
                 UPDATER_DAYS_TEXT, false );
 #endif
         add_string( "qt-slider-colours",
