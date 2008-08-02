@@ -2184,8 +2184,8 @@ end:
 
 - (void)notifyCrashLogToUser:(NSString *)crashLogPath
 {
-    int ret = NSRunInformationalAlertPanel(_NS("VLC has previously crashed"),
-                _NS("VLC has previously crashed, do you want to send an email with the crash to VLC's team?"),
+    int ret = NSRunInformationalAlertPanel(_NS("VLC crashed previously"),
+                _NS("VLC crashed previously. Do you want to send an email with details on the crash to VLC's development team?"),
                 _NS("Send"), _NS("Don't Send"), nil, nil);
     if( ret == NSAlertDefaultReturn )
     {
