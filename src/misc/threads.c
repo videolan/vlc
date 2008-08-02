@@ -469,7 +469,9 @@ static THREAD_RTYPE thread_entry (void *data)
 
     libvlc_priv_t *libpriv = libvlc_priv (obj->p_libvlc);
     vlc_mutex_lock (&libpriv->threads_lock);
+#ifdef NDEBUG
     if (--libpriv->threads_count == 0)
+#endif
         vlc_cond_signal (&libpriv->threads_wait);
     vlc_mutex_unlock (&libpriv->threads_lock);
     return THREAD_RVAL;
