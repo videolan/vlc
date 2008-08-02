@@ -455,7 +455,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_window setDelegate: self];
  
     b_restore_size = false;
-    if( [o_window frame].size.height <= 200 )
+
+    // Set that here as IB seems to be buggy
+    [o_window setContentMinSize:NSMakeSize(338., 30.)];
+
+    if( [o_window contentRectForFrameRect:[o_window frame]].size.height <= 169. )
     {
         b_small_window = YES;
         [o_window setFrame: NSMakeRect( [o_window frame].origin.x,
@@ -466,14 +470,16 @@ static VLCMain *_o_sharedMainInstance = nil;
     else
     {
         b_small_window = NO;
-        [o_playlist_view setFrame: NSMakeRect( 0, 0, [o_window frame].size.width, [o_window frame].size.height - 95 )];
+        NSRect contentRect = [o_window contentRectForFrameRect:[o_window frame]];
+        [o_playlist_view setFrame: NSMakeRect( 0, 0, contentRect.size.width, contentRect.size.height - [o_window contentMinSize].height )];
         [o_playlist_view setNeedsDisplay:YES];
         [o_playlist_view setAutoresizesSubviews: YES];
         [[o_window contentView] addSubview: o_playlist_view];
     }
+
     [self updateTogglePlaylistState];
 
-    o_size_with_playlist = [o_window frame].size;
+    o_size_with_playlist = [o_window contentRectForFrameRect:[o_window frame]].size;
 
     p_playlist = pl_Yield( p_intf );
 
@@ -2242,35 +2248,35 @@ end:
     }
 }
 
+#pragma mark Playlist toggling
+
 - (IBAction)togglePlaylist:(id)sender
 {
-    NSRect o_rect = [o_window frame];
+    NSRect contentRect = [o_window contentRectForFrameRect:[o_window frame]];
+    NSRect o_rect = [o_window contentRectForFrameRect:[o_window frame]];
     /*First, check if the playlist is visible*/
-    if( o_rect.size.height <= 200 )
+    if( contentRect.size.height <= 169. )
     {
-        o_restore_rect = o_rect;
+        o_restore_rect = contentRect;
         b_restore_size = true;
         b_small_window = YES; /* we know we are small, make sure this is actually set (see case below) */
+
         /* make large */
-        if( o_size_with_playlist.height > 200 )
-        {
+        if( o_size_with_playlist.height > 169. )
             o_rect.size.height = o_size_with_playlist.height;
-        } else {
-            o_rect.size.height = 500;
-        }
+        else
+            o_rect.size.height = 500.;
  
-        if( o_size_with_playlist.width > [o_window minSize].width )
-        {
+        if( o_size_with_playlist.width >= [o_window contentMinSize].width )
             o_rect.size.width = o_size_with_playlist.width;
-        } else {
-            o_rect.size.width = 500;
-        }
- 
-        o_rect.size.height = (o_size_with_playlist.height > 200) ?
-            o_size_with_playlist.height : 500;
-        o_rect.origin.x = [o_window frame].origin.x;
-        o_rect.origin.y = [o_window frame].origin.y - o_rect.size.height +
-                                                [o_window minSize].height;
+        else
+            o_rect.size.width = [o_window contentMinSize].width;
+
+        o_rect.origin.x = contentRect.origin.x;
+        o_rect.origin.y = contentRect.origin.y - o_rect.size.height +
+            [o_window contentMinSize].height;
+
+        o_rect = [o_window frameRectForContentRect:o_rect];
 
         NSRect screenRect = [[o_window screen] visibleFrame];
         if( !NSContainsRect( screenRect, o_rect ) ) {
@@ -2285,21 +2291,31 @@ end:
     else
     {
         NSSize curSize = o_rect.size;
-        /* make small */
-        o_rect.size.height = [o_window minSize].height;
-        o_rect.size.width = [o_window minSize].width;
-        o_rect.origin.x = [o_window frame].origin.x;
-        /* Calculate the position of the lower right corner after resize */
-        o_rect.origin.y = [o_window frame].origin.y +
-            [o_window frame].size.height - [o_window minSize].height;
-
         if( b_restore_size )
+        {
             o_rect = o_restore_rect;
+            if( o_rect.size.height < [o_window contentMinSize].height )
+                o_rect.size.height = [o_window contentMinSize].height;
+            if( o_rect.size.width < [o_window contentMinSize].width )
+                o_rect.size.width = [o_window contentMinSize].width;
+        }
+        else
+        {
+            NSRect contentRect = [o_window contentRectForFrameRect:[o_window frame]];
+            /* make small */
+            o_rect.size.height = [o_window contentMinSize].height;
+            o_rect.size.width = [o_window contentMinSize].width;
+            o_rect.origin.x = contentRect.origin.x;
+            /* Calculate the position of the lower right corner after resize */
+            o_rect.origin.y = contentRect.origin.y +
+                contentRect.size.height - [o_window contentMinSize].height;
+        }
 
         [o_playlist_view setAutoresizesSubviews: NO];
         [o_playlist_view removeFromSuperview];
         [o_btn_playlist setState: NO];
         b_small_window = NO; /* we aren't small here just yet. we are doing an animated resize after this */
+        o_rect = [o_window frameRectForContentRect:o_rect];
     }
 
     [o_window setFrame: o_rect display:YES animate: YES];
@@ -2307,7 +2323,7 @@ end:
 
 - (void)updateTogglePlaylistState
 {
-    if( [o_window frame].size.height <= 200 )
+    if( [o_window contentRectForFrameRect:[o_window frame]].size.height <= 169. )
     {
         [o_btn_playlist setState: NO];
     }
@@ -2319,13 +2335,16 @@ end:
 
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize
 {
+
     /* Not triggered on a window resize or maxification of the window. only by window mouse dragging resize */
 
    /*Stores the size the controller one resize, to be able to restore it when
      toggling the playlist*/
     o_size_with_playlist = proposedFrameSize;
 
-    if( proposedFrameSize.height <= 200 )
+    NSRect rect;
+    rect.size = proposedFrameSize;
+    if( [o_window contentRectForFrameRect:rect].size.height <= 169. )
     {
         if( b_small_window == NO )
         {
@@ -2350,13 +2369,16 @@ end:
     {
         /* If large and coming from small then show */
         [o_playlist_view setAutoresizesSubviews: YES];
-        [o_playlist_view setFrame: NSMakeRect( 0, 0, [o_window frame].size.width, [o_window frame].size.height - [o_window minSize].height )];
+        NSRect contentRect = [o_window contentRectForFrameRect:[o_window frame]];
+        [o_playlist_view setFrame: NSMakeRect( 0, 0, contentRect.size.width, contentRect.size.height - [o_window contentMinSize].height )];
         [o_playlist_view setNeedsDisplay:YES];
         [[o_window contentView] addSubview: o_playlist_view];
         b_small_window = NO;
     }
     [self updateTogglePlaylistState];
 }
+
+#pragma mark -
 
 @end
 
