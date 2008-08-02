@@ -1354,7 +1354,7 @@
         _("Please enter a name for the new node."), &psz_name );
 
     PL_LOCK;
-    if( ret_v != DIALOG_CANCELLED && psz_name && *psz_name )
+    if( ret_v != DIALOG_CANCELLED && psz_name )
     {
         playlist_NodeCreate( p_playlist, psz_name,
                                       p_playlist->p_local_category, 0, NULL );
@@ -1367,6 +1367,7 @@
     }
     PL_UNLOCK;
 
+    free( psz_name );
     pl_Release( VLCIntf );
     [ourPool release];
 }
