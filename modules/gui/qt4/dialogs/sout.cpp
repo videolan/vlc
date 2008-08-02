@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sout.cpp : Stream output dialog ( old-style )
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques
  * Copyright (C) 2007 Savoir-faire Linux
  *
@@ -26,6 +26,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -103,8 +104,8 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     /* UI stuff */
     ui.setupUi( this );
 
-    ui.UDPEdit->hide(); ui.UDPLabel->hide();
-    ui.UDPPort->hide(); ui.UDPPortLabel->hide();
+    changeUDPandRTPmess( false );
+
 /* ADD HERE for new profiles */
 #define ADD_PROFILE( name, shortname ) ui.profileBox->addItem( qtr( name ), QVariant( QString( shortname ) ) );
     ADD_PROFILE( "Custom" , "Custom" )
@@ -149,8 +150,10 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     ADD_SCALING( "1.75" )
     ADD_SCALING( "2" )
 
-    ui.mrlEdit->setToolTip ( qtr( "Stream output string.\n This is automatically generated "
-                                                "when you change the above settings,\n but you can update it manually." ) ) ;
+    ui.mrlEdit->setToolTip ( qtr( "Stream output string.\n"
+                "This is automatically generated "
+                 "when you change the above settings,\n"
+                 "but you can update it manually." ) ) ;
 
 //     /* Connect everything to the updateMRL function */
  #define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );
@@ -192,11 +195,11 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     BUTTONACT( cancelButton, cancel() );
 
     if( b_transcode_only ) toggleSout();
-}
+
+    CONNECT( ui.UDPOutput, toggled( bool ), this, changeUDPandRTPmess( bool ) );}
 
 void SoutDialog::fileBrowse()
 {
-    ui.tabWidget->setTabEnabled( 0,false );
     QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file" ), "",
         qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)" ) );
     ui.fileEdit->setText( fileName );
@@ -232,18 +235,15 @@ void SoutDialog::setSTranscodeOptions( bool b_trans )
 void SoutDialog::setRawOptions( bool b_raw )
 {
     if( b_raw )
-    {
         ui.tabWidget->setDisabled( true );
-    }
     else
-    {
         SoutDialog::setOptions();
-    }
 }
 
 void SoutDialog::setOptions()
 {
-    QString profileString = ui.profileBox->itemData( ui.profileBox->currentIndex() ).toString();
+    QString profileString =
+        ui.profileBox->itemData( ui.profileBox->currentIndex() ).toString();
     msg_Dbg( p_intf, "Profile Used: %s",  qta( profileString ));
     int index;
 
@@ -267,18 +267,15 @@ void SoutDialog::setOptions()
 
         /* If the profile is not a custom one, then disable the tabWidget */
         if ( profileString == "Custom" )
-        {
             ui.tabWidget->setEnabled( true );
-        }
         else
-        {
             ui.tabWidget->setDisabled( true );
-        }
 
     /* Update the MRL !! */
     updateMRL();
 }
 
+//FIXME
 void SoutDialog::toggleSout()
 {
     //Toggle all the streaming options.
@@ -298,14 +295,27 @@ void SoutDialog::toggleSout()
     updateGeometry();
 }
 
+void SoutDialog::changeUDPandRTPmess( bool b_udp )
+{
+    ui.RTPEdit->setVisible( !b_udp );
+    ui.RTPLabel->setVisible( !b_udp );
+    ui.RTPPort->setVisible( !b_udp );
+    ui.RTPPortLabel->setVisible( !b_udp );
+    ui.UDPEdit->setVisible( b_udp );
+    ui.UDPLabel->setVisible( b_udp );
+    ui.UDPPortLabel->setText( b_udp ? qtr( "Port:") : qtr( "Video Port:" ) );
+    ui.RTPPortLabel->setText( b_udp ? qtr( "Port:") : qtr( "Audio Port:" ) );
+}
+
 void SoutDialog::ok()
 {
     mrl = ui.mrlEdit->text();
     accept();
 }
+
 void SoutDialog::cancel()
 {
-    mrl = ui.mrlEdit->text();
+    mrl.clear();
     reject();
 }
 
@@ -411,7 +421,8 @@ void SoutDialog::updateMRL()
         mrl.append( "}" );
     }
 
-    if ( sout.b_local || sout.b_file || sout.b_http || sout.b_mms || sout.b_rtp || sout.b_udp )
+    if ( sout.b_local || sout.b_file || sout.b_http ||
+         sout.b_mms || sout.b_rtp || sout.b_udp )
     {
 
 #define ISMORE() if ( more ) mrl.append( "," );
