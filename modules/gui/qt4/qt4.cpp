@@ -417,6 +417,11 @@ static void Init( intf_thread_t *p_intf )
     if (miP)
     {
         QMutexLocker locker (&windowLock);
+
+        /* We need to warn to detach from any vout before
+         * deleting miP (WindowClose will not be called after it) */
+        p_intf->p_sys->p_mi->releaseVideo( NULL );
+
         val.p_address = NULL;
         var_Set (p_intf, "window_widget", val);
         delete miP;
@@ -534,6 +539,6 @@ static void WindowClose (vlc_object_t *obj)
     QMutexLocker locker (&windowLock);
 
     if (!miP->isNull ())
-        (*miP)->releaseVideo( wnd->vout, wnd->handle );
+        (*miP)->releaseVideo( wnd->handle );
     delete miP;
 }
