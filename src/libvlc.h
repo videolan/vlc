@@ -259,6 +259,10 @@ typedef struct libvlc_priv_t
     unsigned           threads_count;
     vlc_mutex_t        threads_lock;
     vlc_cond_t         threads_wait;
+
+#ifdef WIN32
+    vlc_object_t       *ipc_helper;
+#endif
 } libvlc_priv_t;
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)

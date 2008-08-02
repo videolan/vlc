@@ -149,6 +149,8 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
         }
     }
 
+    libvlc_priv (p_this)->ipc_helper = NULL;
+
     if( config_GetInt( p_this, "one-instance" )
         || ( config_GetInt( p_this, "one-instance-when-started-from-file" )
              && config_GetInt( p_this, "started-from-file" ) ) )
@@ -181,8 +183,10 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
             {
                 msg_Err( p_this, "one instance mode DISABLED "
                          "(IPC helper thread couldn't be created)" );
-
+                vlc_object_release (p_helper);
             }
+            else
+                libvlc_priv (p_this)->ipc_helper = p_helper;
 
             /* Initialization done.
              * Release the mutex to unblock other instances */
@@ -359,6 +363,12 @@ void system_End( libvlc_int_t *p_this )
     {
         free( vlc_global()->psz_vlcpath );
         vlc_global()->psz_vlcpath = NULL;
+    }
+    vlc_object_t *obj = libvlc_priv (p_this)->ipc_helper;
+    if (obj)
+    {
+        vlc_thread_join (obj);
+        vlc_object_release (obj);
     }
 
 #if !defined( UNDER_CE )
