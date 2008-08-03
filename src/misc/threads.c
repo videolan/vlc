@@ -442,7 +442,7 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 
 struct vlc_thread_boot
 {
-    void * (*entry) (void *);
+    void * (*entry) (vlc_object_t *);
     vlc_object_t *object;
 };
 
@@ -457,7 +457,7 @@ struct vlc_thread_boot
 static THREAD_RTYPE thread_entry (void *data)
 {
     vlc_object_t *obj = ((struct vlc_thread_boot *)data)->object;
-    void *(*func) (void *) = ((struct vlc_thread_boot *)data)->entry;
+    void *(*func) (vlc_object_t *) = ((struct vlc_thread_boot *)data)->entry;
 
     free (data);
 #ifndef NDEBUG
@@ -486,7 +486,7 @@ static THREAD_RTYPE thread_entry (void *data)
  * userland real-time priority threads.
  *****************************************************************************/
 int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
-                         const char *psz_name, void * ( *func ) ( void * ),
+                         const char *psz_name, void * ( *func ) ( vlc_object_t * ),
                          int i_priority, bool b_wait )
 {
     int i_ret;
