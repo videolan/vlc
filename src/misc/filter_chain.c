@@ -328,7 +328,18 @@ int filter_chain_GetLength( filter_chain_t *p_chain )
 
 const es_format_t *filter_chain_GetFmtOut( filter_chain_t *p_chain )
 {
-    return &p_chain->fmt_out;
+
+    if( p_chain->b_allow_fmt_out_change )
+        return &p_chain->fmt_out;
+
+    /* Unless filter_chain_Reset has been called we are doomed */
+    if( p_chain->filters.i_count <= 0 )
+        return &p_chain->fmt_out;
+
+    /* */
+    filter_t *p_last = (filter_t*)p_chain->filters.pp_elems[p_chain->filters.i_count-1];
+
+    return &p_last->fmt_out;
 }
 
 /**
