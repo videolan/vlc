@@ -5873,7 +5873,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
         if( i_track < tracks.size() )
         {
-           if( sys.i_pts >= sys.i_start_pts )
+            if( sys.i_pts >= sys.i_start_pts )
             {
                 cluster = static_cast<KaxCluster*>(ep->UnGet( i_block_pos, i_cluster_pos ));
                 i_track_skipping = 0;
@@ -5887,6 +5887,8 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
                 }
                 if( !tracks[i_track]->b_search_keyframe )
                 {
+                    
+            //es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, sys.i_pts );
 #if LIBMATROSKA_VERSION >= 0x000800
                     BlockDecode( &sys.demuxer, block, simpleblock, sys.i_pts, 0, i_block_ref1 >= 0 || i_block_ref2 > 0 );
 #else
@@ -5897,6 +5899,16 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
         }
 
         delete block;
+    }
+
+    /* FIXME current ES_OUT_SET_NEXT_DISPLAY_TIME does not work that well if
+     * the delay is too high. */
+    if( sys.i_pts + 500*1000 < sys.i_start_pts )
+    {
+        sys.i_start_pts = sys.i_pts;
+
+        for( i_track = 0; i_track < tracks.size(); i_track++ )
+            es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, sys.i_start_pts );
     }
 }
 
