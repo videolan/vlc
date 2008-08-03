@@ -84,7 +84,7 @@ struct decoder_sys_t
 };
 
 /* FIXME (dummy palette for now) */
-static AVPaletteControl palette_control;
+static const AVPaletteControl palette_control;
 
 /*****************************************************************************
  * Local prototypes
