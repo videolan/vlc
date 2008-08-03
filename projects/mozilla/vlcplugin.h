@@ -189,8 +189,8 @@ private:
     "video/mpeg-system:mpg,mpeg,mpe,vob:MPEG video;" \
     "video/x-mpeg-system:mpg,mpeg,mpe,vob:MPEG video;" \
     /* MPEG-4 */ \
-    "video/mpeg4:mp4,mpg4:MPEG-4 video;" \
-    "audio/mpeg4:mp4,mpg4:MPEG-4 audio;" \
+    "video/mp4:mp4,mpg4:MPEG-4 video;" \
+    "audio/mp4:mp4,mpg4:MPEG-4 audio;" \
     "application/mpeg4-iod:mp4,mpg4:MPEG-4 video;" \
     "application/mpeg4-muxcodetable:mp4,mpg4:MPEG-4 video;" \
     /* AVI */ \

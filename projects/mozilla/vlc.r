@@ -80,8 +80,8 @@ resource 'STR#' (128,"MIME Type")
         "video/mpeg-system", "mpg,mpeg,vob",
         "video/x-mpeg-system", "mpg,mpeg,vob",
         /* MPEG-4 */
-        "video/mpeg4", "mp4,mpg4",
-        "audio/mpeg4", "mp4,mpg4",
+        "video/mp4", "mp4,mpg4",
+        "audio/mp4", "mp4,mpg4",
         "application/mpeg4-iod", "mp4,mpg4",
         "application/mpeg4-muxcodetable", "mp4,mpg4",
         /* AVI */
