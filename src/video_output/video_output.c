@@ -63,7 +63,7 @@
  * Local prototypes
  *****************************************************************************/
 static int      InitThread        ( vout_thread_t * );
-static void     RunThread         ( vout_thread_t * );
+static void*    RunThread         ( vlc_object_t *  );
 static void     ErrorThread       ( vout_thread_t * );
 static void     CleanThread       ( vout_thread_t * );
 static void     EndThread         ( vout_thread_t * );
@@ -366,8 +366,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
 
     /* Create the vout thread */
-    config_ChainCreate( &psz_name, &p_cfg, psz_parser );
+    char* psz_tmp = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
     free( psz_parser );
+    free( psz_tmp );
     p_vout->p_cfg = p_cfg;
     p_vout->p_module = module_Need( p_vout,
         ( p_vout->psz_filter_chain && *p_vout->psz_filter_chain ) ?
@@ -696,8 +697,9 @@ static int InitThread( vout_thread_t *p_vout )
  * terminated. It handles the pictures arriving in the video heap and the
  * display device events.
  *****************************************************************************/
-static void RunThread( vout_thread_t *p_vout)
+static void* RunThread( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
     int             i_index;                                /* index in heap */
     int             i_idle_loops = 0;  /* loops without displaying a picture */
     mtime_t         current_date;                            /* current date */
@@ -1389,8 +1391,9 @@ typedef struct suxor_thread_t
 
 } suxor_thread_t;
 
-static void SuxorRestartVideoES( suxor_thread_t *p_this )
+static void* SuxorRestartVideoES( vlc_object_t * p_vlc_t )
 {
+    suxor_thread_t *p_this = (suxor_thread_t *) p_vlc_t;
     /* Now restart current video stream */
     int val = var_GetInteger( p_this->p_input, "video-es" );
     if( val >= 0 )
