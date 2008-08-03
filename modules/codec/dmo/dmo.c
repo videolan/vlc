@@ -67,7 +67,7 @@ int     WINAPI FreeLibrary(HMODULE);
 
 typedef long (STDCALL *GETCLASS) ( const GUID*, const GUID*, void** );
 
-static int pi_channels_maps[7] =
+static const int pi_channels_maps[7] =
 {
     0,
     AOUT_CHAN_CENTER,
