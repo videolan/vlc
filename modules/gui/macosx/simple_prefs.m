@@ -305,11 +305,10 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [object removeAllItems];
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
-    if( !p_item )
-    {
-        NSLog( @"serious problem, item not found" );
-        return;
-    }
+
+    /* serious problem, if no item found */
+    assert( p_item );
+
     for( int i = 0; i < p_item->i_list; i++ )
     {
         NSMenuItem *mi;
@@ -337,11 +336,10 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [object removeAllItems];
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
-    if( !p_item )
-    {
-        NSLog( @"serious problem, item not found" );
-        return;
-    }
+
+    /* serious problem, if no item found */
+    assert( p_item );
+
     for( int i = 0; i < p_item->i_list; i++ )
     {
         NSMenuItem *mi;
