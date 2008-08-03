@@ -38,19 +38,12 @@
 /******************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void fft_prepare(const sound_sample *input, float * re, float * im);
-static void fft_calculate(float * re, float * im);
+static void fft_prepare(const sound_sample *input, float * re, float * im,
+                        const unsigned int *bitReverse);
+static void fft_calculate(float * re, float * im,
+                          const float *costable, const float *sintable );
 static void fft_output(const float *re, const float *im, float *output);
 static int reverseBits(unsigned int initial);
-
-
-/* Table to speed up bit reverse copy */
-static unsigned int bitReverse[FFT_BUFFER_SIZE];
-
-/* The next two tables could be made to use less space in memory, since they
- * overlap hugely, but hey. */
-static float sintable[FFT_BUFFER_SIZE / 2];
-static float costable[FFT_BUFFER_SIZE / 2];
 
 /*****************************************************************************
  * These functions are the ones called externally
@@ -67,19 +60,19 @@ fft_state *visual_fft_init(void)
     fft_state *p_state;
     unsigned int i;
 
-    p_state = (fft_state *) malloc (sizeof(fft_state));
+    p_state = malloc( sizeof(*p_state) );
     if(! p_state )
         return NULL;
 
     for(i = 0; i < FFT_BUFFER_SIZE; i++)
     {
-        bitReverse[i] = reverseBits(i);
+        p_state->bitReverse[i] = reverseBits(i);
     }
     for(i = 0; i < FFT_BUFFER_SIZE / 2; i++)
     {
         float j = 2 * PI * i / FFT_BUFFER_SIZE;
-        costable[i] = cos(j);
-        sintable[i] = sin(j);
+        p_state->costable[i] = cos(j);
+        p_state->sintable[i] = sin(j);
     }
 
     return p_state;
@@ -96,10 +89,10 @@ fft_state *visual_fft_init(void)
  */
 void fft_perform(const sound_sample *input, float *output, fft_state *state) {
     /* Convert data from sound format to be ready for FFT */
-    fft_prepare(input, state->real, state->imag);
+    fft_prepare(input, state->real, state->imag, state->bitReverse );
 
     /* Do the actual FFT */
-    fft_calculate(state->real, state->imag);
+    fft_calculate(state->real, state->imag, state->costable, state->sintable);
 
     /* Convert the FFT output into intensities */
     fft_output(state->real, state->imag, output);
@@ -119,7 +112,8 @@ void fft_close(fft_state *state) {
 /*
  * Prepare data to perform an FFT on
  */
-static void fft_prepare(const sound_sample *input, float * re, float * im) {
+static void fft_prepare( const sound_sample *input, float * re, float * im,
+                         const unsigned int *bitReverse ) {
     unsigned int i;
     float *p_real = re;
     float *p_imag = im;
@@ -158,7 +152,7 @@ static void fft_output(const float * re, const float * im, float *output)
 /*
  * Actually perform the FFT
  */
-static void fft_calculate(float * re, float * im)
+static void fft_calculate(float * re, float * im, const float *costable, const float *sintable )
 {
     unsigned int i, j, k;
     unsigned int exchanges;
