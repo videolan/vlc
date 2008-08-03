@@ -243,7 +243,7 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
 {
 #define TEMP_STR_SIZE 256
 #define TEMP_STR_LEN (TEMP_STR_SIZE-1)
-  static char    temp_str[TEMP_STR_SIZE];
+  char           temp_str[TEMP_STR_SIZE];
   size_t         i;
   char *         tp = temp_str;
   bool     saw_control_prefix = false;
