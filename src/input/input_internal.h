@@ -242,7 +242,7 @@ static inline void input_item_SetPreparsed( input_item_t *p_i, bool preparsed )
         new_status = p_i->p_meta->i_status | ITEM_PREPARSED;
     else
         new_status = p_i->p_meta->i_status & ~ITEM_PREPARSED;
-    if ( p_i->p_meta->i_status != new_status )
+    if( p_i->p_meta->i_status != new_status )
     {
         p_i->p_meta->i_status = new_status;
         send_event = true;
@@ -250,7 +250,7 @@ static inline void input_item_SetPreparsed( input_item_t *p_i, bool preparsed )
 
     vlc_mutex_unlock( &p_i->lock );
 
-    if ( send_event == true )
+    if( send_event )
     {
         vlc_event_t event;
         event.type = vlc_InputItemPreparsedChanged;
