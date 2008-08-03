@@ -519,14 +519,13 @@ libvlc_media_get_duration( libvlc_media_t * p_md,
 {
     VLC_UNUSED(p_e);
 
-    if( p_md && p_md->p_input_item)
+    if( !p_md || !p_md->p_input_item)
     {
-        return input_item_GetDuration( p_md->p_input_item );
-    }
-    else
-    {
+        libvlc_exception_raise( p_e, "No input item" );
         return -1;
     }
+
+    return input_item_GetDuration( p_md->p_input_item );
 }
 
 /**************************************************************************
@@ -538,14 +537,13 @@ libvlc_media_is_preparsed( libvlc_media_t * p_md,
 {
     VLC_UNUSED(p_e);
 
-    if( p_md && p_md->p_input_item)
+    if( !p_md || !p_md->p_input_item)
     {
-        return input_item_IsPreparsed( p_md->p_input_item );
-    }
-    else
-    {
+        libvlc_exception_raise( p_e, "No input item" );
         return false;
     }
+
+    return input_item_IsPreparsed( p_md->p_input_item );
 }
 
 /**************************************************************************
