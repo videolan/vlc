@@ -43,7 +43,9 @@ get_next_path( libvlc_media_list_player_t * p_mlp )
 
     if ( !p_mlp->current_playing_item_path )
     {
-        p_mlp->current_playing_item_path = libvlc_media_list_path_empty();
+        ret = libvlc_media_list_path_empty();
+        libvlc_media_list_path_append( &ret, 0 );
+        return ret;
     }
     
     p_sublist_of_playing_item = libvlc_media_list_sublist_at_path(
