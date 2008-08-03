@@ -2436,6 +2436,29 @@ CLEAN_PKG += schroedinger
 DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
 
 # ***************************************************************************
+# ASS library
+# ***************************************************************************
+
+libass-$(ASS_VERSION).tar.bz2:
+	$(WGET) $(ASS_URL)
+
+libass: libass-$(ASS_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+ifneq ($(HOST),$(BUILD))
+	patch -p0 < Patches/libass-cross.patch
+	cd $@; autoconf
+endif
+
+.libass: libass
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
+	touch $@
+
+CLEAN_FILE += .schroedinger
+CLEAN_PKG += schroedinger
+DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
+
+
+# ***************************************************************************
 # Some cleaning
 # ***************************************************************************
 

@@ -1,0 +1,14 @@
+--- libass/configure.ac	2008-05-22 21:04:13.000000000 +0200
++++ libass.new/configure.ac	2008-08-03 09:10:02.000000000 +0200
+@@ -42,9 +42,9 @@
+ AC_TYPE_UINT8_T
+ 
+ # Checks for library functions.
+-AC_FUNC_MALLOC
++#AC_FUNC_MALLOC
+ AC_FUNC_MEMCMP
+-AC_FUNC_REALLOC
++#AC_FUNC_REALLOC
+ AC_FUNC_STAT
+ AC_FUNC_STRTOD
+ AC_FUNC_VPRINTF
