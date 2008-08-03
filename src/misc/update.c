@@ -1403,14 +1403,32 @@ void update_CheckReal( update_check_thread_t *p_uct )
  * \param p_update structure
  * \return true if we have to upgrade to the given version to be up to date
  */
+static bool is_strictly_greater( int * a, int * b, int n)
+{
+    if( n <= 0 ) return false;
+    if(a[0] > b[0] ) return true;
+    if(a[0] == b[0] ) return is_strictly_greater( a+1, b+1, n-1 );
+    /* a[0] < b[0] */ return false;
+}
+
 bool update_NeedUpgrade( update_t *p_update )
 {
     assert( p_update );
 
-    return  p_update->release.i_major    < *PACKAGE_VERSION_MAJOR    - '0'  ||
-            p_update->release.i_minor    < *PACKAGE_VERSION_MINOR    - '0'  ||
-            p_update->release.i_revision < *PACKAGE_VERSION_REVISION - '0'  ||
-            p_update->release.extra      < *PACKAGE_VERSION_EXTRA;
+    int current_version[] = {
+        *PACKAGE_VERSION_MAJOR - '0',
+        *PACKAGE_VERSION_MINOR - '0',
+        *PACKAGE_VERSION_REVISION - '0',
+        *PACKAGE_VERSION_EXTRA
+    };
+    int latest_version[] = {
+        p_update->release.i_major,
+        p_update->release.i_minor,
+        p_update->release.i_revision,
+        p_update->release.extra
+    };
+
+    return is_strictly_greater( latest_version, current_version, 4 );
 }
 
 /**
