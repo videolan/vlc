@@ -66,12 +66,23 @@ vlc_module_end();
  *****************************************************************************/
 typedef struct aout_filter_sys_t
 {
-    /* reverb static config */
-    bool b_first;
+    vlc_mutex_t lock;
+    revmodel *p_reverbm;
 
 } aout_filter_sys_t;
 
-static revmodel reverbm;
+class CLocker
+{
+public:
+    CLocker( vlc_mutex_t *p_lock ) : p_lock(p_lock) {
+        vlc_mutex_lock( p_lock );
+    }
+    virtual ~CLocker() {
+        vlc_mutex_unlock( p_lock );
+    }
+private:
+    vlc_mutex_t *p_lock;
+};
 
 static const char *psz_control_names[] =
 {
@@ -131,11 +142,14 @@ static int Open( vlc_object_t *p_this )
 
      /* Allocate structure */
     p_sys = p_filter->p_sys = (aout_filter_sys_t*)malloc( sizeof( aout_filter_sys_t ) );
-    reverbm.setroomsize(1.05);
-    reverbm.setwet(10.0f);
-    reverbm.setdry(1.0f);
-    reverbm.setdamp(0.3);
-    reverbm.setwidth(0.9);
+
+    vlc_mutex_init( &p_sys->lock );
+    p_sys->p_reverbm = new revmodel();
+    p_sys->p_reverbm->setroomsize(1.05);
+    p_sys->p_reverbm->setwet(10.0f);
+    p_sys->p_reverbm->setdry(1.0f);
+    p_sys->p_reverbm->setdamp(0.3);
+    p_sys->p_reverbm->setwidth(0.9);
     SpatInit( p_filter);
 
     return VLC_SUCCESS;
@@ -149,6 +163,8 @@ static void Close( vlc_object_t *p_this )
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys = p_filter->p_sys;
     SpatClean( p_filter );
+    delete p_sys->p_reverbm;
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
     msg_Dbg(p_this, "Closing filter spatializer %s %s %d\n", __FILE__,__func__,__LINE__);
 }
@@ -176,9 +192,9 @@ static int SpatInit( aout_filter_t *p_filter )
     vlc_value_t val1, val2, val3, val4, val5;
     aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
 
-    for( int i = 0; i < 5 ; i ++ )
+    for( i = 0; i < 5 ; i ++ )
     {
-     var_CreateGetFloatCommand( p_aout, psz_control_names[i] );
+        var_CreateGetFloatCommand( p_aout, psz_control_names[i] );
     }
 
     /* Get initial values */
@@ -209,6 +225,9 @@ static void SpatFilter( aout_instance_t *p_aout,
                        aout_filter_t *p_filter, float *out, float *in,
                        int i_samples, int i_channels )
 {
+    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    CLocker locker( &p_sys->lock );
+
     int i, ch, j;
     for( i = 0; i < i_samples; i++ )
     {
@@ -216,62 +235,72 @@ static void SpatFilter( aout_instance_t *p_aout,
         {
             in[ch] = in[ch] * SPAT_AMP;
         }
-           reverbm.processreplace( in, out , 1, i_channels);
-         in  += i_channels;
-         out += i_channels;
+        p_sys->p_reverbm->processreplace( in, out , 1, i_channels);
+        in  += i_channels;
+        out += i_channels;
     }
 }
 
 static void SpatClean( aout_filter_t *p_filter )
 {
+    aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
     aout_filter_sys_t *p_sys = p_filter->p_sys;
 
-    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
-                        "Roomsize", RoomCallback, p_sys );
-    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
-                        "Width", WidthCallback, p_sys );
-    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
-                        "Wet", WetCallback, p_sys );
-    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
-                        "Dry", DryCallback, p_sys );
-    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
-                        "Damp", DampCallback, p_sys );
-
+    var_DelCallback( p_aout, psz_control_names[0], RoomCallback, p_sys );
+    var_DelCallback( p_aout, psz_control_names[1], WidthCallback, p_sys );
+    var_DelCallback( p_aout, psz_control_names[2], WetCallback, p_sys );
+    var_DelCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
+    var_DelCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
 }
 
 static int RoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    CLocker locker( &p_sys->lock );
+
+    p_sys->p_reverbm->setroomsize(newval.f_float);
     msg_Dbg (p_this,"room callback %3.1f %s %s %d\n", newval.f_float, __FILE__,__func__,__LINE__);
-    reverbm.setroomsize(newval.f_float);
     return VLC_SUCCESS;
 }
 
 static int WidthCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    reverbm.setwidth(newval.f_float);
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    CLocker locker( &p_sys->lock );
+
+    p_sys->p_reverbm->setwidth(newval.f_float);
     msg_Dbg (p_this,"width callback %3.1f %s %s %d\n", newval.f_float,  __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
 static int WetCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    reverbm.setwet(newval.f_float);
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    CLocker locker( &p_sys->lock );
+
+    p_sys->p_reverbm->setwet(newval.f_float);
     msg_Dbg (p_this,"wet callback %3.1f %s %s %d\n", newval.f_float,  __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
 static int DryCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    reverbm.setdry(newval.f_float);
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    CLocker locker( &p_sys->lock );
+
+    p_sys->p_reverbm->setdry(newval.f_float);
     msg_Dbg (p_this,"dry callback %3.1f %s %s %d\n", newval.f_float, __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
 static int DampCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    reverbm.setdamp(newval.f_float);
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    CLocker locker( &p_sys->lock );
+
+    p_sys->p_reverbm->setdamp(newval.f_float);
     msg_Dbg (p_this, "damp callback %3.1f %s %s %d\n", newval.f_float, __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
