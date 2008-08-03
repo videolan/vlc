@@ -621,7 +621,7 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 
 - (void)initStrings
 {
-    [o_window setTitle: _NS("VLC")];
+    [o_window setTitle: _NS("VLC Media Player")];
     [self setScrollField:_NS("VLC media player") stopAfter:-1];
 
     /* button controls */
