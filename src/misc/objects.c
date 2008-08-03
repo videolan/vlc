@@ -23,6 +23,9 @@
 /**
  * \file
  * This file contains the functions to handle the vlc_object_t type
+ *
+ * Unless otherwise stated, functions in this file are not cancellation point.
+ * All functions in this file are safe w.r.t. deferred cancellation.
  */
 
 
@@ -96,6 +99,13 @@ static void held_objects_destroy (void *);
  *****************************************************************************/
 static vlc_mutex_t structure_lock;
 static unsigned    object_counter = 0;
+
+static void close_nocancel (int fd)
+{
+    int canc = vlc_savecancel ();
+    close (fd);
+    vlc_restorecancel (canc);
+}
 
 void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
                            int i_type, const char *psz_type )
@@ -200,12 +210,14 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     if( i_type == VLC_OBJECT_LIBVLC )
     {
+        int canc = vlc_savecancel ();
         var_Create( p_new, "list", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
         var_AddCallback( p_new, "list", DumpCommand, NULL );
         var_Create( p_new, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
         var_AddCallback( p_new, "tree", DumpCommand, NULL );
         var_Create( p_new, "vars", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
         var_AddCallback( p_new, "vars", DumpCommand, NULL );
+        vlc_restorecancel (canc);
     }
 
     return p_new;
@@ -289,6 +301,8 @@ void __vlc_object_set_destructor( vlc_object_t *p_this,
  * This function destroys an object that has been previously allocated with
  * vlc_object_create. The object's refcount must be zero and it must not be
  * attached to other objects in any way.
+ *
+ * This function must be called with cancellation disabled (currently).
  *****************************************************************************/
 static void vlc_object_destroy( vlc_object_t *p_this )
 {
@@ -516,6 +530,9 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
  * If the object was signaled before the caller locked the object, it is
  * undefined whether the signal will be lost or will wake the process.
  *
+ * This function is a cancellation point. In case of cancellation, the object
+ * will be in locked state.
+ *
  * @return true if the object is dying and should terminate.
  */
 void __vlc_object_wait( vlc_object_t *obj )
@@ -529,6 +546,9 @@ void __vlc_object_wait( vlc_object_t *obj )
 /**
  * Waits for the object to be signaled (using vlc_object_signal()), or for
  * a timer to expire. It is asserted that the caller holds the object lock.
+ *
+ * This function is a cancellation point. In case of cancellation, the object
+ * will be in locked state.
  *
  * @return 0 if the object was signaled before the timer expiration, or
  * ETIMEDOUT if the timer expired without any signal.
@@ -575,7 +595,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
     if( fd != -1 )
     {
         msg_Dbg (p_this, "waitpipe: object killed");
-        close (fd);
+        close_nocancel (fd);
     }
 
     vlc_object_signal_unlocked( p_this );
@@ -603,8 +623,12 @@ void * vlc_object_get( int i_id )
     if (caller)
         msg_Dbg (caller, "uses deprecated vlc_object_get(%d)", i_id);
     else
+    {
+        int canc = vlc_savecancel ();
         fprintf (stderr, "main thread uses deprecated vlc_object_get(%d)\n",
                  i_id);
+        vlc_restorecancel (canc);
+    }
 #endif
     vlc_mutex_lock( &structure_lock );
 
@@ -745,7 +769,7 @@ void __vlc_object_yield( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * decrement an object refcount
+ * Decrement an object refcount
  * And destroy the object if its refcount reach zero.
  *****************************************************************************/
 void __vlc_object_release( vlc_object_t *p_this )
@@ -814,10 +838,14 @@ void __vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
+        int canc;
+
         free( internals->pp_children );
         internals->pp_children = NULL;
         internals->i_children = 0;
+        canc = vlc_savecancel ();
         vlc_object_destroy( p_this );
+        vlc_restorecancel (canc);
     }
 }
 
@@ -1272,6 +1300,7 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
     char psz_children[20], psz_refcount[20], psz_thread[30], psz_name[50],
          psz_parent[20];
 
+    int canc = vlc_savecancel ();
     memset( &psz_name, 0, sizeof(psz_name) );
     if( p_this->psz_object_name )
     {
@@ -1312,6 +1341,7 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
             p_this->i_object_id, p_this->psz_object_type,
             psz_name, psz_thread, psz_refcount, psz_children,
             psz_parent );
+    vlc_restorecancel (canc);
 }
 
 static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
@@ -1509,6 +1539,8 @@ void vlc_refcheck (vlc_object_t *obj)
         if (hlcur->obj == obj)
             return;
 
+    int canc = vlc_savecancel ();
+
     fprintf (stderr, "The %s %s thread object is accessing...\n"
              "the %s %s object without references.\n",
              caller && caller->psz_object_name
@@ -1526,6 +1558,7 @@ void vlc_refcheck (vlc_object_t *obj)
 
     if (++errors == 100)
         fprintf (stderr, "Too many reference errors!\n");
+    vlc_restorecancel (canc);
 }
 
 static void held_objects_destroy (void *data)
@@ -1533,6 +1566,8 @@ static void held_objects_destroy (void *data)
     VLC_UNUSED( data );
     held_list_t *hl = vlc_threadvar_get (&held_objects);
     vlc_object_t *caller = vlc_threadobj ();
+
+    int canc = vlc_savecancel ();
 
     while (hl != NULL)
     {
@@ -1549,5 +1584,6 @@ static void held_objects_destroy (void *data)
         free (hl);
         hl = buf;
     }
+    vlc_restorecancel (canc);
 }
 #endif
