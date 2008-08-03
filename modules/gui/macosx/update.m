@@ -167,9 +167,9 @@ static VLCUpdate *_o_sharedInstance = nil;
     [self setShouldCheckUpdate: [sender state]];
 }
 
-- (void)setUpToDate:(BOOL)uptodate
+- (void)setUpToDate:(NSNumber *)uptodate
 {
-    if( uptodate )
+    if( [uptodate boolValue] )
     {
         [o_fld_releaseNote setString: @""];
         [o_fld_currentVersion setStringValue: @""];
