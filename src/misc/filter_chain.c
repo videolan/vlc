@@ -214,10 +214,11 @@ static int filter_chain_AppendFromStringInternal( filter_chain_t *p_chain,
 {
     config_chain_t *p_cfg = NULL;
     char *psz_name = NULL;
+    char* psz_new_string;
 
     if( !psz_string || !*psz_string ) return 0;
 
-    psz_string = config_ChainCreate( &psz_name, &p_cfg, psz_string );
+    psz_new_string = config_ChainCreate( &psz_name, &p_cfg, psz_string );
 
     filter_t *p_filter = filter_chain_AppendFilterInternal( p_chain, psz_name,
                                                             p_cfg, NULL, NULL );
@@ -227,11 +228,13 @@ static int filter_chain_AppendFromStringInternal( filter_chain_t *p_chain,
                  "to filter chain", psz_name );
         free( psz_name );
         free( p_cfg );
+        free( psz_new_string );
         return -1;
     }
     free( psz_name );
 
-    int ret = filter_chain_AppendFromStringInternal( p_chain, psz_string );
+    int ret = filter_chain_AppendFromStringInternal( p_chain, psz_new_string );
+    free( psz_new_string );
     if( ret < 0 )
     {
         filter_chain_DeleteFilterInternal( p_chain, p_filter );
