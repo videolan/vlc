@@ -220,7 +220,7 @@ static void StreamRead  ( void *, unsigned int, unsigned int,
 static void StreamClose ( void * );
 static void TaskInterrupt( void * );
 
-static void TimeoutPrevention( timeout_thread_t * );
+static void* TimeoutPrevention( vlc_object_t * );
 
 static unsigned char* parseH264ConfigStr( char const* configStr,
                                           unsigned int& configSize );
@@ -1702,7 +1702,7 @@ static void TaskInterrupt( void *p_private )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void * TimeoutPrevention( vlc_object_t * p_this )
+static void* TimeoutPrevention( vlc_object_t * p_this )
 {
     timeout_thread_t *p_timeout = (timeout_thread_t *)p_this;
     p_timeout->b_die = false;
