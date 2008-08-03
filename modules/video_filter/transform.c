@@ -140,7 +140,7 @@ static int Create( vlc_object_t *p_this )
                            p_vout->p_cfg );
 
     /* Look what method was requested */
-    psz_method = var_CreateGetNonEmptyString( p_vout, "transform-type" );
+    psz_method = var_CreateGetNonEmptyStringCommand( p_vout, "transform-type" );
 
     switch( p_vout->fmt_in.i_chroma )
     {
