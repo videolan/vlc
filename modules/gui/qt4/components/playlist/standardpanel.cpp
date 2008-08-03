@@ -140,9 +140,9 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     buttons->addWidget( repeatButton );
 
     /* Goto */
-    gotoPlayingButton = new QPushButton( "X" , this );
-    gotoPlayingButton->setToolTip( qtr( "Show the current item" ));
-    BUTTONACT( gotoPlayingButton, gotoPlayingItem() );
+    gotoPlayingButton = new QPushButton;
+    BUTTON_SET_ACT_I( gotoPlayingButton, "", jump_to,
+            qtr( "Show the current item" ), gotoPlayingItem() );
     buttons->addWidget( gotoPlayingButton );
 
     /* A Spacer and the search possibilities */
