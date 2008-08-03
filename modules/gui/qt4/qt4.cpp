@@ -57,7 +57,7 @@ static int  OpenDialogs  ( vlc_object_t * );
 static int  WindowOpen   ( vlc_object_t * );
 static void WindowClose  ( vlc_object_t * );
 static void Run          ( intf_thread_t * );
-static void Init         ( intf_thread_t * );
+static void *Init        ( vlc_object_t * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 /*****************************************************************************
@@ -294,14 +294,15 @@ static void Run( intf_thread_t *p_intf )
             msg_Err( p_intf, "failed to create Qt dialogs thread" );
     }
     else
-        Init( p_intf );
+        Init( VLC_OBJECT(p_intf) );
 }
 
 static QMutex windowLock;
 static QWaitCondition windowWait;
 
-static void Init( intf_thread_t *p_intf )
+static void *Init( vlc_object_t *obj )
 {
+    intf_thread_t *p_intf = (intf_thread_t *)obj;
     vlc_value_t val;
     char dummy[] = "";
     char *argv[] = { dummy };
