@@ -299,62 +299,103 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_sprefs_win setTitle: _NS("Preferences")];
 }
 
-- (void)resetControls
+- (void)setupButton: (NSPopUpButton *)object forStringList: (const char *)name
+{
+    module_config_t *p_item;
+
+    [object removeAllItems];
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
+    if( !p_item )
+    {
+        NSLog( @"serious problem, item not found" );
+        return;
+    }
+    for( int i = 0; i < p_item->i_list; i++ )
+    {
+        NSMenuItem *mi;
+        if( p_item->ppsz_list_text != NULL )
+            mi = [[NSMenuItem alloc] initWithTitle: _NS( p_item->ppsz_list_text[i] ) action:NULL keyEquivalent: @""];
+        else if( p_item->ppsz_list[i] && p_item->ppsz_list[i] == "" )
+        {
+            [[object menu] addItem: [NSMenuItem separatorItem]];
+            continue;
+        }
+        else if( p_item->ppsz_list[i] )
+            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i]] action:NULL keyEquivalent: @""];
+        else NSLog( @"item %d of pref %s failed to be created", i, name);
+        [mi setRepresentedObject:[NSString stringWithUTF8String: p_item->ppsz_list[i]]];
+        [[object menu] addItem: [mi autorelease]];
+        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
+            [object selectItem:[object lastItem]];
+    }
+    [object setToolTip: _NS( p_item->psz_longtext )];
+}
+
+- (void)setupButton: (NSPopUpButton *)object forIntList: (const char *)name
+{
+    module_config_t *p_item;
+
+    [object removeAllItems];
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
+    if( !p_item )
+    {
+        NSLog( @"serious problem, item not found" );
+        return;
+    }
+    for( int i = 0; i < p_item->i_list; i++ )
+    {
+        NSMenuItem *mi;
+        if( p_item->ppsz_list_text != NULL)
+            mi = [[NSMenuItem alloc] initWithTitle: _NS( p_item->ppsz_list_text[i] ) action:NULL keyEquivalent: @""];
+        else if( p_item->pi_list[i] )
+            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->pi_list[i]] action:NULL keyEquivalent: @""];
+        else NSLog( @"item %d of pref %s failed to be created", i, name);
+        [mi setRepresentedObject:[NSNumber numberWithInt: p_item->pi_list[i]]];
+        [[object menu] addItem: [mi autorelease]];
+        if( p_item->value.i == p_item->pi_list[i] )
+            [object selectItem:[object lastItem]];
+    }
+    [object setToolTip: _NS( p_item->psz_longtext )];
+}
+
+- (void)setupButton: (NSPopUpButton *)object forModuleList: (const char *)name
 {
     module_config_t *p_item;
     vlc_list_t *p_list;
     module_t *p_parser;
+    int y = 0;
+    
+    [object removeAllItems];
+    
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    if( !p_item ||!p_list )
+    {
+        if( p_list ) vlc_list_release(p_list);
+        NSLog( @"serious problem, item or list not found" );
+        return;
+    }
+
+    [object addItemWithTitle: _NS("Default")];
+    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
+        p_parser = (module_t *)p_list->p_values[i_index].p_object;
+        if( p_parser && module_IsCapable( p_parser, p_item->psz_type ) )
+        {
+            [object addItemWithTitle: [NSString stringWithUTF8String: module_GetLongName( p_parser ) ?: ""]];
+            if( p_item->value.psz && !strcmp( p_item->value.psz, module_GetObjName( p_parser ) ) )
+                [object selectItem: [object lastItem]];
+        }
+    }
+    vlc_list_release( p_list );
+    [object setToolTip: _NS(p_item->psz_longtext)];
+}
+
+- (void)resetControls
+{
+    module_config_t *p_item;
     int i, y = 0;
     char *psz_tmp;
-
-#define SetupIntList( object, name ) \
-    [object removeAllItems]; \
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-    for( i = 0; i < p_item->i_list; i++ ) \
-    { \
-        if( p_item->ppsz_list_text[i] != NULL) \
-            [object addItemWithTitle: _NS( p_item->ppsz_list_text[i] )]; \
-        else \
-            [object addItemWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i] ?: ""]]; \
-    } \
-    if( p_item->value.i < [object numberOfItems] ) \
-        [object selectItemAtIndex: p_item->value.i]; \
-    else \
-        [object selectItemAtIndex: 0]; \
-    [object setToolTip: _NS( p_item->psz_longtext )]
-
-#define SetupStringList( object, name ) \
-    [object removeAllItems]; \
-    y = 0; \
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-    for( i = 0; p_item->ppsz_list[i] != nil; i++ ) \
-    { \
-        [object addItemWithTitle: _NS( p_item->ppsz_list_text[i] )]; \
-        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) ) \
-            y = i; \
-    } \
-    [object selectItemAtIndex: y]; \
-    [object setToolTip: _NS( p_item->psz_longtext )]
-    
-#define SetupModuleList( object, name ) \
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE ); \
-    [object removeAllItems]; \
-    [object addItemWithTitle: _NS("Default")]; \
-    for( int i_index = 0; i_index < p_list->i_count; i_index++ ) \
-    { \
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ; \
-        \
-        if( module_IsCapable( p_parser, p_item->psz_type ) ) \
-        { \
-            [object addItemWithTitle: [NSString stringWithUTF8String: module_GetLongName( p_parser ) ?: ""]]; \
-            \
-            if( p_item->value.psz && !strcmp( p_item->value.psz, module_GetObjName( p_parser ) ) ) \
-                [object selectItem: [object lastItem]]; \
-        } \
-    } \
-    vlc_list_release( p_list ); \
-    [object setToolTip: _NS(p_item->psz_longtext)]
 
     [[o_sprefs_basicFull_matrix cellAtRow:0 column:0] setState: NSOnState];
     [[o_sprefs_basicFull_matrix cellAtRow:0 column:1] setState: NSOffState];
@@ -362,8 +403,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     /**********************
      * interface settings *
      **********************/
-    SetupStringList( o_intf_lang_pop, "language" );
-    SetupIntList( o_intf_art_pop, "album-art" );
+    [self setupButton: o_intf_lang_pop forStringList: "language"];
+    [self setupButton: o_intf_art_pop forIntList: "album-art"];
 
     [o_intf_fspanel_ckb setState: config_GetInt( p_intf, "macosx-fspanel" )];
     [o_intf_embedded_ckb setState: config_GetInt( p_intf, "embedded-video" )];
@@ -377,7 +418,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [o_audio_spdif_ckb setState: config_GetInt( p_intf, "spdif" )];
 
-    SetupIntList( o_audio_dolby_pop, "force-dolby-surround" );
+    [self setupButton: o_audio_dolby_pop forIntList: "force-dolby-surround"];
 
     [o_audio_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "audio-language" ) ?: ""]];
 
@@ -388,7 +429,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_audio_norm_ckb setState: (int)strstr( psz_tmp, "normvol" )];
     [o_audio_norm_fld setFloatValue: config_GetFloat( p_intf, "norm-max-level" )];
 
-    SetupModuleList( o_audio_visual_pop, "audio-visual" );
+    [self setupButton: o_audio_visual_pop forModuleList: "audio-visual"];
 
     /* Last.FM is optional */
     if( module_Exists( p_intf, "audioscrobbler" ) )
@@ -421,7 +462,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_video_skipFrames_ckb setState: config_GetInt( p_intf, "skip-frames" )];
     [o_video_black_ckb setState: config_GetInt( p_intf, "macosx-black" )];
 
-    SetupModuleList( o_video_output_pop, "vout" );
+    [self setupButton: o_video_output_pop forModuleList: "vout"];
 
     [o_video_device_pop removeAllItems];
     i = 0;
@@ -443,15 +484,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_video_snap_folder_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-path" ) ?: ""]];
     [o_video_snap_prefix_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-prefix" ) ?: ""]];
     [o_video_snap_seqnum_ckb setState: config_GetInt( p_intf, "snapshot-sequential" )];
-    
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), "snapshot-format" );
-    for( i = 0; p_item->ppsz_list[i] != nil; i++ )
-    {
-        [o_video_snap_format_pop addItemWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i] ?: ""]];
-        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
-            y = i;
-    }
-    [o_video_snap_format_pop selectItemAtIndex: y];
+    [self setupButton: o_video_snap_format_pop forStringList: "snapshot-format"];
 
     /***************************
      * input & codecs settings *
@@ -463,7 +496,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_input_httpproxypwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy-pwd" ) ?: ""]];
     [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "ffmpeg-pp-q" )];
 
-    SetupIntList( o_input_avi_pop, "avi-index" );
+    [self setupButton: o_input_avi_pop forIntList: "avi-index"];
 
     [o_input_rtsp_ckb setState: config_GetInt( p_intf, "rtsp-tcp" )];
 
@@ -531,28 +564,15 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
      *********************/
     [o_osd_osd_ckb setState: config_GetInt( p_intf, "osd" )];
     
-    [o_osd_encoding_pop removeAllItems];
-    y = 0;
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), "subsdec-encoding" );
-    for( i = 0; p_item->ppsz_list[i] != nil; i++ )
-    {
-        if( p_item->ppsz_list[i] != "" )
-            [o_osd_encoding_pop addItemWithTitle: _NS( p_item->ppsz_list[i] )];
-        else
-            [o_osd_encoding_pop addItemWithTitle: @" "];
-
-        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
-            y = i;
-    }
-    [o_osd_encoding_pop selectItemAtIndex: y];
+    [self setupButton: o_osd_encoding_pop forStringList: "subsdec-encoding"];
     
     [o_osd_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "sub-language" ) ?: ""]];
     if( config_GetPsz( p_intf, "quartztext-font" ) != NULL )
         [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "quartztext-font" ) ?: ""]];
 
-    SetupIntList( o_osd_font_color_pop, "quartztext-color" );
-    SetupIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
-    //SetupIntList( o_osd_font_effect_pop, "quartztext-effect" );
+    [self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
+    [self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
+    //[self setupButton: o_osd_font_effect_pop forIntList: "quartztext-effect"];
 
     /********************
      * hotkeys settings *
@@ -638,20 +658,18 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     module_t *p_parser;
     char *psz_tmp;
     int i;
+    NSNumber *p_valueobject;
+    NSString *p_stringobject;
     
 #define SaveIntList( object, name ) \
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-    if( [object indexOfSelectedItem] >= 0 ) \
-        config_PutInt( p_intf, name, p_item->pi_list[[object indexOfSelectedItem]] ); \
-    else \
-        config_PutInt( p_intf, name, [object intValue] ) \
+    p_valueobject = (NSNumber *)[[object selectedItem] representedObject]; \
+    if( p_valueobject) config_PutInt( p_intf, name, [p_valueobject intValue] );
                     
 #define SaveStringList( object, name ) \
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-    if( [object indexOfSelectedItem] >= 0 ) \
-        config_PutPsz( p_intf, name, strdup( p_item->ppsz_list[[object indexOfSelectedItem]] ) ); \
-    else \
-        config_PutPsz( p_intf, name, strdup( [[VLCMain sharedInstance] delocalizeString: [object stringValue]] ) )
+    p_stringobject = (NSString *)[[object selectedItem] representedObject]; \
+    if( p_stringobject ) config_PutPsz( p_intf, name, [p_stringobject UTF8String] );
 
 #define SaveModuleList( object, name ) \
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
@@ -782,9 +800,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         config_PutPsz( p_intf, "snapshot-path", [[o_video_snap_folder_fld stringValue] UTF8String] );
         config_PutPsz( p_intf, "snapshot-prefix", [[o_video_snap_prefix_fld stringValue] UTF8String] );
         config_PutInt( p_intf, "snapshot-sequential", [o_video_snap_seqnum_ckb state] );
-
-        if( [o_video_snap_format_pop indexOfSelectedItem] >= 0 )
-            config_PutPsz( p_intf, "snapshot-format", [[[o_video_snap_format_pop selectedItem] title] UTF8String] );
+        SaveStringList( o_video_snap_format_pop, "snapshot-format" );
 
         i = config_SaveConfigFile( p_intf, "main" );
         i = i + config_SaveConfigFile( p_intf, "macosx" );
