@@ -2365,7 +2365,7 @@ end:
 
 - (void)windowDidResize:(NSNotification *)notif
 {
-    if( [o_window frame].size.height > 200 && b_small_window )
+    if( [o_window contentRectForFrameRect:[o_window frame]].size.height > 169. && b_small_window )
     {
         /* If large and coming from small then show */
         [o_playlist_view setAutoresizesSubviews: YES];
