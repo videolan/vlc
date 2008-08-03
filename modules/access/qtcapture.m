@@ -163,7 +163,7 @@ struct demux_sys_t {
 *****************************************************************************/
 static int qtchroma_to_fourcc( int i_qt )
 {
-    static struct
+    static const struct
     {
         unsigned int i_qt;
         int i_fourcc;
