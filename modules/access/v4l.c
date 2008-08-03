@@ -141,7 +141,7 @@ static void Close( vlc_object_t * );
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
     "(-1 for autodetect)." )
 
-static int i_norm_list[] =
+static const int i_norm_list[] =
     { VIDEO_MODE_AUTO, VIDEO_MODE_SECAM, VIDEO_MODE_PAL, VIDEO_MODE_NTSC };
 static const char *const psz_norm_list_text[] =
     { N_("Automatic"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
@@ -225,7 +225,7 @@ struct quicktime_mjpeg_app1
     uint32_t    i_data_offset;          /* following SOS marker data */
 };
 
-static struct
+static const struct
 {
     int i_v4l;
     int i_fourcc;
