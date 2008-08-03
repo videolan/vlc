@@ -151,6 +151,23 @@ struct demux_sys_t
     subtitle_t  *subtitle;
 
     int64_t     i_length;
+
+    /* */
+    struct
+    {
+        bool b_inited;
+
+        int i_comment;
+        int i_time_resolution;
+        int i_time_shift;
+    } jss;
+    struct
+    {
+        bool  b_inited;
+
+        float f_total;
+        float f_factor;
+    } mpsub;
 };
 
 static int  ParseMicroDvd   ( demux_t *, subtitle_t *, int );
@@ -234,6 +251,9 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_subtitles        = 0;
     p_sys->subtitle           = NULL;
     p_sys->i_microsecperframe = 40000;
+
+    p_sys->jss.b_inited       = false;
+    p_sys->mpsub.b_inited     = false;
 
     /* Get the FPS */
     f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" ); /* FIXME */
@@ -1422,9 +1442,6 @@ static int ParsePJS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     return VLC_SUCCESS;
 }
 
-static float mpsub_total = 0.0;
-static float mpsub_factor = 0.0;
-
 static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 {
     VLC_UNUSED( i_idx );
@@ -1432,6 +1449,14 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
     char *psz_text = strdup( "" );
+
+    if( !p_sys->mpsub.b_inited )
+    {
+        p_sys->mpsub.f_total = 0.0;
+        p_sys->mpsub.f_factor = 0.0;
+
+        p_sys->mpsub.b_inited = true;
+    }
 
     for( ;; )
     {
@@ -1447,7 +1472,7 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         {
             if( sscanf (s, "FORMAT=TIM%c", &p_dummy ) == 1 && p_dummy == 'E')
             {
-                mpsub_factor = 100.0;
+                p_sys->mpsub.f_factor = 100.0;
                 break;
             }
 
@@ -1462,7 +1487,7 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
                 if( f_fps > 0.0 && var_GetFloat( p_demux, "sub-fps" ) <= 0.0 )
                     var_SetFloat( p_demux, "sub-fps", f_fps );
 
-                mpsub_factor = 1.0;
+                p_sys->mpsub.f_factor = 1.0;
                 free( psz_temp );
                 break;
             }
@@ -1473,10 +1498,10 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         if( *psz_temp )
         {
             f2 = us_strtod( psz_temp, NULL );
-            mpsub_total += f1 * mpsub_factor;
-            p_subtitle->i_start = (int64_t)(10000.0 * mpsub_total);
-            mpsub_total += f2 * mpsub_factor;
-            p_subtitle->i_stop = (int64_t)(10000.0 * mpsub_total);
+            p_sys->mpsub.f_total += f1 * p_sys->mpsub.f_factor;
+            p_subtitle->i_start = (int64_t)(10000.0 * p_sys->mpsub.f_total);
+            p_sys->mpsub.f_total += f2 * p_sys->mpsub.f_factor;
+            p_subtitle->i_stop = (int64_t)(10000.0 * p_sys->mpsub.f_total);
             break;
         }
     }
@@ -1516,10 +1541,14 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     char         *psz_text2, *psz_orig2;
     int h1, h2, m1, m2, s1, s2, f1, f2;
 
-    static int i_comment = 0;
+    if( !p_sys->jss.b_inited )
+    {
+        p_sys->jss.i_comment = 0;
+        p_sys->jss.i_time_resolution = 30;
+        p_sys->jss.i_time_shift = 0;
 
-    static int jss_time_resolution = 30;
-    static int jss_time_shift = 0;
+        p_sys->jss.b_inited = true;
+    }
 
     /* Parse the main lines */
     for( ;; )
@@ -1538,10 +1567,10 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
                     &h1, &m1, &s1, &f1, &h2, &m2, &s2, &f2, psz_text ) == 9 )
         {
             p_subtitle->i_start = ( (int64_t)( h1 *3600 + m1 * 60 + s1 ) +
-                (int64_t)( ( f1 +  jss_time_shift ) /  jss_time_resolution ) )
+                (int64_t)( ( f1 +  p_sys->jss.i_time_shift ) /  p_sys->jss.i_time_resolution ) )
                 * 1000000;
             p_subtitle->i_stop = ( (int64_t)( h2 *3600 + m2 * 60 + s2 ) +
-                (int64_t)( ( f2 +  jss_time_shift ) /  jss_time_resolution ) )
+                (int64_t)( ( f2 +  p_sys->jss.i_time_shift ) /  p_sys->jss.i_time_resolution ) )
                 * 1000000;
             break;
         }
@@ -1549,9 +1578,9 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         else if( sscanf( s, "@%d @%d %[^\n\r]", &f1, &f2, psz_text ) == 3 )
         {
             p_subtitle->i_start = (int64_t)(
-                    ( f1 + jss_time_shift ) / jss_time_resolution * 1000000.0 );
+                    ( f1 + p_sys->jss.i_time_shift ) / p_sys->jss.i_time_resolution * 1000000.0 );
             p_subtitle->i_stop = (int64_t)(
-                    ( f2 + jss_time_shift ) / jss_time_resolution * 1000000.0 );
+                    ( f2 + p_sys->jss.i_time_shift ) / p_sys->jss.i_time_resolution * 1000000.0 );
             break;
         }
         /* General Directive lines */
@@ -1598,15 +1627,15 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
                          sscanf( &psz_text[shift], "%d.%d", &sec, &f);
                          sec *= inv;
                      }
-                     jss_time_shift = ( ( h * 3600 + m * 60 + sec )
-                         * jss_time_resolution + f ) * inv;
+                     p_sys->jss.i_time_shift = ( ( h * 3600 + m * 60 + sec )
+                         * p_sys->jss.i_time_resolution + f ) * inv;
                  }
                  break;
 
             case 'T':
                 shift = isalpha( psz_text[2] ) ? 8 : 2 ;
 
-                sscanf( &psz_text[shift], "%d", &jss_time_resolution );
+                sscanf( &psz_text[shift], "%d", &p_sys->jss.i_time_resolution );
                 break;
             }
             free( psz_orig );
@@ -1668,17 +1697,17 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         switch( *psz_text )
         {
         case '{':
-            i_comment++;
+            p_sys->jss.i_comment++;
             break;
         case '}':
-            if( i_comment )
+            if( p_sys->jss.i_comment )
             {
-                i_comment = 0;
+                p_sys->jss.i_comment = 0;
                 if( (*(psz_text + 1 ) ) == ' ' ) psz_text++;
             }
             break;
         case '~':
-            if( !i_comment )
+            if( !p_sys->jss.i_comment )
             {
                 *psz_text2 = ' ';
                 psz_text2++;
@@ -1688,7 +1717,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         case '\t':
             if( (*(psz_text + 1 ) ) == ' ' || (*(psz_text + 1 ) ) == '\t' )
                 break;
-            if( !i_comment )
+            if( !p_sys->jss.i_comment )
             {
                 *psz_text2 = ' ';
                 psz_text2++;
@@ -1726,7 +1755,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             }
             break;
         default:
-            if( !i_comment )
+            if( !p_sys->jss.i_comment )
             {
                 *psz_text2 = *psz_text;
                 psz_text2++;
