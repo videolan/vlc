@@ -950,7 +950,6 @@ static int ReadMetaData( intf_thread_t *p_this )
             free( psz_meta ); \
             return VLC_ENOMEM; \
         } \
-        free( psz_meta ); \
     }
 
     vlc_mutex_lock( &p_sys->lock );
@@ -966,6 +965,7 @@ static int ReadMetaData( intf_thread_t *p_this )
         free( psz_meta );
         return VLC_EGENERIC;
     }
+    free( psz_meta );
 
     ALLOC_ITEM_META( p_sys->p_current_song.psz_t, Title )
     else
@@ -977,6 +977,7 @@ static int ReadMetaData( intf_thread_t *p_this )
         free( psz_meta );
         return VLC_EGENERIC;
     }
+    free( psz_meta );
 
     /* Now we have read the mandatory meta data, so we can submit that info */
     p_sys->b_submit = true;
@@ -984,16 +985,19 @@ static int ReadMetaData( intf_thread_t *p_this )
     ALLOC_ITEM_META( p_sys->p_current_song.psz_b, Album )
     else
         p_sys->p_current_song.psz_b = calloc( 1, 1 );
+    free( psz_meta );
 
     ALLOC_ITEM_META( p_sys->p_current_song.psz_m, TrackID )
     else
         p_sys->p_current_song.psz_m = calloc( 1, 1 );
+    free( psz_meta );
 
     p_sys->p_current_song.i_l = input_item_GetDuration( p_item ) / 1000000;
 
     ALLOC_ITEM_META( p_sys->p_current_song.psz_n, TrackNum )
     else
         p_sys->p_current_song.psz_n = calloc( 1, 1 );
+    free( psz_meta );
 #undef ALLOC_ITEM_META
 
     msg_Dbg( p_this, "Meta data registered" );
