@@ -30,14 +30,14 @@
       <string>_("General Audio")</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="0" column="0" colspan="3" >
+      <item row="0" column="0" colspan="2" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
          <string>_("Default volume")</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3" >
+      <item row="0" column="2" colspan="2" >
        <widget class="QSlider" name="defaultVolume" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
