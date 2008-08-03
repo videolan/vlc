@@ -1702,8 +1702,9 @@ static void TaskInterrupt( void *p_private )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void TimeoutPrevention( timeout_thread_t *p_timeout )
+static void * TimeoutPrevention( vlc_object_t * p_this )
 {
+    timeout_thread_t *p_timeout = (timeout_thread_t *)p_this;
     p_timeout->b_die = false;
     p_timeout->i_remain = (int64_t)p_timeout->p_sys->i_timeout -2;
     p_timeout->i_remain *= 1000000;

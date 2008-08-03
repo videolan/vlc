@@ -1406,7 +1406,7 @@ public:
 
     /* event */
     event_thread_t *p_ev;
-    static int EventThread( vlc_object_t *p_this );
+    static void * EventThread( vlc_object_t *p_this );
     static int EventMouse( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
     static int EventKey( vlc_object_t *p_this, char const *psz_var,
@@ -2797,7 +2797,7 @@ int demux_sys_t::EventKey( vlc_object_t *p_this, char const *,
     return VLC_SUCCESS;
 }
 
-int demux_sys_t::EventThread( vlc_object_t *p_this )
+void * demux_sys_t::EventThread( vlc_object_t *p_this )
 {
     event_thread_t *p_ev = (event_thread_t*)p_this;
     demux_sys_t    *p_sys = p_ev->p_demux->p_sys;
