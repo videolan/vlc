@@ -751,8 +751,6 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
     uint32_t *p_bordel = p_shuffle->p_bordel;
     unsigned int i;
 
-    static uint32_t i_secret = 0;
-
     static const uint32_t p_secret3[] =
     {
         0xAAAAAAAA, 0x01757700, 0x00554580, 0x01724500, 0x00424580,
@@ -763,21 +761,11 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
         0xD5DDB938, 0x5455A092, 0x5D95A013, 0x4415A192, 0xC5DD393A,
         0x00000080, 0x55555555
     };
+    static const uint32_t i_secret3 = sizeof(p_secret3)/sizeof(p_secret3[0]);
 
-    static char p_secret4[] =
+    static const char p_secret4[] =
         "pbclevtug (p) Nccyr Pbzchgre, Vap.  Nyy Evtugf Erfreirq.";
-
-    if( i_secret == 0 )
-    {
-        REVERSE( p_secret3, sizeof(p_secret3)/sizeof(p_secret3[ 0 ]) );
-        for( ; p_secret4[ i_secret ] != '\0'; i_secret++ )
-        {
-#define ROT13(c) (((c)>='A'&&(c)<='Z')?(((c)-'A'+13)%26)+'A':\
-                  ((c)>='a'&&(c)<='z')?(((c)-'a'+13)%26)+'a':c)
-            p_secret4[ i_secret ] = ROT13(p_secret4[ i_secret ]);
-        }
-        i_secret++; /* include zero terminator */
-    }
+    static const uint32_t i_secret4 = sizeof(p_secret4)/sizeof(p_secret4[0]); /* It include the terminal '\0' */
 
     /* Using the MD5 hash of a memory block is probably not one-way enough
      * for the iTunes people. This function randomises p_bordel depending on
@@ -827,8 +815,20 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
     AddMD5( &md5, (const uint8_t *)p_big_bordel, 64 );
     if( p_shuffle->i_version == 0x01000300 )
     {
-        AddMD5( &md5, (const uint8_t *)p_secret3, sizeof(p_secret3) );
-        AddMD5( &md5, (const uint8_t *)p_secret4, i_secret );
+        uint32_t p_tmp3[i_secret3];
+        char     p_tmp4[i_secret4];
+
+        memcpy( p_tmp3, p_secret3, sizeof(p_secret3) );
+        REVERSE( p_tmp3, i_secret3 );
+
+#define ROT13(c) (((c)>='A'&&(c)<='Z')?(((c)-'A'+13)%26)+'A':\
+                      ((c)>='a'&&(c)<='z')?(((c)-'a'+13)%26)+'a':c)
+        for( uint32_t i = 0; i < i_secret4; i++ )
+            p_tmp4[i] = ROT13( p_secret4[i] );
+#undef ROT13
+
+        AddMD5( &md5, (const uint8_t *)p_tmp3, sizeof(p_secret3) );
+        AddMD5( &md5, (const uint8_t *)p_tmp4, i_secret4 );
     }
     EndMD5( &md5 );
 
