@@ -964,7 +964,7 @@ package-beos:
 # Clean up
 	rm -Rf $(srcdir)/tmp
 
-package-macosx:
+package-macosx: VLC-release.app
 # Check that the temporary location isn't in the way
 	@if test -e "$(top_builddir)/vlc-$(VERSION)/"; then \
 	  rm -Rf "$(top_builddir)/vlc-$(VERSION)/" ; \
@@ -1032,7 +1032,7 @@ package-macosx:
 # Clean up
 	rm -Rf "$(top_builddir)/vlc-$(VERSION)"
 
-package-macosx-zip:
+package-macosx-zip: VLC-release.app
 	rm -Rf $(top_builddir)/vlc-$(VERSION)
 	mkdir -p $(top_builddir)/vlc-$(VERSION)
 	cp -R $(top_builddir)/VLC-release.app $(top_builddir)/vlc-$(VERSION)/VLC.app
@@ -1043,7 +1043,7 @@ package-macosx-zip:
 	cp -R  $(srcdir)/extras/package/macosx/Delete_Preferences.app \
 	     $(top_builddir)/vlc-$(VERSION)/Goodies
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf \
-	   $(top_builddir)/vlc-$(VERSION)
+	   $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
 	zip -r $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
 	rm -Rf $(top_builddir)/vlc-$(VERSION)
 
