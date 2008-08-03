@@ -42,6 +42,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define MTU 65535
+
 /* TODO:
  * watch for PluginQuit or DeviceRemoved to stop output to VLC's core then */
 
@@ -55,6 +57,12 @@ static void Close( vlc_object_t * );
 #define CHANNEL_LONGTEXT N_( \
     "EyeTV program number, or use 0 for last channel, " \
     "-1 for S-Video input, -2 for Composite input" )
+
+#define CACHING_TEXT N_("Caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Caching value for EyeTV captures. This " \
+    "value should be set in milliseconds." )
+
 vlc_module_begin();
     set_shortname( "EyeTV" );
     set_description( N_("EyeTV access module") );
@@ -67,6 +75,8 @@ vlc_module_begin();
     set_capability( "access", 0 );
     add_shortcut( "eyetv" );
     set_callbacks( Open, Close );
+    add_integer( "eyetv-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+                 CACHING_TEXT, CACHING_LONGTEXT, true);
 vlc_module_end();
 
 /*****************************************************************************
@@ -75,9 +85,10 @@ vlc_module_end();
 struct access_sys_t
 {
     int eyetvSock;
+    int i_pts_delay;
 };
 
-static ssize_t Read( access_t *, uint8_t *, size_t );
+static block_t *BlockRead( access_t *);
 static int Control( access_t *, int, va_list );
 
 static void selectChannel( vlc_object_t *p_this, int theChannelNum )
@@ -153,9 +164,12 @@ static int Open( vlc_object_t *p_this )
 
     /* Init p_access */
     access_InitFields( p_access ); \
-    ACCESS_SET_CALLBACKS( Read, NULL, Control, NULL ); \
+    ACCESS_SET_CALLBACKS( NULL, BlockRead, Control, NULL ); \
     MALLOC_ERR( p_access->p_sys, access_sys_t ); \
+    p_access->info.b_prebuffered = false;
+
     p_sys = p_access->p_sys; memset( p_sys, 0, sizeof( access_sys_t ) );
+    p_sys->i_pts_delay = var_CreateGetInteger( p_access, "eyetv-caching" );
 
     var_Create( p_access, "eyetv-channel", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_access, "eyetv-channel", &val);
@@ -261,48 +275,69 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
-* Read: forwarding data from EyeTV plugin which was received above
+* BlockRead: forwarding data from EyeTV plugin which was received above
 *****************************************************************************/
-static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
+static block_t *BlockRead( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_read;
+    block_t      *p_block;
+    ssize_t len;
 
     if( p_access->info.b_eof )
-        return 0;
+        return NULL;
 
-    i_read = net_Read( p_access, p_sys->eyetvSock, NULL, p_buffer, i_len,
-                       false );
-    if( i_read == 0 )
-        p_access->info.b_eof = true;
-    else if( i_read > 0 )
-        p_access->info.i_pos += i_read;
+    /* Read data */
+    p_block = block_New( p_access, MTU );
+    len = net_Read( p_access, p_sys->eyetvSock, NULL,
+                    p_block->p_buffer, MTU, false );
 
-    return i_read;
+    if( len < 0 )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
+    return block_Realloc( p_block, 0, p_block->i_buffer = len );
 }
 
 /*****************************************************************************
  * Control:
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
-{/*
+{
     bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
+    access_sys_t  *p_sys = (access_sys_t *) p_access->p_sys;
  
     switch( i_query )
     {
-        * *
-        case ACCESS_SET_PAUSE_STATE:
-            * Nothing to do *
-            break;
-
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
+            break;
         case ACCESS_CAN_PAUSE:
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
+            break;
         case ACCESS_CAN_CONTROL_PACE:
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
+            break;
+
+        /* */
         case ACCESS_GET_MTU:
+            pi_int = (int*)va_arg( args, int * );
+            *pi_int = MTU;
+            break;
+
         case ACCESS_GET_PTS_DELAY:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = (int64_t) p_sys->i_pts_delay * 1000;
+            break;
+        
+        case ACCESS_SET_PAUSE_STATE:
         case ACCESS_GET_TITLE_INFO:
         case ACCESS_SET_TITLE:
         case ACCESS_SET_SEEKPOINT:
@@ -315,6 +350,5 @@ static int Control( access_t *p_access, int i_query, va_list args )
             return VLC_EGENERIC;
  
     }
-    return VLC_SUCCESS;*/
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }

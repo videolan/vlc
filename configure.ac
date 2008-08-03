@@ -4953,7 +4953,7 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx         MacOS X support (default enabled on MacOS X)])
 if test "x${enable_macosx}" = "xyes"
 then
-#  VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,Foundation])
+  VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,Foundation])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer qtcapture],[-Wl,-framework,Cocoa])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
@@ -4967,7 +4967,7 @@ then
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreVideo])
   VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl], [-fobjc-exceptions] )
 
-#  VLC_ADD_PLUGIN([access_eyetv])
+  VLC_ADD_PLUGIN([access_eyetv])
   VLC_ADD_PLUGIN([qtcapture])
   VLC_ADD_PLUGIN([macosx])
   VLC_ADD_PLUGIN([minimal_macosx])
