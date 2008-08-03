@@ -155,7 +155,6 @@ struct decoder_sys_t
 
     int     i_block;
     block_t *pp_block[CC_MAX_REORDER_SIZE];
-    int64_t i_last_pts;
 
     int i_field;
     int i_channel;
@@ -207,7 +206,6 @@ static int Open( vlc_object_t *p_this )
     /* init of p_sys */
     memset( p_sys, 0, sizeof( *p_sys ) );
     p_sys->i_block = 0;
-    p_sys->i_last_pts = 0;
 
     p_sys->i_field = i_field;
     p_sys->i_channel = i_channel;
@@ -393,12 +391,10 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
     if( p_block )
         block_Release( p_block );
 
-    p_sys->i_last_pts = 0;
-    if( b_changed )//&& i_pts - p_sys->i_last_pts > 100*1000 )
+    if( b_changed )
     {
         char *psz_subtitle = Eia608Text( &p_sys->eia608, false );
         char *psz_html     = NULL;//Eia608Text( &p_sys->eia608, true );
-        p_sys->i_last_pts = i_pts;
         return Subtitle( p_dec, psz_subtitle, psz_html, i_pts );
     }
     return NULL;
