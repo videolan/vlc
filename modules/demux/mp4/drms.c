@@ -360,7 +360,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
 
             if( p_drms->i_user == 0 && p_drms->i_key == 0 )
             {
-                static char const p_secret[] = "tr1-th3n.y00_by3";
+                static const char p_secret[] = "tr1-th3n.y00_by3";
                 memcpy( p_drms->p_key, p_secret, 16 );
                 REVERSE( p_drms->p_key, 4 );
             }
@@ -703,7 +703,7 @@ static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key,
                          uint32_t i_version )
 {
     char p_secret1[] = "Tv!*";
-    static char const p_secret2[] = "____v8rhvsaAvOKM____FfUH%798=[;."
+    static const char p_secret2[] = "____v8rhvsaAvOKM____FfUH%798=[;."
                                     "____f8677680a634____ba87fnOIf)(*";
     unsigned int i;
 
@@ -753,7 +753,7 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
 
     static uint32_t i_secret = 0;
 
-    static uint32_t p_secret3[] =
+    static const uint32_t p_secret3[] =
     {
         0xAAAAAAAA, 0x01757700, 0x00554580, 0x01724500, 0x00424580,
         0x01427700, 0x00000080, 0xC1D59D01, 0x80144981, 0x815C8901,
@@ -1506,8 +1506,8 @@ static void TinyShuffle8( uint32_t * p_bordel )
  *****************************************************************************/
 static int GetSystemKey( uint32_t *p_sys_key, bool b_ipod )
 {
-    static char const p_secret5[ 8 ] = "YuaFlafu";
-    static char const p_secret6[ 8 ] = "zPif98ga";
+    static const char p_secret5[ 8 ] = "YuaFlafu";
+    static const char p_secret6[ 8 ] = "zPif98ga";
     struct md5_s md5;
     int64_t i_ipod_id;
     uint32_t p_system_hash[ 4 ];
@@ -1629,7 +1629,7 @@ static int ReadUserKey( void *_p_drms, uint32_t *p_user_key )
  *****************************************************************************/
 static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 {
-    static char const p_secret7[] = "mUfnpognadfgf873";
+    static const char p_secret7[] = "mUfnpognadfgf873";
     struct drms_s *p_drms = (struct drms_s *)_p_drms;
     struct aes_s aes;
     struct shuffle_s shuffle;
@@ -1885,7 +1885,7 @@ static int HashSystemInfo( uint32_t *p_system_hash )
     DWORD i_serial;
     LPBYTE p_reg_buf;
 
-    static LPCTSTR p_reg_keys[ 3 ][ 2 ] =
+    static const LPCTSTR p_reg_keys[ 3 ][ 2 ] =
     {
         {
             _T("HARDWARE\\DESCRIPTION\\System"),

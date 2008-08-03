@@ -217,12 +217,12 @@ strings for settings menus and hints
 #define FILTERMODE_TEXT        N_("Filter mode")
 #define FILTERMODE_LONGTEXT    N_("kind of filtering which should be use to "\
                                   "calcuate the color output")
-static int pi_filtermode_values[] = {
+static const int pi_filtermode_values[] = {
        (int)afmNoFilter,
        (int)afmCombined,
        (int)afmPercent
 };
-static const char *ppsz_filtermode_descriptions[] = {
+static const char *const ppsz_filtermode_descriptions[] = {
         N_("No Filtering"),
         N_("Combined"),
         N_("Percent")
@@ -242,7 +242,7 @@ static const char *ppsz_filtermode_descriptions[] = {
 
 #define CHANNELASSIGN_LONGTEXT N_("Maps the hardware channel X to logical "\
                                   "channel Y to fix wrong wiring :-)")
-static int pi_channel_assignment_values[] = {
+static const int pi_channel_assignment_values[] = {
     -1,
      0,
      1,
@@ -250,7 +250,7 @@ static int pi_channel_assignment_values[] = {
      3,
      4
 };
-static const char *ppsz_channel_assignment_descriptions[] = {
+static const char *const ppsz_channel_assignment_descriptions[] = {
         N_("disabled"),
         N_("summary"),
         N_("left"),

@@ -72,7 +72,7 @@ struct decoder_sys_t
 
 };
 
-static int pi_channels_maps[6] =
+static const int pi_channels_maps[6] =
 {
     0,
     AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,

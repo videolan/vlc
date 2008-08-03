@@ -50,7 +50,7 @@ static inline int bs_eof( bs_t *s )
 }
 static inline uint32_t bs_read( bs_t *s, int i_count )
 {
-     static uint32_t i_mask[33] =
+     static const uint32_t i_mask[33] =
      {  0x00,
         0x01,      0x03,      0x07,      0x0f,
         0x1f,      0x3f,      0x7f,      0xff,

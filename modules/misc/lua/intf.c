@@ -97,7 +97,7 @@ static inline void luaL_register_submodule( lua_State *L, const char *psz_name,
     lua_setfield( L, -2, psz_name );
 }
 
-static struct
+static const struct
 {
     const char *psz_shortcut;
     const char *psz_name;
@@ -145,7 +145,7 @@ static char *GetModuleName( intf_thread_t *p_intf )
     return config_GetPsz( p_intf, "lua-intf" );
 }
 
-static luaL_Reg p_reg[] = { { NULL, NULL } };
+static const luaL_Reg p_reg[] = { { NULL, NULL } };
 
 int Open_LuaIntf( vlc_object_t *p_this )
 {

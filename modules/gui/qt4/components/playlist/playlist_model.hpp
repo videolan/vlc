@@ -50,10 +50,10 @@ class PLItem;
 #define DEPTH_PL -1
 #define DEPTH_SEL 1
 
-static int ItemUpdate_Type = QEvent::User + PLEventType + 2;
-static int ItemDelete_Type = QEvent::User + PLEventType + 3;
-static int ItemAppend_Type = QEvent::User + PLEventType + 4;
-static int PLUpdate_Type   = QEvent::User + PLEventType + 5;
+static const int ItemUpdate_Type = QEvent::User + PLEventType + 2;
+static const int ItemDelete_Type = QEvent::User + PLEventType + 3;
+static const int ItemAppend_Type = QEvent::User + PLEventType + 4;
+static const int PLUpdate_Type   = QEvent::User + PLEventType + 5;
 
 class PLEvent : public QEvent
 {

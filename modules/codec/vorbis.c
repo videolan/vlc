@@ -95,7 +95,7 @@ struct decoder_sys_t
     int pi_chan_table[AOUT_CHAN_MAX];
 };
 
-static int pi_channels_maps[9] =
+static const int pi_channels_maps[9] =
 {
     0,
     AOUT_CHAN_CENTER,

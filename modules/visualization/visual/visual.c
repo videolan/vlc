@@ -167,7 +167,7 @@ static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 static int FilterCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
-static struct
+static const struct
 {
     const char *psz_name;
     int  (*pf_run)( visual_effect_t *, aout_instance_t *,

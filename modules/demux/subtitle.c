@@ -170,7 +170,7 @@ static int  ParseRealText   ( demux_t *, subtitle_t *, int );
 static int  ParseDKS        ( demux_t *, subtitle_t *, int );
 static int  ParseSubViewer1 ( demux_t *, subtitle_t *, int );
 
-static struct
+static const struct
 {
     const char *psz_type_name;
     int  i_type;

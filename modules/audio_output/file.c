@@ -56,7 +56,7 @@ struct aout_sys_t
 };
 
 #define CHANNELS_MAX 6
-static int pi_channels_maps[CHANNELS_MAX+1] =
+static const int pi_channels_maps[CHANNELS_MAX+1] =
 {
     0,
     AOUT_CHAN_CENTER,
@@ -138,7 +138,7 @@ static int Open( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     char * psz_name, * psz_format;
-    const char ** ppsz_compare = format_list;
+    const char * const * ppsz_compare = format_list;
     vlc_value_t val;
     int i_channels, i = 0;
 

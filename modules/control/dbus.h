@@ -214,17 +214,17 @@ DBUS_METHOD( handle_root );
 DBUS_METHOD( handle_player );
 DBUS_METHOD( handle_tracklist );
 
-static DBusObjectPathVTable vlc_dbus_root_vtable = {
+static const DBusObjectPathVTable vlc_dbus_root_vtable = {
         NULL, handle_root, /* handler function */
         NULL, NULL, NULL, NULL
 };
 
-static DBusObjectPathVTable vlc_dbus_player_vtable = {
+static const DBusObjectPathVTable vlc_dbus_player_vtable = {
         NULL, handle_player, /* handler function */
         NULL, NULL, NULL, NULL
 };
 
-static DBusObjectPathVTable vlc_dbus_tracklist_vtable = {
+static const DBusObjectPathVTable vlc_dbus_tracklist_vtable = {
         NULL, handle_tracklist, /* handler function */
         NULL, NULL, NULL, NULL
 };

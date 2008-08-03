@@ -1533,7 +1533,7 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 
 static int64_t get_timestamp(void);
 
-static uint32_t mvhd_matrix[9] =
+static const uint32_t mvhd_matrix[9] =
     { 0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000 };
 
 static bo_t *GetMoovBox( sout_mux_t *p_mux )

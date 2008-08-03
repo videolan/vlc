@@ -189,7 +189,7 @@ struct httpd_client_t
 /*****************************************************************************
  * Various functions
  *****************************************************************************/
-static struct
+static const struct
 {
     const char psz_ext[8];
     const char *psz_mime;

@@ -502,7 +502,7 @@ static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
  * Misc functions
  *
  */
-static struct
+static const struct
 {
     vlc_fourcc_t i_codec;
     const char *psz_ext;

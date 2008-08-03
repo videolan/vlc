@@ -97,7 +97,7 @@ static int asai_child  (iargs);
 #undef iargs
 
 /** vm functions. KEEP IN SYNC WITH imports.h! */
-static asa_import_func importfuncs[] = {
+static const asa_import_func importfuncs[] = {
 	asai_commit,
 	asai_discard,
 	asai_break,

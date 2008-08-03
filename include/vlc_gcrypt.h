@@ -66,7 +66,7 @@ static int gcry_vlc_mutex_unlock( void **lock )
     return VLC_SUCCESS;
 }
 
-static struct gcry_thread_cbs gcry_threads_vlc =
+static const struct gcry_thread_cbs gcry_threads_vlc =
 {
     GCRY_THREAD_OPTION_USER,
     NULL,

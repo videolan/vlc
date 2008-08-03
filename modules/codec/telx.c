@@ -99,7 +99,7 @@ struct decoder_sys_t
   mtime_t     prev_pts;
   int         i_page[9];
   bool  b_erase[9];
-  uint16_t *  pi_active_national_set[9];
+  const uint16_t *  pi_active_national_set[9];
   int         i_wanted_page, i_wanted_magazine;
   bool  b_ignore_sub_flag;
 };
@@ -119,7 +119,7 @@ struct decoder_sys_t
  * 0x08 0x09 0x0a 0x0b 0x0c 0x0d (apparently a control character) 0x0e 0x0f
  */
 
-static uint16_t ppi_national_subsets[][20] =
+static const uint16_t ppi_national_subsets[][20] =
 {
   { 0x00a3, 0x0024, 0x0040, 0x00ab, 0x00bd, 0x00bb, 0x005e, 0x0023,
     0x002d, 0x00bc, 0x00a6, 0x00be, 0x00f7 }, /* english ,000 */

@@ -638,7 +638,7 @@ static int Manage( vout_thread_t *p_vout )
 /*****************************************************************************
  * Key events handling
  *****************************************************************************/
-static struct
+static const struct
 {
     SDLKey sdl_key;
     int i_vlckey;

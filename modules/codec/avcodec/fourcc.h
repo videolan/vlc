@@ -25,7 +25,7 @@
 /*****************************************************************************
  * Codec fourcc -> ffmpeg_id mapping
  *****************************************************************************/
-static struct
+static const struct
 {
     vlc_fourcc_t  i_fourcc;
     int  i_codec;

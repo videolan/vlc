@@ -109,7 +109,7 @@ struct preset_t
     const char *psz_chroma;
 };
 
-static struct preset_t p_presets[] =
+static const struct preset_t p_presets[] =
 {
     { "sqcif", 128, 96, 29.97, "4:3", "YV12" },
     { "qcif", 176, 144, 29.97, "4:3", "YV12" },
@@ -133,7 +133,7 @@ static int Open( vlc_object_t * p_this )
     uint32_t i_chroma;
     char *psz_aspect_ratio;
     unsigned int i_aspect = 0;
-    struct preset_t *p_preset = NULL;
+    const struct preset_t *p_preset = NULL;
     const uint8_t *p_peek;
     bool b_valid = false;
     bool b_y4m = false;

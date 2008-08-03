@@ -85,8 +85,8 @@ public slots:
 
 #ifdef UPDATE_CHECK
 
-static int UDOkEvent = QEvent::User + DialogEventType + 21;
-static int UDErrorEvent = QEvent::User + DialogEventType + 22;
+static const int UDOkEvent = QEvent::User + DialogEventType + 21;
+static const int UDErrorEvent = QEvent::User + DialogEventType + 22;
 
 class UpdateDialog : public QVLCFrame
 {

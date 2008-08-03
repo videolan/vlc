@@ -155,7 +155,7 @@ vlc_module_end();
 
 /* following functions are local */
 
-static unsigned accel_priority[] = {
+static const unsigned accel_priority[] = {
     VLC_XVMC_ACCEL_VLD,
 };
 

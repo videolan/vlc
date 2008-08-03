@@ -30,7 +30,7 @@ void LibavutilCallback( void *p_opaque, int i_level,
 {
     int i_vlc_level;
     AVCodecContext *p_avctx = (AVCodecContext *)p_opaque;
-    AVClass *p_avc;
+    const AVClass *p_avc;
     vlc_object_t *p_this;
     char *psz_new_format;
     const char *psz_item_name;

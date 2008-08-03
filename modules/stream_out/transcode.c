@@ -287,7 +287,7 @@ static int  transcode_osd_process( sout_stream_t *, sout_stream_id_t *,
 
 static int  EncoderThread( struct sout_stream_sys_t * p_sys );
 
-static int pi_channels_maps[6] =
+static const int pi_channels_maps[6] =
 {
     0,
     AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,

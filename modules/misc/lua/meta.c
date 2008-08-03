@@ -58,7 +58,7 @@ static lua_State *vlclua_meta_init( vlc_object_t *p_this,
 /*****************************************************************************
  * Init lua
  *****************************************************************************/
-static luaL_Reg p_reg[] = { { NULL, NULL } };
+static const luaL_Reg p_reg[] = { { NULL, NULL } };
 
 static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item )
 {

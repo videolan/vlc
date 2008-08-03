@@ -155,7 +155,7 @@ typedef struct __attribute__((__packed__)) {
 void *__builtin_new(unsigned long size) {return malloc(size);}
 void __builtin_delete(void *p) {free(p);}
 
-static int pi_channels_maps[7] =
+static const int pi_channels_maps[7] =
 {
     0,
     AOUT_CHAN_CENTER,

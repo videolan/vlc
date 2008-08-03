@@ -74,7 +74,7 @@ enum macroType
 };
 
 /* Static mapping of macros type to macro strings */
-static struct
+static const struct
 {
     const char *psz_name;
     int  i_type;

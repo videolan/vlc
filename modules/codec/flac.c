@@ -107,7 +107,7 @@ enum {
     STATE_SEND_DATA
 };
 
-static int pi_channels_maps[7] =
+static const int pi_channels_maps[7] =
 {
     0,
     AOUT_CHAN_CENTER,
@@ -1121,7 +1121,7 @@ static uint64_t read_utf8( const uint8_t *p_buf, int *pi_read )
 }
 
 /* CRC-8, poly = x^8 + x^2 + x^1 + x^0, init = 0 */
-static uint8_t const flac_crc8_table[256] = {
+static const uint8_t flac_crc8_table[256] = {
         0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15,
         0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D,
         0x70, 0x77, 0x7E, 0x79, 0x6C, 0x6B, 0x62, 0x65,

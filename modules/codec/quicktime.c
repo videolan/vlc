@@ -203,7 +203,7 @@ struct decoder_sys_t
     int                 i_out;
 };
 
-static int pi_channels_maps[6] =
+static const int pi_channels_maps[6] =
 {
     0,
     AOUT_CHAN_CENTER,

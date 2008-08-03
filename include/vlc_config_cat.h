@@ -241,7 +241,7 @@ static inline const char * GetCapabilityHelp( char *psz_capability, int i_type)
     return " ";
 }
 
-static struct config_category_t categories_array[] =
+static const struct config_category_t categories_array[] =
 {
     /* Interface */
     { CAT_INTERFACE, INTF_TITLE, INTF_HELP },

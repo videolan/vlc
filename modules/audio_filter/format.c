@@ -117,7 +117,7 @@ static block_t *S8toU8( filter_t *, block_t * );
 static block_t *Swap16( filter_t *, block_t * );
 static block_t *Swap24( filter_t *, block_t * );
 
-static struct
+static const struct
 {
     vlc_fourcc_t i_src;
     vlc_fourcc_t i_dst;

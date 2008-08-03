@@ -135,7 +135,7 @@ static int Demux( demux_t *p_demux )
     return 0; /* Needed for correct operation of go back */
 }
 
-static struct
+static const struct
 {
     const char *psz_name;
     const char *psz_option;

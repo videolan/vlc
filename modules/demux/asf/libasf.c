@@ -1264,7 +1264,7 @@ static void ASF_FreeObject_XXX( asf_object_t *p_obj)
 
 
 /* */
-static struct
+static const struct
 {
     const guid_t  *p_id;
     int     i_type;

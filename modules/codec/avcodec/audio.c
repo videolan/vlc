@@ -45,7 +45,7 @@
 
 #include "avcodec.h"
 
-static unsigned int pi_channels_maps[7] =
+static const unsigned int pi_channels_maps[7] =
 {
     0,
     AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,

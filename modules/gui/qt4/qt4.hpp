@@ -117,10 +117,10 @@ enum {
     PLEventType     = 200
 };
 
-static int DialogEvent_Type = QEvent::User + DialogEventType + 1;
-//static int PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
-//static int PLDockEvent_Type = QEvent::User + DialogEventType + 3;
-static int SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4;
+static const int DialogEvent_Type = QEvent::User + DialogEventType + 1;
+//static const int PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
+//static const int PLDockEvent_Type = QEvent::User + DialogEventType + 3;
+static const int SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4;
 
 class DialogEvent : public QEvent
 {

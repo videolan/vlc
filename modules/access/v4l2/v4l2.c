@@ -435,7 +435,7 @@ static int AccessControlResetCallback( vlc_object_t *p_this,
                                        const char *psz_var, vlc_value_t oldval,
                                        vlc_value_t newval, void *p_data );
 
-static struct
+static const struct
 {
     unsigned int i_v4l2;
     int i_fourcc;
@@ -480,7 +480,7 @@ static const __u32 p_chroma_fallbacks[] =
 { V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV422P,
   V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_MJPEG };
 
-static struct
+static const struct
 {
     const char *psz_name;
     unsigned int i_cid;

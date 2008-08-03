@@ -98,14 +98,14 @@ static int vlclua_demux_readline( lua_State *L )
  *
  *****************************************************************************/
 /* Functions to register */
-static luaL_Reg p_reg[] =
+static const luaL_Reg p_reg[] =
 {
     { "peek", vlclua_demux_peek },
     { NULL, NULL }
 };
 
 /* Functions to register for parse() function call only */
-static luaL_Reg p_reg_parse[] =
+static const luaL_Reg p_reg_parse[] =
 {
     { "read", vlclua_demux_read },
     { "readline", vlclua_demux_readline },

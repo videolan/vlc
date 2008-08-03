@@ -51,12 +51,12 @@ static void Close     ( vlc_object_t * );
 static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
 
-static void FilterFloatUP( float Imp[], float ImpD[], uint16_t Nwing,
+static void FilterFloatUP( const float Imp[], const float ImpD[], uint16_t Nwing,
                            float *f_in, float *f_out, uint32_t ui_remainder,
                            uint32_t ui_output_rate, int16_t Inc,
                            int i_nb_channels );
 
-static void FilterFloatUD( float Imp[], float ImpD[], uint16_t Nwing,
+static void FilterFloatUD( const float Imp[], const float ImpD[], uint16_t Nwing,
                            float *f_in, float *f_out, uint32_t ui_remainder,
                            uint32_t ui_output_rate, uint32_t ui_input_rate,
                            int16_t Inc, int i_nb_channels );
@@ -449,11 +449,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
 }
 
-void FilterFloatUP( float Imp[], float ImpD[], uint16_t Nwing, float *p_in,
+void FilterFloatUP( const float Imp[], const float ImpD[], uint16_t Nwing, float *p_in,
                     float *p_out, uint32_t ui_remainder,
                     uint32_t ui_output_rate, int16_t Inc, int i_nb_channels )
 {
-    float *Hp, *Hdp, *End;
+    const float *Hp, *Hdp, *End;
     float t, temp;
     uint32_t ui_linear_remainder;
     int i;
@@ -492,12 +492,12 @@ void FilterFloatUP( float Imp[], float ImpD[], uint16_t Nwing, float *p_in,
     }
 }
 
-void FilterFloatUD( float Imp[], float ImpD[], uint16_t Nwing, float *p_in,
+void FilterFloatUD( const float Imp[], const float ImpD[], uint16_t Nwing, float *p_in,
                     float *p_out, uint32_t ui_remainder,
                     uint32_t ui_output_rate, uint32_t ui_input_rate,
                     int16_t Inc, int i_nb_channels )
 {
-    float *Hp, *Hdp, *End;
+    const float *Hp, *Hdp, *End;
     float t, temp;
     uint32_t ui_linear_remainder;
     int i, ui_counter = 0;

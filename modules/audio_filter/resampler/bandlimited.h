@@ -46,7 +46,7 @@
 #define SMALL_FILTER_NMULT ((int16_t)13)
 #define SMALL_FILTER_SCALE 13128 /* Unity-gain scale factor */
 #define SMALL_FILTER_NWING 1536 /* Filter table length */
-static float SMALL_FILTER_FLOAT_IMP[] /* Impulse response */ = {
+static const float SMALL_FILTER_FLOAT_IMP[] /* Impulse response */ = {
 0.900000,
 0.899980,
 0.899920,
@@ -1585,7 +1585,7 @@ static float SMALL_FILTER_FLOAT_IMP[] /* Impulse response */ = {
 -0.000046
 };
 
-static float SMALL_FILTER_FLOAT_IMPD[] /* Impulse response */ = {
+static const float SMALL_FILTER_FLOAT_IMPD[] /* Impulse response */ = {
 -0.000020,
 -0.000060,
 -0.000100,

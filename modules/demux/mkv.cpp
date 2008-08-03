@@ -2478,7 +2478,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                  !strncmp( tracks[i_track]->psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )
         {
             int i_profile, i_srate, sbr = 0;
-            static unsigned int i_sample_rates[] =
+            static const unsigned int i_sample_rates[] =
             {
                     96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
                         16000, 12000, 11025, 8000,  7350,  0,     0,     0

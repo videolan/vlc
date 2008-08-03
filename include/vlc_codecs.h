@@ -286,7 +286,7 @@ static const GUID VLC_KSDATAFORMAT_SUBTYPE_UNKNOWN = {0x00000000, 0x0000, 0x0000
 #define WAVE_SPEAKER_TOP_BACK_RIGHT         0x20000
 #define WAVE_SPEAKER_RESERVED               0x80000000
 
-static struct
+static const struct
 {
     uint16_t     i_tag;
     vlc_fourcc_t i_fourcc;
@@ -354,7 +354,7 @@ static inline void fourcc_to_wf_tag( vlc_fourcc_t fcc, uint16_t *pi_tag )
  * to determine the actual format.  Microsoft has stopped giving out wFormatTag
  * assignments in lieu of letting 3rd parties generate their own GUIDs
  */
-static struct
+static const struct
 {
     GUID         guid_tag;
     vlc_fourcc_t i_fourcc;
