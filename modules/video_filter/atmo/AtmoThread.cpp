@@ -67,8 +67,9 @@ CThread::~CThread(void)
 
 #if defined(_ATMO_VLC_PLUGIN_)
 
-void CThread::ThreadProc(atmo_thread_t *pAtmoThread)
+void *CThread::ThreadProc(vlc_object_t *obj)
 {
+      atmo_thread_t *pAtmoThread = (atmo_thread_t *)obj;
       CThread *pThread = (CThread *)pAtmoThread->p_thread;
       if(pThread) {
          // give feedback I'am running?
@@ -77,6 +78,7 @@ void CThread::ThreadProc(atmo_thread_t *pAtmoThread)
 	     pThread->Execute();
 
       }
+      return NULL;
 }
 
 #else

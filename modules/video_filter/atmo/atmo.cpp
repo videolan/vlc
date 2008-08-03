@@ -555,7 +555,7 @@ typedef struct
 
 } fadethread_t;
 
-static void FadeToColorThread(fadethread_t *p_fadethread);
+static void *FadeToColorThread(vlc_object_t *);
 
 
 /*****************************************************************************
@@ -1723,8 +1723,9 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
 * to a target color defined in p_fadethread struct
 * use for: Fade to Pause Color,  and Fade to End Color
 *****************************************************************************/
-static void FadeToColorThread(fadethread_t *p_fadethread)
+static void *FadeToColorThread(vlc_object_t *obj)
 {
+    fadethread_t *p_fadethread = (fadethread_t *)obj;
     filter_sys_t *p_sys = (filter_sys_t *)p_fadethread->p_filter->p_sys;
     int i_steps_done = 0;
     int i_index;

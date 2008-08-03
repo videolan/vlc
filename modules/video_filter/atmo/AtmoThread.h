@@ -50,7 +50,7 @@ protected:
 private:
 
 #if defined(_ATMO_VLC_PLUGIN_)
-    static void ThreadProc(atmo_thread_t *pAtmoThread);
+    static void *ThreadProc(vlc_object_t *);
 #else
 	static DWORD WINAPI ThreadProc(LPVOID lpParameter);
 #endif
