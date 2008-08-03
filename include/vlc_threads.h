@@ -589,7 +589,7 @@ static inline void barrier (void)
  * vlc_thread_create: create a thread
  *****************************************************************************/
 #define vlc_thread_create( P_THIS, PSZ_NAME, FUNC, PRIORITY, WAIT )         \
-    __vlc_thread_create( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PSZ_NAME, (void * ( * ) ( void * ))FUNC, PRIORITY, WAIT )
+    __vlc_thread_create( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PSZ_NAME, FUNC, PRIORITY, WAIT )
 
 /*****************************************************************************
  * vlc_thread_set_priority: set the priority of the calling thread
