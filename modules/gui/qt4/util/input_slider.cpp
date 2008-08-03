@@ -47,6 +47,7 @@ InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
     setSingleStep( 2 );
     setPageStep( 10 );
     setTracking( true );
+    setPosition( 0.0, 0, 0 );
     secstotimestr( psz_length, 0 );
     CONNECT( this, valueChanged(int), this, userDrag( int ) );
 }
