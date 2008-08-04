@@ -237,11 +237,28 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     subpicture_t *p_spu = NULL;
     block_t *p_block;
 
-    //msg_Dbg( p_dec, "DecodeBlock %p", (void *)pp_block);
     if( !pp_block || *pp_block == NULL )
         return NULL;
 
     p_block = *pp_block;
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    {
+        msg_Dbg( p_dec, "Resetting libass track after time discontinuity" );
+        /* We need to reset our tracks for the time discontinuity to be
+         * handled */
+        vlc_mutex_lock( p_sys->p_ass->p_lock );
+        if( p_sys->p_track )
+            ass_free_track( p_sys->p_track );
+
+        p_sys->p_track = ass_new_track( p_sys->p_ass->p_library );
+        if( p_sys->p_track  )
+            ass_process_codec_private( p_sys->p_track,
+                                       p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+        vlc_mutex_unlock( p_sys->p_ass->p_lock );
+
+        block_Release( p_block );
+        return NULL;
+    }
     if( p_block->i_rate != 0 )
         p_block->i_length = p_block->i_length * p_block->i_rate / INPUT_RATE_DEFAULT;
     *pp_block = NULL;
@@ -289,8 +306,11 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->b_pausable = true; /* ? */
 
     vlc_mutex_lock( p_sys->p_ass->p_lock );
-    ass_process_chunk( p_sys->p_track, p_spu->p_sys->p_subs_data, p_spu->p_sys->i_subs_len,
-                       p_spu->i_start / 1000, (p_spu->i_stop-p_spu->i_start) / 1000 );
+    if( p_sys->p_track )
+    {
+        ass_process_chunk( p_sys->p_track, p_spu->p_sys->p_subs_data, p_spu->p_sys->i_subs_len,
+                           p_spu->i_start / 1000, (p_spu->i_stop-p_spu->i_start) / 1000 );
+    }
     vlc_mutex_unlock( p_sys->p_ass->p_lock );
 
     p_spu->pf_pre_render = PreRender;
