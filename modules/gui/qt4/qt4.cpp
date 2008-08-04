@@ -518,6 +518,10 @@ static int WindowOpen (vlc_object_t *obj)
     wnd->handle = (*miP)->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
                                         &wnd->width, &wnd->height);
     windowLock.unlock ();
+
+    if (!wnd->handle)
+        return VLC_EGENERIC;
+
     wnd->control = WindowControl;
     wnd->p_private = miP;
     return VLC_SUCCESS;
