@@ -37,3 +37,4 @@ SOURCES_fluidsynth = fluidsynth.c
 SOURCES_cc = cc.c cc.h
 SOURCES_kate = kate.c
 SOURCES_schroedinger = schroedinger.c
+SOURCES_libass = libass.c
