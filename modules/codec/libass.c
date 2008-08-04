@@ -122,9 +122,7 @@ static void RegionDraw( subpicture_region_t *p_region, ass_image_t *p_img );
 //#define DEBUG_REGION
 
 /*****************************************************************************
- * Create: Open CSRI renderer
- *****************************************************************************
- * Comment me.
+ * Create: Open libass decoder.
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
@@ -183,8 +181,6 @@ static int Create( vlc_object_t *p_this )
 
 /*****************************************************************************
  * Destroy: finish
- *****************************************************************************
- * Comment me.
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
@@ -221,9 +217,7 @@ static void DecSysRelease( decoder_sys_t *p_sys )
 }
 
 /****************************************************************************
- * DecodeBlock: the whole thing
- ****************************************************************************
- * This function must be fed with complete subtitles units.
+ * DecodeBlock:
  ****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
@@ -300,6 +294,9 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     return p_spu;
 }
 
+/****************************************************************************
+ *
+ ****************************************************************************/
 static void DestroySubpicture( subpicture_t *p_subpic )
 {
     DecSysRelease( p_subpic->p_sys->p_dec_sys );
@@ -369,7 +366,7 @@ static void UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
     p_subpic->i_original_picture_width = fmt.i_width;
     SubpictureReleaseRegions( p_spu, p_subpic );
 
-    /* TODO to improve efficiency we merge regions that are close minimizing
+    /* XXX to improve efficiency we merge regions that are close minimizing
      * the lost surface.
      * libass tends to create a lot of small regions and thus spu engine
      * reinstanciate a lot the scaler, and as we do not support subpel blending
@@ -449,7 +446,9 @@ static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, 
     ass_image_t *p_tmp;
     int i_count;
 
+#ifdef DEBUG_REGION
     int64_t i_ck_start = mdate();
+#endif
 
     for( p_tmp = p_img_list, i_count = 0; p_tmp != NULL; p_tmp = p_tmp->next )
         i_count++;
@@ -537,7 +536,9 @@ static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, 
                     }
                 }
             }
+#ifdef DEBUG_REGION
             msg_Err( p_spu, "Merging %d and %d", i_best_i, i_best_j );
+#endif
             r_add( &region[i_best_i], &region[i_best_j] );
 
             if( i_best_j+1 < i_region )
@@ -550,8 +551,10 @@ static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, 
     for( int n = 0; n < i_region; n++ )
         p_region[n] = region[n];
 
+#ifdef DEBUG_REGION
     int64_t i_ck_time = mdate() - i_ck_start;
     msg_Err( p_spu, "ASS: %d objects merged into %d region in %d micros", i_count, i_region, (int)(i_ck_time) );
+#endif
 
     return i_region;
 }
@@ -628,6 +631,8 @@ static void SubpictureReleaseRegions( spu_t *p_spu, subpicture_t *p_subpic )
 static ass_handle_t *AssHandleYield( decoder_t *p_dec )
 {
     vlc_mutex_t *p_lock = var_AcquireMutex( "libass" );
+    if( !p_lock )
+        return NULL;
 
     ass_handle_t *p_ass = NULL;
     ass_library_t *p_library = NULL;
