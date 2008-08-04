@@ -145,7 +145,7 @@ int rootwrap_bind (int family, int socktype, int protocol,
     }
 
     memset (&ss, 0, sizeof (ss));
-    memcpy (&ss, addr, alen > sizeof (ss) ? sizeof (ss) : alen);
+    memcpy (&ss, addr, (alen > sizeof (ss)) ? sizeof (ss) : alen);
 
     pthread_mutex_lock (&mutex);
     if (send (sock, &ss, sizeof (ss), 0) != sizeof (ss))

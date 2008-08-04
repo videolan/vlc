@@ -216,7 +216,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         {
             net_Close (fd);
 #if !defined(WIN32) && !defined(UNDER_CE)
-            fd = rootwrap_bind (ptr->ai_family, ptr->ai_socktype,
+            fd = rootwrap_bind (ptr->ai_family, socktype,
                                 protocol ?: ptr->ai_protocol, ptr->ai_addr,
                                 ptr->ai_addrlen);
             if (fd != -1)
