@@ -345,6 +345,22 @@ static void *Init( vlc_object_t *obj )
 
     QPointer<MainInterface> *miP = NULL;
 
+#ifdef UPDATE_CHECK
+    /* Checking for VLC updates */
+    if( config_GetInt( p_intf, "qt-updates-notif" ) &&
+        !config_GetInt( p_intf, "qt-privacy-ask" ) )
+    {
+        int interval = config_GetInt( p_intf, "qt-updates-days" );
+        if( QDate::currentDate() >
+             getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
+        {
+            /* The constructor of the update Dialog will do the 1st request */
+            UpdateDialog::getInstance( p_intf );
+            getSettings()->setValue( "updatedate", QDate::currentDate() );
+        }
+    }
+#endif
+
     /* Create the normal interface in non-DP mode */
     if( !p_intf->pf_show_dialog )
     {
@@ -394,21 +410,6 @@ static void *Init( vlc_object_t *obj )
     char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
     p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? psz_path
                                                         : config_GetHomeDir();
-
-#ifdef UPDATE_CHECK
-    /* Checking for VLC updates */
-    if( config_GetInt( p_intf, "qt-updates-notif" ) )
-    {
-        int interval = config_GetInt( p_intf, "qt-updates-days" );
-        if( QDate::currentDate() >
-             getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
-        {
-            /* The constructor of the update Dialog will do the 1st request */
-            UpdateDialog::getInstance( p_intf );
-            getSettings()->setValue( "updatedate", QDate::currentDate() );
-        }
-    }
-#endif
 
     /* Launch */
     app->exec();
