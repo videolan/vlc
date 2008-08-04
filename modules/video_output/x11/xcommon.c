@@ -3209,7 +3209,7 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
 /*****************************************************************************
  * Key events handling
  *****************************************************************************/
-static struct
+static const struct
 {
     int i_x11key;
     int i_vlckey;
