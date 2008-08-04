@@ -66,6 +66,7 @@ InstType $Name_InstTypeFull
     !define MUI_WELCOMEPAGE_TITLE_3LINES
     !insertmacro MUI_PAGE_WELCOME
   ; License page
+    !define MUI_LICENSEPAGE_BUTTON $(^NextBtn)
     !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
   ; Components page
     !insertmacro MUI_PAGE_COMPONENTS
