@@ -629,12 +629,10 @@ static ass_handle_t *AssHandleYield( decoder_t *p_dec )
 {
     vlc_mutex_t *p_lock = var_AcquireMutex( "libass" );
 
-    ass_handle_t *p_ass;
-    ass_library_t *p_library;
-    ass_renderer_t *p_renderer;
+    ass_handle_t *p_ass = NULL;
+    ass_library_t *p_library = NULL;
+    ass_renderer_t *p_renderer = NULL;
     vlc_value_t val;
-
-    VLC_UNUSED(p_dec);
 
     var_Create( p_dec->p_libvlc, "libass-handle", VLC_VAR_ADDRESS );
     if( var_Get( p_dec->p_libvlc, "libass-handle", &val ) )
@@ -650,10 +648,11 @@ static ass_handle_t *AssHandleYield( decoder_t *p_dec )
         return p_ass;
     }
 
-    msg_Err( p_dec, "--------------------- ALLOC ASS CONTEXt" );
-
     /* */
     p_ass = malloc( sizeof(*p_ass) );
+    if( !p_ass )
+        goto error;
+
     /* */
     p_ass->p_libvlc = VLC_OBJECT(p_dec->p_libvlc);
     p_ass->p_lock = p_lock;
@@ -661,6 +660,8 @@ static ass_handle_t *AssHandleYield( decoder_t *p_dec )
 
     /* Create libass library */
     p_ass->p_library = p_library = ass_library_init();
+    if( !p_library )
+        goto error;
 
     ass_set_fonts_dir( p_library, "/usr/share/fonts" ); // FIXME
     ass_set_extract_fonts( p_library, true );
@@ -668,6 +669,9 @@ static ass_handle_t *AssHandleYield( decoder_t *p_dec )
 
     /* Create the renderer */
     p_ass->p_renderer = p_renderer = ass_renderer_init( p_library );
+    if( !p_renderer )
+        goto error;
+
     ass_set_use_margins( p_renderer, false);
     //if( false )
     //    ass_set_margins( p_renderer, int t, int b, int l, int r);
@@ -692,6 +696,16 @@ static ass_handle_t *AssHandleYield( decoder_t *p_dec )
     /* */
     vlc_mutex_unlock( p_ass->p_lock );
     return p_ass;
+
+error:
+    if( p_renderer )
+        ass_renderer_done( p_renderer );
+    if( p_library )
+        ass_library_done( p_library );
+
+    free( p_ass );
+    vlc_mutex_unlock( p_lock );
+    return NULL;
 }
 static void AssHandleRelease( ass_handle_t *p_ass )
 {
