@@ -401,23 +401,14 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_effect; i++ )
     {
 #define p_effect p_sys->effect[i]
-        if( p_effect->psz_name )
-        {
-            free( p_effect->psz_name );
-        }
-        if( p_effect->psz_args )
-        {
-            free( p_effect->psz_args );
-        }
+        free( p_effect->p_data );
+        free( p_effect->psz_name );
+        free( p_effect->psz_args );
         free( p_effect );
 #undef p_effect
     }
 
-    if( p_sys->effect )
-    {
-        free( p_sys->effect );
-    }
-
+    free( p_sys->effect );
     free( p_filter->p_sys );
 }
 
