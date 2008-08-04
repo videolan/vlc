@@ -107,7 +107,7 @@ class QVLCTools
       static void centerWidgetOnScreen(QWidget *widget)
       {
          QDesktopWidget * const desktop = QApplication::desktop();
-         QRect screenRect = desktop->screenGeometry(widget);
+         QRect screenRect = desktop->availableGeometry(widget);
          QPoint p1 = widget->frameGeometry().center();
 
          widget->move ( screenRect.center() - p1 );
