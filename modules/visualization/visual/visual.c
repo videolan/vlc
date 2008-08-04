@@ -203,10 +203,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
         return VLC_EGENERIC;
-    }
 
     p_sys->i_height = config_GetInt( p_filter , "effect-height");
     p_sys->i_width  = config_GetInt( p_filter , "effect-width");
@@ -296,10 +293,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if( psz_effects )
-    {
-        free( psz_effects );
-    }
+    free( psz_effects );
 
     if( !p_sys->i_effect )
     {

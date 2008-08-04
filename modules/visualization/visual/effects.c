@@ -315,8 +315,6 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     fft_close( p_state );
 
     free( p_s16_buff );
-    p_s16_buff = NULL;
-
     free( height );
 
     return 0;
