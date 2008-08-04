@@ -149,31 +149,6 @@ static int Create( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     p_sys->i_refcount = 1;
 
-    /* load attachments */
-    input_attachment_t  **pp_attachments;
-    int                   i_attachments;
-
-    if( decoder_GetInputAttachments( p_dec, &pp_attachments, &i_attachments ))
-    {
-        i_attachments = 0;
-        pp_attachments = NULL;
-    }
-    for( int k = 0; k < i_attachments; k++ )
-    {
-        input_attachment_t *p_attach = pp_attachments[k];
-
-        if( !strcasecmp( p_attach->psz_mime, "application/x-truetype-font" ) )
-        {
-            msg_Dbg( p_dec, "adding embedded font %s\n", p_attach->psz_name );
-
-            vlc_mutex_lock( p_sys->p_ass->p_lock );
-            ass_add_font( p_sys->p_ass->p_library, p_attach->psz_name, p_attach->p_data, p_attach->i_data );
-            vlc_mutex_unlock( p_sys->p_ass->p_lock );
-        }
-        vlc_input_attachment_Delete( p_attach );
-    }
-    free( pp_attachments );
-
     /* Add a track */
     vlc_mutex_lock( p_sys->p_ass->p_lock );
     p_sys->p_track = p_track = ass_new_track( p_sys->p_ass->p_library );
@@ -706,7 +681,38 @@ static ass_handle_t *AssHandleYield( decoder_t *p_dec )
     if( !p_library )
         goto error;
 
+    /* load attachments */
+    input_attachment_t  **pp_attachments;
+    int                   i_attachments;
+
+    if( decoder_GetInputAttachments( p_dec, &pp_attachments, &i_attachments ))
+    {
+        i_attachments = 0;
+        pp_attachments = NULL;
+    }
+    for( int k = 0; k < i_attachments; k++ )
+    {
+        input_attachment_t *p_attach = pp_attachments[k];
+
+        if( !strcasecmp( p_attach->psz_mime, "application/x-truetype-font" ) )
+        {
+            msg_Dbg( p_dec, "adding embedded font %s\n", p_attach->psz_name );
+
+            ass_add_font( p_ass->p_library, p_attach->psz_name, p_attach->p_data, p_attach->i_data );
+        }
+        vlc_input_attachment_Delete( p_attach );
+    }
+    free( pp_attachments );
+
+#ifdef __APPLE__
+    char * psz_font_dir;
+    if( asprintf( &psz_font_dir, "%s/Library/Fonts", config_GetHomeDir() ) != -1 ) {
+        ass_set_fonts_dir( p_library, psz_font_dir );
+        free( psz_font_dir );
+    }
+#else
     ass_set_fonts_dir( p_library, "/usr/share/fonts" ); // FIXME
+#endif
     ass_set_extract_fonts( p_library, true );
     ass_set_style_overrides( p_library, NULL );
 
