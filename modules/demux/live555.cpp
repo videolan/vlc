@@ -155,7 +155,6 @@ typedef struct
     char            waiting;
     int64_t         i_pts;
     int64_t         i_npt;
-    u_int32_t       i_start_seq;
 
 } live_track_t;
 
@@ -1060,14 +1059,6 @@ static int Play( demux_t *p_demux )
     }
     p_sys->i_pcr = 0;
 
-    for( i = 0; i < p_sys->i_track; i++ )
-    {
-        if( !p_sys->track[i]->b_rtcp_sync )
-            p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
-        p_sys->track[i]->i_start_seq = (int)p_sys->track[i]->sub->rtpInfo.seqNum;
-        msg_Info( p_demux, "set startseq: %u", p_sys->track[i]->i_start_seq );
-    }
-
     /* Retrieve the starttime if possible */
     p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
     if( p_sys->i_npt_start < 0 )
@@ -1277,9 +1268,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
                     p_sys->track[i]->b_rtcp_sync = false;
-                    p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
-                    p_sys->track[i]->i_start_seq = p_sys->track[i]->sub->rtpInfo.seqNum;
-                    msg_Info( p_demux, "set pos startseq: %u", p_sys->track[i]->i_start_seq );
+                    p_sys->track[i]->i_pts = 0;
                 }
 
                 /* Retrieve the starttime if possible */
@@ -1400,15 +1389,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else if( !b_bool && p_sys->p_timeout != NULL ) 
                 p_sys->p_timeout->b_handle_keep_alive = false;
 
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-            p_sys->i_pcr = 0;
-
-            for( i = 0; i < p_sys->i_track; i++ )
+            for( i = 0; !b_bool && i < p_sys->i_track; i++ )
             {
-                if( !p_sys->track[i]->b_rtcp_sync )
-                    p_sys->track[i]->i_pts = 0; // (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
-                p_sys->track[i]->i_start_seq = p_sys->track[i]->sub->rtpInfo.seqNum;
-                msg_Info( p_demux, "set pause startseq: %u", p_sys->track[i]->i_start_seq );
+                live_track_t *tk = p_sys->track[i];
+                tk->b_rtcp_sync = false;
+                tk->i_pts = 0;
+                p_sys->i_pcr = 0;
+                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             }
 
             /* Retrieve the starttime if possible */
