@@ -2453,9 +2453,9 @@ endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
 	touch $@
 
-CLEAN_FILE += .schroedinger
-CLEAN_PKG += schroedinger
-DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
+CLEAN_FILE += .libass
+CLEAN_PKG += libass
+DISTCLEAN_PKG += libass-$(ASS_VERSION).tar.bz2
 
 
 # ***************************************************************************
