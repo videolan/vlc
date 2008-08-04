@@ -63,7 +63,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     main_panel->setLayout( main_panel_l );
 
     /* Choice for types */
-    types = new QGroupBox( "Show settings" );
+    types = new QGroupBox( qtr("Show settings") );
     types->setAlignment( Qt::AlignHCenter );
     QHBoxLayout *types_l = new QHBoxLayout;
     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
