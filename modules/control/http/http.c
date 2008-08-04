@@ -129,7 +129,7 @@ static int Open( vlc_object_t *p_this )
     psz_address = var_CreateGetNonEmptyString( p_intf, "http-host" );
     if( psz_address != NULL )
     {
-        char *psz_parser = strchr( psz_address, ':' );
+        char *psz_parser = strrchr( psz_address, ':' );
         if( psz_parser )
         {
             *psz_parser++ = '\0';
