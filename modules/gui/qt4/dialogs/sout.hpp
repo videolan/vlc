@@ -87,6 +87,7 @@ private slots:
     void setSTranscodeOptions( bool );
     void setRawOptions( bool );
     void changeUDPandRTPmess( bool );
+    void RTPtoggled( bool );
 };
 
 #endif

@@ -64,6 +64,8 @@ struct sout_gui_descr_t
     int32_t i_http;     /*< http port number */
     int32_t i_mms;      /*< mms port number */
     int32_t i_rtp;      /*< rtp port number */
+    int32_t i_rtp_audio;      /*< rtp port number */
+    int32_t i_rtp_video;      /*< rtp port number */
     int32_t i_udp;      /*< udp port number */
     int32_t i_icecast;  /*< icecast port number */
 
@@ -160,28 +162,31 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
  #define CT( x ) CONNECT( ui.x, textChanged( const QString ), this, updateMRL() );
  #define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateMRL() );
  #define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
-//     /* Output */
+    /* Output */
     CB( fileOutput ); CB( HTTPOutput ); CB( localOutput );
     CB( RTPOutput ); CB( MMSHOutput ); CB( rawInput ); CB( UDPOutput );
     CT( fileEdit ); CT( HTTPEdit ); CT( RTPEdit ); CT( MMSHEdit ); CT( UDPEdit );
     CT( IcecastEdit ); CT( IcecastMountpointEdit ); CT( IcecastNamePassEdit );
-    CS( HTTPPort ); CS( RTPPort ); CS( MMSHPort ); CS( UDPPort );
-//     /* Transcode */
+    CS( HTTPPort ); CS( RTPPort ); CS( RTPPort2 ); CS( MMSHPort ); CS( UDPPort );
+    /* Transcode */
     CC( vCodecBox ); CC( subsCodecBox ); CC( aCodecBox ) ;
     CB( transcodeVideo ); CB( transcodeAudio ); CB( transcodeSubs );
-//     CB( sOverlay );
+    /*   CB( sOverlay ); */
     CS( vBitrateSpin ); CS( aBitrateSpin ); CS( aChannelsSpin ); CC( vScaleBox );
-//     /* Mux */
+    /* Mux */
     CB( PSMux ); CB( TSMux ); CB( MPEG1Mux ); CB( OggMux ); CB( ASFMux );
     CB( MP4Mux ); CB( MOVMux ); CB( WAVMux ); CB( RAWMux ); CB( FLVMux );
-//     /* Misc */
+    /* Misc */
     CB( soutAll ); CS( ttl ); CT( sapName ); CT( sapGroup );
-//
+
     CONNECT( ui.profileBox, activated( const QString & ), this, setOptions() );
     CONNECT( ui.fileSelectButton, clicked() , this, fileBrowse()  );
-    CONNECT( ui.transcodeVideo, toggled( bool ), this, setVTranscodeOptions( bool ) );
-    CONNECT( ui.transcodeAudio, toggled( bool ), this, setATranscodeOptions( bool ) );
-    CONNECT( ui.transcodeSubs, toggled( bool ), this, setSTranscodeOptions( bool ) );
+    CONNECT( ui.transcodeVideo, toggled( bool ),
+            this, setVTranscodeOptions( bool ) );
+    CONNECT( ui.transcodeAudio, toggled( bool ),
+            this, setATranscodeOptions( bool ) );
+    CONNECT( ui.transcodeSubs, toggled( bool ),
+            this, setSTranscodeOptions( bool ) );
     CONNECT( ui.rawInput, toggled( bool ), this, setRawOptions( bool ) );
 
     okButton = new QPushButton( qtr( "&Stream" ) );
@@ -196,7 +201,9 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
 
     if( b_transcode_only ) toggleSout();
 
-    CONNECT( ui.UDPOutput, toggled( bool ), this, changeUDPandRTPmess( bool ) );}
+    CONNECT( ui.UDPOutput, toggled( bool ), this, changeUDPandRTPmess( bool ) );
+    CONNECT( ui.RTPOutput, clicked(bool), this, RTPtoggled( bool ) );
+}
 
 void SoutDialog::fileBrowse()
 {
@@ -303,8 +310,34 @@ void SoutDialog::changeUDPandRTPmess( bool b_udp )
     ui.RTPPortLabel->setVisible( !b_udp );
     ui.UDPEdit->setVisible( b_udp );
     ui.UDPLabel->setVisible( b_udp );
-    ui.UDPPortLabel->setText( b_udp ? qtr( "Port:") : qtr( "Video Port:" ) );
-    ui.RTPPortLabel->setText( b_udp ? qtr( "Port:") : qtr( "Audio Port:" ) );
+    ui.UDPPortLabel->setText( b_udp ? qtr( "Port:") : qtr( "Audio Port:" ) );
+    ui.RTPPort2->setVisible( !b_udp );
+    ui.RTPPortLabel2->setVisible( !b_udp );
+}
+
+void SoutDialog::RTPtoggled( bool b_en )
+{
+    if( !b_en )
+    {
+        if( ui.RTPPort->value() == ui.UDPPort->value() )
+        {
+            ui.UDPPort->setValue( ui.UDPPort->value() + 1 );
+        }
+
+        while( ui.RTPPort2->value() == ui.UDPPort->value() ||
+                ui.RTPPort2->value() == ui.RTPPort->value() )
+        {
+            ui.RTPPort2->setValue( ui.RTPPort2->value() + 1 );
+        }
+    }
+    ui.sap->setEnabled( b_en );
+    ui.RTPLabel->setEnabled( b_en );
+    ui.RTPEdit->setEnabled( b_en );
+    ui.UDPOutput->setEnabled( b_en );
+    ui.UDPPort->setEnabled( b_en );
+    ui.UDPPortLabel->setEnabled( b_en );
+    ui.RTPPort2->setEnabled( b_en );
+    ui.RTPPortLabel2->setEnabled( b_en );
 }
 
 void SoutDialog::ok()
@@ -349,7 +382,8 @@ void SoutDialog::updateMRL()
     sout.i_http = ui.HTTPPort->value();
     sout.i_mms = ui.MMSHPort->value();
     sout.i_rtp = ui.RTPPort->value();
-    sout.i_udp = ui.UDPPort->value();
+    sout.i_rtp_audio = sout.i_udp = ui.UDPPort->value();
+    sout.i_rtp_video = ui.RTPPort2->value();
     sout.i_icecast = ui.IcecastPort->value();
     sout.i_ab = ui.aBitrateSpin->value();
     sout.i_vb = ui.vBitrateSpin->value();
@@ -421,12 +455,13 @@ void SoutDialog::updateMRL()
         mrl.append( "}" );
     }
 
+    /* Protocol output */
     if ( sout.b_local || sout.b_file || sout.b_http ||
-         sout.b_mms || sout.b_rtp || sout.b_udp )
+         sout.b_mms || sout.b_rtp || sout.b_udp || sout.b_icecast )
     {
 
-#define ISMORE() if ( more ) mrl.append( "," );
-#define ATLEASTONE() if ( counter ) mrl.append( "dst=" );
+#define ISMORE() if ( more ) mrl.append( "," )
+#define ATLEASTONE() if ( counter ) mrl.append( "dst=" )
 
 #define CHECKMUX() \
        if( sout.psz_mux ) \
@@ -436,32 +471,26 @@ void SoutDialog::updateMRL()
        }
 
         if ( trans )
-        {
             mrl.append( ":" );
-        }
         else
-        {
             mrl = ":sout=#";
-        }
 
         if ( counter )
-        {
             mrl.append( "duplicate{" );
-        }
 
         if ( sout.b_local )
         {
             ISMORE();
-            ATLEASTONE()
-                mrl.append( "display" );
+            ATLEASTONE();
+            mrl.append( "display" );
             more = true;
         }
 
         if ( sout.b_file )
         {
             ISMORE();
-            ATLEASTONE()
-                mrl.append( "std{access=file" );
+            ATLEASTONE();
+            mrl.append( "std{access=file" );
             CHECKMUX();
             mrl.append( ",dst=" );
             mrl.append( sout.psz_file );
@@ -472,8 +501,8 @@ void SoutDialog::updateMRL()
         if ( sout.b_http )
         {
             ISMORE();
-            ATLEASTONE()
-                mrl.append( "std{access=http" );
+            ATLEASTONE();
+            mrl.append( "std{access=http" );
             CHECKMUX();
             mrl.append( ",dst=" );
             mrl.append( sout.psz_http );
@@ -486,8 +515,8 @@ void SoutDialog::updateMRL()
         if ( sout.b_mms )
         {
             ISMORE();
-            ATLEASTONE()
-                mrl.append( "std{access=mmsh" );
+            ATLEASTONE();
+            mrl.append( "std{access=mmsh" );
             CHECKMUX();
             mrl.append( ",dst=" );
             mrl.append( sout.psz_mms );
@@ -500,27 +529,34 @@ void SoutDialog::updateMRL()
         if ( sout.b_rtp )
         {
             ISMORE();
-            ATLEASTONE()
+            ATLEASTONE();
+            if ( sout.b_udp )
+            {
+                mrl.append( "std{access=udp" );
+                CHECKMUX();
+                mrl.append( ",dst=" );
+                mrl.append( sout.psz_udp );
+                mrl.append( ":" );
+                mrl.append( QString::number( sout.i_udp,10 ) );
+            }
+            else
+            {
                 mrl.append( "rtp{" );
-            CHECKMUX();
-            mrl.append( ",dst=" );
-            mrl.append( sout.psz_rtp );
-            mrl.append( ":" );
-            mrl.append( QString::number( sout.i_rtp,10 ) );
-            mrl.append( "}" );
-            more = true;
-        }
+                mrl.append( "dst=" );
+                mrl.append( sout.psz_rtp );
+                CHECKMUX();
+                mrl.append( ",port=" );
+                mrl.append( QString::number( sout.i_rtp,10 ) );
+                if( !sout.psz_mux || strncmp( sout.psz_mux, "ts", 2 ) )
+                {
+                    mrl.append( ",port-audio=" );
+                    mrl.append( QString::number( sout.i_rtp_audio, 10 ) );
+                    mrl.append( ",port-video=" );
+                    mrl.append( QString::number( sout.i_rtp_video, 10 ) );
+                }
+            }
 
-        if ( sout.b_udp )
-        {
-            ISMORE();
-            ATLEASTONE()
-            mrl.append( "std{access=udp" );
-            CHECKMUX();
-            mrl.append( ",dst=" );
-            mrl.append( sout.psz_udp );
-            mrl.append( ":" );
-            mrl.append( QString::number( sout.i_udp,10 ) );
+            /* SAP */
             if ( sout.b_sap )
             {
                 mrl.append( ",sap," );
@@ -531,13 +567,26 @@ void SoutDialog::updateMRL()
                 mrl.append( sout.psz_name );
                 mrl.append( "\"" );
             }
+
             mrl.append( "}" );
             more = true;
         }
 
         if( sout.b_icecast )
         {
-            // TODO
+            ISMORE();
+            ATLEASTONE();
+            mrl.append( "std{access=shout,mux=ogg" );
+            mrl.append( ",dst=" );
+            mrl.append( sout.sa_icecast.psz_username );
+            mrl.append( "@" );
+            mrl.append( sout.psz_icecast );
+            mrl.append( ":" );
+            mrl.append( QString::number( sout.i_icecast, 10 ) );
+            mrl.append( "/" );
+            mrl.append( sout.psz_icecast_mountpoint );
+            mrl.append( "}" );
+            more = true;
         }
 
         if ( counter )
