@@ -900,7 +900,7 @@ void MainInterface::setName( QString name )
 
 void MainInterface::setStatus( int status )
 {
-    msg_Dbg( p_intf, "I was here, updating your status" );
+    msg_Dbg( p_intf, "Updating the stream status: %i", status );
 
     /* Forward the status to the controls to toggle Play/Pause */
     controls->setStatus( status );

@@ -20,6 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -58,7 +59,6 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
             ErrorsDialog::getInstance( p_intf )->addError(
                  qfu( p_dialog->psz_title ), qfu( p_dialog->psz_description ) );
         i_ret = 0;
-        //  QApplication::style()->standardPixmap(QStyle::SP_MessageBoxCritical)
     }
     else if( p_dialog->i_flags & DIALOG_WARNING )
     {
@@ -119,6 +119,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     {
         progressBar = p_intf->p_sys->p_mi->pgBar;
         progressBar->show();
+        i_ret = 2;
     }
     else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
     {
@@ -131,18 +132,24 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         layout->addWidget( inputEdit );
     }
     else
-        msg_Err( p_intf, "unknown dialog type %i", p_dialog->i_flags );
+    {
+        msg_Err( p_intf, "Unknown dialog type %i", p_dialog->i_flags );
+        return;
+    }
 
     /* We used a message box */
     if( i_ret != -1 )
     {
         if( i_ret == 0 ) Finish( DIALOG_OK_YES );
         else if ( i_ret == 1 ) Finish( DIALOG_NO );
+        else if ( i_ret == 2 ) return ;
         else Finish( DIALOG_CANCELLED );
     }
     else
     /* Custom box, finish it */
     {
+        assert( dialog );
+        /* Start the DialogButtonBox config */
         QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
         if( p_dialog->psz_default_button )
@@ -165,12 +172,17 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
             buttonBox->addButton( otherButton, QDialogButtonBox::ActionRole );
         }
         layout->addWidget( buttonBox );
+        /* End the DialogButtonBox */
+
+        /* CONNECTs */
         if( p_dialog->psz_default_button )
             BUTTONACT( defaultButton, defaultB() );
         if( p_dialog->psz_alternate_button )
             BUTTONACT( altButton, altB() );
         if( p_dialog->psz_other_button )
             BUTTONACT( otherButton, otherB() );
+
+        /* set the layouts and thte title */
         dialog->setLayout( layout );
         dialog->setWindowTitle( qfu( p_dialog->psz_title ) );
     }
