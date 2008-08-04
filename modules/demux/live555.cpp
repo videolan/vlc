@@ -154,6 +154,7 @@ typedef struct
     bool            b_rtcp_sync;
     char            waiting;
     int64_t         i_pts;
+    int64_t         i_npt;
     u_int32_t       i_start_seq;
 
 } live_track_t;
@@ -189,6 +190,7 @@ struct demux_sys_t
 
     /* */
     int64_t          i_pcr; /* The clock */
+    int64_t          i_npt;
     int64_t          i_npt_length;
     int64_t          i_npt_start;
 
@@ -270,6 +272,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_track = 0;
     p_sys->track   = NULL;
     p_sys->i_pcr = 0;
+    p_sys->i_npt = 0;
     p_sys->i_npt_start = 0;
     p_sys->i_npt_length = 0;
     p_sys->p_out_asf = NULL;
@@ -762,6 +765,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->waiting     = 0;
             tk->b_rtcp_sync = false;
             tk->i_pts       = 0;
+            tk->i_npt       = 0;
             tk->i_buffer    = 65536;
             tk->p_buffer    = (uint8_t *)malloc( 65536 );
             if( !tk->p_buffer )
@@ -1098,7 +1102,6 @@ static int Demux( demux_t *p_demux )
         p_sys->b_timeout_call = false;
     }
 
-
     for( i = 0; i < p_sys->i_track; i++ )
     {
         live_track_t *tk = p_sys->track[i];
@@ -1158,7 +1161,9 @@ static int Demux( demux_t *p_demux )
             tk->b_rtcp_sync = true;
             /* reset PCR */
             tk->i_pts = 0;
+            tk->i_npt = 0;
             p_sys->i_pcr = 0;
+            p_sys->i_npt = 0;
             i_pcr = 0;
         }
     }
@@ -1205,7 +1210,7 @@ static int Demux( demux_t *p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t *pi64;
+    int64_t *pi64, i64;
     double  *pf, f;
     bool *pb, *pb2, b_bool;
     int *pi_int;
@@ -1213,6 +1218,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->i_npt > 0 )
+            {
+                *pi64 = p_sys->i_npt;
+                return VLC_SUCCESS;
+            }
             return VLC_EGENERIC;
 
         case DEMUX_GET_LENGTH:
@@ -1225,17 +1236,34 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_POSITION:
+            pf = (double*)va_arg( args, double* );
+            if( p_sys->i_npt_length > 0 && p_sys->i_npt > 0)
+            {
+                *pf = ( (double)p_sys->i_npt / (double)p_sys->i_npt_length );
+                return VLC_SUCCESS;
+            }
             return VLC_EGENERIC;
 
         case DEMUX_SET_POSITION:
-        {
-            float time;
-
-            f = (double)va_arg( args, double );
+        case DEMUX_SET_TIME:
             if( p_sys->rtsp && p_sys->i_npt_length > 0 )
             {
                 int i;
-                time = f * (double)p_sys->i_npt_length / (double)1000000.0;   /* in second */
+                float time;
+
+                if( i_query == DEMUX_SET_TIME && p_sys->i_npt )
+                {
+                    i64 = (int64_t)va_arg( args, int64_t );
+                    time = (float)((double)i64 / (double)1000000.0); /* in second */
+                }
+                else if( i_query == DEMUX_SET_TIME )
+                    return VLC_EGENERIC;
+                else
+                {
+                    f = (double)va_arg( args, double );
+                    time = f * (double)p_sys->i_npt_length / (double)1000000.0;   /* in second */
+                }
+
                 if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time, -1, 1 ) )
                 {
                     msg_Err( p_demux, "PLAY failed %s",
@@ -1258,6 +1286,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
                 if( p_sys->i_npt_start < 0 )
                     p_sys->i_npt_start = -1;
+                else p_sys->i_npt = p_sys->i_npt_start;
 
                 /* Retrieve the duration if possible */
                 p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
@@ -1268,7 +1297,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
-        }
+
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_SEEK:
@@ -1333,6 +1362,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* ReSync the stream */
             p_sys->i_npt_start = 0;
             p_sys->i_pcr = 0;
+            p_sys->i_npt = 0;
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() + 0.5 );
@@ -1385,6 +1415,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
             if( p_sys->i_npt_start < 0 )
                 p_sys->i_npt_start = -1;
+            else p_sys->i_npt = p_sys->i_npt_start;
 
             /* Retrieve the duration if possible */
             p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
@@ -1488,11 +1519,14 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     //msg_Dbg( p_demux, "pts: %d", pts.tv_sec );
 
-    int64_t i_pts = (uint64_t)pts.tv_sec * UINT64_C(1000000) +
-        (uint64_t)pts.tv_usec;
+    int64_t i_pts = (int64_t)pts.tv_sec * INT64_C(1000000) +
+        (int64_t)pts.tv_usec;
 
     /* XXX Beurk beurk beurk Avoid having negative value XXX */
-    i_pts &= UINT64_C(0x00ffffffffffffff);
+    i_pts &= INT64_C(0x00ffffffffffffff);
+
+    /* Retrieve NPT for this pts */
+    tk->i_npt = (int64_t) INT64_C(1000000) * tk->sub->getNormalPlayTime(pts);
 
     if( tk->b_quicktime && tk->p_es == NULL )
     {
@@ -1637,6 +1671,11 @@ static void StreamRead( void *p_private, unsigned int i_size,
     {
         p_block->i_pts = i_pts;
     }
+
+    /* Update our global npt value */
+    if( tk->i_npt > 0 && tk->i_npt > p_sys->i_npt && tk->i_npt < p_sys->i_npt_length)
+        p_sys->i_npt = tk->i_npt; 
+
     if( !tk->b_muxed )
     {
         /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
