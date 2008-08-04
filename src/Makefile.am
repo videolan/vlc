@@ -182,8 +182,8 @@ libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
 libvlccore_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` $(AM_LIBADD) $(LTLIBINTL)
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
-libvlccore_la_DEPENDENCIES += $(DATA_win32_rc)
-libvlccore_la_LDFLAGS += -Wl,$(DATA_win32_rc)
+libvlccore_la_DEPENDENCIES += $(DATA_win32_rc_lib)
+libvlccore_la_LDFLAGS += -Wl,$(DATA_win32_rc_lib)
 endif
 
 libvlc_la_SOURCES = $(SOURCES_libvlc_control)
@@ -195,8 +195,8 @@ libvlc_la_LDFLAGS = $(AM_LDFLAGS) \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym libvlccore.la
 if HAVE_WIN32
-libvlc_la_DEPENDENCIES += $(DATA_win32_rc)
-libvlc_la_LDFLAGS += -Wl,$(DATA_win32_rc)
+libvlc_la_DEPENDENCIES += $(DATA_win32_rc_lib)
+libvlc_la_LDFLAGS += -Wl,$(DATA_win32_rc_lib)
 endif
 
 
@@ -477,10 +477,14 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
 	eval $$cmd
 
 if HAVE_WIN32
-DATA_win32_rc = $(noinst_DATA)
-noinst_DATA = vlc_win32_rc.$(OBJEXT)
+DATA_win32_rc = vlc_win32_rc.$(OBJEXT)
+DATA_win32_rc_lib = libvlc_win32_rc.$(OBJEXT)
+noinst_DATA = $(DATA_win32_rc) $(DATA_win32_rc_lib)
 
 vlc_win32_rc.$(OBJEXT): $(top_builddir)/share/vlc_win32_rc.rc
+	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
+
+libvlc_win32_rc.$(OBJEXT): $(top_builddir)/share/libvlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
 endif
 endif

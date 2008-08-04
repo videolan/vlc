@@ -60,7 +60,8 @@ DIST_rsrc = \
 	resource.h \
 	vlc_wince_rc.rc \
 	vlc_beos.rsrc \
-	vlc_win32_rc.rc
+	vlc_win32_rc.rc.in \
+	libvlc_win32_rc.rc.in
 
 DIST_pda = \
 	pda-forwardb16x16.xpm \

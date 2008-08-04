@@ -5806,6 +5806,7 @@ AC_CONFIG_FILES([
   projects/mozilla/npvlc_rc.rc
   share/Makefile
   share/vlc_win32_rc.rc
+  share/libvlc_win32_rc.rc
   src/Makefile
   test/Makefile
 ])
