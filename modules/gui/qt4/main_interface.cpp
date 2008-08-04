@@ -449,9 +449,10 @@ inline void MainInterface::askForPrivacy()
     if( config_GetInt( p_intf, "qt-privacy-ask") )
     {
         QList<ConfigControl *> controls;
-        if( privacyDialog( controls ) == QDialog::Accepted )
+        if( privacyDialog( &controls ) == QDialog::Accepted )
         {
             QList<ConfigControl *>::Iterator i;
+            msg_Dbg( p_intf, "coin coin %i", controls.size() );
             for(  i = controls.begin() ; i != controls.end() ; i++ )
             {
                 ConfigControl *c = qobject_cast<ConfigControl *>(*i);
@@ -465,7 +466,7 @@ inline void MainInterface::askForPrivacy()
     }
 }
 
-int MainInterface::privacyDialog( QList<ConfigControl *> controls )
+int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
 {
     QDialog *privacy = new QDialog();
 
@@ -505,7 +506,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
     {                                                             \
         control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
                 p_config, options, false, optionsLayout, line );  \
-        controls.append( control );                               \
+        controls->append( control );                               \
     }
 
 #define CONFIG_GENERIC_NOBOOL( option, type )                     \
@@ -514,7 +515,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
     {                                                             \
         control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
                 p_config, options, optionsLayout, line );  \
-        controls.append( control );                               \
+        controls->append( control );                               \
     }
 
     CONFIG_GENERIC( "album-art", IntegerList ); line++;

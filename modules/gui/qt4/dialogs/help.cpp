@@ -241,10 +241,10 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     p_update = update_New( p_intf );
     b_checked = false;
 
-    setMinimumSize( 300, 100 );
+    setMinimumSize( 300, 300 );
     setMaximumSize( 400, 300 );
 
-    readSettings( "Update", QSize( 300, 100 ) );
+    readSettings( "Update", QSize( 300, 250 ) );
 
     /* Check for updates */
     UpdateOrDownload();

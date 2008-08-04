@@ -108,7 +108,7 @@ private:
 
     void handleMainUi( QSettings* );
     void askForPrivacy();
-    int  privacyDialog( QList<ConfigControl *> controls );
+    int  privacyDialog( QList<ConfigControl *> *controls );
 
     /* Systray */
     void handleSystray();
