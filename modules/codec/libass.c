@@ -140,10 +140,14 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* */
+    p_sys->p_ass = AssHandleYield( p_dec );
+    if( !p_sys->p_ass )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     vlc_mutex_init( &p_sys->lock );
     p_sys->i_refcount = 1;
-
-    p_sys->p_ass = AssHandleYield( p_dec );
 
     /* load attachments */
     input_attachment_t  **pp_attachments;
@@ -173,6 +177,12 @@ static int Create( vlc_object_t *p_this )
     /* Add a track */
     vlc_mutex_lock( p_sys->p_ass->p_lock );
     p_sys->p_track = p_track = ass_new_track( p_sys->p_ass->p_library );
+    if( !p_track )
+    {
+        vlc_mutex_unlock( p_sys->p_ass->p_lock );
+        DecSysRelease( p_sys );
+        return VLC_EGENERIC;
+    }
     ass_process_codec_private( p_track, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
     vlc_mutex_unlock( p_sys->p_ass->p_lock );
 
@@ -209,7 +219,8 @@ static void DecSysRelease( decoder_sys_t *p_sys )
     vlc_mutex_destroy( &p_sys->lock );
 
     vlc_mutex_lock( p_sys->p_ass->p_lock );
-    ass_free_track( p_sys->p_track );
+    if( p_sys->p_track )
+        ass_free_track( p_sys->p_track );
     vlc_mutex_unlock( p_sys->p_ass->p_lock );
 
     AssHandleRelease( p_sys->p_ass );
