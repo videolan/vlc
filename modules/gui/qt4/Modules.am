@@ -216,6 +216,7 @@ EXTRA_DIST += \
 	pixmaps/playlist/repeat_one.png \
 	pixmaps/playlist/shuffle_off.png \
 	pixmaps/playlist/shuffle_on.png \
+	pixmaps/playlist/jumpto.png \
 	pixmaps/play.png \
 	pixmaps/previous_16px.png \
 	pixmaps/previous.png \
