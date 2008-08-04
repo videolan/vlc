@@ -29,6 +29,8 @@
 #include "dialogs_provider.hpp"
 #include "components/extended_panels.hpp"
 
+
+#include "main_interface.hpp"
 #include <QTabWidget>
 #include <QGridLayout>
 
@@ -86,7 +88,14 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->addWidget( closeButton, 1, 4, 1, 1 );
     CONNECT( closeButton, clicked(), this, close() );
 
-    readSettings( "EPanel", QSize( 400, 280 ), QPoint( 450, 0 ) );
+    QPoint startPoint( 450, 0 );
+    MainInterface *p_mi = p_intf->p_sys->p_mi;
+    if( p_mi )
+    {
+        startPoint.setX( p_mi->x() );
+        startPoint.setY( p_mi->y() + p_mi->frameGeometry().height() );
+    }
+    readSettings( "EPanel", QSize( 400, 280 ), startPoint );
 }
 
 ExtendedDialog::~ExtendedDialog()
