@@ -1,0 +1,141 @@
+diff -ruN libass/libass/ass.c libass.update/libass/ass.c
+--- libass/libass/ass.c	2008-05-22 20:01:18.000000000 +0200
++++ libass.update/libass/ass.c	2008-08-04 04:10:14.000000000 +0200
+@@ -846,16 +846,22 @@
+ 		char* ip;
+ 		char* op;
+ 		size_t rc;
++                int clear = 0;
+ 		
+-		outbuf = malloc(size);
++		outbuf = malloc(osize);
+ 		ip = data;
+ 		op = outbuf;
+ 		
+-		while (ileft) {
++		while (1) {
++                        if(ileft)
+ 			rc = iconv(icdsc, &ip, &ileft, &op, &oleft);
++                        else {// clear the conversion state and leave
++                            clear = 1;
++                            rc = iconv(icdsc, NULL, NULL, &op, &oleft);
++                        }
+ 			if (rc == (size_t)(-1)) {
+ 				if (errno == E2BIG) {
+-					int offset = op - outbuf;
++					size_t offset = op - outbuf;
+ 					outbuf = (char*)realloc(outbuf, osize + size);
+ 					op = outbuf + offset;
+ 					osize += size;
+@@ -864,7 +870,9 @@
+ 					mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_ErrorRecodingFile);
+ 					return NULL;
+ 				}
+-			}
++			} else
++                            if( clear )
++                                break;
+ 		}
+ 		outbuf[osize - oleft - 1] = 0;
+ 	}
+diff -ruN libass/libass/ass_fontconfig.c libass.update/libass/ass_fontconfig.c
+--- libass/libass/ass_fontconfig.c	2008-05-22 20:01:18.000000000 +0200
++++ libass.update/libass/ass_fontconfig.c	2008-08-04 04:14:45.000000000 +0200
+@@ -129,6 +129,8 @@
+ 		goto error;
+ 
+ 	fset = FcFontSort(priv->config, pat, FcTrue, NULL, &result);
++        if(!fset)
++            goto error;
+ 
+ 	for (curf = 0; curf < fset->nfont; ++curf) {
+ 		FcPattern* curp = fset->fonts[curf];
+@@ -351,12 +353,15 @@
+ 	FcPattern* pattern;
+ 	FcFontSet* fset;
+ 	FcBool res;
++        int face_index, num_faces = 1;
+ 
+-	rc = FT_New_Memory_Face(ftlibrary, (unsigned char*)data, data_size, 0, &face);
++	for (face_index = 0; face_index < num_faces; ++face_index) {
++        rc = FT_New_Memory_Face(ftlibrary, (unsigned char*)data, data_size, 0, &face);
+ 	if (rc) {
+ 		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_ErrorOpeningMemoryFont, name);
+ 		return;
+ 	}
++        num_faces = face->num_faces;
+ 
+ 	pattern = FcFreeTypeQueryFace(face, (unsigned char*)name, 0, FcConfigGetBlanks(priv->config));
+ 	if (!pattern) {
+@@ -380,6 +385,7 @@
+ 	}
+ 
+ 	FT_Done_Face(face);
++        }
+ #endif
+ }
+ 
+@@ -419,7 +425,8 @@
+ 	for (i = 0; i < library->num_fontdata; ++i)
+ 		process_fontdata(priv, library, ftlibrary, i);
+ 
+-	if (FcDirCacheValid((const FcChar8 *)dir) == FcFalse)
++	if(dir) {
++        if (FcDirCacheValid((const FcChar8 *)dir) == FcFalse)
+ 	{
+ 		mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_UpdatingFontCache);
+ 		if (FcGetVersion() >= 20390 && FcGetVersion() < 20400)
+@@ -457,6 +464,7 @@
+ 	if (!rc) {
+ 		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_FcConfigAppFontAddDirFailed);
+ 	}
++        }
+ 
+ 	priv->family_default = family ? strdup(family) : 0;
+ 	priv->path_default = path ? strdup(path) : 0;
+diff -ruN libass/libass/ass_render.c libass.update/libass/ass_render.c
+--- libass/libass/ass_render.c	2008-05-22 20:01:18.000000000 +0200
++++ libass.update/libass/ass_render.c	2008-08-04 04:16:01.000000000 +0200
+@@ -679,11 +679,11 @@
+  * \param pwr multiplier for some tag effects (comes from \t tags)
+  */
+ static char* parse_tag(char* p, double pwr) {
+-#define skip_all(x) if (*p == (x)) ++p; else { \
+-	while ((*p != (x)) && (*p != '}') && (*p != 0)) {++p;} }
++#define skip_to(x) while ((*p != (x)) && (*p != '}') && (*p != 0)) { ++p;}
+ #define skip(x) if (*p == (x)) ++p; else { return p; }
+ 	
+-	skip_all('\\');
++	skip_to('\\');
++	skip('\\');
+ 	if ((*p == '}') || (*p == 0))
+ 		return p;
+ 
+@@ -787,7 +787,7 @@
+ 	} else if (mystrcmp(&p, "fn")) {
+ 		char* start = p;
+ 		char* family;
+-		skip_all('\\');
++		skip_to('\\');
+ 		if (p > start) {
+ 			family = malloc(p - start + 1);
+ 			strncpy(family, start, p - start);
+@@ -928,7 +928,8 @@
+ 		}
+ 		while (*p == '\\')
+ 			p = parse_tag(p, k); // maybe k*pwr ? no, specs forbid nested \t's 
+-		skip_all(')'); // FIXME: better skip(')'), but much more tags support required
++		skip_to(')'); // in case there is some unknown tag or a comment
++		skip(')');
+ 	} else if (mystrcmp(&p, "clip")) {
+ 		int x0, y0, x1, y1;
+ 		int res = 1;
+@@ -1031,7 +1032,7 @@
+ 	return p;
+ 
+ #undef skip
+-#undef skip_all
++#undef skip_to
+ }
+ 
+ /**

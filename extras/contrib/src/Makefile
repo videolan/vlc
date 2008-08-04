@@ -2444,6 +2444,7 @@ libass-$(ASS_VERSION).tar.bz2:
 
 libass: libass-$(ASS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	patch -p0 < Patches/libass_mplayer_updates.patch
 ifneq ($(HOST),$(BUILD))
 	patch -p0 < Patches/libass-cross.patch
 	cd $@; autoconf
