@@ -391,10 +391,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
               p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t));
 
     if( !p_s16_buff )
-    {
-        msg_Err(p_aout,"out of memory");
         return -1;
-    }
 
     p_buffs = p_s16_buff;
     i_original     = config_GetInt ( p_aout, "spect-show-original" );
@@ -423,14 +420,14 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
     if( !p_effect->p_data )
     {
-        p_effect->p_data=(void *)malloc(i_nb_bands * sizeof(int) );
-        if( !p_effect->p_data)
+        p_effect->p_data=(void *)malloc( i_nb_bands * sizeof(int) );
+        if( !p_effect->p_data )
         {
-            msg_Err(p_aout,"out of memory");
+            free( p_s16_buff );
             return -1;
         }
         peaks = (int *)p_effect->p_data;
-        for( i = 0 ; i < i_nb_bands ; i++)
+        for( i = 0 ; i < i_nb_bands ; i++ )
         {
            peaks[i] = 0;
         }
@@ -443,7 +440,8 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     height = (int *)malloc( i_nb_bands * sizeof(int) );
     if( !height)
     {
-        msg_Err(p_aout,"out of memory");
+        free( p_effect->p_data );
+        free( p_s16_buff );
         return -1;
     }
 
@@ -463,6 +461,9 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     if( !p_state)
     {
         msg_Err(p_aout,"unable to initialize FFT transform");
+        free( height );
+        free( p_effect->p_data );
+        free( p_s16_buff );
         return -1;
     }
     p_buffs = p_s16_buff;
@@ -766,8 +767,6 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     fft_close( p_state );
 
     free( p_s16_buff );
-    p_s16_buff = NULL;
-
     free( height );
 
     return 0;
