@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ro\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-08-02 15:44+0100\n"
-"PO-Revision-Date: 2008-08-02 11:43+0200\n"
+"POT-Creation-Date: 2008-08-04 21:31+0100\n"
+"PO-Revision-Date: 2008-08-03 16:02+0200\n"
 "Last-Translator: Cristian Secară <cristi AT secarica DOT ro>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -88,7 +88,7 @@ msgstr "Setări taste rapide"
 #: modules/gui/macosx/wizard.m:378
 #: modules/gui/qt4/components/info_panels.cpp:522
 #: modules/gui/qt4/components/simple_preferences.cpp:78
-#: modules/gui/qt4/ui/sout.ui:671 modules/stream_out/transcode.c:199
+#: modules/gui/qt4/ui/sout.ui:725 modules/stream_out/transcode.c:199
 msgid "Audio"
 msgstr "Audio"
 
@@ -101,7 +101,7 @@ msgid "General audio settings"
 msgstr "Setări audio generale"
 
 #: include/vlc_config_cat.h:60 include/vlc_config_cat.h:85
-#: src/video_output/video_output.c:414
+#: src/video_output/video_output.c:415
 msgid "Filters"
 msgstr "Filtre"
 
@@ -127,7 +127,7 @@ msgid "These are general settings for audio output modules."
 msgstr "Acestea sunt setările generale pentru modulele de ieșire"
 
 #: include/vlc_config_cat.h:71 src/libvlc-module.c:1833
-#: modules/gui/qt4/ui/sout.ui:806 modules/stream_out/transcode.c:231
+#: modules/gui/qt4/ui/sout.ui:860 modules/stream_out/transcode.c:231
 msgid "Miscellaneous"
 msgstr "Diverse"
 
@@ -141,7 +141,7 @@ msgstr "Diverse setări audio și module."
 #: modules/gui/macosx/simple_prefs.m:176 modules/gui/macosx/wizard.m:379
 #: modules/gui/qt4/components/info_panels.cpp:523
 #: modules/gui/qt4/components/simple_preferences.cpp:79
-#: modules/gui/qt4/ui/sout.ui:574 modules/misc/dummy/dummy.c:98
+#: modules/gui/qt4/ui/sout.ui:628 modules/misc/dummy/dummy.c:98
 #: modules/stream_out/transcode.c:168
 msgid "Video"
 msgstr "Video"
@@ -778,7 +778,7 @@ msgstr ""
 # hm ? mai este undeva în afară de (1) video -> video track -> și (2) video -> deinterlace -> ?
 #: src/audio_output/input.c:94 src/audio_output/input.c:140
 #: src/input/es_out.c:459 src/libvlc-module.c:560
-#: src/video_output/video_output.c:391 modules/video_filter/postproc.c:222
+#: src/video_output/video_output.c:392 modules/video_filter/postproc.c:222
 msgid "Disable"
 msgstr "Dezactivat"
 
@@ -1009,7 +1009,7 @@ msgid "Stream %d"
 msgstr "Stream %d"
 
 #: src/input/es_out.c:2040 modules/gui/macosx/wizard.m:383
-#: modules/gui/qt4/ui/sout.ui:594 modules/gui/qt4/ui/sout.ui:681
+#: modules/gui/qt4/ui/sout.ui:648 modules/gui/qt4/ui/sout.ui:735
 msgid "Codec"
 msgstr "Codec"
 
@@ -1026,7 +1026,7 @@ msgid "Type"
 msgstr "Tip"
 
 #: src/input/es_out.c:2054 modules/codec/faad.c:391
-#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/sout.ui:730
+#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/sout.ui:784
 msgid "Channels"
 msgstr "Canale"
 
@@ -1035,9 +1035,9 @@ msgid "Sample rate"
 msgstr "Rată de eșantionare"
 
 #: src/input/es_out.c:2060
-#, fuzzy, c-format
+#, c-format
 msgid "%u Hz"
-msgstr "%d Hz"
+msgstr "%u Hz"
 
 #: src/input/es_out.c:2066
 msgid "Bits per sample"
@@ -1049,9 +1049,9 @@ msgid "Bitrate"
 msgstr "Rată de biți"
 
 #: src/input/es_out.c:2072
-#, fuzzy, c-format
+#, c-format
 msgid "%u kb/s"
-msgstr "%d kb/s"
+msgstr "%u kb/s"
 
 #: src/input/es_out.c:2083
 msgid "Resolution"
@@ -1114,9 +1114,8 @@ msgid "Album"
 msgstr "Album"
 
 #: src/input/meta.c:57
-#, fuzzy
 msgid "Track number"
-msgstr "Număr pistă."
+msgstr "Număr pistă"
 
 #: src/input/meta.c:58 modules/gui/macosx/bookmarks.m:96
 #: modules/gui/qt4/dialogs/bookmarks.cpp:66
@@ -1158,9 +1157,8 @@ msgid "Artwork URL"
 msgstr "Rețea: "
 
 #: src/input/meta.c:68
-#, fuzzy
 msgid "Track ID"
-msgstr "Pistă"
+msgstr "ID pistă"
 
 #: src/input/var.c:149
 msgid "Bookmark"
@@ -1236,7 +1234,7 @@ msgstr "Media: %s"
 #: modules/gui/macosx/interaction.m:136 modules/gui/macosx/open.m:168
 #: modules/gui/macosx/prefs.m:126 modules/gui/macosx/prefs.m:147
 #: modules/gui/macosx/simple_prefs.m:232 modules/gui/macosx/simple_prefs.m:296
-#: modules/gui/macosx/simple_prefs.m:606 modules/gui/macosx/wizard.m:320
+#: modules/gui/macosx/simple_prefs.m:624 modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1140
 #: modules/gui/qt4/components/preferences_widgets.cpp:1289
 msgid "Cancel"
@@ -1312,9 +1310,8 @@ msgid " (default disabled)"
 msgstr " (dezactivat implicit)"
 
 #: src/libvlc.c:1799 src/libvlc.c:1802
-#, fuzzy
 msgid "Note:"
-msgstr "Nimic"
+msgstr "Notă:"
 
 #: src/libvlc.c:1800 src/libvlc.c:1803
 msgid "add --advanced to your command line to see advanced options."
@@ -1336,9 +1333,9 @@ msgid "Compiler: %s\n"
 msgstr "Compilator: %s\n"
 
 #: src/libvlc.c:1912
-#, fuzzy, c-format
+#, c-format
 msgid "Based upon Git commit [%s]\n"
-msgstr "Bazat pe modificările svn [%s]\n"
+msgstr "Bazat pe commitul Git [%s]\n"
 
 #: src/libvlc.c:1948
 msgid ""
@@ -2449,8 +2446,8 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:92 modules/access/v4l2/v4l2.c:246
 #: modules/audio_output/alsa.c:105 modules/gui/fbosd.c:173
 #: modules/gui/macosx/prefs_widgets.m:1280
-#: modules/gui/macosx/simple_prefs.m:343 modules/gui/macosx/simple_prefs.m:429
-#: modules/gui/macosx/simple_prefs.m:674 modules/gui/macosx/vout.m:203
+#: modules/gui/macosx/simple_prefs.m:377 modules/gui/macosx/simple_prefs.m:468
+#: modules/gui/macosx/simple_prefs.m:690 modules/gui/macosx/vout.m:203
 #: modules/gui/qt4/components/preferences_widgets.cpp:556
 #: modules/video_filter/marq.c:61 modules/video_filter/rss.c:70
 #: modules/video_filter/rss.c:182 modules/video_output/msw/directx.c:161
@@ -4520,7 +4517,7 @@ msgstr "Subimagini"
 
 #: src/libvlc-module.c:1594 modules/codec/subtitles/subsdec.c:117
 #: modules/demux/subtitle.c:74 modules/gui/beos/InterfaceWindow.cpp:280
-#: modules/gui/qt4/ui/sout.ui:765 modules/gui/qt4/ui/sout.ui:771
+#: modules/gui/qt4/ui/sout.ui:819 modules/gui/qt4/ui/sout.ui:825
 msgid "Subtitles"
 msgstr "Subtitluri"
 
@@ -4659,44 +4656,44 @@ msgstr "tipărește informația despre versiune"
 msgid "main program"
 msgstr "program principal"
 
-#: src/misc/update.c:1582
+#: src/misc/update.c:1600
 msgid "File could not be verified"
 msgstr ""
 
-#: src/misc/update.c:1583
+#: src/misc/update.c:1601
 #, c-format
 msgid ""
 "It was not possible to download a cryptographic signature for the downloaded "
 "file \"%s\". Thus, it was deleted."
 msgstr ""
 
-#: src/misc/update.c:1594 src/misc/update.c:1606
+#: src/misc/update.c:1612 src/misc/update.c:1624
 msgid "Invalid signature"
 msgstr "Semnătură nevalidă"
 
-#: src/misc/update.c:1595 src/misc/update.c:1607
+#: src/misc/update.c:1613 src/misc/update.c:1625
 #, c-format
 msgid ""
 "The cryptographic signature for the downloaded file \"%s\" was invalid and "
 "could not be used to securely verify it. Thus, the file was deleted."
 msgstr ""
 
-#: src/misc/update.c:1619
+#: src/misc/update.c:1637
 msgid "File not verifiable"
 msgstr "Fișierul nu este verificabil"
 
-#: src/misc/update.c:1620
+#: src/misc/update.c:1638
 #, c-format
 msgid ""
 "It was not possible to securely verify the downloaded file \"%s\". Thus, it "
 "was VLC deleted."
 msgstr ""
 
-#: src/misc/update.c:1631 src/misc/update.c:1643
+#: src/misc/update.c:1649 src/misc/update.c:1661
 msgid "File corrupted"
 msgstr "Fișierul a fost corupt"
 
-#: src/misc/update.c:1632 src/misc/update.c:1644
+#: src/misc/update.c:1650 src/misc/update.c:1662
 #, c-format
 msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr ""
@@ -5265,29 +5262,29 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/video_output/video_output.c:389 modules/gui/macosx/intf.m:724
+#: src/video_output/video_output.c:390 modules/gui/macosx/intf.m:724
 #: modules/gui/macosx/intf.m:725 modules/video_filter/deinterlace.c:127
 msgid "Deinterlace"
 msgstr "Deîntrețesere"
 
-#: src/video_output/video_output.c:393 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:394 modules/video_filter/deinterlace.c:123
 msgid "Discard"
 msgstr "Semicadru înlăturat"
 
-#: src/video_output/video_output.c:395 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:396 modules/video_filter/deinterlace.c:123
 msgid "Blend"
 msgstr "Mixat"
 
-#: src/video_output/video_output.c:397 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:398 modules/video_filter/deinterlace.c:123
 msgid "Mean"
 msgstr "Mediu"
 
 # hm ? sau rotunjit ?
-#: src/video_output/video_output.c:399 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:400 modules/video_filter/deinterlace.c:123
 msgid "Bob"
 msgstr "Bob"
 
-#: src/video_output/video_output.c:401 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:402 modules/video_filter/deinterlace.c:123
 msgid "Linear"
 msgstr "Liniar"
 
@@ -5306,8 +5303,8 @@ msgstr "Raport de aspect"
 #: modules/access/bda/bda.c:40 modules/access/cdda.c:66
 #: modules/access/dshow/dshow.cpp:98 modules/access/dvb/access.c:78
 #: modules/access/dv.c:71 modules/access/dvdnav.c:72
-#: modules/access/dvdread.c:76 modules/access/fake.c:43
-#: modules/access/file.c:84 modules/access/ftp.c:57
+#: modules/access/dvdread.c:76 modules/access/eyetv.m:61
+#: modules/access/fake.c:43 modules/access/file.c:84 modules/access/ftp.c:57
 #: modules/access/gnomevfs.c:47 modules/access/http.c:75
 #: modules/access/jack.c:62 modules/access/mms/mms.c:49
 #: modules/access/pvr.c:60 modules/access/rtmp/access.c:43
@@ -5329,7 +5326,7 @@ msgstr ""
 #: modules/access/bda/bda.c:45 modules/access/dvb/access.c:83
 #: modules/gui/qt4/components/open_panels.cpp:876
 msgid "Adapter card to tune"
-msgstr "Placa adaptor de ajustat"
+msgstr "Placa adaptaore de ajustat"
 
 # hm ?
 #: modules/access/bda/bda.c:46 modules/access/dvb/access.c:84
@@ -5369,7 +5366,7 @@ msgstr "Mod inversiune [0=oprit, 1=pornit, 2=auto]"
 
 #: modules/access/bda/bda.c:65 modules/access/dvb/access.c:95
 msgid "Probe DVB card for capabilities"
-msgstr "Probează capabilitățile cardului DVB"
+msgstr "Probează capabilitățile plăcii DVB"
 
 #: modules/access/bda/bda.c:66 modules/access/dvb/access.c:96
 msgid ""
@@ -5387,7 +5384,7 @@ msgstr "Mod buget"
 msgid "This allows you to stream an entire transponder with a \"budget\" card."
 msgstr ""
 "Aceasta vă permite să difuzați sub formă de stream un transponder întreg cu "
-"o placă de „buget”."
+"o placă tip „buget”."
 
 #: modules/access/bda/bda.c:76
 msgid "Network Identifier"
@@ -6596,17 +6593,25 @@ msgstr ""
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr ""
 
-#: modules/access/eyetv.m:54
+#: modules/access/eyetv.m:56
 msgid "Channel number"
 msgstr "Număr canal"
 
-#: modules/access/eyetv.m:56
+#: modules/access/eyetv.m:58
 msgid ""
 "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
 "for Composite input"
 msgstr ""
 
-#: modules/access/eyetv.m:60
+#: modules/access/eyetv.m:63
+#, fuzzy
+msgid ""
+"Caching value for EyeTV captures. This value should be set in milliseconds."
+msgstr ""
+"Valoarea de stocare în cache pentru capturi V4L. Această valoare ar trebui "
+"stabilită în milisecunde."
+
+#: modules/access/eyetv.m:68
 #, fuzzy
 msgid "EyeTV access module"
 msgstr "Modúl de acces"
@@ -6927,9 +6932,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/http.c:95
-#, fuzzy
 msgid "Forward Cookies"
-msgstr "Înaintează"
+msgstr "Înaintează cookie-urile"
 
 #: modules/access/http.c:96
 msgid "Forward Cookies Across http redirections "
@@ -7212,9 +7216,8 @@ msgid "Genre of the content. "
 msgstr ""
 
 #: modules/access_output/shout.c:84
-#, fuzzy
 msgid "URL description"
-msgstr "Descriere"
+msgstr "Descriere URL"
 
 #: modules/access_output/shout.c:85
 msgid "URL with information about the stream or your channel. "
@@ -7236,9 +7239,8 @@ msgid "Samplerate information of the transcoded stream. "
 msgstr "Rata de biți țintă a stream-ului video transcodat"
 
 #: modules/access_output/shout.c:97
-#, fuzzy
 msgid "Number of channels"
-msgstr "Număr de canale de ieșire"
+msgstr "Număr de canale"
 
 #: modules/access_output/shout.c:98
 #, fuzzy
@@ -7593,7 +7595,7 @@ msgid "Screen Input"
 msgstr "Intrare ecran"
 
 #: modules/access/screen/screen.c:87 modules/gui/macosx/open.m:207
-#: modules/gui/macosx/open.m:863 modules/gui/macosx/simple_prefs.m:435
+#: modules/gui/macosx/open.m:863 modules/gui/macosx/simple_prefs.m:474
 #: modules/gui/macosx/vout.m:214
 msgid "Screen"
 msgstr "Ecran"
@@ -7945,7 +7947,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:204
 msgid "Loudness"
-msgstr ""
+msgstr "Loudness"
 
 #: modules/access/v4l2/v4l2.c:206
 msgid "Loudness of the audio input (if supported by the v4l2 driver)."
@@ -8467,7 +8469,7 @@ msgstr "Spate dreapta"
 
 #: modules/audio_filter/channel_mixer/mono.c:102
 msgid "Left front"
-msgstr ""
+msgstr "Față stânga"
 
 #: modules/audio_filter/channel_mixer/mono.c:114
 #, fuzzy
@@ -9091,16 +9093,17 @@ msgstr "Identidficator PortAudio pentru dispozitivul de ieșire"
 msgid "PORTAUDIO audio output"
 msgstr "Ieșire audio PortAudio"
 
-#: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:625
-#: modules/gui/macosx/intf.m:1615 modules/gui/pda/pda_interface.c:210
-#: modules/gui/pda/pda_interface.c:1353 modules/gui/qt4/main_interface.cpp:361
+#: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:624
+#: modules/gui/macosx/intf.m:625 modules/gui/macosx/intf.m:1615
+#: modules/gui/pda/pda_interface.c:210 modules/gui/pda/pda_interface.c:1353
+#: modules/gui/qt4/main_interface.cpp:361
 #: modules/gui/qt4/main_interface.cpp:365
-#: modules/gui/qt4/main_interface.cpp:957
-#: modules/gui/qt4/main_interface.cpp:959
-#: modules/gui/qt4/main_interface.cpp:1023
-#: modules/gui/qt4/main_interface.cpp:1038
-#: modules/gui/qt4/main_interface.cpp:1045
-#: modules/gui/qt4/main_interface.cpp:1062
+#: modules/gui/qt4/main_interface.cpp:958
+#: modules/gui/qt4/main_interface.cpp:960
+#: modules/gui/qt4/main_interface.cpp:1024
+#: modules/gui/qt4/main_interface.cpp:1039
+#: modules/gui/qt4/main_interface.cpp:1046
+#: modules/gui/qt4/main_interface.cpp:1063
 msgid "VLC media player"
 msgstr "VLC media player"
 
@@ -9854,32 +9857,32 @@ msgstr ""
 msgid "FluidSynth MIDI synthetizer"
 msgstr ""
 
-#: modules/codec/kate.c:106 modules/codec/subtitles/subsdec.c:111
+#: modules/codec/kate.c:105 modules/codec/subtitles/subsdec.c:111
 msgid "Formatted Subtitles"
 msgstr "Subtitluri formatate"
 
-#: modules/codec/kate.c:107
+#: modules/codec/kate.c:106
 msgid ""
 "Kate streams allow for text formatting. VLC partly implements this, but you "
 "can choose to disable all formatting."
 msgstr ""
 
-#: modules/codec/kate.c:113
+#: modules/codec/kate.c:112
 #, fuzzy
 msgid "Kate"
 msgstr "Dată"
 
-#: modules/codec/kate.c:114
+#: modules/codec/kate.c:113
 #, fuzzy
 msgid "Kate text subtitles decoder"
 msgstr "Decodor de subtitluri teletext"
 
-#: modules/codec/kate.c:123
+#: modules/codec/kate.c:122
 #, fuzzy
 msgid "Kate text subtitles packetizer"
 msgstr "Pachetizor de subtitluri DVD"
 
-#: modules/codec/kate.c:634
+#: modules/codec/kate.c:731
 #, fuzzy
 msgid "Kate comment"
 msgstr "Comentariu Speex"
@@ -10971,7 +10974,7 @@ msgstr ""
 
 #: modules/control/dbus.c:111
 msgid "dbus"
-msgstr ""
+msgstr "dbus"
 
 #: modules/control/dbus.c:114
 #, fuzzy
@@ -12108,12 +12111,12 @@ msgstr "Port tunel HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr ""
 
-#: modules/demux/live555.cpp:589
+#: modules/demux/live555.cpp:591
 #, fuzzy
 msgid "RTSP authentication"
 msgstr "Multicast RTP"
 
-#: modules/demux/live555.cpp:590
+#: modules/demux/live555.cpp:592
 msgid "Please enter a valid login name and a password."
 msgstr ""
 
@@ -13306,9 +13309,8 @@ msgid "Font"
 msgstr "Font"
 
 #: modules/gui/fbosd.c:214
-#, fuzzy
 msgid "Commands"
-msgstr "Comentariu"
+msgstr "Comenzi"
 
 #: modules/gui/fbosd.c:219
 msgid "GNU/Linux osd/overlay framebuffer interface"
@@ -13319,9 +13321,9 @@ msgid "About VLC media player"
 msgstr "Despre VLC media player"
 
 #: modules/gui/macosx/about.m:91
-#, fuzzy, c-format
+#, c-format
 msgid "Compiled by %s, based on Git commit %s"
-msgstr "Compilat de %s, bazat pe revizuirea SVN %s"
+msgstr "Compilat de %s, bazat pe commitul Git %s"
 
 #: modules/gui/macosx/about.m:95
 #, c-format
@@ -13338,9 +13340,8 @@ msgid "License"
 msgstr "Licență"
 
 #: modules/gui/macosx/about.m:189
-#, fuzzy
 msgid "VLC media player Help"
-msgstr "VLC media player"
+msgstr "Ajutor VLC media player"
 
 #: modules/gui/macosx/about.m:192 modules/gui/pda/pda.c:285
 msgid "Index"
@@ -13536,15 +13537,15 @@ msgstr "Psihedelic"
 msgid "Gradient"
 msgstr "Gradient"
 
+# hm ? sau generală ?
 #: modules/gui/macosx/extended.m:73
 #, fuzzy
 msgid "General editing filters"
-msgstr "Setări audio generale"
+msgstr "Filtre de editare generale"
 
 #: modules/gui/macosx/extended.m:74
-#, fuzzy
 msgid "Distortion filters"
-msgstr "Filtru de distorsiune video"
+msgstr "Filtre de distorsiune"
 
 #: modules/gui/macosx/extended.m:75
 msgid "Blur"
@@ -13672,11 +13673,6 @@ msgstr "Golește"
 #: modules/gui/macosx/interaction.m:401
 msgid "Show Details"
 msgstr "Arată detaliile"
-
-#: modules/gui/macosx/intf.m:624
-#, fuzzy
-msgid "VLC"
-msgstr "VLM"
 
 #: modules/gui/macosx/intf.m:641
 msgid "Open CrashLog..."
@@ -13893,24 +13889,22 @@ msgid "Can't prepare crash log mail"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:2187
-msgid "VLC has previously crashed"
+msgid "VLC crashed previously"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:2188
 msgid ""
-"VLC has previously crashed, do you want to send an email with the crash to "
-"VLC's team?"
+"VLC crashed previously. Do you want to send an email with details on the "
+"crash to VLC's development team?"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:2189
-#, fuzzy
 msgid "Send"
-msgstr "sfârșit"
+msgstr "Trimite"
 
 #: modules/gui/macosx/intf.m:2189
-#, fuzzy
 msgid "Don't Send"
-msgstr "Dimensiune font"
+msgstr "Nu trimite"
 
 #: modules/gui/macosx/intf.m:2192
 msgid ""
@@ -13923,7 +13917,7 @@ msgid "No CrashLog found"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:2205 modules/gui/macosx/prefs.m:148
-#: modules/gui/macosx/simple_prefs.m:607
+#: modules/gui/macosx/simple_prefs.m:625
 msgid "Continue"
 msgstr "Continuă"
 
@@ -14204,7 +14198,7 @@ msgstr ""
 
 #: modules/gui/macosx/open.m:689
 msgid "Open VIDEO_TS Directory"
-msgstr "Deschide director VIDEO_TS"
+msgstr "Deschide un director VIDEO_TS"
 
 #: modules/gui/macosx/open.m:870
 msgid "iSight Capture Input"
@@ -14259,12 +14253,12 @@ msgid "Transcoding options"
 msgstr "Opțiuni de transcodare"
 
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
-#: modules/gui/macosx/wizard.m:382 modules/gui/qt4/ui/sout.ui:604
-#: modules/gui/qt4/ui/sout.ui:698
+#: modules/gui/macosx/wizard.m:382 modules/gui/qt4/ui/sout.ui:658
+#: modules/gui/qt4/ui/sout.ui:752
 msgid "Bitrate (kb/s)"
 msgstr "Rată de biți (kb/s)"
 
-#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/sout.ui:639
+#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/sout.ui:693
 msgid "Scale"
 msgstr "Scală"
 
@@ -14272,7 +14266,7 @@ msgstr "Scală"
 msgid "Stream Announcing"
 msgstr "Anunțare stream"
 
-#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.ui:817
+#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.ui:871
 msgid "SAP announce"
 msgstr "Anunț SAP"
 
@@ -14409,9 +14403,8 @@ msgid "Expand Node"
 msgstr "Expandează nodul"
 
 #: modules/gui/macosx/playlist.m:444
-#, fuzzy
 msgid "Fetch Meta Data"
-msgstr "Metadata"
+msgstr "Obține meta data"
 
 #: modules/gui/macosx/playlist.m:445
 msgid "Sort Node by Name"
@@ -14486,12 +14479,12 @@ msgstr "Resetează tot"
 msgid "Basic"
 msgstr "Bazic"
 
-#: modules/gui/macosx/prefs.m:147 modules/gui/macosx/simple_prefs.m:606
+#: modules/gui/macosx/prefs.m:147 modules/gui/macosx/simple_prefs.m:624
 #: modules/gui/qt4/dialogs/preferences.cpp:352
 msgid "Reset Preferences"
 msgstr "Resetează preferințele"
 
-#: modules/gui/macosx/prefs.m:150 modules/gui/macosx/simple_prefs.m:609
+#: modules/gui/macosx/prefs.m:150 modules/gui/macosx/simple_prefs.m:627
 msgid ""
 "Beware this will reset the VLC media player preferences.\n"
 "Are you sure you want to continue?"
@@ -14748,97 +14741,97 @@ msgstr ""
 msgid "Sequential numbering"
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:481 modules/gui/macosx/simple_prefs.m:525
-#: modules/gui/macosx/simple_prefs.m:1093
+#: modules/gui/macosx/simple_prefs.m:512 modules/gui/macosx/simple_prefs.m:556
+#: modules/gui/macosx/simple_prefs.m:1107
 msgid "Custom"
 msgstr "Personalizat"
 
-#: modules/gui/macosx/simple_prefs.m:481
+#: modules/gui/macosx/simple_prefs.m:512
 msgid "Lowest latency"
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:481
+#: modules/gui/macosx/simple_prefs.m:512
 msgid "Low latency"
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:481 modules/misc/freetype.c:107
+#: modules/gui/macosx/simple_prefs.m:512 modules/misc/freetype.c:107
 #: modules/misc/quartztext.c:108 modules/misc/win32text.c:80
 msgid "Normal"
 msgstr "Normal"
 
-#: modules/gui/macosx/simple_prefs.m:482
+#: modules/gui/macosx/simple_prefs.m:513
 msgid "High latency"
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:482
+#: modules/gui/macosx/simple_prefs.m:513
 msgid "Higher latency"
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:695
+#: modules/gui/macosx/simple_prefs.m:711
 #, fuzzy
 msgid "Interface Settings not saved"
 msgstr "Setări generale pentru interfață"
 
-#: modules/gui/macosx/simple_prefs.m:696 modules/gui/macosx/simple_prefs.m:761
-#: modules/gui/macosx/simple_prefs.m:796 modules/gui/macosx/simple_prefs.m:880
-#: modules/gui/macosx/simple_prefs.m:909 modules/gui/macosx/simple_prefs.m:934
+#: modules/gui/macosx/simple_prefs.m:712 modules/gui/macosx/simple_prefs.m:777
+#: modules/gui/macosx/simple_prefs.m:810 modules/gui/macosx/simple_prefs.m:894
+#: modules/gui/macosx/simple_prefs.m:923 modules/gui/macosx/simple_prefs.m:948
 #, c-format
 msgid "An error occured while saving your settings via SimplePrefs (%i)."
 msgstr ""
 "A aporut o eroare în timpul salvării setărilor dumneavoastră via SimplePrefs "
 "(%i)."
 
-#: modules/gui/macosx/simple_prefs.m:760
+#: modules/gui/macosx/simple_prefs.m:776
 #, fuzzy
 msgid "Audio Settings not saved"
 msgstr "Setări audio"
 
-#: modules/gui/macosx/simple_prefs.m:795
+#: modules/gui/macosx/simple_prefs.m:809
 #, fuzzy
 msgid "Video Settings not saved"
 msgstr "Setări video"
 
-#: modules/gui/macosx/simple_prefs.m:879
+#: modules/gui/macosx/simple_prefs.m:893
 msgid "Input Settings not saved"
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:908
+#: modules/gui/macosx/simple_prefs.m:922
 #, fuzzy
 msgid "On Screen Display/Subtitle Settings not saved"
 msgstr "Setări demultiplexor subtitlu"
 
-#: modules/gui/macosx/simple_prefs.m:933
+#: modules/gui/macosx/simple_prefs.m:947
 msgid "Hotkeys not saved"
 msgstr "Tastele rapide nu au fost salvate"
 
-#: modules/gui/macosx/simple_prefs.m:1026
+#: modules/gui/macosx/simple_prefs.m:1040
 msgid "Choose the folder to save your video snapshots to."
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:1028
-#: modules/gui/macosx/simple_prefs.m:1073
+#: modules/gui/macosx/simple_prefs.m:1042
+#: modules/gui/macosx/simple_prefs.m:1087
 msgid "Choose"
 msgstr "Alege"
 
-#: modules/gui/macosx/simple_prefs.m:1071
+#: modules/gui/macosx/simple_prefs.m:1085
 msgid "Choose the font to display your Subtitles with."
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:1111
+#: modules/gui/macosx/simple_prefs.m:1125
 msgid ""
 "Press new keys for\n"
 "\"%@\""
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:1185
+#: modules/gui/macosx/simple_prefs.m:1199
 msgid "Invalid combination"
 msgstr "Combinație nevalidă"
 
-#: modules/gui/macosx/simple_prefs.m:1186
+#: modules/gui/macosx/simple_prefs.m:1200
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:1203
+#: modules/gui/macosx/simple_prefs.m:1217
 msgid "This combination is already taken by \"%@\"."
 msgstr ""
 
@@ -15227,7 +15220,7 @@ msgid "In this page, a few additional streaming parameters can be set."
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:399 modules/gui/macosx/wizard.m:1864
-#: modules/gui/qt4/ui/sout.ui:868
+#: modules/gui/qt4/ui/sout.ui:922
 msgid "Time-To-Live (TTL)"
 msgstr "Timp-până-la-Live (TTL)"
 
@@ -15354,7 +15347,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:1351
 msgid "Finish"
-msgstr ""
+msgstr "Terminat"
 
 #: modules/gui/macosx/wizard.m:1364 modules/gui/macosx/wizard.m:1393
 #: modules/gui/macosx/wizard.m:1423
@@ -15824,10 +15817,9 @@ msgstr "Adaugă la lista de redare"
 msgid "MRL:"
 msgstr "MRL:"
 
-#: modules/gui/pda/pda_interface.c:421 modules/gui/qt4/dialogs/sout.cpp:306
-#: modules/gui/qt4/dialogs/sout.cpp:307 modules/gui/qt4/ui/sout.ui:121
-#: modules/gui/qt4/ui/sout.ui:186 modules/gui/qt4/ui/sout.ui:248
-#: modules/gui/qt4/ui/sout.ui:377
+#: modules/gui/pda/pda_interface.c:421 modules/gui/qt4/dialogs/sout.cpp:313
+#: modules/gui/qt4/ui/sout.ui:121 modules/gui/qt4/ui/sout.ui:186
+#: modules/gui/qt4/ui/sout.ui:248 modules/gui/qt4/ui/sout.ui:377
 msgid "Port:"
 msgstr "Port:"
 
@@ -16287,8 +16279,8 @@ msgid ""
 "Play\n"
 "If the playlist is empty, open a media"
 msgstr ""
-"Redă\n"
-"Dacă lista de redare este goală, deschide o media"
+"Redare\n"
+"Dacă lista de redare este goală, deschide dialogul de selecție media"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:256
 msgid "Current visualization"
@@ -16376,7 +16368,7 @@ msgstr "Mut"
 msgid "Pause the playback"
 msgstr "Pune redarea în pauză"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:1274
+#: modules/gui/qt4/components/interface_widgets.cpp:1279
 msgid "Revert to normal play speed"
 msgstr "Revino la viteza normală"
 
@@ -16455,7 +16447,7 @@ msgstr "Opțiuni avansate"
 msgid "Double click to get media information"
 msgstr "Dublu clic pentru a obține informații despre media"
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:144
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:145
 msgid "Show the current item"
 msgstr "Arată elementul curent"
 
@@ -16549,7 +16541,7 @@ msgstr "&Aplică"
 #: modules/gui/qt4/dialogs/help.cpp:210 modules/gui/qt4/dialogs/open.cpp:104
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:39
 #: modules/gui/qt4/dialogs/preferences.cpp:87
-#: modules/gui/qt4/dialogs/sout.cpp:188
+#: modules/gui/qt4/dialogs/sout.cpp:193
 msgid "&Cancel"
 msgstr "&Renunță"
 
@@ -16563,7 +16555,7 @@ msgstr "Creează"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:45
 msgid "Create a new bookmark"
-msgstr ""
+msgstr "Creează un semn de carte nou"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:47
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:37
@@ -16578,7 +16570,7 @@ msgstr "Șterge toate semnele de carte"
 #: modules/gui/qt4/dialogs/errors.cpp:50
 #: modules/gui/qt4/dialogs/extended.cpp:85 modules/gui/qt4/dialogs/help.cpp:65
 #: modules/gui/qt4/dialogs/help.cpp:97
-#: modules/gui/qt4/dialogs/interaction.cpp:194
+#: modules/gui/qt4/dialogs/interaction.cpp:206
 #: modules/gui/qt4/dialogs/mediainfo.cpp:77
 #: modules/gui/qt4/dialogs/messages.cpp:82
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:38
@@ -16656,26 +16648,36 @@ msgid ""
 "platform.\n"
 "\n"
 msgstr ""
+"VLC media player este un player de media liber, codor și streamer ce poate "
+"citi din fișiere, CD-uri, DVD-uri, stream-uri de rețea, plăci de captură și "
+"chiar mai multe !\n"
+"VLC folosește codecurile lui interne și funcționează în esență pe toate "
+"platformele populare.\n"
+"\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:122
 msgid ""
 "This version of VLC was compiled by:\n"
 " "
 msgstr ""
+"Această versiune a fost compilată de:\n"
+" "
 
 #: modules/gui/qt4/dialogs/help.cpp:126 modules/gui/wince/interface.cpp:508
 msgid "Based on Git commit: "
-msgstr ""
+msgstr "Bazat pe commitul Git:"
 
 #: modules/gui/qt4/dialogs/help.cpp:127
 msgid ""
 "You are using the Qt4 Interface.\n"
 "\n"
 msgstr ""
+"Folosiți interfața Qt4.\n"
+"\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:128
 msgid "Copyright (C) "
-msgstr "Drepturi de autor (C) "
+msgstr "Copyright (C) "
 
 #: modules/gui/qt4/dialogs/help.cpp:149
 msgid ""
@@ -16683,6 +16685,9 @@ msgid ""
 "the following people (and the missing ones...) for their collaboration to "
 "create the best free software."
 msgstr ""
+"Am dori să mulțumim întregii comunități VLC, testerilor, utilizatorilor "
+"noștri și următoarelor persoane (și cele pe care le-am uitat...) pentru "
+"colaborarea lor de a crea cel mai bun soft liber."
 
 #: modules/gui/qt4/dialogs/help.cpp:167
 msgid "Authors"
@@ -16832,7 +16837,7 @@ msgid "&Play"
 msgstr "&Redă"
 
 #: modules/gui/qt4/dialogs/open.cpp:115 modules/gui/qt4/dialogs/open.cpp:186
-#: modules/gui/qt4/dialogs/sout.cpp:187
+#: modules/gui/qt4/dialogs/sout.cpp:192
 msgid "&Stream"
 msgstr "&Stream"
 
@@ -16843,6 +16848,11 @@ msgstr "&Convertește"
 #: modules/gui/qt4/dialogs/open.cpp:189
 msgid "&Convert / Save"
 msgstr "&Convertește / Salvează"
+
+#: modules/gui/qt4/dialogs/preferences.cpp:66
+#, fuzzy
+msgid "Show settings"
+msgstr "Arată setările extinse"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:70
 msgid "Simple"
@@ -16880,7 +16890,7 @@ msgstr "Deschide fișierul de listă de redare"
 
 #: modules/gui/qt4/dialogs_provider.cpp:453
 msgid "Choose a filename to save playlist"
-msgstr ""
+msgstr "Alegeți un nume de fișier pentru a salva lista de redare"
 
 #: modules/gui/qt4/dialogs_provider.cpp:455
 msgid "XSPF playlist (*.xspf);; "
@@ -16903,31 +16913,26 @@ msgid "All Files"
 msgstr "Toate fișierele"
 
 # hm ? sau ieșire de stream ?
-#: modules/gui/qt4/dialogs/sout.cpp:100 modules/gui/qt4/ui/sout.ui:20
+#: modules/gui/qt4/dialogs/sout.cpp:102 modules/gui/qt4/ui/sout.ui:20
 msgid "Stream Output"
 msgstr "Stream de ieșire"
 
-#: modules/gui/qt4/dialogs/sout.cpp:153
+#: modules/gui/qt4/dialogs/sout.cpp:155
 msgid ""
 "Stream output string.\n"
 "This is automatically generated when you change the above settings,\n"
 "but you can update it manually."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/sout.cpp:203
+#: modules/gui/qt4/dialogs/sout.cpp:210
 msgid "Save file"
 msgstr "Salvează fișierul"
 
-#: modules/gui/qt4/dialogs/sout.cpp:204
+#: modules/gui/qt4/dialogs/sout.cpp:211
 msgid "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/sout.cpp:306
-#, fuzzy
-msgid "Video Port:"
-msgstr "Rată de biți video:"
-
-#: modules/gui/qt4/dialogs/sout.cpp:307
+#: modules/gui/qt4/dialogs/sout.cpp:313
 #, fuzzy
 msgid "Audio Port:"
 msgstr "Audio:"
@@ -17014,11 +17019,11 @@ msgstr ""
 "<p>Deci, verificați opțiunile următoare, modul implicit fiind aproape fără "
 "acces pe internet.</p>\n"
 
-#: modules/gui/qt4/main_interface.cpp:1024
+#: modules/gui/qt4/main_interface.cpp:1025
 msgid "Control menu for the player"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:1073
+#: modules/gui/qt4/main_interface.cpp:1074
 msgid "Paused"
 msgstr "Pauză"
 
@@ -17416,9 +17421,10 @@ msgstr "Mod de captură"
 msgid "Select the capture device type"
 msgstr "Selectați tipul dispozitivului de captură"
 
+# hm ? dispozitiv nu știu dacă se potrivește, placă nu acoperă tot, card se poate confunda cu cardul de memorie (gen stic USB)
 #: modules/gui/qt4/ui/open_capture.ui:44
 msgid "Card Selection"
-msgstr "Selecție card"
+msgstr "Selecție placă"
 
 #: modules/gui/qt4/ui/open_capture.ui:51 modules/gui/qt4/ui/open_net.ui:101
 msgid "Options"
@@ -17438,7 +17444,7 @@ msgstr "Selecție disc"
 
 #: modules/gui/qt4/ui/open_disk.ui:91
 msgid "Disable DVD Menus (for compatibility)"
-msgstr ""
+msgstr "Dezactivează meniurile DVD (pentru compatibilitate)"
 
 #: modules/gui/qt4/ui/open_disk.ui:108
 msgid "Disc device"
@@ -17454,7 +17460,7 @@ msgstr "Audio și subtitluri"
 
 #: modules/gui/qt4/ui/open_file.ui:26
 msgid "Choose one or more media file to open"
-msgstr ""
+msgstr "Alegeți unul sau mai multe fișiere media de deschis"
 
 #: modules/gui/qt4/ui/open_file.ui:49
 msgid "Add a subtitles file"
@@ -17566,36 +17572,41 @@ msgstr "Punct de montare"
 msgid "Login:pass:"
 msgstr "Autentificare:parolă:"
 
-#: modules/gui/qt4/ui/sout.ui:451
+#: modules/gui/qt4/ui/sout.ui:467
+#, fuzzy
+msgid "Video Port"
+msgstr "Rată de biți video:"
+
+#: modules/gui/qt4/ui/sout.ui:505
 msgid "Profile"
 msgstr "Profil"
 
-#: modules/gui/qt4/ui/sout.ui:473
+#: modules/gui/qt4/ui/sout.ui:527
 msgid "Encapsulation"
 msgstr "Încapsulare"
 
-#: modules/gui/qt4/ui/sout.ui:568
+#: modules/gui/qt4/ui/sout.ui:622
 msgid "Video codec"
 msgstr "Codec video"
 
-#: modules/gui/qt4/ui/sout.ui:665
+#: modules/gui/qt4/ui/sout.ui:719
 msgid "Audio codec"
 msgstr "Codec audio"
 
 # hm ?
-#: modules/gui/qt4/ui/sout.ui:788
+#: modules/gui/qt4/ui/sout.ui:842
 msgid "Overlay subtitles on the video"
 msgstr "Suprapune subtitlurile peste materialul video"
 
-#: modules/gui/qt4/ui/sout.ui:827
+#: modules/gui/qt4/ui/sout.ui:881
 msgid "Group name"
 msgstr "Nume grup"
 
-#: modules/gui/qt4/ui/sout.ui:861
+#: modules/gui/qt4/ui/sout.ui:915
 msgid "Stream all elementary streams"
 msgstr "Difuzează sub formă de stream toate stream-urile elementare"
 
-#: modules/gui/qt4/ui/sout.ui:886
+#: modules/gui/qt4/ui/sout.ui:940
 #, fuzzy
 msgid "Generated stream output string"
 msgstr "Setări generale a stream-ului de ieșire"
@@ -18138,7 +18149,7 @@ msgstr "Compilat de "
 
 #: modules/gui/wince/interface.cpp:507
 msgid "Compiler: "
-msgstr "Compiler: "
+msgstr "Compilator: "
 
 #: modules/gui/wince/interface.cpp:509
 msgid ""
@@ -23278,6 +23289,9 @@ msgid ""
 "If your graphics card provides several adaptors, you have to choose which "
 "one will be used (you shouldn't have to change this)."
 msgstr ""
+"Dacă placa grafică pe care o aveți furnizează mai multe adaptoare, va trebui "
+"să alegeți care dintre ele va fi folosit (ar trebui să nu trebuiască să "
+"schimbați asta)."
 
 #: modules/video_output/x11/glx.c:95 modules/video_output/x11/x11.c:46
 #: modules/video_output/x11/xvideo.c:52 modules/video_output/x11/xvmc.c:102
@@ -23334,7 +23348,6 @@ msgstr ""
 msgid "X11 video output"
 msgstr "Ieșire video X11"
 
-# hm ? la ce se referă ?
 #: modules/video_output/x11/xvideo.c:49
 msgid ""
 "If your graphics card provides several adaptors, you need to choose which "
@@ -23362,16 +23375,14 @@ msgstr ""
 msgid "XVMC adaptor number"
 msgstr ""
 
-# hm ? la ce se referă ?
 #: modules/video_output/x11/xvmc.c:99
-#, fuzzy
 msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
 msgstr ""
-"Dacă placa grafică pe care o aveți furnizează mai multe adaptoare, va trebui "
-"să alegeți care dintre ele va fi folosit (ar trebui să nu trebuiască să "
-"schimbați asta)."
+"Dacă placa grafică pe care o aveți furnizează mai multe adaptoare, această "
+"opțiune vă permite să alegeți care dintre ele va fi folosit (ar trebui să nu "
+"trebuiască să schimbați asta)."
 
 #: modules/video_output/x11/xvmc.c:111
 #, fuzzy
@@ -23596,6 +23607,9 @@ msgstr "Filtru de vizualizare"
 #: modules/visualization/visual/visual.c:123
 msgid "Spectrum analyser"
 msgstr "Analizor de spectru"
+
+#~ msgid "VLC"
+#~ msgstr "VLC"
 
 #~ msgid "VLC - Controller"
 #~ msgstr "Controler - VLC"
