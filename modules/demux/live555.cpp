@@ -163,7 +163,7 @@ struct timeout_thread_t
     VLC_COMMON_MEMBERS
 
     int64_t      i_remain;
-    bool   b_handle_keep_alive;
+    bool         b_handle_keep_alive;
     demux_sys_t  *p_sys;
 };
 
@@ -185,7 +185,7 @@ struct demux_sys_t
     /* Weird formats */
     asf_header_t     asfh;
     stream_t         *p_out_asf;
-    bool       b_real;
+    bool             b_real;
 
     /* */
     int64_t          i_pcr; /* The clock */
@@ -194,7 +194,7 @@ struct demux_sys_t
 
     /* timeout thread information */
     int              i_timeout;     /* session timeout value in seconds */
-    bool       b_timeout_call;/* mark to send an RTSP call to prevent server timeout */
+    bool             b_timeout_call;/* mark to send an RTSP call to prevent server timeout */
     timeout_thread_t *p_timeout;    /* the actual thread that makes sure we don't timeout */
 
     /* */
@@ -640,7 +640,7 @@ static int SessionsSetup( demux_t *p_demux )
     MediaSubsessionIterator *iter   = NULL;
     MediaSubsession         *sub    = NULL;
 
-    bool     b_rtsp_tcp = false;
+    bool           b_rtsp_tcp = false;
     int            i_client_port;
     int            i_return = VLC_SUCCESS;
     unsigned int   i_buffer = 0;
@@ -1086,7 +1086,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t    *p_sys = p_demux->p_sys;
     TaskToken      task;
 
-    bool      b_send_pcr = true;
+    bool            b_send_pcr = true;
     int64_t         i_pcr = 0;
     int             i;
 
