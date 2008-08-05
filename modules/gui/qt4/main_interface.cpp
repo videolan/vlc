@@ -452,7 +452,6 @@ inline void MainInterface::askForPrivacy()
         if( privacyDialog( &controls ) == QDialog::Accepted )
         {
             QList<ConfigControl *>::Iterator i;
-            msg_Dbg( p_intf, "coin coin %i", controls.size() );
             for(  i = controls.begin() ; i != controls.end() ; i++ )
             {
                 ConfigControl *c = qobject_cast<ConfigControl *>(*i);
