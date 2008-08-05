@@ -603,16 +603,17 @@ VLC_EXPORT (void, vlc_control_cancel, (int cmd, ...));
  * Save the cancellation state and disable cancellation for the calling thread.
  * This function must be called before entering a piece of code that is not
  * cancellation-safe.
- * @param p_state storage for the previous cancellation state
- * @return Nothing, always succeeds.
+ * @return Previous cancellation state (opaque value).
  */
-static inline void vlc_savecancel (int *p_state)
+static inline int vlc_savecancel (void)
 {
+    int state;
 #if defined (LIBVLC_USE_PTHREAD)
-    (void) pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, p_state);
+    (void) pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
 #else
-    vlc_control_cancel (VLC_SAVE_CANCEL, p_state);
+    vlc_control_cancel (VLC_SAVE_CANCEL, &state);
 #endif
+    return state;
 }
 
 /**
