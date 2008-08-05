@@ -214,9 +214,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
     if( !p_sys )
-    {
         return VLC_ENOMEM;
-    }
 
     p_stream->p_sys = p_sys;
     p_sys->b_inited = false;
@@ -225,8 +223,7 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_libvlc, "mosaic-lock", &val );
     p_sys->p_lock = val.p_address;
 
-    var_Get( p_stream, CFG_PREFIX "id", &val );
-    p_sys->psz_id = val.psz_string;
+    p_sys->psz_id = var_CreateGetString( p_stream, CFG_PREFIX "id" );
 
     p_sys->i_height =
         var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "height" );
@@ -237,7 +234,7 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_stream, CFG_PREFIX "width", WidthCallback, p_stream );
 
     var_Get( p_stream, CFG_PREFIX "sar", &val );
-    if ( val.psz_string )
+    if( val.psz_string )
     {
         char *psz_parser = strchr( val.psz_string, ':' );
 
@@ -270,14 +267,16 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_stream, "Forcing image chroma to 0x%.8x (%4.4s)", p_sys->i_chroma, (char*)&p_sys->i_chroma );
     }
 
-#define INT_COMMAND( a ) \
+#define INT_COMMAND( a ) do { \
     var_Create( p_stream, CFG_PREFIX #a, \
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND ); \
     var_AddCallback( p_stream, CFG_PREFIX #a, a ## Callback, \
-                     p_stream );
-    INT_COMMAND( alpha )
-    INT_COMMAND( x )
-    INT_COMMAND( y )
+                     p_stream ); } while(0)
+    INT_COMMAND( alpha );
+    INT_COMMAND( x );
+    INT_COMMAND( y );
+
+#undef INT_COMMAND
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
@@ -319,10 +318,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     char *psz_chain;
     int i;
 
-    if ( p_sys->b_inited )
-    {
+    if( p_sys->b_inited || p_fmt->i_cat != VIDEO_ES )
         return NULL;
-    }
 
     /* Create decoder object */
     p_sys->p_decoder = vlc_object_create( p_stream, VLC_OBJECT_DECODER );
@@ -356,9 +353,18 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_sys->p_decoder->p_module =
         module_Need( p_sys->p_decoder, "decoder", "$codec", 0 );
 
-    if( !p_sys->p_decoder->p_module )
+    if( !p_sys->p_decoder->p_module || !p_sys->p_decoder->pf_decode_video )
     {
-        msg_Err( p_stream, "cannot find decoder" );
+        if( p_sys->p_decoder->p_module )
+        {
+            msg_Err( p_stream, "instanciated a non video decoder" );
+            module_Unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
+        }
+        else
+        {
+            msg_Err( p_stream, "cannot find decoder" );
+        }
+        free( p_sys->p_decoder->p_owner );
         vlc_object_detach( p_sys->p_decoder );
         vlc_object_release( p_sys->p_decoder );
         return NULL;
@@ -456,12 +462,10 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     bool b_last_es = true;
     int i;
 
-    if ( !p_sys->b_inited )
-    {
+    if( !p_sys->b_inited )
         return VLC_SUCCESS;
-    }
 
-    if ( p_sys->p_decoder != NULL )
+    if( p_sys->p_decoder != NULL )
     {
         decoder_owner_sys_t *p_owner = p_sys->p_decoder->p_owner;
 
@@ -484,7 +488,8 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     }
 
     /* Destroy user specified video filters */
-    filter_chain_Delete( p_sys->p_vf2 );
+    if( p_sys->p_vf2 )
+        filter_chain_Delete( p_sys->p_vf2 );
 
     vlc_mutex_lock( p_sys->p_lock );
 
@@ -605,7 +610,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             if ( p_new_pic == NULL )
             {
                 msg_Err( p_stream, "image conversion failed" );
-                p_pic->pf_release( p_pic );
+                picture_Release( p_pic );
                 continue;
             }
         }
@@ -626,7 +631,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                                   p_sys->p_decoder->fmt_out.video.i_aspect )
                 != VLC_SUCCESS )
             {
-                p_pic->pf_release( p_pic );
+                picture_Release( p_pic );
                 free( p_new_pic );
                 msg_Err( p_stream, "image allocation failed" );
                 continue;
@@ -641,7 +646,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         p_new_pic->p_sys = (picture_sys_t *)p_new_pic->pf_release;
         p_new_pic->pf_release = ReleasePicture;
         p_new_pic->date = p_pic->date;
-        p_pic->pf_release( p_pic );
+        picture_Release( p_pic );
 
         if( p_sys->p_vf2 )
             p_new_pic = filter_chain_VideoFilter( p_sys->p_vf2, p_new_pic );
