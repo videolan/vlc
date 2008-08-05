@@ -66,9 +66,10 @@ OpenDialog::OpenDialog( QWidget *parent,
 {
     i_action_flag = _action_flag;
 
+    setWindowModality( Qt::WindowModal );
+
     if( b_selectMode ) /* Select mode */
     {
-        setWindowModality( Qt::WindowModal );
         i_action_flag = SELECT;
     }
 
