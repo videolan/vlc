@@ -186,8 +186,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( !id )
         return NULL;
 
-    id->i_nb_ids = 0;
-    id->pp_ids   = NULL;
+    TAB_INIT( id->i_nb_ids, id->pp_ids );
 
     msg_Dbg( p_stream, "duplicated a new stream codec=%4.4s (es=%d group=%d)",
              (char*)&p_fmt->i_codec, p_fmt->i_id, p_fmt->i_group );
@@ -200,7 +199,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         {
             sout_stream_t *out = p_sys->pp_streams[i_stream];
 
-            id_new = (void*)out->pf_add( out, p_fmt );
+            id_new = (void*)sout_StreamIdAdd( out, p_fmt );
             if( id_new )
             {
                 msg_Dbg( p_stream, "    - added for output %d", i_stream );
@@ -243,7 +242,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         if( id->pp_ids[i_stream] )
         {
             sout_stream_t *out = p_sys->pp_streams[i_stream];
-            out->pf_del( out, id->pp_ids[i_stream] );
+            sout_StreamIdDel( out, id->pp_ids[i_stream] );
         }
     }
 
@@ -271,24 +270,21 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         for( i_stream = 0; i_stream < p_sys->i_nb_streams - 1; i_stream++ )
         {
-            block_t *p_dup;
             p_dup_stream = p_sys->pp_streams[i_stream];
 
             if( id->pp_ids[i_stream] )
             {
-                p_dup = block_Duplicate( p_buffer );
+                block_t *p_dup = block_Duplicate( p_buffer );
 
                 if( p_dup )
-                    p_dup_stream->pf_send( p_dup_stream, id->pp_ids[i_stream],
-                                           p_dup );
+                    sout_StreamIdSend( p_dup_stream, id->pp_ids[i_stream], p_dup );
             }
         }
 
         if( i_stream < p_sys->i_nb_streams && id->pp_ids[i_stream] )
         {
             p_dup_stream = p_sys->pp_streams[i_stream];
-            p_dup_stream->pf_send( p_dup_stream, id->pp_ids[i_stream],
-                                   p_buffer );
+            sout_StreamIdSend( p_dup_stream, id->pp_ids[i_stream], p_buffer );
         }
         else
         {
@@ -341,7 +337,9 @@ static bool ESSelected( es_format_t *fmt, char *psz_select )
         return true;
     }
     psz_dup = strdup( psz_select );
-    psz     = psz_dup;
+    if( !psz_dup )
+        return false;
+    psz = psz_dup;
 
     /* If non empty, parse the selection:
      * We have selection[,selection[,..]] where following selection are recognized:
