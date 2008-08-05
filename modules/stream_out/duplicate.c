@@ -88,11 +88,11 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_stream, "creating 'duplicate'" );
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
-    p_sys->i_nb_streams = 0;
-    p_sys->pp_streams   = NULL;
-    p_sys->i_nb_select  = 0;
-    p_sys->ppsz_select  = NULL;
+    TAB_INIT( p_sys->i_nb_streams, p_sys->pp_streams );
+    TAB_INIT( p_sys->i_nb_select, p_sys->ppsz_select );
 
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
     {
@@ -114,9 +114,23 @@ static int Open( vlc_object_t *p_this )
             char *psz = p_cfg->psz_value;
             if( p_sys->i_nb_select > 0 && psz && *psz )
             {
-                msg_Dbg( p_stream, " * apply selection %s", psz );
-                p_sys->ppsz_select[p_sys->i_nb_select - 1] = strdup( psz );
+                char **ppsz_select = &p_sys->ppsz_select[p_sys->i_nb_select - 1];
+
+                if( *ppsz_select )
+                {
+                    msg_Err( p_stream, " * ignore selection `%s' (it already has `%s')",
+                             psz, *ppsz_select );
+                }
+                else
+                {
+                    msg_Dbg( p_stream, " * apply selection `%s'", psz );
+                    *ppsz_select = strdup( psz );
+                }
             }
+        }
+        else
+        {
+            msg_Err( p_stream, " * ignore unknown option `%s'", p_cfg->psz_name );
         }
     }
 
@@ -169,6 +183,9 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     int i_stream, i_valid_streams = 0;
 
     id = malloc( sizeof( sout_stream_id_t ) );
+    if( !id )
+        return NULL;
+
     id->i_nb_ids = 0;
     id->pp_ids   = NULL;
 
@@ -261,8 +278,9 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 p_dup = block_Duplicate( p_buffer );
 
-                p_dup_stream->pf_send( p_dup_stream, id->pp_ids[i_stream],
-                                       p_dup );
+                if( p_dup )
+                    p_dup_stream->pf_send( p_dup_stream, id->pp_ids[i_stream],
+                                           p_dup );
             }
         }
 
