@@ -43,9 +43,11 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
                           p_intf( _p_intf), p_dialog( _p_dialog )
 {
     QVBoxLayout *layout = NULL;
+    description = NULL;
     int i_ret = -1;
     panel = NULL;
     dialog = NULL;
+    altButton = NULL;
 
     if( p_dialog->i_flags & DIALOG_BLOCKING_ERROR )
     {
@@ -102,6 +104,17 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         panel->setLayout( grid );
         layout->addWidget( panel );
     }
+    else if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
+    {
+        if( p_intf->p_sys->p_mi )
+        {
+            progressBar = p_intf->p_sys->p_mi->pgBar;
+            progressBar->show();
+            i_ret = 2;
+        }
+        else
+            p_dialog->i_flags = DIALOG_USER_PROGRESS;
+    }
     else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
         dialog = new QWidget( 0 );layout = new QVBoxLayout( dialog );
@@ -114,12 +127,6 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         progressBar->setTextVisible( true );
         progressBar->setOrientation( Qt::Horizontal );
         layout->addWidget( progressBar );
-    }
-    else if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
-    {
-        progressBar = p_intf->p_sys->p_mi->pgBar;
-        progressBar->show();
-        i_ret = 2;
     }
     else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
     {
@@ -195,15 +202,24 @@ void InteractionDialog::update()
     {
         assert( progressBar );
         progressBar->setValue( (int)( p_dialog->val.f_float * 10 ) );
-        description->setText( qfu( p_dialog->psz_description ) );
+        if( description )
+            description->setText( qfu( p_dialog->psz_description ) );
     }
+    else return;
 
     if( ( p_dialog->i_flags & DIALOG_INTF_PROGRESS ) &&
         ( p_dialog->val.f_float >= 100.0 ) )
+    {
         progressBar->hide();
+        msg_Dbg( p_intf, "Progress Done" );
+    }
+
     if( ( p_dialog->i_flags & DIALOG_USER_PROGRESS ) &&
         ( p_dialog->val.f_float >= 100.0 ) )
+    {
+        assert( altButton );
         altButton->setText( qtr( "&Close" ) );
+    }
 }
 
 InteractionDialog::~InteractionDialog()
