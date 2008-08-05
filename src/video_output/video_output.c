@@ -717,6 +717,7 @@ static void* RunThread( vlc_object_t *p_this )
     bool      b_drop_late;
 
     int             i_displayed = 0, i_lost = 0, i_loops = 0;
+    int canc = vlc_savecancel ();
 
     /*
      * Initialize thread
@@ -735,6 +736,7 @@ static void* RunThread( vlc_object_t *p_this )
     {
         EndThread( p_vout );
         vlc_mutex_unlock( &p_vout->change_lock );
+        vlc_restorecancel (canc);
         return NULL;
     }
 
@@ -1121,6 +1123,7 @@ static void* RunThread( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_vout->change_lock );
 
     vlc_object_unlock( p_vout );
+    vlc_restorecancel (canc);
     return NULL;
 }
 
@@ -1381,6 +1384,7 @@ typedef struct suxor_thread_t
 static void* SuxorRestartVideoES( vlc_object_t * p_vlc_t )
 {
     suxor_thread_t *p_this = (suxor_thread_t *) p_vlc_t;
+    int canc = vlc_savecancel ();
     /* Now restart current video stream */
     int val = var_GetInteger( p_this->p_input, "video-es" );
     if( val >= 0 )
@@ -1390,8 +1394,8 @@ static void* SuxorRestartVideoES( vlc_object_t * p_vlc_t )
     }
 
     vlc_object_release( p_this->p_input );
-
     vlc_object_release( p_this );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

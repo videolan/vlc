@@ -138,6 +138,7 @@ static void* RunControlThread ( vlc_object_t *p_this )
     /* Tell above that we're ready */
     vlc_thread_ready( p_playlist );
 
+    int canc = vlc_savecancel ();
     vlc_object_lock( p_playlist );
     while( vlc_object_alive( p_playlist ) )
     {
@@ -165,6 +166,7 @@ static void* RunControlThread ( vlc_object_t *p_this )
     vlc_object_unlock( p_playlist );
 
     playlist_LastLoop( p_playlist );
+    vlc_restorecancel (canc);
     return NULL;
 }
 
@@ -174,9 +176,13 @@ static void* RunControlThread ( vlc_object_t *p_this )
 static void* RunPreparse ( vlc_object_t *p_this )
 {
     playlist_preparse_t *p_obj = (playlist_preparse_t*)p_this;
+    int canc;
+
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
+    canc = vlc_savecancel ();
     playlist_PreparseLoop( p_obj );
+    vlc_restorecancel (canc);
     return NULL;
 }
 
@@ -185,7 +191,9 @@ static void* RunFetcher( vlc_object_t *p_this )
     playlist_fetcher_t *p_obj = (playlist_fetcher_t *)p_this;
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
+    int canc = vlc_savecancel ();
     playlist_FetcherLoop( p_obj );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

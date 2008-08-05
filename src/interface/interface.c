@@ -198,6 +198,7 @@ static void* RunInterface( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     vlc_value_t val, text;
     char *psz_intf;
+    int canc = vlc_savecancel ();
 
     /* Variable used for interface spawning */
     var_Create( p_intf, "intf-add", VLC_VAR_STRING |
@@ -258,6 +259,8 @@ static void* RunInterface( vlc_object_t *p_this )
         p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
     }
     while( p_intf->p_module );
+
+    vlc_restorecancel (canc);
     return NULL;
 }
 
@@ -269,6 +272,8 @@ static void * MonitorLibVLCDeath( vlc_object_t * p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     libvlc_int_t * p_libvlc = p_intf->p_libvlc;
+    int canc = vlc_savecancel ();
+
     vlc_object_lock( p_libvlc );
     while(vlc_object_alive( p_libvlc ) )
     {
@@ -292,6 +297,7 @@ static void * MonitorLibVLCDeath( vlc_object_t * p_this )
         vlc_object_kill( p_intf );
     }
     vlc_list_release( p_list );
+    vlc_restorecancel (canc);
     return NULL;
 }
 #endif

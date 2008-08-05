@@ -1385,6 +1385,9 @@ void* update_CheckReal( vlc_object_t* p_this )
 {
     update_check_thread_t *p_uct = (update_check_thread_t *)p_this;
     bool b_ret;
+    int canc;
+
+    vlc_savecancel (&canc);
     vlc_mutex_lock( &p_uct->p_update->lock );
 
     EmptyRelease( p_uct->p_update );
@@ -1393,6 +1396,8 @@ void* update_CheckReal( vlc_object_t* p_this )
 
     if( p_uct->pf_callback )
         (p_uct->pf_callback)( p_uct->p_data, b_ret );
+
+    vlc_restorecancel (canc);
     return NULL;
 }
 
@@ -1504,11 +1509,13 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     stream_t *p_stream = NULL;
     void* p_buffer = NULL;
     int i_read;
+    int canc;
 
     update_t *p_update = p_udt->p_update;
     char *psz_destdir = p_udt->psz_destdir;
 
     msg_Dbg( p_udt, "Opening Stream '%s'", p_update->release.psz_url );
+    canc = vlc_savecancel ();
 
     /* Open the stream */
     p_stream = stream_UrlNew( p_udt, p_update->release.psz_url );
@@ -1699,6 +1706,10 @@ end:
     free( p_buffer );
     free( psz_size );
 
+    p_udt->p_update->p_download = NULL;
+
+    vlc_object_release( p_udt );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

@@ -573,12 +573,12 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
  * The decoding main loop
  *
  * \param p_dec the decoder
- * \return 0
  */
 static void* DecoderThread( vlc_object_t *p_this )
 {
     decoder_t * p_dec = (decoder_t *)p_this;
     block_t *p_block;
+    int canc = vlc_savecancel ();
 
     /* The decoder's main loop */
     while( !p_dec->b_die && !p_dec->b_error )
@@ -604,7 +604,7 @@ static void* DecoderThread( vlc_object_t *p_this )
     /* We do it here because of the dll loader that wants close() in the
      * same thread than open()/decode() */
     module_Unneed( p_dec, p_dec->p_module );
-
+    vlc_restorecancel (canc);
     return NULL;
 }
 

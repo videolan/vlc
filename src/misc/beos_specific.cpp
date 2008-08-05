@@ -122,6 +122,7 @@ void system_End( libvlc_int_t *p_this )
  *****************************************************************************/
 static void* AppThread( vlc_object_t * p_this )
 {
+    int canc = vlc_savecancel ();
     VlcApplication * BeApp =
         new VlcApplication("application/x-vnd.videolan-vlc");
     vlc_object_attach( p_this, p_this->p_libvlc );
@@ -129,6 +130,7 @@ static void* AppThread( vlc_object_t * p_this )
     BeApp->Run();
     vlc_object_detach( p_this );
     delete BeApp;
+    vlc_restorecancel (canc);
     return NULL;
 }
 

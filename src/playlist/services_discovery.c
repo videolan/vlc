@@ -205,15 +205,18 @@ services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_it
 static void* RunSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = (services_discovery_t *)p_this;
-    vlc_event_t event;
+    vlc_event_t event = {
+        .type = vlc_ServicesDiscoveryStarted
+    };
+    int canc = vlc_savecancel ();
 
-    event.type = vlc_ServicesDiscoveryStarted;
     vlc_event_send( &p_sd->event_manager, &event );
 
     p_sd->pf_run( p_sd );
 
     event.type = vlc_ServicesDiscoveryEnded;
     vlc_event_send( &p_sd->event_manager, &event );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

@@ -542,6 +542,7 @@ static void* DStreamThread( vlc_object_t* p_this )
     stream_t *s = (stream_t *)p_this;
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
     demux_t *p_demux;
+    int canc = vlc_savecancel ();
 
     /* Create the demuxer */
     if( !(p_demux = demux_New( s, "", p_sys->psz_name, "", s, p_sys->out,
@@ -558,6 +559,7 @@ static void* DStreamThread( vlc_object_t* p_this )
         if( p_demux->pf_demux( p_demux ) <= 0 ) break;
     }
 
+    vlc_restorecancel (canc);
     vlc_object_kill( p_demux );
     return NULL;
 }

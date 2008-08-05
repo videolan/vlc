@@ -192,6 +192,11 @@ static void * RunThread( vlc_object_t *p_this)
 {
     sap_handler_t *p_sap = (sap_handler_t*)p_this;
     sap_session_t *p_session;
+    int canc = vlc_savecancel ();
+    /* TODO: Once net_Write() is cancel-safe, so will this whole thread.
+     * However, there is a more serious issues here: msleep(SAP_IDLE).
+     * This thread should really use poll().
+     */
 
     while( !p_sap->b_die )
     {
@@ -236,6 +241,7 @@ static void * RunThread( vlc_object_t *p_this)
         }
         vlc_object_unlock( p_sap );
     }
+    vlc_restorecancel (canc);
     return NULL;
 }
 

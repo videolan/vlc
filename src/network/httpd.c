@@ -2027,6 +2027,7 @@ static void* httpd_HostThread( vlc_object_t *p_this )
     counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     int evfd;
     bool b_die;
+    int canc = vlc_savecancel ();
 
 retry:
     vlc_object_lock( host );
@@ -2568,6 +2569,7 @@ retry:
         stats_CounterClean( p_total_counter );
     if( p_active_counter )
         stats_CounterClean( p_active_counter );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

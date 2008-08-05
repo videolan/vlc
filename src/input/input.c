@@ -492,6 +492,8 @@ sout_instance_t * input_DetachSout( input_thread_t *p_input )
 static void* Run( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
+    int canc = vlc_savecancel ();
+
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
 
@@ -536,7 +538,7 @@ static void* Run( vlc_object_t *p_this )
 
     /* Clean up */
     End( p_input );
-
+    vlc_restorecancel (canc);
     return NULL;
 }
 
@@ -548,8 +550,11 @@ static void* Run( vlc_object_t *p_this )
 static void* RunAndDestroy( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
+    int canc;
+
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
+    canc = vlc_savecancel ();
 
     if( Init( p_input ) )
         goto exit;
@@ -579,6 +584,7 @@ static void* RunAndDestroy( vlc_object_t *p_this )
 exit:
     /* Release memory */
     vlc_object_release( p_input );
+    vlc_restorecancel (canc);
     return 0;
 }
 

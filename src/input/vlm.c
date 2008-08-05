@@ -309,6 +309,7 @@ static void* Manage( void* p_object )
     mtime_t i_lastcheck;
     mtime_t i_time;
 
+    int canc = vlc_savecancel ();
     i_lastcheck = vlm_Date();
 
     while( !vlm->b_die )
@@ -412,6 +413,7 @@ static void* Manage( void* p_object )
         msleep( 100000 );
     }
 
+    vlc_restorecancel (canc);
     return NULL;
 }
 

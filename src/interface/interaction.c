@@ -558,8 +558,8 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 
 static void* InteractionLoop( vlc_object_t *p_this )
 {
-    int i;
     interaction_t *p_interaction = (interaction_t*) p_this;
+    int canc = vlc_savecancel ();
 
     vlc_object_lock( p_this );
     while( vlc_object_alive( p_this ) )
@@ -570,12 +570,13 @@ static void* InteractionLoop( vlc_object_t *p_this )
     vlc_object_unlock( p_this );
 
     /* Remove all dialogs - Interfaces must be able to clean up their data */
-    for( i = p_interaction->i_dialogs -1 ; i >= 0; i-- )
+    for( int i = p_interaction->i_dialogs -1 ; i >= 0; i-- )
     {
         interaction_dialog_t * p_dialog = p_interaction->pp_dialogs[i];
         DialogDestroy( p_dialog );
         REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs, i );
     }
+    vlc_restorecancel (canc);
     return NULL;
 }
 
