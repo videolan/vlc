@@ -86,6 +86,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Add a tooltip */
     dialogBox->setToolTip( qtr( "Select one or multiple files" ) );
+    dialogBox->setMinimumHeight( 250 );
 
     // But hide the two OK/Cancel buttons. Enable them for debug.
     QDialogButtonBox *fileDialogAcceptBox =

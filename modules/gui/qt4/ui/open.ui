@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
-    <height>668</height>
+    <width>537</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -28,24 +28,11 @@
   <property name="windowTitle" >
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <item>
-    <widget class="QTabWidget" name="Tab" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="MinimumExpanding" hsizetype="Expanding" >
-       <horstretch>0</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize" >
-      <size>
-       <width>500</width>
-       <height>400</height>
-      </size>
-     </property>
-    </widget>
+  <layout class="QGridLayout" name="gridLayout" >
+   <item row="0" column="0" colspan="4" >
+    <widget class="QTabWidget" name="Tab" />
    </item>
-   <item>
+   <item row="1" column="0" colspan="4" >
     <widget class="QCheckBox" name="advancedCheckBox" >
      <property name="toolTip" >
       <string>_("Show extended options")</string>
@@ -55,9 +42,9 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0" colspan="4" >
     <widget class="QGroupBox" name="advancedFrame" >
-     <layout class="QGridLayout" >
+     <layout class="QGridLayout" name="gridLayout_2" >
       <item row="0" column="0" >
        <widget class="QLabel" name="cacheLabel" >
         <property name="text" >
@@ -136,17 +123,17 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1" colspan="6" >
-       <widget class="Line" name="line" />
-      </item>
-      <item row="2" column="0" colspan="7" >
+      <item row="1" column="0" >
        <widget class="QCheckBox" name="slaveCheckbox" >
         <property name="text" >
          <string>_("Play another media synchronously (extra audio file, ...)")</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
+      <item row="1" column="1" colspan="6" >
+       <widget class="Line" name="line" />
+      </item>
+      <item row="2" column="0" >
        <widget class="QLabel" name="slaveLabel" >
         <property name="text" >
          <string>_("Extra media")</string>
@@ -156,10 +143,10 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="4" >
+      <item row="2" column="1" colspan="4" >
        <widget class="QLineEdit" name="slaveText" />
       </item>
-      <item row="3" column="5" colspan="2" >
+      <item row="2" column="5" colspan="2" >
        <widget class="QPushButton" name="slaveBrowseButton" >
         <property name="toolTip" >
          <string>_("Select the file")</string>
@@ -169,10 +156,7 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1" colspan="6" >
-       <widget class="Line" name="line" />
-      </item>
-      <item row="5" column="0" >
+      <item row="4" column="0" >
        <widget class="QLabel" name="advancedLabel" >
         <property name="text" >
          <string>_("Customize")</string>
@@ -182,7 +166,10 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1" colspan="6" >
+      <item row="3" column="1" colspan="6" >
+       <widget class="Line" name="line" />
+      </item>
+      <item row="4" column="1" colspan="6" >
        <widget class="QLineEdit" name="advancedLineInput" >
         <property name="toolTip" >
          <string>_("Complete MRL for VLC internal")</string>
@@ -192,87 +179,80 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <property name="spacing" >
-      <number>0</number>
+   <item row="3" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
      </property>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="menuButton" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize" >
-        <size>
-         <width>20</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="focusPolicy" >
-        <enum>Qt::ClickFocus</enum>
-       </property>
-       <property name="contextMenuPolicy" >
-        <enum>Qt::NoContextMenu</enum>
-       </property>
-       <property name="toolTip" >
-        <string>_("Select play mode")</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="playButton" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize" >
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text" >
-        <string>Play</string>
-       </property>
-       <property name="default" >
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDialogButtonBox" name="buttonsBox" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="standardButtons" >
-        <set>QDialogButtonBox::NoButton</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
-   <item>
+   <item row="3" column="1" >
+    <widget class="QPushButton" name="menuButton" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize" >
+      <size>
+       <width>20</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="focusPolicy" >
+      <enum>Qt::ClickFocus</enum>
+     </property>
+     <property name="contextMenuPolicy" >
+      <enum>Qt::NoContextMenu</enum>
+     </property>
+     <property name="toolTip" >
+      <string>_("Select play mode")</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" >
+    <widget class="QPushButton" name="playButton" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>Play</string>
+     </property>
+     <property name="default" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3" >
+    <widget class="QDialogButtonBox" name="buttonsBox" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::NoButton</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="4" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
