@@ -386,7 +386,13 @@ static void *Init( vlc_object_t *obj )
 
 #ifdef ENABLE_NLS
     // Translation - get locale
-    QLocale ql = QLocale::system();
+#   if defined (WIN32) || defined (__APPLE__)
+    QString lang = qfu( config_GetPsz( p_intf, "language" ) );
+    if (lang == "auto")
+        lang = QLocale::system().name();
+#   else
+    QString lang = QLocale::system().name();
+#   endif
     // Translations for qt's own dialogs
     QTranslator qtTranslator( 0 );
     // Let's find the right path for the translation file
@@ -397,7 +403,7 @@ static void *Init( vlc_object_t *obj )
                             "locale" + DIR_SEP + "qt4" + DIR_SEP );
 #endif
     // files depending on locale
-    bool b_loaded = qtTranslator.load( path + "qt_" + ql.name());
+    bool b_loaded = qtTranslator.load( path + "qt_" + lang );
     if (!b_loaded)
         msg_Dbg( p_intf, "Error while initializing qt-specific localization" );
     app->installTranslator( &qtTranslator );
