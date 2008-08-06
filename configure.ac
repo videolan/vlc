@@ -2952,6 +2952,11 @@ dnl
 dnl  avcodec decoder/encoder plugin
 dnl
 
+if test "${with_ffmpeg_tree}"
+then
+  AC_MSG_WARN([--with-ffmpeg-tree is deprecated. Use PKG_CONFIG_PATH instead.])
+fi
+
 AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
 if test "${enable_avcodec}" != "no"
