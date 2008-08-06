@@ -58,12 +58,7 @@
 #   include <sys/wait.h>
 #   include <fcntl.h>
 #   include <sys/socket.h>
-#ifdef HAVE_POLL
-#   include <poll.h>
-#else
-#undef _poll
-#include <vlc_network.h>
-#endif
+#   include <sys/poll.h>
 #endif
 
 #if defined(WIN32) || defined(UNDER_CE)

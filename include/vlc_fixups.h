@@ -235,8 +235,4 @@ typedef void *locale_t;
 #define N_(str) gettext_noop (str)
 #define gettext_noop(str) (str)
 
-#ifndef HAVE_POLL
-#define poll vlc_poll
-#endif
-
 #endif /* !LIBVLC_FIXUPS_H */
