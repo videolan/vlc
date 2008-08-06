@@ -124,6 +124,8 @@ signals:
     void toggleTelexButtons();
     void toggleTelexTransparency();
     void setNewTelexPage( int );
+    /// Advanced buttons
+    void advControlsSetIcon();
 };
 
 class MainInputManager : public QObject

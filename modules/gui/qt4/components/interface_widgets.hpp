@@ -145,7 +145,7 @@ class AdvControlsWidget : public QFrame
 {
     Q_OBJECT
 public:
-    AdvControlsWidget( intf_thread_t *);
+    AdvControlsWidget( intf_thread_t *, bool );
     virtual ~AdvControlsWidget();
 
     void enableInput( bool );
@@ -156,7 +156,7 @@ private:
     QPushButton *recordButton, *ABButton;
     QPushButton *snapshotButton, *frameButton;
 
-    mtime_t timeA, timeB;
+    static mtime_t timeA, timeB;
 
 private slots:
     void snapshot();
@@ -166,6 +166,10 @@ private slots:
     void fromAtoB();
     void record();
     void AtoBLoop( float, int, int );
+    void setIcon();
+
+signals:
+    void timeChanged();
 };
 
 /* Button Bar */

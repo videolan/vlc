@@ -58,6 +58,10 @@
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 
+/* init static variables in advanced controls */
+mtime_t AdvControlsWidget::timeA = 0;
+mtime_t AdvControlsWidget::timeB = 0;
+
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
  * This class handles resize issues
@@ -298,7 +302,7 @@ void VisualSelector::next()
     aButton->setMinimumSize( QSize( 26, 26 ) ); \
     aButton->setIconSize( QSize( 20, 20 ) ); }
 
-AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
+AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, bool b_fsCreation = false ) :
                                            QFrame( NULL ), p_intf( _p_i )
 {
     QHBoxLayout *advLayout = new QHBoxLayout( this );
@@ -314,8 +318,15 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
       qtr( "Loop from point A to point B continuously.\nClick to set point A" ),
       fromAtoB() );
     timeA = timeB = 0;
-    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
-             this, AtoBLoop( float, int, int ) );
+    /* in FS controller we skip this, because we dont want to have it double
+       controlled */
+    if( !b_fsCreation )
+        CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
+                 this, AtoBLoop( float, int, int ) );
+    /* set up synchronization between main controller and fs controller */
+    CONNECT( THEMIM->getIM(), advControlsSetIcon(), this, setIcon() );
+    connect( this, SIGNAL( timeChanged() ),
+        THEMIM->getIM(), SIGNAL( advControlsSetIcon()));
 #if 0
     frameButton = new QPushButton( "Fr" );
     frameButton->setMaximumSize( QSize( 26, 26 ) );
@@ -368,22 +379,39 @@ void AdvControlsWidget::fromAtoB()
     if( !timeA )
     {
         timeA = var_GetTime( THEMIM->getInput(), "time"  );
-        ABButton->setToolTip( qtr( "Click to set point B" ) );
-        ABButton->setIcon( QIcon( ":/atob_noa" ) );
+        emit timeChanged();
         return;
     }
     if( !timeB )
     {
         timeB = var_GetTime( THEMIM->getInput(), "time"  );
         var_SetTime( THEMIM->getInput(), "time" , timeA );
-        ABButton->setIcon( QIcon( ":/atob" ) );
-        ABButton->setToolTip( qtr( "Stop the A to B loop" ) );
+        emit timeChanged();
         return;
     }
     timeA = 0;
     timeB = 0;
-    ABButton->setToolTip( qtr( "Loop from point A to point B continuously\nClick to set point A" ) );
-    ABButton->setIcon( QIcon( ":/atob_nob" ) );
+    emit timeChanged();
+}
+
+/* setting/synchro icons after click on main or fs controller */
+void AdvControlsWidget::setIcon()
+{
+    if( !timeA && !timeB)
+    {
+        ABButton->setIcon( QIcon( ":/atob_nob" ) );
+        ABButton->setToolTip( qtr( "Loop from point A to point B continuously\nClick to set point A" ) );
+    }
+    else if( timeA && !timeB )
+    {
+        ABButton->setIcon( QIcon( ":/atob_noa" ) );
+        ABButton->setToolTip( qtr( "Click to set point B" ) );
+    }
+    else if( timeA && timeB )
+    {
+        ABButton->setIcon( QIcon( ":/atob" ) );
+        ABButton->setToolTip( qtr( "Stop the A to B loop" ) );
+    }
 }
 
 /* Function called regularly when in an AtoB loop */
@@ -441,7 +469,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
 
-    advControls = new AdvControlsWidget( p_intf );
+    advControls = new AdvControlsWidget( p_intf, b_fsCreation );
     if( !b_advancedVisible ) advControls->hide();
 
     /** Disc and Menus handling */
