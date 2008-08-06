@@ -218,7 +218,7 @@ static int Open( vlc_object_t *p_this )
     raw1394_start_iso_rcv( p_sys->p_raw1394, p_sys->i_channel );
 
     p_sys->raw1394_poll.fd = raw1394_get_fd( p_sys->p_raw1394 );
-    p_sys->raw1394_poll.events = POLLIN | POLLERR | POLLHUP | POLLPRI;
+    p_sys->raw1394_poll.events = POLLIN | POLLPRI;
 
     /* Update default_pts to a suitable value for udp access */
     var_Create( p_access, "dv-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
