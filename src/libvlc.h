@@ -322,4 +322,8 @@ void vlc_rewinddir (void *);
 #   define rewinddir vlc_rewinddir
 #endif
 
+#ifndef HAVE_POLL
+#   define _poll vlc_poll
+#endif
+
 #endif
