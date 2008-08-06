@@ -735,7 +735,7 @@ static void* RunThread( vlc_object_t *p_this )
     {
         EndThread( p_vout );
         vlc_mutex_unlock( &p_vout->change_lock );
-        return;
+        return NULL;
     }
 
     vlc_object_lock( p_vout );
@@ -1121,6 +1121,7 @@ static void* RunThread( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_vout->change_lock );
 
     vlc_object_unlock( p_vout );
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1405,6 +1406,7 @@ static void* SuxorRestartVideoES( vlc_object_t * p_vlc_t )
     vlc_object_release( p_this->p_input );
 
     vlc_object_release( p_this );
+    return NULL;
 }
 
 /*****************************************************************************
