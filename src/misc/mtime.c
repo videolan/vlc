@@ -340,8 +340,19 @@ void mwait( mtime_t date )
         ts.tv_sec = d.quot; ts.tv_nsec = d.rem * 1000;
         while( clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL ) == EINTR );
     }
-#else
 
+#elif defined (WIN32)
+    mtime_t total;
+
+    while ((total = (date - mdate ())) > 0)
+    {
+        DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
+        vlc_testcancel ();
+        SleepEx (delay, TRUE);
+    }
+    vlc_testcancel ();
+
+#else
     mtime_t delay = date - mdate();
     if( delay > 0 )
         msleep( delay );
@@ -350,9 +361,8 @@ void mwait( mtime_t date )
 }
 
 /**
- * More precise sleep()
+ * Portable usleep(). Cancellation point.
  *
- * Portable usleep() function.
  * \param delay the amount of time to sleep
  */
 void msleep( mtime_t delay )
@@ -373,9 +383,7 @@ void msleep( mtime_t delay )
     snooze( delay );
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-    for (delay /= 1000; delay > 0x7fffffff; delay -= 0x7fffffff)
-        Sleep (0x7fffffff);
-    Sleep (delay);
+    mwait (mdate () + delay);
 
 #elif defined( HAVE_NANOSLEEP )
     struct timespec ts_delay;
