@@ -373,7 +373,9 @@ void msleep( mtime_t delay )
     snooze( delay );
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-    Sleep( (DWORD) (delay / 1000) );
+    for (delay /= 1000; delay > 0x7fffffff; delay -= 0x7fffffff)
+        Sleep (0x7fffffff);
+    Sleep (delay);
 
 #elif defined( HAVE_NANOSLEEP )
     struct timespec ts_delay;
