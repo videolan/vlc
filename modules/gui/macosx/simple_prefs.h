@@ -102,8 +102,6 @@
     IBOutlet id o_osd_font_btn;
     IBOutlet id o_osd_font_color_pop;
     IBOutlet id o_osd_font_color_txt;
-    IBOutlet id o_osd_font_effect_pop;
-    IBOutlet id o_osd_font_effect_txt;
     IBOutlet id o_osd_font_fld;
     IBOutlet id o_osd_font_size_pop;
     IBOutlet id o_osd_font_size_txt;

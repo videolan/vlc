@@ -124,8 +124,6 @@
                 "o_osd_font_btn" = id;
                 "o_osd_font_color_pop" = id;
                 "o_osd_font_color_txt" = id;
-                "o_osd_font_effect_pop" = id;
-                "o_osd_font_effect_txt" = id;
                 "o_osd_font_fld" = id;
                 "o_osd_font_size_pop" = id;
                 "o_osd_font_size_txt" = id;

@@ -88,7 +88,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( base )
         [o_temp_str appendString: [NSString stringWithUTF8String: base]];
     else
-        o_temp_str = @"Unset";
+        o_temp_str = _NS("Not Set");
     return o_temp_str;
 }
 
@@ -266,7 +266,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_osd_font_box setTitle: _NS("Display Settings")];
     [o_osd_font_btn setTitle: _NS("Browse...")];
     [o_osd_font_color_txt setStringValue: _NS("Font Color")];
-    [o_osd_font_effect_txt setStringValue: _NS("Effect")];
     [o_osd_font_size_txt setStringValue: _NS("Font Size")];
     [o_osd_font_txt setStringValue: _NS("Font")];
     [o_osd_lang_box setTitle: _NS("Subtitle Languages")];
@@ -570,7 +569,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
     [self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
-    //[self setupButton: o_osd_font_effect_pop forIntList: "quartztext-effect"];
 
     /********************
      * hotkeys settings *
@@ -912,7 +910,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         SaveIntList( o_osd_font_color_pop, "quartztext-color" );
         SaveIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
-        //SaveIntList( o_osd_font_effect_pop, "freetype-effect" );
 
         i = config_SaveConfigFile( p_intf, NULL );
 
