@@ -14767,7 +14767,7 @@ msgstr "Standard-Serverport"
 #: modules/gui/macosx/simple_prefs.m:258
 #: modules/gui/qt4/ui/sprefs_interface.ui:250
 msgid "Album art download policy"
-msgstr "Richtline für Download von Albumcovern"
+msgstr "Richtline für Albumcover"
 
 #: modules/gui/macosx/simple_prefs.m:259
 msgid "Add controls to the video window"
