@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt_BR\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-08-02 17:01+0300\n"
-"PO-Revision-Date: 2008-02-14 21:23-0300\n"
-"Last-Translator: Sidney Doria <ssdoria@gmail.com>\n"
+"POT-Creation-Date: 2008-08-06 18:54+0100\n"
+"PO-Revision-Date: 2008-07-30 19:55-0300\n"
+"Last-Translator: Sidney Doria <sidney@dsc.ufcg.edu.br>\n"
 "Language-Team: Brazilian Portuguese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -85,7 +85,7 @@ msgstr "Configurações de atalhos"
 #: modules/gui/macosx/wizard.m:378
 #: modules/gui/qt4/components/info_panels.cpp:522
 #: modules/gui/qt4/components/simple_preferences.cpp:78
-#: modules/gui/qt4/ui/sout.ui:671 modules/stream_out/transcode.c:199
+#: modules/gui/qt4/ui/sout.ui:725 modules/stream_out/transcode.c:199
 msgid "Audio"
 msgstr "Áudio"
 
@@ -98,7 +98,7 @@ msgid "General audio settings"
 msgstr "Configurações gerais de áudio"
 
 #: include/vlc_config_cat.h:60 include/vlc_config_cat.h:85
-#: src/video_output/video_output.c:414
+#: src/video_output/video_output.c:415
 msgid "Filters"
 msgstr "Filtros"
 
@@ -124,7 +124,7 @@ msgid "These are general settings for audio output modules."
 msgstr "Estas são as configurações gerais para os módulos de saída de áudio."
 
 #: include/vlc_config_cat.h:71 src/libvlc-module.c:1833
-#: modules/gui/qt4/ui/sout.ui:806 modules/stream_out/transcode.c:231
+#: modules/gui/qt4/ui/sout.ui:860 modules/stream_out/transcode.c:231
 msgid "Miscellaneous"
 msgstr "Outros"
 
@@ -138,7 +138,7 @@ msgstr "Outras configurações e módulos de áudio."
 #: modules/gui/macosx/simple_prefs.m:176 modules/gui/macosx/wizard.m:379
 #: modules/gui/qt4/components/info_panels.cpp:523
 #: modules/gui/qt4/components/simple_preferences.cpp:79
-#: modules/gui/qt4/ui/sout.ui:574 modules/misc/dummy/dummy.c:98
+#: modules/gui/qt4/ui/sout.ui:628 modules/misc/dummy/dummy.c:98
 #: modules/stream_out/transcode.c:168
 msgid "Video"
 msgstr "Vídeo"
@@ -480,7 +480,6 @@ msgid "There is no help available for these modules."
 msgstr "Não há ajuda disponível para esses módulos."
 
 #: include/vlc_interface.h:136
-#, fuzzy
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a command-line window, go "
@@ -488,8 +487,8 @@ msgid ""
 msgstr ""
 "\n"
 "Aviso: se voce nao puder mais acessar a interface grafica, abra uma janela "
-"de linha de comando, va ao diretorio onde o VLC esta instalado e execute  "
-"\"vlc -I wx\"\n"
+"de linha de comando, va ao diretorio onde o VLC esta instalado e execute "
+"\"vlc -I qt\"\n"
 
 #: include/vlc_intf_strings.h:29
 msgid "Quick &Open File..."
@@ -524,12 +523,12 @@ msgstr "&Mensagens..."
 #: include/vlc_intf_strings.h:40
 #, fuzzy
 msgid "&Extended Settings..."
-msgstr "Configurações estendidas..."
+msgstr "Configurações Estendidas..."
 
 #: include/vlc_intf_strings.h:41
 #, fuzzy
 msgid "Go to Specific &Time..."
-msgstr "Ir a um ponto específico..."
+msgstr "Ir a um Ponto Específico..."
 
 #: include/vlc_intf_strings.h:42
 #, fuzzy
@@ -560,9 +559,8 @@ msgid "Play"
 msgstr "Reproduzir"
 
 #: include/vlc_intf_strings.h:49
-#, fuzzy
 msgid "Fetch Information"
-msgstr "Buscar informações"
+msgstr "Buscar Informações"
 
 #: include/vlc_intf_strings.h:50 modules/gui/macosx/playlist.m:440
 #: modules/gui/pda/pda_interface.c:1252
@@ -581,9 +579,8 @@ msgid "Sort"
 msgstr "Ordenar"
 
 #: include/vlc_intf_strings.h:53
-#, fuzzy
 msgid "Add Node"
-msgstr "Adiconar computador"
+msgstr "Adiconar Computador"
 
 #: include/vlc_intf_strings.h:54
 msgid "Stream..."
@@ -595,7 +592,7 @@ msgstr "Salvar..."
 
 #: include/vlc_intf_strings.h:56
 msgid "Open Folder..."
-msgstr "Abrir &Pasta..."
+msgstr "Abrir Pasta..."
 
 #: include/vlc_intf_strings.h:60 src/libvlc-module.c:1119
 msgid "Repeat all"
@@ -641,26 +638,25 @@ msgstr "Adicionar pasta..."
 #: include/vlc_intf_strings.h:74
 #, fuzzy
 msgid "Save Playlist to &File..."
-msgstr "Salvar lista de reprodução em um arquivo..."
+msgstr "Salvar Lista de Reprodução em um Arquivo..."
 
 #: include/vlc_intf_strings.h:75
 #, fuzzy
 msgid "&Load Playlist File..."
-msgstr "Carregar lista de reprodução de um arquivo..."
+msgstr "Carregar Lista de Reprodução de um Arquivo..."
 
 #: include/vlc_intf_strings.h:77
 msgid "Search"
 msgstr "Pesquisar"
 
 #: include/vlc_intf_strings.h:78
-#, fuzzy
 msgid "Search Filter"
-msgstr "Pesquisar filtro"
+msgstr "Pesquisar Filtro"
 
 #: include/vlc_intf_strings.h:80
 #, fuzzy
 msgid "Additional &Sources"
-msgstr "Fontes adicionais"
+msgstr "Fontes Adicionais"
 
 #: include/vlc_intf_strings.h:84
 msgid ""
@@ -805,7 +801,7 @@ msgstr "O número máximo de filtros (%d) foi atingido."
 
 #: src/audio_output/input.c:94 src/audio_output/input.c:140
 #: src/input/es_out.c:459 src/libvlc-module.c:560
-#: src/video_output/video_output.c:391 modules/video_filter/postproc.c:222
+#: src/video_output/video_output.c:392 modules/video_filter/postproc.c:222
 msgid "Disable"
 msgstr "Desativar"
 
@@ -823,7 +819,7 @@ msgstr "Espectro"
 
 #: src/audio_output/input.c:102
 msgid "Vu meter"
-msgstr ""
+msgstr "Medidor Vu"
 
 #: src/audio_output/input.c:137 modules/audio_filter/equalizer.c:74
 #: modules/gui/macosx/equalizer.m:156 modules/gui/macosx/equalizer.m:170
@@ -932,9 +928,9 @@ msgid "%s: option `%s' requires an argument\n"
 msgstr "%s: a opção `%s' requer um argumento\n"
 
 #: src/extras/getopt.c:710 src/extras/getopt.c:716
-#, fuzzy, c-format
+#, c-format
 msgid "%s: unrecognized option `%s%s'\n"
-msgstr "%s: a opção não foi reconhecida `%c%s'\n"
+msgstr "%s: a opção não foi reconhecida `%s%s'\n"
 
 #: src/extras/getopt.c:743
 #, c-format
@@ -998,7 +994,7 @@ msgstr "O VLC não pode abrir o módulo decodificador."
 #: src/input/es_out.c:480 src/input/es_out.c:485 src/libvlc-module.c:315
 #: modules/access/cdda/info.c:392 modules/access/vcdx/access.c:477
 #: modules/access/vcdx/info.c:290 modules/access/vcdx/info.c:291
-#: modules/gui/qt4/components/open_panels.cpp:335
+#: modules/gui/qt4/components/open_panels.cpp:336
 msgid "Track"
 msgstr "Trilha"
 
@@ -1035,7 +1031,7 @@ msgid "Stream %d"
 msgstr "Fluxo %d"
 
 #: src/input/es_out.c:2040 modules/gui/macosx/wizard.m:383
-#: modules/gui/qt4/ui/sout.ui:594 modules/gui/qt4/ui/sout.ui:681
+#: modules/gui/qt4/ui/sout.ui:648 modules/gui/qt4/ui/sout.ui:735
 msgid "Codec"
 msgstr "Codec"
 
@@ -1052,7 +1048,7 @@ msgid "Type"
 msgstr "Tipo"
 
 #: src/input/es_out.c:2054 modules/codec/faad.c:391
-#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/sout.ui:730
+#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/sout.ui:784
 msgid "Channels"
 msgstr "Canais"
 
@@ -1070,7 +1066,7 @@ msgid "Bits per sample"
 msgstr "Bits por amostra"
 
 #: src/input/es_out.c:2071 modules/access_output/shout.c:91
-#: modules/access/pvr.c:97 modules/gui/qt4/components/open_panels.cpp:849
+#: modules/access/pvr.c:97 modules/gui/qt4/components/open_panels.cpp:850
 msgid "Bitrate"
 msgstr "Taxa de bits"
 
@@ -1121,7 +1117,7 @@ msgstr ""
 #: modules/gui/beos/MediaControlView.cpp:1237 modules/gui/macosx/intf.m:688
 #: modules/gui/macosx/intf.m:689 modules/gui/macosx/open.m:179
 #: modules/gui/macosx/playlistinfo.m:72 modules/gui/macosx/wizard.m:348
-#: modules/gui/qt4/components/open_panels.cpp:309
+#: modules/gui/qt4/components/open_panels.cpp:310
 #: modules/gui/qt4/ui/open_disk.ui:200 modules/mux/asf.c:52
 msgid "Title"
 msgstr "Título"
@@ -1262,9 +1258,9 @@ msgstr "Mídia: %s"
 #: modules/gui/macosx/interaction.m:129 modules/gui/macosx/interaction.m:133
 #: modules/gui/macosx/interaction.m:136 modules/gui/macosx/open.m:168
 #: modules/gui/macosx/prefs.m:126 modules/gui/macosx/prefs.m:147
-#: modules/gui/macosx/simple_prefs.m:232 modules/gui/macosx/simple_prefs.m:296
-#: modules/gui/macosx/simple_prefs.m:606 modules/gui/macosx/wizard.m:320
-#: modules/gui/qt4/components/open_panels.cpp:1140
+#: modules/gui/macosx/simple_prefs.m:232 modules/gui/macosx/simple_prefs.m:295
+#: modules/gui/macosx/simple_prefs.m:622 modules/gui/macosx/wizard.m:320
+#: modules/gui/qt4/components/open_panels.cpp:1141
 #: modules/gui/qt4/components/preferences_widgets.cpp:1289
 msgid "Cancel"
 msgstr "Cancelar"
@@ -1284,7 +1280,7 @@ msgstr "Cancelar"
 #: modules/gui/macosx/wizard.m:1676 modules/gui/macosx/wizard.m:1684
 #: modules/gui/macosx/wizard.m:1865 modules/gui/macosx/wizard.m:1876
 #: modules/gui/macosx/wizard.m:1889
-#: modules/gui/qt4/components/open_panels.cpp:1139
+#: modules/gui/qt4/components/open_panels.cpp:1140
 #: modules/gui/qt4/components/preferences_widgets.cpp:1288
 #: modules/gui/qt4/main_interface.cpp:526
 msgid "OK"
@@ -1331,7 +1327,7 @@ msgstr ""
 
 #: src/libvlc.c:1307
 msgid "To get exhaustive help, use '-H'."
-msgstr ""
+msgstr "Para uma ajuda detalhada, use '-H'."
 
 #: src/libvlc.c:1639
 msgid " (default enabled)"
@@ -1365,9 +1361,9 @@ msgid "Compiler: %s\n"
 msgstr "Compilador: %s\n"
 
 #: src/libvlc.c:1912
-#, fuzzy, c-format
+#, c-format
 msgid "Based upon Git commit [%s]\n"
-msgstr "Baseado nas mudanças do SVN [%s]\n"
+msgstr "Baseado nas mudanças do Git [%s]\n"
 
 #: src/libvlc.c:1948
 msgid ""
@@ -1520,7 +1516,7 @@ msgstr "Chinês Simplificado"
 
 #: src/libvlc-module.c:114 src/text/iso-639_def.h:159
 msgid "Serbian"
-msgstr ""
+msgstr "Sérvio"
 
 #: src/libvlc-module.c:115 src/text/iso-639_def.h:162
 msgid "Slovak"
@@ -1782,7 +1778,7 @@ msgid ""
 "This delays the audio output. The delay must be given in milliseconds.This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
-"Gera atraso na saída de áudio. O atraso deve ser definido em milisegundos. "
+"Gera atraso na saída de áudio. O atraso deve ser definido em milissegundos. "
 "Esta opção pode ser útil se for notado um atraso entre o vídeo e o áudio."
 
 #: src/libvlc-module.c:261
@@ -2122,13 +2118,13 @@ msgstr ""
 "por padrão."
 
 #: src/libvlc-module.c:396 src/video_output/vout_intf.c:400
-#: modules/gui/macosx/simple_prefs.m:283 modules/gui/qt4/ui/sprefs_video.ui:68
+#: modules/gui/macosx/simple_prefs.m:282 modules/gui/qt4/ui/sprefs_video.ui:68
 msgid "Always on top"
-msgstr "Sempre por cima"
+msgstr "Sempre visível"
 
 #: src/libvlc-module.c:398
 msgid "Always place the video window on top of other windows."
-msgstr "Sempre dispor a janela de vídeo sobre as outras no Windows."
+msgstr "Sempre dispor a janela de vídeo sobre as outras."
 
 #: src/libvlc-module.c:400
 #, fuzzy
@@ -2142,12 +2138,12 @@ msgstr "Mostrar o título do vídeo por sobre o filme."
 #: src/libvlc-module.c:404
 #, fuzzy
 msgid "Show video title for x miliseconds"
-msgstr "Mostrar o título do vídeo por x milisegundos."
+msgstr "Mostrar o título do vídeo por x milissegundos."
 
 #: src/libvlc-module.c:406
 msgid "Show the video title for n miliseconds, default is 5000 ms (5 sec.)"
 msgstr ""
-"Mostrar o título do vídeo por n milisegundos. O padrão é 5000 ms (5 "
+"Mostrar o título do vídeo por n milissegundos. O padrão é 5000 ms (5 "
 "segundos)."
 
 #: src/libvlc-module.c:408
@@ -2163,17 +2159,15 @@ msgstr "Local onde o título será exibido (o padrão é no centro, embaixo)."
 #, fuzzy
 msgid "Hide cursor and fullscreen controller after x miliseconds"
 msgstr ""
-"Mostrar o título do vídeo por n milisegundos. O padrão é 5000 ms (5 "
-"segundos)."
+"Oculta o cursor do mouse e os controles de Tela Inteira após x milissegundos."
 
 #: src/libvlc-module.c:415
-#, fuzzy
 msgid ""
 "Hide mouse cursor and fullscreen controller after n miliseconds, default is "
 "3000 ms (3 sec.)"
 msgstr ""
-"Mostrar o título do vídeo por n milisegundos. O padrão é 5000 ms (5 "
-"segundos)."
+"Ocultar o cursor do mouse e o controle de tela cheia por n milissegundos. O "
+"padrão é 3000 ms (3 segundos)."
 
 #: src/libvlc-module.c:423
 msgid "Disable screensaver"
@@ -2276,24 +2270,27 @@ msgid "Video snapshot width"
 msgstr "Altura da imagem capturada"
 
 #: src/libvlc-module.c:469
-#, fuzzy
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
-msgstr "Você pode escolher a altura de vídeo. Por padrão será de 320 pixels."
+msgstr ""
+"Você pode especificar a largura da captura de vídeo. Por padrão será mantida "
+"a largura original (-1). Usando o valor 0, a largura será aumentada de forma "
+"a manter a proporção."
 
 #: src/libvlc-module.c:473
 msgid "Video snapshot height"
 msgstr "Largura da imagem capturada"
 
 #: src/libvlc-module.c:475
-#, fuzzy
 msgid ""
 "You can enforce the height of the video snapshot. By default it will keep "
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
-"Você pode escolher a largura da captura de vídeo. Por padrão será 200 pixels."
+"Você pode especificar a altura da captura de vídeo. Por padrão será mantida "
+"a altura original (-1). Usando o valor 0, a altura será aumentada de forma "
+"que a proporção seja mantida."
 
 #: src/libvlc-module.c:479
 msgid "Video cropping"
@@ -2378,7 +2375,7 @@ msgstr ""
 "perpendiculares (1:1). Se você tem uma tela em 16:9, pode precisar modificar "
 "esta proporção para 4:3 de forma a manter a imagem proporcional."
 
-#: src/libvlc-module.c:517 modules/gui/macosx/simple_prefs.m:285
+#: src/libvlc-module.c:517 modules/gui/macosx/simple_prefs.m:284
 #: modules/gui/qt4/ui/sprefs_video.ui:101
 msgid "Skip frames"
 msgstr "Pular quadros"
@@ -2468,8 +2465,8 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:92 modules/access/v4l2/v4l2.c:246
 #: modules/audio_output/alsa.c:105 modules/gui/fbosd.c:173
 #: modules/gui/macosx/prefs_widgets.m:1280
-#: modules/gui/macosx/simple_prefs.m:343 modules/gui/macosx/simple_prefs.m:429
-#: modules/gui/macosx/simple_prefs.m:674 modules/gui/macosx/vout.m:203
+#: modules/gui/macosx/simple_prefs.m:376 modules/gui/macosx/simple_prefs.m:467
+#: modules/gui/macosx/simple_prefs.m:688 modules/gui/macosx/vout.m:203
 #: modules/gui/qt4/components/preferences_widgets.cpp:556
 #: modules/video_filter/marq.c:61 modules/video_filter/rss.c:70
 #: modules/video_filter/rss.c:182 modules/video_output/msw/directx.c:161
@@ -2671,7 +2668,7 @@ msgstr ""
 
 #: src/libvlc-module.c:657
 msgid "Input slave (experimental)"
-msgstr "Entrada coordenada (experimetal)"
+msgstr "Entrada coordenada (experimental)"
 
 #: src/libvlc-module.c:659
 msgid ""
@@ -2730,7 +2727,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr "Você pode desativar completamente o processamento de sub telas."
 
 #: src/libvlc-module.c:686 src/libvlc-module.c:1585 src/text/iso-639_def.h:143
-#: modules/gui/macosx/simple_prefs.m:274
+#: modules/gui/macosx/simple_prefs.m:273
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:22
 #: modules/stream_out/transcode.c:227
 msgid "On Screen Display"
@@ -2897,7 +2894,7 @@ msgstr "Tempo limite da conexão TCP"
 
 #: src/libvlc-module.c:765
 msgid "Default TCP connection timeout (in milliseconds). "
-msgstr "Tempo limite de conexão TCP (em milisegundos)."
+msgstr "Tempo limite de conexão TCP (em milissegundos)."
 
 #: src/libvlc-module.c:767
 msgid "SOCKS server"
@@ -3143,7 +3140,7 @@ msgid ""
 "muxer. This value should be set in milliseconds."
 msgstr ""
 "Permite que você configure a quantidade inicial de cache para o misturador "
-"de saída de fluxo. Este valor deve ser ajustado em milisegundos."
+"de saída de fluxo. Este valor deve ser preenchido em milisegundos."
 
 #: src/libvlc-module.c:884
 msgid "Preferred packetizer list"
@@ -3293,6 +3290,8 @@ msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
 msgstr ""
+"Estas opções permitem que você selecione módulos padrão. Deixe-as como "
+"estão, a menos que saiba realmente o que está fazendo."
 
 #: src/libvlc-module.c:957
 msgid "Memory copy module"
@@ -3389,16 +3388,20 @@ msgstr ""
 
 #: src/libvlc-module.c:998
 msgid "(Experimental) Don't do caching at the access level."
-msgstr ""
+msgstr "(Experimental) Não usar cache na entrada."
 
 #: src/libvlc-module.c:1000 src/libvlc-module.c:1006
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
 msgstr ""
+"Esta opção é útil se você quiser reduzir a latência de leitura de um fluxo"
 
 #: src/libvlc-module.c:1003
+#, fuzzy
 msgid "(Experimental) Minimize latency whenreading live stream."
 msgstr ""
+"(Experimental) Ajusta automaticamente o cache, minimizando a latência de "
+"leitura de um fluxo de tempo real."
 
 #: src/libvlc-module.c:1009
 msgid "Modules search path"
@@ -3409,7 +3412,9 @@ msgstr "Caminho de pesquisa de módulos"
 msgid ""
 "Additional path for VLC to look for its modules. You can add several paths "
 "by concatenating them using \" PATH_SEP \" as separator"
-msgstr "Caminho adicional para o VLC procurar módulos."
+msgstr ""
+"Caminho adicional para o VLC procurar módulos. Você pode adicionar vários "
+"caminhos, concatenando-os com "
 
 #: src/libvlc-module.c:1014
 msgid "VLM configuration file"
@@ -3529,6 +3534,12 @@ msgid ""
 "render the whole system unresponsive which might require a reboot of your "
 "machine."
 msgstr ""
+"Aumentando a prioridade do processo melhorará significativamente a "
+"reprodução porque o VLC não será incomodado com a execução de outros "
+"aplicativos que possam, eventualmente, requerer mais processador. "
+"Entretanto, atente que para certas ocasiões (defeitos), o VLC pode tomar "
+"completamente o processador e tornar o sistema inoperante, o que deve "
+"requerer uma reinicialização do computador."
 
 #: src/libvlc-module.c:1079
 msgid "Enqueue items to playlist when in one instance mode"
@@ -3541,12 +3552,16 @@ msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
 msgstr ""
+"Quando estiver usando apenas uma instância, enfileira itens na lista de "
+"reprodução e mantém a reprodução do item atual."
 
 #: src/libvlc-module.c:1090
 msgid ""
 "These options define the behavior of the playlist. Some of them can be "
 "overridden in the playlist dialog box."
 msgstr ""
+"Estas opções definem o comportamento da lista de reprodução. Algumas delas "
+"podem ser sobrepostas na janela de diálogo da lista de reprodução."
 
 #: src/libvlc-module.c:1093
 msgid "Automatically preparse files"
@@ -3589,6 +3604,8 @@ msgid ""
 "Specifies the services discovery modules to load, separated by semi-colons. "
 "Typical values are sap, hal, ..."
 msgstr ""
+"Especifica os módulos de descoberta de serviço a serem carregados, separados "
+"por ponto-e-vírgula. Valores típicos são sap, hal, ..."
 
 #: src/libvlc-module.c:1115
 msgid "Play files randomly forever"
@@ -3641,19 +3658,16 @@ msgstr ""
 "o o VLC é iniciado."
 
 #: src/libvlc-module.c:1140
-#, fuzzy
 msgid "Display playlist tree"
-msgstr "Usar árvore de lista de reprodução"
+msgstr "Exibir lista de reprodução em árvore"
 
 #: src/libvlc-module.c:1142
-#, fuzzy
 msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
 msgstr ""
-"A lista de reprodução pode usar uma árvore para categorizar alguns itens "
-"como os conteúdos de uma pasta. \"Padrão\" significa que a árvore só será "
-"usada quando for realmente necessária."
+"A lista de reprodução pode usar uma árvore para categorizar itens, como o "
+"conteúdo de uma pasta."
 
 #: src/libvlc-module.c:1151
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
@@ -3665,7 +3679,7 @@ msgstr ""
 #: modules/gui/macosx/controls.m:512 modules/gui/macosx/controls.m:961
 #: modules/gui/macosx/controls.m:992 modules/gui/macosx/embeddedwindow.m:50
 #: modules/gui/macosx/intf.m:634 modules/gui/macosx/intf.m:711
-#: modules/gui/macosx/intf.m:767 modules/gui/macosx/simple_prefs.m:282
+#: modules/gui/macosx/intf.m:767 modules/gui/macosx/simple_prefs.m:281
 #: modules/gui/qt4/ui/sprefs_video.ui:61
 msgid "Fullscreen"
 msgstr "Tela inteira"
@@ -4339,9 +4353,8 @@ msgid "Do not display OSD menu on video output"
 msgstr "Não mostrar menu OSD na saída de vídeo"
 
 #: src/libvlc-module.c:1357
-#, fuzzy
 msgid "Do not display OSD menu on top of video output"
-msgstr "Mostrar menu OSD na saída de vídeo"
+msgstr "Não mostrar o menu OSD na saída de vídeo"
 
 #: src/libvlc-module.c:1358
 msgid "Highlight widget on the right"
@@ -4384,9 +4397,8 @@ msgid "Selecting current widget performs the associated action."
 msgstr ""
 
 #: src/libvlc-module.c:1374
-#, fuzzy
 msgid "Cycle through audio devices"
-msgstr "Dispositivo de Áudio"
+msgstr ""
 
 #: src/libvlc-module.c:1375
 msgid "Cycle through available audio devices"
@@ -4446,7 +4458,7 @@ msgstr "Subtelas"
 
 #: src/libvlc-module.c:1594 modules/codec/subtitles/subsdec.c:117
 #: modules/demux/subtitle.c:74 modules/gui/beos/InterfaceWindow.cpp:280
-#: modules/gui/qt4/ui/sout.ui:765 modules/gui/qt4/ui/sout.ui:771
+#: modules/gui/qt4/ui/sout.ui:819 modules/gui/qt4/ui/sout.ui:825
 msgid "Subtitles"
 msgstr "Legendas"
 
@@ -4523,7 +4535,7 @@ msgstr ""
 
 #: src/libvlc-module.c:2474
 msgid "Exhaustive help for VLC and its modules"
-msgstr ""
+msgstr "Ajuda detalhada para o VLC e seus módulos"
 
 #: src/libvlc-module.c:2476
 msgid ""
@@ -4581,52 +4593,47 @@ msgstr "Imprimir informações sobre a versão"
 msgid "main program"
 msgstr "programa principal"
 
-#: src/misc/update.c:1582
-#, fuzzy
+#: src/misc/update.c:1600
 msgid "File could not be verified"
-msgstr "Arquivo não pode ser verificado"
+msgstr "Arquivo não pôde ser verificado"
 
-#: src/misc/update.c:1583
-#, fuzzy, c-format
+#: src/misc/update.c:1601
+#, c-format
 msgid ""
 "It was not possible to download a cryptographic signature for the downloaded "
 "file \"%s\". Thus, it was deleted."
 msgstr ""
-"Não foi possível verificar com segurança o arquivo baixado \"%s\", por isso "
-"o VLC o excluiu."
 
-#: src/misc/update.c:1594 src/misc/update.c:1606
+#: src/misc/update.c:1612 src/misc/update.c:1624
 msgid "Invalid signature"
 msgstr "Assinatura inválida"
 
-#: src/misc/update.c:1595 src/misc/update.c:1607
+#: src/misc/update.c:1613 src/misc/update.c:1625
 #, c-format
 msgid ""
 "The cryptographic signature for the downloaded file \"%s\" was invalid and "
 "could not be used to securely verify it. Thus, the file was deleted."
 msgstr ""
 
-#: src/misc/update.c:1619
+#: src/misc/update.c:1637
 msgid "File not verifiable"
 msgstr "Impossível verificar arquivo"
 
-#: src/misc/update.c:1620
-#, fuzzy, c-format
+#: src/misc/update.c:1638
+#, c-format
 msgid ""
 "It was not possible to securely verify the downloaded file \"%s\". Thus, it "
 "was VLC deleted."
 msgstr ""
-"Não foi possível verificar com segurança o arquivo baixado \"%s\", por isso "
-"o VLC o excluiu."
 
-#: src/misc/update.c:1631 src/misc/update.c:1643
+#: src/misc/update.c:1649 src/misc/update.c:1661
 msgid "File corrupted"
 msgstr "Arquivo corrompido"
 
-#: src/misc/update.c:1632 src/misc/update.c:1644
-#, fuzzy, c-format
+#: src/misc/update.c:1650 src/misc/update.c:1662
+#, c-format
 msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
-msgstr "Arquivo baixado \"%s\" está corrompido, por isso o VLC o excuiu."
+msgstr "O arquivo \"%s\" estava corrompido. Portanto, foi excluído."
 
 #: src/playlist/tree.c:65 modules/access/bda/bda.c:62
 #: modules/access/bda/bda.c:115 modules/access/bda/bda.c:123
@@ -5192,28 +5199,28 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/video_output/video_output.c:389 modules/gui/macosx/intf.m:724
+#: src/video_output/video_output.c:390 modules/gui/macosx/intf.m:724
 #: modules/gui/macosx/intf.m:725 modules/video_filter/deinterlace.c:127
 msgid "Deinterlace"
 msgstr "Desentrelaçamento"
 
-#: src/video_output/video_output.c:393 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:394 modules/video_filter/deinterlace.c:123
 msgid "Discard"
 msgstr "Descartar"
 
-#: src/video_output/video_output.c:395 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:396 modules/video_filter/deinterlace.c:123
 msgid "Blend"
 msgstr "Mesclar"
 
-#: src/video_output/video_output.c:397 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:398 modules/video_filter/deinterlace.c:123
 msgid "Mean"
 msgstr "Média"
 
-#: src/video_output/video_output.c:399 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:400 modules/video_filter/deinterlace.c:123
 msgid "Bob"
 msgstr ""
 
-#: src/video_output/video_output.c:401 modules/video_filter/deinterlace.c:123
+#: src/video_output/video_output.c:402 modules/video_filter/deinterlace.c:123
 msgid "Linear"
 msgstr "Linear"
 
@@ -5232,8 +5239,8 @@ msgstr "Proporção"
 #: modules/access/bda/bda.c:40 modules/access/cdda.c:66
 #: modules/access/dshow/dshow.cpp:98 modules/access/dvb/access.c:78
 #: modules/access/dv.c:71 modules/access/dvdnav.c:72
-#: modules/access/dvdread.c:76 modules/access/fake.c:43
-#: modules/access/file.c:84 modules/access/ftp.c:57
+#: modules/access/dvdread.c:76 modules/access/eyetv.m:61
+#: modules/access/fake.c:43 modules/access/file.c:84 modules/access/ftp.c:57
 #: modules/access/gnomevfs.c:47 modules/access/http.c:75
 #: modules/access/jack.c:62 modules/access/mms/mms.c:49
 #: modules/access/pvr.c:60 modules/access/rtmp/access.c:43
@@ -5250,7 +5257,7 @@ msgid ""
 msgstr "Valor do cache para fluxos DVB"
 
 #: modules/access/bda/bda.c:45 modules/access/dvb/access.c:83
-#: modules/gui/qt4/components/open_panels.cpp:876
+#: modules/gui/qt4/components/open_panels.cpp:877
 msgid "Adapter card to tune"
 msgstr "Placa a ser ajustada"
 
@@ -5259,14 +5266,16 @@ msgid ""
 "Adapter cards have a device file in directory named /dev/dvb/adapter[n] with "
 "n>=0."
 msgstr ""
+"As placas têm um arquivo de dispositivo na pasta /dev/dvb/adapter[n] com "
+"n>=0."
 
 #: modules/access/bda/bda.c:49 modules/access/dvb/access.c:86
 msgid "Device number to use on adapter"
 msgstr "Número de dispositivo a ser usado pela placa"
 
 #: modules/access/bda/bda.c:52 modules/access/dvb/access.c:89
-#: modules/gui/qt4/components/open_panels.cpp:635
-#: modules/gui/qt4/components/open_panels.cpp:898
+#: modules/gui/qt4/components/open_panels.cpp:636
+#: modules/gui/qt4/components/open_panels.cpp:899
 msgid "Transponder/multiplex frequency"
 msgstr "Freqüência do Transponder/multiplexador"
 
@@ -5965,8 +5974,8 @@ msgstr ""
 "milisegundos."
 
 #: modules/access/dshow/dshow.cpp:102 modules/access/v4l.c:81
-#: modules/gui/qt4/components/open_panels.cpp:686
-#: modules/gui/qt4/components/open_panels.cpp:721
+#: modules/gui/qt4/components/open_panels.cpp:687
+#: modules/gui/qt4/components/open_panels.cpp:722
 msgid "Video device name"
 msgstr "Nome do dispositivo de vídeo"
 
@@ -5979,8 +5988,8 @@ msgstr ""
 "Se não for especificado um, o dispositivo padrão será usado."
 
 #: modules/access/dshow/dshow.cpp:107 modules/access/v4l2/v4l2.c:169
-#: modules/access/v4l.c:85 modules/gui/qt4/components/open_panels.cpp:692
-#: modules/gui/qt4/components/open_panels.cpp:727
+#: modules/access/v4l.c:85 modules/gui/qt4/components/open_panels.cpp:693
+#: modules/gui/qt4/components/open_panels.cpp:728
 msgid "Audio device name"
 msgstr "Nome do dispositivo de áudio"
 
@@ -5993,7 +6002,7 @@ msgstr ""
 "Se não for especificado um, o dispositivo padrão será usado."
 
 #: modules/access/dshow/dshow.cpp:112
-#: modules/gui/qt4/components/open_panels.cpp:600
+#: modules/gui/qt4/components/open_panels.cpp:601
 msgid "Video size"
 msgstr "Tamanho do vídeo"
 
@@ -6125,9 +6134,8 @@ msgstr ""
 "DSS."
 
 #: modules/access/dshow/dshow.cpp:164
-#, fuzzy
 msgid "Number of audio channels"
-msgstr "Número de canais"
+msgstr "Número de canais de áudio"
 
 #: modules/access/dshow/dshow.cpp:166
 msgid ""
@@ -6143,9 +6151,8 @@ msgid "Select audio input format with the given sample rate (if non 0)"
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:172
-#, fuzzy
 msgid "Audio bits per sample"
-msgstr "Bits por amostra"
+msgstr "Bits de áudio por amostra"
 
 #: modules/access/dshow/dshow.cpp:174
 msgid "Select audio input format with the given bits/sample (if non 0)"
@@ -6401,17 +6408,23 @@ msgstr ""
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr ""
 
-#: modules/access/eyetv.m:54
+#: modules/access/eyetv.m:56
 msgid "Channel number"
 msgstr "Número do canal"
 
-#: modules/access/eyetv.m:56
+#: modules/access/eyetv.m:58
 msgid ""
 "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
 "for Composite input"
 msgstr ""
 
-#: modules/access/eyetv.m:60
+#: modules/access/eyetv.m:63
+#, fuzzy
+msgid ""
+"Caching value for EyeTV captures. This value should be set in milliseconds."
+msgstr "Valor do cache para fluxos DVB"
+
+#: modules/access/eyetv.m:68
 msgid "EyeTV access module"
 msgstr "Módulo de acesso EyeTV"
 
@@ -6504,7 +6517,7 @@ msgid ""
 msgstr ""
 
 #: modules/access_filter/bandwidth.c:45
-#: modules/gui/qt4/components/open_panels.cpp:654
+#: modules/gui/qt4/components/open_panels.cpp:655
 msgid "Bandwidth"
 msgstr "Largura de banda"
 
@@ -6537,7 +6550,7 @@ msgstr "Pasta dos registros"
 
 #: modules/access_filter/record.c:50
 msgid "Directory where the record will be stored."
-msgstr ""
+msgstr "Pasta onde o registro será gravado."
 
 #: modules/access_filter/record.c:303
 msgid "Recording"
@@ -6556,6 +6569,8 @@ msgid ""
 "This is the size of the temporary files that will be used to store the "
 "timeshifted streams."
 msgstr ""
+"Este é o tamanho dos arquivos temporários que serão usados para armazenar os "
+"fluxos com deslocamento de tempo."
 
 #: modules/access_filter/timeshift.c:57
 msgid "Timeshift directory"
@@ -6667,13 +6682,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/http.c:71
-#, fuzzy
 msgid "HTTP proxy password"
-msgstr "Senha HTTP"
+msgstr "Senha para o proxy HTTP"
 
 #: modules/access/http.c:73
 msgid "If your HTTP proxy requires a password, set it here."
-msgstr ""
+msgstr "Se o seu proxy HTTP requer uma senha, configure ela aqui."
 
 #: modules/access/http.c:77
 msgid ""
@@ -6695,7 +6709,7 @@ msgstr "Reconectar automaticamente"
 #: modules/access/http.c:86
 msgid ""
 "Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr ""
+msgstr "Tentar se reconectar ao fluxo automaticamente em caso de desconexão."
 
 #: modules/access/http.c:89
 msgid "Continuous stream"
@@ -6714,7 +6728,7 @@ msgstr "Retransmitir Cookies"
 
 #: modules/access/http.c:96
 msgid "Forward Cookies Across http redirections "
-msgstr ""
+msgstr "Encaminhar Cookies através de redirecionamentos http"
 
 #: modules/access/http.c:99
 msgid "HTTP input"
@@ -6725,9 +6739,10 @@ msgid "HTTP(S)"
 msgstr "HTTP(S)"
 
 #: modules/access/http.c:446
-#, fuzzy, c-format
+#, c-format
 msgid "Please enter a valid login name and a password for realm %s."
-msgstr "Por favor digite login senha válidos."
+msgstr ""
+"Por favor preencha um nome de usuário válido e uma senha para o domínio %s."
 
 #: modules/access/http.c:450
 msgid "HTTP authentication"
@@ -6764,9 +6779,8 @@ msgid "JACK Input"
 msgstr ""
 
 #: modules/access/mmap.c:42
-#, fuzzy
 msgid "Use file memory mapping"
-msgstr "Usar memória compartilhada"
+msgstr ""
 
 #: modules/access/mmap.c:44
 msgid "Try to use memory mapping to read files and block devices."
@@ -6801,7 +6815,7 @@ msgstr "Taxa de bits máxima"
 
 #: modules/access/mms/mms.c:61
 msgid "Select the stream with the maximum bitrate under that limit."
-msgstr ""
+msgstr "Seleciona o fluxo com a taxa de bits máxima dentro do limite."
 
 #: modules/access/mms/mms.c:65
 msgid ""
@@ -6809,17 +6823,21 @@ msgid ""
 "mydomain:myport/ ; if empty, the http_proxy environment variable will be "
 "tried."
 msgstr ""
+"Para especificar um proxy HTTP, deve-se usar o formato http://[usuário[:"
+"senha]@]meuproxy.meudomínio:minhaporta/ ; se nada for preenchido, será "
+"tentada a variável http_proxy."
 
 #: modules/access/mms/mms.c:69
-#, fuzzy
 msgid "TCP/UDP timeout (ms)"
-msgstr "Tempo Limite (ms)"
+msgstr "Tempo Limite (ms) do TCP/UDP"
 
 #: modules/access/mms/mms.c:70
 msgid ""
 "Amount of time (in ms) to wait before aborting network reception of data. "
 "Note that there will be 10 retries before completely giving up."
 msgstr ""
+"Total de tempo (em ms) que será aguardado antes de encerrar a recepção de "
+"dados da rede. Atente que haverá 10 tentativas antes da desistência total."
 
 #: modules/access/mms/mms.c:74
 msgid "Microsoft Media Server (MMS) input"
@@ -6856,7 +6874,7 @@ msgstr ""
 
 #: modules/access_output/http.c:68 modules/control/telnet.c:87
 #: modules/gui/macosx/simple_prefs.m:222
-#: modules/gui/qt4/dialogs/interaction.cpp:97
+#: modules/gui/qt4/dialogs/interaction.cpp:99
 #: modules/gui/qt4/ui/sprefs_audio.ui:319 modules/misc/audioscrobbler.c:135
 #: modules/misc/notify/growl_udp.c:64
 msgid "Password"
@@ -6909,9 +6927,8 @@ msgid "HTTP stream output"
 msgstr "Saída de fluxo HTTP"
 
 #: modules/access_output/rtmp.c:44
-#, fuzzy
 msgid "Active TCP connection"
-msgstr "Conexão automática"
+msgstr "Conexão TCP ativa"
 
 #: modules/access_output/rtmp.c:46
 msgid ""
@@ -6920,14 +6937,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rtmp.c:55
-#, fuzzy
 msgid "RTMP stream output"
-msgstr "Saída do fluxo RTP"
+msgstr "Saída do fluxo RTMP"
 
 #: modules/access_output/rtmp.c:56 modules/access/rtmp/access.c:53
-#, fuzzy
 msgid "RTMP"
-msgstr "RTP"
+msgstr "RTMP"
 
 #: modules/access_output/shout.c:63
 msgid "Stream name"
@@ -7014,7 +7029,7 @@ msgstr ""
 
 #: modules/access_output/shout.c:110
 msgid "IceCAST output"
-msgstr ""
+msgstr "Saída IceCAST"
 
 #: modules/access_output/udp.c:67 modules/access/rtsp/access.c:46
 #: modules/demux/live555.cpp:74
@@ -7066,8 +7081,8 @@ msgid "PVR radio device"
 msgstr "Dispositivo de rádio PVR"
 
 #: modules/access/pvr.c:71 modules/access/v4l.c:100
-#: modules/gui/qt4/components/open_panels.cpp:734
-#: modules/gui/qt4/components/open_panels.cpp:833
+#: modules/gui/qt4/components/open_panels.cpp:735
+#: modules/gui/qt4/components/open_panels.cpp:834
 msgid "Norm"
 msgstr "Norma"
 
@@ -7096,8 +7111,8 @@ msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "Altura do fluxo a ser capturado (-1 para deteção automática)."
 
 #: modules/access/pvr.c:83 modules/access/v4l2/v4l2.c:230
-#: modules/access/v4l.c:93 modules/gui/qt4/components/open_panels.cpp:741
-#: modules/gui/qt4/components/open_panels.cpp:840
+#: modules/access/v4l.c:93 modules/gui/qt4/components/open_panels.cpp:742
+#: modules/gui/qt4/components/open_panels.cpp:841
 msgid "Frequency"
 msgstr "Freqüência"
 
@@ -7150,11 +7165,11 @@ msgstr "Modo de taxa de bits a ser usado (VBR ou CBR)."
 
 #: modules/access/pvr.c:106
 msgid "Audio bitmask"
-msgstr ""
+msgstr "Máscara de bits de áudio"
 
 #: modules/access/pvr.c:107
 msgid "Bitmask that will get used by the audio part of the card."
-msgstr ""
+msgstr "Máscara de bits que será usada pela porção de áudio da placa."
 
 #: modules/access/pvr.c:110 modules/access/v4l2/v4l2.c:189
 #: modules/access/vcdx/info.c:100 modules/gui/macosx/intf.m:635
@@ -7210,14 +7225,12 @@ msgid "IVTV MPEG Encoding cards input"
 msgstr ""
 
 #: modules/access/qtcapture.m:55 modules/access/qtcapture.m:56
-#, fuzzy
 msgid "Quicktime Capture"
-msgstr "Abrir arquivo rapidamente"
+msgstr ""
 
 #: modules/access/qtcapture.m:226
-#, fuzzy
 msgid "No Input device found"
-msgstr "Nenhuma entrada encontrada"
+msgstr "Nenhum dispositivo de entrada encontrado"
 
 #: modules/access/qtcapture.m:227
 msgid ""
@@ -7226,17 +7239,15 @@ msgid ""
 msgstr ""
 
 #: modules/access/rtmp/access.c:45
-#, fuzzy
 msgid ""
 "Caching value for RTMP streams. This value should be set in milliseconds."
 msgstr ""
-"Valor de cache para fluxos FTP. Este valor deve ser preenchido em "
-"milisegundos."
+"Valor de cache para fluxos RTMP. Este valor deve ser preenchido em "
+"milissegundos."
 
 #: modules/access/rtmp/access.c:52
-#, fuzzy
 msgid "RTMP input"
-msgstr "Entrada de FTP"
+msgstr "Entrada RTMP"
 
 #: modules/access/rtsp/access.c:48
 msgid ""
@@ -7254,7 +7265,7 @@ msgstr "Falha na conexão"
 #: modules/access/rtsp/access.c:99
 #, c-format
 msgid "VLC could not connect to \"%s:%d\"."
-msgstr ""
+msgstr "O VLC não pôde se conectar a \"%s:%d\"."
 
 #: modules/access/rtsp/access.c:232
 msgid "Session failed"
@@ -7275,7 +7286,7 @@ msgstr ""
 
 #: modules/access/screen/screen.c:48
 msgid "Capture fragment size"
-msgstr ""
+msgstr "Tamanho do fragmento de captura"
 
 #: modules/access/screen/screen.c:50
 msgid ""
@@ -7285,42 +7296,38 @@ msgstr ""
 
 #: modules/access/screen/screen.c:55 modules/access/screen/screen.c:59
 msgid "Subscreen top left corner"
-msgstr ""
+msgstr "Canto esquerdo-superior da subtela"
 
 #: modules/access/screen/screen.c:57
-#, fuzzy
 msgid "Top coordinate of the subscreen top left corner."
-msgstr "coordenada x do logo"
+msgstr ""
 
 #: modules/access/screen/screen.c:61
-#, fuzzy
 msgid "Left coordinate of the subscreen top left corner."
-msgstr "coordenada x do logo"
+msgstr ""
 
 #: modules/access/screen/screen.c:63 modules/access/screen/screen.c:65
-#, fuzzy
 msgid "Subscreen width"
-msgstr "Caminho do Screenshot"
+msgstr "Largura da subtela"
 
 #: modules/access/screen/screen.c:67 modules/access/screen/screen.c:69
-#, fuzzy
 msgid "Subscreen height"
-msgstr "Altura da borda"
+msgstr "Altura da subtela"
 
 #: modules/access/screen/screen.c:71
 msgid "Follow the mouse"
-msgstr ""
+msgstr "Seguir o mouse"
 
 #: modules/access/screen/screen.c:73
 msgid "Follow the mouse when capturing a subscreen."
-msgstr ""
+msgstr "Segue o mouse quando estiver capturando de uma subtela."
 
 #: modules/access/screen/screen.c:86
 msgid "Screen Input"
 msgstr "Entrada de tela"
 
 #: modules/access/screen/screen.c:87 modules/gui/macosx/open.m:207
-#: modules/gui/macosx/open.m:863 modules/gui/macosx/simple_prefs.m:435
+#: modules/gui/macosx/open.m:863 modules/gui/macosx/simple_prefs.m:473
 #: modules/gui/macosx/vout.m:214
 msgid "Screen"
 msgstr "Tela"
@@ -7329,6 +7336,8 @@ msgstr "Tela"
 msgid ""
 "Caching value for SMB streams. This value should be set in milliseconds."
 msgstr ""
+"Valor de cache para fluxos SMB. Este valor deve ser preenchido em "
+"milissegundos."
 
 #: modules/access/smb.c:68
 msgid "SMB user name"
@@ -7344,7 +7353,7 @@ msgstr "Domínio SMB"
 
 #: modules/access/smb.c:75
 msgid "Domain/Workgroup that will be used for the connection."
-msgstr ""
+msgstr "Domínio/Grupo de Trabalho que será usado para a conexão."
 
 #: modules/access/smb.c:80
 msgid "SMB input"
@@ -7373,12 +7382,11 @@ msgid "UDP"
 msgstr "UDP"
 
 #: modules/access/udp.c:59
-#, fuzzy
 msgid "UDP input"
-msgstr "Entrada UDP/RTP"
+msgstr "Entrada UDP"
 
 #: modules/access/v4l2/v4l2.c:79 modules/gui/macosx/open.m:178
-#: modules/gui/qt4/components/open_panels.cpp:820
+#: modules/gui/qt4/components/open_panels.cpp:821
 msgid "Device name"
 msgstr "Nome do dispositivo"
 
@@ -7391,7 +7399,7 @@ msgstr ""
 "video0."
 
 #: modules/access/v4l2/v4l2.c:83
-#: modules/gui/qt4/components/open_panels.cpp:699
+#: modules/gui/qt4/components/open_panels.cpp:700
 #: modules/stream_out/standard.c:100
 msgid "Standard"
 msgstr "Padrão"
@@ -7614,11 +7622,10 @@ msgid "Audio method to use: 0 to disable audio, 1 for OSS."
 msgstr "Método do áudio a ser usado: 0 para desativar o áudio, 1 para OSS."
 
 #: modules/access/v4l2/v4l2.c:186
-#, fuzzy
 msgid ""
 "Audio method to use: 0 to disable audio, 1 for OSS, 2 for ALSA, 3 for ALSA "
 "or OSS (ALSA is preferred)."
-msgstr "Método do áudio a ser usado: 0 para desativar o áudio, 1 para OSS."
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:191
 msgid "Volume of the audio input (if supported by the v4l2 driver)."
@@ -7654,11 +7661,13 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:204
 msgid "Loudness"
-msgstr ""
+msgstr "Reforço de graves e agudos"
 
 #: modules/access/v4l2/v4l2.c:206
 msgid "Loudness of the audio input (if supported by the v4l2 driver)."
 msgstr ""
+"Reforço de graves e agudos da entrada de áudio (se houver suporte pelo "
+"driver v4l2)."
 
 #: modules/access/v4l2/v4l2.c:210 modules/access/v4l.c:131
 msgid "Capture the audio stream in stereo."
@@ -7913,7 +7922,7 @@ msgstr ""
 #: modules/access/vcdx/access.c:286 modules/access/vcdx/access.c:369
 #: modules/access/vcdx/access.c:696 modules/access/vcdx/info.c:294
 #: modules/access/vcdx/info.c:295
-#: modules/gui/qt4/components/open_panels.cpp:322
+#: modules/gui/qt4/components/open_panels.cpp:323
 msgid "Entry"
 msgstr "Entrada"
 
@@ -8112,7 +8121,7 @@ msgstr ""
 #: modules/audio_filter/channel_mixer/headphone.c:82
 #: modules/audio_filter/channel_mixer/headphone.c:101
 msgid "Headphone virtual spatialization effect"
-msgstr ""
+msgstr "Efeito espacial de fone de ouvido"
 
 #: modules/audio_filter/channel_mixer/headphone.c:83
 msgid "Headphone effect"
@@ -8454,9 +8463,8 @@ msgid "Scale audio tempo in sync with playback rate"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:48
-#, fuzzy
 msgid "Scaletempo"
-msgstr "Redimensionar"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:54
 msgid "Stride Length"
@@ -8475,9 +8483,8 @@ msgid "Percentage of stride to overlap"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:58
-#, fuzzy
 msgid "Search Length"
-msgstr "Pesquisar"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:58
 msgid "Length in milliseconds to search for best overlap position"
@@ -8631,7 +8638,7 @@ msgstr "Saída de áudio do EsounD"
 
 #: modules/audio_output/esd.c:73
 msgid "Esound server"
-msgstr ""
+msgstr "Servidor Esound"
 
 #: modules/audio_output/file.c:83
 msgid "Output format"
@@ -8736,23 +8743,23 @@ msgstr ""
 msgid "PORTAUDIO audio output"
 msgstr ""
 
-#: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:625
-#: modules/gui/macosx/intf.m:1615 modules/gui/pda/pda_interface.c:210
-#: modules/gui/pda/pda_interface.c:1353 modules/gui/qt4/main_interface.cpp:361
+#: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:624
+#: modules/gui/macosx/intf.m:625 modules/gui/macosx/intf.m:1615
+#: modules/gui/pda/pda_interface.c:210 modules/gui/pda/pda_interface.c:1353
+#: modules/gui/qt4/main_interface.cpp:361
 #: modules/gui/qt4/main_interface.cpp:365
-#: modules/gui/qt4/main_interface.cpp:957
-#: modules/gui/qt4/main_interface.cpp:959
-#: modules/gui/qt4/main_interface.cpp:1023
-#: modules/gui/qt4/main_interface.cpp:1038
-#: modules/gui/qt4/main_interface.cpp:1045
-#: modules/gui/qt4/main_interface.cpp:1062
+#: modules/gui/qt4/main_interface.cpp:958
+#: modules/gui/qt4/main_interface.cpp:960
+#: modules/gui/qt4/main_interface.cpp:1024
+#: modules/gui/qt4/main_interface.cpp:1039
+#: modules/gui/qt4/main_interface.cpp:1046
+#: modules/gui/qt4/main_interface.cpp:1063
 msgid "VLC media player"
 msgstr "VLC media player"
 
 #: modules/audio_output/pulse.c:97
-#, fuzzy
 msgid "Pulseaudio audio output"
-msgstr "Saída de áudio para arquivo"
+msgstr "Saída de áudio Pulseaudio"
 
 #: modules/audio_output/sdl.c:69
 msgid "Simple DirectMedia Layer audio output"
@@ -8760,12 +8767,11 @@ msgstr "Saída de áudio de camada DirectMedia simplificado"
 
 #: modules/audio_output/waveout.c:148
 msgid "Microsoft Soundmapper"
-msgstr ""
+msgstr "Microsoft Soundmapper"
 
 #: modules/audio_output/waveout.c:159
-#, fuzzy
 msgid "Select Audio Device"
-msgstr "Dispositivo de Áudio"
+msgstr "Selecionar Dispositivo de Áudio"
 
 #: modules/audio_output/waveout.c:160
 msgid ""
@@ -8774,9 +8780,8 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/waveout.c:163
-#, fuzzy
 msgid "Default Audio Device"
-msgstr "Dispositivos padrão"
+msgstr "Dispositivo de Áudio Padrão"
 
 #: modules/audio_output/waveout.c:167
 msgid "Win32 waveOut extension output"
@@ -8819,10 +8824,10 @@ msgid "Non-key"
 msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:71 modules/gui/macosx/prefs.m:129
-#: modules/gui/macosx/simple_prefs.m:295
+#: modules/gui/macosx/simple_prefs.m:294
 #: modules/gui/qt4/dialogs/preferences.cpp:73
 msgid "All"
-msgstr "Completo"
+msgstr "Detalhado"
 
 #: modules/codec/avcodec/avcodec.c:76
 msgid "rd"
@@ -8834,7 +8839,7 @@ msgstr "bits"
 
 #: modules/codec/avcodec/avcodec.c:76
 msgid "simple"
-msgstr "amostra"
+msgstr "simples"
 
 #: modules/codec/avcodec/avcodec.c:82
 msgid ""
@@ -8844,14 +8849,12 @@ msgid ""
 msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:94
-#, fuzzy
 msgid "AltiVec FFmpeg audio/video decoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
-msgstr "decodificador de audio/vídeo ffmpeg ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:98
-#, fuzzy
 msgid "FFmpeg audio/video decoder"
-msgstr "Decodificador de vídeo fictício"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:102
 msgid "Decoding"
@@ -9083,7 +9086,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:169
 msgid "Quality level"
-msgstr ""
+msgstr "Nível de qualidade"
 
 #: modules/codec/avcodec/avcodec.h:170
 msgid ""
@@ -9458,38 +9461,31 @@ msgstr ""
 msgid "FluidSynth MIDI synthetizer"
 msgstr ""
 
-#: modules/codec/kate.c:106 modules/codec/subtitles/subsdec.c:111
+#: modules/codec/kate.c:105 modules/codec/subtitles/subsdec.c:111
 msgid "Formatted Subtitles"
 msgstr "Legendas Formatadas"
 
-#: modules/codec/kate.c:107
-#, fuzzy
+#: modules/codec/kate.c:106
 msgid ""
 "Kate streams allow for text formatting. VLC partly implements this, but you "
 "can choose to disable all formatting."
 msgstr ""
-"Alguns formatos de legenda permitem a formatação do texto. O VLC tem esse "
-"recurso, mas você pode desativar todas as formatações."
+
+#: modules/codec/kate.c:112
+msgid "Kate"
+msgstr ""
 
 #: modules/codec/kate.c:113
-#, fuzzy
-msgid "Kate"
-msgstr "Data"
-
-#: modules/codec/kate.c:114
-#, fuzzy
 msgid "Kate text subtitles decoder"
-msgstr "Decodificador de legendas em teletexto"
+msgstr ""
 
-#: modules/codec/kate.c:123
-#, fuzzy
+#: modules/codec/kate.c:122
 msgid "Kate text subtitles packetizer"
-msgstr "Empacotador de legendas de DVD"
+msgstr ""
 
-#: modules/codec/kate.c:634
-#, fuzzy
+#: modules/codec/kate.c:731
 msgid "Kate comment"
-msgstr "Comentário Speex"
+msgstr ""
 
 #: modules/codec/libmpeg2.c:102
 msgid "MPEG I/II video decoder (using libmpeg2)"
@@ -9536,14 +9532,12 @@ msgid "RealAudio library decoder"
 msgstr "Decodificador da biblioteca RealAudio"
 
 #: modules/codec/realvideo.c:132
-#, fuzzy
 msgid "RealVideo library decoder"
-msgstr "Decodificador da biblioteca RealAudio"
+msgstr ""
 
 #: modules/codec/schroedinger.c:51
-#, fuzzy
 msgid "Schroedinger video decoder"
-msgstr "Decodificador de vídeo theora"
+msgstr ""
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
@@ -9633,9 +9627,8 @@ msgid "USFSubs"
 msgstr ""
 
 #: modules/codec/subtitles/subsusf.c:52
-#, fuzzy
 msgid "USF subtitles decoder"
-msgstr "Decodificador de legendas de DVB"
+msgstr ""
 
 #: modules/codec/subtitles/subsusf.c:215
 msgid ""
@@ -9965,11 +9958,11 @@ msgstr ""
 
 #: modules/codec/x264.c:130
 msgid "Interlaced mode"
-msgstr ""
+msgstr "Modo intrelaçado"
 
 #: modules/codec/x264.c:131
 msgid "Pure-interlaced mode."
-msgstr ""
+msgstr "Modo puramente intrelaçado."
 
 #: modules/codec/x264.c:136
 msgid "Set QP"
@@ -10060,9 +10053,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:176
-#, fuzzy
 msgid "Strength of AQ"
-msgstr "Método de fluxo"
+msgstr ""
 
 #: modules/codec/x264.c:177
 msgid ""
@@ -10443,9 +10435,8 @@ msgid "esa"
 msgstr "esa"
 
 #: modules/codec/x264.c:386
-#, fuzzy
 msgid "tesa"
-msgstr "esa"
+msgstr ""
 
 #: modules/codec/x264.c:392
 msgid "fast"
@@ -10577,9 +10568,9 @@ msgid "Hotkeys management interface"
 msgstr "Interface de gerenciamento por teclas de atalho"
 
 #: modules/control/hotkeys.c:393
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Device: %s"
-msgstr "Dispositivo de Áudio"
+msgstr "Dispositivo de Áudio: %s"
 
 #: modules/control/hotkeys.c:497
 #, c-format
@@ -10806,19 +10797,16 @@ msgid "Windows Service interface"
 msgstr "Interface de serviço Windows"
 
 #: modules/control/rc.c:72
-#, fuzzy
 msgid "Initializing"
-msgstr "Italiano"
+msgstr "Iniciando"
 
 #: modules/control/rc.c:73
-#, fuzzy
 msgid "Opening"
-msgstr "Abrir"
+msgstr "Abrindo"
 
 #: modules/control/rc.c:74
-#, fuzzy
 msgid "Buffer"
-msgstr "Aleatório"
+msgstr "Memória (buffer)"
 
 #: modules/control/rc.c:76 modules/gui/macosx/embeddedwindow.m:135
 #: modules/gui/macosx/intf.m:1689 modules/gui/macosx/intf.m:1690
@@ -10834,14 +10822,12 @@ msgid "Forward"
 msgstr "Avançar"
 
 #: modules/control/rc.c:79
-#, fuzzy
 msgid "Backward"
-msgstr "Ir para &trás"
+msgstr ""
 
 #: modules/control/rc.c:80
-#, fuzzy
 msgid "End"
-msgstr "final"
+msgstr "Final"
 
 #: modules/control/rc.c:81 modules/gui/macosx/interaction.m:140
 msgid "Error"
@@ -11351,14 +11337,12 @@ msgid "Height of the zone triggering the interface."
 msgstr ""
 
 #: modules/control/signals.c:39
-#, fuzzy
 msgid "Signals"
-msgstr "Capas"
+msgstr "Sinais"
 
 #: modules/control/signals.c:42
-#, fuzzy
 msgid "POSIX signals handling interface"
-msgstr "Configurações para a interface principal"
+msgstr ""
 
 #: modules/control/telnet.c:78
 msgid "Host"
@@ -11589,7 +11573,7 @@ msgstr ""
 
 #: modules/demux/live555.cpp:114 modules/demux/live555.cpp:115
 msgid "Force multicast RTP via RTSP"
-msgstr ""
+msgstr "Forçar multicast RTP via RTSP"
 
 #: modules/demux/live555.cpp:117 modules/demux/live555.cpp:118
 msgid "Tunnel RTSP and RTP over HTTP"
@@ -11603,11 +11587,11 @@ msgstr "Porta do encapsulamento HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr ""
 
-#: modules/demux/live555.cpp:589
+#: modules/demux/live555.cpp:591
 msgid "RTSP authentication"
 msgstr "Autenticação RTSP"
 
-#: modules/demux/live555.cpp:590
+#: modules/demux/live555.cpp:592
 msgid "Please enter a valid login name and a password."
 msgstr "Por favor digite login senha válidos."
 
@@ -11996,9 +11980,8 @@ msgid "Real demuxer"
 msgstr "Descombinador Real"
 
 #: modules/demux/rtp.c:44
-#, fuzzy
 msgid "RTP de-jitter buffer length (msec)"
-msgstr "Filtros"
+msgstr ""
 
 #: modules/demux/rtp.c:46
 msgid "How long to wait for late RTP packets (and delay the performance)."
@@ -12031,9 +12014,8 @@ msgid "How many distinct active RTP sources are allowed at a time."
 msgstr ""
 
 #: modules/demux/rtp.c:61
-#, fuzzy
 msgid "RTP source timeout (sec)"
-msgstr "Tempo Limite (ms)"
+msgstr ""
 
 #: modules/demux/rtp.c:63
 msgid "How long to wait for any packet before a source is expired."
@@ -12087,9 +12069,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/subtitle_asa.c:64
-#, fuzzy
 msgid "Subtitles (asa demuxer)"
-msgstr "Legendas (avançado)"
+msgstr ""
 
 #: modules/demux/subtitle_asa.c:65 modules/demux/subtitle.c:75
 msgid "Text subtitles parser"
@@ -12275,7 +12256,7 @@ msgstr ""
 
 #: modules/demux/ts.c:3716 modules/demux/ts.c:3757
 msgid "clean effects"
-msgstr ""
+msgstr "desativar efeitos"
 
 #: modules/demux/ts.c:3724 modules/demux/ts.c:3765
 msgid "visual impaired commentary"
@@ -12331,14 +12312,14 @@ msgstr "Abrir arquivos de todas as subpastas também?"
 
 #: modules/gui/beos/InterfaceWindow.cpp:161 modules/gui/macosx/open.m:499
 #: modules/gui/macosx/open.m:690 modules/gui/macosx/open.m:803
-#: modules/gui/macosx/open.m:1022 modules/gui/qt4/dialogs/open.cpp:77
+#: modules/gui/macosx/open.m:1022 modules/gui/qt4/dialogs/open.cpp:78
 #: modules/gui/qt4/menus.cpp:680
 msgid "Open"
 msgstr "Abrir"
 
 #: modules/gui/beos/InterfaceWindow.cpp:226
 #: modules/gui/beos/InterfaceWindow.cpp:331 modules/gui/macosx/prefs.m:124
-#: modules/gui/macosx/simple_prefs.m:299
+#: modules/gui/macosx/simple_prefs.m:298
 #: modules/gui/qt4/dialogs/preferences.cpp:51
 msgid "Preferences"
 msgstr "Preferências"
@@ -12474,7 +12455,7 @@ msgstr "Aplicar"
 
 #: modules/gui/beos/PreferencesWindow.cpp:257 modules/gui/macosx/output.m:526
 #: modules/gui/macosx/playlist.m:678 modules/gui/macosx/prefs.m:125
-#: modules/gui/macosx/simple_prefs.m:298 modules/gui/qt4/ui/vlm.ui:209
+#: modules/gui/macosx/simple_prefs.m:297 modules/gui/qt4/ui/vlm.ui:209
 msgid "Save"
 msgstr "Salvar"
 
@@ -12745,7 +12726,7 @@ msgstr "Azul"
 msgid "Aqua"
 msgstr ""
 
-#: modules/gui/fbosd.c:205 modules/gui/macosx/simple_prefs.m:271
+#: modules/gui/fbosd.c:205 modules/gui/macosx/simple_prefs.m:270
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:147 modules/misc/freetype.c:84
 #: modules/misc/notify/xosd.c:81 modules/misc/quartztext.c:84
 #: modules/misc/win32text.c:57 modules/video_filter/marq.c:159
@@ -12766,9 +12747,9 @@ msgid "About VLC media player"
 msgstr "Sobre o VLC media player"
 
 #: modules/gui/macosx/about.m:91
-#, fuzzy, c-format
+#, c-format
 msgid "Compiled by %s, based on Git commit %s"
-msgstr "Compilado por %s, baseado na revisão %s do SVN"
+msgstr "Compilado por %s, baseado na revisão %s do Git"
 
 #: modules/gui/macosx/about.m:95
 #, c-format
@@ -13072,14 +13053,12 @@ msgid "Adjust Image"
 msgstr "Ajustar Imagem"
 
 #: modules/gui/macosx/extended.m:173 modules/gui/macosx/extended.m:238
-#, fuzzy
 msgid "Video Filter"
-msgstr "Filtros de vídeo"
+msgstr "Filtro de vídeo"
 
 #: modules/gui/macosx/extended.m:174 modules/gui/macosx/extended.m:236
-#, fuzzy
 msgid "Audio Filter"
-msgstr "Filtro de áudio"
+msgstr "Filtro de Áudio"
 
 #: modules/gui/macosx/extended.m:518
 msgid "About the video filters"
@@ -13122,11 +13101,6 @@ msgstr "Limpar"
 #: modules/gui/macosx/interaction.m:401
 msgid "Show Details"
 msgstr "Mostrar Detalhes"
-
-#: modules/gui/macosx/intf.m:624
-#, fuzzy
-msgid "VLC"
-msgstr "VLM"
 
 #: modules/gui/macosx/intf.m:641
 msgid "Open CrashLog..."
@@ -13181,9 +13155,8 @@ msgid "Open Network..."
 msgstr "Abrir na Rede..."
 
 #: modules/gui/macosx/intf.m:661
-#, fuzzy
 msgid "Open Capture Device..."
-msgstr "Abrir Dispositivo de &Captura..."
+msgstr "Abrir Dispositivo de Captura..."
 
 #: modules/gui/macosx/intf.m:662
 msgid "Open Recent"
@@ -13222,10 +13195,9 @@ msgid "Volume Down"
 msgstr "Diminuir Volume"
 
 #: modules/gui/macosx/intf.m:720 modules/gui/macosx/intf.m:721
-#: modules/gui/macosx/simple_prefs.m:279 modules/gui/macosx/vout.m:197
-#, fuzzy
+#: modules/gui/macosx/simple_prefs.m:278 modules/gui/macosx/vout.m:197
 msgid "Fullscreen Video Device"
-msgstr "Saída de vídeo em tela inteira"
+msgstr "Dispositivo de vídeo de Tela Inteira"
 
 #: modules/gui/macosx/intf.m:726 modules/gui/macosx/intf.m:727
 #: modules/video_filter/postproc.c:186
@@ -13320,11 +13292,11 @@ msgstr "Volume: %d%%"
 
 #: modules/gui/macosx/intf.m:2030
 msgid "Update check failed"
-msgstr ""
+msgstr "A busca por atualizações falhou"
 
 #: modules/gui/macosx/intf.m:2030
 msgid "Checking for updates was not enabled in this build."
-msgstr ""
+msgstr "A verificação de atualizações não está habilitada nesta versão."
 
 #: modules/gui/macosx/intf.m:2101
 msgid "Crash Report (Type Command-shift-D and hit send)"
@@ -13345,13 +13317,13 @@ msgid "Can't prepare crash log mail"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:2187
-msgid "VLC has previously crashed"
+msgid "VLC crashed previously"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:2188
 msgid ""
-"VLC has previously crashed, do you want to send an email with the crash to "
-"VLC's team?"
+"VLC crashed previously. Do you want to send an email with details on the "
+"crash to VLC's development team?"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:2189
@@ -13375,7 +13347,7 @@ msgid "No CrashLog found"
 msgstr "Registro de travamentos não encontrado"
 
 #: modules/gui/macosx/intf.m:2205 modules/gui/macosx/prefs.m:148
-#: modules/gui/macosx/simple_prefs.m:607
+#: modules/gui/macosx/simple_prefs.m:623
 msgid "Continue"
 msgstr "Continuar"
 
@@ -13426,7 +13398,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:73
 msgid "Use as Desktop Background"
-msgstr "Usar como papel de parede"
+msgstr "Usar como Papel de Parede"
 
 #: modules/gui/macosx/macosx.m:74
 msgid ""
@@ -13485,9 +13457,8 @@ msgid "Quartz video"
 msgstr ""
 
 #: modules/gui/macosx/open.m:49
-#, fuzzy
 msgid "No device connected"
-msgstr "Nenhum arquivo selecionado"
+msgstr "Nenhum dispositivo conectado"
 
 #: modules/gui/macosx/open.m:50
 msgid ""
@@ -13506,18 +13477,17 @@ msgid "Media Resource Locator (MRL)"
 msgstr "Localizador de Recursos de Mídia (MRL)"
 
 #: modules/gui/macosx/open.m:173 modules/gui/macosx/open.m:431
-#, fuzzy
 msgid "Capture"
-msgstr "Modo de captura"
+msgstr "Capturar"
 
 #: modules/gui/macosx/open.m:175 modules/gui/macosx/open.m:181
 #: modules/gui/macosx/open.m:287 modules/gui/macosx/output.m:145
 #: modules/gui/macosx/prefs_widgets.m:1174
-#: modules/gui/macosx/simple_prefs.m:267 modules/gui/macosx/simple_prefs.m:287
+#: modules/gui/macosx/simple_prefs.m:267 modules/gui/macosx/simple_prefs.m:286
 #: modules/gui/qt4/components/preferences_widgets.cpp:257
 #: modules/gui/qt4/components/simple_preferences.cpp:238
 #: modules/gui/qt4/ui/open_disk.ui:141 modules/gui/qt4/ui/open_file.ui:181
-#: modules/gui/qt4/ui/open.ui:168 modules/gui/qt4/ui/sout.ui:77
+#: modules/gui/qt4/ui/open.ui:155 modules/gui/qt4/ui/sout.ui:77
 #: modules/gui/qt4/ui/sprefs_audio.ui:237
 #: modules/gui/qt4/ui/sprefs_input.ui:39
 #: modules/gui/qt4/ui/sprefs_interface.ui:184
@@ -13568,33 +13538,28 @@ msgid "Allow timeshifting"
 msgstr "Permitir deslocamento de tempo"
 
 #: modules/gui/macosx/open.m:209
-#, fuzzy
 msgid "Screen Capture Input"
-msgstr "Entrada de tela"
+msgstr "Entrada de Captura de Tela"
 
 #: modules/gui/macosx/open.m:210
 msgid "This facility allows you to process your screen's output."
 msgstr ""
 
 #: modules/gui/macosx/open.m:211
-#, fuzzy
 msgid "Frames per Second:"
-msgstr "Quadros por Segundo"
+msgstr "Quadros por Segundo:"
 
 #: modules/gui/macosx/open.m:212
-#, fuzzy
 msgid "Current channel:"
-msgstr "Canal:"
+msgstr "Canal atual:"
 
 #: modules/gui/macosx/open.m:213
-#, fuzzy
 msgid "Previous Channel"
-msgstr "Capítulo anterior"
+msgstr "Canal Anterior"
 
 #: modules/gui/macosx/open.m:214
-#, fuzzy
 msgid "Next Channel"
-msgstr "Canal"
+msgstr "Próximo Canal"
 
 #: modules/gui/macosx/open.m:215 modules/gui/macosx/open.m:962
 msgid "Retrieving Channel Info..."
@@ -13667,7 +13632,7 @@ msgstr "Abrir uma pasta VIDEO_TS"
 
 #: modules/gui/macosx/open.m:870
 msgid "iSight Capture Input"
-msgstr ""
+msgstr "Entrada de Captura do iSight"
 
 #: modules/gui/macosx/open.m:871
 msgid ""
@@ -13717,12 +13682,12 @@ msgid "Transcoding options"
 msgstr "Opções de transcodificação"
 
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
-#: modules/gui/macosx/wizard.m:382 modules/gui/qt4/ui/sout.ui:604
-#: modules/gui/qt4/ui/sout.ui:698
+#: modules/gui/macosx/wizard.m:382 modules/gui/qt4/ui/sout.ui:658
+#: modules/gui/qt4/ui/sout.ui:752
 msgid "Bitrate (kb/s)"
 msgstr "Taxa de Bits (KB/s)"
 
-#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/sout.ui:639
+#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/sout.ui:693
 msgid "Scale"
 msgstr "Redimensionar"
 
@@ -13730,7 +13695,7 @@ msgstr "Redimensionar"
 msgid "Stream Announcing"
 msgstr "Anúncio de Fluxo"
 
-#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.ui:817
+#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.ui:871
 msgid "SAP announce"
 msgstr "Anúncio SAP"
 
@@ -13764,19 +13729,16 @@ msgid "Media Information"
 msgstr "Informações da mídia"
 
 #: modules/gui/macosx/playlistinfo.m:71
-#, fuzzy
 msgid "Location"
-msgstr "Local :"
+msgstr "Local"
 
 #: modules/gui/macosx/playlistinfo.m:74
-#, fuzzy
 msgid "Save Metadata"
-msgstr "&Salvar Metadados"
+msgstr "Salvar Metadados"
 
 #: modules/gui/macosx/playlistinfo.m:77
-#, fuzzy
 msgid "Codec Details"
-msgstr "Detalhes do &Codec"
+msgstr "Detalhes do Codec"
 
 #: modules/gui/macosx/playlistinfo.m:94
 #: modules/gui/qt4/components/info_panels.cpp:527
@@ -13870,9 +13832,8 @@ msgid "Expand Node"
 msgstr ""
 
 #: modules/gui/macosx/playlist.m:444
-#, fuzzy
 msgid "Fetch Meta Data"
-msgstr "&Salvar Metadados"
+msgstr "Buscar Metadados"
 
 #: modules/gui/macosx/playlist.m:445
 msgid "Sort Node by Name"
@@ -13914,9 +13875,8 @@ msgid "%i items"
 msgstr "%i itens"
 
 #: modules/gui/macosx/playlist.m:488 modules/gui/macosx/playlist.m:1398
-#, fuzzy
 msgid "1 item"
-msgstr "%i itens"
+msgstr "1 item"
 
 #: modules/gui/macosx/playlist.m:677
 msgid "Save Playlist"
@@ -13938,21 +13898,21 @@ msgstr ""
 msgid "Empty Folder"
 msgstr "Pasta Vazia"
 
-#: modules/gui/macosx/prefs.m:127 modules/gui/macosx/simple_prefs.m:297
+#: modules/gui/macosx/prefs.m:127 modules/gui/macosx/simple_prefs.m:296
 msgid "Reset All"
 msgstr "Restaurar Padrão"
 
-#: modules/gui/macosx/prefs.m:128 modules/gui/macosx/simple_prefs.m:294
+#: modules/gui/macosx/prefs.m:128 modules/gui/macosx/simple_prefs.m:293
 #: modules/gui/qt4/ui/video_effects.ui:17
 msgid "Basic"
 msgstr "Básico"
 
-#: modules/gui/macosx/prefs.m:147 modules/gui/macosx/simple_prefs.m:606
+#: modules/gui/macosx/prefs.m:147 modules/gui/macosx/simple_prefs.m:622
 #: modules/gui/qt4/dialogs/preferences.cpp:352
 msgid "Reset Preferences"
 msgstr "Restaurar Preferências"
 
-#: modules/gui/macosx/prefs.m:150 modules/gui/macosx/simple_prefs.m:609
+#: modules/gui/macosx/prefs.m:150 modules/gui/macosx/simple_prefs.m:625
 msgid ""
 "Beware this will reset the VLC media player preferences.\n"
 "Are you sure you want to continue?"
@@ -13972,28 +13932,29 @@ msgstr "Selecionar um arquivo"
 msgid "Select"
 msgstr "Selecionar"
 
+#: modules/gui/macosx/simple_prefs.m:91
+#, fuzzy
+msgid "Not Set"
+msgstr "Nota:"
+
 #: modules/gui/macosx/simple_prefs.m:168
 #: modules/gui/qt4/components/simple_preferences.cpp:457
-#, fuzzy
 msgid "Interface Settings"
-msgstr "Configurações da interface"
+msgstr "Configurações da Interface"
 
 #: modules/gui/macosx/simple_prefs.m:172
 #: modules/gui/qt4/components/simple_preferences.cpp:213
-#, fuzzy
 msgid "General Audio Settings"
-msgstr "Configurações gerais de áudio"
+msgstr "Configurações Gerais de Áudio"
 
 #: modules/gui/macosx/simple_prefs.m:176
 #: modules/gui/qt4/components/simple_preferences.cpp:183
-#, fuzzy
 msgid "General Video Settings"
-msgstr "Configurações gerais de vídeo"
+msgstr "Configurações Gerais de Vídeo"
 
 #: modules/gui/macosx/simple_prefs.m:180
-#, fuzzy
 msgid "Subtitles & OSD"
-msgstr "Legendas/OSD"
+msgstr "Legendas e OSD"
 
 #: modules/gui/macosx/simple_prefs.m:180
 #: modules/gui/qt4/components/simple_preferences.cpp:516
@@ -14002,14 +13963,12 @@ msgid "Subtitles & On Screen Display Settings"
 msgstr "Configurações de Legenda e OSD"
 
 #: modules/gui/macosx/simple_prefs.m:184
-#, fuzzy
 msgid "Input & Codecs"
-msgstr "Entrada / Codecs"
+msgstr "Entradas e Codecs"
 
 #: modules/gui/macosx/simple_prefs.m:184
-#, fuzzy
 msgid "Input & Codec settings"
-msgstr "Configurações de Entrada e Codecs"
+msgstr "Configurações de Entradas e Codecs"
 
 #: modules/gui/macosx/simple_prefs.m:216
 #: modules/gui/qt4/ui/sprefs_audio.ui:250
@@ -14017,9 +13976,8 @@ msgid "Effects"
 msgstr "Efeitos"
 
 #: modules/gui/macosx/simple_prefs.m:217
-#, fuzzy
 msgid "Enable Audio"
-msgstr "Habilitar áudio"
+msgstr "Habilitar Áudio"
 
 #: modules/gui/macosx/simple_prefs.m:218 modules/gui/qt4/ui/sprefs_audio.ui:30
 msgid "General Audio"
@@ -14031,39 +13989,33 @@ msgid "Headphone surround effect"
 msgstr "Efeito espacial de fone de ouvido"
 
 #: modules/gui/macosx/simple_prefs.m:220
-#, fuzzy
 msgid "Preferred Audio language"
-msgstr "Língua de áudio preferida"
+msgstr "Língua de Áudio Preferida"
 
 #: modules/gui/macosx/simple_prefs.m:221
 msgid "Enable Last.fm submissions"
 msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:223
-#, fuzzy
 msgid "User name"
 msgstr "Usuário"
 
 #: modules/gui/macosx/simple_prefs.m:226
 #: modules/gui/qt4/ui/sprefs_audio.ui:273
-#, fuzzy
 msgid "Visualization"
-msgstr "Visualizações"
+msgstr "Visualização"
 
 #: modules/gui/macosx/simple_prefs.m:227
-#, fuzzy
 msgid "Default Volume"
-msgstr "Volume padrão"
+msgstr "Volume Padrão"
 
 #: modules/gui/macosx/simple_prefs.m:230
-#, fuzzy
 msgid "Change"
-msgstr "Canal"
+msgstr "Configurar"
 
 #: modules/gui/macosx/simple_prefs.m:231
-#, fuzzy
 msgid "Change Hotkey"
-msgstr "Configurar teclas de atalho"
+msgstr "Configurar Teclas de Atalho"
 
 #: modules/gui/macosx/simple_prefs.m:235
 msgid "Select an action to change the associated hotkey:"
@@ -14085,37 +14037,31 @@ msgid "Access Filter"
 msgstr "Filtro de Acesso"
 
 #: modules/gui/macosx/simple_prefs.m:241
-#, fuzzy
 msgid "Repair AVI Files"
-msgstr "Reparar arquivos AVI"
+msgstr "Reparar Arquivos AVI"
 
 #: modules/gui/macosx/simple_prefs.m:243
-#, fuzzy
 msgid "Default Caching Level"
-msgstr "Nível padrão de cache"
+msgstr "Nível Padrão de Cache"
 
-#: modules/gui/macosx/simple_prefs.m:244 modules/gui/qt4/ui/open.ui:64
+#: modules/gui/macosx/simple_prefs.m:244 modules/gui/qt4/ui/open.ui:51
 #: modules/gui/qt4/ui/sprefs_input.ui:97
 msgid "Caching"
 msgstr "Cache"
 
 #: modules/gui/macosx/simple_prefs.m:245
-#, fuzzy
 msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
 msgstr ""
-"Nesta seção você pode ajustar o valor de cache para o módulo de acesso do "
-"stream de saída."
 
 #: modules/gui/macosx/simple_prefs.m:247
 msgid "HTTP Proxy"
 msgstr "Proxy HTTP"
 
 #: modules/gui/macosx/simple_prefs.m:248
-#, fuzzy
 msgid "Password for HTTP Proxy"
-msgstr "Proxy HTTP"
+msgstr "Senha para o Proxy HTTP"
 
 #: modules/gui/macosx/simple_prefs.m:249
 #: modules/gui/qt4/ui/sprefs_input.ui:119
@@ -14127,9 +14073,8 @@ msgid "Post-Processing Quality"
 msgstr "Qualidade de pós-processamento"
 
 #: modules/gui/macosx/simple_prefs.m:254
-#, fuzzy
 msgid "Default Server Port"
-msgstr "Dispositivos padrão"
+msgstr "Porta Padrão do Servidor"
 
 #: modules/gui/macosx/simple_prefs.m:258
 #: modules/gui/qt4/ui/sprefs_interface.ui:250
@@ -14137,14 +14082,12 @@ msgid "Album art download policy"
 msgstr "Política de obtenção de capas de álbuns"
 
 #: modules/gui/macosx/simple_prefs.m:259
-#, fuzzy
 msgid "Add controls to the video window"
-msgstr "Contraste da entrada de vídeo."
+msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:260
-#, fuzzy
 msgid "Show Fullscreen Controller"
-msgstr "Mostrar controlador em tela inteira"
+msgstr "Mostrar Controle em Tela Inteira"
 
 #: modules/gui/macosx/simple_prefs.m:262
 #: modules/gui/qt4/ui/sprefs_interface.ui:244
@@ -14161,173 +14104,156 @@ msgid "Display Settings"
 msgstr "Configurações da Tela"
 
 #: modules/gui/macosx/simple_prefs.m:268
-#, fuzzy
 msgid "Font Color"
 msgstr "Cor da Fonte"
 
 #: modules/gui/macosx/simple_prefs.m:269
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:101
-#: modules/video_output/opengl.c:174
-msgid "Effect"
-msgstr "Efeito"
-
-#: modules/gui/macosx/simple_prefs.m:270
-#, fuzzy
 msgid "Font Size"
-msgstr "Tamanho da fonte"
+msgstr "Tamanho da Fonte"
+
+#: modules/gui/macosx/simple_prefs.m:271
+msgid "Subtitle Languages"
+msgstr "Línguas da Legenda"
 
 #: modules/gui/macosx/simple_prefs.m:272
-#, fuzzy
-msgid "Subtitle Languages"
-msgstr "Línguas de legendas"
-
-#: modules/gui/macosx/simple_prefs.m:273
-#, fuzzy
 msgid "Preferred Subtitle Language"
-msgstr "Língua de áudio preferida"
+msgstr "Língua Preferida para a Legenda"
 
-#: modules/gui/macosx/simple_prefs.m:275
+#: modules/gui/macosx/simple_prefs.m:274
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:28
 msgid "Enable OSD"
 msgstr "Ativar OSD"
 
-#: modules/gui/macosx/simple_prefs.m:278
-#, fuzzy
+#: modules/gui/macosx/simple_prefs.m:277
 msgid "Black screens in Fullscreen mode"
-msgstr "Tela escura em modo tela inteira"
+msgstr "Tela Escura em Modo Tela Inteira"
 
-#: modules/gui/macosx/simple_prefs.m:280 modules/gui/qt4/ui/sprefs_video.ui:36
+#: modules/gui/macosx/simple_prefs.m:279 modules/gui/qt4/ui/sprefs_video.ui:36
 #: modules/stream_out/display.c:54 modules/video_filter/deinterlace.c:132
 msgid "Display"
 msgstr "Mostrar"
 
-#: modules/gui/macosx/simple_prefs.m:281
-#, fuzzy
+#: modules/gui/macosx/simple_prefs.m:280
 msgid "Enable Video"
-msgstr "Habilitar vídeo"
+msgstr "Habilitar Vídeo"
 
-#: modules/gui/macosx/simple_prefs.m:284
-#, fuzzy
+#: modules/gui/macosx/simple_prefs.m:283
 msgid "Output module"
 msgstr "Módulos de saída"
 
-#: modules/gui/macosx/simple_prefs.m:286
+#: modules/gui/macosx/simple_prefs.m:285
 #: modules/gui/qt4/ui/sprefs_video.ui:149
 msgid "Video snapshots"
 msgstr "Capturas de vídeo"
 
-#: modules/gui/macosx/simple_prefs.m:288 modules/meta_engine/folder.c:58
+#: modules/gui/macosx/simple_prefs.m:287 modules/meta_engine/folder.c:58
 msgid "Folder"
 msgstr "Pasta"
 
-#: modules/gui/macosx/simple_prefs.m:289
+#: modules/gui/macosx/simple_prefs.m:288
 #: modules/gui/qt4/ui/sprefs_video.ui:198
 msgid "Format"
 msgstr "Formato"
 
-#: modules/gui/macosx/simple_prefs.m:290
+#: modules/gui/macosx/simple_prefs.m:289
 #: modules/gui/qt4/ui/sprefs_video.ui:181
 msgid "Prefix"
 msgstr "Prefixo"
 
-#: modules/gui/macosx/simple_prefs.m:291
+#: modules/gui/macosx/simple_prefs.m:290
 #: modules/gui/qt4/ui/sprefs_video.ui:211
 msgid "Sequential numbering"
 msgstr "Numeração seqüencial"
 
-#: modules/gui/macosx/simple_prefs.m:481 modules/gui/macosx/simple_prefs.m:525
-#: modules/gui/macosx/simple_prefs.m:1093
-#, fuzzy
+#: modules/gui/macosx/simple_prefs.m:511 modules/gui/macosx/simple_prefs.m:555
+#: modules/gui/macosx/simple_prefs.m:1104
 msgid "Custom"
-msgstr "Personalizar"
+msgstr "Personalizado"
 
-#: modules/gui/macosx/simple_prefs.m:481
+#: modules/gui/macosx/simple_prefs.m:511
 msgid "Lowest latency"
-msgstr ""
+msgstr "Mínima latência"
 
-#: modules/gui/macosx/simple_prefs.m:481
+#: modules/gui/macosx/simple_prefs.m:511
 msgid "Low latency"
-msgstr ""
+msgstr "Baixa latência"
 
-#: modules/gui/macosx/simple_prefs.m:481 modules/misc/freetype.c:107
+#: modules/gui/macosx/simple_prefs.m:511 modules/misc/freetype.c:107
 #: modules/misc/quartztext.c:108 modules/misc/win32text.c:80
 msgid "Normal"
 msgstr "Normal"
 
-#: modules/gui/macosx/simple_prefs.m:482
+#: modules/gui/macosx/simple_prefs.m:512
 msgid "High latency"
-msgstr ""
+msgstr "Alta latência"
 
-#: modules/gui/macosx/simple_prefs.m:482
+#: modules/gui/macosx/simple_prefs.m:512
 msgid "Higher latency"
-msgstr ""
+msgstr "Máxima latência"
 
-#: modules/gui/macosx/simple_prefs.m:695
+#: modules/gui/macosx/simple_prefs.m:709
 #, fuzzy
 msgid "Interface Settings not saved"
-msgstr "Configurações da interface"
+msgstr "Configurações da Interface"
 
-#: modules/gui/macosx/simple_prefs.m:696 modules/gui/macosx/simple_prefs.m:761
-#: modules/gui/macosx/simple_prefs.m:796 modules/gui/macosx/simple_prefs.m:880
-#: modules/gui/macosx/simple_prefs.m:909 modules/gui/macosx/simple_prefs.m:934
+#: modules/gui/macosx/simple_prefs.m:710 modules/gui/macosx/simple_prefs.m:775
+#: modules/gui/macosx/simple_prefs.m:808 modules/gui/macosx/simple_prefs.m:892
+#: modules/gui/macosx/simple_prefs.m:920 modules/gui/macosx/simple_prefs.m:945
 #, fuzzy, c-format
 msgid "An error occured while saving your settings via SimplePrefs (%i)."
-msgstr "Ocorreu um erro enquanto procurava por atualizações"
+msgstr "Ocorreu um erro enquanto buscava atualizações"
 
-#: modules/gui/macosx/simple_prefs.m:760
+#: modules/gui/macosx/simple_prefs.m:774
 #, fuzzy
 msgid "Audio Settings not saved"
 msgstr "Configurações de Áudio"
 
-#: modules/gui/macosx/simple_prefs.m:795
+#: modules/gui/macosx/simple_prefs.m:807
 #, fuzzy
 msgid "Video Settings not saved"
 msgstr "Configurações de vídeo"
 
-#: modules/gui/macosx/simple_prefs.m:879
+#: modules/gui/macosx/simple_prefs.m:891
 msgid "Input Settings not saved"
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:908
+#: modules/gui/macosx/simple_prefs.m:919
 msgid "On Screen Display/Subtitle Settings not saved"
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:933
+#: modules/gui/macosx/simple_prefs.m:944
 #, fuzzy
 msgid "Hotkeys not saved"
 msgstr "Tecla de atalho para "
 
-#: modules/gui/macosx/simple_prefs.m:1026
-#, fuzzy
+#: modules/gui/macosx/simple_prefs.m:1037
 msgid "Choose the folder to save your video snapshots to."
-msgstr "Procure aqui seu fluxo de entrada."
+msgstr "Escolhe a pasta para gravar suas capturas de vídeo."
 
-#: modules/gui/macosx/simple_prefs.m:1028
-#: modules/gui/macosx/simple_prefs.m:1073
+#: modules/gui/macosx/simple_prefs.m:1039
+#: modules/gui/macosx/simple_prefs.m:1084
 msgid "Choose"
 msgstr "Escolher"
 
-#: modules/gui/macosx/simple_prefs.m:1071
+#: modules/gui/macosx/simple_prefs.m:1082
 msgid "Choose the font to display your Subtitles with."
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:1111
-#, fuzzy
+#: modules/gui/macosx/simple_prefs.m:1122
 msgid ""
 "Press new keys for\n"
 "\"%@\""
-msgstr "Pressione as novas teclas para "
+msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:1185
-#, fuzzy
+#: modules/gui/macosx/simple_prefs.m:1196
 msgid "Invalid combination"
-msgstr "Seleção inválida"
+msgstr "Combinação inválida"
 
-#: modules/gui/macosx/simple_prefs.m:1186
+#: modules/gui/macosx/simple_prefs.m:1197
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr ""
 
-#: modules/gui/macosx/simple_prefs.m:1203
+#: modules/gui/macosx/simple_prefs.m:1214
 msgid "This combination is already taken by \"%@\"."
 msgstr ""
 
@@ -14370,7 +14296,7 @@ msgstr "Esta versão do VLC está desatualizada."
 #: modules/gui/macosx/update.m:185
 #, c-format
 msgid "The current release is %d.%d.%d%c."
-msgstr ""
+msgstr "A versão atual é %d.%d.%d%c."
 
 #: modules/gui/macosx/wizard.m:113
 msgid "MPEG-1 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
@@ -14714,7 +14640,7 @@ msgid "In this page, a few additional streaming parameters can be set."
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:399 modules/gui/macosx/wizard.m:1864
-#: modules/gui/qt4/ui/sout.ui:868
+#: modules/gui/qt4/ui/sout.ui:922
 msgid "Time-To-Live (TTL)"
 msgstr "Tempo limite (TTL)"
 
@@ -14748,7 +14674,7 @@ msgstr "Selecione o arquivo para salvar"
 msgid ""
 "Adds available subtitles directly to the video. These cannot be disabled by "
 "the receiving user as they become part of the image."
-msgstr ""
+msgstr "Adiciona legendas disponíveis diretamente ao vídeo. "
 
 #: modules/gui/macosx/wizard.m:422
 msgid ""
@@ -14837,7 +14763,7 @@ msgstr "Nenhum arquivo selecionado"
 
 #: modules/gui/macosx/wizard.m:1148
 msgid "A file where to save the stream has to be selected."
-msgstr ""
+msgstr "Um arquivo para gravar o fluxo que foi selecionado."
 
 #: modules/gui/macosx/wizard.m:1150
 msgid ""
@@ -14886,6 +14812,7 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:1831
 msgid "Select your video codec. Click one to get more information."
 msgstr ""
+"Seleciona seu codec de vídeo. Clique em um para obter mais informações."
 
 #: modules/gui/macosx/wizard.m:1866
 msgid ""
@@ -14921,6 +14848,7 @@ msgstr "Interface reduzida do Mac OS X"
 #: modules/gui/minimal_macosx/macosx.c:66
 msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
 msgstr ""
+"Saída de vídeo OpenGL mínima para Mac OS X (abre uma janela sem bordas)"
 
 #: modules/gui/ncurses.c:119
 msgid "Filebrowser starting point"
@@ -14959,9 +14887,9 @@ msgid " State    : Playing %s"
 msgstr "Estado    : Reproduzindo %s"
 
 #: modules/gui/ncurses.c:1567
-#, fuzzy, c-format
+#, c-format
 msgid " State    : Stopped %s"
-msgstr "Estado    : %s Pausado"
+msgstr ""
 
 #: modules/gui/ncurses.c:1571
 #, c-format
@@ -15044,9 +14972,8 @@ msgid "     x           Show/Hide objects box"
 msgstr ""
 
 #: modules/gui/ncurses.c:1666
-#, fuzzy
 msgid "     S           Show/Hide statistics box"
-msgstr "     .           Mostrar/Ocultar arquivos ocultos"
+msgstr ""
 
 #: modules/gui/ncurses.c:1667
 msgid "     c           Switch color on/off"
@@ -15230,14 +15157,13 @@ msgid " Objects "
 msgstr " Objetos"
 
 #: modules/gui/ncurses.c:2009
-#, fuzzy
 msgid " Stats "
-msgstr "Status"
+msgstr "Estatísticas"
 
 #: modules/gui/ncurses.c:2098
-#, fuzzy, c-format
+#, c-format
 msgid "\\ sending bitrate  :   %6.0f kb/s"
-msgstr "| taxa de bits no envio  :   %6.0f kb/s"
+msgstr "\\ taxa de bits no envio  :   %6.0f kb/s"
 
 #: modules/gui/ncurses.c:2131
 msgid " Playlist (All, one level) "
@@ -15309,10 +15235,9 @@ msgstr "Adicionar à Lista de Reprodução"
 msgid "MRL:"
 msgstr "MRL:"
 
-#: modules/gui/pda/pda_interface.c:421 modules/gui/qt4/dialogs/sout.cpp:306
-#: modules/gui/qt4/dialogs/sout.cpp:307 modules/gui/qt4/ui/sout.ui:121
-#: modules/gui/qt4/ui/sout.ui:186 modules/gui/qt4/ui/sout.ui:248
-#: modules/gui/qt4/ui/sout.ui:377
+#: modules/gui/pda/pda_interface.c:421 modules/gui/qt4/dialogs/sout.cpp:313
+#: modules/gui/qt4/ui/sout.ui:121 modules/gui/qt4/ui/sout.ui:186
+#: modules/gui/qt4/ui/sout.ui:248 modules/gui/qt4/ui/sout.ui:377
 msgid "Port:"
 msgstr "Porta:"
 
@@ -15691,7 +15616,7 @@ msgstr "Autores: Grupo VideoLAN, http://www.videolan.org/team/"
 
 #: modules/gui/pda/pda_interface.c:1347
 msgid "(c) 1996-2004 the the VideoLAN team team"
-msgstr "(c) 1996-2004 Grupo Grupo VideoLAN"
+msgstr "(c) 1996-2008 Grupo VideoLAN"
 
 #: modules/gui/pda/pda_support.c:88 modules/gui/pda/pda_support.c:112
 #, c-format
@@ -15718,13 +15643,12 @@ msgid "Enable spatializer"
 msgstr "Espacial"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1246
-#, fuzzy
 msgid "Audio/Video"
-msgstr "Modo de áudio"
+msgstr "Áudio/Vídeo"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1262
 msgid "Advance of audio over video:"
-msgstr ""
+msgstr "Avanço do áudio em relação ao vídeo:"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1271
 msgid ""
@@ -15733,14 +15657,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/components/extended_panels.cpp:1279
-#, fuzzy
 msgid "Subtitles/Video"
-msgstr "Arquivo de legendas"
+msgstr "Legendas/Vídeo"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1295
-#, fuzzy
 msgid "Advance of subtitles over video:"
-msgstr "Adicionar legendas ao vídeo transcodificado"
+msgstr "Avanço da legenda em relação ao vídeo:"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1304
 msgid ""
@@ -15749,39 +15671,32 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/components/extended_panels.cpp:1323
-#, fuzzy
 msgid "Speed of the subtitles:"
-msgstr "Selecionar um arquivo de legenda"
+msgstr "Velocidade da legenda:"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1353
-#, fuzzy
 msgid "Force update of this dialog's values"
-msgstr "Forçar o uso do módulo de deslocamento do tempo"
+msgstr ""
 
 #: modules/gui/qt4/components/info_panels.cpp:349
 msgid "Extra metadata and other information are shown in this panel.\n"
 msgstr ""
 
 #: modules/gui/qt4/components/info_panels.cpp:424
-#, fuzzy
 msgid ""
 "Information about what your media or stream is made of.\n"
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
 "Informações sobre sua mídia ou fluxo.\n"
-" São mostrados Combinadores, Codecs de Áudio e Vídeo e Legendas."
+"São mostrados Combinadores, Codecs de Áudio e Vídeo e Legendas."
 
 #: modules/gui/qt4/components/info_panels.cpp:498
-#, fuzzy
 msgid "Statistics about the currently playing media or stream."
-msgstr ""
-"Várias estatísticas sobre a mídia ou fluxo atual.\n"
-"São mostradas informações sobre o que já foi reproduzido ou transmitido."
+msgstr "Estatísticas da mídia ou do fluxo em reprodução."
 
 #: modules/gui/qt4/components/info_panels.cpp:546
-#, fuzzy
 msgid "Sent bitrate"
-msgstr "Taxa de bits do envio"
+msgstr "Taxa de bits no envio"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:59
 msgid ""
@@ -15790,9 +15705,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:256
-#, fuzzy
 msgid "Current visualization"
-msgstr "Visualização atual:"
+msgstr "Visualização atual"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:314
 msgid ""
@@ -15801,9 +15715,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:324
-#, fuzzy
 msgid "Frame by frame"
-msgstr "Quadro a Quadro"
+msgstr "Quadro-a-quadro"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:338
 msgid "Take a snapshot"
@@ -15828,15 +15741,13 @@ msgid "Menu"
 msgstr "Menu"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:517
-#, fuzzy
 msgid "Teletext on"
-msgstr "Selecionar Todos"
+msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:529
 #: modules/gui/qt4/components/interface_widgets.cpp:718
-#, fuzzy
 msgid "Teletext"
-msgstr "Excluir"
+msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:579
 #, fuzzy
@@ -15881,90 +15792,83 @@ msgstr "Sem áudio"
 msgid "Pause the playback"
 msgstr "Inicia a tocagem"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:1274
+#: modules/gui/qt4/components/interface_widgets.cpp:1279
 msgid "Revert to normal play speed"
 msgstr ""
 
 #: modules/gui/qt4/components/open_panels.cpp:48
-#, fuzzy
 msgid "Select the device or the VIDEO_TS directory"
-msgstr "Selecionar dispositivo ou uma pasta VIDEO_TS"
+msgstr "Selecionar o dispositivo ou a pasta VIDEO_TS"
 
 #: modules/gui/qt4/components/open_panels.cpp:88
-#, fuzzy
 msgid "Select one or multiple files"
-msgstr "Selecione um arquivo, vários arquivos ou uma pasta"
+msgstr "Selecione um ou vários arquivos"
 
-#: modules/gui/qt4/components/open_panels.cpp:106
+#: modules/gui/qt4/components/open_panels.cpp:107
 msgid "File names:"
 msgstr "Nomes dos Arquivos:"
 
-#: modules/gui/qt4/components/open_panels.cpp:108
+#: modules/gui/qt4/components/open_panels.cpp:109
 msgid "Filter:"
 msgstr "Filtro:"
 
-#: modules/gui/qt4/components/open_panels.cpp:154
+#: modules/gui/qt4/components/open_panels.cpp:155
 #: modules/gui/qt4/dialogs_provider.cpp:611
 msgid "Open subtitles file"
 msgstr "Abrir arquivo de legenda"
 
-#: modules/gui/qt4/components/open_panels.cpp:261
+#: modules/gui/qt4/components/open_panels.cpp:262
 #, fuzzy
 msgid "Eject the disc"
 msgstr "Ejeta o disco"
 
-#: modules/gui/qt4/components/open_panels.cpp:621
-#: modules/gui/qt4/components/open_panels.cpp:877
+#: modules/gui/qt4/components/open_panels.cpp:622
+#: modules/gui/qt4/components/open_panels.cpp:878
 msgid "DVB Type:"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:645
-#: modules/gui/qt4/components/open_panels.cpp:907
+#: modules/gui/qt4/components/open_panels.cpp:646
+#: modules/gui/qt4/components/open_panels.cpp:908
 msgid "Transponder symbol rate"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:767
-#, fuzzy
+#: modules/gui/qt4/components/open_panels.cpp:768
 msgid "Channels:"
-msgstr "Canais :"
+msgstr "Canais:"
 
-#: modules/gui/qt4/components/open_panels.cpp:780
-#, fuzzy
+#: modules/gui/qt4/components/open_panels.cpp:781
 msgid "Selected ports:"
-msgstr "Portas selecionadas :"
+msgstr "Portas selecionadas:"
 
-#: modules/gui/qt4/components/open_panels.cpp:783
+#: modules/gui/qt4/components/open_panels.cpp:784
 msgid ".*"
 msgstr ".*"
 
-#: modules/gui/qt4/components/open_panels.cpp:788
-#, fuzzy
+#: modules/gui/qt4/components/open_panels.cpp:789
 msgid "Input caching:"
-msgstr "Cache de entrada :"
+msgstr "Cache de entrada:"
 
-#: modules/gui/qt4/components/open_panels.cpp:798
+#: modules/gui/qt4/components/open_panels.cpp:799
 msgid "Use VLC pace"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:802
+#: modules/gui/qt4/components/open_panels.cpp:803
 msgid "Auto connnection"
 msgstr "Conexão automática"
 
-#: modules/gui/qt4/components/open_panels.cpp:826
+#: modules/gui/qt4/components/open_panels.cpp:827
 msgid "Radio device name"
 msgstr "Nome do dispositivo de áudio"
 
-#: modules/gui/qt4/components/open_panels.cpp:1112
-#, fuzzy
+#: modules/gui/qt4/components/open_panels.cpp:1113
 msgid "Advanced Options"
-msgstr "Opções avançadas"
+msgstr "Opções Avançadas"
 
 #: modules/gui/qt4/components/playlist/playlist.cpp:74
-#, fuzzy
 msgid "Double click to get media information"
-msgstr "Clique duas vezes para obter informações da mídia"
+msgstr "Clique duas vezes para obter informações sobre a mídia"
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:144
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:145
 msgid "Show the current item"
 msgstr "Mostrar o item atual"
 
@@ -15978,7 +15882,7 @@ msgstr "Selecionar Pasta"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1114
 msgid "Select an action to change the associated hotkey"
-msgstr ""
+msgstr "Selecionar uma ação para associar a uma tecla"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1129
 msgid "Set"
@@ -15986,7 +15890,7 @@ msgstr "Configurar"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1243
 msgid "Unset"
-msgstr ""
+msgstr "Desmarcar"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1281
 msgid "Hotkey for "
@@ -16008,20 +15912,18 @@ msgstr "Chave: "
 #: modules/gui/qt4/components/simple_preferences.cpp:80
 #, fuzzy
 msgid "Subtitles && OSD"
-msgstr "Legendas/OSD"
+msgstr "Legendas e OSD"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:82
 #, fuzzy
 msgid "Input && Codecs"
-msgstr "Entrada / Codecs"
+msgstr "Entradas e Codecs"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:222
-#, fuzzy
 msgid "Device:"
-msgstr "Dispositivo"
+msgstr "Dispositivo:"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:354
-#, fuzzy
 msgid "Input & Codecs Settings"
 msgstr "Configurações de Entrada e Codecs"
 
@@ -16058,17 +15960,16 @@ msgstr "&Aplicar"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:806
 #: modules/gui/qt4/dialogs/gototime.cpp:52
-#: modules/gui/qt4/dialogs/help.cpp:210 modules/gui/qt4/dialogs/open.cpp:104
+#: modules/gui/qt4/dialogs/help.cpp:210 modules/gui/qt4/dialogs/open.cpp:105
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:39
 #: modules/gui/qt4/dialogs/preferences.cpp:87
-#: modules/gui/qt4/dialogs/sout.cpp:188
+#: modules/gui/qt4/dialogs/sout.cpp:193
 msgid "&Cancel"
 msgstr "&Cancelar"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:40
-#, fuzzy
 msgid "Edit Bookmarks"
-msgstr "Editar favoritos"
+msgstr "Editar Favoritos"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:44
 msgid "Create"
@@ -16091,9 +15992,9 @@ msgstr "Remove os favoritos selecionados"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:54
 #: modules/gui/qt4/dialogs/errors.cpp:50
-#: modules/gui/qt4/dialogs/extended.cpp:85 modules/gui/qt4/dialogs/help.cpp:65
+#: modules/gui/qt4/dialogs/extended.cpp:87 modules/gui/qt4/dialogs/help.cpp:65
 #: modules/gui/qt4/dialogs/help.cpp:97
-#: modules/gui/qt4/dialogs/interaction.cpp:194
+#: modules/gui/qt4/dialogs/interaction.cpp:221
 #: modules/gui/qt4/dialogs/mediainfo.cpp:77
 #: modules/gui/qt4/dialogs/messages.cpp:82
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:38
@@ -16119,40 +16020,37 @@ msgstr "&Limpar"
 msgid "Hide future errors"
 msgstr "Ocultar os próximos erros"
 
-#: modules/gui/qt4/dialogs/extended.cpp:41
+#: modules/gui/qt4/dialogs/extended.cpp:43
 msgid "Adjustments and Effects"
 msgstr "Ajustes e Efeitos"
 
-#: modules/gui/qt4/dialogs/extended.cpp:55
+#: modules/gui/qt4/dialogs/extended.cpp:57
 msgid "Graphic Equalizer"
 msgstr "Equalizador gráfico"
 
-#: modules/gui/qt4/dialogs/extended.cpp:58
+#: modules/gui/qt4/dialogs/extended.cpp:60
 msgid "Spatializer"
 msgstr "Espacial"
 
-#: modules/gui/qt4/dialogs/extended.cpp:61
-#, fuzzy
+#: modules/gui/qt4/dialogs/extended.cpp:63
 msgid "Audio Effects"
-msgstr "Efeitos de áudio"
+msgstr "Efeitos de Áudio"
 
-#: modules/gui/qt4/dialogs/extended.cpp:72
+#: modules/gui/qt4/dialogs/extended.cpp:74
 msgid "Video Effects"
 msgstr "Efeitos de vídeo"
 
-#: modules/gui/qt4/dialogs/extended.cpp:75
-#, fuzzy
+#: modules/gui/qt4/dialogs/extended.cpp:77
 msgid "Synchronization"
-msgstr "Sincronização por relógio"
+msgstr "Sincronização"
 
-#: modules/gui/qt4/dialogs/extended.cpp:80
+#: modules/gui/qt4/dialogs/extended.cpp:82
 msgid "v4l2 controls"
 msgstr "Controles do v4l2"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:46
-#, fuzzy
 msgid "Go to Time"
-msgstr "Ir ao momento"
+msgstr "Ir ao Ponto"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:51
 msgid "&Go"
@@ -16167,7 +16065,6 @@ msgid "VLC media player "
 msgstr "VLC media player"
 
 #: modules/gui/qt4/dialogs/help.cpp:117
-#, fuzzy
 msgid ""
 "VLC media player is a free media player, encoder and streamer that can read "
 "from files, CDs, DVDs, network streams, capture cards and even more!\n"
@@ -16175,10 +16072,10 @@ msgid ""
 "platform.\n"
 "\n"
 msgstr ""
-"O VLC media player é um reprodutor livre que faz codificação, cria fluxos de "
-"transmissão e que pode ler de arquivos, CD, DVD, outros fluxos de rede, "
-"placas de captura e muito mais!\n"
-"O VLC funciona nas plataformas mais populares.\n"
+"O VLC media player é um reprodutor de mídias livre, codificador e produtor "
+"de fluxos de mídia que pode ler de arquivos, de CDs, de DVDs, de fluxos de "
+"rede, de placas de captura e muito mais!\n"
+"O VLC usa codecs internos e funciona em sistemas operacionais populares.\n"
 "\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:122
@@ -16191,7 +16088,7 @@ msgstr ""
 
 #: modules/gui/qt4/dialogs/help.cpp:126 modules/gui/wince/interface.cpp:508
 msgid "Based on Git commit: "
-msgstr ""
+msgstr "Baseado na versão do Git: "
 
 #: modules/gui/qt4/dialogs/help.cpp:127
 msgid ""
@@ -16202,20 +16099,18 @@ msgstr ""
 "\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:128
-#, fuzzy
 msgid "Copyright (C) "
-msgstr "Direito de Cópia (c)"
+msgstr "Direito de Cópia (C) "
 
 #: modules/gui/qt4/dialogs/help.cpp:149
-#, fuzzy
 msgid ""
 "We would like to thank the whole VLC community, the testers, our users and "
 "the following people (and the missing ones...) for their collaboration to "
 "create the best free software."
 msgstr ""
-"Gostaríamos de agradecer a todos da comunidade, aos que testam, aos usuários "
-"e às seguintes pessoas (e aos que estiverem faltando...) por sua colaboração "
-"ao fazer o melhor software possível."
+"Gostaríamos de agradecer a todos da comunidade VLC, aos que testam, aos "
+"usuários e às seguintes pessoas (e aos que estiverem faltando...) por sua "
+"colaboração ao fazer o melhor software livre possível."
 
 #: modules/gui/qt4/dialogs/help.cpp:167
 msgid "Authors"
@@ -16235,9 +16130,8 @@ msgid "&Recheck version"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/help.cpp:218
-#, fuzzy
 msgid "Checking for an update..."
-msgstr "Procurando Atualizações..."
+msgstr "Procurando atualizações..."
 
 #: modules/gui/qt4/dialogs/help.cpp:222
 msgid ""
@@ -16248,10 +16142,9 @@ msgstr ""
 #: modules/gui/qt4/dialogs/help.cpp:270
 #, fuzzy
 msgid "Launching an update request..."
-msgstr "Procurando Atualizações..."
+msgstr "Procurando atualizações..."
 
 #: modules/gui/qt4/dialogs/help.cpp:276
-#, fuzzy
 msgid "Select a directory..."
 msgstr "Selecione uma pasta..."
 
@@ -16262,7 +16155,7 @@ msgstr "&Sim"
 #: modules/gui/qt4/dialogs/help.cpp:315
 #, fuzzy
 msgid "A new version of VLC("
-msgstr "Esta é uma nova versão do VLC :\n"
+msgstr "Uma nova versão do VLC está disponível :\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:321
 #, fuzzy
@@ -16272,16 +16165,14 @@ msgstr "Não há ajuda disponível"
 #: modules/gui/qt4/dialogs/help.cpp:334
 #, fuzzy
 msgid "You have the latest version of VLC media player."
-msgstr ""
-"\n"
-"Você já tem a última versão do VLC\n"
+msgstr "Você já tem a última versão do VLC"
 
 #: modules/gui/qt4/dialogs/help.cpp:338
 #, fuzzy
 msgid "An error occurred while checking for updates..."
-msgstr "Ocorreu um erro enquanto procurava por atualizações"
+msgstr "Ocorreu um erro enquanto buscava atualizações"
 
-#: modules/gui/qt4/dialogs/interaction.cpp:93
+#: modules/gui/qt4/dialogs/interaction.cpp:95
 msgid "Login"
 msgstr "Usuário"
 
@@ -16306,14 +16197,12 @@ msgid "&Save Metadata"
 msgstr "&Salvar Metadados"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:81
-#, fuzzy
 msgid "Location:"
-msgstr "Local :"
+msgstr "Local:"
 
 #: modules/gui/qt4/dialogs/messages.cpp:78
-#, fuzzy
 msgid "Modules tree"
-msgstr "Módulos"
+msgstr "Árvore de módulos"
 
 #: modules/gui/qt4/dialogs/messages.cpp:85
 msgid "&Save as..."
@@ -16325,17 +16214,15 @@ msgstr ""
 
 #: modules/gui/qt4/dialogs/messages.cpp:94
 msgid "Verbosity Level"
-msgstr "Nível Detalhado"
+msgstr "Nível de Detalhamento"
 
 #: modules/gui/qt4/dialogs/messages.cpp:121
-#, fuzzy
 msgid "&Update"
-msgstr "Atualizar"
+msgstr "At&ualizar"
 
 #: modules/gui/qt4/dialogs/messages.cpp:249
-#, fuzzy
 msgid "Select a name for the logs file"
-msgstr "Selecione um arquivo, vários arquivos ou uma pasta"
+msgstr "Selecionar um nome para os arquivos de registro"
 
 #: modules/gui/qt4/dialogs/messages.cpp:251
 msgid "Texts / Logs (*.log *.txt);; All (*.*) "
@@ -16349,52 +16236,55 @@ msgstr ""
 "Não foi possível escrever no arquivo %1:\n"
 "%2."
 
-#: modules/gui/qt4/dialogs/open.cpp:88
+#: modules/gui/qt4/dialogs/open.cpp:89
 msgid "&File"
 msgstr "&Arquivo"
 
-#: modules/gui/qt4/dialogs/open.cpp:89
+#: modules/gui/qt4/dialogs/open.cpp:90
 msgid "&Disc"
 msgstr "&Disco"
 
-#: modules/gui/qt4/dialogs/open.cpp:90
+#: modules/gui/qt4/dialogs/open.cpp:91
 msgid "&Network"
 msgstr "&Rede"
 
-#: modules/gui/qt4/dialogs/open.cpp:92
+#: modules/gui/qt4/dialogs/open.cpp:93
 msgid "Capture &Device"
 msgstr "Capturar &Dispositivo"
 
-#: modules/gui/qt4/dialogs/open.cpp:107
-#, fuzzy
+#: modules/gui/qt4/dialogs/open.cpp:108
 msgid "&Select"
-msgstr "Selecionar"
+msgstr "&Selecionar"
 
-#: modules/gui/qt4/dialogs/open.cpp:111 modules/gui/qt4/dialogs/open.cpp:192
+#: modules/gui/qt4/dialogs/open.cpp:112 modules/gui/qt4/dialogs/open.cpp:193
 msgid "&Enqueue"
 msgstr "&Enfileirar"
 
-#: modules/gui/qt4/dialogs/open.cpp:113 modules/gui/qt4/dialogs/open.cpp:196
+#: modules/gui/qt4/dialogs/open.cpp:114 modules/gui/qt4/dialogs/open.cpp:197
 msgid "&Play"
 msgstr "&Reproduzir"
 
-#: modules/gui/qt4/dialogs/open.cpp:115 modules/gui/qt4/dialogs/open.cpp:186
-#: modules/gui/qt4/dialogs/sout.cpp:187
+#: modules/gui/qt4/dialogs/open.cpp:116 modules/gui/qt4/dialogs/open.cpp:187
+#: modules/gui/qt4/dialogs/sout.cpp:192
 msgid "&Stream"
 msgstr "&Fluxo"
 
-#: modules/gui/qt4/dialogs/open.cpp:117
+#: modules/gui/qt4/dialogs/open.cpp:118
 msgid "&Convert"
 msgstr "&Converter"
 
-#: modules/gui/qt4/dialogs/open.cpp:189
+#: modules/gui/qt4/dialogs/open.cpp:190
 msgid "&Convert / Save"
 msgstr "&Converter / Salvar"
 
-#: modules/gui/qt4/dialogs/preferences.cpp:70
+#: modules/gui/qt4/dialogs/preferences.cpp:66
 #, fuzzy
+msgid "Show settings"
+msgstr "Salvar configurações"
+
+#: modules/gui/qt4/dialogs/preferences.cpp:70
 msgid "Simple"
-msgstr "amostra"
+msgstr "Simplificado"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:71
 #, fuzzy
@@ -16412,7 +16302,7 @@ msgstr "&Salvar"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:88
 msgid "&Reset Preferences"
-msgstr "&Refazer Preferências"
+msgstr "&Redefinir Preferências"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:353
 msgid ""
@@ -16455,44 +16345,37 @@ msgstr "Arquivos de legenda"
 msgid "All Files"
 msgstr "Todos os arquivos"
 
-#: modules/gui/qt4/dialogs/sout.cpp:100 modules/gui/qt4/ui/sout.ui:20
+#: modules/gui/qt4/dialogs/sout.cpp:102 modules/gui/qt4/ui/sout.ui:20
 msgid "Stream Output"
 msgstr "Saída de Fluxo"
 
-#: modules/gui/qt4/dialogs/sout.cpp:153
+#: modules/gui/qt4/dialogs/sout.cpp:155
 msgid ""
 "Stream output string.\n"
 "This is automatically generated when you change the above settings,\n"
 "but you can update it manually."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/sout.cpp:203
+#: modules/gui/qt4/dialogs/sout.cpp:210
 msgid "Save file"
 msgstr "Salvar arquivo"
 
-#: modules/gui/qt4/dialogs/sout.cpp:204
+#: modules/gui/qt4/dialogs/sout.cpp:211
 msgid "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/sout.cpp:306
-#, fuzzy
-msgid "Video Port:"
-msgstr "Taxa de Bits de Vídeo:"
-
-#: modules/gui/qt4/dialogs/sout.cpp:307
+#: modules/gui/qt4/dialogs/sout.cpp:313
 #, fuzzy
 msgid "Audio Port:"
 msgstr "Áudio:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:83
-#, fuzzy
 msgid "Hours / Minutes / Seconds:"
-msgstr "Horas/Minutos/Segundos:"
+msgstr "Horas / Minutos / Segundos:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:85
-#, fuzzy
 msgid "Day / Month / Year:"
-msgstr "Dia Mês Ano:"
+msgstr "Dia / Mês / Ano:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:87
 msgid "Repeat:"
@@ -16504,12 +16387,11 @@ msgstr "Atrazo de repetição:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:114
 msgid " days"
-msgstr "dias"
+msgstr " dias"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:133
-#, fuzzy
 msgid "Import"
-msgstr "Exportar"
+msgstr "Importar"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:136
 msgid "Export"
@@ -16524,9 +16406,8 @@ msgid "VLM conf (*.vlm) ;; All (*.*)"
 msgstr "Configuração VLM (*.vlm) ;; Todos (*.*)"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:336
-#, fuzzy
 msgid "Open a VLM Configuration File"
-msgstr "Arquivo de configuração do VLM"
+msgstr "Abrir um Arquivo de Configuração do VLM"
 
 #: modules/gui/qt4/main_interface.cpp:295
 msgid "Toggle between elapsed and remaining time"
@@ -16539,7 +16420,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/main_interface.cpp:472
-#, fuzzy
 msgid "Privacy and Network Policies"
 msgstr "Privacidade e Políticas de Rede"
 
@@ -16548,7 +16428,6 @@ msgid "Privacy and Network Warning"
 msgstr "Privacidade e Avisos de Rede"
 
 #: modules/gui/qt4/main_interface.cpp:479
-#, fuzzy
 msgid ""
 "<p>The <i>VideoLAN Team</i> doesn't like when an application goes online "
 "without authorization.</p>\n"
@@ -16561,19 +16440,19 @@ msgid ""
 msgstr ""
 "<p>O <i>Grupo VideoLAN</i> não gosta quando um programa transmite "
 "informações on-line sem autorização.</p>\n"
-" <p><i>O VLC media player</i> pode pegar algumas poucas informações na "
-"Internet, especialmente capas de CD e dados de músicas ou para saber se há "
-"atualizações disponíveis.</p>\n"
-"<p><i>O VLC media player</i> <b>NÃO</b> envia ou coleta <b>NENHUMA</b> "
+" <p>O <i>VLC media player</i> pode pegar algumas poucas informações na "
+"Internet, especialmente capas de CD ou para saber se há atualizações "
+"disponíveis.</p>\n"
+"<p>O <i>VLC media player</i> <b>NÃO</b> envia ou coleta <b>NENHUMA</b> "
 "informação, mesmo de forma anônima, sobre a sua utilização.</p>\n"
 "<p>Por favor, verifique as opções abaixo, cujo padrão quase não acessa a Web."
 "</p>\n"
 
-#: modules/gui/qt4/main_interface.cpp:1024
+#: modules/gui/qt4/main_interface.cpp:1025
 msgid "Control menu for the player"
 msgstr "Menu de controles do reprodutor"
 
-#: modules/gui/qt4/main_interface.cpp:1073
+#: modules/gui/qt4/main_interface.cpp:1074
 msgid "Paused"
 msgstr "Pausado"
 
@@ -16583,7 +16462,7 @@ msgstr "&Mídia"
 
 #: modules/gui/qt4/menus.cpp:276
 msgid "&Playlist"
-msgstr "Lista de re&produção"
+msgstr "Lista de Re&produção"
 
 #: modules/gui/qt4/menus.cpp:278
 msgid "&Tools"
@@ -16616,7 +16495,7 @@ msgstr "Abrir &Disco..."
 
 #: modules/gui/qt4/menus.cpp:301 modules/gui/qt4/menus.cpp:687
 msgid "Open &Network..."
-msgstr "Abrir &Rede..."
+msgstr "Abrir na &Rede..."
 
 #: modules/gui/qt4/menus.cpp:303 modules/gui/qt4/menus.cpp:689
 msgid "Open &Capture Device..."
@@ -16665,7 +16544,7 @@ msgstr "Alternar modo tela inteira"
 #: modules/gui/qt4/menus.cpp:390
 #, fuzzy
 msgid "&Advanced Controls"
-msgstr "Controles avançados"
+msgstr "Controles Avançados"
 
 #: modules/gui/qt4/menus.cpp:397
 msgid "Visualizations selector"
@@ -16676,39 +16555,32 @@ msgid "&Preferences..."
 msgstr "&Preferências..."
 
 #: modules/gui/qt4/menus.cpp:454
-#, fuzzy
 msgid "Audio &Track"
-msgstr "Trilha de Áudio"
+msgstr "&Trilha de Áudio"
 
 #: modules/gui/qt4/menus.cpp:455
-#, fuzzy
 msgid "Audio &Device"
-msgstr "Dispositivo de Áudio"
+msgstr "&Dispositivo de Áudio"
 
 #: modules/gui/qt4/menus.cpp:456
-#, fuzzy
 msgid "Audio &Channels"
-msgstr "Canais de Áudio"
+msgstr "&Canais de Áudio"
 
 #: modules/gui/qt4/menus.cpp:458
-#, fuzzy
 msgid "&Visualizations"
-msgstr "Visualizações"
+msgstr "&Visualizações"
 
 #: modules/gui/qt4/menus.cpp:493
-#, fuzzy
 msgid "Video &Track"
-msgstr "Trilha de vídeo"
+msgstr "&Trilha de Vídeo"
 
 #: modules/gui/qt4/menus.cpp:496
-#, fuzzy
 msgid "&Subtitles Track"
-msgstr "Trilha de Legendas"
+msgstr "Trilha de Legenda&s"
 
 #: modules/gui/qt4/menus.cpp:499
-#, fuzzy
 msgid "Load File..."
-msgstr "Adicionar arquivo..."
+msgstr "Abrir Arquivo..."
 
 #: modules/gui/qt4/menus.cpp:503
 #, fuzzy
@@ -16716,29 +16588,24 @@ msgid "&Fullscreen"
 msgstr "Tela inteira"
 
 #: modules/gui/qt4/menus.cpp:504
-#, fuzzy
 msgid "&Zoom"
-msgstr "Aproximação"
+msgstr "Apro&ximação"
 
 #: modules/gui/qt4/menus.cpp:505
-#, fuzzy
 msgid "&Deinterlace"
-msgstr "Desentrelaçamento"
+msgstr "&Desentrelaçamento"
 
 #: modules/gui/qt4/menus.cpp:506
-#, fuzzy
 msgid "&Aspect Ratio"
-msgstr "Proporção entre Altura e Largura"
+msgstr "Proporção entre &Altura e Largura"
 
 #: modules/gui/qt4/menus.cpp:507
-#, fuzzy
 msgid "&Crop"
-msgstr "Recortar"
+msgstr "Re&cortar"
 
 #: modules/gui/qt4/menus.cpp:508
-#, fuzzy
 msgid "Always &On Top"
-msgstr "Sempre por cima"
+msgstr "Sempre &Visível"
 
 #: modules/gui/qt4/menus.cpp:510
 #, fuzzy
@@ -16746,9 +16613,8 @@ msgid "Sna&pshot"
 msgstr "Capturar Imagem"
 
 #: modules/gui/qt4/menus.cpp:548
-#, fuzzy
 msgid "&Bookmarks"
-msgstr "Favoritos"
+msgstr "&Favoritos"
 
 #: modules/gui/qt4/menus.cpp:549
 #, fuzzy
@@ -16756,14 +16622,12 @@ msgid "T&itle"
 msgstr "Título"
 
 #: modules/gui/qt4/menus.cpp:550
-#, fuzzy
 msgid "&Chapter"
-msgstr "Capítulo"
+msgstr "&Capítulo"
 
 #: modules/gui/qt4/menus.cpp:551
-#, fuzzy
 msgid "&Program"
-msgstr "Programa"
+msgstr "&Programa"
 
 #: modules/gui/qt4/menus.cpp:552
 msgid "&Navigation"
@@ -16789,13 +16653,12 @@ msgid "Tools"
 msgstr "Ferramentas"
 
 #: modules/gui/qt4/menus.cpp:803
-#, fuzzy
 msgid "Leave Fullscreen"
-msgstr "Desativar tela inteira"
+msgstr "Desativar Tela Inteira"
 
 #: modules/gui/qt4/menus.cpp:829
 msgid "&Playback"
-msgstr "&Reproduzir"
+msgstr "&Reprodução"
 
 #: modules/gui/qt4/menus.cpp:841
 msgid "Show Playlist"
@@ -16824,16 +16687,15 @@ msgstr "Abrir &Mídia"
 #: modules/gui/qt4/menus.hpp:36
 #, fuzzy
 msgid "Open &Folder..."
-msgstr "Abrir &Pasta..."
+msgstr "Abrir Pasta..."
 
 #: modules/gui/qt4/menus.hpp:38
 msgid "Open D&irectory..."
 msgstr "Abrir &Pasta..."
 
 #: modules/gui/qt4/qt4.cpp:66
-#, fuzzy
 msgid "Show advanced preferences over simple ones"
-msgstr "Mostrar opções avançadas"
+msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:67
 msgid ""
@@ -16846,23 +16708,18 @@ msgid "Systray icon"
 msgstr "Ícone de bandeja"
 
 #: modules/gui/qt4/qt4.cpp:72
-#, fuzzy
 msgid ""
 "Show an icon in the systray allowing you to control VLC media player for "
 "basic actions."
 msgstr ""
-"Mostrar um ícone na bandeja, permitindo o controle do VLC com ações básicas"
 
 #: modules/gui/qt4/qt4.cpp:76
 msgid "Start VLC with only a systray icon"
 msgstr "Iniciar o VLC como um ícone de bandeja"
 
 #: modules/gui/qt4/qt4.cpp:77
-#, fuzzy
 msgid "VLC will start with just an icon in your taskbar"
-msgstr ""
-"Quando você marcar esta opção, o VLC iniciará como um ícone em sua barra de "
-"tarefas"
+msgstr "O VLC iniciará como um ícone em sua barra de tarefas"
 
 #: modules/gui/qt4/qt4.cpp:80
 msgid "Show playing item name in window title"
@@ -16891,9 +16748,8 @@ msgid "Advanced options"
 msgstr "Opções avançadas"
 
 #: modules/gui/qt4/qt4.cpp:92
-#, fuzzy
 msgid "Show all the advanced options in the dialogs."
-msgstr "Mostrar opções avançadas nos diálogos"
+msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:95
 msgid "Windows opacity between 0.1 and 1."
@@ -16921,9 +16777,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:107
-#, fuzzy
 msgid "Number of days between two update checks"
-msgstr "Número de dias entre duas verificações"
+msgstr "Número de dias entre duas buscas por atualização"
 
 #: modules/gui/qt4/qt4.cpp:109
 msgid "Allow the volume to be set to 400%"
@@ -16945,12 +16800,11 @@ msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:119
 msgid "Ask for network policy at start"
-msgstr ""
+msgstr "Perguntar sobre as políticas de rede no início"
 
 #: modules/gui/qt4/qt4.cpp:121
-#, fuzzy
 msgid "Define the colors of the volume slider "
-msgstr "Aplica efeito de nagativo de foto na imagem"
+msgstr "Definir as cores da barra de volume"
 
 #: modules/gui/qt4/qt4.cpp:122
 msgid ""
@@ -16998,7 +16852,6 @@ msgid "Preset"
 msgstr "Ajuste predefinido"
 
 #: modules/gui/qt4/ui/open_capture.ui:17
-#, fuzzy
 msgid "Capture mode"
 msgstr "Modo de captura"
 
@@ -17023,23 +16876,20 @@ msgid "Advanced options..."
 msgstr "Opções avançadas..."
 
 #: modules/gui/qt4/ui/open_disk.ui:20
-#, fuzzy
 msgid "Disc Selection"
-msgstr "Seleção de disco"
+msgstr "Seleção de Disco"
 
 #: modules/gui/qt4/ui/open_disk.ui:91
 msgid "Disable DVD Menus (for compatibility)"
 msgstr "Desativa o menu do DVD (para compatibilidade)"
 
 #: modules/gui/qt4/ui/open_disk.ui:108
-#, fuzzy
 msgid "Disc device"
 msgstr "Dispositivo de disco"
 
 #: modules/gui/qt4/ui/open_disk.ui:165
-#, fuzzy
 msgid "Starting Position"
-msgstr "Posição de início"
+msgstr "Posição Inicial"
 
 #: modules/gui/qt4/ui/open_disk.ui:232
 msgid "Audio and Subtitles"
@@ -17050,9 +16900,8 @@ msgid "Choose one or more media file to open"
 msgstr "Escolha um ou mais arquivos de mídia para abrir"
 
 #: modules/gui/qt4/ui/open_file.ui:49
-#, fuzzy
 msgid "Add a subtitles file"
-msgstr "Adiciona um arquivo de legenda"
+msgstr "Adicionar arquivo de legenda"
 
 #: modules/gui/qt4/ui/open_file.ui:52
 #, fuzzy
@@ -17064,74 +16913,71 @@ msgid "Alignment:"
 msgstr "Alinhamento:"
 
 #: modules/gui/qt4/ui/open_file.ui:178
-#, fuzzy
 msgid "Select the subtitles file"
-msgstr "Selecionar um arquivo de legenda"
+msgstr "Selecionar o arquivo de legenda"
 
 #: modules/gui/qt4/ui/open_net.ui:20
 msgid "Network Protocol"
 msgstr "Protocolo de Rede"
 
 #: modules/gui/qt4/ui/open_net.ui:26
-#, fuzzy
 msgid "Select the protocol for the URL."
-msgstr "Informe o protocolo para a URL"
+msgstr "Selecionar o protocolo para a URL."
 
 #: modules/gui/qt4/ui/open_net.ui:33
 msgid "Protocol"
 msgstr "Protocolo"
 
 #: modules/gui/qt4/ui/open_net.ui:43
-#, fuzzy
 msgid "Select the port used"
-msgstr "Informe a porta a ser usada"
+msgstr "Selecionar a porta usada"
 
 #: modules/gui/qt4/ui/open_net.ui:85
 msgid "Enter the URL of the network stream here, with or without the protocol."
 msgstr ""
 
-#: modules/gui/qt4/ui/open.ui:51
+#: modules/gui/qt4/ui/open.ui:38
 msgid "Show extended options"
 msgstr "Mostrar opções estendidas"
 
-#: modules/gui/qt4/ui/open.ui:54
+#: modules/gui/qt4/ui/open.ui:41
 #, fuzzy
 msgid "Show &more options"
 msgstr "Mostrar mais opções"
 
-#: modules/gui/qt4/ui/open.ui:74
+#: modules/gui/qt4/ui/open.ui:61
 msgid "Change the caching for the media"
 msgstr "Modificar o cache para a mídia"
 
-#: modules/gui/qt4/ui/open.ui:103
+#: modules/gui/qt4/ui/open.ui:90
 msgid "Start Time"
 msgstr "Início"
 
-#: modules/gui/qt4/ui/open.ui:113
+#: modules/gui/qt4/ui/open.ui:100
 msgid "Change the start time for the media"
-msgstr ""
+msgstr "Alterar o ponto de início para a mídia"
 
-#: modules/gui/qt4/ui/open.ui:145
+#: modules/gui/qt4/ui/open.ui:129
 msgid "Play another media synchronously (extra audio file, ...)"
 msgstr "Reproduzir outra mídia ao mesmo tempo (mais um arquivo de áudio, etc.)"
 
-#: modules/gui/qt4/ui/open.ui:152
+#: modules/gui/qt4/ui/open.ui:139
 msgid "Extra media"
 msgstr ""
 
-#: modules/gui/qt4/ui/open.ui:165
+#: modules/gui/qt4/ui/open.ui:152
 msgid "Select the file"
 msgstr "Selecionar o arquivo"
 
-#: modules/gui/qt4/ui/open.ui:178
+#: modules/gui/qt4/ui/open.ui:162
 msgid "Customize"
 msgstr "Personalizar"
 
-#: modules/gui/qt4/ui/open.ui:188
+#: modules/gui/qt4/ui/open.ui:175
 msgid "Complete MRL for VLC internal"
 msgstr ""
 
-#: modules/gui/qt4/ui/open.ui:234
+#: modules/gui/qt4/ui/open.ui:216
 #, fuzzy
 msgid "Select play mode"
 msgstr "Selecionar o modo de reprodução de ganho"
@@ -17139,7 +16985,7 @@ msgstr "Selecionar o modo de reprodução de ganho"
 #: modules/gui/qt4/ui/podcast_configuration.ui:19
 #: modules/services_discovery/podcast.c:58
 msgid "Podcast URLs list"
-msgstr ""
+msgstr "Lista de URLs de Podcast"
 
 #: modules/gui/qt4/ui/sout.ui:32
 msgid "Outputs"
@@ -17165,35 +17011,40 @@ msgstr "Ponto de montagem"
 msgid "Login:pass:"
 msgstr "Usuário:senha:"
 
-#: modules/gui/qt4/ui/sout.ui:451
+#: modules/gui/qt4/ui/sout.ui:467
+#, fuzzy
+msgid "Video Port"
+msgstr "Memória de vídeo"
+
+#: modules/gui/qt4/ui/sout.ui:505
 msgid "Profile"
 msgstr "Perfil"
 
-#: modules/gui/qt4/ui/sout.ui:473
+#: modules/gui/qt4/ui/sout.ui:527
 msgid "Encapsulation"
 msgstr "Encapsulamento"
 
-#: modules/gui/qt4/ui/sout.ui:568
+#: modules/gui/qt4/ui/sout.ui:622
 msgid "Video codec"
 msgstr "Codec de vídeo"
 
-#: modules/gui/qt4/ui/sout.ui:665
+#: modules/gui/qt4/ui/sout.ui:719
 msgid "Audio codec"
 msgstr "Codec de áudio"
 
-#: modules/gui/qt4/ui/sout.ui:788
+#: modules/gui/qt4/ui/sout.ui:842
 msgid "Overlay subtitles on the video"
-msgstr ""
+msgstr "Sobrepor legendas ao vídeo"
 
-#: modules/gui/qt4/ui/sout.ui:827
+#: modules/gui/qt4/ui/sout.ui:881
 msgid "Group name"
 msgstr "Nome do grupo"
 
-#: modules/gui/qt4/ui/sout.ui:861
+#: modules/gui/qt4/ui/sout.ui:915
 msgid "Stream all elementary streams"
 msgstr "Fazer fluxo de todos os fluxos primários"
 
-#: modules/gui/qt4/ui/sout.ui:886
+#: modules/gui/qt4/ui/sout.ui:940
 msgid "Generated stream output string"
 msgstr "Linha de saída de fluxo, produzida"
 
@@ -17202,13 +17053,12 @@ msgid "Default volume"
 msgstr "Volume padrão"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:77
-#, fuzzy
 msgid "256 corresponds to 100%, 1024 to 400%"
-msgstr "256 corresponde a 100%, 1024 a 400%)</string>"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:106
 msgid "Save volume on exit"
-msgstr ""
+msgstr "Gravar volume ao sair"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:142
 msgid "Preferred audio language"
@@ -17223,28 +17073,24 @@ msgid "Enable last.fm submission"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_input.ui:20
-#, fuzzy
 msgid "Disc Devices"
 msgstr "Dispositivos de Disco"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:26
-#, fuzzy
 msgid "Default disc device"
-msgstr "Dispositivos padrão"
+msgstr "Dispositivo de disco padrão"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:55
-#, fuzzy
 msgid "Server default port"
-msgstr "Porta Pdrão do Servidor"
+msgstr "Porta padrão do servidor"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:103
 msgid "Default caching level"
 msgstr "Nível padrão de cache"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:125
-#, fuzzy
 msgid "Post-Processing quality"
-msgstr "Qualidade de pós-processamento"
+msgstr "Qualidade de Pós-Processamento"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:151
 msgid "Repair AVI files"
@@ -17255,9 +17101,8 @@ msgid "Use system codecs if available (better quality)"
 msgstr "Usar codecs do sistema, se disponíveis (qualidade melhor)"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:35
-#, fuzzy
 msgid "Interface Type"
-msgstr "Menu de interface"
+msgstr "Tipo de Interface"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:41
 msgid "Native"
@@ -17268,9 +17113,8 @@ msgid "This is VLC's default interface, with a native look and feel."
 msgstr "Esta é a interface padrão do VLC com a aparência nativa."
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:73
-#, fuzzy
 msgid "Display mode"
-msgstr "Mostrar"
+msgstr "Modo de exibição"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:90
 msgid "Integrate video in interface"
@@ -17282,9 +17126,8 @@ msgid "Skins"
 msgstr "Capas"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:158
-#, fuzzy
 msgid "Skin file"
-msgstr "Arquivo de Capa"
+msgstr "Arquivo de capa"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:191
 #, fuzzy
@@ -17328,24 +17171,25 @@ msgstr ""
 "Esta é a inteface de capa do VLC. Você pode baixar capas em &lt;a href="
 
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:50
-#, fuzzy
 msgid "Subtitles Language"
-msgstr "Línguas de legendas"
+msgstr "Língua da Legenda"
 
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:56
-#, fuzzy
 msgid "Preferred subtitles language"
-msgstr "Língua de áudio preferida"
+msgstr "Língua preferida para legenda"
 
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:79
-#, fuzzy
 msgid "Default encoding"
 msgstr "Codificação padrão"
 
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:101
+#: modules/video_output/opengl.c:174
+msgid "Effect"
+msgstr "Efeito"
+
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:114
-#, fuzzy
 msgid "Font color"
-msgstr "Cor da Fonte"
+msgstr "Cor da fonte"
 
 #: modules/gui/qt4/ui/sprefs_video.ui:78
 msgid "Output"
@@ -17360,14 +17204,12 @@ msgid "DirectX"
 msgstr "DirectX"
 
 #: modules/gui/qt4/ui/sprefs_video.ui:129
-#, fuzzy
 msgid "Display device"
-msgstr "Dispositivos de Tela"
+msgstr "Dispositivo de exibição"
 
 #: modules/gui/qt4/ui/sprefs_video.ui:139
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "Ativar modo papel de parede"
+msgstr "Habilitar modo papel de parede"
 
 #: modules/gui/qt4/ui/streampanel.ui:48
 msgid "Edit settings"
@@ -17399,26 +17241,23 @@ msgstr "P/P"
 
 #: modules/gui/qt4/ui/streampanel.ui:115
 msgid "Prev"
-msgstr ""
+msgstr "Anterior"
 
 #: modules/gui/qt4/ui/streampanel.ui:132
-#, fuzzy
 msgid "Add Input"
-msgstr "Adicionar entrada"
+msgstr "Adicionar Entrada"
 
 #: modules/gui/qt4/ui/streampanel.ui:139
-#, fuzzy
 msgid "Edit Input"
-msgstr "Editar entrada"
+msgstr "Editar Entrada"
 
 #: modules/gui/qt4/ui/streampanel.ui:146
-#, fuzzy
 msgid "Clear List"
-msgstr "Limpar lista"
+msgstr "Limpar Lista"
 
 #: modules/gui/qt4/ui/video_effects.ui:23
 msgid "Transform"
-msgstr "Transformar"
+msgstr "Rotacionar"
 
 #: modules/gui/qt4/ui/video_effects.ui:41
 msgid "Sharpen"
@@ -17426,7 +17265,7 @@ msgstr ""
 
 #: modules/gui/qt4/ui/video_effects.ui:53
 msgid "Sigma"
-msgstr ""
+msgstr "Sigma"
 
 #: modules/gui/qt4/ui/video_effects.ui:88 modules/video_filter/adjust.c:83
 msgid "Image adjust"
@@ -17454,19 +17293,16 @@ msgid "Similarity"
 msgstr "Similaridade"
 
 #: modules/gui/qt4/ui/video_effects.ui:403
-#, fuzzy
 msgid "Synchronize top and bottom"
-msgstr "Sincronização na trilha de áudio"
+msgstr ""
 
 #: modules/gui/qt4/ui/video_effects.ui:410
-#, fuzzy
 msgid "Synchronize left and right"
-msgstr "Sincronização na trilha de áudio"
+msgstr ""
 
 #: modules/gui/qt4/ui/video_effects.ui:434
-#, fuzzy
 msgid "Geometry"
-msgstr "Espectro"
+msgstr "Geometria"
 
 #: modules/gui/qt4/ui/video_effects.ui:447
 msgid "Puzzle game"
@@ -17527,9 +17363,8 @@ msgid "Cartoon"
 msgstr "Desenho"
 
 #: modules/gui/qt4/ui/video_effects.ui:664
-#, fuzzy
 msgid "Vout/Overlay"
-msgstr "Sobreposições"
+msgstr ""
 
 #: modules/gui/qt4/ui/video_effects.ui:670
 msgid "Wall"
@@ -17635,7 +17470,7 @@ msgstr "Contínuo"
 
 #: modules/gui/qt4/ui/vlm.ui:235
 msgid "Media Manager List"
-msgstr ""
+msgstr "Lista de Gerenciamento de Mídia"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open a skin file"
@@ -17743,7 +17578,7 @@ msgid ""
 "(c) 1996-2006 - the VideoLAN Team\n"
 "\n"
 msgstr ""
-"(c) 1996-2006 - Grupo VideoLAN\n"
+"(c) 1996-2008 - Grupo VideoLAN\n"
 "\n"
 
 #: modules/gui/wince/interface.cpp:505
@@ -18401,9 +18236,8 @@ msgid "Lua interface module to load"
 msgstr ""
 
 #: modules/misc/lua/vlc.c:57
-#, fuzzy
 msgid "Lua interface configuration"
-msgstr "Função simplificada de interface"
+msgstr ""
 
 #: modules/misc/lua/vlc.c:58
 msgid ""
@@ -18456,9 +18290,8 @@ msgid "Growl Notification Plugin"
 msgstr "Complemento de notificação do Growl"
 
 #: modules/misc/notify/growl.m:280
-#, fuzzy
 msgid "Now playing"
-msgstr "Reproduzindo"
+msgstr ""
 
 #: modules/misc/notify/growl_udp.c:60
 msgid "Server"
@@ -18479,9 +18312,8 @@ msgid "Growl UDP port on the Growl server."
 msgstr "Porta UDP no servidor Growl."
 
 #: modules/misc/notify/growl_udp.c:73
-#, fuzzy
 msgid "Growl UDP Notification Plugin"
-msgstr "Complemento de notificação do Growl"
+msgstr ""
 
 #: modules/misc/notify/msn.c:67 modules/misc/notify/telepathy.c:67
 msgid "Title format string"
@@ -18677,44 +18509,36 @@ msgid "X Screensaver disabler"
 msgstr ""
 
 #: modules/misc/stats/stats.c:48
-#, fuzzy
 msgid "Stats"
-msgstr "Status"
+msgstr ""
 
 #: modules/misc/stats/stats.c:49
-#, fuzzy
 msgid "Stats encoder function"
-msgstr "Função simplificada de codificador"
+msgstr ""
 
 #: modules/misc/stats/stats.c:54
-#, fuzzy
 msgid "Stats decoder"
-msgstr "Codificador de legendas"
+msgstr ""
 
 #: modules/misc/stats/stats.c:55
-#, fuzzy
 msgid "Stats decoder function"
-msgstr "Função simplificada de decodificador"
+msgstr ""
 
 #: modules/misc/stats/stats.c:59
-#, fuzzy
 msgid "Stats demux"
-msgstr "Status"
+msgstr ""
 
 #: modules/misc/stats/stats.c:60
-#, fuzzy
 msgid "Stats demux function"
-msgstr "Função simplificada de demux"
+msgstr ""
 
 #: modules/misc/stats/stats.c:64
-#, fuzzy
 msgid "Stats video output"
-msgstr "Saída de vídeo do ASCII-art"
+msgstr ""
 
 #: modules/misc/stats/stats.c:65
-#, fuzzy
 msgid "Stats video output function"
-msgstr "Função simplificada de saída de vídeo"
+msgstr ""
 
 #: modules/misc/svg.c:70
 msgid "SVG template file"
@@ -18778,9 +18602,8 @@ msgid "ASF packet size -- default is 4096 bytes"
 msgstr ""
 
 #: modules/mux/asf.c:64
-#, fuzzy
 msgid "Bitrate override"
-msgstr "Modo da taxa de bits"
+msgstr ""
 
 #: modules/mux/asf.c:65
 msgid ""
@@ -19201,15 +19024,15 @@ msgstr ""
 msgid "SDP Descriptions parser"
 msgstr ""
 
-#: modules/services_discovery/sap.c:890 modules/services_discovery/sap.c:894
+#: modules/services_discovery/sap.c:874 modules/services_discovery/sap.c:878
 msgid "Session"
 msgstr "Sessão"
 
-#: modules/services_discovery/sap.c:890
+#: modules/services_discovery/sap.c:874
 msgid "Tool"
 msgstr "Ferramenta"
 
-#: modules/services_discovery/sap.c:894
+#: modules/services_discovery/sap.c:878
 msgid "User"
 msgstr "Usuário"
 
@@ -19445,9 +19268,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/mosaic_bridge.c:158
-#, fuzzy
 msgid "Transparency of the mosaic picture."
-msgstr "Transparência da imagem"
+msgstr ""
 
 #: modules/stream_out/mosaic_bridge.c:160 modules/video_filter/marq.c:103
 #: modules/video_filter/rss.c:142
@@ -19455,9 +19277,8 @@ msgid "X offset"
 msgstr "Deslocamento no eixo X"
 
 #: modules/stream_out/mosaic_bridge.c:162
-#, fuzzy
 msgid "X coordinate of the upper left corner in the mosaic if non negative."
-msgstr "Coordenada X da imagem"
+msgstr ""
 
 #: modules/stream_out/mosaic_bridge.c:164 modules/video_filter/marq.c:105
 #: modules/video_filter/rss.c:144
@@ -19465,9 +19286,8 @@ msgid "Y offset"
 msgstr "Deslocamento no eixo Y"
 
 #: modules/stream_out/mosaic_bridge.c:166
-#, fuzzy
 msgid "Y coordinate of the upper left corner in the mosaic if non negative."
-msgstr "Coordenada Y da imagem"
+msgstr ""
 
 #: modules/stream_out/mosaic_bridge.c:171
 msgid "Mosaic bridge"
@@ -20062,9 +19882,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:134
-#, fuzzy
 msgid "Save Debug Frames"
-msgstr "Quadro a Quadro"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:135
 msgid "Write every 128th miniframe to a folder."
@@ -20079,27 +19898,24 @@ msgid "The path where the debugframes should be saved"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:141
-#, fuzzy
 msgid "Extracted Image Width"
-msgstr "Largura da imagem"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:142
 msgid "The width of the mini image for further processing (64 is default)"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:145
-#, fuzzy
 msgid "Extracted Image Height"
-msgstr "Altura da imagem"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:146
 msgid "The height of the mini image for further processing (48 is default)"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:149
-#, fuzzy
 msgid "Color when paused"
-msgstr "Limiar de cor"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:150
 msgid ""
@@ -20108,28 +19924,24 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:153
-#, fuzzy
 msgid "Pause-Red"
-msgstr "Pausado"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:154
-#, fuzzy
 msgid "Red component of the pause color"
-msgstr "Componente RGB a ser extraído"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:155
-#, fuzzy
 msgid "Pause-Green"
-msgstr "Verde"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:156
 msgid "Green component of the pause color"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:157
-#, fuzzy
 msgid "Pause-Blue"
-msgstr "Pausar"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:158
 msgid "Blue component of the pause color"
@@ -20145,27 +19957,24 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:163
-#, fuzzy
 msgid "End-Red"
-msgstr "Vermelho"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:164
 msgid "Red component of the shutdown color"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:165
-#, fuzzy
 msgid "End-Green"
-msgstr "Verde"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:166
 msgid "Green component of the shutdown color"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:167
-#, fuzzy
 msgid "End-Blue"
-msgstr "Azul"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:168
 msgid "Blue component of the shutdown color"
@@ -20191,27 +20000,24 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:177
-#, fuzzy
 msgid "White Red"
-msgstr "Branco"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:178
 msgid "Red value of a pure white on your LED stripes."
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:180
-#, fuzzy
 msgid "White Green"
-msgstr "Nível de Branco para o Verde"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:181
 msgid "Green value of a pure white on your LED stripes."
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:183
-#, fuzzy
 msgid "White Blue"
-msgstr "Branco"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:184
 msgid "Blue value of a pure white on your LED stripes."
@@ -20257,18 +20063,16 @@ msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:203
 #: modules/video_filter/atmo/atmo.cpp:205
-#, fuzzy
 msgid "Used for statistics."
-msgstr "Coletar estatísticas"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:204
 msgid "Sat windowing"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:207
-#, fuzzy
 msgid "Filter length (ms)"
-msgstr "Filtros"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:208
 msgid ""
@@ -20276,51 +20080,44 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:210
-#, fuzzy
 msgid "Filter threshold"
-msgstr "Limiar de cor"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:211
 msgid "How much a color has to be changed for an immediate color change."
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:213
-#, fuzzy
 msgid "Filter Smoothness (in %)"
-msgstr "Posição média (em %)"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:214
 msgid "Filter Smoothness"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:217
-#, fuzzy
 msgid "Filter mode"
-msgstr "Filtros"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:218
 msgid "kind of filtering which should be use to calcuate the color output"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:226
-#, fuzzy
 msgid "No Filtering"
-msgstr "Tamanho do vídeo"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:227
-#, fuzzy
 msgid "Combined"
-msgstr "Comédia"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:228
-#, fuzzy
 msgid "Percent"
-msgstr "Ajuste predefinido"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:231
-#, fuzzy
 msgid "Frame delay"
-msgstr "Taxa de quadros"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:232
 msgid ""
@@ -20329,29 +20126,24 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:237
-#, fuzzy
 msgid "Channel summary"
-msgstr "Número do canal"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:238
-#, fuzzy
 msgid "Channel left"
-msgstr "Nome do Canal"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:239
-#, fuzzy
 msgid "Channel right"
-msgstr "Canal"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:240
-#, fuzzy
 msgid "Channel top"
-msgstr "Canal"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:241
-#, fuzzy
 msgid "Channel bottom"
-msgstr "Nome do Canal"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:243
 msgid ""
@@ -20359,59 +20151,48 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:254
-#, fuzzy
 msgid "disabled"
-msgstr "Desativar"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:255
-#, fuzzy
 msgid "summary"
-msgstr "Sumário"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:256
-#, fuzzy
 msgid "left"
-msgstr "Esquerda"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:257
-#, fuzzy
 msgid "right"
-msgstr "Direita"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:258
-#, fuzzy
 msgid "top"
-msgstr "Parar"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:259
-#, fuzzy
 msgid "bottom"
-msgstr "Base"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:262
-#, fuzzy
 msgid "Summary gradient"
-msgstr "Gradiente"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:263
-#, fuzzy
 msgid "Left gradient"
-msgstr "Gradiente"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:264
-#, fuzzy
 msgid "Right gradient"
-msgstr "Gradiente"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:265
-#, fuzzy
 msgid "Top gradient"
-msgstr "Gradiente"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:266
-#, fuzzy
 msgid "Bottom gradient"
-msgstr "Gradiente"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:267
 msgid ""
@@ -20419,9 +20200,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:271
-#, fuzzy
 msgid "Filename of AtmoWinA.exe"
-msgstr "Nome do arquivo de descarga"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:272
 msgid ""
@@ -20464,9 +20244,8 @@ msgid "Illuminate the room with this color on shutdown"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:356
-#, fuzzy
 msgid "Settings for the built-in Live Video Processor only"
-msgstr "Configurações para a interface principal"
+msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:393
 msgid "Change channel assignment (fixes wrong wiring)"
@@ -20481,19 +20260,16 @@ msgid "Change gradients"
 msgstr ""
 
 #: modules/video_filter/blendbench.c:52
-#, fuzzy
 msgid "Number of time to blend"
-msgstr "Número de faixas"
+msgstr ""
 
 #: modules/video_filter/blendbench.c:53
-#, fuzzy
 msgid "The number of time the blend will be performed"
-msgstr "Número de vezes que a mesma entrada será repetida"
+msgstr ""
 
 #: modules/video_filter/blendbench.c:55
-#, fuzzy
 msgid "Alpha of the blended image"
-msgstr "Coordenada X da imagem"
+msgstr ""
 
 #: modules/video_filter/blendbench.c:56
 msgid "Alpha with which the blend image is blended"
@@ -20504,14 +20280,12 @@ msgid "Image to be blended onto"
 msgstr ""
 
 #: modules/video_filter/blendbench.c:59
-#, fuzzy
 msgid "The image which will be used to blend onto"
-msgstr "Nome do usuário que será usado para a conexão."
+msgstr ""
 
 #: modules/video_filter/blendbench.c:61
-#, fuzzy
 msgid "Chroma for the base image"
-msgstr "Largura da imagem capturada."
+msgstr ""
 
 #: modules/video_filter/blendbench.c:62
 msgid "Chroma which the base image will be loaded in"
@@ -20526,9 +20300,8 @@ msgid "The image blended onto the base image"
 msgstr ""
 
 #: modules/video_filter/blendbench.c:67
-#, fuzzy
 msgid "Chroma for the blend image"
-msgstr "Menu de controles do reprodutor"
+msgstr ""
 
 #: modules/video_filter/blendbench.c:68
 msgid "Chroma which the blend image will be loadedin"
@@ -20551,9 +20324,8 @@ msgid "Base image"
 msgstr ""
 
 #: modules/video_filter/blendbench.c:92
-#, fuzzy
 msgid "Blend image"
-msgstr "Mesclar"
+msgstr ""
 
 #: modules/video_filter/blend.c:100
 msgid "Video pictures blending"
@@ -20630,9 +20402,8 @@ msgid "Set aspect (like 4:3) of the video canvas"
 msgstr ""
 
 #: modules/video_filter/canvas.c:63
-#, fuzzy
 msgid "Automatically resize and padd a video"
-msgstr "Analizar automaticamente os arquivos"
+msgstr ""
 
 #: modules/video_filter/chain.c:43
 msgid "Video filtering using a chain of video filter modules"
@@ -20784,36 +20555,32 @@ msgid "Pixels to crop from top"
 msgstr ""
 
 #: modules/video_filter/croppadd.c:49
-#, fuzzy
 msgid "Number of pixels to crop from the top of the image."
-msgstr "Recortar um pixel do topo do vídeo"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:50
 msgid "Pixels to crop from bottom"
 msgstr ""
 
 #: modules/video_filter/croppadd.c:52
-#, fuzzy
 msgid "Number of pixels to crop from the bottom of the image."
-msgstr "Recortar um pixel da base do vídeo"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:53
 msgid "Pixels to crop from left"
 msgstr ""
 
 #: modules/video_filter/croppadd.c:55
-#, fuzzy
 msgid "Number of pixels to crop from the left of the image."
-msgstr "Recortar um pixel da esquerda do vídeo"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:56
 msgid "Pixels to crop from right"
 msgstr ""
 
 #: modules/video_filter/croppadd.c:58
-#, fuzzy
 msgid "Number of pixels to crop from the right of the image."
-msgstr "Recortar um pixel da direita do vídeo"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:60
 msgid "Pixels to padd to top"
@@ -20824,14 +20591,12 @@ msgid "Number of pixels to padd to the top of the image after cropping."
 msgstr ""
 
 #: modules/video_filter/croppadd.c:63
-#, fuzzy
 msgid "Pixels to padd to bottom"
-msgstr "Sincronização na trilha de áudio"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:65
-#, fuzzy
 msgid "Number of pixels to padd to the bottom of the image after cropping."
-msgstr "Recortar um pixel da base do vídeo"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:66
 msgid "Pixels to padd to left"
@@ -20855,9 +20620,8 @@ msgid "Video scaling filter"
 msgstr ""
 
 #: modules/video_filter/croppadd.c:93
-#, fuzzy
 msgid "Padd"
-msgstr "Pausado"
+msgstr ""
 
 #: modules/video_filter/deinterlace.c:112 modules/video_output/x11/xvmc.c:130
 msgid "Deinterlace mode"
@@ -20880,27 +20644,24 @@ msgid "Deinterlacing video filter"
 msgstr "Desentrelaçamento de vídeo"
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:58
-#, fuzzy
 msgid "Input FIFO"
-msgstr "Entrada"
+msgstr ""
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:59
 msgid "FIFO which will be read for commands"
 msgstr ""
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:61
-#, fuzzy
 msgid "Output FIFO"
-msgstr "Saída"
+msgstr ""
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:62
 msgid "FIFO which will be written to for responses"
 msgstr ""
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:65
-#, fuzzy
 msgid "Dynamic video overlay"
-msgstr "Decodificador de vídeo Dirac"
+msgstr ""
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:66
 msgid "Overlay"
@@ -21144,9 +20905,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/marq.c:111
-#, fuzzy
 msgid "Refresh period in ms"
-msgstr "Atualizar lista"
+msgstr ""
 
 #: modules/video_filter/marq.c:112
 msgid ""
@@ -21767,19 +21527,16 @@ msgid "FFmpeg post processing filter chains"
 msgstr ""
 
 #: modules/video_filter/postproc.c:75
-#, fuzzy
 msgid "Video post processing filter"
-msgstr "Alinhamento do vídeo"
+msgstr ""
 
 #: modules/video_filter/postproc.c:225
-#, fuzzy
 msgid "Lowest"
-msgstr "Mais Devagar"
+msgstr ""
 
 #: modules/video_filter/postproc.c:228
-#, fuzzy
 msgid "Highest"
-msgstr "6 (Máximo)"
+msgstr ""
 
 #: modules/video_filter/psychedelic.c:54
 msgid "Psychedelic video filter"
@@ -21811,38 +21568,32 @@ msgid "Puzzle"
 msgstr "Quebra-cabeças"
 
 #: modules/video_filter/remoteosd.c:74
-#, fuzzy
 msgid "VNC Host"
-msgstr "Computador"
+msgstr ""
 
 #: modules/video_filter/remoteosd.c:76
 msgid "VNC hostname or IP address."
 msgstr ""
 
 #: modules/video_filter/remoteosd.c:78
-#, fuzzy
 msgid "VNC Port"
-msgstr "Formato VCD"
+msgstr ""
 
 #: modules/video_filter/remoteosd.c:80
-#, fuzzy
 msgid "VNC portnumber."
-msgstr "Número do adaptador XVMC"
+msgstr ""
 
 #: modules/video_filter/remoteosd.c:82
-#, fuzzy
 msgid "VNC Password"
-msgstr "Senha"
+msgstr ""
 
 #: modules/video_filter/remoteosd.c:84
-#, fuzzy
 msgid "VNC password."
-msgstr "Senha SOCKS"
+msgstr ""
 
 #: modules/video_filter/remoteosd.c:86
-#, fuzzy
 msgid "VNC poll interval"
-msgstr "Intervalo-chave"
+msgstr ""
 
 #: modules/video_filter/remoteosd.c:88
 msgid ""
@@ -21850,18 +21601,16 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/remoteosd.c:90
-#, fuzzy
 msgid "VNC polling"
-msgstr "Reproduzindo"
+msgstr ""
 
 #: modules/video_filter/remoteosd.c:92
 msgid "Activate VNC polling. Do NOT activate for use as VDR ffnetdev client."
 msgstr ""
 
 #: modules/video_filter/remoteosd.c:94
-#, fuzzy
 msgid "Mouse events"
-msgstr "Movimentos do mouse"
+msgstr ""
 
 #: modules/video_filter/remoteosd.c:96
 msgid ""
@@ -21889,9 +21638,8 @@ msgid "Remote-OSD over VNC"
 msgstr ""
 
 #: modules/video_filter/remoteosd.c:121
-#, fuzzy
 msgid "Remote-OSD"
-msgstr "Remover"
+msgstr ""
 
 #: modules/video_filter/ripple.c:53
 msgid "Ripple video filter"
@@ -22543,64 +22291,59 @@ msgid "Video memory buffer width."
 msgstr ""
 
 #: modules/video_output/vmem.c:54
-#, fuzzy
 msgid "Video memory buffer height."
-msgstr "Altura do vídeo"
+msgstr ""
 
 #: modules/video_output/vmem.c:56
-#, fuzzy
 msgid "Pitch"
-msgstr "Caminho"
+msgstr "Variação"
 
 #: modules/video_output/vmem.c:57
 msgid "Video memory buffer pitch in bytes."
 msgstr ""
 
 #: modules/video_output/vmem.c:60
-#, fuzzy
 msgid ""
 "Output chroma for the memory image as a 4-character string, eg. \"RV32\"."
 msgstr ""
-"Formato cromático de saída para a imagem capturada (uma linha de quatro "
-"letras, como \"RV32\")."
+"Formato cromático para a imagem na memória (uma linha de quatro letras, como "
+"\"RV32\")."
 
 #: modules/video_output/vmem.c:63
-#, fuzzy
 msgid "Lock function"
-msgstr "Local :"
+msgstr "Função de bloqueio"
 
 #: modules/video_output/vmem.c:64
 msgid ""
 "Address of the locking callback function. This function must return a valid "
 "memory address for use by the video renderer."
 msgstr ""
+"Endereço da função de callback para bloqueio. Esta função deve retornar um "
+"endereço válido de memória para uso do gerador de vídeo."
 
 #: modules/video_output/vmem.c:68
-#, fuzzy
 msgid "Unlock function"
-msgstr "Sincronização por relógio"
+msgstr "Função de desbloqueio"
 
 #: modules/video_output/vmem.c:69
 msgid "Address of the unlocking callback function"
-msgstr ""
+msgstr "Endereço da função de callback para desbloqueio"
 
 #: modules/video_output/vmem.c:71
 msgid "Callback data"
-msgstr ""
+msgstr "Dados de Callback"
 
 #: modules/video_output/vmem.c:72
 msgid "Data for the locking and unlocking functions"
-msgstr ""
+msgstr "Dados para as funções de bloqueio e desbloqueio"
 
 #: modules/video_output/vmem.c:75
-#, fuzzy
 msgid "Video memory module"
-msgstr "Módulo de filtro de vídeo"
+msgstr "Módulo de memória de vídeo"
 
 #: modules/video_output/vmem.c:76
-#, fuzzy
 msgid "Video memory"
-msgstr "Codificador de vídeo"
+msgstr "Memória de vídeo"
 
 #: modules/video_output/x11/glx.c:90 modules/video_output/x11/xvideo.c:47
 msgid "XVideo adaptor number"
@@ -22935,9 +22678,8 @@ msgstr "Analizador de espectro"
 #~ msgid "A to B"
 #~ msgstr "A para B"
 
-#, fuzzy
 #~ msgid "Extended settings"
-#~ msgstr "Configurações avançadas..."
+#~ msgstr "Configurações estendidas"
 
 #~ msgid "Open a device or a VIDEO_TS directory"
 #~ msgstr "Abrir um leitor ou uma pasta VIDEO_TS"
@@ -22945,32 +22687,30 @@ msgstr "Analizador de espectro"
 #~ msgid "&Update List"
 #~ msgstr "At&ualizar Lista"
 
-#, fuzzy
 #~ msgid "Choose subtitles file"
-#~ msgstr "Usar arquivo de legendas"
+#~ msgstr "Escolher arquivo de legendas"
 
-#, fuzzy
-#~ msgid "&Equalizer"
-#~ msgstr "Equalizador"
+#~ msgid "Subtitles files (*.cdg *.idx *.srt *.sub *.utf);;All files (*)"
+#~ msgstr ""
+#~ "Arquivos de legenda (*.cdg *.idx *.srt *.sub *.utf);;Todos os arquivos (*)"
 
-#, fuzzy
-#~ msgid "Toggle &Fullscreen"
-#~ msgstr "Alternar modo tela inteira"
-
-#, fuzzy
-#~ msgid "&Title"
-#~ msgstr "Título"
-
-#, fuzzy
 #~ msgid "Undock from Interface"
-#~ msgstr "Destacar da interface"
+#~ msgstr "Destacar da Interface"
 
 #~ msgid "Ctrl+U"
 #~ msgstr "Ctrl+U"
 
-#, fuzzy
 #~ msgid "Add Interfaces"
-#~ msgstr "Adicionar Interface"
+#~ msgstr "Adicionar Interfaces"
+
+#~ msgid "&Equalizer"
+#~ msgstr "&Equalizador"
+
+#~ msgid "Toggle &Fullscreen"
+#~ msgstr "Alternar Modo &Tela Inteira"
+
+#~ msgid "&Title"
+#~ msgstr "&Título"
 
 #~ msgid "Use a sub&amp;titles file"
 #~ msgstr "Usar um arquivo de legendas"
@@ -23054,9 +22794,6 @@ msgstr "Analizador de espectro"
 
 #~ msgid "Subpicture Filters"
 #~ msgstr "Filtros de sub tela"
-
-#~ msgid "Save settings"
-#~ msgstr "Salvar configurações"
 
 #~ msgid "Enabled"
 #~ msgstr "Ativado"
