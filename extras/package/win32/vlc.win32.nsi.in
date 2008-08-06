@@ -3,6 +3,8 @@
 ; (http://nsis.sourceforge.net) ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+!include "languages\declaration.nsh"
+
 !define PRODUCT_NAME "VLC media player"
 !define VERSION @VERSION@
 !define PRODUCT_VERSION @VERSION@
@@ -41,9 +43,9 @@ SetOverwrite ifnewer
 CRCCheck on
 BrandingText "${PRODUCT_GROUP} ${PRODUCT_NAME}"
 
-InstType "Recommended"
-InstType "Minimum"
-InstType "Full"
+InstType $Name_InstTypeRecommended
+InstType $Name_InstTypeMinimum
+InstType $Name_InstTypeFull
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NSIS Modern User Interface configuration ;
@@ -74,7 +76,7 @@ InstType "Full"
     !define MUI_FINISHPAGE_RUN "$INSTDIR\vlc.exe"
     !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
     !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
-    !define MUI_FINISHPAGE_LINK "Visit the VideoLAN VLC media player Website"
+    !define MUI_FINISHPAGE_LINK $Link_VisitWebsite
     !define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
     !define MUI_FINISHPAGE_NOREBOOTSUPPORT
     !insertmacro MUI_PAGE_FINISH
@@ -135,6 +137,7 @@ NoBackup:
   ReadRegStr $0 HKCR "VLC$R0" ""
   WriteRegStr HKCR "VLC$R0" "" "VLC media file ($R0)"
   WriteRegStr HKCR "VLC$R0\shell" "" "Play"
+  WriteRegStr HKCR "VLC$R0\shell\Play" "" $ShellAssociation_Play
   WriteRegStr HKCR "VLC$R0\shell\Play\command" "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
@@ -265,10 +268,10 @@ FunctionEnd
 
 ; Generic function for adding the context menu for one ext.
 !macro AddContextMenuExt EXT
-  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC "" "Play with VLC media player"
+  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC "" $ContextMenuEntry_PlayWith
   WriteRegStr HKCR ${EXT}\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe --started-from-file --no-playlist-enqueue "%1"'
 
-  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC "" "Add to VLC media player's Playlist"
+  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC "" $ContextMenuEntry_AddToPlaylist
   WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --started-from-file --playlist-enqueue "%1"'
 !macroend
 
@@ -384,8 +387,8 @@ FunctionEnd
 ; The CORE of the    ;
 ; installer          ;
 ;;;;;;;;;;;;;;;;;;;;;;
-
-Section "Media player (required)" SEC01
+  
+Section $Name_Section01 SEC01
   SectionIn 1 2 3 RO
   SetShellVarContext all
   SetOutPath "$INSTDIR"
@@ -429,7 +432,7 @@ Section "Media player (required)" SEC01
   ; Add VLC to "recomended programs" for the following extensions
   WriteRegStr HKCR Applications\vlc.exe "" ""
   WriteRegStr HKCR Applications\vlc.exe "FriendlyAppName" "VLC media player"
-  WriteRegStr HKCR Applications\vlc.exe\shell\Play "" "Play with VLC"
+  WriteRegStr HKCR Applications\vlc.exe\shell\Play "" $ContextMenuEntry_PlayWith
   WriteRegStr HKCR Applications\vlc.exe\shell\Play\command "" \
     '$INSTDIR\vlc.exe --started-from-file "%1"'
   !insertmacro MacroAllExtensions WriteRegStrSupportedTypes
@@ -448,7 +451,7 @@ Section "Media player (required)" SEC01
   lbl_done:
 SectionEnd
 
-Section "Start Menu Shortcut" SEC02a
+Section $Name_Section02a SEC02a
   SectionIn 1 2 3
   CreateDirectory "$SMPROGRAMS\VideoLAN"
   CreateDirectory "$SMPROGRAMS\VideoLAN\Quick Settings"
@@ -488,13 +491,13 @@ Section "Start Menu Shortcut" SEC02a
     "$INSTDIR\vlc.exe" ""
 SectionEnd
 
-Section "Desktop Shortcut" SEC02b
+Section $Name_Section02b SEC02b
   SectionIn 1 2 3
   CreateShortCut "$DESKTOP\VLC media player.lnk" \
     "$INSTDIR\vlc.exe" ""
 SectionEnd
 
-Section /o "Mozilla plugin" SEC03
+Section /o $Name_Section03 SEC03
   SectionIn 3
 
   SetOutPath "$INSTDIR"
@@ -540,7 +543,7 @@ Section /o "Mozilla plugin" SEC03
 
 SectionEnd
 
-Section "ActiveX plugin" SEC04
+Section $Name_Section04 SEC04
   SectionIn 1 3
   SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
@@ -549,24 +552,24 @@ Section "ActiveX plugin" SEC04
   RegDLL "$INSTDIR\axvlc.dll"
 SectionEnd
 
-Section "Discs Playback" SEC05
+Section $Name_Section05 SEC05
   SectionIn 1 2 3
-  WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" "Play with VLC media player"
+  WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" $ContextMenuEntry_PlayWith
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
     "$INSTDIR\vlc.exe --started-from-file cdda://%1"
-  WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" "Play with VLC media player"
+  WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" $ContextMenuEntry_PlayWith
   WriteRegStr HKCR "DVD\shell\PlayWithVLC\command" "" \
     "$INSTDIR\vlc.exe --started-from-file dvd://%1"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" "VLCPlayDVDMovieOnArrival" ""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" "Play DVD movie"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" $Action_OnArrivalDVD
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "InvokeProgID" "VLC.DVDMovie"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "InvokeVerb" "play"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayCDAudioOnArrival" "VLCPlayCDAudioOnArrival" ""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Action" "Play CD audio"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Action" $Action_OnArrivalAudioCD
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeProgID" "VLC.CDAudio"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeVerb" "play"
@@ -584,68 +587,63 @@ Section "Discs Playback" SEC05
 
 SectionEnd
 
-SectionGroup "File type associations" SEC06
-  SectionGroup "Audio Files"
+SectionGroup $Name_Section06 SEC06
+  SectionGroup $Name_SectionGroupAudio
     !insertmacro MacroAudioExtensions RegisterExtensionSection
   SectionGroupEnd
-  SectionGroup "Video Files"
+  SectionGroup $Name_SectionGroupVideo
     !insertmacro MacroVideoExtensions RegisterExtensionSection
   SectionGroupEnd
-  SectionGroup "Other"
+  SectionGroup $Name_SectionGroupOther
     !insertmacro MacroOtherExtensions RegisterExtensionSection
   SectionGroupEnd
 SectionGroupEnd
 
-Section "Context Menus" SEC07
+Section $Name_Section07 SEC07
   SectionIn 3
   !insertmacro MacroAllExtensions AddContextMenu
   !insertmacro AddContextMenuExt "Directory"
 SectionEnd
 
-Section /o "Delete preferences and cache" SEC08
+Section /o $Name_Section08 SEC08
   !insertmacro delprefs
 SectionEnd
 
 ; Installer section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} \
-    "The media player itself"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02a} \
-    "Adds icons to your start menu for easy access"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02b} \
-    "Adds icon to your desktop for easy access"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} \
-    "The VLC Mozilla and Mozilla Firefox plugin"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} \
-    "The VLC ActiveX plugin"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} \
-    "DVD and CD playback registration"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} \
-    "Sets VLC media player as the default application for the specified file type"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC07} \
-    "Add context menu items ('Play With VLC' and 'Add To VLC's Playlist')"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC08} \
-    "Deletes VLC media player preferences and cache files leftover from previous installations"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} $Desc_Section01
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02a} $Desc_Section02a
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02b} $Desc_Section02b
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $Desc_Section03
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} $Desc_Section04
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} $Desc_Section05
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $Desc_Section06
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $Desc_Section07
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $Desc_Section08
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;;; Start function
 Function .onInit
+  !insertmacro MUI_LANGDLL_DISPLAY
+  
+  !include "languages\english.nsh"
+  StrCmp $LANGUAGE ${LANG_FRENCH} French EndLanguageCmp
+  French:
+  !include "languages\french.nsh"
+  EndLanguageCmp:
+
   ReadRegStr $R0  ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
   "UninstallString"
   StrCmp $R0 "" done
 
-  MessageBox MB_YESNO|MB_ICONEXCLAMATION \
-  "VLC media player has already been installed. $\nDo you want to remove \
-  the previous version before installing $(^Name) ?" \
-  IDNO done
+  MessageBox MB_YESNO|MB_ICONEXCLAMATION $Message_AlreadyInstalled IDNO done
 
   ;Run the uninstaller
   ;uninst:
     ClearErrors
     ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
   done:
-  !insertmacro MUI_LANGDLL_DISPLAY
-
+  
 FunctionEnd
 
 ;; End function
@@ -726,7 +724,7 @@ Function un.RemoveEmptyDirs
   !undef Index
 FunctionEnd
 
-Section "Uninstall" SEC91
+Section "un.$Name_Section91" SEC91
   SectionIn 1 2 3 RO
   SetShellVarContext all
 
@@ -811,16 +809,14 @@ Section "Uninstall" SEC91
   SetAutoClose true
 SectionEnd
 
-Section /o "un.Delete preferences and cache" SEC92
+Section /o "un.$Name_Section92" SEC92
   !insertmacro delprefs
 SectionEnd
 
 ; Uninstaller section descriptions
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC91} \
-    "Uninstall VLC media player and all its components"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC92} \
-    "Deletes VLC media player preferences and cache files"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC91} $Desc_Section91
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC92} $Desc_Section92
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
 
 ;Function un.onUninstSuccess
@@ -831,4 +827,11 @@ SectionEnd
 
 Function un.onInit
   !insertmacro MUI_UNGETLANGUAGE
+  
+  !include "languages\english.nsh"
+  StrCmp $LANGUAGE ${LANG_FRENCH} French EndLanguageCmp
+  French:
+  !include "languages\french.nsh"
+  EndLanguageCmp:
+  
 FunctionEnd

@@ -1,0 +1,42 @@
+Var Name_Section01
+Var Name_Section02a
+Var Name_Section02b
+Var Name_Section03
+Var Name_Section04
+Var Name_Section05
+Var Name_Section06
+Var Name_SectionGroupAudio
+Var Name_SectionGroupVideo
+Var Name_SectionGroupOther
+Var Name_Section07
+Var Name_Section08
+
+Var Desc_Section01
+Var Desc_Section02a
+Var Desc_Section02b
+Var Desc_Section03
+Var Desc_Section04
+Var Desc_Section05
+Var Desc_Section06
+Var Desc_Section07
+Var Desc_Section08
+
+Var Message_AlreadyInstalled
+
+Var Name_Section91
+Var Name_Section92
+Var Desc_Section91
+Var Desc_Section92
+
+Var ShellAssociation_Play
+Var ContextMenuEntry_PlayWith
+Var ContextMenuEntry_AddToPlaylist
+
+Var Link_VisitWebsite
+
+Var Name_InstTypeRecommended
+Var Name_InstTypeMinimum
+Var Name_InstTypeFull
+
+Var Action_OnArrivalDVD
+Var Action_OnArrivalAudioCD
