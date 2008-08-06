@@ -50,7 +50,6 @@ class SpeedControlWidget;
 class QMenu;
 class QSize;
 //class QDockWidet;
-class QProgressBar;
 
 enum{
     CONTROLS_HIDDEN = 0x0,
@@ -104,7 +103,6 @@ private:
     FullscreenControllerWidget *fullscreenControls;
     QMenu               *speedControlMenu;
     SpeedControlWidget  *speedControl;
-    QProgressBar        *pgBar;
 
     void handleMainUi( QSettings* );
     void askForPrivacy();

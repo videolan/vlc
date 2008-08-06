@@ -104,18 +104,8 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         panel->setLayout( grid );
         layout->addWidget( panel );
     }
-    else if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
-    {
-        if( p_intf->p_sys->p_mi )
-        {
-            progressBar = p_intf->p_sys->p_mi->pgBar;
-            progressBar->show();
-            i_ret = 2;
-        }
-        else
-            p_dialog->i_flags = DIALOG_USER_PROGRESS;
-    }
-    else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
+    else if( (p_dialog->i_flags & DIALOG_INTF_PROGRESS ) ||
+             ( p_dialog->i_flags & DIALOG_USER_PROGRESS ) )
     {
         dialog = new QWidget( 0 );layout = new QVBoxLayout( dialog );
         layout->setMargin( 2 );

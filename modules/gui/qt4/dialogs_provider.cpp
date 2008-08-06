@@ -580,12 +580,14 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         }
         break;
     case INTERACT_HIDE:
+        msg_Dbg( p_intf, "Hide the Interaction Dialog" );
         qdialog = (InteractionDialog*)(p_dialog->p_private);
         if( qdialog )
             qdialog->hide();
         p_dialog->i_status = HIDDEN_DIALOG;
         break;
     case INTERACT_DESTROY:
+        msg_Dbg( p_intf, "Destroy the Interaction Dialog" );
         qdialog = (InteractionDialog*)(p_dialog->p_private);
         if( !p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
             delete qdialog;
