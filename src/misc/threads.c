@@ -144,6 +144,8 @@ void vlc_pthread_fatal (const char *action, int error,
     (void)action; (void)error; (void)file; (void)line;
     abort();
 }
+
+static vlc_threadvar_t cancel_key;
 #endif
 
 /*****************************************************************************
@@ -178,6 +180,9 @@ int vlc_threads_init( void )
         vlc_threadvar_create( &thread_object_key, NULL );
 #endif
         vlc_threadvar_create( &msg_context_global_key, msg_StackDestroy );
+#ifndef LIBVLC_USE_PTHREAD
+        vlc_threadvar_create( &cancel_key, free );
+#endif
     }
     i_initializations++;
 
@@ -207,6 +212,9 @@ void vlc_threads_end( void )
     if( i_initializations == 1 )
     {
         vlc_object_release( p_root );
+#ifndef LIBVLC_USE_PTHREAD
+        vlc_threadvar_delete( &cancel_key );
+#endif
         vlc_threadvar_delete( &msg_context_global_key );
 #ifndef NDEBUG
         vlc_threadvar_delete( &thread_object_key );
@@ -838,42 +846,76 @@ void vlc_thread_cancel (vlc_object_t *obj)
         vlc_cancel (priv->thread_id);
 }
 
+typedef struct vlc_cleanup_t
+{
+    struct vlc_cleanup_t *next;
+    void                (*proc) (void *);
+    void                 *data;
+} vlc_cleanup_t;
+
+typedef struct vlc_cancel_t
+{
+    vlc_cleanup_t *cleaners;
+    bool           killable;
+    bool           killed;
+} vlc_cancel_t;
+
 void vlc_control_cancel (int cmd, ...)
 {
 #ifdef LIBVLC_USE_PTHREAD
     (void) cmd;
     abort();
 #else
-    static __thread struct vlc_cancel_t *stack = NULL;
-    static __thread bool killed = false, killable = true;
     va_list ap;
 
     va_start (ap, cmd);
+
+    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    if (nfo == NULL)
+    {
+        nfo = malloc (sizeof (*nfo));
+        if (nfo == NULL)
+            abort ();
+        nfo->cleaners = NULL;
+        nfo->killed = false;
+        nfo->killable = true;
+    }
 
     switch (cmd)
     {
         case VLC_SAVE_CANCEL:
         {
             int *p_state = va_arg (ap, int *);
-            *p_state = killable;
-            killable = false;
+            *p_state = nfo->killable;
+            nfo->killable = false;
             break;
         }
 
         case VLC_RESTORE_CANCEL:
         {
             int state = va_arg (ap, int);
-            killable = state != 0;
+            nfo->killable = state != 0;
             break;
         }
 
         case VLC_TEST_CANCEL:
-            if (killable)
-#ifdef WIN32
+            if (nfo->killable && nfo->killed)
+            {
+                for (vlc_cleanup_t *p = nfo->cleaners; p != NULL; p = p->next)
+                     p->proc (p->data);
+                free (nfo);
+#if defined (LIBVLC_USE_PTHREAD)
+                pthread_exit (PTHREAD_CANCELLED);
+#elif defined (WIN32)
                 _endthread ();
 #else
 # error Not implemented!
 #endif
+            }
+            break;
+
+        case VLC_DO_CANCEL:
+            nfo->killed = true;
             break;
     }
     va_end (ap);

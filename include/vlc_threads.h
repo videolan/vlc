@@ -186,6 +186,7 @@ enum {
     VLC_SAVE_CANCEL,
     VLC_RESTORE_CANCEL,
     VLC_TEST_CANCEL,
+    VLC_DO_CANCEL,
 };
 #endif
 
