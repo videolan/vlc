@@ -63,7 +63,7 @@ typedef struct aout_filter_sys_t
 static void DoWork   ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                        aout_buffer_t * );
 
-static void Thread   ( vlc_object_t * );
+static void* Thread   ( vlc_object_t * );
 
 static char *TitleGet( vlc_object_t * );
 
@@ -188,7 +188,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 /*****************************************************************************
  * Thread:
  *****************************************************************************/
-static void Thread( vlc_object_t *p_this )
+static void* Thread( vlc_object_t *p_this )
 {
     galaktos_thread_t *p_thread = (galaktos_thread_t*)p_this;
 
@@ -202,10 +202,7 @@ static void Thread( vlc_object_t *p_this )
     p_thread->p_opengl =
         (vout_thread_t *)vlc_object_create( p_this, VLC_OBJECT_OPENGL );
     if( p_thread->p_opengl == NULL )
-    {
-        msg_Err( p_thread, "out of memory" );
-        return;
-    }
+        return NULL;
     vlc_object_attach( p_thread->p_opengl, p_this );
 
     /* Initialize vout parameters */
@@ -231,7 +228,7 @@ static void Thread( vlc_object_t *p_this )
         msg_Err( p_thread, "unable to initialize OpenGL" );
         vlc_object_detach( p_thread->p_opengl );
         vlc_object_release( p_thread->p_opengl );
-        return;
+        return NULL;
     }
 
     p_thread->p_opengl->pf_init( p_thread->p_opengl );
@@ -269,6 +266,7 @@ static void Thread( vlc_object_t *p_this )
     module_Unneed( p_thread->p_opengl, p_thread->p_module );
     vlc_object_detach( p_thread->p_opengl );
     vlc_object_release( p_thread->p_opengl );
+    return NULL;
 }
 
 /*****************************************************************************

@@ -103,7 +103,7 @@ static void FreePicture    ( vout_thread_t *, picture_t * );
 
 static void ToggleFullScreen      ( vout_thread_t * );
 
-static void RunQtThread( event_thread_t *p_event );
+static void* RunQtThread( vlc_object_t *p_this );
 } /* extern "C" */
 
 /*****************************************************************************
@@ -588,8 +588,9 @@ static void CloseDisplay( vout_thread_t *p_vout )
 /*****************************************************************************
  * main loop of qtapplication
  *****************************************************************************/
-static void RunQtThread(event_thread_t *p_event)
+static void* RunQtThread( vlc_object_t *p_this )
 {
+    event_thread_t *p_event = (event_thread_t *)p_this;
     msg_Dbg( p_event->p_vout, "RunQtThread starting" );
 
 #ifdef NEED_QTE_MAIN
@@ -668,5 +669,6 @@ static void RunQtThread(event_thread_t *p_event)
 #endif
 
     msg_Dbg( p_event->p_vout, "RunQtThread terminating" );
+    return NULL;
 }
 

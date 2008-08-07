@@ -121,7 +121,7 @@ typedef struct aout_filter_sys_t
 static void DoWork   ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                        aout_buffer_t * );
 
-static void Thread   ( vlc_object_t * );
+static void* Thread   ( vlc_object_t * );
 
 static char *TitleGet( vlc_object_t * );
 
@@ -317,7 +317,7 @@ static int FillBuffer( int16_t *p_data, int *pi_data,
 /*****************************************************************************
  * Thread:
  *****************************************************************************/
-static void Thread( vlc_object_t *p_this )
+static void* Thread( vlc_object_t *p_this )
 {
     goom_thread_t *p_thread = (goom_thread_t*)p_this;
     vlc_value_t width, height, speed;
@@ -375,6 +375,7 @@ static void Thread( vlc_object_t *p_this )
     }
 
     goom_close( p_plugin_info );
+    return NULL;
 }
 
 /*****************************************************************************

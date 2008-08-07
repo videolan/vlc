@@ -92,8 +92,9 @@ static int DirectXConvertKey( int i_key );
  * The main goal of this thread is to isolate the Win32 PeekMessage function
  * because this one can block for a long time.
  *****************************************************************************/
-void EventThread( event_thread_t *p_event )
+void* EventThread( vlc_object_t *p_this )
 {
+    event_thread_t *p_event = (event_thread_t *)p_this;
     MSG msg;
     POINT old_mouse_pos = {0,0}, mouse_pos;
     vlc_value_t val;
@@ -375,6 +376,7 @@ void EventThread( event_thread_t *p_event )
     p_event->p_vout->p_sys->i_changes = 0;
 
     DirectXCloseWindow( p_event->p_vout );
+    return NULL;
 }
 
 
