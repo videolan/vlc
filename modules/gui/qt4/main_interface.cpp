@@ -807,7 +807,7 @@ void MainInterface::toggleMinimalView()
     if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
         i_visualmode != QT_MINIMAL_MODE )
     {
-        emit askBgWidgetToToggle();
+        if( videoWidget->isHidden() ) emit askBgWidgetToToggle();
     }
 
     TOGGLEV( menuBar() );
