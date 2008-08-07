@@ -387,7 +387,9 @@ static void *Init( vlc_object_t *obj )
 #ifdef ENABLE_NLS
     // Translation - get locale
 #   if defined (WIN32) || defined (__APPLE__)
-    QString lang = qfu( config_GetPsz( p_intf, "language" ) );
+    char* psz_tmp = config_GetPsz( p_intf, "language" );
+    QString lang = qfu( psz_tmp );
+    free( psz_tmp;
     if (lang == "auto")
         lang = QLocale::system().name();
 #   else
