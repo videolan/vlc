@@ -35,11 +35,11 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void RunControlThread ( playlist_t * );
-static void RunPreparse( playlist_preparse_t * );
-static void RunFetcher( playlist_fetcher_t * );
-static void PreparseDestructor( vlc_object_t * );
-static void FetcherDestructor( vlc_object_t * );
+static void* RunControlThread   ( vlc_object_t * );
+static void* RunPreparse        ( vlc_object_t * );
+static void* RunFetcher         ( vlc_object_t * );
+static void PreparseDestructor  ( vlc_object_t * );
+static void FetcherDestructor   ( vlc_object_t * );
 
 /*****************************************************************************
  * Main functions for the global thread
@@ -132,8 +132,9 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 /**
  * Run the main control thread itself
  */
-static void RunControlThread ( playlist_t *p_playlist )
+static void* RunControlThread ( vlc_object_t *p_this )
 {
+    playlist_t *p_playlist = (playlist_t*)p_this;
     /* Tell above that we're ready */
     vlc_thread_ready( p_playlist );
 
@@ -164,23 +165,28 @@ static void RunControlThread ( playlist_t *p_playlist )
     vlc_object_unlock( p_playlist );
 
     playlist_LastLoop( p_playlist );
+    return NULL;
 }
 
 /*****************************************************************************
  * Preparse-specific functions
  *****************************************************************************/
-static void RunPreparse ( playlist_preparse_t *p_obj )
+static void* RunPreparse ( vlc_object_t *p_this )
 {
+    playlist_preparse_t *p_obj = (playlist_preparse_t*)p_this;
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
     playlist_PreparseLoop( p_obj );
+    return NULL;
 }
 
-static void RunFetcher( playlist_fetcher_t *p_obj )
+static void* RunFetcher( vlc_object_t *p_this )
 {
+    playlist_fetcher_t *p_obj = (playlist_fetcher_t *)p_this;
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
     playlist_FetcherLoop( p_obj );
+    return NULL;
 }
 
 static void PreparseDestructor( vlc_object_t * p_this )
