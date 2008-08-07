@@ -32,7 +32,8 @@ struct pollfd;
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
-    return poll (fds, nfds, timeout);
+    (void)fds; (void)nfds; (void)timeout;
+    abort ();
 }
 #else /* !HAVE_POLL */
 #include <string.h>
