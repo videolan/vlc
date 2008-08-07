@@ -584,19 +584,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     if( module_Exists( p_intf, "dshow" ) ){
     addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
 
-    /* dshow Main */
-    int line = 0;
-    module_config_t *p_config =
-        config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
-    vdevDshowW = new StringListConfigControl(
-        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
-    line++;
-
-    p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
-    adevDshowW = new StringListConfigControl(
-        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
-    line++;
-
+    devLayout = dshowDevLayout;
     /* dshow Properties */
     QLabel *dshowVSizeLabel = new QLabel( qtr( "Video size" ) );
     dshowPropLayout->addWidget( dshowVSizeLabel, 0, 0 );
@@ -1073,6 +1061,20 @@ void CaptureOpenPanel::updateButtons()
             bdaBandBox->show();
             bdaBandLabel->show();
         }
+        break;
+    case DSHOW_DEVICE:
+        /* dshow Main */
+        int line = 0;
+        module_config_t *p_config =
+            config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
+        vdevDshowW = new StringListConfigControl(
+                VLC_OBJECT(p_intf), p_config, this, false, devLayout, line );
+        line++;
+
+        p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
+        adevDshowW = new StringListConfigControl(
+                VLC_OBJECT(p_intf), p_config, this, false, devLayout, line );
+        line++;
         break;
 #else
     case DVB_DEVICE:

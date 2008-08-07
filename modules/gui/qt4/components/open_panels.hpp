@@ -187,6 +187,7 @@ private:
     QComboBox *bdaBandBox;
     StringListConfigControl *vdevDshowW, *adevDshowW;
     QLineEdit *dshowVSizeLine;
+    QGridLayout * devLayout;
 #else
     QRadioButton *dvbs, *dvbt, *dvbc;
     QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr;
