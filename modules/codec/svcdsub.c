@@ -148,6 +148,9 @@ static int DecoderOpen( vlc_object_t *p_this )
     }
 
     p_dec->p_sys = p_sys = calloc( 1, sizeof( decoder_sys_t ) );
+    if( p_sys == NULL )
+        return VLC_ENOMEM;
+
     p_sys->i_debug       = config_GetInt( p_this, MODULE_STRING "-debug" );
 
     p_sys->i_image       = -1;
