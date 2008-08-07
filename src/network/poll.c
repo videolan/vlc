@@ -38,7 +38,6 @@ int poll (struct pollfd *fds, unsigned nfds, int timeout)
     struct timeval tv = { 0, 0 };
     int val = -1;
 
-
     FD_ZERO (&rdset);
     FD_ZERO (&wrset);
     FD_ZERO (&exset);
@@ -48,8 +47,26 @@ int poll (struct pollfd *fds, unsigned nfds, int timeout)
         if (val < fd)
             val = fd;
 
-        /* I assume the OS has a solution select overflow if it does not have
-         * poll(). If it did not, we are screwed anyway. */
+        /* With POSIX, FD_SET & FD_ISSET are not defined if fd is negative or
+	 * bigger or equal than FD_SETSIZE. That is one of the reasons why VLC
+	 * uses poll() rather than select(). Most POSIX systems implement
+	 * fd_set has a bit field with no sanity checks. This is especially bad
+	 * on systems (such as BSD) that have no process open files limit by
+	 * default, such that it is quite feasible to get fd >= FD_SETSIZE.
+	 * The next instructions will result in a buffer overflow if run on
+	 * a POSIX system, and the later FD_ISSET will do undefined memory
+	 * access.
+	 *
+	 * With Winsock, fd_set is a table of integers. This is awfully slow.
+	 * However, FD_SET and FD_ISSET silently and safely discard
+	 * overflows. If it happens we will loose socket events. Note that
+	 * most (if not all) Winsock SOCKET handles are actually bigger than
+	 * FD_SETSIZE in terms of absolute value - they are not POSIX file
+	 * descriptors. From Vista, there is a much nicer WSAPoll(), but Mingw
+	 * is yet to support it.
+	 *
+	 * With BeOS, the situation is unknown (FIXME: document).
+	 */
         if (fds[i].events & POLLIN)
             FD_SET (fd, &rdset);
         if (fds[i].events & POLLOUT)
