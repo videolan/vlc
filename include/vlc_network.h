@@ -181,7 +181,8 @@ struct pollfd
     int revents;
 };
 
-  VLC_EXPORT (int, poll, (struct pollfd *fds, unsigned nfds, int timeout));
+VLC_EXPORT (int, vlc_poll, (struct pollfd *fds, unsigned nfds, int timeout));
+# define poll(a, b, c) vlc_poll(a, b, c)
 #endif
 
 #ifdef WIN32

@@ -27,12 +27,19 @@
 
 #include <vlc_common.h>
 
-#ifndef HAVE_POLL
+#ifdef HAVE_POLL
+struct pollfd;
+
+int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
+{
+    return poll (fds, nfds, timeout);
+}
+#else /* !HAVE_POLL */
 #include <string.h>
 #include <stdlib.h>
 #include <vlc_network.h>
 
-int poll (struct pollfd *fds, unsigned nfds, int timeout)
+int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
     fd_set rdset, wrset, exset;
     struct timeval tv = { 0, 0 };
