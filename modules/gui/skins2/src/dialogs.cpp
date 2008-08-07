@@ -237,7 +237,7 @@ void Dialogs::showPlaylistLoad()
 
 void Dialogs::showPlaylistSave()
 {
-    showFileGeneric( _("Save playlist"), _("M3U file|*.m3u|XSPF playlist|*.xspf"),
+    showFileGeneric( _("Save playlist"), _("XSPF playlist|*.xspf|M3U file|*.m3u"),
                      showPlaylistSaveCB, kSAVE );
 }
 
