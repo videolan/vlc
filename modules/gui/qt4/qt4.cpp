@@ -389,7 +389,7 @@ static void *Init( vlc_object_t *obj )
 #   if defined (WIN32) || defined (__APPLE__)
     char* psz_tmp = config_GetPsz( p_intf, "language" );
     QString lang = qfu( psz_tmp );
-    free( psz_tmp;
+    free( psz_tmp);
     if (lang == "auto")
         lang = QLocale::system().name();
 #   else
