@@ -427,6 +427,8 @@ void date_Init( date_t *p_date, uint32_t i_divider_n, uint32_t i_divider_d )
 
 void date_Change( date_t *p_date, uint32_t i_divider_n, uint32_t i_divider_d )
 {
+    /* change time scale of remainder */
+    p_date->i_remainder = p_date->i_remainder * i_divider_n / p_date->i_divider_num;
     p_date->i_divider_num = i_divider_n;
     p_date->i_divider_den = i_divider_d;
 }
@@ -475,14 +477,15 @@ void date_Move( date_t *p_date, mtime_t i_difference )
  */
 mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
 {
-    mtime_t i_dividend = (mtime_t)i_nb_samples * 1000000;
-    p_date->date += i_dividend / p_date->i_divider_num * p_date->i_divider_den;
+    mtime_t i_dividend = (mtime_t)i_nb_samples * 1000000 * p_date->i_divider_den;
+    p_date->date += i_dividend / p_date->i_divider_num;
     p_date->i_remainder += (int)(i_dividend % p_date->i_divider_num);
 
     if( p_date->i_remainder >= p_date->i_divider_num )
     {
         /* This is Bresenham algorithm. */
-        p_date->date += p_date->i_divider_den;
+        /* It is guaranteed that: assert(i_remainder < 2*i_divider_num) */
+        p_date->date += 1;
         p_date->i_remainder -= p_date->i_divider_num;
     }
 
