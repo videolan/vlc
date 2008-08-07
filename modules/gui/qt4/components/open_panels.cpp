@@ -1074,7 +1074,7 @@ void CaptureOpenPanel::updateButtons()
                    VLC_OBJECT(p_intf), p_config, this, false, devLayout, line );
             line++;
         }
-        bvreak;
+        break;
 #else
     case DVB_DEVICE:
         if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
