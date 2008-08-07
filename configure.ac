@@ -810,10 +810,8 @@ AC_CHECK_TYPE(ssize_t,, [
   AC_DEFINE(ssize_t, int)
 ])
 
-dnl don't attemp to use poll on darwin, it can't poll a tty. select will do a better job.
-if test "${SYS}" != "darwin"; then
-  AC_SEARCH_LIBS(poll, [poll], [AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS is usabl... err, has poll().])])
-fi
+dnl Check for poll
+AC_SEARCH_LIBS(poll, [poll], [AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS is usabl... err, has poll().])])
 
 dnl Check for dirent
 need_dirent=false
