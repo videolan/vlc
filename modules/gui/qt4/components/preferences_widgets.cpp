@@ -97,6 +97,9 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     case CONFIG_ITEM_MODULE_LIST_CAT:
         p_control = new ModuleListConfigControl( p_this, p_item, parent, true,
                                              l, line );
+        /* Special Hack for a bug in video-filter */
+        if( qobject_cast<ModuleListConfigControl *>( p_control )->groupBox == NULL )
+            return NULL;
         break;
     case CONFIG_ITEM_STRING:
         if( !p_item->i_list )
@@ -607,6 +610,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
     VStringConfigControl( _p_this, _p_item, _parent )
 {
     groupBox = NULL;
+    /* Special Hack */
     if( !p_item->psz_text ) return;
 
     groupBox = new QGroupBox ( qtr(p_item->psz_text) );
@@ -701,13 +705,14 @@ void ModuleListConfigControl::finish( bool bycat )
     }
     vlc_list_release( p_list );
     text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    if( groupBox )
-        groupBox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    assert( groupBox );
+    groupBox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 #undef CHECKBOX_LISTS
 
 QString ModuleListConfigControl::getValue()
 {
+    assert( text );
     return text->text();
 }
 

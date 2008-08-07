@@ -356,6 +356,7 @@ struct checkBoxListItem {
 class ModuleListConfigControl : public VStringConfigControl
 {
     Q_OBJECT;
+    friend class ConfigControl;
 public:
     ModuleListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                              bool, QGridLayout*, int& );
