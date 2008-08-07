@@ -48,7 +48,7 @@
 static decoder_t * CreateDecoder( input_thread_t *, es_format_t *, int );
 static void        DeleteDecoder( decoder_t * );
 
-static int         DecoderThread( decoder_t * );
+static void*        DecoderThread( vlc_object_t * );
 static int         DecoderDecode( decoder_t * p_dec, block_t *p_block );
 
 /* Buffers allocation callbacks for the decoders */
@@ -576,8 +576,9 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
  * \param p_dec the decoder
  * \return 0
  */
-static int DecoderThread( decoder_t * p_dec )
+static void* DecoderThread( vlc_object_t *p_this )
 {
+    decoder_t * p_dec = (decoder_t *)p_this;
     block_t *p_block;
 
     /* The decoder's main loop */

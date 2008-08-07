@@ -79,7 +79,7 @@ extern "C"
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void AppThread( vlc_object_t *p_appthread );
+static void* AppThread( vlc_object_t *p_appthread );
 
 /*****************************************************************************
  * system_Init: create a BApplication object and fill in program path.
@@ -120,7 +120,7 @@ void system_End( libvlc_int_t *p_this )
 /*****************************************************************************
  * AppThread: the BApplication thread.
  *****************************************************************************/
-static void AppThread( vlc_object_t * p_this )
+static void* AppThread( vlc_object_t * p_this )
 {
     VlcApplication * BeApp =
         new VlcApplication("application/x-vnd.videolan-vlc");
@@ -129,6 +129,7 @@ static void AppThread( vlc_object_t * p_this )
     BeApp->Run();
     vlc_object_detach( p_this );
     delete BeApp;
+    return NULL;
 }
 
 } /* extern "C" */

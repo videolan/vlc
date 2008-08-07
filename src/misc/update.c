@@ -1352,7 +1352,7 @@ error:
     return false;
 }
 
-static void update_CheckReal( update_check_thread_t *p_uct );
+static void* update_CheckReal( vlc_object_t *p_this );
 
 /**
  * Check for updates
@@ -1380,8 +1380,9 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ), void 
                        VLC_THREAD_PRIORITY_LOW, false );
 }
 
-void update_CheckReal( update_check_thread_t *p_uct )
+void* update_CheckReal( vlc_object_t* p_this )
 {
+    update_check_thread_t *p_uct = (update_check_thread_t *)p_this;
     bool b_ret;
     vlc_mutex_lock( &p_uct->p_update->lock );
 
@@ -1395,6 +1396,7 @@ void update_CheckReal( update_check_thread_t *p_uct )
     p_uct->p_update->p_check = NULL;
 
     vlc_object_release( p_uct );
+    return NULL;
 }
 
 /**
@@ -1453,7 +1455,7 @@ static char *size_str( long int l_size )
     return i_retval == -1 ? NULL : psz_tmp;
 }
 
-static void update_DownloadReal( update_download_thread_t *p_udt );
+static void* update_DownloadReal( vlc_object_t *p_this );
 
 /**
  * Download the file given in the update_t
@@ -1480,8 +1482,9 @@ void update_Download( update_t *p_update, const char *psz_destdir )
                        VLC_THREAD_PRIORITY_LOW, false );
 }
 
-static void update_DownloadReal( update_download_thread_t *p_udt )
+static void* update_DownloadReal( vlc_object_t *p_this )
 {
+    update_download_thread_t *p_udt = (update_download_thread_t *)p_this;
     int i_progress = 0;
     long int l_size;
     long int l_downloaded = 0;
@@ -1682,6 +1685,7 @@ end:
     p_udt->p_update->p_download = NULL;
 
     vlc_object_release( p_udt );
+    return NULL;
 }
 
 update_release_t *update_GetRelease( update_t *p_update )

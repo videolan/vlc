@@ -960,7 +960,7 @@ void httpd_StreamDelete( httpd_stream_t *stream )
 /*****************************************************************************
  * Low level
  *****************************************************************************/
-static void httpd_HostThread( httpd_host_t * );
+static void* httpd_HostThread( vlc_object_t * );
 
 /* create a new host */
 httpd_host_t *httpd_HostNew( vlc_object_t *p_this, const char *psz_host,
@@ -2019,8 +2019,9 @@ static void httpd_ClientTlsHsOut( httpd_client_t *cl )
     }
 }
 
-static void httpd_HostThread( httpd_host_t *host )
+static void* httpd_HostThread( vlc_object_t *p_this )
 {
+    httpd_host_t *host = (httpd_host_t *)p_this;
     tls_session_t *p_tls = NULL;
     counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
@@ -2567,6 +2568,7 @@ retry:
         stats_CounterClean( p_total_counter );
     if( p_active_counter )
         stats_CounterClean( p_active_counter );
+    return NULL;
 }
 
 #else /* ENABLE_HTTPD */

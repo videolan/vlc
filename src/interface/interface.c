@@ -49,7 +49,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void RunInterface( intf_thread_t *p_intf );
+static void* RunInterface( vlc_object_t *p_this );
 #ifdef __APPLE__
 static void MonitorLibVLCDeath( intf_thread_t *p_intf );
 #endif
@@ -193,8 +193,9 @@ void intf_StopThread( intf_thread_t *p_intf )
 /*****************************************************************************
  * RunInterface: setups necessary data and give control to the interface
  *****************************************************************************/
-static void RunInterface( intf_thread_t *p_intf )
+static void* RunInterface( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
     vlc_value_t val, text;
     char *psz_intf;
 
@@ -257,6 +258,7 @@ static void RunInterface( intf_thread_t *p_intf )
         p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
     }
     while( p_intf->p_module );
+    return NULL;
 }
 
 #ifdef __APPLE__

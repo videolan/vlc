@@ -309,7 +309,7 @@ typedef struct
 static int DStreamRead   ( stream_t *, void *p_read, int i_read );
 static int DStreamPeek   ( stream_t *, const uint8_t **pp_peek, int i_peek );
 static int DStreamControl( stream_t *, int i_query, va_list );
-static int DStreamThread ( stream_t * );
+static void* DStreamThread ( vlc_object_t * );
 
 
 stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
@@ -534,8 +534,9 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
     }
 }
 
-static int DStreamThread( stream_t *s )
+static void* DStreamThread( vlc_object_t* p_this )
 {
+    stream_t *s = (stream_t *)p_this;
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
     demux_t *p_demux;
 
@@ -543,7 +544,7 @@ static int DStreamThread( stream_t *s )
     if( !(p_demux = demux_New( s, "", p_sys->psz_name, "", s, p_sys->out,
                                false )) )
     {
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     p_sys->p_demux = p_demux;
@@ -555,7 +556,7 @@ static int DStreamThread( stream_t *s )
     }
 
     vlc_object_kill( p_demux );
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 /****************************************************************************

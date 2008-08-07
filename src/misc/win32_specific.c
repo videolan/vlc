@@ -120,7 +120,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-static void IPCHelperThread( vlc_object_t * );
+static void* IPCHelperThread( vlc_object_t * );
 LRESULT CALLBACK WMCOPYWNDPROC( HWND, UINT, WPARAM, LPARAM );
 typedef struct
 {
@@ -262,7 +262,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
 #endif
 }
 
-static void IPCHelperThread( vlc_object_t *p_this )
+static void* IPCHelperThread( vlc_object_t *p_this )
 {
     HWND ipcwindow;
     MSG message;
@@ -291,6 +291,7 @@ static void IPCHelperThread( vlc_object_t *p_this )
         TranslateMessage( &message );
         DispatchMessage( &message );
     }
+    return NULL;
 }
 
 LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,

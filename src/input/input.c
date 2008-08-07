@@ -53,8 +53,8 @@
  *****************************************************************************/
 static void Destructor( input_thread_t * p_input );
 
-static  int Run  ( input_thread_t *p_input );
-static  int RunAndDestroy  ( input_thread_t *p_input );
+static  void* Run            ( vlc_object_t *p_this );
+static  void* RunAndDestroy  ( vlc_object_t *p_this );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
                                   const char *, bool, sout_instance_t * );
@@ -396,7 +396,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
 
     if( b_block )
     {
-        RunAndDestroy( p_input );
+        RunAndDestroy( VLC_OBJECT(p_input) );
         return VLC_SUCCESS;
     }
     else
@@ -484,8 +484,9 @@ sout_instance_t * input_DetachSout( input_thread_t *p_input )
  * This is the "normal" thread that spawns the input processing chain,
  * reads the stream, cleans up and waits
  *****************************************************************************/
-static int Run( input_thread_t *p_input )
+static void* Run( vlc_object_t *p_this )
 {
+    input_thread_t *p_input = (input_thread_t *)p_this;
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
 
@@ -499,7 +500,7 @@ static int Run( input_thread_t *p_input )
         /* Tell we're dead */
         p_input->b_dead = true;
 
-        return 0;
+        return NULL;
     }
 
     MainLoop( p_input );
@@ -531,7 +532,7 @@ static int Run( input_thread_t *p_input )
     /* Clean up */
     End( p_input );
 
-    return 0;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -539,8 +540,9 @@ static int Run( input_thread_t *p_input )
  * This is the "just forget me" thread that spawns the input processing chain,
  * reads the stream, cleans up and releases memory
  *****************************************************************************/
-static int RunAndDestroy( input_thread_t *p_input )
+static void* RunAndDestroy( vlc_object_t *p_this )
 {
+    input_thread_t *p_input = (input_thread_t *)p_this;
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
 

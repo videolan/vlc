@@ -62,7 +62,7 @@
  *****************************************************************************/
 
 static void vlm_Destructor( vlm_t *p_vlm );
-static int Manage( vlc_object_t * );
+static void* Manage( vlc_object_t * );
 static int vlm_MediaVodControl( void *, vod_media_t *, const char *, int, va_list );
 
 /*****************************************************************************
@@ -302,7 +302,7 @@ static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
 /*****************************************************************************
  * Manage:
  *****************************************************************************/
-static int Manage( vlc_object_t* p_object )
+static void* Manage( vlc_object_t* p_object )
 {
     vlm_t *vlm = (vlm_t*)p_object;
     int i, j;
@@ -412,7 +412,7 @@ static int Manage( vlc_object_t* p_object )
         msleep( 100000 );
     }
 
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 /* New API

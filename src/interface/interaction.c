@@ -48,7 +48,7 @@
  *****************************************************************************/
 static interaction_t *          InteractionGet( vlc_object_t * );
 static void                     InteractionSearchInterface( interaction_t * );
-static void                     InteractionLoop( vlc_object_t * );
+static void*                    InteractionLoop( vlc_object_t * );
 static void                     InteractionManage( interaction_t * );
 
 static interaction_dialog_t    *DialogGetById( interaction_t* , int );
@@ -548,7 +548,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
     }
 }
 
-static void InteractionLoop( vlc_object_t *p_this )
+static void* InteractionLoop( vlc_object_t *p_this )
 {
     int i;
     interaction_t *p_interaction = (interaction_t*) p_this;
@@ -568,6 +568,7 @@ static void InteractionLoop( vlc_object_t *p_this )
         DialogDestroy( p_dialog );
         REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs, i );
     }
+    return NULL;
 }
 
 /**

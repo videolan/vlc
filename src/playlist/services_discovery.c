@@ -31,7 +31,7 @@
 #include "playlist_internal.h"
 #include "../libvlc.h"
 
-static void RunSD( services_discovery_t *p_sd );
+static void* RunSD( vlc_object_t *p_this );
 
 /*
  * Services discovery
@@ -202,8 +202,9 @@ services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_it
 /***********************************************************************
  * RunSD (Private)
  ***********************************************************************/
-static void RunSD( services_discovery_t *p_sd )
+static void* RunSD( vlc_object_t *p_this )
 {
+    services_discovery_t *p_sd = (services_discovery_t *)p_this;
     vlc_event_t event;
 
     event.type = vlc_ServicesDiscoveryStarted;
@@ -213,7 +214,7 @@ static void RunSD( services_discovery_t *p_sd )
 
     event.type = vlc_ServicesDiscoveryEnded;
     vlc_event_send( &p_sd->event_manager, &event );
-    return;
+    return NULL;
 }
 
 /*
