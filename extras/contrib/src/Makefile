@@ -1067,7 +1067,7 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 ifdef SVN
 ffmpeg:
-	$(SVN) co $(FFMPEG_SVN) ffmpeg -r 14080
+	$(SVN) co $(FFMPEG_SVN) ffmpeg -r 14661
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-beos.patch)
 endif
@@ -1084,7 +1084,7 @@ ifdef HAVE_DARWIN_OS
 	(cd $@/libswscale; patch -p0 < ../../Patches/ffmpeg-fix-noaltivec.patch)
 endif
 ifdef NO_TEXT_RELOCATION
-	(cd $@; patch -p1 < ../Patches/ffmpeg-svn-mmx_removal-darwin9.patch)
+	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-mmx_removal-darwin9.patch)
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
@@ -2454,10 +2454,9 @@ endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
 	touch $@
 
-CLEAN_FILE += .schroedinger
-CLEAN_PKG += schroedinger
-DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
-
+CLEAN_FILE += .libass
+CLEAN_PKG += libass
+DISTCLEAN_PKG += libass-$(ASS_VERSION).tar.bz2
 
 # ***************************************************************************
 # Some cleaning
