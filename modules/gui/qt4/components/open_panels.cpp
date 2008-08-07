@@ -1057,6 +1057,7 @@ void CaptureOpenPanel::updateButtons()
             bdaBandBox->show();
             bdaBandLabel->show();
         }
+        setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
         break;
     case DSHOW_DEVICE:
         {
@@ -1078,7 +1079,6 @@ void CaptureOpenPanel::updateButtons()
     case DVB_DEVICE:
         if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
         if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
-        setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
         break;
     case PVR_DEVICE:
         setfillVLCConfigCombo( "pvr-norm", p_intf, pvrNormBox );
