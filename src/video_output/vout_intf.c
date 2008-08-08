@@ -484,9 +484,30 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         /* Save the snapshot to a memory zone */
         fmt_in = p_vout->fmt_in;
         fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
+        fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
+
         fmt_out.i_width = var_GetInteger( p_vout, "snapshot-width" );
         fmt_out.i_height = var_GetInteger( p_vout, "snapshot-height" );
-        fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
+        /* If snapshot-width and/or snapshot height were not specified,
+           use a default snapshot width of 320 */
+	if( fmt_out.i_width == 0 && fmt_out.i_height == 0 )
+        {
+            fmt_out.i_width = 320;
+        }
+
+	if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
+        {
+	    fmt_out.i_width = (fmt_in.i_width * fmt_out.i_height) / fmt_in.i_height;
+        }
+	else if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
+        {
+	    fmt_out.i_height = (fmt_in.i_height * fmt_out.i_width) / fmt_in.i_width;
+        }
+	else
+        {
+            fmt_out.i_width = fmt_in.i_width;
+            fmt_out.i_height = fmt_in.i_height;
+        }
 
         p_block = ( block_t* ) image_Write( p_image, p_pic, &fmt_in, &fmt_out );
         if( !p_block )
