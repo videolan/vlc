@@ -84,13 +84,13 @@ void libvlc_exception_raise( libvlc_exception_t *p_exception,
 
     /* Does caller care about exceptions ? */
     if( p_exception == NULL ) {
-        /* Print something, so lazy third-parties can easily
-         * notice that something may have gone unoticedly wrong */
+        /* Print something, so that lazy third-parties can easily
+         * notice that something may have gone unnoticedly wrong */
         libvlc_exception_not_handled( psz );
         return;
     }
 
-    /* Make sure that there is no unoticed previous exception */
+    /* Make sure that there is no unnoticed previous exception */
     if( p_exception->b_raised )
     {
         libvlc_exception_not_handled( p_exception->psz_message );
