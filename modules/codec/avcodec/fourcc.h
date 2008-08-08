@@ -803,6 +803,12 @@ static const struct
     /* DV Audio */
     { VLC_FOURCC('d','v','a','u'), CODEC_ID_DVAUDIO,
       AUDIO_ES, "DV Audio" },
+    { VLC_FOURCC('v','d','v','a'), CODEC_ID_DVAUDIO,
+      AUDIO_ES, "DV Audio" },
+    { VLC_FOURCC('d','v','c','a'), CODEC_ID_DVAUDIO,
+      AUDIO_ES, "DV Audio" },
+    { VLC_FOURCC('R','A','D','V'), CODEC_ID_DVAUDIO,
+      AUDIO_ES, "DV Audio" },
 
     /* MACE-3 Audio */
     { VLC_FOURCC('M','A','C','3'), CODEC_ID_MACE3,
