@@ -206,7 +206,10 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
                     return NULL;
                 }
                 memset( psz_template, 0, s.st_size + 1 );
-                fread( psz_template, s.st_size, 1, file );
+                if(! fread( psz_template, s.st_size, 1, file ) )
+                {
+                    msg_Dbg( p_this, "No data read from template." );
+                }
             }
             fclose( file );
         }
