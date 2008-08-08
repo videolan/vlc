@@ -2442,10 +2442,10 @@ DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
 libass-$(ASS_VERSION).tar.bz2:
 	$(WGET) $(ASS_URL)
 
+# mplayer patches up to August 8, 2008 are included
 libass: libass-$(ASS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/libass_mplayer_updates.patch
-	cd $@; patch -p0 < ../Patches/libass-h-char-fix.patch
 ifneq ($(HOST),$(BUILD))
 	patch -p0 < Patches/libass-cross.patch
 	cd $@; autoconf
