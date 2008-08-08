@@ -698,15 +698,12 @@ static ass_handle_t *AssHandleYield( decoder_t *p_dec )
     }
     free( pp_attachments );
 
-#ifdef __APPLE__
-    char * psz_font_dir;
-    if( asprintf( &psz_font_dir, "%s/Library/Fonts", config_GetHomeDir() ) != -1 ) {
-        ass_set_fonts_dir( p_library, psz_font_dir );
-        free( psz_font_dir );
-    }
-#else
-    ass_set_fonts_dir( p_library, "/usr/share/fonts" ); // FIXME
-#endif
+    char *psz_font_dir = config_GetCacheDir();
+    if( !psz_font_dir )
+        goto error;
+    ass_set_fonts_dir( p_library, psz_font_dir );
+    free( psz_font_dir );
+
     ass_set_extract_fonts( p_library, true );
     ass_set_style_overrides( p_library, NULL );
 
