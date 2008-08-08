@@ -262,15 +262,44 @@ VLC_PUBLIC_API void libvlc_media_add_option(
                                    const char * ppsz_options,
                                    libvlc_exception_t * p_e );
 
+/**
+ * Retain a reference to a media descriptor object (libvlc_media_t). Use
+ * libvlc_media_release() to decrement the reference count of a 
+ * media descriptor object.
+ *
+ * \param p_meta_desc a media descriptor object.
+ */
 VLC_PUBLIC_API void libvlc_media_retain(
                                    libvlc_media_t *p_meta_desc );
 
+/**
+ * Decrement the reference count of a media descriptor object. If the
+ * reference count is 0, then libvlc_media_release() will release the
+ * media descriptor object. It will send out an libvlc_MediaFreed event
+ * to all listeners. If the media descriptor object has been released it
+ * should not be used again.
+ *
+ * \param p_meta_desc a media descriptor object.
+ */
 VLC_PUBLIC_API void libvlc_media_release(
                                    libvlc_media_t *p_meta_desc );
 
+
+/**
+ * Get the media resource locator (mrl) from a media descriptor object
+ *
+ * \param p_md a media descriptor object
+ * \param p_e an initialized exception object
+ * \return string with mrl of media descriptor object
+ */
 VLC_PUBLIC_API char * libvlc_media_get_mrl( libvlc_media_t * p_md,
                                                        libvlc_exception_t * p_e );
 
+/**
+ * Duplicate a media descriptor object.
+ *
+ * \param p_meta_desc a media descriptor object.
+ */
 VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t * );
 
 /**
@@ -285,31 +314,90 @@ VLC_PUBLIC_API char * libvlc_media_get_meta(
                                    libvlc_media_t *p_meta_desc,
                                    libvlc_meta_t e_meta,
                                    libvlc_exception_t *p_e );
-
+/**
+ * Get current state of media descriptor object. Possible media states
+ * are defined in libvlc_structures.c ( libvlc_NothingSpecial=0,
+ * libvlc_Opening, libvlc_Buffering, libvlc_Playing, libvlc_Paused,
+ * libvlc_Stopped, libvlc_Forward, libvlc_Backward, libvlc_Ended,
+ * libvlc_Error).
+ *
+ * @see libvlc_state_t
+ * \param p_meta_desc a media descriptor object
+ * \param p_e an initialized exception object
+ * \return state of media descriptor object
+ */
 VLC_PUBLIC_API libvlc_state_t libvlc_media_get_state(
                                    libvlc_media_t *p_meta_desc,
                                    libvlc_exception_t *p_e );
 
+/**
+ * Get subitems of media descriptor object. This will increment
+ * the reference count of supplied media descriptor object. Use
+ * libvlc_media_list_release() to decrement the reference counting.
+ *
+ * \param p_md media descriptor object
+ * \param p_e initalized exception object
+ * \return list of media descriptor subitems or NULL
+ */
 VLC_PUBLIC_API libvlc_media_list_t *
     libvlc_media_subitems( libvlc_media_t *p_md,
                                       libvlc_exception_t *p_e );
-
+/**
+ * Get event manager from media descriptor object.
+ * NOTE: this function doesn't increment reference counting.
+ *
+ * \param p_md a media descriptor object
+ * \param p_e an initialized exception object
+ * \return event manager object
+ */
 VLC_PUBLIC_API libvlc_event_manager_t *
     libvlc_media_event_manager( libvlc_media_t * p_md,
                                            libvlc_exception_t * p_e );
 
+/**
+ * Get duration of media descriptor object item.
+ *
+ * \param p_md media descriptor object
+ * \param p_e an initialized exception object
+ * \return duration of media item
+ */
 VLC_PUBLIC_API libvlc_time_t
    libvlc_media_get_duration( libvlc_media_t * p_md,
                                          libvlc_exception_t * p_e );
 
+/**
+ * Get preparsed status for media descriptor object.
+ *
+ * \param p_md media descriptor object
+ * \param p_e an initialized exception object
+ * \return true if media object has been preparsed otherwise it returns false
+ */
 VLC_PUBLIC_API int
    libvlc_media_is_preparsed( libvlc_media_t * p_md,
                                          libvlc_exception_t * p_e );
 
+/**
+ * Sets media descriptor's user_data. user_data is specialized data 
+ * accessed by the host application, VLC.framework uses it as a pointer to 
+ * an native object that references a libvlc_media_t pointer
+ *
+ * \param p_md media descriptor object
+ * \param p_new_user_data pointer to user data
+ * \param p_e an initialized exception object
+ */
 VLC_PUBLIC_API void
     libvlc_media_set_user_data( libvlc_media_t * p_md,
                                            void * p_new_user_data,
                                            libvlc_exception_t * p_e);
+
+/**
+ * Get media descriptor's user_data. user_data is specialized data 
+ * accessed by the host application, VLC.framework uses it as a pointer to 
+ * an native object that references a libvlc_media_t pointer
+ *
+ * \param p_md media descriptor object
+ * \param p_e an initialized exception object
+ */
 VLC_PUBLIC_API void *
     libvlc_media_get_user_data( libvlc_media_t * p_md,
                                            libvlc_exception_t * p_e);
@@ -346,13 +434,25 @@ VLC_PUBLIC_API libvlc_media_player_t * libvlc_media_player_new_from_media( libvl
 
 /**
  * Release a media_player after use
+ * Decrement the reference count of a media player object. If the
+ * reference count is 0, then libvlc_media_player_release() will 
+ * release the media player object. If the media player object 
+ * has been released, then it should not be used again.
  *
  * \param p_mi the Media Player to free
  */
 VLC_PUBLIC_API void libvlc_media_player_release( libvlc_media_player_t * );
+
+/**
+ * Retain a reference to a media player object. Use
+ * libvlc_media_player_release() to decrement reference count.
+ *
+ * \param p_mi media player object
+ */
 VLC_PUBLIC_API void libvlc_media_player_retain( libvlc_media_player_t * );
 
-/** Set the media that will be used by the media_player. If any,
+/** 
+ * Set the media that will be used by the media_player. If any,
  * previous md will be released.
  *
  * \param p_mi the Media Player
@@ -440,6 +540,7 @@ VLC_PUBLIC_API float          libvlc_media_player_get_rate       ( libvlc_media_
 VLC_PUBLIC_API void           libvlc_media_player_set_rate       ( libvlc_media_player_t *, float, libvlc_exception_t *);
 VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state   ( libvlc_media_player_t *, libvlc_exception_t *);
 VLC_PUBLIC_API float          libvlc_media_player_get_fps( libvlc_media_player_t *, libvlc_exception_t *);
+/** end bug */
 
 /**
  * Does this media player have a video output?
@@ -837,20 +938,54 @@ VLC_PUBLIC_API const char * libvlc_event_type_name( libvlc_event_type_t event_ty
 VLC_PUBLIC_API libvlc_media_library_t *
     libvlc_media_library_new( libvlc_instance_t * p_inst,
                               libvlc_exception_t * p_e );
+
+/**
+ * Release media library object. This functions decrements the
+ * reference count of the media library object. If it reaches 0,
+ * then the object will be released.
+ *
+ * \param p_mlib media library object
+ */
 VLC_PUBLIC_API void
     libvlc_media_library_release( libvlc_media_library_t * p_mlib );
+
+/**
+ * Retain a reference to a media library object. This function will
+ * increment the reference counting for this object. Use 
+ * libvlc_media_library_release() to decrement the reference count.
+ *
+ * \param p_mlib media library object
+ */
 VLC_PUBLIC_API void
     libvlc_media_library_retain( libvlc_media_library_t * p_mlib );
 
-
+/**
+ * Load media library.
+ *
+ * \param p_mlib media library object
+ * \param p_e an initialized exception object.
+ */
 VLC_PUBLIC_API void
     libvlc_media_library_load( libvlc_media_library_t * p_mlib,
                                libvlc_exception_t * p_e );
 
+/**
+ * Save media library.
+ *
+ * \param p_mlib media library object
+ * \param p_e an initialized exception object.
+ */
 VLC_PUBLIC_API void
     libvlc_media_library_save( libvlc_media_library_t * p_mlib,
                                libvlc_exception_t * p_e );
 
+/**
+ * Get media library subitems.
+ *
+ * \param p_mlib media library object
+ * \param p_e an initialized exception object.
+ * \return media list subitems
+ */
 VLC_PUBLIC_API libvlc_media_list_t *
     libvlc_media_library_media_list( libvlc_media_library_t * p_mlib,
                                      libvlc_exception_t * p_e );
@@ -868,18 +1003,58 @@ VLC_PUBLIC_API libvlc_media_list_t *
  * @{
  */
 
+/**
+ * Discover media service by name.
+ *
+ * \param p_inst libvlc instance
+ * \param psz_name service name
+ * \param p_e an initialized exception object
+ * \return media discover object
+ */
 VLC_PUBLIC_API libvlc_media_discoverer_t *
 libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                                        const char * psz_name,
                                        libvlc_exception_t * p_e );
+
+/**
+ * Release media discover object. If the reference count reaches 0, then
+ * the object will be released.
+ *
+ * \param p_mdis media service discover object
+ */
 VLC_PUBLIC_API void   libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
+
+/**
+ * Get media service discover object its localized name.
+ *
+ * \param media discover object
+ * \return localized name
+ */
 VLC_PUBLIC_API char * libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
 
+/**
+ * Get media service discover media list.
+ *
+ * \param p_mdis media service discover object
+ * \return list of media items
+ */
 VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
 
+/**
+ * Get event manager from media service discover object.
+ *
+ * \param p_mdis media service discover object
+ * \return event manager object.
+ */
 VLC_PUBLIC_API libvlc_event_manager_t *
         libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
 
+/**
+ * Query if media service discover object is running.
+ *
+ * \param p_mdis media service discover object
+ * \return true if running, false if not
+ */
 VLC_PUBLIC_API int
         libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
 
@@ -901,6 +1076,7 @@ VLC_PUBLIC_API int
  *
  * \param p_instance libvlc instance
  * \param p_e an initialized exception pointer
+ * \return verbosity level for messages
  */
 VLC_PUBLIC_API unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance,
                                                   libvlc_exception_t *p_e );
@@ -920,6 +1096,7 @@ VLC_PUBLIC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, uns
  *
  * \param p_instance libvlc instance
  * \param p_e an initialized exception pointer
+ * \return log message instance
  */
 VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( libvlc_instance_t *, libvlc_exception_t *);
 
@@ -936,6 +1113,7 @@ VLC_PUBLIC_API void libvlc_log_close( libvlc_log_t *, libvlc_exception_t *);
  *
  * \param p_log libvlc log instance
  * \param p_e an initialized exception pointer
+ * \return number of log messages
  */
 VLC_PUBLIC_API unsigned libvlc_log_count( const libvlc_log_t *, libvlc_exception_t *);
 
@@ -955,6 +1133,7 @@ VLC_PUBLIC_API void libvlc_log_clear( libvlc_log_t *, libvlc_exception_t *);
  *
  * \param p_log libvlc log instance
  * \param p_e an initialized exception pointer
+ * \return log iterator object
  */
 VLC_PUBLIC_API libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *, libvlc_exception_t *);
 
@@ -971,6 +1150,7 @@ VLC_PUBLIC_API void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter, lib
  *
  * \param p_iter libvlc log iterator
  * \param p_e an initialized exception pointer
+ * \return true if iterator has more message objects, else false
  */
 VLC_PUBLIC_API int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e );
 
@@ -982,6 +1162,7 @@ VLC_PUBLIC_API int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_
  * \param p_iter libvlc log iterator
  * \param p_buffer log buffer
  * \param p_e an initialized exception pointer
+ * \return log message object
  */
 VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
                                                                libvlc_log_message_t *p_buffer,

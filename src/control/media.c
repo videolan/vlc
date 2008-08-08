@@ -404,7 +404,7 @@ libvlc_media_duplicate( libvlc_media_t *p_md_orig )
 }
 
 /**************************************************************************
- * Retain a media descriptor object
+ * Get mrl from a media descriptor object
  **************************************************************************/
 char *
 libvlc_media_get_mrl( libvlc_media_t * p_md,

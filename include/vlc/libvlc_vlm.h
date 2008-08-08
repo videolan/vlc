@@ -214,9 +214,18 @@ VLC_PUBLIC_API void libvlc_vlm_seek_media( libvlc_instance_t *, char *,
  * \param p_instance the instance
  * \param psz_name the name of the broadcast
  * \param p_e an initialized exception pointer
+ * \return string with information about named media
  */
 VLC_PUBLIC_API char* libvlc_vlm_show_media( libvlc_instance_t *, char *, libvlc_exception_t * );
 
+/**
+ * Get information about media attribute from vlm.
+ *
+ * \param libvlc instance
+ * \param type of information
+ * \param default value
+ * \return value of media attribute
+ */
 #define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
 returnType libvlc_vlm_get_media_instance_## attr( libvlc_instance_t *, \
                         char *, int , libvlc_exception_t * );
@@ -237,4 +246,4 @@ VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
 }
 # endif
 
-#endif /* <vlc/libvlc.h> */
+#endif /* <vlc/libvlc_vlm.h> */
