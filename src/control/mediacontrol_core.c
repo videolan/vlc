@@ -397,18 +397,21 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
         }
 
         retval->url = libvlc_media_get_mrl( p_media, &ex );
-
-        /* TIME and LENGTH are in microseconds. We want them in ms */
+	
         retval->position = libvlc_media_player_get_time( self->p_media_player, &ex );
+        if( libvlc_exception_raised( &ex ) )
+        {
+            libvlc_exception_clear( &ex );
+            retval->position = 0;
+        }
 
         retval->length = libvlc_media_player_get_length( self->p_media_player, &ex );
+        if( libvlc_exception_raised( &ex ) )
+        {
+            libvlc_exception_clear( &ex );
+            retval->length = 0;
+        }
 
-        retval->position = private_mediacontrol_unit_convert( self->p_media_player,
-                                         mediacontrol_MediaTime, a_key,
-                                         retval->position );
-        retval->length   = private_mediacontrol_unit_convert( self->p_media_player,
-                                         mediacontrol_MediaTime, a_key,
-                                         retval->length );
     }
     return retval;
 }
