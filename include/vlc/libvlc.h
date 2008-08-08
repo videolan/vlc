@@ -527,8 +527,29 @@ VLC_PUBLIC_API libvlc_drawable_t
                     libvlc_media_player_get_drawable ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /** \bug This might go away ... to be replaced by a broader system */
+/**
+ * Get the current movie length (in ms).
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return the movie length (in ms).
+ */
 VLC_PUBLIC_API libvlc_time_t  libvlc_media_player_get_length     ( libvlc_media_player_t *, libvlc_exception_t *);
+/**
+ * Get the current movie time (in ms).
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return the movie time (in ms).
+ */
 VLC_PUBLIC_API libvlc_time_t  libvlc_media_player_get_time       ( libvlc_media_player_t *, libvlc_exception_t *);
+/**
+ * Set the movie time (in ms).
+ *
+ * \param p_mi the Media Player
+ * \param the movie time (in ms).
+ * \param p_e an initialized exception pointer
+ */
 VLC_PUBLIC_API void           libvlc_media_player_set_time       ( libvlc_media_player_t *, libvlc_time_t, libvlc_exception_t *);
 VLC_PUBLIC_API float          libvlc_media_player_get_position   ( libvlc_media_player_t *, libvlc_exception_t *);
 VLC_PUBLIC_API void           libvlc_media_player_set_position   ( libvlc_media_player_t *, float, libvlc_exception_t *);
