@@ -141,6 +141,9 @@ void InputManager::addCallbacks()
     var_AddCallback( p_input, "state", ItemStateChanged, this );
     /* src/input/es-out.c:552 */
     var_AddCallback( p_input, "spu-es", ChangeSPU, this );
+    /* emit UpdateStatus so that main_interface updates controls 
+     * if there is new videotracks (mpeg-ts)*/
+    var_AddCallback( p_input, "video-es", ItemStateChanged, this );
     /* src/input/es-out.c: */
     var_AddCallback( p_input, "teletext-es", ChangeTeletext, this );
     /* src/input/input.c:1765 */
@@ -155,6 +158,7 @@ void InputManager::addCallbacks()
 void InputManager::delCallbacks()
 {
     var_DelCallback( p_input, "spu-es", ChangeSPU, this );
+    var_DelCallback( p_input, "video-es", ItemStateChanged, this );
     var_DelCallback( p_input, "teletext-es", ChangeTeletext, this );
     var_DelCallback( p_input, "state", ItemStateChanged, this );
     var_DelCallback( p_input, "rate-change", ItemRateChanged, this );
