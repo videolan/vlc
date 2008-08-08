@@ -601,18 +601,12 @@ static void RegionDraw( subpicture_region_t *p_region, ass_image_t *p_img )
                 const int an = (255 - a) * alpha / 255;
 
                 uint8_t *p_rgba = &p->p_pixels[(y+p_img->dst_y-i_y) * p->i_pitch + 4 * (x+p_img->dst_x-i_x)];
-#if 0
-                p_rgba[0] = b;
-                p_rgba[1] = g;
-                p_rgba[2] = r;
-                p_rgba[3] = an;
-#else
-                // FIXME it is not right
-                p_rgba[0] = ( p_rgba[0] * (255-an) + b * an ) / 255;
+
+                /* Native endianness, but RGBA ordering */
+                p_rgba[0] = ( p_rgba[0] * (255-an) + r * an ) / 255;
                 p_rgba[1] = ( p_rgba[1] * (255-an) + g * an ) / 255;
-                p_rgba[2] = ( p_rgba[2] * (255-an) + r * an ) / 255;
+                p_rgba[2] = ( p_rgba[2] * (255-an) + b * an ) / 255;
                 p_rgba[3] = 255 - ( 255 - p_rgba[3] ) * ( 255 - an ) / 255;
-#endif
             }
         }
     }
@@ -696,7 +690,7 @@ static ass_handle_t *AssHandleYield( decoder_t *p_dec )
 
         if( !strcasecmp( p_attach->psz_mime, "application/x-truetype-font" ) )
         {
-            msg_Dbg( p_dec, "adding embedded font %s\n", p_attach->psz_name );
+            msg_Dbg( p_dec, "adding embedded font %s", p_attach->psz_name );
 
             ass_add_font( p_ass->p_library, p_attach->psz_name, p_attach->p_data, p_attach->i_data );
         }
