@@ -647,8 +647,11 @@ void MainInputManager::customEvent( QEvent *event )
         /* we are working as a dialogs provider */
         playlist_t *p_playlist = pl_Yield( p_intf );
         p_input = playlist_CurrentInput( p_playlist );
-        emit inputChanged( p_input );
-        vlc_object_release( p_input );
+        if( p_input )
+        {
+            emit inputChanged( p_input );
+            vlc_object_release( p_input );
+        }
         pl_Release( p_intf );
     }
 }
