@@ -142,11 +142,11 @@ private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_playe
         l_time = libvlc_media_player_get_time( p_media_player, &ex );
         /* Ignore exception, we will assume a 0 time value */
 
-        l_pos = 1000 * private_mediacontrol_unit_convert( p_media_player,
-                                                          pos->key,
-                                                          mediacontrol_MediaTime,
-                                                          pos->value );
-        return l_time + l_pos;
+        l_pos = private_mediacontrol_unit_convert( p_media_player,
+						   pos->key,
+						   mediacontrol_MediaTime,
+						   pos->value );
+        return 1000 * ( l_time + l_pos );
         break;
     }
     case mediacontrol_ModuloPosition:
@@ -164,12 +164,12 @@ private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_playe
         l_time = libvlc_media_player_get_time( p_media_player, &ex );
         /* Ignore exception, we will assume a 0 time value */
 
-        l_pos = ( 1000 * private_mediacontrol_unit_convert( p_media_player,
-                                                            pos->key,
-                                                            mediacontrol_MediaTime,
-                                                            pos->value ) );
+        l_pos = private_mediacontrol_unit_convert( p_media_player,
+						   pos->key,
+						   mediacontrol_MediaTime,
+						   pos->value );
 
-        return ( l_time + l_pos ) % l_length;
+        return 1000 * ( ( l_time + l_pos ) % l_length );
         break;
     }
     }
