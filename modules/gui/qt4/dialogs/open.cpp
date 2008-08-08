@@ -77,7 +77,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     ui.setupUi( this );
     setWindowTitle( qtr( "Open" ) );
     /* resize( 410, 600 ); */
-    setMinimumSize( 520, 460 );
+    setMinimumSize( 520, 490 );
 
     /* Tab definition and creation */
     fileOpenPanel    = new FileOpenPanel( ui.Tab, p_intf );
