@@ -21,6 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -110,8 +111,8 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
     - Mark Kretschmann
     - Gábor Lehel
    */
-#define WLENGTH   90 // px
-#define WHEIGHT   25  // px
+#define WLENGTH   80 // px
+#define WHEIGHT   22  // px
 #define SOUNDMIN  0   // %
 #define SOUNDMAX  200 // % OR 400 ?
 
@@ -119,8 +120,8 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
                           char *psz_colors )
                         : QAbstractSlider( _parent )
 {
-    paddingL = 5;
-    paddingR = 3;
+    paddingL = 3;
+    paddingR = 2;
 
     f_step = ( _i_step * 100 ) / AOUT_VOLUME_MAX ;
     setRange( SOUNDMIN, b_hard ? (2 * SOUNDMAX) : SOUNDMAX  );
@@ -137,7 +138,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     pixGradient = QPixmap( mask.size() );
 
     /* Gradient building from the preferences */
-    QLinearGradient gradient( paddingL, 4, WLENGTH + paddingL , 4 );
+    QLinearGradient gradient( paddingL, 3, WLENGTH + paddingL , 3 );
 
     QStringList colorList = qfu( psz_colors ).split( ";" );
     free( psz_colors );
@@ -201,7 +202,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     if( b_sliding )
     {
         QRect rect( paddingL - 15,    -1,
-                    WLENGTH + 15 * 2, WHEIGHT + 4 );
+                    WLENGTH + 15 * 2, WHEIGHT + 5 );
         if( !rect.contains( event->pos() ) )
         { /* We are outside */
             if ( !b_outside )
