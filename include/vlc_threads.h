@@ -393,13 +393,21 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     vlc_mutex_lock( p_mutex );
 
 #elif defined( WIN32 )
+    DWORD result;
+
+    do
+    {
+        vlc_testcancel ();
+        result = SignalObjectAndWait (*p_mutex, *p_condvar, INFINITE, TRUE);
+
+        /* Reacquire the mutex before returning. */
+        vlc_mutex_lock( p_mutex );
+    }
+    while (result == WAIT_IO_COMPLETION);
+
+    vlc_testcancel ();
+
     (void)psz_file; (void)i_line;
-
-    /* Increase our wait count */
-    SignalObjectAndWait( *p_mutex, *p_condvar, INFINITE, FALSE );
-
-    /* Reacquire the mutex before returning. */
-    vlc_mutex_lock( p_mutex );
 
 #elif defined( SYS_BEOS )
     /* The p_condvar->thread var is initialized before the unlock because
@@ -434,9 +442,9 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     struct timespec ts = { d.quot, d.rem * 1000 };
 
     int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
-    if (val == ETIMEDOUT)
-        return ETIMEDOUT; /* this error is perfectly normal */
-    VLC_THREAD_ASSERT ("timed-waiting on condition");
+    if (val != ETIMEDOUT)
+        VLC_THREAD_ASSERT ("timed-waiting on condition");
+    return val;
 
 #elif defined( UNDER_CE )
     mtime_t delay_ms = (deadline - mdate())/1000;
@@ -450,39 +458,35 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
 
-    if(result == WAIT_TIMEOUT)
-       return ETIMEDOUT; /* this error is perfectly normal */
+    (void)psz_file; (void)i_line;
+
+    return (result == WAIT_TIMEOUT) ? ETIMEDOUT : 0;
+
+#elif defined( WIN32 )
+    mtime_t total;
+    DWORD result = WAIT_TIMEOUT;
 
     (void)psz_file; (void)i_line;
 
-#elif defined( WIN32 )
-    mtime_t total = (deadline - mdate())/1000;
-    DWORD result;
-    if( total < 0 )
-        total = 0;
-
-    do
+    vlc_testcancel ();
+    while ((total = (deadline - mdate ()) > 0))
     {
         DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
         result = SignalObjectAndWait( *p_mutex, *p_condvar,
-                                      delay, FALSE );
-        total -= delay;
+                                      delay, TRUE );
+
+        /* Reacquire the mutex before return/cancel. */
         vlc_mutex_lock (p_mutex);
+        if (result == WAIT_OBJECT_0)
+            return 0; /* Condition signaled! */
+        vlc_testcancel ();
     }
-    while (total);
-
-    /* Reacquire the mutex before returning. */
-    if(result == WAIT_TIMEOUT)
-       return ETIMEDOUT; /* this error is perfectly normal */
-
-    (void)psz_file; (void)i_line;
+    return ETIMEDOUT;
 
 #elif defined( SYS_BEOS )
 #   error Unimplemented
 
 #endif
-
-    return 0;
 }
 
 /*****************************************************************************
