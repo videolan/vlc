@@ -179,6 +179,15 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 VLC_EXPORT( int, vlc_clone, (vlc_thread_t *, void * (*) (void *), void *, int) );
 VLC_EXPORT( void, vlc_cancel, (vlc_thread_t) );
 VLC_EXPORT( int, vlc_join, (vlc_thread_t, void **) );
+VLC_EXPORT (void, vlc_control_cancel, (int cmd, ...));
+
+#ifndef LIBVLC_USE_PTHREAD
+enum {
+    VLC_SAVE_CANCEL,
+    VLC_RESTORE_CANCEL,
+    VLC_TEST_CANCEL,
+};
+#endif
 
 #define vlc_thread_ready vlc_object_signal
 
@@ -261,6 +270,51 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
  *****************************************************************************/
 #define vlc_mutex_destroy( P_MUTEX )                                        \
     __vlc_mutex_destroy( __FILE__, __LINE__, P_MUTEX )
+
+/**
+ * Save the cancellation state and disable cancellation for the calling thread.
+ * This function must be called before entering a piece of code that is not
+ * cancellation-safe.
+ * @return Previous cancellation state (opaque value).
+ */
+static inline int vlc_savecancel (void)
+{
+    int state;
+#if defined (LIBVLC_USE_PTHREAD)
+    (void) pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
+#else
+    vlc_control_cancel (VLC_SAVE_CANCEL, &state);
+#endif
+    return state;
+}
+
+/**
+ * Restore the cancellation state for the calling thread.
+ * @param state previous state as returned by vlc_savecancel().
+ * @return Nothing, always succeeds.
+ */
+static inline void vlc_restorecancel (int state)
+{
+#if defined (LIBVLC_USE_PTHREAD)
+    (void) pthread_setcancelstate (state, NULL);
+#else
+    vlc_control_cancel (VLC_RESTORE_CANCEL, state);
+#endif
+}
+
+/**
+ * Issues an explicit deferred cancellation point.
+ * This has no effect if thread cancellation is disabled.
+ * This can be called when there is a rather slow non-sleeping operation.
+ */
+static inline void vlc_testcancel (void)
+{
+#if defined (LIBVLC_USE_PTHREAD)
+    pthread_testcancel ();
+#else
+    vlc_control_cancel (VLC_TEST_CANCEL);
+#endif
+}
 
 /*****************************************************************************
  * vlc_cond_init: initialize a condition
@@ -586,61 +640,6 @@ static inline void barrier (void)
     vlc_spin_lock (&spin);
     vlc_spin_unlock (&spin);
     vlc_spin_destroy (&spin);
-#endif
-}
-
-#ifndef LIBVLC_USE_PTHREAD
-enum {
-    VLC_SAVE_CANCEL,
-    VLC_RESTORE_CANCEL,
-    VLC_TEST_CANCEL,
-};
-#endif
-
-VLC_EXPORT (void, vlc_control_cancel, (int cmd, ...));
-
-/**
- * Save the cancellation state and disable cancellation for the calling thread.
- * This function must be called before entering a piece of code that is not
- * cancellation-safe.
- * @return Previous cancellation state (opaque value).
- */
-static inline int vlc_savecancel (void)
-{
-    int state;
-#if defined (LIBVLC_USE_PTHREAD)
-    (void) pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
-#else
-    vlc_control_cancel (VLC_SAVE_CANCEL, &state);
-#endif
-    return state;
-}
-
-/**
- * Restore the cancellation state for the calling thread.
- * @param state previous state as returned by vlc_savecancel().
- * @return Nothing, always succeeds.
- */
-static inline void vlc_restorecancel (int state)
-{
-#if defined (LIBVLC_USE_PTHREAD)
-    (void) pthread_setcancelstate (state, NULL);
-#else
-    vlc_control_cancel (VLC_RESTORE_CANCEL, state);
-#endif
-}
-
-/**
- * Issues an explicit deferred cancellation point.
- * This has no effect if thread cancellation is disabled.
- * This can be called when there is a rather slow non-sleeping operation.
- */
-static inline void vlc_testcancel (void)
-{
-#if defined (LIBVLC_USE_PTHREAD)
-    pthread_testcancel ();
-#else
-    vlc_control_cancel (VLC_TEST_CANCEL);
 #endif
 }
 
