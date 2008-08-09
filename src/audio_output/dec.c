@@ -105,6 +105,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     if( p_replay_gain )
         p_input->replay_gain = *p_replay_gain;
 
+    vlc_mutex_lock( &p_aout->input_fifos_lock );
     p_aout->pp_inputs[p_aout->i_nb_inputs] = p_input;
     p_aout->i_nb_inputs++;
 
@@ -149,6 +150,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     }
 
     aout_InputNew( p_aout, p_input );
+    vlc_mutex_unlock( &p_aout->input_fifos_lock );
 
     vlc_mutex_unlock( &p_aout->mixer_lock );
     p_input->i_desync = var_CreateGetInteger( p_this, "audio-desync" ) * 1000;
