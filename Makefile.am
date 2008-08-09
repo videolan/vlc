@@ -84,6 +84,8 @@ ChangeLog: Makefile.am
 ###############################################################################
 
 EXTRA_DIST += \
+	extras/package/macosx/Resources/English.lproj/MainMenu.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/MainMenu.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/MainMenu.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/info.nib \
