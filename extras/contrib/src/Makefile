@@ -471,13 +471,13 @@ fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz Patches/fontconfig.patch
 .fontconfig: fontconfig .xml .freetype
 ifdef HAVE_WIN32
   ifdef HAVE_CYGWIN
-	(cd $<; autoreconf && LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
+	(cd $<; autoreconf && LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --with-default-fonts=C:\\windows\fonts --with-add-fonts=C:\\winnt\fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
   else
-	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
+	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --with-default-fonts=C:\\windows\fonts --with-add-fonts=C:\\winnt\fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
   endif
 else
   ifdef HAVE_DARWIN_OS
-	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/var/cache/fontconfig --with-confdir=/etc/fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
+	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/var/cache/fontconfig --with-default-fonts=/System/Library/Fonts --with-add-fonts=/Library/Fonts,~/Library/Fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
   else
 	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
   endif
@@ -2442,9 +2442,10 @@ DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
 libass-$(ASS_VERSION).tar.bz2:
 	$(WGET) $(ASS_URL)
 
+# mplayer patches up to August 8, 2008 are included
 libass: libass-$(ASS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	cd $@; patch -p0 < ../Patches/libass-h-char-fix.patch
+	patch -p0 < Patches/libass_mplayer_updates.patch
 ifneq ($(HOST),$(BUILD))
 	patch -p0 < Patches/libass-cross.patch
 	cd $@; autoconf
