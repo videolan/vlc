@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <assert.h>
 
 #include <vlc_input.h>                 /* for input_thread_t and i_pts_delay */
 
@@ -46,6 +47,9 @@
 
 /** FIXME: Ugly but needed to access the counters */
 #include "input/input_internal.h"
+
+#define AOUT_ASSERT_MIXER_LOCKED vlc_assert_locked( &p_aout->mixer_lock )
+#define AOUT_ASSERT_INPUT_LOCKED vlc_assert_locked( &p_input->lock )
 
 static void inputFailure( aout_instance_t *, aout_input_t *, const char * );
 static void inputDrop( aout_instance_t *, aout_input_t *, aout_buffer_t * );
@@ -447,6 +451,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
  *****************************************************************************/
 int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 {
+    AOUT_ASSERT_MIXER_LOCKED;
     if ( p_input->b_error ) return 0;
 
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
@@ -471,6 +476,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                     aout_buffer_t * p_buffer, int i_input_rate )
 {
     mtime_t start_date;
+    AOUT_ASSERT_INPUT_LOCKED;
 
     if( p_input->b_restart )
     {
