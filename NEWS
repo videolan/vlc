@@ -17,7 +17,6 @@ Important notes:
  * This version of VLC contains a new interface for Windows and Linux.
    This interface has a fullscreen controller. This interface lacks the
    "Streaming Wizard" that used to be present in VLC 0.8.6.
-   If you absolutely need it, we advise you to keep VLC 0.8.6.
  * The behavior of --sout-keep was changed. It's now activated by default.
  * The marq, mosaic and logo commands in the rc interface changed. They
    now require a target name as their first argument. Example:
@@ -31,11 +30,13 @@ Important notes:
  * You now need to append --m3u-extvlcopt to your command line to enable
    EXTVLCOPT options parsing in m3u playlists. Note that only a limited set
    of options is available to m3u playlists (CVE-2007-6683).
- * The old access:url syntax is no longer supported. Use access://url instead.
+ * The old access:url syntax is no longer supported to resolve ambiguities
+   with some file names. Use access://url instead.
     E.g.:  vlc:quit -> vlc://quit ; 
            udp:@239.255.12.12 -> udp://@239.255.12.12
- * The ffmpeg module has been removed and replaced by avcodec, avformat, swscale
-   (or imgresample if you use a swscale-less ffmpeg build) and postproc modules.
+ * The ffmpeg module has been removed and replaced by the new avcodec,
+   avformat, swscale (or imgresample if you use a swscale-less ffmpeg build)
+   and postproc modules.
  * The web plugins ActiveX (IE)/Firefox/Mozilla/Safari now recognize the
    following states: IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4,
    STOPPING=5, FORWARD=6, BACKWARD=7, ENDED=8, ERROR=9. With FORWARD and
@@ -48,6 +49,7 @@ Important notes:
    For example:
    transcode{vcodec=mp2v,vfilter=canvas{width=640,height=480}}
  * Glide video output module has been removed.
+ * Due to lack of maintainer, the Skins interface might not work properly.
 
 Changes:
 --------
@@ -81,6 +83,7 @@ Inputs:
  * Experimental EyeTV access module
    This requires the user to install a plugin to EyeTV.app
    (available as a separate download).
+ * Simple RTP input (with MPEG A/V, G.711 and PCM support).
  * RTMP input support
  * QTKit-based Input module for Mac OS X allowing display and streaming of video
    taken from all iSight-labelled video cameras (no audio support)
