@@ -26,15 +26,15 @@
  * Preamble: This file contains the functions related to the creation of
  *             a window and the handling of its messages (events).
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <errno.h>                                                 /* ENOMEM */
 #include <ctype.h>                                              /* tolower() */
 
 #ifndef _WIN32_WINNT
 #   define _WIN32_WINNT 0x0500
-#endif
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
 #endif
 
 #include <vlc_common.h>
