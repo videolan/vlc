@@ -120,8 +120,11 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-static void* IPCHelperThread( vlc_object_t * );
+static unsigned __stdcall IPCHelperThread( void * );
 LRESULT CALLBACK WMCOPYWNDPROC( HWND, UINT, WPARAM, LPARAM );
+static vlc_object_t *p_helper = NULL;
+static unsigned long hIPCHelper;
+
 typedef struct
 {
   int argc;
@@ -149,8 +152,6 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
         }
     }
 
-    libvlc_priv (p_this)->ipc_helper = NULL;
-
     if( config_GetInt( p_this, "one-instance" )
         || ( config_GetInt( p_this, "one-instance-when-started-from-file" )
              && config_GetInt( p_this, "started-from-file" ) ) )
@@ -173,20 +174,25 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
         {
             /* We are the 1st instance. */
             static const char typename[] = "ipc helper";
-            vlc_object_t *p_helper =
+            p_helper =
                 vlc_custom_create( p_this, sizeof(vlc_object_t),
                                    VLC_OBJECT_GENERIC, typename );
+            vlc_object_lock( p_helper );
 
             /* Run the helper thread */
-            if( vlc_thread_create( p_helper, "IPC helper", IPCHelperThread,
-                                   VLC_THREAD_PRIORITY_LOW, true ) )
+            hIPCHelper = _beginthreadex( NULL, 0, IPCHelperThread, p_helper,
+                                         0, NULL );
+            if( hIPCHelper )
+                vlc_object_wait( p_helper );
+            vlc_object_unlock( p_helper );
+
+            if( !hIPCHelper )
             {
                 msg_Err( p_this, "one instance mode DISABLED "
                          "(IPC helper thread couldn't be created)" );
                 vlc_object_release (p_helper);
+                p_helper = NULL;
             }
-            else
-                libvlc_priv (p_this)->ipc_helper = p_helper;
 
             /* Initialization done.
              * Release the mutex to unblock other instances */
@@ -262,8 +268,9 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
 #endif
 }
 
-static void* IPCHelperThread( vlc_object_t *p_this )
+static unsigned __stdcall IPCHelperThread( void *data )
 {
+    vlc_object_t *p_this = data;
     HWND ipcwindow;
     MSG message;
 
@@ -284,14 +291,14 @@ static void* IPCHelperThread( vlc_object_t *p_this )
     SetWindowLongPtr( ipcwindow, GWLP_USERDATA, (LONG_PTR)p_this );
 
     /* Signal the creation of the thread and events queue */
-    vlc_thread_ready( p_this );
+    vlc_object_signal( p_this );
 
     while( GetMessage( &message, NULL, 0, 0 ) )
     {
         TranslateMessage( &message );
         DispatchMessage( &message );
     }
-    return NULL;
+    return 0;
 }
 
 LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
@@ -365,11 +372,11 @@ void system_End( libvlc_int_t *p_this )
         free( vlc_global()->psz_vlcpath );
         vlc_global()->psz_vlcpath = NULL;
     }
-    vlc_object_t *obj = libvlc_priv (p_this)->ipc_helper;
-    if (obj)
+    if (p_helper && p_helper->p_parent == VLC_OBJECT(p_this) )
     {
-        vlc_thread_join (obj);
-        vlc_object_release (obj);
+        /* FIXME: thread-safety + join the thread(?)... */
+        vlc_object_release (p_helper);
+        p_helper = NULL;
     }
 
 #if !defined( UNDER_CE )
