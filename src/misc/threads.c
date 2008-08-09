@@ -360,15 +360,12 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
     return ret;
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    /* Initialize counter */
-    p_condvar->i_waiting_threads = 0;
-
     /* Create an auto-reset event. */
-    p_condvar->event = CreateEvent( NULL,   /* no security */
-                                    FALSE,  /* auto-reset event */
-                                    FALSE,  /* start non-signaled */
-                                    NULL ); /* unnamed */
-    return !p_condvar->event;
+    *p_condvar = CreateEvent( NULL,   /* no security */
+                              FALSE,  /* auto-reset event */
+                              FALSE,  /* start non-signaled */
+                              NULL ); /* unnamed */
+    return *p_condvar ? 0 : ENOMEM;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( !p_condvar )
@@ -400,7 +397,7 @@ void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condva
 #elif defined( UNDER_CE ) || defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    CloseHandle( p_condvar->event );
+    CloseHandle( *p_condvar );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_condvar->init = 0;

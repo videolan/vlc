@@ -117,17 +117,9 @@ typedef pthread_key_t   vlc_threadvar_t;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
 typedef HANDLE  vlc_thread_t;
-
 typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT) ( HANDLE, HANDLE, DWORD, BOOL );
-
 typedef HANDLE  vlc_mutex_t;
-
-typedef struct
-{
-    volatile int        i_waiting_threads;
-    HANDLE              event;
-} vlc_cond_t;
-
+typedef HANDLE  vlc_cond_t;
 typedef DWORD   vlc_threadvar_t;
 
 #elif defined( SYS_BEOS )
@@ -283,7 +275,7 @@ static inline void __vlc_cond_signal( const char * psz_file, int i_line,
     /* PulseEvent() only works if none of the waiting threads is suspended.
      * This is particularily problematic under a debug session.
      * as documented in http://support.microsoft.com/kb/q173260/ */
-    PulseEvent( p_condvar->event );
+    PulseEvent( *p_condvar );
 
 #elif defined( SYS_BEOS )
     while( p_condvar->thread != -1 )
@@ -324,10 +316,8 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     VLC_THREAD_ASSERT ("waiting on condition");
 
 #elif defined( UNDER_CE )
-    p_condvar->i_waiting_threads++;
     LeaveCriticalSection( &p_mutex->csection );
-    WaitForSingleObject( p_condvar->event, INFINITE );
-    p_condvar->i_waiting_threads--;
+    WaitForSingleObject( *p_condvar, INFINITE );
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
@@ -336,9 +326,7 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     (void)psz_file; (void)i_line;
 
     /* Increase our wait count */
-    p_condvar->i_waiting_threads++;
-    SignalObjectAndWait( *p_mutex, p_condvar->event, INFINITE, FALSE );
-    p_condvar->i_waiting_threads--;
+    SignalObjectAndWait( *p_mutex, *p_condvar, INFINITE, FALSE );
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
@@ -386,10 +374,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     if( delay_ms < 0 )
         delay_ms = 0;
 
-    p_condvar->i_waiting_threads++;
     LeaveCriticalSection( &p_mutex->csection );
-    result = WaitForSingleObject( p_condvar->event, delay_ms );
-    p_condvar->i_waiting_threads--;
+    result = WaitForSingleObject( *p_condvar, delay_ms );
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
@@ -406,10 +392,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
         delay_ms = 0;
 
     /* Increase our wait count */
-    p_condvar->i_waiting_threads++;
-    result = SignalObjectAndWait( *p_mutex, p_condvar->event,
+    result = SignalObjectAndWait( *p_mutex, *p_condvar,
                                   delay_ms, FALSE );
-    p_condvar->i_waiting_threads--;
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
