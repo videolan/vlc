@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBFramework Version</key>
+	<string>670</string>
+	<key>IBLastKnownRelativeProjectPath</key>
+	<string>../../vlc.xcodeproj</string>
+	<key>IBOldestOS</key>
+	<integer>4</integer>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>3568</integer>
+		<integer>2201</integer>
+		<integer>29</integer>
+		<integer>21</integer>
+		<integer>915</integer>
+	</array>
+	<key>IBSystem Version</key>
+	<string>9E17</string>
+	<key>targetFramework</key>
+	<string>IBCocoaFramework</string>
+</dict>
+</plist>
