@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
 	<data>
-		<int key="IBDocument.SystemTarget">1050</int>
+		<int key="IBDocument.SystemTarget">1040</int>
 		<string key="IBDocument.SystemVersion">9E17</string>
 		<string key="IBDocument.InterfaceBuilderVersion">667</string>
 		<string key="IBDocument.AppKitVersion">949.33</string>
@@ -318,36 +318,7 @@
 				<int key="NSWTFlags">1881669632</int>
 				<string key="NSWindowTitle">VLC media player</string>
 				<string key="NSWindowClass">VLCControllerWindow</string>
-				<object class="NSToolbar" key="NSViewClass" id="89609267">
-					<object class="NSMutableString" key="NSToolbarIdentifier">
-						<characters key="NS.bytes">33859FC5-243A-4329-AA07-DC771FCF99D6</characters>
-					</object>
-					<nil key="NSToolbarDelegate"/>
-					<bool key="NSToolbarPrefersToBeShown">YES</bool>
-					<bool key="NSToolbarShowsBaselineSeparator">NO</bool>
-					<bool key="NSToolbarAllowsUserCustomization">NO</bool>
-					<bool key="NSToolbarAutosavesConfiguration">YES</bool>
-					<int key="NSToolbarDisplayMode">2</int>
-					<int key="NSToolbarSizeMode">1</int>
-					<object class="NSMutableDictionary" key="NSToolbarIBIdentifiedItems">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSArray" key="NSToolbarIBAllowedItems">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-					</object>
-					<object class="NSMutableArray" key="NSToolbarIBDefaultItems">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-					</object>
-					<object class="NSMutableArray" key="NSToolbarIBSelectableItems">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-					</object>
-				</object>
+				<nil key="NSViewClass"/>
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<object class="NSView" key="NSWindowView" id="179044500">
 					<reference key="NSNextResponder"/>
@@ -585,7 +556,7 @@
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
-				<string key="NSMinSize">{0, 41}</string>
+				<string key="NSMinSize">{338, 51}</string>
 				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<string key="NSFrameAutosaveName">vlc</string>
 			</object>
@@ -6859,14 +6830,6 @@
 					<int key="connectionID">3664</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="89609267"/>
-						<reference key="destination" ref="592369951"/>
-					</object>
-					<int key="connectionID">3665</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">togglePlaylist:</string>
 						<reference key="source" ref="592369951"/>
@@ -7110,7 +7073,6 @@
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="179044500"/>
-							<reference ref="89609267"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">vlc</string>
@@ -9773,14 +9735,6 @@
 						<reference key="parent" ref="111740499"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">3607</int>
-						<reference key="object" ref="89609267"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<reference key="parent" ref="451177334"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">3647</int>
 						<reference key="object" ref="104993218"/>
 						<object class="NSMutableArray" key="children">
@@ -10508,8 +10462,6 @@
 					<string>3586.CustomClassName</string>
 					<string>3586.IBPluginDependency</string>
 					<string>3586.ImportedFromIB2</string>
-					<string>3607.IBEditorWindowLastContentRect</string>
-					<string>3607.IBPluginDependency</string>
 					<string>3647.IBPluginDependency</string>
 					<string>3647.ImportedFromIB2</string>
 					<string>3648.IBPluginDependency</string>
@@ -10824,9 +10776,9 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{181, 706}, {338, 29}}</string>
+					<string>{{181, 725}, {338, 29}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{181, 706}, {338, 29}}</string>
+					<string>{{181, 725}, {338, 29}}</string>
 					<reference ref="9"/>
 					<reference ref="9"/>
 					<reference ref="9"/>
@@ -11173,8 +11125,6 @@
 					<string>VLBrushedMetalImageView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{10, 809}, {616, 0}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>

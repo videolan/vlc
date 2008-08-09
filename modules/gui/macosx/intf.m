@@ -392,6 +392,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_msgs_panel setExcludedFromWindowsMenu: YES];
     [o_msgs_panel setDelegate: self];
 
+    /* In code and not in Nib for 10.4 compat */
+    NSToolbar * toolbar = [[[NSToolbar alloc] initWithIdentifier:@"mainControllerToolbar"] autorelease];
+    [toolbar setDelegate:self];
+    [toolbar setShowsBaselineSeparator:NO];
+    [toolbar setAllowsUserCustomization:NO];
+    [toolbar setDisplayMode:NSToolbarDisplayModeIconOnly];
+    [toolbar setAutosavesConfiguration:YES];
+    [o_window setToolbar:toolbar];
+
     i_key = config_GetInt( p_intf, "key-quit" );
     [o_mi_quit setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
     [o_mi_quit setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
