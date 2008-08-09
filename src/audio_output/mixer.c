@@ -287,8 +287,10 @@ static int MixBuffer( aout_instance_t * p_aout )
                 if( i_nb_bytes < 0 )
                 {
                     /* Is it really the best way to do it ? */
+                    vlc_mutex_lock( &p_aout->output_fifo_lock );
                     aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
                     aout_DateSet( &exact_start_date, 0 );
+                    vlc_mutex_unlock( &p_aout->output_fifo_lock );
                     break;
                 }
 
