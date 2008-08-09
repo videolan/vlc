@@ -32,6 +32,7 @@
 # include "config.h"
 #endif
 
+#define _WIN32_WINNT 0x0501
 #include <vlc_common.h>
 
 #include <stdlib.h>
@@ -558,62 +559,38 @@ ssize_t __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 int vlc_inet_pton(int af, const char *src, void *dst)
 {
 #ifndef HAVE_INET_PTON
-# ifdef WIN32
-    /* As we already know, Microsoft always go its own way, so even if they do
-     * provide IPv6, they don't provide the API. */
-    struct sockaddr_storage addr;
-    int len = sizeof( addr );
+    /* Windows Vista has inet_pton(), but not XP. */
+    /* We have a pretty good example of abstraction inversion here... */
+    struct addrinfo hints = {
+        .ai_family = af,
+        .ai_socktype = SOCK_DGRAM, /* make sure we have... */
+        .ai_protocol = IPPROTO_UDP, /* ...only one response */
+        .ai_flags = AI_NUMERICHOST,
+    }, *res;
 
-    /* Damn it, they didn't even put LPCSTR for the firs parameter!!! */
-#ifdef UNICODE
-    wchar_t *workaround_for_ill_designed_api =
-        malloc( MAX_PATH * sizeof(wchar_t) );
-    mbstowcs( workaround_for_ill_designed_api, src, MAX_PATH );
-    workaround_for_ill_designed_api[MAX_PATH-1] = 0;
-#else
-    char *workaround_for_ill_designed_api = strdup( src );
-#endif
-
-    if( WSAStringToAddress( workaround_for_ill_designed_api, af, NULL,
-                             (LPSOCKADDR)&addr, &len ) )
-    {
-        free( workaround_for_ill_designed_api );
+    if (getaddrinfo (src, NULL, &hints, &res))
         return -1;
-    }
-    free( workaround_for_ill_designed_api );
 
-    switch( af )
+    const void *data;
+    size_t len;
+
+    switch (af)
     {
-        case AF_INET6:
-            memcpy( dst, &((struct sockaddr_in6 *)&addr)->sin6_addr, 16 );
-            break;
-
         case AF_INET:
-            memcpy( dst, &((struct sockaddr_in *)&addr)->sin_addr, 4 );
+            data = &((const struct sockaddr_in *)res->ai_addr)->sin_addr;
+            len = 4;
             break;
-
+#ifdef AF_INET6
+        case AF_INET6:
+            data = &((const struct sockaddr_in6 *)res->ai_addr)->sin6_addr;
+            len = 16;
+            break;
+#endif
         default:
-            WSASetLastError( WSAEAFNOSUPPORT );
+            errno = EAFNOSUPPORT;
             return -1;
     }
-# else
-    /* Assume IPv6 is not supported. */
-    /* Would be safer and more simpler to use inet_aton() but it is most
-     * likely not provided either. */
-    uint32_t ipv4;
-
-    if( af != AF_INET )
-    {
-        errno = EAFNOSUPPORT;
-        return -1;
-    }
-
-    ipv4 = inet_addr( src );
-    if( ipv4 == INADDR_NONE )
-        return -1;
-
-    memcpy( dst, &ipv4, 4 );
-# endif /* WIN32 */
+    memcpy (dst, data, len);
     return 0;
 #else /* HAVE_INET_PTON */
     return inet_pton( af, src, dst );
