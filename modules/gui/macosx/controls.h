@@ -77,6 +77,8 @@
 - (IBAction)forward:(id)sender;
 - (IBAction)backward:(id)sender;
 
+- (id)getVoutView;
+
 - (IBAction)volumeUp:(id)sender;
 - (IBAction)volumeDown:(id)sender;
 - (IBAction)mute:(id)sender;
