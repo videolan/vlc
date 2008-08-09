@@ -1221,6 +1221,7 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
     pl_Release( p_intf );
 
     vlc_object_lock( p_intf );
+
     while( vlc_object_alive( p_intf ) )
     {
         vlc_mutex_lock( &p_intf->change_lock );
@@ -1244,6 +1245,10 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
             msg_Dbg( p_intf, "input has stopped, refreshing interface" );
             vlc_object_release( p_input );
             p_input = NULL;
+        }
+        else if( cachedInputState != input_GetState( p_input ) )
+        {
+            p_intf->p_sys->b_intf_update = true;
         }
 
         /* Manage volume status */
@@ -1304,10 +1309,10 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
         if( ( b_input = ( p_input != NULL ) ) )
         {
             /* seekable streams */
-            int state = input_GetState( p_input );
-            if ( state == INIT_S ||
-                 state == OPENING_S ||
-                 state == BUFFERING_S )
+            cachedInputState = input_GetState( p_input );
+            if ( cachedInputState == INIT_S ||
+                 cachedInputState == OPENING_S ||
+                 cachedInputState == BUFFERING_S )
             {
                 b_buffering = YES;
             }

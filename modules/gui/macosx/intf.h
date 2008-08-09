@@ -304,6 +304,8 @@ struct intf_sys_t
 
     int     i_lastShownVolume;
 
+    input_state_e cachedInputState;
+
     /* the manage thread */
     pthread_t manage_thread;
 
