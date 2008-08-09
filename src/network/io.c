@@ -539,9 +539,11 @@ ssize_t __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                         const char *psz_fmt, va_list args )
 {
     char    *psz;
-    int     i_size, i_ret;
+    int      i_ret;
 
-    i_size = vasprintf( &psz, psz_fmt, args );
+    size_t i_size = vasprintf( &psz, psz_fmt, args );
+    if( i_size == -1 )
+        return -1;
     i_ret = __net_Write( p_this, fd, p_vs, (uint8_t *)psz, i_size ) < i_size
         ? -1 : i_size;
     free( psz );
