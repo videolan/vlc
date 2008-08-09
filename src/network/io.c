@@ -32,7 +32,6 @@
 # include "config.h"
 #endif
 
-#define _WIN32_WINNT 0x0501
 #include <vlc_common.h>
 
 #include <stdlib.h>
@@ -550,106 +549,6 @@ ssize_t __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
     free( psz );
 
     return i_ret;
-}
-
-
-/*****************************************************************************
- * inet_pton replacement for obsolete and/or crap operating systems
- *****************************************************************************/
-int vlc_inet_pton(int af, const char *src, void *dst)
-{
-#ifndef HAVE_INET_PTON
-    /* Windows Vista has inet_pton(), but not XP. */
-    /* We have a pretty good example of abstraction inversion here... */
-    struct addrinfo hints = {
-        .ai_family = af,
-        .ai_socktype = SOCK_DGRAM, /* make sure we have... */
-        .ai_protocol = IPPROTO_UDP, /* ...only one response */
-        .ai_flags = AI_NUMERICHOST,
-    }, *res;
-
-    if (getaddrinfo (src, NULL, &hints, &res))
-        return -1;
-
-    const void *data;
-    size_t len;
-
-    switch (af)
-    {
-        case AF_INET:
-            data = &((const struct sockaddr_in *)res->ai_addr)->sin_addr;
-            len = 4;
-            break;
-#ifdef AF_INET6
-        case AF_INET6:
-            data = &((const struct sockaddr_in6 *)res->ai_addr)->sin6_addr;
-            len = 16;
-            break;
-#endif
-        default:
-            errno = EAFNOSUPPORT;
-            return -1;
-    }
-    memcpy (dst, data, len);
-    return 0;
-#else /* HAVE_INET_PTON */
-    return inet_pton( af, src, dst );
-#endif /* HAVE_INET_PTON */
-}
-
-const char *vlc_inet_ntop(int af, const void * src,
-                               char * dst, socklen_t cnt)
-{
-#ifndef HAVE_INET_NTOP
-#ifdef WIN32
-    switch( af )
-    {
-#ifdef AF_INET6
-        case AF_INET6:
-            {
-                struct sockaddr_in6 addr;
-                memset(&addr, 0, sizeof(addr));
-                addr.sin6_family = AF_INET6;
-                addr.sin6_addr = *((struct in6_addr*)src);
-                if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr,
-                                             sizeof(struct sockaddr_in6),
-                                             NULL, dst, &cnt) )
-                {
-                    dst[cnt] = '\0';
-                    return dst;
-                }
-                errno = WSAGetLastError();
-                return NULL;
-
-            }
-
-#endif
-        case AF_INET:
-            {
-                struct sockaddr_in addr;
-                memset(&addr, 0, sizeof(addr));
-                addr.sin_family = AF_INET;
-                addr.sin_addr = *((struct in_addr*)src);
-                if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr,
-                                             sizeof(struct sockaddr_in),
-                                             NULL, dst, &cnt) )
-                {
-                    dst[cnt] = '\0';
-                    return dst;
-                }
-                errno = WSAGetLastError();
-                return NULL;
-
-            }
-    }
-    errno = EAFNOSUPPORT;
-    return NULL;
-#else /* WIN32 */
-    return NULL;
-#endif /* WIN32 */
-#else /* HAVE_INET_NTOP */
-    return inet_ntop( af, src, dst, cnt );
-#endif /* HAVE_INET_NTOP */
 }
 
 #ifdef WIN32
