@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include "aout_internal.h"
@@ -35,6 +37,29 @@
 /*
  * Instances management (internal and external)
  */
+
+#define AOUT_ASSERT_FIFO_LOCKED aout_assert_fifo_locked(p_aout, p_fifo)
+static inline void aout_assert_fifo_locked( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
+{
+#ifndef NDEBUG
+    if( p_fifo == &p_aout->output.fifo )
+        vlc_assert_locked( &p_aout->output_fifo_lock );
+    else
+    {
+        int i;
+        for( i = 0; i < p_aout->i_nb_inputs; i++ )
+        {
+            if( p_fifo == &p_aout->pp_inputs[i]->fifo)
+            {
+                vlc_assert_locked( &p_aout->input_fifos_lock );
+                break;
+            }
+        }
+        if( i == p_aout->i_nb_inputs )
+            vlc_assert_locked( &p_aout->mixer_lock );
+    }
+#endif
+}
 
 /* Local functions */
 static void aout_Destructor( vlc_object_t * p_this );
@@ -296,6 +321,8 @@ void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text,
 void aout_FifoInit( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
                     uint32_t i_rate )
 {
+    AOUT_ASSERT_FIFO_LOCKED;
+
     if( i_rate == 0 )
     {
         msg_Err( p_aout, "initialising fifo with zero divider" );
@@ -313,6 +340,8 @@ void aout_FifoPush( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
                     aout_buffer_t * p_buffer )
 {
     (void)p_aout;
+    AOUT_ASSERT_FIFO_LOCKED;
+
     *p_fifo->pp_last = p_buffer;
     p_fifo->pp_last = &p_buffer->p_next;
     *p_fifo->pp_last = NULL;
@@ -338,6 +367,7 @@ void aout_FifoSet( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
 {
     aout_buffer_t * p_buffer;
     (void)p_aout;
+    AOUT_ASSERT_FIFO_LOCKED;
 
     aout_DateSet( &p_fifo->end_date, date );
     p_buffer = p_fifo->p_first;
@@ -359,6 +389,7 @@ void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
 {
     aout_buffer_t * p_buffer;
     (void)p_aout;
+    AOUT_ASSERT_FIFO_LOCKED;
 
     aout_DateMove( &p_fifo->end_date, difference );
     p_buffer = p_fifo->p_first;
@@ -376,6 +407,7 @@ void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
 mtime_t aout_FifoNextStart( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     (void)p_aout;
+    AOUT_ASSERT_FIFO_LOCKED;
     return aout_DateGet( &p_fifo->end_date );
 }
 
@@ -386,6 +418,7 @@ mtime_t aout_FifoNextStart( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 mtime_t aout_FifoFirstDate( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     (void)p_aout;
+    AOUT_ASSERT_FIFO_LOCKED;
     return p_fifo->p_first ?  p_fifo->p_first->start_date : 0;
 }
 
@@ -396,6 +429,7 @@ aout_buffer_t * aout_FifoPop( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     aout_buffer_t * p_buffer;
     (void)p_aout;
+    AOUT_ASSERT_FIFO_LOCKED;
 
     p_buffer = p_fifo->p_first;
     if ( p_buffer == NULL ) return NULL;
@@ -415,6 +449,7 @@ void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     aout_buffer_t * p_buffer;
     (void)p_aout;
+    AOUT_ASSERT_FIFO_LOCKED;
 
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )
