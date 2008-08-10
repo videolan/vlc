@@ -1456,6 +1456,14 @@ static char *size_str( long int l_size )
     return i_retval == -1 ? NULL : psz_tmp;
 }
 
+void update_WaitDownload( update_t *p_update )
+{
+    if(p_update->p_download)
+        vlc_thread_join( p_update->p_download );
+    vlc_object_release( p_update->p_download );
+    p_update->p_download = NULL;
+}
+
 static void* update_DownloadReal( vlc_object_t *p_this );
 
 /**
@@ -1504,6 +1512,8 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     update_t *p_update = p_udt->p_update;
     char *psz_destdir = p_udt->psz_destdir;
 
+    msg_Dbg( p_udt, "Opening Stream '%s'", p_update->release.psz_url );
+
     /* Open the stream */
     p_stream = stream_UrlNew( p_udt, p_update->release.psz_url );
     if( !p_stream )
@@ -1536,7 +1546,12 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     /* Create a buffer and fill it with the downloaded file */
     p_buffer = (void *)malloc( 1 << 10 );
     if( !p_buffer )
+    {
+        msg_Err( p_udt, "Can't malloc (1 << 10) bytes! download cancelled." );
         goto end;
+    }
+
+    msg_Dbg( p_udt, "Downloading Stream '%s'", p_update->release.psz_url );
 
     psz_size = size_str( l_size );
     if( asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",
@@ -1585,6 +1600,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
             p_update->release.psz_url, psz_size ) != -1 )
         {
             intf_ProgressUpdate( p_udt, i_progress, psz_status, 100.0, 0 );
+            i_progress = 0;
             free( psz_status );
         }
     }
@@ -1674,6 +1690,10 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     free( p_hash );
 
 end:
+    if( i_progress )
+    {
+        intf_ProgressUpdate( p_udt, i_progress, "Cancelled", 100.0, 0 );
+    }
     if( p_stream )
         stream_Delete( p_stream );
     if( p_file )
@@ -1713,6 +1733,11 @@ bool update_NeedUpgrade( update_t *p_update )
 {
     (void)p_update;
     return false;
+}
+
+void update_WaitDownload( update_t *p_update )
+{
+    (void)p_update;
 }
 
 void update_Download( update_t *p_update, const char *psz_destdir )

@@ -151,7 +151,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     if( returnCode == NSOKButton )
     {
         /* perform download and pass the selected path */
-        [self performDownload: [sheet filename]];
+        [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:self withObject:[sheet filename]];
     }
     [sheet release];
 }
@@ -215,11 +215,14 @@ static void updateCallback( void * p_data, bool b_success )
 
 - (void)performDownload:(NSString *)path
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     update_Download( p_u, [path UTF8String] );
     [o_btn_DownloadNow setEnabled: NO];
     [o_update_window orderOut: self];
+    update_WaitDownload( p_u );
     update_Delete( p_u );
     p_u = nil;
+    [pool release];
 }
 
 @end
