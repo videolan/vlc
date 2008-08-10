@@ -565,12 +565,12 @@ static inline void barrier (void)
     asm volatile ("sync":::"memory");
 #elif defined(__i386__)
     asm volatile ("mfence":::"memory");
-#elif defined (LIBVLC_USE_PTHREAD)
-    static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_lock (&lock);
-    pthread_mutex_unlock (&lock);
 #else
-# error barrier not implemented!
+    vlc_spin_t spin;
+    vlc_spin_init (&spin);
+    vlc_spin_lock (&spin);
+    vlc_spin_unlock (&spin);
+    vlc_spin_destroy (&spin);
 #endif
 }
 
