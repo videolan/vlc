@@ -270,7 +270,7 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
  * Loads a file into a block of memory. If possible a private file mapping is
  * created. Otherwise, the file is read normally. On 32-bits platforms, this
  * function will not work for very large files, due to memory space
- * constraints.
+ * constraints. Cancellation point.
  *
  * @param fd file descriptor to load from
  * @return a new block with the file content at p_buffer, and file length at
@@ -325,6 +325,7 @@ block_t *block_File (int fd)
     block_t *block = block_Alloc (length);
     if (block == NULL)
         return NULL;
+    block_cleanup_push (block);
 
     for (size_t i = 0; i < length;)
     {
@@ -332,10 +333,12 @@ block_t *block_File (int fd)
         if (len == -1)
         {
             block_Release (block);
-            return NULL;
+            block = NULL;
+            break;
         }
         i += len;
     }
+    vlc_cleanup_pop ();
     return block;
 }
 
@@ -437,14 +440,14 @@ block_t *block_FifoGet( block_fifo_t *p_fifo )
     block_t *b;
 
     vlc_mutex_lock( &p_fifo->lock );
+    mutex_cleanup_push( &p_fifo->lock );
 
     /* Remember vlc_cond_wait() may cause spurious wakeups
      * (on both Win32 and POSIX) */
     while( ( p_fifo->p_first == NULL ) && !p_fifo->b_force_wake )
-    {
         vlc_cond_wait( &p_fifo->wait, &p_fifo->lock );
-    }
 
+    vlc_cleanup_pop();
     b = p_fifo->p_first;
 
     p_fifo->b_force_wake = false;
@@ -475,24 +478,24 @@ block_t *block_FifoShow( block_fifo_t *p_fifo )
     block_t *b;
 
     vlc_mutex_lock( &p_fifo->lock );
+    mutex_cleanup_push( &p_fifo->lock );
 
     if( p_fifo->p_first == NULL )
-    {
         vlc_cond_wait( &p_fifo->wait, &p_fifo->lock );
-    }
 
     b = p_fifo->p_first;
 
-    vlc_mutex_unlock( &p_fifo->lock );
-
-    return( b );
+    vlc_cleanup_run ();
+    return b;
 }
 
+/* FIXME: not thread-safe */
 size_t block_FifoSize( const block_fifo_t *p_fifo )
 {
     return p_fifo->i_size;
 }
 
+/* FIXME: not thread-safe */
 size_t block_FifoCount( const block_fifo_t *p_fifo )
 {
     return p_fifo->i_depth;

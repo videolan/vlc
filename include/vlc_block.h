@@ -155,6 +155,12 @@ static inline void block_Release( block_t *p_block )
 VLC_EXPORT( block_t *, block_mmap_Alloc, (void *addr, size_t length) );
 VLC_EXPORT( block_t *, block_File, (int fd) );
 
+static inline void block_Cleanup (void *block)
+{
+    block_Release ((block_t *)block);
+}
+#define block_cleanup_push( block ) vlc_cleanup_push (block_Cleanup, block)
+
 /****************************************************************************
  * Chains of blocks functions helper
  ****************************************************************************
@@ -282,6 +288,8 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * - block_FifoSize : how many cumulated bytes are waiting in the fifo
  * - block_FifoWake : wake ups a thread with block_FifoGet() = NULL
  *   (this is used to wakeup a thread when there is no data to queue)
+ *
+ * block_FifoGet and block_FifoShow are cancellation points.
  ****************************************************************************/
 
 VLC_EXPORT( block_fifo_t *, block_FifoNew,      ( void ) );
