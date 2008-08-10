@@ -427,7 +427,7 @@ error:
 
 - (input_item_t *)item
 {
-    vlc_gc_incref( p_item );
+    if( p_item ) vlc_gc_incref( p_item );
     return p_item;
 }
 
