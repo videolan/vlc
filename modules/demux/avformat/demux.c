@@ -430,6 +430,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
+            i64 = i64 *AV_TIME_BASE / 1000000;
             if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
                 i64 += p_sys->ic->start_time;
 
@@ -501,12 +502,13 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
             return i_size;
 #endif
         case SEEK_SET:
+            i_absolute = (int64_t)offset;
             break;
         case SEEK_CUR:
-            i_absolute = stream_Tell( p_demux->s ) + offset;
+            i_absolute = stream_Tell( p_demux->s ) + (int64_t)offset;
             break;
         case SEEK_END:
-            i_absolute = i_size + offset;
+            i_absolute = i_size + (int64_t)offset;
             break;
         default:
             return -1;
@@ -515,7 +517,7 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     if( i_absolute < 0 )
         i_absolute = 0;
 
-    if( i_size && i_absolute >= i_size )
+    if( i_size > 0 && i_absolute >= i_size )
     {
         msg_Dbg( p_demux, "Trying to seek too far : EOF?" );
         return -1;
