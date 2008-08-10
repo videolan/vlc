@@ -386,14 +386,19 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     (void)psz_file; (void)i_line;
 
 #elif defined( WIN32 )
-    mtime_t delay_ms = (deadline - mdate())/1000;
+    mtime_t total = (deadline - mdate())/1000;
     DWORD result;
-    if( delay_ms < 0 )
-        delay_ms = 0;
+    if( total < 0 )
+        total = 0;
 
-    /* Increase our wait count */
-    result = SignalObjectAndWait( *p_mutex, *p_condvar,
-                                  delay_ms, FALSE );
+    do
+    {
+        DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
+        result = SignalObjectAndWait( *p_mutex, *p_condvar,
+                                      delay, FALSE );
+        total -= delay;
+    }
+    while (total);
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
