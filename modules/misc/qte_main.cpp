@@ -162,6 +162,7 @@ static void* QteMain( vlc_object_t* p_vlc_obj )
 {
     qte_thread_t *p_this = (qte_thread_t*)p_vlc_obj;
     int i_argc = 1;
+    int canc = vlc_savecancel ();
 
     p_this->b_gui_server = false;
     if( config_GetInt( p_this, "qte-guiserver" ) )
@@ -191,5 +192,6 @@ static void* QteMain( vlc_object_t* p_vlc_obj )
     vlc_thread_ready( p_this );
     p_this->p_qte_application->exec();
 
+    vlc_restorecancel (canc);
     return NULL;
 }

@@ -1737,6 +1737,7 @@ static void* TimeoutPrevention( vlc_object_t * p_this )
 
     vlc_thread_ready( p_timeout );
 
+    int canc = vlc_savecancel ();
     /* Avoid lock */
     while( vlc_object_alive (p_timeout) )
     {
@@ -1759,6 +1760,7 @@ static void* TimeoutPrevention( vlc_object_t * p_this )
         p_timeout->i_remain -= 200000;
         msleep( 200000 ); /* 200 ms */
     }
+    vlc_restorecancel (canc);
 }
 
 /*****************************************************************************

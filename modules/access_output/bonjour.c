@@ -186,11 +186,13 @@ static void* poll_iterate_thread( vlc_object_t *p_this )
 {
     poll_thread_t *p_pt = (poll_thread_t*)p_this;
     vlc_thread_ready( p_pt );
+    int canc = vlc_savecancel ();
 
     while( vlc_object_alive (p_pt) )
         if( avahi_simple_poll_iterate( p_pt->simple_poll, 100 ) != 0 )
             break;
 
+    vlc_restorecancel (canc);
     return NULL;
 }
 

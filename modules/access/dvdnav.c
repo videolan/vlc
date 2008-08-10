@@ -1263,6 +1263,8 @@ static void* EventThread( vlc_object_t *p_this )
     p_ev->i_key_action = 0;
     p_ev->b_still   = false;
 
+    int canc = vlc_savecancel ();
+
     /* catch all key event */
     var_AddCallback( p_ev->p_libvlc, "key-action", EventKey, p_ev );
 
@@ -1373,7 +1375,7 @@ static void* EventThread( vlc_object_t *p_this )
         vlc_object_release( p_vout );
     }
     var_DelCallback( p_ev->p_libvlc, "key-action", EventKey, p_ev );
-
+    vlc_restorecancel (canc);
     vlc_mutex_destroy( &p_ev->lock );
 
     return NULL;

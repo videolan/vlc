@@ -443,6 +443,7 @@ static void* ThreadWrite( vlc_object_t *p_this )
     mtime_t              i_date_last = -1;
     mtime_t              i_to_send = p_thread->i_group;
     int                  i_dropped_packets = 0;
+    int canc = vlc_savecancel ();
 
     while( vlc_object_alive (p_thread) )
     {
@@ -519,5 +520,6 @@ static void* ThreadWrite( vlc_object_t *p_this )
 
         i_date_last = i_date;
     }
+    vlc_restorecancel (canc);
     return NULL;
 }

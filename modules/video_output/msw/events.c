@@ -100,6 +100,7 @@ void* EventThread( vlc_object_t *p_this )
     vlc_value_t val;
     unsigned int i_width, i_height, i_x, i_y;
     HMODULE hkernel32;
+    int canc = vlc_savecancel ();
 
     /* Initialisation */
     p_event->p_vout->pf_control = Control;
@@ -376,6 +377,7 @@ void* EventThread( vlc_object_t *p_this )
     p_event->p_vout->p_sys->i_changes = 0;
 
     DirectXCloseWindow( p_event->p_vout );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

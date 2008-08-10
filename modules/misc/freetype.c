@@ -525,6 +525,7 @@ static void* FontBuilderThread( vlc_object_t *p_this )
     if( p_fontconfig )
     {
         mtime_t    t1, t2;
+        int canc = vlc_savecancel ();
 
         //msg_Dbg( p_this, "Building font database..." );
         msg_Dbg( p_this, "Building font database..." );
@@ -548,6 +549,7 @@ static void* FontBuilderThread( vlc_object_t *p_this )
         vlc_mutex_unlock( p_lock );
 
         var_SetBool( p_this, "build-done", true );
+        vlc_restorecancel (canc);
     }
     return NULL;
 }

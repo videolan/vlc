@@ -325,6 +325,7 @@ static void* Thread( vlc_object_t *p_this )
     int16_t p_data[2][512];
     int i_data = 0, i_count = 0;
     PluginInfo *p_plugin_info;
+    int canc = vlc_savecancel ();
 
     var_Get( p_this, "goom-width", &width );
     var_Get( p_this, "goom-height", &height );
@@ -375,6 +376,7 @@ static void* Thread( vlc_object_t *p_this )
     }
 
     goom_close( p_plugin_info );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

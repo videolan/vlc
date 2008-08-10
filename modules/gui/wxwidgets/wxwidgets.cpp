@@ -299,6 +299,7 @@ static void* Init( vlc_object_t * p_this )
     static char  *p_args[] = { "" };
     int i_args = 1;
 #endif
+    int canc = vlc_savecancel ();
 
     /* Hack to pass the p_intf pointer to the new wxWidgets Instance object */
 #ifdef wxTheApp
@@ -321,6 +322,7 @@ static void* Init( vlc_object_t * p_this )
 #else
     wxEntry( i_args, p_args );
 #endif
+    vlc_restorecancel (canc);
     return NULL;
 }
 

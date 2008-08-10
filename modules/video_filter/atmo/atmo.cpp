@@ -1741,6 +1741,7 @@ static void *FadeToColorThread(vlc_object_t *obj)
 
     uint8_t *p_source = NULL;
 
+    int canc = vlc_savecancel ();
     /* initialize AtmoWin for this thread! */
     AtmoInitialize(p_fadethread->p_filter , true);
 
@@ -1825,6 +1826,7 @@ static void *FadeToColorThread(vlc_object_t *obj)
     }
     /* call indirect to OleUnitialize() for this thread */
     AtmoFinalize(p_fadethread->p_filter, 0);
+    vlc_restorecancel (canc);
 }
 
 /*****************************************************************************

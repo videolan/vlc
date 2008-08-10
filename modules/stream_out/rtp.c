@@ -1434,6 +1434,7 @@ static void* ThreadSend( vlc_object_t *p_this )
 {
     sout_stream_id_t *id = (sout_stream_id_t *)p_this;
     unsigned i_caching = id->i_caching;
+    int canc = vlc_savecancel ();
 
     while( vlc_object_alive (id) )
     {
@@ -1499,6 +1500,7 @@ static void* ThreadSend( vlc_object_t *p_this )
             rtp_add_sink( id, fd, true );
         }
     }
+    vlc_restorecancel (canc);
     return NULL;
 }
 

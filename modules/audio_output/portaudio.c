@@ -573,6 +573,7 @@ static void* PORTAUDIOThread( vlc_object_t *p_this )
     aout_instance_t *p_aout;
     aout_sys_t *p_sys;
     int i_err;
+    int canc = vlc_savecancel ();
 
     while( vlc_object_alive (pa_thread) )
     {
@@ -645,6 +646,7 @@ static void* PORTAUDIOThread( vlc_object_t *p_this )
         vlc_cond_signal( &pa_thread->wait );
         vlc_mutex_unlock( &pa_thread->lock_wait );
     }
+    vlc_restorecancel (canc);
     return NULL;
 }
 #endif

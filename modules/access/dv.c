@@ -363,6 +363,7 @@ static void* Raw1394EventThread( vlc_object_t *p_this )
     access_t *p_access = (access_t *) p_ev->p_access;
     access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
     int result = 0;
+    int canc = vlc_savecancel ();
 
     AVCPlay( p_access, p_sys->i_node );
 
@@ -386,6 +387,7 @@ static void* Raw1394EventThread( vlc_object_t *p_this )
     }
 
     AVCStop( p_access, p_sys->i_node );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

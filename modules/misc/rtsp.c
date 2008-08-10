@@ -816,6 +816,7 @@ static void* CommandThread( vlc_object_t *p_this )
 {
     vod_t *p_vod = (vod_t*)p_this;
     vod_sys_t *p_sys = p_vod->p_sys;
+    int canc = vlc_savecancel ();
 
     while( vlc_object_alive (p_vod) )
     {
@@ -883,6 +884,8 @@ static void* CommandThread( vlc_object_t *p_this )
         free( cmd.psz_session );
         free( cmd.psz_arg );
     }
+
+    vlc_restorecancel (canc);
     return NULL;
 }
 

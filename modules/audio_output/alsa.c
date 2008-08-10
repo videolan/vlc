@@ -764,6 +764,7 @@ static void* ALSAThread( vlc_object_t* p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t*)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    int canc = vlc_savecancel ();
     p_sys->p_status = (snd_pcm_status_t *)malloc(snd_pcm_status_sizeof());
 
     /* Wait for the exact time to start playing (avoids resampling) */
@@ -785,6 +786,7 @@ static void* ALSAThread( vlc_object_t* p_this )
 cleanup:
     snd_pcm_drop( p_sys->p_snd_pcm );
     free( p_aout->output.p_sys->p_status );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

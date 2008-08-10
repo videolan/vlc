@@ -677,6 +677,7 @@ static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
     filter_t* p_filter = (filter_t*)(p_thread_obj->p_parent);
     filter_sys_t *p_sys = p_filter->p_sys;
     vlc_object_t *p_update_request_thread;
+    int canc = vlc_savecancel ();
 
     msg_Dbg( p_filter, "VNC worker thread started" );
 
@@ -799,6 +800,7 @@ exit:
     vlc_mutex_unlock( &p_sys->lock );
 
     msg_Dbg( p_filter, "VNC message reader thread ended" );
+    vlc_restorecancel (canc);
     return NULL;
 }
 
@@ -806,6 +808,7 @@ static void* update_request_thread( vlc_object_t *p_thread_obj )
 {
     filter_t* p_filter = (filter_t*)(p_thread_obj->p_parent);
     filter_sys_t *p_sys = p_filter->p_sys;
+    int canc = vlc_savecancel ();
 
     msg_Dbg( p_filter, "VNC update request thread started" );
 
@@ -848,6 +851,7 @@ static void* update_request_thread( vlc_object_t *p_thread_obj )
     }
 
     msg_Dbg( p_filter, "VNC update request thread ended" );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

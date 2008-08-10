@@ -982,6 +982,7 @@ static void* WaveOutThread( vlc_object_t *p_this )
     bool b_sleek;
     mtime_t next_date;
     uint32_t i_buffer_length = 64;
+    int canc = vlc_savecancel ();
 
     /* We don't want any resampling when using S/PDIF */
     b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
@@ -1108,6 +1109,7 @@ static void* WaveOutThread( vlc_object_t *p_this )
     }
 
 #undef waveout_warn
+    vlc_restorecancel (canc);
     return NULL;
 }
 

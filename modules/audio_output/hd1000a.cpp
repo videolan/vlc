@@ -222,6 +222,7 @@ static void* Thread( vlc_object_t *p_this )
     aout_buffer_t * p_buffer;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     PCMAudioPlayer * pPlayer = p_sys->pPlayer;
+    int canc = vlc_savecancel ();
 
     while( vlc_object_alive (p_aout) )
     {
@@ -254,6 +255,7 @@ static void* Thread( vlc_object_t *p_this )
 #undef i
     }
 
+    vlc_restorecancel (canc);
     return NULL;
 }
 

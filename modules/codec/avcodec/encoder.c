@@ -706,6 +706,7 @@ int OpenEncoder( vlc_object_t *p_this )
 static void* FfmpegThread( vlc_object_t *p_this )
 {
     struct thread_context_t *p_context = (struct thread_context_t *)p_this;
+    int canc = vlc_savecancel ();
     while ( vlc_object_alive (p_context) && !p_context->b_error )
     {
         vlc_mutex_lock( &p_context->lock );
@@ -730,6 +731,7 @@ static void* FfmpegThread( vlc_object_t *p_this )
         vlc_mutex_unlock( &p_context->lock );
     }
 
+    vlc_restorecancel (canc);
     return NULL;
 }
 

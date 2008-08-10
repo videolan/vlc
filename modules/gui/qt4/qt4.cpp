@@ -311,6 +311,7 @@ static void *Init( vlc_object_t *obj )
     char dummy[] = "";
     char *argv[] = { dummy };
     int argc = 1;
+    int canc = vlc_savecancel ();
 
     Q_INIT_RESOURCE( vlc );
 
@@ -464,6 +465,8 @@ static void *Init( vlc_object_t *obj )
     /* Save the path */
     config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
     free( psz_path );
+    vlc_restorecancel (canc);
+    return NULL;
 }
 
 /*****************************************************************************

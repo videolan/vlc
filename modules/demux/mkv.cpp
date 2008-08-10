@@ -2770,6 +2770,7 @@ void * demux_sys_t::EventThread( vlc_object_t *p_this )
     event_thread_t *p_ev = (event_thread_t*)p_this;
     demux_sys_t    *p_sys = p_ev->p_demux->p_sys;
     vlc_object_t   *p_vout = NULL;
+    int canc = vlc_savecancel ();
 
     p_ev->b_moved   = false;
     p_ev->b_clicked = false;
@@ -3071,6 +3072,7 @@ void * demux_sys_t::EventThread( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_ev->lock );
 
+    vlc_restorecancel (canc);
     return VLC_SUCCESS;
 }
 

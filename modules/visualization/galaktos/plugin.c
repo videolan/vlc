@@ -197,12 +197,16 @@ static void* Thread( vlc_object_t *p_this )
     int timed=0;
     int timestart=0;
     int mspf=0;
+    int canc = vlc_savecancel ();
 
     /* Get on OpenGL provider */
     p_thread->p_opengl =
         (vout_thread_t *)vlc_object_create( p_this, VLC_OBJECT_OPENGL );
     if( p_thread->p_opengl == NULL )
+    {
+        vlc_restorecancel (canc);
         return NULL;
+    }
     vlc_object_attach( p_thread->p_opengl, p_this );
 
     /* Initialize vout parameters */
@@ -228,6 +232,7 @@ static void* Thread( vlc_object_t *p_this )
         msg_Err( p_thread, "unable to initialize OpenGL" );
         vlc_object_detach( p_thread->p_opengl );
         vlc_object_release( p_thread->p_opengl );
+        vlc_restorecancel (canc);
         return NULL;
     }
 
@@ -267,6 +272,7 @@ static void* Thread( vlc_object_t *p_this )
     module_Unneed( p_thread->p_opengl, p_thread->p_module );
     vlc_object_detach( p_thread->p_opengl );
     vlc_object_release( p_thread->p_opengl );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

@@ -1609,6 +1609,7 @@ static void* KeepAliveThread( vlc_object_t *p_this )
     vlc_object_lock( p_thread );
     while( vlc_object_alive( p_thread) )
     {
+        int canc = vlc_savecancel ();
         b_paused = p_thread->b_paused;
 
         if( b_paused && b_was_paused )
@@ -1616,6 +1617,7 @@ static void* KeepAliveThread( vlc_object_t *p_this )
 
         b_was_paused = b_paused;
         vlc_object_timedwait( p_thread, mdate() + 10000000 );
+        vlc_restorecancel (canc);
     }
     vlc_object_unlock( p_thread );
     return NULL;

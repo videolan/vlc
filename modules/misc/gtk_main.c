@@ -167,6 +167,7 @@ static void* GtkMain( vlc_object_t *p_this )
     static char **pp_args  = p_args;
 #endif
     static int    i_args   = 1;
+    int canc = vlc_savecancel ();
 
     /* FIXME: deprecated ? */
 #if defined(MODULE_NAME_IS_gtk2_main) || defined(MODULE_NAME_IS_gnome2_main)
@@ -197,5 +198,6 @@ static void* GtkMain( vlc_object_t *p_this )
     gtk_main();
 
     gdk_threads_leave();
+    vlc_restorecancel (canc);
     return NULL;
 }

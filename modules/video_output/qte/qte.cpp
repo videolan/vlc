@@ -591,6 +591,7 @@ static void CloseDisplay( vout_thread_t *p_vout )
 static void* RunQtThread( vlc_object_t *p_this )
 {
     event_thread_t *p_event = (event_thread_t *)p_this;
+    int canc = vlc_savecancel ();
     msg_Dbg( p_event->p_vout, "RunQtThread starting" );
 
 #ifdef NEED_QTE_MAIN
@@ -669,6 +670,7 @@ static void* RunQtThread( vlc_object_t *p_this )
 #endif
 
     msg_Dbg( p_event->p_vout, "RunQtThread terminating" );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

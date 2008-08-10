@@ -265,6 +265,7 @@ static void* QNXaoutThread( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t*)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    int canc = vlc_savecancel ();
 
     while ( vlc_object_alive (p_aout) )
     {
@@ -321,6 +322,7 @@ static void* QNXaoutThread( vlc_object_t *p_this )
         }
     }
 
+    vlc_restorecancel (canc);
     return NULL;
 }
 

@@ -242,10 +242,13 @@ static void * MyThread( vlc_object_t *p_this )
     while( vlc_object_alive (p_this) )
     {
         int i = (int) (100.0 * rand() / (RAND_MAX));
+        /* FIXME: not thread-safe */
 
         sprintf( psz_var, "blork-%i", i );
         val.i_int = i + 200;
+        int canc = vlc_savecancel ();
         var_Set( p_parent, psz_var, val );
+        vlc_restorecancel (canc);
 
         /* This is quite heavy, but we only have 10 threads. Keep cool. */
         msleep( 1000 );

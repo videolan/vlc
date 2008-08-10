@@ -279,6 +279,7 @@ static void* Thread( vlc_object_t* p_this )
     access_t     *p_src = p_access->p_source;
     block_t      *p_block;
 
+    int canc = vlc_savecancel ();
     while( vlc_object_alive (p_access) )
     {
         /* Get a new block from the source */
@@ -357,6 +358,7 @@ static void* Thread( vlc_object_t* p_this )
 
     /* Send dummy packet to avoid deadlock in Block() */
     block_FifoPut( p_sys->p_fifo, block_New( p_access, 0 ) );
+    vlc_restorecancel (canc);
     return NULL;
 }
 

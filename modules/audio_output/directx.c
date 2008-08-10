@@ -1054,6 +1054,7 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     mtime_t last_time;
     HRESULT dsresult;
     long l_queued = 0;
+    int canc = vlc_savecancel ();
 
     /* We don't want any resampling when using S/PDIF output */
     b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
@@ -1148,6 +1149,7 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     /* free the event */
     CloseHandle( p_notif->event );
 
+    vlc_restorecancel (canc);
     msg_Dbg( p_notif, "DirectSoundThread exiting" );
     return NULL;
 }

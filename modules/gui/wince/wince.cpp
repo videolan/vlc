@@ -213,6 +213,7 @@ static void* MainLoop( vlc_object_t * p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     MSG msg;
     Interface *intf = 0;
+    int canc = vlc_savecancel ();
 
     if( !hInstance ) hInstance = GetModuleHandle(NULL);
 
@@ -268,6 +269,7 @@ static void* MainLoop( vlc_object_t * p_this )
     /* Uninitialize OLE/COM */
     CoUninitialize();
 #endif
+    vlc_restorecancel (canc);
     return NULL;
 }
 

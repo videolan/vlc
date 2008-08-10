@@ -383,6 +383,7 @@ static void* ThreadControl( vlc_object_t *p_this )
 {
     rtmp_control_thread_t *p_thread = (rtmp_control_thread_t *) p_this;
     rtmp_packet_t *rtmp_packet;
+    int canc = vlc_savecancel ();
 
     rtmp_init_handler( p_thread->rtmp_handler );
 
@@ -416,5 +417,6 @@ static void* ThreadControl( vlc_object_t *p_this )
             p_thread->b_die = 1;
         }
     }
+    vlc_restorecancel (canc);
     return NULL;
 }
