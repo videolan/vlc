@@ -38,6 +38,8 @@
 #include <vlc_osd.h>
 #include <vlc_charset.h>
 
+#include <limits.h>
+
 #include "osd_menu.h"
 
 int osd_parser_simpleOpen( vlc_object_t *p_this );
