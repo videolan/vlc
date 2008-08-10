@@ -705,7 +705,7 @@ int vlc_inet_pton (int af, const char *src, void *dst)
     }, *res;
 
     if (getaddrinfo (src, NULL, &hints, &res))
-        return -1;
+        return 0;
 
     const void *data;
     size_t len;
@@ -726,7 +726,7 @@ int vlc_inet_pton (int af, const char *src, void *dst)
             return -1;
     }
     memcpy (dst, data, len);
-    return 0;
+    return 1;
 #else /* HAVE_INET_PTON */
     return inet_pton( af, src, dst );
 #endif /* HAVE_INET_PTON */
