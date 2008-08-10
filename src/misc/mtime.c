@@ -484,7 +484,7 @@ mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
     if( p_date->i_remainder >= p_date->i_divider_num )
     {
         /* This is Bresenham algorithm. */
-        /* It is guaranteed that: assert(i_remainder < 2*i_divider_num) */
+        assert( p_date->i_remainder < 2*p_date->i_divider_num);
         p_date->date += 1;
         p_date->i_remainder -= p_date->i_divider_num;
     }
