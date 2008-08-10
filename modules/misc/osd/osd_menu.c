@@ -1,7 +1,7 @@
 /*****************************************************************************
  * parser.c : OSD import module
  *****************************************************************************
- * Copyright (C) 2007 M2X
+ * Copyright (C) 2007-2008 M2X
  * $Id$
  *
  * Authors: Jean-Paul Saman
@@ -120,6 +120,8 @@ void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
     osd_button_t *p_next = NULL;
     osd_button_t *p_prev = NULL;
 
+    if( !p_current ) return;
+
     /* First walk to the end. */
     while( p_current->p_next )
     {
@@ -218,9 +220,11 @@ osd_state_t *osd_StateNew( osd_menu_t *p_menu, const char *psz_file,
     {
         p_state->p_pic = image_ReadUrl( p_menu->p_image, psz_file,
                                         &fmt_in, &fmt_out );
-
-        p_state->i_width  = p_state->p_pic->p[Y_PLANE].i_visible_pitch;
-        p_state->i_height = p_state->p_pic->p[Y_PLANE].i_visible_lines;
+        if( p_state->p_pic )
+        {
+            p_state->i_width  = p_state->p_pic->p[Y_PLANE].i_visible_pitch;
+            p_state->i_height = p_state->p_pic->p[Y_PLANE].i_visible_lines;
+        }
     }
 
     if( psz_state )
@@ -247,6 +251,8 @@ void osd_StatesFree( osd_menu_t *p_menu, osd_state_t *p_states )
     osd_state_t *p_state = p_states;
     osd_state_t *p_next = NULL;
     osd_state_t *p_prev = NULL;
+
+    if( !p_state ) return;
 
     while( p_state->p_next )
     {

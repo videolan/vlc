@@ -1,7 +1,7 @@
 /*****************************************************************************
  * osd.c - The OSD Menu core code.
  *****************************************************************************
- * Copyright (C) 2005-2007 M2X
+ * Copyright (C) 2005-2008 M2X
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
@@ -38,10 +38,6 @@
 
 #undef OSD_MENU_DEBUG
 
-#if 0
-static const char *ppsz_button_states[] = { "unselect", "select", "pressed" };
-#endif
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -74,6 +70,7 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
     if( !p_menu )
         return NULL;
 
+    p_menu->p_parser = NULL;
     vlc_object_attach( p_menu, p_this->p_libvlc );
 
     /* Stuff needed for Parser */
@@ -110,11 +107,11 @@ static void osd_ParserUnload( osd_menu_t *p_menu )
 {
     if( p_menu->p_image )
         image_HandlerDelete( p_menu->p_image );
-    if( p_menu->psz_file )
-        free( p_menu->psz_file );
 
     if( p_menu->p_parser )
         module_Unneed( p_menu, p_menu->p_parser );
+
+    free( p_menu->psz_file );
 
     vlc_object_detach( p_menu );
     vlc_object_release( p_menu );
@@ -123,7 +120,7 @@ static void osd_ParserUnload( osd_menu_t *p_menu )
 /**
  * Change state on an osd_button_t.
  *
- * This function selects the specified state and returns a pointer to it. The
+ * This function selects the specified state and returns a pointer vlc_custom_createto it. The
  * following states are currently supported:
  * \see OSD_BUTTON_UNSELECT
  * \see OSD_BUTTON_SELECT
@@ -173,7 +170,7 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
 
         /* Parse configuration file */
         p_osd = osd_ParserLoad( p_this, psz_file );
-        if( !p_osd )
+        if( !p_osd || !p_osd->p_state )
             goto error;
 
         /* Setup default button (first button) */
@@ -207,16 +204,7 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     return p_osd;
 
 error:
-    msg_Err( p_this, "creating OSD menu object failed" );
-
-    if( p_osd->p_image )
-        image_HandlerDelete( p_osd->p_image );
-    if( p_osd->psz_file )
-        free( p_osd->psz_file );
-
-    vlc_object_detach( p_osd );
-    vlc_object_release( p_osd );
-    vlc_mutex_unlock( lockval.p_address );
+    __osd_MenuDelete( p_this, p_osd );
     return NULL;
 }
 

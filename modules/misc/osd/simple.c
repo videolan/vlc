@@ -1,7 +1,7 @@
 /*****************************************************************************
  * simple.c - The OSD Menu simple parser code.
  *****************************************************************************
- * Copyright (C) 2005-2007 M2X
+ * Copyright (C) 2005-2008 M2X
  * $Id$
  *
  * Authors: Jean-Paul Saman
@@ -51,7 +51,6 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
     osd_button_t   *p_current = NULL; /* button currently processed */
     osd_button_t   *p_prev = NULL;    /* previous processed button */
 
-#define MAX_FILE_PATH 256
     FILE       *fd = NULL;
     int        result = 0;
 
@@ -71,7 +70,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
     {
         char action[25] = "";
         char cmd[25] = "";
-        char path[MAX_FILE_PATH] = "";
+        char path[PATH_MAX] = "";
         char *psz_path = NULL;
         size_t i_len = 0;
         long pos = 0;
@@ -85,14 +84,14 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
             /* psz_path is not null and therefor &path[0] cannot be NULL
              * it might be null terminated.
              */
-            strncpy( &path[0], psz_path, MAX_FILE_PATH );
+            strncpy( &path[0], psz_path, PATH_MAX );
             free( psz_path );
             psz_path = NULL;
         }
         /* NULL terminate before asking the length of path[] */
-        path[MAX_FILE_PATH-1] = '\0';
+        path[PATH_MAX-1] = '\0';
         i_len = strlen(&path[0]);
-        if( i_len == MAX_FILE_PATH )
+        if( i_len == PATH_MAX )
             i_len--; /* truncate to prevent buffer overflow */
 #if defined(WIN32) || defined(UNDER_CE)
         if( (i_len > 0) && path[i_len] != '\\' )
@@ -153,7 +152,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
         char action[25] = "";
         char state[25]  = "";
         char file[256]  = "";
-        char path[512]  = "";
+        char path[PATH_MAX]  = "";
         int  i_x = 0;
         int  i_y = 0;
 
@@ -261,8 +260,13 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                             size_t i_path_size = strlen( p_menu->psz_path );
                             size_t i_file_size = strlen( &file[0] );
 
+                            if( (i_path_size + i_file_size >= PATH_MAX) ||
+                                (i_path_size >= PATH_MAX) )
+                                goto error;
+
                             strncpy( &path[0], p_menu->psz_path, i_path_size );
-                            strncpy( &path[i_path_size], &file[0], 512 - (i_path_size + i_file_size) );
+                            strncpy( &path[i_path_size], &file[0],
+                                     PATH_MAX - (i_path_size + i_file_size) );
                             path[ i_path_size + i_file_size ] = '\0';
 
                             p_range_current = osd_StateNew( p_menu, &path[0], "pressed" );
@@ -366,8 +370,13 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                         size_t i_path_size = strlen( p_menu->psz_path );
                         size_t i_file_size = strlen( &file[0] );
 
+                        if( (i_path_size + i_file_size >= PATH_MAX) ||
+                            (i_path_size >= PATH_MAX) )
+                            goto error;
+
                         strncpy( &path[0], p_menu->psz_path, i_path_size );
-                        strncpy( &path[i_path_size], &file[0], 512 - (i_path_size + i_file_size) );
+                        strncpy( &path[i_path_size], &file[0],
+                                 PATH_MAX - (i_path_size + i_file_size) );
                         path[ i_path_size + i_file_size ] = '\0';
 
                         p_range_current = osd_StateNew( p_menu, &path[0], "pressed" );
@@ -442,8 +451,13 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                 size_t i_path_size = strlen( p_menu->psz_path );
                 size_t i_file_size = strlen( &file[0] );
 
+                if( (i_path_size + i_file_size >= PATH_MAX) ||
+                    (i_path_size >= PATH_MAX) )
+                    goto error;
+
                 strncpy( &path[0], p_menu->psz_path, i_path_size );
-                strncpy( &path[i_path_size], &file[0], 512 - (i_path_size + i_file_size) );
+                strncpy( &path[i_path_size], &file[0],
+                         PATH_MAX - (i_path_size + i_file_size) );
                 path[ i_path_size + i_file_size ] = '\0';
 
                 p_state_current = osd_StateNew( p_menu, &path[0], &state[0] );
@@ -489,7 +503,6 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
     fclose( fd );
     return VLC_SUCCESS;
 
-#undef MAX_FILE_PATH
 error:
     msg_Err( p_menu, "parsing file failed (returned %d)", result );
     osd_MenuFree( p_menu );
