@@ -480,7 +480,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( i_pressed_modifiers & NSCommandKeyMask )
         val.i_int |= KEY_MODIFIER_COMMAND;
 
-    key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
+    key = [[[o_event charactersIgnoringModifiers] lowercaseString] characterAtIndex: 0];
 
     if( key )
     {

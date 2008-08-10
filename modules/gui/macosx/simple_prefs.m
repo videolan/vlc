@@ -1236,125 +1236,27 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (void)keyDown:(NSEvent *)o_theEvent
 {
-    int i_nonReadableKey = 0;
+    unichar key;
+    int i_key = 0;
 
     if( [o_theEvent modifierFlags] & NSControlKeyMask )
-        i_nonReadableKey = i_nonReadableKey | KEY_MODIFIER_CTRL;
+        i_key |= KEY_MODIFIER_CTRL;
 
     if( [o_theEvent modifierFlags] & NSAlternateKeyMask  )
-        i_nonReadableKey = i_nonReadableKey | KEY_MODIFIER_ALT;
+        i_key |= KEY_MODIFIER_ALT;
 
     if( [o_theEvent modifierFlags] & NSShiftKeyMask )
-        i_nonReadableKey = i_nonReadableKey | KEY_MODIFIER_SHIFT;
+        i_key |= KEY_MODIFIER_SHIFT;
 
     if( [o_theEvent modifierFlags] & NSCommandKeyMask )
-        i_nonReadableKey = i_nonReadableKey | KEY_MODIFIER_COMMAND;
+        i_key |= KEY_MODIFIER_COMMAND;
 
-    if( [o_theEvent modifierFlags] & NSFunctionKeyMask  )
+    key = [[[o_theEvent charactersIgnoringModifiers] lowercaseString] characterAtIndex: 0];
+    if( key )
     {
-        unichar key = 0;
-        key = [[o_theEvent charactersIgnoringModifiers] characterAtIndex: 0];
-        
-        switch( key )
-        {
-            case 0x1b:
-                i_nonReadableKey = i_nonReadableKey | KEY_ESC;
-                break;
-            case NSF1FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F1;
-                break;
-            case NSF2FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F2;
-                break;
-            case NSF3FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F3;
-                break;
-            case NSF4FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F4;
-                break;
-            case NSF5FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F5;
-                break;
-            case NSF6FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F6;
-                break;
-            case NSF7FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F7;
-                break;
-            case NSF8FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F8;
-                break;
-            case NSF9FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F9;
-                break;
-            case NSF10FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F10;
-                break;
-            case NSF11FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F11;
-                break;
-            case NSF12FunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_F12;
-                break;
-            case NSInsertFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_INSERT;
-                break;
-            case NSHomeFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_HOME;
-                break;
-            case NSEndFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_END;
-                break;
-            case NSPageUpFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_PAGEUP;
-                break;
-            case NSPageDownFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_PAGEDOWN;
-                break;
-            case NSMenuFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_MENU;
-                break;
-            case NSTabCharacter:
-                i_nonReadableKey = i_nonReadableKey | KEY_TAB;
-                break;
-            case NSDeleteCharacter:
-                i_nonReadableKey = i_nonReadableKey | KEY_DELETE;
-                break;
-            case NSBackspaceCharacter:
-                i_nonReadableKey = i_nonReadableKey | KEY_BACKSPACE;
-                break;
-            case NSUpArrowFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_UP;
-                break;
-            case NSDownArrowFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_DOWN;
-                break;
-            case NSRightArrowFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_RIGHT;
-                break;
-            case NSLeftArrowFunctionKey:
-                i_nonReadableKey = i_nonReadableKey | KEY_LEFT;
-                break;
-            case NSEnterCharacter:
-                i_nonReadableKey = i_nonReadableKey | KEY_ENTER;
-                break;
-            default:
-            {
-                msg_Warn( VLCIntf, "user pressed unknown function key" );
-                i_nonReadableKey = 0;
-                break;
-            }
-        }
+        i_key |= CocoaKeyToVLC( key );
+        [[[VLCMain sharedInstance] getSimplePreferences] changeHotkeyTo: i_key];
     }
-    else
-    {
-        if( [[o_theEvent charactersIgnoringModifiers] isEqualToString: @" "] )
-            i_nonReadableKey = i_nonReadableKey | KEY_SPACE;
-        else
-            i_nonReadableKey = i_nonReadableKey | StringToKey( (char *)[[[o_theEvent charactersIgnoringModifiers] lowercaseString] UTF8String] );
-    }
-
-    [[[VLCMain sharedInstance] getSimplePreferences] changeHotkeyTo: i_nonReadableKey];
 }
 
 @end
