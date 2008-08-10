@@ -2285,6 +2285,26 @@ CLEAN_PKG += yasm
 DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.bz2
 
 # ***************************************************************************
+# kate
+# ***************************************************************************
+
+libkate-$(KATE_VERSION).tar.gz:
+	$(WGET) $(KATE_URL)
+
+libkate: libkate-$(KATE_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	(cd $@; autoconf)
+
+.kate: libkate .ogg
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-valgrind && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .kate
+CLEAN_PKG += libkate
+DISTCLEAN_PKG += libkate-$(KATE_VERSION).tar.gz
+
+# ***************************************************************************
 # Copy aclocal files
 # This is necessary for --missing aclocal to succeed after a
 # configure.ac/Makefile.am change in the vlc root dir
