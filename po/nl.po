@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2008-07-21 00:07+0200\n"
-"PO-Revision-Date: 2008-08-08 07:46+0100\n"
+"PO-Revision-Date: 2008-08-10 20:05+0100\n"
 "Last-Translator: Myckel Habets <myckel@sdf.lonestar.org>\n"
 "Language-Team: De Vrije CD <leiden@losc.nl>\n"
 "MIME-Version: 1.0\n"
@@ -27,7 +27,7 @@ msgid ""
 msgstr ""
 "Dit programma wordt verspreid ZONDER ENIGE GARANTIE, voor zover dit door de wet is toegestaan.\n"
 "Het programma mag verspreid worden onder verplichtingen van de GNU General Public License;\n"
-"Zie het bestand COPYING voor details.\n"
+"zie het bestand COPYING voor details.\n"
 "Geschreven door het VideoLAN team; zie het bestand AUTHORS.\n"
 
 #: include/vlc_config_cat.h:32
@@ -73,11 +73,11 @@ msgstr "Instellingen voor de Hoofdinterface"
 #: include/vlc_config_cat.h:47
 #: src/libvlc-module.c:156
 msgid "Control interfaces"
-msgstr "Besturing interfaces"
+msgstr "Besturingsinterfaces"
 
 #: include/vlc_config_cat.h:48
 msgid "Settings for VLC's control interfaces"
-msgstr "Instellingen voor VLC's Besturing interfaces"
+msgstr "Instellingen voor VLC's Besturingsinterfaces"
 
 #: include/vlc_config_cat.h:50
 #: include/vlc_config_cat.h:51
@@ -135,11 +135,11 @@ msgstr "Geluidsvisualisaties"
 #: include/vlc_config_cat.h:68
 #: include/vlc_config_cat.h:81
 msgid "Output modules"
-msgstr "Uitvoer modules"
+msgstr "Uitvoermodules"
 
 #: include/vlc_config_cat.h:69
 msgid "These are general settings for audio output modules."
-msgstr "Dit zijn de algemene instellingen voor audio uitvoer modules."
+msgstr "Dit zijn de algemene instellingen voor audio-uitvoermodules."
 
 #: include/vlc_config_cat.h:71
 #: src/libvlc-module.c:1833
@@ -227,19 +227,19 @@ msgstr "Demuxers worden gebruikt om de audio- en videosporen van elkaar te schei
 
 #: include/vlc_config_cat.h:118
 msgid "Video codecs"
-msgstr "Video codecs"
+msgstr "Videocodecs"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the video-only decoders and encoders."
-msgstr "Instellingen voor video decoders en encoders"
+msgstr "Instellingen voor videodecoders en -encoders"
 
 #: include/vlc_config_cat.h:121
 msgid "Audio codecs"
-msgstr "Audio codecs"
+msgstr "Audiocodecs"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for the audio-only decoders and encoders."
-msgstr "Instellingen voor audio decoders en encoders"
+msgstr "Instellingen voor audiodecoders en -encoders"
 
 #: include/vlc_config_cat.h:124
 msgid "Other codecs"
@@ -251,12 +251,12 @@ msgstr "Instellingen voor audio+video en overige codecs die kunnen decoderen en 
 
 #: include/vlc_config_cat.h:128
 msgid "General input settings. Use with care."
-msgstr "Algemene invoer instellingen. Gebruik met aandacht."
+msgstr "Algemene invoer instellingen. Voorzichtigheid geboden."
 
 #: include/vlc_config_cat.h:131
 #: src/libvlc-module.c:1759
 msgid "Stream output"
-msgstr "Stream uitvoer"
+msgstr "Stream-uitvoer"
 
 #: include/vlc_config_cat.h:133
 msgid ""
@@ -264,7 +264,7 @@ msgid ""
 "Streams are first muxed and then sent through an \"access output\" module that can either save the stream to a file, or stream it (UDP, HTTP, RTP/RTSP).\n"
 "Sout streams modules allow advanced stream processing (transcoding, duplicating...)."
 msgstr ""
-"Stream uitvoer is hetgeen dat VLC in staat stelt als een streaming server te dienen of binnenkomende streams op te slaan.\n"
+"Stream-uitvoer is hetgeen dat VLC in staat stelt als een streaming server te dienen of binnenkomende streams op te slaan.\n"
 "Streams worden eerst muxed en dan door een \"toegangsuitvoer\" module, die naar bestand kan opslaan of het kan streamen (UDP, HTTP, RTP/RTSP), gezonden. \n"
 "Sout streams modules zorgen voor geavanceerde stream verwerkingen (transcoding, dupliceren...)."
 
@@ -363,7 +363,7 @@ msgstr "Dienst-ontdekking"
 
 #: include/vlc_config_cat.h:189
 msgid "Services discovery modules are facilities that automatically add items to playlist."
-msgstr "Dienst-ontdekking modules zijn faciliteiten die automatisch items aan een afspeellijst toevoegen."
+msgstr "Dienst-ontdekkingmodules zijn faciliteiten die automatisch items aan een afspeellijst toevoegen."
 
 #: include/vlc_config_cat.h:193
 #: src/libvlc-module.c:1718
@@ -372,7 +372,7 @@ msgstr "Geavanceerd"
 
 #: include/vlc_config_cat.h:194
 msgid "Advanced settings. Use with care."
-msgstr "Geadvanceerde instellingen. Voorzichtigheid geboden."
+msgstr "Geavanceerde instellingen. Voorzichtigheid geboden."
 
 #: include/vlc_config_cat.h:196
 msgid "CPU features"
@@ -481,7 +481,7 @@ msgstr "&Codec informatie..."
 
 #: include/vlc_intf_strings.h:39
 msgid "&Messages..."
-msgstr "&Berichten..."
+msgstr "Be&richten..."
 
 #: include/vlc_intf_strings.h:40
 msgid "&Extended Settings..."
@@ -624,7 +624,7 @@ msgstr "Zoekfilter"
 
 #: include/vlc_intf_strings.h:80
 msgid "Additional &Sources"
-msgstr "&Additionele bronnen"
+msgstr "Additionele &bronnen"
 
 #: include/vlc_intf_strings.h:84
 msgid "Some options are available but hidden. Check \"Advanced options\" to see them."
@@ -697,7 +697,7 @@ msgstr "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; chars
 #: src/audio_output/filters.c:206
 #: src/audio_output/filters.c:229
 msgid "Audio filtering failed"
-msgstr "Audio filteren faalde"
+msgstr "Audiofilteren faalde"
 
 #: src/audio_output/filters.c:160
 #: src/audio_output/filters.c:207
@@ -1911,7 +1911,7 @@ msgstr "Video Y-coördinaat"
 
 #: src/libvlc-module.c:356
 msgid "You can enforce the position of the top left corner of the video window (Y coordinate)."
-msgstr "Hiermee kunt u de positie van de bovenkant van het videoscherm ten opzichte van het beeldscherm (Y coordinaat) vastleggen."
+msgstr "Hiermee kunt u de positie van de bovenkant van het videoscherm ten opzichte van het beeldscherm (y-coördinaat) vastleggen."
 
 #: src/libvlc-module.c:359
 msgid "Video title"
@@ -2386,7 +2386,7 @@ msgstr "DiffServ Code Punt"
 
 #: src/libvlc-module.c:589
 msgid "Differentiated Services Code Point for outgoing UDP streams (or IPv4 Type Of Service, or IPv6 Traffic Class). This is used for network Quality of Service."
-msgstr ""
+msgstr "DiffServ codepunt voor uitgaande UDP streams (of IPv4 Type of Service, of IPv6 Traffic Class). Dit wordt gebruikt voor netwerk Quality of Service."
 
 #: src/libvlc-module.c:595
 msgid "Choose the program to select by giving its Service ID. Only use this option if you want to read a multi-program stream (like DVB streams for example)."
@@ -2420,7 +2420,7 @@ msgstr "Audio taal"
 
 #: src/libvlc-module.c:619
 msgid "Language of the audio track you want to use (comma separated, two or three letter country code)."
-msgstr "Taal van het audiospoor dat u wilt gebruiken (gescheiden door comma's, twee- of drie-letterig landencode)."
+msgstr "Taal van het audiospoor dat u wilt gebruiken (gescheiden door komma's, twee- of drie-letterig landencode)."
 
 #: src/libvlc-module.c:622
 msgid "Subtitle language"
@@ -2428,7 +2428,7 @@ msgstr "Ondertitelingstaal"
 
 #: src/libvlc-module.c:624
 msgid "Language of the subtitle track you want to use (comma separated, two or tree letter country code)."
-msgstr "Taal van het  ondertitelingsspoor dat u wilt gebruiken (gescheiden door comma's, twee- of drie-letterig landencode)."
+msgstr "Taal van het ondertitelingsspoor dat u wilt gebruiken (gescheiden door komma's, twee- of drie-letterig landencode)."
 
 #: src/libvlc-module.c:628
 msgid "Audio track ID"
@@ -2484,7 +2484,7 @@ msgstr "Invoer lijst"
 
 #: src/libvlc-module.c:654
 msgid "You can give a comma-separated list of inputs that will be concatenated together after the normal one."
-msgstr "U kunt een door comma's gescheiden lijst van invoer opgeven die samengevoegd zal worden na de normale."
+msgstr "U kunt een door komma's gescheiden lijst van invoer opgeven die samengevoegd zal worden na de normale."
 
 #: src/libvlc-module.c:657
 msgid "Input slave (experimental)"
@@ -2504,7 +2504,7 @@ msgstr "U kan handmatig een lijst van bladwijzers aanleggen voor een stream in d
 
 #: src/libvlc-module.c:671
 msgid "These options allow you to modify the behavior of the subpictures subsystem. You can for example enable subpictures filters (logo, etc.). Enable these filters here and configure them in the \"subpictures filters\" modules section. You can also set many miscellaneous subpictures options."
-msgstr "Met deze instellingen kunnen opties voor de ondertiteling gewijzigd worden. Video filters zoals deinterlacing etc kunnen hier geactiveerd worden. Configureer deze modules in de module sectie \"video filters\"."
+msgstr "Met deze instellingen kunnen opties voor de ondertiteling gewijzigd worden. Video filters zoals deinterlacing etc kunnen hier geactiveerd worden. Configureer deze modules in de module sectie \"videofilters\"."
 
 #: src/libvlc-module.c:677
 msgid "Force subtitle position"
@@ -2545,7 +2545,7 @@ msgstr "VLC gebruikt normaal Freetype voor rendering, maar dit staat u toe om bi
 
 #: src/libvlc-module.c:695
 msgid "Subpictures filter module"
-msgstr "Subpictures filter module"
+msgstr "Subpictures-filtermodule"
 
 #: src/libvlc-module.c:697
 msgid "This adds so-called \"subpicture filters\". These filters overlay some images or text over the video (like a logo, arbitrary text...)."
@@ -3160,7 +3160,7 @@ msgstr "Dienst-ontdekking modules"
 
 #: src/libvlc-module.c:1112
 msgid "Specifies the services discovery modules to load, separated by semi-colons. Typical values are sap, hal, ..."
-msgstr "Specifeer de dienst-ontdekking modules om te laden, gescheiden door punt-comma's. Gangbare waarden zijn sap, hal, ..."
+msgstr "Specifeer de dienst-ontdekking modules om te laden, gescheiden door punt-komma's. Gangbare waarden zijn sap, hal, ..."
 
 #: src/libvlc-module.c:1115
 msgid "Play files randomly forever"
@@ -3762,7 +3762,7 @@ msgstr "Met deze opties kunnen bladwijzers voor een afspeelijst worden ingesteld
 
 #: src/libvlc-module.c:1290
 msgid "Go back in browsing history"
-msgstr "Ga terug in blader geschiedenis"
+msgstr "Ga terug in bladergeschiedenis"
 
 #: src/libvlc-module.c:1291
 msgid "Select the key to go back (to the previous media item) in the browsing history."
@@ -3770,7 +3770,7 @@ msgstr "Selecteer de sneltoets om naar het vorige onderdeel in de bladergeschied
 
 #: src/libvlc-module.c:1292
 msgid "Go forward in browsing history"
-msgstr "Go voorwaarts in de blader geschiedenis"
+msgstr "Go voorwaarts in de bladergeschiedenis"
 
 #: src/libvlc-module.c:1293
 msgid "Select the key to go forward (to the next media item) in the browsing history."
@@ -3778,11 +3778,11 @@ msgstr "Selecteer de sneltoets om naar het volgende onderdeel in de bladergeschi
 
 #: src/libvlc-module.c:1295
 msgid "Cycle audio track"
-msgstr "Verander Audio Spoor"
+msgstr "Verander Audiospoor"
 
 #: src/libvlc-module.c:1296
 msgid "Cycle through the available audio tracks(languages)."
-msgstr "Schakel tussen de beschikbare audio sporen (talen)"
+msgstr "Schakel tussen de beschikbare audiosporen (talen)"
 
 #: src/libvlc-module.c:1297
 msgid "Cycle subtitle track"
@@ -3802,23 +3802,23 @@ msgstr "Wissel tussen een voorgedefinieerde lijst van bronbeeldverhoudingen."
 
 #: src/libvlc-module.c:1301
 msgid "Cycle video crop"
-msgstr "Wissel tussen video snijdingen."
+msgstr "Wissel tussen video-bijsnijdingen"
 
 #: src/libvlc-module.c:1302
 msgid "Cycle through a predefined list of crop formats."
-msgstr "Wissel tussen een voorgedefinieerde lijst van snijdingsformaten."
+msgstr "Wissel tussen een voorgedefinieerde lijst van bijsnijdingsformaten."
 
 #: src/libvlc-module.c:1303
 msgid "Cycle deinterlace modes"
-msgstr "Wissel tussen deinterlace modussen"
+msgstr "Wissel tussen deïnterlace-modussen"
 
 #: src/libvlc-module.c:1304
 msgid "Cycle through deinterlace modes."
-msgstr "Wissel tussen deinterlace modussen."
+msgstr "Wissel tussen deïnterlace-modussen."
 
 #: src/libvlc-module.c:1305
 msgid "Show interface"
-msgstr "Toon Interface"
+msgstr "Interface weergeven"
 
 #: src/libvlc-module.c:1306
 msgid "Raise the interface above all other windows."
@@ -3834,7 +3834,7 @@ msgstr "Toon de interface onder alle ander vensters."
 
 #: src/libvlc-module.c:1309
 msgid "Take video snapshot"
-msgstr "Maak video snapshot"
+msgstr "Maak video-snapshot"
 
 #: src/libvlc-module.c:1310
 msgid "Takes a video snapshot and writes it to disk."
@@ -3859,11 +3859,11 @@ msgstr "Start/Stop voor opname filter"
 #: modules/gui/macosx/simple_prefs.m:246
 #: modules/gui/qt4/ui/sprefs_input.ui:201
 msgid "Dump"
-msgstr "Schrijver"
+msgstr "Dump"
 
 #: src/libvlc-module.c:1315
 msgid "Media dump access filter trigger."
-msgstr "Media dump toegangs filter trekker."
+msgstr "Mediadump-toegangs-filter-schakelaar."
 
 #: src/libvlc-module.c:1317
 msgid "Normal/Repeat/Loop"
@@ -3890,7 +3890,7 @@ msgstr "Snijd een pixel vanaf de bovenkant van de video"
 #: src/libvlc-module.c:1331
 #: src/libvlc-module.c:1332
 msgid "Uncrop one pixel from the top of the video"
-msgstr "Verwijder snijding van een pixel aan de bovenkant van de video."
+msgstr "Verwijder bijsnijding van een pixel aan de bovenkant van de video"
 
 #: src/libvlc-module.c:1334
 #: src/libvlc-module.c:1335
@@ -3900,7 +3900,7 @@ msgstr "Snijd een pixel van de linkerzijde van de video"
 #: src/libvlc-module.c:1336
 #: src/libvlc-module.c:1337
 msgid "Uncrop one pixel from the left of the video"
-msgstr "Verwijder snijding van een pixel aan de linkerzijde van de video"
+msgstr "Verwijder bijsnijding van een pixel aan de linkerzijde van de video"
 
 #: src/libvlc-module.c:1339
 #: src/libvlc-module.c:1340
@@ -3910,25 +3910,25 @@ msgstr "Snijd een pixel van de onderkant van de video"
 #: src/libvlc-module.c:1341
 #: src/libvlc-module.c:1342
 msgid "Uncrop one pixel from the bottom of the video"
-msgstr "Verwijder snijding van een pixel aan de onderkand van de video"
+msgstr "Verwijder bijsnijding van een pixel aan de onderkand van de video"
 
 #: src/libvlc-module.c:1344
 #: src/libvlc-module.c:1345
 msgid "Crop one pixel from the right of the video"
-msgstr "Snij een pixel aan de rechterkant van de video af."
+msgstr "Snij een pixel aan de rechterkant van de video af"
 
 #: src/libvlc-module.c:1346
 #: src/libvlc-module.c:1347
 msgid "Uncrop one pixel from the right of the video"
-msgstr "Verwijder snijding van een pixel aan de rechterkant van de video."
+msgstr "Verwijder bijsnijding van een pixel aan de rechterkant van de video"
 
 #: src/libvlc-module.c:1349
 msgid "Toggle wallpaper mode in video output"
-msgstr "Achtergrond modus in video-uitvoer aan/uit"
+msgstr "Bureaubladachtergrondmodus in video-uitvoer aan/uit"
 
 #: src/libvlc-module.c:1351
 msgid "Toggle wallpaper mode in video output. Only works with the directx video output for the time being."
-msgstr "Schakel de bureaubladmodus in video-uitvoer om. Werkt alleen met de directx-video-uitvoer voor de komende tijd."
+msgstr "Schakel de bureaubladachtergrondmodus in video-uitvoer om. Werkt alleen met de directx video-uitvoer voor de komende tijd."
 
 #: src/libvlc-module.c:1354
 #: src/libvlc-module.c:1355
@@ -3937,7 +3937,7 @@ msgstr "Geef OSD menu bovenop de video-uitvoer weer"
 
 #: src/libvlc-module.c:1356
 msgid "Do not display OSD menu on video output"
-msgstr "Geef OSD menu bovenop de video-uitvoer niet weer."
+msgstr "Geef OSD menu bovenop de video-uitvoer niet weer"
 
 #: src/libvlc-module.c:1357
 msgid "Do not display OSD menu on top of video output"
@@ -3949,7 +3949,7 @@ msgstr "Widget rechts oplichten"
 
 #: src/libvlc-module.c:1360
 msgid "Move OSD menu highlight to the widget on the right"
-msgstr "Verplaats OSD menu selectie naar de widget rechts."
+msgstr "Verplaats OSD menu selectie naar de widget rechts"
 
 #: src/libvlc-module.c:1361
 msgid "Highlight widget on the left"
@@ -3957,7 +3957,7 @@ msgstr "Widget rechts oplichten"
 
 #: src/libvlc-module.c:1363
 msgid "Move OSD menu highlight to the widget on the left"
-msgstr "Verplaats OSD menu selectie naar de widget links."
+msgstr "Verplaats OSD menu selectie naar de widget links"
 
 #: src/libvlc-module.c:1364
 msgid "Highlight widget on top"
@@ -3965,7 +3965,7 @@ msgstr "Widget boven oplichten"
 
 #: src/libvlc-module.c:1366
 msgid "Move OSD menu highlight to the widget on top"
-msgstr "Verplaats OSD menu selectie naar de widget boven."
+msgstr "Verplaats OSD menu selectie naar de widget boven"
 
 #: src/libvlc-module.c:1367
 msgid "Highlight widget below"
@@ -3973,7 +3973,7 @@ msgstr "Widget beneden oplichten"
 
 #: src/libvlc-module.c:1369
 msgid "Move OSD menu highlight to the widget below"
-msgstr "Verplaats OSD menu selectie naar de widget onder."
+msgstr "Verplaats OSD menu selectie naar de widget onder"
 
 #: src/libvlc-module.c:1370
 msgid "Select current widget"
@@ -3985,11 +3985,11 @@ msgstr "Selecteren van de huidige widget voert de geassocieerde actie uit."
 
 #: src/libvlc-module.c:1374
 msgid "Cycle through audio devices"
-msgstr "Wissel tussen audio apparaten"
+msgstr "Wissel tussen audio-apparaten"
 
 #: src/libvlc-module.c:1375
 msgid "Cycle through available audio devices"
-msgstr "Wissel tussen beschikbare audio apparaten"
+msgstr "Wissel tussen beschikbare audio-apparaten"
 
 # c-format
 #: src/libvlc-module.c:1377
@@ -4089,7 +4089,7 @@ msgstr "Overlappingen"
 
 #: src/libvlc-module.c:1619
 msgid "Track settings"
-msgstr "Instellingen voor sporen"
+msgstr "Instellingen voor tracks"
 
 #: src/libvlc-module.c:1649
 msgid "Playback control"
@@ -4097,7 +4097,7 @@ msgstr "Afspeelbesturing"
 
 #: src/libvlc-module.c:1670
 msgid "Default devices"
-msgstr "Standaard apparaten"
+msgstr "Standaardapparaten"
 
 #: src/libvlc-module.c:1679
 msgid "Network settings"
@@ -4140,7 +4140,7 @@ msgstr "Modules"
 
 #: src/libvlc-module.c:1847
 msgid "Performance options"
-msgstr "Prestatie opties"
+msgstr "Prestatie-opties"
 
 #: src/libvlc-module.c:1997
 msgid "Hot keys"
@@ -4152,7 +4152,7 @@ msgstr "Spronggrootte"
 
 #: src/libvlc-module.c:2471
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
-msgstr "toon help voor VLC (kan worden gecombineerd met --advanced en --help-verbose)"
+msgstr "geef help voor VLC weer (kan worden gecombineerd met --advanced en --help-verbose)"
 
 #: src/libvlc-module.c:2474
 msgid "Exhaustive help for VLC and its modules"
@@ -4160,7 +4160,7 @@ msgstr "Uitgebreide help voor VLC en zijn modules"
 
 #: src/libvlc-module.c:2476
 msgid "print help for VLC and all its modules (can be combined with --advanced and --help-verbose)"
-msgstr "toon help voor VLC en al zijn modules (kan worden gecombineerd met --advanced en --help-verbose)"
+msgstr "geef help voor VLC en al zijn modules weer (kan worden gecombineerd met --advanced en --help-verbose)"
 
 #: src/libvlc-module.c:2479
 msgid "ask for extra verbosity when displaying help"
@@ -4176,7 +4176,7 @@ msgstr "toon een lijst van beschikbare modules met extra details"
 
 #: src/libvlc-module.c:2485
 msgid "print help on a specific module (can be combined with --advanced and --help-verbose)"
-msgstr "toon help voor een specifieke module (kan worden gecombineerd met --advanced en --help-verbose)"
+msgstr "geef help voor een specifieke module weer (kan worden gecombineerd met --advanced en --help-verbose)"
 
 #: src/libvlc-module.c:2488
 msgid "no configuration option will be loaded nor saved to config file"
@@ -4188,23 +4188,23 @@ msgstr "bewaar de huidige opties in de command-line"
 
 #: src/libvlc-module.c:2492
 msgid "reset the current config to the default values"
-msgstr "herstel de huidige configuratie naar de standaard waarden"
+msgstr "herstel de huidige configuratie naar de standaardwaarden"
 
 #: src/libvlc-module.c:2494
 msgid "use alternate config file"
-msgstr "gebruik een alternatief configuratie bestand"
+msgstr "gebruik een alternatief configuratiebestand"
 
 #: src/libvlc-module.c:2496
 msgid "resets the current plugins cache"
-msgstr "verwijder de huidige plugin cache"
+msgstr "verwijder de huidige plugin-cache"
 
 #: src/libvlc-module.c:2498
 msgid "print version information"
-msgstr "print versie informatie"
+msgstr "print versie-informatie"
 
 #: src/libvlc-module.c:2555
 msgid "main program"
-msgstr "hoofd programma"
+msgstr "hoofdprogramma"
 
 #: src/misc/update.c:1582
 msgid "File could not be verified"
@@ -5044,7 +5044,7 @@ msgstr "Lage Ruis Blok switch freq in kHz meestal 11.7GHz"
 #: modules/access/bda/bda.c:110
 #: modules/access/dvb/access.c:131
 msgid "Modulation type"
-msgstr "Modulatie type"
+msgstr "Modulatietype"
 
 #: modules/access/bda/bda.c:111
 msgid "QAM constellation points [16, 32, 64, 128, 256]"
@@ -5073,11 +5073,11 @@ msgstr "256"
 #: modules/access/bda/bda.c:118
 #: modules/access/dvb/access.c:135
 msgid "Terrestrial high priority stream code rate (FEC)"
-msgstr "Terrestrial hoge prioriteit stream code ratio (FEC)"
+msgstr "Terrestrial hoge prioriteit streamcode-ratio (FEC)"
 
 #: modules/access/bda/bda.c:119
 msgid "High Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
-msgstr "Hoge prioriteit FEC Ratio [Undefined,1/2,2/3,3/4,5/6,7/8]"
+msgstr "Hoge prioriteit FEC-Ratio [Undefined,1/2,2/3,3/4,5/6,7/8]"
 
 #: modules/access/bda/bda.c:123
 #: modules/access/bda/bda.c:130
@@ -5137,7 +5137,6 @@ msgstr "8 MHz"
 
 #: modules/access/bda/bda.c:138
 #: modules/access/dvb/access.c:144
-#, fuzzy
 msgid "Terrestrial guard interval"
 msgstr "Terrestrial guard interval"
 
@@ -5164,11 +5163,11 @@ msgstr "1/32"
 #: modules/access/bda/bda.c:144
 #: modules/access/dvb/access.c:147
 msgid "Terrestrial transmission mode"
-msgstr "Terrestrial transmissiemode"
+msgstr "Terrestrial transmissiemodus"
 
 #: modules/access/bda/bda.c:145
 msgid "Transmission mode [Undefined,2k,8k]"
-msgstr "Transmissie modus [Ongedefinieerd,2k,8k]"
+msgstr "Transmissiemodus [Ongedefinieerd,2k,8k]"
 
 #: modules/access/bda/bda.c:148
 msgid "2k"
@@ -5240,14 +5239,12 @@ msgid "Vertical"
 msgstr "Verticaal"
 
 #: modules/access/bda/bda.c:169
-#, fuzzy
 msgid "Circular Left"
-msgstr "resterende tijd: "
+msgstr "Cirkelvormig links"
 
 #: modules/access/bda/bda.c:169
-#, fuzzy
 msgid "Circular Right"
-msgstr "Rechts uitlijnen"
+msgstr "Cirkelvormig rechts"
 
 #: modules/access/bda/bda.c:172
 #: modules/access/dvb/access.c:188
@@ -6106,7 +6103,7 @@ msgstr "ID"
 
 #: modules/access/fake.c:52
 msgid "Set the ID of the fake elementary stream for use in #duplicate{} constructs (default 0)."
-msgstr ""
+msgstr "Zet de ID voor de fake-elementaire-stream om te gebruiken in #duplicate{} constructies (standaard 0)."
 
 #: modules/access/fake.c:54
 msgid "Duration in ms"
@@ -6114,16 +6111,16 @@ msgstr "Duur in ms"
 
 #: modules/access/fake.c:56
 msgid "Duration of the fake streaming before faking an end-of-file (default is 0, meaning that the stream is unlimited)."
-msgstr "Tijdsduur van het vals-streamen voor het faken van een bestandseinde. (standaard is 0, wat betekent dat de stream ongelimiteerd is)."
+msgstr "Tijdsduur van het fake-streamen voor het faken van een bestandseinde. (standaard is 0, wat betekent dat de stream ongelimiteerd is)."
 
 #: modules/access/fake.c:60
 #: modules/codec/fake.c:89
 msgid "Fake"
-msgstr "Vals"
+msgstr "Fake"
 
 #: modules/access/fake.c:61
 msgid "Fake input"
-msgstr "Valse invoer"
+msgstr "Fake-invoer"
 
 #: modules/access/file.c:86
 msgid "Caching value for files. This value should be set in milliseconds."
@@ -6189,7 +6186,7 @@ msgstr "Bandbreedte beperker"
 
 #: modules/access_filter/dump.c:42
 msgid "Force use of dump module"
-msgstr "Forceer gebruik van schrijver module"
+msgstr "Forceer gebruik van dumpmodule"
 
 #: modules/access_filter/dump.c:43
 msgid "Activate the dump module even for media with fast seeking."
@@ -6702,9 +6699,8 @@ msgstr "PVR radio-apparaat"
 #: modules/access/v4l.c:100
 #: modules/gui/qt4/components/open_panels.cpp:734
 #: modules/gui/qt4/components/open_panels.cpp:833
-#, fuzzy
 msgid "Norm"
-msgstr "Standaard"
+msgstr "Norm"
 
 #: modules/access/pvr.c:72
 #: modules/access/v4l.c:102
@@ -7305,7 +7301,7 @@ msgstr "v4l2-driver besturing"
 
 #: modules/access/v4l2/v4l2.c:221
 msgid "Set the v4l2 driver controls to the values specified using a comma separated list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available controls, increase verbosity (-vvv) or use the v4l2-ctl application."
-msgstr ""
+msgstr "Zet de v4l2-modulebesturing naar de waarden gespecificeerd in een door komma's gescheiden lijst optioneel aangehaald in accolades (bijv.: {video_bitrate=6000000,audio_crc=0,stream_type=3} ). Om een lijst van alle beschikbare besturingsopties te krijgen, vergroot het informatieniveau (-vvv) of gebruik de v4l2-ctl toepassing."
 
 #: modules/access/v4l2/v4l2.c:227
 msgid "Tuner id"
@@ -7554,7 +7550,7 @@ msgstr "Segment"
 
 #: modules/access/vcdx/access.c:538
 msgid "LID"
-msgstr ""
+msgstr "LID"
 
 #: modules/access/vcdx/info.c:93
 msgid "VCD Format"
@@ -7566,9 +7562,8 @@ msgid "Application"
 msgstr "Toepassing"
 
 #: modules/access/vcdx/info.c:96
-#, fuzzy
 msgid "Preparer"
-msgstr "Prepareer"
+msgstr "Voorverwerker"
 
 #: modules/access/vcdx/info.c:97
 msgid "Vol #"
@@ -7579,9 +7574,8 @@ msgid "Vol max #"
 msgstr "Volume max #"
 
 #: modules/access/vcdx/info.c:99
-#, fuzzy
 msgid "Volume Set"
-msgstr "Zet volume"
+msgstr "Volume ingesteld"
 
 #: modules/access/vcdx/info.c:102
 msgid "System Id"
@@ -8297,7 +8291,7 @@ msgstr "JACK audio-uitvoer"
 
 #: modules/audio_output/oss.c:103
 msgid "Try to work around buggy OSS drivers"
-msgstr "Workaround voor foutieve OSS drivers"
+msgstr "Probleemomzeiling voor foutieve OSS drivers"
 
 #: modules/audio_output/oss.c:105
 msgid "Some buggy OSS drivers just don't like when their internal buffers are completely filled (the sound gets heavily hashed). If you have one of these drivers, then you need to enable this option."
@@ -8388,19 +8382,16 @@ msgid "Raw audio encoder"
 msgstr "Raw audio encoder"
 
 #: modules/codec/avcodec/avcodec.c:71
-#, fuzzy
 msgid "Non-ref"
-msgstr "verw;fractie"
+msgstr "Geen-referentie"
 
 #: modules/codec/avcodec/avcodec.c:71
-#, fuzzy
 msgid "Bidir"
-msgstr "Hindi"
+msgstr "Bidirectioneel"
 
 #: modules/codec/avcodec/avcodec.c:71
-#, fuzzy
 msgid "Non-key"
-msgstr "Sneltoets"
+msgstr "Geen-sleutel"
 
 #: modules/codec/avcodec/avcodec.c:71
 #: modules/gui/macosx/prefs.m:129
@@ -8410,9 +8401,8 @@ msgid "All"
 msgstr "Alles"
 
 #: modules/codec/avcodec/avcodec.c:76
-#, fuzzy
 msgid "rd"
-msgstr "Whiteboa_rd"
+msgstr "rd"
 
 #: modules/codec/avcodec/avcodec.c:76
 msgid "bits"
@@ -8448,7 +8438,7 @@ msgstr "FFmpeg audio/video encoder"
 
 #: modules/codec/avcodec/avcodec.c:200
 msgid "FFmpeg deinterlace video filter"
-msgstr "FFmpeg deinterlace video filter"
+msgstr "FFmpeg deïnterlace videofilter"
 
 #: modules/codec/avcodec/avcodec.h:54
 #: modules/codec/avcodec/avcodec.h:56
@@ -8500,7 +8490,7 @@ msgstr ""
 #: modules/demux/rawdv.c:40
 #: modules/stream_out/transcode.c:146
 msgid "Hurry up"
-msgstr "Opschieten"
+msgstr "Haasten"
 
 #: modules/codec/avcodec/avcodec.h:80
 msgid "The decoder can partially decode or skip frame(s) when there is not enough time. It's useful with low CPU power but it can produce distorted pictures."
@@ -8558,11 +8548,11 @@ msgstr "Decodeer alleen een lage resolutie van de video. Dit vereist minder verw
 
 #: modules/codec/avcodec/avcodec.h:111
 msgid "Skip the loop filter for H.264 decoding"
-msgstr "Loop filter voor H.264 decodering overslaan."
+msgstr "Loop-filter voor H.264 decodering overslaan."
 
 #: modules/codec/avcodec/avcodec.h:112
 msgid "Skipping the loop filter (aka deblocking) usually has a detrimental effect on quality. However it provides a big speedup for high definition streams."
-msgstr "Overslaan van de loop filter (deblocking) heeft gewoonlijk een negatieve invloed op kwaliteit. Het geeft echter wel een gigantische snelheidswinst  voor high definition streams."
+msgstr "Overslaan van de loop-filter (deblocking) heeft gewoonlijk een negatieve invloed op kwaliteit. Het geeft echter wel een gigantische snelheidswinst  voor high definition streams."
 
 #: modules/codec/avcodec/avcodec.h:121
 msgid "Ratio of key frames"
@@ -8739,9 +8729,8 @@ msgid "Raise the quantizer for macroblocks at the border of the frame (default: 
 msgstr "Verhoog de quantizer voor macroblocks aan de rand van de frame (standaard: 0.0)."
 
 #: modules/codec/avcodec/avcodec.h:217
-#, fuzzy
 msgid "Luminance elimination"
-msgstr "Verminder helderheid"
+msgstr "Helderheid-eliminatie"
 
 #: modules/codec/avcodec/avcodec.h:218
 msgid "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). The H264 specification recommends -4."
@@ -8753,7 +8742,7 @@ msgstr "Kleur-eliminatie"
 
 #: modules/codec/avcodec/avcodec.h:223
 msgid "Eliminates chrominance blocks when the PSNR isn't much changed (default: 0.0). The H264 specification recommends 7."
-msgstr ""
+msgstr "Elimineert chrominantieblokken wanneer de PSNR niet veel veranderd is (standaard: 0.0). De H264-specificatie raadt 7 aan."
 
 #: modules/codec/avcodec/avcodec.h:228
 msgid "Specify AAC audio profile to use"
@@ -8856,19 +8845,19 @@ msgstr "DTS audio packetizer"
 
 #: modules/codec/dvbsub.c:56
 msgid "Decoding X coordinate"
-msgstr "X coordinaat decoderen"
+msgstr "X-coördinaat decoderen"
 
 #: modules/codec/dvbsub.c:57
 msgid "X coordinate of the rendered subtitle"
-msgstr "X coordinaat van de weergegeven ondertiteling"
+msgstr "X-coördinaat van de weergegeven ondertiteling"
 
 #: modules/codec/dvbsub.c:59
 msgid "Decoding Y coordinate"
-msgstr "Y coordinaat decoderen"
+msgstr "Y-coördinaat decoderen"
 
 #: modules/codec/dvbsub.c:60
 msgid "Y coordinate of the rendered subtitle"
-msgstr "Y coordinaat van de weergegeven ondertiteling"
+msgstr "Y-coördinaat van de weergegeven ondertiteling"
 
 #: modules/codec/dvbsub.c:62
 msgid "Subpicture position"
@@ -8880,19 +8869,19 @@ msgstr "U kan hier de subafbeeling positie op de video forceren (0=centreren, 1=
 
 #: modules/codec/dvbsub.c:68
 msgid "Encoding X coordinate"
-msgstr "X coordinaat coderen"
+msgstr "X-coördinaat coderen"
 
 #: modules/codec/dvbsub.c:69
 msgid "X coordinate of the encoded subtitle"
-msgstr "X coordinaat van de geencodeerde ondertiteling"
+msgstr "X-coördinaat van de geencodeerde ondertiteling"
 
 #: modules/codec/dvbsub.c:70
 msgid "Encoding Y coordinate"
-msgstr "Y coordinaat coderen"
+msgstr "Y-coördinaat coderen"
 
 #: modules/codec/dvbsub.c:71
 msgid "Y coordinate of the encoded subtitle"
-msgstr "Y coordinaat van de geencodeerde ondertiteling"
+msgstr "Y-coördinaat van de geencodeerde ondertiteling"
 
 #: modules/codec/dvbsub.c:91
 msgid "DVB subtitles decoder"
@@ -8923,7 +8912,7 @@ msgstr "Afbeeldingsbestand"
 
 #: modules/codec/fake.c:55
 msgid "Path of the image file for fake input."
-msgstr "Pad voor het afbeeldingsbestand voor vals invoer."
+msgstr "Pad voor het afbeeldingsbestand voor fake-invoer."
 
 #: modules/codec/fake.c:56
 msgid "Reload image file"
@@ -8965,20 +8954,20 @@ msgstr "beeldverhouding van het afbeeldingsbestand (4:3, 16:9). Standaard is vie
 #: modules/codec/fake.c:71
 #: modules/stream_out/transcode.c:70
 msgid "Deinterlace video"
-msgstr "Deinterlace video"
+msgstr "Deïnterlace video"
 
 #: modules/codec/fake.c:73
 msgid "Deinterlace the image after loading it."
-msgstr "Deinterlace de afbeelding na het laden ervan."
+msgstr "Deïnterlace de afbeelding na het laden ervan."
 
 #: modules/codec/fake.c:74
 #: modules/stream_out/transcode.c:73
 msgid "Deinterlace module"
-msgstr "Deinterlace module"
+msgstr "Deïnterlace module"
 
 #: modules/codec/fake.c:76
 msgid "Deinterlace module to use."
-msgstr "Deinterlace module om te gebruiken."
+msgstr "Deïnterlacemodule om te gebruiken."
 
 #: modules/codec/fake.c:77
 #: modules/video_output/fb.c:87
@@ -8992,15 +8981,15 @@ msgstr "Forceer gebruik van een specifieke chroma voor uitvoer. Standaard is I42
 
 #: modules/codec/fake.c:90
 msgid "Fake video decoder"
-msgstr "Nep video decoder"
+msgstr "Fake videodecoder"
 
 #: modules/codec/flac.c:184
 msgid "Flac audio decoder"
-msgstr "Flac audio decoder"
+msgstr "Flac audiodecoder"
 
 #: modules/codec/flac.c:189
 msgid "Flac audio encoder"
-msgstr "Flac audio encoder"
+msgstr "Flac audio-encoder"
 
 #: modules/codec/flac.c:195
 msgid "Flac audio packetizer"
@@ -9242,7 +9231,7 @@ msgstr "Negeer de ondertitelingsvlag, probeer dit als uw ondertitelingen niet ve
 
 #: modules/codec/telx.c:66
 msgid "Workaround for France"
-msgstr "Workaround voor Frankrijk"
+msgstr "Probleemomzeiling voor Frankrijk"
 
 #: modules/codec/telx.c:67
 msgid "Some French channels do not flag their subtitling pages correctly due to a historical interpretation mistake. Try using this wrong interpretation if your subtitles don't appear."
@@ -9294,9 +9283,8 @@ msgid "Use Variable BitRate. Default is to use Constant BitRate (CBR)."
 msgstr "Gebruik Variabele BitRatio. Standaard is om Constante BitRatio (CBR) te gebruiken."
 
 #: modules/codec/twolame.c:65
-#, fuzzy
 msgid "Psycho-acoustic model"
-msgstr "Pictogramweergave-model"
+msgstr "Psycho-akoestisch model"
 
 #: modules/codec/twolame.c:67
 msgid "Integer from -1 (no model) to 4."
@@ -9371,6 +9359,8 @@ msgid ""
 "Sets minimum interval between IDR-frames. In H.264, I-frames do not necessarily bound a closed GOP because it is allowable for a P-frame to be predicted from more frames than just the one frame before it (also see reference frame option). Therefore, I-frames are not necessarily seekable. IDR-frames restrict subsequent P-frames from referring to any frame prior to the IDR-frame. \n"
 "If scenecuts appear within this interval, they are still encoded as I-frames, but do not start a new GOP."
 msgstr ""
+"Zet minimum interval tussen IDR-frames. In H.264, I-frames binden niet per se aan een gesloten GOP, omdat een P-frame voorspeld mag worden meer frames dan net een frame ervoor (ziek ook referentie-frame optie). Daarom zijn I-frames niet per se zoekbaar. IDR-frames beperken opeenvolgende P-frames van refereren naar iedere frame voor de IDR-frame.\n"
+"Als scenecuts binnen deze interval plaatsvinden, worden ze nog steeds als I-frames gecodeerd, maar starten niet een nieuwe GOP."
 
 #: modules/codec/x264.c:67
 msgid "Extra I-frames aggressivity"
@@ -9438,19 +9428,19 @@ msgstr "Aantal vorige frames te gebruiken bij voorspelling. Dit is effectief bij
 
 #: modules/codec/x264.c:112
 msgid "Skip loop filter"
-msgstr "Loop filter overslaan"
+msgstr "Loop-filter overslaan"
 
 #: modules/codec/x264.c:113
 msgid "Deactivate the deblocking loop filter (decreases quality)."
-msgstr "Deactiveer de deblocking loop filter (vermindert kwaliteit)."
+msgstr "Deactiveer de deblocking loop-filter (vermindert kwaliteit)."
 
 #: modules/codec/x264.c:115
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
-msgstr ""
+msgstr "Loop-filter AlphaC0- en beta-parameters alpha:beta"
 
 #: modules/codec/x264.c:116
 msgid "Loop filter AlphaC0 and Beta parameters. Range -6 to 6 for both alpha and beta parameters. -6 means light filter, 6 means strong."
-msgstr ""
+msgstr "Loop-filter AlphaC0- en beta-parameters. Bereik -6 tot 6 voor beide alpha- en beta-parameters. -6 betekend lichte filter, 6 betekend sterk."
 
 #: modules/codec/x264.c:120
 msgid "H.264 level"
@@ -9567,6 +9557,10 @@ msgid ""
 " - 0.5: weak AQ\n"
 " - 1.5: strong AQ"
 msgstr ""
+"Kracht om blocking en vervaging in vlakke en\n"
+"getextuurde gebieden te reduceren, standaard 1.0 aanbevolen om tussen 0..2 te houden\n"
+" - 0.5: zwakke AQ\n"
+" - 1.5: sterke AQ"
 
 #: modules/codec/x264.c:184
 msgid "QP factor between I and P"
@@ -9623,16 +9617,15 @@ msgstr "Reduceer fluctuaties in QP"
 
 #: modules/codec/x264.c:204
 msgid "This reduces the fluctuations in QP before curve compression. Temporally blurs complexity."
-msgstr ""
+msgstr "Dit reduceert de fluctuaties in QP voor curve-compressie. Vervaagt tijdelijk complexiteit."
 
 #: modules/codec/x264.c:208
 msgid "This reduces the fluctations in QP after curve compression. Temporally blurs quants."
-msgstr ""
+msgstr "Dit reduceert de fluctuaties in QP na curve-compressie. Vervaagt tijdelijk quants."
 
 #: modules/codec/x264.c:213
-#, fuzzy
 msgid "Partitions to consider"
-msgstr "Aanmaken %s mislukt: %s"
+msgstr "Partities om in besluit te nemen"
 
 #: modules/codec/x264.c:214
 msgid ""
@@ -9644,6 +9637,13 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
+"Partities om in besluit mee te nemen in analyse modus: \n"
+" - geen  : \n"
+" - snel  : i4x4\n"
+" - normaal: i4x4,p8x8,(i8x8)\n"
+" - langzaam  : i4x4,p8x8,(i8x8),b8x8\n"
+" - alles   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
+"(p4x4 vereist p8x8. i8x8 vereist 8x8dct)."
 
 #: modules/codec/x264.c:222
 msgid "Direct MV prediction mode"
@@ -9676,9 +9676,8 @@ msgid "Weighted prediction for B-frames."
 msgstr "Gewogen voorspelling voor B-frames."
 
 #: modules/codec/x264.c:236
-#, fuzzy
 msgid "Integer pixel motion estimation method"
-msgstr "<span weight=\"bold\">Methode verwijderen</span>"
+msgstr "Integer pixel bewegingsvoorspelling-methode"
 
 #: modules/codec/x264.c:238
 msgid ""
@@ -9712,7 +9711,7 @@ msgstr "Maximale bewegingsvector-zoekbereik"
 
 #: modules/codec/x264.c:254
 msgid "Maximum distance to search for motion estimation, measured from predicted position(s). Default of 16 is good for most footage, high motion sequences may benefit from settings between 24 and 32. Range 0 to 64."
-msgstr ""
+msgstr "Maximum zoekafstand voor bewegingsschatting, gemeten van voorspelde positie(s). Standaard van 16 is goed genoeg voor meeste opnames, opnames met veel beweging kunnen voordeel halen uit instellingen tussen 24 en 32. Bereik 0 tot 64."
 
 #: modules/codec/x264.c:259
 msgid "Maximum motion vector length"
@@ -9756,11 +9755,11 @@ msgstr "RD-gebaseerde modusbepaling voor B-frames. Dit vereist subbs 6 (of hoger
 
 #: modules/codec/x264.c:293
 msgid "Decide references on a per partition basis"
-msgstr ""
+msgstr "Kies referenties op een per partitie basis"
 
 #: modules/codec/x264.c:294
 msgid "Allows each 8x8 or 16x8 partition to independently select a reference frame, as opposed to only one ref per macroblock."
-msgstr ""
+msgstr "Laat iedere 8x8 of 16x8 partitie onafhankelijk een referentieframe selecteren, in tegenstelling tot alleen een referentie per macroblock."
 
 #: modules/codec/x264.c:298
 msgid "Chroma in motion estimation"
@@ -9768,21 +9767,19 @@ msgstr "Chroma in bewegingsschatting"
 
 #: modules/codec/x264.c:299
 msgid "Chroma ME for subpel and mode decision in P-frames."
-msgstr ""
+msgstr "Chroma ME voor subpel en modusbepaling in P-frames."
 
 #: modules/codec/x264.c:302
 msgid "Jointly optimize both MVs in B-frames"
 msgstr "Gezamenlijke optimalisatie van beide MV's in B-frames"
 
 #: modules/codec/x264.c:303
-#, fuzzy
 msgid "Joint bidirectional motion refinement."
-msgstr "Bewegingsdetectie filter"
+msgstr "Samengevoegde bidirectionele bewegingsverfijning."
 
 #: modules/codec/x264.c:305
-#, fuzzy
 msgid "Adaptive spatial transform size"
-msgstr "Maximale grootte van het logvenster:"
+msgstr "Aanpasbare ruimtelijke vervormingsgrootte"
 
 #: modules/codec/x264.c:307
 msgid "SATD-based decision for 8x8 transform in inter-MBs."
@@ -9815,9 +9812,8 @@ msgid "Early SKIP detection on P-frames."
 msgstr "Vroege SKIP detectie op P-frames."
 
 #: modules/codec/x264.c:319
-#, fuzzy
 msgid "Coefficient thresholding on P-frames"
-msgstr "Vroege SKIP detectie op P-frames"
+msgstr "Drempelcoëfficiënt voor P-frames"
 
 #: modules/codec/x264.c:320
 msgid "Coefficient thresholding on P-frames.Eliminate dct blocks containing only a small single coefficient."
@@ -9836,18 +9832,16 @@ msgid "Set the size of the inter luma quantization deadzone. Range 0 to 32."
 msgstr "Stel de grootte in van de dode zone van de inter luma-quantisatie. Bereik: 0 tot 32."
 
 #: modules/codec/x264.c:333
-#, fuzzy
 msgid "Intra luma quantization deadzone"
-msgstr "Synchronizeer op intra-frame"
+msgstr "Intra luma-quantisatie dode zone"
 
 #: modules/codec/x264.c:334
 msgid "Set the size of the intra luma quantization deadzone. Range 0 to 32."
 msgstr "Stel de grootte in van de dode zone van de intra luma-quantisatie. Bereik: 0 tot 32."
 
 #: modules/codec/x264.c:341
-#, fuzzy
 msgid "Non-deterministic optimizations when threaded"
-msgstr "BitTorrent starten wanneer Windows wordt opgestart"
+msgstr "Onvoorspelbare optimalizaties bij threading"
 
 #: modules/codec/x264.c:342
 msgid "Slightly improve quality of SMP, at the cost of repeatability."
@@ -9867,7 +9861,7 @@ msgstr "Bestandsnaam voor 2-pass-statistiekbestand"
 
 #: modules/codec/x264.c:350
 msgid "Filename for 2 pass stats file for multi-pass encoding."
-msgstr ""
+msgstr "Bestandsnaam voor het 2-pass statistiekenbestand bij multi-pass encodering"
 
 #: modules/codec/x264.c:352
 msgid "PSNR computation"
@@ -9912,14 +9906,12 @@ msgid "Set SPS and PPS id numbers to allow concatenating streams with different 
 msgstr "Zet SPS en PPS id nummers om streams met verschillende instellingen aan elkaar te plakken."
 
 #: modules/codec/x264.c:372
-#, fuzzy
 msgid "Access unit delimiters"
-msgstr "Europese monetaire eenheid (E.M.U.-6)"
+msgstr "Toegangsmodules-scheidingstekens"
 
 #: modules/codec/x264.c:373
-#, fuzzy
 msgid "Generate access unit delimiter NAL units."
-msgstr "Obligatiemarkteneenheid: Europese samengestelde eenheid (EURCO)"
+msgstr "Genereer toegangsmodule-scheidingsteken NAL-units."
 
 #: modules/codec/x264.c:379
 #: modules/codec/x264.c:386
@@ -10108,7 +10100,7 @@ msgstr "Bijsnijden: %s"
 #: modules/control/hotkeys.c:621
 #, c-format
 msgid "Deinterlace mode: %s"
-msgstr "Deinterlace modus: %s"
+msgstr "Deïnterlacemodus: %s"
 
 #: modules/control/hotkeys.c:653
 #, c-format
@@ -10281,7 +10273,7 @@ msgstr "Configuratieopties die door de Dienst gebruikt worden (bijv. --foo=bar -
 
 #: modules/control/ntservice.c:59
 msgid "Additional interfaces spawned by the Service. It should be specified at install time so the Service is properly configured. Use a comma separated list of interface modules. (common values are: logger, sap, rc, http)"
-msgstr "Additionele besturingen opgestart door de Dienst. Het moet tijdens de installatie opgegeven worden zodat de Dienst juist geconfigureerd is. Gebruik een door comma's gescheiden leist van besturingsmodules. (veelvoorkomende waardes zijn: logger, sap, rc, http)"
+msgstr "Additionele besturingen opgestart door de Dienst. Het moet tijdens de installatie opgegeven worden zodat de Dienst juist geconfigureerd is. Gebruik een door komma's gescheiden leist van besturingsmodules. (veelvoorkomende waardes zijn: logger, sap, rc, http)"
 
 #: modules/control/ntservice.c:65
 msgid "NT Service"
@@ -10988,7 +10980,7 @@ msgstr "CDG demuxer"
 
 #: modules/demux/demuxdump.c:42
 msgid "Dump filename"
-msgstr "Schrijver bestandsnaam"
+msgstr "Dump bestandsnaam"
 
 #: modules/demux/demuxdump.c:44
 msgid "Name of the file to which the raw stream will be dumped."
@@ -11004,7 +10996,7 @@ msgstr "Als het bestand reeds bestaat zal het niet overschreven worden."
 
 #: modules/demux/demuxdump.c:56
 msgid "File dumper"
-msgstr "Bestandenschrijver"
+msgstr "Bestands-dumper"
 
 #: modules/demux/dts.c:45
 msgid "Raw DTS demuxer"
@@ -11122,7 +11114,7 @@ msgstr "Geordende hoofdstukken"
 
 #: modules/demux/mkv.cpp:132
 msgid "Play ordered chapters as specified in the segment."
-msgstr ""
+msgstr "Speel geordende hoofdstukken zoals gespecificeerd in het segment."
 
 #: modules/demux/mkv.cpp:135
 msgid "Chapter codecs"
@@ -11202,11 +11194,11 @@ msgstr "Megabass-modus afsnijdingsfrequentie, in Hz. Dit is de maximum frequenti
 
 #: modules/demux/mod.c:63
 msgid "Surround effect level (from 0 to 100, default value is 0)."
-msgstr "Surround effect niveau (van 0 tot 100, standaardwaarde is 0)."
+msgstr "Surround-effectniveau (van 0 tot 100, standaardwaarde is 0)."
 
 #: modules/demux/mod.c:65
 msgid "Surround delay, in ms. Usual values are from 5 to 40 ms."
-msgstr "Surround vertraging in ms. Meestal waarden van 5 tot 40 ms."
+msgstr "Surround-vertraging in ms. Meestal waarden van 5 tot 40 ms."
 
 #: modules/demux/mod.c:70
 msgid "MOD demuxer (libmodplug)"
@@ -11242,11 +11234,11 @@ msgstr "Surround"
 
 #: modules/demux/mod.c:95
 msgid "Surround level"
-msgstr "Surround niveau"
+msgstr "Surround-niveau"
 
 #: modules/demux/mod.c:97
 msgid "Surround delay (ms)"
-msgstr "Surround vertraging (ms)"
+msgstr "Surround-vertraging (ms)"
 
 #: modules/demux/mp4/mp4.c:58
 msgid "MP4 stream demuxer"
@@ -11914,7 +11906,7 @@ msgstr "Shuffle"
 #: modules/gui/beos/PlayListWindow.cpp:130
 #: modules/gui/macosx/bookmarks.m:94
 msgid "Remove"
-msgstr "Verwijder"
+msgstr "Verwijderen"
 
 #: modules/gui/beos/PlayListWindow.cpp:133
 msgid "Remove All"
@@ -12031,22 +12023,22 @@ msgstr "tekst om op de overlap-framebuffer weer te geven."
 #: modules/video_filter/logo.c:81
 #: modules/video_filter/osdmenu.c:51
 msgid "X coordinate"
-msgstr "X coordinaat"
+msgstr "X-coördinaat"
 
 #: modules/gui/fbosd.c:124
 msgid "X coordinate of the rendered image"
-msgstr "X coordinaat van de weergegeven afbeelding"
+msgstr "X-coördinaat van de weergegeven afbeelding"
 
 #: modules/gui/fbosd.c:126
 #: modules/video_filter/erase.c:60
 #: modules/video_filter/logo.c:84
 #: modules/video_filter/osdmenu.c:54
 msgid "Y coordinate"
-msgstr "Y coordinaat"
+msgstr "Y-coördinaat"
 
 #: modules/gui/fbosd.c:127
 msgid "Y coordinate of the rendered image"
-msgstr "Y coordinaat van de weergegeven afbeelding"
+msgstr "Y-coördinaat van de weergegeven afbeelding"
 
 #: modules/gui/fbosd.c:131
 msgid "You can enforce the picture position on the overlay (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use combinations of these values, e.g. 6=top-right)."
@@ -12484,7 +12476,7 @@ msgstr "Dubbel toepassen"
 
 #: modules/gui/macosx/equalizer.m:158
 msgid "Apply the equalizer filter twice. The effect will be sharper."
-msgstr "Pas de equalizer filter twee keer toe. Het effect zal scherper zijn."
+msgstr "Pas de equalizer-filter twee keer toe. Het effect zal scherper zijn."
 
 #: modules/gui/macosx/equalizer.m:161
 msgid "Enable the equalizer. Bands can be set manually or using a preset."
@@ -12501,7 +12493,7 @@ msgstr "Uitgebreide besturing"
 
 #: modules/gui/macosx/extended.m:68
 msgid "Shows more information about the available video filters."
-msgstr "Geef meer informatie over beschikbare video filters."
+msgstr "Geef meer informatie over beschikbare videofilters."
 
 #: modules/gui/macosx/extended.m:69
 #: modules/video_filter/wave.c:55
@@ -12613,7 +12605,7 @@ msgstr "Ondoorzichtigheid"
 #: modules/gui/macosx/extended.m:172
 #: modules/gui/macosx/extended.m:234
 msgid "Adjust Image"
-msgstr "Afbeelding bijstellen"
+msgstr "Beeld bijstellen"
 
 #: modules/gui/macosx/extended.m:173
 #: modules/gui/macosx/extended.m:238
@@ -13158,9 +13150,8 @@ msgid "Settings..."
 msgstr "Instellingen..."
 
 #: modules/gui/macosx/open.m:288
-#, fuzzy
 msgid "Override parametters"
-msgstr "LRO Links-naar-rechts _tenietdoen"
+msgstr "Overschrijf parameters"
 
 #: modules/gui/macosx/open.m:289
 #: modules/stream_out/bridge.c:45
@@ -13580,7 +13571,7 @@ msgstr "Algemene audio"
 #: modules/gui/macosx/simple_prefs.m:219
 #: modules/gui/qt4/ui/sprefs_audio.ui:259
 msgid "Headphone surround effect"
-msgstr "Koptelefoon surround effect"
+msgstr "Koptelefoon surround-effect"
 
 #: modules/gui/macosx/simple_prefs.m:220
 msgid "Preferred Audio language"
@@ -14652,15 +14643,15 @@ msgstr "     .           Verborgen bestanden weergeven/verbergen"
 
 #: modules/gui/ncurses.c:1719
 msgid "[Boxes]"
-msgstr ""
+msgstr "[Boxen]"
 
 #: modules/gui/ncurses.c:1722
 msgid "     <up>,<down>     Navigate through the box line by line"
-msgstr ""
+msgstr "     <pijl-omhoog>,<pijl-omlaag>     Navigeer door de box lijn per lijn"
 
 #: modules/gui/ncurses.c:1723
 msgid "     <pgup>,<pgdown> Navigate through the box page by page"
-msgstr ""
+msgstr "     <PgUp>,<PgDown> Navigeer door de box pagina per pagina"
 
 #: modules/gui/ncurses.c:1728
 msgid "[Player]"
@@ -15026,7 +15017,7 @@ msgstr "Audio Codec:"
 
 #: modules/gui/pda/pda_interface.c:967
 msgid "Deinterlace:"
-msgstr "Deinterlace:"
+msgstr "Deïnterlace:"
 
 #: modules/gui/pda/pda_interface.c:976
 msgid "Access:"
@@ -15391,9 +15382,8 @@ msgstr "DVB Type:"
 
 #: modules/gui/qt4/components/open_panels.cpp:645
 #: modules/gui/qt4/components/open_panels.cpp:907
-#, fuzzy
 msgid "Transponder symbol rate"
-msgstr "Transponder symbool ration in KHz"
+msgstr "Transponder-symboolratio in KHz"
 
 #: modules/gui/qt4/components/open_panels.cpp:767
 msgid "Channels:"
@@ -15548,11 +15538,11 @@ msgstr "Maak nieuwe bladwijzer aan"
 #: modules/gui/qt4/dialogs/bookmarks.cpp:47
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:37
 msgid "Delete the selected item"
-msgstr "Verwijder het geselecteerde item"
+msgstr "Het geselecteerde item verwijderen"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:49
 msgid "Delete all the bookmarks"
-msgstr "Verwijder alle bladwijzers"
+msgstr "Alle bladwijzers verwijderen"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:54
 #: modules/gui/qt4/dialogs/errors.cpp:50
@@ -15579,7 +15569,7 @@ msgstr "Fouten"
 #: modules/gui/qt4/dialogs/messages.cpp:84
 #: modules/gui/qt4/dialogs/messages.cpp:130
 msgid "&Clear"
-msgstr "&Verwijder"
+msgstr "&Verwijderen"
 
 #: modules/gui/qt4/dialogs/errors.cpp:58
 msgid "Hide future errors"
@@ -15746,7 +15736,7 @@ msgstr "&Statistieken"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:75
 msgid "&Save Metadata"
-msgstr "Metadata Op&slaan"
+msgstr "Metadata &Opslaan"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:81
 msgid "Location:"
@@ -15758,7 +15748,7 @@ msgstr "Modules"
 
 #: modules/gui/qt4/dialogs/messages.cpp:85
 msgid "&Save as..."
-msgstr "Op&slaan als..."
+msgstr "&Opslaan als..."
 
 #: modules/gui/qt4/dialogs/messages.cpp:86
 msgid "Save all the displayed logs to a file"
@@ -15766,7 +15756,7 @@ msgstr "Sla alle weergegeven logboeken naar een bestand op."
 
 #: modules/gui/qt4/dialogs/messages.cpp:94
 msgid "Verbosity Level"
-msgstr "Meldingsniveau:"
+msgstr "Informatieniveau:"
 
 #: modules/gui/qt4/dialogs/messages.cpp:121
 msgid "&Update"
@@ -15992,9 +15982,9 @@ msgid ""
 "<p>Therefore please check the following options, the default being almost no access on the web.</p>\n"
 msgstr ""
 "<p>Het <i>VideoLAN Team</i> houdt er niet van als een toepassing zonder toestemming verbinding maakt met het internet.</p>\n"
-" <p><i>VLC media player</i> kan beperkt informatie ophalen van internet, voornamelijk om CD hoesjes of om te kijken of er nieuwere versies van VLC zijn.</p>\n"
-"<p><i>VLC media player</i> verzamelt of zendt <b>GEEN</b> informatie, zelfs niet anoniem, over uw gebruik van VLC.</p>\n"
-"<p>Daarom, controleer de volgende opties, standaard zal er bijna geen verbinding met internet gemaakt worden.</p>\n"
+" <p><i>VLC mediaspeler</i> kan beperkt informatie ophalen van internet, voornamelijk om CD hoesjes of om te kijken of er nieuwere versies van VLC zijn.</p>\n"
+"<p><i>VLC mediaspeler</i> verzamelt of zendt <b>GEEN</b> informatie, zelfs niet anoniem, over uw gebruik van VLC.</p>\n"
+"<p>Daarom, controleer de volgende opties. Standaard zal er bijna geen verbinding met internet gemaakt worden.</p>\n"
 
 #: modules/gui/qt4/main_interface.cpp:1024
 msgid "Control menu for the player"
@@ -16014,7 +16004,7 @@ msgstr "Afspeel&lijst"
 
 #: modules/gui/qt4/menus.cpp:278
 msgid "&Tools"
-msgstr "&Gereedschappen"
+msgstr "E&xtra"
 
 #: modules/gui/qt4/menus.cpp:279
 #: modules/gui/qt4/menus.cpp:817
@@ -16121,7 +16111,7 @@ msgstr "&Visuele effecten"
 
 #: modules/gui/qt4/menus.cpp:493
 msgid "Video &Track"
-msgstr "Video &Spoor"
+msgstr "&Videospoor"
 
 #: modules/gui/qt4/menus.cpp:496
 msgid "&Subtitles Track"
@@ -16149,11 +16139,11 @@ msgstr "&Beeldverhouding"
 
 #: modules/gui/qt4/menus.cpp:507
 msgid "&Crop"
-msgstr "&Snijden"
+msgstr "Bijs&nijden"
 
 #: modules/gui/qt4/menus.cpp:508
 msgid "Always &On Top"
-msgstr "Altijd &Boven"
+msgstr "&Altijd boven"
 
 #: modules/gui/qt4/menus.cpp:510
 msgid "Sna&pshot"
@@ -16161,7 +16151,7 @@ msgstr "Sna&pshot"
 
 #: modules/gui/qt4/menus.cpp:548
 msgid "&Bookmarks"
-msgstr "B&ladwijzers"
+msgstr "&Bladwijzers"
 
 #: modules/gui/qt4/menus.cpp:549
 msgid "T&itle"
@@ -16193,7 +16183,7 @@ msgstr "Controleren op &updates"
 
 #: modules/gui/qt4/menus.cpp:676
 msgid "Tools"
-msgstr "Gereedschappen"
+msgstr "Extra"
 
 #: modules/gui/qt4/menus.cpp:803
 msgid "Leave Fullscreen"
@@ -16592,7 +16582,7 @@ msgstr "Volume opslaan bij afsluiten"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:142
 msgid "Preferred audio language"
-msgstr "Voorkeur audio taal"
+msgstr "Voorkeur audiotaal"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:293
 msgid "last.fm"
@@ -16616,7 +16606,7 @@ msgstr "Standaardpoort server"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:103
 msgid "Default caching level"
-msgstr "Standaard buffering niveau"
+msgstr "Standaard bufferingsniveau"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:125
 msgid "Post-Processing quality"
@@ -16644,7 +16634,7 @@ msgstr "Dit is VLC's standaard interface, met de oorspronkelijke weergave en geb
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:73
 msgid "Display mode"
-msgstr "Weergave-modus"
+msgstr "Weergavemodus"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:90
 msgid "Integrate video in interface"
@@ -16689,7 +16679,7 @@ msgstr "Haal meta-gegevens van het internet op"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:267
 msgid "Activate update notifier"
-msgstr "Nieuwere versie melder activeren"
+msgstr "Melding van nieuwere versie activeren"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:120
 msgid "This is VLC's skinnable interface. You can download skins at &lt;a href="
@@ -16761,7 +16751,7 @@ msgstr "P/P"
 
 #: modules/gui/qt4/ui/streampanel.ui:115
 msgid "Prev"
-msgstr "Vorig"
+msgstr "Vorige"
 
 #: modules/gui/qt4/ui/streampanel.ui:132
 msgid "Add Input"
@@ -16790,7 +16780,7 @@ msgstr "Sigma"
 #: modules/gui/qt4/ui/video_effects.ui:88
 #: modules/video_filter/adjust.c:83
 msgid "Image adjust"
-msgstr "Afbeelding bijstellen"
+msgstr "Beeld bijstellen"
 
 #: modules/gui/qt4/ui/video_effects.ui:218
 #: modules/video_filter/adjust.c:66
@@ -16985,14 +16975,12 @@ msgid "Select Output"
 msgstr "Selecteer uitvoer"
 
 #: modules/gui/qt4/ui/vlm.ui:120
-#, fuzzy
 msgid "Time Control"
-msgstr "Archiefbeheer:"
+msgstr "Tijdsbediening"
 
 #: modules/gui/qt4/ui/vlm.ui:127
-#, fuzzy
 msgid "Mux Control"
-msgstr "Archiefbeheer:"
+msgstr "Mux-bediening"
 
 #: modules/gui/qt4/ui/vlm.ui:169
 msgid "Loop"
@@ -17116,7 +17104,7 @@ msgstr ""
 
 #: modules/gui/wince/open.cpp:135
 msgid "Open:"
-msgstr "Open:"
+msgstr "Openen:"
 
 #: modules/gui/wince/open.cpp:147
 msgid "Alternatively, you can build an MRL using one of the following predefined targets:"
@@ -17472,7 +17460,7 @@ msgstr ""
 
 #: modules/misc/audioscrobbler.c:810
 msgid "last.fm: Authentication failed"
-msgstr "last.fm: Authenticatie mislukt"
+msgstr "last.fm: Aanmelding mislukt"
 
 #: modules/misc/audioscrobbler.c:811
 msgid "last.fm username or password is incorrect. Please verify your settings and relaunch VLC."
@@ -17665,7 +17653,7 @@ msgstr "Dit is het maximaal aantal hervatte TLS sessies die de buffer zal houden
 
 #: modules/misc/gnutls.c:90
 msgid "GnuTLS transport layer security"
-msgstr "GnuTLS TLS encryptie laag"
+msgstr "GnuTLS TLS encryptielaag"
 
 #: modules/misc/gnutls.c:100
 msgid "GnuTLS server"
@@ -17681,7 +17669,7 @@ msgstr "Energiebeheer Onderdrukking"
 
 #: modules/misc/logger.c:125
 msgid "Log format"
-msgstr "Log formaat"
+msgstr "Logboekformaat"
 
 #: modules/misc/logger.c:127
 msgid "Specify the log format. Available choices are \"text\" (default), \"html\", and \"syslog\" (special mode to send to syslog instead of file."
@@ -17689,7 +17677,7 @@ msgstr "Specificeer het logboekformaat. Beschikbare opties zijn \"tekst\" (stand
 
 #: modules/misc/logger.c:131
 msgid "Specify the log format. Available choices are \"text\" (default) and \"html\"."
-msgstr "Specificeer het log formaat. De beschikbare keuzes zijn \"text\" (standaard) en \"html\"."
+msgstr "Specificeer het logboekformaat. De beschikbare keuzes zijn \"text\" (standaard) en \"html\"."
 
 #: modules/misc/logger.c:136
 msgid "Logging"
@@ -18495,9 +18483,8 @@ msgid "Universal Plug'n'Play discovery ( Intel SDK )"
 msgstr "Universal Plug'n'Play discovery ( Intel SDK )"
 
 #: modules/stream_out/autodel.c:46
-#, fuzzy
 msgid "Autodel"
-msgstr "Auto"
+msgstr "Automatisch verwijderen"
 
 #: modules/stream_out/autodel.c:47
 msgid "Automatically add/delete input streams"
@@ -18517,27 +18504,23 @@ msgstr "ID verschuiving"
 
 #: modules/stream_out/bridge.c:51
 msgid "Offset to add to the stream IDs specified in bridge_out to obtain the stream IDs bridge_in will register."
-msgstr ""
+msgstr "Uitlijning om aan de stream-ID's toe te voegen gespecificeerd in bridge_uit om de stream-ID's te verkrijgen die bridge_in zal registreren."
 
 #: modules/stream_out/bridge.c:63
-#, fuzzy
 msgid "Bridge"
-msgstr "Mozaïek bridge"
+msgstr "Bridge"
 
 #: modules/stream_out/bridge.c:64
-#, fuzzy
 msgid "Bridge stream output"
-msgstr "Mozaïek bridge stream uitvoer"
+msgstr "Bridge stream-uitvoer"
 
 #: modules/stream_out/bridge.c:66
-#, fuzzy
 msgid "Bridge out"
-msgstr "Uitloggen"
+msgstr "Bridge uit"
 
 #: modules/stream_out/bridge.c:77
-#, fuzzy
 msgid "Bridge in"
-msgstr ", in %d bestanden"
+msgstr "Bridge in"
 
 #: modules/stream_out/description.c:54
 msgid "Description stream output"
@@ -18688,7 +18671,7 @@ msgstr "Transparantie van mozaiekafbeelding"
 #: modules/video_filter/marq.c:103
 #: modules/video_filter/rss.c:142
 msgid "X offset"
-msgstr "Verspringing X"
+msgstr "X-uitlijning"
 
 #: modules/stream_out/mosaic_bridge.c:162
 msgid "X coordinate of the upper left corner in the mosaic if non negative."
@@ -18698,21 +18681,19 @@ msgstr "X-coördinaat van de linkerbovenhoek in de mozaïek, indien niet negatie
 #: modules/video_filter/marq.c:105
 #: modules/video_filter/rss.c:144
 msgid "Y offset"
-msgstr "Verspringing X"
+msgstr "Y-uitlijning"
 
 #: modules/stream_out/mosaic_bridge.c:166
 msgid "Y coordinate of the upper left corner in the mosaic if non negative."
 msgstr "Y-coördinaat van de linkerbovenhoek in de mozaïek, indien niet negatief."
 
 #: modules/stream_out/mosaic_bridge.c:171
-#, fuzzy
 msgid "Mosaic bridge"
 msgstr "Mozaïek bridge"
 
 #: modules/stream_out/mosaic_bridge.c:172
-#, fuzzy
 msgid "Mosaic bridge stream output"
-msgstr "Mozaïek bridge stream uitvoer"
+msgstr "Mozaïek bridge stream-uitvoer"
 
 #: modules/stream_out/rtp.c:72
 msgid "This is the output URL that will be used."
@@ -18872,7 +18853,7 @@ msgstr "adres om aan te binden (hulpinstelling voor doel)"
 
 #: modules/stream_out/standard.c:56
 msgid "address:port to bind vlc to listening incoming streams helper setting for dst,dst=bind+'/'+path. dst-parameter overrides this"
-msgstr ""
+msgstr "adres:poort om vlc aan te binden voor luisteren naar binnenkomende streams hulpinstelling voor doel, doel=bind+'/'+pad. doel-parameter overschrijft dit "
 
 #: modules/stream_out/standard.c:58
 msgid "filename for stream (helper setting for dst)"
@@ -18880,7 +18861,7 @@ msgstr "bestandsnaam voor stream (hulpinstelling voor doel)"
 
 #: modules/stream_out/standard.c:60
 msgid "Filename for stream helper setting for dst, dst=bind+'/'+path, dst-parameter overrides this"
-msgstr ""
+msgstr "Bestandsnaam voor streamhulp-instellingen voor doel, doel=bind+'/'+pad, doel-parameter overschrijft dit"
 
 #: modules/stream_out/standard.c:67
 msgid "Session groupname"
@@ -19000,11 +18981,11 @@ msgstr "Doel uitvoer framerate voor de videostream."
 
 #: modules/stream_out/transcode.c:72
 msgid "Deinterlace the video before encoding."
-msgstr "Deinterlace de video voor de encodering."
+msgstr "Deïnterlace de video voor de encodering."
 
 #: modules/stream_out/transcode.c:75
 msgid "Specify the deinterlace module to use."
-msgstr "Geeft de deinterlace module om te gebruiken op."
+msgstr "Geeft de deïnterlace-module om te gebruiken op."
 
 #: modules/stream_out/transcode.c:82
 msgid "Maximum video width"
@@ -19024,7 +19005,7 @@ msgstr "Maximale uitvoer video hoogte."
 
 #: modules/stream_out/transcode.c:90
 msgid "Video filters will be applied to the video streams (after overlays are applied). You must enter a comma-separated list of filters."
-msgstr "Videofilters die (na de overlapfilters) op de videostreams toegepast worden. U moet een door comma's gescheiden lijst van filters opgeven."
+msgstr "Videofilters die (na de overlapfilters) op de videostreams toegepast worden. U moet een door komma's gescheiden lijst van filters opgeven."
 
 #: modules/stream_out/transcode.c:93
 msgid "Audio encoder"
@@ -19068,7 +19049,7 @@ msgstr "Audiofilter"
 
 #: modules/stream_out/transcode.c:111
 msgid "Audio filters will be applied to the audio streams (after conversion filters are applied). You must enter a comma-separated list of filters."
-msgstr "Audiofilters die (na de conversiefilters) op de audiostreams toegepast worden. U moet een door comma's gescheiden lijst van filters opgeven."
+msgstr "Audiofilters die (na de conversiefilters) op de audiostreams toegepast worden. U moet een door komma's gescheiden lijst van filters opgeven."
 
 #: modules/stream_out/transcode.c:114
 msgid "Subtitles encoder"
@@ -19088,7 +19069,7 @@ msgstr "Dit is de ondertitelingscodec dat gebruikt zal gaan worden."
 
 #: modules/stream_out/transcode.c:124
 msgid "This allows you to add overlays (also known as \"subpictures\" on the transcoded video stream. The subpictures produced by the filters will be overlayed directly onto the video. You must specify a comma-separated list of subpicture modules"
-msgstr ""
+msgstr "Dit staat u toe om overlays (ook bekend als \"ondertitels\" toe te voegen aan de getranscodeerde videostream. De ondertitels geproduceerd door de filters zullen direct op de video gelegd worden. U moet een lijst met door komma's gescheiden waardes van ondertitelings-modules specifiëren."
 
 #: modules/stream_out/transcode.c:129
 #: modules/video_filter/osdmenu.c:135
@@ -19222,7 +19203,7 @@ msgstr "Zet de gamma van de afbeelding, tussen 0.01 en 10. Standaard is 1."
 
 #: modules/video_filter/adjust.c:82
 msgid "Image properties filter"
-msgstr "Beeld eigenschappen filter"
+msgstr "Beeldeigenschappen-filter"
 
 #: modules/video_filter/alphamask.c:40
 msgid "Use an image's alpha channel as a transparency mask."
@@ -19238,7 +19219,7 @@ msgstr "Alpha-menging-transparantiemasker. Gebruikt een png alpha-kanaal."
 
 #: modules/video_filter/alphamask.c:63
 msgid "Alpha mask video filter"
-msgstr "Alpha masker video filter"
+msgstr "Alpha masker videofilter"
 
 #: modules/video_filter/alphamask.c:64
 msgid "Alpha mask"
@@ -19256,6 +19237,15 @@ msgid ""
 "You can find there detailed descriptions on how to build it for yourself and where to get the required parts.\n"
 "You can also have a look at pictures and some movies showing such a device in live action."
 msgstr ""
+"Deze module stelt u in staat een AtmoLight-apparaat verbonden met uw computer aan te sturen.\n"
+"AtmoLight is de zelfgemaakte versie van wat Philips AmbiLight noemt.\n"
+"Als u meer informatie nodig heeft bezoek ons dan op\n"
+"\n"
+"http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin\n"
+" http://www.vdr-wiki.de/wiki/index.php/AtmoWin\n"
+"\n"
+"U kan daar gedetailleerde informatie vinden over hoe u zelf een AtmoLight bouwt en waar u de benodigde onderdelen kunt krijgen.\n"
+"U kan ook afbeeldingen en video's van een apparaat in actie zien."
 
 #: modules/video_filter/atmo/atmo.cpp:134
 msgid "Save Debug Frames"
@@ -19295,7 +19285,7 @@ msgstr "Kleur bij pause"
 
 #: modules/video_filter/atmo/atmo.cpp:150
 msgid "Set the color to show if the user pauses the video. (Have light to get another beer?)"
-msgstr ""
+msgstr "Stel de kleur in die getoond wordt als de gebruiker de video pauzeert. (Licht hebben om een ander biertje te halen?)"
 
 #: modules/video_filter/atmo/atmo.cpp:153
 msgid "Pause-Red"
@@ -19322,9 +19312,8 @@ msgid "Blue component of the pause color"
 msgstr "Blauw-component van de pause-kleur"
 
 #: modules/video_filter/atmo/atmo.cpp:159
-#, fuzzy
 msgid "Pause-Fadesteps"
-msgstr "Pauze \"torrent\""
+msgstr "Pauze-kleurstappen"
 
 #: modules/video_filter/atmo/atmo.cpp:160
 msgid "Number of steps to change current color to pause color (each step takes 40ms)"
@@ -19355,13 +19344,12 @@ msgid "Blue component of the shutdown color"
 msgstr "Blauw-component van de afsluitkleur"
 
 #: modules/video_filter/atmo/atmo.cpp:169
-#, fuzzy
 msgid "End-Fadesteps"
-msgstr "Einde index"
+msgstr "Einde-kleurstappen"
 
 #: modules/video_filter/atmo/atmo.cpp:170
 msgid "Number of steps to change current color to end color for dimming up the light in cinema style... (each step takes 40ms)"
-msgstr ""
+msgstr "Aantal stappen om de huidige kleur te veranderen naar de eindkleur bij het dimmen van het licht in cinema-stijl... (elke stap is 40 ms)"
 
 #: modules/video_filter/atmo/atmo.cpp:174
 msgid "Use Software White adjust"
@@ -19428,9 +19416,8 @@ msgid "Pixels with a saturation lower than this will be ignored. Should be great
 msgstr "Pixels met een verzadiging die lager is dan de ingestelde, zullen genegeerd worden. Waarde is best groter dan 1 bij letterbox-video's."
 
 #: modules/video_filter/atmo/atmo.cpp:202
-#, fuzzy
 msgid "Hue windowing"
-msgstr "Hue-draaiing:"
+msgstr "Tint-venstering"
 
 #: modules/video_filter/atmo/atmo.cpp:203
 #: modules/video_filter/atmo/atmo.cpp:205
@@ -19438,9 +19425,8 @@ msgid "Used for statistics."
 msgstr "Gebruikt voor statistieken."
 
 #: modules/video_filter/atmo/atmo.cpp:204
-#, fuzzy
 msgid "Sat windowing"
-msgstr "Minder sat.:"
+msgstr "Verzadigingsvenstering"
 
 #: modules/video_filter/atmo/atmo.cpp:207
 msgid "Filter length (ms)"
@@ -19543,9 +19529,8 @@ msgid "bottom"
 msgstr "onder"
 
 #: modules/video_filter/atmo/atmo.cpp:262
-#, fuzzy
 msgid "Summary gradient"
-msgstr "Horizontake Gradiënt"
+msgstr "Samenvatting gradiënt"
 
 #: modules/video_filter/atmo/atmo.cpp:263
 msgid "Left gradient"
@@ -19640,9 +19625,8 @@ msgid "Alpha with which the blend image is blended"
 msgstr "Alpha-waarde waarmee de mengafbeelding wordt gemengd"
 
 #: modules/video_filter/blendbench.c:58
-#, fuzzy
 msgid "Image to be blended onto"
-msgstr "Afbeelding te groot om als ICO-bestand te worden opgeslagen"
+msgstr "Afbeelding waarmee gemengd moet worden"
 
 #: modules/video_filter/blendbench.c:59
 msgid "The image which will be used to blend onto"
@@ -19653,41 +19637,36 @@ msgid "Chroma for the base image"
 msgstr "Chroma voor de basisafbeelding"
 
 #: modules/video_filter/blendbench.c:62
-#, fuzzy
 msgid "Chroma which the base image will be loaded in"
-msgstr "Afbeeldingsformaat dat gebruikt wordt om screenshots van een video in op te slaan."
+msgstr "Kleur waarin de basisafbeelding geladen wordt"
 
 #: modules/video_filter/blendbench.c:64
 msgid "Image which will be blended."
 msgstr "Afbeelding wat gemend zal gaan worden."
 
 #: modules/video_filter/blendbench.c:65
-#, fuzzy
 msgid "The image blended onto the base image"
-msgstr "Functies en X-Base import."
+msgstr "Het beeld dat gemengd wordt met het basisbeeld"
 
 #: modules/video_filter/blendbench.c:67
 msgid "Chroma for the blend image"
 msgstr "Chroma voor de gemende afbeelding"
 
 #: modules/video_filter/blendbench.c:68
-#, fuzzy
 msgid "Chroma which the blend image will be loadedin"
-msgstr "Afbeeldingsformaat dat gebruikt wordt om screenshots van een video in op te slaan."
+msgstr "Chroma waarin het gemengde beeld zal geladen worden"
 
 #: modules/video_filter/blendbench.c:74
-#, fuzzy
 msgid "Blending benchmark filter"
-msgstr "Aut_o-filter toevoegen"
+msgstr "Mengende benchmark-filter"
 
 #: modules/video_filter/blendbench.c:75
 msgid "blendbench"
 msgstr "meng-bank"
 
 #: modules/video_filter/blendbench.c:80
-#, fuzzy
 msgid "Benchmarking"
-msgstr "Randreliëf"
+msgstr "Benchmarking"
 
 #: modules/video_filter/blendbench.c:86
 msgid "Base image"
@@ -19739,7 +19718,7 @@ msgstr "Tolerantie voor de blauwschermmenger op kleurvariaties voor het V vlak. 
 
 #: modules/video_filter/bluescreen.c:79
 msgid "Bluescreen video filter"
-msgstr "Blauwscherm video filter"
+msgstr "Blauwscherm videofilter"
 
 #: modules/video_filter/bluescreen.c:80
 msgid "Bluescreen"
@@ -19783,7 +19762,7 @@ msgstr "U kan specifieke video-uitvoermodules gebruiken voor de klonen. Gebruik 
 
 #: modules/video_filter/clone.c:69
 msgid "Clone video filter"
-msgstr "Kloon video filter"
+msgstr "Kloon videofilter"
 
 #: modules/video_filter/colorthres.c:55
 msgid "Colors similar to this will be kept, others will be grayscaled. This must be an hexadecimal (like HTML colors). The first two chars are for red, then green, then blue. #000000 = black, #FF0000 = red, #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white"
@@ -19803,7 +19782,7 @@ msgstr "Gelijkheidsdrempel"
 
 #: modules/video_filter/crop.c:73
 msgid "Crop geometry (pixels)"
-msgstr "Snij-afmeetingen (pixels)"
+msgstr "Bijsnij-afmetingen (pixels)"
 
 #: modules/video_filter/crop.c:74
 msgid "Set the geometry of the zone to crop. This is set as <width> x <height> + <left offset> + <top offset>."
@@ -19811,7 +19790,7 @@ msgstr "Stel het uit te snijden vlak in. Dit is gespecificeerd als <breedte> x <
 
 #: modules/video_filter/crop.c:76
 msgid "Automatic cropping"
-msgstr "Automatisch snijden"
+msgstr "Automatisch bijsnijden"
 
 #: modules/video_filter/crop.c:77
 msgid "Automatically detect black borders and crop them."
@@ -19823,7 +19802,7 @@ msgstr "Verhoudingsmaximum (x 1000)"
 
 #: modules/video_filter/crop.c:81
 msgid "Maximum image ratio. The crop plugin will never automatically crop to a higher ratio (ie, to a more \"flat\" image). The value is x1000: 1333 means 4/3."
-msgstr ""
+msgstr "Maximum beeldverhouding. De bijsnijd-plugin zal nooit automatisch bijsnijden naar een hogere ratio (dit is, naar een meer \"plat\" beeld). De waarde is x1000: 1333 betekent 4/3"
 
 #: modules/video_filter/crop.c:83
 msgid "Manual ratio"
@@ -19839,7 +19818,7 @@ msgstr "Aantal afbeeldingen voor verandering"
 
 #: modules/video_filter/crop.c:87
 msgid "The number of consecutive images with the same detected ratio (different from the previously detected ratio) to consider that ratio chnged and trigger recrop."
-msgstr ""
+msgstr "Aantal opeenvolgende beelden met dezelfde gedetecteerde beeldverhouding (verschillend van de vorig gedetecteerde beeldverhouding) om te zien dat de beeldverhouding veranderde en om het opnieuw bijsnijden in te schakelen."
 
 #: modules/video_filter/crop.c:89
 msgid "Number of lines for change"
@@ -19847,7 +19826,7 @@ msgstr "Aantal regels voor verandering"
 
 #: modules/video_filter/crop.c:90
 msgid "The minimum difference in the number of detected black lines to consider that ratio changed and trigger recrop."
-msgstr ""
+msgstr "Het minimum verschil in het aantal gedetecteerde zwarte lijnen om te zien dat de beeldverhouding veranderde en om het opnieuw bijsnijden te activeren."
 
 #: modules/video_filter/crop.c:92
 msgid "Number of non black pixels "
@@ -19855,7 +19834,7 @@ msgstr "Aantal niet-zwarte pixels"
 
 #: modules/video_filter/crop.c:93
 msgid "The maximum of non-black pixels in a line to consider that the line is black."
-msgstr ""
+msgstr "Het maximum aantal niet-zwarte pixels in een lijn om te besluiten dat de lijn zwart is."
 
 #: modules/video_filter/crop.c:96
 msgid "Skip percentage (%)"
@@ -19863,7 +19842,7 @@ msgstr "Stap-percentage (%)"
 
 #: modules/video_filter/crop.c:97
 msgid "Percentage of the line to consider while checking for black lines. This allows to skip logos in black borders and crop them anyway."
-msgstr ""
+msgstr "Percentage van de lijn in overweging te nemen wanneer gecheckt wordt voor zwarte lijnen. Dit laat toe om logo's in zwarte randen over te slaan en ze toch bij te snijden."
 
 #: modules/video_filter/crop.c:99
 msgid "Luminance threshold "
@@ -19875,12 +19854,12 @@ msgstr "Maximale belichting om een pixels als zwart te beschouwen (0-255)."
 
 #: modules/video_filter/crop.c:104
 msgid "Crop video filter"
-msgstr "Snijden videofilter"
+msgstr "Bijsnijden-videofilter"
 
 #: modules/video_filter/crop.c:378
 #: modules/video_filter/crop.c:474
 msgid "Cropping failed"
-msgstr "Snijden mislukt"
+msgstr "Bijsnijden mislukt"
 
 #: modules/video_filter/crop.c:379
 #: modules/video_filter/crop.c:475
@@ -19964,23 +19943,23 @@ msgstr "Vullen"
 #: modules/video_filter/deinterlace.c:112
 #: modules/video_output/x11/xvmc.c:130
 msgid "Deinterlace mode"
-msgstr "Deinterlace methode"
+msgstr "Deïnterlace-methode"
 
 #: modules/video_filter/deinterlace.c:113
 msgid "Deinterlace method to use for local playback."
-msgstr "Deinterlacemethode om te gebruiken bij lokaal afspelen."
+msgstr "Deïnterlace-methode om te gebruiken bij lokaal afspelen."
 
 #: modules/video_filter/deinterlace.c:115
 msgid "Streaming deinterlace mode"
-msgstr "Streaming deinterlacemodus"
+msgstr "Streaming deïnterlacemodus"
 
 #: modules/video_filter/deinterlace.c:116
 msgid "Deinterlace method to use for streaming."
-msgstr "Deinterlacemethode om te gebruiken voor streamen."
+msgstr "Deïnterlace-methode om te gebruiken voor streamen."
 
 #: modules/video_filter/deinterlace.c:126
 msgid "Deinterlacing video filter"
-msgstr "Deinterlace video filter"
+msgstr "Deïnterlace videofilter"
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:58
 msgid "Input FIFO"
@@ -20052,7 +20031,7 @@ msgstr "Gaussiaan's standaarddeviatie"
 
 #: modules/video_filter/gaussianblur.c:49
 msgid "Gaussian's standard deviation. The bluring will take into account pixels up to 3*sigma away in any direction."
-msgstr ""
+msgstr "Gaussiaanse standaarddeviatie. Het wazig maken zal rekening houden met pixels tot 3*sigma ver in elke richting."
 
 #: modules/video_filter/gaussianblur.c:55
 msgid "Gaussian blur video filter"
@@ -20068,16 +20047,15 @@ msgstr "Verstoringsmodus"
 
 #: modules/video_filter/gradient.c:64
 msgid "Distort mode, one of \"gradient\", \"edge\" and \"hough\"."
-msgstr ""
+msgstr "Vervormingsmodus, een van \"gradiënt\", \"edge\" en \"hough\"."
 
 #: modules/video_filter/gradient.c:66
-#, fuzzy
 msgid "Gradient image type"
-msgstr "Afbeeldingstype ‘%s’ wordt niet ondersteund"
+msgstr "Gradiënt-beeldtype"
 
 #: modules/video_filter/gradient.c:67
 msgid "Gradient image type (0 or 1). 0 will turn the image to white while 1 will keep colors."
-msgstr ""
+msgstr "Gradiënt beeldtype (0 of 1). 0 zal het beeld naar wit omzetten, terwijl 1 kleuren zal behouden."
 
 #: modules/video_filter/gradient.c:70
 msgid "Apply cartoon effect"
@@ -20096,14 +20074,12 @@ msgid "Hough"
 msgstr "Hough-transformatie"
 
 #: modules/video_filter/gradient.c:80
-#, fuzzy
 msgid "Gradient video filter"
-msgstr "Kloon beeld van de video filter"
+msgstr "Gradiënt-videofilter"
 
 #: modules/video_filter/grain.c:53
-#, fuzzy
 msgid "Grain video filter"
-msgstr "Kloon beeld van de video filter"
+msgstr "Korrel-videofilter"
 
 #: modules/video_filter/grain.c:54
 msgid "Grain"
@@ -20111,7 +20087,7 @@ msgstr "Korrel"
 
 #: modules/video_filter/imgresample.c:63
 msgid "FFmpeg video filter"
-msgstr "FFmpeg video filter"
+msgstr "FFmpeg videofilter"
 
 #: modules/video_filter/invert.c:51
 msgid "Invert video filter"
@@ -20138,9 +20114,8 @@ msgid "Number of loops for the logo animation.-1 = continuous, 0 = disabled"
 msgstr "Aantal herhalingen voor de logo-animatie. -1 = blijvend herhalen, 0 = uitgeschakeld"
 
 #: modules/video_filter/logo.c:78
-#, fuzzy
 msgid "Logo individual image time in ms"
-msgstr "Afbeeldingen niet in de cache opslaan"
+msgstr "Logo individuele beeldtijd in ms"
 
 #: modules/video_filter/logo.c:79
 msgid "Individual image display time of 0 - 60000 ms."
@@ -20148,11 +20123,11 @@ msgstr "Weergavetijd van individuele afbeelding van 0 - 60000 ms."
 
 #: modules/video_filter/logo.c:82
 msgid "X coordinate of the logo. You can move the logo by left-clicking it."
-msgstr "X coordinaat van het logo. U kan het logo verplaatsen door erop te links-klikken."
+msgstr "X-coördinaat van het logo. U kan het logo verplaatsen door erop te links-klikken."
 
 #: modules/video_filter/logo.c:85
 msgid "Y coordinate of the logo. You can move the logo by left-clicking it."
-msgstr "Y coordinaat van het logo. U kan het logo verplaatsen door erop te links-klikken."
+msgstr "Y-coördinaat van het logo. U kan het logo verplaatsen door erop te links-klikken."
 
 #: modules/video_filter/logo.c:87
 msgid "Transparency of the logo"
@@ -20222,11 +20197,11 @@ msgstr "Aantal milliseconden tussen regel verversingen. Dit is hoofdzakelijk han
 
 #: modules/video_filter/marq.c:128
 msgid "Marquee position"
-msgstr "Lichtkrant positie"
+msgstr "Lichtkrantpositie"
 
 #: modules/video_filter/marq.c:130
 msgid "You can enforce the marquee position on the video (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use combinations of these values, eg 6 = top-right)."
-msgstr "De oriëntatie/positionering van de lichtkrant op de video kan hier bepaald worden. (0=midden, 1=links, 2=rechts, 4=boven, 8=beneden. Combinaties van deze waarden zijn ook mogelijk, zoals 6 = boven-rechts)."
+msgstr "U kan de positie van de lichtkrant op de video hier bepalen (0=midden, 1=links, 2=rechts, 4=boven, 8=beneden; combinaties van deze waarden zijn ook mogelijk, zoals 6 = boven-rechts)"
 
 #: modules/video_filter/marq.c:146
 msgid "Marquee"
@@ -20258,36 +20233,32 @@ msgid "Top left corner X coordinate"
 msgstr "Boven-links hoek X-coordinaat"
 
 #: modules/video_filter/mosaic.c:101
-#, fuzzy
 msgid "X Coordinate of the top-left corner of the mosaic."
-msgstr "Linkse coordinaat van de subscreen boven links hoek."
+msgstr "X-coördinaat van de linkerbovenhoek van de mozaïek."
 
 #: modules/video_filter/mosaic.c:102
 msgid "Top left corner Y coordinate"
 msgstr "Boven-links hoek Y-coordinaat"
 
 #: modules/video_filter/mosaic.c:104
-#, fuzzy
 msgid "Y Coordinate of the top-left corner of the mosaic."
-msgstr "Linkse coordinaat van de subscreen boven links hoek."
+msgstr "Y-coördinaat van de linkerbovenhoek van de mozaïek."
 
 #: modules/video_filter/mosaic.c:106
 msgid "Border width"
 msgstr "Kaderbreedte"
 
 #: modules/video_filter/mosaic.c:108
-#, fuzzy
 msgid "Width in pixels of the border between miniatures."
-msgstr "Breedte, in beeldpunten, tussen de aandacht-indicator en de widget-box"
+msgstr "Breedte in pixels van de rand tussen miniaturen."
 
 #: modules/video_filter/mosaic.c:109
 msgid "Border height"
 msgstr "Kaderhoogte"
 
 #: modules/video_filter/mosaic.c:111
-#, fuzzy
 msgid "Height in pixels of the border between miniatures."
-msgstr "De vensterhoogte van de effecten in pixels."
+msgstr "Hoogte in pixels van de rand tussen miniaturen."
 
 #: modules/video_filter/mosaic.c:113
 msgid "Mosaic alignment"
@@ -20303,7 +20274,7 @@ msgstr "Positioneringsmethode"
 
 #: modules/video_filter/mosaic.c:121
 msgid "Positioning method for the mosaic. auto: automatically choose the best number of rows and columns. fixed: use the user-defined number of rows and columns. offsets: use the user-defined offsets for each image."
-msgstr ""
+msgstr "Positioneringsmethode voor de mozaïek. Auto: kies automatisch het beste aantal rijen en kolommen. Vast: gebruik het manueel ingestelde aantal rijen en kolommen. Offsets: gebruik de manueel ingestelde offsets voor elk beeld."
 
 #: modules/video_filter/mosaic.c:126
 #: modules/video_filter/panoramix.c:85
@@ -20327,7 +20298,7 @@ msgstr "Aantal beeldkolommen in de mozaïek (alleen gebruikt indien de positione
 
 #: modules/video_filter/mosaic.c:138
 msgid "Keep the original aspect ratio when resizing mosaic elements."
-msgstr ""
+msgstr "Behoud de originele beeldverhouding bij het herschalen van mozaïek-elementen"
 
 #: modules/video_filter/mosaic.c:140
 msgid "Keep original size"
@@ -20338,13 +20309,12 @@ msgid "Keep the original size of mosaic elements."
 msgstr "Behoud de originele grootte van mozaïek-elementen."
 
 #: modules/video_filter/mosaic.c:144
-#, fuzzy
 msgid "Elements order"
-msgstr "<b>Paginavolgorde</b>"
+msgstr "Element-volgorde"
 
 #: modules/video_filter/mosaic.c:146
 msgid "You can enforce the order of the elements on the mosaic. You must give a comma-separated list of picture ID(s).These IDs are assigned in the \"mosaic-bridge\" module."
-msgstr ""
+msgstr "U kan de element-volgorde van de mozaïek forceren. U moet een lijst met door komma's gescheiden waarden van afbeelding-ID's ingeven. Deze ID's worden toegewezen in de  \"mozaïek-bridge\"-module."
 
 #: modules/video_filter/mosaic.c:150
 msgid "Offsets in order"
@@ -20352,11 +20322,11 @@ msgstr "Uitlijning in volgorde"
 
 #: modules/video_filter/mosaic.c:152
 msgid "You can enforce the (x,y) offsets of the elements on the mosaic (only used if positioning method is set to \"offsets\"). You must give a comma-separated list of coordinates (eg: 10,10,150,10)."
-msgstr ""
+msgstr "U kan de (x,y)-afstanden forceren van de elementen op de mozaïek (alleen gebruikt indien de positioneringsmethode ingesteld is op \"offsets\"). U moet een lijst met door komma's gescheiden waardes van coördinaten geven (bijvoorbeeld: 10,10,150,10)."
 
 #: modules/video_filter/mosaic.c:158
 msgid "Pictures coming from the mosaic elements will be delayed according to this value (in milliseconds). For high values you will need to raise caching at input."
-msgstr ""
+msgstr "Afbeeldingen afkomstig van de mozaïek-elementen zullen evenredig met deze waarde (in milliseconden) vertraagd worden. Voor hoge waarden moet de caching aan de input vergroot worden."
 
 #: modules/video_filter/mosaic.c:168
 msgid "fixed"
@@ -20407,14 +20377,12 @@ msgid "OpenCV example"
 msgstr "OpenCV voorbeeld"
 
 #: modules/video_filter/opencv_example.cpp:77
-#, fuzzy
 msgid "Haar cascade filename"
-msgstr "De nu geselecteerde bestandsnaam"
+msgstr "Haar-cascadebestandsnaam"
 
 #: modules/video_filter/opencv_example.cpp:78
-#, fuzzy
 msgid "Name of XML file containing Haar cascade description"
-msgstr "Kan de gebruikersinterfacebeschrijving niet uit het XML-bestand %s lezen."
+msgstr "Naam van het XML-bestand dat de Haar-cascadebeschrijving bevat."
 
 #: modules/video_filter/opencv_wrapper.c:70
 msgid "Use input chroma unaltered"
@@ -20466,35 +20434,31 @@ msgstr "Schalingsfactor (0.1-2.0)"
 
 #: modules/video_filter/opencv_wrapper.c:91
 msgid "Ammount by which to scale the picture before sending it to the internal OpenCV filter"
-msgstr ""
+msgstr "Hoeveelheid schaling van de afbeelding voordat het naar de interne OpenCV-filter gezonden wordt"
 
 #: modules/video_filter/opencv_wrapper.c:94
-#, fuzzy
 msgid "OpenCV filter chroma"
-msgstr "Instellingen van chroma modules"
+msgstr "OpenCV-filter chroma"
 
 #: modules/video_filter/opencv_wrapper.c:95
 msgid "Chroma to convert picture to before sending it to the internal OpenCV filter"
-msgstr ""
+msgstr "Chroma waarnaar de afbeelding moet geconverteerd worden voordat het naar de interne OpenCV-filter gezonden wordt"
 
 #: modules/video_filter/opencv_wrapper.c:98
-#, fuzzy
 msgid "Wrapper filter output"
-msgstr "video-uitvoer filter module"
+msgstr "Wrapper-filteruitvoer"
 
 #: modules/video_filter/opencv_wrapper.c:99
 msgid "Determines what (if any) video is displayed by the wrapper filter"
-msgstr ""
+msgstr "Geeft aan welke video er getoond wordt door de wrapper-filter (als er video getoond wordt)"
 
 #: modules/video_filter/opencv_wrapper.c:102
-#, fuzzy
 msgid "Wrapper filter verbosity"
-msgstr "Aut_o-filter toevoegen"
+msgstr "Wrapper-filter informatieniveau"
 
 #: modules/video_filter/opencv_wrapper.c:103
-#, fuzzy
 msgid "Determines wrapper filter verbosity level"
-msgstr "Voor elke niveau extra inspringen"
+msgstr "Bepaalt het informatieniveau van de wrapper-filter"
 
 #: modules/video_filter/opencv_wrapper.c:106
 msgid "OpenCV internal filter name"
@@ -20577,7 +20541,7 @@ msgstr "Actieve vensters"
 
 #: modules/video_filter/panoramix.c:90
 msgid "Comma separated list of active windows, defaults to all"
-msgstr ""
+msgstr "Lijst met door komma's gescheiden waarden van actieve vensters, alles standaard"
 
 #: modules/video_filter/panoramix.c:96
 msgid "Panoramix: wall with overlap video filter"
@@ -20589,7 +20553,7 @@ msgstr "Uitlijning X uitlijning (automatische compensatie)"
 
 #: modules/video_filter/panoramix.c:109
 msgid "Select if you want an automatic offset in horizontal (in case of misalignment due to autoratio control)"
-msgstr ""
+msgstr "Selecteer als u een automatische horizontale offset wil (in geval van verkeerde uitlijning door automatische beeldverhoudings-instelling)"
 
 #: modules/video_filter/panoramix.c:112
 msgid "length of the overlapping area (in %)"
@@ -20827,7 +20791,7 @@ msgstr "Maak een tegel zwart. Andere tegels kunnen alleen met deze zwarte tegel 
 
 #: modules/video_filter/puzzle.c:75
 msgid "Puzzle interactive game video filter"
-msgstr "Puzzel interactief spel video filter"
+msgstr "Interactief puzzelspel videofilter"
 
 #: modules/video_filter/puzzle.c:76
 msgid "Puzzle"
@@ -20998,14 +20962,12 @@ msgid "RV32 conversion filter"
 msgstr "RV32 conversiefilter"
 
 #: modules/video_filter/seamcarving.c:63
-#, fuzzy
 msgid "Seam Carving video filter"
-msgstr "Mozaïek video sub filter"
+msgstr "Seam Carving videofilter"
 
 #: modules/video_filter/seamcarving.c:64
-#, fuzzy
 msgid "Seam Carving"
-msgstr "Streaming"
+msgstr "Seam Carving"
 
 #: modules/video_filter/sharpen.c:47
 msgid "Sharpen strength (0-2)"
@@ -21072,13 +21034,12 @@ msgid "Lanczos"
 msgstr "Lanczos"
 
 #: modules/video_filter/swscale.c:60
-#, fuzzy
 msgid "Bicubic spline"
 msgstr "Bicubisch (goede kwaliteit)"
 
 #: modules/video_filter/transform.c:65
 msgid "Transform type"
-msgstr "Transformatie type"
+msgstr "Transformatietype"
 
 #: modules/video_filter/transform.c:66
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
@@ -21130,7 +21091,7 @@ msgstr "Beeldverhouding van de individuele schermen waar de muur uit opgebouwd i
 
 #: modules/video_filter/wall.c:75
 msgid "Wall video filter"
-msgstr "Videomuur filter"
+msgstr "Video-muurfilter"
 
 #: modules/video_filter/wall.c:76
 msgid "Image wall"
@@ -21138,7 +21099,7 @@ msgstr "Videomuur"
 
 #: modules/video_filter/wave.c:54
 msgid "Wave video filter"
-msgstr "Golf video filter"
+msgstr "Golf videofilter"
 
 #: modules/video_output/aa.c:58
 msgid "ASCII Art"
@@ -21233,7 +21194,7 @@ msgstr "Bestandsnaam prefix"
 
 #: modules/video_output/image.c:71
 msgid "Prefix of the output images filenames. Output filenames will have the \"prefixNUMBER.format\" form."
-msgstr ""
+msgstr "Prefix van de bestandsnamen van de uitvoer-afbeeldingen. Uitvoer-bestandsnamen hebben de \"prefixNUMMER.formaat\"-vorm."
 
 #: modules/video_output/image.c:75
 msgid "Always write to the same file"
@@ -21517,16 +21478,15 @@ msgstr "Sluit functie"
 
 #: modules/video_output/vmem.c:64
 msgid "Address of the locking callback function. This function must return a valid memory address for use by the video renderer."
-msgstr ""
+msgstr "Adres van de locking terugroepfunctie. Deze functie moet een geldig geheugenadres weergeven bij gebruik door de video-renderer."
 
 #: modules/video_output/vmem.c:68
 msgid "Unlock function"
 msgstr "Ontsluit functie"
 
 #: modules/video_output/vmem.c:69
-#, fuzzy
 msgid "Address of the unlocking callback function"
-msgstr "R.PF:cumulatieve distributiefunctie van de F-verdeling."
+msgstr "Adres van de ontsluitingsterugroepfunctie"
 
 #: modules/video_output/vmem.c:71
 msgid "Callback data"
@@ -21534,7 +21494,7 @@ msgstr "Terugroepgegevens"
 
 #: modules/video_output/vmem.c:72
 msgid "Data for the locking and unlocking functions"
-msgstr "Gegevens voor de locking- en unlocking-functies"
+msgstr "Gegevens voor de sluitings- en ontsluitingsfuncties"
 
 #: modules/video_output/vmem.c:75
 msgid "Video memory module"
@@ -21657,7 +21617,7 @@ msgstr "Kies het scherm om te gebruiken in schermvullende modus. Bijvoorbeeld ze
 
 #: modules/video_output/x11/xvmc.c:131
 msgid "You can choose the default deinterlace mode"
-msgstr "U kan kiezen voor de standaard deinterlace modus"
+msgstr "U kan kiezen voor de standaard deïnterlacemodus"
 
 #: modules/video_output/x11/xvmc.c:134
 msgid "You can choose the crop style to apply."
@@ -21697,7 +21657,7 @@ msgstr "Goom"
 
 #: modules/visualization/goom.c:74
 msgid "Goom effect"
-msgstr "Goom effect"
+msgstr "Goom-effect"
 
 #: modules/visualization/visual/visual.c:41
 msgid "Effects list"
@@ -21708,7 +21668,7 @@ msgid ""
 "A list of visual effect, separated by commas.\n"
 "Current effects include: dummy, scope, spectrum."
 msgstr ""
-"Een lijst van visuele effecten, gescheiden door comma's.\n"
+"Een lijst van visuele effecten, gescheiden door komma's.\n"
 "Huidige effecten bevatten: dummy, scope, spectrum."
 
 #: modules/visualization/visual/visual.c:48
@@ -21809,7 +21769,7 @@ msgstr "Piek extra breedte"
 
 #: modules/visualization/visual/visual.c:98
 msgid "Additions or subtractions of pixels on the peak width."
-msgstr ""
+msgstr "Toevoegingen of verwijderingen van pixels op de piekbreedte."
 
 #: modules/visualization/visual/visual.c:100
 msgid "V-plane color"
