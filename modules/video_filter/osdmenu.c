@@ -270,8 +270,6 @@ static int CreateFilter ( vlc_object_t *p_this )
 error:
     msg_Err( p_filter, "osdmenu filter discarded" );
 
-    osd_MenuDelete( p_this, p_sys->p_menu );
-    p_sys->p_menu = NULL;
     free( p_sys->psz_path );
     free( p_sys->psz_file );
     free( p_sys );

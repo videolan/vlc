@@ -68,7 +68,6 @@ static bool osd_ParserLoad( osd_menu_t *p_menu, const char *psz_file )
     if( !p_menu->p_image || !p_menu->psz_file )
     {
         msg_Err( p_menu, "unable to load images, aborting .." );
-        osd_ParserUnload( p_menu );
         return true;
     }
     else
@@ -85,7 +84,6 @@ static bool osd_ParserLoad( osd_menu_t *p_menu, const char *psz_file )
                                         psz_type, true );
         if( !p_menu->p_parser )
         {
-            osd_ParserUnload( p_menu );
             return false;
         }
     }
@@ -200,6 +198,7 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     return p_osd;
 
 error:
+    vlc_mutex_unlock( lockval.p_address );
     __osd_MenuDelete( p_this, p_osd );
     return NULL;
 }
