@@ -584,7 +584,19 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     if( module_Exists( p_intf, "dshow" ) ){
     addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
 
-    devLayout = dshowDevLayout;
+    /* dshow Main */
+    int line = 0;
+    module_config_t *p_config =
+        config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
+    vdevDshowW = new StringListConfigControl(
+        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
+    line++;
+
+    p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
+    adevDshowW = new StringListConfigControl(
+        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
+    line++;
+
     /* dshow Properties */
     QLabel *dshowVSizeLabel = new QLabel( qtr( "Video size" ) );
     dshowPropLayout->addWidget( dshowVSizeLabel, 0, 0 );
@@ -644,6 +656,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaPropLayout->addWidget( bdaBandLabel, 2, 0 );
 
     bdaBandBox = new QComboBox;
+    setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
     bdaPropLayout->addWidget( bdaBandBox, 2, 1 );
 
     bdaBandLabel->hide();
@@ -688,6 +701,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     v4l2PropLayout->addWidget( v4l2StdLabel, 0 , 0 );
 
     v4l2StdBox = new QComboBox;
+    setfillVLCConfigCombo( "v4l2-standard", p_intf, v4l2StdBox );
     v4l2PropLayout->addWidget( v4l2StdBox, 0 , 1 );
     v4l2PropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
             1, 0, 3, 1 );
@@ -722,6 +736,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     v4lPropLayout->addWidget( v4lNormLabel, 0 , 0 );
 
     v4lNormBox = new QComboBox;
+    setfillVLCConfigCombo( "v4l-norm", p_intf, v4lNormBox );
     v4lPropLayout->addWidget( v4lNormBox, 0 , 1 );
 
     QLabel *v4lFreqLabel = new QLabel( qtr( "Frequency" ) );
@@ -820,6 +835,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
 
     pvrNormBox = new QComboBox;
+    setfillVLCConfigCombo( "pvr-norm", p_intf, pvrNormBox );
     pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
 
     QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
@@ -1057,37 +1073,11 @@ void CaptureOpenPanel::updateButtons()
             bdaBandBox->show();
             bdaBandLabel->show();
         }
-        setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
-        break;
-    case DSHOW_DEVICE:
-        {
-            /* dshow Main */
-            int line = 0;
-            module_config_t *p_config =
-                config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
-            vdevDshowW = new StringListConfigControl(
-                   VLC_OBJECT(p_intf), p_config, this, false, devLayout, line );
-            line++;
-
-            p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
-            adevDshowW = new StringListConfigControl(
-                   VLC_OBJECT(p_intf), p_config, this, false, devLayout, line );
-            line++;
-        }
         break;
 #else
     case DVB_DEVICE:
         if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
         if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
-        break;
-    case PVR_DEVICE:
-        setfillVLCConfigCombo( "pvr-norm", p_intf, pvrNormBox );
-        break;
-    case V4L_DEVICE:
-        setfillVLCConfigCombo( "v4l-norm", p_intf, v4lNormBox );
-        break;
-    case V4L2_DEVICE:
-        setfillVLCConfigCombo( "v4l2-standard", p_intf, v4l2StdBox );
         break;
 #endif
     case SCREEN_DEVICE:
