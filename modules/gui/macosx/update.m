@@ -219,6 +219,7 @@ static void updateCallback( void * p_data, bool b_success )
     [o_btn_DownloadNow setEnabled: NO];
     [o_update_window orderOut: self];
     update_Delete( p_u );
+    p_u = nil;
 }
 
 @end
