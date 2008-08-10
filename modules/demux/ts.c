@@ -1670,8 +1670,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
         case 0xBC:  /* Program stream map */
         case 0xBE:  /* Padding */
         case 0xBF:  /* Private stream 2 */
-        case 0xB0:  /* ECM */
-        case 0xB1:  /* EMM */
+        case 0xF0:  /* ECM */
+        case 0xF1:  /* EMM */
         case 0xFF:  /* Program stream directory */
         case 0xF2:  /* DSMCC stream */
         case 0xF8:  /* ITU-T H.222.1 type E stream */
