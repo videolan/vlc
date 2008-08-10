@@ -457,6 +457,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             if( box )
             {
                 box->setLayout( boxlayout );
+                box->show();
                 layout->addWidget( box, i_line, 0, 1, -1 );
                 i_line++;
             }
