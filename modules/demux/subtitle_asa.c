@@ -133,7 +133,6 @@ static int Open ( vlc_object_t *p_this )
 
     if( strcmp( p_demux->psz_demux, "asademux" ) )
     {
-        msg_Dbg( p_demux, "asademux discarded" );
         return VLC_EGENERIC;
     }
 
