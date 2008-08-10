@@ -397,11 +397,11 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
         result = SignalObjectAndWait( *p_mutex, *p_condvar,
                                       delay, FALSE );
         total -= delay;
+        vlc_mutex_lock (p_mutex);
     }
     while (total);
 
     /* Reacquire the mutex before returning. */
-    vlc_mutex_lock( p_mutex );
     if(result == WAIT_TIMEOUT)
        return ETIMEDOUT; /* this error is perfectly normal */
 
