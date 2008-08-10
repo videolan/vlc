@@ -117,7 +117,6 @@
 
 - (IBAction)play:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
 
@@ -134,8 +133,7 @@
         vlc_object_release( p_playlist );
     }
 
-    val.i_int = config_GetInt( p_intf, "key-play-pause" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
 }
 
 /* Small helper method */
@@ -165,10 +163,8 @@
 
 - (IBAction)stop:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-stop" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_STOP );
     /* Close the window directly, because we do know that there
      * won't be anymore video. It's currently waiting a bit. */
     [[[self getVoutView] window] orderOut:self];
@@ -176,34 +172,26 @@
 
 - (IBAction)faster:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-faster" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_FASTER );
 }
 
 - (IBAction)slower:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-slower" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_SLOWER );
 }
 
 - (IBAction)prev:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-prev" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PREV );
 }
 
 - (IBAction)next:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-next" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_NEXT );
 }
 
 - (IBAction)random:(id)sender
@@ -384,47 +372,38 @@
 
 - (IBAction)forward:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-jump+short" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
 }
 
 - (IBAction)backward:(id)sender
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-jump-short" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
 }
 
 
 - (IBAction)volumeUp:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-vol-up" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }
 
 - (IBAction)volumeDown:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-vol-down" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }
 
 - (IBAction)mute:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-vol-mute" );
-    var_Set( p_intf->p_libvlc, "key-pressed", val );
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_MUTE );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }
@@ -446,10 +425,8 @@
                                              FIND_ANYWHERE );
     if( p_vout != NULL )
     {
-        vlc_value_t val;
         intf_thread_t * p_intf = VLCIntf;
-        val.i_int = config_GetInt( p_intf, "key-position" );
-        var_Set( p_intf, "key-pressed", val );
+        var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_POSITION );
         vlc_object_release( (vlc_object_t *)p_vout );
     }
 }
