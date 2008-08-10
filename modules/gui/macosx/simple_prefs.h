@@ -205,12 +205,10 @@
 - (void)showHotkeySettings;
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
-- (void)changeHotkeyTo: (int)i_theNewKey;
+- (BOOL)changeHotkeyTo: (int)i_theNewKey;
 
 @end
 
 @interface VLCHotkeyChangeWindow : NSWindow
-
-- (void)keyDown:(NSEvent *)theEvent;
 
 @end

@@ -1187,7 +1187,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     }
 }
 
-- (void)changeHotkeyTo: (int)i_theNewKey
+- (BOOL)changeHotkeyTo: (int)i_theNewKey
 {
     int i_returnValue;
     i_returnValue = [o_hotkeysNonUseableKeys indexOfObject: [NSNumber numberWithInt: i_theNewKey]];
@@ -1196,6 +1196,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_hotkeys_change_keys_lbl setStringValue: _NS("Invalid combination")];
         [o_hotkeys_change_taken_lbl setStringValue: _NS("Regrettably, these keys cannot be assigned as hotkey shortcuts.")];
         [o_hotkeys_change_ok_btn setEnabled: NO];
+        return NO;
     }
     else
     {
@@ -1217,6 +1218,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
             [o_hotkeys_change_taken_lbl setStringValue: @""];
 
         [o_hotkeys_change_ok_btn setEnabled: YES];
+        return YES;
     }
 }
     
@@ -1228,13 +1230,23 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 @implementation VLCHotkeyChangeWindow
 
+- (BOOL)acceptsFirstResponder
+{
+    return YES;
+}
+
+- (BOOL)becomeFirstResponder
+{
+    return YES;
+}
+
 - (BOOL)resignFirstResponder
 {
     /* We need to stay the first responder or we'll miss the user's input */
     return NO;
 }
 
-- (void)keyDown:(NSEvent *)o_theEvent
+- (BOOL)performKeyEquivalent:(NSEvent *)o_theEvent
 {
     unichar key;
     int i_key = 0;
@@ -1255,8 +1267,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( key )
     {
         i_key |= CocoaKeyToVLC( key );
-        [[[VLCMain sharedInstance] getSimplePreferences] changeHotkeyTo: i_key];
+        return [[[VLCMain sharedInstance] getSimplePreferences] changeHotkeyTo: i_key];
     }
+    return FALSE;
 }
 
 @end
