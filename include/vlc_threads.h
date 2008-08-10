@@ -187,6 +187,8 @@ enum {
     VLC_RESTORE_CANCEL,
     VLC_TEST_CANCEL,
     VLC_DO_CANCEL,
+    VLC_CLEANUP_PUSH,
+    VLC_CLEANUP_POP,
 };
 #endif
 
@@ -316,6 +318,60 @@ static inline void vlc_testcancel (void)
     vlc_control_cancel (VLC_TEST_CANCEL);
 #endif
 }
+
+#if defined (LIBVLC_USE_PTHREAD)
+/**
+ * Registers a new procedure to run if the thread is cancelled (or otherwise
+ * exits prematurely). Any call to vlc_cleanup_push() <b>must</b> paired with a
+ * call to either vlc_cleanup_pop() or vlc_cleanup_run(). Branching into or out
+ * of the block between these two function calls is not allowed (read: it will
+ * likely crash the whole process). If multiple procedures are registered,
+ * they are handled in last-in first-out order.
+ *
+ * @param routine procedure to call if the thread ends
+ * @param arg argument for the procedure
+ */
+# define vlc_cleanup_push( routine, arg ) pthread_cleanup_push (routine, arg)
+
+/**
+ * Removes a cleanup procedure that was previously registered with
+ * vlc_cleanup_push().
+ */
+# define vlc_cleanup_pop( ) pthread_cleanup_pop (0)
+
+/**
+ * Removes a cleanup procedure that was previously registered with
+ * vlc_cleanup_push(), and executes it.
+ */
+# define vlc_cleanup_run( ) pthread_cleanup_pop (1)
+#else
+typedef struct vlc_cleanup_t vlc_cleanup_t;
+
+struct vlc_cleanup_t
+{
+    vlc_cleanup_t *next;
+    void         (*proc) (void *);
+    void          *data;
+};
+
+/* This macros opens a code block on purpose. This is needed for multiple
+ * calls within a single function. This also prevent Win32 developpers from
+ * writing code that would break on POSIX (POSIX opens a block as well). */
+# define vlc_cleanup_push( routine, arg ) \
+    do { \
+        vlc_cleanup_t vlc_cleanup_data = { NULL, routine, arg, }; \
+        vlc_control_cancel (VLC_CLEANUP_PUSH, &vlc_cleanup_data)
+
+# define vlc_cleanup_pop( ) \
+        vlc_control_cancel (VLC_CLEANUP_POP); \
+    } while (0)
+
+# define vlc_cleanup_run( ) \
+        vlc_control_cancel (VLC_CLEANUP_POP); \
+        vlc_cleanup_data.proc (vlc_cleanup_data.data); \
+    } while (0)
+
+#endif /* LIBVLC_USE_PTHREAD */
 
 /*****************************************************************************
  * vlc_cond_init: initialize a condition

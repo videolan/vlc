@@ -864,22 +864,19 @@ void vlc_thread_cancel (vlc_object_t *obj)
         vlc_cancel (priv->thread_id);
 }
 
-typedef struct vlc_cleanup_t
-{
-    struct vlc_cleanup_t *next;
-    void                (*proc) (void *);
-    void                 *data;
-} vlc_cleanup_t;
-
+#ifndef LIBVLC_USE_PTHREAD
 typedef struct vlc_cancel_t
 {
     vlc_cleanup_t *cleaners;
     bool           killable;
     bool           killed;
 } vlc_cancel_t;
+#endif
 
 void vlc_control_cancel (int cmd, ...)
 {
+    /* NOTE: This function only modifies thread-specific data, so there is no
+     * need to lock anything. */
 #ifdef LIBVLC_USE_PTHREAD
     (void) cmd;
     assert (0);
@@ -935,6 +932,22 @@ void vlc_control_cancel (int cmd, ...)
         case VLC_DO_CANCEL:
             nfo->killed = true;
             break;
+
+        case VLC_CLEANUP_PUSH:
+        {
+            /* cleaner is a pointer to the caller stack, no need to allocate
+             * and copy anything. As a nice side effect, this cannot fail. */
+            vlc_cleanup_t *cleaner = va_arg (ap, vlc_cleanup_t *);
+            cleaner->next = nfo->cleaners;
+            nfo->cleaners = cleaner;
+            break;
+        }
+
+        case VLC_CLEANUP_POP:
+        {
+            nfo->cleaners = nfo->cleaners->next;
+            break;
+        }
     }
     va_end (ap);
 #endif
