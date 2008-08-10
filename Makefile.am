@@ -472,7 +472,7 @@ VLC-release.app: vlc
 	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
-	ACTION="VLC-release.app" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
+	PRODUCT="VLC-release.app" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/playlist
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/playlist/`basename $${i}` ; \

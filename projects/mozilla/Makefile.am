@@ -105,47 +105,13 @@ endef
 VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	rm -Rf "$@"
 	$(INSTALL) -d "$@/Contents/MacOS/lib"
-	$(INSTALL) ".libs/npvlc.dylib" "$@/Contents/MacOS/VLC Plugin"
-	$(INSTALL) -d "$(srcdir)/$@/Contents/MacOS/lib"; \
-	install_name_tool -change "$(libdir)/libvlccore.0.dylib" \
-	    "@executable_path/lib/libvlccore.dylib" \
-	    "$@/Contents/MacOS/VLC Plugin"
-	install_name_tool -change "$(libdir)/libvlc.2.dylib" \
-	    "@executable_path/lib/libvlc.dylib" \
-	    "$@/Contents/MacOS/VLC Plugin"
-	$(INSTALL) "$(top_builddir)/src/.libs/libvlccore.0.dylib" \
-	    "$@/Contents/MacOS/lib/libvlccore.dylib"
-	$(INSTALL) "$(top_builddir)/src/.libs/libvlc.2.dylib" \
-	    "$@/Contents/MacOS/lib/libvlc.dylib"
-	install_name_tool -change "$(libdir)/libvlccore.0.dylib" \
-	    "@executable_path/lib/libvlccore.dylib" \
-	    "$@/Contents/MacOS/lib/libvlc.dylib"
-	dylib="$@/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH) ;
-	dylib="$@/Contents/MacOS/lib/libvlccore.dylib"; $(FIXEXECPATH) ;
-	dylib="$@/Contents/MacOS/lib/libvlc.dylib"; $(FIXEXECPATH) ;
 	$(INSTALL) -d "$@/Contents/Resources"
 	$(INSTALL) npvlc.rsrc "$@/Contents/Resources/VLC Plugin.rsrc"
 	cp -r "$(top_srcdir)/extras/package/macosx/plugin/English.lproj" "$@/Contents/Resources/"
 	cp -r "$(top_builddir)/extras/package/macosx/plugin/English.lproj" "$@/Contents/Resources/"
 	$(INSTALL) "$(top_builddir)/extras/package/macosx/plugin/Info.plist" "$@/Contents/Info.plist"
-	$(INSTALL) -d "$@/Contents/MacOS/modules"
-	find $(top_srcdir)/modules/ -name '*_plugin.$(LIBEXT)' | \
-	while read i; do \
-	  if test -n "$$i" ; then \
-	    dylib="$@/Contents/MacOS/modules/`basename $$i`"; \
-	    $(INSTALL) "$$i" "$$dylib"; \
-	    install_name_tool -change "$(libdir)/libvlccore.0.dylib" \
-	        "@executable_path/lib/libvlccore.dylib" "$$dylib"; \
-	    $(FIXEXECPATH) ; \
-	  fi ; \
-	done
-	if test -d $(top_srcdir)/extras/contrib/vlc-lib; then \
-	  for i in $(top_srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
-	    dylib="$@/Contents/MacOS/lib/`basename $${i}`" ; \
-	    $(INSTALL) -m 644 "$${i}" "$$dylib" ; \
-	    $(FIXEXECPATH); \
-	  done ; \
-	fi
+   ACTION="release-makefile" PRODUCT="VLC Plugin.plugin" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
+
 # uncomment if dependencies on XPCOM libs is sought
 #	if test -d "$(MOZILLA_SDK_PATH)/lib"; then \
 #	  for i in "$(MOZILLA_SDK_PATH)"/lib/*.dylib ; do \

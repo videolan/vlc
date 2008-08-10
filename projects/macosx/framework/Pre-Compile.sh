@@ -8,16 +8,15 @@ if test "${ACTION}" = ""; then
     ACTION="build"
     rm -fr ${FULL_PRODUCT_NAME}
     # Debug --
-fi
-
 # Hack to use that script with the current VLC-release.app
-if test "${ACTION}" = "VLC-release.app"; then
+elif test "${ACTION}" = "release-makefile"; then
     TARGET_BUILD_DIR="${build_dir}"
-    FULL_PRODUCT_NAME="VLC-release.app"
+    FULL_PRODUCT_NAME="${PRODUCT}"
     CONTENTS_FOLDER_PATH="${FULL_PRODUCT_NAME}/Contents/MacOS"
     VLC_BUILD_DIR="${build_dir}"
     VLC_SRC_DIR="${src_dir}"
     ACTION="build"
+    RELEASE_MAKEFILE="yes"
 fi
 
 if test "${ACTION}" = "build"; then    
@@ -98,6 +97,10 @@ if test "${ACTION}" = "build"; then
         install_library "${VLC_BUILD_DIR}/src/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
         mv ${target}/vlc ${target}/VLC
         chmod +x ${target}/VLC
+    elif [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
+        install_library "${VLC_BUILD_DIR}/src/${prefix}npvlc.${suffix}" "${target}" "bin" "@loader_path/lib"
+        mv ${target}/npvlc.${suffix} "${target}/VLC Plugin.plugin"
+        chmod +x "${target}/VLC Plugin.plugin"
     fi
 
     ##########################
@@ -118,7 +121,7 @@ if test "${ACTION}" = "build"; then
     mkdir -p ${target_lib}
     mkdir -p ${target_modules}
 
-    if [ "$FULL_PRODUCT_NAME" != "VLC-release.app" ] ; then
+    if [ "$RELEASE_MAKEFILE" != "yes" ] ; then
         pushd `pwd` > /dev/null
         cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}
 
