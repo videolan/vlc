@@ -373,6 +373,12 @@ struct vlc_cleanup_t
 
 #endif /* LIBVLC_USE_PTHREAD */
 
+static inline void vlc_cleanup_lock (void *lock)
+{
+    vlc_mutex_unlock ((vlc_mutex_t *)lock);
+}
+#define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
+
 /*****************************************************************************
  * vlc_cond_init: initialize a condition
  *****************************************************************************/
