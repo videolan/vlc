@@ -894,7 +894,9 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
           return VLC_SUCCESS;
     }
 
-    return PutAction( p_intf, i_action );
+    if( i_action )
+        return PutAction( p_intf, i_action );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
