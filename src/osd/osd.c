@@ -46,7 +46,7 @@ static void osd_UpdateState( osd_menu_state_t *, int, int, int, int, picture_t *
 static inline osd_state_t *osd_VolumeStateChange( osd_state_t *, int );
 static int osd_VolumeStep( vlc_object_t *, int, int );
 static bool osd_isVisible( osd_menu_t *p_osd );
-static osd_menu_t *osd_ParserLoad( vlc_object_t *, const char * );
+static bool osd_ParserLoad( osd_menu_t *, const char * );
 static void osd_ParserUnload( osd_menu_t * );
 
 static bool osd_isVisible( osd_menu_t *p_osd )
@@ -60,27 +60,16 @@ static bool osd_isVisible( osd_menu_t *p_osd )
 /*****************************************************************************
  * Wrappers for loading and unloading osd parser modules.
  *****************************************************************************/
-static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
+static bool osd_ParserLoad( osd_menu_t *p_menu, const char *psz_file )
 {
-    osd_menu_t *p_menu;
-    static const char osdmenu_name[] = "osd menu";
-
-    p_menu = vlc_custom_create( p_this, sizeof( *p_menu ), VLC_OBJECT_OSDMENU,
-                                osdmenu_name );
-    if( !p_menu )
-        return NULL;
-
-    p_menu->p_parser = NULL;
-    vlc_object_attach( p_menu, p_this->p_libvlc );
-
     /* Stuff needed for Parser */
     p_menu->psz_file = strdup( psz_file );
-    p_menu->p_image = image_HandlerCreate( p_this );
+    p_menu->p_image = image_HandlerCreate( p_menu );
     if( !p_menu->p_image || !p_menu->psz_file )
     {
-        msg_Err( p_this, "unable to load images, aborting .." );
+        msg_Err( p_menu, "unable to load images, aborting .." );
         osd_ParserUnload( p_menu );
-        return NULL;
+        return true;
     }
     else
     {
@@ -97,10 +86,10 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
         if( !p_menu->p_parser )
         {
             osd_ParserUnload( p_menu );
-            return NULL;
+            return false;
         }
     }
-    return p_menu;
+    return true;
 }
 
 static void osd_ParserUnload( osd_menu_t *p_menu )
@@ -112,9 +101,6 @@ static void osd_ParserUnload( osd_menu_t *p_menu )
         module_Unneed( p_menu, p_menu->p_parser );
 
     free( p_menu->psz_file );
-
-    vlc_object_detach( p_menu );
-    vlc_object_release( p_menu );
 }
 
 /**
@@ -166,11 +152,21 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
     if( p_osd == NULL )
     {
+        static const char osdmenu_name[] = "osd menu";
         vlc_value_t val;
 
+        p_osd = vlc_custom_create( p_this, sizeof( *p_osd ), VLC_OBJECT_OSDMENU,
+                                    osdmenu_name );
+        if( !p_osd )
+            return NULL;
+
+        p_osd->p_parser = NULL;
+        vlc_object_attach( p_osd, p_this->p_libvlc );
+
         /* Parse configuration file */
-        p_osd = osd_ParserLoad( p_this, psz_file );
-        if( !p_osd || !p_osd->p_state )
+        if ( !osd_ParserLoad( p_osd, psz_file ) )
+            goto error;
+        if( !p_osd->p_state )
             goto error;
 
         /* Setup default button (first button) */
@@ -217,17 +213,19 @@ void __osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
     var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
+    if( vlc_internals( VLC_OBJECT(p_osd) )->i_refcount == 1 )
+    {
+        var_Destroy( p_osd, "osd-menu-visible" );
+        var_Destroy( p_osd, "osd-menu-update" );
+        osd_ParserUnload( p_osd );
+    }
+
     vlc_object_release( p_osd );
     if( vlc_internals( VLC_OBJECT(p_osd) )->i_refcount > 0 )
     {
         vlc_mutex_unlock( lockval.p_address );
         return;
     }
-
-    var_Destroy( p_osd, "osd-menu-visible" );
-    var_Destroy( p_osd, "osd-menu-update" );
-
-    osd_ParserUnload( p_osd );
     p_osd = NULL;
     vlc_mutex_unlock( lockval.p_address );
 }
