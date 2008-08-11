@@ -24,6 +24,12 @@
 #ifndef VLC_META_H
 #define VLC_META_H 1
 
+/**
+ * \file
+ * This file defines functions and structures for stream meta-data in vlc
+ *
+ */
+
 #include <vlc_arrays.h>
 
 typedef enum vlc_meta_type_t

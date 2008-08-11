@@ -36,6 +36,11 @@
 extern "C" {
 # endif
 
+/**
+ * \file
+ * This file defines SPU subpicture and OSD functions and object types.
+ */
+
 /**********************************************************************
  * Base SPU structures
  **********************************************************************/

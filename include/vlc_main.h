@@ -21,6 +21,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \file
+ * This file defines libvlc_int_t internal libvlc instance
+ */
+
 TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
 
 /*****************************************************************************

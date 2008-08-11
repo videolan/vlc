@@ -25,6 +25,11 @@
 #ifndef VLC_CHARSET_H
 #define VLC_CHARSET_H 1
 
+/**
+ * \file
+ * This files handles locale conversions in vlc
+ */
+
 #include <stdarg.h>
 #include <sys/types.h>
 #include <dirent.h>

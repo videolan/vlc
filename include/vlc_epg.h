@@ -24,6 +24,11 @@
 #ifndef VLC_EPG_H
 #define VLC_EPG_H 1
 
+/**
+ * \file
+ * This file defines functions and structures for storing dvb epg information
+ */
+
 typedef struct
 {
     int64_t i_start;    /* Interpreted as a value return by time() */
@@ -50,6 +55,7 @@ static inline void vlc_epg_Init( vlc_epg_t *p_epg, const char *psz_name )
     p_epg->p_current = NULL;
     TAB_INIT( p_epg->i_event, p_epg->pp_event );
 }
+
 static inline void vlc_epg_Clean( vlc_epg_t *p_epg )
 {
     int i;
@@ -64,6 +70,7 @@ static inline void vlc_epg_Clean( vlc_epg_t *p_epg )
     TAB_CLEAN( p_epg->i_event, p_epg->pp_event );
     free( p_epg->psz_name );
 }
+
 static inline void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_duration,
                                 const char *psz_name, const char *psz_short_description, const char *psz_description )
 {
@@ -85,11 +92,13 @@ static inline vlc_epg_t *vlc_epg_New( const char *psz_name )
         vlc_epg_Init( p_epg, psz_name );
     return p_epg;
 }
+
 static inline void vlc_epg_Delete( vlc_epg_t *p_epg )
 {
     vlc_epg_Clean( p_epg );
     free( p_epg );
 }
+
 static inline void vlc_epg_SetCurrent( vlc_epg_t *p_epg, int64_t i_start )
 {
     int i;

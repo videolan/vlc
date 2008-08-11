@@ -25,6 +25,11 @@
 #define VLC_STRINGS_H 1
 
 /**
+ * \file
+ * This file defines functions and structures handling misc strings
+ */
+
+/**
  * \defgroup strings Strings
  * @{
  */

@@ -24,6 +24,11 @@
 #ifndef VLC_ACCESS_H
 #define VLC_ACCESS_H 1
 
+/**
+ * \file
+ * This file defines functions and definitions for access object
+ */
+
 #include <vlc_block.h>
 
 /**

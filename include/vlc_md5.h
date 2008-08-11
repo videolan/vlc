@@ -25,6 +25,11 @@
 #ifndef VLC_MD5_H
 # define VLC_MD5_H
 
+/**
+ * \file
+ * This file defines functions and structures for handling md5 checksums
+ */
+
 /*****************************************************************************
  * md5_s: MD5 message structure
  *****************************************************************************

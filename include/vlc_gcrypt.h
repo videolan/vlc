@@ -18,6 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \file
+ * This file implements gcrypt support functions in vlc
+ */
+
 #ifdef LIBVLC_USE_PTHREAD
 /**
  * If possible, use gcrypt-provided thread implementation. This is so that
@@ -26,6 +31,7 @@
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 # define gcry_threads_vlc gcry_threads_pthread
 #else
+
 /**
  * gcrypt thread option VLC implementation
  */

@@ -27,6 +27,11 @@
 #ifndef VLC_SOUT_H_
 #define VLC_SOUT_H_
 
+/**
+ * \file
+ * This file defines structures and functions for stream ouput in vlc
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -25,6 +25,11 @@
 #define VLC_ARRAYS_H_
 
 /**
+ * \file
+ * This file defines functions, structures and macros for handling arrays in vlc
+ */
+
+/**
  * Simple dynamic array handling. Array is realloced at each insert/removal
  */
 #if defined( _MSC_VER ) && _MSC_VER < 1300 && !defined( UNDER_CE )

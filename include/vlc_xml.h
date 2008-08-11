@@ -24,6 +24,12 @@
 #ifndef VLC_XML_H
 #define VLC_XML_H
 
+/**
+ * \file
+ * This file defines functions and structures to handle xml tags in vlc
+ *
+ */
+
 # ifdef __cplusplus
 extern "C" {
 # endif

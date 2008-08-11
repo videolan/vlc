@@ -22,6 +22,11 @@
 #ifndef VLC_RAND_H
 # define VLC_RAND_H
 
+/**
+ * \file
+ * This file defined random number generator function in vlc
+ */
+
 VLC_EXPORT( void, vlc_rand_bytes, (void *buf, size_t len) );
 
 #endif

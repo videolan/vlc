@@ -24,6 +24,12 @@
 #ifndef VLC_KEYS_H
 #define VLC_KEYS_H 1
 
+/**
+ * \file
+ * This file defines keys, functions and structures for hotkey handling in vlc
+ *
+ */
+
 #define KEY_MODIFIER         0xFF000000
 #define KEY_MODIFIER_ALT     0x01000000
 #define KEY_MODIFIER_SHIFT   0x02000000

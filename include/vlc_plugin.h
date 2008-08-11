@@ -24,6 +24,11 @@
 #ifndef LIBVLC_MODULES_MACROS_H
 # define LIBVLC_MODULES_MACROS_H 1
 
+/**
+ * \file
+ * This file implements plugin (module) macros used to define a vlc module.
+ */
+
 /*****************************************************************************
  * If we are not within a module, assume we're in the vlc core.
  *****************************************************************************/

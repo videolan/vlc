@@ -24,6 +24,11 @@
 #ifndef VLC_HTTPD_H
 #define VLC_HTTPD_H 1
 
+/**
+ * \file
+ * This file defines functions, structures, enums and macros for httpd functionality in vlc.
+ */
+
 enum
 {
     HTTPD_MSG_NONE,

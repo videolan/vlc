@@ -27,6 +27,11 @@
 #ifndef VLC_MESSAGES_H_
 #define VLC_MESSAGES_H_
 
+/**
+ * \file
+ * This file defines structures and functions to handle messages and statistics gathering
+ */
+
 #include <stdarg.h>
 
 /**

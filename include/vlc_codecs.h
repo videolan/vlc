@@ -24,6 +24,11 @@
 #ifndef VLC_CODECS_H
 #define VLC_CODECS_H 1
 
+/**
+ * \file
+ * This file defines codec related structures needed by the demuxers and decoders
+ */
+
 #ifdef HAVE_ATTRIBUTE_PACKED
 #   define ATTR_PACKED __attribute__((__packed__))
 #else

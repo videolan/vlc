@@ -26,6 +26,11 @@
 
 #include <vlc_block.h>
 
+/**
+ * \file
+ * This file defines structures and functions for stream (between access and demux) descriptor in vlc
+ */
+
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -121,7 +126,6 @@ static inline char *stream_ContentType( stream_t *s )
 VLC_EXPORT( stream_t *,__stream_DemuxNew, ( vlc_object_t *p_obj, const char *psz_demux, es_out_t *out ) );
 VLC_EXPORT( void,      stream_DemuxSend,  ( stream_t *s, block_t *p_block ) );
 VLC_EXPORT( void,      stream_DemuxDelete,( stream_t *s ) );
-
 
 #define stream_MemoryNew( a, b, c, d ) __stream_MemoryNew( VLC_OBJECT(a), b, c, d )
 VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, bool i_preserve_memory ) );

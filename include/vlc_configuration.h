@@ -26,6 +26,11 @@
 #ifndef VLC_CONFIGURATION_H
 #define VLC_CONFIGURATION_H 1
 
+/**
+ * \file
+ * This file describes the programming interface for the configuration module.
+ * It includes functions allowing to declare, get or set configuration options.
+ */
 
 # ifdef __cplusplus
 extern "C" {

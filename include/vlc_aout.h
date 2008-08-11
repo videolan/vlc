@@ -24,6 +24,11 @@
 #ifndef VLC_AOUT_H
 #define VLC_AOUT_H 1
 
+/**
+ * \file
+ * This file defines functions, structures and macros for audio output object
+ */
+
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -85,7 +90,6 @@ typedef int32_t vlc_fixed_t;
 #define FIXED32_MIN ((vlc_fixed_t) -0x80000000L)
 #define FIXED32_MAX ((vlc_fixed_t) +0x7fffffffL)
 #define FIXED32_ONE ((vlc_fixed_t) 0x10000000)
-
 
 /*
  * Channels descriptions

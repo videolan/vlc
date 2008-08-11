@@ -24,6 +24,17 @@
 #ifndef VLC_VOD_H
 #define VLC_VOD_H 1
 
+/**
+ * \file
+ * This file defines an interface for VOD server modules in vlc
+ */
+
+/**
+ * \defgroup server Video On Demand (VOD)
+ * Video On Demand (VOD) functionality is provided from VLM.
+ * @{
+ */
+
 struct vod_t
 {
     VLC_COMMON_MEMBERS
@@ -66,5 +77,7 @@ enum vod_query_e
     VOD_MEDIA_REWIND,       /* arg1= double         res=    */
     VOD_MEDIA_FORWARD,      /* arg1= double         res=    */
 };
+
+/**}*/
 
 #endif

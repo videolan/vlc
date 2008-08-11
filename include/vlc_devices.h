@@ -24,6 +24,11 @@
 #ifndef VLC_DEVICES_H
 #define VLC_DEVICES_H 1
 
+/**
+ * \file
+ * This file implements functions, structures for probing devices (DVD, CD, VCD)
+ */
+
 enum
 {
     DEVICE_CAN_DVD,

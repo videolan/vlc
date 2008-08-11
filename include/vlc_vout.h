@@ -26,6 +26,11 @@
 #ifndef VLC_VOUT_H_
 #define VLC_VOUT_H_ 1
 
+/**
+ * \file
+ * This file defines common video output structures and functions in vlc
+ */
+
 #include <vlc_es.h>
 #include <vlc_filter.h>
 

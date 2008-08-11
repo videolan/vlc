@@ -25,6 +25,11 @@
 #define VLC_ES_OUT_H 1
 
 /**
+ * \file
+ * This file defines functions and structures for handling es_out in stream output
+ */
+
+/**
  * \defgroup es out Es Out
  * @{
  */
@@ -105,10 +110,12 @@ static inline es_out_id_t * es_out_Add( es_out_t *out, es_format_t *fmt )
 {
     return out->pf_add( out, fmt );
 }
+
 static inline void es_out_Del( es_out_t *out, es_out_id_t *id )
 {
     out->pf_del( out, id );
 }
+
 static inline int es_out_Send( es_out_t *out, es_out_id_t *id,
                                block_t *p_block )
 {
@@ -119,6 +126,7 @@ static inline int es_out_vaControl( es_out_t *out, int i_query, va_list args )
 {
     return out->pf_control( out, i_query, args );
 }
+
 static inline int es_out_Control( es_out_t *out, int i_query, ... )
 {
     va_list args;

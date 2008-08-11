@@ -24,6 +24,11 @@
 #ifndef VLC_TLS_H
 # define VLC_TLS_H
 
+/**
+ * \file
+ * This file defines Transport Layer Security API (TLS) in vlc
+ */
+
 # include <vlc_network.h>
 
 typedef struct tls_server_sys_t tls_server_sys_t;

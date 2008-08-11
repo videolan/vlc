@@ -24,6 +24,11 @@
 #ifndef VLC_SERVICES_DISCOVERY_H_
 #define VLC_SERVICES_DISCOVERY_H_
 
+/**
+ * \file
+ * This file functions and structures for service discovery in vlc
+ */
+
 # ifdef __cplusplus
 extern "C" {
 # endif

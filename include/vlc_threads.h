@@ -28,6 +28,12 @@
 #ifndef VLC_THREADS_H_
 #define VLC_THREADS_H_
 
+/**
+ * \file
+ * This file defines structures and functions for handling threads in vlc
+ *
+ */
+
 #if defined( UNDER_CE )
                                                                 /* WinCE API */
 #elif defined( WIN32 )

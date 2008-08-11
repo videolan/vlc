@@ -21,6 +21,11 @@
 #ifndef LIBVLCCORE_WINDOW_H
 # define LIBVLCCORE_WINDOW_H 1
 
+/**
+ * \file
+ * This file defines functions and structures for output windows
+ */
+
 # include <stdarg.h>
 
 typedef struct vout_window_t vout_window_t;

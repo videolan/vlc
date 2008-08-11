@@ -27,6 +27,11 @@
 #ifndef VLC_NETWORK_H
 # define VLC_NETWORK_H
 
+/**
+ * \file
+ * This file defines interface to communicate with network plug-ins
+ */
+
 #if defined( WIN32 )
 #   if !defined(UNDER_CE)
 #       define _NO_OLDNAMES 1

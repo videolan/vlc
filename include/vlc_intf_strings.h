@@ -24,6 +24,11 @@
 #ifndef VLC_INTF_STRINGS_H
 #define VLC_INTF_STRINGS_H 1
 
+/**
+ * \file
+ * This file defines a number of strings used in user interfaces
+ */
+
 /*************** Open dialogs **************/
 
 #define I_OP_OPF        N_("Quick &Open File...")

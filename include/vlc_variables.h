@@ -26,6 +26,11 @@
 #define VLC_VARIABLES_H 1
 
 /**
+ * \file
+ * This file defines functions and structures for dynamic variables in vlc
+ */
+
+/**
  * \defgroup variables Variables
  *
  * Functions for using the object variables in vlc.

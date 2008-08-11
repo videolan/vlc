@@ -24,6 +24,11 @@
 #ifndef VLC_DEMUX_H
 #define VLC_DEMUX_H 1
 
+/**
+ * \file
+ * This files defines functions and structures used by demux objects in vlc
+ */
+
 #include <vlc_es.h>
 #include <vlc_stream.h>
 #include <vlc_es_out.h>

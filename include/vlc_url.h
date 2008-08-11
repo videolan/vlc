@@ -25,6 +25,11 @@
 #ifndef VLC_URL_H
 # define VLC_URL_H
 
+/**
+ * \file
+ * This file defines functions for manipulating URL in vlc
+ */
+
 struct vlc_url_t
 {
     char *psz_protocol;
@@ -192,7 +197,6 @@ static inline void vlc_UrlClean( vlc_url_t *url )
     url->psz_buffer   = NULL;
 }
 
-
 static inline char *vlc_UrlEncode( const char *psz_url )
 {
     /* FIXME: do not encode / : ? and & _when_ not needed */
@@ -226,6 +230,5 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
     }
     return 0; /* looks fine - but maybe it is not encoded */
 }
-
 
 #endif

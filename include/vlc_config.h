@@ -22,6 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \file
+ * This file defines of values used in interface, vout, aout and vlc core functions.
+ */
+
 /* Conventions regarding names of symbols and variables
  * ----------------------------------------------------
  *

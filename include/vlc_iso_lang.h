@@ -22,6 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \file
+ * This file defines functions and structures for iso639 language codes
+ */
+
 struct iso639_lang_t
 {
     const char * psz_eng_name;        /* Description in English */
