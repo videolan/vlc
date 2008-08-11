@@ -171,7 +171,8 @@ Video outputs and filters:
 
 Audio outputs and filters:
  * Replay gain support
- * Audio playback when going slower/faster (no pitch filter yet)
+ * Audio playback when going slower/faster (with pitch correction via
+   new scaletempo audio filter)
  * New spatializer audio filter
  * Correct DTS output via S/PDIF
 
