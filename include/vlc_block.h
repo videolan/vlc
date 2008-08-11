@@ -135,6 +135,7 @@ static inline block_t *block_Duplicate( block_t *p_block )
 
     return p_dup;
 }
+
 static inline void block_Release( block_t *p_block )
 {
     p_block->pf_release( p_block );
@@ -146,14 +147,14 @@ VLC_EXPORT( block_t *, block_File, (int fd) );
 /****************************************************************************
  * Chains of blocks functions helper
  ****************************************************************************
- * - block_ChainAppend : append a block the the last block of a chain. Try to
+ * - block_ChainAppend : append a block to the last block of a chain. Try to
  *      avoid using with a lot of data as it's really slow, prefer
  *      block_ChainLastAppend
  * - block_ChainLastAppend : use a pointer over a pointer to the next blocks,
  *      and update it.
  * - block_ChainRelease : release a chain of block
  * - block_ChainExtract : extract data from a chain, return real bytes counts
- * - block_ChainGather : gather a chain, free it and return a block.
+ * - block_ChainGather : gather a chain, free it and return one block.
  ****************************************************************************/
 static inline void block_ChainAppend( block_t **pp_list, block_t *p_block )
 {
@@ -170,7 +171,7 @@ static inline void block_ChainAppend( block_t **pp_list, block_t *p_block )
     }
 }
 
-static inline void block_ChainLastAppend( block_t ***ppp_last, block_t *p_block  )
+static inline void block_ChainLastAppend( block_t ***ppp_last, block_t *p_block )
 {
     block_t *p_last = p_block;
 
@@ -235,7 +236,6 @@ static inline block_t *block_ChainGather( block_t *p_list )
     block_ChainRelease( p_list );
     return g;
 }
-
 
 /****************************************************************************
  * Fifos of blocks.
