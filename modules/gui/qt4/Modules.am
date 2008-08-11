@@ -250,6 +250,5 @@ EXTRA_DIST += \
 	pixmaps/toolbar/volume-medium.png \
 	pixmaps/toolbar/volume-low.png \
 	pixmaps/toolbar/volume-muted.png \
-	pixmaps/toolbar/volume-slider.svg \
 	pixmaps/toolbar/volume-slider-inside.png \
 	pixmaps/toolbar/volume-slider-outside.png
