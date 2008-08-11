@@ -272,9 +272,11 @@ static void Close( vlc_object_t *p_this )
 
     if( p_intf->p_sys->b_isDialogProvider )
     {
-        DialogEvent *event = new DialogEvent( INTF_DIALOG_EXIT, 0, NULL );
-        QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
-
+        if( p_intf->p_sys->p_dp )
+        {
+            DialogEvent *event = new DialogEvent( INTF_DIALOG_EXIT, 0, NULL );
+            QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
+        }
         vlc_thread_join( p_intf );
     }
 
@@ -342,7 +344,7 @@ static void *Init( vlc_object_t *obj )
         app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
 
     /* Initialize timers and the Dialog Provider */
-    DialogsProvider::getInstance( p_intf );
+    p_intf->p_sys->p_dp = DialogsProvider::getInstance( p_intf );
 
     QPointer<MainInterface> *miP = NULL;
 
@@ -424,6 +426,7 @@ static void *Init( vlc_object_t *obj )
     app->exec();
 
     /* And quit */
+    msg_Dbg( p_intf, "Quitting the Qt4 Interface" );
 
     if (miP)
     {
@@ -442,15 +445,19 @@ static void *Init( vlc_object_t *obj )
        in the MainInputManager */
     delete p_intf->p_sys->p_mi;
 
-    /* Destroy then other windows, because some are connected to some slots
-       in the MainInputManager */
+    /* Destroy all remaining windows,
+       because some are connected to some slots
+       in the MainInputManager
+       Settings must be destroyed after that.
+     */
     DialogsProvider::killInstance();
+    p_intf->p_sys->p_dp = NULL;
+
+    /* Delete the configuration. Application has to be deleted after that. */
+    delete p_intf->p_sys->mainSettings;
 
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
-
-    /* Delete the configuration */
-    delete p_intf->p_sys->mainSettings;
 
     /* Delete the application */
     delete app;
