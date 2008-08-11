@@ -1668,6 +1668,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     switch( header[3] )
     {
         case 0xBC:  /* Program stream map */
+        case 0xBD:  /* Private stream 1 */
         case 0xBE:  /* Padding */
         case 0xBF:  /* Private stream 2 */
         case 0xF0:  /* ECM */
