@@ -1269,7 +1269,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( id->p_fifo != NULL )
     {
         vlc_object_kill( id );
-        block_FifoWake( id->p_fifo );
         vlc_thread_join( id );
         block_FifoRelease( id->p_fifo );
     }
@@ -1434,13 +1433,11 @@ static void* ThreadSend( vlc_object_t *p_this )
 {
     sout_stream_id_t *id = (sout_stream_id_t *)p_this;
     unsigned i_caching = id->i_caching;
-    int canc = vlc_savecancel ();
 
-    while( vlc_object_alive (id) )
+    for (;;)
     {
         block_t *out = block_FifoGet( id->p_fifo );
-        if( out == NULL )
-            continue; /* Forced wakeup */
+        block_cleanup_push (out);
 
         if( id->srtp )
         {   /* FIXME: this is awfully inefficient */
@@ -1448,21 +1445,28 @@ static void* ThreadSend( vlc_object_t *p_this )
             out = block_Realloc( out, 0, len + 10 );
             out->i_buffer = len;
 
+            int canc = vlc_savecancel ();
             int val = srtp_send( id->srtp, out->p_buffer, &len, len + 10 );
+            vlc_restorecancel (canc);
             if( val )
             {
                 errno = val;
                 msg_Dbg( id, "SRTP sending error: %m" );
                 block_Release( out );
-                continue;
+                out = NULL;
             }
-            out->i_buffer = len;
+            else
+                out->i_buffer = len;
         }
 
-        mtime_t  i_date = out->i_dts + i_caching;
-        ssize_t  len = out->i_buffer;
+        if (out)
+            mwait (out->i_dts + i_caching);
+        vlc_cleanup_pop ();
+        if (out == NULL)
+            continue;
 
-        mwait( i_date );
+        ssize_t len = out->i_buffer;
+        int canc = vlc_savecancel ();
 
         vlc_mutex_lock( &id->lock_sink );
         unsigned deadc = 0; /* How many dead sockets? */
@@ -1499,8 +1503,8 @@ static void* ThreadSend( vlc_object_t *p_this )
             msg_Dbg( id, "adding socket %d", fd );
             rtp_add_sink( id, fd, true );
         }
+        vlc_restorecancel (canc);
     }
-    vlc_restorecancel (canc);
     return NULL;
 }
 
