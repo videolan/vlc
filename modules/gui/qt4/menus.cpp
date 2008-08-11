@@ -371,6 +371,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     }
     if( mi )
     {
+        msg_Dbg( p_intf, "I am here" );
         /* Minimal View */
         QAction *action = menu->addAction( qtr( "Mi&nimal View..." ), mi,
                                 SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
@@ -837,20 +838,26 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         if( !b_isFullscreen )
         {
             submenu = new QMenu( qtr( "Interface" ), menu );
-            submenu->addAction( QIcon( ":/playlist" ),
-                     qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
+            if( mi )
+            {
+                submenu->addAction( QIcon( ":/playlist" ),
+                         qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
+            }
             addDPStaticEntry( submenu, qtr( I_MENU_EXT ), "",
                 ":/settings", SLOT( extendedDialog() ) );
-            action = submenu->addAction( QIcon( "" ),
-                 qtr( "Minimal View..." ), mi, SLOT( toggleMinimalView() ) );
-            action->setCheckable( true );
-            action->setChecked( !( mi->getControlsVisibilityStatus() &
-                                   CONTROLS_VISIBLE ) );
-            action = submenu->addAction( QIcon( "" ),
-                 qtr( "Toggle Fullscreen Interface" ),
-                 mi, SLOT( toggleFullScreen() ) );
-            action->setCheckable( true );
-            action->setChecked( mi->isFullScreen() );
+            if( mi )
+            {
+                action = submenu->addAction( QIcon( "" ),
+                     qtr( "Minimal View..." ), mi, SLOT( toggleMinimalView() ) );
+                action->setCheckable( true );
+                action->setChecked( !( mi->getControlsVisibilityStatus() &
+                            CONTROLS_VISIBLE ) );
+                action = submenu->addAction( QIcon( "" ),
+                        qtr( "Toggle Fullscreen Interface" ),
+                        mi, SLOT( toggleFullScreen() ) );
+                action->setCheckable( true );
+                action->setChecked( mi->isFullScreen() );
+            }
             menu->addMenu( submenu );
         }
 
