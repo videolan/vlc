@@ -85,6 +85,9 @@ DialogsProvider::~DialogsProvider()
 #endif
 
     fixed_timer->stop();
+    delete menusMapper;
+    delete menusUpdateMapper;
+    delete SDMapper;
 }
 
 void DialogsProvider::quit()
