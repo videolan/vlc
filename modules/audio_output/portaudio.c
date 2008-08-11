@@ -91,7 +91,7 @@ static const uint32_t pi_channels_out[] =
 #ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
 static bool b_init = 0;
 static pa_thread_t *pa_thread;
-static void PORTAUDIOThread( pa_thread_t * );
+static void* PORTAUDIOThread( vlc_object_t * );
 #endif
 
 /*****************************************************************************
@@ -572,8 +572,9 @@ static void Play( aout_instance_t * p_aout )
  * PORTAUDIOThread: all interactions with libportaudio.a are handled
  * in this single thread.  Otherwise libportaudio.a is _not_ happy :-(
  *****************************************************************************/
-static void PORTAUDIOThread( pa_thread_t *pa_thread )
+static void* PORTAUDIOThread( vlc_object_t *p_this )
 {
+    pa_thread_t *pa_thread = (pa_thread_t*)p_this;
     aout_instance_t *p_aout;
     aout_sys_t *p_sys;
     int i_err;
@@ -649,5 +650,6 @@ static void PORTAUDIOThread( pa_thread_t *pa_thread )
         vlc_cond_signal( &pa_thread->wait );
         vlc_mutex_unlock( &pa_thread->lock_wait );
     }
+    return NULL;
 }
 #endif

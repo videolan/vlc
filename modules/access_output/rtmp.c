@@ -68,7 +68,7 @@ vlc_module_end();
  *****************************************************************************/
 static ssize_t Write( sout_access_out_t *, block_t * );
 static int     Seek ( sout_access_out_t *, off_t  );
-static void ThreadControl( vlc_object_t * );
+static void* ThreadControl( vlc_object_t * );
 
 struct sout_access_out_sys_t
 {
@@ -379,7 +379,7 @@ static int Seek( sout_access_out_t *p_access, off_t i_pos )
 /*****************************************************************************
  * ThreadControl: manage control messages and pipe media to Read
  *****************************************************************************/
-static void ThreadControl( vlc_object_t *p_this )
+static void* ThreadControl( vlc_object_t *p_this )
 {
     rtmp_control_thread_t *p_thread = (rtmp_control_thread_t *) p_this;
     rtmp_packet_t *rtmp_packet;
@@ -416,4 +416,5 @@ static void ThreadControl( vlc_object_t *p_this )
             p_thread->b_die = 1;
         }
     }
+    return NULL;
 }

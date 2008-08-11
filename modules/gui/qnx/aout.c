@@ -59,7 +59,7 @@ int            OpenAudio    ( vlc_object_t *p_this );
 void           CloseAudio   ( vlc_object_t *p_this );
 static int     GetBufInfo       ( aout_instance_t * );
 static void    Play             ( aout_instance_t * );
-static int     QNXaoutThread    ( aout_instance_t * );
+static void*   QNXaoutThread    ( vlc_object_t * );
 
 /*****************************************************************************
  * Open : creates a handle and opens an alsa device
@@ -261,8 +261,9 @@ void CloseAudio ( vlc_object_t *p_this )
 /*****************************************************************************
  * QNXaoutThread: asynchronous thread used to DMA the data to the device
  *****************************************************************************/
-static int QNXaoutThread( aout_instance_t * p_aout )
+static void* QNXaoutThread( vlc_object_t *p_this )
 {
+    aout_instance_t * p_aout = (aout_instance_t*)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
     while ( vlc_object_alive (p_aout) )
@@ -320,6 +321,6 @@ static int QNXaoutThread( aout_instance_t * p_aout )
         }
     }
 
-    return 0;
+    return NULL;
 }
 

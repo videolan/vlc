@@ -93,7 +93,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 static void Play         ( aout_instance_t * );
-static int  OSSThread    ( aout_instance_t * );
+static void* OSSThread   ( vlc_object_t * );
 
 static mtime_t BufferDuration( aout_instance_t * p_aout );
 
@@ -585,8 +585,9 @@ static mtime_t BufferDuration( aout_instance_t * p_aout )
 /*****************************************************************************
  * OSSThread: asynchronous thread used to DMA the data to the device
  *****************************************************************************/
-static int OSSThread( aout_instance_t * p_aout )
+static void* OSSThread( vlc_object_t *p_this )
 {
+    aout_instance_t * p_aout = (aout_instance_t*)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     mtime_t next_date = 0;
 
@@ -689,5 +690,5 @@ static int OSSThread( aout_instance_t * p_aout )
         }
     }
 
-    return VLC_SUCCESS;
+    return NULL;
 }

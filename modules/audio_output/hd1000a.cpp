@@ -67,7 +67,7 @@ static int     Open        ( vlc_object_t * );
 static void    Close       ( vlc_object_t * );
 
 static void    Play        ( aout_instance_t * );
-static int     Thread      ( aout_instance_t * );
+static void*   Thread      ( vlc_object_t * );
 
 static void    InterleaveS16( int16_t *, int16_t * );
 
@@ -216,8 +216,9 @@ static void Play( aout_instance_t * p_aout )
 /*****************************************************************************
  * Thread: thread used to DMA the data to the device
  *****************************************************************************/
-static int Thread( aout_instance_t * p_aout )
+static void* Thread( vlc_object_t *p_this )
 {
+    aout_instance_t * p_aout = (aout_instance_t*)p_this;
     aout_buffer_t * p_buffer;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     PCMAudioPlayer * pPlayer = p_sys->pPlayer;
@@ -253,7 +254,7 @@ static int Thread( aout_instance_t * p_aout )
 #undef i
     }
 
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 /*****************************************************************************

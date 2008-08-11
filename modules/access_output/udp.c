@@ -114,7 +114,7 @@ static const char *const ppsz_core_options[] = {
 static ssize_t Write   ( sout_access_out_t *, block_t * );
 static int  Seek    ( sout_access_out_t *, off_t  );
 
-static void ThreadWrite( vlc_object_t * );
+static void* ThreadWrite( vlc_object_t * );
 static block_t *NewUDPPacket( sout_access_out_t *, mtime_t );
 
 typedef struct sout_access_thread_t
@@ -437,7 +437,7 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
 /*****************************************************************************
  * ThreadWrite: Write a packet on the network at the good time.
  *****************************************************************************/
-static void ThreadWrite( vlc_object_t *p_this )
+static void* ThreadWrite( vlc_object_t *p_this )
 {
     sout_access_thread_t *p_thread = (sout_access_thread_t*)p_this;
     mtime_t              i_date_last = -1;
@@ -519,4 +519,5 @@ static void ThreadWrite( vlc_object_t *p_this )
 
         i_date_last = i_date;
     }
+    return NULL;
 }

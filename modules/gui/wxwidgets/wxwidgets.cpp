@@ -57,7 +57,7 @@ static void Close        ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
 
 static void Run          ( intf_thread_t * );
-static void Init         ( intf_thread_t * );
+static void* Init        ( vlc_object_t *  );
 
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
@@ -292,8 +292,9 @@ static void Run( intf_thread_t *p_intf )
     }
 }
 
-static void Init( intf_thread_t *p_intf )
+static void* Init( vlc_object_t * p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
 #if !defined( WIN32 )
     static char  *p_args[] = { "" };
     int i_args = 1;
@@ -320,6 +321,7 @@ static void Init( intf_thread_t *p_intf )
 #else
     wxEntry( i_args, p_args );
 #endif
+    return NULL;
 }
 
 /* following functions are local */

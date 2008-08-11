@@ -90,11 +90,11 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Open         ( vlc_object_t * );
-static void Close        ( vlc_object_t * );
-static void Play         ( aout_instance_t * );
-static int  ALSAThread   ( aout_instance_t * );
-static void ALSAFill     ( aout_instance_t * );
+static int   Open         ( vlc_object_t * );
+static void  Close        ( vlc_object_t * );
+static void  Play         ( aout_instance_t * );
+static void* ALSAThread   ( vlc_object_t * );
+static void  ALSAFill     ( aout_instance_t * );
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                 vlc_value_t newval, vlc_value_t oldval, void *p_unused );
 
@@ -760,8 +760,9 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * ALSAThread: asynchronous thread used to DMA the data to the device
  *****************************************************************************/
-static int ALSAThread( aout_instance_t * p_aout )
+static void* ALSAThread( vlc_object_t* p_this )
 {
+    aout_instance_t * p_aout = (aout_instance_t*)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     p_sys->p_status = (snd_pcm_status_t *)malloc(snd_pcm_status_sizeof());
 
@@ -784,7 +785,7 @@ static int ALSAThread( aout_instance_t * p_aout )
 cleanup:
     snd_pcm_drop( p_sys->p_snd_pcm );
     free( p_aout->output.p_sys->p_status );
-    return 0;
+    return NULL;
 }
 
 /*****************************************************************************

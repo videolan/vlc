@@ -130,7 +130,7 @@ static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
                            aout_buffer_t *, bool );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
-static void WaveOutThread( notification_thread_t * );
+static void* WaveOutThread( vlc_object_t * );
 
 static int VolumeInfos( aout_instance_t *, audio_volume_t * );
 static int VolumeGet( aout_instance_t *, audio_volume_t * );
@@ -969,8 +969,9 @@ static int WaveOutClearDoneBuffers(aout_sys_t *p_sys)
  * we are not authorized to use waveOutWrite() directly in the waveout
  * callback.
  *****************************************************************************/
-static void WaveOutThread( notification_thread_t *p_notif )
+static void* WaveOutThread( vlc_object_t *p_this )
 {
+    notification_thread_t *p_notif = (notification_thread_t*)p_this;
     aout_instance_t *p_aout = p_notif->p_aout;
     aout_sys_t *p_sys = p_aout->output.p_sys;
     aout_buffer_t *p_buffer = NULL;
@@ -987,7 +988,7 @@ static void WaveOutThread( notification_thread_t *p_notif )
     while( !p_sys->start_date && vlc_object_alive (p_aout) )
            WaitForSingleObject( p_sys->event, INFINITE );
     if( !vlc_object_alive (p_aout) )
-        return;
+        return NULL;
 
     msg_Dbg( p_aout, "will start to play in %"PRId64" us",
              (p_sys->start_date - AOUT_PTS_TOLERANCE/4)-mdate());
@@ -1008,7 +1009,7 @@ static void WaveOutThread( notification_thread_t *p_notif )
         /* Cleanup and find out the current latency */
         i_queued_frames = WaveOutClearDoneBuffers( p_sys );
 
-        if( !vlc_object_alive (p_aout) ) return;
+        if( !vlc_object_alive (p_aout) ) return NULL;
 
         /* Try to fill in as many frame buffers as possible */
         for( i = 0; i < FRAMES_NUM; i++ )
@@ -1084,7 +1085,7 @@ static void WaveOutThread( notification_thread_t *p_notif )
             }
         }
 
-        if( !vlc_object_alive (p_aout) ) return;
+        if( !vlc_object_alive (p_aout) ) return NULL;
 
         /*
           deal with the case that the loop didn't fillup the buffer to the
@@ -1105,6 +1106,7 @@ static void WaveOutThread( notification_thread_t *p_notif )
     }
 
 #undef waveout_warn
+    return NULL;
 }
 
 static int VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )

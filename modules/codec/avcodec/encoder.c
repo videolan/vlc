@@ -69,7 +69,7 @@ static block_t *EncodeVideo( encoder_t *, picture_t * );
 static block_t *EncodeAudio( encoder_t *, aout_buffer_t * );
 
 struct thread_context_t;
-static int FfmpegThread( struct thread_context_t *p_context );
+static void* FfmpegThread( vlc_object_t *p_this );
 static int FfmpegExecute( AVCodecContext *s,
                           int (*pf_func)(AVCodecContext *c2, void *arg2),
                           void **arg, int *ret, int count );
@@ -700,8 +700,9 @@ int OpenEncoder( vlc_object_t *p_this )
 /****************************************************************************
  * Ffmpeg threading system
  ****************************************************************************/
-static int FfmpegThread( struct thread_context_t *p_context )
+static void* FfmpegThread( vlc_object_t *p_this )
 {
+    struct thread_context_t *p_context = (struct thread_context_t *)p_this;
     while ( vlc_object_alive (p_context) && !p_context->b_error )
     {
         vlc_mutex_lock( &p_context->lock );
@@ -726,7 +727,7 @@ static int FfmpegThread( struct thread_context_t *p_context )
         vlc_mutex_unlock( &p_context->lock );
     }
 
-    return 0;
+    return NULL;
 }
 
 static int FfmpegExecute( AVCodecContext *s,

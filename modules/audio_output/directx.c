@@ -210,7 +210,7 @@ static int  InitDirectSound   ( aout_instance_t * );
 static int  CreateDSBuffer    ( aout_instance_t *, int, int, int, int, int, bool );
 static int  CreateDSBufferPCM ( aout_instance_t *, int*, int, int, int, bool );
 static void DestroyDSBuffer   ( aout_instance_t * );
-static void DirectSoundThread ( notification_thread_t * );
+static void* DirectSoundThread( vlc_object_t * );
 static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
 
 /*****************************************************************************
@@ -1045,8 +1045,9 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
  * We use this thread to emulate a callback mechanism. The thread probes for
  * event notification and fills up the DS secondary buffer when needed.
  *****************************************************************************/
-static void DirectSoundThread( notification_thread_t *p_notif )
+static void* DirectSoundThread( vlc_object_t *p_this )
 {
+    notification_thread_t *p_notif = (notification_thread_t*)p_this;
     aout_instance_t *p_aout = p_notif->p_aout;
     bool b_sleek;
     mtime_t last_time;
@@ -1147,4 +1148,5 @@ static void DirectSoundThread( notification_thread_t *p_notif )
     CloseHandle( p_notif->event );
 
     msg_Dbg( p_notif, "DirectSoundThread exiting" );
+    return NULL;
 }
