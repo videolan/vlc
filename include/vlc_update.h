@@ -22,8 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef _VLC_UPDATE_H
-#define _VLC_UPDATE_H
+#ifndef VLC_UPDATE_H
+#define VLC_UPDATE_H
 
 /**
  * \defgroup update Update

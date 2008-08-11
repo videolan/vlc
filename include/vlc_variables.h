@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_VARIABLES_H
-#define _VLC_VARIABLES_H 1
+#ifndef VLC_VARIABLES_H
+#define VLC_VARIABLES_H 1
 
 /**
  * \defgroup variables Variables

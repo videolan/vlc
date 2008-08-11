@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_ACCESS_H
-#define _VLC_ACCESS_H 1
+#ifndef VLC_ACCESS_H
+#define VLC_ACCESS_H 1
 
 #include <vlc_block.h>
 

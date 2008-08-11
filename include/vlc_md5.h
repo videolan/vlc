@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_MD5_H
-# define _VLC_MD5_H
+#ifndef VLC_MD5_H
+# define VLC_MD5_H
 
 /*****************************************************************************
  * md5_s: MD5 message structure

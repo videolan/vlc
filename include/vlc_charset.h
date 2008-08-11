@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef __VLC_CHARSET_H
-#define __VLC_CHARSET_H 1
+#ifndef VLC_CHARSET_H
+#define VLC_CHARSET_H 1
 
 #include <stdarg.h>
 #include <sys/types.h>

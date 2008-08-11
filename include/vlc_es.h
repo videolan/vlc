@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_ES_H
-#define _VLC_ES_H 1
+#ifndef VLC_ES_H
+#define VLC_ES_H 1
 
 /* FIXME: i'm not too sure about this include but it fixes compilation of
  * video chromas -- dionoea */

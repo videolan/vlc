@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_EPG_H
-#define _VLC_EPG_H 1
+#ifndef VLC_EPG_H
+#define VLC_EPG_H 1
 
 typedef struct
 {

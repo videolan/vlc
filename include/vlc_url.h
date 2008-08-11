@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef __VLC_URL_H
-# define __VLC_URL_H
+#ifndef VLC_URL_H
+# define VLC_URL_H
 
 struct vlc_url_t
 {

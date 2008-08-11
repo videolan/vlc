@@ -21,8 +21,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
-#ifndef _VLC_ARRAYS_H_
-#define _VLC_ARRAYS_H_
+#ifndef VLC_ARRAYS_H_
+#define VLC_ARRAYS_H_
 
 /**
  * Simple dynamic array handling. Array is realloced at each insert/removal

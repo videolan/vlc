@@ -23,8 +23,8 @@
  *****************************************************************************/
 
 /* __ is need because conflict with <vlc/input.h> */
-#ifndef _VLC__INPUT_H
-#define _VLC__INPUT_H 1
+#ifndef VLC__INPUT_H
+#define VLC__INPUT_H 1
 
 #include <vlc_es.h>
 #include <vlc_meta.h>

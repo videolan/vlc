@@ -24,8 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef __VLC_NETWORK_H
-# define __VLC_NETWORK_H
+#ifndef VLC_NETWORK_H
+# define VLC_NETWORK_H
 
 #if defined( WIN32 )
 #   if !defined(UNDER_CE)

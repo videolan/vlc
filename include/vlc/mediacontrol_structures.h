@@ -27,8 +27,8 @@
  * @{
  */
 
-#ifndef _VLC_CONTROL_STRUCTURES_H
-#define _VLC_CONTROL_STRUCTURES_H 1
+#ifndef VLC_CONTROL_STRUCTURES_H
+#define VLC_CONTROL_STRUCTURES_H 1
 
 # ifdef __cplusplus
 extern "C" {

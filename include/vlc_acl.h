@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef __VLC_ACL_H
-# define __VLC_ACL_H
+#ifndef VLC_ACL_H
+# define VLC_ACL_H
 
 #define ACL_Create(a, b) __ACL_Create(VLC_OBJECT(a), b)
 #define ACL_Duplicate(a,b) __ACL_Duplicate(VLC_OBJECT(a),b)

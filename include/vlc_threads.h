@@ -25,8 +25,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_THREADS_H_
-#define _VLC_THREADS_H_
+#ifndef VLC_THREADS_H_
+#define VLC_THREADS_H_
 
 #if defined( UNDER_CE )
                                                                 /* WinCE API */

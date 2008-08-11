@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_RAND_H
-# define _VLC_RAND_H
+#ifndef VLC_RAND_H
+# define VLC_RAND_H
 
 VLC_EXPORT( void, vlc_rand_bytes, (void *buf, size_t len) );
 

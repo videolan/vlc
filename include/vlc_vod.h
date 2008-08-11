@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_VOD_H
-#define _VLC_VOD_H 1
+#ifndef VLC_VOD_H
+#define VLC_VOD_H 1
 
 struct vod_t
 {
