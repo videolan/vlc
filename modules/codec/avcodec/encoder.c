@@ -378,7 +378,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     var_Get( p_enc, ENC_CFG_PREFIX "aac-profile", &val );
-    p_sys->i_aac_profile = FF_PROFILE_UNKNOWN;
+    p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
     if( val.psz_string && *val.psz_string )
     {
         if( !strncmp( val.psz_string, "main", 4 ) )
@@ -393,8 +393,8 @@ int OpenEncoder( vlc_object_t *p_this )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
         else
         {
-            msg_Warn( p_enc, "unknown AAC profile requested" );
-            p_sys->i_aac_profile = FF_PROFILE_UNKNOWN;
+            msg_Warn( p_enc, "unknown AAC profile requested, setting it to low" );
+            p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
         }
     }
     free( val.psz_string );
