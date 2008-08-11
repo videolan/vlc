@@ -97,7 +97,7 @@ typedef struct
 
 } event_thread_t;
 
-static int Raw1394EventThread( vlc_object_t * );
+static void* Raw1394EventThread( vlc_object_t * );
 static int Raw1394Handler( raw1394handle_t, int, size_t, quadlet_t * );
 
 static int Raw1394GetNumPorts( access_t *p_access );
@@ -357,7 +357,7 @@ static block_t *Block( access_t *p_access )
     return p_block;
 }
 
-static int Raw1394EventThread( vlc_object_t *p_this )
+static void* Raw1394EventThread( vlc_object_t *p_this )
 {
     event_thread_t *p_ev = (event_thread_t *) p_this;
     access_t *p_access = (access_t *) p_ev->p_access;
@@ -386,7 +386,7 @@ static int Raw1394EventThread( vlc_object_t *p_this )
     }
 
     AVCStop( p_access, p_sys->i_node );
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 static int Raw1394Handler( raw1394handle_t handle, int channel, size_t length, quadlet_t *data )

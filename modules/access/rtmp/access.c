@@ -70,7 +70,7 @@ static ssize_t  Read( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, int64_t );
 static int Control( access_t *, int, va_list );
 
-static void ThreadControl( vlc_object_t * );
+static void* ThreadControl( vlc_object_t * );
 
 /*****************************************************************************
  * Open: open the rtmp connection
@@ -503,7 +503,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * ThreadControl: manage control messages and pipe media to Read
  *****************************************************************************/
-static void ThreadControl( vlc_object_t *p_this )
+static void* ThreadControl( vlc_object_t *p_this )
 {
     rtmp_control_thread_t *p_thread = (rtmp_control_thread_t *) p_this;
     rtmp_packet_t *rtmp_packet;
@@ -543,4 +543,5 @@ static void ThreadControl( vlc_object_t *p_this )
             block_FifoWake( p_thread->p_fifo_input );
         }
     }
+    return NULL;
 }

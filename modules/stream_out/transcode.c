@@ -285,7 +285,7 @@ static void transcode_osd_close  ( sout_stream_t *, sout_stream_id_t * );
 static int  transcode_osd_process( sout_stream_t *, sout_stream_id_t *,
                                    block_t *, block_t ** );
 
-static int  EncoderThread( struct sout_stream_sys_t * p_sys );
+static void* EncoderThread( vlc_object_t * p_this );
 
 static const int pi_channels_maps[6] =
 {
@@ -2078,8 +2078,9 @@ static int transcode_video_process( sout_stream_t *p_stream,
     return VLC_SUCCESS;
 }
 
-static int EncoderThread( sout_stream_sys_t *p_sys )
+static void* EncoderThread( vlc_object_t* p_this )
 {
+    sout_stream_sys_t *p_sys = (sout_stream_sys_t*)p_this;
     sout_stream_id_t *id = p_sys->id_video;
     picture_t *p_pic;
 
@@ -2122,7 +2123,7 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
     }
     block_ChainRelease( p_sys->p_buffers );
 
-    return 0;
+    return NULL;
 }
 
 struct picture_sys_t

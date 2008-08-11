@@ -56,7 +56,7 @@ typedef struct qte_thread_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-static void QteMain ( qte_thread_t * );
+static void* QteMain( vlc_object_t * );
 
 /*****************************************************************************
  * Local variables (mutex-protected).
@@ -158,8 +158,9 @@ static void Close( vlc_object_t *p_this )
  * this part of the interface is in a separate thread so that we can call
  * qte_main() from within it without annoying the rest of the program.
  *****************************************************************************/
-static void QteMain( qte_thread_t *p_this )
+static void* QteMain( vlc_object_t* p_vlc_obj )
 {
+    qte_thread_t *p_this = (qte_thread_t*)p_vlc_obj;
     int i_argc = 1;
 
     p_this->b_gui_server = false;
@@ -189,4 +190,6 @@ static void QteMain( qte_thread_t *p_this )
 
     vlc_thread_ready( p_this );
     p_this->p_qte_application->exec();
+
+    return NULL;
 }

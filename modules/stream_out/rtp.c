@@ -232,7 +232,7 @@ static int               MuxSend( sout_stream_t *, sout_stream_id_t *,
                                   block_t* );
 
 static sout_access_out_t *GrabberCreate( sout_stream_t *p_sout );
-static void ThreadSend( vlc_object_t *p_this );
+static void* ThreadSend( vlc_object_t *p_this );
 
 static void SDPHandleUrl( sout_stream_t *, const char * );
 
@@ -1429,7 +1429,7 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 /****************************************************************************
  * RTP send
  ****************************************************************************/
-static void ThreadSend( vlc_object_t *p_this )
+static void* ThreadSend( vlc_object_t *p_this )
 {
     sout_stream_id_t *id = (sout_stream_id_t *)p_this;
     unsigned i_caching = id->i_caching;
@@ -1498,6 +1498,7 @@ static void ThreadSend( vlc_object_t *p_this )
             rtp_add_sink( id, fd, true );
         }
     }
+    return NULL;
 }
 
 int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux )

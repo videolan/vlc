@@ -85,7 +85,7 @@ vlc_module_end();
 static int      Seek( access_t *, int64_t );
 static block_t *Block  ( access_t *p_access );
 static int      Control( access_t *, int i_query, va_list args );
-static void     Thread ( access_t *p_access );
+static void*    Thread ( vlc_object_t *p_this );
 static int      WriteBlockToFile( access_t *p_access, block_t *p_block );
 static block_t *ReadBlockFromFile( access_t *p_access );
 static char    *GetTmpFilePath( access_t *p_access );
@@ -269,8 +269,9 @@ static block_t *Block( access_t *p_access )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void Thread( access_t *p_access )
+static void* Thread( vlc_object_t* p_this )
 {
+    access_t *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
     access_t     *p_src = p_access->p_source;
     block_t      *p_block;
@@ -352,6 +353,7 @@ static void Thread( access_t *p_access )
 
     /* Send dummy packet to avoid deadlock in Block() */
     block_FifoPut( p_sys->p_fifo, block_New( p_access, 0 ) );
+    return NULL;
 }
 
 /*****************************************************************************

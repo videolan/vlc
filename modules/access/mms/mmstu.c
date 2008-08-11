@@ -92,7 +92,7 @@ static int  mms_HeaderMediaRead( access_t *, int );
 
 static int  mms_ReceivePacket( access_t * );
 
-static void KeepAliveThread( vlc_object_t *p_this );
+static void* KeepAliveThread( vlc_object_t *p_this );
 
 int  MMSTUOpen( access_t *p_access )
 {
@@ -1599,7 +1599,7 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
     return -1;
 }
 
-static void KeepAliveThread( vlc_object_t *p_this )
+static void* KeepAliveThread( vlc_object_t *p_this )
 {
     mmstu_keepalive_thread_t *p_thread = (mmstu_keepalive_thread_t *) p_this;
     access_t *p_access = p_thread->p_access;
@@ -1618,4 +1618,5 @@ static void KeepAliveThread( vlc_object_t *p_this )
         vlc_object_timedwait( p_thread, mdate() + 10000000 );
     }
     vlc_object_unlock( p_thread );
+    return NULL;
 }

@@ -48,7 +48,7 @@
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-static void GtkMain ( vlc_object_t * );
+static void* GtkMain ( vlc_object_t * );
 
 /*****************************************************************************
  * Local variables (mutex-protected).
@@ -158,7 +158,7 @@ static gint foo( gpointer bar ) { return TRUE; }
  * this part of the interface is in a separate thread so that we can call
  * gtk_main() from within it without annoying the rest of the program.
  *****************************************************************************/
-static void GtkMain( vlc_object_t *p_this )
+static void* GtkMain( vlc_object_t *p_this )
 {
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
@@ -197,4 +197,5 @@ static void GtkMain( vlc_object_t *p_this )
     gtk_main();
 
     gdk_threads_leave();
+    return NULL;
 }

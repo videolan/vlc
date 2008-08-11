@@ -244,10 +244,10 @@ static void FreeLine( line_desc_t * );
 
 #ifdef HAVE_FONTCONFIG
 static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_lock  );
-static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder );
-static void FontBuilderThread( vlc_object_t *p_this);
-static void FontBuilderDestructor( vlc_object_t *p_this );
-static int FontBuilderDone( vlc_object_t*, const char *, vlc_value_t, vlc_value_t,
+static void  FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder );
+static void* FontBuilderThread( vlc_object_t *p_this);
+static void  FontBuilderDestructor( vlc_object_t *p_this );
+static int   FontBuilderDone( vlc_object_t*, const char *, vlc_value_t, vlc_value_t,
                         void* );
 #endif
 
@@ -515,7 +515,7 @@ static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder )
     }
     vlc_mutex_unlock( lock );
 }
-static void FontBuilderThread( vlc_object_t *p_this )
+static void* FontBuilderThread( vlc_object_t *p_this )
 {
     FcConfig      *p_fontconfig = FcInitLoadConfig();
 
@@ -548,6 +548,7 @@ static void FontBuilderThread( vlc_object_t *p_this )
 
         var_SetBool( p_this, "build-done", true );
     }
+    return NULL;
 }
 static void FontBuilderDestructor( vlc_object_t *p_this )
 {

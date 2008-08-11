@@ -226,9 +226,9 @@ static void         MediaDel( vod_t *, vod_media_t * );
 static int          MediaAddES( vod_t *, vod_media_t *, es_format_t * );
 static void         MediaDelES( vod_t *, vod_media_t *, es_format_t * );
 
-static void CommandThread( vlc_object_t *p_this );
-static void CommandPush( vod_t *, rtsp_cmd_type_t, vod_media_t *, const char *psz_session,
-                         double f_arg, const char *psz_arg );
+static void* CommandThread( vlc_object_t *p_this );
+static void  CommandPush( vod_t *, rtsp_cmd_type_t, vod_media_t *, const char *psz_session,
+                          double f_arg, const char *psz_arg );
 
 static rtsp_client_t *RtspClientNew( vod_media_t *, char * );
 static rtsp_client_t *RtspClientGet( vod_media_t *, const char * );
@@ -801,7 +801,7 @@ static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_me
     block_FifoPut( p_vod->p_sys->p_fifo_cmd, p_cmd );
 }
 
-static void CommandThread( vlc_object_t *p_this )
+static void* CommandThread( vlc_object_t *p_this )
 {
     vod_t *p_vod = (vod_t*)p_this;
     vod_sys_t *p_sys = p_vod->p_sys;
@@ -872,6 +872,7 @@ static void CommandThread( vlc_object_t *p_this )
         free( cmd.psz_session );
         free( cmd.psz_arg );
     }
+    return NULL;
 }
 
 /****************************************************************************

@@ -122,7 +122,7 @@ typedef struct
 
 } event_thread_t;
 
-static int EventThread( vlc_object_t * );
+static void* EventThread( vlc_object_t * );
 
 struct demux_sys_t
 {
@@ -1221,7 +1221,7 @@ static int  EventMouse( vlc_object_t *, char const *,
 static int  EventKey  ( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
 
-static int EventThread( vlc_object_t *p_this )
+static void* EventThread( vlc_object_t *p_this )
 {
     event_thread_t *p_ev = (event_thread_t*)p_this;
     demux_sys_t    *p_sys = p_ev->p_demux->p_sys;
@@ -1346,7 +1346,7 @@ static int EventThread( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_ev->lock );
 
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 static int EventMouse( vlc_object_t *p_this, char const *psz_var,
