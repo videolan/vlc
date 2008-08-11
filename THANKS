@@ -95,7 +95,7 @@ Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
 Gabor Kelemen <kelemeng at gnome dot hu> - Hungarian translation
 Geoffrey Roussel <meka321 at hotmail dot com> - Christmas easter egg Artwork
 Geoffroy Couprie <geo dot couprie -- gmail # com> - Podcast fix
-Georgi Chorbadzhiyski <gf at unixsol dot org> - HTTP access error handling fix
+Georgi Chorbadzhiyski <gf at unixsol dot org> - HTTP access error handling fix, ASF output patches.
 Gisle Vanem <giva at bgnet dot no>  - gettimeoffay under win32
 Glen Gray <slaine at slaine do rog> - RTSP keepalive
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
