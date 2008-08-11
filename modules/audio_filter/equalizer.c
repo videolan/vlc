@@ -172,9 +172,14 @@ static int Open( vlc_object_t *p_this )
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     if( EqzInit( p_filter, p_filter->input.i_rate ) )
+    {
+        free( p_sys );
         return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
@@ -358,12 +363,15 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     PreampCallback( VLC_OBJECT( p_aout ), NULL, val3, val3, p_sys );
     p_sys->b_first = false;
 
+    free( val1.psz_string );
+
     /* Register preset bands (for intf) if : */
     /* We have no bands info --> the preset info must be given to the intf */
     /* or The bands info matches the preset */
     if (p_sys->psz_newbands == NULL)
     {
         msg_Err(p_filter, "No preset selected");
+        free( val2.psz_string );
         return (VLC_EGENERIC);
     }
     if( ( *(val2.psz_string) &&
@@ -373,6 +381,7 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
         if( p_sys->f_newpreamp == p_sys->f_gamp )
             var_SetFloat( p_aout, "equalizer-preamp", p_sys->f_newpreamp );
     }
+    free( val2.psz_string );
 
     /* Add our own callbacks */
     var_AddCallback( p_aout, "equalizer-preset", PresetCallback, p_sys );
@@ -467,6 +476,7 @@ static void EqzClean( aout_filter_t *p_filter )
     free( p_sys->f_gamma );
 
     free( p_sys->f_amp );
+    free( p_sys->psz_newbands );
 }
 
 
