@@ -239,6 +239,7 @@ static int Open( vlc_object_t *p_this )
     memset( p_intf->p_sys, 0, sizeof( intf_sys_t ) );
 
     p_intf->pf_run = Run;
+    p_intf->p_sys->p_mi = NULL;
 
     /* Access to the playlist */
     p_intf->p_sys->p_playlist = pl_Yield( p_intf );
