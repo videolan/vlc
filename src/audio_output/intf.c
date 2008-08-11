@@ -379,6 +379,8 @@ static int aout_Restart( aout_instance_t * p_aout )
     }
 
     /* Lock all inputs. */
+    vlc_mutex_lock( &p_aout->input_fifos_lock );
+
     for ( i = 0; i < p_aout->i_nb_inputs; i++ )
     {
         vlc_mutex_lock( &p_aout->pp_inputs[i]->lock );
@@ -397,6 +399,7 @@ static int aout_Restart( aout_instance_t * p_aout )
         {
             vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
         }
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
         vlc_mutex_unlock( &p_aout->mixer_lock );
         return -1;
     }
@@ -408,6 +411,7 @@ static int aout_Restart( aout_instance_t * p_aout )
         {
             vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
         }
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
         vlc_mutex_unlock( &p_aout->mixer_lock );
         return -1;
     }
@@ -422,6 +426,7 @@ static int aout_Restart( aout_instance_t * p_aout )
         vlc_mutex_unlock( &p_input->lock );
     }
 
+    vlc_mutex_unlock( &p_aout->input_fifos_lock );
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
     return b_error;
