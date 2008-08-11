@@ -144,13 +144,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char                *psz_artist     = NULL;
     char                *psz_album      = NULL;
     char                *psz_arturl     = NULL;
-    input_thread_t      *p_input        = NULL;
-    playlist_t          * p_playlist    = pl_Yield( p_this );
+    input_thread_t      *p_input        = ((playlist_t*) p_this)->p_input;
     intf_thread_t       *p_intf         = ( intf_thread_t* ) param;
     intf_sys_t          *p_sys          = p_intf->p_sys;
-
-    p_input = p_playlist->p_input;
-    pl_Release( p_this );
 
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_yield( p_input );

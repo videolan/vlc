@@ -169,6 +169,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 {
     VLC_UNUSED(oldval);
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    playlist_t* p_playlist = (playlist_t*) p_this;
     char *psz_buf = NULL;
     input_thread_t *p_input;
 
@@ -193,11 +194,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         p_intf->p_sys->i_item_changes++;
     }
 
-
-    playlist_t *p_playlist = pl_Yield( p_this );
-
     p_input = p_playlist->p_input;
-    pl_Release( p_this );
 
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_yield( p_input );
@@ -219,7 +216,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         var_AddCallback( p_input, "state", StateChange, p_intf );
 
     /* We format the string to be displayed */
-    psz_buf = str_format_meta( p_this, p_intf->p_sys->psz_format );
+    psz_buf = str_format_meta( (vlc_object_t*) p_intf,
+            p_intf->p_sys->psz_format );
 
     /* We don't need the input anymore */
     vlc_object_release( p_input );
