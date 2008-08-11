@@ -2471,7 +2471,7 @@ ifneq ($(HOST),$(BUILD))
 	cd $@; autoconf
 endif
 
-.libass: libass
+.libass: libass .png
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
 	touch $@
 
