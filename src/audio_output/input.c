@@ -484,6 +484,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         uint8_t     *p_first_byte_to_mix;
 
         vlc_mutex_lock( &p_aout->mixer_lock );
+        vlc_mutex_lock( &p_aout->input_fifos_lock );
 
         /* A little trick to avoid loosing our input fifo */
         aout_FifoInit( p_aout, &dummy_fifo, p_aout->mixer.mixer.i_rate );
@@ -495,6 +496,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         p_input->p_first_byte_to_mix = p_first_byte_to_mix;
         p_input->fifo = fifo;
 
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
         vlc_mutex_unlock( &p_aout->mixer_lock );
     }
 
