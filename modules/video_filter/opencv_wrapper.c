@@ -395,7 +395,7 @@ static void End( vout_thread_t *p_vout )
         p_vout->p_sys->p_opencv = NULL;
     }
 
-    vout_CloseAndRelease( p_vout->p_sys->p_vout )
+    vout_CloseAndRelease( p_vout->p_sys->p_vout );
 }
 
 /*****************************************************************************
