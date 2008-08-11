@@ -473,7 +473,7 @@ static void GetVideoSize( decoder_t *p_dec, int *w, int *h )
 
 #ifdef ENABLE_BITMAPS
 
-static void CreateBitmap( picture_t *pic, const kate_bitmap *bitmap )
+static void CreateKateBitmap( picture_t *pic, const kate_bitmap *bitmap )
 {
     size_t y;
 
@@ -485,7 +485,7 @@ static void CreateBitmap( picture_t *pic, const kate_bitmap *bitmap )
     }
 }
 
-static void CreatePalette( video_palette_t *fmt_palette, const kate_palette *palette )
+static void CreateKatePalette( video_palette_t *fmt_palette, const kate_palette *palette )
 {
     size_t n;
 
@@ -639,10 +639,10 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         }
 
         /* create the palette */
-        CreatePalette( fmt.p_palette, ev->palette );
+        CreateKatePalette( fmt.p_palette, ev->palette );
 
         /* create the bitmap */
-        CreateBitmap( &p_bitmap_region->picture, ev->bitmap );
+        CreateKateBitmap( &p_bitmap_region->picture, ev->bitmap );
 
         msg_Dbg(p_dec, "Created bitmap, %zux%zu, %zu colors\n", ev->bitmap->width, ev->bitmap->height, ev->palette->ncolors);
     }
