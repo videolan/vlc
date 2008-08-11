@@ -371,7 +371,6 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     }
     if( mi )
     {
-        msg_Dbg( p_intf, "I am here" );
         /* Minimal View */
         QAction *action = menu->addAction( qtr( "Mi&nimal View..." ), mi,
                                 SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
@@ -962,7 +961,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
             p_object = ( vlc_object_t * )vlc_object_get( objects[i] );
             if( !p_object )
             {
-                msg_Dbg( p_intf, "object %d not found !", objects[i] );
+                msg_Warn( p_intf, "object %d not found !", objects[i] );
                 continue;
             }
         }
