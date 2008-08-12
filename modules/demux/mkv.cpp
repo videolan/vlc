@@ -1029,6 +1029,7 @@ public:
         ,i_cues_position(-1)
         ,i_chapters_position(-1)
         ,i_tags_position(-1)
+        ,i_seekhead_position(-1)
         ,cluster(NULL)
         ,i_block_pos(0)
         ,i_cluster_pos(0)
@@ -1113,6 +1114,7 @@ public:
     int64_t                 i_cues_position;
     int64_t                 i_chapters_position;
     int64_t                 i_tags_position;
+    int64_t                 i_seekhead_position;
 
     KaxCluster              *cluster;
     uint64                  i_block_pos;
@@ -1122,7 +1124,7 @@ public:
     KaxPrevUID              *p_prev_segment_uid;
     KaxNextUID              *p_next_segment_uid;
 
-    bool              b_cues;
+    bool                    b_cues;
     int                     i_index;
     int                     i_index_max;
     mkv_index_t             *p_indexes;
@@ -4238,6 +4240,13 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
                     msg_Dbg( &sys.demuxer, "|   |   |   = tags at %"PRId64, i_pos );
                     i_tags_position = segment->GetGlobalPosition( i_pos );
                 }
+                else if( id == KaxSeekHead::ClassInfos.GlobalId )
+                {
+                    msg_Dbg( &sys.demuxer, "|   |   |   = seekhead at %"PRId64, i_pos );
+                    i_seekhead_position = segment->GetGlobalPosition( i_pos );
+                }
+                else
+                    msg_Dbg( &sys.demuxer, "|   |   |   = unknown at %"PRId64, i_pos );
             }
         }
         else
