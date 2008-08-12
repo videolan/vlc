@@ -58,6 +58,9 @@ static inline void aout_assert_fifo_locked( aout_instance_t * p_aout, aout_fifo_
         if( i == p_aout->i_nb_inputs )
             vlc_assert_locked( &p_aout->mixer_lock );
     }
+#else
+    (void)p_aout;
+    (void)p_fifo;
 #endif
 }
 
