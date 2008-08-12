@@ -101,6 +101,10 @@ static int Open( vlc_object_t * p_this )
     if( !p_demux->b_force )
         return VLC_EGENERIC;
 
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
     var_Create( p_demux, "demuxdump-append", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     var_Get( p_demux, "demuxdump-append", &val );
     b_append = val.b_bool;
@@ -111,13 +115,15 @@ static int Open( vlc_object_t * p_this )
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+
     p_sys->i_write = 0;
     p_sys->p_file = NULL;
     p_sys->psz_file = var_CreateGetString( p_demux, "demuxdump-file" );
     if( *p_sys->psz_file == '\0' )
     {
         msg_Warn( p_demux, "no dump file name given" );
+        free( p_sys->psz_file );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -129,7 +135,7 @@ static int Open( vlc_object_t * p_this )
     else if( ( p_sys->p_file = utf8_fopen( p_sys->psz_file, psz_mode ) ) == NULL )
     {
         msg_Err( p_demux, "cannot create `%s' for writing", p_sys->psz_file );
-
+        free( p_sys->psz_file );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -156,7 +162,6 @@ static void Close( vlc_object_t *p_this )
         fclose( p_sys->p_file );
     }
     free( p_sys->psz_file );
-
     free( p_sys );
 }
 
