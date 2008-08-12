@@ -94,7 +94,7 @@ struct sap_session_t {
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void RunThread( vlc_object_t *p_this);
+static void * RunThread( vlc_object_t *p_this);
 static int ComputeRate( sap_address_t *p_address );
 
 static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
@@ -188,7 +188,7 @@ static void announce_SAPHandlerDestructor( vlc_object_t * p_this )
  * \param p_this the SAP Handler object
  * \return nothing
  */
-static void RunThread( vlc_object_t *p_this)
+static void * RunThread( vlc_object_t *p_this)
 {
     sap_handler_t *p_sap = (sap_handler_t*)p_this;
     sap_session_t *p_session;
@@ -237,6 +237,7 @@ static void RunThread( vlc_object_t *p_this)
 
         msleep( SAP_IDLE );
     }
+    return NULL;
 }
 
 /* Add a SAP announce */
