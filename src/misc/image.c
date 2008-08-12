@@ -566,11 +566,6 @@ static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
 }
 */
 
-static void video_release_buffer( picture_t *p_pic )
-{
-    picture_Release( p_pic );
-}
-
 static picture_t *video_new_buffer( decoder_t *p_dec )
 {
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
