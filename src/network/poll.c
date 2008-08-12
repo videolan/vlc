@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_network.h>
 
 #ifdef HAVE_POLL
 struct pollfd;

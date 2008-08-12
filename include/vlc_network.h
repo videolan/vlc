@@ -180,10 +180,11 @@ struct pollfd
     int events;
     int revents;
 };
-
-VLC_EXPORT (int, vlc_poll, (struct pollfd *fds, unsigned nfds, int timeout));
 # define poll(a, b, c) vlc_poll(a, b, c)
 #endif
+struct pollfd;
+VLC_EXPORT (int, vlc_poll, (struct pollfd *fds, unsigned nfds, int timeout));
+
 
 #ifdef WIN32
 /* Microsoft: same semantic, same value, different name... go figure */
