@@ -103,7 +103,9 @@
 static libvlc_int_t *    p_static_vlc = NULL;
 static unsigned          i_instances = 0;
 
+#ifndef WIN32
 static bool b_daemon = false;
+#endif
 
 /*****************************************************************************
  * vlc_gc_*.
