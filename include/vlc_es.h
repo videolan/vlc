@@ -136,6 +136,34 @@ struct video_format_t
     video_palette_t *p_palette;              /**< video palette from demuxer */
 };
 
+static inline void video_format_Init( video_format_t *p_src, vlc_fourcc_t i_chroma )
+{
+    memset( p_src, 0, sizeof( video_format_t ) );
+    p_src->i_chroma = i_chroma;
+    p_src->i_sar_num = p_src->i_sar_den = 1;
+    p_src->p_palette = NULL;
+}
+
+static inline int video_format_Copy( video_format_t *p_dst, video_format_t *p_src )
+{
+    memcpy( p_dst, p_src, sizeof( video_format_t ) );
+    if( p_src->p_palette )
+    {
+        p_dst->p_palette = (video_palette_t *) malloc( sizeof( video_palette_t ) );
+        if( !p_dst->p_palette )
+            return VLC_ENOMEM;
+        memcpy( p_dst->p_palette, p_src->p_palette, sizeof( video_palette_t ) );
+    }
+    return VLC_SUCCESS;
+};
+
+static inline void video_format_Clean( video_format_t *p_src )
+{
+    free( p_src->p_palette );
+    memset( p_src, 0, sizeof( video_format_t ) );
+    p_src->p_palette = NULL;
+}
+
 /**
  * subtitles format description
  */
