@@ -69,6 +69,9 @@ typedef struct
 static void InputAddCallbacks( input_thread_t *, const vlc_input_callback_t * );
 static void InputDelCallbacks( input_thread_t *, const vlc_input_callback_t * );
 
+#ifdef CALLBACK /* For windows */
+# undef CALLBACK /* We don't care of this one here */
+#endif
 /* List all callbacks added by input */
 #define CALLBACK(name,cb) { name, cb }
 static const vlc_input_callback_t p_input_callbacks[] =
