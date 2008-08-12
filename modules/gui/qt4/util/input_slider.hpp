@@ -63,9 +63,10 @@ class SoundSlider : public QAbstractSlider
 public:
     SoundSlider( QWidget *_parent, int _i_step, bool b_softamp, char * );
     virtual ~SoundSlider() {};
+
 protected:
-    int paddingL;
-    int paddingR;
+    const static int paddingL = 3;
+    const static int paddingR = 2;
     virtual void paintEvent(QPaintEvent *);
     virtual void wheelEvent( QWheelEvent *event );
     virtual void mousePressEvent( QMouseEvent * );

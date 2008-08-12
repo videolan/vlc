@@ -120,9 +120,6 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
                           char *psz_colors )
                         : QAbstractSlider( _parent )
 {
-    paddingL = 3;
-    paddingR = 2;
-
     f_step = ( _i_step * 100 ) / AOUT_VOLUME_MAX ;
     setRange( SOUNDMIN, b_hard ? (2 * SOUNDMAX) : SOUNDMAX  );
     setMouseTracking( true );
@@ -202,7 +199,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     if( b_sliding )
     {
         QRect rect( paddingL - 15,    -1,
-                    WLENGTH + 15 * 2, WHEIGHT + 5 );
+                    WLENGTH  , WHEIGHT + 5 );
         if( !rect.contains( event->pos() ) )
         { /* We are outside */
             if ( !b_outside )

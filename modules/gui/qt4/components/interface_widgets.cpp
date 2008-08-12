@@ -674,34 +674,38 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
         controlLayout->setSpacing( 0 );
         controlLayout->setLayoutMargins( 7, 5, 7, 3, 6 );
 
-        controlLayout->addWidget( slider, 0, 1, 1, 16 );
+        controlLayout->addWidget( slider, 0, 1, 1, 18 );
         controlLayout->addWidget( slowerButton, 0, 0 );
-        controlLayout->addWidget( fasterButton, 0, 17 );
+        controlLayout->addWidget( fasterButton, 0, 19 );
 
-        controlLayout->addWidget( advControls, 1, 3, 2, 4, Qt::AlignBottom );
-        controlLayout->addWidget( discFrame, 1, 10, 2, 3, Qt::AlignBottom );
-        controlLayout->addWidget( telexFrame, 1, 10, 2, 4, Qt::AlignBottom );
+        controlLayout->addWidget( discFrame, 1, 8, 2, 3, Qt::AlignBottom );
+        controlLayout->addWidget( telexFrame, 1, 8, 2, 5, Qt::AlignBottom );
 
-        controlLayout->addWidget( playButton, 2, 0, 2, 2 );
-        controlLayout->setColumnMinimumWidth( 2, 20 );
+        controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
+        controlLayout->setColumnMinimumWidth( 2, 10 );
         controlLayout->setColumnStretch( 2, 0 );
 
-        controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
-        controlLayout->setColumnMinimumWidth( 7, 20 );
+        controlLayout->addLayout( controlButLayout, 3, 3, 1, 3, Qt::AlignBottom );
+        /* Column 6 is unused */
+        controlLayout->setColumnStretch( 6, 0 );
         controlLayout->setColumnStretch( 7, 0 );
-        controlLayout->setColumnStretch( 8, 0 );
-        controlLayout->setColumnStretch( 9, 0 );
+        controlLayout->setColumnMinimumWidth( 7, 10 );
 
-        controlLayout->addWidget( fullscreenButton, 3, 10, Qt::AlignBottom );
-        controlLayout->addWidget( playlistButton, 3, 11, Qt::AlignBottom );
-        controlLayout->addWidget( extSettingsButton, 3, 12, Qt::AlignBottom );
+        controlLayout->addWidget( fullscreenButton, 3, 8, Qt::AlignBottom );
+        controlLayout->addWidget( playlistButton, 3, 9, Qt::AlignBottom );
+        controlLayout->addWidget( extSettingsButton, 3, 10, Qt::AlignBottom );
+        controlLayout->setColumnStretch( 11, 0 ); /* telex alignment */
 
-        controlLayout->setColumnStretch( 13, 0 );
-        controlLayout->setColumnMinimumWidth( 13, 24 );
-        controlLayout->setColumnStretch( 14, 5 );
+        controlLayout->setColumnStretch( 12, 0 );
+        controlLayout->setColumnMinimumWidth( 12, 10 );
 
-        controlLayout->addWidget( volMuteLabel, 3, 15, Qt::AlignBottom );
-        controlLayout->addWidget( volumeSlider, 2, 16, 2 , 2, Qt::AlignBottom );
+        controlLayout->addWidget( advControls, 3, 13, 1, 3, Qt::AlignBottom );
+
+        controlLayout->setColumnStretch( 16, 10 );
+        controlLayout->setColumnMinimumWidth( 16, 10 );
+
+        controlLayout->addWidget( volMuteLabel, 3, 17, Qt::AlignBottom );
+        controlLayout->addWidget( volumeSlider, 3, 18, 1 , 2, Qt::AlignBottom );
     }
 
     updateInput();
