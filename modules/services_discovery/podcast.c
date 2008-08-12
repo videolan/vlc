@@ -223,6 +223,7 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
                                         psz_urls, 0, NULL, -1 );
             input_ItemAddOption( p_input, "demux=podcast" );
             services_discovery_AddItem( p_sd, p_input, NULL /* no cat */ );
+            vlc_gc_decref( p_input );
             INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,
                          input_CreateThread( p_sd, p_input ) );
         }
