@@ -101,7 +101,7 @@ static const char *const ppsz_filter_options[] = {
 };
 
 /*****************************************************************************
- * vout_sys_t: Distort video output method descriptor
+ * filter_sys_t: Distort video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
  * It describes the Distort specific properties of an output thread.
