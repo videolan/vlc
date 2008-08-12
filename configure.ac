@@ -3772,8 +3772,7 @@ dnl
 AC_ARG_ENABLE(libass,
   [  --enable-libass           Subtitle support using libass (default disabled)])
 AS_IF( [test "${enable_libass}" = "yes"], [
-  PKG_CHECK_MODULES(LIBASS,
-      libass >= 0.9.5,
+  PKG_CHECK_MODULES(LIBASS, libass >= 0.9.5,
       [
         VLC_ADD_LDFLAGS([libass],[$LIBASS_LIBS])
         VLC_ADD_CFLAGS([libass],[$LIBASS_CFLAGS])
@@ -3781,10 +3780,12 @@ AS_IF( [test "${enable_libass}" = "yes"], [
 
         AC_CHECK_HEADERS(fontconfig/fontconfig.h,
           [VLC_ADD_CPPFLAGS([libass],[-DHAVE_FONTCONFIG])
-           VLC_ADD_LIBS([libass],[-lfontconfig])])
         if test "${SYS}" = "mingw32"; then
-          VLC_ADD_LIBS([libass],[-lfontconfig -lfreetype -liconv  -lxml2])
+           VLC_ADD_LIBS([libass],[-lfontconfig -lfreetype -liconv  -lxml2])
+        else
+           VLC_ADD_LIBS([libass],[-lfontconfig])
         fi
+       ])
       ],[
         AC_MSG_WARN([LIBASS library not found])
       ])
