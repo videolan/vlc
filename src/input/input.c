@@ -2710,6 +2710,20 @@ void MRLSplit( char *psz_dup, const char **ppsz_access, const char **ppsz_demux,
     *ppsz_path = psz_path ? psz_path : (char*)"";
 }
 
+static inline bool next(char ** src)
+{
+    char *end;
+    errno = 0;
+    long result = strtol( *src, &end, 0 );
+    if( errno != 0 || result >= LONG_MAX || result <= LONG_MIN ||
+        end == *src )
+    {
+        return false;
+    }
+    *src = end;
+    return true;
+}
+
 /*****************************************************************************
  * MRLSections: parse title and seekpoint info from the Media Resource Locator.
  *
@@ -2728,19 +2742,27 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
     /* Start by parsing titles and chapters */
     if( !psz_source || !( psz = strrchr( psz_source, '@' ) ) ) return;
 
+
     /* Check we are really dealing with a title/chapter section */
     psz_check = psz + 1;
     if( !*psz_check ) return;
-    if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
+    if( isdigit(*psz_check) )
+        if(!next(&psz_check)) return;
     if( *psz_check != ':' && *psz_check != '-' && *psz_check ) return;
     if( *psz_check == ':' && ++psz_check )
-        if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
+    {
+        if( isdigit(*psz_check) )
+            if(!next(&psz_check)) return;
+    }
     if( *psz_check != '-' && *psz_check ) return;
     if( *psz_check == '-' && ++psz_check )
         if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
     if( *psz_check != ':' && *psz_check ) return;
     if( *psz_check == ':' && ++psz_check )
-        if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
+    {
+        if( isdigit(*psz_check) )
+            if(!next(&psz_check)) return;
+    }
     if( *psz_check ) return;
 
     /* Separate start and end */
