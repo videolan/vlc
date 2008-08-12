@@ -3779,9 +3779,12 @@ AS_IF( [test "${enable_libass}" = "yes"], [
         VLC_ADD_CFLAGS([libass],[$LIBASS_CFLAGS])
         VLC_ADD_PLUGIN([libass])
 
-		AC_CHECK_HEADERS(fontconfig/fontconfig.h,
-		  [VLC_ADD_CPPFLAGS([libass],[-DHAVE_FONTCONFIG])
-		   VLC_ADD_LIBS([libass],[-lfontconfig])])
+        AC_CHECK_HEADERS(fontconfig/fontconfig.h,
+          [VLC_ADD_CPPFLAGS([libass],[-DHAVE_FONTCONFIG])
+           VLC_ADD_LIBS([libass],[-lfontconfig])])
+        if test "${SYS}" = "mingw32"; then
+          VLC_ADD_LIBS([libass],[-lfontconfig -lfreetype -liconv  -lxml2])
+        fi
       ],[
         AC_MSG_WARN([LIBASS library not found])
       ])
@@ -4158,7 +4161,10 @@ then
       VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
       if test "${SYS}" = "mingw32"; then
         VLC_ADD_LIBS([freetype skins2],[-lxml2])
-     fi
+      fi
+      if test "${SYS}" = "mingw32"; then
+        VLC_ADD_LIBS([freetype],[-liconv])
+      fi
     AC_CHECK_HEADERS(fontconfig/fontconfig.h,
       [VLC_ADD_CPPFLAGS([freetype],[-DHAVE_FONTCONFIG])
        VLC_ADD_LIBS([freetype],[-lfontconfig])])
