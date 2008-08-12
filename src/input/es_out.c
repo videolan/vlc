@@ -669,9 +669,15 @@ static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
 {
     char *psz = NULL;
     if( p_pgrm->psz_name )
-        asprintf( &psz, _("%s [%s %d]"), p_pgrm->psz_name, _("Program"), p_pgrm->i_id );
+    {
+        if( asprintf( &psz, _("%s [%s %d]"), p_pgrm->psz_name, _("Program"), p_pgrm->i_id ) == -1 )
+            psz = NULL;
+    }
     else
-        asprintf( &psz, "%s %d", _("Program"), p_pgrm->i_id );
+    {
+        if( asprintf( &psz, "%s %d", _("Program"), p_pgrm->i_id ) == -1 )
+            psz = NULL;
+    }
     return psz;
 }
 
@@ -735,9 +741,11 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
 
         if( psz_provider && *psz_provider )
         {
-            asprintf( &text.psz_string, "%s [%s]", psz_title, psz_provider );
-            var_Change( p_input, "program", VLC_VAR_ADDCHOICE, &val, &text );
-            free( text.psz_string );
+            if( asprintf( &text.psz_string, "%s [%s]", psz_title, psz_provider ) != -1 )
+            {
+                var_Change( p_input, "program", VLC_VAR_ADDCHOICE, &val, &text );
+                free( text.psz_string );
+            }
         }
         else
         {
@@ -2035,7 +2043,8 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
     lldiv_t         div;
 
     /* Add stream info */
-    asprintf( &psz_cat, _("Stream %d"), out->p_sys->i_id - 1 );
+    if( asprintf( &psz_cat, _("Stream %d"), out->p_sys->i_id - 1 ) == -1 )
+        return;
 
     input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Codec"),
                    "%.4s", (char*)&fmt->i_codec );
