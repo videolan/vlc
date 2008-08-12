@@ -1153,6 +1153,7 @@ VLC_ADD_PLUGIN([magnify])
 VLC_ADD_PLUGIN([puzzle])
 VLC_ADD_PLUGIN([colorthres])
 VLC_ADD_PLUGIN([scene])
+VLC_ADD_PLUGIN([yuv])
 dnl Meta demuxers:
 VLC_ADD_PLUGIN([playlist])
 VLC_ADD_PLUGIN([export])

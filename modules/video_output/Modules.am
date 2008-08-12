@@ -18,4 +18,6 @@ SOURCES_opengllayer = opengllayer.m
 SOURCES_image = image.c
 SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
+SOURCES_yuv = yuv.c
+
 
