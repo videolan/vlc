@@ -48,7 +48,7 @@ playlist_t *__pl_Yield( vlc_object_t *p_this )
     barrier ();
     pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
 
-    assert( pl != p_this /* This does not make sense to yield the playlist
+    assert( VLC_OBJECT(pl) != p_this /* This does not make sense to yield the playlist
     using pl_Yield. use vlc_object_yield in this case */ );
 
     if (pl)
@@ -61,7 +61,7 @@ void __pl_Release( vlc_object_t *p_this )
     playlist_t *pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
     assert( pl != NULL );
     
-    assert( pl != p_this /* The rule is that pl_Release() should act on
+    assert( VLC_OBJECT(pl) != p_this /* The rule is that pl_Release() should act on
     the same object than pl_Yield() */ );
 
     vlc_object_release( pl );
@@ -85,6 +85,8 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
 {
     playlist_item_t *p_item, *p_node;
     vlc_value_t val;
+
+    PL_ASSERT_LOCKED;
 
     if( !vlc_object_alive( p_playlist ) )
         return VLC_EGENERIC;
@@ -176,7 +178,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         return VLC_EBADVAR;
         break;
     }
-    vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
+    vlc_object_signal_unlocked( p_playlist );
 
     return VLC_SUCCESS;
 }
