@@ -2468,7 +2468,7 @@ libass: libass-$(ASS_VERSION).tar.bz2
 	patch -p0 < Patches/libass_mplayer_updates.patch
 ifneq ($(HOST),$(BUILD))
 	patch -p0 < Patches/libass-cross.patch
-	cd $@; autoconf
+	cd $@; autoconf; automake
 endif
 
 .libass: libass .png

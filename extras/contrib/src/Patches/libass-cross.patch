@@ -12,3 +12,11 @@
  AC_FUNC_STAT
  AC_FUNC_STRTOD
  AC_FUNC_VPRINTF
+--- libass/Makefile.am.old	2008-08-12 08:55:47.000000000 +0200
++++ libass/Makefile.am	2008-08-12 08:56:05.000000000 +0200
+@@ -4,4 +4,4 @@
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libass.pc
+ 
+-SUBDIRS = libass test
++SUBDIRS = libass
