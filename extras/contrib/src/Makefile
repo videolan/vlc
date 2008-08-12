@@ -1539,6 +1539,7 @@ qt4-$(QT4_VERSION)-win32-bin.tar.bz2:
 
 qt4_win32: qt4-$(QT4_VERSION)-win32-bin.tar.bz2
 	$(EXTRACT_BZ2)
+	chmod -R 755 qt4_win32
 
 .qt4_win32: qt4_win32
 	(cd qt4_win32;mkdir -p $(PREFIX)/bin; mkdir -p $(PREFIX)/include;mkdir -p $(PREFIX)/lib/pkgconfig;rm -f $(PREFIX)/lib/pkgconfig/Qt*; sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtCore.pc.in > $(PREFIX)/lib/pkgconfig/QtCore.pc;sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtGui.pc.in > $(PREFIX)/lib/pkgconfig/QtGui.pc;cp -r include/* $(PREFIX)/include;cp lib/*a $(PREFIX)/lib)
