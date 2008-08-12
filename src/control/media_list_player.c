@@ -43,7 +43,7 @@ get_next_path( libvlc_media_list_player_t * p_mlp )
 
     if ( !p_mlp->current_playing_item_path )
     {
-        if( !libvlc_media_list_count( p_mlp, NULL ) )
+        if( !libvlc_media_list_count( p_mlp->p_mlist, NULL ) )
             return NULL;
         return libvlc_media_list_path_with_root_index(0);
     }
