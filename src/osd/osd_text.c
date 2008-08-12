@@ -123,18 +123,20 @@ int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
 void osd_Message( spu_t *p_spu, int i_channel,
                         char *psz_format, ... )
 {
-    char *psz_string;
     va_list args;
 
     if( p_spu )
     {
+        char *psz_string;
         va_start( args, psz_format );
-        vasprintf( &psz_string, psz_format, args );
+        if( vasprintf( &psz_string, psz_format, args ) != -1 )
+        {
 
-        osd_ShowTextRelative( p_spu, i_channel, psz_string, NULL,
-                               OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,1000000 );
+            osd_ShowTextRelative( p_spu, i_channel, psz_string, NULL,
+                    OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,1000000 );
 
-        free( psz_string );
+            free( psz_string );
+        }
         va_end( args );
     }
 }
