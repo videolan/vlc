@@ -213,7 +213,7 @@ struct playlist_t
 
     struct {
         /* Request. Use this to give orders to the playlist main loop  */
-        int                 i_status; /**< requested playlist status */
+        playlist_status_t   i_status; /**< requested playlist status */
         playlist_item_t *   p_node;   /**< requested node to play from */
         playlist_item_t *   p_item;   /**< requested item to play in the node */
 
