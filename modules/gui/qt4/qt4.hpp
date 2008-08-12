@@ -52,7 +52,6 @@ struct intf_sys_t
 {
     QApplication *p_app;
     MainInterface *p_mi;
-    DialogsProvider *p_dp;
 
     QSettings *mainSettings;
 

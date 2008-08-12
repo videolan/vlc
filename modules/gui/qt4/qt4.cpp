@@ -272,8 +272,9 @@ static void Close( vlc_object_t *p_this )
 
     if( p_intf->p_sys->b_isDialogProvider )
     {
-        if( p_intf->p_sys->p_dp )
+        if( DialogsProvider::isAlive() )
         {
+            msg_Dbg( p_intf, "Asking the DP to quit nicely" );
             DialogEvent *event = new DialogEvent( INTF_DIALOG_EXIT, 0, NULL );
             QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
         }
@@ -344,7 +345,7 @@ static void *Init( vlc_object_t *obj )
         app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
 
     /* Initialize timers and the Dialog Provider */
-    p_intf->p_sys->p_dp = DialogsProvider::getInstance( p_intf );
+    DialogsProvider::getInstance( p_intf );
 
     QPointer<MainInterface> *miP = NULL;
 
@@ -451,7 +452,6 @@ static void *Init( vlc_object_t *obj )
        Settings must be destroyed after that.
      */
     DialogsProvider::killInstance();
-    p_intf->p_sys->p_dp = NULL;
 
     /* Delete the configuration. Application has to be deleted after that. */
     delete p_intf->p_sys->mainSettings;

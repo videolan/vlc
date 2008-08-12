@@ -104,6 +104,10 @@ public:
         if( instance ) delete instance;
         instance = NULL;
     }
+    static bool isAlive()
+    {
+        return ( instance != NULL );
+    }
     virtual ~DialogsProvider();
     QTimer *fixed_timer;
 
