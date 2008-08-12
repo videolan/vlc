@@ -465,15 +465,6 @@ static THREAD_RTYPE thread_entry (void *data)
     func (obj);
     msg_Dbg (obj, "thread ended");
 
-    libvlc_priv_t *libpriv = libvlc_priv (obj->p_libvlc);
-    vlc_mutex_lock (&libpriv->threads_lock);
-#ifndef NDEBUG
-    libpriv->threads_count--;
-#else
-    if (--libpriv->threads_count == 0)
-#endif
-        vlc_cond_signal (&libpriv->threads_wait);
-    vlc_mutex_unlock (&libpriv->threads_lock);
     return THREAD_RVAL;
 }
 
@@ -775,8 +766,19 @@ error:
                          (unsigned long)p_priv->thread_id, psz_file, i_line );
     }
     else
+    {
+        libvlc_priv_t *libpriv = libvlc_priv (p_this->p_libvlc);
         msg_Dbg( p_this, "thread %lu joined (%s:%d)",
                          (unsigned long)p_priv->thread_id, psz_file, i_line );
+        vlc_mutex_lock (&libpriv->threads_lock);
+#ifndef NDEBUG
+        libpriv->threads_count--;
+#else
+        if (--libpriv->threads_count == 0)
+#endif
+            vlc_cond_signal (&libpriv->threads_wait);
+        vlc_mutex_unlock (&libpriv->threads_lock);
+    }
 
     p_priv->b_thread = false;
 }
