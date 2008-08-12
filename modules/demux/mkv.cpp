@@ -5079,7 +5079,9 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
 
         if( new_attachment )
         {
-            new_attachment->psz_file_name  = ToUTF8( UTFstring( file_name ) );
+            char* tmp = ToUTF8( UTFstring( file_name ) );
+            new_attachment->psz_file_name  = tmp;
+            free( tmp );
             new_attachment->psz_mime_type  = psz_mime_type;
             new_attachment->i_size         = img_data.GetSize();
             new_attachment->p_data         = malloc( img_data.GetSize() );
