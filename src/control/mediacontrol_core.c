@@ -330,6 +330,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
                                      mediacontrol_PositionKey a_key,
                                      mediacontrol_Exception *exception )
 {
+    (void)a_key;
     mediacontrol_StreamInformation *retval = NULL;
     libvlc_media_t * p_media;
     libvlc_exception_t ex;

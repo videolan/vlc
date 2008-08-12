@@ -55,6 +55,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
                        const mediacontrol_Position * a_position,
                        mediacontrol_Exception *exception )
 {
+    (void)a_position;
     vlc_object_t* p_cache;
     vout_thread_t* p_vout;
     input_thread_t *p_input;
