@@ -98,10 +98,12 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->b_auto_preparse =
                         var_CreateGetBool( p_playlist, "auto-preparse" ) ;
 
+    PL_LOCK; /* playlist_NodeCreate will check for it */
     p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL,
                                     0, NULL );
     p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL,
                                     0, p_playlist->p_root_category->p_input );
+    PL_UNLOCK;
 
     if( !p_playlist->p_root_category || !p_playlist->p_root_onelevel )
         return NULL;

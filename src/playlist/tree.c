@@ -62,6 +62,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     input_item_t *p_new_input = NULL;
     playlist_item_t *p_item;
 
+    PL_ASSERT_LOCKED;
     if( !psz_name ) psz_name = _("Undefined");
 
     if( !p_input )
