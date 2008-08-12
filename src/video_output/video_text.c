@@ -127,7 +127,7 @@ void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
                         const char *psz_format, ... )
 {
     vout_thread_t *p_vout;
-    char *psz_string;
+    char *psz_string = NULL;
     va_list args;
 
     if( !config_GetInt( p_caller, "osd" ) ) return;
@@ -136,17 +136,17 @@ void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
     if( p_vout )
     {
         va_start( args, psz_format );
-        vasprintf( &psz_string, psz_format, args );
-
-        vout_ShowTextRelative( p_vout, i_channel, psz_string, NULL,
-                               OSD_ALIGN_TOP|OSD_ALIGN_RIGHT,
-                               30 + p_vout->fmt_in.i_width
-                                  - p_vout->fmt_in.i_visible_width
-                                  - p_vout->fmt_in.i_x_offset,
-                               20 + p_vout->fmt_in.i_y_offset, 1000000 );
-
+        if( vasprintf( &psz_string, psz_format, args ) != -1 )
+        {
+            vout_ShowTextRelative( p_vout, i_channel, psz_string, NULL,
+                                   OSD_ALIGN_TOP|OSD_ALIGN_RIGHT,
+                                   30 + p_vout->fmt_in.i_width
+                                      - p_vout->fmt_in.i_visible_width
+                                      - p_vout->fmt_in.i_x_offset,
+                                   20 + p_vout->fmt_in.i_y_offset, 1000000 );
+            free( psz_string );
+        }
         vlc_object_release( p_vout );
-        free( psz_string );
         va_end( args );
     }
 }
