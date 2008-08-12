@@ -280,7 +280,6 @@ static void Close( vlc_object_t * p_this )
     int i;
 
     vlc_object_kill( p_sys->p_thread );
-    block_FifoWake( p_sys->p_thread->p_fifo );
 
     for( i = 0; i < 10; i++ )
     {
@@ -443,9 +442,8 @@ static void* ThreadWrite( vlc_object_t *p_this )
     mtime_t              i_date_last = -1;
     mtime_t              i_to_send = p_thread->i_group;
     int                  i_dropped_packets = 0;
-    int canc = vlc_savecancel ();
 
-    while( vlc_object_alive (p_thread) )
+    for (;;)
     {
         block_t *p_pk;
         mtime_t       i_date, i_sent;
@@ -462,8 +460,6 @@ static void* ThreadWrite( vlc_object_t *p_this )
         }
 #endif
         p_pk = block_FifoGet( p_thread->p_fifo );
-        if( p_pk == NULL )
-            continue; /* forced wake-up */
 
         i_date = p_thread->i_caching + p_pk->i_dts;
         if( i_date_last > 0 )
@@ -488,18 +484,17 @@ static void* ThreadWrite( vlc_object_t *p_this )
             }
         }
 
+        block_cleanup_push( p_pk );
         i_to_send--;
         if( !i_to_send || (p_pk->i_flags & BLOCK_FLAG_CLOCK) )
         {
             mwait( i_date );
             i_to_send = p_thread->i_group;
         }
-        ssize_t val = send( p_thread->i_handle, p_pk->p_buffer,
-                            p_pk->i_buffer, 0 );
-        if (val == -1)
-        {
+        if ( send( p_thread->i_handle, p_pk->p_buffer,
+                            p_pk->i_buffer, 0 ) == -1 )
             msg_Warn( p_thread, "send error: %m" );
-        }
+        vlc_cleanup_pop();
 
         if( i_dropped_packets )
         {
@@ -520,6 +515,5 @@ static void* ThreadWrite( vlc_object_t *p_this )
 
         i_date_last = i_date;
     }
-    vlc_restorecancel (canc);
     return NULL;
 }
