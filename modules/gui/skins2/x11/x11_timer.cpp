@@ -153,7 +153,6 @@ bool X11TimerLoop::sleep( int delay )
     ufd.events = POLLIN;
 
     // Wait for an X11 event, or timeout
-    // TODO: use VLC object waitpipe?
     return poll( &ufd, 1, delay ) > 0;
 }
 
