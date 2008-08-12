@@ -231,6 +231,7 @@ static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
                             playlist_item_t *p_root, bool b_do_stop )
 {
     int i;
+    PL_ASSERT_LOCKED;
     for( i = 0 ; i< p_root->i_children ; i++ )
     {
         if( p_root->pp_children[i]->i_children == -1 &&
@@ -319,6 +320,7 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
  */
 int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
 {
+    PL_ASSERT_LOCKED;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id,
                                                     pl_Locked );
     if( !p_item ) return VLC_EGENERIC;
@@ -690,6 +692,8 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                        playlist_item_t *p_node, int i_newpos )
 {
     int i_ret;
+    PL_ASSERT_LOCKED;
+
     /* Drop on a top level node. Move in the two trees */
     if( p_node->p_parent == p_playlist->p_root_category ||
         p_node->p_parent == p_playlist->p_root_onelevel )
@@ -732,7 +736,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     else
         i_ret = TreeMove( p_playlist, p_item, p_node, i_newpos );
     p_playlist->b_reset_currently_playing = true;
-    vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
+    vlc_object_signal_unlocked( p_playlist );
     return i_ret;
 }
 
@@ -749,6 +753,8 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
                              int i_node_id, bool b_signal )
 {
     vlc_value_t val;
+    PL_ASSERT_LOCKED;
+
     playlist_add_t *p_add = (playlist_add_t *)malloc( sizeof( playlist_add_t) );
     if( !p_add )
         return;
@@ -758,7 +764,8 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     val.p_address = p_add;
     p_playlist->b_reset_currently_playing = true;
     if( b_signal )
-        vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
+        vlc_object_signal_unlocked( p_playlist );
+
     var_Set( p_playlist, "item-append", val );
     free( p_add );
 }
@@ -793,6 +800,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
                            playlist_item_t *p_item_cat,
                            playlist_item_t *p_item_one )
 {
+    PL_ASSERT_LOCKED;
     if( (i_mode & PLAYLIST_GO ) )
     {
         playlist_item_t *p_parent = p_item_one;
@@ -816,7 +824,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         if( p_playlist->p_input )
             input_StopThread( p_playlist->p_input );
         p_playlist->request.i_status = PLAYLIST_RUNNING;
-        vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
+        vlc_object_signal_unlocked( p_playlist );
     }
     /* Preparse if PREPARSE or SPREPARSE & not enough meta */
     char *psz_artist = input_item_GetArtist( p_item_cat->p_input );
@@ -838,6 +846,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
 static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
                      playlist_item_t *p_node, int i_mode, int i_pos )
 {
+    PL_ASSERT_LOCKED;
     ARRAY_APPEND(p_playlist->items, p_item);
     ARRAY_APPEND(p_playlist->all_items, p_item);
 
@@ -870,6 +879,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
 {
     int i;
     int i_id = p_item->i_id;
+    PL_ASSERT_LOCKED;
 
     if( p_item->i_children > -1 )
     {
@@ -897,7 +907,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
             p_playlist->request.b_request = true;
             p_playlist->request.p_item = NULL;
             msg_Info( p_playlist, "stopping playback" );
-            vlc_object_signal_maybe( VLC_OBJECT(p_playlist) );
+            vlc_object_signal_unlocked( VLC_OBJECT(p_playlist) );
         }
     }
 
