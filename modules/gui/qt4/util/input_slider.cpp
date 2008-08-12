@@ -135,7 +135,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     pixGradient = QPixmap( mask.size() );
 
     /* Gradient building from the preferences */
-    QLinearGradient gradient( paddingL, 3, WLENGTH + paddingL , 3 );
+    QLinearGradient gradient( paddingL, 2, WLENGTH + paddingL , 2 );
 
     QStringList colorList = qfu( psz_colors ).split( ";" );
     free( psz_colors );
@@ -199,7 +199,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     if( b_sliding )
     {
         QRect rect( paddingL - 15,    -1,
-                    WLENGTH  , WHEIGHT + 5 );
+                    WLENGTH + 15 * 2 , WHEIGHT + 5 );
         if( !rect.contains( event->pos() ) )
         { /* We are outside */
             if ( !b_outside )

@@ -653,7 +653,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
         volumeSlider->setOrientation( Qt::Horizontal );
     }
     volumeSlider->setMaximumSize( QSize( 200, 40 ) );
-    volumeSlider->setMinimumSize( QSize( 106, 30 ) );
+    volumeSlider->setMinimumSize( QSize( 85, 30 ) );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
 
     /* Set the volume from the config */
