@@ -239,7 +239,8 @@ static void __ArtCacheGetDirPath( vlc_object_t *p_obj,
                                   const char *psz_title,
                                   const char *psz_artist, const char *psz_album )
 {
-   char *psz_cachedir = config_GetCacheDir();
+    (void)p_obj;
+    char *psz_cachedir = config_GetCacheDir();
 
     if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
