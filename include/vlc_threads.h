@@ -209,7 +209,7 @@ static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
 }
 
 #ifndef vlc_assert_locked
-# define vlc_assert_locked( m ) (void)0
+# define vlc_assert_locked( m ) (void)m
 #endif
 
 /*****************************************************************************
