@@ -165,8 +165,14 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
             p_longopts[i_index].name = strdup( p_item->psz_name );
             if( p_longopts[i_index].name == NULL ) continue;
             p_longopts[i_index].has_arg =
-                (p_item->i_type == CONFIG_ITEM_BOOL)?
-                                               no_argument : required_argument;
+                (p_item->i_type == CONFIG_ITEM_BOOL) ? no_argument : 
+#ifndef __APPLE__
+                                                       required_argument;
+#else
+/* It seems that required_argument is broken on Darwin.
+ * Radar ticket #6113829 */
+                                                       optional_argument;
+#endif
             p_longopts[i_index].flag = &flag;
             p_longopts[i_index].val = 0;
             i_index++;
