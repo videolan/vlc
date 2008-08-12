@@ -1096,7 +1096,7 @@ msgstr "Titul"
 #: src/input/meta.c:53 modules/gui/macosx/playlistinfo.m:73
 #: modules/gui/macosx/playlist.m:1106
 msgid "Artist"
-msgstr "Herec"
+msgstr "Interpret"
 
 #: src/input/meta.c:54
 msgid "Genre"
@@ -16925,7 +16925,7 @@ msgstr "Audio efekty"
 
 #: modules/gui/qt4/dialogs/extended.cpp:72
 msgid "Video Effects"
-msgstr "Audio efekty"
+msgstr "Video efekty"
 
 #: modules/gui/qt4/dialogs/extended.cpp:75
 msgid "Synchronization"
