@@ -2756,7 +2756,10 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
     }
     if( *psz_check != '-' && *psz_check ) return;
     if( *psz_check == '-' && ++psz_check )
-        if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
+    {
+        if( isdigit(*psz_check) )
+            if(!next(&psz_check)) return;
+    }
     if( *psz_check != ':' && *psz_check ) return;
     if( *psz_check == ':' && ++psz_check )
     {
