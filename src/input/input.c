@@ -223,7 +223,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Parse input options */
     vlc_mutex_lock( &p_item->lock );
-    assert( p_item->optflagc == p_item->i_options );
+    assert( (int)p_item->optflagc == p_item->i_options );
     for( i = 0; i < p_item->i_options; i++ )
         var_OptionParse( VLC_OBJECT(p_input), p_item->ppsz_options[i],
                          !!(p_item->optflagv[i] & VLC_INPUT_OPTION_TRUSTED) );
@@ -2056,6 +2056,7 @@ static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
  *****************************************************************************/
 static input_source_t *InputSourceNew( input_thread_t *p_input )
 {
+    (void)p_input;
     input_source_t *in = (input_source_t*) malloc( sizeof( input_source_t ) );
     if( in )
         memset( in, 0, sizeof( input_source_t ) );
@@ -2704,10 +2705,9 @@ void MRLSplit( char *psz_dup, const char **ppsz_access, const char **ppsz_demux,
     {
         psz_path = psz_dup;
     }
-
-    *ppsz_access = psz_access ? psz_access : "";
-    *ppsz_demux = psz_demux ? psz_demux : "";
-    *ppsz_path = psz_path ? psz_path : "";
+    *ppsz_access = psz_access ? psz_access : (char*)"";
+    *ppsz_demux = psz_demux ? psz_demux : (char*)"";
+    *ppsz_path = psz_path ? psz_path : (char*)"";
 }
 
 /*****************************************************************************
