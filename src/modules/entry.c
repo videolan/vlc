@@ -47,7 +47,7 @@ module_t *vlc_module_create (vlc_object_t *obj)
 
     module->b_reentrant = module->b_unloadable = true;
     module->psz_object_name = strdup( default_name );
-    module->psz_longname = default_name;
+    module->psz_longname = (char*)default_name;
     module->psz_capability = (char*)"";
     module->i_score = 1;
     module->i_config_items = module->i_bool_items = 0;
@@ -161,9 +161,9 @@ int vlc_module_set (module_t *module, int propid, ...)
             const char *value = va_arg (ap, const char *);
             free( module->psz_object_name );
             module->psz_object_name = strdup( value );
-            module->pp_shortcuts[0] = value;
+            module->pp_shortcuts[0] = (char*)value; /* dooh! */
             if (module->psz_longname == default_name)
-                module->psz_longname = value;
+                module->psz_longname = (char*)value; /* dooh! */
             break;
         }
 
