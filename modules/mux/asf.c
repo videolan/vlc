@@ -294,6 +294,12 @@ static void Close( vlc_object_t * p_this )
         free( p_sys->track[i].p_extra );
         es_format_Clean( &p_sys->track[i].fmt );
     }
+
+    free( p_sys->psz_title );
+    free( p_sys->psz_author );
+    free( p_sys->psz_copyright );
+    free( p_sys->psz_comment );
+    free( p_sys->psz_rating );
     free( p_sys );
 }
 
