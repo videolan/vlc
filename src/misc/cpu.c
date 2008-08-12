@@ -294,6 +294,8 @@ uint32_t CPUCapabilities( void )
     }
 
     signal( SIGILL, pf_sigill );
+#   else
+    (void)SigHandler; /* Don't complain about dead code here */
 #   endif
 
     return i_capabilities;
