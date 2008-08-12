@@ -154,6 +154,8 @@ dnl  Set default values
 dnl
 LDFLAGS_vlc="${LDFLAGS}"
 
+VLC_ADD_CFLAGS([libvlc libvlc_control],[-Werror])
+
 dnl
 dnl  Check the operating system
 dnl
