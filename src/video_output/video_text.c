@@ -73,6 +73,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
+    (void)p_style;
     subpicture_t *p_spu;
     video_format_t fmt;
     /* (void)p_style; FIXME: <-- why ask for this if it's unused?!? */
