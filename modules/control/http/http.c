@@ -96,24 +96,6 @@ int  ArtCallback( httpd_handler_sys_t *p_args,
                           uint8_t **pp_data, int *pi_data );
 
 /*****************************************************************************
- * Local functions
- *****************************************************************************/
-#if !defined(__APPLE__) && !defined(SYS_BEOS) && !defined(WIN32)
-static int DirectoryCheck( const char *psz_dir )
-{
-    struct stat   stat_info;
-
-    if( ( utf8_stat( psz_dir, &stat_info ) == -1 )
-      || !S_ISDIR( stat_info.st_mode ) )
-    {
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-#endif
-
-
-/*****************************************************************************
  * Activate: initialize and create stuff
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
@@ -246,42 +228,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_files  = 0;
     p_sys->pp_files = NULL;
 
-#if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
-    if ( ( psz_src = config_GetPsz( p_intf, "http-src" )) == NULL )
-    {
-        const char * psz_vlcpath = config_GetDataDir();
-        psz_src = malloc( strlen(psz_vlcpath) + strlen("/http" ) + 1 );
-        if( !psz_src ) return VLC_ENOMEM;
-        sprintf( psz_src, "%s/http", psz_vlcpath );
-    }
-#else
     psz_src = config_GetPsz( p_intf, "http-src" );
-
     if( ( psz_src == NULL ) || ( *psz_src == '\0' ) )
     {
         const char *data_path = config_GetDataDir ();
-        char buf[strlen (data_path) + sizeof ("/http")];
-        snprintf (buf, sizeof (buf), "%s/http", data_path);
-
-        const char const* ppsz_paths[] = {
-            "share/http",
-            "../share/http",
-            buf,
-            NULL
-        };
-        unsigned i;
-
-        free( psz_src );
-        psz_src = NULL;
-
-        for( i = 0; ppsz_paths[i] != NULL; i++ )
-            if( !DirectoryCheck( ppsz_paths[i] ) )
-            {
-                psz_src = strdup( ppsz_paths[i] );
-                break;
-            }
+        if( asprintf( &psz_src, "%s/http", data_path ) == -1 )
+            psz_src = NULL;
     }
-#endif
 
     if( !psz_src || *psz_src == '\0' )
     {
