@@ -306,8 +306,8 @@ typedef struct
 
 } d_stream_sys_t;
 
-static int DStreamRead   ( stream_t *, void *p_read, int i_read );
-static int DStreamPeek   ( stream_t *, const uint8_t **pp_peek, int i_peek );
+static int DStreamRead   ( stream_t *, void *p_read, unsigned int i_read );
+static int DStreamPeek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
 static int DStreamControl( stream_t *, int i_query, va_list );
 static void* DStreamThread ( vlc_object_t * );
 
@@ -395,7 +395,7 @@ void stream_DemuxDelete( stream_t *s )
 }
 
 
-static int DStreamRead( stream_t *s, void *p_read, int i_read )
+static int DStreamRead( stream_t *s, void *p_read, unsigned int i_read )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
     uint8_t *p_out = p_read;
@@ -436,7 +436,7 @@ static int DStreamRead( stream_t *s, void *p_read, int i_read )
     return i_out;
 }
 
-static int DStreamPeek( stream_t *s, const uint8_t **pp_peek, int i_peek )
+static int DStreamPeek( stream_t *s, const uint8_t **pp_peek, unsigned int i_peek )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
     block_t **pp_block = &p_sys->p_block;
@@ -512,7 +512,7 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
 
             while( i_skip > 0 )
             {
-                int i_read = DStreamRead( s, NULL, i_skip );
+                int i_read = DStreamRead( s, NULL, (long)i_skip );
                 if( i_read <= 0 ) return VLC_EGENERIC;
                 i_skip -= i_read;
             }

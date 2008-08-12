@@ -126,7 +126,7 @@ struct stream_sys_t
     struct
     {
         int64_t i_start;        /* Offset of block for p_first */
-        int     i_offset;       /* Offset for data in p_current */
+        int64_t i_offset;       /* Offset for data in p_current */
         block_t *p_current;     /* Current block */
 
         int     i_size;         /* Total amount of data in the list */
@@ -159,7 +159,7 @@ struct stream_sys_t
     } immediate;
 
     /* Peek temporary buffer */
-    int     i_peek;
+    unsigned int i_peek;
     uint8_t *p_peek;
 
     /* Stat for both method */
@@ -189,22 +189,22 @@ struct stream_sys_t
 };
 
 /* Method 1: */
-static int  AStreamReadBlock( stream_t *s, void *p_read, int i_read );
-static int  AStreamPeekBlock( stream_t *s, const uint8_t **p_peek, int i_read );
+static int  AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read );
+static int  AStreamPeekBlock( stream_t *s, const uint8_t **p_peek, unsigned int i_read );
 static int  AStreamSeekBlock( stream_t *s, int64_t i_pos );
 static void AStreamPrebufferBlock( stream_t *s );
 static block_t *AReadBlock( stream_t *s, bool *pb_eof );
 
 /* Method 2 */
-static int  AStreamReadStream( stream_t *s, void *p_read, int i_read );
-static int  AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, int i_read );
+static int  AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read );
+static int  AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int i_read );
 static int  AStreamSeekStream( stream_t *s, int64_t i_pos );
 static void AStreamPrebufferStream( stream_t *s );
-static int  AReadStream( stream_t *s, void *p_read, int i_read );
+static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
 
 /* Method 3 */
-static int  AStreamReadImmediate( stream_t *s, void *p_read, int i_read );
-static int  AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, int i_read );
+static int  AStreamReadImmediate( stream_t *s, void *p_read, unsigned int i_read );
+static int  AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, unsigned int i_read );
 static int  AStreamSeekImmediate( stream_t *s, int64_t i_pos );
 
 /* Common */
@@ -765,12 +765,12 @@ static void AStreamPrebufferBlock( stream_t *s )
 
 static int AStreamRefillBlock( stream_t *s );
 
-static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
+static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
     uint8_t *p_data= (uint8_t*)p_read;
-    int     i_data = 0;
+    unsigned int i_data = 0;
 
     /* It means EOF */
     if( p_sys->block.p_current == NULL )
@@ -791,7 +791,7 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
     {
         int i_current =
             p_sys->block.p_current->i_buffer - p_sys->block.i_offset;
-        int i_copy = __MIN( i_current, i_read - i_data);
+        unsigned int i_copy = __MIN( (unsigned int)__MAX(i_current,0), i_read - i_data);
 
         /* Copy data */
         if( p_data )
@@ -824,13 +824,13 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
     return i_data;
 }
 
-static int AStreamPeekBlock( stream_t *s, const uint8_t **pp_peek, int i_read )
+static int AStreamPeekBlock( stream_t *s, const uint8_t **pp_peek, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     uint8_t *p_data;
-    int      i_data = 0;
+    unsigned int i_data = 0;
     block_t *b;
-    int      i_offset;
+    unsigned int i_offset;
 
     if( p_sys->block.p_current == NULL ) return 0; /* EOF */
 
@@ -872,7 +872,7 @@ static int AStreamPeekBlock( stream_t *s, const uint8_t **pp_peek, int i_read )
 
     while( b && i_data < i_read )
     {
-        int i_current = b->i_buffer - i_offset;
+        unsigned int i_current = __MAX(b->i_buffer - i_offset,0);
         int i_copy = __MIN( i_current, i_read - i_data );
 
         memcpy( p_data, &b->p_buffer[i_offset], i_copy );
@@ -1094,13 +1094,13 @@ static int AStreamRefillBlock( stream_t *s )
  ****************************************************************************/
 static int AStreamRefillStream( stream_t *s );
 
-static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
+static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
 
     uint8_t *p_data = (uint8_t *)p_read;
-    int      i_data = 0;
+    unsigned int i_data = 0;
 
     if( tk->i_start >= tk->i_end ) return 0; /* EOF */
 
@@ -1131,9 +1131,9 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
     {
         int i_off = (tk->i_start + p_sys->stream.i_offset) %
                     STREAM_CACHE_TRACK_SIZE;
-        int i_current =
-            __MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
-                   STREAM_CACHE_TRACK_SIZE - i_off );
+        unsigned int i_current =
+            __MAX(0,__MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
+                   STREAM_CACHE_TRACK_SIZE - i_off ));
         int i_copy = __MIN( i_current, i_read - i_data );
 
         if( i_copy <= 0 ) break; /* EOF */
@@ -1167,7 +1167,7 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
     return i_data;
 }
 
-static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, int i_read )
+static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
@@ -1507,7 +1507,7 @@ static void AStreamPrebufferStream( stream_t *s )
  * Method 3:
  ****************************************************************************/
 
-static int AStreamReadImmediate( stream_t *s, void *p_read, int i_read )
+static int AStreamReadImmediate( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -1556,7 +1556,7 @@ static int AStreamReadImmediate( stream_t *s, void *p_read, int i_read )
     return i_to_read + i_copy;
 }
 
-static int AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, int i_read )
+static int AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, unsigned int i_read )
 {
 #ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamPeekImmediate: %d  size=%"PRId64,
@@ -1859,7 +1859,7 @@ error:
 /****************************************************************************
  * Access reading/seeking wrappers to handle concatenated streams.
  ****************************************************************************/
-static int AReadStream( stream_t *s, void *p_read, int i_read )
+static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     access_t *p_access = p_sys->p_access;
