@@ -1486,7 +1486,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_segment = p_stream->segments[0];
-    if( p_segment->cluster != NULL )
+    if( p_segment->cluster == NULL )
     {
         msg_Warn( p_demux, "cannot find any cluster, damaged file ?" );
 
