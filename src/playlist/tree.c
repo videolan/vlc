@@ -279,7 +279,6 @@ playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
                                            const char *psz_search )
 {
     playlist_t * p_playlist = p_node->p_playlist; /* For assert_locked */
-    (void)p_playlist; /* in NDEBUG case */
     PL_ASSERT_LOCKED;
     int i;
 
