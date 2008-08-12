@@ -51,7 +51,7 @@
  *****************************************************************************/
 static void* RunInterface( vlc_object_t *p_this );
 #ifdef __APPLE__
-static void MonitorLibVLCDeath( intf_thread_t *p_intf );
+static void * MonitorLibVLCDeath( vlc_object_t *p_this );
 #endif
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
@@ -150,7 +150,7 @@ int intf_RunThread( intf_thread_t *p_intf )
             msg_Err( p_intf, "cannot spawn libvlc death monitoring thread" );
             return VLC_EGENERIC;
         }
-        RunInterface( p_intf );
+        RunInterface( VLC_OBJECT(p_intf) );
 
         /* Make sure our MonitorLibVLCDeath thread exit */
         vlc_object_kill( p_intf );
@@ -265,8 +265,9 @@ static void* RunInterface( vlc_object_t *p_this )
 /*****************************************************************************
  * MonitorLibVLCDeath: Used when b_should_run_on_first_thread is set.
  *****************************************************************************/
-static void MonitorLibVLCDeath( intf_thread_t *p_intf )
+static void * MonitorLibVLCDeath( vlc_object_t * p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
     libvlc_int_t * p_libvlc = p_intf->p_libvlc;
     vlc_object_lock( p_libvlc );
     while(vlc_object_alive( p_libvlc ) )
@@ -274,7 +275,7 @@ static void MonitorLibVLCDeath( intf_thread_t *p_intf )
         if(p_intf->b_die)
         {
             vlc_object_unlock( p_libvlc );
-            return;
+            return NULL;
         }
         vlc_object_wait( p_libvlc );
     }
@@ -291,6 +292,7 @@ static void MonitorLibVLCDeath( intf_thread_t *p_intf )
         vlc_object_kill( p_intf );
     }
     vlc_list_release( p_list );
+    return NULL;
 }
 #endif
 
