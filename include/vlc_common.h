@@ -106,6 +106,13 @@ typedef uint32_t vlc_fourcc_t;
 
 #endif
 
+/**
+ * Translate a vlc_fourcc into its string representation. This function
+ * assumes there is enough room in psz_fourcc to store 4 characters in.
+ *
+ * \param fcc a vlc_fourcc_t
+ * \param psz_fourcc string to store string representation of vlc_fourcc in
+ */
 static inline void __vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
 {
     memcpy( psz_fourcc, &fcc, 4 );
