@@ -42,6 +42,7 @@ PodcastConfigDialog::PodcastConfigDialog( QWidget *parent, intf_thread_t *_p_int
 
     CONNECT( ui.podcastAdd, clicked(), this, add() );
     CONNECT( ui.podcastDelete, clicked(), this, remove() );
+    CONNECT( okButton, clicked(), this, close() );
 
     char *psz_urls = config_GetPsz( p_intf, "podcast-urls" );
     if( psz_urls )
