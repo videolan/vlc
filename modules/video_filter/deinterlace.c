@@ -2187,6 +2187,7 @@ static int OpenFilter( vlc_object_t *p_this )
     var_Get( p_filter, FILTER_CFG_PREFIX "mode", &val );
     var_Create( p_filter, "deinterlace-mode", VLC_VAR_STRING );
     var_Set( p_filter, "deinterlace-mode", val );
+    free( val.psz_string );
 
     if ( Create( VLC_OBJECT(p_vout) ) != VLC_SUCCESS )
     {

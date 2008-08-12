@@ -266,6 +266,7 @@ static int Open( vlc_object_t *p_this )
         memcpy( &p_sys->i_chroma, val.psz_string, 4 );
         msg_Dbg( p_stream, "Forcing image chroma to 0x%.8x (%4.4s)", p_sys->i_chroma, (char*)&p_sys->i_chroma );
     }
+    free( val.psz_string );
 
 #define INT_COMMAND( a ) do { \
     var_Create( p_stream, CFG_PREFIX #a, \
