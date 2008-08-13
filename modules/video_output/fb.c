@@ -466,6 +466,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED(p_vout);
     free( p_pic->p_sys->p_data );
     free( p_pic->p_sys );
     p_pic->p_sys = NULL;
@@ -557,7 +558,7 @@ static int Init( vout_thread_t *p_vout )
             /* Find an empty picture slot */
             for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
             {
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+                if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
                 {
                     p_pic = p_vout->p_picture + i_index;
                     break;
@@ -978,6 +979,7 @@ static void CloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void SwitchDisplay( int i_signal )
 {
+    VLC_UNUSED( i_signal );
 #if 0
     vout_thread_t *p_vout;
 
