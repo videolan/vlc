@@ -316,7 +316,10 @@ libvlc:
 core:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
 
-.PHONY: libvlc core
+doc:
+	cd doc && $(MAKE) $(AM_MAKEFLAGS) doc
+
+.PHONY: libvlc core doc
 
 #To get some nice output
 nice:

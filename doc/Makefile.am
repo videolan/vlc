@@ -32,6 +32,7 @@ EXTRA_DIST = \
 	intf-vcd.txt \
 	release-howto.txt \
 	arm-crosscompile-howto.sgml \
+	Doxyfile.in \
 	Configure.help \
 	lirc/example.lircrc \
 	skins/skins-howto.txt \
@@ -47,7 +48,13 @@ EXTRA_DIST = \
 	demo.sh \
 	$(NULL)
 
-DISTCLEANFILES = $(CHANGELOGS)
+DISTCLEANFILES = $(CHANGELOGS) Doxyfile
+
+Doxyfile: Doxyfile.in $(top_builddir)/config.status
+	cd $(top_builddir) && $(SHELL) ./config.status --file=$(subdir)/$@
+
+doc: Doxyfile
+	doxygen
 
 $(CHANGELOGS): Makefile.am
 	if test -d "$(top_srcdir)/.git"; then \
@@ -59,7 +66,7 @@ $(CHANGELOGS): Makefile.am
 	fi
 
 # This one needs to be rebuilt all the time :)
-.PHONY: ChangeLog-2008 changelogs
+.PHONY: ChangeLog-2008 changelogs doc
 
 changelogs: $(CHANGELOGS)
 
