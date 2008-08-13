@@ -222,10 +222,12 @@ static char **paths_to_list( const char *psz_dir, char *psz_path )
         if( *psz_subdir == '\0' )
             continue;
 
-        asprintf( &subdirs[i++], "%s%s%c",
+        if( asprintf( &subdirs[i++], "%s%s%c",
                   psz_subdir[0] == '.' ? psz_dir : "",
                   psz_subdir,
-                  psz_subdir[strlen(psz_subdir) - 1] == DIR_SEP_CHAR ? '\0' : DIR_SEP_CHAR );
+                  psz_subdir[strlen(psz_subdir) - 1] == DIR_SEP_CHAR ?
+                                           '\0' : DIR_SEP_CHAR ) == -1 )
+            break;
     }
     subdirs[i] = NULL;
 
@@ -288,7 +290,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             return NULL;
 
         f_fname = strdup( psz_fname );
-        asprintf( &f_dir, "%s%c", psz_cwd, DIR_SEP_CHAR );
+        if( asprintf( &f_dir, "%s%c", psz_cwd, DIR_SEP_CHAR ) == -1 )
+        f_dir = NULL; /* Assure that function will return in next test */
         free( psz_cwd );
     }
     if( !f_fname || !f_dir )
