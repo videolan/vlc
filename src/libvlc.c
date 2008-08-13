@@ -909,8 +909,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( psz_codecs )
         {
             char *psz_morecodecs;
-            asprintf(&psz_morecodecs, "%s,dmo,quicktime", psz_codecs);
-            if( psz_morecodecs )
+            if( asprintf(&psz_morecodecs, "%s,dmo,quicktime", psz_codecs) != -1 )
             {
                 config_PutPsz( p_libvlc, "codec", psz_morecodecs);
                 free( psz_morecodecs );
