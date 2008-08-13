@@ -174,7 +174,7 @@ static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
 
 #define STANDARD_DEMUX_INIT_MSG( msg ) do { \
     DEMUX_INIT_COMMON();                    \
-    msg_Dbg( p_demux, msg ); } while(0)
+    msg_Dbg( p_demux, "%s", msg ); } while(0)
 
 #define DEMUX_BY_EXTENSION( ext ) \
     demux_t *p_demux = (demux_t *)p_this; \

@@ -62,12 +62,12 @@ void Logger::destroy( intf_thread_t *pIntf )
 
 void Logger::error( const string &rMsg )
 {
-    msg_Err( getIntf(), rMsg.c_str() );
+    msg_Err( getIntf(), "%s", rMsg.c_str() );
 }
 
 
 void Logger::warn( const string &rMsg )
 {
-    msg_Warn( getIntf(), rMsg.c_str() );
+    msg_Warn( getIntf(), "%s", rMsg.c_str() );
 }
 

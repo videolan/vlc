@@ -227,7 +227,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 #endif
 
     /* Announce who we are - Do it only for first instance ? */
-    msg_Dbg( p_libvlc, COPYRIGHT_MESSAGE );
+    msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
 
     /* Initialize mutexes */

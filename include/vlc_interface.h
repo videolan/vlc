@@ -132,7 +132,7 @@ VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
          freopen( "CONOUT$", "w", stderr ); \
          freopen( "CONIN$", "r", stdin ); \
          } \
-         msg_Info( p_intf, COPYRIGHT_MESSAGE ); \
+         msg_Info( p_intf, "%s", COPYRIGHT_MESSAGE ); \
          msg_Info( p_intf, _("\nWarning: if you can't access the GUI " \
                              "anymore, open a command-line window, go to the " \
                              "directory where you installed VLC and run " \
