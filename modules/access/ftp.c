@@ -589,10 +589,13 @@ static int ftp_SendCommand( vlc_object_t *p_access, access_sys_t *p_sys,
     char         *psz_cmd;
 
     va_start( args, psz_fmt );
-    vasprintf( &psz_cmd, psz_fmt, args );
+    if( vasprintf( &psz_cmd, psz_fmt, args ) == -1 )
+        return VLC_EGENERIC;
+
     va_end( args );
 
     msg_Dbg( p_access, "ftp_SendCommand:\"%s\"", psz_cmd);
+
     if( net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd, NULL, "%s\r\n",
                     psz_cmd ) < 0 )
     {
