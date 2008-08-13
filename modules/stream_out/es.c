@@ -225,7 +225,7 @@ static char * es_print_url( char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
 
     if( psz_fmt == NULL || !*psz_fmt )
     {
-        psz_fmt = "stream-%n-%c.%m";
+        psz_fmt = (char*)"stream-%n-%c.%m";
     }
 
     p = psz_dst = malloc( 4096 );
@@ -374,6 +374,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                     _("There is no suitable stream-output access module for \"%s/%s://%s\"."),
                           psz_access,
                           psz_mux, psz_dst );
+        free( psz_dst );
         return( NULL );
     }
 
@@ -389,8 +390,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                           "for \"%s/%s://%s\"."),
                           psz_access, psz_mux, psz_dst );
         sout_AccessOutDelete( p_access );
+        free( psz_dst );
         return( NULL );
     }
+    free( psz_dst );
 
     id = malloc( sizeof( sout_stream_id_t ) );
     if( !id )
