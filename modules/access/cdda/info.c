@@ -904,7 +904,8 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         input_title_t *t = p_cdda->p_title[0] = //i_track-i_first_track] =
         vlc_input_title_New();
 
-        asprintf( &t->psz_name, _("Track %i"), i_track );
+        if( asprintf( &t->psz_name, _("Track %i"), i_track ) )
+            t->psz_name = NULL;
         t->i_size = i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
         t->i_length = INT64_C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
 
@@ -935,7 +936,8 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
             t = p_cdda->p_title[i] = vlc_input_title_New();
 
-            asprintf( &t->psz_name, _("Track %i"), i_track );
+            if( asprintf( &t->psz_name, _("Track %i"), i_track ) )
+                t->psz_name = NULL;
             t->i_size = i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 
             t->i_length = INT64_C(1000000) * t->i_size
