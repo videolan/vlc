@@ -532,8 +532,12 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
 /**@}*/                                                                     \
 
 /* VLC_OBJECT: attempt at doing a clever cast */
-#define VLC_OBJECT( x ) \
-    (((vlc_object_t *)(x))+0*(x)->be_sure_to_add_VLC_COMMON_MEMBERS_to_struct)
+#ifdef __GNUC__
+# define VLC_OBJECT( x ) \
+    (((vlc_object_t *)(x))+0*(((typeof(x))0)->be_sure_to_add_VLC_COMMON_MEMBERS_to_struct))
+#else
+# define VLC_OBJECT( x ) ((vlc_object_t *)(x))
+#endif
 
 #define VLC_GC_MEMBERS                                                       \
 /** \name VLC_GC_MEMBERS                                                     \
