@@ -53,8 +53,8 @@
 #define dbg_print(mask, s, args...)
 #endif
 
-#define LOG_ERR(args...)  msg_Err( p_access, args )
-#define LOG_WARN(args...) msg_Warn( p_access, args )
+#define LOG_ERR(...)  msg_Err( p_access, __VA_ARGS__ )
+#define LOG_WARN(...) msg_Warn( p_access, __VA_ARGS__ )
 
 /*------------------------------------------------------------------
   General definitions and structures.
