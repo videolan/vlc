@@ -351,9 +351,9 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     {
         if (EnsureUTF8( psz_subtitle ) == NULL)
         {
-            msg_Err( p_dec, _("failed to convert subtitle encoding.\n"
+            msg_Err( p_dec, "failed to convert subtitle encoding.\n"
                      "Try manually setting a character-encoding "
-                     "before you open the file.") );
+                     "before you open the file." );
         }
     }
     else
@@ -387,9 +387,9 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
             if( ( ret == (size_t)(-1) ) || inbytes_left )
             {
                 free( psz_new_subtitle );
-                msg_Err( p_dec, _("failed to convert subtitle encoding.\n"
+                msg_Err( p_dec, "failed to convert subtitle encoding.\n"
                         "Try manually setting a character-encoding "
-                                "before you open the file.") );
+                                "before you open the file." );
                 return NULL;
             }
 

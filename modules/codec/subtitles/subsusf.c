@@ -212,8 +212,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     /* USF Subtitles are mandated to be UTF-8 -- make sure it is */
     if (EnsureUTF8( psz_subtitle ) == NULL)
     {
-        msg_Err( p_dec, _("USF subtitles must be in UTF-8 format.\n"
-                 "This stream contains USF subtitles which aren't.") );
+        msg_Err( p_dec, "USF subtitles must be in UTF-8 format.\n"
+                 "This stream contains USF subtitles which aren't." );
     }
 
     /* Create the subpicture unit */

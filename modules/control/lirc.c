@@ -186,7 +186,7 @@ static void Run( intf_thread_t *p_intf )
                     osd_MenuActivate( VLC_OBJECT(p_intf) );
                 else
                 {
-                    msg_Err( p_intf, _("Please provide one of the following parameters:") );
+                    msg_Err( p_intf, "Please provide one of the following parameters:" );
                     msg_Err( p_intf, "[on|off|up|down|left|right|select]" );
                     break;
                 }
