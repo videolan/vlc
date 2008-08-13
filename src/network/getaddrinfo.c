@@ -206,16 +206,12 @@ static void WSAAPI freeaddrinfo (struct addrinfo *res)
 static void freeaddrinfo (struct addrinfo *res)
 #endif
 {
-    if (res != NULL)
-    {
-        if (res->ai_canonname != NULL)
-            free (res->ai_canonname);
-        if (res->ai_addr != NULL)
-            free (res->ai_addr);
-        if (res->ai_next != NULL)
-            free (res->ai_next);
-        free (res);
-    }
+    if (res == NULL)
+        return;
+    free (res->ai_canonname);
+    free (res->ai_addr);
+    free (res->ai_next);
+    free (res);
 }
 
 
