@@ -330,6 +330,8 @@ static void SigHandler( int i_signal )
 
 #ifdef HAVE_SIGRELSE
     sigrelse( i_signal );
+#else
+    VLC_UNUSED( i_signal );
 #endif
 
 #if defined( __i386__ )
