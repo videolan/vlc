@@ -1476,6 +1476,9 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     id->p_decoder->pf_picture_link    = video_link_picture_decoder;
     id->p_decoder->pf_picture_unlink  = video_unlink_picture_decoder;
     id->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
+    if( !id->p_decoder->p_owner )
+        return VLC_EGENERIC;
+
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
         id->p_decoder->p_owner->pp_pics[i] = 0;
     id->p_decoder->p_owner->p_sys = p_sys;
@@ -1487,6 +1490,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( !id->p_decoder->p_module )
     {
         msg_Err( p_stream, "cannot find video decoder" );
+        free( id->p_decoder->p_owner );
         return VLC_EGENERIC;
     }
 
@@ -1525,6 +1529,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
                  (char *)&p_sys->i_vcodec );
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = 0;
+        free( id->p_decoder->p_owner );
         return VLC_EGENERIC;
     }
 
@@ -1557,6 +1562,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
             msg_Err( p_stream, "cannot spawn encoder thread" );
             module_Unneed( id->p_decoder, id->p_decoder->p_module );
             id->p_decoder->p_module = 0;
+            free( id->p_decoder->p_owner );
             return VLC_EGENERIC;
         }
     }
