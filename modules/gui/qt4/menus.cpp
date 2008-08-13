@@ -191,7 +191,9 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
     PUSH_VAR( "aspect-ratio" );
     PUSH_VAR( "crop" );
     PUSH_VAR( "video-on-top" );
+#ifdef WIN32
     PUSH_VAR( "directx-wallpaper" );
+#endif
     PUSH_VAR( "video-snapshot" );
 
     if( p_object )
@@ -227,17 +229,6 @@ static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
     foreach( action, menu->actions() )
     {
         if( action->data().toString() == psz_var )
-            return action;
-    }
-    return NULL;
-}
-
-static QAction * FindActionWithText( QMenu *menu, QString &text )
-{
-    QAction *action;
-    foreach( action, menu->actions() )
-    {
-        if( action->text() == text )
             return action;
     }
     return NULL;
@@ -506,7 +497,9 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         ACT_ADD( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
         ACT_ADD( current, "crop", qtr( "&Crop" ) );
         ACT_ADD( current, "video-on-top", qtr( "Always &On Top" ) );
-        /* ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) ); */
+#ifdef WIN32
+        ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) );
+#endif
         ACT_ADD( current, "video-snapshot", qtr( "Sna&pshot" ) );
         /* ACT_ADD( current, "ffmpeg-pp-q", qtr( "Decoder" ) ); */
     }
@@ -1157,7 +1150,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     }
 
     if( var_Change( p_object, psz_var, VLC_VAR_GETLIST,
-                &val_list, &text_list ) < 0 )
+                    &val_list, &text_list ) < 0 )
     {
         return VLC_EGENERIC;
     }
@@ -1236,18 +1229,11 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
     QAction *action = FindActionWithVar( menu, psz_var );
     if( !action )
     {
-        /* This is a value */
-        action = FindActionWithText( menu, text );
-        if( !action )
-        {
-            action = new QAction( text, menu );
-            menu->addAction( action );
-        }
+        action = new QAction( text, menu );
+        menu->addAction( action );
     }
 
-    /* FIXME action->setText( text ); */
     action->setToolTip( help );
-
     action->setEnabled( i_object_id != 0 );
 
     if( i_item_type == ITEM_CHECK )
