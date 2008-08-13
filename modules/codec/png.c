@@ -106,13 +106,13 @@ static void user_error( png_structp p_png, png_const_charp error_msg )
 {
     decoder_t *p_dec = (decoder_t *)png_get_error_ptr( p_png );
     p_dec->p_sys->b_error = true;
-    msg_Err( p_dec, error_msg );
+    msg_Err( p_dec, "%s", error_msg );
 }
 
 static void user_warning( png_structp p_png, png_const_charp warning_msg )
 {
     decoder_t *p_dec = (decoder_t *)png_get_error_ptr( p_png );
-    msg_Warn( p_dec, warning_msg );
+    msg_Warn( p_dec, "%s", warning_msg );
 }
 
 /****************************************************************************
