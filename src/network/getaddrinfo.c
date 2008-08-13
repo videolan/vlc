@@ -518,8 +518,8 @@ static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *se
     if ((entry == NULL) ||  (freentry == NULL))
     {
         /* not found, use replacement API instead */
-    entry = getaddrinfo;
-    freentry = freeaddrinfo;
+        entry = getaddrinfo;
+        freentry = freeaddrinfo;
     }
     /* call API before replacing function pointer to avoid crash */
     result = entry (node, service, hints, res);
@@ -723,9 +723,11 @@ int vlc_inet_pton (int af, const char *src, void *dst)
             break;
 #endif
         default:
+            freeaddrinfo (res);
             return -1;
     }
     memcpy (dst, data, len);
+    freeaddrinfo (res);
     return 1;
 #else /* HAVE_INET_PTON */
     return inet_pton( af, src, dst );
