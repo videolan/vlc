@@ -186,26 +186,26 @@ static void Probe( aout_instance_t * p_aout,
                 {
                 case 1:
                     val.i_int = AOUT_VAR_MONO;
-                    text.psz_string = N_("Mono");
+                    text.psz_string = (char*)N_("Mono");
                     var_Change( p_aout, "audio-device",
                                 VLC_VAR_ADDCHOICE, &val, &text );
                     break;
                 case 2:
                     val.i_int = AOUT_VAR_STEREO;
-                    text.psz_string = N_("Stereo");
+                    text.psz_string = (char*)N_("Stereo");
                     var_Change( p_aout, "audio-device",
                                 VLC_VAR_ADDCHOICE, &val, &text );
                     var_Set( p_aout, "audio-device", val );
                     break;
                 case 4:
                     val.i_int = AOUT_VAR_2F2R;
-                    text.psz_string = N_("2 Front 2 Rear");
+                    text.psz_string = (char*)N_("2 Front 2 Rear");
                     var_Change( p_aout, "audio-device",
                                 VLC_VAR_ADDCHOICE, &val, &text );
                     break;
                 case 6:
                     val.i_int = AOUT_VAR_5_1;
-                    text.psz_string = "5.1";
+                    text.psz_string = (char*)"5.1";
                     var_Change( p_aout, "audio-device",
                                 VLC_VAR_ADDCHOICE, &val, &text );
                     break;
@@ -223,7 +223,7 @@ static void Probe( aout_instance_t * p_aout,
             if ( !snd_pcm_hw_params_test_channels( p_sys->p_snd_pcm, p_hw, 2 ))
             {
                 val.i_int = AOUT_VAR_STEREO;
-                text.psz_string = N_("Stereo");
+                text.psz_string = (char*)N_("Stereo");
                 var_Change( p_aout, "audio-device",
                             VLC_VAR_ADDCHOICE, &val, &text );
                 var_Set( p_aout, "audio-device", val );
@@ -247,7 +247,7 @@ static void Probe( aout_instance_t * p_aout,
                                      SND_PCM_NONBLOCK ) ) )
         {
             val.i_int = AOUT_VAR_SPDIF;
-            text.psz_string = N_("A/52 over S/PDIF");
+            text.psz_string = (char*)N_("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
             if( config_GetInt( p_aout, "spdif" ) )
@@ -915,6 +915,9 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 {
     module_config_t *p_item;
     int i;
+    (void)newval;
+    (void)oldval;
+    (void)p_unused;
 
     p_item = config_FindConfig( p_this, psz_name );
     if( !p_item ) return VLC_SUCCESS;
@@ -940,7 +943,6 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     p_item->b_dirty = true;
 
     return VLC_SUCCESS;
-
 }
 
 
@@ -987,15 +989,20 @@ static void GetDevicesForCard( module_config_t *p_item, int i_card )
             continue;
         }
 
-        asprintf( &psz_device, "hw:%d,%d", i_card, i_pcm_device );
-        asprintf( &psz_descr, "%s: %s (%s)", psz_card_name,
-                  snd_pcm_info_get_name(p_pcm_info), psz_device );
+        if( asprintf( &psz_device, "hw:%d,%d", i_card, i_pcm_device ) == -1 )
+            break;
+        if( asprintf( &psz_descr, "%s: %s (%s)", psz_card_name,
+                  snd_pcm_info_get_name(p_pcm_info), psz_device ) == -1 )
+        {
+            free( psz_device );
+            break;
+        }
 
         p_item->ppsz_list =
-            (const char **)realloc( p_item->ppsz_list,
+            (char **)realloc( p_item->ppsz_list,
                               (p_item->i_list + 2) * sizeof(char *) );
         p_item->ppsz_list_text =
-            (const char **)realloc( p_item->ppsz_list_text,
+            (char **)realloc( p_item->ppsz_list_text,
                               (p_item->i_list + 2) * sizeof(char *) );
         p_item->ppsz_list[ p_item->i_list ] = psz_device;
         p_item->ppsz_list_text[ p_item->i_list ] = psz_descr;

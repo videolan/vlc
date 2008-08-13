@@ -539,8 +539,9 @@ static int OpenConnection( access_t *p_access )
             char *buf;
             char *b64;
 
-            asprintf( &buf, "%s:%s", p_sys->proxy.psz_username,
-                       p_sys->proxy.psz_password ? p_sys->proxy.psz_password : "" );
+            if( asprintf( &buf, "%s:%s", p_sys->proxy.psz_username,
+                       p_sys->proxy.psz_password ? p_sys->proxy.psz_password : "" ) == -1 )
+                return VLC_ENOMEM;
 
             b64 = vlc_b64_encode( buf );
             free( buf );
