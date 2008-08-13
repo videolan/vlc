@@ -113,13 +113,13 @@ void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
-    i_size = asprintf( &psz_filename, "%s"DIR_SEP"%s",
-                       psz_cachedir, CacheName() );
-    free( psz_cachedir );
-    if( i_size <= 0 )
+    if( asprintf( &psz_filename, "%s"DIR_SEP"%s",
+                       psz_cachedir, CacheName() == -1 ) )
     {
+        free( psz_cachedir );
         return;
     }
+    free( psz_cachedir );
 
     if( p_libvlc_global->p_module_bank->b_cache_delete )
     {
