@@ -29,7 +29,7 @@
 #endif
 
 #ifndef _WIN32_WINNT
-# define _WIN32_WINNT 0x0501
+# define _WIN32_WINNT 0x0500
 #endif
 
 #include <vlc_common.h>
@@ -411,23 +411,20 @@ static int Open( vlc_object_t *p_this )
         char *dhost = var_GetNonEmptyString (p_access, "dst-addr");
         int sport = var_GetInteger (p_access, "src-port");
         int dport = var_GetInteger (p_access, "dst-port");
-        char port[6];
         struct sockaddr_storage src, dst;
         socklen_t srclen = 0, dstlen = 0;
         struct addrinfo *res;
 
-        snprintf (port, sizeof (port), "%d", dport);
-        if (getaddrinfo (dhost, port, &hints, &res) == 0)
+        if ( vlc_getaddrinfo ( VLC_OBJECT(p_stream), dhost, dport, &hints, &res) == 0)
         {
             memcpy (&dst, res->ai_addr, dstlen = res->ai_addrlen);
-            freeaddrinfo (res);
+            vlc_freeaddrinfo (res);
         }
 
-        snprintf (port, sizeof (port), "%d", sport);
-        if (getaddrinfo (shost, port, &hints, &res) == 0)
+        if (vlc_getaddrinfo ( VLC_OBJECT(p_stream), shost, sport, &hints, &res) == 0)
         {
             memcpy (&src, res->ai_addr, srclen = res->ai_addrlen);
-            freeaddrinfo (res);
+            vlc_freeaddrinfo (res);
         }
 
         char *head = vlc_sdp_Start (VLC_OBJECT (p_stream), SOUT_CFG_PREFIX,
