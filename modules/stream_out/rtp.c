@@ -1014,6 +1014,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         {
             id->psz_enc = "MP2P";
         }
+        free( psz );
     }
     else
     switch( p_fmt->i_codec )
