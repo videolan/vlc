@@ -2129,7 +2129,7 @@ block_t *stream_Block( stream_t *s, int i_size )
         {
             return p_bk;
         }
+        block_Release( p_bk );
     }
-    if( p_bk ) block_Release( p_bk );
     return NULL;
 }
