@@ -114,7 +114,7 @@ void CacheLoad( vlc_object_t *p_this )
     }
 
     if( asprintf( &psz_filename, "%s"DIR_SEP"%s",
-                       psz_cachedir, CacheName() == -1 ) )
+                       psz_cachedir, CacheName() ) == -1 )
     {
         free( psz_cachedir );
         return;
