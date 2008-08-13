@@ -291,7 +291,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
         f_fname = strdup( psz_fname );
         if( asprintf( &f_dir, "%s%c", psz_cwd, DIR_SEP_CHAR ) == -1 )
-        f_dir = NULL; /* Assure that function will return in next test */
+            f_dir = NULL; /* Assure that function will return in next test */
         free( psz_cwd );
     }
     if( !f_fname || !f_dir )
