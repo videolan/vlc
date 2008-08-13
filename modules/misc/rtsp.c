@@ -402,11 +402,21 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     if( asprintf( &p_media->psz_rtsp_control_v4,
                "a=control:rtsp://%%s:%d%s/trackID=%%d\r\n",
                p_sys->i_port, p_media->psz_rtsp_path ) < 0 )
+    {
+        httpd_UrlDelete( p_media->p_rtsp_url );
+        free( p_media->psz_rtsp_path );
+        free( p_media );
         return NULL;
+    }
     if( asprintf( &p_media->psz_rtsp_control_v6,
                "a=control:rtsp://[%%s]:%d%s/trackID=%%d\r\n",
               p_sys->i_port, p_media->psz_rtsp_path ) < 0 )
+    {
+        httpd_UrlDelete( p_media->p_rtsp_url );
+        free( p_media->psz_rtsp_path );
+        free( p_media );
         return NULL;
+    }
 
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_SETUP,
                     RtspCallback, (void*)p_media );
@@ -522,15 +532,15 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             {
                 p_es->i_payload_type = p_media->i_payload_type++;
             }
-            p_es->psz_rtpmap = malloc( strlen( "L16/*/*" ) + 20+1 );
-            sprintf( p_es->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
-                    p_fmt->audio.i_channels );
+            if( asprintf( &p_es->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
+                          p_fmt->audio.i_channels ) == -1 )
+                p_es->psz_rtpmap = NULL;
             break;
         case VLC_FOURCC( 'u', '8', ' ', ' ' ):
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = malloc( strlen( "L8/*/*" ) + 20+1 );
-            sprintf( p_es->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
-                    p_fmt->audio.i_channels );
+            if( asprintf( &p_es->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
+                          p_fmt->audio.i_channels ) == -1 )
+                p_es->psz_rtpmap = NULL;
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
         case VLC_FOURCC( 'm', 'p', '3', ' ' ):
@@ -543,7 +553,8 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             break;
         case VLC_FOURCC( 'a', '5', '2', ' ' ):
             p_es->i_payload_type = p_media->i_payload_type++;
-            asprintf( &p_es->psz_rtpmap, "ac3/%d", p_fmt->audio.i_rate );
+            if( asprintf( &p_es->psz_rtpmap, "ac3/%d", p_fmt->audio.i_rate ) == -1 )
+                p_es->psz_rtpmap = NULL;
             break;
         case VLC_FOURCC( 'H', '2', '6', '3' ):
             p_es->i_payload_type = p_media->i_payload_type++;
@@ -619,26 +630,26 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             if( p_fmt->i_extra > 0 )
             {
                 char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
-                p_es->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra );
                 sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
-                sprintf( p_es->psz_fmtp,
-                        "profile-level-id=3; config=%s;", p_hexa );
+                if( asprintf( &p_es->psz_fmtp,
+                              "profile-level-id=3; config=%s;", p_hexa ) == -1 )
+                    p_es->psz_fmtp = NULL;
                 free( p_hexa );
             }
             break;
         case VLC_FOURCC( 'm', 'p', '4', 'a' ):
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = malloc( strlen( "mpeg4-generic/" ) + 12 );
-            sprintf( p_es->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate );
+            if( asprintf( &p_es->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate ) == -1 )
+                p_es->psz_rtpmap = NULL;
             if( p_fmt->i_extra > 0 )
             {
                 char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
-                p_es->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
                 sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
-                sprintf( p_es->psz_fmtp,
-                        "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
-                        "config=%s; SizeLength=13;IndexLength=3; "
-                        "IndexDeltaLength=3; Profile=1;", p_hexa );
+                if( asprintf( &p_es->psz_fmtp,
+                              "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
+                              "config=%s; SizeLength=13;IndexLength=3; "
+                              "IndexDeltaLength=3; Profile=1;", p_hexa ) == -1 )
+                    p_es->psz_fmtp = NULL;
                 free( p_hexa );
             }
             break;
