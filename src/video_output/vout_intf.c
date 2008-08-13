@@ -609,16 +609,9 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         }
 
         if( p_mypicturesdir == NULL )
-        {
-            if( asprintf( &val.psz_string, "%s", config_GetHomeDir() ) == -1 )
-                val.psz_string = NULL;
-        }
+            val.psz_string = strdup( config_GetHomeDir() );
         else
-        {
-            if( asprintf( &val.psz_string, p_mypicturesdir ) == -1 )
-                val.psz_string = NULL;
-            free( p_mypicturesdir );
-        }
+            val.psz_string = p_mypicturesdir;
     }
 
 #else
