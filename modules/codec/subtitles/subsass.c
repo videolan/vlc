@@ -300,7 +300,6 @@ void ParseSSAHeader( decoder_t *p_dec )
                     p_style->psz_stylename = strdup( psz_temp_stylename );
                     p_style->font_style.psz_fontname = strdup( psz_temp_fontname );
                     p_style->font_style.i_font_size = i_font_size;
-                    msg_Dbg( p_dec, psz_temp_color1 );
                     ParseColor( psz_temp_color1, &p_style->font_style.i_font_color,
                                 &p_style->font_style.i_font_alpha );
                     ParseColor( psz_temp_color3, &p_style->font_style.i_outline_color,
