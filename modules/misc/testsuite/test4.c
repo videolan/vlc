@@ -99,16 +99,19 @@ static int Foo( vlc_object_t *p_this, char const *psz_cmd,
     var_Change( p_this, "honk", VLC_VAR_SETDEFAULT, &val, NULL );
 
     var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
+    free( val.psz_string );
 
     val.psz_string = "foo";
     var_Set( p_this, "honk", val );
 
     var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
+    free( val.psz_string );
 
     val.psz_string = "blork";
     var_Set( p_this, "honk", val );
 
     var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
+    free( val.psz_string );
 
     val.psz_string = "baz";
     var_Change( p_this, "honk", VLC_VAR_DELCHOICE, &val, NULL );
