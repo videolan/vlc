@@ -26,7 +26,7 @@
 
 PENGUIN=http://ftp.penguin.cz/pub/users/utx/amr
 GNU=ftp://ftp.esat.net/pub/gnu
-SF=http://downloads.sourceforge.net
+SF=http://heanet.dl.sourceforge.net/sourceforge
 VIDEOLAN=http://download.videolan.org/pub/videolan
 PERL_VERSION=5.8.8
 PERL_URL=http://ftp.funet.fi/pub/CPAN/src/perl-$(PERL_VERSION).tar.gz
