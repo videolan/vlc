@@ -641,7 +641,6 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
     if (alert) {
         lprintf("real: got message from server:\n%s\n", alert);
     }
-    printf( "bou\n");
     rtsp_send_ok( rtsp_session );
     free( challenge1 );
     free( alert );

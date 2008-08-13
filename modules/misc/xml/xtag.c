@@ -294,7 +294,7 @@ static char *ReaderName( xml_reader_t *p_reader )
     {
         psz_name = xtag_get_name( p_reader->p_sys->p_curtag );
 #ifdef XTAG_DEBUG
-        printf( "TAG: %s\n", psz_name );
+        fprintf( stderr, "TAG: %s\n", psz_name );
 #endif
     }
     else
@@ -310,7 +310,7 @@ static char *ReaderValue( xml_reader_t *p_reader )
     if( p_reader->p_sys->p_curtag->pcdata )
     {
 #ifdef XTAG_DEBUG
-        printf( "%s\n", p_reader->p_sys->p_curtag->pcdata );
+        fprintf( stderr, "%s\n", p_reader->p_sys->p_curtag->pcdata );
 #endif
         return strdup( p_reader->p_sys->p_curtag->pcdata );
     }
@@ -318,7 +318,7 @@ static char *ReaderValue( xml_reader_t *p_reader )
     if( !p_reader->p_sys->p_curattr ) return 0;
 
 #ifdef XTAG_DEBUG
-    printf( "%s=%s\n", ((XAttribute *)p_reader->p_sys->p_curattr->data)->name,
+    fprintf( stderr, "%s=%s\n", ((XAttribute *)p_reader->p_sys->p_curattr->data)->name,
             ((XAttribute *)p_reader->p_sys->p_curattr->data)->value );
 #endif
 
@@ -531,7 +531,7 @@ static XAttribute *xtag_parse_attribute( XTagParser *parser )
     if( !xtag_assert_and_pass( parser, X_EQUAL ) )
     {
 #ifdef XTAG_DEBUG
-        printf( "xtag: attr failed EQUAL on <%s>\n", name );
+        fprintf( stderr, "xtag: attr failed EQUAL on <%s>\n", name );
 #endif
         goto err_free_name;
     }
@@ -543,7 +543,7 @@ static XAttribute *xtag_parse_attribute( XTagParser *parser )
     if( value == NULL )
     {
 #ifdef XTAG_DEBUG
-        printf ("Got NULL quoted attribute value\n");
+        fprintf (stderr, "Got NULL quoted attribute value\n");
 #endif
         goto err_free_name;
     }
@@ -669,7 +669,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
     if( name == NULL ) return NULL;
 
 #ifdef XTAG_DEBUG
-    printf ("<%s ...\n", name);
+    fprintf (stderr, "<%s ...\n", name);
 #endif
 
     tag = malloc( sizeof(*tag) );
@@ -716,7 +716,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
             if( strcmp( name, tag->name ) )
             {
 #ifdef XTAG_DEBUG
-                printf ("got %s expected %s\n", name, tag->name);
+                fprintf (stderr, "got %s expected %s\n", name, tag->name);
 #endif
                 parser->valid = false;
             }
@@ -784,7 +784,7 @@ static XTag *xtag_new_parse( const char *s, int n )
     else if( n == 0 )
     {
 #ifdef XTAG_DEBUG
-        printf ("empty buffer");
+        fprintf (stderr, "empty buffer\n");
 #endif
         return NULL;
     }
@@ -798,7 +798,7 @@ static XTag *xtag_new_parse( const char *s, int n )
     if( !parser.valid )
     {
 #ifdef XTAG_DEBUG
-        printf ("invalid file");
+        fprintf (stderr, "invalid file\n");
 #endif
         xtag_free( tag );
         return NULL;

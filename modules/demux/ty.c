@@ -828,10 +828,10 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         return -1;
 #if 0
         int i;
-        printf( "Audio Packet Header " );
+        fprintf( stderr, "Audio Packet Header " );
         for( i = 0 ; i < 24 ; i++ )
-            printf( "%2.2x ", p_block_in->p_buffer[i] );
-        printf( "\n" );
+            fprintf( stderr, "%2.2x ", p_block_in->p_buffer[i] );
+        fprintf( stderr, "\n" );
 #endif
 
     if( subrec_type == 2 )
