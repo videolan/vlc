@@ -222,6 +222,8 @@ vlc_object_signal_maybe (vlc_object_t *p_this)
  */
 typedef struct libvlc_priv_t
 {
+    libvlc_int_t       public_data;
+
     /* Configuration */
     vlc_mutex_t        config_lock; ///< config file lock
     char *             psz_configfile;   ///< location of config file
@@ -263,7 +265,7 @@ typedef struct libvlc_priv_t
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
 {
-    return (libvlc_priv_t *)(libvlc + 1);
+    return (libvlc_priv_t *)libvlc;
 }
 
 void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist );
