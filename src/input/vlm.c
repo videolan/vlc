@@ -126,7 +126,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         msg_Dbg( p_this, "loading VLM configuration" );
         if( asprintf(&psz_buffer, "load %s", psz_vlmconf ) != -1 )
         {
-            msg_Dbg( p_this, psz_buffer );
+            msg_Dbg( p_this, "%s", psz_buffer );
             if( vlm_ExecuteCommand( p_vlm, psz_buffer, &p_message ) )
                 msg_Warn( p_this, "error while loading the configuration file" );
 
