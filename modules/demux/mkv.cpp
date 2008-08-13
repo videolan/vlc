@@ -1027,9 +1027,13 @@ public:
         ,i_duration(-1)
         ,i_start_time(0)
         ,i_cues_position(-1)
+        ,i_info_position(-1)
         ,i_chapters_position(-1)
         ,i_tags_position(-1)
+        ,i_tracks_position(-1)
+        ,i_attachments_position(-1)
         ,i_seekhead_position(-1)
+        ,i_seekhead_count(0)
         ,cluster(NULL)
         ,i_block_pos(0)
         ,i_cluster_pos(0)
@@ -1111,10 +1115,14 @@ public:
     std::vector<mkv_track_t*> tracks;
 
     /* from seekhead */
+    int                     i_seekhead_count;
+    int64_t                 i_seekhead_position;
     int64_t                 i_cues_position;
+    int64_t                 i_tracks_position;
+    int64_t                 i_info_position;
     int64_t                 i_chapters_position;
     int64_t                 i_tags_position;
-    int64_t                 i_seekhead_position;
+    int64_t                 i_attachments_position;
 
     KaxCluster              *cluster;
     uint64                  i_block_pos;
@@ -1150,6 +1158,7 @@ public:
     bool                           b_preloaded;
 
     bool Preload( );
+    bool LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int64_t i_element_position );
     bool PreloadFamily( const matroska_segment_c & segment );
     void ParseInfo( KaxInfo *info );
     void ParseAttachments( KaxAttachments *attachments );
@@ -1160,8 +1169,8 @@ public:
     void ParseTrackEntry( KaxTrackEntry *m );
     void ParseCluster( );
     void IndexAppendCluster( KaxCluster *cluster );
-    void LoadCues( );
-    void LoadTags( );
+    void LoadCues( KaxCues *cues );
+    void LoadTags( KaxTags *tags );
     void InformationCreate( );
     void Seek( mtime_t i_date, mtime_t i_time_offset );
 #if LIBMATROSKA_VERSION >= 0x000800
@@ -1197,7 +1206,6 @@ public:
     size_t AddSegment( matroska_segment_c *p_segment );
     void PreloadLinked( );
     mtime_t Duration( ) const;
-    void LoadCues( );
     void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter );
 
     inline chapter_edition_c *Edition()
@@ -3932,34 +3940,15 @@ bool EbmlParser::IsTopPresent( EbmlElement *el )
  *  * InformationCreate : create all information, load tags if present
  *
  *****************************************************************************/
-void matroska_segment_c::LoadCues( )
+void matroska_segment_c::LoadCues( KaxCues *cues )
 {
-    int64_t     i_sav_position = es.I_O().getFilePointer();
     EbmlParser  *ep;
-    EbmlElement *el, *cues;
+    EbmlElement *el;
+    size_t i, j;
 
-    /* *** Load the cue if found *** */
-    if( i_cues_position < 0 )
+    if( b_cues )
     {
-        msg_Warn( &sys.demuxer, "no cues/empty cues found->seek won't be precise" );
-
-//        IndexAppendCluster( cluster );
-    }
-
-    bool b_seekable;
-
-    stream_Control( sys.demuxer.s, STREAM_CAN_FASTSEEK, &b_seekable );
-    if( !b_seekable )
-        return;
-
-    msg_Dbg( &sys.demuxer, "loading cues" );
-    es.I_O().setFilePointer( i_cues_position, seek_beginning );
-    cues = es.FindNextID( KaxCues::ClassInfos, 0xFFFFFFFFL);
-
-    if( cues == NULL )
-    {
-        msg_Err( &sys.demuxer, "cannot load cues (broken seekhead or file)" );
-        es.I_O().setFilePointer( i_sav_position, seek_beginning );
+        msg_Err( &sys.demuxer, "There can be only 1 Cues per section." );
         return;
     }
 
@@ -4047,33 +4036,19 @@ void matroska_segment_c::LoadCues( )
         }
     }
     delete ep;
-    delete cues;
-
     b_cues = true;
-
-    msg_Dbg( &sys.demuxer, "loading cues done." );
-    es.I_O().setFilePointer( i_sav_position, seek_beginning );
+    msg_Dbg( &sys.demuxer, "|   - loading cues done." );
 }
 
-void matroska_segment_c::LoadTags( )
+void matroska_segment_c::LoadTags( KaxTags *tags )
 {
-    int64_t     i_sav_position = es.I_O().getFilePointer();
     EbmlParser  *ep;
-    EbmlElement *el, *tags;
+    EbmlElement *el;
+    size_t i, j;
 
-    msg_Dbg( &sys.demuxer, "loading tags" );
-    es.I_O().setFilePointer( i_tags_position, seek_beginning );
-    tags = es.FindNextID( KaxTags::ClassInfos, 0xFFFFFFFFL);
-
-    if( tags == NULL )
-    {
-        msg_Err( &sys.demuxer, "cannot load tags (broken seekhead or file)" );
-        es.I_O().setFilePointer( i_sav_position, seek_beginning );
-        return;
-    }
-
-    msg_Dbg( &sys.demuxer, "Tags" );
+    /* Master elements */
     ep = new EbmlParser( &es, tags, &sys.demuxer );
+
     while( ( el = ep->Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxTag ) )
@@ -4162,7 +4137,7 @@ void matroska_segment_c::LoadTags( )
                 }
                 else
                 {
-                    msg_Dbg( &sys.demuxer, "|   + Unknown (%s)", typeid( *el ).name() );
+                    msg_Dbg( &sys.demuxer, "|   + LoadTag Unknown (%s)", typeid( *el ).name() );
                 }
             }
             ep->Up();
@@ -4173,10 +4148,8 @@ void matroska_segment_c::LoadTags( )
         }
     }
     delete ep;
-    delete tags;
 
     msg_Dbg( &sys.demuxer, "loading tags done." );
-    es.I_O().setFilePointer( i_sav_position, seek_beginning );
 }
 
 /*****************************************************************************
@@ -4184,76 +4157,96 @@ void matroska_segment_c::LoadTags( )
  *****************************************************************************/
 void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 {
-    EbmlElement *el;
+    EbmlParser  *ep;
+    EbmlElement *l;
     size_t i, j;
     int i_upper_level = 0;
+    bool b_seekable;
 
-    msg_Dbg( &sys.demuxer, "|   + Seek head" );
+    i_seekhead_count++;
 
-    /* Master elements */
-    seekhead->Read( es, seekhead->Generic().Context, i_upper_level, el, true );
+    stream_Control( sys.demuxer.s, STREAM_CAN_SEEK, &b_seekable );
+    if( !b_seekable )
+        return;
 
-    for( i = 0; i < seekhead->ListSize(); i++ )
+    ep = new EbmlParser( &es, seekhead, &sys.demuxer );
+
+    while( ( l = ep->Get() ) != NULL )
     {
-        EbmlElement *l = (*seekhead)[i];
-
         if( MKV_IS_ID( l, KaxSeek ) )
         {
-            EbmlMaster *sk = static_cast<EbmlMaster *>(l);
             EbmlId id = EbmlVoid::ClassInfos.GlobalId;
             int64_t i_pos = -1;
 
-            for( j = 0; j < sk->ListSize(); j++ )
+            msg_Dbg( &sys.demuxer, "|   |   + Seek" );
+            ep->Down();
+            while( ( l = ep->Get() ) != NULL )
             {
-                EbmlElement *l = (*sk)[j];
-
                 if( MKV_IS_ID( l, KaxSeekID ) )
                 {
                     KaxSeekID &sid = *(KaxSeekID*)l;
+                    sid.ReadData( es.I_O() );
                     id = EbmlId( sid.GetBuffer(), sid.GetSize() );
                 }
                 else if( MKV_IS_ID( l, KaxSeekPosition ) )
                 {
                     KaxSeekPosition &spos = *(KaxSeekPosition*)l;
-                    i_pos = uint64( spos );
+                    spos.ReadData( es.I_O() );
+                    i_pos = (int64_t)segment->GetGlobalPosition( uint64( spos ) );
                 }
                 else
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   + Unknown (%s)", typeid(*l).name() );
+                    /* Many mkvmerge files hit this case. It seems to be a broken SeekHead */
+                    msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name()  );
                 }
             }
+            ep->Up();
 
             if( i_pos >= 0 )
             {
                 if( id == KaxCues::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   = cues at %"PRId64, i_pos );
-                    i_cues_position = segment->GetGlobalPosition( i_pos );
+                    msg_Dbg( &sys.demuxer, "|   - cues at %"PRId64, i_pos );
+                    LoadSeekHeadItem( KaxCues::ClassInfos, i_pos );
+                }
+                else if( id == KaxInfo::ClassInfos.GlobalId )
+                {
+                    msg_Dbg( &sys.demuxer, "|   - info at %"PRId64, i_pos );
+                    LoadSeekHeadItem( KaxInfo::ClassInfos, i_pos );
                 }
                 else if( id == KaxChapters::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   = chapters at %"PRId64, i_pos );
-                    i_chapters_position = segment->GetGlobalPosition( i_pos );
+                    msg_Dbg( &sys.demuxer, "|   - chapters at %"PRId64, i_pos );
+                    LoadSeekHeadItem( KaxChapters::ClassInfos, i_pos );
                 }
                 else if( id == KaxTags::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   = tags at %"PRId64, i_pos );
-                    i_tags_position = segment->GetGlobalPosition( i_pos );
+                    msg_Dbg( &sys.demuxer, "|   - tags at %"PRId64, i_pos );
+                    LoadSeekHeadItem( KaxTags::ClassInfos, i_pos );
                 }
                 else if( id == KaxSeekHead::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   = seekhead at %"PRId64, i_pos );
-                    i_seekhead_position = segment->GetGlobalPosition( i_pos );
+                    msg_Dbg( &sys.demuxer, "|   - chained seekhead at %"PRId64, i_pos );
+                    LoadSeekHeadItem( KaxSeekHead::ClassInfos, i_pos );
+                }
+                else if( id == KaxTracks::ClassInfos.GlobalId )
+                {
+                    msg_Dbg( &sys.demuxer, "|   - tracks at %"PRId64, i_pos );
+                    LoadSeekHeadItem( KaxTracks::ClassInfos, i_pos );
+                }
+                else if( id == KaxAttachments::ClassInfos.GlobalId )
+                {
+                    msg_Dbg( &sys.demuxer, "|   - attachments at %"PRId64, i_pos );
+                    LoadSeekHeadItem( KaxAttachments::ClassInfos, i_pos );
                 }
                 else
-                    msg_Dbg( &sys.demuxer, "|   |   |   = unknown at %"PRId64, i_pos );
+                    msg_Dbg( &sys.demuxer, "|   - unknown seekhead reference at %"PRId64, i_pos );
             }
         }
         else
-        {
-            msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
-        }
+            msg_Dbg( &sys.demuxer, "|   |   + ParseSeekHead Unknown (%s)", typeid(*l).name() );
     }
+    delete ep;
 }
 
 /*****************************************************************************
@@ -4748,8 +4741,6 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
     unsigned int i;
     int i_upper_level = 0;
 
-    msg_Dbg( &sys.demuxer, "|   + Tracks" );
-
     /* Master elements */
     tracks->Read( es, tracks->Generic().Context, i_upper_level, el, true );
 
@@ -4777,8 +4768,6 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
     EbmlMaster  *m;
     size_t i, j;
     int i_upper_level = 0;
-
-    msg_Dbg( &sys.demuxer, "|   + Information" );
 
     /* Master elements */
     m = static_cast<EbmlMaster *>(info);
@@ -4870,7 +4859,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
             msg_Dbg( &sys.demuxer, "|   |   + family=%d", *(uint32*)uid->GetBuffer() );
         }
-#if defined( HAVE_GMTIME_R ) && !defined( __APPLE__ )
+#if defined( HAVE_GMTIME_R )
         else if( MKV_IS_ID( l, KaxDateUTC ) )
         {
             KaxDateUTC &date = *(KaxDateUTC*)l;
@@ -5238,7 +5227,7 @@ void matroska_segment_c::InformationCreate( )
         fprintf( stderr, "***** WARNING: Unhandled child meta\n");
     }
 #endif
-
+#if 0
     if( i_tags_position >= 0 )
     {
         bool b_seekable;
@@ -5249,6 +5238,7 @@ void matroska_segment_c::InformationCreate( )
             LoadTags( );
         }
     }
+#endif
 }
 
 
@@ -5527,13 +5517,13 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_segment )
         p_current_segment = p_new_segment;
         i_current_title = p_new_segment->i_sys_title;
     }
+    if( !p_current_segment->Segment()->b_cues )
+        msg_Warn( &p_current_segment->Segment()->sys.demuxer, "no cues/empty cues found->seek won't be precise" );
 
-    p_current_segment->LoadCues();
     f_duration = p_current_segment->Duration();
 
     /* add information */
     p_current_segment->Segment()->InformationCreate( );
-
     p_current_segment->Segment()->Select( 0 );
 
     return true;
@@ -5596,26 +5586,44 @@ bool matroska_segment_c::Preload( )
 
     while( ( el = ep->Get() ) != NULL )
     {
-        if( MKV_IS_ID( el, KaxInfo ) )
+        if( MKV_IS_ID( el, KaxSeekHead ) )
         {
-            ParseInfo( static_cast<KaxInfo*>( el ) );
+            /* Multiple allowed */
+            /* We bail at 10, to prevent possible recursion */
+            msg_Dbg(  &sys.demuxer, "|   + Seek head" );
+            if( i_seekhead_count < 10 )
+            {
+                i_seekhead_position = (int64_t) es.I_O().getFilePointer();
+                ParseSeekHead( static_cast<KaxSeekHead*>( el ) );
+            }
+        }
+        else if( MKV_IS_ID( el, KaxInfo ) )
+        {
+            /* Multiple allowed, mandatory */
+            msg_Dbg(  &sys.demuxer, "|   + Information" );
+            if( i_info_position < 0 ) // FIXME
+                ParseInfo( static_cast<KaxInfo*>( el ) );
+            i_info_position = (int64_t) es.I_O().getFilePointer();
         }
         else if( MKV_IS_ID( el, KaxTracks ) )
         {
-            ParseTracks( static_cast<KaxTracks*>( el ) );
+            /* Multiple allowed */
+            msg_Dbg(  &sys.demuxer, "|   + Tracks" );
+            if( i_tracks_position < 0 ) // FIXME
+                ParseTracks( static_cast<KaxTracks*>( el ) );
             if ( tracks.size() == 0 )
             {
                 msg_Err( &sys.demuxer, "No tracks supported" );
                 return false;
             }
-        }
-        else if( MKV_IS_ID( el, KaxSeekHead ) )
-        {
-            ParseSeekHead( static_cast<KaxSeekHead*>( el ) );
+            i_tracks_position = (int64_t) es.I_O().getFilePointer();
         }
         else if( MKV_IS_ID( el, KaxCues ) )
         {
-            msg_Dbg( &sys.demuxer, "|   + Cues" );
+            msg_Dbg(  &sys.demuxer, "|   + Cues" );
+            if( i_cues_position < 0 )
+                LoadCues( static_cast<KaxCues*>( el ) );
+            i_cues_position = (int64_t) es.I_O().getFilePointer();
         }
         else if( MKV_IS_ID( el, KaxCluster ) )
         {
@@ -5627,31 +5635,123 @@ bool matroska_segment_c::Preload( )
             ParseCluster( );
 
             ep->Down();
-            /* stop parsing the stream */
+            /* stop pre-parsing the stream */
             break;
         }
         else if( MKV_IS_ID( el, KaxAttachments ) )
         {
             msg_Dbg( &sys.demuxer, "|   + Attachments" );
-            ParseAttachments( static_cast<KaxAttachments*>( el ) );
+            if( i_attachments_position < 0 )
+                ParseAttachments( static_cast<KaxAttachments*>( el ) );
+            i_attachments_position = (int64_t) es.I_O().getFilePointer();
         }
         else if( MKV_IS_ID( el, KaxChapters ) )
         {
             msg_Dbg( &sys.demuxer, "|   + Chapters" );
-            ParseChapters( static_cast<KaxChapters*>( el ) );
+            if( i_chapters_position < 0 )
+                ParseChapters( static_cast<KaxChapters*>( el ) );
+            i_chapters_position = (int64_t) es.I_O().getFilePointer();
         }
         else if( MKV_IS_ID( el, KaxTag ) )
         {
-            msg_Dbg( &sys.demuxer, "|   + Tags FIXME TODO" );
+            msg_Dbg( &sys.demuxer, "|   + Tags" );
+            if( i_tags_position < 0) // FIXME
+                ;//LoadTags( static_cast<KaxTags*>( el ) );
+            i_tags_position = (int64_t) es.I_O().getFilePointer();
         }
         else
-        {
-            msg_Dbg( &sys.demuxer, "|   + Unknown (%s)", typeid(*el).name() );
-        }
+            msg_Dbg( &sys.demuxer, "|   + Preload Unknown (%s)", typeid(*el).name() );
     }
 
     b_preloaded = true;
 
+    return true;
+}
+
+/* Here we try to load elements that were found in Seek Heads, but not yet parsed */
+bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int64_t i_element_position )
+{
+    int64_t     i_sav_position = (int64_t)es.I_O().getFilePointer();
+    EbmlElement *el;
+
+    es.I_O().setFilePointer( i_element_position, seek_beginning );
+    el = es.FindNextID( ClassInfos, 0xFFFFFFFFL);
+
+    if( el == NULL )
+    {
+        msg_Err( &sys.demuxer, "cannot load some cues/chapters/tags etc. (broken seekhead or file)" );
+        es.I_O().setFilePointer( i_sav_position, seek_beginning );
+        return false;
+    }
+
+    if( MKV_IS_ID( el, KaxSeekHead ) )
+    {
+        /* Multiple allowed */
+        msg_Dbg( &sys.demuxer, "|   + Seek head" );
+        if( i_seekhead_count < 10 )
+        {
+            i_seekhead_position = i_element_position;
+            ParseSeekHead( static_cast<KaxSeekHead*>( el ) );
+        }
+    }
+    else if( MKV_IS_ID( el, KaxInfo ) ) // FIXME
+    {
+        /* Multiple allowed, mandatory */
+        msg_Dbg( &sys.demuxer, "|   + Information" );
+        if( i_info_position < 0 )
+            ParseInfo( static_cast<KaxInfo*>( el ) );
+        i_info_position = i_element_position;
+    }
+    else if( MKV_IS_ID( el, KaxTracks ) ) // FIXME
+    {
+        /* Multiple allowed */
+        msg_Dbg( &sys.demuxer, "|   + Tracks" );
+        if( i_tracks_position < 0 )
+            ParseTracks( static_cast<KaxTracks*>( el ) );
+        if ( tracks.size() == 0 )
+        {
+            msg_Err( &sys.demuxer, "No tracks supported" );
+            delete el;
+            es.I_O().setFilePointer( i_sav_position, seek_beginning );
+            return false;
+        }
+        i_tracks_position = i_element_position;
+    }
+    else if( MKV_IS_ID( el, KaxCues ) )
+    {
+        msg_Dbg( &sys.demuxer, "|   + Cues" );
+        if( i_cues_position < 0 )
+            LoadCues( static_cast<KaxCues*>( el ) );
+        i_cues_position = i_element_position;
+    }
+    else if( MKV_IS_ID( el, KaxAttachments ) )
+    {
+        msg_Dbg( &sys.demuxer, "|   + Attachments" );
+        if( i_attachments_position < 0 )
+            ParseAttachments( static_cast<KaxAttachments*>( el ) );
+        i_attachments_position = i_element_position;
+    }
+    else if( MKV_IS_ID( el, KaxChapters ) )
+    {
+        msg_Dbg( &sys.demuxer, "|   + Chapters" );
+        if( i_chapters_position < 0 )
+            ParseChapters( static_cast<KaxChapters*>( el ) );
+        i_chapters_position = i_element_position;
+    }
+    else if( MKV_IS_ID( el, KaxTag ) ) // FIXME
+    {
+        msg_Dbg( &sys.demuxer, "|   + Tags" );
+        if( i_tags_position < 0 )
+            ;//LoadTags( static_cast<KaxTags*>( el ) );
+        i_tags_position = i_element_position;
+    }
+    else
+    {
+        msg_Dbg( &sys.demuxer, "|   + LoadSeekHeadItem Unknown (%s)", typeid(*el).name() );
+    }
+    delete el;
+
+    es.I_O().setFilePointer( i_sav_position, seek_beginning );
     return true;
 }
 
@@ -5762,14 +5862,6 @@ mtime_t virtual_segment_c::Duration() const
         i_duration = p_last_segment->i_start_time / 1000 + p_last_segment->i_duration;
     }
     return i_duration;
-}
-
-void virtual_segment_c::LoadCues( )
-{
-    for ( size_t i=0; i<linked_segments.size(); i++ )
-    {
-        linked_segments[i]->LoadCues();
-    }
 }
 
 void virtual_segment_c::AppendUID( const EbmlBinary * p_UID )
