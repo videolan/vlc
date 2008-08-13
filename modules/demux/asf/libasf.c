@@ -1190,17 +1190,20 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
         else if( i_type == 3 )
         {
             /* DWord */
-            asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ4() );
+            if( asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ4() ) == -1 )
+                p_ec->ppsz_value[i] = NULL;
         }
         else if( i_type == 4 )
         {
             /* QWord */
-            asprintf( &p_ec->ppsz_value[i], "%"PRId64, ASF_READ8() );
+            if( asprintf( &p_ec->ppsz_value[i], "%"PRId64, ASF_READ8() ) == -1 )
+                p_ec->ppsz_value[i] = NULL;
         }
         else if( i_type == 5 )
         {
             /* Word */
-            asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ2() );
+            if( asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ2() ) == -1 )
+                p_ec->ppsz_value[i] = NULL;
         }
         else
         {

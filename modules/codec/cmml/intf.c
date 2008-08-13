@@ -584,7 +584,8 @@ char *GetTimedURIFragmentForTime( int seconds )
 {
     char *psz_time;
 
-    asprintf( &psz_time, "%d", seconds );
+    if( asprintf( &psz_time, "%d", seconds ) == -1 )
+        return NULL;
     return psz_time;
 }
 

@@ -315,13 +315,14 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
                 if( b_index && ( p = strstr( f->file, "index." ) ) )
                 {
-                    asprintf( &psz_redir, "%s%s", f->name, p );
+                    if( asprintf( &psz_redir, "%s%s", f->name, p ) != -1 )
+                    {
+                        msg_Dbg( p_intf, "redir=%s -> %s", psz_redir, f->name );
+                        f->p_redir2 = httpd_RedirectNew( p_sys->p_httpd_host,
+                                                         f->name, psz_redir );
 
-                    msg_Dbg( p_intf, "redir=%s -> %s", psz_redir, f->name );
-                    f->p_redir2 = httpd_RedirectNew( p_sys->p_httpd_host,
-                                                     f->name, psz_redir );
-
-                    free( psz_redir );
+                        free( psz_redir );
+                    }
                 }
             }
         }

@@ -345,19 +345,22 @@ static int OpenDll( decoder_t *p_dec )
     for( i = 0; ppsz_path[i]; i++ )
     {
         /* Old format */
-        asprintf( &psz_dll, "%s/%4.4s.so.6.0", ppsz_path[i],
-                  (char *)&p_dec->fmt_in.i_codec );
-        i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
-        free( psz_dll );
-        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+        if( asprintf( &psz_dll, "%s/%4.4s.so.6.0", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec ) != -1 )
+        {
+            i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
+            free( psz_dll );
+            if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+        }
 
         /* New format */
-        asprintf( &psz_dll, "%s/%4.4s.so", ppsz_path[i],
-                  (char *)&p_dec->fmt_in.i_codec );
-        i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
-        free( psz_dll );
-        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
-
+        if( asprintf( &psz_dll, "%s/%4.4s.so", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec ) != -1 )
+        {
+            i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
+            free( psz_dll );
+            if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+        }
     }
 #endif
 
@@ -366,18 +369,22 @@ static int OpenDll( decoder_t *p_dec )
     for( i = 0; ppsz_path[i]; i++ )
     {
         /* New format */
-        asprintf( &psz_dll, "%s\\%4.4s.dll", ppsz_path[i],
-                  (char *)&p_dec->fmt_in.i_codec );
-        i_result = OpenWin32Dll( p_dec, ppsz_path[i], psz_dll );
-        free( psz_dll );
-        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+        if( asprintf( &psz_dll, "%s\\%4.4s.dll", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec ) != -1 )
+        {
+            i_result = OpenWin32Dll( p_dec, ppsz_path[i], psz_dll );
+            free( psz_dll );
+            if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+        }
 
         /* Old format */
-        asprintf( &psz_dll, "%s\\%4.4s3260.dll", ppsz_path[i],
-                  (char *)&p_dec->fmt_in.i_codec );
-        i_result = OpenWin32Dll( p_dec, ppsz_path[i], psz_dll );
-        free( psz_dll );
-        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+        if( asprintf( &psz_dll, "%s\\%4.4s3260.dll", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec ) != -1 )
+        {
+            i_result = OpenWin32Dll( p_dec, ppsz_path[i], psz_dll );
+            free( psz_dll );
+            if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+        }
     }
 #endif
 
