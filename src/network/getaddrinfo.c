@@ -119,11 +119,11 @@ const char *vlc_gai_strerror (int errnum)
  */
 #ifdef WIN32
 static int WSAAPI
-getnameinfo (const struct sockaddr *sa, socklen_t salen,
+stub_getnameinfo (const struct sockaddr *sa, socklen_t salen,
              char *host, DWORD hostlen, char *serv, DWORD servlen, int flags)
 #else
 static int
-getnameinfo (const struct sockaddr *sa, socklen_t salen,
+stub_getnameinfo (const struct sockaddr *sa, socklen_t salen,
              char *host, int hostlen, char *serv, int servlen, int flags)
 #endif
 {
@@ -165,7 +165,8 @@ getnameinfo (const struct sockaddr *sa, socklen_t salen,
     }
     return 0;
 }
-
+#undef getnameinfo
+#define getnameifo stub_getnameinfo
 #endif /* if !HAVE_GETNAMEINFO */
 
 #ifndef HAVE_GETADDRINFO
@@ -201,9 +202,9 @@ gai_error_from_herrno (void)
  * This functions must be used to free the memory allocated by getaddrinfo().
  */
 #ifdef WIN32
-static void WSAAPI freeaddrinfo (struct addrinfo *res)
+static void WSAAPI stub_freeaddrinfo (struct addrinfo *res)
 #else
-static void freeaddrinfo (struct addrinfo *res)
+static void stub_freeaddrinfo (struct addrinfo *res)
 #endif
 {
     if (res == NULL)
@@ -286,11 +287,11 @@ makeipv4info (int type, int proto, u_long ip, u_short port, const char *name)
  */
 #ifdef WIN32
 static int WSAAPI
-getaddrinfo (const char *node, const char *service,
+stub_getaddrinfo (const char *node, const char *service,
              const struct addrinfo *hints, struct addrinfo **res)
 #else
 static int
-getaddrinfo (const char *node, const char *service,
+stub_getaddrinfo (const char *node, const char *service,
              const struct addrinfo *hints, struct addrinfo **res)
 #endif
 {
@@ -437,6 +438,10 @@ getaddrinfo (const char *node, const char *service,
 
     return 0;
 }
+#undef getaddrinfo
+#define getaddrifo stub_getaddrinfo
+#undef freeaddrinfo
+#define freeaddrifo stub_freeaddrinfo
 #endif /* if !HAVE_GETADDRINFO */
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
@@ -490,8 +495,7 @@ static WSAAPI int _ws2_getnameinfo_bind( const struct sockaddr FAR * sa, socklen
     if (entry == NULL)
     {
         /* not found, use replacement API instead */
-    entry = getnameinfo;
-
+        entry = stub_getnameinfo;
     }
     /* call API before replacing function pointer to avoid crash */
     result = entry (sa, salen, host, hostlen, serv, servlen, flags);
@@ -514,8 +518,8 @@ static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *se
     if ((entry == NULL) ||  (freentry == NULL))
     {
         /* not found, use replacement API instead */
-        entry = getaddrinfo;
-        freentry = freeaddrinfo;
+        entry = stub_getaddrinfo;
+        freentry = stub_freeaddrinfo;
     }
     /* call API before replacing function pointer to avoid crash */
     result = entry (node, service, hints, res);
@@ -529,7 +533,6 @@ static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *se
 #define freeaddrinfo ws2_freeaddrinfo
 #define HAVE_GETADDRINFO
 #endif
-
 
 
 int vlc_getnameinfo( const struct sockaddr *sa, int salen,
