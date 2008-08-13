@@ -58,6 +58,8 @@ dnl
 AC_PROG_CC_C99
 AC_USE_SYSTEM_EXTENSIONS
 AC_DEFINE([_FORTIFY_SOURCE], 2, [Define to '2' to get glibc warnings.])
+AC_DEFINE([_WIN32_WINNT], 0x0500, [Define to '0x0500' for Windows 2000 APIs.])
+
 AM_PROG_CC_C_O
 AC_PROG_CXX
 AC_PROG_CPP
