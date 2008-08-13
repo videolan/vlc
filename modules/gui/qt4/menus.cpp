@@ -850,6 +850,25 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 action->setCheckable( true );
                 action->setChecked( mi->isFullScreen() );
             }
+            else /* We are using the skins interface.
+                    If not, this entry will not show. */
+            {
+                objects.clear();
+                varnames.clear();
+                vlc_object_t *p_object = ( vlc_object_t* )
+                     vlc_object_find( p_intf, VLC_OBJECT_INTF, FIND_PARENT );
+                if( p_object )
+                {
+                    objects.push_back( p_object->i_object_id );
+                    varnames.push_back( "intf-skins" );
+                    Populate( p_intf, submenu, varnames, objects );
+                    vlc_object_release( p_object );
+                }
+                else
+                {
+                    msg_Dbg( p_intf, "could not find parent interface" );
+                }
+            }
             menu->addMenu( submenu );
         }
 
