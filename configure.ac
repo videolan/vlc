@@ -1708,7 +1708,8 @@ dnl
 dnl Growl notification plugin
 dnl
 AC_ARG_ENABLE(growl,
-  [  --enable-growl          growl notification plugin (default enabled)])
+  [  --enable-growl          growl notification plugin (default disabled)],,
+  [enable_growl=no])
 AS_IF([test "${enable_growl}" != "no"], [
     VLC_ADD_PLUGIN([growl_udp])
     AC_CHECK_HEADERS(Growl/GrowlDefines.h, [
