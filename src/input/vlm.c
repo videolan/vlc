@@ -124,19 +124,17 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         char *psz_buffer = NULL;
 
         msg_Dbg( p_this, "loading VLM configuration" );
-        if( asprintf(&psz_buffer, "load %s", psz_vlmconf ) == -1 )
-            psz_buffer = NULL;
-        if( psz_buffer )
+        if( asprintf(&psz_buffer, "load %s", psz_vlmconf ) != -1 )
         {
             msg_Dbg( p_this, psz_buffer );
             if( vlm_ExecuteCommand( p_vlm, psz_buffer, &p_message ) )
                 msg_Warn( p_this, "error while loading the configuration file" );
 
-            vlm_MessageDelete(p_message);
-            free(psz_buffer);
+            vlm_MessageDelete( p_message );
+            free( psz_buffer );
         }
     }
-    free(psz_vlmconf);
+    free( psz_vlmconf );
 
     vlc_object_set_destructor( p_vlm, (vlc_destructor_t)vlm_Destructor );
     *pp_vlm = p_vlm; /* for future reference */
@@ -510,17 +508,19 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             else
                 psz_output = strdup( "#description" );
 
-            if( psz_output && asprintf( &psz_dup, "sout=%s", psz_output) != -1 )
+            if( psz_output && asprintf( &psz_dup, "sout=%s", psz_output ) != -1 )
             {
                 input_ItemAddOption( p_media->vod.p_item, psz_dup );
-                free( psz_output );
                 free( psz_dup );
             }
+            free( psz_output );
+
             for( i = 0; i < p_cfg->i_option; i++ )
                 input_ItemAddOption( p_media->vod.p_item,
                                      p_cfg->ppsz_option[i] );
 
-            asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name );
+            if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
+                psz_header = NULL;
 
             if( (p_input = input_CreateThreadExtended( p_vlm, p_media->vod.p_item, psz_header, NULL ) ) )
             {
@@ -804,12 +804,14 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         if( p_cfg->psz_output != NULL || psz_vod_output != NULL )
         {
             char *psz_buffer;
-            asprintf( &psz_buffer, "sout=%s%s%s",
+            if( asprintf( &psz_buffer, "sout=%s%s%s",
                       p_cfg->psz_output ? p_cfg->psz_output : "",
                       (p_cfg->psz_output && psz_vod_output) ? ":" : psz_vod_output ? "#" : "",
-                      psz_vod_output ? psz_vod_output : "" );
-            input_ItemAddOption( p_instance->p_item, psz_buffer );
-            free( psz_buffer );
+                      psz_vod_output ? psz_vod_output : "" ) != -1 )
+            {
+                input_ItemAddOption( p_instance->p_item, psz_buffer );
+                free( psz_buffer );
+            }
         }
 
         for( i = 0; i < p_cfg->i_option; i++ )
@@ -849,14 +851,16 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     p_instance->i_index = i_input_index;
     input_item_SetURI( p_instance->p_item, p_media->cfg.ppsz_input[p_instance->i_index] ) ;
 
-    asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name );
-    p_instance->p_input = input_CreateThreadExtended( p_vlm, p_instance->p_item, psz_log, p_instance->p_sout );
-    if( !p_instance->p_input )
+    if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
-        TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
-        vlm_MediaInstanceDelete( p_instance );
+        p_instance->p_input = input_CreateThreadExtended( p_vlm, p_instance->p_item, psz_log, p_instance->p_sout );
+        if( !p_instance->p_input )
+        {
+            TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
+            vlm_MediaInstanceDelete( p_instance );
+        }
+        free( psz_log );
     }
-    free( psz_log );
 
     return VLC_SUCCESS;
 }
