@@ -365,6 +365,9 @@ static void ConvertToUTF16( const char *psz_utf8_str, uint32_t *pi_strlen, UniCh
     int           i_string_length;
 
     p_cfString = CFStringCreateWithCString( NULL, psz_utf8_str, kCFStringEncodingUTF8 );
+    if( !p_cfString )
+        return;
+
     i_string_length = CFStringGetLength( p_cfString );
 
     if( pi_strlen )
