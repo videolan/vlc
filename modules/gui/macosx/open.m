@@ -216,6 +216,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_noInstance_lbl setStringValue: _NS("EyeTV is not launched")];
     [o_eyetv_noInstanceLong_lbl setStringValue: _NS("VLC could not connect to EyeTV.\nMake sure that you installed VLC's EyeTV plugin.")];
     [o_eyetv_launchEyeTV_btn setTitle: _NS("Launch EyeTV now")];
+    [o_eyetv_getPlugin_btn setTitle: _NS("Download Plugin")];
 
     [self setSubPanel];
 
@@ -919,6 +920,11 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)eyetvLaunch:(id)sender
 {
     [[[VLCMain sharedInstance] getEyeTVController] launchEyeTV];
+}
+
+- (IBAction)eyetvGetPlugin:(id)sender
+{
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: @"http://www.videolan.org/eyetv"]];
 }
 
 - (void)eyetvChanged:(NSNotification *)o_notification

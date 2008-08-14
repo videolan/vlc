@@ -265,6 +265,7 @@
         },
                 {
             ACTIONS =             {
+                eyetvGetPlugin = id;
                 eyetvLaunch = id;
                 eyetvSwitchChannel = id;
                 openCaptureModeChanged = id;
@@ -316,6 +317,7 @@
                 "o_eyetv_chn_bgbar" = id;
                 "o_eyetv_chn_status_txt" = id;
                 "o_eyetv_currentChannel_lbl" = id;
+                "o_eyetv_getPlugin_btn" = id;
                 "o_eyetv_launchEyeTV_btn" = id;
                 "o_eyetv_nextProgram_btn" = id;
                 "o_eyetv_noInstanceLong_lbl" = id;
