@@ -122,7 +122,13 @@ typedef pthread_cond_t  vlc_cond_t;
 typedef pthread_key_t   vlc_threadvar_t;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-typedef HANDLE  vlc_thread_t;
+typedef struct
+{
+    HANDLE handle;
+    void  *(*entry) (void *);
+    void  *data;
+} *vlc_thread_t;
+
 typedef HANDLE  vlc_mutex_t;
 typedef HANDLE  vlc_cond_t;
 typedef DWORD   vlc_threadvar_t;
@@ -169,6 +175,9 @@ VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( vlc_object_t * ), int, bool ) );
 VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
+
+VLC_EXPORT( int, vlc_clone, (vlc_thread_t *, void * (*) (void *), void *, int) );
+VLC_EXPORT( int, vlc_join, (vlc_thread_t, void **) );
 
 #define vlc_thread_ready vlc_object_signal
 

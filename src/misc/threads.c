@@ -1,7 +1,7 @@
 /*****************************************************************************
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
- * Copyright (C) 1999-2007 the VideoLAN team
+ * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
@@ -438,21 +438,165 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 #endif
 }
 
+#if defined (LIBVLC_USE_PTHREAD)
+#elif defined (WIN32)
+static unsigned __stdcall vlc_entry (void *data)
+{
+    vlc_thread_t self = data;
+    self->data = self->entry (self->data);
+    return 0;
+}
+#endif
+
+/**
+ * Creates and starts new thread.
+ *
+ * @param p_handle [OUT] pointer to write the handle of the created thread to
+ * @param entry entry point for the thread
+ * @param data data parameter given to the entry point
+ * @param priority thread priority value
+ * @return 0 on success, a standard error code on error.
+ */
+int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
+               int priority)
+{
+    int ret;
+
+#if defined( LIBVLC_USE_PTHREAD )
+    pthread_attr_t attr;
+    pthread_attr_init (&attr);
+
+    /* Block the signals that signals interface plugin handles.
+     * If the LibVLC caller wants to handle some signals by itself, it should
+     * block these before whenever invoking LibVLC. And it must obviously not
+     * start the VLC signals interface plugin.
+     *
+     * LibVLC will normally ignore any interruption caused by an asynchronous
+     * signal during a system call. But there may well be some buggy cases
+     * where it fails to handle EINTR (bug reports welcome). Some underlying
+     * libraries might also not handle EINTR properly.
+     */
+    sigset_t oldset;
+    {
+        sigset_t set;
+        sigemptyset (&set);
+        sigdelset (&set, SIGHUP);
+        sigaddset (&set, SIGINT);
+        sigaddset (&set, SIGQUIT);
+        sigaddset (&set, SIGTERM);
+
+        sigaddset (&set, SIGPIPE); /* We don't want this one, really! */
+        pthread_sigmask (SIG_BLOCK, &set, &oldset);
+    }
+    {
+        struct sched_param sp = { .sched_priority = priority, };
+        int policy;
+
+        if (sp.sched_priority <= 0)
+            sp.sched_priority += sched_get_priority_max (policy = SCHED_OTHER);
+        else
+            sp.sched_priority += sched_get_priority_min (policy = SCHED_RR);
+
+        pthread_attr_setschedpolicy (&attr, policy);
+        pthread_attr_setschedparam (&attr, &sp);
+    }
+
+    ret = pthread_create (p_handle, &attr, entry, data);
+    pthread_sigmask (SIG_SETMASK, &oldset, NULL);
+    pthread_attr_destroy (&attr);
+
+#elif defined( WIN32 ) || defined( UNDER_CE )
+    /* When using the MSVCRT C library you have to use the _beginthreadex
+     * function instead of CreateThread, otherwise you'll end up with
+     * memory leaks and the signal functions not working (see Microsoft
+     * Knowledge Base, article 104641) */
+    HANDLE hThread;
+    vlc_thread_t th = malloc (sizeof (*p_handle));
+
+    if (th == NULL)
+        return ENOMEM;
+
+    th->data = data;
+    th->entry = entry;
+#if defined( UNDER_CE )
+    hThread = CreateThread (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
+#else
+    hThread = (HANDLE)(uintptr_t)
+        _beginthreadex (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
+#endif
+
+    if (hThread)
+    {
+        ResumeThread (hThread);
+        th->handle = hThread;
+        if (priority)
+            SetThreadPriority (hThread, priority);
+        ret = 0;
+    }
+    else
+    {
+        ret = errno;
+        free (th);
+        th = NULL;
+    }
+    *p_handle = th;
+
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    *p_handle = spawn_thread( entry, psz_name, priority, data );
+    ret = resume_thread( *p_handle );
+
+#endif
+    return ret;
+}
+
+/**
+ * Waits for a thread to complete (if needed), and destroys it.
+ * @param handle thread handle
+ * @param p_result [OUT] pointer to write the thread return value or NULL
+ * @return 0 on success, a standard error code otherwise.
+ */
+int vlc_join (vlc_thread_t handle, void **result)
+{
+#if defined( LIBVLC_USE_PTHREAD )
+    return pthread_join (handle, result);
+
+#elif defined( UNDER_CE ) || defined( WIN32 )
+    HANDLE hThread;
+
+    /*
+    ** object will close its thread handle when destroyed, duplicate it here
+    ** to be on the safe side
+    */
+    if (!DuplicateHandle (GetCurrentProcess (), handle->handle,
+                          GetCurrentProcess(), &hThread, 0, FALSE,
+                          DUPLICATE_SAME_ACCESS))
+        return GetLastError (); /* FIXME: errno */
+
+    WaitForSingleObject (hThread, INFINITE);
+    CloseHandle (hThread);
+    if (result)
+        *result = handle->data;
+    free (handle);
+    return 0;
+
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    int32_t exit_value;
+    ret = (B_OK == wait_for_thread( p_priv->thread_id, &exit_value ));
+    if( !ret && result )
+        *result = (void *)exit_value;
+
+    return ret;
+#endif
+}
+
+
 struct vlc_thread_boot
 {
     void * (*entry) (vlc_object_t *);
     vlc_object_t *object;
 };
 
-#if defined (LIBVLC_USE_PTHREAD)
-# define THREAD_RTYPE void *
-# define THREAD_RVAL  NULL
-#elif defined (WIN32)
-# define THREAD_RTYPE __stdcall unsigned
-# define THREAD_RVAL 0
-#endif
-
-static THREAD_RTYPE thread_entry (void *data)
+static void *thread_entry (void *data)
 {
     vlc_object_t *obj = ((struct vlc_thread_boot *)data)->object;
     void *(*func) (vlc_object_t *) = ((struct vlc_thread_boot *)data)->entry;
@@ -465,7 +609,7 @@ static THREAD_RTYPE thread_entry (void *data)
     func (obj);
     msg_Dbg (obj, "thread ended");
 
-    return THREAD_RVAL;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -493,85 +637,17 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     assert( !p_priv->b_thread );
 
 #if defined( LIBVLC_USE_PTHREAD )
-    pthread_attr_t attr;
-    pthread_attr_init (&attr);
-
-    /* Block the signals that signals interface plugin handles.
-     * If the LibVLC caller wants to handle some signals by itself, it should
-     * block these before whenever invoking LibVLC. And it must obviously not
-     * start the VLC signals interface plugin.
-     *
-     * LibVLC will normally ignore any interruption caused by an asynchronous
-     * signal during a system call. But there may well be some buggy cases
-     * where it fails to handle EINTR (bug reports welcome). Some underlying
-     * libraries might also not handle EINTR properly.
-     */
-    sigset_t set, oldset;
-    sigemptyset (&set);
-    sigdelset (&set, SIGHUP);
-    sigaddset (&set, SIGINT);
-    sigaddset (&set, SIGQUIT);
-    sigaddset (&set, SIGTERM);
-
-    sigaddset (&set, SIGPIPE); /* We don't want this one, really! */
-    pthread_sigmask (SIG_BLOCK, &set, &oldset);
-
 #ifndef __APPLE__
     if( config_GetInt( p_this, "rt-priority" ) > 0 )
 #endif
     {
-        struct sched_param p = { .sched_priority = i_priority, };
-        int policy;
-
         /* Hack to avoid error msg */
         if( config_GetType( p_this, "rt-offset" ) )
-            p.sched_priority += config_GetInt( p_this, "rt-offset" );
-        if( p.sched_priority <= 0 )
-            p.sched_priority += sched_get_priority_max (policy = SCHED_OTHER);
-        else
-            p.sched_priority += sched_get_priority_min (policy = SCHED_RR);
-
-        pthread_attr_setschedpolicy (&attr, policy);
-        pthread_attr_setschedparam (&attr, &p);
+            i_priority += config_GetInt( p_this, "rt-offset" );
     }
-
-    i_ret = pthread_create( &p_priv->thread_id, &attr, thread_entry, boot );
-    pthread_sigmask (SIG_SETMASK, &oldset, NULL);
-    pthread_attr_destroy (&attr);
-
-#elif defined( WIN32 ) || defined( UNDER_CE )
-    /* When using the MSVCRT C library you have to use the _beginthreadex
-     * function instead of CreateThread, otherwise you'll end up with
-     * memory leaks and the signal functions not working (see Microsoft
-     * Knowledge Base, article 104641) */
-#if defined( UNDER_CE )
-    HANDLE hThread = CreateThread( NULL, 0, thread_entry,
-                                  (LPVOID)boot, CREATE_SUSPENDED, NULL );
-#else
-    HANDLE hThread = (HANDLE)(uintptr_t)
-        _beginthreadex( NULL, 0, thread_entry, boot, CREATE_SUSPENDED, NULL );
-#endif
-    if( hThread )
-    {
-        p_priv->thread_id = hThread;
-        ResumeThread (hThread);
-        i_ret = 0;
-        if( i_priority && !SetThreadPriority (hThread, i_priority) )
-        {
-            msg_Warn( p_this, "couldn't set a faster priority" );
-            i_priority = 0;
-        }
-    }
-    else
-        i_ret = errno;
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    p_priv->thread_id = spawn_thread( (thread_func)thread_entry, psz_name,
-                                      i_priority, p_data );
-    i_ret = resume_thread( p_priv->thread_id );
-
 #endif
 
+    i_ret = vlc_clone( &p_priv->thread_id, thread_entry, boot, i_priority );
     if( i_ret == 0 )
     {
         if( b_wait )
@@ -645,7 +721,7 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 #elif defined( WIN32 ) || defined( UNDER_CE )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( !SetThreadPriority(p_priv->thread_id, i_priority) )
+    if( !SetThreadPriority(p_priv->thread_id->handle, i_priority) )
     {
         msg_Warn( p_this, "couldn't set a faster priority" );
         return 1;
@@ -673,22 +749,15 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
         i_ret = pthread_detach (p_priv->thread_id);
     }
     else
-        i_ret = pthread_join (p_priv->thread_id, NULL);
+        i_ret = vlc_join (p_priv->thread_id, NULL);
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    HMODULE hmodule;
-    BOOL (WINAPI *OurGetThreadTimes)( HANDLE, FILETIME*, FILETIME*,
-                                      FILETIME*, FILETIME* );
+    HANDLE hThread;
     FILETIME create_ft, exit_ft, kernel_ft, user_ft;
     int64_t real_time, kernel_time, user_time;
-    HANDLE hThread;
 
-    /*
-    ** object will close its thread handle when destroyed, duplicate it here
-    ** to be on the safe side
-    */
     if( ! DuplicateHandle(GetCurrentProcess(),
-            p_priv->thread_id,
+            p_priv->thread_id->handle,
             GetCurrentProcess(),
             &hThread,
             0,
@@ -700,20 +769,9 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
         goto error;
     }
 
-    WaitForSingleObject( hThread, INFINITE );
+    vlc_join( p_priv->thread_id, NULL );
 
-#if defined( UNDER_CE )
-    hmodule = GetModuleHandle( _T("COREDLL") );
-#else
-    hmodule = GetModuleHandle( _T("KERNEL32") );
-#endif
-    OurGetThreadTimes = (BOOL (WINAPI*)( HANDLE, FILETIME*, FILETIME*,
-                                         FILETIME*, FILETIME* ))
-        GetProcAddress( hmodule, _T("GetThreadTimes") );
-
-    if( OurGetThreadTimes &&
-        OurGetThreadTimes( hThread,
-                           &create_ft, &exit_ft, &kernel_ft, &user_ft ) )
+    if( GetThreadTimes( hThread, &create_ft, &exit_ft, &kernel_ft, &user_ft ) )
     {
         real_time =
           ((((int64_t)exit_ft.dwHighDateTime)<<32)| exit_ft.dwLowDateTime) -
@@ -740,9 +798,8 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     CloseHandle( hThread );
 error:
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    int32_t exit_value;
-    i_ret = (B_OK == wait_for_thread( p_priv->thread_id, &exit_value ));
+#else
+    i_ret = vlc_join( p_priv->thread_id, NULL );
 
 #endif
 
