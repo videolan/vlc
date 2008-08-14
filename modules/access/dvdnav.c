@@ -1352,6 +1352,7 @@ static void* EventThread( vlc_object_t *p_this )
 static int EventMouse( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)p_this;    (void)oldval;    (void)newval;    (void)p_data;
     event_thread_t *p_ev = p_data;
     vlc_mutex_lock( &p_ev->lock );
     if( psz_var[6] == 'c' )
@@ -1366,6 +1367,7 @@ static int EventMouse( vlc_object_t *p_this, char const *psz_var,
 static int EventKey( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)p_this;    (void)psz_var;    (void)oldval;
     event_thread_t *p_ev = p_data;
     vlc_mutex_lock( &p_ev->lock );
     p_ev->i_key_action = newval.i_int;
@@ -1379,6 +1381,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
  *****************************************************************************/
 static int ProbeDVD( demux_t *p_demux, char *psz_name )
 {
+    (void)p_demux;
 #ifdef HAVE_SYS_STAT_H
     struct stat stat_info;
     uint8_t pi_anchor[2];

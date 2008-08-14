@@ -1140,6 +1140,7 @@ static void DemuxClose( vlc_object_t *p_this )
 
 static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
 {
+    (void)p_this;
     /* Close */
     if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
 #ifdef HAVE_ALSA
@@ -3474,6 +3475,7 @@ static int DemuxControlCallback( vlc_object_t *p_this,
     const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
     void *p_data )
 {
+    (void)oldval;
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_cid = (int)p_data;
@@ -3489,9 +3491,9 @@ static int DemuxControlCallback( vlc_object_t *p_this,
 }
 
 static int DemuxControlResetCallback( vlc_object_t *p_this,
-    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
-    void *p_data )
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_var;    (void)oldval;    (void)newval;    (void)p_data;
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -3509,6 +3511,7 @@ static int AccessControlCallback( vlc_object_t *p_this,
     const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
     void *p_data )
 {
+    (void)oldval;
     access_t *p_access = (access_t *)p_this;
     demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
     int i_cid = (int)p_data;
@@ -3524,9 +3527,9 @@ static int AccessControlCallback( vlc_object_t *p_this,
 }
 
 static int AccessControlResetCallback( vlc_object_t *p_this,
-    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
-    void *p_data )
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_var;     (void)oldval;     (void)newval;     (void)p_data;
     access_t *p_access = (access_t *)p_this;
     demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
 
