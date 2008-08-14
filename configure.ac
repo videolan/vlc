@@ -869,7 +869,7 @@ dnl Check for hal
 AC_ARG_ENABLE(hal,
   [  --enable-hal            Linux HAL services discovery (default enabled)])
  
-if test "${enable_hal}" != "no"
+if test "${enable_hal}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 then
   PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
     [
@@ -887,7 +887,7 @@ AC_ARG_ENABLE(dbus,
   [  --enable-dbus           Linux D-BUS message bus system (default enabled)])
 case "${SYS}" in
     linux*|*bsd*)
-if test "${enable_dbus}" != "no"
+if test "${enable_dbus}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 then
   dnl api stable dbus
   PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.0.0,
