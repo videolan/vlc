@@ -2098,43 +2098,13 @@ end:
 }
 
 #pragma mark Crash Log
-<<<<<<< HEAD:modules/gui/macosx/intf.m
-- (void)mailCrashLog:(NSString *)crashLog withUserComment:(NSString *)userComment
-{
-    static char mail[] =
-        "From: vlcuser <vlcuser@videolan.org>\n"
-        "To: VideoLAN Crash Report <apple-bugreport@videolan.org>\n"
-        "Subject: %@\n"
-        "Content-Type: text/plain; charset=UTF-8; format=flowed\n"
-        "Content-Transfer-Encoding: 8bit\n"
-        "\n"
-        "%@\n\n"
-        "User Comment:\n%@\n--------------\n"
-        "\n"
-        "Crash log:\n%@\n--------------\n"
-        "\n"
-        "\n";
-    NSString * mailPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"vlc_crash_mail.eml"];
-    NSString * mailContent = [NSString stringWithFormat:[NSString stringWithUTF8String:mail],
-        _NS("Crash Report (Type Command-shift-D and hit send)"),
-        _NS("Type Command-shift-D (or in Menu \"Message\">\"Send Again\") and hit the \"Send Mail\" button."),
-        userComment, crashLog];
-    BOOL ret = [mailContent writeToFile:mailPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-    if( !ret )
-    {
-        NSRunAlertPanel(_NS("Error when generating crash report mail."), _NS("Can't prepare crash log mail"), _NS("OK"), nil, nil, nil );
-        return;
-    }
-=======
 - (void)sendCrashLog:(NSString *)crashLog withUserComment:(NSString *)userComment
 {
     NSString *urlStr = @"http://jones.videolan.org/crashlog/sendcrashreport.php";
-
     NSURL *url = [NSURL URLWithString:urlStr];
-    NSString *requestMethod = @"POST";
 
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
-    [req setHTTPMethod:requestMethod];
+    [req setHTTPMethod:@"POST"];
 
     ABPerson * contact = [[ABAddressBook sharedAddressBook] me];
 
@@ -2146,12 +2116,8 @@ end:
     postBody = [NSString stringWithFormat:@"CrashLog=%@&Comment=Nothing&Email=%@\r\n",
             [crashLog stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
             [email stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
->>>>>>> macosx: Send crashes reports without going though Mail.app but through Jones.:modules/gui/macosx/intf.m
 
     [req setHTTPBody:[postBody dataUsingEncoding:NSUTF8StringEncoding]];
-
-    NSHTTPURLResponse *res = nil;
-    NSError *err = nil;
 
     /* Released from delegate */
     NSURLConnection *theConnection = [[NSURLConnection alloc] initWithRequest:req delegate:self];
