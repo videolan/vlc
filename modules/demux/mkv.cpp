@@ -520,8 +520,8 @@ class vlc_stream_io_callback: public IOCallback
 {
   private:
     stream_t       *s;
-    bool     mb_eof;
-    bool     b_owner;
+    bool           mb_eof;
+    bool           b_owner;
 
   public:
     vlc_stream_io_callback( stream_t *, bool );
@@ -569,8 +569,8 @@ class EbmlParser
     EbmlElement *m_got;
 
     int         mi_user_level;
-    bool  mb_keep;
-    bool  mb_dummy;
+    bool        mb_keep;
+    bool        mb_dummy;
 };
 
 
@@ -590,8 +590,8 @@ typedef struct
 {
 //    ~mkv_track_t();
 
-    bool   b_default;
-    bool   b_enabled;
+    bool         b_default;
+    bool         b_enabled;
     unsigned int i_number;
 
     int          i_extra_data;
@@ -611,14 +611,14 @@ typedef struct
     /* audio */
     unsigned int i_original_rate;
 
-    bool      b_inited;
+    bool            b_inited;
     /* data to be send first */
     int             i_data_init;
     uint8_t         *p_data_init;
 
     /* hack : it's for seek */
-    bool      b_search_keyframe;
-    bool      b_silent;
+    bool            b_search_keyframe;
+    bool            b_silent;
 
     /* informative */
     const char   *psz_codec_name;
@@ -640,7 +640,7 @@ typedef struct
     int64_t i_position;
     int64_t i_time;
 
-    bool b_key;
+    bool       b_key;
 } mkv_index_t;
 
 class demux_sys_t;
@@ -1299,8 +1299,8 @@ typedef struct
     demux_t        *p_demux;
     vlc_mutex_t     lock;
 
-    bool      b_moved;
-    bool      b_clicked;
+    bool            b_moved;
+    bool            b_clicked;
     int             i_key_action;
 
 } event_thread_t;
@@ -1950,7 +1950,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 
     size_t          i_track;
     unsigned int    i;
-    bool      b;
+    bool            b;
 
 #define tk  p_segment->tracks[i_track]
     for( i_track = 0; i_track < p_segment->tracks.size(); i_track++ )
