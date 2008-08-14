@@ -135,9 +135,9 @@ static int Create( vlc_object_t *p_this )
 
     /* Allocate the memory needed to store the module's structure */
     p_sys = malloc( sizeof(filter_sys_t) );
-    p_filter->p_sys = (struct aout_filter_sys_t *)p_sys;
     if( p_sys == NULL )
         return VLC_ENOMEM;
+    p_filter->p_sys = (struct aout_filter_sys_t *)p_sys;
 
     /* Calculate worst case for the length of the filter wing */
     d_factor = (double)p_filter->output.i_rate
@@ -156,6 +156,7 @@ static int Create( vlc_object_t *p_this )
     }
 
     p_sys->i_old_wing = 0;
+    p_sys->b_filter2 = false;           /* It seams to be a good valuefor this module */
     p_filter->pf_do_work = DoWork;
 
     /* We don't want a new buffer to be created because we're not sure we'll
