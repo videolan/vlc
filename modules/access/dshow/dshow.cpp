@@ -578,6 +578,8 @@ static int DemuxOpen( vlc_object_t *p_this )
     int i;
 
     p_sys = (access_sys_t *)malloc( sizeof( access_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     memset( p_sys, 0, sizeof( access_sys_t ) );
     p_demux->p_sys = (demux_sys_t *)p_sys;
 
@@ -660,6 +662,8 @@ static int AccessOpen( vlc_object_t *p_this )
     access_sys_t *p_sys;
 
     p_access->p_sys = p_sys = (access_sys_t *)malloc( sizeof( access_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     memset( p_sys, 0, sizeof( access_sys_t ) );
 
     if( CommonOpen( p_this, p_sys, false ) != VLC_SUCCESS )
