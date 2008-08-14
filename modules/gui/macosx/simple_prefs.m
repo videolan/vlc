@@ -65,8 +65,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_hotkeyDescriptions release];
     [o_hotkeysNonUseableKeys release];
 
-    if( o_keyInTransition )
-        [o_keyInTransition release];
+    [o_keyInTransition release];
 
     [super dealloc];
 }
