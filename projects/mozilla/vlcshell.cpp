@@ -182,7 +182,6 @@ int16 NPP_HandleEvent( NPP instance, void * event )
             {
                 /* double click */
                 libvlc_instance_t *p_vlc = p_plugin->getVLC();
-
                 if( p_vlc )
                 {
                     if( libvlc_playlist_isplaying(p_vlc, NULL) )
@@ -365,7 +364,7 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
 NPError NPP_SetWindow( NPP instance, NPWindow* window )
 {
-#ifdef XP_UNIX && !defined(__APPLE__)
+#if defined(XP_UNIX) && !defined(__APPLE__)
     Window control;
     unsigned int i_control_height = 0, i_control_width = 0;
 #endif
@@ -382,7 +381,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         /* we should probably show a splash screen here */
         return NPERR_NO_ERROR;
     }
-#ifdef XP_UNIX && !defined(__APPLE__)
+#if defined(XP_UNIX) && !defined(__APPLE__)
     control = p_plugin->getControlWindow();
 #endif
     libvlc_instance_t *p_vlc = p_plugin->getVLC();
@@ -847,7 +846,6 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
         libvlc_exception_clear( &ex );
 
-        libvlc_exception_init( &ex );
         i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
         if( libvlc_exception_raised(&ex) )
             fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
@@ -860,7 +858,6 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             case clicked_Play:
             case clicked_Pause:
             {
-                libvlc_exception_init( &ex );
                 if( i_playing == 1 )
                     libvlc_playlist_pause( p_plugin->getVLC(), &ex );
                 else
@@ -874,7 +871,6 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
 
             case clicked_Stop:
             {
-                libvlc_exception_init( &ex );
                 libvlc_playlist_stop( p_plugin->getVLC(), &ex );
                 if( libvlc_exception_raised(&ex) )
                     fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
@@ -886,7 +882,6 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             {
                 if( (i_playing == 1) && p_md )
                 {
-                    libvlc_exception_init( &ex );
                     libvlc_set_fullscreen( p_md, 1, &ex );
                     if( libvlc_exception_raised(&ex) )
                         fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
@@ -898,7 +893,6 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             case clicked_Mute:
             case clicked_Unmute:
             {
-                libvlc_exception_init( &ex );
                 libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
                 if( libvlc_exception_raised(&ex) )
                     fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
@@ -912,14 +906,12 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
                 if( p_md )
                 {
                     int64_t f_length;
-                    libvlc_exception_init( &ex );
                     f_length = libvlc_media_player_get_length( p_md, &ex ) / 100;
                     libvlc_exception_clear( &ex );
 
                     f_length = (float)f_length *
                             ( ((float)i_xPos-4.0 ) / ( ((float)i_width-8.0)/100) );
 
-                    libvlc_exception_init( &ex );
                     libvlc_media_player_set_time( p_md, f_length, &ex );
                     if( libvlc_exception_raised(&ex) )
                         fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));

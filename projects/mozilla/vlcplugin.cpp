@@ -191,6 +191,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         libvlc_exception_clear(&ex);
         return NPERR_GENERIC_ERROR;
     }
+    libvlc_exception_clear(&ex);
 
     /*
     ** fetch plugin base URL, which is the URL of the page containing the plugin
@@ -579,19 +580,16 @@ void VlcPlugin::redrawToolbar()
     libvlc_exception_clear( &ex );
 
     /* get isplaying */
-    libvlc_exception_init( &ex );
     i_playing = libvlc_playlist_isplaying( getVLC(), &ex );
     libvlc_exception_clear( &ex );
 
     /* get mute info */
-    libvlc_exception_init(&ex);
     b_mute = libvlc_audio_get_mute( getVLC(), &ex );
     libvlc_exception_clear( &ex );
 
     /* get movie position in % */
     if( i_playing == 1 )
     {
-        libvlc_exception_init( &ex );
         f_position = libvlc_media_player_get_position( p_md, &ex ) * 100;
         libvlc_exception_clear( &ex );
     }
@@ -698,7 +696,6 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
     libvlc_exception_clear( &ex );
 
     /* get mute info */
-    libvlc_exception_init(&ex);
     b_mute = libvlc_audio_get_mute( getVLC(), &ex );
     libvlc_exception_clear( &ex );
 
