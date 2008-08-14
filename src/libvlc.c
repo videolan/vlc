@@ -268,6 +268,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #endif
 #endif
 
+#if defined (WIN32) && !defined (NDEBUG)
+    ShowConsole (true);
+#endif
+
     /* System specific initialization code */
     system_Init( p_libvlc, &i_argc, ppsz_argv );
 
