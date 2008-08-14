@@ -417,6 +417,7 @@ int vlc_threadvar_create( vlc_threadvar_t *p_tls, void (*destr) (void *) )
 #elif defined( UNDER_CE )
     i_ret = ENOSYS;
 #elif defined( WIN32 )
+    /* FIXME: remember/use the destr() callback and stop leaking whatever */
     *p_tls = TlsAlloc();
     i_ret = (*p_tls == TLS_OUT_OF_INDEXES) ? EAGAIN : 0;
 #else
