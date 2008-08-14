@@ -88,7 +88,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( base )
         [o_temp_str appendString: [NSString stringWithUTF8String: base]];
     else
-        o_temp_str = _NS("Not Set");
+        o_temp_str = [NSMutableString stringWithString:_NS("Not Set")];
     return o_temp_str;
 }
 
