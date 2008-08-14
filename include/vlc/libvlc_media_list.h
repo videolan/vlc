@@ -164,7 +164,7 @@ VLC_PUBLIC_API libvlc_media_t *
     libvlc_media_list_item_at_index( libvlc_media_list_t *, int,
                                      libvlc_exception_t * );
 /**
- * Find index position of List media instance in media list. 
+ * Find index position of List media instance in media list.
  * Warning: the function will return the first matched position.
  * The libvlc_media_list_lock should be held upon entering this function.
  *
@@ -312,7 +312,7 @@ VLC_PUBLIC_API libvlc_media_list_view_t *
                                            libvlc_exception_t * p_e );
 
 /**
- * Get index position of media instance in media list view. 
+ * Get index position of media instance in media list view.
  * The function will return the first occurence.
  *
  * \param p_mlv a media list view instance
