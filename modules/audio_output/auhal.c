@@ -965,7 +965,7 @@ static void Probe( aout_instance_t * p_aout )
     p_sys->i_default_dev = devid_def;
  
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE );
-    text.psz_string = _("Audio Device");
+    text.psz_string = (char*)_("Audio Device");
     var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
  
     for( i = 0; i < p_sys->i_devices; i++ )
@@ -998,8 +998,9 @@ static void Probe( aout_instance_t * p_aout )
 
         /* Add the menu entries */
         val.i_int = (int)p_devices[i];
-        text.psz_string = strdup( psz_name );
+        text.psz_string = psz_name;
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
+        text.psz_string = NULL;
         if( p_sys->i_default_dev == p_devices[i] )
         {
             /* The default device is the selected device normally */
@@ -1010,14 +1011,17 @@ static void Probe( aout_instance_t * p_aout )
         if( AudioDeviceSupportsDigital( p_aout, p_devices[i] ) )
         {
             val.i_int = (int)p_devices[i] | AOUT_VAR_SPDIF_FLAG;
-            asprintf( &text.psz_string, _("%s (Encoded Output)"), psz_name );
-            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-            if( p_sys->i_default_dev == p_devices[i] && config_GetInt( p_aout, "spdif" ) )
+            if( asprintf( &text.psz_string, _("%s (Encoded Output)"), psz_name ) != -1 )
             {
-                /* We selected to prefer SPDIF output if available
-                 * then this "dummy" entry should be selected */
-                var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-                var_Set( p_aout, "audio-device", val );
+                var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
+                free( text.psz_string );
+                if( p_sys->i_default_dev == p_devices[i] && config_GetInt( p_aout, "spdif" ) )
+                {
+                    /* We selected to prefer SPDIF output if available
+                     * then this "dummy" entry should be selected */
+                    var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+                    var_Set( p_aout, "audio-device", val );
+                }
             }
         }
  
