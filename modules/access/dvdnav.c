@@ -257,7 +257,7 @@ static int Open( vlc_object_t *p_this )
     /* Set menu language ("en")
      * XXX: maybe it would be better to set it like audio/spu
      * or to create a --menu-language option */
-    if( dvdnav_menu_language_select( p_sys->dvdnav, LANGUAGE_DEFAULT ) !=
+    if( dvdnav_menu_language_select( p_sys->dvdnav, (char*)LANGUAGE_DEFAULT ) !=
         DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "can't set menu language to '%s' (%s)",
@@ -273,7 +273,7 @@ static int Open( vlc_object_t *p_this )
                   psz_code, dvdnav_err_to_string( p_sys->dvdnav ) );
         /* We try to fall back to 'en' */
         if( strcmp( psz_code, LANGUAGE_DEFAULT ) )
-            dvdnav_audio_language_select( p_sys->dvdnav, LANGUAGE_DEFAULT );
+            dvdnav_audio_language_select( p_sys->dvdnav, (char*)LANGUAGE_DEFAULT );
     }
     free( psz_code );
 
@@ -286,7 +286,7 @@ static int Open( vlc_object_t *p_this )
                   psz_code, dvdnav_err_to_string( p_sys->dvdnav ) );
         /* We try to fall back to 'en' */
         if( strcmp( psz_code, LANGUAGE_DEFAULT ) )
-            dvdnav_spu_language_select(p_sys->dvdnav, LANGUAGE_DEFAULT );
+            dvdnav_spu_language_select(p_sys->dvdnav, (char*)LANGUAGE_DEFAULT );
     }
     free( psz_code );
 
