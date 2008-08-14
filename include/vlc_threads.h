@@ -123,7 +123,6 @@ typedef pthread_key_t   vlc_threadvar_t;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
 typedef HANDLE  vlc_thread_t;
-typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT) ( HANDLE, HANDLE, DWORD, BOOL );
 typedef HANDLE  vlc_mutex_t;
 typedef HANDLE  vlc_cond_t;
 typedef DWORD   vlc_threadvar_t;
