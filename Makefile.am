@@ -410,9 +410,10 @@ VLC-release.app: vlc
 	for i in vlc.xcodeproj Resources README.MacOSX.rtf ; do \
 	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
 	done
-	for i in  Resources Info.plist; do \
-	  cp -R $(top_builddir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
-	done
+	REVISION=`git-describe` && \
+	cat $(top_builddir)/extras/package/macosx/Info.plist | \
+	sed "s/#REVISION#/$$REVISION/g" > $(top_builddir)/tmp/extras/package/macosx/Info.plist
+	cp -R $(top_builddir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx/
 	for i in AUTHORS COPYING THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
@@ -571,9 +572,10 @@ VLC.app: vlc
 	for i in vlc.xcodeproj Resources README.MacOSX.rtf; do \
 	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
 	done
-	for i in  Resources Info.plist; do \
-	  cp -R $(top_builddir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
-	done
+	REVISION=`git-describe` && \
+	cat $(top_builddir)/extras/package/macosx/Info.plist | \
+	sed "s/#REVISION#/$$REVISION/g" > $(top_builddir)/tmp/extras/package/macosx/Info.plist
+	cp -R $(top_builddir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx/
 	for i in AUTHORS COPYING THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
@@ -634,17 +636,11 @@ VLC.app: vlc
 	    cd ../../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle \
 	          $(top_builddir)/VLC.app
-	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
 	touch $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	chmod +x $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) $(top_builddir)/src/.libs/vlc $(top_builddir)/VLC.app/Contents/MacOS/VLC
-	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
-	find modules/ -name '*_plugin$(LIBEXT)' | while read i; do \
-	  if test -n "$$i" ; \
-	   then ln -sfn "`pwd`/$$i" \
-				   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
-	  fi ; done && \
+	ln -sf ../../../modules $(top_builddir)/VLC.app/Contents/MacOS/modules
 	ln -sfn `pwd`/$(srcdir)/share $(top_builddir)/VLC.app/Contents/MacOS/
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
