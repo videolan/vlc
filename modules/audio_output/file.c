@@ -192,8 +192,10 @@ static int Open( vlc_object_t * p_this )
         if( p_aout->output.p_sys->p_file != stdout )
             fclose( p_aout->output.p_sys->p_file );
         free( p_aout->output.p_sys );
+        free( psz_format );
         return VLC_EGENERIC;
     }
+    free( psz_format );
 
     p_aout->output.output.i_format = format_int[i];
     if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
