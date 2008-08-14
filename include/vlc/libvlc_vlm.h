@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc_vlm.h:  libvlc_* new external API
  *****************************************************************************
- * Copyright (C) 1998-2005 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -24,6 +24,11 @@
 
 #ifndef LIBVLC_VLM_H
 #define LIBVLC_VLM_H 1
+
+/**
+ * \file
+ * This file defines libvlc_vlm_* external API
+ */
 
 # ifdef __cplusplus
 extern "C" {

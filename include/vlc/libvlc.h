@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *          Pierre d'Herbemont <pdherbemont@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,12 +24,16 @@
  *****************************************************************************/
 
 /**
+ * \file
+ * This file defines libvlc external API
+ */
+
+/**
  * \defgroup libvlc libvlc
  * This is libvlc, the base library of the VLC program.
  *
  * @{
  */
-
 
 #ifndef VLC_LIBVLC_H
 #define VLC_LIBVLC_H 1
@@ -527,6 +531,7 @@ VLC_PUBLIC_API libvlc_drawable_t
                     libvlc_media_player_get_drawable ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /** \bug This might go away ... to be replaced by a broader system */
+
 /**
  * Get the current movie length (in ms).
  *
@@ -534,7 +539,8 @@ VLC_PUBLIC_API libvlc_drawable_t
  * \param p_e an initialized exception pointer
  * \return the movie length (in ms).
  */
-VLC_PUBLIC_API libvlc_time_t  libvlc_media_player_get_length     ( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_time_t libvlc_media_player_get_length( libvlc_media_player_t *, libvlc_exception_t *);
+
 /**
  * Get the current movie time (in ms).
  *
@@ -542,7 +548,8 @@ VLC_PUBLIC_API libvlc_time_t  libvlc_media_player_get_length     ( libvlc_media_
  * \param p_e an initialized exception pointer
  * \return the movie time (in ms).
  */
-VLC_PUBLIC_API libvlc_time_t  libvlc_media_player_get_time       ( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t *, libvlc_exception_t *);
+
 /**
  * Set the movie time (in ms).
  *
@@ -550,17 +557,90 @@ VLC_PUBLIC_API libvlc_time_t  libvlc_media_player_get_time       ( libvlc_media_
  * \param the movie time (in ms).
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void           libvlc_media_player_set_time       ( libvlc_media_player_t *, libvlc_time_t, libvlc_exception_t *);
-VLC_PUBLIC_API float          libvlc_media_player_get_position   ( libvlc_media_player_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void           libvlc_media_player_set_position   ( libvlc_media_player_t *, float, libvlc_exception_t *);
-VLC_PUBLIC_API void           libvlc_media_player_set_chapter    ( libvlc_media_player_t *, int, libvlc_exception_t *);
-VLC_PUBLIC_API int            libvlc_media_player_get_chapter    (libvlc_media_player_t *, libvlc_exception_t *);
-VLC_PUBLIC_API int            libvlc_media_player_get_chapter_count( libvlc_media_player_t *, libvlc_exception_t *);
-VLC_PUBLIC_API int            libvlc_media_player_will_play      ( libvlc_media_player_t *, libvlc_exception_t *);
-VLC_PUBLIC_API float          libvlc_media_player_get_rate       ( libvlc_media_player_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void           libvlc_media_player_set_rate       ( libvlc_media_player_t *, float, libvlc_exception_t *);
-VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state   ( libvlc_media_player_t *, libvlc_exception_t *);
-VLC_PUBLIC_API float          libvlc_media_player_get_fps( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_media_player_set_time( libvlc_media_player_t *, libvlc_time_t, libvlc_exception_t *);
+
+/**
+ * Get movie position.
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return movie position
+ */
+VLC_PUBLIC_API float libvlc_media_player_get_position( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Set movie position.
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return movie position
+ */
+VLC_PUBLIC_API void libvlc_media_player_set_position( libvlc_media_player_t *, float, libvlc_exception_t *);
+
+/**
+ * Set movie chapter
+ *
+ * \param p_mi the Media Player
+ * \param i_chapter chapter number to play
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_media_player_set_chapter( libvlc_media_player_t *, int, libvlc_exception_t *);
+
+/**
+ * Get movie chapter
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return chapter number currently playing
+ */
+VLC_PUBLIC_API int libvlc_media_player_get_chapter( libvlc_media_player_t *, libvlc_exception_t * );
+
+/**
+ * Get movie chapter count
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return number of chapters in movie
+ */
+VLC_PUBLIC_API int libvlc_media_player_get_chapter_count( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_media_player_will_play        ( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Get movie play rate
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return movie play rate
+ */
+VLC_PUBLIC_API float libvlc_media_player_get_rate( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Set movie play rate
+ *
+ * \param p_mi the Media Player
+ * \param movie play rate to set
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_media_player_set_rate( libvlc_media_player_t *, float, libvlc_exception_t *);
+
+/**
+ * Get current movie state
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return current movie state as libvlc_state_t
+ */
+VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Get movie fps rate
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return frames per second (fps) for this playing movie
+ */
+VLC_PUBLIC_API float libvlc_media_player_get_fps( libvlc_media_player_t *, libvlc_exception_t *);
+
 /** end bug */
 
 /**

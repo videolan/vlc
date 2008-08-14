@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc_events.h:  libvlc_events external API structure
  *****************************************************************************
- * Copyright (C) 1998-2007 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  * $Id $
  *
  * Authors: Filippo Carone <littlejohn@videolan.org>
@@ -24,6 +24,11 @@
 
 #ifndef LIBVLC_EVENTS_H
 #define LIBVLC_EVENTS_H 1
+
+/**
+ * \file
+ * This file defines libvlc_event external API
+ */
 
 # ifdef __cplusplus
 extern "C" {

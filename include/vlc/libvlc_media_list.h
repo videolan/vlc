@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc_media_list.h:  libvlc_media_list API
  *****************************************************************************
- * Copyright (C) 1998-2005 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Pierre d'Herbemont
@@ -23,6 +23,11 @@
 
 #ifndef LIBVLC_MEDIA_LIST_H
 #define LIBVLC_MEDIA_LIST_H 1
+
+/**
+ * \file
+ * This file defines libvlc_media_list API
+ */
 
 # ifdef __cplusplus
 extern "C" {

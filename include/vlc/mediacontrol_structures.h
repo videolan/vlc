@@ -1,7 +1,7 @@
 /*****************************************************************************
- * control_structures.h: global header for mediacontrol
+ * mediacontrol_structures.h: global header for mediacontrol
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Olivier Aubert <olivier.aubert@liris.univ-lyon1.fr>
@@ -20,6 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
+/**
+ * \file
+ * This file defines libvlc mediacontrol_* data structures
+ */
+
 /**
  * \defgroup mediacontrol_structures MediaControl Structures
  * Data structures used in the MediaControl API.

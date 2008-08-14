@@ -1,11 +1,11 @@
 /*****************************************************************************
  * deprecated.h:  libvlc deprecated API
  *****************************************************************************
- * Copyright (C) 1998-2005 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,11 @@
 
 #ifndef LIBVLC_DEPRECATED_H
 #define LIBVLC_DEPRECATED_H 1
+
+/**
+ * \file
+ * This file defines libvlc depreceated API
+ */
 
 # ifdef __cplusplus
 extern "C" {
