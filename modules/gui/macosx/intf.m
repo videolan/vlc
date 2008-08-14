@@ -57,6 +57,7 @@
 
 #import <vlc_input.h>
 #import <vlc_interface.h>
+#import <AddressBook/AddressBook.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -2097,6 +2098,7 @@ end:
 }
 
 #pragma mark Crash Log
+<<<<<<< HEAD:modules/gui/macosx/intf.m
 - (void)mailCrashLog:(NSString *)crashLog withUserComment:(NSString *)userComment
 {
     static char mail[] =
@@ -2123,10 +2125,48 @@ end:
         NSRunAlertPanel(_NS("Error when generating crash report mail."), _NS("Can't prepare crash log mail"), _NS("OK"), nil, nil, nil );
         return;
     }
+=======
+- (void)sendCrashLog:(NSString *)crashLog withUserComment:(NSString *)userComment
+{
+    NSString *urlStr = @"http://jones.videolan.org/crashlog/sendcrashreport.php";
 
-    [[NSWorkspace sharedWorkspace] openFile:mailPath];
+    NSURL *url = [NSURL URLWithString:urlStr];
+    NSString *requestMethod = @"POST";
+
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
+    [req setHTTPMethod:requestMethod];
+
+    ABPerson * contact = [[ABAddressBook sharedAddressBook] me];
+
+    ABMultiValue *emails = [contact valueForProperty:kABEmailProperty];
+    NSString * email = [emails valueAtIndex:[emails indexForIdentifier:
+                [emails primaryIdentifier]]];
+
+    NSString *postBody;
+    postBody = [NSString stringWithFormat:@"CrashLog=%@&Comment=Nothing&Email=%@\r\n",
+            [crashLog stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
+            [email stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+>>>>>>> macosx: Send crashes reports without going though Mail.app but through Jones.:modules/gui/macosx/intf.m
+
+    [req setHTTPBody:[postBody dataUsingEncoding:NSUTF8StringEncoding]];
+
+    NSHTTPURLResponse *res = nil;
+    NSError *err = nil;
+
+    /* Released from delegate */
+    NSURLConnection *theConnection = [[NSURLConnection alloc] initWithRequest:req delegate:self];
 }
 
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    [connection release];
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+    NSRunCriticalAlertPanel(_NS("Error when sending the Crash Report"), [error localizedDescription], @"OK", nil, nil);
+    [connection release];
+}
 
 - (NSString *)latestCrashLogPathPreviouslySeen:(BOOL)previouslySeen
 {
@@ -2205,7 +2245,7 @@ end:
                 _NS("Send"), _NS("Don't Send"), nil, nil);
     if( ret == NSAlertDefaultReturn )
     {
-        [self mailCrashLog:[NSString stringWithContentsOfFile:crashLogPath] withUserComment:_NS("<Explain here what you were doing when VLC crashed, with possibly a link to the failing video>")];
+        [self sendCrashLog:[NSString stringWithContentsOfFile:crashLogPath] withUserComment:_NS("<Explain here what you were doing when VLC crashed, with possibly a link to the failing video>")];
     }
 }
 

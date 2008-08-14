@@ -5003,6 +5003,8 @@ then
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,AGL])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,IOKit])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,QuickTime])
+  dnl For bug report
+  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
   VLC_ADD_LDFLAGS([macosx qtcapture],                 [-Wl,-framework,QTKit])
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreAudio])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
