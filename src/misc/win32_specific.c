@@ -193,6 +193,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
                 vlc_object_release (p_helper);
                 p_helper = NULL;
             }
+            vlc_object_attach (p_helper, p_this);
 
             /* Initialization done.
              * Release the mutex to unblock other instances */
@@ -374,7 +375,10 @@ void system_End( libvlc_int_t *p_this )
     }
     if (p_helper && p_helper->p_parent == VLC_OBJECT(p_this) )
     {
-        /* FIXME: thread-safety + join the thread(?)... */
+        /* FIXME: thread-safety... */
+        SendMessage( NULL, WM_QUIT, 0, 0 );
+        vlc_thread_join (p_helper);
+        vlc_object_detach (p_helper);
         vlc_object_release (p_helper);
         p_helper = NULL;
     }
