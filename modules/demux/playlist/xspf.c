@@ -136,7 +136,7 @@ int Demux( demux_t *p_demux )
         input_item_t *p_new_input = p_demux->p_sys->pp_tracklist[i];
         if( p_new_input )
         {
-            input_ItemAddSubItem( p_current_input, p_new_input );
+            input_item_AddSubItem( p_current_input, p_new_input );
         }
     }
 
@@ -558,10 +558,10 @@ static bool parse_track_node COMPLEX_INTERFACE
                            free( psz_uri );
                            psz_uri = psz_tmp;
                         }
-                        p_new_input = input_ItemNewExt( p_demux, psz_uri,
+                        p_new_input = input_item_NewExt( p_demux, psz_uri,
                                                         NULL, 0, NULL, -1 );
                         free( psz_uri );
-                        input_ItemCopyOptions( p_input_item, p_new_input );
+                        input_item_CopyOptions( p_input_item, p_new_input );
                         psz_uri = NULL;
                         FREE_ATT();
                         p_handler = NULL;
@@ -672,7 +672,7 @@ static bool set_option SIMPLE_INTERFACE
     /* re-convert xml special characters inside psz_value */
     resolve_xml_special_chars( psz_value );
     
-    input_ItemAddOpt( p_input, psz_value, 0 );
+    input_item_AddOpt( p_input, psz_value, 0 );
     
     return true;
 }
@@ -734,11 +734,11 @@ static bool parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<node> requires \"title\" attribute" );
             return false;
         }
-        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_demux ), "vlc://nop",
+        p_new_input = input_item_NewWithType( VLC_OBJECT( p_demux ), "vlc://nop",
                                 psz_title, 0, NULL, -1, ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
-            input_ItemAddSubItem( p_input_item, p_new_input );
+            input_item_AddSubItem( p_input_item, p_new_input );
             p_input_item = p_new_input;
             vlc_gc_decref( p_new_input );
         }
@@ -914,7 +914,7 @@ static bool parse_extitem_node COMPLEX_INTERFACE
     p_new_input = p_demux->p_sys->pp_tracklist[ i_href ];
     if( p_new_input )
     {
-        input_ItemAddSubItem( p_input_item, p_new_input );
+        input_item_AddSubItem( p_input_item, p_new_input );
         vlc_gc_decref( p_new_input );
         p_demux->p_sys->pp_tracklist[i_href] = NULL;
     }

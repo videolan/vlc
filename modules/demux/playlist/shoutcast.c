@@ -228,12 +228,12 @@ static int DemuxGenre( demux_t *p_demux )
                             + strlen( "?genre=" ) + strlen( psz_name ) + 1 );
                     sprintf( psz_mrl, SHOUTCAST_BASE_URL "?genre=%s",
                              psz_name );
-                    p_input = input_ItemNewExt( p_demux, psz_mrl,
+                    p_input = input_item_NewExt( p_demux, psz_mrl,
                                                 psz_name, 0, NULL, -1 );
-                    input_ItemCopyOptions( p_sys->p_current_input,
+                    input_item_CopyOptions( p_sys->p_current_input,
                                                 p_input );
                     free( psz_mrl );
-                    input_ItemAddSubItem( p_sys->p_current_input, p_input );
+                    input_item_AddSubItem( p_sys->p_current_input, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_name );
                 }
@@ -402,14 +402,14 @@ static int DemuxStation( demux_t *p_demux )
                         sprintf( psz_mrl, SHOUTCAST_TUNEIN_BASE_URL "%s?id=%s",
                              psz_base, psz_id );
                     }
-                    p_input = input_ItemNewExt( p_demux, psz_mrl,
+                    p_input = input_item_NewExt( p_demux, psz_mrl,
                                                 psz_name , 0, NULL, -1 );
                     free( psz_mrl );
 
-                    input_ItemCopyOptions( p_sys->p_current_input,
+                    input_item_CopyOptions( p_sys->p_current_input,
                                                 p_input );
 
-#define SADD_INFO( type, field ) if( field ) { input_ItemAddInfo( \
+#define SADD_INFO( type, field ) if( field ) { input_item_AddInfo( \
                     p_input, _("Shoutcast"), _(type), "%s", field ) ; }
                     SADD_INFO( "Mime type", psz_mt );
                     SADD_INFO( "Bitrate", psz_br );
@@ -421,7 +421,7 @@ static int DemuxStation( demux_t *p_demux )
                         input_item_SetNowPlaying( p_input, psz_ct );
                     if( psz_rt )
                         input_item_SetRating( p_input, psz_rt );
-                    input_ItemAddSubItem( p_sys->p_current_input, p_input );
+                    input_item_AddSubItem( p_sys->p_current_input, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_name );
                     FREENULL( psz_mt );

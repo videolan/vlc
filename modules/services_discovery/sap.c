@@ -854,7 +854,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->p_sdp = p_sdp;
 
     /* Released in RemoveAnnounce */
-    p_input = input_ItemNewWithType( VLC_OBJECT(p_sd),
+    p_input = input_item_NewWithType( VLC_OBJECT(p_sd),
                                      p_sap->p_sdp->psz_uri,
                                      p_sdp->psz_sessionname,
                                      0, NULL, -1, ITEM_TYPE_NET );
@@ -866,16 +866,16 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     }
 
     if( p_sys->b_timeshift )
-        input_ItemAddOption( p_input, ":access-filter=timeshift" );
+        input_item_AddOption( p_input, ":access-filter=timeshift" );
 
     psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "tool" );
     if( psz_value != NULL )
     {
-        input_ItemAddInfo( p_input, _("Session"), _("Tool"), "%s", psz_value );
+        input_item_AddInfo( p_input, _("Session"), _("Tool"), "%s", psz_value );
     }
     if( strcmp( p_sdp->username, "-" ) )
     {
-        input_ItemAddInfo( p_input, _("Session"), _("User"), "%s",
+        input_item_AddInfo( p_input, _("Session"), _("User"), "%s",
                            p_sdp->username );
     }
 

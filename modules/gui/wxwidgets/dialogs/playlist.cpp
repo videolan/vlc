@@ -1285,7 +1285,7 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
         char *psz_utf8 = wxDnDFromLocale( filenames[i] );
-        input_item_t *p_input = input_ItemNew( p->p_playlist,
+        input_item_t *p_input = input_item_New( p->p_playlist,
                                               psz_utf8, psz_utf8 );
         int i_ret = ( playlist_BothAddInput( p->p_playlist, p_input, p_dest,
                 PLAYLIST_PREPARSE, i_pos, NULL, NULL, pl_Unlocked ) != VLC_SUCCESS );

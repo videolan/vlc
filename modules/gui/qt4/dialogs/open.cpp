@@ -308,13 +308,13 @@ void OpenDialog::finish( bool b_enqueue = false )
             bool b_start = !i && !b_enqueue;
             input_item_t *p_input;
 
-            p_input = input_ItemNew( p_intf, qtu( tempMRL[i] ), NULL );
+            p_input = input_item_New( p_intf, qtu( tempMRL[i] ), NULL );
 
             /* Insert options */
             while( i + 1 < tempMRL.size() && tempMRL[i + 1].startsWith( ":" ) )
             {
                 i++;
-                input_ItemAddOption( p_input, qtu( tempMRL[i] ) );
+                input_item_AddOption( p_input, qtu( tempMRL[i] ) );
             }
 
             /* Switch between enqueuing and starting the item */

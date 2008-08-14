@@ -459,9 +459,9 @@ static int Demux( demux_t *p_demux )
                             psz_string = malloc( i_strlen*sizeof( char ) +1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
-                            p_input = input_ItemNew( p_demux, psz_string, psz_title_asx );
-                            input_ItemCopyOptions( p_current_input, p_input );
-                            input_ItemAddSubItem( p_current_input, p_input );
+                            p_input = input_item_New( p_demux, psz_string, psz_title_asx );
+                            input_item_CopyOptions( p_current_input, p_input );
+                            input_item_AddSubItem( p_current_input, p_input );
                             free( psz_string );
                         }
                         else continue;
@@ -516,9 +516,9 @@ static int Demux( demux_t *p_demux )
                     /* create the new entry */
                     asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current_input->psz_name ) );
 
-                    p_entry = input_ItemNewExt( p_demux, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
+                    p_entry = input_item_NewExt( p_demux, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
                     FREENULL( psz_name );
-                    input_ItemCopyOptions( p_current_input, p_entry );
+                    input_item_CopyOptions( p_current_input, p_entry );
                     while( i_options )
                     {
                         psz_name = ppsz_options[--i_options];
@@ -530,7 +530,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_copyright_entry ) input_item_SetCopyright( p_entry, psz_copyright_entry );
                     if( psz_moreinfo_entry ) input_item_SetURL( p_entry, psz_moreinfo_entry );
                     if( psz_abstract_entry ) input_item_SetDescription( p_entry, psz_abstract_entry );
-                    input_ItemAddSubItem( p_current_input, p_entry );
+                    input_item_AddSubItem( p_current_input, p_entry );
                     vlc_gc_decref( p_entry );
                 }
 

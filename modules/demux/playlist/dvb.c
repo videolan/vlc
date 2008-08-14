@@ -117,13 +117,13 @@ static int Demux( demux_t *p_demux )
 
         EnsureUTF8( psz_name );
 
-        p_input = input_ItemNewExt( p_demux, "dvb://", psz_name, 0, NULL, -1 );
+        p_input = input_item_NewExt( p_demux, "dvb://", psz_name, 0, NULL, -1 );
         for( i = 0; i< i_options; i++ )
         {
             EnsureUTF8( ppsz_options[i] );
-            input_ItemAddOption( p_input, ppsz_options[i] );
+            input_item_AddOption( p_input, ppsz_options[i] );
         }
-        input_ItemAddSubItem( p_current_input, p_input );
+        input_item_AddSubItem( p_current_input, p_input );
         vlc_gc_decref( p_input );
         while( i_options-- ) free( ppsz_options[i_options] );
         free( ppsz_options );

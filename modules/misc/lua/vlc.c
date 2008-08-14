@@ -316,7 +316,7 @@ void __vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
                         msg_Dbg( p_this, "Custom meta %s, %s: %s",
                                  psz_meta_category, psz_meta_name,
                                  psz_meta_value );
-                        input_ItemAddInfo( p_input, psz_meta_category,
+                        input_item_AddInfo( p_input, psz_meta_category,
                                            psz_meta_name, psz_meta_value );
                     }
                     lua_pop( L, 1 ); /* pop item */
@@ -433,7 +433,7 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     vlclua_read_options( p_this, L, &i_options, &ppsz_options );
 
                     /* Create input item */
-                    p_input = input_ItemNewExt( p_playlist, psz_path,
+                    p_input = input_item_NewExt( p_playlist, psz_path,
                                                 psz_name, i_options,
                                                 (const char **)ppsz_options,
                                                 i_duration );
@@ -448,7 +448,7 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
 
                     /* Append item to playlist */
                     if( p_parent ) /* Add to node */
-                        input_ItemAddSubItem( p_parent, p_input );
+                        input_item_AddSubItem( p_parent, p_input );
                     else /* Play or Enqueue (preparse) */
                         /* FIXME: playlist_AddInput() can fail */
                         playlist_AddInput( p_playlist, p_input,

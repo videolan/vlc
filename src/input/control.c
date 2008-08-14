@@ -132,7 +132,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_ADD_INFO:
         {
-            /* FIXME : Impossible to use input_ItemAddInfo because of
+            /* FIXME : Impossible to use input_item_AddInfo because of
              * the ... problem ? */
             char *psz_cat = (char *)va_arg( args, char * );
             char *psz_name = (char *)va_arg( args, char * );
@@ -286,7 +286,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             int i_ret = VLC_EGENERIC;
             *ppsz_value = NULL;
 
-            *ppsz_value = input_ItemGetInfo( p_input->p->input.p_item,
+            *ppsz_value = input_item_GetInfo( p_input->p->input.p_item,
                                                   psz_cat, psz_name );
             return i_ret;
         }
@@ -515,7 +515,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             if( asprintf( &str, "%s=%s", psz_option, psz_value ) == -1 )
                 return VLC_ENOMEM;
 
-            i = input_ItemAddOpt( p_input->p->input.p_item, str,
+            i = input_item_AddOpt( p_input->p->input.p_item, str,
                                   VLC_INPUT_OPTION_UNIQUE );
             free( str );
             return i;

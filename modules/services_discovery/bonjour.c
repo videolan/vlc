@@ -191,7 +191,7 @@ static void resolve_callback(
 
         if( psz_uri != NULL )
         {
-            p_input = input_ItemNewExt( p_sd, psz_uri, name, 0, NULL, -1 );
+            p_input = input_item_NewExt( p_sd, psz_uri, name, 0, NULL, -1 );
             free( (void *)psz_uri );
         }
         if( p_input != NULL )

@@ -103,7 +103,7 @@ struct input_item_t
 #define ITEM_TYPE_NODE          8
 #define ITEM_TYPE_NUMBER        9
 
-static inline void input_ItemCopyOptions( input_item_t *p_parent,
+static inline void input_item_CopyOptions( input_item_t *p_parent,
                                           input_item_t *p_child )
 {
     int i;
@@ -137,7 +137,7 @@ static inline void input_item_SetName( input_item_t *p_item, const char *psz_nam
  * Like the playlist, that there is a new sub item. With this design
  * It is not the input item's responsability to keep all the ref of
  * the input item children. */
-static inline void input_ItemAddSubItem( input_item_t *p_parent,
+static inline void input_item_AddSubItem( input_item_t *p_parent,
                                          input_item_t *p_child )
 {
     vlc_event_t event;
@@ -150,22 +150,22 @@ static inline void input_ItemAddSubItem( input_item_t *p_parent,
     vlc_event_send( &p_parent->event_manager, &event );
 }
 
-/* Flags handled past input_ItemAddOpt() */
+/* Flags handled past input_item_AddOpt() */
 #define VLC_INPUT_OPTION_TRUSTED 0x2
 
-/* Flags handled within input_ItemAddOpt() */
+/* Flags handled within input_item_AddOpt() */
 #define VLC_INPUT_OPTION_UNIQUE  0x100
 
-VLC_EXPORT( int, input_ItemAddOpt, ( input_item_t *, const char *str, unsigned flags ) );
+VLC_EXPORT( int, input_item_AddOpt, ( input_item_t *, const char *str, unsigned flags ) );
 
 static inline
-int input_ItemAddOption (input_item_t *item, const char *str)
+int input_item_AddOption (input_item_t *item, const char *str)
 {
-    return input_ItemAddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
+    return input_item_AddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
 }
 
 static inline
-int input_ItemHasErrorWhenReading (input_item_t *item)
+int input_item_HasErrorWhenReading (input_item_t *item)
 {
     return item->b_error_when_reading;
 }
@@ -325,16 +325,16 @@ static inline void input_item_MetaMerge( input_item_t *p_i, const vlc_meta_t * p
 #define input_item_GetTrackID( item )        input_item_GetMeta( item, vlc_meta_TrackID )
 #define input_item_GetSetting( item )        input_item_GetMeta( item, vlc_meta_Setting )
 
-VLC_EXPORT( char *, input_ItemGetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
-VLC_EXPORT(int, input_ItemAddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
+VLC_EXPORT( char *, input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
+VLC_EXPORT(int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
 
-#define input_ItemNew( a,b,c ) input_ItemNewExt( a, b, c, 0, NULL, -1 )
-#define input_ItemNewExt(a,b,c,d,e,f) __input_ItemNewExt( VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( input_item_t *, __input_ItemNewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, mtime_t i_duration )  );
-VLC_EXPORT( input_item_t *, input_ItemNewWithType, ( vlc_object_t *, const char *, const char *e, int, const char *const *, mtime_t i_duration, int ) );
+#define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, -1 )
+#define input_item_NewExt(a,b,c,d,e,f) __input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, mtime_t i_duration )  );
+VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char *, const char *e, int, const char *const *, mtime_t i_duration, int ) );
 
-#define input_ItemGetById(a,b) __input_ItemGetById( VLC_OBJECT(a),b )
-VLC_EXPORT( input_item_t *, __input_ItemGetById, (vlc_object_t *, int ) );
+#define input_item_GetById(a,b) __input_item_GetById( VLC_OBJECT(a),b )
+VLC_EXPORT( input_item_t *, __input_item_GetById, (vlc_object_t *, int ) );
 
 /*****************************************************************************
  * Meta data helpers

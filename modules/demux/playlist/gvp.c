@@ -201,14 +201,14 @@ static int Demux( demux_t *p_demux )
     }
     else
     {
-        p_input = input_ItemNewExt( p_demux,
+        p_input = input_item_NewExt( p_demux,
                                     psz_url, psz_title, 0, NULL, -1 );
-#define SADD_INFO( type, field ) if( field ) { input_ItemAddInfo( \
+#define SADD_INFO( type, field ) if( field ) { input_item_AddInfo( \
                     p_input, _("Google Video"), _(type), "%s", field ) ; }
         SADD_INFO( "gvp_version", psz_version );
         SADD_INFO( "docid", psz_docid );
         SADD_INFO( "description", psz_description );
-        input_ItemAddSubItem( p_current_input, p_input );
+        input_item_AddSubItem( p_current_input, p_input );
         vlc_gc_decref( p_input );
     }
 

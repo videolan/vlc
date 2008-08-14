@@ -36,7 +36,7 @@ static void GuessType( input_item_t *p_item );
 
 /** Stuff moved out of vlc_input.h -- FIXME: should probably not be inline
  * anyway. */
-static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
+static inline void input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
 {
     memset( p_i, 0, sizeof(input_item_t) );
     p_i->psz_name = NULL;
@@ -64,7 +64,7 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
     vlc_event_manager_register_event_type( p_em, vlc_InputItemErrorWhenReadingChanged );
 }
 
-static inline void input_ItemClean( input_item_t *p_i )
+static inline void input_item_Clean( input_item_t *p_i )
 {
     int i;
 
@@ -166,7 +166,7 @@ input_item_t *input_GetItem( input_thread_t *p_input )
  *         empty string otherwise. The caller should free the returned
  *         pointer.
  */
-char *input_ItemGetInfo( input_item_t *p_i,
+char *input_item_GetInfo( input_item_t *p_i,
                               const char *psz_cat,
                               const char *psz_name )
 {
@@ -195,14 +195,14 @@ char *input_ItemGetInfo( input_item_t *p_i,
     return strdup( "" );
 }
 
-static void input_ItemDestroy ( gc_object_t *p_this )
+static void input_item_Destroy ( gc_object_t *p_this )
 {
     vlc_object_t *p_obj = (vlc_object_t *)p_this->p_destructor_arg;
     libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
     input_item_t *p_input = (input_item_t *) p_this;
     int i;
 
-    input_ItemClean( p_input );
+    input_item_Clean( p_input );
 
     vlc_object_lock( p_obj->p_libvlc );
 
@@ -215,7 +215,7 @@ static void input_ItemDestroy ( gc_object_t *p_this )
     free( p_input );
 }
 
-int input_ItemAddOpt( input_item_t *p_input, const char *psz_option,
+int input_item_AddOpt( input_item_t *p_input, const char *psz_option,
                       unsigned flags )
 {
     int err = VLC_SUCCESS;
@@ -247,7 +247,7 @@ out:
     return err;
 }
 
-int input_ItemAddInfo( input_item_t *p_i,
+int input_item_AddInfo( input_item_t *p_i,
                             const char *psz_cat,
                             const char *psz_name,
                             const char *psz_format, ... )
@@ -315,7 +315,7 @@ int input_ItemAddInfo( input_item_t *p_i,
     return p_info->psz_value ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
-input_item_t *__input_ItemGetById( vlc_object_t *p_obj, int i_id )
+input_item_t *__input_item_GetById( vlc_object_t *p_obj, int i_id )
 {
     libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
     input_item_t * p_ret = NULL;
@@ -332,19 +332,19 @@ input_item_t *__input_ItemGetById( vlc_object_t *p_obj, int i_id )
     return p_ret;
 }
 
-input_item_t *__input_ItemNewExt( vlc_object_t *p_obj, const char *psz_uri,
+input_item_t *__input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
                                   const char *psz_name,
                                   int i_options,
                                   const char *const *ppsz_options,
                                   mtime_t i_duration )
 {
-    return input_ItemNewWithType( p_obj, psz_uri, psz_name,
+    return input_item_NewWithType( p_obj, psz_uri, psz_name,
                                   i_options, ppsz_options,
                                   i_duration, ITEM_TYPE_UNKNOWN );
 }
 
 
-input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
+input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                 const char *psz_name,
                                 int i_options,
                                 const char *const *ppsz_options,
@@ -355,8 +355,8 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
 
     DECMALLOC_NULL( p_input, input_item_t );
 
-    input_ItemInit( p_obj, p_input );
-    vlc_gc_init( p_input, input_ItemDestroy, (void *)p_obj->p_libvlc );
+    input_item_Init( p_obj, p_input );
+    vlc_gc_init( p_input, input_item_Destroy, (void *)p_obj->p_libvlc );
 
     vlc_object_lock( p_obj->p_libvlc );
     p_input->i_id = ++priv->i_last_input_id;
@@ -391,7 +391,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
     p_input->i_duration = i_duration;
 
     for( int i = 0; i < i_options; i++ )
-        input_ItemAddOption( p_input, ppsz_options[i] );
+        input_item_AddOption( p_input, ppsz_options[i] );
     return p_input;
 }
 

@@ -213,7 +213,7 @@ static void AddDvd( services_discovery_t *p_sd, const char *psz_device )
     if( asprintf( &psz_uri, "dvd://%s", psz_blockdevice ) == -1 )
         return;
     /* Create the playlist item here */
-    p_input = input_ItemNew( p_sd, psz_uri, psz_name );
+    p_input = input_item_New( p_sd, psz_uri, psz_name );
     free( psz_uri );
     if( !p_input )
     {
@@ -255,7 +255,7 @@ static void AddCdda( services_discovery_t *p_sd, const char *psz_device )
     if( asprintf( &psz_uri, "cdda://%s", psz_blockdevice ) == -1 )
         return;
     /* Create the item here */
-    p_input = input_ItemNew( p_sd, psz_uri, "Audio CD" );
+    p_input = input_item_New( p_sd, psz_uri, "Audio CD" );
     free( psz_uri );
     if( !p_input )
         return;

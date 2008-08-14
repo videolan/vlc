@@ -848,7 +848,7 @@ input_item_t *MRLParse( intf_thread_t *p_intf, char *_psz,
         s_temp = s_mrl + strlen( s_mrl );
     }
 
-    p_input = input_ItemNew( p_intf, s_mrl, psz_name );
+    p_input = input_item_New( p_intf, s_mrl, psz_name );
     s_mrl = s_temp;
 
     /* now we can take care of the options */
@@ -861,7 +861,7 @@ input_item_t *MRLParse( intf_thread_t *p_intf, char *_psz,
         {
             s_temp = s_mrl + strlen( s_mrl );
         }
-        input_ItemAddOption( p_input, s_mrl );
+        input_item_AddOption( p_input, s_mrl );
         s_mrl = s_temp;
     }
 

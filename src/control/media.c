@@ -288,7 +288,7 @@ libvlc_media_t * libvlc_media_new(
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
 
-    p_input_item = input_ItemNew( p_instance->p_libvlc_int, psz_mrl, NULL );
+    p_input_item = input_item_New( p_instance->p_libvlc_int, psz_mrl, NULL );
 
     if (!p_input_item)
     {
@@ -316,7 +316,7 @@ libvlc_media_t * libvlc_media_new_as_node(
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
 
-    p_input_item = input_ItemNew( p_instance->p_libvlc_int, "vlc://nop", psz_name );
+    p_input_item = input_item_New( p_instance->p_libvlc_int, "vlc://nop", psz_name );
 
     if (!p_input_item)
     {
@@ -346,7 +346,7 @@ void libvlc_media_add_option(
                                    libvlc_exception_t *p_e )
 {
     VLC_UNUSED(p_e);
-    input_ItemAddOpt( p_md->p_input_item, ppsz_option,
+    input_item_AddOpt( p_md->p_input_item, ppsz_option,
                       VLC_INPUT_OPTION_UNIQUE|VLC_INPUT_OPTION_TRUSTED );
 }
 
