@@ -60,7 +60,7 @@ void __pl_Release( vlc_object_t *p_this )
 {
     playlist_t *pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
     assert( pl != NULL );
-    
+
     assert( VLC_OBJECT(pl) != p_this /* The rule is that pl_Release() should act on
     the same object than pl_Yield() */ );
 
@@ -410,9 +410,23 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
             p_playlist->b_reset_currently_playing = true;
         }
 
-        /* If we are asked for a node, don't take it */
+        /* If we are asked for a node, go to it's first child */
         if( i_skip == 0 && ( p_new == NULL || p_new->i_children != -1 ) )
+        {
             i_skip++;
+            if( p_new != NULL )
+            {
+                p_new = playlist_GetNextLeaf( p_playlist, p_new, NULL, true, false );
+                for( i = 0; i < p_playlist->current.i_size; i++ )
+                {
+                    if( p_new == ARRAY_VAL( p_playlist->current, i ) )
+                    {
+                        p_playlist->i_current_index = i;
+                        i_skip = 0;
+                    }
+                }
+            }
+        }
 
         if( p_playlist->b_reset_currently_playing )
             /* A bit too bad to reset twice ... */
