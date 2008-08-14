@@ -380,9 +380,9 @@ static bool parse_track_dict COMPLEX_INTERFACE
             memmove( psz_uri + 7, psz_uri + 17, strlen( psz_uri ) - 9 );
             msg_Info( p_demux, "Adding '%s'", psz_uri );
 
-            p_new_input = input_ItemNewExt( p_demux, psz_uri,
+            p_new_input = input_item_NewExt( p_demux, psz_uri,
                                             NULL, 0, NULL, -1 );
-            input_ItemAddSubItem( p_input_item, p_new_input );
+            input_item_AddSubItem( p_input_item, p_new_input );
 
             /* add meta info */
             add_meta( p_new_input, p_track );

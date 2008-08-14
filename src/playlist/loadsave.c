@@ -140,7 +140,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     const char *const psz_option = "meta-file";
     /* that option has to be cleaned in input_item_subitem_added() */
     /* vlc_gc_decref() in the same function */
-    p_input = input_ItemNewExt( p_playlist, psz_uri,
+    p_input = input_item_NewExt( p_playlist, psz_uri,
                                 _("Media Library"), 1, &psz_option, -1 );
     if( p_input == NULL )
         goto error;

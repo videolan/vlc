@@ -1609,25 +1609,25 @@ void WizardDialog::Run()
         playlist_t *p_playlist = pl_Yield( p_intf );
         if( p_playlist )
         {
-            input_item_t *p_input = input_ItemNew( p_playlist, mrl,
+            input_item_t *p_input = input_item_New( p_playlist, mrl,
                                                    ITEM_NAME );
-            input_ItemAddOption( p_input, psz_opt );
+            input_item_AddOption( p_input, psz_opt );
             if( i_from != 0)
             {
                 char psz_from[20];
                 snprintf( psz_from, 20, "start-time=%i", i_from);
-                input_ItemAddOption( p_input, psz_from );
+                input_item_AddOption( p_input, psz_from );
             }
             if( i_to != 0)
             {
                 char psz_to[20];
                 snprintf( psz_to, 20, "stop-time=%i", i_to);
-                input_ItemAddOption( p_input, psz_to );
+                input_item_AddOption( p_input, psz_to );
             }
 
             char psz_ttl[20];
             snprintf( psz_ttl, 20, "ttl=%i",i_ttl );
-            input_ItemAddOption( p_input, psz_ttl );
+            input_item_AddOption( p_input, psz_ttl );
 
             /* FIXME: playlist_AddInput() can fail */
             playlist_AddInput( p_playlist, p_input,

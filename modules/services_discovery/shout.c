@@ -174,14 +174,14 @@ static input_item_t * CreateInputItemFromShoutItem( services_discovery_t *p_sd,
 {
     int i;
     /* Create the item */
-    input_item_t *p_input = input_ItemNewExt( p_sd,
+    input_item_t *p_input = input_item_NewExt( p_sd,
                     p_item->psz_url, _(p_item->psz_name),
                     0, NULL, -1 );
 
     /* Copy options */
     for( i = 0; p_item->ppsz_options[i] != NULL; i++ )
-        input_ItemAddOption( p_input, p_item->ppsz_options[i] );
-    input_ItemAddOption( p_input, "no-playlist-autostart" );
+        input_item_AddOption( p_input, p_item->ppsz_options[i] );
+    input_item_AddOption( p_input, "no-playlist-autostart" );
 
     return p_input;
 }

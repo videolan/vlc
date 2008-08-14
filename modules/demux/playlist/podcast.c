@@ -233,7 +233,7 @@ static int Demux( demux_t *p_demux )
 #define ADD_GINFO( info, name ) \
     else if( !b_item && !b_image && !strcmp( psz_elname, name ) ) \
     { \
-        input_ItemAddInfo( p_current_input, _("Podcast Info"), \
+        input_item_AddInfo( p_current_input, _("Podcast Info"), \
                                 _( info ), "%s", psz_text ); \
     }
                 ADD_GINFO( "Podcast Link", "link" )
@@ -246,7 +246,7 @@ static int Demux( demux_t *p_demux )
                          && ( !strcmp( psz_elname, "itunes:summary" )
                             ||!strcmp( psz_elname, "description" ) ) )
                 { /* <description> isn't standard iTunes podcast stuff */
-                    input_ItemAddInfo( p_current_input,
+                    input_item_AddInfo( p_current_input,
                              _( "Podcast Info" ), _( "Podcast Summary" ),
                              "%s", psz_text );
                 }
@@ -272,11 +272,11 @@ static int Demux( demux_t *p_demux )
                         msg_Err( p_demux, "invalid XML (no enclosure markup)" );
                         return -1;
                     }
-                    p_input = input_ItemNewExt( p_demux, psz_item_mrl,
+                    p_input = input_item_NewExt( p_demux, psz_item_mrl,
                                                 psz_item_name, 0, NULL, -1 );
                     if( p_input == NULL ) break;
 #define ADD_INFO( info, field ) \
-    if( field ) { input_ItemAddInfo( p_input, \
+    if( field ) { input_item_AddInfo( p_input, \
                             _( "Podcast Info" ),  _( info ), "%s", field ); }
                     ADD_INFO( "Podcast Publication Date", psz_item_date  );
                     ADD_INFO( "Podcast Author", psz_item_author );
@@ -288,13 +288,13 @@ static int Demux( demux_t *p_demux )
                     ADD_INFO( "Podcast Type", psz_item_type );
                     if( psz_item_size )
                     {
-                        input_ItemAddInfo( p_input,
+                        input_item_AddInfo( p_input,
                                                 _( "Podcast Info" ),
                                                 _( "Podcast Size" ),
                                                 "%s bytes",
                                                 psz_item_size );
                     }
-                    input_ItemAddSubItem( p_current_input, p_input );
+                    input_item_AddSubItem( p_current_input, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_item_name );
                     FREENULL( psz_item_mrl );

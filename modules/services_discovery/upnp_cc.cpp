@@ -217,7 +217,7 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
     if ( node->isItemNode() )
     {
         ItemNode *iNode = (ItemNode *)node;
-        input_item_t *p_input = input_ItemNew( p_sd, iNode->getResource(), title );
+        input_item_t *p_input = input_item_New( p_sd, iNode->getResource(), title );
         /* FIXME: playlist_AddInput() can fail */
         playlist_BothAddInput( p_playlist, p_input, p_parent,
                                PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL,

@@ -880,7 +880,7 @@ void MediaServer::_buildPlaylist( Container* parent )
         Item* item = parent->getItem( i );
         playlist_item_t* parentNode = parent->getPlaylistNode();
 
-        input_item_t* p_input = input_ItemNew( _cookie->serviceDiscovery,
+        input_item_t* p_input = input_item_New( _cookie->serviceDiscovery,
                                                item->getResource(),
                                                item->getTitle() );
         int i_cat;

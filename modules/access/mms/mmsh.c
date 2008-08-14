@@ -188,8 +188,8 @@ int MMSHOpen( access_t *p_access )
         input_thread_t * p_input = vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
         input_item_t * p_new_loc;
         /** \bug we do not autodelete here */
-        p_new_loc = input_ItemNew( p_access, psz_location, psz_location );
-        input_ItemAddSubItem( input_GetItem( p_input ), p_new_loc );
+        p_new_loc = input_item_New( p_access, psz_location, psz_location );
+        input_item_AddSubItem( input_GetItem( p_input ), p_new_loc );
         vlc_object_release( p_input );
 
         free( psz_location );

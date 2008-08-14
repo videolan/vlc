@@ -349,19 +349,19 @@ static int Demux( demux_t *p_demux )
     }
     else
     {
-        p_input = input_ItemNewExt( p_demux,
+        p_input = input_item_NewExt( p_demux,
                                 psz_src, psz_moviename, 0, NULL, -1 );
-#define SADD_INFO( type, field ) if( field ) { input_ItemAddInfo( \
+#define SADD_INFO( type, field ) if( field ) { input_item_AddInfo( \
                     p_input, "QuickTime Media Link", _(type), "%s", field ) ; }
         SADD_INFO( "href", psz_href );
         SADD_INFO( "mime type", psz_mimetype );
-        input_ItemAddSubItem( p_current_input, p_input );
+        input_item_AddSubItem( p_current_input, p_input );
         vlc_gc_decref( p_input );
         if( psz_qtnext )
         {
-            p_input = input_ItemNewExt( p_demux,
+            p_input = input_item_NewExt( p_demux,
                                         psz_qtnext, NULL, 0, NULL, -1 );
-            input_ItemAddSubItem( p_current_input, p_input );
+            input_item_AddSubItem( p_current_input, p_input );
             vlc_gc_decref( p_input );
         }
     }

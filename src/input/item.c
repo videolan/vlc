@@ -36,7 +36,7 @@ static void GuessType( input_item_t *p_item );
 
 /** Stuff moved out of vlc_input.h -- FIXME: should probably not be inline
  * anyway. */
-static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
+static inline void input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
 {
     memset( p_i, 0, sizeof(input_item_t) );
     p_i->psz_name = NULL;
@@ -64,7 +64,7 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
     vlc_event_manager_register_event_type( p_em, vlc_InputItemErrorWhenReadingChanged );
 }
 
-static inline void input_ItemClean( input_item_t *p_i )
+static inline void input_item_Clean( input_item_t *p_i )
 {
     int i;
 
@@ -156,6 +156,178 @@ input_item_t *input_GetItem( input_thread_t *p_input )
     return p_input->p->input.p_item;
 }
 
+void input_item_CopyOptions( input_item_t *p_parent,
+                                          input_item_t *p_child )
+{
+    int i;
+    for( i = 0 ; i< p_parent->i_options; i++ )
+    {
+        char *psz_option= strdup( p_parent->ppsz_options[i] );
+        if( !strcmp( psz_option, "meta-file" ) )
+        {
+            free( psz_option );
+            continue;
+        }
+        p_child->i_options++;
+        p_child->ppsz_options = (char **)realloc( p_child->ppsz_options,
+                                                  p_child->i_options *
+                                                  sizeof( char * ) );
+        p_child->ppsz_options[p_child->i_options-1] = psz_option;
+        p_child->optflagc++;
+        p_child->optflagv = (uint8_t *)realloc( p_child->optflagv,
+                                                p_child->optflagc );
+        p_child->optflagv[p_child->optflagc - 1] = p_parent->optflagv[i];
+    }
+}
+
+void input_item_SetName( input_item_t *p_item, const char *psz_name )
+{
+    free( p_item->psz_name );
+    p_item->psz_name = strdup( psz_name );
+}
+
+/* This won't hold the item, but can tell to interested third parties
+ * Like the playlist, that there is a new sub item. With this design
+ * It is not the input item's responsability to keep all the ref of
+ * the input item children. */
+void input_item_AddSubItem( input_item_t *p_parent,
+                                         input_item_t *p_child )
+{
+    vlc_event_t event;
+
+    p_parent->i_type = ITEM_TYPE_PLAYLIST;
+
+    /* Notify interested third parties */
+    event.type = vlc_InputItemSubItemAdded;
+    event.u.input_item_subitem_added.p_new_child = p_child;
+    vlc_event_send( &p_parent->event_manager, &event );
+}
+
+int input_item_AddOption (input_item_t *item, const char *str)
+{
+    return input_item_AddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
+}
+
+bool input_item_HasErrorWhenReading (input_item_t *item)
+{
+    return item->b_error_when_reading;
+}
+
+bool input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz )
+{
+    vlc_mutex_lock( &p_i->lock );
+    if( !p_i->p_meta )
+    {
+        vlc_mutex_unlock( &p_i->lock );
+        return false;
+    }
+    const char * meta = vlc_meta_Get( p_i->p_meta, meta_type );
+    bool ret = meta && strcasestr( meta, psz );
+    vlc_mutex_unlock( &p_i->lock );
+
+    return ret;
+}
+
+char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
+{
+    char * psz = NULL;
+    vlc_mutex_lock( &p_i->lock );
+
+    if( !p_i->p_meta )
+    {
+        vlc_mutex_unlock( &p_i->lock );
+        return NULL;
+    }
+
+    if( vlc_meta_Get( p_i->p_meta, meta_type ) )
+        psz = strdup( vlc_meta_Get( p_i->p_meta, meta_type ) );
+
+    vlc_mutex_unlock( &p_i->lock );
+    return psz;
+}
+
+char * input_item_GetName( input_item_t * p_i )
+{
+    vlc_mutex_lock( &p_i->lock );
+    char *psz_s = p_i->psz_name ? strdup( p_i->psz_name ) : NULL;
+    vlc_mutex_unlock( &p_i->lock );
+    return psz_s;
+}
+
+char * input_item_GetURI( input_item_t * p_i )
+{
+    vlc_mutex_lock( &p_i->lock );
+    char *psz_s = p_i->psz_uri ? strdup( p_i->psz_uri ) : NULL;
+    vlc_mutex_unlock( &p_i->lock );
+    return psz_s;
+}
+
+void input_item_SetURI( input_item_t * p_i, char * psz_uri )
+{
+    vlc_mutex_lock( &p_i->lock );
+    free( p_i->psz_uri );
+    p_i->psz_uri = strdup( psz_uri );
+    vlc_mutex_unlock( &p_i->lock );
+}
+
+mtime_t input_item_GetDuration( input_item_t * p_i )
+{
+    vlc_mutex_lock( &p_i->lock );
+    mtime_t i_duration = p_i->i_duration;
+    vlc_mutex_unlock( &p_i->lock );
+    return i_duration;
+}
+
+void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration )
+{
+    bool send_event = false;
+
+    vlc_mutex_lock( &p_i->lock );
+    if( p_i->i_duration != i_duration )
+    {
+        p_i->i_duration = i_duration;
+        send_event = true;
+    }
+    vlc_mutex_unlock( &p_i->lock );
+
+    if ( send_event == true )
+    {
+        vlc_event_t event;
+        event.type = vlc_InputItemDurationChanged;
+        event.u.input_item_duration_changed.new_duration = i_duration;
+        vlc_event_send( &p_i->event_manager, &event );
+    }
+
+    return;
+}
+
+
+bool input_item_IsPreparsed( input_item_t *p_i )
+{
+    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_PREPARSED : false ;
+}
+
+bool input_item_IsArtFetched( input_item_t *p_i )
+{
+    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_ART_FETCHED : false ;
+}
+
+const vlc_meta_t * input_item_GetMetaObject( input_item_t *p_i )
+{
+    if( !p_i->p_meta )
+        p_i->p_meta = vlc_meta_New();
+
+    return p_i->p_meta;
+}
+
+void input_item_MetaMerge( input_item_t *p_i, const vlc_meta_t * p_new_meta )
+{
+    if( !p_i->p_meta )
+        p_i->p_meta = vlc_meta_New();
+
+    vlc_meta_Merge( p_i->p_meta, p_new_meta );
+}
+
 /**
  * Get a info item from a given category in a given input item.
  *
@@ -166,7 +338,7 @@ input_item_t *input_GetItem( input_thread_t *p_input )
  *         empty string otherwise. The caller should free the returned
  *         pointer.
  */
-char *input_ItemGetInfo( input_item_t *p_i,
+char *input_item_GetInfo( input_item_t *p_i,
                               const char *psz_cat,
                               const char *psz_name )
 {
@@ -195,14 +367,14 @@ char *input_ItemGetInfo( input_item_t *p_i,
     return strdup( "" );
 }
 
-static void input_ItemDestroy ( gc_object_t *p_this )
+static void input_item_Destroy ( gc_object_t *p_this )
 {
     vlc_object_t *p_obj = (vlc_object_t *)p_this->p_destructor_arg;
     libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
     input_item_t *p_input = (input_item_t *) p_this;
     int i;
 
-    input_ItemClean( p_input );
+    input_item_Clean( p_input );
 
     vlc_object_lock( p_obj->p_libvlc );
 
@@ -215,7 +387,7 @@ static void input_ItemDestroy ( gc_object_t *p_this )
     free( p_input );
 }
 
-int input_ItemAddOpt( input_item_t *p_input, const char *psz_option,
+int input_item_AddOpt( input_item_t *p_input, const char *psz_option,
                       unsigned flags )
 {
     int err = VLC_SUCCESS;
@@ -247,7 +419,7 @@ out:
     return err;
 }
 
-int input_ItemAddInfo( input_item_t *p_i,
+int input_item_AddInfo( input_item_t *p_i,
                             const char *psz_cat,
                             const char *psz_name,
                             const char *psz_format, ... )
@@ -315,7 +487,7 @@ int input_ItemAddInfo( input_item_t *p_i,
     return p_info->psz_value ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
-input_item_t *__input_ItemGetById( vlc_object_t *p_obj, int i_id )
+input_item_t *__input_item_GetById( vlc_object_t *p_obj, int i_id )
 {
     libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
     input_item_t * p_ret = NULL;
@@ -332,19 +504,19 @@ input_item_t *__input_ItemGetById( vlc_object_t *p_obj, int i_id )
     return p_ret;
 }
 
-input_item_t *__input_ItemNewExt( vlc_object_t *p_obj, const char *psz_uri,
+input_item_t *__input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
                                   const char *psz_name,
                                   int i_options,
                                   const char *const *ppsz_options,
                                   mtime_t i_duration )
 {
-    return input_ItemNewWithType( p_obj, psz_uri, psz_name,
+    return input_item_NewWithType( p_obj, psz_uri, psz_name,
                                   i_options, ppsz_options,
                                   i_duration, ITEM_TYPE_UNKNOWN );
 }
 
 
-input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
+input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                 const char *psz_name,
                                 int i_options,
                                 const char *const *ppsz_options,
@@ -355,8 +527,8 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
 
     DECMALLOC_NULL( p_input, input_item_t );
 
-    input_ItemInit( p_obj, p_input );
-    vlc_gc_init( p_input, input_ItemDestroy, (void *)p_obj->p_libvlc );
+    input_item_Init( p_obj, p_input );
+    vlc_gc_init( p_input, input_item_Destroy, (void *)p_obj->p_libvlc );
 
     vlc_object_lock( p_obj->p_libvlc );
     p_input->i_id = ++priv->i_last_input_id;
@@ -391,7 +563,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
     p_input->i_duration = i_duration;
 
     for( int i = 0; i < i_options; i++ )
-        input_ItemAddOption( p_input, ppsz_options[i] );
+        input_item_AddOption( p_input, ppsz_options[i] );
     return p_input;
 }
 

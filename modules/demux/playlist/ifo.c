@@ -95,8 +95,8 @@ static int Demux( demux_t *p_demux )
     psz_url = (char *)malloc( len+1 );
     snprintf( psz_url, len+1, "dvd://%s", p_demux->psz_path );
 
-    p_input = input_ItemNewExt( p_demux, psz_url, psz_url, 0, NULL, -1 );
-    input_ItemAddSubItem( p_current_input, p_input );
+    p_input = input_item_NewExt( p_demux, psz_url, psz_url, 0, NULL, -1 );
+    input_item_AddSubItem( p_current_input, p_input );
     vlc_gc_decref( p_input );
 
     HANDLE_PLAY_AND_RELEASE;

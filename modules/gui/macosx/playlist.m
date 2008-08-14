@@ -296,7 +296,7 @@
     }
     else if( [[o_tc identifier] isEqualToString:@"status"] )
     {
-        if( input_ItemHasErrorWhenReading( p_item->p_input ) )
+        if( input_item_HasErrorWhenReading( p_item->p_input ) )
         {
             o_value = [NSImage imageWithWarningIcon];
         }
@@ -978,7 +978,7 @@
         o_uri = o_temp;
     }
 
-    p_input = input_ItemNew( p_playlist, [o_uri fileSystemRepresentation], [o_name UTF8String] );
+    p_input = input_item_New( p_playlist, [o_uri fileSystemRepresentation], [o_name UTF8String] );
     if( !p_input )
        return NULL;
 
@@ -986,7 +986,7 @@
     {
         for( i = 0; i < (int)[o_options count]; i++ )
         {
-            input_ItemAddOption( p_input, strdup( [[o_options objectAtIndex:i] UTF8String] ) );
+            input_item_AddOption( p_input, strdup( [[o_options objectAtIndex:i] UTF8String] ) );
         }
     }
 
@@ -1102,7 +1102,7 @@
         PL_LOCK;
         o_current_name = [NSString stringWithUTF8String:
             p_item->pp_children[i_current]->p_input->psz_name];
-        psz_temp = input_ItemGetInfo( p_item->p_input ,
+        psz_temp = input_item_GetInfo( p_item->p_input ,
                    _("Meta-information"),_("Artist") );
         o_current_author = [NSString stringWithUTF8String: psz_temp];
         free( psz_temp);

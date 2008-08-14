@@ -52,7 +52,7 @@
             NSURL * o_url;
             input_item_t *p_input;
 
-            p_input = input_ItemNew( p_playlist,
+            p_input = input_item_New( p_playlist,
                                     [o_urlString fileSystemRepresentation],
                                     [[[NSFileManager defaultManager]
                                     displayNameAtPath: o_urlString] UTF8String] );

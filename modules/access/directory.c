@@ -530,13 +530,13 @@ static int ReadDir( access_t *p_access, playlist_t *p_playlist,
 
                 memmove (psz_uri + 7, psz_uri, sizeof (psz_uri) - 7);
                 memcpy (psz_uri, "file://", 7);
-                p_input = input_ItemNewWithType( p_playlist,
+                p_input = input_item_NewWithType( p_playlist,
                                                  psz_uri, entry, 0, NULL,
                                                  -1, ITEM_TYPE_FILE );
                 if (p_input != NULL)
                 {
                     if( p_current_input )
-                        input_ItemCopyOptions( p_current_input, p_input );
+                        input_item_CopyOptions( p_current_input, p_input );
                     assert( p_parent_category );
                     int i_ret = playlist_BothAddInput( p_playlist, p_input,
                                            p_parent_category,

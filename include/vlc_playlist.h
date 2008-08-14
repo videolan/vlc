@@ -409,7 +409,7 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
     input_item_t *p_input;
     snprintf( psz_uri, 256+9, "file/://%s", psz_file );
     const char *const psz_option = "meta-file";
-    p_input = input_ItemNewExt( p_playlist, psz_uri, psz_file,
+    p_input = input_item_NewExt( p_playlist, psz_uri, psz_file,
                                 1, &psz_option, -1 );
     playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
                        true, false );

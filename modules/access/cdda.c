@@ -467,12 +467,12 @@ static int GetTracks( access_t *p_access,
             psz_name = NULL;
 
         /* Create playlist items */
-        p_input_item = input_ItemNewWithType( VLC_OBJECT( p_playlist ),
+        p_input_item = input_item_NewWithType( VLC_OBJECT( p_playlist ),
                                               psz_uri, psz_name, 0, NULL, -1,
                                               ITEM_TYPE_DISC );
-        input_ItemAddOption( p_input_item, psz_first );
-        input_ItemAddOption( p_input_item, psz_last );
-        input_ItemAddOption( p_input_item, psz_opt );
+        input_item_AddOption( p_input_item, psz_first );
+        input_item_AddOption( p_input_item, psz_last );
+        input_item_AddOption( p_input_item, psz_opt );
 
 #ifdef HAVE_LIBCDDB
         /* If we have CDDB info, change the name */
