@@ -581,7 +581,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     {
         if( b_wait )
         {
-            msg_Dbg( p_this, "waiting for thread completion" );
+            msg_Dbg( p_this, "waiting for thread initialization" );
             vlc_object_wait( p_this );
         }
 
