@@ -1190,5 +1190,7 @@ void CaptureOpenPanel::advancedDialog()
         msg_Dbg( p_intf, "%s", qtu( advMRL ) );
     }
     delete adv;
+    module_PutConfig( p_config );
+    module_Put( p_module );
 }
 
