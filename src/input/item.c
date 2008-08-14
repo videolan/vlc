@@ -156,6 +156,178 @@ input_item_t *input_GetItem( input_thread_t *p_input )
     return p_input->p->input.p_item;
 }
 
+void input_item_CopyOptions( input_item_t *p_parent,
+                                          input_item_t *p_child )
+{
+    int i;
+    for( i = 0 ; i< p_parent->i_options; i++ )
+    {
+        char *psz_option= strdup( p_parent->ppsz_options[i] );
+        if( !strcmp( psz_option, "meta-file" ) )
+        {
+            free( psz_option );
+            continue;
+        }
+        p_child->i_options++;
+        p_child->ppsz_options = (char **)realloc( p_child->ppsz_options,
+                                                  p_child->i_options *
+                                                  sizeof( char * ) );
+        p_child->ppsz_options[p_child->i_options-1] = psz_option;
+        p_child->optflagc++;
+        p_child->optflagv = (uint8_t *)realloc( p_child->optflagv,
+                                                p_child->optflagc );
+        p_child->optflagv[p_child->optflagc - 1] = p_parent->optflagv[i];
+    }
+}
+
+void input_item_SetName( input_item_t *p_item, const char *psz_name )
+{
+    free( p_item->psz_name );
+    p_item->psz_name = strdup( psz_name );
+}
+
+/* This won't hold the item, but can tell to interested third parties
+ * Like the playlist, that there is a new sub item. With this design
+ * It is not the input item's responsability to keep all the ref of
+ * the input item children. */
+void input_item_AddSubItem( input_item_t *p_parent,
+                                         input_item_t *p_child )
+{
+    vlc_event_t event;
+
+    p_parent->i_type = ITEM_TYPE_PLAYLIST;
+
+    /* Notify interested third parties */
+    event.type = vlc_InputItemSubItemAdded;
+    event.u.input_item_subitem_added.p_new_child = p_child;
+    vlc_event_send( &p_parent->event_manager, &event );
+}
+
+int input_item_AddOption (input_item_t *item, const char *str)
+{
+    return input_item_AddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
+}
+
+bool input_item_HasErrorWhenReading (input_item_t *item)
+{
+    return item->b_error_when_reading;
+}
+
+bool input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz )
+{
+    vlc_mutex_lock( &p_i->lock );
+    if( !p_i->p_meta )
+    {
+        vlc_mutex_unlock( &p_i->lock );
+        return false;
+    }
+    const char * meta = vlc_meta_Get( p_i->p_meta, meta_type );
+    bool ret = meta && strcasestr( meta, psz );
+    vlc_mutex_unlock( &p_i->lock );
+
+    return ret;
+}
+
+char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
+{
+    char * psz = NULL;
+    vlc_mutex_lock( &p_i->lock );
+
+    if( !p_i->p_meta )
+    {
+        vlc_mutex_unlock( &p_i->lock );
+        return NULL;
+    }
+
+    if( vlc_meta_Get( p_i->p_meta, meta_type ) )
+        psz = strdup( vlc_meta_Get( p_i->p_meta, meta_type ) );
+
+    vlc_mutex_unlock( &p_i->lock );
+    return psz;
+}
+
+char * input_item_GetName( input_item_t * p_i )
+{
+    vlc_mutex_lock( &p_i->lock );
+    char *psz_s = p_i->psz_name ? strdup( p_i->psz_name ) : NULL;
+    vlc_mutex_unlock( &p_i->lock );
+    return psz_s;
+}
+
+char * input_item_GetURI( input_item_t * p_i )
+{
+    vlc_mutex_lock( &p_i->lock );
+    char *psz_s = p_i->psz_uri ? strdup( p_i->psz_uri ) : NULL;
+    vlc_mutex_unlock( &p_i->lock );
+    return psz_s;
+}
+
+void input_item_SetURI( input_item_t * p_i, char * psz_uri )
+{
+    vlc_mutex_lock( &p_i->lock );
+    free( p_i->psz_uri );
+    p_i->psz_uri = strdup( psz_uri );
+    vlc_mutex_unlock( &p_i->lock );
+}
+
+mtime_t input_item_GetDuration( input_item_t * p_i )
+{
+    vlc_mutex_lock( &p_i->lock );
+    mtime_t i_duration = p_i->i_duration;
+    vlc_mutex_unlock( &p_i->lock );
+    return i_duration;
+}
+
+void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration )
+{
+    bool send_event = false;
+
+    vlc_mutex_lock( &p_i->lock );
+    if( p_i->i_duration != i_duration )
+    {
+        p_i->i_duration = i_duration;
+        send_event = true;
+    }
+    vlc_mutex_unlock( &p_i->lock );
+
+    if ( send_event == true )
+    {
+        vlc_event_t event;
+        event.type = vlc_InputItemDurationChanged;
+        event.u.input_item_duration_changed.new_duration = i_duration;
+        vlc_event_send( &p_i->event_manager, &event );
+    }
+
+    return;
+}
+
+
+bool input_item_IsPreparsed( input_item_t *p_i )
+{
+    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_PREPARSED : false ;
+}
+
+bool input_item_IsArtFetched( input_item_t *p_i )
+{
+    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_ART_FETCHED : false ;
+}
+
+const vlc_meta_t * input_item_GetMetaObject( input_item_t *p_i )
+{
+    if( !p_i->p_meta )
+        p_i->p_meta = vlc_meta_New();
+
+    return p_i->p_meta;
+}
+
+void input_item_MetaMerge( input_item_t *p_i, const vlc_meta_t * p_new_meta )
+{
+    if( !p_i->p_meta )
+        p_i->p_meta = vlc_meta_New();
+
+    vlc_meta_Merge( p_i->p_meta, p_new_meta );
+}
+
 /**
  * Get a info item from a given category in a given input item.
  *
