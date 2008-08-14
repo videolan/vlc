@@ -443,26 +443,28 @@ static int GetTracks( access_t *p_access,
     {
         msg_Dbg( p_access, "track[%d] start=%d", i, p_sys->p_sectors[i] );
         char *psz_uri, *psz_opt, *psz_first, *psz_last;
-        int i_path_len = p_access->psz_path ? strlen( p_access->psz_path ) : 0;
 
-        psz_name = (char*)malloc( strlen( _("Audio CD - Track ") ) + 5 );
-        psz_opt = (char*)malloc( strlen( "cdda-track=" ) + 3 );
-        psz_first = (char*)malloc( strlen( "cdda-first-sector=" ) + 7 );
-        psz_last = (char*)malloc( strlen( "cdda-last-sector=" ) + 7 );
-        psz_uri = (char*)malloc( i_path_len + 13 );
-
-        snprintf( psz_uri, i_path_len + 13, "cdda://%s",
-                           p_access->psz_path ? p_access->psz_path : "" );
-        sprintf( psz_opt, "cdda-track=%i", i+1 );
-        sprintf( psz_first, "cdda-first-sector=%i",p_sys->p_sectors[i] );
+        if( asprintf( &psz_uri, "cdda://%s", p_access->psz_path ? p_access->psz_path : "" ) == -1 )
+            psz_uri = NULL;
+        if( asprintf( &psz_opt, "cdda-track=%i", i+1 ) == -1 )
+            psz_opt = NULL;
+        if( asprintf( &psz_first, "cdda-first-sector=%i",p_sys->p_sectors[i] ) == -1 )
+            psz_first = NULL;
 
 //        if( i != i_titles -1 )
-            sprintf( psz_last, "cdda-last-sector=%i", p_sys->p_sectors[i+1] );
-//         else
-//            sprintf( psz_last, "cdda-last-sector=%i", 1242 /* FIXME */);
+//        {
+            if( asprintf( &psz_last, "cdda-last-sector=%i", p_sys->p_sectors[i+1] ) == -1 )
+                psz_last = NULL;
+//        }
+//        else
+//        {
+//            if( asprintf( &psz_last, "cdda-last-sector=%i", 1242 /* FIXME */) == -1 )
+//                psz_last = NULL;
+//        }
 
         /* Define a "default name" */
-        sprintf( psz_name, _("Audio CD - Track %i"), (i+1) );
+        if( asprintf( &psz_name, _("Audio CD - Track %i"), (i+1) ) == -1 )
+            psz_name = NULL;
 
         /* Create playlist items */
         p_input_item = input_ItemNewWithType( VLC_OBJECT( p_playlist ),
