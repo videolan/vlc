@@ -125,10 +125,9 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     libvlc_media_list_t * p_mlist;
 
     p_mlist = malloc(sizeof(libvlc_media_list_t));
-
     if( !p_mlist )
         return NULL;
- 
+
     p_mlist->p_libvlc_instance = p_inst;
     p_mlist->p_event_manager = libvlc_event_manager_new( p_mlist, p_inst, p_e );
 
@@ -153,7 +152,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     }
 
     vlc_mutex_init( &p_mlist->object_lock );
- 
+
     vlc_array_init( &p_mlist->items );
     p_mlist->i_refcount = 1;
     p_mlist->p_md = NULL;
@@ -405,7 +404,7 @@ void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
         libvlc_exception_raise( p_e, "Index out of bounds exception");
         return;
     }
-            
+
     p_md = vlc_array_item_at_index( &p_mlist->items, index );
 
     notify_item_deletion( p_mlist, p_md, index, EventWillHappen );

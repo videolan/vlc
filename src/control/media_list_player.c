@@ -261,6 +261,9 @@ libvlc_media_list_player_new( libvlc_instance_t * p_instance,
     (void)p_e;
     libvlc_media_list_player_t * p_mlp;
     p_mlp = malloc(sizeof(libvlc_media_list_player_t));
+    if( !p_mlp )
+        return NULL;
+
     p_mlp->current_playing_item_path = NULL;
     p_mlp->p_mi = NULL;
     p_mlp->p_mlist = NULL;
@@ -316,7 +319,7 @@ void libvlc_media_list_player_set_media_list(
                                      libvlc_exception_t * p_e )
 {
     vlc_mutex_lock( &p_mlp->object_lock );
- 
+
     if( libvlc_media_list_player_is_playing( p_mlp, p_e ) )
     {
         libvlc_media_player_stop( p_mlp->p_mi, p_e );
