@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * xspf.c : XSPF playlist import functions
  *******************************************************************************
@@ -63,6 +64,12 @@ int Import_xspf( vlc_object_t *p_this )
 void Close_xspf( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
+    int i;
+    for(i = 0; i < p_demux->p_sys->i_tracklist_entries; i++)
+    {
+        if(p_demux->p_sys->pp_tracklist[i])
+            vlc_gc_decref( p_demux->p_sys->pp_tracklist[i] );
+    }
     FREENULL( p_demux->p_sys->pp_tracklist );
     FREENULL( p_demux->p_sys->psz_base );
     free( p_demux->p_sys );
