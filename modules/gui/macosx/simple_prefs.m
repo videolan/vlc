@@ -59,7 +59,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (void)dealloc
 {
     [o_currentlyShownCategoryView release];
-    [o_sprefs_toolbar release];
 
     [o_hotkeySettings release];
     [o_hotkeyDescriptions release];
@@ -96,7 +95,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [self initStrings];
     
     /* setup the toolbar */
-    o_sprefs_toolbar = [[[NSToolbar alloc] initWithIdentifier: VLCSPrefsToolbarIdentifier] autorelease];
+    NSToolbar * o_sprefs_toolbar = [[[NSToolbar alloc] initWithIdentifier: VLCSPrefsToolbarIdentifier] autorelease];
     [o_sprefs_toolbar setAllowsUserCustomization: NO];
     [o_sprefs_toolbar setAutosavesConfiguration: NO];
     [o_sprefs_toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
@@ -596,9 +595,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (void)showSimplePrefs
 {
     /* we want to show the interface settings, if no category was chosen */
-    if( [o_sprefs_toolbar selectedItemIdentifier] == nil )
+    if( [[o_sprefs_win toolbar] selectedItemIdentifier] == nil )
     {
-        [o_sprefs_toolbar setSelectedItemIdentifier: VLCIntfSettingToolbarIdentifier];
+        [[o_sprefs_win toolbar] setSelectedItemIdentifier: VLCIntfSettingToolbarIdentifier];
         [self showInterfaceSettings];
     }
     

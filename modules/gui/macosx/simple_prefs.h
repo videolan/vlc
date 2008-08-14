@@ -150,7 +150,6 @@
     BOOL b_hotkeyChanged;
     id o_currentlyShownCategoryView;
 
-    NSToolbar *o_sprefs_toolbar;
     NSOpenPanel *o_selectFolderPanel;
     NSArray *o_hotkeyDescriptions;
     NSArray *o_hotkeysNonUseableKeys;
