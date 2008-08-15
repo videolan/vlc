@@ -1329,8 +1329,8 @@ msgid ""
 "Running vlc with the default interface. Use 'cvlc' to use vlc without "
 "interface."
 msgstr ""
-"vlc wird mit dem Standard-Interface ausgeführt. Benutzten Sie 'cvlc', um vlc "
-"ohne Interface zu benutzen."
+"vlc wird mit dem Standard-Interface ausgeführt. Benutzen Sie 'cvlc', um vlc "
+"ohne Interface zu verwenden."
 
 #: src/libvlc.c:1307
 msgid "To get exhaustive help, use '-H'."
