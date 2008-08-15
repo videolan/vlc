@@ -146,6 +146,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     if ( aout_MixerNew( p_aout ) == -1 )
     {
         aout_OutputDelete( p_aout );
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
         goto error;
     }
 
