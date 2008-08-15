@@ -80,7 +80,7 @@ static int MixBuffer( aout_instance_t * p_aout )
     if ( p_aout->mixer.b_error )
     {
         /* Free all incoming buffers. */
-        vlc_mutex_lock( &p_aout->input_fifos_lock );
+        aout_lock_input_fifos( p_aout );
         for ( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
             aout_input_t * p_input = p_aout->pp_inputs[i];
@@ -93,13 +93,13 @@ static int MixBuffer( aout_instance_t * p_aout )
                 p_buffer = p_next;
             }
         }
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        aout_unlock_input_fifos( p_aout );
         return -1;
     }
 
 
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
-    vlc_mutex_lock( &p_aout->input_fifos_lock );
+    aout_lock_output_fifo( p_aout );
+    aout_lock_input_fifos( p_aout );
 
     /* Retrieve the date of the next buffer. */
     memcpy( &exact_start_date, &p_aout->output.fifo.end_date,
@@ -118,7 +118,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         start_date = 0;
     }
 
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    aout_unlock_output_fifo( p_aout );
 
     /* See if we have enough data to prepare a new buffer for the audio
      * output. First : start date. */
@@ -164,7 +164,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         if ( i < p_aout->i_nb_inputs )
         {
             /* Interrupted before the end... We can't run. */
-            vlc_mutex_unlock( &p_aout->input_fifos_lock );
+            aout_unlock_input_fifos( p_aout );
             return -1;
         }
     }
@@ -287,10 +287,10 @@ static int MixBuffer( aout_instance_t * p_aout )
                 if( i_nb_bytes < 0 )
                 {
                     /* Is it really the best way to do it ? */
-                    vlc_mutex_lock( &p_aout->output_fifo_lock );
+                    aout_lock_output_fifo( p_aout );
                     aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
                     aout_DateSet( &exact_start_date, 0 );
-                    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+                    aout_unlock_output_fifo( p_aout );
                     break;
                 }
 
@@ -302,7 +302,7 @@ static int MixBuffer( aout_instance_t * p_aout )
     if ( i < p_aout->i_nb_inputs || i_first_input == p_aout->i_nb_inputs )
     {
         /* Interrupted before the end... We can't run. */
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        aout_unlock_input_fifos( p_aout );
         return -1;
     }
 
@@ -316,7 +316,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                       p_output_buffer );
     if ( p_output_buffer == NULL )
     {
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        aout_unlock_input_fifos( p_aout );
         return -1;
     }
     /* This is again a bit kludgy - for the S/PDIF mixer. */
@@ -332,7 +332,7 @@ static int MixBuffer( aout_instance_t * p_aout )
 
     p_aout->mixer.pf_do_work( p_aout, p_output_buffer );
 
-    vlc_mutex_unlock( &p_aout->input_fifos_lock );
+    aout_unlock_input_fifos( p_aout );
 
     aout_OutputPlay( p_aout, p_output_buffer );
 

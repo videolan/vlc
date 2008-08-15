@@ -28,6 +28,8 @@
 #ifndef __LIBVLC_AOUT_INTERNAL_H
 # define __LIBVLC_AOUT_INTERNAL_H 1
 
+#include <assert.h>
+
 #if defined( __APPLE__ ) || defined( SYS_BSD )
 #undef HAVE_ALLOCA
 #endif
@@ -140,16 +142,59 @@ int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t *, int i_inpu
 
 /* Helpers */
 
+static inline void aout_lock_mixer( aout_instance_t *p_aout )
+{
+    vlc_mutex_lock( &p_aout->mixer_lock );
+}
+
+static inline void aout_unlock_mixer( aout_instance_t *p_aout )
+{
+    vlc_mutex_unlock( &p_aout->mixer_lock );
+}
+
+static inline void aout_lock_input_fifos( aout_instance_t *p_aout )
+{
+    vlc_mutex_lock( &p_aout->input_fifos_lock );
+}
+
+static inline void aout_unlock_input_fifos( aout_instance_t *p_aout )
+{
+    vlc_mutex_unlock( &p_aout->input_fifos_lock );
+}
+
+static inline void aout_lock_output_fifo( aout_instance_t *p_aout )
+{
+    vlc_mutex_lock( &p_aout->output_fifo_lock );
+}
+
+static inline void aout_unlock_output_fifo( aout_instance_t *p_aout )
+{
+    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+}
+
+static inline void aout_lock_input( aout_instance_t *p_aout, aout_input_t * p_input )
+{
+    (void)p_aout;
+    vlc_mutex_lock( &p_input->lock );
+}
+
+static inline void aout_unlock_input( aout_instance_t *p_aout, aout_input_t * p_input )
+{
+    (void)p_aout;
+    vlc_mutex_unlock( &p_input->lock );
+}
+
+
 /**
  * This function will safely mark aout input to be restarted as soon as
  * possible to take configuration changes into account */
 static inline void AoutInputsMarkToRestart( aout_instance_t *p_aout )
 {
     int i;
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
     for( i = 0; i < p_aout->i_nb_inputs; i++ )
         p_aout->pp_inputs[i]->b_restart = true;
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 }
 
 /* This function will add or remove a a module from a string list (comma

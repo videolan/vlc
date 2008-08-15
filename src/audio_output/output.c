@@ -51,14 +51,14 @@ int aout_OutputNew( aout_instance_t * p_aout,
         p_aout->output.output.i_rate = i_rate;
     aout_FormatPrepare( &p_aout->output.output );
 
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
+    aout_lock_output_fifo( p_aout );
 
     /* Find the best output plug-in. */
     p_aout->output.p_module = module_Need( p_aout, "audio output", "$aout", 0);
     if ( p_aout->output.p_module == NULL )
     {
         msg_Err( p_aout, "no suitable audio output module" );
-        vlc_mutex_unlock( &p_aout->output_fifo_lock );
+        aout_unlock_output_fifo( p_aout );
         return -1;
     }
 
@@ -165,7 +165,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_FifoInit( p_aout, &p_aout->output.fifo,
                    p_aout->output.output.i_rate );
 
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    aout_unlock_output_fifo( p_aout );
 
     aout_FormatPrint( p_aout, "output", &p_aout->output.output );
 
@@ -232,9 +232,9 @@ void aout_OutputDelete( aout_instance_t * p_aout )
     aout_FiltersDestroyPipeline( p_aout, p_aout->output.pp_filters,
                                  p_aout->output.i_nb_filters );
 
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
+    aout_lock_output_fifo( p_aout );
     aout_FifoDestroy( p_aout, &p_aout->output.fifo );
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    aout_unlock_output_fifo( p_aout );
 
     p_aout->output.b_error = true;
 }
@@ -256,10 +256,10 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         return;
     }
 
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
+    aout_lock_output_fifo( p_aout );
     aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
     p_aout->output.pf_play( p_aout );
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    aout_unlock_output_fifo( p_aout );
 }
 
 /*****************************************************************************
@@ -276,7 +276,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
 {
     aout_buffer_t * p_buffer;
 
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
+    aout_lock_output_fifo( p_aout );
 
     p_buffer = p_aout->output.fifo.p_first;
 
@@ -310,7 +310,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         p_aout->output.b_starving = 1;
 #endif
 
-        vlc_mutex_unlock( &p_aout->output_fifo_lock );
+        aout_unlock_output_fifo( p_aout );
         return NULL;
     }
 
@@ -327,7 +327,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
      */
     {
         const mtime_t i_delta = p_buffer->start_date - start_date;
-        vlc_mutex_unlock( &p_aout->output_fifo_lock );
+        aout_unlock_output_fifo( p_aout );
 
         if ( !p_aout->output.b_starving )
             msg_Dbg( p_aout, "audio output is starving (%"PRId64"), "
@@ -348,7 +348,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         msg_Warn( p_aout, "output date isn't PTS date, requesting "
                   "resampling (%"PRId64")", difference );
 
-        vlc_mutex_lock( &p_aout->input_fifos_lock );
+        aout_lock_input_fifos( p_aout );
         for ( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
             aout_fifo_t * p_fifo = &p_aout->pp_inputs[i]->fifo;
@@ -357,7 +357,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         }
 
         aout_FifoMoveDates( p_aout, &p_aout->output.fifo, difference );
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        aout_unlock_input_fifos( p_aout );
     }
 
     p_aout->output.fifo.p_first = p_buffer->p_next;
@@ -366,6 +366,6 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
     }
 
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    aout_unlock_output_fifo( p_aout );
     return p_buffer;
 }

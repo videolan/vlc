@@ -78,7 +78,7 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
         return 0;
     }
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
     if ( !p_aout->mixer.b_error )
     {
         i_result = p_aout->output.pf_volume_get( p_aout, pi_volume );
@@ -87,7 +87,7 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
     {
         *pi_volume = (audio_volume_t)config_GetInt( p_object, "volume" );
     }
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 
     vlc_object_release( p_aout );
     return i_result;
@@ -109,12 +109,12 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 
     if ( p_aout == NULL ) return 0;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
     if ( !p_aout->mixer.b_error )
     {
         i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
     }
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 
     var_Set( p_aout, "intf-change", val );
     vlc_object_release( p_aout );
@@ -132,7 +132,7 @@ int __aout_VolumeInfos( vlc_object_t * p_object, audio_volume_t * pi_soft )
 
     if ( p_aout == NULL ) return 0;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
     if ( p_aout->mixer.b_error )
     {
         /* The output module is destroyed. */
@@ -142,7 +142,7 @@ int __aout_VolumeInfos( vlc_object_t * p_object, audio_volume_t * pi_soft )
     {
         i_result = p_aout->output.pf_volume_infos( p_aout, pi_soft );
     }
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 
     vlc_object_release( p_aout );
     return i_result;
@@ -180,13 +180,13 @@ int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
 
     if ( p_aout == NULL ) return 0;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
     if ( !p_aout->mixer.b_error )
     {
         i_result = p_aout->output.pf_volume_set( p_aout,
                                                 (audio_volume_t) i_volume );
     }
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 
     vlc_object_release( p_aout );
     return i_result;
@@ -223,12 +223,12 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
 
     if ( p_aout == NULL ) return 0;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
     if ( !p_aout->mixer.b_error )
     {
         i_result = p_aout->output.pf_volume_set( p_aout, (audio_volume_t) i_volume );
     }
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 
     vlc_object_release( p_aout );
     return i_result;
@@ -369,21 +369,21 @@ static int aout_Restart( aout_instance_t * p_aout )
     int i;
     bool b_error = 0;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
 
     if ( p_aout->i_nb_inputs == 0 )
     {
-        vlc_mutex_unlock( &p_aout->mixer_lock );
+        aout_unlock_mixer( p_aout );
         msg_Err( p_aout, "no decoder thread" );
         return -1;
     }
 
     /* Lock all inputs. */
-    vlc_mutex_lock( &p_aout->input_fifos_lock );
+    aout_lock_input_fifos( p_aout );
 
     for ( i = 0; i < p_aout->i_nb_inputs; i++ )
     {
-        vlc_mutex_lock( &p_aout->pp_inputs[i]->lock );
+        aout_lock_input( p_aout, p_aout->pp_inputs[i] );
         aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
     }
 
@@ -399,8 +399,8 @@ static int aout_Restart( aout_instance_t * p_aout )
         {
             vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
         }
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
+        aout_unlock_input_fifos( p_aout );
+        aout_unlock_mixer( p_aout );
         return -1;
     }
 
@@ -411,8 +411,8 @@ static int aout_Restart( aout_instance_t * p_aout )
         {
             vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
         }
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
+        aout_unlock_input_fifos( p_aout );
+        aout_unlock_mixer( p_aout );
         return -1;
     }
 
@@ -420,14 +420,13 @@ static int aout_Restart( aout_instance_t * p_aout )
     for ( i = 0; i < p_aout->i_nb_inputs; i++ )
     {
         aout_input_t * p_input = p_aout->pp_inputs[i];
-
         b_error |= aout_InputNew( p_aout, p_input );
         p_input->b_changed = 1;
-        vlc_mutex_unlock( &p_input->lock );
+        aout_unlock_input( p_aout, p_input );
     }
 
-    vlc_mutex_unlock( &p_aout->input_fifos_lock );
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_input_fifos( p_aout );
+    aout_unlock_mixer( p_aout );
 
     return b_error;
 }

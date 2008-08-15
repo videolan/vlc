@@ -483,8 +483,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         aout_fifo_t fifo, dummy_fifo;
         uint8_t     *p_first_byte_to_mix;
 
-        vlc_mutex_lock( &p_aout->mixer_lock );
-        vlc_mutex_lock( &p_aout->input_fifos_lock );
+        aout_lock_mixer( p_aout );
+        aout_lock_input_fifos( p_aout );
 
         /* A little trick to avoid loosing our input fifo */
         aout_FifoInit( p_aout, &dummy_fifo, p_aout->mixer.mixer.i_rate );
@@ -496,8 +496,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         p_input->p_first_byte_to_mix = p_first_byte_to_mix;
         p_input->fifo = fifo;
 
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
+        aout_unlock_input_fifos( p_aout );
+        aout_unlock_mixer( p_aout );
     }
 
     if( i_input_rate != INPUT_RATE_DEFAULT && p_input->p_playback_rate_filter == NULL )
@@ -541,9 +541,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
      * with the next incoming buffer. */
-    vlc_mutex_lock( &p_aout->input_fifos_lock );
+    aout_lock_input_fifos( p_aout );
     start_date = aout_FifoNextStart( p_aout, &p_input->fifo );
-    vlc_mutex_unlock( &p_aout->input_fifos_lock );
+    aout_unlock_input_fifos( p_aout );
 
     if ( start_date != 0 && start_date < mdate() )
     {
@@ -552,10 +552,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * happen :). */
         msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
                   "clearing out", mdate() - start_date );
-        vlc_mutex_lock( &p_aout->input_fifos_lock );
+        aout_lock_input_fifos( p_aout );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
         p_input->p_first_byte_to_mix = NULL;
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
@@ -582,10 +582,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     {
         msg_Warn( p_aout, "audio drift is too big (%"PRId64"), clearing out",
                   start_date - p_buffer->start_date );
-        vlc_mutex_lock( &p_aout->input_fifos_lock );
+        aout_lock_input_fifos( p_aout );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
         p_input->p_first_byte_to_mix = NULL;
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
@@ -710,9 +710,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         (p_buffer->end_date - p_buffer->start_date);
     p_buffer->start_date = start_date;
 
-    vlc_mutex_lock( &p_aout->input_fifos_lock );
+    aout_lock_input_fifos( p_aout );
     aout_FifoPush( p_aout, &p_input->fifo, p_buffer );
-    vlc_mutex_unlock( &p_aout->input_fifos_lock );
+    aout_unlock_input_fifos( p_aout );
     return 0;
 }
 
@@ -862,13 +862,13 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     int i;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
     for( i = 0; i < p_aout->i_nb_inputs; i++ )
         ReplayGainSelect( p_aout, p_aout->pp_inputs[i] );
 
     /* Restart the mixer (a trivial mixer may be in use) */
     aout_MixerMultiplierSet( p_aout, p_aout->mixer.f_multiplier );
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 
     return VLC_SUCCESS;
 }

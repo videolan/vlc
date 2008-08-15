@@ -80,7 +80,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
 
     /* We can only be called by the decoder, so no need to lock
      * p_input->lock. */
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
 
     if ( p_aout->i_nb_inputs >= AOUT_MAX_INPUTS )
     {
@@ -105,7 +105,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     if( p_replay_gain )
         p_input->replay_gain = *p_replay_gain;
 
-    vlc_mutex_lock( &p_aout->input_fifos_lock );
+    aout_lock_input_fifos( p_aout );
     p_aout->pp_inputs[p_aout->i_nb_inputs] = p_input;
     p_aout->i_nb_inputs++;
 
@@ -121,22 +121,22 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
         {
             for ( i = 0; i < p_aout->i_nb_inputs - 1; i++ )
             {
-                vlc_mutex_lock( &p_aout->pp_inputs[i]->lock );
+                aout_lock_input( p_aout, p_aout->pp_inputs[i] );
                 aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
-                vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
+                aout_unlock_input( p_aout, p_aout->pp_inputs[i] );
             }
-            vlc_mutex_unlock( &p_aout->input_fifos_lock );
-            vlc_mutex_unlock( &p_aout->mixer_lock );
+            aout_unlock_input_fifos( p_aout );
+            aout_unlock_mixer( p_aout );
             return p_input;
         }
 
         /* Create other input streams. */
         for ( i = 0; i < p_aout->i_nb_inputs - 1; i++ )
         {
-            vlc_mutex_lock( &p_aout->pp_inputs[i]->lock );
+            aout_lock_input( p_aout, p_aout->pp_inputs[i] );
             aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
             aout_InputNew( p_aout, p_aout->pp_inputs[i] );
-            vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
+            aout_unlock_input( p_aout, p_aout->pp_inputs[i] );
         }
     }
     else
@@ -147,14 +147,14 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     if ( aout_MixerNew( p_aout ) == -1 )
     {
         aout_OutputDelete( p_aout );
-        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        aout_unlock_input_fifos( p_aout );
         goto error;
     }
 
     aout_InputNew( p_aout, p_input );
-    vlc_mutex_unlock( &p_aout->input_fifos_lock );
+    aout_unlock_input_fifos( p_aout );
 
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
     p_input->i_desync = var_CreateGetInteger( p_this, "audio-desync" ) * 1000;
 
     p_input_thread = (input_thread_t *)vlc_object_find( p_this,
@@ -176,7 +176,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     return p_input;
 
 error:
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
     return NULL;
 }
 
@@ -211,7 +211,7 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 
     /* This function can only be called by the decoder itself, so no need
      * to lock p_input->lock. */
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
 
     for ( i_input = 0; i_input < p_aout->i_nb_inputs; i_input++ )
     {
@@ -224,7 +224,7 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
     if ( i_input == p_aout->i_nb_inputs )
     {
         msg_Err( p_aout, "cannot find an input to delete" );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
+        aout_unlock_mixer( p_aout );
         return -1;
     }
 
@@ -252,7 +252,7 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
         }
     }
 
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 
     return 0;
 }
@@ -271,11 +271,11 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
     aout_buffer_t * p_buffer;
     mtime_t duration;
 
-    vlc_mutex_lock( &p_input->lock );
+    aout_lock_input( NULL, p_input );
 
     if ( p_input->b_error )
     {
-        vlc_mutex_unlock( &p_input->lock );
+        aout_unlock_input( NULL, p_input );
         return NULL;
     }
 
@@ -290,7 +290,7 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
     /* Suppose the decoder doesn't have more than one buffered buffer */
     p_input->b_changed = 0;
 
-    vlc_mutex_unlock( &p_input->lock );
+    aout_unlock_input( NULL, p_input );
 
     if( p_buffer == NULL )
         return NULL;
@@ -360,11 +360,11 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                             + (mtime_t)p_buffer->i_nb_samples * 1000000
                                 / p_input->input.i_rate;
 
-    vlc_mutex_lock( &p_input->lock );
+    aout_lock_input( p_aout, p_input );
 
     if ( p_input->b_error )
     {
-        vlc_mutex_unlock( &p_input->lock );
+        aout_unlock_input( p_aout, p_input );
         aout_BufferFree( p_buffer );
         return -1;
     }
@@ -391,16 +391,14 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* If the buffer is too early, wait a while. */
     mwait( p_buffer->start_date - AOUT_MAX_PREPARE_TIME );
 
-    if ( aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate ) == -1 )
-    {
-        vlc_mutex_unlock( &p_input->lock );
-        return -1;
-    }
+    int ret = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
 
-    vlc_mutex_unlock( &p_input->lock );
+    aout_unlock_input( p_aout, p_input );
+
+    if ( ret == -1 ) return -1;
 
     /* Run the mixer if it is able to run. */
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_mixer( p_aout );
     aout_MixerRun( p_aout );
     if( p_input->p_input_thread )
     {
@@ -410,7 +408,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                              1, NULL );
         vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
     }
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    aout_unlock_mixer( p_aout );
 
     return 0;
 }
