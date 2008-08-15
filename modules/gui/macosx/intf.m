@@ -1681,8 +1681,7 @@ end:
 
             o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]
                 forKey: NSForegroundColorAttributeName];
-            o_msg = [NSString stringWithFormat: @"%s\n",
-                p_intf->p_sys->p_sub->p_msg[i_start].psz_msg];
+            o_msg = [[NSString stringWithUTF8String: p_intf->p_sys->p_sub->p_msg[i_start].psz_msg] stringByAppendingString: @"\n"];
             o_msg_color = [[NSAttributedString alloc]
                 initWithString: o_msg attributes: o_attr];
             [o_msg_arr addObject: [o_msg_color autorelease]];
