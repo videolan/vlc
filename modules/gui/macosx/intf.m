@@ -778,6 +778,13 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
     [o_vmi_mute setTitle: _NS("Mute")];
     [o_vmi_fullscreen setTitle: _NS("Fullscreen")];
     [o_vmi_snapshot setTitle: _NS("Snapshot")];
+
+    /* crash reporter panel */
+    [o_crashrep_send_btn setTitle: _NS("Send")];
+    [o_crashrep_dontSend_btn setTitle: _NS("Don't Send")];
+    [o_crashrep_title_txt setStringValue: _NS("VLC crashed previously")];
+    [o_crashrep_win setTitle: _NS("VLC crashed previously")];
+    [o_crashrep_desc_txt setStringValue: _NS("Do you want to send details on the crash to VLC's development team?\n\nIf you want, you can enter a few lines on what you did before VLC crashed along with other helpful information: a link to download a sample file, a URL of a network stream, ...")];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
@@ -2125,7 +2132,7 @@ end:
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    NSRunInformationalAlertPanel(_NS("Crash report successfully sent"),
+    NSRunInformationalAlertPanel(_NS("Crash Report successfully sent"),
                 _NS("Thanks for your report!"),
                 _NS("OK"), nil, nil, nil);
     [connection release];
