@@ -224,17 +224,17 @@ static int DemuxGenre( demux_t *p_demux )
                 if( !psz_eltname ) return -1;
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
-                    char *psz_mrl = malloc( strlen( SHOUTCAST_BASE_URL )
-                            + strlen( "?genre=" ) + strlen( psz_name ) + 1 );
-                    sprintf( psz_mrl, SHOUTCAST_BASE_URL "?genre=%s",
-                             psz_name );
-                    p_input = input_item_NewExt( p_demux, psz_mrl,
-                                                psz_name, 0, NULL, -1 );
-                    input_item_CopyOptions( p_sys->p_current_input,
-                                                p_input );
-                    free( psz_mrl );
-                    input_item_AddSubItem( p_sys->p_current_input, p_input );
-                    vlc_gc_decref( p_input );
+                    char* psz_mrl;
+                    if( asprintf( &psz_mrl, SHOUTCAST_BASE_URL "?genre=%s",
+                             psz_name ) != -1 )
+                    {
+                        p_input = input_ItemNewExt( p_demux, psz_mrl,
+                                                    psz_name, 0, NULL, -1 );
+                        input_ItemCopyOptions( p_sys->p_current_input, p_input );
+                        free( psz_mrl );
+                        input_ItemAddSubItem( p_sys->p_current_input, p_input );
+                        vlc_gc_decref( p_input );
+                    }
                     FREENULL( psz_name );
                 }
                 FREENULL( psz_eltname );
@@ -318,9 +318,9 @@ static int DemuxStation( demux_t *p_demux )
                             xml_ReaderValue( p_sys->p_xml_reader );
                         if( !psz_attrname || !psz_attrvalue )
                         {
-                            free(psz_eltname);
-                            FREENULL(psz_attrname);
-                            FREENULL(psz_attrvalue);
+                            free( psz_eltname );
+                            free( psz_attrname );
+                            free( psz_attrvalue );
                             return -1;
                         }
 
@@ -344,9 +344,9 @@ static int DemuxStation( demux_t *p_demux )
                             xml_ReaderValue( p_sys->p_xml_reader );
                         if( !psz_attrname || !psz_attrvalue )
                         {
-                            free(psz_eltname);
-                            FREENULL(psz_attrname);
-                            FREENULL(psz_attrvalue);
+                            free( psz_eltname );
+                            free( psz_attrname );
+                            free( psz_attrvalue );
                             return -1;
                         }
 
@@ -369,7 +369,7 @@ static int DemuxStation( demux_t *p_demux )
                         free( psz_attrvalue );
                     }
                 }
-                free(psz_eltname);
+                free( psz_eltname );
                 break;
 
             case XML_READER_TEXT:
