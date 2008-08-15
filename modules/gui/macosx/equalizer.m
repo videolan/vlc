@@ -52,8 +52,10 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
     vlc_object_t *p_object = vlc_object_find( p_intf,
                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
     aout_instance_t *p_aout = (aout_instance_t *)p_object;
-    if( p_object == NULL )
+    if( !p_object )
+    {
         p_object = (vlc_object_t *)pl_Yield( p_intf );
+    }
 
     psz_string = var_GetNonEmptyString( p_object, "audio-filter" );
 
@@ -72,6 +74,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
         }
         else
         {
+            vlc_object_release( p_object );
             return;
         }
     }
@@ -90,8 +93,9 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
          }
          else
          {
-             free( psz_string );
-             return;
+            free( psz_string );
+            vlc_object_release( p_object );
+            return;
          }
     }
 
