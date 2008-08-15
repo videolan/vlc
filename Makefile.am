@@ -564,7 +564,7 @@ VLC-release.app: vlc
 
 # This is just for development purposes. 
 # The resulting VLC.app will only in this tree.
-VLC.app: vlc 
+VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.libs/libvlc.dylib
 	(cd src && make install)
 	rm -Rf $(top_builddir)/tmp
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
