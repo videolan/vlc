@@ -152,7 +152,7 @@
 - (BOOL)windowShouldZoom:(NSWindow *)sender toFrame:(NSRect)newFrame
 {
     [self setFrame: newFrame display: YES animate: YES];
-    return YES;
+    return NO;
 }
 
 - (BOOL)windowShouldClose:(id)sender
