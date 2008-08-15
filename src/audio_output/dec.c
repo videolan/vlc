@@ -125,6 +125,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
                 aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
                 vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
             }
+            vlc_mutex_unlock( &p_aout->input_fifos_lock );
             vlc_mutex_unlock( &p_aout->mixer_lock );
             return p_input;
         }
