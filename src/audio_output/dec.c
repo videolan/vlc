@@ -223,6 +223,7 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
     if ( i_input == p_aout->i_nb_inputs )
     {
         msg_Err( p_aout, "cannot find an input to delete" );
+        vlc_mutex_unlock( &p_aout->mixer_lock );
         return -1;
     }
 
