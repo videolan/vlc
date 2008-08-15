@@ -163,7 +163,12 @@ bool XMLParser::parse()
                 {
                     char *name = xml_ReaderName( m_pReader );
                     char *value = xml_ReaderValue( m_pReader );
-                    if( !name || !value ) return false;
+                    if( !name || !value )
+                    {
+                        free( name );
+                        free( value );
+                        return false;
+                    }
                     attributes[name] = value;
                 }
 
