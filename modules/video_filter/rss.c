@@ -744,7 +744,6 @@ static int FetchRSS( filter_t *p_filter)
 
                 case XML_READER_STARTELEM:
                     free( psz_eltname );
-                    psz_eltname = NULL;
                     psz_eltname = xml_ReaderName( p_xml_reader );
                     if( !psz_eltname )
                     {
@@ -779,10 +778,20 @@ static int FetchRSS( filter_t *p_filter)
                             char *psz_value = xml_ReaderValue( p_xml_reader );
                             if( !strcmp( psz_name, "rel" ) )
                             {
+                                if( psz_rel )
+                                {
+                                    msg_Dbg( p_filter, "\"rel\" attribute of link atom duplicated (last value: %s)", psz_value );
+                                    free( psz_rel );
+                                }
                                 psz_rel = psz_value;
                             }
                             else if( !strcmp( psz_name, "href" ) )
                             {
+                                if( psz_href )
+                                {
+                                    msg_Dbg( p_filter, "\"href\" attribute of link atom duplicated (last value: %s)", psz_href );
+                                    free( psz_href );
+                                }
                                 psz_href = psz_value;
                             }
                             else
