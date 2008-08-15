@@ -110,6 +110,8 @@ int FrontendOpen( access_t *p_access )
     }
 
     p_sys->p_frontend = p_frontend = malloc( sizeof(frontend_t) );
+    if( !p_frontend )
+        return VLC_ENOMEM;
 
     msg_Dbg( p_access, "Opening device %s", frontend );
     if( (p_sys->i_frontend_handle = open(frontend, O_RDWR | O_NONBLOCK)) < 0 )
@@ -1508,7 +1510,8 @@ int CAMOpen( access_t *p_access )
     {
         p_sys->i_ca_type = CA_CI;
     }
-    else {
+    else
+    {
         p_sys->i_ca_type = -1;
         msg_Err( p_access, "CAMInit: incompatible CAM interface" );
         close( p_sys->i_ca_handle );
