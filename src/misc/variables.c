@@ -1200,7 +1200,7 @@ static int GetUnused( vlc_object_t *p_this, const char *psz_name )
 
         if( i_tries++ > 100 )
         {
-            msg_Err( p_this, "caught in a callback deadlock?" );
+            msg_Err( p_this, "caught in a callback deadlock? ('%s')", psz_name );
             return VLC_ETIMEOUT;
         }
 
