@@ -2112,8 +2112,9 @@ end:
                 [emails primaryIdentifier]]];
 
     NSString *postBody;
-    postBody = [NSString stringWithFormat:@"CrashLog=%@&Comment=Nothing&Email=%@\r\n",
+    postBody = [NSString stringWithFormat:@"CrashLog=%@&Comment=%@&Email=%@\r\n",
             [crashLog stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
+            [userComment stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
             [email stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 
     [req setHTTPBody:[postBody dataUsingEncoding:NSUTF8StringEncoding]];
@@ -2124,7 +2125,7 @@ end:
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    NSRunInformationalAlertPanel(_NS("Crash Log successfully sent"),
+    NSRunInformationalAlertPanel(_NS("Crash report successfully sent"),
                 _NS("Thanks for your report!"),
                 _NS("OK"), nil, nil, nil);
     [connection release];
@@ -2195,26 +2196,22 @@ end:
 
 - (void)lookForCrashLog
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     // This pref key doesn't exists? this VLC is an upgrade, and this crash log come from previous version
     BOOL areCrashLogsTooOld = ![[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportYear"];
     NSString * latestLog = [self latestCrashLogPathPreviouslySeen:NO];
     if( latestLog && !areCrashLogsTooOld )
-        [self performSelectorOnMainThread:@selector(notifyCrashLogToUser:) withObject:latestLog waitUntilDone:NO];
-
-    [pool release];
+        [NSApp runModalForWindow: o_crashrep_win];
+    [o_pool release];
 }
 
-- (void)notifyCrashLogToUser:(NSString *)crashLogPath
+- (IBAction)crashReporterAction:(id)sender
 {
-    int ret = NSRunInformationalAlertPanel(_NS("VLC crashed previously"),
-                _NS("VLC crashed previously. Do you want to send an email with details on the crash to VLC's development team?"),
-                _NS("Send"), _NS("Don't Send"), nil, nil);
-    if( ret == NSAlertDefaultReturn )
-    {
-        [self sendCrashLog:[NSString stringWithContentsOfFile:crashLogPath] withUserComment:_NS("<Explain here what you were doing when VLC crashed, with possibly a link to the failing video>")];
-    }
+    if( sender == o_crashrep_send_btn )
+        [self sendCrashLog:[NSString stringWithContentsOfFile: [self latestCrashLogPath]] withUserComment: [o_crashrep_fld string]];
+
+    [NSApp stopModal];
+    [o_crashrep_win orderOut: sender];
 }
 
 - (IBAction)openCrashLog:(id)sender

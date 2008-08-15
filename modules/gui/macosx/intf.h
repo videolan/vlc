@@ -161,6 +161,14 @@ struct intf_sys_t
     NSMutableArray * o_msg_arr; /* messages array */
     NSLock * o_msg_lock;        /* messages lock  */
     IBOutlet NSButton * o_msgs_btn_crashlog;    /* messages open crashlog */
+    
+    /* CrashReporter panel */
+    IBOutlet NSButton * o_crashrep_dontSend_btn;
+    IBOutlet NSButton * o_crashrep_send_btn;
+    IBOutlet NSTextView * o_crashrep_fld;
+    IBOutlet NSTextField * o_crashrep_title_txt;
+    IBOutlet NSTextField * o_crashrep_desc_txt;
+    IBOutlet NSWindow * o_crashrep_win;
 
     /* main menu */
 
@@ -384,6 +392,8 @@ struct intf_sys_t
 - (IBAction)viewErrorsAndWarnings:(id)sender;
 - (IBAction)showMessagesPanel:(id)sender;
 - (IBAction)showInformationPanel:(id)sender;
+
+- (IBAction)crashReporterAction:(id)sender;
 
 - (IBAction)togglePlaylist:(id)sender;
 - (void)updateTogglePlaylistState;
