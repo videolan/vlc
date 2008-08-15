@@ -4,14 +4,14 @@ download-all: autoconf gnumake automake libtool gettext pkgconfig freetype2 \
     speex libshout faad2 faac lame twolame libebml libmatroska ffmpeg libdca \
     libdvdcss libdvdread libdvdnav libdvbpsi live libcaca libmodplug xml pcre \
     asa jpeg tiff SDL zlib libpng libgpg-error libgcrypt opencdk gnutls \
-    libopendaap libcddb libcdio vcdimager SDL_image glib gecko-sdk mpcdec \
+    libcddb libcdio vcdimager SDL_image glib gecko-sdk mpcdec \
     dirac expat taglib x264 yasm goom lua zvbi fontconfig ncurses liboil \
     schroedinger libass all
 all: .autoconf .gnumake .automake .libtool .intl .pkgcfg .freetype \
     .fribidi .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
     .flac .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
     .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig .asa \
-    .png .gpg-error .gcrypt .opencdk .gnutls .opendaap .cddb .cdio .vcdimager \
+    .png .gpg-error .gcrypt .opencdk .gnutls .cddb .cdio .vcdimager \
     .SDL_image .glib .gecko .mpcdec .dirac_encoder .dirac_decoder \
     .dca .tag .x264 .goom2k4 .lua .zvbi .fontconfig .ncurses .liboil \
     .schroedinger .libass .aclocal
