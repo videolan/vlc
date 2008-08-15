@@ -134,11 +134,22 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *p_stream )
     if( !p_libxml_reader )
     {
         msg_Err( p_xml, "failed to create XML parser" );
-        return 0;
+        return NULL;
     }
 
     p_reader = malloc( sizeof(xml_reader_t) );
+    if( !p_reader )
+    {
+        xmlFreeTextReader( p_reader->p_sys->p_reader );
+        return NULL;
+    }
     p_reader->p_sys = p_sys = malloc( sizeof(xml_reader_sys_t) );
+    if( !p_sys )
+    {
+        free( p_reader );
+        xmlFreeTextReader( p_reader->p_sys->p_reader );
+        return NULL;
+    }
     p_reader->p_sys->p_reader = p_libxml_reader;
     p_reader->p_xml = p_xml;
 
