@@ -1172,7 +1172,7 @@ public:
     void LoadCues( KaxCues *cues );
     void LoadTags( KaxTags *tags );
     void InformationCreate( );
-    void Seek( mtime_t i_date, mtime_t i_time_offset );
+    void Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position );
 #if LIBMATROSKA_VERSION >= 0x000800
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, int64_t *, int64_t *, int64_t *);
 #else
@@ -1206,7 +1206,7 @@ public:
     size_t AddSegment( matroska_segment_c *p_segment );
     void PreloadLinked( );
     mtime_t Duration( ) const;
-    void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter );
+    void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter, int64_t i_global_position );
 
     inline chapter_edition_c *Edition()
     {
@@ -3228,7 +3228,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                 {
                     // only physically seek if necessary
                     if ( psz_current_chapter == NULL || (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time) )
-                        Seek( demux, sys.i_pts, 0, psz_curr_chapter );
+                        Seek( demux, sys.i_pts, 0, psz_curr_chapter, -1 );
                 }
             }
  
@@ -3449,6 +3449,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
     matroska_segment_c *p_segment = p_vsegment->Segment();
     mtime_t            i_time_offset = 0;
+    int64_t            i_global_position = -1;
 
     int         i_index;
 
@@ -3475,13 +3476,13 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
         {
             int64_t i_pos = int64_t( f_percent * stream_Size( p_demux->s ) );
 
-            msg_Dbg( p_demux, "inacurate way of seeking" );
+            msg_Dbg( p_demux, "inaccurate way of seeking for pos:%"PRId64, i_pos );
             for( i_index = 0; i_index < p_segment->i_index; i_index++ )
             {
-                if( p_segment->p_indexes[i_index].i_position >= i_pos)
-                {
+                if( p_segment->b_cues && p_segment->p_indexes[i_index].i_position < i_pos )
                     break;
-                }
+                if( !p_segment->b_cues && p_segment->p_indexes[i_index].i_position >= i_pos && p_segment->p_indexes[i_index].i_time > 0 )
+                    break;
             }
             if( i_index == p_segment->i_index )
             {
@@ -3490,37 +3491,15 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
 
             i_date = p_segment->p_indexes[i_index].i_time;
 
-#if 0
-            if( p_segment->p_indexes[i_index].i_position < i_pos )
+            if( !p_segment->b_cues && ( p_segment->p_indexes[i_index].i_position < i_pos || p_segment->p_indexes[i_index].i_position - i_pos > 2000000 ))
             {
-                EbmlElement *el;
-
-                msg_Warn( p_demux, "searching for cluster, could take some time" );
-
-                /* search a cluster */
-                while( ( el = p_sys->ep->Get() ) != NULL )
-                {
-                    if( MKV_IS_ID( el, KaxCluster ) )
-                    {
-                        KaxCluster *cluster = (KaxCluster*)el;
-
-                        /* add it to the index */
-                        p_segment->IndexAppendCluster( cluster );
-
-                        if( (int64_t)cluster->GetElementPosition() >= i_pos )
-                        {
-                            p_sys->cluster = cluster;
-                            p_sys->ep->Down();
-                            break;
-                        }
-                    }
-                }
+                msg_Dbg( p_demux, "no cues, seek request to global pos: %"PRId64, i_pos );
+                i_global_position = i_pos;
             }
-#endif
         }
     }
 
-    p_vsegment->Seek( *p_demux, i_date, i_time_offset, psz_chapter );
+    p_vsegment->Seek( *p_demux, i_date, i_time_offset, psz_chapter, i_global_position );
 }
 
 /*****************************************************************************
@@ -5542,7 +5521,7 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, chapter_item_c * p_chapt
         if ( !p_chapter->Enter( true ) )
         {
             // jump to the location in the found segment
-            vsegment.Seek( demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+            vsegment.Seek( demuxer, p_chapter->i_user_start_time, -1, p_chapter, -1 );
         }
     }
  
@@ -5879,7 +5858,7 @@ void virtual_segment_c::AppendUID( const EbmlBinary * p_UID )
     linked_uids.push_back( *(KaxSegmentUID*)(p_UID) );
 }
 
-void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
+void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position )
 {
     KaxBlock    *block;
 #if LIBMATROSKA_VERSION >= 0x000800
@@ -5892,6 +5871,39 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
     size_t      i_track;
     int64_t     i_seek_position = i_start_pos;
     int64_t     i_seek_time = i_start_time;
+
+    if( i_global_position >= 0 )
+    {
+        /* Special case for seeking in files with no cues */
+        EbmlElement *el = NULL;
+        es.I_O().setFilePointer( i_start_pos, seek_beginning );
+        delete ep;
+        ep = new EbmlParser( &es, segment, &sys.demuxer );
+        cluster = NULL;
+
+        while( ( el = ep->Get() ) != NULL )
+        {
+            if( MKV_IS_ID( el, KaxCluster ) )
+            {
+                cluster = (KaxCluster *)el;
+                i_cluster_pos = cluster->GetElementPosition();
+                if( i_index == 0 ||
+                        ( i_index > 0 && p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
+                {
+                    IndexAppendCluster( cluster );
+                }
+                if( es.I_O().getFilePointer() >= i_global_position )
+                {
+                    ParseCluster();
+                    msg_Dbg( &sys.demuxer, "we found a cluster that is in the neighbourhood" );
+                    es_out_Control( sys.demuxer.out, ES_OUT_RESET_PCR );
+                    return;
+                }
+            }
+        }
+        msg_Err( &sys.demuxer, "This file has no cues, and we were unable to seek to the requested position by parsing." );
+        return;
+    }
 
     if ( i_index > 0 )
     {
@@ -5938,7 +5950,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
         }
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, i_date );
     }
-
 
     while( i_track_skipping > 0 )
     {
@@ -6015,7 +6026,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
     }
 }
 
-void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter )
+void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter, int64_t i_global_position )
 {
     demux_sys_t *p_sys = demuxer.p_sys;
     size_t i;
@@ -6059,7 +6070,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
         i_current_segment = i;
     }
 
-    linked_segments[i]->Seek( i_date, i_time_offset );
+    linked_segments[i]->Seek( i_date, i_time_offset, i_global_position );
 }
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
@@ -6604,7 +6615,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             {
                 if ( !p_chapter->Enter( true ) )
                     // jump to the location in the found segment
-                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter, -1 );
 
                 f_result = true;
             }
@@ -6622,7 +6633,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             {
                 if ( !p_chapter->Enter( true ) )
                     // jump to the location in the found segment
-                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter, -1 );
 
                 f_result = true;
             }
@@ -6854,7 +6865,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         else
         {
             if ( !p_chapter->EnterAndLeave( sys.p_current_segment->CurrentChapter() ) )
-                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter, -1 );
             b_result = true;
         }
     }
