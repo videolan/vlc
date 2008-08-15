@@ -1496,10 +1496,8 @@ static int Open( vlc_object_t * p_this )
     p_segment = p_stream->segments[0];
     if( p_segment->cluster == NULL )
     {
-        msg_Warn( p_demux, "cannot find any cluster, damaged file ?" );
-
-        // reset the stream reading to the first cluster of the segment used
-        p_stream->p_in->setFilePointer( p_segment->cluster->GetElementPosition() );
+        msg_Err( p_demux, "cannot find any cluster, damaged file ?" );
+        goto error;
     }
 
     if (config_GetInt( p_demux, "mkv-preload-local-dir" ))
