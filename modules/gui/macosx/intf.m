@@ -1870,6 +1870,9 @@ end:
 
     if( nib_wizard_loaded )
         [o_wizard release];
+
+    [crashLogURLConnection cancel];
+    [crashLogURLConnection release];
  
     [o_embedded_list release];
     [o_interaction_list release];
@@ -2127,7 +2130,7 @@ end:
     [req setHTTPBody:[postBody dataUsingEncoding:NSUTF8StringEncoding]];
 
     /* Released from delegate */
-    NSURLConnection *theConnection = [[NSURLConnection alloc] initWithRequest:req delegate:self];
+    crashLogURLConnection = [[NSURLConnection alloc] initWithRequest:req delegate:self];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -2135,13 +2138,15 @@ end:
     NSRunInformationalAlertPanel(_NS("Crash Report successfully sent"),
                 _NS("Thanks for your report!"),
                 _NS("OK"), nil, nil, nil);
-    [connection release];
+    [crashLogURLConnection release];
+    crashLogURLConnection = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     NSRunCriticalAlertPanel(_NS("Error when sending the Crash Report"), [error localizedDescription], @"OK", nil, nil);
-    [connection release];
+    [crashLogURLConnection release];
+    crashLogURLConnection = nil;
 }
 
 - (NSString *)latestCrashLogPathPreviouslySeen:(BOOL)previouslySeen
