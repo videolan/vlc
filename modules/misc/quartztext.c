@@ -663,9 +663,9 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                 i_font_alpha = strtol( psz_value + 1, NULL, 16 );
                 i_font_alpha &= 0xff;
             }
-            free( psz_name );
-            free( psz_value );
         }
+        free( psz_name );
+        free( psz_value );
     }
     rv = PushFont( p_fonts,
                    psz_fontname,
@@ -736,7 +736,6 @@ static int ProcessNodes( filter_t *p_filter,
                 break;
             case XML_READER_ENDELEM:
                 psz_node = xml_ReaderName( p_xml_reader );
-
                 if( psz_node )
                 {
                     if( !strcasecmp( "font", psz_node ) )
