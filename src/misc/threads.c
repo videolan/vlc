@@ -568,6 +568,15 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
     return ret;
 }
 
+#if defined (WIN32)
+/* APC procedure for thread cancellation */
+static void CALLBACK vlc_cancel_self (ULONG_PTR dummy)
+{
+    (void)dummy;
+    vlc_control_cancel (VLC_DO_CANCEL);
+}
+#endif
+
 /**
  * Marks a thread as cancelled. Next time the target thread reaches a
  * cancellation point (while not having disabled cancellation), it will
@@ -579,6 +588,8 @@ void vlc_cancel (vlc_thread_t thread_id)
 {
 #if defined (LIBVLC_USE_PTHREAD)
     pthread_cancel (thread_id);
+#elif defined (WIN32)
+    QueueUserAPC (vlc_cancel_self, thread_id->handle, 0);
 #endif
 }
 
@@ -864,7 +875,7 @@ void vlc_control_cancel (int cmd, ...)
 {
 #ifdef LIBVLC_USE_PTHREAD
     (void) cmd;
-    abort();
+    assert (0);
 #else
     va_list ap;
 
