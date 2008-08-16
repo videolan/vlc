@@ -5019,9 +5019,9 @@ then
  
   ORIGCFLAGS=$CFLAGS
   CFLAGS="$CFLAGS -x objective-c"
-  AC_TRY_COMPILE([#import <QuartzCore/CALayer.h>], 
+  AC_TRY_COMPILE([#import <QuartzCore/CALayer.h>],,
   [VLC_ADD_PLUGIN([opengllayer])
-  VLC_ADD_OBJCFLAGS([opengllayer], [-isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5])])
+  VLC_ADD_OBJCFLAGS([opengllayer])],[])
   CFLAGS=$ORIGCFLAGS
 fi
 
