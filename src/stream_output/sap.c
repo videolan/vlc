@@ -197,6 +197,8 @@ static void * RunThread( vlc_object_t *p_this)
     {
         int i;
 
+        msleep( SAP_IDLE );
+
         /* If needed, get the rate info */
         if( p_sap->b_control == true )
         {
@@ -222,11 +224,9 @@ static void * RunThread( vlc_object_t *p_this)
         else
         {
             vlc_object_unlock( p_sap );
-            msleep( SAP_IDLE );
             continue;
         }
         p_session = p_sap->pp_sessions[p_sap->i_current_session];
-        vlc_object_unlock( p_sap );
 
         /* And announce it */
         if( p_session->p_address->b_enabled == true &&
@@ -234,8 +234,7 @@ static void * RunThread( vlc_object_t *p_this)
         {
             announce_SendSAPAnnounce( p_sap, p_session );
         }
-
-        msleep( SAP_IDLE );
+        vlc_object_unlock( p_sap );
     }
     return NULL;
 }
