@@ -269,7 +269,8 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t     header[18];
-    int         i_size, i_id, i_flags, i;
+    int         i_id, i_flags, i;
+    unsigned int i_size;
     int64_t     i_pts;
     real_track_t *tk = NULL;
     bool  b_selected;
@@ -309,6 +310,14 @@ static int Demux( demux_t *p_demux )
              p_sys->i_data_packets, i_size, i_id, (uint32_t)(i_pts/1000) );
 
     p_sys->i_data_packets++;
+
+    if( i_size == 0 ) return 0;
+
+    if( i_size > sizeof(p_sys->buffer) )
+    {
+        msg_Err( p_demux, "Got a size to read bigger than our buffer. Ignoring current frame." );
+        return 0;
+    }
 
     stream_Read( p_demux->s, p_sys->buffer, i_size );
 
