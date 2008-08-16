@@ -356,7 +356,7 @@
 /* Begin PBXLegacyTarget section */
 		633BD6DB0D2ADE4E0012A314 /* vlc-core */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = $ACTION;
+			buildArgumentsString = vlc;
 			buildConfigurationList = 633BD6DF0D2ADE6D0012A314 /* Build configuration list for PBXLegacyTarget "vlc-core" */;
 			buildPhases = (
 			);
@@ -365,7 +365,7 @@
 			dependencies = (
 			);
 			name = "vlc-core";
-			passBuildSettingsInEnvironment = 0;
+			passBuildSettingsInEnvironment = 1;
 			productName = "vlc-core";
 		};
 /* End PBXLegacyTarget section */
