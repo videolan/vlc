@@ -82,7 +82,7 @@ struct sap_address_t
 /* A SAP session descriptor, enqueued in the SAP handler queue */
 struct sap_session_t {
     uint8_t       *psz_data;
-    unsigned      i_length;
+    size_t         i_length;
     sap_address_t *p_address;
     session_descriptor_t *p_sd;
 
@@ -193,10 +193,7 @@ static void * RunThread( vlc_object_t *p_this)
     sap_handler_t *p_sap = (sap_handler_t*)p_this;
     sap_session_t *p_session;
     int canc = vlc_savecancel ();
-    /* TODO: Once net_Write() is cancel-safe, so will this whole thread.
-     * However, there is a more serious issues here: msleep(SAP_IDLE).
-     * This thread should really use poll().
-     */
+    /* TODO: Use poll() instead of msleep()). */
 
     while( !p_sap->b_die )
     {
@@ -551,8 +548,6 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
 static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
                                      sap_session_t *p_session )
 {
-    int i_ret;
-
     /* This announce has never been sent yet */
     if( p_session->i_last == 0 )
     {
@@ -563,15 +558,11 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
 
     if( p_session->i_next < mdate() )
     {
-#ifdef EXTRA_DEBUG
-        msg_Dbg( p_sap, "sending announce");
-#endif
-        i_ret = net_Write( p_sap, p_session->p_address->i_wfd, NULL,
-                           p_session->psz_data,
-                           p_session->i_length );
-        if( i_ret != (int)p_session->i_length )
+        ssize_t i_ret = send( p_session->p_address->i_wfd, p_session->psz_data,
+                              p_session->i_length, 0 );
+        if( i_ret != (ssize_t)p_session->i_length )
         {
-            msg_Warn( p_sap, "SAP send failed on address %s (%i %i)",
+            msg_Warn( p_sap, "SAP send failed on address %s (%zd/%zu)",
                       p_session->p_address->psz_address,
                       i_ret, p_session->i_length );
         }
