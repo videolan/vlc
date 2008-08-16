@@ -111,7 +111,6 @@ struct intf_sys_t
 
 static int  Open            ( vlc_object_t * );
 static void Close           ( vlc_object_t * );
-static void Unload          ( intf_thread_t * );
 static void Run             ( intf_thread_t * );
 
 static int ItemChange       ( vlc_object_t *, const char *, vlc_value_t,
@@ -205,23 +204,26 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t                  *p_sys  = p_intf->p_sys;
 
     p_playlist = pl_Yield( p_intf );
-    PL_LOCK;
-
-    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
-
-    p_input = p_playlist->p_input;
-    if ( p_input )
+    if( p_playlist )
     {
-        vlc_object_yield( p_input );
+        PL_LOCK;
 
-        if( p_sys->b_state_cb )
-            var_DelCallback( p_input, "state", PlayingChange, p_intf );
+        var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
 
-        vlc_object_release( p_input );
+        p_input = p_playlist->p_input;
+        if ( p_input )
+        {
+            vlc_object_yield( p_input );
+
+            if( p_sys->b_state_cb )
+                var_DelCallback( p_input, "state", PlayingChange, p_intf );
+
+            vlc_object_release( p_input );
+        }
+
+        PL_UNLOCK;
+        pl_Release( p_intf );
     }
-
-    PL_UNLOCK;
-    pl_Release( p_intf );
 
     p_intf->b_dead = true;
     /* we lock the mutex in case p_sys is being accessed from a callback */
@@ -240,19 +242,6 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-
-/*****************************************************************************
- * Unload: Unloads the audioscrobbler when encountering fatal errors
- *****************************************************************************/
-static void Unload( intf_thread_t *p_this )
-{
-    vlc_object_kill( p_this );
-    vlc_object_detach( p_this );
-    if( p_this->p_module )
-        module_Unneed( p_this, p_this->p_module );
-    vlc_mutex_destroy( &p_this->change_lock );
-    vlc_object_release( p_this );
-}
 
 /*****************************************************************************
  * Run : call Handshake() then submit songs
@@ -300,7 +289,6 @@ static void Run( intf_thread_t *p_intf )
             switch( Handshake( p_intf ) )
             {
                 case VLC_ENOMEM:
-                    Unload( p_intf );
                     return;
 
                 case VLC_ENOVAR:
@@ -311,7 +299,6 @@ static void Run( intf_thread_t *p_intf )
                         "audioscrobbler plugin, and restart VLC.\n"
                         "Visit http://www.last.fm/join/ to get an account.")
                     );
-                    Unload( p_intf );
                     return;
 
                 case VLC_SUCCESS:
@@ -322,8 +309,7 @@ static void Run( intf_thread_t *p_intf )
                     break;
 
                 case VLC_AUDIOSCROBBLER_EFATAL:
-                    msg_Warn( p_intf, "Unloading..." );
-                    Unload( p_intf );
+                    msg_Warn( p_intf, "Exiting..." );
                     return;
 
                 case VLC_EGENERIC:
@@ -341,7 +327,6 @@ static void Run( intf_thread_t *p_intf )
 
         if( !asprintf( &psz_submit, "s=%s", p_sys->psz_auth_token ) )
         {   /* Out of memory */
-            Unload( p_intf );
             return;
         }
 
@@ -363,7 +348,6 @@ static void Run( intf_thread_t *p_intf )
             ) )
             {   /* Out of memory */
                 vlc_mutex_unlock( &p_sys->lock );
-                Unload( p_intf );
                 return;
             }
             psz_submit_tmp = psz_submit;
@@ -373,7 +357,6 @@ static void Run( intf_thread_t *p_intf )
                 free( psz_submit_tmp );
                 free( psz_submit_song );
                 vlc_mutex_unlock( &p_sys->lock );
-                Unload( p_intf );
                 return;
             }
             free( psz_submit_song );
