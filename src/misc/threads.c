@@ -180,7 +180,7 @@ int vlc_threads_init( void )
         vlc_threadvar_create( &thread_object_key, NULL );
 #endif
         vlc_threadvar_create( &msg_context_global_key, msg_StackDestroy );
-#ifndef LIBVLC_USE_PTHREAD
+#ifndef LIBVLC_USE_PTHREAD_CANCEL
         vlc_threadvar_create( &cancel_key, free );
 #endif
     }
@@ -586,10 +586,12 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR dummy)
  */
 void vlc_cancel (vlc_thread_t thread_id)
 {
-#if defined (LIBVLC_USE_PTHREAD)
+#if defined (LIBVLC_USE_PTHREAD_CANCEL)
     pthread_cancel (thread_id);
 #elif defined (WIN32)
     QueueUserAPC (vlc_cancel_self, thread_id->handle, 0);
+#else
+#   warning vlc_cancel is not implemented!
 #endif
 }
 
@@ -864,7 +866,7 @@ void vlc_thread_cancel (vlc_object_t *obj)
         vlc_cancel (priv->thread_id);
 }
 
-#ifndef LIBVLC_USE_PTHREAD
+#ifndef LIBVLC_USE_PTHREAD_CANCEL
 typedef struct vlc_cancel_t
 {
     vlc_cleanup_t *cleaners;
@@ -877,7 +879,7 @@ void vlc_control_cancel (int cmd, ...)
 {
     /* NOTE: This function only modifies thread-specific data, so there is no
      * need to lock anything. */
-#ifdef LIBVLC_USE_PTHREAD
+#ifdef LIBVLC_USE_PTHREAD_CANCEL
     (void) cmd;
     assert (0);
 #else

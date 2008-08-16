@@ -47,6 +47,7 @@
 
 #else                                         /* pthreads (like Linux & BSD) */
 #   define LIBVLC_USE_PTHREAD 1
+#   define LIBVLC_USE_PTHREAD_CANCEL 1
 #   define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
 
 #   include <stdlib.h> /* lldiv_t definition (only in C99) */
@@ -181,7 +182,7 @@ VLC_EXPORT( void, vlc_cancel, (vlc_thread_t) );
 VLC_EXPORT( int, vlc_join, (vlc_thread_t, void **) );
 VLC_EXPORT (void, vlc_control_cancel, (int cmd, ...));
 
-#ifndef LIBVLC_USE_PTHREAD
+#ifndef LIBVLC_USE_PTHREAD_CANCEL
 enum {
     VLC_SAVE_CANCEL,
     VLC_RESTORE_CANCEL,
@@ -283,7 +284,7 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
 static inline int vlc_savecancel (void)
 {
     int state;
-#if defined (LIBVLC_USE_PTHREAD)
+#if defined (LIBVLC_USE_PTHREAD_CANCEL)
     (void) pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
 #else
     vlc_control_cancel (VLC_SAVE_CANCEL, &state);
@@ -298,7 +299,7 @@ static inline int vlc_savecancel (void)
  */
 static inline void vlc_restorecancel (int state)
 {
-#if defined (LIBVLC_USE_PTHREAD)
+#if defined (LIBVLC_USE_PTHREAD_CANCEL)
     (void) pthread_setcancelstate (state, NULL);
 #else
     vlc_control_cancel (VLC_RESTORE_CANCEL, state);
@@ -312,14 +313,14 @@ static inline void vlc_restorecancel (int state)
  */
 static inline void vlc_testcancel (void)
 {
-#if defined (LIBVLC_USE_PTHREAD)
+#if defined (LIBVLC_USE_PTHREAD_CANCEL)
     pthread_testcancel ();
 #else
     vlc_control_cancel (VLC_TEST_CANCEL);
 #endif
 }
 
-#if defined (LIBVLC_USE_PTHREAD)
+#if defined (LIBVLC_USE_PTHREAD_CANCEL)
 /**
  * Registers a new procedure to run if the thread is cancelled (or otherwise
  * exits prematurely). Any call to vlc_cleanup_push() <b>must</b> paired with a
@@ -371,7 +372,7 @@ struct vlc_cleanup_t
         vlc_cleanup_data.proc (vlc_cleanup_data.data); \
     } while (0)
 
-#endif /* LIBVLC_USE_PTHREAD */
+#endif /* LIBVLC_USE_PTHREAD_CANCEL */
 
 static inline void vlc_cleanup_lock (void *lock)
 {
