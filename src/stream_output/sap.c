@@ -192,10 +192,9 @@ static void * RunThread( vlc_object_t *p_this)
 {
     sap_handler_t *p_sap = (sap_handler_t*)p_this;
     sap_session_t *p_session;
-    int canc = vlc_savecancel ();
     /* TODO: Use poll() instead of msleep()). */
 
-    while( !p_sap->b_die )
+    for (;;)
     {
         int i;
 
@@ -234,11 +233,12 @@ static void * RunThread( vlc_object_t *p_this)
         if( p_session->p_address->b_enabled == true &&
             p_session->p_address->b_ready == true )
         {
+            int canc = vlc_savecancel ();
             announce_SendSAPAnnounce( p_sap, p_session );
+            vlc_restorecancel (canc);
         }
         vlc_object_unlock( p_sap );
     }
-    vlc_restorecancel (canc);
     return NULL;
 }
 
