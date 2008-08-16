@@ -1146,7 +1146,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                     id->p_decoder->fmt_out.i_codec );
     id->p_encoder->fmt_in.audio.i_format = id->p_decoder->fmt_out.i_codec;
 
-    id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
+    id->p_encoder->fmt_in.audio.i_rate = fmt_last.audio.i_rate;//id->p_encoder->fmt_out.audio.i_rate;
     id->p_encoder->fmt_in.audio.i_physical_channels =
         id->p_encoder->fmt_out.audio.i_physical_channels;
     id->p_encoder->fmt_in.audio.i_original_channels =
