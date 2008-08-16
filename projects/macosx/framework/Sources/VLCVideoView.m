@@ -153,7 +153,7 @@
     [layoutManager setOriginalVideoSize:aLayer.bounds.size];
     [rootLayer setLayoutManager:layoutManager];
     [rootLayer insertSublayer:aLayer atIndex:0];
-    [self setNeedsDisplayOnBoundsChange:YES];
+    [aLayer setNeedsDisplayOnBoundsChange:YES];
 
     [CATransaction commit];
     self.hasVideo = YES;
