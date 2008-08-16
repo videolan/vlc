@@ -148,6 +148,20 @@ void vlc_pthread_fatal (const char *action, int error,
 static vlc_threadvar_t cancel_key;
 #endif
 
+/**
+ * Per-thread cancellation data
+ */
+#ifndef LIBVLC_USE_PTHREAD_CANCEL
+typedef struct vlc_cancel_t
+{
+    vlc_cleanup_t *cleaners;
+    bool           killable;
+    bool           killed;
+} vlc_cancel_t;
+
+# define VLC_CANCEL_INIT { NULL, false, true }
+#endif
+
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
  *****************************************************************************
@@ -451,7 +465,10 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 #elif defined (WIN32)
 static unsigned __stdcall vlc_entry (void *data)
 {
+    vlc_cancel_t cancel_data = VLC_CANCEL_INIT;
     vlc_thread_t self = data;
+
+    vlc_threadvar_set (&cancel_key, &cancel_data);
     self->data = self->entry (self->data);
     return 0;
 }
@@ -866,15 +883,6 @@ void vlc_thread_cancel (vlc_object_t *obj)
         vlc_cancel (priv->thread_id);
 }
 
-#ifndef LIBVLC_USE_PTHREAD_CANCEL
-typedef struct vlc_cancel_t
-{
-    vlc_cleanup_t *cleaners;
-    bool           killable;
-    bool           killed;
-} vlc_cancel_t;
-#endif
-
 void vlc_control_cancel (int cmd, ...)
 {
     /* NOTE: This function only modifies thread-specific data, so there is no
@@ -888,15 +896,16 @@ void vlc_control_cancel (int cmd, ...)
     va_start (ap, cmd);
 
     vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+#ifndef WIN32
     if (nfo == NULL)
     {
         nfo = malloc (sizeof (*nfo));
         if (nfo == NULL)
             abort ();
-        nfo->cleaners = NULL;
-        nfo->killed = false;
-        nfo->killable = true;
+        *nfo = VLC_CANCEL_INIT;
+        vlc_threadvar_set (&cancel_key, nfo);
     }
+#endif
 
     switch (cmd)
     {
