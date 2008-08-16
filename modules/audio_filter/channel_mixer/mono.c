@@ -88,7 +88,7 @@ struct filter_sys_t
 
 #define MONO_DOWNMIX_TEXT N_("Use downmix algorithm")
 #define MONO_DOWNMIX_LONGTEXT N_("This option selects a stereo to mono " \
-    "downmix algorithm that is used in the headphone channel mixer. It" \
+    "downmix algorithm that is used in the headphone channel mixer. It " \
     "gives the effect of standing in a room full of speakers." )
 
 #define MONO_CHANNEL_TEXT N_("Select channel to keep")
