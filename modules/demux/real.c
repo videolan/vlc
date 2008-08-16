@@ -311,12 +311,16 @@ static int Demux( demux_t *p_demux )
 
     p_sys->i_data_packets++;
 
-    if( i_size == 0 ) return 0;
+    if( i_size == 0 )
+    {
+        msg_Err( p_demux, "Got a NUKK size to read. (Invalid format?)" );
+        return 1;
+    }
 
     if( i_size > sizeof(p_sys->buffer) )
     {
-        msg_Err( p_demux, "Got a size to read bigger than our buffer. Ignoring current frame." );
-        return 0;
+        msg_Err( p_demux, "Got a size to read bigger than our buffer. (Invalid format?)" );
+        return 1;
     }
 
     stream_Read( p_demux->s, p_sys->buffer, i_size );
