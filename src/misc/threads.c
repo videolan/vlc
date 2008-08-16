@@ -829,3 +829,10 @@ error:
     p_priv->b_thread = false;
 }
 
+void vlc_thread_cancel (vlc_object_t *obj)
+{
+    vlc_object_internals_t *priv = vlc_internals (obj);
+
+    if (priv->b_thread)
+        vlc_cancel (priv->thread_id);
+}

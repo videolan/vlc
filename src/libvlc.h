@@ -52,6 +52,10 @@ void vlc_refcheck (vlc_object_t *obj);
 # define vlc_refcheck( obj ) (void)0
 #endif
 
+/* Hopefully, no need to export this. There is a new thread API instead. */
+void vlc_thread_cancel (vlc_object_t *);
+
+
 /*
  * CPU capabilities
  */
