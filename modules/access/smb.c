@@ -198,20 +198,23 @@ static int Open( vlc_object_t *p_this )
 #ifdef WIN32
     if( psz_user )
         Win32AddConnection( p_access, psz_path, psz_user, psz_pwd, psz_domain);
-    asprintf( &psz_uri, "//%s", psz_path );
+    i_ret = asprintf( &psz_uri, "//%s", psz_path );
 #else
     if( psz_user )
-        asprintf( &psz_uri, "smb://%s%s%s%s%s@%s",
-                  psz_domain ? psz_domain : "", psz_domain ? ";" : "",
-                  psz_user, psz_pwd ? ":" : "",
-                  psz_pwd ? psz_pwd : "", psz_path );
+        i_ret = asprintf( &psz_uri, "smb://%s%s%s%s%s@%s",
+                          psz_domain ? psz_domain : "", psz_domain ? ";" : "",
+                          psz_user, psz_pwd ? ":" : "",
+                          psz_pwd ? psz_pwd : "", psz_path );
     else
-        asprintf( &psz_uri, "smb://%s", psz_path );
+        i_ret = asprintf( &psz_uri, "smb://%s", psz_path );
 #endif
 
     free( psz_user );
     free( psz_pwd );
     free( psz_domain );
+
+    if( i_ret == -1 )
+        return VLC_ENOMEM;
 
 #ifdef USE_CTX
     if( !(p_smb = smbc_new_context()) )
