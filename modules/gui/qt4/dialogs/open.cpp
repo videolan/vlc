@@ -165,10 +165,14 @@ OpenDialog::OpenDialog( QWidget *parent,
     /* Initialize caching */
     storedMethod = "";
     newCachingMethod( "file-caching" );
+
+    resize( getSettings()->value( "opendialog-size", QSize( 520, 490 ) ).toSize() );
 }
 
 OpenDialog::~OpenDialog()
-{}
+{
+    getSettings()->setValue( "opendialog-size", size() );
+}
 
 /* Finish the dialog and decide if you open another one after */
 void OpenDialog::setMenuAction()
