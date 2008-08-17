@@ -155,6 +155,8 @@ void vlm_Delete( vlm_t *p_vlm )
      * is serialized against setting libvlc_priv->p_vlm from vlm_New(). */
     var_Get( p_vlm->p_libvlc, "vlm_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
+    vlc_object_kill( p_vlm );
+    vlc_thread_join( p_vlm );
     vlc_object_release( p_vlm );
     vlc_mutex_unlock( lockval.p_address );
 }
