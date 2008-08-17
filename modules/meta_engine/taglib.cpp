@@ -32,6 +32,13 @@
 #include <vlc_meta.h>
 #include <vlc_demux.h>
 #include <vlc_strings.h>
+#include <vlc_charset.h>
+
+#ifdef WIN32
+# include <io.h>
+#else
+# include <unistd.h>
+#endif
 
 #include <fileref.h>
 #include <tag.h>
@@ -242,7 +249,30 @@ static int ReadMeta( vlc_object_t *p_this )
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
     p_demux_meta->p_meta = NULL;
 
-    FileRef f( p_demux->psz_path );
+#if defined(WIN32) || defined (UNDER_CE)
+    if(GetVersion() < 0x80000000)
+    {
+        wchar_t wpath[MAX_PATH + 1];
+        if( !MultiByteToWideChar( CP_UTF8, 0, p_demux->psz_path, -1, wpath, MAX_PATH) )
+        {
+            errno = ENOENT;
+            return VLC_EGENERIC;
+        }
+        wpath[MAX_PATH] = L'0';
+        FileRef f( wpath );
+    }
+    else return VLC_EGENERIC;
+#else
+    const char *local_name = ToLocale( p_demux->psz_path );
+
+    if( local_name == NULL )
+    {
+        return VLC_EGENERIC;
+    }
+    FileRef f( local_name );
+    LocaleFree( local_name );
+#endif
+
     if( f.isNull() )
         return VLC_EGENERIC;
 
