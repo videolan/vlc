@@ -9,6 +9,7 @@ Laurent Dupuy, who made a 540€ donation
 The VideoLAN team would like to thank the following contributors:
 
 Adam Sampson <ats @t offog d0t org> - libFLAC >= 1.1.3 API support
+Alan Wright <the dot smoothness at gmail d0t com> - Forum help and support
 Alex Antropoff <alant at transtelecom dot md> - RFC3016 (LATM) RTP packetizer extension, MMS fixes
 Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
 Alexander Didebulidze <alexander.didebulidze at stusta dot mhn dot de> - Georgian localization
@@ -83,6 +84,7 @@ Emmanuel Blindauer <manu at agat.net> - aRts audio output
 Enrico Gueli <e_gueli at yahoo.it> - Brightness threshold in adjust video filter
 Enrique Osuna <enrique.osuna at gmail.com> - Various bug fixes in libvlc. Major Mac OS X Framework improvements.
 Eren Türkay <turkay dot eren \a/ gmail point com> - Speex boundary checks and security fix
+Eric Adler <eric dot adler -- videoproductionsupport dot com> - Forum help and support, strings review
 Espen Skoglund <esk at ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE at cadmus.com> - directory browsing code
 Eurodata Computer Club <retron.info> - VLC icon design (v0.8.4)
@@ -135,6 +137,7 @@ Johnathan Rosser - Dirac video codec
 Jonas Larsen <jonas at vrt.dk> - Danish translation
 Jouni Kähkönen - Finnish translation
 Julien Blache <jb at technologeek.org> - disc ejection code
+Julien Bouquillon <julien -- bouquillon ## org> - Forum support and a VLC JS library 
 Julien Plissonneau Duquène - JACK audio input module 
 Julien Robert <jul at mac.com> - DTS to SPDIF fixes.
 Kang Jeong-Hee <keizie at gmail dot com> - Korean translation
