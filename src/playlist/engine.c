@@ -241,6 +241,7 @@ void playlist_release_current_input( playlist_t * p_playlist )
     /* Release the playlist lock, because we may get stuck
      * in vlc_object_release() for some time. */
     PL_UNLOCK;
+    vlc_thread_join( p_input );
     vlc_object_release( p_input );
     PL_LOCK;
 }

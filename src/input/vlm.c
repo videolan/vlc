@@ -759,11 +759,13 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
 }
 static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
 {
-    if( p_instance->p_input )
+    input_thread_t *p_input = p_instance->p_input;
+    if( p_input )
     {
-        input_StopThread( p_instance->p_input );
-        p_instance->p_sout = input_DetachSout( p_instance->p_input );
-        vlc_object_release( p_instance->p_input );
+        input_StopThread( p_input );
+        p_instance->p_sout = input_DetachSout( p_input );
+        vlc_thread_join( p_input );
+        vlc_object_release( p_input );
     }
     if( p_instance->p_sout )
         sout_DeleteInstance( p_instance->p_sout );
@@ -827,19 +829,21 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     }
 
     /* Stop old instance */
-    if( p_instance->p_input )
+    input_thread_t *p_input = p_instance->p_input;
+    if( p_input )
     {
         if( p_instance->i_index == i_input_index &&
-            !p_instance->p_input->b_eof && !p_instance->p_input->b_error )
+            !p_input->b_eof && !p_input->b_error )
         {
-            if( var_GetInteger( p_instance->p_input, "state" ) == PAUSE_S )
-                var_SetInteger( p_instance->p_input, "state",  PLAYING_S );
+            if( var_GetInteger( p_input, "state" ) == PAUSE_S )
+                var_SetInteger( p_input, "state",  PLAYING_S );
             return VLC_SUCCESS;
         }
 
-        input_StopThread( p_instance->p_input );
-        p_instance->p_sout = input_DetachSout( p_instance->p_input );
-        vlc_object_release( p_instance->p_input );
+        input_StopThread( p_input );
+        p_instance->p_sout = input_DetachSout( p_input );
+        vlc_thread_join( p_input );
+        vlc_object_release( p_input );
         if( !p_instance->b_sout_keep && p_instance->p_sout )
         {
             sout_DeleteInstance( p_instance->p_sout );
