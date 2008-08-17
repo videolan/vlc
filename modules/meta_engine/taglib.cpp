@@ -245,6 +245,7 @@ static int ReadMeta( vlc_object_t *p_this )
     demux_t         *p_demux = (demux_t *)p_this;
     demux_meta_t    *p_demux_meta = (demux_meta_t*)p_demux->p_private;
     vlc_meta_t      *p_meta;
+    TagLib::FileRef  f;
 
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
     p_demux_meta->p_meta = NULL;
@@ -254,22 +255,19 @@ static int ReadMeta( vlc_object_t *p_this )
     {
         wchar_t wpath[MAX_PATH + 1];
         if( !MultiByteToWideChar( CP_UTF8, 0, p_demux->psz_path, -1, wpath, MAX_PATH) )
-        {
-            errno = ENOENT;
             return VLC_EGENERIC;
-        }
+
         wpath[MAX_PATH] = L'0';
-        FileRef f( wpath );
+        f = FileRef( wpath );
     }
     else return VLC_EGENERIC;
 #else
     const char *local_name = ToLocale( p_demux->psz_path );
 
     if( local_name == NULL )
-    {
         return VLC_EGENERIC;
-    }
-    FileRef f( local_name );
+
+    f = FileRef( local_name );
     LocaleFree( local_name );
 #endif
 
