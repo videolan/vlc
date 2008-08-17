@@ -69,7 +69,7 @@ static void * ManageThread( void *user_data );
 static unichar VLCKeyToCocoa( unsigned int i_key );
 static unsigned int VLCModifiersToCocoa( unsigned int i_key );
 
-#pragma mark VLC -
+#pragma mark -
 #pragma mark VLC Interface Object Callbacks
 
 /*****************************************************************************
