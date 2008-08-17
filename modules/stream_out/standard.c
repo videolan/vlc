@@ -498,10 +498,12 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_id_t  *id;
 
     id = malloc( sizeof( sout_stream_id_t ) );
+    if( !id )
+        return NULL;
+
     if( ( id->p_input = sout_MuxAddStream( p_sys->p_mux, p_fmt ) ) == NULL )
     {
         free( id );
-
         return NULL;
     }
 
