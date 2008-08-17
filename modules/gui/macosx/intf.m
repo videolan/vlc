@@ -136,9 +136,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* Install a jmpbuffer to where we can go back before the NSApp exit
      * see applicationWillTerminate: */
-    /* We need that code to run on main thread */
-    [VLCApplication sharedApplication];
-    [NSApp setVLC: p_intf->p_libvlc];
+    [NSApplication sharedApplication];
 
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
