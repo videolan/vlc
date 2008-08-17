@@ -208,6 +208,8 @@ playlist_item_t * playlist_ItemNewWithType( playlist_t *p_playlist,
 */
 int playlist_ItemRelease( playlist_item_t *p_item )
 {
+    PL_ASSERT_LOCKED;
+
     /* Surprise, we can't actually do more because we
      * don't do refcounting, or eauivalent.
      * Because item are not only accessed by their id
