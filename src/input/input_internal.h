@@ -206,14 +206,13 @@ static inline void input_ControlPush( input_thread_t *p_input,
         memset( &p_input->p->control[0].val, 0, sizeof( vlc_value_t ) );
     }
     else
+    if( p_input->p->i_control >= INPUT_CONTROL_FIFO_SIZE )
     {
-        if( p_input->p->i_control >= INPUT_CONTROL_FIFO_SIZE )
-        {
-            msg_Err( p_input, "input control fifo overflow, trashing type=%d",
-                     i_type );
-            vlc_mutex_unlock( &p_input->p->lock_control );
-            return;
-        }
+        msg_Err( p_input, "input control fifo overflow, trashing type=%d",
+                 i_type );
+    }
+    else
+    {
         p_input->p->control[p_input->p->i_control].i_type = i_type;
         if( p_val )
             p_input->p->control[p_input->p->i_control].val = *p_val;
