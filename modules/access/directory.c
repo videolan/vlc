@@ -189,6 +189,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static ssize_t ReadNull( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 {
+    (void)p_access;
     /* Return fake data */
     memset( p_buffer, 0, i_len );
     return i_len;
@@ -201,7 +202,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 {
     char               *psz;
     int                 i_mode;
-    char               *psz_name = strdup (p_access->psz_path);
+    char               *psz_name = strdup( p_access->psz_path );
 
     if( psz_name == NULL )
         return VLC_ENOMEM;
@@ -216,6 +217,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     if( !p_input )
     {
         msg_Err( p_access, "unable to find input (internal error)" );
+        free( psz_name );
         pl_Release( p_access );
         return VLC_ENOOBJ;
     }
@@ -227,6 +229,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     {
         msg_Err( p_access, "unable to find item in playlist" );
         vlc_object_release( p_input );
+        free( psz_name );
         pl_Release( p_access );
         return VLC_ENOOBJ;
     }
@@ -340,6 +343,7 @@ static int DemuxOpen ( vlc_object_t *p_this )
  *****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
+    (void)p_demux;
     return 0;
 }
 
@@ -530,7 +534,7 @@ static int ReadDir( access_t *p_access, playlist_t *p_playlist,
 
                 memmove (psz_uri + 7, psz_uri, sizeof (psz_uri) - 7);
                 memcpy (psz_uri, "file://", 7);
-                p_input = input_item_NewWithType( p_playlist,
+                p_input = input_item_NewWithType( VLC_OBJECT( p_playlist ),
                                                  psz_uri, entry, 0, NULL,
                                                  -1, ITEM_TYPE_FILE );
                 if (p_input != NULL)
