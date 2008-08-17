@@ -256,11 +256,6 @@ typedef struct libvlc_priv_t
 
     /* Private playlist data (FIXME - playlist_t is too public...) */
     sout_instance_t   *p_sout; ///< kept sout instance (for playlist)
-
-    /* Thread support */
-    unsigned           threads_count;
-    vlc_mutex_t        threads_lock;
-    vlc_cond_t         threads_wait;
 } libvlc_priv_t;
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
