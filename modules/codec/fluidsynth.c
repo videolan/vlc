@@ -81,8 +81,8 @@ static int Open (vlc_object_t *p_this)
     p_dec->fmt_out.audio.i_original_channels =
     p_dec->fmt_out.audio.i_physical_channels =
         AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
-    p_dec->fmt_out.audio.i_bitspersample = 16;
+    p_dec->fmt_out.i_codec = VLC_FOURCC('f', 'l', '3', '2');
+    p_dec->fmt_out.audio.i_bitspersample = 32;
 
     p_dec->pf_decode_audio = DecodeBlock;
     p_sys = p_dec->p_sys = malloc (sizeof (*p_sys));
@@ -186,8 +186,8 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
 
     p_out->start_date = aout_DateGet (&p_sys->end_date );
     p_out->end_date   = aout_DateIncrement (&p_sys->end_date, samples);
-    fluid_synth_write_s16 (p_sys->synth, samples,
-                           (int16_t *)p_out->p_buffer, 0, 2,
-                           (int16_t *)p_out->p_buffer, 1, 2);
+    fluid_synth_write_float (p_sys->synth, samples,
+                             p_out->p_buffer, 0, 2,
+                             p_out->p_buffer, 1, 2);
     return p_out;
 }
