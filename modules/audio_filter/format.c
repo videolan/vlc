@@ -229,11 +229,14 @@ static int Open( vlc_object_t *p_this )
     p_filter->pf_audio_filter = ConvertTable[i].pf_convert;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
+    p_filter->fmt_out.audio.i_bitspersample =
+        aout_BitsPerSample( p_filter->fmt_out.i_codec );
 
-    msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
+    msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i->%i",
              (char *)&p_filter->fmt_in.i_codec,
              (char *)&p_filter->fmt_out.i_codec,
-             p_filter->fmt_in.audio.i_bitspersample );
+             p_filter->fmt_in.audio.i_bitspersample,
+             p_filter->fmt_out.audio.i_bitspersample );
 
     return VLC_SUCCESS;
 }
