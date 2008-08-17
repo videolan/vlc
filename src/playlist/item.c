@@ -163,6 +163,8 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
 {
     DECMALLOC_NULL( p_item, playlist_item_t );
 
+    assert( p_input );
+
     p_item->p_input = p_input;
     vlc_gc_incref( p_item->p_input );
 
