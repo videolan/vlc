@@ -208,6 +208,8 @@ playlist_item_t * playlist_ItemNewWithType( playlist_t *p_playlist,
 */
 int playlist_ItemRelease( playlist_item_t *p_item )
 {
+    /* For the assert */
+    playlist_t *p_playlist = p_item->p_playlist;
     PL_ASSERT_LOCKED;
 
     /* Surprise, we can't actually do more because we
