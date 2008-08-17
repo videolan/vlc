@@ -47,7 +47,6 @@
 #include <textidentificationframe.h>
 #include <tbytevector.h>
 #include <mpegfile.h>
-#include <flacfile.h>
 #include <attachedpictureframe.h>
 //#include <oggflacfile.h> /* ogg flac files aren't auto-casted by TagLib */
 #include <flacfile.h>
