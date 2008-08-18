@@ -510,7 +510,7 @@ static int OpaquePage( picture_t *p_src, const vbi_page p_page,
                 break;
             /* Transparency for boxed text */
             case VBI_SEMI_TRANSPARENT:
-                if( (*p_pixel & 0xffffff00) == 0xff ) /* FIXME cannot be true ? */
+                if( (*p_pixel) == 0xff000000 && 0 ) /* Disabled until someone implement borders */
                     *p_pixel = 0;
                 break;
             }
