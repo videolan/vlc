@@ -1058,6 +1058,13 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
         return 0;
     }
 
+    /* Sanity check using stream info header when possible */
+    if( p_sys->b_stream_info )
+    {
+        if( i_blocksize < p_sys->stream_info.min_blocksize ||
+            i_blocksize > p_sys->stream_info.max_blocksize )
+            return 0;
+    }
     return i_blocksize;
 }
 
