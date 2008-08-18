@@ -343,7 +343,10 @@ void __intf_UserHide( vlc_object_t *p_this, int i_id )
     p_dialog = DialogGetById( p_interaction, i_id );
 
     if( p_dialog )
+    {
         p_dialog->i_status = ANSWERED_DIALOG;
+        vlc_object_signal_unlocked( p_interaction );
+    }
 
     vlc_object_unlock( p_interaction );
     vlc_object_release( p_interaction );
