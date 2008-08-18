@@ -162,10 +162,6 @@ struct demux_sys_t
 
     /* meta */
     vlc_meta_t  *meta;
-
-    /* Progress box */
-    mtime_t    last_update;
-    int        i_dialog_id;
 };
 
 static inline off_t __EVEN( off_t i )
@@ -2352,11 +2348,14 @@ static void AVI_IndexCreate( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    avi_chunk_list_t    *p_riff;
-    avi_chunk_list_t    *p_movi;
+    avi_chunk_list_t *p_riff;
+    avi_chunk_list_t *p_movi;
 
     unsigned int i_stream;
     off_t i_movi_end;
+
+    mtime_t i_dialog_update;
+    int     i_dialog_id;
 
     p_riff = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0);
     p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
@@ -2381,13 +2380,13 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
 
     /* Only show dialog if AVI is > 10MB */
-    p_demux->p_sys->i_dialog_id = -1;
+    i_dialog_id = -1;
     if( stream_Size( p_demux->s ) > 10000000 )
     {
-        p_demux->p_sys->i_dialog_id = intf_IntfProgress( p_demux,
+        i_dialog_id = intf_IntfProgress( p_demux,
                                         _( "Fixing AVI Index..." ),
                                         0.0 );
-        p_demux->p_sys->last_update = mdate();
+        i_dialog_update = mdate();
     }
 
     for( ;; )
@@ -2398,14 +2397,13 @@ static void AVI_IndexCreate( demux_t *p_demux )
             break;
 
         /* Don't update dialog too often */
-        if( p_demux->p_sys->i_dialog_id > 0 &&
-            mdate() - p_demux->p_sys->last_update > 100000 )
+        if( i_dialog_id > 0 && mdate() - i_dialog_update > 100000 )
         {
             int64_t i_pos = stream_Tell( p_demux->s )* 100 /
                             stream_Size( p_demux->s );
             float f_pos = (float)i_pos;
-            p_demux->p_sys->last_update = mdate();
-            intf_ProgressUpdate( p_demux, p_demux->p_sys->i_dialog_id,
+            i_dialog_update = mdate();
+            intf_ProgressUpdate( p_demux, i_dialog_id,
                                  _( "Fixing AVI Index..." ), f_pos, -1 );
         }
 
@@ -2466,9 +2464,9 @@ static void AVI_IndexCreate( demux_t *p_demux )
     }
 
 print_stat:
-    if( p_demux->p_sys->i_dialog_id > 0 )
+    if( i_dialog_id > 0 )
     {
-        intf_UserHide( p_demux, p_demux->p_sys->i_dialog_id );
+        intf_UserHide( p_demux, i_dialog_id );
     }
 
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
