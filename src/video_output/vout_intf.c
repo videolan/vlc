@@ -147,7 +147,6 @@ void vout_ReleaseWindow( vout_thread_t *p_vout, void *dummy )
 int vout_ControlWindow( vout_thread_t *p_vout, void *dummy,
                         int i_query, va_list args )
 {
-    (void)dummy;
     vout_window_t *wnd = p_vout->p_window;
 
     if (wnd == NULL)
@@ -515,8 +514,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         {
             msg_Err( p_vout, "Could not get snapshot" );
             image_HandlerDelete( p_image );
-            vlc_object_kill( p_dest );
-            vlc_thread_join( p_dest );
+            vlc_object_signal_maybe( VLC_OBJECT(p_dest) );
             vlc_object_release( p_dest );
             return VLC_EGENERIC;
         }
@@ -528,7 +526,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         {
             block_Release( p_block );
             image_HandlerDelete( p_image );
-            vlc_object_signal( p_dest );
+            vlc_object_signal_maybe( VLC_OBJECT(p_dest) );
             vlc_object_release( p_dest );
             return VLC_ENOMEM;
         }
@@ -545,7 +543,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             block_Release( p_block );
             free( p_snapshot );
             image_HandlerDelete( p_image );
-            vlc_object_signal( p_dest );
+            vlc_object_signal_maybe( VLC_OBJECT(p_dest) );
             vlc_object_release( p_dest );
             return VLC_ENOMEM;
         }
@@ -556,7 +554,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         block_Release( p_block );
 
         /* Unlock the object */
-        vlc_object_signal( p_dest ); /* Why do we signal here */
+        vlc_object_signal_maybe( VLC_OBJECT(p_dest) );
         vlc_object_release( p_dest );
 
         image_HandlerDelete( p_image );
