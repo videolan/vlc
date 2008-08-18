@@ -829,7 +829,7 @@ void MainInterface::doComponentsUpdate()
 void MainInterface::toggleAdvanced()
 {
     controls->toggleAdvanced();
-    fullscreenControls->toggleAdvanced();
+    if( fullscreenControls ) fullscreenControls->toggleAdvanced();
 }
 
 /* Get the visibility status of the controls (hidden or not, advanced or not) */
