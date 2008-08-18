@@ -2395,9 +2395,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
         avi_packet_t pk;
 
         if( !vlc_object_alive (p_demux) )
-        {
-            return;
-        }
+            break;
 
         /* Don't update dialog too often */
         if( p_demux->p_sys->i_dialog_id > 0 &&
