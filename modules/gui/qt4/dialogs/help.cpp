@@ -61,7 +61,7 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     QGridLayout *layout = new QGridLayout( this );
     QTextBrowser *helpBrowser = new QTextBrowser( this );
     helpBrowser->setOpenExternalLinks( true );
-    helpBrowser->setHtml( I_LONGHELP );
+    helpBrowser->setHtml( qtr(I_LONGHELP) );
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
 
@@ -125,7 +125,8 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
             + "Compiler: " + qfu( VLC_Compiler() ) + ".\n"
             + qtr( "Based on Git commit: " ) + qfu( VLC_Changeset() ) + ".\n"
             + qtr( "You are using the Qt4 Interface.\n\n" )
-            + qtr( "Copyright (C) " COPYRIGHT_YEARS " by the VideoLAN Team.\n" )
+            + qtr( "Copyright (C) " ) + COPYRIGHT_YEARS
+            + qtr( " by the VideoLAN Team.\n" )
             + "vlc@videolan.org, http://www.videolan.org" );
     infoLabel->setWordWrap( infoLabel );
 
