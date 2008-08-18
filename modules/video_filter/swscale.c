@@ -103,7 +103,16 @@ static picture_t *Filter( filter_t *, picture_t * );
 static int  Init( filter_t * );
 static void Clean( filter_t * );
 
-static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, bool *pb_add_a, int *pi_sws_flags,
+typedef struct
+{
+    int  i_fmti;
+    int  i_fmto;
+    bool b_has_a;
+    bool b_add_a;
+    int  i_sws_flags;
+} ScalerConfiguration;
+
+static int GetParameters( ScalerConfiguration *,
                           const video_format_t *p_fmti, 
                           const video_format_t *p_fmto,
                           int i_sws_flags_default );
@@ -133,7 +142,7 @@ static int OpenScaler( vlc_object_t *p_this )
     int sws_chr_vshift = 0, sws_chr_hshift = 0;
     float sws_chr_sharpen = 0.0, sws_lum_sharpen = 0.0;
 
-    if( GetParameters( NULL, NULL, NULL, NULL, NULL,
+    if( GetParameters( NULL,
                        &p_filter->fmt_in.video,
                        &p_filter->fmt_out.video, 0 ) )
     {
@@ -247,7 +256,7 @@ static bool IsFmtSimilar( const video_format_t *p_fmt1, const video_format_t *p_
            p_fmt1->i_height == p_fmt2->i_height;
 }
 
-static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, bool *pb_add_a, int *pi_sws_flags,
+static int GetParameters( ScalerConfiguration *p_cfg,
                           const video_format_t *p_fmti, 
                           const video_format_t *p_fmto,
                           int i_sws_flags_default )
@@ -295,16 +304,14 @@ static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, bool *pb_a
         }
     }
 
-    if( pi_fmti )
-        *pi_fmti = i_fmti;
-    if( pi_fmto )
-        *pi_fmto = i_fmto;
-    if( pb_has_a )
-        *pb_has_a = b_has_a;
-    if( pb_add_a )
-        *pb_add_a = b_add_a;
-    if( pi_sws_flags )
-        *pi_sws_flags = i_sws_flags;
+    if( p_cfg )
+    {
+        p_cfg->i_fmti = i_fmti;
+        p_cfg->i_fmto = i_fmto;
+        p_cfg->b_has_a = b_has_a;
+        p_cfg->b_add_a = b_add_a;
+        p_cfg->i_sws_flags = i_sws_flags;
+    }
 
     if( i_fmti < 0 || i_fmto < 0 )
         return VLC_EGENERIC;
@@ -327,12 +334,8 @@ static int Init( filter_t *p_filter )
     Clean( p_filter );
 
     /* Init with new parameters */
-    int i_fmt_in, i_fmt_out;
-    bool b_has_a;
-    bool b_add_a;
-    int i_sws_flags;
-    if( GetParameters( &i_fmt_in, &i_fmt_out, &b_has_a, &b_add_a, &i_sws_flags,
-                       p_fmti, p_fmto, p_sys->i_sws_flags ) )
+    ScalerConfiguration cfg;
+    if( GetParameters( &cfg, p_fmti, p_fmto, p_sys->i_sws_flags ) )
     {
         msg_Err( p_filter, "format not supported" );
         return VLC_EGENERIC;
@@ -350,15 +353,15 @@ static int Init( filter_t *p_filter )
 
     const unsigned i_fmti_width = p_fmti->i_width * p_sys->i_extend_factor;
     const unsigned i_fmto_width = p_fmto->i_width * p_sys->i_extend_factor;
-    for( int n = 0; n < (b_has_a ? 2 : 1); n++ )
+    for( int n = 0; n < (cfg.b_has_a ? 2 : 1); n++ )
     {
-        const int i_fmti = n == 0 ? i_fmt_in  : PIX_FMT_GRAY8;
-        const int i_fmto = n == 0 ? i_fmt_out : PIX_FMT_GRAY8;
+        const int i_fmti = n == 0 ? cfg.i_fmti : PIX_FMT_GRAY8;
+        const int i_fmto = n == 0 ? cfg.i_fmto : PIX_FMT_GRAY8;
         struct SwsContext *ctx;
 
         ctx = sws_getContext( i_fmti_width, p_fmti->i_height, i_fmti,
                               i_fmto_width, p_fmto->i_height, i_fmto,
-                              i_sws_flags | p_sys->i_cpu_mask,
+                              cfg.i_sws_flags | p_sys->i_cpu_mask,
                               p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
         if( n == 0 )
             p_sys->ctx = ctx;
@@ -380,7 +383,7 @@ static int Init( filter_t *p_filter )
     }
 
     if( !p_sys->ctx ||
-        ( b_has_a && ( !p_sys->ctxA || !p_sys->p_src_a || !p_sys->p_dst_a ) ) ||
+        ( cfg.b_has_a && ( !p_sys->ctxA || !p_sys->p_src_a || !p_sys->p_dst_a ) ) ||
         ( p_sys->i_extend_factor != 1 && ( !p_sys->p_src_e || !p_sys->p_dst_e ) ) )
     {
         msg_Err( p_filter, "could not init SwScaler and/or allocate memory" );
@@ -388,7 +391,7 @@ static int Init( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
-    p_sys->b_add_a = b_add_a;
+    p_sys->b_add_a = cfg.b_add_a;
     p_sys->fmt_in  = *p_fmti;
     p_sys->fmt_out = *p_fmto;
 
@@ -560,7 +563,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             Convert( p_sys->ctxA, p_dst, p_src, p_fmti->i_height, 3, 1 );
         }
     }
-    if( p_sys->b_add_a )
+    else if( p_sys->b_add_a )
     {
         /* We inject a complete opaque alpha plane */
         if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
