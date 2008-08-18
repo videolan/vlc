@@ -96,13 +96,14 @@ struct filter_sys_t
     int i_extend_factor;
     picture_t *p_src_e;
     picture_t *p_dst_e;
+    bool b_add_a;
 };
 
 static picture_t *Filter( filter_t *, picture_t * );
 static int  Init( filter_t * );
 static void Clean( filter_t * );
 
-static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, int *pi_sws_flags,
+static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, bool *pb_add_a, int *pi_sws_flags,
                           const video_format_t *p_fmti, 
                           const video_format_t *p_fmto,
                           int i_sws_flags_default );
@@ -114,6 +115,9 @@ static int GetSwsCpuMask(void);
 #define ALLOW_YUVP (false)
 /* SwScaler does not like too small picture */
 #define MINIMUM_WIDTH (16)
+
+/* XXX is it always 3 even for BIG_ENDIAN (blend.c seems to think so) ? */
+#define OFFSET_A (3)
 
 /*****************************************************************************
  * OpenScaler: probe the filter and return score
@@ -129,7 +133,7 @@ static int OpenScaler( vlc_object_t *p_this )
     int sws_chr_vshift = 0, sws_chr_hshift = 0;
     float sws_chr_sharpen = 0.0, sws_lum_sharpen = 0.0;
 
-    if( GetParameters( NULL, NULL, NULL, NULL,
+    if( GetParameters( NULL, NULL, NULL, NULL, NULL,
                        &p_filter->fmt_in.video,
                        &p_filter->fmt_out.video, 0 ) )
     {
@@ -243,20 +247,16 @@ static bool IsFmtSimilar( const video_format_t *p_fmt1, const video_format_t *p_
            p_fmt1->i_height == p_fmt2->i_height;
 }
 
-static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, int *pi_sws_flags,
+static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, bool *pb_add_a, int *pi_sws_flags,
                           const video_format_t *p_fmti, 
                           const video_format_t *p_fmto,
                           int i_sws_flags_default )
 {
-    /* Supported Input formats: YV12, I420/IYUV, YUY2, UYVY, BGR32, BGR24,
-     * BGR16, BGR15, RGB32, RGB24, Y8/Y800, YVU9/IF09 */
     int i_fmti = GetFfmpegChroma( p_fmti->i_chroma );
-
-    /* Supported output formats: YV12, I420/IYUV, YUY2, UYVY,
-     * {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09 */
     int i_fmto = GetFfmpegChroma( p_fmto->i_chroma );
 
     bool b_has_a = false;
+    bool b_add_a = false;
     int i_sws_flags = i_sws_flags_default;
 
     if( p_fmti->i_chroma == p_fmto->i_chroma )
@@ -277,6 +277,23 @@ static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, int *pi_sw
             b_has_a = true;
         }
     }
+    if( i_fmti >= 0 && i_fmto < 0 )
+    {
+        /* Special case: injecting dummy alpha plane */
+        switch( p_fmto->i_chroma )
+        {
+        case VLC_FOURCC( 'Y', 'U', 'V', 'A' ):
+            i_fmto = PIX_FMT_YUV444P;
+            b_add_a = true;
+            break;
+        case VLC_FOURCC( 'R', 'G', 'B', 'A' ):
+            i_fmto = PIX_FMT_RGBA32;
+            b_add_a = true;
+            break;
+        default:
+            break;
+        }
+    }
 
     if( pi_fmti )
         *pi_fmti = i_fmti;
@@ -284,6 +301,8 @@ static int GetParameters( int *pi_fmti, int *pi_fmto, bool *pb_has_a, int *pi_sw
         *pi_fmto = i_fmto;
     if( pb_has_a )
         *pb_has_a = b_has_a;
+    if( pb_add_a )
+        *pb_add_a = b_add_a;
     if( pi_sws_flags )
         *pi_sws_flags = i_sws_flags;
 
@@ -310,8 +329,9 @@ static int Init( filter_t *p_filter )
     /* Init with new parameters */
     int i_fmt_in, i_fmt_out;
     bool b_has_a;
+    bool b_add_a;
     int i_sws_flags;
-    if( GetParameters( &i_fmt_in, &i_fmt_out, &b_has_a, &i_sws_flags,
+    if( GetParameters( &i_fmt_in, &i_fmt_out, &b_has_a, &b_add_a, &i_sws_flags,
                        p_fmti, p_fmto, p_sys->i_sws_flags ) )
     {
         msg_Err( p_filter, "format not supported" );
@@ -368,6 +388,7 @@ static int Init( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
+    p_sys->b_add_a = b_add_a;
     p_sys->fmt_in  = *p_fmti;
     p_sys->fmt_out = *p_fmto;
 
@@ -425,8 +446,6 @@ static void GetPixels( uint8_t *pp_pixel[3], int pi_pitch[3],
     }
 }
 
-/* XXX is it always 3 even for BIG_ENDIAN (blend.c seems to think so) ? */
-#define OFFSET_A (3)
 static void ExtractA( picture_t *p_dst, const picture_t *p_src, unsigned i_width, unsigned i_height )
 {
     plane_t *d = &p_dst->p[0];
@@ -445,7 +464,12 @@ static void InjectA( picture_t *p_dst, const picture_t *p_src, unsigned i_width,
         for( unsigned x = 0; x < i_width; x++ )
             d->p_pixels[y*d->i_pitch+4*x+OFFSET_A] = s->p_pixels[y*s->i_pitch+x];
 }
-#undef OFFSET_A
+static void FillA( plane_t *d, int i_offset )
+{
+    for( int y = 0; y < d->i_visible_lines; y++ )
+        for( int x = 0; x < d->i_visible_pitch; x += d->i_pixel_pitch )
+            d->p_pixels[y*d->i_pitch+x+i_offset] = 0xff;
+}
 
 static void CopyPad( picture_t *p_dst, const picture_t *p_src )
 {
@@ -535,6 +559,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         {
             Convert( p_sys->ctxA, p_dst, p_src, p_fmti->i_height, 3, 1 );
         }
+    }
+    if( p_sys->b_add_a )
+    {
+        /* We inject a complete opaque alpha plane */
+        if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+            FillA( &p_dst->p[0], OFFSET_A );
+        else
+            FillA( &p_dst->p[A_PLANE], 0 );
     }
 
     if( p_sys->i_extend_factor != 1 )
