@@ -247,6 +247,7 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_loc
 static void  FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder );
 static void* FontBuilderThread( vlc_object_t *p_this);
 static void  FontBuilderDestructor( vlc_object_t *p_this );
+static void  FontBuilderGetFcConfig( filter_t *p_filter, vlc_object_t *p_fontbuilder );
 static int   FontBuilderDone( vlc_object_t*, const char *, vlc_value_t, vlc_value_t,
                         void* );
 #endif
@@ -483,7 +484,7 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_loc
     if( p_fontbuilder )
     {
         var_AddCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
-        var_TriggerCallback( p_fontbuilder, "build-done" );
+        FontBuilderGetFcConfig( p_filter, p_fontbuilder );
     }
     vlc_mutex_unlock( p_lock );
     *pp_lock = p_lock;
@@ -550,6 +551,13 @@ static void* FontBuilderThread( vlc_object_t *p_this )
     }
     return NULL;
 }
+static void FontBuilderGetFcConfig( filter_t *p_filter, vlc_object_t *p_fontbuilder )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    p_sys->p_fontconfig = p_fontbuilder->p_private;
+    p_sys->b_fontconfig_ok = p_fontbuilder->p_private != NULL;
+}
 static void FontBuilderDestructor( vlc_object_t *p_this )
 {
     FcConfig *p_fontconfig = p_this->p_private;
@@ -561,14 +569,12 @@ static int FontBuilderDone( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     filter_t *p_filter = param;
-    filter_sys_t *p_sys = p_filter->p_sys;
 
     if( newval.b_bool )
     {
         vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
 
-        p_sys->b_fontconfig_ok = true;
-        p_sys->p_fontconfig = p_this->p_private;
+        FontBuilderGetFcConfig( p_filter, p_this );
 
         vlc_mutex_unlock( p_lock );
     }
