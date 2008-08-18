@@ -65,7 +65,7 @@ public:
     virtual ~SoundSlider() {};
 
 protected:
-    const static int paddingL = 4;
+    const static int paddingL = 3;
     const static int paddingR = 2;
     virtual void paintEvent(QPaintEvent *);
     virtual void wheelEvent( QWheelEvent *event );

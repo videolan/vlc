@@ -215,7 +215,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     }
     else
     {
-        int i = ( event->x() - paddingL ) * maximum() / WLENGTH;
+        int i = ( ( event->x() - paddingL ) * maximum() + 40 ) / WLENGTH;
         i = __MIN( __MAX( 0, i ), maximum() );
         setToolTip( QString("%1  \%" ).arg( i ) );
     }
@@ -223,15 +223,13 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
 
 void SoundSlider::changeValue( int x )
 {
-    setValue( x * maximum() / WLENGTH );
+    setValue( (x * maximum() + 40 ) / WLENGTH );
 }
 
 void SoundSlider::paintEvent(QPaintEvent *e)
 {
     QPainter painter( this );
-    const int offset = int(
-            double( WLENGTH * value() ) /
-            double( maximum() ) ) + paddingL;
+    const int offset = int( ( WLENGTH * value() + 100 ) / maximum() ) + paddingL;
 
     const QRectF boundsG( 0, 0, offset , pixGradient.height() );
     painter.drawPixmap( boundsG, pixGradient, boundsG );
