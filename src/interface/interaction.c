@@ -470,9 +470,14 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 {
     interaction_t *p_interaction = InteractionGet( p_this );
 
+    if( !p_interaction )
+        return VLC_EGENERIC;
+
     /* Get an id, if we don't already have one */
+    vlc_object_lock( p_interaction );
     if( p_dialog->i_id == 0 )
         p_dialog->i_id = ++p_interaction->i_last_id;
+    vlc_object_unlock( p_interaction );
 
     if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
     {
