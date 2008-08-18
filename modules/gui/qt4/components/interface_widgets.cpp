@@ -58,10 +58,6 @@
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 
-/* init static variables in advanced controls */
-mtime_t AdvControlsWidget::timeA = 0;
-mtime_t AdvControlsWidget::timeB = 0;
-
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
  * This class handles resize issues
@@ -301,6 +297,10 @@ void VisualSelector::next()
     aButton->setMaximumSize( QSize( 26, 26 ) ); \
     aButton->setMinimumSize( QSize( 26, 26 ) ); \
     aButton->setIconSize( QSize( 20, 20 ) ); }
+
+/* init static variables in advanced controls */
+mtime_t AdvControlsWidget::timeA = 0;
+mtime_t AdvControlsWidget::timeB = 0;
 
 AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, bool b_fsCreation = false ) :
                                            QFrame( NULL ), p_intf( _p_i )
