@@ -283,10 +283,7 @@ static int64_t ControlGetTime( demux_t *p_demux )
 static int ControlSetTime( demux_t *p_demux, int64_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t i_next_time;
-    int64_t i_next_offset;
     int64_t i_delta_time;
-    int64_t i_delta_offset;
     bool b_seekable;
     int i;
 
@@ -302,33 +299,43 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
         if( p_sys->seekpoint[i]->i_time_offset <= i_time )
             break;
     }
-    if( i+1 < p_sys->i_seekpoint )
-    {
-        i_next_time   = p_sys->seekpoint[i+1]->i_time_offset;
-        i_next_offset = p_sys->seekpoint[i+1]->i_byte_offset;
-    }
-    else
-    {
-        i_next_time   = p_sys->i_length;
-        i_next_offset = stream_Size(p_demux->s)-p_sys->i_data_pos;
-    }
     i_delta_time = i_time - p_sys->seekpoint[i]->i_time_offset;
-    i_delta_offset = (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) * i_delta_time /
-                            (p_sys->seekpoint[i+1]->i_time_offset-p_sys->seekpoint[i]->i_time_offset);
 
     /* XXX We do exact seek if it's not too far away(45s) */
     if( i_delta_time < 45*INT64_C(1000000) )
     {
         if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos ) )
             return VLC_EGENERIC;
+
         p_sys->i_time_offset = p_sys->seekpoint[i]->i_time_offset - p_sys->i_pts;
         p_sys->i_pts_start = p_sys->i_pts+i_delta_time;
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, p_sys->p_es, p_sys->i_pts_start );
     }
     else
     {
+        int64_t i_delta_offset;
+        int64_t i_next_time;
+        int64_t i_next_offset;
+
+        if( i+1 < p_sys->i_seekpoint )
+        {
+            i_next_time   = p_sys->seekpoint[i+1]->i_time_offset;
+            i_next_offset = p_sys->seekpoint[i+1]->i_byte_offset;
+        }
+        else
+        {
+            i_next_time   = p_sys->i_length;
+            i_next_offset = stream_Size(p_demux->s)-p_sys->i_data_pos;
+        }
+
+        i_delta_offset = 0;
+        if( i_next_time-p_sys->seekpoint[i]->i_time_offset > 0 )
+            i_delta_offset = (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) * i_delta_time /
+                             (i_next_time-p_sys->seekpoint[i]->i_time_offset);
+
         if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos + i_delta_offset ) )
             return VLC_EGENERIC;
+
         p_sys->i_pts_start = p_sys->i_pts;
         p_sys->i_time_offset = (p_sys->seekpoint[i]->i_time_offset+i_delta_time) - p_sys->i_pts;
     }
