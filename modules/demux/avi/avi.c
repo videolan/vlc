@@ -2396,9 +2396,12 @@ static void AVI_IndexCreate( demux_t *p_demux )
         if( !vlc_object_alive (p_demux) )
             break;
 
-        /* Don't update dialog too often */
+        /* Don't update/check dialog too often */
         if( i_dialog_id > 0 && mdate() - i_dialog_update > 100000 )
         {
+            if( intf_ProgressIsCancelled( p_demux, i_dialog_id ) )
+                break;
+
             int64_t i_pos = stream_Tell( p_demux->s )* 100 /
                             stream_Size( p_demux->s );
             float f_pos = (float)i_pos;
