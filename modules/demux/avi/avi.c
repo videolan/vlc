@@ -384,19 +384,28 @@ static int Open( vlc_object_t * p_this )
                 tk->i_cat   = AUDIO_ES;
                 tk->i_codec = AVI_FourccGetCodec( AUDIO_ES,
                                                   p_auds->p_wf->wFormatTag );
-                if( tk->i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
-                    tk->i_blocksize = 0; /* fix vorbis VBR decoding */
-                else if( ( tk->i_blocksize = p_auds->p_wf->nBlockAlign ) == 0 )
+
+                tk->i_blocksize = p_auds->p_wf->nBlockAlign;
+                if( tk->i_blocksize == 0 )
                 {
                     if( p_auds->p_wf->wFormatTag == 1 )
-                    {
                         tk->i_blocksize = p_auds->p_wf->nChannels * (p_auds->p_wf->wBitsPerSample/8);
-                    }
                     else
-                    {
                         tk->i_blocksize = 1;
-                    }
                 }
+                else if( tk->i_samplesize != 0 && tk->i_samplesize != tk->i_blocksize )
+                {
+                    msg_Warn( p_demux, "track[%d] samplesize=%d and blocksize=%d are not equal."
+                                       "Using blocksize as a workaround.",
+                                       i, tk->i_samplesize, tk->i_blocksize );
+                    tk->i_samplesize = tk->i_blocksize;
+                }
+
+                if( tk->i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+                {
+                    tk->i_blocksize = 0; /* fix vorbis VBR decoding */
+                }
+
                 es_format_Init( &fmt, AUDIO_ES, tk->i_codec );
 
                 fmt.audio.i_channels        = p_auds->p_wf->nChannels;
