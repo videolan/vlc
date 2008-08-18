@@ -2381,13 +2381,9 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
     /* Only show dialog if AVI is > 10MB */
     i_dialog_id = -1;
+    i_dialog_update = mdate();
     if( stream_Size( p_demux->s ) > 10000000 )
-    {
-        i_dialog_id = intf_IntfProgress( p_demux,
-                                        _( "Fixing AVI Index..." ),
-                                        0.0 );
-        i_dialog_update = mdate();
-    }
+        i_dialog_id = intf_IntfProgress( p_demux, _("Fixing AVI Index..."), 0.0 );
 
     for( ;; )
     {
@@ -2402,18 +2398,17 @@ static void AVI_IndexCreate( demux_t *p_demux )
             if( intf_ProgressIsCancelled( p_demux, i_dialog_id ) )
                 break;
 
-            int64_t i_pos = stream_Tell( p_demux->s )* 100 /
-                            stream_Size( p_demux->s );
-            float f_pos = (float)i_pos;
-            i_dialog_update = mdate();
+            double f_pos = 100.0 * stream_Tell( p_demux->s ) /
+                           stream_Size( p_demux->s );
             intf_ProgressUpdate( p_demux, i_dialog_id,
                                  _( "Fixing AVI Index..." ), f_pos, -1 );
+
+            i_dialog_update = mdate();
         }
 
         if( AVI_PacketGetHeader( p_demux, &pk ) )
-        {
             break;
-        }
+
         if( pk.i_stream < p_sys->i_track &&
             pk.i_cat == p_sys->track[pk.i_stream]->i_cat )
         {
@@ -2429,33 +2424,35 @@ static void AVI_IndexCreate( demux_t *p_demux )
         {
             switch( pk.i_fourcc )
             {
-                case AVIFOURCC_idx1:
-                    if( p_sys->b_odml )
-                    {
-                        avi_chunk_list_t *p_sysx;
-                        p_sysx = AVI_ChunkFind( &p_sys->ck_root,
-                                                AVIFOURCC_RIFF, 1 );
+            case AVIFOURCC_idx1:
+                if( p_sys->b_odml )
+                {
+                    avi_chunk_list_t *p_sysx;
+                    p_sysx = AVI_ChunkFind( &p_sys->ck_root,
+                                            AVIFOURCC_RIFF, 1 );
 
-                        msg_Dbg( p_demux, "looking for new RIFF chunk" );
-                        if( stream_Seek( p_demux->s, p_sysx->i_chunk_pos + 24))
-                        {
-                            goto print_stat;
-                        }
-                        break;
-                    }
-                    goto print_stat;
-                case AVIFOURCC_RIFF:
-                        msg_Dbg( p_demux, "new RIFF chunk found" );
-                case AVIFOURCC_rec:
-                case AVIFOURCC_JUNK:
-                    break;
-                default:
-                    msg_Warn( p_demux, "need resync, probably broken avi" );
-                    if( AVI_PacketSearch( p_demux ) )
-                    {
-                        msg_Warn( p_demux, "lost sync, abord index creation" );
+                    msg_Dbg( p_demux, "looking for new RIFF chunk" );
+                    if( stream_Seek( p_demux->s, p_sysx->i_chunk_pos + 24 ) )
                         goto print_stat;
-                    }
+                    break;
+                }
+                goto print_stat;
+
+            case AVIFOURCC_RIFF:
+                    msg_Dbg( p_demux, "new RIFF chunk found" );
+                    break;
+
+            case AVIFOURCC_rec:
+            case AVIFOURCC_JUNK:
+                break;
+
+            default:
+                msg_Warn( p_demux, "need resync, probably broken avi" );
+                if( AVI_PacketSearch( p_demux ) )
+                {
+                    msg_Warn( p_demux, "lost sync, abord index creation" );
+                    goto print_stat;
+                }
             }
         }
 
@@ -2468,16 +2465,12 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
 print_stat:
     if( i_dialog_id > 0 )
-    {
         intf_UserHide( p_demux, i_dialog_id );
-    }
 
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
-        msg_Dbg( p_demux,
-                "stream[%d] creating %d index entries",
-                i_stream,
-                p_sys->track[i_stream]->i_idxnb );
+        msg_Dbg( p_demux, "stream[%d] creating %d index entries",
+                i_stream, p_sys->track[i_stream]->i_idxnb );
     }
 }
 
