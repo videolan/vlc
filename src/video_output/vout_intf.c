@@ -147,6 +147,7 @@ void vout_ReleaseWindow( vout_thread_t *p_vout, void *dummy )
 int vout_ControlWindow( vout_thread_t *p_vout, void *dummy,
                         int i_query, va_list args )
 {
+    (void)dummy;
     vout_window_t *wnd = p_vout->p_window;
 
     if (wnd == NULL)
