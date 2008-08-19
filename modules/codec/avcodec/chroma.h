@@ -46,8 +46,10 @@ static const struct
     VLC_FF( ('I','4','4','4'), PIX_FMT_YUV444P ),
     VLC_FF( ('J','4','4','4'), PIX_FMT_YUVJ444P ),
 
+#if LIBAVUTIL_VERSION_INT >= ((49<<16)+(5<<8)+0)
     VLC_FF( ('I','4','4','0'), PIX_FMT_YUV440P ),
     VLC_FF( ('J','4','4','0'), PIX_FMT_YUVJ440P ),
+#endif
 
     VLC_FF( ('I','4','2','2'), PIX_FMT_YUV422P ),
     VLC_FF( ('J','4','2','2'), PIX_FMT_YUVJ422P ),
