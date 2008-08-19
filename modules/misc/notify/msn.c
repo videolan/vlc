@@ -52,7 +52,7 @@ static void Close   ( vlc_object_t * );
 
 static int ItemChange( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
-static int SendToMSN( char * psz_msg );
+static int SendToMSN( const char * psz_msg );
 
 #define MSN_MAX_LENGTH 256
 
@@ -134,6 +134,7 @@ static void Close( vlc_object_t *p_this )
 static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
+    (void)psz_var;    (void)oldval;    (void)newval;
     intf_thread_t *p_intf = (intf_thread_t *)param;
     char psz_tmp[MSN_MAX_LENGTH];
     char *psz_title = NULL;
@@ -180,7 +181,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     free( psz_artist );
     free( psz_album );
 
-    SendToMSN( psz_tmp );
+    SendToMSN( (const char*)psz_tmp );
     vlc_object_release( p_input );
 
     return VLC_SUCCESS;
@@ -189,7 +190,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 /*****************************************************************************
  * SendToMSN
  *****************************************************************************/
-static int SendToMSN( char *psz_msg )
+static int SendToMSN( const char *psz_msg )
 {
     COPYDATASTRUCT msndata;
     HWND msnui = NULL;
