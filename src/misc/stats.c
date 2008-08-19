@@ -513,11 +513,12 @@ static int CounterUpdate( vlc_object_t *p_handler,
     case STATS_DERIVATIVE:
     {
         counter_sample_t *p_new, *p_old;
-        if( mdate() - p_counter->last_update < p_counter->update_interval )
+        mtime_t now = mdate();
+        if( now - p_counter->last_update < p_counter->update_interval )
         {
             return VLC_EGENERIC;
         }
-        p_counter->last_update = mdate();
+        p_counter->last_update = now;
         if( p_counter->i_type != VLC_VAR_FLOAT &&
             p_counter->i_type != VLC_VAR_INTEGER )
         {

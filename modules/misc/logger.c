@@ -435,9 +435,10 @@ static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
 
 static void DoRRD( intf_thread_t *p_intf )
 {
-    if( mdate() - p_intf->p_sys->last_update < 1000000 )
+    mtime_t now = mdate();
+    if( now - p_intf->p_sys->last_update < 1000000 )
         return;
-    p_intf->p_sys->last_update = mdate();
+    p_intf->p_sys->last_update = now;
 
     if( p_intf->p_libvlc->p_stats )
     {

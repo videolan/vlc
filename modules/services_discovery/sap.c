@@ -820,8 +820,9 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                     p_announce->i_period_trust++;
 
                 /* Compute the average period */
-                p_announce->i_period = (p_announce->i_period + (mdate() - p_announce->i_last)) / 2;
-                p_announce->i_last = mdate();
+                mtime_t now = mdate();
+                p_announce->i_period = (p_announce->i_period + (now - p_announce->i_last)) / 2;
+                p_announce->i_last = now;
             }
             FreeSDP( p_sdp ); p_sdp = NULL;
             return VLC_SUCCESS;

@@ -248,14 +248,15 @@ static void* Thread( vlc_object_t *p_this )
         free( p_thread->psz_title );
         p_thread->psz_title = NULL;
 
+        mtime_t now = mdate();
         if (++count%100==0)
         {
-            realfps=100/((mdate()/1000-fpsstart)/1000);
+            realfps=100/((now/1000-fpsstart)/1000);
  //           printf("%f\n",realfps);
-            fpsstart=mdate()/1000;
+            fpsstart=now/1000;
         }
         //framerate limiter
-        timed=mspf-(mdate()/1000-timestart);
+        timed=mspf-(now/1000-timestart);
       //   printf("%d,%d\n",time,mspf);
         if (timed>0) msleep(1000*timed);
     //     printf("Limiter %d\n",(mdate()/1000-timestart));
