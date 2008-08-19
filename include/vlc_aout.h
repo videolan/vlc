@@ -51,11 +51,13 @@ extern "C" {
 #   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','b')
 #   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','b')
 #   define AOUT_FMT_S24_NE VLC_FOURCC('s','2','4','b')
+#   define AOUT_FMT_S32_NE VLC_FOURCC('s','3','2','b')
 #   define AOUT_FMT_SPDIF_NE VLC_FOURCC('s','p','d','b')
 #else
 #   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','l')
 #   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','l')
 #   define AOUT_FMT_S24_NE VLC_FOURCC('s','2','4','l')
+#   define AOUT_FMT_S32_NE VLC_FOURCC('s','3','2','l')
 #   define AOUT_FMT_SPDIF_NE VLC_FOURCC('s','p','d','i')
 #endif
 

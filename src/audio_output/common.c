@@ -159,6 +159,8 @@ unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
     case VLC_FOURCC('s','2','4','b'):
         return 24;
 
+    case VLC_FOURCC('s','3','2','l'):
+    case VLC_FOURCC('s','3','2','b'):
     case VLC_FOURCC('f','l','3','2'):
     case VLC_FOURCC('f','i','3','2'):
         return 32;
