@@ -45,6 +45,9 @@ static const struct
     /* Planar YUV formats */
     VLC_FF( ('I','4','4','4'), PIX_FMT_YUV444P ),
     VLC_FF( ('J','4','4','4'), PIX_FMT_YUVJ444P ),
+    
+    VLC_FF( ('J','4','4','0'), PIX_FMT_YUV440P ),
+    VLC_FF( ('J','4','4','0'), PIX_FMT_YUVJ440P ),
 
     VLC_FF( ('I','4','2','2'), PIX_FMT_YUV422P ),
     VLC_FF( ('J','4','2','2'), PIX_FMT_YUVJ422P ),
@@ -56,11 +59,15 @@ static const struct
     VLC_FF( ('I','4','1','1'), PIX_FMT_YUV411P ),
     VLC_FF( ('I','4','1','0'), PIX_FMT_YUV410P ),
     VLC_FF( ('Y','V','U','9'), PIX_FMT_YUV410P ),
+    
+    VLC_FF( ('N','V','1','2'), PIX_FMT_NV12 ),
+    VLC_FF( ('N','V','2','1'), PIX_FMT_NV21 ),
 
     /* Packed YUV formats */
     VLC_FF( ('Y','U','Y','2'), PIX_FMT_YUV422 ),
     VLC_FF( ('Y','U','Y','V'), PIX_FMT_YUV422 ),
     VLC_FF( ('U','Y','V','Y'), PIX_FMT_UYVY422 ),
+    VLC_FF( ('Y','4','1','1'), PIX_FMT_UYYVYY411 ),
 
     /* Packed RGB formats */
     VLC_FF_RGB_DEFAULT( ('R','G','B','8'), PIX_FMT_RGB8,    PIX_FMT_BGR8 ),
