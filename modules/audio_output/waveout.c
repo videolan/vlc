@@ -903,6 +903,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
                                       DWORD _p_aout,
                                       DWORD dwParam1, DWORD dwParam2 )
 {
+    (void)h_waveout;    (void)dwParam1;    (void)dwParam2;
     aout_instance_t *p_aout = (aout_instance_t *)_p_aout;
     int i, i_queued_frames = 0;
 
