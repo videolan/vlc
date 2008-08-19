@@ -87,18 +87,15 @@ struct filter_sys_t
 int OpenFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    int i_ffmpeg_chroma[2], i_vlc_chroma[2], i;
+    int i_ffmpeg_chroma[2];
 
     /*
      * Check the source chroma first, then the destination chroma
      */
-    i_vlc_chroma[0] = p_filter->fmt_in.video.i_chroma;
-    i_vlc_chroma[1] = p_filter->fmt_out.video.i_chroma;
-    for( i = 0; i < 2; i++ )
-    {
-        i_ffmpeg_chroma[i] = GetFfmpegChroma( i_vlc_chroma[i] );
-        if( i_ffmpeg_chroma[i] < 0 ) return VLC_EGENERIC;
-    }
+    if( GetFfmpegChroma( &i_ffmpeg_chroma[0], p_filter->fmt_in.video ) == VLC_EGENERIC )
+        return VLC_EGENERIC;
+    if( GetFfmpegChroma( &i_ffmpeg_chroma[1], p_filter->fmt_out.video ) == VLC_EGENERIC )
+        return VLC_EGENERIC;
 
     p_filter->pf_video_filter = Conversion_Filter;
 
