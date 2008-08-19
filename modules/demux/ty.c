@@ -264,7 +264,7 @@ static int find_es_header( const uint8_t *header,
 static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct);
 static int ty_stream_seek_time(demux_t *, uint64_t);
 
-static ty_rec_hdr_t *parse_chunk_headers( demux_t *p_demux, const uint8_t *p_buf,
+static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
                                           int i_num_recs, int *pi_payload_size);
 static int probe_stream(demux_t *p_demux);
 static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk);
@@ -1731,7 +1731,7 @@ static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
     int i_num_recs, i;
     ty_rec_hdr_t *p_hdrs;
     int i_num_6e0, i_num_be0, i_num_9c0, i_num_3c0;
-    uint32_t i_payload_size;
+    int i_payload_size;
 
     /* skip if it's a Part header */
     if( U32_AT( &p_chunk[ 0 ] ) == TIVO_PES_FILEID )
@@ -1747,7 +1747,7 @@ static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
     
     p_chunk += 4;       /* skip past rec count & SEQ bytes */
     //msg_Dbg(p_demux, "probe: chunk has %d recs", i_num_recs);
-    p_hdrs = parse_chunk_headers(p_demux, p_chunk, i_num_recs, &i_payload_size);
+    p_hdrs = parse_chunk_headers(p_chunk, i_num_recs, &i_payload_size);
     /* scan headers.
      * 1. check video packets.  Presence of 0x6e0 means S1.
      *    No 6e0 but have be0 means S2.
@@ -1906,7 +1906,7 @@ static int get_chunk_header(demux_t *p_demux)
         return 0;
     }
     /* parse them */
-    p_sys->rec_hdrs = parse_chunk_headers(p_demux, p_hdr_buf, i_num_recs,
+    p_sys->rec_hdrs = parse_chunk_headers(p_hdr_buf, i_num_recs,
             &i_payload_size);
     free(p_hdr_buf);
 
@@ -1919,7 +1919,7 @@ static int get_chunk_header(demux_t *p_demux)
 }
 
 
-static ty_rec_hdr_t *parse_chunk_headers( demux_t *p_demux, const uint8_t *p_buf,
+static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
                                           int i_num_recs, int *pi_payload_size)
 {
     int i;
