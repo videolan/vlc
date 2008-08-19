@@ -635,6 +635,8 @@ static int Manage( vout_thread_t *p_vout )
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
+    (void)p_vout;
+    (void)p_pic;
 }
 
 /*****************************************************************************

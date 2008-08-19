@@ -98,7 +98,7 @@ void* EventThread( vlc_object_t *p_this )
     MSG msg;
     POINT old_mouse_pos = {0,0}, mouse_pos;
     vlc_value_t val;
-    int i_width, i_height, i_x, i_y;
+    unsigned int i_width, i_height, i_x, i_y;
     HMODULE hkernel32;
 
     /* Initialisation */
