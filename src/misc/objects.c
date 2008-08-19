@@ -94,7 +94,8 @@ static void held_objects_destroy (void *);
 /*****************************************************************************
  * Local structure lock
  *****************************************************************************/
-static vlc_mutex_t     structure_lock;
+static vlc_mutex_t structure_lock;
+static unsigned    object_counter = 0;
 
 void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
                            int i_type, const char *psz_type )
@@ -148,7 +149,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_libvlc_global = (libvlc_global_data_t *)p_new;
         p_new->p_libvlc = NULL;
 
-        p_libvlc_global->i_counter = 0;
+        object_counter = 0; /* reset */
         p_priv->next = p_priv->prev = p_new;
         vlc_mutex_init( &structure_lock );
 #ifdef LIBVLC_REFCHECK
@@ -194,7 +195,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->prev = vlc_internals (p_libvlc_global)->prev;
     vlc_internals (p_libvlc_global)->prev = p_new;
     vlc_internals (p_priv->prev)->next = p_new;
-    p_new->i_object_id = p_libvlc_global->i_counter++;
+    p_new->i_object_id = object_counter++; /* fetch THEN increment */
     vlc_mutex_unlock( &structure_lock );
 
     if( i_type == VLC_OBJECT_LIBVLC )

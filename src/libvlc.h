@@ -154,9 +154,6 @@ typedef struct libvlc_global_data_t
 {
     VLC_COMMON_MEMBERS
 
-    /* Object structure data */
-    int                    i_counter;   ///< object counter
-
     module_bank_t *        p_module_bank; ///< The module bank
 
     char *                 psz_vlcpath;
