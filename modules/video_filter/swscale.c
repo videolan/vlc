@@ -61,7 +61,7 @@ const char *const ppsz_mode_descriptions[] =
 
 vlc_module_begin();
     set_description( N_("Video scaling filter") );
-    set_capability( "video filter2", 1000 );
+    set_capability( "video filter2", 55 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_callbacks( OpenScaler, CloseScaler );
