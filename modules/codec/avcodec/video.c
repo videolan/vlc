@@ -122,8 +122,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
     {
-        /* we are doomed */
-        msg_Err( p_dec, "avcodec does not know how to convert this chroma" );
+        /* we are doomed, but not really, because most codecs set their pix_fmt much later */
         p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
@@ -333,8 +332,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_dec->fmt_out.i_cat = VIDEO_ES;
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
     {
-        /* we are doomed */
-        msg_Err( p_dec, "avcodec does not know how to convert this chroma" );
+        /* we are doomed. but not really, because most codecs set their pix_fmt later on */
         p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
@@ -754,7 +752,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( TestFfmpegChroma( p_sys->p_context->pix_fmt, -1 ) )
+    if( TestFfmpegChroma( p_sys->p_context->pix_fmt, -1 ) == VLC_SUCCESS )
     {
         int i_plane, i_size, i_line;
         uint8_t *p_dst, *p_src;
