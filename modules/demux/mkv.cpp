@@ -1769,6 +1769,23 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
         if( (el = ep->Get()) == NULL && pp_block != NULL )
 #endif
         {
+            /* Check blocks validity to protect againts broken files */
+            if(
+#if LIBMATROSKA_VERSION >= 0x000800
+                pp_simpleblock && pp_simpleblock->TrackNum() >= tracks.size() ||
+#else
+                false ||
+#endif
+                pp_block && pp_block->TrackNum() >= tracks.size() )
+            {
+                delete pp_block;
+#if LIBMATROSKA_VERSION >= 0x000800
+                pp_simpleblock = NULL;
+#endif
+                pp_block = NULL;
+                continue;
+            }
+
             /* update the index */
 #define idx p_indexes[i_index - 1]
             if( i_index > 0 && idx.i_time == -1 )
@@ -3843,6 +3860,19 @@ void EbmlParser::Reset( demux_t *p_demux )
     mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
 }
 
+#if LIBMATROSKA_VERSION >= 0x000800
+/* This function workarounds a bug in KaxBlockVirtual implementation */
+class KaxBlockVirtualWorkaround : public KaxBlockVirtual
+{
+public:
+    void Fix()
+    {
+        if( Data == DataBlock )
+            SetBuffer( NULL, 0 );
+    }
+};
+#endif
+
 EbmlElement *EbmlParser::Get( void )
 {
     int i_ulev = 0;
@@ -3864,6 +3894,10 @@ EbmlElement *EbmlParser::Get( void )
         m_el[mi_level]->SkipData( *m_es, m_el[mi_level]->Generic().Context );
         if( !mb_keep )
         {
+#if LIBMATROSKA_VERSION >= 0x000800
+            if( MKV_IS_ID( m_el[mi_level], KaxBlockVirtual ) )
+                static_cast<KaxBlockVirtualWorkaround*>(m_el[mi_level])->Fix();
+#endif
             delete m_el[mi_level];
         }
         mb_keep = false;
