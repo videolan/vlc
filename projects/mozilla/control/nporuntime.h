@@ -315,8 +315,8 @@ RuntimeNPClass<T>::RuntimeNPClass()
 template<class T>
 RuntimeNPClass<T>::~RuntimeNPClass()
 {
-    delete propertyIdentifiers;
-    delete methodIdentifiers;
+    delete[] propertyIdentifiers;
+    delete[] methodIdentifiers;
 }
 
 template<class T>
