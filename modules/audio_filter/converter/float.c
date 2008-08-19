@@ -76,11 +76,15 @@ static void Do_S16ToFL32( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                            aout_buffer_t * );
 static void Do_S24ToFL32( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                            aout_buffer_t * );
+static void Do_S32ToFL32( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+                           aout_buffer_t * );
 
 static int  Create_S16ToFL32_SW( vlc_object_t * );
 static void Do_S16ToFL32_SW( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                            aout_buffer_t * );
 static void Do_S24ToFL32_SW( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+                           aout_buffer_t * );
+static void Do_S32ToFL32_SW( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                            aout_buffer_t * );
 
 static int  Create_S8ToFL32( vlc_object_t * );
@@ -393,7 +397,8 @@ static int Create_S16ToFL32( vlc_object_t *p_this )
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
     if ( ( p_filter->input.i_format != AOUT_FMT_S16_NE &&
-           p_filter->input.i_format != AOUT_FMT_S24_NE )
+           p_filter->input.i_format != AOUT_FMT_S24_NE &&
+           p_filter->input.i_format != AOUT_FMT_S32_NE )
           || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
         return -1;
@@ -404,7 +409,9 @@ static int Create_S16ToFL32( vlc_object_t *p_this )
         return -1;
     }
 
-    if( p_filter->input.i_format == AOUT_FMT_S24_NE )
+    if( p_filter->input.i_format == AOUT_FMT_S32_NE )
+        p_filter->pf_do_work = Do_S32ToFL32;
+    else if( p_filter->input.i_format == AOUT_FMT_S24_NE )
         p_filter->pf_do_work = Do_S24ToFL32;
     else
         p_filter->pf_do_work = Do_S16ToFL32;
@@ -442,7 +449,7 @@ static void Do_S16ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 2;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 2;
 }
 
 static void Do_S24ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
@@ -469,6 +476,25 @@ static void Do_S24ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 3;
+}
+
+static void Do_S32ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                          aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+{
+    VLC_UNUSED(p_aout);
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+
+    /* We start from the end because b_in_place is true */
+    int32_t * p_in = (int32_t *)p_in_buf->p_buffer + i - 1;
+    float * p_out = (float *)p_out_buf->p_buffer + i - 1;
+
+    while( i-- )
+    {
+        *p_out-- = (float)*p_in-- / 2147483648.0;
+    }
+
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 4;
 }
 
 /*****************************************************************************
@@ -504,11 +530,23 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
 
         return 0;
     }
+
+    if ( (p_filter->input.i_format == VLC_FOURCC('s','3','2','l') ||
+         p_filter->input.i_format == VLC_FOURCC('s','3','2','b'))
+         && p_filter->output.i_format == VLC_FOURCC('f','l','3','2')
+         && p_filter->input.i_format != AOUT_FMT_S32_NE )
+    {
+        p_filter->pf_do_work = Do_S32ToFL32_SW;
+        p_filter->b_in_place = true;
+
+        return 0;
+    }
+
     return -1;
 }
 
 static void Do_S16ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                          aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+                             aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
@@ -551,11 +589,11 @@ static void Do_S16ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #endif
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 2;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 2;
 }
 
 static void Do_S24ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                           aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+                             aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
@@ -585,6 +623,26 @@ static void Do_S24ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 3;
 }
+
+static void Do_S32ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                             aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+{
+    VLC_UNUSED(p_aout);
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+
+    /* We start from the end because b_in_place is true */
+    int32_t * p_in = (int32_t *)p_in_buf->p_buffer + i - 1;
+    float * p_out = (float *)p_out_buf->p_buffer + i - 1;
+
+    while( i-- )
+    {
+        *p_out-- = (float)*p_in-- / 2147483648.0;
+    }
+
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 4;
+}
+
 
 /*****************************************************************************
  * S8 To FL32
