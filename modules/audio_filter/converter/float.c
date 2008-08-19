@@ -74,13 +74,13 @@ static void Do_FL32ToU8( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 static int  Create_S16ToFL32( vlc_object_t * );
 static void Do_S16ToFL32( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                            aout_buffer_t * );
-static void Do_S16ToFL24( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+static void Do_S24ToFL32( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                            aout_buffer_t * );
 
 static int  Create_S16ToFL32_SW( vlc_object_t * );
 static void Do_S16ToFL32_SW( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                            aout_buffer_t * );
-static void Do_S16ToFL24_SW( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+static void Do_S24ToFL32_SW( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                            aout_buffer_t * );
 
 static int  Create_S8ToFL32( vlc_object_t * );
@@ -405,7 +405,7 @@ static int Create_S16ToFL32( vlc_object_t *p_this )
     }
 
     if( p_filter->input.i_format == AOUT_FMT_S24_NE )
-        p_filter->pf_do_work = Do_S16ToFL24;
+        p_filter->pf_do_work = Do_S24ToFL32;
     else
         p_filter->pf_do_work = Do_S16ToFL32;
 
@@ -445,7 +445,7 @@ static void Do_S16ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 2;
 }
 
-static void Do_S16ToFL24( aout_instance_t * p_aout, aout_filter_t * p_filter,
+static void Do_S24ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
                           aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
@@ -499,7 +499,7 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
          && p_filter->output.i_format == VLC_FOURCC('f','l','3','2')
          && p_filter->input.i_format != AOUT_FMT_S24_NE )
     {
-        p_filter->pf_do_work = Do_S16ToFL24_SW;
+        p_filter->pf_do_work = Do_S24ToFL32_SW;
         p_filter->b_in_place = true;
 
         return 0;
@@ -554,7 +554,7 @@ static void Do_S16ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 2;
 }
 
-static void Do_S16ToFL24_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
+static void Do_S24ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
                            aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
