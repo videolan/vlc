@@ -87,27 +87,40 @@ static const struct
     { 0, 0 }
 };
 
-static inline int GetFfmpegChroma( vlc_fourcc_t i_chroma )
+static inline int TestFfmpegChroma( const int i_ffmpeg_id, const vlc_fourcc_t i_vlc_fourcc )
 {
-    int i;
-
-    for( i = 0; chroma_table[i].i_chroma != 0; i++ )
+    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
-        if( chroma_table[i].i_chroma == i_chroma )
-            return chroma_table[i].i_chroma_id;
+        if( chroma_table[i].i_chroma == i_vlc_fourcc || chroma_table[i].i_chroma_id == i_ffmpeg_id )
+            return VLC_SUCCESS;
     }
-    return -1;
+    return VLC_EGENERIC;
 }
 
-static inline vlc_fourcc_t GetVlcChroma( int i_ffmpeg_chroma )
+/* FIXME special case the RGB formats */
+static inline int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t fmt )
 {
-    int i;
+    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
+    {
+        if( chroma_table[i].i_chroma == fmt.i_chroma )
+        {
+            *i_ffmpeg_chroma =  chroma_table[i].i_chroma_id;
+            return VLC_SUCCESS;
+        }
+    }
+    return VLC_EGENERIC;
+}
 
+static inline int GetVlcChroma( video_format_t *fmt, const int i_ffmpeg_chroma )
+{
     /* TODO FIXME for rgb format we HAVE to set rgb mask/shift */
-    for( i = 0; chroma_table[i].i_chroma != 0; i++ )
+    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
         if( chroma_table[i].i_chroma_id == i_ffmpeg_chroma )
-            return chroma_table[i].i_chroma;
+        {
+            fmt->i_chroma = chroma_table[i].i_chroma;
+            return VLC_SUCCESS;
+        }
     }
-    return 0;
+    return VLC_EGENERIC;
 }

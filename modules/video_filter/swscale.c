@@ -261,8 +261,11 @@ static int GetParameters( ScalerConfiguration *p_cfg,
                           const video_format_t *p_fmto,
                           int i_sws_flags_default )
 {
-    int i_fmti = GetFfmpegChroma( p_fmti->i_chroma );
-    int i_fmto = GetFfmpegChroma( p_fmto->i_chroma );
+    int i_fmti;
+    int i_fmto;
+    if( GetFfmpegChroma( &i_fmti, *p_fmti ) != VLC_SUCCESS ||
+        GetFfmpegChroma( &i_fmto, *p_fmto ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
 
     bool b_has_a = false;
     bool b_add_a = false;

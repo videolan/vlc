@@ -212,7 +212,7 @@ int OpenEncoder( vlc_object_t *p_this )
     if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
-        if( GetFfmpegChroma( p_enc->fmt_out.i_codec ) < 0 )
+        if( TestFfmpegChroma( -1, p_enc->fmt_out.i_codec ) != VLC_SUCCESS )
         {
             /* handed chroma output */
             return VLC_EGENERIC;
@@ -460,7 +460,9 @@ int OpenEncoder( vlc_object_t *p_this )
         p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
 
         p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
-        p_context->pix_fmt = GetFfmpegChroma( p_enc->fmt_in.i_codec );
+        p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
+        GetFfmpegChroma( &p_context->pix_fmt, p_enc->fmt_in.video );
+
         if( p_codec->pix_fmts )
         {
             const enum PixelFormat *p = p_codec->pix_fmts;
@@ -469,7 +471,8 @@ int OpenEncoder( vlc_object_t *p_this )
                 if( *p == p_context->pix_fmt ) break;
             }
             if( *p == -1 ) p_context->pix_fmt = p_codec->pix_fmts[0];
-            p_enc->fmt_in.i_codec = GetVlcChroma( p_context->pix_fmt );
+            GetVlcChroma( &p_enc->fmt_in.video, p_context->pix_fmt );
+            p_enc->fmt_in.i_codec = p_enc->fmt_in.video.i_chroma;
         }
 
 
@@ -588,8 +591,8 @@ int OpenEncoder( vlc_object_t *p_this )
     if( i_codec_id == CODEC_ID_RAWVIDEO )
     {
         /* XXX: hack: Force same codec (will be handled by transcode) */
-        p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
-        p_context->pix_fmt = GetFfmpegChroma( p_enc->fmt_in.i_codec );
+        p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
+        GetFfmpegChroma( &p_context->pix_fmt, p_enc->fmt_in.video );
     }
 
     /* Make sure we get extradata filled by the encoder */

@@ -207,16 +207,7 @@ int OpenDemux( vlc_object_t *p_this )
         const char *psz_type = "unknown";
 
         if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
-        {
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
-
-            /* Special case for raw video data */
-            if( cc->codec_id == CODEC_ID_RAWVIDEO )
-            {
-                msg_Dbg( p_demux, "raw video, pixel format: %i", cc->pix_fmt );
-                fcc = GetVlcChroma( cc->pix_fmt );
-            }
-        }
 
         switch( cc->codec_type )
         {
@@ -230,6 +221,19 @@ int OpenDemux( vlc_object_t *p_this )
             break;
         case CODEC_TYPE_VIDEO:
             es_format_Init( &fmt, VIDEO_ES, fcc );
+
+            /* Special case for raw video data */
+            if( cc->codec_id == CODEC_ID_RAWVIDEO )
+            {
+                msg_Dbg( p_demux, "raw video, pixel format: %i", cc->pix_fmt );
+                if( GetVlcChroma( &fmt.video, cc->pix_fmt ) != VLC_SUCCESS)
+                {
+                    msg_Err( p_demux, "was unable to find a FourCC match for raw video" );
+                }
+                else
+                    fmt.i_codec = fmt.video.i_chroma;
+            }
+
             fmt.video.i_width = cc->width;
             fmt.video.i_height = cc->height;
             if( cc->palctrl )

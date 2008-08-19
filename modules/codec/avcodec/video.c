@@ -114,18 +114,19 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 
     p_dec->fmt_out.video.i_width = p_context->width;
     p_dec->fmt_out.video.i_height = p_context->height;
-    p_dec->fmt_out.i_codec = GetVlcChroma( p_context->pix_fmt );
 
     if( !p_context->width || !p_context->height )
     {
         return NULL; /* invalid display size */
     }
 
-    if( !p_dec->fmt_out.i_codec )
+    if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
     {
         /* we are doomed */
+        msg_Err( p_dec, "avcodec does not know how to convert this chroma" );
         p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
     }
+    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* If an aspect-ratio was specified in the input format then force it */
     if( p_dec->fmt_in.video.i_aspect )
@@ -330,7 +331,13 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = GetVlcChroma( p_context->pix_fmt );
+    if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
+    {
+        /* we are doomed */
+        msg_Err( p_dec, "avcodec does not know how to convert this chroma" );
+        p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
+    }
+    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* Setup palette */
     if( p_dec->fmt_in.video.p_palette )
@@ -747,7 +754,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( GetVlcChroma( p_sys->p_context->pix_fmt ) )
+    if( TestFfmpegChroma( p_sys->p_context->pix_fmt, -1 ) )
     {
         int i_plane, i_size, i_line;
         uint8_t *p_dst, *p_src;
@@ -807,13 +814,14 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so this check is necessary. */
-    if( !GetVlcChroma( p_context->pix_fmt ) ||
+    if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS ||
         p_sys->p_context->width % 16 || p_sys->p_context->height % 16 )
     {
         msg_Dbg( p_dec, "disabling direct rendering" );
         p_sys->b_direct_rendering = 0;
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
+    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* Get a new picture */
     //p_sys->p_vout->render.b_allow_modify_pics = 0;
