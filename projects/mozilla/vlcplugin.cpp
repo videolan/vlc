@@ -246,7 +246,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
 
 VlcPlugin::~VlcPlugin()
 {
-    delete psz_baseURL;
+    delete[] psz_baseURL;
     delete psz_target;
     if( libvlc_log )
         libvlc_log_close(libvlc_log, NULL);
@@ -340,6 +340,7 @@ relativeurl:
                     if( '/' != *href )
                     {
                         /* baseURL is not an absolute path */
+                        delete[] href;
                         return NULL;
                     }
                     pathstart = href;
