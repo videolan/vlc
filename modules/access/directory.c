@@ -200,6 +200,7 @@ static ssize_t ReadNull( access_t *p_access, uint8_t *p_buffer, size_t i_len)
  *****************************************************************************/
 static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 {
+    (void)p_buffer;    (void)i_len;
     char               *psz;
     int                 i_mode;
     char               *psz_name = strdup( p_access->psz_path );
