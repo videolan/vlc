@@ -266,7 +266,7 @@ ATMO_BOOL CAtmoSerialConnection::SendData(unsigned char numChannels,
    tcdrain(m_hComport);
 #endif
 
-   delete buffer;
+   delete[] buffer;
 
    return (iBytesWritten == bufSize) ? ATMO_TRUE : ATMO_FALSE;
 }
