@@ -2745,7 +2745,7 @@ AC_ARG_ENABLE(mkv,
 if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
   AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS(ebml/EbmlVersion.h, [
-    AC_MSG_CHECKING(for libebml version >= 0.7.6)
+    AC_MSG_CHECKING(for libebml version >= 0.7.7)
     AC_EGREP_CPP(yes,
       [#include <ebml/EbmlVersion.h>
        #ifdef LIBEBML_VERSION
@@ -2755,7 +2755,7 @@ if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
        #endif],
       [AC_MSG_RESULT([yes])
         AC_CHECK_HEADERS(matroska/KaxVersion.h, [
-          AC_MSG_CHECKING(for libmatroska version >= 0.7.7)
+          AC_MSG_CHECKING(for libmatroska version >= 0.8.0)
           AC_EGREP_CPP(yes,
             [#include <matroska/KaxVersion.h>
              #ifdef LIBMATROSKA_VERSION
