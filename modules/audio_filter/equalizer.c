@@ -358,10 +358,8 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
         }
     }
 
-    char *psz_tmp = var_CreateGetString( p_aout,"equalizer-bands" );
-    free( psz_tmp );
-    psz_tmp = var_CreateGetString( p_aout, "equalizer-preset" );
-    free( psz_tmp );
+    var_Create( p_aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     p_sys->b_2eqz = var_CreateGetBool( p_aout, "equalizer-2pass" );
 
