@@ -81,6 +81,7 @@ struct demux_sys_t
     int             i_frame_size_estimate;
     const uint8_t   *p_peek;
     int             i_data_peeked;
+    int             i_level;
 };
 
 /*****************************************************************************
@@ -307,6 +308,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es         = NULL;
     p_sys->i_time       = 0;
+    p_sys->i_level      = 0;
 
     p_sys->psz_separator = NULL;
     p_sys->i_frame_size_estimate = 15 * 1024;
@@ -324,6 +326,7 @@ static int Open( vlc_object_t * p_this )
         {
             msg_Dbg( p_demux, "JPEG SOI marker detected" );
             p_demux->pf_demux = MjpgDemux;
+            p_sys->i_level++;
         }
         else
         {
@@ -405,8 +408,14 @@ static int MjpgDemux( demux_t *p_demux )
         return 0;
     }
     i = 3;
+FIND_NEXT_EOI:
     while( !( 0xFF == p_sys->p_peek[i-1] && 0xD9 == p_sys->p_peek[i] ) )
     {
+        if( 0xFF == p_sys->p_peek[i-1] && 0xD8 == p_sys->p_peek[i] )
+        {
+            p_sys->i_level++;
+            msg_Dbg( p_demux, "we found another JPEG SOI at %d", i );
+        }
         i++;
         if( i >= p_sys->i_data_peeked )
         {
@@ -422,6 +431,10 @@ static int MjpgDemux( demux_t *p_demux )
     i++;
 
     msg_Dbg( p_demux, "JPEG EOI detected at %d", i );
+    p_sys->i_level--;
+
+    if( p_sys->i_level > 0 )
+        goto FIND_NEXT_EOI;
     return SendBlock( p_demux, i );
 }
 
