@@ -186,18 +186,24 @@ static int Open( vlc_object_t *p_this )
     psz_address  = config_GetPsz( p_intf, "telnet-host" );
 
     vlc_UrlParse(&url, psz_address, 0);
+    free( psz_address );
 
     // There might be two ports given, resolve any potentially
     // conflict
     url.i_port = getPort(p_intf, url, i_telnetport);
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( ( p_intf->p_sys->pi_fd = net_ListenTCP( p_intf, url.psz_host, url.i_port ) )
-                == NULL )
+    if( !p_intf->p_sys )
+    {
+        vlm_Delete( p_intf->p_sys->mediatheque );
+        vlc_UrlClean( &url );
+        return VLC_ENOMEM;
+    }
+    if( ( p_intf->p_sys->pi_fd = net_ListenTCP( p_intf, url.psz_host, url.i_port ) ) == NULL )
     {
         msg_Err( p_intf, "cannot listen for telnet" );
-        vlc_UrlClean(&url);
-        free( psz_address );
+        vlm_Delete( p_intf->p_sys->mediatheque );
+        vlc_UrlClean( &url );
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
@@ -210,8 +216,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->mediatheque = mediatheque;
     p_intf->pf_run = Run;
 
-    vlc_UrlClean(&url);
-    free( psz_address );
+    vlc_UrlClean( &url );
     return VLC_SUCCESS;
 }
 
@@ -228,8 +233,8 @@ static void Close( vlc_object_t *p_this )
     {
         telnet_client_t *cl = p_sys->clients[i];
         net_Close( cl->fd );
+        free( cl->buffer_write );
         free( cl );
-        p_sys->clients[i] = NULL;
     }
     free( p_sys->clients );
 
@@ -419,6 +424,7 @@ static void Run( intf_thread_t *p_intf )
                     net_Close( cl->fd );
                     TAB_REMOVE( p_intf->p_sys->i_clients ,
                                 p_intf->p_sys->clients , cl );
+                    free( cl->buffer_write );
                     free( cl );
                 }
                 else if( !strncmp( cl->buffer_read, "shutdown", 8 ) )
@@ -482,7 +488,6 @@ static void Run( intf_thread_t *p_intf )
                     }
                     Write_message( cl, message, NULL, WRITE_MODE_CMD );
                     vlm_MessageDelete( message );
-
                 }
             }
         }
