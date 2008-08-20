@@ -2134,6 +2134,7 @@ static void box_gather ( bo_t *box, bo_t *box2 )
 
 static block_t * bo_to_sout( sout_instance_t *p_sout,  bo_t *box )
 {
+    (void)p_sout;
     block_t *p_buf;
 
     p_buf = block_New( p_sout, box->i_buffer );
