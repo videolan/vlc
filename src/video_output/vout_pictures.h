@@ -90,6 +90,10 @@
 #define FOURCC_I422         VLC_FOURCC('I','4','2','2')
 #define FOURCC_J422         VLC_FOURCC('J','4','2','2')
 
+/* Planar 4:4:0, Y:U:V */
+#define FOURCC_I440         VLC_FOURCC('I','4','4','0')
+#define FOURCC_J440         VLC_FOURCC('J','4','4','0')
+
 /* Planar 4:4:4, Y:U:V */
 #define FOURCC_I444         VLC_FOURCC('I','4','4','4')
 #define FOURCC_J444         VLC_FOURCC('J','4','4','4')
