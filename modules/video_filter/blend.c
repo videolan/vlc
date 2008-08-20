@@ -77,14 +77,14 @@ static void Blend( filter_t *, picture_t *, picture_t *, picture_t *,
                    int, int, int );
 
 /* YUVA */
-static void BlendI420( filter_t *, picture_t *, picture_t *, picture_t *,
-                       int, int, int, int, int );
-static void BlendR16( filter_t *, picture_t *, picture_t *, picture_t *,
-                      int, int, int, int, int );
-static void BlendR24( filter_t *, picture_t *, picture_t *, picture_t *,
-                      int, int, int, int, int );
-static void BlendYUVPacked( filter_t *, picture_t *, picture_t *, picture_t *,
-                            int, int, int, int, int );
+static void BlendYUVAI420( filter_t *, picture_t *, picture_t *, picture_t *,
+                           int, int, int, int, int );
+static void BlendYUVARV16( filter_t *, picture_t *, picture_t *, picture_t *,
+                           int, int, int, int, int );
+static void BlendYUVARV24( filter_t *, picture_t *, picture_t *, picture_t *,
+                           int, int, int, int, int );
+static void BlendYUVAYUVPacked( filter_t *, picture_t *, picture_t *, picture_t *,
+                                int, int, int, int, int );
 
 /* I420, YV12 */
 static void BlendI420I420( filter_t *, picture_t *, picture_t *, picture_t *,
@@ -196,7 +196,7 @@ static const struct
     BlendFunction pf_blend;
 } p_blend_cfg[] = {
 
-    BLEND_CFG( FCC_YUVA, BlendI420, BlendYUVPacked, BlendR16, BlendR24 ),
+    BLEND_CFG( FCC_YUVA, BlendYUVAI420, BlendYUVAYUVPacked, BlendYUVARV16, BlendYUVARV24 ),
 
     BLEND_CFG( FCC_YUVP, BlendPalI420, BlendPalYUVPacked, BlendPalRV, BlendPalRV ),
 
@@ -411,11 +411,6 @@ static int BinaryLog( uint32_t i )
     return i_log;
 }
 
-/**
- * It transforms a color mask into right and left shifts
- * FIXME copied from video_output.c
- */
-#if 1
 static void vlc_rgb_index( int *pi_rindex, int *pi_gindex, int *pi_bindex,
                            const video_format_t *p_fmt )
 {
@@ -434,10 +429,9 @@ static void vlc_rgb_index( int *pi_rindex, int *pi_gindex, int *pi_bindex,
     *pi_bindex = p_fmt->i_lbshift / 8;
 #endif
 }
-#endif
 
-
-/*
+/**
+ * It transforms a color mask into right and left shifts
  * FIXME copied from video_output.c
  */
 static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
@@ -520,10 +514,10 @@ static void video_format_FixRgb( video_format_t *p_fmt )
 /***********************************************************************
  * YUVA
  ***********************************************************************/
-static void BlendI420( filter_t *p_filter, picture_t *p_dst,
-                       picture_t *p_dst_orig, picture_t *p_src,
-                       int i_x_offset, int i_y_offset,
-                       int i_width, int i_height, int i_alpha )
+static void BlendYUVAI420( filter_t *p_filter, picture_t *p_dst,
+                           picture_t *p_dst_orig, picture_t *p_src,
+                           int i_x_offset, int i_y_offset,
+                           int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1_y, *p_src2_y, *p_dst_y;
@@ -589,10 +583,10 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
     }
 }
 
-static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
-                      picture_t *p_dst_orig, picture_t *p_src,
-                      int i_x_offset, int i_y_offset,
-                      int i_width, int i_height, int i_alpha )
+static void BlendYUVARV16( filter_t *p_filter, picture_t *p_dst_pic,
+                           picture_t *p_dst_orig, picture_t *p_src,
+                           int i_x_offset, int i_y_offset,
+                           int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
@@ -648,10 +642,10 @@ static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
     }
 }
 
-static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
-                      picture_t *p_dst_orig, picture_t *p_src,
-                      int i_x_offset, int i_y_offset,
-                      int i_width, int i_height, int i_alpha )
+static void BlendYUVARV24( filter_t *p_filter, picture_t *p_dst_pic,
+                           picture_t *p_dst_orig, picture_t *p_src,
+                           int i_x_offset, int i_y_offset,
+                           int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
@@ -781,10 +775,10 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
     }
 }
 
-static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
-                            picture_t *p_dst_orig, picture_t *p_src,
-                            int i_x_offset, int i_y_offset,
-                            int i_width, int i_height, int i_alpha )
+static void BlendYUVAYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
+                                picture_t *p_dst_orig, picture_t *p_src,
+                                int i_x_offset, int i_y_offset,
+                                int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
@@ -850,7 +844,7 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
                     i_u = p_src2_u[i_x];
                     i_v = p_src2_v[i_x];
                 }
- 
+
                 vlc_blend_packed( &p_dst[i_x * 2], &p_src1[i_x * 2],
                                   i_l_offset, i_u_offset, i_v_offset,
                                   p_src2_y[i_x], i_u, i_v, i_trans, true );
