@@ -1838,16 +1838,23 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
 	 ])
     ])
      other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
+     other_libs_pic="-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic"
       if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
         other_libs="$other_libs -lws2_32"
       fi
+    dnl We need to check for pic because live555 don't provide shared libs
+    dnl and we want to build a plugins so we need -fPIC on some arch.
     AC_CHECK_HEADERS(liveMedia.hh, [
       VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
+        AC_CHECK_LIB(liveMedia_pic, main, [
+          VLC_ADD_PLUGIN([live555])
+         VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
+	 ],[
         AC_CHECK_LIB(liveMedia, main, [
           VLC_ADD_PLUGIN([live555])
           VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
-        ],[],[${other_libs}])
+        ],[],[${other_libs}]) ],[${other_libs_pic}])
     ])
     CPPFLAGS="${CPPFLAGS_save}"
     AC_LANG_POP(C++)
