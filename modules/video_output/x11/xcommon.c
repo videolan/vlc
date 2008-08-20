@@ -138,7 +138,7 @@ static void DestroyCursor  ( vout_thread_t * );
 static void ToggleCursor   ( vout_thread_t * );
 
 #if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
-static int  XVideoGetPort    ( vout_thread_t *, vlc_fourcc_t, vlc_fourcc_t * );
+static int  XVideoGetPort    ( vout_thread_t *, vlc_fourcc_t, picture_heap_t * );
 static void XVideoReleasePort( vout_thread_t *, int );
 #endif
 
@@ -259,7 +259,7 @@ int Activate ( vlc_object_t *p_this )
 
     /* Check that we have access to an XVideo port providing this chroma */
     p_vout->p_sys->i_xvport = XVideoGetPort( p_vout, VLC2X11_FOURCC(i_chroma),
-                                             &p_vout->output.i_chroma );
+                                             &p_vout->output );
     if( p_vout->p_sys->i_xvport < 0 )
     {
         /* If a specific chroma format was requested, then we don't try to
@@ -276,7 +276,7 @@ int Activate ( vlc_object_t *p_this )
          * conversion, but at least it has got scaling. */
         p_vout->p_sys->i_xvport =
                         XVideoGetPort( p_vout, X11_FOURCC('Y','U','Y','2'),
-                                               &p_vout->output.i_chroma );
+                                               &p_vout->output );
         if( p_vout->p_sys->i_xvport < 0 )
         {
             /* It failed, but it's not completely lost ! We try to open an
@@ -284,7 +284,7 @@ int Activate ( vlc_object_t *p_this )
              * an YUV conversion, but at least it has got scaling. */
             p_vout->p_sys->i_xvport =
                             XVideoGetPort( p_vout, X11_FOURCC('R','V','1','6'),
-                                                   &p_vout->output.i_chroma );
+                                                   &p_vout->output );
             if( p_vout->p_sys->i_xvport < 0 )
             {
                 XCloseDisplay( p_vout->p_sys->p_display );
@@ -821,6 +821,7 @@ static int InitVideo( vout_thread_t *p_vout )
     p_vout->fmt_out = p_vout->fmt_in;
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
+#if XvVersion < 2 || ( XvVersion == 2 && XvRevision < 2 )
     switch( p_vout->output.i_chroma )
     {
         case VLC_FOURCC('R','V','1','6'):
@@ -846,6 +847,7 @@ static int InitVideo( vout_thread_t *p_vout )
 #endif
             break;
     }
+#endif
 
 #elif defined(MODULE_NAME_IS_x11)
     /* Initialize the output structure: RGB with square pixels, whatever
@@ -2461,7 +2463,7 @@ static void ToggleCursor( vout_thread_t *p_vout )
  * XVideoGetPort: get YUV12 port
  *****************************************************************************/
 static int XVideoGetPort( vout_thread_t *p_vout,
-                          vlc_fourcc_t i_chroma, vlc_fourcc_t *pi_newchroma )
+                          vlc_fourcc_t i_chroma, picture_heap_t *p_heap )
 {
     XvAdaptorInfo *p_adaptor;
     unsigned int i;
@@ -2564,7 +2566,12 @@ static int XVideoGetPort( vout_thread_t *p_vout,
                      == Success )
                 {
                     i_selected_port = i_port;
-                    *pi_newchroma = p_formats[ i_format ].id;
+                    p_heap->i_chroma = p_formats[ i_format ].id;
+#if XvVersion > 2 || ( XvVersion == 2 && XvRevision >= 2 )
+                    p_heap->i_rmask = p_formats[ i_format ].red_mask;
+                    p_heap->i_gmask = p_formats[ i_format ].green_mask;
+                    p_heap->i_bmask = p_formats[ i_format ].blue_mask;
+#endif
                 }
             }
 
