@@ -160,6 +160,8 @@ static int Open( vlc_object_t *p_this )
     p_access->info = p_src->info;
 
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     /* */
     p_sys->p_fifo = block_FifoNew();
@@ -186,6 +188,7 @@ static int Open( vlc_object_t *p_this )
     if( vlc_thread_create( p_access, "timeshift thread", Thread,
                            VLC_THREAD_PRIORITY_LOW, false ) )
     {
+        Close( p_this );
         msg_Err( p_access, "cannot spawn timeshift access thread" );
         return VLC_EGENERIC;
     }
