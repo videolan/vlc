@@ -131,6 +131,8 @@ static int Open( vlc_object_t *p_this )
     i_channels = aout_FormatNbChannels( &p_filter->input );
 
     p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->i_nb = var_CreateGetInteger( p_filter->p_parent, "norm-buff-size" );
     p_sys->f_max = var_CreateGetFloat( p_filter->p_parent, "norm-max-level" );
 
@@ -139,6 +141,11 @@ static int Open( vlc_object_t *p_this )
     /* We need to store (nb_buffers+1)*nb_channels floats */
     p_sys->p_last = malloc( sizeof( float ) * (i_channels) *
                             (p_filter->p_sys->i_nb + 2) );
+    if( !p_sys->p_last )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
     memset( p_sys->p_last, 0 ,sizeof( float ) * (i_channels) *
             (p_filter->p_sys->i_nb + 2) );
     return VLC_SUCCESS;
@@ -162,10 +169,17 @@ static int Open( vlc_object_t *p_this )
 
     struct aout_filter_sys_t *p_sys = p_filter->p_sys;
 
-    pf_sum = (float *)malloc( sizeof(float) * i_channels );
+    pf_sum = malloc( sizeof(float) * i_channels );
+    if( !pf_sum )
+        return;
     memset( pf_sum, 0, sizeof(float) * i_channels );
 
-    pf_gain = (float *)malloc( sizeof(float) * i_channels );
+    pf_gain = malloc( sizeof(float) * i_channels );
+    if( !pf_gain )
+    {
+        free( pf_sum );
+        return;
+    }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
