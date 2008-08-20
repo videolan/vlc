@@ -110,6 +110,8 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_mux       = Mux;
 
     p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->b_used   = false;
     p_sys->b_header = true;
     p_sys->i_data   = 0;

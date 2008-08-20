@@ -218,6 +218,8 @@ static int Open( vlc_object_t *p_this )
     msg_Info( p_mux, "Open" );
 
     p_sys                 = malloc( sizeof( sout_mux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->i_streams      = 0;
     p_sys->i_add_streams  = 0;
     p_sys->i_del_streams  = 0;
@@ -319,6 +321,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     msg_Dbg( p_mux, "adding input" );
 
     p_input->p_sys = p_stream = malloc( sizeof( ogg_stream_t ) );
+    if( !p_stream )
+        return VLC_ENOMEM;
 
     p_stream->i_cat       = p_input->p_fmt->i_cat;
     p_stream->i_fourcc    = p_input->p_fmt->i_codec;
@@ -350,6 +354,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'S', 'N', 'O', 'W' ):
         case VLC_FOURCC( 'd', 'r', 'a', 'c' ):
             p_stream->p_oggds_header = malloc( sizeof(oggds_header_t) );
+            if( !p_stream->p_oggds_header )
+            {
+                free( p_stream );
+                return VLC_ENOMEM;
+            }
             memset( p_stream->p_oggds_header, 0, sizeof(oggds_header_t) );
             p_stream->p_oggds_header->i_packet_type = PACKET_TYPE_HEADER;
 
@@ -418,6 +427,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
             p_stream->p_oggds_header =
                 malloc( sizeof(oggds_header_t) + p_input->p_fmt->i_extra );
+            if( !p_stream->p_oggds_header )
+            {
+                free( p_stream );
+                return VLC_ENOMEM;
+            }
             memset( p_stream->p_oggds_header, 0, sizeof(oggds_header_t) );
             p_stream->p_oggds_header->i_packet_type = PACKET_TYPE_HEADER;
 
@@ -458,6 +472,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
         case VLC_FOURCC( 's', 'u','b', 't' ):
             p_stream->p_oggds_header = malloc( sizeof(oggds_header_t) );
+            if( !p_stream->p_oggds_header )
+            {
+                free( p_stream );
+                return VLC_ENOMEM;
+            }
             memset( p_stream->p_oggds_header, 0, sizeof(oggds_header_t) );
             p_stream->p_oggds_header->i_packet_type = PACKET_TYPE_HEADER;
 
@@ -537,6 +556,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 static block_t *OggStreamFlush( sout_mux_t *p_mux,
                                 ogg_stream_state *p_os, mtime_t i_pts )
 {
+    (void)p_mux;
     block_t *p_og, *p_og_first = NULL;
     ogg_page og;
 
@@ -562,6 +582,7 @@ static block_t *OggStreamFlush( sout_mux_t *p_mux,
 static block_t *OggStreamPageOut( sout_mux_t *p_mux,
                                   ogg_stream_state *p_os, mtime_t i_pts )
 {
+    (void)p_mux;
     block_t *p_og, *p_og_first = NULL;
     ogg_page og;
 
