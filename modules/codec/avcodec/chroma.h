@@ -25,6 +25,19 @@
 /*****************************************************************************
  * Chroma fourcc -> ffmpeg_id mapping
  *****************************************************************************/
+#if defined(WORDS_BIGENDIAN)
+#   define VLC_RGB_ES( fcc, leid, beid ) \
+    { fcc, beid, 0, 0, 0 },
+#else
+#   define VLC_RGB_ES( fcc, leid, beid ) \
+    { fcc, beid, 0, 0, 0 },
+#endif
+
+#define VLC_RGB( fcc, leid, beid, rmask, gmask, bmask ) \
+    { fcc, leid, rmask, gmask, bmask }, \
+    { fcc, beid, bmask, gmask, rmask }, \
+    VLC_RGB_ES( fcc, leid, beid )
+
 
 static const struct
 {
@@ -66,22 +79,14 @@ static const struct
     {VLC_FOURCC('Y','4','1','1'), PIX_FMT_UYYVYY411, 0, 0, 0 },
 
     /* Packed RGB formats */
-    {VLC_FOURCC('R','G','B','4'), PIX_FMT_RGB4, 0x10, 0x06, 0x01 }, /* FIXME verify */
-    {VLC_FOURCC('R','G','B','4'), PIX_FMT_BGR4, 0x01, 0x06, 0x10 },
-    {VLC_FOURCC('R','G','B','8'), PIX_FMT_RGB8, 0xC0, 0x38, 0x07 }, /* FIXME verify */
-    {VLC_FOURCC('R','G','B','8'), PIX_FMT_BGR8, 0x07, 0x38, 0xC0 },
-    {VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555, 0x7c00, 0x03e0, 0x001f },
-    {VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555, 0x7c00, 0x03e0, 0x001f },
-    {VLC_FOURCC('R','V','1','5'), PIX_FMT_BGR555, 0x001f, 0x03e0, 0x7c00 },
-    {VLC_FOURCC('R','V','1','6'), PIX_FMT_RGB565, 0xf800, 0x07e0, 0x001f },
-    {VLC_FOURCC('R','V','1','6'), PIX_FMT_BGR565, 0x001f, 0x07e0, 0x001f },
-    {VLC_FOURCC('R','V','2','4'), PIX_FMT_RGB24, 0xff0000, 0x00ff00, 0x0000ff },
-    {VLC_FOURCC('R','V','2','4'), PIX_FMT_BGR24, 0x0000ff, 0x00ff00, 0xff0000 },
+    VLC_RGB( VLC_FOURCC('R','G','B','4'), PIX_FMT_RGB4, PIX_FMT_BGR4, 0x10, 0x06, 0x01 )
+    VLC_RGB( VLC_FOURCC('R','G','B','8'), PIX_FMT_RGB8, PIX_FMT_BGR8, 0xC0, 0x38, 0x07 )
+    VLC_RGB( VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555, PIX_FMT_BGR555, 0x7c00, 0x03e0, 0x001f )
+    VLC_RGB( VLC_FOURCC('R','V','1','6'), PIX_FMT_RGB565, PIX_FMT_BGR565, 0xf800, 0x07e0, 0x001f )
+    VLC_RGB( VLC_FOURCC('R','V','2','4'), PIX_FMT_RGB24, PIX_FMT_BGR24, 0xff0000, 0x00ff00, 0x0000ff )
 
-    {VLC_FOURCC('R','V','3','2'), PIX_FMT_RGB32, 0x00ff0000, 0x0000ff00, 0x000000ff },
-    {VLC_FOURCC('R','V','3','2'), PIX_FMT_BGR32, 0x000000ff, 0x0000ff00, 0x00ff0000 },
-    {VLC_FOURCC('R','V','3','2'), PIX_FMT_RGB32_1, 0xff000000, 0x00ff0000, 0x0000ff00 },
-    {VLC_FOURCC('R','V','3','2'), PIX_FMT_BGR32_1, 0x0000ff00, 0x00ff0000, 0xff000000 },
+    VLC_RGB( VLC_FOURCC('R','V','3','2'), PIX_FMT_RGB32, PIX_FMT_BGR32, 0x00ff0000, 0x0000ff00, 0x000000ff )
+    VLC_RGB( VLC_FOURCC('R','V','3','2'), PIX_FMT_RGB32_1, PIX_FMT_BGR32_1, 0xff000000, 0x00ff0000, 0x0000ff00 )
 
 #if defined(PIX_FMT_RGBA)
     {VLC_FOURCC('R','G','B','A'), PIX_FMT_RGBA, 0xff000000, 0x00ff0000, 0x0000ff00},
