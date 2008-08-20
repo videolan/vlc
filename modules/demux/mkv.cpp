@@ -1178,6 +1178,15 @@ public:
 #else
     int BlockGet( KaxBlock * &, int64_t *, int64_t *, int64_t *);
 #endif
+
+    int BlockFindTrackIndex( size_t *pi_track,
+                             const KaxBlock *p_block
+#if LIBMATROSKA_VERSION >= 0x000800
+                             , const KaxSimpleBlock *p_simpleblock
+#endif
+                           );
+
+
     bool Select( mtime_t i_start_time );
     void UnSelect( );
 
@@ -1770,13 +1779,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
 #endif
         {
             /* Check blocks validity to protect againts broken files */
-            if(
+            if( BlockFindTrackIndex( NULL, pp_block
 #if LIBMATROSKA_VERSION >= 0x000800
-                pp_simpleblock && pp_simpleblock->TrackNum() >= tracks.size() ||
-#else
-                false ||
+                                    , pp_simpleblock
 #endif
-                pp_block && pp_block->TrackNum() >= tracks.size() )
+              ) )
             {
                 delete pp_block;
 #if LIBMATROSKA_VERSION >= 0x000800
@@ -1967,25 +1974,18 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
     unsigned int    i;
     bool            b;
 
-#define tk  p_segment->tracks[i_track]
-    for( i_track = 0; i_track < p_segment->tracks.size(); i_track++ )
-    {
+    if( p_segment->BlockFindTrackIndex( &i_track, block
 #if LIBMATROSKA_VERSION >= 0x000800
-        if( (block != NULL && tk->i_number == block->TrackNum()) ||
-            (simpleblock != NULL && tk->i_number == simpleblock->TrackNum()))
-#else
-        if( tk->i_number == block->TrackNum() )
+                                       , simpleblock
 #endif
-        {
-            break;
-        }
-    }
-
-    if( i_track >= p_segment->tracks.size() )
+      ) )
     {
         msg_Err( p_demux, "invalid track number" );
         return;
     }
+
+    mkv_track_t *tk = p_segment->tracks[i_track];
+
     if( tk->fmt.i_cat != NAV_ES && tk->p_es == NULL )
     {
         msg_Err( p_demux, "unknown track number" );
@@ -2115,8 +2115,6 @@ msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_b
         /* use time stamp only for first block */
         i_pts = 0;
     }
-
-#undef tk
 }
 
 matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial )
@@ -6056,6 +6054,40 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         for( i_track = 0; i_track < tracks.size(); i_track++ )
             es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, sys.i_start_pts );
     }
+}
+
+int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
+                                             const KaxBlock *p_block
+#if LIBMATROSKA_VERSION >= 0x000800
+                                            , const KaxSimpleBlock *p_simpleblock
+#endif
+                                           )
+{
+    size_t          i_track;
+    unsigned int    i;
+    bool            b;
+
+    for( i_track = 0; i_track < tracks.size(); i_track++ )
+    {
+        const mkv_track_t *tk = tracks[i_track];
+
+#if LIBMATROSKA_VERSION >= 0x000800
+        if( ( p_block != NULL && tk->i_number == p_block->TrackNum() ) ||
+            ( p_simpleblock != NULL && tk->i_number == p_simpleblock->TrackNum() ) )
+#else
+        if( tk->i_number == p_block->TrackNum() )
+#endif
+        {
+            break;
+        }
+    }
+
+    if( i_track >= tracks.size() )
+        return VLC_EGENERIC;
+
+    if( pi_track )
+        *pi_track = i_track;
+    return VLC_SUCCESS;
 }
 
 void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter, int64_t i_global_position )
