@@ -494,13 +494,14 @@ static block_t *Block( access_t *p_access )
         {
             p_block = block_New( p_access,
                                  p_sys->i_read_once * TS_PACKET_SIZE );
-            if( ( p_block->i_buffer = read( p_sys->i_handle, p_block->p_buffer,
+            if( ( i_ret = read( p_sys->i_handle, p_block->p_buffer,
                                 p_sys->i_read_once * TS_PACKET_SIZE ) ) <= 0 )
             {
                 msg_Warn( p_access, "read failed (%m)" );
                 block_Release( p_block );
                 continue;
             }
+            p_block->i_buffer = i_ret;
             break;
         }
     }

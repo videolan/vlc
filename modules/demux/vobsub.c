@@ -336,7 +336,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t i_maxdate;
-    int i;
+    int i, i_read;
 
     for( i = 0; i < p_sys->i_tracks; i++ )
     {
@@ -382,13 +382,14 @@ static int Demux( demux_t *p_demux )
             }
 
             /* read data */
-            p_block->i_buffer = stream_Read( p_sys->p_vobsub_stream, p_block->p_buffer, i_size );
-            if( p_block->i_buffer <= 6 )
+            i_read = stream_Read( p_sys->p_vobsub_stream, p_block->p_buffer, i_size );
+            if( i_read <= 6 )
             {
                 block_Release( p_block );
                 tk.i_current_subtitle++;
                 continue;
             }
+            p_block->i_buffer = i_read;
 
             /* pts */
             p_block->i_pts = tk.p_subtitles[tk.i_current_subtitle].i_start;

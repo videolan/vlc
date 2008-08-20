@@ -273,16 +273,18 @@ static int Demux( demux_t *p_demux )
     block_t     *p_frame;
     int         i_bk = ( p_sys->fmt.audio.i_bitspersample / 8 ) *
                        p_sys->fmt.audio.i_channels;
+    int         i_read;
 
     p_frame = block_New( p_demux, p_sys->fmt.audio.i_rate / 10 * i_bk );
 
-    p_frame->i_buffer = ModPlug_Read( p_sys->f, p_frame->p_buffer, p_frame->i_buffer );
-    if( p_frame->i_buffer <= 0 )
+    i_read = ModPlug_Read( p_sys->f, p_frame->p_buffer, p_frame->i_buffer );
+    if( i_read <= 0 )
     {
         /* EOF */
         block_Release( p_frame );
         return 0;
     }
+    p_frame->i_buffer = i_read;
 
     /* Set PCR */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_time );

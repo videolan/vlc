@@ -2124,9 +2124,10 @@ block_t *stream_Block( stream_t *s, int i_size )
     block_t *p_bk = block_New( s, i_size );
     if( p_bk )
     {
-        p_bk->i_buffer = stream_Read( s, p_bk->p_buffer, i_size );
-        if( p_bk->i_buffer > 0 )
+        int i_read = stream_Read( s, p_bk->p_buffer, i_size );
+        if( i_read > 0 )
         {
+            p_bk->i_buffer = i_read;
             return p_bk;
         }
         block_Release( p_bk );
