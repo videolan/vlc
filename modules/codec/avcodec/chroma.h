@@ -30,7 +30,7 @@
     { fcc, beid, 0, 0, 0 },
 #else
 #   define VLC_RGB_ES( fcc, leid, beid ) \
-    { fcc, beid, 0, 0, 0 },
+    { fcc, leid, 0, 0, 0 },
 #endif
 
 #define VLC_RGB( fcc, leid, beid, rmask, gmask, bmask ) \
