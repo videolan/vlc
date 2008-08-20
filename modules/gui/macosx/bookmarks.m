@@ -76,8 +76,6 @@ static VLCBookmarks *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
-    if( p_old_input )
-        vlc_object_release( p_old_input );
     [super dealloc];
 }
 
@@ -188,6 +186,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
             pp_bookmarks[row]->i_byte_offset] stringValue]];
     }
  
+    /* Just keep the pointer value to check if it
+     * changes. Note, we don't need to keep a reference to the object.
+     * so release it now. */
     p_old_input = p_input;
     vlc_object_release( p_input );
 
