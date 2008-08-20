@@ -69,10 +69,8 @@ static void     CleanThread       ( vout_thread_t * );
 static void     EndThread         ( vout_thread_t * );
 
 static void     AspectRatio       ( int, int *, int * );
-static int      BinaryLog         ( uint32_t );
-static void     MaskToShift       ( int *, int *, uint32_t );
 
-static void VideoFormatImportRgb( video_format_t *, picture_heap_t * );
+static void VideoFormatImportRgb( video_format_t *, const picture_heap_t * );
 static void PictureHeapFixRgb( picture_heap_t * );
 
 static void     vout_Destructor   ( vlc_object_t * p_this );
@@ -1312,63 +1310,11 @@ static void AspectRatio( int i_aspect, int *i_aspect_x, int *i_aspect_y )
     *i_aspect_y = VOUT_ASPECT_FACTOR / i_pgcd;
 }
 
-/*****************************************************************************
- * BinaryLog: computes the base 2 log of a binary value
- *****************************************************************************
- * This functions is used by MaskToShift, to get a bit index from a binary
- * value.
- *****************************************************************************/
-static int BinaryLog( uint32_t i )
-{
-    int i_log = 0;
-
-    if( i == 0 ) return -31337;
-
-    if( i & 0xffff0000 ) i_log += 16;
-    if( i & 0xff00ff00 ) i_log += 8;
-    if( i & 0xf0f0f0f0 ) i_log += 4;
-    if( i & 0xcccccccc ) i_log += 2;
-    if( i & 0xaaaaaaaa ) i_log += 1;
-
-    return i_log;
-}
-
-/*****************************************************************************
- * MaskToShift: transform a color mask into right and left shifts
- *****************************************************************************
- * This function is used for obtaining color shifts from masks.
- *****************************************************************************/
-static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
-{
-    uint32_t i_low, i_high;            /* lower hand higher bits of the mask */
-
-    if( !i_mask )
-    {
-        *pi_left = *pi_right = 0;
-        return;
-    }
-
-    /* Get bits */
-    i_low = i_high = i_mask;
-
-    i_low &= - (int32_t)i_low;          /* lower bit of the mask */
-    i_high += i_low;                    /* higher bit of the mask */
-
-    /* Transform bits into an index. Also deal with i_high overflow, which
-     * is faster than changing the BinaryLog code to handle 64 bit integers. */
-    i_low =  BinaryLog (i_low);
-    i_high = i_high ? BinaryLog (i_high) : 32;
-
-    /* Update pointers and return */
-    *pi_left =   i_low;
-    *pi_right = (8 - i_high + i_low);
-}
-
 /**
  * This function copies all RGB informations from a picture_heap_t into
  * a video_format_t
  */
-static void VideoFormatImportRgb( video_format_t *p_fmt, picture_heap_t *p_heap )
+static void VideoFormatImportRgb( video_format_t *p_fmt, const picture_heap_t *p_heap )
 {
     p_fmt->i_rmask = p_heap->i_rmask;
     p_fmt->i_gmask = p_heap->i_gmask;
@@ -1382,13 +1328,37 @@ static void VideoFormatImportRgb( video_format_t *p_fmt, picture_heap_t *p_heap 
 }
 
 /**
+ * This funtion copes all RGB informations from a video_format_t into
+ * a picture_heap_t
+ */
+static void VideoFormatExportRgb( const video_format_t *p_fmt, picture_heap_t *p_heap )
+{
+    p_heap->i_rmask = p_fmt->i_rmask;
+    p_heap->i_gmask = p_fmt->i_gmask;
+    p_heap->i_bmask = p_fmt->i_bmask;
+    p_heap->i_rrshift = p_fmt->i_rrshift;
+    p_heap->i_lrshift = p_fmt->i_lrshift;
+    p_heap->i_rgshift = p_fmt->i_rgshift;
+    p_heap->i_lgshift = p_fmt->i_lgshift;
+    p_heap->i_rbshift = p_fmt->i_rbshift;
+    p_heap->i_lbshift = p_fmt->i_lbshift;
+}
+
+/**
  * This function computes rgb shifts from masks
  */
 static void PictureHeapFixRgb( picture_heap_t *p_heap )
 {
-    MaskToShift( &p_heap->i_lrshift, &p_heap->i_rrshift, p_heap->i_rmask );
-    MaskToShift( &p_heap->i_lgshift, &p_heap->i_rgshift, p_heap->i_gmask );
-    MaskToShift( &p_heap->i_lbshift, &p_heap->i_rbshift, p_heap->i_bmask );
+    video_format_t fmt;
+
+    /* */
+    fmt.i_chroma = p_heap->i_chroma;
+    VideoFormatImportRgb( &fmt, p_heap );
+
+    /* */
+    video_format_FixRgb( &fmt );
+
+    VideoFormatExportRgb( &fmt, p_heap );
 }
 
 /*****************************************************************************
