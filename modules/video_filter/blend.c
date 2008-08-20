@@ -1099,8 +1099,6 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
     int i_x, i_y, i_trans;
     bool b_even_scanline = i_y_offset % 2;
 
-    fprintf( stderr, "--------------\n" );
-
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
               p_filter->fmt_out.video.i_x_offset +
