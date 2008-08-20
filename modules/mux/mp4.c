@@ -193,6 +193,8 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
     p_mux->p_sys        = p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->i_pos        = 0;
     p_sys->i_nb_streams = 0;
     p_sys->pp_streams   = NULL;
@@ -422,6 +424,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     p_stream                = malloc( sizeof( mp4_stream_t ) );
+    if( !p_stream )
+        return VLC_ENOMEM;
     es_format_Copy( &p_stream->fmt, p_input->p_fmt );
     p_stream->i_track_id    = p_sys->i_nb_streams + 1;
     p_stream->i_length_neg  = 0;

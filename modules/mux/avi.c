@@ -143,6 +143,8 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_mux, "AVI muxer opened" );
 
     p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->i_streams = 0;
     p_sys->i_stream_video = -1;
     p_sys->i_movi_size = 0;
@@ -151,6 +153,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->idx1.i_entry_max = 10000;
     p_sys->idx1.entry = calloc( p_sys->idx1.i_entry_max,
                                 sizeof( avi_idx1_entry_t ) );
+    if( !p_sys->idx1.entry )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
     p_sys->b_write_header = true;
 
 
@@ -253,11 +260,13 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_sys->i_streams >= 100 )
     {
         msg_Err( p_mux, "too many streams" );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
     msg_Dbg( p_mux, "adding input" );
     p_input->p_sys = malloc( sizeof( int ) );
+    if( !p_input->p_sys )
+        return VLC_ENOMEM;
 
     *((int*)p_input->p_sys) = p_sys->i_streams;
     p_stream = &p_sys->stream[p_sys->i_streams];
@@ -275,6 +284,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
             p_stream->p_wf  = malloc( sizeof( WAVEFORMATEX ) +
                                       p_input->p_fmt->i_extra );
+            if( !p_stream->p_wf )
+            {
+                free( p_input->p_sys );
+                return VLC_ENOMEM;
+            }
 #define p_wf p_stream->p_wf
             p_wf->cbSize = p_input->p_fmt->i_extra;
             if( p_wf->cbSize > 0 )
@@ -349,6 +363,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->p_wf  = NULL;
             p_stream->p_bih = malloc( sizeof( BITMAPINFOHEADER ) +
                                       p_input->p_fmt->i_extra );
+            if( !p_stream->p_bih )
+            {
+                free( p_input->p_sys );
+                return VLC_ENOMEM;
+            }
 #define p_bih p_stream->p_bih
             p_bih->biSize  = sizeof( BITMAPINFOHEADER ) +
                              p_input->p_fmt->i_extra;
@@ -395,11 +414,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
-
     msg_Dbg( p_mux, "removing input" );
 
     free( p_input->p_sys );
-    return( 0 );
+    return 0;
 }
 
 static int Mux      ( sout_mux_t *p_mux )
