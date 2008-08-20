@@ -182,7 +182,11 @@ static int Open ( vlc_object_t *p_this )
         }
     }
 
-    asprintf( &psz_vobname, "%s://%s", p_demux->psz_access, p_demux->psz_path );
+    if( asprintf( &psz_vobname, "%s://%s", p_demux->psz_access, p_demux->psz_path ) == -1 )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     i_len = strlen( psz_vobname );
     if( i_len >= 4 ) memcpy( psz_vobname + i_len - 4, ".sub", 4 );
 

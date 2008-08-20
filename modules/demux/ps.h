@@ -183,7 +183,7 @@ static inline int ps_pkt_id( block_t *p_pkt )
 {
     if( p_pkt->p_buffer[3] == 0xbd &&
         p_pkt->i_buffer >= 9 &&
-        p_pkt->i_buffer >= 9 + p_pkt->p_buffer[8] )
+        p_pkt->i_buffer >= 9 + (size_t)p_pkt->p_buffer[8] )
     {
         /* VOB extension */
         return 0xbd00 | p_pkt->p_buffer[9+p_pkt->p_buffer[8]];
