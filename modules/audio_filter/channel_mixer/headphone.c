@@ -218,12 +218,6 @@ static int Init( vlc_object_t *p_this, struct aout_filter_sys_t * p_data
     int i_source_channel_offset;
     unsigned int i;
 
-    if( p_data == NULL )
-    {
-        msg_Dbg( p_this, "passing a null pointer as argument" );
-        return 0;
-    }
-
     if( config_GetInt( p_this, "headphone-compensate" ) )
     {
         /* minimal distance to any speaker */
@@ -343,11 +337,13 @@ static int Init( vlc_object_t *p_this, struct aout_filter_sys_t * p_data
         }
     }
     p_data->p_overflow_buffer = malloc( p_data->i_overflow_buffer_size );
-    if( p_data->p_atomic_operations == NULL )
+    if( p_data->p_overflow_buffer == NULL )
+    {
+        free( p_data->p_atomic_operations );
         return -1;
+    }
     memset( p_data->p_overflow_buffer, 0 , p_data->i_overflow_buffer_size );
 
-    /* end */
     return 0;
 }
 
@@ -397,7 +393,8 @@ static int Create( vlc_object_t *p_this )
                                               AOUT_CHAN_REARLEFT |
                                               AOUT_CHAN_REARRIGHT;
     }
-    if( ! b_fit )
+
+    if( !b_fit )
     {
         msg_Dbg( p_filter, "requesting specific format" );
         return VLC_EGENERIC;
@@ -417,6 +414,7 @@ static int Create( vlc_object_t *p_this )
                 , p_filter->input.i_physical_channels
                 , p_filter->input.i_rate ) < 0 )
     {
+        free( p_filter->p_sys );
         return VLC_EGENERIC;
     }
 
@@ -435,14 +433,8 @@ static void Destroy( vlc_object_t *p_this )
 
     if( p_filter->p_sys != NULL )
     {
-        if( p_filter->p_sys->p_overflow_buffer != NULL )
-        {
-            free( p_filter->p_sys->p_overflow_buffer );
-        }
-        if( p_filter->p_sys->p_atomic_operations != NULL )
-        {
-            free( p_filter->p_sys->p_atomic_operations );
-        }
+        free( p_filter->p_sys->p_overflow_buffer );
+        free( p_filter->p_sys->p_atomic_operations );
         free( p_filter->p_sys );
         p_filter->p_sys = NULL;
     }
@@ -629,6 +621,7 @@ static int OpenFilter( vlc_object_t *p_this )
                 , p_filter->fmt_in.audio.i_physical_channels
                 , p_filter->fmt_in.audio.i_rate ) < 0 )
     {
+        free( p_filter->p_sys );
         return VLC_EGENERIC;
     }
 
@@ -647,14 +640,8 @@ static void CloseFilter( vlc_object_t *p_this )
 
     if( p_filter->p_sys != NULL )
     {
-        if( p_filter->p_sys->p_overflow_buffer != NULL )
-        {
-            free ( p_filter->p_sys->p_overflow_buffer );
-        }
-        if( p_filter->p_sys->p_atomic_operations != NULL )
-        {
-            free ( p_filter->p_sys->p_atomic_operations );
-        }
+        free( p_filter->p_sys->p_overflow_buffer );
+        free( p_filter->p_sys->p_atomic_operations );
         free( p_filter->p_sys );
         p_filter->p_sys = NULL;
     }

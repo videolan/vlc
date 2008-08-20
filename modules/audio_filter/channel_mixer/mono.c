@@ -219,12 +219,6 @@ static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data,
     int i_source_channel_offset;
     unsigned int i;
 
-    if( p_data == NULL )
-    {
-        msg_Dbg( p_this, "passing a null pointer as argument" );
-        return 0;
-    }
-
     if( config_GetInt( p_this, "headphone-compensate" ) )
     {
         /* minimal distance to any speaker */
@@ -344,8 +338,11 @@ static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data,
         }
     }
     p_data->p_overflow_buffer = malloc( p_data->i_overflow_buffer_size );
-    if( p_data->p_atomic_operations == NULL )
+    if( p_data->p_overflow_buffer == NULL )
+    {
+        free( p_data->p_atomic_operations );
         return -1;
+    }
     memset( p_data->p_overflow_buffer, 0, p_data->i_overflow_buffer_size );
 
     /* end */
@@ -428,6 +425,9 @@ static int OpenFilter( vlc_object_t *p_this )
               p_filter->fmt_in.audio.i_physical_channels,
               p_filter->fmt_in.audio.i_rate ) < 0 )
     {
+        var_Destroy( p_this, MONO_CFG "channel" );
+        var_Destroy( p_this, MONO_CFG "downmix" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -454,6 +454,8 @@ static void CloseFilter( vlc_object_t *p_this)
 
     var_Destroy( p_this, MONO_CFG "channel" );
     var_Destroy( p_this, MONO_CFG "downmix" );
+    free( p_sys->p_atomic_operations );
+    free( p_sys->p_overflow_buffer );
     free( p_sys );
 }
 
