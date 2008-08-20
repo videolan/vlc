@@ -64,8 +64,7 @@ static int SDES_client_item_del( rtcp_client_t *p_client )
         rtcp_SDES_item_t *p_old = p_client->pp_sdes[i];
         REMOVE_ELEM( p_client->pp_sdes, p_client->i_items, i );
         p_client->i_items--;
-        if( p_old->psz_data)
-            free( p_old->psz_data );
+        free( p_old->psz_data );
         free( p_old );
     }
     return VLC_SUCCESS;
@@ -332,15 +331,12 @@ static int rtcp_decode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
         rtcp_client_t *p_client = NULL;
         uint32_t i_pos = 0;
         uint32_t u_ssrc = 0;
-        int   result = 0;
 
         u_ssrc = bs_read( p_rtcp->bs, 32 );
 
-        result = p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos );
-        if( result == VLC_EGENERIC )
+        if( p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos ) == VLC_EGENERIC )
         {
-            result = p_rtcp->pf_add_client( p_this, p_pkt->u_ssrc, &i_pos );
-            if( result == VLC_EGENERIC )
+            if( p_rtcp->pf_add_client( p_this, p_pkt->u_ssrc, &i_pos ) == VLC_EGENERIC )
                 return VLC_ENOMEM;
         }
         vlc_object_lock( p_rtcp );
@@ -400,15 +396,12 @@ static int rtcp_decode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
         rtcp_client_t *p_client = NULL;
         uint32_t i_pos = 0;
         uint32_t u_ssrc = 0;
-        int   result = 0;
 
         u_ssrc = bs_read( p_rtcp->bs, 32 );
 
-        result = p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos );
-        if( result == VLC_EGENERIC )
+        if( p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos ) == VLC_EGENERIC )
         {
-            result = p_rtcp->pf_add_client( p_this, p_pkt->u_ssrc, &i_pos );
-            if( result == VLC_EGENERIC )
+            if( p_rtcp->pf_add_client( p_this, p_pkt->u_ssrc, &i_pos ) == VLC_EGENERIC )
                 return VLC_ENOMEM;
         }
 
@@ -466,15 +459,12 @@ static int rtcp_decode_SDES( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
         uint8_t  u_item = 0;
         uint8_t  u_length = 0;
         int   i = 0;
-        int   result = 0;
 
         u_ssrc = bs_read( p_rtcp->bs, 32 );
 
-        result = p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos );
-        if( result == VLC_EGENERIC )
+        if( p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos ) == VLC_EGENERIC )
         {
-            result = p_rtcp->pf_add_client( p_this, p_pkt->u_ssrc, &i_pos );
-            if( result == VLC_EGENERIC )
+            if( p_rtcp->pf_add_client( p_this, p_pkt->u_ssrc, &i_pos ) == VLC_EGENERIC )
                 return VLC_ENOMEM;
         }
 
@@ -580,7 +570,6 @@ static int rtcp_decode_APP( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     uint32_t u_ssrc = 0;
     uint32_t i_pos = 0;
     uint32_t i = 0;
-    int   result = 0;
 
     if( !p_pkt )
         return VLC_EGENERIC;
@@ -589,11 +578,9 @@ static int rtcp_decode_APP( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
 
     u_ssrc = bs_read( p_rtcp->bs, 32 );
 
-    result = p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos );
-    if( result == VLC_EGENERIC )
+    if( p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos ) == VLC_EGENERIC )
     {
-        result = p_rtcp->pf_add_client( p_this, p_pkt->u_ssrc, &i_pos );
-        if( result == VLC_EGENERIC )
+        if( p_rtcp->pf_add_client( p_this, p_pkt->u_ssrc, &i_pos ) == VLC_EGENERIC )
             return VLC_ENOMEM;
     }
 
@@ -823,7 +810,6 @@ block_t *rtcp_encode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     rtcp_stats_t *p_stats = NULL;
     rtcp_client_t *p_client = NULL;
     uint32_t i_pos = 0;
-    int result = 0;
 
     if( p_pkt->u_payload_type != RTCP_SR )
         return NULL;
@@ -858,8 +844,7 @@ block_t *rtcp_encode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     bs_write( s, 32, p_pkt->report.sr.u_octet_count );
 
     /* report block */
-    result = p_rtcp->pf_find_client( p_this, p_pkt->u_ssrc, &i_pos );
-    if( result == VLC_EGENERIC )
+    if( p_rtcp->pf_find_client( p_this, p_pkt->u_ssrc, &i_pos ) == VLC_EGENERIC )
     {
         msg_Err( p_this, "SR: SSRC identifier doesn't exists", p_pkt->u_ssrc );
         free( p_block );
@@ -898,7 +883,6 @@ block_t *rtcp_encode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     rtcp_stats_t *p_stats = NULL;
     rtcp_client_t *p_client = NULL;
     uint32_t i_pos = 0;
-    int result = 0;
 
     if( p_pkt->u_payload_type != RTCP_RR )
         return NULL;
@@ -919,8 +903,7 @@ block_t *rtcp_encode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     bs_write( s, 32, p_pkt->u_ssrc );
 
     /* report block */
-    result = p_rtcp->pf_find_client( p_this, p_pkt->u_ssrc, &i_pos );
-    if( result == VLC_EGENERIC )
+    if( p_rtcp->pf_find_client( p_this, p_pkt->u_ssrc, &i_pos ) == VLC_EGENERIC )
     {
         msg_Err( p_this, "RR: SSRC identifier doesn't exists", p_pkt->u_ssrc );
         free( p_block );
