@@ -83,7 +83,7 @@ vlc_module_begin ();
     set_description (_("(Experimental) Real-Time Protocol demuxer"));
     set_category (CAT_INPUT);
     set_subcategory (SUBCAT_INPUT_DEMUX);
-    set_capability ("access_demux", 10);
+    set_capability ("access_demux", 0);
     set_callbacks (Open, Close);
 
     add_integer ("rtp-caching", 1000, NULL, RTP_CACHING_TEXT,
