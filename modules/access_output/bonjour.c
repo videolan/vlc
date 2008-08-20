@@ -81,6 +81,7 @@ static void entry_group_callback( AvahiEntryGroup *g,
                                   AvahiEntryGroupState state,
                                   void *userdata )
 {
+    (void)g;
     bonjour_t *p_sys = (bonjour_t *)userdata;
 
     if( state == AVAHI_ENTRY_GROUP_ESTABLISHED )
@@ -272,7 +273,7 @@ error:
     if( p_sys->psz_txt != NULL )
         avahi_free( p_sys->psz_txt );
 
-    free( (void *)p_sys );
+    free( p_sys );
 
     return NULL;
 }

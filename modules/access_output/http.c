@@ -324,7 +324,7 @@ static int Open( vlc_object_t *p_this )
                                        ? "_vlc-http._tcp" : "_vlc-https._tcp",
                                              psz_name, i_bind_port, psz_txt );
         free( psz_uri );
-        free( (void *)psz_txt );
+        free( psz_txt );
 
         if( p_sys->p_bonjour == NULL )
             msg_Err( p_access, "unable to start requested Bonjour announce" );
@@ -448,6 +448,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
+    (void)i_pos;
     msg_Warn( p_access, "HTTP sout access cannot seek" );
     return VLC_EGENERIC;
 }
