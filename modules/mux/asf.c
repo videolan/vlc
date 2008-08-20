@@ -201,6 +201,8 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_mux       = Mux;
 
     p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->b_asf_http = p_mux->psz_mux && !strcmp( p_mux->psz_mux, "asfh" );
     if( p_sys->b_asf_http )
     {
@@ -449,6 +451,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             tk->i_extra = sizeof( WAVEFORMATEX ) +
                           p_input->p_fmt->i_extra + i_extra;
             tk->p_extra = malloc( tk->i_extra );
+            if( !tk->p_extra )
+                return VLC_ENOMEM;
             bo_init( &bo, tk->p_extra, tk->i_extra );
             bo_addle_u16( &bo, tk->i_tag );
             bo_addle_u16( &bo, p_input->p_fmt->audio.i_channels );
@@ -506,6 +510,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             tk->i_extra = 11 + sizeof( BITMAPINFOHEADER ) +
                           p_input->p_fmt->i_extra;
             tk->p_extra = malloc( tk->i_extra );
+            if( !tk->p_extra )
+                return VLC_ENOMEM;
             bo_init( &bo, tk->p_extra, tk->i_extra );
             bo_addle_u32( &bo, p_input->p_fmt->video.i_width );
             bo_addle_u32( &bo, p_input->p_fmt->video.i_height );

@@ -299,12 +299,15 @@ static int ReadMeta( vlc_object_t *p_this )
                         * terminated string */
                     char *psz_ufid = (char*) malloc( 64 );
                     int j = 0;
-                    while( ( j < 63 ) &&
-                            ( j < p_ufid->identifier().size() ) )
-                        psz_ufid[j] = p_ufid->identifier()[j++];
-                    psz_ufid[j] = '\0';
-                    vlc_meta_SetTrackID( p_meta, psz_ufid );
-                    free( psz_ufid );
+                    if( psz_ufid )
+                    {
+                        while( ( j < 63 ) &&
+                               ( j < p_ufid->identifier().size() ) )
+                            psz_ufid[j] = p_ufid->identifier()[j++];
+                        psz_ufid[j] = '\0';
+                        vlc_meta_SetTrackID( p_meta, psz_ufid );
+                        free( psz_ufid );
+                    }
                 }
             }
 
