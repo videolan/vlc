@@ -1099,6 +1099,8 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
     int i_x, i_y, i_trans;
     bool b_even_scanline = i_y_offset % 2;
 
+    fprintf( stderr, "--------------\n" );
+
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
               p_filter->fmt_out.video.i_x_offset +
@@ -1131,7 +1133,6 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
     p_src2 = p_src->p->p_pixels + p_filter->fmt_in.video.i_x_offset +
              i_src2_pitch * p_filter->fmt_in.video.i_y_offset;
 
-    const uint8_t *p_trans = p_src2;
 #define p_pal p_filter->fmt_in.video.p_palette->palette
 
     /* Draw until we reach the bottom of the subtitle */
@@ -1143,6 +1144,7 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
          p_dst_v += b_even_scanline ? i_dst_pitch/2 : 0,
          p_src1_v += b_even_scanline ? i_src1_pitch/2 : 0 )
     {
+        const uint8_t *p_trans = p_src2;
         b_even_scanline = !b_even_scanline;
 
         /* Draw until we reach the end of the line */
@@ -1195,13 +1197,13 @@ static void BlendPalYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
 
     i_width &= ~1; /* Needs to be a multiple of 2 */
 
-    const uint8_t *p_trans = p_src2;
 #define p_pal p_filter->fmt_in.video.p_palette->palette
 
     /* Draw until we reach the bottom of the subtitle */
     for( i_y = 0; i_y < i_height; i_y++,
          p_dst += i_dst_pitch, p_src1 += i_src1_pitch, p_src2 += i_src2_pitch )
     {
+        const uint8_t *p_trans = p_src2;
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x++, b_even = !b_even )
         {
@@ -1265,7 +1267,6 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
     p_src2 = p_src->p->p_pixels + p_filter->fmt_in.video.i_x_offset +
              i_src2_pitch * p_filter->fmt_in.video.i_y_offset;
 
-    const uint8_t *p_trans = p_src2;
 #define p_pal p_filter->fmt_in.video.p_palette->palette
 #define rgbpal rgbpalette.palette
 
@@ -1283,6 +1284,7 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
     for( i_y = 0; i_y < i_height; i_y++,
          p_dst += i_dst_pitch, p_src1 += i_src1_pitch, p_src2 += i_src2_pitch )
     {
+        const uint8_t *p_trans = p_src2;
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x++ )
         {
