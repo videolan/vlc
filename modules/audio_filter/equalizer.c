@@ -175,7 +175,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    if( EqzInit( p_filter, p_filter->input.i_rate ) )
+    if( EqzInit( p_filter, p_filter->input.i_rate ) != VLC_SUCCESS )
     {
         free( p_sys );
         return VLC_EGENERIC;
@@ -310,6 +310,14 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     p_sys->f_alpha = malloc( p_sys->i_band * sizeof(float) );
     p_sys->f_beta  = malloc( p_sys->i_band * sizeof(float) );
     p_sys->f_gamma = malloc( p_sys->i_band * sizeof(float) );
+    if( !p_sys->f_alpha || !p_sys->f_beta || !p_sys->f_gamma )
+    {
+        free( p_sys->f_alpha );
+        free( p_sys->f_beta );
+        free( p_sys->f_gamma );
+        return VLC_ENOMEM;
+    }
+
     for( i = 0; i < p_sys->i_band; i++ )
     {
         p_sys->f_alpha[i] = p_cfg->band[i].f_alpha;
@@ -320,7 +328,14 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     /* Filter dyn config */
     p_sys->b_2eqz = false;
     p_sys->f_gamp = 1.0;
-    p_sys->f_amp   = malloc( p_sys->i_band * sizeof(float) );
+    p_sys->f_amp  = malloc( p_sys->i_band * sizeof(float) );
+    if( !p_sys->f_amp )
+    {
+        free( p_sys->f_alpha );
+        free( p_sys->f_beta );
+        free( p_sys->f_gamma );
+        return VLC_ENOMEM;
+    }
     for( i = 0; i < p_sys->i_band; i++ )
     {
         p_sys->f_amp[i] = 0.0;
@@ -372,7 +387,11 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     {
         msg_Err(p_filter, "No preset selected");
         free( val2.psz_string );
-        return (VLC_EGENERIC);
+        free( p_sys->f_amp );
+        free( p_sys->f_alpha );
+        free( p_sys->f_beta );
+        free( p_sys->f_gamma );
+        return VLC_EGENERIC;
     }
     if( ( *(val2.psz_string) &&
         strstr( p_sys->psz_newbands, val2.psz_string ) ) || !*val2.psz_string )
