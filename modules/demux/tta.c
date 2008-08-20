@@ -118,6 +118,11 @@ static int Open( vlc_object_t * p_this )
     fmt.audio.i_channels = GetWLE( &p_header[6] );
     fmt.audio.i_bitspersample = GetWLE( &p_header[8] );
     fmt.audio.i_rate = GetDWLE( &p_header[10] );
+    if( fmt.audio.i_rate == 0 )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     p_sys->i_datalength = GetDWLE( &p_header[14] );
     p_sys->i_framelength = TTA_FRAMETIME * fmt.audio.i_rate;
