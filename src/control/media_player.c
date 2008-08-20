@@ -97,6 +97,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
 
         /* We owned this one */
         input_StopThread( p_input_thread );
+        vlc_thread_join( p_input_thread );
 
         var_Destroy( p_input_thread, "drawable" );
     }
