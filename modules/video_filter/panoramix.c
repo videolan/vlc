@@ -384,11 +384,11 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
 #endif
 
 #ifdef OVERLAP
-    p_vout->p_sys->i_offset_x = var_CreateGetInteger( p_vout, CFG_PREFIX "offset-x" );
+    p_vout->p_sys->i_offset_x = var_CreateGetBool( p_vout, CFG_PREFIX "offset-x" );
     if (p_vout->p_sys->i_col > 2) p_vout->p_sys->i_offset_x = 0; // offset-x is used in case of 2x1 wall & autocrop
     p_vout->p_sys->b_autocrop = !(var_CreateGetInteger( p_vout, "crop-ratio" ) == 0);
     if (!p_vout->p_sys->b_autocrop) p_vout->p_sys->b_autocrop = var_CreateGetInteger( p_vout, "autocrop" );
-    p_vout->p_sys->b_attenuate = var_CreateGetInteger( p_vout, CFG_PREFIX "attenuate");
+    p_vout->p_sys->b_attenuate = var_CreateGetBool( p_vout, CFG_PREFIX "attenuate");
     p_vout->p_sys->bz_length = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-length" );
     if (p_vout->p_sys->i_row > 1)
         p_vout->p_sys->bz_height = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-height" );
@@ -412,7 +412,7 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
     p_vout->p_sys->f_gamma_blue = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-blue" );
 #endif
 #ifndef SYS_MINGW32
-    p_vout->p_sys->b_xinerama= var_CreateGetInteger( p_vout, CFG_PREFIX "xinerama" );
+    p_vout->p_sys->b_xinerama = var_CreateGetBool( p_vout, CFG_PREFIX "xinerama" );
 #endif
 #else
     p_vout->p_sys->i_col = __MAX( 1, __MIN( 15, p_vout->p_sys->i_col ) );
@@ -540,7 +540,7 @@ static uint8_t F(uint8_t i, float gamma)
  *****************************************************************************/
 static int AdjustHeight( vout_thread_t *p_vout )
 {
-    bool b_fullscreen = var_CreateGetInteger( p_vout, "fullscreen" );
+    bool b_fullscreen = p_vout->b_fullscreen;
     int i_window_width = p_vout->i_window_width;
     int i_window_height = p_vout->i_window_height;
     double d_halfLength = 0;
@@ -548,34 +548,33 @@ static int AdjustHeight( vout_thread_t *p_vout )
     double d_halfLength_calculated;
     int    i_offset = 0;
 
-// OS DEPENDENT CODE to get display dimensions
-        if (b_fullscreen)
-        {
+    // OS DEPENDENT CODE to get display dimensions
+    if (b_fullscreen )
+    {
 #ifdef SYS_MINGW32
-            i_window_width  = GetSystemMetrics(SM_CXSCREEN);
-            i_window_height = GetSystemMetrics(SM_CYSCREEN);
+        i_window_width  = GetSystemMetrics(SM_CXSCREEN);
+        i_window_height = GetSystemMetrics(SM_CYSCREEN);
 #else
-            Display *p_display = XOpenDisplay( "" );
-            if (p_vout->p_sys->b_xinerama)
-            {
-                i_window_width = DisplayWidth(p_display, 0) / p_vout->p_sys->i_col;
-                i_window_height = DisplayHeight(p_display, 0) / p_vout->p_sys->i_row;
-             }
-            else
-            {
-                i_window_width = DisplayWidth(p_display, 0);
-                i_window_height = DisplayHeight(p_display, 0);
-            }
-               XCloseDisplay( p_display );
-               free(p_display);
+        Display *p_display = XOpenDisplay( "" );
+        if (p_vout->p_sys->b_xinerama)
+        {
+            i_window_width = DisplayWidth(p_display, 0) / p_vout->p_sys->i_col;
+            i_window_height = DisplayHeight(p_display, 0) / p_vout->p_sys->i_row;
+        }
+        else
+        {
+            i_window_width = DisplayWidth(p_display, 0);
+            i_window_height = DisplayHeight(p_display, 0);
+        }
+        XCloseDisplay( p_display );
 #endif
         var_SetInteger( p_vout, "width", i_window_width);
         var_SetInteger( p_vout, "height", i_window_height);
         p_vout->i_window_width = i_window_width;
-           p_vout->i_window_height = i_window_height;
-        }
+        p_vout->i_window_height = i_window_height;
+    }
 
-        if (p_vout->p_sys->bz_length)
+    if( p_vout->p_sys->bz_length)
         if ((!p_vout->p_sys->b_autocrop) && (!p_vout->p_sys->i_ratio))
         {
             if ((p_vout->p_sys->i_row > 1) || (p_vout->p_sys->i_col > 1))
@@ -622,10 +621,10 @@ static int AdjustHeight( vout_thread_t *p_vout )
                         (p_vout->p_sys->i_halfLength * (double)i_window_height *
                         (double)p_vout->render.i_aspect  /     VOUT_ASPECT_FACTOR / (double)p_vout->output.i_width);
         }
-        else
-            d_halfLength = 0;
+    else
+        d_halfLength = 0;
 
-        return i_offset;
+    return i_offset;
 }
 #endif
 
@@ -633,6 +632,8 @@ static int AdjustHeight( vout_thread_t *p_vout )
 /*****************************************************************************
  * Init: initialize Wall video thread output method
  *****************************************************************************/
+#define VLC_XCHG( type, a, b ) do { type __tmp = (b); (b) = (a); (a) = __tmp; } while(0)
+
 static int Init( vout_thread_t *p_vout )
 {
     int i_index, i_row, i_col, i_width, i_height;
@@ -673,6 +674,16 @@ static int Init( vout_thread_t *p_vout )
         f_WhiteLevel[0] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-red" ) / 255.0;
         f_WhiteLevel[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-green" ) / 255.0;
         f_WhiteLevel[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-blue" ) / 255.0;
+        for( int i = 3; i < VOUT_MAX_PLANES; i++ )
+        {
+            /* Initialize unsupported planes */
+            f_BlackCrush[i] = 140.0/255.0;
+            f_WhiteCrush[i] = 200.0/255.0;
+            f_BlackLevel[i] = 150.0/255.0;
+            f_WhiteLevel[i] = 0.0/255.0;
+            p_vout->p_sys->f_gamma[i] = 1.0;
+        }
+
         switch (p_vout->render.i_chroma)
         {
         // planar YVU
@@ -683,16 +694,11 @@ static int Init( vout_thread_t *p_vout )
             case VLC_FOURCC('U','Y','N','V'):    // packed by 2
             case VLC_FOURCC('Y','4','2','2'):    // packed by 2
     //        case VLC_FOURCC('c','y','u','v'):    // packed by 2
-                p_vout->p_sys->f_gamma[2] = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-green" );
-                p_vout->p_sys->f_gamma[1] = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-blue" );
-                f_BlackCrush[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blackcrush-green" ) / 255.0;
-                f_BlackCrush[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blackcrush-blue" ) / 255.0;
-                f_WhiteCrush[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitecrush-green" ) / 255.0;
-                f_WhiteCrush[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitecrush-blue" ) / 255.0;
-                f_BlackLevel[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blacklevel-green" ) / 255.0;
-                f_BlackLevel[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blacklevel-blue" ) / 255.0;
-                f_WhiteLevel[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-green" ) / 255.0;
-                f_WhiteLevel[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-blue" ) / 255.0;
+                VLC_XCHG( float, p_vout->p_sys->f_gamma[1], p_vout->p_sys->f_gamma[2] );
+                VLC_XCHG( float, f_BlackCrush[1], f_BlackCrush[2] );
+                VLC_XCHG( float, f_WhiteCrush[1], f_WhiteCrush[2] );
+                VLC_XCHG( float, f_BlackLevel[1], f_BlackLevel[2] );
+                VLC_XCHG( float, f_WhiteLevel[1], f_WhiteLevel[2] );
         // planar YUV
             case VLC_FOURCC('I','4','4','4'):
             case VLC_FOURCC('I','4','2','2'):
@@ -981,6 +987,7 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
                 int i_out_pitch = p_outpic->p[i_plane].i_pitch;
                 int i_copy_pitch = p_outpic->p[i_plane].i_visible_pitch;
                 int i_lines = p_outpic->p[i_plane].i_visible_lines;
+
 #ifdef OVERLAP
                 if (i_col) pi_left_skip[i_plane] -= (2 * p_vout->p_sys->i_halfLength ) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
                 if ((i_row) && (!i_col)) pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
@@ -989,13 +996,12 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
                     pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * i_row * p_pic->p[i_plane].i_pitch) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
 // i_n : previous inactive pp_vout
                 int i_n=0;
-                while ((!p_vout->p_sys->pp_vout[i_row * p_vout->p_sys->i_col + i_col - 1 - i_n].b_active) && (i_col - i_n > 1)) i_n++;
+                while( (i_col - i_n > 1) && (!p_vout->p_sys->pp_vout[i_row * p_vout->p_sys->i_col + i_col - 1 - i_n].b_active) ) i_n++;
                 if ((i_col > 1) && i_n)
                     pi_left_skip[i_plane] -= i_n*(2 * p_vout->p_sys->i_halfLength ) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
 
                 p_in = p_pic->p[i_plane].p_pixels
-                /* Wall proprities */
-                + pi_top_skip[i_plane] + pi_left_skip[i_plane];
+                        + pi_top_skip[i_plane] + pi_left_skip[i_plane]; /* Wall proprities */
 
                 if ((p_vout->p_sys->i_row > 2) &&
                     ((!i_row) || (i_row + 1 == p_vout->p_sys->i_row)))
