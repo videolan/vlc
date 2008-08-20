@@ -93,6 +93,9 @@ demux_vaControlHelper
 encode_URI_component
 EndMD5
 EnsureUTF8
+es_format_Init
+es_format_Copy
+es_format_Clean
 filename_sanitize
 filter_chain_AppendFilter
 filter_chain_AppendFromString
@@ -404,6 +407,7 @@ __var_Get
 __var_Set
 __var_TriggerCallback
 __var_Type
+video_format_FixRgb
 vlc_b64_decode
 vlc_b64_decode_binary
 vlc_b64_decode_binary_to_buffer

@@ -211,107 +211,36 @@ struct es_format_t
 };
 
 /* ES Categories */
-#define UNKNOWN_ES      0x00
-#define VIDEO_ES        0x01
-#define AUDIO_ES        0x02
-#define SPU_ES          0x03
-#define NAV_ES          0x04
-
-static inline void es_format_Init( es_format_t *fmt,
-                                   int i_cat, vlc_fourcc_t i_codec )
+enum es_format_category_e
 {
-    fmt->i_cat                  = i_cat;
-    fmt->i_codec                = i_codec;
-    fmt->i_id                   = -1;
-    fmt->i_group                = 0;
-    fmt->i_priority             = 0;
-    fmt->psz_language           = NULL;
-    fmt->psz_description        = NULL;
+    UNKNOWN_ES = 0x00,
+    VIDEO_ES   = 0x01,
+    AUDIO_ES   = 0x02,
+    SPU_ES     = 0x03,
+    NAV_ES     = 0x04,
+};
 
-    fmt->i_extra_languages      = 0;
-    fmt->p_extra_languages      = NULL;
+/**
+ * This function will fill all RGB shift from RGB masks.
+ */
+VLC_EXPORT( void, video_format_FixRgb, ( video_format_t * ) );
 
-    memset( &fmt->audio, 0, sizeof(audio_format_t) );
-    memset( &fmt->audio_replay_gain, 0, sizeof(audio_replay_gain_t) );
-    memset( &fmt->video, 0, sizeof(video_format_t) );
-    memset( &fmt->subs, 0, sizeof(subs_format_t) );
+/**
+ * This funtion will initialize a es_format_t structure.
+ */
+VLC_EXPORT( void, es_format_Init, ( es_format_t *, int i_cat, vlc_fourcc_t i_codec ) );
 
-    fmt->b_packetized           = true;
-    fmt->i_bitrate              = 0;
-    fmt->i_extra                = 0;
-    fmt->p_extra                = NULL;
-}
+/**
+ * This functions will copy a es_format_t.
+ */
+VLC_EXPORT( int, es_format_Copy, ( es_format_t *p_dst, const es_format_t *p_src ) );
 
-static inline int es_format_Copy( es_format_t *dst, const es_format_t *src )
-{
-    int i;
-    memcpy( dst, src, sizeof( es_format_t ) );
-    if( src->psz_language )
-         dst->psz_language = strdup( src->psz_language );
-    if( src->psz_description )
-        dst->psz_description = strdup( src->psz_description );
-    if( src->i_extra > 0 )
-    {
-        dst->i_extra = src->i_extra;
-        dst->p_extra = malloc( src->i_extra );
-        memcpy( dst->p_extra, src->p_extra, src->i_extra );
-    }
-    else
-    {
-        dst->i_extra = 0;
-        dst->p_extra = NULL;
-    }
+/**
+ * This function will clean up a es_format_t and relasing all associated
+ * resources.
+ * You can call it multiple times on the same structure.
+ */
+VLC_EXPORT( void, es_format_Clean, ( es_format_t *fmt ) );
 
-    if( src->subs.psz_encoding )
-        dst->subs.psz_encoding = strdup( src->subs.psz_encoding );
-
-    if( src->video.p_palette )
-    {
-        dst->video.p_palette =
-            (video_palette_t*)malloc( sizeof( video_palette_t ) );
-        memcpy( dst->video.p_palette, src->video.p_palette,
-                sizeof( video_palette_t ) );
-    }
-
-    dst->i_extra_languages = src->i_extra_languages;
-    if( dst->i_extra_languages )
-        dst->p_extra_languages = (extra_languages_t*)
-            malloc(dst->i_extra_languages * sizeof(*dst->p_extra_languages ));
-    for( i = 0; i < dst->i_extra_languages; i++ ) {
-        if( src->p_extra_languages[i].psz_language )
-            dst->p_extra_languages[i].psz_language = strdup( src->p_extra_languages[i].psz_language );
-        else
-            dst->p_extra_languages[i].psz_language = NULL;
-        if( src->p_extra_languages[i].psz_description )
-            dst->p_extra_languages[i].psz_description = strdup( src->p_extra_languages[i].psz_description );
-        else
-            dst->p_extra_languages[i].psz_description = NULL;
-    }
-    return VLC_SUCCESS;
-}
-
-static inline void es_format_Clean( es_format_t *fmt )
-{
-    free( fmt->psz_language );
-    free( fmt->psz_description );
-
-    if( fmt->i_extra > 0 ) free( fmt->p_extra );
-
-    free( fmt->video.p_palette );
-    free( fmt->subs.psz_encoding );
-
-    if( fmt->i_extra_languages > 0 && fmt->p_extra_languages )
-    {
-        int i;
-        for( i = 0; i < fmt->i_extra_languages; i++ )
-        {
-            free( fmt->p_extra_languages[i].psz_language );
-            free( fmt->p_extra_languages[i].psz_description );
-        }
-        free( fmt->p_extra_languages );
-    }
-
-    /* es_format_Clean can be called multiple times */
-    memset( fmt, 0, sizeof(*fmt) );
-}
 #endif
+

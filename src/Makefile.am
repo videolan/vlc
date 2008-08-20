@@ -345,6 +345,7 @@ SOURCES_libvlc_common = \
 	misc/rand.c \
 	misc/mtime.c \
 	misc/block.c \
+	misc/es_format.c \
 	modules/modules.h \
 	modules/modules.c \
 	modules/cache.c \
