@@ -99,7 +99,7 @@ static int Open( vlc_object_t * p_this )
         if( !p_demux->b_force ) return VLC_EGENERIC;
 
         /* User forced */
-        msg_Err( p_demux, "this doesn't look like a flac stream, "
+        msg_Err( p_demux, "this doesn't look like a true-audio stream, "
                  "continuing anyway" );
     }
 
@@ -120,8 +120,12 @@ static int Open( vlc_object_t * p_this )
     fmt.audio.i_channels = GetWLE( &p_header[6] );
     fmt.audio.i_bitspersample = GetWLE( &p_header[8] );
     fmt.audio.i_rate = GetDWLE( &p_header[10] );
-    if( fmt.audio.i_rate == 0 )
+    if( fmt.audio.i_rate == 0 || /* Avoid divide by 0 */
+        fmt.audio.i_rate > ( 1 << 20 ) /* Avoid i_framelength overflow */ )
+    {
+        msg_Warn( p_demux, "Wrong sample rate" );
         goto error;
+    }
 
     p_sys->i_datalength = GetDWLE( &p_header[14] );
     p_sys->i_framelength = TTA_FRAMETIME * fmt.audio.i_rate;
