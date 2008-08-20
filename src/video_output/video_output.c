@@ -72,6 +72,9 @@ static void     AspectRatio       ( int, int *, int * );
 static int      BinaryLog         ( uint32_t );
 static void     MaskToShift       ( int *, int *, uint32_t );
 
+static void VideoFormatImportRgb( video_format_t *, picture_heap_t * );
+static void PictureHeapFixRgb( picture_heap_t * );
+
 static void     vout_Destructor   ( vlc_object_t * p_this );
 
 /* Object variables callbacks */
@@ -601,20 +604,13 @@ static int InitThread( vout_thread_t *p_vout )
              i_aspect_x, i_aspect_y,
              p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den );
 
+    /* FIXME removed the need of both fmt_* and heap infos */
     /* Calculate shifts from system-updated masks */
-    MaskToShift( &p_vout->render.i_lrshift, &p_vout->output.i_rrshift,
-                 p_vout->render.i_rmask );
-    MaskToShift( &p_vout->render.i_lgshift, &p_vout->output.i_rgshift,
-                 p_vout->render.i_gmask );
-    MaskToShift( &p_vout->render.i_lbshift, &p_vout->output.i_rbshift,
-                 p_vout->render.i_bmask );
+    PictureHeapFixRgb( &p_vout->render );
+    VideoFormatImportRgb( &p_vout->fmt_render, &p_vout->render );
 
-    MaskToShift( &p_vout->output.i_lrshift, &p_vout->output.i_rrshift,
-                 p_vout->output.i_rmask );
-    MaskToShift( &p_vout->output.i_lgshift, &p_vout->output.i_rgshift,
-                 p_vout->output.i_gmask );
-    MaskToShift( &p_vout->output.i_lbshift, &p_vout->output.i_rbshift,
-                 p_vout->output.i_bmask );
+    PictureHeapFixRgb( &p_vout->output );
+    VideoFormatImportRgb( &p_vout->fmt_out, &p_vout->output );
 
     /* Check whether we managed to create direct buffers similar to
      * the render buffers, ie same size and chroma */
@@ -1203,19 +1199,6 @@ static picture_t *ChromaGetPicture( filter_t *p_filter )
     return p_pic;
 }
 
-static void ChromaCopyRgbInfo( es_format_t *p_fmt, picture_heap_t *p_heap )
-{
-    p_fmt->video.i_rmask = p_heap->i_rmask;
-    p_fmt->video.i_gmask = p_heap->i_gmask;
-    p_fmt->video.i_bmask = p_heap->i_bmask;
-    p_fmt->video.i_rrshift = p_heap->i_rrshift;
-    p_fmt->video.i_lrshift = p_heap->i_lrshift;
-    p_fmt->video.i_rgshift = p_heap->i_rgshift;
-    p_fmt->video.i_lgshift = p_heap->i_lgshift;
-    p_fmt->video.i_rbshift = p_heap->i_rbshift;
-    p_fmt->video.i_lbshift = p_heap->i_lbshift;
-}
-
 static int ChromaCreate( vout_thread_t *p_vout )
 {
     static const char typename[] = "chroma";
@@ -1231,8 +1214,8 @@ static int ChromaCreate( vout_thread_t *p_vout )
     /* TODO: Set the fmt_in and fmt_out stuff here */
     p_chroma->fmt_in.video = p_vout->fmt_render;
     p_chroma->fmt_out.video = p_vout->fmt_out;
-    ChromaCopyRgbInfo( &p_chroma->fmt_in, &p_vout->render );
-    ChromaCopyRgbInfo( &p_chroma->fmt_out, &p_vout->output );
+    VideoFormatImportRgb( &p_chroma->fmt_in.video, &p_vout->render );
+    VideoFormatImportRgb( &p_chroma->fmt_out.video, &p_vout->output );
 
     p_chroma->p_module = module_Need( p_chroma, "video filter2", NULL, 0 );
 
@@ -1379,6 +1362,33 @@ static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
     /* Update pointers and return */
     *pi_left =   i_low;
     *pi_right = (8 - i_high + i_low);
+}
+
+/**
+ * This function copies all RGB informations from a picture_heap_t into
+ * a video_format_t
+ */
+static void VideoFormatImportRgb( video_format_t *p_fmt, picture_heap_t *p_heap )
+{
+    p_fmt->i_rmask = p_heap->i_rmask;
+    p_fmt->i_gmask = p_heap->i_gmask;
+    p_fmt->i_bmask = p_heap->i_bmask;
+    p_fmt->i_rrshift = p_heap->i_rrshift;
+    p_fmt->i_lrshift = p_heap->i_lrshift;
+    p_fmt->i_rgshift = p_heap->i_rgshift;
+    p_fmt->i_lgshift = p_heap->i_lgshift;
+    p_fmt->i_rbshift = p_heap->i_rbshift;
+    p_fmt->i_lbshift = p_heap->i_lbshift;
+}
+
+/**
+ * This function computes rgb shifts from masks
+ */
+static void PictureHeapFixRgb( picture_heap_t *p_heap )
+{
+    MaskToShift( &p_heap->i_lrshift, &p_heap->i_rrshift, p_heap->i_rmask );
+    MaskToShift( &p_heap->i_lgshift, &p_heap->i_rgshift, p_heap->i_gmask );
+    MaskToShift( &p_heap->i_lbshift, &p_heap->i_rbshift, p_heap->i_bmask );
 }
 
 /*****************************************************************************
