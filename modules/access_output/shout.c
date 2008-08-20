@@ -183,16 +183,16 @@ static int Open( vlc_object_t *p_this )
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
-    psz_accessname = psz_parser = strdup( p_access->psz_path );
-    if( !psz_parser )
-        return VLC_ENOMEM;
-
     if( !p_access->psz_path )
     {
         msg_Err( p_access,
                  "please specify url=user:password@host:port/mountpoint" );
         return VLC_EGENERIC;
     }
+
+    psz_accessname = psz_parser = strdup( p_access->psz_path );
+    if( !psz_parser )
+        return VLC_ENOMEM;
 
     /* Parse connection data user:pwd@host:port/mountpoint */
     psz_user = psz_parser;
@@ -262,6 +262,10 @@ static int Open( vlc_object_t *p_this )
                  psz_host, i_port, psz_mount );
         free( p_access->p_sys );
         free( psz_accessname );
+        free( psz_name );
+        free( psz_description );
+        free( psz_genre );
+        free( psz_url );
         return VLC_EGENERIC;
     }
 
@@ -293,6 +297,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the bitrate" );
+            free( val.psz_string );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
@@ -318,6 +323,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the samplerate" );
+            free( val.psz_string );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
@@ -333,6 +339,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the number of channels" );
+            free( val.psz_string );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
@@ -348,6 +355,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about Ogg Vorbis quality" );
+            free( val.psz_string );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
