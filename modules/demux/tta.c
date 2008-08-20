@@ -68,7 +68,7 @@ struct demux_sys_t
     uint32_t i_totalframes;
     uint32_t i_currentframe;
     uint32_t *pi_seektable;
-    int      i_datalength;
+    uint32_t i_datalength;
     int      i_framelength;
 
     /* */
@@ -240,7 +240,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( i64 > 0 )
             {
                 int64_t tmp = 0;
-                int     i;
+                uint32_t i;
                 for( i=0; i < p_sys->i_totalframes && tmp+p_sys->pi_seektable[i] < i64; i++)
                 {
                     tmp += p_sys->pi_seektable[i];
