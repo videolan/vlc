@@ -103,7 +103,10 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_prev_sample = malloc(
         p_filter->input.i_channels * sizeof(int32_t) );
     if( p_sys->p_prev_sample == NULL )
+    {
+        free( p_sys );
         return VLC_ENOMEM;
+    }
     aout_DateInit( &p_sys->end_date, p_filter->output.i_rate );
 
     p_filter->pf_do_work = DoWork;

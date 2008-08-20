@@ -142,6 +142,8 @@ static int Open( vlc_object_t *p_this )
 
      /* Allocate structure */
     p_sys = p_filter->p_sys = (aout_filter_sys_t*)malloc( sizeof( aout_filter_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     vlc_mutex_init( &p_sys->lock );
     p_sys->p_reverbm = new revmodel();
