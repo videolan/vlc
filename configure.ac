@@ -1125,6 +1125,7 @@ VLC_ADD_PLUGIN([lpcm])
 VLC_ADD_PLUGIN([a52])
 VLC_ADD_PLUGIN([dts])
 VLC_ADD_PLUGIN([flac])
+VLC_ADD_PLUGIN([aes3])
 dnl Video filters:
 VLC_ADD_PLUGIN([deinterlace])
 VLC_ADD_PLUGIN([invert])
