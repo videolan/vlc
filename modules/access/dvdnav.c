@@ -1272,8 +1272,8 @@ static void* EventThread( vlc_object_t *p_this )
                 break;
             case ACTIONID_NAV_ACTIVATE:
                 b_activated = true;
-                dvdnav_button_activate( p_sys->dvdnav, pci );
                 ButtonUpdate( p_ev->p_demux, true );
+                dvdnav_button_activate( p_sys->dvdnav, pci );
                 break;
             default:
                 break;
@@ -1300,9 +1300,9 @@ static void* EventThread( vlc_object_t *p_this )
             if( p_ev->b_clicked )
             {
                 b_activated = true;
+                ButtonUpdate( p_ev->p_demux, true );
                 dvdnav_mouse_activate( p_sys->dvdnav, pci, valx.i_int,
                                        valy.i_int );
-                ButtonUpdate( p_ev->p_demux, true );
             }
 
             p_ev->b_moved = false;
