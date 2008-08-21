@@ -422,8 +422,8 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
     msg_Dbg( p_vout, "opening a %i x %i wall",
              p_vout->p_sys->i_col, p_vout->p_sys->i_row );
 
-    p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
-                                     p_vout->p_sys->i_col *
+    p_vout->p_sys->pp_vout = calloc( p_vout->p_sys->i_row *
+                                     p_vout->p_sys->i_col,
                                      sizeof(struct vout_list_t) );
     if( p_vout->p_sys->pp_vout == NULL )
     {
@@ -505,14 +505,18 @@ static double Gamma_Correction(int i_plane, float f_component, float f_BlackCrus
 
     f_Input = (f_component * f_BlackLevel[i_plane]) / (f_BlackCrush[i_plane]) + (1.0 - f_BlackLevel[i_plane]);
     if (f_component <= f_BlackCrush[i_plane])
-         return pow(f_Input, 1.0 / f_Gamma[i_plane]);
+    {
+        return pow(f_Input, 1.0 / f_Gamma[i_plane]);
+    }
     else if (f_component >= f_WhiteCrush[i_plane])
     {
         f_Input = (f_component * (1.0 - (f_WhiteLevel[i_plane] + 1.0)) + (f_WhiteLevel[i_plane] + 1.0) * f_WhiteCrush[i_plane] - 1.0) / (f_WhiteCrush[i_plane] - 1.0);
         return pow(f_Input, 1.0 / f_Gamma[i_plane]);
     }
-           else
-            return 1.0;
+    else
+    {
+        return 1.0;
+    }
 }
 
 #ifdef PACKED_YUV
@@ -522,15 +526,14 @@ static double Gamma_Correction(int i_plane, float f_component, float f_BlackCrus
  *****************************************************************************/
 static uint8_t F(uint8_t i, float gamma)
 {
- double input = (double) i / 255.0;
+    double input = (double) i / 255.0;
 
-// return clip(255 * pow(input, 1.0 / gamma));
+    // return clip(255 * pow(input, 1.0 / gamma));
 
- if (input < 0.5)
-     return clip_uint8((255 * pow(2 * input, gamma)) / 2);
- else
-     return clip_uint8(255 * (1 - pow(2 * (1 - input), gamma) / 2));
-
+    if (input < 0.5)
+        return clip_uint8((255 * pow(2 * input, gamma)) / 2);
+    else
+        return clip_uint8(255 * (1 - pow(2 * (1 - input), gamma) / 2));
 }
 #endif
 #endif
@@ -579,27 +582,30 @@ static int AdjustHeight( vout_thread_t *p_vout )
         {
             if ((p_vout->p_sys->i_row > 1) || (p_vout->p_sys->i_col > 1))
             {
-              while ((d_halfLength <= 0) || (d_halfLength > p_vout->render.i_width / (2 * p_vout->p_sys->i_col)))
-              {
-                if (p_vout->p_sys->bz_length >= 50)
-                    d_halfLength = i_window_width * p_vout->render.i_height / (2 * i_window_height * p_vout->p_sys->i_row) - p_vout->render.i_width / (2 * p_vout->p_sys->i_col);
-                else
+                while ((d_halfLength <= 0) || (d_halfLength > p_vout->render.i_width / (2 * p_vout->p_sys->i_col)))
                 {
-                    d_halfLength = (p_vout->render.i_width * p_vout->p_sys->bz_length) / (100.0 * p_vout->p_sys->i_col);
-                    d_halfLength = __MAX(i_window_width * p_vout->render.i_height / (2 * i_window_height * p_vout->p_sys->i_row) - p_vout->render.i_width / (2 * p_vout->p_sys->i_col), d_halfLength);
+                    if (p_vout->p_sys->bz_length >= 50)
+                    {
+                        d_halfLength = i_window_width * p_vout->render.i_height / (2 * i_window_height * p_vout->p_sys->i_row) - p_vout->render.i_width / (2 * p_vout->p_sys->i_col);
+                    }
+                    else
+                    {
+                        d_halfLength = (p_vout->render.i_width * p_vout->p_sys->bz_length) / (100.0 * p_vout->p_sys->i_col);
+                        d_halfLength = __MAX(i_window_width * p_vout->render.i_height / (2 * i_window_height * p_vout->p_sys->i_row) - p_vout->render.i_width / (2 * p_vout->p_sys->i_col), d_halfLength);
+                    }
+                    if ((d_halfLength <= 0) || (d_halfLength > p_vout->render.i_width / (2 * p_vout->p_sys->i_col)))
+                        p_vout->p_sys->i_row--;
+                    if (p_vout->p_sys->i_row < 1 )
+                    {
+                        p_vout->p_sys->i_row = 1;
+                        break;
+                    }
                 }
-                if ((d_halfLength <= 0) || (d_halfLength > p_vout->render.i_width / (2 * p_vout->p_sys->i_col))) p_vout->p_sys->i_row--;
-                if (p_vout->p_sys->i_row < 1 )
-                {
-                    p_vout->p_sys->i_row = 1;
-                    break;
-                }
-              }
-              p_vout->p_sys->i_halfLength = (d_halfLength + 0.5);
-              p_vout->p_sys->bz_length = (p_vout->p_sys->i_halfLength * 100.0 * p_vout->p_sys->i_col) / p_vout->render.i_width;
-              var_SetInteger( p_vout, "bz-length", p_vout->p_sys->bz_length);
-              var_SetInteger( p_vout, "panoramix-rows", p_vout->p_sys->i_row);
-              }
+                p_vout->p_sys->i_halfLength = (d_halfLength + 0.5);
+                p_vout->p_sys->bz_length = (p_vout->p_sys->i_halfLength * 100.0 * p_vout->p_sys->i_col) / p_vout->render.i_width;
+                var_SetInteger( p_vout, "bz-length", p_vout->p_sys->bz_length);
+                var_SetInteger( p_vout, "panoramix-rows", p_vout->p_sys->i_row);
+            }
         }
         else
         {
@@ -622,7 +628,7 @@ static int AdjustHeight( vout_thread_t *p_vout )
                         (double)p_vout->render.i_aspect  /     VOUT_ASPECT_FACTOR / (double)p_vout->output.i_width);
         }
     else
-        d_halfLength = 0;
+        p_vout->p_sys->i_halfLength = 0;
 
     return i_offset;
 }
@@ -636,7 +642,7 @@ static int AdjustHeight( vout_thread_t *p_vout )
 
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index, i_row, i_col, i_width, i_height;
+    int i_index, i_row, i_col;
     picture_t *p_pic;
 
     I_OUTPUTPICTURES = 0;
@@ -749,70 +755,59 @@ static int Init( vout_thread_t *p_vout )
         p_vout->p_sys->i_offset_x = AdjustHeight(p_vout);
     else
         AdjustHeight(p_vout);
+    if (p_vout->p_sys->i_row >= 2)
+    {
+        p_vout->p_sys->i_halfHeight = (p_vout->p_sys->i_halfLength * p_vout->p_sys->bz_height) / 100;
+        p_vout->p_sys->i_halfHeight -= (p_vout->p_sys->i_halfHeight % 2);
+    }
 #endif
 
     /* Try to open the real video output */
     msg_Dbg( p_vout, "spawning the real video outputs" );
 
-    p_vout->p_sys->i_vout = 0;
-
     /* FIXME: use bresenham instead of those ugly divisions */
+    p_vout->p_sys->i_vout = 0;
     for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
-        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
+        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++, p_vout->p_sys->i_vout++ )
         {
+            struct vout_list_t *p_entry = &p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ];
             video_format_t fmt;
+            int i_width, i_height;
 
-            memset( &fmt, 0, sizeof(video_format_t) );
+            /* */
+            i_width = ( p_vout->render.i_width / p_vout->p_sys->i_col ) & ~0x1;
+            if( i_col + 1 == p_vout->p_sys->i_col )
+                i_width = p_vout->render.i_width - i_col * i_width;
 
-            if( i_col + 1 < p_vout->p_sys->i_col )
-            {
-                i_width = ( p_vout->render.i_width
-                             / p_vout->p_sys->i_col ) & ~0x1;
-            }
-            else
-            {
-                i_width = p_vout->render.i_width
-                           - ( ( p_vout->render.i_width
-                                  / p_vout->p_sys->i_col ) & ~0x1 ) * i_col;
-
-            }
 #ifdef OVERLAP
             i_width += p_vout->p_sys->i_halfLength;
-            if (p_vout->p_sys->i_col > 2 ) i_width += p_vout->p_sys->i_halfLength;
-            i_width -= i_width % 2;
+            if (p_vout->p_sys->i_col > 2 )
+                i_width += p_vout->p_sys->i_halfLength;
+            i_width &= ~0x1;
 #endif
-            if( i_row + 1 < p_vout->p_sys->i_row )
-            {
-                i_height = ( p_vout->render.i_height
-                              / p_vout->p_sys->i_row ) & ~0x3;
-            }
-            else
-            {
-                i_height = p_vout->render.i_height
-                            - ( ( p_vout->render.i_height
-                                   / p_vout->p_sys->i_row ) & ~0x3 ) * i_row;
-            }
 
+            /* */
+            i_height = ( p_vout->render.i_height / p_vout->p_sys->i_row ) & ~0x3;
+            if( i_row + 1 == p_vout->p_sys->i_row )
+                i_height = p_vout->render.i_height - i_row * i_height;
 #ifdef OVERLAP
-            if (p_vout->p_sys->i_row >= 2)
+            if(p_vout->p_sys->i_row >= 2 )
             {
-                p_vout->p_sys->i_halfHeight = (p_vout->p_sys->i_halfLength * p_vout->p_sys->bz_height) / 100;
-                p_vout->p_sys->i_halfHeight -= (p_vout->p_sys->i_halfHeight % 2);
                 i_height += p_vout->p_sys->i_halfHeight;
-                if (p_vout->p_sys->i_row > 2) i_height += p_vout->p_sys->i_halfHeight;
+                if( p_vout->p_sys->i_row > 2 )
+                    i_height += p_vout->p_sys->i_halfHeight;
             }
-            i_height -= i_height % 2;
+            i_height &= ~0x1;
 #endif
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_width = i_width;
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_height = i_height;
+            p_entry->i_width = i_width;
+            p_entry->i_height = i_height;
 
-            if( !p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
-            {
-                p_vout->p_sys->i_vout++;
+            if( !p_entry->b_active )
                 continue;
-            }
 
+            /* */
+            memset( &fmt, 0, sizeof(video_format_t) );
             fmt.i_width = fmt.i_visible_width = p_vout->render.i_width;
             fmt.i_height = fmt.i_visible_height = p_vout->render.i_height;
             fmt.i_x_offset = fmt.i_y_offset = 0;
@@ -832,36 +827,40 @@ static int Init( vout_thread_t *p_vout )
                 p_vout->p_sys->i_offset_x = 0;
             }
 #endif
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
-                vout_Create( p_vout, &fmt);
+            p_entry->p_vout = vout_Create( p_vout, &fmt);
 
-            if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout == NULL )
+            if( p_entry->p_vout == NULL )
             {
                 msg_Err( p_vout, "failed to get %ix%i vout threads",
                                  p_vout->p_sys->i_col, p_vout->p_sys->i_row );
                 RemoveAllVout( p_vout );
                 return VLC_EGENERIC;
             }
-            ADD_CALLBACKS(
-                p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout,
-                SendEvents );
+            ADD_CALLBACKS( p_entry->p_vout, SendEvents );
 #ifdef OVERLAP
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment = 0;
-            if (i_col == 0) p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment |= VOUT_ALIGN_RIGHT;
-            else if (i_col == p_vout->p_sys->i_col -1) p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment |= VOUT_ALIGN_LEFT;
+            p_entry->p_vout->i_alignment = 0;
+            if (i_col == 0)
+                p_entry->p_vout->i_alignment |= VOUT_ALIGN_RIGHT;
+            else if (i_col == p_vout->p_sys->i_col -1)
+                p_entry->p_vout->i_alignment |= VOUT_ALIGN_LEFT;
             if (p_vout->p_sys->i_row > 1)
             {
-                if (i_row == 0) p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment |= VOUT_ALIGN_BOTTOM;
-                else if (i_row == p_vout->p_sys->i_row -1) p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment |= VOUT_ALIGN_TOP;
+                if (i_row == 0)
+                    p_entry->p_vout->i_alignment |= VOUT_ALIGN_BOTTOM;
+                else if (i_row == p_vout->p_sys->i_row -1)
+                    p_entry->p_vout->i_alignment |= VOUT_ALIGN_TOP;
             }
-    // i_n : number of active pp_vout
-            int i_index, i_n = p_vout->p_sys->i_vout;
-                for (i_index = p_vout->p_sys->i_vout; i_index >= 0; i_index--) if (!p_vout->p_sys->pp_vout[i_index].b_active) i_n -= 1;
-            var_SetInteger( p_vout, "align", p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment );
-            var_SetInteger( p_vout, "video-x",i_video_x + p_vout->p_sys->i_offset_x + ((i_n + 1) % p_vout->p_sys->i_col) * p_vout->i_window_width);
-            var_SetInteger( p_vout, "video-y",i_video_y + ((i_n + 1) / p_vout->p_sys->i_col) * p_vout->i_window_height);
+            // i_n : number of active pp_vout
+            int i_active = 0;
+            for( int i = 0; i <= p_vout->p_sys->i_vout; i++ )
+            {
+                if( p_vout->p_sys->pp_vout[i].b_active )
+                    i_active++;
+            }
+            var_SetInteger( p_vout, "align", p_entry->p_vout->i_alignment );
+            var_SetInteger( p_vout, "video-x", i_video_x + p_vout->p_sys->i_offset_x + ((i_active + 1) % p_vout->p_sys->i_col) * p_vout->i_window_width);
+            var_SetInteger( p_vout, "video-y", i_video_y +                             ((i_active + 1) / p_vout->p_sys->i_col) * p_vout->i_window_height);
 #endif
-            p_vout->p_sys->i_vout++;
         }
     }
 
@@ -922,7 +921,7 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
     int i_col, i_row, i_vout, i_plane;
     int pi_left_skip[VOUT_MAX_PLANES], pi_top_skip[VOUT_MAX_PLANES];
 #ifdef OVERLAP
-    int LeftOffset, TopOffset;
+    int TopOffset;
     int constantYUV[3] = {0,128,128};
     int Denom;
     int a_2;
@@ -931,54 +930,38 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
     int i_index, i_index2;
 #endif
 
-
-    i_vout = 0;
-
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-    {
         pi_top_skip[i_plane] = 0;
-    }
 
-    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
+    for( i_vout = 0, i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-        {
             pi_left_skip[i_plane] = 0;
-        }
 
-        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
+        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++, i_vout++ )
         {
-            if( !p_vout->p_sys->pp_vout[ i_vout ].b_active )
+            struct vout_list_t *p_entry = &p_vout->p_sys->pp_vout[ i_vout ];
+            if( !p_entry->b_active )
             {
                 for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
                 {
-                    pi_left_skip[i_plane] +=
-                        p_vout->p_sys->pp_vout[ i_vout ].i_width
-                         * p_pic->p[i_plane].i_pitch / p_vout->output.i_width;
+                    pi_left_skip[i_plane] += p_entry->i_width * p_pic->p[i_plane].i_pitch / p_vout->output.i_width;
                 }
-                i_vout++;
                 continue;
             }
 
-            while( ( p_outpic =
-                vout_CreatePicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                                    0, 0, 0 )
-                   ) == NULL )
+            while( ( p_outpic = vout_CreatePicture( p_entry->p_vout, 0, 0, 0 )) == NULL )
             {
-                if( !vlc_object_alive (p_vout) || p_vout->b_error )
+                if( !vlc_object_alive(p_vout) || p_vout->b_error )
                 {
-                    vout_DestroyPicture(
-                        p_vout->p_sys->pp_vout[ i_vout ].p_vout, p_outpic );
+                    vout_DestroyPicture( p_entry->p_vout, p_outpic );
                     return;
                 }
-
                 msleep( VOUT_OUTMEM_SLEEP );
             }
 
-            vout_DatePicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                              p_outpic, p_pic->date );
-            vout_LinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                              p_outpic );
+            vout_DatePicture( p_entry->p_vout, p_outpic, p_pic->date );
+            vout_LinkPicture( p_entry->p_vout, p_outpic );
 
             for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
             {
@@ -987,271 +970,238 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
                 int i_out_pitch = p_outpic->p[i_plane].i_pitch;
                 int i_copy_pitch = p_outpic->p[i_plane].i_visible_pitch;
                 int i_lines = p_outpic->p[i_plane].i_visible_lines;
+                const int i_div = p_entry->i_width / i_copy_pitch;
+
+                const bool b_row_first = i_row == 0;
+                const bool b_row_last = i_row + 1 == p_vout->p_sys->i_row;
+                const bool b_col_first = i_col == 0;
+                const bool b_col_last = i_col + 1 == p_vout->p_sys->i_col;
 
 #ifdef OVERLAP
-                if (i_col) pi_left_skip[i_plane] -= (2 * p_vout->p_sys->i_halfLength ) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                if ((i_row) && (!i_col)) pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                if ((p_vout->p_sys->i_row > 2) && (i_row == 1) && (!i_col)) pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                if ((!p_vout->p_sys->pp_vout[p_vout->p_sys->i_col].b_active))
-                    pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * i_row * p_pic->p[i_plane].i_pitch) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
+                if( !b_col_first )
+                    pi_left_skip[i_plane] -= (2 * p_vout->p_sys->i_halfLength ) / i_div;
+
+                if( p_vout->p_sys->i_row >= 2 )
+                {
+                    if( !b_row_first && b_col_first )
+                        pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / i_div;
+                    if( p_vout->p_sys->i_row > 2 && i_row == 1 && b_col_first )
+                        pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / i_div;
+                    if( !p_vout->p_sys->pp_vout[p_vout->p_sys->i_col-1].b_active )
+                        pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * i_row * p_pic->p[i_plane].i_pitch) / i_div;
+                }
 // i_n : previous inactive pp_vout
                 int i_n=0;
                 while( (i_col - i_n > 1) && (!p_vout->p_sys->pp_vout[i_row * p_vout->p_sys->i_col + i_col - 1 - i_n].b_active) ) i_n++;
-                if ((i_col > 1) && i_n)
-                    pi_left_skip[i_plane] -= i_n*(2 * p_vout->p_sys->i_halfLength ) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
+                if( i_col > 1 && i_n )
+                    pi_left_skip[i_plane] -= i_n * (2 * p_vout->p_sys->i_halfLength ) / i_div;
 
-                p_in = p_pic->p[i_plane].p_pixels
-                        + pi_top_skip[i_plane] + pi_left_skip[i_plane]; /* Wall proprities */
 
-                if ((p_vout->p_sys->i_row > 2) &&
-                    ((!i_row) || (i_row + 1 == p_vout->p_sys->i_row)))
-                        i_lines -= (2 * p_vout->p_sys->i_halfHeight) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
+                if( p_vout->p_sys->i_row > 2 && ( b_row_first || b_row_last ) )
+                    i_lines -= (2 * p_vout->p_sys->i_halfHeight) / i_div;
 
 // 1088 lines bug in a mpeg2 stream of 1080 lines
-                if ((p_vout->p_sys->i_row - 1 == i_row) &&
-                    (p_pic->p[i_plane].i_lines == 1088))
-                        i_lines -= 8 / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-
-                p_in_end = p_in + i_lines * p_pic->p[i_plane].i_pitch;
-#else
-                p_in = p_pic->p[i_plane].p_pixels
-                        + pi_top_skip[i_plane] + pi_left_skip[i_plane];
-
-                p_in_end = p_in + i_lines * p_pic->p[i_plane].i_pitch;
+                if( b_row_last && p_pic->p[i_plane].i_lines == 1088 )
+                    i_lines -= 8 / i_div;
 #endif
+                /* */
+                p_in = &p_pic->p[i_plane].p_pixels[ pi_top_skip[i_plane] + pi_left_skip[i_plane] ]; /* Wall proprities */
+                p_in_end = &p_in[i_lines * p_pic->p[i_plane].i_pitch];
+
                 p_out = p_outpic->p[i_plane].p_pixels;
 #ifdef OVERLAP
-        if ((p_vout->p_sys->i_row > 2) && (!i_row))
-            p_out += (p_outpic->p[i_plane].i_pitch * (2 * p_vout->p_sys->i_halfHeight) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch));
+                if( p_vout->p_sys->i_row > 2 && b_row_first )
+                    p_out += p_outpic->p[i_plane].i_pitch * (2 * p_vout->p_sys->i_halfHeight) / i_div;
 
-        int length;
-        int i_col_mod;
-        length = 2 * p_vout->p_sys->i_halfLength / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
+                int i_col_mod;
+                int length = 2 * p_vout->p_sys->i_halfLength / i_div;
 
-        if (p_vout->p_sys->b_has_changed)
-        {
-            Denom = F2(length);
-            a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
-            a_1 = p_vout->p_sys->a_1 * length * (ACCURACY / 100);
-            a_0 = p_vout->p_sys->a_0 * Denom * (ACCURACY / 100);
-            for(i_col_mod = 0; i_col_mod < 2; i_col_mod++)
-             for (i_index = 0; i_index < length; i_index++)
-             {
-                p_vout->p_sys->lambda[i_col_mod][i_plane][i_index] = CLIP_0A(!i_col_mod ? ACCURACY - (F4(a_2, a_1, i_index) + a_0) / Denom : ACCURACY - (F4(a_2, a_1,length - i_index) + a_0) / Denom);
-                p_vout->p_sys->cstYUV[i_col_mod][i_plane][i_index] = ((ACCURACY - p_vout->p_sys->lambda[i_col_mod][i_plane][i_index]) * constantYUV[i_plane]) / ACCURACY;
-             }
-        }
-#endif
-            while( p_in < p_in_end )
-            {
-#ifndef OVERLAP
-                vlc_memcpy( p_out, p_in, i_copy_pitch);
-#else
-                if (p_vout->p_sys->i_col > 2)
-                {
-                    length /= 2;
-                    if (i_col == 0)
-                        vlc_memcpy( p_out + length , p_in, i_copy_pitch - length);
-                    else if (i_col + 1 == p_vout->p_sys->i_col)
-                        vlc_memcpy( p_out, p_in - length, i_copy_pitch - length);
-                    else
-                        vlc_memcpy( p_out, p_in - length, i_copy_pitch);
-
-                    if ((i_col == 0))
-                    // black bar
-                    {
-                        LeftOffset = 0;
-                        p_out += LeftOffset;
-                        memset(p_out, constantYUV[i_plane], length);
-                        p_out -= LeftOffset;
-                    }
-                    else if ((i_col + 1 == p_vout->p_sys->i_col ))
-                    // black bar
-                        {
-                            LeftOffset = i_copy_pitch - length;
-                            p_out += LeftOffset;
-                            memset(p_out, constantYUV[i_plane], length);
-                            p_out -= LeftOffset;
-                        }
-                    length *= 2;
-                }
-                else
-                    vlc_memcpy( p_out , p_in, i_copy_pitch);
-
-              if (p_vout->p_sys->b_attenuate)
-            {
-// vertical blend
-// first blended zone
-                if (i_col)
-                {
-                    LeftOffset = 0;
-                    p_out += LeftOffset;
-                    for (i_index = 0; i_index < length; i_index++)
-                    {
-#ifndef GAMMA
-                        *(p_out + i_index) = (p_vout->p_sys->lambda[1][i_plane][i_index] *
-                                 (*(p_out + i_index))) / ACCURACY +
-                                     p_vout->p_sys->cstYUV[1][i_plane][i_index];
-#else
-                            *(p_out + i_index) = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda[1][i_plane][i_index]][*(p_out + i_index)];
-#endif
-                    }
-                    p_out -= LeftOffset;
-                }
-// second blended zone
-                if (i_col + 1 < p_vout->p_sys->i_col)
-                {
-                    LeftOffset = i_copy_pitch - length;
-                    p_out +=  LeftOffset;
-                    for (i_index = 0; i_index < length; i_index++)
-                    {
-#ifndef GAMMA
-                            *(p_out + i_index) = (p_vout->p_sys->lambda[0][i_plane][i_index] *
-                                     (*(p_out + i_index))) / ACCURACY +
-                                     p_vout->p_sys->cstYUV[0][i_plane][i_index];
-#else
-
-                        *(p_out + i_index) = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda[0][i_plane][i_index]][*(p_out + i_index)];
-#endif
-                    }
-                    p_out -= LeftOffset;
-                }
-// end blended zone
-            }
-#endif
-                p_in += i_in_pitch;
-                p_out += i_out_pitch;
-            }
-#ifdef OVERLAP
-// horizontal blend
-        if (!p_vout->p_sys->b_attenuate)
-        {
-            if ((i_row == 0) && (p_vout->p_sys->i_row > 2))
-            // black bar
-            {
-                    int height = 2 * p_vout->p_sys->i_halfHeight / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                    TopOffset = i_lines + (2 * p_vout->p_sys->i_halfHeight) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                    p_out -= TopOffset * p_outpic->p[i_plane].i_pitch;
-                    for (i_index = 0; i_index < height; i_index++)
-                        for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
-                            *(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2) = constantYUV[i_plane];
-                    p_out += TopOffset * p_outpic->p[i_plane].i_pitch;
-            }
-            else if ((i_row + 1 == p_vout->p_sys->i_row) && (p_vout->p_sys->i_row > 2))
-            // black bar
-                {
-                        int height = 2 * p_vout->p_sys->i_halfHeight / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                        TopOffset = height - (2 * p_vout->p_sys->i_halfHeight) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                        p_out -= TopOffset * p_outpic->p[i_plane].i_pitch;
-                        for (i_index = 0; i_index < height; i_index++)
-                            for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
-                                *(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2) = constantYUV[i_plane];
-                        p_out += TopOffset * p_outpic->p[i_plane].i_pitch;
-                }
-        }
-        else
-        {
-            if (p_vout->p_sys->i_row >= 2)
-            {
-                length = 2 * p_vout->p_sys->i_halfHeight / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                if (p_vout->p_sys->b_has_changed)
+                if( p_vout->p_sys->b_has_changed )
                 {
                     Denom = F2(length);
                     a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
                     a_1 = p_vout->p_sys->a_1 * length * (ACCURACY / 100);
                     a_0 = p_vout->p_sys->a_0 * Denom * (ACCURACY / 100);
-                   for(i_col_mod = 0; i_col_mod < 2; i_col_mod++)
-                    for (i_index = 0; i_index < length; i_index++)
+                    for( i_col_mod = 0; i_col_mod < 2; i_col_mod++ )
                     {
-                        p_vout->p_sys->lambda2[i_col_mod][i_plane][i_index] = CLIP_0A(!i_col_mod ? ACCURACY - (F4(a_2, a_1, i_index) + a_0) / Denom : ACCURACY - (F4(a_2, a_1,length - i_index) + a_0) / Denom);
-                        p_vout->p_sys->cstYUV2[i_col_mod][i_plane][i_index] = ((ACCURACY - p_vout->p_sys->lambda2[i_col_mod][i_plane][i_index]) * constantYUV[i_plane]) / ACCURACY;
+                        for( i_index = 0; i_index < length; i_index++ )
+                        {
+                            p_vout->p_sys->lambda[i_col_mod][i_plane][i_index] = CLIP_0A(!i_col_mod ? ACCURACY - (F4(a_2, a_1, i_index) + a_0) / Denom : ACCURACY - (F4(a_2, a_1,length - i_index) + a_0) / Denom);
+                            p_vout->p_sys->cstYUV[i_col_mod][i_plane][i_index] = ((ACCURACY - p_vout->p_sys->lambda[i_col_mod][i_plane][i_index]) * constantYUV[i_plane]) / ACCURACY;
+                        }
                     }
                 }
-// first blended zone
+#endif
+                while( p_in < p_in_end )
+                {
+#ifndef OVERLAP
+                    vlc_memcpy( p_out, p_in, i_copy_pitch);
+#else
+                    if( p_vout->p_sys->i_col > 2 )
+                    {
+                        const int halfl = length / 2;
+                        if( b_col_first == 0)
+                            vlc_memcpy( &p_out[halfl], &p_in[0], i_copy_pitch - halfl );
+                        else if( b_col_last )
+                            vlc_memcpy( &p_out[    0], &p_in[-halfl], i_copy_pitch - halfl );
+                        else
+                            vlc_memcpy( &p_out[    0], &p_in[-halfl], i_copy_pitch);
 
-            if (i_row)
-            {
-                TopOffset = i_lines;
-                p_out -= TopOffset * p_outpic->p[i_plane].i_pitch;
-                for (i_index = 0; i_index < length; i_index++)
-                    for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
+                        // black bar
+                        if( b_col_first )
+                            memset( &p_out[0], constantYUV[i_plane], halfl);
+                        else if( b_col_last )
+                            memset( &p_out[i_copy_pitch - halfl], constantYUV[i_plane], halfl );
+                    }
+                    else
+                    {
+                        vlc_memcpy( p_out , p_in, i_copy_pitch );
+                    }
+
+                    if( p_vout->p_sys->b_attenuate )
+                    {
+                        // vertical blend
+                        // first blended zone
+                        if( !b_col_first )
+                        {
+                            uint8_t *p_dst = &p_out[0];
+                            for (i_index = 0; i_index < length; i_index++)
+                            {
 #ifndef GAMMA
-                        *(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2) = (p_vout->p_sys->lambda2[1][i_plane][i_index] *
-                                     (*(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2))) / ACCURACY +
-                                     p_vout->p_sys->cstYUV2[1][i_plane][i_index];
+                                p_dst[i_index] = (p_vout->p_sys->lambda[1][i_plane][i_index] * p_dst[i_index]) / ACCURACY +
+                                                        p_vout->p_sys->cstYUV[1][i_plane][i_index];
+#else
+                                p_dst[i_index] = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda[1][i_plane][i_index]][p_dst[i_index]];
+#endif
+                            }
+                        }
+                        // second blended zone
+                        if( !b_col_last )
+                        {
+                            uint8_t *p_dst = &p_out[i_copy_pitch - length];
+                            for (i_index = 0; i_index < length; i_index++)
+                            {
+#ifndef GAMMA
+                                p_dst[i_index] = (p_vout->p_sys->lambda[0][i_plane][i_index] * p_dst[i_index]) / ACCURACY +
+                                                        p_vout->p_sys->cstYUV[0][i_plane][i_index];
+#else
+                                fprintf( stderr, "r=%d c=%d, i_plane=%d i_index=%d | %d %d\n", i_row, i_col, i_plane, i_index,
+                                         i_copy_pitch, length );
+                                fprintf( stderr, "# %d\n", p_dst[i_index] );
+                                p_dst[i_index] = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda[0][i_plane][i_index]][p_dst[i_index]];
+#endif
+                            }
+                        }
+                        // end blended zone
+                    }
+#endif
+                    p_in += i_in_pitch;
+                    p_out += i_out_pitch;
+                }
+#ifdef OVERLAP
+                // horizontal blend
+                if( p_vout->p_sys->i_row > 2 )
+                {
+                    length = 2 * p_vout->p_sys->i_halfHeight / i_div;
+                    if (p_vout->p_sys->b_has_changed)
+                    {
+                        Denom = F2(length);
+                        a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
+                        a_1 = p_vout->p_sys->a_1 * length * (ACCURACY / 100);
+                        a_0 = p_vout->p_sys->a_0 * Denom * (ACCURACY / 100);
+                       for(i_col_mod = 0; i_col_mod < 2; i_col_mod++)
+                        for (i_index = 0; i_index < length; i_index++)
+                        {
+                            p_vout->p_sys->lambda2[i_col_mod][i_plane][i_index] = CLIP_0A(!i_col_mod ? ACCURACY - (F4(a_2, a_1, i_index) + a_0) / Denom : ACCURACY - (F4(a_2, a_1,length - i_index) + a_0) / Denom);
+                            p_vout->p_sys->cstYUV2[i_col_mod][i_plane][i_index] = ((ACCURACY - p_vout->p_sys->lambda2[i_col_mod][i_plane][i_index]) * constantYUV[i_plane]) / ACCURACY;
+                        }
+                    }
+
+                    if( b_row_first )
+                    {
+                        // black bar
+                        TopOffset = i_lines + (2 * p_vout->p_sys->i_halfHeight) / i_div;
+                        uint8_t *p_dst = p_out - TopOffset * i_out_pitch;
+
+                        for (i_index = 0; i_index < length; i_index++)
+                            memset( &p_dst[i_index * i_out_pitch], constantYUV[i_plane], i_copy_pitch );
+                    }
+                    else if( p_vout->p_sys->b_attenuate )
+                    {
+                        // first blended zone
+                        TopOffset = i_lines;
+                        uint8_t *p_dst = p_out - TopOffset * i_out_pitch;
+
+                        for (i_index = 0; i_index < length; i_index++)
+                        {
+                            for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
+                            {
+#ifndef GAMMA
+                                p_dst[i_index * i_out_pitch + i_index2] = ( p_vout->p_sys->lambda2[1][i_plane][i_index] *
+                                             p_dst[i_index * i_out_pitch + i_index2] ) / ACCURACY +
+                                             p_vout->p_sys->cstYUV2[1][i_plane][i_index];
+#else
+                                p_dst[i_index * i_out_pitch + i_index2] = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda2[1][i_plane][i_index]][p_dst[i_index * i_out_pitch + i_index2]];
+#endif
+                            }
+                        }
+                    }
+
+                    if( b_row_last )
+                    {
+                        // black bar
+                        TopOffset = length - (2 * p_vout->p_sys->i_halfHeight) / i_div;
+                        uint8_t *p_dst = p_out - TopOffset * p_outpic->p[i_plane].i_pitch;
+
+                        for (i_index = 0; i_index < length; i_index++)
+                            memset( &p_dst[i_index * i_out_pitch], constantYUV[i_plane], i_copy_pitch );
+                    }
+                    else if( p_vout->p_sys->b_attenuate )
+                    {
+                    // second blended zone
+                        TopOffset = length;
+                        uint8_t *p_dst = p_out - TopOffset * p_outpic->p[i_plane].i_pitch;
+
+                        for (i_index = 0; i_index < length; i_index++)
+                        {
+                            for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
+                            {
+#ifndef GAMMA
+                                p_dst[i_index * i_out_pitch + i_index2] = (p_vout->p_sys->lambda2[0][i_plane][i_index] *
+                                             p_dst[i_index * i_out_pitch + i_index2]) / ACCURACY +
+                                             p_vout->p_sys->cstYUV2[0][i_plane][i_index];
 #else
 
-                        *(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2) = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda2[1][i_plane][i_index]][*(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2)];
+                                p_dst[i_index * i_out_pitch + i_index2] = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda2[0][i_plane][i_index]][p_dst[i_index * i_out_pitch + i_index2]];
 #endif
-                p_out += TopOffset * p_outpic->p[i_plane].i_pitch;
-            }
-            else if (p_vout->p_sys->i_row > 2)
-            // black bar
-            {
-                TopOffset = i_lines + (2 * p_vout->p_sys->i_halfHeight) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                p_out -= TopOffset * p_outpic->p[i_plane].i_pitch;
-                for (i_index = 0; i_index < length; i_index++)
-                    for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
-                        *(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2) = constantYUV[i_plane];
-                p_out += TopOffset * p_outpic->p[i_plane].i_pitch;
-            }
-
-// second blended zone
-
-            if (i_row + 1 < p_vout->p_sys->i_row)
-            {
-                TopOffset = length;
-                p_out -= TopOffset * p_outpic->p[i_plane].i_pitch;
-                for (i_index = 0; i_index < length; i_index++)
-                    for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
-#ifndef GAMMA
-                        *(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2) = (p_vout->p_sys->lambda2[0][i_plane][i_index] *
-                                     (*(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2))) / ACCURACY +
-                                     p_vout->p_sys->cstYUV2[0][i_plane][i_index];
-#else
-
-                        *(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2) = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda2[0][i_plane][i_index]][*(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2)];
-
+                            }
+                        }
+                    }
+                    // end blended zone
+                }
 #endif
-                p_out += TopOffset * p_outpic->p[i_plane].i_pitch;
-            }
-            else if (p_vout->p_sys->i_row > 2)
-            // black bar
-            {
-                TopOffset = length - (2 * p_vout->p_sys->i_halfHeight) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                p_out -= TopOffset * p_outpic->p[i_plane].i_pitch;
-                for (i_index = 0; i_index < length; i_index++)
-                    for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
-                        *(p_out + (i_index * p_outpic->p[i_plane].i_pitch) + i_index2) = constantYUV[i_plane];
-                p_out += TopOffset * p_outpic->p[i_plane].i_pitch;
-            }
-// end blended zone
-            }
-        }
-#endif
-// bug for wall filter : fix by CC
-//            pi_left_skip[i_plane] += i_out_pitch;
-            pi_left_skip[i_plane] += i_copy_pitch;
+                // bug for wall filter : fix by CC
+                //            pi_left_skip[i_plane] += i_out_pitch;
+                pi_left_skip[i_plane] += i_copy_pitch;
             }
 
             vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                                 p_outpic );
             vout_DisplayPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                                  p_outpic );
-            i_vout++;
         }
 
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-                {
-                    pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout ].i_height
+        {
+            pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout-1 ].i_height
                                              * p_pic->p[i_plane].i_lines
                                              / p_vout->output.i_height
                                              * p_pic->p[i_plane].i_pitch;
-                }
-
+        }
     }
 #ifdef OVERLAP
-    if (p_vout->p_sys->b_has_changed) p_vout->p_sys->b_has_changed = false;
+    if (p_vout->p_sys->b_has_changed)
+        p_vout->p_sys->b_has_changed = false;
 #endif
 }
 
@@ -1277,21 +1227,15 @@ static void RenderPackedRGB( vout_thread_t *p_vout, picture_t *p_pic )
     int i_index, i_index2;
 #endif
 
-    i_vout = 0;
-
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-    {
         pi_top_skip[i_plane] = 0;
-    }
 
-    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
+    for( i_vout = 0, i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-        {
             pi_left_skip[i_plane] = 0;
-        }
 
-        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
+        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++, i_vout++ )
         {
             if( !p_vout->p_sys->pp_vout[ i_vout ].b_active )
             {
@@ -1300,7 +1244,6 @@ static void RenderPackedRGB( vout_thread_t *p_vout, picture_t *p_pic )
                     pi_left_skip[i_plane] +=
                         p_vout->p_sys->pp_vout[ i_vout ].i_width * p_pic->p->i_pixel_pitch;
                 }
-                i_vout++;
                 continue;
             }
 
@@ -1332,10 +1275,17 @@ static void RenderPackedRGB( vout_thread_t *p_vout, picture_t *p_pic )
                 int i_copy_pitch = p_outpic->p[i_plane].i_visible_pitch;
 
 #ifdef OVERLAP
-                if (i_col) pi_left_skip[i_plane] -= (2 * p_vout->p_sys->i_halfLength) * p_pic->p->i_pixel_pitch;
-                if ((i_row) && (!i_col)) pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch);
-                if ((!p_vout->p_sys->pp_vout[p_vout->p_sys->i_col].b_active))
-                    pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * i_row * p_pic->p[i_plane].i_pitch);
+                if (i_col)
+                    pi_left_skip[i_plane] -= (2 * p_vout->p_sys->i_halfLength) * p_pic->p->i_pixel_pitch;
+                if( p_vout->p_sys->i_row >= 2 )
+                {
+                    if( (i_row) && (!i_col))
+                        pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch);
+                    if( (p_vout->p_sys->i_row > 2) && (i_row == 1) && (!i_col) )
+                        pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch);
+                    if( !p_vout->p_sys->pp_vout[p_vout->p_sys->i_col-1].b_active )
+                        pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * i_row * p_pic->p[i_plane].i_pitch);
+                }
 // i_n : previous inactive pp_vout
                 int i_n=0;
                 while ((!p_vout->p_sys->pp_vout[i_row * p_vout->p_sys->i_col + i_col - 1 - i_n].b_active) && (i_col - i_n > 1)) i_n++;
@@ -1572,12 +1522,11 @@ static void RenderPackedRGB( vout_thread_t *p_vout, picture_t *p_pic )
                                 p_outpic );
             vout_DisplayPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                                  p_outpic );
-            i_vout++;
         }
 
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
         {
-            pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout ].i_height
+            pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout-1 ].i_height
                                      * p_pic->p[i_plane].i_lines
                                      / p_vout->output.i_height
                                      * p_pic->p[i_plane].i_pitch;
@@ -1613,22 +1562,15 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
     int i_index, i_index2;
 #endif
 
-
-    i_vout = 0;
-
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-    {
         pi_top_skip[i_plane] = 0;
-    }
 
-    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
+    for( i_vout = 0;, i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-        {
             pi_left_skip[i_plane] = 0;
-        }
 
-        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
+        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++, i_vout++ )
         {
             if( !p_vout->p_sys->pp_vout[ i_vout ].b_active )
             {
@@ -1638,7 +1580,6 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
                         p_vout->p_sys->pp_vout[ i_vout ].i_width
                          * p_pic->p[i_plane].i_pitch / p_vout->output.i_width;
                 }
-                i_vout++;
                 continue;
             }
 
@@ -1668,18 +1609,19 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
                 int i_in_pitch = p_pic->p[i_plane].i_pitch;
                 int i_out_pitch = p_outpic->p[i_plane].i_pitch;
                 int i_copy_pitch = p_outpic->p[i_plane].i_visible_pitch;
+                const int i_div = p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch;
 
 #ifdef OVERLAP
-                if (i_col) pi_left_skip[i_plane] -= (2 * p_vout->p_sys->i_halfLength ) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                if ((i_row) && (!i_col)) pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                if ((p_vout->p_sys->i_row > 2) && (i_row == 1) && (!i_col)) pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
-                if ((!p_vout->p_sys->pp_vout[p_vout->p_sys->i_col].b_active))
-                    pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * i_row * p_pic->p[i_plane].i_pitch) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
+                if (i_col) pi_left_skip[i_plane] -= (2 * p_vout->p_sys->i_halfLength ) / i_div;
+                if ((p_vout->p_sys->i_row >= 2) && (i_row) && (!i_col)) pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / i_div;
+                if ((p_vout->p_sys->i_row > 2) && (i_row == 1) && (!i_col)) pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * p_pic->p[i_plane].i_pitch) / i_div;
+                if( !p_vout->p_sys->pp_vout[p_vout->p_sys->i_col-1].b_active )
+                    pi_top_skip[i_plane] -= (2 * p_vout->p_sys->i_halfHeight * i_row * p_pic->p[i_plane].i_pitch) / i_div;
 // i_n : previous inactive pp_vout
                 int i_n=0;
                 while ((!p_vout->p_sys->pp_vout[i_row * p_vout->p_sys->i_col + i_col - 1 - i_n].b_active) && (i_col - i_n > 1)) i_n++;
                 if ((i_col > 1) && i_n)
-                    pi_left_skip[i_plane] -= i_n*(2 * p_vout->p_sys->i_halfLength ) / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
+                    pi_left_skip[i_plane] -= i_n*(2 * p_vout->p_sys->i_halfLength ) / i_div;
 
                 p_in = p_pic->p[i_plane].p_pixels
                 /* Wall proprities */
@@ -1878,12 +1820,11 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
                                 p_outpic );
             vout_DisplayPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                                  p_outpic );
-            i_vout++;
         }
 
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
         {
-            pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout ].i_height
+            pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout-1 ].i_height
                                      * p_pic->p[i_plane].i_lines
                                      / p_vout->output.i_height
                                      * p_pic->p[i_plane].i_pitch;
@@ -1901,16 +1842,14 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void RemoveAllVout( vout_thread_t *p_vout )
 {
-    while( p_vout->p_sys->i_vout )
+    for( int i = 0; i < p_vout->p_sys->i_vout; i++ )
     {
-         --p_vout->p_sys->i_vout;
-         if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
-         {
-             DEL_CALLBACKS(
-                 p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout,
-                 SendEvents );
-             vout_CloseAndRelease( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
-         }
+        if( p_vout->p_sys->pp_vout[i].b_active )
+        {
+            DEL_CALLBACKS( p_vout->p_sys->pp_vout[i].p_vout, SendEvents );
+            vout_CloseAndRelease( p_vout->p_sys->pp_vout[i].p_vout );
+            p_vout->p_sys->pp_vout[i].p_vout = NULL;
+        }
     }
 }
 
