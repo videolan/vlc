@@ -70,7 +70,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     audio_sample_format_t chain_input_format;
     audio_sample_format_t chain_output_format;
     vlc_value_t val, text;
-    char * psz_filters, *psz_visual;
+    char *psz_filters, *psz_visual, *psz_scaletempo;
     int i_visual;
 
     aout_FormatPrint( p_aout, "input", &p_input->input );
@@ -211,17 +211,25 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Create( p_aout, "audio-replay-gain-peak-protection",
                     VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     }
+    if( var_Type( p_aout, "audio-time-stretch" ) == 0 )
+    {
+        var_Create( p_aout, "audio-time-stretch",
+                    VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    }
 
     var_Get( p_aout, "audio-filter", &val );
     psz_filters = val.psz_string;
     var_Get( p_aout, "audio-visual", &val );
     psz_visual = val.psz_string;
 
+    psz_scaletempo = var_GetBool( p_aout, "audio-time-stretch" ) ? strdup( "scaletempo" ) : NULL;
+
     /* parse user filter lists */
     for( i_visual = 0; i_visual < 2; i_visual++ )
     {
+        char *ppsz_array[] = { psz_scaletempo, psz_filters, psz_visual };
         char *psz_next = NULL;
-        char *psz_parser = i_visual ? psz_visual : psz_filters;
+        char *psz_parser = ppsz_array[i_visual];
 
         if( psz_parser == NULL || !*psz_parser )
             continue;
@@ -264,7 +272,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             vlc_object_attach( p_filter , p_aout );
 
             /* try to find the requested filter */
-            if( i_visual == 1 ) /* this can only be a visualization module */
+            if( i_visual == 2 ) /* this can only be a visualization module */
             {
                 /* request format */
                 memcpy( &p_filter->input, &chain_output_format,
@@ -357,8 +365,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             psz_parser = psz_next;
         }
     }
-    free( psz_filters );
     free( psz_visual );
+    free( psz_filters );
+    free( psz_scaletempo );
 
     /* complete the filter chain if necessary */
     if ( !AOUT_FMTS_IDENTICAL( &chain_input_format, &chain_output_format ) )

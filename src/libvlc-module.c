@@ -313,6 +313,13 @@ static const char *const ppsz_force_dolby_descriptions[] = {
 #define AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT N_( \
     "Protect against sound clipping" )
 
+#define AUDIO_TIME_STRETCH_TEXT N_( \
+    "Enable time streching audio" )
+#define AUDIO_TIME_STRETCH_LONGTEXT N_( \
+    "This allows to play audio at lower or higher speed without" \
+    "affecting the audio pitch" )
+
+
 static const char *const ppsz_replay_gain_mode[] = {
     "none", "track", "album" };
 static const char *const ppsz_replay_gain_mode_text[] = {
@@ -1462,6 +1469,9 @@ vlc_module_begin();
                AUDIO_REPLAY_GAIN_DEFAULT_TEXT, AUDIO_REPLAY_GAIN_DEFAULT_LONGTEXT, false );
     add_bool( "audio-replay-gain-peak-protection", true, NULL,
               AUDIO_REPLAY_GAIN_PEAK_PROTECTION_TEXT, AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT, true );
+
+    add_bool( "audio-time-stretch", true, NULL,
+              AUDIO_TIME_STRETCH_TEXT, AUDIO_TIME_STRETCH_LONGTEXT, false );
 
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_module( "aout", "audio output", NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT,
