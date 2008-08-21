@@ -436,9 +436,7 @@ static const char *const ppsz_pos_descriptions[] =
 
 #define VOUT_FILTER_TEXT N_("Video output filter module")
 #define VOUT_FILTER_LONGTEXT N_( \
-    "This adds post-processing filters to enhance the " \
-    "picture quality, for instance deinterlacing, or to clone or distort " \
-    "the video window.")
+    "This adds video output filters like clone or wall" )
 
 #define VIDEO_FILTER_TEXT N_("Video filter module")
 #define VIDEO_FILTER_LONGTEXT N_( \
@@ -1575,9 +1573,8 @@ vlc_module_begin();
     add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false );
        add_deprecated_alias( "filter" ); /*deprecated since 0.8.2 */
-//       add_deprecated_alias( "vout-filter" ); /* deprecated since 0.8.6 *// While the "video-filter" chain isn't parsed for both vfilter and vfilter2, keep both options
     add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
-                        NULL, NULL, false );
+                        VOUT_FILTER_TEXT, VOUT_FILTER_LONGTEXT, false );
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
