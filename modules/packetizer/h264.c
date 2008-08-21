@@ -886,8 +886,9 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
                 w = 0;
                 h = 0;
             }
+
             if( h != 0 )
-                p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
+                p_dec->fmt_out.video.i_aspect = (int64_t)VOUT_ASPECT_FACTOR *
                         ( w * p_dec->fmt_out.video.i_width ) /
                         ( h * p_dec->fmt_out.video.i_height);
             else
