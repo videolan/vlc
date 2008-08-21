@@ -141,7 +141,8 @@ void BookmarksDialog::add()
 
     seekpoint_t bookmark;
     vlc_value_t pos;
-    bookmark.psz_name = NULL;
+    bookmark.psz_name = qtu( THEMIM->getIM()->getName() +
+                    QString("_%1" ).arg( bookmarksList->topLevelItemCount() ) );
     bookmark.i_byte_offset = 0;
     bookmark.i_time_offset = 0;
 
