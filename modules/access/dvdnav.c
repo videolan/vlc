@@ -155,7 +155,7 @@ struct demux_sys_t
 
 static int Control( demux_t *, int, va_list );
 static int Demux( demux_t * );
-static int DemuxBlock( demux_t *, uint8_t *, int );
+static int DemuxBlock( demux_t *, const uint8_t *, int );
 
 static void DemuxTitles( demux_t * );
 static void ESSubtitleUpdate( demux_t * );
@@ -603,6 +603,15 @@ static int Demux( demux_t *p_demux )
 
     case DVDNAV_STILL_FRAME:
     {
+        /* We send a dummy mpeg2 end of sequence to force still frame display */
+        static const uint8_t buffer[] = {
+            0x00, 0x00, 0x01, 0xe0, 0x00, 0x07,
+            0x80, 0x00, 0x00,
+            0x00, 0x00, 0x01, 0xB7,
+        };
+        DemuxBlock( p_demux, buffer, sizeof(buffer) );
+
+        /* */
         dvdnav_still_event_t *event = (dvdnav_still_event_t*)packet;
         vlc_mutex_lock( &p_sys->p_ev->lock );
         if( !p_sys->p_ev->b_still )
@@ -1028,10 +1037,10 @@ static void ESSubtitleUpdate( demux_t *p_demux )
 /*****************************************************************************
  * DemuxBlock: demux a given block
  *****************************************************************************/
-static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
+static int DemuxBlock( demux_t *p_demux, const uint8_t *pkt, int i_pkt )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    uint8_t     *p = pkt;
+    const uint8_t     *p = pkt;
 
     while( p < &pkt[i_pkt] )
     {
