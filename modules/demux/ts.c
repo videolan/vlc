@@ -3303,7 +3303,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         else if( !memcmp( p_dr->p_data, "BSSD", 4 ) )
                         {
                             pid->es->fmt.i_cat = AUDIO_ES;
-                            pid->es->fmt.i_codec = VLC_FOURCC('l','p','c','m');
+                            pid->es->fmt.i_codec = VLC_FOURCC('a','e','s','3');
                         }
                         else
                         {
