@@ -171,10 +171,7 @@ private slots:
     void popupInfo();
     void popupStream();
     void popupSave();
-#ifdef WIN32
     void popupExplore();
-#endif
-
     void viewchanged( int );
 };
 

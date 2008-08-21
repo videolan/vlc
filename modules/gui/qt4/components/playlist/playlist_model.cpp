@@ -898,13 +898,13 @@ void PLModel::popupSave()
      msg_Err( p_playlist, "Save not implemented" );
 }
 
-#ifdef WIN32
-#include <shellapi.h>
 void PLModel::popupExplore()
 {
+#ifdef WIN32
+#include <shellapi.h>
     ShellExecute( NULL, "explore", "C:\\", NULL, NULL, SW_SHOWNORMAL );
-}
 #endif
+}
 
 /**********************************************************************
  * Playlist callbacks
