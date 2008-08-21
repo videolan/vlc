@@ -81,6 +81,10 @@ struct decoder_sys_t
 
     int i_buffer_orig, i_buffer;
     char *p_buffer_orig, *p_buffer;
+
+
+    /* */
+    bool b_flush;
 };
 
 /* FIXME (dummy palette for now) */
@@ -318,6 +322,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_pts = 0;
     p_sys->b_has_b_frames = false;
     p_sys->b_first_frame = true;
+    p_sys->b_flush = false;
     p_sys->i_late_frames = 0;
     p_sys->i_buffer = 0;
     p_sys->i_buffer_orig = 1;
@@ -478,6 +483,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
      * that the real frame size */
     if( p_block->i_buffer > 0 )
     {
+        p_sys->b_flush = ( p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE ) != 0;
+
         p_sys->i_buffer = p_block->i_buffer;
         if( p_sys->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE >
             p_sys->i_buffer_orig )
@@ -501,16 +508,18 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_block->i_buffer = 0;
     }
 
-    while( p_sys->i_buffer > 0 )
+    while( p_sys->i_buffer > 0 || p_sys->b_flush )
     {
         int i_used, b_gotpicture;
         picture_t *p_pic;
 
         i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
                                        &b_gotpicture,
-                                       (uint8_t*)p_sys->p_buffer, p_sys->i_buffer );
+                                       p_sys->i_buffer <= 0 && p_sys->b_flush ? NULL : (uint8_t*)p_sys->p_buffer, p_sys->i_buffer );
+
         if( b_null_size && p_sys->p_context->width > 0 &&
-            p_sys->p_context->height > 0 )
+            p_sys->p_context->height > 0 &&
+            !p_sys->b_flush )
         {
             /* Reparse it to not drop the I frame */
             b_null_size = false;
@@ -520,6 +529,12 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                                            &b_gotpicture,
                                            (uint8_t*)p_sys->p_buffer, p_sys->i_buffer );
         }
+
+        if( p_sys->b_flush )
+            p_sys->b_first_frame = true;
+
+        if( p_sys->i_buffer <= 0 )
+            p_sys->b_flush = false;
 
         if( i_used < 0 )
         {
@@ -536,6 +551,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         /* Consumed bytes */
         p_sys->i_buffer -= i_used;
         p_sys->p_buffer += i_used;
+
+    p_sys->b_first_frame = true;
 
         /* Nothing to display */
         if( !b_gotpicture )

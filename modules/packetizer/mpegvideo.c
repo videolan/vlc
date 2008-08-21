@@ -445,9 +445,20 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     else if( p_sys->b_frame_slice &&
              (p_frag->p_buffer[3] == 0x00 || p_frag->p_buffer[3] > 0xaf) )
     {
+        const bool b_eos = p_frag->p_buffer[3] == 0xb7;
+
         mtime_t i_duration;
 
+        if( b_eos )
+        {
+            block_ChainLastAppend( &p_sys->pp_last, p_frag );
+            p_frag = NULL;
+        }
+
         p_pic = block_ChainGather( p_sys->p_frame );
+
+        if( b_eos )
+            p_pic->i_flags |= BLOCK_FLAG_END_OF_SEQUENCE;
 
         i_duration = (mtime_t)( 1000000 * p_sys->i_frame_rate_base /
                                 p_sys->i_frame_rate );
@@ -563,6 +574,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         cc_Flush( &p_sys->cc );
     }
 
+    if( !p_frag )
+        return p_pic;
     /*
      * Check info of current fragment
      */
