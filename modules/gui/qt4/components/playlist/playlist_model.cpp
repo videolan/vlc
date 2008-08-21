@@ -149,11 +149,11 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
         if( action == Qt::IgnoreAction )
             return true;
 
-        PLItem *targetItem;
-        if( target.isValid() )
-            targetItem = static_cast<PLItem*>( target.internalPointer() );
-        else
-            targetItem = rootItem;
+        if( !target.isValid() )
+            /* We don't want to move on an invalid position */
+            return true;
+
+        PLItem *targetItem = static_cast<PLItem*>( target.internalPointer() );
 
         QByteArray encodedData = data->data( "vlc/playlist-item-id" );
         QDataStream stream( &encodedData, QIODevice::ReadOnly );
