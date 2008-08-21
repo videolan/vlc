@@ -571,7 +571,7 @@ static inline void barrier (void)
 #elif defined(__i386__)
     asm volatile ("mfence":::"memory");
 #else
-    vlc_spin_t spin;
+    vlc_spinlock_t spin;
     vlc_spin_init (&spin);
     vlc_spin_lock (&spin);
     vlc_spin_unlock (&spin);
