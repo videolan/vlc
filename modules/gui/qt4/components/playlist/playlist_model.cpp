@@ -812,10 +812,8 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             menu->addAction( qfu(I_POP_SORT), this, SLOT( popupSort() ) );
             menu->addAction( qfu(I_POP_ADD), this, SLOT( popupAdd() ) );
         }
-#ifdef WIN32
         menu->addSeparator();
         menu->addAction( qfu( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
-#endif
         menu->popup( point );
     }
     else
@@ -898,12 +896,26 @@ void PLModel::popupSave()
      msg_Err( p_playlist, "Save not implemented" );
 }
 
+#include <QUrl>
+#include <QFileInfo>
+#include <QDesktopServices>
 void PLModel::popupExplore()
 {
-#ifdef WIN32
-#include <shellapi.h>
-    ShellExecute( NULL, "explore", "C:\\", NULL, NULL, SW_SHOWNORMAL );
-#endif
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
+                                                    i_popup_item,
+                                                    pl_Unlocked );
+    if( p_item )
+    {
+       input_item_t *p_input = p_item->p_input;
+       char *psz_meta = input_item_GetURI( p_input );
+       if( psz_meta )
+       {
+           /* FIXME add a MRLSplit like function */
+           QFileInfo info( qfu( psz_meta ) );
+           QDesktopServices::openUrl( QUrl::fromLocalFile( info.absolutePath() ) );
+           free( psz_meta );
+       }
+    }
 }
 
 /**********************************************************************
