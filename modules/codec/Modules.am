@@ -1,7 +1,6 @@
 SUBDIRS = cmml dmo avcodec subtitles spudec xvmc
 # Disabled modules
 SOURCES_a52 = a52.c
-SOURCES_cinepak = cinepak.c
 SOURCES_dts = dts.c
 SOURCES_flac = flac.c
 SOURCES_lpcm = lpcm.c

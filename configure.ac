@@ -1116,7 +1116,6 @@ VLC_ADD_PLUGIN([t140])
 VLC_ADD_PLUGIN([dvbsub])
 VLC_ADD_PLUGIN([cc])
 dnl Video codecs:
-VLC_ADD_PLUGIN([cinepak])
 dnl Audio codecs:
 VLC_ADD_PLUGIN([araw])
 VLC_ADD_PLUGIN([adpcm])
