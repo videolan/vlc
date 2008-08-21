@@ -48,14 +48,14 @@ InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
     setSingleStep( 2 );
     setPageStep( 10 );
     setTracking( true );
-    setPosition( 0.0, 0, 0 );
+    setPosition( -1.0, 0, 0 );
     secstotimestr( psz_length, 0 );
     CONNECT( this, valueChanged(int), this, userDrag( int ) );
 }
 
 void InputSlider::setPosition( float pos, int a, int b )
 {
-    if( pos == 0.0 )
+    if( pos == -1.0 )
         setEnabled( false );
     else
         setEnabled( true );

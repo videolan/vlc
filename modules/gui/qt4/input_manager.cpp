@@ -114,7 +114,7 @@ void InputManager::delInput()
         i_input_id = 0;
         old_name   = "";
         artUrl     = "";
-        emit positionUpdated( 0.0, 0 ,0 );
+        emit positionUpdated( -1.0, 0 ,0 );
         emit statusChanged( END_S );
         emit nameChanged( "" );
         emit artChanged( "" );
