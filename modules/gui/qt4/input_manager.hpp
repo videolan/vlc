@@ -70,6 +70,8 @@ public:
     bool hasInput() { return p_input && !p_input->b_dead && vlc_object_alive (p_input); }
     bool hasAudio();
     bool hasVideo();
+    
+    QString getName() { return old_name; }
 
 private:
     intf_thread_t  *p_intf;
