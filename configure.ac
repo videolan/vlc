@@ -1160,7 +1160,7 @@ VLC_ADD_PLUGIN([nsc])
 VLC_ADD_PLUGIN([xtag])
 dnl Channel mixing audio filters:
 VLC_ADD_PLUGIN([converter_fixed])
-VLC_ADD_PLUGIN([mono])
+dnl VLC_ADD_PLUGIN([mono])
 VLC_ADD_PLUGIN([trivial_channel_mixer])
 dnl Resampling audio filters:
 VLC_ADD_PLUGIN([trivial_resampler])
