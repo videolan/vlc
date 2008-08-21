@@ -286,19 +286,29 @@ void SoutDialog::setOptions()
 void SoutDialog::toggleSout()
 {
     //Toggle all the streaming options.
-    TOGGLEV( ui.HTTPOutput ) ; TOGGLEV( ui.RTPOutput ) ; TOGGLEV( ui.MMSHOutput ) ; TOGGLEV( ui.UDPOutput ) ;
-    TOGGLEV( ui.HTTPEdit ) ; TOGGLEV( ui.RTPEdit ) ; TOGGLEV( ui.MMSHEdit ) ; TOGGLEV( ui.UDPEdit ) ;
-    TOGGLEV( ui.HTTPLabel ) ; TOGGLEV( ui.RTPLabel ) ; TOGGLEV( ui.MMSHLabel ) ; TOGGLEV( ui.UDPLabel ) ;
-    TOGGLEV( ui.HTTPPortLabel ) ; TOGGLEV( ui.RTPPortLabel ) ; TOGGLEV( ui.MMSHPortLabel ) ; TOGGLEV( ui.UDPPortLabel )
-    TOGGLEV( ui.HTTPPort ) ; TOGGLEV( ui.RTPPort ) ; TOGGLEV( ui.MMSHPort ) ; TOGGLEV( ui.UDPPort ) ;
+#define HIDEORSHOW(x) if( b_transcode_only ) x->hide(); else x->show();
+    HIDEORSHOW( ui.HTTPOutput ) ; HIDEORSHOW( ui.RTPOutput ) ; HIDEORSHOW( ui.MMSHOutput ) ; HIDEORSHOW( ui.UDPOutput ) ;
+    HIDEORSHOW( ui.HTTPEdit ) ; HIDEORSHOW( ui.RTPEdit ) ; HIDEORSHOW( ui.MMSHEdit ) ; HIDEORSHOW( ui.UDPEdit ) ;
+    HIDEORSHOW( ui.HTTPLabel ) ; HIDEORSHOW( ui.RTPLabel ) ; HIDEORSHOW( ui.MMSHLabel ) ; HIDEORSHOW( ui.UDPLabel ) ;
+    HIDEORSHOW( ui.HTTPPortLabel ) ; HIDEORSHOW( ui.RTPPortLabel ) ; HIDEORSHOW( ui.MMSHPortLabel ) ; HIDEORSHOW( ui.UDPPortLabel )
+    HIDEORSHOW( ui.HTTPPort ) ; HIDEORSHOW( ui.RTPPort ) ; HIDEORSHOW( ui.MMSHPort ) ; HIDEORSHOW( ui.UDPPort ) ; HIDEORSHOW( ui.RTPPortLabel2 ); HIDEORSHOW( ui.RTPPort2 );
 
-    TOGGLEV( ui.sap ); TOGGLEV( ui.sapName );
-    TOGGLEV( ui.sapGroup ); TOGGLEV( ui.sapGroupLabel );
-    TOGGLEV( ui.ttlLabel ); TOGGLEV( ui.ttl );
+    HIDEORSHOW( ui.sap ); HIDEORSHOW( ui.sapName );
+    HIDEORSHOW( ui.sapGroup ); HIDEORSHOW( ui.sapGroupLabel );
+    HIDEORSHOW( ui.ttlLabel ); HIDEORSHOW( ui.ttl );
+
+    HIDEORSHOW( ui.IcecastOutput ); HIDEORSHOW( ui.IcecastEdit );
+    HIDEORSHOW( ui.IcecastNamePassEdit ); HIDEORSHOW( ui.IcecastMountpointEdit );
+    HIDEORSHOW( ui.IcecastPort ); HIDEORSHOW( ui.IcecastLabel );
+    HIDEORSHOW( ui.IcecastPortLabel );
+    HIDEORSHOW( ui.IcecastMountpointLabel ); HIDEORSHOW( ui.IcecastNameLabel );
+#undef HIDEORSHOW
 
     if( b_transcode_only ) okButton->setText( "&Save" );
     else okButton->setText( "&Stream" );
 
+    /* FIXME:
+     * The Save dialog is too big if the Stream dialog has already be shown */
     updateGeometry();
 }
 

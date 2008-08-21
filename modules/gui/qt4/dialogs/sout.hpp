@@ -51,11 +51,8 @@ public:
         {
             /* Recenter the dialog on the parent */
             instance->setParent( parent, Qt::Dialog );
-            if( transcode_only != instance->b_transcode_only )
-            {
-                instance->toggleSout();
-                instance->b_transcode_only = transcode_only;
-            }
+            instance->b_transcode_only = transcode_only;
+            instance->toggleSout();
         }
         return instance;
     }
