@@ -1270,6 +1270,9 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         ck->p_sample_count_dts = calloc( i_entry, sizeof( uint32_t ) );
         ck->p_sample_delta_dts = calloc( i_entry, sizeof( uint32_t ) );
 
+        if( !ck->p_sample_count_dts || !ck->p_sample_delta_dts )
+            return VLC_ENOMEM;
+
         /* now copy */
         i_sample_count = ck->i_sample_count;
         for( i = 0; i < i_entry; i++ )
@@ -1333,6 +1336,8 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
             /* allocate them */
             ck->p_sample_count_pts = calloc( i_entry, sizeof( uint32_t ) );
             ck->p_sample_offset_pts = calloc( i_entry, sizeof( int32_t ) );
+            if( !ck->p_sample_count_pts || !ck->p_sample_offset_pts )
+                return VLC_ENOMEM;
 
             /* now copy */
             i_sample_count = ck->i_sample_count;
