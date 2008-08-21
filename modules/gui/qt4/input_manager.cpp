@@ -181,6 +181,12 @@ void InputManager::customEvent( QEvent *event )
          type != ItemStateChanged_Type )
         return;
 
+    if( type == ItemStateChanged_Type )
+    {
+        UpdateStatus();
+        UpdateNavigation();
+    }
+
     if( !hasInput() ) return;
 
     if( ( type != PositionUpdate_Type  &&
@@ -242,7 +248,8 @@ void InputManager::UpdateNavigation()
 {
     /* Update navigation status */
     vlc_value_t val; val.i_int = 0;
-    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    if( hasInput() )
+        var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
     if( val.i_int > 0 )
     {
         val.i_int = 0;
@@ -355,8 +362,6 @@ void InputManager::UpdateTeletext()
     else
         telexToggle( false );
 }
-
-
 
 void InputManager::UpdateArt()
 {
