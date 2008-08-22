@@ -191,7 +191,8 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                 }
                 for( i = 0 ; i< p_parent->i_children ; i++ )
                     if( p_parent->pp_children[i] == p_target ) break;
-                playlist_TreeMove( p_playlist, p_src, p_parent, i );
+                // Move the item to the element after i
+                playlist_TreeMove( p_playlist, p_src, p_parent, i + 1 );
                 newParentItem = parentItem;
             }
             else
@@ -201,25 +202,10 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                 i = 0;
                 newParentItem = targetItem;
             }
-            /* Remove from source */
-            PLItem *srcItem = FindById( rootItem, p_src->i_id );
-            // We dropped on the source selector. Ask the dialog to forward
-            // to the main view
-            if( !srcItem )
-            {
-                emit shouldRemove( p_src->i_id );
-            }
-            else
-                srcItem->remove( srcItem );
-
-            /* Display at new destination */
-            PLItem *newItem = new PLItem( p_src, newParentItem, this );
-            newParentItem->insertChild( newItem, i, true );
-            UpdateTreeItem( p_src, newItem, true );
-            if( p_src->i_children != -1 )
-                UpdateNodeChildren( newItem );
             PL_UNLOCK;
         }
+        /*TODO: That's not a good idea to rebuild the playlist */
+        rebuild();
     }
     return true;
 }

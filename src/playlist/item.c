@@ -697,6 +697,13 @@ static int TreeMove( playlist_t *p_playlist, playlist_item_t *p_item,
     }
     REMOVE_ELEM( p_detach->pp_children, p_detach->i_children, j );
 
+    /* If j < i_newpos, we are moving the element from the top to the
+     * down of the playlist. So when removing the element we change have
+     * to change the position as we loose one element
+     */
+    if( j < i_newpos )
+        i_newpos--;
+
     /* Attach to new parent */
     INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
     p_item->p_parent = p_node;
@@ -742,7 +749,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                                                 p_playlist->p_root_onelevel,
                                                 false );
             if( p_node_onelevel && p_item_onelevel )
-                TreeMove( p_playlist, p_item_onelevel, p_node_onelevel, 0 );
+                TreeMove( p_playlist, p_item_onelevel, p_node_onelevel, i_newpos );
         }
         {
             playlist_item_t *p_node_category;
@@ -756,7 +763,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                                                 p_playlist->p_root_category,
                                                 false );
             if( p_node_category && p_item_category )
-                TreeMove( p_playlist, p_item_category, p_node_category, 0 );
+                TreeMove( p_playlist, p_item_category, p_node_category, i_newpos );
         }
         i_ret = VLC_SUCCESS;
     }
