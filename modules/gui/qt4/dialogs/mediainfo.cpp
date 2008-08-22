@@ -53,7 +53,6 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     i_runs = 0;
 
     setWindowTitle( qtr( "Media Information" ) );
-    resize( 600 , 480 );
 
     /* TabWidgets and Tabs creation */
     IT = new QTabWidget;
@@ -114,11 +113,13 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
 
     if( stats )
         ON_TIMEOUT( updateOnTimeOut() );
+
+    readSettings( "Mediainfo", QSize( 600 , 480 ) );
 }
 
 MediaInfoDialog::~MediaInfoDialog()
 {
-    writeSettings( "mediainfo" );
+    writeSettings( "Mediainfo" );
 }
 
 void MediaInfoDialog::showTab( int i_tab = 0 )
