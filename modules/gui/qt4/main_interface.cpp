@@ -713,8 +713,8 @@ void MainInterface::releaseVideoSlot( void *p_win )
         bgWidget->show();
     }
 
-    adjustSize();
     videoIsActive = false;
+    if( !isFullScreen() ) adjustSize();
 }
 
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
