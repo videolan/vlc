@@ -26,6 +26,7 @@
 #endif
 
 #include "qt4.hpp"
+#include "dialogs_provider.hpp"
 #include "components/playlist/playlist_model.hpp"
 #include "dialogs/mediainfo.hpp"
 #include <vlc_intf_strings.h>
@@ -394,6 +395,35 @@ int PLModel::rowCount( const QModelIndex &parent ) const
         parentItem = static_cast<PLItem*>(parent.internalPointer());
 
     return parentItem->childCount();
+}
+
+QStringList PLModel::selectedURIs()
+{
+    QStringList lst;
+    for( int i = 0; i < current_selection.size(); i++ )
+    {
+        PL_LOCK;
+        PLItem *item = static_cast<PLItem*>
+                    (current_selection[i].internalPointer());
+        if( !item )
+            continue;
+
+        input_item_t *p_item = input_item_GetById( p_playlist,
+                                                   item->i_input_id );
+        if( !p_item )
+            continue;
+
+        char *psz = input_item_GetURI( p_item );
+        if( !psz )
+            continue;
+        else
+        {
+            lst.append( QString( psz ) );
+            free( psz );
+        }
+        PL_UNLOCK;
+    }
+    return lst;
 }
 
 /************************* General playlist status ***********************/
@@ -862,6 +892,7 @@ void PLModel::popupDel()
 {
     doDelete( current_selection );
 }
+
 void PLModel::popupPlay()
 {
     PL_LOCK;
@@ -888,12 +919,17 @@ void PLModel::popupInfo()
 
 void PLModel::popupStream()
 {
-     msg_Err( p_playlist, "Stream not implemented" );
+    QStringList mrls = selectedURIs();
+    if( !mrls.isEmpty() )
+        THEDP->streamingDialog( NULL, mrls[0], false );
+
 }
 
 void PLModel::popupSave()
 {
-     msg_Err( p_playlist, "Save not implemented" );
+    QStringList mrls = selectedURIs();
+    if( !mrls.isEmpty() )
+        THEDP->streamingDialog( NULL, mrls[0], true );
 }
 
 #include <QUrl>

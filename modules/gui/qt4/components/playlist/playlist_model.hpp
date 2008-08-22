@@ -96,6 +96,9 @@ public:
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
     int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 
+    /* Get current selection */
+    QStringList selectedURIs();
+
     void rebuild(); void rebuild( playlist_item_t * );
     bool hasRandom(); bool hasLoop(); bool hasRepeat();
 
