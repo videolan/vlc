@@ -378,12 +378,7 @@ static void NextFileWrite( access_t *p_access )
 
     /* Put written file in read list */
     if( p_sys->i_write_size < p_sys->i_file_size )
-        if( ftruncate( fileno( p_sys->p_write_list->file ),
-                       p_sys->i_write_size ) == -1 )
-        {
-            msg_Dbg( p_access, "unable to truncate file: %m" );
-            /* return; */
-        }
+        ftruncate( fileno( p_sys->p_write_list->file ), p_sys->i_write_size );
 
     fseek( p_sys->p_write_list->file, 0, SEEK_SET );
     *p_sys->pp_read_last = p_sys->p_write_list;
