@@ -355,6 +355,9 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
         p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
         if( !p_sds )
             return VLC_ENOMEM;
+
+        /* We want tree-view for service directory */
+        p_one->p_input->b_prefers_tree = true;
         p_sds->p_sd = p_sd;
         p_sds->p_one = p_one;
         p_sds->p_cat = p_cat;
