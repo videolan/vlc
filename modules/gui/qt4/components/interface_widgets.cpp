@@ -1007,7 +1007,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
 #ifdef WIN32TRICK
     setWindowOpacity( 0.0 );
-    fscHidden = true;
+    b_fscHidden = true;
     adjustSize();
     show();
 #endif
@@ -1032,9 +1032,9 @@ void FullscreenControllerWidget::showFSC()
     if( isHidden() )
         show();
 
-    if( fscHidden )
+    if( b_fscHidden )
     {
-        fscHidden = false;
+        b_fscHidden = false;
         setWindowOpacity( 1.0 );
     }
 #else
@@ -1054,7 +1054,7 @@ void FullscreenControllerWidget::showFSC()
 void FullscreenControllerWidget::hideFSC()
 {
 #ifdef WIN32TRICK
-    fscHidden = true;
+    b_fscHidden = true;
     setWindowOpacity( 0.0 );    // simulate hidding
 #else
     hide();
@@ -1099,7 +1099,7 @@ void FullscreenControllerWidget::slowHideFSC()
     else
     {
 #ifdef WIN32TRICK
-         if ( windowOpacity() > 0.0 && !fscHidden )
+         if ( windowOpacity() > 0.0 && !b_fscHidden )
 #else
          if ( windowOpacity() > 0.0 )
 #endif
@@ -1125,25 +1125,38 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
 
     switch( event->type() )
     {
-    case FullscreenControlToggle_Type:
-         // FIXME 
-         TOGGLEV( this );
-         break;
-    case FullscreenControlShow_Type:
-        vlc_mutex_lock( &lock );
-        b_fs = b_fullscreen;
-        vlc_mutex_unlock( &lock );
+        case FullscreenControlToggle_Type:
+            vlc_mutex_lock( &lock );
+            b_fs = b_fullscreen;
+            vlc_mutex_unlock( &lock );
+            if( b_fs )
+#if WIN32TRICK
+                if( b_fscHidden )
+#else
+                if( isHidden() )
+#endif
+                {
+                    p_hideTimer->stop();
+                    showFSC();
+                }
+                else
+                    hideFSC();
+            break;
+        case FullscreenControlShow_Type:
+            vlc_mutex_lock( &lock );
+            b_fs = b_fullscreen;
+            vlc_mutex_unlock( &lock );
 
-        if( b_fs )  // FIXME I am not sure about that one
-            showFSC();
-        break;
-    case FullscreenControlHide_Type:
-        hideFSC();
-        break;
-    case FullscreenControlPlanHide_Type:
-        if( !b_mouse_over ) // Only if the mouse is not over FSC
-            planHideFSC();
-        break;
+            if( b_fs )  // FIXME I am not sure about that one
+                showFSC();
+            break;
+        case FullscreenControlHide_Type:
+            hideFSC();
+            break;
+        case FullscreenControlPlanHide_Type:
+            if( !b_mouse_over ) // Only if the mouse is not over FSC
+                planHideFSC();
+            break;
     }
 }
 

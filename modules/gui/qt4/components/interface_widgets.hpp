@@ -288,7 +288,7 @@ private:
     int  i_slow_hide_timeout;
 
 #ifdef WIN32TRICK
-    bool fscHidden;
+    bool b_fscHidden;
 #endif
 
     virtual void customEvent( QEvent *event );
