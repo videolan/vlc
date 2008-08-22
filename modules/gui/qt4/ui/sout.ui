@@ -284,7 +284,7 @@
         <item row="5" column="4" >
          <widget class="QLineEdit" name="UDPEdit" >
           <property name="enabled" >
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -385,7 +385,11 @@
          </widget>
         </item>
         <item row="7" column="4" >
-         <widget class="QLineEdit" name="IcecastEdit" />
+         <widget class="QLineEdit" name="IcecastEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="7" column="5" >
          <widget class="QLabel" name="IcecastPortLabel" >
@@ -433,7 +437,11 @@
          </widget>
         </item>
         <item row="8" column="4" >
-         <widget class="QLineEdit" name="IcecastMountpointEdit" />
+         <widget class="QLineEdit" name="IcecastMountpointEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="8" column="5" >
          <widget class="QLabel" name="IcecastNameLabel" >

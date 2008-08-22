@@ -241,10 +241,18 @@ void SoutDialog::setSTranscodeOptions( bool b_trans )
 
 void SoutDialog::setRawOptions( bool b_raw )
 {
+    ui.localOutput->setEnabled( !b_raw );
+    ui.HTTPOutput->setEnabled( !b_raw );
+    ui.MMSHOutput->setEnabled( !b_raw );
+    ui.UDPOutput->setEnabled( !b_raw );
+    ui.RTPOutput->setEnabled( !b_raw );
+    ui.IcecastOutput->setEnabled( !b_raw );
+    ui.UDPRTPLabel->setEnabled( !b_raw );
+
     if( b_raw )
         ui.tabWidget->setDisabled( true );
     else
-        SoutDialog::setOptions();
+        setOptions();
 }
 
 void SoutDialog::setOptions()
@@ -373,6 +381,7 @@ void SoutDialog::updateMRL()
     sout.b_icecast = ui.IcecastOutput->isChecked();
     sout.b_rtp = ui.RTPOutput->isChecked();
     sout.b_udp = ui.UDPOutput->isChecked();
+    sout.b_dump = ui.rawInput->isChecked();
     sout.b_sap = ui.sap->isChecked();
     sout.b_all_es = ui.soutAll->isChecked();
     sout.psz_vcodec = strdup( qtu( ui.vCodecBox->itemData( ui.vCodecBox->currentIndex() ).toString() ) );
@@ -424,7 +433,8 @@ void SoutDialog::updateMRL()
     bool trans = false;
     bool more = false;
 
-    if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked() )
+    if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked()
+         && !ui.rawInput->isChecked() /*demuxdump speciality*/ )
     {
         if ( ui.transcodeVideo->isChecked() )
         {
@@ -462,6 +472,15 @@ void SoutDialog::updateMRL()
         }
         mrl.append( "}" );
     }
+
+    /* Special case for demuxdump */
+    if ( sout.b_file && sout.b_dump )
+    {
+        mrl = ":demux=dump :demuxdump-file=";
+        mrl.append( sout.psz_file );
+    }
+    else
+
 
     /* Protocol output */
     if ( sout.b_local || sout.b_file || sout.b_http ||
