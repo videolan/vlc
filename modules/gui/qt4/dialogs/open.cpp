@@ -344,7 +344,7 @@ void OpenDialog::stream( bool b_transcode_only )
     toggleVisible();
     QStringList listMRL = SeparateEntries( mrl );
     if( listMRL.size() > 0 )
-    THEDP->streamingDialog( this, SeparateEntries( mrl )[0], b_transcode_only );
+    THEDP->streamingDialog( this, listMRL[0], b_transcode_only );
 }
 
 /* Update the MRL */
