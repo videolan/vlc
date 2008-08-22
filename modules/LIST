@@ -23,6 +23,7 @@ $Id$
  * access_output_dummy: dummy access_output module
  * access_output_file: File access_output module
  * access_output_http: HTTP Network access module
+ * access_output_rtmp: RTMP stream output
  * access_output_shout: Shoutcast access output
  * access_output_udp: UDP Network access_output module
  * access_realrtsp: Real RTSP access
@@ -47,6 +48,8 @@ $Id$
  * audio_format: helper module for audio transcoding
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
  * auhal: Audio output for MacOS X based on the AUHAL API.
+ * avcodec: FFmpeg audio/video decoder
+ * avformat: FFmpeg demuxer
  * avi: AVI File stream demuxer
  * bandlimited_resampler: Bandlimited interpolation audio resampler
  * bda: DVB support for Windows BDA drivers
@@ -56,11 +59,12 @@ $Id$
  * bluescreen: Bluescreen (weather channel like) video filter
  * bonjour: Zeroconf services discovery
  * caca: color ASCII art video output using libcaca
+ * canvas: Automatically resize and padd a video
  * cc: CC 608/708 subtitles decoder
  * cdda: input module to read audio CDs
  * cddax: input module to read audio CDs via libcdio
  * cdg: CD-G decoder
- * chroma_chain: chain for chroma conversions
+ * chain: Video filtering using a chain of video filter modules
  * cinepak: Cinepack video decoder
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
@@ -105,8 +109,6 @@ $Id$
  * fake: fake codec to be used in advanced streaming setups
  * fb: video output module for the Linux framebuffer.
  * fbosd: framebuffer osd plugin
- * ffmpeg: Video decoder using the ffmpeg library
- * ffmpegaltivec: Video decoder using the ffmpeg library (Altivec version)
  * flac: Flac decoder using libflac
  * flacsys: FLAC demuxer
  * float32_mixer: Precise float32 audio mixer
@@ -156,10 +158,12 @@ $Id$
  * id3: ID3 tag skipper
  * id3tag: ID3 tag parser/skipper using libid3tag
  * image: Image file video output
+ * imgresample: FFmpeg video filter
  * inhibit: preventing the computer from suspending
  * invert: inverse video filter.
  * jack: jack server audio output
  * kate: kate text bitstream decoder
+ * libass: Subtitle renderers using libass
  * libmpeg2: Mpeg2 video decoder using libmpeg2
  * linear_resampler: linear audio resampler
  * lirc: Linux infrared control module
@@ -237,8 +241,8 @@ $Id$
  * png: PNG images decoder
  * podcast: podcast feed parser
  * portaudio: audio output module that uses the portaudio library (www.portaudio.com)
+ * postproc: Video post processing filter
  * probe_hal: HAL probing module
- * profile_parser: Streaming Profile parser
  * ps: input module for MPEG PS decapsulation.
  * psychedelic: Psychedelic video filter
  * pulse: PulseAudio audio output module
@@ -247,6 +251,7 @@ $Id$
  * pvr: input module to read from a PVR card
  * qnx: QNX RTOS plugin
  * qt4: interface module using the cross-platform Qt4 library.
+ * qtcapture: Quicktime Capture
  * qte: video output module for Qt Embedded.
  * qte_main: a QT Embedded GUI wrapper module.
  * quartztext: Text renderer using native Mac OS X API
@@ -258,6 +263,7 @@ $Id$
  * real: partial Real audio/video demuxer
  * realaudio: Real audio decoder
  * realvideo: Real video decoder
+ * remoteosd: Remote-OSD over VNC
  * ripple: Ripple video effect
  * rotate: Video rotation filter
  * rss: Display a RSS feed on the video output
@@ -265,6 +271,8 @@ $Id$
  * rv32: RV32 image format conversion module
  * sap: Interface module to read SAP/SDP announcments
  * scale: Images rescaler
+ * scaletempo: Scale audio tempo in sync with playback rate
+ * schroedinger: Schroedinger video decoder
  * screen: a input module that takes screenshots of the primary monitor
  * screensaver: screensaver disabling module
  * sdl_image: SDL-based image decoder
@@ -272,6 +280,7 @@ $Id$
  * sharpen: Sharpen video filter
  * shout: Shoutcast services discovery
  * showintf: shows the main interface
+ * signals: POSIX signals handling interface
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
@@ -280,6 +289,7 @@ $Id$
  * spdif_mixer: dummy audio mixer for the S/PDIF output
  * speex: a speex audio decoder/packetizer using the libspeex library.
  * spudec: RLE DVD subtitles decoder.
+ * stats: Stats encoder function
  * stream_out_autodel: monitor mux inputs and automatically add/delete streams
  * stream_out_bridge: "exchange" streams between sout instances. To be used with VLM
  * stream_out_description: helper module for RTSP vod
@@ -289,7 +299,6 @@ $Id$
  * stream_out_es: stream out module outputing ES
  * stream_out_gather: stream out module gathering inputs for seemless transitions
  * stream_out_mosaic_bridge: stream output module to make a mosaic. To be used with VLM
- * stream_out_rtp: output using the RTP protocol
  * stream_out_standard: standard stream output module
  * stream_out_switcher: stream output module to display backgrounds
  * stream_out_transcode: audio & video transcoder using ffmpeg
@@ -300,6 +309,7 @@ $Id$
  * svcdsub: SVCD subtitles decoder
  * svg: a svg renderer module
  * svgalib: SGVAlib output plugin
+ * swscale: Video scaling filter
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
  * tarkin: a tarkin video decoder using libtarkin
