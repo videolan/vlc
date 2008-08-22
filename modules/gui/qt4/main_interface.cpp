@@ -813,10 +813,16 @@ void MainInterface::toggleMinimalView()
 {
     /* HACK for minimalView, see menus.cpp */
     if( !menuBar()->isVisible() ) QVLCMenu::minimalViewAction->toggle();
+
     if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
         i_visualmode != QT_MINIMAL_MODE )
-    {
+    { /* NORMAL MODE then */
         if( videoWidget->isHidden() ) emit askBgWidgetToToggle();
+        else
+        {
+            /* If video is visible, then toggle the status of bgWidget */
+            bgWasVisible = !bgWasVisible;    	
+        }
     }
 
     TOGGLEV( menuBar() );
