@@ -318,6 +318,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, bool b_fsCreation = f
       qtr( "Loop from point A to point B continuously.\nClick to set point A" ),
       fromAtoB() );
     timeA = timeB = 0;
+    i_last_input_id = 0;
     /* in FS controller we skip this, because we dont want to have it double
        controlled */
     if( !b_fsCreation )
@@ -354,8 +355,21 @@ AdvControlsWidget::~AdvControlsWidget()
 
 void AdvControlsWidget::enableInput( bool enable )
 {
+    int i_input_id = 0;
+    if( THEMIM->getInput() != NULL )
+    {
+        input_item_t *p_item = input_GetItem( THEMIM->getInput() );
+        i_input_id = p_item->i_id;
+    }
     ABButton->setEnabled( enable );
     recordButton->setEnabled( enable );
+
+    if( enable && ( i_last_input_id != i_input_id ) )
+    {
+        timeA = timeB = 0;
+        i_last_input_id = i_input_id;
+        emit timeChanged();
+    }
 }
 
 void AdvControlsWidget::enableVideo( bool enable )
@@ -419,7 +433,8 @@ void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
 {
     if( timeB )
     {
-        if( i_time >= (int)(timeB/1000000) )
+        if( ( i_time >= (int)( timeB/1000000 ) )
+            || ( i_time < (int)( timeA/1000000 ) ) )
             var_SetTime( THEMIM->getInput(), "time" , timeA );
     }
 }

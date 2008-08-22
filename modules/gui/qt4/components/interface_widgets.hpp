@@ -157,6 +157,7 @@ private:
     QPushButton *snapshotButton, *frameButton;
 
     static mtime_t timeA, timeB;
+    int i_last_input_id;
 
 private slots:
     void snapshot();
