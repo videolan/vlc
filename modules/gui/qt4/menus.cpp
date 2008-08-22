@@ -265,9 +265,9 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     QMenuBar *bar = mi->menuBar();
     BAR_ADD( FileMenu(), qtr( "&Media" ) );
 
-    BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "P&layback" ), 3 );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 1 );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 2 );
+    BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "P&layback" ), 3 );
 
     BAR_ADD( PlaylistMenu( p_intf, mi ), qtr( "&Playlist" ) );
     BAR_ADD( ToolsMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
