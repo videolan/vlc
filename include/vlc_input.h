@@ -543,4 +543,13 @@ VLC_EXPORT( bool, input_AddSubtitles, ( input_thread_t *, char *, bool ) );
 
 VLC_EXPORT( vlc_event_manager_t *, input_get_event_manager, ( input_thread_t * ) );
 
+/**
+ * This function allows to split a MRL into access, demux and path part.
+ *
+ *  You should not write into access and demux string as they may not point into
+ * the provided buffer.
+ *  The buffer provided by psz_dup will be modified.
+ */
+VLC_EXPORT( void, input_SplitMRL, ( const char **ppsz_access, const char **ppsz_demux, char **ppsz_path, char *psz_dup ) );
+
 #endif

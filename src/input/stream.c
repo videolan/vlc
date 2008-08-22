@@ -254,11 +254,12 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     access_t *p_access;
     stream_t *p_res;
 
-    if( !psz_url ) return 0;
+    if( !psz_url )
+        return NULL;
 
-    char psz_dup[strlen (psz_url) + 1];
-    strcpy (psz_dup, psz_url);;
-    MRLSplit( psz_dup, &psz_access, &psz_demux, &psz_path );
+    char psz_dup[strlen( psz_url ) + 1];
+    strcpy( psz_dup, psz_url );
+    input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
 
     /* Now try a real access */
     p_access = access_New( p_parent, psz_access, psz_demux, psz_path );

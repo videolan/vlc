@@ -177,6 +177,7 @@ input_item_SetURI
 input_MetaTypeToLocalizedString
 __input_Preparse
 __input_Read
+input_SplitMRL
 input_StopThread
 input_vaControl
 __intf_Create

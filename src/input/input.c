@@ -2085,7 +2085,7 @@ static int InputSourceInit( input_thread_t *p_input,
     if( !p_input ) return VLC_EGENERIC;
 
     /* Split uri */
-    MRLSplit( psz_dup, &psz_access, &psz_demux, &psz_path );
+    input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
 
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
@@ -2292,7 +2292,7 @@ static int InputSourceInit( input_thread_t *p_input,
             {
                 const char *psz_a, *psz_d;
                 psz_buf = strdup( in->p_access->psz_path );
-                MRLSplit( psz_buf, &psz_a, &psz_d, &psz_real_path );
+                input_SplitMRL( &psz_a, &psz_d, &psz_real_path, psz_buf );
             }
             else
             {
@@ -2674,8 +2674,8 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
  * MRLSplit: parse the access, demux and url part of the
  *           Media Resource Locator.
  *****************************************************************************/
-void MRLSplit( char *psz_dup, const char **ppsz_access, const char **ppsz_demux,
-               char **ppsz_path )
+void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux, char **ppsz_path,
+                     char *psz_dup )
 {
     char *psz_access = NULL;
     char *psz_demux  = NULL;
@@ -2707,7 +2707,7 @@ void MRLSplit( char *psz_dup, const char **ppsz_access, const char **ppsz_demux,
     }
     *ppsz_access = psz_access ? psz_access : (char*)"";
     *ppsz_demux = psz_demux ? psz_demux : (char*)"";
-    *ppsz_path = psz_path ? psz_path : (char*)"";
+    *ppsz_path = psz_path;
 }
 
 static inline bool next(char ** src)
@@ -2871,8 +2871,7 @@ bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
 /*****************************************************************************
  * input_get_event_manager
  *****************************************************************************/
-vlc_event_manager_t *
-input_get_event_manager( input_thread_t *p_input )
+vlc_event_manager_t *input_get_event_manager( input_thread_t *p_input )
 {
     return &p_input->p->event_manager;
 }
