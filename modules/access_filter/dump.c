@@ -325,6 +325,7 @@ static int KeyHandler (vlc_object_t *obj, char const *varname,
 {
     access_t *access = data;
 
+    (void)varname;
     (void)oldval;
     (void)obj;
 

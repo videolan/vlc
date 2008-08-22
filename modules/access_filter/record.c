@@ -264,6 +264,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
     access_t     *p_access = p_data;
     access_sys_t *p_sys = p_access->p_sys;
 
+    (void)p_this;
     (void)psz_var;
     (void)oldval;
 
