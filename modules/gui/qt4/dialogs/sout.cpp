@@ -199,10 +199,10 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     BUTTONACT( okButton, ok() );
     BUTTONACT( cancelButton, cancel() );
 
-    if( b_transcode_only ) toggleSout();
-
     CONNECT( ui.UDPOutput, toggled( bool ), this, changeUDPandRTPmess( bool ) );
     CONNECT( ui.RTPOutput, clicked(bool), this, RTPtoggled( bool ) );
+
+    if( b_transcode_only ) toggleSout();
 }
 
 void SoutDialog::fileBrowse()
@@ -282,7 +282,6 @@ void SoutDialog::setOptions()
     updateMRL();
 }
 
-//FIXME
 void SoutDialog::toggleSout()
 {
     //Toggle all the streaming options.
@@ -291,7 +290,7 @@ void SoutDialog::toggleSout()
     HIDEORSHOW( ui.HTTPEdit ) ; HIDEORSHOW( ui.RTPEdit ) ; HIDEORSHOW( ui.MMSHEdit ) ; HIDEORSHOW( ui.UDPEdit ) ;
     HIDEORSHOW( ui.HTTPLabel ) ; HIDEORSHOW( ui.RTPLabel ) ; HIDEORSHOW( ui.MMSHLabel ) ; HIDEORSHOW( ui.UDPLabel ) ;
     HIDEORSHOW( ui.HTTPPortLabel ) ; HIDEORSHOW( ui.RTPPortLabel ) ; HIDEORSHOW( ui.MMSHPortLabel ) ; HIDEORSHOW( ui.UDPPortLabel )
-    HIDEORSHOW( ui.HTTPPort ) ; HIDEORSHOW( ui.RTPPort ) ; HIDEORSHOW( ui.MMSHPort ) ; HIDEORSHOW( ui.UDPPort ) ; HIDEORSHOW( ui.RTPPortLabel2 ); HIDEORSHOW( ui.RTPPort2 );
+    HIDEORSHOW( ui.HTTPPort ) ; HIDEORSHOW( ui.RTPPort ) ; HIDEORSHOW( ui.MMSHPort ) ; HIDEORSHOW( ui.UDPPort ) ; HIDEORSHOW( ui.RTPPortLabel2 ); HIDEORSHOW( ui.RTPPort2 ); HIDEORSHOW( ui.UDPRTPLabel )
 
     HIDEORSHOW( ui.sap ); HIDEORSHOW( ui.sapName );
     HIDEORSHOW( ui.sapGroup ); HIDEORSHOW( ui.sapGroupLabel );
@@ -307,9 +306,8 @@ void SoutDialog::toggleSout()
     if( b_transcode_only ) okButton->setText( "&Save" );
     else okButton->setText( "&Stream" );
 
-    /* FIXME:
-     * The Save dialog is too big if the Stream dialog has already be shown */
-    updateGeometry();
+    setMinimumHeight( 500 );
+    resize( width(), sizeHint().height() );
 }
 
 void SoutDialog::changeUDPandRTPmess( bool b_udp )
