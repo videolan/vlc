@@ -303,10 +303,14 @@ static int Demux( demux_t *p_demux )
         {
             block_t *p_next = p_block_out->p_next;
 
+            p_sys->i_pts = p_block_out->i_pts;
+
+            /* Correct timestamp */
+            p_block_out->i_pts += p_sys->i_time_offset;
+            p_block_out->i_dts += p_sys->i_time_offset;
+
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
 
-            p_block_out->p_next = NULL;
-            p_sys->i_pts = p_block_out->i_pts;
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
             p_block_out = p_next;
@@ -393,7 +397,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     p_sys->i_bitrate_avg;
 
                 /* Fix time_offset */
-                if( i_time >= 0 ) p_sys->i_time_offset = i_time - p_sys->i_pts;
+                if( i_time >= 0 )
+                    p_sys->i_time_offset = i_time - p_sys->i_pts;
             }
             return i_ret;
     }

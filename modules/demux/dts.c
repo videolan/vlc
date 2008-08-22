@@ -62,6 +62,9 @@ struct demux_sys_t
     /* Packetizer */
     decoder_t *p_packetizer;
 
+    mtime_t i_pts;
+    mtime_t i_time_offset;
+
     int i_mux_rate;
 };
 
@@ -156,6 +159,9 @@ static int Open( vlc_object_t * p_this )
     }
 
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
+    p_sys->i_mux_rate = 0;
+    p_sys->i_pts = 0;
+    p_sys->i_time_offset = 0;
  
     INIT_APACKETIZER( p_sys->p_packetizer, 'd','t','s',' ' );
     LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "DTS" );
@@ -214,6 +220,10 @@ static int Demux( demux_t *p_demux )
                     p_block_out->i_buffer * INT64_C(1000000) / p_block_out->i_length;
             }
 
+            /* Correct timestamp */
+            p_block_out->i_pts += p_sys->i_time_offset;
+            p_block_out->i_dts += p_sys->i_time_offset;
+
             /* set PCR */
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
 
@@ -232,12 +242,40 @@ static int Demux( demux_t *p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
-    if( i_query == DEMUX_SET_TIME )
-        return VLC_EGENERIC;
-    else
-        return demux_vaControlHelper( p_demux->s,
+    bool *pb_bool;
+    int64_t *pi64;
+    int i_ret;
+
+    switch( i_query )
+    {
+    case DEMUX_HAS_UNSUPPORTED_META:
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = true;
+        return VLC_SUCCESS;
+
+    case DEMUX_GET_TIME:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        *pi64 = p_sys->i_pts + p_sys->i_time_offset;
+        return VLC_SUCCESS;
+
+    case DEMUX_SET_TIME: /* TODO implement a high precicsion seek */
+    default:
+        i_ret = demux_vaControlHelper( p_demux->s,
                                        0, -1,
                                        8*p_sys->i_mux_rate, 1, i_query, args );
+        if( !i_ret && p_sys->i_mux_rate > 0 &&
+            ( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) )
+        {
+
+            const int64_t i_time = INT64_C(1000000) * stream_Tell(p_demux->s) /
+                                        p_sys->i_mux_rate;
+
+            /* Fix time_offset */
+            if( i_time >= 0 )
+                p_sys->i_time_offset = i_time - p_sys->i_pts;
+        }
+        return i_ret;
+    }
 }
 
 /*****************************************************************************

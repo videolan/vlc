@@ -160,16 +160,20 @@ static int Demux( demux_t *p_demux)
                                           &p_sys->p_packetizer->fmt_out);
             }
 
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
-
-            p_block_out->p_next = NULL;
-
             p_sys->i_pts = p_block_out->i_pts;
             if( p_sys->i_pts > M4A_PTS_START + INT64_C(500000) )
                 p_sys->i_bitrate_avg =
                     8*INT64_C(1000000)*p_sys->i_bytes/(p_sys->i_pts-M4A_PTS_START);
 
             p_sys->i_bytes += p_block_out->i_buffer;
+
+            /* Correct timestamp */
+            p_block_out->i_pts += p_sys->i_time_offset;
+            p_block_out->i_dts += p_sys->i_time_offset;
+
+            /* */
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
+
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
             p_block_out = p_next;

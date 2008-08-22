@@ -66,6 +66,9 @@ struct demux_sys_t
     /* Packetizer */
     decoder_t *p_packetizer;
 
+    mtime_t i_pts;
+    mtime_t i_time_offset;
+
     int i_mux_rate;
     bool b_big_endian;
 };
@@ -73,7 +76,8 @@ struct demux_sys_t
 static int CheckSync( const uint8_t *p_peek, bool *p_big_endian );
 
 #define PCM_FRAME_SIZE (1536 * 4)
-#define A52_PACKET_SIZE (4 * PCM_FRAME_SIZE)
+#define A52_PACKET_SIZE (1024)
+#define A52_PEEK_SIZE (4 * PCM_FRAME_SIZE)
 #define A52_PROBE_SIZE (512*1024)
 #define A52_MAX_HEADER_SIZE 10
 
@@ -109,7 +113,7 @@ static int Open( vlc_object_t * p_this )
 
         /* Some A52 wav files don't begin with a sync code so we do a more
          * extensive search */
-        int i_size = stream_Peek( p_demux->s, &p_peek, i_peek + A52_PACKET_SIZE * 2);
+        int i_size = stream_Peek( p_demux->s, &p_peek, i_peek + A52_PEEK_SIZE * 2);
         i_size -= (PCM_FRAME_SIZE + A52_MAX_HEADER_SIZE);
 
         while( i_peek < i_size )
@@ -150,6 +154,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->b_start = true;
     p_sys->i_mux_rate = 0;
     p_sys->b_big_endian = b_big_endian;
+    p_sys->i_pts = 0;
+    p_sys->i_time_offset = 0;
 
     /* Load the A52 packetizer */
     INIT_APACKETIZER( p_sys->p_packetizer, 'a', '5', '2', ' ' );
@@ -233,6 +239,11 @@ static int Demux( demux_t *p_demux )
                 p_sys->i_mux_rate =
                     p_block_out->i_buffer * INT64_C(1000000)/p_block_out->i_length;
             }
+            p_sys->i_pts = p_block_out->i_pts;
+
+            /* Correct timestamp */
+            p_block_out->i_pts += p_sys->i_time_offset;
+            p_block_out->i_dts += p_sys->i_time_offset;
 
             /* set PCR */
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
@@ -252,21 +263,39 @@ static int Demux( demux_t *p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
-    if( i_query == DEMUX_SET_TIME )
+    bool *pb_bool;
+    int64_t *pi64;
+    int i_ret;
+
+    switch( i_query )
     {
-        return VLC_EGENERIC;
-    }
-    else if( i_query == DEMUX_HAS_UNSUPPORTED_META )
-    {
-        bool *pb_bool = (bool*)va_arg( args, bool* );
+    case DEMUX_HAS_UNSUPPORTED_META:
+        pb_bool = (bool*)va_arg( args, bool* );
         *pb_bool = true;
         return VLC_SUCCESS;
-    }
-    else
-    {
-        return demux_vaControlHelper( p_demux->s,
+
+    case DEMUX_GET_TIME:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        *pi64 = p_sys->i_pts + p_sys->i_time_offset;
+        return VLC_SUCCESS;
+
+    case DEMUX_SET_TIME: /* TODO implement a high precicsion seek */
+    default:
+        i_ret = demux_vaControlHelper( p_demux->s,
                                        0, -1,
                                        8*p_sys->i_mux_rate, 1, i_query, args );
+        if( !i_ret && p_sys->i_mux_rate > 0 &&
+            ( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) )
+        {
+
+            const int64_t i_time = INT64_C(1000000) * stream_Tell(p_demux->s) /
+                                        p_sys->i_mux_rate;
+
+            /* Fix time_offset */
+            if( i_time >= 0 )
+                p_sys->i_time_offset = i_time - p_sys->i_pts;
+        }
+        return i_ret;
     }
 }
 
