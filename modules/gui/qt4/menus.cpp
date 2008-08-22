@@ -299,11 +299,11 @@ QMenu *QVLCMenu::FileMenu()
         "Ctrl+C" );
     menu->addSeparator();
 
+    addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "", "",
+        SLOT( openThenTranscodingDialogs() ), "Ctrl+R" );
     addDPStaticEntry( menu, qtr( "&Streaming..." ), "",
         ":/stream", SLOT( openThenStreamingDialogs() ),
         "Ctrl+S" );
-    addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "", "",
-        SLOT( openThenTranscodingDialogs() ), "Ctrl+R" );
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( "&Quit" ) , "",
