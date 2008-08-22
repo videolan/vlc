@@ -184,7 +184,7 @@ void InputManager::customEvent( QEvent *event )
     if( type == ItemStateChanged_Type )
     {
         UpdateNavigation();
-        UpdateTelextext();
+        UpdateTeletext();
     }
 
     if( !hasInput() ) return;
