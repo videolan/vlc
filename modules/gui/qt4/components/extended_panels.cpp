@@ -94,6 +94,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
                            p_intf( _p_intf )
 {
     ui.setupUi( _parent );
+    p_vout = NULL;
 
 #define SETUP_VFILTER( widget ) \
     { \
@@ -221,14 +222,18 @@ ExtVideo::~ExtVideo()
 
 void ExtVideo::cropChange()
 {
-    p_vout = ( vout_thread_t * )vlc_object_find( p_intf,
-                                VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout )
+    if( THEMIM->getInput() )
     {
-        var_SetInteger( p_vout, "crop-top", ui.cropTopPx->value() );
-        var_SetInteger( p_vout, "crop-bottom", ui.cropBotPx->value() );
-        var_SetInteger( p_vout, "crop-left", ui.cropLeftPx->value() );
-        var_SetInteger( p_vout, "crop-right", ui.cropRightPx->value() );
+        p_vout = ( vout_thread_t * )vlc_object_find( THEMIM->getInput(),
+                VLC_OBJECT_VOUT, FIND_CHILD );
+        if( p_vout )
+        {
+            var_SetInteger( p_vout, "crop-top", ui.cropTopPx->value() );
+            var_SetInteger( p_vout, "crop-bottom", ui.cropBotPx->value() );
+            var_SetInteger( p_vout, "crop-left", ui.cropLeftPx->value() );
+            var_SetInteger( p_vout, "crop-right", ui.cropRightPx->value() );
+        }
+        vlc_object_release( p_vout );
     }
 }
 
@@ -327,8 +332,9 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
         ui.subpictureFilterText->setText( psz_string );
 
     /* Try to set on the fly */
-    p_vout = ( vout_thread_t * )vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                              FIND_ANYWHERE );
+    if( THEMIM->getInput() )
+        p_vout = ( vout_thread_t * )vlc_object_find( THEMIM->getInput(),
+                VLC_OBJECT_VOUT, FIND_CHILD );
     if( p_vout )
     {
         if( !strcmp( psz_filter_type, "sub-filter" ) )
@@ -344,7 +350,6 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
 void ExtVideo::updateFilters()
 {
     QString module = ModuleFromWidgetName( sender() );
-    //std::cout << "Module name: " << module.toStdString() << std::endl;
 
     QCheckBox *checkbox = qobject_cast<QCheckBox*>( sender() );
     QGroupBox *groupbox = qobject_cast<QGroupBox*>( sender() );
