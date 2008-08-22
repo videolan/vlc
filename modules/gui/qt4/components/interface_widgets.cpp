@@ -1130,7 +1130,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
             b_fs = b_fullscreen;
             vlc_mutex_unlock( &lock );
             if( b_fs )
-#if WIN32TRICK
+#ifdef WIN32TRICK
                 if( b_fscHidden )
 #else
                 if( isHidden() )
