@@ -45,9 +45,10 @@ static int const VolumeChanged_Type      = QEvent::User + IMEventType + 6;
 static int const ItemSpuChanged_Type     = QEvent::User + IMEventType + 7;
 static int const ItemTeletextChanged_Type= QEvent::User + IMEventType + 8;
 
-static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 10;
-static int const FullscreenControlHide_Type = QEvent::User + IMEventType + 11;
-static int const FullscreenControlPlanHide_Type = QEvent::User + IMEventType + 12;
+static int const FullscreenControlToggle_Type = QEvent::User + IMEventType + 10;
+static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 11;
+static int const FullscreenControlHide_Type = QEvent::User + IMEventType + 12;
+static int const FullscreenControlPlanHide_Type = QEvent::User + IMEventType + 13;
 
 class IMEvent : public QEvent
 {

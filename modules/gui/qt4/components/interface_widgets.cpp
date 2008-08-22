@@ -1110,6 +1110,10 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
 
     switch( event->type() )
     {
+    case FullscreenControlToggle_Type:
+         // FIXME 
+         TOGGLEV( this );
+         break;
     case FullscreenControlShow_Type:
         vlc_mutex_lock( &lock );
         b_fs = b_fullscreen;

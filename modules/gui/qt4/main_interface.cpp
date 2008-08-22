@@ -594,10 +594,19 @@ void MainInterface::resizeEvent( QResizeEvent *e )
 }
 #endif
 
+void MainInterface::toggleFSC()
+{
+   if( !fullscreenControls ) return;
+
+   IMEvent *eShow = new IMEvent( FullscreenControlToggle_Type, 0 );
+   QApplication::postEvent( fullscreenControls, static_cast<QEvent *>(eShow) );
+}
+#if 0
 void MainInterface::requestLayoutUpdate()
 {
     emit askUpdate();
 }
+#endif
 
 //FIXME remove me at the end...
 void MainInterface::debug()
@@ -1227,7 +1236,8 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    p_intf->p_sys->p_mi->requestLayoutUpdate();
+    p_intf->p_sys->p_mi->toggleFSC();
 
-    return VLC_SUCCESS;
+    /* Show event */
+     return VLC_SUCCESS;
 }

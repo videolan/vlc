@@ -75,8 +75,9 @@ public:
     void releaseVideo( void * );
     int controlVideo( void *p_window, int i_query, va_list args );
 
+#if 0
     void requestLayoutUpdate();
-
+#endif
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; };
     QMenu *getSysTrayMenu() { return systrayMenu; };
@@ -151,6 +152,7 @@ public slots:
     void toggleUpdateSystrayMenu();
     void toggleAdvanced();
     void toggleFullScreen();
+    void toggleFSC();
 
     /* Manage the Video Functions from the vout threads */
     void releaseVideoSlot( void * );
