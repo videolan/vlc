@@ -105,9 +105,9 @@ struct access_sys_t
 {
     block_fifo_t *p_fifo;
 
-    int  i_files;
-    int  i_file_size;
-    int  i_write_size;
+    unsigned  i_files;
+    unsigned  i_file_size;
+    unsigned  i_write_size;
 
     ts_entry_t *p_read_list;
     ts_entry_t **pp_read_last;
@@ -204,7 +204,7 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
     ts_entry_t *p_entry;
-    int i;
+    unsigned i;
 
     msg_Dbg( p_access, "timeshift close called" );
     vlc_thread_join( p_access );
@@ -378,7 +378,12 @@ static void NextFileWrite( access_t *p_access )
 
     /* Put written file in read list */
     if( p_sys->i_write_size < p_sys->i_file_size )
-        ftruncate( fileno( p_sys->p_write_list->file ), p_sys->i_write_size );
+        if( ftruncate( fileno( p_sys->p_write_list->file ),
+                       p_sys->i_write_size ) == -1 )
+        {
+            msg_Dbg( p_access, "unable to truncate file: %m" );
+            /* return; */
+        }
 
     fseek( p_sys->p_write_list->file, 0, SEEK_SET );
     *p_sys->pp_read_last = p_sys->p_write_list;
@@ -430,7 +435,7 @@ static int WriteBlockToFile( access_t *p_access, block_t *p_block )
     {
         FILE *file;
 
-        sprintf( p_sys->psz_filename, "%s%i.dat",
+        sprintf( p_sys->psz_filename, "%s%u.dat",
                  p_sys->psz_filename_base, p_sys->i_files );
         file = utf8_fopen( p_sys->psz_filename, "w+b" );
 
@@ -522,6 +527,8 @@ static block_t *ReadBlockFromFile( access_t *p_access )
 static int Seek( access_t *p_access, int64_t i_pos )
 {
     //access_sys_t *p_sys = p_access->p_sys;
+    (void)p_access;
+    (void)i_pos;
     return VLC_SUCCESS;
 }
 
