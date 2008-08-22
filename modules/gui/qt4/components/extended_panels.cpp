@@ -222,7 +222,7 @@ ExtVideo::~ExtVideo()
 void ExtVideo::cropChange()
 {
     p_vout = ( vout_thread_t * )vlc_object_find( p_intf,
-                                VLC_OBJECT_VOUT, FIND_CHILD );
+                                VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout )
     {
         var_SetInteger( p_vout, "crop-top", ui.cropTopPx->value() );

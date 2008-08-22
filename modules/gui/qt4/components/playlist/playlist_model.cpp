@@ -946,9 +946,19 @@ void PLModel::popupExplore()
        char *psz_meta = input_item_GetURI( p_input );
        if( psz_meta )
        {
-           /* FIXME add a MRLSplit like function */
-           QFileInfo info( qfu( psz_meta ) );
-           QDesktopServices::openUrl( QUrl::fromLocalFile( info.absolutePath() ) );
+           const char *psz_access;
+           const char *psz_demux;
+           char  *psz_path;
+           input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_meta );
+
+           if( EMPTY_STR( psz_access ) ||
+               !strncasecmp( psz_access, "file", 4 ) ||
+               !strncasecmp( psz_access, "dire", 4 ) )
+           {
+               QFileInfo info( qfu( psz_meta ) );
+               QDesktopServices::openUrl(
+                               QUrl::fromLocalFile( info.absolutePath() ) );
+           }
            free( psz_meta );
        }
     }

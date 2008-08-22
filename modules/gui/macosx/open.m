@@ -924,7 +924,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)eyetvGetPlugin:(id)sender
 {
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: @"http://www.videolan.org/eyetv"]];
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: @"http://www.videolan.org/vlc/eyetv"]];
 }
 
 - (void)eyetvChanged:(NSNotification *)o_notification
