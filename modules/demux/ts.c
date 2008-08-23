@@ -2912,11 +2912,14 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                     if( pE->i_text_length > 0 )
                     {
                         char *psz_text = EITConvertToUTF8( pE->i_text, pE->i_text_length );
-                        msg_Dbg( p_demux, "       - text='%s'", psz_text );
+                        if( psz_text )
+                        {
+                            msg_Dbg( p_demux, "       - text='%s'", psz_text );
 
-                        psz_extra = realloc( psz_extra, strlen(psz_extra) + strlen(psz_text) + 1 );
-                        strcat( psz_extra, psz_text );
-                        free( psz_text );
+                            psz_extra = realloc( psz_extra, strlen(psz_extra) + strlen(psz_text) + 1 );
+                            strcat( psz_extra, psz_text );
+                            free( psz_text );
+                        }
                     }
 
                     for( i = 0; i < pE->i_entry_count; i++ )
