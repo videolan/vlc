@@ -1195,17 +1195,35 @@ static int transcode_audio_new( sout_stream_t *p_stream,
             (fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate) ||
             (fmt_last.i_codec != id->p_encoder->fmt_in.i_codec) )
         {
-            filter_chain_AppendFilter( id->p_f_chain, NULL, NULL, &fmt_last, &id->p_encoder->fmt_in );
+            msg_Dbg( p_stream, "Looking for filter "
+                     "(%4.4s->%4.4s, channels %d->%d, rate %d->%d)",
+                 (char *)&fmt_last.i_codec,
+                 (char *)&id->p_encoder->fmt_in.i_codec,
+                 fmt_last.audio.i_channels,
+                 id->p_encoder->fmt_in.audio.i_channels,
+                 fmt_last.audio.i_rate,
+                 id->p_encoder->fmt_in.audio.i_rate );
+            filter_chain_AppendFilter( id->p_f_chain, NULL, NULL,
+                                       &fmt_last, &id->p_encoder->fmt_in );
             fmt_last = *filter_chain_GetFmtOut( id->p_f_chain );
         }
+        else break;
     }
 
     /* Final checks to see if conversions were successful */
-    if( fmt_last.i_codec != id->p_encoder->fmt_in.i_codec )
+    if( (fmt_last.audio.i_channels !=
+        id->p_encoder->fmt_in.audio.i_channels) ||
+        (fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate) ||
+        (fmt_last.i_codec != id->p_encoder->fmt_in.i_codec) )
     {
-        msg_Err( p_stream, "no audio filter found (%4.4s->%4.4s)",
+        msg_Err( p_stream, "no audio filter found "
+                           "(%4.4s->%4.4s, channels %d->%d, rate %d->%d)",
                  (char *)&fmt_last.i_codec,
-                 (char *)&id->p_encoder->fmt_in.i_codec );
+                 (char *)&id->p_encoder->fmt_in.i_codec,
+                 fmt_last.audio.i_channels,
+                 id->p_encoder->fmt_in.audio.i_channels,
+                 fmt_last.audio.i_rate,
+                 id->p_encoder->fmt_in.audio.i_rate );
         transcode_audio_close( id );
         return VLC_EGENERIC;
     }
