@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sap.c : SAP announce handler
  *****************************************************************************
- * Copyright (C) 2002-2007 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -87,7 +87,6 @@ struct sap_session_t {
     session_descriptor_t *p_sd;
 
     /* Last and next send */
-    mtime_t        i_last;
     mtime_t        i_next;
 };
 
@@ -97,8 +96,8 @@ struct sap_session_t {
 static void * RunThread( vlc_object_t *p_this);
 static int ComputeRate( sap_address_t *p_address );
 
-static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
-                                     sap_session_t *p_session );
+static void announce_SendSAPAnnounce( sap_handler_t *p_sap,
+                                      sap_session_t *p_session );
 
 
 static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
@@ -443,7 +442,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     /* If needed, build the SDP */
     assert( p_session->psz_sdp != NULL );
 
-    p_sap_session->i_last = 0;
+    p_sap_session->i_next = 0;
     p_sap_session->i_length = headsize + strlen (p_session->psz_sdp);
     p_sap_session->psz_data = malloc (p_sap_session->i_length + 1);
     if (p_sap_session->psz_data == NULL)
@@ -545,32 +544,23 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
     return VLC_SUCCESS;
 }
 
-static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
-                                     sap_session_t *p_session )
+static void announce_SendSAPAnnounce( sap_handler_t *p_sap,
+                                      sap_session_t *p_session )
 {
-    /* This announce has never been sent yet */
-    if( p_session->i_last == 0 )
-    {
-        p_session->i_next = mdate()+ p_session->p_address->i_interval*1000000;
-        p_session->i_last = 1;
-        return VLC_SUCCESS;
-    }
+    mtime_t now = mdate();
 
-    if( p_session->i_next < mdate() )
+    if( p_session->i_next >= now )
+        return;
+
+    ssize_t i_ret = send( p_session->p_address->i_wfd, p_session->psz_data,
+                          p_session->i_length, 0 );
+    if( i_ret != (ssize_t)p_session->i_length )
     {
-        ssize_t i_ret = send( p_session->p_address->i_wfd, p_session->psz_data,
-                              p_session->i_length, 0 );
-        if( i_ret != (ssize_t)p_session->i_length )
-        {
-            msg_Warn( p_sap, "SAP send failed on address %s (%zd/%zu)",
-                      p_session->p_address->psz_address,
-                      i_ret, p_session->i_length );
-        }
-        p_session->i_last = p_session->i_next;
-        p_session->i_next = p_session->i_last
-                            + p_session->p_address->i_interval*1000000;
+        msg_Warn( p_sap, "SAP send failed on address %s (%zd/%zu)",
+                  p_session->p_address->psz_address,
+                  i_ret, p_session->i_length );
     }
-    return VLC_SUCCESS;
+    p_session->i_next = now + p_session->p_address->i_interval*CLOCK_FREQ;
 }
 
 static int ComputeRate( sap_address_t *p_address )
