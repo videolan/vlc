@@ -195,14 +195,14 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
     {
-        vlm_Delete( p_intf->p_sys->mediatheque );
+        vlm_Delete( mediatheque );
         vlc_UrlClean( &url );
         return VLC_ENOMEM;
     }
     if( ( p_intf->p_sys->pi_fd = net_ListenTCP( p_intf, url.psz_host, url.i_port ) ) == NULL )
     {
         msg_Err( p_intf, "cannot listen for telnet" );
-        vlm_Delete( p_intf->p_sys->mediatheque );
+        vlm_Delete( mediatheque );
         vlc_UrlClean( &url );
         free( p_intf->p_sys );
         return VLC_EGENERIC;
