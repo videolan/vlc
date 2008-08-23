@@ -2813,6 +2813,8 @@ bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
     vlc_value_t list;
     char *psz_path, *psz_extension;
 
+    int i_state = p_input->i_state;
+
     if( b_check_extension && !subtitles_Filter( psz_subtitle ) )
     {
         return false;
@@ -2862,6 +2864,7 @@ bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
             }
             var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
         }
+        input_ChangeState( p_input, i_state );
     }
     else free( sub );
 
