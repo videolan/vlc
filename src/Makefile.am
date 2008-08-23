@@ -3,6 +3,7 @@
 ###############################################################################
 
 AUTOMAKE_OPTIONS = subdir-objects
+SUBDIRS = . test
 
 NULL =
 EXTRA_DIST = extras/COPYING modules/builtin.h.in \
@@ -493,49 +494,9 @@ endif
 ###############################################################################
 # Unit/regression test
 ###############################################################################
-check_PROGRAMS = \
-	test_block \
-	test_dictionary \
-	test_i18n_atof \
-	test_url \
-	test_utf8 \
-	test_headers \
-	$(NULL)
 
 dist_check_SCRIPTS = check_symbols check_headers
-TESTS = $(check_PROGRAMS) check_symbols
-
-CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
-LDFLAGS_tests = $(AM_LDFLAGS) -no-install
-
-test_block_SOURCES = test/block.c
-test_block_LDADD = libvlccore.la
-test_block_CFLAGS = $(CFLAGS_tests)
-test_block_LDFLAGS = $(LDFLAGS_tests)
-
-test_dictionary_SOURCES = test/dictionary.c
-test_dictionary_LDADD = libvlccore.la
-test_dictionary_CFLAGS = $(CFLAGS_tests)
-test_dictionary_LDFLAGS = $(LDFLAGS_tests)
-
-test_i18n_atof_SOURCES = test/i18n_atof.c text/charset.c
-test_i18n_atof_LDADD = libvlccore.la
-test_i18n_atof_CFLAGS = $(CFLAGS_tests)
-test_i18n_atof_LDFLAGS = $(LDFLAGS_tests)
-
-test_url_SOURCES = test/url.c
-test_url_LDADD = libvlccore.la
-test_url_CFLAGS = $(CFLAGS_tests)
-test_url_LDFLAGS = $(LDFLAGS_tests)
-
-test_utf8_SOURCES = test/utf8.c
-test_utf8_LDADD = libvlccore.la
-test_utf8_CFLAGS = $(CFLAGS_tests)
-test_utf8_LDFLAGS = $(LDFLAGS_tests)
-
-test_headers_SOURCES = test/headers.c
-test_headers_CFLAGS = $(CFLAGS_tests)
-test_headers_LDFLAGS = $(LDFLAGS_tests)
+TESTS = check_symbols
 
 check-local:
 	for h in `echo $(pkginclude_HEADERS) | sed -e s,\.\./include/,,g`; \

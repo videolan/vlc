@@ -5860,6 +5860,7 @@ AC_CONFIG_FILES([
   share/vlc_win32_rc.rc
   share/libvlc_win32_rc.rc
   src/Makefile
+  src/test/Makefile
   test/Makefile
 ])
 
