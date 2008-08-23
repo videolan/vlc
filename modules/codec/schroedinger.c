@@ -206,16 +206,14 @@ static void StorePicturePTS( decoder_t *p_dec, block_t *p_block, int i_pupos )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint32_t u_pnum;
-    mtime_t i_pts;
 
     u_pnum = GetDWBE( p_block->p_buffer + i_pupos + 13 );
-    i_pts = p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts;
 
     for( int i=0; i<PTS_TLB_SIZE; i++ ) {
         if( p_sys->pts_tlb[i].i_empty ) {
 
             p_sys->pts_tlb[i].u_pnum = u_pnum;
-            p_sys->pts_tlb[i].i_pts = i_pts;
+            p_sys->pts_tlb[i].i_pts = p_block->i_pts;
             p_sys->pts_tlb[i].i_empty = 0;
 
             return;
@@ -223,7 +221,7 @@ static void StorePicturePTS( decoder_t *p_dec, block_t *p_block, int i_pupos )
     }
 
     msg_Err( p_dec, "Could not store PTS %"PRId64" for picture %u",
-             i_pts, u_pnum );
+             p_block->i_pts, u_pnum );
 }
 
 /*****************************************************************************
