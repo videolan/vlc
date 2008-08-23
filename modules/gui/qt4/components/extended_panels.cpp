@@ -1270,8 +1270,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVSpin = new QDoubleSpinBox;
     AVSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
     AVSpin->setDecimals( 3 );
-    AVSpin->setMinimum( -100 );
-    AVSpin->setMaximum( 100 );
+    AVSpin->setMinimum( -100.0 );
+    AVSpin->setMaximum( 100.0 );
     AVSpin->setSingleStep( 0.1 );
     AVSpin->setToolTip( qtr( "A positive value means that\n"
                              "the audio is ahead of the video" ) );
@@ -1303,8 +1303,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsSpin = new QDoubleSpinBox;
     subsSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
     subsSpin->setDecimals( 3 );
-    subsSpin->setMinimum( -100 );
-    subsSpin->setMaximum( 100 );
+    subsSpin->setMinimum( -100.0 );
+    subsSpin->setMaximum( 100.0 );
     subsSpin->setSingleStep( 0.1 );
     subsSpin->setToolTip( qtr( "A positive value means that\n"
                              "the subtitles are ahead of the video" ) );
@@ -1379,9 +1379,8 @@ void SyncControls::advanceAudio( double f_advance )
     if( THEMIM->getInput() )
     {
         int64_t i_delay = var_GetTime( THEMIM->getInput(), "audio-delay" );
-        i_delay += f_advance * 1000000;
+        i_delay = f_advance * 1000000;
         var_SetTime( THEMIM->getInput(), "audio-delay", i_delay );
-        msg_Dbg( p_intf, "I am advancing Audio %d", f_advance );
     }
 }
 
@@ -1390,7 +1389,7 @@ void SyncControls::advanceSubs( double f_advance )
     if( THEMIM->getInput() )
     {
         int64_t i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
-        i_delay += f_advance * 1000000;
+        i_delay = f_advance * 1000000;
         var_SetTime( THEMIM->getInput(), "spu-delay", i_delay );
         msg_Dbg( p_intf, "I am advancing subtitles %d", f_advance );
     }
