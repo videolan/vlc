@@ -408,6 +408,8 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
     else if( !aout_DateGet( &p_sys->end_date ) )
     {
         /* The first PTS is as good as anything else. */
+        p_sys->i_rate = p_dec->fmt_out.audio.i_rate;
+        aout_DateInit( &p_sys->end_date, p_sys->i_rate );
         aout_DateSet( &p_sys->end_date, (*pp_block)->i_pts );
     }
 
