@@ -1211,10 +1211,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     }
 
     /* Final checks to see if conversions were successful */
-    if( (fmt_last.audio.i_channels !=
-        id->p_encoder->fmt_in.audio.i_channels) ||
-        (fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate) ||
-        (fmt_last.i_codec != id->p_encoder->fmt_in.i_codec) )
+    if( fmt_last.i_codec != id->p_encoder->fmt_in.i_codec )
     {
         msg_Err( p_stream, "no audio filter found "
                            "(%4.4s->%4.4s, channels %d->%d, rate %d->%d)",
@@ -1235,6 +1232,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                        transcode_audio_filter_allocation_init, NULL, NULL );
         filter_chain_Reset( id->p_uf_chain, &fmt_last, &id->p_encoder->fmt_in );
         filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_af2 );
+        fmt_last = *filter_chain_GetFmtOut( id->p_uf_chain );
     }
 
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
