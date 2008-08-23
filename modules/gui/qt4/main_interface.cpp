@@ -544,7 +544,8 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
 
 QSize MainInterface::sizeHint() const
 {
-    int nwidth  = controls->sizeHint().width();
+    int nwidth  = __MAX( controls->sizeHint().width(),
+                         menuBar()->sizeHint().width() );
     int nheight = controls->isVisible() ?
                   controls->size().height()
                   + menuBar()->size().height()
