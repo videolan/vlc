@@ -2070,6 +2070,8 @@ static int InputSourceInit( input_thread_t *p_input,
                             input_source_t *in, const char *psz_mrl,
                             const char *psz_forced_demux )
 {
+    const bool b_master = in == &p_input->p->input;
+
     char psz_dup[strlen (psz_mrl) + 1];
     const char *psz_access;
     const char *psz_demux;
@@ -2190,7 +2192,8 @@ static int InputSourceInit( input_thread_t *p_input,
     {
         int64_t i_pts_delay;
 
-        input_ChangeState( p_input, OPENING_S );
+        if( b_master )
+            input_ChangeState( p_input, OPENING_S );
 
         /* Now try a real access */
         in->p_access = access_New( p_input, psz_access, psz_demux, psz_path );
@@ -2268,7 +2271,8 @@ static int InputSourceInit( input_thread_t *p_input,
             var_Set( p_input, "seekable", val );
         }
 
-        input_ChangeState( p_input, BUFFERING_S );
+        if( b_master )
+            input_ChangeState( p_input, BUFFERING_S );
 
         /* Create the stream_t */
         in->p_stream = stream_AccessNew( in->p_access, p_input->b_preparsing );
@@ -2360,7 +2364,8 @@ static int InputSourceInit( input_thread_t *p_input,
     return VLC_SUCCESS;
 
 error:
-    input_ChangeState( p_input, ERROR_S );
+    if( b_master )
+        input_ChangeState( p_input, ERROR_S );
 
     if( in->p_demux )
         demux_Delete( in->p_demux );
