@@ -444,7 +444,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)manage
 {
     /* Disable Screensaver, when we're playing something, but allow it on pause */
-    if( !VLCIntf || !VLCIntf->p_sys || !VLCIntf->p_sys->i_play_status )
+    if( !VLCIntf || !VLCIntf->p_sys )
         return;
 
     if( VLCIntf->p_sys->i_play_status == PLAYING_S )

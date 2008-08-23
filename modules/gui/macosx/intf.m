@@ -737,6 +737,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     vlc_object_kill( p_intf->p_libvlc );
 
+    [self setIntf:nil];
+
     /* Go back to Run() and make libvlc exit properly */
     if( jmpbuffer )
         longjmp( jmpbuffer, 1 );
