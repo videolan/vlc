@@ -336,6 +336,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, bool b_fsCreation = f
     BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by frame" ), frame() );
 #endif
 
+    /* Record Button */
     recordButton = new QPushButton;
     setupSmallButton( recordButton );
     advLayout->addWidget( recordButton );
@@ -360,7 +361,15 @@ void AdvControlsWidget::enableInput( bool enable )
     {
         input_item_t *p_item = input_GetItem( THEMIM->getInput() );
         i_input_id = p_item->i_id;
+
+        if( var_Type( THEMIM->getInput(), "record-toggle" ) == VLC_VAR_VOID )
+            recordButton->setVisible( true );
+        else
+            recordButton->setVisible( false );
     }
+    else
+        recordButton->setVisible( false );
+
     ABButton->setEnabled( enable );
     recordButton->setEnabled( enable );
 
@@ -448,6 +457,7 @@ void AdvControlsWidget::record()
         /* This method won't work fine if the stream can't be cut anywhere */
         if( var_Type( p_input, "record-toggle" ) == VLC_VAR_VOID )
             var_TriggerCallback( p_input, "record-toggle" );
+#if 0
         else
         {
             /* 'record' access-filter is not loaded, we open Save dialog */
@@ -459,6 +469,7 @@ void AdvControlsWidget::record()
             if( psz )
                 THEDP->streamingDialog( NULL, psz, true );
         }
+#endif
     }
 }
 
