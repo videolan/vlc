@@ -439,59 +439,6 @@ misc/revision.c:
 
 
 ###############################################################################
-# Building vlc
-###############################################################################
-
-EXTRA_PROGRAMS = vlc vlc-wrapper
-if BUILD_VLC
-bin_PROGRAMS = vlc
-if !HAVE_WIN32
-bin_PROGRAMS += vlc-wrapper
-endif
-endif
-
-EXTRA_vlc_SOURCES = vlc.c winvlc.c
-if !HAVE_WIN32
-vlc_SOURCES = vlc.c
-else
-vlc_SOURCES = winvlc.c
-endif
-vlc_wrapper_SOURCES = network/rootwrap.c
-
-vlc_DEPENDENCIES = $(DATA_win32_rc) libvlc.la
-
-vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
-# vlc needs libvlccore for locale conversion
-vlc_LDADD = $(DATA_win32_rc) libvlc.la libvlccore.la $(LTLIBINTL) \
-	`$(VLC_CONFIG) -libs vlc`
-
-if BUILD_VLC
-vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
-	@rm -f vlc$(EXEEXT)
-	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
-	  c++) cmd="$(CXXLINK)" ;; \
-	  objc) cmd="$(OBJCLINK)" ;; \
-	  c|*) cmd="$(LINK)" ;; \
-	esac ; \
-	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS)" ; \
-	echo $$cmd ; \
-	eval $$cmd
-
-if HAVE_WIN32
-DATA_win32_rc = vlc_win32_rc.$(OBJEXT)
-DATA_win32_rc_lib = libvlc_win32_rc.$(OBJEXT)
-noinst_DATA = $(DATA_win32_rc) $(DATA_win32_rc_lib)
-
-vlc_win32_rc.$(OBJEXT): $(top_builddir)/share/vlc_win32_rc.rc
-	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
-
-libvlc_win32_rc.$(OBJEXT): $(top_builddir)/share/libvlc_win32_rc.rc
-	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
-endif
-endif
-
-###############################################################################
 # Unit/regression test
 ###############################################################################
 
