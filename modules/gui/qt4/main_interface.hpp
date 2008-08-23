@@ -83,9 +83,8 @@ public:
     QMenu *getSysTrayMenu() { return systrayMenu; };
     int getControlsVisibilityStatus();
 
-#if 0    /* Sizehint() */
+    /* Sizehint() */
     QSize sizeHint() const;
-#endif
 protected:
 //    void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);

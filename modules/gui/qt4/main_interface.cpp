@@ -540,7 +540,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
    ask _parent->isFloating()...
    If you think this would be better, please FIXME it...
 */
-#if 0
+
 QSize MainInterface::sizeHint() const
 {
     int nwidth  = controls->sizeHint().width();
@@ -559,20 +559,22 @@ QSize MainInterface::sizeHint() const
     }
     else if( videoIsActive )
     {
-        nheight += videoWidget->size().height();
-        nwidth  = videoWidget->size().width();
+        nheight += videoWidget->sizeHint().height();
+        nwidth  = videoWidget->sizeHint().width();
         msg_Dbg( p_intf, "2 %i %i", nheight, nwidth );
     }
-/*    if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
+#if 0
+    if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
     {
         nheight += dockPL->size().height();
         nwidth = __MAX( nwidth, dockPL->size().width() );
         msg_Dbg( p_intf, "3 %i %i", nheight, nwidth );
-    }*/
+    }
+#endif
     msg_Dbg( p_intf, "4 %i %i", nheight, nwidth );
     return QSize( nwidth, nheight );
 }
-#endif
+
 #if 0
 /* FIXME This is dead code and need to be removed AT THE END */
 void MainInterface::resizeEvent( QResizeEvent *e )
