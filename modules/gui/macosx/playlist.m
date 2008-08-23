@@ -445,6 +445,7 @@
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
     [o_mi_services setTitle: _NS("Services discovery")];
+    [o_mm_mi_services setTitle: _NS("Services discovery")];
     [o_status_field setStringValue: _NS("No items in the playlist")];
 
     [o_search_field setToolTip: _NS("Search in Playlist")];
