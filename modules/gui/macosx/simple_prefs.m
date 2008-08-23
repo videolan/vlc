@@ -907,6 +907,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         i = i + config_SaveConfigFile( p_intf, "access_ftp" );
         i = i + config_SaveConfigFile( p_intf, "access_mms" );
         i = i + config_SaveConfigFile( p_intf, "live555" );
+        i = i + config_SaveConfigFile( p_intf, "avi" );
 
         if( i != 0 )
         {
