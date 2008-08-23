@@ -182,10 +182,11 @@ static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
 
     error:
         if( psz_name )
-            msg_Err( p_chain->p_this, "Failed to create video filter '%s'",
-                     psz_name );
+            msg_Err( p_chain->p_this, "Failed to create %s '%s'",
+                     p_chain->psz_capability, psz_name );
         else
-            msg_Err( p_chain->p_this, "Failed to create video filter" );
+            msg_Err( p_chain->p_this, "Failed to create %s",
+                     p_chain->psz_capability );
         if( p_filter->p_module ) module_Unneed( p_filter,
                                                 p_filter->p_module );
         es_format_Clean( &p_filter->fmt_in );
