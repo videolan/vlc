@@ -440,7 +440,27 @@ void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
 }
 
 /* FIXME Record function */
-void AdvControlsWidget::record(){}
+void AdvControlsWidget::record()
+{
+    input_thread_t *p_input = THEMIM->getInput();
+    if( p_input )
+    {
+        /* This method won't work fine if the stream can't be cut anywhere */
+        if( var_Type( p_input, "record-toggle" ) == VLC_VAR_VOID )
+            var_TriggerCallback( p_input, "record-toggle" );
+        else
+        {
+            /* 'record' access-filter is not loaded, we open Save dialog */
+            input_item_t *p_item = input_GetItem( p_input );
+            if( !p_item )
+                return;
+
+            char *psz = input_item_GetURI( p_item );
+            if( psz )
+                THEDP->streamingDialog( NULL, psz, true );
+        }
+    }
+}
 
 #if 0
 //FIXME Frame by frame function
