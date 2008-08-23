@@ -140,27 +140,34 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
                                 nil] retain];
 }
 
+#define CreateToolbarItem( o_name, o_desc, o_img, sel ) \
+    o_toolbarItem = create_toolbar_item(o_itemIdent, o_name, o_desc, o_img, self, @selector(sel));
+static inline NSToolbarItem *
+create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_desc, NSString * o_img, id target, SEL selector )
+{
+    NSToolbarItem *o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease]; \
+
+    [o_toolbarItem setLabel: o_name];
+    [o_toolbarItem setPaletteLabel: o_desc];
+
+    [o_toolbarItem setToolTip: o_desc];
+    [o_toolbarItem setImage: [NSImage imageNamed: o_img]];
+
+    [o_toolbarItem setTarget: target];
+    [o_toolbarItem setAction: selector];
+
+    [o_toolbarItem setEnabled: YES];
+    [o_toolbarItem setAutovalidates: YES];
+
+    return o_toolbarItem;
+}
+
 - (NSToolbarItem *) toolbar: (NSToolbar *)o_sprefs_toolbar 
       itemForItemIdentifier: (NSString *)o_itemIdent 
   willBeInsertedIntoToolbar: (BOOL)b_willBeInserted
 {
     NSToolbarItem *o_toolbarItem = nil;
-    
-    #define CreateToolbarItem( o_name, o_desc, o_img, sel ) \
-    o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease]; \
-    \
-    [o_toolbarItem setLabel: o_name]; \
-    [o_toolbarItem setPaletteLabel: o_desc]; \
-    \
-    [o_toolbarItem setToolTip: o_desc]; \
-    [o_toolbarItem setImage: [NSImage imageNamed: o_img]]; \
-    \
-    [o_toolbarItem setTarget: self]; \
-    [o_toolbarItem setAction: @selector( sel )]; \
-    \
-    [o_toolbarItem setEnabled: YES]; \
-    [o_toolbarItem setAutovalidates: YES]
-    
+
     if( [o_itemIdent isEqual: VLCIntfSettingToolbarIdentifier] )
     {
         CreateToolbarItem( _NS("Interface"), _NS("Interface Settings"), @"spref_cone_Interface_64", showInterfaceSettings );
@@ -645,46 +652,64 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     }
 }
 
-- (void)saveChangedSettings
+static inline void save_int_list( intf_thread_t * p_intf, id object, const char * name )
+{
+    NSNumber *p_valueobject;
+    module_config_t *p_item;
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
+    p_valueobject = (NSNumber *)[[object selectedItem] representedObject];
+    assert([p_valueobject isKindOfClass:[NSNumber class]]);
+    if( p_valueobject) config_PutInt( p_intf, name, [p_valueobject intValue] );
+}
+
+static inline void save_string_list( intf_thread_t * p_intf, id object, const char * name )
+{
+    NSString *p_stringobject;
+    module_config_t *p_item;
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
+    p_stringobject = (NSString *)[[object selectedItem] representedObject];
+    assert([p_stringobject isKindOfClass:[NSString class]]);
+    if( p_stringobject ) config_PutPsz( p_intf, name, [p_stringobject UTF8String] );
+}
+
+static inline void save_module_list( intf_thread_t * p_intf, id object, const char * name )
 {
     module_config_t *p_item;
-    vlc_list_t *p_list;
     module_t *p_parser;
+    vlc_list_t *p_list;
+
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
+
+    p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    for( int i_module_index = 0; i_module_index < p_list->i_count; i_module_index++ )
+    {
+        p_parser = (module_t *)p_list->p_values[i_module_index].p_object;
+
+        if( p_item->i_type == CONFIG_ITEM_MODULE && module_IsCapable( p_parser, p_item->psz_type ) )
+        {
+            if( [[[object selectedItem] title] isEqualToString: _NS( module_GetLongName( p_parser ) )] )
+            {
+                config_PutPsz( p_intf, name, strdup( module_GetObjName( p_parser )));
+                break;
+            }
+        }
+    }
+    vlc_list_release( p_list );
+    if( [[[object selectedItem] title] isEqualToString: _NS( "Default" )] )
+        config_PutPsz( p_intf, name, "" );
+}
+
+- (void)saveChangedSettings
+{
     char *psz_tmp;
     int i;
-    NSNumber *p_valueobject;
     NSString *p_stringobject;
     
-#define SaveIntList( object, name ) \
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-    p_valueobject = (NSNumber *)[[object selectedItem] representedObject]; \
-    if( p_valueobject) config_PutInt( p_intf, name, [p_valueobject intValue] );
+#define SaveIntList( object, name ) save_int_list( p_intf, object, name )
                     
-#define SaveStringList( object, name ) \
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-    p_stringobject = (NSString *)[[object selectedItem] representedObject]; \
-    if( p_stringobject ) config_PutPsz( p_intf, name, [p_stringobject UTF8String] );
+#define SaveStringList( object, name ) save_string_list( p_intf, object, name )
 
-#define SaveModuleList( object, name ) \
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-    \
-    p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE ); \
-    for( int i_module_index = 0; i_module_index < p_list->i_count; i_module_index++ ) \
-    { \
-        p_parser = (module_t *)p_list->p_values[i_module_index].p_object; \
-        \
-        if( p_item->i_type == CONFIG_ITEM_MODULE && module_IsCapable( p_parser, p_item->psz_type ) ) \
-        { \
-            if( [[[object selectedItem] title] isEqualToString: _NS( module_GetLongName( p_parser ) )] ) \
-            { \
-                config_PutPsz( p_intf, name, strdup( module_GetObjName( p_parser ))); \
-                break; \
-            } \
-        } \
-    } \
-    vlc_list_release( p_list ); \
-    if( [[[object selectedItem] title] isEqualToString: _NS( "Default" )] ) \
-        config_PutPsz( p_intf, name, "" )
+#define SaveModuleList( object, name ) save_module_list( p_intf, object, name )
 
     /**********************
      * interface settings *
