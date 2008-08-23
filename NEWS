@@ -1,5 +1,5 @@
-Changes between 0.8.6i and 0.9.0-test3:
----------------------------------------
+Changes between 0.8.6i and 0.9.0:
+---------------------------------
 
 Important notes:
 ----------------
@@ -50,6 +50,7 @@ Important notes:
    transcode{vcodec=mp2v,vfilter=canvas{width=640,height=480}}
  * Glide video output module has been removed.
  * Due to lack of maintainer, the Skins interface might not work properly.
+ * Transcoding multiple audio channels to mono does not work anymore.
 
 Changes:
 --------
