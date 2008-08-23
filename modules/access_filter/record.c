@@ -81,6 +81,8 @@ static void Dump( access_t *, uint8_t *, int );
 
 static int EventKey( vlc_object_t *, char const *,
                      vlc_value_t, vlc_value_t, void * );
+static int ToggleRecord( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
 
 struct access_sys_t
 {
@@ -157,6 +159,15 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_path = psz;
     msg_Dbg( p_access, "Record access filter path %s", psz );
 
+    input_thread_t *p_input = ( input_thread_t * )
+            vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( p_input )
+    {
+        var_Create( p_input, "record-toggle", VLC_VAR_VOID );
+        var_AddCallback( p_input, "record-toggle", ToggleRecord, p_access );
+        vlc_object_release( p_input );
+    }
+
     /* catch all key event */
     var_AddCallback( p_access->p_libvlc, "key-action", EventKey, p_access );
 
@@ -172,6 +183,13 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     var_DelCallback( p_access->p_libvlc, "key-action", EventKey, p_access );
+    input_thread_t *p_input = ( input_thread_t * )
+            vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( p_input )
+    {
+        var_Destroy( p_input, "record-toggle" );
+        vlc_object_release( p_input );
+    }
 
     if( p_sys->f )
     {
@@ -275,6 +293,23 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
         else
             p_sys->b_dump = true;
     }
+
+    return VLC_SUCCESS;
+}
+
+static int ToggleRecord( vlc_object_t *p_this, char const *psz_var,
+                          vlc_value_t oldval, vlc_value_t newval,
+                          void *p_data )
+{
+    access_t     *p_access = p_data;
+    access_sys_t *p_sys = p_access->p_sys;
+
+    (void)p_this;
+    (void)psz_var;
+    (void)oldval;
+    (void)newval;
+
+    p_sys->b_dump = !p_sys->b_dump;
 
     return VLC_SUCCESS;
 }
