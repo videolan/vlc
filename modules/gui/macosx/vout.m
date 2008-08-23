@@ -145,7 +145,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (id)initWithFrame: (NSRect)frameRect
 {
-    [super initWithFrame: frameRect];
+    self = [super initWithFrame: frameRect];
     p_vout = NULL;
     o_view = nil;
     s_frame = &frameRect;

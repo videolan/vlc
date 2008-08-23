@@ -260,7 +260,8 @@ static int Manage( vout_thread_t * p_vout )
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
 
-    [p_vout->p_sys->o_vout_view manage];
+    if( p_vout->p_sys->o_vout_view )
+        [p_vout->p_sys->o_vout_view manage];
     return VLC_SUCCESS;
 }
 
@@ -319,8 +320,10 @@ static void Unlock( vout_thread_t * p_vout )
     [p_vout->p_sys->o_glview autorelease];
 
     /* Spawn the window */
-    p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
-                        subView: p_vout->p_sys->o_glview frame: nil];
+    id old_vout = p_vout->p_sys->o_vout_view;
+    p_vout->p_sys->o_vout_view = [[VLCVoutView getVoutView: p_vout
+                        subView: p_vout->p_sys->o_glview frame: nil] retain];
+    [old_vout release];
 }
 
 /* This function will reset the o_vout_view. It's useful to go fullscreen. */
@@ -345,15 +348,18 @@ static void Unlock( vout_thread_t * p_vout )
  
     if( p_vout->p_sys->b_saved_frame )
     {
-        p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+        id old_vout = p_vout->p_sys->o_vout_view;
+        p_vout->p_sys->o_vout_view = [[VLCVoutView getVoutView: p_vout
                                                       subView: o_glview
-                                                        frame: &p_vout->p_sys->s_frame];
+                                                        frame: &p_vout->p_sys->s_frame] retain];
+        [old_vout release];
     }
     else
     {
-        p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
-                                                      subView: o_glview frame: nil];
- 
+        id old_vout = p_vout->p_sys->o_vout_view;
+        p_vout->p_sys->o_vout_view = [[VLCVoutView getVoutView: p_vout
+                                                      subView: o_glview frame: nil] retain];
+        [old_vout release];
     }
 #undef o_glview
 }
