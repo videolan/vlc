@@ -112,9 +112,9 @@ static const uint32_t pi_channels_out[] =
  *****************************************************************************/
 vlc_module_begin();
     set_description( N_("Audio filter for stereo to mono conversion") );
-    set_capability( "audio filter2", 0 );
+    set_capability( "audio filter2", 1 );
 
-    add_bool( MONO_CFG "downmix", false, NULL, MONO_DOWNMIX_TEXT,
+    add_bool( MONO_CFG "downmix", true, NULL, MONO_DOWNMIX_TEXT,
               MONO_DOWNMIX_LONGTEXT, false );
     add_integer( MONO_CFG "channel", -1, NULL, MONO_CHANNEL_TEXT,
         MONO_CHANNEL_LONGTEXT, false );
