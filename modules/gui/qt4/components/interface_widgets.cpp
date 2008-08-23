@@ -1000,8 +1000,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     fsLayout->addWidget( discFrame, 1, 3 );
     fsLayout->addWidget( telexFrame, 1, 4 );
-    fsLayout->addWidget( advControls, 1, 5, Qt::AlignVCenter );
-    fsLayout->addWidget( fullscreenButton, 1, 6 );
+    fsLayout->addWidget( fullscreenButton, 1, 5 );
+    fsLayout->addWidget( advControls, 1, 6, Qt::AlignVCenter );
 
     fsLayout->addWidget( volMuteLabel, 1, 7 );
     fsLayout->addWidget( volumeSlider, 1, 8, 1, 2 );
