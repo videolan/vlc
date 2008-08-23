@@ -7077,7 +7077,7 @@ msgid ""
 msgstr ""
 "Množstvo času (v ms), počas ktorého sa bude čakať na prerušenie prijímania "
 "dát zo siete. Pamätajte prosím nato, že pokus o pripojenie sa pred "
-"definitívnym zrušením zopakuje 10x.\v "
+"definitívnym zrušením zopakuje 10x."
 
 #: modules/access/mms/mms.c:74
 msgid "Microsoft Media Server (MMS) input"
@@ -21262,7 +21262,7 @@ msgid ""
 "Maps the hardware channel X to logical channel Y to fix wrong wiring :-)"
 msgstr ""
 "Namapuje hardvérový kanál X na logický kanál Y, aby sa opravilo zlé "
-"prepojenie :-)\v"
+"prepojenie :-)"
 
 #: modules/video_filter/atmo/atmo.cpp:254
 msgid "disabled"
