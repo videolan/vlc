@@ -49,6 +49,7 @@
   <file alias="type_playlist">pixmaps/types/type_playlist.png</file>
   <file alias="tv">pixmaps/toolbar/tv.png</file>
   <file alias="fullscreen">pixmaps/toolbar/fullscreen.png</file>
+  <file alias="defullscreen">pixmaps/toolbar/defullscreen.png</file>
   <file alias="tvtelx-trans">pixmaps/toolbar/tvtelx-transparent.png</file>
   <file alias="tvtelx">pixmaps/toolbar/tvtelx.png</file>
   <file alias="extended">pixmaps/toolbar/extended_16px.png</file>

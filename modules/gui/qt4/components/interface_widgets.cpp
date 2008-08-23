@@ -1032,6 +1032,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     show();
 #endif
 
+    fullscreenButton->setIcon( QIcon( ":/defullscreen" ) );
+
     vlc_mutex_init_recursive( &lock );
 }
 
