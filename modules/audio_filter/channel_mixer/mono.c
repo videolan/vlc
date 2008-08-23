@@ -359,15 +359,15 @@ static int OpenFilter( vlc_object_t *p_this )
 
     if( aout_FormatNbChannels( &(p_filter->fmt_in.audio) ) == 1 )
     {
-        msg_Dbg( p_filter, "filter discarded (incompatible format)" );
+        /*msg_Dbg( p_filter, "filter discarded (incompatible format)" );*/
         return VLC_EGENERIC;
     }
 
     if( (p_filter->fmt_in.i_codec != AOUT_FMT_S16_NE) ||
         (p_filter->fmt_out.i_codec != AOUT_FMT_S16_NE) )
     {
-        msg_Err( p_this, "filter discarded (invalid format)" );
-        return -1;
+        /*msg_Err( p_this, "filter discarded (invalid format)" );*/
+        return VLC_EGENERIC;
     }
 
     if( (p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format) &&
@@ -377,7 +377,7 @@ static int OpenFilter( vlc_object_t *p_this )
         (p_filter->fmt_in.audio.i_bitspersample !=
                                     p_filter->fmt_out.audio.i_bitspersample))
     {
-        msg_Err( p_this, "couldn't load mono filter" );
+        /*msg_Err( p_this, "couldn't load mono filter" );*/
         return VLC_EGENERIC;
     }
 
