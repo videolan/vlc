@@ -202,8 +202,8 @@
 /* hotkeys */
 - (IBAction)hotkeySettingChanged:(id)sender;
 - (void)showHotkeySettings;
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView;
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
+- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 - (BOOL)changeHotkeyTo: (int)i_theNewKey;
 
 @end

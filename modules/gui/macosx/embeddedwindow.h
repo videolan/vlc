@@ -53,7 +53,7 @@
     BOOL              b_window_is_invisible;
 
     NSSize videoRatio;
-    NSInteger originalLevel;
+    int originalLevel;
 }
 
 - (void)controlTintChanged;

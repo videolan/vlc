@@ -1221,7 +1221,7 @@
 
     pt = [o_outline_view convertPoint: [o_event locationInWindow]
                                                  fromView: nil];
-    NSInteger row = [o_outline_view rowAtPoint:pt];
+    int row = [o_outline_view rowAtPoint:pt];
     if( row != -1 )
         [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
