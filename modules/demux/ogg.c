@@ -190,7 +190,6 @@ static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
-static uint32_t Ogg_ReadDiracPictureNumber( ogg_packet *p_oggpacket );
 
 /*****************************************************************************
  * Open: initializes ogg demux structures
@@ -469,7 +468,6 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
     if( p_oggpacket->granulepos >= 0 )
     {
         if( p_stream->fmt.i_codec == VLC_FOURCC( 't','h','e','o' ) ||
-            p_stream->fmt.i_codec == VLC_FOURCC( 'd','r','a','c' ) ||
             p_stream->fmt.i_codec == VLC_FOURCC( 'k','a','t','e' ) )
         {
             ogg_int64_t iframe = p_oggpacket->granulepos >>
@@ -479,6 +477,12 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
 
             p_stream->i_pcr = ( iframe + pframe ) * INT64_C(1000000)
                               / p_stream->f_rate;
+        }
+        else if( p_stream->fmt.i_codec == VLC_FOURCC( 'd','r','a','c' ) )
+        {
+            ogg_int64_t i_dts = p_oggpacket->granulepos >> 31;
+            /* NB, OggDirac granulepos values are in units of 2*picturerate */
+            p_stream->i_pcr = (i_dts/2) * INT64_C(1000000) / p_stream->f_rate;
         }
         else
         {
@@ -706,15 +710,16 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_block->i_dts = p_block->i_pts = i_pts;
     else if( p_stream->fmt.i_codec == VLC_FOURCC( 'd','r','a','c' ) )
     {
-        /* every packet[1] in the stream contains a picture, there may
-         * be header cruft infront of it though
-         * [1] EXCEPT the BOS page/packet */
-        uint32_t u_pnum = Ogg_ReadDiracPictureNumber( p_oggpacket );
+        ogg_int64_t dts = p_oggpacket->granulepos >> 31;
+        ogg_int64_t delay = (p_oggpacket->granulepos >> 9) & 0x1fff;
 
-        if ( u_pnum != 0xffffffff ) {
-            p_block->i_dts =
-            p_block->i_pts = (u_pnum * INT64_C(1000000) / p_stream->f_rate);
-        }
+        uint64_t u_pnum = dts + delay;
+
+        p_block->i_dts = p_stream->i_pcr;
+        p_block->i_pts = 0;
+        /* NB, OggDirac granulepos values are in units of 2*picturerate */
+        if( -1 != p_oggpacket->granulepos )
+            p_block->i_pts = u_pnum * INT64_C(1000000) / p_stream->f_rate / 2;
     }
     else
     {
@@ -1648,27 +1653,6 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
             p_stream->fmt.i_codec = VLC_FOURCC( 'c','m','m','l' );
         }
     }
-}
-
-/* every packet[1] in the stream contains a picture, there may
- * be header cruft infront of it though
- * [1] EXCEPT the BOS page/packet */
-static uint32_t Ogg_ReadDiracPictureNumber( ogg_packet *p_oggpacket )
-{
-    uint32_t u_pos = 4;
-    /* protect against falling off the edge */
-    while ( u_pos + 13 < p_oggpacket->bytes ) {
-        /* find the picture startcode */
-        if ( p_oggpacket->packet[u_pos] & 0x08 ) {
-            return GetDWBE( p_oggpacket->packet + u_pos + 9 );
-        }
-        /* skip to the next dirac parse unit */
-        uint32_t u_npo = GetDWBE( p_oggpacket->packet + u_pos + 1 );
-        if (u_npo == 0)
-            u_npo = 13;
-        u_pos += u_npo;
-    }
-    return -1;
 }
 
 static uint32_t dirac_uint( bs_t *p_bs )
