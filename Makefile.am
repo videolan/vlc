@@ -7,7 +7,7 @@
 # which have makefiles with distribution information.
 #  - src (libvlc) is nedeed by modules, mozilla and bindings
 #  - libs/* are needed by modules
-BASE_SUBDIRS = po src bin modules share doc test
+BASE_SUBDIRS = po src modules share doc test
 EXTRA_SUBDIRS = m4 extras/package/ipkg \
 	libs/loader libs/srtp \
 	projects/mozilla projects/activex
@@ -19,9 +19,6 @@ SUBDIRS += libs/loader
 endif
 if HAVE_LIBGCRYPT
 SUBDIRS += libs/srtp
-endif
-if BUILD_VLC
-SUBDIRS += bin
 endif
 SUBDIRS += modules share doc test
 if BUILD_MOZILLA
@@ -316,8 +313,8 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile ChangeLog
 libvlc:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlccore.la
 
-core: libvlc
-	cd bin && $(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
+core:
+	cd src && $(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
 
 doc:
 	cd doc && $(MAKE) $(AM_MAKEFLAGS) doc
@@ -392,7 +389,7 @@ endif
 vlc$(EXEEXT): Makefile.am
 	rm -f -- vlc vlc.tmp
 	echo '#! /bin/sh' > vlc.tmp
-	echo 'exec "$$(dirname "$$0")/bin/vlc$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
+	echo 'exec "$$(dirname "$$0")/src/vlc$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
 	chmod +x vlc.tmp
 	mv -f -- vlc.tmp vlc
 
