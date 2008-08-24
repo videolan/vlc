@@ -1177,7 +1177,6 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         return VLC_EGENERIC;
     }
 
-#define NORMAL_OR_RADIO i_type & VLC_VAR_ISCOMMAND ? ITEM_NORMAL: ITEM_RADIO
 #define NOTCOMMAND !( i_type & VLC_VAR_ISCOMMAND )
 #define CURVAL val_list.p_list->p_values[i]
 #define CURTEXT text_list.p_list->p_values[i].psz_string
@@ -1200,7 +1199,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 var_Get( p_object, psz_var, &val );
                 another_val.psz_string = strdup( CURVAL.psz_string );
                 menutext = qfu( CURTEXT ? CURTEXT : another_val.psz_string );
-                CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
+                CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
                         p_object->i_object_id, another_val, i_type,
                         NOTCOMMAND && val.psz_string &&
                         !strcmp( val.psz_string, CURVAL.psz_string ) );
@@ -1212,7 +1211,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 var_Get( p_object, psz_var, &val );
                 if( CURTEXT ) menutext = qfu( CURTEXT );
                 else menutext.sprintf( "%d", CURVAL.i_int );
-                CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
+                CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
                         p_object->i_object_id, CURVAL, i_type,
                         NOTCOMMAND && CURVAL.i_int == val.i_int );
                 break;
@@ -1221,7 +1220,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 var_Get( p_object, psz_var, &val );
                 if( CURTEXT ) menutext = qfu( CURTEXT );
                 else menutext.sprintf( "%.2f", CURVAL.f_float );
-                CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
+                CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
                         p_object->i_object_id, CURVAL, i_type,
                         NOTCOMMAND && CURVAL.f_float == val.f_float );
                 break;
@@ -1235,7 +1234,6 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     /* clean up everything */
     var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, &text_list );
 
-#undef NORMAL_OR_RADIO
 #undef NOTCOMMAND
 #undef CURVAL
 #undef CURTEXT
