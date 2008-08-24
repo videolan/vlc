@@ -350,6 +350,7 @@ void SoutDialog::RTPtoggled( bool b_en )
     ui.RTPLabel->setEnabled( b_en );
     ui.RTPEdit->setEnabled( b_en );
     ui.UDPOutput->setEnabled( b_en );
+    ui.UDPEdit->setEnabled( b_en );
     ui.UDPPort->setEnabled( b_en );
     ui.UDPPortLabel->setEnabled( b_en );
     ui.RTPPort2->setEnabled( b_en );
