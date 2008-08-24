@@ -44,7 +44,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 
     if( p_export_root == NULL ) return VLC_EGENERIC;
 
-    msg_Info( p_playlist, "saving %s to file %s",
+    msg_Dbg( p_playlist, "saving %s to file %s",
                     p_export_root->p_input->psz_name, psz_filename );
 
     /* Prepare the playlist_export_t structure */
