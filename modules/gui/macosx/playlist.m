@@ -1031,9 +1031,23 @@
 
         if( i_item == 0 && !b_enqueue )
         {
-            playlist_item_t *p_item;
+            playlist_item_t *p_item = NULL;
+            playlist_item_t *p_node = NULL;
             p_item = playlist_ItemGetByInput( p_playlist, p_input, pl_Locked );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, NULL, p_item );
+            if( p_item )
+            {
+                if( p_item->i_children == -1 )
+                    p_node = p_item->p_parent;
+                else
+                {
+                    p_node = p_item;
+                    if( p_node->i_children > 0 && p_node->pp_children[0]->i_children == -1 )
+                        p_item = p_node->pp_children[0];
+                    else
+                        p_item = NULL;
+                }
+                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item );
+            }
         }
         vlc_gc_decref( p_input );
     }
@@ -1073,7 +1087,7 @@
         {
             playlist_item_t *p_item;
             p_item = playlist_ItemGetByInput( p_playlist, p_input, pl_Locked );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, NULL, p_item );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item );
         }
         PL_UNLOCK;
         vlc_gc_decref( p_input );
