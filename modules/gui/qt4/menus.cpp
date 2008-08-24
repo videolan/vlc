@@ -289,7 +289,7 @@ QMenu *QVLCMenu::FileMenu()
     addDPStaticEntry( menu, qtr( "&Open File..." ), "",
         ":/file-asym", SLOT( openFileDialog() ), "Ctrl+O" );
     addDPStaticEntry( menu, qtr( I_OPEN_FOLDER ), "",
-        ":/folder-grey", SLOT( PLAppendDir() ), "Ctrl+F" );
+        ":/folder-grey", SLOT( PLOpenDir() ), "Ctrl+F" );
     addDPStaticEntry( menu, qtr( "Open &Disc..." ), "",
         ":/disc", SLOT( openDiscDialog() ), "Ctrl+D" );
     addDPStaticEntry( menu, qtr( "Open &Network..." ), "",
@@ -677,7 +677,7 @@ void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
     addDPStaticEntry( openmenu, qtr( "&Open File..." ), "",
         ":/file-asym", SLOT( openFileDialog() ) );
     addDPStaticEntry( openmenu, qtr( I_OPEN_FOLDER ), "",
-        ":/folder-grey", SLOT( PLAppendDir() ) );
+        ":/folder-grey", SLOT( PLOpenDir() ) );
     addDPStaticEntry( openmenu, qtr( "Open &Disc..." ), "",
         ":/disc", SLOT( openDiscDialog() ) );
     addDPStaticEntry( openmenu, qtr( "Open &Network..." ), "",

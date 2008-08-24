@@ -166,6 +166,7 @@ public slots:
 
     void PLAppendDialog();
     void MLAppendDialog();
+    void PLOpenDir();
     void PLAppendDir();
     void MLAppendDir();
 

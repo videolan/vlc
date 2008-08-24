@@ -422,9 +422,15 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
         playlist_AddInput( THEPL, p_input,
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
                        PLAYLIST_END, pl, pl_Unlocked );
-        input_Read( THEPL, p_input, false );
+        if( !go )
+            input_Read( THEPL, p_input, false );
         vlc_gc_decref( p_input );
     }
+}
+
+void DialogsProvider::PLOpenDir()
+{
+    openDirectory( p_intf, true, true );
 }
 
 void DialogsProvider::PLAppendDir()
