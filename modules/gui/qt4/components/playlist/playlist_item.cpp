@@ -68,9 +68,9 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m, QSett
         }
         else
         {
-            i_showflags = settings->value( "qt-pl-showflags", 39 ).toInt();
+            i_showflags = settings->value( "qt-pl-showflags", 38 ).toInt();
             if( i_showflags < 1)
-                i_showflags = 39; /* reasonable default to show something; */
+                i_showflags = 38; /* reasonable default to show something; */
             else if ( i_showflags >= COLUMN_END )
                 i_showflags = COLUMN_END - 1; /* show everything */
 
@@ -187,7 +187,14 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 
     assert( parentItem->i_showflags < COLUMN_END );
 
-    for( uint32_t i_index=1; i_index < COLUMN_END; i_index <<= 1 )
+    /* Meta: ID */
+    if( parentItem->i_showflags & COLUMN_NUMBER )
+    {
+        QModelIndex idx = model->index( this, 0 );
+        item_col_strings.append( QString::number( idx.row() + 1 ) );
+    }
+    /* Other meta informations */
+    for( uint32_t i_index=2; i_index < COLUMN_END; i_index <<= 1 )
     {
         if( parentItem->i_showflags & i_index )
         {
