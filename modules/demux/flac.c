@@ -431,7 +431,7 @@ static inline int Get24bBE( const uint8_t *p )
     return (p[0] << 16)|(p[1] << 8)|(p[2]);
 }
 
-static void ParseStreamInfo( demux_t *p_demux, int *pi_rate, int64_t *pi_count, uint8_t *p_data, int i_data );
+static void ParseStreamInfo( int *pi_rate, int64_t *pi_count, uint8_t *p_data );
 static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
                             int i_sample_rate );
 static void ParseComment( demux_t *, const uint8_t *p_data, int i_data );
@@ -473,7 +473,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
     }
 
     /* */
-    ParseStreamInfo( p_demux, &i_sample_rate, &i_sample_count,  *pp_streaminfo, *pi_streaminfo );
+    ParseStreamInfo( &i_sample_rate, &i_sample_count, *pp_streaminfo );
     if( i_sample_rate > 0 )
         p_sys->i_length = i_sample_count * INT64_C(1000000)/i_sample_rate;
 
@@ -524,7 +524,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
 
     return VLC_SUCCESS;
 }
-static void ParseStreamInfo( demux_t *p_demux, int *pi_rate, int64_t *pi_count, uint8_t *p_data, int i_data )
+static void ParseStreamInfo( int *pi_rate, int64_t *pi_count, uint8_t *p_data )
 {
     const int i_skip = 4+4;
 
@@ -620,7 +620,7 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
         if( n <= 0 )
             continue;
 
-        psz = strndup( p_data, n );
+        psz = strndup( (const char*)p_data, n );
         RM(n);
 
         EnsureUTF8( psz );
@@ -693,11 +693,11 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
     i_len = GetDWBE( p_data ); RM(4);
     if( i_len < 0 || i_data < i_len + 4 )
         goto error;
-    psz_mime = strndup( p_data, i_len ); RM(i_len);
+    psz_mime = strndup( (const char*)p_data, i_len ); RM(i_len);
     i_len = GetDWBE( p_data ); RM(4);
     if( i_len < 0 || i_data < i_len + 4*4 + 4)
         goto error;
-    psz_description = strndup( p_data, i_len ); RM(i_len);
+    psz_description = strndup( (const char*)p_data, i_len ); RM(i_len);
     EnsureUTF8( psz_description );
     RM(4*4);
     i_len = GetDWBE( p_data ); RM(4);
@@ -717,7 +717,7 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
                                              p_data, i_data );
     TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
 
-    if( i_type >= 0 && i_type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
+    if( i_type >= 0 && (unsigned int)i_type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
         p_sys->i_cover_score < pi_cover_score[i_type] )
     {
         p_sys->i_cover_idx = p_sys->i_attachments-1;
