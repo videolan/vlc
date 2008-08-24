@@ -5429,30 +5429,38 @@ AC_ARG_WITH(mozilla-sdk-path,
 AC_LANG_PUSH(C++)
 if test "${enable_mozilla}" = "yes" 
 then
-  dnl currently vlc plugin only needs headers, no xpcom support apis are actually used
-  need_xpcom_libs=false
+  AS_IF([test "${with_mozilla_sdk_path}" = "" -o "${with_mozilla_sdk_path}" = "no"],
+    [
+    dnl pkg-config
+    dnl As we want to do a loop due to the number of name possible for the .pc 
+    dnl we can't use the pkg-config macros.
 
-  if test "${with_mozilla_sdk_path}" = "" -o "${with_mozilla_sdk_path}" = "no"
-  then
-    dnl New firefox-1.5 SDK api
-    PKG_CHECK_MODULES([FIREFOX], [firefox-plugin],
-      [
-        PKG_CHECK_MODULES([FIREFOX_XPCOM], [firefox-xpcom],
-          [],
-          [
-            PKG_CHECK_MODULES([MOZILLA_NSPR], [mozilla-nspr],
-              [],
-              [
-                PKG_CHECK_MODULES([NSPR], [nspr],
-                  [],
-                  [
-                    AC_MSG_ERROR([Please install the nspr development tools.])
-                  ]
-                )
-              ]
-            )
-          ])
-        CPPFLAGS="${CPPFLAGS_save} ${FIREFOX_CFLAGS} ${FIREFOX_XPCOM_CFLAGS} ${MOZILLA_NSPR_CFLAGS} ${NSPR_CFLAGS} ${MOZILLA_CPPFLAGS}"
+    AC_ARG_VAR([MOZILLA_CFLAGS], [C compiler flags for Mozilla, overriding pkg-config])
+    AC_ARG_VAR([MOZILLA_LIBS], [linker flags for Mozilla, overriding pkg-config])
+    AC_MSG_NOTICE([Checking for Mozilla])
+    found=0
+    if test -n "$MOZILLA_CFLAGS" -a -n "$MOZILLA_LIBS"
+    then
+      found=1
+    else
+      if test -n "$PKG_CONFIG"; then
+	for i in seamonkey iceape xulrunner firefox iceweasel mozilla; do
+	  echo "Trying to find $i .pc files" >&5
+	  i="${i}-xpcom ${i}-plugin"
+	  if $PKG_CONFIG --exists --print-errors "$i" 2>&5
+	  then
+            echo "Using $i .pc files." >&5
+            echo "Using $i .pc files." >&6
+	    found=1
+	    MOZILLA_CFLAGS=$( $PKG_CONFIG --cflags "$i" )
+	    MOZILLA_LIBS=$( $PKG_CONFIG --libs "$i" )
+	    break
+	  fi
+	done
+      fi
+    fi 
+    AS_IF( [test $found = 1],[
+        CPPFLAGS="${CPPFLAGS_save} ${MOZILLA_CFLAGS}"
         MOZILLA_REQUIRED_HEADERS=1
         AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
         AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
@@ -5466,94 +5474,30 @@ then
         fi
         MOZILLA_REQUIRED_HEADERS=
         mozilla=:
-        firefox_include=`pkg-config --variable=includedir firefox-plugin`
-        if test -f "${firefox_include}/mozilla-config.h" -a -f "${firefox_include}/mozilla-config32.h"; then
-            MOZILLA_CONFIG_H="${firefox_include}/mozilla-config32.h"
-        elif test -f "${firefox_include}/mozilla-config.h" -a -f "${firefox_include}/mozilla-config64.h"; then
-            MOZILLA_CONFIG_H="${firefox_include}/mozilla-config64.h"
-        else
-            MOZILLA_CONFIG_H="${firefox_include}/mozilla-config.h"
-        fi
-        if grep '^#define MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
-            AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
+	AC_EGREP_CPP(yes,
+	     [#include <mozilla-config.h>
+	      #ifdef MOZ_X11
+	      yes
+	      #endif],
+            [AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
             VLC_ADD_LIBS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt -lXpm])
-        fi
+        ]) 
         VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS}])
-        VLC_ADD_LDFLAGS([mozilla],[${MOZILLA_LDFLAGS}])
-        VLC_ADD_LIBS([mozilla],[${FIREFOX_LIBS} ${MOZILLA_NSPR_LIBS} ${NSPR_LIBS}])
+        VLC_ADD_LIBS([mozilla],[${MOZILLA_LIBS}])
         VLC_ADD_PLUGIN([mozilla])
+        PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
         MOZILLA_CONFIG=
         CPPFLAGS="${CPPFLAGS_save}"
-      ],
-      [
-        PKG_CHECK_MODULES([XULRUNNER], [libxul],
-          [
-            PKG_CHECK_MODULES([FIREFOX_XPCOM], [firefox-xpcom],
-              [],
-              [
-                PKG_CHECK_MODULES([MOZILLA_NSPR], [mozilla-nspr],
-                  [],
-                  [
-                    PKG_CHECK_MODULES([NSPR], [nspr],
-                      [],
-                      [
-                        AC_MSG_ERROR([Please install the nspr development tools.])
-                      ]
-                    )
-                  ]
-                )
-              ]
-            )
-            CPPFLAGS="${CPPFLAGS_save} ${XULRUNNER_CFLAGS} ${XULRUNNER_CPPFLAGS} ${FIREFOX_XPCOM_CFLAGS} ${MOZILLA_NSPR_CFLAGS} ${NSPR_CFLAGS} ${MOZILLA_CPPFLAGS}"
-            MOZILLA_REQUIRED_HEADERS=1
-            AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
-            AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
-              [#if HAVE_NPAPI_H
-               # include <npapi.h>
-               #endif
-              ])
-            if test "${MOZILLA_REQUIRED_HEADERS}" = "0"; then
-                AC_MSG_ERROR([Please install the Mozilla runtime package xulrunner-devel; plugplugin/npapi.h and plugin/npruntime.h were not found.])
-            fi
-            MOZILLA_REQUIRED_HEADERS=
-            mozilla=:
-            AC_DEFINE([XP_UNIX],[1],[Defined for Mozilla as we are Unix])
-            AC_DEFINE([MOZ_X11],[1],[Defined as Unix mozilla uses X11])
-            AC_DEFINE([OJI],[1],[Java Runtime Interface])
-            AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
-            VLC_ADD_LIBS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt -lXpm])
-            VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS}])
-            VLC_ADD_LDFLAGS([mozilla],[${MOZILLA_LDFLAGS}])
-            VLC_ADD_LIBS([mozilla],[${FIREFOX_LIBS} ${MOZILLA_NSPR_LIBS} ${NSPR_LIBS}])
-            VLC_ADD_PLUGIN([mozilla])
-            MOZILLA_CONFIG=
-            CPPFLAGS="${CPPFLAGS_save}"
           ],
           [
-            AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
-            if test "${MOZILLA_CONFIG}" = "no"
-            then
-              AC_PATH_PROG(SEAMONKEY_CONFIG, seamonkey-config, no)
-              if test "${SEAMONKEY_CONFIG}" = "no"
-              then
-                AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
-                if test "${XULRUNNER_CONFIG}" = "no"
-                then
-                  AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
-                else
-                  have_xul=true
-                  MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
-                fi
-              else
-                MOZILLA_CONFIG="${SEAMONKEY_CONFIG}"
-              fi
-            fi
+            AC_PATH_PROGS(MOZILLA_CONFIG, 
+	    [mozilla-config seamonkey-config xulrunner-config], 
+            AC_MSG_ERROR([Please install the Mozilla development tools. mozilla-config was not found.])
+		  )
           ]
         )
-      ]
-    )
-    if test ! -z "${MOZILLA_CONFIG}"
-    then
+    dnl pkg-config failed but we might have found a mozilla-config
+    AS_IF( [test ! -z "${MOZILLA_CONFIG}"],[
       if ${MOZILLA_CONFIG} --defines | grep -q 'MOZ_X11=1'; then
         LDFLAGS="${LDFLAGS_save} ${X_LIBS} ${X_PRE_LIBS}"
         AC_CHECK_LIB(Xt,XtStrings,
@@ -5570,13 +5514,8 @@ then
 
       mozilla=:
       PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
-      dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
-      VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
-      if ${need_xpcom_libs}; then
-         VLC_ADD_LIBS([mozilla],[`${MOZILLA_CONFIG} --libs plugin xpcom`])
-      else
-         VLC_ADD_LIBS([mozilla],[`${MOZILLA_CONFIG} --libs plugin`])
-      fi
+      VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin java`]])
+      VLC_ADD_LIBS([mozilla],[`${MOZILLA_CONFIG} --libs plugin`])
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mozilla}"
       MOZILLA_REQUIRED_HEADERS=1
       AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
@@ -5593,9 +5532,9 @@ then
       MOZILLA_REQUIRED_HEADERS=
       CPPFLAGS="${CPPFLAGS_save}"
       MOZILLA_SDK_PATH="`${MOZILLA_CONFIG} --prefix`"
-    fi
+    ])
     dnl End of moz_sdk = ""
-  else
+  ],[
     dnl special case for mingw32
     if test "${SYS}" = "mingw32"
     then
@@ -5640,7 +5579,7 @@ then
       real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
     fi
     CPPFLAGS="${CPPFLAGS_save}"
-  fi
+ ]) 
 fi
 AC_LANG_POP(C++)
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
