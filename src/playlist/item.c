@@ -763,7 +763,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                                                 p_playlist->p_root_category,
                                                 false );
             if( p_node_category && p_item_category )
-                TreeMove( p_playlist, p_item_category, p_node_category, i_newpos );
+                TreeMove( p_playlist, p_item_category, p_node_category, 0 );
         }
         i_ret = VLC_SUCCESS;
     }
