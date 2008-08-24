@@ -382,7 +382,7 @@ void MainInterface::handleMainUi( QSettings *settings )
              this, doComponentsUpdate() );
 
 #ifdef WIN32
-    if ( depth > 8 )
+    if ( depth() > 8 )
 #endif
     /* Create the FULLSCREEN CONTROLS Widget */
     if( config_GetInt( p_intf, "qt-fs-controller" ) )
