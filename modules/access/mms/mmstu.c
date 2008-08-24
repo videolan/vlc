@@ -739,9 +739,9 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
         GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 60 );
 
     msg_Dbg( p_access,
-             "answer 0x06 flags:0x%8.8x media_length:%us "
-             "packet_length:%ul packet_count:%d max_bit_rate:%d "
-             "header_size:%d",
+             "answer 0x06 flags:0x%8.8"PRIx32" media_length:%"PRIu32"s "
+             "packet_length:%zul packet_count:%"PRId32" max_bit_rate:%d "
+             "header_size:%zu",
              p_sys->i_flags_broadcast,
              p_sys->i_media_length,
              (unsigned)p_sys->i_packet_length,
@@ -795,12 +795,12 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
         if( p_sys->i_header >= p_sys->i_header_size )
         {
             msg_Dbg( p_access,
-                     "header complete(%d)",
+                     "header complete(%zu)",
                      p_sys->i_header );
             break;
         }
         msg_Dbg( p_access,
-                 "header incomplete (%d/%d), reading more",
+                 "header incomplete (%zu/%zu), reading more",
                  p_sys->i_header,
                  p_sys->i_header_size );
     }
@@ -1169,7 +1169,7 @@ static int NetFillBuffer( access_t *p_access )
 
 static int  mms_ParseCommand( access_t *p_access,
                               uint8_t *p_data,
-                              int i_data,
+                              size_t i_data,
                               int *pi_used )
 {
  #define GET32( i_pos ) \
@@ -1178,7 +1178,7 @@ static int  mms_ParseCommand( access_t *p_access,
       ( p_sys->p_cmd[i_pos + 3] << 24 ) )
 
     access_sys_t        *p_sys = p_access->p_sys;
-    int         i_length;
+    uint32_t    i_length;
     uint32_t    i_id;
 
     free( p_sys->p_cmd );
@@ -1197,10 +1197,10 @@ static int  mms_ParseCommand( access_t *p_access,
     i_id =  GetDWLE( p_data + 4 );
     i_length = GetDWLE( p_data + 8 ) + 16;
 
-    if( i_id != 0xb00bface )
+    if( i_id != 0xb00bface || i_length < 16 )
     {
         msg_Err( p_access,
-                 "incorrect command header (0x%x)", i_id );
+                 "incorrect command header (0x%"PRIx32")", i_id );
         p_sys->i_command = 0;
         return -1;
     }
@@ -1208,8 +1208,8 @@ static int  mms_ParseCommand( access_t *p_access,
     if( i_length > p_sys->i_cmd )
     {
         msg_Warn( p_access,
-                  "truncated command (missing %d bytes)",
-                   i_length - i_data  );
+                  "truncated command (missing %zu bytes)",
+                   (size_t)i_length - i_data  );
         p_sys->i_command = 0;
         return -1;
     }

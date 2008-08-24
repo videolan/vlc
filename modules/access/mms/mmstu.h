@@ -67,10 +67,10 @@ struct access_sys_t
     int         i_packet_seq_num;
 
     uint8_t     *p_cmd;     /* latest command read */
-    int         i_cmd;      /* allocated at the begining */
+    size_t      i_cmd;      /* allocated at the begining */
 
     uint8_t     *p_header;  /* allocated by mms_ReadPacket */
-    int         i_header;
+    size_t      i_header;
 
     uint8_t     *p_media;   /* allocated by mms_ReadPacket */
     size_t      i_media;
@@ -91,7 +91,7 @@ struct access_sys_t
     size_t      i_packet_length;
     uint32_t    i_packet_count;
     int         i_max_bit_rate;
-    int         i_header_size;
+    size_t      i_header_size;
 
     /* misc */
     bool  b_seekable;
