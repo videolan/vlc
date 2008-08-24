@@ -314,7 +314,7 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile ChangeLog
 # Don't use it if you don't know what it is about.
 # Don't complain if it doesn't work. -- Courmisch
 libvlc:
-	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlccore.la
+	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlc.la
 
 core: libvlc
 	cd bin && $(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
