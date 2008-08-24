@@ -851,6 +851,7 @@ static void BlendI420I420_no_alpha( filter_t *p_filter, picture_t *p_dst,
                                     int i_x_offset, int i_y_offset,
                                     int i_width, int i_height )
 {
+    VLC_UNUSED(p_dst_orig);
     int i_src2_pitch, i_dst_pitch;
     uint8_t *p_src2_y, *p_dst_y;
     uint8_t *p_src2_u, *p_dst_u;
@@ -951,7 +952,7 @@ static void BlendI420R16( filter_t *p_filter, picture_t *p_dst_pic,
 
             vlc_blend_rgb16( (uint16_t*)&p_dst[i_x * i_pix_pitch],
                              (const uint16_t*)&p_src1[i_x * i_pix_pitch],
-                             r, g, b, 0xff, &p_filter->fmt_out.video );
+                             r, g, b, i_alpha, &p_filter->fmt_out.video );
         }
         if( i_y%2 == 1 )
         {
