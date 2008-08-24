@@ -35,73 +35,36 @@
 #include <stdlib.h>
 #include <windows.h>
 
-static int parse_cmdline (char *line, char ***argvp)
+static char *FromWide (const wchar_t *wide)
 {
-    char **argv = malloc (sizeof (char *));
-    int argc = 0;
+    size_t len;
+    len = WideCharToMultiByte (CP_UTF8, 0, wide, -1, NULL, 0, NULL, NULL);
 
-    while (*line != '\0')
-    {
-        char quote = 0;
-
-        /* Skips white spaces */
-        while (strchr ("\t ", *line))
-            line++;
-        if (!*line)
-            break;
-
-        /* Starts a new parameter */
-        argv = realloc (argv, (argc + 2) * sizeof (char *));
-        if (*line == '"')
-        {
-            quote = '"';
-            line++;
-        }
-        argv[argc++] = line;
-
-    more:
-        while (*line && !strchr ("\t ", *line))
-            line++;
-
-        if (line > argv[argc - 1] && line[-1] == quote)
-            /* End of quoted parameter */
-            line[-1] = 0;
-        else
-        if (*line && quote)
-        {
-            /* Space within a quote */
-            line++;
-            goto more;
-        }
-        else
-        /* End of unquoted parameter */
-        if (*line)
-            *line++ = 0;
-    }
-    argv[argc] = NULL;
-    *argvp = argv;
-    return argc;
+    char *out = (char *)malloc (len);
+    if (out)
+        WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
+    return out;
 }
 
-#ifdef UNDER_CE
-# define wWinMain WinMain
+
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
+#ifndef UNDER_CE
+                    LPSTR lpCmdLine,
+#else
+                    LPWSTR lpCmdLine,
 #endif
-
-/*****************************************************************************
- * wWinMain: parse command line, start interface and spawn threads.
- *****************************************************************************/
-int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                     LPWSTR lpCmdLine, int nCmdShow )
+                    int nCmdShow )
 {
-    char **argv, psz_cmdline[wcslen(lpCmdLine) * 4 + 1];
     int argc, ret;
+    wchar_t **wargv = CommandLineToArgvW (GetCommandLine (), &argc);
+    if (wargv == NULL)
+        return 1;
 
-    (void)hInstance; (void)hPrevInstance; (void)nCmdShow;
-
-    WideCharToMultiByte( CP_UTF8, 0, lpCmdLine, -1,
-                         psz_cmdline, sizeof (psz_cmdline), NULL, NULL );
-
-    argc = parse_cmdline (psz_cmdline, &argv);
+    char *argv[argc + 1];
+    for (int i = 0; i < argc; i++)
+        argv[i] = FromWide (wargv[i]);
+    argv[argc] = NULL;
+    LocalFree (wargv);
 
     libvlc_exception_t ex, dummy;
     libvlc_exception_init (&ex);
@@ -121,16 +84,10 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     ret = libvlc_exception_raised (&ex);
     libvlc_exception_clear (&ex);
     libvlc_exception_clear (&dummy);
+
+    for (int i = 0; i < argc; i++)
+        free (argv[i]);
+
+    (void)hInstance; (void)hPrevInstance; (void)lpCmdLine; (void)nCmdShow;
     return ret;
 }
-
-#ifndef IF_MINGW_SUPPORTED_UNICODE
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                    LPSTR args, int nCmdShow)
-{
-    /* This makes little sense, but at least it links properly */
-    wchar_t lpCmdLine[(strlen (args) + 1) * 3];
-    MultiByteToWideChar (CP_ACP, 0, args, -1, lpCmdLine, sizeof (lpCmdLine));
-    return wWinMain (hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-}
-#endif
