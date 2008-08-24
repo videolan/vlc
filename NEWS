@@ -22,6 +22,8 @@ Important notes:
    now require a target name as their first argument. Example:
    vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
    You can then use commands like: @test marq-marquee Goodbye
+   If you didn't name the object using @test, its name will default to the
+   plugin name (hence 'marq') in this example.
    These new commands are also available in the telnet interface.
  * The "rtp" access output module has been removed.
    Please use the RTP stream output instead, e.g.:
@@ -161,7 +163,8 @@ Video outputs and filters:
  * New erase video filter (removes logos from a video)
  * Enhanced subtitles' renderer to support bold, italic and some HTML tags
    (Google Summer of Code Student project)
- * Support for RGBA and I420 blending. This improves Mosaic CPU usage *a lot*.
+ * Support for RGBA and I420 blending.
+   The latter improves Mosaic CPU usage *a lot*.
  * New transparency mask video filter (for use with the mosaic_bridge module).
  * New bluescreen video filter (for use with the mosaic_bridge module). 
    This was previously part of the mosaic module.
