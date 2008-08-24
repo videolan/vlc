@@ -373,7 +373,7 @@ add_integer_with_range(CFG_PREFIX "SatWinSize",   3, 0, 5, NULL,
 add_integer(CFG_PREFIX "filtermode", (int)afmCombined, NULL,
             FILTERMODE_TEXT, FILTERMODE_LONGTEXT, false );
 
-change_integer_list(pi_filtermode_values, ppsz_filtermode_descriptions, 0 );
+change_integer_list(pi_filtermode_values, ppsz_filtermode_descriptions, NULL );
 
 add_integer_with_range(CFG_PREFIX "MeanLength",    300, 300, 5000, NULL,
                        MEANLENGTH_TEXT, MEANLENGTH_LONGTEXT, false);

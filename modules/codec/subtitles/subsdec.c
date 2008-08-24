@@ -123,7 +123,7 @@ vlc_module_begin();
 
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
                  false );
-        change_integer_list( pi_justification, ppsz_justification_text, 0 );
+        change_integer_list( pi_justification, ppsz_justification_text, NULL );
     add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
                 ENCODING_TEXT, ENCODING_LONGTEXT, false );
         change_string_list( ppsz_encodings, 0, 0 );

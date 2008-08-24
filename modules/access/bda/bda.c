@@ -192,7 +192,7 @@ vlc_module_begin();
     /* DVB-S (satellite) */
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT,
         INVERSION_LONGTEXT, true );
-        change_integer_list( i_inversion_list, ppsz_inversion_text, 0 );
+        change_integer_list( i_inversion_list, ppsz_inversion_text, NULL );
 #   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
             POLARISATION_LONGTEXT, true );
@@ -230,26 +230,26 @@ vlc_module_begin();
     /* DVB-C (cable) */
     add_integer( "dvb-modulation", -1, NULL, MODULATION_TEXT,
         MODULATION_LONGTEXT, true );
-        change_integer_list( i_qam_list, ppsz_qam_text, 0 );
+        change_integer_list( i_qam_list, ppsz_qam_text, NULL );
 
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", -1, NULL, CODE_RATE_HP_TEXT,
         CODE_RATE_HP_LONGTEXT, true );
-        change_integer_list( i_hp_fec_list, ppsz_hp_fec_text, 0 );
+        change_integer_list( i_hp_fec_list, ppsz_hp_fec_text, NULL );
     add_integer( "dvb-code-rate-lp", -1, NULL, CODE_RATE_LP_TEXT,
         CODE_RATE_LP_LONGTEXT, true );
-        change_integer_list( i_lp_fec_list, ppsz_lp_fec_text, 0 );
+        change_integer_list( i_lp_fec_list, ppsz_lp_fec_text, NULL );
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
         true );
-        change_integer_list( i_band_list, ppsz_band_text, 0 );
+        change_integer_list( i_band_list, ppsz_band_text, NULL );
     add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true );
-        change_integer_list( i_guard_list, ppsz_guard_text, 0 );
+        change_integer_list( i_guard_list, ppsz_guard_text, NULL );
     add_integer( "dvb-transmission", -1, NULL, TRANSMISSION_TEXT,
         TRANSMISSION_LONGTEXT, true );
-        change_integer_list( i_transmission_list, ppsz_transmission_text, 0 );
+        change_integer_list( i_transmission_list, ppsz_transmission_text, NULL );
     add_integer( "dvb-hierarchy", -1, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
         true );
-        change_integer_list( i_hierarchy_list, ppsz_hierarchy_text, 0 );
+        change_integer_list( i_hierarchy_list, ppsz_hierarchy_text, NULL );
 
     set_capability( "access", 0 );
     add_shortcut( "dvb" );      /* Generic name */

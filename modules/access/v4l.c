@@ -168,7 +168,7 @@ vlc_module_begin();
     add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, true );
     add_integer( "v4l-norm", VIDEO_MODE_AUTO, NULL, NORM_TEXT, NORM_LONGTEXT,
                 false );
-        change_integer_list( i_norm_list, psz_norm_list_text, 0 );
+        change_integer_list( i_norm_list, psz_norm_list_text, NULL );
     add_integer( "v4l-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
                 false );
     add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, true );

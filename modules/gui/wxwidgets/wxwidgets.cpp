@@ -147,7 +147,7 @@ vlc_module_begin();
         add_deprecated_alias( "wxwin-autosize" ); /*Deprecated since 0.8.4*/
     add_integer( "wx-playlist-view", 0, NULL, PLAYLIST_TEXT, PLAYLIST_LONGTEXT,
              false );
-        change_integer_list( pi_playlist_views, psz_playlist_views, 0 );
+        change_integer_list( pi_playlist_views, psz_playlist_views, NULL );
 /* wxCocoa pretends to support this, but at least 2.6.x doesn't */
 #ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON

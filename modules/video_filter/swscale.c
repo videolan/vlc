@@ -66,7 +66,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_callbacks( OpenScaler, CloseScaler );
     add_integer( "swscale-mode", 2, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, true );
-        change_integer_list( pi_mode_values, ppsz_mode_descriptions, 0 );
+        change_integer_list( pi_mode_values, ppsz_mode_descriptions, NULL );
 vlc_module_end();
 
 /* Version checking */

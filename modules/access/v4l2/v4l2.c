@@ -282,7 +282,7 @@ vlc_module_begin();
                 false );
     add_integer( CFG_PREFIX "standard", 0, NULL, STANDARD_TEXT,
                  STANDARD_LONGTEXT, false );
-        change_integer_list( i_standards_list, psz_standards_list_text, 0 );
+        change_integer_list( i_standards_list, psz_standards_list_text, NULL );
     add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true );
     add_integer( CFG_PREFIX "input", 0, NULL, INPUT_TEXT, INPUT_LONGTEXT,
@@ -291,7 +291,7 @@ vlc_module_begin();
                  AUDIO_INPUT_LONGTEXT, true );
     add_integer( CFG_PREFIX "io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT,
                  IOMETHOD_LONGTEXT, true );
-        change_integer_list( i_iomethod_list, psz_iomethod_list_text, 0 );
+        change_integer_list( i_iomethod_list, psz_iomethod_list_text, NULL );
     add_integer( CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
                 WIDTH_LONGTEXT, true );
     add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,

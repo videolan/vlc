@@ -158,7 +158,7 @@ vlc_module_begin();
 
         add_integer( "qt-display-mode", QT_NORMAL_MODE, NULL,
                      QT_MODE_TEXT, QT_MODE_LONGTEXT, false );
-            change_integer_list( i_mode_list, psz_mode_list_text, 0 );
+            change_integer_list( i_mode_list, psz_mode_list_text, NULL );
 
         add_bool( "qt-notification", true, NULL, NOTIFICATION_TEXT,
                   NOTIFICATION_LONGTEXT, false );

@@ -1447,7 +1447,7 @@ vlc_module_begin();
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, false );
     add_integer( "force-dolby-surround", 0, NULL, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false );
-        change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, 0 );
+        change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, NULL );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true );
         change_safe();
@@ -1514,7 +1514,7 @@ vlc_module_begin();
                  VIDEO_TITLE_TIMEOUT_LONGTEXT, false );
     add_integer( "video-title-position", 8, NULL, VIDEO_TITLE_POSITION_TEXT,
                  VIDEO_TITLE_POSITION_LONGTEXT, false );
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
     // autohide after 1.5s
     add_integer( "mouse-hide-timeout", 1500, NULL, MOUSE_HIDE_TIMEOUT_TEXT,
                  MOUSE_HIDE_TIMEOUT_LONGTEXT, false );
@@ -1562,7 +1562,7 @@ vlc_module_begin();
     add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
                  VIDEO_TITLE_LONGTEXT, true );
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, true );
-        change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
+        change_integer_list( pi_align_values, ppsz_align_descriptions, NULL );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, true );
 
 
@@ -1722,7 +1722,7 @@ vlc_module_begin();
                  CR_AVERAGE_LONGTEXT, true );
     add_integer( "clock-synchro", -1, NULL, CLOCK_SYNCHRO_TEXT,
                  CLOCK_SYNCHRO_LONGTEXT, true );
-        change_integer_list( pi_clock_values, ppsz_clock_descriptions, 0 );
+        change_integer_list( pi_clock_values, ppsz_clock_descriptions, NULL );
 
     add_bool( "network-synchronisation", false, NULL, NETSYNC_TEXT,
               NETSYNC_LONGTEXT, true );
