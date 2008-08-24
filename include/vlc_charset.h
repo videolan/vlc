@@ -72,7 +72,8 @@ static inline char *FromWide (const wchar_t *wide)
 
     char *out = (char *)malloc (len);
 
-    WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
+    if (out)
+        WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
     return out;
 }
 #endif
