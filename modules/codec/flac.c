@@ -161,6 +161,8 @@ static void DecoderErrorCallback( const FLAC__StreamDecoder *decoder,
 
 static void Interleave32( int32_t *p_out, const int32_t * const *pp_in,
                           int i_nb_channels, int i_samples );
+static void Interleave24( int8_t *p_out, const int32_t * const *pp_in,
+                          int i_nb_channels, int i_samples );
 static void Interleave16( int16_t *p_out, const int32_t * const *pp_in,
                           int i_nb_channels, int i_samples );
 
@@ -630,6 +632,10 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
         Interleave16( (int16_t *)p_sys->p_aout_buffer->p_buffer, buffer,
                       frame->header.channels, frame->header.blocksize );
         break;
+    case 24:
+        Interleave24( (int8_t *)p_sys->p_aout_buffer->p_buffer, buffer,
+                      frame->header.channels, frame->header.blocksize );
+        break;
     default:
         Interleave32( (int32_t *)p_sys->p_aout_buffer->p_buffer, buffer,
                       frame->header.channels, frame->header.blocksize );
@@ -663,6 +669,9 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
             break;
         case 16:
             p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+            break;
+        case 24:
+            p_dec->fmt_out.i_codec = AOUT_FMT_S24_NE;
             break;
         default:
             msg_Dbg( p_dec, "strange bit/sample value: %d",
@@ -739,6 +748,28 @@ static void Interleave32( int32_t *p_out, const int32_t * const *pp_in,
         }
     }
 }
+
+static void Interleave24( int8_t *p_out, const int32_t * const *pp_in,
+                          int i_nb_channels, int i_samples )
+{
+    int i, j;
+    for ( j = 0; j < i_samples; j++ )
+    {
+        for ( i = 0; i < i_nb_channels; i++ )
+        {
+#ifdef WORDS_BIGENDIAN
+            p_out[3*(j * i_nb_channels + i)+0] = (pp_in[i][j] >> 16) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+1] = (pp_in[i][j] >> 8 ) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+2] = (pp_in[i][j] >> 0 ) & 0xff;
+#else
+            p_out[3*(j * i_nb_channels + i)+2] = (pp_in[i][j] >> 16) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+1] = (pp_in[i][j] >> 8 ) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+0] = (pp_in[i][j] >> 0 ) & 0xff;
+#endif
+        }
+    }
+}
+
 static void Interleave16( int16_t *p_out, const int32_t * const *pp_in,
                           int i_nb_channels, int i_samples )
 {
