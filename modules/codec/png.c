@@ -83,7 +83,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','3','2');
+    p_dec->fmt_out.i_codec = VLC_FOURCC('R','G','B','A');
 
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
@@ -178,7 +178,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->b_error ) goto error;
 
     /* Set output properties */
-    p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','3','2');
+    p_dec->fmt_out.i_codec = VLC_FOURCC('R','G','B','A');
     p_dec->fmt_out.video.i_width = i_width;
     p_dec->fmt_out.video.i_height = i_height;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
