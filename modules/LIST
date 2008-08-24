@@ -276,7 +276,6 @@ $Id$
  * screen: a input module that takes screenshots of the primary monitor
  * screensaver: screensaver disabling module
  * sdl_image: SDL-based image decoder
- * seamcarving: Seam Carving for Content-Aware Image Resizing video filter
  * sharpen: Sharpen video filter
  * shout: Shoutcast services discovery
  * showintf: shows the main interface

@@ -36,7 +36,6 @@ SOURCES_bluescreen = bluescreen.c
 SOURCES_alphamask = alphamask.c
 SOURCES_gaussianblur = gaussianblur.c
 SOURCES_grain = grain.c
-SOURCES_seamcarving = seamcarving.c
 SOURCES_croppadd = croppadd.c
 SOURCES_canvas = canvas.c
 SOURCES_blendbench = blendbench.c
