@@ -1,18 +1,18 @@
-# Finnish translation of VLC.
+# Finnish translation of PACKAGE.
 # Copyright (C) 2008 VideoLAN
-# This file is distributed under the same license as the  VLC package.
+# This file is distributed under the same license as the PACKAGE package.
 # Jouni Kähkönen <email: user is kajouni and host name is mbnet dot fi>, 2008.
 # Translated by Jouni Kähkönen 2007 and 2008 (user name: kajouni, and host name: mbnet dot fi)
 # , fuzzy
 # Jouni Kähkönen <email: user is kajouni and host name is mbnet dot fi>, 2008.
-# Otto Kekäläinen <otto qt sange . fi>, 2008
+#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.86\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-08-24 00:09+0100\n"
-"PO-Revision-Date: 2008-08-23 19:53+0200\n"
+"POT-Creation-Date: 2008-08-24 20:25+0100\n"
+"PO-Revision-Date: 2008-08-24 21:46+0200\n"
 "Last-Translator: Otto Kekäläinen <otto@sange.fi>\n"
 "Language-Team: Finnish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -236,7 +236,7 @@ msgstr "Yleiset syöteasetukset. Käytä varoen."
 
 #: include/vlc_config_cat.h:131 src/libvlc-module.c:1760
 msgid "Stream output"
-msgstr "Suoratoisto"
+msgstr "Suoratoiston ulostulo"
 
 #: include/vlc_config_cat.h:133
 msgid ""
@@ -328,9 +328,9 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:326 modules/gui/macosx/intf.m:494
 #: modules/gui/pda/pda_interface.c:1262
 #: modules/gui/qt4/dialogs/playlist.cpp:48
-#: modules/gui/qt4/main_interface.cpp:127
+#: modules/gui/qt4/main_interface.cpp:120
 msgid "Playlist"
-msgstr "Soittoluettelo"
+msgstr "Soittolista"
 
 #: include/vlc_config_cat.h:183
 msgid ""
@@ -476,9 +476,8 @@ msgid "Media &Information..."
 msgstr "Tietovälineen tiedot..."
 
 #: include/vlc_intf_strings.h:43
-#, fuzzy
 msgid "&Codec Information..."
-msgstr "Koodekin tiedot..."
+msgstr "&Koodekin tiedot..."
 
 #: include/vlc_intf_strings.h:44
 #, fuzzy
@@ -486,9 +485,8 @@ msgid "&Messages..."
 msgstr "Viestit"
 
 #: include/vlc_intf_strings.h:45
-#, fuzzy
 msgid "&Extended Settings..."
-msgstr "Lisäasetukset..."
+msgstr "Lisä&asetukset..."
 
 #: include/vlc_intf_strings.h:46
 #, fuzzy
@@ -500,9 +498,8 @@ msgid "&Bookmarks..."
 msgstr "Kirjanmerkit..."
 
 #: include/vlc_intf_strings.h:48
-#, fuzzy
 msgid "&VLM Configuration..."
-msgstr "VLM-asetukset..."
+msgstr "&VLM-asetukset..."
 
 #: include/vlc_intf_strings.h:50
 msgid "&About..."
@@ -549,7 +546,7 @@ msgstr "Lisää solmu"
 
 #: include/vlc_intf_strings.h:59
 msgid "Stream..."
-msgstr "Toista virtaa..."
+msgstr "Suoratoista..."
 
 #: include/vlc_intf_strings.h:60
 msgid "Save..."
@@ -602,13 +599,12 @@ msgid "Add directory..."
 msgstr "Lisää kansio..."
 
 #: include/vlc_intf_strings.h:79
-#, fuzzy
 msgid "Save Playlist to &File..."
-msgstr "Tallenna soittolista tiedostoon..."
+msgstr "Tallenna soittolista &tiedostoon..."
 
 #: include/vlc_intf_strings.h:80
 msgid "&Load Playlist File..."
-msgstr "&Lataa soittolista tiedostosta..."
+msgstr "Lataa &soittolista..."
 
 #: include/vlc_intf_strings.h:82
 msgid "Search"
@@ -620,9 +616,8 @@ msgid "Search Filter"
 msgstr "Hakusuodatin"
 
 #: include/vlc_intf_strings.h:85
-#, fuzzy
 msgid "Additional &Sources"
-msgstr "Lisää lähteitä"
+msgstr "Muut &lähteet"
 
 #: include/vlc_intf_strings.h:89
 msgid ""
@@ -966,7 +961,7 @@ msgstr ""
 #: src/input/es_out.c:2046 modules/codec/faad.c:386
 #, c-format
 msgid "Stream %d"
-msgstr "Suoratoisto %d"
+msgstr "Suoratoista %d"
 
 #: src/input/es_out.c:2049 modules/gui/macosx/wizard.m:383
 #: modules/gui/qt4/ui/sout.ui:671 modules/gui/qt4/ui/sout.ui:758
@@ -1174,12 +1169,12 @@ msgid "Chapter %i"
 msgstr "Luku %i"
 
 #: src/input/var.c:367 modules/gui/beos/InterfaceWindow.cpp:291
-#: modules/gui/qt4/components/interface_widgets.cpp:837
+#: modules/gui/qt4/components/interface_widgets.cpp:847
 msgid "Next chapter"
 msgstr "Seuraava luku"
 
 #: src/input/var.c:372 modules/gui/beos/InterfaceWindow.cpp:290
-#: modules/gui/qt4/components/interface_widgets.cpp:836
+#: modules/gui/qt4/components/interface_widgets.cpp:846
 msgid "Previous chapter"
 msgstr "Edellinen luku"
 
@@ -1775,7 +1770,7 @@ msgstr "Suojaudu äänen leikkaantumiselta"
 
 #: src/libvlc-module.c:319 modules/access/dshow/dshow.cpp:81
 #: modules/access/dshow/dshow.cpp:83 modules/codec/avcodec/avcodec.c:71
-#: modules/gui/qt4/components/interface_widgets.cpp:258
+#: modules/gui/qt4/components/interface_widgets.cpp:268
 #: modules/video_output/opengl.c:126 modules/video_output/opengl.c:182
 msgid "None"
 msgstr "Ei mikään"
@@ -3403,7 +3398,7 @@ msgstr "Valitse pelattava pelityyppi"
 
 #: src/libvlc-module.c:1166 modules/control/hotkeys.c:695
 #: modules/gui/macosx/controls.m:868 modules/gui/macosx/intf.m:533
-#: modules/gui/qt4/components/interface_widgets.cpp:513
+#: modules/gui/qt4/components/interface_widgets.cpp:523
 msgid "Faster"
 msgstr "Nopeampi toisto"
 
@@ -3413,7 +3408,7 @@ msgstr "Valitse pikatoiston pikanäppäin."
 
 #: src/libvlc-module.c:1168 modules/control/hotkeys.c:701
 #: modules/gui/macosx/controls.m:869 modules/gui/macosx/intf.m:534
-#: modules/gui/qt4/components/interface_widgets.cpp:507
+#: modules/gui/qt4/components/interface_widgets.cpp:517
 msgid "Slower"
 msgstr "Hitaampi toisto"
 
@@ -3692,7 +3687,7 @@ msgstr ""
 #: src/libvlc-module.c:1240 modules/access/v4l2/v4l2.c:195
 #: modules/gui/macosx/controls.m:928 modules/gui/macosx/intf.m:553
 #: modules/gui/macosx/intf.m:614 modules/gui/macosx/intf.m:623
-#: modules/gui/qt4/components/interface_widgets.cpp:876
+#: modules/gui/qt4/components/interface_widgets.cpp:886
 msgid "Mute"
 msgstr "Vaimenna"
 
@@ -3986,7 +3981,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1314 modules/access_filter/record.c:56
 #: modules/access_filter/record.c:57 modules/gui/macosx/simple_prefs.m:257
-#: modules/gui/qt4/components/interface_widgets.cpp:344
+#: modules/gui/qt4/components/interface_widgets.cpp:354
 #: modules/gui/qt4/ui/sprefs_input.ui:194
 msgid "Record"
 msgstr "Nauhoita"
@@ -5745,7 +5740,7 @@ msgstr ""
 
 #: modules/access/directory.c:97 modules/gui/qt4/ui/sprefs_video.ui:171
 msgid "Directory"
-msgstr "Kansio"
+msgstr "Hakemisto"
 
 #: modules/access/directory.c:99
 #, fuzzy
@@ -6787,18 +6782,16 @@ msgid "RTMP"
 msgstr "RTP"
 
 #: modules/access_output/shout.c:63
-#, fuzzy
 msgid "Stream name"
-msgstr "Lisäosan nimi:"
+msgstr "Suoratoiston nimi"
 
 #: modules/access_output/shout.c:64
 msgid "Name to give to this stream/channel on the shoutcast/icecast server."
 msgstr ""
 
 #: modules/access_output/shout.c:67
-#, fuzzy
 msgid "Stream description"
-msgstr "Pitkä kuvaus"
+msgstr "Suoratoiston kuvaus"
 
 #: modules/access_output/shout.c:68
 msgid "Description of the stream content or information about your channel."
@@ -7275,9 +7268,8 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:83
 #: modules/gui/qt4/components/open_panels.cpp:700
 #: modules/stream_out/standard.c:100
-#, fuzzy
 msgid "Standard"
-msgstr "Tavallinen"
+msgstr "Standardi"
 
 #: modules/access/v4l2/v4l2.c:85
 #, fuzzy
@@ -8695,14 +8687,14 @@ msgstr "PORTAUDIO-äänen ulostulo"
 #: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:481
 #: modules/gui/macosx/intf.m:482 modules/gui/macosx/intf.m:1779
 #: modules/gui/pda/pda_interface.c:210 modules/gui/pda/pda_interface.c:1353
-#: modules/gui/qt4/main_interface.cpp:358
-#: modules/gui/qt4/main_interface.cpp:362
-#: modules/gui/qt4/main_interface.cpp:973
-#: modules/gui/qt4/main_interface.cpp:975
+#: modules/gui/qt4/main_interface.cpp:355
+#: modules/gui/qt4/main_interface.cpp:359
+#: modules/gui/qt4/main_interface.cpp:934
+#: modules/gui/qt4/main_interface.cpp:936
+#: modules/gui/qt4/main_interface.cpp:1000
+#: modules/gui/qt4/main_interface.cpp:1015
+#: modules/gui/qt4/main_interface.cpp:1022
 #: modules/gui/qt4/main_interface.cpp:1039
-#: modules/gui/qt4/main_interface.cpp:1054
-#: modules/gui/qt4/main_interface.cpp:1061
-#: modules/gui/qt4/main_interface.cpp:1078
 msgid "VLC media player"
 msgstr "VLC-mediasoitin"
 
@@ -13475,9 +13467,8 @@ msgid "Help"
 msgstr "Ohje"
 
 #: modules/gui/macosx/intf.m:601
-#, fuzzy
 msgid "VLC media player Help..."
-msgstr "VLC-mediasoitin"
+msgstr "VLC-mediasoittimen ohje..."
 
 #: modules/gui/macosx/intf.m:602
 #, fuzzy
@@ -13889,7 +13880,7 @@ msgstr "Näytä tietovirta paikallisena"
 #: modules/gui/macosx/output.m:143 modules/gui/macosx/output.m:251
 #: modules/gui/macosx/output.m:391
 msgid "Stream"
-msgstr "Suoratoisto"
+msgstr "Suoratoista"
 
 #: modules/gui/macosx/output.m:144 modules/gui/qt4/ui/sout.ui:81
 msgid "Dump raw input"
@@ -14800,7 +14791,7 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:335 modules/gui/macosx/wizard.m:491
 #: modules/gui/macosx/wizard.m:1675
 msgid "Stream to network"
-msgstr "Sisällön lähetys verkkoon"
+msgstr "Suoratoista verkkoon"
 
 #: modules/gui/macosx/wizard.m:337 modules/gui/macosx/wizard.m:1683
 msgid "Transcode/Save to file"
@@ -14860,7 +14851,7 @@ msgstr "Kohde"
 
 #: modules/gui/macosx/wizard.m:365 modules/gui/macosx/wizard.m:437
 msgid "Streaming method"
-msgstr "Lähetystapa"
+msgstr "Suoratoiston lähetystapa"
 
 #: modules/gui/macosx/wizard.m:366
 msgid "Address of the computer to stream to."
@@ -15326,9 +15317,8 @@ msgid "     z           Volume Down"
 msgstr ""
 
 #: modules/gui/ncurses.c:1691
-#, fuzzy
 msgid "[Playlist]"
-msgstr "Soittoluettelo"
+msgstr "[Soittolista]"
 
 #: modules/gui/ncurses.c:1694
 msgid "     r           Toggle Random playing"
@@ -16010,100 +16000,100 @@ msgid ""
 "If the playlist is empty, open a media"
 msgstr ""
 
-#: modules/gui/qt4/components/interface_widgets.cpp:256
+#: modules/gui/qt4/components/interface_widgets.cpp:266
 #, fuzzy
 msgid "Current visualization"
 msgstr "Nykyinen visualisointi:"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:318
+#: modules/gui/qt4/components/interface_widgets.cpp:328
 msgid ""
 "Loop from point A to point B continuously.\n"
 "Click to set point A"
 msgstr ""
 
-#: modules/gui/qt4/components/interface_widgets.cpp:336
+#: modules/gui/qt4/components/interface_widgets.cpp:346
 #, fuzzy
 msgid "Frame by frame"
 msgstr "Ruutunopeus"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:351
+#: modules/gui/qt4/components/interface_widgets.cpp:361
 msgid "Take a snapshot"
 msgstr "Tallenna kaappaus"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:426
+#: modules/gui/qt4/components/interface_widgets.cpp:436
 msgid ""
 "Loop from point A to point B continuously\n"
 "Click to set point A"
 msgstr ""
 
-#: modules/gui/qt4/components/interface_widgets.cpp:431
+#: modules/gui/qt4/components/interface_widgets.cpp:441
 msgid "Click to set point B"
 msgstr ""
 
-#: modules/gui/qt4/components/interface_widgets.cpp:436
+#: modules/gui/qt4/components/interface_widgets.cpp:446
 msgid "Stop the A to B loop"
 msgstr ""
 
-#: modules/gui/qt4/components/interface_widgets.cpp:542
+#: modules/gui/qt4/components/interface_widgets.cpp:552
 msgid "Menu"
 msgstr "Valikko"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:591
+#: modules/gui/qt4/components/interface_widgets.cpp:601
 #, fuzzy
 msgid "Teletext on"
 msgstr "Sivukoko"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:603
-#: modules/gui/qt4/components/interface_widgets.cpp:796
+#: modules/gui/qt4/components/interface_widgets.cpp:613
+#: modules/gui/qt4/components/interface_widgets.cpp:806
 #, fuzzy
 msgid "Teletext"
 msgstr "Sivukoko"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:653
+#: modules/gui/qt4/components/interface_widgets.cpp:663
 #, fuzzy
 msgid "Previous media in the playlist"
 msgstr "Soittolistassa ei ole kohteita"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:655
+#: modules/gui/qt4/components/interface_widgets.cpp:665
 #, fuzzy
 msgid "Next media in the playlist"
 msgstr "Soittolistassa ei ole kohteita"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:656
+#: modules/gui/qt4/components/interface_widgets.cpp:666
 #, fuzzy
 msgid "Stop playback"
 msgstr "Paikallinen toisto"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:664
+#: modules/gui/qt4/components/interface_widgets.cpp:674
 #, fuzzy
 msgid "Toggle the video in fullscreen"
 msgstr "Käynnistä video koko näytön tilassa"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:672
+#: modules/gui/qt4/components/interface_widgets.cpp:682
 msgid "Show playlist"
 msgstr "Näytä soittolista"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:678
+#: modules/gui/qt4/components/interface_widgets.cpp:688
 #, fuzzy
 msgid "Show extended settings"
 msgstr "Näytä laajennetut asetukset"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:802
+#: modules/gui/qt4/components/interface_widgets.cpp:812
 #, fuzzy
 msgid "Transparent"
 msgstr "Läpinäkyvyys"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:867
+#: modules/gui/qt4/components/interface_widgets.cpp:877
 #, fuzzy
 msgid "Unmute"
 msgstr "Vaimenna"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:907
+#: modules/gui/qt4/components/interface_widgets.cpp:917
 #, fuzzy
 msgid "Pause the playback"
 msgstr "Paikallinen toisto"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:1376
+#: modules/gui/qt4/components/interface_widgets.cpp:1386
 msgid "Revert to normal play speed"
 msgstr ""
 
@@ -16117,7 +16107,6 @@ msgid "Select one or multiple files"
 msgstr "Valitse yksi tai useampi tiedosto tai kansio"
 
 #: modules/gui/qt4/components/open_panels.cpp:107
-#, fuzzy
 msgid "File names:"
 msgstr "Tiedostonimet:"
 
@@ -16126,7 +16115,7 @@ msgid "Filter:"
 msgstr "Suodatin:"
 
 #: modules/gui/qt4/components/open_panels.cpp:155
-#: modules/gui/qt4/dialogs_provider.cpp:616
+#: modules/gui/qt4/dialogs_provider.cpp:622
 msgid "Open subtitles file"
 msgstr "Avaa tekstitystiedosto"
 
@@ -16367,24 +16356,20 @@ msgid "Spatializer"
 msgstr "Kolmiulotteinen hahmottaminen"
 
 #: modules/gui/qt4/dialogs/extended.cpp:63
-#, fuzzy
 msgid "Audio Effects"
-msgstr "Äänikoodekit"
+msgstr "Äänitehosteet"
 
 #: modules/gui/qt4/dialogs/extended.cpp:74
-#, fuzzy
 msgid "Video Effects"
-msgstr "Videokoodekit"
+msgstr "Videotehosteet"
 
 #: modules/gui/qt4/dialogs/extended.cpp:77
-#, fuzzy
 msgid "Synchronization"
-msgstr "Kellotahdistus"
+msgstr "Tahdistus"
 
 #: modules/gui/qt4/dialogs/extended.cpp:82
-#, fuzzy
 msgid "v4l2 controls"
-msgstr "Lisäsäätimet"
+msgstr "v4l2-säätimet"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:46
 #, fuzzy
@@ -16606,7 +16591,7 @@ msgstr "&Toista"
 #: modules/gui/qt4/dialogs/open.cpp:116 modules/gui/qt4/dialogs/open.cpp:191
 #: modules/gui/qt4/dialogs/sout.cpp:192
 msgid "&Stream"
-msgstr "&Tietovirta"
+msgstr "&Suoratoista"
 
 #: modules/gui/qt4/dialogs/open.cpp:118
 msgid "&Convert"
@@ -16655,19 +16640,19 @@ msgstr ""
 msgid "Open Directory"
 msgstr "Avaa hakemisto"
 
-#: modules/gui/qt4/dialogs_provider.cpp:445
+#: modules/gui/qt4/dialogs_provider.cpp:451
 msgid "Open playlist file"
 msgstr "Avaa soittolistatiedosto"
 
-#: modules/gui/qt4/dialogs_provider.cpp:456
+#: modules/gui/qt4/dialogs_provider.cpp:462
 msgid "Choose a filename to save playlist"
 msgstr "Valitse tiedostonimi soittolistan tallentamiseksi"
 
-#: modules/gui/qt4/dialogs_provider.cpp:458
+#: modules/gui/qt4/dialogs_provider.cpp:464
 msgid "XSPF playlist (*.xspf);; "
 msgstr "XSPF-soittolista (*.xspf);; "
 
-#: modules/gui/qt4/dialogs_provider.cpp:459
+#: modules/gui/qt4/dialogs_provider.cpp:465
 msgid "M3U playlist (*.m3u);; Any (*.*) "
 msgstr "M3U-soittolista (*.m3u);; Mikä tahansa (*.*) "
 
@@ -16755,11 +16740,11 @@ msgstr ""
 msgid "Open a VLM Configuration File"
 msgstr "Vedosasetustiedosto"
 
-#: modules/gui/qt4/main_interface.cpp:295
+#: modules/gui/qt4/main_interface.cpp:293
 msgid "Toggle between elapsed and remaining time"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:301
+#: modules/gui/qt4/main_interface.cpp:299
 msgid ""
 "Current playback speed.\n"
 "Right click to adjust"
@@ -16785,11 +16770,11 @@ msgid ""
 "access on the web.</p>\n"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:1040
+#: modules/gui/qt4/main_interface.cpp:1001
 msgid "Control menu for the player"
 msgstr "Soittimen säädinvalikko"
 
-#: modules/gui/qt4/main_interface.cpp:1089
+#: modules/gui/qt4/main_interface.cpp:1050
 msgid "Paused"
 msgstr "Tauko"
 
@@ -16871,14 +16856,12 @@ msgid "Ctrl+H"
 msgstr "Ctrl+H"
 
 #: modules/gui/qt4/menus.cpp:378
-#, fuzzy
 msgid "&Fullscreen Interface"
-msgstr "Telnet-käyttöliittymä"
+msgstr "&Kokoruututila"
 
 #: modules/gui/qt4/menus.cpp:384
-#, fuzzy
 msgid "&Advanced Controls"
-msgstr "Lisäsäätimet"
+msgstr "Lisä&säätimet"
 
 #: modules/gui/qt4/menus.cpp:391
 msgid "Visualizations selector"
@@ -16889,34 +16872,28 @@ msgid "&Preferences..."
 msgstr "&Asetukset..."
 
 #: modules/gui/qt4/menus.cpp:448
-#, fuzzy
 msgid "Audio &Track"
-msgstr "Ääniraita"
+msgstr "Ääni&raita"
 
 #: modules/gui/qt4/menus.cpp:449
-#, fuzzy
 msgid "Audio &Device"
-msgstr "Äänilaite"
+msgstr "Ääni&laite"
 
 #: modules/gui/qt4/menus.cpp:450
-#, fuzzy
 msgid "Audio &Channels"
-msgstr "Äänikanavat"
+msgstr "Ääni&kanava"
 
 #: modules/gui/qt4/menus.cpp:452
-#, fuzzy
 msgid "&Visualizations"
-msgstr "Visualisointi"
+msgstr "&Visualisointi"
 
 #: modules/gui/qt4/menus.cpp:487
-#, fuzzy
 msgid "Video &Track"
-msgstr "Videoraita"
+msgstr "Video&raita"
 
 #: modules/gui/qt4/menus.cpp:490
-#, fuzzy
 msgid "&Subtitles Track"
-msgstr "Tekstitysraita"
+msgstr "&Tekstitysraita"
 
 #: modules/gui/qt4/menus.cpp:493
 msgid "Load File..."
@@ -16931,14 +16908,12 @@ msgid "&Zoom"
 msgstr "&Suurenna"
 
 #: modules/gui/qt4/menus.cpp:499
-#, fuzzy
 msgid "&Deinterlace"
-msgstr "Lomituksenpoisto"
+msgstr "&Lomituksenpoisto"
 
 #: modules/gui/qt4/menus.cpp:500
-#, fuzzy
 msgid "&Aspect Ratio"
-msgstr "Kuvasuhde"
+msgstr "&Kuvasuhde"
 
 #: modules/gui/qt4/menus.cpp:501
 msgid "&Crop"
@@ -16978,9 +16953,8 @@ msgid "&Navigation"
 msgstr "&Ohjaus"
 
 #: modules/gui/qt4/menus.cpp:592
-#, fuzzy
 msgid "Configure podcasts..."
-msgstr "VLM-asetukset..."
+msgstr "Aseta podcastit..."
 
 #: modules/gui/qt4/menus.cpp:610
 msgid "&Help..."
@@ -17011,9 +16985,8 @@ msgid "Minimal View..."
 msgstr "Pienennetty näkymä..."
 
 #: modules/gui/qt4/menus.cpp:851
-#, fuzzy
 msgid "Toggle Fullscreen Interface"
-msgstr "Telnet-käyttöliittymä"
+msgstr "Kokoruututila päälle/pois"
 
 #: modules/gui/qt4/menus.cpp:911
 #, fuzzy
@@ -17230,7 +17203,6 @@ msgid "Advanced options..."
 msgstr "Lisäasetukset..."
 
 #: modules/gui/qt4/ui/open_disk.ui:20
-#, fuzzy
 msgid "Disc Selection"
 msgstr "Levyn valinta"
 
@@ -17239,12 +17211,10 @@ msgid "Disable DVD Menus (for compatibility)"
 msgstr "Älä käytä DVD-valikkoja (yhteensopivuuden vuoksi)"
 
 #: modules/gui/qt4/ui/open_disk.ui:108
-#, fuzzy
 msgid "Disc device"
 msgstr "Levylaite"
 
 #: modules/gui/qt4/ui/open_disk.ui:165
-#, fuzzy
 msgid "Starting Position"
 msgstr "Aloituskohta"
 
@@ -17257,21 +17227,18 @@ msgid "Choose one or more media file to open"
 msgstr "Valitse yksi tai useampi mediatiedosto avattavaksi"
 
 #: modules/gui/qt4/ui/open_file.ui:49
-#, fuzzy
 msgid "Add a subtitles file"
 msgstr "Lisää tekstitystiedosto"
 
 #: modules/gui/qt4/ui/open_file.ui:52
-#, fuzzy
 msgid "Use a sub&titles file"
-msgstr "Käytä tekstitystiedostoa"
+msgstr "Käytä &tekstitystiedostoa"
 
 #: modules/gui/qt4/ui/open_file.ui:126
 msgid "Alignment:"
 msgstr "Tasaus:"
 
 #: modules/gui/qt4/ui/open_file.ui:178
-#, fuzzy
 msgid "Select the subtitles file"
 msgstr "Valitse tekstitystiedosto"
 
@@ -17280,21 +17247,18 @@ msgid "Network Protocol"
 msgstr "Verkkoyhteyskäytäntö"
 
 #: modules/gui/qt4/ui/open_net.ui:26
-#, fuzzy
 msgid "Select the protocol for the URL."
-msgstr "Aseta osoitteen yhteyskäytäntö"
+msgstr "Valitse osoitteen yhteyskäytäntö"
 
 #: modules/gui/qt4/ui/open_net.ui:33
 msgid "Protocol"
 msgstr "Yhteyskäytäntö"
 
 #: modules/gui/qt4/ui/open_net.ui:43
-#, fuzzy
 msgid "Select the port used"
-msgstr "Aseta käytettävä portti"
+msgstr "Valitse käytettävä portti"
 
 #: modules/gui/qt4/ui/open_net.ui:85
-#, fuzzy
 msgid "Enter the URL of the network stream here, with or without the protocol."
 msgstr ""
 "Syötä tähän verkkotoiston osoite\n"
@@ -17305,9 +17269,8 @@ msgid "Show extended options"
 msgstr "Näytä laajennetut asetukset"
 
 #: modules/gui/qt4/ui/open.ui:41
-#, fuzzy
 msgid "Show &more options"
-msgstr "Näytä enemmän asetuksia"
+msgstr "Näytä &enemmän asetuksia"
 
 #: modules/gui/qt4/ui/open.ui:61
 msgid "Change the caching for the media"
@@ -17342,9 +17305,8 @@ msgid "Complete MRL for VLC internal"
 msgstr ""
 
 #: modules/gui/qt4/ui/open.ui:216
-#, fuzzy
 msgid "Select play mode"
-msgstr "Valitse toistonvahvistustila"
+msgstr "Valitse soittotila"
 
 #: modules/gui/qt4/ui/podcast_configuration.ui:19
 #: modules/services_discovery/podcast.c:58
@@ -17366,9 +17328,8 @@ msgid "Video Port"
 msgstr "IP:Portti"
 
 #: modules/gui/qt4/ui/sout.ui:435
-#, fuzzy
 msgid "Mount Point"
-msgstr "mongoli"
+msgstr "Liitoskohta"
 
 #: modules/gui/qt4/ui/sout.ui:452
 #, fuzzy
@@ -17384,9 +17345,8 @@ msgid "Using this option is not recommended in most of the cases."
 msgstr ""
 
 #: modules/gui/qt4/ui/sout.ui:522
-#, fuzzy
 msgid "Profile"
-msgstr "Purppura"
+msgstr "Profiili"
 
 #: modules/gui/qt4/ui/sout.ui:550
 msgid "Encapsulation"
@@ -23607,47 +23567,8 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Track Number"
 #~ msgstr "Raitanumero"
 
-#, fuzzy
-#~ msgid "Concatenate with additional files"
-#~ msgstr "Noudetaan tarvittavia lisäpaketteja..."
-
-#, fuzzy
-#~ msgid "VLC could not open file \"%s\" (%s)."
-#~ msgstr "Lukkotiedostoa %s ei voitu avata"
-
-#, fuzzy
-#~ msgid "Raw write"
-#~ msgstr "Virhe kirjoitettaessa"
-
-#, fuzzy
-#~ msgid "RTCP Sender Report"
-#~ msgstr "viestin jakeluilmoitus"
-
-#, fuzzy
-#~ msgid "RTCP destination port number"
-#~ msgstr "url portin pitää olla luku\n"
-
-#, fuzzy
-#~ msgid "Automatic multicast streaming"
-#~ msgstr "Järjestä lisäosat automaattisesti"
-
-#, fuzzy
-#~ msgid "UDP-Lite"
-#~ msgstr "UDP-liput"
-
-#, fuzzy
-#~ msgid "Checksum coverage"
-#~ msgstr "Luodaan tarkistussummaa"
-
 #~ msgid "FFmpeg audio/video decoders/encoders"
 #~ msgstr "FFmpeg-sovelluksen ääni- ja videokoodekit"
-
-#~ msgid "FFmpeg chroma conversion"
-#~ msgstr "FFmpeg:n kylläisyyden muunnos"
-
-#, fuzzy
-#~ msgid "Strict rate control"
-#~ msgstr "Ohjaustiedosto ei jäsenny"
 
 #~ msgid "Charset"
 #~ msgstr "Merkistökoodaus"
@@ -23655,15 +23576,8 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "goto is deprecated"
 #~ msgstr "goto on vanhentunut"
 
-#, fuzzy
-#~ msgid "Replay Gain type"
-#~ msgstr "Tukematon tiedostomuoto"
-
 #~ msgid "Image adjustment"
 #~ msgstr "Kuvan hienosäätö"
-
-#~ msgid "Video Device"
-#~ msgstr "Videolaite"
 
 #~ msgid "Report a Bug"
 #~ msgstr "Ilmoita virheestä"
@@ -23847,7 +23761,7 @@ msgstr "Spektrin tarkastelu"
 #~ msgstr "2 läpikäyntiä"
 
 #~ msgid "Use a sub&amp;titles file"
-#~ msgstr "Käytä tekstitystiedostoa"
+#~ msgstr "Käytä &tekstitystiedostoa"
 
 #~ msgid "Transcoding"
 #~ msgstr "Transkoodaus"
@@ -23863,78 +23777,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "Visualisation"
 #~ msgstr "Visualisointi"
-
-#, fuzzy
-#~ msgid "Disk Device"
-#~ msgstr "Irrota levylaite."
-
-#, fuzzy
-#~ msgid "Default Interface"
-#~ msgstr "Verkkolaite"
-
-#, fuzzy
-#~ msgid "Always display the video"
-#~ msgstr "_Näytä kuvake aina"
-
-#, fuzzy
-#~ msgid "Subtitles preferred language"
-#~ msgstr "Haluttu asiakirjan kieli"
-
-#~ msgid "Skip Frames"
-#~ msgstr "Ohita kehyksiä"
-
-#~ msgid "Enable Wallpaper Mode"
-#~ msgstr "Salli taustakuvatila"
-
-#, fuzzy
-#~ msgid "Color invert"
-#~ msgstr "Käännä tulos"
-
-#, fuzzy
-#~ msgid "Some random name"
-#~ msgstr "Anna profiilin nimi"
-
-#, fuzzy
-#~ msgid "Find a name"
-#~ msgstr "Lisäosan nimi:"
-
-#, fuzzy
-#~ msgid "Find one here too"
-#~ msgstr "Liian monta käyttäjää lueteltavaksi tässä..."
-
-#, fuzzy
-#~ msgid "Based on SVN revision: "
-#~ msgstr "1.x (pohjautuu eMule-versioon v0.%u)"
-
-#, fuzzy
-#~ msgid "&OK"
-#~ msgstr "OK"
-
-#, fuzzy
-#~ msgid "&Delete"
-#~ msgstr "&Poista"
-
-#, fuzzy
-#~ msgid "Edit the properties of a bookmark"
-#~ msgstr "Muokkka _itsemääriteltyjä ominaisuuksia..."
-
-#, fuzzy
-#~ msgid "You must select two bookmarks"
-#~ msgstr "Voit valita tasan yhden avaimen.\n"
-
-#, fuzzy
-#~ msgid "Input has changed "
-#~ msgstr "Malli %s (nimi=%s) on muuttunut!"
-
-#~ msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
-#~ msgstr "Kaikki tiedostot (*.*)|*|Äänitiedostot (*.mp3, *.ogg, jne.)|"
-
-#, fuzzy
-#~ msgid "Stream and Media Info"
-#~ msgstr "Asemien ja medioiden asetukset"
-
-#~ msgid "Advanced information"
-#~ msgstr "Lisätiedot"
 
 #~ msgid "&No"
 #~ msgstr "&Ei"
@@ -23963,10 +23805,6 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Customize:"
 #~ msgstr "Mukauta:"
 
-#, fuzzy
-#~ msgid "Use an external subtitles file."
-#~ msgstr "Käytä annettua sessionrc-tiedostoa"
-
 #~ msgid "Advanced Settings..."
 #~ msgstr "Lisäasetukset..."
 
@@ -23979,23 +23817,11 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Disc type"
 #~ msgstr "Levyn tyyppi"
 
-#, fuzzy
-#~ msgid "Probe Disc(s)"
-#~ msgstr "Levyn koko:"
-
-#, fuzzy
-#~ msgid "RTSP"
-#~ msgstr "rtsp: huono mrl (median latauslähde): %s\n"
-
 #~ msgid "DVD device to use"
 #~ msgstr "Käytettävä DVD-laite"
 
 #~ msgid "CD-ROM device to use"
 #~ msgstr "Käytettävä CD-laite"
-
-#, fuzzy
-#~ msgid "Title number."
-#~ msgstr "Numero - Nimi"
 
 #~ msgid "Track number."
 #~ msgstr "Raidan numero."
@@ -24011,9 +23837,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "&Add URL..."
 #~ msgstr "Lisää &URL..."
-
-#~ msgid "Services Discovery"
-#~ msgstr "Palvelujen haut"
 
 #~ msgid "&Open Playlist..."
 #~ msgstr "&Avaa soittolista..."
@@ -24044,14 +23867,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "&View items"
 #~ msgstr "&Näytä kohteet"
-
-#, fuzzy
-#~ msgid "Play this Branch"
-#~ msgstr "haaroituskohdemuuttuja ei ole tasarajalla"
-
-#, fuzzy
-#~ msgid "Sort this Branch"
-#~ msgstr "haaroituskohdemuuttuja ei ole tasarajalla"
 
 #~ msgid "Info"
 #~ msgstr "Tietoja"
@@ -24101,15 +23916,8 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Subtitles codec"
 #~ msgstr "Tekstityskoodekki"
 
-#, fuzzy
-#~ msgid "Subtitles overlay"
-#~ msgstr "Aseta kuvake päälle"
-
 #~ msgid "Subtitle options"
 #~ msgstr "Tekstityksen asetukset"
-
-#~ msgid "Set subtitle delay (in 1/10s)"
-#~ msgstr "Aseta tekstityksen kesto (sekunnin kymmenesosina)"
 
 #~ msgid "Open file"
 #~ msgstr "Avaa tiedosto"
@@ -24132,22 +23940,8 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Save Configuration"
 #~ msgstr "Tallenna asetukset"
 
-#, fuzzy
-#~ msgid "New broadcast"
-#~ msgstr "Broadcast-osoite:"
-
 #~ msgid "VLM stream"
 #~ msgstr "VLM-suoratoisto"
-
-#, fuzzy
-#~ msgid "Use this to stream on a network."
-#~ msgstr ""
-#~ "Käytä tätä kytkeäksesi AddHelper-ominaisuuden päälle tai pois vauhdissa."
-
-#, fuzzy
-#~ msgid "Use this to stream on a network"
-#~ msgstr ""
-#~ "Käytä tätä kytkeäksesi AddHelper-ominaisuuden päälle tai pois vauhdissa."
 
 #~ msgid "You must choose a stream"
 #~ msgstr "Sinun on valittava tietovirta"
@@ -24156,50 +23950,14 @@ msgstr "Spektrin tarkastelu"
 #~ msgstr "Soittolistaa ei voitu löytää"
 
 #, fuzzy
-#~ msgid "Transcode video (if available)"
-#~ msgstr "Käynnistä oikoluin (jos saatavilla)"
-
-#, fuzzy
 #~ msgid "Please enter an address"
 #~ msgstr "Syötä sähköpostiosoitteesi"
-
-#, fuzzy
-#~ msgid "You must choose a file to save to"
-#~ msgstr "Yksi on valittava asennettavaksi.\n"
 
 #~ msgid "More information"
 #~ msgstr "Lisätietoja"
 
 #~ msgid "Save to file"
 #~ msgstr "Tallenna tiedostoon"
-
-#, fuzzy
-#~ msgid "Transcode audio (if available)"
-#~ msgstr "Käynnistä oikoluin (jos saatavilla)"
-
-#~ msgid "Distortion"
-#~ msgstr "Kierto"
-
-#~ msgid "Adds distortion effects"
-#~ msgstr "Lisää kiertoilmiöitä"
-
-#~ msgid "Image inversion"
-#~ msgstr "Kuvankääntö"
-
-#~ msgid "Blurring"
-#~ msgstr "Sumennus"
-
-#, fuzzy
-#~ msgid "Magnifies part of the image"
-#~ msgstr "Tallenna Tilastokuva"
-
-#, fuzzy
-#~ msgid "Turns the image into a puzzle"
-#~ msgstr "Lisää kuva asiakirjaan..."
-
-#, fuzzy
-#~ msgid "Video Options"
-#~ msgstr "<b>DVD - Videoasetukset</b>"
 
 #, fuzzy
 #~ msgid "Smooth :"
@@ -24286,22 +24044,231 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Preference&s...\tCtrl-S"
 #~ msgstr "A&setukset...\tCtrl-S"
 
+#~ msgid "About %s"
+#~ msgstr "Tietoja %s:sta"
+
+#~ msgid "Open &Network Stream..."
+#~ msgstr "Avaa suoratoisto &verkosta..."
+
+#, fuzzy
+#~ msgid "Embedded"
+#~ msgstr "Upotettu"
+
+#, fuzzy
+#~ msgid "Both"
+#~ msgstr "Molemmat"
+
+#, fuzzy
+#~ msgid "Concatenate with additional files"
+#~ msgstr "Noudetaan tarvittavia lisäpaketteja..."
+
+#, fuzzy
+#~ msgid "VLC could not open file \"%s\" (%s)."
+#~ msgstr "Lukkotiedostoa %s ei voitu avata"
+
+#, fuzzy
+#~ msgid "Raw write"
+#~ msgstr "Virhe kirjoitettaessa"
+
+#, fuzzy
+#~ msgid "RTCP Sender Report"
+#~ msgstr "viestin jakeluilmoitus"
+
+#, fuzzy
+#~ msgid "RTCP destination port number"
+#~ msgstr "url portin pitää olla luku\n"
+
+#, fuzzy
+#~ msgid "Automatic multicast streaming"
+#~ msgstr "Järjestä lisäosat automaattisesti"
+
+#, fuzzy
+#~ msgid "UDP-Lite"
+#~ msgstr "UDP-liput"
+
+#, fuzzy
+#~ msgid "Checksum coverage"
+#~ msgstr "Luodaan tarkistussummaa"
+
+#~ msgid "FFmpeg chroma conversion"
+#~ msgstr "FFmpeg:n kylläisyyden muunnos"
+
+#, fuzzy
+#~ msgid "Strict rate control"
+#~ msgstr "Ohjaustiedosto ei jäsenny"
+
+#, fuzzy
+#~ msgid "Replay Gain type"
+#~ msgstr "Tukematon tiedostomuoto"
+
+#~ msgid "Video Device"
+#~ msgstr "Videolaite"
+
+#, fuzzy
+#~ msgid "Disk Device"
+#~ msgstr "Irrota levylaite."
+
+#, fuzzy
+#~ msgid "Default Interface"
+#~ msgstr "Verkkolaite"
+
+#, fuzzy
+#~ msgid "Always display the video"
+#~ msgstr "_Näytä kuvake aina"
+
+#, fuzzy
+#~ msgid "Subtitles preferred language"
+#~ msgstr "Haluttu asiakirjan kieli"
+
+#~ msgid "Skip Frames"
+#~ msgstr "Ohita kehyksiä"
+
+#~ msgid "Enable Wallpaper Mode"
+#~ msgstr "Salli taustakuvatila"
+
+#, fuzzy
+#~ msgid "Color invert"
+#~ msgstr "Käännä tulos"
+
+#, fuzzy
+#~ msgid "Some random name"
+#~ msgstr "Anna profiilin nimi"
+
+#, fuzzy
+#~ msgid "Find a name"
+#~ msgstr "Lisäosan nimi:"
+
+#, fuzzy
+#~ msgid "Find one here too"
+#~ msgstr "Liian monta käyttäjää lueteltavaksi tässä..."
+
+#, fuzzy
+#~ msgid "Based on SVN revision: "
+#~ msgstr "1.x (pohjautuu eMule-versioon v0.%u)"
+
+#, fuzzy
+#~ msgid "&OK"
+#~ msgstr "OK"
+
+#, fuzzy
+#~ msgid "&Delete"
+#~ msgstr "&Poista"
+
+#, fuzzy
+#~ msgid "Edit the properties of a bookmark"
+#~ msgstr "Muokkka _itsemääriteltyjä ominaisuuksia..."
+
+#, fuzzy
+#~ msgid "You must select two bookmarks"
+#~ msgstr "Voit valita tasan yhden avaimen.\n"
+
+#, fuzzy
+#~ msgid "Input has changed "
+#~ msgstr "Malli %s (nimi=%s) on muuttunut!"
+
+#~ msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
+#~ msgstr "Kaikki tiedostot (*.*)|*|Äänitiedostot (*.mp3, *.ogg, jne.)|"
+
+#, fuzzy
+#~ msgid "Stream and Media Info"
+#~ msgstr "Asemien ja medioiden asetukset"
+
+#~ msgid "Advanced information"
+#~ msgstr "Lisätiedot"
+
+#, fuzzy
+#~ msgid "Use an external subtitles file."
+#~ msgstr "Käytä annettua sessionrc-tiedostoa"
+
+#, fuzzy
+#~ msgid "Probe Disc(s)"
+#~ msgstr "Levyn koko:"
+
+#, fuzzy
+#~ msgid "RTSP"
+#~ msgstr "rtsp: huono mrl (median latauslähde): %s\n"
+
+#, fuzzy
+#~ msgid "Title number."
+#~ msgstr "Numero - Nimi"
+
+#~ msgid "Services Discovery"
+#~ msgstr "Palvelujen haut"
+
+#, fuzzy
+#~ msgid "Play this Branch"
+#~ msgstr "haaroituskohdemuuttuja ei ole tasarajalla"
+
+#, fuzzy
+#~ msgid "Sort this Branch"
+#~ msgstr "haaroituskohdemuuttuja ei ole tasarajalla"
+
+#, fuzzy
+#~ msgid "Subtitles overlay"
+#~ msgstr "Aseta kuvake päälle"
+
+#~ msgid "Set subtitle delay (in 1/10s)"
+#~ msgstr "Aseta tekstityksen kesto (sekunnin kymmenesosina)"
+
+#, fuzzy
+#~ msgid "New broadcast"
+#~ msgstr "Broadcast-osoite:"
+
+#, fuzzy
+#~ msgid "Use this to stream on a network."
+#~ msgstr ""
+#~ "Käytä tätä kytkeäksesi AddHelper-ominaisuuden päälle tai pois vauhdissa."
+
+#, fuzzy
+#~ msgid "Use this to stream on a network"
+#~ msgstr ""
+#~ "Käytä tätä kytkeäksesi AddHelper-ominaisuuden päälle tai pois vauhdissa."
+
+#, fuzzy
+#~ msgid "Transcode video (if available)"
+#~ msgstr "Käynnistä oikoluin (jos saatavilla)"
+
+#, fuzzy
+#~ msgid "You must choose a file to save to"
+#~ msgstr "Yksi on valittava asennettavaksi.\n"
+
+#, fuzzy
+#~ msgid "Transcode audio (if available)"
+#~ msgstr "Käynnistä oikoluin (jos saatavilla)"
+
+#~ msgid "Distortion"
+#~ msgstr "Kierto"
+
+#~ msgid "Adds distortion effects"
+#~ msgstr "Lisää kiertoilmiöitä"
+
+#~ msgid "Image inversion"
+#~ msgstr "Kuvankääntö"
+
+#~ msgid "Blurring"
+#~ msgstr "Sumennus"
+
+#, fuzzy
+#~ msgid "Magnifies part of the image"
+#~ msgstr "Tallenna Tilastokuva"
+
+#, fuzzy
+#~ msgid "Turns the image into a puzzle"
+#~ msgstr "Lisää kuva asiakirjaan..."
+
+#, fuzzy
+#~ msgid "Video Options"
+#~ msgstr "<b>DVD - Videoasetukset</b>"
+
 #, fuzzy
 #~ msgid ""
 #~ "(wxWidgets interface)\n"
 #~ "\n"
 #~ msgstr "Verkkolaite"
 
-#~ msgid "About %s"
-#~ msgstr "Tietoja %s:sta"
-
 #, fuzzy
 #~ msgid "Show/Hide Interface"
 #~ msgstr "Näytä/piilota säätimet"
-
-#, fuzzy
-#~ msgid "Open &Network Stream..."
-#~ msgstr "Avaa &verkkovirta..."
 
 #, fuzzy
 #~ msgid "Media &Info..."
@@ -24342,14 +24309,6 @@ msgstr "Spektrin tarkastelu"
 #, fuzzy
 #~ msgid "Playlist view"
 #~ msgstr "&Koko näyttö"
-
-#, fuzzy
-#~ msgid "Embedded"
-#~ msgstr "Upotettu"
-
-#, fuzzy
-#~ msgid "Both"
-#~ msgstr "Molemmat"
 
 #, fuzzy
 #~ msgid "wxWidgets interface module"
