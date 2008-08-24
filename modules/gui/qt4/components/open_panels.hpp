@@ -110,6 +110,7 @@ public:
         QFileDialog( parent, caption, directory, filter ) {}
 public slots:
     void accept();
+    void reject();
 };
 
 class FileOpenPanel: public OpenPanel

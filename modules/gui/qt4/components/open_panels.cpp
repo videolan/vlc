@@ -194,6 +194,9 @@ void FileOpenBox::accept()
     OpenDialog::getInstance( NULL, NULL, true )->selectSlots();
 }
 
+void FileOpenBox::reject()
+{}
+
 /* Function called by Open Dialog when clicked on cancel */
 void FileOpenPanel::clear()
 {
