@@ -98,13 +98,14 @@ dnl  Check for the contrib directory
 dnl
 AC_ARG_WITH(contrib,
     [  --without-contrib       do not use the libraries in extras/contrib],[],[])
-  if test "${with_contrib}" != "no"; then 
+  AS_IF([test "${with_contrib}" != "no"],[
     AC_MSG_CHECKING([for libs in extras/contrib])
     topdir="`dirname $0`"
     if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
        topdir="`pwd`/$topdir"
     fi
-   if test "`grep HOST ${topdir}/extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "`$CC -dumpmachine`"; then
+  AS_IF([test -d ${topdir}/extras/contrib/lib],[
+   AS_IF([test "`grep HOST ${topdir}/extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "`$CC -dumpmachine`"],[
       if test "${with_contrib}" = "yes"; then
         AC_MSG_RESULT([no])
         AC_MSG_ERROR([ not using the libs in extras/contrib as it is not the same host])
@@ -112,8 +113,7 @@ AC_ARG_WITH(contrib,
         AC_MSG_RESULT([no])
         AC_MSG_WARN([ not using the libs in extras/contrib as it is not the same host])
       fi
-     else
-  if test -d ${topdir}/extras/contrib/lib; then
+     ],[
     AC_MSG_RESULT([yes])
     export PATH=${topdir}/extras/contrib/bin:$PATH
     CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
@@ -146,11 +146,11 @@ AC_ARG_WITH(contrib,
       export LIBRARY_PATH=${topdir}/extras/contrib/lib:$LIBRARY_PATH
       export BELIBRARIES=${topdir}/extras/contrib/lib:$BELIBRARIES
     fi
-  else
-     AC_MSG_RESULT([no])
-  fi
-  fi
-fi
+    ])
+  ],[
+    AC_MSG_RESULT([no])
+  ])
+])
 dnl
 dnl  Set default values
 dnl
