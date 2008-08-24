@@ -100,7 +100,6 @@ char *SSPop( rpn_stack_t *st )
 int SSPopN( rpn_stack_t *st, mvar_t  *vars )
 {
     char *name;
-    char *value;
 
     char *end;
     int  i;
@@ -109,7 +108,7 @@ int SSPopN( rpn_stack_t *st, mvar_t  *vars )
     i = strtol( name, &end, 0 );
     if( end == name )
     {
-        value = mvar_GetValue( vars, name );
+        const char *value = mvar_GetValue( vars, name );
         i = atoi( value );
     }
     free( name );
@@ -348,7 +347,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "url_extract" ) )
         {
-            char *url = mvar_GetValue( vars, "url_value" );
+            const char *url = mvar_GetValue( vars, "url_value" );
             char *name = SSPop( st );
             char *value = ExtractURIString( url, name );
             if( value != NULL )
@@ -483,7 +482,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "value" ) )
         {
             char *name  = SSPop( st );
-            char *value = mvar_GetValue( vars, name );
+            const char *value = mvar_GetValue( vars, name );
 
             SSPush( st, value );
 
@@ -855,11 +854,19 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 i_ret = playlist_AddInput( p_sys->p_playlist, p_input,
                                    PLAYLIST_APPEND, PLAYLIST_END, true,
                                    pl_Unlocked );
-                vlc_gc_decref( p_input );
                 if( i_ret == VLC_SUCCESS )
+                {
+                    playlist_item_t *p_item;
                     msg_Dbg( p_intf, "requested mrl add: %s", mrl );
+                    p_item = playlist_ItemGetByInput( p_sys->p_playlist,
+                                                      p_input,
+                                                      pl_Unlocked );
+                    if( p_item )
+                        i_ret = p_item->i_id;
+                }
                 else
                     msg_Warn( p_intf, "adding mrl %s failed", mrl );
+                vlc_gc_decref( p_input );
             }
             free( psz_uri );
             SSPushN( st, i_ret );

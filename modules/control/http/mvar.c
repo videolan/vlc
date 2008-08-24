@@ -182,7 +182,7 @@ mvar_t *mvar_GetVar( mvar_t *s, const char *name )
     return NULL;
 }
 
-char *mvar_GetValue( mvar_t *v, char *field )
+const char *mvar_GetValue( mvar_t *v, const char *field )
 {
     if( *field == '\0' )
     {

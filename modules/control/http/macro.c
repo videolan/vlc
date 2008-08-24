@@ -362,7 +362,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_DEL:
                 {
                     int i_item, *p_items = NULL, i_nb_items = 0;
-                    char item[512], *p_parser = p_request;
+                    char item[512];
+                    const char *p_parser = p_request;
 
                     /* Get the list of items to delete */
                     while( (p_parser =
@@ -396,7 +397,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_KEEP:
                 {
                     int i_item, *p_items = NULL, i_nb_items = 0;
-                    char item[512], *p_parser = p_request;
+                    char item[512];
+                    const char *p_parser = p_request;
                     int i,j;
 
                     /* Get the list of items to keep */
@@ -769,7 +771,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
         }
         case MVLC_VALUE:
         {
-            char *s, *v;
+            char *s;
+            const char *v;
 
             if( m->param1 )
             {

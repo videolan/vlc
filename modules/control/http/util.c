@@ -650,10 +650,10 @@ int TestURIParam( char *psz_uri, const char *psz_name )
     return false;
 }
 
-static char *FindURIValue( char *psz_uri, const char *restrict psz_name,
+static const char *FindURIValue( const char *psz_uri, const char *restrict psz_name,
                            size_t *restrict p_len )
 {
-    char *p = psz_uri, *end;
+    const char *p = psz_uri, *end;
     size_t len;
 
     while( (p = strstr( p, psz_name )) )
@@ -695,13 +695,13 @@ static char *FindURIValue( char *psz_uri, const char *restrict psz_name,
     return p;
 }
 
-char *ExtractURIValue( char *restrict psz_uri,
+const char *ExtractURIValue( const char *restrict psz_uri,
                            const char *restrict psz_name,
                            char *restrict psz_buf, size_t bufsize )
 {
     size_t len;
-    char *psz_value = FindURIValue( psz_uri, psz_name, &len );
-    char *psz_next;
+    const char *psz_value = FindURIValue( psz_uri, psz_name, &len );
+    const char *psz_next;
 
     if( psz_value == NULL )
     {
@@ -723,11 +723,11 @@ char *ExtractURIValue( char *restrict psz_uri,
     return psz_next;
 }
 
-char *ExtractURIString( char *restrict psz_uri,
+char *ExtractURIString( const char *restrict psz_uri,
                             const char *restrict psz_name )
 {
     size_t len;
-    char *psz_value = FindURIValue( psz_uri, psz_name, &len );
+    const char *psz_value = FindURIValue( psz_uri, psz_name, &len );
 
     if( psz_value == NULL )
         return NULL;
