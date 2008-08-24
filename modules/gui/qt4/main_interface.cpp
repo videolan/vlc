@@ -1,7 +1,7 @@
 /*****************************************************************************
  * main_interface.cpp : Main interface
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -51,9 +51,6 @@
 #include <QLabel>
 #include <QSlider>
 #include <QWidgetAction>
-#if 0
-#include <QDockWidget>
-#endif
 #include <QToolBar>
 #include <QGroupBox>
 #include <QDate>
@@ -61,12 +58,6 @@
 #include <assert.h>
 #include <vlc_keys.h>
 #include <vlc_vout.h>
-
-#define SET_WIDTH(i,j) i->widgetSize.setWidth(j)
-#define SET_HEIGHT(i,j) i->widgetSize.setHeight(j)
-#define SET_WH( i,j,k) i->widgetSize.setWidth(j); i->widgetSize.setHeight(k);
-
-#define DS(i) i.width(),i.height()
 
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
@@ -112,8 +103,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     settings = getSettings();
     settings->beginGroup( "MainWindow" );
 
-    //TODO: I don't like that code
-    visualSelectorEnabled = settings->value( "visual-selector", false ).toBool();
+    /* Visualisation, not really used yet */
+    visualSelectorEnabled = settings->value( "visual-selector", false).toBool();
+
+    /* Do we want anoying popups or not */
     notificationEnabled = (bool)config_GetInt( p_intf, "qt-notification" );
 
     /**************************
@@ -134,11 +127,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     dockPL->hide();
 #endif
 
-    /************
-     * Menu Bar
-     ************/
+    /**************************
+     * Menu Bar and Status Bar
+     **************************/
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
-
     /* StatusBar Creation */
     createStatusBar();
 
@@ -197,13 +189,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /** OnTimeOut **/
     /* TODO Remove this function, but so far, there is no choice because there
-       is no intf-should-die variable */
+       is no intf-should-die variable #1365 */
     ON_TIMEOUT( updateOnTimer() );
-    //ON_TIMEOUT( debug() );
 
-    /**
+    /************
      * Callbacks
-     **/
+     ************/
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     p_intf->b_interaction = true;
@@ -213,7 +204,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Register callback for the intf-popupmenu variable */
     var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
-    /* VideoWidget connect mess to avoid different threads speaking to each other */
+
+    /* VideoWidget connects to avoid different threads speaking to each other */
     CONNECT( this, askReleaseVideo( void * ),
              this, releaseVideoSlot( void * ) );
     if( videoWidget )
@@ -230,14 +222,20 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     if( settings->value( "playlist-visible", 0 ).toInt() ) togglePlaylist();
     settings->endGroup();
 
+
+    /* Final sizing and showing */
+    setMinimumWidth( __MAX( controls->sizeHint().width(),
+                            menuBar()->sizeHint().width() ) );
     show();
 
+    /* And switch to minimal view if needed
+       Must be called after the show() */
     if( i_visualmode == QT_MINIMAL_MODE )
         toggleMinimalView();
 
     /* Update the geometry TODO: is it useful ?*/
     updateGeometry();
-    resize( sizeHint() );
+    //    resize( sizeHint() );
 
     /*****************************************************
      * End everything by creating the Systray Management *
@@ -305,7 +303,6 @@ inline void MainInterface::createStatusBar()
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
-
 
     /* and adding those */
     statusBar()->addWidget( nameLabel, 8 );
@@ -544,59 +541,33 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
 
 QSize MainInterface::sizeHint() const
 {
-    int nwidth  = __MAX( controls->sizeHint().width(),
-                         menuBar()->sizeHint().width() );
+    int nwidth  = controls->sizeHint().width();
     int nheight = controls->isVisible() ?
                   controls->size().height()
                   + menuBar()->size().height()
                   + statusBar()->size().height()
                   : 0 ;
 
-    msg_Dbg( p_intf, "1 %i %i", nheight, nwidth );
     if( VISIBLE( bgWidget ) )
     {
         nheight += bgWidget->size().height();
         nwidth  = bgWidget->size().width();
-        msg_Dbg( p_intf, "1b %i %i", nheight, nwidth );
     }
-    else if( videoIsActive )
+    else if( videoIsActive && videoWidget->isVisible() )
     {
         nheight += videoWidget->sizeHint().height();
         nwidth  = videoWidget->sizeHint().width();
-        msg_Dbg( p_intf, "2 %i %i", nheight, nwidth );
     }
 #if 0
     if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
     {
         nheight += dockPL->size().height();
         nwidth = __MAX( nwidth, dockPL->size().width() );
-        msg_Dbg( p_intf, "3 %i %i", nheight, nwidth );
+        msg_Warn( p_intf, "3 %i %i", nheight, nwidth );
     }
 #endif
-    msg_Dbg( p_intf, "4 %i %i", nheight, nwidth );
     return QSize( nwidth, nheight );
 }
-
-#if 0
-/* FIXME This is dead code and need to be removed AT THE END */
-void MainInterface::resizeEvent( QResizeEvent *e )
-{
-    if( videoWidget )
-        videoWidget->widgetSize.setWidth( e->size().width() - addSize.width() );
-    if( videoWidget && videoIsActive && videoWidget->widgetSize.height() > 1 )
-    {
-        SET_WH( videoWidget, e->size().width() - addSize.width(),
-                             e->size().height()  - addSize.height() );
-        videoWidget->updateGeometry();
-    }
-    if( VISIBLE( playlistWidget ) )
-    {
-//        SET_WH( playlistWidget , e->size().width() - addSize.width(),
-              //                   e->size().height() - addSize.height() );
-        playlistWidget->updateGeometry();
-    }
-}
-#endif
 
 void MainInterface::toggleFSC()
 {
@@ -605,25 +576,22 @@ void MainInterface::toggleFSC()
    IMEvent *eShow = new IMEvent( FullscreenControlToggle_Type, 0 );
    QApplication::postEvent( fullscreenControls, static_cast<QEvent *>(eShow) );
 }
-#if 0
-void MainInterface::requestLayoutUpdate()
-{
-    emit askUpdate();
-}
-#endif
+
 
 //FIXME remove me at the end...
 void MainInterface::debug()
 {
+#ifndef NDEBUG
     msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
     if( videoWidget && videoWidget->isVisible() )
     {
-//    sleep( 10 );
-    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
-    msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
+        //    sleep( 10 );
+        msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
+        msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
     }
     adjustSize();
+#endif
 }
 
 /****************************************************************************
@@ -638,6 +606,9 @@ void MainInterface::showSpeedMenu( QPoint pos )
 /****************************************************************************
  * Video Handling
  ****************************************************************************/
+
+/* This event is used to deal with the fullscreen and always on top
+   issue conflict (bug in wx) */
 class SetVideoOnTopQtEvent : public QEvent
 {
 public:
@@ -645,17 +616,13 @@ public:
       QEvent( (QEvent::Type)SetVideoOnTopEvent_Type ), onTop( _onTop)
     {}
 
-    bool OnTop() const
-    {
-        return onTop;
-    }
+    bool OnTop() const { return onTop; }
 
 private:
     bool onTop;
 };
 
 /**
- * README
  * README
  * Thou shall not call/resize/hide widgets from on another thread.
  * This is wrong, and this is TEH reason to emit signals on those Video Functions
@@ -664,8 +631,6 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
                                    unsigned int *pi_height )
 {
-    bgWasVisible = false;
-
     /* Request the videoWidget */
     void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
     if( ret ) /* The videoWidget is available */
@@ -676,22 +641,12 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
             bgWasVisible = true;
             emit askBgWidgetToToggle();
         }
-#if 0
-        if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
-        {
-            videoWidget->widgetSize = QSize( *pi_width, *pi_height );
-        }
-        else /* Background widget available, use its size */
-        {
-            /* Ok, our visualizations are bad, so don't do this for the moment
-             * use the requested size anyway */
-            // videoWidget->widgetSize = bgWidget->widgeTSize;
-            videoWidget->widgetSize = QSize( *pi_width, *pi_height );
-        }
-#endif
+        else
+            bgWasVisible = false;
+
+        /* Consider the video active now */
         videoIsActive = true;
 
-//        emit askVideoToResize( *pi_width, *pi_height );
         emit askUpdate();
 
         if( fullscreenControls ) fullscreenControls->attachVout( p_nvout );
@@ -699,6 +654,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
     return ret;
 }
 
+/* Call from the WindowClose function */
 void MainInterface::releaseVideo( void *p_win )
 {
     if( fullscreenControls ) fullscreenControls->detachVout();
@@ -706,21 +662,23 @@ void MainInterface::releaseVideo( void *p_win )
         emit askReleaseVideo( p_win );
 }
 
+/* Function that is CONNECTED to the previous emit */
 void MainInterface::releaseVideoSlot( void *p_win )
 {
     videoWidget->release( p_win );
-    videoWidget->hide();
 
     if( bgWasVisible )
     {
+        /* Reset the bg state */
         bgWasVisible = false;
         bgWidget->show();
     }
 
-    videoIsActive = false;
-    if( !isFullScreen() ) adjustSize();
+    /* Try to resize, except when you are in Fullscreen mode */
+    if( !isFullScreen() ) doComponentsUpdate();
 }
 
+/* Call from WindowControl function */
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
 {
     int i_ret = VLC_SUCCESS;
@@ -825,7 +783,7 @@ void MainInterface::toggleMinimalView()
         else
         {
             /* If video is visible, then toggle the status of bgWidget */
-            bgWasVisible = !bgWasVisible;    	
+            bgWasVisible = !bgWasVisible;
         }
     }
 
@@ -840,8 +798,8 @@ void MainInterface::toggleMinimalView()
 void MainInterface::doComponentsUpdate()
 {
     msg_Dbg( p_intf, "Updating the geometry" );
-//    resize( sizeHint() );
-    debug();
+    //    resize( sizeHint() );
+    adjustSize();
 }
 
 /* toggling advanced controls buttons */

@@ -41,26 +41,6 @@
 #include <QWidget>
 #include <QFrame>
 
-#define VOLUME_MAX 200
-
-/* on WIN32 hide() for fullscreen controller doesnt work, so it have to be
-   done by trick with setting the opacity of window */
-#ifdef WIN32
-    #define WIN32TRICK
-#endif
-
-/* to trying transparency with fullscreen controller on windows enable that */
-/* it can be enabled on-non windows systems,
-   but it will be transparent only with composite manager */
-#ifndef WIN32
-    #define HAVE_TRANSPARENCY 1
-#else
-    #define HAVE_TRANSPARENCY 0
-#endif
-
-/* Default value of opacity for FS controller */
-#define DEFAULT_OPACITY 0.75
-
 class ResizeEvent;
 class QPalette;
 class QPixmap;
@@ -240,6 +220,24 @@ signals:
     void advancedControlsToggled( bool );
 };
 
+/* on WIN32 hide() for fullscreen controller doesnt work, so it have to be
+   done by trick with setting the opacity of window */
+#ifdef WIN32
+    #define WIN32TRICK
+#endif
+
+/* to trying transparency with fullscreen controller on windows enable that */
+/* it can be enabled on-non windows systems,
+   but it will be transparent only with composite manager */
+#ifndef WIN32
+    #define HAVE_TRANSPARENCY 1
+#else
+    #define HAVE_TRANSPARENCY 0
+#endif
+
+/* Default value of opacity for FS controller */
+#define DEFAULT_OPACITY 0.75
+
 /***********************************
  * Fullscreen controller
  ***********************************/
@@ -302,7 +300,7 @@ private:
 };
 
 
-
+#define VOLUME_MAX 200
 class VolumeClickHandler : public QObject
 {
 public:
