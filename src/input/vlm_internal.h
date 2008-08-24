@@ -87,7 +87,8 @@ struct vlm_t
 {
     VLC_COMMON_MEMBERS
 
-    vlc_mutex_t lock;
+    vlc_mutex_t  lock;
+    vlc_thread_t thread;
 
     /* */
     int64_t        i_id;

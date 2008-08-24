@@ -62,7 +62,7 @@
  *****************************************************************************/
 
 static void vlm_Destructor( vlm_t *p_vlm );
-static void* Manage( vlc_object_t * );
+static void* Manage( void * );
 static int vlm_MediaVodControl( void *, vod_media_t *, const char *, int, va_list );
 
 /*****************************************************************************
@@ -108,8 +108,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     p_vlm->p_vod = NULL;
     vlc_object_attach( p_vlm, p_this->p_libvlc );
 
-    if( vlc_thread_create( p_vlm, "vlm thread",
-                           Manage, VLC_THREAD_PRIORITY_LOW, false ) )
+    if( vlc_clone( &p_vlm->thread, Manage, p_vlm, VLC_THREAD_PRIORITY_LOW ) )
     {
         vlc_mutex_destroy( &p_vlm->lock );
         vlc_object_release( p_vlm );
@@ -155,11 +154,6 @@ void vlm_Delete( vlm_t *p_vlm )
      * is serialized against setting libvlc_priv->p_vlm from vlm_New(). */
     var_Get( p_vlm->p_libvlc, "vlm_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    /* Parental advisory: terrific humongous horrible follows...
-     * This is so that vlc_object_destroy() (from vlc_object_release()) will
-     * NOT join our thread. See also vlm_Destructor().
-     * -- Courmisch, 24/08/2008 */
-    vlc_internals( p_vlm )->b_thread = false;
     vlc_object_release( p_vlm );
     vlc_mutex_unlock( lockval.p_address );
 }
@@ -178,9 +172,8 @@ static void vlm_Destructor( vlm_t *p_vlm )
     TAB_CLEAN( p_vlm->schedule, p_vlm->schedule );
 
     vlc_object_kill( p_vlm );
-    /* Continuation of the vlm_Delete() hack. -- Courmisch */
-    vlc_internals( p_vlm )->b_thread = true;
-    vlc_thread_join( p_vlm );
+    /*vlc_cancel( p_vlm->thread ); */
+    vlc_join( p_vlm->thread, NULL );
     vlc_mutex_destroy( &p_vlm->lock );
 }
 
@@ -309,7 +302,7 @@ static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
 /*****************************************************************************
  * Manage:
  *****************************************************************************/
-static void* Manage( vlc_object_t* p_object )
+static void* Manage( void* p_object )
 {
     vlm_t *vlm = (vlm_t*)p_object;
     int i, j;
