@@ -1007,7 +1007,7 @@ void Equalizer::updateUISliderValues( int i_preset )
 
             bands[i]->setValue( (int)( ( f + 20 ) * 10 )  );
 
-            band_texts[i]->setText( band_frequencies[i] + "\n" 
+            band_texts[i]->setText( band_frequencies[i] + "\n"
                                   + QString("%1").arg( f, 5, 'f', 1 ) + "dB" );
             if( p == NULL || *p == '\0' )
                 break;
