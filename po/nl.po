@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-08-24 20:25+0100\n"
+"POT-Creation-Date: 2008-08-24 22:56+0300\n"
 "PO-Revision-Date: 2008-08-24 20:58+0100\n"
 "Last-Translator: Myckel Habets <myckel@sdf.lonestar.org>\n"
 "Language-Team: De Vrije CD <leiden@losc.nl>\n"
@@ -994,7 +994,7 @@ msgstr "VLC kon decoder module niet openen."
 #: src/input/es_out.c:480 src/input/es_out.c:485 src/libvlc-module.c:319
 #: modules/access/cdda/info.c:392 modules/access/vcdx/access.c:477
 #: modules/access/vcdx/info.c:290 modules/access/vcdx/info.c:291
-#: modules/gui/qt4/components/open_panels.cpp:336
+#: modules/gui/qt4/components/open_panels.cpp:341
 msgid "Track"
 msgstr "Spoor"
 
@@ -1066,7 +1066,7 @@ msgid "Bits per sample"
 msgstr "Aantal bits per sample"
 
 #: src/input/es_out.c:2080 modules/access_output/shout.c:91
-#: modules/access/pvr.c:97 modules/gui/qt4/components/open_panels.cpp:850
+#: modules/access/pvr.c:97 modules/gui/qt4/components/open_panels.cpp:855
 msgid "Bitrate"
 msgstr "Bitrate"
 
@@ -1115,13 +1115,13 @@ msgstr ""
 #: modules/gui/beos/MediaControlView.cpp:1237 modules/gui/macosx/intf.m:545
 #: modules/gui/macosx/intf.m:546 modules/gui/macosx/open.m:179
 #: modules/gui/macosx/playlistinfo.m:72 modules/gui/macosx/wizard.m:348
-#: modules/gui/qt4/components/open_panels.cpp:310
+#: modules/gui/qt4/components/open_panels.cpp:315
 #: modules/gui/qt4/ui/open_disk.ui:200 modules/mux/asf.c:52
 msgid "Title"
 msgstr "Titel"
 
 #: src/input/meta.c:53 modules/gui/macosx/playlistinfo.m:73
-#: modules/gui/macosx/playlist.m:1107
+#: modules/gui/macosx/playlist.m:1121
 msgid "Artist"
 msgstr "Artiest"
 
@@ -1245,7 +1245,7 @@ msgstr "Volgend Hoofdstuk"
 msgid "Previous chapter"
 msgstr "Vorig Hoofdstuk"
 
-#: src/input/vlm.c:524 src/input/vlm.c:860
+#: src/input/vlm.c:531 src/input/vlm.c:867
 #, c-format
 msgid "Media: %s"
 msgstr "Media: %s"
@@ -1258,7 +1258,7 @@ msgstr "Media: %s"
 #: modules/gui/macosx/prefs.m:126 modules/gui/macosx/prefs.m:147
 #: modules/gui/macosx/simple_prefs.m:237 modules/gui/macosx/simple_prefs.m:300
 #: modules/gui/macosx/simple_prefs.m:627 modules/gui/macosx/wizard.m:320
-#: modules/gui/qt4/components/open_panels.cpp:1141
+#: modules/gui/qt4/components/open_panels.cpp:1146
 #: modules/gui/qt4/components/preferences_widgets.cpp:1294
 msgid "Cancel"
 msgstr "Annuleren"
@@ -1278,7 +1278,7 @@ msgstr "Annuleren"
 #: modules/gui/macosx/wizard.m:1676 modules/gui/macosx/wizard.m:1684
 #: modules/gui/macosx/wizard.m:1865 modules/gui/macosx/wizard.m:1876
 #: modules/gui/macosx/wizard.m:1889
-#: modules/gui/qt4/components/open_panels.cpp:1140
+#: modules/gui/qt4/components/open_panels.cpp:1145
 #: modules/gui/qt4/components/preferences_widgets.cpp:1293
 #: modules/gui/qt4/main_interface.cpp:523
 msgid "OK"
@@ -5298,7 +5298,7 @@ msgstr ""
 "in milliseconden opgegeven worden."
 
 #: modules/access/bda/bda.c:45 modules/access/dvb/access.c:83
-#: modules/gui/qt4/components/open_panels.cpp:877
+#: modules/gui/qt4/components/open_panels.cpp:882
 msgid "Adapter card to tune"
 msgstr "Adapter kaart voor tunen"
 
@@ -5315,8 +5315,8 @@ msgid "Device number to use on adapter"
 msgstr "Apparaat nummer voor de adapter"
 
 #: modules/access/bda/bda.c:52 modules/access/dvb/access.c:89
-#: modules/gui/qt4/components/open_panels.cpp:636
-#: modules/gui/qt4/components/open_panels.cpp:899
+#: modules/gui/qt4/components/open_panels.cpp:641
+#: modules/gui/qt4/components/open_panels.cpp:904
 msgid "Transponder/multiplex frequency"
 msgstr "Transponder/multiplex frequentie"
 
@@ -6073,8 +6073,8 @@ msgstr ""
 "waarde moet in milliseconden opgegeven worden."
 
 #: modules/access/dshow/dshow.cpp:102 modules/access/v4l.c:81
-#: modules/gui/qt4/components/open_panels.cpp:687
-#: modules/gui/qt4/components/open_panels.cpp:722
+#: modules/gui/qt4/components/open_panels.cpp:692
+#: modules/gui/qt4/components/open_panels.cpp:727
 msgid "Video device name"
 msgstr "Video apparaatnaam"
 
@@ -6087,8 +6087,8 @@ msgstr ""
 "worden. Als u niets opgeeft, zal het standaardapparaat gebruikt worden."
 
 #: modules/access/dshow/dshow.cpp:107 modules/access/v4l2/v4l2.c:169
-#: modules/access/v4l.c:85 modules/gui/qt4/components/open_panels.cpp:693
-#: modules/gui/qt4/components/open_panels.cpp:728
+#: modules/access/v4l.c:85 modules/gui/qt4/components/open_panels.cpp:698
+#: modules/gui/qt4/components/open_panels.cpp:733
 msgid "Audio device name"
 msgstr "Audio apparaatnaam"
 
@@ -6101,7 +6101,7 @@ msgstr ""
 "worden. Als u niets opgeeft, zal het standaardapparaat gebruikt worden."
 
 #: modules/access/dshow/dshow.cpp:112
-#: modules/gui/qt4/components/open_panels.cpp:601
+#: modules/gui/qt4/components/open_panels.cpp:606
 msgid "Video size"
 msgstr "Video grootte"
 
@@ -6661,7 +6661,7 @@ msgstr ""
 "per seconde uitkomen negeren."
 
 #: modules/access_filter/bandwidth.c:45
-#: modules/gui/qt4/components/open_panels.cpp:655
+#: modules/gui/qt4/components/open_panels.cpp:660
 msgid "Bandwidth"
 msgstr "Bandbreedte"
 
@@ -7275,8 +7275,8 @@ msgid "PVR radio device"
 msgstr "PVR radio-apparaat"
 
 #: modules/access/pvr.c:71 modules/access/v4l.c:100
-#: modules/gui/qt4/components/open_panels.cpp:735
-#: modules/gui/qt4/components/open_panels.cpp:834
+#: modules/gui/qt4/components/open_panels.cpp:740
+#: modules/gui/qt4/components/open_panels.cpp:839
 msgid "Norm"
 msgstr "Norm"
 
@@ -7305,8 +7305,8 @@ msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "Hoogte van de stream voor opname (-1 voor autodetectie)."
 
 #: modules/access/pvr.c:83 modules/access/v4l2/v4l2.c:230
-#: modules/access/v4l.c:93 modules/gui/qt4/components/open_panels.cpp:742
-#: modules/gui/qt4/components/open_panels.cpp:841
+#: modules/access/v4l.c:93 modules/gui/qt4/components/open_panels.cpp:747
+#: modules/gui/qt4/components/open_panels.cpp:846
 msgid "Frequency"
 msgstr "Frequentie"
 
@@ -7595,7 +7595,7 @@ msgid "UDP input"
 msgstr "UDP-invoer"
 
 #: modules/access/v4l2/v4l2.c:79 modules/gui/macosx/open.m:178
-#: modules/gui/qt4/components/open_panels.cpp:821
+#: modules/gui/qt4/components/open_panels.cpp:826
 msgid "Device name"
 msgstr "Apparaatnaam"
 
@@ -7608,7 +7608,7 @@ msgstr ""
 "video0 gebruikt worden."
 
 #: modules/access/v4l2/v4l2.c:83
-#: modules/gui/qt4/components/open_panels.cpp:700
+#: modules/gui/qt4/components/open_panels.cpp:705
 #: modules/stream_out/standard.c:100
 msgid "Standard"
 msgstr "Standaard"
@@ -8178,7 +8178,7 @@ msgstr "Bovenstaand bericht had een onbekend vcdimage log niveau"
 #: modules/access/vcdx/access.c:286 modules/access/vcdx/access.c:369
 #: modules/access/vcdx/access.c:696 modules/access/vcdx/info.c:294
 #: modules/access/vcdx/info.c:295
-#: modules/gui/qt4/components/open_panels.cpp:323
+#: modules/gui/qt4/components/open_panels.cpp:328
 msgid "Entry"
 msgstr "Onderdeel"
 
@@ -9811,15 +9811,15 @@ msgstr ""
 msgid "Fake video decoder"
 msgstr "Fake videodecoder"
 
-#: modules/codec/flac.c:184
+#: modules/codec/flac.c:186
 msgid "Flac audio decoder"
 msgstr "Flac audiodecoder"
 
-#: modules/codec/flac.c:189
+#: modules/codec/flac.c:191
 msgid "Flac audio encoder"
 msgstr "Flac audio-encoder"
 
-#: modules/codec/flac.c:195
+#: modules/codec/flac.c:197
 msgid "Flac audio packetizer"
 msgstr "Flac audio packetizer"
 
@@ -14476,7 +14476,7 @@ msgid "Sort Node by Author"
 msgstr "Sorteer subgroep op auteur"
 
 #: modules/gui/macosx/playlist.m:449 modules/gui/macosx/playlist.m:487
-#: modules/gui/macosx/playlist.m:1395
+#: modules/gui/macosx/playlist.m:1409
 msgid "No items in the playlist"
 msgstr "Geen items in de afspeellijst"
 
@@ -14500,13 +14500,13 @@ msgstr "Uitgebreid M3U bestand"
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr "XML Uitwisselbare Afspeellijst Formaat (XSPF)"
 
-#: modules/gui/macosx/playlist.m:481 modules/gui/macosx/playlist.m:1388
+#: modules/gui/macosx/playlist.m:481 modules/gui/macosx/playlist.m:1402
 #: modules/gui/macosx/wizard.m:1356
 #, c-format
 msgid "%i items"
 msgstr "%i items"
 
-#: modules/gui/macosx/playlist.m:489 modules/gui/macosx/playlist.m:1399
+#: modules/gui/macosx/playlist.m:489 modules/gui/macosx/playlist.m:1413
 msgid "1 item"
 msgstr "1 item"
 
@@ -14514,19 +14514,19 @@ msgstr "1 item"
 msgid "Save Playlist"
 msgstr "Afspeellijst opslaan"
 
-#: modules/gui/macosx/playlist.m:1107 modules/gui/ncurses.c:1808
+#: modules/gui/macosx/playlist.m:1121 modules/gui/ncurses.c:1808
 msgid "Meta-information"
 msgstr "Metadata"
 
-#: modules/gui/macosx/playlist.m:1354
+#: modules/gui/macosx/playlist.m:1368
 msgid "New Node"
 msgstr "Nieuwe subgroep"
 
-#: modules/gui/macosx/playlist.m:1355
+#: modules/gui/macosx/playlist.m:1369
 msgid "Please enter a name for the new node."
 msgstr "Geef een naam op voor de nieuwe subgroep"
 
-#: modules/gui/macosx/playlist.m:1366
+#: modules/gui/macosx/playlist.m:1380
 msgid "Empty Folder"
 msgstr "Lege map"
 
@@ -16540,49 +16540,49 @@ msgstr "Filter:"
 msgid "Open subtitles file"
 msgstr "Open ondertitelingsbestand"
 
-#: modules/gui/qt4/components/open_panels.cpp:262
+#: modules/gui/qt4/components/open_panels.cpp:267
 msgid "Eject the disc"
 msgstr "De schijf uitwerpen"
 
-#: modules/gui/qt4/components/open_panels.cpp:622
-#: modules/gui/qt4/components/open_panels.cpp:878
+#: modules/gui/qt4/components/open_panels.cpp:627
+#: modules/gui/qt4/components/open_panels.cpp:883
 msgid "DVB Type:"
 msgstr "DVB Type:"
 
-#: modules/gui/qt4/components/open_panels.cpp:646
-#: modules/gui/qt4/components/open_panels.cpp:908
+#: modules/gui/qt4/components/open_panels.cpp:651
+#: modules/gui/qt4/components/open_panels.cpp:913
 msgid "Transponder symbol rate"
 msgstr "Transponder-symboolratio in KHz"
 
-#: modules/gui/qt4/components/open_panels.cpp:768
+#: modules/gui/qt4/components/open_panels.cpp:773
 msgid "Channels:"
 msgstr "Kanalen:"
 
-#: modules/gui/qt4/components/open_panels.cpp:781
+#: modules/gui/qt4/components/open_panels.cpp:786
 msgid "Selected ports:"
 msgstr "Geselecteerde poorten:"
 
-#: modules/gui/qt4/components/open_panels.cpp:784
+#: modules/gui/qt4/components/open_panels.cpp:789
 msgid ".*"
 msgstr ".*"
 
-#: modules/gui/qt4/components/open_panels.cpp:789
+#: modules/gui/qt4/components/open_panels.cpp:794
 msgid "Input caching:"
 msgstr "Invoerbufferen:"
 
-#: modules/gui/qt4/components/open_panels.cpp:799
+#: modules/gui/qt4/components/open_panels.cpp:804
 msgid "Use VLC pace"
 msgstr "Gebruik VLC pace"
 
-#: modules/gui/qt4/components/open_panels.cpp:803
+#: modules/gui/qt4/components/open_panels.cpp:808
 msgid "Auto connnection"
 msgstr "Automatisch verbinden"
 
-#: modules/gui/qt4/components/open_panels.cpp:827
+#: modules/gui/qt4/components/open_panels.cpp:832
 msgid "Radio device name"
 msgstr "Radio apparaatnaam"
 
-#: modules/gui/qt4/components/open_panels.cpp:1113
+#: modules/gui/qt4/components/open_panels.cpp:1118
 msgid "Advanced Options"
 msgstr "Geavanceerde opties"
 
@@ -22855,14 +22855,6 @@ msgstr "RSS en Atom feed weergave"
 msgid "RV32 conversion filter"
 msgstr "RV32 conversiefilter"
 
-#: modules/video_filter/seamcarving.c:63
-msgid "Seam Carving video filter"
-msgstr "Seam Carving videofilter"
-
-#: modules/video_filter/seamcarving.c:64
-msgid "Seam Carving"
-msgstr "Seam Carving"
-
 #: modules/video_filter/sharpen.c:47
 msgid "Sharpen strength (0-2)"
 msgstr "Verscherpingskracht (0-2)"
@@ -23806,6 +23798,12 @@ msgstr "Visuele effecten filter"
 #: modules/visualization/visual/visual.c:123
 msgid "Spectrum analyser"
 msgstr "Spectrum analyser"
+
+#~ msgid "Seam Carving video filter"
+#~ msgstr "Seam Carving videofilter"
+
+#~ msgid "Seam Carving"
+#~ msgstr "Seam Carving"
 
 #~ msgid ""
 #~ "This adds post-processing filters to enhance the picture quality, for "

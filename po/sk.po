@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Slovak translation for VLC Media Player\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-08-24 00:09+0100\n"
+"POT-Creation-Date: 2008-08-24 22:56+0300\n"
 "PO-Revision-Date: 2008-08-23 21:51+0100\n"
 "Last-Translator: Marián Hikaník <podnety-at-mojepreklady.net>\n"
 "Language-Team: Marián Hikaník, translation controlled by: Pavel Kříž\n"
@@ -365,7 +365,7 @@ msgstr "Implementácia funkcie video na požiadanie (Video on Demand)"
 #: modules/gui/beos/InterfaceWindow.cpp:326 modules/gui/macosx/intf.m:494
 #: modules/gui/pda/pda_interface.c:1262
 #: modules/gui/qt4/dialogs/playlist.cpp:48
-#: modules/gui/qt4/main_interface.cpp:127
+#: modules/gui/qt4/main_interface.cpp:120
 msgid "Playlist"
 msgstr "Playlist"
 
@@ -966,7 +966,7 @@ msgstr "Program VLC nemohol otvoriť dekódovací modul."
 #: src/input/es_out.c:480 src/input/es_out.c:485 src/libvlc-module.c:319
 #: modules/access/cdda/info.c:392 modules/access/vcdx/access.c:477
 #: modules/access/vcdx/info.c:290 modules/access/vcdx/info.c:291
-#: modules/gui/qt4/components/open_panels.cpp:336
+#: modules/gui/qt4/components/open_panels.cpp:341
 msgid "Track"
 msgstr "Stopa"
 
@@ -1038,7 +1038,7 @@ msgid "Bits per sample"
 msgstr "bitov na vzorok"
 
 #: src/input/es_out.c:2080 modules/access_output/shout.c:91
-#: modules/access/pvr.c:97 modules/gui/qt4/components/open_panels.cpp:850
+#: modules/access/pvr.c:97 modules/gui/qt4/components/open_panels.cpp:855
 msgid "Bitrate"
 msgstr "Dátový tok"
 
@@ -1089,13 +1089,13 @@ msgstr ""
 #: modules/gui/beos/MediaControlView.cpp:1237 modules/gui/macosx/intf.m:545
 #: modules/gui/macosx/intf.m:546 modules/gui/macosx/open.m:179
 #: modules/gui/macosx/playlistinfo.m:72 modules/gui/macosx/wizard.m:348
-#: modules/gui/qt4/components/open_panels.cpp:310
+#: modules/gui/qt4/components/open_panels.cpp:315
 #: modules/gui/qt4/ui/open_disk.ui:200 modules/mux/asf.c:52
 msgid "Title"
 msgstr "Titul"
 
 #: src/input/meta.c:53 modules/gui/macosx/playlistinfo.m:73
-#: modules/gui/macosx/playlist.m:1107
+#: modules/gui/macosx/playlist.m:1121
 msgid "Artist"
 msgstr "Interpret"
 
@@ -1210,16 +1210,16 @@ msgid "Chapter %i"
 msgstr "Kapitola %i"
 
 #: src/input/var.c:367 modules/gui/beos/InterfaceWindow.cpp:291
-#: modules/gui/qt4/components/interface_widgets.cpp:837
+#: modules/gui/qt4/components/interface_widgets.cpp:847
 msgid "Next chapter"
 msgstr "Ďalšia kapitola"
 
 #: src/input/var.c:372 modules/gui/beos/InterfaceWindow.cpp:290
-#: modules/gui/qt4/components/interface_widgets.cpp:836
+#: modules/gui/qt4/components/interface_widgets.cpp:846
 msgid "Previous chapter"
 msgstr "Predchádzajúca kapitola"
 
-#: src/input/vlm.c:524 src/input/vlm.c:860
+#: src/input/vlm.c:531 src/input/vlm.c:867
 #, c-format
 msgid "Media: %s"
 msgstr "Médium: %s"
@@ -1232,7 +1232,7 @@ msgstr "Médium: %s"
 #: modules/gui/macosx/prefs.m:126 modules/gui/macosx/prefs.m:147
 #: modules/gui/macosx/simple_prefs.m:237 modules/gui/macosx/simple_prefs.m:300
 #: modules/gui/macosx/simple_prefs.m:627 modules/gui/macosx/wizard.m:320
-#: modules/gui/qt4/components/open_panels.cpp:1141
+#: modules/gui/qt4/components/open_panels.cpp:1146
 #: modules/gui/qt4/components/preferences_widgets.cpp:1294
 msgid "Cancel"
 msgstr "Storno"
@@ -1252,7 +1252,7 @@ msgstr "Storno"
 #: modules/gui/macosx/wizard.m:1676 modules/gui/macosx/wizard.m:1684
 #: modules/gui/macosx/wizard.m:1865 modules/gui/macosx/wizard.m:1876
 #: modules/gui/macosx/wizard.m:1889
-#: modules/gui/qt4/components/open_panels.cpp:1140
+#: modules/gui/qt4/components/open_panels.cpp:1145
 #: modules/gui/qt4/components/preferences_widgets.cpp:1293
 #: modules/gui/qt4/main_interface.cpp:523
 msgid "OK"
@@ -1878,7 +1878,7 @@ msgstr "Zabrániť orezávaniu zvuku"
 
 #: src/libvlc-module.c:319 modules/access/dshow/dshow.cpp:81
 #: modules/access/dshow/dshow.cpp:83 modules/codec/avcodec/avcodec.c:71
-#: modules/gui/qt4/components/interface_widgets.cpp:258
+#: modules/gui/qt4/components/interface_widgets.cpp:268
 #: modules/video_output/opengl.c:126 modules/video_output/opengl.c:182
 msgid "None"
 msgstr "Žiaden"
@@ -3728,7 +3728,7 @@ msgstr "Vyberte si klávesu, ktorú chcete používať pre spustenie prehrávani
 
 #: src/libvlc-module.c:1166 modules/control/hotkeys.c:695
 #: modules/gui/macosx/controls.m:868 modules/gui/macosx/intf.m:533
-#: modules/gui/qt4/components/interface_widgets.cpp:513
+#: modules/gui/qt4/components/interface_widgets.cpp:523
 msgid "Faster"
 msgstr "Rýchlejšie"
 
@@ -3738,7 +3738,7 @@ msgstr "Vyberte si klávesu, ktorú chcete používať pre zrýchlenie prehráva
 
 #: src/libvlc-module.c:1168 modules/control/hotkeys.c:701
 #: modules/gui/macosx/controls.m:869 modules/gui/macosx/intf.m:534
-#: modules/gui/qt4/components/interface_widgets.cpp:507
+#: modules/gui/qt4/components/interface_widgets.cpp:517
 msgid "Slower"
 msgstr "Pomalšie"
 
@@ -4026,7 +4026,7 @@ msgstr "Vyberte si klávesu pre zníženie hlasitosti zvuku."
 #: src/libvlc-module.c:1240 modules/access/v4l2/v4l2.c:195
 #: modules/gui/macosx/controls.m:928 modules/gui/macosx/intf.m:553
 #: modules/gui/macosx/intf.m:614 modules/gui/macosx/intf.m:623
-#: modules/gui/qt4/components/interface_widgets.cpp:876
+#: modules/gui/qt4/components/interface_widgets.cpp:886
 msgid "Mute"
 msgstr "Stlmiť"
 
@@ -4294,7 +4294,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1314 modules/access_filter/record.c:56
 #: modules/access_filter/record.c:57 modules/gui/macosx/simple_prefs.m:257
-#: modules/gui/qt4/components/interface_widgets.cpp:344
+#: modules/gui/qt4/components/interface_widgets.cpp:354
 #: modules/gui/qt4/ui/sprefs_input.ui:194
 msgid "Record"
 msgstr "Nahrať"
@@ -5330,7 +5330,7 @@ msgstr ""
 "pamäte. Táto hodnota sa udáva v milisekundách."
 
 #: modules/access/bda/bda.c:45 modules/access/dvb/access.c:83
-#: modules/gui/qt4/components/open_panels.cpp:877
+#: modules/gui/qt4/components/open_panels.cpp:882
 msgid "Adapter card to tune"
 msgstr "Karta adaptéra"
 
@@ -5347,8 +5347,8 @@ msgid "Device number to use on adapter"
 msgstr "Číslo zariadenia, ktoré chcete použiť na adaptéri. "
 
 #: modules/access/bda/bda.c:52 modules/access/dvb/access.c:89
-#: modules/gui/qt4/components/open_panels.cpp:636
-#: modules/gui/qt4/components/open_panels.cpp:899
+#: modules/gui/qt4/components/open_panels.cpp:641
+#: modules/gui/qt4/components/open_panels.cpp:904
 msgid "Transponder/multiplex frequency"
 msgstr "Frekvencia transpondéru/multiplexu"
 
@@ -6126,8 +6126,8 @@ msgstr ""
 "v milisekundách."
 
 #: modules/access/dshow/dshow.cpp:102 modules/access/v4l.c:81
-#: modules/gui/qt4/components/open_panels.cpp:687
-#: modules/gui/qt4/components/open_panels.cpp:722
+#: modules/gui/qt4/components/open_panels.cpp:692
+#: modules/gui/qt4/components/open_panels.cpp:727
 msgid "Video device name"
 msgstr "Názov video-zariadenia"
 
@@ -6140,8 +6140,8 @@ msgstr ""
 "zariadenie nešpecifikujete, použije sa predvolené."
 
 #: modules/access/dshow/dshow.cpp:107 modules/access/v4l2/v4l2.c:169
-#: modules/access/v4l.c:85 modules/gui/qt4/components/open_panels.cpp:693
-#: modules/gui/qt4/components/open_panels.cpp:728
+#: modules/access/v4l.c:85 modules/gui/qt4/components/open_panels.cpp:698
+#: modules/gui/qt4/components/open_panels.cpp:733
 msgid "Audio device name"
 msgstr "Názov zvuk. zariadenia"
 
@@ -6154,7 +6154,7 @@ msgstr ""
 "zariadenie nešpecifikujete, použije sa predvolené."
 
 #: modules/access/dshow/dshow.cpp:112
-#: modules/gui/qt4/components/open_panels.cpp:601
+#: modules/gui/qt4/components/open_panels.cpp:606
 msgid "Video size"
 msgstr "Veľkosť videa"
 
@@ -6725,7 +6725,7 @@ msgstr ""
 "povolený dátový tok."
 
 #: modules/access_filter/bandwidth.c:45
-#: modules/gui/qt4/components/open_panels.cpp:655
+#: modules/gui/qt4/components/open_panels.cpp:660
 msgid "Bandwidth"
 msgstr "Šírka prenosového pásma"
 
@@ -7341,8 +7341,8 @@ msgid "PVR radio device"
 msgstr "Jednotka pre PVR - rádio"
 
 #: modules/access/pvr.c:71 modules/access/v4l.c:100
-#: modules/gui/qt4/components/open_panels.cpp:735
-#: modules/gui/qt4/components/open_panels.cpp:834
+#: modules/gui/qt4/components/open_panels.cpp:740
+#: modules/gui/qt4/components/open_panels.cpp:839
 msgid "Norm"
 msgstr "Norma"
 
@@ -7371,8 +7371,8 @@ msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "Výška zachytávaného streamu (pre autodetekciu zadajte hodnotu -1)."
 
 #: modules/access/pvr.c:83 modules/access/v4l2/v4l2.c:230
-#: modules/access/v4l.c:93 modules/gui/qt4/components/open_panels.cpp:742
-#: modules/gui/qt4/components/open_panels.cpp:841
+#: modules/access/v4l.c:93 modules/gui/qt4/components/open_panels.cpp:747
+#: modules/gui/qt4/components/open_panels.cpp:846
 msgid "Frequency"
 msgstr "Frekvencia"
 
@@ -7663,7 +7663,7 @@ msgid "UDP input"
 msgstr "Vstup UDP"
 
 #: modules/access/v4l2/v4l2.c:79 modules/gui/macosx/open.m:178
-#: modules/gui/qt4/components/open_panels.cpp:821
+#: modules/gui/qt4/components/open_panels.cpp:826
 msgid "Device name"
 msgstr "Označenie jednotky"
 
@@ -7676,7 +7676,7 @@ msgstr ""
 "zariadenie, použije sa zariadenie s označením /dev/video0."
 
 #: modules/access/v4l2/v4l2.c:83
-#: modules/gui/qt4/components/open_panels.cpp:700
+#: modules/gui/qt4/components/open_panels.cpp:705
 #: modules/stream_out/standard.c:100
 msgid "Standard"
 msgstr "Štandardné"
@@ -8258,7 +8258,7 @@ msgstr "Horeuvedenená správa má neznámu úroveň zaznamenávania vcdimager"
 #: modules/access/vcdx/access.c:286 modules/access/vcdx/access.c:369
 #: modules/access/vcdx/access.c:696 modules/access/vcdx/info.c:294
 #: modules/access/vcdx/info.c:295
-#: modules/gui/qt4/components/open_panels.cpp:323
+#: modules/gui/qt4/components/open_panels.cpp:328
 msgid "Entry"
 msgstr "Záznam"
 
@@ -9128,14 +9128,14 @@ msgstr "Zvukový výstup PORTAUDIO"
 #: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:481
 #: modules/gui/macosx/intf.m:482 modules/gui/macosx/intf.m:1779
 #: modules/gui/pda/pda_interface.c:210 modules/gui/pda/pda_interface.c:1353
-#: modules/gui/qt4/main_interface.cpp:358
-#: modules/gui/qt4/main_interface.cpp:362
-#: modules/gui/qt4/main_interface.cpp:973
-#: modules/gui/qt4/main_interface.cpp:975
+#: modules/gui/qt4/main_interface.cpp:355
+#: modules/gui/qt4/main_interface.cpp:359
+#: modules/gui/qt4/main_interface.cpp:934
+#: modules/gui/qt4/main_interface.cpp:936
+#: modules/gui/qt4/main_interface.cpp:1000
+#: modules/gui/qt4/main_interface.cpp:1015
+#: modules/gui/qt4/main_interface.cpp:1022
 #: modules/gui/qt4/main_interface.cpp:1039
-#: modules/gui/qt4/main_interface.cpp:1054
-#: modules/gui/qt4/main_interface.cpp:1061
-#: modules/gui/qt4/main_interface.cpp:1078
 msgid "VLC media player"
 msgstr "VLC media player"
 
@@ -9901,15 +9901,15 @@ msgstr ""
 msgid "Fake video decoder"
 msgstr "Fingovaný video-dekodér"
 
-#: modules/codec/flac.c:184
+#: modules/codec/flac.c:186
 msgid "Flac audio decoder"
 msgstr "Dekodér zvuku Flac"
 
-#: modules/codec/flac.c:189
+#: modules/codec/flac.c:191
 msgid "Flac audio encoder"
 msgstr "Enkodér zvuku Flac"
 
-#: modules/codec/flac.c:195
+#: modules/codec/flac.c:197
 msgid "Flac audio packetizer"
 msgstr "Paketizér pre zvuk vo formáte Flac"
 
@@ -14597,7 +14597,7 @@ msgid "Sort Node by Author"
 msgstr "Zoradiť uzol podľa autora"
 
 #: modules/gui/macosx/playlist.m:449 modules/gui/macosx/playlist.m:487
-#: modules/gui/macosx/playlist.m:1395
+#: modules/gui/macosx/playlist.m:1409
 msgid "No items in the playlist"
 msgstr "Žiadne položky v playliste"
 
@@ -14621,13 +14621,13 @@ msgstr "Rozšírený M3U súbor"
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr "XML formát playlistu (XSPF)"
 
-#: modules/gui/macosx/playlist.m:481 modules/gui/macosx/playlist.m:1388
+#: modules/gui/macosx/playlist.m:481 modules/gui/macosx/playlist.m:1402
 #: modules/gui/macosx/wizard.m:1356
 #, c-format
 msgid "%i items"
 msgstr "%i položiek"
 
-#: modules/gui/macosx/playlist.m:489 modules/gui/macosx/playlist.m:1399
+#: modules/gui/macosx/playlist.m:489 modules/gui/macosx/playlist.m:1413
 msgid "1 item"
 msgstr "1 položka"
 
@@ -14635,19 +14635,19 @@ msgstr "1 položka"
 msgid "Save Playlist"
 msgstr "Uložiť playlist"
 
-#: modules/gui/macosx/playlist.m:1107 modules/gui/ncurses.c:1808
+#: modules/gui/macosx/playlist.m:1121 modules/gui/ncurses.c:1808
 msgid "Meta-information"
 msgstr "Meta-Informácia"
 
-#: modules/gui/macosx/playlist.m:1354
+#: modules/gui/macosx/playlist.m:1368
 msgid "New Node"
 msgstr "Nový uzol"
 
-#: modules/gui/macosx/playlist.m:1355
+#: modules/gui/macosx/playlist.m:1369
 msgid "Please enter a name for the new node."
 msgstr "Prosím zadajte názov pre nový uzol."
 
-#: modules/gui/macosx/playlist.m:1366
+#: modules/gui/macosx/playlist.m:1380
 msgid "Empty Folder"
 msgstr "Prázdny priečinok"
 
@@ -16567,11 +16567,11 @@ msgstr ""
 "Prehrať\n"
 "Ak je playlist prázdny, otvoriť médium"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:256
+#: modules/gui/qt4/components/interface_widgets.cpp:266
 msgid "Current visualization"
 msgstr "Aktuálna vizualizácia"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:318
+#: modules/gui/qt4/components/interface_widgets.cpp:328
 msgid ""
 "Loop from point A to point B continuously.\n"
 "Click to set point A"
@@ -16579,15 +16579,15 @@ msgstr ""
 "Kontinuálne opakovať od bodu A po bod B.\n"
 "Pre nastavenie bodu A kliknite sem."
 
-#: modules/gui/qt4/components/interface_widgets.cpp:336
+#: modules/gui/qt4/components/interface_widgets.cpp:346
 msgid "Frame by frame"
 msgstr "Snímka za snímkou"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:351
+#: modules/gui/qt4/components/interface_widgets.cpp:361
 msgid "Take a snapshot"
 msgstr "Vytvoriť snímok"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:426
+#: modules/gui/qt4/components/interface_widgets.cpp:436
 msgid ""
 "Loop from point A to point B continuously\n"
 "Click to set point A"
@@ -16595,64 +16595,64 @@ msgstr ""
 "Kontinuálne Opakovať od bodu A do bodu B\n"
 "Pre nastavenie bodu A kliknite sem."
 
-#: modules/gui/qt4/components/interface_widgets.cpp:431
+#: modules/gui/qt4/components/interface_widgets.cpp:441
 msgid "Click to set point B"
 msgstr "Pre nastavenie bodu B kliknite sem"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:436
+#: modules/gui/qt4/components/interface_widgets.cpp:446
 msgid "Stop the A to B loop"
 msgstr "Zastaviť opakovanie od bodu A po B"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:542
+#: modules/gui/qt4/components/interface_widgets.cpp:552
 msgid "Menu"
 msgstr "Menu"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:591
+#: modules/gui/qt4/components/interface_widgets.cpp:601
 msgid "Teletext on"
 msgstr "Teletext je zapnutý"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:603
-#: modules/gui/qt4/components/interface_widgets.cpp:796
+#: modules/gui/qt4/components/interface_widgets.cpp:613
+#: modules/gui/qt4/components/interface_widgets.cpp:806
 msgid "Teletext"
 msgstr "Teletext"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:653
+#: modules/gui/qt4/components/interface_widgets.cpp:663
 msgid "Previous media in the playlist"
 msgstr "Predchádzajúce mediálne súbory v playliste"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:655
+#: modules/gui/qt4/components/interface_widgets.cpp:665
 msgid "Next media in the playlist"
 msgstr "Ďalšie mediálne súbory v playliste"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:656
+#: modules/gui/qt4/components/interface_widgets.cpp:666
 msgid "Stop playback"
 msgstr "Zastaviť prehrávanie"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:664
+#: modules/gui/qt4/components/interface_widgets.cpp:674
 msgid "Toggle the video in fullscreen"
 msgstr "Prepnúť video do celoobrazovkového režimu"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:672
+#: modules/gui/qt4/components/interface_widgets.cpp:682
 msgid "Show playlist"
 msgstr "Zobraziť playlist"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:678
+#: modules/gui/qt4/components/interface_widgets.cpp:688
 msgid "Show extended settings"
 msgstr "Zobraziť pokročilé nastavenia"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:802
+#: modules/gui/qt4/components/interface_widgets.cpp:812
 msgid "Transparent"
 msgstr "Priehľadné"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:867
+#: modules/gui/qt4/components/interface_widgets.cpp:877
 msgid "Unmute"
 msgstr "Vypnúť stlmenie"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:907
+#: modules/gui/qt4/components/interface_widgets.cpp:917
 msgid "Pause the playback"
 msgstr "Pozastaviť prehrávanie"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:1376
+#: modules/gui/qt4/components/interface_widgets.cpp:1386
 msgid "Revert to normal play speed"
 msgstr "Vrátiť na normálnu rýchlosť prehrávania"
 
@@ -16673,53 +16673,53 @@ msgid "Filter:"
 msgstr "Filter:"
 
 #: modules/gui/qt4/components/open_panels.cpp:155
-#: modules/gui/qt4/dialogs_provider.cpp:616
+#: modules/gui/qt4/dialogs_provider.cpp:622
 msgid "Open subtitles file"
 msgstr "Otvoriť súbor s titulkami"
 
-#: modules/gui/qt4/components/open_panels.cpp:262
+#: modules/gui/qt4/components/open_panels.cpp:267
 msgid "Eject the disc"
 msgstr "Vysunúť disk"
 
-#: modules/gui/qt4/components/open_panels.cpp:622
-#: modules/gui/qt4/components/open_panels.cpp:878
+#: modules/gui/qt4/components/open_panels.cpp:627
+#: modules/gui/qt4/components/open_panels.cpp:883
 msgid "DVB Type:"
 msgstr "Typ DVB"
 
-#: modules/gui/qt4/components/open_panels.cpp:646
-#: modules/gui/qt4/components/open_panels.cpp:908
+#: modules/gui/qt4/components/open_panels.cpp:651
+#: modules/gui/qt4/components/open_panels.cpp:913
 msgid "Transponder symbol rate"
 msgstr "Symbolová rýchlosť transpondéra"
 
-#: modules/gui/qt4/components/open_panels.cpp:768
+#: modules/gui/qt4/components/open_panels.cpp:773
 msgid "Channels:"
 msgstr "Kanály:"
 
-#: modules/gui/qt4/components/open_panels.cpp:781
+#: modules/gui/qt4/components/open_panels.cpp:786
 msgid "Selected ports:"
 msgstr "Vybrané porty:"
 
-#: modules/gui/qt4/components/open_panels.cpp:784
+#: modules/gui/qt4/components/open_panels.cpp:789
 msgid ".*"
 msgstr ".*"
 
-#: modules/gui/qt4/components/open_panels.cpp:789
+#: modules/gui/qt4/components/open_panels.cpp:794
 msgid "Input caching:"
 msgstr "Ukladanie vstupu do vyrovnávacej pamäte:"
 
-#: modules/gui/qt4/components/open_panels.cpp:799
+#: modules/gui/qt4/components/open_panels.cpp:804
 msgid "Use VLC pace"
 msgstr "Použiť VLC pace"
 
-#: modules/gui/qt4/components/open_panels.cpp:803
+#: modules/gui/qt4/components/open_panels.cpp:808
 msgid "Auto connnection"
 msgstr "Automatické pripojenie"
 
-#: modules/gui/qt4/components/open_panels.cpp:827
+#: modules/gui/qt4/components/open_panels.cpp:832
 msgid "Radio device name"
 msgstr "Názov rádio-zariadenia"
 
-#: modules/gui/qt4/components/open_panels.cpp:1113
+#: modules/gui/qt4/components/open_panels.cpp:1118
 msgid "Advanced Options"
 msgstr "Pokročilé nastavenia"
 
@@ -17176,19 +17176,19 @@ msgstr ""
 msgid "Open Directory"
 msgstr "Otvoriť priečinok"
 
-#: modules/gui/qt4/dialogs_provider.cpp:445
+#: modules/gui/qt4/dialogs_provider.cpp:451
 msgid "Open playlist file"
 msgstr "Otvoriť súbor s playlistom"
 
-#: modules/gui/qt4/dialogs_provider.cpp:456
+#: modules/gui/qt4/dialogs_provider.cpp:462
 msgid "Choose a filename to save playlist"
 msgstr "Musíte si vybrať súbor, do ktorého uloží playlist"
 
-#: modules/gui/qt4/dialogs_provider.cpp:458
+#: modules/gui/qt4/dialogs_provider.cpp:464
 msgid "XSPF playlist (*.xspf);; "
 msgstr "XSPF playlist (*.xspf);; "
 
-#: modules/gui/qt4/dialogs_provider.cpp:459
+#: modules/gui/qt4/dialogs_provider.cpp:465
 msgid "M3U playlist (*.m3u);; Any (*.*) "
 msgstr "M3U playlist (*.m3u);; Akýkoľvek (*.*) "
 
@@ -17270,11 +17270,11 @@ msgstr "Konfigurácia VLM (*.vlm) ;; Všetky (*.*)"
 msgid "Open a VLM Configuration File"
 msgstr "Otvoriť konfiguračný súbor VLM"
 
-#: modules/gui/qt4/main_interface.cpp:295
+#: modules/gui/qt4/main_interface.cpp:293
 msgid "Toggle between elapsed and remaining time"
 msgstr "Prepnúť medzi uplynulým a zostávajúcim časom"
 
-#: modules/gui/qt4/main_interface.cpp:301
+#: modules/gui/qt4/main_interface.cpp:299
 msgid ""
 "Current playback speed.\n"
 "Right click to adjust"
@@ -17311,11 +17311,11 @@ msgstr ""
 "<p>Preto si prosím skontrolujte nasledujúce nastavenia, predvolené hodnoty "
 "týchto nastavení neposkytujú totiž takmer žiadny prístup na internet.</p>\n"
 
-#: modules/gui/qt4/main_interface.cpp:1040
+#: modules/gui/qt4/main_interface.cpp:1001
 msgid "Control menu for the player"
 msgstr "Kontrolné menu prehrávača"
 
-#: modules/gui/qt4/main_interface.cpp:1089
+#: modules/gui/qt4/main_interface.cpp:1050
 msgid "Paused"
 msgstr "Pozastavené"
 
@@ -23023,14 +23023,6 @@ msgstr "Zobrazenie polí pre RSS a Atom"
 msgid "RV32 conversion filter"
 msgstr "Filter pre konverziu RV32"
 
-#: modules/video_filter/seamcarving.c:63
-msgid "Seam Carving video filter"
-msgstr "Video filter pre vyrezávanie"
-
-#: modules/video_filter/seamcarving.c:64
-msgid "Seam Carving"
-msgstr "Vyrezávanie (Seam Carving)"
-
 #: modules/video_filter/sharpen.c:47
 msgid "Sharpen strength (0-2)"
 msgstr "Úroveň zaostrenia (0-2)"
@@ -23989,6 +23981,12 @@ msgstr "Filter vizualizátora"
 #: modules/visualization/visual/visual.c:123
 msgid "Spectrum analyser"
 msgstr "Spektrálny analyzátor"
+
+#~ msgid "Seam Carving video filter"
+#~ msgstr "Video filter pre vyrezávanie"
+
+#~ msgid "Seam Carving"
+#~ msgstr "Vyrezávanie (Seam Carving)"
 
 #~ msgid ""
 #~ "This adds post-processing filters to enhance the picture quality, for "
