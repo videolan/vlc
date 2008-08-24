@@ -183,9 +183,12 @@ libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
 libvlccore_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` $(AM_LIBADD) $(LTLIBINTL)
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
-libvlccore_la_DEPENDENCIES += $(DATA_win32_rc_lib)
-libvlccore_la_LDFLAGS += -Wl,$(DATA_win32_rc_lib)
+libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
+libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT)
 endif
+
+libvlc_win32_rc.$(OBJEXT): $(top_builddir)/share/libvlc_win32_rc.rc
+	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
 
 libvlc_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_la_LIBADD = libvlccore.la
