@@ -142,24 +142,13 @@ struct intf_sys_t
  * This code relies upon the fact the url.i_port is 0 if the :PORT
  * option is missing from --telnet-host.
  */
-static int getPort(intf_thread_t *p_intf, vlc_url_t url, int i_port)
+static int getPort(intf_thread_t *p_intf, const vlc_url_t *url, int i_port)
 {
-    // Print error if two different ports have been specified
-    if (url.i_port != 0  &&
-        i_port != TELNETPORT_DEFAULT &&
-        url.i_port != i_port )
-    {
-        msg_Err( p_intf, "ignoring port %d and using %d", url.i_port,
-                 i_port);
-    }
-    if (i_port != TELNETPORT_DEFAULT)
-    {
-        return i_port;
-    }
-    if (url.i_port != 0)
-    {
-         return url.i_port;
-    }
+    if (i_port == TELNETPORT_DEFAULT && url->i_port != 0)
+        i_port = url->i_port;
+    if (url->i_port != 0 && url->i_port != i_port)
+        // Print error if two different ports have been specified
+        msg_Warn( p_intf, "ignoring port %d (using %d)", url->i_port, i_port );
     return i_port;
 }
 
@@ -190,7 +179,7 @@ static int Open( vlc_object_t *p_this )
 
     // There might be two ports given, resolve any potentially
     // conflict
-    url.i_port = getPort(p_intf, url, i_telnetport);
+    url.i_port = getPort(p_intf, &url, i_telnetport);
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
