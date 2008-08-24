@@ -113,7 +113,7 @@ typedef struct
 } ScalerConfiguration;
 
 static int GetParameters( ScalerConfiguration *,
-                          const video_format_t *p_fmti, 
+                          const video_format_t *p_fmti,
                           const video_format_t *p_fmto,
                           int i_sws_flags_default );
 
@@ -145,9 +145,7 @@ static int OpenScaler( vlc_object_t *p_this )
     if( GetParameters( NULL,
                        &p_filter->fmt_in.video,
                        &p_filter->fmt_out.video, 0 ) )
-    {
         return VLC_EGENERIC;
-    }
 
     /* */
     p_filter->pf_video_filter = Filter;
@@ -257,19 +255,19 @@ static bool IsFmtSimilar( const video_format_t *p_fmt1, const video_format_t *p_
 }
 
 static int GetParameters( ScalerConfiguration *p_cfg,
-                          const video_format_t *p_fmti, 
+                          const video_format_t *p_fmti,
                           const video_format_t *p_fmto,
                           int i_sws_flags_default )
 {
-    int i_fmti;
-    int i_fmto;
-    if( GetFfmpegChroma( &i_fmti, *p_fmti ) != VLC_SUCCESS ||
-        GetFfmpegChroma( &i_fmto, *p_fmto ) != VLC_SUCCESS )
-        return VLC_EGENERIC;
+    int i_fmti = -1;
+    int i_fmto = -1;
 
-    bool b_has_a = false;
-    bool b_add_a = false;
+    bool b_has_ai = false;
+    bool b_has_ao = false;
     int i_sws_flags = i_sws_flags_default;
+
+    GetFfmpegChroma( &i_fmti, *p_fmti );
+    GetFfmpegChroma( &i_fmto, *p_fmto );
 
     if( p_fmti->i_chroma == p_fmto->i_chroma )
     {
@@ -278,41 +276,36 @@ static int GetParameters( ScalerConfiguration *p_cfg,
             i_fmti = i_fmto = PIX_FMT_GRAY8;
             i_sws_flags = SWS_POINT;
         }
-        else if( p_fmti->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'A' ) )
-        {
-            i_fmti = i_fmto = PIX_FMT_YUV444P;
-            b_has_a = true;
-        }
-        else if( p_fmti->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
-        {
-            i_fmti = i_fmto = PIX_FMT_RGBA32;
-            b_has_a = true;
-        }
     }
-    if( i_fmti >= 0 && i_fmto < 0 )
+
+    if( p_fmti->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'A' ) )
     {
-        /* Special case: injecting dummy alpha plane */
-        switch( p_fmto->i_chroma )
-        {
-        case VLC_FOURCC( 'Y', 'U', 'V', 'A' ):
-            i_fmto = PIX_FMT_YUV444P;
-            b_add_a = true;
-            break;
-        case VLC_FOURCC( 'R', 'G', 'B', 'A' ):
-            i_fmto = PIX_FMT_RGBA32;
-            b_add_a = true;
-            break;
-        default:
-            break;
-        }
+        i_fmti = PIX_FMT_YUV444P;
+        b_has_ai = true;
+    }
+    else if( p_fmti->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+    {
+        i_fmti = PIX_FMT_RGBA32;
+        b_has_ai = true;
+    }
+
+    if( p_fmto->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'A' ) )
+    {
+        i_fmto = PIX_FMT_YUV444P;
+        b_has_ao = true;
+    }
+    else if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+    {
+        i_fmti = PIX_FMT_RGBA32;
+        b_has_ao = true;
     }
 
     if( p_cfg )
     {
         p_cfg->i_fmti = i_fmti;
         p_cfg->i_fmto = i_fmto;
-        p_cfg->b_has_a = b_has_a;
-        p_cfg->b_add_a = b_add_a;
+        p_cfg->b_has_a = b_has_ai && b_has_ao;
+        p_cfg->b_add_a = (!b_has_ai) && b_has_ao;
         p_cfg->i_sws_flags = i_sws_flags;
     }
 
@@ -456,7 +449,7 @@ static void ExtractA( picture_t *p_dst, const picture_t *p_src, unsigned i_width
 {
     plane_t *d = &p_dst->p[0];
     const plane_t *s = &p_src->p[0];
-    
+
     for( unsigned y = 0; y < i_height; y++ )
         for( unsigned x = 0; x < i_width; x++ )
             d->p_pixels[y*d->i_pitch+x] = s->p_pixels[y*s->i_pitch+4*x+OFFSET_A];
@@ -465,7 +458,7 @@ static void InjectA( picture_t *p_dst, const picture_t *p_src, unsigned i_width,
 {
     plane_t *d = &p_dst->p[0];
     const plane_t *s = &p_src->p[0];
-    
+
     for( unsigned y = 0; y < i_height; y++ )
         for( unsigned x = 0; x < i_width; x++ )
             d->p_pixels[y*d->i_pitch+4*x+OFFSET_A] = s->p_pixels[y*s->i_pitch+x];
@@ -552,19 +545,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     Convert( p_sys->ctx, p_dst, p_src, p_fmti->i_height, 0, 3 );
     if( p_sys->ctxA )
     {
-        if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
-        {
-            /* We extract the A plane to rescale it, and then we reinject it. */
+        /* We extract the A plane to rescale it, and then we reinject it. */
+        if( p_fmti->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
             ExtractA( p_sys->p_src_a, p_src, p_fmti->i_width * p_sys->i_extend_factor, p_fmti->i_height );
-
-            Convert( p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_height, 0, 1 );
-
-            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height );
-        }
         else
-        {
-            Convert( p_sys->ctxA, p_dst, p_src, p_fmti->i_height, 3, 1 );
-        }
+            plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
+
+        Convert( p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_height, 0, 1 );
+        if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height );
+        else
+            plane_CopyPixels( p_dst->p+A_PLANE, p_sys->p_dst_a->p );
     }
     else if( p_sys->b_add_a )
     {
