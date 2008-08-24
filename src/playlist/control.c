@@ -109,7 +109,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
         if ( p_node == NULL )
         {
-            p_node = p_playlist->status.p_node;
+            p_node = get_current_status_node( p_playlist );
             assert( p_node );
         }
         p_playlist->request.i_status = PLAYLIST_RUNNING;
