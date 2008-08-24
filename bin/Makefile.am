@@ -15,7 +15,7 @@ vlc_SOURCES = winvlc.c
 endif
 vlc_wrapper_SOURCES = rootwrap.c
 
-vlc_DEPENDENCIES = $(DATA_win32_rc) ../src/libvlc.la
+vlc_DEPENDENCIES = ../src/libvlc.la
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
@@ -26,16 +26,11 @@ vlc_LDADD = ../src/libvlc.la ../src/libvlccore.la $(LTLIBINTL) \
 #vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
 #	$(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS)
 
-DATA_win32_rc = vlc_win32_rc.$(OBJEXT)
-DATA_win32_rc_lib = libvlc_win32_rc.$(OBJEXT)
-EXTRA_DATA = $(DATA_win32_rc) $(DATA_win32_rc_lib)
 if HAVE_WIN32
-vlc_LDADD += $(DATA_win32_rc)
-noinst_DATA = $(DATA_win32_rc) $(DATA_win32_rc_lib)
+vlc_LDADD += vlc_win32_rc.$(OBJEXT)
+vlc_DEPENDENCIES += vlc_win32_rc.$(OBJEXT)
 endif
 
 vlc_win32_rc.$(OBJEXT): $(top_builddir)/share/vlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
 
-libvlc_win32_rc.$(OBJEXT): $(top_builddir)/share/libvlc_win32_rc.rc
-	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
