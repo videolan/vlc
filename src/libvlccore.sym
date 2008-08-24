@@ -259,6 +259,7 @@ path_sanitize
 picture_CopyPixels
 picture_Delete
 picture_New
+plane_CopyPixels
 playlist_Add
 playlist_AddExt
 playlist_AddInput

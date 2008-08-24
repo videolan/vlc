@@ -1053,34 +1053,37 @@ void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
     int i;
 
     for( i = 0; i < p_src->i_planes ; i++ )
+        plane_CopyPixels( p_dst->p+i, p_src->p+i );
+}
+
+void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
+{
+    const unsigned i_width  = __MIN( p_dst->i_visible_pitch,
+                                     p_src->i_visible_pitch );
+    const unsigned i_height = __MIN( p_dst->i_visible_lines,
+                                     p_src->i_visible_lines );
+
+    if( p_src->i_pitch == p_dst->i_pitch )
     {
-        const unsigned i_width  = __MIN( p_dst->p[i].i_visible_pitch,
-                                         p_src->p[i].i_visible_pitch );
-        const unsigned i_height = __MIN( p_dst->p[i].i_visible_lines,
-                                         p_src->p[i].i_visible_lines );
+        /* There are margins, but with the same width : perfect ! */
+        vlc_memcpy( p_dst->p_pixels, p_src->p_pixels,
+                    p_src->i_pitch * i_height );
+    }
+    else
+    {
+        /* We need to proceed line by line */
+        uint8_t *p_in = p_src->p_pixels;
+        uint8_t *p_out = p_dst->p_pixels;
+        int i_line;
 
-        if( p_src->p[i].i_pitch == p_dst->p[i].i_pitch )
+        assert( p_in );
+        assert( p_out );
+
+        for( i_line = i_height; i_line--; )
         {
-            /* There are margins, but with the same width : perfect ! */
-            vlc_memcpy( p_dst->p[i].p_pixels, p_src->p[i].p_pixels,
-                        p_src->p[i].i_pitch * i_height );
-        }
-        else
-        {
-            /* We need to proceed line by line */
-            uint8_t *p_in = p_src->p[i].p_pixels;
-            uint8_t *p_out = p_dst->p[i].p_pixels;
-            int i_line;
-
-            assert( p_in );
-            assert( p_out );
-
-            for( i_line = i_height; i_line--; )
-            {
-                vlc_memcpy( p_out, p_in, i_width );
-                p_in += p_src->p[i].i_pitch;
-                p_out += p_dst->p[i].i_pitch;
-            }
+            vlc_memcpy( p_out, p_in, i_width );
+            p_in += p_src->i_pitch;
+            p_out += p_dst->i_pitch;
         }
     }
 }

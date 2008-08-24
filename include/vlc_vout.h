@@ -176,6 +176,7 @@ static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_
  * only the compatible(smaller) part will be copied.
  */
 VLC_EXPORT( void, picture_CopyPixels, ( picture_t *p_dst, const picture_t *p_src ) );
+VLC_EXPORT( void, plane_CopyPixels, ( plane_t *p_dst, const plane_t *p_src ) );
 
 /**
  * This function will copy both picture dynamic properties and pixels.
