@@ -56,6 +56,8 @@ Changes:
 
 Security updates:
  * Updated libfreetype on Windows and Mac OS X (CVE-??)
+ * TTA Parser improvements (CVE-2008-3732)
+ * MMS Access Module improvements (CVE-??)
 
 Playlist:
  * Vastly improved playlist support:
