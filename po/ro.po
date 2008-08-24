@@ -1,15 +1,15 @@
 # Romanian translation for vlc package
-# Copyright (C) 2005-2008 the VideoLAN team
+# Copyright (C) 2005 the VideoLAN team
 # This file is distributed under the same license as the vlc package.
 # Circo Radu <circo DOT radusorin AT gmail DOT com>, 2005
-# Cristian Secara <cristi AT secarica DOT ro>, 2007-2008
+# Cristian Secara <cristi AT secarica DOT ro>, 2007
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: ro\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2008-08-24 22:56+0300\n"
-"PO-Revision-Date: 2008-08-23 21:20+0200\n"
+"PO-Revision-Date: 2008-08-24 22:33+0200\n"
 "Last-Translator: Cristian Secară <cristi AT secarica DOT ro>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Romanian\n"
 "X-Poedit-Country: Romania\n"
-"X-Poedit-Bookmarks: 344,1389,4129,3298,3030,-1,-1,-1,-1,-1\n"
+"X-Poedit-Bookmarks: 3314,1389,4129,3298,3030,-1,-1,-1,-1,-1\n"
 
 #: include/vlc_common.h:893
 msgid ""
@@ -1292,7 +1292,7 @@ msgstr "Gesturi de maus"
 #: src/libvlc.c:292 src/libvlc.c:425 src/modules/cache.c:206
 #: src/modules/cache.c:525
 msgid "C"
-msgstr "ro"
+msgstr "C"
 
 #: src/libvlc.c:1145
 msgid ""
@@ -7461,11 +7461,11 @@ msgstr ""
 
 #: modules/access/qtcapture.m:55 modules/access/qtcapture.m:56
 msgid "Quicktime Capture"
-msgstr ""
+msgstr "Captură Quicktime"
 
 #: modules/access/qtcapture.m:226
 msgid "No Input device found"
-msgstr ""
+msgstr "Nu a fost găsit niciun dispozitiv de intrare"
 
 #: modules/access/qtcapture.m:227
 msgid ""
@@ -7685,11 +7685,11 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:98
 msgid "IO Method"
-msgstr ""
+msgstr "Metoda IO"
 
 #: modules/access/v4l2/v4l2.c:100
 msgid "IO Method (READ, MMAP, USERPTR)."
-msgstr ""
+msgstr "Metoda IO (READ, MMAP, USERPTR)."
 
 #: modules/access/v4l2/v4l2.c:103
 #, fuzzy
@@ -7708,7 +7708,7 @@ msgstr "Controale extinse"
 
 #: modules/access/v4l2/v4l2.c:113
 msgid "Reset controls to defaults provided by the v4l2 driver."
-msgstr ""
+msgstr "Resetează la implicit controalele furnizate de driverul v4l2."
 
 #: modules/access/v4l2/v4l2.c:114 modules/access/v4l.c:112
 #: modules/gui/macosx/extended.m:97 modules/gui/qt4/ui/video_effects.ui:197
@@ -7739,7 +7739,7 @@ msgstr "Saturație"
 
 #: modules/access/v4l2/v4l2.c:122
 msgid "Saturation of the video input (if supported by the v4l2 driver)."
-msgstr ""
+msgstr "Saturația intrării video (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:123 modules/access/v4l.c:115
 #: modules/gui/macosx/extended.m:100 modules/gui/qt4/ui/video_effects.ui:211
@@ -7748,7 +7748,7 @@ msgstr "Nuanță"
 
 #: modules/access/v4l2/v4l2.c:125
 msgid "Hue of the video input (if supported by the v4l2 driver)."
-msgstr ""
+msgstr "Nuanța intrării video (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:126
 msgid "Black level"
@@ -7757,42 +7757,49 @@ msgstr "Nivel de negru"
 #: modules/access/v4l2/v4l2.c:128
 msgid "Black level of the video input (if supported by the v4l2 driver)."
 msgstr ""
+"Nivelul la negru al intrării video (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:129
 msgid "Auto white balance"
-msgstr ""
+msgstr "Balans automat la alb"
 
 #: modules/access/v4l2/v4l2.c:131
 msgid ""
 "Automatically set the white balance of the video input (if supported by the "
 "v4l2 driver)."
 msgstr ""
+"Stabilește automat balansul la alb al intrării video (dacă este suportat de "
+"driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:133
 msgid "Do white balance"
-msgstr ""
+msgstr "Fă balansul la alb"
 
 #: modules/access/v4l2/v4l2.c:135
 msgid ""
 "Trigger a white balancing action, useless if auto white balance is activated "
 "(if supported by the v4l2 driver)."
 msgstr ""
+"Declanșează o acțiune de balans la alb, inutil dacă balansul automat la alb "
+"este activat (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:137
 msgid "Red balance"
-msgstr ""
+msgstr "Balans la roșu"
 
 #: modules/access/v4l2/v4l2.c:139
 msgid "Red balance of the video input (if supported by the v4l2 driver)."
 msgstr ""
+"Balansul la roșu al intrării video (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:140
 msgid "Blue balance"
-msgstr ""
+msgstr "Balans la albastru"
 
 #: modules/access/v4l2/v4l2.c:142
 msgid "Blue balance of the video input (if supported by the v4l2 driver)."
 msgstr ""
+"Balansul la albastru al intrării video (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:143 modules/gui/macosx/extended.m:99
 #: modules/gui/qt4/ui/video_effects.ui:183
@@ -7801,15 +7808,15 @@ msgstr "Gama"
 
 #: modules/access/v4l2/v4l2.c:145
 msgid "Gamma of the video input (if supported by the v4l2 driver)."
-msgstr ""
+msgstr "Gama intrării video (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:146
 msgid "Exposure"
-msgstr ""
+msgstr "Expunere"
 
 #: modules/access/v4l2/v4l2.c:148
 msgid "Exposure of the video input (if supported by the v4L2 driver)."
-msgstr ""
+msgstr "Expunerea intrării video (dacă este suportat de driverul v4l2)."
 
 # hm ? sau nivel ?
 #: modules/access/v4l2/v4l2.c:149
@@ -7820,6 +7827,8 @@ msgstr "Câștig automat"
 msgid ""
 "Automatically set the video input's gain (if supported by the v4l2 driver)."
 msgstr ""
+"Stabilește automat câștigul intrării video (dacă este suportat de driverul "
+"v4l2)."
 
 # hm ? sau nivel ?
 #: modules/access/v4l2/v4l2.c:153
@@ -7828,7 +7837,7 @@ msgstr "Câștig"
 
 #: modules/access/v4l2/v4l2.c:155
 msgid "Video input's gain (if supported by the v4l2 driver)."
-msgstr ""
+msgstr "Câștigul intrării video (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:156
 msgid "Horizontal flip"
@@ -7837,6 +7846,7 @@ msgstr "Întoarcere pe orizontală"
 #: modules/access/v4l2/v4l2.c:158
 msgid "Flip the video horizontally (if supported by the v4l2 driver)."
 msgstr ""
+"Întoarce imaginea video pe orizontală (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:159
 msgid "Vertical flip"
@@ -7845,15 +7855,18 @@ msgstr "Întoarcere pe verticală"
 #: modules/access/v4l2/v4l2.c:161
 msgid "Flip the video vertically (if supported by the v4l2 driver)."
 msgstr ""
+"Întoarce imaginea video pe verticală (dacă este suportat de driverul v4l2)."
 
 #: modules/access/v4l2/v4l2.c:162
 msgid "Horizontal centering"
-msgstr ""
+msgstr "Centrare orizontală"
 
 #: modules/access/v4l2/v4l2.c:164
 msgid ""
 "Set the camera's horizontal centering (if supported by the v4l2 driver)."
 msgstr ""
+"Stabilește centrarea orizontală a camerei (dacă este suportat de driverul "
+"v4l2)."
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Vertical centering"
@@ -7862,6 +7875,8 @@ msgstr "Centrare pe verticală"
 #: modules/access/v4l2/v4l2.c:167
 msgid "Set the camera's vertical centering (if supported by the v4l2 driver)."
 msgstr ""
+"Stabilește centrarea verticală a camerei (dacă este suportat de driverul "
+"v4l2)."
 
 #: modules/access/v4l2/v4l2.c:172
 msgid ""
@@ -16641,11 +16656,8 @@ msgid "Copyright (C) "
 msgstr "Copyright (C) "
 
 #: modules/gui/qt4/dialogs/help.cpp:129
-#, fuzzy
 msgid " by the VideoLAN Team.\n"
-msgstr ""
-"(c) 1996-2006 - echipa VideoLAN\n"
-"\n"
+msgstr " de echipa VideoLAN.\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:150
 msgid ""
@@ -16818,9 +16830,8 @@ msgid "&Convert / Save"
 msgstr "&Convertește / Salvează"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:66
-#, fuzzy
 msgid "Show settings"
-msgstr "Arată setările extinse"
+msgstr "Arată setările"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:70
 msgid "Simple"
@@ -16900,9 +16911,8 @@ msgid "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/sout.cpp:329
-#, fuzzy
 msgid "Audio Port:"
-msgstr "Audio:"
+msgstr "Port audio:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:83
 msgid "Hours / Minutes / Seconds:"
@@ -17125,7 +17135,7 @@ msgstr "&Zoom"
 
 #: modules/gui/qt4/menus.cpp:499
 msgid "&Deinterlace"
-msgstr "&Deîntrețese"
+msgstr "&Deîntrețesere"
 
 #: modules/gui/qt4/menus.cpp:500
 msgid "&Aspect Ratio"
@@ -17133,16 +17143,15 @@ msgstr "&Raport de aspect"
 
 #: modules/gui/qt4/menus.cpp:501
 msgid "&Crop"
-msgstr "&Trunchiază"
+msgstr "&Trunchiere"
 
 #: modules/gui/qt4/menus.cpp:502
 msgid "Always &On Top"
 msgstr "Înt&otdeauna deasupra"
 
 #: modules/gui/qt4/menus.cpp:504
-#, fuzzy
 msgid "DirectX Wallpaper"
-msgstr "Tapet"
+msgstr "Tapet DirectX"
 
 #: modules/gui/qt4/menus.cpp:506
 msgid "Sna&pshot"
@@ -17285,7 +17294,7 @@ msgstr "Arată toate opțiunile avansate în dialoguri."
 
 #: modules/gui/qt4/qt4.cpp:95
 msgid "Windows opacity between 0.1 and 1."
-msgstr ""
+msgstr "Opacitatea ferestrei între 0.1 și 1."
 
 #: modules/gui/qt4/qt4.cpp:96
 msgid ""
@@ -17316,7 +17325,7 @@ msgstr "Numărul de zile între două verificări de actualizare"
 
 #: modules/gui/qt4/qt4.cpp:109
 msgid "Allow the volume to be set to 400%"
-msgstr ""
+msgstr "Permite ca volumul să fie stabilit la 400%"
 
 #: modules/gui/qt4/qt4.cpp:110
 msgid ""
@@ -17326,7 +17335,7 @@ msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:115
 msgid "Automatically save the volume on exit"
-msgstr ""
+msgstr "Salvează automat volumul la ieșire"
 
 #: modules/gui/qt4/qt4.cpp:117
 msgid "Use non native buttons and volume slider"
@@ -17393,10 +17402,10 @@ msgstr "Mod de captură"
 msgid "Select the capture device type"
 msgstr "Selectați tipul dispozitivului de captură"
 
-# hm ? dispozitiv nu știu dacă se potrivește, placă nu acoperă tot, card se poate confunda cu cardul de memorie (gen stic USB)
+# hm ? dispozitiv nu sunt sigur că se potrivește, placă nu acoperă tot, card se poate confunda cu cardul de memorie (gen stic USB)
 #: modules/gui/qt4/ui/open_capture.ui:44
 msgid "Card Selection"
-msgstr "Selecție placă"
+msgstr "Selecție dispozitiv"
 
 #: modules/gui/qt4/ui/open_capture.ui:51 modules/gui/qt4/ui/open_net.ui:101
 msgid "Options"
@@ -17529,9 +17538,8 @@ msgid "Play locally"
 msgstr "Redă local"
 
 #: modules/gui/qt4/ui/sout.ui:338
-#, fuzzy
 msgid "Video Port"
-msgstr "Rată de biți video:"
+msgstr "Port video:"
 
 #: modules/gui/qt4/ui/sout.ui:435
 msgid "Mount Point"
@@ -17543,11 +17551,12 @@ msgstr "Autentificare:parolă:"
 
 #: modules/gui/qt4/ui/sout.ui:481
 msgid "Prefer UDP over RTP"
-msgstr ""
+msgstr "Preferă UDP peste RTP"
 
 #: modules/gui/qt4/ui/sout.ui:500
 msgid "Using this option is not recommended in most of the cases."
 msgstr ""
+"Folosirea acestei opțiuni nu este recomandată în majoritatea cazurilor."
 
 #: modules/gui/qt4/ui/sout.ui:522
 msgid "Profile"
@@ -17579,9 +17588,8 @@ msgid "Stream all elementary streams"
 msgstr "Difuzează toate fluxurile elementare"
 
 #: modules/gui/qt4/ui/sout.ui:957
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "Setări generale a stream-ului de ieșire"
+msgstr "Șir generat pentru fluxul de ieșire"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:36
 msgid "Default volume"
@@ -17589,11 +17597,11 @@ msgstr "Volum audio implicit"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:77
 msgid "256 corresponds to 100%, 1024 to 400%"
-msgstr ""
+msgstr "256 correspunde la 100%, 1024 la 400%"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:106
 msgid "Save volume on exit"
-msgstr ""
+msgstr "Salvează volumul la ieșire"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:142
 msgid "Preferred audio language"
@@ -17631,11 +17639,12 @@ msgstr "Calitate post procesare"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:151
 msgid "Repair AVI files"
-msgstr ""
+msgstr "Repară fișierele AVI"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:164
 msgid "Use system codecs if available (better quality)"
 msgstr ""
+"Folosește codecurile sistemului dacă sunt disponibile (calitate mai bună)"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:35
 msgid "Interface Type"
