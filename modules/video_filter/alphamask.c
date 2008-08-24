@@ -152,7 +152,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         || p_mask->i_visible_lines
         != p_apic->i_visible_lines )
     {
-        msg_Warn( p_filter,
+        msg_Err( p_filter,
                   "Mask size (%d x %d) and image size (%d x %d) "
                   "don't match. The mask will not be applied.",
                   p_mask->i_visible_pitch,
@@ -162,31 +162,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
     else
     {
-        if( p_mask->i_pitch != p_apic->i_pitch
-        ||  p_mask->i_lines != p_apic->i_lines )
-        {
-            /* visible plane sizes match ... but not the underlying
-             * buffer. I'm not sure that this can happen,
-             * but better safe than sorry. */
-            int i_line;
-            int i_lines = p_mask->i_visible_lines;
-            uint8_t *p_src = p_mask->p_pixels;
-            uint8_t *p_dst = p_apic->p_pixels;
-            int i_src_pitch = p_mask->i_pitch;
-            int i_dst_pitch = p_apic->i_pitch;
-            int i_visible_pitch = p_mask->i_visible_pitch;
-            for( i_line = 0; i_line < i_lines; i_line++,
-                 p_src += i_src_pitch, p_dst += i_dst_pitch )
-            {
-                vlc_memcpy( p_dst, p_src, i_visible_pitch );
-            }
-        }
-        else
-        {
-            /* plane sizes match */
-            vlc_memcpy( p_apic->p_pixels, p_mask->p_pixels,
-                        p_mask->i_pitch * p_mask->i_lines );
-        }
+        plane_CopyPixels( p_apic, p_mask );
     }
     vlc_mutex_unlock( &p_sys->mask_lock );
     return p_pic;
