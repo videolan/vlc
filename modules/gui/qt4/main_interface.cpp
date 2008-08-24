@@ -381,6 +381,9 @@ void MainInterface::handleMainUi( QSettings *settings )
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
 
+#ifdef WIN32
+    if ( depth > 8 )
+#endif
     /* Create the FULLSCREEN CONTROLS Widget */
     if( config_GetInt( p_intf, "qt-fs-controller" ) )
     {
