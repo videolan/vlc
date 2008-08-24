@@ -155,8 +155,11 @@ void vlm_Delete( vlm_t *p_vlm )
      * is serialized against setting libvlc_priv->p_vlm from vlm_New(). */
     var_Get( p_vlm->p_libvlc, "vlm_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    vlc_object_kill( p_vlm );
-    vlc_thread_join( p_vlm );
+    /* Parental advisory: terrific humongous horrible follows...
+     * This is so that vlc_object_destroy() (from vlc_object_release()) will
+     * NOT join our thread. See also vlm_Destructor().
+     * -- Courmisch, 24/08/2008 */
+    vlc_internals( p_vlm )->b_thread = false;
     vlc_object_release( p_vlm );
     vlc_mutex_unlock( lockval.p_address );
 }
@@ -174,6 +177,10 @@ static void vlm_Destructor( vlm_t *p_vlm )
     vlm_ControlInternal( p_vlm, VLM_CLEAR_SCHEDULES );
     TAB_CLEAN( p_vlm->schedule, p_vlm->schedule );
 
+    vlc_object_kill( p_vlm );
+    /* Continuation of the vlm_Delete() hack. -- Courmisch */
+    vlc_internals( p_vlm )->b_thread = true;
+    vlc_thread_join( p_vlm );
     vlc_mutex_destroy( &p_vlm->lock );
 }
 
