@@ -1208,7 +1208,6 @@ modules/video_filter/rotate.c
 modules/video_filter/rss.c
 modules/video_filter/rv32.c
 modules/video_filter/scale.c
-modules/video_filter/seamcarving.c
 modules/video_filter/sharpen.c
 modules/video_filter/swscale.c
 modules/video_filter/transform.c
