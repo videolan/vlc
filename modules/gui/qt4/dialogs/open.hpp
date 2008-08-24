@@ -57,6 +57,8 @@ class QTabWidget;
 
 class OpenDialog : public QVLCDialog
 {
+    friend class FileOpenBox;
+
     Q_OBJECT;
 public:
     static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf,
