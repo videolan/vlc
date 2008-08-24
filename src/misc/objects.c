@@ -300,18 +300,12 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     /* Send a kill to the object's thread if applicable */
     vlc_object_kill( p_this );
 
-    /* If we are running on a thread, wait until it ends */
-    if( p_priv->b_thread )
-    {
-        msg_Warn (p_this->p_libvlc, /* do NOT use a dead object for logging! */
-                  "%s %d destroyed while thread alive (VLC might crash)",
-                  p_this->psz_object_type, p_this->i_object_id);
-        vlc_thread_join( p_this );
-    }
-
     /* Call the custom "subclass" destructor */
     if( p_priv->pf_destructor )
         p_priv->pf_destructor( p_this );
+
+    /* Any thread must have been cleaned up at this point. */
+    assert( !p_priv->b_thread );
 
     /* Destroy the associated variables, starting from the end so that
      * no memmove calls have to be done. */
