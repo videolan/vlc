@@ -27,10 +27,10 @@
 
 #include "dialogs/extended.hpp"
 #include "dialogs_provider.hpp"
-#include "components/extended_panels.hpp"
-
 
 #include "main_interface.hpp"
+#include "input_manager.hpp"
+
 #include <QTabWidget>
 #include <QGridLayout>
 
@@ -53,7 +53,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     QHBoxLayout *audioLayout = new QHBoxLayout( audioWidget );
     QTabWidget *audioTab = new QTabWidget( audioWidget );
 
-    Equalizer *equal = new Equalizer( p_intf, audioTab );
+    equal = new Equalizer( p_intf, audioTab );
     audioTab->addTab( equal, qtr( "Graphic Equalizer" ) );
 
     Spatializer *spatial = new Spatializer( p_intf, audioTab );
@@ -67,13 +67,13 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     QHBoxLayout *videoLayout = new QHBoxLayout( videoWidget );
     QTabWidget *videoTab = new QTabWidget( videoWidget );
 
-    ExtVideo *videoEffect = new ExtVideo( p_intf, videoTab );
+    videoEffect = new ExtVideo( p_intf, videoTab );
     videoLayout->addWidget( videoTab );
     videoTab->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
 
     mainTabW->addTab( videoWidget, qtr( "Video Effects" ) );
 
-    SyncControls *syncW = new SyncControls( p_intf, videoTab );
+    syncW = new SyncControls( p_intf, videoTab );
     mainTabW->addTab( syncW, qtr( "Synchronization" ) );
 
     if( module_Exists( p_intf, "v4l2" ) )
@@ -96,6 +96,9 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
         startPoint.setY( p_mi->y() + p_mi->frameGeometry().height() );
     }
     readSettings( "EPanel", QSize( 400, 280 ), startPoint );
+
+    CONNECT( THEMIM->getIM(), statusChanged( int ), this, changedItem( int ) );
+
 }
 
 ExtendedDialog::~ExtendedDialog()
@@ -103,3 +106,10 @@ ExtendedDialog::~ExtendedDialog()
     writeSettings( "EPanel" );
 }
 
+void ExtendedDialog::changedItem( int i_status )
+{
+    if( i_status != END_S ) return;
+    syncW->clean();
+    videoEffect->clean();
+    equal->clean();
+}

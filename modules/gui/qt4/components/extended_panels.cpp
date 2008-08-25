@@ -237,6 +237,14 @@ void ExtVideo::cropChange()
     }
 }
 
+void ExtVideo::clean()
+{
+    ui.cropTopPx->setValue( 0 );
+    ui.cropBotPx->setValue( 0 );
+    ui.cropLeftPx->setValue( 0 );
+    ui.cropRightPx->setValue( 0 );
+}
+
 void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
 {
     char *psz_parser, *psz_string;
@@ -858,6 +866,11 @@ Equalizer::~Equalizer()
 {
 }
 
+void Equalizer::clean()
+{
+    ui.enableCheck->setChecked( false );
+    enable();
+}
 /* Write down initial values */
 void Equalizer::updateUIFromCore()
 {
@@ -1359,6 +1372,13 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     /* Set it */
     update();
+}
+
+void SyncControls::clean()
+{
+    AVSpin->setValue( 0.0 );
+    subsSpin->setValue( 0.0 );
+    subSpeedSpin->setValue( 1.0 );
 }
 
 void SyncControls::update()

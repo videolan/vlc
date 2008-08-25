@@ -26,6 +26,8 @@
 
 #include "util/qvlcframe.hpp"
 
+#include "components/extended_panels.hpp"
+
 class ExtendedDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -45,6 +47,12 @@ public:
 private:
     ExtendedDialog( intf_thread_t * );
     static ExtendedDialog *instance;
+    SyncControls *syncW;
+    ExtVideo *videoEffect;
+    Equalizer *equal;
+private slots:
+    void changedItem( int );
 };
 
 #endif
+

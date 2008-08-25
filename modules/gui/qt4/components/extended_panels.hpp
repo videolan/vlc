@@ -48,6 +48,7 @@ class QSignalMapper;
 class ExtVideo: public QObject
 {
     Q_OBJECT
+    friend class ExtendedDialog;
 public:
     ExtVideo( intf_thread_t *, QTabWidget * );
     virtual ~ExtVideo();
@@ -60,6 +61,7 @@ private:
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
     void ChangeVFiltersString( char *psz_name, bool b_add );
+    void clean();
 private slots:
     void updateFilters();
     void updateFilterOptions();
@@ -89,6 +91,7 @@ private slots:
 class Equalizer: public QWidget
 {
     Q_OBJECT
+    friend class ExtendedDialog;
 public:
     Equalizer( intf_thread_t *, QWidget * );
     virtual ~Equalizer();
@@ -105,6 +108,7 @@ private:
     void addCallbacks( aout_instance_t * );
 
     intf_thread_t *p_intf;
+    void clean();
 private slots:
     void enable(bool);
     void enable();
@@ -141,25 +145,10 @@ private slots:
     void setInitValues();
 };
 
-class ExtendedControls: public QWidget
-{
-    Q_OBJECT
-public:
-    ExtendedControls( intf_thread_t *, QWidget * ) {};
-    virtual ~ExtendedControls() {};
-
-private:
-    intf_thread_t *p_intf;
-private slots:
-    void slower() {};
-    void faster() {};
-    void normal() {};
-    void snapshot() {};
-};
-
 class SyncControls : public QWidget
 {
     Q_OBJECT
+    friend class ExtendedDialog;
 public:
     SyncControls( intf_thread_t *, QWidget * );
     virtual ~SyncControls() {};
@@ -168,6 +157,7 @@ private:
     QDoubleSpinBox *AVSpin;
     QDoubleSpinBox *subsSpin;
     QDoubleSpinBox *subSpeedSpin;
+    void clean();
 public slots:
     void update();
 private slots:
