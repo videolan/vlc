@@ -43,17 +43,13 @@
 
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(unsigned int)windowStyle backing:(NSBackingStoreType)bufferingType defer:(BOOL)deferCreation
 {
-    BOOL useTextured = YES;
-    if([[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)])
-    {
-        useTextured = NO;
-        windowStyle ^= NSTexturedBackgroundWindowMask;
-    }
+    if(MACOS_VERSION < 10.5f)
+        return [super initWithContentRect:contentRect styleMask:windowStyle backing:bufferingType defer:deferCreation];
+
+    windowStyle ^= NSTexturedBackgroundWindowMask;
     self = [super initWithContentRect:contentRect styleMask:windowStyle backing:bufferingType defer:deferCreation];
-    if(!useTextured)
-    {
-        [self setContentBorderThickness:32.0 forEdge:NSMinYEdge];
-    }
+    [self setContentBorderThickness:32.0 forEdge:NSMinYEdge];
+
     return self;
 }
 
