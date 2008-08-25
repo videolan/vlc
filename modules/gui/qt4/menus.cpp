@@ -366,7 +366,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     if( mi )
     {
         /* Minimal View */
-        QAction *action = menu->addAction( qtr( "Mi&nimal View..." ), mi,
+        QAction *action = menu->addAction( qtr( "Mi&nimal View" ), mi,
                                 SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
         action->setCheckable( true );
         action->setData( "_static_" );
@@ -843,7 +843,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             if( mi )
             {
                 action = submenu->addAction( QIcon( "" ),
-                     qtr( "Minimal View..." ), mi, SLOT( toggleMinimalView() ) );
+                     qtr( "Minimal View" ), mi, SLOT( toggleMinimalView() ) );
                 action->setCheckable( true );
                 action->setChecked( !( mi->getControlsVisibilityStatus() &
                             CONTROLS_VISIBLE ) );
