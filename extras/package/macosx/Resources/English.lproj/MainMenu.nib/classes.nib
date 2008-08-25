@@ -46,6 +46,25 @@
 			<string>NSWindow</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>VLCPlaylistCommon</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_outline_view</key>
+				<string>id</string>
+				<key>o_tc_author</key>
+				<string>id</string>
+				<key>o_tc_duration</key>
+				<string>id</string>
+				<key>o_tc_name</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>checkForUpdate</key>
@@ -134,17 +153,17 @@
 				<key>o_controls</key>
 				<string>VLCControls</string>
 				<key>o_crashrep_desc_txt</key>
-				<string>id</string>
+				<string>NSTextField</string>
 				<key>o_crashrep_dontSend_btn</key>
-				<string>id</string>
+				<string>NSButton</string>
 				<key>o_crashrep_fld</key>
-				<string>id</string>
+				<string>NSTextView</string>
 				<key>o_crashrep_send_btn</key>
-				<string>id</string>
+				<string>NSButton</string>
 				<key>o_crashrep_title_txt</key>
-				<string>id</string>
+				<string>NSTextField</string>
 				<key>o_crashrep_win</key>
-				<string>id</string>
+				<string>NSWindow</string>
 				<key>o_dmi_mute</key>
 				<string>NSMenuItem</string>
 				<key>o_dmi_next</key>
@@ -425,25 +444,6 @@
 				<string>id</string>
 				<key>toolbarMediaControl</key>
 				<string>NSView</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>VLCPlaylistCommon</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>o_outline_view</key>
-				<string>id</string>
-				<key>o_tc_author</key>
-				<string>id</string>
-				<key>o_tc_duration</key>
-				<string>id</string>
-				<key>o_tc_name</key>
-				<string>id</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
