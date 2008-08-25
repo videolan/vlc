@@ -7,6 +7,9 @@ Stream output:
 Changes between 0.8.6i and 0.9.1:
 ---------------------------------
 
+Note: version 0.9.0 was skipped due to bugs being discovered at the last
+minute.
+
 Important notes:
 ----------------
  * This release will not work with Windows 98/ME and Mac OS X 10.3.9 (Panther)
