@@ -56,5 +56,21 @@ public class JVLCTest extends AbstractJVLCTest
         jvlc.release();
     }
     
+    @Test
+    public void jvlcMultipleInstances()
+    {
+        JVLC[] jvlcInstancesArray = new JVLC[10];
+        
+        for (int i = 0; i < jvlcInstancesArray.length; i++)
+        {
+            jvlcInstancesArray[i] = new JVLC();
+        }
+        for (int i = 0; i < jvlcInstancesArray.length; i++)
+        {
+            jvlcInstancesArray[i].release();
+        }
+        
+    }
+    
 
 }
