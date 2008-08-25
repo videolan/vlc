@@ -179,7 +179,7 @@ libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DPLUGIN_PATH=\"$(pkglibdir)\"
 libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
 	-export-symbols $(srcdir)/libvlccore.sym \
-	-version-info 0:2:0
+	-version-info 1:0:1
 libvlccore_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` $(AM_LIBADD) $(LTLIBINTL)
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
