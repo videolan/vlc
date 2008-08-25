@@ -1,6 +1,8 @@
 Changes between 0.9.1 and 1.0.0:
 ---------------------------------
 
+Decoders:
+ * AES3 (SMPTE 302M) support
 Stream output:
  * Restored the old mpeg2 transrating module.
 
