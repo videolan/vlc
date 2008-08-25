@@ -57,7 +57,6 @@
 #   include <dvbpsi/psi.h>
 #   include <dvbpsi/demux.h>
 #   include <dvbpsi/sdt.h>
-#   include <dvbpsi/nit.h>
 #else
 #   include "dvbpsi.h"
 #   include "descriptor.h"
@@ -67,7 +66,6 @@
 #   include "psi.h"
 #   include "demux.h"
 #   include "sdt.h"
-#   include "nit.h"
 #endif
 
 #ifdef ENABLE_HTTPD

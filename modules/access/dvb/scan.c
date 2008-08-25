@@ -52,7 +52,6 @@
 #   include <dvbpsi/psi.h>
 #   include <dvbpsi/demux.h>
 #   include <dvbpsi/sdt.h>
-#   include <dvbpsi/nit.h>
 #else
 #   include "dvbpsi.h"
 #   include "descriptor.h"
@@ -62,7 +61,6 @@
 #   include "psi.h"
 #   include "demux.h"
 #   include "sdt.h"
-#   include "nit.h"
 #endif
 
 #ifdef ENABLE_HTTPD
@@ -388,6 +386,7 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
     }
 }
 
+#ifdef DVBPSI_USE_NIT
 static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 {
     vlc_object_t *p_obj = p_session->p_obj;
@@ -498,13 +497,16 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
         }
     }
 }
+#endif
 
 static void PSINewTableCallBack( scan_session_t *p_session, dvbpsi_handle h, uint8_t  i_table_id, uint16_t i_extension )
 {
     if( i_table_id == 0x42 )
         dvbpsi_AttachSDT( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_session );
+#ifdef DVBPSI_USE_NIT
     else if( i_table_id == 0x40 )
         dvbpsi_AttachNIT( h, i_table_id, i_extension, (dvbpsi_nit_callback)NITCallBack, p_session );
+#endif
 }
 
 
@@ -520,9 +522,10 @@ int scan_session_Init( vlc_object_t *p_obj, scan_session_t *p_session, const sca
     p_session->i_nit_pid = -1;
     p_session->sdt = NULL;
     p_session->p_sdt = NULL;
+#ifdef DVBPSI_USE_NIT
     p_session->nit = NULL;
     p_session->p_nit = NULL;
-
+#endif
     return VLC_SUCCESS;
 }
 
@@ -532,7 +535,10 @@ void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session )
 
     dvbpsi_pat_t *p_pat = p_session->p_pat;
     dvbpsi_sdt_t *p_sdt = p_session->p_sdt;
+
+#ifdef DVBPSI_USE_NIT
     dvbpsi_nit_t *p_nit = p_session->p_nit;
+#endif
 
     if( p_pat )
     {
@@ -586,6 +592,7 @@ void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session )
         }
     }
 
+#ifdef DVBPSI_USE_NIT
     /* Parse NIT */
     if( p_pat && p_nit )
     {
@@ -619,6 +626,7 @@ void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session )
             }
         }
     }
+#endif
 
     /* */
     for( int i = i_service_start; i < p_scan->i_service; i++ )
@@ -626,13 +634,15 @@ void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session )
         scan_service_t *p_srv = p_scan->pp_service[i];
 
         p_srv->i_snr = p_session->i_snr;
+        if( p_sdt )
+            p_srv->i_sdt_version = p_sdt->i_version;
+#ifdef DVBPSI_USE_NIT
         if( p_nit )
         {
             p_srv->i_network_id = p_nit->i_network_id;
             p_srv->i_nit_version = p_nit->i_version;
         }
-        if( p_sdt )
-            p_srv->i_sdt_version = p_sdt->i_version;
+#endif
     }
 
 
@@ -646,10 +656,12 @@ void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session )
         dvbpsi_DetachDemux( p_session->sdt );
     if( p_session->p_sdt )
         dvbpsi_DeleteSDT( p_session->p_sdt );
+#ifdef DVBPSI_USE_NIT
     if( p_session->nit )
         dvbpsi_DetachDemux( p_session->nit );
     if( p_session->p_nit )
         dvbpsi_DeleteNIT( p_session->p_nit );
+#endif
 }
 
 static int ScanServiceCmp( const void *a, const void *b )
@@ -772,16 +784,23 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
     }
     else if( i_pid == p_scan->i_nit_pid )
     {
+#ifdef DVBPSI_USE_NIT
         if( !p_scan->nit )
             p_scan->nit = dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan );
 
         if( p_scan->nit )
             dvbpsi_PushPacket( p_scan->nit, p_block->p_buffer );
+#endif
     }
 
     block_Release( p_block );
 
-    return p_scan->p_pat && p_scan->p_sdt && p_scan->p_nit;
+    return p_scan->p_pat && p_scan->p_sdt && 
+#ifdef DVBPSI_USE_NIT
+        p_scan->p_nit;
+#else
+        true;
+#endif
 }
 
 void scan_service_SetSNR( scan_session_t *p_session, int i_snr )

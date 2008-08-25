@@ -20,6 +20,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA    02111, USA.
  *****************************************************************************/
 
+#ifdef HAVE_DVBPSI_DR_H
+#ifdef _DVBPSI_DR_43_H_
+#   define DVBPSI_USE_NIT 1
+#   include <dvbpsi/nit.h>
+#endif
+#else
+#ifdef _DVBPSI_DR_43_H_
+#   define DVBPSI_USE_NIT 1
+#   include "nit.h"
+#endif
+#endif
+
+#ifndef DVBPSI_USE_NIT
+#   warning NIT is not supported by your libdvbpsi version
+#endif
+
 typedef enum
 {
     SCAN_NONE,
@@ -101,8 +117,10 @@ typedef struct
     dvbpsi_handle sdt;
     dvbpsi_sdt_t *p_sdt;
 
+#ifdef DVBPSI_USE_NIT
     dvbpsi_handle nit;
     dvbpsi_nit_t *p_nit;
+#endif
 
 } scan_session_t;
 
