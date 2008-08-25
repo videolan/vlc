@@ -111,11 +111,17 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
 /* ADD HERE for new profiles */
 #define ADD_PROFILE( name, shortname ) ui.profileBox->addItem( qtr( name ), QVariant( QString( shortname ) ) );
     ADD_PROFILE( "Custom" , "Custom" )
+    ADD_PROFILE( "Ogg / Theora", "theora" )
+    ADD_PROFILE( "Ogg / Vorbis", "vorbis" )
+    ADD_PROFILE( "MPEG-2", "mpeg2" )
+    ADD_PROFILE( "MP3", "mp3" )
+    ADD_PROFILE( "MPEG-4 audio AAC", "aac" )
+    ADD_PROFILE( "MPEG-4 / DivX", "mp4" )
+    ADD_PROFILE( "H264", "h264" )
     ADD_PROFILE( "IPod (mp4/aac)", "IPod" )
     ADD_PROFILE( "XBox", "XBox" )
     ADD_PROFILE( "Windows (wmv/asf)", "Windows" )
     ADD_PROFILE( "PSP", "PSP")
-    ADD_PROFILE( "GSM", "GSM" )
 
 #define ADD_VCODEC( name, fourcc ) ui.vCodecBox->addItem( name, QVariant( fourcc ) );
     ADD_VCODEC( "MPEG-1", "mp1v" )
@@ -267,18 +273,26 @@ void SoutDialog::setOptions()
         ui.muxName ##Mux->setChecked( true ); \
         \
         ui.transcodeAudio->setChecked( hasAudio ); \
-        index = ui.aCodecBox->findText( vCodecName );  \
+        index = ui.aCodecBox->findData( aCodecName );  \
         if( index >= 0 ) ui.aCodecBox->setCurrentIndex( index ); \
         \
         ui.transcodeVideo->setChecked( hasVideo ); \
-        index = ui.aCodecBox->findText( vCodecName );  \
+        index = ui.vCodecBox->findData( vCodecName );  \
         if( index >=0 ) ui.vCodecBox->setCurrentIndex( index ); \
     }
 
     /* ADD HERE the profiles you want and need */
-    /* FIXME */
-    if( profileString == "IPod" ) setProfile( MP4, true, "mp4a", true, "mp4v" )
-    else if( profileString == "XBox" ) setProfile( ASF, true, "wma", true, "WMV2" )
+    if( profileString == "IPod" ) setProfile( MP4, true, "mp4v", true, "mp4a" )
+    else if( profileString == "theora" ) setProfile( Ogg, true, "theo", true, "vorb" )
+    else if( profileString == "vorbis" ) setProfile( Ogg, false, "", true, "vorb" )
+    else if( profileString == "mpeg2" ) setProfile( TS, true, "mp2v", true, "mpga" )
+    else if( profileString == "mp3" ) setProfile( RAW, false, "", true, "mp3" )
+    else if( profileString == "aac" ) setProfile( MP4, false, "", true, "mp4a" )
+    else if( profileString == "mp4" ) setProfile( MP4, true, "mp4v", true, "mp4a" )
+    else if( profileString == "h264" ) setProfile( TS, true, "h264", true, "mp4a" )
+    else if( profileString == "XBox" ) setProfile( ASF, true, "WMV2", true, "wma" )
+    else if( profileString == "Windows" ) setProfile( ASF, true, "WMV2", true, "wma" )
+    else if( profileString == "PSP" ) setProfile( Ogg, true, "DIV3", true, "vorb" )
 
         /* If the profile is not a custom one, then disable the tabWidget */
         if ( profileString == "Custom" )

@@ -458,7 +458,6 @@ void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
     }
 }
 
-/* FIXME Record function */
 void AdvControlsWidget::record()
 {
     input_thread_t *p_input = THEMIM->getInput();
