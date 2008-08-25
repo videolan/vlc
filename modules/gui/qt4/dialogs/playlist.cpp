@@ -63,10 +63,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
 PlaylistDialog::~PlaylistDialog()
 {
     getSettings()->beginGroup("playlistdialog");
-
     writeSettings( getSettings() );
-    playlistWidget->savingSettings();
-
     getSettings()->endGroup();
 }
 

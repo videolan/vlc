@@ -74,12 +74,22 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     view->setDropIndicatorShown( true );
     view->setAutoScroll( true );
 
-    /* Configure the size of the header */
-    view->header()->resizeSection( 0, 200 );
-    view->header()->resizeSection( 1, 80 );
-    view->header()->setSortIndicatorShown( true );
-    view->header()->setClickable( true );
-    view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
+#if HAS_QT43
+    if( getSettings()->contains( "headerState" ) )
+    {
+        view->header()->restoreState( getSettings()->value( "headerState" ).toByteArray() );
+        msg_Dbg( p_intf, "exists" );
+    }
+    else
+#endif
+    {
+        /* Configure the size of the header */
+        view->header()->resizeSection( 0, 200 );
+        view->header()->resizeSection( 1, 80 );
+        view->header()->setSortIndicatorShown( true );
+        view->header()->setClickable( true );
+        view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
+    }
 
     /* Connections for the TreeView */
     CONNECT( view, activated( const QModelIndex& ) ,
@@ -350,4 +360,12 @@ void StandardPLPanel::deleteSelection()
 }
 
 StandardPLPanel::~StandardPLPanel()
-{}
+{
+#if HAS_QT43
+    getSettings()->beginGroup("playlistdialog");
+    getSettings()->setValue( "headerState", view->header()->saveState() );
+    getSettings()->endGroup();
+#endif
+}
+
+

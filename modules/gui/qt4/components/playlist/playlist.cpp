@@ -140,10 +140,9 @@ QSize PlaylistWidget::sizeHint() const
 }
 
 PlaylistWidget::~PlaylistWidget()
-{}
-
-void PlaylistWidget::savingSettings()
 {
+    getSettings()->beginGroup("playlistdialog");
     getSettings()->setValue( "splitterSizes", saveState() );
+    getSettings()->endGroup();
 }
 
