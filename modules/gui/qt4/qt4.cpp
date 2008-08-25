@@ -337,8 +337,7 @@ static void *Init( vlc_object_t *obj )
 #endif
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
 
-    /* Icon setting
-       FIXME: use a bigger icon ? */
+    /* Icon setting */
     if( QDate::currentDate().dayOfYear() >= 354 )
         app->setWindowIcon( QIcon( QPixmap(vlc_christmas_xpm) ) );
     else

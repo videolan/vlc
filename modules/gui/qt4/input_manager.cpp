@@ -571,9 +571,6 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
 
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
 
-    // No necessary, I think TODO REMOVE ME at the end
-    //var_AddCallback( THEPL, "intf-change", ItemChanged, im );
-
     /* Warn our embedded IM about input changes */
     CONNECT( this, inputChanged( input_thread_t * ),
              im, setInput( input_thread_t * ) );

@@ -178,8 +178,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             /* Create a new TreeWidget */
             QTreeWidgetItem *subcat_item = new QTreeWidgetItem();
             subcat_item->setText( 0, data_sub->name );
-            /* TODO : Choose the image */
-            //subcat_item->setIcon( 0 , XXX );
             subcat_item->setData( 0, Qt::UserRole,
                                   qVariantFromValue( data_sub ) );
             subcat_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
@@ -274,10 +272,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         module_data->i_type = TYPE_MODULE;
         module_data->psz_name = strdup( module_GetObjName( p_module ) );
         module_data->help.clear();
-        // TODO image
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
         module_item->setText( 0, qtr( module_GetName( p_module, false ) ) );
-        //item->setIcon( 0 , XXX );
         module_item->setData( 0, Qt::UserRole,
                               QVariant::fromValue( module_data) );
         module_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );

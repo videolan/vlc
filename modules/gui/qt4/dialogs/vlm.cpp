@@ -164,7 +164,7 @@ VLMDialog::~VLMDialog()
 {
     delete vlmWrapper;
 
-   /* FIXME :you have to destroy vlm here to close
+   /* TODO :you have to destroy vlm here to close
     * but we shouldn't destroy vlm here in case somebody else wants it */
     if( p_vlm )
     {
@@ -259,7 +259,7 @@ void VLMDialog::addVLMItem()
     clearWidgets();
 }
 
-// FIXME : VOD are not exported to the file
+/* TODO : VOD are not exported to the file */
 bool VLMDialog::exportVLMConf()
 {
     QString saveVLMConfFileName = QFileDialog::getSaveFileName(
@@ -454,8 +454,7 @@ void VLMDialog::saveModifications()
             break;
            //           vlmObj->
         }
-        vlmObj->update(); /* It should call the correct function is VLMAWidget
-                             is abstract, but I am far from sure... FIXME ? */
+        vlmObj->update();
     }
     clearWidgets();
 }
