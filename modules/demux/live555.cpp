@@ -730,7 +730,7 @@ static int SessionsSetup( demux_t *p_demux )
                     /* if we get an unsupported transport error, toggle TCP use and try again */
                     if( !strstr(p_sys->env->getResultMsg(), "461 Unsupported Transport")
                      || !p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                           !b_rtsp_tcp ? False : True,
+                                           b_rtsp_tcp ? False : True,
                                            False ) )
                     {
                         msg_Err( p_demux, "SETUP of'%s/%s' failed %s", sub->mediumName(),
