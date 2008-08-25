@@ -697,7 +697,7 @@ static const char *const ppsz_clock_descriptions[] =
 #define SUB_FILTER_TEXT N_("Subpictures filter module")
 #define SUB_FILTER_LONGTEXT N_( \
     "This adds so-called \"subpicture filters\". These filters overlay " \
-    "some images or text over the video (like a logo, arbitrary text...)." )
+    "some images or text over the video (like a logo, arbitrary text, ...)." )
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT N_( \
@@ -1056,7 +1056,7 @@ static const char *const ppsz_clock_descriptions[] =
     "don't want a new instance of VLC to be opened each time you " \
     "open a file in your file manager. This option will allow you " \
     "to play the file with the already running instance or enqueue it. " \
-    "This option require the D-Bus session daemon to be active " \
+    "This option requires the D-Bus session daemon to be active " \
     "and the running instance of VLC to use D-Bus control interface.")
 
 #define STARTEDFROMFILE_TEXT N_("VLC is started from file association")

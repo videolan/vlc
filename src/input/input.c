@@ -2316,7 +2316,7 @@ static int InputSourceInit( input_thread_t *p_input,
             intf_UserFatal( VLC_OBJECT( p_input ), false,
                             _("VLC can't recognize the input's format"),
                             _("The format of '%s' cannot be detected. "
-                            "Have a look the log for details."), psz_mrl );
+                            "Have a look at the log for details."), psz_mrl );
             goto error;
         }
 
