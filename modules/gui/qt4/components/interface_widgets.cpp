@@ -181,7 +181,7 @@ QSize VideoWidget::sizeHint() const
  **********************************************************************/
 #define ICON_SIZE 128
 #define MAX_BG_SIZE 400
-#define MIN_BG_SIZE 64
+#define MIN_BG_SIZE 128
 
 BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
                  :QWidget( NULL ), p_intf( _p_i )
@@ -191,7 +191,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
 
     /* A dark background */
     setAutoFillBackground( true );
-    plt =  palette();
+    plt = palette();
     plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
     plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
     setPalette( plt );
