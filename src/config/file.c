@@ -694,7 +694,7 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
     vlc_mutex_unlock( &priv->config_lock );
 
     if( i_index == i_count ) return VLC_SUCCESS;
-    return SaveConfigFile( p_this, 0, true );
+    return SaveConfigFile( p_this, NULL, true );
 }
 
 int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
