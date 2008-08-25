@@ -11,10 +11,11 @@ The Developers site . . . . http://www.videolan.org/developers/vlc.html
 ABOUT-NLS          - Notes on the Free Translation Project.
 AUTHORS            - Main VLC authors.
 COPYING            - The GPL license.
-ChangeLog          - The vlc ChangeLog.
-HACKING            - Hacking vlc.
+ChangeLog          - The VLC ChangeLog.
+HACKING            - Hacking VLC.
 INSTALL            - Installation instructions.
-INSTALL.win32      - Installation instructions for the Win32 version of vlc.
+INSTALL.win32      - Installation instructions for the Win32 version of VLC.
+NEWS               - Important modifications between the releases.
 README             - This file.
 THANKS             - All VLC contributors.
 bindings/          - Bindings around LibVLC.
@@ -29,6 +30,6 @@ include/           - Include files
 doc/               - Miscellaneous documentation.
 libs/              - libraries that we host.
 po/                - languages related files.
-projects/          - projects that uses libvlc such as the web browsers plugin.
+projects/          - projects that uses libVLC such as the web browsers plugin.
 share/             - Common Resources files.
-src/               - VLC and LibVLC source code.
+src/               - VLC and libvlc source code.
