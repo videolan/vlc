@@ -134,7 +134,7 @@ protected:
     intf_thread_t *p_intf;
 
     void readSettings( QString name,
-                       QSize defSize = QSize( 0, 0 ),
+                       QSize defSize = QSize( 1, 1 ),
                        QPoint defPos = QPoint( 0, 0 ) )
     {
         QVLCTools::restoreWidgetPosition(p_intf, name, this, defSize, defPos);
