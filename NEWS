@@ -1,10 +1,10 @@
-Changes between 0.9.0 and 1.0.0:
+Changes between 0.9.1 and 1.0.0:
 ---------------------------------
 
-<nothing yet>
+Stream output:
+ * Restored the old mpeg2 transrating module.
 
-
-Changes between 0.8.6i and 0.9.0:
+Changes between 0.8.6i and 0.9.1:
 ---------------------------------
 
 Important notes:
