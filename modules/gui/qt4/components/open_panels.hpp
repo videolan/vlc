@@ -179,6 +179,8 @@ public:
     virtual void clear() ;
 private:
     Ui::OpenCapture ui;
+    bool isInitialized;
+
     QString advMRL;
     QDialog *adv;
 #ifdef WIN32
@@ -203,6 +205,7 @@ private:
 
 public slots:
     virtual void updateMRL();
+    void initialize();
 private slots:
     void updateButtons();
     void advancedDialog();

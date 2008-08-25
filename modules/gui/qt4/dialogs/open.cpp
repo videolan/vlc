@@ -128,7 +128,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     setMenuAction();
 
     /* Force MRL update on tab change */
-    CONNECT( ui.Tab, currentChanged( int ), this, signalCurrent() );
+    CONNECT( ui.Tab, currentChanged( int ), this, signalCurrent( int ) );
 
     CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
     CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
@@ -208,13 +208,16 @@ void OpenDialog::setMenuAction()
 
 void OpenDialog::showTab( int i_tab )
 {
+    if( i_tab == OPEN_CAPTURE_TAB ) captureOpenPanel->initialize();
     ui.Tab->setCurrentIndex( i_tab );
     show();
 }
 
 /* Function called on signal currentChanged triggered */
-void OpenDialog::signalCurrent()
+void OpenDialog::signalCurrent( int i_tab )
 {
+    if( i_tab == OPEN_CAPTURE_TAB ) captureOpenPanel->initialize();
+
     if( ui.Tab->currentWidget() != NULL )
         ( dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() ) )->updateMRL();
 }

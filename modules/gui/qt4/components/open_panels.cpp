@@ -557,6 +557,16 @@ void NetOpenPanel::updateMRL() {
 CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
+    isInitialized = false;
+}
+
+void CaptureOpenPanel::initialize()
+{
+    if( isInitialized ) return;
+
+    msg_Dbg( p_intf, "Initialization of Capture device panel" );
+    isInitialized = true;
+
     ui.setupUi( this );
 
     BUTTONACT( ui.advancedButton, advancedDialog() );
