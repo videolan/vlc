@@ -1170,7 +1170,10 @@ void MainInterface::closeEvent( QCloseEvent *e )
 void MainInterface::toggleFullScreen( void )
 {
     if( isFullScreen() )
+    {
         showNormal();
+        emit askUpdate(); // Needed if video was launched after the F11
+    }
     else
         showFullScreen();
 }
