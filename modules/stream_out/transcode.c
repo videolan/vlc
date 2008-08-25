@@ -1953,9 +1953,6 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
             {
-                filter_chain_Delete( id->p_f_chain );
-                if( id->p_uf_chain )
-                    filter_chain_Delete( id->p_uf_chain );
                 p_pic->pf_release( p_pic );
                 transcode_video_close( p_stream, id );
                 id->b_transcode = false;
