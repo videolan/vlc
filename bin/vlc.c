@@ -80,10 +80,6 @@ int main( int i_argc, const char *ppsz_argv[] )
 #   endif
 #endif
 
-#if defined (HAVE_GETEUID) && !defined (SYS_BEOS)
-    /* FIXME: rootwrap (); */
-#endif
-
     /* Synchronously intercepted POSIX signals.
      *
      * In a threaded program such as VLC, the only sane way to handle signals
