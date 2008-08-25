@@ -21,8 +21,9 @@ Important notes:
    - On Mac OS X, you can find it in VLC.app/Contents/MacOS/share/http/.hosts
      and respectively in VLC.app/Contents/MacOS/share/http/old/.hosts
  * This version of VLC contains a new interface for Windows and Linux.
-   This interface has a fullscreen controller. This interface lacks the
-   "Streaming Wizard" that used to be present in VLC 0.8.6.
+   This interface has a fullscreen controller and simplified preferences.
+   This interface lacks the "Streaming Wizard" that used to be present in VLC
+   0.8.6.
  * The behavior of --sout-keep was changed. It's now activated by default.
  * The marq, mosaic and logo commands in the rc interface changed. They
    now require a target name as their first argument. Example:
@@ -58,6 +59,7 @@ Important notes:
    transcode{vcodec=mp2v,vfilter=canvas{width=640,height=480}}
  * Glide video output module has been removed.
  * Due to lack of maintainer, the Skins interface might not work properly.
+   It does not work on windows for this version. Help is needed!
 
 Changes:
 --------
