@@ -123,6 +123,10 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     // with other uses of the same component...
     // getSettings()->beginGroup( "playlist" );
     restoreState( getSettings()->value("splitterSizes").toByteArray());
+
+    setAcceptDrops( true );
+    setWindowTitle( qtr( "Playlist" ) );
+    setWindowIcon( QApplication::windowIcon() );
 }
 
 void PlaylistWidget::setArt( QString url )
@@ -139,5 +143,16 @@ PlaylistWidget::~PlaylistWidget()
     getSettings()->beginGroup("playlistdialog");
     getSettings()->setValue( "splitterSizes", saveState() );
     getSettings()->endGroup();
+}
+
+#include "main_interface.hpp"
+void PlaylistWidget::dropEvent(QDropEvent *event)
+{
+    if( p_intf->p_sys->p_mi )
+        p_intf->p_sys->p_mi->dropEvent( event );
+}
+void PlaylistWidget::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
 }
 

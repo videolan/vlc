@@ -56,6 +56,9 @@ private:
     QWidget *parent;
 protected:
     intf_thread_t *p_intf;
+    void dropEvent( QDropEvent *);
+    void dragEnterEvent( QDragEnterEvent * );
+
 private slots:
     void setArt( QString );
 signals:

@@ -70,6 +70,7 @@ class MainInterface : public QVLCMW
 
     friend class VolumeClickHandler;
     friend class InteractionDialog;
+    friend class PlaylistWidget;
 
 public:
     MainInterface( intf_thread_t *);
