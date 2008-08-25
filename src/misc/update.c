@@ -1393,10 +1393,6 @@ void* update_CheckReal( vlc_object_t* p_this )
 
     if( p_uct->pf_callback )
         (p_uct->pf_callback)( p_uct->p_data, b_ret );
-
-    p_uct->p_update->p_check = NULL;
-
-    vlc_object_release( p_uct );
     return NULL;
 }
 
