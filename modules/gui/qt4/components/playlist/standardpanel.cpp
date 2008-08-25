@@ -20,6 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -252,8 +253,7 @@ void StandardPLPanel::popupAdd()
     if( currentRootId == THEPL->p_local_category->i_id ||
         currentRootId == THEPL->p_local_onelevel->i_id )
     {
-        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(simplePLAppendDialog()));
-        popup.addAction( qtr(I_PL_ADVADD), THEDP, SLOT(PLAppendDialog()) );
+        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(PLAppendDialog()) );
         popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
     }
     else if( ( THEPL->p_ml_category &&
@@ -261,8 +261,7 @@ void StandardPLPanel::popupAdd()
              ( THEPL->p_ml_onelevel &&
                 currentRootId == THEPL->p_ml_onelevel->i_id ) )
     {
-        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(simpleMLAppendDialog()));
-        popup.addAction( qtr(I_PL_ADVADD), THEDP, SLOT( MLAppendDialog() ) );
+        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT( MLAppendDialog() ) );
         popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
     }
     popup.exec( QCursor::pos() - addButton->mapFromGlobal( QCursor::pos() )
