@@ -290,7 +290,6 @@ bool scan_IsCancelled( scan_t *p_scan )
 
 static scan_service_t *ScanFindService( scan_t *p_scan, int i_service_start, int i_program )
 {
-    /* FIXME add network id */
     for( int i = i_service_start; i < p_scan->i_service; i++ )
     {
         if( p_scan->pp_service[i]->i_program == i_program )
@@ -304,7 +303,7 @@ static void PATCallBack( scan_session_t *p_session, dvbpsi_pat_t *p_pat )
 {
     vlc_object_t *p_obj = p_session->p_obj;
 
-    msg_Err( p_obj, "PATCallBack" );
+    msg_Dbg( p_obj, "PATCallBack" );
 
     /* */
     if( p_session->p_pat && p_session->p_pat->b_current_next )
@@ -337,7 +336,7 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
 {
     vlc_object_t *p_obj = p_session->p_obj;
 
-    msg_Err( p_obj, "SDTCallBack" );
+    msg_Dbg( p_obj, "SDTCallBack" );
 
     if( p_session->p_sdt && p_session->p_sdt->b_current_next )
     {
@@ -393,7 +392,7 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 {
     vlc_object_t *p_obj = p_session->p_obj;
 
-    msg_Err( p_obj, "NITCallBack" );
+    msg_Dbg( p_obj, "NITCallBack" );
     msg_Dbg( p_obj, "new NIT network_id=%d version=%d current_next=%d",
              p_nit->i_network_id, p_nit->i_version, p_nit->b_current_next );
 
@@ -498,7 +497,6 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
             }
         }
     }
-    //dvbpsi_DeleteNIT( p_nit );
 }
 
 static void PSINewTableCallBack( scan_session_t *p_session, dvbpsi_handle h, uint8_t  i_table_id, uint16_t i_extension )
