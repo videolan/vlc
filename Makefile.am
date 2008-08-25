@@ -976,7 +976,7 @@ package-beos:
 # Clean up
 	rm -Rf $(srcdir)/tmp
 
-package-macosx: VLC-release.app
+package-macosx: VLC-release.app ChangeLog
 # Check that the temporary location isn't in the way
 	@if test -e "$(top_builddir)/vlc-$(VERSION)/"; then \
 	  rm -Rf "$(top_builddir)/vlc-$(VERSION)/" ; \
