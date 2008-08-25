@@ -149,7 +149,7 @@ static const uint8_t map_non_linear_mquant[113] =
 
 int scale_quant( transrate_t *tr, double qrate )
 {
-    int i_quant = (int)floor( tr->quantizer_scale * qrate + 0.5 );
+    int i_quant = floor( tr->quantizer_scale * qrate + 0.5 );
 
     if ( tr->q_scale_type )
     {
@@ -171,7 +171,7 @@ int scale_quant( transrate_t *tr, double qrate )
     return i_quant;
 }
 
-int increment_quant( transrate_t *tr, int i_quant )
+static int increment_quant( transrate_t *tr, int i_quant )
 {
     if ( tr->q_scale_type )
     {

@@ -1,1 +1,3 @@
 SOURCES_stream_out_transrate = transrate.c transrate.h frame.c block.c getvlc.h putvlc.h
+
+libvlc_LTLIBRARIES += libstream_out_transrate_plugin.la

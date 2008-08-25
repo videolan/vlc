@@ -37,6 +37,7 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_input.h>
+#include <vlc_block.h>
 
 #include "transrate.h"
 
@@ -55,6 +56,21 @@ static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, block_
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+#define VB_TEXT N_("Video bitrate")
+#define VB_LONGTEXT N_( \
+    "... FIXME ..." )
+
+#define SHAPING_TEXT N_("Shaping delay")
+#define SHAPING_LONGTEXT N_( \
+    "... FIXME ..." )
+
+#define MPEG4_MATRIX_TEXT N_("Use MPEG4 matrix")
+#define MPEG4_MATRIX_LONGTEXT N_( \
+    "... FIXME ..." )
+
+#define SOUT_CFG_PREFIX "sout-transrate-"
+
 vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );
@@ -62,7 +78,18 @@ vlc_module_begin();
     set_capability( "sout stream", 50 );
     add_shortcut( "transrate" );
     set_callbacks( Open, Close );
+
+    add_integer( SOUT_CFG_PREFIX "vb", 3 * 100 * 1000, NULL,
+                 VB_TEXT, VB_LONGTEXT, false );
+    add_integer( SOUT_CFG_PREFIX "shaping", 500, NULL,
+                 SHAPING_TEXT, SHAPING_LONGTEXT, false );
+    add_bool( SOUT_CFG_PREFIX "mpeg4-matrix", false, NULL,
+              MPEG4_MATRIX_TEXT, MPEG4_MATRIX_LONGTEXT, false );
 vlc_module_end();
+
+static const char *const ppsz_sout_options[] = {
+    "vb", "shaping", "mpeg4-matrix", NULL
+};
 
 struct sout_stream_sys_t
 {
@@ -82,44 +109,28 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
-    char *val;
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
     p_sys->p_out = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
 
-    p_sys->i_vbitrate   = 0;
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+                       p_stream->p_cfg );
+    p_sys->i_vbitrate = var_CreateGetInteger( p_stream, SOUT_CFG_PREFIX "vb" );
+    if( p_sys->i_vbitrate < 16000 )
+        p_sys->i_vbitrate *= 1000;
 
-    if( ( val = sout_cfg_find_value( p_stream->p_cfg, "vb" ) ) )
+    p_sys->i_shaping_delay = var_CreateGetInteger( p_stream,
+                                SOUT_CFG_PREFIX "shaping" ) * 1000;
+    if( p_sys->i_shaping_delay <= 0 )
     {
-        p_sys->i_vbitrate = atoi( val );
-        if( p_sys->i_vbitrate < 16000 )
-        {
-            p_sys->i_vbitrate *= 1000;
-        }
-    }
-    else
-    {
-        p_sys->i_vbitrate = 3000000;
-    }
-
-    p_sys->i_shaping_delay = 500000;
-    if( ( val = sout_cfg_find_value( p_stream->p_cfg, "shaping" ) ) )
-    {
-        p_sys->i_shaping_delay = (int64_t)atoi( val ) * 1000;
-        if( p_sys->i_shaping_delay <= 0 )
-        {
-            msg_Err( p_stream,
-                     "invalid shaping (%"PRId64"ms) reseting to 500ms",
-                     p_sys->i_shaping_delay / 1000 );
-            p_sys->i_shaping_delay = 500000;
-        }
+        msg_Err( p_stream,
+                 "invalid shaping (%"PRId64"ms) reseting to 500ms",
+                 p_sys->i_shaping_delay / 1000 );
+        p_sys->i_shaping_delay = 500000;
     }
 
-    p_sys->b_mpeg4_matrix = 0;
-    if( sout_cfg_find( p_stream->p_cfg, "mpeg4-matrix" ) )
-    {
-        p_sys->b_mpeg4_matrix = 1;
-    }
+    p_sys->b_mpeg4_matrix = var_CreateGetBool( p_stream,
+                                               SOUT_CFG_PREFIX "mpeg4-matrix" );
 
     msg_Dbg( p_stream, "codec video %dkb/s max gop=%"PRId64"us",
              p_sys->i_vbitrate / 1024, p_sys->i_shaping_delay );
@@ -308,11 +319,11 @@ static int transrate_video_process( sout_stream_t *p_stream,
                 i_new_bitrate = (mtime_t)tr->i_current_output * 8000
                                     / (id->i_next_gop_duration / 1000);
                 if (i_new_bitrate > p_stream->p_sys->i_vbitrate + 300000)
-                    msg_Err(p_stream, "%lld -> %lld d=%lld",
+                    msg_Err(p_stream, "%"PRId64" -> %"PRId64" d=%"PRId64,
                             i_bitrate, i_new_bitrate,
                             id->i_next_gop_duration);
                 else
-                    msg_Dbg(p_stream, "%lld -> %lld d=%lld",
+                    msg_Dbg(p_stream, "%"PRId64" -> %"PRId64" d=%"PRId64,
                             i_bitrate, i_new_bitrate,
                             id->i_next_gop_duration);
             }
