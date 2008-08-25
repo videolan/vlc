@@ -103,7 +103,7 @@ struct intf_sys_t
 #define TOGGLEV( x ) { if( x->isVisible() ) x->hide();          \
             else  x->show(); }
 
-#if QT43
+#if HAS_QT43
     #define setLayoutMargins( a, b, c, d, e) setContentsMargins( a, b, c, d )
 #else
     #define setLayoutMargins( a, b, c, d, e) setMargin( e )

@@ -1008,13 +1008,14 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
 
     QGridLayout *fsLayout = new QGridLayout( this );
-    fsLayout->setLayoutMargins( 5, 1, 5, 1, 5 );
+    fsLayout->setLayoutMargins( 5, 2, 5, 2, 5 );
 
     /* First line */
     slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);
+    slider->setMinimumWidth( 220 );
     fsLayout->addWidget( slowerButton, 0, 0 );
-    fsLayout->addWidget( slider, 0, 1, 1, 8 );
-    fsLayout->addWidget( fasterButton, 0, 9 );
+    fsLayout->addWidget( slider, 0, 1, 1, 9 );
+    fsLayout->addWidget( fasterButton, 0, 10 );
 
     fsLayout->addWidget( playButton, 1, 0, 1, 2 );
     fsLayout->addLayout( controlButLayout, 1, 2 );
@@ -1024,8 +1025,9 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     fsLayout->addWidget( fullscreenButton, 1, 5 );
     fsLayout->addWidget( advControls, 1, 6, Qt::AlignVCenter );
 
-    fsLayout->addWidget( volMuteLabel, 1, 7 );
-    fsLayout->addWidget( volumeSlider, 1, 8, 1, 2 );
+    fsLayout->setColumnStretch( 7, 10 );
+    fsLayout->addWidget( volMuteLabel, 1, 8 );
+    fsLayout->addWidget( volumeSlider, 1, 9, 1, 2 );
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
