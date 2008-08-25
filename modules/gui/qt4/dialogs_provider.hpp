@@ -116,6 +116,7 @@ public:
                                 EXT_FILTER_VIDEO | EXT_FILTER_AUDIO |
                                 EXT_FILTER_PLAYLIST,
                                 QString path = QString() );
+    bool isDying() { return b_isDying; }
 protected:
     QSignalMapper *menusMapper;
     QSignalMapper *menusUpdateMapper;
@@ -127,6 +128,7 @@ private:
     intf_thread_t *p_intf;
     static DialogsProvider *instance;
     void addFromSimple( bool, bool );
+    bool b_isDying;
 
 public slots:
     void doInteraction( intf_dialog_args_t * );

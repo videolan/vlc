@@ -156,3 +156,15 @@ void PlaylistWidget::dragEnterEvent(QDragEnterEvent *event)
     event->acceptProposedAction();
 }
 
+void PlaylistWidget::closeEvent( QCloseEvent *event )
+{
+    if( THEDP->isDying() )
+    {
+        close();
+    }
+    else
+    {
+        if( p_intf->p_sys->p_mi )
+            p_intf->p_sys->p_mi->togglePlaylist();
+    }
+}

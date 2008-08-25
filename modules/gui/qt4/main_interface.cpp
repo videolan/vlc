@@ -218,9 +218,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     QVLCTools::restoreWidgetPosition( settings, this, QSize(380, 60) );
 
 
-    /* Playlist */
-    if( settings->value( "playlist-visible", 0 ).toInt() ) togglePlaylist();
+    bool b_visible = settings->value( "playlist-visible", 0 ).toInt();
     settings->endGroup();
+
+    /* Playlist */
+    if( b_visible ) togglePlaylist();
 
     /* Final sizing and showing */
     setMinimumWidth( __MAX( controls->sizeHint().width(),
@@ -740,8 +742,10 @@ void MainInterface::togglePlaylist()
     {
         playlistWidget = new PlaylistWidget( p_intf, this );
 
-        i_pl_dock = (pl_dock_e)getSettings()
-                         ->value( "pl-dock-status", PL_UNDOCKED ).toInt();
+        i_pl_dock = PL_UNDOCKED;
+/*        i_pl_dock = (pl_dock_e)getSettings()
+                         ->value( "pl-dock-status", PL_UNDOCKED ).toInt(); */
+
         if( i_pl_dock == PL_UNDOCKED )
         {
             playlistWidget->setWindowFlags( Qt::Window );

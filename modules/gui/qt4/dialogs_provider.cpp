@@ -57,6 +57,7 @@ DialogsProvider* DialogsProvider::instance = NULL;
 DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
                                   QObject( NULL ), p_intf( _p_intf )
 {
+    b_isDying = false;
     fixed_timer = new QTimer( this );
     fixed_timer->start( 150 /* milliseconds */ );
 
@@ -92,6 +93,7 @@ DialogsProvider::~DialogsProvider()
 
 void DialogsProvider::quit()
 {
+    b_isDying = true;
     vlc_object_kill( p_intf->p_libvlc );
     QApplication::closeAllWindows();
     QApplication::quit();
