@@ -331,7 +331,6 @@ static void Close( vlc_object_t * p_this )
 
     DESTROY_PACKETIZER( p_sys->p_packetizer );
     if( p_sys->p_block_out ) block_Release( p_sys->p_block_out );
-    if( p_sys->p_block_in ) block_Release( p_sys->p_block_in );
 
     free( p_sys );
 }
