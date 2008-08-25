@@ -88,6 +88,7 @@ class MediaServer;
 class MediaServerList;
 class Item;
 class Container;
+class Lockable;
 
 // Cookie that is passed to the callback
 
@@ -105,10 +106,14 @@ typedef struct
 class Lockable
 {
 public:
+    Lockable()
+    {
+        vlc_mutex_init( &_mutex );
+    }
 
     Lockable( Cookie* c )
     {
-    vlc_mutex_init( &_mutex );
+        Lockable();
     }
 
     ~Lockable()
