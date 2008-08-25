@@ -258,7 +258,13 @@ MainInterface::~MainInterface()
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
 
     if( !videoIsActive )
+    {
         QVLCTools::saveWidgetPosition(settings, this);
+    }
+    else
+    {
+        msg_Dbg( p_intf, "Not saving because video is in use." );
+    }
 
     if( bgWidget )
         settings->setValue( "backgroundSize", bgWidget->size() );
@@ -676,6 +682,8 @@ void MainInterface::releaseVideoSlot( void *p_win )
         bgWasVisible = false;
         bgWidget->show();
     }
+
+    videoIsActive = false;
 
     /* Try to resize, except when you are in Fullscreen mode */
     if( !isFullScreen() ) doComponentsUpdate();
