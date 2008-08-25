@@ -77,7 +77,6 @@ struct demux_sys_t
     int i_xing_bytes;
     int i_xing_bitrate_avg;
     int i_xing_frame_samples;
-    block_t *p_block_in, *p_block_out;
 };
 
 static int HeaderCheck( uint32_t h )
@@ -113,7 +112,6 @@ static int mpga_frame_samples( uint32_t h )
     }
 }
 
-
 /*****************************************************************************
  * Open: initializes demux structures
  *****************************************************************************/
@@ -125,7 +123,6 @@ static int Open( vlc_object_t * p_this )
 
     uint32_t     header;
     const uint8_t     *p_peek;
-    block_t     *p_block_in, *p_block_out;
 
     if( demux_IsPathExtension( p_demux, ".mp3" ) )
         b_forced = true;
@@ -224,24 +221,6 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    if( ( p_block_in = stream_Block( p_demux->s, MPGA_PACKET_SIZE ) ) == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-    p_block_in->i_pts = p_block_in->i_dts = 1;
-    p_block_out = p_sys->p_packetizer->pf_packetize(
-        p_sys->p_packetizer, &p_block_in );
-
-    if( p_block_out == NULL )
-    {
-        msg_Dbg( p_demux, "did not sync on first block" );
-        p_sys->b_initial_sync_failed = true;
-    }
-    else
-        p_sys->b_initial_sync_failed = false;
-
-    p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
-
     if( p_sys->i_xing_bytes && p_sys->i_xing_frames &&
         p_sys->i_xing_frame_samples )
     {
@@ -250,13 +229,6 @@ static int Open( vlc_object_t * p_this )
             p_sys->i_xing_frames / p_sys->i_xing_frame_samples;
     }
 
-    p_sys->p_block_in = p_block_in;
-    p_sys->p_block_out = p_block_out;
-
-    /* */
-    p_sys->p_packetizer->fmt_out.b_packetized = true;
-    p_sys->p_es = es_out_Add( p_demux->out,
-                              &p_sys->p_packetizer->fmt_out);
     return VLC_SUCCESS;
 }
 
@@ -269,39 +241,31 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_in, *p_block_out;
-    if( p_sys->b_start )
+
+    if( ( p_block_in = stream_Block( p_demux->s, MPGA_PACKET_SIZE ) ) == NULL )
     {
-        p_sys->b_start = false;
-        p_block_in = p_sys->p_block_in;
-        p_sys->p_block_in = NULL;
-        p_block_out = p_sys->p_block_out;
-        p_sys->p_block_out = NULL;
-    }
-    else
-    {
-        if( ( p_block_in = stream_Block( p_demux->s, MPGA_PACKET_SIZE ) )
-            == NULL )
-        {
-            return 0;
-        }
-        if( p_demux->p_sys->b_initial_sync_failed == true )
-        {
-            p_block_in->i_pts = p_block_in->i_dts = 1;
-            /* Only try to resync once */
-            p_demux->p_sys->b_initial_sync_failed = 0;
-        }
-        else
-            p_block_in->i_pts = p_block_in->i_dts = 0;
-        p_block_out = p_sys->p_packetizer->pf_packetize(
-            p_sys->p_packetizer, &p_block_in );
+        return 0;
     }
 
+    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start || p_sys->b_initial_sync_failed ? 1 : 0;
+    p_sys->b_initial_sync_failed = p_sys->b_start; /* Only try to resync once */
 
-    while( p_block_out )
+    while( ( p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in ) ) )
     {
+        p_sys->b_initial_sync_failed = false;
         while( p_block_out )
         {
             block_t *p_next = p_block_out->p_next;
+
+            if( !p_sys->p_es )
+            {
+                p_sys->p_packetizer->fmt_out.b_packetized = true;
+                p_sys->p_es = es_out_Add( p_demux->out,
+                                          &p_sys->p_packetizer->fmt_out);
+
+                if( p_sys->i_bitrate_avg <= 0 )
+                    p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
+            }
 
             p_sys->i_pts = p_block_out->i_pts;
 
@@ -315,9 +279,11 @@ static int Demux( demux_t *p_demux )
 
             p_block_out = p_next;
         }
-        p_block_out = p_sys->p_packetizer->pf_packetize(
-            p_sys->p_packetizer, &p_block_in );
     }
+
+    if( p_sys->b_initial_sync_failed )
+        msg_Dbg( p_demux, "did not sync on first block" );
+    p_sys->b_start = false;
     return 1;
 }
 
@@ -330,7 +296,6 @@ static void Close( vlc_object_t * p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     DESTROY_PACKETIZER( p_sys->p_packetizer );
-    if( p_sys->p_block_out ) block_Release( p_sys->p_block_out );
 
     free( p_sys );
 }
