@@ -1119,15 +1119,13 @@ void CaptureOpenPanel::advancedDialog()
 
     /* A main Layout with a Frame */
     QVBoxLayout *mainLayout = new QVBoxLayout( adv );
-    QFrame *advFrame = new QFrame;
     QScrollArea *scroll = new QScrollArea;
     mainLayout->addWidget( scroll );
 
+    QFrame *advFrame = new QFrame;
     /* GridLayout inside the Frame */
     QGridLayout *gLayout = new QGridLayout( advFrame );
-    gLayout->setSizeConstraint( QLayout::SetFixedSize );
 
-    scroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     scroll->setWidgetResizable( true );
     scroll->setWidget( advFrame );
 
