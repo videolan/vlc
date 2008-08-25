@@ -51,6 +51,7 @@ vlc_module_begin();
     set_description( N_("Dummy stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "dummy" );
+    add_shortcut( "drop" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
