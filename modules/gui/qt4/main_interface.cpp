@@ -232,9 +232,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     if( i_visualmode == QT_MINIMAL_MODE )
         toggleMinimalView();
 
-    /* Update the geometry TODO: is it useful ?*/
+    /* Update the geometry : It is useful if you switch between
+       qt-display-modes ?*/
     updateGeometry();
-    //    resize( sizeHint() );
+    resize( sizeHint() );
 
     /*****************************************************
      * End everything by creating the Systray Management *
