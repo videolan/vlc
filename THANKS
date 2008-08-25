@@ -33,6 +33,7 @@ Arkadiusz Miskiewicz <misiek at pld.ORG.PL> - autoconf and Makefile patches
 Ari Constâncio <ari.constancio at gmail d0t com> - Portuguese localisation
 Arnaud Gomes-do-Vale <arnaud at carrosse.frmug.org> - autoconf patches
 Arwed v. Merkatz <v.merkatz at gmx dot net> - Gamma correction for adjust filter
+Audrey Prevost <fee . clochette007 at wanadoo dot fr> - Help on french translation
 Aurelien - Patch for modules/stream_output/rtp.c proper test for NULL
 Basil Achermann <vlc at acherma dot com> - Patch to handle esc and space key events from VLCControl (OSX)
 Barak Ori <barakori at gmail dot com> - Bidi fixes
