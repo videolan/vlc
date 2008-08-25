@@ -134,11 +134,6 @@ void PlaylistWidget::setArt( QString url )
     }
 }
 
-QSize PlaylistWidget::sizeHint() const
-{
-   return QSize( 600 , 300 );
-}
-
 PlaylistWidget::~PlaylistWidget()
 {
     getSettings()->beginGroup("playlistdialog");

@@ -51,11 +51,18 @@ class QMenu;
 class QSize;
 //class QDockWidet;
 
-enum{
+enum {
     CONTROLS_HIDDEN = 0x0,
     CONTROLS_VISIBLE = 0x1,
     CONTROLS_ADVANCED = 0x2
 };
+
+typedef enum pl_dock_e {
+    PL_UNDOCKED,
+    PL_BOTTOM,
+    PL_RIGHT,
+    PL_LEFT
+} pl_dock_e;
 
 class MainInterface : public QVLCMW
 {
@@ -114,12 +121,10 @@ private:
 
     /* Video */
     VideoWidget         *videoWidget;
-    //    QSize                savedVideoSize;
 
     BackgroundWidget    *bgWidget;
     VisualSelector      *visualSelector;
     PlaylistWidget      *playlistWidget;
-//    QDockWidget         *dockPL;
 
     bool                 videoIsActive; ///< Having a video now / THEMIM->hasV
     bool                 videoEmbeddedFlag; ///< Want an external Video Window
@@ -129,6 +134,8 @@ private:
     bool                 b_remainingTime; /* Show elapsed or remaining time */
     bool                 bgWasVisible;
     int                  i_visualmode; ///< Visual Mode
+    pl_dock_e            i_pl_dock;
+    bool                 isDocked() { return ( i_pl_dock != PL_UNDOCKED ); }
 
     input_thread_t      *p_input;    ///< Main input associated to the playlist
 
@@ -143,6 +150,7 @@ private:
 
 public slots:
     void undockPlaylist();
+    void dockPlaylist( pl_dock_e i_pos = PL_BOTTOM );
     void toggleMinimalView();
     void togglePlaylist();
     void toggleUpdateSystrayMenu();

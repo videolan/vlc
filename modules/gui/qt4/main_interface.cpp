@@ -222,7 +222,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     if( settings->value( "playlist-visible", 0 ).toInt() ) togglePlaylist();
     settings->endGroup();
 
-
     /* Final sizing and showing */
     setMinimumWidth( __MAX( controls->sizeHint().width(),
                             menuBar()->sizeHint().width() ) );
@@ -248,11 +247,14 @@ MainInterface::~MainInterface()
     msg_Dbg( p_intf, "Destroying the main interface" );
 
     if( playlistWidget )
-        playlistWidget->savingSettings();
+    {
+        if( !isDocked() )
+            QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
+    }
 
     settings->beginGroup( "MainWindow" );
 
-    // settings->setValue( "playlist-floats", (int)(dockPL->isFloating()) );
+    settings->setValue( "pl-dock-status", (int)i_pl_dock );
     settings->setValue( "playlist-visible", (int)playlistVisible );
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
@@ -586,8 +588,6 @@ void MainInterface::toggleFSC()
    QApplication::postEvent( fullscreenControls, static_cast<QEvent *>(eShow) );
 }
 
-
-//FIXME remove me at the end...
 void MainInterface::debug()
 {
 #ifndef NDEBUG
@@ -733,46 +733,36 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
  **/
 void MainInterface::togglePlaylist()
 {
-    THEDP->playlistDialog();
-#if 0
     /* CREATION
     If no playlist exist, then create one and attach it to the DockPL*/
     if( !playlistWidget )
     {
-        playlistWidget = new PlaylistWidget( p_intf, settings, dockPL );
+        playlistWidget = new PlaylistWidget( p_intf, this );
 
-        /* Add it to the parent DockWidget */
-        dockPL->setWidget( playlistWidget );
-
-        /* Add the dock to the main Interface */
-        addDockWidget( Qt::BottomDockWidgetArea, dockPL );
-
-        /* Make the playlist floating is requested. Default is not. */
-        settings->beginGroup( "MainWindow" );
-        if( settings->value( "playlist-floats", 1 ).toInt() )
+        i_pl_dock = (pl_dock_e)getSettings()
+                         ->value( "pl-dock-status", PL_UNDOCKED ).toInt();
+        if( i_pl_dock == PL_UNDOCKED )
         {
-            msg_Dbg( p_intf, "we don't want the playlist inside");
-            dockPL->setFloating( true );
-        }
-        settings->endGroup();
-        settings->beginGroup( "playlist" );
-        dockPL->move( settings->value( "pos", QPoint( 0,0 ) ).toPoint() );
-        QSize newSize = settings->value( "size", QSize( 400, 300 ) ).toSize();
-        if( newSize.isValid() )
-            dockPL->resize( newSize );
-        settings->endGroup();
+            playlistWidget->setWindowFlags( Qt::Window );
 
-        dockPL->show();
+            QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
+                    playlistWidget, QSize( 600, 300 ) );
+        }
+        else
+        {
+            mainLayout->insertWidget( 4, playlistWidget );
+        }
         playlistVisible = true;
+
+        playlistWidget->show();
     }
     else
     {
     /* toggle the visibility of the playlist */
-       TOGGLEV( dockPL );
+       TOGGLEV( playlistWidget );
        resize( sizeHint() );
        playlistVisible = !playlistVisible;
     }
-    #endif
 }
 
 /* Function called from the menu to undock the playlist */
@@ -780,6 +770,10 @@ void MainInterface::undockPlaylist()
 {
 //    dockPL->setFloating( true );
     adjustSize();
+}
+
+void MainInterface::dockPlaylist( pl_dock_e i_pos )
+{
 }
 
 void MainInterface::toggleMinimalView()
