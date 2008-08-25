@@ -59,15 +59,16 @@ static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, block_
 
 #define VB_TEXT N_("Video bitrate")
 #define VB_LONGTEXT N_( \
-    "... FIXME ..." )
+    "New target video bitrate. Quality is ok for -10/15\% of the original" \
+    "bitrate." )
 
 #define SHAPING_TEXT N_("Shaping delay")
 #define SHAPING_LONGTEXT N_( \
-    "... FIXME ..." )
+    "Amount of data used for transrating in ms." )
 
 #define MPEG4_MATRIX_TEXT N_("Use MPEG4 matrix")
 #define MPEG4_MATRIX_LONGTEXT N_( \
-    "... FIXME ..." )
+    "Use the MPEG4 quantification matrix." )
 
 #define SOUT_CFG_PREFIX "sout-transrate-"
 
