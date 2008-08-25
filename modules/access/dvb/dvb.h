@@ -24,6 +24,8 @@
  *****************************************************************************/
 
 
+#include "scan.h"
+
 /*****************************************************************************
  * Devices location
  *****************************************************************************/
@@ -43,6 +45,19 @@ typedef struct demux_handle_t
 } demux_handle_t;
 
 typedef struct frontend_t frontend_t;
+typedef struct
+{
+    int i_snr;              /**< Signal Noise ratio */
+    int i_ber;              /**< Bitrate error ratio */
+    int i_signal_strenth;   /**< Signal strength */
+} frontend_statistic_t;
+
+typedef struct
+{
+    bool b_has_signal;
+    bool b_has_carrier;
+    bool b_has_lock;
+} frontend_status_t;
 
 typedef struct en50221_session_t
 {
@@ -138,6 +153,7 @@ struct access_sys_t
     demux_handle_t p_demux_handles[MAX_DEMUX];
     frontend_t *p_frontend;
     bool b_budget_mode;
+    bool b_scan_mode;
 
     /* CA management */
     int i_ca_handle;
@@ -168,6 +184,9 @@ struct access_sys_t
     char                *psz_frontend_info, *psz_mmi_info;
     char                *psz_request;
 #endif
+
+    /* Scan */
+    scan_t scan;
 };
 
 #define VIDEO0_TYPE     1
@@ -181,6 +200,7 @@ struct access_sys_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+
 int  FrontendOpen( access_t * );
 void FrontendPoll( access_t *p_access );
 int  FrontendSet( access_t * );
@@ -188,6 +208,10 @@ void FrontendClose( access_t * );
 #ifdef ENABLE_HTTPD
 void FrontendStatus( access_t * );
 #endif
+
+int  FrontendGetStatistic( access_t *, frontend_statistic_t * );
+void FrontendGetStatus( access_t *, frontend_status_t * );
+int  FrontendGetScanParameter( access_t *, scan_parameter_t * );
 
 int DMXSetFilter( access_t *, int i_pid, int * pi_fd, int i_type );
 int DMXUnsetFilter( access_t *, int i_fd );
@@ -214,6 +238,8 @@ void en50221_SendMMIObject( access_t * p_access, int i_slot,
                                 en50221_mmi_object_t *p_object );
 void en50221_End( access_t * );
 
+char *dvbsi_to_utf8( char *psz_instring, size_t i_length );
+
 #ifdef ENABLE_HTTPD
 int HTTPOpen( access_t *p_access );
 void HTTPClose( access_t *p_access );
@@ -225,3 +251,4 @@ char *HTTPExtractValue( char *psz_uri, const char *psz_name,
  *****************************************************************************/
 #define STRINGIFY( z )   UGLY_KLUDGE( z )
 #define UGLY_KLUDGE( z ) #z
+

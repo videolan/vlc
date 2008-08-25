@@ -55,6 +55,9 @@
 #   include <dvbpsi/pmt.h>
 #   include <dvbpsi/dr.h>
 #   include <dvbpsi/psi.h>
+#   include <dvbpsi/demux.h>
+#   include <dvbpsi/sdt.h>
+#   include <dvbpsi/nit.h>
 #else
 #   include "dvbpsi.h"
 #   include "descriptor.h"
@@ -62,6 +65,9 @@
 #   include "tables/pmt.h"
 #   include "descriptors/dr.h"
 #   include "psi.h"
+#   include "demux.h"
+#   include "sdt.h"
+#   include "nit.h"
 #endif
 
 #ifdef ENABLE_HTTPD
@@ -339,17 +345,21 @@ void FrontendPoll( access_t *p_access )
 
             IF_UP( FE_HAS_LOCK )
             {
-                int32_t i_value = 0;
+                frontend_statistic_t stat;
+
                 msg_Dbg( p_access, "frontend has acquired lock" );
                 p_sys->i_frontend_timeout = 0;
 
                 /* Read some statistics */
-                if( ioctl( p_sys->i_frontend_handle, FE_READ_BER, &i_value ) >= 0 )
-                    msg_Dbg( p_access, "- Bit error rate: %d", i_value );
-                if( ioctl( p_sys->i_frontend_handle, FE_READ_SIGNAL_STRENGTH, &i_value ) >= 0 )
-                    msg_Dbg( p_access, "- Signal strength: %d", i_value );
-                if( ioctl( p_sys->i_frontend_handle, FE_READ_SNR, &i_value ) >= 0 )
-                    msg_Dbg( p_access, "- SNR: %d", i_value );
+                if( !FrontendGetStatistic( p_access, &stat ) )
+                {
+                    if( stat.i_ber >= 0 )
+                        msg_Dbg( p_access, "- Bit error rate: %d", stat.i_ber );
+                    if( stat.i_signal_strenth >= 0 )
+                        msg_Dbg( p_access, "- Signal strength: %d", stat.i_signal_strenth );
+                    if( stat.i_snr >= 0 )
+                        msg_Dbg( p_access, "- SNR: %d", stat.i_snr );
+                }
             }
             else
             {
@@ -366,6 +376,66 @@ void FrontendPoll( access_t *p_access )
         }
 #undef IF_UP
     }
+}
+int FrontendGetStatistic( access_t *p_access, frontend_statistic_t *p_stat )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    frontend_t * p_frontend = p_sys->p_frontend;
+
+    if( (p_frontend->i_last_status & FE_HAS_LOCK) == 0 )
+        return VLC_EGENERIC;
+
+    memset( p_stat, 0, sizeof(*p_stat) );
+    if( ioctl( p_sys->i_frontend_handle, FE_READ_BER, &p_stat->i_ber ) < 0 )
+        p_stat->i_ber = -1;
+    if( ioctl( p_sys->i_frontend_handle, FE_READ_SIGNAL_STRENGTH, &p_stat->i_signal_strenth ) < 0 )
+        p_stat->i_signal_strenth = -1;
+    if( ioctl( p_sys->i_frontend_handle, FE_READ_SNR, &p_stat->i_snr ) < 0 )
+        p_stat->i_snr = -1;
+
+    return VLC_SUCCESS;
+}
+void FrontendGetStatus( access_t *p_access, frontend_status_t *p_status )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    frontend_t * p_frontend = p_sys->p_frontend;
+
+    p_status->b_has_signal = (p_frontend->i_last_status & FE_HAS_SIGNAL) != 0;
+    p_status->b_has_carrier = (p_frontend->i_last_status & FE_HAS_CARRIER) != 0;
+    p_status->b_has_lock = (p_frontend->i_last_status & FE_HAS_LOCK) != 0;
+}
+static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
+{
+    const frontend_t *p_frontend = p_access->p_sys->p_frontend;
+
+
+    memset( p_scan, 0, sizeof(*p_scan) );
+    p_scan->type = SCAN_DVB_T;
+    p_scan->b_exhaustive = false;
+
+    /* */
+    p_scan->frequency.i_min = p_frontend->info.frequency_min;
+    p_scan->frequency.i_max = p_frontend->info.frequency_max;
+    p_scan->frequency.i_step = p_frontend->info.frequency_stepsize;
+    p_scan->frequency.i_count = (p_scan->frequency.i_max-p_scan->frequency.i_min)/p_scan->frequency.i_step;
+
+    /* */
+    p_scan->bandwidth.i_min  = 6;
+    p_scan->bandwidth.i_max  = 8;
+    p_scan->bandwidth.i_step = 1;
+    p_scan->bandwidth.i_count = 3;
+    return VLC_SUCCESS;
+}
+int  FrontendGetScanParameter( access_t *p_access, scan_parameter_t *p_scan )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    const frontend_t *p_frontend = p_sys->p_frontend;
+
+    if( p_frontend->info.type == FE_OFDM )  // DVB-T
+        return ScanParametersDvbT( p_access, p_scan );
+
+    msg_Err( p_access, "Frontend type not supported for scanning" );
+    return VLC_EGENERIC;
 }
 
 #ifdef ENABLE_HTTPD

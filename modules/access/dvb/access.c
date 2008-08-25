@@ -54,6 +54,9 @@
 #   include <dvbpsi/pmt.h>
 #   include <dvbpsi/dr.h>
 #   include <dvbpsi/psi.h>
+#   include <dvbpsi/demux.h>
+#   include <dvbpsi/sdt.h>
+#   include <dvbpsi/nit.h>
 #else
 #   include "dvbpsi.h"
 #   include "descriptor.h"
@@ -61,6 +64,9 @@
 #   include "tables/pmt.h"
 #   include "descriptors/dr.h"
 #   include "psi.h"
+#   include "demux.h"
+#   include "sdt.h"
+#   include "nit.h"
 #endif
 
 #ifdef ENABLE_HTTPD
@@ -196,7 +202,7 @@ vlc_module_begin();
                  false );
     add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                  true );
-    add_integer( "dvb-frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
+    add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                  false );
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
                  true );
@@ -274,6 +280,7 @@ vlc_module_begin();
     add_shortcut( "usdigital" );
 
     set_callbacks( Open, Close );
+
 vlc_module_end();
 
 
@@ -283,9 +290,16 @@ vlc_module_end();
 static block_t *Block( access_t * );
 static int Control( access_t *, int, va_list );
 
+static block_t *BlockScan( access_t * );
+
 #define DVB_READ_ONCE 20
 #define DVB_READ_ONCE_START 2
+#define DVB_READ_ONCE_SCAN 1
 #define TS_PACKET_SIZE 188
+
+#define DVB_SCAN_MAX_SIGNAL_TIME (300*1000)
+#define DVB_SCAN_MAX_LOCK_TIME (5000*1000)
+#define DVB_SCAN_MAX_PROBE_TIME (30000*1000)
 
 static void FilterUnset( access_t *, int i_max );
 static void FilterUnsetPID( access_t *, int i_pid );
@@ -293,7 +307,6 @@ static void FilterSet( access_t *, int i_pid, int i_type );
 
 static void VarInit( access_t * );
 static int  ParseMRL( access_t * );
-
 
 /*****************************************************************************
  * Open: open the frontend device
@@ -342,13 +355,23 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Setting frontend parameters for tuning the hardware */
-    msg_Dbg( p_access, "trying to tune the frontend...");
-    if( FrontendSet( p_access ) < 0 )
+    /* */
+    p_sys->b_scan_mode = var_GetInteger( p_access, "dvb-frequency" ) == 0;
+    if( p_sys->b_scan_mode )
     {
-        FrontendClose( p_access );
-        free( p_sys );
-        return VLC_EGENERIC;
+        msg_Dbg( p_access, "DVB scan mode selected" );
+        p_access->pf_block = BlockScan;
+    }
+    else
+    {
+        /* Setting frontend parameters for tuning the hardware */
+        msg_Dbg( p_access, "trying to tune the frontend...");
+        if( FrontendSet( p_access ) < 0 )
+        {
+            FrontendClose( p_access );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
     }
 
     /* Opening DVR device */
@@ -359,28 +382,49 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->b_budget_mode = var_GetBool( p_access, "dvb-budget-mode" );
-    if( p_sys->b_budget_mode )
+    if( p_sys->b_scan_mode )
     {
-        msg_Dbg( p_access, "setting filter on all PIDs" );
-        FilterSet( p_access, 0x2000, OTHER_TYPE );
+        scan_parameter_t parameter;
+
+        msg_Dbg( p_access, "setting filter on PAT/NIT/SDT (DVB only)" );
+        FilterSet( p_access, 0x00, OTHER_TYPE );    // PAT
+        FilterSet( p_access, 0x10, OTHER_TYPE );    // NIT
+        FilterSet( p_access, 0x11, OTHER_TYPE );    // SDT
+
+        if( FrontendGetScanParameter( p_access, &parameter ) ||
+            scan_Init( VLC_OBJECT(p_access), &p_sys->scan, &parameter ) )
+        {
+            Close( VLC_OBJECT(p_access) );
+            return VLC_EGENERIC;
+        }
     }
     else
     {
-        msg_Dbg( p_access, "setting filter on PAT" );
-        FilterSet( p_access, 0x0, OTHER_TYPE );
+        p_sys->b_budget_mode = var_GetBool( p_access, "dvb-budget-mode" );
+        if( p_sys->b_budget_mode )
+        {
+            msg_Dbg( p_access, "setting filter on all PIDs" );
+            FilterSet( p_access, 0x2000, OTHER_TYPE );
+        }
+        else
+        {
+            msg_Dbg( p_access, "setting filter on PAT" );
+            FilterSet( p_access, 0x0, OTHER_TYPE );
+        }
+
+        CAMOpen( p_access );
+
+#ifdef ENABLE_HTTPD
+        HTTPOpen( p_access );
+#endif
     }
 
-    CAMOpen( p_access );
-
-    if( p_sys->b_budget_mode )
+    if( p_sys->b_scan_mode )
+        p_sys->i_read_once = DVB_READ_ONCE_SCAN;
+    else if( p_sys->b_budget_mode )
         p_sys->i_read_once = DVB_READ_ONCE;
     else
         p_sys->i_read_once = DVB_READ_ONCE_START;
-
-#ifdef ENABLE_HTTPD
-    HTTPOpen( p_access );
-#endif
 
     return VLC_SUCCESS;
 }
@@ -393,14 +437,18 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    FilterUnset( p_access, p_sys->b_budget_mode ? 1 : MAX_DEMUX );
+    FilterUnset( p_access, p_sys->b_budget_mode && !p_sys->b_scan_mode ? 1 : MAX_DEMUX );
 
     DVRClose( p_access );
     FrontendClose( p_access );
-    CAMClose( p_access );
+    if( p_sys->b_scan_mode )
+        scan_Clean( &p_sys->scan );
+    else
+        CAMClose( p_access );
 
 #ifdef ENABLE_HTTPD
-    HTTPClose( p_access );
+    if( !p_sys->b_scan_mode )
+        HTTPClose( p_access );
 #endif
 
     free( p_sys );
@@ -513,6 +561,154 @@ static block_t *Block( access_t *p_access )
 }
 
 /*****************************************************************************
+ * BlockScan:
+ *****************************************************************************/
+static block_t *BlockScan( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    scan_t *p_scan = &p_sys->scan;
+    scan_configuration_t cfg;
+    scan_session_t session;
+
+    /* */
+    if( scan_Next( p_scan, &cfg ) )
+    {
+        const bool b_first_eof = !p_access->info.b_eof;
+
+        if( b_first_eof )
+            msg_Warn( p_access, "Scanning finished" );
+
+        /* */
+        p_access->info.b_eof = true;
+        return b_first_eof ? scan_GetM3U( p_scan ) : NULL;
+    }
+
+    /* */
+
+    if( scan_session_Init( VLC_OBJECT(p_access), &session, &cfg ) )
+        return NULL;
+
+    /* */
+    msg_Dbg( p_access, "Scanning frequency %d", cfg.i_frequency );
+    var_SetInteger( p_access, "dvb-frequency", cfg.i_frequency );
+    var_SetInteger( p_access, "dvb-bandwidth", cfg.i_bandwidth );
+
+    /* Setting frontend parameters for tuning the hardware */
+    if( FrontendSet( p_access ) < 0 )
+    {
+        msg_Err( p_access, "Failed to tune the frontend" );
+        p_access->info.b_eof = true;
+        return NULL;
+    }
+
+    /* */
+    int64_t i_scan_start = mdate();
+
+    bool b_has_dvb_signal = false;
+    bool b_has_lock = false;
+    int i_best_snr = -1;
+
+    for ( ; ; )
+    {
+        struct pollfd ufds[2];
+        int i_ret;
+
+        /* Initialize file descriptor sets */
+        memset (ufds, 0, sizeof (ufds));
+        ufds[0].fd = p_sys->i_handle;
+        ufds[0].events = POLLIN;
+        ufds[1].fd = p_sys->i_frontend_handle;
+        ufds[1].events = POLLPRI;
+
+        /* We'll wait 0.1 second if nothing happens */
+        /* Find if some data is available */
+        i_ret = poll( ufds, 2, 100 );
+
+        if( !vlc_object_alive (p_access) || scan_IsCancelled( p_scan ) )
+            break;
+
+        if( i_ret <= 0 )
+        {
+            const mtime_t i_scan_time = mdate() - i_scan_start;
+            frontend_status_t status;
+
+            FrontendGetStatus( p_access, &status );
+
+            b_has_dvb_signal |= status.b_has_carrier;
+            b_has_lock |= status.b_has_lock;
+
+            if( ( !b_has_dvb_signal && i_scan_time > DVB_SCAN_MAX_SIGNAL_TIME ) ||
+                ( !b_has_lock && i_scan_time > DVB_SCAN_MAX_LOCK_TIME ) ||
+                ( i_scan_time > DVB_SCAN_MAX_PROBE_TIME ) )
+            {
+                msg_Dbg( p_access, "timed out scanning current frequency (s=%d l=%d)", b_has_dvb_signal, b_has_lock );
+                break;
+            }
+        }
+
+        if( i_ret < 0 )
+        {
+            if( errno == EINTR )
+                continue;
+
+            msg_Err( p_access, "poll error: %m" );
+            scan_session_Clean( p_scan, &session );
+
+            p_access->info.b_eof = true;
+            return NULL;
+        }
+
+        if( ufds[1].revents )
+        {
+            frontend_statistic_t stat;
+
+            FrontendPoll( p_access );
+
+            if( !FrontendGetStatistic( p_access, &stat ) )
+            {
+                if( stat.i_snr > i_best_snr )
+                    i_best_snr = stat.i_snr;
+            }
+        }
+
+        if ( p_sys->i_frontend_timeout && mdate() > p_sys->i_frontend_timeout )
+        {
+            msg_Warn( p_access, "no lock, tuning again" );
+            FrontendSet( p_access );
+        }
+
+        if ( ufds[0].revents )
+        {
+            const int i_read_once = 1;
+            block_t *p_block = block_New( p_access, i_read_once * TS_PACKET_SIZE );
+
+            if( ( i_ret = read( p_sys->i_handle, p_block->p_buffer,
+                                i_read_once * TS_PACKET_SIZE ) ) <= 0 )
+            {
+                msg_Warn( p_access, "read failed (%m)" );
+                block_Release( p_block );
+                continue;
+            }
+            p_block->i_buffer = i_ret;
+
+            /* */
+            if( scan_session_Push( &session, p_block ) )
+            {
+                msg_Dbg( p_access, "finished scanning current frequency" );
+                break;
+            }
+        }
+    }
+
+    /* */
+    if( i_best_snr > 0 )
+        scan_service_SetSNR( &session, i_best_snr );
+
+    scan_session_Clean( p_scan, &session );
+    return NULL;
+}
+
+/*****************************************************************************
  * Control:
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
@@ -521,6 +717,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     bool   *pb_bool, b_bool;
     int          *pi_int, i_int;
     int64_t      *pi_64;
+    dvbpsi_pmt_t *p_pmt;
 
     switch( i_query )
     {
@@ -535,7 +732,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_MTU:
             pi_int = (int*)va_arg( args, int * );
-            *pi_int = DVB_READ_ONCE * TS_PACKET_SIZE;
+            if( p_sys->b_scan_mode )
+                *pi_int = 0;
+            else
+                *pi_int = DVB_READ_ONCE * TS_PACKET_SIZE;
             break;
 
         case ACCESS_GET_PTS_DELAY:
@@ -552,6 +752,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case ACCESS_SET_PRIVATE_ID_STATE:
+            if( p_sys->b_scan_mode )
+                return VLC_EGENERIC;
+
             i_int  = (int)va_arg( args, int );               /* Private data (pid for now)*/
             b_bool = (bool)va_arg( args, int ); /* b_selected */
             if( !p_sys->b_budget_mode )
@@ -565,14 +768,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_SET_PRIVATE_ID_CA:
-        {
-            dvbpsi_pmt_t *p_pmt;
+            if( p_sys->b_scan_mode )
+                return VLC_EGENERIC;
 
             p_pmt = (dvbpsi_pmt_t *)va_arg( args, dvbpsi_pmt_t * );
 
             CAMSet( p_access, p_pmt );
             break;
-        }
 
         default:
             msg_Warn( p_access, "unimplemented query in control" );

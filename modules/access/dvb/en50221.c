@@ -55,6 +55,9 @@
 #   include <dvbpsi/pmt.h>
 #   include <dvbpsi/dr.h>
 #   include <dvbpsi/psi.h>
+#   include <dvbpsi/demux.h>
+#   include <dvbpsi/sdt.h>
+#   include <dvbpsi/nit.h>
 #else
 #   include "dvbpsi.h"
 #   include "descriptor.h"
@@ -62,6 +65,9 @@
 #   include "tables/pmt.h"
 #   include "descriptors/dr.h"
 #   include "psi.h"
+#   include "demux.h"
+#   include "sdt.h"
+#   include "nit.h"
 #endif
 
 #ifdef ENABLE_HTTPD
@@ -81,7 +87,6 @@ static void ApplicationInformationOpen( access_t * p_access, int i_session_id );
 static void ConditionalAccessOpen( access_t * p_access, int i_session_id );
 static void DateTimeOpen( access_t * p_access, int i_session_id );
 static void MMIOpen( access_t * p_access, int i_session_id );
-static char *dvbsi_to_utf8( char *psz_instring, size_t i_length );
 
 /*****************************************************************************
  * Utility functions
@@ -174,6 +179,8 @@ static void Dump( bool b_outgoing, uint8_t *p_data, int i_size )
     for ( i = 0; i < i_size && i < MAX_DUMP; i++)
         fprintf(stderr, "%02X ", p_data[i]);
     fprintf(stderr, "%s\n", i_size >= MAX_DUMP ? "..." : "");
+#else
+    VLC_UNUSED(b_outgoing); VLC_UNUSED(p_data); VLC_UNUSED(i_size);
 #endif
 }
 
@@ -2318,7 +2325,7 @@ static inline void *FixUTF8( char *p )
     return p;
 }
 
-static char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
+char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
 {
     const char *psz_encoding, *psz_stringstart;
     char *psz_outstring, *psz_tmp;
