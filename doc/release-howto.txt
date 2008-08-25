@@ -102,7 +102,7 @@
   - Update the list of files for the mirror check 
      (/var/www/local/mirrors.v.o/files)
   - Disable mirrors which haven't synced yet and possibly ganesh if there are
-    enough other mirrors
+    enough other mirrors (see http://mirrors.videolan.org/release.html)
 
  * Update the wiki
   - edit http://wiki.videolan.org/Template:VLC:latest_version
@@ -127,7 +127,7 @@
  * Announce on VersionTracker
   - ask Meuuh
 
- * Announce email
+ * Announce email and forum topic
   - write something along the lines of previous releases
   - post in videolan-announce (moderated), vlc et vlc-devel
     You are advised to add the author list for this version using
