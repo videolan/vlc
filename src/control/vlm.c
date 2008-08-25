@@ -96,6 +96,22 @@ char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
     return NULL;
 #endif
 }
+#else
+
+char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
+                             libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+    (void)p_instance;
+    /* FIXME is it needed ? */
+    libvlc_exception_raise( p_exception, "Unable to call show %s", psz_name );
+    return NULL;
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
+}
+
 #endif /* 0 */
 
 static int libvlc_vlm_init( libvlc_instance_t *p_instance,
@@ -172,7 +188,6 @@ void libvlc_vlm_release( libvlc_instance_t *p_instance, libvlc_exception_t *p_ex
     return VLC_EGENERIC;
 #endif
 }
-
 
 void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance, char *psz_name,
                                char *psz_input, char *psz_output,
@@ -477,38 +492,146 @@ void libvlc_vlm_seek_media( libvlc_instance_t *p_instance, char *psz_name,
 #endif
 }
 
-#define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, ret, code )\
-returnType libvlc_vlm_get_media_instance_## attr( libvlc_instance_t *p_instance, \
-                        char *psz_name, int i_instance, libvlc_exception_t *p_exception ) \
-{ \
-    vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name, i_instance, \
-                                                                p_exception );  \
-    if( p_mi ) {                            \
-        returnType ret_value;               \
-        code;                               \
-        vlm_media_instance_Delete( p_mi );  \
-        return ret_value;                   \
-    }                                       \
-    libvlc_exception_raise( p_exception, "Unable to get %s "#attr "attribute" ); \
-    return ret; \
+float libvlc_vlm_get_media_instance_position( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+    float result = -1;
+    vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name,
+                                        i_instance, p_exception );
+    if( p_mi )
+    {
+        result = p_mi->d_position;
+        vlm_media_instance_Delete( p_mi );
+        return result;
+    }
+    libvlc_exception_raise( p_exception, "Unable to get position attribute" );
+    return result;
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
 }
 
-LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( position, float, Float, -1, ret_value = p_mi->d_position; );
-LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( time,     int, Integer, -1, ret_value = p_mi->i_time );
-LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( length,   int, Integer, -1, ret_value = p_mi->i_length );
-LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( rate,     int, Integer, -1, ret_value = p_mi->i_rate );
-/* FIXME extend vlm_media_instance_t to be able to implement them */
-LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( title,    int, Integer,  0, ret_value = 0 );
-LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( chapter,  int, Integer,  0, ret_value = 0 );
-LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool,     0, ret_value = false );
-
-#undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
-
-char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
-                             libvlc_exception_t *p_exception )
+int libvlc_vlm_get_media_instance_time( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_exception )
 {
-    (void)p_instance;
-    /* FIXME is it needed ? */
-    libvlc_exception_raise( p_exception, "Unable to call show %s", psz_name );
-    return NULL;
+#ifdef ENABLE_VLM
+    int result = -1;
+    vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name,
+                                        i_instance, p_exception );
+    if( p_mi )
+    {
+        result = p_mi->i_time;
+        vlm_media_instance_Delete( p_mi );
+        return result;
+    }
+    libvlc_exception_raise( p_exception, "Unable to get time attribute" );
+    return result;
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
+}
+
+int libvlc_vlm_get_media_instance_length( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+    int result = -1;
+    vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name,
+                                        i_instance, p_exception );
+    if( p_mi )
+    {
+        result = p_mi->i_length;
+        vlm_media_instance_Delete( p_mi );
+        return result;
+    }
+    libvlc_exception_raise( p_exception, "Unable to get length attribute" );
+    return result;
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
+}
+
+int libvlc_vlm_get_media_instance_rate( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+    int result = -1;
+    vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name,
+                                        i_instance, p_exception );
+    if( p_mi )
+    {
+        result = p_mi->i_rate;
+        vlm_media_instance_Delete( p_mi );
+        return result;
+    }
+    libvlc_exception_raise( p_exception, "Unable to get rate attribute" );
+    return result;
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
+}
+
+int libvlc_vlm_get_media_instance_title( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+    int result = 0;
+    vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name,
+                                        i_instance, p_exception );
+    if( p_mi )
+    {
+        vlm_media_instance_Delete( p_mi );
+        return result;
+    }
+    libvlc_exception_raise( p_exception, "Unable to get title attribute" );
+    return result;
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
+}
+
+int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+    int result = 0;
+    vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name,
+                                        i_instance, p_exception );
+    if( p_mi )
+    {
+        vlm_media_instance_Delete( p_mi );
+        return result;
+    }
+    libvlc_exception_raise( p_exception, "Unable to get chapter attribute" );
+    return result;
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
+}
+
+int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_exception )
+{
+#ifdef ENABLE_VLM
+    bool result = 0;
+    vlm_media_instance_t *p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name,
+                                        i_instance, p_exception );
+    if( p_mi )
+    {
+        vlm_media_instance_Delete( p_mi );
+        return result;
+    }
+    libvlc_exception_raise( p_exception, "Unable to get seekable attribute" );
+    return result;
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
+#endif
 }

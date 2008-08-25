@@ -215,7 +215,7 @@ VLC_PUBLIC_API void libvlc_vlm_seek_media( libvlc_instance_t *, char *,
 
 /**
  * Return information about the named broadcast.
- *
+ * \bug will always return NULL
  * \param p_instance the instance
  * \param psz_name the name of the broadcast
  * \param p_e an initialized exception pointer
@@ -224,26 +224,88 @@ VLC_PUBLIC_API void libvlc_vlm_seek_media( libvlc_instance_t *, char *,
 VLC_PUBLIC_API char* libvlc_vlm_show_media( libvlc_instance_t *, char *, libvlc_exception_t * );
 
 /**
- * Get information about media attribute from vlm.
+ * Get vlm_media instance position by name or instance id
  *
- * \param libvlc instance
- * \param type of information
- * \param default value
- * \return value of media attribute
+ * \param p_instance a libvlc instance
+ * \param psz_name name of vlm media instance
+ * \param i_instance instance id
+ * \param p_e an initialized exception pointer
+ * \return position as float
  */
-#define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
-returnType libvlc_vlm_get_media_instance_## attr( libvlc_instance_t *, \
-                        char *, int , libvlc_exception_t * );
+VLC_PUBLIC_API float libvlc_vlm_get_media_instance_position( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_e );
 
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( position, float, Float, -1);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( time, int, Integer, -1);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( length, int, Integer, -1);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( rate, int, Integer, -1);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( title, int, Integer, 0);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( chapter, int, Integer, 0);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
+/**
+ * Get vlm_media instance time by name or instance id
+ *
+ * \param p_instance a libvlc instance
+ * \param psz_name name of vlm media instance
+ * \param i_instance instance id
+ * \param p_e an initialized exception pointer
+ * \return time as integer
+ */
+VLC_PUBLIC_API int libvlc_vlm_get_media_instance_time( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_e );
 
-#undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
+/**
+ * Get vlm_media instance length by name or instance id
+ *
+ * \param p_instance a libvlc instance
+ * \param psz_name name of vlm media instance
+ * \param i_instance instance id
+ * \param p_e an initialized exception pointer
+ * \return length of media item
+ */
+VLC_PUBLIC_API int libvlc_vlm_get_media_instance_length( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_e );
+
+/**
+ * Get vlm_media instance playback rate by name or instance id
+ *
+ * \param p_instance a libvlc instance
+ * \param psz_name name of vlm media instance
+ * \param i_instance instance id
+ * \param p_e an initialized exception pointer
+ * \return playback rate
+ */
+VLC_PUBLIC_API int libvlc_vlm_get_media_instance_rate( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_e );
+
+/**
+ * Get vlm_media instance title number by name or instance id
+ * \bug will always return 0
+ * \param p_instance a libvlc instance
+ * \param psz_name name of vlm media instance
+ * \param i_instance instance id
+ * \param p_e an initialized exception pointer
+ * \return title as number
+ */
+VLC_PUBLIC_API int libvlc_vlm_get_media_instance_title( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_e );
+
+/**
+ * Get vlm_media instance chapter number by name or instance id
+ * \bug will always return 0
+ * \param p_instance a libvlc instance
+ * \param psz_name name of vlm media instance
+ * \param i_instance instance id
+ * \param p_e an initialized exception pointer
+ * \return chapter as number
+ */
+VLC_PUBLIC_API int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_e );
+
+/**
+ * Is libvlc instance seekable ?
+ * \bug will always return 0
+ * \param p_instance a libvlc instance
+ * \param psz_name name of vlm media instance
+ * \param i_instance instance id
+ * \param p_e an initialized exception pointer
+ * \return 1 if seekable, 0 if not
+ */
+VLC_PUBLIC_API int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
+    char *psz_name, int i_instance, libvlc_exception_t *p_e );
 
 /** @} */
 

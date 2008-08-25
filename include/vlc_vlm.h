@@ -40,46 +40,43 @@
  * @{
  */
 
-/* VLM media */
+/** VLM media */
 typedef struct
 {
-    int64_t     id;
-    bool  b_enabled;
+    int64_t     id;     /*< numeric id for vlm_media_t item */
+    bool  b_enabled;    /*< vlm_media_t is enabled */
 
-    /* */
-    char *psz_name;
+    char *psz_name;     /*< descriptive name of vlm_media_t item */
 
-    /* */
-    int  i_input;
-    char **ppsz_input;
+    int  i_input;       /*< number of input options */
+    char **ppsz_input;  /*< array of input options */
 
-    int  i_option;
-    char **ppsz_option;
+    int  i_option;      /*< number of output options */
+    char **ppsz_option; /*< array of output options */
 
-    char *psz_output;
+    char *psz_output;   /*< */
 
-    /* */
-    bool b_vod;
+    bool b_vod;         /*< vlm_media_t is of type VOD */
     struct
     {
-        bool b_loop;
-    } broadcast;
+        bool b_loop;    /*< this vlc_media_t broadcast item should loop */
+    } broadcast;        /*< Broadcast specific information */
     struct
     {
-        char *psz_mux;
-    } vod;
+        char *psz_mux;  /*< name of muxer to use */
+    } vod;              /*< VOD specific information */
 
 } vlm_media_t;
 
-/* VLM media instance */
+/** VLM media instance */
 typedef struct
 {
-    char *psz_name;
+    char *psz_name;         /*< vlm media instance descriptive name */
 
-    int64_t     i_time;
-    int64_t     i_length;
-    double      d_position;
-    bool  b_paused;
+    int64_t     i_time;     /*< vlm media instance vlm media current time */
+    int64_t     i_length;   /*< vlm media instance vlm media item length */
+    double      d_position; /*< vlm media instance position in stream */
+    bool        b_paused;   /*< vlm media instance is paused */
     int         i_rate;     // normal is INPUT_RATE_DEFAULT
 } vlm_media_instance_t;
 
@@ -90,7 +87,7 @@ typedef struct
 } vlm_schedule_t
 #endif
 
-/* VLM control query */
+/** VLM control query */
 enum vlm_query_e
 {
     /* --- Media control */
@@ -148,11 +145,11 @@ enum vlm_query_e
    If a node has children, it should not have a value (=NULL).*/
 struct vlm_message_t
 {
-    char *psz_name;
-    char *psz_value;
+    char *psz_name;         /*< message name */
+    char *psz_value;        /*< message value */
 
-    int           i_child;
-    vlm_message_t **child;
+    int           i_child;  /*< number of child messages */
+    vlm_message_t **child;  /*< array of vlm_message_t */
 };
 
 
@@ -171,6 +168,11 @@ VLC_EXPORT( vlm_message_t *, vlm_MessageAdd, ( vlm_message_t *, vlm_message_t * 
 VLC_EXPORT( void,            vlm_MessageDelete, ( vlm_message_t * ) );
 
 /* media helpers */
+
+/**
+ * Initialize a vlm_media_t instance
+ * \param p_media vlm_media_t instance to initialize
+ */
 static inline void vlm_media_Init( vlm_media_t *p_media )
 {
     memset( p_media, 0, sizeof(vlm_media_t) );
@@ -185,6 +187,11 @@ static inline void vlm_media_Init( vlm_media_t *p_media )
     p_media->broadcast.b_loop = false;
 }
 
+/**
+ * Copy a vlm_media_t instance into another vlm_media_t instance
+ * \param p_dst vlm_media_t instance to copy to
+ * \param p_src vlm_media_t instance to copy from
+ */
 static inline void vlm_media_Copy( vlm_media_t *p_dst, vlm_media_t *p_src )
 {
     int i;
@@ -214,6 +221,12 @@ static inline void vlm_media_Copy( vlm_media_t *p_dst, vlm_media_t *p_src )
         p_dst->broadcast.b_loop = p_src->broadcast.b_loop;
     }
 }
+
+/**
+ * Cleanup and release memory associated with this vlm_media_t instance.
+ * You still need to release p_media itself with vlm_media_Delete().
+ * \param p_media vlm_media_t to cleanup
+ */
 static inline void vlm_media_Clean( vlm_media_t *p_media )
 {
     int i;
@@ -231,6 +244,11 @@ static inline void vlm_media_Clean( vlm_media_t *p_media )
     if( p_media->b_vod )
         free( p_media->vod.psz_mux );
 }
+
+/**
+ * Allocate a new vlm_media_t instance
+ * \return vlm_media_t instance
+ */
 static inline vlm_media_t *vlm_media_New(void)
 {
     vlm_media_t *p_media = (vlm_media_t *)malloc( sizeof(vlm_media_t) );
@@ -238,11 +256,22 @@ static inline vlm_media_t *vlm_media_New(void)
         vlm_media_Init( p_media );
     return p_media;
 }
+
+/**
+ * Delete a vlm_media_t instance
+ * \param p_media vlm_media_t instance to delete
+ */
 static inline void vlm_media_Delete( vlm_media_t *p_media )
 {
     vlm_media_Clean( p_media );
     free( p_media );
 }
+
+/**
+ * Copy a vlm_media_t instance
+ * \param p_src vlm_media_t instance to copy
+ * \return vlm_media_t duplicate of p_src
+ */
 static inline vlm_media_t *vlm_media_Duplicate( vlm_media_t *p_src )
 {
     vlm_media_t *p_dst = vlm_media_New();
@@ -252,6 +281,10 @@ static inline vlm_media_t *vlm_media_Duplicate( vlm_media_t *p_src )
 }
 
 /* media instance helpers */
+/**
+ * Initialize vlm_media_instance_t
+ * \param p_instance vlm_media_instance_t to initialize
+ */
 static inline void vlm_media_instance_Init( vlm_media_instance_t *p_instance )
 {
     memset( p_instance, 0, sizeof(vlm_media_instance_t) );
@@ -262,10 +295,20 @@ static inline void vlm_media_instance_Init( vlm_media_instance_t *p_instance )
     p_instance->b_paused = false;
     p_instance->i_rate = INPUT_RATE_DEFAULT;
 }
+
+/**
+ * Cleanup vlm_media_instance_t
+ * \param p_instance vlm_media_instance_t to cleanup
+ */
 static inline void vlm_media_instance_Clean( vlm_media_instance_t *p_instance )
 {
     free( p_instance->psz_name );
 }
+
+/**
+ * Allocate a new vlm_media_instance_t
+ * \return a new vlm_media_instance_t
+ */
 static inline vlm_media_instance_t *vlm_media_instance_New(void)
 {
     vlm_media_instance_t *p_instance = (vlm_media_instance_t *) malloc( sizeof(vlm_media_instance_t) );
@@ -273,6 +316,11 @@ static inline vlm_media_instance_t *vlm_media_instance_New(void)
         vlm_media_instance_Init( p_instance );
     return p_instance;
 }
+
+/**
+ * Delete a vlm_media_instance_t
+ * \param p_instance vlm_media_instance_t to delete
+ */
 static inline void vlm_media_instance_Delete( vlm_media_instance_t *p_instance )
 {
     vlm_media_instance_Clean( p_instance );
