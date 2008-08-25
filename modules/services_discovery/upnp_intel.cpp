@@ -77,6 +77,7 @@ typedef struct
     services_discovery_t* serviceDiscovery;
     UpnpClient_Handle clientHandle;
     MediaServerList* serverList;
+    Lockable* lock;
 } Cookie;
 
 
@@ -275,7 +276,6 @@ vlc_module_end();
 
 // More prototypes...
 
-static Lockable* CallbackLock;
 static int Callback( Upnp_EventType eventType, void* event, void* pCookie );
 
 const char* xml_getChildElementValue( IXML_Element* parent, const char* tagName );
@@ -333,8 +333,7 @@ static void Run( services_discovery_t* p_sd )
     Cookie cookie;
     cookie.serviceDiscovery = p_sd;
     cookie.serverList = new MediaServerList( &cookie );
-
-    CallbackLock = new Lockable( &cookie );
+    cookie.lock = new Lockable();
 
     res = UpnpRegisterClient( Callback, &cookie, &cookie.clientHandle );
     if( res != UPNP_E_SUCCESS )
@@ -361,7 +360,7 @@ static void Run( services_discovery_t* p_sd )
  shutDown:
     UpnpFinish();
     delete cookie.serverList;
-    delete CallbackLock;
+    delete cookie.lock;
 }
 
 
@@ -419,9 +418,9 @@ IXML_Document* parseBrowseResult( IXML_Document* doc )
 // Handles all UPnP events
 static int Callback( Upnp_EventType eventType, void* event, void* pCookie )
 {
-    Locker locker( CallbackLock );
-
     Cookie* cookie = ( Cookie* )pCookie;
+
+    Locker locker( cookie->lock );
 
     switch( eventType ) {
 
