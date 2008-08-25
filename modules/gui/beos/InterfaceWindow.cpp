@@ -1112,7 +1112,6 @@ InterfaceWindow::_StoreSettings()
 {
     /* Save the volume */
     config_PutInt( p_intf, "volume", p_mediaControl->GetVolume() );
-    config_SaveConfigFile( p_intf, "main" );
 
     /* Save the windows positions */
     if ( fSettings->ReplaceRect( "main frame", Frame() ) != B_OK )

@@ -112,9 +112,6 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
     {
         /* save changed to config */
         config_PutPsz( p_object, "audio-filter", psz_string );
-
-        /* save to vlcrc */
-        config_SaveConfigFile( p_object, "main" );
     }
     
     free( psz_string );
