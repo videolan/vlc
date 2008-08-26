@@ -253,5 +253,5 @@ static block_t *BlockUDP( access_t *p_access )
         return NULL;
     }
 
-    return block_Realloc( p_block, 0, p_block->i_buffer = len );
+    return block_Realloc( p_block, 0, len );
 }
