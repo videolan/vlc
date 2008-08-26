@@ -29,9 +29,9 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
 #include <stdio.h>
+#include <assert.h>
+#include <vlc_common.h>
 
 #include <vlc_input.h>
 #include <vlc_es_out.h>
@@ -39,6 +39,8 @@
 #include <vlc_aout.h>
 
 #include "input_internal.h"
+
+#include "../stream_output/stream_output.h"
 
 #include <vlc_iso_lang.h>
 /* FIXME we should find a better way than including that */
@@ -83,6 +85,7 @@ struct es_out_id_t
     char        *psz_language_code;
 
     decoder_t   *p_dec;
+    decoder_t   *p_dec_record;
 
     /* Fields for Video with CC */
     bool  pb_cc_present[4];
@@ -134,6 +137,9 @@ struct es_out_sys_t
 
     /* Rate used to rescale ES ts */
     int         i_rate;
+
+    /* Record */
+    sout_instance_t *p_sout_record;
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
@@ -266,6 +272,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 
     p_sys->i_rate = i_rate;
 
+    p_sys->p_sout_record = NULL;
+
     return out;
 }
 
@@ -277,12 +285,14 @@ void input_EsOutDelete( es_out_t *out )
     es_out_sys_t *p_sys = out->p_sys;
     int i;
 
+    if( p_sys->p_sout_record )
+        input_EsOutSetRecord( out, false );
+
     for( i = 0; i < p_sys->i_es; i++ )
     {
         if( p_sys->es[i]->p_dec )
-        {
             input_DecoderDelete( p_sys->es[i]->p_dec );
-        }
+
         free( p_sys->es[i]->psz_language );
         free( p_sys->es[i]->psz_language_code );
         es_format_Clean( &p_sys->es[i]->fmt );
@@ -301,7 +311,6 @@ void input_EsOutDelete( es_out_t *out )
             free( p_sys->ppsz_sub_language[i] );
         free( p_sys->ppsz_sub_language );
     }
-
     free( p_sys->es );
 
     /* FIXME duplicate work EsOutProgramDel (but we cannot use it) add a EsOutProgramClean ? */
@@ -351,7 +360,11 @@ static void EsOutDiscontinuity( es_out_t *out, bool b_flush, bool b_audio )
         /* Send a dummy block to let decoder know that
          * there is a discontinuity */
         if( es->p_dec && ( !b_audio || es->fmt.i_cat == AUDIO_ES ) )
+        {
             input_DecoderDiscontinuity( es->p_dec, b_flush );
+            if( es->p_dec_record )
+                input_DecoderDiscontinuity( es->p_dec_record, b_flush );
+        }
     }
 }
 void input_EsOutChangeRate( es_out_t *out, int i_rate )
@@ -366,6 +379,73 @@ void input_EsOutChangeRate( es_out_t *out, int i_rate )
         input_ClockSetRate( &p_sys->pgrm[i]->clock, i_rate );
 }
 
+int input_EsOutSetRecord(  es_out_t *out, bool b_record )
+{
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+
+    assert( ( b_record && !p_sys->p_sout_record ) || ( !b_record && p_sys->p_sout_record ) );
+
+    if( b_record )
+    {
+        char *psz_path = var_CreateGetString( p_input, "input-record-path" );
+        if( !psz_path || *psz_path == '\0' )
+        {
+            free( psz_path );
+            psz_path = strdup( config_GetHomeDir() );
+        }
+
+        char *psz_sout = NULL;  // TODO conf
+
+        if( !psz_sout && psz_path )
+        {
+            char *psz_file = input_CreateFilename( VLC_OBJECT(p_input), psz_path, INPUT_RECORD_PREFIX, NULL );
+            if( psz_file )
+            {
+                if( asprintf( &psz_sout, "#record{dst-prefix='%s'}", psz_file ) < 0 )
+                    psz_sout = NULL;
+                free( psz_file );
+            }
+        }
+        free( psz_path );
+
+        if( !psz_sout )
+            return VLC_EGENERIC;
+
+        p_sys->p_sout_record = sout_NewInstance( p_input, psz_sout );
+        free( psz_sout );
+
+        if( !p_sys->p_sout_record )
+            return VLC_EGENERIC;
+
+        for( int i = 0; i < p_sys->i_es; i++ )
+        {
+            es_out_id_t *p_es = p_sys->es[i];
+
+            if( !p_es->p_dec || p_es->p_master )
+                continue;
+
+            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_sys->p_sout_record );
+        }
+    }
+    else
+    {
+        for( int i = 0; i < p_sys->i_es; i++ )
+        {
+            es_out_id_t *p_es = p_sys->es[i];
+
+            if( !p_es->p_dec_record )
+                continue;
+
+            input_DecoderDelete( p_es->p_dec_record );
+            p_es->p_dec_record = NULL;
+        }
+        sout_DeleteInstance( p_sys->p_sout_record );
+        p_sys->p_sout_record = NULL;
+    }
+
+    return VLC_SUCCESS;
+}
 void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -410,6 +490,8 @@ bool input_EsOutDecodersEmpty( es_out_t *out )
         es_out_id_t *es = p_sys->es[i];
 
         if( es->p_dec && !input_DecoderEmpty( es->p_dec ) )
+            return false;
+        if( es->p_dec_record && !input_DecoderEmpty( es->p_dec_record ) )
             return false;
     }
     return true;
@@ -994,9 +1076,10 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     es->psz_language = LanguageGetName( fmt->psz_language ); /* remember so we only need to do it once */
     es->psz_language_code = LanguageGetCode( fmt->psz_language );
     es->p_dec = NULL;
+    es->p_dec_record = NULL;
     for( i = 0; i < 4; i++ )
         es->pb_cc_present[i] = false;
-    es->p_master = false;
+    es->p_master = NULL;
 
     if( es->p_pgrm == p_sys->p_pgrm )
         EsOutESVarUpdate( out, es, false );
@@ -1043,6 +1126,32 @@ static bool EsIsSelected( es_out_id_t *es )
         return es->p_dec != NULL;
     }
 }
+static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
+{
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+
+    p_es->p_dec = input_DecoderNew( p_input, &p_es->fmt, p_input->p->p_sout );
+    if( p_es->p_dec && !p_es->p_master && p_sys->p_sout_record )
+        p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_sys->p_sout_record );
+}
+static void EsDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
+{
+    es_out_sys_t   *p_sys = out->p_sys;
+
+    if( !p_es->p_dec )
+        return;
+
+    input_DecoderDelete( p_es->p_dec );
+    p_es->p_dec = NULL;
+
+    if( p_es->p_dec_record )
+    {
+        input_DecoderDelete( p_es->p_dec_record );
+        p_es->p_dec_record = NULL;
+    }
+}
+
 static void EsSelect( es_out_t *out, es_out_id_t *es )
 {
     es_out_sys_t   *p_sys = out->p_sys;
@@ -1099,7 +1208,8 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         }
 
         es->i_preroll_end = -1;
-        es->p_dec = input_DecoderNew( p_input, &es->fmt, false );
+        EsCreateDecoder( out, es );
+
         if( es->p_dec == NULL || es->p_pgrm != p_sys->p_pgrm )
             return;
     }
@@ -1163,8 +1273,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
 
             es->pb_cc_present[i] = false;
         }
-        input_DecoderDelete( es->p_dec );
-        es->p_dec = NULL;
+        EsDestroyDecoder( out, es );
     }
 
     if( !b_update )
@@ -1450,6 +1559,12 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         bool pb_cc[4];
         bool b_cc_new = false;
         int i;
+        if( es->p_dec_record )
+        {
+            block_t *p_dup = block_Duplicate( p_block );
+            if( p_dup )
+                input_DecoderDecode( es->p_dec_record, p_dup );
+        }
         input_DecoderDecode( es->p_dec, p_block );
 
         /* Check CC status */
@@ -1510,7 +1625,8 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     {
         while( !out->p_sys->p_input->b_die && es->p_dec )
         {
-            if( input_DecoderEmpty( es->p_dec ) )
+            if( input_DecoderEmpty( es->p_dec ) &&
+                ( !es->p_dec_record || input_DecoderEmpty( es->p_dec_record ) ))
                 break;
             msleep( 20*1000 );
         }
@@ -1824,7 +1940,8 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             es_format_t *p_fmt;
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
             p_fmt = (es_format_t*) va_arg( args, es_format_t * );
-            if( es == NULL ) return VLC_EGENERIC;
+            if( es == NULL )
+                return VLC_EGENERIC;
 
             if( p_fmt->i_extra )
             {
@@ -1832,13 +1949,12 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 es->fmt.p_extra = realloc( es->fmt.p_extra, p_fmt->i_extra );
                 memcpy( es->fmt.p_extra, p_fmt->p_extra, p_fmt->i_extra );
 
-                if( !es->p_dec ) return VLC_SUCCESS;
-
+                if( !es->p_dec )
+                    return VLC_SUCCESS;
 #if 1
-                input_DecoderDelete( es->p_dec );
-                es->p_dec = input_DecoderNew( p_sys->p_input,
-                                              &es->fmt, false );
+                EsDestroyDecoder( out, es );
 
+                EsCreateDecoder( out, es );
 #else
                 es->p_dec->fmt_in.i_extra = p_fmt->i_extra;
                 es->p_dec->fmt_in.p_extra =

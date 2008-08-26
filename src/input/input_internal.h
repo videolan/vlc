@@ -63,7 +63,7 @@ typedef struct
     bool b_can_pause;
     bool b_can_pace_control;
     bool b_can_rate_control;
-    bool b_can_record;
+    bool b_can_stream_record;
     bool b_rescale_ts;
 
     bool       b_eof;   /* eof of demuxer */
@@ -343,6 +343,7 @@ es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
 void       input_EsOutDelete( es_out_t * );
 es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
 void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
+int        input_EsOutSetRecord(  es_out_t *, bool b_record );
 void       input_EsOutChangeRate( es_out_t *, int );
 void       input_EsOutChangeState( es_out_t * );
 void       input_EsOutChangePosition( es_out_t * );
@@ -419,6 +420,10 @@ static inline void input_ChangeState( input_thread_t *p_input, int state )
     input_ChangeStateWithVarCallback( p_input, state, true );
 }
 
+/* Helpers FIXME to export without input_ prefix */
+char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const char *psz_prefix, const char *psz_extension );
+
+#define INPUT_RECORD_PREFIX "vlc-record-%Y-%m-%d-%H:%M:%S-$p"
 
 /* Access */
 

@@ -28,9 +28,9 @@
 #include <dirent.h>
 
 #include <vlc_common.h>
-#include <vlc_charset.h>
 #include <vlc_strings.h>
 #include <vlc_osd.h>
+#include <vlc_charset.h>
 
 #include <assert.h>
 
@@ -731,37 +731,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 /****************************************************************************
  * ARecord*: record stream functions
  ****************************************************************************/
-
-/* TODO FIXME nearly the same logic that snapshot code */
-static char *ARecordGetFileName( stream_t *s, const char *psz_path, const char *psz_prefix, const char *psz_extension )
-{
-    char *psz_file;
-    DIR *path;
-
-    path = utf8_opendir( psz_path );
-    if( path )
-    {
-        closedir( path );
-
-        char *psz_tmp = str_format( s, psz_prefix );
-        if( !psz_tmp )
-            return NULL;
-
-        filename_sanitize( psz_tmp );
-        if( asprintf( &psz_file, "%s"DIR_SEP"%s.%s",
-                      psz_path, psz_tmp, psz_extension ) < 0 )
-            psz_file = NULL;
-        free( psz_tmp );
-        return psz_file;
-    }
-    else
-    {
-        psz_file = str_format( s, psz_path );
-        path_sanitize( psz_file );
-        return psz_file;
-    }
-}
-
 static int  ARecordStart( stream_t *s, const char *psz_extension )
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -786,7 +755,7 @@ static int  ARecordStart( stream_t *s, const char *psz_extension )
 
     /* Create file name
      * TODO allow prefix configuration */
-    psz_file = ARecordGetFileName( s, psz_path, "vlc-record-%Y-%m-%d-%H:%M:%S-$p", psz_extension );
+    psz_file = input_CreateFilename( VLC_OBJECT(s), psz_path, INPUT_RECORD_PREFIX, psz_extension );
 
     free( psz_path );
 

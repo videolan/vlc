@@ -43,6 +43,7 @@
 #include <vlc_interface.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
+#include <vlc_strings.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -1946,16 +1947,20 @@ static bool Control( input_thread_t *p_input, int i_type,
             break;
 
         case INPUT_CONTROL_SET_RECORD_STATE:
-            if( p_input->p->input.b_can_record )
+            if( !!p_input->p->b_recording != !!val.b_bool )
             {
-                if( !!p_input->p->b_recording != !!val.b_bool )
+                if( p_input->p->input.b_can_stream_record )
                 {
                     if( demux_Control( p_input->p->input.p_demux,
                                        DEMUX_SET_RECORD_STATE, val.b_bool ) )
                         val.b_bool = false;
-
-                    p_input->p->b_recording = val.b_bool;
                 }
+                else
+                {
+                    if( input_EsOutSetRecord( p_input->p->p_es_out, val.b_bool ) )
+                        val.b_bool = false;
+                }
+                p_input->p->b_recording = val.b_bool;
 
                 var_Change( p_input, "record", VLC_VAR_SETVALUE, &val, NULL );
 
@@ -2365,9 +2370,11 @@ static int InputSourceInit( input_thread_t *p_input,
             goto error;
         }
 
-        if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_record ) )
-            in->b_can_record = false;
-        var_SetBool( p_input, "can-record", in->b_can_record );
+        if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
+            in->b_can_stream_record = false;
+        if( !var_CreateGetBool( p_input, "input-record-native" ) )
+            in->b_can_stream_record = false;
+        var_SetBool( p_input, "can-record", true ); // Is it still needed ?
 
         /* Get title from demux */
         if( !p_input->b_preparsing && in->i_title <= 0 )
@@ -2929,3 +2936,37 @@ vlc_event_manager_t *input_get_event_manager( input_thread_t *p_input )
 {
     return &p_input->p->event_manager;
 }
+
+/**/
+/* TODO FIXME nearly the same logic that snapshot code */
+char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const char *psz_prefix, const char *psz_extension )
+{
+    char *psz_file;
+    DIR *path;
+
+    path = utf8_opendir( psz_path );
+    if( path )
+    {
+        closedir( path );
+
+        char *psz_tmp = str_format( p_obj, psz_prefix );
+        if( !psz_tmp )
+            return NULL;
+
+        filename_sanitize( psz_tmp );
+        if( asprintf( &psz_file, "%s"DIR_SEP"%s%s%s",
+                      psz_path, psz_tmp,
+                      psz_extension ? "." : "",
+                      psz_extension ? psz_extension : "" ) < 0 )
+            psz_file = NULL;
+        free( psz_tmp );
+        return psz_file;
+    }
+    else
+    {
+        psz_file = str_format( p_obj, psz_path );
+        path_sanitize( psz_file );
+        return psz_file;
+    }
+}
+

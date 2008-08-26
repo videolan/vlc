@@ -679,6 +679,11 @@ static const char *const ppsz_clock_descriptions[] =
 #define INPUT_RECORD_PATH_LONGTEXT N_( \
     "Directory or filename where the records will be stored" )
 
+#define INPUT_RECORD_NATIVE_TEXT N_("Prefer native stream recording")
+#define INPUT_RECORD_NATIVE_LONGTEXT N_( \
+    "When possible, the input stream will be recorded instead of using" \
+    "the stream output module" )
+
 // DEPRECATED
 #define SUB_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the subpictures " \
@@ -1743,6 +1748,8 @@ vlc_module_begin();
 
     add_string( "input-record-path", NULL, NULL, INPUT_RECORD_PATH_TEXT,
                 INPUT_RECORD_PATH_LONGTEXT, true );
+    add_bool( "input-record-native", true, NULL, INPUT_RECORD_NATIVE_TEXT,
+              INPUT_RECORD_NATIVE_LONGTEXT, true );
 
 /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , true );
