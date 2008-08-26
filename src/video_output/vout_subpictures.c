@@ -785,10 +785,17 @@ static void SpuRenderRegion( spu_t *p_spu,
                 p_pic = p_scale->pf_video_filter( p_scale, &p_region->p_cache->picture );
             else
                 msg_Err( p_spu, "scaling failed (module not loaded)" );
+
             if( p_pic )
             {
                 p_region->p_cache->picture = *p_pic;
                 free( p_pic );
+            }
+            else
+            {
+                p_subpic->pf_destroy_region( VLC_OBJECT(p_spu),
+                                             p_region->p_cache );
+                p_region->p_cache = NULL;
             }
         }
 
