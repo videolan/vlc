@@ -114,9 +114,9 @@ typedef struct
 
 typedef enum stream_read_method_t
 {
-    Immediate,
-    Block,
-    Stream
+    STREAM_METHOD_IMMEDIATE,
+    STREAM_METHOD_BLOCK,
+    STREAM_METHOD_STREAM
 } stream_read_method_t;
 
 struct stream_sys_t
@@ -197,7 +197,8 @@ struct stream_sys_t
     {
         bool b_active;
 
-        FILE *f;    /* TODO it could be replaced by access_output_t one day */
+        FILE *f;        /* TODO it could be replaced by access_output_t one day */
+        bool b_error;
     } record;
 };
 
@@ -323,11 +324,11 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     /* Common field */
     p_sys->p_access = p_access;
     if( p_access->pf_block )
-        p_sys->method = Block;
-    else if (var_CreateGetBool( s, "use-stream-immediate"))
-        p_sys->method = Immediate;
+        p_sys->method = STREAM_METHOD_BLOCK;
+    else if( var_CreateGetBool( s, "use-stream-immediate" ) )
+        p_sys->method = STREAM_METHOD_IMMEDIATE;
     else
-        p_sys->method = Stream;
+        p_sys->method = STREAM_METHOD_STREAM;
 
     p_sys->record.b_active = false;
 
@@ -409,7 +410,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     p_sys->i_peek = 0;
     p_sys->p_peek = NULL;
 
-    if( p_sys->method == Block )
+    if( p_sys->method == STREAM_METHOD_BLOCK )
     {
         msg_Dbg( s, "Using AStream*Block" );
         s->pf_read = AStreamReadBlock;
@@ -432,7 +433,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
             goto error;
         }
     }
-    else if (p_sys->method == Immediate)
+    else if( p_sys->method == STREAM_METHOD_IMMEDIATE )
     {
         msg_Dbg( s, "Using AStream*Immediate" );
 
@@ -443,8 +444,9 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
         p_sys->immediate.i_end = 0;
         p_sys->immediate.p_buffer = malloc( STREAM_CACHE_SIZE );
 
-        msg_Dbg( s, "p_buffer %p-%p", p_sys->immediate.p_buffer,
-                p_sys->immediate.p_buffer + STREAM_CACHE_SIZE );
+        msg_Dbg( s, "p_buffer %p-%p",
+                 p_sys->immediate.p_buffer,
+                 &p_sys->immediate.p_buffer[STREAM_CACHE_SIZE] );
 
         if( p_sys->immediate.p_buffer == NULL )
         {
@@ -453,9 +455,11 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
             goto error;
         }
     }
-    else /* ( p_sys->method == Stream ) */
+    else
     {
         int i;
+
+        assert( p_sys->method == STREAM_METHOD_STREAM );
 
         msg_Dbg( s, "Using AStream*Stream" );
 
@@ -502,7 +506,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     return s;
 
 error:
-    if( p_sys->method == Block )
+    if( p_sys->method == STREAM_METHOD_BLOCK )
     {
         /* Nothing yet */
     }
@@ -532,9 +536,9 @@ static void AStreamDestroy( stream_t *s )
     if( p_sys->record.b_active )
         ARecordSetState( s, false, NULL );
 
-    if( p_sys->method == Block )
+    if( p_sys->method == STREAM_METHOD_BLOCK )
         block_ChainRelease( p_sys->block.p_first );
-    else if ( p_sys->method == Immediate )
+    else if( p_sys->method == STREAM_METHOD_IMMEDIATE )
         free( p_sys->immediate.p_buffer );
     else
         free( p_sys->stream.p_buffer );
@@ -572,7 +576,7 @@ void stream_AccessReset( stream_t *s )
 
     p_sys->i_pos = p_sys->p_access->info.i_pos;
 
-    if( p_sys->method == Block )
+    if( p_sys->method == STREAM_METHOD_BLOCK )
     {
         block_ChainRelease( p_sys->block.p_first );
 
@@ -587,13 +591,15 @@ void stream_AccessReset( stream_t *s )
         /* Do the prebuffering */
         AStreamPrebufferBlock( s );
     }
-    else if( p_sys->method == Immediate )
+    else if( p_sys->method == STREAM_METHOD_IMMEDIATE )
     {
         stream_buffer_empty( s, stream_buffered_size( s ) );
     }
-    else /* ( p_sys->method == Stream ) */
+    else
     {
         int i;
+
+        assert( p_sys->method == STREAM_METHOD_STREAM );
 
         /* Setup our tracks */
         p_sys->stream.i_offset = 0;
@@ -677,12 +683,18 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_SET_POSITION:
             i_64 = (int64_t)va_arg( args, int64_t );
-            if( p_sys->method == Block )
+            switch( p_sys->method )
+            {
+            case STREAM_METHOD_BLOCK:
                 return AStreamSeekBlock( s, i_64 );
-            else if( p_sys->method == Immediate )
+            case STREAM_METHOD_IMMEDIATE:
                 return AStreamSeekImmediate( s, i_64 );
-            else /* ( p_sys->method == Stream ) */
+            case STREAM_METHOD_STREAM:
                 return AStreamSeekStream( s, i_64 );
+            default:
+                assert(0);
+                return VLC_EGENERIC;
+            }
 
         case STREAM_GET_MTU:
             return VLC_EGENERIC;
@@ -731,7 +743,6 @@ static char *ARecordGetFileName( stream_t *s, const char *psz_path, const char *
     {
         closedir( path );
 
-        const char *psz_prefix = "vlc-record-%Y-%m-%d-%H:%M:%S-$p";  // TODO allow conf ?
         char *psz_tmp = str_format( s, psz_prefix );
         if( !psz_tmp )
             return NULL;
@@ -755,7 +766,6 @@ static int  ARecordStart( stream_t *s, const char *psz_extension )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    DIR *path;
     char *psz_file;
     FILE *f;
 
@@ -795,6 +805,7 @@ static int  ARecordStart( stream_t *s, const char *psz_extension )
     /* */
     p_sys->record.f = f;
     p_sys->record.b_active = true;
+    p_sys->record.b_error = false;
     return VLC_SUCCESS;
 }
 static int  ARecordStop( stream_t *s )
@@ -827,8 +838,19 @@ static void ARecordWrite( stream_t *s, const uint8_t *p_buffer, size_t i_buffer 
 
     assert( p_sys->record.b_active );
 
-    if( i_buffer )
-        fwrite( p_buffer, 1, i_buffer, p_sys->record.f );
+    if( i_buffer > 0 )
+    {
+        const bool b_previous_error = p_sys->record.b_error;
+        const size_t i_written = fwrite( p_buffer, 1, i_buffer, p_sys->record.f );
+
+        p_sys->record.b_error = i_written != i_buffer;
+
+        /* TODO maybe a intf_UserError or something like that ? */
+        if( p_sys->record.b_error && !b_previous_error )
+            msg_Err( s, "Failed to record data (begin)" );
+        else if( !p_sys->record.b_error && b_previous_error )
+            msg_Err( s, "Failed to record data (end)" );
+    }
 }
 
 /****************************************************************************
@@ -914,14 +936,18 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    uint8_t *p_data= (uint8_t*)p_read;
+    uint8_t *p_data = p_read;
+    uint8_t *p_record = p_data;
     unsigned int i_data = 0;
 
     /* It means EOF */
     if( p_sys->block.p_current == NULL )
         return 0;
 
-    if( p_read == NULL )
+    if( p_sys->record.b_active && !p_data )
+        p_record = p_data = malloc( i_read );
+
+    if( p_data == NULL )
     {
         /* seek within this stream if possible, else use plain old read and discard */
         stream_sys_t *p_sys = s->p_sys;
@@ -965,8 +991,13 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
         }
     }
 
-    if( p_sys->record.b_active && i_data > 0 )
-        ARecordWrite( s, p_read, i_data );
+    if( p_sys->record.b_active )
+    {
+        if( i_data > 0 && p_record != NULL)
+            ARecordWrite( s, p_record, i_data );
+        if( !p_read )
+            free( p_record );
+    }
 
     p_sys->i_pos += i_data;
     return i_data;
@@ -1248,11 +1279,16 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
 
     uint8_t *p_data = (uint8_t *)p_read;
+    uint8_t *p_record = p_data;
     unsigned int i_data = 0;
 
-    if( tk->i_start >= tk->i_end ) return 0; /* EOF */
+    if( tk->i_start >= tk->i_end )
+        return 0; /* EOF */
 
-    if( p_read == NULL )
+    if( p_sys->record.b_active && !p_data )
+        p_record = p_data = malloc( i_read );
+
+    if( p_data == NULL )
     {
         /* seek within this stream if possible, else use plain old read and discard */
         stream_sys_t *p_sys = s->p_sys;
@@ -1312,8 +1348,13 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
         }
     }
 
-    if( p_sys->record.b_active && i_data > 0 )
-        ARecordWrite( s, p_read, i_data );
+    if( p_sys->record.b_active )
+    {
+        if( i_data > 0 && p_record != NULL)
+            ARecordWrite( s, p_record, i_data );
+        if( !p_read )
+            free( p_record );
+    }
 
     return i_data;
 }
@@ -1661,53 +1702,77 @@ static void AStreamPrebufferStream( stream_t *s )
 static int AStreamReadImmediate( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
+    uint8_t *p_data= (uint8_t*)p_read;
+    uint8_t *p_record = p_data;
+    unsigned int i_data;
 
 #ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamReadImmediate p_read=%p i_read=%d",
              p_read, i_read );
 #endif
 
+    if( p_sys->record.b_active && !p_data )
+        p_record = p_data = malloc( i_read );
+
     /* First, check if we already have some data in the buffer,
      * that we could copy directly */
-    int i_copy = __MIN( stream_buffered_size( s ), i_read );
-    if( i_copy )
+    i_data = __MIN( stream_buffered_size( s ), i_read );
+    if( i_data > 0 )
     {
 #ifdef STREAM_DEBUG
-        msg_Dbg( s, "AStreamReadImmediate: copy %d from %p", i_copy, stream_buffer( s ) );
+        msg_Dbg( s, "AStreamReadImmediate: copy %u from %p", i_data, stream_buffer( s ) );
 #endif
 
-        assert( i_copy <= STREAM_CACHE_SIZE );
+        assert( i_data <= STREAM_CACHE_SIZE );
 
-        if( p_read )
+        if( p_data )
         {
-            memcpy( p_read, stream_buffer( s ), i_copy );
-            p_read = (uint8_t *)p_read + i_copy;
+            memcpy( p_data, stream_buffer( s ), i_data );
+            p_data += i_data;
         }
     }
 
     /* Now that we've read our buffer we don't need its i_copy bytes */
-    stream_buffer_empty( s, i_copy );
+    stream_buffer_empty( s, i_data );
 
     /* Now check if we have still to really read some data */
-    int i_to_read = i_read - i_copy;
-    if( i_to_read )
+    while( i_data < i_read )
     {
-        if( p_read )
-            i_to_read = AReadStream( s, p_read, i_to_read );
+        const unsigned int i_to_read = i_read - i_data;
+        int i_result;
+
+        if( p_data )
+        {
+            i_result = AReadStream( s, p_data, i_to_read );
+        }
         else
         {
-            void * dummy = malloc(i_to_read);
-            i_to_read = AReadStream( s, dummy, i_to_read );
-            free(dummy);
+            void *p_dummy = malloc( i_to_read );
+
+            if( !p_dummy )
+                break;
+
+            i_result = AReadStream( s, p_dummy, i_to_read );
+
+            free( p_dummy );
         }
+        if( i_result <= 0 )
+            break;
+
+        p_sys->i_pos += i_data;
+        if( p_data )
+            p_data += i_result;
+        i_data += i_result;
     }
 
-    if( p_sys->record.b_active && i_copy > 0 )
-        ARecordWrite( s, p_read, i_copy );
-
-    p_sys->i_pos += i_to_read;
-
-    return i_to_read + i_copy;
+    if( p_sys->record.b_active )
+    {
+        if( i_data > 0 && p_record != NULL)
+            ARecordWrite( s, p_record, i_data );
+        if( !p_read )
+            free( p_record );
+    }
+    return i_data;
 }
 
 static int AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, unsigned int i_read )
@@ -1717,7 +1782,8 @@ static int AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, unsigned 
              i_read, size_buffered_size( s ) );
 #endif
 
-    /* Avoid problem, but that shouldn't happen */
+    /* Avoid problem, but that shouldn't happen
+     * FIXME yes it can */
     if( i_read > STREAM_CACHE_SIZE / 2 )
         i_read = STREAM_CACHE_SIZE / 2;
 
@@ -1737,7 +1803,7 @@ static int AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, unsigned 
 
     *pp_peek = stream_buffer( s );
 
-    return __MIN(stream_buffered_size( s ), i_read);
+    return __MIN( stream_buffered_size( s ), i_read );
 }
 
 static int AStreamSeekImmediate( stream_t *s, int64_t i_pos )
@@ -1762,7 +1828,8 @@ static int AStreamSeekImmediate( stream_t *s, int64_t i_pos )
     /* Just reset our buffer */
     stream_buffer_empty( s, stream_buffered_size( s ) );
 
-    if( ASeek( s, i_pos ) ) return VLC_EGENERIC;
+    if( ASeek( s, i_pos ) )
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
@@ -2256,7 +2323,7 @@ int stream_Control( stream_t *s, int i_query, ... )
     va_list args;
     int     i_result;
 
-    if ( s == NULL )
+    if( s == NULL )
         return VLC_EGENERIC;
 
     va_start( args, i_query );
