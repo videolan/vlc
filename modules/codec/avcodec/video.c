@@ -552,7 +552,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_buffer -= i_used;
         p_sys->p_buffer += i_used;
 
-    p_sys->b_first_frame = true;
+        p_sys->b_first_frame = true;
 
         /* Nothing to display */
         if( !b_gotpicture )
@@ -636,6 +636,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         /* Send decoded frame to vout */
         if( p_sys->i_pts )
         {
+            int i;
             p_pic->date = p_sys->i_pts;
 
             ffmpeg_NextPts( p_dec, p_block->i_rate );
@@ -650,6 +651,29 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_pic->i_nb_fields = 2 + p_sys->p_ff_pic->repeat_pict;
             p_pic->b_progressive = !p_sys->p_ff_pic->interlaced_frame;
             p_pic->b_top_field_first = p_sys->p_ff_pic->top_field_first;
+
+            p_pic->i_qstride = p_sys->p_ff_pic->qstride;
+#if 1
+            p_pic->p_q = p_sys->p_ff_pic->qscale_table; /* XXX: is this dangerous? shouldn't be since the ff pics are never freed ... but you never know */
+#else
+            /* FIXME: this leaks p_q */
+            int i_mb_h = ( p_pic->format.i_height + 15 ) / 16;
+            p_pic->p_q = malloc( p_pic->i_qstride * i_mb_h );
+            memcpy( p_pic->p_q, p_sys->p_ff_pic->qscale_table,
+                    p_pic->i_qstride * i_mb_h );
+#endif
+            switch( p_sys->p_ff_pic->qscale_type )
+            {
+                case FF_QSCALE_TYPE_MPEG1:
+                    p_pic->i_qtype = QTYPE_MPEG1;
+                    break;
+                case FF_QSCALE_TYPE_MPEG2:
+                    p_pic->i_qtype = QTYPE_MPEG2;
+                    break;
+                case FF_QSCALE_TYPE_H264:
+                    p_pic->i_qtype = QTYPE_H264;
+                    break;
+            }
 
             return p_pic;
         }

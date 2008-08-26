@@ -102,6 +102,8 @@ struct filter_sys_t
     pp_context_t *pp_context; /* Never changes after init */
     pp_mode_t    *pp_mode; /* Set to NULL if post processing is disabled */
 
+    bool b_had_matrix; /* Set to true if previous pic had a quant matrix (used to prevent spamming warning messages */
+
     vlc_mutex_t lock; /* Lock when using or changing pp_mode */
 };
 
@@ -139,6 +141,7 @@ static int OpenPostproc( vlc_object_t *p_this )
     {
         case VLC_FOURCC('I','4','4','4'):
         case VLC_FOURCC('J','4','4','4'):
+        /* case VLC_FOURCC('Y','U','V','A'): FIXME Should work but alpha plane needs to be copied manually and I'm kind of feeling too lazy to write the code to do that ATM (i_pitch vs i_visible_pitch...). */
             i_flags |= PP_FORMAT_444;
             break;
         case VLC_FOURCC('I','4','2','2'):
@@ -152,7 +155,6 @@ static int OpenPostproc( vlc_object_t *p_this )
         case VLC_FOURCC('I','Y','U','V'):
         case VLC_FOURCC('J','4','2','0'):
         case VLC_FOURCC('Y','V','1','2'):
-        /* case VLC_FOURCC('Y','U','V','A'): FIXME Should work but alpha plane needs to be copied manually and I'm kind of feeling too lazy to write the code to do that ATM (i_pitch vs i_visible_pitch...). */
             i_flags |= PP_FORMAT_420;
             break;
         default:
@@ -238,6 +240,7 @@ static int OpenPostproc( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
 
     p_filter->pf_video_filter = PostprocPict;
+    p_sys->b_had_matrix = true;
 
     return VLC_SUCCESS;
 }
@@ -293,13 +296,22 @@ static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
         i_dst_stride[i_plane] = p_outpic->p[i_plane].i_pitch;
     }
 
+    if( !p_pic->p_q && p_sys->b_had_matrix )
+    {
+        msg_Warn( p_filter, "Quantification table was not set by video decoder. Postprocessing won't look good." );
+        p_sys->b_had_matrix = false;
+    }
+    else if( p_pic->p_q )
+    {
+        p_sys->b_had_matrix = true;
+    }
+
     pp_postprocess( src, i_src_stride, dst, i_dst_stride,
                     p_filter->fmt_in.video.i_width,
                     p_filter->fmt_in.video.i_height,
-                    NULL /* FIXME ? works by selecting a default table. But maybe setting our own might help improve post processing quality ... */,
-                    0 /* FIXME */,
+                    p_pic->p_q, p_pic->i_qstride,
                     p_sys->pp_mode, p_sys->pp_context,
-                    PP_PICT_TYPE_QP2 /* FIXME ? This should be set only for mpeg2 type codecs if I understand correctly. */ );
+                    p_pic->i_qtype == QTYPE_MPEG2 ? PP_PICT_TYPE_QP2 : 0 );
     vlc_mutex_unlock( &p_sys->lock );
 
     return CopyInfoAndRelease( p_outpic, p_pic );

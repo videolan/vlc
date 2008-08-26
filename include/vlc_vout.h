@@ -100,6 +100,9 @@ struct picture_t
     bool            b_progressive;          /**< is it a progressive frame ? */
     unsigned int    i_nb_fields;                  /**< # of displayed fields */
     bool            b_top_field_first;             /**< which field is first */
+    uint8_t        *p_q;                           /**< quantification table */
+    int             i_qstride;                    /**< quantification stride */
+    int             i_qtype;                       /**< quantification style */
     /**@}*/
 
     /** The picture heap we are attached to */
@@ -168,6 +171,8 @@ static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_
     p_dst->b_progressive = p_src->b_progressive;
     p_dst->i_nb_fields = p_src->i_nb_fields;
     p_dst->b_top_field_first = p_src->b_top_field_first;
+
+    /* FIXME: copy ->p_q and ->p_qstride */
 }
 
 /**
@@ -239,6 +244,11 @@ struct picture_heap_t
 #define READY_PICTURE           4                       /* ready for display */
 #define DISPLAYED_PICTURE       5            /* been displayed but is linked */
 #define DESTROYED_PICTURE       6              /* allocated but no more used */
+
+/* Quantification type */
+#define QTYPE_MPEG1            0
+#define QTYPE_MPEG2            1
+#define QTYPE_H264             2
 
 /*****************************************************************************
  * Shortcuts to access image components

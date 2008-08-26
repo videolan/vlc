@@ -681,6 +681,10 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
     p_pic->pf_unlock = 0;
     p_pic->i_refcount = 0;
 
+    p_pic->p_q = NULL;
+    p_pic->i_qstride = 0;
+    p_pic->i_qtype = 0;
+
     vout_InitFormat( &p_pic->format, i_chroma, i_width, i_height, i_aspect );
 
     /* Make sure the real dimensions are a multiple of 16 */
