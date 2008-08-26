@@ -412,7 +412,9 @@ int input_EsOutSetRecord(  es_out_t *out, bool b_record )
         if( !psz_sout )
             return VLC_EGENERIC;
 
+#ifdef ENABLE_SOUT
         p_sys->p_sout_record = sout_NewInstance( p_input, psz_sout );
+#endif
         free( psz_sout );
 
         if( !p_sys->p_sout_record )
@@ -440,7 +442,9 @@ int input_EsOutSetRecord(  es_out_t *out, bool b_record )
             input_DecoderDelete( p_es->p_dec_record );
             p_es->p_dec_record = NULL;
         }
+#ifdef ENABLE_SOUT
         sout_DeleteInstance( p_sys->p_sout_record );
+#endif
         p_sys->p_sout_record = NULL;
     }
 
