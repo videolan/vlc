@@ -296,7 +296,7 @@ static int GetParameters( ScalerConfiguration *p_cfg,
     }
     else if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
     {
-        i_fmti = PIX_FMT_RGBA32;
+        i_fmto = PIX_FMT_RGBA32;
         b_has_ao = true;
     }
 
