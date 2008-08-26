@@ -42,12 +42,12 @@ class VLCPlayerFrame extends Frame
 
     public Canvas jvcanvas;
 
-    public VLCPlayerFrame()
+    public VLCPlayerFrame(String[] args)
     {
-        initComponents();
+        initComponents(args);
     }
 
-    private void initComponents()
+    private void initComponents(String[] args)
     {
 
         java.awt.GridBagConstraints gridBagConstraints;
@@ -63,7 +63,7 @@ class VLCPlayerFrame extends Frame
         jvcanvas.setSize(200, 200);
         jvcc.add(jvcanvas);
         
-        jvlc = new JVLC();
+        jvlc = new JVLC(args);
         
         playlist = new Playlist(jvlc);
 
@@ -215,7 +215,7 @@ public class VlcClient
 
     public static void main(String[] args)
     {
-        Frame f = new VLCPlayerFrame();
+        Frame f = new VLCPlayerFrame(args);
         f.setBounds(0, 0, 500, 500);
         f.addWindowListener(new WindowAdapter()
         {
