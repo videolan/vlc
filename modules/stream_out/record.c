@@ -48,7 +48,7 @@ static void     Close   ( vlc_object_t * );
  *****************************************************************************/
 #define DST_PREFIX_TEXT N_("Destination prefix")
 #define DST_PREFIX_LONGTEXT N_( \
-	"Prefix of the destination file automatically generated" )
+    "Prefix of the destination file automatically generated" )
 
 #define SOUT_CFG_PREFIX "sout-record-"
 
@@ -60,7 +60,7 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );
 
-	add_string( SOUT_CFG_PREFIX "dst-prefix", "", NULL, DST_PREFIX_TEXT,
+    add_string( SOUT_CFG_PREFIX "dst-prefix", "", NULL, DST_PREFIX_TEXT,
                 DST_PREFIX_LONGTEXT, true );
 
     set_callbacks( Open, Close );
@@ -93,7 +93,7 @@ struct sout_stream_id_t
 
 struct sout_stream_sys_t
 {
-	char *psz_prefix;
+    char *psz_prefix;
 
     sout_stream_t *p_out;
 
@@ -119,23 +119,23 @@ static void OutputSend( sout_stream_t *p_stream, sout_stream_id_t *id, block_t *
 static int Open( vlc_object_t *p_this )
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
-	sout_stream_sys_t *p_sys;
+    sout_stream_sys_t *p_sys;
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
 
     p_stream->p_sys = p_sys = malloc( sizeof(*p_sys) );
-	if( !p_sys )
-		return VLC_ENOMEM;
+    if( !p_sys )
+        return VLC_ENOMEM;
 
-	config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
 
     p_sys->p_out = NULL;
-	p_sys->psz_prefix = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "dst-prefix" );
-	if( !p_sys->psz_prefix  )
+    p_sys->psz_prefix = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "dst-prefix" );
+    if( !p_sys->psz_prefix  )
     {
-		p_sys->psz_prefix = strdup( "sout-record-" );
+        p_sys->psz_prefix = strdup( "sout-record-" );
         if( !p_sys->psz_prefix )
         {
             free( p_sys );
@@ -164,15 +164,15 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-	sout_stream_t *p_stream = (sout_stream_t*)p_this; 
-	sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_t *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( p_sys->p_out )
         sout_StreamDelete( p_sys->p_out );
 
     TAB_CLEAN( p_sys->i_id, p_sys->id );
-	free( p_sys->psz_prefix );
-	free( p_sys );
+    free( p_sys->psz_prefix );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -180,7 +180,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
-	sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
 
     id = malloc( sizeof(*id) );
@@ -201,7 +201,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
-	sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( !p_sys->p_out )
         OutputStart( p_stream );
@@ -229,7 +229,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                  block_t *p_buffer )
 {
-	sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( p_sys->i_date_start < 0 )
         p_sys->i_date_start = mdate();
@@ -270,7 +270,7 @@ static const muxer_properties_t p_muxers[] = {
     M( "raw", "ape", 1,         VLC_FOURCC('A','P','E',' ') ),
 
     M( "wav", "wav", 1,         VLC_FOURCC('a','r','a','w'), VLC_FOURCC('u','8',' ',' '), VLC_FOURCC('s','1','6','l'),
-                                VLC_FOURCC('s','2','4','l'), VLC_FOURCC('s','3','2','l'), VLC_FOURCC('f','l','3','2') ), 
+                                VLC_FOURCC('s','2','4','l'), VLC_FOURCC('s','3','2','l'), VLC_FOURCC('f','l','3','2') ),
 
     //M( "ffmpeg{mux=flac}", "flac", 1, VLC_FOURCC('f','l','a','c') ), BROKEN
 
@@ -281,15 +281,15 @@ static const muxer_properties_t p_muxers[] = {
                                 VLC_FOURCC('w','m','a','p'), VLC_FOURCC('w','m','a','l'),
                                 VLC_FOURCC('W','M','V','1'), VLC_FOURCC('W','M','V','2'), VLC_FOURCC('W','M','V','3') ),
 
-    M( "mp4", "mp4", INT_MAX,   VLC_FOURCC('m','p','4','a'), VLC_FOURCC('h','2','6','4'), VLC_FOURCC('m','p','4','v'), 
+    M( "mp4", "mp4", INT_MAX,   VLC_FOURCC('m','p','4','a'), VLC_FOURCC('h','2','6','4'), VLC_FOURCC('m','p','4','v'),
                                 VLC_FOURCC('s','u','b','t') ),
 
-    M( "ps", "ps", 16/* FIXME*/,VLC_FOURCC('m','p','g','v'), VLC_FOURCC('m','p','1','v'), VLC_FOURCC('m','p','2','v'), 
+    M( "ps", "ps", 16/* FIXME*/,VLC_FOURCC('m','p','g','v'), VLC_FOURCC('m','p','1','v'), VLC_FOURCC('m','p','2','v'),
                                 VLC_FOURCC('m','p','g','a'), VLC_FOURCC('l','p','c','m'), VLC_FOURCC('a','5','2',' '),
                                 VLC_FOURCC('d','t','s',' '),
                                 VLC_FOURCC('s','p','u',' ') ),
 
-    M( "ts", "ts", 8000,        VLC_FOURCC('m','p','g','v'), VLC_FOURCC('m','p','1','v'), VLC_FOURCC('m','p','2','v'), 
+    M( "ts", "ts", 8000,        VLC_FOURCC('m','p','g','v'), VLC_FOURCC('m','p','1','v'), VLC_FOURCC('m','p','2','v'),
                                 VLC_FOURCC('h','2','6','4'),
                                 VLC_FOURCC('m','p','g','a'), VLC_FOURCC('l','p','c','m'), VLC_FOURCC('a','5','2',' '),
                                 VLC_FOURCC('d','t','s',' '), VLC_FOURCC('m','p','4','a'),
@@ -335,7 +335,7 @@ static int OutputNew( sout_stream_t *p_stream,
 
 static void OutputStart( sout_stream_t *p_stream )
 {
-	sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     /* */
     if( p_sys->b_drop )
@@ -348,7 +348,7 @@ static void OutputStart( sout_stream_t *p_stream )
     const char *psz_muxer = NULL;
     const char *psz_extension = NULL;
 
-    /* Look for prefered muxer 
+    /* Look for prefered muxer
      * TODO we could insert transcode in a few cases like
      * s16l <-> s16b
      */
@@ -393,7 +393,7 @@ static void OutputStart( sout_stream_t *p_stream )
 #if 0
             // XXX ffmpeg sefault really easily if you try an unsupported codec
             // mov and avi at least segfault
-            { "ffmpeg{mux=avi}", "avi" }, 
+            { "ffmpeg{mux=avi}", "avi" },
             { "ffmpeg{mux=mov}", "mov" },
             { "ffmpeg{mux=mp4}", "mp4" },
             { "ffmpeg{mux=nsv}", "nsv" },
@@ -409,7 +409,7 @@ static void OutputStart( sout_stream_t *p_stream )
         {
             char *psz_file;
             int i_es;
-            
+
             psz_file = tempnam( NULL, "vlc" );
             if( !psz_file )
                 continue;
@@ -514,7 +514,7 @@ static void OutputStart( sout_stream_t *p_stream )
 
 static void OutputSend( sout_stream_t *p_stream, sout_stream_id_t *id, block_t *p_block )
 {
-	sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( id->id )
     {
