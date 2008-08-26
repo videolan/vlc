@@ -687,6 +687,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
     char *psz_title = NULL;
     char *psz_application = NULL;
     int i_node;
+    bool b_release_input_item = false;
     xml_elem_hnd_t *p_handler = NULL;
     input_item_t *p_new_input = NULL;
 
@@ -740,7 +741,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
         {
             input_item_AddSubItem( p_input_item, p_new_input );
             p_input_item = p_new_input;
-            vlc_gc_decref( p_new_input );
+            b_release_input_item = true;
         }
         free( psz_title );
     }
@@ -775,6 +776,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
+                    if(b_release_input_item) vlc_gc_decref( p_new_input );
                     return false;
                 }
                 /* choose handler */
@@ -785,6 +787,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "unexpected element <%s>", psz_name );
                     FREE_ATT();
+                    if(b_release_input_item) vlc_gc_decref( p_new_input );
                     return false;
                 }
                 FREE_NAME();
@@ -802,6 +805,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                     else
                     {
                         FREE_ATT();
+                        if(b_release_input_item) vlc_gc_decref( p_new_input );
                         return false;
                     }
                 }
@@ -815,6 +819,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
+                    if(b_release_input_item) vlc_gc_decref( p_new_input );
                     return false;
                 }
                 break;
@@ -826,12 +831,14 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
+                    if(b_release_input_item) vlc_gc_decref( p_new_input );
                     return false;
                 }
                 /* leave if the current parent node is terminated */
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
+                    if(b_release_input_item) vlc_gc_decref( p_new_input );
                     return true;
                 }
                 /* there MUST have been a start tag for that element name */
@@ -841,6 +848,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                     msg_Err( p_demux, "there's no open element left for <%s>",
                              psz_name );
                     FREE_ATT();
+                    if(b_release_input_item) vlc_gc_decref( p_new_input );
                     return false;
                 }
 
@@ -857,10 +865,12 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 /* unknown/unexpected xml node */
                 msg_Err( p_demux, "unexpected xml node %i", i_node );
                 FREE_ATT();
+                if(b_release_input_item) vlc_gc_decref( p_new_input );
                 return false;
         }
         FREE_NAME();
     }
+    if(b_release_input_item) vlc_gc_decref( p_new_input );
     return false;
 }
 
