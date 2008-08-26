@@ -71,7 +71,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     libvlc_exception_init (&dummy);
 
     /* Initialize libvlc */
-    libvlc_instance_t *vlc = libvlc_new (argc, (const char **)argv, &ex);
+    libvlc_instance_t *vlc;
+    vlc = libvlc_new (argc - 1, (const char **)argv + 1, &ex);
     if (vlc != NULL)
     {
         libvlc_add_intf (vlc, NULL, &ex);
