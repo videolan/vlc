@@ -217,20 +217,39 @@ static size_t block_ChainExtract( block_t *p_list, void *p_data, size_t i_max )
     return i_total;
 }
 
+static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t *pi_size, mtime_t *pi_length )
+{
+    size_t i_size = 0;
+    mtime_t i_length = 0;
+    int i_count;
+
+    while( p_list )
+    {
+        i_size += p_list->i_buffer;
+        i_length += p_list->i_length;
+        i_count++;
+
+        p_list = p_list->p_next;
+    }
+
+    if( pi_size )
+        *pi_size = i_size;
+    if( pi_length )
+        *pi_length = i_length;
+    if( pi_count )
+        *pi_count = i_count;
+}
+
 static inline block_t *block_ChainGather( block_t *p_list )
 {
     size_t  i_total = 0;
     mtime_t i_length = 0;
-    block_t *b, *g;
+    block_t *g;
 
     if( p_list->p_next == NULL )
         return p_list;  /* Already gathered */
 
-    for( b = p_list; b != NULL; b = b->p_next )
-    {
-        i_total += b->i_buffer;
-        i_length += b->i_length;
-    }
+    block_ChainProperties( p_list, NULL, &i_total, &i_length );
 
     g = block_Alloc( i_total );
     block_ChainExtract( p_list, g->p_buffer, g->i_buffer );
