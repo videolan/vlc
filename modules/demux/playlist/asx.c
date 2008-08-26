@@ -232,7 +232,6 @@ static int Demux( demux_t *p_demux )
     char        *psz_parse = NULL;
     char        *psz_backup = NULL;
     bool  b_entry = false;
-    input_item_t *p_input;
     INIT_PLAYLIST_STUFF;
 
     /* init txt */
@@ -459,9 +458,11 @@ static int Demux( demux_t *p_demux )
                             psz_string = malloc( i_strlen*sizeof( char ) +1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
+                            input_item_t *p_input;
                             p_input = input_item_New( p_demux, psz_string, psz_title_asx );
                             input_item_CopyOptions( p_current_input, p_input );
                             input_item_AddSubItem( p_current_input, p_input );
+                            vlc_gc_decref( p_input );
                             free( psz_string );
                         }
                         else continue;
