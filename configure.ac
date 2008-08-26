@@ -1173,7 +1173,6 @@ dnl Video codecs:
 VLC_ADD_PLUGIN([rawvideo])
 dnl Access filters:
 VLC_ADD_PLUGIN([access_filter_timeshift])
-VLC_ADD_PLUGIN([access_filter_record])
 VLC_ADD_PLUGIN([access_filter_dump])
 VLC_ADD_PLUGIN([access_filter_bandwidth])
 
