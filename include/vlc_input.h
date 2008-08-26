@@ -540,7 +540,7 @@ static inline input_state_e input_GetState( input_thread_t * p_input )
     input_Control( p_input, INPUT_GET_STATE, &state );
     return state;
 }
-VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, bool b_force_decoder ) );
+VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, sout_instance_t * ) );
 VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
 VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
 

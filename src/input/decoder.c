@@ -45,7 +45,7 @@
 #include "stream_output/stream_output.h"
 #include "input_internal.h"
 
-static decoder_t * CreateDecoder( input_thread_t *, es_format_t *, int );
+static decoder_t * CreateDecoder( input_thread_t *, es_format_t *, int, sout_instance_t *p_sout );
 static void        DeleteDecoder( decoder_t * );
 
 static void*        DecoderThread( vlc_object_t * );
@@ -148,7 +148,7 @@ mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
  * \return the spawned decoder object
  */
 decoder_t *input_DecoderNew( input_thread_t *p_input,
-                             es_format_t *fmt, bool b_force_decoder )
+                             es_format_t *fmt, sout_instance_t *p_sout  )
 {
     decoder_t   *p_dec = NULL;
     vlc_value_t val;
@@ -157,10 +157,10 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
     (void)b_force_decoder;
 #else
     /* If we are in sout mode, search for packetizer module */
-    if( p_input->p->p_sout && !b_force_decoder )
+    if( p_sout )
     {
         /* Create the decoder configuration structure */
-        p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_PACKETIZER );
+        p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_PACKETIZER, p_sout );
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create packetizer" );
@@ -173,7 +173,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
 #endif
     {
         /* Create the decoder configuration structure */
-        p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_DECODER );
+        p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_DECODER, p_sout );
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create decoder" );
@@ -192,8 +192,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         return NULL;
     }
 
-    if( p_input->p->p_sout && p_input->p->input.b_can_pace_control &&
-        !b_force_decoder )
+    if( p_sout && p_sout == p_input->p->p_sout && p_input->p->input.b_can_pace_control )
     {
         msg_Dbg( p_input, "stream out mode -> no decoder thread" );
         p_dec->p_owner->b_own_thread = false;
@@ -375,7 +374,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         es_format_t fmt;
 
         es_format_Init( &fmt, SPU_ES, fcc[i_channel] );
-        p_cc = CreateDecoder( p_owner->p_input, &fmt, VLC_OBJECT_DECODER );
+        p_cc = CreateDecoder( p_owner->p_input, &fmt, VLC_OBJECT_DECODER, p_dec->p_owner->p_sout );
         if( !p_cc )
         {
             msg_Err( p_dec, "could not create decoder" );
@@ -437,7 +436,7 @@ int input_DecoderGetCcState( decoder_t *p_dec, bool *pb_decode, int i_channel )
  * \return the decoder object
  */
 static decoder_t * CreateDecoder( input_thread_t *p_input,
-                                  es_format_t *fmt, int i_object_type )
+                                  es_format_t *fmt, int i_object_type, sout_instance_t *p_sout )
 {
     decoder_t *p_dec;
     decoder_owner_sys_t *p_owner;
@@ -475,7 +474,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->p_owner->p_vout = NULL;
     p_dec->p_owner->p_spu_vout = NULL;
     p_dec->p_owner->i_spu_channel = 0;
-    p_dec->p_owner->p_sout = p_input->p->p_sout;
+    p_dec->p_owner->p_sout = p_sout;
     p_dec->p_owner->p_sout_input = NULL;
     p_dec->p_owner->p_packetizer = NULL;
 
