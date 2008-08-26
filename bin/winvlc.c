@@ -80,7 +80,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         libvlc_wait (vlc);
         libvlc_release (vlc);
     }
-    free (argv);
 
     ret = libvlc_exception_raised (&ex);
     libvlc_exception_clear (&ex);
