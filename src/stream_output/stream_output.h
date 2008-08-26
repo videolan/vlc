@@ -47,7 +47,7 @@ struct sout_packetizer_input_t
 };
 
 #define sout_NewInstance(a,b) __sout_NewInstance(VLC_OBJECT(a),b)
-VLC_EXPORT( sout_instance_t *,  __sout_NewInstance,  ( vlc_object_t *, char * ) );
+VLC_EXPORT( sout_instance_t *,  __sout_NewInstance,  ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void,               sout_DeleteInstance, ( sout_instance_t * ) );
 
 VLC_EXPORT( sout_packetizer_input_t *, sout_InputNew,( sout_instance_t *, es_format_t * ) );

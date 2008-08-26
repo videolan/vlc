@@ -73,7 +73,7 @@ static void mrl_Clean( mrl_t *p_mrl );
 /*****************************************************************************
  * sout_NewInstance: creates a new stream output instance
  *****************************************************************************/
-sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
+sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
 {
     static const char typename[] = "stream output";
     sout_instance_t *p_sout;
