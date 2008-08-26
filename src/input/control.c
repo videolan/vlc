@@ -63,6 +63,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
     int *pi_bkmk;
 
     int i_int, *pi_int;
+    bool b_bool, *pb_bool;
     double f, *pf;
     int64_t i_64, *pi_64;
 
@@ -598,6 +599,15 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_EGENERIC;
         }
 
+        case INPUT_SET_RECORD_STATE:
+            b_bool = (bool)va_arg( args, int );
+            var_SetBool( p_input, "record", b_bool );
+            return VLC_SUCCESS;
+
+        case INPUT_GET_RECORD_STATE:
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = var_GetBool( p_input, "record" );
+            return VLC_SUCCESS;
 
         default:
             msg_Err( p_input, "unknown query in input_vaControl" );

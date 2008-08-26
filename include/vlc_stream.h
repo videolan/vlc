@@ -64,7 +64,11 @@ enum stream_query_e
     STREAM_CONTROL_ACCESS,  /* arg1= int i_access_query, args   res: can fail
                              if access unreachable or access control answer */
 
-    STREAM_GET_CONTENT_TYPE,   /**< arg1= char **         res=can file */
+    STREAM_GET_CONTENT_TYPE,    /**< arg1= char **         res=can fail */
+
+    /* SET_RECORD:
+     * XXX only data read through stream_Read/Block will be recorded */
+    STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *psz_ext (if arg1 is true)  res=can fail */
 };
 
 VLC_EXPORT( int, stream_Read, ( stream_t *s, void *p_read, int i_read ) );

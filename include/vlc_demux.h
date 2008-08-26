@@ -124,8 +124,14 @@ enum demux_query_e
     /* Attachments */
     DEMUX_GET_ATTACHMENTS,      /* arg1=input_attachment_t***, int* res=can fail */
 
+    /* RECORD you should accept it only if the stream can be recorded without
+     * any modification or header addition. */
+    DEMUX_CAN_RECORD,           /* arg1=bool*   res=can fail(assume false) */
+    DEMUX_SET_RECORD_STATE,     /* arg1=bool    res=can fail */
+
+
     /* II. Specific access_demux queries */
-    DEMUX_CAN_PAUSE,            /* arg1= bool*    can fail (assume false)*/
+    DEMUX_CAN_PAUSE = 0x1000,   /* arg1= bool*    can fail (assume false)*/
     DEMUX_SET_PAUSE_STATE,      /* arg1= bool     can fail */
 
     DEMUX_GET_PTS_DELAY,        /* arg1= int64_t*       cannot fail */

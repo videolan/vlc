@@ -524,7 +524,11 @@ enum input_query_e
     INPUT_GET_ATTACHMENT,  /* arg1=input_attachment_t**, arg2=char*  res=can fail */
 
     /* On the fly input slave */
-    INPUT_ADD_SLAVE        /* arg1= char * */
+    INPUT_ADD_SLAVE,       /* arg1= char * */
+
+    /* On the fly record while playing */
+    INPUT_SET_RECORD_STATE, /* arg1=bool    res=can fail */
+    INPUT_GET_RECORD_STATE, /* arg1=bool*   res=can fail */
 };
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );

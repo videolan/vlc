@@ -280,6 +280,8 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_GET_TITLE_INFO:
         case DEMUX_SET_GROUP:
         case DEMUX_GET_ATTACHMENTS:
+        case DEMUX_CAN_RECORD:
+        case DEMUX_SET_RECORD_STATE:
             return VLC_EGENERIC;
 
         default:
@@ -526,6 +528,7 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_CONTROL_ACCESS:
         case STREAM_GET_CONTENT_TYPE:
+        case STREAM_SET_RECORD_STATE:
             return VLC_EGENERIC;
 
         default:

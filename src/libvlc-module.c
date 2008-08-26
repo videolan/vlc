@@ -675,6 +675,10 @@ static const char *const ppsz_clock_descriptions[] =
     "the form \"{name=bookmark-name,time=optional-time-offset," \
     "bytes=optional-byte-offset},{...}\"")
 
+#define INPUT_RECORD_PATH_TEXT N_("Record directory or filename")
+#define INPUT_RECORD_PATH_LONGTEXT N_( \
+    "Directory or filename where the records will be stored" )
+
 // DEPRECATED
 #define SUB_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the subpictures " \
@@ -1736,6 +1740,9 @@ vlc_module_begin();
 
     add_bool( "network-synchronisation", false, NULL, NETSYNC_TEXT,
               NETSYNC_LONGTEXT, true );
+
+    add_string( "input-record-path", NULL, NULL, INPUT_RECORD_PATH_TEXT,
+                INPUT_RECORD_PATH_LONGTEXT, true );
 
 /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , true );

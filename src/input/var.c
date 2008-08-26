@@ -61,6 +61,10 @@ static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
 static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 
+static int RecordCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data );
+
 typedef struct
 {
     const char *psz_name;
@@ -93,6 +97,7 @@ static const vlc_input_callback_t p_input_callbacks[] =
     CALLBACK( "video-es", ESCallback ),
     CALLBACK( "audio-es", ESCallback ),
     CALLBACK( "spu-es", ESCallback ),
+    CALLBACK( "record", RecordCallback ),
 
     CALLBACK( NULL, NULL )
 };
@@ -188,9 +193,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "spu-delay", VLC_VAR_TIME );
     val.i_time = 0;
     var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
-
-    p_input->p->pts_adjust.auto_adjust = var_CreateGetBool(
-            p_input, "auto-adjust-pts-delay" );
 
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
@@ -404,8 +406,6 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
  *****************************************************************************/
 void input_ConfigVarInit ( input_thread_t *p_input )
 {
-    vlc_value_t val;
-
     /* Create Object Variables for private use only */
 
     if( !p_input->b_preparsing )
@@ -460,14 +460,22 @@ void input_ConfigVarInit ( input_thread_t *p_input )
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
         var_Create( p_input, "clock-synchro",
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+        var_Create( p_input, "auto-adjust-pts-delay",
+                    VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     }
 
     var_Create( p_input, "seekable", VLC_VAR_BOOL );
-    val.b_bool = true; /* Fixed later*/
-    var_Change( p_input, "seekable", VLC_VAR_SETVALUE, &val, NULL );
+    var_SetBool( p_input, "seekable", true ); /* Fixed later*/
+
     var_Create( p_input, "can-pause", VLC_VAR_BOOL );
-    val.b_bool = true; /* Fixed later*/
-    var_Change( p_input, "can-pause", VLC_VAR_SETVALUE, &val, NULL );
+    var_SetBool( p_input, "can-pause", true ); /* Fixed later*/
+
+    var_Create( p_input, "can-record", VLC_VAR_BOOL );
+    var_SetBool( p_input, "can-record", false ); /* Fixed later*/
+
+    var_Create( p_input, "record", VLC_VAR_BOOL );
+    var_SetBool( p_input, "record", false );
+
     var_Create( p_input, "teletext-es", VLC_VAR_INTEGER );
     var_SetInteger( p_input, "teletext-es", -1 );
 
@@ -773,6 +781,18 @@ static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_BOOKMARK, &newval );
+
+    return VLC_SUCCESS;
+}
+
+static int RecordCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t*)p_this;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    input_ControlPush( p_input, INPUT_CONTROL_SET_RECORD_STATE, &newval );
 
     return VLC_SUCCESS;
 }

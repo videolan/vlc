@@ -372,13 +372,12 @@ void AdvControlsWidget::enableInput( bool enable )
         input_item_t *p_item = input_GetItem( THEMIM->getInput() );
         i_input_id = p_item->i_id;
 
-        if( var_Type( THEMIM->getInput(), "record-toggle" ) == VLC_VAR_VOID )
-            recordButton->setVisible( true );
-        else
-            recordButton->setVisible( false );
+        recordButton->setVisible( var_GetBool( THEMIM->getInput(), "can-record" ) );
     }
     else
+    {
         recordButton->setVisible( false );
+    }
 
     ABButton->setEnabled( enable );
     recordButton->setEnabled( enable );
@@ -464,8 +463,8 @@ void AdvControlsWidget::record()
     if( p_input )
     {
         /* This method won't work fine if the stream can't be cut anywhere */
-        if( var_Type( p_input, "record-toggle" ) == VLC_VAR_VOID )
-            var_TriggerCallback( p_input, "record-toggle" );
+        const bool b_recording = var_GetBool( p_input, "record" );
+        var_SetBool( p_input, "record", !b_recording );
 #if 0
         else
         {

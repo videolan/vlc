@@ -370,6 +370,9 @@ struct demux_sys_t
 
     /* */
     bool        b_meta;
+
+    /* */
+    bool        b_start_record;
 };
 
 static int Demux    ( demux_t *p_demux );
@@ -642,6 +645,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_udp_out = false;
     p_sys->i_ts_read = 50;
     p_sys->csa = NULL;
+    p_sys->b_start_record = false;
 
     /* Init PAT handler */
     pat = &p_sys->pid[0];
@@ -1091,6 +1095,13 @@ static int Demux( demux_t *p_demux )
             }
         }
 
+        if( p_sys->b_start_record )
+        {
+            /* Enable recording once synchronized */
+            stream_Control( p_demux->s, STREAM_SET_RECORD_STATE, true, "ts" );
+            p_sys->b_start_record = false;
+        }
+
         if( p_sys->b_udp_out )
         {
             memcpy( &p_sys->buffer[i_pkt * p_sys->i_packet_size],
@@ -1190,6 +1201,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
+    bool b_bool, *pb_bool;
     int64_t i64;
     int64_t *pi64;
     int i_int;
@@ -1385,6 +1397,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_SUCCESS;
         }
+
+        case DEMUX_CAN_RECORD:
+            pb_bool = (bool*)va_arg( args, bool * );
+            *pb_bool = true;
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_RECORD_STATE:
+            b_bool = (bool)va_arg( args, int );
+
+            if( !b_bool )
+                stream_Control( p_demux->s, STREAM_SET_RECORD_STATE, false );
+            p_sys->b_start_record = b_bool;
+            return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:
         case DEMUX_SET_TIME:

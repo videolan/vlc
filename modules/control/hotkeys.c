@@ -810,6 +810,19 @@ static void Run( intf_thread_t *p_intf )
             {
                 osd_MenuActivate( VLC_OBJECT(p_intf) );
             }
+            else if( i_action == ACTIONID_RECORD )
+            {
+                if( var_GetBool( p_input, "can-record" ) )
+                {
+                    const bool b_record = !var_GetBool( p_input, "record" );
+
+                    if( b_record )
+                        vout_OSDMessage( p_intf, DEFAULT_CHAN, _("Recording") );
+                    else
+                        vout_OSDMessage( p_intf, DEFAULT_CHAN, _("Recording done") );
+                    var_SetBool( p_input, "record", b_record );
+                }
+            }
         }
         if( p_vout )
             vlc_object_release( p_vout );

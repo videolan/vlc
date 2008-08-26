@@ -25,7 +25,12 @@
 # include "config.h"
 #endif
 
+#include <dirent.h>
+
 #include <vlc_common.h>
+#include <vlc_charset.h>
+#include <vlc_strings.h>
+#include <vlc_osd.h>
 
 #include <assert.h>
 
@@ -186,6 +191,14 @@ struct stream_sys_t
 
     /* Preparse mode ? */
     bool      b_quick;
+
+    /* */
+    struct
+    {
+        bool b_active;
+
+        FILE *f;    /* TODO it could be replaced by access_output_t one day */
+    } record;
 };
 
 /* Method 1: */
@@ -212,6 +225,8 @@ static int AStreamControl( stream_t *s, int i_query, va_list );
 static void AStreamDestroy( stream_t *s );
 static void UStreamDestroy( stream_t *s );
 static int  ASeek( stream_t *s, int64_t i_pos );
+static int  ARecordSetState( stream_t *s, bool b_record, const char *psz_extension );
+static void ARecordWrite( stream_t *s, const uint8_t *p_buffer, size_t i_buffer );
 
 /****************************************************************************
  * Method 3 helpers:
@@ -313,6 +328,8 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
         p_sys->method = Immediate;
     else
         p_sys->method = Stream;
+
+    p_sys->record.b_active = false;
 
     p_sys->i_pos = p_access->info.i_pos;
 
@@ -512,9 +529,15 @@ static void AStreamDestroy( stream_t *s )
 
     vlc_object_detach( s );
 
-    if( p_sys->method == Block ) block_ChainRelease( p_sys->block.p_first );
-    else if ( p_sys->method == Immediate ) free( p_sys->immediate.p_buffer );
-    else free( p_sys->stream.p_buffer );
+    if( p_sys->record.b_active )
+        ARecordSetState( s, false, NULL );
+
+    if( p_sys->method == Block )
+        block_ChainRelease( p_sys->block.p_first );
+    else if ( p_sys->method == Immediate )
+        free( p_sys->immediate.p_buffer );
+    else
+        free( p_sys->stream.p_buffer );
 
     free( p_sys->p_peek );
 
@@ -617,6 +640,8 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     access_t     *p_access = p_sys->p_access;
 
     bool *p_bool;
+    bool b_bool;
+    const char *psz_string;
     int64_t    *pi_64, i_64;
     int        i_int;
 
@@ -677,6 +702,12 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_GET_CONTENT_TYPE:
             return access_Control( p_access, ACCESS_GET_CONTENT_TYPE,
                                     va_arg( args, char ** ) );
+        case STREAM_SET_RECORD_STATE:
+            b_bool = (bool)va_arg( args, int );
+            psz_string = NULL;
+            if( b_bool )
+                psz_string = (const char*)va_arg( args, const char* );
+            return ARecordSetState( s, b_bool, psz_string );
 
         default:
             msg_Err( s, "invalid stream_vaControl query=0x%x", i_query );
@@ -685,7 +716,120 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
+/****************************************************************************
+ * ARecord*: record stream functions
+ ****************************************************************************/
 
+/* TODO FIXME nearly the same logic that snapshot code */
+static char *ARecordGetFileName( stream_t *s, const char *psz_path, const char *psz_prefix, const char *psz_extension )
+{
+    char *psz_file;
+    DIR *path;
+
+    path = utf8_opendir( psz_path );
+    if( path )
+    {
+        closedir( path );
+
+        const char *psz_prefix = "vlc-record-%Y-%m-%d-%H:%M:%S-$p";  // TODO allow conf ?
+        char *psz_tmp = str_format( s, psz_prefix );
+        if( !psz_tmp )
+            return NULL;
+
+        filename_sanitize( psz_tmp );
+        if( asprintf( &psz_file, "%s"DIR_SEP"%s.%s",
+                      psz_path, psz_tmp, psz_extension ) < 0 )
+            psz_file = NULL;
+        free( psz_tmp );
+        return psz_file;
+    }
+    else
+    {
+        psz_file = str_format( s, psz_path );
+        path_sanitize( psz_file );
+        return psz_file;
+    }
+}
+
+static int  ARecordStart( stream_t *s, const char *psz_extension )
+{
+    stream_sys_t *p_sys = s->p_sys;
+
+    DIR *path;
+    char *psz_file;
+    FILE *f;
+
+    /* */
+    if( !psz_extension )
+        psz_extension = "dat";
+
+    /* Retreive path */
+    char *psz_path = var_CreateGetString( s, "input-record-path" );
+    if( !psz_path || *psz_path == '\0' )
+    {
+        free( psz_path );
+        psz_path = strdup( config_GetHomeDir() );
+    }
+
+    if( !psz_path )
+        return VLC_ENOMEM;
+
+    /* Create file name
+     * TODO allow prefix configuration */
+    psz_file = ARecordGetFileName( s, psz_path, "vlc-record-%Y-%m-%d-%H:%M:%S-$p", psz_extension );
+
+    free( psz_path );
+
+    if( !psz_file )
+        return VLC_ENOMEM;
+
+    f = utf8_fopen( psz_file, "wb" );
+    if( !f )
+    {
+        free( psz_file );
+        return VLC_EGENERIC;
+    }
+    msg_Dbg( s, "Recording into %s", psz_file );
+    free( psz_file );
+
+    /* */
+    p_sys->record.f = f;
+    p_sys->record.b_active = true;
+    return VLC_SUCCESS;
+}
+static int  ARecordStop( stream_t *s )
+{
+    stream_sys_t *p_sys = s->p_sys;
+
+    assert( p_sys->record.b_active );
+
+    msg_Dbg( s, "Recording completed" );
+    fclose( p_sys->record.f );
+    p_sys->record.b_active = false;
+    return VLC_SUCCESS;
+}
+
+static int  ARecordSetState( stream_t *s, bool b_record, const char *psz_extension )
+{
+    stream_sys_t *p_sys = s->p_sys;
+
+    if( !!p_sys->record.b_active == !!b_record )
+        return VLC_SUCCESS;
+
+    if( b_record )
+        return ARecordStart( s, psz_extension );
+    else
+        return ARecordStop( s );
+}
+static void ARecordWrite( stream_t *s, const uint8_t *p_buffer, size_t i_buffer )
+{
+    stream_sys_t *p_sys = s->p_sys;
+
+    assert( p_sys->record.b_active );
+
+    if( i_buffer )
+        fwrite( p_buffer, 1, i_buffer, p_sys->record.f );
+}
 
 /****************************************************************************
  * Method 1:
@@ -820,6 +964,9 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
             }
         }
     }
+
+    if( p_sys->record.b_active && i_data > 0 )
+        ARecordWrite( s, p_read, i_data );
 
     p_sys->i_pos += i_data;
     return i_data;
@@ -1164,6 +1311,9 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
             }
         }
     }
+
+    if( p_sys->record.b_active && i_data > 0 )
+        ARecordWrite( s, p_read, i_data );
 
     return i_data;
 }
@@ -1551,6 +1701,9 @@ static int AStreamReadImmediate( stream_t *s, void *p_read, unsigned int i_read 
             free(dummy);
         }
     }
+
+    if( p_sys->record.b_active && i_copy > 0 )
+        ARecordWrite( s, p_read, i_copy );
 
     p_sys->i_pos += i_to_read;
 

@@ -734,33 +734,34 @@ static void VoutFlushPicture( vout_thread_t *p_vout )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-
-static void optimize_video_pts( decoder_t *p_dec )
+static void DecoderOptimizePtsDelay( decoder_t *p_dec )
 {
-    picture_t * oldest_pict = NULL;
-    picture_t * youngest_pict = NULL;
+    input_thread_t *p_input = p_dec->p_owner->p_input;
+    vout_thread_t *p_vout = p_dec->p_owner->p_vout;
+    input_thread_private_t *p_priv = p_input->p;
+
+    picture_t *p_old = NULL;
+    picture_t *p_young = NULL;
     int i;
 
-    input_thread_t * p_input = p_dec->p_owner->p_input;
-    vout_thread_t * p_vout = p_dec->p_owner->p_vout;
-    input_thread_private_t * p_priv = p_input->p;
-
     /* Enable with --auto-adjust-pts-delay */
-    if( !p_priv->pts_adjust.auto_adjust ) return;
+    if( !p_priv->pts_adjust.b_auto_adjust )
+        return;
 
     for( i = 0; i < I_RENDERPICTURES; i++ )
     {
-        picture_t * pic = PP_RENDERPICTURE[i];
-        if( pic->i_status != READY_PICTURE )
+        picture_t *p_pic = PP_RENDERPICTURE[i];
+
+        if( p_pic->i_status != READY_PICTURE )
             continue;
 
-        if( !oldest_pict || pic->date < oldest_pict->date )
-            oldest_pict = pic;
-        if( !youngest_pict || pic->date > youngest_pict->date )
-            youngest_pict = pic;
+        if( !p_old || p_pic->date < p_old->date )
+            p_old = p_pic;
+        if( !p_young || p_pic->date > p_young->date )
+            p_young = p_pic;
     }
 
-    if( !youngest_pict || !oldest_pict )
+    if( !p_young || !p_old )
         return;
 
     /* Try to find if we can reduce the pts
@@ -775,59 +776,58 @@ static void optimize_video_pts( decoder_t *p_dec )
      * pts<->dts delay in the muxed stream. That is
      * why we may end up in having a negative pts_delay,
      * to compensate that artificial delay. */
-    mtime_t buffer_size = youngest_pict->date - oldest_pict->date;
-    int64_t pts_slide = 0;
-    if( buffer_size < 10000 )
+    const mtime_t i_buffer_length = p_young->date - p_old->date;
+    int64_t i_pts_slide = 0;
+    if( i_buffer_length < 10000 )
     {
         if( p_priv->pts_adjust.i_num_faulty > 10 )
         {
-            pts_slide = __MAX(p_input->i_pts_delay *3 / 2, 10000);
+            i_pts_slide = __MAX(p_input->i_pts_delay *3 / 2, 10000);
             p_priv->pts_adjust.i_num_faulty = 0;
         }
-        if( p_priv->pts_adjust.to_high )
+        if( p_priv->pts_adjust.b_to_high )
         {
-            p_priv->pts_adjust.to_high = !p_priv->pts_adjust.to_high;
+            p_priv->pts_adjust.b_to_high = !p_priv->pts_adjust.b_to_high;
             p_priv->pts_adjust.i_num_faulty = 0;
         }
         p_priv->pts_adjust.i_num_faulty++;
     }
-    else if( buffer_size > 100000 )
+    else if( i_buffer_length > 100000 )
     {
         if( p_priv->pts_adjust.i_num_faulty > 25 )
         {
-            pts_slide = -buffer_size/2;
+            i_pts_slide = -i_buffer_length/2;
             p_priv->pts_adjust.i_num_faulty = 0;
         }
-        if( p_priv->pts_adjust.to_high )
+        if( p_priv->pts_adjust.b_to_high )
         {
-            p_priv->pts_adjust.to_high = !p_priv->pts_adjust.to_high;
+            p_priv->pts_adjust.b_to_high = !p_priv->pts_adjust.b_to_high;
             p_priv->pts_adjust.i_num_faulty = 0;
         }
         p_priv->pts_adjust.i_num_faulty++;
     }
-    if( pts_slide )
+    if( i_pts_slide != 0 )
     {
-        mtime_t origi_delay = p_input->i_pts_delay;
+        const mtime_t i_pts_delay_org = p_input->i_pts_delay;
 
-        p_input->i_pts_delay += pts_slide;
+        p_input->i_pts_delay += i_pts_slide;
 
         /* Don't play with the pts delay for more than -2<->3sec */
         if( p_input->i_pts_delay < -2000000 )
             p_input->i_pts_delay = -2000000;
         else if( p_input->i_pts_delay > 3000000 )
             p_input->i_pts_delay = 3000000;
-        pts_slide = p_input->i_pts_delay - origi_delay;
+        i_pts_slide = p_input->i_pts_delay - i_pts_delay_org;
 
         msg_Dbg( p_input, "Sliding the pts by %dms pts delay at %dms picture buffer was %dms",
-            (int)pts_slide/1000, (int)p_input->i_pts_delay/1000, (int)buffer_size/1000);
+            (int)i_pts_slide/1000, (int)p_input->i_pts_delay/1000, (int)i_buffer_length/1000);
 
         vlc_mutex_lock( &p_vout->picture_lock );
         /* Slide all the picture */
         for( i = 0; i < I_RENDERPICTURES; i++ )
-            PP_RENDERPICTURE[i]->date += pts_slide;
+            PP_RENDERPICTURE[i]->date += i_pts_slide;
         /* FIXME: slide aout/spu */
         vlc_mutex_unlock( &p_vout->picture_lock );
-
     }
 }
 
@@ -872,7 +872,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         vout_DatePicture( p_vout, p_pic, p_pic->date );
 
-        optimize_video_pts( p_dec );
+        DecoderOptimizePtsDelay( p_dec );
 
         vout_DisplayPicture( p_vout, p_pic );
     }

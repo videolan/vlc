@@ -63,6 +63,7 @@ typedef struct
     bool b_can_pause;
     bool b_can_pace_control;
     bool b_can_rate_control;
+    bool b_can_record;
     bool b_rescale_ts;
 
     bool       b_eof;   /* eof of demuxer */
@@ -84,6 +85,7 @@ struct input_thread_private_t
     bool        b_can_rate_control;
 
     int         i_rate;
+    bool        b_recording;
     /* */
     int64_t     i_start;    /* :start-time,0 by default */
     int64_t     i_stop;     /* :stop-time, 0 if none */
@@ -116,10 +118,11 @@ struct input_thread_private_t
     input_source_t **slave;
 
     /* pts delay fixup */
-    struct {
+    struct
+    {
         int  i_num_faulty;
-        bool to_high;
-        bool auto_adjust;
+        bool b_to_high;
+        bool b_auto_adjust;
     } pts_adjust;
 
     /* Stats counters */
@@ -191,6 +194,8 @@ enum input_control_e
     INPUT_CONTROL_SET_SPU_DELAY,
 
     INPUT_CONTROL_ADD_SLAVE,
+
+    INPUT_CONTROL_SET_RECORD_STATE,
 };
 
 /* Internal helpers */

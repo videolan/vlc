@@ -112,6 +112,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown
  *    or not, for that check position != 0.0)
  *  - can-pause
+ *  - can-record (if a stream can be recorded while playing)
  *  - teletext-es to get the index of spu track that is teletext --1 if no teletext)
  * * For intf callback upon changes
  *  - intf-change
@@ -184,6 +185,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->i_title_offset = p_input->p->i_seekpoint_offset = 0;
     p_input->i_state = INIT_S;
     p_input->p->i_rate  = INPUT_RATE_DEFAULT;
+    p_input->p->b_recording = false;
     TAB_INIT( p_input->p->i_bookmark, p_input->p->bookmark );
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
     p_input->p->p_es_out = NULL;
@@ -235,6 +237,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Create Objects variables for public Get and Set */
     input_ControlVarInit( p_input );
 
+    /* */
+    p_input->p->pts_adjust.b_auto_adjust = var_GetBool( p_input, "auto-adjust-pts-delay" );
     p_input->p->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
 
     if( !p_input->b_preparsing )
@@ -1452,6 +1456,12 @@ static bool Control( input_thread_t *p_input, int i_type,
         case INPUT_CONTROL_SET_POSITION_OFFSET:
         {
             double f_pos;
+
+            if( p_input->p->b_recording )
+            {
+                msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) ignored while recording" );
+                break;
+            }
             if( i_type == INPUT_CONTROL_SET_POSITION )
             {
                 f_pos = val.f_float;
@@ -1488,6 +1498,12 @@ static bool Control( input_thread_t *p_input, int i_type,
         {
             int64_t i_time;
             int i_ret;
+
+            if( p_input->p->b_recording )
+            {
+                msg_Err( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) ignored while recording" );
+                break;
+            }
 
             if( i_type == INPUT_CONTROL_SET_TIME )
             {
@@ -1744,6 +1760,11 @@ static bool Control( input_thread_t *p_input, int i_type,
         case INPUT_CONTROL_SET_TITLE:
         case INPUT_CONTROL_SET_TITLE_NEXT:
         case INPUT_CONTROL_SET_TITLE_PREV:
+            if( p_input->p->b_recording )
+            {
+                msg_Err( p_input, "INPUT_CONTROL_SET_TITLE(*) ignored while recording" );
+                break;
+            }
             if( p_input->p->input.b_title_demux &&
                 p_input->p->input.i_title > 0 )
             {
@@ -1791,6 +1812,12 @@ static bool Control( input_thread_t *p_input, int i_type,
         case INPUT_CONTROL_SET_SEEKPOINT:
         case INPUT_CONTROL_SET_SEEKPOINT_NEXT:
         case INPUT_CONTROL_SET_SEEKPOINT_PREV:
+            if( p_input->p->b_recording )
+            {
+                msg_Err( p_input, "INPUT_CONTROL_SET_SEEKPOINT(*) ignored while recording" );
+                break;
+            }
+
             if( p_input->p->input.b_title_demux &&
                 p_input->p->input.i_title > 0 )
             {
@@ -1915,6 +1942,24 @@ static bool Control( input_thread_t *p_input, int i_type,
                 }
 
                 free( val.psz_string );
+            }
+            break;
+
+        case INPUT_CONTROL_SET_RECORD_STATE:
+            if( p_input->p->input.b_can_record )
+            {
+                if( !!p_input->p->b_recording != !!val.b_bool )
+                {
+                    if( demux_Control( p_input->p->input.p_demux,
+                                       DEMUX_SET_RECORD_STATE, val.b_bool ) )
+                        val.b_bool = false;
+
+                    p_input->p->b_recording = val.b_bool;
+                }
+
+                var_Change( p_input, "record", VLC_VAR_SETVALUE, &val, NULL );
+
+                b_force_update = true;
             }
             break;
 
@@ -2056,8 +2101,8 @@ static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
  *****************************************************************************/
 static input_source_t *InputSourceNew( input_thread_t *p_input )
 {
-    (void)p_input;
-    input_source_t *in = (input_source_t*) malloc( sizeof( input_source_t ) );
+    VLC_UNUSED(p_input);
+    input_source_t *in = malloc( sizeof( input_source_t ) );
     if( in )
         memset( in, 0, sizeof( input_source_t ) );
     return in;
@@ -2319,6 +2364,10 @@ static int InputSourceInit( input_thread_t *p_input,
                             "Have a look at the log for details."), psz_mrl );
             goto error;
         }
+
+        if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_record ) )
+            in->b_can_record = false;
+        var_SetBool( p_input, "can-record", in->b_can_record );
 
         /* Get title from demux */
         if( !p_input->b_preparsing && in->i_title <= 0 )
