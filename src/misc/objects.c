@@ -991,7 +991,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
     (void)oldval; (void)p_data;
     if( *psz_cmd == 'l' )
     {
-        vlc_object_t *root = VLC_OBJECT (vlc_global ()), *cur = root; 
+        vlc_object_t *root = VLC_OBJECT (vlc_global ()), *cur = root;
 
         vlc_mutex_lock( &structure_lock );
         do
@@ -1079,6 +1079,8 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                 if( p_var->psz_text )
                     printf( ", %s", p_var->psz_text );
                 printf( ")" );
+                if( p_var->i_type & VLC_VAR_HASCHOICE )
+                    printf( ", has choices" );
                 if( p_var->i_type & VLC_VAR_ISCOMMAND )
                     printf( ", command" );
                 if( p_var->i_entries )
