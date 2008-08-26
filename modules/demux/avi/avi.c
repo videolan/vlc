@@ -935,7 +935,13 @@ static int Demux_Seekable( demux_t *p_demux )
 
         if( b_done )
         {
-            return( 1 );
+            for( i = 0; i < p_sys->i_track; i++ )
+            {
+                if( toread[i].b_ok )
+                    return 1;
+            }
+            msg_Warn( p_demux, "all tracks have failed, exiting..." );
+            return 0;
         }
 
         if( i_pos == -1 )
