@@ -2372,10 +2372,13 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
             in->b_can_stream_record = false;
+#ifdef ENABLE_SOUT
         if( !var_CreateGetBool( p_input, "input-record-native" ) )
             in->b_can_stream_record = false;
-        var_SetBool( p_input, "can-record", true ); // Is it still needed ?
-
+        var_SetBool( p_input, "can-record", true );
+#else
+        var_SetBool( p_input, "can-record", in->b_can_stream_record );
+#endif
         /* Get title from demux */
         if( !p_input->b_preparsing && in->i_title <= 0 )
         {
