@@ -136,6 +136,11 @@ struct video_format_t
     video_palette_t *p_palette;              /**< video palette from demuxer */
 };
 
+/**
+ * Initialize a video_format_t structure with chroma 'i_chroma'
+ * \param p_src pointer to video_format_t structure
+ * \param i_chroma chroma value to use
+ */
 static inline void video_format_Init( video_format_t *p_src, vlc_fourcc_t i_chroma )
 {
     memset( p_src, 0, sizeof( video_format_t ) );
@@ -144,6 +149,11 @@ static inline void video_format_Init( video_format_t *p_src, vlc_fourcc_t i_chro
     p_src->p_palette = NULL;
 }
 
+/**
+ * Copy video_format_t including the palette
+ * \param p_dst video_format_t to copy to
+ * \param p_src video_format_t to copy from
+ */
 static inline int video_format_Copy( video_format_t *p_dst, video_format_t *p_src )
 {
     memcpy( p_dst, p_src, sizeof( video_format_t ) );
@@ -157,6 +167,10 @@ static inline int video_format_Copy( video_format_t *p_dst, video_format_t *p_sr
     return VLC_SUCCESS;
 };
 
+/**
+ * Cleanup and free palette of this video_format_t
+ * \param p_src video_format_t structure to clean
+ */
 static inline void video_format_Clean( video_format_t *p_src )
 {
     free( p_src->p_palette );
@@ -195,7 +209,7 @@ struct subs_format_t
 };
 
 /**
- * ES definition
+ * ES language definition
  */
 typedef struct extra_languages_t
 {
@@ -203,42 +217,46 @@ typedef struct extra_languages_t
         char *psz_description;
 } extra_languages_t;
 
-
+/**
+ * ES format definition
+ */
 struct es_format_t
 {
-    int             i_cat;
-    vlc_fourcc_t    i_codec;
+    int             i_cat;      /**< ES category @see es_format_category_e */
+    vlc_fourcc_t    i_codec;    /**< FOURCC value as used in vlc */
 
-    int             i_id;       /* -1: let the core mark the right id
-                                   >=0: valid id */
-    int             i_group;    /* -1 : standalone
-                                   >= 0 then a "group" (program) is created
+    int             i_id;       /**< es identifier, where means
+                                    -1: let the core mark the right id
+                                    >=0: valid id */
+    int             i_group;    /**< group identifier, where means:
+                                    -1 : standalone
+                                    >= 0 then a "group" (program) is created
                                         for each value */
-    int             i_priority; /*  -2 : mean not selectable by the users
+    int             i_priority; /**< priority, where means:
+                                    -2 : mean not selectable by the users
                                     -1 : mean not selected by default even
-                                        when no other stream
+                                         when no other stream
                                     >=0: priority */
 
-    char            *psz_language;
-    char            *psz_description;
-    int             i_extra_languages;
-    extra_languages_t *p_extra_languages;
+    char            *psz_language;        /**< human readible language name */
+    char            *psz_description;     /**< human readible description of language */
+    int             i_extra_languages;    /**< length in bytes of extra language data pointer */
+    extra_languages_t *p_extra_languages; /**< extra language data needed by some decoders */
 
-    audio_format_t  audio;
-    audio_replay_gain_t audio_replay_gain;
-    video_format_t video;
-    subs_format_t  subs;
+    audio_format_t  audio;    /**< description of audio format */
+    audio_replay_gain_t audio_replay_gain; /*< audio replay gain information */
+    video_format_t video;     /**< description of video format */
+    subs_format_t  subs;      /**< description of subtitle format */
 
-    unsigned int   i_bitrate;
+    unsigned int   i_bitrate; /**< bitrate of this ES */
 
-    bool     b_packetized; /* wether the data is packetized
-                                    (ie. not truncated) */
-    int     i_extra;
-    void    *p_extra;
+    bool     b_packetized;  /**< wether the data is packetized (ie. not truncated) */
+    int     i_extra;        /**< length in bytes of extra data pointer */
+    void    *p_extra;       /**< extra data needed by some decoders or muxers */
 
 };
 
-/* ES Categories */
+/** ES Categories */
 enum es_format_category_e
 {
     UNKNOWN_ES = 0x00,
@@ -271,4 +289,3 @@ VLC_EXPORT( int, es_format_Copy, ( es_format_t *p_dst, const es_format_t *p_src 
 VLC_EXPORT( void, es_format_Clean, ( es_format_t *fmt ) );
 
 #endif
-
