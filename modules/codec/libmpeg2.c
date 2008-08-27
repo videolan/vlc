@@ -466,8 +466,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->p_info->discard_fbuf &&
                 p_sys->p_info->discard_fbuf->id )
             {
-                p_dec->pf_picture_unlink( p_dec,
-                                          p_sys->p_info->discard_fbuf->id );
+
+                picture_t *p_old = p_sys->p_info->discard_fbuf->id;
+
+                if( p_old->i_status == RESERVED_PICTURE && p_old->date == 0 )
+                    p_dec->pf_vout_buffer_del( p_dec, p_old );
+                else
+                    p_dec->pf_picture_unlink( p_dec, p_old );
             }
 
             /* For still frames */
