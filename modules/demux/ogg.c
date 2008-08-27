@@ -212,6 +212,8 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_bitrate = 0;
@@ -549,7 +551,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
     if( p_stream->b_force_backup )
     {
-        uint8_t *p_extra;
+        uint8_t *p_sav;
         bool b_store_size = true;
         bool b_store_num_headers = false;
 
@@ -593,35 +595,48 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
         /* Backup the ogg packet (likely an header packet) */
         p_stream->p_headers =
-            realloc( p_stream->p_headers, p_stream->i_headers +
+            realloc( p_sav = p_stream->p_headers, p_stream->i_headers +
                      p_oggpacket->bytes + (b_store_size ? 2 : 0) + (b_store_num_headers ? 1 : 0) );
-        p_extra = p_stream->p_headers + p_stream->i_headers;
-        if( b_store_num_headers )
+        if( p_stream->p_headers )
         {
-            /* Kate streams store the number of headers in the first header,
-               so we can't just test for 3 as Vorbis/Theora */
-            *(p_extra++) = p_stream->i_kate_num_headers;
-        }
-        if( b_store_size )
-        {
-            *(p_extra++) = p_oggpacket->bytes >> 8;
-            *(p_extra++) = p_oggpacket->bytes & 0xFF;
-        }
-        memcpy( p_extra, p_oggpacket->packet, p_oggpacket->bytes );
-        p_stream->i_headers += p_oggpacket->bytes + (b_store_size ? 2 : 0) + (b_store_num_headers ? 1 : 0);
+            uint8_t *p_extra = p_stream->p_headers + p_stream->i_headers;
 
-        if( !p_stream->b_force_backup )
-        {
-            /* Last header received, commit changes */
-            p_stream->fmt.i_extra = p_stream->i_headers;
-            p_stream->fmt.p_extra =
-                realloc( p_stream->fmt.p_extra, p_stream->i_headers );
-            memcpy( p_stream->fmt.p_extra, p_stream->p_headers,
-                    p_stream->i_headers );
+            if( b_store_num_headers )
+            {
+                /* Kate streams store the number of headers in the first header,
+                   so we can't just test for 3 as Vorbis/Theora */
+                *(p_extra++) = p_stream->i_kate_num_headers;
+            }
+            if( b_store_size )
+            {
+                *(p_extra++) = p_oggpacket->bytes >> 8;
+                *(p_extra++) = p_oggpacket->bytes & 0xFF;
+            }
+            memcpy( p_extra, p_oggpacket->packet, p_oggpacket->bytes );
+            p_stream->i_headers += p_oggpacket->bytes + (b_store_size ? 2 : 0) + (b_store_num_headers ? 1 : 0);
 
-            if( Ogg_LogicalStreamResetEsFormat( p_demux, p_stream ) )
-                es_out_Control( p_demux->out, ES_OUT_SET_FMT,
-                                p_stream->p_es, &p_stream->fmt );
+            if( !p_stream->b_force_backup )
+            {
+                /* Last header received, commit changes */
+                free( p_stream->fmt.p_extra );
+
+                p_stream->fmt.i_extra = p_stream->i_headers;
+                p_stream->fmt.p_extra =
+                    realloc( p_stream->fmt.p_extra, p_stream->i_headers );
+                if( p_stream->fmt.p_extra )
+                    memcpy( p_stream->fmt.p_extra, p_stream->p_headers,
+                            p_stream->i_headers );
+                else
+                    p_stream->fmt.i_extra = 0;
+
+                if( Ogg_LogicalStreamResetEsFormat( p_demux, p_stream ) )
+                    es_out_Control( p_demux->out, ES_OUT_SET_FMT,
+                                    p_stream->p_es, &p_stream->fmt );
+            }
+        }
+        else
+        {
+                p_stream->p_headers = p_sav;
         }
 
         b_selected = false; /* Discard the header packet */
@@ -812,12 +827,22 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
              * We found the beginning of our first logical stream. */
             while( ogg_page_bos( &oggpage ) )
             {
+                logical_stream_t **pp_sav = p_ogg->pp_stream;
+
                 p_ogg->i_streams++;
                 p_ogg->pp_stream =
                     realloc( p_ogg->pp_stream, p_ogg->i_streams *
                              sizeof(logical_stream_t *) );
+                if( !p_ogg->pp_stream )
+                {
+                    p_ogg->pp_stream = pp_sav;
+                    p_ogg->i_streams--;
+                    return VLC_ENOMEM;
+                }
 
                 p_stream = malloc( sizeof(logical_stream_t) );
+                if( !p_stream )
+                    return VLC_ENOMEM;
                 memset( p_stream, 0, sizeof(logical_stream_t) );
                 p_stream->p_headers = 0;
                 p_stream->secondary_header_packets = 0;
@@ -1004,12 +1029,15 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream->fmt.i_cat = AUDIO_ES;
 
                         i_extra_size = GetWLE((oggpacket.packet+140));
-                        if( i_extra_size )
+                        if( i_extra_size > 0 && i_extra_size < oggpacket.bytes - 142 )
                         {
                             p_stream->fmt.i_extra = i_extra_size;
                             p_stream->fmt.p_extra = malloc( i_extra_size );
-                            memcpy( p_stream->fmt.p_extra,
-                                    oggpacket.packet + 142, i_extra_size );
+                            if( p_stream->fmt.p_extra )
+                                memcpy( p_stream->fmt.p_extra,
+                                        oggpacket.packet + 142, i_extra_size );
+                            else
+                                p_stream->fmt.i_extra = 0;
                         }
 
                         i_format_tag = GetWLE((oggpacket.packet+124));
@@ -1104,14 +1132,16 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
 
-                        p_stream->fmt.i_extra = GetQWLE(&st->size) -
-                            sizeof(stream_header);
-                        if( p_stream->fmt.i_extra )
+                        p_stream->fmt.i_extra = GetQWLE(&st->size) - sizeof(stream_header);
+                        if( p_stream->fmt.i_extra > 0 &&
+                            p_stream->fmt.i_extra < oggpacket.bytes - 1 - sizeof(stream_header) )
                         {
-                            p_stream->fmt.p_extra =
-                                malloc( p_stream->fmt.i_extra );
-                            memcpy( p_stream->fmt.p_extra, st + 1,
-                                    p_stream->fmt.i_extra );
+                            p_stream->fmt.p_extra = malloc( p_stream->fmt.i_extra );
+                            if( p_stream->fmt.p_extra )
+                                memcpy( p_stream->fmt.p_extra, st + 1,
+                                        p_stream->fmt.i_extra );
+                            else
+                                p_stream->fmt.i_extra = 0;
                         }
 
                         memcpy( p_buffer, st->subtype, 4 );
