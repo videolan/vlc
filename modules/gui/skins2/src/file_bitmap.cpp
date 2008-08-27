@@ -39,7 +39,7 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
     video_format_t fmt_in = {0}, fmt_out = {0};
     picture_t *pPic;
 
-    fmt_out.i_chroma = VLC_FOURCC('R','V','3','2');
+    fmt_out.i_chroma = VLC_FOURCC('R','G','B','A');
 
     pPic = image_ReadUrl( pImageHandler, fileName.c_str(), &fmt_in, &fmt_out );
     if( !pPic ) return;
@@ -55,13 +55,14 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
     {
         for( int x = 0; x < m_width; x++ )
         {
-            uint32_t b = *(pSrc++);
-            uint32_t g = *(pSrc++);
-            uint32_t r = *(pSrc++);
-            uint8_t a = *(pSrc++);
-            *(pData++) = (b * a) >> 8;
-            *(pData++) = (g * a) >> 8;
-            *(pData++) = (r * a) >> 8;
+            uint32_t r = *pSrc++;
+            uint32_t g = *pSrc++;
+            uint32_t b = *pSrc++;
+            uint8_t  a = *pSrc++;
+
+            *(pData++) = b * a / 255;
+            *(pData++) = g * a / 255;
+            *(pData++) = r * a / 255;
 
             // Transparent pixel ?
             if( aColor == (r<<16 | g<<8 | b) )
