@@ -1387,7 +1387,7 @@ void* update_CheckReal( vlc_object_t* p_this )
     bool b_ret;
     int canc;
 
-    vlc_savecancel (&canc);
+    canc = vlc_savecancel ();
     vlc_mutex_lock( &p_uct->p_update->lock );
 
     EmptyRelease( p_uct->p_update );
