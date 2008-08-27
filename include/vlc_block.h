@@ -79,6 +79,9 @@ typedef struct block_sys_t block_sys_t;
 /** This block is corrupted and/or there is data loss  */
 #define BLOCK_FLAG_CORRUPTED     0x1000
 
+#define BLOCK_FLAG_TYPE_MASK \
+    (BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B|BLOCK_FLAG_TYPE_PB)
+
 #define BLOCK_FLAG_PRIVATE_MASK  0xffff0000
 #define BLOCK_FLAG_PRIVATE_SHIFT 16
 
