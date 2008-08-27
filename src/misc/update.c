@@ -1659,7 +1659,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
         utf8_unlink( psz_destfile );
         intf_UserFatal( p_udt, true, _("File not verifiable"),
             _("It was not possible to securely verify the downloaded file"
-              " \"%s\". Thus, it was VLC deleted."),
+              " \"%s\". Thus, it was deleted."),
             psz_destfile );
 
         goto end;
