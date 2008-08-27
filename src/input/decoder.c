@@ -446,11 +446,11 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     if( p_dec == NULL )
         return NULL;
 
-    p_dec->pf_decode_audio = 0;
-    p_dec->pf_decode_video = 0;
-    p_dec->pf_decode_sub = 0;
-    p_dec->pf_get_cc = 0;
-    p_dec->pf_packetize = 0;
+    p_dec->pf_decode_audio = NULL;
+    p_dec->pf_decode_video = NULL;
+    p_dec->pf_decode_sub = NULL;
+    p_dec->pf_get_cc = NULL;
+    p_dec->pf_packetize = NULL;
 
     /* Initialize the decoder fifo */
     p_dec->p_module = NULL;
@@ -605,7 +605,7 @@ static void* DecoderThread( vlc_object_t *p_this )
      * same thread than open()/decode() */
     module_Unneed( p_dec, p_dec->p_module );
 
-    return 0;
+    return NULL;
 }
 
 static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
@@ -901,7 +901,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         block_t *p_sout_block;
 
         while( ( p_sout_block =
-                     p_dec->pf_packetize( p_dec, p_block ? &p_block : 0 ) ) )
+                     p_dec->pf_packetize( p_dec, p_block ? &p_block : NULL ) ) )
         {
             if( !p_dec->p_owner->p_sout_input )
             {
@@ -1124,7 +1124,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 #undef p_pic
 
         /* We are about to die. Reattach video output to p_vlc. */
-        vout_Request( p_dec, p_dec->p_owner->p_vout, 0 );
+        vout_Request( p_dec, p_dec->p_owner->p_vout, NULL );
     }
 
 #ifdef ENABLE_SOUT
