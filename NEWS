@@ -1,5 +1,5 @@
-Changes between 0.9.1 and 1.0.0:
----------------------------------
+Changes between 0.9.1 and 1.0.0-git:
+------------------------------------
 
 Decoders:
  * AES3 (SMPTE 302M) support
