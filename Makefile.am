@@ -668,6 +668,9 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 # the same setup as the maintaner(s).
 #
 
+############################################################################
+## Win                                                                    ##
+############################################################################
 win32_destdir=$(top_builddir)/vlc-$(VERSION)
 win32_lua_destdir=$(win32_destdir)/lua
 win32_http_destdir=$(win32_destdir)/http
@@ -908,9 +911,18 @@ package-win32-base-zip: package-win32-base
 	rm -f -- vlc-$(VERSION)-win32.zip
 	zip -r -9 vlc-$(VERSION)-win32.zip vlc-$(VERSION)
 
+package-win32-base-debug-zip: package-win32-base-debug
+# Create package
+	rm -f -- vlc-$(VERSION)-win32-debug.zip
+	zip -r -9 vlc-$(VERSION)-win32-debug.zip vlc-$(VERSION)
+
 package-win32-base-7zip: package-win32-base
 # Create package 
 	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$(VERSION)-win32.7z vlc-$(VERSION)
+
+package-win32-base-debug-7zip: package-win32-base-debug
+# Create package
+	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$(VERSION)-win32-debug.7z vlc-$(VERSION)
 
 package-win32-exe: package-win32-base package-win32-base-exe
 # Clean up
@@ -920,13 +932,25 @@ package-win32-zip: package-win32-base-zip
 # Clean up
 	rm -Rf $(win32_destdir)
 
+package-win32-debug-zip: package-win32-base-debug-zip
+# Clean up
+	rm -Rf $(win32_destdir)
+
 package-win32-7zip: package-win32-base-7zip
+# Clean up
+	rm -Rf $(win32_destdir)
+
+package-win32-debug-7zip: package-win32-base-debug-7zip
 # Clean up
 	rm -Rf $(win32_destdir)
 
 package-win32-no-clean: package-win32-base-zip package-win32-base-7zip package-win32-base-exe 
 
 package-win32: package-win32-no-clean
+# Clean up
+	rm -Rf $(win32_destdir)
+
+package-win32-debug: package-win32-base-debug-zip package-win32-base-debug-7zip
 # Clean up
 	rm -Rf $(win32_destdir)
 
@@ -941,6 +965,9 @@ package-wince: package-wince-base  package-wince-base-zip
 	rm -Rf $(win32_destdir)
 
 
+#####################################################################
+##   BeOS                                                          ##
+#####################################################################
 package-beos:
 # Check that tmp isn't in the way
 	@if test -e $(srcdir)/tmp; then \
@@ -976,6 +1003,9 @@ package-beos:
 # Clean up
 	rm -Rf $(srcdir)/tmp
 
+#########################################################################
+## MacOS X                                                             ##
+#########################################################################
 package-macosx: VLC-release.app ChangeLog
 # Check that the temporary location isn't in the way
 	@if test -e "$(top_builddir)/vlc-$(VERSION)/"; then \
