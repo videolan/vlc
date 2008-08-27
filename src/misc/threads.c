@@ -527,19 +527,30 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
 
     if (hThread)
     {
+        /* Thread closes the handle when exiting, duplicate it here
+         * to be on the safe side when joining. */
+        if (!DuplicateHandle (GetCurrentProcess (), hThread,
+                              GetCurrentProcess (), &th->handle, 0, FALSE,
+                              DUPLICATE_SAME_ACCESS))
+        {
+            CloseHandle (hThread);
+            free (th);
+            return ENOMEM;
+        }
+
         ResumeThread (hThread);
         th->handle = hThread;
         if (priority)
             SetThreadPriority (hThread, priority);
+
         ret = 0;
+        *p_handle = th;
     }
     else
     {
         ret = errno;
         free (th);
-        th = NULL;
     }
-    *p_handle = th;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     *p_handle = spawn_thread( entry, psz_name, priority, data );
@@ -561,19 +572,8 @@ int vlc_join (vlc_thread_t handle, void **result)
     return pthread_join (handle, result);
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    HANDLE hThread;
-
-    /*
-    ** object will close its thread handle when destroyed, duplicate it here
-    ** to be on the safe side
-    */
-    if (!DuplicateHandle (GetCurrentProcess (), handle->handle,
-                          GetCurrentProcess(), &hThread, 0, FALSE,
-                          DUPLICATE_SAME_ACCESS))
-        return GetLastError (); /* FIXME: errno */
-
-    WaitForSingleObject (hThread, INFINITE);
-    CloseHandle (hThread);
+    WaitForSingleObject (handle->handle, INFINITE);
+    CloseHandle (handle->handle);
     if (result)
         *result = handle->data;
     free (handle);
