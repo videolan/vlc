@@ -18808,7 +18808,7 @@ msgstr "Панк"
 
 #: modules/meta_engine/id3genres.h:72
 msgid "Space"
-msgstr "Космос"
+msgstr "Пробел"
 
 #: modules/meta_engine/id3genres.h:73
 msgid "Meditative"
