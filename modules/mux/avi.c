@@ -474,7 +474,9 @@ static int Mux      ( sout_mux_t *p_mux )
             /* add idx1 entry for this frame */
             p_idx = &p_sys->idx1.entry[p_sys->idx1.i_entry_count];
             memcpy( p_idx->fcc, p_stream->fcc, 4 );
-            p_idx->i_flags = AVIIF_KEYFRAME;
+            p_idx->i_flags = 0;
+            if( ( p_data->i_flags & BLOCK_FLAG_TYPE_MASK ) == 0 || ( p_data->i_flags & BLOCK_FLAG_TYPE_I ) )
+                p_idx->i_flags = AVIIF_KEYFRAME;
             p_idx->i_pos   = p_sys->i_movi_size + 4;
             p_idx->i_length= p_data->i_buffer;
             p_sys->idx1.i_entry_count++;
