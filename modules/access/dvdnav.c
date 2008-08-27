@@ -1143,7 +1143,10 @@ static void ESNew( demux_t *p_demux, int i_id )
     {
         switch( p_sys->i_aspect )
         {
-        /* XXX We need the video size to support it */
+        case 1: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR; break;
+        case 2: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 4 / 3; break;
+        case 3: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 16 / 9; break;
+        case 4: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 221 / 10; break;
         default:
             tk->fmt.video.i_aspect = 0;
             break;
