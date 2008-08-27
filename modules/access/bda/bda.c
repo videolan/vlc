@@ -97,14 +97,14 @@ static const char *const ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
 #define SRATE_LONGTEXT ""
 
 #define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (kHz)")
-#define LNB_LOF1_LONGTEXT N_("Low Band Local Osc Freq in kHz usually 9.75GHz")
+#define LNB_LOF1_LONGTEXT N_("Low Band Local Osc Freq in kHz (usually 9.75GHz)")
 
 #define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (kHz)")
-#define LNB_LOF2_LONGTEXT N_("High Band Local Osc Freq in kHz usually 10.6GHz")
+#define LNB_LOF2_LONGTEXT N_("High Band Local Osc Freq in kHz (usually 10.6GHz)")
 
 #define LNB_SLOF_TEXT N_("Antenna lnb_slof (kHz)")
 #define LNB_SLOF_LONGTEXT N_( \
-    "Low Noise Block switch freq in kHz usually 11.7GHz")
+    "Low Noise Block switch freq in kHz (usually 11.7GHz)")
 
 /* Cable */
 #define MODULATION_TEXT N_("Modulation type")
