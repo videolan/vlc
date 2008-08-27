@@ -1359,7 +1359,7 @@ static void BlendRGBAI420( filter_t *p_filter, picture_t *p_dst,
     i_src_pix_pitch = p_src->p->i_pixel_pitch;
     i_src2_pitch = p_src->p->i_pitch;
     p_src2 = p_src->p->p_pixels +
-             p_filter->fmt_in.video.i_x_offset * i_src2_pitch +
+             p_filter->fmt_in.video.i_x_offset * i_src_pix_pitch +
              p_src->p->i_pitch * p_filter->fmt_in.video.i_y_offset;
 
 
@@ -1424,7 +1424,7 @@ static void BlendRGBAR24( filter_t *p_filter, picture_t *p_dst_pic,
     i_src_pix_pitch = p_src->p->i_pixel_pitch;
     i_src2_pitch = p_src->p->i_pitch;
     p_src2 = p_src->p->p_pixels +
-             p_filter->fmt_in.video.i_x_offset * i_pix_pitch +
+             p_filter->fmt_in.video.i_x_offset * i_src_pix_pitch +
              p_src->p->i_pitch * p_filter->fmt_in.video.i_y_offset;
 
     vlc_rgb_index( &i_rindex, &i_gindex, &i_bindex, &p_filter->fmt_out.video );
@@ -1477,7 +1477,7 @@ static void BlendRGBAR16( filter_t *p_filter, picture_t *p_dst_pic,
     i_src_pix_pitch = p_src->p->i_pixel_pitch;
     i_src2_pitch = p_src->p->i_pitch;
     p_src2 = p_src->p->p_pixels +
-             p_filter->fmt_in.video.i_x_offset * i_pix_pitch +
+             p_filter->fmt_in.video.i_x_offset * i_src_pix_pitch +
              p_src->p->i_pitch * p_filter->fmt_in.video.i_y_offset;
 
     /* Draw until we reach the bottom of the subtitle */
