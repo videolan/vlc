@@ -638,7 +638,7 @@ char *str_format_time( const char *tformat )
                         d += len;                                   \
                         free( string );                             \
                     }                                               \
-                    else                                            \
+                    else if( !b_empty_if_na )                       \
                     {                                               \
                         *(dst+d) = '-';                             \
                         d++;                                        \
@@ -655,8 +655,8 @@ char *str_format_time( const char *tformat )
 char *__str_format_meta( vlc_object_t *p_object, const char *string )
 {
     const char *s = string;
-    int b_is_format = 0;
-    int b_empty_if_na = 0;
+    bool b_is_format = false;
+    bool b_empty_if_na = false;
     char buf[10];
     int i_size = strlen( string ) + 1; /* +1 to store '\0' */
     char *dst = strdup( string );
@@ -938,7 +938,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     break;
 
                 case ' ':
-                    b_empty_if_na = 1;
+                    b_empty_if_na = true;
                     break;
 
                 default:
@@ -947,12 +947,12 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     break;
             }
             if( *s != ' ' )
-                b_is_format = 0;
+                b_is_format = false;
         }
         else if( *s == '$' )
         {
-            b_is_format = 1;
-            b_empty_if_na = 0;
+            b_is_format = true;
+            b_empty_if_na = false;
         }
         else
         {
