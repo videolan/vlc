@@ -38,12 +38,6 @@
 
 #include <vlc_codec_synchro.h>
 
-/* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
-#define AR_SQUARE_PICTURE       1                           /* square pixels */
-#define AR_4_3_PICTURE          2                        /* 4:3 picture (TV) */
-#define AR_16_9_PICTURE         3              /* 16:9 picture (wide screen) */
-#define AR_221_1_PICTURE        4                  /* 2.21:1 picture (movie) */
-
 /*****************************************************************************
  * decoder_sys_t : libmpeg2 decoder descriptor
  *****************************************************************************/
@@ -633,31 +627,6 @@ static void GetAR( decoder_t *p_dec )
     if( p_dec->fmt_in.video.i_aspect )
     {
         p_sys->i_aspect = p_dec->fmt_in.video.i_aspect;
-        if( p_sys->i_aspect <= AR_221_1_PICTURE )
-        switch( p_sys->i_aspect )
-        {
-        case AR_4_3_PICTURE:
-            p_sys->i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
-            p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 4;
-            p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 3;
-            break;
-        case AR_16_9_PICTURE:
-            p_sys->i_aspect = VOUT_ASPECT_FACTOR * 16 / 9;
-            p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 16;
-            p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 9;
-            break;
-        case AR_221_1_PICTURE:
-            p_sys->i_aspect = VOUT_ASPECT_FACTOR * 221 / 100;
-            p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 221;
-            p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 100;
-            break;
-        case AR_SQUARE_PICTURE:
-            p_sys->i_aspect = VOUT_ASPECT_FACTOR *
-                           p_sys->p_info->sequence->picture_width /
-                           p_sys->p_info->sequence->picture_height;
-            p_sys->i_sar_num = p_sys->i_sar_den = 1;
-            break;
-        }
     }
     else
     {
