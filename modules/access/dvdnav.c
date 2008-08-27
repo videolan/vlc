@@ -166,6 +166,8 @@ static int ProbeDVD( demux_t *, char * );
 
 static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 
+static int ControlInternal( demux_t *, int, ... );
+
 /*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
@@ -566,6 +568,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
 }
 
+static int ControlInternal( demux_t *p_demux, int i_query, ... )
+{
+    va_list args;
+    int     i_result;
+
+    va_start( args, i_query );
+    i_result = Control( p_demux, i_query, args );
+    va_end( args );
+
+    return i_result;
+}
 /*****************************************************************************
  * Demux:
  *****************************************************************************/
@@ -588,6 +601,11 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "cannot get next block (%s)",
                   dvdnav_err_to_string( p_sys->dvdnav ) );
+        if( p_demux->info.i_title == 0 )
+        {
+            msg_Dbg( p_demux, "jumping to first title" );
+            return ControlInternal( p_demux, DEMUX_SET_TITLE, 1 ) == VLC_SUCCESS ? 1 : -1;
+        }
         return -1;
     }
 
