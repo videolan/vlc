@@ -61,7 +61,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Make VLC buffer audio data capturer from jack for the specified " \
+    "Make VLC buffer audio data captured from jack for the specified " \
     "length in milliseconds." )
 #define PACE_TEXT N_( "Pace" )
 #define PACE_LONGTEXT N_( \
