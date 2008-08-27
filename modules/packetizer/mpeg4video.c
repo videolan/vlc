@@ -403,6 +403,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     {
         /* We are dealing with a VOP */
         p_pic = block_ChainGather( p_sys->p_frame );
+        p_pic->i_flags = p_sys->i_flags;
         p_pic->i_pts = p_sys->i_interpolated_pts;
         p_pic->i_dts = p_sys->i_interpolated_dts;
 
