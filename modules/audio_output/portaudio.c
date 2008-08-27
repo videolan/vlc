@@ -77,15 +77,10 @@ struct aout_sys_t
     uint32_t i_channels;
 };
 
-static const uint32_t pi_channels_in[] =
-    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-      AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
 static const uint32_t pi_channels_out[] =
     { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
       AOUT_CHAN_CENTER, AOUT_CHAN_LFE,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
       AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, 0 };
 
 #ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
@@ -515,7 +510,7 @@ static int PAOpenStream( aout_instance_t *p_aout )
     p_aout->output.p_sys->i_channels = i_channels;
 
     p_aout->output.p_sys->b_chan_reorder =
-        aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+        aout_CheckChannelReorder( NULL, pi_channels_out,
                                   i_channel_mask, i_channels,
                                   p_aout->output.p_sys->pi_chan_table );
 

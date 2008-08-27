@@ -537,7 +537,13 @@ int aout_CheckChannelReorder( const uint32_t *pi_chan_order_in,
     bool b_chan_reorder = false;
     int i, j, k, l;
 
-    if( i_channels > AOUT_CHAN_MAX ) return false;
+    if( i_channels > AOUT_CHAN_MAX )
+        return false;
+
+    if( pi_chan_order_in == NULL )
+        pi_chan_order_in = pi_vlc_chan_order_wg4;
+    if( pi_chan_order_out == NULL )
+        pi_chan_order_out = pi_vlc_chan_order_wg4;
 
     for( i = 0, j = 0; pi_chan_order_in[i]; i++ )
     {

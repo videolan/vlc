@@ -356,6 +356,17 @@ struct aout_instance_t
     aout_output_t           output;
 };
 
+/**
+ * It describes the audio channel order VLC except.
+ */
+static const uint32_t pi_vlc_chan_order_wg4[] =
+{
+    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+    AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+    AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
+    AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0
+};
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
@@ -369,7 +380,13 @@ VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, uint32_t ) );
 
 VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, bool ) );
 
-VLC_EXPORT( int, aout_CheckChannelReorder, ( const uint32_t *, const uint32_t *, uint32_t, int, int * ) );
+/**
+ * This function computes the reordering needed to go from pi_chan_order_in to
+ * pi_chan_order_out.
+ * If pi_chan_order_in or pi_chan_order_out is NULL, it will assume that vlc
+ * internal (WG4) order is requested.
+ */
+VLC_EXPORT( int, aout_CheckChannelReorder, ( const uint32_t *pi_chan_order_in, const uint32_t *pi_chan_order_out, uint32_t i_channel_mask, int i_channels, int *pi_chan_table ) );
 VLC_EXPORT( void, aout_ChannelReorder, ( uint8_t *, int, int, const int *, int ) );
 
 VLC_EXPORT( unsigned int, aout_FormatNbChannels, ( const audio_sample_format_t * p_format ) );

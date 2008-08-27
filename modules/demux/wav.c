@@ -84,18 +84,13 @@ static void FrameInfo_PCM      ( demux_t *, unsigned int *, int * );
 static const uint32_t pi_channels_src[] =
     { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
       WAVE_SPEAKER_FRONT_CENTER, WAVE_SPEAKER_LOW_FREQUENCY,
-      WAVE_SPEAKER_BACK_LEFT, WAVE_SPEAKER_BACK_RIGHT,
+      WAVE_SPEAKER_BACK_LEFT, WAVE_SPEAKER_BACK_RIGHT, WAVE_SPEAKER_BACK_CENTER,
       WAVE_SPEAKER_SIDE_LEFT, WAVE_SPEAKER_SIDE_RIGHT, 0 };
 static const uint32_t pi_channels_in[] =
     { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
       AOUT_CHAN_CENTER, AOUT_CHAN_LFE,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
       AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, 0 };
-static const uint32_t pi_channels_out[] =
-    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-      AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
 
 /*****************************************************************************
  * Open: check file and initializes structures
@@ -210,7 +205,7 @@ static int Open( vlc_object_t * p_this )
                 p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
 
             p_sys->b_chan_reorder =
-                aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+                aout_CheckChannelReorder( pi_channels_in, NULL,
                                           p_sys->i_channel_mask,
                                           p_sys->fmt.audio.i_channels,
                                           p_sys->pi_chan_table );

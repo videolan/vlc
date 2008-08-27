@@ -55,14 +55,13 @@ static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 static block_t *Convert( filter_t *, block_t * );
 
-/* libdca channel order */
+/* libdca channel order
+ * FIXME middle values should be checked */
 static const uint32_t pi_channels_in[] =
-{ AOUT_CHAN_CENTER, AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_LFE, 0 };
-/* our internal channel order (WG-4 order) */
-static const uint32_t pi_channels_out[] =
-{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-  AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
+{ AOUT_CHAN_LFE, AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,
+  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARCENTER, AOUT_CHAN_REARRIGHT,
+  AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+  0 };
 
 /*****************************************************************************
  * Local structures
@@ -223,7 +222,7 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
         return VLC_EGENERIC;
     }
 
-    aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+    aout_CheckChannelReorder( pi_channels_in, NULL,
                               output.i_physical_channels & AOUT_CHAN_PHYSMASK,
                               p_sys->i_nb_channels,
                               p_sys->pi_chan_table );

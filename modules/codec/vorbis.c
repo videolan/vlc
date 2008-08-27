@@ -132,11 +132,6 @@ static const uint32_t pi_4channels_in[] =
 static const uint32_t pi_3channels_in[] =
 { AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT, 0 };
 
-/* our internal channel order (WG-4 order) */
-static const uint32_t pi_channels_out[] =
-{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-  AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
-
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
@@ -736,12 +731,12 @@ static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i
     }
 
     if( b_decode )
-        aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+        aout_CheckChannelReorder( pi_channels_in, NULL,
                                   i_channel_mask & AOUT_CHAN_PHYSMASK,
                                   i_channels,
                                   pi_chan_table );
     else
-        aout_CheckChannelReorder( pi_channels_out, pi_channels_in,
+        aout_CheckChannelReorder( NULL, pi_channels_in,
                                   i_channel_mask & AOUT_CHAN_PHYSMASK,
                                   i_channels,
                                   pi_chan_table );
