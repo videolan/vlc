@@ -227,6 +227,14 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     char *psz_parser;
     char *psz_name;
 
+    if( i_width <= 0 || i_height <= 0 || i_aspect <= 0 )
+        return NULL;
+
+    vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,
+                 p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
+    if( p_fmt->i_sar_num <= 0 || p_fmt->i_sar_den <= 0 )
+        return NULL;
+
     /* Allocate descriptor */
     static const char typename[] = "video output";
     p_vout = vlc_custom_create( p_parent, sizeof( *p_vout ), VLC_OBJECT_VOUT,
@@ -251,8 +259,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* Initialize the rendering heap */
     I_RENDERPICTURES = 0;
 
-    vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,
-                 p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
     p_vout->fmt_render        = *p_fmt;   /* FIXME palette */
     p_vout->fmt_in            = *p_fmt;   /* FIXME palette */
 

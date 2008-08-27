@@ -471,20 +471,22 @@ void vout_PlacePicture( vout_thread_t *p_vout,
         *pi_height = __MIN( i_height, p_vout->fmt_in.i_visible_height );
     }
 
-    if( p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *
-        *pi_height / p_vout->fmt_in.i_visible_height /
-        p_vout->fmt_in.i_sar_den > *pi_width )
+     int64_t i_scaled_width = p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *
+                              *pi_height / p_vout->fmt_in.i_visible_height / p_vout->fmt_in.i_sar_den;
+     int64_t i_scaled_height = p_vout->fmt_in.i_visible_height * (int64_t)p_vout->fmt_in.i_sar_den *
+                               *pi_width / p_vout->fmt_in.i_visible_width / p_vout->fmt_in.i_sar_num;
+
+    if( i_scaled_width <= 0 || i_scaled_height <= 0 )
     {
-        *pi_height = p_vout->fmt_in.i_visible_height *
-            (int64_t)p_vout->fmt_in.i_sar_den * *pi_width /
-            p_vout->fmt_in.i_visible_width / p_vout->fmt_in.i_sar_num;
+        msg_Warn( p_vout, "ignoring broken aspect ratio" );
+        i_scaled_width = *pi_width;
+        i_scaled_height = *pi_height;
     }
+
+    if( i_scaled_width > *pi_width )
+        *pi_height = i_scaled_height;
     else
-    {
-        *pi_width = p_vout->fmt_in.i_visible_width *
-            (int64_t)p_vout->fmt_in.i_sar_num * *pi_height /
-            p_vout->fmt_in.i_visible_height / p_vout->fmt_in.i_sar_den;
-    }
+        *pi_width = i_scaled_width;
 
     switch( p_vout->i_alignment & VOUT_ALIGN_HMASK )
     {
