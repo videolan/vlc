@@ -595,6 +595,9 @@ void vlc_cancel (vlc_thread_t thread_id)
 
 /**
  * Waits for a thread to complete (if needed), and destroys it.
+ * This is a cancellation point; in case of cancellation, the join does _not_
+ * occur.
+ *
  * @param handle thread handle
  * @param p_result [OUT] pointer to write the thread return value or NULL
  * @return 0 on success, a standard error code otherwise.
@@ -605,7 +608,11 @@ int vlc_join (vlc_thread_t handle, void **result)
     return pthread_join (handle, result);
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    WaitForSingleObject (handle->handle, INFINITE);
+    do
+        vlc_testcancel ();
+    while (WaitForSingleObjectEx (handle->handle, INFINITE, TRUE)
+                                                        == WAIT_IO_COMPLETION);
+
     CloseHandle (handle->handle);
     if (result)
         *result = handle->data;
