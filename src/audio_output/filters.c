@@ -334,7 +334,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
 {
     int i;
 
-    for ( i = 0; i < i_nb_filters; i++ )
+    for( i = 0; i < i_nb_filters; i++ )
     {
         aout_filter_t * p_filter = pp_filters[i];
         aout_buffer_t * p_output_buffer;
@@ -343,25 +343,32 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
          * p_filter->output.i_rate / p_filter->input.i_rate) so we need
          * slightly bigger buffers. */
         aout_BufferAlloc( &p_filter->output_alloc,
-            ((mtime_t)(*pp_input_buffer)->i_nb_samples + 2)
-            * 1000000 / p_filter->input.i_rate,
-            *pp_input_buffer, p_output_buffer );
-        if ( p_output_buffer == NULL )
+                          ((mtime_t)(*pp_input_buffer)->i_nb_samples + 2)
+                          * 1000000 / p_filter->input.i_rate,
+                          *pp_input_buffer, p_output_buffer );
+        if( p_output_buffer == NULL )
             return;
+
         /* Please note that p_output_buffer->i_nb_samples & i_nb_bytes
          * shall be set by the filter plug-in. */
+        if( (*pp_input_buffer)->i_nb_samples > 0 )
+        {
+            p_filter->pf_do_work( p_aout, p_filter, *pp_input_buffer,
+                                  p_output_buffer );
+        }
+        else
+        {
+            p_output_buffer->i_nb_bytes = 0;
+            p_output_buffer->i_nb_samples = 0;
+        }
 
-        p_filter->pf_do_work( p_aout, p_filter, *pp_input_buffer,
-                              p_output_buffer );
-
-        if ( !p_filter->b_in_place )
+        if( !p_filter->b_in_place )
         {
             aout_BufferFree( *pp_input_buffer );
             *pp_input_buffer = p_output_buffer;
         }
-
-        if( p_output_buffer->i_nb_samples <= 0 )
-            break;
     }
+
+    assert( (*pp_input_buffer) == NULL || (*pp_input_buffer)->i_alloc_type != AOUT_ALLOC_STACK );
 }
 
