@@ -182,6 +182,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_dec->fmt_out.video.i_width = i_width;
     p_dec->fmt_out.video.i_height = i_height;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
+    p_dec->fmt_out.video.i_rmask = 0x000000ff;
+    p_dec->fmt_out.video.i_gmask = 0x0000ff00;
+    p_dec->fmt_out.video.i_bmask = 0x00ff0000;
 
     if( i_color_type == PNG_COLOR_TYPE_PALETTE )
         png_set_palette_to_rgb( p_png );
@@ -200,12 +203,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     else if( !(i_color_type & PNG_COLOR_MASK_ALPHA) )
     {
         p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','2','4');
-    }
-    if( i_color_type & PNG_COLOR_MASK_COLOR &&
-        p_dec->fmt_out.i_codec != VLC_FOURCC('R','V','2','4') )
-    {
-        /* Invert colors */
-        png_set_bgr( p_png );
     }
 
     /* Get a new picture */
