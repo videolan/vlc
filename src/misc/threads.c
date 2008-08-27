@@ -539,7 +539,6 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         }
 
         ResumeThread (hThread);
-        th->handle = hThread;
         if (priority)
             SetThreadPriority (hThread, priority);
 
