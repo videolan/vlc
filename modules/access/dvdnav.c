@@ -1143,7 +1143,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     {
         switch( p_sys->i_aspect )
         {
-            /* TODO Any docs somewhere ? */
+        /* XXX We need the video size to support it */
         default:
             tk->fmt.video.i_aspect = 0;
             break;
