@@ -528,7 +528,7 @@ static void OutputSend( sout_stream_t *p_stream, sout_stream_id_t *id, block_t *
                 id->b_wait_start = false;
             }
 
-            if( ( p_block->i_flags & (BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B|BLOCK_FLAG_TYPE_PB) ) == 0 )
+            if( ( p_block->i_flags & BLOCK_FLAG_TYPE_MASK ) == 0 )
                 id->b_wait_key = false;
         }
         if( id->b_wait_start )
