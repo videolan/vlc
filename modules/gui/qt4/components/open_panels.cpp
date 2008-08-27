@@ -232,7 +232,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     b_firstvcd = true;
     b_firstcdda = true;
 
-    ui.browseDiscButton->setToolTip( I_DEVICE_TOOLTIP );
+    ui.browseDiscButton->setToolTip( qtr( I_DEVICE_TOOLTIP ));
     ui.deviceCombo->setToolTip( I_DEVICE_TOOLTIP );
 
 #if WIN32 /* Disc drives probing for Windows */

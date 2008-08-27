@@ -849,13 +849,13 @@ void ControlsWidget::setNavigation( int navigation )
     {
         discFrame->hide();
     } else if( navigation == 1 ) {
-        prevSectionButton->setToolTip( qfu( HELP_PCH ) );
-        nextSectionButton->setToolTip( qfu( HELP_NCH ) );
+        prevSectionButton->setToolTip( qtr( HELP_PCH ) );
+        nextSectionButton->setToolTip( qtr( HELP_NCH ) );
         menuButton->show();
         discFrame->show();
     } else {
-        prevSectionButton->setToolTip( qfu( HELP_PCH ) );
-        nextSectionButton->setToolTip( qfu( HELP_NCH ) );
+        prevSectionButton->setToolTip( qtr( HELP_PCH ) );
+        nextSectionButton->setToolTip( qtr( HELP_NCH ) );
         menuButton->hide();
         discFrame->show();
     }
