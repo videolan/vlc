@@ -96,7 +96,7 @@ misc.cachedir(): Get the user's VLC cache directory.
 
 misc.datadir_list( name ): FIXME: write description ... or ditch function if it isn't usefull anymore, we have datadir and userdatadir :)
 
-misc.mdate(): Get the current date (in miliseconds).
+misc.mdate(): Get the current date (in milliseconds).
 
 misc.lock_and_wait(): Lock our object thread and wait for a wake up signal.
 misc.signal(): Wake up our object thread.
@@ -111,7 +111,7 @@ net.url_parse( url, [option delimiter] ): Parse URL. Returns a table with
   "option".
 net.listen_tcp( host, port ): Listen to TCP connections. This returns an
   object with an accept method. This method takes an optional timeout
-  argument (in miliseconds). For example:
+  argument (in milliseconds). For example:
 local l = vlc.net.listen_tcp( "localhost", 1234 )
 while true do
   local fd = l:accept( 500 )

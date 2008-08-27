@@ -336,7 +336,7 @@ static int ExecuteHelp( vlm_message_t **pp_status )
     MessageAddChild( "play [input_number]" );
     MessageAddChild( "pause" );
     MessageAddChild( "stop" );
-    MessageAddChild( "seek [+-](percentage) | [+-](seconds)s | [+-](miliseconds)ms" );
+    MessageAddChild( "seek [+-](percentage) | [+-](seconds)s | [+-](milliseconds)ms" );
 
     return VLC_SUCCESS;
 }

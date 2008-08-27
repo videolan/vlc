@@ -412,19 +412,19 @@ static const char *const ppsz_align_descriptions[] =
 #define VIDEO_TITLE_SHOW_LONGTEXT N_( \
     "Display the title of the video on top of the movie.")
 
-#define VIDEO_TITLE_TIMEOUT_TEXT N_("Show video title for x miliseconds")
+#define VIDEO_TITLE_TIMEOUT_TEXT N_("Show video title for x milliseconds")
 #define VIDEO_TITLE_TIMEOUT_LONGTEXT N_( \
-    "Show the video title for n miliseconds, default is 5000 ms (5 sec.)")
+    "Show the video title for n milliseconds, default is 5000 ms (5 sec.)")
 
 #define VIDEO_TITLE_POSITION_TEXT N_("Position of video title")
 #define VIDEO_TITLE_POSITION_LONGTEXT N_( \
     "Place on video where to display the title (default bottom center).")
 
 #define MOUSE_HIDE_TIMEOUT_TEXT N_("Hide cursor and fullscreen " \
-                                   "controller after x miliseconds")
+                                   "controller after x milliseconds")
 #define MOUSE_HIDE_TIMEOUT_LONGTEXT N_( \
     "Hide mouse cursor and fullscreen controller after " \
-    "n miliseconds, default is 3000 ms (3 sec.)")
+    "n milliseconds, default is 3000 ms (3 sec.)")
 
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *const ppsz_pos_descriptions[] =

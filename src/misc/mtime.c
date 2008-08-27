@@ -265,7 +265,7 @@ mtime_t mdate( void )
     }
     else
     {
-        /* Fallback on timeGetTime() which has a milisecond resolution
+        /* Fallback on timeGetTime() which has a millisecond resolution
          * (actually, best case is about 5 ms resolution)
          * timeGetTime() only returns a DWORD thus will wrap after
          * about 49.7 days so we try to detect the wrapping. */

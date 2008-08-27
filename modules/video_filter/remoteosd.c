@@ -282,7 +282,7 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_this, RMTOSD_CFG "alpha" );
 
-    /* in miliseconds, 0 disables polling, should not be lower than 100 */
+    /* in milliseconds, 0 disables polling, should not be lower than 100 */
     p_sys->i_vnc_poll_interval  = var_CreateGetIntegerCommand( p_this,
                                                        RMTOSD_CFG "update" );
     if ( p_sys->i_vnc_poll_interval < 100)

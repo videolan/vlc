@@ -116,7 +116,7 @@ const double RTMP_DEFAULT_STREAM_SERVER_ID = 1.0;
 /* misc */
 const uint16_t MAX_EMPTY_BLOCKS = 200; /* empty blocks in fifo for media*/
 const uint16_t RTMP_BODY_SIZE_ALLOC = 1024;
-const uint32_t RTMP_TIME_CLIENT_BUFFER = 2000; /* miliseconds */
+const uint32_t RTMP_TIME_CLIENT_BUFFER = 2000; /* milliseconds */
 const uint32_t RTMP_SERVER_BW = 0x00000200;
 const uint32_t RTMP_SRC_DST_CONNECT_OBJECT = 0x00000000;
 const uint32_t RTMP_SRC_DST_CONNECT_OBJECT2 = 0x00000001;

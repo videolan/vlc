@@ -999,7 +999,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     else if( p_stream->i_cat == SPU_ES )
     {
-        /* granulepos is in milisec */
+        /* granulepos is in millisec */
         op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) / 1000;
     }
 

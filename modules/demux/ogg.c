@@ -1194,7 +1194,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found text subtitles header" );
                         p_stream->fmt.i_cat = SPU_ES;
                         p_stream->fmt.i_codec = VLC_FOURCC('s','u','b','t');
-                        p_stream->f_rate = 1000; /* granulepos is in milisec */
+                        p_stream->f_rate = 1000; /* granulepos is in millisec */
                     }
                     else
                     {
