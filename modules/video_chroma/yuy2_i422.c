@@ -75,6 +75,10 @@ static int Activate( vlc_object_t *p_this )
         return -1;
     }
 
+    if( p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width
+     || p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height )
+        return -1;
+
     switch( p_filter->fmt_out.video.i_chroma )
     {
         case VLC_FOURCC('I','4','2','2'):
