@@ -5220,17 +5220,16 @@ dnl  Bonjour services discovery
 dnl
 AC_ARG_ENABLE(bonjour,
   [  --enable-bonjour        Bonjour services discovery (default enabled)])
-if test "${enable_bonjour}" != "no"
-then
-  PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.3,
-    [PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.6,
-       [AC_DEFINE(HAVE_AVAHI_06, 1, [Define if you have avahi-client 0.6 or greater])],)
-      AC_DEFINE(HAVE_AVAHI_CLIENT, 1, [Define if you have the avahi-client library])
-      VLC_ADD_LIBS([bonjour access_output_http],[$BONJOUR_LIBS])
-      VLC_ADD_CFLAGS([bonjour access_output_http],[$BONJOUR_CFLAGS])
-      VLC_ADD_PLUGIN([bonjour]) ],
-    [AC_MSG_WARN(avahi-client library not found)])
-fi
+AS_IF([test "${enable_bonjour}" != "no"], [
+  PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.6, [
+    AC_DEFINE(HAVE_AVAHI_CLIENT, 1, [Define to 1 if you have libavahi-client])
+    VLC_ADD_LIBS([bonjour access_output_http],[$BONJOUR_LIBS])
+    VLC_ADD_CFLAGS([bonjour access_output_http],[$BONJOUR_CFLAGS])
+    VLC_ADD_PLUGIN([bonjour])
+  ], [
+    AC_MSG_WARN(avahi-client library not found)
+  ])
+])
 
 dnl
 dnl  Lirc plugin
