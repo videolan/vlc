@@ -118,20 +118,21 @@ struct demux_sys_t
 };
 
 /* OggDS headers for the new header format (used in ogm files) */
-typedef struct stream_header_video
+typedef struct
 {
     ogg_int32_t width;
     ogg_int32_t height;
-} stream_header_video;
+} stream_header_video_t;
 
-typedef struct stream_header_audio
+typedef struct
 {
     ogg_int16_t channels;
+    ogg_int16_t padding;
     ogg_int16_t blockalign;
     ogg_int32_t avgbytespersec;
-} stream_header_audio;
+} stream_header_audio_t;
 
-typedef struct stream_header
+typedef struct
 {
     char        streamtype[8];
     char        subtype[4];
@@ -144,15 +145,16 @@ typedef struct stream_header
 
     ogg_int32_t buffersize;
     ogg_int16_t bits_per_sample;
+    ogg_int16_t padding;
 
     union
     {
         /* Video specific */
-        stream_header_video video;
+        stream_header_video_t video;
         /* Audio specific */
-        stream_header_audio audio;
+        stream_header_audio_t audio;
     } sh;
-} stream_header;
+} stream_header_t;
 
 #define OGG_BLOCK_SIZE 4096
 
@@ -816,8 +818,6 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
     ogg_page oggpage;
     int i_stream;
 
-#define p_stream p_ogg->pp_stream[p_ogg->i_streams - 1]
-
     while( Ogg_ReadPage( p_demux, &oggpage ) == VLC_SUCCESS )
     {
         if( ogg_page_bos( &oggpage ) )
@@ -828,21 +828,14 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
             while( ogg_page_bos( &oggpage ) )
             {
                 logical_stream_t **pp_sav = p_ogg->pp_stream;
-
-                p_ogg->i_streams++;
-                p_ogg->pp_stream =
-                    realloc( p_ogg->pp_stream, p_ogg->i_streams *
-                             sizeof(logical_stream_t *) );
-                if( !p_ogg->pp_stream )
-                {
-                    p_ogg->pp_stream = pp_sav;
-                    p_ogg->i_streams--;
-                    return VLC_ENOMEM;
-                }
+                logical_stream_t *p_stream;
 
                 p_stream = malloc( sizeof(logical_stream_t) );
                 if( !p_stream )
                     return VLC_ENOMEM;
+
+                TAB_APPEND( p_ogg->i_streams, p_ogg->pp_stream, p_stream );
+
                 memset( p_stream, 0, sizeof(logical_stream_t) );
                 p_stream->p_headers = 0;
                 p_stream->secondary_header_packets = 0;
@@ -1082,15 +1075,27 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_ogg->i_streams--;
                     }
                 }
-                else if( (*oggpacket.packet & PACKET_TYPE_BITS )
-                         == PACKET_TYPE_HEADER &&
-                         oggpacket.bytes >= (int)sizeof(stream_header)+1 )
+                else if( (*oggpacket.packet & PACKET_TYPE_BITS ) == PACKET_TYPE_HEADER &&
+                         oggpacket.bytes >= 56+1 )
                 {
-                    stream_header *st = (stream_header *)(oggpacket.packet+1);
+                    stream_header_t tmp;
+                    stream_header_t *st = &tmp;
+
+                    memcpy( st->streamtype, &oggpacket.packet[1+0], 8 );
+                    memcpy( st->subtype, &oggpacket.packet[1+8], 4 );
+                    st->size = GetDWLE( &oggpacket.packet[1+12] );
+                    st->time_unit = GetQWLE( &oggpacket.packet[1+16] );
+                    st->samples_per_unit = GetQWLE( &oggpacket.packet[1+24] );
+                    st->default_len = GetDWLE( &oggpacket.packet[1+32] );
+                    st->buffersize = GetDWLE( &oggpacket.packet[1+36] );
+                    st->bits_per_sample = GetWLE( &oggpacket.packet[1+40] ); // (padding 2)
 
                     /* Check for video header (new format) */
                     if( !strncmp( st->streamtype, "video", 5 ) )
                     {
+                        st->sh.video.width = GetDWLE( &oggpacket.packet[1+44] );
+                        st->sh.video.height = GetDWLE( &oggpacket.packet[1+48] );
+
                         p_stream->fmt.i_cat = VIDEO_ES;
 
                         /* We need to get rid of the header packet */
@@ -1103,16 +1108,13 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                                  (char *)&p_stream->fmt.i_codec );
 
                         p_stream->fmt.video.i_frame_rate = 10000000;
-                        p_stream->fmt.video.i_frame_rate_base =
-                            GetQWLE(&st->time_unit);
-                        p_stream->f_rate = 10000000.0 /
-                            GetQWLE(&st->time_unit);
-                        p_stream->fmt.video.i_bits_per_pixel =
-                            GetWLE(&st->bits_per_sample);
-                        p_stream->fmt.video.i_width =
-                            GetDWLE(&st->sh.video.width);
-                        p_stream->fmt.video.i_height =
-                            GetDWLE(&st->sh.video.height);
+                        p_stream->fmt.video.i_frame_rate_base = st->time_unit;
+                        if( st->time_unit <= 0 )
+                            st->time_unit = 400000;
+                        p_stream->f_rate = 10000000.0 / st->time_unit;
+                        p_stream->fmt.video.i_bits_per_pixel = st->bits_per_sample;
+                        p_stream->fmt.video.i_width = st->sh.video.width;
+                        p_stream->fmt.video.i_height = st->sh.video.height;
 
                         msg_Dbg( p_demux,
                                  "fps: %f, width:%i; height:%i, bitcount:%i",
@@ -1125,17 +1127,24 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     else if( !strncmp( st->streamtype, "audio", 5 ) )
                     {
                         char p_buffer[5];
+                        unsigned int i_extra_size;
                         int i_format_tag;
+
+                        st->sh.audio.channels = GetWLE( &oggpacket.packet[1+44] );
+                        st->sh.audio.blockalign = GetWLE( &oggpacket.packet[1+48] );
+                        st->sh.audio.avgbytespersec = GetDWLE( &oggpacket.packet[1+52] );
 
                         p_stream->fmt.i_cat = AUDIO_ES;
 
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
 
-                        p_stream->fmt.i_extra = GetQWLE(&st->size) - sizeof(stream_header);
-                        if( p_stream->fmt.i_extra > 0 &&
-                            p_stream->fmt.i_extra < oggpacket.bytes - 1 - sizeof(stream_header) )
+                        i_extra_size = st->size - 56;
+
+                        if( i_extra_size > 0 &&
+                            i_extra_size < oggpacket.bytes - 1 - 56 )
                         {
+                            p_stream->fmt.i_extra = i_extra_size;
                             p_stream->fmt.p_extra = malloc( p_stream->fmt.i_extra );
                             if( p_stream->fmt.p_extra )
                                 memcpy( p_stream->fmt.p_extra, st + 1,
@@ -1147,16 +1156,13 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         memcpy( p_buffer, st->subtype, 4 );
                         p_buffer[4] = '\0';
                         i_format_tag = strtol(p_buffer,NULL,16);
-                        p_stream->fmt.audio.i_channels =
-                            GetWLE(&st->sh.audio.channels);
-                        p_stream->f_rate = p_stream->fmt.audio.i_rate =
-                            GetQWLE(&st->samples_per_unit);
-                        p_stream->fmt.i_bitrate =
-                            GetDWLE(&st->sh.audio.avgbytespersec) * 8;
-                        p_stream->fmt.audio.i_blockalign =
-                            GetWLE(&st->sh.audio.blockalign);
-                        p_stream->fmt.audio.i_bitspersample =
-                            GetWLE(&st->bits_per_sample);
+                        p_stream->fmt.audio.i_channels = st->sh.audio.channels;
+                        if( st->time_unit <= 0 )
+                            st->time_unit = 10000000;
+                        p_stream->f_rate = p_stream->fmt.audio.i_rate = st->samples_per_unit * 10000000 / st->time_unit;
+                        p_stream->fmt.i_bitrate = st->sh.audio.avgbytespersec * 8;
+                        p_stream->fmt.audio.i_blockalign = st->sh.audio.blockalign;
+                        p_stream->fmt.audio.i_bitspersample = st->bits_per_sample;
 
                         wf_tag_to_fourcc( i_format_tag,
                                           &p_stream->fmt.i_codec, 0 );
@@ -1234,7 +1240,6 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
             return VLC_SUCCESS;
         }
     }
-#undef p_stream
 
     return VLC_EGENERIC;
 }
