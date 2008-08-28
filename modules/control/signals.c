@@ -22,7 +22,6 @@
 # include "config.h"
 #endif
 
-#include <pthread.h>
 #include <signal.h>
 #include <time.h>
 
@@ -46,7 +45,7 @@ vlc_module_end ();
 
 struct intf_sys_t
 {
-    pthread_t       thread;
+    vlc_thread_t    thread;
     int             signum;
 };
 
@@ -61,7 +60,7 @@ static int Open (vlc_object_t *obj)
     p_sys->signum = 0;
     intf->p_sys = p_sys;
 
-    if (pthread_create (&p_sys->thread, NULL, SigThread, obj))
+    if (vlc_clone (&p_sys->thread, SigThread, obj, VLC_THREAD_PRIORITY_LOW))
     {
         free (p_sys);
         intf->p_sys = NULL;
@@ -77,14 +76,14 @@ static void Close (vlc_object_t *obj)
     intf_thread_t *intf = (intf_thread_t *)obj;
     intf_sys_t *p_sys = intf->p_sys;
 
-    pthread_cancel (p_sys->thread);
+    vlc_cancel (p_sys->thread);
 #ifdef __APPLE__
    /* In Mac OS X up to 10.5 sigwait (among others) is not a pthread
     * cancellation point, so we throw a dummy quit signal to end
     * sigwait() in the sigth thread */
     pthread_kill (p_sys->thread, SIGQUIT);
 # endif
-    pthread_join (p_sys->thread, NULL);
+    vlc_join (p_sys->thread, NULL);
     free (p_sys);
 }
 
@@ -111,7 +110,7 @@ static void *SigThread (void *data)
 #ifdef __APPLE__
         /* In Mac OS X up to 10.5 sigwait (among others) is not a pthread
          * cancellation point */
-        pthread_testcancel();
+        vlc_testcancel();
 #endif
 
         vlc_object_lock (obj);
