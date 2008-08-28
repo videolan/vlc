@@ -125,7 +125,7 @@ static int GetSwsCpuMask(void);
  * (change it to true to try) */
 #define ALLOW_YUVP (false)
 /* SwScaler does not like too small picture */
-#define MINIMUM_WIDTH (16)
+#define MINIMUM_WIDTH (32)
 
 /* XXX is it always 3 even for BIG_ENDIAN (blend.c seems to think so) ? */
 #define OFFSET_A (3)
