@@ -97,6 +97,7 @@ struct filter_sys_t
     picture_t *p_src_e;
     picture_t *p_dst_e;
     bool b_add_a;
+    bool b_copy;
 };
 
 static picture_t *Filter( filter_t *, picture_t * );
@@ -110,6 +111,7 @@ typedef struct
     bool b_has_a;
     bool b_add_a;
     int  i_sws_flags;
+    bool b_copy;
 } ScalerConfiguration;
 
 static int GetParameters( ScalerConfiguration *,
@@ -306,6 +308,7 @@ static int GetParameters( ScalerConfiguration *p_cfg,
         p_cfg->i_fmto = i_fmto;
         p_cfg->b_has_a = b_has_ai && b_has_ao;
         p_cfg->b_add_a = (!b_has_ai) && b_has_ao;
+        p_cfg->b_copy = i_fmti == i_fmto && p_fmti->i_width == p_fmto->i_width && p_fmti->i_width && p_fmto->i_height;
         p_cfg->i_sws_flags = i_sws_flags;
     }
 
@@ -388,6 +391,7 @@ static int Init( filter_t *p_filter )
     }
 
     p_sys->b_add_a = cfg.b_add_a;
+    p_sys->b_copy = cfg.b_copy;
     p_sys->fmt_in  = *p_fmti;
     p_sys->fmt_out = *p_fmto;
 
@@ -542,7 +546,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         CopyPad( p_src, p_pic );
     }
 
-    Convert( p_sys->ctx, p_dst, p_src, p_fmti->i_height, 0, 3 );
+    if( p_sys->b_copy )
+        picture_CopyPixels( p_dst, p_src );
+    else
+        Convert( p_sys->ctx, p_dst, p_src, p_fmti->i_height, 0, 3 );
     if( p_sys->ctxA )
     {
         /* We extract the A plane to rescale it, and then we reinject it. */
