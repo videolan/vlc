@@ -69,10 +69,15 @@ static int OpenFilter( vlc_object_t *p_this )
 
     /* XXX Only support RV24 -> RV32 conversion */
     if( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('R','V','2','4') ||
-        p_filter->fmt_out.video.i_chroma != VLC_FOURCC('R', 'V', '3', '2') )
+        (p_filter->fmt_out.video.i_chroma != VLC_FOURCC('R', 'V', '3', '2') &&
+        p_filter->fmt_out.video.i_chroma != VLC_FOURCC('R', 'G', 'B', 'A')) )
     {
         return VLC_EGENERIC;
     }
+
+    if( p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width
+     || p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height )
+        return -1;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_filter->p_sys = p_sys =
