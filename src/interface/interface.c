@@ -43,7 +43,6 @@
 #include <vlc_vout.h>
 
 #include "vlc_interface.h"
-#include "modules/modules.h" // Gruik!
 #include "libvlc.h"
 
 /*****************************************************************************
