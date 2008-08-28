@@ -227,13 +227,6 @@ static void* RunInterface( vlc_object_t *p_this )
     /* Give control to the interface */
     if( p_intf->pf_run )
         p_intf->pf_run( p_intf );
-    else
-    {
-        vlc_object_lock( p_intf );
-        while( vlc_object_alive( p_intf ) )
-            vlc_object_wait( p_intf );
-        vlc_object_unlock( p_intf );
-    }
 
     vlc_restorecancel (canc);
     return NULL;
