@@ -208,16 +208,6 @@ struct vlc_object_internals_t
 
 #define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
 
-/* Signal an object without checking for locking consistency. This is wrong. */
-#ifdef __GNUC__
-__attribute__((deprecated))
-#endif
-static inline void
-vlc_object_signal_maybe (vlc_object_t *p_this)
-{
-    vlc_cond_signal (&(vlc_internals(p_this)->wait));
-}
-
 /**
  * Private LibVLC instance data.
  */
