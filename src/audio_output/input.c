@@ -225,7 +225,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     psz_scaletempo = var_GetBool( p_aout, "audio-time-stretch" ) ? strdup( "scaletempo" ) : NULL;
 
     /* parse user filter lists */
-    for( i_visual = 0; i_visual < 2; i_visual++ )
+    for( i_visual = 0; i_visual < 3; i_visual++ )
     {
         char *ppsz_array[] = { psz_scaletempo, psz_filters, psz_visual };
         char *psz_next = NULL;
