@@ -1714,7 +1714,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     /* some last initialisation */
     switch( p_track->fmt.i_cat )
     {
-    case( VIDEO_ES ):
+    case VIDEO_ES:
         p_track->fmt.video.i_width = p_sample->data.p_sample_vide->i_width;
         p_track->fmt.video.i_height = p_sample->data.p_sample_vide->i_height;
         p_track->fmt.video.i_bits_per_pixel =
@@ -1751,7 +1751,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
         break;
 
-    case( AUDIO_ES ):
+    case AUDIO_ES:
         p_track->fmt.audio.i_channels =
             p_sample->data.p_sample_soun->i_channelcount;
         p_track->fmt.audio.i_rate =
@@ -1761,6 +1761,13 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 p_sample->data.p_sample_soun->i_samplesize;
         p_track->fmt.audio.i_bitspersample =
             p_sample->data.p_sample_soun->i_samplesize;
+
+        if( p_track->i_sample_size != 0 &&
+            p_sample->data.p_sample_soun->i_qt_version == 1 && p_sample->data.p_sample_soun->i_sample_per_packet <= 0 )
+        {
+            msg_Err( p_demux, "Invalid sample per packet value for qt_version 1" );
+            return VLC_EGENERIC;
+        }
         break;
 
     default:
