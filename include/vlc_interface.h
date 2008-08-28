@@ -74,9 +74,6 @@ struct intf_thread_t
     vlc_mutex_t  change_lock;
     bool   b_menu_change;
     bool   b_menu;
-
-    /* Provides the ability to switch an interface on the fly */
-    char *psz_switch_intf;
 };
 
 /** \brief Arguments passed to a dialogs provider

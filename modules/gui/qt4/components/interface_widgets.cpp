@@ -114,16 +114,8 @@ VideoWidget::~VideoWidget()
 
     if( p_vout )
     {
-        if( !p_intf->psz_switch_intf )
-        {
-            if( vout_Control( p_vout, VOUT_CLOSE ) != VLC_SUCCESS )
-                vout_Control( p_vout, VOUT_REPARENT );
-        }
-        else
-        {
-            if( vout_Control( p_vout, VOUT_REPARENT ) != VLC_SUCCESS )
-                vout_Control( p_vout, VOUT_CLOSE );
-        }
+        if( vout_Control( p_vout, VOUT_CLOSE ) != VLC_SUCCESS )
+            vout_Control( p_vout, VOUT_REPARENT );
         vlc_object_release( p_vout );
     }
 }

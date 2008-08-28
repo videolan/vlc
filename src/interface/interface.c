@@ -224,41 +224,16 @@ static void* RunInterface( vlc_object_t *p_this )
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
 
-    do
+    /* Give control to the interface */
+    if( p_intf->pf_run )
+        p_intf->pf_run( p_intf );
+    else
     {
-        /* Give control to the interface */
-        if( p_intf->pf_run )
-            p_intf->pf_run( p_intf );
-        else
-        {
-            vlc_object_lock( p_intf );
-            while( vlc_object_alive( p_intf ) )
-                vlc_object_wait( p_intf );
-            vlc_object_unlock( p_intf );
-        }
-
-        if( !p_intf->psz_switch_intf )
-        {
-            break;
-        }
-
-        /* Make sure the old interface is completely uninitialized */
-        module_Unneed( p_intf, p_intf->p_module );
-
-        /* Provide ability to switch the main interface on the fly */
-        psz_intf = p_intf->psz_switch_intf;
-        p_intf->psz_switch_intf = NULL;
-
         vlc_object_lock( p_intf );
-        p_intf->b_die = false; /* FIXME */
-        p_intf->b_dead = false;
-
+        while( vlc_object_alive( p_intf ) )
+            vlc_object_wait( p_intf );
         vlc_object_unlock( p_intf );
-
-        p_intf->psz_intf = psz_intf;
-        p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
     }
-    while( p_intf->p_module );
 
     vlc_restorecancel (canc);
     return NULL;
