@@ -66,16 +66,6 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 
-// VLC handle
-
-struct services_discovery_sys_t
-{
-    playlist_t *p_playlist;
-    playlist_item_t *p_node_cat;
-    playlist_item_t *p_node_one;
-};
-
-
 // Constants
 
 const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
@@ -272,7 +262,6 @@ private:
 
 // VLC callback prototypes
 
-static void Run( services_discovery_t *p_sd );
 static playlist_t *pl_Get( services_discovery_t *p_sd )
 {
     return p_sd->p_sys->p_playlist;
@@ -286,6 +275,17 @@ const char* xml_getChildElementValue( IXML_Element* parent, const char* tagName 
 IXML_Document* parseBrowseResult( IXML_Document* doc );
 
 
+
+// VLC handle
+
+struct services_discovery_sys_t
+{
+    playlist_t *p_playlist;
+    playlist_item_t *p_node_cat;
+    playlist_item_t *p_node_one;
+    Cookie cookie;
+};
+
 // VLC callbacks...
 
 static int Open( vlc_object_t *p_this )
@@ -294,7 +294,6 @@ static int Open( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = ( services_discovery_sys_t * )
     malloc( sizeof( services_discovery_sys_t ) );
 
-    p_sd->pf_run = Run;
     p_sd->p_sys = p_sys;
     p_sys->p_playlist = pl_Yield( p_sd );
 
@@ -305,39 +304,16 @@ static int Open( vlc_object_t *p_this )
                               true );
     vlc_object_unlock( p_sys->p_playlist );
 
-    return VLC_SUCCESS;
-}
+    p_sys->cookie.serviceDiscovery = p_sd;
+    p_sys->cookie.serverList = new MediaServerList( &cookie );
+    p_sys->cookie.lock = new Lockable();
 
-static void Close( vlc_object_t *p_this )
-{
-    services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_sys_t *p_sys = p_sd->p_sys;
-
-    vlc_object_lock( p_sys->p_playlist );
-    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_one, true,
-                         true );
-    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, true,
-                         true );
-    vlc_object_unlock( p_sys->p_playlist );
-    pl_Release( p_sd );
-    free( p_sys );
-}
-
-static void Run( services_discovery_t* p_sd )
-{
-    int res;
-
-    res = UpnpInit( 0, 0 );
+    int res = UpnpInit( 0, 0 );
     if( res != UPNP_E_SUCCESS )
     {
         msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
-        return;
+        goto shutDown;
     }
-
-    Cookie cookie;
-    cookie.serviceDiscovery = p_sd;
-    cookie.serverList = new MediaServerList( &cookie );
-    cookie.lock = new Lockable();
 
     res = UpnpRegisterClient( Callback, &cookie, &cookie.clientHandle );
     if( res != UPNP_E_SUCCESS )
@@ -353,20 +329,31 @@ static void Run( services_discovery_t* p_sd )
         goto shutDown;
     }
 
-    msg_Dbg( p_sd, "UPnP discovery started" );
-    while( vlc_object_alive (p_sd) )
-    {
-        msleep( 500 );
-    }
-
-    msg_Dbg( p_sd, "UPnP discovery stopped" );
+    return VLC_SUCCESS;
 
  shutDown:
-    UpnpFinish();
-    delete cookie.serverList;
-    delete cookie.lock;
+    Close( p_this );
+    return VLC_EGENERIC;
 }
 
+static void Close( vlc_object_t *p_this )
+{
+    services_discovery_t *p_sd = ( services_discovery_t* )p_this;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+
+    UpnpFinish();
+    delete p_sys->cookie.serverList;
+    delete p_sys->cookie.lock;
+
+    vlc_object_lock( p_sys->p_playlist );
+    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_one, true,
+                         true );
+    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, true,
+                         true );
+    vlc_object_unlock( p_sys->p_playlist );
+    pl_Release( p_sd );
+    free( p_sys );
+}
 
 // XML utility functions:
 
