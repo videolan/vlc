@@ -617,7 +617,7 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
             break;
         case FOURCC_I410:
         case FOURCC_YVU9:
-            p_format->i_bits_per_pixel = 10;
+            p_format->i_bits_per_pixel = 9;
             break;
         case FOURCC_Y211:
             p_format->i_bits_per_pixel = 8;
