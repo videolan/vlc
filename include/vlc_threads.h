@@ -175,7 +175,7 @@ VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) 
 VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( vlc_object_t * ), int, bool ) );
 VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
-VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
+VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t * ) );
 
 VLC_EXPORT( int, vlc_clone, (vlc_thread_t *, void * (*) (void *), void *, int) );
 VLC_EXPORT( void, vlc_cancel, (vlc_thread_t) );
@@ -727,6 +727,6 @@ static inline void barrier (void)
  * vlc_thread_join: wait until a thread exits
  *****************************************************************************/
 #define vlc_thread_join( P_THIS )                                           \
-    __vlc_thread_join( VLC_OBJECT(P_THIS), __FILE__, __LINE__ )
+    __vlc_thread_join( VLC_OBJECT(P_THIS) )
 
 #endif /* !_VLC_THREADS_H */

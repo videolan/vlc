@@ -794,21 +794,12 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 /*****************************************************************************
  * vlc_thread_join: wait until a thread exits, inner version
  *****************************************************************************/
-void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line )
+void __vlc_thread_join( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-    int i_ret = 0;
 
 #if defined( LIBVLC_USE_PTHREAD )
-    /* Make sure we do return if we are calling vlc_thread_join()
-     * from the joined thread */
-    if (pthread_equal (pthread_self (), p_priv->thread_id))
-    {
-        msg_Warn (p_this, "joining the active thread (VLC might crash)");
-        i_ret = pthread_detach (p_priv->thread_id);
-    }
-    else
-        i_ret = vlc_join (p_priv->thread_id, NULL);
+    vlc_join (p_priv->thread_id, NULL);
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
     HANDLE hThread;
@@ -824,8 +815,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
             DUPLICATE_SAME_ACCESS) )
     {
         p_priv->b_thread = false;
-        i_ret = GetLastError();
-        goto error;
+        return; /* We have a problem! */
     }
 
     vlc_join( p_priv->thread_id, NULL );
@@ -855,22 +845,11 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
                  (double)((user_time%(60*1000000))/1000000.0) );
     }
     CloseHandle( hThread );
-error:
 
 #else
-    i_ret = vlc_join( p_priv->thread_id, NULL );
+    vlc_join( p_priv->thread_id, NULL );
 
 #endif
-
-    if( i_ret )
-    {
-        errno = i_ret;
-        msg_Err( p_this, "thread_join(%lu) failed at %s:%d (%m)",
-                         (unsigned long)p_priv->thread_id, psz_file, i_line );
-    }
-    else
-        msg_Dbg( p_this, "thread %lu joined (%s:%d)",
-                         (unsigned long)p_priv->thread_id, psz_file, i_line );
 
     p_priv->b_thread = false;
 }
