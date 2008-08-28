@@ -80,6 +80,9 @@ VLC_EXPORT( void *, __vlc_object_create, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, __vlc_object_set_destructor, ( vlc_object_t *, vlc_destructor_t ) );
 VLC_EXPORT( void, __vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_detach, ( vlc_object_t * ) );
+#if defined (__GNUC__) && !defined __cplusplus
+__attribute__((deprecated))
+#endif
 VLC_EXPORT( void *, vlc_object_get, ( int ) );
 VLC_EXPORT( void *, __vlc_object_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( void *, __vlc_object_find_name, ( vlc_object_t *, const char *, int ) );
