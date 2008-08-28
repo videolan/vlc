@@ -456,28 +456,19 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         val.psz_string = 0;
     }
 
-    /* Embedded snapshot : if snapshot-path == object:object-id, then
+    /* Embedded snapshot : if snapshot-path == object:object_ptr, then
        create a snapshot_t* and store it in
-       object(object-id)->p_private, then unlock and signal the
+       object_ptr->p_private, then unlock and signal the
        waiting object.
      */
-    if( val.psz_string && !strncmp( val.psz_string, "object:", 7 ) )
+    uintmax_t i_id;
+    if( val.psz_string && sscanf( val.psz_string, "object:%ju", &i_id ) > 0 )
     {
-        int i_id;
-        vlc_object_t* p_dest;
+        vlc_object_t* p_dest = (vlc_object_t *)(uintptr_t)i_id;
         block_t *p_block;
         snapshot_t *p_snapshot;
         int i_size;
 
-        /* Destination object-id is following object: */
-        i_id = atoi( &val.psz_string[7] );
-        p_dest = ( vlc_object_t* )vlc_object_get( i_id );
-        if( !p_dest )
-        {
-            msg_Err( p_vout, "Cannot find calling object" );
-            image_HandlerDelete( p_image );
-            return VLC_EGENERIC;
-        }
         /* Object must be locked. We will unlock it once we get the
            snapshot and written it to p_private */
         p_dest->p_private = NULL;

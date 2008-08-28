@@ -84,7 +84,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
         vlc_object_release( p_input );
         RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
     }
-    snprintf( path, 255, "object:%d", p_cache->i_object_id );
+    snprintf( path, 255, "object:%ju", (uintmax_t)(uintptr_t)p_cache );
     var_SetString( p_vout, "snapshot-path", path );
     var_SetString( p_vout, "snapshot-format", "png" );
 
