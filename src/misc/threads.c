@@ -621,10 +621,12 @@ void vlc_cancel (vlc_thread_t thread_id)
  * @param p_result [OUT] pointer to write the thread return value or NULL
  * @return 0 on success, a standard error code otherwise.
  */
-int vlc_join (vlc_thread_t handle, void **result)
+void vlc_join (vlc_thread_t handle, void **result)
 {
 #if defined( LIBVLC_USE_PTHREAD )
-    return pthread_join (handle, result);
+    int val = pthread_join (handle, result);
+    if (val)
+        vlc_pthread_fatal ("joining thread", val, __FILE__, __LINE__);
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
     do
@@ -636,15 +638,13 @@ int vlc_join (vlc_thread_t handle, void **result)
     if (result)
         *result = handle->data;
     free (handle);
-    return 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     int32_t exit_value;
-    ret = (B_OK == wait_for_thread( p_priv->thread_id, &exit_value ));
-    if( !ret && result )
+    int val = (B_OK == wait_for_thread( p_priv->thread_id, &exit_value ));
+    if( !val && result )
         *result = (void *)exit_value;
 
-    return ret;
 #endif
 }
 
