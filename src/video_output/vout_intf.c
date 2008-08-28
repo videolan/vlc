@@ -435,73 +435,208 @@ void vout_IntfInit( vout_thread_t *p_vout )
 /*****************************************************************************
  * vout_Snapshot: generates a snapshot.
  *****************************************************************************/
+/**
+ * This function will inject a subpicture into the vout with the provided
+ * picture
+ */
+static int VoutSnapshotPip( vout_thread_t *p_vout, image_handler_t *p_image, picture_t *p_pic, const video_format_t *p_fmt_in )
+{
+    video_format_t fmt_in = *p_fmt_in;
+    video_format_t fmt_out;
+    picture_t *p_pip;
+    subpicture_t *p_subpic;
+
+    /* */
+    memset( &fmt_out, 0, sizeof(fmt_out) );
+    fmt_out = fmt_in;
+    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+
+    /* */
+    p_pip = image_Convert( p_image, p_pic, &fmt_in, &fmt_out );
+    if( !p_pip )
+        return VLC_EGENERIC;
+
+    p_subpic = spu_CreateSubpicture( p_vout->p_spu );
+    if( p_subpic == NULL )
+    {
+         picture_Release( p_pip );
+         return VLC_EGENERIC;
+    }
+
+    p_subpic->i_channel = 0;
+    p_subpic->i_start = mdate();
+    p_subpic->i_stop = mdate() + 4000000;
+    p_subpic->b_ephemer = true;
+    p_subpic->b_fade = true;
+    p_subpic->i_original_picture_width = fmt_out.i_width * 4;
+    p_subpic->i_original_picture_height = fmt_out.i_height * 4;
+    fmt_out.i_aspect = 0;
+    fmt_out.i_sar_num =
+    fmt_out.i_sar_den = 0;
+
+    p_subpic->p_region = spu_CreateRegion( p_vout->p_spu, &fmt_out );
+    if( p_subpic->p_region )
+        vout_CopyPicture( p_image->p_parent, &p_subpic->p_region->picture, p_pip );
+    picture_Release( p_pip );
+
+    spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
+    return VLC_SUCCESS;
+}
+/**
+ * This function will return the default directory used for snapshots
+ */
+static char *VoutSnapshotGetDefaultDirectory( vout_thread_t *p_vout )
+{
+    char *psz_path;
+#if defined(__APPLE__) || defined(SYS_BEOS)
+
+    if( asprintf( &psz_path, "%s/Desktop",
+                  config_GetHomeDir() ) == -1 )
+        psz_path = NULL;
+
+#elif defined(WIN32) && !defined(UNDER_CE)
+
+    /* Get the My Pictures folder path */
+    char *p_mypicturesdir = NULL;
+    typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
+                                               LPWSTR );
+    #ifndef CSIDL_FLAG_CREATE
+    #   define CSIDL_FLAG_CREATE 0x8000
+    #endif
+    #ifndef CSIDL_MYPICTURES
+    #   define CSIDL_MYPICTURES 0x27
+    #endif
+    #ifndef SHGFP_TYPE_CURRENT
+    #   define SHGFP_TYPE_CURRENT 0
+    #endif
+
+    HINSTANCE shfolder_dll;
+    SHGETFOLDERPATH SHGetFolderPath ;
+
+    /* load the shfolder dll to retrieve SHGetFolderPath */
+    if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
+    {
+       wchar_t wdir[PATH_MAX];
+       SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
+                                                  _T("SHGetFolderPathW") );
+        if ((SHGetFolderPath != NULL )
+         && SUCCEEDED (SHGetFolderPath (NULL,
+                                       CSIDL_MYPICTURES | CSIDL_FLAG_CREATE,
+                                       NULL, SHGFP_TYPE_CURRENT,
+                                       wdir)))
+            p_mypicturesdir = FromWide (wdir);
+
+        FreeLibrary( shfolder_dll );
+    }
+
+    if( p_mypicturesdir == NULL )
+        psz_path = strdup( config_GetHomeDir() );
+    else
+        psz_path = p_mypicturesdir;
+
+#else
+
+    /* XXX: This saves in the data directory. Shouldn't we try saving
+     *      to psz_homedir/Desktop or something nicer ? */
+    char *psz_datadir = config_GetUserDataDir();
+    if( psz_datadir )
+    {
+        if( asprintf( &psz_path, "%s", psz_datadir ) == -1 )
+            psz_path = NULL;
+        free( psz_datadir );
+    }
+
+#endif
+
+    return psz_path;
+}
+
 int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 {
     image_handler_t *p_image = image_HandlerCreate( p_vout );
     video_format_t fmt_in, fmt_out;
     char *psz_filename = NULL;
-    subpicture_t *p_subpic;
-    picture_t *p_pif;
     vlc_value_t val, format;
     DIR *path;
     int i_ret;
+    bool b_embedded_snapshot;
+    uintmax_t i_id = (uintmax_t)NULL;
 
+    /* */
+    val.psz_string = var_GetNonEmptyString( p_vout, "snapshot-path" );
+
+    /* Embedded snapshot : if snapshot-path == object:object_ptr */
+    if( val.psz_string && sscanf( val.psz_string, "object:%ju", &i_id ) > 0 )
+        b_embedded_snapshot = true;
+    else
+        b_embedded_snapshot = false;
+
+    /* */
     memset( &fmt_in, 0, sizeof(video_format_t) );
-    memset( &fmt_out, 0, sizeof(video_format_t) );
-
-    var_Get( p_vout, "snapshot-path", &val );
-    if( val.psz_string && !*val.psz_string )
+    fmt_in = p_vout->fmt_in;
+    if( fmt_in.i_sar_num <= 0 || fmt_in.i_sar_den <= 0 )
     {
-        free( val.psz_string );
-        val.psz_string = 0;
+        fmt_in.i_sar_num =
+        fmt_in.i_sar_den = 1;
     }
 
-    /* Embedded snapshot : if snapshot-path == object:object_ptr, then
+    /* */
+    memset( &fmt_out, 0, sizeof(video_format_t) );
+    fmt_out.i_sar_num =
+    fmt_out.i_sar_den = 1;
+    fmt_out.i_chroma = b_embedded_snapshot ? VLC_FOURCC('p','n','g',' ') : 0;
+    fmt_out.i_width = var_GetInteger( p_vout, "snapshot-width" );
+    fmt_out.i_height = var_GetInteger( p_vout, "snapshot-height" );
+
+    if( b_embedded_snapshot &&
+        fmt_out.i_width == 0 && fmt_out.i_height == 0 )
+    {
+        /* If snapshot-width and/or snapshot height were not specified,
+           use a default snapshot width of 320 */
+        fmt_out.i_width = 320;
+    }
+
+    if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
+    {
+        fmt_out.i_height = fmt_in.i_height * fmt_out.i_width / fmt_in.i_width;
+        const int i_height = fmt_out.i_height * fmt_in.i_sar_den / fmt_in.i_sar_num;
+        if( i_height > 0 )
+            fmt_out.i_height = i_height;
+    }
+    else
+    {
+        if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
+        {
+            fmt_out.i_width = fmt_in.i_width * fmt_out.i_height / fmt_in.i_height;
+        }
+        else
+        {
+            fmt_out.i_width = fmt_in.i_width;
+            fmt_out.i_height = fmt_in.i_height;
+        }
+        const int i_width = fmt_out.i_width * fmt_in.i_sar_num / fmt_in.i_sar_den;
+        if( i_width > 0 )
+            fmt_out.i_width = i_width;
+    }
+
+    /* Embedded snapshot
        create a snapshot_t* and store it in
        object_ptr->p_private, then unlock and signal the
        waiting object.
      */
-    uintmax_t i_id;
-    if( val.psz_string && sscanf( val.psz_string, "object:%ju", &i_id ) > 0 )
+    if( b_embedded_snapshot )
     {
         vlc_object_t* p_dest = (vlc_object_t *)(uintptr_t)i_id;
         block_t *p_block;
         snapshot_t *p_snapshot;
-        int i_size;
+        size_t i_size;
 
         /* Object must be locked. We will unlock it once we get the
            snapshot and written it to p_private */
         p_dest->p_private = NULL;
 
         /* Save the snapshot to a memory zone */
-        fmt_in = p_vout->fmt_in;
-        fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
-        fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
-
-        fmt_out.i_width = var_GetInteger( p_vout, "snapshot-width" );
-        fmt_out.i_height = var_GetInteger( p_vout, "snapshot-height" );
-        /* If snapshot-width and/or snapshot height were not specified,
-           use a default snapshot width of 320 */
-	if( fmt_out.i_width == 0 && fmt_out.i_height == 0 )
-        {
-            fmt_out.i_width = 320;
-        }
-
-	if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
-        {
-	    fmt_out.i_width = (fmt_in.i_width * fmt_out.i_height) / fmt_in.i_height;
-        }
-	else if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
-        {
-	    fmt_out.i_height = (fmt_in.i_height * fmt_out.i_width) / fmt_in.i_width;
-        }
-	else
-        {
-            fmt_out.i_width = fmt_in.i_width;
-            fmt_out.i_height = fmt_in.i_height;
-        }
-
-        p_block = ( block_t* ) image_Write( p_image, p_pic, &fmt_in, &fmt_out );
+        p_block = image_Write( p_image, p_pic, &fmt_in, &fmt_out );
         if( !p_block )
         {
             msg_Err( p_vout, "Could not get snapshot" );
@@ -513,7 +648,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
         /* Copy the p_block data to a snapshot structure */
         /* FIXME: get the timestamp */
-        p_snapshot = ( snapshot_t* ) malloc( sizeof( snapshot_t ) );
+        p_snapshot = malloc( sizeof( snapshot_t ) );
         if( !p_snapshot )
         {
             block_Release( p_block );
@@ -529,7 +664,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         p_snapshot->i_height = fmt_out.i_height;
         p_snapshot->i_datasize = i_size;
         p_snapshot->date = p_block->i_pts; /* FIXME ?? */
-        p_snapshot->p_data = ( char* ) malloc( i_size );
+        p_snapshot->p_data = malloc( i_size );
         if( !p_snapshot->p_data )
         {
             block_Release( p_block );
@@ -553,80 +688,25 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         return VLC_SUCCESS;
     }
 
-#if defined(__APPLE__) || defined(SYS_BEOS)
+    /* Get default directory if none provided */
     if( !val.psz_string )
-    {
-        if( asprintf( &val.psz_string, "%s/Desktop",
-                      config_GetHomeDir() ) == -1 )
-            val.psz_string = NULL;
-    }
-
-#elif defined(WIN32) && !defined(UNDER_CE)
-    if( !val.psz_string )
-    {
-        /* Get the My Pictures folder path */
-
-        char *p_mypicturesdir = NULL;
-        typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
-                                                   LPWSTR );
-        #ifndef CSIDL_FLAG_CREATE
-        #   define CSIDL_FLAG_CREATE 0x8000
-        #endif
-        #ifndef CSIDL_MYPICTURES
-        #   define CSIDL_MYPICTURES 0x27
-        #endif
-        #ifndef SHGFP_TYPE_CURRENT
-        #   define SHGFP_TYPE_CURRENT 0
-        #endif
-
-        HINSTANCE shfolder_dll;
-        SHGETFOLDERPATH SHGetFolderPath ;
-
-        /* load the shfolder dll to retrieve SHGetFolderPath */
-        if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
-        {
-           wchar_t wdir[PATH_MAX];
-           SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
-                                                      _T("SHGetFolderPathW") );
-            if ((SHGetFolderPath != NULL )
-             && SUCCEEDED (SHGetFolderPath (NULL,
-                                           CSIDL_MYPICTURES | CSIDL_FLAG_CREATE,
-                                           NULL, SHGFP_TYPE_CURRENT,
-                                           wdir)))
-                p_mypicturesdir = FromWide (wdir);
-
-            FreeLibrary( shfolder_dll );
-        }
-
-        if( p_mypicturesdir == NULL )
-            val.psz_string = strdup( config_GetHomeDir() );
-        else
-            val.psz_string = p_mypicturesdir;
-    }
-
-#else
-    /* XXX: This saves in the data directory. Shouldn't we try saving
-     *      to psz_homedir/Desktop or something nicer ? */
-    char *psz_datadir = config_GetUserDataDir();
-    if( !val.psz_string && psz_datadir )
-    {
-        if( asprintf( &val.psz_string, "%s", psz_datadir ) == -1 )
-            val.psz_string = NULL;
-    }
-    free( psz_datadir );
-#endif
-
+        val.psz_string = VoutSnapshotGetDefaultDirectory( p_vout );
     if( !val.psz_string )
     {
         msg_Err( p_vout, "no path specified for snapshots" );
         image_HandlerDelete( p_image );
         return VLC_EGENERIC;
     }
-    var_Get( p_vout, "snapshot-format", &format );
-    if( !format.psz_string || !*format.psz_string )
-    {
-        free( format.psz_string );
+
+    /* Get snapshot format, default being "png" */
+    format.psz_string = var_GetNonEmptyString( p_vout, "snapshot-format" );
+    if( !format.psz_string )
         format.psz_string = strdup( "png" );
+    if( !format.psz_string )
+    {
+        free( val.psz_string );
+        image_HandlerDelete( p_image );
+        return VLC_ENOMEM;
     }
 
     /*
@@ -689,27 +769,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     free( val.psz_string );
     free( format.psz_string );
 
-    fmt_out.i_width = var_GetInteger( p_vout, "snapshot-width" );
-    fmt_out.i_height = var_GetInteger( p_vout, "snapshot-height" );
-
-    fmt_in = p_vout->fmt_in;
-
-    if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
-    {
-        fmt_out.i_width = (fmt_in.i_width * fmt_out.i_height) / fmt_in.i_height;
-    }
-    else if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
-    {
-        fmt_out.i_height = (fmt_in.i_height * fmt_out.i_width) / fmt_in.i_width;
-    }
-    else
-    {
-        fmt_out.i_width = fmt_in.i_width;
-        fmt_out.i_height = fmt_in.i_height;
-    }
-
     /* Save the snapshot */
-    fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     i_ret = image_WriteUrl( p_image, p_pic, &fmt_in, &fmt_out, psz_filename );
     if( i_ret != VLC_SUCCESS )
     {
@@ -719,46 +779,19 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         return VLC_EGENERIC;
     }
 
+    /* */
     msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
     vout_OSDMessage( VLC_OBJECT( p_vout ), DEFAULT_CHAN,
                      "%s", psz_filename );
     free( psz_filename );
 
+    /* */
     if( var_GetBool( p_vout, "snapshot-preview" ) )
     {
-        /* Inject a subpicture with the snapshot */
-        memset( &fmt_out, 0, sizeof(fmt_out) );
-        fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-        p_pif = image_Convert( p_image, p_pic, &fmt_in, &fmt_out );
-        image_HandlerDelete( p_image );
-        if( !p_pif ) return VLC_EGENERIC;
-
-        p_subpic = spu_CreateSubpicture( p_vout->p_spu );
-        if( p_subpic == NULL )
-        {
-             p_pif->pf_release( p_pif );
-             return VLC_EGENERIC;
-        }
-
-        p_subpic->i_channel = 0;
-        p_subpic->i_start = mdate();
-        p_subpic->i_stop = mdate() + 4000000;
-        p_subpic->b_ephemer = true;
-        p_subpic->b_fade = true;
-        p_subpic->i_original_picture_width = p_vout->render.i_width * 4;
-        p_subpic->i_original_picture_height = p_vout->render.i_height * 4;
-
-        p_subpic->p_region = spu_CreateRegion( p_vout->p_spu, &fmt_out );
-        vout_CopyPicture( p_image->p_parent, &p_subpic->p_region->picture,
-                          p_pif );
-        p_pif->pf_release( p_pif );
-
-        spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
+        if( VoutSnapshotPip( p_vout, p_image, p_pic, &fmt_in ) )
+            msg_Warn( p_vout, "Failed to display snapshot" );
     }
-    else
-    {
-        image_HandlerDelete( p_image );
-    }
+    image_HandlerDelete( p_image );
 
     return VLC_SUCCESS;
 }
