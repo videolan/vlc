@@ -609,6 +609,11 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             *pb_bool = var_GetBool( p_input, "record" );
             return VLC_SUCCESS;
 
+        case INPUT_RESTART_ES:
+            val.i_int = (int)va_arg( args, int );
+            input_ControlPush( p_input, INPUT_CONTROL_RESTART_ES, &val );
+            return VLC_SUCCESS;
+
         default:
             msg_Err( p_input, "unknown query in input_vaControl" );
             return VLC_EGENERIC;

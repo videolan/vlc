@@ -529,6 +529,9 @@ enum input_query_e
     /* On the fly record while playing */
     INPUT_SET_RECORD_STATE, /* arg1=bool    res=can fail */
     INPUT_GET_RECORD_STATE, /* arg1=bool*   res=can fail */
+
+    /* ES */
+    INPUT_RESTART_ES,       /* arg1=int (-AUDIO/VIDEO/SPU_ES for the whole category) */
 };
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );

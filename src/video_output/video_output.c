@@ -1371,35 +1371,6 @@ static void PictureHeapFixRgb( picture_heap_t *p_heap )
 }
 
 /*****************************************************************************
- * Helper thread for object variables callbacks.
- * Only used to avoid deadlocks when using the video embedded mode.
- *****************************************************************************/
-typedef struct suxor_thread_t
-{
-    VLC_COMMON_MEMBERS
-    input_thread_t *p_input;
-
-} suxor_thread_t;
-
-static void* SuxorRestartVideoES( vlc_object_t * p_vlc_t )
-{
-    suxor_thread_t *p_this = (suxor_thread_t *) p_vlc_t;
-    int canc = vlc_savecancel ();
-    /* Now restart current video stream */
-    int val = var_GetInteger( p_this->p_input, "video-es" );
-    if( val >= 0 )
-    {
-        var_SetInteger( p_this->p_input, "video-es", -VIDEO_ES );
-        var_SetInteger( p_this->p_input, "video-es", val );
-    }
-
-    vlc_object_release( p_this->p_input );
-    vlc_object_release( p_this );
-    vlc_restorecancel (canc);
-    return NULL;
-}
-
-/*****************************************************************************
  * object variables callbacks: a bunch of object variables are used by the
  * interfaces to interact with the vout.
  *****************************************************************************/
@@ -1484,20 +1455,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Set( p_input, "vout-filter", val );
 
     /* Now restart current video stream */
-    var_Get( p_input, "video-es", &val );
-    if( val.i_int >= 0 )
-    {
-        static const char typename[] = "kludge";
-        suxor_thread_t *p_suxor =
-            vlc_custom_create( p_vout, sizeof(suxor_thread_t),
-                               VLC_OBJECT_GENERIC, typename );
-        p_suxor->p_input = p_input;
-        p_vout->b_filter_change = true;
-        vlc_object_yield( p_input );
-        vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
-                           VLC_THREAD_PRIORITY_LOW, false );
-    }
-
+    input_Control( p_input, INPUT_RESTART_ES, -VIDEO_ES );
     vlc_object_release( p_input );
 
     return VLC_SUCCESS;

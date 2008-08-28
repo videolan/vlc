@@ -1747,8 +1747,12 @@ static bool Control( input_thread_t *p_input, int i_type,
         case INPUT_CONTROL_SET_ES:
             /* No need to force update, es_out does it if needed */
             es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES,
-                            input_EsOutGetFromID( p_input->p->p_es_out,
-                                                  val.i_int ) );
+                            input_EsOutGetFromID( p_input->p->p_es_out, val.i_int ) );
+            break;
+
+        case INPUT_CONTROL_RESTART_ES:
+            es_out_Control( p_input->p->p_es_out, ES_OUT_RESTART_ES,
+                            input_EsOutGetFromID( p_input->p->p_es_out, val.i_int ) );
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:

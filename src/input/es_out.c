@@ -1769,50 +1769,26 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case ES_OUT_SET_ES:
+        case ES_OUT_RESTART_ES:
+        {
+            int i_cat;
+
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            /* Special case NULL, NULL+i_cat */
+
             if( es == NULL )
-            {
-                for( i = 0; i < p_sys->i_es; i++ )
-                {
-                    if( EsIsSelected( p_sys->es[i] ) )
-                        EsUnselect( out, p_sys->es[i],
-                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
-                }
-            }
+                i_cat = UNKNOWN_ES;
             else if( es == (es_out_id_t*)((uint8_t*)NULL+AUDIO_ES) )
-            {
-                for( i = 0; i < p_sys->i_es; i++ )
-                {
-                    if( p_sys->es[i]->fmt.i_cat == AUDIO_ES &&
-                        EsIsSelected( p_sys->es[i] ) )
-                        EsUnselect( out, p_sys->es[i],
-                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
-                }
-            }
+                i_cat = AUDIO_ES;
             else if( es == (es_out_id_t*)((uint8_t*)NULL+VIDEO_ES) )
-            {
-                for( i = 0; i < p_sys->i_es; i++ )
-                {
-                    if( p_sys->es[i]->fmt.i_cat == VIDEO_ES &&
-                        EsIsSelected( p_sys->es[i] ) )
-                        EsUnselect( out, p_sys->es[i],
-                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
-                }
-            }
+                i_cat = VIDEO_ES;
             else if( es == (es_out_id_t*)((uint8_t*)NULL+SPU_ES) )
-            {
-                for( i = 0; i < p_sys->i_es; i++ )
-                {
-                    if( p_sys->es[i]->fmt.i_cat == SPU_ES &&
-                        EsIsSelected( p_sys->es[i] ) )
-                        EsUnselect( out, p_sys->es[i],
-                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
-                }
-            }
+                i_cat = SPU_ES;
             else
+                i_cat = -1;
+
+            for( i = 0; i < p_sys->i_es; i++ )
             {
-                for( i = 0; i < p_sys->i_es; i++ )
+                if( i_cat == -1 )
                 {
                     if( es == p_sys->es[i] )
                     {
@@ -1820,13 +1796,37 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                         break;
                     }
                 }
+                else
+                {
+                    if( i_cat == UNKNOWN_ES || p_sys->es[i]->fmt.i_cat == i_cat )
+                    {
+                        if( EsIsSelected( p_sys->es[i] ) )
+                        {
+                            if( i_query == ES_OUT_RESTART_ES )
+                            {
+                                if( p_sys->es[i]->p_dec )
+                                {
+                                    EsDestroyDecoder( out, p_sys->es[i] );
+                                    EsCreateDecoder( out, p_sys->es[i] );
+                                }
+                            }
+                            else
+                            {
+                                EsUnselect( out, p_sys->es[i],
+                                            p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
+                            }
+                        }
+                    }
+                }
             }
+            if( i_query == ES_OUT_SET_ES )
             {
                 vlc_event_t event;
                 event.type = vlc_InputSelectedStreamChanged;
                 vlc_event_send( &p_sys->p_input->p->event_manager, &event );
             }
             return VLC_SUCCESS;
+        }
  
         case ES_OUT_SET_DEFAULT:
         {
