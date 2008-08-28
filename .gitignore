@@ -40,7 +40,6 @@ nvlc
 wxvlc
 vlc
 vlc_install_dir/*
-intl
 
 # Ignore CMake Stuff
 cmake
