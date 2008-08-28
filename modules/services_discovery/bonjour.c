@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bonjour.c: Bonjour services discovery module
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon@nanocrew.net>
@@ -39,7 +39,7 @@
 # include <avahi-client/publish.h>
 # include <avahi-client/lookup.h>
 #endif
-#include <avahi-common/simple-watch.h>
+#include <avahi-common/thread-watch.h>
 #include <avahi-common/malloc.h>
 #include <avahi-common/error.h>
 
@@ -66,7 +66,7 @@ vlc_module_end();
 
 struct services_discovery_sys_t
 {
-    AvahiSimplePoll     *simple_poll;
+    AvahiThreadedPoll   *poll;
     AvahiClient         *client;
     AvahiServiceBrowser *sb;
     vlc_dictionary_t    services_name_to_input_item;
@@ -96,7 +96,7 @@ static void client_callback( AvahiClient *c, AvahiClientState state,
 #endif
     {
         msg_Err( p_sd, "avahi client disconnected" );
-        avahi_simple_poll_quit( p_sys->simple_poll );
+        avahi_threaded_poll_quit( p_sys->poll );
     }
 }
 
@@ -279,14 +279,14 @@ static int Open( vlc_object_t *p_this )
 
     vlc_dictionary_init( &p_sys->services_name_to_input_item, 1 );
 
-    p_sys->simple_poll = avahi_simple_poll_new();
-    if( p_sys->simple_poll == NULL )
+    p_sys->poll = avahi_threaded_poll_new();
+    if( p_sys->poll == NULL )
     {
-        msg_Err( p_sd, "failed to create avahi simple poll" );
+        msg_Err( p_sd, "failed to create Avahi threaded poll" );
         goto error;
     }
 
-    p_sys->client = avahi_client_new( avahi_simple_poll_get(p_sys->simple_poll),
+    p_sys->client = avahi_client_new( avahi_threaded_poll_get(p_sys->poll),
 #ifdef HAVE_AVAHI_06
                                       0,
 #endif
@@ -313,8 +313,6 @@ static int Open( vlc_object_t *p_this )
 
     services_discovery_SetLocalizedName( p_sd, _("Bonjour") );
 
-    p_sd->pf_run = Run;
-
     return VLC_SUCCESS;
 
 error:
@@ -322,8 +320,8 @@ error:
         avahi_service_browser_free( p_sys->sb );
     if( p_sys->client != NULL )
         avahi_client_free( p_sys->client );
-    if( p_sys->simple_poll != NULL )
-        avahi_simple_poll_free( p_sys->simple_poll );
+    if( p_sys->poll != NULL )
+        avahi_threaded_poll_free( p_sys->poll );
 
     vlc_dictionary_clear( &p_sys->services_name_to_input_item );
     free( p_sys );
@@ -341,25 +339,8 @@ static void Close( vlc_object_t *p_this )
 
     avahi_service_browser_free( p_sys->sb );
     avahi_client_free( p_sys->client );
-    avahi_simple_poll_free( p_sys->simple_poll );
+    avahi_threaded_poll_free( p_sys->poll );
 
     vlc_dictionary_clear( &p_sys->services_name_to_input_item );
     free( p_sys );
-}
-
-/*****************************************************************************
- * Run: main thread
- *****************************************************************************/
-static void Run( services_discovery_t *p_sd )
-{
-    services_discovery_sys_t *p_sys = p_sd->p_sys;
-
-    while( vlc_object_alive (p_sd) )
-    {
-        if( avahi_simple_poll_iterate( p_sys->simple_poll, 100 ) != 0 )
-        {
-            msg_Err( p_sd, "poll iterate failed" );
-            break;
-        }
-    }
 }
