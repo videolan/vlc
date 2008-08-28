@@ -481,6 +481,7 @@ static void Run( services_discovery_t *p_sd )
     char *psz_addr;
     int i;
     int timeout = -1;
+    int canc = vlc_savecancel ();
 
     /* Braindead Winsock DNS resolver will get stuck over 2 seconds per failed
      * DNS queries, even if the DNS server returns an error with milliseconds.
@@ -557,10 +558,11 @@ static void Run( services_discovery_t *p_sd )
     }
 
     /* read SAP packets */
-    while( vlc_object_alive( p_sd ) )
+    for (;;)
     {
+        vlc_restorecancel (canc);
         unsigned n = p_sd->p_sys->i_fd;
-        struct pollfd ufd[n+1];
+        struct pollfd ufd[n];
 
         for (unsigned i = 0; i < n; i++)
         {
@@ -569,12 +571,9 @@ static void Run( services_discovery_t *p_sd )
             ufd[i].revents = 0;
         }
 
-        /* Make sure we track vlc_object_signal() */
-        ufd[n].fd = vlc_object_waitpipe( p_sd );
-        ufd[n].events = POLLIN;
-        ufd[n].revents = 0;
-
-        if (poll (ufd, n+1, timeout) > 0)
+        int val = poll (ufd, n, timeout);
+        canc = vlc_savecancel ();
+        if (val > 0)
         {
             for (unsigned i = 0; i < n; i++)
             {
