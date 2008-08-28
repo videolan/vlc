@@ -300,6 +300,7 @@ static void Run( services_discovery_t *p_sd )
     int i, i_devices;
     char **devices;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
+    int canc = vlc_savecancel();
 
     /* parse existing devices first */
     if( ( devices = libhal_get_all_devices( p_sys->p_ctx, &i_devices, NULL ) ) )
@@ -310,12 +311,16 @@ static void Run( services_discovery_t *p_sd )
             libhal_free_string( devices[ i ] );
         }
     }
+
+    /* FIXME: Totally lame. There are DBus watch functions to do this properly.
+     * -- Courmisch, 28/08/2008 */
     while( vlc_object_alive (p_sd) )
     {
         /* look for events on the bus, blocking 1 second */
         dbus_connection_read_write_dispatch( p_sys->p_connection, 1000 );
         /* HAL 0.5.8.1 can use libhal_ctx_get_dbus_connection(p_sys->p_ctx) */
     }
+    vlc_restorecancel (canc);
 }
 
 void DeviceAdded( LibHalContext *p_ctx, const char *psz_udi )

@@ -159,9 +159,12 @@ static void Run( services_discovery_t *p_sd )
     var_Create( p_sd, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
 
-    while( vlc_object_alive (p_sd) )
+    for( ;; )
     {
-        int i;
+        /* FIXME: That's 2000 wake up per seconds too many. */
+        msleep( 500 );
+
+        int canc = vlc_savecancel (); /* <- FIXME: should not be needed */
         if( p_sys->b_update == true )
         {
             msg_Dbg( p_sd, "Update required" );
@@ -172,7 +175,7 @@ static void Run( services_discovery_t *p_sd )
             p_sys->b_update = false;
         }
 
-        for( i = 0; i < p_sd->p_sys->i_input; i++ )
+        for( int i = 0; i < p_sd->p_sys->i_input; i++ )
         {
             if( p_sd->p_sys->pp_input[i]->b_eof
                 || p_sd->p_sys->pp_input[i]->b_error )
@@ -184,7 +187,7 @@ static void Run( services_discovery_t *p_sd )
                 i--;
             }
         }
-        msleep( 500 );
+        vlc_restorecancel (canc);
     }
 }
 

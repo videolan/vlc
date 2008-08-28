@@ -215,6 +215,7 @@ static void Run( services_discovery_t *p_sd )
 {
     enum type_e i_type = (enum type_e)p_sd->p_sys;
     int i, j;
+    int canc = vlc_savecancel();
     
     if( !p_items[i_type].p_children )
     {
@@ -238,6 +239,7 @@ static void Run( services_discovery_t *p_sd )
             vlc_gc_decref( p_input );
         }
     }
+    vlc_restorecancel(canc);
 }
 
 /*****************************************************************************
