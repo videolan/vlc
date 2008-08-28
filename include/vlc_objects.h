@@ -177,26 +177,3 @@ static inline bool __vlc_object_alive (const vlc_object_t *obj)
 VLC_EXPORT( int, __vlc_object_waitpipe, ( vlc_object_t *obj ));
 #define vlc_object_waitpipe(a) \
     __vlc_object_waitpipe( VLC_OBJECT(a) )
-
-/* NOTE: this function is a *temporary* convenience.
- * See the vlc_object_alive() documentation for a better alternative.
- */
-static inline
-bool __vlc_object_lock_and_wait( vlc_object_t *obj )
-{
-    bool b;
-
-    vlc_object_lock( obj );
-    b = vlc_object_alive( obj );
-    if( b )
-    {
-        vlc_object_wait( obj );
-        b = vlc_object_alive( obj );
-    }
-    vlc_object_unlock( obj );
-    return b;
-}
-#define vlc_object_lock_and_wait( obj ) \
-    __vlc_object_lock_and_wait( VLC_OBJECT(obj) )
-
-
