@@ -158,10 +158,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
      * the global stats. Check if there is already someone doing this */
     if( p_input->p_libvlc->p_stats && !b_quick )
     {
-        libvlc_priv_t *priv = libvlc_priv (p_input->p_libvlc);
+        libvlc_priv_t *p_private = libvlc_priv( p_input->p_libvlc );
         vlc_mutex_lock( &p_input->p_libvlc->p_stats->lock );
-        if( priv->p_stats_computer == NULL )
-            priv->p_stats_computer = p_input;
+        if( p_private->p_stats_computer == NULL )
+            p_private->p_stats_computer = p_input;
         vlc_mutex_unlock( &p_input->p_libvlc->p_stats->lock );
     }
 
@@ -318,8 +318,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
  */
 static void Destructor( input_thread_t * p_input )
 {
-    input_thread_private_t *priv = p_input->p;
-
 #ifndef NDEBUG
     char * psz_name = input_item_GetName( p_input->p->input.p_item );
     msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
@@ -331,15 +329,15 @@ static void Destructor( input_thread_t * p_input )
     stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
     stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
 #ifdef ENABLE_SOUT
-    if( priv->p_sout )
-        sout_DeleteInstance( priv->p_sout );
+    if( p_input->p->p_sout )
+        sout_DeleteInstance( p_input->p->p_sout );
 #endif
     vlc_gc_decref( p_input->p->input.p_item );
 
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 
-    vlc_mutex_destroy( &priv->lock_control );
-    free( priv );
+    vlc_mutex_destroy( &p_input->p->lock_control );
+    free( p_input->p );
 }
 
 /**
@@ -492,7 +490,7 @@ sout_instance_t * input_DetachSout( input_thread_t *p_input )
 static void* Run( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    int canc = vlc_savecancel ();
+    const int canc = vlc_savecancel();
 
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
@@ -538,7 +536,7 @@ static void* Run( vlc_object_t *p_this )
 
     /* Clean up */
     End( p_input );
-    vlc_restorecancel (canc);
+    vlc_restorecancel( canc );
     return NULL;
 }
 
@@ -550,11 +548,10 @@ static void* Run( vlc_object_t *p_this )
 static void* RunAndDestroy( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    int canc;
+    const int canc = vlc_savecancel();
 
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
-    canc = vlc_savecancel ();
 
     if( Init( p_input ) )
         goto exit;
@@ -584,8 +581,8 @@ static void* RunAndDestroy( vlc_object_t *p_this )
 exit:
     /* Release memory */
     vlc_object_release( p_input );
-    vlc_restorecancel (canc);
-    return 0;
+    vlc_restorecancel( canc );
+    return NULL;
 }
 
 /*****************************************************************************
@@ -756,7 +753,7 @@ static void MainLoop( input_thread_t *p_input )
         {
             stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
             /* Are we the thread responsible for computing global stats ? */
-            if( libvlc_priv (p_input->p_libvlc)->p_stats_computer == p_input )
+            if( libvlc_priv( p_input->p_libvlc )->p_stats_computer == p_input )
             {
                 stats_ComputeGlobalStats( p_input->p_libvlc,
                                           p_input->p_libvlc->p_stats );
@@ -772,7 +769,7 @@ static void InitStatistics( input_thread_t * p_input )
     /* Prepare statistics */
 #define INIT_COUNTER( c, type, compute ) p_input->p->counters.p_##c = \
  stats_CounterCreate( p_input, VLC_VAR_##type, STATS_##compute);
-    if( libvlc_stats (p_input) )
+    if( libvlc_stats( p_input ) )
     {
         INIT_COUNTER( read_bytes, INTEGER, COUNTER );
         INIT_COUNTER( read_packets, INTEGER, COUNTER );
@@ -840,10 +837,10 @@ static int InitSout( input_thread_t * p_input )
                 return VLC_EGENERIC;
             }
         }
-        if( libvlc_stats (p_input) )
+        if( libvlc_stats( p_input ) )
         {
             INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
-            INIT_COUNTER (sout_sent_bytes, INTEGER, COUNTER );
+            INIT_COUNTER( sout_sent_bytes, INTEGER, COUNTER );
             INIT_COUNTER( sout_send_bitrate, FLOAT, DERIVATIVE );
             if( p_input->p->counters.p_sout_send_bitrate )
                  p_input->p->counters.p_sout_send_bitrate->update_interval =
@@ -1082,7 +1079,7 @@ static void InitPrograms( input_thread_t * p_input )
     if( p_input->p->p_sout )
     {
         var_Get( p_input, "sout-all", &val );
-        if ( val.b_bool )
+        if( val.b_bool )
         {
             i_es_out_mode = ES_OUT_MODE_ALL;
             val.p_list = NULL;
@@ -1090,14 +1087,16 @@ static void InitPrograms( input_thread_t * p_input )
         else
         {
             var_Get( p_input, "programs", &val );
-            if ( val.p_list && val.p_list->i_count )
+            if( val.p_list && val.p_list->i_count )
             {
                 i_es_out_mode = ES_OUT_MODE_PARTIAL;
                 /* Note : we should remove the "program" callback. */
             }
             else
+            {
                 var_Change( p_input, "programs", VLC_VAR_FREELIST, &val,
                             NULL );
+            }
         }
     }
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, i_es_out_mode );
@@ -1237,7 +1236,7 @@ error:
     }
 #endif
 
-    if( !p_input->b_preparsing && libvlc_stats (p_input) )
+    if( !p_input->b_preparsing && libvlc_stats( p_input ) )
     {
 #define EXIT_COUNTER( c ) do { if( p_input->p->counters.p_##c ) \
                                    stats_CounterClean( p_input->p->counters.p_##c );\
@@ -1258,7 +1257,7 @@ error:
         if( p_input->p->p_sout )
         {
             EXIT_COUNTER( sout_sent_packets );
-            EXIT_COUNTER (sout_sent_bytes );
+            EXIT_COUNTER( sout_sent_bytes );
             EXIT_COUNTER( sout_send_bitrate );
         }
 #undef EXIT_COUNTER
@@ -1320,17 +1319,17 @@ static void End( input_thread_t * p_input )
     if( !p_input->b_preparsing )
     {
 #define CL_CO( c ) stats_CounterClean( p_input->p->counters.p_##c ); p_input->p->counters.p_##c = NULL;
-        if( libvlc_stats (p_input) )
+        if( libvlc_stats( p_input ) )
         {
-            libvlc_priv_t *priv = libvlc_priv (p_input->p_libvlc);
+            libvlc_priv_t *p_private = libvlc_priv( p_input->p_libvlc );
 
             /* make sure we are up to date */
             stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
-            if( priv->p_stats_computer == p_input )
+            if( p_private->p_stats_computer == p_input )
             {
                 stats_ComputeGlobalStats( p_input->p_libvlc,
                                           p_input->p_libvlc->p_stats );
-                priv->p_stats_computer = NULL;
+                p_private->p_stats_computer = NULL;
             }
             CL_CO( read_bytes );
             CL_CO( read_packets );
@@ -1841,7 +1840,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                          !demux_Control( p_demux,
                                           DEMUX_GET_TIME, &i_input_time ) )
                     {
-                        if ( i_input_time < i_seekpoint_time + 3000000 )
+                        if( i_input_time < i_seekpoint_time + 3000000 )
                             i_seekpoint--;
                     }
                     else
@@ -1877,7 +1876,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                         demux_Control( p_demux,
                                         DEMUX_GET_TIME, &i_input_time ) )
                     {
-                        if ( i_input_time < i_seekpoint_time + 3000000 )
+                        if( i_input_time < i_seekpoint_time + 3000000 )
                             i_seekpoint--;
                     }
                     else
@@ -2128,7 +2127,7 @@ static int InputSourceInit( input_thread_t *p_input,
 {
     const bool b_master = in == &p_input->p->input;
 
-    char psz_dup[strlen (psz_mrl) + 1];
+    char psz_dup[strlen(psz_mrl) + 1];
     const char *psz_access;
     const char *psz_demux;
     char *psz_path;
@@ -2212,8 +2211,7 @@ static int InputSourceInit( input_thread_t *p_input,
                             &in->title, &in->i_title,
                             &in->i_title_offset, &in->i_seekpoint_offset ) )
         {
-            in->i_title = 0;
-            in->title   = NULL;
+            TAB_INIT( in->i_title, in->title );
         }
         if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
                             &in->b_can_pace_control ) )
@@ -2311,8 +2309,7 @@ static int InputSourceInit( input_thread_t *p_input,
                                 &in->i_title_offset, &in->i_seekpoint_offset ) )
 
             {
-                in->i_title = 0;
-                in->title   = NULL;
+                TAB_INIT( in->i_title, in->title );
             }
             access_Control( in->p_access, ACCESS_CAN_CONTROL_PACE,
                              &in->b_can_pace_control );
@@ -2376,15 +2373,6 @@ static int InputSourceInit( input_thread_t *p_input,
             goto error;
         }
 
-        if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
-            in->b_can_stream_record = false;
-#ifdef ENABLE_SOUT
-        if( !var_CreateGetBool( p_input, "input-record-native" ) )
-            in->b_can_stream_record = false;
-        var_SetBool( p_input, "can-record", true );
-#else
-        var_SetBool( p_input, "can-record", in->b_can_stream_record );
-#endif
         /* Get title from demux */
         if( !p_input->b_preparsing && in->i_title <= 0 )
         {
@@ -2400,6 +2388,17 @@ static int InputSourceInit( input_thread_t *p_input,
             }
         }
     }
+
+    /* Set record capabilities */
+    if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
+        in->b_can_stream_record = false;
+#ifdef ENABLE_SOUT
+    if( !var_CreateGetBool( p_input, "input-record-native" ) )
+        in->b_can_stream_record = false;
+    var_SetBool( p_input, "can-record", true );
+#else
+    var_SetBool( p_input, "can-record", in->b_can_stream_record );
+#endif
 
     /* get attachment
      * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */
