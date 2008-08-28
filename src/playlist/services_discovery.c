@@ -209,11 +209,12 @@ static void* RunSD( vlc_object_t *p_this )
         .type = vlc_ServicesDiscoveryStarted
     };
     int canc = vlc_savecancel ();
-
     vlc_event_send( &p_sd->event_manager, &event );
+    vlc_restorecancel (canc);
 
     p_sd->pf_run( p_sd );
 
+    canc = vlc_savecancel ();
     event.type = vlc_ServicesDiscoveryEnded;
     vlc_event_send( &p_sd->event_manager, &event );
     vlc_restorecancel (canc);
