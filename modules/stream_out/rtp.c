@@ -1727,7 +1727,6 @@ static sout_access_out_t *GrabberCreate( sout_stream_t *p_stream )
         return NULL;
 
     p_grab->p_module    = NULL;
-    p_grab->p_sout      = p_stream->p_sout;
     p_grab->psz_access  = strdup( "grab" );
     p_grab->p_cfg       = NULL;
     p_grab->psz_path    = strdup( "" );

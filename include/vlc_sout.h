@@ -100,7 +100,6 @@ struct sout_access_out_t
     int                     (*pf_control)( sout_access_out_t *, int, va_list);
 
     config_chain_t          *p_cfg;
-    sout_instance_t         *p_sout;
 };
 
 enum access_out_query_e

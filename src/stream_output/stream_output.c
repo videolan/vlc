@@ -307,7 +307,6 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
                                    psz_access );
     free( psz_next );
     p_access->psz_path   = strdup( psz_name ? psz_name : "" );
-    p_access->p_sout     = p_sout;
     p_access->p_sys      = NULL;
     p_access->pf_seek    = NULL;
     p_access->pf_read    = NULL;
@@ -375,6 +374,7 @@ ssize_t sout_AccessOutRead( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 ssize_t sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
 {
+#if 0
     const unsigned i_packets_gather = 30;
     p_access->i_writes++;
     p_access->i_sent_bytes += p_buffer->i_buffer;
@@ -384,6 +384,7 @@ ssize_t sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
         sout_UpdateStatistic( p_access->p_sout, SOUT_STATISTIC_SENT_BYTE, p_access->i_sent_bytes );
         p_access->i_sent_bytes = 0;
     }
+#endif
     return p_access->pf_write( p_access, p_buffer );
 }
 
