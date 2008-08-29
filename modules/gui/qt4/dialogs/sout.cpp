@@ -94,6 +94,78 @@ struct sout_gui_descr_t
     struct streaming_account_t sa_icecast;  /*< Icecast account information */
 };
 
+class SoutMrl
+{
+public:
+    SoutMrl( const QString head = "")
+    {
+        mrl = head;
+        b_first = true;
+        b_has_bracket = false;
+    }
+
+    QString getMrl()
+    {
+        return mrl;
+    }
+
+    void begin( QString module )
+    {
+        if( !b_first )
+            mrl += ":";
+        b_first = false;
+
+        mrl += module;
+        b_has_bracket = false;
+    }
+    void end()
+    {
+        if( b_has_bracket )
+            mrl += "}";
+    }
+    void option( const QString option, const QString value = "" )
+    {
+        if( !b_has_bracket )
+            mrl += "{";
+        else
+            mrl += ",";
+        b_has_bracket = true;
+
+        mrl += option;
+
+        if( !value.isEmpty() )
+        {
+            char *psz = config_StringEscape( qta(value) );
+            if( psz )
+            {
+                QString v = QString( psz );
+
+                mrl += "=\"" + v + "\"";
+
+                free( psz );
+            }
+        }
+    }
+    void option( const QString name, const int i_value, const int i_precision = 10 )
+    {
+        option( name, QString::number( i_value, i_precision ) );
+    }
+    void option( const QString name, const double f_value )
+    {
+        option( name, QString::number( f_value ) );
+    }
+
+    void option( const QString name, const QString base, const int i_value, const int i_precision = 10 )
+    {
+        option( name, base + ":" + QString::number( i_value, i_precision ) );
+    }
+
+private:
+    QString mrl;
+    bool b_has_bracket;
+    bool b_first;
+};
+
 SoutDialog* SoutDialog::instance = NULL;
 
 SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
@@ -448,44 +520,32 @@ void SoutDialog::updateMRL()
     bool trans = false;
     bool more = false;
 
+    SoutMrl smrl( ":sout=#" );
+
     if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked()
          && !ui.rawInput->isChecked() /*demuxdump speciality*/ )
     {
+        smrl.begin( "transcode" );
+
         if ( ui.transcodeVideo->isChecked() )
         {
-            mrl = ":sout=#transcode{";
-            mrl.append( "vcodec=" );
-            mrl.append( sout.psz_vcodec );
-            mrl.append( "," );
-            mrl.append( "vb=" );
-            mrl.append( QString::number( sout.i_vb,10 ) );
-            mrl.append( "," );
-            mrl.append( "scale=" );
-            mrl.append( QString::number( sout.f_scale ) );
+            smrl.option( "vcodec", sout.psz_vcodec );
+            smrl.option( "vb", sout.i_vb );
+            smrl.option( "scale", sout.f_scale );
             trans = true;
         }
 
         if ( ui.transcodeAudio->isChecked() )
         {
-            if ( trans )
-            {
-                mrl.append( "," );
-            }
-            else
-            {
-                mrl = ":sout=#transcode{";
-            }
-            mrl.append( "acodec=" );
-            mrl.append( sout.psz_acodec );
-            mrl.append( "," );
-            mrl.append( "ab=" );
-            mrl.append( QString::number( sout.i_ab,10 ) );
-            mrl.append( "," );
-            mrl.append( "channels=" );
-            mrl.append( QString::number( sout.i_channels,10 ) );
+            smrl.option( "acodec", sout.psz_acodec );
+            smrl.option( "ab", sout.i_ab );
+            smrl.option( "channels", sout.i_channels );
             trans = true;
         }
-        mrl.append( "}" );
+
+        smrl.end();
+
+        mrl = smrl.getMrl();
     }
 
     /* Special case for demuxdump */
@@ -501,146 +561,137 @@ void SoutDialog::updateMRL()
     if ( sout.b_local || sout.b_file || sout.b_http ||
          sout.b_mms || sout.b_rtp || sout.b_udp || sout.b_icecast )
     {
+        if( counter > 1 )
+            smrl.begin( "duplicate" );
 
-#define ISMORE() if ( more ) mrl.append( "," )
-#define ATLEASTONE() if ( counter ) mrl.append( "dst=" )
-
-#define CHECKMUX() \
-       if( sout.psz_mux ) \
-       {                  \
-         mrl.append( ",mux=");\
-         mrl.append( sout.psz_mux ); \
-       }
-
-        if ( trans )
-            mrl.append( ":" );
-        else
-            mrl = ":sout=#";
-
-        if ( counter )
-            mrl.append( "duplicate{" );
+#define ADD(m) do { if( counter > 1 ) { \
+                smrl.option( "dst", m.getMrl() ); \
+            } else { \
+                smrl.begin( m.getMrl() ); \
+                smrl.end(); \
+            } } while(0)
 
         if ( sout.b_local )
         {
-            ISMORE();
-            ATLEASTONE();
-            mrl.append( "display" );
+            SoutMrl m;
+            m.begin( "display" );
+            m.end();
+
+            ADD( m );
             more = true;
         }
 
         if ( sout.b_file )
         {
-            ISMORE();
-            ATLEASTONE();
-            mrl.append( "std{access=file" );
-            CHECKMUX();
-            mrl.append( ",dst=" );
-            mrl.append( sout.psz_file );
-            mrl.append( "}" );
+            SoutMrl m;
+
+            m.begin( "std" );
+            m.option( "access", "file" );
+            if( sout.psz_mux )
+                m.option( "mux", sout.psz_mux );
+            m.option( "dst", sout.psz_file );
+            m.end();
+
+            ADD( m );
             more = true;
         }
 
         if ( sout.b_http )
         {
-            ISMORE();
-            ATLEASTONE();
-            mrl.append( "std{access=http" );
-            CHECKMUX();
-            mrl.append( ",dst=" );
-            mrl.append( sout.psz_http );
-            mrl.append( ":" );
-            mrl.append( QString::number( sout.i_http,10 ) );
-            mrl.append( "}" );
+            SoutMrl m;
+
+            m.begin( "std" );
+            m.option(  "access", "http" );
+            if( sout.psz_mux )
+                m.option( "mux", sout.psz_mux );
+            m.option( "dst", sout.psz_http, sout.i_http );
+            m.end();
+
+            ADD( m );
             more = true;
         }
 
         if ( sout.b_mms )
         {
-            ISMORE();
-            ATLEASTONE();
-            mrl.append( "std{access=mmsh" );
-            CHECKMUX();
-            mrl.append( ",dst=" );
-            mrl.append( sout.psz_mms );
-            mrl.append( ":" );
-            mrl.append( QString::number( sout.i_mms,10 ) );
-            mrl.append( "}" );
+            SoutMrl m;
+
+            m.begin( "std" );
+            m.option(  "access", "mmsh" );
+            m.option( "mux", "asfh" );
+            m.option( "dst", sout.psz_mms, sout.i_mms );
+            m.end();
+
+            ADD( m );
             more = true;
         }
 
         if ( sout.b_rtp )
         {
-            ISMORE();
-            ATLEASTONE();
+            SoutMrl m;
             if ( sout.b_udp )
             {
-                mrl.append( "std{access=udp" );
-                CHECKMUX();
-                mrl.append( ",dst=" );
-                mrl.append( sout.psz_udp );
-                mrl.append( ":" );
-                mrl.append( QString::number( sout.i_udp,10 ) );
+                m.begin( "std" );
+                m.option(  "access", "udp" );
+                if( sout.psz_mux )
+                    m.option( "mux", sout.psz_mux );
+                m.option( "dst", sout.psz_udp, sout.i_udp );
             }
             else
             {
-                mrl.append( "rtp{" );
-                mrl.append( "dst=" );
-                mrl.append( sout.psz_rtp );
-                CHECKMUX();
-                mrl.append( ",port=" );
-                mrl.append( QString::number( sout.i_rtp,10 ) );
+                m.begin( "rtp" );
+
+                if( sout.psz_rtp && *sout.psz_rtp )
+                    m.option( "dst", sout.psz_rtp );
+                if( sout.psz_mux )
+                    m.option( "mux", sout.psz_mux );
+
+                m.option( "port", sout.i_rtp );
                 if( !sout.psz_mux || strncmp( sout.psz_mux, "ts", 2 ) )
                 {
-                    mrl.append( ",port-audio=" );
-                    mrl.append( QString::number( sout.i_rtp_audio, 10 ) );
-                    mrl.append( ",port-video=" );
-                    mrl.append( QString::number( sout.i_rtp_video, 10 ) );
+                    m.option( "port-audio", sout.i_rtp_audio );
+                    m.option( "port-video", sout.i_rtp_video );
                 }
             }
 
             /* SAP */
             if ( sout.b_sap )
             {
-                mrl.append( ",sap," );
-                mrl.append( "group=\"" );
-                mrl.append( sout.psz_group );
-                mrl.append( "\"," );
-                mrl.append( "name=\"" );
-                mrl.append( sout.psz_name );
-                mrl.append( "\"" );
+                m.option( "sap" );
+                m.option( "group", sout.psz_group );
+                m.option( "name", sout.psz_name );
             }
 
-            mrl.append( "}" );
+            m.end();
+            ADD( m );
             more = true;
         }
 
         if( sout.b_icecast )
         {
-            ISMORE();
-            ATLEASTONE();
-            mrl.append( "std{access=shout,mux=ogg" );
-            mrl.append( ",dst=" );
-            mrl.append( sout.sa_icecast.psz_username );
-            mrl.append( "@" );
-            mrl.append( sout.psz_icecast );
-            mrl.append( ":" );
-            mrl.append( QString::number( sout.i_icecast, 10 ) );
-            mrl.append( "/" );
-            mrl.append( sout.psz_icecast_mountpoint );
-            mrl.append( "}" );
+            SoutMrl m;
+            QString url;
+
+            url = QString(sout.sa_icecast.psz_username) + "@" + sout.psz_icecast + ":" +
+                  QString::number( sout.i_icecast, 10 ) + "/" + sout.psz_icecast_mountpoint;
+
+            m.begin( "std" );
+            m.option( "access", "shout" );
+            m.option( "mux", "ogg" );
+            m.option( "dst", url );
+            m.end();
+
+            ADD( m );
             more = true;
         }
 
         if ( counter )
-        {
-            mrl.append( "}" );
-        }
+            smrl.end();
+
+        mrl = smrl.getMrl();
     }
 
-#undef CHECKMUX
-
     if ( sout.b_all_es )
-        mrl.append( ":sout-all" );
+        mrl.append( " :sout-all" );
 
     ui.mrlEdit->setText( mrl );
     free( sout.psz_acodec ); free( sout.psz_vcodec ); free( sout.psz_scodec );
