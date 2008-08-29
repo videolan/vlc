@@ -413,6 +413,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return NULL;
     }
 
+    if( !sout_AccessOutCanControlPace( p_access ) )
+        p_sout->i_out_pace_nocontrol++;
+
     return id;
 }
 
@@ -422,6 +425,8 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     sout_access_out_t *p_access = id->p_mux->p_access;
     sout_MuxDelete( id->p_mux );
     sout_MuxDeleteStream( id->p_mux, id->p_input );
+    if( !sout_AccessOutCanControlPace( p_access ) )
+        p_stream->p_sout->i_out_pace_nocontrol--;
     sout_AccessOutDelete( p_access );
 
     free( id );

@@ -465,6 +465,9 @@ static int Open( vlc_object_t *p_this )
     free( psz_mux );
     free( psz_url );
 
+    if( !sout_AccessOutCanControlPace( p_access ) )
+        p_sout->i_out_pace_nocontrol++;
+
     return VLC_SUCCESS;
 }
 
@@ -481,6 +484,8 @@ static void Close( vlc_object_t * p_this )
         sout_AnnounceUnRegister( p_stream->p_sout, p_sys->p_session );
 
     sout_MuxDelete( p_sys->p_mux );
+    if( !sout_AccessOutCanControlPace( p_access ) )
+        p_stream->p_sout->i_out_pace_nocontrol--;
     sout_AccessOutDelete( p_access );
 
     free( p_sys );
