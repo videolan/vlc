@@ -121,8 +121,6 @@ typedef struct sout_access_thread_t
 {
     VLC_COMMON_MEMBERS
 
-    sout_instance_t *p_sout;
-
     block_fifo_t *p_fifo;
 
     int         i_handle;
@@ -204,7 +202,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     vlc_object_attach( p_sys->p_thread, p_access );
-    p_sys->p_thread->p_sout = p_access->p_sout;
     p_sys->p_thread->b_die  = 0;
     p_sys->p_thread->b_error= 0;
     p_sys->p_thread->p_fifo = block_FifoNew();
@@ -254,7 +251,7 @@ static int Open( vlc_object_t *p_this )
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
                            VLC_THREAD_PRIORITY_HIGHEST, false ) )
     {
-        msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
+        msg_Err( p_access, "cannot spawn sout access thread" );
         net_Close (i_handle);
         vlc_object_release( p_sys->p_thread );
         free (p_sys);
@@ -418,7 +415,7 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
 
     if( block_FifoCount( p_sys->p_thread->p_empty_blocks ) == 0 )
     {
-        p_buffer = block_New( p_access->p_sout, p_sys->i_mtu );
+        p_buffer = block_Alloc( p_sys->i_mtu );
     }
     else
     {
