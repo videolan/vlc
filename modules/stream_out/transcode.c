@@ -1949,6 +1949,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
                     id->p_encoder->fmt_in.video.i_width;
                 id->p_encoder->fmt_out.video.i_height =
                     id->p_encoder->fmt_in.video.i_height;
+                id->p_encoder->fmt_out.video.i_aspect =
+                    id->p_encoder->fmt_in.video.i_aspect;
             }
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
