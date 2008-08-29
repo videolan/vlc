@@ -464,13 +464,6 @@ static int Open( vlc_object_t *p_this )
 
     msg_Dbg( p_access, "shout access output opened (%s@%s:%i/%s)",
              psz_user, psz_host, i_port, psz_mount );
-
-    /* Update pace control flag */
-    if( p_access->psz_access && !strcmp( p_access->psz_access, "stream" ) )
-    {
-        p_access->p_sout->i_out_pace_nocontrol++;
-    }
-
     free( psz_accessname );
 
     return VLC_SUCCESS;
@@ -489,13 +482,6 @@ static void Close( vlc_object_t * p_this )
         shout_shutdown();
     }
     free( p_access->p_sys );
-
-    /* Update pace control flag */
-    if( p_access->psz_access && !strcmp( p_access->psz_access, "stream" ) )
-    {
-        p_access->p_sout->i_out_pace_nocontrol--;
-    }
-
     msg_Dbg( p_access, "shout access output closed" );
 }
 
