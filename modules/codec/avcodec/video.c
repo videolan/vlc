@@ -852,9 +852,16 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     }
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
-     * so this check is necessary. */
+     * so we need to check for direct rendering again. */
+
+    int i_width = p_sys->p_context->width;
+    int i_height = p_sys->p_context->height;
+    avcodec_align_dimensions( p_sys->p_context, &i_width, &i_height );
+
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS ||
-        p_sys->p_context->width % 16 || p_sys->p_context->height % 16 )
+        p_sys->p_context->width % 16 || p_sys->p_context->height % 16 ||
+        /* We only pad picture up to 16 */
+        PAD(p_sys->p_context->width,16) < i_width || PAD(p_sys->p_context->height,16) < i_height )
     {
         msg_Dbg( p_dec, "disabling direct rendering" );
         p_sys->b_direct_rendering = 0;
