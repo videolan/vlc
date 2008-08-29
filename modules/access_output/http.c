@@ -129,6 +129,7 @@ static const char *const ppsz_sout_options[] = {
 
 static ssize_t Write( sout_access_out_t *, block_t * );
 static int Seek ( sout_access_out_t *, off_t  );
+static int Control( sout_access_out_t *, int, va_list );
 
 struct sout_access_out_sys_t
 {
@@ -343,10 +344,7 @@ static int Open( vlc_object_t *p_this )
 
     p_access->pf_write       = Write;
     p_access->pf_seek        = Seek;
-
-
-    /* update p_sout->i_out_pace_nocontrol */
-    p_access->p_sout->i_out_pace_nocontrol++;
+    p_access->pf_control     = Control;
 
     return VLC_SUCCESS;
 }
@@ -364,9 +362,6 @@ static void Close( vlc_object_t * p_this )
         bonjour_stop_service( p_sys->p_bonjour );
 #endif
 
-    /* update p_sout->i_out_pace_nocontrol */
-    p_access->p_sout->i_out_pace_nocontrol--;
-
     httpd_StreamDelete( p_sys->p_httpd_stream );
     httpd_HostDelete( p_sys->p_httpd_host );
 
@@ -375,6 +370,22 @@ static void Close( vlc_object_t * p_this )
     msg_Dbg( p_access, "Close" );
 
     free( p_sys );
+}
+
+static int Control( sout_access_out_t *p_access, int i_query, va_list args )
+{
+    (void)p_access;
+
+    switch( i_query )
+    {
+        case ACCESS_OUT_CONTROLS_PACE:
+            *va_arg( args, bool * ) = false;
+            break;
+
+        default:
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
