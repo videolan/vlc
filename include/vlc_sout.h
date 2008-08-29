@@ -1,13 +1,14 @@
 /*****************************************************************************
  * stream_output.h : stream output module
  *****************************************************************************
- * Copyright (C) 2002-2007 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
  *          Jean-Paul Saman <jpsaman #_at_# m2x.nl>
+ *          Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,8 +99,13 @@ struct sout_access_out_t
     ssize_t                 (*pf_write)( sout_access_out_t *, block_t * );
     int                     (*pf_control)( sout_access_out_t *, int, va_list);
 
-    config_chain_t              *p_cfg;
+    config_chain_t          *p_cfg;
     sout_instance_t         *p_sout;
+};
+
+enum access_out_query_e
+{
+    ACCESS_OUT_CONTROLS_PACE, /* arg1=bool *, can fail (assume true) */
 };
 
 VLC_EXPORT( sout_access_out_t *,sout_AccessOutNew, ( sout_instance_t *, const char *psz_access, const char *psz_name ) );
@@ -107,7 +113,15 @@ VLC_EXPORT( void,               sout_AccessOutDelete, ( sout_access_out_t * ) );
 VLC_EXPORT( int,                sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
 VLC_EXPORT( ssize_t,            sout_AccessOutRead,   ( sout_access_out_t *, block_t * ) );
 VLC_EXPORT( ssize_t,            sout_AccessOutWrite,  ( sout_access_out_t *, block_t * ) );
-VLC_EXPORT( int,                sout_AccessOutControl,( sout_access_out_t *, int, va_list ) );
+VLC_EXPORT( int,                sout_AccessOutControl,( sout_access_out_t *, int, ... ) );
+
+static inline bool sout_AccessOutCanControlPace( sout_access_out_t *p_ao )
+{
+    bool b;
+    if( sout_AccessOutControl( p_ao, ACCESS_OUT_CONTROLS_PACE, &b ) )
+        return true;
+    return b;
+}
 
 /** Muxer structure */
 struct  sout_mux_t

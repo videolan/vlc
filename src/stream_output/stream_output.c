@@ -390,10 +390,18 @@ ssize_t sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
 /**
  * sout_AccessOutControl
  */
-int sout_AccessOutControl (sout_access_out_t *access, int query, va_list args)
+int sout_AccessOutControl (sout_access_out_t *access, int query, ...)
 {
-    return (access->pf_control) ? access->pf_control (access, query, args)
-                                : VLC_EGENERIC;
+    va_list ap;
+    int ret;
+
+    va_start (ap, query);
+    if (access->pf_control)
+        ret = access->pf_control (access, query, ap);
+    else
+        ret = VLC_EGENERIC;
+    va_end (ap);
+    return ret;
 }
 
 /*****************************************************************************
