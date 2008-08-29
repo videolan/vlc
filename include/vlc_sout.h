@@ -97,7 +97,7 @@ struct sout_access_out_t
     int                     (*pf_seek)( sout_access_out_t *, off_t );
     ssize_t                 (*pf_read)( sout_access_out_t *, block_t * );
     ssize_t                 (*pf_write)( sout_access_out_t *, block_t * );
-    int                     (*pf_control)( sout_access_out_t *, int, va_list);
+    int                     (*pf_control)( sout_access_out_t *, int, va_list );
 
     config_chain_t          *p_cfg;
 };
@@ -107,12 +107,14 @@ enum access_out_query_e
     ACCESS_OUT_CONTROLS_PACE, /* arg1=bool *, can fail (assume true) */
 };
 
-VLC_EXPORT( sout_access_out_t *,sout_AccessOutNew, ( sout_instance_t *, const char *psz_access, const char *psz_name ) );
-VLC_EXPORT( void,               sout_AccessOutDelete, ( sout_access_out_t * ) );
-VLC_EXPORT( int,                sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
-VLC_EXPORT( ssize_t,            sout_AccessOutRead,   ( sout_access_out_t *, block_t * ) );
-VLC_EXPORT( ssize_t,            sout_AccessOutWrite,  ( sout_access_out_t *, block_t * ) );
-VLC_EXPORT( int,                sout_AccessOutControl,( sout_access_out_t *, int, ... ) );
+VLC_EXPORT( sout_access_out_t *,sout_AccessOutNew, ( vlc_object_t *, const char *psz_access, const char *psz_name ) );
+#define sout_AccessOutNew( obj, access, name ) \
+        sout_AccessOutNew( VLC_OBJECT(obj), access, name )
+VLC_EXPORT( void, sout_AccessOutDelete, ( sout_access_out_t * ) );
+VLC_EXPORT( int, sout_AccessOutSeek, ( sout_access_out_t *, off_t ) );
+VLC_EXPORT( ssize_t, sout_AccessOutRead, ( sout_access_out_t *, block_t * ) );
+VLC_EXPORT( ssize_t, sout_AccessOutWrite, ( sout_access_out_t *, block_t * ) );
+VLC_EXPORT( int, sout_AccessOutControl, ( sout_access_out_t *, int, ... ) );
 
 static inline bool sout_AccessOutCanControlPace( sout_access_out_t *p_ao )
 {

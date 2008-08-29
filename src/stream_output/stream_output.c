@@ -288,10 +288,11 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
     return i_ret;
 }
 
+#undef sout_AccessOutNew
 /*****************************************************************************
  * sout_AccessOutNew: allocate a new access out
  *****************************************************************************/
-sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
+sout_access_out_t *sout_AccessOutNew( vlc_object_t *p_sout,
                                       const char *psz_access, const char *psz_name )
 {
     static const char typename[] = "access out";
