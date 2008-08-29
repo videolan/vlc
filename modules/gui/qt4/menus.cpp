@@ -1177,7 +1177,6 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         return VLC_EGENERIC;
     }
 
-#define NOTCOMMAND !( i_type & VLC_VAR_ISCOMMAND )
 #define CURVAL val_list.p_list->p_values[i]
 #define CURTEXT text_list.p_list->p_values[i].psz_string
 
@@ -1201,8 +1200,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 menutext = qfu( CURTEXT ? CURTEXT : another_val.psz_string );
                 CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
                         p_object->i_object_id, another_val, i_type,
-                        NOTCOMMAND && val.psz_string &&
-                        !strcmp( val.psz_string, CURVAL.psz_string ) );
+                        val.psz_string && !strcmp( val.psz_string, CURVAL.psz_string ) );
 
                 free( val.psz_string );
                 break;
@@ -1213,7 +1211,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 else menutext.sprintf( "%d", CURVAL.i_int );
                 CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
                         p_object->i_object_id, CURVAL, i_type,
-                        NOTCOMMAND && CURVAL.i_int == val.i_int );
+                        CURVAL.i_int == val.i_int );
                 break;
 
             case VLC_VAR_FLOAT:
@@ -1222,7 +1220,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 else menutext.sprintf( "%.2f", CURVAL.f_float );
                 CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
                         p_object->i_object_id, CURVAL, i_type,
-                        NOTCOMMAND && CURVAL.f_float == val.f_float );
+                        CURVAL.f_float == val.f_float );
                 break;
 
             default:
@@ -1234,7 +1232,6 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     /* clean up everything */
     var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, &text_list );
 
-#undef NOTCOMMAND
 #undef CURVAL
 #undef CURTEXT
     return VLC_SUCCESS;
