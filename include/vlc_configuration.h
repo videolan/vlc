@@ -243,16 +243,62 @@ VLC_EXPORT( bool, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
  ****************************************************************************/
 struct config_chain_t
 {
-    config_chain_t *p_next;
+    config_chain_t *p_next;     /**< Pointer on the next config_chain_t element */
 
-    char        *psz_name;
-    char        *psz_value;
+    char        *psz_name;      /**< Option name */
+    char        *psz_value;     /**< Option value */
 };
 
+/**
+ * This function will
+ * - create all options in the array ppsz_options (var_Create).
+ * - parse the given linked list of config_chain_t and set the value (var_Set).
+ *
+ * The option names will be created by adding the psz_prefix prefix.
+ */
 #define config_ChainParse( a, b, c, d ) __config_ChainParse( VLC_OBJECT(a), b, c, d )
 VLC_EXPORT( void,   __config_ChainParse, ( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, config_chain_t * ) );
-VLC_EXPORT( char *, config_ChainCreate, ( char **, config_chain_t **, const char * ) );
+
+/**
+ * This function will parse a configuration string (psz_string) and
+ * - set the module name (*ppsz_name)
+ * - set all options for this module in a chained list (*pp_cfg)
+ * - returns a pointer on the next module if any.
+ *
+ * The string format is
+ *   module{option=*,option=*}[:modulenext{option=*,...}]
+ *
+ * The options values are unescaped using config_StringUnescape.
+ */
+VLC_EXPORT( char *, config_ChainCreate, ( char **ppsz_name, config_chain_t **pp_cfg, const char *psz_string ) );
+
+/**
+ * This function will release a linked list of config_chain_t
+ * (Including the head)
+ */
 VLC_EXPORT( void, config_ChainDestroy, ( config_chain_t * ) );
+
+/**
+ * This function will unescape a string in place and will return a pointer on
+ * the given string.
+ * No memory is allocated by it (unlike config_StringEscape).
+ * If NULL is given as parameter nothing will be done (NULL will be returned).
+ *
+ * The following sequences will be unescaped (only one time):
+ * \\ \' and \"
+ */
+VLC_EXPORT( char *, config_StringUnescape, ( char *psz_string ) );
+
+/**
+ * This function will escape a string that can be unescaped by
+ * config_StringUnescape.
+ * The returned value is allocated by it. You have to free it once you
+ * do not need it anymore (unlike config_StringUnescape).
+ * If NULL is given as parameter nothing will be done (NULL will be returned).
+ *
+ * The escaped characters are ' " and \
+ */
+VLC_EXPORT( char *, config_StringEscape, ( const char *psz_string ) );
 
 # ifdef __cplusplus
 }

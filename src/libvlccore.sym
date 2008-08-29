@@ -68,6 +68,8 @@ __config_PutPsz
 __config_RemoveIntf
 __config_ResetAll
 __config_SaveConfigFile
+config_StringEscape
+config_StringUnescape
 convert_xml_special_chars
 date_Change
 date_Get

@@ -39,45 +39,139 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
-/* chain format:
-    module{option=*:option=*}[:module{option=*:...}]
- */
-#define SKIPSPACE( p ) { while( *p && ( *p == ' ' || *p == '\t' ) ) p++; }
-#define SKIPTRAILINGSPACE( p, e ) \
-    { while( e > p && ( *(e-1) == ' ' || *(e-1) == '\t' ) ) e--; }
-
-/* go accross " " and { } */
-static const char *_get_chain_end( const char *str )
+static bool IsEscapeNeeded( char c )
 {
-    char c;
-    const char *p = str;
+    return c == '\'' || c == '"' || c == '\\';
+}
+static bool IsEscape( const char *psz )
+{
+    if( !psz )
+        return false;
+    return psz[0] == '\\' && IsEscapeNeeded( psz[1] );
+}
+static bool IsSpace( char c  )
+{
+    return c == ' ' || c == '\t';
+}
 
+#define SKIPSPACE( p ) do { while( *p && IsSpace( *p ) ) p++; } while(0)
+#define SKIPTRAILINGSPACE( p, e ) \
+    do { while( e > p && IsSpace( *(e-1) ) ) e--; } while(0)
+
+/**
+ * This function will return a pointer after the end of a string element.
+ * It will search the closing element which is
+ * } for { (it will handle nested { ... })
+ * " for "
+ * ' for '
+ */
+static const char *ChainGetEnd( const char *psz_string )
+{
+    const char *p = psz_string;
+    char c;
+
+    if( !psz_string )
+        return NULL;
+
+    /* Look for a opening character */
     SKIPSPACE( p );
 
+    for( ;; p++)
+    {
+        if( *p == '\0' || *p == ',' || *p == '}' )
+            return p;
+
+        if( *p == '{' || *p == '"' || *p == '\'' )
+            break;
+    }
+
+    /* Set c to the closing character */
+    if( *p == '{' )
+        c = '}';
+    else
+        c = *p;
+    p++;
+
+    /* Search the closing character, handle nested {..} */
     for( ;; )
     {
-        if( !*p || *p == ',' || *p == '}' ) return p;
+        if( *p == '\0')
+            return p;
 
-        if( *p != '{' && *p != '"' && *p != '\'' )
-        {
+        if( IsEscape( p ) )
+            p += 2;
+        else if( *p == c )
+            return ++p;
+        else if( *p == '{' && c == '}' )
+            p = ChainGetEnd( p );
+        else
             p++;
-            continue;
-        }
+    }
+}
 
-        if( *p == '{' ) c = '}';
-        else c = *p;
+/**
+ * It will extract an option value (=... or {...}).
+ * It will remove the initial = if present but keep the {}
+ */
+static char *ChainGetValue( const char **ppsz_string )
+{
+    const char *p = *ppsz_string;
+
+    char *psz_value = NULL;
+    const char *end;
+    bool b_keep_brackets = (*p == '{');
+
+    if( *p == '=' )
         p++;
 
-        for( ;; )
-        {
-            if( !*p ) return p;
+    end = ChainGetEnd( p );
+    if( end <= p )
+    {
+        psz_value = NULL;
+    }
+    else
+    {
+        /* Skip heading and trailing spaces.
+         * This ain't necessary but will avoid simple
+         * user mistakes. */
+        SKIPSPACE( p );
+    }
 
-            if( *p == c ) return ++p;
-            else if( *p == '{' && c == '}' ) p = _get_chain_end( p );
-            else p++;
+    if( end <= p )
+    {
+        psz_value = NULL;
+    }
+    else
+    {
+        if( *p == '\'' || *p == '"' || ( !b_keep_brackets && *p == '{' ) )
+        {
+            p++;
+
+            if( *(end-1) != '\'' && *(end-1) == '"' )
+                SKIPTRAILINGSPACE( p, end );
+
+            if( end - 1 <= p )
+                psz_value = NULL;
+            else
+                psz_value = strndup( p, end -1 - p );
+        }
+        else
+        {
+            SKIPTRAILINGSPACE( p, end );
+            if( end <= p )
+                psz_value = NULL;
+            else
+                psz_value = strndup( p, end - p );
         }
     }
+
+    /* */
+    if( psz_value )
+        config_StringUnescape( psz_value );
+
+    /* */
+    *ppsz_string = end;
+    return psz_value;
 }
 
 char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, const char *psz_chain )
@@ -88,116 +182,88 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, const char 
     *ppsz_name = NULL;
     *pp_cfg    = NULL;
 
-    if( !p ) return NULL;
+    if( !p )
+        return NULL;
 
+    /* Look for parameter(either a {...} or :...) or the end of name (space or nul) */
     SKIPSPACE( p );
 
-    while( *p && *p != '{' && *p != ':' && *p != ' ' && *p != '\t' ) p++;
+    while( *p && *p != '{' && *p != ':' && !IsSpace( *p ) )
+        p++;
 
-    if( p == psz_chain ) return NULL;
+    if( p == psz_chain )
+        return NULL;
 
+    /* Extract the name */
     *ppsz_name = strndup( psz_chain, p - psz_chain );
 
+    /* Parse the parameters */
     SKIPSPACE( p );
 
     if( *p == '{' )
     {
         const char *psz_name;
 
+        /* Skip the opening '{' */
         p++;
 
+        /* parse all name=value[,] elements */
         for( ;; )
         {
-            config_chain_t cfg;
-
             SKIPSPACE( p );
 
             psz_name = p;
 
-            while( *p && *p != '=' && *p != ',' && *p != '{' && *p != '}' &&
-                   *p != ' ' && *p != '\t' ) p++;
+            /* Look for the end of the name (,={}_space_) */
+            while( *p && *p != '=' && *p != ',' && *p != '{' && *p != '}' && !IsSpace( *p ) )
+                p++;
 
-            /* fprintf( stderr, "name=%s - rest=%s\n", psz_name, p ); */
+            // fprintf( stderr, "name=%s - rest=%s\n", psz_name, p );
             if( p == psz_name )
             {
                 fprintf( stderr, "config_ChainCreate: invalid options (empty) \n" );
                 break;
             }
 
+            /* */
+            config_chain_t cfg;
             cfg.psz_name = strndup( psz_name, p - psz_name );
+            cfg.psz_value = NULL;
+            cfg.p_next = NULL;
 
+            /* Parse the option name parameter */
             SKIPSPACE( p );
 
             if( *p == '=' || *p == '{' )
             {
-                const char *end;
-                bool b_keep_brackets = (*p == '{');
+                cfg.psz_value = ChainGetValue( &p );
 
-                if( *p == '=' ) p++;
-
-                end = _get_chain_end( p );
-                if( end <= p )
-                {
-                    cfg.psz_value = NULL;
-                }
-                else
-                {
-                    /* Skip heading and trailing spaces.
-                     * This ain't necessary but will avoid simple
-                     * user mistakes. */
-                    SKIPSPACE( p );
-                }
-
-                if( end <= p )
-                {
-                    cfg.psz_value = NULL;
-                }
-                else
-                {
-                    if( *p == '\'' || *p == '"' ||
-                        ( !b_keep_brackets && *p == '{' ) )
-                    {
-                        p++;
-
-                        if( *(end-1) != '\'' && *(end-1) == '"' )
-                            SKIPTRAILINGSPACE( p, end );
-
-                        if( end - 1 <= p ) cfg.psz_value = NULL;
-                        else cfg.psz_value = strndup( p, end -1 - p );
-                    }
-                    else
-                    {
-                        SKIPTRAILINGSPACE( p, end );
-                        if( end <= p ) cfg.psz_value = NULL;
-                        else cfg.psz_value = strndup( p, end - p );
-                    }
-                }
-
-                p = end;
                 SKIPSPACE( p );
             }
-            else
-            {
-                cfg.psz_value = NULL;
-            }
 
-            cfg.p_next = NULL;
+            /* Append the new option */
+            config_chain_t *p_new = malloc( sizeof(*p_new) );
+            if( !p_new )
+            {
+                free( cfg.psz_name );
+                free( cfg.psz_value );
+                break;
+            }
+            *p_new = cfg;
+
             if( p_cfg )
             {
-                p_cfg->p_next = malloc( sizeof( config_chain_t ) );
-                memcpy( p_cfg->p_next, &cfg, sizeof( config_chain_t ) );
-
+                p_cfg->p_next = p_new;
                 p_cfg = p_cfg->p_next;
             }
             else
             {
-                p_cfg = malloc( sizeof( config_chain_t ) );
-                memcpy( p_cfg, &cfg, sizeof( config_chain_t ) );
-
-                *pp_cfg = p_cfg;
+                *pp_cfg = p_cfg = p_new;
             }
 
-            if( *p == ',' ) p++;
+            /* */
+            if( *p == ',' )
+                p++;
 
             if( *p == '}' )
             {
@@ -207,7 +273,8 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, const char 
         }
     }
 
-    if( *p == ':' ) return( strdup( p + 1 ) );
+    if( *p == ':' )
+        return strdup( &p[1] );
 
     return NULL;
 }
@@ -384,3 +451,51 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                  cfg->psz_value ? cfg->psz_value : "(null)" );
     }
 }
+
+char *config_StringUnescape( char *psz_string )
+{
+    char *psz_src = psz_string;
+    char *psz_dst = psz_string;
+    if( !psz_src )
+        return NULL;
+
+    while( *psz_src )
+    {
+        if( IsEscape( psz_src ) )
+            psz_src++;
+        *psz_dst++ = *psz_src++;
+    }
+    *psz_dst = '\0';
+
+    return psz_string;
+}
+
+char *config_StringEscape( const char *psz_string )
+{
+    char *psz_return;
+    char *psz_dst;
+    int i_escape;
+
+    if( !psz_string )
+        return NULL;
+
+    i_escape = 0;
+    for( const char *p = psz_string; *p; p++ )
+    {
+        if( IsEscapeNeeded( *p ) )
+            i_escape++;
+    }
+
+    psz_return = psz_dst = malloc( strlen( psz_string ) + i_escape + 1 );
+    for( const char *p = psz_string; *p; p++ )
+    {
+        if( IsEscapeNeeded( *p ) )
+            *psz_dst++ = '\\';
+        *psz_dst++ = *p;
+    }
+    *psz_dst = '\0';
+
+    return psz_return;
+}
+
+
