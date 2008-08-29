@@ -260,21 +260,6 @@ private:
 };
 
 
-// VLC callback prototypes
-
-static playlist_t *pl_Get( services_discovery_t *p_sd )
-{
-    return p_sd->p_sys->p_playlist;
-}
-
-// More prototypes...
-
-static int Callback( Upnp_EventType eventType, void* event, void* pCookie );
-
-const char* xml_getChildElementValue( IXML_Element* parent, const char* tagName );
-IXML_Document* parseBrowseResult( IXML_Document* doc );
-
-
 
 // VLC handle
 
@@ -286,6 +271,26 @@ struct services_discovery_sys_t
     Cookie cookie;
 };
 
+
+
+// VLC callback prototypes
+
+static playlist_t *pl_Get( services_discovery_t *p_sd )
+{
+    return p_sd->p_sys->p_playlist;
+}
+
+
+
+// More prototypes...
+
+static int Callback( Upnp_EventType eventType, void* event, void* pCookie );
+
+const char* xml_getChildElementValue( IXML_Element* parent, const char* tagName );
+IXML_Document* parseBrowseResult( IXML_Document* doc );
+
+
+
 // VLC callbacks...
 
 static int Open( vlc_object_t *p_this )
@@ -296,6 +301,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sd->p_sys = p_sys;
     p_sys->p_playlist = pl_Yield( p_sd );
+    Cookie cookie = p_sys->cookie;
 
     /* Create our playlist node */
     vlc_object_lock( p_sys->p_playlist );
