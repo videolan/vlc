@@ -586,9 +586,8 @@ void __vlc_object_kill( vlc_object_t *p_this )
  * vlc_object_yield(), use the pointer as your reference, and call
  * vlc_object_release() when you're done.
  */
-void * vlc_object_get( int i_id )
+void * vlc_object_get( libvlc_int_t *p_anchor, int i_id )
 {
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
     vlc_object_t *obj = NULL;
 #ifndef NDEBUG
     int canc = vlc_savecancel ();
@@ -597,8 +596,8 @@ void * vlc_object_get( int i_id )
 #endif
     vlc_mutex_lock( &structure_lock );
 
-    for( obj = vlc_internals (p_libvlc_global)->next;
-         obj != VLC_OBJECT (p_libvlc_global);
+    for( obj = vlc_internals (p_anchor)->next;
+         obj != VLC_OBJECT (p_anchor);
          obj = vlc_internals (obj)->next )
     {
         if( obj->i_object_id == i_id )
@@ -947,10 +946,12 @@ vlc_list_t *__vlc_list_children( vlc_object_t *obj )
 static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    libvlc_int_t *p_libvlc = p_this->p_libvlc;
+
     (void)oldval; (void)p_data;
     if( *psz_cmd == 'l' )
     {
-        vlc_object_t *root = VLC_OBJECT (vlc_global ()), *cur = root;
+        vlc_object_t *cur = VLC_OBJECT (p_libvlc);
 
         vlc_mutex_lock( &structure_lock );
         do
@@ -958,7 +959,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
             PrintObject (cur, "");
             cur = vlc_internals (cur)->next;
         }
-        while (cur != root);
+        while (cur != VLC_OBJECT(p_libvlc));
         vlc_mutex_unlock( &structure_lock );
     }
     else
@@ -969,8 +970,8 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
         {
             char *end;
             int i_id = strtol( newval.psz_string, &end, 0 );
-            if( end != newval.psz_string )
-                p_object = vlc_object_get( i_id );
+            if( !*end )
+                p_object = vlc_object_get( p_libvlc, i_id );
             else
                 /* try using the object's name to find it */
                 p_object = vlc_object_find_name( p_this, newval.psz_string,
@@ -989,7 +990,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
             char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
 
             if( !p_object )
-                p_object = p_this->p_libvlc ? VLC_OBJECT(p_this->p_libvlc) : p_this;
+                p_object = VLC_OBJECT(p_this->p_libvlc);
 
             psz_foo[0] = '|';
             DumpStructure( p_object, 0, psz_foo );

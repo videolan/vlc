@@ -110,7 +110,7 @@ void VideoWidget::paintEvent(QPaintEvent *ev)
 VideoWidget::~VideoWidget()
 {
     vout_thread_t *p_vout = i_vout ?
-        (vout_thread_t *)vlc_object_get( i_vout ) : NULL;
+        (vout_thread_t *)vlc_object_get( p_intf->p_libvlc, i_vout ) : NULL;
 
     if( p_vout )
     {

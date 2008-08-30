@@ -973,7 +973,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
         }
         else
         {
-            p_object = ( vlc_object_t * )vlc_object_get( objects[i] );
+            p_object = ( vlc_object_t * )vlc_object_get( p_intf->p_libvlc, objects[i] );
             if( !p_object )
             {
                 msg_Warn( p_intf, "object %d not found !", objects[i] );
@@ -1277,7 +1277,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
 {
     MenuItemData *itemData = qobject_cast<MenuItemData *>( data );
-    vlc_object_t *p_object = ( vlc_object_t * )vlc_object_get( itemData->i_object_id );
+    vlc_object_t *p_object = ( vlc_object_t * )vlc_object_get( p_intf->p_libvlc, itemData->i_object_id );
     if( p_object == NULL ) return;
 
     var_Set( p_object, itemData->psz_var, itemData->val );
