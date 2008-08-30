@@ -305,40 +305,33 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     free( p_this->psz_header );
 
-    if( p_this->p_libvlc == NULL )
-    {
 #ifndef NDEBUG
-        libvlc_global_data_t *p_global = (libvlc_global_data_t *)p_this;
-
-        assert( p_global == vlc_global() );
+    if( VLC_OBJECT(p_this->p_libvlc) == p_this )
+    {
         /* Test for leaks */
-        if (p_priv->next != p_this)
+        vlc_object_t *leaked = p_priv->next;
+        while( leaked != p_this )
         {
-            vlc_object_t *leaked = p_priv->next, *first = leaked;
-            do
-            {
-                /* We are leaking this object */
-                fprintf( stderr,
-                         "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
-                         leaked->i_object_id, leaked->psz_object_type,
-                         leaked->psz_object_name );
-                /* Dump libvlc object to ease debugging */
-                vlc_object_dump( leaked );
-                fflush(stderr);
-                leaked = vlc_internals (leaked)->next;
-            }
-            while (leaked != first);
-
-            /* Dump global object to ease debugging */
-            vlc_object_dump( p_this );
-            /* Strongly abort, cause we want these to be fixed */
-            abort();
+            /* We are leaking this object */
+            fprintf( stderr,
+                     "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
+                     leaked->i_object_id, leaked->psz_object_type,
+                     leaked->psz_object_name );
+            /* Dump object to ease debugging */
+            vlc_object_dump( leaked );
+            fflush(stderr);
+            leaked = vlc_internals (leaked)->next;
         }
+
+        if( p_priv->next != p_this )
+            /* Dump libvlc object to ease debugging */
+            vlc_object_dump( p_this );
+    }
 #endif
 
+    if( p_this->p_libvlc == NULL )
         /* We are the global object ... no need to lock. */
         vlc_mutex_destroy( &structure_lock );
-    }
 
     FREENULL( p_this->psz_object_name );
 
