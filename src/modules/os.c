@@ -84,7 +84,7 @@ static char * GetWindowsError  ( void );
  * \param p_module the modules
  * \return 0 if it pass and -1 in case of a failure
  */
-int module_Call( module_t *p_module )
+int module_Call( vlc_object_t *obj, module_t *p_module )
 {
     static const char psz_name[] = "vlc_entry" MODULE_SUFFIX;
     int (* pf_symbol) ( module_t * p_module );
@@ -95,19 +95,19 @@ int module_Call( module_t *p_module )
     if( pf_symbol == NULL )
     {
 #if defined(HAVE_DL_DYLD) || defined(HAVE_DL_BEOS)
-        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s'",
-                            psz_name, p_module->psz_filename );
+        msg_Warn( obj, "cannot find symbol \"%s\" in file `%s'",
+                  psz_name, p_module->psz_filename );
 #elif defined(HAVE_DL_WINDOWS)
         char *psz_error = GetWindowsError();
-        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%s)",
-                            psz_name, p_module->psz_filename, psz_error );
+        msg_Warn( obj, "cannot find symbol \"%s\" in file `%s' (%s)",
+                  psz_name, p_module->psz_filename, psz_error );
         free( psz_error );
 #elif defined(HAVE_DL_DLOPEN)
-        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%s)",
-                            psz_name, p_module->psz_filename, dlerror() );
+        msg_Warn( obj, "cannot find symbol \"%s\" in file `%s' (%s)",
+                  psz_name, p_module->psz_filename, dlerror() );
 #elif defined(HAVE_DL_SHL_LOAD)
-        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%m)",
-                            psz_name, p_module->psz_filename );
+        msg_Warn( obj, "cannot find symbol \"%s\" in file `%s' (%m)",
+                  psz_name, p_module->psz_filename );
 #else
 #   error "Something is wrong in modules.c"
 #endif
@@ -119,8 +119,8 @@ int module_Call( module_t *p_module )
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
-        msg_Err( p_module, "Failed to call symbol \"%s\" in file `%s'",
-                           psz_name, p_module->psz_filename );
+        msg_Err( obj, "Failed to call symbol \"%s\" in file `%s'",
+                 psz_name, p_module->psz_filename );
         return -1;
     }
 

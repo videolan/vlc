@@ -1252,7 +1252,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     p_module->b_loaded = true;
 
     /* Initialize the module: fill p_module, default config */
-    if( module_Call( p_module ) != 0 )
+    if( module_Call( VLC_OBJECT(p_module), p_module ) != 0 )
     {
         /* We couldn't call module_init() */
         vlc_object_release( p_module );

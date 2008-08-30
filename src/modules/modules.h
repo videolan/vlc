@@ -154,8 +154,8 @@ void  __module_EndBank         ( vlc_object_t * );
 void  __module_ResetBank       ( vlc_object_t * );
 
 /* Low-level OS-dependent handler */
-int  module_Call   (module_t *);
 int  module_Load   (vlc_object_t *, const char *, module_handle_t *);
+int  module_Call   (vlc_object_t *obj, module_t *);
 void module_Unload (module_handle_t);
 
 /* Plugins cache */
