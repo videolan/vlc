@@ -1039,8 +1039,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
         es->i_channel = p_sys->i_audio;
 
-        vlc_mutex_lock( &p_input->p->input.p_item->lock );
         memset( &rg, 0, sizeof(rg) );
+        vlc_mutex_lock( &p_input->p->input.p_item->lock );
         vlc_audio_replay_gain_MergeFromMeta( &rg, p_input->p->input.p_item->p_meta );
         vlc_mutex_unlock( &p_input->p->input.p_item->lock );
 
