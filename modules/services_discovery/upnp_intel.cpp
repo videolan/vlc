@@ -301,7 +301,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sd->p_sys = p_sys;
     p_sys->p_playlist = pl_Yield( p_sd );
-    Cookie cookie = p_sys->cookie;
+    Cookie *cookie = &p_sys->cookie;
 
     /* Create our playlist node */
     vlc_object_lock( p_sys->p_playlist );
@@ -310,9 +310,9 @@ static int Open( vlc_object_t *p_this )
                               true );
     vlc_object_unlock( p_sys->p_playlist );
 
-    p_sys->cookie.serviceDiscovery = p_sd;
-    p_sys->cookie.serverList = new MediaServerList( &cookie );
-    p_sys->cookie.lock = new Lockable();
+    cookie->serviceDiscovery = p_sd;
+    cookie->lock = new Lockable();
+    cookie->serverList = new MediaServerList( cookie );
 
     int res = UpnpInit( 0, 0 );
     if( res != UPNP_E_SUCCESS )
@@ -321,14 +321,15 @@ static int Open( vlc_object_t *p_this )
         goto shutDown;
     }
 
-    res = UpnpRegisterClient( Callback, &cookie, &cookie.clientHandle );
+    res = UpnpRegisterClient( Callback, cookie, &cookie->clientHandle );
     if( res != UPNP_E_SUCCESS )
     {
         msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
         goto shutDown;
     }
 
-    res = UpnpSearchAsync( cookie.clientHandle, 5, MEDIA_SERVER_DEVICE_TYPE, &cookie );
+    res = UpnpSearchAsync( cookie->clientHandle, 5, MEDIA_SERVER_DEVICE_TYPE,
+                           cookie );
     if( res != UPNP_E_SUCCESS )
     {
         msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
