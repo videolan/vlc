@@ -560,7 +560,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     DIR *path;
     int i_ret;
     bool b_embedded_snapshot;
-    uintmax_t i_id = (uintmax_t)NULL;
+    uintmax_t i_id = (uintptr_t)NULL;
 
     /* */
     val.psz_string = var_GetNonEmptyString( p_vout, "snapshot-path" );
