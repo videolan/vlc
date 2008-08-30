@@ -147,10 +147,12 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         if( i_type == VLC_OBJECT_LIBVLC )
             p_new->p_libvlc = (libvlc_int_t*)p_new;
         else
+        {
             p_new->p_libvlc = NULL;
+            vlc_mutex_init( &structure_lock );
+        }
 
         p_this = p_priv->next = p_priv->prev = p_new;
-        vlc_mutex_init( &structure_lock );
     }
     else
         p_new->p_libvlc = p_this->p_libvlc;
