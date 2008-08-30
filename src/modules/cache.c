@@ -105,7 +105,6 @@ void CacheLoad( vlc_object_t *p_this )
     int i_cache;
     module_cache_t **pp_cache = 0;
     int32_t i_file_size, i_marker;
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     if( !psz_cachedir ) /* XXX: this should never happen */
     {
@@ -121,7 +120,7 @@ void CacheLoad( vlc_object_t *p_this )
     }
     free( psz_cachedir );
 
-    if( p_libvlc_global->p_module_bank->b_cache_delete )
+    if( p_module_bank->b_cache_delete )
     {
 #if !defined( UNDER_CE )
         unlink( psz_filename );
@@ -224,7 +223,7 @@ void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
-    p_libvlc_global->p_module_bank->i_loaded_cache = 0;
+    p_module_bank->i_loaded_cache = 0;
     if (fread( &i_cache, 1, sizeof(i_cache), file ) != sizeof(i_cache) )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
@@ -234,7 +233,7 @@ void CacheLoad( vlc_object_t *p_this )
     }
 
     if( i_cache )
-        pp_cache = p_libvlc_global->p_module_bank->pp_loaded_cache =
+        pp_cache = p_module_bank->pp_loaded_cache =
                    malloc( i_cache * sizeof(void *) );
 
 #define LOAD_IMMEDIATE(a) \
@@ -265,7 +264,7 @@ void CacheLoad( vlc_object_t *p_this )
         int i_submodules;
 
         pp_cache[i] = malloc( sizeof(module_cache_t) );
-        p_libvlc_global->p_module_bank->i_loaded_cache++;
+        p_module_bank->i_loaded_cache++;
 
         /* Load common info */
         LOAD_STRING( pp_cache[i]->psz_file );
@@ -331,7 +330,7 @@ void CacheLoad( vlc_object_t *p_this )
     msg_Warn( p_this, "plugins cache not loaded (corrupted)" );
 
     /* TODO: cleanup */
-    p_libvlc_global->p_module_bank->i_loaded_cache = 0;
+    p_module_bank->i_loaded_cache = 0;
 
     fclose( file );
     return;
@@ -473,7 +472,6 @@ void CacheSave( vlc_object_t *p_this )
     int i, j, i_cache;
     module_cache_t **pp_cache;
     uint32_t i_file_size = 0;
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     if( !psz_cachedir ) /* XXX: this should never happen */
     {
@@ -530,8 +528,8 @@ void CacheSave( vlc_object_t *p_this )
     if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1)
         goto error;
 
-    i_cache = p_libvlc_global->p_module_bank->i_cache;
-    pp_cache = p_libvlc_global->p_module_bank->pp_cache;
+    i_cache = p_module_bank->i_cache;
+    pp_cache = p_module_bank->pp_cache;
 
     if (fwrite( &i_cache, sizeof (i_cache), 1, file) != 1)
         goto error;
@@ -725,10 +723,9 @@ module_cache_t *CacheFind( const char *psz_file,
 {
     module_cache_t **pp_cache;
     int i_cache, i;
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    pp_cache = p_libvlc_global->p_module_bank->pp_loaded_cache;
-    i_cache = p_libvlc_global->p_module_bank->i_loaded_cache;
+    pp_cache = p_module_bank->pp_loaded_cache;
+    i_cache = p_module_bank->i_loaded_cache;
 
     for( i = 0; i < i_cache; i++ )
     {

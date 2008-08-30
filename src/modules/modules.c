@@ -90,6 +90,8 @@
 #include "modules/modules.h"
 #include "modules/builtin.h"
 
+module_bank_t *p_module_bank;
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -117,11 +119,10 @@ static void   UndupModule      ( module_t * );
 void __module_InitBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank = NULL;
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
 
-    if( p_libvlc_global->p_module_bank == NULL )
+    if( p_module_bank == NULL )
     {
         p_bank = vlc_custom_create( p_this, sizeof(module_bank_t),
                                     VLC_OBJECT_GENERIC, "module bank");
@@ -132,8 +133,7 @@ void __module_InitBank( vlc_object_t *p_this )
         p_bank->b_cache_delete = false;
 
         /* Everything worked, attach the object */
-        p_libvlc_global->p_module_bank = p_bank;
-        vlc_object_attach( p_bank, p_libvlc_global );
+        p_module_bank = p_bank;
 
         /* Fills the module bank structure with the main module infos.
          * This is very useful as it will allow us to consider the main
@@ -143,7 +143,7 @@ void __module_InitBank( vlc_object_t *p_this )
         AllocateBuiltinModule( p_this, vlc_entry__main );
     }
     else
-        p_libvlc_global->p_module_bank->i_usage++;
+        p_module_bank->i_usage++;
 
     vlc_mutex_unlock( lock );
 }
@@ -160,15 +160,14 @@ void __module_InitBank( vlc_object_t *p_this )
 void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next = NULL;
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
-    if( !p_libvlc_global->p_module_bank )
+    if( !p_module_bank )
     {
         vlc_mutex_unlock( lock );
         return;
     }
-    if( --p_libvlc_global->p_module_bank->i_usage )
+    if( --p_module_bank->i_usage )
     {
         vlc_mutex_unlock( lock );
         return;
@@ -179,7 +178,7 @@ void __module_EndBank( vlc_object_t *p_this )
     config_AutoSaveConfigFile( p_this );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-# define p_bank p_libvlc_global->p_module_bank
+# define p_bank p_module_bank
     if( p_bank->b_cache ) CacheSave( p_this );
     while( p_bank->i_loaded_cache-- )
     {
@@ -212,16 +211,14 @@ void __module_EndBank( vlc_object_t *p_this )
 # undef p_bank
 #endif
 
-    vlc_object_detach( p_libvlc_global->p_module_bank );
-
-    while( vlc_internals( p_libvlc_global->p_module_bank )->i_children )
+    while( vlc_internals( p_module_bank )->i_children )
     {
-        p_next = (module_t *)vlc_internals( p_libvlc_global->p_module_bank )->pp_children[0];
+        p_next = (module_t *)vlc_internals( p_module_bank )->pp_children[0];
         DeleteModule( p_next, true );
     }
 
-    vlc_object_release( p_libvlc_global->p_module_bank );
-    p_libvlc_global->p_module_bank = NULL;
+    vlc_object_release( p_module_bank );
+    p_module_bank = NULL;
 }
 
 /**
@@ -233,15 +230,13 @@ void __module_EndBank( vlc_object_t *p_this )
  */
 void __module_LoadBuiltins( vlc_object_t * p_this )
 {
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
-
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
-    if( p_libvlc_global->p_module_bank->b_builtins )
+    if( p_module_bank->b_builtins )
     {
         vlc_mutex_unlock( lock );
         return;
     }
-    p_libvlc_global->p_module_bank->b_builtins = true;
+    p_module_bank->b_builtins = true;
     vlc_mutex_unlock( lock );
 
     msg_Dbg( p_this, "checking builtin modules" );
@@ -259,24 +254,22 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
 void __module_LoadPlugins( vlc_object_t * p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
-
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
-    if( p_libvlc_global->p_module_bank->b_plugins )
+    if( p_module_bank->b_plugins )
     {
         vlc_mutex_unlock( lock );
         return;
     }
-    p_libvlc_global->p_module_bank->b_plugins = true;
+    p_module_bank->b_plugins = true;
     vlc_mutex_unlock( lock );
 
     msg_Dbg( p_this, "checking plugin modules" );
 
     if( config_GetInt( p_this, "plugins-cache" ) )
-        p_libvlc_global->p_module_bank->b_cache = true;
+        p_module_bank->b_cache = true;
 
-    if( p_libvlc_global->p_module_bank->b_cache ||
-        p_libvlc_global->p_module_bank->b_cache_delete ) CacheLoad( p_this );
+    if( p_module_bank->b_cache ||
+        p_module_bank->b_cache_delete ) CacheLoad( p_this );
 
     AllocateAllPlugins( p_this );
 #endif
@@ -1188,8 +1181,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
 
     if( p_module )
     {
-        libvlc_global_data_t *p_libvlc_global = vlc_global();
-
         /* Everything worked fine !
          * The module is ready to be added to the list. */
         p_module->b_builtin = false;
@@ -1197,12 +1188,12 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         /* msg_Dbg( p_this, "plugin \"%s\", %s",
                     p_module->psz_object_name, p_module->psz_longname ); */
 
-        vlc_object_attach( p_module, p_libvlc_global->p_module_bank );
+        vlc_object_attach( p_module, p_module_bank );
 
-        if( !p_libvlc_global->p_module_bank->b_cache )
+        if( !p_module_bank->b_cache )
             return 0;
 
-#define p_bank p_libvlc_global->p_module_bank
+#define p_bank p_module_bank
         /* Add entry to cache */
         p_bank->pp_cache =
             realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
@@ -1363,7 +1354,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     /* msg_Dbg( p_this, "builtin \"%s\", %s",
                 p_module->psz_object_name, p_module->psz_longname ); */
 
-    vlc_object_attach( p_module, vlc_global()->p_module_bank );
+    vlc_object_attach( p_module, p_module_bank );
 
     return 0;
 }

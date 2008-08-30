@@ -182,7 +182,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     if (vlc_threads_init ())
         return NULL;
 
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have variables */
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
@@ -190,8 +189,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
     {
         /* Guess what CPU we have */
         cpu_flags = CPUCapabilities();
-       /* The module bank will be initialized later */
-        p_libvlc_global->p_module_bank = NULL;
+        /* The module bank will be initialized later */
+        p_module_bank = NULL;
     }
 
     /* Allocate a libvlc instance object */
@@ -250,7 +249,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
 int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                          const char *ppsz_argv[] )
 {
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     char         p_capabilities[200];
     char *       p_tmp = NULL;
@@ -324,7 +322,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Check for plugins cache options */
     if( config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0 )
     {
-        p_libvlc_global->p_module_bank->b_cache_delete = true;
+        p_module_bank->b_cache_delete = true;
     }
 
     /* Will be re-done properly later on */
@@ -416,7 +414,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     psz_language = config_GetPsz( p_libvlc, "language" );
     if( psz_language && *psz_language && strcmp( psz_language, "auto" ) )
     {
-        bool b_cache_delete = p_libvlc_global->p_module_bank->b_cache_delete;
+        bool b_cache_delete = p_module_bank->b_cache_delete;
 
         /* Reset the default domain */
         SetLanguage( psz_language );
@@ -429,7 +427,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( !config_GetInt( p_libvlc, "ignore-config" ) )
             config_LoadConfigFile( p_libvlc, "main" );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
-        p_libvlc_global->p_module_bank->b_cache_delete = b_cache_delete;
+        p_module_bank->b_cache_delete = b_cache_delete;
     }
     free( psz_language );
 # endif
@@ -449,7 +447,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     msg_Dbg( p_libvlc, "module bank initialized, found %i modules",
-             vlc_internals( p_libvlc_global->p_module_bank )->i_children );
+             vlc_internals( p_module_bank )->i_children );
 
     /* Check for help on modules */
     if( (p_tmp = config_GetPsz( p_libvlc, "module" )) )

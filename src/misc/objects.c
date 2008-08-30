@@ -874,7 +874,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
          * not be shared across LibVLC instances. In the mean time, this ugly
          * hack is brought to you by Courmisch. */
         if (i_type == VLC_OBJECT_MODULE)
-            return vlc_list_find ((vlc_object_t *)vlc_global ()->p_module_bank,
+            return vlc_list_find ((vlc_object_t *)p_module_bank,
                                   i_type, FIND_CHILD);
         return vlc_list_find (p_this->p_libvlc, i_type, FIND_CHILD);
 

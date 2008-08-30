@@ -140,11 +140,13 @@ typedef struct libvlc_global_data_t
 {
     VLC_COMMON_MEMBERS
 
-    module_bank_t *        p_module_bank; ///< The module bank
-
     char *                 psz_vlcpath;
 } libvlc_global_data_t;
 
+/**
+ * The module bank
+ */
+extern module_bank_t *p_module_bank;
 
 libvlc_global_data_t *vlc_global (void);
 
