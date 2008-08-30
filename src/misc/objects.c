@@ -142,20 +142,17 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         return NULL;
     }
 
-    libvlc_global_data_t *p_libvlc_global;
     if( p_this == NULL )
     {
         /* Only the global root object is created out of the blue */
-        p_libvlc_global = (libvlc_global_data_t *)p_new;
         p_new->p_libvlc = NULL;
 
         object_counter = 0; /* reset */
-        p_priv->next = p_priv->prev = p_new;
+        p_this = p_priv->next = p_priv->prev = p_new;
         vlc_mutex_init( &structure_lock );
     }
     else
     {
-        p_libvlc_global = vlc_global();
         if( i_type == VLC_OBJECT_LIBVLC )
             p_new->p_libvlc = (libvlc_int_t*)p_new;
         else
@@ -179,10 +176,10 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_spin_init( &p_priv->spin );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
-    p_priv->next = VLC_OBJECT (p_libvlc_global);
+    p_priv->next = p_this;
     vlc_mutex_lock( &structure_lock );
-    p_priv->prev = vlc_internals (p_libvlc_global)->prev;
-    vlc_internals (p_libvlc_global)->prev = p_new;
+    p_priv->prev = vlc_internals (p_this)->prev;
+    vlc_internals (p_this)->prev = p_new;
     vlc_internals (p_priv->prev)->next = p_new;
     p_new->i_object_id = object_counter++; /* fetch THEN increment */
     vlc_mutex_unlock( &structure_lock );
