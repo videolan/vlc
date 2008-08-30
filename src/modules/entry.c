@@ -141,7 +141,7 @@ int vlc_module_set (module_t *module, int propid, ...)
             break;
 
         case VLC_MODULE_PROGRAM:
-            msg_Warn (module, "deprecated module property %d", propid);
+            fprintf (stderr, "deprecated module property %d", propid);
             break;
 
         case VLC_MODULE_CB_OPEN:
@@ -195,8 +195,8 @@ int vlc_module_set (module_t *module, int propid, ...)
         }
 
         default:
-            msg_Err (module, "unknown module property %d", propid);
-            msg_Err (module, "LibVLC might be too old to use this module.");
+            fprintf (stderr, "LibVLC: unknown module property %d", propid);
+            fprintf (stderr, "LibVLC: too old to use this module?");
             ret = VLC_EGENERIC;
             break;
     }
