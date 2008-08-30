@@ -485,7 +485,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, image_handler_t *p_image, pic
 /**
  * This function will return the default directory used for snapshots
  */
-static char *VoutSnapshotGetDefaultDirectory( vout_thread_t *p_vout )
+static char *VoutSnapshotGetDefaultDirectory( void )
 {
     char *psz_path;
 #if defined(__APPLE__) || defined(SYS_BEOS)
@@ -690,7 +690,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Get default directory if none provided */
     if( !val.psz_string )
-        val.psz_string = VoutSnapshotGetDefaultDirectory( p_vout );
+        val.psz_string = VoutSnapshotGetDefaultDirectory( );
     if( !val.psz_string )
     {
         msg_Err( p_vout, "no path specified for snapshots" );
