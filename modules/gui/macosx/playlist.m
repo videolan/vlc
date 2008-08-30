@@ -1440,9 +1440,11 @@
            (Service Discovery) */
         if( ![self isItem: [o_item pointerValue] inNode:
                         p_playlist->p_local_category checkItemExistence: NO] &&
-            ( var_CreateGetBool( p_playlist, "media-library" ) &&
+            var_CreateGetBool( p_playlist, "media-library" ) &&
             ![self isItem: [o_item pointerValue] inNode:
-                        p_playlist->p_ml_category checkItemExistence: NO]) )
+                        p_playlist->p_ml_category checkItemExistence: NO] ||
+            [o_item pointerValue] == p_playlist->p_local_category ||
+            [o_item pointerValue] == p_playlist->p_ml_category )
         {
             vlc_object_release(p_playlist);
             return NO;
