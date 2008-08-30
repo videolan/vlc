@@ -196,7 +196,6 @@ static void* RunInterface( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     vlc_value_t val, text;
-    char *psz_intf;
     int canc = vlc_savecancel ();
 
     /* Variable used for interface spawning */
