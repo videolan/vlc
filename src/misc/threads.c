@@ -66,8 +66,6 @@ libvlc_global_data_t *vlc_global( void )
     return p_root;
 }
 
-vlc_threadvar_t msg_context_global_key;
-
 #if defined(LIBVLC_USE_PTHREAD)
 static inline unsigned long vlc_threadid (void)
 {
@@ -178,7 +176,6 @@ int vlc_threads_init( void )
         }
 
         /* We should be safe now. Do all the initialization stuff we want. */
-        vlc_threadvar_create( &msg_context_global_key, msg_StackDestroy );
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
         vlc_threadvar_create( &cancel_key, free );
 #endif
@@ -214,7 +211,6 @@ void vlc_threads_end( void )
 #ifndef LIBVLC_USE_PTHREAD
         vlc_threadvar_delete( &cancel_key );
 #endif
-        vlc_threadvar_delete( &msg_context_global_key );
     }
     i_initializations--;
 

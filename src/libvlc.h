@@ -95,21 +95,9 @@ void msg_Flush   (libvlc_int_t *);
 void msg_Destroy (libvlc_int_t *);
 
 /** Internal message stack context */
-typedef struct
-{
-    int i_code;
-    char * psz_message;
-} msg_context_t;
-
 void msg_StackSet ( int, const char*, ... );
 void msg_StackAdd ( const char*, ... );
 const char* msg_StackMsg ( void );
-/** The global thread var for msg stack context
- *  We store this as a static global variable so we don't need a vlc_object_t
- *  everywhere.
- *  This key is created in vlc_threads_init and is therefore ready to use at
- *  the very beginning of the universe */
-extern vlc_threadvar_t msg_context_global_key;
 void msg_StackDestroy (void *);
 
 /*

@@ -55,6 +55,15 @@
 #include <vlc_charset.h>
 #include "../libvlc.h"
 
+typedef struct
+{
+    int i_code;
+    char * psz_message;
+} msg_context_t;
+
+static vlc_threadvar_t msg_context;
+static uintptr_t banks = 0;
+
 /*****************************************************************************
  * Local macros
  *****************************************************************************/
@@ -100,6 +109,11 @@ void msg_Create (libvlc_int_t *p_libvlc)
                     CREATE_ALWAYS, 0, NULL );
     SetFilePointer( QUEUE.logfile, 0, NULL, FILE_END );
 #endif
+
+    vlc_mutex_t *lock = var_AcquireMutex( "msg-stack" );
+    if( banks++ == 0 )
+        vlc_threadvar_create( &msg_context, NULL );
+    vlc_mutex_unlock( lock );
 }
 
 /**
@@ -128,6 +142,11 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
         msg_Err( p_libvlc, "stale interface subscribers" );
 
     FlushMsg( &QUEUE );
+
+    vlc_mutex_t *lock = var_AcquireMutex( "msg-stack" );
+    if( --banks == 0 )
+        vlc_threadvar_delete( &msg_context );
+    vlc_mutex_unlock( lock );
 
 #ifdef UNDER_CE
     CloseHandle( QUEUE.logfile );
@@ -608,12 +627,12 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 
 static msg_context_t* GetContext(void)
 {
-    msg_context_t *p_ctx = vlc_threadvar_get( &msg_context_global_key );
+    msg_context_t *p_ctx = vlc_threadvar_get( &msg_context );
     if( p_ctx == NULL )
     {
         MALLOC_NULL( p_ctx, msg_context_t );
         p_ctx->psz_message = NULL;
-        vlc_threadvar_set( &msg_context_global_key, p_ctx );
+        vlc_threadvar_set( &msg_context, p_ctx );
     }
     return p_ctx;
 }
