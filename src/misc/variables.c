@@ -168,7 +168,6 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     static vlc_list_t dummy_null_list = {0, NULL, NULL};
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_refcheck( p_this );
     vlc_mutex_lock( &p_priv->var_lock );
 
     /* FIXME: if the variable already exists, we don't duplicate it. But we
@@ -332,7 +331,6 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     variable_t *p_var;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_refcheck( p_this );
     vlc_mutex_lock( &p_priv->var_lock );
 
     i_var = GetUnused( p_this, psz_name );
@@ -409,7 +407,6 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
     vlc_value_t oldval;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_refcheck( p_this );
     vlc_mutex_lock( &p_priv->var_lock );
 
     i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
@@ -750,7 +747,6 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     vlc_value_t oldval;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_refcheck( p_this );
     vlc_mutex_lock( &p_priv->var_lock );
 
     i_var = GetUnused( p_this, psz_name );
@@ -828,7 +824,6 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
     variable_t *p_var;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_refcheck( p_this );
     vlc_mutex_lock( &p_priv->var_lock );
 
     i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
@@ -895,7 +890,6 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
     callback_entry_t entry;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_refcheck( p_this );
     entry.pf_callback = pf_callback;
     entry.p_data = p_data;
 
@@ -933,7 +927,6 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
     variable_t *p_var;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_refcheck( p_this );
     vlc_mutex_lock( &p_priv->var_lock );
 
     i_var = GetUnused( p_this, psz_name );
@@ -1570,7 +1563,6 @@ int __var_Command( vlc_object_t *p_this, const char *psz_name,
         return VLC_ENOOBJ;
     }
 
-    vlc_refcheck( p_this );
     i_type = var_Type( p_obj, psz_cmd );
     if( !( i_type&VLC_VAR_ISCOMMAND ) )
     {

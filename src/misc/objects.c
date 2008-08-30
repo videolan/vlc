@@ -84,16 +84,6 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 static void vlc_object_destroy( vlc_object_t *p_this );
 static void vlc_object_detach_unlocked (vlc_object_t *p_this);
 
-#ifdef LIBVLC_REFCHECK
-static vlc_threadvar_t held_objects;
-typedef struct held_list_t
-{
-    struct held_list_t *next;
-    vlc_object_t *obj;
-} held_list_t;
-static void held_objects_destroy (void *);
-#endif
-
 /*****************************************************************************
  * Local structure lock
  *****************************************************************************/
@@ -162,10 +152,6 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         object_counter = 0; /* reset */
         p_priv->next = p_priv->prev = p_new;
         vlc_mutex_init( &structure_lock );
-#ifdef LIBVLC_REFCHECK
-        /* TODO: use the destruction callback to track ref leaks */
-        vlc_threadvar_create( &held_objects, held_objects_destroy );
-#endif
     }
     else
     {
@@ -194,13 +180,6 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
     p_priv->next = VLC_OBJECT (p_libvlc_global);
-#if !defined (LIBVLC_REFCHECK)
-    /* ... */
-#elif defined (LIBVLC_USE_PTHREAD)
-    p_priv->creator_id = pthread_self ();
-#elif defined (WIN32)
-    p_priv->creator_id = GetCurrentThreadId ();
-#endif
     vlc_mutex_lock( &structure_lock );
     p_priv->prev = vlc_internals (p_libvlc_global)->prev;
     vlc_internals (p_libvlc_global)->prev = p_new;
@@ -366,10 +345,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
         /* We are the global object ... no need to lock. */
         vlc_mutex_destroy( &structure_lock );
-#ifdef LIBVLC_REFCHECK
-        held_objects_destroy( vlc_threadvar_get( &held_objects ) );
-        vlc_threadvar_delete( &held_objects );
-#endif
     }
 
     FREENULL( p_this->psz_object_name );
@@ -757,16 +732,6 @@ void __vlc_object_yield( vlc_object_t *p_this )
     /* Increment the counter */
     internals->i_refcount++;
     vlc_spin_unlock( &internals->ref_spin );
-#ifdef LIBVLC_REFCHECK
-    /* Update the list of referenced objects */
-    /* Using TLS, so no need to lock */
-    /* The following line may leak memory if a thread leaks objects. */
-    held_list_t *newhead = malloc (sizeof (*newhead));
-    held_list_t *oldhead = vlc_threadvar_get (&held_objects);
-    newhead->next = oldhead;
-    newhead->obj = p_this;
-    vlc_threadvar_set (&held_objects, newhead);
-#endif
 }
 
 /*****************************************************************************
@@ -777,27 +742,6 @@ void __vlc_object_release( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
     bool b_should_destroy;
-
-#ifdef LIBVLC_REFCHECK
-    /* Update the list of referenced objects */
-    /* Using TLS, so no need to lock */
-    for (held_list_t *hlcur = vlc_threadvar_get (&held_objects),
-                     *hlprev = NULL;
-         hlcur != NULL;
-         hlprev = hlcur, hlcur = hlcur->next)
-    {
-        if (hlcur->obj == p_this)
-        {
-            if (hlprev == NULL)
-                vlc_threadvar_set (&held_objects, hlcur->next);
-            else
-                hlprev->next = hlcur->next;
-            free (hlcur);
-            break;
-        }
-    }
-    /* TODO: what if releasing without references? */
-#endif
 
     vlc_spin_lock( &internals->ref_spin );
     assert( internals->i_refcount > 0 );
@@ -1488,103 +1432,3 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
         ListChildren( p_list, p_tmp, i_type );
     }
 }
-
-#ifdef LIBVLC_REFCHECK
-# if defined(HAVE_EXECINFO_H) && defined(HAVE_BACKTRACE)
-#  include <execinfo.h>
-# endif
-
-void vlc_refcheck (vlc_object_t *obj)
-{
-    static unsigned errors = 0;
-    if (errors > 100)
-        return;
-
-    /* Anyone can use the root object (though it should not exist) */
-    if (obj == VLC_OBJECT (vlc_global ()))
-        return;
-
-    /* Anyone can use its libvlc instance object */
-    if (obj == VLC_OBJECT (obj->p_libvlc))
-        return;
-
-    /* The thread that created the object holds the initial reference */
-    vlc_object_internals_t *priv = vlc_internals (obj);
-#if defined (LIBVLC_USE_PTHREAD)
-    if (pthread_equal (priv->creator_id, pthread_self ()))
-#elif defined WIN32
-    if (priv->creator_id == GetCurrentThreadId ())
-#else
-    if (0)
-#endif
-        return;
-
-    /* A thread can use its own object without references! */
-    vlc_object_t *caller = vlc_threadobj ();
-    if (caller == obj)
-        return;
-#if 0
-    /* The calling thread is younger than the object.
-     * Access could be valid through cross-thread synchronization;
-     * we would need better accounting. */
-    if (caller && (caller->i_object_id > obj->i_object_id))
-        return;
-#endif
-    int refs;
-    vlc_spin_lock (&priv->ref_spin);
-    refs = priv->i_refcount;
-    vlc_spin_unlock (&priv->ref_spin);
-
-    for (held_list_t *hlcur = vlc_threadvar_get (&held_objects);
-         hlcur != NULL; hlcur = hlcur->next)
-        if (hlcur->obj == obj)
-            return;
-
-    int canc = vlc_savecancel ();
-
-    fprintf (stderr, "The %s %s thread object is accessing...\n"
-             "the %s %s object without references.\n",
-             caller && caller->psz_object_name
-                     ? caller->psz_object_name : "unnamed",
-             caller ? caller->psz_object_type : "main",
-             obj->psz_object_name ? obj->psz_object_name : "unnamed",
-             obj->psz_object_type);
-    fflush (stderr);
-
-#ifdef HAVE_BACKTRACE
-    void *stack[20];
-    int stackdepth = backtrace (stack, sizeof (stack) / sizeof (stack[0]));
-    backtrace_symbols_fd (stack, stackdepth, 2);
-#endif
-
-    if (++errors == 100)
-        fprintf (stderr, "Too many reference errors!\n");
-    vlc_restorecancel (canc);
-}
-
-static void held_objects_destroy (void *data)
-{
-    VLC_UNUSED( data );
-    held_list_t *hl = vlc_threadvar_get (&held_objects);
-    vlc_object_t *caller = vlc_threadobj ();
-
-    int canc = vlc_savecancel ();
-
-    while (hl != NULL)
-    {
-        held_list_t *buf = hl->next;
-        vlc_object_t *obj = hl->obj;
-
-        fprintf (stderr, "The %s %s thread object leaked a reference to...\n"
-                         "the %s %s object.\n",
-                 caller && caller->psz_object_name
-                     ? caller->psz_object_name : "unnamed",
-                 caller ? caller->psz_object_type : "main",
-                 obj->psz_object_name ? obj->psz_object_name : "unnamed",
-                 obj->psz_object_type);
-        free (hl);
-        hl = buf;
-    }
-    vlc_restorecancel (canc);
-}
-#endif
