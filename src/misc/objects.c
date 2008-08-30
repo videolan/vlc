@@ -144,20 +144,16 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     if( p_this == NULL )
     {
-        /* Only the global root object is created out of the blue */
-        p_new->p_libvlc = NULL;
+        if( i_type == VLC_OBJECT_LIBVLC )
+            p_new->p_libvlc = (libvlc_int_t*)p_new;
+        else
+            p_new->p_libvlc = NULL;
 
-        object_counter = 0; /* reset */
         p_this = p_priv->next = p_priv->prev = p_new;
         vlc_mutex_init( &structure_lock );
     }
     else
-    {
-        if( i_type == VLC_OBJECT_LIBVLC )
-            p_new->p_libvlc = (libvlc_int_t*)p_new;
-        else
-            p_new->p_libvlc = p_this->p_libvlc;
-    }
+        p_new->p_libvlc = p_this->p_libvlc;
 
     vlc_spin_init( &p_priv->ref_spin );
     p_priv->i_refcount = 1;
