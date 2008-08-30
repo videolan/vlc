@@ -531,7 +531,7 @@ static VLCTreeItem *o_root_item = nil;
         /* Get a pointer to the module */
         if( i_object_category == -1 )
         {
-            p_module = (module_t *) vlc_object_get( i_object_id );
+            p_module = (module_t *) vlc_object_get( p_intf->p_libvlc, i_object_id );
             assert( p_module );
 
             p_items = module_GetConfig( p_module, &confsize );

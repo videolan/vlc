@@ -766,7 +766,7 @@
 
     vlc_thread_set_priority( VLCIntf , VLC_THREAD_PRIORITY_LOW );
 
-    p_object = (vlc_object_t *)vlc_object_get( [o_data objectID] );
+    p_object = (vlc_object_t *)vlc_object_get( VLCIntf->p_libvlc, [o_data objectID] );
 
     if( p_object != NULL )
     {
