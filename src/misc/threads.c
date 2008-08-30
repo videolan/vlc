@@ -850,16 +850,19 @@ void vlc_control_cancel (int cmd, ...)
     va_start (ap, cmd);
 
     vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
-#ifndef WIN32
     if (nfo == NULL)
     {
+#ifdef WIN32
+        /* Main thread - cannot be cancelled anyway */
+        return;
+#else
         nfo = malloc (sizeof (*nfo));
         if (nfo == NULL)
-            abort ();
+            return; /* Uho! Expect problems! */
         *nfo = VLC_CANCEL_INIT;
         vlc_threadvar_set (&cancel_key, nfo);
-    }
 #endif
+    }
 
     switch (cmd)
     {
