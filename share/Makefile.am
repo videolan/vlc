@@ -9,11 +9,13 @@ dist_pkgdata_DATA = \
 	$(DIST_icons32) \
 	$(DIST_icons48) \
 	$(DIST_icons128)
-nobase_dist_pkgdata_DATA = \
+nobase_dist_pkgdata_SCRIPTS = \
 	utils/gnome-vlc-default.sh \
 	utils/audio-vlc-default.sh \
 	utils/video-vlc-default.sh \
 	$(NULL)
+
+nobase_dist_pkgdata_DATA = $(NULL)
 
 EXTRA_DIST = \
 	$(DIST_rsrc) \
