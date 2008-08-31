@@ -70,6 +70,8 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         return NULL;
 
     TAB_INIT( p_playlist->i_sds, p_playlist->pp_sds );
+    MALLOC_NULL( p_playlist->p, playlist_private_t );
+    memset( p_playlist->p, 0, sizeof( playlist_private_t ) );
 
     libvlc_priv(p_parent->p_libvlc)->p_playlist = p_playlist;
 
