@@ -17,9 +17,10 @@ All the Lua standard libraries are available.
  * Art fetcher (see meta/README.txt)
  * Interface (see intf/README.txt)
 
-Lua scripts are tried in alphabetical order in the user's VLC config (FIXME)
-directory lua/{playlist,meta,intf}/ subdirectory, then in the global VLC
-lua/{playlist,meta,intf}/ directory.
+Lua scripts are tried in alphabetical order in the user's VLC config
+directory lua/{playlist,meta,intf}/ subdirectory on Windows and Mac OS X or
+in the user's local share directory (~/.local/share/vlc/lua/... on linux),
+then in the global VLC lua/{playlist,meta,intf}/ directory.
 
 3 - VLC specific Lua modules
 ============================
