@@ -1,7 +1,11 @@
 # Building vlc
 #
 bin_PROGRAMS = vlc
+noinst_PROGRAMS = vlc-static
 EXTRA_PROGRAMS = vlc-wrapper
+
+AM_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
+
 
 if !HAVE_WIN32
 bin_PROGRAMS += vlc-wrapper
@@ -17,14 +21,15 @@ vlc_wrapper_SOURCES = rootwrap.c
 
 vlc_DEPENDENCIES = ../src/libvlc.la
 
-vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
 # vlc needs libvlccore for locale conversion
 vlc_LDADD = ../src/libvlc.la ../src/libvlccore.la $(LTLIBINTL) \
 	`$(VLC_CONFIG) -libs vlc`
 
-#vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
-#	$(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS)
+vlc_static_SOURCES = $(vlc_SOURCES)
+vlc_static_DEPENDENCIES = $(vlc_DEPENDENCIES)
+vlc_static_LDADD = $(vlc_LDADD)
+vlc_static_LDFLAGS = $(vlc_LDFLAGS) -no-install -static
 
 if HAVE_WIN32
 vlc_LDADD += vlc_win32_rc.$(OBJEXT)

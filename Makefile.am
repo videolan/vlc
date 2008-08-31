@@ -392,7 +392,7 @@ endif
 vlc$(EXEEXT): Makefile.am
 	rm -f -- vlc vlc.tmp
 	echo '#! /bin/sh' > vlc.tmp
-	echo 'exec "$$(dirname "$$0")/bin/vlc$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
+	echo 'exec "$$(dirname "$$0")/bin/vlc-static$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
 	chmod +x vlc.tmp
 	mv -f -- vlc.tmp vlc
 
