@@ -225,6 +225,7 @@ void PrefsDialog::changeSimplePanel( int number )
 /* Changing from one Advanced Panel to another */
 void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
 {
+    if( item == NULL ) return;
     PrefsItemData *data = item->data( 0, Qt::UserRole ).value<PrefsItemData*>();
 
     if( advanced_panel )
