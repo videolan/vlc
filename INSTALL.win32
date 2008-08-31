@@ -32,7 +32,7 @@ If you want to build VLC from sources, you can do it in several ways:
   Read http://wiki.videolan.org/Win32CompileCygwinNew to have a complete HOWTO
 
 - On GNU/Linux, using the mingw32 cross-compiler.
-  This method is  preferred over all the others.
+  This method is preferred over all the others.
 
 UNSUPPORTED METHODS
 -------------------
@@ -42,14 +42,7 @@ UNSUPPORTED METHODS
   Please note that the gettext utilities are not included in the default
   MSYS/MINGW packages so you won't be able to build VLC with i18n support.
 
-- natively on Windows, using Microsoft Visual C++. Even though we provide some
-  msvc project files with vlc, this method is advised only if you just want to
-  experiment/play with some basic functionality in vlc. The reason for this
-  is that vlc depends on a lot of 3rd party libraries and building them in
-  MSVC is not convenient and sometimes even impossible.
-  ( NOTE: if you want to run vlc under the msvc debugger, you need to run it
-    with the --fast-mutex --win9x-cv-method=1 options because the debugger
-    usually loses signals sent by PulseEvent() )
+- natively on Windows, using Microsoft Visual Studio. This will not work.
 
 Getting the right compiler tools
 ================================
@@ -60,12 +53,12 @@ You first need to download a GNU/Linux cross-compiler version of mingw32.
 For Debian GNU/Linux users, you can use the mingw32, mingw32-binutils and
 mingw32-runtime packages.
 
-- compiling natively on Windoze with cygwin:
+- compiling natively on Windows with cygwin:
 You will need to download and run the setup.exe app from cygwin's web site
 (www.cygwin.com). You will also need to make sure you install at least the
 gcc-g++, gcc-mingw, mingw-runtime and win32-api packages.
 
-- compiling natively on Windoze with MSYS+MINGW:
+- compiling natively on Windows with MSYS+MINGW:
 You will need to download and install the latest MSYS, MSYS-DTK and MINGW.
 The installation is really easy. Begin with the MSYS auto-installer and once
 this is done, extract MINGW into c:\msys\1.0\mingw. You also have to remember
