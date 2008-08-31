@@ -164,11 +164,15 @@ static int Activate( vlc_object_t *p_this )
     fmt.video.i_width = i_width;
     fmt.video.i_height = ( p_filter->fmt_in.video.i_height * i_width )
                          / p_filter->fmt_in.video.i_width;
+    fmt.video.i_height = ( fmt.video.i_height * i_aspect )
+                         / p_filter->fmt_in.video.i_aspect;
     if( fmt.video.i_height > i_height )
     {
         fmt.video.i_height = i_height;
         fmt.video.i_width = ( p_filter->fmt_in.video.i_width * i_height )
                             / p_filter->fmt_in.video.i_height;
+        fmt.video.i_width = ( fmt.video.i_width * p_filter->fmt_in.video.i_aspect )
+                            / i_aspect;
         if( fmt.video.i_width & 1 ) fmt.video.i_width -= 1;
         i_padd = (i_width - fmt.video.i_width) / 2;
         i_offset = (i_padd & 1);
