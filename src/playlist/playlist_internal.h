@@ -41,6 +41,7 @@ struct playlist_private_t
 {
     playlist_preparse_t  *p_preparse; /**< Preparser object */
     playlist_fetcher_t   *p_fetcher; /**< Meta and art fetcher object */
+    sout_instance_t      *p_sout; /**< Kept sout instance */
 };
 
 struct playlist_preparse_t

@@ -511,7 +511,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     input_item_t *p_input = p_item->p_input;
-    sout_instance_t **pp_sout = &libvlc_priv(p_playlist->p_libvlc)->p_sout;
+    sout_instance_t **pp_sout = &p_playlist->p->p_sout;
     int i_activity = var_GetInteger( p_playlist, "activity" ) ;
 
     msg_Dbg( p_playlist, "creating new input thread" );

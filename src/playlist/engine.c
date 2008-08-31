@@ -365,8 +365,7 @@ check_input:
         {
             int i_activity;
             input_thread_t *p_input;
-            sout_instance_t **pp_sout =
-                &libvlc_priv(p_playlist->p_libvlc)->p_sout;
+            sout_instance_t **pp_sout = &p_playlist->p->p_sout;
 
             PL_DEBUG( "dead input" );
 
@@ -507,7 +506,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
 
 #ifdef ENABLE_SOUT
     /* close the remaining sout-keep (if there was no input atm) */
-    sout_instance_t *p_sout = libvlc_priv (p_playlist->p_libvlc)->p_sout;
+    sout_instance_t *p_sout = p_playlist->p->p_sout;
     if (p_sout)
         sout_DeleteInstance( p_sout );
 #endif
