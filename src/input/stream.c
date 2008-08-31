@@ -1813,7 +1813,7 @@ static int AStreamSeekImmediate( stream_t *s, int64_t i_pos )
  */
 #define STREAM_PROBE_LINE 2048
 #define STREAM_LINE_MAX (2048*100)
-char * stream_ReadLine( stream_t *s )
+char *stream_ReadLine( stream_t *s )
 {
     char *p_line = NULL;
     int i_line = 0, i_read = 0;
@@ -1841,25 +1841,9 @@ char * stream_ReadLine( stream_t *s )
                 psz_encoding = strdup( "UTF-8" );
                 i_bom_size = 3;
             }
-            else if( p_data[0] == 0x00 && p_data[1] == 0x00 )
-            {
-                if( p_data[2] == 0xFE && p_data[3] == 0xFF )
-                {
-                    psz_encoding = strdup( "UTF-32BE" );
-                    s->i_char_width = 4;
-                    i_bom_size = 4;
-                }
-            }
             else if( p_data[0] == 0xFF && p_data[1] == 0xFE )
             {
-                if( p_data[2] == 0x00 && p_data[3] == 0x00 )
-                {
-                    psz_encoding = strdup( "UTF-32LE" );
-                    s->i_char_width = 4;
-                    s->b_little_endian = true;
-                    i_bom_size = 4;
-                }
-                else
+                if( p_data[2] || p_data[3] )
                 {
                     psz_encoding = strdup( "UTF-16LE" );
                     s->b_little_endian = true;
@@ -1940,23 +1924,6 @@ char * stream_ReadLine( stream_t *s )
                     /* UTF-16BE: 00 0A <LF> */
                     while( p <= p_last && ( p[1] != 0x0A || p[0] != 0x00 ) )
                         p += 2;
-                }
-            }
-            else if( s->i_char_width == 4 )
-            {
-                if( s->b_little_endian == true)
-                {
-                    /* UTF-32LE: 0A 00 00 00 <LF> */
-                    while( p <= p_last && ( p[0] != 0x0A || p[1] != 0x00 ||
-                           p[2] != 0x00 || p[3] != 0x00 ) )
-                        p += 4;
-                }
-                else
-                {
-                    /* UTF-32BE: 00 00 00 0A <LF> */
-                    while( p <= p_last && ( p[3] != 0x0A || p[2] != 0x00 ||
-                           p[1] != 0x00 || p[0] != 0x00 ) )
-                        p += 4;
                 }
             }
 
