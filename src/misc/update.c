@@ -1446,13 +1446,13 @@ static char *size_str( long int l_size )
     char *psz_tmp = NULL;
     int i_retval = 0;
     if( l_size >> 30 )
-        i_retval = asprintf( &psz_tmp, "%.1f GB", (float)l_size/(1<<30) );
+        i_retval = asprintf( &psz_tmp, _("%.1f GB"), (float)l_size/(1<<30) );
     else if( l_size >> 20 )
-        i_retval = asprintf( &psz_tmp, "%.1f MB", (float)l_size/(1<<20) );
+        i_retval = asprintf( &psz_tmp, _("%.1f MB"), (float)l_size/(1<<20) );
     else if( l_size >> 10 )
-        i_retval = asprintf( &psz_tmp, "%.1f kB", (float)l_size/(1<<10) );
+        i_retval = asprintf( &psz_tmp, _("%.1f kB"), (float)l_size/(1<<10) );
     else
-        i_retval = asprintf( &psz_tmp, "%ld B", l_size );
+        i_retval = asprintf( &psz_tmp, _("%ld B"), l_size );
 
     return i_retval == -1 ? NULL : psz_tmp;
 }
@@ -1532,7 +1532,8 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     psz_tmpdestfile = strrchr( p_update->release.psz_url, '/' );
     if( !psz_tmpdestfile )
     {
-        msg_Err( p_udt, "The URL %s is false formated", p_update->release.psz_url );
+        msg_Err( p_udt, "The URL %s is badly formated",
+                 p_update->release.psz_url );
         goto end;
     }
     psz_tmpdestfile++;
@@ -1557,10 +1558,11 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     msg_Dbg( p_udt, "Downloading Stream '%s'", p_update->release.psz_url );
 
     psz_size = size_str( l_size );
-    if( asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",
-        p_update->release.psz_url, psz_size, 0.0 ) != -1 )
+    if( asprintf( &psz_status, _("%s\nDownloading... %s/%s %.1f%% done"),
+        p_update->release.psz_url, "0.0", psz_size, 0.0 ) != -1 )
     {
-        i_progress = intf_UserProgress( p_udt, "Downloading ...", psz_status, 0.0, 0 );
+        i_progress = intf_UserProgress( p_udt, _( "Downloading ..."),
+                                        psz_status, 0.0, 0 );
         free( psz_status );
     }
 
@@ -1580,7 +1582,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
         psz_downloaded = size_str( l_downloaded );
         f_progress = 100.0*(float)l_downloaded/(float)l_size;
 
-        if( asprintf( &psz_status, "%s\nDonwloading... %s/%s %.1f%% done",
+        if( asprintf( &psz_status, _( "%s\nDownloading... %s/%s %.1f%% done" ),
                       p_update->release.psz_url, psz_downloaded, psz_size,
                       f_progress ) != -1 )
         {
@@ -1599,7 +1601,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
         !intf_ProgressIsCancelled( p_udt, i_progress ) )
     {
         vlc_object_unlock( p_udt );
-        if( asprintf( &psz_status, "%s\nDone %s (100.0%%)",
+        if( asprintf( &psz_status, _("%s\nDone %s (100.0%%)"),
             p_update->release.psz_url, psz_size ) != -1 )
         {
             intf_ProgressUpdate( p_udt, i_progress, psz_status, 100.0, 0 );
@@ -1695,7 +1697,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
 end:
     if( i_progress )
     {
-        intf_ProgressUpdate( p_udt, i_progress, "Cancelled", 100.0, 0 );
+        intf_ProgressUpdate( p_udt, i_progress, _("Cancelled"), 100.0, 0 );
     }
     if( p_stream )
         stream_Delete( p_stream );
