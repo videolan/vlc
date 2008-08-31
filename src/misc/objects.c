@@ -83,7 +83,7 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
 static void vlc_object_destroy( vlc_object_t *p_this );
 static void vlc_object_detach_unlocked (vlc_object_t *p_this);
-static void vlc_object_dump( vlc_object_t *p_this )
+static void vlc_object_dump( vlc_object_t *p_this );
 
 /*****************************************************************************
  * Local structure lock
