@@ -37,6 +37,12 @@
 #include "input/input_internal.h"
 #include <assert.h>
 
+struct playlist_private_t
+{
+    playlist_preparse_t  *p_preparse; /**< Preparser object */
+    playlist_fetcher_t   *p_fetcher; /**< Meta and art fetcher object */
+};
+
 struct playlist_preparse_t
 {
     VLC_COMMON_MEMBERS

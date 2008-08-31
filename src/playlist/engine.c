@@ -174,14 +174,14 @@ static void playlist_Destructor( vlc_object_t * p_this )
 {
     playlist_t * p_playlist = (playlist_t *)p_this;
 
-    if( p_playlist->p_preparse )
+    if( p_playlist->p->p_preparse )
     {
-        vlc_object_release( p_playlist->p_preparse );
+        vlc_object_release( p_playlist->p->p_preparse );
     }
 
-    if( p_playlist->p_fetcher )
+    if( p_playlist->p->p_fetcher )
     {
-        vlc_object_release( p_playlist->p_fetcher );
+        vlc_object_release( p_playlist->p->p_fetcher );
     }
     msg_Dbg( p_this, "Destroyed" );
 }
@@ -517,10 +517,10 @@ void playlist_LastLoop( playlist_t *p_playlist )
     playlist_ServicesDiscoveryKillAll( p_playlist );
     playlist_MLDump( p_playlist );
 
-    vlc_object_kill( p_playlist->p_preparse );
-    vlc_thread_join( p_playlist->p_preparse );
-    vlc_object_kill( p_playlist->p_fetcher );
-    vlc_thread_join( p_playlist->p_fetcher );
+    vlc_object_kill( p_playlist->p->p_preparse );
+    vlc_thread_join( p_playlist->p->p_preparse );
+    vlc_object_kill( p_playlist->p->p_fetcher );
+    vlc_thread_join( p_playlist->p->p_fetcher );
 
     PL_LOCK;
 
@@ -603,21 +603,21 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
              */
             char *psz_arturl = input_item_GetArtURL( p_current );
             char *psz_name = input_item_GetName( p_current );
-            if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
+            if( p_playlist->p->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
                         ( !psz_arturl || strncmp( psz_arturl, "file://", 7 ) ) )
             {
                 PL_DEBUG("meta ok for %s, need to fetch art", psz_name );
-                vlc_object_lock( p_playlist->p_fetcher );
-                if( vlc_object_alive( p_playlist->p_fetcher ) )
+                vlc_object_lock( p_playlist->p->p_fetcher );
+                if( vlc_object_alive( p_playlist->p->p_fetcher ) )
                 {
-                    INSERT_ELEM( p_playlist->p_fetcher->pp_waiting,
-                        p_playlist->p_fetcher->i_waiting,
-                        p_playlist->p_fetcher->i_waiting, p_current);
-                    vlc_object_signal_unlocked( p_playlist->p_fetcher );
+                    INSERT_ELEM( p_playlist->p->p_fetcher->pp_waiting,
+                        p_playlist->p->p_fetcher->i_waiting,
+                        p_playlist->p->p_fetcher->i_waiting, p_current);
+                    vlc_object_signal_unlocked( p_playlist->p->p_fetcher );
                 }
                 else
                     vlc_gc_decref( p_current );
-                vlc_object_unlock( p_playlist->p_fetcher );
+                vlc_object_unlock( p_playlist->p->p_fetcher );
             }
             else
             {

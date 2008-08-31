@@ -60,57 +60,57 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     // Preparse
     static const char ppname[] = "preparser";
-    p_playlist->p_preparse =
+    p_playlist->p->p_preparse =
         vlc_custom_create( p_playlist, sizeof( playlist_preparse_t ),
                            VLC_OBJECT_GENERIC, ppname );
-    if( !p_playlist->p_preparse )
+    if( !p_playlist->p->p_preparse )
     {
         msg_Err( p_playlist, "unable to create preparser" );
         vlc_object_release( p_playlist );
         return;
     }
-    p_playlist->p_preparse->psz_object_name = strdup( "preparser" );
-    p_playlist->p_preparse->i_waiting = 0;
-    p_playlist->p_preparse->pp_waiting = NULL;
+    p_playlist->p->p_preparse->psz_object_name = strdup( "preparser" );
+    p_playlist->p->p_preparse->i_waiting = 0;
+    p_playlist->p->p_preparse->pp_waiting = NULL;
 
-    vlc_object_set_destructor( p_playlist->p_preparse, PreparseDestructor );
+    vlc_object_set_destructor( p_playlist->p->p_preparse, PreparseDestructor );
 
-    vlc_object_attach( p_playlist->p_preparse, p_playlist );
-    if( vlc_thread_create( p_playlist->p_preparse, "preparser",
+    vlc_object_attach( p_playlist->p->p_preparse, p_playlist );
+    if( vlc_thread_create( p_playlist->p->p_preparse, "preparser",
                            RunPreparse, VLC_THREAD_PRIORITY_LOW, true ) )
     {
         msg_Err( p_playlist, "cannot spawn preparse thread" );
-        vlc_object_release( p_playlist->p_preparse );
+        vlc_object_release( p_playlist->p->p_preparse );
         return;
     }
 
     // Secondary Preparse
     static const char fname[] = "fetcher";
-    p_playlist->p_fetcher =
+    p_playlist->p->p_fetcher =
         vlc_custom_create( p_playlist, sizeof( playlist_fetcher_t ),
                            VLC_OBJECT_GENERIC, fname );
-    if( !p_playlist->p_fetcher )
+    if( !p_playlist->p->p_fetcher )
     {
         msg_Err( p_playlist, "unable to create secondary preparser" );
         vlc_object_release( p_playlist );
         return;
     }
-    p_playlist->p_fetcher->psz_object_name = strdup( "fetcher" );
-    p_playlist->p_fetcher->i_waiting = 0;
-    p_playlist->p_fetcher->pp_waiting = NULL;
-    p_playlist->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
+    p_playlist->p->p_fetcher->psz_object_name = strdup( "fetcher" );
+    p_playlist->p->p_fetcher->i_waiting = 0;
+    p_playlist->p->p_fetcher->pp_waiting = NULL;
+    p_playlist->p->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
                                                                 "album-art" );
 
-    vlc_object_set_destructor( p_playlist->p_fetcher, FetcherDestructor );
+    vlc_object_set_destructor( p_playlist->p->p_fetcher, FetcherDestructor );
 
-    vlc_object_attach( p_playlist->p_fetcher, p_playlist );
-    if( vlc_thread_create( p_playlist->p_fetcher,
+    vlc_object_attach( p_playlist->p->p_fetcher, p_playlist );
+    if( vlc_thread_create( p_playlist->p->p_fetcher,
                            "fetcher",
                            RunFetcher,
                            VLC_THREAD_PRIORITY_LOW, true ) )
     {
         msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
-        vlc_object_release( p_playlist->p_fetcher );
+        vlc_object_release( p_playlist->p->p_fetcher );
         return;
     }
 
