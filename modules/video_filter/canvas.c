@@ -91,7 +91,7 @@ static int Activate( vlc_object_t *p_this )
     unsigned int i_width, i_height;
     es_format_t fmt;
     char psz_croppadd[100];
-    int i_padd;
+    int i_padd,i_offset;
     char *psz_aspect, *psz_parser;
     int i_aspect;
 
@@ -170,18 +170,20 @@ static int Activate( vlc_object_t *p_this )
         fmt.video.i_width = ( p_filter->fmt_in.video.i_width * i_height )
                             / p_filter->fmt_in.video.i_height;
         if( fmt.video.i_width & 1 ) fmt.video.i_width -= 1;
-        i_padd = i_width - fmt.video.i_width;
+        i_padd = (i_width - fmt.video.i_width) / 2;
+        i_offset = (i_padd & 1);
         /* Gruik */
         snprintf( psz_croppadd, 100, "croppadd{paddleft=%d,paddright=%d}",
-                  i_padd/2, (i_padd+1)/2 );
+                  i_padd - i_offset, i_padd + i_offset );
     }
     else
     {
         if( fmt.video.i_height & 1 ) fmt.video.i_height -= 1;
-        i_padd = i_height - fmt.video.i_height;
+        i_padd = (i_height - fmt.video.i_height ) / 2;
+        i_offset = (i_padd & 1);
         /* Gruik */
         snprintf( psz_croppadd, 100, "croppadd{paddtop=%d,paddbottom=%d}",
-                  i_padd/2, (i_padd+1)/2 );
+                  i_padd - i_offset, i_padd + i_offset );
     }
 
     fmt.video.i_visible_width = fmt.video.i_width;
