@@ -279,6 +279,7 @@ DIST_osdmenu_minimal = \
 	osdmenu/minimal/fs_panel_mockup.png
 
 DIST_lua= \
+	lua/README.txt \
 	lua/meta/README.txt \
 	lua/meta/googleimage.lua \
 	lua/playlist/README.txt \
@@ -293,6 +294,7 @@ DIST_lua= \
 	lua/playlist/megavideo.lua \
 	lua/playlist/metacafe.lua \
 	lua/playlist/googlevideo.lua \
+	lua/intf/README.txt \
 	lua/intf/http.lua \
 	lua/intf/rc.lua \
 	lua/intf/hotkeys.lua \

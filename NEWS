@@ -83,8 +83,7 @@ Playlist:
  * Album art support
  * User definable Lua playlist scripts. See share/lua/playlist/README.txt
    (Default scripts open YouTube, DailyMotion, metacafe and Google Video URLs)
- * User definable Lua metadata and album art fetcher scripts. See
-   share/lua/meta/README.txt
+ * User definable Lua album art fetcher scripts. See share/lua/meta/README.txt
 
 Inputs:
  * Video for Linux 2 (V4L2) input support
@@ -227,7 +226,8 @@ Interfaces:
    * Correctly displays wide characters when using an UTF-8 locale, 
      if libncursesw is available.
    * Some nice colors if the terminal supports it (most do)
- * Experimental Lua interface modules. See vlc -I lua for more info
+ * Experimental Lua interface modules. See vlc -I lua and
+   share/lua/playlist/README.txt for more info.
  * Unix
    * Option to allow only one running instance, using D-Bus interface.
    * D-Bus Interface implementing the MPRIS 
