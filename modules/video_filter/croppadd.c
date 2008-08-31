@@ -286,7 +286,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
             /* Padd on the right */
             vlc_memset( p_out, i_padd_color,
-                        ( i_outwidth - i_width ) * i_pixel_pitch );
+                        ( i_outwidth - i_xpadd - i_width ) * i_pixel_pitch );
 
             /* Got to begining of the next line */
             p_in = p_in_next;
