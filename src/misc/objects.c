@@ -307,30 +307,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     free( p_this->psz_header );
 
-#ifndef NDEBUG
-    if( VLC_OBJECT(p_this->p_libvlc) == p_this )
-    {
-        /* Test for leaks */
-        vlc_object_t *leaked = p_priv->next;
-        while( leaked != p_this )
-        {
-            /* We are leaking this object */
-            fprintf( stderr,
-                     "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
-                     leaked->i_object_id, leaked->psz_object_type,
-                     leaked->psz_object_name );
-            /* Dump object to ease debugging */
-            vlc_object_dump( leaked );
-            fflush(stderr);
-            leaked = vlc_internals (leaked)->next;
-        }
-
-        if( p_priv->next != p_this )
-            /* Dump libvlc object to ease debugging */
-            vlc_object_dump( p_this );
-    }
-#endif
-
     if( p_this->p_libvlc == NULL )
         /* We are the global object ... no need to lock. */
         vlc_mutex_destroy( &structure_lock );
@@ -743,6 +719,29 @@ void __vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
+#ifndef NDEBUG
+        if( VLC_OBJECT(p_this->p_libvlc) == p_this )
+        {
+            /* Test for leaks */
+            vlc_object_t *leaked = internals->next;
+            while( leaked != p_this )
+            {
+                /* We are leaking this object */
+                fprintf( stderr,
+                         "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
+                         leaked->i_object_id, leaked->psz_object_type,
+                         leaked->psz_object_name );
+                /* Dump object to ease debugging */
+                vlc_object_dump( leaked );
+                fflush(stderr);
+                leaked = vlc_internals (leaked)->next;
+            }
+
+            if( internals->next != p_this )
+                /* Dump libvlc object to ease debugging */
+                vlc_object_dump( p_this );
+        }
+#endif
         /* Remove the object from object list
          * so that it cannot be encountered by vlc_object_get() */
         vlc_internals (internals->next)->prev = internals->prev;
@@ -1102,11 +1101,11 @@ void vlc_list_release( vlc_list_t *p_list )
  *****************************************************************************/
 void __vlc_object_dump( vlc_object_t *p_this )
 {
-    vlc_mutex_lock( &structure_lock );
     char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
     psz_foo[0] = '|';
+
+    vlc_assert_locked( &structure_lock );
     DumpStructure( p_this, 0, psz_foo );
-    vlc_mutex_unlock( &structure_lock );
 }
 
 /* Following functions are local */
