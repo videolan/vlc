@@ -1831,29 +1831,26 @@ char *stream_ReadLine( stream_t *s )
 
         /* BOM detection */
         i_pos = stream_Tell( s );
-        if( i_pos == 0 && i_data > 4 )
+        if( i_pos == 0 && i_data >= 3 )
         {
             int i_bom_size = 0;
-            char *psz_encoding = NULL;
+            const char *psz_encoding = NULL;
 
-            if( p_data[0] == 0xEF && p_data[1] == 0xBB && p_data[2] == 0xBF )
+            if( !memcmp( p_data, "\xEF\xBB\xBF", 3 ) )
             {
-                psz_encoding = strdup( "UTF-8" );
+                psz_encoding = "UTF-8";
                 i_bom_size = 3;
             }
-            else if( p_data[0] == 0xFF && p_data[1] == 0xFE )
+            else if( !memcmp( p_data, "\xFF\xFE", 2 ) )
             {
-                if( p_data[2] || p_data[3] )
-                {
-                    psz_encoding = strdup( "UTF-16LE" );
-                    s->b_little_endian = true;
-                    s->i_char_width = 2;
-                    i_bom_size = 2;
-                }
+                psz_encoding = "UTF-16LE";
+                s->b_little_endian = true;
+                s->i_char_width = 2;
+                i_bom_size = 2;
             }
-            else if( p_data[0] == 0xFE && p_data[1] == 0xFF )
+            else if( !memcmp( p_data, "\xFE\xFF", 2 ) )
             {
-                psz_encoding = strdup( "UTF-16BE" );
+                psz_encoding = "UTF-16BE";
                 s->i_char_width = 2;
                 i_bom_size = 2;
             }
@@ -1886,7 +1883,6 @@ char *stream_ReadLine( stream_t *s )
                     var_SetString( p_input, "subsdec-encoding", "UTF-8" );
                     vlc_object_release( p_input );
                 }
-                free( psz_encoding );
             }
         }
 
