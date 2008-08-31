@@ -92,9 +92,6 @@ VLC_EXPORT( vlc_list_t *, __vlc_list_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( vlc_list_t *, __vlc_list_children, ( vlc_object_t * ) );
 VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 
-/* __vlc_object_dump */
-VLC_EXPORT( void, __vlc_object_dump, ( vlc_object_t *p_this ) );
-
 /*}@*/
 
 #define vlc_object_create(a,b) \
@@ -126,10 +123,6 @@ VLC_EXPORT( void, __vlc_object_dump, ( vlc_object_t *p_this ) );
 
 #define vlc_list_children(a) \
     __vlc_list_children( VLC_OBJECT(a) )
-
-#define vlc_object_dump(a) \
-    __vlc_object_dump( VLC_OBJECT(a))
-
 
 /* Objects and threading */
 VLC_EXPORT( void, __vlc_object_lock, ( vlc_object_t * ) );
