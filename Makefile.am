@@ -480,6 +480,10 @@ VLC-release.app: vlc
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
 	PRODUCT="VLC-release.app" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua
+	for i in $(srcdir)/share/lua/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/`basename $${i}` ; \
+	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/playlist
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/playlist/`basename $${i}` ; \
@@ -776,6 +780,10 @@ endif
 
 if BUILD_LUA
 #Lua Scripts
+	$(INSTALL) -d $(win32_lua_destdir)
+	for i in $(srcdir)/share/lua/*.* ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/`basename $${i}` ; \
+	done
 	$(INSTALL) -d $(win32_lua_destdir)/playlist
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/playlist/`basename $${i}` ; \
