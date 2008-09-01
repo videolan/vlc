@@ -154,7 +154,7 @@ typedef struct
     bool            b_rtcp_sync;
     char            waiting;
     int64_t         i_pts;
-    int64_t         i_npt;
+    float           i_npt;
 
 } live_track_t;
 
@@ -189,7 +189,7 @@ struct demux_sys_t
 
     /* */
     int64_t          i_pcr; /* The clock */
-    int64_t          i_npt;
+    float            i_npt;
     float            i_npt_length;
     float            i_npt_start;
 
@@ -271,9 +271,9 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_track = 0;
     p_sys->track   = NULL;
     p_sys->i_pcr = 0;
-    p_sys->i_npt = 0;
-    p_sys->i_npt_start = 0;
-    p_sys->i_npt_length = 0;
+    p_sys->i_npt = 0.;
+    p_sys->i_npt_start = 0.;
+    p_sys->i_npt_length = 0.;
     p_sys->p_out_asf = NULL;
     p_sys->b_no_data = true;
     p_sys->i_no_data_ti = 0;
@@ -764,7 +764,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->waiting     = 0;
             tk->b_rtcp_sync = false;
             tk->i_pts       = 0;
-            tk->i_npt       = 0;
+            tk->i_npt       = 0.;
             tk->i_buffer    = 65536;
             tk->p_buffer    = (uint8_t *)malloc( 65536 );
             if( !tk->p_buffer )
@@ -1005,13 +1005,9 @@ static int SessionsSetup( demux_t *p_demux )
 
     /* Retrieve the starttime if possible */
     p_sys->i_npt_start = p_sys->ms->playStartTime();
-    if( p_sys->i_npt_start < 0 )
-        p_sys->i_npt_start = -1;
 
     /* Retrieve the duration if possible */
     p_sys->i_npt_length = p_sys->ms->playEndTime();
-    if( p_sys->i_npt_length < 0 )
-        p_sys->i_npt_length = -1;
 
     msg_Dbg( p_demux, "setup start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
     return i_return;
@@ -1061,12 +1057,7 @@ static int Play( demux_t *p_demux )
 
     /* Retrieve the starttime if possible */
     p_sys->i_npt_start = p_sys->ms->playStartTime();
-    if( p_sys->i_npt_start < 0 )
-        p_sys->i_npt_start = -1;
-
     p_sys->i_npt_length = p_sys->ms->playEndTime();
-    if( p_sys->i_npt_length < 0 )
-        p_sys->i_npt_length = -1;
 
     msg_Dbg( p_demux, "play start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
     return VLC_SUCCESS;
@@ -1152,9 +1143,9 @@ static int Demux( demux_t *p_demux )
             tk->b_rtcp_sync = true;
             /* reset PCR */
             tk->i_pts = 0;
-            tk->i_npt = 0;
+            tk->i_npt = 0.;
             p_sys->i_pcr = 0;
-            p_sys->i_npt = 0;
+            p_sys->i_npt = 0.;
             i_pcr = 0;
         }
     }
@@ -1212,7 +1203,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_npt > 0 )
             {
-                *pi64 = p_sys->i_npt;
+                *pi64 = (int64_t)(p_sys->i_npt * 1000000.);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1221,7 +1212,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_npt_length > 0 )
             {
-                *pi64 = p_sys->i_npt_length;
+                *pi64 = p_sys->i_npt_length * 1000000.0;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1242,7 +1233,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 int i;
                 float time;
 
-                if( i_query == DEMUX_SET_TIME && p_sys->i_npt )
+                if( i_query == DEMUX_SET_TIME && p_sys->i_npt > 0 )
                 {
                     i64 = (int64_t)va_arg( args, int64_t );
                     time = (float)((double)i64 / (double)1000000.0); /* in second */
@@ -1252,7 +1243,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 else
                 {
                     f = (double)va_arg( args, double );
-                    time = f * (double)p_sys->i_npt_length / (double)1000000.0;   /* in second */
+                    time = f * (double)p_sys->i_npt_length;   /* in second */
                 }
 
                 if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time, -1, 1 ) )
@@ -1272,15 +1263,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
 
                 /* Retrieve the starttime if possible */
-                p_sys->i_npt_start = p_sys->ms->playStartTime();
-                if( p_sys->i_npt_start < 0 )
-                    p_sys->i_npt_start = -1;
-                else p_sys->i_npt = p_sys->i_npt_start;
+                p_sys->i_npt = p_sys->i_npt_start = p_sys->ms->playStartTime();
 
                 /* Retrieve the duration if possible */
                 p_sys->i_npt_length = p_sys->ms->playEndTime();
-                if( p_sys->i_npt_length < 0 )
-                    p_sys->i_npt_length = -1;
 
                 msg_Dbg( p_demux, "seek start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
                 return VLC_SUCCESS;
@@ -1291,7 +1277,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_SEEK:
             pb = (bool*)va_arg( args, bool * );
-            if( p_sys->rtsp && p_sys->i_npt_length )
+            if( p_sys->rtsp && p_sys->i_npt_length > 0 )
                 /* Not always true, but will be handled in SET_PAUSE_STATE */
                 *pb = true;
             else
@@ -1351,7 +1337,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* ReSync the stream */
             p_sys->i_npt_start = 0;
             p_sys->i_pcr = 0;
-            p_sys->i_npt = 0;
+            p_sys->i_npt = 0.;
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() + 0.5 );
@@ -1399,15 +1385,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             /* Retrieve the starttime if possible */
-            p_sys->i_npt_start = p_sys->ms->playStartTime();
-            if( p_sys->i_npt_start < 0 )
-                p_sys->i_npt_start = -1;
-            else p_sys->i_npt = p_sys->i_npt_start;
+            p_sys->i_npt = p_sys->i_npt_start = p_sys->ms->playStartTime();
 
             /* Retrieve the duration if possible */
             p_sys->i_npt_length = p_sys->ms->playEndTime();
-            if( p_sys->i_npt_length < 0 )
-                p_sys->i_npt_length = -1;
 
             msg_Dbg( p_demux, "pause start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
             return VLC_SUCCESS;
@@ -1513,7 +1494,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     i_pts &= INT64_C(0x00ffffffffffffff);
 
     /* Retrieve NPT for this pts */
-    tk->i_npt = (int64_t) INT64_C(1000000) * tk->sub->getNormalPlayTime(pts);
+    tk->i_npt = tk->sub->getNormalPlayTime(pts);
 
     if( tk->b_quicktime && tk->p_es == NULL )
     {
