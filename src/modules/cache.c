@@ -506,7 +506,10 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
     free( psz_cachedir );
     msg_Dbg( p_this, "writing plugins cache %s", psz_filename );
 
-    file = utf8_fopen( psz_filename, "wb" );
+    char psz_tmpname[sizeof (psz_filename) + 12];
+    snprintf (psz_tmpname, sizeof (psz_tmpname), "%s.%"PRIu32, psz_filename,
+              (uint32_t)getpid ());
+    file = utf8_fopen( psz_tmpname, "wb" );
     if (file == NULL)
         goto error;
 
@@ -597,13 +600,20 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
     /* Fill-up file size */
     i_file_size = ftell( file );
     fseek( file, 0, SEEK_SET );
-    if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1)
+    if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1
+     || fflush (file)) /* flush libc buffers */
         goto error;
 
-    if (fclose (file) == 0)
-        return; /* success! */
+#ifndef WIN32
+    rename (psz_tmpname, psz_filename); /* atomically replace old cache */
+    fclose (file);
+#else
+    remove (psz_filename);
+    fclose (file);
+    rename (psz_tmpname, psz_filename);
+#endif
+    return; /* success! */
 
-    file = NULL;
 error:
     msg_Warn (p_this, "could not write plugins cache %s (%m)",
               psz_filename);
