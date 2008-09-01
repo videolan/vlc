@@ -532,6 +532,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                     msleep( 100000 );
 
                 input_StopThread( p_input );
+                vlc_thread_join( p_input );
                 vlc_object_release( p_input );
             }
             free( psz_header );
