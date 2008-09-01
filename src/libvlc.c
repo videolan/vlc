@@ -1396,6 +1396,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     bool b_color       = config_GetInt( p_this, "color" ) > 0;
     bool b_has_advanced = false;
     bool b_found       = false;
+    int  i_only_advanced = 0; /* Number of modules ignored because they
+                               * only have advanced options */
 
     memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
@@ -1472,7 +1474,10 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             }
 
             if( p_item == p_end )
+            {
+                i_only_advanced++;
                 continue;
+            }
         }
 
         b_found = true;
@@ -1791,7 +1796,20 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
            _( "add --advanced to your command line to see advanced options."));
     }
 
-    if( !b_found )
+    if( i_only_advanced > 0 )
+    {
+        if( b_color )
+        {
+            utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " ", _( "Note:" ) );
+            utf8_fprintf( stdout, _( "%d module(s) were not displayed because they only have advanced options.\n" ), i_only_advanced );
+        }
+        else
+        {
+            utf8_fprintf( stdout, "\n%s ", _( "Note:" ) );
+            utf8_fprintf( stdout, _( "%d module(s) were not displayed because they only have advanced options.\n" ), i_only_advanced );
+        }
+    }
+    else if( !b_found )
     {
         if( b_color )
             utf8_fprintf( stdout, "\n" WHITE "%s" GRAY "\n",
