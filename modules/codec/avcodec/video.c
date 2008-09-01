@@ -902,12 +902,20 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_ff_pic )
 {
     decoder_t *p_dec = (decoder_t *)p_context->opaque;
+    int i_ret;
 
-    /* Set picture PTS */
-    ffmpeg_SetFrameBufferPts( p_dec, p_ff_pic );
+    /* */
+    p_ff_pic->pts = AV_NOPTS_VALUE;
 
     /* We always use default reget function, it works perfectly fine */
-    return avcodec_default_reget_buffer( p_context, p_ff_pic );
+    i_ret = avcodec_default_reget_buffer( p_context, p_ff_pic );
+
+    /* Set picture PTS if avcodec_default_reget_buffer didn't set it (through a
+     * ffmpeg_GetFrameBuf call) */
+    if( !i_ret && p_ff_pic->pts == AV_NOPTS_VALUE )
+        ffmpeg_SetFrameBufferPts( p_dec, p_ff_pic );
+
+    return i_ret;
 }
 
 static void ffmpeg_SetFrameBufferPts( decoder_t *p_dec, AVFrame *p_ff_pic )
@@ -928,9 +936,15 @@ static void ffmpeg_SetFrameBufferPts( decoder_t *p_dec, AVFrame *p_ff_pic )
         {
             p_ff_pic->pts = p_sys->input_dts;
         }
-        else p_ff_pic->pts = 0;
+        else
+        {
+            p_ff_pic->pts = 0;
+        }
     }
-    else p_ff_pic->pts = 0;
+    else
+    {
+        p_ff_pic->pts = 0;
+    }
 
     if( p_sys->i_pts ) /* make sure 1st frame has a pts > 0 */
     {
