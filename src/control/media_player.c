@@ -183,6 +183,7 @@ input_state_changed( const vlc_event_t * event, void * p_userdata )
         case END_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Ended, NULL);
             forwarded_event.type = libvlc_MediaPlayerEndReached;
+            break;
         case ERROR_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Error, NULL);
             forwarded_event.type = libvlc_MediaPlayerEncounteredError;
