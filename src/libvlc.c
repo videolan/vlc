@@ -1469,6 +1469,9 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 if( (p_item->i_type & CONFIG_ITEM) &&
                     !p_item->b_advanced ) break;
             }
+
+            if( p_item == p_end )
+                continue;
         }
 
         /* Print name of module */
