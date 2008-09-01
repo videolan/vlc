@@ -152,7 +152,7 @@ static void SetLanguage   ( char const * );
 static inline int LoadMessages (void);
 static int  GetFilenames  ( libvlc_int_t *, int, const char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
-static void Usage         ( libvlc_int_t *, char const *psz_module_name );
+static void Usage         ( libvlc_int_t *, char const *psz_search );
 static void ListModules   ( libvlc_int_t *, bool );
 static void Version       ( void );
 
@@ -1297,8 +1297,8 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
     {
         utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
-        Usage( p_this, "help" );
-        Usage( p_this, "main" );
+        Usage( p_this, "=help" );
+        Usage( p_this, "=main" );
         print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
@@ -1355,7 +1355,7 @@ static void print_help_section( module_config_t *p_item, bool b_color, bool b_de
     }
 }
 
-static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
+static void Usage( libvlc_int_t *p_this, char const *psz_search )
 {
 #define FORMAT_STRING "  %s --%s%s%s%s%s%s%s "
     /* short option ------'    | | | | | | |
@@ -1398,6 +1398,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     bool b_found       = false;
     int  i_only_advanced = 0; /* Number of modules ignored because they
                                * only have advanced options */
+    bool b_strict = psz_search && *psz_search == '=';
+    if( b_strict ) psz_search++;
 
     memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
@@ -1424,7 +1426,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 
     /* Ugly hack to make sure that the help options always come first
      * (part 1) */
-    if( !psz_module_name )
+    if( !psz_search )
         Usage( p_this, "help" );
 
     /* Enumerate the config for each module */
@@ -1436,13 +1438,15 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         module_config_t *p_section = NULL;
         module_config_t *p_end = p_parser->p_config + p_parser->confsize;
 
-        if( psz_module_name && strcmp( psz_module_name,
-                                       p_parser->psz_object_name ) )
+        if( psz_search &&
+            ( b_strict ? strcmp( psz_search, p_parser->psz_object_name )
+                       : !strstr( p_parser->psz_object_name, psz_search ) ) )
         {
             char *const *pp_shortcut = p_parser->pp_shortcuts;
             while( *pp_shortcut )
             {
-                if( !strcmp( psz_module_name, *pp_shortcut ) )
+                if( b_strict ? !strcmp( psz_search, *pp_shortcut )
+                             : strstr( *pp_shortcut, psz_search ) )
                     break;
                 pp_shortcut ++;
             }
@@ -1459,7 +1463,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         b_help_module = !strcmp( "help", p_parser->psz_object_name );
         /* Ugly hack to make sure that the help options always come first
          * (part 2) */
-        if( !psz_module_name && b_help_module )
+        if( !psz_search && b_help_module )
             continue;
 
         /* Ignore modules with only advanced config options if requested */
