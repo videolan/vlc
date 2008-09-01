@@ -515,7 +515,7 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
      * memory leaks and the signal functions not working (see Microsoft
      * Knowledge Base, article 104641) */
     HANDLE hThread;
-    vlc_thread_t th = malloc (sizeof (*p_handle));
+    vlc_thread_t th = malloc (sizeof (*th));
 
     if (th == NULL)
         return ENOMEM;
