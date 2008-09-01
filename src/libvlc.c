@@ -1660,7 +1660,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 
             if( p_item->i_type == CONFIG_ITEM_BOOL && !b_help_module )
             {
-                utf8_fprintf( stdout, psz_format_bool, psz_short, 
+                utf8_fprintf( stdout, psz_format_bool, psz_short,
                               p_item->psz_name, psz_prefix, p_item->psz_name,
                               psz_bra, psz_type, psz_ket, psz_spaces );
             }
@@ -1774,7 +1774,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         }
     }
 
-    if( b_has_advanced ) 
+    if( b_has_advanced )
     {
         if( b_color )
             utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " %s\n", _( "Note:" ),
