@@ -578,6 +578,9 @@ AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(fcntl)
 AC_REPLACE_FUNCS([asprintf atof atoll gmtime_r lldiv localtime_r rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtoll vasprintf swab])
 AC_CHECK_FUNCS([stricmp strnicmp])
+AC_CHECK_FUNCS(fdatasync,,
+  [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
+])
 
 dnl Check for Linux system calls
 AC_CHECK_FUNCS([vmsplice])
