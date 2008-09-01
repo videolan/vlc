@@ -47,6 +47,8 @@
     bool b_checked;
 }
 
+- (void)end;
+
 - (IBAction)download:(id)sender;
 - (IBAction)okay:(id)sender;
 - (IBAction)changeCheckUpdateOnStartup:(id)sender;

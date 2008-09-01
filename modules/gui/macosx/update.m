@@ -69,6 +69,11 @@ static VLCUpdate *_o_sharedInstance = nil;
     return _o_sharedInstance;
 }
 
+- (void)end
+{
+    if( p_u ) update_Delete( p_u );
+}
+
 - (void)awakeFromNib
 {
     /* we don't use - (BOOL)shouldCheckUpdateOnStartup because we don't want
