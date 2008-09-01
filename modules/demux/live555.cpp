@@ -190,8 +190,8 @@ struct demux_sys_t
     /* */
     int64_t          i_pcr; /* The clock */
     int64_t          i_npt;
-    int64_t          i_npt_length;
-    int64_t          i_npt_start;
+    float            i_npt_length;
+    float            i_npt_start;
 
     /* timeout thread information */
     int              i_timeout;     /* session timeout value in seconds */
@@ -1004,16 +1004,16 @@ static int SessionsSetup( demux_t *p_demux )
     if( p_sys->i_track <= 0 ) i_return = VLC_EGENERIC;
 
     /* Retrieve the starttime if possible */
-    p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
+    p_sys->i_npt_start = p_sys->ms->playStartTime();
     if( p_sys->i_npt_start < 0 )
         p_sys->i_npt_start = -1;
 
     /* Retrieve the duration if possible */
-    p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
+    p_sys->i_npt_length = p_sys->ms->playEndTime();
     if( p_sys->i_npt_length < 0 )
         p_sys->i_npt_length = -1;
 
-    msg_Dbg( p_demux, "setup start: %lld stop:%lld", p_sys->i_npt_start, p_sys->i_npt_length );
+    msg_Dbg( p_demux, "setup start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
     return i_return;
 }
 
@@ -1060,15 +1060,15 @@ static int Play( demux_t *p_demux )
     p_sys->i_pcr = 0;
 
     /* Retrieve the starttime if possible */
-    p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
+    p_sys->i_npt_start = p_sys->ms->playStartTime();
     if( p_sys->i_npt_start < 0 )
         p_sys->i_npt_start = -1;
 
-    p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
+    p_sys->i_npt_length = p_sys->ms->playEndTime();
     if( p_sys->i_npt_length < 0 )
         p_sys->i_npt_length = -1;
 
-    msg_Dbg( p_demux, "play start: %lld stop:%lld", p_sys->i_npt_start, p_sys->i_npt_length );
+    msg_Dbg( p_demux, "play start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
     return VLC_SUCCESS;
 }
 
@@ -1272,17 +1272,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
 
                 /* Retrieve the starttime if possible */
-                p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
+                p_sys->i_npt_start = p_sys->ms->playStartTime();
                 if( p_sys->i_npt_start < 0 )
                     p_sys->i_npt_start = -1;
                 else p_sys->i_npt = p_sys->i_npt_start;
 
                 /* Retrieve the duration if possible */
-                p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
+                p_sys->i_npt_length = p_sys->ms->playEndTime();
                 if( p_sys->i_npt_length < 0 )
                     p_sys->i_npt_length = -1;
 
-                msg_Dbg( p_demux, "seek start: %lld stop:%lld", p_sys->i_npt_start, p_sys->i_npt_length );
+                msg_Dbg( p_demux, "seek start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1399,17 +1399,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             /* Retrieve the starttime if possible */
-            p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
+            p_sys->i_npt_start = p_sys->ms->playStartTime();
             if( p_sys->i_npt_start < 0 )
                 p_sys->i_npt_start = -1;
             else p_sys->i_npt = p_sys->i_npt_start;
 
             /* Retrieve the duration if possible */
-            p_sys->i_npt_length = (int64_t)( p_sys->ms->playEndTime() * (double)1000000.0 );
+            p_sys->i_npt_length = p_sys->ms->playEndTime();
             if( p_sys->i_npt_length < 0 )
                 p_sys->i_npt_length = -1;
 
-            msg_Dbg( p_demux, "pause start: %lld stop:%lld", p_sys->i_npt_start, p_sys->i_npt_length );
+            msg_Dbg( p_demux, "pause start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
             return VLC_SUCCESS;
         }
         case DEMUX_GET_TITLE_INFO:
