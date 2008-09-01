@@ -1395,6 +1395,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     bool b_description_hack;
     bool b_color       = config_GetInt( p_this, "color" ) > 0;
     bool b_has_advanced = false;
+    bool b_found       = false;
 
     memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
@@ -1473,6 +1474,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             if( p_item == p_end )
                 continue;
         }
+
+        b_found = true;
 
         /* Print name of module */
         if( strcmp( "main", p_parser->psz_object_name ) )
@@ -1784,8 +1787,20 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " %s\n", _( "Note:" ),
            _( "add --advanced to your command line to see advanced options."));
         else
-            utf8_fprintf( stdout, "\n %s %s\n", _( "Note:" ),
+            utf8_fprintf( stdout, "\n%s %s\n", _( "Note:" ),
            _( "add --advanced to your command line to see advanced options."));
+    }
+
+    if( !b_found )
+    {
+        if( b_color )
+            utf8_fprintf( stdout, "\n" WHITE "%s" GRAY "\n",
+                       _( "No matching module found. Use --list or" \
+                          "--list-verbose to list available modules." ) );
+        else
+            utf8_fprintf( stdout, "\n%s\n",
+                       _( "No matching module found. Use --list or" \
+                          "--list-verbose to list available modules." ) );
     }
 
     /* Release the module list */
