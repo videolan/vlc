@@ -81,11 +81,18 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 static int    CacheLoadConfig  ( module_t *, FILE * );
 static int    CacheSaveConfig  ( module_t *, FILE * );
-static char * CacheName        ( void );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
 #define CACHE_SUBVERSION_NUM 3
+
+/* Format string for the cache filename */
+#define CACHENAME_FORMAT \
+    "plugins-%.2zx%.2zx%.2"PRIx8".dat"
+/* Magic for the cache filename */
+#define CACHENAME_VALUES \
+    sizeof(int), sizeof(void *), *(uint8_t *)&(uint16_t){ 0xbe1e }
+
 
 /*****************************************************************************
  * LoadPluginsCache: loads the plugins cache file
@@ -112,8 +119,8 @@ void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
-    if( asprintf( &psz_filename, "%s"DIR_SEP"%s",
-                       psz_cachedir, CacheName() ) == -1 )
+    if( asprintf( &psz_filename, "%s"DIR_SEP CACHENAME_FORMAT,
+                  psz_cachedir, CACHENAME_VALUES ) == -1 )
     {
         free( psz_cachedir );
         return;
@@ -493,7 +500,8 @@ void CacheSave( vlc_object_t *p_this )
     }
 
     snprintf( psz_filename, sizeof( psz_filename ),
-              "%s"DIR_SEP"%s", psz_cachedir, CacheName() );
+              "%s"DIR_SEP CACHENAME_FORMAT, psz_cachedir,
+              CACHENAME_VALUES );
     free( psz_cachedir );
     msg_Dbg( p_this, "writing plugins cache %s", psz_filename );
 
@@ -675,20 +683,6 @@ static int CacheSaveConfig( module_t *p_module, FILE *file )
 
 error:
     return -1;
-}
-
-/*****************************************************************************
- * CacheName: Return the cache file name for this platform.
- *****************************************************************************/
-static char *CacheName( void )
-{
-    static char psz_cachename[32];
-
-    /* Code int size, pointer size and endianness in the filename */
-    int32_t x = 0xbe00001e;
-    sprintf( psz_cachename, "plugins-%.2x%.2x%.2x.dat", (int)sizeof(int),
-             (int)sizeof(void *), (unsigned int)((unsigned char *)&x)[0] );
-    return psz_cachename;
 }
 
 /*****************************************************************************
