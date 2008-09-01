@@ -1324,7 +1324,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
      */
     for( p_pic = NULL; ; )
     {
-        int i_pic, i_ready_pic = 0;
+        int i_pic, i_ready_pic;
 
         if( p_dec->b_die || p_dec->b_error )
             return NULL;
@@ -1343,24 +1343,31 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
 #define p_pic p_dec->p_owner->p_vout->render.pp_picture[i_pic]
         /* Check the decoder doesn't leak pictures */
-        for( i_pic = 0; i_pic < p_dec->p_owner->p_vout->render.i_pictures;
-             i_pic++ )
+        for( i_pic = 0, i_ready_pic = 0; i_pic < p_dec->p_owner->p_vout->render.i_pictures; i_pic++ )
         {
             if( p_pic->i_status == READY_PICTURE )
             {
-                if( i_ready_pic++ > 0 ) break;
-                else continue;
+                i_ready_pic++;
+                /* If we have at least 2 ready pictures, wait for the vout thread to
+                 * process one */
+                if( i_ready_pic >= 2 )
+                    break;
+
+                continue;
             }
 
-            if( p_pic->i_status != DISPLAYED_PICTURE &&
-                p_pic->i_status != RESERVED_PICTURE &&
-                p_pic->i_status != READY_PICTURE ) break;
-
-            if( !p_pic->i_refcount && p_pic->i_status != RESERVED_PICTURE )
-                break;
+            if( p_pic->i_status == DISPLAYED_PICTURE )
+            {
+                /* If at least one displayed picture is not referenced
+                 * let vout free it */
+                if( p_pic->i_refcount == 0 )
+                    break;
+            }
         }
         if( i_pic == p_dec->p_owner->p_vout->render.i_pictures )
         {
+            /* Too many pictures are still referenced, there is probably a bug
+             * with the decoder */
             msg_Err( p_dec, "decoder is leaking pictures, resetting the heap" );
 
             /* Just free all the pictures */
