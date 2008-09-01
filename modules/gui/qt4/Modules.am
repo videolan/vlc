@@ -64,9 +64,92 @@ nodist_SOURCES_qt4 = \
 		ui/streampanel.h \
 		ui/sout.h
 
+res_DEPENDENCIES = \
+	pixmaps/prefs/advprefs_audio.png \
+	pixmaps/prefs/advprefs_codec.png \
+	pixmaps/prefs/advprefs_extended.png \
+	pixmaps/prefs/advprefs_intf.png \
+	pixmaps/prefs/advprefs_playlist.png \
+	pixmaps/prefs/advprefs_sout.png \
+	pixmaps/prefs/advprefs_video.png \
+	pixmaps/prefs/spref_cone_Audio_64.png \
+	pixmaps/prefs/spref_cone_Hotkeys_64.png \
+	pixmaps/prefs/spref_cone_Input_64.png \
+	pixmaps/prefs/spref_cone_Interface_64.png \
+	pixmaps/prefs/spref_cone_Subtitles_64.png \
+	pixmaps/prefs/spref_cone_Video_64.png \
+	pixmaps/types/capture-card_16px.png \
+	pixmaps/types/cdda_16px.png \
+	pixmaps/types/disc_16px.png \
+	pixmaps/types/file-asym_16px.png \
+	pixmaps/types/file-wide_16px.png \
+	pixmaps/types/folder-blue_16px.png \
+	pixmaps/types/folder-grey_16px.png \
+	pixmaps/types/harddisk_16px.png \
+	pixmaps/types/network_16px.png \
+	pixmaps/menus/help_16px.png \
+	pixmaps/menus/info_16px.png \
+	pixmaps/menus/messages_16px.png \
+	pixmaps/menus/preferences_16px.png \
+	pixmaps/menus/quit_16px.png \
+	pixmaps/menus/settings_16px.png \
+	pixmaps/menus/stream_16px.png \
+	pixmaps/menus/playlist_16px.png \
+	pixmaps/go-next.png \
+	pixmaps/next_16px.png \
+	pixmaps/next.png \
+	pixmaps/noart.png \
+	pixmaps/pause_16px.png \
+	pixmaps/pause.png \
+	pixmaps/play_16px.png \
+	pixmaps/playlist/add.png \
+	pixmaps/playlist/playlist.png \
+	pixmaps/playlist/repeat_all.png \
+	pixmaps/playlist/repeat_off.png \
+	pixmaps/playlist/repeat_one.png \
+	pixmaps/playlist/shuffle_off.png \
+	pixmaps/playlist/shuffle_on.png \
+	pixmaps/playlist/jumpto.png \
+	pixmaps/play.png \
+	pixmaps/previous_16px.png \
+	pixmaps/previous.png \
+	pixmaps/stop_16px.png \
+	pixmaps/stop.png \
+	pixmaps/eject.png \
+	pixmaps/update.png \
+	pixmaps/clear.png \
+	pixmaps/arrow_down_dark.png \
+	pixmaps/types/tape_16px.png \
+	pixmaps/types/type_directory.png \
+	pixmaps/types/type_file.png \
+	pixmaps/types/type_net.png \
+	pixmaps/types/type_node.png \
+	pixmaps/types/type_playlist.png \
+	pixmaps/types/type_unknown.xpm \
+	pixmaps/toolbar/extended_16px.png \
+	pixmaps/toolbar/record_16px.png \
+	pixmaps/toolbar/snapshot.png \
+	pixmaps/toolbar/atob.png \
+	pixmaps/toolbar/atob_noa.png \
+	pixmaps/toolbar/atob_nob.png \
+	pixmaps/toolbar/dvd_menu.png \
+	pixmaps/toolbar/dvd_next.png \
+	pixmaps/toolbar/dvd_prev.png \
+	pixmaps/toolbar/tv.png \
+	pixmaps/toolbar/fullscreen.png \
+	pixmaps/toolbar/defullscreen.png \
+	pixmaps/toolbar/tvtelx.png \
+	pixmaps/toolbar/tvtelx-transparent.png \
+	pixmaps/toolbar/volume-high.png \
+	pixmaps/toolbar/volume-medium.png \
+	pixmaps/toolbar/volume-low.png \
+	pixmaps/toolbar/volume-muted.png \
+	pixmaps/toolbar/volume-slider-inside.png \
+	pixmaps/toolbar/volume-slider-outside.png
+
 BUILT_SOURCES += $(nodist_SOURCES_qt4)
 
-resources.cpp: vlc.qrc
+resources.cpp: vlc.qrc $(res_DEPENDENCIES)
 	$(RCC) -name vlc -o $@ $<
 
 .hpp.moc.cpp:
@@ -171,85 +254,6 @@ EXTRA_DIST += \
 	ui/sprefs_video.ui \
 	ui/streampanel.ui \
 	ui/sout.ui \
-	ui/vlm.ui \
-	pixmaps/prefs/advprefs_audio.png \
-	pixmaps/prefs/advprefs_codec.png \
-	pixmaps/prefs/advprefs_extended.png \
-	pixmaps/prefs/advprefs_intf.png \
-	pixmaps/prefs/advprefs_playlist.png \
-	pixmaps/prefs/advprefs_sout.png \
-	pixmaps/prefs/advprefs_video.png \
-	pixmaps/prefs/spref_cone_Audio_64.png \
-	pixmaps/prefs/spref_cone_Hotkeys_64.png \
-	pixmaps/prefs/spref_cone_Input_64.png \
-	pixmaps/prefs/spref_cone_Interface_64.png \
-	pixmaps/prefs/spref_cone_Subtitles_64.png \
-	pixmaps/prefs/spref_cone_Video_64.png \
-	pixmaps/types/capture-card_16px.png \
-	pixmaps/types/cdda_16px.png \
-	pixmaps/types/disc_16px.png \
-	pixmaps/types/file-asym_16px.png \
-	pixmaps/types/file-wide_16px.png \
-	pixmaps/types/folder-blue_16px.png \
-	pixmaps/types/folder-grey_16px.png \
-	pixmaps/types/harddisk_16px.png \
-	pixmaps/types/network_16px.png \
-	pixmaps/menus/help_16px.png \
-	pixmaps/menus/info_16px.png \
-	pixmaps/menus/messages_16px.png \
-	pixmaps/menus/preferences_16px.png \
-	pixmaps/menus/quit_16px.png \
-	pixmaps/menus/settings_16px.png \
-	pixmaps/menus/stream_16px.png \
-	pixmaps/menus/playlist_16px.png \
-	pixmaps/go-next.png \
-	pixmaps/next_16px.png \
-	pixmaps/next.png \
-	pixmaps/noart.png \
-	pixmaps/pause_16px.png \
-	pixmaps/pause.png \
-	pixmaps/play_16px.png \
-	pixmaps/playlist/add.png \
-	pixmaps/playlist/playlist.png \
-	pixmaps/playlist/repeat_all.png \
-	pixmaps/playlist/repeat_off.png \
-	pixmaps/playlist/repeat_one.png \
-	pixmaps/playlist/shuffle_off.png \
-	pixmaps/playlist/shuffle_on.png \
-	pixmaps/playlist/jumpto.png \
-	pixmaps/play.png \
-	pixmaps/previous_16px.png \
-	pixmaps/previous.png \
-	pixmaps/stop_16px.png \
-	pixmaps/stop.png \
-	pixmaps/eject.png \
-	pixmaps/update.png \
-	pixmaps/clear.png \
-	pixmaps/arrow_down_dark.png \
-	pixmaps/types/tape_16px.png \
-	pixmaps/types/type_directory.png \
-	pixmaps/types/type_file.png \
-	pixmaps/types/type_net.png \
-	pixmaps/types/type_node.png \
-	pixmaps/types/type_playlist.png \
-	pixmaps/types/type_unknown.xpm \
-	pixmaps/toolbar/extended_16px.png \
-	pixmaps/toolbar/record_16px.png \
-	pixmaps/toolbar/snapshot.png \
-	pixmaps/toolbar/atob.png \
-	pixmaps/toolbar/atob_noa.png \
-	pixmaps/toolbar/atob_nob.png \
-	pixmaps/toolbar/dvd_menu.png \
-	pixmaps/toolbar/dvd_next.png \
-	pixmaps/toolbar/dvd_prev.png \
-	pixmaps/toolbar/tv.png \
-	pixmaps/toolbar/fullscreen.png \
-	pixmaps/toolbar/defullscreen.png \
-	pixmaps/toolbar/tvtelx.png \
-	pixmaps/toolbar/tvtelx-transparent.png \
-	pixmaps/toolbar/volume-high.png \
-	pixmaps/toolbar/volume-medium.png \
-	pixmaps/toolbar/volume-low.png \
-	pixmaps/toolbar/volume-muted.png \
-	pixmaps/toolbar/volume-slider-inside.png \
-	pixmaps/toolbar/volume-slider-outside.png
+	ui/vlm.ui 
+EXTRA_DIST += $(res_DEPEDENCIES)
+
