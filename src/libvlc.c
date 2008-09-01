@@ -1478,8 +1478,9 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         if( strcmp( "main", p_parser->psz_object_name ) )
         {
             if( b_color )
-                utf8_fprintf( stdout, "\n " GREEN "%s" GRAY "\n",
-                              p_parser->psz_longname );
+                utf8_fprintf( stdout, "\n " GREEN "%s" GRAY " (%s)\n",
+                              p_parser->psz_longname,
+                               p_parser->psz_object_name );
             else
                 utf8_fprintf( stdout, "\n %s\n", p_parser->psz_longname );
         }
