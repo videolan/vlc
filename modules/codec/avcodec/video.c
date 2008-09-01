@@ -552,8 +552,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_buffer -= i_used;
         p_sys->p_buffer += i_used;
 
-        p_sys->b_first_frame = true;
-
         /* Nothing to display */
         if( !b_gotpicture )
         {
