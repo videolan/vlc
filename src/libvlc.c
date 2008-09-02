@@ -1496,7 +1496,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                  p_item++ )
             {
                 if( (p_item->i_type & CONFIG_ITEM) &&
-                    !p_item->b_advanced ) break;
+                    !p_item->b_advanced && !p_item->b_removed ) break;
             }
 
             if( p_item == p_end )
