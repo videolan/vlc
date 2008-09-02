@@ -58,6 +58,7 @@ static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, block_
  *****************************************************************************/
 
 #define VB_TEXT N_("Video bitrate")
+/*xgettext:no-c-format*/
 #define VB_LONGTEXT N_( \
     "New target video bitrate. Quality is ok for -10/15\% of the original" \
     "bitrate." )
