@@ -1247,7 +1247,6 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1, *p_src2, *p_dst;
     int i_x, i_y, i_pix_pitch, i_trans;
-    int r, g, b;
     video_palette_t rgbpalette;
     int i_rindex, i_gindex, i_bindex;
 
@@ -1272,8 +1271,12 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
     /* Convert palette first */
     for( i_y = 0; i_y < p_filter->fmt_in.video.p_palette->i_entries && i_y < 256; i_y++ )
     {
+        int r, g, b;
+
         yuv_to_rgb( &r, &g, &b, p_pal[i_y][0], p_pal[i_y][1], p_pal[i_y][2] );
-        rgbpal[i_y][0] = r; rgbpal[i_y][1] = g; rgbpal[i_y][2] = b;
+        rgbpal[i_y][0] = r;
+        rgbpal[i_y][1] = g;
+        rgbpal[i_y][2] = b;
     }
 
     /* */
@@ -1295,13 +1298,13 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
             if( p_filter->fmt_out.video.i_chroma == FCC_RV15 || p_filter->fmt_out.video.i_chroma == FCC_RV16 )
                 vlc_blend_rgb16( (uint16_t*)&p_dst[i_x * i_pix_pitch],
                                  (const uint16_t*)&p_src1[i_x * i_pix_pitch],
-                                  rgbpal[p_src2[i_x]][0], rgbpal[p_src2[i_x]][1], rgbpal[p_src2[i_x]][3],
+                                  rgbpal[p_src2[i_x]][0], rgbpal[p_src2[i_x]][1], rgbpal[p_src2[i_x]][2],
                                   i_trans,
                                   &p_filter->fmt_out.video );
             else
                 vlc_blend_packed( &p_dst[i_x * i_pix_pitch], &p_src1[i_x * i_pix_pitch],
                                   i_rindex, i_gindex, i_bindex,
-                                  rgbpal[p_src2[i_x]][0], rgbpal[p_src2[i_x]][1], rgbpal[p_src2[i_x]][3],
+                                  rgbpal[p_src2[i_x]][0], rgbpal[p_src2[i_x]][1], rgbpal[p_src2[i_x]][2],
                                   i_trans, true );
         }
     }
