@@ -168,10 +168,6 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         return p_rea;
     }
 
-#if 0
-    /* Shrinking the buffer seems to cause performance problems, on Windows,
-     * at least. Also with demand paging, oversizing buffers is not an issue,
-     * as long as we don't write to the extraneous allocated space. */
     /* We have a very large reserved footer now? Release some of it. */
     if ((p_sys->p_allocated_buffer + p_sys->i_allocated_buffer) -
         (p_block->p_buffer + p_block->i_buffer) > BLOCK_WASTE_SIZE)
@@ -189,7 +185,6 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
                 - ((uintptr_t)p_sys->p_allocated_buffer % BLOCK_ALIGN);
         }
     }
-#endif
     return p_block;
 }
 
