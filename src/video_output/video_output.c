@@ -700,23 +700,15 @@ static int InitThread( vout_thread_t *p_vout )
 static void* RunThread( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    int             i_index;                                /* index in heap */
     int             i_idle_loops = 0;  /* loops without displaying a picture */
-    mtime_t         current_date;                            /* current date */
-    mtime_t         display_date;                            /* display date */
 
-    picture_t *     p_picture;                            /* picture pointer */
     picture_t *     p_last_picture = NULL;                   /* last picture */
-    picture_t *     p_directbuffer;              /* direct buffer to display */
 
     subpicture_t *  p_subpic = NULL;                   /* subpicture pointer */
 
-    input_thread_t *p_input = NULL ;           /* Parent input, if it exists */
+    bool            b_drop_late;
 
-    vlc_value_t     val;
-    bool      b_drop_late;
-
-    int             i_displayed = 0, i_lost = 0, i_loops = 0;
+    int             i_displayed = 0, i_lost = 0;
     int canc = vlc_savecancel ();
 
     /*
@@ -725,9 +717,7 @@ static void* RunThread( vlc_object_t *p_this )
     vlc_mutex_lock( &p_vout->change_lock );
     p_vout->b_error = InitThread( p_vout );
 
-    var_Create( p_vout, "drop-late-frames", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "drop-late-frames", &val );
-    b_drop_late = val.b_bool;
+    b_drop_late = var_CreateGetBool( p_vout, "drop-late-frames" );
 
     /* signal the creation of the vout */
     vlc_thread_ready( p_vout );
@@ -752,16 +742,24 @@ static void* RunThread( vlc_object_t *p_this )
     while( vlc_object_alive( p_vout ) && !p_vout->b_error )
     {
         /* Initialize loop variables */
-        p_picture = NULL;
-        display_date = 0;
-        current_date = mdate();
+        const mtime_t current_date = mdate();
+        picture_t *p_picture = NULL;
+        mtime_t display_date = 0;
+        picture_t *p_directbuffer;
+        input_thread_t *p_input;
+        int i_index;
 
-        i_loops++;
-        if( !p_input )
+#if 0
+        p_vout->c_loops++;
+        if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
         {
-            p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
-                                       FIND_PARENT );
+            msg_Dbg( p_vout, "picture heap: %d/%d",
+                     I_RENDERPICTURES, p_vout->i_heap_size );
         }
+#endif
+
+        /* Update statistics */
+        p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
         if( p_input )
         {
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
@@ -773,16 +771,7 @@ static void* RunThread( vlc_object_t *p_this )
             i_displayed = i_lost = 0;
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
             vlc_object_release( p_input );
-            p_input = NULL;
         }
-#if 0
-        p_vout->c_loops++;
-        if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
-        {
-            msg_Dbg( p_vout, "picture heap: %d/%d",
-                     I_RENDERPICTURES, p_vout->i_heap_size );
-        }
-#endif
 
         /*
          * Find the picture to display (the one with the earliest date).
@@ -790,11 +779,12 @@ static void* RunThread( vlc_object_t *p_this )
          * are handled. */
         for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
         {
-            if( (PP_RENDERPICTURE[i_index]->i_status == READY_PICTURE)
-                && ( (p_picture == NULL) ||
-                     (PP_RENDERPICTURE[i_index]->date < display_date) ) )
+            picture_t *p_pic = PP_RENDERPICTURE[i_index];
+
+            if( p_pic->i_status == READY_PICTURE &&
+                ( p_picture == NULL || p_pic->date < display_date ) )
             {
-                p_picture = PP_RENDERPICTURE[i_index];
+                p_picture = p_pic;
                 display_date = p_picture->date;
             }
         }
@@ -807,12 +797,13 @@ static void* RunThread( vlc_object_t *p_this )
             {
                 for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
                 {
-                    if( (PP_RENDERPICTURE[i_index]->i_status == READY_PICTURE)
-                        && (PP_RENDERPICTURE[i_index] != p_last_picture)
-                        && ((p_picture == p_last_picture) ||
-                            (PP_RENDERPICTURE[i_index]->date < display_date)) )
+                    picture_t *p_pic = PP_RENDERPICTURE[i_index];
+
+                    if( p_pic->i_status == READY_PICTURE &&
+                        p_pic != p_last_picture &&
+                        ( p_picture == p_last_picture || p_pic->date < display_date ) )
                     {
-                        p_picture = PP_RENDERPICTURE[i_index];
+                        p_picture = p_pic;
                         display_date = p_picture->date;
                     }
                 }
@@ -904,16 +895,11 @@ static void* RunThread( vlc_object_t *p_this )
          */
         if( display_date > 0 )
         {
-            if( !p_input )
-            {
-                p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
-                                           FIND_PARENT );
-            }
+            p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
             p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
-            p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : false );
+                                            p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : false );
             if( p_input )
                 vlc_object_release( p_input );
-            p_input = NULL;
         }
 
         /*
@@ -1103,12 +1089,6 @@ static void* RunThread( vlc_object_t *p_this )
             p_vout->psz_vf2 = NULL;
         }
         vlc_mutex_unlock( &p_vout->vfilter_lock );
-    }
-
-
-    if( p_input )
-    {
-        vlc_object_release( p_input );
     }
 
     /*
