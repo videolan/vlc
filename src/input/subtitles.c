@@ -62,14 +62,10 @@ static const char const sub_exts[][6] = {
     "utf", "utf8", "utf-8",
     "sub", "srt", "smi",
     "txt", "ssa", "idx",
-
-    "cdg",
-
+    "ass", "rt", "aqt",
+    "usf", "jss", "cdg",
     ""
 };
-
-/* extensions from unsupported types */
-/* rt, aqt, jss, js, ass */
 
 static void strcpy_trim( char *d, const char *s )
 {
