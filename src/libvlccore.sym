@@ -216,6 +216,8 @@ module_Put
 module_PutConfig
 __module_Unneed
 __msg_Dbg
+__msg_DisableObjectPrinting
+__msg_EnableObjectPrinting
 __msg_Err
 __msg_Generic
 __msg_GenericVa
