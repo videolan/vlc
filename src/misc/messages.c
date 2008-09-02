@@ -144,7 +144,7 @@ void __msg_EnableObjectPrinting (vlc_object_t *p_this, char * psz_object)
     if( !strcmp(psz_object, "all") )
         priv->msg_all_objects_enabled = true;
     else
-        vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, kObjectPrintingEnabled );
+        vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, (void *)kObjectPrintingEnabled );
     vlc_mutex_unlock( &QUEUE.lock );
 }
 
@@ -155,7 +155,7 @@ void __msg_DisableObjectPrinting (vlc_object_t *p_this, char * psz_object)
     if( !strcmp(psz_object, "all") )
         priv->msg_all_objects_enabled = false;
     else
-        vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, kObjectPrintingDisabled );
+        vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, (void *)kObjectPrintingDisabled );
     vlc_mutex_unlock( &QUEUE.lock );
 }
 
