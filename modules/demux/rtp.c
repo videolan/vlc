@@ -334,7 +334,7 @@ static int Control (demux_t *demux, int i_query, va_list args)
         {
             float *v = va_arg (args, float *);
             *v = 0.;
-            return 0;
+            return VLC_SUCCESS;
         }
 
         case DEMUX_GET_LENGTH:
@@ -342,14 +342,23 @@ static int Control (demux_t *demux, int i_query, va_list args)
         {
             int64_t *v = va_arg (args, int64_t *);
             *v = 0;
-            return 0;
+            return VLC_SUCCESS;
         }
 
         case DEMUX_GET_PTS_DELAY:
         {
             int64_t *v = va_arg (args, int64_t *);
-            *v = p_sys->caching;
-            return 0;
+            *v = p_sys->caching * 1000;
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_CAN_SEEK:
+        case DEMUX_CAN_CONTROL_PACE:
+        {
+            bool *v = (bool*)va_arg( args, bool * );
+            *v = false;
+            return VLC_SUCCESS;
         }
     }
 
@@ -453,8 +462,7 @@ static void codec_decode (demux_t *demux, void *data, block_t *block)
     if (data)
     {
         block->i_dts = 0; /* RTP does not specify this */
-        es_out_Control (demux->out, ES_OUT_SET_PCR,
-                        block->i_pts - demux->p_sys->caching * 1000);
+        es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts );
         es_out_Send (demux->out, (es_out_id_t *)data, block);
     }
     else
