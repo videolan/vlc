@@ -603,13 +603,22 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 
     psz_object = p_item->psz_object_type;
     void * val = vlc_dictionary_value_for_key( &priv->msg_enabled_objects,
-                                               psz_object );
+                                               p_item->psz_module );
     if( val == kObjectPrintingDisabled )
         return;
     if( val == kObjectPrintingEnabled )
         /* Allowed */;
-    else if( !priv->msg_all_objects_enabled )
-        return;
+    else
+    {
+        val = vlc_dictionary_value_for_key( &priv->msg_enabled_objects,
+                                            psz_object );
+        if( val == kObjectPrintingDisabled )
+            return;
+        if( val == kObjectPrintingEnabled )
+            /* Allowed */;
+        else if( !priv->msg_all_objects_enabled )
+            return;
+    }
 
     int canc = vlc_savecancel ();
 #ifdef UNDER_CE

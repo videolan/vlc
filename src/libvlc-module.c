@@ -171,8 +171,10 @@ static const char *const ppsz_snap_formats[] =
 #define VERBOSE_OBJECTS_LONGTEXT N_( \
     "This is a ',' separated string, each objects should be prefixed by " \
     "a '+' or a '-' to respectively enable or disable it. The keyword " \
-    "'all' refers to all objects. Note, you still need to use -vvv " \
-    "to actually display debug message.")
+    "'all' refers to all objects. Objects can be refered to by their " \
+    "type or name. Rules applying to named objects take precendence " \
+    "over rules applying to object types. Note that you still need to " \
+    "use -vvv to actually display debug message.")
 
 #define QUIET_TEXT N_("Be quiet")
 #define QUIET_LONGTEXT N_( \
