@@ -299,6 +299,18 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
+static int vout_LockPicture( vout_thread_t *p_vout, picture_t *p_picture )
+{
+    if( p_picture->pf_lock )
+        return p_picture->pf_lock( p_vout, p_picture );
+    return VLC_SUCCESS;
+}
+static void vout_UnlockPicture( vout_thread_t *p_vout, picture_t *p_picture )
+{
+    if( p_picture->pf_unlock )
+        p_picture->pf_unlock( p_vout, p_picture );
+}
+
 /**
  * Render a picture
  *
@@ -324,38 +336,30 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
     if( p_pic->i_type == DIRECT_PICTURE )
     {
-        if( !p_vout->render.b_allow_modify_pics || p_pic->i_refcount ||
-            p_pic->b_force )
+        /* Picture is in a direct buffer. */
+
+        if( p_subpic != NULL )
         {
-            /* Picture is in a direct buffer and is still in use,
-             * we need to copy it to another direct buffer before
-             * displaying it if there are subtitles. */
-            if( p_subpic != NULL )
-            {
-                /* We have subtitles. First copy the picture to
-                 * the spare direct buffer, then render the
-                 * subtitles. */
-                vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
+            /* We have subtitles. First copy the picture to
+             * the spare direct buffer, then render the
+             * subtitles. */
+            if( vout_LockPicture( p_vout, PP_OUTPUTPICTURE[0] ) )
+                return NULL;
 
-                spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
-                                       PP_OUTPUTPICTURE[0], p_pic, p_subpic,
-                                       i_scale_width, i_scale_height );
+            vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
 
-                return PP_OUTPUTPICTURE[0];
-            }
+            spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
+                                   PP_OUTPUTPICTURE[0], p_pic, p_subpic,
+                                   i_scale_width, i_scale_height );
 
-            /* No subtitles, picture is in a directbuffer so
-             * we can display it directly even if it is still
-             * in use. */
-            return p_pic;
+            vout_UnlockPicture( p_vout, PP_OUTPUTPICTURE[0] );
+
+            return PP_OUTPUTPICTURE[0];
         }
 
-        /* Picture is in a direct buffer but isn't used by the
-         * decoder. We can safely render subtitles on it and
-         * display it. */
-        spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out, p_pic, p_pic,
-                               p_subpic, i_scale_width, i_scale_height );
-
+        /* No subtitles, picture is in a directbuffer so
+         * we can display it directly (even if it is still
+         * in use or not). */
         return p_pic;
     }
 
@@ -367,17 +371,15 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
          * same size as the direct buffers. A memcpy() is enough,
          * then render the subtitles. */
 
-        if( PP_OUTPUTPICTURE[0]->pf_lock )
-            if( PP_OUTPUTPICTURE[0]->pf_lock( p_vout, PP_OUTPUTPICTURE[0] ) )
-                return NULL;
+        if( vout_LockPicture( p_vout, PP_OUTPUTPICTURE[0] ) )
+            return NULL;
 
         vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
         spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
                                PP_OUTPUTPICTURE[0], p_pic,
                                p_subpic, i_scale_width, i_scale_height );
 
-        if( PP_OUTPUTPICTURE[0]->pf_unlock )
-            PP_OUTPUTPICTURE[0]->pf_unlock( p_vout, PP_OUTPUTPICTURE[0] );
+        vout_UnlockPicture( p_vout, PP_OUTPUTPICTURE[0] );
 
         return PP_OUTPUTPICTURE[0];
     }
@@ -415,17 +417,15 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                p_tmp_pic, p_subpic,
                                i_scale_width, i_scale_height );
 
-        if( p_vout->p_picture[0].pf_lock )
-            if( p_vout->p_picture[0].pf_lock( p_vout, &p_vout->p_picture[0] ) )
-                return NULL;
+        if( vout_LockPicture( p_vout, &p_vout->p_picture[0] ) )
+            return NULL;
 
         vout_CopyPicture( p_vout, &p_vout->p_picture[0], p_tmp_pic );
     }
     else
     {
-        if( p_vout->p_picture[0].pf_lock )
-            if( p_vout->p_picture[0].pf_lock( p_vout, &p_vout->p_picture[0] ) )
-                return NULL;
+        if( vout_LockPicture( p_vout, &p_vout->p_picture[0] ) )
+            return NULL;
 
         /* Convert image to the first direct buffer */
         p_vout->p_chroma->p_owner = (filter_owner_sys_t *)&p_vout->p_picture[0];
@@ -437,8 +437,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                p_subpic, i_scale_width, i_scale_height );
     }
 
-    if( p_vout->p_picture[0].pf_unlock )
-        p_vout->p_picture[0].pf_unlock( p_vout, &p_vout->p_picture[0] );
+    vout_UnlockPicture( p_vout, &p_vout->p_picture[0] );
 
     return &p_vout->p_picture[0];
 }
@@ -678,9 +677,9 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
         p_pic->p[i_index].i_pixel_pitch = 1;
     }
 
-    p_pic->pf_release = 0;
-    p_pic->pf_lock = 0;
-    p_pic->pf_unlock = 0;
+    p_pic->pf_release = NULL;
+    p_pic->pf_lock = NULL;
+    p_pic->pf_unlock = NULL;
     p_pic->i_refcount = 0;
 
     p_pic->p_q = NULL;
