@@ -59,11 +59,13 @@
  * The possible extensions for subtitle files we support
  */
 static const char const sub_exts[][6] = {
+    "idx", "sub",  "srt",
+    "ssa", "ass",  "smi",
     "utf", "utf8", "utf-8",
-    "sub", "srt", "smi",
-    "txt", "ssa", "idx",
-    "ass", "rt", "aqt",
-    "usf", "jss", "cdg",
+    "txt", "rt",   "aqt",
+    "usf", "jss",  "cdg",
+    "psb", "mpsub","mpl2",
+    "pjs", "dks",
     ""
 };
 
