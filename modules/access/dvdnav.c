@@ -612,6 +612,7 @@ static int Demux( demux_t *p_demux )
     switch( i_event )
     {
     case DVDNAV_BLOCK_OK:   /* mpeg block */
+        p_sys->p_ev->b_still = false;
         DemuxBlock( p_demux, packet, i_len );
         break;
 
@@ -621,19 +622,18 @@ static int Demux( demux_t *p_demux )
 
     case DVDNAV_STILL_FRAME:
     {
-        /* We send a dummy mpeg2 end of sequence to force still frame display */
-        static const uint8_t buffer[] = {
-            0x00, 0x00, 0x01, 0xe0, 0x00, 0x07,
-            0x80, 0x00, 0x00,
-            0x00, 0x00, 0x01, 0xB7,
-        };
-        DemuxBlock( p_demux, buffer, sizeof(buffer) );
-
-        /* */
         dvdnav_still_event_t *event = (dvdnav_still_event_t*)packet;
         vlc_mutex_lock( &p_sys->p_ev->lock );
         if( !p_sys->p_ev->b_still )
         {
+            /* We send a dummy mpeg2 end of sequence to force still frame display */
+            static const uint8_t buffer[] = {
+                0x00, 0x00, 0x01, 0xe0, 0x00, 0x07,
+                0x80, 0x00, 0x00,
+                0x00, 0x00, 0x01, 0xB7,
+            };
+            DemuxBlock( p_demux, buffer, sizeof(buffer) );
+
             msg_Dbg( p_demux, "DVDNAV_STILL_FRAME" );
             msg_Dbg( p_demux, "     - length=0x%x", event->length );
             p_sys->p_ev->b_still = true;
