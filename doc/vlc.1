@@ -16,7 +16,7 @@
 .\" .sp <n>    insert n+1 empty lines
 .\" for manpage-specific macros, see man(7)
 .SH NAME
-vlc, qvlc, svlc \- the VLC media player
+vlc, qvlc, svlc, nvlc, rvlc, cvlc \- the VLC media player
 .SH SYNOPSIS
 .B vlc
 .RI [ OPTIONS ]
@@ -52,9 +52,9 @@ must have been prepared beforehand.
 .B vcd://[<device>][@{E|P|E|T|S}[<number>]]
 VCD device (for instance vcd:///dev/cdrom).
 .TP
-.B udp:[@[<multicast address>][:<local port>]]
+.B udp://[@[<multicast address>][:<local port>]]
 UDP stream, such as one sent by VLS or another VLC.
-Usually "udp:" is enough.
+Usually "udp://" is enough.
 .TP
 .B http://<server address>[:<server port>]/[<file>]
 HTTP stream
