@@ -1261,8 +1261,15 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
         id->p_encoder->p_module =
             module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
-        if( !id->p_encoder->p_module )
+        if( !id->p_encoder->p_module ||
+            fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels  ||
+            fmt_last.i_codec != id->p_encoder->fmt_in.i_codec )
         {
+            if( id->p_encoder->p_module )
+            {
+                module_Unneed( id->p_encoder, id->p_encoder->p_module );
+                id->p_encoder->p_module = NULL;
+            }
             msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s)",
                      p_sys->psz_aenc ? p_sys->psz_aenc : "any",
                      (char *)&p_sys->i_acodec );
