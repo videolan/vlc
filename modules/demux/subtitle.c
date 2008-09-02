@@ -215,6 +215,9 @@ static const struct
     { "subviewer1", SUB_TYPE_SUBVIEW1,    "Subviewer 1", ParseSubViewer1 },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
+/* When adding support for more formats, be sure to add their file extension
+ * to src/input/subtitles.c to enable auto-detection.
+ */
 
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
