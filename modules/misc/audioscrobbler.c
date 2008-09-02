@@ -325,6 +325,11 @@ static void Run( intf_thread_t *p_intf )
 
         msg_Dbg( p_intf, "Going to submit some data..." );
 
+        /* The session may be invalid if there is a trailing \n */
+        char *psz_ln = strrchr( p_sys->psz_auth_token, '\n' );
+        if( psz_ln )
+            *psz_ln = '\0';
+
         if( !asprintf( &psz_submit, "s=%s", p_sys->psz_auth_token ) )
         {   /* Out of memory */
             return;
@@ -337,14 +342,24 @@ static void Run( intf_thread_t *p_intf )
         {
             p_song = &p_sys->p_queue[i_song];
             if( !asprintf( &psz_submit_song,
-                    "&a%%5B%d%%5D=%s&t%%5B%d%%5D=%s"
-                    "&i%%5B%d%%5D=%ju&o%%5B%d%%5D=P&r%%5B%d%%5D="
-                    "&l%%5B%d%%5D=%d&b%%5B%d%%5D=%s"
-                    "&n%%5B%d%%5D=%s&m%%5B%d%%5D=%s",
-                    i_song, p_song->psz_a,           i_song, p_song->psz_t,
-                    i_song, (uintmax_t)p_song->date, i_song, i_song,
-                    i_song, p_song->i_l,             i_song, p_song->psz_b,
-                    i_song, p_song->psz_n,           i_song, p_song->psz_m
+                    "&a%%5B%d%%5D=%s"
+                    "&t%%5B%d%%5D=%s"
+                    "&i%%5B%d%%5D=%u"
+                    "&o%%5B%d%%5D=P"
+                    "&r%%5B%d%%5D="
+                    "&l%%5B%d%%5D=%d"
+                    "&b%%5B%d%%5D=%s"
+                    "&n%%5B%d%%5D=%s"
+                    "&m%%5B%d%%5D=%s",
+                    i_song, p_song->psz_a,
+                    i_song, p_song->psz_t,
+                    i_song, (unsigned)p_song->date, /* HACK: %ju (uintmax_t) unsupported on Windows */
+                    i_song,
+                    i_song,
+                    i_song, p_song->i_l,
+                    i_song, p_song->psz_b,
+                    i_song, p_song->psz_n,
+                    i_song, p_song->psz_m
             ) )
             {   /* Out of memory */
                 vlc_mutex_unlock( &p_sys->lock );
@@ -559,7 +574,7 @@ static void AddToQueue ( intf_thread_t *p_this )
                             p_sys->time_total_pauses;
     played_time /= 1000000; /* µs → s */
 
-    if( ( played_time < 240 ) &&
+    if( ( played_time < 60 ) &&
         ( played_time < ( p_sys->p_current_song.i_l / 2 ) ) )
     {
         msg_Dbg( p_this, "Song not listened long enough, not submitting" );
@@ -568,8 +583,14 @@ static void AddToQueue ( intf_thread_t *p_this )
 
     if( p_sys->p_current_song.i_l < 30 )
     {
-        msg_Dbg( p_this, "Song too short (< 30s), not submitting" );
-        goto end;
+        if( played_time < 30 )
+        {
+            msg_Dbg( p_this, "Song too short (< 30s), not submitting" );
+            goto end;
+        }
+        else
+            /* This is a HACK to avoid length = 0 (seems to be rejected by audioscrobbler) */
+            p_sys->p_current_song.i_l = played_time;
     }
 
     if( !p_sys->p_current_song.psz_a || !*p_sys->p_current_song.psz_a ||
