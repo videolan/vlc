@@ -89,22 +89,27 @@ int vout_Snapshot( vout_thread_t *, picture_t * );
 /* Display media title in OSD */
 static void DisplayTitleOnOSD( vout_thread_t *p_vout );
 
+/* */
+static void DropPicture( vout_thread_t *p_vout, picture_t *p_picture );
+
 /*****************************************************************************
  * Video Filter2 functions
  *****************************************************************************/
 static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
-    picture_t *p_picture;
     vout_thread_t *p_vout = (vout_thread_t*)p_filter->p_owner;
+    picture_t *p_picture = vout_CreatePicture( p_vout, 0, 0, 0 );
 
-    p_picture = vout_CreatePicture( p_vout, 0, 0, 0 );
+    p_picture->i_status = READY_PICTURE;
 
     return p_picture;
 }
 
 static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
 {
-    vout_DestroyPicture( (vout_thread_t*)p_filter->p_owner, p_pic );
+    vout_thread_t *p_vout = (vout_thread_t*)p_filter->p_owner;
+
+    DropPicture( p_vout, p_pic );
 }
 
 static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data )
@@ -518,7 +523,6 @@ static void vout_Destructor( vlc_object_t * p_this )
  *****************************************************************************/
 static int ChromaCreate( vout_thread_t *p_vout );
 static void ChromaDestroy( vout_thread_t *p_vout );
-static void DropPicture( vout_thread_t *p_vout, picture_t *p_picture );
 
 static int InitThread( vout_thread_t *p_vout )
 {
@@ -744,6 +748,7 @@ static void* RunThread( vlc_object_t *p_this )
         /* Initialize loop variables */
         const mtime_t current_date = mdate();
         picture_t *p_picture = NULL;
+        picture_t *p_filtered_picture;
         mtime_t display_date = 0;
         picture_t *p_directbuffer;
         input_thread_t *p_input;
@@ -874,20 +879,17 @@ static void* RunThread( vlc_object_t *p_this )
         }
 
         if( p_picture == NULL )
-        {
             i_idle_loops++;
-        }
 
+        p_filtered_picture = NULL;
         if( p_picture )
-        {
-            p_picture = filter_chain_VideoFilter( p_vout->p_vf2_chain,
-                                                  p_picture );
-        }
+            p_filtered_picture = filter_chain_VideoFilter( p_vout->p_vf2_chain,
+                                                           p_picture );
 
-        if( p_picture && p_vout->b_snapshot )
+        if( p_filtered_picture && p_vout->b_snapshot )
         {
             p_vout->b_snapshot = false;
-            vout_Snapshot( p_vout, p_picture );
+            vout_Snapshot( p_vout, p_filtered_picture );
         }
 
         /*
@@ -906,12 +908,12 @@ static void* RunThread( vlc_object_t *p_this )
          * Perform rendering
          */
         i_displayed++;
-        p_directbuffer = vout_RenderPicture( p_vout, p_picture, p_subpic );
+        p_directbuffer = vout_RenderPicture( p_vout, p_filtered_picture, p_subpic );
 
         /*
          * Call the plugin-specific rendering method if there is one
          */
-        if( p_picture != NULL && p_directbuffer != NULL && p_vout->pf_render )
+        if( p_filtered_picture != NULL && p_directbuffer != NULL && p_vout->pf_render )
         {
             /* Render the direct buffer returned by vout_RenderPicture */
             p_vout->pf_render( p_vout, p_directbuffer );
@@ -965,19 +967,21 @@ static void* RunThread( vlc_object_t *p_this )
         /*
          * Display the previously rendered picture
          */
-        if( p_picture != NULL && p_directbuffer != NULL )
+        if( p_filtered_picture != NULL && p_directbuffer != NULL )
         {
             /* Display the direct buffer returned by vout_RenderPicture */
             if( p_vout->pf_display )
-            {
                 p_vout->pf_display( p_vout, p_directbuffer );
-            }
 
             /* Tell the vout this was the last picture and that it does not
              * need to be forced anymore. */
             p_last_picture = p_picture;
-            p_last_picture->b_force = 0;
+            p_last_picture->b_force = false;
         }
+
+        /* Drop the filtered picture if created by video filters */
+        if( p_filtered_picture != NULL && p_filtered_picture != p_picture )
+            DropPicture( p_vout, p_filtered_picture );
 
         if( p_picture != NULL )
         {

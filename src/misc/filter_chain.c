@@ -54,6 +54,7 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *, filter_t * );
 
 static int UpdateBufferFunctions( filter_chain_t * );
 static picture_t *VideoBufferNew( filter_t * );
+static void VideoBufferDelete( filter_t *, picture_t * );
 
 /**
  * Filter chain initialisation
@@ -362,27 +363,6 @@ picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
         filter_t *p_filter = pp_filter[i];
         picture_t *p_newpic = p_filter->pf_video_filter( p_filter, p_pic );
 
-        /* FIXME Ugly hack to make it work in picture core.
-         * FIXME Remove this code when the picture release API has been
-         * FIXME cleaned up (a git revert of the commit should work) */
-        if( p_chain->p_this->i_object_type == VLC_OBJECT_VOUT )
-        {
-            vout_thread_t *p_vout = (vout_thread_t*)p_chain->p_this;
-            vlc_mutex_lock( &p_vout->picture_lock );
-            if( p_pic->i_refcount )
-            {
-                p_pic->i_status = DISPLAYED_PICTURE;
-            }
-            else
-            {
-                p_pic->i_status = DESTROYED_PICTURE;
-                p_vout->i_heap_size--;
-            }
-            vlc_mutex_unlock( &p_vout->picture_lock );
-
-            if( p_newpic )
-                p_newpic->i_status = READY_PICTURE;
-        }
         if( !p_newpic )
             return NULL;
 
@@ -451,7 +431,7 @@ static int UpdateBufferFunctions( filter_chain_t *p_chain )
                 if( p_chain->pf_buffer_allocation_clear )
                     p_chain->pf_buffer_allocation_clear( p_filter );
                 p_filter->pf_vout_buffer_new = VideoBufferNew;
-                p_filter->pf_vout_buffer_del = NULL;
+                p_filter->pf_vout_buffer_del = VideoBufferDelete;
             }
         }
         if( p_chain->filters.i_count >= 1 )
@@ -460,6 +440,7 @@ static int UpdateBufferFunctions( filter_chain_t *p_chain )
             if( p_filter->pf_vout_buffer_new == VideoBufferNew )
             {
                 p_filter->pf_vout_buffer_new = NULL;
+                p_filter->pf_vout_buffer_del = NULL;
                 if( p_chain->pf_buffer_allocation_init( p_filter,
                         p_chain->p_buffer_allocation_data ) != VLC_SUCCESS )
                     return VLC_EGENERIC;
@@ -479,5 +460,9 @@ static picture_t *VideoBufferNew( filter_t *p_filter )
     if( !p_picture )
         msg_Err( p_filter, "Failed to allocate picture\n" );
     return p_picture;
+}
+static void VideoBufferDelete( filter_t *p_filter, picture_t *p_picture )
+{
+    picture_Release( p_picture );
 }
 
