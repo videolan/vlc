@@ -366,7 +366,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     /* FIXME: handle timestamp wrap properly */
     /* TODO: sync multiple sources sanely... */
     const uint32_t timestamp = GetDWBE (block->p_buffer + 4);
-    block->i_pts = CLOCK_FREQ * timestamp / pt->frequency;
+    block->i_pts = UINT64_C(1) * CLOCK_FREQ * timestamp / pt->frequency;
 
     /* CSRC count */
     size_t skip = 12u + (block->p_buffer[0] & 0x0F) * 4;

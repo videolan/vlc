@@ -38,7 +38,7 @@
  * General configuration
  *****************************************************************************/
 
-#define CLOCK_FREQ (UINT64_C(1000000))
+#define CLOCK_FREQ 1000000
 
 
 /* When creating or destroying threads in blocking mode, delay to poll thread
