@@ -119,6 +119,7 @@ static int Activate( vlc_object_t *p_this )
  *****************************************************************************/
 void Close( vlc_object_t *p_this )
 {
+    (void)p_this;
 }
 
 /*****************************************************************************
@@ -282,6 +283,8 @@ static int NTServiceUninstall( intf_thread_t *p_intf )
 
 static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
 {
+    (void)numArgs;
+    (void)args;
     intf_thread_t *p_intf = (intf_thread_t *)p_global_intf;
     intf_sys_t    *p_sys  = p_intf->p_sys;
     char *psz_modules, *psz_parser;
