@@ -501,8 +501,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
                                         mtime_t deadline )
 {
 #if defined(LIBVLC_USE_PTHREAD)
-    lldiv_t d = lldiv( deadline, 1000000 );
-    struct timespec ts = { d.quot, d.rem * 1000 };
+    lldiv_t d = lldiv( deadline, CLOCK_FREQ );
+    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
 
     int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
     if (val != ETIMEDOUT)
@@ -510,7 +510,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     return val;
 
 #elif defined( UNDER_CE )
-    mtime_t delay_ms = (deadline - mdate())/1000;
+    mtime_t delay_ms = (deadline - mdate()) / (CLOCK_FREQ / 1000);
     DWORD result;
     if( delay_ms < 0 )
         delay_ms = 0;
