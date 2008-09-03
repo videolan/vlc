@@ -298,8 +298,8 @@ RunIntf( intf_thread_t *p_intf )
         }
 
 
-      /* Wait a bit */
-      msleep( INTF_IDLE_SLEEP );
+        /* Wait a bit */
+        msleep( INTF_IDLE_SLEEP );
     }
 
     if( p_vout )
@@ -317,35 +317,24 @@ RunIntf( intf_thread_t *p_intf )
 static int InitThread( intf_thread_t * p_intf )
 {
     /* We might need some locking here */
-    if( vlc_object_alive (p_intf) )
-    {
-        input_thread_t * p_input;
+    input_thread_t * p_input;
 
-        p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
+    p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
 
-        /* Maybe the input just died */
-        if( p_input == NULL )
-        {
-            return VLC_EGENERIC;
-        }
-
-        vlc_mutex_lock( &p_intf->change_lock );
-
-        p_intf->p_sys->p_input     = p_input;
-        p_intf->p_sys->p_vcdplayer = NULL;
-
-        p_intf->p_sys->b_move  = false;
-        p_intf->p_sys->b_click = false;
-        p_intf->p_sys->b_key_pressed = false;
-
-        vlc_mutex_unlock( &p_intf->change_lock );
-
-        return VLC_SUCCESS;
-    }
-    else
-    {
+    /* Maybe the input just died */
+    if( p_input == NULL )
         return VLC_EGENERIC;
-    }
+
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    p_intf->p_sys->p_input     = p_input;
+    p_intf->p_sys->p_vcdplayer = NULL;
+
+    p_intf->p_sys->b_move  = false;
+    p_intf->p_sys->b_click = false;
+    p_intf->p_sys->b_key_pressed = false;
+
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 /*****************************************************************************
