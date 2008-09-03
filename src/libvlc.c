@@ -1468,7 +1468,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             while( *pp_shortcut )
             {
                 if( b_strict ? !strcmp( psz_search, *pp_shortcut )
-                             : strstr( *pp_shortcut, psz_search ) )
+                             : !!strstr( *pp_shortcut, psz_search ) )
                     break;
                 pp_shortcut ++;
             }
