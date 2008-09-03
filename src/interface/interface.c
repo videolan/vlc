@@ -221,12 +221,12 @@ static void* RunInterface( vlc_object_t *p_this )
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
+    vlc_restorecancel (canc);
 
     /* Give control to the interface */
     if( p_intf->pf_run )
         p_intf->pf_run( p_intf );
 
-    vlc_restorecancel (canc);
     return NULL;
 }
 
