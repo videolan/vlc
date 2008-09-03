@@ -5,6 +5,7 @@ Decoders:
  * AES3 (SMPTE 302M) support
 Stream output:
  * Restored the old mpeg2 transrating module.
+ * Restored the old behavior of --sout-keep. It is now de-activated by default.
 
 Changes between 0.8.6i and 0.9.1:
 ---------------------------------

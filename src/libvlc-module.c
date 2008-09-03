@@ -1796,7 +1796,7 @@ vlc_module_begin();
     add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT, true );
     add_bool( "sout-display", false, NULL, SOUT_DISPLAY_TEXT,
                                 SOUT_DISPLAY_LONGTEXT, true );
-    add_bool( "sout-keep", true, NULL, SOUT_KEEP_TEXT,
+    add_bool( "sout-keep", false, NULL, SOUT_KEEP_TEXT,
                                 SOUT_KEEP_LONGTEXT, true );
     add_bool( "sout-all", 0, NULL, SOUT_ALL_TEXT,
                                 SOUT_ALL_LONGTEXT, true );
