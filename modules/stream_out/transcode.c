@@ -2278,6 +2278,7 @@ static void video_del_buffer( vlc_object_t *p_this, picture_t *p_pic )
     VLC_UNUSED(p_this);
     if( p_pic )
     {
+        free( p_pic->p_q );
         free( p_pic->p_data_orig );
         free( p_pic->p_sys );
         free( p_pic );
@@ -2289,6 +2290,7 @@ static void video_del_buffer_decoder( decoder_t *p_decoder, picture_t *p_pic )
     VLC_UNUSED(p_decoder);
     p_pic->i_refcount = 0;
     p_pic->i_status = DESTROYED_PICTURE;
+    picture_CleanupQuant( p_pic );
 }
 
 static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
@@ -2296,6 +2298,7 @@ static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
     VLC_UNUSED(p_filter);
     p_pic->i_refcount = 0;
     p_pic->i_status = DESTROYED_PICTURE;
+    picture_CleanupQuant( p_pic );
 }
 
 static void video_link_picture_decoder( decoder_t *p_dec, picture_t *p_pic )

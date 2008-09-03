@@ -90,6 +90,7 @@ static void ReleasePicture( picture_t *p_pic )
     }
     else
     {
+        free( p_pic->p_q );
         free( p_pic->p_data_orig );
         free( p_pic );
     }

@@ -709,6 +709,7 @@ static void VoutDisplayedPicture( vout_thread_t *p_vout, picture_t *p_pic )
     else
     {
         p_pic->i_status = DESTROYED_PICTURE;
+        picture_CleanupQuant( p_pic );
         p_vout->i_heap_size--;
     }
 

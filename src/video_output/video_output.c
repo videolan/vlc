@@ -1253,6 +1253,7 @@ static void DropPicture( vout_thread_t *p_vout, picture_t *p_picture )
         /* Destroy the picture without displaying it */
         p_picture->i_status = DESTROYED_PICTURE;
         p_vout->i_heap_size--;
+        picture_CleanupQuant( p_picture );
     }
     vlc_mutex_unlock( &p_vout->picture_lock );
 }

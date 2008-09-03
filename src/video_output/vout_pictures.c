@@ -262,6 +262,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     p_pic->i_status = DESTROYED_PICTURE;
     p_vout->i_heap_size--;
+    picture_CleanupQuant( p_pic );
 
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
@@ -294,6 +295,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         p_pic->i_status = DESTROYED_PICTURE;
         p_vout->i_heap_size--;
+        picture_CleanupQuant( p_pic );
     }
 
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -1045,6 +1047,7 @@ void picture_Delete( picture_t *p_picture )
 {
     assert( p_picture && p_picture->i_refcount == 0 );
 
+    free( p_picture->p_q );
     free( p_picture->p_data_orig );
     free( p_picture->p_sys );
     free( p_picture );
@@ -1096,5 +1099,4 @@ void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
 /*****************************************************************************
  *
  *****************************************************************************/
-
 

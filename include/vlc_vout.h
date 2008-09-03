@@ -161,6 +161,17 @@ static inline void picture_Release( picture_t *p_picture )
 }
 
 /**
+ * Cleanup quantization matrix data and set to 0
+ */
+static inline void picture_CleanupQuant( picture_t *p_pic )
+{
+    free( p_pic->p_q );
+    p_pic->p_q = NULL;
+    p_pic->i_qstride = 0;
+    p_pic->i_qtype = 0;
+}
+
+/**
  * This function will copy all picture dynamic properties.
  */
 static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
