@@ -20,7 +20,7 @@
 		CC09359A0AE11E6A00647FD0 /* eyetvplugin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = eyetvplugin.c; sourceTree = "<group>"; };
 		CC09359C0AE11E7900647FD0 /* EyeTVPluginDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EyeTVPluginDefs.h; sourceTree = "<group>"; };
 		CC3AE2920AE2E4EE00ACC87C /* eyetvplugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eyetvplugin.h; sourceTree = "<group>"; };
-		CC74BC500AE2714300AD738B /* eyetv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = eyetv.c; path = ../../../../modules/access/eyetv.c; sourceTree = SOURCE_ROOT; };
+		CC74BC500AE2714300AD738B /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,7 +85,7 @@
 		CC74BC530AE2715100AD738B /* access module */ = {
 			isa = PBXGroup;
 			children = (
-				CC74BC500AE2714300AD738B /* eyetv.c */,
+				CC74BC500AE2714300AD738B /* eyetv.m */,
 			);
 			name = "access module";
 			sourceTree = "<group>";
