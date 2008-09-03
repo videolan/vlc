@@ -122,7 +122,7 @@ RunIntf( intf_thread_t *p_intf )
     p_vcdplayer = p_intf->p_sys->p_vcdplayer;
     p_access    = p_vcdplayer->p_access;
 
-    int canc = vlc_savecancel();
+    canc = vlc_savecancel();
     dbg_print( INPUT_DBG_CALL, "intf initialized" );
 
     /* Main loop */
