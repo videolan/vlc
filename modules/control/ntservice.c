@@ -126,6 +126,7 @@ void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+    intt_sys_t sys;
     intf_thread_t *p_extraintf;
     SERVICE_TABLE_ENTRY dispatchTable[] =
     {
@@ -134,7 +135,7 @@ static void Run( intf_thread_t *p_intf )
     };
 
     p_global_intf = p_intf;
-    p_intf->p_sys = alloca( sizeof( intf_sys_t ) );
+    p_intf->p_sys = &sys;
     p_intf->p_sys->psz_service = config_GetPsz( p_intf, "ntservice-name" );
     p_intf->p_sys->psz_service = p_intf->p_sys->psz_service ?
         p_intf->p_sys->psz_service : strdup(VLCSERVICENAME);
