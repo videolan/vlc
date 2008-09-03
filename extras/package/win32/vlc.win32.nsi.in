@@ -403,12 +403,9 @@ Section $Name_Section01 SEC01
   ; VLC.exe, libvlc.dll
   !insertmacro InstallFile vlc.exe
   !insertmacro InstallFile vlc.exe.manifest
-  !ifdef LIBVLCCORE_DLL
-      !insertmacro InstallFile ${LIBVLCCORE_DLL}
-  !endif
-  !ifdef LIBVLC_DLL
-      !insertmacro InstallFile ${LIBVLC_DLL}
-  !endif
+
+  ; All dlls
+  !insertmacro InstallFile *.dll
 
   ; Text files
   !insertmacro InstallFile *.txt
