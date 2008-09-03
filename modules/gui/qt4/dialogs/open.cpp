@@ -66,11 +66,15 @@ OpenDialog::OpenDialog( QWidget *parent,
 {
     i_action_flag = _action_flag;
 
-    setWindowModality( Qt::WindowModal );
+    /* Workaround the Win32 Vout that put the video on top at regular times */
+#ifdef WIN32
+    setWindowFlags( Qt::WindowStaysOnTopHint | Qt::Dialog );
+#endif
 
     if( b_selectMode ) /* Select mode */
     {
         i_action_flag = SELECT;
+        setWindowModality( Qt::WindowModal );
     }
 
     /* Basic Creation of the Window */
