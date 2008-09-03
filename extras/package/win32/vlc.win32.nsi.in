@@ -633,8 +633,11 @@ Function .onInit
 
   !include "languages\english.nsh"
   StrCmp $LANGUAGE ${LANG_FRENCH} French EndLanguageCmp
+  StrCmp $LANGUAGE ${LANG_FINNISH} Finnish EndLanguageCmp
   French:
   !include "languages\french.nsh"
+  Finnish:
+  !include "languages\finnish.nsh"
   EndLanguageCmp:
 
   ReadRegStr $R0  ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
