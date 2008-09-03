@@ -26,12 +26,12 @@
  * Preamble
  *****************************************************************************/
 #define NDEBUG 1
-#include <assert.h>
-#include <math.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <assert.h>
+#include <math.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
