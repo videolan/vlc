@@ -108,6 +108,10 @@ static inline char *strndup (const char *str, size_t max)
 # define strtoll vlc_strtoll
 #endif
 
+#ifndef HAVE_STRSEP
+# define strsep vlc_strsep
+#endif
+
 #ifndef HAVE_ATOLL
 # define atoll( str ) (strtoll ((str), (char **)NULL, 10))
 #endif
