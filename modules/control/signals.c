@@ -31,7 +31,6 @@
 
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
-static void Run (intf_thread_t *);
 static void *SigThread (void *);
 
 vlc_module_begin ();
@@ -67,7 +66,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
     }
 
-    intf->pf_run = Run;
+    intf->pf_run = NULL;
     return 0;
 }
 
@@ -113,21 +112,7 @@ static void *SigThread (void *data)
         vlc_testcancel();
 #endif
 
-        vlc_object_lock (obj);
-        p_sys->signum = signum;
-        vlc_object_signal_unlocked (obj);
-        vlc_object_unlock (obj);
-    }
-}
-
-static void Run (intf_thread_t *obj)
-{
-    intf_sys_t *p_sys = obj->p_sys;
-
-    vlc_object_lock (obj);
-    while (vlc_object_alive (obj))
-    {
-        switch (p_sys->signum)
+        switch (signum)
         {
             case SIGINT:
             case SIGHUP:
@@ -135,12 +120,8 @@ static void Run (intf_thread_t *obj)
             case SIGQUIT:
                 msg_Err (obj, "Caught %s signal, exiting...",
                          strsignal (p_sys->signum));
-                goto out;
+                vlc_object_kill (obj->p_libvlc);
+                break;
         }
-        vlc_object_wait (obj);
     }
-
-out:
-    vlc_object_unlock (obj);
-    vlc_object_kill (obj->p_libvlc);
 }
