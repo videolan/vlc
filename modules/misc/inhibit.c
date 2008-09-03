@@ -230,28 +230,24 @@ static void Run( intf_thread_t *p_intf )
         p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
         if( p_input )
         {
-            if( PLAYING_S == p_input->i_state && !p_intf->p_sys->i_cookie )
+            int i_state = p_input->i_state;
+            vlc_object_release( p_input );
+
+            if( PLAYING_S == i_state && !p_intf->p_sys->i_cookie )
             {
                 if( !Inhibit( p_intf ) )
-                {
-                    vlc_object_release( p_input );
-                    goto end;
-                }
+                    break;
             }
             else if( p_intf->p_sys->i_cookie )
             {
                 if( !UnInhibit( p_intf ) )
-                {
-                    vlc_object_release( p_input );
-                    goto end;
-                }
+                    break;
             }
-            vlc_object_release( p_input );
         }
         else if( p_intf->p_sys->i_cookie )
         {
             if( !UnInhibit( p_intf ) )
-                goto end;
+                break;
         }
     }
 
