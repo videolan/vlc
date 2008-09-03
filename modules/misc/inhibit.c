@@ -42,7 +42,7 @@
 #include <dbus/dbus.h>
 
 #define PM_SERVICE   "org.freedesktop.PowerManagement"
-#define PM_PATH     "/org/freedesktop/PowerManagement/Inhibit"
+#define PM_PATH      "/org/freedesktop/PowerManagement/Inhibit"
 #define PM_INTERFACE "org.freedesktop.PowerManagement.Inhibit"
 
 /*****************************************************************************
@@ -76,11 +76,8 @@ static int Activate( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     DBusError     error;
 
-
     p_intf->pf_run = Run;
-
     p_intf->p_sys = (intf_sys_t *) calloc( 1, sizeof( intf_sys_t ) );
-
     if( !p_intf->p_sys )
         return VLC_ENOMEM;
 
@@ -122,8 +119,6 @@ static int Inhibit( intf_thread_t *p_intf )
     DBusMessage *p_msg;
     DBusMessageIter args;
     DBusMessage *p_reply;
-    DBusError error;
-    dbus_error_init( &error );
     dbus_uint32_t i_cookie;
 
     p_conn = p_intf->p_sys->p_conn;
@@ -136,7 +131,8 @@ static int Inhibit( intf_thread_t *p_intf )
     dbus_message_iter_init_append( p_msg, &args );
 
     char *psz_app = strdup( PACKAGE );
-    if( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_app ) )
+    if( !psz_app ||
+        !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_app ) )
     {
         free( psz_app );
         dbus_message_unref( p_msg );
@@ -160,8 +156,7 @@ static int Inhibit( intf_thread_t *p_intf )
     free( psz_inhibit_reason );
 
     p_reply = dbus_connection_send_with_reply_and_block( p_conn, p_msg,
-        50, &error ); /* blocks 50ms maximum */
-
+        50, NULL ); /* blocks 50ms maximum */
     dbus_message_unref( p_msg );
     if( p_reply == NULL )
     {   /* g-p-m is not active, or too slow. Better luck next time? */
@@ -169,7 +164,7 @@ static int Inhibit( intf_thread_t *p_intf )
     }
 
     /* extract the cookie from the reply */
-    if( dbus_message_get_args( p_reply, &error,
+    if( dbus_message_get_args( p_reply, NULL,
             DBUS_TYPE_UINT32, &i_cookie,
             DBUS_TYPE_INVALID ) == FALSE )
     {
@@ -191,8 +186,6 @@ static int UnInhibit( intf_thread_t *p_intf )
     DBusConnection *p_conn;
     DBusMessage *p_msg;
     DBusMessageIter args;
-    DBusError error;
-    dbus_error_init( &error );
     dbus_uint32_t i_cookie;
 
     p_conn = p_intf->p_sys->p_conn;
