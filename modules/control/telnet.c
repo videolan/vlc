@@ -246,9 +246,11 @@ static void Run( intf_thread_t *p_intf )
     for (const int *pfd = p_sys->pi_fd; *pfd != -1; pfd++)
         nlisten++; /* How many listening sockets do we have? */
 
+    /* FIXME: make sure config_* is cancel-safe */
     psz_password = config_GetPsz( p_intf, "telnet-password" );
+    vlc_cleanup_push( free, psz_password );
 
-    while( !intf_ShouldDie( p_intf ) )
+    for( ;; )
     {
         unsigned ncli = p_sys->i_clients;
         struct pollfd ufd[ncli + nlisten];
@@ -272,8 +274,7 @@ static void Run( intf_thread_t *p_intf )
             ufd[ncli + i].revents = 0;
         }
 
-        /* FIXME: arbitrary tick */
-        switch (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), 500))
+        switch (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1))
         {
             case -1:
                 if (net_errno != EINTR)
@@ -286,6 +287,7 @@ static void Run( intf_thread_t *p_intf )
                 continue;
         }
 
+        int canc = vlc_savecancel ();
         /* check if there is something to do with the socket */
         for (unsigned i = 0; i < ncli; i++)
         {
@@ -509,8 +511,9 @@ static void Run( intf_thread_t *p_intf )
                            "Password: \xff\xfb\x01" , WRITE_MODE_PWD );
             TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
         }
+        vlc_restorecancel( canc );
     }
-    free( psz_password );
+    vlc_cleanup_run ();
 }
 
 static void Write_message( telnet_client_t *client, vlm_message_t *message,
