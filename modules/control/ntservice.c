@@ -134,6 +134,7 @@ static void Run( intf_thread_t *p_intf )
         { NULL, NULL }
     };
 
+    int canc = vlc_savecancel();
     p_global_intf = p_intf;
     p_intf->p_sys = &sys;
     p_intf->p_sys->psz_service = config_GetPsz( p_intf, "ntservice-name" );
@@ -170,6 +171,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* Make sure we exit (In case other interfaces have been spawned) */
     vlc_object_kill( p_intf->p_libvlc );
+    vlc_restorecancel( canc );
 }
 
 /*****************************************************************************

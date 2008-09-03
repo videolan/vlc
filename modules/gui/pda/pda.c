@@ -156,6 +156,7 @@ static void Run( intf_thread_t *p_intf )
     GtkTreeViewColumn *p_column   = NULL;
     GtkListStore      *p_filelist = NULL;
     GtkListStore      *p_playlist_store = NULL;
+    int canc = vlc_savecancel();
 
 #ifndef NEED_GTK2_MAIN
     gtk_set_locale ();
@@ -348,6 +349,7 @@ static void Run( intf_thread_t *p_intf )
 #ifdef NEED_GTK2_MAIN
     gdk_threads_leave();
 #endif
+    vlc_restorecancel(canc);
 }
 
 /*****************************************************************************

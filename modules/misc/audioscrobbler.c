@@ -254,6 +254,7 @@ static void Run( intf_thread_t *p_intf )
     uint8_t                 p_buffer[1024];
     char                    *p_buffer_pos;
     int                     i_post_socket;
+    int                     canc = vlc_savecancel();
 
     intf_sys_t *p_sys = p_intf->p_sys;
 
@@ -262,13 +263,10 @@ static void Run( intf_thread_t *p_intf )
     {
         bool b_wait = false;
 
+        vlc_restorecancel( canc );
         vlc_object_lock( p_intf );
-        if( !vlc_object_alive( p_intf ) )
-        {
-            vlc_object_unlock( p_intf );
-            msg_Dbg( p_intf, "audioscrobbler is dying");
-            return;
-        }
+        vlc_cleanup_push( __vlc_object_unlock, p_intf );
+
         if( mdate() < p_sys->next_exchange )
             /* wait until we can resubmit, i.e.  */
             b_wait = vlc_object_timedwait( p_intf, p_sys->next_exchange ) == 0;
@@ -276,7 +274,8 @@ static void Run( intf_thread_t *p_intf )
             /* wait for data to submit */
             /* we are signaled each time there is a song to submit */
             vlc_object_wait( p_intf );
-        vlc_object_unlock( p_intf );
+        vlc_cleanup_run();
+        canc = vlc_savecancel();
 
         if( b_wait )
             continue; /* holding on until next_exchange */
@@ -456,6 +455,7 @@ static void Run( intf_thread_t *p_intf )
             continue;
         }
     }
+    vlc_restorecancel( canc );
 }
 
 /*****************************************************************************

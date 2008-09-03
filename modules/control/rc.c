@@ -449,13 +449,14 @@ static void Run( intf_thread_t *p_intf )
     input_thread_t * p_input;
     playlist_t *     p_playlist;
 
-    char       p_buffer[ MAX_LINE_LENGTH + 1 ];
+    char p_buffer[ MAX_LINE_LENGTH + 1 ];
     bool b_showpos = config_GetInt( p_intf, "rc-show-pos" );
     bool b_longhelp = false;
 
-    int        i_size = 0;
-    int        i_oldpos = 0;
-    int        i_newpos;
+    int  i_size = 0;
+    int  i_oldpos = 0;
+    int  i_newpos;
+    int  canc = vlc_savecancel();
 
     p_buffer[0] = 0;
     p_input = NULL;
@@ -846,6 +847,7 @@ static void Run( intf_thread_t *p_intf )
     }
 
     var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, p_intf );
+    vlc_restorecancel( canc );
 }
 
 static void Help( intf_thread_t *p_intf, bool b_longhelp)

@@ -195,6 +195,7 @@ static void Close( vlc_object_t *p_this )
 //---------------------------------------------------------------------------
 static void Run( intf_thread_t *p_intf )
 {
+    int canc = vlc_savecancel();
     // Load a theme
     ThemeLoader *pLoader = new ThemeLoader( p_intf );
     char *skin_last = config_GetPsz( p_intf, "skins2-last" );
@@ -253,6 +254,7 @@ static void Run( intf_thread_t *p_intf )
         delete p_intf->p_sys->p_theme;
         p_intf->p_sys->p_theme = NULL;
     }
+    vlc_restorecancel(canc);
 }
 
 

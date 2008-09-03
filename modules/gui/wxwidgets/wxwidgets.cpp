@@ -287,8 +287,10 @@ static void Run( intf_thread_t *p_intf )
     }
     else
     {
+        int canc = vlc_savecancel();
         /* The module is used in interface mode */
         Init( p_intf );
+        vlc_restorecancel( canc );
     }
 }
 

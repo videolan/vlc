@@ -219,8 +219,9 @@ static void Run( intf_thread_t *p_intf )
     char psz_duration[MSTRTIME_MAX_SIZE+2];
     char *psz_display = NULL;
 
-    while( vlc_object_alive (p_intf) )
+    for( ;; )
     {
+        int canc = vlc_savecancel();
         if( p_intf->p_sys->b_need_update == true )
         {
             p_intf->p_sys->b_need_update = false;
@@ -278,6 +279,7 @@ static void Run( intf_thread_t *p_intf )
                             psz_display );
         }
 
+        vlc_restorecancel( canc );
         msleep( INTF_IDLE_SLEEP );
     }
 }

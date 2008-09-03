@@ -111,6 +111,7 @@ void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void RunIntf( intf_thread_t *p_intf )
 {
+    int canc = vlc_savecancel( );
     p_intf->p_sys->p_vout = NULL;
 
     if( InitThread( p_intf ) < 0 )
@@ -170,6 +171,7 @@ static void RunIntf( intf_thread_t *p_intf )
                          MouseEvent, p_intf );
         vlc_object_release( p_intf->p_sys->p_vout );
     }
+    vlc_restorecancel( canc );
 }
 
 /*****************************************************************************

@@ -390,6 +390,7 @@ static void Run( intf_thread_t *p_intf )
 
     int i_key;
     time_t t_last_refresh;
+    int canc = vlc_savecancel();
 
     /*
      * force drawing the interface for the first time
@@ -464,6 +465,7 @@ static void Run( intf_thread_t *p_intf )
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
     var_DelCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
     var_DelCallback( p_playlist, "item-change", PlaylistChanged, p_intf );
+    vlc_restorecancel( canc );
 }
 
 /* following functions are local */

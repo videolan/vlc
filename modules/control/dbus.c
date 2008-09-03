@@ -826,10 +826,12 @@ static void Close   ( vlc_object_t *p_this )
 
 static void Run          ( intf_thread_t *p_intf )
 {
-    while( !intf_ShouldDie( p_intf ) )
+    for( ;; )
     {
         msleep( INTF_IDLE_SLEEP );
+        int canc = vlc_savecancel();
         dbus_connection_read_write_dispatch( p_intf->p_sys->p_conn, 0 );
+        vlc_restorecancel( canc );
     }
 }
 

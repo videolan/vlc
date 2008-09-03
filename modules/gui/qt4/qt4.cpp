@@ -298,7 +298,11 @@ static void Run( intf_thread_t *p_intf )
             msg_Err( p_intf, "failed to create Qt dialogs thread" );
     }
     else
+    {
+        int canc = vlc_savecancel ();
         Init( VLC_OBJECT(p_intf) );
+        vlc_restorecancel( canc );
+    }
 }
 
 static QMutex windowLock;

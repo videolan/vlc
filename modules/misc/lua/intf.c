@@ -281,6 +281,7 @@ void Close_LuaIntf( vlc_object_t *p_this )
 
 static void Run( intf_thread_t *p_intf )
 {
+    int canc = vlc_savecancel( );
     lua_State *L = p_intf->p_sys->L;
 
     if( luaL_dofile( L, p_intf->p_sys->psz_filename ) )
@@ -289,8 +290,6 @@ static void Run( intf_thread_t *p_intf )
                  p_intf->p_sys->psz_filename,
                  lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );
-        p_intf->b_die = true;
-        return;
     }
-    p_intf->b_die = true;
+    vlc_restorecancel( canc );
 }

@@ -143,6 +143,7 @@ static void Run( intf_thread_t *p_intf )
     char *psz_master = NULL;
     char p_data[MAX_MSG_LENGTH];
     int i_socket;
+    int canc = vlc_savecancel();
 
     if( !b_master )
     {
@@ -312,6 +313,7 @@ static void Run( intf_thread_t *p_intf )
 
     if( p_intf->p_sys->p_input ) vlc_object_release( p_intf->p_sys->p_input );
     net_Close( i_socket );
+    vlc_restorecancel( canc );
 }
 
 static mtime_t GetClockRef( intf_thread_t *p_intf, mtime_t i_pts )

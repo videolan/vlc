@@ -139,6 +139,7 @@ static void Run( intf_thread_t *p_intf )
     vlc_value_t val;
     int i;
     playlist_t *p_playlist = pl_Yield( p_intf );
+    int canc = vlc_savecancel();
 
     /* Initialize hotkey structure */
     for( struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
@@ -830,6 +831,7 @@ static void Run( intf_thread_t *p_intf )
             vlc_object_release( p_input );
     }
     pl_Release( p_intf );
+    vlc_restorecancel( canc );
 }
 
 static int GetAction( intf_thread_t *p_intf )

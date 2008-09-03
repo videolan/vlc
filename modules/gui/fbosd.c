@@ -1270,6 +1270,7 @@ static bool isRendererReady( intf_thread_t *p_intf )
 static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
+    int canc = vlc_savecancel();
 
     while( !intf_ShouldDie( p_intf ) )
     {
@@ -1322,6 +1323,7 @@ static void Run( intf_thread_t *p_intf )
     }
 
     End( p_intf );
+    vlc_restorecancel( canc );
 }
 
 static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,

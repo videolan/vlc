@@ -219,13 +219,12 @@ static int UnInhibit( intf_thread_t *p_intf )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    vlc_object_lock( p_intf );
-    while( vlc_object_alive( p_intf ) )
+    for( ;; )
     {
         input_thread_t *p_input;
 
         /* Check playing state every 30 seconds */
-        vlc_object_timedwait( p_intf, mdate() + 30000000 );
+        msleep( 30 * CLOCK_FREQ );
 
         p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
         if( p_input )
@@ -250,7 +249,4 @@ static void Run( intf_thread_t *p_intf )
                 break;
         }
     }
-
-end:
-    vlc_object_unlock( p_intf );
 }

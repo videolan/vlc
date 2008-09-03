@@ -105,6 +105,7 @@ RunIntf( intf_thread_t *p_intf )
        the 10_ADD keypresses */
     int number_addend = 0;
 
+    int canc = vlc_savecancel();
     if( InitThread( p_intf ) < 0 )
     {
         msg_Err( p_intf, "can't initialize intf" );
@@ -121,6 +122,7 @@ RunIntf( intf_thread_t *p_intf )
     p_vcdplayer = p_intf->p_sys->p_vcdplayer;
     p_access    = p_vcdplayer->p_access;
 
+    int canc = vlc_savecancel();
     dbg_print( INPUT_DBG_CALL, "intf initialized" );
 
     /* Main loop */
@@ -309,6 +311,7 @@ RunIntf( intf_thread_t *p_intf )
     }
 
     vlc_object_release( p_intf->p_sys->p_input );
+    vlc_restorecancel( canc );
 }
 
 /*****************************************************************************

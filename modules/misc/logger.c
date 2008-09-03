@@ -321,14 +321,17 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    while( vlc_object_alive (p_intf) )
+    for( ;; )
     {
+        int canc = vlc_savecancel();
         FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
                     p_intf->p_sys->i_mode,
                     var_CreateGetInteger( p_intf, "verbose" ) );
         if( p_intf->p_sys->p_rrd )
             DoRRD( p_intf );
 
+        vlc_restorecancel( canc );
+        /* FIXME: this is WRONG. */
         msleep( INTF_IDLE_SLEEP );
     }
 }

@@ -166,19 +166,14 @@ static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    mtime_t deadline = mdate();
-
-    vlc_object_lock( p_intf );
+    int canc = vlc_savecancel();
 #ifdef HAVE_DBUS
     p_intf->p_sys->p_connection = dbus_init( p_intf );
 #endif
 
-    while( vlc_object_alive( p_intf ) )
-    {
+    for( ;; )
+   {
         vlc_object_t *p_vout;
-
-        if( vlc_object_timedwait( p_intf, deadline ) == 0 )
-            continue;
 
         p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
 
@@ -213,10 +208,10 @@ static void Run( intf_thread_t *p_intf )
             }
         }
 
+        vlc_restorecancel( canc );
         /* Check screensaver every 30 seconds */
-        deadline = mdate() + 30000000;
+        msleep( 30 * CLOCK_FREQ );
     }
-    vlc_object_unlock( p_intf );
 }
 
 #ifdef HAVE_DBUS

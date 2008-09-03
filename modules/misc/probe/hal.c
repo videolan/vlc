@@ -130,6 +130,7 @@ static void Update( device_probe_t * p_probe )
     int i, i_devices, j;
     char **devices;
     bool b_exists;
+    int canc = vlc_savecancel();
 
     for ( j = 0 ; j < p_sys->i_devices; j++ )
         p_sys->pp_devices[j]->b_seen = false;
@@ -160,6 +161,7 @@ static void Update( device_probe_t * p_probe )
         }
     }
     /// \todo Remove unseen devices
+    vlc_restorecancel( canc );
 }
 
 

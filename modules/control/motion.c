@@ -182,7 +182,7 @@ static void RunIntf( intf_thread_t *p_intf )
     int p_oldx[FILTER_LENGTH];
     memset( p_oldx, 0, FILTER_LENGTH * sizeof( int ) );
 
-    while( !intf_ShouldDie( p_intf ) )
+    for( ;; )
     {
         vout_thread_t *p_vout;
         const char *psz_filter, *psz_type;
@@ -191,6 +191,7 @@ static void RunIntf( intf_thread_t *p_intf )
         /* Wait a bit, get orientation, change filter if necessary */
         msleep( INTF_IDLE_SLEEP );
 
+        int canc = vlc_savecancel();
         i_x = GetOrientation( p_intf );
         i_sum += i_x - p_oldx[i];
         p_oldx[i++] = i_x;
@@ -212,7 +213,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     vlc_object_release( p_obj );
                 }
             }
-            continue;
+            goto loop;
         }
 
         if( i_x < -HIGH_THRESHOLD && i_oldx > -LOW_THRESHOLD )
@@ -235,23 +236,21 @@ static void RunIntf( intf_thread_t *p_intf )
             psz_type = "90";
         }
 
-        if( !b_change )
+        if( b_change )
         {
-            continue;
+            p_vout = (vout_thread_t *)
+                vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+            if( p_vout )
+            {
+                config_PutPsz( p_vout, "transform-type", psz_type );
+                var_SetString( p_vout, "vout-filter", psz_filter );
+                vlc_object_release( p_vout );
+
+                i_oldx = i_x;
+            }
         }
-
-        p_vout = (vout_thread_t *)
-            vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-        if( !p_vout )
-        {
-            continue;
-        }
-
-        config_PutPsz( p_vout, "transform-type", psz_type );
-        var_SetString( p_vout, "vout-filter", psz_filter );
-        vlc_object_release( p_vout );
-
-        i_oldx = i_x;
+loop:
+        vlc_restorecancel( canc );
     }
 }
 #undef FILTER_LENGTH

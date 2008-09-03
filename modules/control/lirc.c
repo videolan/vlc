@@ -138,11 +138,14 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     char *code, *c;
+    int canc = vlc_savecancel();
 
-    while( !intf_ShouldDie( p_intf ) )
+    for( ;; )
     {
         /* Sleep a bit */
+        vlc_restorecancel(canc);
         msleep( INTF_IDLE_SLEEP );
+        canc = vlc_savecancel();
 
         /* We poll the lircsocket */
         if( lirc_nextcode(&code) != 0 )
@@ -199,4 +202,5 @@ static void Run( intf_thread_t *p_intf )
         }
         free( code );
     }
+    vlc_restorecancel(canc);
 }
