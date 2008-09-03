@@ -288,17 +288,17 @@ static int ParseLine( char *psz_line, char **ppsz_name,
     {
         char *psz_option;
 
-        asprintf( &psz_option, "program=%i", i_program );
-        INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
-                     psz_option );
+        if( asprintf( &psz_option, "program=%i", i_program ) != -1 )
+            INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
+                         psz_option );
     }
     if( i_frequency && pppsz_options && pi_options )
     {
         char *psz_option;
 
-        asprintf( &psz_option, "dvb-frequency=%i", i_frequency );
-        INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
-                     psz_option );
+        if( asprintf( &psz_option, "dvb-frequency=%i", i_frequency ) != -1 )
+            INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
+                         psz_option );
     }
     if( ppsz_name && psz_name ) *ppsz_name = strdup( psz_name );
 

@@ -180,6 +180,8 @@ char *ProcessMRL( char *psz_mrl, char *psz_prefix )
     if( strchr( psz_mrl, ':' ) ) return strdup( psz_mrl );
 
     /* This a relative path, prepend the prefix */
-    asprintf( &psz_mrl, "%s%s", psz_prefix, psz_mrl );
-    return psz_mrl;
+    if( asprintf( &psz_mrl, "%s%s", psz_prefix, psz_mrl ) != -1 )
+        return psz_mrl;
+    else
+        return NULL;
 }
