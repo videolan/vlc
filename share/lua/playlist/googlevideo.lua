@@ -18,26 +18,58 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
+function get_url_param( url, name )
+    return string.gsub( url, "^.*[&?]"..name.."=([^&]*).*$", "%1" )
+end
+
 -- Probe function.
 function probe()
     return vlc.access == "http"
         and string.match( vlc.path, "video.google.com" ) 
-        and string.match( vlc.path, "videoplay" )
+        and ( string.match( vlc.path, "videoplay" )
+            or string.match( vlc.path, "videofeed" ) )
+end
+
+function get_arg( line, arg )
+    return string.gsub( line, "^.*"..arg.."=\"(.-)\".*$", "%1" )
 end
 
 -- Parse function.
 function parse()
-    while true
-    do
-        line = vlc.readline()
-        if not line then break end
-        if string.match( line, "^<title>" ) then
-            title = string.gsub( line, "<title>([^<]*).*", "%1" )
+    local docid = get_url_param( vlc.path, "docid" ) 
+    if string.match( vlc.path, "videoplay" ) then
+        return { { path = "http://video.google.com/videofeed?docid=" .. docid } }
+    elseif string.match( vlc.path, "videofeed" ) then
+        local path = nil
+        local arturl
+        local duration
+        local name
+        local description
+        while true
+        do
+            local line = vlc.readline()
+            if not line then break end
+            if string.match( line, "media:content.*flv" )
+            then
+                local s = string.gsub( line, "^.*<media:content(.-)/>.*$", "%1" )
+                path = vlc.strings.resolve_xml_special_chars(get_arg( s, "url" ))
+                duration = get_arg( s, "duration" )
+            end
+            if string.match( line, "media:thumbnail" )
+            then
+                local s = string.gsub( line, "^.*<media:thumbnail(.-)/>.*$", "%1" )
+                arturl = vlc.strings.resolve_xml_special_chars(get_arg( s, "url" ))
+                vlc.msg.err( tostring(arturl))
+            end
+            if string.match( line, "media:title" )
+            then
+                name = string.gsub( line, "^.*<media:title>(.-)</media:title>.*$", "%1" )
+            end
+            if string.match( line, "media:description" )
+            then
+                description = string.gsub( line, "^.*<media:description>(.-)</media:description>.*$", "%1" )
+            end
         end
-        if string.match( line, "src=\"/googleplayer.swf" ) then
-            url = string.gsub( line, ".*videoUrl=([^&]*).*" ,"%1" )
-            arturl = string.gsub( line, ".*thumbnailUrl=([^\"]*).*", "%1" )
-            return { { path = vlc.strings.decode_uri(url), title = title, arturl = vlc.strings.decode_uri(arturl) } }
-        end
+        return { { path = path; name = name; arturl = arturl; duration = duration; description = description } }
     end
 end
