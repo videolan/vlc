@@ -601,12 +601,15 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                 }
 
                 p_bridge->pp_es[i]->fmt.i_id += p_sys->i_id_offset;
-                p_bridge->pp_es[i]->id = p_sys->p_out->pf_add(
-                            p_sys->p_out, &p_bridge->pp_es[i]->fmt );
-                if ( p_bridge->pp_es[i]->id == NULL )
+                if( !p_sys->b_placeholder )
                 {
-                    msg_Warn( p_stream, "couldn't create chain for id %d",
-                              p_bridge->pp_es[i]->fmt.i_id );
+                    p_bridge->pp_es[i]->id = p_sys->p_out->pf_add(
+                                p_sys->p_out, &p_bridge->pp_es[i]->fmt );
+                    if ( p_bridge->pp_es[i]->id == NULL )
+                    {
+                        msg_Warn( p_stream, "couldn't create chain for id %d",
+                                  p_bridge->pp_es[i]->fmt.i_id );
+                    }
                 }
                 msg_Dbg( p_stream, "bridging in input codec=%4.4s id=%d pos=%d",
                          (char*)&p_bridge->pp_es[i]->fmt.i_codec,
@@ -623,7 +626,9 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
             if ( p_bridge->pp_es[i]->id != NULL
                   && p_bridge->pp_es[i]->i_last < i_date )
             {
-                p_sys->p_out->pf_del( p_sys->p_out, p_bridge->pp_es[i]->id );
+                if( !p_sys->b_placeholder )
+                    p_sys->p_out->pf_del( p_sys->p_out,
+                                          p_bridge->pp_es[i]->id );
                 p_bridge->pp_es[i]->fmt.i_id -= p_sys->i_id_offset;
                 p_bridge->pp_es[i]->b_changed = true;
                 p_bridge->pp_es[i]->id = NULL;
@@ -631,7 +636,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
             continue;
         }
 
-        if ( p_bridge->pp_es[i]->id != NULL )
+        if ( p_bridge->pp_es[i]->id != NULL || p_sys->b_placeholder)
         {
             block_t *p_block = p_bridge->pp_es[i]->p_block;
             while ( p_block != NULL )
@@ -649,19 +654,23 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                     case VIDEO_ES:
                         p_sys->i_last_video = i_date;
                         newid = p_sys->id_video;
+                        if( !newid )
+                            break;
                         if( !p_sys->b_switch_on_iframe ||
                             p_sys->i_state == placeholder_off ||
                             ( p_bridge->pp_es[i]->fmt.i_cat == VIDEO_ES &&
                               p_bridge->pp_es[i]->p_block->i_flags & BLOCK_FLAG_TYPE_I ) )
                         {
                             p_sys->p_out->pf_send( p_sys->p_out,
-                                       newid?newid:p_bridge->pp_es[i]->id,
+                                       newid,
                                        p_bridge->pp_es[i]->p_block );
                             p_sys->i_state = placeholder_off;
                         }
                         break;
                     case AUDIO_ES:
                         newid = p_sys->id_audio;
+                        if( !newid )
+                            break;
                         p_sys->i_last_audio = i_date;
                     default:
                         p_sys->p_out->pf_send( p_sys->p_out,
