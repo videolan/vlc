@@ -145,10 +145,6 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
             }
         }
 
-        setsockopt (fd, SOL_SOCKET, SO_SNDBUF, &(int){ 0x80000 }, sizeof (int));
-        setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0x80000 }, sizeof (int));
-        setsockopt (fd, SOL_SOCKET, SO_BROADCAST, &(int){ 1 }, sizeof (int));
-
         /* Bind the socket */
 #if defined (WIN32) || defined (UNDER_CE)
         if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
