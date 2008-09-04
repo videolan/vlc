@@ -201,12 +201,12 @@ enum {
 #define vlc_mutex_lock( P_MUTEX )                                           \
     __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 
-VLC_EXPORT(void, vlc_pthread_fatal, (const char *action, int error, const char *file, unsigned line));
+VLC_EXPORT(void, vlc_thread_fatal, (const char *action, int error, const char *function, const char *file, unsigned line));
 
 #if defined(LIBVLC_USE_PTHREAD)
 # define VLC_THREAD_ASSERT( action ) \
     if (val) \
-        vlc_pthread_fatal (action, val, psz_file, i_line)
+        vlc_thread_fatal (action, val, __func__, psz_file, i_line)
 #else
 # define VLC_THREAD_ASSERT ((void)(val))
 #endif

@@ -66,28 +66,54 @@ libvlc_global_data_t *vlc_global( void )
     return p_root;
 }
 
-#if defined(LIBVLC_USE_PTHREAD)
+#ifdef HAVE_EXECINFO_H
+# include <execinfo.h>
+#endif
+
+/**
+ * Print a backtrace to the standard error for debugging purpose.
+ */
+void vlc_trace (const char *fn, const char *file, unsigned line)
+{
+     fprintf (stderr, "at %s:%u in %s\n", file, line, fn);
+     fflush (stderr); /* needed before switch to low-level I/O */
+#ifdef HAVE_BACKTRACE
+     void *stack[20];
+     int len = backtrace (stack, sizeof (stack) / sizeof (stack[0]));
+     backtrace_symbols_fd (stack, len, 2);
+#endif
+#ifndef WIN32
+     fsync (2);
+#endif
+}
+
 static inline unsigned long vlc_threadid (void)
 {
+#if defined(LIBVLC_USE_PTHREAD)
      union { pthread_t th; unsigned long int i; } v = { };
      v.th = pthread_self ();
      return v.i;
-}
 
-#if defined(HAVE_EXECINFO_H) && defined(HAVE_BACKTRACE)
-# include <execinfo.h>
+#elif defined (WIN32)
+     return GetCurrentThread ();
+
+#else
+     return 0;
+
 #endif
+}
 
 /*****************************************************************************
  * vlc_thread_fatal: Report an error from the threading layer
  *****************************************************************************
  * This is mostly meant for debugging.
  *****************************************************************************/
-void vlc_pthread_fatal (const char *action, int error,
+void vlc_thread_fatal (const char *action, int error, const char *function,
                         const char *file, unsigned line)
 {
-    fprintf (stderr, "LibVLC fatal error %s in thread %lu at %s:%u: %d\n",
-             action, vlc_threadid (), file, line, error);
+    fprintf (stderr, "LibVLC fatal error %s (%d) in thread %lu ",
+             action, error, vlc_threadid ());
+    vlc_trace (function, file, line);
 
     /* Sometimes strerror_r() crashes too, so make sure we print an error
      * message before we invoke it */
@@ -115,24 +141,8 @@ void vlc_pthread_fatal (const char *action, int error,
 #endif
     fflush (stderr);
 
-#ifdef HAVE_BACKTRACE
-    void *stack[20];
-    int len = backtrace (stack, sizeof (stack) / sizeof (stack[0]));
-    backtrace_symbols_fd (stack, len, 2);
-#endif
-
     abort ();
 }
-#else
-void vlc_pthread_fatal (const char *action, int error,
-                        const char *file, unsigned line)
-{
-    (void)action; (void)error; (void)file; (void)line;
-    abort();
-}
-
-static vlc_threadvar_t cancel_key;
-#endif
 
 /**
  * Per-thread cancellation data
@@ -604,7 +614,7 @@ void vlc_join (vlc_thread_t handle, void **result)
 #if defined( LIBVLC_USE_PTHREAD )
     int val = pthread_join (handle, result);
     if (val)
-        vlc_pthread_fatal ("joining thread", val, __FILE__, __LINE__);
+        vlc_thread_fatal ("joining thread", val, __func__, __FILE__, __LINE__);
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
     do

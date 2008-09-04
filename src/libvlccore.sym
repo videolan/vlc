@@ -482,7 +482,6 @@ __vlc_object_wait
 __vlc_object_waitpipe
 __vlc_object_yield
 vlc_poll
-vlc_pthread_fatal
 vlc_rand_bytes
 vlc_recvmsg
 vlc_sdp_Start
@@ -492,6 +491,7 @@ vlc_strlcpy
 vlc_strtoll
 vlc_submodule_create
 __vlc_thread_create
+vlc_thread_fatal
 __vlc_thread_join
 __vlc_thread_set_priority
 vlc_threadvar_create
