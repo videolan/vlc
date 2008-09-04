@@ -254,6 +254,7 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if ( p_sys->b_inited )
     {
+        msg_Err( p_stream, "bridge-out can only handle 1 es at a time." );
         return NULL;
     }
     p_sys->b_inited = true;
