@@ -49,6 +49,8 @@ void vlc_threads_end( void );
 /* Hopefully, no need to export this. There is a new thread API instead. */
 void vlc_thread_cancel (vlc_object_t *);
 
+void vlc_trace (const char *fn, const char *file, unsigned line);
+#define vlc_backtrace() vlc_trace(__func__, __FILE__, __LINE__)
 
 /*
  * CPU capabilities
