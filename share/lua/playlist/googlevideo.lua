@@ -59,7 +59,6 @@ function parse()
             then
                 local s = string.gsub( line, "^.*<media:thumbnail(.-)/>.*$", "%1" )
                 arturl = vlc.strings.resolve_xml_special_chars(get_arg( s, "url" ))
-                vlc.msg.err( tostring(arturl))
             end
             if string.match( line, "media:title" )
             then
