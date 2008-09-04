@@ -342,15 +342,16 @@ void mwait( mtime_t date )
     }
 
 #elif defined (WIN32)
-    mtime_t total;
+    mtime_t i_total;
 
-    while ((total = (date - mdate ())) > 0)
+    while( (i_total = (date - mdate())) > 0 )
     {
-        DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
-        vlc_testcancel ();
-        SleepEx (delay, TRUE);
+        const mtime_t i_sleep = i_total / 1000;
+        DWORD i_delay = (i_sleep > 0x7fffffff) ? 0x7fffffff : i_sleep;
+        vlc_testcancel();
+        SleepEx( i_delay, TRUE );
     }
-    vlc_testcancel ();
+    vlc_testcancel();
 
 #else
     mtime_t delay = date - mdate();
