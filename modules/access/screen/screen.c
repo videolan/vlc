@@ -109,8 +109,8 @@ vlc_module_begin();
 #endif
 
 #ifdef SCREEN_MOUSE
-    add_string( "screen-mouse-image", "", NULL, MOUSE_TEXT, MOUSE_LONGTEXT,
-                true );
+    add_file( "screen-mouse-image", "", NULL, MOUSE_TEXT, MOUSE_LONGTEXT,
+              true );
 #endif
 
 #ifdef WIN32
@@ -222,6 +222,7 @@ static int Open( vlc_object_t *p_this )
         if( !p_sys->p_mouse )
             msg_Err( p_demux, "Failed to open mouse pointer image (%s)",
                      psz_mouse );
+        free( psz_mouse );
     }
 #endif
 
