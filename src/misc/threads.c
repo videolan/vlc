@@ -123,7 +123,7 @@ void vlc_thread_fatal (const char *action, int error, const char *function,
     /* Avoid the strerror_r() prototype brain damage in glibc */
     errno = error;
     fprintf (stderr, " Error message: %m at:\n");
-#else
+#elif !defined (WIN32)
     char buf[1000];
     const char *msg;
 
