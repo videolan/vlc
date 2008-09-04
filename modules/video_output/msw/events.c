@@ -59,12 +59,18 @@
 #include "vlc_keys.h"
 #include "vout.h"
 
-#if defined(UNDER_CE) && !defined(__PLUGIN__) /*FIXME*/
-#   define SHFS_SHOWSIPBUTTON 0x0004
+#ifdef UNDER_CE
+#include <aygshell.h>
+    //WINSHELLAPI BOOL WINAPI SHFullScreen(HWND hwndRequester, DWORD dwState);
+#endif
+
+/*#if defined(UNDER_CE) && !defined(__PLUGIN__) /*FIXME*/
+/*#   define SHFS_SHOWSIPBUTTON 0x0004
 #   define SHFS_HIDESIPBUTTON 0x0008
 #   define MENU_HEIGHT 26
     BOOL SHFullScreen(HWND hwndRequester, DWORD dwState);
-#endif
+#endif*/
+
 
 /*****************************************************************************
  * Local prototypes.
@@ -909,16 +915,16 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         if( !p_vout->p_sys->b_parent_focus ) GXSuspend();
 #endif
 #ifdef UNDER_CE
-        if( hWnd == p_vout->p_sys->hfswnd )
+        if( hwnd == p_vout->p_sys->hfswnd )
         {
             HWND htbar = FindWindow( _T("HHTaskbar"), NULL );
             ShowWindow( htbar, SW_SHOW );
         }
 
         if( !p_vout->p_sys->hparent ||
-            hWnd == p_vout->p_sys->hfswnd )
+            hwnd == p_vout->p_sys->hfswnd )
         {
-            SHFullScreen( hWnd, SHFS_SHOWSIPBUTTON );
+            SHFullScreen( hwnd, SHFS_SHOWSIPBUTTON );
         }
 #endif
         return 0;
@@ -930,19 +936,19 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 #endif
 #ifdef UNDER_CE
         if( p_vout->p_sys->hparent &&
-            hWnd != p_vout->p_sys->hfswnd && p_vout->b_fullscreen )
+            hwnd != p_vout->p_sys->hfswnd && p_vout->b_fullscreen )
             p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
-        if( hWnd == p_vout->p_sys->hfswnd )
+        if( hwnd == p_vout->p_sys->hfswnd )
         {
             HWND htbar = FindWindow( _T("HHTaskbar"), NULL );
             ShowWindow( htbar, SW_HIDE );
         }
 
         if( !p_vout->p_sys->hparent ||
-            hWnd == p_vout->p_sys->hfswnd )
+            hwnd == p_vout->p_sys->hfswnd )
         {
-            SHFullScreen( hWnd, SHFS_HIDESIPBUTTON );
+            SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         }
 #endif
         return 0;
@@ -1197,7 +1203,8 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
                           rect.right, rect.bottom,
                           SWP_NOZORDER|SWP_FRAMECHANGED );
 
-            HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
+            HWND topLevelParent = GetParent( p_vout->p_sys->hparent );
+            //HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
             ShowWindow( topLevelParent, SW_HIDE );
         }
 
@@ -1221,7 +1228,8 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
                           rect.right, rect.bottom,
                           SWP_NOZORDER|SWP_FRAMECHANGED );
 
-            HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
+            HWND topLevelParent = GetParent( p_vout->p_sys->hparent );
+            //HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
             ShowWindow( topLevelParent, SW_SHOW );
             SetForegroundWindow( p_vout->p_sys->hparent );
             ShowWindow( hwnd, SW_HIDE );
