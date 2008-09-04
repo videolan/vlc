@@ -68,6 +68,19 @@ VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
 VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
 VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
 
+#ifdef __GNUC__
+static
+__attribute__((unused))
+__attribute__((noinline))
+__attribute__((warning("use proper event handling instead")))
+void bad_msleep( mtime_t delay )
+{
+    msleep( delay );
+}
+# define msleep( d ) \
+   ((__builtin_constant_p(d) && (d < 29000000)) ? bad_msleep(d) : msleep(d))
+#endif
+
 /*****************************************************************************
  * date_t: date incrementation without long-term rounding errors
  *****************************************************************************/

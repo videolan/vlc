@@ -363,6 +363,7 @@ void mwait( mtime_t date )
 
 
 #include "libvlc.h" /* vlc_backtrace() */
+#undef msleep
 
 /**
  * Portable usleep(). Cancellation point.
