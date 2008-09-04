@@ -587,7 +587,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_inpic )
     vout_DatePicture( p_sys->p_vout, p_outpic, p_inpic->date );
 
     if( p_pic )
-    p_sys->p_blend->pf_video_blend( p_sys->p_blend, p_outpic, p_outpic,
+    p_sys->p_blend->pf_video_blend( p_sys->p_blend, p_outpic,
                                     p_pic, p_sys->posx, p_sys->posy,
                                     p_logo->i_alpha != -1 ? p_logo->i_alpha
                                     : p_logo_list->i_alpha );

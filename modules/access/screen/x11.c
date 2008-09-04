@@ -172,12 +172,6 @@ block_t *screen_Capture( demux_t *p_demux )
         vlc_memcpy( p_block->p_buffer, image->data, i_size );
     else
     {
-        if( !p_sys->src.i_planes )
-            vout_InitPicture( p_demux, &p_sys->src,
-                              p_sys->fmt.video.i_chroma,
-                              p_sys->fmt.video.i_width,
-                              p_sys->fmt.video.i_height,
-                              p_sys->fmt.video.i_aspect );
         if( !p_sys->dst.i_planes )
             vout_InitPicture( p_demux, &p_sys->dst,
                               p_sys->fmt.video.i_chroma,
@@ -208,13 +202,10 @@ block_t *screen_Capture( demux_t *p_demux )
         }
         if( p_sys->p_blend )
         {
-            /* FIXME: why is this memcpy needed?!? (bug in blend?) */
             vlc_memcpy( p_block->p_buffer, image->data, i_size );
             p_sys->dst.p->p_pixels = p_block->p_buffer;
-            p_sys->src.p->p_pixels = image->data;
             p_sys->p_blend->pf_video_blend( p_sys->p_blend,
                                             &p_sys->dst,
-                                            &p_sys->src,
                                             p_sys->p_mouse,
                                             root_x,
                                             root_y,

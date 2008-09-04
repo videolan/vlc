@@ -2017,7 +2017,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             fmt.i_sar_num = fmt.i_aspect * fmt.i_height / fmt.i_width;
             fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 
-            spu_RenderSubpictures( p_sys->p_spu, &fmt, p_pic, p_pic, p_subpic,
+            spu_RenderSubpictures( p_sys->p_spu, &fmt, p_pic, p_subpic,
                                    i_scale_width, i_scale_height );
         }
 

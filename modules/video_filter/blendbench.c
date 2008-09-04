@@ -240,7 +240,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     mtime_t time = mdate();
     for( int i_iter = 0; i_iter < p_sys->i_loops; ++i_iter )
     {
-        p_blend->pf_video_blend( p_blend, p_sys->p_base_image,
+        p_blend->pf_video_blend( p_blend,
                                  p_sys->p_base_image, p_sys->p_blend_image,
                                  0, 0, p_sys->i_alpha );
     }

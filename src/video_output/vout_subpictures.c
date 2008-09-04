@@ -652,7 +652,7 @@ exit:
 }
 
 static void SpuRenderRegion( spu_t *p_spu,
-                             picture_t *p_pic_dst, picture_t *p_pic_src,
+                             picture_t *p_pic_dst,
                              subpicture_t *p_subpic, subpicture_region_t *p_region,
                              const int i_scale_width_orig, const int i_scale_height_orig,
                              const int pi_subpic_x[SCALE_SIZE],
@@ -923,7 +923,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     if( p_spu->p_blend->p_module )
     {
         p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
-            p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
+            &p_region->picture, i_x_offset, i_y_offset,
             i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025 );
     }
     else
@@ -950,7 +950,7 @@ exit:
 }
 
 void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
-                            picture_t *p_pic_dst, picture_t *p_pic_src,
+                            picture_t *p_pic_dst,
                             subpicture_t *p_subpic,
                             int i_scale_width_orig, int i_scale_height_orig )
 {
@@ -1165,7 +1165,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         for( ; p_region != NULL; p_region = p_region->p_next )
-            SpuRenderRegion( p_spu, p_pic_dst, p_pic_src,
+            SpuRenderRegion( p_spu, p_pic_dst,
                              p_subpic, p_region, i_scale_width_orig, i_scale_height_orig,
                              pi_subpic_x, pi_scale_width, pi_scale_height,
                              p_fmt );

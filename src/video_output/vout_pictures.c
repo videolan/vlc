@@ -351,7 +351,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
             vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
 
             spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
-                                   PP_OUTPUTPICTURE[0], p_pic, p_subpic,
+                                   PP_OUTPUTPICTURE[0], p_subpic,
                                    i_scale_width, i_scale_height );
 
             vout_UnlockPicture( p_vout, PP_OUTPUTPICTURE[0] );
@@ -378,7 +378,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
         vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
         spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
-                               PP_OUTPUTPICTURE[0], p_pic,
+                               PP_OUTPUTPICTURE[0],
                                p_subpic, i_scale_width, i_scale_height );
 
         vout_UnlockPicture( p_vout, PP_OUTPUTPICTURE[0] );
@@ -415,7 +415,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         p_vout->p_chroma->pf_video_filter( p_vout->p_chroma, p_pic );
 
         /* Render subpictures on the first direct buffer */
-        spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out, p_tmp_pic,
+        spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
                                p_tmp_pic, p_subpic,
                                i_scale_width, i_scale_height );
 
@@ -435,7 +435,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
         /* Render subpictures on the first direct buffer */
         spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
-                               &p_vout->p_picture[0], &p_vout->p_picture[0],
+                               &p_vout->p_picture[0],
                                p_subpic, i_scale_width, i_scale_height );
     }
 

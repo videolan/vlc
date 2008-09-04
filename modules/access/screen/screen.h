@@ -59,7 +59,6 @@ struct demux_sys_t
 #ifdef SCREEN_MOUSE
     picture_t *p_mouse;
     filter_t *p_blend;
-    picture_t src;
     picture_t dst;
 #endif
 
