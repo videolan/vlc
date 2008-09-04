@@ -278,7 +278,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     }
     else
     {
-#ifdef HAVE_UNISTD_H
+#if defined (HAVE_UNISTD_H) && !defined (UNDER_CE)
         /* Get the current working directory */
         char *psz_cwd = getcwd( NULL, 0 );
 #else
