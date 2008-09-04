@@ -95,7 +95,7 @@ static inline unsigned long vlc_threadid (void)
      return v.i;
 
 #elif defined (WIN32)
-     return GetCurrentThread ();
+     return GetCurrentThreadId ();
 
 #else
      return 0;
