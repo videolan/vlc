@@ -362,24 +362,24 @@ static void vlc_yuv_packed_index( int *pi_y, int *pi_u, int *pi_v, vlc_fourcc_t 
     *pi_v = p_index[i].v;
 }
 
-static void vlc_blend_packed( uint8_t *p_dst, const uint8_t *p_src,
+static void vlc_blend_packed( uint8_t *p_dst,
                               int i_offset0, int i_offset1, int i_offset2,
                               int c0, int c1, int c2, int i_alpha,
                               bool b_do12 )
 {
-    p_dst[i_offset0] = vlc_blend( c0, p_src[i_offset0], i_alpha );
+    p_dst[i_offset0] = vlc_blend( c0, p_dst[i_offset0], i_alpha );
     if( b_do12 )
     {
-        p_dst[i_offset1] = vlc_blend( c1, p_src[i_offset1], i_alpha );
-        p_dst[i_offset2] = vlc_blend( c2, p_src[i_offset2], i_alpha );
+        p_dst[i_offset1] = vlc_blend( c1, p_dst[i_offset1], i_alpha );
+        p_dst[i_offset2] = vlc_blend( c2, p_dst[i_offset2], i_alpha );
     }
 }
 
-static void vlc_blend_rgb16( uint16_t *p_dst, const uint16_t *p_src,
+static void vlc_blend_rgb16( uint16_t *p_dst,
                              int R, int G, int B, int i_alpha,
                              const video_format_t *p_fmt )
 {
-    const int i_pix = *p_src;
+    const int i_pix = *p_dst;
     const int r = ( i_pix & p_fmt->i_rmask ) >> p_fmt->i_lrshift;
     const int g = ( i_pix & p_fmt->i_gmask ) >> p_fmt->i_lgshift;
     const int b = ( i_pix & p_fmt->i_bmask ) >> p_fmt->i_lbshift;
@@ -517,7 +517,6 @@ static void BlendYUVARV16( filter_t *p_filter,
                         p_src_y[i_x], p_src_u[i_x], p_src_v[i_x] );
 
             vlc_blend_rgb16( (uint16_t*)&p_dst[i_x * i_pix_pitch],
-                             (const uint16_t*)&p_dst[i_x * i_pix_pitch],
                              r, g, b, i_trans, &p_filter->fmt_out.video );
         }
     }
@@ -640,7 +639,6 @@ static void BlendYUVARV24( filter_t *p_filter,
                             p_src_y[i_x], p_src_u[i_x], p_src_v[i_x] );
 
                 vlc_blend_packed( &p_dst[ i_x * i_pix_pitch],
-                                  &p_dst[i_x * i_pix_pitch],
                                   i_rindex, i_gindex, i_bindex,
                                   r, g, b, i_alpha, true );
             }
@@ -712,7 +710,7 @@ static void BlendYUVAYUVPacked( filter_t *p_filter,
                     i_v = p_src_v[i_x];
                 }
 
-                vlc_blend_packed( &p_dst[i_x * 2], &p_dst[i_x * 2],
+                vlc_blend_packed( &p_dst[i_x * 2],
                                   i_l_offset, i_u_offset, i_v_offset,
                                   p_src_y[i_x], i_u, i_v, i_trans, true );
             }
@@ -899,7 +897,6 @@ static void BlendI420R16( filter_t *p_filter,
                         p_src_y[i_x], p_src_u[i_x/2], p_src_v[i_x/2] );
 
             vlc_blend_rgb16( (uint16_t*)&p_dst[i_x * i_pix_pitch],
-                             (const uint16_t*)&p_dst[i_x * i_pix_pitch],
                              r, g, b, i_alpha, &p_filter->fmt_out.video );
         }
         if( i_y%2 == 1 )
@@ -954,7 +951,7 @@ static void BlendI420R24( filter_t *p_filter,
             yuv_to_rgb( &r, &g, &b,
                         p_src_y[i_x], p_src_u[i_x/2], p_src_v[i_x/2] );
 
-            vlc_blend_packed( &p_dst[i_x * i_pix_pitch], &p_dst[i_x * i_pix_pitch],
+            vlc_blend_packed( &p_dst[i_x * i_pix_pitch],
                               i_rindex, i_gindex, i_bindex, r, g, b, i_alpha, true );
         }
         if( i_y%2 == 1 )
@@ -1009,7 +1006,7 @@ static void BlendI420YUVPacked( filter_t *p_filter,
                 continue;
 
             /* Blending */
-            vlc_blend_packed( &p_dst[i_x * 2], &p_dst[i_x * 2],
+            vlc_blend_packed( &p_dst[i_x * 2],
                               i_l_offset, i_u_offset, i_v_offset,
                               p_src_y[i_x], p_src_u[i_x/2], p_src_v[i_x/2], i_alpha, b_even );
         }
@@ -1141,7 +1138,7 @@ static void BlendPalYUVPacked( filter_t *p_filter,
                     i_v = p_pal[p_src[i_x]][2];
                 }
 
-                vlc_blend_packed( &p_dst[i_x * 2], &p_dst[i_x * 2],
+                vlc_blend_packed( &p_dst[i_x * 2],
                                   i_l_offset, i_u_offset, i_v_offset,
                                   p_pal[p_src[i_x]][0], i_u, i_v, i_trans, true );
             }
@@ -1207,12 +1204,11 @@ static void BlendPalRV( filter_t *p_filter,
             /* Blending */
             if( p_filter->fmt_out.video.i_chroma == FCC_RV15 || p_filter->fmt_out.video.i_chroma == FCC_RV16 )
                 vlc_blend_rgb16( (uint16_t*)&p_dst[i_x * i_pix_pitch],
-                                 (const uint16_t*)&p_dst[i_x * i_pix_pitch],
                                   rgbpal[p_src[i_x]][0], rgbpal[p_src[i_x]][1], rgbpal[p_src[i_x]][2],
                                   i_trans,
                                   &p_filter->fmt_out.video );
             else
-                vlc_blend_packed( &p_dst[i_x * i_pix_pitch], &p_dst[i_x * i_pix_pitch],
+                vlc_blend_packed( &p_dst[i_x * i_pix_pitch],
                                   i_rindex, i_gindex, i_bindex,
                                   rgbpal[p_src[i_x]][0], rgbpal[p_src[i_x]][1], rgbpal[p_src[i_x]][2],
                                   i_trans, true );
@@ -1336,7 +1332,7 @@ static void BlendRGBAR24( filter_t *p_filter,
                 continue;
 
             /* Blending */
-            vlc_blend_packed( &p_dst[i_x * i_pix_pitch], &p_dst[i_x * i_pix_pitch],
+            vlc_blend_packed( &p_dst[i_x * i_pix_pitch],
                               i_rindex, i_gindex, i_bindex,
                               R, G, B, i_trans, true );
         }
@@ -1382,7 +1378,6 @@ static void BlendRGBAR16( filter_t *p_filter,
 
             /* Blending */
             vlc_blend_rgb16( (uint16_t*)&p_dst[i_x * i_pix_pitch],
-                             (const uint16_t*)&p_dst[i_x * i_pix_pitch],
                              R, G, B, i_trans, &p_filter->fmt_out.video );
         }
     }
@@ -1438,7 +1433,7 @@ static void BlendRGBAYUVPacked( filter_t *p_filter,
             /* Blending */
             rgb_to_yuv( &y, &u, &v, R, G, B );
 
-            vlc_blend_packed( &p_dst[i_x * 2], &p_dst[i_x * 2],
+            vlc_blend_packed( &p_dst[i_x * 2],
                               i_l_offset, i_u_offset, i_v_offset,
                               y, u, v, i_trans, b_even );
         }
