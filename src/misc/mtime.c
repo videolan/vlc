@@ -360,6 +360,9 @@ void mwait( mtime_t date )
 #endif
 }
 
+
+#include "libvlc.h" /* vlc_backtrace() */
+
 /**
  * Portable usleep(). Cancellation point.
  *
@@ -367,6 +370,27 @@ void mwait( mtime_t date )
  */
 void msleep( mtime_t delay )
 {
+#ifndef NDEBUG
+# if defined (__linux__) || defined (WIN32)
+    /* We assume that proper use of msleep() will not use a constant period...
+     * Media synchronization is likely to use mwait() with at least slight
+     * sleep length variation at microsecond precision. Network protocols
+     * normally have exponential backoffs, or long delays. */
+    static __thread unsigned tick_period = 0;
+    static __thread unsigned tick_frequency = 0;
+    if (tick_period != delay)
+        tick_frequency = 0;
+    tick_frequency++;
+    tick_period = delay;
+    if (delay < (29 * CLOCK_FREQ) && tick_frequency == 20)
+    {
+         fprintf (stderr, "Likely bogus delay(%"PRIu64"µs) ", delay);
+         vlc_backtrace ();
+    }
+    //fprintf (stderr, "%u, %u\n", tick_period, tick_frequency);
+# endif
+#endif
+
 #if defined( HAVE_CLOCK_NANOSLEEP )
     lldiv_t d = lldiv( delay, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
