@@ -1064,6 +1064,28 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->psz_enc = "MPV";
             id->pf_packetize = rtp_packetize_mpv;
             break;
+        case VLC_FOURCC( 'G', '7', '2', '6' ):
+        case VLC_FOURCC( 'g', '7', '2', '6' ):
+            switch( p_fmt->i_bitrate / 1000 )
+            {
+            case 16:
+                id->psz_enc = "G726-16";
+                id->pf_packetize = rtp_packetize_g726_16;
+                break;
+            case 24:
+                id->psz_enc = "G726-24";
+                id->pf_packetize = rtp_packetize_g726_24;
+                break;
+            case 32:
+                id->psz_enc = "G726-32";
+                id->pf_packetize = rtp_packetize_g726_32;
+                break;
+            case 40:
+                id->psz_enc = "G726-40";
+                id->pf_packetize = rtp_packetize_g726_40;
+                break;
+            }
+            break;
         case VLC_FOURCC( 'a', '5', '2', ' ' ):
             id->psz_enc = "ac3";
             id->pf_packetize = rtp_packetize_ac3;

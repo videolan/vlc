@@ -58,6 +58,10 @@ int rtp_packetize_h264 (sout_stream_id_t *, block_t *);
 int rtp_packetize_amr  (sout_stream_id_t *, block_t *);
 int rtp_packetize_spx  (sout_stream_id_t *, block_t *);
 int rtp_packetize_t140 (sout_stream_id_t *, block_t *);
+int rtp_packetize_g726_16 (sout_stream_id_t *, block_t *);
+int rtp_packetize_g726_24 (sout_stream_id_t *, block_t *);
+int rtp_packetize_g726_32 (sout_stream_id_t *, block_t *);
+int rtp_packetize_g726_40 (sout_stream_id_t *, block_t *);
 
 /* RTCP */
 typedef struct rtcp_sender_t rtcp_sender_t;
