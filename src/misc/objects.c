@@ -559,7 +559,8 @@ void * vlc_object_get( libvlc_int_t *p_anchor, int i_id )
     vlc_object_t *obj = NULL;
 #ifndef NDEBUG
     int canc = vlc_savecancel ();
-    fprintf (stderr, "Use of deprecated vlc_object_get(%d)\n", i_id);
+    fprintf (stderr, "Use of deprecated vlc_object_get(%d) ", i_id);
+    vlc_backtrace ();
     vlc_restorecancel (canc);
 #endif
     vlc_mutex_lock( &structure_lock );
