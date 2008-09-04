@@ -8,15 +8,20 @@ AM_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
 
 if !HAVE_WIN32
+if !HAVE_WINCE
 bin_PROGRAMS += vlc-wrapper
+vlc_SOURCES = vlc.c
+endif
 endif
 
 EXTRA_vlc_SOURCES = vlc.c winvlc.c
-if !HAVE_WIN32
-vlc_SOURCES = vlc.c
-else
+if HAVE_WIN32
 vlc_SOURCES = winvlc.c
 endif
+if HAVE_WINCE
+vlc_SOURCES = winvlc.c
+endif
+
 vlc_wrapper_SOURCES = rootwrap.c
 
 vlc_DEPENDENCIES = ../src/libvlc.la
