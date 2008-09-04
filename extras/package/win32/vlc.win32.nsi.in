@@ -632,10 +632,11 @@ Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
 
   !include "languages\english.nsh"
-  StrCmp $LANGUAGE ${LANG_FRENCH} French EndLanguageCmp
+  StrCmp $LANGUAGE ${LANG_FRENCH} French 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish EndLanguageCmp
   French:
   !include "languages\french.nsh"
+  Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
   EndLanguageCmp:
