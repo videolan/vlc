@@ -49,6 +49,7 @@ class QTreeWidgetItem;
 class QTreeView;
 class QSpinBox;
 class QLineEdit;
+class CoverArtLabel;
 
 class MetaPanel: public QWidget
 {
@@ -80,7 +81,7 @@ private:
     QLineEdit *nowplaying_text;
     QLineEdit *publisher_text;
 //    QLineEdit *encodedby_text;
-    QLabel *art_cover;
+    CoverArtLabel *art_cover;
 
 public slots:
     void update( input_item_t * );

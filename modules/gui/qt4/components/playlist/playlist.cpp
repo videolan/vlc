@@ -64,13 +64,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     artContainer->setMaximumHeight( 128 );
 
     /* Art label */
-    art = new ArtLabel;
-    art->setMinimumHeight( 128 );
-    art->setMinimumWidth( 128 );
-    art->setMaximumHeight( 128 );
-    art->setMaximumWidth( 128 );
-    art->setScaledContents( true );
-    art->setPixmap( QPixmap( ":/noart.png" ) );
+    art = new ArtLabel( p_intf );
     art->setToolTip( qtr( "Double click to get media information" ) );
 
     artContLay->addWidget( art, 1 );
@@ -103,7 +97,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     emit rootChanged( p_root->i_id );
 
     /* art */
-    CONNECT( THEMIM->getIM(), artChanged( QString ) , this, setArt( QString ) );
+    CONNECT( THEMIM->getIM(), artChanged( input_item_t* ) ,
+             art, update( input_item_t* ) );
 
     /* Add the two sides of the QSplitter */
     addWidget( leftW );
@@ -127,15 +122,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     setAcceptDrops( true );
     setWindowTitle( qtr( "Playlist" ) );
     setWindowIcon( QApplication::windowIcon() );
-}
-
-void PlaylistWidget::setArt( QString url )
-{
-    if( prevArt != url )
-    {
-        art->setPixmap( QPixmap( url.isEmpty() ? ":/noart.png" : url ) );
-        prevArt = url;
-    }
 }
 
 PlaylistWidget::~PlaylistWidget()

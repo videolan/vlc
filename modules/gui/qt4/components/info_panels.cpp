@@ -28,6 +28,7 @@
 
 #include "qt4.hpp"
 #include "components/info_panels.hpp"
+#include "components/interface_widgets.hpp"
 
 #include <QTreeWidget>
 #include <QListView>
@@ -105,13 +106,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     line++;
 
     /* ART_URL */
-    art_cover = new QLabel( "" );
-    art_cover->setMinimumHeight( 128 );
-    art_cover->setMinimumWidth( 128 );
-    art_cover->setMaximumHeight( 128 );
-    art_cover->setMaximumWidth( 128 );
-    art_cover->setScaledContents( true );
-    art_cover->setPixmap( QPixmap( ":/noart.png" ) );
+    art_cover = new CoverArtLabel( VLC_OBJECT( p_intf ) );
     metaLayout->addWidget( art_cover, line, 8, 4, 2, Qt::AlignRight );
 
 /* Settings is unused */
@@ -229,16 +224,8 @@ void MetaPanel::update( input_item_t *p_item )
 #undef UPDATE_META_INT
 #undef UPDATE_META
 
-    /* Art Urls */
-    psz_meta = input_item_GetArtURL( p_item );
-    if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
-    {
-        QString artUrl = qfu( psz_meta ).replace( "file://",QString("" ) );
-        art_cover->setPixmap( QPixmap( artUrl ) );
-    }
-    else
-        art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-    free( psz_meta );
+    /* Update Art */
+    art_cover->update( p_item );
 }
 
 /**
@@ -332,7 +319,7 @@ void MetaPanel::clear()
     language_text->clear();
     nowplaying_text->clear();
     publisher_text->clear();
-    art_cover;
+    art_cover->update( NULL );
 
     setEditMode( false );
 }

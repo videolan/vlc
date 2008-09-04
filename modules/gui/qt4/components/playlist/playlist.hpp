@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
+#include "components/interface_widgets.hpp"
 
 #include <QSplitter>
 #include <QLabel>
@@ -40,6 +41,8 @@
 class PLSelector;
 class PLPanel;
 class QPushButton;
+class CoverArtLabel;
+class ArtLabel;
 
 class PlaylistWidget : public QSplitter
 {
@@ -51,8 +54,7 @@ private:
     PLSelector *selector;
     PLPanel *rightPanel;
     QPushButton *addButton;
-    QLabel *art;
-    QString prevArt;
+    ArtLabel *art;
     QWidget *parent;
 protected:
     intf_thread_t *p_intf;
@@ -60,15 +62,16 @@ protected:
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void closeEvent( QCloseEvent * );
 
-private slots:
-    void setArt( QString );
 signals:
     void rootChanged( int );
 };
 
-class ArtLabel : public QLabel
+class ArtLabel : public CoverArtLabel
 {
     Q_OBJECT
+public:
+    ArtLabel( intf_thread_t *intf ) : CoverArtLabel( VLC_OBJECT( intf ) ) {};
+    virtual ~ArtLabel() {};
     void mouseDoubleClickEvent( QMouseEvent *event )
     {
         THEDP->mediaInfoDialog();
