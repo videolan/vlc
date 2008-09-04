@@ -1,0 +1,58 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH VLC\-WRAPPER 1 "Aug 31, 2008"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+vlc-wrapper
+.SH SYNOPSIS
+.B vlc-wrapper
+.RI [ OPTIONS ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B VLC
+wrapper to open priviledged network ports.
+The ports it can open are 80, 443 and 554.
+
+.SH OPTIONS
+They will be passed to
+.B VLC
+with no modification.
+
+.SH USAGE
+.PP
+The preferred way is to use
+.B sudo
+:
+.PP
+.Vb 1
+\& $ sudo vlc-wrapper --option1 --option2
+.Ve
+.PP
+You can also set the SUDO_UID environement variable:
+.PP
+.Vb 1
+\& # SUDO_UID=1000 vlc-wrapper --option1 --option2
+.Ve
+.PP
+
+
+.SH SEE ALSO
+.BR vlc (1),
+.BR sudo (8)
+
+.PP
+.SH AUTHOR
+This manual page was written by Christophe Mutricy.

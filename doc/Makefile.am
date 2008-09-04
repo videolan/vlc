@@ -25,6 +25,7 @@ CHANGELOGS = \
 EXTRA_DIST = \
 	$(CHANGELOGS) \
 	vlc.1 \
+	vlc-wrapper.1 \
 	vlc-config.1 \
 	bugreport-howto.txt \
 	fortunes.txt \
