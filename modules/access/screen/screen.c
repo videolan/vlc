@@ -73,6 +73,13 @@
     "Follow the mouse when capturing a subscreen." )
 #endif
 
+#ifdef SCREEN_MOUSE
+#define MOUSE_TEXT N_( "Mouse pointer image" )
+#define MOUSE_LONGTEXT N_( \
+    "If specifed, will use the image to draw the mouse pointer on the " \
+    "capture." )
+#endif
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -99,6 +106,11 @@ vlc_module_begin();
     add_integer( "screen-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
     add_bool( "screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
               FOLLOW_MOUSE_LONGTEXT, true );
+#endif
+
+#ifdef SCREEN_MOUSE
+    add_string( "screen-mouse-image", "", NULL, MOUSE_TEXT, MOUSE_LONGTEXT,
+                true );
 #endif
 
 #ifdef WIN32
@@ -189,6 +201,30 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 
+#ifdef SCREEN_MOUSE
+    char * psz_mouse = var_CreateGetNonEmptyString( p_demux,
+                                                    "screen-mouse-image" );
+    if( psz_mouse )
+    {
+        image_handler_t *p_image;
+        video_format_t fmt_in, fmt_out;
+        msg_Dbg( p_demux, "Using %s for the mouse pointer image", psz_mouse );
+        memset( &fmt_in, 0, sizeof( fmt_in ) );
+        memset( &fmt_out, 0, sizeof( fmt_out ) );
+        fmt_out.i_chroma = VLC_FOURCC('R','G','B','A');
+        p_image = image_HandlerCreate( p_demux );
+        if( p_image )
+        {
+            p_sys->p_mouse =
+                image_ReadUrl( p_image, psz_mouse, &fmt_in, &fmt_out );
+            image_HandlerDelete( p_image );
+        }
+        if( !p_sys->p_mouse )
+            msg_Err( p_demux, "Failed to open mouse pointer image (%s)",
+                     psz_mouse );
+    }
+#endif
+
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
 
     return VLC_SUCCESS;
@@ -203,6 +239,10 @@ static void Close( vlc_object_t *p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     screen_CloseCapture( p_demux );
+#ifdef SCREEN_MOUSE
+    if( p_sys->p_mouse )
+        picture_Release( p_sys->p_mouse );
+#endif
     free( p_sys );
 }
 

@@ -27,6 +27,11 @@
 
 #if !defined( HAVE_WIN32 ) && !defined( HAVE_BEOS ) && !defined( HAVE_DARWIN )
 #   define SCREEN_SUBSCREEN
+#   define SCREEN_MOUSE
+#endif
+
+#ifdef SCREEN_MOUSE
+#   include <vlc_image.h>
 #endif
 
 typedef struct screen_data_t screen_data_t;
@@ -49,6 +54,13 @@ struct demux_sys_t
     unsigned int i_left;
     unsigned int i_height;
     unsigned int i_width;
+#endif
+
+#ifdef SCREEN_MOUSE
+    picture_t *p_mouse;
+    filter_t *p_blend;
+    picture_t src;
+    picture_t dst;
 #endif
 
     screen_data_t *p_data;
