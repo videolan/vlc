@@ -29,6 +29,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef __VLC_MTIME_H
+# define __VLC_MTIME_H 1
+
 /*****************************************************************************
  * LAST_MDATE: date which will never happen
  *****************************************************************************
@@ -83,3 +86,4 @@ VLC_EXPORT( mtime_t, date_Get,       ( const date_t * ) );
 VLC_EXPORT( void,    date_Move,      ( date_t *, mtime_t ) );
 VLC_EXPORT( mtime_t, date_Increment, ( date_t *, uint32_t ) );
 VLC_EXPORT( uint64_t, NTPtime64,     ( void ) );
+#endif /* !__VLC_MTIME_ */
