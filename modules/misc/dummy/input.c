@@ -1,5 +1,5 @@
 /*****************************************************************************
- * input_dummy.c: dummy input plugin, to manage "vlc://***" special options
+ * input_dummy.c: dummy input plugin, to manage "vlc://" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 the VideoLAN team
  * $Id$
