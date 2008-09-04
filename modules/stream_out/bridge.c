@@ -69,9 +69,16 @@
     "be used to configure a place holder stream when the real source " \
     "breaks. Source and placeholder streams should have the same format. " )
 
-#define PLACEHOLDER_DELAY_TEXT N_( "Place holder delay" )
+#define PLACEHOLDER_DELAY_TEXT N_( "Placeholder delay" )
 #define PLACEHOLDER_DELAY_LONGTEXT N_( \
-    "Delay (in ms) before the place holder kicks in." )
+    "Delay (in ms) before the placeholder kicks in." )
+
+#define PLACEHOLDER_IFRAME_TEXT N_( "Wait for I frame before toggling placholder" )
+#define PLACEHOLDER_IFRAME_LONGTEXT N_( \
+    "If enabled, switching between the placeholder and the normal stream " \
+    "will only occur on I frames. This will remove artifacts on stream " \
+    "switching at the expense of a slightly longer delay, depending on " \
+    "the frequence of I frames in the streams." )
 
 static int  OpenOut ( vlc_object_t * );
 static void CloseOut( vlc_object_t * );
@@ -113,6 +120,8 @@ vlc_module_begin();
               PLACEHOLDER_TEXT, PLACEHOLDER_LONGTEXT, false );
     add_integer( SOUT_CFG_PREFIX_IN "placeholder-delay", 200, NULL,
                  PLACEHOLDER_DELAY_TEXT, PLACEHOLDER_DELAY_LONGTEXT, false );
+    add_bool( SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", true, NULL,
+              PLACEHOLDER_IFRAME_TEXT, PLACEHOLDER_IFRAME_LONGTEXT, false );
     set_callbacks( OpenIn, CloseIn );
 
 vlc_module_end();
@@ -126,7 +135,9 @@ static const char *const ppsz_sout_options_out[] = {
 };
 
 static const char *const ppsz_sout_options_in[] = {
-    "delay", "id-offset", "name", "placeholder", "placeholder-delay", NULL
+    "delay", "id-offset", "name",
+    "placeholder", "placeholder-delay", "placeholder-switch-on-iframe",
+    NULL
 };
 
 static sout_stream_id_t *AddOut ( sout_stream_t *, es_format_t * );
@@ -381,12 +392,16 @@ typedef struct in_sout_stream_sys_t
     char *psz_name;
 
     bool b_placeholder;
+    bool b_switch_on_iframe;
+    int i_state;
     mtime_t i_placeholder_delay;
     sout_stream_id_t *id_video;
     mtime_t i_last_video;
     sout_stream_id_t *id_audio;
     mtime_t i_last_audio;
 } in_sout_stream_sys_t;
+
+enum { placeholder_on, placeholder_off };
 
 /*****************************************************************************
  * OpenIn:
@@ -431,6 +446,11 @@ static int OpenIn( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder", &val );
     p_sys->b_placeholder = val.b_bool;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", &val);
+    p_sys->b_switch_on_iframe = val.b_bool;
+
+    p_sys->i_state = placeholder_on;
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-delay", &val );
     p_sys->i_placeholder_delay = (mtime_t)val.i_int * 1000;
@@ -629,16 +649,31 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                     case VIDEO_ES:
                         p_sys->i_last_video = i_date;
                         newid = p_sys->id_video;
+                        if( !p_sys->b_switch_on_iframe ||
+                            p_sys->i_state == placeholder_off ||
+                            ( p_bridge->pp_es[i]->fmt.i_cat == VIDEO_ES &&
+                              p_bridge->pp_es[i]->p_block->i_flags & BLOCK_FLAG_TYPE_I ) )
+                        {
+                            p_sys->p_out->pf_send( p_sys->p_out,
+                                       newid?newid:p_bridge->pp_es[i]->id,
+                                       p_bridge->pp_es[i]->p_block );
+                            p_sys->i_state = placeholder_off;
+                        }
                         break;
                     case AUDIO_ES:
                         newid = p_sys->id_audio;
                         p_sys->i_last_audio = i_date;
+                    default:
+                        p_sys->p_out->pf_send( p_sys->p_out,
+                                   newid?newid:p_bridge->pp_es[i]->id,
+                                   p_bridge->pp_es[i]->p_block );
                         break;
                 }
             }
-            p_sys->p_out->pf_send( p_sys->p_out,
-                                   newid ? newid : p_bridge->pp_es[i]->id,
-                                   p_bridge->pp_es[i]->p_block );
+            else /* !b_placeholder */
+                p_sys->p_out->pf_send( p_sys->p_out,
+                                       p_bridge->pp_es[i]->id,
+                                       p_bridge->pp_es[i]->p_block );
         }
         else
         {
@@ -665,8 +700,14 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
         switch( id->i_cat )
         {
             case VIDEO_ES:
-                if( p_sys->i_last_video + p_sys->i_placeholder_delay < i_date )
+                if( ( p_sys->i_last_video + p_sys->i_placeholder_delay < i_date
+                    && (  !p_sys->b_switch_on_iframe
+                       || p_buffer->i_flags & BLOCK_FLAG_TYPE_I ) )
+                  || p_sys->i_state == placeholder_on )
+                {
                     p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
+                    p_sys->i_state = placeholder_on;
+                }
                 else
                     block_Release( p_buffer );
                 break;
