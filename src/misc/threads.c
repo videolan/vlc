@@ -52,6 +52,8 @@ static volatile unsigned i_initializations = 0;
 # include <sched.h>
 
 static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
+#else
+static vlc_threadvar_t cancel_key;
 #endif
 
 /**
