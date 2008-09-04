@@ -703,20 +703,20 @@ static int rtp_packetize_g726( sout_stream_id_t *id, block_t *in, int i_pad )
 
 int rtp_packetize_g726_16( sout_stream_id_t *id, block_t *in )
 {
-    return rtp_packetize_g726( id, in, 16 );
+    return rtp_packetize_g726( id, in, 4 );
 }
 
 int rtp_packetize_g726_24( sout_stream_id_t *id, block_t *in )
 {
-    return rtp_packetize_g726( id, in, 24 );
+    return rtp_packetize_g726( id, in, 8 );
 }
 
 int rtp_packetize_g726_32( sout_stream_id_t *id, block_t *in )
 {
-    return rtp_packetize_g726( id, in, 32 );
+    return rtp_packetize_g726( id, in, 2 );
 }
 
 int rtp_packetize_g726_40( sout_stream_id_t *id, block_t *in )
 {
-    return rtp_packetize_g726( id, in, 40 );
+    return rtp_packetize_g726( id, in, 8 );
 }
