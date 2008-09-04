@@ -205,7 +205,8 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     backgroundLayout->setColumnStretch( 0, 1 );
     backgroundLayout->setColumnStretch( 2, 1 );
 
-    CONNECT( THEMIM->getIM(), artChanged( QString ), this, updateArt( QString ) );
+    CONNECT( THEMIM->getIM(), artChanged( input_item_t* ),
+             this, updateArt( input_item_t* ) );
 }
 
 BackgroundWidget::~BackgroundWidget()
@@ -219,18 +220,28 @@ void BackgroundWidget::resizeEvent( QResizeEvent * event )
         label->show();
 }
 
-void BackgroundWidget::updateArt( QString url )
+void BackgroundWidget::updateArt( input_item_t *p_item )
 {
+    QString url;
+    if( p_item )
+    {
+        char *psz_art = input_item_GetArtURL( p_item );
+        url = psz_art;
+        free( psz_art );
+    }
+
     if( url.isEmpty() )
     {
         if( QDate::currentDate().dayOfYear() >= 354 )
             label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
         else
             label->setPixmap( QPixmap( ":/vlc128.png" ) );
-        return;
     }
     else
     {
+        url = url.replace( "file://", QString("" ) );
+        /* Taglib seems to define a attachment://, It won't work yet */
+        url = url.replace( "attachment://", QString("" ) );
         label->setPixmap( QPixmap( url ) );
     }
 }
@@ -1433,3 +1444,96 @@ void SpeedControlWidget::resetRate()
 {
     THEMIM->getIM()->setRate(INPUT_RATE_DEFAULT);
 }
+
+
+
+static int downloadCoverCallback( vlc_object_t *p_this,
+                                  char const *psz_var,
+                                  vlc_value_t oldvar, vlc_value_t newvar,
+                                  void *data )
+{
+    if( !strcmp( psz_var, "item-change" ) )
+    {
+        CoverArtLabel *art = static_cast< CoverArtLabel* >( data );
+        if( art )
+            art->requestUpdate();
+    }
+    return VLC_SUCCESS;
+}
+
+CoverArtLabel::CoverArtLabel( vlc_object_t *_p_this, input_item_t *_p_input )
+        : p_this( _p_this), p_input( _p_input ), prevArt()
+{
+    setContextMenuPolicy( Qt::ActionsContextMenu );
+    CONNECT( this, updateRequested(), this, doUpdate() );
+
+    playlist_t *p_playlist = pl_Yield( p_this );
+    var_AddCallback( p_playlist, "item-change",
+                     downloadCoverCallback, this );
+    pl_Release( p_this );
+
+    setMinimumHeight( 128 );
+    setMinimumWidth( 128 );
+    setMaximumHeight( 128 );
+    setMaximumWidth( 128 );
+    setScaledContents( true );
+
+    doUpdate();
+}
+
+void CoverArtLabel::downloadCover()
+{
+    if( p_input )
+    {
+        playlist_t *p_playlist = pl_Yield( p_this );
+        playlist_AskForArtEnqueue( p_playlist, p_input );
+        pl_Release( p_this );
+    }
+}
+
+void CoverArtLabel::doUpdate()
+{
+    if( !p_input )
+    {
+        setPixmap( QPixmap( ":/noart.png" ) );
+        QList< QAction* > artActions = actions();
+        if( !artActions.isEmpty() )
+            foreach( QAction *act, artActions )
+                removeAction( act );
+        prevArt = "";
+    }
+    else
+    {
+        char *psz_meta = input_item_GetArtURL( p_input );
+        if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
+        {
+            QString artUrl = qfu( psz_meta ).replace( "file://", "" );
+            if( artUrl != prevArt )
+                setPixmap( QPixmap( artUrl ) );
+            QList< QAction* > artActions = actions();
+            if( !artActions.isEmpty() )
+            {
+                foreach( QAction *act, artActions )
+                    removeAction( act );
+            }
+            prevArt = artUrl;
+        }
+        else
+        {
+            if( prevArt != "" )
+                setPixmap( QPixmap( ":/noart.png" ) );
+            prevArt = "";
+            QList< QAction* > artActions = actions();
+            if( artActions.isEmpty() )
+            {
+                QAction *action = new QAction( qtr( "Download cover art" ),
+                                               this );
+                addAction( action );
+                CONNECT( action, triggered(),
+                         this, downloadCover() );
+            }
+        }
+        free( psz_meta );
+    }
+}
+

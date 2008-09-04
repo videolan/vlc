@@ -100,7 +100,7 @@ private:
     virtual void resizeEvent( QResizeEvent * event );
 public slots:
     void toggle(){ TOGGLEV( this ); }
-    void updateArt( QString );
+    void updateArt( input_item_t* );
 };
 
 #if 0
@@ -374,6 +374,30 @@ public slots:
 private slots:
     void updateRate( int );
     void resetRate();
+};
+
+class CoverArtLabel : public QLabel
+{
+    Q_OBJECT
+public:
+    CoverArtLabel( vlc_object_t *p_this, input_item_t *p_input = NULL );
+    virtual ~CoverArtLabel() {};
+private:
+    input_item_t *p_input;
+    vlc_object_t *p_this;
+    QString prevArt;
+
+public slots:
+    void requestUpdate() { emit updateRequested(); };
+    void update( input_item_t* p_item )
+            { p_input = p_item; requestUpdate(); }
+
+private slots:
+    void doUpdate();
+    void downloadCover();
+
+signals:
+    void updateRequested();
 };
 
 #endif
