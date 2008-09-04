@@ -97,6 +97,47 @@
 extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
 
+/* */
+static int net_SetupDgramSocket( vlc_object_t *p_obj, int fd, const struct addrinfo *ptr )
+{
+#ifdef SO_REUSEPORT
+    setsockopt (fd, SOL_SOCKET, SO_REUSEPORT, &(int){ 1 }, sizeof (int));
+#endif
+
+#ifdef SO_RCVBUF
+    /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
+     * to avoid packet loss caused in case of scheduling hiccups */
+    setsockopt (fd, SOL_SOCKET, SO_RCVBUF,
+                (void *)&(int){ 0x80000 }, sizeof (int));
+    setsockopt (fd, SOL_SOCKET, SO_SNDBUF,
+                (void *)&(int){ 0x80000 }, sizeof (int));
+#endif
+
+#if defined (WIN32) || defined (UNDER_CE)
+    if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
+     && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
+    {
+        // This works for IPv4 too - don't worry!
+        struct sockaddr_in6 dumb =
+        {
+            .sin6_family = ptr->ai_addr->sa_family,
+            .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
+        };
+
+        bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
+    }
+    else
+#endif
+    if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
+    {
+        msg_Err( p_obj, "socket bind error (%m)" );
+        net_Close (fd);
+        return -1;
+    }
+    return fd;
+}
+
+/* */
 static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
                              int family, int protocol)
 {
@@ -145,26 +186,9 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
             }
         }
 
-        /* Bind the socket */
-#if defined (WIN32) || defined (UNDER_CE)
-        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
-         && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
-        {
-            struct sockaddr_in6 dumb =
-            {
-                .sin6_family = ptr->ai_addr->sa_family,
-                .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
-            };
-            bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
-        }
-        else
-#endif
-        if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
-        {
-            msg_Err (obj, "socket bind error (%m)");
-            net_Close (fd);
+        fd = net_SetupDgramSocket( obj, fd, ptr );
+        if( fd == -1 )
             continue;
-        }
 
         if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
          && net_Subscribe (obj, fd, ptr->ai_addr, ptr->ai_addrlen))
@@ -753,39 +777,9 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
         if (fd == -1)
             continue; // usually, address family not supported
 
-#ifdef SO_REUSEPORT
-        setsockopt (fd, SOL_SOCKET, SO_REUSEPORT, &(int){ 1 }, sizeof (int));
-#endif
-
-#ifdef SO_RCVBUF
-        /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
-         * to avoid packet loss caused in case of scheduling hiccups */
-        setsockopt (fd, SOL_SOCKET, SO_RCVBUF,
-                    (void *)&(int){ 0x80000 }, sizeof (int));
-        setsockopt (fd, SOL_SOCKET, SO_SNDBUF,
-                    (void *)&(int){ 0x80000 }, sizeof (int));
-#endif
-
-#if defined (WIN32) || defined (UNDER_CE)
-        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
-         && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
-        {
-            // This works for IPv4 too - don't worry!
-            struct sockaddr_in6 dumb =
-            {
-                .sin6_family = ptr->ai_addr->sa_family,
-                .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
-            };
-
-            bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
-        }
-        else
-#endif
-        if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
-        {
-            net_Close (fd);
+        fd = net_SetupDgramSocket( obj, fd, ptr );
+        if( fd == -1 )
             continue;
-        }
 
         val = -1;
         for (struct addrinfo *ptr2 = rem; ptr2 != NULL; ptr2 = ptr2->ai_next)
