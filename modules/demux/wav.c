@@ -73,8 +73,6 @@ struct demux_sys_t
     int pi_chan_table[AOUT_CHAN_MAX];
 };
 
-#define __EVEN( x ) (((x) + 1) & ~1)
-
 static int ChunkFind( demux_t *, const char *, unsigned int * );
 
 static void FrameInfo_IMA_ADPCM( demux_t *, unsigned int *, int * );
