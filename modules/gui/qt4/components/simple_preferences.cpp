@@ -188,7 +188,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "video-on-top", Bool, NULL, alwaysOnTop );
             CONFIG_GENERIC( "video-deco", Bool, NULL, windowDecorations );
             CONFIG_GENERIC( "skip-frames" , Bool, NULL, skipFrames );
-            CONFIG_GENERIC( "embedded-video", Bool, NULL, embeddedVideo );
             CONFIG_GENERIC( "vout", Module, NULL, outputModule );
 
 #ifdef WIN32

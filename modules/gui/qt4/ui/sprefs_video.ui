@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>526</width>
+    <width>408</width>
     <height>513</height>
    </rect>
   </property>
@@ -69,10 +69,10 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1" colspan="2" >
+      <item row="3" column="1" colspan="2" >
        <widget class="QComboBox" name="outputModule" />
       </item>
-      <item row="4" column="0" >
+      <item row="3" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
          <string>_("Output")</string>
@@ -102,13 +102,6 @@
         </property>
         <property name="checked" >
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" >
-       <widget class="QCheckBox" name="embeddedVideo" >
-        <property name="text" >
-         <string>_("Embedded video")</string>
         </property>
        </widget>
       </item>
@@ -148,10 +141,6 @@
        </widget>
       </item>
      </layout>
-     <zorder>dXdisplayDevice</zorder>
-     <zorder>label_5</zorder>
-     <zorder>wallpaperMode</zorder>
-     <zorder>displayBox</zorder>
     </widget>
    </item>
    <item>
