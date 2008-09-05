@@ -50,7 +50,7 @@ class MenuItemData : public QObject
 Q_OBJECT
 
 public:
-    MenuItemData( int i_id, int _i_type, vlc_value_t _val, const char *_var )
+    MenuItemData( QObject* parent, int i_id, int _i_type, vlc_value_t _val, const char *_var ) : QObject( parent )
     {
         i_object_id = i_id;
         i_val_type = _i_type;

@@ -1267,7 +1267,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 
     action->setChecked( checked );
 
-    MenuItemData *itemData = new MenuItemData( i_object_id, i_val_type,
+    MenuItemData *itemData = new MenuItemData( THEDP->menusMapper, i_object_id, i_val_type,
             val, psz_var );
     CONNECT( action, triggered(), THEDP->menusMapper, map() );
     THEDP->menusMapper->setMapping( action, itemData );
