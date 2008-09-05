@@ -115,8 +115,9 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  *  - can-pause
  *  - can-record (if a stream can be recorded while playing)
  *  - teletext-es to get the index of spu track that is teletext --1 if no teletext)
- * * For intf callback upon changes
+ * * For intf callback upon changes:
  *  - intf-change
+ *  - intf-change-vout for when a vout is created or destroyed
  *  - rate-change for when playback rate changes
  * TODO explain when Callback is called
  * TODO complete this list (?)

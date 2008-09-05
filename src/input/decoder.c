@@ -1126,6 +1126,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 
         /* We are about to die. Reattach video output to p_vlc. */
         vout_Request( p_dec, p_dec->p_owner->p_vout, NULL );
+        var_SetBool( p_dec->p_owner->p_input, "intf-change-vout", true );
     }
 
 #ifdef ENABLE_SOUT
@@ -1306,6 +1307,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
         p_sys->p_vout = vout_Request( p_dec, p_sys->p_vout,
                                       &p_dec->fmt_out.video );
+        var_SetBool( p_sys->p_input, "intf-change-vout", true );
         if( p_sys->p_vout == NULL )
         {
             msg_Err( p_dec, "failed to create video output" );
