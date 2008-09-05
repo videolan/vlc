@@ -99,7 +99,7 @@ static int Open( vlc_object_t *p_this )
     /* Set up p_access */
     access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( NULL, BlockUDP, Control, NULL );
-    p_access->info.b_prebuffered = false;
+    p_access->info.b_prebuffered = true;
 
     if (strlen (p_access->psz_access) > 0)
     {
