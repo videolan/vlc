@@ -405,7 +405,11 @@ void AdvControlsWidget::snapshot()
 {
     vout_thread_t *p_vout =
         (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout ) vout_Control( p_vout, VOUT_SNAPSHOT );
+    if( p_vout )
+    {
+        vout_Control( p_vout, VOUT_SNAPSHOT );
+        vlc_object_release( p_vout );
+    }
 }
 
 /* Function called when the button is clicked() */
