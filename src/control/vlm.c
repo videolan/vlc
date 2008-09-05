@@ -199,12 +199,10 @@ void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance, char *psz_name,
     for( n = 0; n < i_options; n++ )
         TAB_APPEND( m.i_option, m.ppsz_option, strdup(ppsz_options[n]) );
 
-    if( vlm_Control( p_vlm, VLM_ADD_MEDIA, &m, NULL ) )
-    {
-        vlm_media_Clean( &m );
-        libvlc_exception_raise( p_exception, "Media %s creation failed", psz_name );
-    }
+    n = vlm_Control( p_vlm, VLM_ADD_MEDIA, &m, NULL );
     vlm_media_Clean( &m );
+    if( n )
+        libvlc_exception_raise( p_exception, "Media %s creation failed", psz_name );
 #else
     libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
     return VLC_EGENERIC;
@@ -233,12 +231,10 @@ void libvlc_vlm_add_vod( libvlc_instance_t *p_instance, char *psz_name,
     for( n = 0; n < i_options; n++ )
         TAB_APPEND( m.i_option, m.ppsz_option, strdup(ppsz_options[n]) );
 
-    if( vlm_Control( p_vlm, VLM_ADD_MEDIA, &m, NULL ) )
-    {
-        vlm_media_Clean( &m );
-        libvlc_exception_raise( p_exception, "Media %s creation failed", psz_name );
-    }
+    n = vlm_Control( p_vlm, VLM_ADD_MEDIA, &m, NULL );
     vlm_media_Clean( &m );
+    if( n )
+        libvlc_exception_raise( p_exception, "Media %s creation failed", psz_name );
 #else
     libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
     return VLC_EGENERIC;
