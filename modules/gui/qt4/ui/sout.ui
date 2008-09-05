@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>644</width>
-    <height>799</height>
+    <height>843</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -22,14 +22,14 @@
      <layout class="QHBoxLayout" >
       <item>
        <layout class="QGridLayout" >
-        <item row="0" column="0" colspan="3" >
+        <item row="0" column="1" colspan="2" >
          <widget class="QCheckBox" name="localOutput" >
           <property name="text" >
            <string>_("Play locally")</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="3" >
+        <item row="1" column="1" colspan="2" >
          <widget class="QCheckBox" name="fileOutput" >
           <property name="contextMenuPolicy" >
            <enum>Qt::NoContextMenu</enum>
@@ -82,7 +82,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="3" >
+        <item row="2" column="1" colspan="2" >
          <widget class="QCheckBox" name="HTTPOutput" >
           <property name="text" >
            <string>HTTP</string>
@@ -147,7 +147,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0" colspan="3" >
+        <item row="3" column="1" colspan="2" >
          <widget class="QCheckBox" name="MMSHOutput" >
           <property name="text" >
            <string>MMSH</string>
@@ -209,7 +209,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0" colspan="3" >
+        <item row="4" column="1" colspan="2" >
          <widget class="QCheckBox" name="RTPOutput" >
           <property name="text" >
            <string>RTP</string>
@@ -367,7 +367,7 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="0" colspan="3" >
+        <item row="7" column="1" colspan="2" >
          <widget class="QCheckBox" name="IcecastOutput" >
           <property name="text" >
            <string>IceCast</string>
@@ -465,6 +465,9 @@
         </item>
         <item rowspan="2" row="5" column="2" >
          <widget class="QLabel" name="UDPRTPLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy" >
            <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
             <horstretch>0</horstretch>
@@ -473,7 +476,7 @@
           </property>
           <property name="maximumSize" >
            <size>
-            <width>83</width>
+            <width>100</width>
             <height>16777215</height>
            </size>
           </property>
@@ -498,6 +501,12 @@
          <widget class="QCheckBox" name="UDPOutput" >
           <property name="enabled" >
            <bool>false</bool>
+          </property>
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <property name="toolTip" >
            <string>_("Using this option is not recommended in most of the cases.")</string>
@@ -545,8 +554,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>628</width>
-        <height>135</height>
+        <width>622</width>
+        <height>151</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -640,8 +649,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>624</width>
-        <height>129</height>
+        <width>622</width>
+        <height>151</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -737,8 +746,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>624</width>
-        <height>129</height>
+        <width>622</width>
+        <height>151</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -837,8 +846,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>624</width>
-        <height>129</height>
+        <width>622</width>
+        <height>151</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -946,6 +955,13 @@
          <widget class="QLabel" name="ttlLabel" >
           <property name="text" >
            <string>_("Time-To-Live (TTL)")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2" >
+         <widget class="QCheckBox" name="soutKeep" >
+          <property name="text" >
+           <string>_("Keep stream output open")</string>
           </property>
          </widget>
         </item>

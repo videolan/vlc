@@ -85,6 +85,7 @@ struct sout_gui_descr_t
     /* Misc */
     bool b_sap;   /*< send SAP announcement */
     bool b_all_es;/*< send all elementary streams from source stream */
+    bool b_sout_keep;
     char *psz_group;    /*< SAP Group name */
     char *psz_name;     /*< SAP name */
     int32_t i_ttl;      /*< Time To Live (TTL) for network traversal */
@@ -255,7 +256,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     CB( PSMux ); CB( TSMux ); CB( MPEG1Mux ); CB( OggMux ); CB( ASFMux );
     CB( MP4Mux ); CB( MOVMux ); CB( WAVMux ); CB( RAWMux ); CB( FLVMux );
     /* Misc */
-    CB( soutAll ); CS( ttl ); CT( sapName ); CT( sapGroup );
+    CB( soutAll ); CB( soutKeep );  CS( ttl ); CT( sapName ); CT( sapGroup );
 
     CONNECT( ui.profileBox, activated( const QString & ), this, setOptions() );
     CONNECT( ui.fileSelectButton, clicked() , this, fileBrowse()  );
@@ -389,6 +390,7 @@ void SoutDialog::toggleSout()
     HIDEORSHOW( ui.sap ); HIDEORSHOW( ui.sapName );
     HIDEORSHOW( ui.sapGroup ); HIDEORSHOW( ui.sapGroupLabel );
     HIDEORSHOW( ui.ttlLabel ); HIDEORSHOW( ui.ttl );
+    HIDEORSHOW( ui.soutKeep );
 
     HIDEORSHOW( ui.IcecastOutput ); HIDEORSHOW( ui.IcecastEdit );
     HIDEORSHOW( ui.IcecastNamePassEdit ); HIDEORSHOW( ui.IcecastMountpointEdit );
@@ -436,6 +438,7 @@ void SoutDialog::RTPtoggled( bool b_en )
     ui.RTPLabel->setEnabled( b_en );
     ui.RTPEdit->setEnabled( b_en );
     ui.UDPOutput->setEnabled( b_en );
+    ui.UDPRTPLabel->setEnabled( b_en );
     ui.UDPEdit->setEnabled( b_en );
     ui.UDPPort->setEnabled( b_en );
     ui.UDPPortLabel->setEnabled( b_en );
@@ -471,6 +474,7 @@ void SoutDialog::updateMRL()
     sout.b_dump = ui.rawInput->isChecked();
     sout.b_sap = ui.sap->isChecked();
     sout.b_all_es = ui.soutAll->isChecked();
+    sout.b_sout_keep = ui.soutKeep->isChecked();
     sout.psz_vcodec = strdup( qtu( ui.vCodecBox->itemData( ui.vCodecBox->currentIndex() ).toString() ) );
     sout.psz_acodec = strdup( qtu( ui.aCodecBox->itemData( ui.aCodecBox->currentIndex() ).toString() ) );
     sout.psz_scodec = strdup( qtu( ui.subsCodecBox->itemData( ui.subsCodecBox->currentIndex() ).toString() ) );
@@ -692,6 +696,9 @@ void SoutDialog::updateMRL()
 
     if ( sout.b_all_es )
         mrl.append( " :sout-all" );
+
+    if ( sout.b_sout_keep )
+        mrl.append( " :sout-keep" );
 
     ui.mrlEdit->setText( mrl );
     free( sout.psz_acodec ); free( sout.psz_vcodec ); free( sout.psz_scodec );
