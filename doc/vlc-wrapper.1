@@ -16,7 +16,7 @@
 .\" .sp <n>    insert n+1 empty lines
 .\" for manpage-specific macros, see man(7)
 .SH NAME
-vlc-wrapper
+vlc-wrapper \- a wrapper to drop priviledges with VLC
 .SH SYNOPSIS
 .B vlc-wrapper
 .RI [ OPTIONS ]
@@ -37,15 +37,11 @@ The preferred way is to use
 .B sudo
 :
 .PP
-.Vb 1
 \& $ sudo vlc-wrapper --option1 --option2
-.Ve
 .PP
 You can also set the SUDO_UID environement variable:
 .PP
-.Vb 1
 \& # SUDO_UID=1000 vlc-wrapper --option1 --option2
-.Ve
 .PP
 
 
