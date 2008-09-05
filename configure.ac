@@ -275,6 +275,7 @@ case "${host_os}" in
     AC_ARG_WITH(macosx-sdk,
        [  --with-macosx-sdk=DIR   compile using the SDK in DIR])
     if test "${with_macosx_sdk}" != "" ; then
+        CPP="${CPP} -isysroot ${with_macosx_sdk}" 
         CC="${CC} -isysroot ${with_macosx_sdk}" 
         CXX="${CXX} -isysroot ${with_macosx_sdk}"
         OBJC="${OBJC} -isysroot ${with_macosx_sdk}"
@@ -283,6 +284,7 @@ case "${host_os}" in
     AC_ARG_WITH(macosx-version-min,
        [  --with-macosx-version-min=VERSION  compile for MacOSX VERSION and above])
     if test "${with_macosx_version_min}" != "" ; then
+        CPP="${CPP} -mmacosx-version-min=${with_macosx_version_min}" 
         CC="${CC} -mmacosx-version-min=${with_macosx_version_min}" 
         CXX="${CXX} -mmacosx-version-min=${with_macosx_version_min}"
         OBJC="${OBJC} -mmacosx-version-min=${with_macosx_version_min}"
