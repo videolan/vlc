@@ -914,6 +914,7 @@ void ControlsWidget::updateInput()
 {
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
+    enableVideo( THEMIM->getIM()->hasVideo() );
 }
 
 void ControlsWidget::setStatus( int status )

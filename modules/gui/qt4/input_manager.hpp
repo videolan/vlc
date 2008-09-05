@@ -71,7 +71,7 @@ public:
     void delInput();
     bool hasInput() { return p_input && !p_input->b_dead && vlc_object_alive (p_input); }
     bool hasAudio();
-    bool hasVideo();
+    bool hasVideo() { return hasInput() && b_video; }
 
     QString getName() { return old_name; }
 
@@ -84,6 +84,7 @@ private:
     QString         artUrl;
     int             i_rate;
     bool            b_transparentTelextext;
+    bool            b_video;
 
     void customEvent( QEvent * );
     void addCallbacks();

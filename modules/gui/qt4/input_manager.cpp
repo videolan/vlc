@@ -69,6 +69,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     p_input      = NULL;
     i_rate       = 0;
     i_input_id   = 0;
+    b_video      = false;
     b_transparentTelextext = false;
 }
 
@@ -117,6 +118,7 @@ void InputManager::delInput()
         i_input_id = 0;
         old_name   = "";
         artUrl     = "";
+        b_video    = false;
         emit positionUpdated( -1.0, 0 ,0 );
         emit statusChanged( END_S );
         emit nameChanged( "" );
@@ -350,18 +352,6 @@ bool InputManager::hasAudio()
     return false;
 }
 
-bool InputManager::hasVideo()
-{
-    if( hasInput() )
-    {
-        vlc_value_t val;
-        var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        return val.i_int > 0;
-    }
-    return false;
-
-}
-
 void InputManager::UpdateSPU()
 {
     UpdateTeletext();
@@ -380,10 +370,10 @@ void InputManager::UpdateVout()
     if( hasInput() )
     {
         vlc_object_t *p_vout = (vlc_object_t*)vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
-        bool b_vout = p_vout != NULL;
+        b_video = p_vout != NULL;
         if( p_vout )
             vlc_object_release( p_vout );
-        emit voutChanged( b_vout );
+        emit voutChanged( b_video );
     }
 }
 
