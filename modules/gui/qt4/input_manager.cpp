@@ -369,11 +369,14 @@ void InputManager::UpdateVout()
 {
     if( hasInput() )
     {
+        bool b_old_video = b_video;
+
         vlc_object_t *p_vout = (vlc_object_t*)vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
         b_video = p_vout != NULL;
         if( p_vout )
             vlc_object_release( p_vout );
-        emit voutChanged( b_video );
+        if( !!b_old_video != !!b_video )
+            emit voutChanged( b_video );
     }
 }
 
