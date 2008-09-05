@@ -38,7 +38,6 @@
  *****************************************************************************/
 static void VariablesInit( playlist_t *p_playlist );
 static void playlist_Destructor( vlc_object_t * p_this );
-static void playlist_Destructor( vlc_object_t * p_this );
 
 static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval, void *a )
