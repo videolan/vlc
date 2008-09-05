@@ -2556,7 +2556,6 @@ vlc_module_begin();
         change_unsaveable();
     add_bool( "list-verbose", false, NULL, LIST_VERBOSE_TEXT, "",
               false );
-        change_short( 'L' );
         change_internal();
         change_unsaveable();
     add_string( "module", NULL, NULL, MODULE_TEXT, "", false );
