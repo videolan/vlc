@@ -193,10 +193,7 @@ void MetaPanel::update( input_item_t *p_item )
     /* URL / URI */
     psz_meta = input_item_GetURL( p_item );
     if( !EMPTY_STR( psz_meta ) )
-    {
         emit uriSet( QString( psz_meta ) );
-        free( psz_meta );
-    }
     else
     {
         free( psz_meta );
@@ -204,6 +201,7 @@ void MetaPanel::update( input_item_t *p_item )
         if( !EMPTY_STR( psz_meta ) )
             emit uriSet( QString( psz_meta ) );
     }
+    free( psz_meta );
 
     /* Other classic though */
     UPDATE_META( Artist, artist_text );
