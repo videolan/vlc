@@ -855,7 +855,7 @@ AC_EGREP_HEADER(timespec,sys/time.h,[
 
 dnl Check for threads library
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-AC_CHECK_HEADERS(pthread.h kernel/scheduler.h kernel/OS.h)
+AC_CHECK_HEADERS(pthread.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Find where are the X headers and libraries

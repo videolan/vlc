@@ -40,11 +40,6 @@
 #   include <process.h>                                         /* Win32 API */
 #   include <errno.h>
 
-#elif defined( SYS_BEOS )                                            /* BeOS */
-#   include <kernel/OS.h>
-#   include <kernel/scheduler.h>
-#   include <byteorder.h>
-
 #else                                         /* pthreads (like Linux & BSD) */
 #   define LIBVLC_USE_PTHREAD 1
 #   define LIBVLC_USE_PTHREAD_CANCEL 1
@@ -71,14 +66,6 @@
 #   define VLC_THREAD_PRIORITY_VIDEO    0
 #   define VLC_THREAD_PRIORITY_OUTPUT  22
 #   define VLC_THREAD_PRIORITY_HIGHEST 22
-
-#elif defined(SYS_BEOS)
-#   define VLC_THREAD_PRIORITY_LOW 5
-#   define VLC_THREAD_PRIORITY_INPUT 10
-#   define VLC_THREAD_PRIORITY_AUDIO 10
-#   define VLC_THREAD_PRIORITY_VIDEO 5
-#   define VLC_THREAD_PRIORITY_OUTPUT 15
-#   define VLC_THREAD_PRIORITY_HIGHEST 15
 
 #elif defined(LIBVLC_USE_PTHREAD)
 #   define VLC_THREAD_PRIORITY_LOW      0
@@ -133,29 +120,6 @@ typedef struct
 typedef HANDLE  vlc_mutex_t;
 typedef HANDLE  vlc_cond_t;
 typedef DWORD   vlc_threadvar_t;
-
-#elif defined( SYS_BEOS )
-/* This is the BeOS implementation of the vlc threads, note that the mutex is
- * not a real mutex and the cond_var is not like a pthread cond_var but it is
- * enough for what we need */
-
-typedef thread_id vlc_thread_t;
-
-typedef struct
-{
-    int32_t         init;
-    sem_id          lock;
-} vlc_mutex_t;
-
-typedef struct
-{
-    int32_t         init;
-    thread_id       thread;
-} vlc_cond_t;
-
-typedef struct
-{
-} vlc_threadvar_t;
 
 #endif
 
@@ -230,9 +194,6 @@ static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
 
     WaitForSingleObject( *p_mutex, INFINITE );
 
-#elif defined( SYS_BEOS )
-    acquire_sem( p_mutex->lock );
-
 #endif
 }
 
@@ -262,9 +223,6 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
     (void)psz_file; (void)i_line;
 
     ReleaseMutex( *p_mutex );
-
-#elif defined( SYS_BEOS )
-    release_sem( p_mutex->lock );
 
 #endif
 }
@@ -410,28 +368,6 @@ static inline void __vlc_cond_signal( const char * psz_file, int i_line,
      * as documented in http://support.microsoft.com/kb/q173260/ */
     PulseEvent( *p_condvar );
 
-#elif defined( SYS_BEOS )
-    while( p_condvar->thread != -1 )
-    {
-        thread_info info;
-        if( get_thread_info(p_condvar->thread, &info) == B_BAD_VALUE )
-            return;
-
-        if( info.state != B_THREAD_SUSPENDED )
-        {
-            /* The  waiting thread is not suspended so it could
-             * have been interrupted beetwen the unlock and the
-             * suspend_thread line. That is why we sleep a little
-             * before retesting p_condver->thread. */
-            snooze( 10000 );
-        }
-        else
-        {
-            /* Ok, we have to wake up that thread */
-            resume_thread( p_condvar->thread );
-        }
-    }
-
 #endif
 }
 
@@ -471,17 +407,6 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     vlc_testcancel ();
 
     (void)psz_file; (void)i_line;
-
-#elif defined( SYS_BEOS )
-    /* The p_condvar->thread var is initialized before the unlock because
-     * it enables to identify when the thread is interrupted beetwen the
-     * unlock line and the suspend_thread line */
-    p_condvar->thread = find_thread( NULL );
-    vlc_mutex_unlock( p_mutex );
-    suspend_thread( p_condvar->thread );
-    p_condvar->thread = -1;
-
-    vlc_mutex_lock( p_mutex );
 
 #endif
 }
@@ -546,9 +471,6 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     }
     return ETIMEDOUT;
 
-#elif defined( SYS_BEOS )
-#   error Unimplemented
-
 #endif
 }
 
@@ -568,9 +490,6 @@ static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
 #if defined(LIBVLC_USE_PTHREAD)
     i_ret = pthread_setspecific( *p_tls, p_value );
 
-#elif defined( SYS_BEOS )
-    i_ret = EINVAL;
-
 #elif defined( UNDER_CE ) || defined( WIN32 )
     i_ret = TlsSetValue( *p_tls, p_value ) ? EINVAL : 0;
 
@@ -588,9 +507,6 @@ static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
 
 #if defined(LIBVLC_USE_PTHREAD)
     p_ret = pthread_getspecific( *p_tls );
-
-#elif defined( SYS_BEOS )
-    p_ret = NULL;
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
     p_ret = TlsGetValue( *p_tls );

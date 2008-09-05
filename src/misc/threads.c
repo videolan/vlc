@@ -266,27 +266,6 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     *p_mutex = CreateMutex( 0, FALSE, 0 );
     return (*p_mutex != NULL) ? 0 : ENOMEM;
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    /* check the arguments and whether it's already been initialized */
-    if( p_mutex == NULL )
-    {
-        return B_BAD_VALUE;
-    }
-
-    if( p_mutex->init == 9999 )
-    {
-        return EALREADY;
-    }
-
-    p_mutex->lock = create_sem( 1, "BeMutex" );
-    if( p_mutex->lock < B_NO_ERROR )
-    {
-        return( -1 );
-    }
-
-    p_mutex->init = 9999;
-    return B_OK;
-
 #endif
 }
 
@@ -337,12 +316,6 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
 
     CloseHandle( *p_mutex );
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    if( p_mutex->init == 9999 )
-        delete_sem( p_mutex->lock );
-
-    p_mutex->init = 0;
-
 #endif
 }
 
@@ -380,21 +353,6 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
                               NULL ); /* unnamed */
     return *p_condvar ? 0 : ENOMEM;
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    if( !p_condvar )
-    {
-        return B_BAD_VALUE;
-    }
-
-    if( p_condvar->init == 9999 )
-    {
-        return EALREADY;
-    }
-
-    p_condvar->thread = -1;
-    p_condvar->init = 9999;
-    return 0;
-
 #endif
 }
 
@@ -411,9 +369,6 @@ void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condva
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
     CloseHandle( *p_condvar );
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    p_condvar->init = 0;
 
 #endif
 }
@@ -567,10 +522,6 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         free (th);
     }
 
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    *p_handle = spawn_thread( entry, psz_name, priority, data );
-    ret = resume_thread( *p_handle );
-
 #endif
     return ret;
 }
@@ -628,12 +579,6 @@ void vlc_join (vlc_thread_t handle, void **result)
     if (result)
         *result = handle->data;
     free (handle);
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    int32_t exit_value;
-    int val = (B_OK == wait_for_thread( p_priv->thread_id, &exit_value ));
-    if( !val && result )
-        *result = (void *)exit_value;
 
 #endif
 }
