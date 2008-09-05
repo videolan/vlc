@@ -37,7 +37,6 @@ libvlc_LTLIBRARIES += \
 	liba52sys_plugin.la \
 	libaiff_plugin.la \
 	libau_plugin.la \
-	libcdg_plugin.la \
 	libdemux_cdg_plugin.la \
 	libdemuxdump_plugin.la \
 	libdtssys_plugin.la \
