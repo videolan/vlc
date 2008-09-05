@@ -174,7 +174,6 @@ public:
     QPushButton *playlistButton;
     void setStatus( int );
     void enableInput( bool );
-    void enableVideo( bool );
 public slots:
     void setNavigation( int );
 protected:
@@ -216,6 +215,7 @@ protected slots:
     void toggleTeletext();
     void toggleTeletextTransparency();
     void enableTeletext( bool );
+    void enableVideo( bool );
 signals:
     void advancedControlsToggled( bool );
 };

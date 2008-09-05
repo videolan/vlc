@@ -44,6 +44,7 @@ static int const ItemRateChanged_Type    = QEvent::User + IMEventType + 5;
 static int const VolumeChanged_Type      = QEvent::User + IMEventType + 6;
 static int const ItemSpuChanged_Type     = QEvent::User + IMEventType + 7;
 static int const ItemTeletextChanged_Type= QEvent::User + IMEventType + 8;
+static int const InterfaceVoutUpdate_Type= QEvent::User + IMEventType + 9;
 
 static int const FullscreenControlToggle_Type = QEvent::User + IMEventType + 10;
 static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 11;
@@ -95,6 +96,7 @@ private:
     void UpdateSPU();
     void UpdateTeletext();
     void UpdateArt();
+    void UpdateVout();
 
 public slots:
     void setInput( input_thread_t * ); ///< Our controlled input changed
@@ -129,6 +131,8 @@ signals:
     void setNewTelexPage( int );
     /// Advanced buttons
     void advControlsSetIcon();
+    /// Vout
+    void voutChanged( bool );
 };
 
 class MainInputManager : public QObject
