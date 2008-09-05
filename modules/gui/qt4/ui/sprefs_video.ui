@@ -50,9 +50,6 @@
         <property name="checked" >
          <bool>true</bool>
         </property>
-        <property name="tristate" >
-         <bool>true</bool>
-        </property>
        </widget>
       </item>
       <item row="0" column="0" colspan="2" >
