@@ -256,15 +256,19 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_demux, "cannot set PGC positioning flag" );
     }
 
-    /* Set menu language ("en")
-     * XXX: maybe it would be better to set it like audio/spu
-     * or to create a --menu-language option */
-    if( dvdnav_menu_language_select( p_sys->dvdnav, (char*)LANGUAGE_DEFAULT ) !=
+    /* Set menu language
+     * XXX A menu-language may be better than sub-language */
+    psz_code = DemuxGetLanguageCode( p_demux, "sub-language" );
+    if( dvdnav_menu_language_select( p_sys->dvdnav, psz_code ) !=
         DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "can't set menu language to '%s' (%s)",
-                  LANGUAGE_DEFAULT, dvdnav_err_to_string( p_sys->dvdnav ) );
+                  psz_code, dvdnav_err_to_string( p_sys->dvdnav ) );
+        /* We try to fall back to 'en' */
+        if( strcmp( psz_code, LANGUAGE_DEFAULT ) )
+            dvdnav_menu_language_select( p_sys->dvdnav, (char*)LANGUAGE_DEFAULT );
     }
+    free( psz_code );
 
     /* Set audio language */
     psz_code = DemuxGetLanguageCode( p_demux, "audio-language" );
