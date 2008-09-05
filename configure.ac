@@ -1093,40 +1093,6 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-VLC_ADD_PLUGIN([dummy])
-VLC_ADD_PLUGIN([stats])
-VLC_ADD_PLUGIN([logger])
-VLC_ADD_PLUGIN([memcpy])
-dnl Demuxers:
-VLC_ADD_PLUGIN([mpgv])
-VLC_ADD_PLUGIN([mpga])
-VLC_ADD_PLUGIN([m4v])
-VLC_ADD_PLUGIN([m4a])
-VLC_ADD_PLUGIN([h264])
-VLC_ADD_PLUGIN([cdg])
-VLC_ADD_PLUGIN([ps])
-VLC_ADD_PLUGIN([avi])
-VLC_ADD_PLUGIN([asf])
-VLC_ADD_PLUGIN([mp4])
-dnl Text codecs:
-VLC_ADD_PLUGIN([cvdsub])
-VLC_ADD_PLUGIN([svcdsub])
-VLC_ADD_PLUGIN([spudec])
-VLC_ADD_PLUGIN([subsdec])
-VLC_ADD_PLUGIN([subsusf])
-VLC_ADD_PLUGIN([t140])
-VLC_ADD_PLUGIN([dvbsub])
-VLC_ADD_PLUGIN([cc])
-dnl Video codecs:
-dnl Audio codecs:
-VLC_ADD_PLUGIN([araw])
-VLC_ADD_PLUGIN([adpcm])
-VLC_ADD_PLUGIN([mpeg_audio])
-VLC_ADD_PLUGIN([lpcm])
-VLC_ADD_PLUGIN([a52])
-VLC_ADD_PLUGIN([dts])
-VLC_ADD_PLUGIN([flac])
-VLC_ADD_PLUGIN([aes3])
 dnl Video filters:
 VLC_ADD_PLUGIN([deinterlace])
 VLC_ADD_PLUGIN([invert])
@@ -1156,29 +1122,6 @@ VLC_ADD_PLUGIN([puzzle])
 VLC_ADD_PLUGIN([colorthres])
 VLC_ADD_PLUGIN([scene])
 VLC_ADD_PLUGIN([yuv])
-dnl Meta demuxers:
-VLC_ADD_PLUGIN([playlist])
-VLC_ADD_PLUGIN([export])
-VLC_ADD_PLUGIN([nsc])
-VLC_ADD_PLUGIN([xtag])
-dnl Channel mixing audio filters:
-VLC_ADD_PLUGIN([converter_fixed])
-VLC_ADD_PLUGIN([mono])
-VLC_ADD_PLUGIN([trivial_channel_mixer])
-dnl Resampling audio filters:
-VLC_ADD_PLUGIN([trivial_resampler])
-VLC_ADD_PLUGIN([ugly_resampler])
-dnl Audio mixers:
-VLC_ADD_PLUGIN([trivial_mixer])
-dnl Video chromas:
-VLC_ADD_PLUGIN([i420_rgb])
-VLC_ADD_PLUGIN([grey_yuv])
-dnl Video codecs:
-VLC_ADD_PLUGIN([rawvideo])
-dnl Access filters:
-VLC_ADD_PLUGIN([access_filter_timeshift])
-VLC_ADD_PLUGIN([access_filter_dump])
-VLC_ADD_PLUGIN([access_filter_bandwidth])
 
 ALIASES="${ALIASES} cvlc"
 

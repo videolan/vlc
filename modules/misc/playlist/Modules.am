@@ -5,3 +5,5 @@ SOURCES_export = \
 	xspf.h \
 	old.c \
 	$(NULL)
+
+libvlc_LTLIBRARIES += libexport_plugin.la

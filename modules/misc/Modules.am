@@ -24,6 +24,9 @@ SOURCES_svg = svg.c
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
 
+libvlc_LTLIBRARIES += \
+	liblogger_plugin.la
+
 if ENABLE_SOUT
 libvlc_LTLIBRARIES += \
 	libvod_rtsp_plugin.la \

@@ -21,3 +21,4 @@ SOURCES_memcpyaltivec = \
 	memcpyaltivec.c \
 	$(NULL)
 
+libvlc_LTLIBRARIES += libmemcpy_plugin.la

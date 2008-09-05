@@ -1,2 +1,4 @@
 SOURCES_xtag = xtag.c
 SOURCES_xml = libxml.c
+
+libvlc_LTLIBRARIES += libxtag_plugin.la

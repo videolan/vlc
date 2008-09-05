@@ -10,3 +10,4 @@ SOURCES_dummy = \
 	renderer.c \
 	$(NULL)
 
+libvlc_LTLIBRARIES += libdummy_plugin.la

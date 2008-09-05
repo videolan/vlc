@@ -3,3 +3,8 @@ SOURCES_simple_channel_mixer = simple.c
 SOURCES_headphone_channel_mixer = headphone.c
 SOURCES_dolby_surround_decoder = dolby.c
 SOURCES_mono = mono.c
+
+libvlc_LTLIBRARIES += \
+	libmono_plugin.la \
+	libtrivial_channel_mixer_plugin.la \
+	$(NULL)

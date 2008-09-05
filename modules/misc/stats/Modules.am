@@ -7,3 +7,4 @@ SOURCES_stats = \
 	vout.c \
 	$(NULL)
 
+libvlc_LTLIBRARIES += libstats_plugin.la
