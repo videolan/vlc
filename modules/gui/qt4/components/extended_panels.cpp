@@ -343,6 +343,10 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
     if( THEMIM->getInput() )
         p_vout = ( vout_thread_t * )vlc_object_find( THEMIM->getInput(),
                 VLC_OBJECT_VOUT, FIND_CHILD );
+    /* If you have stopped the video, p_vout is still at its old value */
+    else
+        p_vout = NULL;
+
     if( p_vout )
     {
         if( !strcmp( psz_filter_type, "sub-filter" ) )
