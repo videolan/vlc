@@ -328,6 +328,12 @@ const char *module_GetHelp( const module_t *m )
  * module Need
  *
  * Return the best module function, given a capability list.
+ *
+ * If the p_this object doesn't have it's psz_object_name set, then
+ * psz_object_name will be set to the module's name, unless the user
+ * provided an alias using the "module name@alias" syntax in which case
+ * psz_object_name will be set to the alias.
+ *
  * \param p_this the vlc object
  * \param psz_capability list of capabilities needed
  * \param psz_name name of the module asked
