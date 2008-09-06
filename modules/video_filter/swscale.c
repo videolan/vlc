@@ -43,6 +43,8 @@
 /* Gruikkkkkkkkkk!!!!! */
 #include "../codec/avcodec/chroma.h"
 
+#define AVPALETTE_SIZE (256 * sizeof(uint32_t))
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -490,13 +492,25 @@ static void CopyPad( picture_t *p_dst, const picture_t *p_src )
     }
 }
 
-static void Convert( struct SwsContext *ctx,
+static void Convert( filter_t *p_filter, struct SwsContext *ctx,
                      picture_t *p_dst, picture_t *p_src, int i_height, int i_plane_start, int i_plane_count )
 {
+    uint8_t palette[AVPALETTE_SIZE];
+
     uint8_t *src[3]; int src_stride[3];
     uint8_t *dst[3]; int dst_stride[3];
 
     GetPixels( src, src_stride, p_src, i_plane_start, i_plane_count );
+    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'P' ) )
+    {
+        memset( palette, 0, sizeof(palette) );
+        if( p_filter->fmt_in.video.p_palette )
+            memcpy( palette, p_filter->fmt_in.video.p_palette->palette,
+                    __MIN( sizeof(video_palette_t), AVPALETTE_SIZE ) );
+        src[1] = palette;
+        src_stride[1] = 4;
+    }
+
     GetPixels( dst, dst_stride, p_dst, i_plane_start, i_plane_count );
 
 #if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
@@ -549,7 +563,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( p_sys->b_copy )
         picture_CopyPixels( p_dst, p_src );
     else
-        Convert( p_sys->ctx, p_dst, p_src, p_fmti->i_height, 0, 3 );
+        Convert( p_filter, p_sys->ctx, p_dst, p_src, p_fmti->i_height, 0, 3 );
     if( p_sys->ctxA )
     {
         /* We extract the A plane to rescale it, and then we reinject it. */
@@ -558,7 +572,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
 
-        Convert( p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_height, 0, 1 );
+        Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_height, 0, 1 );
         if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
             InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height );
         else
