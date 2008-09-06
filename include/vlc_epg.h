@@ -85,6 +85,7 @@ static inline void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_du
     TAB_APPEND_CPP( vlc_epg_event_t, p_epg->i_event, p_epg->pp_event, p_evt );
 }
 
+LIBVLC_USED
 static inline vlc_epg_t *vlc_epg_New( const char *psz_name )
 {
     vlc_epg_t *p_epg = (vlc_epg_t*)malloc( sizeof(vlc_epg_t) );

@@ -375,10 +375,10 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
 VLC_EXPORT( void, aout_DateInit, ( audio_date_t *, uint32_t ) );
 VLC_EXPORT( void, aout_DateSet, ( audio_date_t *, mtime_t ) );
 VLC_EXPORT( void, aout_DateMove, ( audio_date_t *, mtime_t ) );
-VLC_EXPORT( mtime_t, aout_DateGet, ( const audio_date_t * ) );
+VLC_EXPORT( mtime_t, aout_DateGet, ( const audio_date_t * ) LIBVLC_USED);
 VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, uint32_t ) );
 
-VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, bool ) );
+VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, bool ) LIBVLC_USED );
 
 /**
  * This function computes the reordering needed to go from pi_chan_order_in to
@@ -389,14 +389,14 @@ VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t
 VLC_EXPORT( int, aout_CheckChannelReorder, ( const uint32_t *pi_chan_order_in, const uint32_t *pi_chan_order_out, uint32_t i_channel_mask, int i_channels, int *pi_chan_table ) );
 VLC_EXPORT( void, aout_ChannelReorder, ( uint8_t *, int, int, const int *, int ) );
 
-VLC_EXPORT( unsigned int, aout_FormatNbChannels, ( const audio_sample_format_t * p_format ) );
-VLC_EXPORT( unsigned int, aout_BitsPerSample, ( vlc_fourcc_t i_format ) );
+VLC_EXPORT( unsigned int, aout_FormatNbChannels, ( const audio_sample_format_t * p_format ) LIBVLC_USED );
+VLC_EXPORT( unsigned int, aout_BitsPerSample, ( vlc_fourcc_t i_format ) LIBVLC_USED );
 VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatPrint, ( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format ) );
-VLC_EXPORT( const char *, aout_FormatPrintChannels, ( const audio_sample_format_t * ) );
+VLC_EXPORT( const char *, aout_FormatPrintChannels, ( const audio_sample_format_t * ) LIBVLC_USED );
 
-VLC_EXPORT( mtime_t, aout_FifoFirstDate, ( aout_instance_t *, aout_fifo_t * ) );
-VLC_EXPORT( aout_buffer_t *, aout_FifoPop, ( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) );
+VLC_EXPORT( mtime_t, aout_FifoFirstDate, ( aout_instance_t *, aout_fifo_t * ) LIBVLC_USED );
+VLC_EXPORT( aout_buffer_t *, aout_FifoPop, ( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) LIBVLC_USED );
 
 /* From intf.c : */
 VLC_EXPORT( void, aout_VolumeSoftInit, ( aout_instance_t * ) );

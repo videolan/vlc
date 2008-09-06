@@ -200,12 +200,12 @@ struct module_config_t
  * Prototypes - these methods are used to get, set or manipulate configuration
  * data.
  *****************************************************************************/
-VLC_EXPORT( int,    __config_GetType,  (vlc_object_t *, const char *) );
-VLC_EXPORT( int,    __config_GetInt,   (vlc_object_t *, const char *) );
+VLC_EXPORT( int,    __config_GetType,  (vlc_object_t *, const char *) LIBVLC_USED );
+VLC_EXPORT( int,    __config_GetInt,   (vlc_object_t *, const char *) LIBVLC_USED );
 VLC_EXPORT( void,   __config_PutInt,   (vlc_object_t *, const char *, int) );
-VLC_EXPORT( float,  __config_GetFloat, (vlc_object_t *, const char *) );
+VLC_EXPORT( float,  __config_GetFloat, (vlc_object_t *, const char *) LIBVLC_USED );
 VLC_EXPORT( void,   __config_PutFloat, (vlc_object_t *, const char *, float) );
-VLC_EXPORT( char *, __config_GetPsz,   (vlc_object_t *, const char *) );
+VLC_EXPORT( char *, __config_GetPsz,   (vlc_object_t *, const char *) LIBVLC_USED );
 VLC_EXPORT( void,   __config_PutPsz,   (vlc_object_t *, const char *, const char *) );
 
 #define config_SaveConfigFile(a,b) __config_SaveConfigFile(VLC_OBJECT(a),b)
@@ -213,18 +213,18 @@ VLC_EXPORT( int,    __config_SaveConfigFile, ( vlc_object_t *, const char * ) );
 #define config_ResetAll(a) __config_ResetAll(VLC_OBJECT(a))
 VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
 
-VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) );
+VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) LIBVLC_USED );
 
-VLC_EXPORT(const char *, config_GetDataDir, ( void ));
-VLC_EXPORT(const char *, config_GetConfDir, ( void ) );
-VLC_EXPORT(const char *, config_GetHomeDir, ( void ));
-VLC_EXPORT(char *, config_GetUserConfDir, ( void ) );
-VLC_EXPORT(char *, config_GetUserDataDir, ( void ) );
-VLC_EXPORT(char *, config_GetCacheDir, ( void ) );
+VLC_EXPORT(const char *, config_GetDataDir, ( void ) LIBVLC_USED);
+VLC_EXPORT(const char *, config_GetConfDir, ( void ) LIBVLC_USED);
+VLC_EXPORT(const char *, config_GetHomeDir, ( void ) LIBVLC_USED);
+VLC_EXPORT(char *, config_GetUserConfDir, ( void ) LIBVLC_USED);
+VLC_EXPORT(char *, config_GetUserDataDir, ( void ) LIBVLC_USED);
+VLC_EXPORT(char *, config_GetCacheDir, ( void ) LIBVLC_USED);
 
 VLC_EXPORT( void,       __config_AddIntf,    ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void,       __config_RemoveIntf, ( vlc_object_t *, const char * ) );
-VLC_EXPORT( bool, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
+VLC_EXPORT( bool, __config_ExistIntf,  ( vlc_object_t *, const char * ) LIBVLC_USED);
 
 #define config_GetType(a,b) __config_GetType(VLC_OBJECT(a),b)
 #define config_GetInt(a,b) __config_GetInt(VLC_OBJECT(a),b)
@@ -298,7 +298,7 @@ VLC_EXPORT( char *, config_StringUnescape, ( char *psz_string ) );
  *
  * The escaped characters are ' " and \
  */
-VLC_EXPORT( char *, config_StringEscape, ( const char *psz_string ) );
+VLC_EXPORT( char *, config_StringEscape, ( const char *psz_string ) LIBVLC_USED);
 
 # ifdef __cplusplus
 }

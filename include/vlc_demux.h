@@ -157,6 +157,7 @@ VLC_EXPORT( int,       demux_vaControlHelper, ( stream_t *, int64_t i_start, int
  * Miscellaneous helpers for demuxers
  *************************************************************************/
 
+LIBVLC_USED
 static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_extension )
 {
     const char *psz_ext = strrchr ( p_demux->psz_path, '.' );
@@ -165,6 +166,7 @@ static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_exte
     return true;
 }
 
+LIBVLC_USED
 static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
 {
    if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, psz_name ) )

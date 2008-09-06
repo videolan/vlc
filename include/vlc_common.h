@@ -598,7 +598,8 @@ VLC_EXPORT(void, __vlc_gc_init, ( gc_object_t * p_gc,
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-static inline int64_t GCD( int64_t a, int64_t b )
+LIBVLC_USED
+static inline int64_t GCD ( int64_t a, int64_t b )
 {
     while( b )
     {
@@ -610,6 +611,7 @@ static inline int64_t GCD( int64_t a, int64_t b )
 }
 
 /* function imported from libavutil/common.h */
+LIBVLC_USED
 static inline uint8_t clip_uint8_vlc( int32_t a )
 {
     if( a&(~255) ) return (-a)>>31;
@@ -636,23 +638,28 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
 
 #define EMPTY_STR(str) (!str || !*str)
 
-VLC_EXPORT( char const *, vlc_error, ( int ) );
+VLC_EXPORT( char const *, vlc_error, ( int ) LIBVLC_USED );
 
 #include <vlc_arrays.h>
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. */
+LIBVLC_USED
 static inline uint16_t U16_AT( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint16_t)p[0] << 8) | p[1] );
 }
+
+LIBVLC_USED
 static inline uint32_t U32_AT( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
               | ((uint32_t)p[2] << 8) | p[3] );
 }
+
+LIBVLC_USED
 static inline uint64_t U64_AT( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
@@ -662,17 +669,22 @@ static inline uint64_t U64_AT( const void * _p )
               | ((uint64_t)p[6] << 8) | p[7] );
 }
 
+LIBVLC_USED
 static inline uint16_t GetWLE( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint16_t)p[1] << 8) | p[0] );
 }
+
+LIBVLC_USED
 static inline uint32_t GetDWLE( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint32_t)p[3] << 24) | ((uint32_t)p[2] << 16)
               | ((uint32_t)p[1] << 8) | p[0] );
 }
+
+LIBVLC_USED
 static inline uint64_t GetQWLE( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
@@ -735,6 +747,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #define ntoh16(i) ntohs(i)
 #define ntoh32(i) ntohl(i)
 
+LIBVLC_USED
 static inline uint64_t ntoh64 (uint64_t ll)
 {
     union { uint64_t qw; uint8_t b[16]; } v = { ll };
@@ -754,9 +767,9 @@ static inline uint64_t ntoh64 (uint64_t ll)
 
 /* Stuff defined in src/extras/libc.c */
 VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
-VLC_EXPORT( long long, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
+VLC_EXPORT( long long, vlc_strtoll, ( const char *nptr, char **endptr, int base ) LIBVLC_USED );
 
-VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
+VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) LIBVLC_USED );
 char *vlc_strsep( char **, const char * );
 
 #if defined(WIN32) || defined(UNDER_CE)
@@ -823,16 +836,16 @@ VLC_EXPORT( bool, vlc_ureduce, ( unsigned *, unsigned *, uint64_t, uint64_t, uin
 
 /* vlc_wraptext (defined in src/extras/libc.c) */
 #define wraptext vlc_wraptext
-VLC_EXPORT( char *, vlc_wraptext, ( const char *, int ) );
+VLC_EXPORT( char *, vlc_wraptext, ( const char *, int ) LIBVLC_USED );
 
 /* iconv wrappers (defined in src/extras/libc.c) */
 typedef void *vlc_iconv_t;
-VLC_EXPORT( vlc_iconv_t, vlc_iconv_open, ( const char *, const char * ) );
-VLC_EXPORT( size_t, vlc_iconv, ( vlc_iconv_t, const char **, size_t *, char **, size_t * ) );
+VLC_EXPORT( vlc_iconv_t, vlc_iconv_open, ( const char *, const char * ) LIBVLC_USED );
+VLC_EXPORT( size_t, vlc_iconv, ( vlc_iconv_t, const char **, size_t *, char **, size_t * ) LIBVLC_USED );
 VLC_EXPORT( int, vlc_iconv_close, ( vlc_iconv_t ) );
 
 /* execve wrapper (defined in src/extras/libc.c) */
-VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) );
+VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) LIBVLC_USED );
 #define vlc_execve(a,b,c,d,e,f,g,h,i) __vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
 /* dir wrappers (defined in src/extras/libc.c) */
@@ -864,18 +877,18 @@ VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-VLC_EXPORT( char *, vlc_gettext, ( const char *msgid ) );
+VLC_EXPORT( char *, vlc_gettext, ( const char *msgid ) LIBVLC_USED );
 
 /*****************************************************************************
  * libvlc features
  *****************************************************************************/
-VLC_EXPORT( const char *, VLC_Version, ( void ) );
-VLC_EXPORT( const char *, VLC_CompileBy, ( void ) );
-VLC_EXPORT( const char *, VLC_CompileHost, ( void ) );
-VLC_EXPORT( const char *, VLC_CompileDomain, ( void ) );
-VLC_EXPORT( const char *, VLC_Compiler, ( void ) );
-VLC_EXPORT( const char *, VLC_Error, ( int ) );
-VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
+VLC_EXPORT( const char *, VLC_Version, ( void ) LIBVLC_USED );
+VLC_EXPORT( const char *, VLC_CompileBy, ( void ) LIBVLC_USED );
+VLC_EXPORT( const char *, VLC_CompileHost, ( void ) LIBVLC_USED );
+VLC_EXPORT( const char *, VLC_CompileDomain, ( void ) LIBVLC_USED );
+VLC_EXPORT( const char *, VLC_Compiler, ( void ) LIBVLC_USED );
+VLC_EXPORT( const char *, VLC_Error, ( int ) LIBVLC_USED );
+VLC_EXPORT( const char *, VLC_Changeset, ( void ) LIBVLC_USED );
 
 /*****************************************************************************
  * Additional vlc stuff

@@ -125,11 +125,12 @@ struct block_t
  * - block_Duplicate : create a copy of a block.
  ****************************************************************************/
 VLC_EXPORT( void,      block_Init,    ( block_t *, void *, size_t ) );
-VLC_EXPORT( block_t *, block_Alloc,   ( size_t ) );
-VLC_EXPORT( block_t *, block_Realloc, ( block_t *, ssize_t i_pre, size_t i_body ) );
+VLC_EXPORT( block_t *, block_Alloc,   ( size_t ) LIBVLC_USED );
+VLC_EXPORT( block_t *, block_Realloc, ( block_t *, ssize_t i_pre, size_t i_body ) LIBVLC_USED );
 
 #define block_New( dummy, size ) block_Alloc(size)
 
+LIBVLC_USED
 static inline block_t *block_Duplicate( block_t *p_block )
 {
     block_t *p_dup = block_Alloc( p_block->i_buffer );
@@ -152,8 +153,8 @@ static inline void block_Release( block_t *p_block )
     p_block->pf_release( p_block );
 }
 
-VLC_EXPORT( block_t *, block_mmap_Alloc, (void *addr, size_t length) );
-VLC_EXPORT( block_t *, block_File, (int fd) );
+VLC_EXPORT( block_t *, block_mmap_Alloc, (void *addr, size_t length) LIBVLC_USED );
+VLC_EXPORT( block_t *, block_File, (int fd) LIBVLC_USED );
 
 static inline void block_Cleanup (void *block)
 {
@@ -292,14 +293,14 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * block_FifoGet and block_FifoShow are cancellation points.
  ****************************************************************************/
 
-VLC_EXPORT( block_fifo_t *, block_FifoNew,      ( void ) );
+VLC_EXPORT( block_fifo_t *, block_FifoNew,      ( void ) LIBVLC_USED );
 VLC_EXPORT( void,           block_FifoRelease,  ( block_fifo_t * ) );
 VLC_EXPORT( void,           block_FifoEmpty,    ( block_fifo_t * ) );
 VLC_EXPORT( size_t,         block_FifoPut,      ( block_fifo_t *, block_t * ) );
 VLC_EXPORT( void,           block_FifoWake,     ( block_fifo_t * ) );
-VLC_EXPORT( block_t *,      block_FifoGet,      ( block_fifo_t * ) );
+VLC_EXPORT( block_t *,      block_FifoGet,      ( block_fifo_t * ) LIBVLC_USED );
 VLC_EXPORT( block_t *,      block_FifoShow,     ( block_fifo_t * ) );
-VLC_EXPORT( size_t,         block_FifoSize,     ( const block_fifo_t *p_fifo ) );
-VLC_EXPORT( size_t,         block_FifoCount,    ( const block_fifo_t *p_fifo ) );
+VLC_EXPORT( size_t,         block_FifoSize,     ( const block_fifo_t *p_fifo ) LIBVLC_USED );
+VLC_EXPORT( size_t,         block_FifoCount,    ( const block_fifo_t *p_fifo ) LIBVLC_USED );
 
 #endif /* VLC_BLOCK_H */

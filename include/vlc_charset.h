@@ -35,16 +35,16 @@
 #include <dirent.h>
 
 VLC_EXPORT( void, LocaleFree, ( const char * ) );
-VLC_EXPORT( char *, FromLocale, ( const char * ) );
-VLC_EXPORT( char *, FromLocaleDup, ( const char * ) );
-VLC_EXPORT( char *, ToLocale, ( const char * ) );
-VLC_EXPORT( char *, ToLocaleDup, ( const char * ) );
+VLC_EXPORT( char *, FromLocale, ( const char * ) LIBVLC_USED );
+VLC_EXPORT( char *, FromLocaleDup, ( const char * ) LIBVLC_USED );
+VLC_EXPORT( char *, ToLocale, ( const char * ) LIBVLC_USED );
+VLC_EXPORT( char *, ToLocaleDup, ( const char * ) LIBVLC_USED );
 
 /* TODO: move all of this to "vlc_fs.h" or something like that */
-VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, mode_t mode ) );
-VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) );
-VLC_EXPORT( DIR *, utf8_opendir, ( const char *dirname ) );
-VLC_EXPORT( char *, utf8_readdir, ( DIR *dir ) );
+VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, mode_t mode ) LIBVLC_USED );
+VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) LIBVLC_USED );
+VLC_EXPORT( DIR *, utf8_opendir, ( const char *dirname ) LIBVLC_USED );
+VLC_EXPORT( char *, utf8_readdir, ( DIR *dir ) LIBVLC_USED );
 VLC_EXPORT( int, utf8_loaddir, ( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
 VLC_EXPORT( int, utf8_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
 VLC_EXPORT( int, utf8_mkdir, ( const char *filename, mode_t mode ) );
@@ -61,9 +61,10 @@ VLC_EXPORT( int, utf8_vfprintf, ( FILE *stream, const char *fmt, va_list ap ) );
 VLC_EXPORT( int, utf8_fprintf, ( FILE *, const char *, ... ) LIBVLC_FORMAT( 2, 3 ) );
 
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
-VLC_EXPORT( const char *, IsUTF8, ( const char * ) );
+VLC_EXPORT( const char *, IsUTF8, ( const char * ) LIBVLC_USED );
 
 #ifdef WIN32
+LIBVLC_USED
 static inline char *FromWide (const wchar_t *wide)
 {
     size_t len = WideCharToMultiByte (CP_UTF8, 0, wide, -1, NULL, 0, NULL, NULL);
@@ -78,9 +79,9 @@ static inline char *FromWide (const wchar_t *wide)
 }
 #endif
 
-VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) );
+VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) LIBVLC_USED );
 
-VLC_EXPORT( double, us_strtod, ( const char *, char ** ) );
-VLC_EXPORT( double, us_atof, ( const char * ) );
+VLC_EXPORT( double, us_strtod, ( const char *, char ** ) LIBVLC_USED );
+VLC_EXPORT( double, us_atof, ( const char * ) LIBVLC_USED );
 
 #endif
