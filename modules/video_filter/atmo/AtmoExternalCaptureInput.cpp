@@ -18,7 +18,7 @@ CAtmoExternalCaptureInput::CAtmoExternalCaptureInput(CAtmoDynData *pAtmoDynData)
                            CThread(pAtmoDynData->getAtmoFilter())
 {
     m_pCurrentFramePixels = NULL;
-    vlc_cond_init( this->m_pAtmoThread, &m_WakeupCond );
+    vlc_cond_init( &m_WakeupCond );
     vlc_mutex_init( &m_WakeupLock );
     msg_Dbg( m_pAtmoThread, "CAtmoExternalCaptureInput created.");
 
@@ -142,7 +142,7 @@ DWORD CAtmoExternalCaptureInput::Execute(void)
 */
 #ifdef _ATMO_KLUDGE_
              vlc_cond_destroy( &m_WakeupCond );
-             vlc_cond_init( m_pAtmoThread, &m_WakeupCond );
+             vlc_cond_init( &m_WakeupCond );
 #endif
 #endif
           }

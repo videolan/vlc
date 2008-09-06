@@ -180,7 +180,7 @@ DWORD CAtmoLiveView::Execute(void)
 #ifdef _ATMO_KLUDGE_
                    vlc_mutex_lock( &m_TerminateLock );
                    vlc_cond_destroy( &m_TerminateCond );
-                   vlc_cond_init( m_pAtmoThread, &m_TerminateCond );
+                   vlc_cond_init( &m_TerminateCond );
                    vlc_mutex_unlock( &m_TerminateLock );
 #endif
 #endif

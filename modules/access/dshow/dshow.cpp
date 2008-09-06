@@ -440,7 +440,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     p_sys->p_control = NULL;
 
     vlc_mutex_init( &p_sys->lock );
-    vlc_cond_init( p_this, &p_sys->wait );
+    vlc_cond_init( &p_sys->wait );
 
     /* Build directshow graph */
     CreateDirectShowGraph( p_sys );

@@ -182,7 +182,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = p_sys;
 
     vlc_mutex_init( &p_sys->lock );
-    vlc_cond_init( p_intf, &p_sys->wait );
+    vlc_cond_init( &p_sys->wait );
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;

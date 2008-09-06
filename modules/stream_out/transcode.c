@@ -1573,7 +1573,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
                            VLC_THREAD_PRIORITY_VIDEO;
         p_sys->id_video = id;
         vlc_mutex_init( &p_sys->lock_out );
-        vlc_cond_init( p_stream, &p_sys->cond );
+        vlc_cond_init( &p_sys->cond );
         memset( p_sys->pp_pics, 0, sizeof(p_sys->pp_pics) );
         p_sys->i_first_pic = 0;
         p_sys->i_last_pic = 0;

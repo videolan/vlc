@@ -320,9 +320,9 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
 }
 
 /*****************************************************************************
- * vlc_cond_init: initialize a condition
+ * vlc_cond_init: initialize a condition variable
  *****************************************************************************/
-int __vlc_cond_init( vlc_cond_t *p_condvar )
+int vlc_cond_init( vlc_cond_t *p_condvar )
 {
 #if defined( LIBVLC_USE_PTHREAD )
     pthread_condattr_t attr;

@@ -157,7 +157,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_thread->p_base_object = p_this;
 
-    vlc_cond_init( p_sys->p_thread, &p_sys->p_thread->wait );
+    vlc_cond_init( &p_sys->p_thread->wait );
 
     vlc_mutex_init( &p_sys->p_thread->lock );
 

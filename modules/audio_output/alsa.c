@@ -316,7 +316,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->b_playing = false;
     p_sys->start_date = 0;
-    vlc_cond_init( p_aout, &p_sys->wait );
+    vlc_cond_init( &p_sys->wait );
     vlc_mutex_init( &p_sys->lock );
 
     /* Get device name */

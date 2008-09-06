@@ -211,10 +211,10 @@ static int Open( vlc_object_t * p_this )
         pa_thread->p_aout = p_aout;
         pa_thread->b_error = false;
         vlc_mutex_init( &pa_thread->lock_wait );
-        vlc_cond_init( p_aout, &pa_thread->wait );
+        vlc_cond_init( &pa_thread->wait );
         pa_thread->b_wait = false;
         vlc_mutex_init( &pa_thread->lock_signal );
-        vlc_cond_init( p_aout, &pa_thread->signal );
+        vlc_cond_init( &pa_thread->signal );
         pa_thread->b_signal = false;
 
         /* Create PORTAUDIOThread */

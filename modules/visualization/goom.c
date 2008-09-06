@@ -183,7 +183,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     vlc_mutex_init( &p_thread->lock );
-    vlc_cond_init( p_filter, &p_thread->wait );
+    vlc_cond_init( &p_thread->wait );
 
     p_thread->i_blocks = 0;
     aout_DateInit( &p_thread->date, p_filter->output.i_rate );
