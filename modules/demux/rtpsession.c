@@ -306,8 +306,11 @@ rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
     block_t **pp = &src->blocks;
     for (block_t *prev = *pp; prev != NULL; prev = *pp)
     {
-        if ((int16_t)(seq - rtp_seq (*pp)) < 0)
+        int16_t delta_seq = seq - rtp_seq (prev);
+        if (delta_seq < 0)
             break;
+        if (delta_seq == 0)
+            goto drop; /* duplicate */
         pp = &prev->p_next;
     }
     block->p_next = *pp;
