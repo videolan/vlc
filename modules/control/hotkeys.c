@@ -59,6 +59,8 @@ struct intf_sys_t
                                                         * channel IDs */
     input_thread_t *    p_input;       /* pointer to input */
     vout_thread_t *     p_vout;        /* pointer to vout object */
+    vlc_mutex_t         lock; /* callback lock */
+    vlc_cond_t          wait; /* callback event */
 };
 
 /*****************************************************************************
@@ -106,10 +108,15 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    MALLOC_ERR( p_intf->p_sys, intf_sys_t );
+    intf_sys_t *p_sys;
+    MALLOC_ERR( p_sys, intf_sys_t );
 
-    p_intf->p_sys->i_size = 0;
+    p_intf->p_sys = p_sys;
     p_intf->pf_run = Run;
+
+    p_sys->i_size = 0;
+    vlc_mutex_init( &p_sys->lock );
+    vlc_cond_init( &p_sys->wait );
 
     var_AddCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
     var_AddCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
@@ -122,9 +129,13 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     var_DelCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
     var_DelCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
+
+    vlc_cond_destroy( &p_sys->wait );
+    vlc_mutex_destroy( &p_sys->lock );
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -141,6 +152,8 @@ static void Run( intf_thread_t *p_intf )
     playlist_t *p_playlist = pl_Yield( p_intf );
     int canc = vlc_savecancel();
 
+    vlc_cleanup_push( __pl_Release, p_intf );
+
     /* Initialize hotkey structure */
     for( struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
          p_hotkey->psz_action != NULL;
@@ -153,10 +166,12 @@ static void Run( intf_thread_t *p_intf )
     {
         input_thread_t *p_input;
         vout_thread_t *p_last_vout;
-        int i_action = GetAction( p_intf );
+        int i_action;
 
-        if( i_action == -1 )
-            break; /* die */
+        vlc_restorecancel( canc );
+        i_action = GetAction( p_intf );
+
+        canc = vlc_savecancel();
 
         /* Update the input */
         PL_LOCK;
@@ -830,30 +845,29 @@ static void Run( intf_thread_t *p_intf )
         if( p_input )
             vlc_object_release( p_input );
     }
-    pl_Release( p_intf );
-    vlc_restorecancel( canc );
+
+    /* dead code */
+    abort();
+    vlc_cleanup_pop();
 }
 
 static int GetAction( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    int i_ret = -1;
+    int i_ret;
 
-    vlc_object_lock( p_intf );
+    vlc_mutex_lock( &p_sys->lock );
+    mutex_cleanup_push( &p_sys->lock );
+
     while( p_sys->i_size == 0 )
-    {
-        if( !vlc_object_alive( p_intf ) )
-            goto out;
-        vlc_object_wait( p_intf );
-    }
+        vlc_cond_wait( &p_sys->wait, &p_sys->lock );
 
     i_ret = p_sys->p_actions[ 0 ];
     p_sys->i_size--;
     for( int i = 0; i < p_sys->i_size; i++ )
         p_sys->p_actions[i] = p_sys->p_actions[i + 1];
 
-out:
-    vlc_object_unlock( p_intf );
+    vlc_cleanup_run();
     return i_ret;
 }
 
@@ -862,14 +876,14 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
     intf_sys_t *p_sys = p_intf->p_sys;
     int i_ret = VLC_EGENERIC;
 
-    vlc_object_lock( p_intf );
+    vlc_mutex_lock( &p_sys->lock );
     if ( p_sys->i_size >= BUFFER_SIZE )
         msg_Warn( p_intf, "event buffer full, dropping key actions" );
     else
         p_sys->p_actions[p_sys->i_size++] = i_action;
 
-    vlc_object_signal_unlocked( p_intf );
-    vlc_object_unlock( p_intf );
+    vlc_cond_signal( &p_sys->wait );
+    vlc_mutex_unlock( &p_sys->lock );
     return i_ret;
 }
 
