@@ -392,11 +392,11 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     {
         vlc_testcancel ();
         result = SignalObjectAndWait (*p_mutex, *p_condvar, INFINITE, TRUE);
-
-        /* Reacquire the mutex before returning. */
-        vlc_mutex_lock( p_mutex );
     }
     while (result == WAIT_IO_COMPLETION);
+
+    /* Reacquire the mutex before returning. */
+    vlc_mutex_lock( p_mutex );
 
     vlc_testcancel ();
 
