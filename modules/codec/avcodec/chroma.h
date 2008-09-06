@@ -94,6 +94,10 @@ static const struct
 #endif
     {VLC_FOURCC('G','R','E','Y'), PIX_FMT_GRAY8, 0, 0, 0},
 
+     /* Paletized RGB */
+    {VLC_FOURCC('R','G','B','P'), PIX_FMT_PAL8, 0, 0, 0},
+
+
     { 0, 0, 0, 0, 0 }
 };
 
