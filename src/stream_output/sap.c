@@ -120,7 +120,7 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
     sap_handler_t *p_sap;
 
     p_sap = vlc_custom_create( VLC_OBJECT(p_announce), sizeof( sap_handler_t ),
-                               VLC_OBJECT_ANNOUNCE, "announce" );
+                               VLC_OBJECT_ANNOUNCE, "sap announcer" );
     if( !p_sap )
         return NULL;
 
