@@ -506,6 +506,7 @@ static void* Run( vlc_object_t *p_this )
         /* Tell we're dead */
         p_input->b_dead = true;
 
+        vlc_restorecancel( canc );
         return NULL;
     }
 
