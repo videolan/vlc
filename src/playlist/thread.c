@@ -69,7 +69,6 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
         vlc_object_release( p_playlist );
         return;
     }
-    p_playlist->p->p_preparse->psz_object_name = strdup( "preparser" );
     p_playlist->p->p_preparse->i_waiting = 0;
     p_playlist->p->p_preparse->pp_waiting = NULL;
 
@@ -95,7 +94,6 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
         vlc_object_release( p_playlist );
         return;
     }
-    p_playlist->p->p_fetcher->psz_object_name = strdup( "fetcher" );
     p_playlist->p->p_fetcher->i_waiting = 0;
     p_playlist->p->p_fetcher->pp_waiting = NULL;
     p_playlist->p->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
