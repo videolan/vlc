@@ -146,7 +146,7 @@ struct aout_buffer_t
     size_t                  i_size, i_nb_bytes;
     unsigned int            i_nb_samples;
     mtime_t                 start_date, end_date;
-    bool              b_discontinuity; /* Set on discontinuity (for non pcm stream) */
+    bool                    b_discontinuity; /* Set on discontinuity (for non pcm stream) */
 
     struct aout_buffer_t *  p_next;
 
