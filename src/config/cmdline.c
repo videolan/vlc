@@ -370,9 +370,8 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
         /* Internal error: unknown option */
         if( !b_ignore_errors )
         {
-            fprintf( stderr, "%s: unknown option"
-                     " or missing mandatory argument ",
-                     p_this->p_libvlc->psz_object_name );
+            fputs( stderr, "vlc: unknown option"
+                     " or missing mandatory argument " );
             if( optopt )
             {
                 fprintf( stderr, "`-%c'\n", optopt );
@@ -381,8 +380,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
             {
                 fprintf( stderr, "`%s'\n", ppsz_argv[optind-1] );
             }
-            fprintf( stderr, "Try `%s --help' for more information.\n",
-                             p_this->p_libvlc->psz_object_name );
+            fprintf( stderr, "Try `vlc --help' for more information.\n" );
 
             for( i_index = 0; p_longopts[i_index].name; i_index++ )
                 free( (char *)p_longopts[i_index].name );
