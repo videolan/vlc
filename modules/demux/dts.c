@@ -159,6 +159,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
+    p_sys->b_start = true;
     p_sys->i_mux_rate = 0;
     p_sys->i_pts = 0;
     p_sys->i_time_offset = 0;
