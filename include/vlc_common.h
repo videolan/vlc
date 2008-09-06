@@ -55,6 +55,15 @@
 # include <stdbool.h>
 #endif
 
+/* Format string sanity checks */
+#ifdef __GNUC__
+#   define LIBVLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
+#   define LIBVLC_USED __attribute__ ((warn_unused_result))
+#else
+#   define LIBVLC_FORMAT(x,y)
+#   define LIBVLC_USED
+#endif
+
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
@@ -739,13 +748,6 @@ static inline uint64_t ntoh64 (uint64_t ll)
          | ((uint64_t)v.b[7] <<  0);
 }
 #define hton64(i) ntoh64(i)
-
-/* Format string sanity checks */
-#ifdef __GNUC__
-#   define LIBVLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
-#else
-#   define LIBVLC_FORMAT(x,y)
-#endif
 
 /* */
 #define VLC_UNUSED(x) (void)(x)
