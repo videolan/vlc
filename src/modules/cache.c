@@ -363,7 +363,6 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
         if( p_module->p_config == NULL )
         {
             p_module->confsize = 0;
-            msg_Err( p_module, "config error: can't duplicate p_config" );
             return VLC_ENOMEM;
         }
     }
