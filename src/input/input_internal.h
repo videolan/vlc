@@ -389,29 +389,33 @@ void    input_ClockSetRate( input_clock_t *cl, int i_rate );
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
 int subtitles_Filter( const char *);
 
-static inline void input_ChangeStateWithVarCallback( input_thread_t *p_input, int state, bool callback )
+static inline void input_ChangeStateWithVarCallback( input_thread_t *p_input, int i_state, bool callback )
 {
-    const bool changed = p_input->i_state != state;
+    const bool changed = p_input->i_state != i_state;
 
-    p_input->i_state = state;
+    p_input->i_state = i_state;
+    if( i_state == ERROR_S )
+        p_input->b_error = true;
+    else if( i_state == END_S )
+        p_input->b_eof = true;
 
-    input_item_SetHasErrorWhenReading( p_input->p->input.p_item, (state == ERROR_S) );
+    input_item_SetHasErrorWhenReading( p_input->p->input.p_item, (i_state == ERROR_S) );
 
     if( callback )
     {
-        var_SetInteger( p_input, "state", state );
+        var_SetInteger( p_input, "state", i_state );
     }
     else
     {
         vlc_value_t val;
-        val.i_int = state;
+        val.i_int = i_state;
         var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
     }
     if( changed )
     {
         vlc_event_t event;
         event.type = vlc_InputStateChanged;
-        event.u.input_state_changed.new_state = state;
+        event.u.input_state_changed.new_state = i_state;
         vlc_event_send( &p_input->p->event_manager, &event );
     }
 }
