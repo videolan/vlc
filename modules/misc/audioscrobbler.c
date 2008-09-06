@@ -75,6 +75,7 @@ struct intf_sys_t
     int                     i_songs;            /**< number of songs        */
 
     vlc_mutex_t             lock;               /**< p_sys mutex            */
+    vlc_cond_t              wait;               /**< song to submit event   */
 
     /* data about audioscrobbler session */
     mtime_t                 next_exchange;      /**< when can we send data  */
@@ -181,6 +182,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = p_sys;
 
     vlc_mutex_init( &p_sys->lock );
+    vlc_cond_init( p_intf, &p_sys->wait );
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
@@ -226,8 +228,6 @@ static void Close( vlc_object_t *p_this )
     }
 
     p_intf->b_dead = true;
-    /* we lock the mutex in case p_sys is being accessed from a callback */
-    vlc_mutex_lock ( &p_sys->lock );
     int i;
     for( i = 0; i < p_sys->i_songs; i++ )
         DeleteSong( &p_sys->p_queue[i] );
@@ -237,7 +237,7 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_nowp_host );
     free( p_sys->psz_nowp_file );
 #endif
-    vlc_mutex_unlock ( &p_sys->lock );
+    vlc_cond_destroy( &p_sys->wait );
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
@@ -264,16 +264,17 @@ static void Run( intf_thread_t *p_intf )
         bool b_wait = false;
 
         vlc_restorecancel( canc );
-        vlc_object_lock( p_intf );
-        vlc_cleanup_push( __vlc_object_unlock, p_intf );
+        vlc_mutex_lock( &p_sys->lock );
+        mutex_cleanup_push( &p_sys->lock );
 
         if( mdate() < p_sys->next_exchange )
             /* wait until we can resubmit, i.e.  */
-            b_wait = vlc_object_timedwait( p_intf, p_sys->next_exchange ) == 0;
+            b_wait = vlc_cond_timedwait( &p_sys->wait, &p_sys->lock,
+                                          p_sys->next_exchange ) == 0;
         else
             /* wait for data to submit */
             /* we are signaled each time there is a song to submit */
-            vlc_object_wait( p_intf );
+            vlc_cond_wait( &p_sys->wait, &p_sys->lock );
         vlc_cleanup_run();
         canc = vlc_savecancel();
 
@@ -629,7 +630,7 @@ static void AddToQueue ( intf_thread_t *p_this )
     p_sys->i_songs++;
 
     /* signal the main loop we have something to submit */
-    vlc_object_signal( VLC_OBJECT( p_this ) );
+    vlc_cond_signal( &p_sys->wait );
 
 end:
     DeleteSong( &p_sys->p_current_song );
