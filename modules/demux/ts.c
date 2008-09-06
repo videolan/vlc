@@ -185,6 +185,14 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static const char *const ppsz_teletext_type[] = {
+ "",
+ N_("Teletext"),
+ N_("Teletext subtitles"),
+ N_("Teletext additional information"),
+ N_("Teletext programme schedule"),
+ N_("Teletext hearing impaired subtitles")
+};
 
 typedef struct
 {
@@ -3440,66 +3448,21 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                             p_page->i_iso6392_language_code, 3 );
                                     p_es->fmt.psz_language[3] = 0;
                                 }
-                                switch( p_page->i_teletext_type )
-                                {
-                                case 0x1:
-                                    p_es->fmt.psz_description =
-                                        strdup(_("Teletext"));
-                                    msg_Dbg( p_demux,
-                                             "    * ttxt lan=%s page=%d%02x",
+                                p_es->fmt.psz_description = strdup(_(ppsz_teletext_type[p_page->i_teletext_type]));
+
+                                msg_Dbg( p_demux,
+                                             "    * ttxt type=%s lan=%s page=%d%02x",
+                                             p_es->fmt.psz_description,
                                              p_es->fmt.psz_language,
                                              p_page->i_teletext_magazine_number,
                                              p_page->i_teletext_page_number );
-                                    break;
 
-                                case 0x2:
-                                    p_es->fmt.psz_description =
-                                        strdup(_("Teletext subtitles"));
-                                    msg_Dbg( p_demux,
-                                             "    * sub lan=%s page=%d%02x",
-                                             p_es->fmt.psz_language,
-                                             p_page->i_teletext_magazine_number,
-                                             p_page->i_teletext_page_number );
-                                    break;
-
-                                case 0x3:
-                                    p_es->fmt.psz_description =
-                                        strdup(_("Teletext additional information"));
-                                    msg_Dbg( p_demux,
-                                             "    * info lan=%s page=%d%02x",
-                                             p_es->fmt.psz_language,
-                                             p_page->i_teletext_magazine_number,
-                                             p_page->i_teletext_page_number );
-                                    break;
-
-                                case 0x4:
-                                    p_es->fmt.psz_description =
-                                        strdup(_("Teletext programme schedule"));
-                                    msg_Dbg( p_demux,
-                                             "    * sched lan=%s page=%d%02x",
-                                             p_es->fmt.psz_language,
-                                             p_page->i_teletext_magazine_number,
-                                             p_page->i_teletext_page_number );
-                                    break;
-
-                                case 0x5:
-                                    p_es->fmt.psz_description =
-                                        strdup(_("Teletext hearing impaired subtitles"));
-                                    msg_Dbg( p_demux,
-                                             "    * hearing impaired lan=%s page=%d%02x",
-                                             p_es->fmt.psz_language,
-                                             p_page->i_teletext_magazine_number,
-                                             p_page->i_teletext_page_number );
-                                    break;
-                                default:
-                                    break;
-                                }
-
+                                /* Hack, FIXME This stores the initial page for this track,
+                                   so that it can be used by the telx and zvbi decoders. */
                                 p_es->fmt.subs.dvb.i_id =
                                     p_page->i_teletext_page_number;
-                                /* Hack, FIXME */
                                 p_es->fmt.subs.dvb.i_id |=
-                                ((int)p_page->i_teletext_magazine_number << 16);
+                                    ((int)p_page->i_teletext_magazine_number << 16);
 
                                 i++;
                             }
