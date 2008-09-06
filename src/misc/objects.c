@@ -620,15 +620,25 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     return p_found;
 }
 
+#undef vlc_object_find_name
 /**
- ****************************************************************************
- * find a named object and increment its refcount
- *****************************************************************************
- * This function recursively looks for a given object name. i_mode can be one
- * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
- *****************************************************************************/
-void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
-                               int i_mode )
+ * Finds a named object and increment its reference count.
+ * Beware that objects found in this manner can be "owned" by another thread,
+ * be of _any_ type, and be attached to any module (if any). With such an
+ * object reference, you can set or get object variables, emit log messages,
+ * and read write-once object parameters (i_object_id, psz_object_type, etc).
+ * You CANNOT cast the object to a more specific object type, and you
+ * definitely cannot invoke object type-specific callbacks with this.
+ *
+ * @param p_this object to search from
+ * @param psz_name name of the object to search for
+ * @param i_mode search direction: FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
+ *
+ * @return a matching object (must be released by the caller),
+ * or NULL on error.
+ */
+vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
+                                    const char *psz_name, int i_mode )
 {
     vlc_object_t *p_found;
 
