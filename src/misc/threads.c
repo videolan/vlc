@@ -804,8 +804,6 @@ void vlc_control_cancel (int cmd, ...)
 #else
     va_list ap;
 
-    va_start (ap, cmd);
-
     vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
     if (nfo == NULL)
     {
@@ -821,6 +819,7 @@ void vlc_control_cancel (int cmd, ...)
 #endif
     }
 
+    va_start (ap, cmd);
     switch (cmd)
     {
         case VLC_SAVE_CANCEL:
