@@ -568,21 +568,22 @@ static int Open( vlc_object_t * p_this )
                 /* Extract palette from extradata if bpp <= 8
                  * (assumes that extradata contains only palette but appears
                  *  to be true for all palettized codecs we support) */
-                if( fmt.i_extra && fmt.video.i_bits_per_pixel <= 8 &&
-                    fmt.video.i_bits_per_pixel > 0 )
+                if( fmt.video.i_bits_per_pixel > 0 && fmt.video.i_bits_per_pixel <= 8 )
                 {
-                    int i;
-
-                    fmt.video.p_palette = calloc( sizeof(video_palette_t), 1 );
-                    fmt.video.p_palette->i_entries = 1;
-
-                    /* Apparently this is necessary. But why ? */
-                    fmt.i_extra =
-                        p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER);
-                    for( i = 0; i < __MIN(fmt.i_extra/4, 256); i++ )
+                    /* The palette is not always included in biSize */
+                    fmt.i_extra = p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER);
+                    if( fmt.i_extra > 0 )
                     {
-                        ((uint32_t *)&fmt.video.p_palette->palette[0][0])[i] =
-                            GetDWLE((uint32_t*)fmt.p_extra + i);
+                        const uint8_t *p_pal = fmt.p_extra;
+
+                        fmt.video.p_palette = calloc( sizeof(video_palette_t), 1 );
+                        fmt.video.p_palette->i_entries = __MIN(fmt.i_extra/4, 256);
+
+                        for( int i = 0; i < fmt.video.p_palette->i_entries; i++ )
+                        {
+                            for( int j = 0; j < 4; j++ )
+                                fmt.video.p_palette->palette[i][j] = p_pal[4*i+j];
+                        }
                     }
                 }
                 break;
