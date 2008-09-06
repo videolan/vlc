@@ -269,18 +269,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* System specific initialization code */
     system_Init( p_libvlc, &i_argc, ppsz_argv );
 
-    /* Get the executable name (similar to the basename command) */
-    if( i_argc > 0 && ppsz_argv[0][0] )
-    {
-        free( p_libvlc->psz_object_name );
-
-        const char *psz_exe = strrchr( ppsz_argv[0], '/' );
-        if( psz_exe && *(psz_exe + 1) )
-            p_libvlc->psz_object_name = strdup( psz_exe + 1 );
-        else
-            p_libvlc->psz_object_name = strdup( ppsz_argv[0] );
-    }
-
     /*
      * Support for gettext
      */
@@ -1318,20 +1306,20 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
 
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
     {
-        utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
+        utf8_fprintf( stdout, vlc_usage, "vlc" );
         Usage( p_this, "=help" );
         Usage( p_this, "=main" );
         print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
     {
-        utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
+        utf8_fprintf( stdout, vlc_usage, "vlc" );
         Usage( p_this, NULL );
         print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "full-help" ) )
     {
-        utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
+        utf8_fprintf( stdout, vlc_usage, "vlc" );
         Usage( p_this, NULL );
     }
     else if( psz_help_name )
