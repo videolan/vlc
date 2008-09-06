@@ -96,9 +96,11 @@ void bad_msleep( mtime_t delay )
 }
 
 # define msleep( d ) \
-    (__builtin_constant_p(d < VLC_HARD_MIN_SLEEP) \
+    ((__builtin_constant_p(d < VLC_HARD_MIN_SLEEP) \
+   && (d < VLC_HARD_MIN_SLEEP)) \
        ? impossible_msleep(d) \
-       : (__builtin_constant_p(d < VLC_SOFT_MIN_SLEEP) \
+       : ((__builtin_constant_p(d < VLC_SOFT_MIN_SLEEP) \
+       && (d < VLC_SOFT_MIN_SLEEP)) \
            ? bad_msleep(d) \
            : msleep(d)))
 #endif
