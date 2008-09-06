@@ -579,7 +579,10 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
     free( text.psz_string );
 
     if( b_teletext )
-        var_SetInteger( p_sys->p_input, "teletext-es", i_id );
+    {
+        if( var_GetInteger( p_sys->p_input, "teletext-es" ) < 0 )
+            var_SetInteger( p_sys->p_input, "teletext-es", i_id );
+    }
 
     var_SetBool( p_sys->p_input, "intf-change", true );
 }
