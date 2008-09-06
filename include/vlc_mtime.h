@@ -69,6 +69,23 @@ VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
 VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
 
 #ifdef __GNUC__
+# ifdef __linux__
+#  define VLC_HARD_MIN_SLEEP 1000 /* Linux has 100, 250, 300 or 1000Hz */
+# else
+#  define VLC_HARD_MIN_SLEEP 0
+# endif
+#define VLC_SOFT_MIN_SLEEP 29000000
+
+static
+__attribute__((unused))
+__attribute__((noinline))
+__attribute__((error("sorry, cannot sleep for such short a time")))
+void impossible_msleep( mtime_t delay )
+{
+    (void) delay;
+    msleep( VLC_HARD_MIN_SLEEP );
+}
+
 static
 __attribute__((unused))
 __attribute__((noinline))
@@ -77,8 +94,13 @@ void bad_msleep( mtime_t delay )
 {
     msleep( delay );
 }
+
 # define msleep( d ) \
-   ((__builtin_constant_p(d) && (d < 29000000)) ? bad_msleep(d) : msleep(d))
+    (__builtin_constant_p(d < VLC_HARD_MIN_SLEEP) \
+       ? impossible_msleep(d) \
+       : (__builtin_constant_p(d < VLC_SOFT_MIN_SLEEP) \
+           ? bad_msleep(d) \
+           : msleep(d)))
 #endif
 
 /*****************************************************************************
