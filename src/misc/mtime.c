@@ -373,7 +373,7 @@ void mwait( mtime_t date )
 void msleep( mtime_t delay )
 {
 #ifndef NDEBUG
-# if defined (__linux__) || defined (WIN32)
+# if defined (__linux__)
     /* We assume that proper use of msleep() will not use a constant period...
      * Media synchronization is likely to use mwait() with at least slight
      * sleep length variation at microsecond precision. Network protocols
