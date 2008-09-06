@@ -124,8 +124,6 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
     if( !p_sap )
         return NULL;
 
-    p_sap->psz_object_name = strdup( "sap announcer" );
-
     p_sap->pf_add = announce_SAPAnnounceAdd;
     p_sap->pf_del = announce_SAPAnnounceDel;
 
