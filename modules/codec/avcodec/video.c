@@ -82,6 +82,8 @@ struct decoder_sys_t
     int i_buffer_orig, i_buffer;
     char *p_buffer_orig, *p_buffer;
 
+    /* */
+    AVPaletteControl palette;
 
     /* */
     bool b_flush;
@@ -343,11 +345,34 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* Setup palette */
+    memset( &p_sys->palette, 0, sizeof(p_sys->palette) );
     if( p_dec->fmt_in.video.p_palette )
-        p_sys->p_context->palctrl =
-            (AVPaletteControl *)p_dec->fmt_in.video.p_palette;
+    {
+        p_sys->palette.palette_changed = 1;
+
+        for( int i = 0; i < __MIN( AVPALETTE_COUNT, p_dec->fmt_in.video.p_palette->i_entries ); i++ )
+        {
+            union {
+                uint32_t u;
+                uint8_t a[4];
+            } c;
+            c.a[0] = p_dec->fmt_in.video.p_palette->palette[i][0];
+            c.a[1] = p_dec->fmt_in.video.p_palette->palette[i][1];
+            c.a[2] = p_dec->fmt_in.video.p_palette->palette[i][2];
+            c.a[3] = p_dec->fmt_in.video.p_palette->palette[i][3];
+
+            p_sys->palette.palette[i] = c.u;
+        }
+        p_sys->p_context->palctrl = &p_sys->palette;
+
+        p_dec->fmt_out.video.p_palette = malloc( sizeof(video_palette_t) );
+        if( p_dec->fmt_out.video.p_palette )
+            *p_dec->fmt_out.video.p_palette = *p_dec->fmt_in.video.p_palette;
+    }
     else if( p_sys->i_codec_id != CODEC_ID_MSVIDEO1 && p_sys->i_codec_id != CODEC_ID_CINEPAK )
-        p_sys->p_context->palctrl = (AVPaletteControl *) &palette_control;
+    {
+        p_sys->p_context->palctrl = &p_sys->palette;
+    }
 
     /* ***** Open the codec ***** */
     vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
@@ -854,7 +879,8 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS ||
         p_sys->p_context->width % 16 || p_sys->p_context->height % 16 ||
         /* We only pad picture up to 16 */
-        PAD(p_sys->p_context->width,16) < i_width || PAD(p_sys->p_context->height,16) < i_height )
+        PAD(p_sys->p_context->width,16) < i_width || PAD(p_sys->p_context->height,16) < i_height ||
+        p_context->pix_fmt == PIX_FMT_PAL8 )
     {
         msg_Dbg( p_dec, "disabling direct rendering" );
         p_sys->b_direct_rendering = 0;
