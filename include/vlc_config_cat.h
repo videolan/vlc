@@ -235,12 +235,6 @@
 #define UNKNOWN_HELP N_("There is no help available for these modules.")
 
 /* This function is deprecated and is kept only for compatibility */
-static inline const char * GetCapabilityHelp( char *psz_capability, int i_type)
-{
-    (void)psz_capability; (void)i_type;
-    return " ";
-}
-
 static const struct config_category_t categories_array[] =
 {
     /* Interface */
