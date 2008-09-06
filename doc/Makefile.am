@@ -22,12 +22,15 @@ CHANGELOGS = \
 	ChangeLog-2008 \
 	$(NULL)
 
+man1_MANS = \
+	   vlc.1 \
+	   vlc-wrapper.1 \
+	   vlc-config.1
+
 EXTRA_DIST = \
 	$(CHANGELOGS) \
-	vlc.1 \
-	vlc-wrapper.1 \
-	vlc-config.1 \
-	bugreport-howto.txt \
+        $(man_MANS) \
+        bugreport-howto.txt \
 	fortunes.txt \
 	intf-cdda.txt \
 	intf-vcd.txt \
