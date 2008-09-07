@@ -502,24 +502,20 @@ static void* Run( vlc_object_t *p_this )
     {
         /* If we failed, wait before we are killed, and exit */
         WaitDie( p_input );
-
-        /* Tell we're dead */
-        p_input->b_dead = true;
-
-        vlc_restorecancel( canc );
-        return NULL;
+        goto exit;
     }
 
     MainLoop( p_input );
 
     /* Wait until we are asked to die */
     if( !p_input->b_die )
-    {
         WaitDie( p_input );
-    }
 
     /* Clean up */
     End( p_input );
+
+exit:
+    p_input->b_dead = true;
     vlc_restorecancel( canc );
     return NULL;
 }
@@ -1306,11 +1302,12 @@ error:
 static void WaitDie( input_thread_t *p_input )
 {
     input_ChangeState( p_input, p_input->b_error ? ERROR_S : END_S );
-    while( !p_input->b_die )
-    {
-        /* Sleep a while */
-        msleep( INPUT_IDLE_SLEEP );
-    }
+
+    /* Wait a die order */
+    vlc_object_lock( p_input );
+    while( vlc_object_alive( p_input ) )
+        vlc_object_wait( p_input );
+    vlc_object_unlock( p_input );
 }
 
 /*****************************************************************************
