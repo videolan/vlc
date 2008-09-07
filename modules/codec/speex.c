@@ -1,7 +1,7 @@
 /*****************************************************************************
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
- * Copyright (C) 2003 the VideoLAN team
+ * Copyright (C) 2003-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -41,6 +41,35 @@
 #include <speex/speex_callbacks.h>
 
 #include <assert.h>
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  OpenDecoder   ( vlc_object_t * );
+static int  OpenPacketizer( vlc_object_t * );
+static void CloseDecoder  ( vlc_object_t * );
+static int OpenEncoder   ( vlc_object_t * );
+static void CloseEncoder ( vlc_object_t * );
+
+vlc_module_begin();
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
+
+    set_description( N_("Speex audio decoder") );
+    set_capability( "decoder", 100 );
+    set_callbacks( OpenDecoder, CloseDecoder );
+
+    add_submodule();
+    set_description( N_("Speex audio packetizer") );
+    set_capability( "packetizer", 100 );
+    set_callbacks( OpenPacketizer, CloseDecoder );
+
+    add_submodule();
+    set_description( N_("Speex audio encoder") );
+    set_capability( "encoder", 100 );
+    set_callbacks( OpenEncoder, CloseEncoder );
+vlc_module_end();
+
 
 /*****************************************************************************
  * decoder_sys_t : speex decoder descriptor
@@ -86,9 +115,6 @@ static const int pi_channels_maps[6] =
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );
-static int  OpenPacketizer( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
 
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *, block_t **);
@@ -101,31 +127,7 @@ static block_t *SendPacket( decoder_t *, block_t * );
 
 static void ParseSpeexComments( decoder_t *, ogg_packet * );
 
-static int OpenEncoder   ( vlc_object_t * );
-static void CloseEncoder ( vlc_object_t * );
 static block_t *Encode   ( encoder_t *, aout_buffer_t * );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-
-    set_description( N_("Speex audio decoder") );
-    set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-
-    add_submodule();
-    set_description( N_("Speex audio packetizer") );
-    set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
-
-    add_submodule();
-    set_description( N_("Speex audio encoder") );
-    set_capability( "encoder", 100 );
-    set_callbacks( OpenEncoder, CloseEncoder );
-vlc_module_end();
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
