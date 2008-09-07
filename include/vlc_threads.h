@@ -386,19 +386,13 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     vlc_mutex_lock( p_mutex );
 
 #elif defined( WIN32 )
-    DWORD result;
-
     do
-    {
         vlc_testcancel ();
-        result = SignalObjectAndWait (*p_mutex, *p_condvar, INFINITE, TRUE);
-    }
-    while (result == WAIT_IO_COMPLETION);
+    while (SignalObjectAndWait (*p_mutex, *p_condvar, INFINITE, TRUE)
+            == WAIT_IO_COMPLETION);
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
-
-    vlc_testcancel ();
 
     (void)psz_file; (void)i_line;
 
@@ -445,25 +439,25 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     return (result == WAIT_TIMEOUT) ? ETIMEDOUT : 0;
 
 #elif defined( WIN32 )
-    mtime_t total;
-    DWORD result = WAIT_TIMEOUT;
+    DWORD result;
 
     (void)psz_file; (void)i_line;
 
-    vlc_testcancel ();
-    while ((total = (deadline - mdate ()) > 0))
+    do
     {
-        DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
-        result = SignalObjectAndWait( *p_mutex, *p_condvar,
-                                      delay, TRUE );
-
-        /* Reacquire the mutex before return/cancel. */
-        vlc_mutex_lock (p_mutex);
-        if (result == WAIT_OBJECT_0)
-            return 0; /* Condition signaled! */
         vlc_testcancel ();
+
+        mtime_t total = deadline - mdate ();
+        if (total <= 0)
+            break;
+        DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
+        result = SignalObjectAndWait (*p_mutex, *p_condvar, delay, TRUE);
     }
-    return ETIMEDOUT;
+    while (result == WAIT_IO_COMPLETION);
+
+    /* Reacquire the mutex before return/cancel. */
+    vlc_mutex_lock (p_mutex);
+    return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
 
 #endif
 }
