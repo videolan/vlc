@@ -190,7 +190,7 @@ static const char *const ppsz_teletext_type[] = {
  N_("Teletext"),
  N_("Teletext subtitles"),
  N_("Teletext additional information"),
- N_("Teletext programme schedule"),
+ N_("Teletext program schedule"),
  N_("Teletext hearing impaired subtitles")
 };
 
