@@ -718,8 +718,8 @@ static void MainLoopStatistic( input_thread_t *p_input )
 static void MainLoop( input_thread_t *p_input )
 {
     mtime_t i_start_mdate = mdate();
-    int64_t i_intf_update = 0;
-    int i_updates = 0;
+    mtime_t i_intf_update = 0;
+    mtime_t i_statistic_update = 0;
 
     /* Start the timer */
     stats_TimerStop( p_input, STATS_TIMER_INPUT_LAUNCHING );
@@ -729,6 +729,7 @@ static void MainLoop( input_thread_t *p_input )
         bool b_force_update;
         int i_type;
         vlc_value_t val;
+        mtime_t i_current;
 
         /* Do the read */
         if( p_input->i_state != PAUSE_S )
@@ -753,15 +754,18 @@ static void MainLoop( input_thread_t *p_input )
         }
         vlc_mutex_unlock( &p_input->p->lock_control );
 
-        if( b_force_update || i_intf_update < mdate() )
+        /* Update interface and statistics */
+        i_current = mdate();
+        if( i_intf_update < i_current || b_force_update )
         {
             MainLoopInterface( p_input );
-            i_intf_update = mdate() + INT64_C(150000);
+            i_intf_update = i_current + INT64_C(250000);
         }
-
-        /* 150ms * 8 = ~ 1 second */
-        if( ++i_updates % 8 == 0 )
+        if( i_statistic_update < i_current )
+        {
             MainLoopStatistic( p_input );
+            i_statistic_update = i_current + INT64_C(1000000);
+        }
     }
 
     if( !p_input->b_eof && !p_input->b_error && p_input->p->input.b_eof )
