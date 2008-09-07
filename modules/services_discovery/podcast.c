@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_playlist.h>
 #include <vlc_network.h>
+#include <assert.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 
@@ -88,6 +89,8 @@ struct services_discovery_sys_t
     char **ppsz_urls;
     int i_urls;
 
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
     bool b_update;
 };
 
@@ -114,6 +117,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->ppsz_urls = NULL;
     p_sys->i_input = 0;
     p_sys->pp_input = NULL;
+    vlc_mutex_init( &p_sys->lock );
+    vlc_cond_init( &p_sys->wait );
     p_sys->b_update = true;
 
     p_sd->pf_run = Run;
@@ -121,6 +126,10 @@ static int Open( vlc_object_t *p_this )
 
     /* Give us a name */
     services_discovery_SetLocalizedName( p_sd, _("Podcasts") );
+
+    /* Launch the callback associated with this variable */
+    var_Create( p_sd, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
 
     return VLC_SUCCESS;
 }
@@ -133,6 +142,11 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
     int i;
+
+    var_DelCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
+    vlc_cond_destroy( &p_sys->wait );
+    vlc_mutex_destroy( &p_sys->lock );
+
     for( i = 0; i < p_sys->i_input; i++ )
     {
         if( p_sd->p_sys->pp_input[i] )
@@ -155,25 +169,20 @@ static void Run( services_discovery_t *p_sd )
 {
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
 
-    /* Launch the callback associated with this variable */
-    var_Create( p_sd, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
-
+    vlc_mutex_lock( &p_sys->lock );
+    mutex_cleanup_push( &p_sys->lock );
     for( ;; )
     {
-        /* FIXME: That's 2000 wake up per seconds too many. */
-        msleep( 500 );
+        while( !p_sys->b_update )
+            vlc_cond_wait( &p_sys->wait, &p_sys->lock );
 
-        int canc = vlc_savecancel (); /* <- FIXME: should not be needed */
-        if( p_sys->b_update == true )
-        {
-            msg_Dbg( p_sd, "Update required" );
-            char* psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
-            if( psz_urls != NULL )
-                ParseUrls( p_sd, psz_urls );
-            free( psz_urls );
-            p_sys->b_update = false;
-        }
+        int canc = vlc_savecancel ();
+        msg_Dbg( p_sd, "Update required" );
+        char* psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
+        if( psz_urls != NULL )
+            ParseUrls( p_sd, psz_urls );
+        free( psz_urls );
+        p_sys->b_update = false;
 
         for( int i = 0; i < p_sd->p_sys->i_input; i++ )
         {
@@ -189,6 +198,8 @@ static void Run( services_discovery_t *p_sd )
         }
         vlc_restorecancel (canc);
     }
+    vlc_cleanup_pop();
+    assert(0); /* dead code */
 }
 
 static int UrlsChange( vlc_object_t *p_this, char const *psz_var,
@@ -198,7 +209,11 @@ static int UrlsChange( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     VLC_UNUSED(newval);
     services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)p_data;
+
+    vlc_mutex_lock( &p_sys->lock );
     p_sys->b_update = true;
+    vlc_cond_signal( &p_sys->wait );
+    vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
 
