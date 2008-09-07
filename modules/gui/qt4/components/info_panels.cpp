@@ -126,7 +126,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     nowplaying_text->setReadOnly( true );
     ADD_META_2( VLC_META_PUBLISHER, publisher_text );
     ADD_META_2( VLC_META_COPYRIGHT, copyright_text );
-    ADD_META_2( "Comments", description_text );
+    ADD_META_2( N_("Comments"), description_text );
 
 /* useless metadata */
 
