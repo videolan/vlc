@@ -349,9 +349,30 @@ void OpenDialog::stream( bool b_transcode_only )
 {
     mrl = ui.advancedLineInput->text();
     toggleVisible();
+
+    /* Separate the entries */
     QStringList listMRL = SeparateEntries( mrl );
+
+    /* We can only take the first entry since we have no idea what
+       to do with many files ? Gather ? */
     if( listMRL.size() > 0 )
-    THEDP->streamingDialog( this, listMRL[0], b_transcode_only );
+    {
+        /* First item */
+        QString soutMRL = listMRL[0];
+
+        /* Keep all the :xxx options because they are needed see v4l and dshow */
+        for( int i = 1; i < listMRL.size(); i++ )
+        {
+            if( listMRL[i].at( 0 ) == ':' )
+                soutMRL.append( " " + listMRL[i] );
+            else
+                break;
+        }
+
+        /* Dbg and send :D */
+        msg_Dbg( p_intf, "MRL passed to the Sout: %s", qtu( soutMRL ) );
+        THEDP->streamingDialog( this, listMRL[0], b_transcode_only );
+    }
 }
 
 /* Update the MRL */
