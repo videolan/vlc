@@ -135,6 +135,7 @@ VLC_EXPORT( int,  vlc_mutex_init_recursive, ( vlc_mutex_t * ) );
 VLC_EXPORT( void,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
 VLC_EXPORT( int,  vlc_cond_init,     ( vlc_cond_t * ) );
 VLC_EXPORT( void,  __vlc_cond_destroy,  ( const char *, int, vlc_cond_t * ) );
+VLC_EXPORT( void, vlc_cond_broadcast, (vlc_cond_t *) );
 VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) );
 VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( vlc_object_t * ), int, bool ) );

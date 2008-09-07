@@ -8,6 +8,7 @@
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
  *          Clément Sténac
+ *          Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -372,6 +373,22 @@ void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condva
 
 #endif
 }
+
+/**
+ * Wakes up all threads (if any) waiting on a condition variable.
+ * @param p_cond condition variable
+ */
+void vlc_cond_broadcast (vlc_cond_t *p_condvar)
+{
+#if defined (LIBVLC_USE_PTHREAD)
+    pthread_cond_broadcast (p_condvar);
+
+#elif defined (WIN32)
+    SetEvent (*p_condvar);
+
+#endif
+}
+
 
 /*****************************************************************************
  * vlc_tls_create: create a thread-local variable
