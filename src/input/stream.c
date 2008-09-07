@@ -76,7 +76,6 @@
  *  We get blocks and put them in the linked list.
  *  We release blocks once the total size is bigger than CACHE_BLOCK_SIZE
  */
-#define STREAM_DATA_WAIT 40000       /* Time between before a pf_block retry */
 
 /* Method2: A bit more complex, for pf_read
  *  - We use ring buffers, only one if unseekable, all if seekable
@@ -863,9 +862,8 @@ static void AStreamPrebufferBlock( stream_t *s )
         /* Fetch a block */
         if( ( b = AReadBlock( s, &b_eof ) ) == NULL )
         {
-            if( b_eof ) break;
-
-            msleep( STREAM_DATA_WAIT );
+            if( b_eof )
+                break;
             continue;
         }
 
@@ -1201,15 +1199,14 @@ static int AStreamRefillBlock( stream_t *s )
     {
         bool b_eof;
 
-        if( s->b_die ) return VLC_EGENERIC;
-
+        if( s->b_die )
+            return VLC_EGENERIC;
 
         /* Fetch a block */
-        if( ( b = AReadBlock( s, &b_eof ) ) ) break;
-
-        if( b_eof ) return VLC_EGENERIC;
-
-        msleep( STREAM_DATA_WAIT );
+        if( ( b = AReadBlock( s, &b_eof ) ) )
+            break;
+        if( b_eof )
+            return VLC_EGENERIC;
     }
 
     while( b )
@@ -1563,12 +1560,12 @@ static int AStreamRefillStream( stream_t *s )
         /* msg_Dbg( s, "AStreamRefillStream: read=%d", i_read ); */
         if( i_read <  0 )
         {
-            msleep( STREAM_DATA_WAIT );
             continue;
         }
         else if( i_read == 0 )
         {
-            if( !b_read ) return VLC_EGENERIC;
+            if( !b_read )
+                return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
         b_read = true;
@@ -1642,15 +1639,9 @@ static void AStreamPrebufferStream( stream_t *s )
         i_read = __MIN( p_sys->stream.i_read_size, i_read );
         i_read = AReadStream( s, &tk->p_buffer[tk->i_end], i_read );
         if( i_read <  0 )
-        {
-            msleep( STREAM_DATA_WAIT );
             continue;
-        }
         else if( i_read == 0 )
-        {
-            /* EOF */
-            break;
-        }
+            break;  /* EOF */
 
         if( i_first == 0 )
         {
