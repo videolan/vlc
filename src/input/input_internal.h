@@ -147,6 +147,7 @@ struct input_thread_private_t
 
     /* Buffer of pending actions */
     vlc_mutex_t lock_control;
+    vlc_cond_t  wait_control;
     int i_control;
     struct
     {
@@ -211,8 +212,7 @@ static inline void input_ControlPush( input_thread_t *p_input,
         p_input->p->control[0].i_type = i_type;
         memset( &p_input->p->control[0].val, 0, sizeof( vlc_value_t ) );
     }
-    else
-    if( p_input->p->i_control >= INPUT_CONTROL_FIFO_SIZE )
+    else if( p_input->p->i_control >= INPUT_CONTROL_FIFO_SIZE )
     {
         msg_Err( p_input, "input control fifo overflow, trashing type=%d",
                  i_type );
@@ -228,6 +228,7 @@ static inline void input_ControlPush( input_thread_t *p_input,
 
         p_input->p->i_control++;
     }
+    vlc_cond_signal( &p_input->p->wait_control );
     vlc_mutex_unlock( &p_input->p->lock_control );
 }
 

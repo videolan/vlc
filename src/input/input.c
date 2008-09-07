@@ -64,7 +64,7 @@ static void             WaitDie   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input );
 
-static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t * );
+static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline );
 static void       ControlReduce( input_thread_t * );
 static bool Control( input_thread_t *, int, vlc_value_t );
 
@@ -223,6 +223,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Init control buffer */
     vlc_mutex_init( &p_input->p->lock_control );
+    vlc_cond_init( &p_input->p->wait_control );
     p_input->p->i_control = 0;
 
     /* Parse input options */
@@ -337,6 +338,7 @@ static void Destructor( input_thread_t * p_input )
 
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 
+    vlc_cond_destroy( &p_input->p->wait_control );
     vlc_mutex_destroy( &p_input->p->lock_control );
     free( p_input->p );
 }
@@ -730,23 +732,22 @@ static void MainLoop( input_thread_t *p_input )
         int i_type;
         vlc_value_t val;
         mtime_t i_current;
+        mtime_t i_deadline;
 
-        /* Do the read */
+        /* Demux data */
+        b_force_update = false;
         if( p_input->i_state != PAUSE_S )
-        {
             MainLoopDemux( p_input, &b_force_update, &i_start_mdate );
-        }
-        else
-        {
-            /* Small wait */
-            b_force_update = false;
-            msleep( 10*1000 );
-        }
+
+        /* */
+        i_deadline = 0;
+        if( p_input->i_state == PAUSE_S )
+            i_deadline = __MIN( i_intf_update, i_statistic_update );
 
         /* Handle control */
         vlc_mutex_lock( &p_input->p->lock_control );
         ControlReduce( p_input );
-        while( !ControlPopNoLock( p_input, &i_type, &val ) )
+        while( !ControlPopNoLock( p_input, &i_type, &val, i_deadline ) )
         {
             msg_Dbg( p_input, "control type=%d", i_type );
             if( Control( p_input, i_type, val ) )
@@ -1396,11 +1397,17 @@ static void End( input_thread_t * p_input )
  * Control
  *****************************************************************************/
 static inline int ControlPopNoLock( input_thread_t *p_input,
-                                    int *pi_type, vlc_value_t *p_val )
+                                    int *pi_type, vlc_value_t *p_val,
+                                    mtime_t i_deadline )
 {
-    if( p_input->p->i_control <= 0 )
+
+    while( p_input->p->i_control <= 0 )
     {
-        return VLC_EGENERIC;
+        if( i_deadline <= 0 )
+            return VLC_EGENERIC;
+
+        if( vlc_cond_timedwait( &p_input->p->wait_control, &p_input->p->lock_control, i_deadline ) )
+            return VLC_EGENERIC;
     }
 
     *pi_type = p_input->p->control[0].i_type;
