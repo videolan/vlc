@@ -111,8 +111,9 @@ static inline unsigned long vlc_threadid (void)
  *****************************************************************************
  * This is mostly meant for debugging.
  *****************************************************************************/
-void vlc_thread_fatal (const char *action, int error, const char *function,
-                        const char *file, unsigned line)
+static void
+vlc_thread_fatal (const char *action, int error,
+                  const char *function, const char *file, unsigned line)
 {
     fprintf (stderr, "LibVLC fatal error %s (%d) in thread %lu ",
              action, error, vlc_threadid ());

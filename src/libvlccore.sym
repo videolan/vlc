@@ -497,7 +497,6 @@ vlc_strlcpy
 vlc_strtoll
 vlc_submodule_create
 __vlc_thread_create
-vlc_thread_fatal
 __vlc_thread_join
 __vlc_thread_set_priority
 vlc_threadvar_create

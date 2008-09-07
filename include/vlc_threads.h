@@ -165,8 +165,6 @@ enum {
 
 #define vlc_thread_ready vlc_object_signal
 
-VLC_EXPORT(void, vlc_thread_fatal, (const char *action, int error, const char *function, const char *file, unsigned line));
-
 #if defined(LIBVLC_USE_PTHREAD)
 #   define vlc_assert_locked( m ) \
            assert (pthread_mutex_lock (m) == EDEADLK)
