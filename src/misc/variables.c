@@ -848,6 +848,7 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 }
 
 
+#undef var_AcquireMutex
 /**
  * Finds a process-wide mutex, creates it if needed, and locks it.
  * Unlock with vlc_mutex_unlock().

@@ -131,6 +131,23 @@ VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 VLC_EXPORT( int, __var_Command, ( vlc_object_t *, const char *, const char *, const char *, char ** ) );
 
 VLC_EXPORT( vlc_mutex_t *, var_AcquireMutex, ( const char * ) );
+#ifdef __GNUC__
+static
+__attribute__((unused))
+__attribute__((noinline))
+__attribute__((error("variable mutex name leaks memory at run-time")))
+const char *nonconst_mutex_name( const char *str )
+{
+    return str;
+}
+
+# define check_named_mutex( m ) \
+    (__builtin_constant_p(m) ? m : nonconst_mutex_name(m))
+#else
+# define check_named_mutex( m ) (m)
+#endif
+
+#define var_AcquireMutex( n ) var_AcquireMutex(check_named_mutex(n))
 
 /**
  * __var_Create() with automatic casting.
