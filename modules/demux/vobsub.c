@@ -325,10 +325,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_FPS:
         case DEMUX_GET_META:
         case DEMUX_GET_TITLE_INFO:
+        case DEMUX_HAS_UNSUPPORTED_META:
+        case DEMUX_GET_ATTACHMENTS:
+        case DEMUX_CAN_RECORD:
             return VLC_EGENERIC;
 
         default:
-            msg_Err( p_demux, "unknown query in subtitle control" );
+            msg_Warn( p_demux, "unknown query in subtitle control" );
             return VLC_EGENERIC;
     }
 }
