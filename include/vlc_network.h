@@ -109,7 +109,7 @@ VLC_EXPORT( int, net_AcceptSingle, (vlc_object_t *obj, int lfd) );
 
 VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
 #define net_Accept(a, b, c) \
-      __net_Accept(VLC_OBJECT(a), b, c ? check_delay(c) : 0)
+      __net_Accept(VLC_OBJECT(a), b, (c == -1) ? -1 : (c ? check_delay(c) : 0))
 
 #define net_ConnectDgram(a, b, c, d, e ) __net_ConnectDgram(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_ConnectDgram, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim, int proto ) );
