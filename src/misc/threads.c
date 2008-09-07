@@ -376,8 +376,11 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 #elif defined( WIN32 )
     if (p_mutex->recursive)
     {
-        if (--p_mutex->recursion != 0)
+        if (p_mutex->recursion != 0)
+        {
+            p_mutex->recursion--;
             return; /* We still own this mutex */
+        }
 
         /* We release the mutex */
         DWORD self = GetCurrentThreadId ();
