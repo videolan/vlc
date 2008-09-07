@@ -539,7 +539,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
         close_nocancel (fd);
     }
 
-    vlc_object_signal_unlocked( p_this );
+    vlc_cond_broadcast (&priv->wait);
     /* This also serves as a memory barrier toward vlc_object_alive(): */
     vlc_object_unlock( p_this );
 }
