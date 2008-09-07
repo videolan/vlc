@@ -535,9 +535,10 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
         LeaveCriticalSection (&p_mutex->mutex);
         result = WaitForSingleObjectEx (*p_condvar, INFINITE, TRUE);
         EnterCriticalSection (&p_mutex->mutex);
-        ResetEvent (*p_condvar);
     }
     while (result == WAIT_IO_COMPLETION);
+
+    ResetEvent (*p_condvar);
 
 #endif
 }
@@ -581,9 +582,10 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
         LeaveCriticalSection (&p_mutex->mutex);
         result = WaitForSingleObjectEx (*p_condvar, delay, TRUE);
         EnterCriticalSection (&p_mutex->mutex);
-        ResetEvent (*p_condvar);
     }
     while (result == WAIT_IO_COMPLETION);
+
+    ResetEvent (*p_condvar);
 
     return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
 
