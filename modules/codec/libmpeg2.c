@@ -235,7 +235,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     uint8_t *buf[3];
                     buf[0] = buf[1] = buf[2] = NULL;
                     if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
+                    {
+                        p_block->i_buffer = 0;
                         break;
+                    }
                     mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
                     mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
                 }
