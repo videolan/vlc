@@ -510,23 +510,6 @@ static void* Run( vlc_object_t *p_this )
 
     MainLoop( p_input );
 
-    if( !p_input->b_eof && !p_input->b_error && p_input->p->input.b_eof )
-    {
-        /* We have finish to demux data but not to play them */
-        while( !p_input->b_die )
-        {
-            if( input_EsOutDecodersEmpty( p_input->p->p_es_out ) )
-                break;
-
-            msg_Dbg( p_input, "waiting decoder fifos to empty" );
-
-            msleep( INPUT_IDLE_SLEEP );
-        }
-
-        /* We have finished */
-        input_ChangeState( p_input, END_S );
-    }
-
     /* Wait until we are asked to die */
     if( !p_input->b_die )
     {
@@ -556,23 +539,6 @@ static void* RunAndDestroy( vlc_object_t *p_this )
         goto exit;
 
     MainLoop( p_input );
-
-    if( !p_input->b_eof && !p_input->b_error && p_input->p->input.b_eof )
-    {
-        /* We have finished demuxing data but not playing it */
-        while( !p_input->b_die )
-        {
-            if( input_EsOutDecodersEmpty( p_input->p->p_es_out ) )
-                break;
-
-            msg_Dbg( p_input, "waiting decoder fifos to empty" );
-
-            msleep( INPUT_IDLE_SLEEP );
-        }
-
-        /* We have finished */
-        input_ChangeState( p_input, END_S );
-    }
 
     /* Clean up */
     End( p_input );
@@ -758,6 +724,23 @@ static void MainLoop( input_thread_t *p_input )
                                           p_input->p_libvlc->p_stats );
             }
         }
+    }
+
+    if( !p_input->b_eof && !p_input->b_error && p_input->p->input.b_eof )
+    {
+        /* We have finish to demux data but not to play them */
+        while( !p_input->b_die )
+        {
+            if( input_EsOutDecodersEmpty( p_input->p->p_es_out ) )
+                break;
+
+            msg_Dbg( p_input, "waiting decoder fifos to empty" );
+
+            msleep( INPUT_IDLE_SLEEP );
+        }
+
+        /* We have finished */
+        input_ChangeState( p_input, END_S );
     }
 }
 
