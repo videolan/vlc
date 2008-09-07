@@ -193,7 +193,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->pi_active_national_set[i] = ppi_national_subsets[1];
 
     var_Create( p_dec, "telx-override-page",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "telx-override-page", &val );
     if( val.i_int == -1 && p_dec->fmt_in.subs.dvb.i_id != -1 )
     {
@@ -231,7 +231,7 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_dec, "telx-ignore-subtitle-flag", &val );
     p_sys->b_ignore_sub_flag = val.b_bool;
 
-    msg_Dbg( p_dec, "starting telx on magazine %d page %x flag %d",
+    msg_Dbg( p_dec, "starting telx on magazine %d page %02x flag %d",
              p_sys->i_wanted_magazine, p_sys->i_wanted_page,
              p_sys->b_ignore_sub_flag );
 
