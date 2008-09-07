@@ -447,9 +447,10 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     {
         vlc_testcancel ();
 
-        mtime_t total = deadline - mdate ();
-        if (total <= 0)
-            break;
+        mtime_t total = (deadline - mdate ())/1000;
+        if( total < 0 )
+            total = 0;
+
         DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
         result = SignalObjectAndWait (*p_mutex, *p_condvar, delay, TRUE);
     }
