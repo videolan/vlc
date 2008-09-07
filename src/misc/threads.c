@@ -527,6 +527,8 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 
 #elif defined( WIN32 )
     DWORD result;
+
+    assert (!p_mutex->recursive);
     do
     {
         vlc_testcancel ();
@@ -566,6 +568,7 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 #elif defined( WIN32 )
     DWORD result;
 
+    assert (!p_mutex->recursive);
     do
     {
         vlc_testcancel ();
