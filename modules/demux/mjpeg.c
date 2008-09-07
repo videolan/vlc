@@ -386,14 +386,11 @@ static int MjpgDemux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     int i;
 
-    if( p_sys->b_still && p_sys->i_still_end && p_sys->i_still_end < mdate() )
+    if( p_sys->b_still && p_sys->i_still_end )
     {
         /* Still frame, wait until the pause delay is gone */
+        mwait( p_sys->i_still_end );
         p_sys->i_still_end = 0;
-    }
-    else if( p_sys->b_still && p_sys->i_still_end )
-    {
-        msleep( 400 );
         return 1;
     }
 
