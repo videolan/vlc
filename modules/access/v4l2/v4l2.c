@@ -1371,7 +1371,9 @@ static int Demux( demux_t *p_demux )
     {
         /* Sleep so we do not consume all the cpu, 10ms seems
          * like a good value (100fps) */
-        msleep( 10 );
+        /* Yeah, nevermind this was sleeping 10 microseconds! This is
+         * completely brain damaged anyway. Use poll() or mwait() FIXME. */
+        msleep(10000);
         return 1;
     }
 
