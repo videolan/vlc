@@ -427,8 +427,11 @@ VLC_CompileDomain
 VLC_CompileHost
 VLC_Compiler
 vlc_cond_broadcast
-__vlc_cond_destroy
+vlc_cond_destroy
 vlc_cond_init
+vlc_cond_signal
+vlc_cond_timedwait
+vlc_cond_wait
 vlc_config_create
 vlc_config_set
 vlc_control_cancel
@@ -463,9 +466,11 @@ vlc_memcpy
 vlc_memset
 vlc_module_create
 vlc_module_set
-__vlc_mutex_destroy
+vlc_mutex_destroy
 vlc_mutex_init
 vlc_mutex_init_recursive
+vlc_mutex_lock
+vlc_mutex_unlock
 __vlc_object_attach
 __vlc_object_create
 __vlc_object_detach

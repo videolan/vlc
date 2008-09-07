@@ -132,10 +132,15 @@ typedef DWORD   vlc_threadvar_t;
  *****************************************************************************/
 VLC_EXPORT( int,  vlc_mutex_init,    ( vlc_mutex_t * ) );
 VLC_EXPORT( int,  vlc_mutex_init_recursive, ( vlc_mutex_t * ) );
-VLC_EXPORT( void,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
+VLC_EXPORT( void, vlc_mutex_destroy, ( vlc_mutex_t * ) );
+VLC_EXPORT( void, vlc_mutex_lock, ( vlc_mutex_t * ) );
+VLC_EXPORT( void, vlc_mutex_unlock, ( vlc_mutex_t * ) );
 VLC_EXPORT( int,  vlc_cond_init,     ( vlc_cond_t * ) );
-VLC_EXPORT( void,  __vlc_cond_destroy,  ( const char *, int, vlc_cond_t * ) );
+VLC_EXPORT( void, vlc_cond_destroy,  ( vlc_cond_t * ) );
+VLC_EXPORT( void, vlc_cond_signal, (vlc_cond_t *) );
 VLC_EXPORT( void, vlc_cond_broadcast, (vlc_cond_t *) );
+VLC_EXPORT( void, vlc_cond_wait, (vlc_cond_t *, vlc_mutex_t *) );
+VLC_EXPORT( int, vlc_cond_timedwait, (vlc_cond_t *, vlc_mutex_t *, mtime_t) );
 VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) );
 VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( vlc_object_t * ), int, bool ) );
@@ -160,79 +165,14 @@ enum {
 
 #define vlc_thread_ready vlc_object_signal
 
-/*****************************************************************************
- * vlc_mutex_lock: lock a mutex
- *****************************************************************************/
-#define vlc_mutex_lock( P_MUTEX )                                           \
-    __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
-
 VLC_EXPORT(void, vlc_thread_fatal, (const char *action, int error, const char *function, const char *file, unsigned line));
 
 #if defined(LIBVLC_USE_PTHREAD)
-# define VLC_THREAD_ASSERT( action ) \
-    if (val) \
-        vlc_thread_fatal (action, val, __func__, psz_file, i_line)
-#else
-# define VLC_THREAD_ASSERT ((void)(val))
-#endif
-
-static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
-                                    vlc_mutex_t * p_mutex )
-{
-#if defined(LIBVLC_USE_PTHREAD)
 #   define vlc_assert_locked( m ) \
            assert (pthread_mutex_lock (m) == EDEADLK)
-    int val = pthread_mutex_lock( p_mutex );
-    VLC_THREAD_ASSERT ("locking mutex");
-
-#elif defined( UNDER_CE )
-    (void)psz_file; (void)i_line;
-
-    EnterCriticalSection( &p_mutex->csection );
-
-#elif defined( WIN32 )
-    (void)psz_file; (void)i_line;
-
-    WaitForSingleObject( *p_mutex, INFINITE );
-
-#endif
-}
-
-#ifndef vlc_assert_locked
+#else
 # define vlc_assert_locked( m ) (void)m
 #endif
-
-/*****************************************************************************
- * vlc_mutex_unlock: unlock a mutex
- *****************************************************************************/
-#define vlc_mutex_unlock( P_MUTEX )                                         \
-    __vlc_mutex_unlock( __FILE__, __LINE__, P_MUTEX )
-
-static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
-                                      vlc_mutex_t *p_mutex )
-{
-#if defined(LIBVLC_USE_PTHREAD)
-    int val = pthread_mutex_unlock( p_mutex );
-    VLC_THREAD_ASSERT ("unlocking mutex");
-
-#elif defined( UNDER_CE )
-    (void)psz_file; (void)i_line;
-
-    LeaveCriticalSection( &p_mutex->csection );
-
-#elif defined( WIN32 )
-    (void)psz_file; (void)i_line;
-
-    ReleaseMutex( *p_mutex );
-
-#endif
-}
-
-/*****************************************************************************
- * vlc_mutex_destroy: destroy a mutex
- *****************************************************************************/
-#define vlc_mutex_destroy( P_MUTEX )                                        \
-    __vlc_mutex_destroy( __FILE__, __LINE__, P_MUTEX )
 
 /**
  * Save the cancellation state and disable cancellation for the calling thread.
@@ -338,137 +278,6 @@ static inline void vlc_cleanup_lock (void *lock)
     vlc_mutex_unlock ((vlc_mutex_t *)lock);
 }
 #define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
-
-/*****************************************************************************
- * vlc_cond_signal: start a thread on condition completion
- *****************************************************************************/
-#define vlc_cond_signal( P_COND )                                           \
-    __vlc_cond_signal( __FILE__, __LINE__, P_COND )
-
-static inline void __vlc_cond_signal( const char * psz_file, int i_line,
-                                      vlc_cond_t *p_condvar )
-{
-#if defined(LIBVLC_USE_PTHREAD)
-    int val = pthread_cond_signal( p_condvar );
-    VLC_THREAD_ASSERT ("signaling condition variable");
-
-#elif defined( UNDER_CE ) || defined( WIN32 )
-    (void)psz_file; (void)i_line;
-
-    /* Release one waiting thread if one is available. */
-    /* For this trick to work properly, the vlc_cond_signal must be surrounded
-     * by a mutex. This will prevent another thread from stealing the signal */
-    /* PulseEvent() only works if none of the waiting threads is suspended.
-     * This is particularily problematic under a debug session.
-     * as documented in http://support.microsoft.com/kb/q173260/ */
-    PulseEvent( *p_condvar );
-
-#endif
-}
-
-/*****************************************************************************
- * vlc_cond_wait: wait until condition completion
- *****************************************************************************/
-#define vlc_cond_wait( P_COND, P_MUTEX )                                     \
-    __vlc_cond_wait( __FILE__, __LINE__, P_COND, P_MUTEX  )
-
-static inline void __vlc_cond_wait( const char * psz_file, int i_line,
-                                    vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
-{
-#if defined(LIBVLC_USE_PTHREAD)
-    int val = pthread_cond_wait( p_condvar, p_mutex );
-    VLC_THREAD_ASSERT ("waiting on condition");
-
-#elif defined( UNDER_CE )
-    LeaveCriticalSection( &p_mutex->csection );
-    WaitForSingleObject( *p_condvar, INFINITE );
-
-    /* Reacquire the mutex before returning. */
-    vlc_mutex_lock( p_mutex );
-
-#elif defined( WIN32 )
-    do
-        vlc_testcancel ();
-    while (SignalObjectAndWait (*p_mutex, *p_condvar, INFINITE, TRUE)
-            == WAIT_IO_COMPLETION);
-
-    /* Reacquire the mutex before returning. */
-    vlc_mutex_lock( p_mutex );
-
-    (void)psz_file; (void)i_line;
-
-#endif
-}
-
-
-/*****************************************************************************
- * vlc_cond_timedwait: wait until condition completion or expiration
- *****************************************************************************
- * Returns 0 if object signaled, an error code in case of timeout or error.
- *****************************************************************************/
-#define vlc_cond_timedwait( c, m, d ) \
-    __vlc_cond_timedwait( __FILE__, __LINE__, c, m, check_deadline(d) )
-
-static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
-                                        vlc_cond_t *p_condvar,
-                                        vlc_mutex_t *p_mutex,
-                                        mtime_t deadline )
-{
-#if defined(LIBVLC_USE_PTHREAD)
-    lldiv_t d = lldiv( deadline, CLOCK_FREQ );
-    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
-
-    int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
-    if (val != ETIMEDOUT)
-        VLC_THREAD_ASSERT ("timed-waiting on condition");
-    return val;
-
-#elif defined( UNDER_CE )
-    mtime_t delay_ms = (deadline - mdate()) / (CLOCK_FREQ / 1000);
-    DWORD result;
-    if( delay_ms < 0 )
-        delay_ms = 0;
-
-    LeaveCriticalSection( &p_mutex->csection );
-    result = WaitForSingleObject( *p_condvar, delay_ms );
-
-    /* Reacquire the mutex before returning. */
-    vlc_mutex_lock( p_mutex );
-
-    (void)psz_file; (void)i_line;
-
-    return (result == WAIT_TIMEOUT) ? ETIMEDOUT : 0;
-
-#elif defined( WIN32 )
-    DWORD result;
-
-    (void)psz_file; (void)i_line;
-
-    do
-    {
-        vlc_testcancel ();
-
-        mtime_t total = (deadline - mdate ())/1000;
-        if( total < 0 )
-            total = 0;
-
-        DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
-        result = SignalObjectAndWait (*p_mutex, *p_condvar, delay, TRUE);
-    }
-    while (result == WAIT_IO_COMPLETION);
-
-    /* Reacquire the mutex before return/cancel. */
-    vlc_mutex_lock (p_mutex);
-    return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
-
-#endif
-}
-
-/*****************************************************************************
- * vlc_cond_destroy: destroy a condition
- *****************************************************************************/
-#define vlc_cond_destroy( P_COND )                                          \
-    __vlc_cond_destroy( __FILE__, __LINE__, P_COND )
 
 /*****************************************************************************
  * vlc_threadvar_set: create: set the value of a thread-local variable

@@ -147,6 +147,13 @@ void vlc_thread_fatal (const char *action, int error, const char *function,
     abort ();
 }
 
+#ifndef NDEBUG
+# define VLC_THREAD_ASSERT( action ) \
+    if (val) vlc_thread_fatal (action, val, __func__, __FILE__, __LINE__)
+#else
+# define VLC_THREAD_ASSERT( action ) ((void)val)
+#endif
+
 /**
  * Per-thread cancellation data
  */
@@ -298,24 +305,66 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 }
 
 
-/*****************************************************************************
- * vlc_mutex_destroy: destroy a mutex, inner version
- *****************************************************************************/
-void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex )
+/**
+ * Destroys a mutex. The mutex must not be locked.
+ *
+ * @param p_mutex mutex to destroy
+ * @return always succeeds
+ */
+void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
 {
 #if defined( LIBVLC_USE_PTHREAD )
     int val = pthread_mutex_destroy( p_mutex );
     VLC_THREAD_ASSERT ("destroying mutex");
 
 #elif defined( UNDER_CE )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
-
     DeleteCriticalSection( &p_mutex->csection );
 
 #elif defined( WIN32 )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
-
     CloseHandle( *p_mutex );
+
+#endif
+}
+
+/**
+ * Acquires a mutex. If needed, waits for any other thread to release it.
+ * Beware of deadlocks when locking multiple mutexes at the same time,
+ * or when using mutexes from callbacks.
+ *
+ * @param p_mutex mutex initialized with vlc_mutex_init() or
+ *                vlc_mutex_init_recursive()
+ */
+void vlc_mutex_lock (vlc_mutex_t *p_mutex)
+{
+#if defined(LIBVLC_USE_PTHREAD)
+    int val = pthread_mutex_lock( p_mutex );
+    VLC_THREAD_ASSERT ("locking mutex");
+
+#elif defined( UNDER_CE )
+    EnterCriticalSection( &p_mutex->csection );
+
+#elif defined( WIN32 )
+    WaitForSingleObject( *p_mutex, INFINITE );
+
+#endif
+}
+
+
+/**
+ * Releases a mutex (or crashes if the mutex is not locked by the caller).
+ * @param p_mutex mutex locked with vlc_mutex_lock().
+ */
+void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
+{
+#if defined(LIBVLC_USE_PTHREAD)
+    int val = pthread_mutex_unlock( p_mutex );
+    VLC_THREAD_ASSERT ("unlocking mutex");
+
+#elif defined( UNDER_CE )
+    LeaveCriticalSection( &p_mutex->csection );
+
+#elif defined( WIN32 )
+    ReleaseMutex( *p_mutex );
 
 #endif
 }
@@ -357,19 +406,41 @@ int vlc_cond_init( vlc_cond_t *p_condvar )
 #endif
 }
 
-/*****************************************************************************
- * vlc_cond_destroy: destroy a condition, inner version
- *****************************************************************************/
-void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar )
+/**
+ * Destroys a condition variable. No threads shall be waiting or signaling the
+ * condition.
+ * @param p_condvar condition variable to destroy
+ */
+void vlc_cond_destroy (vlc_cond_t *p_condvar)
 {
 #if defined( LIBVLC_USE_PTHREAD )
     int val = pthread_cond_destroy( p_condvar );
     VLC_THREAD_ASSERT ("destroying condition");
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
-
     CloseHandle( *p_condvar );
+
+#endif
+}
+
+/**
+ * Wakes up one thread waiting on a condition variable, if any.
+ * @param p_condvar condition variable
+ */
+void vlc_cond_signal (vlc_cond_t *p_condvar)
+{
+#if defined(LIBVLC_USE_PTHREAD)
+    int val = pthread_cond_signal( p_condvar );
+    VLC_THREAD_ASSERT ("signaling condition variable");
+
+#elif defined( UNDER_CE ) || defined( WIN32 )
+    /* Release one waiting thread if one is available. */
+    /* For this trick to work properly, the vlc_cond_signal must be surrounded
+     * by a mutex. This will prevent another thread from stealing the signal */
+    /* PulseEvent() only works if none of the waiting threads is suspended.
+     * This is particularily problematic under a debug session.
+     * as documented in http://support.microsoft.com/kb/q173260/ */
+    PulseEvent( *p_condvar );
 
 #endif
 }
@@ -389,6 +460,124 @@ void vlc_cond_broadcast (vlc_cond_t *p_condvar)
 #endif
 }
 
+/**
+ * Waits for a condition variable. The calling thread will be suspended until
+ * another thread calls vlc_cond_signal() or vlc_cond_broadcast() on the same
+ * condition variable, the thread is cancelled with vlc_cancel(), or the
+ * system causes a "spurious" unsolicited wake-up.
+ *
+ * A mutex is needed to wait on a condition variable. It must <b>not</b> be
+ * a recursive mutex. Although it is possible to use the same mutex for
+ * multiple condition, it is not valid to use different mutexes for the same
+ * condition variable at the same time from different threads.
+ *
+ * In case of thread cancellation, the mutex is always locked before
+ * cancellation proceeds.
+ *
+ * The canonical way to use a condition variable to wait for event foobar is:
+ @code
+   vlc_mutex_lock (&lock);
+   mutex_cleanup_push (&lock); // release the mutex in case of cancellation
+
+   while (!foobar)
+       vlc_cond_wait (&wait, &lock);
+
+   --- foobar is now true, do something about it here --
+
+   vlc_cleanup_run (); // release the mutex
+  @endcode
+ *
+ * @param p_condvar condition variable to wait on
+ * @param p_mutex mutex which is unlocked while waiting,
+ *                then locked again when waking up.
+ * @param deadline <b>absolute</b> timeout
+ *
+ * @return 0 if the condition was signaled, an error code in case of timeout.
+ */
+void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
+{
+#if defined(LIBVLC_USE_PTHREAD)
+    int val = pthread_cond_wait( p_condvar, p_mutex );
+    VLC_THREAD_ASSERT ("waiting on condition");
+
+#elif defined( UNDER_CE )
+    LeaveCriticalSection( &p_mutex->csection );
+    WaitForSingleObject( *p_condvar, INFINITE );
+
+    /* Reacquire the mutex before returning. */
+    vlc_mutex_lock( p_mutex );
+
+#elif defined( WIN32 )
+    do
+        vlc_testcancel ();
+    while (SignalObjectAndWait (*p_mutex, *p_condvar, INFINITE, TRUE)
+            == WAIT_IO_COMPLETION);
+
+    /* Reacquire the mutex before returning. */
+    vlc_mutex_lock( p_mutex );
+
+#endif
+}
+
+/**
+ * Waits for a condition variable up to a certain date.
+ * This works like vlc_cond_wait(), except for the additional timeout.
+ *
+ * @param p_condvar condition variable to wait on
+ * @param p_mutex mutex which is unlocked while waiting,
+ *                then locked again when waking up.
+ * @param deadline <b>absolute</b> timeout
+ *
+ * @return 0 if the condition was signaled, an error code in case of timeout.
+ */
+int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
+                        mtime_t deadline)
+{
+#if defined(LIBVLC_USE_PTHREAD)
+    lldiv_t d = lldiv( deadline, CLOCK_FREQ );
+    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
+
+    int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
+    if (val != ETIMEDOUT)
+        VLC_THREAD_ASSERT ("timed-waiting on condition");
+    return val;
+
+#elif defined( UNDER_CE )
+    mtime_t delay_ms = (deadline - mdate()) / (CLOCK_FREQ / 1000);
+    DWORD result;
+    if( delay_ms < 0 )
+        delay_ms = 0;
+
+    LeaveCriticalSection( &p_mutex->csection );
+    result = WaitForSingleObject( *p_condvar, delay_ms );
+
+    /* Reacquire the mutex before returning. */
+    vlc_mutex_lock( p_mutex );
+
+    return (result == WAIT_TIMEOUT) ? ETIMEDOUT : 0;
+
+#elif defined( WIN32 )
+    DWORD result;
+
+    do
+    {
+        vlc_testcancel ();
+
+        mtime_t total = (deadline - mdate ())/1000;
+        if( total < 0 )
+            total = 0;
+
+        DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
+        result = SignalObjectAndWait (*p_mutex, *p_condvar, delay, TRUE);
+    }
+    while (result == WAIT_IO_COMPLETION);
+
+    /* Reacquire the mutex before return/cancel. */
+    vlc_mutex_lock (p_mutex);
+    return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
+
+#endif
+}
 
 /*****************************************************************************
  * vlc_tls_create: create a thread-local variable
