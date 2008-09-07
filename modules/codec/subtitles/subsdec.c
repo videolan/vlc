@@ -576,6 +576,25 @@ static char *StripTags( char *psz_subtitle )
  * returned, and the rendering engine will fall back to the
  * plain text version of the subtitle.
  */
+static void HtmlNPut( char **ppsz_html, const char *psz_text, int i_max )
+{
+    const int i_len = strlen(psz_text);
+
+    strncpy( *ppsz_html, psz_text, i_max );
+    *ppsz_html += __MIN(i_max,i_len);
+}
+
+static void HtmlPut( char **ppsz_html, const char *psz_text )
+{
+    strcpy( *ppsz_html, psz_text );
+    *ppsz_html += strlen(psz_text);
+}
+static void HtmlCopy( char **ppsz_html, char **ppsz_subtitle, const char *psz_text )
+{
+    HtmlPut( ppsz_html, psz_text );
+    *ppsz_subtitle += strlen(psz_text);
+}
+
 static char *CreateHtmlSubtitle( char *psz_subtitle )
 {
     char   *psz_tag = malloc( ( strlen( psz_subtitle ) / 3 ) + 1 );
@@ -600,50 +619,39 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
     {
         if( *psz_subtitle == '\n' )
         {
-            strcpy( psz_html, "<br/>" );
-            psz_html += 5;
+            HtmlPut( &psz_html, "<br/>" );
             psz_subtitle++;
         }
         else if( *psz_subtitle == '<' )
         {
             if( !strncasecmp( psz_subtitle, "<br/>", 5 ))
             {
-                strcpy( psz_html, "<br/>" );
-                psz_html += 5;
-                psz_subtitle += 5;
+                HtmlCopy( &psz_html, &psz_subtitle, "<br/>" );
             }
             else if( !strncasecmp( psz_subtitle, "<b>", 3 ) )
             {
-                strcpy( psz_html, "<b>" );
+                HtmlCopy( &psz_html, &psz_subtitle, "<b>" );
                 strcat( psz_tag, "b" );
-                psz_html += 3;
-                psz_subtitle += 3;
             }
             else if( !strncasecmp( psz_subtitle, "<i>", 3 ) )
             {
-                strcpy( psz_html, "<i>" );
+                HtmlCopy( &psz_html, &psz_subtitle, "<i>" );
                 strcat( psz_tag, "i" );
-                psz_html += 3;
-                psz_subtitle += 3;
             }
             else if( !strncasecmp( psz_subtitle, "<u>", 3 ) )
             {
-                strcpy( psz_html, "<u>" );
+                HtmlCopy( &psz_html, &psz_subtitle, "<u>" );
                 strcat( psz_tag, "u" );
-                psz_html += 3;
-                psz_subtitle += 3;
             }
             else if( !strncasecmp( psz_subtitle, "<font ", 6 ))
             {
-                const char *psz_attribs[] = { "face=\"", "family=\"", "size=\"",
-                        "color=\"", "outline-color=\"", "shadow-color=\"",
-                        "outline-level=\"", "shadow-level=\"", "back-color=\"",
-                        "alpha=\"", NULL };
+                const char *psz_attribs[] = { "face=", "family=", "size=",
+                        "color=", "outline-color=", "shadow-color=",
+                        "outline-level=", "shadow-level=", "back-color=",
+                        "alpha=", NULL };
 
-                strcpy( psz_html, "<font " );
+                HtmlCopy( &psz_html, &psz_subtitle, "<font " );
                 strcat( psz_tag, "f" );
-                psz_html += 6;
-                psz_subtitle += 6;
 
                 while( *psz_subtitle != '>' )
                 {
@@ -653,13 +661,31 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
                     {
                         int i_len = strlen( psz_attribs[ k ] );
 
-                        if( !strncasecmp( psz_subtitle, psz_attribs[k], i_len ))
+                        if( !strncasecmp( psz_subtitle, psz_attribs[k], i_len ) )
                         {
-                            i_len += strcspn( psz_subtitle + i_len, "\"" ) + 1;
-
-                            strncpy( psz_html, psz_subtitle, i_len );
-                            psz_html += i_len;
+                            /* */
+                            HtmlPut( &psz_html, psz_attribs[k] );
                             psz_subtitle += i_len;
+
+                            /* */
+                            if( *psz_subtitle == '"' )
+                            {
+                                psz_subtitle++;
+                                i_len = strcspn( psz_subtitle, "\"" );
+                            }
+                            else
+                            {
+                                i_len = strcspn( psz_subtitle, " \t>" );
+                            }
+                            HtmlPut( &psz_html, "\"" );
+                            if( !strcmp( psz_attribs[ k ], "color=" ) && *psz_subtitle >= '0' && *psz_subtitle <= '9' )
+                                HtmlPut( &psz_html, "#" );
+                            HtmlNPut( &psz_html, psz_subtitle, i_len );
+                            HtmlPut( &psz_html, "\"" );
+
+                            psz_subtitle += i_len;
+                            if( *psz_subtitle == '\"' )
+                                psz_subtitle++;
                             break;
                         }
                     }
@@ -728,26 +754,19 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
         {
             if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
             {
-                strcpy( psz_html, "&lt;" );
-                psz_html += 4;
-                psz_subtitle += 4;
+                HtmlCopy( &psz_html, &psz_subtitle, "&lt;" );
             }
             else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
             {
-                strcpy( psz_html, "&gt;" );
-                psz_html += 4;
-                psz_subtitle += 4;
+                HtmlCopy( &psz_html, &psz_subtitle, "&gt;" );
             }
             else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
             {
-                strcpy( psz_html, "&amp;" );
-                psz_html += 5;
-                psz_subtitle += 5;
+                HtmlCopy( &psz_html, &psz_subtitle, "&amp;" );
             }
             else
             {
-                strcpy( psz_html, "&amp;" );
-                psz_html += 5;
+                HtmlPut( &psz_html, "&amp;" );
                 psz_subtitle++;
             }
         }
@@ -757,24 +776,22 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
             if( psz_html > psz_html_start )
             {
                 /* Check for double whitespace */
-                if((( *psz_html == ' ' ) ||
-                    ( *psz_html == '\t' )) &&
-                   (( *(psz_html-1) == ' ' ) ||
-                    ( *(psz_html-1) == '\t' )))
+                if( ( *psz_html == ' '  || *psz_html == '\t' ) &&
+                    ( *(psz_html-1) == ' ' || *(psz_html-1) == '\t' ) )
                 {
-                    strcpy( psz_html, NO_BREAKING_SPACE );
-                    psz_html += strlen( NO_BREAKING_SPACE ) - 1;
+                    HtmlPut( &psz_html, NO_BREAKING_SPACE );
+                    psz_html--;
                 }
             }
             psz_html++;
             psz_subtitle++;
         }
 
-        if( ( size_t )( psz_html - psz_html_start ) > i_buf_size - 10 )
+        if( ( size_t )( psz_html - psz_html_start ) > i_buf_size - 50 )
         {
             int i_len = psz_html - psz_html_start;
 
-            i_buf_size += 100;
+            i_buf_size += 200;
             psz_html_start = realloc( psz_html_start, i_buf_size );
             psz_html = psz_html_start + i_len;
             *psz_html = '\0';
@@ -795,5 +812,7 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
         psz_html_start = realloc( psz_html_start,  psz_html - psz_html_start + 1 );
     }
     free( psz_tag );
+
     return psz_html_start;
 }
+
