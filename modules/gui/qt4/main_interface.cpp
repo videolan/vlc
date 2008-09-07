@@ -598,11 +598,9 @@ void MainInterface::debug()
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
     if( videoWidget && videoWidget->isVisible() )
     {
-        //    sleep( 10 );
         msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
         msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
     }
-    adjustSize();
 #endif
 }
 
@@ -765,8 +763,8 @@ void MainInterface::togglePlaylist()
     {
     /* toggle the visibility of the playlist */
        TOGGLEV( playlistWidget );
-       resize( sizeHint() );
        playlistVisible = !playlistVisible;
+       //doComponentsUpdate(); //resize( sizeHint() );
     }
 }
 
@@ -774,7 +772,7 @@ void MainInterface::togglePlaylist()
 void MainInterface::undockPlaylist()
 {
 //    dockPL->setFloating( true );
-    adjustSize();
+//    adjustSize();
 }
 
 void MainInterface::dockPlaylist( pl_dock_e i_pos )
@@ -805,11 +803,22 @@ void MainInterface::toggleMinimalView()
 
 /* Video widget cannot do this synchronously as it runs in another thread */
 /* Well, could it, actually ? Probably dangerous ... */
+
+/* This function is called:
+   - toggling of minimal View
+   - through askUpdate() by Vout thread request video and resize video (zoom)
+   - Advanced buttons toggled
+ */
 void MainInterface::doComponentsUpdate()
 {
     msg_Dbg( p_intf, "Updating the geometry" );
-    //    resize( sizeHint() );
-    adjustSize();
+    /* Here we resize to sizeHint() and not adjustsize because we want
+       the videoWidget to be exactly the correctSize */
+    resize( sizeHint() );
+    //    adjustSize()  ;
+#ifndef NDEBUG
+    debug();
+#endif
 }
 
 /* toggling advanced controls buttons */

@@ -73,7 +73,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     hide();
 
     /* Set the policy to expand in both directions */
-    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+//    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
     /* Black background is more coherent for a Video Widget */
     QPalette plt =  palette();
