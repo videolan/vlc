@@ -185,12 +185,16 @@ ssize_t vlc_recvmsg (int s, struct msghdr *hdr, int flags)
         buf[i].buf = hdr->msg_iov[i].iov_base,
         buf[i].len = hdr->msg_iov[i].iov_len;
 
-    DWORD recvd;
+    DWORD recvd, dwFlags = flags;
+    INT fromlen = hdr->msg_namelen;
     hdr->msg_controllen = 0;
     hdr->msg_flags = 0;
 
-    if (WSARecvFrom (s, buf, sizeof (buf) / sizeof (buf[0]), &recvd, flags,
-                     hdr->msg_name, hdr->msg_namelen, NULL, NULL) == 0)
+    int ret = WSARecvFrom (s, buf, sizeof (buf) / sizeof (buf[0]), &recvd,
+                           &dwFlags, hdr->msg_name, &fromlen, NULL, NULL);
+    hdr->msg_namelen = fromlen;
+    hdr->msg_flags = dwFlags;
+    if (ret == 0)
         return recvd;
 
 #ifdef MSG_TRUNC
