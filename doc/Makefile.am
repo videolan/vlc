@@ -29,7 +29,7 @@ man1_MANS = \
 
 EXTRA_DIST = \
 	$(CHANGELOGS) \
-        $(man_MANS) \
+        $(man1_MANS) \
         bugreport-howto.txt \
 	fortunes.txt \
 	intf-cdda.txt \
