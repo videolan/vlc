@@ -80,30 +80,48 @@ static
 __attribute__((unused))
 __attribute__((noinline))
 __attribute__((error("sorry, cannot sleep for such short a time")))
-void impossible_msleep( mtime_t delay )
+mtime_t impossible_delay( mtime_t delay )
 {
     (void) delay;
-    msleep( VLC_HARD_MIN_SLEEP );
+    return VLC_HARD_MIN_SLEEP;
 }
 
 static
 __attribute__((unused))
 __attribute__((noinline))
-__attribute__((warning("use proper event handling instead")))
-void bad_msleep( mtime_t delay )
+__attribute__((warning("use proper event handling instead of short delay")))
+mtime_t harmful_delay( mtime_t delay )
 {
-    msleep( delay );
+    return delay;
 }
 
-# define msleep( d ) \
+# define check_delay( d ) \
     ((__builtin_constant_p(d < VLC_HARD_MIN_SLEEP) \
    && (d < VLC_HARD_MIN_SLEEP)) \
-       ? impossible_msleep(d) \
+       ? impossible_delay(d) \
        : ((__builtin_constant_p(d < VLC_SOFT_MIN_SLEEP) \
        && (d < VLC_SOFT_MIN_SLEEP)) \
-           ? bad_msleep(d) \
-           : msleep(d)))
+           ? harmful_delay(d) \
+           : d))
+
+static
+__attribute__((unused))
+__attribute__((noinline))
+__attribute__((error("deadlines can not be constant")))
+mtime_t impossible_deadline( mtime_t deadline )
+{
+    return deadline;
+}
+
+# define check_deadline( d ) \
+    (__builtin_constant_p(d) ? impossible_deadline(d) : d)
+#else
+# define check_delay(d) (d)
+# define check_deadline(d) (d)
 #endif
+
+#define msleep(d) msleep(check_delay(d))
+#define mwait(d) mwait(check_deadline(d))
 
 /*****************************************************************************
  * date_t: date incrementation without long-term rounding errors

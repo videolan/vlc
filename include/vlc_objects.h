@@ -139,7 +139,7 @@ VLC_EXPORT( void, __vlc_object_wait, ( vlc_object_t * ) );
 
 VLC_EXPORT( int, __vlc_object_timedwait, ( vlc_object_t *, mtime_t ) );
 #define vlc_object_timedwait( obj, d ) \
-    __vlc_object_timedwait( VLC_OBJECT( obj ), d )
+    __vlc_object_timedwait( VLC_OBJECT( obj ), check_deadline(d) )
 
 VLC_EXPORT( void, __vlc_object_signal_unlocked, ( vlc_object_t * ) );
 #define vlc_object_signal_unlocked( obj ) \

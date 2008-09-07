@@ -314,6 +314,7 @@ mtime_t mdate( void )
     return res;
 }
 
+#undef mwait
 /**
  * Wait for a date
  *

@@ -411,8 +411,8 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
  *****************************************************************************
  * Returns 0 if object signaled, an error code in case of timeout or error.
  *****************************************************************************/
-#define vlc_cond_timedwait( P_COND, P_MUTEX, DEADLINE )                      \
-    __vlc_cond_timedwait( __FILE__, __LINE__, P_COND, P_MUTEX, DEADLINE  )
+#define vlc_cond_timedwait( c, m, d ) \
+    __vlc_cond_timedwait( __FILE__, __LINE__, c, m, check_deadline(d) )
 
 static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
                                         vlc_cond_t *p_condvar,
