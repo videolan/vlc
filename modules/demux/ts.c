@@ -189,9 +189,9 @@ static const char *const ppsz_teletext_type[] = {
  "",
  N_("Teletext"),
  N_("Teletext subtitles"),
- N_("Teletext additional information"),
- N_("Teletext program schedule"),
- N_("Teletext hearing impaired subtitles")
+ N_("Teletext: additional information"),
+ N_("Teletext: program schedule"),
+ N_("Teletext subtitles: hearing impaired")
 };
 
 typedef struct
@@ -3475,7 +3475,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 #endif  /* defined _DVBPSI_DR_56_H_  && DVBPSI_VERSION(0,1,6) */
                     {
                         pid->es->fmt.subs.dvb.i_id = -1;
-                        pid->es->fmt.psz_description = strdup( "Teletext" );
+                        pid->es->fmt.psz_description = strdup( _(ppsz_teletext_type[1]) );
                     }
                 }
                 else if( p_dr->i_tag == 0x59 )
@@ -3540,37 +3540,19 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                             switch( p_sub->i_subtitling_type )
                             {
-                            case 0x10:
+                            case 0x10: /* unspec. */
+                            case 0x11: /* 4:3 */
+                            case 0x12: /* 16:9 */
+                            case 0x13: /* 2.21:1 */
                                 p_es->fmt.psz_description =
-                                    strdup(_("subtitles"));
+                                    strdup(_("DVB subtitles"));
                                 break;
-                            case 0x11:
+                            case 0x20: /* Hearing impaired unspec. */
+                            case 0x21: /* h.i. 4:3 */
+                            case 0x22: /* h.i. 16:9 */
+                            case 0x23: /* h.i. 2.21:1 */
                                 p_es->fmt.psz_description =
-                                    strdup(_("4:3 subtitles"));
-                                break;
-                            case 0x12:
-                                p_es->fmt.psz_description =
-                                    strdup(_("16:9 subtitles"));
-                                break;
-                            case 0x13:
-                                p_es->fmt.psz_description =
-                                    strdup(_("2.21:1 subtitles"));
-                                break;
-                            case 0x20:
-                                p_es->fmt.psz_description =
-                                    strdup(_("hearing impaired"));
-                                break;
-                            case 0x21:
-                                p_es->fmt.psz_description =
-                                    strdup(_("4:3 hearing impaired"));
-                                break;
-                            case 0x22:
-                                p_es->fmt.psz_description =
-                                    strdup(_("16:9 hearing impaired"));
-                                break;
-                            case 0x23:
-                                p_es->fmt.psz_description =
-                                    strdup(_("2.21:1 hearing impaired"));
+                                    strdup(_("DVB subtitles: hearing impaired"));
                                 break;
                             default:
                                 break;
@@ -3592,7 +3574,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 #endif /* _DVBPSI_DR_59_H_ */
                     {
                         pid->es->fmt.subs.dvb.i_id = -1;
-                        pid->es->fmt.psz_description = strdup( "DVB subtitles" );
+                        pid->es->fmt.psz_description = strdup( _("DVB subtitles") );
                     }
                 }
             }
