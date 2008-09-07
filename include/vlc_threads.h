@@ -109,7 +109,7 @@ typedef pthread_mutex_t vlc_mutex_t;
 typedef pthread_cond_t  vlc_cond_t;
 typedef pthread_key_t   vlc_threadvar_t;
 
-#elif defined( WIN32 ) || defined( UNDER_CE )
+#elif defined( WIN32 )
 typedef struct
 {
     HANDLE handle;
@@ -117,7 +117,14 @@ typedef struct
     void  *data;
 } *vlc_thread_t;
 
-typedef HANDLE  vlc_mutex_t;
+typedef struct
+{
+    CRITICAL_SECTION mutex;
+    LONG             owner;
+    unsigned         recursion;
+    bool             recursive;
+}
+vlc_mutex_t;
 typedef HANDLE  vlc_cond_t;
 typedef DWORD   vlc_threadvar_t;
 

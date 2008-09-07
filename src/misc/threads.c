@@ -267,13 +267,11 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     i_result = pthread_mutex_init( p_mutex, &attr );
     pthread_mutexattr_destroy( &attr );
     return i_result;
-#elif defined( UNDER_CE )
-    InitializeCriticalSection( &p_mutex->csection );
-    return 0;
 
 #elif defined( WIN32 )
-    *p_mutex = CreateMutex( NULL, FALSE, NULL );
-    return (*p_mutex != NULL) ? 0 : ENOMEM;
+    InitializeCriticalSection (&p_mutex->mutex);
+    p_mutex->recursive = false;
+    return 0;
 
 #endif
 }
@@ -296,12 +294,14 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
     i_result = pthread_mutex_init( p_mutex, &attr );
     pthread_mutexattr_destroy( &attr );
     return( i_result );
+
 #elif defined( WIN32 )
-    /* Create mutex returns a recursive mutex */
-    *p_mutex = CreateMutex( 0, FALSE, 0 );
-    return (*p_mutex != NULL) ? 0 : ENOMEM;
-#else
-# error Unimplemented!
+    InitializeCriticalSection( &p_mutex->mutex );
+    p_mutex->owner = 0; /* the error value for GetThreadId()! */
+    p_mutex->recursion = 0;
+    p_mutex->recursive = true;
+    return 0;
+
 #endif
 }
 
@@ -318,11 +318,8 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
     int val = pthread_mutex_destroy( p_mutex );
     VLC_THREAD_ASSERT ("destroying mutex");
 
-#elif defined( UNDER_CE )
-    DeleteCriticalSection( &p_mutex->csection );
-
 #elif defined( WIN32 )
-    CloseHandle( *p_mutex );
+    DeleteCriticalSection (&p_mutex->mutex);
 
 #endif
 }
@@ -341,11 +338,26 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
     int val = pthread_mutex_lock( p_mutex );
     VLC_THREAD_ASSERT ("locking mutex");
 
-#elif defined( UNDER_CE )
-    EnterCriticalSection( &p_mutex->csection );
-
 #elif defined( WIN32 )
-    WaitForSingleObject( *p_mutex, INFINITE );
+    if (p_mutex->recursive)
+    {
+        DWORD self = GetCurrentThreadId ();
+
+        if ((DWORD)InterlockedCompareExchange (&p_mutex->owner, self,
+                                               self) == self)
+        {   /* We already locked this recursive mutex */
+            p_mutex->recursion++;
+            return;
+        }
+
+        /* We need to lock this recursive mutex */
+        EnterCriticalSection (&p_mutex->mutex);
+        self = InterlockedCompareExchange (&p_mutex->owner, self, 0);
+        assert (self == 0); /* no previous owner */
+        return;
+    }
+    /* Non-recursive mutex */
+    EnterCriticalSection (&p_mutex->mutex);
 
 #endif
 }
@@ -361,11 +373,19 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
     int val = pthread_mutex_unlock( p_mutex );
     VLC_THREAD_ASSERT ("unlocking mutex");
 
-#elif defined( UNDER_CE )
-    LeaveCriticalSection( &p_mutex->csection );
-
 #elif defined( WIN32 )
-    ReleaseMutex( *p_mutex );
+    if (p_mutex->recursive)
+    {
+        if (--p_mutex->recursion != 0)
+            return; /* We still own this mutex */
+
+        /* We release the mutex */
+        DWORD self = GetCurrentThreadId ();
+        self = InterlockedCompareExchange (&p_mutex->owner, self, 0);
+        assert (self == GetCurrentThreadId ());
+        /* fall through */
+    }
+    LeaveCriticalSection (&p_mutex->mutex);
 
 #endif
 }
@@ -396,12 +416,9 @@ int vlc_cond_init( vlc_cond_t *p_condvar )
     pthread_condattr_destroy (&attr);
     return ret;
 
-#elif defined( UNDER_CE ) || defined( WIN32 )
-    /* Create an auto-reset event. */
-    *p_condvar = CreateEvent( NULL,   /* no security */
-                              FALSE,  /* auto-reset event */
-                              FALSE,  /* start non-signaled */
-                              NULL ); /* unnamed */
+#elif defined( WIN32 )
+    /* Create a manual-reset event (manual reset is needed for broadcast). */
+    *p_condvar = CreateEvent( NULL, TRUE, FALSE, NULL );
     return *p_condvar ? 0 : ENOMEM;
 
 #endif
@@ -418,7 +435,7 @@ void vlc_cond_destroy (vlc_cond_t *p_condvar)
     int val = pthread_cond_destroy( p_condvar );
     VLC_THREAD_ASSERT ("destroying condition");
 
-#elif defined( UNDER_CE ) || defined( WIN32 )
+#elif defined( WIN32 )
     CloseHandle( *p_condvar );
 
 #endif
@@ -434,14 +451,13 @@ void vlc_cond_signal (vlc_cond_t *p_condvar)
     int val = pthread_cond_signal( p_condvar );
     VLC_THREAD_ASSERT ("signaling condition variable");
 
-#elif defined( UNDER_CE ) || defined( WIN32 )
-    /* Release one waiting thread if one is available. */
-    /* For this trick to work properly, the vlc_cond_signal must be surrounded
-     * by a mutex. This will prevent another thread from stealing the signal */
-    /* PulseEvent() only works if none of the waiting threads is suspended.
-     * This is particularily problematic under a debug session.
-     * as documented in http://support.microsoft.com/kb/q173260/ */
-    PulseEvent( *p_condvar );
+#elif defined( WIN32 )
+    /* NOTE: This will cause a broadcast, that is wrong.
+     * This will also wake up the next waiting thread if no thread are yet
+     * waiting, which is also wrong. However both of these issues are allowed
+     * by the provision for spurious wakeups. Better have too many wakeups
+     * than too few (= deadlocks). */
+    SetEvent (*p_condvar);
 
 #endif
 }
@@ -460,6 +476,11 @@ void vlc_cond_broadcast (vlc_cond_t *p_condvar)
 
 #endif
 }
+
+#ifdef UNDER_CE
+# warning FIXME
+# define WaitForMultipleObjectsEx(a,b,c) WaitForMultipleObjects(a,b)
+#endif
 
 /**
  * Waits for a condition variable. The calling thread will be suspended until
@@ -501,21 +522,16 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
     int val = pthread_cond_wait( p_condvar, p_mutex );
     VLC_THREAD_ASSERT ("waiting on condition");
 
-#elif defined( UNDER_CE )
-    LeaveCriticalSection( &p_mutex->csection );
-    WaitForSingleObject( *p_condvar, INFINITE );
-
-    /* Reacquire the mutex before returning. */
-    vlc_mutex_lock( p_mutex );
-
 #elif defined( WIN32 )
+    DWORD result;
     do
+    {
         vlc_testcancel ();
-    while (SignalObjectAndWait (*p_mutex, *p_condvar, INFINITE, TRUE)
-            == WAIT_IO_COMPLETION);
-
-    /* Reacquire the mutex before returning. */
-    vlc_mutex_lock( p_mutex );
+        LeaveCriticalSection (&p_mutex->mutex);
+        result = WaitForSingleObjectEx (*p_condvar, INFINITE, TRUE);
+        EnterCriticalSection (&p_mutex->mutex);
+    }
+    while (result == WAIT_IO_COMPLETION);
 
 #endif
 }
@@ -543,20 +559,6 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
         VLC_THREAD_ASSERT ("timed-waiting on condition");
     return val;
 
-#elif defined( UNDER_CE )
-    mtime_t delay_ms = (deadline - mdate()) / (CLOCK_FREQ / 1000);
-    DWORD result;
-    if( delay_ms < 0 )
-        delay_ms = 0;
-
-    LeaveCriticalSection( &p_mutex->csection );
-    result = WaitForSingleObject( *p_condvar, delay_ms );
-
-    /* Reacquire the mutex before returning. */
-    vlc_mutex_lock( p_mutex );
-
-    return (result == WAIT_TIMEOUT) ? ETIMEDOUT : 0;
-
 #elif defined( WIN32 )
     DWORD result;
 
@@ -569,12 +571,12 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
             total = 0;
 
         DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
-        result = SignalObjectAndWait (*p_mutex, *p_condvar, delay, TRUE);
+        LeaveCriticalSection (&p_mutex->mutex);
+        result = WaitForSingleObjectEx (*p_condvar, delay, TRUE);
+        EnterCriticalSection (&p_mutex->mutex);
     }
     while (result == WAIT_IO_COMPLETION);
 
-    /* Reacquire the mutex before return/cancel. */
-    vlc_mutex_lock (p_mutex);
     return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
 
 #endif
