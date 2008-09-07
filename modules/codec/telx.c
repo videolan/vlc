@@ -93,15 +93,15 @@ vlc_module_end();
 struct decoder_sys_t
 {
   int         i_align;
-  bool  b_is_subtitle[9];
+  bool        b_is_subtitle[9];
   char        ppsz_lines[32][128];
   char        psz_prev_text[512];
   mtime_t     prev_pts;
   int         i_page[9];
-  bool  b_erase[9];
+  bool        b_erase[9];
   const uint16_t *  pi_active_national_set[9];
   int         i_wanted_page, i_wanted_magazine;
-  bool  b_ignore_sub_flag;
+  bool        b_ignore_sub_flag;
 };
 
 /****************************************************************************
