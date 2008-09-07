@@ -157,7 +157,7 @@ typedef struct vlc_cancel_t
     bool           killed;
 } vlc_cancel_t;
 
-# define VLC_CANCEL_INIT { NULL, false, true }
+# define VLC_CANCEL_INIT { NULL, true, false }
 #endif
 
 /*****************************************************************************
