@@ -79,16 +79,3 @@ Index: configure.ac
  dnl ---------------------------------------------
  dnl cflags
  dnl ---------------------------------------------
-Index: autogen.sh
-===================================================================
---- autogen.sh	(revision 1107)
-+++ autogen.sh	(working copy)
-@@ -86,7 +86,7 @@
- try_libtool_executable() {
-   libtool=$1
-     LT="`$libtool --version | awk '{ print $4 }' | sed -e 's/[a-zA-Z\ \.\(\)\-\;]//g'`"
--    if test "$LT" -ne "" ; then
-+    if test "$LT" -ne "0" ; then
-     LIBTOOL_MIN="`echo $LIBTOOL_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-     if test $LT -lt 100 ; then
-       LT=`expr $LT \* 10`
