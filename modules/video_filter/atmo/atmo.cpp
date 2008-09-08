@@ -1737,8 +1737,6 @@ static void *FadeToColorThread(vlc_object_t *obj)
     int i_src_green;
     int i_src_blue;
 
-    vlc_thread_ready( p_fadethread );
-
     uint8_t *p_source = NULL;
 
     int canc = vlc_savecancel ();

@@ -74,9 +74,6 @@ void *CThread::ThreadProc(vlc_object_t *obj)
       if(pThread) {
          int canc;
 
-         // give feedback I'am running?
-         vlc_thread_ready( pThread->m_pAtmoThread );
-
          canc = vlc_savecancel ();
          pThread->Execute();
          vlc_restorecancel (canc);

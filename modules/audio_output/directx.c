@@ -1059,9 +1059,6 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     /* We don't want any resampling when using S/PDIF output */
     b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
 
-    /* Tell the main thread that we are ready */
-    vlc_thread_ready( p_notif );
-
     msg_Dbg( p_notif, "DirectSoundThread ready" );
 
     /* Wait here until Play() is called */
