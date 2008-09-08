@@ -989,16 +989,6 @@ int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
                     return 0;
             }
 
-        case FOURCC_RGBP:
-            switch( i_amorhc )
-            {
-                case FOURCC_RGBP:
-                    return 1;
-
-                default:
-                    return 0;
-            }
-
         default:
             return 0;
     }
