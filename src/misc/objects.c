@@ -464,16 +464,14 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
 
 
 /**
- * Waits for the object to be signaled (using vlc_object_signal()).
- * It is assumed that the caller has locked the object. This function will
- * unlock the object, and lock it again before returning.
- * If the object was signaled before the caller locked the object, it is
- * undefined whether the signal will be lost or will wake the process.
+ * Suspends until another thread calls vlc_object_signal_unlocked().
+ * The thread may be woken up earlier due to limitations of the underlying
+ * implementation.
+ *
+ * In new code, please use vlc_cond_wait() instead.
  *
  * This function is a cancellation point. In case of cancellation, the object
  * will be in locked state.
- *
- * @return true if the object is dying and should terminate.
  */
 void __vlc_object_wait( vlc_object_t *obj )
 {
@@ -484,11 +482,9 @@ void __vlc_object_wait( vlc_object_t *obj )
 
 
 /**
- * Waits for the object to be signaled (using vlc_object_signal()), or for
- * a timer to expire. It is asserted that the caller holds the object lock.
+ * Same as vlc_object_wait(), with an additional time-out.
  *
- * This function is a cancellation point. In case of cancellation, the object
- * will be in locked state.
+ * @param deadline <b>absolute</b> time-out (using the same clock as mdate())
  *
  * @return 0 if the object was signaled before the timer expiration, or
  * ETIMEDOUT if the timer expired without any signal.
@@ -502,11 +498,11 @@ int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
 
 
 /**
- * Signals an object for which the lock is held.
- * At least one thread currently sleeping in vlc_object_wait() or
- * vlc_object_timedwait() will wake up, assuming that there is at least one
- * such thread in the first place. Otherwise, it is undefined whether the
- * signal will be lost or will wake up one or more thread later.
+ * Wakes up one thread waiting on the object. If no thread are (yet) waiting,
+ * nothing happens.
+ *
+ * Please do not use this function in new code as we are trying to untangle
+ * objects and threads. Use vlc_cond_wait() instead.
  */
 void __vlc_object_signal_unlocked( vlc_object_t *obj )
 {
