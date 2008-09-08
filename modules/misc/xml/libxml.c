@@ -74,6 +74,8 @@ static int Open( vlc_object_t *p_this )
 {
     xml_t *p_xml = (xml_t *)p_this;
 
+    xmlInitParser();
+
     p_xml->pf_reader_create = ReaderCreate;
     p_xml->pf_reader_delete = ReaderDelete;
 
@@ -88,6 +90,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+    xmlCleanupParser();
     VLC_UNUSED(p_this);
     return;
 }
