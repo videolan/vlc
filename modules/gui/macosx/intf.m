@@ -1397,7 +1397,7 @@ static void * ManageThread( void *user_data )
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
-        vlc_object_timedwait( p_intf, 100000 + mdate());
+        msleep( INTF_IDLE_SLEEP );
     }
     vlc_object_unlock( p_intf );
     [o_pool release];
