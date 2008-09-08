@@ -482,22 +482,6 @@ void __vlc_object_wait( vlc_object_t *obj )
 
 
 /**
- * Same as vlc_object_wait(), with an additional time-out.
- *
- * @param deadline <b>absolute</b> time-out (using the same clock as mdate())
- *
- * @return 0 if the object was signaled before the timer expiration, or
- * ETIMEDOUT if the timer expired without any signal.
- */
-int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
-{
-    vlc_object_internals_t *priv = vlc_internals( obj );
-    vlc_assert_locked( &priv->lock);
-    return vlc_cond_timedwait( &priv->wait, &priv->lock, deadline );
-}
-
-
-/**
  * Wakes up one thread waiting on the object. If no thread are (yet) waiting,
  * nothing happens.
  *
