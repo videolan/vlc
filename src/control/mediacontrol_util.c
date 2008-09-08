@@ -176,20 +176,6 @@ private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_playe
     return 0;
 }
 
-mediacontrol_RGBPicture*
-private_mediacontrol_RGBPicture__alloc( int datasize )
-{
-    mediacontrol_RGBPicture* pic;
-
-    pic = ( mediacontrol_RGBPicture * )malloc( sizeof( mediacontrol_RGBPicture ) );
-    if( ! pic )
-        return NULL;
-
-    pic->size = datasize;
-    pic->data = ( char* )malloc( datasize * sizeof( char ) );
-    return pic;
-}
-
 void
 mediacontrol_RGBPicture__free( mediacontrol_RGBPicture* pic )
 {
@@ -245,13 +231,25 @@ mediacontrol_exception_free( mediacontrol_Exception *exception )
     free( exception );
 }
 
+/**
+ * Allocates and initializes a mediacontrol_RGBPicture object.
+ *
+ * @param i_width: picture width
+ * @param i_height: picture width
+ * @param i_chroma: picture chroma
+ * @param l_date: picture timestamp
+ * @param p_data: pointer to the data. The data will be directly used, not copied.
+ * @param i_datasize: data size in bytes
+ *
+ * @return the new object, or NULL on error.
+ */
 mediacontrol_RGBPicture*
 private_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma, int64_t l_date,
-                                char* p_data, int i_datasize )
+				       char* p_data, int i_datasize )
 {
     mediacontrol_RGBPicture *retval;
 
-    retval = private_mediacontrol_RGBPicture__alloc( i_datasize );
+    retval = ( mediacontrol_RGBPicture * )malloc( sizeof( mediacontrol_RGBPicture ) );
     if( retval )
     {
         retval->width  = i_width;
@@ -259,7 +257,7 @@ private_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma,
         retval->type   = i_chroma;
         retval->date   = l_date;
         retval->size   = i_datasize;
-        memcpy( retval->data, p_data, i_datasize );
+        retval->data   = p_data;
     }
     return retval;
 }

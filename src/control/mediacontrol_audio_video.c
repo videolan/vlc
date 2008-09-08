@@ -100,15 +100,16 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     if( p_snapshot )
     {
+        /* Note: p_snapshot->p_data is directly used, not copied. Thus
+           do not free it here. */
         p_pic = private_mediacontrol_createRGBPicture( p_snapshot->i_width,
-                               p_snapshot->i_height,
-                               VLC_FOURCC( 'p','n','g',' ' ),
-                               p_snapshot->date,
-                               p_snapshot->p_data,
-                               p_snapshot->i_datasize );
+                                                       p_snapshot->i_height,
+                                                       VLC_FOURCC( 'p','n','g',' ' ),
+                                                       p_snapshot->date,
+                                                       p_snapshot->p_data,
+                                                       p_snapshot->i_datasize );
         if( !p_pic )
         {
-            free( p_snapshot->p_data );
             free( p_snapshot );
             RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
         }
