@@ -86,6 +86,8 @@ static void SlaveSeek( input_thread_t *p_input );
 
 static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
 static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta );
+static char *InputGetExtraFiles( input_thread_t *p_input,
+                                 const char *psz_access, const char *psz_path );
 
 static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_demux );
 static void AccessMeta( input_thread_t * p_input, vlc_meta_t *p_meta );
@@ -2353,8 +2355,24 @@ static int InputSourceInit( input_thread_t *p_input,
         if( b_master )
             input_ChangeState( p_input, BUFFERING_S );
 
+        /* Autodetect extra files if none specified */
+        char *psz_input_list = var_CreateGetNonEmptyString( p_input, "input-list" );
+        if( !psz_input_list )
+        {
+            char *psz_extra_files = InputGetExtraFiles( p_input, psz_access, psz_path );
+            if( psz_extra_files )
+                var_SetString( p_input, "input-list", psz_extra_files );
+            free( psz_extra_files );
+        }
+
         /* Create the stream_t */
         in->p_stream = stream_AccessNew( in->p_access, p_input->b_preparsing );
+
+        /* Restor old value */
+        if( !psz_input_list )
+            var_SetString( p_input, "input-list", "" );
+        free( psz_input_list );
+
         if( in->p_stream == NULL )
         {
             msg_Warn( p_input, "cannot create a stream_t from access" );
@@ -2594,6 +2612,62 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
     GET_META( Date, "meta-date" );
     GET_META( URL, "meta-url" );
 #undef GET_META
+}
+
+/*****************************************************************************
+ * InputGetExtraFiles
+ *  Autodetect extra input list
+ *****************************************************************************/
+static char *InputGetExtraFiles( input_thread_t *p_input,
+                                 const char *psz_access, const char *psz_path )
+{
+    char *psz_list = NULL;
+
+    if( ( psz_access && *psz_access && strcmp( psz_access, "file" ) ) || !psz_path )
+        return NULL;
+
+
+    const char *psz_ext = strrchr( psz_path, '.' );
+    if( !psz_ext || strcmp( psz_ext, ".001" ) )
+        return NULL;
+
+    char *psz_file = strdup( psz_path );
+    if( !psz_file )
+        return NULL;
+
+    /* Try to list .xyz files */
+    for( int i = 2; i < 999; i++ )
+    {
+        char *psz_ext = strrchr( psz_file, '.' );
+        struct stat st;
+
+        snprintf( psz_ext, 5, ".%.3d", i );
+
+        if( utf8_stat( psz_file, &st ) != 0 )
+            break;
+        if( st.st_size <= 0 )
+            continue;
+
+        msg_Dbg( p_input, "Detected extra file `%s'", psz_file );
+
+        if( psz_list )
+        {
+            char *psz_old = psz_list;
+            /* FIXME how to handle file with ',' ?*/
+            if( asprintf( &psz_list, "%s,%s", psz_old, psz_file ) < 0 )
+            {
+                psz_list = psz_old;
+                break;
+            }
+        }
+        else
+        {
+            psz_list = strdup( psz_file );
+        }
+    }
+    free( psz_file );
+
+    return psz_list;
 }
 
 /*****************************************************************************
