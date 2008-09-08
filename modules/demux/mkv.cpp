@@ -1730,8 +1730,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_EGENERIC;
 
-        case DEMUX_SET_TIME:
         case DEMUX_GET_FPS:
+            pf = (double *)va_arg( args, double * );
+            *pf = 0.0;
+            if( p_sys->p_current_segment && p_sys->p_current_segment->Segment() )
+            {
+                const matroska_segment_c *p_segment = p_sys->p_current_segment->Segment();
+                for( size_t i = 0; i < p_segment->tracks.size(); i++ )
+                {
+                    mkv_track_t *tk = p_segment->tracks[i];
+                    if( tk->fmt.i_cat == VIDEO_ES && tk->fmt.video.i_frame_rate_base > 0 )
+                    {
+                        *pf = (double)tk->fmt.video.i_frame_rate / tk->fmt.video.i_frame_rate_base;
+                        break;
+                    }
+                }
+            }
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_TIME:
         default:
             return VLC_EGENERIC;
     }
