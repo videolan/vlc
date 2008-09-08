@@ -88,9 +88,18 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     var_SetString( p_vout, "snapshot-path", path );
     var_SetString( p_vout, "snapshot-format", "png" );
 
+    
     vlc_object_lock( p_cache );
+    /* Initialize p_cache->p_private with p_cache own value, to be
+       used as a sentinel against spurious vlc_object_wait wakeups.
+
+       If a legitimate wakeup occurs, then p_cache->p_private will hold either
+       NULL (in case of error) or a pointer to a p_snapshot data structure.
+    */
+    p_cache->p_private = p_cache;
     vout_Control( p_vout, VOUT_SNAPSHOT );
-    vlc_object_wait( p_cache );
+    while ( p_cache->p_private == p_cache )
+        vlc_object_wait( p_cache );
     vlc_object_release( p_vout );
 
     p_snapshot = ( snapshot_t* ) p_cache->p_private;

@@ -632,16 +632,17 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         snapshot_t *p_snapshot;
         size_t i_size;
 
-        /* Object must be locked. We will unlock it once we get the
-           snapshot and written it to p_private */
-        p_dest->p_private = NULL;
-
+        /* Object must be locked by the caller function. We will
+           unlock it once we get the snapshot and have written it to
+           p_cache->p_private. */
+	
         /* Save the snapshot to a memory zone */
         p_block = image_Write( p_image, p_pic, &fmt_in, &fmt_out );
         if( !p_block )
         {
             msg_Err( p_vout, "Could not get snapshot" );
             image_HandlerDelete( p_image );
+	    p_dest->p_private = NULL;
             vlc_object_signal_unlocked( p_dest );
             vlc_object_release( p_dest );
             return VLC_EGENERIC;
@@ -654,6 +655,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         {
             block_Release( p_block );
             image_HandlerDelete( p_image );
+	    p_dest->p_private = NULL;
             vlc_object_signal_unlocked( p_dest );
             vlc_object_release( p_dest );
             return VLC_ENOMEM;
@@ -671,6 +673,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             block_Release( p_block );
             free( p_snapshot );
             image_HandlerDelete( p_image );
+	    p_dest->p_private = NULL;
             vlc_object_signal_unlocked( p_dest );
             vlc_object_release( p_dest );
             return VLC_ENOMEM;
