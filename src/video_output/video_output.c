@@ -58,6 +58,7 @@
 
 #include "modules/modules.h"
 #include <assert.h>
+#include "vout_pictures.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -524,6 +525,22 @@ static void vout_Destructor( vlc_object_t * p_this )
 static int ChromaCreate( vout_thread_t *p_vout );
 static void ChromaDestroy( vout_thread_t *p_vout );
 
+static bool ChromaIsEqual( const picture_heap_t *p_output, const picture_heap_t *p_render )
+{
+     if( !vout_ChromaCmp( p_output->i_chroma, p_render->i_chroma ) )
+         return false;
+
+     if( p_output->i_chroma != FOURCC_RV15 &&
+         p_output->i_chroma != FOURCC_RV16 &&
+         p_output->i_chroma != FOURCC_RV24 &&
+         p_output->i_chroma != FOURCC_RV32 )
+         return true;
+
+     return p_output->i_rmask == p_render->i_rmask &&
+            p_output->i_gmask == p_render->i_gmask &&
+            p_output->i_bmask == p_render->i_bmask;
+}
+
 static int InitThread( vout_thread_t *p_vout )
 {
     int i, i_aspect_x, i_aspect_y;
@@ -624,7 +641,7 @@ static int InitThread( vout_thread_t *p_vout )
      * the render buffers, ie same size and chroma */
     if( ( p_vout->output.i_width == p_vout->render.i_width )
      && ( p_vout->output.i_height == p_vout->render.i_height )
-     && ( vout_ChromaCmp( p_vout->output.i_chroma, p_vout->render.i_chroma ) ) )
+     && ( ChromaIsEqual( &p_vout->output, &p_vout->render ) ) )
     {
         /* Cool ! We have direct buffers, we can ask the decoder to
          * directly decode into them ! Map the first render buffers to
