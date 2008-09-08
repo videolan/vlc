@@ -162,7 +162,6 @@ struct timeout_thread_t
 {
     VLC_COMMON_MEMBERS
 
-    int64_t      i_remain;
     bool         b_handle_keep_alive;
     demux_sys_t  *p_sys;
 };
@@ -1045,8 +1044,9 @@ static int Play( demux_t *p_demux )
             msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
             p_sys->p_timeout = (timeout_thread_t *)vlc_object_create( p_demux, sizeof(timeout_thread_t) );
             p_sys->p_timeout->p_sys = p_demux->p_sys; /* lol, object recursion :D */
-            if( vlc_thread_create( p_sys->p_timeout, "liveMedia-timeout", TimeoutPrevention,
-                                   VLC_THREAD_PRIORITY_LOW, true ) )
+            if( vlc_thread_create( p_sys->p_timeout, "liveMedia-timeout",
+                                   TimeoutPrevention,
+                                   VLC_THREAD_PRIORITY_LOW, false ) )
             {
                 msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
                 vlc_object_release( p_sys->p_timeout );
@@ -1714,21 +1714,19 @@ static void TaskInterrupt( void *p_private )
 static void* TimeoutPrevention( vlc_object_t * p_this )
 {
     timeout_thread_t *p_timeout = (timeout_thread_t *)p_this;
-    p_timeout->b_die = false;
-    p_timeout->i_remain = (int64_t)p_timeout->p_sys->i_timeout -2;
-    p_timeout->i_remain *= 1000000;
+    int64_t i_remain = (int64_t)p_timeout->p_sys->i_timeout - 2;
 
-    vlc_thread_ready( p_timeout );
+    i_remain *= 1000000;
 
     int canc = vlc_savecancel ();
     /* Avoid lock */
     while( vlc_object_alive (p_timeout) )
     {
-        if( p_timeout->i_remain <= 0 )
+        if( i_remain <= 0 )
         {
             char *psz_bye = NULL;
-            p_timeout->i_remain = (int64_t)p_timeout->p_sys->i_timeout -2;
-            p_timeout->i_remain *= 1000000;
+            i_remain = (int64_t)p_timeout->p_sys->i_timeout -2;
+            i_remain *= 1000000;
             msg_Dbg( p_timeout, "reset the timeout timer" );
             if( p_timeout->b_handle_keep_alive == true )
             {
@@ -1740,7 +1738,7 @@ static void* TimeoutPrevention( vlc_object_t * p_this )
                 p_timeout->p_sys->b_timeout_call = true;
             }
         }
-        p_timeout->i_remain -= 200000;
+        i_remain -= 200000;
         msleep( 200000 ); /* 200 ms */
     }
     vlc_restorecancel (canc);
