@@ -1174,9 +1174,9 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 libdvdread: 
 	$(SVN) co $(LIBDVDREAD_SVN)  libdvdread
 	(cd $@; patch  -p 0 < ../Patches/libdvdread.patch)
-#ifdef HAVE_WIN32
+ifdef HAVE_WIN32
 	(cd $@; patch  -p 0 < ../Patches/libdvdread-win32.patch)
-#endif
+endif
 	(cd $@; sh autogen.sh noconfig)
 
 .libdvdread: libdvdread .dvdcss
@@ -1437,9 +1437,9 @@ libmodplug-$(MODPLUG_VERSION).tar.gz:
 
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz
 	$(EXTRACT_GZ)
-#ifdef HAVE_WIN32
+ifdef HAVE_WIN32
 	patch -p0 < Patches/libmodplug-win32.patch
-#end
+end
 
 .mod: libmodplug
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
