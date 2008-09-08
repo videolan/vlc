@@ -2104,7 +2104,7 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
         return p_block;
     }
 
-    p_block = p_sys->p_list_access->pf_block( p_access );
+    p_block = p_sys->p_list_access->pf_block( p_sys->p_list_access );
     if( p_access->b_die )
         vlc_object_kill( s );
     b_eof = p_sys->p_list_access->info.b_eof;
