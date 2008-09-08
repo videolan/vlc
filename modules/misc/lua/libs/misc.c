@@ -180,6 +180,7 @@ static int vlclua_lock_and_wait( lua_State *L )
         vlc_object_wait( p_this );
         b_quit = vlc_object_alive( p_this );
     }
+    vlc_object_unlock( p_this );
     lua_pushboolean( L, b_quit );
     return 1;
 }
