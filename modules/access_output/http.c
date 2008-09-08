@@ -180,45 +180,36 @@ static int Open( vlc_object_t *p_this )
     psz_bind_addr = psz_parser = strdup( p_access->psz_path );
 
     i_bind_port = 0;
-    psz_file_name = NULL;
 
-    while( *psz_parser && *psz_parser != ':' && *psz_parser != '/' )
+    psz_parser = strchr( psz_bind_addr, '/' );
+    if( psz_parser )
     {
-        psz_parser++;
-    }
-    if( *psz_parser == ':' )
-    {
+        psz_file_name = strdup( psz_parser );
         *psz_parser = '\0';
-        psz_parser++;
-        i_bind_port = atoi( psz_parser );
-
-        while( *psz_parser && *psz_parser != '/' )
-        {
-            psz_parser++;
-        }
     }
-    if( *psz_parser == '/' )
-    {
-        *psz_parser = '\0';
-        psz_parser++;
-        psz_file_name = psz_parser;
-    }
-
-    if( psz_file_name == NULL )
-    {
+    else
         psz_file_name = strdup( "/" );
-    }
-    else if( *psz_file_name != '/' )
-    {
-        char *p = psz_file_name;
 
-        psz_file_name = malloc( strlen( p ) + 2 );
-        strcpy( psz_file_name, "/" );
-        strcat( psz_file_name, p );
+    if( psz_bind_addr[0] == '[' )
+    {
+        psz_bind_addr++;
+        psz_parser = strstr( psz_bind_addr, "]:" );
+        if( psz_parser )
+        {
+            *psz_parser = '\0';
+            i_bind_port = atoi( psz_parser + 2 );
+        }
+        psz_parser = psz_bind_addr - 1;
     }
     else
     {
-        psz_file_name = strdup( psz_file_name );
+        psz_parser = strrchr( psz_bind_addr, ':' );
+        if( psz_parser )
+        {
+            *psz_parser = '\0';
+            i_bind_port = atoi( psz_parser + 1 );
+        }
+        psz_parser = psz_bind_addr;
     }
 
     /* SSL support */
@@ -249,14 +240,14 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->p_httpd_host == NULL )
     {
-        msg_Err( p_access, "cannot listen on %s:%d",
+        msg_Err( p_access, "cannot listen on %s port %d",
                  psz_bind_addr, i_bind_port );
         free( psz_file_name );
-        free( psz_bind_addr );
+        free( psz_parser );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    free( psz_bind_addr );
+    free( psz_parser );
 
     if( p_access->psz_access && !strcmp( p_access->psz_access, "mmsh" ) )
     {
