@@ -80,9 +80,8 @@ int screen_InitCapture( demux_t *p_demux )
     case 8: /* FIXME: set the palette */
         i_chroma = VLC_FOURCC('R','G','B','2'); break;
     case 15:
+    case 16:    /* Yes it is really 15 bits (when using BI_RGB) */
         i_chroma = VLC_FOURCC('R','V','1','5'); break;
-    case 16:
-        i_chroma = VLC_FOURCC('R','V','1','6'); break;
     case 24:
         i_chroma = VLC_FOURCC('R','V','2','4'); break;
     case 32:
@@ -105,11 +104,6 @@ int screen_InitCapture( demux_t *p_demux )
     case VLC_FOURCC('R','V','1','5'):
         p_sys->fmt.video.i_rmask = 0x7c00;
         p_sys->fmt.video.i_gmask = 0x03e0;
-        p_sys->fmt.video.i_bmask = 0x001f;
-        break;
-    case VLC_FOURCC('R','V','1','6'):
-        p_sys->fmt.video.i_rmask = 0xf800;
-        p_sys->fmt.video.i_gmask = 0x07e0;
         p_sys->fmt.video.i_bmask = 0x001f;
         break;
     case VLC_FOURCC('R','V','2','4'):
