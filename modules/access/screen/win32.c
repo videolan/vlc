@@ -95,15 +95,38 @@ int screen_InitCapture( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-#if 1 /* For now we force RV24 because of chroma inversion in the other cases*/
-    i_chroma = VLC_FOURCC('R','V','2','4');
-    i_bits_per_pixel = 24;
-#endif
-
     es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
     p_sys->fmt.video.i_width  = GetDeviceCaps( p_data->hdc_src, HORZRES );
     p_sys->fmt.video.i_height = GetDeviceCaps( p_data->hdc_src, VERTRES );
     p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
+
+    switch( i_chroma )
+    {
+    case VLC_FOURCC('R','V','1','5'):
+        p_sys->fmt.video.i_rmask = 0x7c00;
+        p_sys->fmt.video.i_gmask = 0x03e0;
+        p_sys->fmt.video.i_bmask = 0x001f;
+        break;
+    case VLC_FOURCC('R','V','1','6'):
+        p_sys->fmt.video.i_rmask = 0xf800;
+        p_sys->fmt.video.i_gmask = 0x07e0;
+        p_sys->fmt.video.i_bmask = 0x001f;
+        break;
+    case VLC_FOURCC('R','V','2','4'):
+        p_sys->fmt.video.i_rmask = 0x00ff0000;
+        p_sys->fmt.video.i_gmask = 0x0000ff00;
+        p_sys->fmt.video.i_bmask = 0x000000ff;
+        break;
+    case VLC_FOURCC('R','V','3','2'):
+        p_sys->fmt.video.i_rmask = 0x00ff0000;
+        p_sys->fmt.video.i_gmask = 0x0000ff00;
+        p_sys->fmt.video.i_bmask = 0x000000ff;
+        break;
+    default:
+        msg_Warn( p_demux, "Unknown RGB masks" );
+        break;
+    }
+
 
     /* Create the bitmap info header */
     p_data->bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -117,14 +140,6 @@ int screen_InitCapture( demux_t *p_demux )
         p_data->bmi.bmiHeader.biYPelsPerMeter = 0;
     p_data->bmi.bmiHeader.biClrUsed = 0;
     p_data->bmi.bmiHeader.biClrImportant = 0;
-
-    if( i_chroma == VLC_FOURCC('R','V','2','4') )
-    {
-        /* This is in BGR format */
-        p_sys->fmt.video.i_bmask = 0x00ff0000;
-        p_sys->fmt.video.i_gmask = 0x0000ff00;
-        p_sys->fmt.video.i_rmask = 0x000000ff;
-    }
 
     var_Create( p_demux, "screen-fragment-size",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
