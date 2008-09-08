@@ -205,6 +205,8 @@ struct demux_sys_t
     int              i_no_data_ti;  /* consecutive number of TaskInterrupt */
 
     char             event;
+
+    bool             b_get_param;   /* Does the server support GET_PARAMETER */
 };
 
 static int Demux  ( demux_t * );
@@ -284,6 +286,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_real = false;
     p_sys->psz_path = strdup( p_demux->psz_path );
     p_sys->b_force_mcast = var_CreateGetBool( p_demux, "rtsp-mcast" );
+    p_sys->b_get_param = false;
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
@@ -548,6 +551,7 @@ describe:
 
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
                                                &authenticator );
+    p_sys->b_get_param = strstr( psz_options, "GET_PARAMETER" ) ? true : false ;
     delete [] psz_options;
 
     p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
@@ -1035,10 +1039,8 @@ static int Play( demux_t *p_demux )
         if( p_sys->i_timeout <= 0 )
             p_sys->i_timeout = 60; /* default value from RFC2326 */
 
-        /* start timeout-thread only on x-asf streams (wms), it has rtcp support but doesn't 
-         * seem to use it for liveness/keep-alive, get_parameter seems to work for it. get_parameter
-         * doesn't work with dss 5.5.4 & 5.5.5, they seems to work with rtcp */
-        if( !p_sys->p_timeout && p_sys->p_out_asf )
+        /* start timeout-thread only if GET_PARAMETER is supported by the server */
+        if( !p_sys->p_timeout && p_sys->b_get_param )
         {
             msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
             p_sys->p_timeout = (timeout_thread_t *)vlc_object_create( p_demux, sizeof(timeout_thread_t) );
