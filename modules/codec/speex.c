@@ -51,6 +51,43 @@ static void CloseDecoder  ( vlc_object_t * );
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
 
+#define ENC_CFG_PREFIX "sout-speex-"
+
+#define ENC_MODE_TEXT N_("Mode" )
+#define ENC_MODE_LONGTEXT N_( \
+    "Enforce the mode of the encoder." )
+
+#define ENC_QUALITY_TEXT N_("Encoding quality")
+#define ENC_QUALITY_LONGTEXT N_( \
+    "Enforce a quality between 0 (low) and 10 (high)." )
+
+#define ENC_COMPLEXITY_TEXT N_("Encoding complexity" )
+#define ENC_COMPLEXITY_LONGTEXT N_( \
+    "Enforce the complexity of the encoder." )
+
+#define ENC_MAXBITRATE_TEXT N_( "Maximal bitrate" )
+#define ENC_MAXBITRATE_LONGTEXT N_( \
+    "Enforce the maximal VBR bitrate" )
+
+#define ENC_CBR_TEXT N_( "CBR encoding" )
+#define ENC_CBR_LONGTEXT N_( \
+    "Enforce a constant bitrate encoding (CBR) instead of default " \
+    "variable bitrate encoding (VBR)." )
+
+#define ENC_VAD_TEXT N_( "Voice activity detection" )
+#define ENC_VAD_LONGTEXT N_( \
+    "Enable voice activity detection (VAD). It is automatically " \
+    "activated in VBR mode." )
+
+#define ENC_DTX_TEXT N_( "Discontinuous Transmission" )
+#define ENC_DTX_LONGTEXT N_( \
+    "Enable discontinuous transmission (DTX)." )
+
+static const int pi_enc_mode_values[] = { 0, 1, 2 };
+static const char * const ppsz_enc_mode_descriptions[] = {
+    N_("Narrow-band (8kHz)"), N_("Wide-band (16kHz)"), N_("Ultra-wideband (32kHz)"), NULL
+};
+
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
@@ -68,8 +105,38 @@ vlc_module_begin();
     set_description( N_("Speex audio encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
+
+    add_integer( ENC_CFG_PREFIX "mode", 0, NULL, ENC_MODE_TEXT,
+                 ENC_MODE_LONGTEXT, false );
+        change_integer_list( pi_enc_mode_values, ppsz_enc_mode_descriptions, NULL );
+
+    add_integer( ENC_CFG_PREFIX "complexity", 3, NULL, ENC_COMPLEXITY_TEXT,
+                 ENC_COMPLEXITY_LONGTEXT, false );
+        change_integer_range( 1, 10 );
+
+    add_bool( ENC_CFG_PREFIX "cbr", false, NULL, ENC_CBR_TEXT,
+                 ENC_CBR_LONGTEXT, false );
+
+    add_float( ENC_CFG_PREFIX "quality", 8.0, NULL, ENC_QUALITY_TEXT,
+               ENC_QUALITY_LONGTEXT, false );
+        change_float_range( 0.0, 10.0 );
+
+    add_integer( ENC_CFG_PREFIX "max-bitrate", 0, NULL, ENC_MAXBITRATE_TEXT,
+                 ENC_MAXBITRATE_LONGTEXT, false );
+
+    add_bool( ENC_CFG_PREFIX "vad", true, NULL, ENC_VAD_TEXT,
+                 ENC_VAD_LONGTEXT, false );
+
+    add_bool( ENC_CFG_PREFIX "dtx", false, NULL, ENC_DTX_TEXT,
+                 ENC_DTX_LONGTEXT, false );
+
+    /* TODO agc, noise suppression, */
+
 vlc_module_end();
 
+static const char *const ppsz_enc_options[] = {
+    "mode", "complexity", "cbr", "quality", "max-bitrate", "vad", "dtx", NULL
+};
 
 /*****************************************************************************
  * decoder_sys_t : speex decoder descriptor
@@ -851,7 +918,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     const SpeexMode *p_speex_mode = &speex_nb_mode;
-    int i_quality, i;
+    int i_tmp, i;
     const char *pp_header[2];
     int pi_header[2];
     uint8_t *p_extra;
@@ -860,6 +927,23 @@ static int OpenEncoder( vlc_object_t *p_this )
         !p_enc->b_force )
     {
         return VLC_EGENERIC;
+    }
+
+    config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+    switch( var_GetInteger( p_enc, ENC_CFG_PREFIX "mode" ) )
+    {
+    case 1:
+        msg_Dbg( p_enc, "Using wideband" );
+        p_speex_mode = &speex_wb_mode;
+        break;
+    case 2:
+        msg_Dbg( p_enc, "Using ultra-wideband" );
+        p_speex_mode = &speex_uwb_mode;
+        break;
+    default:
+        msg_Dbg( p_enc, "Using narrowband" );
+        p_speex_mode = &speex_nb_mode;
+        break;
     }
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -874,15 +958,42 @@ static int OpenEncoder( vlc_object_t *p_this )
                        1, p_speex_mode );
 
     p_sys->header.frames_per_packet = 1;
-    p_sys->header.vbr = 1;
+    p_sys->header.vbr = var_GetBool( p_enc, ENC_CFG_PREFIX "cbr" ) ? 0 : 1;
     p_sys->header.nb_channels = p_enc->fmt_in.audio.i_channels;
 
     /* Create a new encoder state in narrowband mode */
     p_sys->p_state = speex_encoder_init( p_speex_mode );
 
-    /* Set the quality to 8 (15 kbps) */
-    i_quality = 8;
-    speex_encoder_ctl( p_sys->p_state, SPEEX_SET_QUALITY, &i_quality );
+    /* Parameters */
+    i_tmp = var_GetInteger( p_enc, ENC_CFG_PREFIX "complexity" );
+    speex_encoder_ctl( p_sys->p_state, SPEEX_SET_COMPLEXITY, &i_tmp );
+
+    i_tmp = var_GetBool( p_enc, ENC_CFG_PREFIX "cbr" ) ? 0 : 1;
+    speex_encoder_ctl( p_sys->p_state, SPEEX_SET_VBR, &i_tmp );
+
+    if( i_tmp == 0 ) /* CBR */
+    {
+        i_tmp = var_GetFloat( p_enc, ENC_CFG_PREFIX "quality" );
+        speex_encoder_ctl( p_sys->p_state, SPEEX_SET_QUALITY, &i_tmp );
+
+        i_tmp = var_GetBool( p_enc, ENC_CFG_PREFIX "vad" ) ? 1 : 0;
+        speex_encoder_ctl( p_sys->p_state, SPEEX_SET_VAD, &i_tmp );
+    }
+    else
+    {
+        float f_tmp;
+
+        f_tmp = var_GetFloat( p_enc, ENC_CFG_PREFIX "quality" );
+        speex_encoder_ctl( p_sys->p_state, SPEEX_SET_VBR_QUALITY, &f_tmp );
+
+        i_tmp = var_GetInteger( p_enc, ENC_CFG_PREFIX "max-bitrate" );
+        if( i_tmp > 0 )
+            speex_encoder_ctl( p_sys->p_state, SPEEX_SET_VBR_MAX_BITRATE, &i_tmp );
+    }
+
+    i_tmp = var_GetBool( p_enc, ENC_CFG_PREFIX "dtx" ) ? 1 : 0;
+    speex_encoder_ctl( p_sys->p_state, SPEEX_SET_DTX, &i_tmp );
+
 
     /*Initialization of the structure that holds the bits*/
     speex_bits_init( &p_sys->bits );
