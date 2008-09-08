@@ -74,7 +74,7 @@ VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
 # else
 #  define VLC_HARD_MIN_SLEEP 0
 # endif
-#define VLC_SOFT_MIN_SLEEP 29000000
+#define VLC_SOFT_MIN_SLEEP 9000000
 
 static
 __attribute__((unused))

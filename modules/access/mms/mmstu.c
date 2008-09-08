@@ -33,6 +33,7 @@
 #include <vlc_access.h>
 
 #include <errno.h>
+#include <assert.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -92,7 +93,7 @@ static int  mms_HeaderMediaRead( access_t *, int );
 
 static int  mms_ReceivePacket( access_t * );
 
-static void* KeepAliveThread( vlc_object_t *p_this );
+static void* KeepAliveThread( void * );
 
 int  MMSTUOpen( access_t *p_access )
 {
@@ -203,13 +204,17 @@ int  MMSTUOpen( access_t *p_access )
     }
 
     /* Keep the connection alive when paused */
-    p_sys->p_keepalive_thread = vlc_object_create( p_access, sizeof( mmstu_keepalive_thread_t ) );
-    p_sys->p_keepalive_thread->p_access = p_access;
-    p_sys->p_keepalive_thread->b_paused = false;
-    p_sys->p_keepalive_thread->b_thread_error = false;
-    if( vlc_thread_create( p_sys->p_keepalive_thread, "mmstu keepalive thread", KeepAliveThread,
-                           VLC_THREAD_PRIORITY_LOW, false) )
-        p_sys->p_keepalive_thread->b_thread_error = true;
+    p_sys->p_keepalive = malloc( sizeof( mmstu_keepalive_t ) );
+    p_sys->p_keepalive->p_access = p_access;
+    vlc_mutex_init( &p_sys->p_keepalive->lock );
+    p_sys->p_keepalive->b_paused = false;
+    if( vlc_clone( &p_sys->p_keepalive->handle, KeepAliveThread,
+                   p_sys->p_keepalive, VLC_THREAD_PRIORITY_LOW ) )
+    {
+        vlc_mutex_destroy( &p_sys->p_keepalive->lock );
+        free( p_sys->p_keepalive );
+        p_sys->p_keepalive = NULL;
+    }
 
     return VLC_SUCCESS;
 }
@@ -221,10 +226,13 @@ void MMSTUClose( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    vlc_object_kill( p_sys->p_keepalive_thread );
-    if( !p_sys->p_keepalive_thread->b_thread_error )
-        vlc_thread_join( p_sys->p_keepalive_thread );
-    vlc_object_release( p_sys->p_keepalive_thread );
+    if( p_sys->p_keepalive )
+    {
+        vlc_cancel( p_sys->p_keepalive->handle );
+        vlc_join( p_sys->p_keepalive->handle, NULL );
+        vlc_mutex_destroy( &p_sys->p_keepalive->lock );
+        free( p_sys->p_keepalive );
+    }
 
     /* close connection with server */
     MMSClose( p_access );
@@ -302,19 +310,15 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_PAUSE_STATE:
             b_bool = (bool)va_arg( args, int );
             if( b_bool )
-            {
                 MMSStop( p_access );
-                vlc_object_lock( p_sys->p_keepalive_thread );
-                p_sys->p_keepalive_thread->b_paused = true;
-                vlc_object_unlock( p_sys->p_keepalive_thread );
-            }
             else
-            {
                 Seek( p_access, p_access->info.i_pos );
-                vlc_object_lock( p_sys->p_keepalive_thread );
-                p_sys->p_keepalive_thread->b_paused = false;
-                vlc_object_unlock( p_sys->p_keepalive_thread );
-            }
+
+            vlc_mutex_lock( &p_sys->p_keepalive->lock );
+            p_sys->p_keepalive->b_paused = b_bool;
+            if( b_bool )
+                vlc_cond_signal( &p_sys->p_keepalive->wait );
+            vlc_mutex_unlock( &p_sys->p_keepalive->lock );
             break;
 
         case ACCESS_GET_TITLE_INFO:
@@ -1599,26 +1603,38 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
     return -1;
 }
 
-static void* KeepAliveThread( vlc_object_t *p_this )
+static void* KeepAliveThread( void *p_data )
 {
-    mmstu_keepalive_thread_t *p_thread = (mmstu_keepalive_thread_t *) p_this;
+    mmstu_keepalive_t *p_thread = (mmstu_keepalive_t *) p_data;
     access_t *p_access = p_thread->p_access;
-    bool b_paused;
-    bool b_was_paused = false;
 
-    vlc_object_lock( p_thread );
-    while( vlc_object_alive( p_thread) )
+    vlc_mutex_lock( &p_thread->lock );
+    mutex_cleanup_push( &p_thread->lock );
+
+    for( ;; )
     {
-        int canc = vlc_savecancel ();
-        b_paused = p_thread->b_paused;
+        /* Do nothing until paused (if ever) */
+        while( !p_thread->b_paused )
+            vlc_cond_wait( &p_thread->wait, &p_thread->lock );
 
-        if( b_paused && b_was_paused )
-                mms_CommandSend( p_access, 0x1b, 0, 0, NULL, 0 );
+        do
+        {
+            int canc;
 
-        b_was_paused = b_paused;
-        vlc_object_timedwait( p_thread, mdate() + 10000000 );
-        vlc_restorecancel (canc);
+            /* Send keep-alive every ten seconds */
+            vlc_mutex_unlock( &p_thread->lock );
+            canc = vlc_savecancel();
+
+            mms_CommandSend( p_access, 0x1b, 0, 0, NULL, 0 );
+
+            vlc_restorecancel( canc );
+            vlc_mutex_lock( &p_thread->lock );
+
+            msleep( 10 * CLOCK_FREQ );
+        }
+        while( p_thread->b_paused );
     }
-    vlc_object_unlock( p_thread );
-    return NULL;
+
+    vlc_cleanup_pop();
+    assert(0);
 }
