@@ -370,7 +370,7 @@ input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
 
     /* Create thread and wait for its readiness. */
     if( vlc_thread_create( p_input, "input", Run,
-                           VLC_THREAD_PRIORITY_INPUT, true ) )
+                           VLC_THREAD_PRIORITY_INPUT, false ) )
     {
         input_ChangeState( p_input, ERROR_S );
         msg_Err( p_input, "cannot create input thread" );
@@ -408,7 +408,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
     else
     {
         if( vlc_thread_create( p_input, "input", RunAndDestroy,
-                               VLC_THREAD_PRIORITY_INPUT, true ) )
+                               VLC_THREAD_PRIORITY_INPUT, false ) )
         {
             input_ChangeState( p_input, ERROR_S );
             msg_Err( p_input, "cannot create input thread" );
@@ -495,9 +495,6 @@ static void* Run( vlc_object_t *p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     const int canc = vlc_savecancel();
 
-    /* Signal that the thread is launched */
-    vlc_thread_ready( p_input );
-
     if( Init( p_input ) )
     {
         /* If we failed, wait before we are killed, and exit */
@@ -529,9 +526,6 @@ static void* RunAndDestroy( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     const int canc = vlc_savecancel();
-
-    /* Signal that the thread is launched */
-    vlc_thread_ready( p_input );
 
     if( Init( p_input ) )
         goto exit;

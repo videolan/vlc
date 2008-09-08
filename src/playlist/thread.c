@@ -76,7 +76,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     vlc_object_attach( p_playlist->p->p_preparse, p_playlist );
     if( vlc_thread_create( p_playlist->p->p_preparse, "preparser",
-                           RunPreparse, VLC_THREAD_PRIORITY_LOW, true ) )
+                           RunPreparse, VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_playlist, "cannot spawn preparse thread" );
         vlc_object_release( p_playlist->p->p_preparse );
@@ -105,7 +105,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     if( vlc_thread_create( p_playlist->p->p_fetcher,
                            "fetcher",
                            RunFetcher,
-                           VLC_THREAD_PRIORITY_LOW, true ) )
+                           VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
         vlc_object_release( p_playlist->p->p_fetcher );
@@ -114,7 +114,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     // Start the thread
     if( vlc_thread_create( p_playlist, "playlist", RunControlThread,
-                           VLC_THREAD_PRIORITY_LOW, true ) )
+                           VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
         vlc_object_release( p_playlist );
@@ -133,8 +133,6 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 static void* RunControlThread ( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t*)p_this;
-    /* Tell above that we're ready */
-    vlc_thread_ready( p_playlist );
 
     int canc = vlc_savecancel ();
     vlc_object_lock( p_playlist );
@@ -176,8 +174,6 @@ static void* RunPreparse ( vlc_object_t *p_this )
     playlist_preparse_t *p_obj = (playlist_preparse_t*)p_this;
     int canc;
 
-    /* Tell above that we're ready */
-    vlc_thread_ready( p_obj );
     canc = vlc_savecancel ();
     playlist_PreparseLoop( p_obj );
     vlc_restorecancel (canc);
@@ -187,8 +183,6 @@ static void* RunPreparse ( vlc_object_t *p_this )
 static void* RunFetcher( vlc_object_t *p_this )
 {
     playlist_fetcher_t *p_obj = (playlist_fetcher_t *)p_this;
-    /* Tell above that we're ready */
-    vlc_thread_ready( p_obj );
     int canc = vlc_savecancel ();
     playlist_FetcherLoop( p_obj );
     vlc_restorecancel (canc);
