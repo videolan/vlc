@@ -135,7 +135,7 @@ static inline lldiv_t lldiv (long long numer, long long denom)
 #endif
 
 #ifndef HAVE_GETENV
-static inline getenv (const char *name)
+static inline char *getenv (const char *name)
 {
     (void)name;
     return NULL;
