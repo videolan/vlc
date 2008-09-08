@@ -48,6 +48,7 @@
 
 #include <iostream>
 #include <limits.h>
+#include <assert.h>
 
 
 #if defined( WIN32 )
@@ -160,10 +161,9 @@ typedef struct
 
 struct timeout_thread_t
 {
-    VLC_COMMON_MEMBERS
-
-    bool         b_handle_keep_alive;
     demux_sys_t  *p_sys;
+    vlc_thread_t handle;
+    bool         b_handle_keep_alive;
 };
 
 struct demux_sys_t
@@ -222,7 +222,7 @@ static void StreamRead  ( void *, unsigned int, unsigned int,
 static void StreamClose ( void * );
 static void TaskInterrupt( void * );
 
-static void* TimeoutPrevention( vlc_object_t * );
+static void* TimeoutPrevention( void * );
 
 static unsigned char* parseH264ConfigStr( char const* configStr,
                                           unsigned int& configSize );
@@ -412,10 +412,9 @@ error:
     if( p_sys->env ) p_sys->env->reclaim();
     if( p_sys->p_timeout )
     {
-        vlc_object_kill( p_sys->p_timeout );
-        vlc_thread_join( p_sys->p_timeout );
-        vlc_object_detach( p_sys->p_timeout );
-        vlc_object_release( p_sys->p_timeout );
+        vlc_cancel( p_sys->p_timeout->handle );
+        vlc_join( p_sys->p_timeout->handle, NULL );
+        free( p_sys->p_timeout );
     }
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
@@ -454,10 +453,9 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->env ) p_sys->env->reclaim();
     if( p_sys->p_timeout )
     {
-        vlc_object_kill( p_sys->p_timeout );
-        vlc_thread_join( p_sys->p_timeout );
-        vlc_object_detach( p_sys->p_timeout );
-        vlc_object_release( p_sys->p_timeout );
+        vlc_cancel( p_sys->p_timeout->handle );
+        vlc_join( p_sys->p_timeout->handle, NULL );
+        free( p_sys->p_timeout );
     }
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
@@ -1042,17 +1040,16 @@ static int Play( demux_t *p_demux )
         if( !p_sys->p_timeout && p_sys->b_get_param )
         {
             msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
-            p_sys->p_timeout = (timeout_thread_t *)vlc_object_create( p_demux, sizeof(timeout_thread_t) );
+            p_sys->p_timeout = (timeout_thread_t *)malloc( sizeof(timeout_thread_t) );
             p_sys->p_timeout->p_sys = p_demux->p_sys; /* lol, object recursion :D */
-            if( vlc_thread_create( p_sys->p_timeout, "liveMedia-timeout",
-                                   TimeoutPrevention,
-                                   VLC_THREAD_PRIORITY_LOW, false ) )
+            if( vlc_clone( &p_sys->p_timeout->handle,  TimeoutPrevention,
+                           p_sys->p_timeout, VLC_THREAD_PRIORITY_LOW ) )
             {
                 msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
-                vlc_object_release( p_sys->p_timeout );
+                free( p_sys->p_timeout );
+                p_sys->p_timeout = NULL;
             }
             msg_Dbg( p_demux, "spawned timeout thread" );
-            vlc_object_attach( p_sys->p_timeout, p_demux );
         }
     }
     p_sys->i_pcr = 0;
@@ -1711,37 +1708,26 @@ static void TaskInterrupt( void *p_private )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void* TimeoutPrevention( vlc_object_t * p_this )
+static void* TimeoutPrevention( void *p_data )
 {
-    timeout_thread_t *p_timeout = (timeout_thread_t *)p_this;
-    int64_t i_remain = (int64_t)p_timeout->p_sys->i_timeout - 2;
+    timeout_thread_t *p_timeout = (timeout_thread_t *)p_data;
 
-    i_remain *= 1000000;
-
-    int canc = vlc_savecancel ();
-    /* Avoid lock */
-    while( vlc_object_alive (p_timeout) )
+    for( ;; )
     {
-        if( i_remain <= 0 )
+        /* Voodoo (= no) thread safety here! *Ahem* */
+        if( p_timeout->b_handle_keep_alive )
         {
             char *psz_bye = NULL;
-            i_remain = (int64_t)p_timeout->p_sys->i_timeout -2;
-            i_remain *= 1000000;
-            msg_Dbg( p_timeout, "reset the timeout timer" );
-            if( p_timeout->b_handle_keep_alive == true )
-            {
-                p_timeout->p_sys->rtsp->getMediaSessionParameter( *p_timeout->p_sys->ms, NULL, psz_bye );
-                p_timeout->p_sys->b_timeout_call = false;
-            }
-            else
-            {
-                p_timeout->p_sys->b_timeout_call = true;
-            }
+            int canc = vlc_savecancel ();
+
+            p_timeout->p_sys->rtsp->getMediaSessionParameter( *p_timeout->p_sys->ms, NULL, psz_bye );
+            vlc_restorecancel (canc);
         }
-        i_remain -= 200000;
-        msleep( 200000 ); /* 200 ms */
+        p_timeout->p_sys->b_timeout_call = !p_timeout->b_handle_keep_alive;
+
+        msleep (((int64_t)p_timeout->p_sys->i_timeout - 2) * CLOCK_FREQ);
     }
-    vlc_restorecancel (canc);
+    assert(0); /* dead code */
 }
 
 /*****************************************************************************
