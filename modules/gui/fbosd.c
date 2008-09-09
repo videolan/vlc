@@ -1309,10 +1309,7 @@ static void Run( intf_thread_t *p_intf )
             p_sys->b_need_update = false;
         }
 
-        if( vlc_CPU() & CPU_CAPABILITY_FPU )
-            msleep( INTF_IDLE_SLEEP );
-        else
-            msleep( 500 );
+        msleep( INTF_IDLE_SLEEP );
     }
 
     End( p_intf );
