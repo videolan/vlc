@@ -1,5 +1,4 @@
       $CONFIG \
-      --enable-release \
       --without-contrib \
       --enable-nls \
       --enable-shared-libvlc \
@@ -18,6 +17,7 @@
       --enable-dca \
       --enable-libass \
       --enable-x264 \
+      --disable-zvbi --enable-telx \
       --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \
       --enable-shout \
       --enable-goom \
