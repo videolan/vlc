@@ -3354,6 +3354,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     pid->es->fmt.i_cat = AUDIO_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
                 }
+                else if( p_dr->i_tag == 0x7a )
+                {
+                    /* DVB with stream_type 0x06 (ETS EN 300 468) */
+                    pid->es->fmt.i_cat = AUDIO_ES;
+                    pid->es->fmt.i_codec = VLC_FOURCC( 'e', 'a', 'c', '3' );
+                }
                 else if( p_dr->i_tag == 0x73 )
                 {
                     /* DTS audio descriptor (ETSI TS 101 154 Annex F) */
