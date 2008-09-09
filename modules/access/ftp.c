@@ -153,6 +153,8 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         psz = strdup( p_sys->url.psz_username );
     else
         psz = var_CreateGetString( p_access, "ftp-user" );
+    if( !psz )
+        return -1;
 
     if( ftp_SendCommand( p_access, p_sys, "USER %s", psz ) < 0 ||
         ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
@@ -173,6 +175,8 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                 psz = strdup( p_sys->url.psz_password );
             else
                 psz = var_CreateGetString( p_access, "ftp-pwd" );
+            if( !psz )
+                return -1;
 
             if( ftp_SendCommand( p_access, p_sys, "PASS %s", psz ) < 0 ||
                 ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
