@@ -3183,7 +3183,7 @@ dnl
 dnl skins2 module
 dnl
 AC_ARG_ENABLE(libtar,
-  [  --enable-libtar support for skins2 (default enabled)])
+  [  --enable-libtar         libtar support for skins2 (default enabled)])
 
 AS_IF([test "${enable_libtar}" != "no"],[
   AC_CHECK_HEADERS(libtar.h, [
@@ -3560,7 +3560,7 @@ dnl
 dnl  schroedinger decoder plugin (for dirac format video)
 dnl
 AC_ARG_ENABLE(schroedinger,
-[  --disable-schroedinger   high performance dirac codec (default enabled)])
+[  --disable-schroedinger  high performance dirac codec (default enabled)])
 if test "${enable_schroedinger}" != "no"; then
   PKG_CHECK_MODULES(SCHROEDINGER,[schroedinger-1.0 >= 1.0], [
       VLC_ADD_PLUGIN([schroedinger])
@@ -3714,7 +3714,7 @@ dnl
 dnl libass subtitle rendering module
 dnl
 AC_ARG_ENABLE(libass,
-  [  --enable-libass           Subtitle support using libass (default disabled)])
+  [  --enable-libass         Subtitle support using libass (default disabled)])
 AS_IF( [test "${enable_libass}" = "yes"], [
   PKG_CHECK_MODULES(LIBASS, libass >= 0.9.5,
       [
