@@ -222,10 +222,10 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     ADD_ACODEC( "WMA", "wma" )
 
 #define ADD_SCALING( factor ) ui.vScaleBox->addItem( factor );
+    ADD_SCALING( "1" )
     ADD_SCALING( "0.25" )
     ADD_SCALING( "0.5" )
     ADD_SCALING( "0.75" )
-    ADD_SCALING( "1" )
     ADD_SCALING( "1.25" )
     ADD_SCALING( "1.5" )
     ADD_SCALING( "1.75" )
