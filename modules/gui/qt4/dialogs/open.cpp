@@ -371,7 +371,7 @@ void OpenDialog::stream( bool b_transcode_only )
 
         /* Dbg and send :D */
         msg_Dbg( p_intf, "MRL passed to the Sout: %s", qtu( soutMRL ) );
-        THEDP->streamingDialog( this, listMRL[0], b_transcode_only );
+        THEDP->streamingDialog( this, soutMRL, b_transcode_only );
     }
 }
 
