@@ -3670,12 +3670,9 @@ AC_ARG_ENABLE(zvbi,
 		  libzvbi (default enabled)]))
 AC_ARG_ENABLE(telx,
   AS_HELP_STRING([--enable-telx],[Teletext decoding module (conflicting with 
-		  zvbi) (default disabled)]))
+		  zvbi) (default enabled if zvbi is absent)]))
 
 AS_IF( [test "${enable_zvbi}" != "no"],[
-  AS_IF( [test "${enable_telx}" = "yes"],[
-    AC_MSG_ERROR([The zvbi and telx modules are uncompatibles. Disable the other if you enable one.])
-  ],[
     PKG_CHECK_MODULES(ZVBI,
     	zvbi-0.2 >= 0.2.25,
     	[
@@ -3683,13 +3680,15 @@ AS_IF( [test "${enable_zvbi}" != "no"],[
     	  VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
           VLC_ADD_PLUGIN([zvbi])
 	  AC_DEFINE(ZVBI_COMPILED, 1, [Define if the zvbi module is built]) 
+	  AS_IF( [test "${enable_telx}" = "yes"],[
+		  AC_MSG_WARN([The zvbi and telx modules are uncompatibles. 
+			       Using zvbi.])
+		  ])
 	],[
 	  AC_MSG_WARN(ZVBI library not found. Enabling the telx module instead)
-	  enable_telx="yes"
 	])
     ])  
-  ])
-AS_IF( [test "${enable_telx}" = "yes"],[
+AS_IF( [test "${enable_telx}" !=no ],[
   VLC_ADD_PLUGIN([telx])
   ])
 
