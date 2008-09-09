@@ -3055,6 +3055,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
     ts_pid_t             **pp_clean = NULL;
     int                  i_clean = 0, i;
+    bool                 b_hdmv = false;
 
     msg_Dbg( p_demux, "PMTCallBack called" );
 
@@ -3140,6 +3141,26 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
                                 | p_dr->p_data[1];
             msg_Dbg( p_demux, " * descriptor : CA (0x9) SysID 0x%x", i_sysid );
+        }
+        else if( p_dr->i_tag == 0x05 )
+        {
+            if( p_dr->i_tag == 0x05 )
+            {
+                /* Registration Descriptor */
+                if( p_dr->i_length != 4 )
+                {
+                    msg_Warn( p_demux, "invalid Registration Descriptor" );
+                }
+                else
+                {
+                    msg_Dbg( p_demux, " * descriptor : registration %4.4s", p_dr->p_data );
+                    if( !memcmp( p_dr->p_data, "HDMV", 4 ) )
+                    {
+                        /* Blu-Ray */
+                        b_hdmv = true;
+                    }
+                }
+            }
         }
         else
         {
@@ -3351,6 +3372,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 else if( p_dr->i_tag == 0x6a )
                 {
                     /* DVB with stream_type 0x06 */
+                    pid->es->fmt.i_cat = AUDIO_ES;
+                    pid->es->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
+                }
+                else if( p_dr->i_tag == 0x81 )
+                {
+                    /* ATSC with stream_type 0x06 */
                     pid->es->fmt.i_cat = AUDIO_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
                 }
@@ -3691,6 +3718,36 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
              * packetizer.
              * Yes it's ugly but it's the only way to have DIV3 working */
             pid->es->fmt.b_packetized = true;
+        }
+        else if( b_hdmv )
+        {
+            /* Blu-Ray mapping */
+            switch( p_es->i_type )
+            {
+            case 0x80:
+                pid->es->fmt.i_cat = AUDIO_ES;
+                pid->es->fmt.i_codec = VLC_FOURCC( 'l', 'p', 'c', 'm' );
+                break;
+            case 0x82:
+            case 0x85: /* DTS-HD High resolution audio */
+            case 0x86: /* DTS-HD Master audio */
+            case 0xA2: /* Secondary DTS audio */
+                pid->es->fmt.i_cat = AUDIO_ES;
+                pid->es->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
+                break;
+            case 0x83: /* TrueHD AC3 */
+            case 0x84: /* E-AC3 */
+            case 0x87: /* E-AC3 */
+            case 0xA1: /* Secondary E-AC3 */
+                pid->es->fmt.i_cat = AUDIO_ES;
+                pid->es->fmt.i_codec = VLC_FOURCC( 'e', 'a', 'c', '3' );
+                break;
+            case 0x90: /* Presentation graphics */
+            case 0x91: /* Interactive graphics */
+            case 0x92: /* Subtitle */
+            default:
+                break;
+            }
         }
 
         if( pid->es->fmt.i_cat == AUDIO_ES ||
