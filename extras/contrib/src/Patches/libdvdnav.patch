@@ -1,24 +1,15 @@
 Index: src/vm/vm.c
 ===================================================================
---- src/vm/vm.c	(revision 1096)
+--- src/vm/vm.c	(revision 1136)
 +++ src/vm/vm.c	(working copy)
-@@ -139,19 +139,18 @@
-      * all off_t are 64bit.
-      */
-     off_t off;
--    int fd, i;
-+    int i, fd;
-     uint8_t data[DVD_VIDEO_LB_LEN];
- 
-     /* Read DVD name */
+@@ -146,12 +146,11 @@
      fd = open(device, O_RDONLY);
-     if (fd > 0) { 
+     if (fd > 0) {
        off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
 -      if( off == ( 32 * (off_t) DVD_VIDEO_LB_LEN ) ) {
--        off = read( fd, data, DVD_VIDEO_LB_LEN ); 
++      if (off == 16) {
+         off = read( fd, data, DVD_VIDEO_LB_LEN );
 -        close(fd);
-+      if( off == 16 ) {
-+        off =  read( fd, data, DVD_VIDEO_LB_LEN );
          if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
            fprintf(MSG_OUT, "libdvdnav: DVD Title: ");
 -          for(i=25; i < 73; i++ ) {
@@ -34,7 +25,7 @@ Index: src/vm/vm.c
 -          name[48] = 0;
 +          strncpy(name, (char*) &data[40], 32);
 +          i=31;
-+          while( (i >= 0) && (name[i] <= ' ')) --i;
++          while( (i>=0) && (name[i] <= ' ')) --i;
 +          name[i+1] = '\0';
            fprintf(MSG_OUT, "\nlibdvdnav: DVD Serial Number: ");
 -          for(i=73; i < 89; i++ ) {
@@ -44,7 +35,7 @@ Index: src/vm/vm.c
                fprintf(MSG_OUT, "%c", data[i]);
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 1100)
+--- Makefile.am	(revision 1136)
 +++ Makefile.am	(working copy)
 @@ -1,7 +1,7 @@
  include $(top_srcdir)/misc/Makefile.common
