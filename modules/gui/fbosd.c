@@ -79,10 +79,8 @@ static void CloseTextRenderer( intf_thread_t * );
 static int  OverlayCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 
-static picture_t *AllocatePicture( vlc_object_t *,
-                                         video_format_t * );
-static void DeAllocatePicture( vlc_object_t *, picture_t *,
-                                     video_format_t * );
+static picture_t *AllocatePicture( video_format_t * );
+static void DeAllocatePicture( picture_t *, video_format_t * );
 static void SetOverlayTransparency( intf_thread_t *,
                                     bool );
 static picture_t *LoadImage( intf_thread_t *, video_format_t *,
@@ -625,8 +623,7 @@ static void CloseTextRenderer( intf_thread_t *p_intf )
  * AllocatePicture:
  * allocate a picture buffer for use with the overlay fb.
  *****************************************************************************/
-static picture_t *AllocatePicture( vlc_object_t *p_this,
-                                   video_format_t *p_fmt )
+static picture_t *AllocatePicture( video_format_t *p_fmt )
 {
     picture_t *p_picture = picture_New( p_fmt->i_chroma,
                                         p_fmt->i_width, p_fmt->i_height,
@@ -656,11 +653,8 @@ static picture_t *AllocatePicture( vlc_object_t *p_this,
  * DeAllocatePicture:
  * Deallocate a picture buffer and free all associated memory.
  *****************************************************************************/
-static void DeAllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
-                               video_format_t *p_fmt )
+static void DeAllocatePicture( picture_t *p_pic, video_format_t *p_fmt )
 {
-    VLC_UNUSED(p_this);
-
     if( p_fmt )
     {
         free( p_fmt->p_palette );
@@ -1006,8 +1000,7 @@ static int Init( intf_thread_t *p_intf )
     p_sys->fmt_out.i_sar_num = p_sys->fmt_out.i_sar_den = 1;
 
     /* Allocate overlay buffer */
-    p_sys->p_overlay = AllocatePicture( VLC_OBJECT(p_intf),
-                                        &p_sys->fmt_out );
+    p_sys->p_overlay = AllocatePicture( &p_sys->fmt_out );
     if( !p_sys->p_overlay ) return VLC_EGENERIC;
 
     SetOverlayTransparency( p_intf, true );
@@ -1055,7 +1048,7 @@ static void End( intf_thread_t *p_intf )
             msg_Err( p_intf, "unable to clear overlay" );
     }
 
-    DeAllocatePicture( VLC_OBJECT(p_intf), p_intf->p_sys->p_overlay,
+    DeAllocatePicture( p_intf->p_sys->p_overlay,
                        &p_intf->p_sys->fmt_out );
     p_intf->p_sys->p_overlay = NULL;
 }
@@ -1215,7 +1208,7 @@ static void Render( intf_thread_t *p_intf, struct fbosd_render_t *render )
             BlendPicture( p_intf, &fmt_in, &p_sys->fmt_out,
                           p_text, p_sys->p_overlay );
             msg_Dbg( p_intf, "releasing picture" );
-            DeAllocatePicture( VLC_OBJECT( p_intf ), p_text, &fmt_in );
+            DeAllocatePicture( p_text, &fmt_in );
         }
 #else
         p_text = RenderText( p_intf, render->psz_string, &render->text_style,
