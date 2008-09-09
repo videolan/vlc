@@ -28,9 +28,6 @@
 
 #if !defined( HAVE_BEOS ) && !defined( HAVE_DARWIN )
 #   define SCREEN_SUBSCREEN
-#endif
-
-#if !defined( HAVE_WIN32 ) && !defined( HAVE_BEOS ) && !defined( HAVE_DARWIN )
 #   define SCREEN_MOUSE
 #endif
 
@@ -75,4 +72,7 @@ block_t *screen_Capture( demux_t * );
 
 #ifdef SCREEN_SUBSCREEN
 void FollowMouse( demux_sys_t *, int, int );
+#endif
+#ifdef SCREEN_MOUSE
+void RenderCursor( demux_t *, int, int, uint8_t * );
 #endif

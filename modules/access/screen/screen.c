@@ -192,7 +192,9 @@ static int Open( vlc_object_t *p_this )
         {
             p_sys->i_screen_width = p_sys->fmt.video.i_width;
             p_sys->i_screen_height = p_sys->fmt.video.i_height;
+            p_sys->fmt.video.i_visible_width =
             p_sys->fmt.video.i_width = p_sys->i_width;
+            p_sys->fmt.video.i_visible_height =
             p_sys->fmt.video.i_height = p_sys->i_height;
             p_sys->b_follow_mouse = var_CreateGetInteger( p_demux,
                                                 "screen-follow-mouse" );
@@ -322,5 +324,64 @@ void FollowMouse( demux_sys_t *p_sys, int i_x, int i_y )
     if( i_y < 0 ) i_y = 0;
     p_sys->i_top = __MIN( (unsigned int)i_y,
     p_sys->i_screen_height - p_sys->i_height );
+}
+#endif
+
+#ifdef SCREEN_MOUSE
+void RenderCursor( demux_t *p_demux, int i_x, int i_y,
+                   uint8_t *p_dst )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    if( !p_sys->dst.i_planes )
+        vout_InitPicture( p_demux, &p_sys->dst,
+                          p_sys->fmt.video.i_chroma,
+                          p_sys->fmt.video.i_width,
+                          p_sys->fmt.video.i_height,
+                          p_sys->fmt.video.i_aspect );
+    if( !p_sys->p_blend )
+    {
+        p_sys->p_blend = vlc_object_create( p_demux, sizeof(filter_t) );
+        if( !p_sys->p_blend )
+            msg_Err( p_demux, "Could not allocate memory for blending module" );
+        else
+        {
+            es_format_Init( &p_sys->p_blend->fmt_in, VIDEO_ES,
+                            VLC_FOURCC('R','G','B','A') );
+            p_sys->p_blend->fmt_in.video = p_sys->p_mouse->format;
+            p_sys->p_blend->fmt_out = p_sys->fmt;
+            p_sys->p_blend->p_module =
+                module_Need( p_sys->p_blend, "video blending", 0, 0 );
+            if( !p_sys->p_blend->p_module )
+            {
+                msg_Err( p_demux, "Could not load video blending module" );
+                vlc_object_detach( p_sys->p_blend );
+                vlc_object_release( p_sys->p_blend );
+                p_sys->p_blend = NULL;
+            }
+        }
+    }
+    if( p_sys->p_blend )
+    {
+        p_sys->dst.p->p_pixels = p_dst;
+        p_sys->p_blend->pf_video_blend( p_sys->p_blend,
+                                        &p_sys->dst,
+                                        p_sys->p_mouse,
+#ifdef SCREEN_SUBSCREEN
+                                        i_x-p_sys->i_left,
+#else
+                                        i_x,
+#endif
+#ifdef SCREEN_SUBSCREEN
+                                        i_y-p_sys->i_top,
+#else
+                                        i_y,
+#endif
+                                        255 );
+    }
+    else
+    {
+        picture_Release( p_sys->p_mouse );
+        p_sys->p_mouse = NULL;
+    }
 }
 #endif

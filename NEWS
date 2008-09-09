@@ -2,7 +2,7 @@ Changes between 0.9.1 and 1.0.0-git:
 ------------------------------------
 
 Inputs:
- * Mouse cursor support in x11 screen module
+ * Mouse cursor support in x11 and win32 screen modules
  * Screen module now supports partial screen capture and mouse following on
    windows.
 

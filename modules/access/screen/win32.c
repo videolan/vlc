@@ -1,7 +1,7 @@
 /*****************************************************************************
  * win32.c: Screen capture module.
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -97,9 +97,12 @@ int screen_InitCapture( demux_t *p_demux )
     }
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
+    p_sys->fmt.video.i_visible_width =
     p_sys->fmt.video.i_width  = GetDeviceCaps( p_data->hdc_src, HORZRES );
+    p_sys->fmt.video.i_visible_height =
     p_sys->fmt.video.i_height = GetDeviceCaps( p_data->hdc_src, VERTRES );
     p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
+    p_sys->fmt.video.i_chroma = i_chroma;
 
     switch( i_chroma )
     {
@@ -275,6 +278,15 @@ block_t *screen_Capture( demux_t *p_demux )
         block_t *p_block = p_data->p_block;
         p_data->i_fragment = 0;
         p_data->p_block = 0;
+
+        if( p_sys->p_mouse )
+        {
+            POINT pos;
+            GetCursorPos( &pos );
+            RenderCursor( p_demux, pos.x, pos.y,
+                          p_block->p_buffer );
+        }
+
         return p_block;
     }
 
