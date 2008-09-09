@@ -283,7 +283,7 @@ static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
 static int parseURL( vlc_url_t *url, const char *path )
 {
     if( path == NULL )
-        return -1;
+        return VLC_EGENERIC;
 
     /* *** Parse URL and get server addr/port and path *** */
     while( *path == '/' )
@@ -292,7 +292,7 @@ static int parseURL( vlc_url_t *url, const char *path )
     vlc_UrlParse( url, path, 0 );
 
     if( url->psz_host == NULL || *url->psz_host == '\0' )
-        return -1;
+        return VLC_EGENERIC;
 
     if( url->i_port <= 0 )
         url->i_port = IPPORT_FTP; /* default port */
@@ -300,10 +300,10 @@ static int parseURL( vlc_url_t *url, const char *path )
     /* FTP URLs are relative to user's default directory (RFC1738)
     For absolute path use ftp://foo.bar//usr/local/etc/filename */
 
-    if( *url->psz_path == '/' )
+    if( url->psz_path && *url->psz_path == '/' )
         url->psz_path++;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 
@@ -328,7 +328,7 @@ static int InOpen( vlc_object_t *p_this )
         goto exit_error;
 
     /* get size */
-    if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path ) < 0 ||
+    if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path ? : "" ) < 0 ||
         ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
     {
         msg_Err( p_access, "cannot get file size" );
@@ -762,7 +762,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     /* "1xx" message */
     if( ftp_SendCommand( p_access, p_sys, "%s %s",
                          p_sys->out ? "STOR" : "RETR",
-                         p_sys->url.psz_path ) < 0 ||
+                         p_sys->url.psz_path ?: "" ) < 0 ||
         ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
     {
         msg_Err( p_access, "cannot retrieve file" );
