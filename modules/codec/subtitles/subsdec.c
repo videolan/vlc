@@ -43,7 +43,7 @@ static void CloseDecoder  ( vlc_object_t * );
 static subpicture_t   *DecodeBlock   ( decoder_t *, block_t ** );
 static subpicture_t   *ParseText     ( decoder_t *, block_t * );
 static char           *StripTags      ( char * );
-static char           *CreateHtmlSubtitle ( char * );
+static char           *CreateHtmlSubtitle( int *pi_align, char * );
 
 
 /*****************************************************************************
@@ -437,7 +437,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_spu->p_region->psz_text = StripTags( psz_subtitle );
         if( var_CreateGetBool( p_dec, "subsdec-formatted" ) )
         {
-            p_spu->p_region->psz_html = CreateHtmlSubtitle( psz_subtitle );
+            p_spu->p_region->psz_html = CreateHtmlSubtitle( &p_spu->p_region->i_align, psz_subtitle );
         }
 
         p_spu->i_start = p_block->i_pts;
@@ -595,7 +595,7 @@ static void HtmlCopy( char **ppsz_html, char **ppsz_subtitle, const char *psz_te
     *ppsz_subtitle += strlen(psz_text);
 }
 
-static char *CreateHtmlSubtitle( char *psz_subtitle )
+static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
 {
     char   *psz_tag = malloc( ( strlen( psz_subtitle ) / 3 ) + 1 );
     if( !psz_tag ) return NULL;
@@ -615,6 +615,19 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
     strcpy( psz_html, "<text>" );
     psz_html += 6;
 
+    /* Check for forced alignment */
+    if( !strncmp( psz_subtitle, "{\\an", 4 ) && psz_subtitle[4] >= '1' && psz_subtitle[4] <= '9' && psz_subtitle[5] == '}' )
+    {
+        static const pi_vertical[3] = { SUBPICTURE_ALIGN_BOTTOM, 0, SUBPICTURE_ALIGN_TOP };
+        static const pi_horizontal[3] = { SUBPICTURE_ALIGN_LEFT, 0, SUBPICTURE_ALIGN_RIGHT };
+        const int i_id = psz_subtitle[4] - '1';
+
+        *pi_align = pi_vertical[i_id/3] | pi_horizontal[i_id%3];
+
+        psz_subtitle += 6;
+    }
+
+    /* */
     while( *psz_subtitle )
     {
         if( *psz_subtitle == '\n' )
