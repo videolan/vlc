@@ -255,5 +255,5 @@ EXTRA_DIST += \
 	ui/streampanel.ui \
 	ui/sout.ui \
 	ui/vlm.ui 
-EXTRA_DIST += $(res_DEPEDENCIES)
+EXTRA_DIST += $(res_DEPENDENCIES)
 
