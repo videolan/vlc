@@ -3,6 +3,8 @@ Changes between 0.9.1 and 1.0.0-git:
 
 Inputs:
  * Mouse cursor support in x11 screen module
+ * Screen module now supports partial screen capture and mouse following on
+   windows.
 
 Decoders:
  * AES3 (SMPTE 302M) support

@@ -54,9 +54,11 @@ int screen_InitCapture( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data;
     int i_chroma, i_bits_per_pixel;
-    vlc_value_t val;
 
     p_sys->p_data = p_data = malloc( sizeof( screen_data_t ) );
+    if( !p_data )
+        return VLC_ENOMEM;
+    memset( p_data, 0, sizeof( screen_data_t ) );
 
     /* Get the device context for the whole screen */
     p_data->hdc_src = CreateDC( "DISPLAY", NULL, NULL, NULL );
@@ -122,32 +124,6 @@ int screen_InitCapture( demux_t *p_demux )
     }
 
 
-    /* Create the bitmap info header */
-    p_data->bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    p_data->bmi.bmiHeader.biWidth = p_sys->fmt.video.i_width;
-    p_data->bmi.bmiHeader.biHeight = - p_sys->fmt.video.i_height;
-    p_data->bmi.bmiHeader.biPlanes = 1;
-    p_data->bmi.bmiHeader.biBitCount = p_sys->fmt.video.i_bits_per_pixel;
-    p_data->bmi.bmiHeader.biCompression = BI_RGB;
-    p_data->bmi.bmiHeader.biSizeImage = 0;
-    p_data->bmi.bmiHeader.biXPelsPerMeter =
-        p_data->bmi.bmiHeader.biYPelsPerMeter = 0;
-    p_data->bmi.bmiHeader.biClrUsed = 0;
-    p_data->bmi.bmiHeader.biClrImportant = 0;
-
-    var_Create( p_demux, "screen-fragment-size",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "screen-fragment-size", &val );
-    p_data->i_fragment_size =
-        val.i_int > 0 ? val.i_int : p_sys->fmt.video.i_height;
-    p_data->i_fragment_size =
-        val.i_int > p_sys->fmt.video.i_height ? p_sys->fmt.video.i_height :
-        p_data->i_fragment_size;
-    p_sys->f_fps *= (p_sys->fmt.video.i_height/p_data->i_fragment_size);
-    p_sys->i_incr = 1000000 / p_sys->f_fps;
-    p_data->i_fragment = 0;
-    p_data->p_block = 0;
-
     return VLC_SUCCESS;
 }
 
@@ -188,6 +164,37 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     void *p_buffer;
     int i_buffer;
     HBITMAP hbmp;
+
+    if( p_data->bmi.bmiHeader.biSize == 0 )
+    {
+        vlc_value_t val;
+        /* Create the bitmap info header */
+        p_data->bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+        p_data->bmi.bmiHeader.biWidth = p_sys->fmt.video.i_width;
+        p_data->bmi.bmiHeader.biHeight = - p_sys->fmt.video.i_height;
+        p_data->bmi.bmiHeader.biPlanes = 1;
+        p_data->bmi.bmiHeader.biBitCount = p_sys->fmt.video.i_bits_per_pixel;
+        p_data->bmi.bmiHeader.biCompression = BI_RGB;
+        p_data->bmi.bmiHeader.biSizeImage = 0;
+        p_data->bmi.bmiHeader.biXPelsPerMeter =
+            p_data->bmi.bmiHeader.biYPelsPerMeter = 0;
+        p_data->bmi.bmiHeader.biClrUsed = 0;
+        p_data->bmi.bmiHeader.biClrImportant = 0;
+
+        var_Create( p_demux, "screen-fragment-size",
+                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_Get( p_demux, "screen-fragment-size", &val );
+        p_data->i_fragment_size =
+            val.i_int > 0 ? val.i_int : p_sys->fmt.video.i_height;
+        p_data->i_fragment_size =
+            val.i_int > p_sys->fmt.video.i_height ? p_sys->fmt.video.i_height :
+            p_data->i_fragment_size;
+        p_sys->f_fps *= (p_sys->fmt.video.i_height/p_data->i_fragment_size);
+        p_sys->i_incr = 1000000 / p_sys->f_fps;
+        p_data->i_fragment = 0;
+        p_data->p_block = 0;
+    }
+
 
     /* Create the bitmap storage space */
     hbmp = CreateDIBSection( p_data->hdc_dst, &p_data->bmi, DIB_RGB_COLORS,
@@ -242,11 +249,18 @@ block_t *screen_Capture( demux_t *p_demux )
         }
     }
 
-    if( !BitBlt( p_data->hdc_dst, 0, p_data->i_fragment *
-                 p_data->i_fragment_size,
+    if( p_sys->b_follow_mouse )
+    {
+        POINT pos;
+        GetCursorPos( &pos );
+        FollowMouse( p_sys, pos.x, pos.y );
+    }
+
+    if( !BitBlt( p_data->hdc_dst, 0,
+                 p_data->i_fragment * p_data->i_fragment_size,
                  p_sys->fmt.video.i_width, p_data->i_fragment_size,
-                 p_data->hdc_src, 0, p_data->i_fragment *
-                 p_data->i_fragment_size,
+                 p_data->hdc_src, p_sys->i_left, p_sys->i_top +
+                 p_data->i_fragment * p_data->i_fragment_size,
                  IS_WINNT ? SRCCOPY | CAPTUREBLT : SRCCOPY ) )
     {
         msg_Err( p_demux, "error during BitBlt()" );

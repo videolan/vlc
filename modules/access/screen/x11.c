@@ -1,10 +1,11 @@
 /*****************************************************************************
  * x11.c: Screen capture module.
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Antoine Cellerier <dionoea at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -133,16 +134,7 @@ block_t *screen_Capture( demux_t *p_demux )
             &mask ) )
         {
             if( p_sys->b_follow_mouse )
-            {
-                root_x -= p_sys->i_width/2;
-                if( root_x < 0 ) root_x = 0;
-                p_sys->i_left = __MIN( (unsigned int)root_x,
-                                       p_sys->i_screen_width - p_sys->i_width );
-                root_y -= p_sys->i_height/2;
-                if( root_y < 0 ) root_y = 0;
-                p_sys->i_top = __MIN( (unsigned int)root_y,
-                                      p_sys->i_screen_height - p_sys->i_height );
-            }
+                FollowMouse( p_sys, root_x, root_y );
         }
         else
             msg_Dbg( p_demux, "XQueryPointer() failed" );

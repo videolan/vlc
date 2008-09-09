@@ -1,10 +1,11 @@
 /*****************************************************************************
  * screen.h: Screen capture module.
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Antoine Cellerier <dionoea at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +26,11 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 
-#if !defined( HAVE_WIN32 ) && !defined( HAVE_BEOS ) && !defined( HAVE_DARWIN )
+#if !defined( HAVE_BEOS ) && !defined( HAVE_DARWIN )
 #   define SCREEN_SUBSCREEN
+#endif
+
+#if !defined( HAVE_WIN32 ) && !defined( HAVE_BEOS ) && !defined( HAVE_DARWIN )
 #   define SCREEN_MOUSE
 #endif
 
@@ -69,3 +73,6 @@ int      screen_InitCapture ( demux_t * );
 int      screen_CloseCapture( demux_t * );
 block_t *screen_Capture( demux_t * );
 
+#ifdef SCREEN_SUBSCREEN
+void FollowMouse( demux_sys_t *, int, int );
+#endif
