@@ -859,6 +859,11 @@ static const struct
     { VLC_FOURCC('a','5','2','b'), CODEC_ID_AC3, /* VLC specific hack */
       AUDIO_ES, "A52 Audio (aka AC3)" },
 
+#if LIBAVCODEC_VERSION_INT >= ((52<<16)+(0<<8)+0)
+    { VLC_FOURCC('e','a','c','3'), CODEC_ID_EAC3,
+      AUDIO_ES, "A/52 B Audio (aka E-AC3)" },
+#endif
+
     /* DTS Audio */
     { VLC_FOURCC('d','t','s',' '), CODEC_ID_DTS,
       AUDIO_ES, "DTS Audio" },

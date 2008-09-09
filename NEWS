@@ -8,6 +8,7 @@ Inputs:
 
 Decoders:
  * AES3 (SMPTE 302M) support
+ * E-AC3 (A/52b) support
 
 Stream output:
  * Restored the old mpeg2 transrating module.

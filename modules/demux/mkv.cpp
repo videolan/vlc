@@ -2410,6 +2410,10 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
         }
+        else if( !strcmp( tracks[i_track]->psz_codec, "A_EAC3" ) )
+        {
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'e', 'a', 'c', '3' );
+        }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_DTS" ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
