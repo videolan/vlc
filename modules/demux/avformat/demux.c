@@ -215,7 +215,11 @@ int OpenDemux( vlc_object_t *p_this )
             es_format_Init( &fmt, AUDIO_ES, fcc );
             fmt.audio.i_channels = cc->channels;
             fmt.audio.i_rate = cc->sample_rate;
+#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
             fmt.audio.i_bitspersample = cc->bits_per_sample;
+#else
+            fmt.audio.i_bitspersample = cc->bits_per_coded_sample;
+#endif
             fmt.audio.i_blockalign = cc->block_align;
             psz_type = "audio";
             break;

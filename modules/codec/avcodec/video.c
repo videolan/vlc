@@ -202,13 +202,22 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_codec );
     p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
     p_sys->p_context->height = p_dec->fmt_in.video.i_height;
+#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
     p_sys->p_context->bits_per_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+#else
+    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+#endif
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
     p_sys->p_context->workaround_bugs =
         config_GetInt( p_dec, "ffmpeg-workaround-bugs" );
+#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
     p_sys->p_context->error_resilience =
         config_GetInt( p_dec, "ffmpeg-error-resilience" );
+#else
+    p_sys->p_context->error_recognition =
+        config_GetInt( p_dec, "ffmpeg-error-resilience" );
+#endif
 
     var_Create( p_dec, "grayscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "grayscale", &val );
