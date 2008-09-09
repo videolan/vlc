@@ -250,8 +250,6 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
     char *psz_parser, *psz_string;
     const char *psz_filter_type;
 
-    /* Please leave p_libvlc_global. This is where cached modules are
-     * stored. We're not trying to find a module instance. */
     module_t *p_obj = module_Find( p_intf, psz_name );
     if( !p_obj )
     {
@@ -504,14 +502,20 @@ void ExtVideo::updateFilterOptions()
         vlc_object_find_name( p_intf->p_libvlc,
                               qtu( module ),
                               FIND_CHILD );
+    int i_type;
+    bool b_is_command;
     if( !p_obj )
     {
-        msg_Err( p_intf, "Module %s not found.", qtu( module ) );
-        return;
+        msg_Warn( p_intf, "Module %s not found. You'll need to restart the filter to take the change into account.", qtu( module ) );
+        i_type = config_GetType( p_intf, qtu( option ) );
+        b_is_command = false;
+    }
+    else
+    {
+        i_type = var_Type( p_obj, qtu( option ) );
+        b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
     }
 
-    int i_type = var_Type( p_obj, qtu( option ) );
-    bool b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
     if( !b_is_command )
     {
         msg_Warn( p_intf, "Module %s's %s variable isn't a command. You'll need to restart the filter to take change into account.",
@@ -581,7 +585,7 @@ void ExtVideo::updateFilterOptions()
                  qtu( option ),
                  i_type );
 
-    vlc_object_release( p_obj );
+    if( p_obj ) vlc_object_release( p_obj );
 }
 
 #if 0
