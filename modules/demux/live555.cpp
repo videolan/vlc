@@ -548,7 +548,8 @@ describe:
 
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
                                                &authenticator );
-    p_sys->b_get_param = strstr( psz_options, "GET_PARAMETER" ) ? true : false ;
+    if( psz_options )
+        p_sys->b_get_param = strstr( psz_options, "GET_PARAMETER" ) ? true : false ;
     delete [] psz_options;
 
     p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
