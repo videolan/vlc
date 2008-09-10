@@ -92,7 +92,7 @@ struct intf_sys_t
     int                     i_nowp_port;        /**< port to which submit   */
     char                    *psz_nowp_file;     /**< file to which submit   */
 #endif
-    bool              b_handshaked;       /**< are we authenticated ? */
+    bool                    b_handshaked;       /**< are we authenticated ? */
     char                    psz_auth_token[33]; /**< Authentication token */
 
     /* data about song currently playing */
@@ -101,12 +101,12 @@ struct intf_sys_t
     mtime_t                 time_pause;         /**< time when vlc paused   */
     mtime_t                 time_total_pauses;  /**< total time in pause    */
 
-    bool              b_submit;           /**< do we have to submit ? */
+    bool                    b_submit;           /**< do we have to submit ? */
 
-    bool              b_state_cb;         /**< if we registered the
+    bool                    b_state_cb;         /**< if we registered the
                                                  * "state" callback         */
 
-    bool              b_meta_read;        /**< if we read the song's
+    bool                    b_meta_read;        /**< if we read the song's
                                                  * metadata already         */
 };
 
@@ -575,30 +575,31 @@ static void AddToQueue ( intf_thread_t *p_this )
                             p_sys->time_total_pauses;
     played_time /= 1000000; /* µs → s */
 
-    if( ( played_time < 60 ) &&
+    /*HACK: it seam that the preparsing sometime fail,
+            so use the playing time as the song length */
+    if( p_sys->p_current_song.i_l == 0 )
+        p_sys->p_current_song.i_l = played_time;
+
+    /* Don't send song shorter than 30s */
+    if( p_sys->p_current_song.i_l < 30 )
+    {
+        msg_Dbg( p_this, "Song too short (< 30s), not submitting" );
+        goto end;
+    }
+
+    /* Send if the user had listen more than 240s OR half the track length */
+    if( ( played_time < 240 ) &&
         ( played_time < ( p_sys->p_current_song.i_l / 2 ) ) )
     {
         msg_Dbg( p_this, "Song not listened long enough, not submitting" );
         goto end;
     }
 
-    if( p_sys->p_current_song.i_l < 30 )
-    {
-        if( played_time < 30 )
-        {
-            msg_Dbg( p_this, "Song too short (< 30s), not submitting" );
-            goto end;
-        }
-        else
-            /* This is a HACK to avoid length = 0 (seems to be rejected by audioscrobbler) */
-            p_sys->p_current_song.i_l = played_time;
-    }
-
+    /* Check that all meta are present */
     if( !p_sys->p_current_song.psz_a || !*p_sys->p_current_song.psz_a ||
         !p_sys->p_current_song.psz_t || !*p_sys->p_current_song.psz_t )
     {
         msg_Dbg( p_this, "Missing artist or title, not submitting" );
-/*XXX*/        msg_Dbg( p_this, "%s %s", p_sys->p_current_song.psz_a, p_sys->p_current_song.psz_t );
         goto end;
     }
 
@@ -952,6 +953,8 @@ static int ReadMetaData( intf_thread_t *p_this )
         a = encode_URI_component( psz_meta ); \
         if( !a ) \
         { \
+            vlc_mutex_unlock( &p_sys->lock ); \
+            vlc_object_release( p_input ); \
             free( psz_meta ); \
             return VLC_ENOMEM; \
         } \
