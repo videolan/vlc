@@ -953,6 +953,15 @@ void CaptureOpenPanel::initialize()
     screenLabel->setWordWrap( true );
     screenDevLayout->addWidget( screenLabel, 0, 0 );
 
+    QLabel *screenFPSLabel = new QLabel(
+            qtr( "Desired frame rate for the capture." ) );
+    screenPropLayout->addWidget( screenFPSLabel, 0, 0 );
+
+    screenFPS = new QSpinBox;
+    screenFPS->setValue( 1 );
+    screenFPS->setAlignment( Qt::AlignRight );
+    screenPropLayout->addWidget( screenFPS, 0, 1 );
+
     /* General connects */
     CONNECT( ui.deviceCombo, activated( int ) ,
              stackedDevLayout, setCurrentIndex( int ) );
@@ -1048,6 +1057,7 @@ void CaptureOpenPanel::updateMRL()
 #endif
     case SCREEN_DEVICE:
         mrl = "screen://";
+        mrl += " :screen-fps=" + QString("%1").arg( screenFPS->value() );
         updateButtons();
         break;
     }
@@ -1096,7 +1106,7 @@ void CaptureOpenPanel::updateButtons()
         break;
 #endif
     case SCREEN_DEVICE:
-        ui.optionsBox->hide();
+        //ui.optionsBox->hide();
         ui.advancedButton->hide();
         break;
     }
