@@ -53,6 +53,10 @@ static int alloc_init( filter_t *, void * );
 #define ASPECT_TEXT N_( "Aspect ratio" )
 #define ASPECT_LONGTEXT N_( \
     "Set aspect (like 4:3) of the video canvas" )
+#define PADD_TEXT N_( "Padd video" )
+#define PADD_LONGTEXT N_( \
+    "If enabled, video will be padded to fit in canvas after scaling. " \
+    "Otherwise, video will be cropped to fix in canvas after scaling." )
 
 #define CFG_PREFIX "canvas-"
 
@@ -71,10 +75,13 @@ vlc_module_begin();
 
     add_string( CFG_PREFIX "aspect", "4:3", NULL,
                 ASPECT_TEXT, ASPECT_LONGTEXT, false );
+
+    add_bool( CFG_PREFIX "padd", true, NULL,
+              PADD_TEXT, PADD_LONGTEXT, false );
 vlc_module_end();
 
 static const char *const ppsz_filter_options[] = {
-    "width", "height", "aspect", NULL
+    "width", "height", "aspect", "padd", NULL
 };
 
 struct filter_sys_t
@@ -94,6 +101,7 @@ static int Activate( vlc_object_t *p_this )
     int i_padd,i_offset;
     char *psz_aspect, *psz_parser;
     int i_aspect;
+    bool b_padd;
 
     if( !p_filter->b_allow_fmt_out_change )
     {
@@ -145,6 +153,8 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    b_padd = var_CreateGetBool( p_filter, CFG_PREFIX "padd" );
+
     filter_sys_t *p_sys = (filter_sys_t *)malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -166,28 +176,62 @@ static int Activate( vlc_object_t *p_this )
                          / p_filter->fmt_in.video.i_width;
     fmt.video.i_height = ( fmt.video.i_height * i_aspect )
                          / p_filter->fmt_in.video.i_aspect;
-    if( fmt.video.i_height > i_height )
+
+    if( b_padd )
     {
-        fmt.video.i_height = i_height;
-        fmt.video.i_width = ( p_filter->fmt_in.video.i_width * i_height )
-                            / p_filter->fmt_in.video.i_height;
-        fmt.video.i_width = ( fmt.video.i_width * p_filter->fmt_in.video.i_aspect )
-                            / i_aspect;
-        if( fmt.video.i_width & 1 ) fmt.video.i_width -= 1;
-        i_padd = (i_width - fmt.video.i_width) / 2;
-        i_offset = (i_padd & 1);
-        /* Gruik */
-        snprintf( psz_croppadd, 100, "croppadd{paddleft=%d,paddright=%d}",
-                  i_padd - i_offset, i_padd + i_offset );
+        /* Padd */
+        if( fmt.video.i_height > i_height )
+        {
+            fmt.video.i_height = i_height;
+            fmt.video.i_width = ( p_filter->fmt_in.video.i_width * i_height )
+                                / p_filter->fmt_in.video.i_height;
+            fmt.video.i_width = ( fmt.video.i_width * p_filter->fmt_in.video.i_aspect )
+                                / i_aspect;
+            if( fmt.video.i_width & 1 ) fmt.video.i_width -= 1;
+
+            i_padd = (i_width - fmt.video.i_width) / 2;
+            i_offset = (i_padd & 1);
+            /* Gruik */
+            snprintf( psz_croppadd, 100, "croppadd{paddleft=%d,paddright=%d}",
+                      i_padd - i_offset, i_padd + i_offset );
+        }
+        else
+        {
+            if( fmt.video.i_height & 1 ) fmt.video.i_height -= 1;
+            i_padd = (i_height - fmt.video.i_height ) / 2;
+            i_offset = (i_padd & 1);
+            /* Gruik */
+            snprintf( psz_croppadd, 100, "croppadd{paddtop=%d,paddbottom=%d}",
+                      i_padd - i_offset, i_padd + i_offset );
+        }
     }
     else
     {
-        if( fmt.video.i_height & 1 ) fmt.video.i_height -= 1;
-        i_padd = (i_height - fmt.video.i_height ) / 2;
-        i_offset = (i_padd & 1);
-        /* Gruik */
-        snprintf( psz_croppadd, 100, "croppadd{paddtop=%d,paddbottom=%d}",
-                  i_padd - i_offset, i_padd + i_offset );
+        /* Crop */
+        if( fmt.video.i_height < i_height )
+        {
+            fmt.video.i_height = i_height;
+            fmt.video.i_width = ( p_filter->fmt_in.video.i_width * i_height )
+                                / p_filter->fmt_in.video.i_height;
+            fmt.video.i_width = ( fmt.video.i_width * p_filter->fmt_in.video.i_aspect )
+                                / i_aspect;
+            if( fmt.video.i_width & 1 ) fmt.video.i_width -= 1;
+
+            i_padd = (fmt.video.i_width - i_width) / 2;
+            i_offset =  (i_padd & 1);
+            /* Gruik */
+            snprintf( psz_croppadd, 100, "croppadd{cropleft=%d,cropright=%d}",
+                      i_padd - i_offset, i_padd + i_offset );
+        }
+        else
+        {
+            if( fmt.video.i_height & 1 ) fmt.video.i_height -= 1;
+            i_padd = (fmt.video.i_height - i_height) / 2;
+            i_offset = (i_padd & 1);
+            /* Gruik */
+            snprintf( psz_croppadd, 100, "croppadd{croptop=%d,cropbottom=%d}",
+                      i_padd - i_offset, i_padd + i_offset );
+        }
     }
 
     fmt.video.i_visible_width = fmt.video.i_width;
