@@ -1,7 +1,7 @@
 /*****************************************************************************
- * mpga.c : MPEG-I/II Audio input module for vlc
+ * es.c : Generic audio ES input module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -36,8 +36,6 @@
 #include <vlc_codec.h>
 #include <vlc_input.h>
 
-#define MPGA_PACKET_SIZE 1024
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -50,8 +48,12 @@ vlc_module_begin();
     set_description( N_("MPEG audio / MP3 demuxer" ) );
     set_capability( "demux", 100 );
     set_callbacks( Open, Close );
+
     add_shortcut( "mpga" );
     add_shortcut( "mp3" );
+
+    //add_shortcut( "ac3" );
+    //add_shortcut( "a52" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -69,48 +71,29 @@ struct demux_sys_t
 
     mtime_t     i_pts;
     mtime_t     i_time_offset;
+
     int         i_bitrate_avg;  /* extracted from Xing header */
 
     bool b_initial_sync_failed;
 
-    int i_xing_frames;
-    int i_xing_bytes;
-    int i_xing_bitrate_avg;
-    int i_xing_frame_samples;
+    int i_packet_size;
+
+    int64_t i_stream_offset;
+
+    /* Mpga specific */
+    struct
+    {
+        int i_frames;
+        int i_bytes;
+        int i_bitrate_avg;
+        int i_frame_samples;
+    } xing;
 };
 
-static int HeaderCheck( uint32_t h )
-{
-    if( ((( h >> 21 )&0x07FF) != 0x07FF )   /* header sync */
-        || (((h >> 17)&0x03) == 0 )         /* valid layer ?*/
-        || (((h >> 12)&0x0F) == 0x0F )
-        || (((h >> 12)&0x0F) == 0x00 )      /* valid bitrate ? */
-        || (((h >> 10) & 0x03) == 0x03 )    /* valide sampling freq ? */
-        || ((h & 0x03) == 0x02 ))           /* valid emphasis ? */
-    {
-        return false;
-    }
-    return true;
-}
+#define FCC_MPGA VLC_FOURCC( 'm', 'p', 'g', 'a' )
 
-#define MPGA_VERSION( h )   ( 1 - (((h)>>19)&0x01) )
-#define MPGA_LAYER( h )     ( 3 - (((h)>>17)&0x03) )
-#define MPGA_MODE(h)        (((h)>> 6)&0x03)
-
-static int mpga_frame_samples( uint32_t h )
-{
-    switch( MPGA_LAYER(h) )
-    {
-        case 0:
-            return 384;
-        case 1:
-            return 1152;
-        case 2:
-            return MPGA_VERSION(h) ? 576 : 1152;
-        default:
-            return 0;
-    }
-}
+static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset );
+static int MpgaInit( demux_t *p_demux );
 
 /*****************************************************************************
  * Open: initializes demux structures
@@ -119,115 +102,35 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    bool   b_forced = false;
 
-    uint32_t     header;
-    const uint8_t     *p_peek;
+    int64_t i_offset;
 
-    if( demux_IsPathExtension( p_demux, ".mp3" ) )
-        b_forced = true;
-
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
-
-    if( !HeaderCheck( header = GetDWBE( p_peek ) ) )
-    {
-        bool b_ok = false;
-        int i_peek;
-
-        if( !p_demux->b_force && !b_forced ) return VLC_EGENERIC;
-
-        i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
-        while( i_peek > 4 )
-        {
-            if( HeaderCheck( header = GetDWBE( p_peek ) ) )
-            {
-                b_ok = true;
-                break;
-            }
-            p_peek += 1;
-            i_peek -= 1;
-        }
-        if( !b_ok && !p_demux->b_force ) return VLC_EGENERIC;
-    }
+    if( MpgaProbe( p_demux, &i_offset ) )
+        return VLC_EGENERIC;
 
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     memset( p_sys, 0, sizeof( demux_sys_t ) );
-    p_sys->p_es = 0;
+    p_sys->p_es = NULL;
     p_sys->b_start = true;
+    p_sys->i_stream_offset = i_offset;
+    p_sys->i_bitrate_avg = 0;
+
+    if( stream_Seek( p_demux->s, p_sys->i_stream_offset ) )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    if( MpgaInit( p_demux ) )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     /* Load the mpeg audio packetizer */
     INIT_APACKETIZER( p_sys->p_packetizer, 'm', 'p', 'g', 'a' );
     es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
     LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "mpga" );
-
-    /* Xing header */
-    if( HeaderCheck( header ) )
-    {
-        int i_xing, i_skip;
-        const uint8_t *p_xing;
-
-        if( ( i_xing = stream_Peek( p_demux->s, &p_xing, 1024 ) ) < 21 )
-            return VLC_SUCCESS; /* No header */
-
-        if( MPGA_VERSION( header ) == 0 )
-        {
-            i_skip = MPGA_MODE( header ) != 3 ? 36 : 21;
-        }
-        else
-        {
-            i_skip = MPGA_MODE( header ) != 3 ? 21 : 13;
-        }
-
-        if( i_skip + 8 < i_xing && !strncmp( (char *)&p_xing[i_skip], "Xing", 4 ) )
-        {
-            unsigned int i_flags = GetDWBE( &p_xing[i_skip+4] );
-
-            p_xing += i_skip + 8;
-            i_xing -= i_skip + 8;
-
-            i_skip = 0;
-            if( i_flags&0x01 && i_skip + 4 <= i_xing )   /* XING_FRAMES */
-            {
-                p_sys->i_xing_frames = GetDWBE( &p_xing[i_skip] );
-                i_skip += 4;
-            }
-            if( i_flags&0x02 && i_skip + 4 <= i_xing )   /* XING_BYTES */
-            {
-                p_sys->i_xing_bytes = GetDWBE( &p_xing[i_skip] );
-                i_skip += 4;
-            }
-            if( i_flags&0x04 )   /* XING_TOC */
-            {
-                i_skip += 100;
-            }
-
-            // FIXME: doesn't return the right bitrage average, at least
-            // with some MP3's
-            if( i_flags&0x08 && i_skip + 4 <= i_xing )   /* XING_VBR */
-            {
-                p_sys->i_xing_bitrate_avg = GetDWBE( &p_xing[i_skip] );
-                msg_Dbg( p_demux, "xing vbr value present (%d)",
-                         p_sys->i_xing_bitrate_avg );
-            }
-
-            if( p_sys->i_xing_frames > 0 && p_sys->i_xing_bytes > 0 )
-            {
-                p_sys->i_xing_frame_samples = mpga_frame_samples( header );
-                msg_Dbg( p_demux, "xing frames&bytes value present "
-                         "(%d bytes, %d frames, %d samples/frame)",
-                         p_sys->i_xing_bytes, p_sys->i_xing_frames,
-                         p_sys->i_xing_frame_samples );
-            }
-        }
-    }
-
-    if( p_sys->i_xing_bytes && p_sys->i_xing_frames &&
-        p_sys->i_xing_frame_samples )
-    {
-        p_sys->i_bitrate_avg = p_sys->i_xing_bytes * INT64_C(8) *
-            p_sys->p_packetizer->fmt_out.audio.i_rate /
-            p_sys->i_xing_frames / p_sys->i_xing_frame_samples;
-    }
 
     return VLC_SUCCESS;
 }
@@ -242,10 +145,8 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_in, *p_block_out;
 
-    if( ( p_block_in = stream_Block( p_demux->s, MPGA_PACKET_SIZE ) ) == NULL )
-    {
+    if( ( p_block_in = stream_Block( p_demux->s, p_sys->i_packet_size ) ) == NULL )
         return 0;
-    }
 
     p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start || p_sys->b_initial_sync_failed ? 1 : 0;
     p_sys->b_initial_sync_failed = p_sys->b_start; /* Only try to resync once */
@@ -263,6 +164,16 @@ static int Demux( demux_t *p_demux )
                 p_sys->p_es = es_out_Add( p_demux->out,
                                           &p_sys->p_packetizer->fmt_out);
 
+
+                /* Try the xing header */
+                if( p_sys->xing.i_bytes && p_sys->xing.i_frames &&
+                    p_sys->xing.i_frame_samples )
+                {
+                    p_sys->i_bitrate_avg = p_sys->xing.i_bytes * INT64_C(8) *
+                        p_sys->p_packetizer->fmt_out.audio.i_rate /
+                        p_sys->xing.i_frames / p_sys->xing.i_frame_samples;
+                }
+                /* Use the bitrate */
                 if( p_sys->i_bitrate_avg <= 0 )
                     p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
             }
@@ -296,7 +207,6 @@ static void Close( vlc_object_t * p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     DESTROY_PACKETIZER( p_sys->p_packetizer );
-
     free( p_sys );
 }
 
@@ -326,7 +236,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
-            i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
+            i_ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
                                             args );
             /* No bitrate, we can't have it precisely, but we can compute
@@ -352,13 +262,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
         default:
-            i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
+            i_ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
                                             args );
             if( !i_ret && p_sys->i_bitrate_avg > 0 &&
                 (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
             {
-                int64_t i_time = INT64_C(8000000) * stream_Tell(p_demux->s) /
+                int64_t i_time = INT64_C(8000000) * ( stream_Tell(p_demux->s) - p_sys->i_stream_offset ) /
                     p_sys->i_bitrate_avg;
 
                 /* Fix time_offset */
@@ -368,3 +278,168 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return i_ret;
     }
 }
+
+/*****************************************************************************
+ * Mpeg I/II Audio
+ *****************************************************************************/
+static int CheckSyncMpga( const uint8_t *p_peek )
+{
+    uint32_t h = GetDWBE( p_peek );
+
+    if( ((( h >> 21 )&0x07FF) != 0x07FF )   /* header sync */
+        || (((h >> 17)&0x03) == 0 )         /* valid layer ?*/
+        || (((h >> 12)&0x0F) == 0x0F )
+        || (((h >> 12)&0x0F) == 0x00 )      /* valid bitrate ? */
+        || (((h >> 10) & 0x03) == 0x03 )    /* valide sampling freq ? */
+        || ((h & 0x03) == 0x02 ))           /* valid emphasis ? */
+    {
+        return false;
+    }
+    return true;
+}
+
+#define MPGA_VERSION( h )   ( 1 - (((h)>>19)&0x01) )
+#define MPGA_MODE(h)        (((h)>> 6)&0x03)
+
+static int MpgaGetFrameSamples( uint32_t h )
+{
+    const int i_layer = 3 - (((h)>>17)&0x03);
+    switch( i_layer )
+    {
+    case 0:
+        return 384;
+    case 1:
+        return 1152;
+    case 2:
+        return MPGA_VERSION(h) ? 576 : 1152;
+    default:
+        return 0;
+    }
+}
+
+static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset )
+{
+    bool   b_forced;
+    bool   b_forced_demux;
+    int64_t i_offset;
+
+    const uint8_t     *p_peek;
+
+    b_forced = demux_IsPathExtension( p_demux, ".mp3" );
+    b_forced_demux = demux_IsForced( p_demux, "mp3" ) ||
+                     demux_IsForced( p_demux, "mpga" );
+
+    i_offset = stream_Tell( p_demux->s );
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+        return VLC_EGENERIC;
+
+    if( !CheckSyncMpga( p_peek ) )
+    {
+        bool b_ok = false;
+        int i_peek;
+
+        if( !b_forced_demux && !b_forced )
+            return VLC_EGENERIC;
+
+        i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
+        while( i_peek > 4 )
+        {
+            if( CheckSyncMpga( p_peek ) )
+            {
+                b_ok = true;
+                break;
+            }
+            p_peek += 1;
+            i_peek -= 1;
+            i_offset++;
+        }
+        if( !b_ok && !b_forced_demux )
+            return VLC_EGENERIC;
+    }
+    *pi_offset = i_offset;
+    return VLC_SUCCESS;
+}
+
+static void MpgaXingSkip( const uint8_t **pp_xing, int *pi_xing, int i_count )
+{
+    if(i_count > *pi_xing )
+        i_count = *pi_xing;
+
+    (*pp_xing) += i_count;
+    (*pi_xing) -= i_count;
+}
+
+static uint32_t MpgaXingGetDWBE( const uint8_t **pp_xing, int *pi_xing, uint32_t i_default )
+{
+    if( *pi_xing < 4 )
+        return i_default;
+
+    uint32_t v = GetDWBE( *pp_xing );
+
+    MpgaXingSkip( pp_xing, pi_xing, 4 );
+
+    return v;
+}
+
+static int MpgaInit( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    const uint8_t *p_peek;
+    int i_peek;
+
+    /* */
+    p_sys->i_packet_size = 1024;
+
+    /* Load a potential xing header */
+    i_peek = stream_Peek( p_demux->s, &p_peek, 4 + 1024 );
+    if( i_peek < 4 + 21 )
+        return VLC_SUCCESS;
+
+    const uint32_t header = GetDWBE( p_peek );
+    if( !CheckSyncMpga( p_peek ) )
+        return VLC_SUCCESS;
+
+    /* Xing header */
+    const uint8_t *p_xing = p_peek;
+    int i_xing = i_peek;
+    int i_skip;
+
+    if( MPGA_VERSION( header ) == 0 )
+        i_skip = MPGA_MODE( header ) != 3 ? 36 : 21;
+    else
+        i_skip = MPGA_MODE( header ) != 3 ? 21 : 13;
+
+    if( i_skip + 8 >= i_xing || memcmp( &p_xing[i_skip], "Xing", 4 ) )
+        return VLC_SUCCESS;
+
+    const uint32_t i_flags = GetDWBE( &p_xing[i_skip+4] );
+
+    MpgaXingSkip( &p_xing, &i_xing, i_skip + 8 );
+
+    if( i_flags&0x01 )
+        p_sys->xing.i_frames = MpgaXingGetDWBE( &p_xing, &i_xing, 0 );
+    if( i_flags&0x02 )
+        p_sys->xing.i_bytes = MpgaXingGetDWBE( &p_xing, &i_xing, 0 );
+    if( i_flags&0x04 ) /* TODO Support XING TOC to improve seeking accuracy */
+        MpgaXingSkip( &p_xing, &i_xing, 100 );
+    if( i_flags&0x08 )
+    {
+        /* FIXME: doesn't return the right bitrage average, at least
+           with some MP3's */
+        p_sys->xing.i_bitrate_avg = MpgaXingGetDWBE( &p_xing, &i_xing, 0 );
+        msg_Dbg( p_demux, "xing vbr value present (%d)",
+                 p_sys->xing.i_bitrate_avg );
+    }
+
+    if( p_sys->xing.i_frames > 0 && p_sys->xing.i_bytes > 0 )
+    {
+        p_sys->xing.i_frame_samples = MpgaGetFrameSamples( header );
+        msg_Dbg( p_demux, "xing frames&bytes value present "
+                 "(%d bytes, %d frames, %d samples/frame)",
+                 p_sys->xing.i_bytes, p_sys->xing.i_frames,
+                 p_sys->xing.i_frame_samples );
+    }
+    return VLC_SUCCESS;
+}
+
