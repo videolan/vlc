@@ -466,7 +466,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
  * vout_Close: Close a vout created by vout_Create.
  *****************************************************************************
  * You HAVE to call it on vout created by vout_Create before vlc_object_release.
- * You should NEVER call it on vout not obtained though vout_Create
+ * You should NEVER call it on vout not obtained through vout_Create
  * (like with vout_Request or vlc_object_find.)
  * You can use vout_CloseAndRelease() as a convenient method.
  *****************************************************************************/
