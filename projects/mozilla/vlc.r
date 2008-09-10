@@ -65,6 +65,9 @@ resource 'STR#' (127)
         /* FLV */
         "FLV video",
         "FLV video",
+        /* MkV */
+        "MKV video",
+        "MKV audio",
     };
 };
 
@@ -117,6 +120,8 @@ resource 'STR#' (128,"MIME Type")
         /* MKV */
         "video/x-matroska", "mkv",
         "audio/x-matroska", "mka",
+        /* XSPF */
+        "application/xspf+xml", "xspf",
 
     };
 };

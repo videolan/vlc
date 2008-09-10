@@ -226,7 +226,9 @@ private:
     "video/x-flv:flv:FLV video;" \
     /* Matroska */ \
     "video/x-matroska:mkv:Matroska video;" \
-    "audio/x-matroska:mka:Matroska audio;"
+    "audio/x-matroska:mka:Matroska audio;" \
+    /* XSPF */ \
+    "application/xspf+xml:xspf:Playlist xspf;"
 
 
 
