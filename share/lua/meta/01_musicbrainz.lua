@@ -31,7 +31,7 @@ function fetch_art()
     local l = vlc.object.libvlc()
     local t = vlc.var.get( l, "musicbrainz-previousdate" )
     if t ~= nil then
-        if t + 10000000. > vlc.misc.mdate() then
+        if t + 1000000. > vlc.misc.mdate() then
             vlc.msg.warn( "We must wait 1 second between requests unless we want to be blacklisted from the musicbrainz server." )
             vlc.misc.mwait( t + 1000000. )
         end
