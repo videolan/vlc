@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_vout.h>
 #include <vlc_codec.h>
+#include <vlc_input.h>
 
 #include "spudec.h"
 
@@ -172,9 +173,8 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
 
             /* Get the control sequence date */
             date = (mtime_t)GetWBE( &p_sys->buffer[i_index] ) * 11000;
-            /* FIXME How to access i_rate
-                    * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;
-            */
+            if( p_sys->i_rate )
+                date = date * p_sys->i_rate / INPUT_RATE_DEFAULT;
 
             /* Next offset */
             i_cur_seq = i_index;
