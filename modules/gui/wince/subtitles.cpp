@@ -139,7 +139,7 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                 hwnd, NULL, hInst, NULL );
 
             encoding_combo = CreateWindow( _T("COMBOBOX"),
-                _FROMMB(p_item->psz_value),
+                _FROMMB(p_item->value.psz),
                 WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST |
                 LBS_SORT  | WS_VSCROLL,
                 rcClient.right - 150 - 10, 10 + 5*(15 + 10) - 3, 150, 5*15 + 6,
@@ -152,15 +152,15 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                 ComboBox_AddString( encoding_combo,
                                     _FROMMB(p_item->ppsz_list[i_index]) );
 
-                if( p_item->psz_value &&
-                    !strcmp( p_item->psz_value, p_item->ppsz_list[i_index] ) )
+                if( p_item->value.psz &&
+                    !strcmp( p_item->value.psz, p_item->ppsz_list[i_index] ) )
                     ComboBox_SetCurSel( encoding_combo, i_index );
             }
 
-            if( p_item->psz_value )
+            if( p_item->value.psz )
             {
                 ComboBox_SelectString( encoding_combo, 0,
-                                       _FROMMB(p_item->psz_value) );
+                                       _FROMMB(p_item->value.psz) );
 
             }
         }

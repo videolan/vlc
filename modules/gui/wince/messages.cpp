@@ -206,17 +206,20 @@ void Messages::UpdateLog()
         for( i_start = p_sub->i_start; i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
+            vlc_value_t val;
+            var_Get( p_intf->p_libvlc, "verbose", &val );
+
             switch( p_sub->p_msg[i_start].i_type )
             {
             case VLC_MSG_ERR:
             case VLC_MSG_INFO:
-                if( p_intf->p_libvlc_global->i_verbose < 0 ) continue;
+                if( val.i_int < 0 )  continue;
                 break;
             case VLC_MSG_WARN:
-                if( p_intf->p_libvlc_global->i_verbose < 1 ) continue;
+                if( val.i_int < 1 ) continue;
                 break;
             case VLC_MSG_DBG:
-                if( p_intf->p_libvlc_global->i_verbose < 2 ) continue;
+                if( val.i_int < 2 ) continue;
                 break;
             }
 

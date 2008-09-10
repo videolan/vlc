@@ -100,9 +100,10 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, HWND _p_parent )
 
     p_vout = NULL;
 
-    p_intf->pf_request_window = ::GetWindow;
-    p_intf->pf_release_window = ::ReleaseWindow;
-    p_intf->pf_control_window = ::ControlWindow;
+    // Changeset 138da19...
+    //p_intf->pf_request_window = ::GetWindow;
+    //p_intf->pf_release_window = ::ReleaseWindow;
+    //p_intf->pf_control_window = ::ControlWindow;
 
     p_intf->p_sys->p_video_window = this;
 

@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 #include "wince.h"
 
@@ -222,7 +223,7 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
     else
     {
         playlist_t * p_playlist = pl_Yield( p_intf );
-        if( p_playlist && p_playlist->i_size )
+        if( p_playlist && !playlist_IsEmpty( p_playlist ) )
         {
             AppendMenu( hmenu, MF_SEPARATOR, 0, _T("") );
             AppendMenu( hmenu, MF_STRING, PlayStream_Event, _T("Play") );

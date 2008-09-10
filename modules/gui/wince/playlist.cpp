@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 #include "wince.h"
 
@@ -80,21 +81,21 @@ enum
 // The TBBUTTON structure contains information the toolbar buttons.
 static TBBUTTON tbButton2[] =
 {
-  {0, ID_MANAGE_OPENPL,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
-  {1, ID_MANAGE_SAVEPL,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
-  {2, ID_MANAGE_ADDFILE,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
-  {3, ID_MANAGE_ADDMRL,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
-  {4, ID_SEL_DELETE,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
-  {5, Infos_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
-  {6, Up_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
-  {7, Down_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
-  {8, Random_Event,      TBSTATE_ENABLED, TBSTYLE_CHECK},
-  {9, Loop_Event,       TBSTATE_ENABLED, TBSTYLE_CHECK},
-  {10, Repeat_Event,       TBSTATE_ENABLED, TBSTYLE_CHECK}
+  {0,  ID_MANAGE_OPENPL,        TBSTATE_ENABLED, TBSTYLE_BUTTON },
+  {1,  ID_MANAGE_SAVEPL,        TBSTATE_ENABLED, TBSTYLE_BUTTON },
+  {0,  0,                       TBSTATE_ENABLED, TBSTYLE_SEP    },
+  {2,  ID_MANAGE_ADDFILE,       TBSTATE_ENABLED, TBSTYLE_BUTTON },
+  {3,  ID_MANAGE_ADDMRL,        TBSTATE_ENABLED, TBSTYLE_BUTTON },
+  {4,  ID_SEL_DELETE,           TBSTATE_ENABLED, TBSTYLE_BUTTON },
+  {0,  0,                       TBSTATE_ENABLED, TBSTYLE_SEP    },
+  {5,  Infos_Event,             TBSTATE_ENABLED, TBSTYLE_BUTTON },
+  {0,  0,                       TBSTATE_ENABLED, TBSTYLE_SEP    },
+  {6,  Up_Event,                TBSTATE_ENABLED, TBSTYLE_BUTTON },
+  {7,  Down_Event,              TBSTATE_ENABLED, TBSTYLE_BUTTON },
+  {0,  0,                       TBSTATE_ENABLED, TBSTYLE_SEP    },
+  {8,  Random_Event,            TBSTATE_ENABLED, TBSTYLE_CHECK  },
+  {9,  Loop_Event,              TBSTATE_ENABLED, TBSTYLE_CHECK  },
+  {10, Repeat_Event,            TBSTATE_ENABLED, TBSTYLE_CHECK  }
 };
 
 // Toolbar ToolTips
@@ -518,21 +519,21 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
     case CDDS_ITEMPREPAINT: //Before an item is drawn
         playlist_t *p_playlist = pl_Yield( p_intf );
         if( p_playlist == NULL ) return CDRF_DODEFAULT;
-        if( (int)lplvcd->nmcd.dwItemSpec == p_playlist->i_index )
+        if( (int)lplvcd->nmcd.dwItemSpec == p_playlist->i_current_index )
         {
             lplvcd->clrText = RGB(255,0,0);
             pl_Release( p_intf );
             return CDRF_NEWFONT;
         }
  
-        playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist,
-                                        (int)lplvcd->nmcd.dwItemSpec );
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
+                                        (int)lplvcd->nmcd.dwItemSpec, FALSE );
         if( !p_item )
         {
             pl_Release( p_intf );
             return CDRF_DODEFAULT;
         }
-        if( p_item->b_enabled == false )
+        if( p_item->i_flags & PLAYLIST_DBL_FLAG )
         {
             lplvcd->clrText = RGB(192,192,192);
             pl_Release( p_intf );
@@ -594,13 +595,13 @@ void Playlist::UpdatePlaylist()
     /* Update the colour of items */
 
     vlc_object_lock( p_playlist );
-    if( p_intf->p_sys->i_playing != p_playlist->i_index )
+    if( p_intf->p_sys->i_playing != playlist_CurrentSize( p_playlist ) )
     {
         // p_playlist->i_index in RED
         Rebuild();
 
         // if exists, p_intf->p_sys->i_playing in BLACK
-        p_intf->p_sys->i_playing = p_playlist->i_index;
+        p_intf->p_sys->i_playing = p_playlist->i_current_index;
     }
     vlc_object_unlock( p_playlist );
 
@@ -623,8 +624,12 @@ void Playlist::Rebuild()
 
     /* ...and rebuild it */
     vlc_object_lock( p_playlist );
-    for( int i = 0; i < p_playlist->i_size; i++ )
+    playlist_item_t * p_root = p_playlist->p_local_onelevel;
+    playlist_item_t * p_child = NULL;
+
+    for( int i = 0; i < playlist_NodeChildrenCount( p_playlist, p_root ); i++ )
     {
+        p_child = playlist_GetNextLeaf( p_playlist, p_root, p_child, FALSE, FALSE);
         LVITEM lv;
         lv.mask = LVIF_TEXT;
         lv.pszText = _T("");
@@ -633,8 +638,9 @@ void Playlist::Rebuild()
         lv.iItem = i;
         ListView_InsertItem( hListView, &lv );
         ListView_SetItemText( hListView, lv.iItem, 0,
-            _FROMMB(p_playlist->pp_items[i]->input.psz_name) );
-        UpdateItem( i );
+            _FROMMB(p_child->p_input->psz_name) );
+
+        UpdateItem( p_child->i_id );
     }
     vlc_object_unlock( p_playlist );
 
@@ -657,7 +663,7 @@ void Playlist::UpdateItem( int i )
 
     if( p_playlist == NULL ) return;
 
-    playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, i );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i, FALSE );
 
     if( !p_item )
     {
@@ -665,17 +671,19 @@ void Playlist::UpdateItem( int i )
         return;
     }
 
-    ListView_SetItemText( hListView, i, 0, _FROMMB(p_item->input.psz_name) );
+    ListView_SetItemText( hListView, i, 0, _FROMMB(p_item->p_input->psz_name) );
+
     ListView_SetItemText( hListView, i, 1,
-                          _FROMMB( input_item_GetInfo( &p_item->input,
+                          _FROMMB( input_item_GetInfo( p_item->p_input,
                                    _("General") , _("Author") ) ) );
 
     char psz_duration[MSTRTIME_MAX_SIZE];
-    mtime_t dur = input_item_GetDuration( p_item );
+    mtime_t dur = input_item_GetDuration( p_item->p_input );
+
     if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
     else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
 
-    ListView_SetItemText( hListView, i, 3, _FROMMB(psz_duration) );
+    ListView_SetItemText( hListView, i, 2, _FROMMB(psz_duration) );
 
     pl_Release( p_intf );
 }
@@ -688,7 +696,7 @@ void Playlist::DeleteItem( int item )
     playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
-    playlist_Delete( p_playlist, item );
+    playlist_DeleteFromInput( p_playlist, item, FALSE );
     ListView_DeleteItem( hListView, item );
 
     pl_Release( p_intf );
@@ -746,7 +754,7 @@ static void OnSaveCB( intf_dialog_args_t *p_arg )
                 psz_export = "export-pls";
             else psz_export = "export-m3u";
 
-            playlist_Export( p_playlist, p_arg->psz_results[0], psz_export );
+            playlist_Export( p_playlist, p_arg->psz_results[0], p_playlist->p_local_onelevel, psz_export );
             pl_Release( p_intf );
         }
     }
@@ -809,8 +817,8 @@ void Playlist::OnEnableSelection()
         if( ListView_GetItemState( hListView, item, LVIS_SELECTED ) )
         {
             playlist_item_t *p_item =
-                playlist_ItemGetByPos( p_playlist, item );
-            playlist_Enable( p_playlist, p_item );
+                playlist_ItemGetById( p_playlist, item, FALSE );
+            p_item->i_flags ^= PLAYLIST_DBL_FLAG;
             UpdateItem( item );
         }
     }
@@ -829,8 +837,8 @@ void Playlist::OnDisableSelection()
         {
             /*XXX*/
             playlist_item_t *p_item =
-                playlist_ItemGetByPos( p_playlist, item );
-            playlist_Disable( p_playlist, p_item );
+                playlist_ItemGetById( p_playlist, item, FALSE );
+            p_item->i_flags |= PLAYLIST_DBL_FLAG;
             UpdateItem( item );
         }
     }
@@ -851,7 +859,7 @@ void Playlist::OnActivateItem( int i_item )
     playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
-    playlist_Goto( p_playlist, i_item );
+    playlist_Skip( p_playlist, i_item - p_playlist->i_current_index );
 
     pl_Release( p_intf );
 }
@@ -862,7 +870,7 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
     if( p_playlist == NULL ) return;
 
     vlc_object_lock( p_playlist);
-    playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, i_item );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_item, true );
     vlc_object_unlock( p_playlist );
 
     if( p_item )
@@ -889,9 +897,9 @@ void Playlist::OnUp()
     long i_item =
         ListView_GetNextItem( hListView, -1, LVIS_SELECTED | LVNI_ALL );
 
-    if( i_item > 0 && i_item < p_playlist->i_size )
+    if( i_item > 0 && i_item < playlist_CurrentSize( p_playlist ) )
     {
-        playlist_Move( p_playlist , i_item, i_item - 1);
+        playlist_Prev( p_playlist );
         if( i_item > 1 )
         {
             ListView_SetItemState( hListView, i_item - 1, LVIS_FOCUSED,
@@ -917,9 +925,9 @@ void Playlist::OnDown()
     long i_item =
         ListView_GetNextItem( hListView, -1, LVIS_SELECTED | LVNI_ALL );
 
-    if( i_item >= 0 && i_item < p_playlist->i_size - 1 )
+    if( i_item >= 0 && i_item < playlist_CurrentSize( p_playlist ) - 1 )
     {
-        playlist_Move( p_playlist , i_item, i_item + 2 );
+        playlist_Next( p_playlist );
         ListView_SetItemState( hListView, i_item + 1, LVIS_FOCUSED,
                                LVIS_STATEIMAGEMASK );
     }
@@ -981,19 +989,24 @@ void Playlist::OnSort( UINT event )
     switch( event )
     {
     case ID_SORT_TITLE:
-        playlist_SortTitle( p_playlist , ORDER_NORMAL );
+        playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_TITLE, ORDER_NORMAL);
         break;
     case ID_SORT_RTITLE:
-        playlist_SortTitle( p_playlist , ORDER_REVERSE );
+        playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_TITLE, ORDER_REVERSE );
         break;
     case ID_SORT_AUTHOR:
-        playlist_SortAuthor(p_playlist , ORDER_NORMAL );
+        playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_ARTIST, ORDER_NORMAL);
         break;
     case ID_SORT_RAUTHOR:
-        playlist_SortAuthor( p_playlist , ORDER_REVERSE );
+        playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_ARTIST, ORDER_REVERSE);
         break;
     case ID_SORT_SHUFFLE:
-        playlist_Sort( p_playlist , SORT_RANDOM, ORDER_NORMAL );
+        playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_RANDOM, ORDER_NORMAL);
         break;
     }
 
@@ -1014,24 +1027,28 @@ void Playlist::OnColSelect( int iSubItem )
     case 0:
         if( i_title_sorted != 1 )
         {
-            playlist_SortTitle( p_playlist, ORDER_NORMAL );
+            playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_TITLE, ORDER_NORMAL);
             i_title_sorted = 1;
         }
         else
         {
-            playlist_SortTitle( p_playlist, ORDER_REVERSE );
+            playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_TITLE, ORDER_REVERSE );
             i_title_sorted = -1;
         }
         break;
     case 1:
         if( i_author_sorted != 1 )
         {
-            playlist_SortAuthor( p_playlist, ORDER_NORMAL );
+            playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_ARTIST, ORDER_NORMAL);
             i_author_sorted = 1;
         }
         else
         {
-            playlist_SortAuthor( p_playlist, ORDER_REVERSE );
+            playlist_RecursiveNodeSort(p_playlist , p_playlist->p_root_onelevel,
+                                    SORT_ARTIST, ORDER_REVERSE);
             i_author_sorted = -1;
         }
         break;
@@ -1059,7 +1076,7 @@ void Playlist::OnPopupPlay()
 
     if( i_popup_item != -1 )
     {
-        playlist_Goto( p_playlist, i_popup_item );
+        playlist_Skip( p_playlist, i_popup_item - p_playlist->i_current_index );
     }
 
     pl_Release( p_intf );
@@ -1082,16 +1099,16 @@ void Playlist::OnPopupEna()
     if( p_playlist == NULL ) return;
 
     playlist_item_t *p_item =
-        playlist_ItemGetByPos( p_playlist, i_popup_item );
+        playlist_ItemGetById( p_playlist, i_popup_item, FALSE );
 
-    if( p_playlist->pp_items[i_popup_item]->b_enabled )
+    if( !(p_playlist->items.p_elems[i_popup_item]->i_flags & PLAYLIST_DBL_FLAG) )
         //playlist_IsEnabled( p_playlist, i_popup_item ) )
     {
-        playlist_Disable( p_playlist, p_item );
+        p_item->i_flags |= PLAYLIST_DBL_FLAG;
     }
     else
     {
-        playlist_Enable( p_playlist, p_item );
+        p_item->i_flags ^= PLAYLIST_DBL_FLAG;
     }
 
     pl_Release( p_intf );

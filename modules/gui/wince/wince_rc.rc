@@ -134,7 +134,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-#ifdef __MINGW32__
+#ifdef UNDER_CE
 IDI_ICON1               ICON    DISCARDABLE     "bitmaps/vlc16x16.ico"
 #else
 IDI_ICON1               ICON    DISCARDABLE     "bitmaps\\vlc16x16.ico"
@@ -145,7 +145,7 @@ IDI_ICON1               ICON    DISCARDABLE     "bitmaps\\vlc16x16.ico"
 // Bitmap
 //
 
-#ifdef __MINGW32__
+#ifdef UNDER_CE
 IDB_BITMAP1             BITMAP  DISCARDABLE     "bitmaps/toolbar1.bmp"
 IDB_BITMAP2             BITMAP  DISCARDABLE     "bitmaps/toolbar2.bmp"
 IDB_BITMAP3             BITMAP  DISCARDABLE     "bitmaps/toolbar3.bmp"

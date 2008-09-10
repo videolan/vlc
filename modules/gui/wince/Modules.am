@@ -23,6 +23,7 @@ SOURCES_wince = \
 	$(NULL)
 
 EXTRA_DIST += \
+    wince_rc.rc \
 	bitmaps/vlc16x16.ico \
 	bitmaps/toolbar1.bmp \
 	bitmaps/toolbar2.bmp \

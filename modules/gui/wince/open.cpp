@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 #include "wince.h"
 
@@ -601,32 +602,32 @@ void OpenDialog::OnOk()
     GetWindowText( mrl_combo, psz_text, 2048 );
 
     int i_args;
-    char **pp_args = vlc_parse_cmdline( _TOMB(psz_text), &i_args );
+    /*char **pp_args = vlc_parse_cmdline( _TOMB(psz_text), &i_args );
 
     ComboBox_AddString( mrl_combo, psz_text );
     if( ComboBox_GetCount( mrl_combo ) > 10 )
         ComboBox_DeleteString( mrl_combo, 0 );
-    ComboBox_SetCurSel( mrl_combo, ComboBox_GetCount( mrl_combo ) - 1 );
+    ComboBox_SetCurSel( mrl_combo, ComboBox_GetCount( mrl_combo ) - 1 );*/
 
     /* Update the playlist */
     playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
-    for( int i = 0; i < i_args; i++ )
+ /*   for( int i = 0; i < i_args; i++ )
     {
         bool b_start = !i && i_open_arg;
         playlist_item_t *p_item =
             playlist_ItemNew( p_playlist, pp_args[i], pp_args[i] );
 
         /* Insert options */
-        while( i + 1 < i_args && pp_args[i + 1][0] == ':' )
+/*        while( i + 1 < i_args && pp_args[i + 1][0] == ':' )
         {
             playlist_ItemAddOption( p_item, pp_args[i + 1] );
             i++;
-        }
+        }*/
 
         /* Get the options from the subtitles dialog */
-        if( (SendMessage( subsfile_checkbox, BM_GETCHECK, 0, 0 ) & BST_CHECKED)
+/*        if( (SendMessage( subsfile_checkbox, BM_GETCHECK, 0, 0 ) & BST_CHECKED)
             && subsfile_mrl.size() )
         {
             for( int j = 0; j < (int)subsfile_mrl.size(); j++ )
@@ -654,7 +655,7 @@ void OpenDialog::OnOk()
     {
         free( pp_args[i_args] );
         if( !i_args ) free( pp_args );
-    }
+    }*/
     pl_Release( p_intf );
 }
 

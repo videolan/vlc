@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 #include "wince.h"
 
@@ -330,7 +331,7 @@ void DialogsProvider::OnOpenFileSimple( int i_arg )
 {
     OPENFILENAME ofn;
     TCHAR szFile[MAX_PATH] = _T("\0");
-    static TCHAR szFilter[] = _T("All (*.*)\0*.*\0");
+    static TCHAR szFilter[] = _T("wav (*.wav)\0*.wav\0mp3 (*.mp3 *.mpga)\0*.mp3;*.mpga\0All (*.*)\0*.*\0");
 
     playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
@@ -363,7 +364,8 @@ void DialogsProvider::OnOpenFileSimple( int i_arg )
     {
         char *psz_filename = _TOMB(ofn.lpstrFile);
         playlist_Add( p_playlist, psz_filename, psz_filename,
-                      PLAYLIST_APPEND | (i_arg?PLAYLIST_GO:0), PLAYLIST_END );
+                      PLAYLIST_APPEND | (i_arg?PLAYLIST_GO:0), PLAYLIST_END,
+                      TRUE, FALSE );
     }
 
     pl_Release( p_intf );
@@ -423,7 +425,7 @@ void DialogsProvider::OnOpenDirectory( int i_arg )
             char *psz_filename = _TOMB(psz_result);
             playlist_Add( p_playlist, psz_filename, psz_filename,
                           PLAYLIST_APPEND | (i_arg ? PLAYLIST_GO : 0),
-                          PLAYLIST_END );
+                          PLAYLIST_END, TRUE, FALSE );
         }
         p_malloc->Free( pidl );
     }

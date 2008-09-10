@@ -32,6 +32,8 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
+#include <vlc_playlist.h>
 
 #include "wince.h"
 
@@ -105,9 +107,10 @@ void Timer::Notify( void )
             ShowWindow( p_main_interface->hwndVol, SW_SHOW );
 
             // only for local file, check if works well with net url
-            shortname = strrchr( p_intf->p_sys->p_input->input.p_item->psz_name, '\\' );
+            input_item_t *p_item =input_GetItem(p_intf->p_sys->p_input);
+            shortname = strrchr( input_item_GetURL(p_item), '\\' );
             if (! shortname)
-                shortname = p_intf->p_sys->p_input->input.p_item->psz_name;
+                shortname = input_item_GetURL(p_item);
             else shortname++;
  
             SendMessage( p_main_interface->hwndSB, SB_SETTEXT,

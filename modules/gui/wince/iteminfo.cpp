@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 #include "wince.h"
 
@@ -71,6 +72,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     SHMENUBARINFO mbi;
     INITCOMMONCONTROLSEX iccex;
     RECT rcClient;
+    char *psz_uri;
 
     switch( msg )
     {
@@ -104,7 +106,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                         WS_CHILD | WS_VISIBLE | SS_RIGHT,
                         0, 10, 60, 15, hwnd, NULL, hInst, NULL);
 
-        char *psz_uri = input_item_GetURI( &p_item->input );
+        psz_uri = input_item_GetURI( p_item->p_input );
         uri_text = CreateWindow( _T("EDIT"), _FROMMB(psz_uri),
             WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT | ES_AUTOHSCROLL,
             70, 10 - 3, rcClient.right - 70 - 10, 15 + 6, hwnd, 0, hInst, 0 );
@@ -117,7 +119,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                                    hwnd, NULL, hInst, NULL);
 
         name_text = CreateWindow( _T("EDIT"),
-            _FROMMB(p_item->input.psz_name),
+            _FROMMB(p_item->p_input->psz_name),
             WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT | ES_AUTOHSCROLL,
             70, 10 + 15 + 10 - 3, rcClient.right - 70 - 10, 15 + 6,
             hwnd, NULL, hInst, NULL);
@@ -134,7 +136,8 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             hwnd, NULL, hInst, NULL );
 
         SendMessage( enabled_checkbox, BM_SETCHECK,
-                     p_item->b_enabled ? BST_CHECKED : BST_UNCHECKED, 0 );
+                     (p_item->i_flags & PLAYLIST_DBL_FLAG) ?
+                     BST_UNCHECKED : BST_CHECKED, 0 );
 
         /* Treeview */
         iccex.dwSize = sizeof( INITCOMMONCONTROLSEX );
@@ -190,7 +193,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
     // Set the text of the item.
-    tvi.pszText = _FROMMB(p_item->input.psz_name);
+    tvi.pszText = _FROMMB(p_item->p_input->psz_name);
     tvi.cchTextMax = _tcslen(tvi.pszText);
 
     // Save the heading level in the item's application-defined data area
@@ -204,13 +207,13 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     hPrevRootItem = hPrev;
 
     /* Rebuild the tree */
-    vlc_mutex_lock( &p_item->input.lock );
-    for( int i = 0; i < p_item->input.i_categories; i++ )
+    vlc_mutex_lock( &p_item->p_input->lock );
+    for( int i = 0; i < p_item->p_input->i_categories; i++ )
     {
-        info_category_t *p_cat = p_item->input.pp_categories[i];
+        info_category_t *p_cat = p_item->p_input->pp_categories[i];
 
         // Set the text of the item.
-        tvi.pszText = _FROMMB( p_item->input.psz_name );
+        tvi.pszText = _FROMMB( p_item->p_input->psz_name );
         tvi.cchTextMax = _tcslen( tvi.pszText );
  
         // Save the heading level in the item's application-defined data area
@@ -246,7 +249,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         TreeView_Expand( info_tree, hPrevLev2Item,
                          TVE_EXPANDPARTIAL |TVE_EXPAND );
     }
-    vlc_mutex_unlock( &p_item->input.lock );
+    vlc_mutex_unlock( &p_item->p_input->lock );
 
     TreeView_Expand( info_tree, hPrevRootItem, TVE_EXPANDPARTIAL |TVE_EXPAND );
 }
@@ -260,14 +263,14 @@ void ItemInfoDialog::OnOk()
 
     TCHAR psz_name[MAX_PATH];
     Edit_GetText( name_text, psz_name, MAX_PATH );
-    input_item_SetName( &p_item->input, _TOMB( psz_name ) );
+    input_item_SetName( p_item->p_input, _TOMB( psz_name ) );
 
     TCHAR psz_uri[MAX_PATH];
     Edit_GetText( uri_text, psz_uri, MAX_PATH );
-    input_item_SetURI( &p_item->input, _TOMB(psz_uri) );
+    input_item_SetURI( p_item->p_input, _TOMB(psz_uri) );
 
-    vlc_mutex_lock( &p_item->input.lock );
-    bool b_old_enabled = p_item->b_enabled;
+    vlc_mutex_lock( &p_item->p_input->lock );
+    bool b_old_enabled = !(p_item->i_flags & PLAYLIST_DBL_FLAG);
 
     playlist_t * p_playlist = pl_Yield( p_intf );
     if( p_playlist != NULL )
@@ -276,7 +279,7 @@ void ItemInfoDialog::OnOk()
         pl_Release( p_intf );
     }
 
-    p_item->b_enabled = (b_state & BST_CHECKED) ? true : false ;
+    p_item->i_flags |= (b_state & BST_CHECKED) ? false : PLAYLIST_DBL_FLAG ;
 
-    vlc_mutex_unlock( &p_item->input.lock );
+    vlc_mutex_unlock( &p_item->p_input->lock );
 }

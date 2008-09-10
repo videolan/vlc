@@ -37,8 +37,11 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
+#include <vlc_playlist.h>
 
 #include "wince.h"
+#define INT64_C(val) val##LL
 
 #include <windowsx.h>
 #include <commctrl.h>
@@ -501,7 +504,7 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         {
             string about = (string)"VLC media player " PACKAGE_VERSION +
                 _("\n(WinCE interface)\n\n") +
-                _("(c) 1996-2006 - the VideoLAN Team\n\n") +
+                _("(c) 1996-2008 - the VideoLAN Team\n\n") +
                 _("Compiled by ") + VLC_CompileBy() + "@" +
                 VLC_CompileHost() + "." + VLC_CompileDomain() + ".\n" +
                 _("Compiler: ") + VLC_Compiler() + ".\n" +
@@ -640,7 +643,7 @@ void Interface::OnPlayStream( void )
     playlist_t *p_playlist = pl_Yield( p_intf );
     if( p_playlist == NULL ) return;
 
-    if( p_playlist->i_size )
+    if( !playlist_IsEmpty(p_playlist) )
     {
         vlc_value_t state;
 

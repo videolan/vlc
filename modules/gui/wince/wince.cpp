@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
 
 #if defined( UNDER_CE ) && defined(__MINGW32__)
 /* This is a gross hack for the wince gcc cross-compiler */
@@ -51,7 +52,7 @@ static void Run    ( intf_thread_t * );
 
 static int  OpenDialogs( vlc_object_t * );
 
-static void* MainLoop  ( intf_thread_t * );
+static void* MainLoop  ( vlc_object_t * );
 static void ShowDialog( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 /*****************************************************************************
@@ -62,11 +63,14 @@ static void ShowDialog( intf_thread_t *, int, int, intf_dialog_args_t * );
     "of having it in a separate window.")
 
 vlc_module_begin();
+    set_shortname( "WinCE" );
     set_description( (char *) _("WinCE interface module") );
     set_capability( "interface", 100 );
     set_callbacks( Open, Close );
     add_shortcut( "wince" );
 
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_bool( "wince-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, false );
 
@@ -152,10 +156,11 @@ static int OpenDialogs( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t    *p_sys = p_intf->p_sys;
 
-    if( p_intf->p_sys->p_input )
+    if( p_sys->p_input )
     {
-        vlc_object_release( p_intf->p_sys->p_input );
+        vlc_object_release( p_sys->p_input );
     }
 
     MenuItemExt::ClearList( p_intf->p_sys->p_video_menu );
@@ -194,10 +199,10 @@ static void Run( intf_thread_t *p_intf )
         /* The module is used in dialog provider mode */
 
         /* Create a new thread for the dialogs provider */
-        if( vlc_thread_create( p_intf, "Skins Dialogs Thread",
+        if( vlc_thread_create( p_intf, "WinCE Dialogs Thread",
                                MainLoop, 0, true ) )
         {
-            msg_Err( p_intf, "cannot create Skins Dialogs Thread" );
+            msg_Err( p_intf, "cannot create WinCE Dialogs Thread" );
             p_intf->pf_show_dialog = NULL;
         }
     }
@@ -205,7 +210,7 @@ static void Run( intf_thread_t *p_intf )
     {
         int canc = vlc_savecancel();
         /* The module is used in interface mode */
-        MainLoop( p_intf );
+        MainLoop( VLC_OBJECT(p_intf) );
         vlc_restorecancel( canc );
     }
 }

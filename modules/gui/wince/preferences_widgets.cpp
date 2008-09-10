@@ -193,7 +193,7 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
     alt = CreateWindow( _T("BUTTON"), _T("Alt"),
                         WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
                         20, *py_pos, 15, 15, parent, NULL, hInst, NULL );
-    Button_SetCheck( alt, p_item->i_value & KEY_MODIFIER_ALT ? BST_CHECKED :
+    Button_SetCheck( alt, p_item->i_type & KEY_MODIFIER_ALT ? BST_CHECKED :
                      BST_UNCHECKED );
 
     alt_label = CreateWindow( _T("STATIC"), _T("Alt"),
@@ -204,7 +204,7 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
                 WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
                 20 + 15 + 5 + 30 + 5, *py_pos, 15, 15,
                 parent, NULL, hInst, NULL );
-    Button_SetCheck( ctrl, p_item->i_value & KEY_MODIFIER_CTRL ? BST_CHECKED :
+    Button_SetCheck( ctrl, p_item->i_type & KEY_MODIFIER_CTRL ? BST_CHECKED :
                      BST_UNCHECKED );
 
     ctrl_label = CreateWindow( _T("STATIC"), _T("Ctrl"),
@@ -216,7 +216,7 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
                 WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
                 20 + 15 + 5 + 2*(30 + 5) + 15 + 5, *py_pos, 15, 15,
                 parent, NULL, hInst, NULL );
-    Button_SetCheck( shift, p_item->i_value & KEY_MODIFIER_SHIFT ?
+    Button_SetCheck( shift, p_item->i_type & KEY_MODIFIER_SHIFT ?
                      BST_CHECKED : BST_UNCHECKED );
 
     shift_label = CreateWindow( _T("STATIC"), _T("Shift"),
@@ -238,7 +238,7 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
         ComboBox_AddString( combo, _FROMMB(m_keysList[i].c_str()) );
         ComboBox_SetItemData( combo, i, (void*)vlc_keys[i].i_key_code );
         if( (unsigned int)vlc_keys[i].i_key_code ==
-            ( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ) )
+            ( ((unsigned int)p_item->i_type) & ~KEY_MODIFIER ) )
         {
             ComboBox_SetCurSel( combo, i );
             ComboBox_SetText( combo, _FROMMB(m_keysList[i].c_str()) );
@@ -315,13 +315,13 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
+        if( module_IsCapable( p_parser, p_item->psz_type ) )
         {
-            ComboBox_AddString( combo, _FROMMB(p_parser->psz_longname) );
+            ComboBox_AddString( combo, _FROMMB(module_GetLongName( p_parser ) ));
             ComboBox_SetItemData( combo, i_index,
-                                  (void*)p_parser->psz_object_name );
-            if( p_item->psz_value && !strcmp(p_item->psz_value,
-                                             p_parser->psz_object_name) )
+                                  (void *) module_GetObjName( p_parser ) );
+            if( p_item->value.psz && !strcmp( p_item->value.psz,
+                                             module_GetObjName( p_parser )) )
             {
                 ComboBox_SetCurSel( combo, i_index );
                 //ComboBox_SetText( combo, _FROMMB(p_parser->psz_longname) );
@@ -360,8 +360,8 @@ StringConfigControl::StringConfigControl( vlc_object_t *p_this,
 
     *py_pos += 15 + 10;
 
-    textctrl = CreateWindow( _T("EDIT"), p_item->psz_value ?
-                             _FROMMB(p_item->psz_value) : _T(""),
+    textctrl = CreateWindow( _T("EDIT"), p_item->psz_type ?
+                             _FROMMB(p_item->psz_type) : _T(""),
                              WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT |
                              ES_AUTOHSCROLL, 20, *py_pos - 3, 180, 15 + 3,
                              parent, NULL, hInst, NULL );
@@ -733,7 +733,7 @@ FloatConfigControl::FloatConfigControl( vlc_object_t *p_this,
     *py_pos += 15 + 10;
 
     TCHAR psz_string[100];
-    _stprintf( psz_string, _T("%f"), p_item->f_value );
+    _stprintf( psz_string, _T("%d"), p_item->i_type );
     textctrl = CreateWindow( _T("EDIT"), psz_string,
         WS_CHILD | WS_VISIBLE | WS_BORDER | SS_RIGHT | ES_AUTOHSCROLL,
         20, *py_pos - 3, 70, 15 + 3, parent, NULL, hInst, NULL );
@@ -776,7 +776,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *p_this,
                              WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
                              5, *py_pos, 15, 15,
                              parent, NULL, hInst, NULL );
-    Button_SetCheck( checkbox, p_item->i_value ? BST_CHECKED : BST_UNCHECKED );
+    Button_SetCheck( checkbox, config_GetInt(p_this, p_item->psz_name) ? BST_CHECKED : BST_UNCHECKED );
 
     checkbox_label = CreateWindow( _T("STATIC"), _FROMMB(p_item->psz_text),
                                    WS_CHILD | WS_VISIBLE | SS_LEFT,

@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
 
 #include "wince.h"
 
@@ -119,8 +120,10 @@ void FileInfo::UpdateFileInfo()
 
     tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-    // Set the text of the item.
-    tvi.pszText = _FROMMB( p_input->input.p_item->psz_name );
+    // Set the text of the item. Not right, but I don't know yet how to handle this
+    //tvi.pszText = _FROMMB( p_input->input.p_item->psz_name ); <- old line
+    input_item_t * inp_item = input_item_GetById( p_input, 1 );
+    tvi.pszText = _FROMMB( input_item_GetName( inp_item ) );
     tvi.cchTextMax = _tcslen( tvi.pszText );
 
     // Save the heading level in the item's application-defined data area
@@ -135,13 +138,13 @@ void FileInfo::UpdateFileInfo()
 
     hPrevRootItem = hPrev;
 
-    vlc_mutex_lock( &p_input->input.p_item->lock );
-    for( int i = 0; i < p_input->input.p_item->i_categories; i++ )
+    vlc_mutex_lock( &inp_item->lock );
+    for( int i = 0; i < inp_item->i_categories; i++ )
     {
-        info_category_t *p_cat = p_input->input.p_item->pp_categories[i];
+        info_category_t *p_cat = inp_item->pp_categories[i];
 
         // Set the text of the item.
-        tvi.pszText = _FROMMB( p_input->input.p_item->psz_name );
+        tvi.pszText = _FROMMB( inp_item->psz_name );
         tvi.cchTextMax = _tcslen( tvi.pszText );
  
         // Save the heading level in the item's application-defined data area
@@ -176,7 +179,7 @@ void FileInfo::UpdateFileInfo()
 
         TreeView_Expand( hwndTV, hPrevLev2Item, TVE_EXPANDPARTIAL|TVE_EXPAND );
     }
-    vlc_mutex_unlock( &p_input->input.p_item->lock );
+    vlc_mutex_unlock( &inp_item->lock );
 
     TreeView_Expand( hwndTV, hPrevRootItem, TVE_EXPANDPARTIAL|TVE_EXPAND );
 
