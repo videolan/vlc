@@ -1,4 +1,3 @@
 SOURCES_folder = folder.c
 SOURCES_id3tag = id3tag.c id3genres.h $(NULL)
-SOURCES_musicbrainz = musicbrainz.c
 SOURCES_taglib = taglib.cpp

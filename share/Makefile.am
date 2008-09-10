@@ -281,7 +281,8 @@ DIST_osdmenu_minimal = \
 DIST_lua= \
 	lua/README.txt \
 	lua/meta/README.txt \
-	lua/meta/googleimage.lua \
+	lua/meta/01_musicbrainz.lua \
+	lua/meta/10_googleimage.lua \
 	lua/playlist/README.txt \
 	lua/playlist/appletrailers.lua \
 	lua/playlist/break.lua \
