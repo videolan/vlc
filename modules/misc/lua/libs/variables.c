@@ -142,7 +142,8 @@ static int vlclua_var_get( lua_State *L )
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
     i_type = var_Type( *pp_obj, psz_var );
-    var_Get( *pp_obj, psz_var, &val );
+    if( var_Get( *pp_obj, psz_var, &val ) != VLC_SUCCESS )
+        return 0;
     lua_pop( L, 2 );
     return vlclua_pushvalue( L, i_type, val );
 }
@@ -159,6 +160,34 @@ static int vlclua_var_set( lua_State *L )
     i_ret = var_Set( *pp_obj, psz_var, val );
     lua_pop( L, 3 );
     return vlclua_push_ret( L, i_ret );
+}
+
+static int vlclua_var_create( lua_State *L )
+{
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+    int i_type;
+    switch( lua_type( L, 3 ) )
+    {
+        case LUA_TNUMBER:
+            i_type = VLC_VAR_FLOAT;
+            break;
+        case LUA_TBOOLEAN:
+            i_type = VLC_VAR_BOOL;
+            break;
+        case LUA_TSTRING:
+            i_type = VLC_VAR_STRING;
+            break;
+        default:
+            return 0;
+    }
+
+    int i_ret = var_Create( *pp_obj, psz_var, i_type );
+    if( i_ret != VLC_SUCCESS )
+        return vlclua_push_ret( L, i_ret );
+    vlc_value_t val;
+    vlclua_tovalue( L, i_type, &val );
+    return vlclua_push_ret( L, var_Set( *pp_obj, psz_var, val ) );
 }
 
 static int vlclua_var_get_list( lua_State *L )
@@ -207,7 +236,8 @@ static int vlclua_libvlc_command( lua_State *L )
     psz_cmd = luaL_checkstring( L, 1 );
     val_arg.psz_string = strdup( luaL_optstring( L, 2, "" ) );
     lua_pop( L, 2 );
-    if( !var_Type( p_this->p_libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
+    int i_type = var_Type( p_this->p_libvlc, psz_cmd );
+    if( ! i_type & VLC_VAR_ISCOMMAND )
     {
         free( val_arg.psz_string );
         return luaL_error( L, "libvlc's \"%s\" is not a command",
@@ -492,6 +522,7 @@ static const luaL_Reg vlclua_var_reg[] = {
     { "get", vlclua_var_get },
     { "get_list", vlclua_var_get_list },
     { "set", vlclua_var_set },
+    { "create", vlclua_var_create },
     { "add_callback", vlclua_add_callback },
     { "del_callback", vlclua_del_callback },
     { "command", vlclua_command },

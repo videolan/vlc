@@ -198,6 +198,13 @@ static int vlclua_mdate( lua_State *L )
     return 1;
 }
 
+static int vlclua_mwait( lua_State *L )
+{
+    double f = luaL_checknumber( L, 1 );
+    mwait( (int64_t)f );
+    return 0;
+}
+
 static int vlclua_intf_should_die( lua_State *L )
 {
     intf_thread_t *p_intf = (intf_thread_t*)vlclua_get_this( L );
@@ -221,6 +228,7 @@ static const luaL_Reg vlclua_misc_reg[] = {
     { "datadir_list", vlclua_datadir_list },
 
     { "mdate", vlclua_mdate },
+    { "mwait", vlclua_mwait },
 
     { "lock_and_wait", vlclua_lock_and_wait },
     { "signal", vlclua_signal },

@@ -8,4 +8,5 @@ Examples: See googleimage.lua .
 VLC Lua meta modules should define one of the following functions:
  * fetch_art(): returns a path to an artwork for the given item
 
-Available VLC specific Lua modules: msg, stream and strings. See lua/README.txt
+Available VLC specific Lua modules: msg, stream, strings, variables,
+objects and misc. See lua/README.txt

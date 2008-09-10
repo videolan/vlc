@@ -98,6 +98,7 @@ misc.cachedir(): Get the user's VLC cache directory.
 misc.datadir_list( name ): FIXME: write description ... or ditch function if it isn't usefull anymore, we have datadir and userdatadir :)
 
 misc.mdate(): Get the current date (in milliseconds).
+misc.mwait(): Wait for the given date (in milliseconds).
 
 misc.lock_and_wait(): Lock our object thread and wait for a wake up signal.
 misc.signal(): Wake up our object thread.
@@ -267,6 +268,8 @@ Strings
 -------
 strings.decode_uri( [uri1, [uri2, [...]]] ): Decode a list of URIs. This
   function returns as many variables as it had arguments.
+strings.encode_uri_component( [uri1, [uri2, [...]]] ): Encode a list of URI
+  components. This function returns as many variables as it had arguments.
 strings.resolve_xml_special_chars( [str1, [str2, [...]]] ): Resolve XML
   special characters in a list of strings. This function returns as many
   variables as it had arguments.
@@ -279,6 +282,8 @@ var.get( object, name ): Get the object's variable "name"'s value.
 var.set( object, name, value ): Set the object's variable "name" to "value".
 var.get_list( object, name ): Get the object's variable "name"'s value list.
   1st return value is the value list, 2nd return value is the text list.
+var.create( object, name, value ): Create and set the object's variable "name"
+  to "value". Created vars can be of type float, string or bool.
 
 var.add_callback( object, name, function, data ): Add a callback to the
   object's "name" variable. Callback functions take 4 arguments: the

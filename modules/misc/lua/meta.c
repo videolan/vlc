@@ -78,6 +78,9 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
     luaopen_msg( L );
     luaopen_stream( L );
     luaopen_strings( L );
+    luaopen_variables( L );
+    luaopen_object( L );
+    luaopen_misc( L );
 
     lua_pushlightuserdata( L, p_this );
     lua_setfield( L, -2, "private" );
