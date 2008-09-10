@@ -28,6 +28,7 @@ struct decoder_sys_t
     int b_packetizer;
 
     mtime_t i_pts;
+    int     i_rate;
     unsigned int i_spu_size;
     unsigned int i_rle_size;
     unsigned int i_spu;
