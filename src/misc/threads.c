@@ -383,8 +383,7 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
         }
 
         /* We release the mutex */
-        DWORD self = InterlockedExchange (&p_mutex->owner, 0);
-        assert (self == 0);
+        InterlockedExchange (&p_mutex->owner, 0);
         /* fall through */
     }
     LeaveCriticalSection (&p_mutex->mutex);
