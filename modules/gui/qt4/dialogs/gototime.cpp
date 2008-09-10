@@ -31,7 +31,6 @@
 #include "input_manager.hpp"
 
 #include <QTabWidget>
-#include <QFile>
 #include <QLabel>
 #include <QTimeEdit>
 #include <QGroupBox>

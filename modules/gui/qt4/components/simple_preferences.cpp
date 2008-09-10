@@ -37,7 +37,6 @@
 #include <QFont>
 #include <QToolButton>
 #include <QButtonGroup>
-#include <QUrl>
 #include <QVBoxLayout>
 
 #include <QtAlgorithms>

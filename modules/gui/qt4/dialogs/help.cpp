@@ -41,7 +41,6 @@
 
 #include <QTextBrowser>
 #include <QTabWidget>
-#include <QFile>
 #include <QLabel>
 #include <QString>
 #include <QDialogButtonBox>

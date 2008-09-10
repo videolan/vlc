@@ -49,7 +49,6 @@
 #include <QDialog>
 
 
-class QFile;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
