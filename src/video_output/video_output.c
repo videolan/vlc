@@ -130,6 +130,7 @@ static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data
 vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
                                video_format_t *p_fmt )
 {
+    const bool b_vout_provided = p_vout != NULL;
     if( !p_fmt )
     {
         /* Video output is no longer used.
@@ -153,6 +154,8 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
     {
         char *psz_filter_chain;
         vlc_value_t val;
+
+        vlc_mutex_lock( &p_vout->change_lock );
 
         /* We don't directly check for the "vout-filter" variable for obvious
          * performance reasons. */
@@ -180,11 +183,13 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             free( psz_filter_chain );
         }
 
-        if( ( p_vout->fmt_render.i_width != p_fmt->i_width ) ||
-            ( p_vout->fmt_render.i_height != p_fmt->i_height ) ||
-            ( p_vout->fmt_render.i_aspect != p_fmt->i_aspect ) ||
+        if( p_vout->fmt_render.i_chroma != p_fmt->i_chroma ||
+            p_vout->fmt_render.i_width != p_fmt->i_width ||
+            p_vout->fmt_render.i_height != p_fmt->i_height ||
             p_vout->b_filter_change )
         {
+            vlc_mutex_unlock( &p_vout->change_lock );
+
             /* We are not interested in this format, close this vout */
             vout_CloseAndRelease( p_vout );
             vlc_object_release( p_vout );
@@ -193,11 +198,63 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         else
         {
             /* This video output is cool! Hijack it. */
-            spu_Attach( p_vout->p_spu, p_this, true );
-            vlc_object_attach( p_vout, p_this );
-            if( p_vout->b_title_show )
-                DisplayTitleOnOSD( p_vout );
+            if( p_vout->fmt_render.i_aspect != p_fmt->i_aspect )
+            {
+                /* Correct aspect ratio on change
+                 * FIXME factorize this code with other aspect ration related code */
+                unsigned int i_sar_num;
+                unsigned int i_sar_den;
+                unsigned int i_aspect;
+
+                i_aspect = p_fmt->i_aspect;
+                vlc_ureduce( &i_sar_num, &i_sar_den,
+                             p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
+#if 0
+                /* What's that, it does not seems to be used correcly everywhere
+                 * beside the previous p_vout->fmt_render.i_aspect != p_fmt->i_aspect
+                 * should be fixed to use it too then */
+                if( p_vout->i_par_num > 0 && p_vout->i_par_den > 0 )
+                {
+                    i_sar_num *= p_vout->i_par_den;
+                    i_sar_den *= p_vout->i_par_num;
+                    i_aspect = i_aspect * p_vout->i_par_den / p_vout->i_par_num;
+                }
+#endif
+
+                if( i_sar_num > 0 && i_sar_den > 0 && i_aspect > 0 )
+                {
+                    p_vout->fmt_in.i_sar_num = i_sar_num;
+                    p_vout->fmt_in.i_sar_den = i_sar_den;
+                    p_vout->fmt_in.i_aspect  = i_aspect;
+
+                    p_vout->fmt_render.i_sar_num = i_sar_num;
+                    p_vout->fmt_render.i_sar_den = i_sar_den;
+                    p_vout->fmt_render.i_aspect  = i_aspect;
+
+                    p_vout->render.i_aspect   = i_aspect;
+
+                    p_vout->i_changes |= VOUT_ASPECT_CHANGE;
+
+                }
+            }
+            vlc_mutex_unlock( &p_vout->change_lock );
+
             vlc_object_release( p_vout );
+        }
+
+        if( p_vout )
+        {
+            msg_Dbg( p_this, "reusing provided vout" );
+
+            spu_Attach( p_vout->p_spu, p_this, true );
+
+            vlc_object_detach( p_vout );
+            vlc_object_attach( p_vout, p_this );
+
+            /* Display title if we are not using the vout given to vout_Request.
+             * XXX for now b_vout_provided is always true at this stage */
+            if( p_vout->b_title_show && !b_vout_provided )
+                DisplayTitleOnOSD( p_vout );
         }
     }
 
