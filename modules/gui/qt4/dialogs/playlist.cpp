@@ -71,7 +71,7 @@ void PlaylistDialog::dropEvent( QDropEvent *event )
 {
      const QMimeData *mimeData = event->mimeData();
      foreach( QUrl url, mimeData->urls() ) {
-        QString s = url.toString();
+        QString s = toNativeSeparators( url.toString() );
         if( s.length() > 0 ) {
             playlist_Add( THEPL, qtu(s), NULL,
                           PLAYLIST_APPEND, PLAYLIST_END, true, false );
