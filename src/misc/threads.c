@@ -1059,7 +1059,9 @@ void vlc_control_cancel (int cmd, ...)
             {
                 for (vlc_cleanup_t *p = nfo->cleaners; p != NULL; p = p->next)
                      p->proc (p->data);
+#ifndef WIN32
                 free (nfo);
+#endif
 #if defined (LIBVLC_USE_PTHREAD)
                 pthread_exit (PTHREAD_CANCELLED);
 #elif defined (WIN32)
