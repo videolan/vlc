@@ -352,7 +352,7 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
 
         /* We need to lock this recursive mutex */
         EnterCriticalSection (&p_mutex->mutex);
-        self = InterlockedCompareExchange (&p_mutex->owner, self, 0);
+        self = InterlockedExchange (&p_mutex->owner, self);
         assert (self == 0); /* no previous owner */
         return;
     }
@@ -383,9 +383,8 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
         }
 
         /* We release the mutex */
-        DWORD self = GetCurrentThreadId ();
-        self = InterlockedCompareExchange (&p_mutex->owner, self, 0);
-        assert (self == GetCurrentThreadId ());
+        DWORD self = InterlockedExchange (&p_mutex->owner, 0);
+        assert (self == 0);
         /* fall through */
     }
     LeaveCriticalSection (&p_mutex->mutex);
