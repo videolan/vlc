@@ -1832,8 +1832,7 @@ vlc_module_begin();
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT, true );
 
     set_subcategory( SUBCAT_SOUT_SAP );
-    add_bool( "sap-flow-control", false, NULL, ANN_SAPCTRL_TEXT,
-                               ANN_SAPCTRL_LONGTEXT, true );
+    add_obsolete_bool( "sap-flow-control" );
     add_integer( "sap-interval", 5, NULL, ANN_SAPINTV_TEXT,
                                ANN_SAPINTV_LONGTEXT, true );
 

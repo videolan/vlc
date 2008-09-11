@@ -47,35 +47,14 @@ struct sout_packetizer_input_t
 };
 
 #define sout_NewInstance(a,b) __sout_NewInstance(VLC_OBJECT(a),b)
-VLC_EXPORT( sout_instance_t *,  __sout_NewInstance,  ( vlc_object_t *, const char * ) );
-VLC_EXPORT( void,               sout_DeleteInstance, ( sout_instance_t * ) );
+sout_instance_t *  __sout_NewInstance( vlc_object_t *, const char * );
+void sout_DeleteInstance( sout_instance_t * );
 
-VLC_EXPORT( sout_packetizer_input_t *, sout_InputNew,( sout_instance_t *, es_format_t * ) );
-VLC_EXPORT( int,                sout_InputDelete,      ( sout_packetizer_input_t * ) );
-VLC_EXPORT( int,                sout_InputSendBuffer,  ( sout_packetizer_input_t *, block_t* ) );
+sout_packetizer_input_t *sout_InputNew( sout_instance_t *, es_format_t * );
+int sout_InputDelete( sout_packetizer_input_t * );
+int sout_InputSendBuffer( sout_packetizer_input_t *, block_t* );
 
 /* Announce system */
-
-/* The SAP handler, running in a separate thread */
-struct sap_handler_t
-{
-    VLC_COMMON_MEMBERS /* needed to create a thread */
-
-    sap_session_t **pp_sessions;
-    sap_address_t **pp_addresses;
-
-    bool b_control;
-
-    int i_sessions;
-    int i_addresses;
-
-    int i_current_session;
-
-    int (*pf_add)  ( sap_handler_t*, session_descriptor_t *);
-    int (*pf_del)  ( sap_handler_t*, session_descriptor_t *);
-
-    /* private data, not in p_sys as there is one kind of sap_handler_t */
-};
 
 struct session_descriptor_t
 {
@@ -98,7 +77,9 @@ struct announce_handler_t
 
 int announce_HandlerDestroy( announce_handler_t * );
 
-/* Release it with vlc_object_release() */
-sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
+sap_handler_t *SAP_Create (vlc_object_t *);
+void SAP_Destroy (sap_handler_t *);
+int SAP_Add (sap_handler_t *, session_descriptor_t *);
+void SAP_Del (sap_handler_t *, const session_descriptor_t *);
 
 #endif

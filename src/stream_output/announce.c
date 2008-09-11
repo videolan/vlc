@@ -176,10 +176,7 @@ static announce_handler_t *announce_HandlerCreate( vlc_object_t *p_this )
 int announce_HandlerDestroy( announce_handler_t *p_announce )
 {
     if( p_announce->p_sap )
-    {
-        /* Exit the SAP */
-        vlc_object_release( p_announce->p_sap );
-    }
+        SAP_Destroy( p_announce->p_sap );
 
     /* Free the structure */
     vlc_object_release( p_announce );
@@ -201,7 +198,7 @@ static int announce_Register( announce_handler_t *p_announce,
         /* Do we already have a SAP announce handler ? */
         if( !p_announce->p_sap )
         {
-            sap_handler_t *p_sap = announce_SAPHandlerCreate( p_announce );
+            sap_handler_t *p_sap = SAP_Create (VLC_OBJECT(p_announce));
             msg_Dbg( p_announce, "creating SAP announce handler");
             if( !p_sap )
             {
@@ -212,7 +209,7 @@ static int announce_Register( announce_handler_t *p_announce,
         }
         /* this will set p_session->p_sap for later deletion */
         msg_Dbg( p_announce, "adding SAP session");
-        p_announce->p_sap->pf_add( p_announce->p_sap, p_session );
+        SAP_Add( p_announce->p_sap, p_session );
     }
     else
     {
@@ -228,7 +225,6 @@ static int announce_UnRegister( announce_handler_t *p_announce,
                                 session_descriptor_t *p_session )
 {
     msg_Dbg( p_announce, "unregistering announce" );
-    if( p_announce->p_sap )
-        p_announce->p_sap->pf_del( p_announce->p_sap, p_session );
+    SAP_Del( p_announce->p_sap, p_session );
     return VLC_SUCCESS;
 }
