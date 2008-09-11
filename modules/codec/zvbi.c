@@ -214,7 +214,7 @@ static int Open( vlc_object_t *p_this )
      * is known. It would be better if people started sending G0 */
     for( int i = 0; ppsz_default_triplet[i] != NULL; i++ )
     {
-        if( p_dec->fmt_in.psz_language && !strcmp( p_dec->fmt_in.psz_language, ppsz_default_triplet[i] ) )
+        if( p_dec->fmt_in.psz_language && !strcasecmp( p_dec->fmt_in.psz_language, ppsz_default_triplet[i] ) )
         {
             vbi_teletext_set_default_region( p_sys->p_vbi_dec, pi_default_triplet[i]);
             msg_Dbg( p_dec, "overwriting default zvbi region: %d", pi_default_triplet[i] );
