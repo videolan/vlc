@@ -102,6 +102,27 @@ vlc_module_end();
 
 // #define ZVBI_DEBUG
 
+//Guessing table for missing "default region triplet"
+static const int pi_default_triplet[] = {
+ 0, 0,           // slo cze
+ 8,              // pol
+ 24,24,24,24,    //ssc scr slv rum
+ 32,32,32,32,32, //est lit rus bul ukr
+ 48,48,          //gre ell
+ 64,             //ara
+ 88,             //heb
+ 16 };           //default
+static const char *const ppsz_default_triplet[] = {
+ "slo", "cze",
+ "pol",
+ "ssc", "scr", "slv", "rum",
+ "est", "lit", "rus", "bul", "ukr",
+ "gre", "ell",
+ "ara",
+ "heb",
+ NULL
+};
+
 typedef enum {
     DATA_UNIT_EBU_TELETEXT_NON_SUBTITLE     = 0x02,
     DATA_UNIT_EBU_TELETEXT_SUBTITLE         = 0x03,
@@ -185,6 +206,19 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_dec, "VBI decoder/demux could not be created." );
         Close( p_this );
         return VLC_ENOMEM;
+    }
+
+    /* Some broadcasters in countries with level 1 and level 1.5 still not send a G0 to do 
+     * matches against table 32 of ETSI 300 706. We try to do some best effort guessing
+     * This is not perfect, but might handle some cases where we know the vbi language 
+     * is known. It would be better if people started sending G0 */
+    for( int i = 0; ppsz_default_triplet[i] != NULL; i++ )
+    {
+        if( p_dec->fmt_in.psz_language && !strcmp( p_dec->fmt_in.psz_language, ppsz_default_triplet[i] ) )
+        {
+            vbi_teletext_set_default_region( p_sys->p_vbi_dec, pi_default_triplet[i]);
+            msg_Dbg( p_dec, "overwriting default zvbi region: %d", pi_default_triplet[i] );
+        }
     }
 
     vbi_event_handler_register( p_sys->p_vbi_dec, VBI_EVENT_TTX_PAGE |
