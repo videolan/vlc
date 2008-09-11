@@ -41,7 +41,6 @@
 #   include <mozilla-config.h>
 #endif
 
-#include "nscore.h"
 #include "npapi.h"
 #include "npupp.h"
 

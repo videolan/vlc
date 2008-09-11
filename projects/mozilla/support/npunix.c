@@ -42,7 +42,6 @@
 #define OJI 1
 
 #include <stdio.h>
-#include <nscore.h>
 #include <npapi.h>
 #include <npupp.h>
 
