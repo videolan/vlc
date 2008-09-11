@@ -46,3 +46,16 @@ Index: Makefile.am
  
  EXTRA_DIST = autogen.sh \
  	     AUTHORS \
+Index: src/dvdnav_internal.h
+===================================================================
+--- src/dvdnav_internal.h	(revision 1136)
++++ src/dvdnav_internal.h	working copy)
+@@ -37,7 +37,7 @@
+ #define pthread_mutex_init(a, b) InitializeCriticalSection(a)
+ #define pthread_mutex_lock(a)    EnterCriticalSection(a)
+ #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
+-#define pthread_mutex_destroy(a)
++#define pthread_mutex_destroy(a) DeleteCriticalSection(a)
+
+ /* replacement gettimeofday implementation */
+ #include <sys/timeb.h>
