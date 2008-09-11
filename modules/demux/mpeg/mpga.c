@@ -71,7 +71,9 @@ struct demux_sys_t
 
     mtime_t     i_pts;
     mtime_t     i_time_offset;
+    int64_t     i_bytes;
 
+    bool        b_estimate_bitrate;
     int         i_bitrate_avg;  /* extracted from Xing header */
 
     bool b_initial_sync_failed;
@@ -113,6 +115,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es = NULL;
     p_sys->b_start = true;
     p_sys->i_stream_offset = i_offset;
+    p_sys->b_estimate_bitrate = true;
     p_sys->i_bitrate_avg = 0;
 
     if( stream_Seek( p_demux->s, p_sys->i_stream_offset ) )
@@ -172,13 +175,21 @@ static int Demux( demux_t *p_demux )
                     p_sys->i_bitrate_avg = p_sys->xing.i_bytes * INT64_C(8) *
                         p_sys->p_packetizer->fmt_out.audio.i_rate /
                         p_sys->xing.i_frames / p_sys->xing.i_frame_samples;
+
+                    if( p_sys->i_bitrate_avg > 0 )
+                        p_sys->b_estimate_bitrate = false;
                 }
-                /* Use the bitrate */
-                if( p_sys->i_bitrate_avg <= 0 )
+                /* Use the bitrate as initual value */
+                if( p_sys->b_estimate_bitrate )
                     p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
             }
 
             p_sys->i_pts = p_block_out->i_pts;
+
+            /* Re-estimate bitrate */
+            if( p_sys->b_estimate_bitrate && p_sys->i_pts > 1 + INT64_C(500000) )
+                p_sys->i_bitrate_avg = 8*INT64_C(1000000)*p_sys->i_bytes/(p_sys->i_pts-1);
+            p_sys->i_bytes += p_block_out->i_buffer;
 
             /* Correct timestamp */
             p_block_out->i_pts += p_sys->i_time_offset;
