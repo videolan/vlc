@@ -26,9 +26,6 @@ If you want to build VLC from sources, you can do it in several ways:
 - natively on Windows, using cygwin (www.cygwin.com) with or without the
   POSIX emulation layer. This is the preferred way to compile vlc if you want
   to do it on Windows.
-  NOTE: This is the PREFERRED way of building VLC natively (the others
-  are not as much tested so expect more difficulties with them).
-
   Read http://wiki.videolan.org/Win32CompileCygwinNew to have a complete HOWTO
 
 - On GNU/Linux, using the mingw32 cross-compiler.
@@ -52,6 +49,7 @@ You first need to download a GNU/Linux cross-compiler version of mingw32.
 
 For Debian GNU/Linux users, you can use the mingw32, mingw32-binutils and
 mingw32-runtime packages.
+For Fedora users, you can use mingw-binutils, mingw-gcc-core, mingw-gcc-g++
 
 - compiling natively on Windows with cygwin:
 You will need to download and run the setup.exe app from cygwin's web site
@@ -79,9 +77,6 @@ or mpeg4 video decoding, etc...
 Depending on your needs you will have to compile/install some or all of these
 external libraries.
 
-* They can be found here (source code):
-  http://download.videolan.org/pub/testing/contrib/
-
 * We also provide a package with all the libraries already compiled so it is
   actually really easy to compile a full-featured version of vlc (these compiled
   libraries will only work with mingw or cygwin):
@@ -95,6 +90,9 @@ external libraries.
     tar xjvf contrib-20060330-win32-bin-gcc-3.4.5-only.tar.bz2 -C /
 
   Please note the "-C /". 
+
+* They can also be found here (source code):
+  http://download.videolan.org/pub/testing/contrib/
 
 * An automated way of building the contrib libraries is provided in 
   extra/contrib. It will download, configure and build the libraries.
