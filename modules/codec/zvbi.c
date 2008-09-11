@@ -124,6 +124,14 @@ static const char *const ppsz_default_triplet[] = {
 };
 
 typedef enum {
+    ZVBI_KEY_RED    = 'r' << 0x16,
+    ZVBI_KEY_GREEN  = 'g' << 0x16,
+    ZVBI_KEY_YELLOW = 'y' << 0x16,
+    ZVBI_KEY_BLUE   = 'b' << 0x16,
+    ZVBI_KEY_INDEX  = 'i' << 0x16,
+} ttxt_key_id;
+
+typedef enum {
     DATA_UNIT_EBU_TELETEXT_NON_SUBTITLE     = 0x02,
     DATA_UNIT_EBU_TELETEXT_SUBTITLE         = 0x03,
     DATA_UNIT_EBU_TELETEXT_INVERTED         = 0x0C,
@@ -155,6 +163,9 @@ struct decoder_sys_t
     unsigned int      i_wanted_page;
     /* */
     bool              b_opaque;
+    struct {
+        int pgno, subno;
+    }                 nav_link[6];
 };
 
 static subpicture_t *Decode( decoder_t *, block_t ** );
@@ -221,10 +232,12 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    vbi_event_handler_register( p_sys->p_vbi_dec, VBI_EVENT_TTX_PAGE |
-                                VBI_EVENT_CAPTION | VBI_EVENT_NETWORK |
-                                VBI_EVENT_ASPECT | VBI_EVENT_PROG_INFO,
-                                EventHandler, p_dec );
+    vbi_event_handler_register( p_sys->p_vbi_dec, VBI_EVENT_TTX_PAGE | VBI_EVENT_NETWORK |
+#ifdef ZVBI_DEBUG
+                                VBI_EVENT_CAPTION | VBI_EVENT_TRIGGER |
+                                VBI_EVENT_ASPECT | VBI_EVENT_PROG_INFO | VBI_EVENT_NETWORK_ID |
+#endif
+                                0 , EventHandler, p_dec );
 
     /* Create the var on vlc_global. */
     p_sys->i_wanted_page = var_CreateGetInteger( p_dec, "vbi-page" );
@@ -336,7 +349,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     b_cached = vbi_fetch_vt_page( p_sys->p_vbi_dec, &p_page,
                                   vbi_dec2bcd( i_wanted_page ),
                                   VBI_ANY_SUBNO, VBI_WST_LEVEL_3p5,
-                                  25, FALSE );
+                                  25, true );
 
     if( i_wanted_page == p_sys->i_last_page && !p_sys->b_update )
         goto error;
@@ -400,6 +413,10 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         p_pic->p->i_pitch = 4 * fmt.i_width;
         vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
                           p_spu->p_region->picture.p->p_pixels, 1, 1 );
+
+        vlc_mutex_lock( &p_sys->lock );
+        memcpy( p_sys->nav_link, &p_page.nav_link, sizeof( p_sys->nav_link )) ;
+        vlc_mutex_unlock( &p_sys->lock );
 
         OpaquePage( p_pic, p_page, fmt, b_opaque );
     }
@@ -504,22 +521,31 @@ static void EventHandler( vbi_event *ev, void *user_data )
 #endif
         if( p_sys->i_last_page == vbi_bcd2dec( ev->ev.ttx_page.pgno ) )
             p_sys->b_update = true;
-
+#ifdef ZVBI_DEBUG
         if( ev->ev.ttx_page.clock_update )
             msg_Dbg( p_dec, "clock" );
-#ifdef ZVBI_DEBUG
         if( ev->ev.ttx_page.header_update )
             msg_Dbg( p_dec, "header" );
 #endif
     }
+    else if( ev->type == VBI_EVENT_CLOSE )
+        msg_Dbg( p_dec, "Close event" );
     else if( ev->type == VBI_EVENT_CAPTION )
         msg_Dbg( p_dec, "Caption line: %x", ev->ev.caption.pgno );
     else if( ev->type == VBI_EVENT_NETWORK )
-        msg_Dbg( p_dec, "Network change" );
+    {
+        msg_Dbg( p_dec, "Network change");
+        vbi_network n = ev->ev.network;
+        msg_Dbg( p_dec, "Network id:%d name: %s, call: %s ", n.nuid, n.name, n.call );
+    }
+    else if( ev->type == VBI_EVENT_TRIGGER )
+        msg_Dbg( p_dec, "Trigger event" );
     else if( ev->type == VBI_EVENT_ASPECT )
         msg_Dbg( p_dec, "Aspect update" );
-    else if( ev->type == VBI_EVENT_NETWORK )
+    else if( ev->type == VBI_EVENT_PROG_INFO )
         msg_Dbg( p_dec, "Program info received" );
+    else if( ev->type == VBI_EVENT_NETWORK_ID )
+        msg_Dbg( p_dec, "Network ID changed" );
 }
 
 static int OpaquePage( picture_t *p_src, const vbi_page p_page,
@@ -572,6 +598,24 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
     vlc_mutex_lock( &p_sys->lock );
+    switch( newval.i_int )
+    {
+        case ZVBI_KEY_RED:
+            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[0].pgno );
+            break;
+        case ZVBI_KEY_GREEN:
+            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[1].pgno );
+            break;
+        case ZVBI_KEY_YELLOW:
+            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[2].pgno );
+            break;
+        case ZVBI_KEY_BLUE:
+            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[3].pgno );
+            break;
+        case ZVBI_KEY_INDEX:
+            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[5].pgno ); /* #4 is SKIPPED */
+            break;
+    }
     if( newval.i_int > 0 && newval.i_int < 999 )
         p_sys->i_wanted_page = newval.i_int;
     vlc_mutex_unlock( &p_sys->lock );
