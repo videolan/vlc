@@ -1951,7 +1951,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                         break;
                     }
                     if( demux_Control( slave->p_demux,
-                                        DEMUX_SET_TIME, i_time ) )
+                                       DEMUX_SET_TIME, i_time ) )
                     {
                         msg_Err( p_input, "seek failed for new slave" );
                         InputSourceClean( slave );
@@ -2515,11 +2515,12 @@ static void SlaveDemux( input_thread_t *p_input )
 {
     int64_t i_time;
     int i;
+    bool b_set_time = true;
 
     if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
     {
-        msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
-        return;
+        /* msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" ); */
+        b_set_time = false;
     }
 
     for( i = 0; i < p_input->p->i_slave; i++ )
@@ -2530,7 +2531,7 @@ static void SlaveDemux( input_thread_t *p_input )
         if( in->b_eof )
             continue;
 
-        if( demux_Control( in->p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_time ) )
+        if( b_set_time && demux_Control( in->p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_time ) )
         {
             for( ;; )
             {
