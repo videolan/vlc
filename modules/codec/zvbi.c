@@ -162,6 +162,7 @@ struct decoder_sys_t
     int               i_align;
     /* */
     unsigned int      i_wanted_page;
+    unsigned int      i_wanted_subpage;
     /* */
     bool              b_opaque;
     struct {
@@ -258,6 +259,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_wanted_page = vbi_bcd2dec(p_dec->fmt_in.subs.dvb.i_id & 0xff);
         p_sys->i_wanted_page += 100*i_wanted_magazine;
     }
+    p_sys->i_wanted_subpage = VBI_ANY_SUBNO;
 
     p_sys->b_opaque = var_CreateGetBool( p_dec, "vbi-opaque" );
     var_AddCallback( p_dec, "vbi-opaque", Opaque, p_sys );
@@ -350,14 +352,14 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     vlc_mutex_lock( &p_sys->lock );
     const int i_align = p_sys->i_align;
     const unsigned int i_wanted_page = p_sys->i_wanted_page;
+    const unsigned int i_wanted_subpage = p_sys->i_wanted_subpage;
     const bool b_opaque = p_sys->b_opaque;
     vlc_mutex_unlock( &p_sys->lock );
-
 
     /* Try to see if the page we want is in the cache yet */
     b_cached = vbi_fetch_vt_page( p_sys->p_vbi_dec, &p_page,
                                   vbi_dec2bcd( i_wanted_page ),
-                                  VBI_ANY_SUBNO, VBI_WST_LEVEL_3p5,
+                                  i_wanted_subpage, VBI_WST_LEVEL_3p5,
                                   25, true );
 
     if( i_wanted_page == p_sys->i_last_page && !p_sys->b_update )
@@ -610,22 +612,30 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
     {
         case ZVBI_KEY_RED:
             p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[0].pgno );
+            p_sys->i_wanted_subpage = p_sys->nav_link[0].subno;
             break;
         case ZVBI_KEY_GREEN:
             p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[1].pgno );
+            p_sys->i_wanted_subpage = p_sys->nav_link[1].subno;
             break;
         case ZVBI_KEY_YELLOW:
             p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[2].pgno );
+            p_sys->i_wanted_subpage = p_sys->nav_link[2].subno;
             break;
         case ZVBI_KEY_BLUE:
             p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[3].pgno );
+            p_sys->i_wanted_subpage = p_sys->nav_link[3].subno;
             break;
         case ZVBI_KEY_INDEX:
             p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[5].pgno ); /* #4 is SKIPPED */
+            p_sys->i_wanted_subpage = p_sys->nav_link[5].subno;
             break;
     }
     if( newval.i_int > 0 && newval.i_int < 999 )
+    {
         p_sys->i_wanted_page = newval.i_int;
+        p_sys->i_wanted_subpage = VBI_ANY_SUBNO;
+    }
     vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
@@ -661,8 +671,29 @@ static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     decoder_sys_t *p_sys = p_data;
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
+    /* FIXME: Capture + and - key for subpage browsing */
+    if( newval.i_int == '-' || newval.i_int == '+' )
+    {
+        vlc_mutex_lock( &p_sys->lock );
+        if( p_sys->i_wanted_subpage == VBI_ANY_SUBNO )
+            p_sys->i_wanted_subpage = vbi_dec2bcd(1);
+        else if ( newval.i_int == '+' )
+            p_sys->i_wanted_subpage = vbi_add_bcd( p_sys->i_wanted_subpage, 1);
+        else if( newval.i_int == '-')
+            p_sys->i_wanted_subpage = vbi_add_bcd( p_sys->i_wanted_subpage, 0xF9999999); /* BCD complement - 1 */
+
+        if ( !vbi_bcd_digits_greater( p_sys->i_wanted_subpage, 0x00 ) || vbi_bcd_digits_greater( p_sys->i_wanted_subpage, 0x99 ) )
+                p_sys->i_wanted_subpage = VBI_ANY_SUBNO;
+        else
+            vout_OSDMessage( p_this, DEFAULT_CHAN, "%s: %d", _("Subpage"), vbi_bcd2dec( p_sys->i_wanted_subpage) );
+
+        p_sys->b_update = true;
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+
+    /* Capture 0-9 for page selection */
     if( newval.i_int < '0' || newval.i_int > '9' )
         return VLC_SUCCESS;
 
@@ -677,6 +708,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
         p_sys->i_key[2] >= 0 && p_sys->i_key[2] <= 9 )
     {
         p_sys->i_wanted_page = p_sys->i_key[0]*100 + p_sys->i_key[1]*10 + p_sys->i_key[2];
+        p_sys->i_wanted_subpage = VBI_ANY_SUBNO;
         p_sys->i_key[0] = p_sys->i_key[1] = p_sys->i_key[2] = '*' - '0';
     }
     vlc_mutex_unlock( &p_sys->lock );
