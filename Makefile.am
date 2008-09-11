@@ -848,7 +848,7 @@ if BUILD_SKINS
 	for i in $(srcdir)/share/skins2/fonts/*.*; do \
 	  cp -- "$$i" $(win32_destdir)/skins/fonts/ || true ; \
 	done
-	for i in $(srcdir)/share/skins2/*.*; do \
+	for i in $(top_builddir)/share/skins2/*.*; do \
 	  cp -- "$$i" $(win32_destdir)/skins/ || true ; \
 	done
 endif
