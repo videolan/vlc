@@ -125,11 +125,11 @@ static const char *const ppsz_default_triplet[] = {
 };
 
 typedef enum {
-    ZVBI_KEY_RED    = 'r' << 0x16,
-    ZVBI_KEY_GREEN  = 'g' << 0x16,
-    ZVBI_KEY_YELLOW = 'y' << 0x16,
-    ZVBI_KEY_BLUE   = 'b' << 0x16,
-    ZVBI_KEY_INDEX  = 'i' << 0x16,
+    ZVBI_KEY_RED    = 'r' << 16,
+    ZVBI_KEY_GREEN  = 'g' << 16,
+    ZVBI_KEY_YELLOW = 'y' << 16,
+    ZVBI_KEY_BLUE   = 'b' << 16,
+    ZVBI_KEY_INDEX  = 'i' << 16,
 } ttxt_key_id;
 
 typedef enum {
