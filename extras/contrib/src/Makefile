@@ -369,9 +369,10 @@ pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -d pkgconfig/glib-1.2.8 -p 1 < Patches/glib.patch
 	patch -d pkgconfig -p0 < Patches/pkgcfg.patch
+	(cd $@; autoconf)
 
 .pkgcfg: pkgconfig
-	(cd pkgconfig; autoconf && ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 	touch $@
 
 CLEAN_FILE += .pkgcfg
@@ -467,19 +468,20 @@ fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz Patches/fontconfig.patch
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/fontconfig.patch
 	patch -p0 < Patches/fontconfig-nodocs.patch
+	(cd $@; autoreconf)
 
 .fontconfig: fontconfig .xml .freetype
 ifdef HAVE_WIN32
   ifdef HAVE_CYGWIN
-	(cd $<; autoreconf && LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --with-default-fonts=C:\\windows\fonts --with-add-fonts=C:\\winnt\fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
+	(cd $<; LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --with-default-fonts=C:\\windows\fonts --with-add-fonts=C:\\winnt\fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
   else
-	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --with-default-fonts=C:\\windows\fonts --with-add-fonts=C:\\winnt\fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
+	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --with-default-fonts=C:\\windows\fonts --with-add-fonts=C:\\winnt\fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
   endif
 else
   ifdef HAVE_DARWIN_OS
-	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/var/cache/fontconfig --with-default-fonts=/System/Library/Fonts --with-add-fonts=/Library/Fonts,~/Library/Fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
+	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/var/cache/fontconfig --with-default-fonts=/System/Library/Fonts --with-add-fonts=/Library/Fonts,~/Library/Fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
   else
-	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
+	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
   endif
 endif
 	$(INSTALL_NAME)
@@ -522,9 +524,10 @@ fribidi-$(FRIBIDI_VERSION).tar.gz:
 fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/fribidi.patch
+	( cd $@; rm -f configure; ./bootstrap)
 
 .fribidi: fribidi .iconv
-	(cd $<; rm -f configure; ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -726,9 +729,7 @@ libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	(cd $@; autoconf)
 
 .vorbis: libvorbis .ogg
-# FIXME: shared libs disabled for now because of linking errors
-#   -- titer 2005/09/16
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 #	$(INSTALL_NAME)
 	touch $@
 
@@ -788,14 +789,16 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	patch -p0 < Patches/libtheora-includes.patch
 	(cd $@; autoconf)
 
+THEORACONF = --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples
+
 .theora: libtheora .ogg
 ifdef HAVE_BEOS
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest --disable-asm --disable-examples && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) --disable-asm && make && make install)
 else
   ifdef NO_TEXT_RELOCATION
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm --disable-sdltest --disable-oggtest --disable-vorbistest --disable-asm --disable-examples && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm $(THEORACONF) && make && make install)
   else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF)&& make && make install)
   endif
 endif
 	$(INSTALL_NAME)
@@ -1102,6 +1105,9 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 endif
 
+
+FFMPEGCONF = --enable-gpl --enable-postproc --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --disable-devices --disable-protocols --disable-network --disable-filters
+
 ifdef HAVE_WINCE
 .ffmpeg: ffmpeg .zlib
 else
@@ -1111,8 +1117,7 @@ else
 .ffmpeg: ffmpeg .faac .lame
 endif
 endif
-
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-postproc --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --disable-devices --disable-protocols --disable-network --disable-filters --disable-shared --enable-static && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
@@ -1660,19 +1665,19 @@ xml: libxml2-$(XML_VERSION).tar.gz
 ifdef HAVE_WIN32
 	patch -p0 < Patches/xml2-win32.patch
 	rm -f xml/aclocal.m4
+	(cd $@; aclocal && automake && autoreconf)
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/xml2-uclibc.patch
 endif
 
+XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp  --without-debug --without-docbook --without-regexps
+
 .xml: xml
-ifdef HAVE_WIN32
-	(cd xml; aclocal && automake && autoreconf)
-endif
   ifdef HAVE_CYGWIN
-	(cd xml; ac_cv_header_pthread_h="no" CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp  --without-debug --without-docbook --without-regexps && make && make install)
+	(cd xml; ac_cv_header_pthread_h="no" CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(XMLCONF) && make && make install)
   else
-	(cd xml; CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp  --without-debug --without-docbook --without-regexps && make && make install)
+	(cd xml; CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(XMLCONF) && make && make install)
   endif
 ifndef HAVE_DARWIN_OS
 	$(INSTALL_NAME)
@@ -1695,11 +1700,11 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz
 ifdef HAVE_BEOS
 	patch -p0 < Patches/twolame-BeOS.patch
 endif
-
-.twolame: twolame
 ifdef HAVE_WIN32
 	(cd twolame/win32; $(WGET) "http://twolame.svn.sourceforge.net/viewvc/*checkout*/twolame/trunk/win32/winutil.h")
 endif	
+
+.twolame: twolame
 	(cd twolame; $(HOSTCC) CFLAGS="${CFLAGS}  -DLIBTWOLAME_STATIC" ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd libtwolame &&  make && make install)
 	$(INSTALL_NAME)
 	touch $@
@@ -1916,11 +1921,12 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 ifdef HAVE_WIN32
 	patch -p0 < Patches/gnutls-win32.patch
 	(cd $@; cd lgl; ln -sf alloca_.h alloca.h;)
+	(cd $@; autoconf)
 endif
 
 .gnutls: gnutls .opencdk .gcrypt .gpg-error 
 ifdef HAVE_WIN32
-	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc --disable-cxx -disable-shared --enable-static --disable-nls   --with-included-opencdk --with-included-libtasn1 && cd lgl && make && cd ../gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc --disable-cxx -disable-shared --enable-static --disable-nls   --with-included-opencdk --with-included-libtasn1 && cd lgl && make && cd ../gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --disable-cxx --with-libopencdk-prefix=$(PREFIX) --disable-guile && make && make install)
 endif
@@ -2259,9 +2265,10 @@ clinkcc: clinkcc$(CLINKCC_VERSION).tar.gz
 ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/clinkcc_osx.patch
 endif
+	(cd $@; ./bootstrap)
 
 .clinkcc: clinkcc
-	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) --enable-expat && make && chmod 755 config/install-sh && make install )
+	(cd $<;./configure --prefix=$(PREFIX) --enable-expat && make && chmod 755 config/install-sh && make install )
 	touch $@
 
 CLEAN_FILE += .clinkcc
