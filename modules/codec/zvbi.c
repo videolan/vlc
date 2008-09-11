@@ -46,8 +46,9 @@
 #include <assert.h>
 #include <libzvbi.h>
 
-#include "vlc_vout.h"
-#include "vlc_codec.h"
+#include <vlc_vout.h>
+#include <vlc_codec.h>
+#include <vlc_osd.h>
 
 /*****************************************************************************
  * Module descriptor.
@@ -166,6 +167,7 @@ struct decoder_sys_t
     struct {
         int pgno, subno;
     }                 nav_link[6];
+    int               i_key[3];
 };
 
 static subpicture_t *Decode( decoder_t *, block_t ** );
@@ -185,6 +187,8 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
 static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int Position( vlc_object_t *p_this, char const *psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
 /*****************************************************************************
@@ -207,6 +211,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
+    p_sys->i_key[0] = p_sys->i_key[1] = p_sys->i_key[2] = '*' - '0';
     p_sys->b_update = false;
     p_sys->p_vbi_dec = vbi_decoder_new();
     p_sys->p_dvb_demux = vbi_dvb_pes_demux_new( NULL, NULL );
@@ -263,6 +268,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_text = var_CreateGetBool( p_dec, "vbi-text" );
 //    var_AddCallback( p_dec, "vbi-text", Text, p_sys );
 
+    /* Listen for keys */
+    var_AddCallback( p_dec->p_libvlc, "key-pressed", EventKey, p_sys );
+
     es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
     if( p_sys->b_text )
         p_dec->fmt_out.video.i_chroma = VLC_FOURCC('T','E','X','T');
@@ -282,6 +290,7 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_dec, "vbi-position", Position, p_sys );
     var_DelCallback( p_dec, "vbi-opaque", Opaque, p_sys );
     var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
+    var_DelCallback( p_dec->p_libvlc, "key-pressed", EventKey, p_sys );
 
     vlc_mutex_destroy( &p_sys->lock );
 
@@ -493,7 +502,6 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     p_spu->b_absolute = false;
     p_spu->b_pausable = true;
 
-
     if( !b_text )
     {
         p_spu->i_width =
@@ -644,6 +652,33 @@ static int Position( vlc_object_t *p_this, char const *psz_cmd,
 
     vlc_mutex_lock( &p_sys->lock );
     p_sys->i_align = newval.i_int;
+    vlc_mutex_unlock( &p_sys->lock );
+
+    return VLC_SUCCESS;
+}
+
+static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    decoder_sys_t *p_sys = p_data;
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+
+    if( newval.i_int < '0' || newval.i_int > '9' )
+        return VLC_SUCCESS;
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->i_key[0] = p_sys->i_key[1];
+    p_sys->i_key[1] = p_sys->i_key[2];
+    p_sys->i_key[2] = (int)(newval.i_int - '0');
+    vout_OSDMessage( p_this, DEFAULT_CHAN, "%s: %c%c%c", _("Page"), (char)(p_sys->i_key[0]+'0'), (char)(p_sys->i_key[1]+'0'), (char)(p_sys->i_key[2]+'0') );
+
+    if( p_sys->i_key[0] > 0 && p_sys->i_key[0] <= 8 &&
+        p_sys->i_key[1] >= 0 && p_sys->i_key[1] <= 9 &&
+        p_sys->i_key[2] >= 0 && p_sys->i_key[2] <= 9 )
+    {
+        p_sys->i_wanted_page = p_sys->i_key[0]*100 + p_sys->i_key[1]*10 + p_sys->i_key[2];
+        p_sys->i_key[0] = p_sys->i_key[1] = p_sys->i_key[2] = '*' - '0';
+    }
     vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
