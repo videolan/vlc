@@ -314,12 +314,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     FREENULL( p_this->psz_object_name );
 
-#if defined(WIN32) || defined(UNDER_CE)
-    /* if object has an associated thread, close it now */
-    if( p_priv->thread_id )
-       CloseHandle(p_priv->thread_id);
-#endif
-
     vlc_spin_destroy( &p_priv->ref_spin );
     vlc_mutex_destroy( &p_priv->lock );
     vlc_cond_destroy( &p_priv->wait );
