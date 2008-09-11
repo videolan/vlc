@@ -48,6 +48,11 @@
 #include "../../../share/vlc32x32-christmas.xpm"
 #include <vlc_plugin.h>
 
+#ifdef WIN32
+ #include <QtPlugin>
+ Q_IMPORT_PLUGIN(qjpeg)
+#endif
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
