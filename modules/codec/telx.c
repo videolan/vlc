@@ -195,7 +195,8 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_dec, "telx-override-page",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "telx-override-page", &val );
-    if( val.i_int == -1 && p_dec->fmt_in.subs.dvb.i_id != -1 )
+    if( val.i_int == -1 && p_dec->fmt_in.subs.dvb.i_id != -1 
+          && p_dec->fmt_in.subs.dvb.i_id != (1<<16) ) /* ignore if TS demux wants page 100 (unlikely to be sub) */
     {
         p_sys->i_wanted_magazine = p_dec->fmt_in.subs.dvb.i_id >> 16;
         if( p_sys->i_wanted_magazine == 0 )
