@@ -649,6 +649,7 @@ static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
 
     vlc_mutex_lock( &p_sys->lock );
     p_sys->b_opaque = newval.b_bool;
+    p_sys->b_update = true;
     vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
