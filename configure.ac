@@ -3688,7 +3688,7 @@ AS_IF( [test "${enable_zvbi}" != "no"],[
 	  AC_MSG_WARN(ZVBI library not found. Enabling the telx module instead)
 	])
     ])  
-AS_IF( [test "${enable_telx}" !=no ],[
+AS_IF( [test "${enable_telx}" != "no" ],[
   VLC_ADD_PLUGIN([telx])
   ])
 
