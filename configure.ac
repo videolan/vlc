@@ -5355,6 +5355,8 @@ AC_ARG_ENABLE(mozilla,
 		  (default disabled)]))
 AC_ARG_WITH(mozilla-sdk-path,
   [    --with-mozilla-sdk-path=PATH path to mozilla sdk])
+AC_ARG_WITH(mozilla-pkg,
+  [    --with-mozilla-pkg=PKG  look for PKG.pc to build the mozilla plugin.])
 AC_LANG_PUSH(C++)
 if test "${enable_mozilla}" = "yes" 
 then
@@ -5373,13 +5375,12 @@ then
       found=1
     else
       if test -n "$PKG_CONFIG"; then
-	for i in seamonkey iceape xulrunner firefox iceweasel mozilla; do
-	  echo "Trying to find $i .pc files" >&5
-	  i="${i}-xpcom ${i}-plugin"
+	for i in "${with_mozilla_pkg}" libxul {seamonkey,iceape,xulrunner,firefox,iceweasel,mozilla}-plugin; do
+	  echo "Trying to find $i.pc files" >&5
 	  if $PKG_CONFIG --exists --print-errors "$i" 2>&5
 	  then
-            echo "Using $i .pc files." >&5
-            echo "Using $i .pc files." >&6
+            echo "Using $i.pc files." >&5
+            echo "Using $i.pc files." >&6
 	    found=1
 	    MOZILLA_CFLAGS=$( $PKG_CONFIG --cflags "$i" )
 	    MOZILLA_LIBS=$( $PKG_CONFIG --libs "$i" )
@@ -5391,7 +5392,6 @@ then
     AS_IF( [test $found = 1],[
         CPPFLAGS="${CPPFLAGS_save} ${MOZILLA_CFLAGS}"
         MOZILLA_REQUIRED_HEADERS=1
-        AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
         AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
         AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
           [#if HAVE_NPAPI_H
@@ -5403,16 +5403,18 @@ then
         fi
         MOZILLA_REQUIRED_HEADERS=
         mozilla=:
-	AC_EGREP_CPP(yes,
-	     [#include <mozilla-config.h>
-	      #ifdef MOZ_X11
-	      yes
-	      #endif],
-            [AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
-            VLC_ADD_LIBS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt -lXpm])
-        ]) 
-        VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS}])
-        VLC_ADD_LIBS([mozilla],[${MOZILLA_LIBS}])
+        AS_IF([ test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"],[
+	   VLC_ADD_CPPFLAGS([mozilla],[-DXP_UNIX -DOJI])
+	   AS_IF([ test "${SYS}" != "darwin"],[
+	     PKG_CHECK_MODULES(XPM, [xpm xt],[
+		VLC_ADD_CPPFLAGS([mozilla],[-DMOZ_X11])
+	     ],[
+		AC_MSG_ERROR([Please install the libXpm and libXt development files.])
+	     ])
+          ])
+        ])
+	VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS} ${XPM_CFLAGS}])
+        VLC_ADD_LIBS([mozilla],[${MOZILLA_LIBS} ${XPM_LIBS}])
         VLC_ADD_PLUGIN([mozilla])
         PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
         MOZILLA_CONFIG=
