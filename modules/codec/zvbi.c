@@ -679,7 +679,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
     if( newval.i_int == '-' || newval.i_int == '+' )
     {
         vlc_mutex_lock( &p_sys->lock );
-        if( p_sys->i_wanted_subpage == VBI_ANY_SUBNO )
+        if( p_sys->i_wanted_subpage == VBI_ANY_SUBNO && newval.i_int == '+' )
             p_sys->i_wanted_subpage = vbi_dec2bcd(1);
         else if ( newval.i_int == '+' )
             p_sys->i_wanted_subpage = vbi_add_bcd( p_sys->i_wanted_subpage, 1);
