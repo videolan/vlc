@@ -1082,6 +1082,7 @@ ifdef HAVE_DARWIN_OS_ON_INTEL
 endif
 ifdef HAVE_DARWIN_OS
 	(cd $@/libswscale; patch -p0 < ../../Patches/ffmpeg-fix-noaltivec.patch)
+	(cd $@/libswscale; patch -p0 < ../../Patches/ffmpeg-libswscale-head.patch)
 endif
 ifdef NO_TEXT_RELOCATION
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-mmx_removal-darwin9.patch)
