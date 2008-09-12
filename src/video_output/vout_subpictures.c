@@ -1322,7 +1322,10 @@ static int spu_vaControlDefault( spu_t *p_spu, int i_query, va_list args )
     {
     case SPU_CHANNEL_REGISTER:
         pi = (int *)va_arg( args, int * );
-        if( pi ) *pi = p_spu->i_channel++;
+        vlc_mutex_lock( &p_spu->subpicture_lock );
+        if( pi )
+            *pi = p_spu->i_channel++;
+        vlc_mutex_unlock( &p_spu->subpicture_lock );
         break;
 
     case SPU_CHANNEL_CLEAR:
