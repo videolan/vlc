@@ -29,6 +29,7 @@
 #include "dialogs_provider.hpp"
 #include "components/playlist/playlist_model.hpp"
 #include "dialogs/mediainfo.hpp"
+#include "dialogs/playlist.hpp"
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/types/type_unknown.xpm"
@@ -899,6 +900,8 @@ void PLModel::popupInfo()
     if( p_item )
     {
         MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_item->p_input );
+        mid->setParent( PlaylistDialog::getInstance( p_intf ),
+                        Qt::Dialog );
         mid->show();
     }
 }
