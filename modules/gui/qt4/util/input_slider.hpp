@@ -27,9 +27,13 @@
 
 #include "qt4.hpp"
 
+#include <QAbstractSlider>
 #include <QSlider>
-#include <QMouseEvent>
 
+#include <QMouseEvent>
+#include <QWheelEvent>
+
+/* Input Slider derived from QSlider */
 class InputSlider : public QSlider
 {
     Q_OBJECT
@@ -41,6 +45,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent* event);
     virtual void mouseReleaseEvent(QMouseEvent* event);
+    virtual void wheelEvent(QWheelEvent *event);
 private:
     bool b_sliding;
     int inputLength;
@@ -54,8 +59,9 @@ signals:
 };
 
 
+/* Sound Slider inherited directly from QAbstractSlider */
+
 class QPaintEvent;
-#include <QAbstractSlider>
 
 class SoundSlider : public QAbstractSlider
 {

@@ -107,6 +107,22 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
     setToolTip( psz_length );
 }
 
+void InputSlider::wheelEvent( QWheelEvent *event)
+{
+    /* Don't do anything if we are for somehow reason sliding */
+    if( !b_sliding )
+    {
+        setValue( value() + event->delta()/12 ); /* 12 = 8 * 15 / 10
+         Since delta is in 1/8 of ° and mouse have steps of 15 °
+         and that our slider is in 0.1% and we want one step to be a 1%
+         increment of position */
+        emit sliderDragged( value()/1000.0 );
+    }
+    /* We do accept because for we don't want the parent to change the sound
+       vol */
+    event->accept();
+}
+
 /* This work is derived from Amarok's work under GPLv2+
     - Mark Kretschmann
     - Gábor Lehel
