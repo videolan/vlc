@@ -45,7 +45,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( N_("MPEG-I/II/4 / A52 audio" ) );
+    set_description( N_("MPEG-I/II/4 / A52 / DTS audio" ) );
     set_capability( "demux", 155 );
     set_callbacks( Open, Close );
 
@@ -58,6 +58,8 @@ vlc_module_begin();
 
     add_shortcut( "ac3" );
     add_shortcut( "a52" );
+
+    add_shortcut( "dts" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -117,10 +119,14 @@ static int AacInit( demux_t *p_demux );
 static int A52Probe( demux_t *p_demux, int64_t *pi_offset );
 static int A52Init( demux_t *p_demux );
 
+static int DtsProbe( demux_t *p_demux, int64_t *pi_offset );
+static int DtsInit( demux_t *p_demux );
+
 static const codec_t p_codec[] = {
     { VLC_FOURCC( 'm', 'p', '4', 'a' ), false, "mp4 audio", AacProbe, AacInit },
     { VLC_FOURCC( 'm', 'p', 'g', 'a' ), false, "mpeg audio", MpgaProbe, MpgaInit },
     { VLC_FOURCC( 'a', '5', '2', ' ' ), true,  "a52 audio", A52Probe, A52Init },
+    { VLC_FOURCC( 'd', 't', 's', ' ' ), false, "dts audio", DtsProbe, DtsInit },
 
     { 0, false, NULL, NULL, NULL }
 };
@@ -199,6 +205,8 @@ static int Open( vlc_object_t * p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
+
+    msg_Dbg( p_demux, "detected format %4.4s", (const char*)&p_sys->codec.i_codec );
 
     /* Load the audio packetizer */
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, AUDIO_ES, p_sys->codec.i_codec,
@@ -662,6 +670,46 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip )
     return VLC_SUCCESS;
 }
 
+static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
+                         const char * ppsz_name[],
+                         bool (*pf_check)( const uint8_t * ), int i_check_size )
+{
+    bool   b_forced_demux;
+
+    int64_t i_offset;
+    const uint8_t *p_peek;
+    int i_skip;
+
+    b_forced_demux = false;
+    for( int i = 0; ppsz_name[i] != NULL; i++ )
+    {
+        b_forced_demux |= demux_IsForced( p_demux, ppsz_name[i] );
+    }
+
+    i_offset = stream_Tell( p_demux->s );
+
+    if( WavSkipHeader( p_demux, &i_skip ) )
+    {
+        if( !b_forced_demux )
+            return VLC_EGENERIC;
+    }
+
+    /* peek the begining */
+    if( stream_Peek( p_demux->s, &p_peek, i_skip + i_check_size ) < i_skip + i_check_size )
+    {
+        msg_Err( p_demux, "cannot peek" );
+        return VLC_EGENERIC;
+    }
+    if( !pf_check( &p_peek[i_skip] ) )
+    {
+        if( !b_forced_demux )
+            return VLC_EGENERIC;
+    }
+
+    *pi_offset = i_offset + i_skip;
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * A52
  *****************************************************************************/
@@ -684,41 +732,17 @@ static bool A52CheckSync( const uint8_t *p_peek, bool *p_big_endian )
 
     return false;
 }
+static bool A52CheckSyncProbe( const uint8_t *p_peek )
+{
+    bool b_dummy;
+    return A52CheckSync( p_peek, &b_dummy );
+}
 
 static int A52Probe( demux_t *p_demux, int64_t *pi_offset )
 {
-    bool   b_forced_demux;
-    bool   b_big_endian;
+    const char *ppsz_name[] = { "a52", "ac3", NULL };
 
-    int64_t i_offset;
-    const uint8_t *p_peek;
-    int i_skip;
-
-    b_forced_demux = demux_IsForced( p_demux, "a52" ) ||
-                     demux_IsForced( p_demux, "ac3" );
-
-    i_offset = stream_Tell( p_demux->s );
-
-    if( WavSkipHeader( p_demux, &i_skip ) )
-    {
-        if( !b_forced_demux )
-            return VLC_EGENERIC;
-    }
-
-    /* peek the begining (10 is for a52 header) */
-    if( stream_Peek( p_demux->s, &p_peek, i_skip + 10 ) < i_skip + 10 )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
-    if( !A52CheckSync( &p_peek[i_skip], &b_big_endian ) )
-    {
-        if( !b_forced_demux )
-            return VLC_EGENERIC;
-    }
-
-    *pi_offset = i_offset + i_skip;
-    return VLC_SUCCESS;
+    return GenericProbe( p_demux, pi_offset, ppsz_name, A52CheckSyncProbe, 10 );
 }
 
 static int A52Init( demux_t *p_demux )
@@ -735,6 +759,56 @@ static int A52Init( demux_t *p_demux )
     {
         A52CheckSync( p_peek, &p_sys->b_big_endian );
     }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * DTS
+ *****************************************************************************/
+static bool DtsCheckSync( const uint8_t *p_peek )
+{
+    /* 14 bits, little endian version of the bitstream */
+    if( p_peek[0] == 0xff && p_peek[1] == 0x1f &&
+        p_peek[2] == 0x00 && p_peek[3] == 0xe8 &&
+        (p_peek[4] & 0xf0) == 0xf0 && p_peek[5] == 0x07 )
+    {
+        return true;
+    }
+    /* 14 bits, big endian version of the bitstream */
+    else if( p_peek[0] == 0x1f && p_peek[1] == 0xff &&
+             p_peek[2] == 0xe8 && p_peek[3] == 0x00 &&
+             p_peek[4] == 0x07 && (p_peek[5] & 0xf0) == 0xf0)
+    {
+        return true;
+    }
+    /* 16 bits, big endian version of the bitstream */
+    else if( p_peek[0] == 0x7f && p_peek[1] == 0xfe &&
+             p_peek[2] == 0x80 && p_peek[3] == 0x01 )
+    {
+        return true;
+    }
+    /* 16 bits, little endian version of the bitstream */
+    else if( p_peek[0] == 0xfe && p_peek[1] == 0x7f &&
+             p_peek[2] == 0x01 && p_peek[3] == 0x80 )
+    {
+        return true;
+    }
+
+    return false;
+}
+
+static int DtsProbe( demux_t *p_demux, int64_t *pi_offset )
+{
+    const char *ppsz_name[] = { "dts", NULL };
+
+    return GenericProbe( p_demux, pi_offset, ppsz_name, DtsCheckSync, 11 );
+}
+static int DtsInit( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->i_packet_size = 16384;
+
     return VLC_SUCCESS;
 }
 
