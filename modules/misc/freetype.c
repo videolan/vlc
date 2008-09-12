@@ -3128,9 +3128,12 @@ static int GetFontSize( filter_t *p_filter )
     else
     {
         var_Get( p_filter, "freetype-rel-fontsize", &val );
-        i_size = (int)p_filter->fmt_out.video.i_height / val.i_int;
-        p_filter->p_sys->i_display_height =
-            p_filter->fmt_out.video.i_height;
+        if( val.i_int  > 0 )
+        {
+            i_size = (int)p_filter->fmt_out.video.i_height / val.i_int;
+            p_filter->p_sys->i_display_height =
+                p_filter->fmt_out.video.i_height;
+        }
     }
     if( i_size <= 0 )
     {
