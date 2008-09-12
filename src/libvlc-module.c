@@ -2130,7 +2130,7 @@ vlc_module_begin();
 #   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'l'
 
 /* the macosx-interface already has bindings */
-#   define KEY_ZOOM_QUARTER       KEY_UNSET 
+#   define KEY_ZOOM_QUARTER       KEY_UNSET
 #   define KEY_ZOOM_HALF          KEY_UNSET
 #   define KEY_ZOOM_ORIGINAL      KEY_UNSET
 #   define KEY_ZOOM_DOUBLE        KEY_UNSET
@@ -2169,7 +2169,14 @@ vlc_module_begin();
 #   define KEY_MENU_DOWN          KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_DOWN
 #   define KEY_MENU_SELECT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_ENTER
 
-#else
+#else /* Non Mac OS X */
+    /*
+       You should try to avoid Ctrl + letter key, because they are usually for
+       dialogs showing and interface related stuffs.
+       It would be nice (less important than previous rule) to try to avoid
+       alt + letter key, because they are usually for menu accelerators and you
+       don't know how the translator is going to do it.
+     */
 #   define KEY_TOGGLE_FULLSCREEN  'f'
 #   define KEY_LEAVE_FULLSCREEN   KEY_ESC
 #   define KEY_PLAY_PAUSE         KEY_SPACE
@@ -2212,30 +2219,41 @@ vlc_module_begin();
 #   define KEY_DEINTERLACE        'd'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          KEY_MODIFIER_SHIFT|'i'
-#   define KEY_DISC_MENU          KEY_MODIFIER_ALT|'r'
-#   define KEY_TITLE_PREV         KEY_MODIFIER_ALT|'o'
-#   define KEY_TITLE_NEXT         KEY_MODIFIER_ALT|'b'
-#   define KEY_CHAPTER_PREV       KEY_MODIFIER_ALT|'p'
-#   define KEY_CHAPTER_NEXT       KEY_MODIFIER_ALT|'n'
-#   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|'s'
+#   define KEY_DISC_MENU          KEY_MODIFIER_SHIFT|'m'
+#   define KEY_TITLE_PREV         KEY_MODIFIER_SHIFT|'o'
+#   define KEY_TITLE_NEXT         KEY_MODIFIER_SHIFT|'b'
+#   define KEY_CHAPTER_PREV       KEY_MODIFIER_SHIFT|'p'
+#   define KEY_CHAPTER_NEXT       KEY_MODIFIER_SHIFT|'n'
+#   define KEY_SNAPSHOT           KEY_MODIFIER_SHIFT|'s'
 
 #   define KEY_ZOOM               'z'
 #   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
 
-#   define KEY_CROP_TOP           KEY_MODIFIER_ALT|'i'
-#   define KEY_UNCROP_TOP         KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'i'
-#   define KEY_CROP_LEFT          KEY_MODIFIER_ALT|'j'
-#   define KEY_UNCROP_LEFT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'j'
-#   define KEY_CROP_BOTTOM        KEY_MODIFIER_ALT|'k'
-#   define KEY_UNCROP_BOTTOM      KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'k'
-#   define KEY_CROP_RIGHT         KEY_MODIFIER_ALT|'l'
-#   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'l'
+#   define KEY_AUDIODEVICE_CYCLE  KEY_MODIFIER_SHIFT|'a'
 
+#   define KEY_HISTORY_BACK       KEY_MODIFIER_SHIFT|'g'
+#   define KEY_HISTORY_FORWARD    KEY_MODIFIER_SHIFT|'h'
+#   define KEY_RECORD             KEY_MODIFIER_SHIFT|'r'
+#   define KEY_DUMP               KEY_MODIFIER_SHIFT|'d'
+#   define KEY_WALLPAPER          'w'
+
+/* Cropping */
+#   define KEY_CROP_TOP           KEY_MODIFIER_ALT|'r'
+#   define KEY_UNCROP_TOP         KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'r'
+#   define KEY_CROP_LEFT          KEY_MODIFIER_ALT|'d'
+#   define KEY_UNCROP_LEFT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'d'
+#   define KEY_CROP_BOTTOM        KEY_MODIFIER_ALT|'c'
+#   define KEY_UNCROP_BOTTOM      KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'c'
+#   define KEY_CROP_RIGHT         KEY_MODIFIER_ALT|'f'
+#   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'f'
+
+/* Zooming */
 #   define KEY_ZOOM_QUARTER       KEY_MODIFIER_CTRL|'1'
 #   define KEY_ZOOM_HALF          KEY_MODIFIER_CTRL|'2'
 #   define KEY_ZOOM_ORIGINAL      KEY_MODIFIER_CTRL|'3'
 #   define KEY_ZOOM_DOUBLE        KEY_MODIFIER_CTRL|'4'
 
+/* Bookmarks */
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_CTRL|KEY_F2
 #   define KEY_SET_BOOKMARK3      KEY_MODIFIER_CTRL|KEY_F3
@@ -2256,20 +2274,15 @@ vlc_module_begin();
 #   define KEY_PLAY_BOOKMARK8     KEY_F8
 #   define KEY_PLAY_BOOKMARK9     KEY_F9
 #   define KEY_PLAY_BOOKMARK10    KEY_F10
-#   define KEY_HISTORY_BACK       KEY_MODIFIER_ALT|'g'
-#   define KEY_HISTORY_FORWARD    KEY_MODIFIER_ALT|'h'
-#   define KEY_RECORD             KEY_MODIFIER_CTRL|KEY_MODIFIER_SHIFT|'r'
-#   define KEY_DUMP               KEY_MODIFIER_CTRL|KEY_MODIFIER_SHIFT|'d'
-#   define KEY_WALLPAPER          'w'
 
-#   define KEY_MENU_ON            KEY_MODIFIER_ALT|'m'
-#   define KEY_MENU_OFF           KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'m'
+/* OSD menu */
+#   define KEY_MENU_ON            KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'m'
+#   define KEY_MENU_OFF           KEY_MODIFIER_ALT|KEY_MODIFIER_CTRL|'m'
 #   define KEY_MENU_RIGHT         KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_RIGHT
 #   define KEY_MENU_LEFT          KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_LEFT
 #   define KEY_MENU_UP            KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_UP
 #   define KEY_MENU_DOWN          KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_DOWN
 #   define KEY_MENU_SELECT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_ENTER
-#   define KEY_AUDIODEVICE_CYCLE  KEY_MODIFIER_ALT|'a'
 #endif
 
     add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, NULL, TOGGLE_FULLSCREEN_KEY_TEXT,
@@ -2418,15 +2431,15 @@ vlc_module_begin();
              LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT, false );
 
     set_section ( N_("Zoom" ), NULL );
-    add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER, NULL, 
+    add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER, NULL,
         ZOOM_QUARTER_KEY_TEXT,  NULL, false );
-    add_key( "key-zoom-half",     KEY_ZOOM_HALF, NULL, 
+    add_key( "key-zoom-half",     KEY_ZOOM_HALF, NULL,
         ZOOM_HALF_KEY_TEXT,     NULL, false );
-    add_key( "key-zoom-original", KEY_ZOOM_ORIGINAL, NULL, 
+    add_key( "key-zoom-original", KEY_ZOOM_ORIGINAL, NULL,
         ZOOM_ORIGINAL_KEY_TEXT, NULL, false );
-    add_key( "key-zoom-double",   KEY_ZOOM_DOUBLE, NULL, 
+    add_key( "key-zoom-double",   KEY_ZOOM_DOUBLE, NULL,
         ZOOM_DOUBLE_KEY_TEXT,   NULL, false );
-    
+
     set_section ( N_("Jump sizes" ), NULL );
     add_integer( "extrashort-jump-size", 3, NULL, JIEXTRASHORT_TEXT,
                                     JIEXTRASHORT_LONGTEXT, false );
@@ -2533,7 +2546,7 @@ vlc_module_begin();
     N_("resets the current plugins cache")
 #define VERSION_TEXT \
     N_("print version information")
- 
+
     add_bool( "help", false, NULL, HELP_TEXT, "", false );
         change_short( 'h' );
         change_internal();
