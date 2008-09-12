@@ -615,7 +615,7 @@ QMenu *QVLCMenu::HelpMenu( QMenu *current )
 #endif
     menu->addSeparator();
     addDPStaticEntry( menu, qtr( I_MENU_ABOUT ), "", ":/info",
-            SLOT( aboutDialog() ), "Ctrl+F1" );
+            SLOT( aboutDialog() ), "Shift+F1" );
     return menu;
 }
 
