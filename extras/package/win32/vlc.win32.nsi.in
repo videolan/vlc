@@ -240,7 +240,6 @@ FunctionEnd
   !insertmacro ${_action} ".mts"
   !insertmacro ${_action} ".mxf"
   !insertmacro ${_action} ".ogm"
-  !insertmacro ${_action} ".ps"
   !insertmacro ${_action} ".ts"
   !insertmacro ${_action} ".vob"
   !insertmacro ${_action} ".wmv"
