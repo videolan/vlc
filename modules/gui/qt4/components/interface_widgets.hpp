@@ -390,7 +390,9 @@ private:
 public slots:
     void requestUpdate() { emit updateRequested(); };
     void update( input_item_t* p_item )
-            { p_input = p_item; requestUpdate(); }
+            { if( p_input ) vlc_gc_decref( p_input );
+              if( ( p_input = p_item ) ) vlc_gc_incref( p_input );
+              requestUpdate(); }
 
 private slots:
     void doUpdate();
