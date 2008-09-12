@@ -773,7 +773,7 @@ void SPrefsPanel::assoDialog()
 
     aTa( ".a52" ); aTa( ".aac" ); aTa( ".ac3" ); aTa( ".dts" ); aTa( ".flac" );
     aTa( ".m4a" ); aTa( ".m4p" ); aTa( ".mka" ); aTa( ".mod" ); aTa( ".mp1" );
-    aTa( ".mp2" ); aTa( ".mp3" ); aTa( ".oma" ); aTa( ".ogg" ); aTa( ".spx" );
+    aTa( ".mp2" ); aTa( ".mp3" ); aTa( ".oma" ); aTa( ".oga" ); aTa( ".spx" );
     aTa( ".wav" ); aTa( ".wma" ); aTa( ".xm" );
     audioType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
@@ -785,7 +785,8 @@ void SPrefsPanel::assoDialog()
     aTv( ".gxf" ); aTv( ".m1v" ); aTv( ".m2v" ); aTv( ".m2ts" ); aTv( ".m4v" );
     aTv( ".mkv" ); aTv( ".mov" ); aTv( ".mp2" ); aTv( ".mp4" ); aTv( ".mpeg" );
     aTv( ".mpeg1" ); aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" );
-    aTv( ".mts" ); aTv( ".mxf" ); aTv( ".ogm" ); aTv( ".ts" );
+    aTv( ".mts" ); aTv( ".mxf" );
+    aTv( ".ogg" ); aTv( ".ogm" ); aTv( ".ogx" ); aTv( ".ogv" );  aTv( ".ts" );
     aTv( ".vob" ); aTv( ".wmv" );
     videoType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
