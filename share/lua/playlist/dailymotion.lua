@@ -25,7 +25,12 @@
 function probe()
     return vlc.access == "http"
         and string.match( vlc.path, "dailymotion.com" ) 
-        and string.match( vlc.peek( 256 ), "<!DOCTYPE.*<title>Video " )
+        and string.match( vlc.peek( 2048 ), "<!DOCTYPE.*video_type" )
+end
+
+function find( haystack, needle )
+    local _,_,ret = string.find( haystack, needle )
+    return ret
 end
 
 -- Parse function.
@@ -36,8 +41,8 @@ function parse()
         if not line then break end
         if string.match( line, "param name=\"flashvars\" value=\".*video=" )
         then
-            arturl = vlc.strings.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*preview=([^&]*).*$", "%1" ) )
-            videos = vlc.strings.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*video=([^&]*).*$", "%1" ) )
+            arturl = vlc.strings.decode_uri( find( line, "param name=\"flashvars\" value=\".*preview=([^&]*)" ) )
+            videos = vlc.strings.decode_uri( find( line, "param name=\"flashvars\" value=\".*video=([^&]*)" ) )
        --[[ we get a list of different streams available, at various codecs
             and resolutions:
             /A@@spark||/B@@spark-mini||/C@@vp6-hd||/D@@vp6||/E@@h264
@@ -74,10 +79,13 @@ function parse()
                 path = "http://dailymotion.com" .. available[bestcodec]
             end
         end
+        if string.match( line, "<meta name=\"title\"" )
+        then
+            name = vlc.strings.resolve_xml_special_chars( find( line, "name=\"title\" content=\"(.-)\"" ) )
+        end
         if string.match( line, "<meta name=\"description\"" )
         then
-            name = vlc.strings.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ (.*) %w+ %w+ %w+ %w+ Videos\..*$", "%1" ) )
-            description = vlc.strings.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ .* %w+ %w+ %w+ %w+ Videos\. ([^\"]*)\".*$", "%1" ) )
+            description = vlc.strings.resolve_xml_special_chars( find( line, "name=\"description\" content=\"(.-)\"" ) )
         end
         if path and name and description and arturl then break end
     end

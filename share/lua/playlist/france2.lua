@@ -34,15 +34,16 @@ function parse()
         line = vlc.readline()
         if not line then break end
         if string.match( line, "class=\"editiondate\"" ) then
-            editiondate = string.gsub( line, "^.*<h1>(.*)</h1>.*$", "%1" )
+            _,_,editiondate = string.find( line, "<h1>(.-)</h1>" )
         end
         if string.match( line, "mms.*%.wmv" ) then
-            video = string.gsub( line, "^.*mms(.*%.wmv).*$", "mmsh%1" )
+            _,_,video = string.find( line, "mms(.-%.wmv)" )
+            video = "mmsh"..video
             table.insert( p, { path = video; name = editiondate } )
         end
         if string.match( line, "class=\"subjecttimer\"" ) then
             oldtime = time
-            time = string.gsub( line, "^.*href=\"([^\"]*)\".*$", "%1" )
+            _,_,time = string.find( line, "href=\"(.-)\"" )
             if oldtime then
                 table.insert( p, { path = video; name = name; duration = time - oldtime; options = { ':start-time='..tostring(oldtime); ':stop-time='..tostring(time) } } )
             end

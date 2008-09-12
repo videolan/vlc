@@ -23,7 +23,12 @@
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "trailers.apple.com" ) 
+        and string.match( vlc.path, "www.apple.com/trailers" ) 
+end
+
+function find( haystack, needle )
+    local _,_,r = string.find( haystack, needle )
+    return r
 end
 
 -- Parse function.
@@ -33,19 +38,17 @@ function parse()
     do 
         line = vlc.readline()
         if not line then break end
-        if string.match( line, "http://movies.apple.com/movies/.*%.mov" )
-        or string.match( line, "http://images.apple.com/movies/.*%.mov" )
-        then
-            if string.match( line, "http://movies.apple.com/movies/.*%.mov" ) then
-                path = vlc.strings.decode_uri( string.gsub( line, "^.*(http://movies.apple.com/movies/.*%.mov).*$", "%1" ) )
-            elseif string.match( line, "http://images.apple.com/movies/.*%.mov" ) then
-                path = vlc.strings.decode_uri( string.gsub( line, "^.*(http://images.apple.com/movies/.*%.mov).*$", "%1" ) )
-            end
-            if string.match( path, "480p" ) then
+        for path in string.gmatch( line, "http://movies.apple.com/movies/.-%.mov" ) do
+            path = vlc.strings.decode_uri( path )
+            if string.match( path, "320" ) then
+                extraname = " (320p)"
+            elseif string.match( path, "480" ) then
                 extraname = " (480p)"
-            elseif string.match( path, "720p" ) then
+            elseif string.match( path, "640" ) then
+                extraname = " (640p)"
+            elseif string.match( path, "720" ) then
                 extraname = " (720p)"
-            elseif string.match( path, "1080p" ) then
+            elseif string.match( path, "1080" ) then
                 extraname = " (1080p)"
             else
                 extraname = ""
@@ -54,11 +57,11 @@ function parse()
         end
         if string.match( line, "<title>" )
         then
-            title = vlc.strings.decode_uri( string.gsub( line, "^.*<title>([^<]*).*$", "%1" ) )
+            title = vlc.strings.decode_uri( find( line, "<title>(.-)<" ) )
         end
         if string.match( line, "<meta name=\"Description\"" )
         then
-            description = vlc.strings.resolve_xml_special_chars( string.gsub( line, "^.*name=\"Description\" content=\"([^\"]*)\".*$", "%1" ) )
+            description = vlc.strings.resolve_xml_special_chars( find( line, "name=\"Description\" content=\"(.-)\"" ) )
         end
     end
     return p

@@ -19,7 +19,8 @@
 --]]
 
 function get_url_param( url, name )
-    return string.gsub( url, "^.*[&?]"..name.."=([^&]*).*$", "%1" )
+    local _,_,ret = string.find( url, "[&?]"..name.."=([^&]*)" )
+    return ret
 end
 
 -- Probe function.
@@ -51,22 +52,22 @@ function parse()
             if not line then break end
             if string.match( line, "media:content.*flv" )
             then
-                local s = string.gsub( line, "^.*<media:content(.-)/>.*$", "%1" )
+                local _,_,s = string.find( line, "<media:content(.-)/>" )
                 path = vlc.strings.resolve_xml_special_chars(get_arg( s, "url" ))
                 duration = get_arg( s, "duration" )
             end
             if string.match( line, "media:thumbnail" )
             then
-                local s = string.gsub( line, "^.*<media:thumbnail(.-)/>.*$", "%1" )
+                local _,_,s = string.find( line, "<media:thumbnail(.-)/>" )
                 arturl = vlc.strings.resolve_xml_special_chars(get_arg( s, "url" ))
             end
             if string.match( line, "media:title" )
             then
-                name = string.gsub( line, "^.*<media:title>(.-)</media:title>.*$", "%1" )
+                _,_,name = string.find( line, "<media:title>(.-)</media:title>" )
             end
             if string.match( line, "media:description" )
             then
-                description = string.gsub( line, "^.*<media:description>(.-)</media:description>.*$", "%1" )
+                _,_,description = string.find( line, "<media:description>(.-)</media:description>" )
             end
         end
         return { { path = path; name = name; arturl = arturl; duration = duration; description = description } }

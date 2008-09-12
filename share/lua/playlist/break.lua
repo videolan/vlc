@@ -21,7 +21,7 @@
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "www.break.com" ) 
+        and string.match( vlc.path, "break.com" ) 
 end
 
 -- Parse function.
@@ -34,19 +34,20 @@ function parse()
         line = vlc.readline()
         if not line then break end
         if string.match( line, "sGlobalContentFilePath=" ) then
-            filepath= string.gsub( line, ".*sGlobalContentFilePath='([^']*).*", "%1" )
+            _,_,filepath= string.find( line, "sGlobalContentFilePath='(.-)'" )
         end
         if string.match( line, "sGlobalFileName=" ) then
-            filename = string.gsub( line, ".*sGlobalFileName='([^']*).*", "%1")
+            _,_,filename = string.find( line, ".*sGlobalFileName='(.-)'")
         end
         if string.match( line, "sGlobalContentTitle=" ) then
-            filetitle = string.gsub( line, ".*sGlobalContentTitle='([^']*).*", "%1")
+            _,_,filetitle = string.find( line, "sGlobalContentTitle='(.-)'")
         end
         if string.match( line, "el=\"videothumbnail\" href=\"" ) then
-            arturl = string.gsub( line, ".*el=\"videothumbnail\" href=\"([^\"]*).*", "%1" )
+            _,_,arturl = string.find( line, "el=\"videothumbnail\" href=\"(.-)\"" )
         end
         if string.match( line, "videoPath" ) then
-            return { { path = ( string.gsub( line, ".*videoPath', '([^']*).*", "%1" ) )..filepath.."/"..filename..".flv"; title = filetitle; arturl = arturl } }
+            _,_,videopath = string.find( line, ".*videoPath', '(.-)'" )
+            return { { path = videopath..filepath.."/"..filename..".flv"; title = filetitle; arturl = arturl } }
         end
     end
 end

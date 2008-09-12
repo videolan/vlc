@@ -45,7 +45,7 @@ function fetch_art()
     local page = s:read( 65653 )
 
     -- FIXME: multiple results may be available
-    asin = string.gsub( page, "^.*<asin>([^<]*)</asin>.*$", "%1" )
+    _,_,asin = string.find( page, "<asin>(.-)</asin>" )
     if asin ~= page then
         return "http://images.amazon.com/images/P/"..asin..".01._SCLZZZZZZZ_.jpg"
     else

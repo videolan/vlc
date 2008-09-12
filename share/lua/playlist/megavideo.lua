@@ -31,7 +31,7 @@ function parse()
 
     -- we have to get the xml
     if string.match( vlc.path, "www.megavideo.com.*&v=.*&u=.*" ) then
-        id = string.gsub( vlc.path, "www.megavideo.com.*v=([^&]*).*$", "%1" )
+        _,_,id = string.find( vlc.path, "www.megavideo.com.*v=([^&]*)" )
         path = "http://www.megavideo.com/xml/videolink.php?v=" .. id
         return { { path = path } }
     end
@@ -51,7 +51,7 @@ function parse()
                 line = vlc.readline()
             end
             -- now gets the encoded url
-            s = string.gsub( xml, ".*ROW url=\"([^\"]*).*", "%1" )
+            _,_,s = string.find( xml, ".*ROW url=\"(.-)\"" )
             path = ""
             i = 1
             while s:byte(i) do

@@ -27,8 +27,9 @@ end
 function parse()
     p = {}
     --vlc.msg.dbg( vlc.path )
-    if string.match( vlc.path, "www.canalplus.fr/index.php%?pid=" )
+    if string.match( vlc.path, "www.canalplus.fr/.*%?pid=.*" )
     then -- This is the HTML page's URL
+        local _,_,pid = string.find( vlc.path, "pid(%d-)%-" )
         local id, name, description, arturl
         while true do
             -- Try to find the video's title
@@ -37,12 +38,12 @@ function parse()
             -- vlc.msg.dbg( line )
             if string.match( line, "aVideos" ) then
                 if string.match( line, "CONTENT_ID.*=" ) then
-                    id = string.gsub( line, "^.*\"(.*)\".*$", "%1" )
+                    _,_,id = string.find( line, "\"(.-)\"" )
                 elseif string.match( line, "CONTENT_VNC_TITRE" ) then
-                    arturl = string.gsub( line, "^.*src=\"(.*)\".*$", "%1" )
-                    name = string.gsub( line, "^.*title=\"(.*)\".*$", "%1" )
+                    _,_,arturl = string.find( line, "src=\"(.-)\"" )
+                    _,_,name = string.find( line, "title=\"(.-)\"" )
                 elseif string.match( line, "CONTENT_VNC_DESCRIPTION" ) then
-                    description = string.gsub( line, "^.*\"(.*)\".*$", "%1" )
+                    _,_,description = string.find( line, "\"(.-)\"" )
                 end
                 if id and string.match( line, "new Array" ) then
                     add_item( p, id, name, description, arturl )
@@ -63,16 +64,16 @@ function parse()
             if not line then break end
             --vlc.msg.dbg( line )
             if string.match( line, "<hi" ) then
-                local path = string.gsub( line, "^.*%[(.-)%].*$", "%1" )
+                local _,_,path = string.find( line, "%[(http.-)%]" )
                 return { { path = path } }
             end
         end
-        vlc.msg.err( "canalplus: can't find video in page" )
     end
 end
 
 function get_url_param( url, name )
-    return string.gsub( url, "^.*[&?]"..name.."=([^&]*).*$", "%1" )
+    local _,_,ret = string.find( url, "[&?]"..name.."=([^&]*)" )
+    return ret
 end
 
 function add_item( p, id, name, description, arturl )

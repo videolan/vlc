@@ -28,6 +28,7 @@ end
 
 -- Parse function.
 function parse()
+    vlc.msg.warn("FIXME")
     if string.match( vlc.path, "watch/" )
     then -- This is the HTML page's URL
         while true do
@@ -35,18 +36,19 @@ function parse()
             line = vlc.readline()
             if not line then break end
             if string.match( line, "<meta name=\"title\"" ) then
-                name = string.gsub( line, "^.*content=\"Metacafe %- ([^\"]*).*$", "%1" )  
+                _,_,name = string.find( line, "content=\"Metacafe %- (.-)\"" )  
             end
             if string.match( line, "<meta name=\"description\"" ) then
-                description = string.gsub( line, "^.*content=\"([^\"]*).*$", "%1" )  
+                _,_,description = string.find( line, "content=\"(.-)\"" )  
             end
             if string.match( line, "<link rel=\"image_src\"" ) then
-                arturl = string.gsub( line, "^.*href=\"([^\"]*)\".*$", "%1" )
+                _,_,arturl = string.find( line, "href=\"(.-)\"" )
             end
             if name and description and arturl then break end
         end
         return { { path = string.gsub( vlc.path, "^.*watch/(.*[^/])/?$", "http://www.metacafe.com/fplayer/%1.swf" ); name = name; description = description; arturl = arturl;  } }
     else -- This is the flash player's URL
-        return { { path = string.gsub( vlc.path, "^.*mediaURL=([^&]*).*$", "%1" ) } }
+        local _,_,path = string.find( vlc.path, "mediaURL=([^&]*)" )
+        return { { path = path } }
     end
 end
