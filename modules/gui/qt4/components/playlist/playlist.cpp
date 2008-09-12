@@ -64,7 +64,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     artContainer->setMaximumHeight( 128 );
 
     /* Art label */
-    art = new ArtLabel( p_intf );
+    art = new ArtLabel( artContainer, p_intf );
     art->setToolTip( qtr( "Double click to get media information" ) );
 
     artContLay->addWidget( art, 1 );

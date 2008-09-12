@@ -159,13 +159,5 @@ public slots:
     void update( input_item_t * );
     void clear();
 };
-class ArtCover : public QLabel
-{
-    Q_OBJECT
-    void mouseDoubleClickEvent( QMouseEvent *event )
-    {
-        fprintf(stderr, "**************************" );
-    }
-};
 
 #endif

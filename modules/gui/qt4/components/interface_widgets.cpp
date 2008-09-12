@@ -1467,8 +1467,10 @@ static int downloadCoverCallback( vlc_object_t *p_this,
     return VLC_SUCCESS;
 }
 
-CoverArtLabel::CoverArtLabel( vlc_object_t *_p_this, input_item_t *_p_input )
-        : p_this( _p_this), p_input( _p_input ), prevArt()
+CoverArtLabel::CoverArtLabel( QWidget *parent,
+                              vlc_object_t *_p_this,
+                              input_item_t *_p_input )
+        : QLabel( parent ), p_this( _p_this), p_input( _p_input ), prevArt()
 {
     setContextMenuPolicy( Qt::ActionsContextMenu );
     CONNECT( this, updateRequested(), this, doUpdate() );

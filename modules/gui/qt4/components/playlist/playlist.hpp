@@ -70,7 +70,8 @@ class ArtLabel : public CoverArtLabel
 {
     Q_OBJECT
 public:
-    ArtLabel( intf_thread_t *intf ) : CoverArtLabel( VLC_OBJECT( intf ) ) {};
+    ArtLabel( QWidget *parent, intf_thread_t *intf )
+            : CoverArtLabel( parent, VLC_OBJECT( intf ) ) {};
     virtual ~ArtLabel() {};
     void mouseDoubleClickEvent( QMouseEvent *event )
     {

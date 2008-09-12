@@ -106,7 +106,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     line++;
 
     /* ART_URL */
-    art_cover = new CoverArtLabel( VLC_OBJECT( p_intf ) );
+    art_cover = new CoverArtLabel( this, VLC_OBJECT( p_intf ) );
     metaLayout->addWidget( art_cover, line, 8, 4, 2, Qt::AlignRight );
 
 /* Settings is unused */
