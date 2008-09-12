@@ -430,7 +430,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
                        PLAYLIST_END, pl, pl_Unlocked );
         if( !go )
-            input_Read( THEPL, p_input, false );
+            input_Read( THEPL, p_input, true );
         vlc_gc_decref( p_input );
     }
 }
