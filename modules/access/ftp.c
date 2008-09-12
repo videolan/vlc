@@ -791,16 +791,13 @@ static int ftp_StopStream ( vlc_object_t *p_access, access_sys_t *p_sys )
 
     if( p_sys->fd_data != -1 )
     {
-        int i_answer;
-        ftp_ReadCommand( p_access, p_sys, &i_answer, NULL );
-        if ( i_answer != 227 )
-            /* If answer is from the previous command,
-             * rathen that succesful ABOR - read next command */
-            ftp_ReadCommand( p_access, p_sys, NULL, NULL );
-
         net_Close( p_sys->fd_data );
         p_sys->fd_data = -1;
+        /* Read the final response from RETR/STOR, i.e. 426 or 226 */
+        ftp_ReadCommand( p_access, p_sys, NULL, NULL );
     }
+    /* Read the response from ABOR, i.e. 226 or 225 */
+    ftp_ReadCommand( p_access, p_sys, NULL, NULL );
 
     return VLC_SUCCESS;
 }
