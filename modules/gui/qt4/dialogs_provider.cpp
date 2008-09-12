@@ -336,9 +336,12 @@ void DialogsProvider::PLAppendDialog()
                             ->showTab( OPEN_FILE_TAB );
 }
 
-/* Unimplemmented yet - Usefull ? */
 void DialogsProvider::MLAppendDialog()
-{}
+{
+    OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false,
+                            OPEN_AND_ENQUEUE, false, false )
+                                    ->showTab( OPEN_FILE_TAB );
+}
 
 /**
  * Simple open

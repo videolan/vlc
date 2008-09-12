@@ -62,7 +62,8 @@ class OpenDialog : public QVLCDialog
     Q_OBJECT;
 public:
     static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf,
-                                     bool b_rawInstance = false, int _action_flag = 0, bool b_selectMode = false  );
+                                bool b_rawInstance = false, int _action_flag = 0,
+                                bool b_selectMode = false, bool b_pl = true );
 
     static void killInstance()
     {
@@ -83,7 +84,7 @@ public slots:
 
 private:
     OpenDialog( QWidget *parent, intf_thread_t *, bool b_selectMode,
-                int _action_flag = 0 );
+                int _action_flag = 0, bool b_pl = true );
 
     static OpenDialog *instance;
     input_thread_t *p_input;
@@ -99,6 +100,7 @@ private:
     CaptureOpenPanel *captureOpenPanel;
 
     int i_action_flag;
+    bool b_pl;
     QStringList SeparateEntries( QString );
 
     QPushButton *cancelButton, *selectButton;
