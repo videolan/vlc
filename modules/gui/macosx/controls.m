@@ -499,6 +499,47 @@
 
 }
 
+- (IBAction)telxTransparent:(id)sender
+{
+    intf_thread_t * p_intf = VLCIntf;
+    vlc_object_t *p_vbi;
+    p_vbi = (vlc_object_t *) vlc_object_find_name( p_intf,
+                    "zvbi", FIND_ANYWHERE );
+    if( p_vbi )
+    {
+        var_SetBool( p_vbi, "vbi-opaque", [sender state] );
+        [sender setState: ![sender state]];
+        vlc_object_release( p_vbi );
+    }
+}
+
+- (IBAction)telxNavLink:(id)sender;
+{
+    intf_thread_t * p_intf = VLCIntf;
+    vlc_object_t *p_vbi;
+    int i_page = 0;
+
+    if( [[sender title] isEqualToString: _NS("Index")] )
+        i_page = 'i' << 16;
+    else if( [[sender title] isEqualToString: _NS("Red")] )
+        i_page = 'r' << 16;
+    else if( [[sender title] isEqualToString: _NS("Green")] )
+        i_page = 'g' << 16;
+    else if( [[sender title] isEqualToString: _NS("Yellow")] )
+        i_page = 'y' << 16;
+    else if( [[sender title] isEqualToString: _NS("Blue")] )
+        i_page = 'b' << 16;
+    if( i_page == 0 ) return;
+
+    p_vbi = (vlc_object_t *) vlc_object_find_name( p_intf,
+                "zvbi", FIND_ANYWHERE );
+    if( p_vbi )
+    {
+        var_SetInteger( p_vbi, "vbi-page", i_page );
+        vlc_object_release( p_vbi );
+    }
+}
+
 - (void)scrollWheel:(NSEvent *)theEvent
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -973,6 +1014,26 @@
             bEnabled = TRUE;
         }
         [o_main setupMenus]; /* Make sure video menu is up to date */
+    }
+
+    /* Special case for telx menu */
+    if( [[o_mi title] isEqualToString: _NS("Normal Size")] );
+    {
+        NSMenuItem *item = [[o_mi menu] itemWithTitle:_NS("Teletext")];
+        bool b_telx = false;
+        if( p_input )
+        {
+            const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+            const int i_spu_es = var_GetInteger( p_input, "spu-es" );
+
+            if( i_teletext_es >= 0 && i_teletext_es == i_spu_es )
+                b_telx = true;
+        }
+        [[item submenu] setAutoenablesItems:NO];
+        for( int k=0; k < [[item submenu] numberOfItems]; k++ )
+        {
+            [[[item submenu] itemAtIndex:k] setEnabled: b_telx];
+        }
     }
 
     if( p_input ) vlc_object_release( p_input );

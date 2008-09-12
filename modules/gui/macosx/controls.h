@@ -88,6 +88,10 @@
 - (IBAction)toogleFullscreen:(id)sender;
 - (BOOL) isFullscreen;
 - (IBAction)windowAction:(id)sender;
+
+- (IBAction)telxTransparent:(id)sender;
+- (IBAction)telxNavLink:(id)sender;
+
 - (BOOL)keyEvent:(NSEvent *)o_event;
 - (void)scrollWheel: (NSEvent *)theEvent;
 

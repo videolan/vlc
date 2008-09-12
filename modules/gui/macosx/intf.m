@@ -582,6 +582,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mu_deinterlace setTitle: _NS("Deinterlace")];
     [o_mi_ffmpeg_pp setTitle: _NS("Post processing")];
     [o_mu_ffmpeg_pp setTitle: _NS("Post processing")];
+    [o_mi_teletext setTitle: _NS("Teletext")];
+    [o_mi_teletext_transparent setTitle: _NS("Transparent")];
+    [o_mi_teletext_index setTitle: _NS("Index")];
+    [o_mi_teletext_red setTitle: _NS("Red")];
+    [o_mi_teletext_green setTitle: _NS("Green")];
+    [o_mi_teletext_yellow setTitle: _NS("Yellow")];
+    [o_mi_teletext_blue setTitle: _NS("Blue")];
 
     [o_mu_window setTitle: _NS("Window")];
     [o_mi_minimize setTitle: _NS("Minimize Window")];

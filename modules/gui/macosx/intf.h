@@ -253,6 +253,13 @@ struct intf_sys_t
     IBOutlet NSMenu * o_mu_deinterlace;
     IBOutlet NSMenuItem * o_mi_ffmpeg_pp;
     IBOutlet NSMenuItem * o_mu_ffmpeg_pp;
+    IBOutlet NSMenuItem * o_mi_teletext;
+    IBOutlet NSMenuItem * o_mi_teletext_transparent;
+    IBOutlet NSMenuItem * o_mi_teletext_index;
+    IBOutlet NSMenuItem * o_mi_teletext_red;
+    IBOutlet NSMenuItem * o_mi_teletext_green;
+    IBOutlet NSMenuItem * o_mi_teletext_yellow;
+    IBOutlet NSMenuItem * o_mi_teletext_blue;
 
     IBOutlet NSMenu * o_mu_window;
     IBOutlet NSMenuItem * o_mi_minimize;
