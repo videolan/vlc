@@ -80,7 +80,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     const uint8_t *p_peek;
-    vlc_value_t val;
+    es_format_t fmt;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
@@ -103,17 +103,17 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_dts       = 1;
 
     /*  Load the mpeg4video packetizer */
-    INIT_VPACKETIZER( p_sys->p_packetizer, 'm', 'p', '4', 'v' );
-    es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
-
-    LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "mpeg4 video" );
+    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', '4', 'v' ) );
+    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "mpeg4 video" );
+    if( !p_sys->p_packetizer )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     /* We need to wait until we get p_extra (VOL header) from the packetizer
      * before we create the output */
-
-    var_Create( p_demux, "m4v-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "m4v-fps", &val );
-    p_sys->f_fps = val.f_float;
+    p_sys->f_fps = var_CreateGetFloat( p_demux, "m4v-fps" );
 
     return VLC_SUCCESS;
 }
@@ -126,8 +126,7 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    DESTROY_PACKETIZER( p_sys->p_packetizer) ;
-
+    demux_PacketizerDestroy( p_sys->p_packetizer );
     free( p_sys );
 }
 

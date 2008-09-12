@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_codec.h>
 
 #include "input_internal.h"
 
@@ -567,6 +568,43 @@ static void* DStreamThread( vlc_object_t* p_this )
 /****************************************************************************
  * Utility functions
  ****************************************************************************/
+decoder_t *demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg )
+{
+    decoder_t *p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER );
+
+    if( !p_packetizer )
+    {
+        es_format_Clean( p_fmt );
+        return NULL;
+    }
+
+    p_packetizer->pf_decode_audio = NULL;
+    p_packetizer->pf_decode_video = NULL;
+    p_packetizer->pf_decode_sub = NULL;
+    p_packetizer->pf_packetize = NULL;
+
+    p_packetizer->fmt_in = *p_fmt;
+    es_format_Init( &p_packetizer->fmt_out, UNKNOWN_ES, 0 );
+
+    p_packetizer->p_module = module_Need( p_packetizer, "packetizer", NULL, 0 );
+    if( !p_packetizer->p_module )
+    {
+        es_format_Clean( p_fmt );
+        vlc_object_release( p_packetizer );
+        msg_Err( p_demux, "cannot find packetizer for %s", psz_msg );
+        return NULL;
+    }
+
+    return p_packetizer;
+}
+void demux_PacketizerDestroy( decoder_t *p_packetizer )
+{
+    if( p_packetizer->p_module )
+        module_Unneed( p_packetizer, p_packetizer->p_module );
+    es_format_Clean( &p_packetizer->fmt_in );
+    vlc_object_release( p_packetizer );
+}
+
 static bool SkipID3Tag( demux_t *p_demux )
 {
     const uint8_t *p_peek;

@@ -80,7 +80,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     const uint8_t *p_peek;
-    vlc_value_t val;
+    es_format_t fmt;
 
     if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
 
@@ -103,16 +103,19 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es        = NULL;
     p_sys->i_dts       = 1;
-    var_Create( p_demux, "h264-fps", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "h264-fps", &val );
-    p_sys->f_fps = val.f_float;
-    if( val.f_float < 0.001 ) p_sys->f_fps = 0.001;
+    p_sys->f_fps       = var_CreateGetFloat( p_demux, "h264-fps" );
+    if( p_sys->f_fps < 0.001 )
+        p_sys->f_fps = 0.001;
     msg_Dbg( p_demux, "using %.2f fps", p_sys->f_fps );
 
     /* Load the mpegvideo packetizer */
-    INIT_VPACKETIZER( p_sys->p_packetizer,  'h', '2', '6', '4'  );
-    es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
-    LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "H264" );
+    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'h', '2', '6', '4' ) );
+    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "h264" );
+    if( !p_sys->p_packetizer )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
@@ -125,8 +128,7 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    DESTROY_PACKETIZER( p_sys->p_packetizer );
-
+    demux_PacketizerDestroy( p_sys->p_packetizer );
     free( p_sys );
 }
 

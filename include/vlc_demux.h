@@ -174,6 +174,21 @@ static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
     return true;
 }
 
+/**
+ * This function will create a packetizer suitable for a demuxer that parses
+ * elementary stream.
+ *
+ * The provided es_format_t will be cleaned on error or by
+ * demux_PacketizerDestroy.
+ */
+VLC_EXPORT( decoder_t *,demux_PacketizerNew, ( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) );
+
+/**
+ * This function will destroy a packetizer create by demux_PacketizerNew.
+ */
+VLC_EXPORT( void, demux_PacketizerDestroy, ( decoder_t *p_packetizer ) );
+
+/* */
 #define DEMUX_INIT_COMMON() do {            \
     p_demux->pf_control = Control;          \
     p_demux->pf_demux = Demux;              \
@@ -217,39 +232,6 @@ static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
         msg_Dbg( p_demux, "not enough data" ); goto error; }
 
 #define POKE( peek, stuff, size ) (strncasecmp( (const char *)peek, stuff, size )==0)
-
-#define COMMON_INIT_PACKETIZER( location ) \
-    location = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER ); \
-    location->pf_decode_audio = 0; \
-    location->pf_decode_video = 0; \
-    location->pf_decode_sub = 0; \
-    location->pf_packetize = 0; \
-
-#define INIT_APACKETIZER( location, a,b,c,d ) \
-    COMMON_INIT_PACKETIZER(location ); \
-    es_format_Init( &location->fmt_in, AUDIO_ES, \
-                    VLC_FOURCC( a, b, c, d ) );
-
-#define INIT_VPACKETIZER( location, a,b,c,d ) \
-    COMMON_INIT_PACKETIZER(location ); \
-    es_format_Init( &location->fmt_in, VIDEO_ES, \
-                    VLC_FOURCC( a, b, c, d ) );
-
-/* BEWARE ! This can lead to memory leaks ! */
-#define LOAD_PACKETIZER_OR_FAIL( location, msg ) \
-    location->p_module = \
-        module_Need( location, "packetizer", NULL, 0 ); \
-    if( location->p_module == NULL ) \
-    { \
-        vlc_object_release( location ); \
-        msg_Err( p_demux, "cannot find packetizer for " # msg ); \
-        free( p_sys ); \
-        return VLC_EGENERIC; \
-    }
-
-#define DESTROY_PACKETIZER( location ) \
-    if( location->p_module ) module_Unneed( location, location->p_module ); \
-    vlc_object_release( location );
 
 /**
  * @}

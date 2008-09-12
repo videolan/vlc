@@ -79,7 +79,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     const uint8_t *p_peek;
-    vlc_value_t val;
+    es_format_t fmt;
 
     if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
 
@@ -103,13 +103,17 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es        = NULL;
     p_sys->i_dts       = 1;
     p_sys->f_fps = var_CreateGetFloat( p_demux, "vc1-fps" );
-    if( val.f_float < 0.001 ) p_sys->f_fps = 0.0;
+    if( p_sys->f_fps < 0.001 )
+        p_sys->f_fps = 0.0;
 
     /* Load the packetizer */
-    INIT_VPACKETIZER( p_sys->p_packetizer,  'W', 'V', 'C', '1'  );
-    es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
-    LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "VC-1" );
-
+    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'W', 'V', 'C', '1' ) );
+    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "VC-1" );
+    if( !p_sys->p_packetizer )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
@@ -121,8 +125,7 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    DESTROY_PACKETIZER( p_sys->p_packetizer );
-
+    demux_PacketizerDestroy( p_sys->p_packetizer );
     free( p_sys );
 }
 

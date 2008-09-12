@@ -131,39 +131,6 @@ static const codec_t p_codec[] = {
     { 0, false, NULL, NULL, NULL }
 };
 
-static inline decoder_t *demux_PacketizerNew( demux_t *p_demux, int i_cat, vlc_fourcc_t i_codec, const char *psz_msg )
-{
-    decoder_t *p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER );
-
-    if( !p_packetizer )
-        return NULL;
-
-    p_packetizer->pf_decode_audio = NULL;
-    p_packetizer->pf_decode_video = NULL;
-    p_packetizer->pf_decode_sub = NULL;
-    p_packetizer->pf_packetize = NULL;
-
-    es_format_Init( &p_packetizer->fmt_in, i_cat, i_codec );
-    es_format_Init( &p_packetizer->fmt_out, UNKNOWN_ES, 0 );
-
-    p_packetizer->p_module = module_Need( p_packetizer, "packetizer", NULL, 0 );
-    if( !p_packetizer->p_module )
-    {
-        vlc_object_release( p_packetizer );
-        msg_Err( p_demux, "cannot find packetizer for %s", psz_msg );
-        return NULL;
-    }
-
-    return p_packetizer;
-}
-
-static inline void demux_PacketizerDestroy( decoder_t *p_packetizer )
-{
-    if( p_packetizer->p_module )
-        module_Unneed( p_packetizer, p_packetizer->p_module );
-    vlc_object_release( p_packetizer );
-}
-
 /*****************************************************************************
  * Open: initializes demux structures
  *****************************************************************************/
@@ -172,6 +139,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
+    es_format_t fmt;
     int64_t i_offset;
     int i_index;
 
@@ -209,8 +177,8 @@ static int Open( vlc_object_t * p_this )
     msg_Dbg( p_demux, "detected format %4.4s", (const char*)&p_sys->codec.i_codec );
 
     /* Load the audio packetizer */
-    p_sys->p_packetizer = demux_PacketizerNew( p_demux, AUDIO_ES, p_sys->codec.i_codec,
-                                               p_sys->codec.psz_name );
+    es_format_Init( &fmt, AUDIO_ES, p_sys->codec.i_codec );
+    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, p_sys->codec.psz_name );
     if( !p_sys->p_packetizer )
     {
         free( p_sys );

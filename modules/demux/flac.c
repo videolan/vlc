@@ -103,6 +103,7 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_peek;
     uint8_t     *p_streaminfo;
     int         i_streaminfo;
+    es_format_t fmt;
 
     /* Have a peep at the show. */
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
@@ -140,21 +141,16 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Load the FLAC packetizer */
-    INIT_APACKETIZER( p_sys->p_packetizer, 'f', 'l', 'a', 'c' );
-
     /* Store STREAMINFO for the decoder and packetizer */
     p_streaminfo[4] |= 0x80; /* Fake this as the last metadata block */
-    p_sys->p_packetizer->fmt_in.i_extra = i_streaminfo;
-    p_sys->p_packetizer->fmt_in.p_extra = p_streaminfo;
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
+    fmt.i_extra = i_streaminfo;
+    fmt.p_extra = p_streaminfo;
 
-    p_sys->p_packetizer->p_module =
-        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
-    if( !p_sys->p_packetizer->p_module )
+    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "flac" );
+    if( !p_sys->p_packetizer )
     {
-        free( p_sys->p_packetizer->fmt_in.p_extra );
-        vlc_object_release( p_sys->p_packetizer );
-
-        msg_Err( p_demux, "cannot find flac packetizer" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -186,13 +182,9 @@ static void Close( vlc_object_t * p_this )
         free( p_sys->attachments[i] );
     TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
-    /* Unneed module */
-    module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
-
-    free( p_sys->p_packetizer->fmt_in.p_extra );
-
     /* Delete the decoder */
-    vlc_object_release( p_sys->p_packetizer );
+    demux_PacketizerDestroy( p_sys->p_packetizer );
+
     if( p_sys->p_meta )
         vlc_meta_Delete( p_sys->p_meta );
     free( p_sys );
