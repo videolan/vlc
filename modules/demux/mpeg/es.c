@@ -45,12 +45,16 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( N_("MPEG audio / MP3 demuxer" ) );
+    set_description( N_("MPEG-I/II/4 audio" ) );
     set_capability( "demux", 100 );
     set_callbacks( Open, Close );
 
     add_shortcut( "mpga" );
     add_shortcut( "mp3" );
+
+    add_shortcut( "m4a" );
+    add_shortcut( "mp4a" );
+    add_shortcut( "aac" );
 
     //add_shortcut( "ac3" );
     //add_shortcut( "a52" );
@@ -62,8 +66,18 @@ vlc_module_end();
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int, va_list );
 
+typedef struct
+{
+    vlc_fourcc_t i_codec;
+    const char *psz_name;
+    int  (*pf_probe)( demux_t *p_demux, int64_t *pi_offset );
+    int  (*pf_init)( demux_t *p_demux );
+} codec_t;
+
 struct demux_sys_t
 {
+    codec_t codec;
+
     es_out_id_t *p_es;
 
     bool  b_start;
@@ -97,6 +111,49 @@ struct demux_sys_t
 static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset );
 static int MpgaInit( demux_t *p_demux );
 
+static int AacProbe( demux_t *p_demux, int64_t *pi_offset );
+static int AacInit( demux_t *p_demux );
+
+static const codec_t p_codec[] = {
+    { VLC_FOURCC( 'm', 'p', '4', 'a' ), "mp4 audio", AacProbe, AacInit },
+    { VLC_FOURCC( 'm', 'p', 'g', 'a' ), "mpeg audio", MpgaProbe, MpgaInit },
+
+    { 0, NULL, NULL, NULL }
+};
+
+static inline decoder_t *demux_PacketizerNew( demux_t *p_demux, int i_cat, vlc_fourcc_t i_codec, const char *psz_msg )
+{
+    decoder_t *p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER );
+
+    if( !p_packetizer )
+        return NULL;
+
+    p_packetizer->pf_decode_audio = NULL;
+    p_packetizer->pf_decode_video = NULL;
+    p_packetizer->pf_decode_sub = NULL;
+    p_packetizer->pf_packetize = NULL;
+
+    es_format_Init( &p_packetizer->fmt_in, i_cat, i_codec );
+    es_format_Init( &p_packetizer->fmt_out, UNKNOWN_ES, 0 );
+
+    p_packetizer->p_module = module_Need( p_packetizer, "packetizer", NULL, 0 );
+    if( !p_packetizer->p_module )
+    {
+        vlc_object_release( p_packetizer );
+        msg_Err( p_demux, "cannot find packetizer for %s", psz_msg );
+        return NULL;
+    }
+
+    return p_packetizer;
+}
+
+static inline void demux_PacketizerDestroy( decoder_t *p_packetizer )
+{
+    if( p_packetizer->p_module )
+        module_Unneed( p_packetizer, p_packetizer->p_module );
+    vlc_object_release( p_packetizer );
+}
+
 /*****************************************************************************
  * Open: initializes demux structures
  *****************************************************************************/
@@ -106,12 +163,20 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
 
     int64_t i_offset;
+    int i_index;
 
-    if( MpgaProbe( p_demux, &i_offset ) )
+    for( i_index = 0; p_codec[i_index].i_codec != 0; i_index++ )
+    {
+        if( !p_codec[i_index].pf_probe( p_demux, &i_offset ) )
+            break;
+    }
+
+    if( p_codec[i_index].i_codec == 0 )
         return VLC_EGENERIC;
 
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     memset( p_sys, 0, sizeof( demux_sys_t ) );
+    p_sys->codec = p_codec[i_index];
     p_sys->p_es = NULL;
     p_sys->b_start = true;
     p_sys->i_stream_offset = i_offset;
@@ -124,17 +189,20 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    if( MpgaInit( p_demux ) )
+    if( p_sys->codec.pf_init( p_demux ) )
     {
         free( p_sys );
         return VLC_EGENERIC;
     }
 
-    /* Load the mpeg audio packetizer */
-    INIT_APACKETIZER( p_sys->p_packetizer, 'm', 'p', 'g', 'a' );
-    es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
-    LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "mpga" );
-
+    /* Load the audio packetizer */
+    p_sys->p_packetizer = demux_PacketizerNew( p_demux, AUDIO_ES, p_sys->codec.i_codec,
+                                               p_sys->codec.psz_name );
+    if( !p_sys->p_packetizer )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
@@ -217,7 +285,7 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    DESTROY_PACKETIZER( p_sys->p_packetizer );
+    demux_PacketizerDestroy( p_sys->p_packetizer );
     free( p_sys );
 }
 
@@ -451,6 +519,52 @@ static int MpgaInit( demux_t *p_demux )
                  p_sys->xing.i_bytes, p_sys->xing.i_frames,
                  p_sys->xing.i_frame_samples );
     }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * AAC
+ *****************************************************************************/
+static int AacProbe( demux_t *p_demux, int64_t *pi_offset )
+{
+    bool   b_forced;
+    bool   b_forced_demux;
+
+    int64_t i_offset;
+    const uint8_t *p_peek;
+
+    b_forced = demux_IsPathExtension( p_demux, ".aac" ) ||
+               demux_IsPathExtension( p_demux, ".aacp" );
+    b_forced_demux = demux_IsForced( p_demux, "m4a" ) ||
+                     demux_IsForced( p_demux, "aac" ) ||
+                     demux_IsForced( p_demux, "mp4a" );
+
+    if( !b_forced_demux && !b_forced )
+        return VLC_EGENERIC;
+
+    i_offset = stream_Tell( p_demux->s );
+
+    /* peek the begining (10 is for adts header) */
+    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
+    {
+        msg_Err( p_demux, "cannot peek" );
+        return VLC_EGENERIC;
+    }
+    if( !strncmp( (char *)p_peek, "ADIF", 4 ) )
+    {
+        msg_Err( p_demux, "ADIF file. Not yet supported. (Please report)" );
+        return VLC_EGENERIC;
+    }
+
+    *pi_offset = i_offset;
+    return VLC_SUCCESS;
+}
+static int AacInit( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->i_packet_size = 4096;
+
     return VLC_SUCCESS;
 }
 
