@@ -1,12 +1,4 @@
 # Darwin rules
-download-all: autoconf gnumake automake libtool gettext pkgconfig freetype2 \
-    fribidi a52dec libmpeg2 libid3tag libmad libogg libvorbis libtheora flac \
-    speex libshout faad2 faac lame twolame libebml libmatroska ffmpeg libdca \
-    libdvdcss libdvdread libdvdnav libdvbpsi live libcaca libmodplug xml pcre \
-    asa jpeg tiff SDL zlib libpng libgpg-error libgcrypt opencdk gnutls \
-    libcddb libcdio vcdimager SDL_image glib gecko-sdk mpcdec \
-    dirac expat taglib x264 yasm goom lua zvbi fontconfig ncurses liboil \
-    schroedinger libass all
 all: .autoconf .gnumake .automake .libtool .intl .pkgcfg .freetype \
     .fribidi .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
     .flac .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
