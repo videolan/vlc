@@ -50,6 +50,7 @@ InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
     setTracking( true );
     setPosition( -1.0, 0, 0 );
     secstotimestr( psz_length, 0 );
+    setFocusPolicy( Qt::NoFocus );
     CONNECT( this, valueChanged(int), this, userDrag( int ) );
 }
 
