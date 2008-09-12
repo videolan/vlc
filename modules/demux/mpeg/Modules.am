@@ -1,13 +1,11 @@
-SOURCES_m4a = m4a.c
 SOURCES_m4v = m4v.c
-SOURCES_mpga = mpga.c
+SOURCES_es  = es.c
 SOURCES_mpgv = mpgv.c
 SOURCES_h264 = h264.c
 
 libvlc_LTLIBRARIES += \
-	libmpga_plugin.la \
+	libes_plugin.la \
 	libmpgv_plugin.la \
-	libm4a_plugin.la \
 	libm4v_plugin.la \
 	libh264_plugin.la \
 	$(NULL)

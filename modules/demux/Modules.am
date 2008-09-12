@@ -1,6 +1,4 @@
 SUBDIRS = asf avformat avi mp4 mpeg playlist
-SOURCES_a52sys = a52.c
-SOURCES_dtssys = dts.c
 SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c
 SOURCES_demuxdump = demuxdump.c
@@ -34,12 +32,10 @@ SOURCES_demux_cdg = cdg.c
 SOURCES_smf = smf.c
 
 libvlc_LTLIBRARIES += \
-	liba52sys_plugin.la \
 	libaiff_plugin.la \
 	libau_plugin.la \
 	libdemux_cdg_plugin.la \
 	libdemuxdump_plugin.la \
-	libdtssys_plugin.la \
 	libflacsys_plugin.la \
 	libmjpeg_plugin.la \
 	libnsc_plugin.la \
