@@ -806,7 +806,7 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
         if (val != -1)
             break;
 
-        close (fd);
+        net_Close (fd);
     }
 
     vlc_freeaddrinfo (rem);
