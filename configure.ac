@@ -2331,7 +2331,11 @@ then
     VLC_ADD_CPPFLAGS([v4l2],[-I${with_v4l2}/include])
   fi
 
-  AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_v4l2_alsa="true", have_v4l2_alsa="false"),have_v4l2_alsa="false")
+  if test "${enable_alsa}" != "no"
+  then
+    AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_v4l2_alsa="true", have_v4l2_alsa="false"),have_v4l2_alsa="false")
+  fi
+
   if test "${have_v4l2_alsa}" = "true"
   then
     CFLAGS="${CFLAGS_save}"
