@@ -566,6 +566,8 @@ VLC-release.app: vlc
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC-release.app/Contents/PkgInfo
+	find $(top_builddir)/VLC-release.app/Contents/Resources/English.lproj -name classes.nib -delete;
+	find $(top_builddir)/VLC-release.app/Contents/Resources/English.lproj -name info.nib -delete;
 	find $(top_builddir)/VLC-release.app -type d -exec chmod ugo+rx '{}' \;
 	find $(top_builddir)/VLC-release.app -type f -exec chmod ugo+r '{}' \;
 
