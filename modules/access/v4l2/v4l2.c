@@ -439,46 +439,59 @@ static const struct
 {
     unsigned int i_v4l2;
     int i_fourcc;
+    int i_rmask;
+    int i_gmask;
+    int i_bmask;
 } v4l2chroma_to_fourcc[] =
 {
     /* Raw data types */
-    { V4L2_PIX_FMT_GREY,    VLC_FOURCC('G','R','E','Y') },
-    { V4L2_PIX_FMT_HI240,   VLC_FOURCC('I','2','4','0') },
-    { V4L2_PIX_FMT_RGB565,  VLC_FOURCC('R','V','1','6') },
-    { V4L2_PIX_FMT_RGB555,  VLC_FOURCC('R','V','1','5') },
-    { V4L2_PIX_FMT_BGR24,   VLC_FOURCC('R','V','2','4') },
-    { V4L2_PIX_FMT_BGR32,   VLC_FOURCC('R','V','3','2') },
-    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC('Y','U','Y','2') },
-    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC('Y','U','Y','V') },
-    { V4L2_PIX_FMT_UYVY,    VLC_FOURCC('U','Y','V','Y') },
-    { V4L2_PIX_FMT_Y41P,    VLC_FOURCC('I','4','1','N') },
-    { V4L2_PIX_FMT_YUV422P, VLC_FOURCC('I','4','2','2') },
-    { V4L2_PIX_FMT_YVU420,  VLC_FOURCC('Y','V','1','2') },
-    { V4L2_PIX_FMT_YUV411P, VLC_FOURCC('I','4','1','1') },
-    { V4L2_PIX_FMT_YUV410,  VLC_FOURCC('I','4','1','0') },
+    { V4L2_PIX_FMT_GREY,    VLC_FOURCC('G','R','E','Y'), 0, 0, 0 },
+    { V4L2_PIX_FMT_HI240,   VLC_FOURCC('I','2','4','0'), 0, 0, 0 },
+    { V4L2_PIX_FMT_RGB555,  VLC_FOURCC('R','V','1','5'), 0x001f,0x03e0,0x7c00 },
+    { V4L2_PIX_FMT_RGB565,  VLC_FOURCC('R','V','1','6'), 0x001f,0x07e0,0xf800 },
+    /* Won't work since we don't know how to handle such gmask values
+     * correctly
+    { V4L2_PIX_FMT_RGB555X, VLC_FOURCC('R','V','1','5'), 0x007c,0xe003,0x1f00 },
+    { V4L2_PIX_FMT_RGB565X, VLC_FOURCC('R','V','1','6'), 0x00f8,0xe007,0x1f00 },
+    */
+    { V4L2_PIX_FMT_BGR24,   VLC_FOURCC('R','V','2','4'), 0xff0000,0xff00,0xff },
+    { V4L2_PIX_FMT_RGB24,   VLC_FOURCC('R','V','2','4'), 0xff,0xff00,0xff0000 },
+    { V4L2_PIX_FMT_BGR32,   VLC_FOURCC('R','V','3','2'), 0xff0000,0xff00,0xff },
+    { V4L2_PIX_FMT_RGB32,   VLC_FOURCC('R','V','3','2'), 0xff,0xff00,0xff0000 },
+    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC('Y','U','Y','2'), 0, 0, 0 },
+    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC('Y','U','Y','V'), 0, 0, 0 },
+    { V4L2_PIX_FMT_UYVY,    VLC_FOURCC('U','Y','V','Y'), 0, 0, 0 },
+    { V4L2_PIX_FMT_Y41P,    VLC_FOURCC('I','4','1','N'), 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV422P, VLC_FOURCC('I','4','2','2'), 0, 0, 0 },
+    { V4L2_PIX_FMT_YVU420,  VLC_FOURCC('Y','V','1','2'), 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV411P, VLC_FOURCC('I','4','1','1'), 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV410,  VLC_FOURCC('I','4','1','0'), 0, 0, 0 },
 
     /* Raw data types, not in V4L2 spec but still in videodev2.h and supported
      * by VLC */
-    { V4L2_PIX_FMT_YUV420,  VLC_FOURCC('I','4','2','0') },
+    { V4L2_PIX_FMT_YUV420,  VLC_FOURCC('I','4','2','0'), 0, 0, 0 },
     /* FIXME { V4L2_PIX_FMT_RGB444,  VLC_FOURCC('R','V','3','2') }, */
 
     /* Compressed data types */
-    { V4L2_PIX_FMT_MJPEG,   VLC_FOURCC('M','J','P','G') },
+    { V4L2_PIX_FMT_MJPEG,   VLC_FOURCC('M','J','P','G'), 0, 0, 0 },
 #if 0
     { V4L2_PIX_FMT_JPEG,    VLC_FOURCC('J','P','E','G') },
     { V4L2_PIX_FMT_DV,      VLC_FOURCC('?','?','?','?') },
     { V4L2_PIX_FMT_MPEG,    VLC_FOURCC('?','?','?','?') },
 #endif
-    { 0, 0 }
+    { 0, 0, 0, 0, 0 }
 };
 
 /**
  * List of V4L2 chromas were confident enough to use as fallbacks if the
  * user hasn't provided a --v4l2-chroma value.
+ *
+ * Try YUV chromas first, then RGB little endian and MJPEG as last resort.
  */
 static const __u32 p_chroma_fallbacks[] =
 { V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV422P,
-  V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_MJPEG };
+  V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_BGR24,
+  V4L2_PIX_FTM_BGR32, V4L2_PIX_FMT_MJPEG };
 
 static const struct
 {
@@ -1816,6 +1829,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
     char *psz_device = p_sys->psz_vdev;
+    es_format_t es_fmt;
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
@@ -2054,6 +2068,10 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         if( v4l2chroma_to_fourcc[i].i_v4l2 == fmt.fmt.pix.pixelformat )
         {
             p_sys->i_fourcc = v4l2chroma_to_fourcc[i].i_fourcc;
+            es_format_Init( &es_fmt, VIDEO_ES, p_sys->i_fourcc );
+            es_fmt.video.i_rmask = v4l2chroma_to_fourcc[i].i_rmask;
+            es_fmt.video.i_gmask = v4l2chroma_to_fourcc[i].i_gmask;
+            es_fmt.video.i_bmask = v4l2chroma_to_fourcc[i].i_bmask;
             break;
         }
     }
@@ -2131,20 +2149,9 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     }
 
     /* Add */
-    es_format_t es_fmt;
-    es_format_Init( &es_fmt, VIDEO_ES, p_sys->i_fourcc );
     es_fmt.video.i_width  = p_sys->i_width;
     es_fmt.video.i_height = p_sys->i_height;
     es_fmt.video.i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
-
-    /* Setup rgb mask for RGB formats */
-    if( p_sys->i_fourcc == VLC_FOURCC( 'R','V','2','4' ) )
-    {
-        /* This is in BGR format */
-        es_fmt.video.i_bmask = 0x00ff0000;
-        es_fmt.video.i_gmask = 0x0000ff00;
-        es_fmt.video.i_rmask = 0x000000ff;
-    }
 
     msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
         (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
