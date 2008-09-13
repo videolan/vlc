@@ -640,7 +640,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;
 
-    if( p_sys->fd < 0 )
+    if( p_sys->fd == -1 )
     {
         p_access->info.b_eof = true;
         return 0;
@@ -1019,8 +1019,8 @@ static int Connect( access_t *p_access, int64_t i_tell )
     p_access->info.i_pos  = i_tell;
     p_access->info.b_eof  = false;
 
-
     /* Open connection */
+    assert( p_sys->fd == -1 );
     p_sys->fd = net_ConnectTCP( p_access, srv.psz_host, srv.i_port );
     if( p_sys->fd == -1 )
     {
