@@ -389,10 +389,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             free( psz );
             ui.timeshiftBox->setChecked( qs_filter.contains( "timeshift" ) );
             ui.dumpBox->setChecked( qs_filter.contains( "dump" ) );
-            ui.recordBox->setChecked( qs_filter.contains( "record" ) );
             ui.bandwidthBox->setChecked( qs_filter.contains( "bandwidth" ) );
 
-            optionWidgets.append( ui.recordBox );
             optionWidgets.append( ui.dumpBox );
             optionWidgets.append( ui.bandwidthBox );
             optionWidgets.append( ui.timeshiftBox );
@@ -619,7 +617,6 @@ void SPrefsPanel::apply()
 
         bool b_first = true;
         qs_filter.clear();
-        saveBox( "record", qobject_cast<QCheckBox *>(optionWidgets[recordChB]) );
         saveBox( "dump", qobject_cast<QCheckBox *>(optionWidgets[dumpChB]) );
         saveBox( "timeshift", qobject_cast<QCheckBox *>(optionWidgets[timeshiftChB]) );
         saveBox( "bandwidth", qobject_cast<QCheckBox *>(optionWidgets[bandwidthChB] ) );

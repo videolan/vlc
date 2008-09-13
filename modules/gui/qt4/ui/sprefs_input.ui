@@ -189,13 +189,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="recordBox" >
-        <property name="text" >
-         <string>_("Record")</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="dumpBox" >
         <property name="text" >
          <string>_("Dump")</string>
@@ -225,7 +218,6 @@
   <tabstop>RTSP_TCPBox</tabstop>
   <tabstop>systemCodecBox</tabstop>
   <tabstop>timeshiftBox</tabstop>
-  <tabstop>recordBox</tabstop>
   <tabstop>dumpBox</tabstop>
   <tabstop>bandwidthBox</tabstop>
  </tabstops>

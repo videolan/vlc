@@ -350,11 +350,13 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, bool b_fsCreation = f
 #endif
 
     /* Record Button */
+#if 0
     recordButton = new QPushButton;
     setupSmallButton( recordButton );
     advLayout->addWidget( recordButton );
     BUTTON_SET_ACT_I( recordButton, "", record,
             qtr( "Record" ), record() );
+#endif
 
     /* Snapshot Button */
     snapshotButton = new QPushButton;
@@ -374,16 +376,19 @@ void AdvControlsWidget::enableInput( bool enable )
     {
         input_item_t *p_item = input_GetItem( THEMIM->getInput() );
         i_input_id = p_item->i_id;
-
+#if 0
         recordButton->setVisible( var_GetBool( THEMIM->getInput(), "can-record" ) );
     }
     else
     {
         recordButton->setVisible( false );
+#endif
     }
 
     ABButton->setEnabled( enable );
+#if 0
     recordButton->setEnabled( enable );
+#endif
 
     if( enable && ( i_last_input_id != i_input_id ) )
     {
@@ -464,6 +469,7 @@ void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
     }
 }
 
+// TODO: On-the-fly record needs to be reimplemented
 void AdvControlsWidget::record()
 {
     input_thread_t *p_input = THEMIM->getInput();

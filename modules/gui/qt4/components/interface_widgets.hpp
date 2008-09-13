@@ -133,7 +133,10 @@ public:
 
 private:
     intf_thread_t *p_intf;
-    QPushButton *recordButton, *ABButton;
+#if 0
+    QPushButton *recordButton;
+#endif
+    QPushButton *ABButton;
     QPushButton *snapshotButton, *frameButton;
 
     static mtime_t timeA, timeB;

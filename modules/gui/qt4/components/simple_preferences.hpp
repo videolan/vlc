@@ -72,7 +72,7 @@ enum {
        audioOutCoB,
        normalizerChB,
        volLW };
-enum { recordChB, dumpChB, bandwidthChB, timeshiftChB, inputLE, cachingCoB };
+enum { dumpChB, bandwidthChB, timeshiftChB, inputLE, cachingCoB };
 enum { skinRB, qtRB };
 
 class ConfigControl;
