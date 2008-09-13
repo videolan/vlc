@@ -49,7 +49,7 @@
  * Local prototypes
  *****************************************************************************/
 static void* RunInterface( vlc_object_t *p_this );
-#ifdef __APPLE__
+#if defined( __APPLE__ ) || defined( WIN32 )
 static void * MonitorLibVLCDeath( vlc_object_t *p_this );
 #endif
 static int AddIntfCallback( vlc_object_t *, char const *,
@@ -95,7 +95,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     if( !p_intf )
         return NULL;
     p_intf->b_interaction = false;
-#ifdef __APPLE__
+#if defined( __APPLE__ ) || defined( WIN32 )
     p_intf->b_should_run_on_first_thread = false;
 #endif
 
@@ -138,7 +138,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
  */
 int intf_RunThread( intf_thread_t *p_intf )
 {
-#ifdef __APPLE__
+#if defined( __APPLE__ ) || defined( WIN32 )
     /* Hack to get Mac OS X Cocoa runtime running
      * (it needs access to the main thread) */
     if( p_intf->b_should_run_on_first_thread )
@@ -230,7 +230,7 @@ static void* RunInterface( vlc_object_t *p_this )
     return NULL;
 }
 
-#ifdef __APPLE__
+#if defined( __APPLE__ ) || defined( WIN32 )
 /*****************************************************************************
  * MonitorLibVLCDeath: Used when b_should_run_on_first_thread is set.
  *****************************************************************************/

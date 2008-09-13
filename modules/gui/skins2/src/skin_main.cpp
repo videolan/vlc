@@ -157,6 +157,10 @@ static int Open( vlc_object_t *p_this )
     Dialogs::instance( p_intf );
     ThemeRepository::instance( p_intf );
 
+#ifdef WIN32
+    p_intf->b_should_run_on_first_thread = true;
+#endif
+
     return( VLC_SUCCESS );
 }
 
