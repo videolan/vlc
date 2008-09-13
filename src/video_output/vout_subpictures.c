@@ -1187,7 +1187,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
 subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
-                                   bool b_paused )
+                                   bool b_paused, bool b_subtitle_only )
 {
     int i_index, i_channel;
     subpicture_t *p_subpic = NULL;
@@ -1207,7 +1207,8 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
         for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
         {
             if( p_spu->p_subpicture[i_index].i_channel != i_channel ||
-                p_spu->p_subpicture[i_index].i_status != READY_SUBPICTURE )
+                p_spu->p_subpicture[i_index].i_status != READY_SUBPICTURE ||
+                ( b_subtitle_only && !p_spu->p_subpicture[i_index].b_subtitle ) )
             {
                 continue;
             }

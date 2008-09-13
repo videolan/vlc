@@ -574,7 +574,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* */
     memset( &fmt_in, 0, sizeof(video_format_t) );
-    fmt_in = p_vout->fmt_in;
+    fmt_in = p_vout->fmt_out;
     if( fmt_in.i_sar_num <= 0 || fmt_in.i_sar_den <= 0 )
     {
         fmt_in.i_sar_num =

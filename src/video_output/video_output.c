@@ -960,11 +960,11 @@ static void* RunThread( vlc_object_t *p_this )
             p_filtered_picture = filter_chain_VideoFilter( p_vout->p_vf2_chain,
                                                            p_picture );
 
-        if( p_filtered_picture && p_vout->b_snapshot )
-        {
+        /* FIXME it is a bit ugly that b_snapshot is not locked but I do not
+         * know which lock to use (here and in the snapshot callback) */
+        const bool b_snapshot = p_vout->b_snapshot;
+        if( b_snapshot )
             p_vout->b_snapshot = false;
-            vout_Snapshot( p_vout, p_filtered_picture );
-        }
 
         /*
          * Check for subpictures to display
@@ -973,7 +973,8 @@ static void* RunThread( vlc_object_t *p_this )
         {
             p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
             p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
-                                            p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : false );
+                                            p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : false,
+                                            b_snapshot );
             if( p_input )
                 vlc_object_release( p_input );
         }
@@ -983,6 +984,12 @@ static void* RunThread( vlc_object_t *p_this )
          */
         i_displayed++;
         p_directbuffer = vout_RenderPicture( p_vout, p_filtered_picture, p_subpic );
+
+        /*
+         * Take a snapshot if requested
+         */
+        if( p_directbuffer && b_snapshot )
+            vout_Snapshot( p_vout, p_directbuffer );
 
         /*
          * Call the plugin-specific rendering method if there is one
