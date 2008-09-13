@@ -1586,7 +1586,6 @@ static subpicture_t *render( decoder_t *p_dec )
     p_spu->i_start = (mtime_t) p_sys->i_pts;
     //p_spu->i_stop = (mtime_t) 0;
     p_spu->b_ephemer = true;
-    p_spu->b_pausable = true;
     //p_spu->b_fade = true;
     //p_spu->i_stop = p_spu->i_start + (mtime_t) (i_timeout * 1000000);
 

@@ -338,8 +338,6 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
         return NULL;
     }
 
-    p_spu->b_pausable = true;
-
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');

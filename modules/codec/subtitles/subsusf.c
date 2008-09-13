@@ -225,8 +225,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         return NULL;
     }
 
-    p_spu->b_pausable = true;
-
     /* Decode USF strings */
     p_spu->p_region = ParseUSFString( p_dec, psz_subtitle, p_spu );
 

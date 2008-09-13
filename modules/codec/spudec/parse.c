@@ -76,8 +76,6 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
     if( !p_spu ) return NULL;
 
-    p_spu->b_pausable = true;
-
     /* Rationale for the "p_spudec->i_rle_size * 4": we are going to
      * expand the RLE stuff so that we won't need to read nibbles later
      * on. This will speed things up a lot. Plus, we'll only need to do

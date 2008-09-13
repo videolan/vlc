@@ -344,8 +344,6 @@ struct subpicture_t
     bool            b_ephemer;    /**< If this flag is set to true the subtitle
                                 will be displayed untill the next one appear */
     bool            b_fade;                               /**< enable fading */
-    bool            b_pausable;               /**< subpicture will be paused if
-                                                            stream is paused */
     /**@}*/
 
     subpicture_region_t *p_region;  /**< region list composing this subtitle */

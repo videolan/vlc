@@ -725,7 +725,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer = (p_block->i_length == 0);
     p_spu->b_absolute = false;
-    p_spu->b_pausable = true;
     dbg((p_dec, "%ld --> %ld\n", (long int) p_block->i_pts/100000, (long int)p_block->i_length/100000));
 
     block_Release( p_block );

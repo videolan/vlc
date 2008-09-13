@@ -392,7 +392,6 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     memset( p_subpic, 0, sizeof(subpicture_t) );
     p_subpic->i_status   = RESERVED_SUBPICTURE;
     p_subpic->b_absolute = true;
-    p_subpic->b_pausable = false;
     p_subpic->b_fade     = false;
     p_subpic->b_subtitle = false;
     p_subpic->i_alpha    = 0xFF;
@@ -1225,7 +1224,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
 
             if( display_date > p_current->i_stop &&
                 ( !p_current->b_ephemer || p_current->i_stop > p_current->i_start ) &&
-                !( p_current->b_pausable && b_paused ) )
+                !( p_current->b_subtitle && b_paused ) ) /* XXX Assume that subtitle are pausable */
             {
                 /* Too late, destroy the subpic */
                 spu_DestroySubpicture( p_spu, &p_spu->p_subpicture[i_index] );

@@ -502,7 +502,6 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
     p_spu->b_absolute = false;
-    p_spu->b_pausable = true;
 
     if( !b_text )
     {

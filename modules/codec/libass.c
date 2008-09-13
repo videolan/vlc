@@ -278,7 +278,6 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer = true;
     p_spu->b_absolute = true;
-    p_spu->b_pausable = true; /* ? */
 
     vlc_mutex_lock( p_sys->p_ass->p_lock );
     if( p_sys->p_track )

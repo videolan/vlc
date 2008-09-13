@@ -584,8 +584,6 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         return NULL;
     }
 
-    p_spu->b_pausable = true;
-
     /* these may be 0 for "not specified" */
     p_spu->i_original_picture_width = p_sys->ki.original_canvas_width;
     p_spu->i_original_picture_height = p_sys->ki.original_canvas_height;
