@@ -491,7 +491,7 @@ static const struct
 static const __u32 p_chroma_fallbacks[] =
 { V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV422P,
   V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_BGR24,
-  V4L2_PIX_FTM_BGR32, V4L2_PIX_FMT_MJPEG };
+  V4L2_PIX_FMT_BGR32, V4L2_PIX_FMT_MJPEG };
 
 static const struct
 {
