@@ -160,6 +160,7 @@ struct vout_sys_t
 {
     int        i_mode;        /* Deinterlace mode */
     bool b_double_rate; /* Shall we double the framerate? */
+    bool b_half_height; /* Shall be devide the height by 2 */
 
     mtime_t    last_date;
     mtime_t    next_date;
@@ -204,6 +205,7 @@ static int Create( vlc_object_t *p_this )
 
     p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
     p_vout->p_sys->b_double_rate = false;
+    p_vout->p_sys->b_half_height = true;
     p_vout->p_sys->last_date = 0;
     p_vout->p_sys->p_vout = 0;
     vlc_mutex_init( &p_vout->p_sys->filter_lock );
@@ -271,15 +273,11 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
 {
-    if( !strcmp( psz_method, "discard" ) )
-    {
-        p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
-        p_vout->p_sys->b_double_rate = false;
-    }
-    else if( !strcmp( psz_method, "mean" ) )
+    if( !strcmp( psz_method, "mean" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_MEAN;
         p_vout->p_sys->b_double_rate = false;
+        p_vout->p_sys->b_half_height = true;
     }
     else if( !strcmp( psz_method, "blend" )
              || !strcmp( psz_method, "average" )
@@ -287,27 +285,36 @@ static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_BLEND;
         p_vout->p_sys->b_double_rate = false;
+        p_vout->p_sys->b_half_height = false;
     }
     else if( !strcmp( psz_method, "bob" )
              || !strcmp( psz_method, "progressive-scan" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_BOB;
         p_vout->p_sys->b_double_rate = true;
+        p_vout->p_sys->b_half_height = false;
     }
     else if( !strcmp( psz_method, "linear" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_LINEAR;
         p_vout->p_sys->b_double_rate = true;
+        p_vout->p_sys->b_half_height = false;
     }
     else if( !strcmp( psz_method, "x" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_X;
         p_vout->p_sys->b_double_rate = false;
+        p_vout->p_sys->b_half_height = false;
     }
     else
     {
-        msg_Err( p_vout, "no valid deinterlace mode provided, "
-                 "using \"discard\"" );
+        if( strcmp( psz_method, "discard" ) )
+            msg_Err( p_vout, "no valid deinterlace mode provided, "
+                     "using \"discard\"" );
+
+        p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
+        p_vout->p_sys->b_double_rate = false;
+        p_vout->p_sys->b_half_height = true;
     }
 
     msg_Dbg( p_vout, "using %s deinterlace method", psz_method );
@@ -383,22 +390,12 @@ static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
     case VLC_FOURCC('I','4','2','0'):
     case VLC_FOURCC('I','Y','U','V'):
     case VLC_FOURCC('Y','V','1','2'):
-        switch( p_vout->p_sys->i_mode )
+        if( p_vout->p_sys->b_half_height )
         {
-        case DEINTERLACE_MEAN:
-        case DEINTERLACE_DISCARD:
             fmt.i_height /= 2; fmt.i_visible_height /= 2; fmt.i_y_offset /= 2;
             fmt.i_sar_den *= 2;
-            p_real_vout = vout_Create( p_vout, &fmt );
-            break;
-
-        case DEINTERLACE_BOB:
-        case DEINTERLACE_BLEND:
-        case DEINTERLACE_LINEAR:
-        case DEINTERLACE_X:
-            p_real_vout = vout_Create( p_vout, &fmt );
-            break;
         }
+        p_real_vout = vout_Create( p_vout, &fmt );
         break;
 
     case VLC_FOURCC('I','4','2','2'):
@@ -460,22 +457,43 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
     vout_sys_t *p_sys = p_vout->p_sys;
     picture_t *pp_outpic[2];
 
-    p_vout->fmt_out.i_x_offset = p_sys->p_vout->fmt_in.i_x_offset =
-        p_vout->fmt_in.i_x_offset;
-    p_vout->fmt_out.i_y_offset = p_sys->p_vout->fmt_in.i_y_offset =
-        p_vout->fmt_in.i_y_offset;
-    p_vout->fmt_out.i_visible_width = p_sys->p_vout->fmt_in.i_visible_width =
-        p_vout->fmt_in.i_visible_width;
-    p_vout->fmt_out.i_visible_height = p_sys->p_vout->fmt_in.i_visible_height =
-        p_vout->fmt_in.i_visible_height;
-    if( p_vout->p_sys->i_mode == DEINTERLACE_MEAN ||
-        p_vout->p_sys->i_mode == DEINTERLACE_DISCARD )
+    /* FIXME are they needed ? */
+    p_vout->fmt_out.i_x_offset = p_vout->fmt_in.i_x_offset;
+    p_vout->fmt_out.i_y_offset = p_vout->fmt_in.i_y_offset;
+    p_vout->fmt_out.i_visible_width = p_vout->fmt_in.i_visible_width;
+    p_vout->fmt_out.i_visible_height = p_vout->fmt_in.i_visible_height;
+
+    /* FIXME p_sys->p_vout->* should NOT be changed FIXME */
+    p_sys->p_vout->fmt_in.i_x_offset = p_vout->fmt_out.i_x_offset;
+    p_sys->p_vout->fmt_in.i_y_offset = p_vout->fmt_out.i_y_offset;
+    p_sys->p_vout->fmt_in.i_visible_width = p_vout->fmt_out.i_visible_width;
+    p_sys->p_vout->fmt_in.i_visible_height = p_vout->fmt_in.i_visible_height;
+    if( p_vout->p_sys->b_half_height )
     {
-        p_vout->fmt_out.i_y_offset /= 2; p_sys->p_vout->fmt_in.i_y_offset /= 2;
-        p_vout->fmt_out.i_visible_height /= 2;
+        p_sys->p_vout->fmt_in.i_y_offset /= 2;
         p_sys->p_vout->fmt_in.i_visible_height /= 2;
     }
- 
+
+    if( p_vout->i_changes & VOUT_ASPECT_CHANGE && 0)
+    {
+        p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
+
+        p_vout->fmt_out.i_aspect = p_vout->fmt_in.i_aspect;
+        p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
+        p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
+
+        video_format_t fmt = p_vout->fmt_out;
+        if( p_vout->p_sys->b_half_height )
+        {
+            fmt.i_height /= 2; fmt.i_visible_height /= 2; fmt.i_y_offset /= 2;
+            fmt.i_sar_den *= 2;
+        }
+
+        p_sys->p_vout = vout_Request( p_vout, p_sys->p_vout, &fmt );
+    }
+    if( !p_sys->p_vout )
+        return;
+
     pp_outpic[0] = pp_outpic[1] = NULL;
 
     vlc_mutex_lock( &p_vout->p_sys->filter_lock );
@@ -485,7 +503,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
                                                 0, 0, 0 ) )
               == NULL )
     {
-        if( !vlc_object_alive (p_vout) || p_vout->b_error )
+        if( !vlc_object_alive( p_vout ) || p_vout->b_error )
         {
             vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
             return;
@@ -502,7 +520,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
                                                  0, 0, 0 ) )
                   == NULL )
         {
-            if( !vlc_object_alive (p_vout) || p_vout->b_error )
+            if( !vlc_object_alive( p_vout ) || p_vout->b_error )
             {
                 vout_DestroyPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
                 vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
