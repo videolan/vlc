@@ -1517,7 +1517,17 @@ void CoverArtLabel::doUpdate()
         {
             QString artUrl = qfu( psz_meta ).replace( "file://", "" );
             if( artUrl != prevArt )
-                setPixmap( QPixmap( artUrl ) );
+            {
+                QPixmap pix;
+                if( pix.load( artUrl ) )
+                    setPixmap( pix );
+                else
+                {
+                    msg_Dbg( p_this, "Qt could not load image '%s'",
+                             qtu( artUrl ) );
+                    setPixmap( QPixmap( ":/noart.png" ) );
+                }
+            }
             QList< QAction* > artActions = actions();
             if( !artActions.isEmpty() )
             {
