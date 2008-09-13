@@ -1189,10 +1189,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
                                    bool b_paused, bool b_subtitle_only )
 {
-    int i_index, i_channel;
+    int i_channel;
     subpicture_t *p_subpic = NULL;
-    subpicture_t *p_ephemer;
-    mtime_t      ephemer_date;
 
     /* Run subpicture filters */
     filter_chain_SubFilter( p_spu->p_chain, display_date );
@@ -1201,33 +1199,33 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
      * ends with NULL since p_subpic was initialized to NULL. */
     for( i_channel = 0; i_channel < p_spu->i_channel; i_channel++ )
     {
-        p_ephemer = 0;
-        ephemer_date = 0;
+        subpicture_t *p_ephemer = NULL;
+        mtime_t      ephemer_date = 0;
+        int i_index;
 
         for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
         {
-            if( p_spu->p_subpicture[i_index].i_channel != i_channel ||
-                p_spu->p_subpicture[i_index].i_status != READY_SUBPICTURE ||
-                ( b_subtitle_only && !p_spu->p_subpicture[i_index].b_subtitle ) )
+            subpicture_t *p_current = &p_spu->p_subpicture[i_index];
+
+            if( p_current->i_channel != i_channel ||
+                p_current->i_status != READY_SUBPICTURE ||
+                ( b_subtitle_only && !p_current->b_subtitle ) )
             {
                 continue;
             }
             if( display_date &&
-                display_date < p_spu->p_subpicture[i_index].i_start )
+                display_date < p_current->i_start )
             {
                 /* Too early, come back next monday */
                 continue;
             }
 
-            if( p_spu->p_subpicture[i_index].i_start > ephemer_date )
-                ephemer_date = p_spu->p_subpicture[i_index].i_start;
+            if( p_current->i_start > ephemer_date )
+                ephemer_date = p_current->i_start;
 
-            if( display_date > p_spu->p_subpicture[i_index].i_stop &&
-                ( !p_spu->p_subpicture[i_index].b_ephemer ||
-                  p_spu->p_subpicture[i_index].i_stop >
-                  p_spu->p_subpicture[i_index].i_start ) &&
-                !( p_spu->p_subpicture[i_index].b_pausable &&
-                   b_paused ) )
+            if( display_date > p_current->i_stop &&
+                ( !p_current->b_ephemer || p_current->i_stop > p_current->i_start ) &&
+                !( p_current->b_pausable && b_paused ) )
             {
                 /* Too late, destroy the subpic */
                 spu_DestroySubpicture( p_spu, &p_spu->p_subpicture[i_index] );
@@ -1235,16 +1233,16 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
             }
 
             /* If this is an ephemer subpic, add it to our list */
-            if( p_spu->p_subpicture[i_index].b_ephemer )
+            if( p_current->b_ephemer )
             {
-                p_spu->p_subpicture[i_index].p_next = p_ephemer;
-                p_ephemer = &p_spu->p_subpicture[i_index];
+                p_current->p_next = p_ephemer;
+                p_ephemer = p_current;
 
                 continue;
             }
 
-            p_spu->p_subpicture[i_index].p_next = p_subpic;
-            p_subpic = &p_spu->p_subpicture[i_index];
+            p_current->p_next = p_subpic;
+            p_subpic = p_current;
         }
 
         /* If we found ephemer subpictures, check if they have to be
