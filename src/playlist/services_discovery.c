@@ -109,6 +109,11 @@ void services_discovery_Destroy ( services_discovery_t * p_sd )
  ***********************************************************************/
 int services_discovery_Start ( services_discovery_t * p_sd )
 {
+    vlc_event_t event = {
+        .type = vlc_ServicesDiscoveryStarted
+    };
+    vlc_event_send( &p_sd->event_manager, &event );
+
     if ((p_sd->pf_run != NULL)
         && vlc_thread_create( p_sd, "services_discovery", RunSD,
                               VLC_THREAD_PRIORITY_LOW, false))
@@ -137,9 +142,14 @@ static void ObjectKillChildrens( vlc_object_t *p_obj )
 
 void services_discovery_Stop ( services_discovery_t * p_sd )
 {
+    vlc_event_t event = {
+        .type = vlc_ServicesDiscoveryEnded
+    };
+
     ObjectKillChildrens( VLC_OBJECT(p_sd) );
     if( p_sd->pf_run ) vlc_thread_join( p_sd );
 
+    vlc_event_send( &p_sd->event_manager, &event );
     module_Unneed( p_sd, p_sd->p_module );
 }
 
@@ -205,19 +215,7 @@ services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_it
 static void* RunSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = (services_discovery_t *)p_this;
-    vlc_event_t event = {
-        .type = vlc_ServicesDiscoveryStarted
-    };
-    int canc = vlc_savecancel ();
-    vlc_event_send( &p_sd->event_manager, &event );
-    vlc_restorecancel (canc);
-
     p_sd->pf_run( p_sd );
-
-    canc = vlc_savecancel ();
-    event.type = vlc_ServicesDiscoveryEnded;
-    vlc_event_send( &p_sd->event_manager, &event );
-    vlc_restorecancel (canc);
     return NULL;
 }
 
