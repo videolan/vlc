@@ -503,12 +503,24 @@ static int Open( vlc_object_t *p_this )
         fmt.video.i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
 
         /* Setup rgb mask for RGB formats */
-        if( p_sys->i_fourcc == VLC_FOURCC('R','V','2','4') )
+        switch( p_sys->i_fourcc )
         {
-            /* This is in BGR format */
-            fmt.video.i_bmask = 0x00ff0000;
-            fmt.video.i_gmask = 0x0000ff00;
-            fmt.video.i_rmask = 0x000000ff;
+            case VLC_FOURCC('R','V','1','5'):
+                fmt.video.i_rmask = 0x001f;
+                fmt.video.i_gmask = 0x03e0;
+                fmt.video.i_bmask = 0x7c00;
+                break;
+            case VLC_FOURCC('R','V','1','6'):
+                fmt.video.i_rmask = 0x001f;
+                fmt.video.i_gmask = 0x07e0;
+                fmt.video.i_bmask = 0xf800;
+                break;
+            case VLC_FOURCC('R','V','2','4'):
+            case VLC_FOURCC('R','V','3','2'):
+                fmt.video.i_rmask = 0x00ff0000;
+                fmt.video.i_gmask = 0x0000ff00;
+                fmt.video.i_bmask = 0x000000ff;
+                break;
         }
 
         msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
