@@ -637,6 +637,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_crashrep_title_txt setStringValue: _NS("VLC crashed previously")];
     [o_crashrep_win setTitle: _NS("VLC crashed previously")];
     [o_crashrep_desc_txt setStringValue: _NS("Do you want to send details on the crash to VLC's development team?\n\nIf you want, you can enter a few lines on what you did before VLC crashed along with other helpful information: a link to download a sample file, a URL of a network stream, ...")];
+    [o_crashrep_includeEmail_ckb setTitle: _NS("I agree to be possibly contacted about this bugreport.")];
+    [o_crashrep_includeEmail_txt setStringValue: _NS("Only your default E-Mail address will be submitted, including no further information.")];
 }
 
 #pragma mark -
@@ -2088,11 +2090,16 @@ end:
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
     [req setHTTPMethod:@"POST"];
 
-    ABPerson * contact = [[ABAddressBook sharedAddressBook] me];
-
-    ABMultiValue *emails = [contact valueForProperty:kABEmailProperty];
-    NSString * email = [emails valueAtIndex:[emails indexForIdentifier:
-                [emails primaryIdentifier]]];
+    NSString * email;
+    if( [o_crashrep_includeEmail_ckb state] == NSOnState )
+    {
+        ABPerson * contact = [[ABAddressBook sharedAddressBook] me];
+        ABMultiValue *emails = [contact valueForProperty:kABEmailProperty];
+        email = [emails valueAtIndex:[emails indexForIdentifier:
+                    [emails primaryIdentifier]]];
+    }
+    else
+        email = [NSString string];
 
     NSString *postBody;
     postBody = [NSString stringWithFormat:@"CrashLog=%@&Comment=%@&Email=%@\r\n",

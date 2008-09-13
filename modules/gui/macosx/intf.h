@@ -163,6 +163,8 @@ struct intf_sys_t
     IBOutlet NSTextField * o_crashrep_title_txt;
     IBOutlet NSTextField * o_crashrep_desc_txt;
     IBOutlet NSWindow * o_crashrep_win;
+    IBOutlet NSButton * o_crashrep_includeEmail_ckb;
+    IBOutlet NSTextField * o_crashrep_includeEmail_txt;
 
     /* main menu */
 
