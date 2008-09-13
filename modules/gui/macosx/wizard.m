@@ -419,7 +419,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t7_btn_mrInfo_local setTitle: _NS("More Info")];
 
     /* page eight ("Summary") */
-    [o_t8_txt_text setStringValue: _NS("This page lists all the settings."
+    [o_t8_txt_text setStringValue: _NS("This page lists all the settings. "
         "Click \"Finish\" to start streaming or transcoding.")];
     [o_t8_txt_title setStringValue: _NS("Summary")];
     [o_t8_txt_destination setStringValue: [_NS("Destination")

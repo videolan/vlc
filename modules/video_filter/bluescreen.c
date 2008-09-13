@@ -38,8 +38,8 @@
 #define BLUESCREEN_HELP N_( \
     "This effect, also known as \"greenscreen\" or \"chroma key\" blends " \
     "the \"blue parts\" of the foreground image of the mosaic on the " \
-    "background (like weather forcasts). You can choose the \"key\" " \
-    "color for blending (blyyue by default)." )
+    "background (like weather forecasts). You can choose the \"key\" " \
+    "color for blending (blue by default)." )
 
 #define BLUESCREENU_TEXT N_("Bluescreen U value")
 #define BLUESCREENU_LONGTEXT N_( \

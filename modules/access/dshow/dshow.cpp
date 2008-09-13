@@ -98,7 +98,7 @@ static const char *const ppsz_amtuner_mode_text[] = { N_("Default"),
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Caching value for DirectShow streams. " \
-    "This value should be set in millisecondss." )
+    "This value should be set in milliseconds." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
     "Name of the video device that will be used by the " \
