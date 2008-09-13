@@ -182,7 +182,14 @@ SOURCES_skins2 = \
 	vars/time.hpp \
 	vars/volume.cpp \
 	vars/volume.hpp \
-	\
+    unzip/crypt.h \
+	unzip/ioapi.c \
+	unzip/ioapi.h \
+	unzip/unzip.c \
+	unzip/unzip.h
+
+if HAVE_WIN32
+SOURCES_skins2 += \
 	win32/win32_dragdrop.cpp \
 	win32/win32_dragdrop.hpp \
 	win32/win32_factory.cpp \
@@ -199,7 +206,11 @@ SOURCES_skins2 = \
 	win32/win32_tooltip.hpp \
 	win32/win32_window.cpp \
 	win32/win32_window.hpp \
-	\
+    $(NULL)
+endif
+
+if HAVE_LINUX
+SOURCES_skins2 += \
 	x11/x11_display.cpp \
 	x11/x11_display.hpp \
 	x11/x11_dragdrop.cpp \
@@ -218,7 +229,11 @@ SOURCES_skins2 = \
 	x11/x11_window.hpp \
 	x11/x11_tooltip.cpp \
 	x11/x11_tooltip.hpp \
-	\
+    $(NULL)
+endif
+
+if HAVE_DARWIN
+SOURCES_skins2 += \
 	macosx/macosx_dragdrop.cpp \
 	macosx/macosx_dragdrop.hpp \
 	macosx/macosx_factory.cpp \
@@ -235,10 +250,5 @@ SOURCES_skins2 = \
 	macosx/macosx_window.hpp \
 	macosx/macosx_tooltip.cpp \
 	macosx/macosx_tooltip.hpp \
-	\
-	unzip/crypt.h \
-	unzip/ioapi.c \
-	unzip/ioapi.h \
-	unzip/unzip.c \
-	unzip/unzip.h \
-	$(NULL)
+    $(NULL)
+endif
