@@ -534,7 +534,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_DBUS
     dbus_threads_init_default();
 
-    if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
+    if( config_GetInt( p_libvlc, "one-instance" ) > 0
+        || ( config_GetInt( p_libvlc, "one-instance-when-started-from-file" )
+             && config_GetInt( p_libvlc, "started-from-file" ) ) )
     {
         /* Initialise D-Bus interface, check for other instances */
         DBusConnection  *p_conn = NULL;
@@ -854,7 +856,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_DBUS
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
-    if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
+    if( config_GetInt( p_libvlc, "one-instance" ) > 0
+        || ( config_GetInt( p_libvlc, "one-instance-when-started-from-file" )
+             && config_GetInt( p_libvlc, "started-from-file" ) ) )
         libvlc_InternalAddIntf( p_libvlc, "dbus,none" );
 
     /* Prevents the power management daemon from suspending the system

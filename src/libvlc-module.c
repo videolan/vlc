@@ -1067,16 +1067,16 @@ static const char *const ppsz_clock_descriptions[] =
 #define SYSLOG_LONGTEXT N_( \
     "Log all VLC messages to syslog (UNIX systems)." )
 
-#define ONEINSTANCE_WIN_TEXT N_("Allow only one running instance")
-#define ONEINSTANCE_WIN_LONGTEXT N_( \
+#define ONEINSTANCE_TEXT N_("Allow only one running instance")
+#if defined( WIN32 )
+#define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
     "for example if you associated VLC with some media types and you " \
     "don't want a new instance of VLC to be opened each time you " \
     "double-click on a file in the explorer. This option will allow you " \
     "to play the file with the already running instance or enqueue it.")
-
-#define ONEINSTANCE_DBUS_TEXT ONEINSTANCE_WIN_TEXT
-#define ONEINSTANCE_DBUS_LONGTEXT N_( \
+#elif defined( HAVE_DBUS )
+#define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
     "for example if you associated VLC with some media types and you " \
     "don't want a new instance of VLC to be opened each time you " \
@@ -1084,6 +1084,7 @@ static const char *const ppsz_clock_descriptions[] =
     "to play the file with the already running instance or enqueue it. " \
     "This option requires the D-Bus session daemon to be active " \
     "and the running instance of VLC to use D-Bus control interface.")
+#endif
 
 #define STARTEDFROMFILE_TEXT N_("VLC is started from file association")
 #define STARTEDFROMFILE_LONGTEXT N_( \
@@ -1902,18 +1903,13 @@ vlc_module_begin();
 #endif
 
 #if defined(HAVE_DBUS)
-    add_bool( "one-instance", 0, NULL, ONEINSTANCE_DBUS_TEXT,
-              ONEINSTANCE_DBUS_LONGTEXT, true );
-    add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
-              PLAYLISTENQUEUE_LONGTEXT, true );
-
     add_bool( "inhibit", 1, NULL, INHIBIT_TEXT,
               INHIBIT_LONGTEXT, true );
 #endif
 
-#if defined(WIN32)
-    add_bool( "one-instance", 0, NULL, ONEINSTANCE_WIN_TEXT,
-              ONEINSTANCE_WIN_LONGTEXT, true );
+#if defined(WIN32) || defined(HAVE_DBUS)
+    add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
+              ONEINSTANCE_LONGTEXT, true );
     add_bool( "started-from-file", 0, NULL, STARTEDFROMFILE_TEXT,
               STARTEDFROMFILE_LONGTEXT, true );
         change_internal();
@@ -1924,6 +1920,9 @@ vlc_module_begin();
     add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, true );
         change_unsaveable();
+#endif
+
+#if defined(WIN32)
     add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, false );
         change_need_restart();
