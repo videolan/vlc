@@ -394,6 +394,7 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     p_subpic->b_absolute = true;
     p_subpic->b_pausable = false;
     p_subpic->b_fade     = false;
+    p_subpic->b_subtitle = false;
     p_subpic->i_alpha    = 0xFF;
     p_subpic->p_region   = NULL;
     p_subpic->pf_render  = NULL;

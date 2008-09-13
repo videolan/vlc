@@ -364,6 +364,7 @@ struct subpicture_t
     int          i_original_picture_height;/**< original height of the movie */
     bool         b_absolute;                       /**< position is absolute */
     int          i_flags;                                /**< position flags */
+    bool         b_subtitle;            /**< the picture is a movie subtitle */
      /**@}*/
 
     /** Pointer to function that renders this subtitle in a picture */
