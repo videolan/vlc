@@ -433,6 +433,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     else
     {
         psz_parser = strdup( p_vout->psz_filter_chain );
+        p_vout->b_title_show = false;
     }
 
     /* Create the vout thread */
