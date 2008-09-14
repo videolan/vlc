@@ -954,6 +954,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             subpicture_t *p_subpic_list,
                             int i_scale_width_orig, int i_scale_height_orig )
 {
+    const mtime_t i_current_date = mdate();
     int i_source_video_width;
     int i_source_video_height;
     subpicture_t *p_subpic;
@@ -1001,7 +1002,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             fmt_org.i_height =
             fmt_org.i_visible_height = i_source_video_height;
 
-            p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, mdate() );
+            p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, i_current_date );
         }
     }
 
