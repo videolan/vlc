@@ -227,7 +227,6 @@ static void Close( vlc_object_t *p_this )
         pl_Release( p_intf );
     }
 
-    p_intf->b_dead = true;
     int i;
     for( i = 0; i < p_sys->i_songs; i++ )
         DeleteSong( &p_sys->p_queue[i] );
@@ -470,9 +469,6 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
 
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
 
-    if( p_intf->b_dead )
-        return VLC_SUCCESS;
-
     if( p_sys->b_meta_read == false && newval.i_int >= PLAYING_S )
     {
         ReadMetaData( p_intf );
@@ -504,9 +500,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
     VLC_UNUSED( oldval ); VLC_UNUSED( newval );
-
-    if( p_intf->b_dead )
-        return VLC_SUCCESS;
 
     p_sys->b_state_cb       = false;
     p_sys->b_meta_read      = false;
