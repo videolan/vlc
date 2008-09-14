@@ -226,7 +226,7 @@ void VlcProc::dropVout()
 void VlcProc::manage()
 {
     // Did the user request to quit vlc ?
-    if( intf_ShouldDie( getIntf() ) )
+    if( !vlc_object_alive( getIntf() ) )
     {
         CmdQuit *pCmd = new CmdQuit( getIntf() );
         AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
