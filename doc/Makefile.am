@@ -1,7 +1,5 @@
 NULL =
 
-docdir = $(datadir)/doc/@PACKAGE@
-
 doc_DATA = \
 	bugreport-howto.txt \
 	fortunes.txt \
