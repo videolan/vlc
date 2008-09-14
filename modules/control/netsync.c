@@ -51,11 +51,6 @@
 
 #define NETSYNC_PORT 9875
 
-/* Needed for Solaris */
-#ifndef INADDR_NONE
-#define INADDR_NONE 0xffffffff
-#endif
-
 /* FIXME: UGLY UGLY !! Netsync should be totally reworked */
 #include "../../src/input/input_internal.h"
 
@@ -92,11 +87,6 @@ vlc_module_begin();
     set_callbacks( Activate, Close );
 vlc_module_end();
 
-struct intf_sys_t
-{
-    input_thread_t *p_input;
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -108,16 +98,29 @@ static void Run( intf_thread_t *p_intf );
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    int fd;
 
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( !p_intf->p_sys )
+    if( config_GetInt( p_intf, "netsync-master" ) <= 0 )
     {
-        msg_Err( p_intf, "no memory" );
-        return VLC_ENOMEM;
+        char *psz_master = config_GetPsz( p_intf, "netsync-master-ip" );
+        if( psz_master == NULL )
+        {
+            msg_Err( p_intf, "master address not specified" );
+            return VLC_EGENERIC;
+        }
+        fd = net_ConnectUDP( VLC_OBJECT(p_intf), psz_master, NETSYNC_PORT, 0 );
+        free( psz_master );
+    }
+    else
+        fd = net_ListenUDP1( VLC_OBJECT(p_intf), NULL, NETSYNC_PORT );
+
+    if( fd == -1 )
+    {
+        msg_Err( p_intf, "Netsync socket failure" );
+        return VLC_EGENERIC;
     }
 
-    p_intf->p_sys->p_input = NULL;
-
+    p_intf->p_sys = (void *)(intptr_t)fd;
     p_intf->pf_run = Run;
     return VLC_SUCCESS;
 }
@@ -129,7 +132,7 @@ void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
 
-    free( p_intf->p_sys );
+    net_Close( (intptr_t)p_intf->p_sys );
 }
 
 /*****************************************************************************
@@ -139,34 +142,10 @@ static void Run( intf_thread_t *p_intf )
 {
 #define MAX_MSG_LENGTH (2 * sizeof(int64_t))
 
-    bool b_master = config_GetInt( p_intf, "netsync-master" );
-    char *psz_master = NULL;
+    input_thread_t *p_input = NULL;
     char p_data[MAX_MSG_LENGTH];
     int i_socket;
     int canc = vlc_savecancel();
-
-    if( !b_master )
-    {
-        psz_master = config_GetPsz( p_intf, "netsync-master-ip" );
-        if( psz_master == NULL )
-        {
-            msg_Err( p_intf, "master address not specified" );
-            return;
-        }
-    }
-
-    if( b_master )
-        i_socket = net_ListenUDP1( VLC_OBJECT(p_intf), NULL, NETSYNC_PORT );
-    else
-        i_socket = net_ConnectUDP( VLC_OBJECT(p_intf), psz_master, NETSYNC_PORT, 0 );
-
-    free( psz_master );
-
-    if( i_socket < 0 )
-    {
-        msg_Err( p_intf, "failed opening UDP socket" ); /* str review: is this good enough? */
-        return;
-    }
 
     /* High priority thread */
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_INPUT );
@@ -174,19 +153,17 @@ static void Run( intf_thread_t *p_intf )
     while( !intf_ShouldDie( p_intf ) )
     {
         /* Update the input */
-        if( p_intf->p_sys->p_input == NULL )
-        {
-            p_intf->p_sys->p_input =
+        if( p_input == NULL )
+            p_input =
                 (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                    FIND_ANYWHERE );
-        }
-        else if( p_intf->p_sys->p_input->b_dead )
+        else if( p_input->b_dead )
         {
-            vlc_object_release( p_intf->p_sys->p_input );
-            p_intf->p_sys->p_input = NULL;
+            vlc_object_release( p_input );
+            p_input = NULL;
         }
 
-        if( p_intf->p_sys->p_input == NULL )
+        if( p_input == NULL )
         {
             /* Wait a bit */
             msleep( INTF_IDLE_SLEEP );
@@ -289,14 +266,14 @@ static void Run( intf_thread_t *p_intf )
                           ((i_receive_date - i_send_date) / 2 + i_master_date);
 
             i_client_clockref = i_drift = 0;
-            if( p_intf->p_sys->p_input && i_master_clockref )
+            if( p_input && i_master_clockref )
             {
                 i_client_clockref = GetClockRef( p_intf, i_clockref );
                 i_drift = i_client_clockref - i_master_clockref - i_diff_date;
 
                 /* Update our clock to match the master's one */
                 if( i_client_clockref )
-                    p_intf->p_sys->p_input->i_pts_delay -= i_drift;
+                    p_input->i_pts_delay -= i_drift;
             }
 
 #if 0
@@ -311,8 +288,7 @@ static void Run( intf_thread_t *p_intf )
         }
     }
 
-    if( p_intf->p_sys->p_input ) vlc_object_release( p_intf->p_sys->p_input );
-    net_Close( i_socket );
+    if( p_input ) vlc_object_release( p_input );
     vlc_restorecancel( canc );
 }
 
