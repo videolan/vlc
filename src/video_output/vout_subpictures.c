@@ -951,23 +951,15 @@ exit:
 
 void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             picture_t *p_pic_dst,
-                            subpicture_t *p_subpic,
+                            subpicture_t *p_subpic_list,
                             int i_scale_width_orig, int i_scale_height_orig )
 {
     int i_source_video_width;
     int i_source_video_height;
-    subpicture_t *p_subpic_v;
+    subpicture_t *p_subpic;
 
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
-
-    for( p_subpic_v = p_subpic;
-            p_subpic_v != NULL && p_subpic_v->i_status != FREE_SUBPICTURE;
-            p_subpic_v = p_subpic_v->p_next )
-    {
-        if( p_subpic_v->pf_pre_render )
-            p_subpic_v->pf_pre_render( p_fmt, p_spu, p_subpic_v );
-    }
 
     if( i_scale_width_orig <= 0 )
         i_scale_width_orig = 1000;
@@ -978,14 +970,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     i_source_video_height = p_fmt->i_height * 1000 / i_scale_height_orig;
 
     /* Check i_status again to make sure spudec hasn't destroyed the subpic */
-    for( ; ( p_subpic != NULL ) && ( p_subpic->i_status != FREE_SUBPICTURE ); p_subpic = p_subpic->p_next )
+    for( p_subpic = p_subpic_list;
+            p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE;
+                p_subpic = p_subpic->p_next )
     {
-        subpicture_region_t *p_region;
-        int pi_scale_width[ SCALE_SIZE ];
-        int pi_scale_height[ SCALE_SIZE ];
-        int pi_subpic_x[ SCALE_SIZE ];
-        int k;
-
         /* If the source video and subtitles stream agree on the size of
          * the video then disregard all further references to the subtitle
          * stream.
@@ -998,8 +986,9 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_subpic->i_original_picture_width = 0;
         }
 
-        for( k = 0; k < SCALE_SIZE ; k++ )
-            pi_subpic_x[ k ] = p_subpic->i_x;
+        /* */
+        if( p_subpic->pf_pre_render )
+            p_subpic->pf_pre_render( p_fmt, p_spu, p_subpic );
 
         if( p_subpic->pf_update_regions )
         {
@@ -1014,23 +1003,41 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
             p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, mdate() );
         }
+    }
 
-        /* */
-        p_region = p_subpic->p_region;
-        if( !p_region )
+    /* Create the blending module */
+    if( !p_spu->p_blend )
+        SpuRenderCreateBlend( p_spu, p_fmt->i_chroma, p_fmt->i_aspect );
+
+    /* Load the scaling module */
+    if( !p_spu->p_scale && !p_spu->p_scale_yuvp )
+        SpuRenderCreateAndLoadScale( p_spu );
+
+    /* Load the text rendering module; it is possible there is a
+     * text region somewhere in the subpicture other than the first
+     * element in the region list, so just load it anyway as we'll
+     * probably want it sooner or later. */
+    if( !p_spu->p_text )
+        SpuRenderCreateAndLoadText( p_spu, p_fmt->i_width, p_fmt->i_height );
+
+    /* Process all subpictures and regions */
+    for( p_subpic = p_subpic_list;
+            p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE;
+                p_subpic = p_subpic->p_next )
+    {
+        subpicture_region_t *p_region;
+        int pi_scale_width[ SCALE_SIZE ];
+        int pi_scale_height[ SCALE_SIZE ];
+        int pi_subpic_x[ SCALE_SIZE ];
+        int k;
+
+        if( !p_subpic->p_region )
             continue;
 
-        /* Create the blending module */
-        if( !p_spu->p_blend )
-            SpuRenderCreateBlend( p_spu, p_fmt->i_chroma, p_fmt->i_aspect );
+        for( k = 0; k < SCALE_SIZE ; k++ )
+            pi_subpic_x[ k ] = p_subpic->i_x;
 
-        /* Load the text rendering module; it is possible there is a
-         * text region somewhere in the subpicture other than the first
-         * element in the region list, so just load it anyway as we'll
-         * probably want it sooner or later. */
-        if( !p_spu->p_text )
-            SpuRenderCreateAndLoadText( p_spu, p_fmt->i_width, p_fmt->i_height );
-
+        /* */
         if( p_spu->p_text )
         {
             subpicture_region_t *p_text_region = p_subpic->p_region;
@@ -1089,7 +1096,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         /* XXX for default:
          *  scale[] allows to pass from native (either video or original) size to output size */
-
         if( p_subpic->i_original_picture_height > 0 &&
             p_subpic->i_original_picture_width  > 0 )
         {
@@ -1118,7 +1124,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
         }
 
-        /* Set default subpicture aspect ratio */
+        /* Set default subpicture aspect ratio
+         * FIXME if we only handle 1 aspect ratio per picture, why is it set per
+         * region ? */
+        p_region = p_subpic->p_region;
         if( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den )
         {
             if( p_region->fmt.i_aspect != 0 )
@@ -1147,23 +1156,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
         }
 
-        /* Load the scaling module when needed */
-        if( !p_spu->p_scale )
-        {
-            bool b_scale_used = false;
-
-            for( k = 0; k < SCALE_SIZE; k++ )
-            {
-                const int i_scale_w = pi_scale_width[k];
-                const int i_scale_h = pi_scale_height[k];
-                if( ( i_scale_w > 0 && i_scale_w != 1000 ) || ( i_scale_h > 0 && i_scale_h != 1000 ) )
-                    b_scale_used = true;
-            }
-
-            if( b_scale_used )
-                SpuRenderCreateAndLoadScale( p_spu );
-        }
-
+        /* Render all regions */
         for( ; p_region != NULL; p_region = p_region->p_next )
             SpuRenderRegion( p_spu, p_pic_dst,
                              p_subpic, p_region, i_scale_width_orig, i_scale_height_orig,
