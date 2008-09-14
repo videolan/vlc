@@ -149,18 +149,15 @@ struct intf_sys_t
 static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {
     va_list args;
+    char fmt_eol[strlen (psz_fmt) + 3];
+
+    snprintf (fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
     va_start( args, psz_fmt );
 
     if( p_intf->p_sys->i_socket == -1 )
-    {
-        utf8_vfprintf( stdout, psz_fmt, args );
-        printf( "\r\n" );
-    }
+        utf8_vfprintf( stdout, fmt_eol, args );
     else
-    {
-        net_vaPrintf( p_intf, p_intf->p_sys->i_socket, NULL, psz_fmt, args );
-        net_Write( p_intf, p_intf->p_sys->i_socket, NULL, (uint8_t*)"\r\n", 2 );
-    }
+        net_vaPrintf( p_intf, p_intf->p_sys->i_socket, NULL, fmt_eol, args );
     va_end( args );
 }
 
