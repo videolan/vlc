@@ -25,6 +25,7 @@
 # include "config.h"
 #endif
 
+#include <stddef.h>
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_sout.h>
@@ -77,6 +78,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     VariablesInit( p_playlist );
 
     /* Initialise data structures */
+    p_playlist->p->p_playlist = p_playlist;
     p_playlist->i_last_playlist_id = 0;
     p_playlist->p_input = NULL;
 
@@ -174,12 +176,23 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 static void playlist_Destructor( vlc_object_t * p_this )
 {
     playlist_t * p_playlist = (playlist_t *)p_this;
+    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
 
-    if( p_playlist->p->p_preparse )
+    /* Destroy the item preparser */
+    if (p_preparse->up)
     {
-        vlc_object_release( p_playlist->p->p_preparse );
+        vlc_cancel (p_preparse->thread);
+        vlc_join (p_preparse->thread, NULL);
     }
+    while (p_preparse->i_waiting > 0)
+    {   /* Any left-over unparsed item? */
+        vlc_gc_decref (p_preparse->pp_waiting[0]);
+        REMOVE_ELEM (p_preparse->pp_waiting, p_preparse->i_waiting, 0);
+    }
+    vlc_cond_destroy (&p_preparse->wait);
+    vlc_mutex_destroy (&p_preparse->lock);
 
+    /* Destroy the item meta-infos fetcher */
     if( p_playlist->p->p_fetcher )
     {
         vlc_object_release( p_playlist->p->p_fetcher );
@@ -517,8 +530,6 @@ void playlist_LastLoop( playlist_t *p_playlist )
     playlist_ServicesDiscoveryKillAll( p_playlist );
     playlist_MLDump( p_playlist );
 
-    vlc_object_kill( p_playlist->p->p_preparse );
-    vlc_thread_join( p_playlist->p->p_preparse );
     vlc_object_kill( p_playlist->p->p_fetcher );
     vlc_thread_join( p_playlist->p->p_fetcher );
 
@@ -550,35 +561,36 @@ void playlist_LastLoop( playlist_t *p_playlist )
 }
 
 /**
- * Preparse loop
+ * Preparse queue loop
  *
- * Main loop for preparser queue
- * \param p_obj items to preparse
- * \return nothing
+ * @param p_obj preparse structure
+ * @return never
  */
-void playlist_PreparseLoop( playlist_preparse_t *p_obj )
+void *playlist_PreparseLoop( void *data )
 {
-    playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
-    input_item_t *p_current;
+    playlist_preparse_t *p_preparse = data;
+    playlist_t *p_playlist =  ((playlist_private_t *)(((char *)p_preparse)
+             - offsetof(playlist_private_t, preparse)))->p_playlist;
     int i_activity;
 
-    vlc_object_lock( p_obj );
-
-    while( vlc_object_alive( p_obj ) )
+    for( ;; )
     {
-        if( p_obj->i_waiting == 0 )
-        {
-            vlc_object_wait( p_obj );
-            continue;
-        }
+        input_item_t *p_current;
 
-        p_current = p_obj->pp_waiting[0];
-        REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
-        vlc_object_unlock( p_obj );
+        vlc_mutex_lock( &p_preparse->lock );
+        mutex_cleanup_push( &p_preparse->lock );
 
-        PL_LOCK;
+        while( p_preparse->i_waiting == 0 )
+            vlc_cond_wait( &p_preparse->wait, &p_preparse->lock );
+
+        p_current = p_preparse->pp_waiting[0];
+        REMOVE_ELEM( p_preparse->pp_waiting, p_preparse->i_waiting, 0 );
+        vlc_cleanup_run( );
+
         if( p_current )
         {
+            int canc = vlc_savecancel ();
+            PL_LOCK;
             if( p_current->i_type == ITEM_TYPE_FILE )
             {
                 stats_TimerStart( p_playlist, "Preparse run",
@@ -627,27 +639,18 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             }
             free( psz_name );
             free( psz_arturl );
-            PL_UNLOCK;
+	    PL_UNLOCK;
+            vlc_restorecancel( canc );
         }
-        else
-            PL_UNLOCK;
 
-        vlc_object_lock( p_obj );
         i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;
-        vlc_object_unlock( p_obj );
         /* Sleep at least 1ms */
         msleep( (i_activity+1) * 1000 );
-        vlc_object_lock( p_obj );
     }
 
-    while( p_obj->i_waiting > 0 )
-    {
-        vlc_gc_decref( p_obj->pp_waiting[0] );
-        REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
-    }
-
-    vlc_object_unlock( p_obj );
+    assert( 0 );
+    return NULL;
 }
 
 /**

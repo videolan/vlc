@@ -176,7 +176,6 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
     default:
         msg_Err( p_playlist, "unknown playlist query" );
         return VLC_EBADVAR;
-        break;
     }
     vlc_object_signal_unlocked( p_playlist );
 
@@ -190,37 +189,29 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
 int playlist_PreparseEnqueue( playlist_t *p_playlist,
                               input_item_t *p_item )
 {
-    vlc_object_lock( p_playlist->p->p_preparse );
-    if( !vlc_object_alive( p_playlist->p->p_preparse ) )
-    {
-        vlc_object_unlock( p_playlist->p->p_preparse );
-        return VLC_EGENERIC;
-    }
+    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+
     vlc_gc_incref( p_item );
-    INSERT_ELEM( p_playlist->p->p_preparse->pp_waiting,
-                 p_playlist->p->p_preparse->i_waiting,
-                 p_playlist->p->p_preparse->i_waiting,
-                 p_item );
-    vlc_object_signal_unlocked( p_playlist->p->p_preparse );
-    vlc_object_unlock( p_playlist->p->p_preparse );
+
+    vlc_mutex_lock( &p_preparse->lock );
+    INSERT_ELEM( p_preparse->pp_waiting, p_preparse->i_waiting,
+                 p_preparse->i_waiting, p_item );
+    vlc_cond_signal( &p_preparse->wait );
+    vlc_mutex_unlock( &p_preparse->lock );
     return VLC_SUCCESS;
 }
 
-/** Enqueue a playlist item or a node for peparsing.
- *  This function should be entered without playlist and preparser locks */
+/** Enqueue a playlist item or a node for preparsing.
+ *  This function shall be called without playlist and preparser locks */
 int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
                                   playlist_item_t *p_item )
 {
+    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+
     vlc_object_lock( p_playlist );
-    vlc_object_lock( p_playlist->p->p_preparse );
-    if( !vlc_object_alive( p_playlist->p->p_preparse ) )
-    {
-        vlc_object_unlock( p_playlist->p->p_preparse );
-        vlc_object_unlock( p_playlist );
-        return VLC_EGENERIC;
-    }
+    vlc_mutex_lock( &p_preparse->lock );
     PreparseEnqueueItemSub( p_playlist, p_item );
-    vlc_object_unlock( p_playlist->p->p_preparse );
+    vlc_mutex_unlock( &p_preparse->lock );
     vlc_object_unlock( p_playlist );
     return VLC_SUCCESS;
 }
@@ -247,18 +238,21 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
 static void PreparseEnqueueItemSub( playlist_t *p_playlist,
                                     playlist_item_t *p_item )
 {
-    int i;
+    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+
     if( p_item->i_children == -1 )
     {
+        /* Leaf item */
         vlc_gc_incref( p_item->p_input );
-        INSERT_ELEM( p_playlist->p->p_preparse->pp_waiting,
-                     p_playlist->p->p_preparse->i_waiting,
-                     p_playlist->p->p_preparse->i_waiting,
+        INSERT_ELEM( p_preparse->pp_waiting,
+                     p_preparse->i_waiting,
+                     p_preparse->i_waiting,
                      p_item->p_input );
     }
     else
     {
-        for( i = 0; i < p_item->i_children; i++)
+        /* Non-leaf item: recurse */
+        for( int i = 0; i < p_item->i_children; i++)
         {
             PreparseEnqueueItemSub( p_playlist, p_item->pp_children[i] );
         }

@@ -36,9 +36,7 @@
  * Local prototypes
  *****************************************************************************/
 static void* RunControlThread   ( vlc_object_t * );
-static void* RunPreparse        ( vlc_object_t * );
 static void* RunFetcher         ( vlc_object_t * );
-static void PreparseDestructor  ( vlc_object_t * );
 static void FetcherDestructor   ( vlc_object_t * );
 
 /*****************************************************************************
@@ -59,29 +57,20 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     if( !p_playlist ) return;
 
     // Preparse
-    static const char ppname[] = "preparser";
-    p_playlist->p->p_preparse =
-        vlc_custom_create( p_playlist, sizeof( playlist_preparse_t ),
-                           VLC_OBJECT_GENERIC, ppname );
-    if( !p_playlist->p->p_preparse )
-    {
-        msg_Err( p_playlist, "unable to create preparser" );
-        vlc_object_release( p_playlist );
-        return;
-    }
-    p_playlist->p->p_preparse->i_waiting = 0;
-    p_playlist->p->p_preparse->pp_waiting = NULL;
+    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+    vlc_mutex_init (&p_preparse->lock);
+    vlc_cond_init (&p_preparse->wait);
+    p_preparse->i_waiting = 0;
+    p_preparse->pp_waiting = NULL;
 
-    vlc_object_set_destructor( p_playlist->p->p_preparse, PreparseDestructor );
-
-    vlc_object_attach( p_playlist->p->p_preparse, p_playlist );
-    if( vlc_thread_create( p_playlist->p->p_preparse, "preparser",
-                           RunPreparse, VLC_THREAD_PRIORITY_LOW, false ) )
+    if( vlc_clone( &p_preparse->thread, playlist_PreparseLoop, p_preparse,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_playlist, "cannot spawn preparse thread" );
-        vlc_object_release( p_playlist->p->p_preparse );
+        p_preparse->up = false;
         return;
     }
+    p_preparse->up = true;
 
     // Secondary Preparse
     static const char fname[] = "fetcher";
@@ -166,20 +155,6 @@ static void* RunControlThread ( vlc_object_t *p_this )
     return NULL;
 }
 
-/*****************************************************************************
- * Preparse-specific functions
- *****************************************************************************/
-static void* RunPreparse ( vlc_object_t *p_this )
-{
-    playlist_preparse_t *p_obj = (playlist_preparse_t*)p_this;
-    int canc;
-
-    canc = vlc_savecancel ();
-    playlist_PreparseLoop( p_obj );
-    vlc_restorecancel (canc);
-    return NULL;
-}
-
 static void* RunFetcher( vlc_object_t *p_this )
 {
     playlist_fetcher_t *p_obj = (playlist_fetcher_t *)p_this;
@@ -187,13 +162,6 @@ static void* RunFetcher( vlc_object_t *p_this )
     playlist_FetcherLoop( p_obj );
     vlc_restorecancel (canc);
     return NULL;
-}
-
-static void PreparseDestructor( vlc_object_t * p_this )
-{
-    playlist_preparse_t * p_preparse = (playlist_preparse_t *)p_this;
-    free( p_preparse->pp_waiting );
-    msg_Dbg( p_this, "Destroyed" );
 }
 
 static void FetcherDestructor( vlc_object_t * p_this )

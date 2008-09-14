@@ -1,7 +1,7 @@
 /*****************************************************************************
- * playlist_internal.h : Functions for use by the playlist
+ * playlist_internal.h : Playlist internals
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -39,10 +39,12 @@
 
 typedef struct playlist_preparse_t
 {
-    VLC_COMMON_MEMBERS
+    vlc_thread_t    thread;
     vlc_mutex_t     lock;
-    int             i_waiting;
+    vlc_cond_t      wait;
     input_item_t  **pp_waiting;
+    int             i_waiting;
+    bool            up;
 } playlist_preparse_t;
 
 typedef struct playlist_fetcher_t
@@ -58,7 +60,8 @@ typedef struct playlist_fetcher_t
 
 struct playlist_private_t
 {
-    playlist_preparse_t  *p_preparse; /**< Preparser object */
+    playlist_t           *p_playlist; /**< Public data */
+    playlist_preparse_t  preparse; /**< Preparser data */
     playlist_fetcher_t   *p_fetcher; /**< Meta and art fetcher object */
     sout_instance_t      *p_sout; /**< Kept sout instance */
 };
@@ -80,7 +83,7 @@ playlist_t *playlist_Create   ( vlc_object_t * );
 /* Engine */
 void playlist_MainLoop( playlist_t * );
 void playlist_LastLoop( playlist_t * );
-void playlist_PreparseLoop( playlist_preparse_t * );
+void *playlist_PreparseLoop( void * );
 void playlist_FetcherLoop( playlist_fetcher_t * );
 
 void ResetCurrentlyPlaying( playlist_t *, bool, playlist_item_t * );
