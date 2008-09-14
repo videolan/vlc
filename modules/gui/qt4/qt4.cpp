@@ -271,10 +271,6 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    vlc_object_lock( p_intf );
-    p_intf->b_dead = true;
-    vlc_object_unlock( p_intf );
-
     if( p_intf->p_sys->b_isDialogProvider )
     {
         if( DialogsProvider::isAlive() )
