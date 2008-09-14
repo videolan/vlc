@@ -8,15 +8,8 @@
  * Changes on the git repository
    - update the version number everywhere it's needed
      · configure.ac
-     · extras/package/macosx/Resources/English.lproj/InfoPlist.strings
-     · extras/package/macosx/Info.plist
-     · extras/package/macosx/plugin/English.lproj/InfoPlist.strings
-     · extras/package/macosx/plugin/Info.plist
-     · extras/package/macosx/plugin/InstallerInfo.plist
-     · extras/package/macosx/vlc.xcodeproj/project.pbxproj 
-   - update the ChangeLog and NEWS files, as well as the Trac database:
-        LANG=C git log --since="01-01" --until="12-31" >! ChangeLog
-   - read all the commits and add important things to the NEWS file
+   - update the NEWS files, as well as the Trac database.
+     read all the commits and add important things to the NEWS file
    - update the milestones info on https://trac.videolan.org/vlc
    - Add a note about the matching contrib package in INSTALL.win32
    - Update OpenGPG key embedded in include/vlc_update.h if needed
