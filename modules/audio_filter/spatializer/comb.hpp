@@ -35,6 +35,13 @@ private:
 
 inline float comb::process(float input)
 {
+
+#if 1
+    /* FIXME FIXME FIXME
+     * comb::process is completly broken so ignore it for now */
+    return 0.0;
+
+#else
     float output;
 
     output = undenormalise( buffer[bufidx] );
@@ -46,6 +53,7 @@ inline float comb::process(float input)
     if(++bufidx>=bufsize) bufidx = 0;
 
     return output;
+#endif
 }
 
 #endif //_comb_

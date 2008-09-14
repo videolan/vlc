@@ -10,11 +10,11 @@
 
 #include <stdint.h>
 
+#include <math.h>
+
 static inline float undenormalise( float f )
 {
-    union { float f; uint32_t u; } data;
-    data.f = f;
-    if( (data.u & 0x7f800000) == 0 )
+    if( fpclassify( f ) == FP_SUBNORMAL  )
         return 0.0;
     return f;
 }
