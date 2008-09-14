@@ -12,9 +12,14 @@ Decoders:
 
 Stream output:
  * Restored the old mpeg2 transrating module.
- * Restored the old behavior of --sout-keep. It is now de-activated by default.
  * Multiple bridge-in instances are now possible.
  * bridge-in can be used to configure a placeholder stream.
+
+Changes between 0.9.1 and 0.9.2
+-------------------------------
+
+ * Restored the old behavior of --sout-keep. It is now de-activated by default.
+ * Multiple bugfixes
 
 Changes between 0.8.6i and 0.9.1:
 ---------------------------------
@@ -24,7 +29,8 @@ minute.
 
 Important notes:
 ----------------
- * This release will not work with Windows 98/ME and Mac OS X 10.3.9 (Panther)
+ * This release will need Windows 2000 and Mac OS X 10.4 (Tiger) to work
+   correctly
  * The HTTP interface is now only available on the local machine by default.
    If you want to make it available from other machines, you will have to
    edit the ".hosts" file.
@@ -38,7 +44,7 @@ Important notes:
  * This version of VLC contains a new interface for Windows and Linux.
    This interface has a fullscreen controller and simplified preferences.
    This interface lacks the "Streaming Wizard" that used to be present in VLC
-   0.8.6.
+   0.8.6, but provides basic profiles.
  * The behavior of --sout-keep was changed. It's now activated by default.
  * The marq, mosaic and logo commands in the rc interface changed. They
    now require a target name as their first argument. Example:
@@ -56,7 +62,7 @@ Important notes:
    of options is available to m3u playlists (CVE-2007-6683).
  * The old access:url syntax is no longer supported to resolve ambiguities
    with some file names. Use access://url instead.
-    E.g.:  vlc:quit -> vlc://quit ; 
+    E.g.:  vlc:quit -> vlc://quit ;
            udp:@239.255.12.12 -> udp://@239.255.12.12
  * The ffmpeg module has been removed and replaced by the new avcodec,
    avformat, swscale (or imgresample if you use a swscale-less ffmpeg build)
@@ -78,7 +84,8 @@ Changes:
 --------
 
 Security updates:
- * Updated libfreetype on Windows and Mac OS X (CVE-??)
+ * Updated libfreetype on Windows and Mac OS X (CVE-2008-1806, CVE-2008-1806,
+   CVE-2008-1807)
  * TTA Parser improvements (CVE-2008-3732)
  * MMS Access Module improvements (CVE-2008-3794 )
 
