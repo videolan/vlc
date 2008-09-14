@@ -219,19 +219,15 @@ int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
 int playlist_AskForArtEnqueue( playlist_t *p_playlist,
                                input_item_t *p_item )
 {
-    playlist_fetcher_t *p_fetcher = pl_priv(p_playlist)->p_fetcher;
-    vlc_object_lock( p_fetcher );
-    if( !vlc_object_alive( p_fetcher ) )
-    {
-        vlc_object_unlock( p_fetcher );
-        return VLC_EGENERIC;
-    }
+    playlist_fetcher_t *p_fetcher = &pl_priv(p_playlist)->fetcher;
 
     vlc_gc_incref( p_item );
+
+    vlc_mutex_lock( &p_fetcher->lock );
     INSERT_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting,
                  p_fetcher->i_waiting, p_item );
-    vlc_object_signal_unlocked( p_fetcher );
-    vlc_object_unlock( p_fetcher );
+    vlc_cond_signal( &p_fetcher->wait );
+    vlc_mutex_unlock( &p_fetcher->lock );
     return VLC_SUCCESS;
 }
 
@@ -534,8 +530,7 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
     free( psz_uri );
 
-    if( pl_priv(p_playlist)->p_fetcher &&
-        pl_priv(p_playlist)->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
+    if( pl_priv(p_playlist)->fetcher.i_art_policy == ALBUM_ART_WHEN_PLAYED )
     {
         bool b_has_art;
 

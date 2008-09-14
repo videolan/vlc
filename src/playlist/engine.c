@@ -176,9 +176,9 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 static void playlist_Destructor( vlc_object_t * p_this )
 {
     playlist_t * p_playlist = (playlist_t *)p_this;
-    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
 
     /* Destroy the item preparser */
+    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
     if (p_preparse->up)
     {
         vlc_cancel (p_preparse->thread);
@@ -193,10 +193,20 @@ static void playlist_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy (&p_preparse->lock);
 
     /* Destroy the item meta-infos fetcher */
-    if( pl_priv(p_playlist)->p_fetcher )
+    playlist_fetcher_t *p_fetcher = &pl_priv(p_playlist)->fetcher;
+    if (p_fetcher->up)
     {
-        vlc_object_release( pl_priv(p_playlist)->p_fetcher );
+        vlc_cancel (p_fetcher->thread);
+        vlc_join (p_fetcher->thread, NULL);
     }
+    while (p_fetcher->i_waiting > 0)
+    {   /* Any left-over unparsed item? */
+        vlc_gc_decref (p_fetcher->pp_waiting[0]);
+        REMOVE_ELEM (p_fetcher->pp_waiting, p_fetcher->i_waiting, 0);
+    }
+    vlc_cond_destroy (&p_fetcher->wait);
+    vlc_mutex_destroy (&p_fetcher->lock);
+
     msg_Dbg( p_this, "Destroyed" );
 }
 
@@ -530,9 +540,6 @@ void playlist_LastLoop( playlist_t *p_playlist )
     playlist_ServicesDiscoveryKillAll( p_playlist );
     playlist_MLDump( p_playlist );
 
-    vlc_object_kill( pl_priv(p_playlist)->p_fetcher );
-    vlc_thread_join( pl_priv(p_playlist)->p_fetcher );
-
     PL_LOCK;
 
     /* Release the current node */
@@ -571,7 +578,6 @@ void *playlist_PreparseLoop( void *data )
     playlist_preparse_t *p_preparse = data;
     playlist_t *p_playlist = &((playlist_private_t *)(((char *)p_preparse)
              - offsetof(playlist_private_t, preparse)))->public_data;
-    int i_activity;
 
     for( ;; )
     {
@@ -615,21 +621,16 @@ void *playlist_PreparseLoop( void *data )
              */
             char *psz_arturl = input_item_GetArtURL( p_current );
             char *psz_name = input_item_GetName( p_current );
-            playlist_fetcher_t *p_fetcher = pl_priv(p_playlist)->p_fetcher;
+            playlist_fetcher_t *p_fetcher = &pl_priv(p_playlist)->fetcher;
             if( p_fetcher->i_art_policy == ALBUM_ART_ALL &&
                 ( !psz_arturl || strncmp( psz_arturl, "file://", 7 ) ) )
             {
                 PL_DEBUG("meta ok for %s, need to fetch art", psz_name );
-                vlc_object_lock( p_fetcher );
-                if( vlc_object_alive( p_fetcher ) )
-                {
-                    INSERT_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting,
-                                 p_fetcher->i_waiting, p_current);
-                    vlc_object_signal_unlocked( p_fetcher );
-                }
-                else
-                    vlc_gc_decref( p_current );
-                vlc_object_unlock( p_fetcher );
+                vlc_mutex_lock( &p_fetcher->lock );
+                INSERT_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting,
+                             p_fetcher->i_waiting, p_current);
+                vlc_cond_signal( &p_fetcher->wait );
+                vlc_mutex_unlock( &p_fetcher->lock );
             }
             else
             {
@@ -643,7 +644,7 @@ void *playlist_PreparseLoop( void *data )
             vlc_restorecancel( canc );
         }
 
-        i_activity = var_GetInteger( p_playlist, "activity" );
+        int i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;
         /* Sleep at least 1ms */
         msleep( (i_activity+1) * 1000 );
@@ -656,36 +657,38 @@ void *playlist_PreparseLoop( void *data )
 /**
  * Fetcher loop
  *
- * Main loop for secondary preparser queue
- * \param p_obj items to preparse
- * \return nothing
+ * \return never
  */
-void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
+void *playlist_FetcherLoop( void *data )
 {
-    playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
-    input_item_t *p_item;
-    int i_activity;
+    playlist_fetcher_t *p_fetcher = data;
+    playlist_t *p_playlist = &((playlist_private_t *)(((char *)p_fetcher)
+             - offsetof(playlist_private_t, fetcher)))->public_data;
 
-    vlc_object_lock( p_obj );
-
-    while( vlc_object_alive( p_obj ) )
+    for( ;; )
     {
-        if( p_obj->i_waiting == 0 )
-        {
-            vlc_object_wait( p_obj );
-            continue;
-        }
+        input_item_t *p_item;
 
-        p_item = p_obj->pp_waiting[0];
-        REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
-        vlc_object_unlock( p_obj );
+        vlc_mutex_lock( &p_fetcher->lock );
+        mutex_cleanup_push( &p_fetcher->lock );
+
+        while( p_fetcher->i_waiting == 0 )
+            vlc_cond_wait( &p_fetcher->wait, &p_fetcher->lock );
+
+        p_item = p_fetcher->pp_waiting[0];
+        REMOVE_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting, 0 );
+        vlc_cleanup_run( );
+
+        int canc = vlc_savecancel();
         if( p_item )
         {
             int i_ret;
 
-            /* Check if it is not yet preparsed and if so wait for it (at most 0.5s)
+            /* Check if it is not yet preparsed and if so wait for it
+             * (at most 0.5s)
              * (This can happen if we fetch art on play)
-             * FIXME this doesn't work if we need to fetch meta before art ... */
+             * FIXME this doesn't work if we need to fetch meta before art...
+             */
             for( i_ret = 0; i_ret < 10 && !input_item_IsPreparsed( p_item ); i_ret++ )
             {
                 bool b_break;
@@ -723,22 +726,16 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
             }
             vlc_gc_decref( p_item );
         }
-        vlc_object_lock( p_obj );
-        i_activity = var_GetInteger( p_playlist, "activity" );
+        vlc_restorecancel( canc );
+
+        int i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;
-        vlc_object_unlock( p_obj );
         /* Sleep at least 1ms */
         msleep( (i_activity+1) * 1000 );
-        vlc_object_lock( p_obj );
     }
 
-    while( p_obj->i_waiting > 0 )
-    {
-        vlc_gc_decref( p_obj->pp_waiting[0] );
-        REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
-    }
-
-    vlc_object_unlock( p_obj );
+    assert( 0 );
+    return NULL;
 }
 
 static void VariablesInit( playlist_t *p_playlist )

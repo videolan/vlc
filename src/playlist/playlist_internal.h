@@ -49,11 +49,13 @@ typedef struct playlist_preparse_t
 
 typedef struct playlist_fetcher_t
 {
-    VLC_COMMON_MEMBERS
+    vlc_thread_t    thread;
     vlc_mutex_t     lock;
+    vlc_cond_t      wait;
     int             i_art_policy;
     int             i_waiting;
     input_item_t    **pp_waiting;
+    bool            up;
 
     DECL_ARRAY(playlist_album_t) albums;
 } playlist_fetcher_t;
@@ -62,7 +64,7 @@ typedef struct playlist_private_t
 {
     playlist_t           public_data;
     playlist_preparse_t  preparse; /**< Preparser data */
-    playlist_fetcher_t   *p_fetcher; /**< Meta and art fetcher object */
+    playlist_fetcher_t   fetcher; /**< Meta and art fetcher data */
     sout_instance_t      *p_sout; /**< Kept sout instance */
 } playlist_private_t;
 
@@ -86,7 +88,7 @@ playlist_t *playlist_Create   ( vlc_object_t * );
 void playlist_MainLoop( playlist_t * );
 void playlist_LastLoop( playlist_t * );
 void *playlist_PreparseLoop( void * );
-void playlist_FetcherLoop( playlist_fetcher_t * );
+void *playlist_FetcherLoop( void * );
 
 void ResetCurrentlyPlaying( playlist_t *, bool, playlist_item_t * );
 

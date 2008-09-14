@@ -36,8 +36,6 @@
  * Local prototypes
  *****************************************************************************/
 static void* RunControlThread   ( vlc_object_t * );
-static void* RunFetcher         ( vlc_object_t * );
-static void FetcherDestructor   ( vlc_object_t * );
 
 /*****************************************************************************
  * Main functions for the global thread
@@ -73,30 +71,21 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     p_preparse->up = true;
 
     // Secondary Preparse
-    static const char fname[] = "fetcher";
-    playlist_fetcher_t *p_fetcher =
-    pl_priv(p_playlist)->p_fetcher =
-        vlc_custom_create( p_playlist, sizeof( playlist_fetcher_t ),
-                           VLC_OBJECT_GENERIC, fname );
-    if( !p_fetcher )
-    {
-        msg_Err( p_playlist, "unable to create secondary preparser" );
-        vlc_object_release( p_playlist );
-        return;
-    }
+    playlist_fetcher_t *p_fetcher = &pl_priv(p_playlist)->fetcher;
+    vlc_mutex_init (&p_fetcher->lock);
+    vlc_cond_init (&p_fetcher->wait);
     p_fetcher->i_waiting = 0;
     p_fetcher->pp_waiting = NULL;
     p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist, "album-art" );
 
-    vlc_object_set_destructor( p_fetcher, FetcherDestructor );
-    vlc_object_attach( p_fetcher, p_playlist );
-    if( vlc_thread_create( p_fetcher, "fetcher", RunFetcher,
-                           VLC_THREAD_PRIORITY_LOW, false ) )
+    if( vlc_clone( &p_fetcher->thread, playlist_FetcherLoop, p_fetcher,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
-        vlc_object_release( p_fetcher );
+        p_fetcher->up = false;
         return;
     }
+    p_fetcher->up = true;
 
     // Start the thread
     if( vlc_thread_create( p_playlist, "playlist", RunControlThread,
@@ -150,20 +139,4 @@ static void* RunControlThread ( vlc_object_t *p_this )
     playlist_LastLoop( p_playlist );
     vlc_restorecancel (canc);
     return NULL;
-}
-
-static void* RunFetcher( vlc_object_t *p_this )
-{
-    playlist_fetcher_t *p_obj = (playlist_fetcher_t *)p_this;
-    int canc = vlc_savecancel ();
-    playlist_FetcherLoop( p_obj );
-    vlc_restorecancel (canc);
-    return NULL;
-}
-
-static void FetcherDestructor( vlc_object_t * p_this )
-{
-    playlist_fetcher_t * p_fetcher = (playlist_fetcher_t *)p_this;
-    free( p_fetcher->pp_waiting );
-    msg_Dbg( p_this, "Destroyed" );
 }
