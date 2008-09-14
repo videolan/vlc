@@ -2427,6 +2427,8 @@ dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
 AC_ARG_ENABLE(libcdio,
   [  --enable-libcdio        CD input and control library support (default enabled)])
 
+AC_ARG_ENABLE(vcdinfo,
+  [  --enable-libvcdinfo     VCD information library support (default enabled)])
 
 have_libcdio=no
 have_libvcdinfo=no
@@ -2438,11 +2440,14 @@ then
      [Define if you have libcdio 0.78.2 or greater installed]),
      [AC_MSG_WARN(CD Reading and information library not found)])
 
-  PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.22,
-     [have_libvcdinfo=yes
-     AC_DEFINE(HAVE_VCDINFO, 1, 
-     [Define if you have libvcdinfo 0.7.22 or greater installed])],
-     [AC_MSG_WARN(VCD information library not found)])
+  if test "${enable_vcdinfo}" != "no"
+  then
+    PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.22,
+       [have_libvcdinfo=yes
+       AC_DEFINE(HAVE_VCDINFO, 1, 
+       [Define if you have libvcdinfo 0.7.22 or greater installed])],
+       [AC_MSG_WARN(VCD information library not found)])
+  fi
 fi
 
 dnl
