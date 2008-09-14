@@ -37,22 +37,15 @@
 #include "input/input_internal.h"
 #include <assert.h>
 
-struct playlist_private_t
-{
-    playlist_preparse_t  *p_preparse; /**< Preparser object */
-    playlist_fetcher_t   *p_fetcher; /**< Meta and art fetcher object */
-    sout_instance_t      *p_sout; /**< Kept sout instance */
-};
-
-struct playlist_preparse_t
+typedef struct playlist_preparse_t
 {
     VLC_COMMON_MEMBERS
     vlc_mutex_t     lock;
     int             i_waiting;
     input_item_t  **pp_waiting;
-};
+} playlist_preparse_t;
 
-struct playlist_fetcher_t
+typedef struct playlist_fetcher_t
 {
     VLC_COMMON_MEMBERS
     vlc_mutex_t     lock;
@@ -61,6 +54,13 @@ struct playlist_fetcher_t
     input_item_t    **pp_waiting;
 
     DECL_ARRAY(playlist_album_t) albums;
+} playlist_fetcher_t;
+
+struct playlist_private_t
+{
+    playlist_preparse_t  *p_preparse; /**< Preparser object */
+    playlist_fetcher_t   *p_fetcher; /**< Meta and art fetcher object */
+    sout_instance_t      *p_sout; /**< Kept sout instance */
 };
 
 /*****************************************************************************
