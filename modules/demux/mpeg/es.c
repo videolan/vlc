@@ -59,6 +59,8 @@ vlc_module_begin();
     add_shortcut( "ac3" );
     add_shortcut( "a52" );
 
+    add_shortcut( "eac3" );
+
     add_shortcut( "dts" );
 vlc_module_end();
 
@@ -116,6 +118,7 @@ static int MpgaInit( demux_t *p_demux );
 static int AacProbe( demux_t *p_demux, int64_t *pi_offset );
 static int AacInit( demux_t *p_demux );
 
+static int EA52Probe( demux_t *p_demux, int64_t *pi_offset );
 static int A52Probe( demux_t *p_demux, int64_t *pi_offset );
 static int A52Init( demux_t *p_demux );
 
@@ -123,10 +126,11 @@ static int DtsProbe( demux_t *p_demux, int64_t *pi_offset );
 static int DtsInit( demux_t *p_demux );
 
 static const codec_t p_codec[] = {
-    { VLC_FOURCC( 'm', 'p', '4', 'a' ), false, "mp4 audio", AacProbe, AacInit },
+    { VLC_FOURCC( 'm', 'p', '4', 'a' ), false, "mp4 audio",  AacProbe,  AacInit },
     { VLC_FOURCC( 'm', 'p', 'g', 'a' ), false, "mpeg audio", MpgaProbe, MpgaInit },
-    { VLC_FOURCC( 'a', '5', '2', ' ' ), true,  "a52 audio", A52Probe, A52Init },
-    { VLC_FOURCC( 'd', 't', 's', ' ' ), false, "dts audio", DtsProbe, DtsInit },
+    { VLC_FOURCC( 'a', '5', '2', ' ' ), true,  "a52 audio",  A52Probe,  A52Init },
+    { VLC_FOURCC( 'e', 'a', 'c', '3' ), true,  "eac3 audio", EA52Probe, A52Init },
+    { VLC_FOURCC( 'd', 't', 's', ' ' ), false, "dts audio",  DtsProbe,  DtsInit },
 
     { 0, false, NULL, NULL, NULL }
 };
@@ -681,18 +685,20 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
 /*****************************************************************************
  * A52
  *****************************************************************************/
-static bool A52CheckSync( const uint8_t *p_peek, bool *p_big_endian )
+static bool A52CheckSync( const uint8_t *p_peek, bool *p_big_endian, bool b_eac3 )
 {
+    /* bsid: 0-8 11-16 */
+
     /* Little endian version of the bitstream */
     if( p_peek[0] == 0x77 && p_peek[1] == 0x0b &&
-        p_peek[4] < 0x60 /* bsid < 12 */ )
+        ( p_peek[4] >> 3 ) <= ( b_eac3 ? 16 : 10 ) /* bsid */ )
     {
         *p_big_endian = false;
         return true;
     }
     /* Big endian version of the bitstream */
     else if( p_peek[0] == 0x0b && p_peek[1] == 0x77 &&
-             p_peek[5] < 0x60 /* bsid < 12 */ )
+             ( p_peek[5] >> 3 ) <= ( b_eac3 ? 16 : 10 ) /* bsid */ )
     {
         *p_big_endian = true;
         return true;
@@ -700,10 +706,23 @@ static bool A52CheckSync( const uint8_t *p_peek, bool *p_big_endian )
 
     return false;
 }
+static bool EA52CheckSyncProbe( const uint8_t *p_peek )
+{
+    bool b_dummy;
+    return A52CheckSync( p_peek, &b_dummy, true );
+}
+
+static int EA52Probe( demux_t *p_demux, int64_t *pi_offset )
+{
+    const char *ppsz_name[] = { "eac3", NULL };
+
+    return GenericProbe( p_demux, pi_offset, ppsz_name, EA52CheckSyncProbe, 10 );
+}
+
 static bool A52CheckSyncProbe( const uint8_t *p_peek )
 {
     bool b_dummy;
-    return A52CheckSync( p_peek, &b_dummy );
+    return A52CheckSync( p_peek, &b_dummy, false );
 }
 
 static int A52Probe( demux_t *p_demux, int64_t *pi_offset )
@@ -725,7 +744,7 @@ static int A52Init( demux_t *p_demux )
     /* peek the begining (10 is for a52 header) */
     if( stream_Peek( p_demux->s, &p_peek, 10 ) >= 10 )
     {
-        A52CheckSync( p_peek, &p_sys->b_big_endian );
+        A52CheckSync( p_peek, &p_sys->b_big_endian, true );
     }
     return VLC_SUCCESS;
 }
