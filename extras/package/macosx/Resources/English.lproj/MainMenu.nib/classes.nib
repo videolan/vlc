@@ -356,6 +356,7 @@
                 playItem = id;
                 preparseItem = id;
                 recursiveExpandNode = id;
+                revealItemInFinder = id;
                 savePlaylist = id;
                 searchItem = id;
                 selectAll = id;
@@ -376,11 +377,13 @@
                 "o_mi_play" = id;
                 "o_mi_preparse" = id;
                 "o_mi_recursive_expand" = id;
+                "o_mi_revealInFinder" = id;
                 "o_mi_save_playlist" = id;
                 "o_mi_selectall" = id;
                 "o_mi_services" = id;
                 "o_mi_sort_author" = id;
                 "o_mi_sort_name" = id;
+                "o_mm_mi_revealInFinder" = id;
                 "o_mm_mi_services" = id;
                 "o_mm_mu_services" = id;
                 "o_mu_services" = id;

@@ -442,6 +442,9 @@
     [o_mi_selectall setTitle: _NS("Select All")];
     [o_mi_info setTitle: _NS("Information...")];
     [o_mi_preparse setTitle: _NS("Fetch Meta Data")];
+    [o_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
+    [o_mm_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
+    [[o_mm_mi_revealInFinder menu] setAutoenablesItems: NO];
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
     [o_mi_services setTitle: _NS("Services discovery")];
@@ -520,6 +523,28 @@
     {
         /* update our info-panel to reflect the new item */
         [[[VLCMain sharedInstance] getInfo] updatePanelWithItem:p_item->p_input];
+        
+        /* update the state of our Reveal-in-Finder menu items */
+        NSMutableString *o_mrl;
+        char *psz_uri = input_item_GetURI( p_item->p_input );
+        if( psz_uri )
+        {
+            o_mrl = [NSMutableString stringWithUTF8String: psz_uri];
+        
+            /* perform some checks whether it is a file and if it is local at all... */
+            NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
+            if( prefix_range.location != NSNotFound )
+                [o_mrl deleteCharactersInRange: prefix_range];
+            
+            if( [o_mrl characterAtIndex:0] == '/' )
+            {
+                [o_mi_revealInFinder setEnabled: YES];
+                [o_mm_mi_revealInFinder setEnabled: YES];
+                return;
+            }
+        }
+        [o_mi_revealInFinder setEnabled: NO];
+        [o_mm_mi_revealInFinder setEnabled: NO];
     }
 }
 
@@ -762,6 +787,27 @@
     }
     vlc_object_release( p_playlist );
 }
+
+- (IBAction)revealItemInFinder:(id)sender
+{
+    playlist_item_t * p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
+    NSMutableString * o_mrl = nil;
+
+    if(! p_item || !p_item->p_input )
+        return;
+    
+    char *psz_uri = input_item_GetURI( p_item->p_input );
+    if( psz_uri )
+        o_mrl = [NSMutableString stringWithUTF8String: psz_uri];
+
+    /* perform some checks whether it is a file and if it is local at all... */
+    NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
+    if( prefix_range.location != NSNotFound )
+        [o_mrl deleteCharactersInRange: prefix_range];
+    
+    if( [o_mrl characterAtIndex:0] == '/' )
+        [[NSWorkspace sharedWorkspace] selectFile: o_mrl inFileViewerRootedAtPath: o_mrl];
+}    
 
 /* When called retrieves the selected outlineview row and plays that node or item */
 - (IBAction)preparseItem:(id)sender
