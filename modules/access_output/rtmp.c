@@ -272,7 +272,6 @@ static void Close( vlc_object_t * p_this )
 //    p_sys->p_thread->b_die = true;
     vlc_object_kill( p_sys->p_thread );
     block_FifoWake( p_sys->p_thread->p_fifo_input );
-    block_FifoWake( p_sys->p_thread->p_empty_blocks );
 
     vlc_thread_join( p_sys->p_thread );
 
