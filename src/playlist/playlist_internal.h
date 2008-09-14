@@ -58,13 +58,15 @@ typedef struct playlist_fetcher_t
     DECL_ARRAY(playlist_album_t) albums;
 } playlist_fetcher_t;
 
-struct playlist_private_t
+typedef struct playlist_private_t
 {
-    playlist_t           *p_playlist; /**< Public data */
+    playlist_t           public_data;
     playlist_preparse_t  preparse; /**< Preparser data */
     playlist_fetcher_t   *p_fetcher; /**< Meta and art fetcher object */
     sout_instance_t      *p_sout; /**< Kept sout instance */
-};
+} playlist_private_t;
+
+#define pl_priv( pl ) ((playlist_private_t *)(pl))
 
 /*****************************************************************************
  * Prototypes

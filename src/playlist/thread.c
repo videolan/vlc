@@ -57,7 +57,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     if( !p_playlist ) return;
 
     // Preparse
-    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
     vlc_mutex_init (&p_preparse->lock);
     vlc_cond_init (&p_preparse->wait);
     p_preparse->i_waiting = 0;
@@ -74,30 +74,27 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     // Secondary Preparse
     static const char fname[] = "fetcher";
-    p_playlist->p->p_fetcher =
+    playlist_fetcher_t *p_fetcher =
+    pl_priv(p_playlist)->p_fetcher =
         vlc_custom_create( p_playlist, sizeof( playlist_fetcher_t ),
                            VLC_OBJECT_GENERIC, fname );
-    if( !p_playlist->p->p_fetcher )
+    if( !p_fetcher )
     {
         msg_Err( p_playlist, "unable to create secondary preparser" );
         vlc_object_release( p_playlist );
         return;
     }
-    p_playlist->p->p_fetcher->i_waiting = 0;
-    p_playlist->p->p_fetcher->pp_waiting = NULL;
-    p_playlist->p->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
-                                                                "album-art" );
+    p_fetcher->i_waiting = 0;
+    p_fetcher->pp_waiting = NULL;
+    p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist, "album-art" );
 
-    vlc_object_set_destructor( p_playlist->p->p_fetcher, FetcherDestructor );
-
-    vlc_object_attach( p_playlist->p->p_fetcher, p_playlist );
-    if( vlc_thread_create( p_playlist->p->p_fetcher,
-                           "fetcher",
-                           RunFetcher,
+    vlc_object_set_destructor( p_fetcher, FetcherDestructor );
+    vlc_object_attach( p_fetcher, p_playlist );
+    if( vlc_thread_create( p_fetcher, "fetcher", RunFetcher,
                            VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
-        vlc_object_release( p_playlist->p->p_fetcher );
+        vlc_object_release( p_fetcher );
         return;
     }
 

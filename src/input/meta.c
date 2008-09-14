@@ -99,7 +99,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     /* If we already checked this album in this session, skip */
     if( psz_artist && psz_album )
     {
-        FOREACH_ARRAY( playlist_album_t album, p_playlist->p->p_fetcher->albums )
+        FOREACH_ARRAY( playlist_album_t album, pl_priv(p_playlist)->p_fetcher->albums )
             if( !strcmp( album.psz_artist, psz_artist ) &&
                 !strcmp( album.psz_album, psz_album ) )
             {
@@ -179,7 +179,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
         a.psz_album = psz_album;
         a.psz_arturl = input_item_GetArtURL( p_item );
         a.b_found = (i_ret == VLC_EGENERIC ? false : true );
-        ARRAY_APPEND( p_playlist->p->p_fetcher->albums, a );
+        ARRAY_APPEND( pl_priv(p_playlist)->p_fetcher->albums, a );
     }
     else
     {

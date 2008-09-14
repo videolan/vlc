@@ -189,7 +189,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
 int playlist_PreparseEnqueue( playlist_t *p_playlist,
                               input_item_t *p_item )
 {
-    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
 
     vlc_gc_incref( p_item );
 
@@ -206,7 +206,7 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
 int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
                                   playlist_item_t *p_item )
 {
-    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
 
     vlc_object_lock( p_playlist );
     vlc_mutex_lock( &p_preparse->lock );
@@ -219,26 +219,26 @@ int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
 int playlist_AskForArtEnqueue( playlist_t *p_playlist,
                                input_item_t *p_item )
 {
-    vlc_object_lock( p_playlist->p->p_fetcher );
-    if( !vlc_object_alive( p_playlist->p->p_fetcher ) )
+    playlist_fetcher_t *p_fetcher = pl_priv(p_playlist)->p_fetcher;
+    vlc_object_lock( p_fetcher );
+    if( !vlc_object_alive( p_fetcher ) )
     {
-        vlc_object_unlock( p_playlist->p->p_fetcher );
+        vlc_object_unlock( p_fetcher );
         return VLC_EGENERIC;
     }
 
     vlc_gc_incref( p_item );
-    INSERT_ELEM( p_playlist->p->p_fetcher->pp_waiting,
-                 p_playlist->p->p_fetcher->i_waiting,
-                 p_playlist->p->p_fetcher->i_waiting, p_item );
-    vlc_object_signal_unlocked( p_playlist->p->p_fetcher );
-    vlc_object_unlock( p_playlist->p->p_fetcher );
+    INSERT_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting,
+                 p_fetcher->i_waiting, p_item );
+    vlc_object_signal_unlocked( p_fetcher );
+    vlc_object_unlock( p_fetcher );
     return VLC_SUCCESS;
 }
 
 static void PreparseEnqueueItemSub( playlist_t *p_playlist,
                                     playlist_item_t *p_item )
 {
-    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
 
     if( p_item->i_children == -1 )
     {
@@ -505,7 +505,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     input_item_t *p_input = p_item->p_input;
-    sout_instance_t **pp_sout = &p_playlist->p->p_sout;
+    sout_instance_t **pp_sout = &pl_priv(p_playlist)->p_sout;
     int i_activity = var_GetInteger( p_playlist, "activity" ) ;
 
     msg_Dbg( p_playlist, "creating new input thread" );
@@ -534,8 +534,8 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
     free( psz_uri );
 
-    if( p_playlist->p->p_fetcher &&
-            p_playlist->p->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
+    if( pl_priv(p_playlist)->p_fetcher &&
+        pl_priv(p_playlist)->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
     {
         bool b_has_art;
 

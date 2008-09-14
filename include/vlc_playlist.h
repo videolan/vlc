@@ -153,8 +153,6 @@ struct playlist_item_t
 typedef enum
 { PLAYLIST_STOPPED,PLAYLIST_RUNNING,PLAYLIST_PAUSED } playlist_status_t;
 
-typedef struct playlist_private_t playlist_private_t;
-
 /** Structure containing information about the playlist */
 struct playlist_t
 {
@@ -224,10 +222,6 @@ struct playlist_t
                                            when processing the request */
         vlc_mutex_t         lock;     /**< Lock to protect request */
     } request;
-
-    /* All other data is PRIVATE. You can't access it
-     * outside of src/input */
-    playlist_private_t *p;
 };
 
 /** Helper to add an item */

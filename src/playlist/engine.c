@@ -61,24 +61,24 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 {
     static const char playlist_name[] = "playlist";
     playlist_t *p_playlist;
+    playlist_private_t *p;
     bool b_save;
 
     /* Allocate structure */
-    p_playlist = vlc_custom_create( p_parent, sizeof( *p_playlist ),
-                                    VLC_OBJECT_GENERIC, playlist_name );
-    if( !p_playlist )
+    p = vlc_custom_create( p_parent, sizeof( *p ),
+                           VLC_OBJECT_GENERIC, playlist_name );
+    if( !p )
         return NULL;
 
+    assert( offsetof( playlist_private_t, public_data ) == 0 );
+    p_playlist = &p->public_data;
     TAB_INIT( p_playlist->i_sds, p_playlist->pp_sds );
-    MALLOC_NULL( p_playlist->p, playlist_private_t );
-    memset( p_playlist->p, 0, sizeof( playlist_private_t ) );
 
     libvlc_priv(p_parent->p_libvlc)->p_playlist = p_playlist;
 
     VariablesInit( p_playlist );
 
     /* Initialise data structures */
-    p_playlist->p->p_playlist = p_playlist;
     p_playlist->i_last_playlist_id = 0;
     p_playlist->p_input = NULL;
 
@@ -176,7 +176,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 static void playlist_Destructor( vlc_object_t * p_this )
 {
     playlist_t * p_playlist = (playlist_t *)p_this;
-    playlist_preparse_t *p_preparse = &p_playlist->p->preparse;
+    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
 
     /* Destroy the item preparser */
     if (p_preparse->up)
@@ -193,9 +193,9 @@ static void playlist_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy (&p_preparse->lock);
 
     /* Destroy the item meta-infos fetcher */
-    if( p_playlist->p->p_fetcher )
+    if( pl_priv(p_playlist)->p_fetcher )
     {
-        vlc_object_release( p_playlist->p->p_fetcher );
+        vlc_object_release( pl_priv(p_playlist)->p_fetcher );
     }
     msg_Dbg( p_this, "Destroyed" );
 }
@@ -379,7 +379,7 @@ check_input:
         {
             int i_activity;
             input_thread_t *p_input;
-            sout_instance_t **pp_sout = &p_playlist->p->p_sout;
+            sout_instance_t **pp_sout = &pl_priv(p_playlist)->p_sout;
 
             PL_DEBUG( "dead input" );
 
@@ -520,7 +520,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
 
 #ifdef ENABLE_SOUT
     /* close the remaining sout-keep (if there was no input atm) */
-    sout_instance_t *p_sout = p_playlist->p->p_sout;
+    sout_instance_t *p_sout = pl_priv(p_playlist)->p_sout;
     if (p_sout)
         sout_DeleteInstance( p_sout );
 #endif
@@ -530,8 +530,8 @@ void playlist_LastLoop( playlist_t *p_playlist )
     playlist_ServicesDiscoveryKillAll( p_playlist );
     playlist_MLDump( p_playlist );
 
-    vlc_object_kill( p_playlist->p->p_fetcher );
-    vlc_thread_join( p_playlist->p->p_fetcher );
+    vlc_object_kill( pl_priv(p_playlist)->p_fetcher );
+    vlc_thread_join( pl_priv(p_playlist)->p_fetcher );
 
     PL_LOCK;
 
@@ -569,8 +569,8 @@ void playlist_LastLoop( playlist_t *p_playlist )
 void *playlist_PreparseLoop( void *data )
 {
     playlist_preparse_t *p_preparse = data;
-    playlist_t *p_playlist =  ((playlist_private_t *)(((char *)p_preparse)
-             - offsetof(playlist_private_t, preparse)))->p_playlist;
+    playlist_t *p_playlist = &((playlist_private_t *)(((char *)p_preparse)
+             - offsetof(playlist_private_t, preparse)))->public_data;
     int i_activity;
 
     for( ;; )
@@ -615,21 +615,21 @@ void *playlist_PreparseLoop( void *data )
              */
             char *psz_arturl = input_item_GetArtURL( p_current );
             char *psz_name = input_item_GetName( p_current );
-            if( p_playlist->p->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
-                        ( !psz_arturl || strncmp( psz_arturl, "file://", 7 ) ) )
+            playlist_fetcher_t *p_fetcher = pl_priv(p_playlist)->p_fetcher;
+            if( p_fetcher->i_art_policy == ALBUM_ART_ALL &&
+                ( !psz_arturl || strncmp( psz_arturl, "file://", 7 ) ) )
             {
                 PL_DEBUG("meta ok for %s, need to fetch art", psz_name );
-                vlc_object_lock( p_playlist->p->p_fetcher );
-                if( vlc_object_alive( p_playlist->p->p_fetcher ) )
+                vlc_object_lock( p_fetcher );
+                if( vlc_object_alive( p_fetcher ) )
                 {
-                    INSERT_ELEM( p_playlist->p->p_fetcher->pp_waiting,
-                        p_playlist->p->p_fetcher->i_waiting,
-                        p_playlist->p->p_fetcher->i_waiting, p_current);
-                    vlc_object_signal_unlocked( p_playlist->p->p_fetcher );
+                    INSERT_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting,
+                                 p_fetcher->i_waiting, p_current);
+                    vlc_object_signal_unlocked( p_fetcher );
                 }
                 else
                     vlc_gc_decref( p_current );
-                vlc_object_unlock( p_playlist->p->p_fetcher );
+                vlc_object_unlock( p_fetcher );
             }
             else
             {
