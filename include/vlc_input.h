@@ -439,8 +439,9 @@ struct input_thread_t
 {
     VLC_COMMON_MEMBERS;
 
-    bool  b_eof;
+    bool b_eof;
     bool b_preparsing;
+    bool b_dead;
 
     int i_state;
     bool b_can_pace_control;

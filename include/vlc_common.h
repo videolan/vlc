@@ -537,7 +537,6 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
     /* Object properties */                                                 \
     volatile bool b_error;                  /**< set by the object */ \
     volatile bool b_die;                   /**< set by the outside */ \
-    volatile bool b_dead;                   /**< set by the object */ \
     bool b_force;      /**< set by the outside (eg. module_Need()) */ \
                                                                             \
     /* Stuff related to the libvlc structure */                             \
