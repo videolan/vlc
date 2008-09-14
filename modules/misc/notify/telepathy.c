@@ -135,15 +135,8 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    p_this->b_dead = true;
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     playlist_t *p_playlist = pl_Yield( p_this );
-
-    /* Clears the Presence message ... else it looks like we're still playing
-     * something although VLC (or the Telepathy plugin) is closed */
-
-    /* Do not check for VLC_ENOMEM as we're closing */
-    SendToTelepathy( p_intf, "" );
 
     PL_LOCK;
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
@@ -152,6 +145,12 @@ static void Close( vlc_object_t *p_this )
         var_DelCallback( p_playlist->p_input, "state", StateChange, p_intf );
     PL_UNLOCK;
     pl_Release( p_this );
+
+    /* Clears the Presence message ... else it looks like we're still playing
+     * something although VLC (or the Telepathy plugin) is closed */
+
+    /* Do not check for VLC_ENOMEM as we're closing */
+    SendToTelepathy( p_intf, "" );
 
     /* we won't use the DBus connection anymore */
     dbus_connection_unref( p_intf->p_sys->p_conn );
@@ -172,9 +171,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     playlist_t* p_playlist = (playlist_t*) p_this;
     char *psz_buf = NULL;
     input_thread_t *p_input;
-
-    if( p_intf->b_dead )
-        return VLC_EGENERIC;
 
     /* Don't update Telepathy presence each time an item has been preparsed */
     if( !strncmp( "playlist-current", psz_var, 16 ) )
@@ -239,8 +235,6 @@ static int StateChange( vlc_object_t *p_this, const char *psz_var,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    if( p_intf->b_dead )
-        return VLC_EGENERIC;
     if( newval.i_int >= END_S )
         return SendToTelepathy( p_intf, "" );
     return VLC_SUCCESS;
