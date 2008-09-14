@@ -272,9 +272,9 @@
 
 #define FOREACH_ARRAY( item, array ) { \
     int fe_idx; \
-    for( fe_idx = 0 ; fe_idx < array.i_size ; fe_idx++ ) \
+    for( fe_idx = 0 ; fe_idx < (array).i_size ; fe_idx++ ) \
     { \
-        item = array.p_elems[fe_idx];
+        item = (array).p_elems[fe_idx];
 
 #define FOREACH_END() } }
 
