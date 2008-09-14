@@ -119,19 +119,15 @@
 {
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
+    bool empty;
 
-    vlc_object_lock( p_playlist );
-    if( playlist_IsEmpty( p_playlist ) )
-    {
-        vlc_object_unlock( p_playlist );
-        vlc_object_release( p_playlist );
+    PL_LOCK;
+    empty = playlist_IsEmpty( p_playlist );
+    PL_UNLOCK;
+    vlc_object_release( p_playlist );
+
+    if( empty )
         [o_main intfOpenFileGeneric: (id)sender];
-    }
-    else
-    {
-        vlc_object_unlock( p_playlist );
-        vlc_object_release( p_playlist );
-    }
 
     var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
 }

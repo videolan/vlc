@@ -87,9 +87,9 @@ static int vlclua_playlist_skip( lua_State * L )
 static int vlclua_playlist_play( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    vlc_object_lock( p_playlist );
+    PL_LOCK;
     playlist_Play( p_playlist );
-    vlc_object_unlock( p_playlist );
+    PL_UNLOCK;
     vlclua_release_playlist_internal( p_playlist );
     return 0;
 }
@@ -147,12 +147,12 @@ static int vlclua_playlist_goto( lua_State * L )
 {
     int i_id = luaL_checkint( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    vlc_object_lock( p_playlist );
+    PL_LOCK;
     int i_ret = playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                                   true, NULL,
                                   playlist_ItemGetById( p_playlist, i_id,
                                                         true ) );
-    vlc_object_unlock( p_playlist );
+    PL_UNLOCK;
     vlclua_release_playlist_internal( p_playlist );
     return vlclua_push_ret( L, i_ret );
 }
@@ -236,7 +236,7 @@ static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
 static int vlclua_playlist_get( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    vlc_object_lock( p_playlist );
+    PL_LOCK;
     int b_category = luaL_optboolean( L, 2, 1 ); /* Default to tree playlist (discared when 1st argument is a playlist_item's id) */
     playlist_item_t *p_item = NULL;
 
@@ -246,7 +246,7 @@ static int vlclua_playlist_get( lua_State *L )
         p_item = playlist_ItemGetById( p_playlist, i_id, true );
         if( !p_item )
         {
-            vlc_object_unlock( p_playlist );
+            PL_UNLOCK;
             vlclua_release_playlist_internal( p_playlist );
             return 0; /* Should we return an error instead? */
         }
@@ -280,7 +280,7 @@ static int vlclua_playlist_get( lua_State *L )
             }
             if( !p_item )
             {
-                vlc_object_unlock( p_playlist );
+                PL_UNLOCK;
                 vlclua_release_playlist_internal( p_playlist );
                 return 0; /* Should we return an error instead? */
             }
@@ -292,7 +292,7 @@ static int vlclua_playlist_get( lua_State *L )
                             : p_playlist->p_root_onelevel;
     }
     push_playlist_item( L, p_item );
-    vlc_object_unlock( p_playlist );
+    PL_UNLOCK;
     vlclua_release_playlist_internal( p_playlist );
     return 1;
 }
@@ -304,9 +304,9 @@ static int vlclua_playlist_search( lua_State *L )
     int b_category = luaL_optboolean( L, 2, 1 ); /* default to category */
     playlist_item_t *p_item = b_category ? p_playlist->p_root_category
                                          : p_playlist->p_root_onelevel;
-    vlc_object_lock( p_playlist );
+    PL_LOCK;
     playlist_LiveSearchUpdate( p_playlist, p_item, psz_string );
-    vlc_object_unlock( p_playlist );
+    PL_UNLOCK;
     push_playlist_item( L, p_item );
     vlclua_release_playlist_internal( p_playlist );
     return 1;
@@ -355,12 +355,12 @@ static int vlclua_playlist_sort( lua_State *L )
     int i_type = luaL_optboolean( L, 2, 0 ) ? ORDER_REVERSE : ORDER_NORMAL;
     int b_category = luaL_optboolean( L, 3, 1 ); /* default to category */
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    vlc_object_lock( p_playlist );
+    PL_LOCK;
     playlist_item_t *p_root = b_category ? p_playlist->p_local_category
                                          : p_playlist->p_local_onelevel;
     int i_ret = playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
                                             i_type );
-    vlc_object_unlock( p_playlist );
+    PL_UNLOCK;
     vlclua_release_playlist_internal( p_playlist );
     return vlclua_push_ret( L, i_ret );
 }
@@ -379,7 +379,7 @@ static int vlclua_playlist_status( lua_State *L )
         lua_pushstring( L, psz_uri );
         free( psz_uri );
         lua_pushnumber( L, config_GetInt( p_intf, "volume" ) );*/
-        vlc_object_lock( p_playlist );
+        PL_LOCK;
         switch( p_playlist->status.i_status )
         {
             case PLAYLIST_STOPPED:
@@ -395,7 +395,7 @@ static int vlclua_playlist_status( lua_State *L )
                 lua_pushstring( L, "unknown" );
                 break;
         }
-        vlc_object_unlock( p_playlist );
+        PL_UNLOCK;
         /*i_count += 3;*/
     }
     else

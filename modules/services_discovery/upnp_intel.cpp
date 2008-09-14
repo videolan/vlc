@@ -297,18 +297,19 @@ static int Open( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = ( services_discovery_sys_t * )
-    malloc( sizeof( services_discovery_sys_t ) );
+        malloc( sizeof( services_discovery_sys_t ) );
+    playlist_t *p_playlist = pl_Yield( p_sd );
 
     p_sd->p_sys = p_sys;
-    p_sys->p_playlist = pl_Yield( p_sd );
+    p_sys->p_playlist = p_playlist;
     Cookie *cookie = &p_sys->cookie;
 
     /* Create our playlist node */
-    vlc_object_lock( p_sys->p_playlist );
-    playlist_NodesPairCreate( pl_Get( p_sd ), _("Devices"),
+    PL_LOCK;
+    playlist_NodesPairCreate( p_playlist, _("Devices"),
                               &p_sys->p_node_cat, &p_sys->p_node_one,
                               true );
-    vlc_object_unlock( p_sys->p_playlist );
+    PL_UNLOCK;
 
     cookie->serviceDiscovery = p_sd;
     cookie->lock = new Lockable();
@@ -347,17 +348,16 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
+    playlist_t *p_playlist = p_sys->p_playlist;
 
     UpnpFinish();
     delete p_sys->cookie.serverList;
     delete p_sys->cookie.lock;
 
-    vlc_object_lock( p_sys->p_playlist );
-    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_one, true,
-                         true );
-    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, true,
-                         true );
-    vlc_object_unlock( p_sys->p_playlist );
+    PL_LOCK;
+    playlist_NodeDelete( p_playlist, p_sys->p_node_one, true, true );
+    playlist_NodeDelete( p_playlist, p_sys->p_node_cat, true, true );
+    PL_UNLOCK;
     pl_Release( p_sd );
     free( p_sys );
 }

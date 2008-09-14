@@ -161,7 +161,7 @@ void PlaylistRebuildListStore( intf_thread_t *p_intf,
     red.blue    = 0;
     red.green   = 0;
 #endif
-    vlc_object_lock( p_playlist );
+    PL_LOCK;
     for( i_dummy = 0; i_dummy < playlist_CurrentSize(p_playlist) ; i_dummy++ )
     {
         playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_dummy, pl_Locked );
@@ -177,7 +177,7 @@ void PlaylistRebuildListStore( intf_thread_t *p_intf,
                                 -1);
         }
     }
-    vlc_object_unlock( p_playlist );
+    PL_UNLOCK;
 }
 
 /*****************************************************************
@@ -382,16 +382,16 @@ void onPlay(GtkButton *button, gpointer user_data)
 
     if (p_playlist)
     {
-        vlc_object_lock( p_playlist );
-        if (playlist_CurrentSize(p_playlist))
+        int s;
+
+        PL_LOCK;
+        s = playlist_CurrentSize(p_playlist);
+        PL_UNLOCK;
+        /* FIXME: This is racy... */
+        if (s)
         {
-            vlc_object_unlock( p_playlist );
             playlist_Play( p_playlist );
             gdk_window_lower( p_intf->p_sys->p_window->window );
-        }
-        else
-        {
-            vlc_object_unlock( p_playlist );
         }
         pl_Release( p_intf );
     }

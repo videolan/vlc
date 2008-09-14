@@ -542,17 +542,17 @@ static void Run( intf_thread_t *p_intf )
 
             if( p_playlist )
             {
-                vlc_object_lock( p_playlist );
+                PL_LOCK;
                 p_intf->p_sys->i_last_state = (int) PLAYLIST_STOPPED;
                 msg_rc( STATUS_CHANGE "( stop state: 0 )" );
-                vlc_object_unlock( p_playlist );
+                PL_UNLOCK;
             }
         }
 
         if( (p_input != NULL) && !p_input->b_dead && vlc_object_alive (p_input) &&
             (p_playlist != NULL) )
         {
-            vlc_object_lock( p_playlist );
+            PL_LOCK;
             if( (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
                 (p_playlist->status.i_status == PLAYLIST_STOPPED) )
             {
@@ -573,7 +573,7 @@ static void Run( intf_thread_t *p_intf )
                 p_intf->p_sys->i_last_state = p_playlist->status.i_status;
                 msg_rc( STATUS_CHANGE "( pause state: 4 )" );
             }
-            vlc_object_unlock( p_playlist );
+            PL_UNLOCK;
         }
 
         if( p_input && b_showpos )
