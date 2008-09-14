@@ -191,6 +191,8 @@ struct vlc_object_internals_t
 
 #define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
 
+typedef struct sap_handler_t sap_handler_t;
+
 /**
  * Private LibVLC instance data.
  */
@@ -229,6 +231,9 @@ typedef struct libvlc_priv_t
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     interaction_t     *p_interaction;    ///< interface interaction object
     httpd_t           *p_httpd; ///< HTTP daemon (src/network/httpd.c)
+#ifdef ENABLE_SOUT
+    sap_handler_t     *p_sap; ///< SAP SDP advertiser
+#endif
 } libvlc_priv_t;
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)

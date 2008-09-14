@@ -238,10 +238,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof( vout_thread_t );
             psz_type = "opengl";
             break;
-        case VLC_OBJECT_ANNOUNCE:
-            i_size = sizeof( announce_handler_t );
-            psz_type = "announce";
-            break;
         default:
             assert( i_type > 0 ); /* unknown type?! */
             i_size = i_type;

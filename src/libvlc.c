@@ -83,10 +83,7 @@
 #include "audio_output/aout_internal.h"
 
 #include <vlc_vout.h>
-
 #include <vlc_sout.h>
-#include "stream_output/stream_output.h"
-
 #include <vlc_charset.h>
 
 #include "libvlc.h"
@@ -1025,20 +1022,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     stats_TimersDumpAll( p_libvlc );
     stats_TimersCleanAll( p_libvlc );
-
-#ifdef ENABLE_SOUT
-    announce_handler_t * p_announce;
-
-    /* Free announce handler(s?) */
-    while( (p_announce = vlc_object_find( p_libvlc, VLC_OBJECT_ANNOUNCE,
-                                                 FIND_CHILD ) ) )
-    {
-        msg_Dbg( p_libvlc, "removing announce handler" );
-        vlc_object_detach( p_announce );
-        vlc_object_release( p_announce );
-        announce_HandlerDestroy( p_announce );
-    }
-#endif
 
     bool b_clean = true;
     FOREACH_ARRAY( input_item_t *p_del, priv->input_items )

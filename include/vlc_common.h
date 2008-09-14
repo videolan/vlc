@@ -265,8 +265,6 @@ typedef struct sout_stream_sys_t sout_stream_sys_t;
 typedef struct config_chain_t       config_chain_t;
 typedef struct session_descriptor_t session_descriptor_t;
 typedef struct announce_method_t announce_method_t;
-typedef struct announce_handler_t announce_handler_t;
-typedef struct sap_handler_t sap_handler_t;
 
 typedef struct sout_param_t sout_param_t;
 typedef struct sout_pcat_t sout_pcat_t;

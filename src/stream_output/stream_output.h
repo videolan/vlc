@@ -67,19 +67,9 @@ struct session_descriptor_t
     bool b_ssm;
 };
 
-/* The main announce handler object */
-struct announce_handler_t
-{
-    VLC_COMMON_MEMBERS
-
-    sap_handler_t *p_sap;
-};
-
-int announce_HandlerDestroy( announce_handler_t * );
-
-sap_handler_t *SAP_Create (vlc_object_t *);
-void SAP_Destroy (sap_handler_t *);
-int SAP_Add (sap_handler_t *, session_descriptor_t *);
-void SAP_Del (sap_handler_t *, const session_descriptor_t *);
+struct sap_handler_t *SAP_Create (vlc_object_t *);
+void SAP_Destroy (struct sap_handler_t *);
+int SAP_Add (struct sap_handler_t *, session_descriptor_t *);
+void SAP_Del (struct sap_handler_t *, const session_descriptor_t *);
 
 #endif
