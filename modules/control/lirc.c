@@ -175,7 +175,7 @@ static int Process( intf_thread_t *p_intf )
         if( code == NULL )
             return 0;
 
-        while( !intf_ShouldDie( p_intf )
+        while( vlc_object_alive( p_intf )
                 && (lirc_code2char( p_intf->p_sys->config, code, &c ) == 0)
                 && (c != NULL) )
         {

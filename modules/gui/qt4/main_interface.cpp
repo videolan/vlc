@@ -924,7 +924,7 @@ void MainInterface::setRate( int rate )
 void MainInterface::updateOnTimer()
 {
     /* No event for dying */
-    if( intf_ShouldDie( p_intf ) )
+    if( !vlc_object_alive( p_intf ) )
     {
         QApplication::closeAllWindows();
         QApplication::quit();

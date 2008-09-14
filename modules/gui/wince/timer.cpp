@@ -210,14 +210,14 @@ void Timer::Notify( void )
             }
         }
     }
-    else if( p_intf->p_sys->b_playing && !intf_ShouldDie( p_intf ) )
+    else if( p_intf->p_sys->b_playing && vlc_object_alive( p_intf ) )
     {
         p_intf->p_sys->b_playing = 0;
         p_main_interface->TogglePlayButton( PAUSE_S );
         i_old_playing_status = PAUSE_S;
     }
 
-    if( intf_ShouldDie( p_intf ) )
+    if( !vlc_object_alive( p_intf ) )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
 

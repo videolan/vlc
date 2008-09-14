@@ -1272,7 +1272,7 @@ static void Run( intf_thread_t *p_intf )
     intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
     int canc = vlc_savecancel();
 
-    while( !intf_ShouldDie( p_intf ) )
+    while( vlc_object_alive( p_intf ) )
     {
         int i;
 

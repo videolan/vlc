@@ -150,7 +150,7 @@ static void Run( intf_thread_t *p_intf )
     /* High priority thread */
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_INPUT );
 
-    while( !intf_ShouldDie( p_intf ) )
+    while( vlc_object_alive( p_intf ) )
     {
         /* Update the input */
         if( p_input == NULL )

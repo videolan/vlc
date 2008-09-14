@@ -182,7 +182,7 @@ static void RunIntf( intf_thread_t *p_intf )
     msg_Dbg( p_intf, "interface thread initialized" );
 
     /* Main loop */
-    while( !intf_ShouldDie( p_intf ) )
+    while( vlc_object_alive( p_intf ) )
     {
         vlc_mutex_lock( &p_intf->change_lock );
 
@@ -461,7 +461,7 @@ static int InitThread( intf_thread_t * p_intf )
 {
     char *psz_button;
     /* we might need some locking here */
-    if( !intf_ShouldDie( p_intf ) )
+    if( vlc_object_alive( p_intf ) )
     {
         /* p_intf->change_lock locking strategy:
          * - Every access to p_intf->p_sys are locked threw p_intf->change_lock

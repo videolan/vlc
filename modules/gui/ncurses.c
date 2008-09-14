@@ -404,7 +404,7 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, p_intf );
 
-    while( !intf_ShouldDie( p_intf ) )
+    while( vlc_object_alive( p_intf ) )
     {
         msleep( INTF_IDLE_SLEEP );
 

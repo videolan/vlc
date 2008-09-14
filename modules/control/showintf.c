@@ -121,7 +121,7 @@ static void RunIntf( intf_thread_t *p_intf )
     }
 
     /* Main loop */
-    while( !intf_ShouldDie( p_intf ) )
+    while( vlc_object_alive( p_intf ) )
     {
         vlc_mutex_lock( &p_intf->change_lock );
 
@@ -179,7 +179,7 @@ static void RunIntf( intf_thread_t *p_intf )
  *****************************************************************************/
 static int InitThread( intf_thread_t * p_intf )
 {
-    if( !intf_ShouldDie( p_intf ) )
+    if( vlc_object_alive( p_intf ) )
     {
         vlc_mutex_lock( &p_intf->change_lock );
 
