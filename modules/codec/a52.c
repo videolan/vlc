@@ -36,12 +36,34 @@
 #include <vlc_aout.h>
 #include <vlc_input.h>
 #include <vlc_block_helper.h>
+#include <vlc_bits.h>
 
-#define A52_HEADER_SIZE 7
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  OpenDecoder   ( vlc_object_t * );
+static int  OpenPacketizer( vlc_object_t * );
+static void CloseCommon   ( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( N_("A/52 parser") );
+    set_capability( "decoder", 100 );
+    set_callbacks( OpenDecoder, CloseCommon );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
+
+    add_submodule();
+    set_description( N_("A/52 audio packetizer") );
+    set_capability( "packetizer", 10 );
+    set_callbacks( OpenPacketizer, CloseCommon );
+vlc_module_end();
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
+
+#define A52_HEADER_SIZE 7
+
 struct decoder_sys_t
 {
     /* Module mode */
@@ -79,9 +101,6 @@ enum {
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );
-static int  OpenPacketizer( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 
 static int  SyncInfo      ( const uint8_t *, unsigned int *, unsigned int *,
@@ -92,32 +111,28 @@ static aout_buffer_t *GetAoutBuffer( decoder_t * );
 static block_t       *GetSoutBuffer( decoder_t * );
 
 /*****************************************************************************
- * Module descriptor
+ * OpenCommon: probe the decoder/packetizer and return score
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("A/52 parser") );
-    set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-
-    add_submodule();
-    set_description( N_("A/52 audio packetizer") );
-    set_capability( "packetizer", 10 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
-vlc_module_end();
-
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
+    vlc_fourcc_t i_codec;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('a','5','2',' ')
-          && p_dec->fmt_in.i_codec != VLC_FOURCC('a','5','2','b') )
+    switch( p_dec->fmt_in.i_codec )
     {
+    case VLC_FOURCC('a','5','2',' '):
+    case VLC_FOURCC('a','5','2','b'):
+        i_codec = VLC_FOURCC('a','5','2',' ');
+        break;
+    case VLC_FOURCC('e','a','c','3'):
+        /* XXX ugly hack, a52 does not support eac3 so no eac3 pass-through
+         * support */
+        if( !b_packetizer )
+            return VLC_EGENERIC;
+        i_codec = VLC_FOURCC('e','a','c','3');
+        break;
+    default:
         return VLC_EGENERIC;
     }
 
@@ -127,7 +142,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Misc init */
-    p_sys->b_packetizer = false;
+    p_sys->b_packetizer = b_packetizer;
     p_sys->i_state = STATE_NOSYNC;
     aout_DateSet( &p_sys->end_date, 0 );
 
@@ -136,27 +151,27 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('a','5','2',' ');
+    p_dec->fmt_out.i_codec = i_codec;
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
 
     /* Set callback */
-    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-
+    if( b_packetizer )
+        p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
+            DecodeBlock;
+    else
+        p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
+            DecodeBlock;
     return VLC_SUCCESS;
+}
+
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, false );
 }
 
 static int OpenPacketizer( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-
-    int i_ret = OpenDecoder( p_this );
-
-    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = true;
-
-    return i_ret;
+    return OpenCommon( p_this, true );
 }
 
 /****************************************************************************
@@ -325,9 +340,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 }
 
 /*****************************************************************************
- * CloseDecoder: clean up the decoder
+ * CloseCommon: clean up the decoder
  *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
+static void CloseCommon( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -420,17 +435,36 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
     return p_block;
 }
 
-/*****************************************************************************
- * SyncInfo: parse A/52 sync info
- *****************************************************************************
+/* Tables */
+static const struct
+{
+    unsigned int i_count;
+    unsigned int i_configuration;
+} p_acmod[8] = {
+    { 2, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DUALMONO },   /* Dual-channel 1+1 */
+    { 1, AOUT_CHAN_CENTER },                                        /* Mono 1/0 */
+    { 2, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT },                        /* Stereo 2/0 */
+    { 3, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER },     /* 3F 3/0 */
+    { 3, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER }, /* 2F1R 2/1 */
+    { 4, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
+         AOUT_CHAN_REARCENTER },                                    /* 3F1R 3/1 */
+    { 5, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT },                /* 2F2R 2/2 */
+    { 6, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
+         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT },                /* 3F2R 3/2 */
+};
+
+/**
+ * It parse AC3 sync info.
+ *
  * This code is borrowed from liba52 by Aaron Holtzman & Michel Lespinasse,
  * since we don't want to oblige S/PDIF people to use liba52 just to get
  * their SyncInfo...
- *****************************************************************************/
-static int SyncInfo( const uint8_t * p_buf,
-                     unsigned int * pi_channels,
-                     unsigned int * pi_channels_conf,
-                     unsigned int * pi_sample_rate, int * pi_bit_rate )
+ */
+static int SyncInfoAC3( const uint8_t *p_buf,
+                        unsigned int *pi_channels,
+                        unsigned int *pi_channels_conf,
+                        unsigned int *pi_sample_rate, int *pi_bit_rate )
 {
     static const uint8_t halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
     static const int rate[] = { 32,  40,  48,  56,  64,  80,  96, 112,
@@ -443,11 +477,7 @@ static int SyncInfo( const uint8_t * p_buf,
     int half;
     int acmod;
 
-    if ((p_buf[0] != 0x0b) || (p_buf[1] != 0x77))        /* syncword */
-        return 0;
-
-    if (p_buf[5] >= 0x60)                /* bsid >= 12 */
-        return 0;
+    /* */
     half = halfrate[p_buf[5] >> 3];
 
     /* acmod, dsurmod and lfeon */
@@ -459,56 +489,10 @@ static int SyncInfo( const uint8_t * p_buf,
         *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                             | AOUT_CHAN_DOLBYSTEREO;
     }
-    else switch ( acmod )
+    else
     {
-    case 0x0:
-        /* Dual-mono = stereo + dual-mono */
-        *pi_channels = 2;
-        *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                            | AOUT_CHAN_DUALMONO;
-        break;
-    case 0x1:
-        /* Mono */
-        *pi_channels = 1;
-        *pi_channels_conf = AOUT_CHAN_CENTER;
-        break;
-    case 0x2:
-        /* Stereo */
-        *pi_channels = 2;
-        *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        break;
-    case 0x3:
-        /* 3F */
-        *pi_channels = 3;
-        *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                            | AOUT_CHAN_CENTER;
-        break;
-    case 0x4:
-        /* 2F1R */
-        *pi_channels = 3;
-        *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                            | AOUT_CHAN_REARCENTER;
-        break;
-    case 0x5:
-        /* 3F1R */
-        *pi_channels = 4;
-        *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                            | AOUT_CHAN_REARCENTER;
-        break;
-    case 0x6:
-        /* 2F2R */
-        *pi_channels = 4;
-        *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                            | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        break;
-    case 0x7:
-        /* 3F2R */
-        *pi_channels = 5;
-        *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                            | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        break;
-    default:
-        return 0;
+        *pi_channels      = p_acmod[acmod].i_count;
+        *pi_channels_conf = p_acmod[acmod].i_configuration;
     }
 
     if ( p_buf[6] & lfeon[acmod] )
@@ -537,3 +521,81 @@ static int SyncInfo( const uint8_t * p_buf,
         return 0;
     }
 }
+
+/**
+ * It parse E-AC3 sync info
+ */
+static int SyncInfoEAC3( const uint8_t *p_buf,
+                         unsigned int *pi_channels,
+                         unsigned int *pi_channels_conf,
+                         unsigned int *pi_sample_rate, int *pi_bit_rate )
+{
+    static const int pi_samplerate[3] = { 48000, 44100, 32000 };
+    bs_t s;
+    int i_frame_size;
+    int i_fscod, i_fscod2;
+    int i_numblkscod;
+    int i_acmod, i_lfeon;
+    int i_bytes;
+
+
+    bs_init( &s, (void*)p_buf, A52_HEADER_SIZE );
+    bs_skip( &s, 16 +   /* start code */
+                 2 +    /* stream type */
+                 3 );   /* substream id */
+    i_frame_size = bs_read( &s, 11 );
+    if( i_frame_size < 2 )
+        return 0;
+    i_bytes = 2 * ( i_frame_size + 1 );
+
+    i_fscod = bs_read( &s, 2 );
+    if( i_fscod == 0x03 )
+    {
+        i_fscod2 = bs_read( &s, 2 );
+        if( i_fscod2 == 0X03 )
+            return 0;
+        *pi_sample_rate = pi_samplerate[i_fscod2] / 2;
+        i_numblkscod = 6;
+    }
+    else
+    {
+        static const int pi_blocks[4] = { 1, 2, 3, 6 };
+
+        *pi_sample_rate = pi_samplerate[i_fscod];
+        i_numblkscod = pi_blocks[bs_read( &s, 2 )];
+    }
+
+    i_acmod = bs_read( &s, 3 );
+    i_lfeon = bs_read1( &s );
+
+    *pi_channels      = p_acmod[i_acmod].i_count + i_lfeon;
+    *pi_channels_conf = p_acmod[i_acmod].i_configuration | ( i_lfeon ? AOUT_CHAN_LFE : 0);
+    *pi_bit_rate = 8 * i_bytes * (*pi_sample_rate) / (i_numblkscod * 256);
+
+    return i_bytes;
+}
+
+static int SyncInfo( const uint8_t *p_buf,
+                     unsigned int *pi_channels,
+                     unsigned int *pi_channels_conf,
+                     unsigned int *pi_sample_rate, int *pi_bit_rate )
+{
+    int bsid;
+
+    /* Check synword */
+    if( p_buf[0] != 0x0b || p_buf[1] != 0x77 )
+        return 0;
+
+    /* Check bsid */
+    bsid = p_buf[5] >> 3;
+    if( bsid > 16 )
+        return 0;
+
+    if( bsid <= 10 )
+        return SyncInfoAC3( p_buf, pi_channels, pi_channels_conf,
+                            pi_sample_rate, pi_bit_rate );
+    else
+        return SyncInfoEAC3( p_buf, pi_channels, pi_channels_conf,
+                             pi_sample_rate, pi_bit_rate );
+}
+
