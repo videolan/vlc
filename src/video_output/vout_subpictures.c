@@ -73,6 +73,8 @@ enum {
     SCALE_SIZE
 };
 
+#define SCALE_UNIT (1000)
+
 static void FilterRelease( filter_t *p_filter )
 {
     if( p_filter->p_module )
@@ -695,12 +697,12 @@ static void SpuRenderRegion( spu_t *p_spu,
     else
     {
         i_scale_idx   = SCALE_DEFAULT;
-        i_inv_scale_x = 1000;
-        i_inv_scale_y = 1000;
+        i_inv_scale_x = SCALE_UNIT;
+        i_inv_scale_y = SCALE_UNIT;
     }
 
-    i_x_offset = (p_region->i_x + pi_subpic_x[ i_scale_idx ]) * i_inv_scale_x / 1000;
-    i_y_offset = (p_region->i_y + p_subpic->i_y) * i_inv_scale_y / 1000;
+    i_x_offset = (p_region->i_x + pi_subpic_x[ i_scale_idx ]) * i_inv_scale_x / SCALE_UNIT;
+    i_y_offset = (p_region->i_y + p_subpic->i_y) * i_inv_scale_y / SCALE_UNIT;
 
     /* Force palette if requested
      * FIXME b_force_palette and b_force_crop are applied to all subpictures using palette
@@ -726,12 +728,12 @@ static void SpuRenderRegion( spu_t *p_spu,
         p_scale = p_spu->p_scale;
 
     if( p_scale &&
-        ( ( pi_scale_width[i_scale_idx]  > 0 && pi_scale_width[i_scale_idx]  != 1000 ) ||
-          ( pi_scale_height[i_scale_idx] > 0 && pi_scale_height[i_scale_idx] != 1000 ) ||
+        ( ( pi_scale_width[i_scale_idx]  > 0 && pi_scale_width[i_scale_idx]  != SCALE_UNIT ) ||
+          ( pi_scale_height[i_scale_idx] > 0 && pi_scale_height[i_scale_idx] != SCALE_UNIT ) ||
           ( b_force_palette ) ) )
     {
-        const unsigned i_dst_width  = p_region->fmt.i_width  * pi_scale_width[i_scale_idx] / 1000;
-        const unsigned i_dst_height = p_region->fmt.i_height * pi_scale_height[i_scale_idx] / 1000;
+        const unsigned i_dst_width  = p_region->fmt.i_width  * pi_scale_width[i_scale_idx] / SCALE_UNIT;
+        const unsigned i_dst_height = p_region->fmt.i_height * pi_scale_height[i_scale_idx] / SCALE_UNIT;
 
         /* Destroy if cache is unusable */
         if( p_region->p_cache )
@@ -770,13 +772,13 @@ static void SpuRenderRegion( spu_t *p_spu,
             p_scale->fmt_out.video.i_height = i_dst_height;
 
             p_scale->fmt_out.video.i_visible_width =
-                p_region->fmt.i_visible_width * pi_scale_width[ i_scale_idx ] / 1000;
+                p_region->fmt.i_visible_width * pi_scale_width[ i_scale_idx ] / SCALE_UNIT;
             p_scale->fmt_out.video.i_visible_height =
-                p_region->fmt.i_visible_height * pi_scale_height[ i_scale_idx ] / 1000;
+                p_region->fmt.i_visible_height * pi_scale_height[ i_scale_idx ] / SCALE_UNIT;
 
             p_region->p_cache->fmt = p_scale->fmt_out.video;
-            p_region->p_cache->i_x = p_region->i_x * pi_scale_width[ i_scale_idx ] / 1000;
-            p_region->p_cache->i_y = p_region->i_y * pi_scale_height[ i_scale_idx ] / 1000;
+            p_region->p_cache->i_x = p_region->i_x * pi_scale_width[ i_scale_idx ] / SCALE_UNIT;
+            p_region->p_cache->i_y = p_region->i_y * pi_scale_height[ i_scale_idx ] / SCALE_UNIT;
             p_region->p_cache->i_align = p_region->i_align;
             p_region->p_cache->i_alpha = p_region->i_alpha;
 
@@ -810,7 +812,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     if( p_region->i_align & SUBPICTURE_ALIGN_BOTTOM )
     {
         i_y_offset = p_fmt->i_height - p_region->fmt.i_height -
-            (p_subpic->i_y + p_region->i_y) * i_inv_scale_y / 1000;
+            (p_subpic->i_y + p_region->i_y) * i_inv_scale_y / SCALE_UNIT;
     }
     else if ( !(p_region->i_align & SUBPICTURE_ALIGN_TOP) )
     {
@@ -821,7 +823,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     {
         i_x_offset = p_fmt->i_width - p_region->fmt.i_width -
             (pi_subpic_x[ i_scale_idx ] + p_region->i_x)
-            * i_inv_scale_x / 1000;
+            * i_inv_scale_x / SCALE_UNIT;
     }
     else if ( !(p_region->i_align & SUBPICTURE_ALIGN_LEFT) )
     {
@@ -832,11 +834,11 @@ static void SpuRenderRegion( spu_t *p_spu,
     {
         i_x_offset = (p_region->i_x +
             pi_subpic_x[ i_scale_idx ] *
-                             pi_scale_width[ i_scale_idx ] / 1000)
-            * i_inv_scale_x / 1000;
+                             pi_scale_width[ i_scale_idx ] / SCALE_UNIT)
+            * i_inv_scale_x / SCALE_UNIT;
         i_y_offset = (p_region->i_y +
-            p_subpic->i_y * pi_scale_height[ i_scale_idx ] / 1000)
-            * i_inv_scale_y / 1000;
+            p_subpic->i_y * pi_scale_height[ i_scale_idx ] / SCALE_UNIT)
+            * i_inv_scale_y / SCALE_UNIT;
 
     }
 
@@ -846,7 +848,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     if( p_spu->i_margin != 0 && !b_force_crop )
     {
         int i_diff = 0;
-        int i_low = (i_y_offset - p_spu->i_margin) * i_inv_scale_y / 1000;
+        int i_low = (i_y_offset - p_spu->i_margin) * i_inv_scale_y / SCALE_UNIT;
         int i_high = i_low + p_region->fmt.i_height;
 
         /* crop extra margin to keep within bounds */
@@ -854,21 +856,21 @@ static void SpuRenderRegion( spu_t *p_spu,
             i_diff = i_low;
         if( i_high > (int)p_fmt->i_height )
             i_diff = i_high - p_fmt->i_height;
-        i_y_offset -= ( p_spu->i_margin * i_inv_scale_y / 1000 + i_diff );
+        i_y_offset -= ( p_spu->i_margin * i_inv_scale_y / SCALE_UNIT + i_diff );
     }
 
     /* Force cropping if requested */
     if( b_force_crop )
     {
         video_format_t *p_fmt = &p_region->fmt;
-        int i_crop_x = p_spu->i_crop_x * pi_scale_width[ i_scale_idx ] / 1000
-                            * i_inv_scale_x / 1000;
-        int i_crop_y = p_spu->i_crop_y * pi_scale_height[ i_scale_idx ] / 1000
-                            * i_inv_scale_y / 1000;
-        int i_crop_width = p_spu->i_crop_width * pi_scale_width[ i_scale_idx ] / 1000
-                            * i_inv_scale_x / 1000;
-        int i_crop_height = p_spu->i_crop_height * pi_scale_height[ i_scale_idx ] / 1000
-                            * i_inv_scale_y / 1000;
+        int i_crop_x = p_spu->i_crop_x * pi_scale_width[ i_scale_idx ] / SCALE_UNIT
+                            * i_inv_scale_x / SCALE_UNIT;
+        int i_crop_y = p_spu->i_crop_y * pi_scale_height[ i_scale_idx ] / SCALE_UNIT
+                            * i_inv_scale_y / SCALE_UNIT;
+        int i_crop_width = p_spu->i_crop_width * pi_scale_width[ i_scale_idx ] / SCALE_UNIT
+                            * i_inv_scale_x / SCALE_UNIT;
+        int i_crop_height = p_spu->i_crop_height * pi_scale_height[ i_scale_idx ] / SCALE_UNIT
+                            * i_inv_scale_y / SCALE_UNIT;
 
         /* Find the intersection */
         if( i_crop_x + i_crop_width <= i_x_offset ||
@@ -963,12 +965,12 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
     if( i_scale_width_orig <= 0 )
-        i_scale_width_orig = 1000;
+        i_scale_width_orig = SCALE_UNIT;
     if( i_scale_height_orig <= 0 )
-        i_scale_height_orig = 1000;
+        i_scale_height_orig = SCALE_UNIT;
 
-    i_source_video_width  = p_fmt->i_width  * 1000 / i_scale_width_orig;
-    i_source_video_height = p_fmt->i_height * 1000 / i_scale_height_orig;
+    i_source_video_width  = p_fmt->i_width  * SCALE_UNIT / i_scale_width_orig;
+    i_source_video_height = p_fmt->i_height * SCALE_UNIT / i_scale_height_orig;
 
     /* Check i_status again to make sure spudec hasn't destroyed the subpic */
     for( p_subpic = p_subpic_list;
@@ -1035,9 +1037,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         if( !p_subpic->p_region )
             continue;
 
-        for( k = 0; k < SCALE_SIZE ; k++ )
-            pi_subpic_x[ k ] = p_subpic->i_x;
-
         /* */
         if( p_spu->p_text )
         {
@@ -1083,16 +1082,16 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
             /* XXX for text:
              *  scale[] allows to pass from rendered size (by text module) to video output size */
-            pi_scale_width[SCALE_TEXT] = p_fmt->i_width * 1000 /
+            pi_scale_width[SCALE_TEXT] = p_fmt->i_width * SCALE_UNIT /
                                           p_spu->p_text->fmt_out.video.i_width;
-            pi_scale_height[SCALE_TEXT]= p_fmt->i_height * 1000 /
+            pi_scale_height[SCALE_TEXT]= p_fmt->i_height * SCALE_UNIT /
                                           p_spu->p_text->fmt_out.video.i_height;
         }
         else
         {
             /* Just set a value to avoid using invalid memory while looping over the array */
             pi_scale_width[SCALE_TEXT] =
-            pi_scale_height[SCALE_TEXT]= 1000;
+            pi_scale_height[SCALE_TEXT]= SCALE_UNIT;
         }
 
         /* XXX for default:
@@ -1100,8 +1099,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         if( p_subpic->i_original_picture_height > 0 &&
             p_subpic->i_original_picture_width  > 0 )
         {
-            pi_scale_width[SCALE_DEFAULT]  = p_fmt->i_width  * 1000 / p_subpic->i_original_picture_width;
-            pi_scale_height[SCALE_DEFAULT] = p_fmt->i_height * 1000 / p_subpic->i_original_picture_height;
+            pi_scale_width[SCALE_DEFAULT]  = p_fmt->i_width  * SCALE_UNIT / p_subpic->i_original_picture_width;
+            pi_scale_height[SCALE_DEFAULT] = p_fmt->i_height * SCALE_UNIT / p_subpic->i_original_picture_height;
         }
         else
         {
@@ -1144,16 +1143,19 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Take care of the aspect ratio */
+        for( k = 0; k < SCALE_SIZE ; k++ )
+            pi_subpic_x[k] = p_subpic->i_x;
+
         if( ( p_region->fmt.i_sar_num * p_fmt->i_sar_den ) !=
             ( p_region->fmt.i_sar_den * p_fmt->i_sar_num ) )
         {
             for( k = 0; k < SCALE_SIZE; k++ )
             {
-                pi_scale_width[k] = pi_scale_width[ k ] *
+                pi_scale_width[k] = pi_scale_width[k] *
                     (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
                     p_region->fmt.i_sar_den / p_fmt->i_sar_num;
 
-                pi_subpic_x[k] = p_subpic->i_x * pi_scale_width[ k ] / 1000;
+                pi_subpic_x[k] = p_subpic->i_x * pi_scale_width[ k ] / SCALE_UNIT;
             }
         }
 
