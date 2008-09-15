@@ -559,10 +559,15 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
 {
     const uint8_t *p_peek;
     int      i_peek = stream_Peek( s, &p_peek, 14 );
-    int      i_size = ps_pkt_size( p_peek, i_peek );
+    int      i_size;
     VLC_UNUSED(i_code);
 
-    if( i_size <= 6 && p_peek[3] > 0xba )
+    /* Smallest valid packet */
+    if( i_peek < 6 ) return NULL;
+
+    i_size = ps_pkt_size( p_peek, i_peek );
+
+    if( i_size < 0 || ( i_size <= 6 && p_peek[3] > 0xba ) )
     {
         /* Special case, search the next start code */
         i_size = 6;

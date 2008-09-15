@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vlc_demux.h>
+#include <assert.h>
 
 /* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream */
 #define PS_TK_COUNT (768 - 0xc0)
@@ -246,10 +247,11 @@ static inline int ps_pkt_id( block_t *p_pkt )
 }
 
 /* return the size of the next packet
- * XXX you need to give him at least 14 bytes (and it need to start as a
- * valid packet) */
+ * You need to give him at least 14 bytes (and it need to start as a
+ * valid packet) It does not handle less than 6 bytes */
 static inline int ps_pkt_size( const uint8_t *p, int i_peek )
 {
+    assert( i_peek >= 6 );
     if( p[3] == 0xb9 && i_peek >= 4 )
     {
         return 4;
