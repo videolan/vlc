@@ -474,7 +474,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
         p_sys->p_vout->fmt_in.i_visible_height /= 2;
     }
 
-    if( p_vout->i_changes & VOUT_ASPECT_CHANGE && 0)
+    if( p_vout->i_changes & VOUT_ASPECT_CHANGE )
     {
         p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
 
