@@ -498,25 +498,22 @@ static bool parse_track_node COMPLEX_INTERFACE
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
-                    if( p_demux->p_sys->i_identifier <
-                        p_demux->p_sys->i_tracklist_entries )
+                    if( p_demux->p_sys->i_identifier >=
+                           p_demux->p_sys->i_tracklist_entries )
                     {
-                        p_demux->p_sys->pp_tracklist[
+                        input_item_t **pp;
+                        pp = realloc( p_demux->p_sys->pp_tracklist,
+                            (p_demux->p_sys->i_identifier + 1) * sizeof(*pp) );
+                        if( !pp )
+                            return false;
+                        p_demux->p_sys->pp_tracklist = pp;
+                        while( p_demux->p_sys->i_identifier >=
+                               p_demux->p_sys->i_tracklist_entries )
+                            pp[p_demux->p_sys->i_tracklist_entries++] = NULL;
+                    }
+
+                    p_demux->p_sys->pp_tracklist[
                             p_demux->p_sys->i_identifier ] = p_new_input;
-                    }
-                    else
-                    {
-                        if( p_demux->p_sys->i_identifier >
-                            p_demux->p_sys->i_tracklist_entries )
-                        {
-                            p_demux->p_sys->i_tracklist_entries =
-                                p_demux->p_sys->i_identifier;
-                        }
-                        INSERT_ELEM( p_demux->p_sys->pp_tracklist,
-                                     p_demux->p_sys->i_tracklist_entries,
-                                     p_demux->p_sys->i_tracklist_entries,
-                                     p_new_input );
-                    }
                     return true;
                 }
                 /* there MUST have been a start tag for that element name */
