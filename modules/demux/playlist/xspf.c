@@ -70,8 +70,8 @@ void Close_xspf( vlc_object_t *p_this )
         if(p_demux->p_sys->pp_tracklist[i])
             vlc_gc_decref( p_demux->p_sys->pp_tracklist[i] );
     }
-    FREENULL( p_demux->p_sys->pp_tracklist );
-    FREENULL( p_demux->p_sys->psz_base );
+    free( p_demux->p_sys->pp_tracklist );
+    free( p_demux->p_sys->psz_base );
     free( p_demux->p_sys );
 }
 
