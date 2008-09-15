@@ -127,44 +127,10 @@ int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
-    subpicture_t *p_spu;
-    video_format_t fmt;
-
-    if( !psz_string ) return VLC_EGENERIC;
-
-    p_spu = spu_CreateSubpicture( p_vout->p_spu );
-    if( !p_spu ) return VLC_EGENERIC;
-
-    /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
-    fmt.i_aspect = 0;
-    fmt.i_width = fmt.i_height = 0;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_vout), &fmt );
-    if( !p_spu->p_region )
-    {
-        msg_Err( p_vout, "cannot allocate SPU region" );
-        spu_DestroySubpicture( p_vout->p_spu, p_spu );
-        return VLC_EGENERIC;
-    }
-
-    p_spu->p_region->psz_text = strdup( psz_string );
-    p_spu->p_region->i_align = i_flags & SUBPICTURE_ALIGN_MASK;
-    p_spu->p_region->p_style = p_style;
-    p_spu->i_start = i_start;
-    p_spu->i_stop = i_stop;
-    p_spu->b_ephemer = false;
-    p_spu->b_absolute = false;
-
-    p_spu->i_x = i_hmargin;
-    p_spu->i_y = i_vmargin;
-    p_spu->i_flags = i_flags & ~SUBPICTURE_ALIGN_MASK;
-    p_spu->i_channel = i_channel;
-
-    spu_DisplaySubpicture( p_vout->p_spu, p_spu );
-
-    return VLC_SUCCESS;
+    return osd_ShowTextAbsolute( p_vout->p_spu, i_channel,
+                                 psz_string, p_style,
+                                 i_flags, i_hmargin, i_vmargin,
+                                 i_start, i_stop );
 }
 
 

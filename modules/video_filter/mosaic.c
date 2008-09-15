@@ -458,7 +458,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
     p_spu->i_alpha = p_sys->i_alpha;
-    p_spu->i_flags = p_sys->i_align;
     p_spu->b_absolute = false;
 
     vlc_mutex_lock( &p_sys->lock );

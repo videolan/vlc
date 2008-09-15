@@ -530,9 +530,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->b_absolute = false;
     }
 
-    p_spu->i_x = p_sys->i_xoff;
-    p_spu->i_y = p_sys->i_yoff;
-
     p_spu->p_region->p_style = p_sys->p_style;
 
     if( p_feed->p_pic )
@@ -558,6 +555,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
         else
         {
+            p_region->i_x = p_sys->i_xoff;
+            p_region->i_y = p_sys->i_yoff;
             vout_CopyPicture( p_filter, &p_region->picture, p_pic );
             p_spu->p_region->p_next = p_region;
         }

@@ -81,7 +81,16 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
     if( !psz_string ) return VLC_EGENERIC;
 
     p_spu = spu_CreateSubpicture( p_vout->p_spu );
-    if( !p_spu ) return VLC_EGENERIC;
+    if( !p_spu )
+        return VLC_EGENERIC;
+
+    p_spu->i_channel = i_channel;
+    p_spu->i_start = i_start;
+    p_spu->i_stop = i_stop;
+    p_spu->b_ephemer = true;
+    p_spu->b_absolute = false;
+    p_spu->b_fade = true;
+
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -99,16 +108,8 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
 
     p_spu->p_region->psz_text = strdup( psz_string );
     p_spu->p_region->i_align = i_flags & SUBPICTURE_ALIGN_MASK;
-    p_spu->i_start = i_start;
-    p_spu->i_stop = i_stop;
-    p_spu->b_ephemer = true;
-    p_spu->b_absolute = false;
-    p_spu->b_fade = true;
-
-    p_spu->i_x = i_hmargin;
-    p_spu->i_y = i_vmargin;
-    p_spu->i_flags = i_flags & ~SUBPICTURE_ALIGN_MASK;
-    p_spu->i_channel = i_channel;
+    p_spu->p_region->i_x = i_hmargin;
+    p_spu->p_region->i_y = i_vmargin;
 
     spu_DisplaySubpicture( p_vout->p_spu, p_spu );
 

@@ -317,8 +317,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->b_absolute = false;
     }
 
-    p_spu->i_x = p_sys->i_xoff;
-    p_spu->i_y = p_sys->i_yoff;
+    p_spu->p_region->i_x = p_sys->i_xoff;
+    p_spu->p_region->i_y = p_sys->i_yoff;
 
     p_spu->p_region->p_style = p_sys->p_style;
 

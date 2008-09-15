@@ -1446,10 +1446,42 @@ static subpicture_t *render( decoder_t *p_dec )
     subpicture_t *p_spu;
     subpicture_region_t **pp_spu_region;
     int i, j, i_timeout = 0;
+    int i_base_x;
+    int i_base_y;
 
     /* Allocate the subpicture internal data. */
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
-    if( !p_spu ) return NULL;
+    if( !p_spu )
+        return NULL;
+
+    p_spu->b_absolute = p_sys->b_absolute;
+    /* Set the pf_render callback */
+    p_spu->i_start = (mtime_t) p_sys->i_pts;
+    //p_spu->i_stop = (mtime_t) 0;
+    p_spu->b_ephemer = true;
+    //p_spu->b_fade = true;
+    //p_spu->i_stop = p_spu->i_start + (mtime_t) (i_timeout * 1000000);
+
+    /* Correct positioning of SPU */
+    i_base_x = p_sys->i_spu_x;
+    i_base_y = p_sys->i_spu_y;
+    p_spu->i_original_picture_width = 720;
+    p_spu->i_original_picture_height = 576;
+
+    if( p_sys->p_display )
+    {
+        p_spu->i_original_picture_width = p_sys->p_display->i_width;
+        p_spu->i_original_picture_height = p_sys->p_display->i_height;
+
+        if( p_sys->p_display->b_windowed )
+        {
+            /* TODO: check that this actually works */
+            p_spu->i_original_picture_width = p_sys->p_display->i_max_x - p_sys->p_display->i_x;
+            p_spu->i_original_picture_height = p_sys->p_display->i_max_y - p_sys->p_display->i_y;
+            i_base_x += p_sys->p_display->i_x;
+            i_base_y += p_sys->p_display->i_y;
+        }
+    }
 
     pp_spu_region = &p_spu->p_region;
 
@@ -1519,8 +1551,8 @@ static subpicture_t *render( decoder_t *p_dec )
             msg_Err( p_dec, "cannot allocate SPU region" );
             continue;
         }
-        p_spu_region->i_x = p_regiondef->i_x;
-        p_spu_region->i_y = p_regiondef->i_y;
+        p_spu_region->i_x = i_base_x + p_regiondef->i_x;
+        p_spu_region->i_y = i_base_y + p_regiondef->i_y;
         p_spu_region->i_align = p_sys->i_spu_position;
         *pp_spu_region = p_spu_region;
         pp_spu_region = &p_spu_region->p_next;
@@ -1574,40 +1606,11 @@ static subpicture_t *render( decoder_t *p_dec )
             }
 
             p_spu_region->psz_text = strdup( p_object_def->psz_text );
-            p_spu_region->i_x = p_regiondef->i_x + p_object_def->i_x;
-            p_spu_region->i_y = p_regiondef->i_y + p_object_def->i_y;
+            p_spu_region->i_x = i_base_x + p_regiondef->i_x + p_object_def->i_x;
+            p_spu_region->i_y = i_base_y + p_regiondef->i_y + p_object_def->i_y;
             p_spu_region->i_align = p_sys->i_spu_position;
             *pp_spu_region = p_spu_region;
             pp_spu_region = &p_spu_region->p_next;
-        }
-    }
-
-    /* Set the pf_render callback */
-    p_spu->i_start = (mtime_t) p_sys->i_pts;
-    //p_spu->i_stop = (mtime_t) 0;
-    p_spu->b_ephemer = true;
-    //p_spu->b_fade = true;
-    //p_spu->i_stop = p_spu->i_start + (mtime_t) (i_timeout * 1000000);
-
-    /* Correct positioning of SPU */
-    p_spu->b_absolute = p_sys->b_absolute;
-    p_spu->i_x = p_sys->i_spu_x;
-    p_spu->i_y = p_sys->i_spu_y;
-    p_spu->i_original_picture_width = 720;
-    p_spu->i_original_picture_height = 576;
-
-    if( p_sys->p_display )
-    {
-        p_spu->i_original_picture_width = p_sys->p_display->i_width;
-        p_spu->i_original_picture_height = p_sys->p_display->i_height;
-
-        if( p_sys->p_display->b_windowed )
-        {
-            /* TODO: check that this actually works */
-            p_spu->i_original_picture_width = p_sys->p_display->i_max_x - p_sys->p_display->i_x;
-            p_spu->i_original_picture_height = p_sys->p_display->i_max_y - p_sys->p_display->i_y;
-            p_spu->i_x += p_sys->p_display->i_x;
-            p_spu->i_y += p_sys->p_display->i_y;
         }
     }
 
@@ -2092,8 +2095,8 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
         }
         else
         {
-            bs_write( s, 16, p_subpic->i_x + p_region->i_x );
-            bs_write( s, 16, p_subpic->i_y + p_region->i_y );
+            bs_write( s, 16, p_region->i_x );
+            bs_write( s, 16, p_region->i_y );
         }
     }
 }

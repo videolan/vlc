@@ -504,9 +504,6 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
     if( !p_spu ) return NULL;
 
-    p_spu->i_x = p_sys->i_x_start;
-    p_spu->i_x = p_spu->i_x * 3 / 4; /* FIXME: use aspect ratio for x? */
-    p_spu->i_y = p_sys->i_y_start;
     p_spu->i_start = p_data->i_pts;
     p_spu->i_stop  = p_data->i_pts + p_sys->i_duration;
     p_spu->b_ephemer = true;
@@ -526,7 +523,9 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     }
 
     p_spu->p_region = p_region;
-    p_region->i_x = p_region->i_y = 0;
+    p_region->i_x = p_sys->i_x_start;
+    p_region->i_x = p_region->i_x * 3 / 4; /* FIXME: use aspect ratio for x? */
+    p_region->i_y = p_sys->i_y_start;
 
     /* Build palette */
     fmt.p_palette->i_entries = 4;

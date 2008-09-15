@@ -357,8 +357,8 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
     /* Decode and format the subpicture unit */
     /* Normal text subs, easy markup */
     p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;// | SUBPICTURE_ALIGN_LEFT;// | p_sys->i_align;
-    p_spu->i_x = 0; //p_sys->i_align ? 20 : 0;
-    p_spu->i_y = 10;
+    p_spu->p_region->i_x = 0; //p_sys->i_align ? 20 : 0;
+    p_spu->p_region->i_y = 10;
 
     p_spu->p_region->psz_text = psz_subtitle;
     p_spu->p_region->psz_html = psz_html;

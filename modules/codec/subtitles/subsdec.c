@@ -427,8 +427,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     {
         /* Normal text subs, easy markup */
         p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-        p_spu->i_x = p_sys->i_align ? 20 : 0;
-        p_spu->i_y = 10;
+        p_spu->p_region->i_x = p_sys->i_align ? 20 : 0;
+        p_spu->p_region->i_y = 10;
 
         /* Remove formatting from string */
 
@@ -616,8 +616,8 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
     /* Check for forced alignment */
     if( !strncmp( psz_subtitle, "{\\an", 4 ) && psz_subtitle[4] >= '1' && psz_subtitle[4] <= '9' && psz_subtitle[5] == '}' )
     {
-        static const pi_vertical[3] = { SUBPICTURE_ALIGN_BOTTOM, 0, SUBPICTURE_ALIGN_TOP };
-        static const pi_horizontal[3] = { SUBPICTURE_ALIGN_LEFT, 0, SUBPICTURE_ALIGN_RIGHT };
+        static const int pi_vertical[3] = { SUBPICTURE_ALIGN_BOTTOM, 0, SUBPICTURE_ALIGN_TOP };
+        static const int pi_horizontal[3] = { SUBPICTURE_ALIGN_LEFT, 0, SUBPICTURE_ALIGN_RIGHT };
         const int i_id = psz_subtitle[4] - '1';
 
         *pi_align = pi_vertical[i_id/3] | pi_horizontal[i_id%3];

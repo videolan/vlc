@@ -888,8 +888,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->b_absolute = false;
     }
 
-    p_spu->i_x = p_sys->posx;
-    p_spu->i_y = p_sys->posy;
+    p_region->i_x = p_sys->posx;
+    p_region->i_y = p_sys->posy;
 
     p_spu->p_region = p_region;
 

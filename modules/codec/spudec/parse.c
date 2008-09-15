@@ -44,6 +44,8 @@ typedef struct
 {
     int i_width;
     int i_height;
+    int i_x;
+    int i_y;
 } spu_properties_t;
 
 static int  ParseControlSeq( decoder_t *, subpicture_t *, subpicture_data_t *,
@@ -277,15 +279,15 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                 return VLC_EGENERIC;
             }
 
-            p_spu->i_x = (p_sys->buffer[i_index+1]<<4)|
+            p_spu_properties->i_x = (p_sys->buffer[i_index+1]<<4)|
                          ((p_sys->buffer[i_index+2]>>4)&0x0f);
             p_spu_properties->i_width = (((p_sys->buffer[i_index+2]&0x0f)<<8)|
-                              p_sys->buffer[i_index+3]) - p_spu->i_x + 1;
+                              p_sys->buffer[i_index+3]) - p_spu_properties->i_x + 1;
 
-            p_spu->i_y = (p_sys->buffer[i_index+4]<<4)|
+            p_spu_properties->i_y = (p_sys->buffer[i_index+4]<<4)|
                          ((p_sys->buffer[i_index+5]>>4)&0x0f);
             p_spu_properties->i_height = (((p_sys->buffer[i_index+5]&0x0f)<<8)|
-                              p_sys->buffer[i_index+6]) - p_spu->i_y + 1;
+                              p_sys->buffer[i_index+6]) - p_spu_properties->i_y + 1;
 
             /* Auto crop fullscreen subtitles */
             if( p_spu_properties->i_height > 250 )
@@ -672,8 +674,8 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
         return;
     }
 
-    p_spu->p_region->i_x = 0;
-    p_spu->p_region->i_y = p_spu_data->i_y_top_offset;
+    p_spu->p_region->i_x = p_spu_properties->i_x;
+    p_spu->p_region->i_y = p_spu_properties->i_y + p_spu_data->i_y_top_offset;
     p_p = p_spu->p_region->picture.p->p_pixels;
     i_pitch = p_spu->p_region->picture.p->i_pitch;
 

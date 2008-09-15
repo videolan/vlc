@@ -272,8 +272,6 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     memcpy( p_spu->p_sys->p_subs_data, p_block->p_buffer,
             p_block->i_buffer );
 
-    p_spu->i_x = 0;
-    p_spu->i_y = 0;
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer = true;

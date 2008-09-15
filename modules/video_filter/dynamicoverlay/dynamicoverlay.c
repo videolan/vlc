@@ -337,9 +337,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
-    p_spu->i_flags = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
-    p_spu->i_x = 0;
-    p_spu->i_y = 0;
     p_spu->b_absolute = true;
     p_spu->i_start = date;
     p_spu->i_stop = 0;

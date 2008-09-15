@@ -660,20 +660,10 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
                             const video_format_t *p_fmt,
                             const subpicture_t *p_subpic,
                             const subpicture_region_t *p_region,
-                            int i_subpic_x,
-                            int i_inv_scale_x, int i_inv_scale_y,
-                            int i_scale_width, int i_scale_height )
+                            int i_inv_scale_x, int i_inv_scale_y )
 {
-    /* FIXME i_delta_x/y and i_x/y in absolute mode does not use the same
-     * it seems weird unless I missed something
-     * At this point we have:
-     *   i_subpic_x == p_subpic->i_x * i_scale_width / SCALE_UNIT
-     *   p_region->i_x/i_y have already been scaled by i_scale_width/i_scale_height.
-     * */
-    int i_delta_x = ( i_subpic_x + p_region->i_x ) *
-                                            i_inv_scale_x / SCALE_UNIT;
-    int i_delta_y = ( p_subpic->i_y + p_region->i_y ) *
-                                            i_inv_scale_y / SCALE_UNIT;
+    int i_delta_x = p_region->i_x * i_inv_scale_x / SCALE_UNIT;
+    int i_delta_y = p_region->i_y * i_inv_scale_y / SCALE_UNIT;
     int i_x, i_y;
 
     if( p_region->i_align & SUBPICTURE_ALIGN_TOP )
@@ -704,10 +694,8 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
 
     if( p_subpic->b_absolute )
     {
-        i_x = (p_region->i_x + i_subpic_x * i_scale_width / SCALE_UNIT) *
-                i_inv_scale_x / SCALE_UNIT;
-        i_y = (p_region->i_y + p_subpic->i_y * i_scale_height / SCALE_UNIT) *
-                i_inv_scale_y / SCALE_UNIT;
+        i_x = i_delta_x;
+        i_y = i_delta_y;
     }
 
     *pi_x = __MAX( i_x, 0 );
@@ -718,7 +706,6 @@ static void SpuRenderRegion( spu_t *p_spu,
                              picture_t *p_pic_dst,
                              subpicture_t *p_subpic, subpicture_region_t *p_region,
                              const int i_scale_width_orig, const int i_scale_height_orig,
-                             const int pi_subpic_x[SCALE_SIZE],
                              const int pi_scale_width[SCALE_SIZE],
                              const int pi_scale_height[SCALE_SIZE],
                              const video_format_t *p_fmt )
@@ -869,9 +856,8 @@ static void SpuRenderRegion( spu_t *p_spu,
 
     /* */
     SpuRegionPlace( &i_x_offset, &i_y_offset,
-                    p_fmt, p_subpic, p_region, pi_subpic_x[i_scale_idx],
-                    i_inv_scale_x, i_inv_scale_y,
-                    pi_scale_width[i_scale_idx], pi_scale_height[i_scale_idx] );
+                    p_fmt, p_subpic, p_region,
+                    i_inv_scale_x, i_inv_scale_y );
 
     if( p_spu->i_margin != 0 && !b_force_crop )
     {
@@ -1059,7 +1045,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         subpicture_region_t *p_region;
         int pi_scale_width[ SCALE_SIZE ];
         int pi_scale_height[ SCALE_SIZE ];
-        int pi_subpic_x[ SCALE_SIZE ];
         int k;
 
         if( !p_subpic->p_region )
@@ -1171,19 +1156,15 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Take care of the aspect ratio */
-        for( k = 0; k < SCALE_SIZE ; k++ )
-            pi_subpic_x[k] = p_subpic->i_x;
-
         if( ( p_region->fmt.i_sar_num * p_fmt->i_sar_den ) !=
             ( p_region->fmt.i_sar_den * p_fmt->i_sar_num ) )
         {
+            /* FIXME FIXME what about region->i_x/i_y ? */
             for( k = 0; k < SCALE_SIZE; k++ )
             {
                 pi_scale_width[k] = pi_scale_width[k] *
                     (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
                     p_region->fmt.i_sar_den / p_fmt->i_sar_num;
-
-                pi_subpic_x[k] = p_subpic->i_x * pi_scale_width[ k ] / SCALE_UNIT;
             }
         }
 
@@ -1191,7 +1172,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         for( ; p_region != NULL; p_region = p_region->p_next )
             SpuRenderRegion( p_spu, p_pic_dst,
                              p_subpic, p_region, i_scale_width_orig, i_scale_height_orig,
-                             pi_subpic_x, pi_scale_width, pi_scale_height,
+                             pi_scale_width, pi_scale_height,
                              p_fmt );
     }
 

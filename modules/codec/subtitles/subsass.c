@@ -127,8 +127,8 @@ void ParseSSAString( decoder_t *p_dec,
     if( p_style == NULL )
     {
         p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-        p_spu->i_x = p_sys->i_align ? 20 : 0;
-        p_spu->i_y = 10;
+        p_spu->p_region->i_x = p_sys->i_align ? 20 : 0;
+        p_spu->p_region->i_y = 10;
     }
     else
     {
@@ -137,13 +137,13 @@ void ParseSSAString( decoder_t *p_dec,
         p_spu->p_region->i_align = p_style->i_align;
         if( p_style->i_align & SUBPICTURE_ALIGN_LEFT )
         {
-            p_spu->i_x = (i_margin_l) ? i_margin_l : p_style->i_margin_h;
+            p_spu->p_region->i_x = (i_margin_l) ? i_margin_l : p_style->i_margin_h;
         }
         else if( p_style->i_align & SUBPICTURE_ALIGN_RIGHT )
         {
-            p_spu->i_x = (i_margin_r) ? i_margin_r : p_style->i_margin_h;
+            p_spu->p_region->i_x = (i_margin_r) ? i_margin_r : p_style->i_margin_h;
         }
-        p_spu->i_y = (i_margin_v) ? i_margin_v : p_style->i_margin_v;
+        p_spu->p_region->i_y = (i_margin_v) ? i_margin_v : p_style->i_margin_v;
     }
 }
 

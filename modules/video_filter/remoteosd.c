@@ -1182,8 +1182,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->b_absolute = false;
 
 
-    p_spu->i_x = 0;
-    p_spu->i_y = 0;
     p_spu->i_original_picture_width = 0; /*Let vout core do the horizontal scaling */
     p_spu->i_original_picture_height = fmt.i_height;
 

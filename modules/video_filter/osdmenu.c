@@ -451,6 +451,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu = NULL;
     subpicture_region_t *p_region = NULL;
+    int i_x, i_y;
 
     if( !p_sys->b_update || (p_sys->i_update <= 0) )
             return NULL;
@@ -472,7 +473,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
         p_spu->b_absolute = true;
     else
         p_spu->b_absolute = p_sys->b_absolute;
-    p_spu->i_flags = p_sys->i_position;
 
     /* Determine the duration of the subpicture */
     if( p_sys->i_end_date > 0 )
@@ -505,8 +505,11 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
             NULL );
 
         /* proper positioning of OSD menu image */
-        p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
-        p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;
+        p_region->i_x = p_filter->p_sys->p_menu->p_state->i_x;
+        p_region->i_y = p_filter->p_sys->p_menu->p_state->i_y;
+        /* FIXME is it needed ?
+        p_region->i_align = p_sys->i_position;
+        */
         p_spu->p_region = p_region;
         p_spu->i_alpha = 0xFF; /* Picture is completely non transparent. */
         return p_spu;
@@ -535,14 +538,16 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     /* proper positioning of OSD menu image */
     if( p_filter->p_sys->p_menu->i_style == OSD_MENU_STYLE_CONCAT )
     {
-        p_spu->i_x = p_filter->p_sys->p_menu->p_button->i_x;
-        p_spu->i_y = p_filter->p_sys->p_menu->p_button->i_y;
+        i_x = p_filter->p_sys->p_menu->p_button->i_x;
+        i_y = p_filter->p_sys->p_menu->p_button->i_y;
     }
     else
     {
-        p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
-        p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;
+        i_x = p_filter->p_sys->p_menu->p_state->i_x;
+        i_y = p_filter->p_sys->p_menu->p_state->i_y;
     }
+    p_region->i_x = i_x;
+    p_region->i_y = i_y;
 
     if( p_filter->p_sys->p_menu->i_style == OSD_MENU_STYLE_CONCAT )
     {
@@ -582,8 +587,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
             }
             else
             {
-                p_new->i_x = p_region_tail->fmt.i_visible_width;
-                p_new->i_y = p_button->i_y;
+                p_new->i_x = i_x+p_region_tail->fmt.i_visible_width;
+                p_new->i_y = i_y+p_button->i_y;
                 p_region_tail->p_next = p_new;
                 p_region_tail = p_new;
             }
