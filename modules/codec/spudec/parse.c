@@ -40,9 +40,18 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  ParseControlSeq( decoder_t *, subpicture_t *, subpicture_data_t *);
-static int  ParseRLE       ( decoder_t *, subpicture_t *, subpicture_data_t *);
-static void Render         ( decoder_t *, subpicture_t *, subpicture_data_t *);
+typedef struct
+{
+    int i_width;
+    int i_height;
+} spu_properties_t;
+
+static int  ParseControlSeq( decoder_t *, subpicture_t *, subpicture_data_t *,
+                             spu_properties_t * );
+static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
+                             const spu_properties_t * );
+static void Render         ( decoder_t *, subpicture_t *, subpicture_data_t *,
+                             const spu_properties_t * );
 
 /*****************************************************************************
  * AddNibble: read a nibble from a source packet and add it to our integer.
@@ -71,6 +80,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_data_t *p_spu_data;
     subpicture_t *p_spu;
+    spu_properties_t spu_properties;
 
     /* Allocate the subpicture internal data. */
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
@@ -100,8 +110,10 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     p_spu->i_original_picture_height =
         p_dec->fmt_in.subs.spu.i_original_frame_height;
 
+    memset( &spu_properties, 0, sizeof(spu_properties) );
+
     /* Getting the control part */
-    if( ParseControlSeq( p_dec, p_spu, p_spu_data ) )
+    if( ParseControlSeq( p_dec, p_spu, p_spu_data, &spu_properties ) )
     {
         /* There was a parse error, delete the subpicture */
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
@@ -109,7 +121,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     }
 
     /* We try to display it */
-    if( ParseRLE( p_dec, p_spu, p_spu_data ) )
+    if( ParseRLE( p_dec, p_spu_data, &spu_properties ) )
     {
         /* There was a parse error, delete the subpicture */
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
@@ -122,7 +134,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
              p_spu_data->pi_offset[0], p_spu_data->pi_offset[1] );
 #endif
 
-    Render( p_dec, p_spu, p_spu_data );
+    Render( p_dec, p_spu, p_spu_data, &spu_properties );
     free( p_spu_data );
 
     return p_spu;
@@ -136,7 +148,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
  * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
  *****************************************************************************/
 static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
-                            subpicture_data_t *p_spu_data )
+                            subpicture_data_t *p_spu_data, spu_properties_t *p_spu_properties )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -267,16 +279,16 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
 
             p_spu->i_x = (p_sys->buffer[i_index+1]<<4)|
                          ((p_sys->buffer[i_index+2]>>4)&0x0f);
-            p_spu->i_width = (((p_sys->buffer[i_index+2]&0x0f)<<8)|
+            p_spu_properties->i_width = (((p_sys->buffer[i_index+2]&0x0f)<<8)|
                               p_sys->buffer[i_index+3]) - p_spu->i_x + 1;
 
             p_spu->i_y = (p_sys->buffer[i_index+4]<<4)|
                          ((p_sys->buffer[i_index+5]>>4)&0x0f);
-            p_spu->i_height = (((p_sys->buffer[i_index+5]&0x0f)<<8)|
+            p_spu_properties->i_height = (((p_sys->buffer[i_index+5]&0x0f)<<8)|
                               p_sys->buffer[i_index+6]) - p_spu->i_y + 1;
 
             /* Auto crop fullscreen subtitles */
-            if( p_spu->i_height > 250 )
+            if( p_spu_properties->i_height > 250 )
                 p_spu_data->b_auto_crop = true;
 
             i_index += 7;
@@ -385,16 +397,17 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
  * convenient structure for later decoding. For more information on the
  * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
  *****************************************************************************/
-static int ParseRLE( decoder_t *p_dec, subpicture_t * p_spu,
-                     subpicture_data_t *p_spu_data )
+static int ParseRLE( decoder_t *p_dec,
+                     subpicture_data_t *p_spu_data,
+                     const spu_properties_t *p_spu_properties )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t       *p_src = &p_sys->buffer[4];
 
     unsigned int i_code;
 
-    unsigned int i_width = p_spu->i_width;
-    unsigned int i_height = p_spu->i_height;
+    unsigned int i_width = p_spu_properties->i_width;
+    unsigned int i_height = p_spu_properties->i_height;
     unsigned int i_x, i_y;
 
     uint16_t *p_dest = (uint16_t *)p_spu_data->p_data;
@@ -636,7 +649,8 @@ static int ParseRLE( decoder_t *p_dec, subpicture_t * p_spu,
 }
 
 static void Render( decoder_t *p_dec, subpicture_t *p_spu,
-                    subpicture_data_t *p_spu_data )
+                    subpicture_data_t *p_spu_data,
+                    const spu_properties_t *p_spu_properties )
 {
     uint8_t *p_p;
     int i_x, i_y, i_len, i_color, i_pitch;
@@ -647,8 +661,8 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
     fmt.i_aspect = 0; /* 0 means use aspect ratio of background video */
-    fmt.i_width = fmt.i_visible_width = p_spu->i_width;
-    fmt.i_height = fmt.i_visible_height = p_spu->i_height -
+    fmt.i_width = fmt.i_visible_width = p_spu_properties->i_width;
+    fmt.i_height = fmt.i_visible_height = p_spu_properties->i_height -
         p_spu_data->i_y_top_offset - p_spu_data->i_y_bottom_offset;
     fmt.i_x_offset = fmt.i_y_offset = 0;
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );

@@ -355,8 +355,6 @@ struct subpicture_t
     /**@{*/
     int          i_x;                    /**< offset from alignment position */
     int          i_y;                    /**< offset from alignment position */
-    int          i_width;                                 /**< picture width */
-    int          i_height;                               /**< picture height */
     int          i_alpha;                                  /**< transparency */
     int          i_original_picture_width;  /**< original width of the movie */
     int          i_original_picture_height;/**< original height of the movie */

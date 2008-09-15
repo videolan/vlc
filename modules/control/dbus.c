@@ -101,6 +101,7 @@ struct intf_sys_t
     DBusConnection *p_conn;
     bool      b_meta_read;
     dbus_int32_t    i_caps;
+    bool       b_dead;
 };
 
 /*****************************************************************************
@@ -727,6 +728,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_meta_read = false;
     p_sys->i_caps = CAPS_NONE;
+    p_sys->b_dead = false;
 
     dbus_error_init( &error );
 
@@ -792,8 +794,6 @@ static void Close   ( vlc_object_t *p_this )
     intf_thread_t   *p_intf     = (intf_thread_t*) p_this;
     playlist_t      *p_playlist = pl_Yield( p_intf );;
     input_thread_t  *p_input;
-
-    p_this->b_dead = true;
 
     PL_LOCK;
     var_DelCallback( p_playlist, "playlist-current", TrackChange, p_intf );
@@ -887,7 +887,7 @@ static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
             return VLC_SUCCESS;
     }
 
-    if( p_intf->b_dead )
+    if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
     UpdateCaps( p_intf, true );
@@ -935,7 +935,7 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
     intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
 
-    if( p_intf->b_dead )
+    if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
     UpdateCaps( p_intf, true );
@@ -969,7 +969,7 @@ static int StatusChangeEmit( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = p_data;
 
-    if( p_intf->b_dead )
+    if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
     UpdateCaps( p_intf, false );
@@ -991,7 +991,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
     VLC_UNUSED( oldval ); VLC_UNUSED( newval );
 
-    if( p_intf->b_dead )
+    if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
     p_sys->b_meta_read = false;

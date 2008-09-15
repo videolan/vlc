@@ -530,8 +530,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
         return NULL;
     }
 
-    p_spu->i_width = p_region->fmt.i_visible_width;
-    p_spu->i_height = p_region->fmt.i_visible_height;
     p_spu->i_alpha = p_filter->p_sys->i_alpha;
 
     /* proper positioning of OSD menu image */
@@ -576,9 +574,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
                 p_filter->pf_sub_buffer_del( p_filter, p_spu );
                 return NULL;
             }
-
-            p_spu->i_width += p_new->fmt.i_visible_width;
-            p_spu->i_height += p_new->fmt.i_visible_height;
 
             if( !p_region_list )
             {

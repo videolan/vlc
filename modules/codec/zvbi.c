@@ -505,9 +505,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
 
     if( !b_text )
     {
-        p_spu->i_width =
         p_spu->i_original_picture_width = fmt.i_width;
-        p_spu->i_height =
         p_spu->i_original_picture_height = fmt.i_height;
     }
 
