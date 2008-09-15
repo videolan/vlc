@@ -653,6 +653,67 @@ exit:
     p_region->i_align |= SUBPICTURE_RENDERED;
 }
 
+/**
+ * Place a region
+ */
+static void SpuRegionPlace( int *pi_x, int *pi_y,
+                            const video_format_t *p_fmt,
+                            const subpicture_t *p_subpic,
+                            const subpicture_region_t *p_region,
+                            int i_subpic_x,
+                            int i_inv_scale_x, int i_inv_scale_y,
+                            int i_scale_width, int i_scale_height )
+{
+    /* FIXME i_delta_x/y and i_x/y in absolute mode does not use the same
+     * it seems weird unless I missed something
+     * At this point we have:
+     *   i_subpic_x == p_subpic->i_x * i_scale_width / SCALE_UNIT
+     *   p_region->i_x/i_y have already been scaled by i_scale_width/i_scale_height.
+     * */
+    int i_delta_x = ( i_subpic_x + p_region->i_x ) *
+                                            i_inv_scale_x / SCALE_UNIT;
+    int i_delta_y = ( p_subpic->i_y + p_region->i_y ) *
+                                            i_inv_scale_y / SCALE_UNIT;
+    int i_x, i_y;
+
+    if( p_region->i_align & SUBPICTURE_ALIGN_TOP )
+    {
+        i_y = i_delta_y;
+    }
+    else if( p_region->i_align & SUBPICTURE_ALIGN_BOTTOM )
+    {
+        i_y = p_fmt->i_height - p_region->fmt.i_height - i_delta_y;
+    }
+    else
+    {
+        i_y = p_fmt->i_height / 2 - p_region->fmt.i_height / 2;
+    }
+
+    if( p_region->i_align & SUBPICTURE_ALIGN_LEFT )
+    {
+        i_x = i_delta_x;
+    }
+    else if( p_region->i_align & SUBPICTURE_ALIGN_RIGHT )
+    {
+        i_x = p_fmt->i_width - p_region->fmt.i_width - i_delta_x;
+    }
+    else
+    {
+        i_x = p_fmt->i_width / 2 - p_region->fmt.i_width / 2;
+    }
+
+    if( p_subpic->b_absolute )
+    {
+        i_x = (p_region->i_x + i_subpic_x * i_scale_width / SCALE_UNIT) *
+                i_inv_scale_x / SCALE_UNIT;
+        i_y = (p_region->i_y + p_subpic->i_y * i_scale_height / SCALE_UNIT) *
+                i_inv_scale_y / SCALE_UNIT;
+    }
+
+    *pi_x = __MAX( i_x, 0 );
+    *pi_y = __MAX( i_y, 0 );
+}
+
 static void SpuRenderRegion( spu_t *p_spu,
                              picture_t *p_pic_dst,
                              subpicture_t *p_subpic, subpicture_region_t *p_region,
@@ -700,9 +761,6 @@ static void SpuRenderRegion( spu_t *p_spu,
         i_inv_scale_x = SCALE_UNIT;
         i_inv_scale_y = SCALE_UNIT;
     }
-
-    i_x_offset = (p_region->i_x + pi_subpic_x[ i_scale_idx ]) * i_inv_scale_x / SCALE_UNIT;
-    i_y_offset = (p_region->i_y + p_subpic->i_y) * i_inv_scale_y / SCALE_UNIT;
 
     /* Force palette if requested
      * FIXME b_force_palette and b_force_crop are applied to all subpictures using palette
@@ -809,41 +867,11 @@ static void SpuRenderRegion( spu_t *p_spu,
         }
     }
 
-    if( p_region->i_align & SUBPICTURE_ALIGN_BOTTOM )
-    {
-        i_y_offset = p_fmt->i_height - p_region->fmt.i_height -
-            (p_subpic->i_y + p_region->i_y) * i_inv_scale_y / SCALE_UNIT;
-    }
-    else if ( !(p_region->i_align & SUBPICTURE_ALIGN_TOP) )
-    {
-        i_y_offset = p_fmt->i_height / 2 - p_region->fmt.i_height / 2;
-    }
-
-    if( p_region->i_align & SUBPICTURE_ALIGN_RIGHT )
-    {
-        i_x_offset = p_fmt->i_width - p_region->fmt.i_width -
-            (pi_subpic_x[ i_scale_idx ] + p_region->i_x)
-            * i_inv_scale_x / SCALE_UNIT;
-    }
-    else if ( !(p_region->i_align & SUBPICTURE_ALIGN_LEFT) )
-    {
-        i_x_offset = p_fmt->i_width / 2 - p_region->fmt.i_width / 2;
-    }
-
-    if( p_subpic->b_absolute )
-    {
-        i_x_offset = (p_region->i_x +
-            pi_subpic_x[ i_scale_idx ] *
-                             pi_scale_width[ i_scale_idx ] / SCALE_UNIT)
-            * i_inv_scale_x / SCALE_UNIT;
-        i_y_offset = (p_region->i_y +
-            p_subpic->i_y * pi_scale_height[ i_scale_idx ] / SCALE_UNIT)
-            * i_inv_scale_y / SCALE_UNIT;
-
-    }
-
-    i_x_offset = __MAX( i_x_offset, 0 );
-    i_y_offset = __MAX( i_y_offset, 0 );
+    /* */
+    SpuRegionPlace( &i_x_offset, &i_y_offset,
+                    p_fmt, p_subpic, p_region, pi_subpic_x[i_scale_idx],
+                    i_inv_scale_x, i_inv_scale_y,
+                    pi_scale_width[i_scale_idx], pi_scale_height[i_scale_idx] );
 
     if( p_spu->i_margin != 0 && !b_force_crop )
     {
