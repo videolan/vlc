@@ -219,48 +219,59 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
     }
 }
 
-/**
- * Create a subpicture region
- *
- * \param p_this vlc_object_t
- * \param p_fmt the format that this subpicture region should have
- */
+
+/* */
+static subpicture_region_t *RegionCreate( video_format_t *p_fmt )
+{
+    subpicture_region_t *p_region = calloc( 1, sizeof(*p_region ) );
+    if( !p_region )
+        return NULL;
+
+    /* FIXME is that *really* wanted? */
+    if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
+        p_fmt->p_palette = calloc( 1, sizeof(video_palette_t) );
+    else
+        p_fmt->p_palette = NULL;    /* XXX and that above all? */
+
+    p_region->fmt = *p_fmt;
+    p_region->i_alpha = 0xff;
+    p_region->p_next = NULL;
+    p_region->p_cache = NULL;
+    p_region->psz_text = NULL;
+    p_region->p_style = NULL;
+
+    return p_region;
+}
 static void RegionPictureRelease( picture_t *p_pic )
 {
     free( p_pic->p_data_orig );
     /* We use pf_release nullity to know if the picture has already been released. */
     p_pic->pf_release = NULL;
 }
+
+/**
+ * Create a subpicture region
+ *
+ * \param p_this vlc_object_t
+ * \param p_fmt the format that this subpicture region should have
+ */
 subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
                                          video_format_t *p_fmt )
 {
-    subpicture_region_t *p_region = malloc( sizeof(subpicture_region_t) );
-    if( !p_region ) return NULL;
+    subpicture_region_t *p_region = RegionCreate( p_fmt );
+    if( !p_region )
+        return NULL;
 
-    memset( p_region, 0, sizeof(subpicture_region_t) );
-    p_region->i_alpha = 0xff;
-    p_region->p_next = NULL;
-    p_region->p_cache = NULL;
-    p_region->fmt = *p_fmt;
-    p_region->psz_text = NULL;
-    p_region->p_style = NULL;
-
-    if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
-        p_fmt->p_palette = p_region->fmt.p_palette =
-            malloc( sizeof(video_palette_t) );
-    else p_fmt->p_palette = p_region->fmt.p_palette = NULL;
-
-    p_region->picture.p_data_orig = NULL;
-
-    if( p_fmt->i_chroma == VLC_FOURCC('T','E','X','T') ) return p_region;
+    if( p_fmt->i_chroma == VLC_FOURCC('T','E','X','T') )
+        return p_region;
 
     vout_AllocatePicture( p_this, &p_region->picture, p_fmt->i_chroma,
                           p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
 
     if( !p_region->picture.i_planes )
     {
-        free( p_region );
         free( p_fmt->p_palette );
+        free( p_region );
         return NULL;
     }
 
@@ -280,25 +291,15 @@ subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
                                        video_format_t *p_fmt,
                                        picture_t *p_pic )
 {
-    subpicture_region_t *p_region = malloc( sizeof(subpicture_region_t) );
-    (void)p_this;
-    if( !p_region ) return NULL;
-    memset( p_region, 0, sizeof(subpicture_region_t) );
-    p_region->i_alpha = 0xff;
-    p_region->p_next = 0;
-    p_region->p_cache = 0;
-    p_region->fmt = *p_fmt;
-    p_region->psz_text = 0;
-    p_region->p_style = NULL;
+    subpicture_region_t *p_region = RegionCreate( p_fmt );
+    if( !p_region )
+        return NULL;
 
-    if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
-        p_fmt->p_palette = p_region->fmt.p_palette =
-            malloc( sizeof(video_palette_t) );
-    else p_fmt->p_palette = p_region->fmt.p_palette = NULL;
-
-    memcpy( &p_region->picture, p_pic, sizeof(picture_t) );
+    /* FIXME overwriting picture.pf_release seems wrong */
+    p_region->picture = *p_pic;
     p_region->picture.pf_release = RegionPictureRelease;
 
+    VLC_UNUSED(p_this);
     return p_region;
 }
 
@@ -310,11 +311,14 @@ subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
  */
 void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
 {
-    if( !p_region ) return;
-    if( p_region->picture.pf_release )
-        p_region->picture.pf_release( &p_region->picture );
+    if( !p_region )
+        return;
+
+    picture_Release( &p_region->picture );
+
     free( p_region->fmt.p_palette );
-    if( p_region->p_cache ) __spu_DestroyRegion( p_this, p_region->p_cache );
+    if( p_region->p_cache )
+        __spu_DestroyRegion( p_this, p_region->p_cache );
 
     free( p_region->psz_text );
     free( p_region->psz_html );
