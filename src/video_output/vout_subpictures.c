@@ -669,9 +669,9 @@ static int spu_scale_h( int v, const spu_scale_t s )
  * Place a region
  */
 static void SpuRegionPlace( int *pi_x, int *pi_y,
-                            const video_format_t *p_fmt,
                             const subpicture_t *p_subpic,
-                            const subpicture_region_t *p_region )
+                            const subpicture_region_t *p_region,
+                            int i_margin_y )
 {
     int i_delta_x = p_region->i_x;
     int i_delta_y = p_region->i_y;
@@ -683,11 +683,11 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
     }
     else if( p_region->i_align & SUBPICTURE_ALIGN_BOTTOM )
     {
-        i_y = p_fmt->i_height - p_region->fmt.i_height - i_delta_y;
+        i_y = p_subpic->i_original_picture_height - p_region->fmt.i_height - i_delta_y;
     }
     else
     {
-        i_y = p_fmt->i_height / 2 - p_region->fmt.i_height / 2;
+        i_y = p_subpic->i_original_picture_height / 2 - p_region->fmt.i_height / 2;
     }
 
     if( p_region->i_align & SUBPICTURE_ALIGN_LEFT )
@@ -696,11 +696,11 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
     }
     else if( p_region->i_align & SUBPICTURE_ALIGN_RIGHT )
     {
-        i_x = p_fmt->i_width - p_region->fmt.i_width - i_delta_x;
+        i_x = p_subpic->i_original_picture_width - p_region->fmt.i_width - i_delta_x;
     }
     else
     {
-        i_x = p_fmt->i_width / 2 - p_region->fmt.i_width / 2;
+        i_x = p_subpic->i_original_picture_width / 2 - p_region->fmt.i_width / 2;
     }
 
     if( p_subpic->b_absolute )
@@ -708,6 +708,22 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
         i_x = i_delta_x;
         i_y = i_delta_y;
     }
+
+    /* */
+    if( i_margin_y != 0 )
+    {
+        int i_diff = 0;
+        int i_low = i_y - i_margin_y;
+        int i_high = i_low + p_region->fmt.i_height;
+
+        /* crop extra margin to keep within bounds */
+        if( i_low < 0 )
+            i_diff = i_low;
+        if( i_high > (int)p_subpic->i_original_picture_height )
+            i_diff = i_high - p_subpic->i_original_picture_height;
+        i_y -= i_margin_y + i_diff;
+    }
+
     if( i_x < 0 )
         i_x = 0;
     if( i_y < 0 )
@@ -753,6 +769,16 @@ static void SpuRenderRegion( spu_t *p_spu,
     const bool b_force_palette = b_using_palette && p_spu->b_force_palette;
     const bool b_force_crop    = b_force_palette && p_spu->b_force_crop;
 
+
+    /* Place the picture
+     * We compute the position in the rendered size */
+    SpuRegionPlace( &i_x_offset, &i_y_offset,
+                    p_subpic, p_region, !b_force_crop ? p_spu->i_margin : 0  );
+
+    /* Fix the position for the current scale_size */
+    i_x_offset = spu_scale_w( i_x_offset, scale_size );
+    i_y_offset = spu_scale_h( i_y_offset, scale_size );
+
     if( b_force_palette )
     {
         /* It looks so wrong I won't comment
@@ -768,6 +794,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     else
         p_scale = p_spu->p_scale;
 
+    /* Scale from rendered size to destination size */
     if( p_scale &&
         ( scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || b_force_palette ) )
     {
@@ -835,7 +862,6 @@ static void SpuRenderRegion( spu_t *p_spu,
                                              p_region->p_cache );
                 p_region->p_cache = NULL;
             }
-
         }
 
         /* And use the scaled picture */
@@ -844,24 +870,6 @@ static void SpuRenderRegion( spu_t *p_spu,
             p_region = p_region->p_cache;
             fmt_original = p_region->fmt;
         }
-    }
-
-    /* */
-    SpuRegionPlace( &i_x_offset, &i_y_offset,
-                    p_fmt, p_subpic, p_region );
-
-    if( p_spu->i_margin != 0 && !b_force_crop )
-    {
-        int i_diff = 0;
-        int i_low = i_y_offset - p_spu->i_margin;
-        int i_high = i_low + p_region->fmt.i_height;
-
-        /* crop extra margin to keep within bounds */
-        if( i_low < 0 )
-            i_diff = i_low;
-        if( i_high > (int)p_fmt->i_height )
-            i_diff = i_high - p_fmt->i_height;
-        i_y_offset -= p_spu->i_margin + i_diff;
     }
 
     /* Force cropping if requested */
@@ -1019,8 +1027,8 @@ void spu_RenderSubpictures( spu_t *p_spu,
                 msg_Err( p_spu, "unsupported original picture size %dx%d",
                          i_render_width, i_render_height );
 
-            i_render_width = i_source_video_width;
-            i_render_height = i_source_video_height;
+            p_subpic->i_original_picture_width  = i_render_width = i_source_video_width;
+            p_subpic->i_original_picture_height = i_render_height = i_source_video_height;
         }
 
         if( p_spu->p_text )
