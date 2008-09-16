@@ -221,7 +221,21 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
 
 
 /* */
-static subpicture_region_t *RegionCreate( video_format_t *p_fmt )
+static void RegionPictureRelease( picture_t *p_pic )
+{
+    free( p_pic->p_data_orig );
+    /* We use pf_release nullity to know if the picture has already been released. */
+    p_pic->pf_release = NULL;
+}
+
+/**
+ * Create a subpicture region
+ *
+ * \param p_this vlc_object_t
+ * \param p_fmt the format that this subpicture region should have
+ */
+subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
+                                         video_format_t *p_fmt )
 {
     subpicture_region_t *p_region = calloc( 1, sizeof(*p_region ) );
     if( !p_region )
@@ -240,28 +254,6 @@ static subpicture_region_t *RegionCreate( video_format_t *p_fmt )
     p_region->psz_text = NULL;
     p_region->p_style = NULL;
 
-    return p_region;
-}
-static void RegionPictureRelease( picture_t *p_pic )
-{
-    free( p_pic->p_data_orig );
-    /* We use pf_release nullity to know if the picture has already been released. */
-    p_pic->pf_release = NULL;
-}
-
-/**
- * Create a subpicture region
- *
- * \param p_this vlc_object_t
- * \param p_fmt the format that this subpicture region should have
- */
-subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
-                                         video_format_t *p_fmt )
-{
-    subpicture_region_t *p_region = RegionCreate( p_fmt );
-    if( !p_region )
-        return NULL;
-
     if( p_fmt->i_chroma == VLC_FOURCC('T','E','X','T') )
         return p_region;
 
@@ -277,29 +269,6 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
 
     p_region->picture.pf_release = RegionPictureRelease;
 
-    return p_region;
-}
-
-/**
- * Make a subpicture region from an existing picture_t
- *
- * \param p_this vlc_object_t
- * \param p_fmt the format that this subpicture region should have
- * \param p_pic a pointer to the picture creating the region (not freed)
- */
-subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
-                                       video_format_t *p_fmt,
-                                       picture_t *p_pic )
-{
-    subpicture_region_t *p_region = RegionCreate( p_fmt );
-    if( !p_region )
-        return NULL;
-
-    /* FIXME overwriting picture.pf_release seems wrong */
-    p_region->picture = *p_pic;
-    p_region->picture.pf_release = RegionPictureRelease;
-
-    VLC_UNUSED(p_this);
     return p_region;
 }
 
@@ -409,7 +378,6 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     vlc_mutex_unlock( &p_spu->subpicture_lock );
 
     p_subpic->pf_create_region = __spu_CreateRegion;
-    p_subpic->pf_make_region = __spu_MakeRegion;
     p_subpic->pf_destroy_region = __spu_DestroyRegion;
 
     return p_subpic;
@@ -1381,7 +1349,6 @@ static subpicture_t *spu_new_buffer( filter_t *p_filter )
     p_subpic->b_absolute = true;
 
     p_subpic->pf_create_region = __spu_CreateRegion;
-    p_subpic->pf_make_region = __spu_MakeRegion;
     p_subpic->pf_destroy_region = __spu_DestroyRegion;
 
     return p_subpic;
