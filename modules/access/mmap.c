@@ -281,8 +281,11 @@ static int Control (access_t *p_access, int query, va_list args)
             return VLC_SUCCESS;
 
         case ACCESS_GET_PTS_DELAY:
-            *((int64_t *)va_arg (args, int64_t *)) = DEFAULT_PTS_DELAY;
+        {
+            int delay_ms = var_CreateGetInteger (p_access, "file-caching");
+            *((int64_t *)va_arg (args, int64_t *)) = delay_ms * INT64_C (1000);
             return VLC_SUCCESS;
+        }
 
         case ACCESS_GET_TITLE_INFO:
         case ACCESS_GET_META:
