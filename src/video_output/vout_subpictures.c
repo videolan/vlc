@@ -515,7 +515,7 @@ static void SpuRenderUpdateBlend( spu_t *p_spu, int i_out_width, int i_out_heigh
     if( !p_blend->p_module )
         p_blend->p_module = module_Need( p_blend, "video blending", 0, 0 );
 }
-static void SpuRenderCreateAndLoadText( spu_t *p_spu, int i_width, int i_height )
+static void SpuRenderCreateAndLoadText( spu_t *p_spu )
 {
     filter_t *p_text;
 
@@ -531,9 +531,9 @@ static void SpuRenderCreateAndLoadText( spu_t *p_spu, int i_width, int i_height 
 
     es_format_Init( &p_text->fmt_out, VIDEO_ES, 0 );
     p_text->fmt_out.video.i_width =
-    p_text->fmt_out.video.i_visible_width = i_width;
+    p_text->fmt_out.video.i_visible_width = 32;
     p_text->fmt_out.video.i_height =
-    p_text->fmt_out.video.i_visible_height = i_height;
+    p_text->fmt_out.video.i_visible_height = 32;
 
     p_text->pf_sub_buffer_new = spu_new_buffer;
     p_text->pf_sub_buffer_del = spu_del_buffer;
@@ -1038,7 +1038,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt_a,
      * element in the region list, so just load it anyway as we'll
      * probably want it sooner or later. */
     if( !p_spu->p_text )
-        SpuRenderCreateAndLoadText( p_spu, p_fmt->i_width, p_fmt->i_height );
+        SpuRenderCreateAndLoadText( p_spu );
 
     /* */
     for( p_subpic = p_subpic_list; ; p_subpic = p_subpic->p_next )
