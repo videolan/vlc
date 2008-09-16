@@ -121,7 +121,7 @@ vlc_module_begin();
     add_integer( "quartztext-color", 0x00FFFFFF, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, false );
         change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
-    set_capability( "text renderer", 120 );
+    set_capability( "text renderer", 0 ); // Freetype is better than us
     add_shortcut( "text" );
     set_callbacks( Create, Destroy );
 vlc_module_end();
