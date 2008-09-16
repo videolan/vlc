@@ -180,14 +180,13 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     }
 
 #elif defined(HAVE_DL_WINDOWS)
+    wchar_t psz_wfile[MAX_PATH];
+    MultiByteToWideChar( CP_ACP, 0, psz_file, -1, psz_wfile, MAX_PATH );
+
 #ifdef UNDER_CE
-    {
-        wchar_t psz_wfile[MAX_PATH];
-        MultiByteToWideChar( CP_ACP, 0, psz_file, -1, psz_wfile, MAX_PATH );
-        handle = LoadLibrary( psz_wfile );
-    }
+    handle = LoadLibrary( psz_wfile );
 #else
-    handle = LoadLibrary( psz_file );
+    handle = LoadLibraryW( psz_wfile );
 #endif
     if( handle == NULL )
     {
