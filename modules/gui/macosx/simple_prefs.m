@@ -569,11 +569,11 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [self setupButton: o_osd_encoding_pop forStringList: "subsdec-encoding"];
     
     [o_osd_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "sub-language" ) ?: ""]];
-    if( config_GetPsz( p_intf, "quartztext-font" ) != NULL )
-        [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "quartztext-font" ) ?: ""]];
+    if( config_GetPsz( p_intf, "freetype-font" ) != NULL )
+        [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "freetype-font" ) ?: ""]];
 
-    [self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
-    [self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
+    [self setupButton: o_osd_font_color_pop forIntList: "freetype-color"];
+    [self setupButton: o_osd_font_size_pop forIntList: "freetype-rel-fontsize"];
 
     /********************
      * hotkeys settings *
@@ -930,10 +930,10 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             config_PutPsz( p_intf, "subsdec-encoding", [[[o_osd_encoding_pop selectedItem] title] UTF8String] );
 
         config_PutPsz( p_intf, "sub-language", [[o_osd_lang_fld stringValue] UTF8String] );
-        config_PutPsz( p_intf, "quartztext-font", [[o_osd_font_fld stringValue] UTF8String] );
+        config_PutPsz( p_intf, "freetype-font", [[o_osd_font_fld stringValue] UTF8String] );
 
-        SaveIntList( o_osd_font_color_pop, "quartztext-color" );
-        SaveIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
+        SaveIntList( o_osd_font_color_pop, "freetype-color" );
+        SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
 
         i = config_SaveConfigFile( p_intf, NULL );
 
