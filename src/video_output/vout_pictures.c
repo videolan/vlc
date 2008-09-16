@@ -320,21 +320,11 @@ static void vout_UnlockPicture( vout_thread_t *p_vout, picture_t *p_picture )
  * before rendering, does the subpicture magic, and tells the video output
  * thread which direct buffer needs to be displayed.
  */
-picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
-                                                       subpicture_t *p_subpic )
+picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
+                               subpicture_t *p_subpic )
 {
-    int i_scale_width, i_scale_height;
-
     if( p_pic == NULL )
-    {
-        /* XXX: subtitles */
         return NULL;
-    }
-
-    i_scale_width = p_vout->fmt_out.i_visible_width * 1000 /
-        p_vout->fmt_in.i_visible_width;
-    i_scale_height = p_vout->fmt_out.i_visible_height * 1000 /
-        p_vout->fmt_in.i_visible_height;
 
     if( p_pic->i_type == DIRECT_PICTURE )
     {
@@ -350,9 +340,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
             vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
 
-            spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
-                                   PP_OUTPUTPICTURE[0], p_subpic,
-                                   i_scale_width, i_scale_height );
+            spu_RenderSubpictures( p_vout->p_spu,
+                                   PP_OUTPUTPICTURE[0], &p_vout->fmt_out,
+                                   p_subpic, &p_vout->fmt_in );
 
             vout_UnlockPicture( p_vout, PP_OUTPUTPICTURE[0] );
 
@@ -377,9 +367,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
             return NULL;
 
         vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
-        spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
-                               PP_OUTPUTPICTURE[0],
-                               p_subpic, i_scale_width, i_scale_height );
+        spu_RenderSubpictures( p_vout->p_spu,
+                               PP_OUTPUTPICTURE[0], &p_vout->fmt_out,
+                               p_subpic, &p_vout->fmt_in );
 
         vout_UnlockPicture( p_vout, PP_OUTPUTPICTURE[0] );
 
@@ -415,9 +405,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         p_vout->p_chroma->pf_video_filter( p_vout->p_chroma, p_pic );
 
         /* Render subpictures on the first direct buffer */
-        spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
-                               p_tmp_pic, p_subpic,
-                               i_scale_width, i_scale_height );
+        spu_RenderSubpictures( p_vout->p_spu,
+                               p_tmp_pic, &p_vout->fmt_out,
+                               p_subpic, &p_vout->fmt_in );
 
         if( vout_LockPicture( p_vout, &p_vout->p_picture[0] ) )
             return NULL;
@@ -434,9 +424,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         p_vout->p_chroma->pf_video_filter( p_vout->p_chroma, p_pic );
 
         /* Render subpictures on the first direct buffer */
-        spu_RenderSubpictures( p_vout->p_spu, &p_vout->fmt_out,
-                               &p_vout->p_picture[0],
-                               p_subpic, i_scale_width, i_scale_height );
+        spu_RenderSubpictures( p_vout->p_spu,
+                               &p_vout->p_picture[0], &p_vout->fmt_out,
+                               p_subpic, &p_vout->fmt_in );
     }
 
     vout_UnlockPicture( p_vout, &p_vout->p_picture[0] );

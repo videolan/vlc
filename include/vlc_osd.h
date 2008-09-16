@@ -122,7 +122,14 @@ VLC_EXPORT( subpicture_region_t *,__spu_CreateRegion, ( vlc_object_t *, video_fo
 #define spu_DestroyRegion(a,b) __spu_DestroyRegion(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __spu_DestroyRegion, ( vlc_object_t *, subpicture_region_t * ) );
 VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t display_date, bool b_paused, bool b_subtitle_only ) );
-VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  video_format_t *, picture_t *, subpicture_t *, int, int ) );
+
+/**
+ * This function renders a list of subpicture_t on the provided picture.
+ *
+ * \param p_fmt_dst is the format of the destination picture.
+ * \param p_fmt_src is the format of the original(source) video.
+ */
+VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  picture_t *, video_format_t *p_fmt_dst, subpicture_t *p_list, const video_format_t *p_fmt_src ) );
 
 /** @}*/
 

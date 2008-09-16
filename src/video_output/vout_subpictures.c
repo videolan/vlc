@@ -949,17 +949,16 @@ exit:
         p_region->fmt = fmt_original;
 }
 
-void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt_a,
-                            picture_t *p_pic_dst,
+void spu_RenderSubpictures( spu_t *p_spu,
+                            picture_t *p_pic_dst, video_format_t *p_fmt_dst,
                             subpicture_t *p_subpic_list,
-                            int i_scale_width_orig, int i_scale_height_orig )
+                            const video_format_t *p_fmt_src )
 {
-    video_format_t fmt = *p_fmt_a, *p_fmt = &fmt;
+    video_format_t *p_fmt = p_fmt_dst;
     const mtime_t i_current_date = mdate();
     int i_source_video_width;
     int i_source_video_height;
     subpicture_t *p_subpic;
-    spu_scale_t scale_size_org;
 
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
@@ -971,10 +970,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt_a,
         return;
     }
 
-    scale_size_org = spu_scale_create( i_scale_width_orig, i_scale_height_orig );
-
-    i_source_video_width  = p_fmt->i_width  * SCALE_UNIT / scale_size_org.w;
-    i_source_video_height = p_fmt->i_height * SCALE_UNIT / scale_size_org.h;
+    i_source_video_width  = p_fmt_src->i_width;
+    i_source_video_height = p_fmt_src->i_height;
 
     /* */
     for( p_subpic = p_subpic_list;

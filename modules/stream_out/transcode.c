@@ -1988,13 +1988,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
         /* Overlay subpicture */
         if( p_subpic )
         {
-            int i_scale_width, i_scale_height;
             video_format_t fmt;
-
-            i_scale_width = id->p_encoder->fmt_in.video.i_width * 1000 /
-                id->p_decoder->fmt_out.video.i_width;
-            i_scale_height = id->p_encoder->fmt_in.video.i_height * 1000 /
-                id->p_decoder->fmt_out.video.i_height;
 
             if( p_pic->i_refcount && !filter_chain_GetLength( id->p_f_chain ) )
             {
@@ -2017,8 +2011,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
             fmt.i_sar_num = fmt.i_aspect * fmt.i_height / fmt.i_width;
             fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 
-            spu_RenderSubpictures( p_sys->p_spu, &fmt, p_pic, p_subpic,
-                                   i_scale_width, i_scale_height );
+            spu_RenderSubpictures( p_sys->p_spu, p_pic, &fmt,
+                                   p_subpic, &id->p_decoder->fmt_out.video );
         }
 
         /* Run user specified filter chain */
