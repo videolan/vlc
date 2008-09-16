@@ -671,10 +671,6 @@ static spu_scale_t spu_scale_create( int w, int h )
         s.h = SCALE_UNIT;
     return s;
 }
-static spu_scale_t spu_scale_unit(void)
-{
-    return spu_scale_create( SCALE_UNIT, SCALE_UNIT );
-}
 static spu_scale_t spu_scale_createq( int wn, int wd, int hn, int hd )
 {
     return spu_scale_create( wn * SCALE_UNIT / wd,
@@ -793,9 +789,7 @@ static void SpuRenderRegion( spu_t *p_spu,
         p_scale = p_spu->p_scale;
 
     if( p_scale &&
-        ( ( scale_size.w > 0 && scale_size.w != SCALE_UNIT ) ||
-          ( scale_size.h > 0 && scale_size.h != SCALE_UNIT ) ||
-          ( b_force_palette ) ) )
+        ( scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || b_force_palette ) )
     {
         const unsigned i_dst_width  = spu_scale_w( p_region->fmt.i_width, scale_size );
         const unsigned i_dst_height = spu_scale_h( p_region->fmt.i_height, scale_size );
@@ -1119,6 +1113,11 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt_a,
         /* Render all regions */
         for( p_region = p_subpic->p_region; p_region != NULL; p_region = p_region->p_next )
         {
+            /* Check scale validity */
+            if( scale.w <= 0 || scale.h <= 0 )
+                continue;
+
+            /* */
             SpuRenderRegion( p_spu, p_pic_dst, p_subpic, p_region,
                              scale, p_fmt );
         }
