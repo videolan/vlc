@@ -1020,7 +1020,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
     p_access->info.b_eof  = false;
 
     /* Open connection */
-    assert( p_sys->fd == -1 );
+    assert( p_sys->fd == -1 ); /* No open sockets (leaking fds is BAD) */
     p_sys->fd = net_ConnectTCP( p_access, srv.psz_host, srv.i_port );
     if( p_sys->fd == -1 )
     {
