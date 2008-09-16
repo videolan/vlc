@@ -38,7 +38,6 @@ SOURCES_macosx = \
 	update.m \
 	update.h \
 	vout.m \
-	voutqt.m \
 	voutgl.m \
 	vout.h \
 	wizard.h \

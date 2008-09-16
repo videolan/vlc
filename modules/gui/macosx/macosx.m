@@ -43,9 +43,6 @@
 int  OpenIntf     ( vlc_object_t * );
 void CloseIntf    ( vlc_object_t * );
 
-int  OpenVideoQT  ( vlc_object_t * );
-void CloseVideoQT ( vlc_object_t * );
-
 int  OpenVideoGL  ( vlc_object_t * );
 void CloseVideoGL ( vlc_object_t * );
 
@@ -105,23 +102,6 @@ vlc_module_begin();
     add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
               false );
 
-    add_submodule();
-        set_description( N_("Quartz video") );
-        set_capability( "video output", 100 );
-        set_category( CAT_VIDEO);
-        set_subcategory( SUBCAT_VIDEO_VOUT );
-        set_callbacks( OpenVideoQT, CloseVideoQT );
-
-        add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
-                     false );
-        add_bool( "macosx-stretch", 0, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
-                  false );
-        add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
-                              OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
-        add_bool( "macosx-black", 1, NULL, BLACK_TEXT, BLACK_LONGTEXT,
-                  false );
-        add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
-                  false );
     add_submodule();
         set_description( "Mac OS X OpenGL" );
         set_capability( "opengl provider", 100 );
