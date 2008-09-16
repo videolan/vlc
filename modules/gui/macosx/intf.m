@@ -2252,7 +2252,11 @@ end:
     int res = NSRunInformationalAlertPanel(_NS("Remove old preferences?"),
                 _NS("We just found an older version of VLC's preferences files."),
                 _NS("Move To Trash and Relaunch VLC"), _NS("Ignore"), nil, nil);
-    if( res != NSOKButton ) return;
+    if( res != NSOKButton )
+    {
+        [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+        return;
+    }
 
     NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc.plist", @"VLC"];
 
