@@ -115,7 +115,10 @@ void* EventThread( vlc_object_t *p_this )
     /* Creating a window under Windows also initializes the thread's event
      * message queue */
     if( DirectXCreateWindow( p_event->p_vout ) )
-        p_event->b_dead = true;
+    {
+        vlc_restorecancel (canc);
+        return NULL;
+    }
 
     /* Signal the creation of the window */
     vlc_thread_ready( p_event );
