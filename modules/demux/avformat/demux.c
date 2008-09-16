@@ -488,6 +488,7 @@ static int IORead( void *opaque, uint8_t *buf, int buf_size )
 {
     URLContext *p_url = opaque;
     demux_t *p_demux = p_url->priv_data;
+    if( buf_size < 0 ) return -1;
     int i_ret = stream_Read( p_demux->s, buf, buf_size );
     return i_ret ? i_ret : -1;
 }
