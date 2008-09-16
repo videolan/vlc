@@ -60,7 +60,8 @@ int xspf_export_playlist( vlc_object_t *p_this )
     /* write XSPF XML header */
     fprintf( p_export->p_file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
     fprintf( p_export->p_file,
-             "<playlist version=\"1\" xmlns=\"http://xspf.org/ns/0/\">\n" );
+             "<playlist version=\"1\" xmlns=\"http://xspf.org/ns/0/\" " \
+             "xmlns:vlc=\"http://www.videolan.org/vlc/playlist/ns/0/\">\n" );
 
     if( !p_node ) return VLC_SUCCESS;
 
@@ -91,7 +92,8 @@ int xspf_export_playlist( vlc_object_t *p_this )
     fprintf( p_export->p_file, "\t</trackList>\n" );
 
     /* export the tree structure in <extension> */
-    fprintf( p_export->p_file, "\t<extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" );
+    fprintf( p_export->p_file, "\t<extension application=\"" \
+             "http://www.videolan.org/vlc/playlist/0\">\n" );
     i_count = 0;
     for( i = 0; i < p_node->i_children; i++ )
     {
@@ -141,10 +143,6 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
 
     /* leaves can be written directly */
     fprintf( p_file, "\t\t<track>\n" );
-
-    /* print identifier and increase the counter */
-    fprintf( p_file, "\t\t\t<identifier>%i</identifier>\n", *p_i_count );
-    ( *p_i_count )++;
 
     /* -> the location */
 
@@ -228,17 +226,6 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     }
     free( psz );
 
-    /* export the input's options (bookmarks, ...) in <extension> */
-    fprintf( p_file, "\t\t\t<extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" );
-    for( i = 0; i < p_item->p_input->i_options; i++ )
-    {
-        fprintf( p_file, "\t\t\t\t<option>%s</option>\n",
-                 p_item->p_input->ppsz_options[i][0] == ':' ?
-                 p_item->p_input->ppsz_options[i] + 1 :
-                 p_item->p_input->ppsz_options[i] );
-    }
-    fprintf( p_file, "\t\t\t</extension>\n" );
-
 xspfexportitem_end:
     /* -> the duration */
     i_duration = input_item_GetDuration( p_item->p_input );
@@ -247,6 +234,24 @@ xspfexportitem_end:
         fprintf( p_file, "\t\t\t<duration>%ld</duration>\n",
                  (long)(i_duration / 1000) );
     }
+
+    /* export the intenal id and the input's options (bookmarks, ...)
+     * in <extension> */
+    fprintf( p_file, "\t\t\t<extension application=\"" \
+             "http://www.videolan.org/vlc/playlist/0\">\n" );
+
+    /* print the id and increase the counter */
+    fprintf( p_file, "\t\t\t\t<vlc:id>%i</vlc:id>\n", *p_i_count );
+    ( *p_i_count )++;
+
+    for( i = 0; i < p_item->p_input->i_options; i++ )
+    {
+        fprintf( p_file, "\t\t\t\t<vlc:option>%s</vlc:option>\n",
+                 p_item->p_input->ppsz_options[i][0] == ':' ?
+                 p_item->p_input->ppsz_options[i] + 1 :
+                 p_item->p_input->ppsz_options[i] );
+    }
+    fprintf( p_file, "\t\t\t</extension>\n" );
 
     fprintf( p_file, "\t\t</track>\n" );
 
@@ -270,7 +275,7 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
         int i;
         char *psz_temp;
         psz_temp = convert_xml_special_chars( p_item->p_input->psz_name );
-        fprintf( p_file, "\t\t<node title=\"%s\">\n",
+        fprintf( p_file, "\t\t<vlc:node title=\"%s\">\n",
                  *psz_temp ? psz_temp : "" );
         free( psz_temp );
 
@@ -279,13 +284,13 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
             xspf_extension_item( p_item->pp_children[i], p_file, p_i_count );
         }
 
-        fprintf( p_file, "\t\t</node>\n" );
+        fprintf( p_file, "\t\t</vlc:node>\n" );
         return;
     }
 
 
     /* print leaf and increase the counter */
-    fprintf( p_file, "\t\t\t<item href=\"%i\" />\n", *p_i_count );
+    fprintf( p_file, "\t\t\t<vlc:item tid=\"%i\" />\n", *p_i_count );
     ( *p_i_count )++;
 
     return;
