@@ -2267,6 +2267,7 @@ end:
     [NSUserDefaults resetStandardUserDefaults];
 
     [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 
     /* Relaunch now */
     [[NSWorkspace sharedWorkspace] launchApplication:[[NSBundle mainBundle] bundlePath]];
