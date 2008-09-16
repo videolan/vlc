@@ -814,9 +814,8 @@ static void SpuRenderRegion( spu_t *p_spu,
             p_pic = NULL;
             if( p_scale->p_module )
             {
-                picture_t picture = p_region->picture;
-                picture.pf_release = NULL;  /* That's an ugly hack */
-                p_pic = p_scale->pf_video_filter( p_scale, &picture );
+                picture_Yield( &p_region->picture );
+                p_pic = p_scale->pf_video_filter( p_scale, &p_region->picture );
             }
             if( p_pic )
             {
