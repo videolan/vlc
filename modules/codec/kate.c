@@ -672,17 +672,16 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     {
         p_bitmap_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
     }
-    p_spu->i_x = 0;
-    p_spu->i_y = 10;
+    p_spu->p_region->i_x = 0;
+    p_spu->p_region->i_y = 10;
 
     /* override if tracker info present */
     if (tracker_valid)
     {
-        p_spu->i_flags = 0;
         if (kin.has.region)
         {
-            p_spu->i_x = kin.region_x;
-            p_spu->i_y = kin.region_y;
+            p_spu->p_region->i_x = kin.region_x;
+            p_spu->p_region->i_y = kin.region_y;
             p_spu->b_absolute = true;
         }
 
