@@ -67,12 +67,6 @@ struct filter_owner_sys_t
     int i_channel;
 };
 
-enum {
-    SCALE_DEFAULT,
-    SCALE_TEXT,
-    SCALE_SIZE
-};
-
 #define SCALE_UNIT (1000)
 
 /* */
@@ -1342,15 +1336,17 @@ static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 
 static subpicture_t *spu_new_buffer( filter_t *p_filter )
 {
-    (void)p_filter;
-    subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
-    if( !p_subpic ) return NULL;
-    memset( p_subpic, 0, sizeof(subpicture_t) );
+    subpicture_t *p_subpic = calloc( 1, sizeof(subpicture_t) );
+    if( !p_subpic )
+        return NULL;
+
     p_subpic->b_absolute = true;
+    p_subpic->i_alpha    = 0xFF;
 
     p_subpic->pf_create_region = __spu_CreateRegion;
     p_subpic->pf_destroy_region = __spu_DestroyRegion;
 
+    VLC_UNUSED(p_filter);
     return p_subpic;
 }
 
@@ -1368,41 +1364,27 @@ static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 
 static picture_t *spu_new_video_buffer( filter_t *p_filter )
 {
-    picture_t *p_picture = malloc( sizeof(picture_t) );
-    if( !p_picture ) return NULL;
-    if( vout_AllocatePicture( p_filter, p_picture,
-                              p_filter->fmt_out.video.i_chroma,
-                              p_filter->fmt_out.video.i_width,
-                              p_filter->fmt_out.video.i_height,
-                              p_filter->fmt_out.video.i_aspect )
-        != VLC_SUCCESS )
-    {
-        free( p_picture );
-        return NULL;
-    }
+    const video_format_t *p_fmt = &p_filter->fmt_out.video;
 
-    p_picture->pf_release = RegionPictureRelease;
-
-    return p_picture;
+    VLC_UNUSED(p_filter);
+    return picture_New( p_fmt->i_chroma,
+                        p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
 }
 
-static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_pic )
+static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_picture )
 {
-    (void)p_filter;
-    if( p_pic )
-    {
-        free( p_pic->p_data_orig );
-        free( p_pic );
-    }
+    VLC_UNUSED(p_filter);
+    picture_Release( p_picture );
 }
 
 static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    spu_t *p_spu = p_data;
+
     VLC_UNUSED(p_object); VLC_UNUSED(oldval);
     VLC_UNUSED(newval); VLC_UNUSED(psz_var);
 
-    spu_t *p_spu = (spu_t *)p_data;
     vlc_mutex_lock( &p_spu->subpicture_lock );
     filter_chain_Reset( p_spu->p_chain, NULL, NULL );
     spu_ParseChain( p_spu );
@@ -1412,13 +1394,14 @@ static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
 
 static int SubFilterAllocationInit( filter_t *p_filter, void *p_data )
 {
-    spu_t *p_spu = (spu_t *)p_data;
+    spu_t *p_spu = p_data;
+
+    filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
+    if( !p_sys )
+        return VLC_EGENERIC;
 
     p_filter->pf_sub_buffer_new = sub_new_buffer;
     p_filter->pf_sub_buffer_del = sub_del_buffer;
-
-    filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
-    if( !p_sys ) return VLC_EGENERIC;
 
     p_filter->p_owner = p_sys;
     spu_Control( p_spu, SPU_CHANNEL_REGISTER, &p_sys->i_channel );
@@ -1430,6 +1413,7 @@ static int SubFilterAllocationInit( filter_t *p_filter, void *p_data )
 static void SubFilterAllocationClean( filter_t *p_filter )
 {
     filter_owner_sys_t *p_sys = p_filter->p_owner;
+
     SpuClearChannel( p_sys->p_spu, p_sys->i_channel, true );
     free( p_filter->p_owner );
 }
