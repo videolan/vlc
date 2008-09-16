@@ -59,8 +59,8 @@ static int spu_ParseChain( spu_t * );
 static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 
-static int sub_filter_allocation_init( filter_t *, void * );
-static void sub_filter_allocation_clear( filter_t * );
+static int SubFilterAllocationInit( filter_t *, void * );
+static void SubFilterAllocationClean( filter_t * );
 struct filter_owner_sys_t
 {
     spu_t *p_spu;
@@ -75,14 +75,10 @@ enum {
 
 #define SCALE_UNIT (1000)
 
-static void FilterRelease( filter_t *p_filter )
-{
-    if( p_filter->p_module )
-        module_Unneed( p_filter, p_filter->p_module );
-
-    vlc_object_detach( p_filter );
-    vlc_object_release( p_filter );
-}
+/* */
+static void SpuRenderCreateAndLoadText( spu_t *p_spu );
+static void SpuRenderCreateAndLoadScale( spu_t *p_spu );
+static void FilterRelease( filter_t *p_filter );
 
 /**
  * Creates the subpicture unit
@@ -114,9 +110,14 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     vlc_object_attach( p_spu, p_this );
 
     p_spu->p_chain = filter_chain_New( p_spu, "sub filter", false,
-                                       sub_filter_allocation_init,
-                                       sub_filter_allocation_clear,
+                                       SubFilterAllocationInit,
+                                       SubFilterAllocationClean,
                                        p_spu );
+
+    /* Load text and scale module */
+    SpuRenderCreateAndLoadText( p_spu );
+    SpuRenderCreateAndLoadScale( p_spu );
+
     return p_spu;
 }
 
@@ -460,6 +461,15 @@ void spu_DestroySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
  *****************************************************************************
  * This function renders all sub picture units in the list.
  *****************************************************************************/
+static void FilterRelease( filter_t *p_filter )
+{
+    if( p_filter->p_module )
+        module_Unneed( p_filter, p_filter->p_module );
+
+    vlc_object_detach( p_filter );
+    vlc_object_release( p_filter );
+}
+
 static void SpuRenderCreateBlend( spu_t *p_spu, vlc_fourcc_t i_chroma, int i_aspect )
 {
     filter_t *p_blend;
@@ -581,7 +591,6 @@ static filter_t *CreateAndLoadScale( vlc_object_t *p_obj, vlc_fourcc_t i_chroma 
 
     return p_scale;
 }
-
 static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
 {
     /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
@@ -1029,17 +1038,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt_a,
     if( !p_spu->p_blend )
         SpuRenderCreateBlend( p_spu, p_fmt->i_chroma, p_fmt->i_aspect );
 
-    /* Load the scaling module */
-    if( !p_spu->p_scale && !p_spu->p_scale_yuvp )
-        SpuRenderCreateAndLoadScale( p_spu );
-
-    /* Load the text rendering module; it is possible there is a
-     * text region somewhere in the subpicture other than the first
-     * element in the region list, so just load it anyway as we'll
-     * probably want it sooner or later. */
-    if( !p_spu->p_text )
-        SpuRenderCreateAndLoadText( p_spu );
-
     /* */
     for( p_subpic = p_subpic_list; ; p_subpic = p_subpic->p_next )
     {
@@ -1441,7 +1439,7 @@ static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
     return VLC_SUCCESS;
 }
 
-static int sub_filter_allocation_init( filter_t *p_filter, void *p_data )
+static int SubFilterAllocationInit( filter_t *p_filter, void *p_data )
 {
     spu_t *p_spu = (spu_t *)p_data;
 
@@ -1458,9 +1456,10 @@ static int sub_filter_allocation_init( filter_t *p_filter, void *p_data )
     return VLC_SUCCESS;
 }
 
-static void sub_filter_allocation_clear( filter_t *p_filter )
+static void SubFilterAllocationClean( filter_t *p_filter )
 {
     filter_owner_sys_t *p_sys = p_filter->p_owner;
     SpuClearChannel( p_sys->p_spu, p_sys->i_channel, true );
     free( p_filter->p_owner );
 }
+
