@@ -653,7 +653,9 @@ exit:
     p_region->i_align |= SUBPICTURE_RENDERED;
 }
 
-/* */
+/**
+ * A few scale functions helpers.
+ */
 typedef struct
 {
     int w;
@@ -693,11 +695,10 @@ static int spu_scale_h( int v, const spu_scale_t s )
 static void SpuRegionPlace( int *pi_x, int *pi_y,
                             const video_format_t *p_fmt,
                             const subpicture_t *p_subpic,
-                            const subpicture_region_t *p_region,
-                            const spu_scale_t scale_inv )
+                            const subpicture_region_t *p_region )
 {
-    int i_delta_x = spu_scale_w( p_region->i_x, scale_inv );
-    int i_delta_y = spu_scale_h( p_region->i_y, scale_inv );
+    int i_delta_x = p_region->i_x;
+    int i_delta_y = p_region->i_y;
     int i_x, i_y;
 
     if( p_region->i_align & SUBPICTURE_ALIGN_TOP )
@@ -731,16 +732,19 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
         i_x = i_delta_x;
         i_y = i_delta_y;
     }
+    if( i_x < 0 )
+        i_x = 0;
+    if( i_y < 0 )
+        i_y = 0;
 
-    *pi_x = __MAX( i_x, 0 );
-    *pi_y = __MAX( i_y, 0 );
+    *pi_x = i_x;
+    *pi_y = i_y;
 }
 
 static void SpuRenderRegion( spu_t *p_spu,
                              picture_t *p_pic_dst,
                              subpicture_t *p_subpic, subpicture_region_t *p_region,
-                             const spu_scale_t scale_org,
-                             const spu_scale_t p_scale_size[SCALE_SIZE],
+                             const spu_scale_t scale_size,
                              const video_format_t *p_fmt )
 {
     video_format_t fmt_original;
@@ -749,8 +753,6 @@ static void SpuRenderRegion( spu_t *p_spu,
     int i_fade_alpha;
     int i_x_offset;
     int i_y_offset;
-    spu_scale_t scale_inv;
-    spu_scale_t scale_size;
     filter_t *p_scale;
 
     vlc_assert_locked( &p_spu->subpicture_lock );
@@ -759,24 +761,12 @@ static void SpuRenderRegion( spu_t *p_spu,
     b_rerender_text = false;
     if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
     {
-        SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, __MIN( scale_org.w, scale_org.h ) );
+        SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, SCALE_UNIT );
         b_restore_format = b_rerender_text;
 
         /* Check if the rendering has failed ... */
         if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
             goto exit;
-    }
-
-    if( p_region->i_align & SUBPICTURE_RENDERED )
-    {
-        /* We are using a region which come from rendered text */
-        scale_inv  = scale_org;
-        scale_size = p_scale_size[SCALE_TEXT];
-    }
-    else
-    {
-        scale_inv   = spu_scale_unit();
-        scale_size = p_scale_size[SCALE_DEFAULT];
     }
 
     /* Force palette if requested
@@ -886,13 +876,12 @@ static void SpuRenderRegion( spu_t *p_spu,
 
     /* */
     SpuRegionPlace( &i_x_offset, &i_y_offset,
-                    p_fmt, p_subpic, p_region,
-                    scale_inv );
+                    p_fmt, p_subpic, p_region );
 
     if( p_spu->i_margin != 0 && !b_force_crop )
     {
         int i_diff = 0;
-        int i_low = spu_scale_h( i_y_offset - p_spu->i_margin, scale_inv );
+        int i_low = i_y_offset - p_spu->i_margin;
         int i_high = i_low + p_region->fmt.i_height;
 
         /* crop extra margin to keep within bounds */
@@ -900,17 +889,17 @@ static void SpuRenderRegion( spu_t *p_spu,
             i_diff = i_low;
         if( i_high > (int)p_fmt->i_height )
             i_diff = i_high - p_fmt->i_height;
-        i_y_offset -= spu_scale_h( p_spu->i_margin, scale_inv ) + i_diff;
+        i_y_offset -= p_spu->i_margin + i_diff;
     }
 
     /* Force cropping if requested */
     if( b_force_crop )
     {
         video_format_t *p_fmt = &p_region->fmt;
-        int i_crop_x = spu_scale_w( spu_scale_w( p_spu->i_crop_x, scale_size ), scale_inv );
-        int i_crop_y = spu_scale_h( spu_scale_h( p_spu->i_crop_y, scale_size ), scale_inv );
-        int i_crop_width = spu_scale_w( spu_scale_w( p_spu->i_crop_width, scale_size ), scale_inv );
-        int i_crop_height= spu_scale_h( spu_scale_h( p_spu->i_crop_height,scale_size ), scale_inv );
+        int i_crop_x = spu_scale_w( p_spu->i_crop_x, scale_size );
+        int i_crop_y = spu_scale_h( p_spu->i_crop_y, scale_size );
+        int i_crop_width = spu_scale_w( p_spu->i_crop_width, scale_size );
+        int i_crop_height= spu_scale_h( p_spu->i_crop_height,scale_size );
 
         /* Find the intersection */
         if( i_crop_x + i_crop_width <= i_x_offset ||
@@ -991,11 +980,12 @@ exit:
         p_region->fmt = fmt_original;
 }
 
-void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
+void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt_a,
                             picture_t *p_pic_dst,
                             subpicture_t *p_subpic_list,
                             int i_scale_width_orig, int i_scale_height_orig )
 {
+    video_format_t fmt = *p_fmt_a, *p_fmt = &fmt;
     const mtime_t i_current_date = mdate();
     int i_source_video_width;
     int i_source_video_height;
@@ -1005,28 +995,23 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
+    /* Be sure we have at least 1 picture to process */
+    if( !p_subpic_list || p_subpic_list->i_status == FREE_SUBPICTURE )
+    {
+        vlc_mutex_unlock( &p_spu->subpicture_lock );
+        return;
+    }
+
     scale_size_org = spu_scale_create( i_scale_width_orig, i_scale_height_orig );
 
     i_source_video_width  = p_fmt->i_width  * SCALE_UNIT / scale_size_org.w;
     i_source_video_height = p_fmt->i_height * SCALE_UNIT / scale_size_org.h;
 
-    /* Check i_status again to make sure spudec hasn't destroyed the subpic */
+    /* */
     for( p_subpic = p_subpic_list;
-            p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE;
+            p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE; /* Check again status (as we where unlocked) */
                 p_subpic = p_subpic->p_next )
     {
-        /* If the source video and subtitles stream agree on the size of
-         * the video then disregard all further references to the subtitle
-         * stream.
-         */
-        if( i_source_video_height == p_subpic->i_original_picture_height &&
-            i_source_video_width  == p_subpic->i_original_picture_width )
-        {
-            /* FIXME this looks wrong */
-            p_subpic->i_original_picture_width  = 0;
-            p_subpic->i_original_picture_height = 0;
-        }
-
         /* */
         if( p_subpic->pf_pre_render )
             p_subpic->pf_pre_render( p_fmt, p_spu, p_subpic );
@@ -1061,102 +1046,47 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     if( !p_spu->p_text )
         SpuRenderCreateAndLoadText( p_spu, p_fmt->i_width, p_fmt->i_height );
 
-    /* Process all subpictures and regions */
-    for( p_subpic = p_subpic_list;
-            p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE;
-                p_subpic = p_subpic->p_next )
+    /* */
+    for( p_subpic = p_subpic_list; ; p_subpic = p_subpic->p_next )
     {
         subpicture_region_t *p_region;
-        spu_scale_t p_scale_size[SCALE_SIZE];
-        int k;
+
+        if( !p_subpic || p_subpic->i_status == FREE_SUBPICTURE )
+            break;
 
         if( !p_subpic->p_region )
             continue;
 
-        /* */
+        /* FIXME when possible use a better rendering size than source size
+         * (max of display size and source size for example) FIXME */
+        int i_render_width  = p_subpic->i_original_picture_width;
+        int i_render_height = p_subpic->i_original_picture_height;
+        if( !i_render_width || !i_render_height )
+        {
+            if( i_render_width != 0 || i_render_height != 0 )
+                msg_Err( p_spu, "unsupported original picture size %dx%d",
+                         i_render_width, i_render_height );
+
+            i_render_width = i_source_video_width;
+            i_render_height = i_source_video_height;
+        }
+
         if( p_spu->p_text )
         {
-            subpicture_region_t *p_text_region = p_subpic->p_region;
+            p_spu->p_text->fmt_out.video.i_width          =
+            p_spu->p_text->fmt_out.video.i_visible_width  = i_render_width;
 
-            /* Only overwrite the size fields if the region is still in
-             * pre-rendered TEXT format. We have to traverse the subregion
-             * list because if more than one subregion is present, the text
-             * region isn't guarentteed to be the first in the list, and
-             * only text regions use this flag. All of this effort assists
-             * with the rescaling of text that has been rendered at native
-             * resolution, rather than video resolution.
-             */
-            while( p_text_region &&
-                   p_text_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )
-            {
-                p_text_region = p_text_region->p_next;
-            }
-
-            if( p_text_region &&
-                ( ( p_text_region->i_align & SUBPICTURE_RENDERED ) == 0 ) )
-            {
-                if( p_subpic->i_original_picture_height > 0 &&
-                    p_subpic->i_original_picture_width  > 0 )
-                {
-                    p_spu->p_text->fmt_out.video.i_width =
-                    p_spu->p_text->fmt_out.video.i_visible_width =
-                        p_subpic->i_original_picture_width;
-                    p_spu->p_text->fmt_out.video.i_height =
-                    p_spu->p_text->fmt_out.video.i_visible_height =
-                        p_subpic->i_original_picture_height;
-                }
-                else
-                {
-                    p_spu->p_text->fmt_out.video.i_width =
-                    p_spu->p_text->fmt_out.video.i_visible_width =
-                        p_fmt->i_width;
-                    p_spu->p_text->fmt_out.video.i_height =
-                    p_spu->p_text->fmt_out.video.i_visible_height =
-                        p_fmt->i_height;
-                }
-            }
-
-            /* XXX for text:
-             *  scale[] allows to pass from rendered size (by text module) to video output size */
-
-            p_scale_size[SCALE_TEXT] =
-                spu_scale_createq( p_fmt->i_width,  p_spu->p_text->fmt_out.video.i_width,
-                                   p_fmt->i_height, p_spu->p_text->fmt_out.video.i_height );
-        }
-        else
-        {
-            /* Just set a value to avoid using invalid memory while looping over the array */
-            p_scale_size[SCALE_TEXT] = spu_scale_unit();
+            p_spu->p_text->fmt_out.video.i_height         =
+            p_spu->p_text->fmt_out.video.i_visible_height = i_render_height;
         }
 
-        /* XXX for default:
-         *  scale[] allows to pass from native (either video or original) size to output size */
-        if( p_subpic->i_original_picture_height > 0 &&
-            p_subpic->i_original_picture_width  > 0 )
-        {
-            p_scale_size[SCALE_DEFAULT] =
-                spu_scale_createq( p_fmt->i_width,  p_subpic->i_original_picture_width,
-                                   p_fmt->i_height, p_subpic->i_original_picture_height );
-        }
-        else
-        {
+        /* Compute scaling from picture to source size */
+        spu_scale_t scale = spu_scale_createq( i_source_video_width,  i_render_width,
+                                               i_source_video_height, i_render_height );
 
-            p_scale_size[SCALE_DEFAULT] = scale_size_org;
-        }
-
-        for( k = 0; k < SCALE_SIZE ; k++ )
-        {
-            /* Case of both width and height being specified has been dealt
-             * with above by instead rendering to an output pane of the
-             * explicit dimensions specified - we don't need to scale it.
-             */
-            if( p_subpic->i_original_picture_height > 0 &&
-                p_subpic->i_original_picture_width <= 0 )
-            {
-                p_scale_size[k].h = p_scale_size[k].h * i_source_video_height / p_subpic->i_original_picture_height;
-                p_scale_size[k].w = p_scale_size[k].w * i_source_video_height / p_subpic->i_original_picture_height;
-            }
-        }
+        /* Update scaling from source size to display size(p_fmt) */
+        scale.w = scale.w * p_fmt->i_width  / i_source_video_width;
+        scale.h = scale.h * p_fmt->i_height / i_source_video_height;
 
         /* Set default subpicture aspect ratio
          * FIXME if we only handle 1 aspect ratio per picture, why is it set per
@@ -1177,22 +1107,21 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Take care of the aspect ratio */
-        if( ( p_region->fmt.i_sar_num * p_fmt->i_sar_den ) !=
-            ( p_region->fmt.i_sar_den * p_fmt->i_sar_num ) )
+        if( p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
+            p_region->fmt.i_sar_den * p_fmt->i_sar_num )
         {
             /* FIXME FIXME what about region->i_x/i_y ? */
-            for( k = 0; k < SCALE_SIZE; k++ )
-            {
-                p_scale_size[k].w = p_scale_size[k].w *
-                    (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
-                    p_region->fmt.i_sar_den / p_fmt->i_sar_num;
-            }
+            scale.w = scale.w *
+                (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
+                p_region->fmt.i_sar_den / p_fmt->i_sar_num;
         }
 
         /* Render all regions */
-        for( ; p_region != NULL; p_region = p_region->p_next )
+        for( p_region = p_subpic->p_region; p_region != NULL; p_region = p_region->p_next )
+        {
             SpuRenderRegion( p_spu, p_pic_dst, p_subpic, p_region,
-                             scale_size_org, p_scale_size, p_fmt );
+                             scale, p_fmt );
+        }
     }
 
     vlc_mutex_unlock( &p_spu->subpicture_lock );
