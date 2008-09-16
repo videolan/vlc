@@ -634,7 +634,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         else
         {
             p_converted = p_es->p_picture;
-            picture_Yield( p_converted );
             fmt_in.i_width = fmt_out.i_width = p_converted->format.i_width;
             fmt_in.i_height = fmt_out.i_height = p_converted->format.i_height;
             fmt_in.i_chroma = fmt_out.i_chroma = p_converted->format.i_chroma;
@@ -642,8 +641,13 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             fmt_out.i_visible_height = fmt_out.i_height;
         }
 
-        p_region = p_spu->pf_make_region( VLC_OBJECT(p_filter), &fmt_out,
-                                          p_converted );
+        p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt_out );
+        /* XXX That's a pity to do a copy, but it is needed for now */
+        if( p_region )
+            picture_Copy( &p_region->picture, p_converted );
+        if( !p_sys->b_keep )
+            picture_Release( p_converted );
+
         if( !p_region )
         {
             msg_Err( p_filter, "cannot allocate SPU region" );
@@ -651,20 +655,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             vlc_mutex_unlock( &p_sys->lock );
             vlc_mutex_unlock( p_sys->p_lock );
             return p_spu;
-        }
-
-        /* HACK ALERT: let's fix the pointers to avoid picture duplication.
-         * This is necessary because p_region->picture is not a pointer
-         * as it ought to be. */
-        if( !p_sys->b_keep )
-        {
-            free( p_converted );
-        }
-        else
-        {
-            /* Keep a pointer to the original picture (and its refcount...). */
-            p_region->picture.p_sys = (picture_sys_t *)p_converted;
-            p_region->picture.pf_release = MosaicReleasePicture;
         }
 
         if( p_es->i_x >= 0 && p_es->i_y >= 0 )
