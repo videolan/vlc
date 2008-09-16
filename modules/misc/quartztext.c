@@ -121,7 +121,7 @@ vlc_module_begin();
     add_integer( "quartztext-color", 0x00FFFFFF, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, false );
         change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
-    set_capability( "text renderer", 0 ); // Freetype is better than us
+    set_capability( "text renderer", 150 );
     add_shortcut( "text" );
     set_callbacks( Create, Destroy );
 vlc_module_end();
@@ -1233,7 +1233,8 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
             // Set up black outlining of the text --
             CGContextSetRGBStrokeColor( p_context, 0, 0, 0, 0.5 );
             CGContextSetTextDrawingMode( p_context, kCGTextFillStroke );
-
+            CGContextSetShadow( p_context, CGSizeMake( 0, 0 ), 5 );
+            CGContextSetShadowWithColor (p_context, CGSizeMake( 0, 0 ), 5, CGColorGetConstantColor(kCGColorBlack));
             do
             {
                 // ATSUBreakLine will automatically pick up any manual '\n's also
@@ -1255,8 +1256,7 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
                     // Set the outlining for this line to be dependent on the size of the line -
                     // make it about 5% of the ascent, with a minimum at 1.0
                     float f_thickness = FixedToFloat( ascent ) * 0.05;
-                    CGContextSetLineWidth( p_context, (( f_thickness > 1.0 ) ? 1.0 : f_thickness ));
-
+                    CGContextSetLineWidth( p_context, (( f_thickness < 1.0 ) ? 1.0 : f_thickness ));
                     ATSUDrawText( p_textLayout, i_start, i_end - i_start, x, y );
 
                     // and now prepare for the next line by coming down far enough for our
