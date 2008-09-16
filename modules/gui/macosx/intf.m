@@ -31,7 +31,7 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 #include <vlc_keys.h>
-#include <spawn.h>
+#include <unistd.h> /* execl() */
 
 #ifdef HAVE_CONFIG_H
 #   include "config.h"
@@ -2272,11 +2272,14 @@ end:
 
     /* Relaunch now */
     const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];
-    const char *spawnedArgs[2] = { path, NULL };
-    char *spawnedEnv[] = {NULL};
 
-    posix_spawn(NULL, path, NULL, NULL, spawnedArgs, spawnedEnv);
-    exit(0);
+    /* For some reason we need to fork(), not just execl(), which reports a ENOTSUP then. */
+    if(fork() != 0)
+    {
+        exit(0);
+        return;
+    }
+    execl(path, path, NULL);
 }
 
 #pragma mark -
