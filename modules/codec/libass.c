@@ -63,9 +63,9 @@ vlc_module_end();
  *****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
 static void DestroySubpicture( subpicture_t * );
-static void PreRender( video_format_t *, spu_t *, subpicture_t * );
-static void UpdateRegions( video_format_t *, spu_t *,
-                           subpicture_t *, mtime_t );
+static void PreRender( spu_t *, subpicture_t *, const video_format_t * );
+static void UpdateRegions( spu_t *,
+                           subpicture_t *, const video_format_t *, mtime_t );
 
 /* Yes libass sux with threads */
 typedef struct 
@@ -308,8 +308,8 @@ static void DestroySubpicture( subpicture_t *p_subpic )
     free( p_subpic->p_sys );
 }
 
-static void PreRender( video_format_t *p_fmt, spu_t *p_spu,
-                       subpicture_t *p_subpic )
+static void PreRender( spu_t *p_spu, subpicture_t *p_subpic,
+                       const video_format_t *p_fmt )
 {
     decoder_sys_t *p_dec_sys = p_subpic->p_sys->p_dec_sys;
 
@@ -318,8 +318,8 @@ static void PreRender( video_format_t *p_fmt, spu_t *p_spu,
     VLC_UNUSED(p_spu);
 }
 
-static void UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
-                           subpicture_t *p_subpic, mtime_t i_ts )
+static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
+                           const video_format_t *p_fmt, mtime_t i_ts )
 {
     decoder_sys_t *p_sys = p_subpic->p_sys->p_dec_sys;
     ass_handle_t *p_ass = p_sys->p_ass;

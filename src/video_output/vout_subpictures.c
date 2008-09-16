@@ -950,14 +950,14 @@ exit:
 }
 
 void spu_RenderSubpictures( spu_t *p_spu,
-                            picture_t *p_pic_dst, video_format_t *p_fmt_dst,
+                            picture_t *p_pic_dst, const video_format_t *p_fmt_dst,
                             subpicture_t *p_subpic_list,
                             const video_format_t *p_fmt_src )
 {
-    video_format_t *p_fmt = p_fmt_dst;
+    const int i_source_video_width  = p_fmt_src->i_width;
+    const int i_source_video_height = p_fmt_src->i_height;
     const mtime_t i_current_date = mdate();
-    int i_source_video_width;
-    int i_source_video_height;
+
     subpicture_t *p_subpic;
 
     /* Get lock */
@@ -970,8 +970,6 @@ void spu_RenderSubpictures( spu_t *p_spu,
         return;
     }
 
-    i_source_video_width  = p_fmt_src->i_width;
-    i_source_video_height = p_fmt_src->i_height;
 
     /* */
     for( p_subpic = p_subpic_list;
@@ -980,26 +978,23 @@ void spu_RenderSubpictures( spu_t *p_spu,
     {
         /* */
         if( p_subpic->pf_pre_render )
-            p_subpic->pf_pre_render( p_fmt, p_spu, p_subpic );
+            p_subpic->pf_pre_render( p_spu, p_subpic, p_fmt_dst );
 
         if( p_subpic->pf_update_regions )
         {
-            /* TODO do not reverse the scaling that was done before calling
-             * spu_RenderSubpictures, just pass it along (or do it inside
-             * spu_RenderSubpictures) */
-            video_format_t fmt_org = *p_fmt;
+            video_format_t fmt_org = *p_fmt_dst;
             fmt_org.i_width =
             fmt_org.i_visible_width = i_source_video_width;
             fmt_org.i_height =
             fmt_org.i_visible_height = i_source_video_height;
 
-            p_subpic->pf_update_regions( &fmt_org, p_spu, p_subpic, i_current_date );
+            p_subpic->pf_update_regions( p_spu, p_subpic, &fmt_org, i_current_date );
         }
     }
 
     /* Create the blending module */
     if( !p_spu->p_blend )
-        SpuRenderCreateBlend( p_spu, p_fmt->i_chroma, p_fmt->i_aspect );
+        SpuRenderCreateBlend( p_spu, p_fmt_dst->i_chroma, p_fmt_dst->i_aspect );
 
     /* */
     for( p_subpic = p_subpic_list; ; p_subpic = p_subpic->p_next )
@@ -1039,9 +1034,9 @@ void spu_RenderSubpictures( spu_t *p_spu,
         spu_scale_t scale = spu_scale_createq( i_source_video_width,  i_render_width,
                                                i_source_video_height, i_render_height );
 
-        /* Update scaling from source size to display size(p_fmt) */
-        scale.w = scale.w * p_fmt->i_width  / i_source_video_width;
-        scale.h = scale.h * p_fmt->i_height / i_source_video_height;
+        /* Update scaling from source size to display size(p_fmt_dst) */
+        scale.w = scale.w * p_fmt_dst->i_width  / i_source_video_width;
+        scale.h = scale.h * p_fmt_dst->i_height / i_source_video_height;
 
         /* Set default subpicture aspect ratio
          * FIXME if we only handle 1 aspect ratio per picture, why is it set per
@@ -1056,19 +1051,19 @@ void spu_RenderSubpictures( spu_t *p_spu,
             }
             else
             {
-                p_region->fmt.i_sar_den = p_fmt->i_sar_den;
-                p_region->fmt.i_sar_num = p_fmt->i_sar_num;
+                p_region->fmt.i_sar_den = p_fmt_dst->i_sar_den;
+                p_region->fmt.i_sar_num = p_fmt_dst->i_sar_num;
             }
         }
 
         /* Take care of the aspect ratio */
-        if( p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
-            p_region->fmt.i_sar_den * p_fmt->i_sar_num )
+        if( p_region->fmt.i_sar_num * p_fmt_dst->i_sar_den !=
+            p_region->fmt.i_sar_den * p_fmt_dst->i_sar_num )
         {
             /* FIXME FIXME what about region->i_x/i_y ? */
             scale.w = scale.w *
-                (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
-                p_region->fmt.i_sar_den / p_fmt->i_sar_num;
+                (int64_t)p_region->fmt.i_sar_num * p_fmt_dst->i_sar_den /
+                p_region->fmt.i_sar_den / p_fmt_dst->i_sar_num;
         }
 
         /* Render all regions */
@@ -1080,7 +1075,7 @@ void spu_RenderSubpictures( spu_t *p_spu,
 
             /* */
             SpuRenderRegion( p_spu, p_pic_dst, p_subpic, p_region,
-                             scale, p_fmt );
+                             scale, p_fmt_dst );
         }
     }
 

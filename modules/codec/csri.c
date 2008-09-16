@@ -62,9 +62,9 @@ vlc_module_end();
  *****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
 static void DestroySubpicture( subpicture_t * );
-static void PreRender( video_format_t *, spu_t *, subpicture_t * );
-static void UpdateRegions( video_format_t *, spu_t *,
-                           subpicture_t *, mtime_t );
+static void PreRender( spu_t *, subpicture_t *, const video_format_t * );
+static void UpdateRegions( spu_t *, subpicture_t *,
+                           const video_format_t *,  mtime_t );
 
 /*****************************************************************************
  * decoder_sys_t: decoder data
@@ -231,15 +231,17 @@ static void DestroySubpicture( subpicture_t *p_subpic )
     free( p_subpic->p_sys );
 }
 
-static void PreRender( video_format_t *p_fmt, spu_t *p_spu,
-                       subpicture_t *p_subpic )
+static void PreRender( spu_t *p_spu, subpicture_t *p_subpic,
+                       const video_format_t *p_fmt )
 {
     decoder_t *p_dec = p_subpic->p_sys->p_dec;
     p_dec->p_sys->p_spu_final = p_subpic;
+    VLC_UNUSED(p_fmt);
+    VLC_UNUSED(p_spu);
 }
 
-static void UpdateRegions( video_format_t *p_fmt, spu_t *p_spu,
-                           subpicture_t *p_subpic, mtime_t ts )
+static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
+                           const video_format_t *p_fmt, mtime_t ts )
 {
     decoder_t *p_dec = p_subpic->p_sys->p_dec;
     decoder_sys_t *p_sys = p_dec->p_sys;
