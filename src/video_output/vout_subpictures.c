@@ -790,17 +790,9 @@ static void SpuRenderRegion( spu_t *p_spu,
             p_scale->fmt_in.video = p_region->fmt;
             p_scale->fmt_out.video = p_region->fmt;
 
-            p_region->p_cache =
-                p_subpic->pf_create_region( VLC_OBJECT(p_spu),
-                                            &p_scale->fmt_out.video );
-            p_region->p_cache->p_next = p_region->p_next;
-
             if( p_scale->fmt_out.video.p_palette )
                 *p_scale->fmt_out.video.p_palette =
                     *p_region->fmt.p_palette;
-
-            vout_CopyPicture( p_spu, &p_region->p_cache->picture,
-                              &p_region->picture );
 
             p_scale->fmt_out.video.i_width = i_dst_width;
             p_scale->fmt_out.video.i_height = i_dst_height;
@@ -810,29 +802,36 @@ static void SpuRenderRegion( spu_t *p_spu,
             p_scale->fmt_out.video.i_visible_height =
                 spu_scale_h( p_region->fmt.i_visible_height, scale_size );
 
-            p_region->p_cache->fmt = p_scale->fmt_out.video;
-            p_region->p_cache->i_x = spu_scale_w( p_region->i_x, scale_size );
-            p_region->p_cache->i_y = spu_scale_h( p_region->i_y, scale_size );
-            p_region->p_cache->i_align = p_region->i_align;
-            p_region->p_cache->i_alpha = p_region->i_alpha;
+            p_region->p_cache =
+                p_subpic->pf_create_region( VLC_OBJECT(p_spu),
+                                            &p_scale->fmt_out.video );
 
             p_pic = NULL;
             if( p_scale->p_module )
-                p_pic = p_scale->pf_video_filter( p_scale, &p_region->p_cache->picture );
-            else
-                msg_Err( p_spu, "scaling failed (module not loaded)" );
-
+            {
+                picture_t picture = p_region->picture;
+                picture.pf_release = NULL;  /* That's an ugly hack */
+                p_pic = p_scale->pf_video_filter( p_scale, &picture );
+            }
             if( p_pic )
             {
-                p_region->p_cache->picture = *p_pic;
-                free( p_pic );
+                picture_Copy( &p_region->p_cache->picture, p_pic );
+                picture_Release( p_pic );
+
+                p_region->p_cache->fmt = p_scale->fmt_out.video;
+                p_region->p_cache->i_x = spu_scale_w( p_region->i_x, scale_size );
+                p_region->p_cache->i_y = spu_scale_h( p_region->i_y, scale_size );
+                p_region->p_cache->i_align = p_region->i_align;
+                p_region->p_cache->i_alpha = p_region->i_alpha;
             }
             else
             {
+                msg_Err( p_spu, "scaling failed (module not loaded)" );
                 p_subpic->pf_destroy_region( VLC_OBJECT(p_spu),
                                              p_region->p_cache );
                 p_region->p_cache = NULL;
             }
+
         }
 
         /* And use the scaled picture */
@@ -969,7 +968,6 @@ void spu_RenderSubpictures( spu_t *p_spu,
         vlc_mutex_unlock( &p_spu->subpicture_lock );
         return;
     }
-
 
     /* */
     for( p_subpic = p_subpic_list;
