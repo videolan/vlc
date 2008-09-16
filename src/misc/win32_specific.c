@@ -368,16 +368,21 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
  *****************************************************************************/
 void system_End( libvlc_int_t *p_this )
 {
+    HWND ipcwindow;
     if( p_this && vlc_global() )
     {
         free( vlc_global()->psz_vlcpath );
         vlc_global()->psz_vlcpath = NULL;
     }
+
+    if( ipcwindow = FindWindow( 0, L"VLC ipc "VERSION ) )
+    {
+        SendMessage( ipcwindow, WM_QUIT, 0, 0 );
+    }
+
     if (p_helper && p_helper->p_parent == VLC_OBJECT(p_this) )
     {
         /* FIXME: thread-safety... */
-        SendMessage( NULL, WM_QUIT, 0, 0 );
-        vlc_thread_join (p_helper);
         vlc_object_detach (p_helper);
         vlc_object_release (p_helper);
         p_helper = NULL;
