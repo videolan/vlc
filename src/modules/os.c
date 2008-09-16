@@ -183,11 +183,17 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     wchar_t psz_wfile[MAX_PATH];
     MultiByteToWideChar( CP_ACP, 0, psz_file, -1, psz_wfile, MAX_PATH );
 
+    /* FIXME: this is not thread-safe -- Courmisch */
+    UINT mode = SetErrorMode (SEM_FAILCRITICALERRORS);
+    SetErrorMode (mode|SEM_FAILCRITICALERRORS);
+
 #ifdef UNDER_CE
     handle = LoadLibrary( psz_wfile );
 #else
     handle = LoadLibraryW( psz_wfile );
 #endif
+    SetErrorMode (mode);
+
     if( handle == NULL )
     {
         char *psz_err = GetWindowsError();
