@@ -215,11 +215,15 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
 
 
 /* */
-static void RegionPictureRelease( picture_t *p_pic )
+static void RegionPictureRelease( picture_t *p_picture )
 {
-    free( p_pic->p_data_orig );
-    /* We use pf_release nullity to know if the picture has already been released. */
-    p_pic->pf_release = NULL;
+    if( --p_picture->i_refcount > 0 )
+        return;
+
+    assert( p_picture->i_refcount == 0 );
+    free( p_picture->p_q );
+    free( p_picture->p_data_orig );
+    free( p_picture->p_sys );
 }
 
 /**
@@ -261,6 +265,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
         return NULL;
     }
 
+    p_region->picture.i_refcount = 1;
     p_region->picture.pf_release = RegionPictureRelease;
 
     return p_region;
