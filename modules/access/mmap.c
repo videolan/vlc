@@ -213,8 +213,7 @@ static block_t *Block (access_t *p_access)
         msg_Err (p_access, "memory mapping failed (%m)");
         intf_UserFatal (p_access, false, _("File reading failed"),
                         _("VLC could not read the file."));
-        msleep (INPUT_ERROR_SLEEP);
-        return NULL;
+        goto fatal;
     }
 #ifdef HAVE_POSIX_MADVISE    
     posix_madvise (addr, length, POSIX_MADV_SEQUENTIAL);
@@ -222,7 +221,7 @@ static block_t *Block (access_t *p_access)
 
     block_t *block = block_mmap_Alloc (addr, length);
     if (block == NULL)
-        return NULL;
+        goto fatal;
 
     block->p_buffer += inner_offset;
     block->i_buffer -= inner_offset;
@@ -245,6 +244,10 @@ static block_t *Block (access_t *p_access)
 
     p_access->info.i_pos = outer_offset + length;
     return block;
+
+fatal:
+    p_access->info.b_eof = true;
+    return NULL;
 }
 
 
