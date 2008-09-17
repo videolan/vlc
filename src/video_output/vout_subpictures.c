@@ -647,6 +647,10 @@ static spu_scale_t spu_scale_create( int w, int h )
         s.h = SCALE_UNIT;
     return s;
 }
+static spu_scale_t spu_scale_unit(void )
+{
+    return spu_scale_create( SCALE_UNIT, SCALE_UNIT );
+}
 static spu_scale_t spu_scale_createq( int wn, int wd, int hn, int hd )
 {
     return spu_scale_create( wn * SCALE_UNIT / wd,
@@ -660,10 +664,135 @@ static int spu_scale_h( int v, const spu_scale_t s )
 {
     return v * s.h / SCALE_UNIT;
 }
+static int spu_invscale_w( int v, const spu_scale_t s )
+{
+    return v * SCALE_UNIT / s.w;
+}
 static int spu_invscale_h( int v, const spu_scale_t s )
 {
     return v * SCALE_UNIT / s.h;
 }
+
+/**
+ * A few area functions helpers
+ */
+
+typedef struct
+{
+    int i_x;
+    int i_y;
+    int i_width;
+    int i_height;
+
+    spu_scale_t scale;
+} spu_area_t;
+
+static spu_area_t spu_area_create( int x, int y, int w, int h, spu_scale_t s )
+{
+    spu_area_t a = { .i_x = x, .i_y = y, .i_width = w, .i_height = h, .scale = s };
+    return a;
+}
+static spu_area_t spu_area_scaled( spu_area_t a )
+{
+    if( a.scale.w == SCALE_UNIT && a.scale.h == SCALE_UNIT )
+        return a;
+
+    a.i_x = spu_scale_w( a.i_x, a.scale );
+    a.i_y = spu_scale_h( a.i_y, a.scale );
+
+    a.i_width  = spu_scale_w( a.i_width,  a.scale );
+    a.i_height = spu_scale_h( a.i_height, a.scale );
+
+    a.scale = spu_scale_unit();
+    return a;
+}
+static spu_area_t spu_area_unscaled( spu_area_t a, spu_scale_t s )
+{
+    if( a.scale.w == s.w && a.scale.h == s.h )
+        return a;
+
+    a = spu_area_scaled( a );
+
+    a.i_x = spu_invscale_w( a.i_x, s );
+    a.i_y = spu_invscale_h( a.i_y, s );
+
+    a.i_width  = spu_invscale_w( a.i_width, s );
+    a.i_height = spu_invscale_h( a.i_height, s );
+
+    a.scale = s;
+    return a;
+}
+static bool spu_area_overlap( spu_area_t a, spu_area_t b )
+{
+    const int i_dx = 0;
+    const int i_dy = 0;
+
+    a = spu_area_scaled( a );
+    b = spu_area_scaled( b );
+
+    return  __MAX( a.i_x-i_dx, b.i_x ) < __MIN( a.i_x+a.i_width +i_dx, b.i_x+b.i_width  ) &&
+            __MAX( a.i_y-i_dy, b.i_y ) < __MIN( a.i_y+a.i_height+i_dy, b.i_y+b.i_height );
+}
+
+/**
+ * Avoid area overlapping
+ */
+static void SpuAreaFixOverlap( spu_area_t *p_dst,
+                               const spu_area_t *p_master,
+                               const spu_area_t *p_sub, int i_sub, int i_align )
+{
+    spu_area_t a = spu_area_scaled( *p_dst );
+    bool b_moved = false;
+    bool b_ok;
+
+    assert( p_master->i_x == 0 && p_master->i_y == 0 );
+
+    /* Check for overlap
+     * XXX It is not fast O(n^2) but we should not have a lot of region */
+    do
+    {
+        b_ok = true;
+        for( int i = 0; i < i_sub; i++ )
+        {
+            spu_area_t sub = spu_area_scaled( p_sub[i] );
+
+            if( !spu_area_overlap( a, sub ) )
+                continue;
+
+            if( i_align & SUBPICTURE_ALIGN_TOP )
+            {
+                /* We go down */
+                int i_y = sub.i_y + sub.i_height;
+                if( i_y + a.i_height > p_master->i_height )
+                    break;
+                a.i_y = i_y;
+                b_moved = true;
+            }
+            else if( i_align & SUBPICTURE_ALIGN_BOTTOM )
+            {
+                /* We go up */
+                int i_y = sub.i_y - a.i_height;
+                if( i_y < 0 )
+                    break;
+                a.i_y = i_y;
+                b_moved = true;
+            }
+            else
+            {
+                /* TODO what to do in this case? */
+                //fprintf( stderr, "Overlap with unsupported alignment\n" );
+                break;
+            }
+
+            b_ok = false;
+            break;
+        }
+    } while( !b_ok );
+
+    if( b_moved )
+        *p_dst = spu_area_unscaled( a, p_dst->scale );
+}
+
 
 /**
  * Place a region
@@ -753,14 +882,19 @@ static int SpuRegionAlpha( subpicture_t *p_subpic, subpicture_region_t *p_region
     return i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025;
 }
 
+/**
+ * It will render the provided region onto p_pic_dst.
+ */
+
 static void SpuRenderRegion( spu_t *p_spu,
-                             picture_t *p_pic_dst,
+                             picture_t *p_pic_dst, spu_area_t *p_area,
                              subpicture_t *p_subpic, subpicture_region_t *p_region,
                              const spu_scale_t scale_size,
-                             const video_format_t *p_fmt )
+                             const video_format_t *p_fmt,
+                             const spu_area_t *p_subtitle_area, int i_subtitle_area )
 {
-    video_format_t fmt_original;
-    bool b_rerender_text;
+    video_format_t fmt_original = p_region->fmt;
+    bool b_rerender_text = false;
     bool b_restore_format = false;
     int i_x_offset;
     int i_y_offset;
@@ -768,11 +902,13 @@ static void SpuRenderRegion( spu_t *p_spu,
 
     vlc_assert_locked( &p_spu->subpicture_lock );
 
-    fmt_original = p_region->fmt;
-    b_rerender_text = false;
+    /* Invalidate area by default */
+    *p_area = spu_area_create( 0,0, 0,0, scale_size );
+
+    /* Render text region */
     if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
     {
-        const int i_min_scale_ratio = __MIN( scale_size.w, scale_size.h );
+        const int i_min_scale_ratio = SCALE_UNIT; /* FIXME what is the right value? (scale_size is not) */
         SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, i_min_scale_ratio );
         b_restore_format = b_rerender_text;
 
@@ -802,11 +938,23 @@ static void SpuRenderRegion( spu_t *p_spu,
     SpuRegionPlace( &i_x_offset, &i_y_offset,
                     p_subpic, p_region, i_margin_y );
 
-    /* TODO save this position for subtitle overlap support */
+    /* Save this position for subtitle overlap support
+     * it is really important that there are given without scale_size applied */
+    *p_area = spu_area_create( i_x_offset, i_y_offset,
+                               p_region->fmt.i_width, p_region->fmt.i_height,
+                               scale_size );
+
+    /* Handle overlapping subtitles when possible */
+    if( p_subpic->b_subtitle && !p_subpic->b_absolute )
+    {
+        spu_area_t display = spu_area_create( 0, 0, p_fmt->i_width, p_fmt->i_height, spu_scale_unit() );
+
+        SpuAreaFixOverlap( p_area, &display, p_subtitle_area, i_subtitle_area, p_region->i_align );
+    }
 
     /* Fix the position for the current scale_size */
-    i_x_offset = spu_scale_w( i_x_offset, scale_size );
-    i_y_offset = spu_scale_h( i_y_offset, scale_size );
+    i_x_offset = spu_scale_w( p_area->i_x, scale_size );
+    i_y_offset = spu_scale_h( p_area->i_y, scale_size );
 
     if( b_force_palette )
     {
@@ -990,6 +1138,11 @@ void spu_RenderSubpictures( spu_t *p_spu,
     const int i_source_video_height = p_fmt_src->i_height;
     const mtime_t i_current_date = mdate();
 
+    unsigned int i_subtitle_region_count;
+    spu_area_t p_subtitle_area_buffer[VOUT_MAX_SUBPICTURES];
+    spu_area_t *p_subtitle_area;
+    int i_subtitle_area;
+
     subpicture_t *p_subpic;
 
     /* Get lock */
@@ -1003,6 +1156,7 @@ void spu_RenderSubpictures( spu_t *p_spu,
     }
 
     /* */
+    i_subtitle_region_count = 0;
     for( p_subpic = p_subpic_list;
             p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE; /* Check again status (as we where unlocked) */
                 p_subpic = p_subpic->p_next )
@@ -1021,7 +1175,20 @@ void spu_RenderSubpictures( spu_t *p_spu,
 
             p_subpic->pf_update_regions( p_spu, p_subpic, &fmt_org, i_current_date );
         }
+
+        /* */
+        if( p_subpic->b_subtitle )
+        {
+            for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
+                i_subtitle_region_count++;
+        }
     }
+
+    /* Allocate area array for subtitle overlap */
+    i_subtitle_area = 0;
+    p_subtitle_area = p_subtitle_area_buffer;
+    if( i_subtitle_region_count > sizeof(p_subtitle_area_buffer)/sizeof(*p_subtitle_area_buffer) )
+        p_subtitle_area = calloc( i_subtitle_region_count, sizeof(*p_subtitle_area) );
 
     /* Create the blending module */
     if( !p_spu->p_blend )
@@ -1100,15 +1267,27 @@ void spu_RenderSubpictures( spu_t *p_spu,
         /* Render all regions */
         for( p_region = p_subpic->p_region; p_region != NULL; p_region = p_region->p_next )
         {
+            spu_area_t area;
             /* Check scale validity */
             if( scale.w <= 0 || scale.h <= 0 )
                 continue;
 
             /* */
-            SpuRenderRegion( p_spu, p_pic_dst, p_subpic, p_region,
-                             scale, p_fmt_dst );
+            SpuRenderRegion( p_spu, p_pic_dst, &area,
+                             p_subpic, p_region, scale, p_fmt_dst,
+                             p_subtitle_area, i_subtitle_area );
+
+            if( p_subpic->b_subtitle )
+            {
+                if( p_subtitle_area )
+                    p_subtitle_area[i_subtitle_area++] = area;
+            }
         }
     }
+
+    /* */
+    if( p_subtitle_area != p_subtitle_area_buffer )
+        free( p_subtitle_area );
 
     vlc_mutex_unlock( &p_spu->subpicture_lock );
 }
