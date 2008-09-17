@@ -974,7 +974,7 @@ static void* RunThread( vlc_object_t *p_this )
         {
             p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
             p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
-                                            p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : false,
+                                            p_input ? var_GetInteger( p_input, "state" ) == PAUSE_S : false,
                                             b_snapshot );
             if( p_input )
                 vlc_object_release( p_input );
