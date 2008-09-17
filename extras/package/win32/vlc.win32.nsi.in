@@ -239,6 +239,7 @@ FunctionEnd
   !insertmacro ${_action} ".mpg"
   !insertmacro ${_action} ".mts"
   !insertmacro ${_action} ".mxf"
+  !insertmacro ${_action} ".nuv"
   !insertmacro ${_action} ".ogg"
   !insertmacro ${_action} ".ogm"
   !insertmacro ${_action} ".ogx"
