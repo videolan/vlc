@@ -1026,7 +1026,12 @@ AC_CACHE_CHECK([if \$CC accepts -fomit-frame-pointer],
     [CFLAGS="${CFLAGS_save} -fomit-frame-pointer"
      AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
 if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
+ if test "${SYS}" != "darwin"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
+ else
+    dnl On darwin we explicitely disable it.
+    CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fno-omit-frame-pointer"
+ fi
 fi
 
 dnl Check for Darwin plugin linking flags
