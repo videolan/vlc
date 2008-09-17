@@ -1016,7 +1016,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                     printf( ", command" );
                 if( p_var->i_entries )
                     printf( ", %d callbacks", p_var->i_entries );
-                switch( p_var->i_type & 0x00f0 )
+                switch( p_var->i_type & VLC_VAR_CLASS )
                 {
                     case VLC_VAR_VOID:
                     case VLC_VAR_MUTEX:

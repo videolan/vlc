@@ -1573,7 +1573,7 @@ int __var_Command( vlc_object_t *p_this, const char *psz_name,
         return VLC_EGENERIC;
     }
 
-    i_type &= 0xf0;
+    i_type &= VLC_VAR_CLASS;
     switch( i_type )
     {
         case VLC_VAR_INTEGER:

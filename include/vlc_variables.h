@@ -25,6 +25,8 @@
 #ifndef VLC_VARIABLES_H
 #define VLC_VARIABLES_H 1
 
+#include <assert.h>
+
 /**
  * \file
  * This file defines functions and structures for dynamic variables in vlc
@@ -45,6 +47,7 @@
  * Variable types - probably very incomplete
  *****************************************************************************/
 #define VLC_VAR_TYPE      0x00ff
+#define VLC_VAR_CLASS     0x00f0
 #define VLC_VAR_FLAGS     0xff00
 
 /** \defgroup var_flags Additive flags
@@ -209,6 +212,17 @@ VLC_EXPORT( int, __var_TriggerCallback, ( vlc_object_t *, const char * ) );
  *****************************************************************************/
 
 /**
+ * This function assert the variable is of the expected type or it
+ * is not defined
+ */
+static inline void __var_AssertType( vlc_object_t *p_obj, const char *psz_name,
+                                     int i_expected )
+{
+    const int i_type = __var_Type( p_obj, psz_name ) & VLC_VAR_CLASS;
+    assert( i_type == 0 || i_type == (i_expected&VLC_VAR_CLASS) );
+}
+
+/**
  * Set the value of an integer variable
  *
  * \param p_obj The object that holds the variable
@@ -219,6 +233,7 @@ static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, i
 {
     vlc_value_t val;
     val.i_int = i;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_INTEGER );
     return __var_Set( p_obj, psz_name, val );
 }
 #define var_SetInteger(a,b,c)   __var_SetInteger( VLC_OBJECT(a),b,c)
@@ -233,6 +248,7 @@ static inline int __var_SetBool( vlc_object_t *p_obj, const char *psz_name, bool
 {
     vlc_value_t val;
     val.b_bool = b;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_BOOL );
     return __var_Set( p_obj, psz_name, val );
 }
 
@@ -247,6 +263,7 @@ static inline int __var_SetTime( vlc_object_t *p_obj, const char *psz_name, int6
 {
     vlc_value_t val;
     val.i_time = i;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_TIME );
     return __var_Set( p_obj, psz_name, val );
 }
 
@@ -261,6 +278,7 @@ static inline int __var_SetFloat( vlc_object_t *p_obj, const char *psz_name, flo
 {
     vlc_value_t val;
     val.f_float = f;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_FLOAT );
     return __var_Set( p_obj, psz_name, val );
 }
 
@@ -275,6 +293,7 @@ static inline int __var_SetString( vlc_object_t *p_obj, const char *psz_name, co
 {
     vlc_value_t val;
     val.psz_string = (char *)psz_string;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_STRING );
     return __var_Set( p_obj, psz_name, val );
 }
 
@@ -288,6 +307,7 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
     val.b_bool = true;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_VOID );
     return __var_Set( p_obj, psz_name, val );
 }
 #define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
@@ -320,6 +340,7 @@ LIBVLC_USED
 static inline int __var_GetInteger( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;val.i_int = 0;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_INTEGER );
     if( !__var_Get( p_obj, psz_name, &val ) )
         return val.i_int;
     else
@@ -336,6 +357,8 @@ LIBVLC_USED
 static inline int __var_GetBool( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val; val.b_bool = false;
+
+    __var_AssertType( p_obj, psz_name, VLC_VAR_BOOL );
     if( !__var_Get( p_obj, psz_name, &val ) )
         return val.b_bool;
     else
@@ -352,6 +375,7 @@ LIBVLC_USED
 static inline int64_t __var_GetTime( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val; val.i_time = 0L;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_TIME );
     if( !__var_Get( p_obj, psz_name, &val ) )
         return val.i_time;
     else
@@ -368,6 +392,7 @@ LIBVLC_USED
 static inline float __var_GetFloat( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val; val.f_float = 0.0;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_FLOAT );
     if( !__var_Get( p_obj, psz_name, &val ) )
         return val.f_float;
     else
@@ -384,6 +409,7 @@ LIBVLC_USED
 static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val; val.psz_string = NULL;
+    __var_AssertType( p_obj, psz_name, VLC_VAR_STRING );
     if( __var_Get( p_obj, psz_name, &val ) )
         return NULL;
     else
@@ -391,10 +417,11 @@ static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
 }
 
 LIBVLC_USED
-static inline char *__var_GetNonEmptyString( vlc_object_t *obj, const char *name )
+static inline char *__var_GetNonEmptyString( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
-    if( __var_Get( obj, name, &val ) )
+    __var_AssertType( p_obj, psz_name, VLC_VAR_STRING );
+    if( __var_Get( p_obj, psz_name, &val ) )
         return NULL;
     if( *val.psz_string )
         return val.psz_string;
