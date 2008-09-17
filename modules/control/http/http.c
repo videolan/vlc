@@ -232,7 +232,7 @@ static int Open( vlc_object_t *p_this )
     if( ( psz_src == NULL ) || ( *psz_src == '\0' ) )
     {
         const char *data_path = config_GetDataDir ();
-        if( asprintf( &psz_src, "%s/http", data_path ) == -1 )
+        if( asprintf( &psz_src, "%s" DIR_SEP "http", data_path ) == -1 )
             psz_src = NULL;
     }
 
