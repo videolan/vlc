@@ -34,6 +34,7 @@
 #include <vlc_demux.h>
 #include <vlc_stream.h>
 #include <vlc_meta.h>
+#include <vlc_input.h>
 
 /* ffmpeg header */
 #if defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
@@ -75,6 +76,9 @@ struct demux_sys_t
     int64_t     i_pcr;
     int64_t     i_pcr_inc;
     int         i_pcr_tk;
+
+    int                i_attachments;
+    input_attachment_t **attachments;
 };
 
 /*****************************************************************************
@@ -158,6 +162,7 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->tk = NULL;
     p_sys->i_pcr_tk = -1;
     p_sys->i_pcr = -1;
+    TAB_INIT( p_sys->i_attachments, p_sys->attachments);
 
     /* Create I/O wrapper */
     p_sys->io_buffer_size = 32768;  /* FIXME */
@@ -209,6 +214,22 @@ int OpenDemux( vlc_object_t *p_this )
         if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
 
+#ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
+        if( cc->codec_type == CODEC_TYPE_ATTACHMENT )
+        {
+            input_attachment_t *p_attachment;
+            psz_type = "attachment";
+            if( cc->codec_id == CODEC_ID_TTF )
+            {
+                p_attachment = vlc_input_attachment_New( p_sys->ic->streams[i]->filename, "application/x-truetype-font", NULL,
+                                             cc->extradata, (int)cc->extradata_size );
+                TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
+            }
+            else msg_Warn( p_demux, "unsupported attachment type in ffmpeg demux" );
+        }
+        continue; /* Not a real track. nothing left to do here */
+#endif
+
         switch( cc->codec_type )
         {
         case CODEC_TYPE_AUDIO:
@@ -223,6 +244,7 @@ int OpenDemux( vlc_object_t *p_this )
             fmt.audio.i_blockalign = cc->block_align;
             psz_type = "audio";
             break;
+
         case CODEC_TYPE_VIDEO:
             es_format_Init( &fmt, VIDEO_ES, fcc );
 
@@ -247,6 +269,7 @@ int OpenDemux( vlc_object_t *p_this )
             }
             psz_type = "video";
             break;
+
         case CODEC_TYPE_SUBTITLE:
             es_format_Init( &fmt, SPU_ES, fcc );
             psz_type = "subtitle";
@@ -256,14 +279,10 @@ int OpenDemux( vlc_object_t *p_this )
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
             if( cc->codec_type == CODEC_TYPE_DATA )
                 psz_type = "data";
-#ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
-            else if( cc->codec_type == CODEC_TYPE_ATTACHMENT )
-                psz_type = "attachment";
-#endif
+
             msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
             break;
         }
-
         fmt.psz_language = strdup( p_sys->ic->streams[i]->language );
         fmt.i_extra = cc->extradata_size;
         fmt.p_extra = cc->extradata;
@@ -302,6 +321,10 @@ void CloseDemux( vlc_object_t *p_this )
     p_sys->fmt->flags |= AVFMT_NOFILE; /* libavformat must not fopen/fclose */
     if( p_sys->ic ) av_close_input_file( p_sys->ic );
     if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
+
+    for( int i = 0; i < p_sys->i_attachments; i++ )
+        free( p_sys->attachments[i] );
+    TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     free( p_sys->io_buffer );
     free( p_sys );
@@ -473,6 +496,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 vlc_meta_SetDescription( p_meta, p_sys->ic->comment );
             if( p_sys->ic->genre[0] )
                 vlc_meta_SetGenre( p_meta, p_sys->ic->genre );
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_GET_ATTACHMENTS:
+        {
+            input_attachment_t ***ppp_attach =
+                (input_attachment_t***)va_arg( args, input_attachment_t*** );
+            int *pi_int = (int*)va_arg( args, int * );
+            int i;
+
+            if( p_sys->i_attachments <= 0 )
+                return VLC_EGENERIC;
+
+            *pi_int = p_sys->i_attachments;;
+            *ppp_attach = malloc( sizeof(input_attachment_t**) * p_sys->i_attachments );
+            for( i = 0; i < p_sys->i_attachments; i++ )
+                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
             return VLC_SUCCESS;
         }
 
