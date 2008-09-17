@@ -130,7 +130,7 @@ typedef struct
 {
   int argc;
   int enqueue;
-  char data[0];
+  char data[];
 } vlc_ipc_data_t;
 
 void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )

@@ -53,7 +53,7 @@ typedef struct sap_session_t
     struct sap_session_t *next;
     const session_descriptor_t *p_sd;
     size_t                length;
-    uint8_t               data[0];
+    uint8_t               data[];
 } sap_session_t;
 
 /* A SAP announce address. For each of these, we run the

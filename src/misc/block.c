@@ -40,7 +40,7 @@ struct block_sys_t
 {
     block_t     self;
     size_t      i_allocated_buffer;
-    uint8_t     p_allocated_buffer[0];
+    uint8_t     p_allocated_buffer[];
 };
 
 #ifndef NDEBUG

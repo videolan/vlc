@@ -212,7 +212,7 @@ struct  sdp_t
 struct attribute_t
 {
     const char *value;
-    char name[0];
+    char name[];
 };
 
 struct sap_announce_t
