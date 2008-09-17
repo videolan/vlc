@@ -1235,7 +1235,7 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
             CGContextSetTextDrawingMode( p_context, kCGTextFillStroke );
             CGContextSetShadow( p_context, CGSizeMake( 0, 0 ), 5 );
             float black_components[4] = {0, 0, 0, 1};
-            CGContextSetShadowWithColor (p_context, CGSizeMake( 0, 0 ), 5, CGColorCreate( kCGColorSpaceGenericRGB, black_components ));
+            CGContextSetShadowWithColor (p_context, CGSizeMake( 0, 0 ), 5, CGColorCreate( CGColorSpaceCreateWithName( kCGColorSpaceGenericRGB ), black_components ));
             do
             {
                 // ATSUBreakLine will automatically pick up any manual '\n's also
