@@ -108,5 +108,16 @@ vlc_module_begin();
         set_category( CAT_VIDEO);
         set_subcategory( SUBCAT_VIDEO_VOUT );
         set_callbacks( OpenVideoGL, CloseVideoGL );
+
+        add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
+                     false );
+        add_bool( "macosx-stretch", 0, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
+                  false );
+        add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
+                              OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
+        add_bool( "macosx-black", 1, NULL, BLACK_TEXT, BLACK_LONGTEXT,
+                  false );
+        add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
+                  false );
 vlc_module_end();
 
