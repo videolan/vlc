@@ -428,11 +428,6 @@ void spu_DestroySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
     vlc_mutex_unlock( &p_spu->subpicture_lock );
 }
 
-/*****************************************************************************
- * spu_RenderSubpictures: render a subpicture list
- *****************************************************************************
- * This function renders all sub picture units in the list.
- *****************************************************************************/
 static void FilterRelease( filter_t *p_filter )
 {
     if( p_filter->p_module )
@@ -983,6 +978,9 @@ exit:
         p_region->fmt = fmt_original;
 }
 
+/**
+ * This function renders all sub picture units in the list.
+ */
 void spu_RenderSubpictures( spu_t *p_spu,
                             picture_t *p_pic_dst, const video_format_t *p_fmt_dst,
                             subpicture_t *p_subpic_list,
