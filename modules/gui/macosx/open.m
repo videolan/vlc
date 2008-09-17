@@ -472,7 +472,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     if( b_dir )
     {
-        o_mrl_string = [NSString stringWithFormat: @"dir:%@", o_filename];
+        o_mrl_string = [NSString stringWithFormat: @"directory://%@", o_filename];
     }
     else if( [o_ext isEqualToString: @"bin"] ||
         [o_ext isEqualToString: @"cue"] ||
