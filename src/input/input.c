@@ -2586,6 +2586,10 @@ static void SlaveSeek( input_thread_t *p_input )
             msg_Err( p_input, "seek failed for slave %d -> EOF", i );
             in->b_eof = true;
         }
+        else
+        {
+            in->b_eof = false;
+        }
     }
 }
 
