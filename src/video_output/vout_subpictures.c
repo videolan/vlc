@@ -777,7 +777,8 @@ static void SpuRenderRegion( spu_t *p_spu,
     b_rerender_text = false;
     if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
     {
-        SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, SCALE_UNIT );
+        const int i_min_scale_ratio = __MIN( scale_size.w, scale_size.h );
+        SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, i_min_scale_ratio );
         b_restore_format = b_rerender_text;
 
         /* Check if the rendering has failed ... */
