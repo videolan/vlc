@@ -26,6 +26,7 @@
 
 #include "subsdec.h"
 #include <vlc_plugin.h>
+#include <assert.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -66,21 +67,15 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
-    vlc_value_t    val;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('u','s','f',' ') )
-    {
         return VLC_EGENERIC;
-    }
-
-    p_dec->pf_decode_sub = DecodeBlock;
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)calloc(1, sizeof(decoder_sys_t)) ) == NULL )
-    {
+    if( ( p_dec->p_sys = p_sys = calloc(1, sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
-    }
+
+    p_dec->pf_decode_sub = DecodeBlock;
 
     /* Unused fields of p_sys - not needed for USF decoding */
     p_sys->b_ass = false;
@@ -96,9 +91,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* USF subtitles are mandated to be UTF-8, so don't need vlc_iconv */
 
-    var_Create( p_dec, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "subsdec-align", &val );
-    p_sys->i_align = val.i_int;
+    p_sys->i_align = var_CreateGetInteger( p_dec, "subsdec-align" );
 
     ParseImageAttachments( p_dec );
 
@@ -1204,9 +1197,9 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
     fmt_out.i_aspect = VOUT_ASPECT_FACTOR;
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     fmt_out.i_width =
-        fmt_out.i_visible_width = p_pic->p[Y_PLANE].i_visible_pitch;
+        fmt_out.i_visible_width = p_pic->format.i_visible_width;
     fmt_out.i_height =
-        fmt_out.i_visible_height = p_pic->p[Y_PLANE].i_visible_lines;
+        fmt_out.i_visible_height = p_pic->format.i_visible_height;
 
     p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt_out );
     if( !p_region )
@@ -1214,7 +1207,8 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
         msg_Err( p_dec, "cannot allocate SPU region" );
         return NULL;
     }
-    vout_CopyPicture( p_dec, &p_region->picture, p_pic );
+    assert( p_pic->format.i_chroma == VLC_FOURCC('Y','U','V','A') );
+    picture_CopyPixels( &p_region->picture, p_pic );
 
     /* This isn't the best way to do this - if you really want transparency, then
      * you're much better off using an image type that supports it like PNG. The
@@ -1222,35 +1216,27 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
      */
     if( i_transparent_color > 0 )
     {
-        uint8_t i_r = ( i_transparent_color >> 16 ) & 0xff;
-        uint8_t i_g = ( i_transparent_color >>  8 ) & 0xff;
-        uint8_t i_b = ( i_transparent_color       ) & 0xff;
-        uint8_t i_y = ( ( (  66 * i_r + 129 * i_g +  25 * i_b + 128 ) >> 8 ) + 16 );
-        uint8_t i_u =   ( ( -38 * i_r -  74 * i_g + 112 * i_b + 128 ) >> 8 ) + 128 ;
-        uint8_t i_v =   ( ( 112 * i_r -  94 * i_g -  18 * i_b + 128 ) >> 8 ) + 128 ;
+        int i_r = ( i_transparent_color >> 16 ) & 0xff;
+        int i_g = ( i_transparent_color >>  8 ) & 0xff;
+        int i_b = ( i_transparent_color       ) & 0xff;
 
-        if( ( p_region->picture.Y_PITCH == p_region->picture.U_PITCH ) &&
-            ( p_region->picture.Y_PITCH == p_region->picture.V_PITCH ) &&
-            ( p_region->picture.Y_PITCH == p_region->picture.A_PITCH ) )
+        /* FIXME it cannot work as the yuv conversion code will probably NOT match
+         * this one  */
+        int i_y = ( ( (  66 * i_r + 129 * i_g +  25 * i_b + 128 ) >> 8 ) + 16 );
+        int i_u =   ( ( -38 * i_r -  74 * i_g + 112 * i_b + 128 ) >> 8 ) + 128 ;
+        int i_v =   ( ( 112 * i_r -  94 * i_g -  18 * i_b + 128 ) >> 8 ) + 128 ;
+
+        assert( p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','A') );
+        for( unsigned int y = 0; y < p_region->fmt.i_height; y++ )
         {
-            int i_lines = p_region->picture.p[ Y_PLANE ].i_lines;
-            if( i_lines > p_region->picture.p[ U_PLANE ].i_lines )
-                i_lines = p_region->picture.p[ U_PLANE ].i_lines;
-            if( i_lines > p_region->picture.p[ V_PLANE ].i_lines )
-                i_lines = p_region->picture.p[ V_PLANE ].i_lines;
-            if( i_lines > p_region->picture.p[ A_PLANE ].i_lines )
-                i_lines = p_region->picture.p[ A_PLANE ].i_lines;
-
-            int   i;
-
-            for( i = 0; i < p_region->picture.A_PITCH * i_lines; i++ )
+            for( unsigned int x = 0; x < p_region->fmt.i_width; x++ )
             {
-                if(( p_region->picture.Y_PIXELS[ i ] == i_y ) &&
-                   ( p_region->picture.U_PIXELS[ i ] == i_u ) &&
-                   ( p_region->picture.V_PIXELS[ i ] == i_v ) )
-                {
-                    p_region->picture.A_PIXELS[ i ] = 1;
-                }
+                if( p_region->picture.Y_PIXELS[y*p_region->picture.Y_PITCH + x] != i_y ||
+                    p_region->picture.U_PIXELS[y*p_region->picture.U_PITCH + x] != i_u ||
+                    p_region->picture.V_PIXELS[y*p_region->picture.V_PITCH + x] != i_v )
+                    continue;
+                p_region->picture.A_PIXELS[y*p_region->picture.A_PITCH + x] = 0;
+
             }
         }
     }
