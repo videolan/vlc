@@ -486,13 +486,13 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
     QLabel *text = new QLabel( qtr(
         "<p>The <i>VideoLAN Team</i> doesn't like when an application goes "
         "online without authorization.</p>\n "
-        "<p><i>VLC media player</i> can request limited information on "
-        "the Internet, especially to get CD covers or to know "
-        "if updates are available.</p>\n"
+        "<p><i>VLC media player</i> can retreive limited information from "
+        "the Internet in order to get CD covers or to check "
+        "for available updates.</p>\n"
         "<p><i>VLC media player</i> <b>DOES NOT</b> send or collect <b>ANY</b> "
         "information, even anonymously, about your usage.</p>\n"
-        "<p>Therefore please check the following options, the default being "
-        "almost no access on the web.</p>\n") );
+        "<p>Therefore please select from the following options, the default being "
+        "almost no access to the web.</p>\n") );
     text->setWordWrap( true );
     text->setTextFormat( Qt::RichText );
 

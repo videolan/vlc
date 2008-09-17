@@ -490,7 +490,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
         action = current->addMenu( submenu );
         action->setData( "spu-es" );
-        addDPStaticEntry( submenu, qtr( "Load File..." ), "", "",
+        addDPStaticEntry( submenu, qtr( "Open File..." ), "", "",
                           SLOT( loadSubtitlesFile() ) );
         submenu->addSeparator();
 

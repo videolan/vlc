@@ -130,10 +130,10 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
         new QSpacerItem( 10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
     vlmItemLayout->addItem( spacer );
 
-    QPushButton *importButton = new QPushButton( qtr( "Import" ) );
+    QPushButton *importButton = new QPushButton( qtr( "I&mport" ) );
     ui.buttonBox->addButton( importButton, QDialogButtonBox::ActionRole );
 
-    QPushButton *exportButton = new QPushButton( qtr( "Export" ) );
+    QPushButton *exportButton = new QPushButton( qtr( "E&xport" ) );
     ui.buttonBox->addButton( exportButton, QDialogButtonBox::ActionRole );
 
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
@@ -263,7 +263,7 @@ void VLMDialog::addVLMItem()
 bool VLMDialog::exportVLMConf()
 {
     QString saveVLMConfFileName = QFileDialog::getSaveFileName(
-            this, qtr( "Choose a filename to save the VLM configuration..." ),
+            this, qtr( "Save VLM configuration as..." ),
             qfu( config_GetHomeDir() ),
             qtr( "VLM conf (*.vlm) ;; All (*.*)" ) );
 
@@ -333,7 +333,7 @@ void VLMDialog::mediasPopulator()
 bool VLMDialog::importVLMConf()
 {
     QString openVLMConfFileName = QFileDialog::getOpenFileName(
-            this, qtr( "Open a VLM Configuration File" ),
+            this, qtr( "Open VLM configuration..." ),
             qfu( config_GetHomeDir() ),
             qtr( "VLM conf (*.vlm) ;; All (*.*)" ) );
 

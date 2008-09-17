@@ -81,9 +81,9 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     /* Buttons and general layout */
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
-    clearUpdateButton = new QPushButton( qtr( "&Clear" ) );
+    clearUpdateButton = new QPushButton( qtr( "C&lear" ) );
     saveLogButton = new QPushButton( qtr( "&Save as..." ) );
-    saveLogButton->setToolTip( qtr( "Save all the displayed logs to a file" ) );
+    saveLogButton->setToolTip( qtr( "Saves all the displayed logs to a file" ) );
 
     verbosityBox = new QSpinBox();
     verbosityBox->setRange( 0, 2 );
@@ -246,7 +246,7 @@ void MessagesDialog::clear()
 bool MessagesDialog::save()
 {
     QString saveLogFileName = QFileDialog::getSaveFileName(
-            this, qtr( "Select a name for the logs file" ),
+            this, qtr( "Save log file as..." ),
             qfu( config_GetHomeDir() ),
             qtr( "Texts / Logs (*.log *.txt);; All (*.*) ") );
 
@@ -255,7 +255,7 @@ bool MessagesDialog::save()
         QFile file( saveLogFileName );
         if ( !file.open( QFile::WriteOnly | QFile::Text ) ) {
             QMessageBox::warning( this, qtr( "Application" ),
-                    qtr( "Cannot write file %1:\n%2." )
+                    qtr( "Cannot write to file %1:\n%2." )
                     .arg( saveLogFileName )
                     .arg( file.errorString() ) );
             return false;

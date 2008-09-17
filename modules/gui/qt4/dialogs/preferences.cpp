@@ -68,10 +68,10 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     QHBoxLayout *types_l = new QHBoxLayout;
     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
     small = new QRadioButton( qtr( "Simple" ), types );
-    small->setToolTip( qtr( "Switch to simple preferences" ) );
+    small->setToolTip( qtr( "Switch to simple preferences view" ) );
     types_l->addWidget( small );
     all = new QRadioButton( qtr("All"), types ); types_l->addWidget( all );
-    all->setToolTip( qtr( "Switch to complete preferences" ) );
+    all->setToolTip( qtr( "Switch to full preferences view" ) );
     types->setLayout( types_l );
     small->setChecked( true );
 
@@ -351,8 +351,7 @@ void PrefsDialog::reset()
     int ret = QMessageBox::question(
                  this,
                  qtr( "Reset Preferences" ),
-                 qtr( "This will reset your VLC media player preferences.\n"
-                      "Are you sure you want to continue?" ),
+                 qtr( "Are you sure you want to reset your VLC media player preferences?" ),
                  QMessageBox::Ok | QMessageBox::Cancel,
                  QMessageBox::Ok);
 

@@ -455,7 +455,7 @@ void DialogsProvider::MLAppendDir()
  ****************/
 void DialogsProvider::openAPlaylist()
 {
-    QStringList files = showSimpleOpen( qtr( "Open playlist file" ),
+    QStringList files = showSimpleOpen( qtr( "Open playlist..." ),
                                         EXT_FILTER_PLAYLIST );
     foreach( QString file, files )
     {
@@ -466,7 +466,7 @@ void DialogsProvider::openAPlaylist()
 void DialogsProvider::saveAPlaylist()
 {
     QFileDialog *qfd = new QFileDialog( NULL,
-                                   qtr( "Choose a filename to save playlist" ),
+                                   qtr( "Save playlist as..." ),
                                    qfu( p_intf->p_sys->psz_filepath ),
                                    qtr( "XSPF playlist (*.xspf);; " ) +
                                    qtr( "M3U playlist (*.m3u);; Any (*.*) " ) );
@@ -626,7 +626,7 @@ void DialogsProvider::loadSubtitlesFile()
     char *sep = strrchr( path, DIR_SEP_CHAR );
     if( sep )
         *sep = '\0';
-    QStringList qsl = showSimpleOpen( qtr( "Open subtitles file" ),
+    QStringList qsl = showSimpleOpen( qtr( "Open subtitles..." ),
                                       EXT_FILTER_SUBTITLE,
                                       path );
     free( path );

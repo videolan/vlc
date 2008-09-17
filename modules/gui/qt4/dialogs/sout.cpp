@@ -234,7 +234,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     ui.mrlEdit->setToolTip ( qtr( "Stream output string.\n"
                 "This is automatically generated "
                  "when you change the above settings,\n"
-                 "but you can update it manually." ) ) ;
+                 "but you can change it manually." ) ) ;
 
 //     /* Connect everything to the updateMRL function */
  #define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );
@@ -286,7 +286,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
 
 void SoutDialog::fileBrowse()
 {
-    QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file" ), "",
+    QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ), "",
         qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)" ) );
     ui.fileEdit->setText( fileName );
     updateMRL();

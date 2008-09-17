@@ -34,7 +34,7 @@ PodcastConfigDialog::PodcastConfigDialog( QWidget *parent, intf_thread_t *_p_int
 {
     ui.setupUi( this );
 
-    ui.podcastDelete->setToolTip( qtr( "Delete the selected item" ) );
+    ui.podcastDelete->setToolTip( qtr( "Deletes the selected item" ) );
     QPushButton *okButton = new QPushButton( qtr( "&Close" ), this );
     QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ), this );
     ui.okCancel->addButton( okButton, QDialogButtonBox::AcceptRole );
