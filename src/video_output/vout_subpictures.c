@@ -38,6 +38,7 @@
 #include "../libvlc.h"
 
 #include <assert.h>
+#include <limits.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -664,6 +665,10 @@ static int spu_scale_h( int v, const spu_scale_t s )
 {
     return v * s.h / SCALE_UNIT;
 }
+static int spu_invscale_h( int v, const spu_scale_t s )
+{
+    return v * SCALE_UNIT / s.h;
+}
 
 /**
  * Place a region
@@ -673,10 +678,11 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
                             const subpicture_region_t *p_region,
                             int i_margin_y )
 {
-    int i_delta_x = p_region->i_x;
-    int i_delta_y = p_region->i_y;
+    const int i_delta_x = p_region->i_x;
+    const int i_delta_y = p_region->i_y;
     int i_x, i_y;
 
+    assert( p_region->i_x != INT_MAX && p_region->i_y != INT_MAX );
     if( p_region->i_align & SUBPICTURE_ALIGN_TOP )
     {
         i_y = i_delta_y;
@@ -709,28 +715,47 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
         i_y = i_delta_y;
     }
 
-    /* */
+    /* Margin shifts all subpictures */
     if( i_margin_y != 0 )
-    {
-        int i_diff = 0;
-        int i_low = i_y - i_margin_y;
-        int i_high = i_low + p_region->fmt.i_height;
+        i_y -= i_margin_y;
 
-        /* crop extra margin to keep within bounds */
-        if( i_low < 0 )
-            i_diff = i_low;
-        if( i_high > (int)p_subpic->i_original_picture_height )
-            i_diff = i_high - p_subpic->i_original_picture_height;
-        i_y -= i_margin_y + i_diff;
-    }
-
+    /* Clamp offset to not go out of the screen (when possible) */
+    const int i_error_x = (i_x + p_region->fmt.i_width) - p_subpic->i_original_picture_width;
+    if( i_error_x > 0 )
+        i_x -= i_error_x;
     if( i_x < 0 )
         i_x = 0;
+
+    const int i_error_y = (i_y + p_region->fmt.i_height) - p_subpic->i_original_picture_height;
+    if( i_error_y > 0 )
+        i_y -= i_error_y;
     if( i_y < 0 )
         i_y = 0;
 
     *pi_x = i_x;
     *pi_y = i_y;
+}
+
+/**
+ * This function computes the current alpha value for a given region.
+ */
+static int SpuRegionAlpha( subpicture_t *p_subpic, subpicture_region_t *p_region )
+{
+    /* Compute alpha blend value */
+    int i_fade_alpha = 255;
+    if( p_subpic->b_fade )
+    {
+        mtime_t i_fade_start = ( p_subpic->i_stop +
+                                 p_subpic->i_start ) / 2;
+        mtime_t i_now = mdate();
+
+        if( i_now >= i_fade_start && p_subpic->i_stop > i_fade_start )
+        {
+            i_fade_alpha = 255 * ( p_subpic->i_stop - i_now ) /
+                           ( p_subpic->i_stop - i_fade_start );
+        }
+    }
+    return i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025;
 }
 
 static void SpuRenderRegion( spu_t *p_spu,
@@ -742,7 +767,6 @@ static void SpuRenderRegion( spu_t *p_spu,
     video_format_t fmt_original;
     bool b_rerender_text;
     bool b_restore_format = false;
-    int i_fade_alpha;
     int i_x_offset;
     int i_y_offset;
     filter_t *p_scale;
@@ -770,10 +794,19 @@ static void SpuRenderRegion( spu_t *p_spu,
     const bool b_force_crop    = b_force_palette && p_spu->b_force_crop;
 
 
+    /* Compute the margin which is expressed in destination pixel unit
+     * The margin is applied only to subtitle and when no forced crop is
+     * requested (dvd menu) */
+    int i_margin_y = 0;
+    if( !b_force_crop && p_subpic->b_subtitle )
+        i_margin_y = spu_invscale_h( p_spu->i_margin, scale_size );
+
     /* Place the picture
      * We compute the position in the rendered size */
     SpuRegionPlace( &i_x_offset, &i_y_offset,
-                    p_subpic, p_region, !b_force_crop ? p_spu->i_margin : 0  );
+                    p_subpic, p_region, i_margin_y );
+
+    /* TODO save this position for subtitle overlap support */
 
     /* Fix the position for the current scale_size */
     i_x_offset = spu_scale_w( i_x_offset, scale_size );
@@ -800,6 +833,9 @@ static void SpuRenderRegion( spu_t *p_spu,
     {
         const unsigned i_dst_width  = spu_scale_w( p_region->fmt.i_width, scale_size );
         const unsigned i_dst_height = spu_scale_h( p_region->fmt.i_height, scale_size );
+
+        /* TODO when b_using_palette is true, we should first convert it to YUVA to allow
+         * a proper rescaling */
 
         /* Destroy if cache is unusable */
         if( p_region->p_cache )
@@ -850,8 +886,10 @@ static void SpuRenderRegion( spu_t *p_spu,
                 picture_Release( p_pic );
 
                 p_region->p_cache->fmt = p_scale->fmt_out.video;
-                p_region->p_cache->i_x = spu_scale_w( p_region->i_x, scale_size );
-                p_region->p_cache->i_y = spu_scale_h( p_region->i_y, scale_size );
+                /* i_x/i_y of cached region should NOT be used. I set them to
+                 * an invalid value to catch it (assert) */
+                p_region->p_cache->i_x = INT_MAX;
+                p_region->p_cache->i_y = INT_MAX;
                 p_region->p_cache->i_align = p_region->i_align;
                 p_region->p_cache->i_alpha = p_region->i_alpha;
             }
@@ -905,27 +943,10 @@ static void SpuRenderRegion( spu_t *p_spu,
             p_fmt->i_visible_width = i_x_end - i_x;
             p_fmt->i_visible_height = i_y_end - i_y;
 
-            i_x_offset = i_x;
-            i_y_offset = i_y;
+            i_x_offset = __MAX( i_x, 0 );
+            i_y_offset = __MAX( i_y, 0 );
         }
         b_restore_format = true;
-    }
-
-    i_x_offset = __MAX( i_x_offset, 0 );
-    i_y_offset = __MAX( i_y_offset, 0 );
-
-    /* Compute alpha blend value */
-    i_fade_alpha = 255;
-    if( p_subpic->b_fade )
-    {
-        mtime_t i_fade_start = ( p_subpic->i_stop +
-                                 p_subpic->i_start ) / 2;
-        mtime_t i_now = mdate();
-        if( i_now >= i_fade_start && p_subpic->i_stop > i_fade_start )
-        {
-            i_fade_alpha = 255 * ( p_subpic->i_stop - i_now ) /
-                           ( p_subpic->i_stop - i_fade_start );
-        }
     }
 
     /* Update the blender */
@@ -933,9 +954,10 @@ static void SpuRenderRegion( spu_t *p_spu,
 
     if( p_spu->p_blend->p_module )
     {
+        const int i_alpha = SpuRegionAlpha( p_subpic, p_region );
+
         p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
-            &p_region->picture, i_x_offset, i_y_offset,
-            i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025 );
+            &p_region->picture, i_x_offset, i_y_offset, i_alpha );
     }
     else
     {
