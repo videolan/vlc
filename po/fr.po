@@ -16502,7 +16502,7 @@ msgstr "Activez les notification automatiques de nouvelles version. Il se lance 
 
 #: modules/gui/qt4/qt4.cpp:107
 msgid "Number of days between two update checks"
-msgstr "Nombre d'images entre deux vérifications de mises à jour"
+msgstr "Nombre de jours entre deux vérifications de mises à jour"
 
 #: modules/gui/qt4/qt4.cpp:109
 msgid "Allow the volume to be set to 400%"
