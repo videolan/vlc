@@ -953,8 +953,8 @@ static void SpuRenderRegion( spu_t *p_spu,
     }
 
     /* Fix the position for the current scale_size */
-    i_x_offset = spu_scale_w( p_area->i_x, scale_size );
-    i_y_offset = spu_scale_h( p_area->i_y, scale_size );
+    i_x_offset = spu_scale_w( p_area->i_x, p_area->scale );
+    i_y_offset = spu_scale_h( p_area->i_y, p_area->scale );
 
     if( b_force_palette )
     {
@@ -1145,6 +1145,8 @@ void spu_RenderSubpictures( spu_t *p_spu,
 
     subpicture_t *p_subpic;
 
+    int i_pass;
+
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
@@ -1194,13 +1196,29 @@ void spu_RenderSubpictures( spu_t *p_spu,
     if( !p_spu->p_blend )
         SpuRenderCreateBlend( p_spu, p_fmt_dst->i_chroma, p_fmt_dst->i_aspect );
 
-    /* */
-    for( p_subpic = p_subpic_list; ; p_subpic = p_subpic->p_next )
+
+    /* Process all subpictures and regions
+     * We do two pass:
+     *   1. all absolute pictures
+     *   2. not yet absolute subtitle pictures
+     * The order is important to correctly move the non absolute picture.
+     */
+    for( i_pass = 0, p_subpic = p_subpic_list; ; p_subpic = p_subpic->p_next )
     {
         subpicture_region_t *p_region;
 
         if( !p_subpic || p_subpic->i_status == FREE_SUBPICTURE )
-            break;
+        {
+            i_pass++;
+            if( i_pass >= 2 )
+                break;
+            p_subpic = p_subpic_list;
+            assert( p_subpic && p_subpic->i_status != FREE_SUBPICTURE );
+        }
+
+        if( ( i_pass == 0 && !p_subpic->b_absolute ) ||
+            ( i_pass == 1 &&  p_subpic->b_absolute ) )
+            continue;
 
         if( !p_subpic->p_region )
             continue;
@@ -1264,10 +1282,14 @@ void spu_RenderSubpictures( spu_t *p_spu,
                 p_region->fmt.i_sar_den / p_fmt_dst->i_sar_num;
         }
 
-        /* Render all regions */
+        /* Render all regions
+         * We always transform non absolute subtitle into absolute one on the
+         * first rendering to allow good subtitle overlap support.
+         */
         for( p_region = p_subpic->p_region; p_region != NULL; p_region = p_region->p_next )
         {
             spu_area_t area;
+
             /* Check scale validity */
             if( scale.w <= 0 || scale.h <= 0 )
                 continue;
@@ -1279,10 +1301,18 @@ void spu_RenderSubpictures( spu_t *p_spu,
 
             if( p_subpic->b_subtitle )
             {
+                area = spu_area_unscaled( area, scale );
+                if( !p_subpic->b_absolute && area.i_width > 0 && area.i_height > 0 )
+                {
+                    p_region->i_x = area.i_x;
+                    p_region->i_y = area.i_y;
+                }
                 if( p_subtitle_area )
                     p_subtitle_area[i_subtitle_area++] = area;
             }
         }
+        if( p_subpic->b_subtitle )
+            p_subpic->b_absolute = true;
     }
 
     /* */
