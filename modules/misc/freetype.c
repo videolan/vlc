@@ -1726,10 +1726,9 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
                     glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
         if( line.xMax > (int)p_filter->fmt_out.video.i_visible_width - 20 )
         {
-            while( --i > *pi_start )
-            {
+            for( ; i >= *pi_start; i-- )
                 FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
-            }
+            i = *pi_start;
 
             while( psz_unicode > psz_unicode_start && *psz_unicode != ' ' )
             {
@@ -1753,8 +1752,6 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
                 p_result->x = __MAX( p_result->x, line.xMax );
                 p_result->y = __MAX( p_result->y, __MAX( p_line->i_height,
                                                          i_yMax - i_yMin ) );
-
-                *pi_start = i;
                 return VLC_SUCCESS;
             }
             else
