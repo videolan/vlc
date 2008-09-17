@@ -84,8 +84,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* init of p_sys */
     p_sys->i_align = 0;
-    p_sys->i_original_height = -1;
-    p_sys->i_original_width = -1;
+    p_sys->i_original_height = 0;
+    p_sys->i_original_width = 0;
     TAB_INIT( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
     TAB_INIT( p_sys->i_images, p_sys->pp_images );
 
