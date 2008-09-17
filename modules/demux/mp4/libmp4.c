@@ -2885,7 +2885,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
                           MP4_Box_t *p_box, const char *psz_fmt, va_list args)
 {
     char *psz_dup;
-    char    *psz_path;
+    char *psz_path;
 
     if( !p_box )
     {
@@ -2898,7 +2898,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
 
     if( !psz_path || !psz_path[0] )
     {
-        FREENULL( psz_path );
+        free( psz_path );
         *pp_result = NULL;
         return;
     }
@@ -2915,7 +2915,6 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
 //                 psz_path,psz_token,i_number );
         if( !psz_token )
         {
-            FREENULL( psz_token );
             free( psz_dup );
             *pp_result = p_box;
             return;
