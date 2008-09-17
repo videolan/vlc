@@ -9,6 +9,10 @@
 
 #include "denormals.h"
 
+/**
+* Combination filter
+*Takes multiple audio channels and mix them for one ear
+*/
 class comb
 {
 public:
@@ -35,25 +39,20 @@ private:
 
 inline float comb::process(float input)
 {
-
-#if 1
-    /* FIXME FIXME FIXME
-     * comb::process is completly broken so ignore it for now */
-    return 0.0;
-
-#else
+/* FIXME
+* comb::process is not really ear-friendly the tunning values must
+* be changed*/
     float output;
 
     output = undenormalise( buffer[bufidx] );
 
-    filterstore = undenormalise( output*damp2 + filterstore*damp1 );
+    filterstore = undenormalise(output*damp2);
 
     buffer[bufidx] = input + filterstore*feedback;
 
     if(++bufidx>=bufsize) bufidx = 0;
 
     return output;
-#endif
 }
 
 #endif //_comb_

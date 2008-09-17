@@ -1,5 +1,5 @@
 /*****************************************************************************
- * spatializer.cpp:
+ * spatializer.cpp: sound reverberation
  *****************************************************************************
  * Copyright (C) 2004, 2006, 2007 the VideoLAN team
  *
@@ -45,6 +45,22 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define ROOMSIZE_TEXT N_("Room size")
+#define ROOMSIZE_LONGTEXT N_("Defines the virtual surface of the room" \
+                                "emulated by the filter." )
+
+#define WIDTH_TEXT N_("Room width")
+#define WIDTH_LONGTEXT N_("Width of the virtual room")
+
+#define WET_TEXT N_("")
+#define WET_LONGTEXT N_("")
+
+#define DRY_TEXT N_("")
+#define DRY_LONGTEXT N_("")
+
+#define DAMP_TEXT N_("")
+#define DAMP_LONGTEXT N_("")
+
 vlc_module_begin();
     set_description( N_("spatializer") );
     set_shortname( N_("spatializer" ) );
@@ -54,11 +70,11 @@ vlc_module_begin();
 
     set_callbacks( Open, Close );
     add_shortcut( "spatializer" );
-    add_float( "Roomsize", 1.05, NULL, NULL,NULL, true);
-    add_float( "Width", 10.0, NULL, NULL,NULL, true);
-    add_float( "Wet", 3.0, NULL, NULL,NULL, true);
-    add_float( "Dry", 2.0, NULL, NULL,NULL, true);
-    add_float( "Damp", 1.0, NULL, NULL,NULL, true);
+    add_float( "Roomsize", 1.05, NULL, ROOMSIZE_TEXT,ROOMSIZE_LONGTEXT, true);
+    add_float( "Width", 10.0, NULL, WIDTH_TEXT,WIDTH_LONGTEXT, true);
+    add_float( "Wet", 3.0, NULL, WET_TEXT,WET_LONGTEXT, true);
+    add_float( "Dry", 2.0, NULL, DRY_TEXT,DRY_LONGTEXT, true);
+    add_float( "Damp", 1.0, NULL, DAMP_TEXT,DAMP_LONGTEXT, true);
 vlc_module_end();
 
 /*****************************************************************************
@@ -173,8 +189,6 @@ static void Close( vlc_object_t *p_this )
 
 /*****************************************************************************
  * DoWork: process samples buffer
- *****************************************************************************
- *
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
@@ -254,6 +268,10 @@ static void SpatClean( aout_filter_t *p_filter )
     var_DelCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
     var_DelCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
 }
+
+/*****************************************************************************
+ * Variables callbacks
+ *****************************************************************************/
 
 static int RoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )

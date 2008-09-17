@@ -80,6 +80,13 @@ void revmodel::mute()
     }
 }
 
+/*****************************************************************************
+ *  Transforms the audio stream
+ * /param float *inputL     input buffer
+ * /param float *outputL   output buffer
+ * /param long numsamples  number of samples to be processed
+ * /param int skip             number of channels in the audio stream
+ *****************************************************************************/
 void revmodel::processreplace(float *inputL, float *outputL, long numsamples, int skip)
 {
     float outL,outR,input;
@@ -87,6 +94,7 @@ void revmodel::processreplace(float *inputL, float *outputL, long numsamples, in
     int i;
 
     outL = outR = 0;
+        /* TODO this module supports only 2 audio channels, let's improve this */
         if (skip > 1)
            inputR = inputL[1];
         else
