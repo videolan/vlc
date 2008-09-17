@@ -1085,7 +1085,6 @@ ifdef HAVE_DARWIN_OS_ON_INTEL
 endif
 ifdef HAVE_DARWIN_OS
 	(cd $@/libswscale; patch -p0 < ../../Patches/ffmpeg-fix-noaltivec.patch)
-	(cd $@/libswscale; patch -p0 < ../../Patches/ffmpeg-libswscale-head.patch)
 endif
 ifdef NO_TEXT_RELOCATION
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-mmx_removal-darwin9.patch)
@@ -1106,7 +1105,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
 endif
 
 
-FFMPEGCONF = --enable-gpl --enable-postproc --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --disable-devices --disable-protocols --disable-network --disable-filters
+FFMPEGCONF = --enable-gpl --enable-postproc --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --disable-devices --disable-protocols --disable-network --enable-swscale
 
 ifdef HAVE_WINCE
 .ffmpeg: ffmpeg .zlib
