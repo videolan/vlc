@@ -118,11 +118,15 @@ void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
 {
     p_gc->pf_destructor = pf_destruct;
 
+    p_gc->refs = 1;
+#ifdef __GNUC__
+    __sync_synchronize ();
+#else
     /* Nobody else can possibly lock the spin - it's there as a barrier */
     vlc_spin_init (&p_gc->spin);
     vlc_spin_lock (&p_gc->spin);
-    p_gc->refs = 1;
     vlc_spin_unlock (&p_gc->spin);
+#endif
     return p_gc;
 }
 
@@ -133,12 +137,17 @@ void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
  */
 void *vlc_hold (gc_object_t * p_gc)
 {
+    uintptr_t refs;
     assert( p_gc );
 
+#ifdef __GNUC__
+    refs = __sync_fetch_and_add (&p_gc->refs, 1);
+#else
     vlc_spin_lock (&p_gc->spin);
-    assert (p_gc->refs > 0);
-    p_gc->refs++;
+    refs = p_gc->refs++;
     vlc_spin_unlock (&p_gc->spin);
+#endif
+    assert (refs > 0);
     return p_gc;
 }
 
@@ -148,15 +157,20 @@ void *vlc_hold (gc_object_t * p_gc)
  */
 void vlc_release (gc_object_t *p_gc)
 {
-    bool dead;
+    unsigned refs;
 
     assert( p_gc );
-    vlc_spin_lock (&p_gc->spin);
-    assert (p_gc->refs > 0);
-    dead = !--p_gc->refs;
-    vlc_spin_unlock (&p_gc->spin);
 
-    if (dead)
+#ifdef __GNUC__
+    refs = __sync_fetch_and_sub (&p_gc->refs, 1);
+#else
+    vlc_spin_lock (&p_gc->spin);
+    refs = p_gc->refs--;
+    vlc_spin_unlock (&p_gc->spin);
+#endif
+
+    assert (refs > 0);
+    if (refs == 1)
     {
         vlc_spin_destroy (&p_gc->spin);
         p_gc->pf_destructor (p_gc);
