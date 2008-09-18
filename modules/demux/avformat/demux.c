@@ -377,6 +377,10 @@ static int Demux( demux_t *p_demux )
         0 : (pkt.pts) * 1000000 *
         p_sys->ic->streams[pkt.stream_index]->time_base.num /
         p_sys->ic->streams[pkt.stream_index]->time_base.den - i_start_time;
+    if( pkt.duration > 0 )
+        p_frame->i_length = pkt.duration * 1000000 *
+            p_sys->ic->streams[pkt.stream_index]->time_base.num /
+            p_sys->ic->streams[pkt.stream_index]->time_base.den - i_start_time;
 
 #ifdef AVFORMAT_DEBUG
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
