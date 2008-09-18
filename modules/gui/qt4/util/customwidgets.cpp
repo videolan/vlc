@@ -127,6 +127,7 @@ int qtEventToVLCKey( QKeyEvent *e )
         HANDLE( Key_Down, KEY_DOWN );
         HANDLE( Key_Space, KEY_SPACE );
         HANDLE( Key_Escape, KEY_ESC );
+        HANDLE( Key_Return, KEY_ENTER );
         HANDLE( Key_Enter, KEY_ENTER );
         HANDLE( Key_F1, KEY_F1 );
         HANDLE( Key_F2, KEY_F2 );
