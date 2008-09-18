@@ -14,6 +14,10 @@ do
   printf "."
   dir="$1"
   modf="modules/${dir}/Modules.am"
+  if ! test -f "$modf"; then
+    echo "$modf does not exist!" >&2
+    exit 1
+  fi
   makf="modules/${dir}/Makefile.am"
   basedir="`echo "${dir}" | cut -f1 -d/`"
   mods="`sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < "${modf}" | sort | uniq | xargs`"
