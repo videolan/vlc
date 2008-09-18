@@ -1032,6 +1032,23 @@ static const struct
     { VLC_FOURCC('d','a','u','d'), CODEC_ID_PCM_S24DAUD,
       AUDIO_ES, "PCM ULAW" },
 
+    /* Subtitle streams */
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(41<<8)+0)
+    /* Before this version, subs were too experimental */
+    { VLC_FOURCC('s','p','u',' '), CODEC_ID_DVD_SUBTITLE,
+      SPU_ES, "DVD Subtitles" },
+    { VLC_FOURCC('d','v','b','s'), CODEC_ID_DVB_SUBTITLE,
+      SPU_ES, "DVB Subtitles" },
+    { VLC_FOURCC('s','u','b','t'), CODEC_ID_TEXT,
+      SPU_ES, "Plain text subtitles" },
+    { VLC_FOURCC('x','s','u','b'), CODEC_ID_XSUB,
+      SPU_ES, "DivX XSUB subtitles" },
+#endif
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(50<<8)+0)
+    { VLC_FOURCC('s','s','a',' '), CODEC_ID_SSA,
+      SPU_ES, "SubStation Alpha subtitles" },
+#endif
+
     { 0, 0, 0, 0 }
 };
 
