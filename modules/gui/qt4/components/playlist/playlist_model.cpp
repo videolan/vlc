@@ -851,6 +851,7 @@ void PLModel::viewchanged( int meta )
         {
             beginRemoveColumns( parent, index, index+1 );
             rootItem->i_showflags &= ~( meta );
+            getSettings()->setValue( "qt-pl-showflags", rootItem->i_showflags );
             rootItem->updateColumnHeaders();
             endRemoveColumns();
         }
@@ -859,6 +860,7 @@ void PLModel::viewchanged( int meta )
             /* Adding columns */
             beginInsertColumns( parent, index, index+1 );
             rootItem->i_showflags |= meta;
+            getSettings()->setValue( "qt-pl-showflags", rootItem->i_showflags );
             rootItem->updateColumnHeaders();
             endInsertColumns();
         }
