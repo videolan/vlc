@@ -223,7 +223,6 @@
 		8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = prefs_widgets.h; path = ../../../modules/gui/macosx/prefs_widgets.h; sourceTree = SOURCE_ROOT; };
 		8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs_widgets.m; path = ../../../modules/gui/macosx/prefs_widgets.m; sourceTree = SOURCE_ROOT; };
 		8E9CA1A506D7DEE800B7186C /* voutgl.m */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.objc; name = voutgl.m; path = ../../../modules/gui/macosx/voutgl.m; sourceTree = SOURCE_ROOT; };
-		8E9CA1A606D7DEE800B7186C /* voutqt.m */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.objc; name = voutqt.m; path = ../../../modules/gui/macosx/voutqt.m; sourceTree = SOURCE_ROOT; };
 		8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text; name = vlc.scriptSuite; path = Resources/vlc.scriptSuite; sourceTree = SOURCE_ROOT; };
 		8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = vlc.scriptTerminology; path = Resources/vlc.scriptTerminology; sourceTree = SOURCE_ROOT; };
 		8ED6C27B03E2EB1C0059A3A7 /* controls.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = controls.m; path = ../../../modules/gui/macosx/controls.m; sourceTree = SOURCE_ROOT; };
@@ -463,7 +462,6 @@
 				8ED6C28703E2EB1C0059A3A7 /* vout.h */,
 				8ED6C28803E2EB1C0059A3A7 /* vout.m */,
 				8E9CA1A506D7DEE800B7186C /* voutgl.m */,
-				8E9CA1A606D7DEE800B7186C /* voutqt.m */,
 				DC769AB8085DF0DB001A838D /* wizard.h */,
 				DC769AB7085DF0DB001A838D /* wizard.m */,
 				DC7F46F008A187F60027DB24 /* extended.h */,
