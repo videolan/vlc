@@ -636,9 +636,9 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     /* Play */
     playButton = new QPushButton;
     playButton->setSizePolicy( sizePolicy );
-    playButton->setMaximumSize( QSize( 36, 36 ) );
-    playButton->setMinimumSize( QSize( 36, 36 ) );
-    playButton->setIconSize( QSize( 30, 30 ) );
+    playButton->setMaximumSize( QSize( 32, 32 ) );
+    playButton->setMinimumSize( QSize( 32, 32 ) );
+    playButton->setIconSize( QSize( 26, 26 ) );
     playButton->setFocusPolicy( Qt::NoFocus );
 
     /** Prev + Stop + Next Block **/
@@ -1024,7 +1024,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     /* First line */
     slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);
-    slider->setMinimumWidth( 220 );
+    slider->setMinimumWidth( 300 );
     fsLayout->addWidget( slowerButton, 0, 0 );
     fsLayout->addWidget( slider, 0, 1, 1, 9 );
     fsLayout->addWidget( fasterButton, 0, 10 );
