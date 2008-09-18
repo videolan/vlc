@@ -214,22 +214,6 @@ int OpenDemux( vlc_object_t *p_this )
         if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
 
-#ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
-        if( cc->codec_type == CODEC_TYPE_ATTACHMENT )
-        {
-            input_attachment_t *p_attachment;
-            psz_type = "attachment";
-            if( cc->codec_id == CODEC_ID_TTF )
-            {
-                p_attachment = vlc_input_attachment_New( p_sys->ic->streams[i]->filename, "application/x-truetype-font", NULL,
-                                             cc->extradata, (int)cc->extradata_size );
-                TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
-            }
-            else msg_Warn( p_demux, "unsupported attachment type in ffmpeg demux" );
-        }
-        continue; /* Not a real track. nothing left to do here */
-#endif
-
         switch( cc->codec_type )
         {
         case CODEC_TYPE_AUDIO:
@@ -277,6 +261,22 @@ int OpenDemux( vlc_object_t *p_this )
 
         default:
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
+#ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
+            if( cc->codec_type == CODEC_TYPE_ATTACHMENT )
+            {
+                input_attachment_t *p_attachment;
+                psz_type = "attachment";
+                if( cc->codec_id == CODEC_ID_TTF )
+                {
+                    p_attachment = vlc_input_attachment_New( p_sys->ic->streams[i]->filename, "application/x-truetype-font", NULL,
+                                             cc->extradata, (int)cc->extradata_size );
+                    TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
+                }
+                else msg_Warn( p_demux, "unsupported attachment type in ffmpeg demux" );
+            }
+            break;
+#endif
+
             if( cc->codec_type == CODEC_TYPE_DATA )
                 psz_type = "data";
 
@@ -284,8 +284,14 @@ int OpenDemux( vlc_object_t *p_this )
             break;
         }
         fmt.psz_language = strdup( p_sys->ic->streams[i]->language );
-        fmt.i_extra = cc->extradata_size;
-        fmt.p_extra = cc->extradata;
+
+#ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
+        if( cc->codec_type != CODEC_TYPE_ATTACHMENT )
+#endif
+        {
+            fmt.i_extra = cc->extradata_size;
+            fmt.p_extra = cc->extradata;
+        }
         es = es_out_Add( p_demux->out, &fmt );
 
         msg_Dbg( p_demux, "adding es: %s codec = %4.4s",
