@@ -82,8 +82,13 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_TYPE_MASK \
     (BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B|BLOCK_FLAG_TYPE_PB)
 
-#define BLOCK_FLAG_PRIVATE_MASK  0xffff0000
-#define BLOCK_FLAG_PRIVATE_SHIFT 16
+/* These are for input core private usage only */
+#define BLOCK_FLAG_CORE_PRIVATE_MASK  0x00ff0000
+#define BLOCK_FLAG_CORE_PRIVATE_SHIFT 16
+
+/* These are for module private usage only */
+#define BLOCK_FLAG_PRIVATE_MASK  0xff000000
+#define BLOCK_FLAG_PRIVATE_SHIFT 24
 
 typedef void (*block_free_t) (block_t *);
 
