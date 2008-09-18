@@ -2,39 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>IBDocumentLocation</key>
-	<string>48 424 356 240 0 0 1280 778 </string>
-	<key>IBEditorPositions</key>
-	<dict>
-		<key>2311</key>
-		<string>345 425 590 230 0 0 1280 778 </string>
-		<key>2330</key>
-		<string>345 221 590 502 0 0 1280 778 </string>
-		<key>2440</key>
-		<string>345 307 590 389 0 0 1280 778 </string>
-		<key>2523</key>
-		<string>345 348 590 343 0 0 1280 778 </string>
-		<key>2562</key>
-		<string>345 219 590 505 0 0 1280 778 </string>
-		<key>2668</key>
-		<string>345 255 590 457 0 0 1280 778 </string>
-	</dict>
 	<key>IBFramework Version</key>
-	<string>489.0</string>
+	<string>644</string>
 	<key>IBLastKnownRelativeProjectPath</key>
 	<string>../../vlc.xcodeproj</string>
 	<key>IBOldestOS</key>
 	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
+		<integer>1530</integer>
 		<integer>2677</integer>
 		<integer>2330</integer>
-		<integer>2668</integer>
-		<integer>2523</integer>
-		<integer>1530</integer>
-		<integer>2562</integer>
-		<integer>2265</integer>
 		<integer>2311</integer>
+		<integer>2562</integer>
+		<integer>2537</integer>
+		<integer>2265</integer>
+		<integer>2668</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9E17</string>

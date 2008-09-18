@@ -193,6 +193,7 @@
 
 /* OSD / subtitles */
 - (IBAction)osdSettingChanged:(id)sender;
+- (IBAction)showFontPicker:(id)sender;
 - (void)showOSDSettings;
 
 /* input & codecs */

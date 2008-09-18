@@ -1,169 +1,327 @@
-{
-    IBClasses =     (
-                {
-            CLASS = FirstResponder;
-            LANGUAGE = ObjC;
-            SUPERCLASS = NSObject;
-        },
-                {
-            CLASS = NSApplication;
-            LANGUAGE = ObjC;
-            SUPERCLASS = NSResponder;
-        },
-                {
-            CLASS = NSObject;
-            LANGUAGE = ObjC;
-        },
-                {
-            CLASS = VLCHotkeyChangeWindow;
-            LANGUAGE = ObjC;
-            SUPERCLASS = NSWindow;
-        },
-                {
-            ACTIONS =             {
-                buttonAction = id;
-                closePrefs = id;
-                resetAll = id;
-                savePrefs = id;
-            };
-            CLASS = VLCPrefs;
-            LANGUAGE = ObjC;
-            OUTLETS =             {
-                "o_basicFull_matrix" = id;
-                "o_cancel_btn" = id;
-                "o_prefs_view" = id;
-                "o_prefs_window" = id;
-                "o_reset_btn" = id;
-                "o_save_btn" = id;
-                "o_title" = id;
-                "o_tree" = id;
-            };
-            SUPERCLASS = NSObject;
-        },
-                {
-            ACTIONS =             {
-                audioSettingChanged = id;
-                buttonAction = id;
-                hotkeySettingChanged = id;
-                inputSettingChanged = id;
-                interfaceSettingChanged = id;
-                osdSettingChanged = id;
-                videoSettingChanged = id;
-            };
-            CLASS = VLCSimplePrefs;
-            LANGUAGE = ObjC;
-            OUTLETS =             {
-                "o_audio_dolby_pop" = id;
-                "o_audio_dolby_txt" = id;
-                "o_audio_effects_box" = id;
-                "o_audio_enable_ckb" = id;
-                "o_audio_general_box" = id;
-                "o_audio_headphone_ckb" = id;
-                "o_audio_lang_fld" = id;
-                "o_audio_lang_txt" = id;
-                "o_audio_last_box" = id;
-                "o_audio_last_ckb" = id;
-                "o_audio_lastpwd_sfld" = id;
-                "o_audio_lastpwd_txt" = id;
-                "o_audio_lastuser_fld" = id;
-                "o_audio_lastuser_txt" = id;
-                "o_audio_norm_ckb" = id;
-                "o_audio_norm_fld" = id;
-                "o_audio_spdif_ckb" = id;
-                "o_audio_view" = id;
-                "o_audio_visual_pop" = id;
-                "o_audio_visual_txt" = id;
-                "o_audio_vol_fld" = id;
-                "o_audio_vol_sld" = id;
-                "o_audio_vol_txt" = id;
-                "o_hotkeys_change_btn" = id;
-                "o_hotkeys_change_cancel_btn" = id;
-                "o_hotkeys_change_keys_lbl" = id;
-                "o_hotkeys_change_lbl" = id;
-                "o_hotkeys_change_ok_btn" = id;
-                "o_hotkeys_change_taken_lbl" = id;
-                "o_hotkeys_change_win" = id;
-                "o_hotkeys_clear_btn" = id;
-                "o_hotkeys_lbl" = id;
-                "o_hotkeys_listbox" = id;
-                "o_hotkeys_view" = id;
-                "o_input_access_box" = id;
-                "o_input_avi_pop" = id;
-                "o_input_avi_txt" = id;
-                "o_input_bandwidth_ckb" = id;
-                "o_input_cachelevel_custom_txt" = id;
-                "o_input_cachelevel_pop" = id;
-                "o_input_cachelevel_txt" = id;
-                "o_input_caching_box" = id;
-                "o_input_dump_ckb" = id;
-                "o_input_httpproxy_fld" = id;
-                "o_input_httpproxy_txt" = id;
-                "o_input_httpproxypwd_sfld" = id;
-                "o_input_httpproxypwd_txt" = id;
-                "o_input_mux_box" = id;
-                "o_input_net_box" = id;
-                "o_input_postproc_fld" = id;
-                "o_input_postproc_txt" = id;
-                "o_input_record_ckb" = id;
-                "o_input_rtsp_ckb" = id;
-                "o_input_serverport_fld" = id;
-                "o_input_serverport_txt" = id;
-                "o_input_timeshift_ckb" = id;
-                "o_input_view" = id;
-                "o_intf_art_pop" = id;
-                "o_intf_art_txt" = id;
-                "o_intf_embedded_ckb" = id;
-                "o_intf_fspanel_ckb" = id;
-                "o_intf_lang_pop" = id;
-                "o_intf_lang_txt" = id;
-                "o_intf_network_box" = id;
-                "o_intf_view" = id;
-                "o_osd_encoding_pop" = id;
-                "o_osd_encoding_txt" = id;
-                "o_osd_font_box" = id;
-                "o_osd_font_btn" = id;
-                "o_osd_font_color_pop" = id;
-                "o_osd_font_color_txt" = id;
-                "o_osd_font_fld" = id;
-                "o_osd_font_size_pop" = id;
-                "o_osd_font_size_txt" = id;
-                "o_osd_font_txt" = id;
-                "o_osd_lang_box" = id;
-                "o_osd_lang_fld" = id;
-                "o_osd_lang_txt" = id;
-                "o_osd_osd_box" = id;
-                "o_osd_osd_ckb" = id;
-                "o_osd_view" = id;
-                "o_sprefs_basicFull_matrix" = id;
-                "o_sprefs_basic_box" = id;
-                "o_sprefs_cancel_btn" = id;
-                "o_sprefs_controls_box" = id;
-                "o_sprefs_reset_btn" = id;
-                "o_sprefs_save_btn" = id;
-                "o_sprefs_win" = id;
-                "o_video_black_ckb" = id;
-                "o_video_device_pop" = id;
-                "o_video_device_txt" = id;
-                "o_video_display_box" = id;
-                "o_video_enable_ckb" = id;
-                "o_video_fullscreen_ckb" = id;
-                "o_video_onTop_ckb" = id;
-                "o_video_output_pop" = id;
-                "o_video_output_txt" = id;
-                "o_video_skipFrames_ckb" = id;
-                "o_video_snap_box" = id;
-                "o_video_snap_folder_btn" = id;
-                "o_video_snap_folder_fld" = id;
-                "o_video_snap_folder_txt" = id;
-                "o_video_snap_format_pop" = id;
-                "o_video_snap_format_txt" = id;
-                "o_video_snap_prefix_fld" = id;
-                "o_video_snap_prefix_txt" = id;
-                "o_video_snap_seqnum_ckb" = id;
-                "o_video_view" = id;
-            };
-            SUPERCLASS = NSObject;
-        }
-    );
-    IBVersion = 1;
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCHotkeyChangeWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>audioSettingChanged</key>
+				<string>id</string>
+				<key>buttonAction</key>
+				<string>id</string>
+				<key>hotkeySettingChanged</key>
+				<string>id</string>
+				<key>inputSettingChanged</key>
+				<string>id</string>
+				<key>interfaceSettingChanged</key>
+				<string>id</string>
+				<key>osdSettingChanged</key>
+				<string>id</string>
+				<key>showFontPicker</key>
+				<string>id</string>
+				<key>videoSettingChanged</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>VLCSimplePrefs</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_audio_dolby_pop</key>
+				<string>id</string>
+				<key>o_audio_dolby_txt</key>
+				<string>id</string>
+				<key>o_audio_effects_box</key>
+				<string>id</string>
+				<key>o_audio_enable_ckb</key>
+				<string>id</string>
+				<key>o_audio_general_box</key>
+				<string>id</string>
+				<key>o_audio_headphone_ckb</key>
+				<string>id</string>
+				<key>o_audio_lang_fld</key>
+				<string>id</string>
+				<key>o_audio_lang_txt</key>
+				<string>id</string>
+				<key>o_audio_last_box</key>
+				<string>id</string>
+				<key>o_audio_last_ckb</key>
+				<string>id</string>
+				<key>o_audio_lastpwd_sfld</key>
+				<string>id</string>
+				<key>o_audio_lastpwd_txt</key>
+				<string>id</string>
+				<key>o_audio_lastuser_fld</key>
+				<string>id</string>
+				<key>o_audio_lastuser_txt</key>
+				<string>id</string>
+				<key>o_audio_norm_ckb</key>
+				<string>id</string>
+				<key>o_audio_norm_fld</key>
+				<string>id</string>
+				<key>o_audio_spdif_ckb</key>
+				<string>id</string>
+				<key>o_audio_view</key>
+				<string>id</string>
+				<key>o_audio_visual_pop</key>
+				<string>id</string>
+				<key>o_audio_visual_txt</key>
+				<string>id</string>
+				<key>o_audio_vol_fld</key>
+				<string>id</string>
+				<key>o_audio_vol_sld</key>
+				<string>id</string>
+				<key>o_audio_vol_txt</key>
+				<string>id</string>
+				<key>o_currentlyShownCategoryView</key>
+				<string>id</string>
+				<key>o_hotkeys_change_btn</key>
+				<string>id</string>
+				<key>o_hotkeys_change_cancel_btn</key>
+				<string>id</string>
+				<key>o_hotkeys_change_keys_lbl</key>
+				<string>id</string>
+				<key>o_hotkeys_change_lbl</key>
+				<string>id</string>
+				<key>o_hotkeys_change_ok_btn</key>
+				<string>id</string>
+				<key>o_hotkeys_change_taken_lbl</key>
+				<string>id</string>
+				<key>o_hotkeys_change_win</key>
+				<string>id</string>
+				<key>o_hotkeys_clear_btn</key>
+				<string>id</string>
+				<key>o_hotkeys_lbl</key>
+				<string>id</string>
+				<key>o_hotkeys_listbox</key>
+				<string>id</string>
+				<key>o_hotkeys_view</key>
+				<string>id</string>
+				<key>o_input_access_box</key>
+				<string>id</string>
+				<key>o_input_avi_pop</key>
+				<string>id</string>
+				<key>o_input_avi_txt</key>
+				<string>id</string>
+				<key>o_input_bandwidth_ckb</key>
+				<string>id</string>
+				<key>o_input_cachelevel_custom_txt</key>
+				<string>id</string>
+				<key>o_input_cachelevel_pop</key>
+				<string>id</string>
+				<key>o_input_cachelevel_txt</key>
+				<string>id</string>
+				<key>o_input_caching_box</key>
+				<string>id</string>
+				<key>o_input_dump_ckb</key>
+				<string>id</string>
+				<key>o_input_httpproxy_fld</key>
+				<string>id</string>
+				<key>o_input_httpproxy_txt</key>
+				<string>id</string>
+				<key>o_input_httpproxypwd_sfld</key>
+				<string>id</string>
+				<key>o_input_httpproxypwd_txt</key>
+				<string>id</string>
+				<key>o_input_mux_box</key>
+				<string>id</string>
+				<key>o_input_net_box</key>
+				<string>id</string>
+				<key>o_input_postproc_fld</key>
+				<string>id</string>
+				<key>o_input_postproc_txt</key>
+				<string>id</string>
+				<key>o_input_record_ckb</key>
+				<string>id</string>
+				<key>o_input_rtsp_ckb</key>
+				<string>id</string>
+				<key>o_input_serverport_fld</key>
+				<string>id</string>
+				<key>o_input_serverport_txt</key>
+				<string>id</string>
+				<key>o_input_timeshift_ckb</key>
+				<string>id</string>
+				<key>o_input_view</key>
+				<string>id</string>
+				<key>o_intf_art_pop</key>
+				<string>id</string>
+				<key>o_intf_art_txt</key>
+				<string>id</string>
+				<key>o_intf_embedded_ckb</key>
+				<string>id</string>
+				<key>o_intf_fspanel_ckb</key>
+				<string>id</string>
+				<key>o_intf_lang_pop</key>
+				<string>id</string>
+				<key>o_intf_lang_txt</key>
+				<string>id</string>
+				<key>o_intf_network_box</key>
+				<string>id</string>
+				<key>o_intf_view</key>
+				<string>id</string>
+				<key>o_osd_encoding_pop</key>
+				<string>id</string>
+				<key>o_osd_encoding_txt</key>
+				<string>id</string>
+				<key>o_osd_font_box</key>
+				<string>id</string>
+				<key>o_osd_font_btn</key>
+				<string>id</string>
+				<key>o_osd_font_color_pop</key>
+				<string>id</string>
+				<key>o_osd_font_color_txt</key>
+				<string>id</string>
+				<key>o_osd_font_fld</key>
+				<string>id</string>
+				<key>o_osd_font_size_pop</key>
+				<string>id</string>
+				<key>o_osd_font_size_txt</key>
+				<string>id</string>
+				<key>o_osd_font_txt</key>
+				<string>id</string>
+				<key>o_osd_lang_box</key>
+				<string>id</string>
+				<key>o_osd_lang_fld</key>
+				<string>id</string>
+				<key>o_osd_lang_txt</key>
+				<string>id</string>
+				<key>o_osd_osd_box</key>
+				<string>id</string>
+				<key>o_osd_osd_ckb</key>
+				<string>id</string>
+				<key>o_osd_view</key>
+				<string>id</string>
+				<key>o_sprefs_basicFull_matrix</key>
+				<string>id</string>
+				<key>o_sprefs_basic_box</key>
+				<string>id</string>
+				<key>o_sprefs_cancel_btn</key>
+				<string>id</string>
+				<key>o_sprefs_controls_box</key>
+				<string>id</string>
+				<key>o_sprefs_reset_btn</key>
+				<string>id</string>
+				<key>o_sprefs_save_btn</key>
+				<string>id</string>
+				<key>o_sprefs_win</key>
+				<string>id</string>
+				<key>o_video_black_ckb</key>
+				<string>id</string>
+				<key>o_video_device_pop</key>
+				<string>id</string>
+				<key>o_video_device_txt</key>
+				<string>id</string>
+				<key>o_video_display_box</key>
+				<string>id</string>
+				<key>o_video_enable_ckb</key>
+				<string>id</string>
+				<key>o_video_fullscreen_ckb</key>
+				<string>id</string>
+				<key>o_video_onTop_ckb</key>
+				<string>id</string>
+				<key>o_video_output_pop</key>
+				<string>id</string>
+				<key>o_video_output_txt</key>
+				<string>id</string>
+				<key>o_video_skipFrames_ckb</key>
+				<string>id</string>
+				<key>o_video_snap_box</key>
+				<string>id</string>
+				<key>o_video_snap_folder_btn</key>
+				<string>id</string>
+				<key>o_video_snap_folder_fld</key>
+				<string>id</string>
+				<key>o_video_snap_folder_txt</key>
+				<string>id</string>
+				<key>o_video_snap_format_pop</key>
+				<string>id</string>
+				<key>o_video_snap_format_txt</key>
+				<string>id</string>
+				<key>o_video_snap_prefix_fld</key>
+				<string>id</string>
+				<key>o_video_snap_prefix_txt</key>
+				<string>id</string>
+				<key>o_video_snap_seqnum_ckb</key>
+				<string>id</string>
+				<key>o_video_view</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>buttonAction</key>
+				<string>id</string>
+				<key>closePrefs</key>
+				<string>id</string>
+				<key>resetAll</key>
+				<string>id</string>
+				<key>savePrefs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>VLCPrefs</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_basicFull_matrix</key>
+				<string>id</string>
+				<key>o_cancel_btn</key>
+				<string>id</string>
+				<key>o_prefs_view</key>
+				<string>id</string>
+				<key>o_prefs_window</key>
+				<string>id</string>
+				<key>o_reset_btn</key>
+				<string>id</string>
+				<key>o_save_btn</key>
+				<string>id</string>
+				<key>o_title</key>
+				<string>id</string>
+				<key>o_tree</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
