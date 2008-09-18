@@ -249,6 +249,8 @@ MainInterface::~MainInterface()
 {
     msg_Dbg( p_intf, "Destroying the main interface" );
 
+    if( videoIsActive ) videoWidget->hide();
+
     if( playlistWidget )
     {
         if( !isDocked() )
@@ -262,18 +264,10 @@ MainInterface::~MainInterface()
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
 
-    if( !videoIsActive )
-    {
-        QVLCTools::saveWidgetPosition(settings, this);
-    }
-    else
-    {
-        msg_Dbg( p_intf, "Not saving because video is in use." );
-    }
-
     if( bgWidget )
         settings->setValue( "backgroundSize", bgWidget->size() );
 
+    QVLCTools::saveWidgetPosition(settings, this);
     settings->endGroup();
 
     var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
