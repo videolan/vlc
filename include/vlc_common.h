@@ -513,8 +513,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #include "vlc_mtime.h"
 #include "vlc_threads.h"
 
-typedef struct vlc_object_internals_t vlc_object_internals_t;
-
 /*****************************************************************************
  * Common structure members
  *****************************************************************************/

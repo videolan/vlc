@@ -155,7 +155,7 @@ libvlc_global_data_t *vlc_global (void);
 /**
  * Private LibVLC data for each object.
  */
-struct vlc_object_internals_t
+typedef struct vlc_object_internals_t
 {
     /* Object variables */
     variable_t *    p_vars;
@@ -181,7 +181,7 @@ struct vlc_object_internals_t
     vlc_object_t    *prev, *next;
     vlc_object_t   **pp_children;
     int              i_children;
-};
+} vlc_object_internals_t;
 
 #define ZOOM_SECTION N_("Zoom")
 #define ZOOM_QUARTER_KEY_TEXT N_("1:4 Quarter")
