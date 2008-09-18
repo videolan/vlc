@@ -326,6 +326,8 @@ void input_DecoderDiscontinuity( decoder_t * p_dec, bool b_flush )
     /* Send a special block */
     p_null = block_New( p_dec, 128 );
     p_null->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    if( b_flush && p_dec->fmt_in.i_cat == SPU_ES )
+        p_null->i_flags |= BLOCK_FLAG_CORE_FLUSH;
     /* FIXME check for p_packetizer or b_packitized from es_format_t of input ? */
     if( p_dec->p_owner->p_packetizer && b_flush )
         p_null->i_flags |= BLOCK_FLAG_CORRUPTED;
@@ -1047,12 +1049,16 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         input_thread_t *p_input = p_dec->p_owner->p_input;
         vout_thread_t *p_vout;
         subpicture_t *p_spu;
-        bool b_flush = p_dec->p_owner->i_preroll_end == INT64_MAX;
+        bool b_flushing = p_dec->p_owner->i_preroll_end == INT64_MAX;
+        bool b_flush = false;
 
         if( p_block )
+        {
             DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
+            b_flush = (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH) != 0;
+        }
 
-        if( !b_flush && p_dec->p_owner->i_preroll_end == INT64_MAX && p_sys->p_spu_vout )
+        if( !b_flushing && b_flush && p_sys->p_spu_vout )
         {
             p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
 
