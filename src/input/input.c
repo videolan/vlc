@@ -94,6 +94,8 @@ static void AccessMeta( input_thread_t * p_input, vlc_meta_t *p_meta );
 static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
                               int i_new, input_attachment_t **pp_new );
 
+static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_forced );
+
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
@@ -919,7 +921,7 @@ static void StartTitle( input_thread_t * p_input )
 {
     double f_fps;
     vlc_value_t val;
-    int i, i_delay;
+    int i_delay;
     char *psz;
     char *psz_subtitle;
     int64_t i_length;
@@ -1006,45 +1008,29 @@ static void StartTitle( input_thread_t * p_input )
     if( psz_subtitle != NULL )
     {
         msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
-        input_AddSubtitles( p_input, psz_subtitle, false );
+        SubtitleAdd( p_input, psz_subtitle, true );
     }
 
     var_Get( p_input, "sub-autodetect-file", &val );
     if( val.b_bool )
     {
         char *psz_autopath = var_GetNonEmptyString( p_input, "sub-autodetect-path" );
-        char **subs = subtitles_Detect( p_input, psz_autopath,
-                                        p_input->p->input.p_item->psz_uri );
-        input_source_t *sub;
-        i = 0;
-        if( psz_autopath == NULL )
-            psz_autopath = strdup("");
-
-        /* Try to autoselect the first autodetected subtitles file
-         * if no subtitles file was specified */
-        if( ( psz_subtitle == NULL ) && subs && subs[0] )
-        {
-            input_AddSubtitles( p_input, subs[0], false );
-            free( subs[0] );
-            i = 1;
-        }
-
-        /* Then, just add the following subtitles files */
-        for( ; subs && subs[i]; i++ )
-        {
-            if( !psz_subtitle || strcmp( psz_subtitle, subs[i] ) )
-            {
-                sub = InputSourceNew( p_input );
-                if( !InputSourceInit( p_input, sub, subs[i], "subtitle" ) )
-                {
-                    TAB_APPEND( p_input->p->i_slave, p_input->p->slave, sub );
-                }
-                else free( sub );
-            }
-            free( subs[i] );
-        }
-        free( subs );
+        char **ppsz_subs = subtitles_Detect( p_input, psz_autopath,
+                                             p_input->p->input.p_item->psz_uri );
         free( psz_autopath );
+
+        for( int i = 0; ppsz_subs && ppsz_subs[i]; i++ )
+        {
+            /* Try to autoselect the first autodetected subtitles file
+             * if no subtitles file was specified */
+            bool b_forced = i == 0 && !psz_subtitle;
+
+            if( !psz_subtitle || strcmp( psz_subtitle, ppsz_subs[i] ) )
+                SubtitleAdd( p_input, ppsz_subs[i], b_forced );
+
+            free( ppsz_subs[i] );
+        }
+        free( ppsz_subs );
     }
     free( psz_subtitle );
 
@@ -1927,6 +1913,14 @@ static bool Control( input_thread_t *p_input, int i_type,
             }
             break;
 
+        case INPUT_CONTROL_ADD_SUBTITLE:
+            if( val.psz_string )
+            {
+                SubtitleAdd( p_input, val.psz_string, true );
+                free( val.psz_string );
+            }
+            break;
+
         case INPUT_CONTROL_ADD_SLAVE:
             if( val.psz_string )
             {
@@ -2583,7 +2577,8 @@ static void SlaveSeek( input_thread_t *p_input )
 
         if( demux_Control( in->p_demux, DEMUX_SET_TIME, i_time ) )
         {
-            msg_Err( p_input, "seek failed for slave %d -> EOF", i );
+            if( !in->b_eof )
+                msg_Err( p_input, "seek failed for slave %d -> EOF", i );
             in->b_eof = true;
         }
         else
@@ -2979,18 +2974,12 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
 /*****************************************************************************
  * input_AddSubtitles: add a subtitles file and enable it
  *****************************************************************************/
-bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
-                               bool b_check_extension )
+static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_forced )
 {
     input_source_t *sub;
     vlc_value_t count;
     vlc_value_t list;
     char *psz_path, *psz_extension;
-
-    if( b_check_extension && !subtitles_Filter( psz_subtitle ) )
-    {
-        return false;
-    }
 
     /* if we are provided a subtitle.sub file,
      * see if we don't have a subtitle.idx and use it instead */
@@ -3000,13 +2989,12 @@ bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
         psz_extension = strrchr( psz_path, '.');
         if( psz_extension && strcmp( psz_extension, ".sub" ) == 0 )
         {
-            FILE *f;
+            struct stat st;
 
             strcpy( psz_extension, ".idx" );
-            /* FIXME: a portable wrapper for stat() or access() would be more suited */
-            if( ( f = utf8_fopen( psz_path, "rt" ) ) )
+
+            if( !utf8_stat( psz_path, &st ) )
             {
-                fclose( f );
                 msg_Dbg( p_input, "using %s subtitles file instead of %s",
                          psz_path, psz_subtitle );
                 strcpy( psz_subtitle, psz_path );
@@ -3018,27 +3006,45 @@ bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
     var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
 
     sub = InputSourceNew( p_input );
-    if( !InputSourceInit( p_input, sub, psz_subtitle, "subtitle" ) )
+    if( InputSourceInit( p_input, sub, psz_subtitle, "subtitle" ) )
     {
-        TAB_APPEND( p_input->p->i_slave, p_input->p->slave, sub );
-
-        /* Select the ES */
-        if( !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
-        {
-            if( count.i_int == 0 )
-                count.i_int++;
-            /* if it was first one, there is disable too */
-
-            if( count.i_int < list.p_list->i_count )
-            {
-                input_ControlPush( p_input, INPUT_CONTROL_SET_ES,
-                                   &list.p_list->p_values[count.i_int] );
-            }
-            var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
-        }
+        free( sub );
+        return;
     }
-    else free( sub );
+    TAB_APPEND( p_input->p->i_slave, p_input->p->slave, sub );
 
+    /* Select the ES */
+    if( b_forced && !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
+    {
+        if( count.i_int == 0 )
+            count.i_int++;
+        /* if it was first one, there is disable too */
+
+        if( count.i_int < list.p_list->i_count )
+        {
+            int i_id = list.p_list->p_values[count.i_int].i_int;
+            es_out_id_t *p_es = input_EsOutGetFromID( p_input->p->p_es_out, i_id );
+
+            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_DEFAULT, p_es );
+            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES, p_es );
+        }
+        var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
+    }
+}
+
+bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
+                               bool b_check_extension )
+{
+    vlc_value_t val;
+
+    if( b_check_extension && !subtitles_Filter( psz_subtitle ) )
+        return false;
+
+    assert( psz_subtitle != NULL );
+
+    val.psz_string = strdup( psz_subtitle );
+    if( val.psz_string )
+        input_ControlPush( p_input, INPUT_CONTROL_ADD_SUBTITLE, &val );
     return true;
 }
 
