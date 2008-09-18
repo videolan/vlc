@@ -244,6 +244,7 @@ struct playlist_add_t
 #define SORT_TRACK_NUMBER 9
 #define SORT_DESCRIPTION 10
 #define SORT_RATING 11
+#define SORT_URI 12
 
 #define ORDER_NORMAL 0
 #define ORDER_REVERSE 1

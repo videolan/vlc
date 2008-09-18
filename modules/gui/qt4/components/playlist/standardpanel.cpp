@@ -274,26 +274,18 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 
     QMenu selectColMenu;
 
-#define ADD_META_ACTION( meta ) {                                              \
-    QAction* option = selectColMenu.addAction( qfu( psz_column_title( meta ) ) );     \
-    option->setCheckable( true );                                              \
-    option->setChecked( model->shownFlags() & meta );                          \
-    ContextUpdateMapper->setMapping( option, meta );                           \
-    CONNECT( option, triggered(), ContextUpdateMapper, map() );                \
-}
-
     CONNECT( ContextUpdateMapper, mapped( int ),  model, viewchanged( int ) );
 
-    ADD_META_ACTION( COLUMN_NUMBER );
-    ADD_META_ACTION( COLUMN_TITLE );
-    ADD_META_ACTION( COLUMN_DURATION );
-    ADD_META_ACTION( COLUMN_ARTIST );
-    ADD_META_ACTION( COLUMN_GENRE );
-    ADD_META_ACTION( COLUMN_ALBUM );
-    ADD_META_ACTION( COLUMN_TRACK_NUMBER );
-    ADD_META_ACTION( COLUMN_DESCRIPTION );
-
-#undef ADD_META_ACTION
+    int i_column = 1;
+    for( i_column = 1; i_column != COLUMN_END; i_column<<=1 )
+    {
+        QAction* option = selectColMenu.addAction(
+            qfu( psz_column_title( i_column ) ) );
+        option->setCheckable( true );
+        option->setChecked( model->shownFlags() & i_column );
+        ContextUpdateMapper->setMapping( option, i_column );
+        CONNECT( option, triggered(), ContextUpdateMapper, map() );
+    }
 
     selectColMenu.exec( QCursor::pos() );
 }
