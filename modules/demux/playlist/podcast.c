@@ -125,6 +125,14 @@ static int Demux( demux_t *p_demux )
         msg_Err( p_demux, "invalid file (no root node)" );
         return -1;
     }
+
+    while( xml_ReaderNodeType( p_xml_reader ) == XML_READER_NONE )
+        if( xml_ReaderRead( p_xml_reader ) != 1 )
+        {
+            msg_Err( p_demux, "invalid file (no root node)" );
+            return -1;
+        }
+
     if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
         ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
         strcmp( psz_elname, "rss" ) )
