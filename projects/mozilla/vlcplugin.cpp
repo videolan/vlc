@@ -82,7 +82,7 @@ static bool boolValue(const char *value) {
 NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
 {
     /* prepare VLC command line */
-    char *ppsz_argv[32];
+    const char *ppsz_argv[32];
     int ppsz_argc = 0;
 
     /* locate VLC module path */
@@ -218,7 +218,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
             {
                 NPString &location = NPVARIANT_TO_STRING(result);
 
-                psz_baseURL = new char[location.utf8length+1];
+                psz_baseURL = static_cast<char*>(malloc(location.utf8length+1));
                 if( psz_baseURL )
                 {
                     strncpy(psz_baseURL, location.utf8characters, location.utf8length);
@@ -246,8 +246,8 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
 
 VlcPlugin::~VlcPlugin()
 {
-    delete[] psz_baseURL;
-    delete psz_target;
+    free(psz_baseURL);
+    free(psz_target);
     if( libvlc_log )
         libvlc_log_close(libvlc_log, NULL);
     if( libvlc_instance )
@@ -295,7 +295,7 @@ relativeurl:
         if( psz_baseURL )
         {
             size_t baseLen = strlen(psz_baseURL);
-            char *href = new char[baseLen+strlen(url)+1];
+            char *href = static_cast<char*>(malloc(baseLen+strlen(url)+1));
             if( href )
             {
                 /* prepend base URL */
@@ -340,7 +340,7 @@ relativeurl:
                     if( '/' != *href )
                     {
                         /* baseURL is not an absolute path */
-                        delete[] href;
+		        free(href);
                         return NULL;
                     }
                     pathstart = href;

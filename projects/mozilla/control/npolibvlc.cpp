@@ -1423,7 +1423,7 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                     {
                         url = p_plugin->getAbsoluteURL(s);
                         if( url )
-                            delete s;
+			    free(s);
                         else
                             // problem with combining url, use argument
                             url = s;
@@ -1449,7 +1449,7 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                     }
                     else
                     {
-                        delete url;
+		        free(url);
                         return INVOKERESULT_INVALID_VALUE;
                     }
                 }
@@ -1475,8 +1475,8 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                     }
                     else
                     {
-                        delete url;
-                        delete name;
+		        free(url);
+                        free(name);
                         return INVOKERESULT_INVALID_VALUE;
                     }
                 }
@@ -1487,13 +1487,13 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                                                         i_options,
                                                         const_cast<const char **>(ppsz_options),
                                                         &ex);
-                delete url;
-                delete name;
+                free(url);
+                free(name);
                 for( int i=0; i< i_options; ++i )
                 {
-                    delete ppsz_options[i];
+		    free(ppsz_options[i]);
                 }
-                delete ppsz_options;
+                free(ppsz_options);
 
                 if( libvlc_exception_raised(&ex) )
                 {
@@ -1695,7 +1695,7 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &nps, int *i_options, c
                             if( ! moreOptions )
                             {
                                 /* failed to allocate more memory */
-                                delete s;
+			        free(s);
                                 /* return what we got so far */
                                 *i_options = nOptions;
                                 *ppsz_options = options;
@@ -1713,7 +1713,7 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &nps, int *i_options, c
                 *i_options = nOptions;
                 *ppsz_options = options;
             }
-            delete s;
+            free(s);
         }
     }
 }
@@ -1985,7 +1985,7 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::setProperty(int index, const 
                 }
 
                 libvlc_video_set_aspect_ratio(p_md, psz_aspect, &ex);
-                delete psz_aspect;
+                free(psz_aspect);
                 libvlc_media_player_release(p_md);
 
                 if( libvlc_exception_raised(&ex) )
@@ -2032,7 +2032,7 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::setProperty(int index, const 
                 }
 
                 libvlc_video_set_crop_geometry(p_md, psz_geometry, &ex);
-                delete psz_geometry;
+                free(psz_geometry);
                 libvlc_media_player_release(p_md);
 
                 if( libvlc_exception_raised(&ex) )
