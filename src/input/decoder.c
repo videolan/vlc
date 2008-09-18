@@ -1047,9 +1047,22 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         input_thread_t *p_input = p_dec->p_owner->p_input;
         vout_thread_t *p_vout;
         subpicture_t *p_spu;
+        bool b_flush = p_dec->p_owner->i_preroll_end == INT64_MAX;
 
         if( p_block )
             DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
+
+        if( !b_flush && p_dec->p_owner->i_preroll_end == INT64_MAX && p_sys->p_spu_vout )
+        {
+            p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+
+            if( p_vout && p_sys->p_spu_vout == p_vout )
+                spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR,
+                             p_dec->p_owner->i_spu_channel );
+
+            if( p_vout )
+                vlc_object_release( p_vout );
+        }
 
         while( (p_spu = p_dec->pf_decode_sub( p_dec, p_block ? &p_block : NULL ) ) )
         {
@@ -1063,7 +1076,9 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 /* Prerool does not work very well with subtitle */
                 if( p_spu->i_start < p_dec->p_owner->i_preroll_end &&
                     ( p_spu->i_stop <= 0 || p_spu->i_stop < p_dec->p_owner->i_preroll_end ) )
+                {
                     spu_DestroySubpicture( p_vout->p_spu, p_spu );
+                }
                 else
                     spu_DisplaySubpicture( p_vout->p_spu, p_spu );
             }
