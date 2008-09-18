@@ -803,8 +803,11 @@ static void vlc_object_detach_unlocked (vlc_object_t *p_this)
 
     if( priv->i_children )
     {
-        priv->pp_children = (vlc_object_t **)realloc( priv->pp_children,
-                               priv->i_children * sizeof(vlc_object_t *) );
+        vlc_object_t **pp_children = (vlc_object_t **)
+            realloc( priv->pp_children,
+                     priv->i_children * sizeof(vlc_object_t *) );
+        if( pp_children )
+            priv->pp_children = pp_children;
     }
     else
     {
