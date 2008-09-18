@@ -537,6 +537,9 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     volatile bool b_die;                   /**< set by the outside */ \
     bool b_force;      /**< set by the outside (eg. module_Need()) */ \
                                                                             \
+    /** Just a reminder so that people don't cast garbage */                \
+    bool be_sure_to_add_VLC_COMMON_MEMBERS_to_struct;                       \
+                                                                            \
     /* Stuff related to the libvlc structure */                             \
     libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
                                                                             \
@@ -545,8 +548,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     /* Private data */                                                      \
     void *          p_private;                                              \
                                                                             \
-    /** Just a reminder so that people don't cast garbage */                \
-    int be_sure_to_add_VLC_COMMON_MEMBERS_to_struct;                        \
 /**@}*/                                                                     \
 
 /* VLC_OBJECT: attempt at doing a clever cast */
