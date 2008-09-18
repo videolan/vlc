@@ -198,14 +198,24 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
 
     if( p_object )
     {
-        vlc_object_t *p_dec_obj = ( vlc_object_t * )vlc_object_find( p_object,
-                VLC_OBJECT_DECODER,
-                FIND_PARENT );
-        if( p_dec_obj )
+        /* p_object is the vout, so the decoder is our parent and the
+         * postproc filter one of the decoder's children */
+        vlc_object_t *p_dec = (vlc_object_t *)
+                              vlc_object_find( p_object, VLC_OBJECT_DECODER,
+                                               FIND_PARENT );
+        if( p_dec )
         {
-            vlc_object_t *p_object = p_dec_obj;
-            PUSH_VAR( "ffmpeg-pp-q" );
-            vlc_object_release( p_dec_obj );
+            vlc_object_t *p_pp = (vlc_object_t *)
+                                 vlc_object_find_name( p_dec, "postproc",
+                                                       FIND_CHILD );
+            if( p_pp )
+            {
+                p_object = p_pp;
+                PUSH_VAR( "postproc-q" );
+                vlc_object_release( p_pp );
+            }
+
+            vlc_object_release( p_dec );
         }
     }
     return VLC_SUCCESS;
@@ -504,7 +514,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) );
 #endif
         ACT_ADD( current, "video-snapshot", qtr( "Sna&pshot" ) );
-        /* ACT_ADD( current, "ffmpeg-pp-q", qtr( "Decoder" ) ); */
+        ACT_ADD( current, "postproc-q", qtr( "Post processing" ) );
     }
 
     p_input = THEMIM->getInput();
@@ -1053,7 +1063,8 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
 
     /* Check the type of the object variable */
     if( !strcmp( psz_var, "audio-es" )
-     || !strcmp( psz_var, "video-es" ) )
+     || !strcmp( psz_var, "video-es" )
+     || !strcmp( psz_var, "postproc-q" ) )
         i_type = VLC_VAR_INTEGER | VLC_VAR_HASCHOICE;
     else
         i_type = var_Type( p_object, psz_var );
