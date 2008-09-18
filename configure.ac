@@ -5794,6 +5794,7 @@ AC_CONFIG_FILES([
   modules/demux/asf/Makefile
   modules/demux/avformat/Makefile
   modules/demux/avi/Makefile
+  modules/demux/mkv/Makefile
   modules/demux/mp4/Makefile
   modules/demux/mpeg/Makefile
   modules/demux/playlist/Makefile

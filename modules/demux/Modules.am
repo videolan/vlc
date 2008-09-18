@@ -1,4 +1,4 @@
-SUBDIRS = asf avformat avi mp4 mpeg playlist
+SUBDIRS = asf avformat avi mkv mp4 mpeg playlist
 SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c
 SOURCES_demuxdump = demuxdump.c
@@ -6,7 +6,6 @@ SOURCES_rawdv = rawdv.c
 SOURCES_rawvid = rawvid.c
 SOURCES_au = au.c
 SOURCES_wav = wav.c
-SOURCES_mkv = mkv.cpp mp4/libmp4.c mp4/drms.c
 SOURCES_live555 = live555.cpp ../access/mms/asf.c ../access/mms/buffer.c
 SOURCES_nsv = nsv.c
 SOURCES_real = real.c
