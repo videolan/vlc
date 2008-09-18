@@ -566,9 +566,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
             p_sys->i_subtitle = 0;
-            while( p_sys->i_subtitle < p_sys->i_subtitles &&
-                   p_sys->subtitle[p_sys->i_subtitle].i_start < i64 )
+            while( p_sys->i_subtitle < p_sys->i_subtitles )
             {
+                const subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitle];
+
+                if( p_subtitle->i_start > i64 )
+                    break;
+                if( p_subtitle->i_stop > p_subtitle->i_start && p_subtitle->i_stop > i64 )
+                    break;
+
                 p_sys->i_subtitle++;
             }
 
@@ -646,12 +652,13 @@ static int Demux( demux_t *p_demux )
     while( p_sys->i_subtitle < p_sys->i_subtitles &&
            p_sys->subtitle[p_sys->i_subtitle].i_start < i_maxdate )
     {
-        block_t *p_block;
-        int i_len = strlen( p_sys->subtitle[p_sys->i_subtitle].psz_text ) + 1;
+        const subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitle];
 
-        if( i_len <= 1 )
+        block_t *p_block;
+        int i_len = strlen( p_subtitle->psz_text ) + 1;
+
+        if( i_len <= 1 || p_subtitle->i_start < 0 )
         {
-            /* empty subtitle */
             p_sys->i_subtitle++;
             continue;
         }
@@ -662,30 +669,15 @@ static int Demux( demux_t *p_demux )
             continue;
         }
 
-        if( p_sys->subtitle[p_sys->i_subtitle].i_start < 0 )
-        {
-            p_sys->i_subtitle++;
-            continue;
-        }
+        p_block->i_dts =
+        p_block->i_pts = 1 + p_subtitle->i_start;
+        if( p_subtitle->i_stop > 0 && p_subtitle->i_stop >= p_subtitle->i_start )
+            p_block->i_length = p_subtitle->i_stop - p_subtitle->i_start;
 
-        p_block->i_pts = p_sys->subtitle[p_sys->i_subtitle].i_start;
-        p_block->i_dts = p_block->i_pts;
-        if( p_sys->subtitle[p_sys->i_subtitle].i_stop > 0 )
-        {
-            p_block->i_length =
-                p_sys->subtitle[p_sys->i_subtitle].i_stop - p_block->i_pts;
-        }
+        memcpy( p_block->p_buffer, p_subtitle->psz_text, i_len );
 
-        memcpy( p_block->p_buffer,
-                p_sys->subtitle[p_sys->i_subtitle].psz_text, i_len );
-        if( p_block->i_pts > 0 )
-        {
-            es_out_Send( p_demux->out, p_sys->es, p_block );
-        }
-        else
-        {
-            block_Release( p_block );
-        }
+        es_out_Send( p_demux->out, p_sys->es, p_block );
+
         p_sys->i_subtitle++;
     }
 
@@ -908,19 +900,14 @@ static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
     psz_text = strdup("");
     if( !psz_text )
         return VLC_ENOMEM;
+
     for( ;; )
     {
         const char *s = TextGetLine( txt );
         int i_len;
         int i_old;
 
-        if( !s )
-        {
-            free( psz_text );
-            return VLC_EGENERIC;
-        }
-
-        i_len = strlen( s );
+        i_len = s ? strlen( s ) : 0;
         if( i_len <= 0 )
         {
             p_subtitle->psz_text = psz_text;
@@ -930,7 +917,9 @@ static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
         i_old = strlen( psz_text );
         psz_text = realloc( psz_text, i_old + i_len + 1 + 1 );
         if( !psz_text )
+        {
             return VLC_ENOMEM;
+        }
         strcat( psz_text, s );
         strcat( psz_text, "\n" );
 
