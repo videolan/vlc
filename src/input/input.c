@@ -2643,9 +2643,8 @@ static char *InputGetExtraFiles( input_thread_t *p_input,
 
         snprintf( psz_ext, 5, ".%.3d", i );
 
-        if( utf8_stat( psz_file, &st ) != 0 )
-            break;
-        if( st.st_size <= 0 )
+        if( utf8_stat( psz_file, &st )
+         || !S_ISREG( st.st_mode ) || !st.st_size )
             continue;
 
         msg_Dbg( p_input, "Detected extra file `%s'", psz_file );
@@ -2993,7 +2992,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
 
             strcpy( psz_extension, ".idx" );
 
-            if( !utf8_stat( psz_path, &st ) )
+            if( !utf8_stat( psz_path, &st ) && S_ISREG( st.st_mode ) )
             {
                 msg_Dbg( p_input, "using %s subtitles file instead of %s",
                          psz_path, psz_subtitle );
