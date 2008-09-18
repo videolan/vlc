@@ -39,6 +39,8 @@ enum
     COLUMN_END          = 0x0200
 };
 
+#define COLUMN_DEFAULT (COLUMN_TITLE|COLUMN_DURATION|COLUMN_ALBUM)
+
 /* Return the title of a column */
 static const char * psz_column_title( uint32_t i_column )
 {

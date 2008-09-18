@@ -68,9 +68,9 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m, QSett
         }
         else
         {
-            i_showflags = settings->value( "qt-pl-showflags", 38 ).toInt();
+            i_showflags = settings->value( "qt-pl-showflags", COLUMN_DEFAULT ).toInt();
             if( i_showflags < 1)
-                i_showflags = 38; /* reasonable default to show something; */
+                i_showflags = COLUMN_DEFAULT; /* reasonable default to show something; */
             else if ( i_showflags >= COLUMN_END )
                 i_showflags = COLUMN_END - 1; /* show everything */
 
