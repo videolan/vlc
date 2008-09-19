@@ -135,6 +135,7 @@ static void FreeList( vlc_value_t *p_val )
 }
 
 static const struct variable_ops_t
+void_ops   = { NULL,       DupDummy,  FreeDummy,  },
 addr_ops   = { CmpAddress, DupDummy,  FreeDummy,  },
 bool_ops   = { CmpBool,    DupDummy,  FreeDummy,  },
 float_ops  = { CmpFloat,   DupDummy,  FreeDummy,  },
@@ -275,6 +276,9 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         case VLC_VAR_LIST:
             p_var->ops = &list_ops;
             p_var->val.p_list = &dummy_null_list;
+            break;
+        default:
+            p_var->ops = &void_ops;
             break;
     }
 
