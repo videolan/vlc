@@ -642,7 +642,7 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
     int             i_val, i_handle = -1;
     bool      b_unreach = false;
 
-    if( i_hlim < 1 )
+    if( i_hlim < 0 )
         i_hlim = var_CreateGetInteger( p_this, "ttl" );
 
     memset( &hints, 0, sizeof( hints ) );
@@ -676,7 +676,7 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
         setsockopt (fd, SOL_SOCKET, SO_BROADCAST, &(int){ 1 }, sizeof (int));
 #endif
 
-        if( i_hlim > 0 )
+        if( i_hlim >= 0 )
             net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
 
         str = var_CreateGetNonEmptyString (p_this, "miface");

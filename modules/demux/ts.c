@@ -712,7 +712,7 @@ static int Open( vlc_object_t *p_this )
         if( i_port <= 0 ) i_port  = 1234;
         msg_Dbg( p_demux, "resend ts to '%s:%d'", val.psz_string, i_port );
 
-        p_sys->fd = net_ConnectUDP( VLC_OBJECT(p_demux), val.psz_string, i_port, 0 );
+        p_sys->fd = net_ConnectUDP( VLC_OBJECT(p_demux), val.psz_string, i_port, -1 );
         if( p_sys->fd < 0 )
         {
             msg_Err( p_demux, "failed to open udp socket, send disabled" );

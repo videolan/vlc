@@ -108,7 +108,7 @@ static int Activate( vlc_object_t *p_this )
             msg_Err( p_intf, "master address not specified" );
             return VLC_EGENERIC;
         }
-        fd = net_ConnectUDP( VLC_OBJECT(p_intf), psz_master, NETSYNC_PORT, 0 );
+        fd = net_ConnectUDP( VLC_OBJECT(p_intf), psz_master, NETSYNC_PORT, -1 );
         free( psz_master );
     }
     else
