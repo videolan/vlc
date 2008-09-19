@@ -193,8 +193,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "directx-wallpaper" , Bool , NULL, wallpaperMode );
             CONFIG_GENERIC( "directx-device", StringList, NULL,
                             dXdisplayDevice );
+            CONFIG_GENERIC( "directx-hw-yuv", Bool, NULL, hwYUVBox );
 #else
             ui.directXBox->setVisible( false );
+            ui.hwYUVBox->setVisible( false );
 #endif
 
             CONFIG_GENERIC_FILE( "snapshot-path", Directory, NULL,
