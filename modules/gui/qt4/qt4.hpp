@@ -132,6 +132,15 @@ static inline QString toNativeSeparators( QString s )
     return s;
 }
 
+static inline QString removeTrailingSlash( QString s )
+{
+    if( ( s.length() > 1 ) && ( s[s.length()-1] == QLatin1Char( '/' ) ) )
+        s.remove( s.length() - 1, 1 );
+    return s;
+}
+
+#define toNativeSepNoSlash( a ) toNativeSeparators( removeTrailingSlash( a ) )
+
 static const int DialogEvent_Type = QEvent::User + DialogEventType + 1;
 //static const int PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
 //static const int PLDockEvent_Type = QEvent::User + DialogEventType + 3;

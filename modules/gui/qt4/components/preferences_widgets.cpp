@@ -304,7 +304,7 @@ void FileConfigControl::updateField()
     QString file = QFileDialog::getOpenFileName( NULL,
                   qtr( "Select File" ), qfu( config_GetHomeDir() ) );
     if( file.isNull() ) return;
-    text->setText( file );
+    text->setText( toNativeSeparators( file ) );
 }
 
 void FileConfigControl::finish()
@@ -334,10 +334,10 @@ void DirectoryConfigControl::updateField()
                       qtr( "Select Directory" ),
                       text->text().isEmpty() ?
                         qfu( config_GetHomeDir() ) : text->text(),
-                      QFileDialog::ShowDirsOnly |
-                        QFileDialog::DontResolveSymlinks );
+                  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+
     if( dir.isNull() ) return;
-    text->setText( toNativeSeparators( dir ) );
+    text->setText( toNativeSepNoSlash( dir ) );
 }
 
 #if 0

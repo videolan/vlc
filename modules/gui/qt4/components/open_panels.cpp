@@ -405,11 +405,11 @@ void DiscOpenPanel::updateMRL()
 
 void DiscOpenPanel::browseDevice()
 {
-    QString dir = QFileDialog::getExistingDirectory( 0,
+    QString dir = QFileDialog::getExistingDirectory( this,
             qtr( I_DEVICE_TOOLTIP ) );
-    if (!dir.isEmpty()) {
-        ui.deviceCombo->setEditText( toNativeSeparators( dir ) );
-    }
+    if (!dir.isEmpty())
+        ui.deviceCombo->setEditText( toNativeSepNoSlash( dir ) );
+
     updateMRL();
 }
 

@@ -276,14 +276,9 @@ void UpdateDialog::UpdateOrDownload()
                                  qtr( "Select a directory..." ),
                                  qfu( config_GetHomeDir() ) );
 
-        if( dest_dir != "" )
+        if( !dest_dir.isEmpty() )
         {
-            /*HACK: Qt4 isn't able to change the way OS deals with directories
-              names. Windows doesn't add an ending separator so we might add it.
-             */
-            #if defined( WIN32 ) || defined( UNDER_CE )
-            dest_dir += DIR_SEP;
-            #endif
+            dest_dir = toNativeSepNoSlash( dest_dir ) + DIR_SEP;
             msg_Dbg( p_intf, "Downloading to folder: %s", qtu( dest_dir ) );
             toggleVisible();
             update_Download( p_update, qtu( dest_dir ) );

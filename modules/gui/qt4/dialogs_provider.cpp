@@ -279,7 +279,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         {
             p_arg->i_results = 1;
             p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
-            p_arg->psz_results[0] = strdup( qtu( file ) );
+            p_arg->psz_results[0] = strdup( qtu( toNativeSepNoSlash( file ) ) );
         }
         else
             p_arg->i_results = 0;
@@ -293,7 +293,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
         i = 0;
         foreach( QString file, files )
-            p_arg->psz_results[i++] = strdup( qtu( file ) );
+            p_arg->psz_results[i++] = strdup( qtu( toNativeSepNoSlash( file ) ) );
     }
 
     /* Callback */
@@ -368,6 +368,7 @@ QStringList DialogsProvider::showSimpleOpen( QString help,
     }
     ADD_FILTER_ALL( fileTypes );
     fileTypes.replace(QString(";*"), QString(" *"));
+
     return QFileDialog::getOpenFileNames( NULL,
         help.isNull() ? qfu(I_OP_SEL_FILES ) : help,
         path.isNull() ? qfu( p_intf->p_sys->psz_filepath ) : path,
@@ -385,7 +386,7 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
     int i = 0;
     foreach( QString file, files )
     {
-        const char * psz_utf8 = qtu( file );
+        const char * psz_utf8 = qtu( toNativeSeparators( file ) );
         playlist_Add( THEPL, psz_utf8, NULL,
                       go ? ( PLAYLIST_APPEND | ( i ? 0 : PLAYLIST_GO ) |
                                                ( i ? PLAYLIST_PREPARSE : 0 ) )
@@ -419,11 +420,13 @@ void DialogsProvider::simpleMLAppendDialog()
  **/
 static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 {
-    QString dir = QFileDialog::getExistingDirectory( 0, qtr("Open Directory") );
-    if (!dir.isEmpty()) {
+    QString dir = QFileDialog::getExistingDirectory( NULL, qtr("Open Directory") );
+
+    if (!dir.isEmpty() )
+    {
         input_item_t *p_input = input_item_NewExt( THEPL,
-                                        qtu( "directory://" + dir ), NULL,
-                                        0, NULL, -1 );
+                              qtu( "directory://" + toNativeSeparators(dir) ),
+                              NULL, 0, NULL, -1 );
 
         /* FIXME: playlist_AddInput() can fail */
         playlist_AddInput( THEPL, p_input,
@@ -459,7 +462,7 @@ void DialogsProvider::openAPlaylist()
                                         EXT_FILTER_PLAYLIST );
     foreach( QString file, files )
     {
-        playlist_Import( THEPL, qtu(file) );
+        playlist_Import( THEPL, qtu( toNativeSeparators( file ) ) );
     }
 }
 
@@ -499,8 +502,8 @@ void DialogsProvider::saveAPlaylist()
                     file.append( ".m3u" );
             }
 
-            playlist_Export( THEPL, qtu( file ), THEPL->p_local_category,
-                             psz_module);
+            playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
+                        THEPL->p_local_category, psz_module);
         }
     }
     delete qfd;
@@ -633,7 +636,8 @@ void DialogsProvider::loadSubtitlesFile()
     QString qsFile;
     foreach( qsFile, qsl )
     {
-        if( !input_AddSubtitles( p_input, qtu( qsFile ), true ) )
+        if( !input_AddSubtitles( p_input, qtu( toNativeSeparators( qsFile ) ),
+                    true ) )
             msg_Warn( p_intf, "unable to load subtitles from '%s'",
                       qtu( qsFile ) );
     }
