@@ -861,3 +861,17 @@ VLC development is NOT about being a sed god.
 <thresh> yeah, it needs up to four black men to kill vlc for me
  -- #videolan
 %
+< sam> 16:52 <&timecop> sam: can that homosexual volume slider please go away in next vlc
+< sam> 16:52 <&timecop> this is a fucking joke
+< sam> 16:52 <&timecop> who made that UI
+< sam> because I know you like positive feedback
+< ivoire> mouarf
+< ivoire> -positiv +constructiv feedback
+< ivoire> sam: you can configure the color sheme of the volume slider
+< ivoire> if you xant pink slide bar you can
+< ivoire> -x+w
+< sam> I see homosexuality as positive
+< sam> look at what it did to Apple sales
+< thedj> LMAO
+ -- #videolan
+%
