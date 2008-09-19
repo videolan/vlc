@@ -166,8 +166,6 @@ $(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
 	      --msgid-bugs-address="$$msgid_bugs_address" \
 	    ;; \
 	esac
-	sed 's/&amp;/\&/' $(DOMAIN).po > $(DOMAIN).po1  && \
-	mv $(DOMAIN).po1 $(DOMAIN).po;
 	test ! -f $(DOMAIN).po || { \
 	  if test -f $(srcdir)/$(DOMAIN).pot; then \
 	    sed -f remove-potcdate.sed < $(srcdir)/$(DOMAIN).pot > $(DOMAIN).1po && \

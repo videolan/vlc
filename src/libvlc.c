@@ -98,6 +98,10 @@
 
 #include <vlc_vlm.h>
 
+#ifdef __APPLE__
+# include <libkern/OSAtomic.h>
+#endif
+
 #include <assert.h>
 
 /*****************************************************************************
@@ -127,6 +131,8 @@ void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
     p_gc->refs = 1;
 #ifdef USE_SYNC
     __sync_synchronize ();
+#elif defined(__APPLE__)
+    OSMemoryBarrier ();
 #else
     /* Nobody else can possibly lock the spin - it's there as a barrier */
     vlc_spin_init (&p_gc->spin);
@@ -148,6 +154,8 @@ void *vlc_hold (gc_object_t * p_gc)
 
 #ifdef USE_SYNC
     refs = __sync_fetch_and_add (&p_gc->refs, 1);
+#elif defined(__APPLE__)
+    OSAtomicIncrement32Barrier((int*)&p_gc->refs);
 #else
     vlc_spin_lock (&p_gc->spin);
     refs = p_gc->refs++;
@@ -169,6 +177,8 @@ void vlc_release (gc_object_t *p_gc)
 
 #ifdef USE_SYNC
     refs = __sync_fetch_and_sub (&p_gc->refs, 1);
+#elif defined(__APPLE__)
+    OSAtomicDecrement32Barrier((int*)&p_gc->refs);
 #else
     vlc_spin_lock (&p_gc->spin);
     refs = p_gc->refs--;
