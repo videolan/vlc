@@ -125,12 +125,8 @@ void EbmlParser::Reset( demux_t *p_demux )
         mi_level--;
     }
     mi_user_level = mi_level = 1;
-#if LIBEBML_VERSION >= 0x000704
     // a little faster and cleaner
     m_es->I_O().setFilePointer( static_cast<KaxSegment*>(m_el[0])->GetGlobalPosition(0) );
-#else
-    m_es->I_O().setFilePointer( m_el[0]->GetElementPosition() + m_el[0]->ElementSize(true) - m_el[0]->GetSize() );
-#endif
     mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
 }
 
