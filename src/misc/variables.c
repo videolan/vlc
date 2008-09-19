@@ -134,6 +134,16 @@ static void FreeList( vlc_value_t *p_val )
     free( p_val->p_list );
 }
 
+static const struct variable_ops_t
+addr_ops   = { CmpAddress, DupDummy,  FreeDummy,  },
+bool_ops   = { CmpBool,    DupDummy,  FreeDummy,  },
+float_ops  = { CmpFloat,   DupDummy,  FreeDummy,  },
+int_ops    = { CmpInt,     DupDummy,  FreeDummy,  },
+list_ops   = { CmpAddress, DupList,   FreeList,   },
+mutex_ops  = { CmpAddress, DupDummy,  FreeMutex,  },
+string_ops = { CmpString,  DupString, FreeString, },
+time_ops   = { CmpTime,    DupDummy,  FreeDummy,  };
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -216,9 +226,6 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_var->i_type = i_type & ~VLC_VAR_DOINHERIT;
     memset( &p_var->val, 0, sizeof(vlc_value_t) );
 
-    p_var->pf_dup = DupDummy;
-    p_var->pf_free = FreeDummy;
-
     p_var->i_usage = 1;
 
     p_var->i_default = -1;
@@ -237,47 +244,42 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     switch( i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_BOOL:
-            p_var->pf_cmp = CmpBool;
+            p_var->ops = &bool_ops;
             p_var->val.b_bool = false;
             break;
         case VLC_VAR_INTEGER:
-            p_var->pf_cmp = CmpInt;
+            p_var->ops = &int_ops;
             p_var->val.i_int = 0;
             break;
         case VLC_VAR_STRING:
-            p_var->pf_cmp = CmpString;
-            p_var->pf_dup = DupString;
-            p_var->pf_free = FreeString;
+            p_var->ops = &string_ops;
             p_var->val.psz_string = NULL;
             break;
         case VLC_VAR_FLOAT:
-            p_var->pf_cmp = CmpFloat;
+            p_var->ops = &float_ops;
             p_var->val.f_float = 0.0;
             break;
         case VLC_VAR_TIME:
-            p_var->pf_cmp = CmpTime;
+            p_var->ops = &time_ops;
             p_var->val.i_time = 0;
             break;
         case VLC_VAR_ADDRESS:
-            p_var->pf_cmp = CmpAddress;
+            p_var->ops = &addr_ops;
             p_var->val.p_address = NULL;
             break;
         case VLC_VAR_MUTEX:
-            p_var->pf_cmp = CmpAddress;
-            p_var->pf_free = FreeMutex;
+            p_var->ops = &mutex_ops;
             p_var->val.p_address = malloc( sizeof(vlc_mutex_t) );
             vlc_mutex_init( (vlc_mutex_t*)p_var->val.p_address );
             break;
         case VLC_VAR_LIST:
-            p_var->pf_cmp = CmpAddress;
-            p_var->pf_dup = DupList;
-            p_var->pf_free = FreeList;
+            p_var->ops = &list_ops;
             p_var->val.p_list = &dummy_null_list;
             break;
     }
 
     /* Duplicate the default data we stored. */
-    p_var->pf_dup( &p_var->val );
+    p_var->ops->pf_dup( &p_var->val );
 
     if( i_type & VLC_VAR_DOINHERIT )
     {
@@ -287,7 +289,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             == VLC_SUCCESS )
         {
             /* Free data if needed */
-            p_var->pf_free( &p_var->val );
+            p_var->ops->pf_free( &p_var->val );
             /* Set the variable */
             p_var->val = val;
 
@@ -300,7 +302,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
                              0, val );
                 INSERT_ELEM( p_var->choices_text.p_values,
                              p_var->choices_text.i_count, 0, val );
-                p_var->pf_dup( &p_var->choices.p_values[0] );
+                p_var->ops->pf_dup( &p_var->choices.p_values[0] );
                 p_var->choices_text.p_values[0].psz_string = NULL;
             }
         }
@@ -345,14 +347,14 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     }
 
     /* Free value if needed */
-    p_var->pf_free( &p_var->val );
+    p_var->ops->pf_free( &p_var->val );
 
     /* Free choice list if needed */
     if( p_var->choices.i_count )
     {
         for( i = 0 ; i < p_var->choices.i_count ; i++ )
         {
-            p_var->pf_free( &p_var->choices.p_values[i] );
+            p_var->ops->pf_free( &p_var->choices.p_values[i] );
             free( p_var->choices_text.p_values[i].psz_string );
         }
         free( p_var->choices.p_values );
@@ -419,11 +421,11 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
         case VLC_VAR_SETMIN:
             if( p_var->i_type & VLC_VAR_HASMIN )
             {
-                p_var->pf_free( &p_var->min );
+                p_var->ops->pf_free( &p_var->min );
             }
             p_var->i_type |= VLC_VAR_HASMIN;
             p_var->min = *p_val;
-            p_var->pf_dup( &p_var->min );
+            p_var->ops->pf_dup( &p_var->min );
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_GETMIN:
@@ -435,11 +437,11 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
         case VLC_VAR_SETMAX:
             if( p_var->i_type & VLC_VAR_HASMAX )
             {
-                p_var->pf_free( &p_var->max );
+                p_var->ops->pf_free( &p_var->max );
             }
             p_var->i_type |= VLC_VAR_HASMAX;
             p_var->max = *p_val;
-            p_var->pf_dup( &p_var->max );
+            p_var->ops->pf_dup( &p_var->max );
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_GETMAX:
@@ -451,11 +453,11 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
         case VLC_VAR_SETSTEP:
             if( p_var->i_type & VLC_VAR_HASSTEP )
             {
-                p_var->pf_free( &p_var->step );
+                p_var->ops->pf_free( &p_var->step );
             }
             p_var->i_type |= VLC_VAR_HASSTEP;
             p_var->step = *p_val;
-            p_var->pf_dup( &p_var->step );
+            p_var->ops->pf_dup( &p_var->step );
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_GETSTEP:
@@ -471,7 +473,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                          i, *p_val );
             INSERT_ELEM( p_var->choices_text.p_values,
                          p_var->choices_text.i_count, i, *p_val );
-            p_var->pf_dup( &p_var->choices.p_values[i] );
+            p_var->ops->pf_dup( &p_var->choices.p_values[i] );
             p_var->choices_text.p_values[i].psz_string =
                 ( p_val2 && p_val2->psz_string ) ?
                 strdup( p_val2->psz_string ) : NULL;
@@ -481,7 +483,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
         case VLC_VAR_DELCHOICE:
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
-                if( p_var->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
+                if( p_var->ops->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
                 {
                     break;
                 }
@@ -503,7 +505,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                 p_var->i_default = -1;
             }
 
-            p_var->pf_free( &p_var->choices.p_values[i] );
+            p_var->ops->pf_free( &p_var->choices.p_values[i] );
             free( p_var->choices_text.p_values[i].psz_string );
             REMOVE_ELEM( p_var->choices.p_values, p_var->choices.i_count, i );
             REMOVE_ELEM( p_var->choices_text.p_values,
@@ -517,7 +519,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
         case VLC_VAR_CLEARCHOICES:
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
-                p_var->pf_free( &p_var->choices.p_values[i] );
+                p_var->ops->pf_free( &p_var->choices.p_values[i] );
             }
             for( i = 0 ; i < p_var->choices_text.i_count ; i++ )
                 free( p_var->choices_text.p_values[i].psz_string );
@@ -535,7 +537,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             /* FIXME: the list is sorted, dude. Use something cleverer. */
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
-                if( p_var->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
+                if( p_var->ops->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
                 {
                     break;
                 }
@@ -552,7 +554,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_SETVALUE:
             /* Duplicate data if needed */
-            p_var->pf_dup( p_val );
+            p_var->ops->pf_dup( p_val );
             /* Backup needed stuff */
             oldval = p_var->val;
             /* Check boundaries and list */
@@ -560,7 +562,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             /* Set the variable */
             p_var->val = *p_val;
             /* Free data if needed */
-            p_var->pf_free( &oldval );
+            p_var->ops->pf_free( &oldval );
             break;
         case VLC_VAR_GETCHOICES:
         case VLC_VAR_GETLIST:
@@ -586,7 +588,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             {
                 p_val->p_list->p_values[i] = p_var->choices.p_values[i];
                 p_val->p_list->pi_types[i] = p_var->i_type;
-                p_var->pf_dup( &p_val->p_list->p_values[i] );
+                p_var->ops->pf_dup( &p_val->p_list->p_values[i] );
                 if( p_val2 )
                 {
                     p_val2->p_list->p_values[i].psz_string =
@@ -640,13 +642,13 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                     /* Set the variable */
                     p_var->val = val;
                     /* Free data if needed */
-                    p_var->pf_free( &oldval );
+                    p_var->ops->pf_free( &oldval );
                 }
 
                 if( p_val )
                 {
                     *p_val = p_var->val;
-                    p_var->pf_dup( p_val );
+                    p_var->ops->pf_dup( p_val );
                 }
             }
             break;
@@ -754,7 +756,7 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     p_var = &p_priv->p_vars[i_var];
 
     /* Duplicate data if needed */
-    p_var->pf_dup( &val );
+    p_var->ops->pf_dup( &val );
 
     /* Backup needed stuff */
     oldval = p_var->val;
@@ -798,7 +800,7 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     }
 
     /* Free data if needed */
-    p_var->pf_free( &oldval );
+    p_var->ops->pf_free( &oldval );
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -835,7 +837,7 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
     *p_val = p_var->val;
 
     /* Duplicate value if needed */
-    p_var->pf_dup( p_val );
+    p_var->ops->pf_dup( p_val );
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -1377,7 +1379,7 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
         /* FIXME: the list is sorted, dude. Use something cleverer. */
         for( i = p_var->choices.i_count ; i-- ; )
         {
-            if( p_var->pf_cmp( *p_val, p_var->choices.p_values[i] ) == 0 )
+            if( p_var->ops->pf_cmp( *p_val, p_var->choices.p_values[i] ) == 0 )
             {
                 break;
             }
@@ -1387,10 +1389,10 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
         if( i < 0 )
         {
             /* Free the old variable, get the new one, dup it */
-            p_var->pf_free( p_val );
+            p_var->ops->pf_free( p_val );
             *p_val = p_var->choices.p_values[p_var->i_default >= 0
                                           ? p_var->i_default : 0 ];
-            p_var->pf_dup( p_val );
+            p_var->ops->pf_dup( p_val );
         }
     }
 
@@ -1529,7 +1531,7 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
         *p_val = p_var->val;
 
         /* Duplicate value if needed */
-        p_var->pf_dup( p_val );
+        p_var->ops->pf_dup( p_val );
 
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_SUCCESS;

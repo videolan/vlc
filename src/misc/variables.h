@@ -30,6 +30,13 @@
 
 typedef struct callback_entry_t callback_entry_t;
 
+typedef struct variable_ops_t
+{
+    int  (*pf_cmp) ( vlc_value_t, vlc_value_t );
+    void (*pf_dup) ( vlc_value_t * );
+    void (*pf_free) ( vlc_value_t * );
+} variable_ops_t;
+
 /**
  * The structure describing a variable.
  * \note vlc_value_t is the common union for variable values
@@ -46,12 +53,7 @@ struct variable_t
     /** The variable display name, mainly for use by the interfaces */
     char *       psz_text;
 
-    /** A pointer to a comparison function */
-    int      ( * pf_cmp ) ( vlc_value_t, vlc_value_t );
-    /** A pointer to a duplication function */
-    void     ( * pf_dup ) ( vlc_value_t * );
-    /** A pointer to a deallocation function */
-    void     ( * pf_free ) ( vlc_value_t * );
+    const variable_ops_t *ops;
 
     /** Creation count: we only destroy the variable if it reaches 0 */
     int          i_usage;

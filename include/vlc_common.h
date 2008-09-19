@@ -139,7 +139,6 @@ static inline void __vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
 typedef struct vlc_list_t vlc_list_t;
 typedef struct vlc_object_t vlc_object_t;
 typedef struct libvlc_int_t libvlc_int_t;
-typedef struct variable_t variable_t;
 typedef struct date_t date_t;
 typedef struct dict_entry_t dict_entry_t;
 typedef struct dict_t dict_t;

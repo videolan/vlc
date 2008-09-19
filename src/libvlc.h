@@ -25,6 +25,8 @@
 #ifndef LIBVLC_LIBVLC_H
 # define LIBVLC_LIBVLC_H 1
 
+typedef struct variable_t variable_t;
+
 extern const char vlc_usage[];
 
 /* Hotkey stuff */
