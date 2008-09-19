@@ -104,39 +104,63 @@ static unsigned          i_instances = 0;
 static bool b_daemon = false;
 #endif
 
-/*****************************************************************************
- * vlc_gc_*.
- *****************************************************************************/
-void __vlc_gc_incref( gc_object_t * p_gc )
-{
-    assert( p_gc->i_gc_refcount > 0 );
+#undef vlc_gc_init
+#undef vlc_hold
+#undef vlc_release
 
-    /* FIXME: atomic version needed! */
-    p_gc->i_gc_refcount ++;
+/**
+ * Atomically set the reference count to 1.
+ * @param p_gc reference counted object
+ * @param pf_destruct destruction calback
+ * @return p_gc.
+ */
+void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
+{
+    p_gc->pf_destructor = pf_destruct;
+
+    /* Nobody else can possibly lock the spin - it's there as a barrier */
+    vlc_spin_init (&p_gc->spin);
+    vlc_spin_lock (&p_gc->spin);
+    p_gc->refs = 1;
+    vlc_spin_unlock (&p_gc->spin);
+    return p_gc;
 }
 
-void __vlc_gc_decref( gc_object_t *p_gc )
+/**
+ * Atomically increment the reference count.
+ * @param p_gc reference counted object
+ * @return p_gc.
+ */
+void *vlc_hold (gc_object_t * p_gc)
 {
     assert( p_gc );
-    assert( p_gc->i_gc_refcount > 0 );
 
-    /* FIXME: atomic version needed! */
-    p_gc->i_gc_refcount -- ;
-
-    if( p_gc->i_gc_refcount == 0 )
-    {
-        p_gc->pf_destructor( p_gc );
-        /* Do not use the p_gc pointer from now on ! */
-    }
+    vlc_spin_lock (&p_gc->spin);
+    assert (p_gc->refs > 0);
+    p_gc->refs++;
+    vlc_spin_unlock (&p_gc->spin);
+    return p_gc;
 }
 
-void
-__vlc_gc_init( gc_object_t * p_gc, void (*pf_destructor)( gc_object_t * ),
-               void * arg)
+/**
+ * Atomically decrement the reference count and, if it reaches zero, destroy.
+ * @param p_gc reference counted object.
+ */
+void vlc_release (gc_object_t *p_gc)
 {
-    p_gc->i_gc_refcount = 1;
-    p_gc->pf_destructor = pf_destructor;
-    p_gc->p_destructor_arg = arg;
+    bool dead;
+
+    assert( p_gc );
+    vlc_spin_lock (&p_gc->spin);
+    assert (p_gc->refs > 0);
+    dead = !--p_gc->refs;
+    vlc_spin_unlock (&p_gc->spin);
+
+    if (dead)
+    {
+        vlc_spin_destroy (&p_gc->spin);
+        p_gc->pf_destructor (p_gc);
+    }
 }
 
 /*****************************************************************************
@@ -1025,8 +1049,8 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     bool b_clean = true;
     FOREACH_ARRAY( input_item_t *p_del, priv->input_items )
-        msg_Err( p_libvlc, "input item %p has not been deleted properly: refcount %d, name %s",
-            p_del, p_del->i_gc_refcount, p_del->psz_name ? p_del->psz_name : "(null)" );
+        msg_Err( p_libvlc, "input item %p has not been deleted properly: name %s",
+            p_del, p_del->psz_name ? p_del->psz_name : "(null)" );
         b_clean = false;
     FOREACH_END();
     assert( b_clean );

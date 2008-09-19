@@ -367,23 +367,25 @@ char *input_item_GetInfo( input_item_t *p_i,
     return strdup( "" );
 }
 
-static void input_item_Destroy ( gc_object_t *p_this )
+static void input_item_Destroy ( gc_object_t *gc )
 {
-    vlc_object_t *p_obj = (vlc_object_t *)p_this->p_destructor_arg;
-    libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
-    input_item_t *p_input = (input_item_t *) p_this;
+    input_item_t *p_input = vlc_priv(gc, input_item_t);
+    libvlc_int_t *p_libvlc = p_input->p_libvlc;
     int i;
 
     input_item_Clean( p_input );
 
-    vlc_object_lock( p_obj->p_libvlc );
+    /* This is broken. Items must be removed from any table before their
+     * reference count drops to zero (unless the table is not used, but then
+     * why have it?). Full point, no buts. -- Courmisch */
+    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
+    vlc_object_lock( p_libvlc );
 
     ARRAY_BSEARCH( priv->input_items,->i_id, int, p_input->i_id, i);
     if( i != -1 )
         ARRAY_REMOVE( priv->input_items, i);
 
-    vlc_object_unlock( p_obj->p_libvlc );
-
+    vlc_object_unlock( p_libvlc );
     free( p_input );
 }
 
@@ -528,7 +530,8 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
     DECMALLOC_NULL( p_input, input_item_t );
 
     input_item_Init( p_obj, p_input );
-    vlc_gc_init( p_input, input_item_Destroy, (void *)p_obj->p_libvlc );
+    vlc_gc_init( p_input, input_item_Destroy );
+    p_input->p_libvlc = p_obj->p_libvlc;
 
     vlc_object_lock( p_obj->p_libvlc );
     p_input->i_id = ++priv->i_last_input_id;

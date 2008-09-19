@@ -448,12 +448,11 @@ __vlc_execve
 vlc_fastmem_register
 vlc_freeaddrinfo
 vlc_gai_strerror
-__vlc_gc_decref
-__vlc_gc_incref
-__vlc_gc_init
+vlc_gc_init
 vlc_getaddrinfo
 vlc_getnameinfo
 vlc_gettext
+vlc_hold
 vlc_iconv
 vlc_iconv_close
 vlc_iconv_open
@@ -490,6 +489,7 @@ __vlc_object_yield
 vlc_poll
 vlc_rand_bytes
 vlc_recvmsg
+vlc_release
 vlc_sdp_Start
 vlc_sendmsg
 vlc_strcasestr

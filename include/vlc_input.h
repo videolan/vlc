@@ -60,6 +60,7 @@ struct input_item_t
 {
     VLC_GC_MEMBERS
     int        i_id;                 /**< Identifier of the item */
+    libvlc_int_t *p_libvlc;
 
     char       *psz_name;            /**< text describing this item */
     char       *psz_uri;             /**< mrl of this item */

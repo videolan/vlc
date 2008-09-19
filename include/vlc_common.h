@@ -50,6 +50,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <stddef.h>
 
 #ifndef __cplusplus
 # include <stdbool.h>
@@ -142,7 +143,6 @@ typedef struct variable_t variable_t;
 typedef struct date_t date_t;
 typedef struct dict_entry_t dict_entry_t;
 typedef struct dict_t dict_t;
-typedef struct gc_object_t gc_object_t ;
 
 /* Messages */
 typedef struct msg_subscription_t msg_subscription_t;
@@ -558,30 +558,26 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 # define VLC_OBJECT( x ) ((vlc_object_t *)(x))
 #endif
 
-#define VLC_GC_MEMBERS                                                       \
-/** \name VLC_GC_MEMBERS                                                     \
- * these members are common to all objects that wish to be garbage-collected \
- */                                                                          \
-/**@{*/                                                                      \
-    int i_gc_refcount;                                                       \
-    void (*pf_destructor) ( gc_object_t * );                                 \
-    void *p_destructor_arg;                                                  \
-/**@}*/
-
-struct gc_object_t
+typedef struct gc_object_t
 {
-    VLC_GC_MEMBERS
-};
+    vlc_spinlock_t spin;
+    uintptr_t      refs;
+    void          (*pf_destructor) (struct gc_object_t *);
+} gc_object_t;
 
-VLC_EXPORT(void, __vlc_gc_incref, ( gc_object_t * p_gc ));
-VLC_EXPORT(void, __vlc_gc_decref, ( gc_object_t * p_gc ));
-VLC_EXPORT(void, __vlc_gc_init, ( gc_object_t * p_gc,
-    void (*pf_destructor)( gc_object_t * ), void * arg));
+/**
+ * These members are common to all objects that wish to be garbage-collected.
+ */
+#define VLC_GC_MEMBERS gc_object_t vlc_gc_data;
 
-#define vlc_gc_incref( a ) __vlc_gc_incref( (gc_object_t *)a )
-#define vlc_gc_decref( a ) __vlc_gc_decref( (gc_object_t *)a )
-#define vlc_gc_init( a,b,c ) __vlc_gc_init( (gc_object_t *)a,b,c )
+VLC_EXPORT(void *, vlc_gc_init, (gc_object_t *, void (*)(gc_object_t *)));
+VLC_EXPORT(void *, vlc_hold, (gc_object_t *));
+VLC_EXPORT(void, vlc_release, (gc_object_t *));
 
+#define vlc_gc_init( a,b ) vlc_gc_init( &(a)->vlc_gc_data, (b) )
+#define vlc_gc_incref( a ) vlc_hold( &(a)->vlc_gc_data )
+#define vlc_gc_decref( a ) vlc_release( &(a)->vlc_gc_data )
+#define vlc_priv( gc, t ) ((t *)(((char *)(gc)) - offsetof(t, vlc_gc_data)))
 
 /*****************************************************************************
  * Macros and inline functions
