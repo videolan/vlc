@@ -421,7 +421,7 @@ static inline void barrier (void)
     OSMemoryBarrier ();
 #elif defined(__powerpc__)
     asm volatile ("sync":::"memory");
-#elif defined(__i386__)
+#elif 0 // defined(__i386__) /*  Requires SSE2 support */
     asm volatile ("mfence":::"memory");
 #else
     vlc_spinlock_t spin;
