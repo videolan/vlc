@@ -32,7 +32,7 @@ static uint8_t videolan_public_key_longid[8] = {
   0x8B, 0x08, 0x52, 0x31, 0xD0, 0x38, 0x35, 0x37
 };
 
-/* gpg --export --armor "VideoLAN Release"|sed -e s/^/\"/ -e s/\$/\\\\n\"/ */
+/* gpg --export --armor "<id>"|sed -e s/^/\"/ -e s/\$/\\\\n\"/ */
 static uint8_t videolan_public_key[] = {
 "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
 "Version: GnuPG v2.0.4 (FreeBSD)\n"
