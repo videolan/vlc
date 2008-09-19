@@ -1321,7 +1321,6 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniCha
     video_format_t fmt;
     int x, y, i_offset, i_pitch;
     uint8_t i_y, i_u, i_v; // YUV values, derived from incoming RGB
-    subpicture_region_t *p_region_tmp;
 
     // Create a new subpicture region
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -1330,21 +1329,17 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniCha
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_textblock_height + VERTICAL_MARGIN * 2;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region_tmp = spu_CreateRegion( p_filter, &fmt );
-    if( !p_region_tmp )
-    {
-        msg_Err( p_filter, "cannot allocate SPU region" );
-        return VLC_EGENERIC;
-    }
-    p_region->fmt = p_region_tmp->fmt;
-    p_region->picture = p_region_tmp->picture;
-    free( p_region_tmp );
 
-    p_dst_y = p_region->picture.Y_PIXELS;
-    p_dst_u = p_region->picture.U_PIXELS;
-    p_dst_v = p_region->picture.V_PIXELS;
-    p_dst_a = p_region->picture.A_PIXELS;
-    i_pitch = p_region->picture.A_PITCH;
+    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    if( !p_region->p_picture )
+        return VLC_EGENERIC;
+    p_region->fmt = fmt;
+
+    p_dst_y = p_region->p_picture->Y_PIXELS;
+    p_dst_u = p_region->p_picture->U_PIXELS;
+    p_dst_v = p_region->p_picture->V_PIXELS;
+    p_dst_a = p_region->p_picture->A_PIXELS;
+    i_pitch = p_region->p_picture->A_PITCH;
 
     i_offset = VERTICAL_MARGIN *i_pitch;
     for( y=0; y<i_textblock_height; y++)

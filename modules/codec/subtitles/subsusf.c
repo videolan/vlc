@@ -1208,7 +1208,8 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
         return NULL;
     }
     assert( p_pic->format.i_chroma == VLC_FOURCC('Y','U','V','A') );
-    picture_CopyPixels( &p_region->picture, p_pic );
+    /* FIXME the copy is probably not needed anymore */
+    picture_CopyPixels( p_region->p_picture, p_pic );
 
     /* This isn't the best way to do this - if you really want transparency, then
      * you're much better off using an image type that supports it like PNG. The
@@ -1231,11 +1232,11 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
         {
             for( unsigned int x = 0; x < p_region->fmt.i_width; x++ )
             {
-                if( p_region->picture.Y_PIXELS[y*p_region->picture.Y_PITCH + x] != i_y ||
-                    p_region->picture.U_PIXELS[y*p_region->picture.U_PITCH + x] != i_u ||
-                    p_region->picture.V_PIXELS[y*p_region->picture.V_PITCH + x] != i_v )
+                if( p_region->p_picture->Y_PIXELS[y*p_region->p_picture->Y_PITCH + x] != i_y ||
+                    p_region->p_picture->U_PIXELS[y*p_region->p_picture->U_PITCH + x] != i_u ||
+                    p_region->p_picture->V_PIXELS[y*p_region->p_picture->V_PITCH + x] != i_v )
                     continue;
-                p_region->picture.A_PIXELS[y*p_region->picture.A_PITCH + x] = 0;
+                p_region->p_picture->A_PIXELS[y*p_region->p_picture->A_PITCH + x] = 0;
 
             }
         }

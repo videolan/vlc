@@ -477,8 +477,14 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, image_handler_t *p_image, pic
 
     p_subpic->p_region = spu_CreateRegion( p_vout->p_spu, &fmt_out );
     if( p_subpic->p_region )
-        vout_CopyPicture( p_image->p_parent, &p_subpic->p_region->picture, p_pip );
-    picture_Release( p_pip );
+    {
+        picture_Release( p_subpic->p_region->p_picture );
+        p_subpic->p_region->p_picture = p_pip;
+    }
+    else
+    {
+        picture_Release( p_pip );
+    }
 
     spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
     return VLC_SUCCESS;

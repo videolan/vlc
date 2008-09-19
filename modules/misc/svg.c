@@ -257,7 +257,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     int channels_in;
     int alpha;
     picture_t *p_pic;
-    subpicture_region_t *p_region_tmp;
 
     if ( p_filter->p_sys->i_width != i_width ||
          p_filter->p_sys->i_height != i_height )
@@ -284,31 +283,27 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region_tmp = spu_CreateRegion( p_filter, &fmt );
-    if( !p_region_tmp )
-    {
-        msg_Err( p_filter, "cannot allocate SPU region" );
+
+    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    if( !p_region->p_picture )
         return VLC_EGENERIC;
-    }
-    p_region->fmt = p_region_tmp->fmt;
-    p_region->picture = p_region_tmp->picture;
-    free( p_region_tmp );
+    p_region->fmt = fmt;
 
     p_region->i_x = p_region->i_y = 0;
-    p_y = p_region->picture.Y_PIXELS;
-    p_u = p_region->picture.U_PIXELS;
-    p_v = p_region->picture.V_PIXELS;
-    p_a = p_region->picture.A_PIXELS;
+    p_y = p_region->p_picture->Y_PIXELS;
+    p_u = p_region->p_picture->U_PIXELS;
+    p_v = p_region->p_picture->V_PIXELS;
+    p_a = p_region->p_picture->A_PIXELS;
 
-    i_pitch = p_region->picture.Y_PITCH;
-    i_u_pitch = p_region->picture.U_PITCH;
+    i_pitch = p_region->p_picture->Y_PITCH;
+    i_u_pitch = p_region->p_picture->U_PITCH;
 
     /* Initialize the region pixels (only the alpha will be changed later) */
     memset( p_y, 0x00, i_pitch * p_region->fmt.i_height );
     memset( p_u, 0x80, i_u_pitch * p_region->fmt.i_height );
     memset( p_v, 0x80, i_u_pitch * p_region->fmt.i_height );
 
-    p_pic = &p_region->picture;
+    p_pic = p_region->p_picture;
 
     /* Copy the data */
 

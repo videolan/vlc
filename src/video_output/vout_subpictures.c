@@ -71,6 +71,39 @@ struct filter_owner_sys_t
 #define SCALE_UNIT (1000)
 
 /* */
+struct subpicture_region_private_t
+{
+    video_format_t fmt;
+    picture_t      *p_picture;
+};
+
+static subpicture_region_private_t *SpuRegionPrivateCreate( video_format_t *p_fmt )
+{
+    subpicture_region_private_t *p_private = malloc( sizeof(*p_private) );
+
+    if( !p_private )
+        return NULL;
+
+    p_private->fmt = *p_fmt;
+    if( p_fmt->p_palette )
+    {
+        p_private->fmt.p_palette = malloc( sizeof(*p_private->fmt.p_palette) );
+        if( p_private->fmt.p_palette )
+            *p_private->fmt.p_palette = *p_fmt->p_palette;
+    }
+    p_private->p_picture = NULL;
+
+    return p_private;
+}
+static void SpuRegionPrivateDestroy( subpicture_region_private_t *p_private )
+{
+    if( p_private->p_picture )
+        picture_Release( p_private->p_picture );
+    free( p_private->fmt.p_palette );
+    free( p_private );
+}
+
+/* */
 static void SpuRenderCreateAndLoadText( spu_t *p_spu );
 static void SpuRenderCreateAndLoadScale( spu_t *p_spu );
 static void FilterRelease( filter_t *p_filter );
@@ -215,19 +248,6 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
     }
 }
 
-
-/* */
-static void RegionPictureRelease( picture_t *p_picture )
-{
-    if( --p_picture->i_refcount > 0 )
-        return;
-
-    assert( p_picture->i_refcount == 0 );
-    free( p_picture->p_q );
-    free( p_picture->p_data_orig );
-    free( p_picture->p_sys );
-}
-
 /**
  * Create a subpicture region
  *
@@ -250,25 +270,22 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     p_region->fmt = *p_fmt;
     p_region->i_alpha = 0xff;
     p_region->p_next = NULL;
-    p_region->p_cache = NULL;
+    p_region->p_private = NULL;
     p_region->psz_text = NULL;
     p_region->p_style = NULL;
+    p_region->p_picture = NULL;
 
     if( p_fmt->i_chroma == VLC_FOURCC('T','E','X','T') )
         return p_region;
 
-    vout_AllocatePicture( p_this, &p_region->picture, p_fmt->i_chroma,
-                          p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
-
-    if( !p_region->picture.i_planes )
+    p_region->p_picture = picture_New( p_fmt->i_chroma, p_fmt->i_width, p_fmt->i_height,
+                                       p_fmt->i_aspect );
+    if( !p_region->p_picture )
     {
         free( p_fmt->p_palette );
         free( p_region );
         return NULL;
     }
-
-    p_region->picture.i_refcount = 1;
-    p_region->picture.pf_release = RegionPictureRelease;
 
     return p_region;
 }
@@ -284,11 +301,13 @@ void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
     if( !p_region )
         return;
 
-    picture_Release( &p_region->picture );
+    if( p_region->p_private )
+        SpuRegionPrivateDestroy( p_region->p_private );
+
+    if( p_region->p_picture )
+        picture_Release( p_region->p_picture );
 
     free( p_region->fmt.p_palette );
-    if( p_region->p_cache )
-        __spu_DestroyRegion( p_this, p_region->p_cache );
 
     free( p_region->psz_text );
     free( p_region->psz_html );
@@ -902,6 +921,9 @@ static void SpuRenderRegion( spu_t *p_spu,
     int i_y_offset;
     filter_t *p_scale;
 
+    video_format_t *p_region_fmt;
+    picture_t *p_region_picture;
+
     vlc_assert_locked( &p_spu->subpicture_lock );
 
     /* Invalidate area by default */
@@ -958,6 +980,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     i_x_offset = spu_scale_w( p_area->i_x, p_area->scale );
     i_y_offset = spu_scale_h( p_area->i_y, p_area->scale );
 
+    /* */
     if( b_force_palette )
     {
         /* It looks so wrong I won't comment
@@ -968,12 +991,14 @@ static void SpuRenderRegion( spu_t *p_spu,
         memcpy( p_region->fmt.p_palette->palette, p_spu->palette, 4*sizeof(uint32_t) );
     }
 
-    if( b_using_palette )
-        p_scale = p_spu->p_scale_yuvp;
-    else
-        p_scale = p_spu->p_scale;
+    /* */
+    p_region_fmt = &p_region->fmt;
+    p_region_picture = p_region->p_picture;
+
 
     /* Scale from rendered size to destination size */
+    p_scale = b_using_palette ? p_spu->p_scale_yuvp : p_spu->p_scale;
+
     if( p_scale &&
         ( scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || b_force_palette ) )
     {
@@ -983,21 +1008,17 @@ static void SpuRenderRegion( spu_t *p_spu,
         /* TODO when b_using_palette is true, we should first convert it to YUVA to allow
          * a proper rescaling */
 
-        /* Destroy if cache is unusable */
-        if( p_region->p_cache )
+        /* Destroy if cache is unusable
+         * FIXME do not always destroy the region it can sometimes be reused 
+         * if same size and same palette if present */
+        if( p_region->p_private )
         {
-            if( p_region->p_cache->fmt.i_width  != i_dst_width ||
-                p_region->p_cache->fmt.i_height != i_dst_height ||
-                b_force_palette )
-            {
-                p_subpic->pf_destroy_region( VLC_OBJECT(p_spu),
-                                             p_region->p_cache );
-                p_region->p_cache = NULL;
-            }
+            SpuRegionPrivateDestroy( p_region->p_private );
+            p_region->p_private = NULL;
         }
 
         /* Scale if needed into cache */
-        if( !p_region->p_cache )
+        if( !p_region->p_private )
         {
             picture_t *p_pic;
 
@@ -1012,52 +1033,33 @@ static void SpuRenderRegion( spu_t *p_spu,
             p_scale->fmt_out.video.i_visible_height =
                 spu_scale_h( p_region->fmt.i_visible_height, scale_size );
 
-            p_region->p_cache =
-                p_subpic->pf_create_region( VLC_OBJECT(p_spu),
-                                            &p_scale->fmt_out.video );
+            p_region->p_private = SpuRegionPrivateCreate( &p_scale->fmt_out.video );
 
-            p_pic = NULL;
             if( p_scale->p_module )
             {
-                picture_Yield( &p_region->picture );
-                p_pic = p_scale->pf_video_filter( p_scale, &p_region->picture );
+                picture_Yield( p_region->p_picture );
+                p_region->p_private->p_picture = p_scale->pf_video_filter( p_scale, p_region->p_picture );
             }
-            if( p_pic )
-            {
-                picture_CopyPixels( &p_region->p_cache->picture, p_pic );
-                picture_Release( p_pic );
-
-                if( p_region->p_cache->fmt.p_palette )
-                    *p_region->p_cache->fmt.p_palette = *p_region->fmt.p_palette;
-
-                /* i_x/i_y of cached region should NOT be used. I set them to
-                 * an invalid value to catch it (assert) */
-                p_region->p_cache->i_x = INT_MAX;
-                p_region->p_cache->i_y = INT_MAX;
-                p_region->p_cache->i_align = p_region->i_align;
-                p_region->p_cache->i_alpha = p_region->i_alpha;
-            }
-            else
+            if( !p_region->p_private->p_picture )
             {
                 msg_Err( p_spu, "scaling failed (module not loaded)" );
-                p_subpic->pf_destroy_region( VLC_OBJECT(p_spu),
-                                             p_region->p_cache );
-                p_region->p_cache = NULL;
+                SpuRegionPrivateDestroy( p_region->p_private );
+                p_region->p_private = NULL;
             }
         }
 
         /* And use the scaled picture */
-        if( p_region->p_cache )
+        if( p_region->p_private )
         {
-            p_region = p_region->p_cache;
-            fmt_original = p_region->fmt;
+            p_region_fmt = &p_region->p_private->fmt;
+            p_region_picture = p_region->p_private->p_picture;
         }
     }
 
     /* Force cropping if requested */
     if( b_force_crop )
     {
-        video_format_t *p_fmt = &p_region->fmt;
+        video_format_t *p_fmt = p_region_fmt;
         int i_crop_x = spu_scale_w( p_spu->i_crop_x, scale_size );
         int i_crop_y = spu_scale_h( p_spu->i_crop_y, scale_size );
         int i_crop_width = spu_scale_w( p_spu->i_crop_width, scale_size );
@@ -1094,14 +1096,14 @@ static void SpuRenderRegion( spu_t *p_spu,
     }
 
     /* Update the blender */
-    SpuRenderUpdateBlend( p_spu, p_fmt->i_width, p_fmt->i_height, &p_region->fmt );
+    SpuRenderUpdateBlend( p_spu, p_fmt->i_width, p_fmt->i_height, p_region_fmt );
 
     if( p_spu->p_blend->p_module )
     {
         const int i_alpha = SpuRegionAlpha( p_subpic, p_region );
 
         p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
-            &p_region->picture, i_x_offset, i_y_offset, i_alpha );
+            p_region_picture, i_x_offset, i_y_offset, i_alpha );
     }
     else
     {
@@ -1118,8 +1120,13 @@ exit:
          * pre-rendered state, so the next time through everything is
          * calculated again.
          */
-        p_region->picture.pf_release( &p_region->picture );
-        memset( &p_region->picture, 0, sizeof( picture_t ) );
+        picture_Release( p_region->p_picture );
+        p_region->p_picture = NULL;
+        if( p_region->p_private )
+        {
+            SpuRegionPrivateDestroy( p_region->p_private );
+            p_region->p_private = NULL;
+        }
         p_region->i_align &= ~SUBPICTURE_RENDERED;
     }
     if( b_restore_format )

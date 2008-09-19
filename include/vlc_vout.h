@@ -290,6 +290,11 @@ struct picture_heap_t
  */
 
 /**
+ * Video subtitle region spu core private
+ */
+typedef struct subpicture_region_private_t subpicture_region_private_t;
+
+/**
  * Video subtitle region
  *
  * A subtitle region is defined by a picture (graphic) and its rendering
@@ -299,7 +304,7 @@ struct picture_heap_t
 struct subpicture_region_t
 {
     video_format_t  fmt;                          /**< format of the picture */
-    picture_t       picture;             /**< picture comprising this region */
+    picture_t       *p_picture;          /**< picture comprising this region */
 
     int             i_x;                             /**< position of region */
     int             i_y;                             /**< position of region */
@@ -311,7 +316,7 @@ struct subpicture_region_t
     text_style_t    *p_style;        /**< a description of the text style formatting */
 
     subpicture_region_t *p_next;                /**< next region in the list */
-    subpicture_region_t *p_cache;       /**< modified version of this region */
+    subpicture_region_private_t *p_private;  /**< modified version of this region */
 };
 
 /**

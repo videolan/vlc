@@ -418,12 +418,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-        picture_t *p_pic = &p_spu->p_region->picture;
+        picture_t *p_pic = p_spu->p_region->p_picture;
 
         /* ZVBI is stupid enough to assume pitch == width */
         p_pic->p->i_pitch = 4 * fmt.i_width;
         vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
-                          p_spu->p_region->picture.p->p_pixels, 1, 1 );
+                          p_spu->p_region->p_picture->p->p_pixels, 1, 1 );
 
         vlc_mutex_lock( &p_sys->lock );
         memcpy( p_sys->nav_link, &p_page.nav_link, sizeof( p_sys->nav_link )) ;

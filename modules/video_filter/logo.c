@@ -873,7 +873,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
-    vout_CopyPicture( p_filter, &p_region->picture, p_pic );
+    /* FIXME the copy is probably not needed anymore */
+    vout_CopyPicture( p_filter, &p_region->p_picture, p_pic );
     vlc_mutex_unlock( &p_logo_list->lock );
 
     /*  where to locate the logo: */

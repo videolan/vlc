@@ -642,9 +642,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
 
         p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt_out );
-        /* XXX That's a pity to do a copy, but it is needed for now */
+        /* FIXME the copy is probably not needed anymore */
         if( p_region )
-            picture_Copy( &p_region->picture, p_converted );
+            picture_Copy( &p_region->p_picture, p_converted );
         if( !p_sys->b_keep )
             picture_Release( p_converted );
 

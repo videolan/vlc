@@ -569,7 +569,7 @@ static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, 
 
 static void RegionDraw( subpicture_region_t *p_region, ass_image_t *p_img )
 {
-    const plane_t *p = &p_region->picture.p[0];
+    const plane_t *p = &p_region->p_picture->p[0];
     const int i_x = p_region->i_x;
     const int i_y = p_region->i_y;
     const int i_width  = p_region->fmt.i_width;

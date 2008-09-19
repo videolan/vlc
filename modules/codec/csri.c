@@ -305,14 +305,14 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
 
         /* */
         p_spu_region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
-        memset( p_spu_region->picture.Y_PIXELS, 0x00, p_spu_region->picture.Y_PITCH * p_sys->fmt_cached.i_height );
+        memset( p_spu_region->p_picture->Y_PIXELS, 0x00, p_spu_region->p_picture->Y_PITCH * p_sys->fmt_cached.i_height );
 
         /* */
         //msg_Dbg( p_dec, "TS %lf", ts * 0.000001 );
         memset( &csri_frame, 0, sizeof(csri_frame) );
         csri_frame.pixfmt = CSRI_F_BGRA;
-        csri_frame.planes[0] = (unsigned char*)p_spu_region->picture.Y_PIXELS;
-        csri_frame.strides[0] = p_spu_region->picture.Y_PITCH;
+        csri_frame.planes[0] = (unsigned char*)p_spu_region->p_picture->Y_PIXELS;
+        csri_frame.strides[0] = p_spu_region->p_picture->Y_PITCH;
         csri_render( p_sys->p_instance, &csri_frame, ts * 0.000001 );
     }
 }

@@ -640,7 +640,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         CreateKatePalette( fmt.p_palette, ev->palette );
 
         /* create the bitmap */
-        CreateKateBitmap( &p_bitmap_region->picture, ev->bitmap );
+        CreateKateBitmap( p_bitmap_region->p_picture, ev->bitmap );
 
         msg_Dbg(p_dec, "Created bitmap, %zux%zu, %zu colors\n", ev->bitmap->width, ev->bitmap->height, ev->palette->ncolors);
     }

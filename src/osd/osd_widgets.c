@@ -52,8 +52,8 @@ static void DrawRect( subpicture_t *p_subpic, int i_x1, int i_y1,
                       int i_x2, int i_y2, short fill )
 {
     int x, y;
-    uint8_t *p_a = p_subpic->p_region->picture.A_PIXELS;
-    int i_pitch = p_subpic->p_region->picture.Y_PITCH;
+    uint8_t *p_a = p_subpic->p_region->p_picture->A_PIXELS;
+    int i_pitch = p_subpic->p_region->p_picture->Y_PITCH;
 
     if( fill == STYLE_FILLED )
     {
@@ -88,8 +88,8 @@ static void DrawTriangle( subpicture_t *p_subpic, int i_x1, int i_y1,
                           int i_x2, int i_y2, short fill )
 {
     int x, y, i_mid, h;
-    uint8_t *p_a = p_subpic->p_region->picture.A_PIXELS;
-    int i_pitch = p_subpic->p_region->picture.Y_PITCH;
+    uint8_t *p_a = p_subpic->p_region->p_picture->A_PIXELS;
+    int i_pitch = p_subpic->p_region->p_picture->Y_PITCH;
 
     i_mid = i_y1 + ( ( i_y2 - i_y1 ) >> 1 );
 
@@ -173,11 +173,11 @@ static int CreatePicture( spu_t *p_spu, subpicture_t *p_subpic,
 
     p_subpic->p_region->i_x = i_x;
     p_subpic->p_region->i_y = i_y;
-    p_y = p_subpic->p_region->picture.Y_PIXELS;
-    p_u = p_subpic->p_region->picture.U_PIXELS;
-    p_v = p_subpic->p_region->picture.V_PIXELS;
-    p_a = p_subpic->p_region->picture.A_PIXELS;
-    i_pitch = p_subpic->p_region->picture.Y_PITCH;
+    p_y = p_subpic->p_region->p_picture->Y_PIXELS;
+    p_u = p_subpic->p_region->p_picture->U_PIXELS;
+    p_v = p_subpic->p_region->p_picture->V_PIXELS;
+    p_a = p_subpic->p_region->p_picture->A_PIXELS;
+    i_pitch = p_subpic->p_region->p_picture->Y_PITCH;
 
     /* Initialize the region pixels (only the alpha will be changed later) */
     memset( p_y, 0xff, i_pitch * p_subpic->p_region->fmt.i_height );
@@ -328,8 +328,8 @@ int osd_Icon( vlc_object_t *p_this, spu_t *p_spu,
                       STYLE_FILLED );
         if( i_type == OSD_MUTE_ICON )
         {
-            uint8_t *p_a = p_subpic->p_region->picture.A_PIXELS;
-            int i_pitch = p_subpic->p_region->picture.Y_PITCH;
+            uint8_t *p_a = p_subpic->p_region->p_picture->A_PIXELS;
+            int i_pitch = p_subpic->p_region->p_picture->Y_PITCH;
             int i;
             for( i = 1; i < i_pitch; i++ )
             {

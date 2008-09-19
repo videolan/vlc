@@ -217,7 +217,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     uint8_t *p_dst;
     video_format_t fmt;
     int i, i_pitch;
-    subpicture_region_t *p_region_tmp;
     bool b_outline = true;
 
     /* Create a new subpicture region */
@@ -226,12 +225,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     fmt.i_width = fmt.i_visible_width = i_width + (b_outline ? 4 : 0);
     fmt.i_height = fmt.i_visible_height = i_height + (b_outline ? 4 : 0);
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region_tmp = spu_CreateRegion( p_filter, &fmt );
-    if( !p_region_tmp )
-    {
-        msg_Err( p_filter, "cannot allocate SPU region" );
-        return VLC_EGENERIC;
-    }
 
     /* Build palette */
     fmt.p_palette->i_entries = 16;
@@ -243,17 +236,18 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
         fmt.p_palette->palette[i][3] = pi_gamma[i];
     }
 
-    p_region->fmt = p_region_tmp->fmt;
-    p_region->picture = p_region_tmp->picture;
-    free( p_region_tmp );
+    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    if( !p_region->p_picture )
+        return VLC_EGENERIC;
+    p_region->fmt = fmt;
 
-    p_dst = p_region->picture.Y_PIXELS;
-    i_pitch = p_region->picture.Y_PITCH;
+    p_dst = p_region->p_picture->Y_PIXELS;
+    i_pitch = p_region->p_picture->Y_PITCH;
 
     if( b_outline )
     {
         memset( p_dst, 0, i_pitch * fmt.i_height );
-        p_dst += p_region->picture.Y_PITCH * 2 + 2;
+        p_dst += p_region->p_picture->Y_PITCH * 2 + 2;
     }
 
     for( i = 0; i < i_height; i++ )
@@ -270,7 +264,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
         uint8_t left, current;
         int x, y;
 
-        p_dst = p_region->picture.Y_PIXELS;
+        p_dst = p_region->p_picture->Y_PIXELS;
 
         for( y = 1; y < (int)fmt.i_height - 1; y++ )
         {

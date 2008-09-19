@@ -662,7 +662,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     int i, x, y, i_pitch;
     uint8_t i_y; /* YUV values, derived from incoming RGB */
     int8_t i_u, i_v;
-    subpicture_region_t *p_region_tmp;
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -675,16 +674,12 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     if( p_region->fmt.i_visible_height > 0 )
         fmt.i_visible_height = p_region->fmt.i_visible_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region_tmp = spu_CreateRegion( p_filter, &fmt );
-    if( !p_region_tmp )
-    {
-        msg_Err( p_filter, "cannot allocate SPU region" );
-        return VLC_EGENERIC;
-    }
 
-    p_region->fmt = p_region_tmp->fmt;
-    p_region->picture = p_region_tmp->picture;
-    free( p_region_tmp );
+    assert( !p_region->p_picture );
+    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    if( !p_region->p_picture )
+        return VLC_EGENERIC;
+    p_region->fmt = fmt;
 
     /* Calculate text color components */
     i_y = (uint8_t)(( 66 * p_line->i_red  + 129 * p_line->i_green +
@@ -715,8 +710,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
             (int)fmt.p_palette->palette[i][3] * (255 - p_line->i_alpha) / 255;
     }
 
-    p_dst = p_region->picture.Y_PIXELS;
-    i_pitch = p_region->picture.Y_PITCH;
+    p_dst = p_region->p_picture->Y_PIXELS;
+    i_pitch = p_region->p_picture->Y_PITCH;
 
     /* Initialize the region pixels */
     memset( p_dst, 0, i_pitch * p_region->fmt.i_height );
@@ -768,21 +763,21 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     /* Outlining (find something better than nearest neighbour filtering ?) */
     if( 1 )
     {
-        uint8_t *p_dst = p_region->picture.Y_PIXELS;
+        uint8_t *p_dst = p_region->p_picture->Y_PIXELS;
         uint8_t *p_top = p_dst; /* Use 1st line as a cache */
         uint8_t left, current;
 
         for( y = 1; y < (int)fmt.i_height - 1; y++ )
         {
             if( y > 1 ) memcpy( p_top, p_dst, fmt.i_width );
-            p_dst += p_region->picture.Y_PITCH;
+            p_dst += p_region->p_picture->Y_PITCH;
             left = 0;
 
             for( x = 1; x < (int)fmt.i_width - 1; x++ )
             {
                 current = p_dst[x];
                 p_dst[x] = ( 8 * (int)p_dst[x] + left + p_dst[x+1] + p_top[x -1]+ p_top[x] + p_top[x+1] +
-                             p_dst[x -1 + p_region->picture.Y_PITCH ] + p_dst[x + p_region->picture.Y_PITCH] + p_dst[x + 1 + p_region->picture.Y_PITCH]) / 16;
+                             p_dst[x -1 + p_region->p_picture->Y_PITCH ] + p_dst[x + p_region->p_picture->Y_PITCH] + p_dst[x + 1 + p_region->p_picture->Y_PITCH]) / 16;
                 left = current;
             }
         }
@@ -803,11 +798,11 @@ static void UnderlineGlyphYUVA( int i_line_thickness, int i_line_offset, bool b_
     int i_pitch;
     uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
 
-    p_dst_y = p_region->picture.Y_PIXELS;
-    p_dst_u = p_region->picture.U_PIXELS;
-    p_dst_v = p_region->picture.V_PIXELS;
-    p_dst_a = p_region->picture.A_PIXELS;
-    i_pitch = p_region->picture.A_PITCH;
+    p_dst_y = p_region->p_picture->Y_PIXELS;
+    p_dst_u = p_region->p_picture->U_PIXELS;
+    p_dst_v = p_region->p_picture->V_PIXELS;
+    p_dst_a = p_region->p_picture->A_PIXELS;
+    i_pitch = p_region->p_picture->A_PITCH;
 
     int i_offset = ( p_this_glyph_pos->y + i_glyph_tmax + i_line_offset + 3 ) * i_pitch +
                      p_this_glyph_pos->x + p_this_glyph->left + 3 + i_align_offset;
@@ -866,8 +861,8 @@ static void UnderlineGlyphYUVA( int i_line_thickness, int i_line_offset, bool b_
 
 static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_region, int xoffset, int yoffset )
 {
-    uint8_t *p_dst = p_region->picture.A_PIXELS;
-    int i_pitch = p_region->picture.A_PITCH;
+    uint8_t *p_dst = p_region->p_picture->A_PIXELS;
+    int i_pitch = p_region->p_picture->A_PITCH;
     int x,y;
 
     for( ; p_line != NULL; p_line = p_line->p_next )
@@ -930,7 +925,6 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     video_format_t fmt;
     int i, x, y, i_pitch, i_alpha;
     uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
-    subpicture_region_t *p_region_tmp;
 
     if( i_width == 0 || i_height == 0 )
         return VLC_SUCCESS;
@@ -946,16 +940,11 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     if( p_region->fmt.i_visible_height > 0 )
         fmt.i_visible_height = p_region->fmt.i_visible_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region_tmp = spu_CreateRegion( p_filter, &fmt );
-    if( !p_region_tmp )
-    {
-        msg_Err( p_filter, "cannot allocate SPU region" );
-        return VLC_EGENERIC;
-    }
 
-    p_region->fmt = p_region_tmp->fmt;
-    p_region->picture = p_region_tmp->picture;
-    free( p_region_tmp );
+    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    if( !p_region->p_picture )
+        return VLC_EGENERIC;
+    p_region->fmt = fmt;
 
     /* Calculate text color components */
     YUVFromRGB( (p_line->i_red   << 16) |
@@ -964,11 +953,11 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                 &i_y, &i_u, &i_v);
     i_alpha = p_line->i_alpha;
 
-    p_dst_y = p_region->picture.Y_PIXELS;
-    p_dst_u = p_region->picture.U_PIXELS;
-    p_dst_v = p_region->picture.V_PIXELS;
-    p_dst_a = p_region->picture.A_PIXELS;
-    i_pitch = p_region->picture.A_PITCH;
+    p_dst_y = p_region->p_picture->Y_PIXELS;
+    p_dst_u = p_region->p_picture->U_PIXELS;
+    p_dst_v = p_region->p_picture->V_PIXELS;
+    p_dst_a = p_region->p_picture->A_PIXELS;
+    i_pitch = p_region->p_picture->A_PITCH;
 
     /* Initialize the region pixels */
     if( p_filter->p_sys->i_effect != EFFECT_BACKGROUND )

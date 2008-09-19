@@ -1571,8 +1571,8 @@ static subpicture_t *render( decoder_t *p_dec )
         }
 
         p_src = p_region->p_pixbuf;
-        p_dst = p_spu_region->picture.Y_PIXELS;
-        i_pitch = p_spu_region->picture.Y_PITCH;
+        p_dst = p_spu_region->p_picture->Y_PIXELS;
+        i_pitch = p_spu_region->p_picture->Y_PITCH;
 
         /* Copy pixel buffer */
         for( j = 0; j < p_region->i_height; j++ )
@@ -1710,11 +1710,11 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
 #else
         int *pi_delta;
 #endif
-        int i_pixels = p_region->picture.p[0].i_visible_lines
-                        * p_region->picture.p[0].i_pitch;
-        int i_iterator = p_region->picture.p[0].i_visible_lines * 3 / 4
-                            * p_region->picture.p[0].i_pitch
-                        + p_region->picture.p[0].i_pitch * 1 / 3;
+        int i_pixels = p_region->p_picture->p[0].i_visible_lines
+                        * p_region->p_picture->p[0].i_pitch;
+        int i_iterator = p_region->p_picture->p[0].i_visible_lines * 3 / 4
+                            * p_region->p_picture->p[0].i_pitch
+                        + p_region->p_picture->p[0].i_pitch * 1 / 3;
         int i_tolerance = 0;
 
 #ifdef DEBUG_DVBSUB
@@ -1754,10 +1754,10 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
             for( i = 0; i < i_pixels ; )
             {
                 uint8_t y, u, v, a;
-                y = p_region->picture.p[0].p_pixels[i];
-                u = p_region->picture.p[1].p_pixels[i];
-                v = p_region->picture.p[2].p_pixels[i];
-                a = p_region->picture.p[3].p_pixels[i];
+                y = p_region->p_picture->p[0].p_pixels[i];
+                u = p_region->p_picture->p[1].p_pixels[i];
+                v = p_region->p_picture->p[2].p_pixels[i];
+                a = p_region->p_picture->p[3].p_pixels[i];
                 for( j = 0; j < p_fmt->p_palette->i_entries; j++ )
                 {
                     if( abs((int)p_fmt->p_palette->palette[j][0] - (int)y) <= i_tolerance &&
@@ -1799,29 +1799,29 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
 #endif
 
 #ifndef RANDOM_DITHERING
-        pi_delta = malloc( ( p_region->picture.p[0].i_pitch + 1 )
+        pi_delta = malloc( ( p_region->p_picture->p[0].i_pitch + 1 )
                             * sizeof(int) * 4  );
-        for( i = 0; i < (p_region->picture.p[0].i_pitch + 1) * 4 ; i++ )
+        for( i = 0; i < (p_region->p_picture->p[0].i_pitch + 1) * 4 ; i++ )
         {
             pi_delta[ i ] = 0;
         }
 #endif
 
         /* Fill image with our new colours */
-        for( p = 0; p < p_region->picture.p[0].i_visible_lines ; p++ )
+        for( p = 0; p < p_region->p_picture->p[0].i_visible_lines ; p++ )
         {
             int i_ydelta = 0, i_udelta = 0, i_vdelta = 0, i_adelta = 0;
 
-            for( n = 0; n < p_region->picture.p[0].i_pitch ; n++ )
+            for( n = 0; n < p_region->p_picture->p[0].i_pitch ; n++ )
             {
-                int i_offset = p * p_region->picture.p[0].i_pitch + n;
+                int i_offset = p * p_region->p_picture->p[0].i_pitch + n;
                 int y, u, v, a;
                 int i_mindist, i_best;
 
-                y = (int)p_region->picture.p[0].p_pixels[i_offset];
-                u = (int)p_region->picture.p[1].p_pixels[i_offset];
-                v = (int)p_region->picture.p[2].p_pixels[i_offset];
-                a = (int)p_region->picture.p[3].p_pixels[i_offset];
+                y = (int)p_region->p_picture->p[0].p_pixels[i_offset];
+                u = (int)p_region->p_picture->p[1].p_pixels[i_offset];
+                v = (int)p_region->p_picture->p[2].p_pixels[i_offset];
+                a = (int)p_region->p_picture->p[3].p_pixels[i_offset];
 
                 /* Add dithering compensation */
 #ifdef RANDOM_DITHERING
@@ -1854,7 +1854,7 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
                 }
 
                 /* Set pixel to best color */
-                p_region->picture.p[0].p_pixels[i_offset] = i_best;
+                p_region->p_picture->p[0].p_pixels[i_offset] = i_best;
 
                 /* Update dithering state */
 #ifdef RANDOM_DITHERING
@@ -2364,8 +2364,8 @@ static void encode_pixel_line_2bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;
-    int i_pitch = p_region->picture.p->i_pitch;
-    uint8_t *p_data = &p_region->picture.p->p_pixels[ i_pitch * i_line ];
+    int i_pitch = p_region->p_picture->p->i_pitch;
+    uint8_t *p_data = &p_region->p_picture->p->p_pixels[ i_pitch * i_line ];
     int i_last_pixel = p_data[0];
 
     for( i = 0; i <= p_region->fmt.i_visible_width; i++ )
@@ -2455,8 +2455,8 @@ static void encode_pixel_line_4bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;
-    int i_pitch = p_region->picture.p->i_pitch;
-    uint8_t *p_data = &p_region->picture.p->p_pixels[ i_pitch * i_line ];
+    int i_pitch = p_region->p_picture->p->i_pitch;
+    uint8_t *p_data = &p_region->p_picture->p->p_pixels[ i_pitch * i_line ];
     int i_last_pixel = p_data[0];
 
     for( i = 0; i <= p_region->fmt.i_visible_width; i++ )
@@ -2553,8 +2553,8 @@ static void encode_pixel_line_8bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;
-    int i_pitch = p_region->picture.p->i_pitch;
-    uint8_t *p_data = &p_region->picture.p->p_pixels[ i_pitch * i_line ];
+    int i_pitch = p_region->p_picture->p->i_pitch;
+    uint8_t *p_data = &p_region->p_picture->p->p_pixels[ i_pitch * i_line ];
     int i_last_pixel = p_data[0];
 
     for( i = 0; i <= p_region->fmt.i_visible_width; i++ )

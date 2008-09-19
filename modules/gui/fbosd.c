@@ -883,23 +883,22 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
             fmt_out.i_bits_per_pixel = 32;
             vlc_memcpy( p_fmt, &fmt_out, sizeof(video_format_t) );
 
+            /* FIXME not needed to copy the picture anymore no ? */
             p_dest = AllocatePicture( VLC_OBJECT(p_intf), &fmt_out );
             if( !p_dest )
             {
-                if( p_region->picture.pf_release )
-                    p_region->picture.pf_release( &p_region->picture );
+                picture_Release( p_region->p_picture );
                 free( p_region->psz_text );
                 free( p_region );
                 return NULL;
             }
-            vout_CopyPicture( VLC_OBJECT(p_intf), p_dest, &p_region->picture );
+            vout_CopyPicture( VLC_OBJECT(p_intf), p_dest, p_region->p_picture );
 #else
             fmt_out.i_chroma = p_fmt->i_chroma;
-            p_dest = ConvertImage( p_intf, &p_region->picture,
+            p_dest = ConvertImage( p_intf, &p_region->p_picture,
                                    &p_region->fmt, &fmt_out );
 #endif
-            if( p_region->picture.pf_release )
-                p_region->picture.pf_release( &p_region->picture );
+            picture_Release( p_region->p_picture );
             free( p_region->psz_text );
             free( p_region );
             return p_dest;
