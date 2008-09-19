@@ -85,7 +85,8 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     int i_index;
     spu_t *p_spu = vlc_custom_create( p_this, sizeof( spu_t ),
                                       VLC_OBJECT_GENERIC, "subpicture" );
-
+    /* */
+    p_spu->i_subpicture_order = 1;
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
     {
         p_spu->p_subpicture[i_index].i_status = FREE_SUBPICTURE;
@@ -312,15 +313,15 @@ void spu_DisplaySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
                  p_subpic, p_subpic->i_status );
     }
 
-    /* Remove reservation flag */
-    p_subpic->i_status = READY_SUBPICTURE;
-
     if( p_subpic->i_channel == DEFAULT_CHAN )
     {
         p_subpic->i_channel = 0xFFFF;
         spu_Control( p_spu, SPU_CHANNEL_CLEAR, DEFAULT_CHAN );
         p_subpic->i_channel = DEFAULT_CHAN;
     }
+
+    /* Remove reservation flag */
+    p_subpic->i_status = READY_SUBPICTURE;
 }
 
 /**
@@ -366,6 +367,7 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
 
     /* Copy subpicture information, set some default values */
     memset( p_subpic, 0, sizeof(subpicture_t) );
+    p_subpic->i_order    = p_spu->i_subpicture_order++;
     p_subpic->i_status   = RESERVED_SUBPICTURE;
     p_subpic->b_absolute = true;
     p_subpic->b_fade     = false;
@@ -1002,10 +1004,6 @@ static void SpuRenderRegion( spu_t *p_spu,
             p_scale->fmt_in.video = p_region->fmt;
             p_scale->fmt_out.video = p_region->fmt;
 
-            if( p_scale->fmt_out.video.p_palette )
-                *p_scale->fmt_out.video.p_palette =
-                    *p_region->fmt.p_palette;
-
             p_scale->fmt_out.video.i_width = i_dst_width;
             p_scale->fmt_out.video.i_height = i_dst_height;
 
@@ -1026,10 +1024,12 @@ static void SpuRenderRegion( spu_t *p_spu,
             }
             if( p_pic )
             {
-                picture_Copy( &p_region->p_cache->picture, p_pic );
+                picture_CopyPixels( &p_region->p_cache->picture, p_pic );
                 picture_Release( p_pic );
 
-                p_region->p_cache->fmt = p_scale->fmt_out.video;
+                if( p_region->p_cache->fmt.p_palette )
+                    *p_region->p_cache->fmt.p_palette = *p_region->fmt.p_palette;
+
                 /* i_x/i_y of cached region should NOT be used. I set them to
                  * an invalid value to catch it (assert) */
                 p_region->p_cache->i_x = INT_MAX;
@@ -1127,6 +1127,38 @@ exit:
 }
 
 /**
+ * This function compares two 64 bits integers.
+ * It can be used by qsort.
+ */
+static int IntegerCmp( int64_t i0, int64_t i1 )
+{
+    return i0 < i1 ? -1 : i0 > i1 ? 1 : 0;
+}
+/**
+ * This function compares 2 subpictures using the following properties 
+ * (ordered by priority)
+ * 1. absolute positionning
+ * 2. start time
+ * 3. creation order
+ *
+ * It can be used by qsort.
+ *
+ * XXX spu_RenderSubpictures depends heavily on this order.
+ */
+static int SubpictureCmp( const void *s0, const void *s1 )
+{
+    subpicture_t *p_subpic0 = *(subpicture_t**)s0;
+    subpicture_t *p_subpic1 = *(subpicture_t**)s1;
+    int r;
+
+    r = IntegerCmp( !p_subpic0->b_absolute, !p_subpic1->b_absolute );
+    if( !r )
+        r = IntegerCmp( p_subpic0->i_start, p_subpic1->i_start );
+    if( !r )
+        r = IntegerCmp( p_subpic0->i_order, p_subpic1->i_order );
+    return r;
+}
+/**
  * This function renders all sub picture units in the list.
  */
 void spu_RenderSubpictures( spu_t *p_spu,
@@ -1138,28 +1170,21 @@ void spu_RenderSubpictures( spu_t *p_spu,
     const int i_source_video_height = p_fmt_src->i_height;
     const mtime_t i_current_date = mdate();
 
+    unsigned int i_subpicture;
+    subpicture_t *pp_subpicture[VOUT_MAX_SUBPICTURES];
+
     unsigned int i_subtitle_region_count;
     spu_area_t p_subtitle_area_buffer[VOUT_MAX_SUBPICTURES];
     spu_area_t *p_subtitle_area;
     int i_subtitle_area;
 
-    subpicture_t *p_subpic;
-
-    int i_pass;
-
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
-    /* Be sure we have at least 1 picture to process */
-    if( !p_subpic_list || p_subpic_list->i_status == FREE_SUBPICTURE )
-    {
-        vlc_mutex_unlock( &p_spu->subpicture_lock );
-        return;
-    }
-
-    /* */
+    /* Preprocess subpictures */
+    i_subpicture = 0;
     i_subtitle_region_count = 0;
-    for( p_subpic = p_subpic_list;
+    for( subpicture_t * p_subpic = p_subpic_list;
             p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE; /* Check again status (as we where unlocked) */
                 p_subpic = p_subpic->p_next )
     {
@@ -1184,7 +1209,21 @@ void spu_RenderSubpictures( spu_t *p_spu,
             for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
                 i_subtitle_region_count++;
         }
+
+        /* */
+        pp_subpicture[i_subpicture++] = p_subpic;
     }
+
+    /* Be sure we have at least 1 picture to process */
+    if( i_subpicture <= 0 )
+    {
+        vlc_mutex_unlock( &p_spu->subpicture_lock );
+        return;
+    }
+
+    /* Now order subpicture array
+     * XXX The order is *really* important for overlap subtitles positionning */
+    qsort( pp_subpicture, i_subpicture, sizeof(*pp_subpicture), SubpictureCmp );
 
     /* Allocate area array for subtitle overlap */
     i_subtitle_area = 0;
@@ -1196,29 +1235,11 @@ void spu_RenderSubpictures( spu_t *p_spu,
     if( !p_spu->p_blend )
         SpuRenderCreateBlend( p_spu, p_fmt_dst->i_chroma, p_fmt_dst->i_aspect );
 
-
-    /* Process all subpictures and regions
-     * We do two pass:
-     *   1. all absolute pictures
-     *   2. not yet absolute subtitle pictures
-     * The order is important to correctly move the non absolute picture.
-     */
-    for( i_pass = 0, p_subpic = p_subpic_list; ; p_subpic = p_subpic->p_next )
+    /* Process all subpictures and regions (in the right order) */
+    for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
     {
+        subpicture_t *p_subpic = pp_subpicture[i_index];
         subpicture_region_t *p_region;
-
-        if( !p_subpic || p_subpic->i_status == FREE_SUBPICTURE )
-        {
-            i_pass++;
-            if( i_pass >= 2 )
-                break;
-            p_subpic = p_subpic_list;
-            assert( p_subpic && p_subpic->i_status != FREE_SUBPICTURE );
-        }
-
-        if( ( i_pass == 0 && !p_subpic->b_absolute ) ||
-            ( i_pass == 1 &&  p_subpic->b_absolute ) )
-            continue;
 
         if( !p_subpic->p_region )
             continue;

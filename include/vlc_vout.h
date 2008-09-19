@@ -332,6 +332,7 @@ struct subpicture_t
     /** \name Type and flags
        Should NOT be modified except by the vout thread */
     /**@{*/
+    int64_t         i_order;                 /** an increasing unique number */
     int             i_type;                                        /**< type */
     int             i_status;                                     /**< flags */
     subpicture_t *  p_next;               /**< next subtitle to be displayed */
