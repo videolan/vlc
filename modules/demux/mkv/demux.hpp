@@ -372,7 +372,7 @@ public:
     void StartUiThread();
     void StopUiThread();
     bool b_ui_hooked;
-    inline void SwapButtons();
+    void SwapButtons();
 
     /* for spu variables */
     input_thread_t *p_input;
