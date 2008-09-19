@@ -1453,12 +1453,11 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
 {
     int i_var;
     variable_t *p_var;
-    vlc_object_internals_t *p_priv;
 
     /* No need to take the structure lock,
      * we are only looking for our parents */
 
-    if( !p_this->p_parent && !p_this->p_libvlc )
+    if( !p_this->p_parent )
     {
         switch( i_type & VLC_VAR_CLASS )
         {
@@ -1512,10 +1511,7 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
         return VLC_SUCCESS;
     }
 
-    if( !p_this->p_parent )
-        p_priv = vlc_internals( p_this->p_libvlc );
-    else
-        p_priv = vlc_internals( p_this->p_parent );
+    vlc_object_internals_t *p_priv = vlc_internals( p_this->p_parent );
 
     /* Look for the variable */
     vlc_mutex_lock( &p_priv->var_lock );
