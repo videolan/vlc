@@ -76,6 +76,12 @@
 #   include <hal/libhal.h>
 #endif
 
+#if defined(__GNUC__)
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 0)
+#define USE_SYNC
+#endif
+#endif
+
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
@@ -119,7 +125,7 @@ void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
     p_gc->pf_destructor = pf_destruct;
 
     p_gc->refs = 1;
-#ifdef __GNUC__
+#ifdef USE_SYNC
     __sync_synchronize ();
 #else
     /* Nobody else can possibly lock the spin - it's there as a barrier */
@@ -140,7 +146,7 @@ void *vlc_hold (gc_object_t * p_gc)
     uintptr_t refs;
     assert( p_gc );
 
-#ifdef __GNUC__
+#ifdef USE_SYNC
     refs = __sync_fetch_and_add (&p_gc->refs, 1);
 #else
     vlc_spin_lock (&p_gc->spin);
@@ -161,7 +167,7 @@ void vlc_release (gc_object_t *p_gc)
 
     assert( p_gc );
 
-#ifdef __GNUC__
+#ifdef USE_SYNC
     refs = __sync_fetch_and_sub (&p_gc->refs, 1);
 #else
     vlc_spin_lock (&p_gc->spin);
