@@ -51,6 +51,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 {
     int i_ret;
 
+#ifndef ALLOW_RUN_AS_ROOT
     if (geteuid () == 0)
     {
         fprintf (stderr, "VLC is not supposed to be run as root. Sorry.\n"
@@ -59,6 +60,7 @@ int main( int i_argc, const char *ppsz_argv[] )
         "cannot be run by non-trusted users first).\n", ppsz_argv[0]);
         return 1;
     }
+#endif
 
     setlocale (LC_ALL, "");
 

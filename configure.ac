@@ -1530,6 +1530,16 @@ AH_TEMPLATE(NDEBUG,
 AS_IF([test "x${enable_debug}" = "xno"], [AC_DEFINE(NDEBUG)])
 
 dnl
+dnl Allow runing as root (usefull for people runing on embedded platforms)
+dnl
+AC_ARG_ENABLE(debug,
+[  --enable-run-as-root    allow runing VLC as root (default disabled)])
+AS_IF([test "${enable_run_as_root}" == "yes"],[
+    AC_DEFINE(ALLOW_RUN_AS_ROOT, 1,
+              [Define to 1 to allow runing VLC as root (uid 0).])
+])
+
+dnl
 dnl  Test coverage
 dnl
 AC_ARG_ENABLE(coverage,
