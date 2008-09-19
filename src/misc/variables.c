@@ -90,7 +90,7 @@ static void DupList( vlc_value_t *p_val )
     {
         p_list->p_values[i] = p_val->p_list->p_values[i];
         p_list->pi_types[i] = p_val->p_list->pi_types[i];
-        switch( p_val->p_list->pi_types[i] & VLC_VAR_TYPE )
+        switch( p_val->p_list->pi_types[i] & VLC_VAR_CLASS )
         {
         case VLC_VAR_STRING:
 
@@ -113,7 +113,7 @@ static void FreeList( vlc_value_t *p_val )
     int i;
     for( i = 0; i < p_val->p_list->i_count; i++ )
     {
-        switch( p_val->p_list->pi_types[i] & VLC_VAR_TYPE )
+        switch( p_val->p_list->pi_types[i] & VLC_VAR_CLASS )
         {
         case VLC_VAR_STRING:
             FreeString( &p_val->p_list->p_values[i] );
@@ -234,22 +234,17 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     /* Always initialize the variable, even if it is a list variable; this
      * will lead to errors if the variable is not initialized, but it will
      * not cause crashes in the variable handling. */
-    switch( i_type & VLC_VAR_TYPE )
+    switch( i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_BOOL:
             p_var->pf_cmp = CmpBool;
             p_var->val.b_bool = false;
             break;
         case VLC_VAR_INTEGER:
-        case VLC_VAR_HOTKEY:
             p_var->pf_cmp = CmpInt;
             p_var->val.i_int = 0;
             break;
         case VLC_VAR_STRING:
-        case VLC_VAR_MODULE:
-        case VLC_VAR_FILE:
-        case VLC_VAR_DIRECTORY:
-        case VLC_VAR_VARIABLE:
             p_var->pf_cmp = CmpString;
             p_var->pf_dup = DupString;
             p_var->pf_free = FreeString;
@@ -1463,12 +1458,9 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
 
     if( !p_this->p_parent && !p_this->p_libvlc )
     {
-        switch( i_type & VLC_VAR_TYPE )
+        switch( i_type & VLC_VAR_CLASS )
         {
-        case VLC_VAR_FILE:
-        case VLC_VAR_DIRECTORY:
         case VLC_VAR_STRING:
-        case VLC_VAR_MODULE:
             p_val->psz_string = config_GetPsz( p_this, psz_name );
             if( !p_val->psz_string ) p_val->psz_string = strdup("");
             break;
@@ -1476,7 +1468,6 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
             p_val->f_float = config_GetFloat( p_this, psz_name );
             break;
         case VLC_VAR_INTEGER:
-        case VLC_VAR_HOTKEY:
             p_val->i_int = config_GetInt( p_this, psz_name );
             break;
         case VLC_VAR_BOOL:
