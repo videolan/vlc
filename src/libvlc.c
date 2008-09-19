@@ -185,8 +185,8 @@ void vlc_release (gc_object_t *p_gc)
     vlc_spin_unlock (&p_gc->spin);
 #endif
 
-    assert (refs > 0);
-    if (refs == 1)
+    /* assert(refs >= 0); */
+    if (refs == 0)
     {
         vlc_spin_destroy (&p_gc->spin);
         p_gc->pf_destructor (p_gc);
