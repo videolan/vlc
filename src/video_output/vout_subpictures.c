@@ -921,7 +921,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     int i_y_offset;
     filter_t *p_scale;
 
-    video_format_t *p_region_fmt;
+    video_format_t region_fmt;
     picture_t *p_region_picture;
 
     vlc_assert_locked( &p_spu->subpicture_lock );
@@ -992,7 +992,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     }
 
     /* */
-    p_region_fmt = &p_region->fmt;
+    region_fmt = p_region->fmt;
     p_region_picture = p_region->p_picture;
 
 
@@ -1008,13 +1008,42 @@ static void SpuRenderRegion( spu_t *p_spu,
         /* TODO when b_using_palette is true, we should first convert it to YUVA to allow
          * a proper rescaling */
 
-        /* Destroy if cache is unusable
-         * FIXME do not always destroy the region it can sometimes be reused 
-         * if same size and same palette if present */
+        /* Destroy the cache if unusable
+         * FIXME we should not use b_force_palette but check that the palettes
+         * are not the identical */
         if( p_region->p_private )
         {
-            SpuRegionPrivateDestroy( p_region->p_private );
-            p_region->p_private = NULL;
+            subpicture_region_private_t *p_private = p_region->p_private;
+            bool b_changed = false;
+
+            /* Check resize changes */
+            if( i_dst_width  != p_private->fmt.i_width ||
+                i_dst_height != p_private->fmt.i_height )
+                b_changed = true;
+
+            /* Check palette changes */
+            if( b_using_palette )
+            {
+                const video_palette_t *p_palette0 = p_region->fmt.p_palette;
+                const video_palette_t *p_palette1 = p_private->fmt.p_palette;
+
+                if( p_palette0->i_entries == p_palette1->i_entries )
+                {
+                    for( int i = 0; i < p_palette0->i_entries; i++ )
+                        for( int j = 0; j < 4; j++ )
+                            b_changed |= p_palette0->palette[i][j] != p_palette1->palette[i][j];
+                }
+                else
+                {
+                    b_changed = true;
+                }
+            }
+
+            if( b_changed )
+            {
+                SpuRegionPrivateDestroy( p_private );
+                p_region->p_private = NULL;
+            }
         }
 
         /* Scale if needed into cache */
@@ -1051,7 +1080,7 @@ static void SpuRenderRegion( spu_t *p_spu,
         /* And use the scaled picture */
         if( p_region->p_private )
         {
-            p_region_fmt = &p_region->p_private->fmt;
+            region_fmt = p_region->p_private->fmt;
             p_region_picture = p_region->p_private->p_picture;
         }
     }
@@ -1059,7 +1088,6 @@ static void SpuRenderRegion( spu_t *p_spu,
     /* Force cropping if requested */
     if( b_force_crop )
     {
-        video_format_t *p_fmt = p_region_fmt;
         int i_crop_x = spu_scale_w( p_spu->i_crop_x, scale_size );
         int i_crop_y = spu_scale_h( p_spu->i_crop_y, scale_size );
         int i_crop_width = spu_scale_w( p_spu->i_crop_width, scale_size );
@@ -1067,12 +1095,13 @@ static void SpuRenderRegion( spu_t *p_spu,
 
         /* Find the intersection */
         if( i_crop_x + i_crop_width <= i_x_offset ||
-            i_x_offset + (int)p_fmt->i_visible_width < i_crop_x ||
+            i_x_offset + (int)region_fmt.i_visible_width < i_crop_x ||
             i_crop_y + i_crop_height <= i_y_offset ||
-            i_y_offset + (int)p_fmt->i_visible_height < i_crop_y )
+            i_y_offset + (int)region_fmt.i_visible_height < i_crop_y )
         {
             /* No intersection */
-            p_fmt->i_visible_width = p_fmt->i_visible_height = 0;
+            region_fmt.i_visible_width =
+            region_fmt.i_visible_height = 0;
         }
         else
         {
@@ -1080,23 +1109,22 @@ static void SpuRenderRegion( spu_t *p_spu,
             i_x = __MAX( i_crop_x, i_x_offset );
             i_y = __MAX( i_crop_y, i_y_offset );
             i_x_end = __MIN( i_crop_x + i_crop_width,
-                           i_x_offset + (int)p_fmt->i_visible_width );
+                           i_x_offset + (int)region_fmt.i_visible_width );
             i_y_end = __MIN( i_crop_y + i_crop_height,
-                           i_y_offset + (int)p_fmt->i_visible_height );
+                           i_y_offset + (int)region_fmt.i_visible_height );
 
-            p_fmt->i_x_offset = i_x - i_x_offset;
-            p_fmt->i_y_offset = i_y - i_y_offset;
-            p_fmt->i_visible_width = i_x_end - i_x;
-            p_fmt->i_visible_height = i_y_end - i_y;
+            region_fmt.i_x_offset = i_x - i_x_offset;
+            region_fmt.i_y_offset = i_y - i_y_offset;
+            region_fmt.i_visible_width = i_x_end - i_x;
+            region_fmt.i_visible_height = i_y_end - i_y;
 
             i_x_offset = __MAX( i_x, 0 );
             i_y_offset = __MAX( i_y, 0 );
         }
-        b_restore_format = true;
     }
 
     /* Update the blender */
-    SpuRenderUpdateBlend( p_spu, p_fmt->i_width, p_fmt->i_height, p_region_fmt );
+    SpuRenderUpdateBlend( p_spu, p_fmt->i_width, p_fmt->i_height, &region_fmt );
 
     if( p_spu->p_blend->p_module )
     {
