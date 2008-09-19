@@ -118,7 +118,7 @@
 #define TTL_TEXT N_("Hop limit (TTL)")
 #define TTL_LONGTEXT N_( \
     "This is the hop limit (also known as \"Time-To-Live\" or TTL) of " \
-    "the multicast packets sent by the stream output (0 = use operating " \
+    "the multicast packets sent by the stream output (-1 = use operating " \
     "system built-in default).")
 
 #define RTCP_MUX_TEXT N_("RTP/RTCP multiplexing")
@@ -196,7 +196,7 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "port-video", 50002, NULL, PORT_VIDEO_TEXT,
                  PORT_VIDEO_LONGTEXT, true );
 
-    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
+    add_integer( SOUT_CFG_PREFIX "ttl", -1, NULL, TTL_TEXT,
                  TTL_LONGTEXT, true );
     add_bool( SOUT_CFG_PREFIX "rtcp-mux", false, NULL,
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false );
@@ -429,7 +429,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->i_ttl = var_GetInteger( p_stream, SOUT_CFG_PREFIX "ttl" );
-    if( p_sys->i_ttl == 0 )
+    if( p_sys->i_ttl == -1 )
     {
         /* Normally, we should let the default hop limit up to the core,
          * but we have to know it to build our SDP properly, which is why
@@ -801,7 +801,7 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
             if( id->listen_fd != NULL )
                 sdp_AddAttribute( &psz_sdp, "setup", "passive" );
             if( p_sys->proto == IPPROTO_DCCP )
-                sdp_AddAttribute( &psz_sdp, "dccp-service-code", 
+                sdp_AddAttribute( &psz_sdp, "dccp-service-code",
                                   "SC:RTP%c", toupper( mime_major[0] ) );
         }
     }
