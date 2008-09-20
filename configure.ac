@@ -1100,6 +1100,7 @@ dnl  default modules
 dnl
 dnl Video filters:
 VLC_ADD_PLUGIN([deinterlace])
+VLC_ADD_PLUGIN([yuvp])
 VLC_ADD_PLUGIN([invert])
 VLC_ADD_PLUGIN([adjust])
 VLC_ADD_PLUGIN([transform])
