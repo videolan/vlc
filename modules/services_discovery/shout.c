@@ -140,8 +140,12 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 
-static void Run( services_discovery_t *p_sd );
-
+static void *Run( void * );
+struct services_discovery_sys_t
+{
+    vlc_thread_t thread;
+    enum type_e i_type;
+};
 
 /*****************************************************************************
  * Open: initialize and create stuff
@@ -150,8 +154,17 @@ static int Open( vlc_object_t *p_this, enum type_e i_type )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_SetLocalizedName( p_sd, _(p_items[i_type].psz_name) );
-    p_sd->pf_run = Run;
-    p_sd->p_sys = (void *)i_type;
+
+    p_sd->p_sys = malloc (sizeof (*(p_sd->p_sys)));
+    if (p_sd->p_sys == NULL)
+        return VLC_ENOMEM;
+
+    p_sd->p_sys->i_type = i_type;
+    if (vlc_clone (&p_sd->p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
+    {
+        free (p_sd->p_sys);
+        return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
@@ -211,16 +224,19 @@ static void AddSubitemsOfShoutItemURL( services_discovery_t *p_sd,
 /*****************************************************************************
  * Run:
  *****************************************************************************/
-static void Run( services_discovery_t *p_sd )
+static void *Run( void *data )
 {
-    enum type_e i_type = (enum type_e)p_sd->p_sys;
+    services_discovery_t *p_sd = data;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    enum type_e i_type = p_sys->i_type;
     int i, j;
     int canc = vlc_savecancel();
     
     if( !p_items[i_type].p_children )
     {
         AddSubitemsOfShoutItemURL( p_sd, &p_items[i_type], NULL );
-        return;
+        vlc_restorecancel(canc);
+        return NULL;
     }
     for( i = 0; p_items[i_type].p_children[i].psz_name; i++ )
     {
@@ -240,6 +256,7 @@ static void Run( services_discovery_t *p_sd )
         }
     }
     vlc_restorecancel(canc);
+    return NULL;
 }
 
 /*****************************************************************************
@@ -247,5 +264,9 @@ static void Run( services_discovery_t *p_sd )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    VLC_UNUSED(p_this);
+    services_discovery_t *p_sd = (services_discovery_t *)p_this;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+
+    vlc_join (p_sys->thread, NULL);
+    free (p_sys);
 }

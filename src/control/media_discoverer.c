@@ -200,8 +200,6 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                       services_discovery_ended,
                       p_mdis );
 
-    services_discovery_Start( p_mdis->p_sd );
-
     /* Here we go */
 
     return p_mdis;

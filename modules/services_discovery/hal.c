@@ -59,13 +59,13 @@ struct udi_input_id_t
 
 struct services_discovery_sys_t
 {
+    vlc_thread_t            thread;
     LibHalContext           *p_ctx;
     DBusConnection          *p_connection;
     int                     i_devices_number;
     struct udi_input_id_t   **pp_devices;
 };
-static void Run    ( services_discovery_t *p_intf );
-
+static void *Run ( void * );
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -108,7 +108,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_devices_number = 0;
     p_sys->pp_devices = NULL;
 
-    p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
     dbus_error_init( &dbus_error );
@@ -133,23 +132,26 @@ static int Open( vlc_object_t *p_this )
     if( !libhal_ctx_init( p_sys->p_ctx, &dbus_error ) )
     {
         msg_Err( p_sd, "hal not available : %s", dbus_error.message );
-        dbus_error_free( &dbus_error );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if( !libhal_ctx_set_device_added( p_sys->p_ctx, DeviceAdded ) ||
             !libhal_ctx_set_device_removed( p_sys->p_ctx, DeviceRemoved ) )
     {
         msg_Err( p_sd, "unable to add callback" );
-        dbus_error_free( &dbus_error );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
+
+    if( vlc_clone( &p_sys->thread, Run, p_this, VLC_THREAD_PRIORITY_LOW ) )
+        goto error;
 
     services_discovery_SetLocalizedName( p_sd, _("Devices") );
 
     return VLC_SUCCESS;
+error:
+    dbus_error_free( &dbus_error );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -160,6 +162,9 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
 
+    /*vlc_cancel( p_sys->thread );*/
+    vlc_object_kill( p_sd );
+    vlc_join( p_sys->thread, NULL );
     dbus_connection_unref( p_sys->p_connection );
     struct udi_input_id_t *p_udi_entry;
 
@@ -295,11 +300,12 @@ static void ParseDevice( services_discovery_t *p_sd, const char *psz_device )
 /*****************************************************************************
  * Run: main HAL thread
  *****************************************************************************/
-static void Run( services_discovery_t *p_sd )
+static void *Run( voidt *data )
 {
-    int i, i_devices;
+    services_discovery_t     *p_sd  = data;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
     char **devices;
-    services_discovery_sys_t    *p_sys  = p_sd->p_sys;
+    int i, i_devices;
     int canc = vlc_savecancel();
 
     /* parse existing devices first */
@@ -321,6 +327,7 @@ static void Run( services_discovery_t *p_sd )
         /* HAL 0.5.8.1 can use libhal_ctx_get_dbus_connection(p_sys->p_ctx) */
     }
     vlc_restorecancel (canc);
+    return NULL;
 }
 
 void DeviceAdded( LibHalContext *p_ctx, const char *psz_udi )

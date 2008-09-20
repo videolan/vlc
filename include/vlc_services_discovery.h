@@ -50,7 +50,6 @@ struct services_discovery_t
     vlc_event_manager_t event_manager;      /* Accessed through Setters for non class function */
 
     services_discovery_sys_t *p_sys;
-    void (*pf_run) ( services_discovery_t *);
 };
 
 
@@ -67,8 +66,6 @@ VLC_EXPORT( char **, __services_discovery_GetServicesNames, ( vlc_object_t * p_s
 /* Creation of a service_discovery object */
 VLC_EXPORT( services_discovery_t *, services_discovery_Create, ( vlc_object_t * p_super, const char * psz_service_name ) );
 VLC_EXPORT( void,                   services_discovery_Destroy, ( services_discovery_t * p_this ) );
-VLC_EXPORT( int,                    services_discovery_Start, ( services_discovery_t * p_this ) );
-VLC_EXPORT( void,                   services_discovery_Stop, ( services_discovery_t * p_this ) );
 
 /* Read info from discovery object */
 VLC_EXPORT( char *,                 services_discovery_GetLocalizedName, ( services_discovery_t * p_this ) );

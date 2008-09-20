@@ -232,6 +232,8 @@ struct sap_announce_t
 
 struct services_discovery_sys_t
 {
+    vlc_thread_t thread;
+
     /* Socket descriptors */
     int i_fd;
     int *pi_fd;
@@ -261,7 +263,7 @@ struct demux_sys_t
 /* Main functions */
     static int Demux( demux_t *p_demux );
     static int Control( demux_t *, int, va_list );
-    static void Run    ( services_discovery_t *p_sd );
+    static void *Run  ( void *p_sd );
 
 /* Main parsing functions */
     static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp );
@@ -300,7 +302,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_timeout = var_CreateGetInteger( p_sd, "sap-timeout" );
 
-    p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
     p_sys->pi_fd = NULL;
@@ -324,6 +325,12 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
+    /* TODO: create sockets here, and fix racy sockets table */
+    if (vlc_clone (&p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
+    {
+        free (p_sys);
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
@@ -431,8 +438,10 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-
     int i;
+
+    vlc_cancel (p_sys->thread);
+    vlc_join (p_sys->thread, NULL);
 
     for( i = p_sys->i_fd-1 ; i >= 0 ; i-- )
     {
@@ -476,8 +485,9 @@ static void CloseDemux( vlc_object_t *p_this )
  *****************************************************************************/
 #define MAX_SAP_BUFFER 5000
 
-static void Run( services_discovery_t *p_sd )
+static void *Run( void *data )
 {
+    services_discovery_t *p_sd = data;
     char *psz_addr;
     int i;
     int timeout = -1;
@@ -554,7 +564,7 @@ static void Run( services_discovery_t *p_sd )
     if( p_sd->p_sys->i_fd == 0 )
     {
         msg_Err( p_sd, "unable to listen on any address" );
-        return;
+        return NULL;
     }
 
     /* read SAP packets */
@@ -631,6 +641,7 @@ static void Run( services_discovery_t *p_sd )
         else if( timeout < 200 )
             timeout = 200; /* Don't wakeup too fast. */
     }
+    assert (0);
 }
 
 /**********************************************************************

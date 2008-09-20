@@ -31,8 +31,6 @@
 #include "playlist_internal.h"
 #include "../libvlc.h"
 
-static void* RunSD( vlc_object_t *p_this );
-
 /*
  * Services discovery
  * Basically you just listen to Service discovery event through the
@@ -62,7 +60,6 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
     if( !p_sd )
         return NULL;
 
-    p_sd->pf_run = NULL;
     p_sd->psz_localized_name = NULL;
 
     vlc_event_manager_init( &p_sd->event_manager, p_sd, (vlc_object_t *)p_sd );
@@ -87,47 +84,14 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
     p_sd->b_die = false; /* FIXME */
 
     vlc_object_attach( p_sd, p_super );
-    return p_sd;
-}
 
-/***********************************************************************
- * Destroy
- ***********************************************************************/
-void services_discovery_Destroy ( services_discovery_t * p_sd )
-{
-    vlc_event_manager_fini( &p_sd->event_manager );
-
-    free( p_sd->psz_module );
-    free( p_sd->psz_localized_name );
-
-    vlc_object_detach( p_sd );
-    vlc_object_release( p_sd );
-}
-
-/***********************************************************************
- * Start
- ***********************************************************************/
-int services_discovery_Start ( services_discovery_t * p_sd )
-{
     vlc_event_t event = {
         .type = vlc_ServicesDiscoveryStarted
     };
     vlc_event_send( &p_sd->event_manager, &event );
-
-    if ((p_sd->pf_run != NULL)
-        && vlc_thread_create( p_sd, "services_discovery", RunSD,
-                              VLC_THREAD_PRIORITY_LOW, false))
-    {
-        msg_Err( p_sd, "cannot create services discovery thread" );
-        vlc_object_release( p_sd );
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    return p_sd;
 }
 
-/***********************************************************************
- * Stop
- ***********************************************************************/
 static void ObjectKillChildrens( vlc_object_t *p_obj )
 {
     vlc_list_t *p_list;
@@ -140,17 +104,26 @@ static void ObjectKillChildrens( vlc_object_t *p_obj )
     vlc_list_release( p_list );
 }
 
-void services_discovery_Stop ( services_discovery_t * p_sd )
+/***********************************************************************
+ * Destroy
+ ***********************************************************************/
+void services_discovery_Destroy ( services_discovery_t * p_sd )
 {
     vlc_event_t event = {
         .type = vlc_ServicesDiscoveryEnded
     };
 
     ObjectKillChildrens( VLC_OBJECT(p_sd) );
-    if( p_sd->pf_run ) vlc_thread_join( p_sd );
 
     vlc_event_send( &p_sd->event_manager, &event );
     module_Unneed( p_sd, p_sd->p_module );
+
+    vlc_event_manager_fini( &p_sd->event_manager );
+
+    free( p_sd->psz_module );
+    free( p_sd->psz_localized_name );
+
+    vlc_object_release( p_sd );
 }
 
 /***********************************************************************
@@ -207,16 +180,6 @@ services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_it
     event.u.services_discovery_item_removed.p_item = p_item;
 
     vlc_event_send( &p_sd->event_manager, &event );
-}
-
-/***********************************************************************
- * RunSD (Private)
- ***********************************************************************/
-static void* RunSD( vlc_object_t *p_this )
-{
-    services_discovery_t *p_sd = (services_discovery_t *)p_this;
-    p_sd->pf_run( p_sd );
-    return NULL;
 }
 
 /*
@@ -351,8 +314,6 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
                           playlist_sd_item_removed,
                           p_cat );
 
-        services_discovery_Start( p_sd );
-
         /* Free in playlist_ServicesDiscoveryRemove */
         p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
         if( !p_sds )
@@ -395,8 +356,6 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
         msg_Warn( p_playlist, "module %s is not loaded", psz_module );
         return VLC_EGENERIC;
     }
-
-    services_discovery_Stop( p_sds->p_sd );
 
     vlc_event_detach( services_discovery_EventManager( p_sds->p_sd ),
                         vlc_ServicesDiscoveryItemAdded,

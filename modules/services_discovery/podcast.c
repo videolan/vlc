@@ -89,6 +89,7 @@ struct services_discovery_sys_t
     char **ppsz_urls;
     int i_urls;
 
+    vlc_thread_t thread;
     vlc_mutex_t lock;
     vlc_cond_t  wait;
     bool b_update;
@@ -97,7 +98,7 @@ struct services_discovery_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Run( services_discovery_t *p_intf );
+static void *Run( void * );
 static int UrlsChange( vlc_object_t *, char const *, vlc_value_t,
                        vlc_value_t, void * );
 static void ParseUrls( services_discovery_t *p_sd, char *psz_urls );
@@ -121,9 +122,7 @@ static int Open( vlc_object_t *p_this )
     vlc_cond_init( &p_sys->wait );
     p_sys->b_update = true;
 
-    p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
-
     /* Give us a name */
     services_discovery_SetLocalizedName( p_sd, _("Podcasts") );
 
@@ -131,6 +130,11 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_sd, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
 
+    if (vlc_clone (&p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
+    {
+        free (p_sys);
+        return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
@@ -142,6 +146,9 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
     int i;
+
+    vlc_cancel (p_sys->thread);
+    vlc_join (p_sys->thread, NULL);
 
     var_DelCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
     vlc_cond_destroy( &p_sys->wait );
@@ -165,8 +172,9 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: main thread
  *****************************************************************************/
-static void Run( services_discovery_t *p_sd )
+static void *Run( void *data )
 {
+    services_discovery_t *p_sd = data;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
