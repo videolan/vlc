@@ -459,7 +459,7 @@
 }
 
 - (BOOL) isFullscreen {
-    id o_vout_view = [self getVoutView];
+    id o_vout_view = [self voutView];
     if( o_vout_view )
     {
         return [o_vout_view isFullscreen];
@@ -475,7 +475,7 @@
                                               FIND_ANYWHERE );
     if( p_vout != NULL )
     {
-        id o_vout_view = [self getVoutView];
+        id o_vout_view = [self voutView];
         if( o_vout_view )
         {
             if( [o_title isEqualToString: _NS("Half Size") ] )
@@ -605,7 +605,7 @@
             /* Escape */
             if( key == (unichar) 0x1b )
             {
-                id o_vout_view = [self getVoutView];
+                id o_vout_view = [self voutView];
                 if( o_vout_view && [o_vout_view isFullscreen] )
                 {
                     [o_vout_view toggleFullscreen];
