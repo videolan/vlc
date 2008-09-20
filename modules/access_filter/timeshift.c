@@ -604,8 +604,8 @@ static char *GetTmpFilePath( access_t *p_access )
 #endif
     }
 
-    if( asprintf( &psz_filename_base, "%s/vlc-timeshift-%d-%d-",
-              psz_dir, getpid(), p_access->i_object_id ) == -1 )
+    if( asprintf( &psz_filename_base, "%s/vlc-timeshift-%d-%p-",
+              psz_dir, getpid(), p_access ) == -1 )
         psz_filename_base = NULL;
     free( psz_dir );
 

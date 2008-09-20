@@ -301,18 +301,18 @@ static int Init( vout_thread_t *p_vout )
 
     if( var_Create( p_vout->p_sys->p_input, "snapshot-id", VLC_VAR_INTEGER ) )
     {
-        msg_Err( p_vout, "Cannot create snapshot-id variable in p_input (%d).",
-                 p_vout->p_sys->p_input->i_object_id );
+        msg_Err( p_vout, "Cannot create snapshot-id variable in p_input(%p).",
+                 p_vout->p_sys->p_input );
         return VLC_EGENERIC;
     }
 
     /* Register the snapshot vout module at the input level */
-    val.i_int = p_vout->i_object_id;
+    val.p_address = p_vout;
 
     if( var_Set( p_vout->p_sys->p_input, "snapshot-id", val ) )
     {
-        msg_Err( p_vout, "Cannot register snapshot-id in p_input (%d).",
-                 p_vout->p_sys->p_input->i_object_id );
+        msg_Err( p_vout, "Cannot register snapshot-id in p_input(%p).",
+                 p_vout->p_sys->p_input );
         return VLC_EGENERIC;
     }
 

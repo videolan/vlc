@@ -82,7 +82,7 @@ int OpenDecoder ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    sprintf( psz_file, "stream.%i", p_dec->i_object_id );
+    snprintf( psz_file, sizeof( psz_file), "stream.%p", p_dec );
 
 #ifndef UNDER_CE
     var_Create( p_dec, "dummy-save-es", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
