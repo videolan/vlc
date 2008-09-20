@@ -81,7 +81,6 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
         return NULL;
     }
     p_sd->psz_module = strdup( psz_module_name );
-    p_sd->b_die = false; /* FIXME */
 
     vlc_object_attach( p_sd, p_super );
 
