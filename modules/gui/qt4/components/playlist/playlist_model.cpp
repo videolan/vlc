@@ -395,8 +395,7 @@ QStringList PLModel::selectedURIs()
         if( !item )
             continue;
 
-        input_item_t *p_item = input_item_GetById( p_playlist,
-                                                   item->i_input_id );
+        input_item_t *p_item = NULL;
         if( !p_item )
             continue;
 
