@@ -1358,13 +1358,39 @@ static void * ManageThread( void *user_data )
     return NULL;
 }
 
+struct manage_cleanup_stack {
+    intf_thread_t * p_intf;
+    input_thread_t ** p_input;
+    playlist_t * p_playlist;
+    id self;
+};
+
+static void * manage_cleanup( void * args )
+{
+    struct manage_cleanup_stack * manage_cleanup_stack = args;
+    intf_thread_t * p_intf = manage_cleanup_stack->p_intf;
+    input_thread_t * p_input = *manage_cleanup_stack->p_input;
+    id self = manage_cleanup_stack->self;
+    playlist_t * p_playlist = manage_cleanup_stack->p_playlist;
+
+    var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
+
+    pl_Release( p_intf );
+
+    if( p_input ) vlc_object_release( p_input );
+    return NULL;
+}
+
 - (void)manage
 {
     playlist_t * p_playlist;
     input_thread_t * p_input = NULL;
 
     /* new thread requires a new pool */
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 
@@ -1376,12 +1402,12 @@ static void * ManageThread( void *user_data )
     var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
 
-    pl_Release( p_intf );
+    struct manage_cleanup_stack stack = { p_intf, &p_input, p_playlist, self };
+    pthread_cleanup_push(manage_cleanup, &stack);
 
-    vlc_object_lock( p_intf );
-
-    while( vlc_object_alive( p_intf ) )
+    while( true )
     {
+        NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
         vlc_mutex_lock( &p_intf->change_lock );
 
         if( !p_input )
@@ -1414,22 +1440,11 @@ static void * ManageThread( void *user_data )
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
-        vlc_object_unlock( p_intf );
         msleep( INTF_IDLE_SLEEP );
-        vlc_object_lock( p_intf );
+        [pool release];
     }
-    vlc_object_unlock( p_intf );
-    [o_pool release];
 
-    if( p_input ) vlc_object_release( p_input );
-
-    var_DelCallback( p_playlist, "playlist-current", PlaylistChanged, self );
-    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, self );
-    var_DelCallback( p_playlist, "item-change", PlaylistChanged, self );
-    var_DelCallback( p_playlist, "item-append", PlaylistChanged, self );
-    var_DelCallback( p_playlist, "item-deleted", PlaylistChanged, self );
-
-    pthread_testcancel(); /* If we were cancelled stop here */
+    pthread_cleanup_pop(1);
 
     msg_Dbg( p_intf, "Killing the Mac OS X module" );
 
