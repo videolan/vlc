@@ -892,7 +892,7 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
                 free( p_region );
                 return NULL;
             }
-            vout_CopyPicture( VLC_OBJECT(p_intf), p_dest, p_region->p_picture );
+            picture_Copy( p_dest, p_region->p_picture );
 #else
             fmt_out.i_chroma = p_fmt->i_chroma;
             p_dest = ConvertImage( p_intf, &p_region->p_picture,

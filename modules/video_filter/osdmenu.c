@@ -428,7 +428,7 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
     }
     /* FIXME the copy is probably not needed anymore */
     if( p_pic )
-        vout_CopyPicture( p_filter, p_region->p_picture, p_pic );
+        picture_Copy( p_region->p_picture, p_pic );
 
     p_region->i_x = 0;
     p_region->i_y = 0;

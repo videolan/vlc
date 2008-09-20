@@ -639,7 +639,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                 continue;
             }
 
-            vout_CopyPicture( p_stream, p_new_pic, p_pic );
+            picture_Copy( p_new_pic, p_pic );
         }
 
         p_new_pic->i_refcount = 1;

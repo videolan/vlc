@@ -199,6 +199,9 @@ VLC_EXPORT( void, plane_CopyPixels, ( plane_t *p_dst, const plane_t *p_src ) );
  * You have to notice that sometime a simple picture_Hold may do what
  * you want without the copy overhead.
  * Provided for convenience.
+ *
+ * \param p_dst pointer to the destination picture.
+ * \param p_src pointer to the source picture.
  */
 static inline void picture_Copy( picture_t *p_dst, const picture_t *p_src )
 {
@@ -411,15 +414,6 @@ struct subpicture_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-
-/**
- * Copy the source picture onto the destination picture.
- * \param p_this a vlc object
- * \param p_dst pointer to the destination picture.
- * \param p_src pointer to the source picture.
- */
-#define vout_CopyPicture(a,b,c) __vout_CopyPicture(VLC_OBJECT(a),b,c)
-VLC_EXPORT( void, __vout_CopyPicture, ( vlc_object_t *p_this, picture_t *p_dst, picture_t *p_src ) );
 
 /**
  * Initialise different fields of a picture_t (but does not allocate memory).

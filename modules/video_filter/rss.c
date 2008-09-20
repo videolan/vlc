@@ -558,7 +558,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             p_region->i_x = p_sys->i_xoff;
             p_region->i_y = p_sys->i_yoff;
             /* FIXME the copy is probably not needed anymore */
-            vout_CopyPicture( p_filter, p_region->p_picture, p_pic );
+            picture_Copy( p_region->p_picture, p_pic );
             p_spu->p_region->p_next = p_region;
         }
 

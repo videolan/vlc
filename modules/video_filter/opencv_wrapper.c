@@ -565,7 +565,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         //This copy is a bit unfortunate but image_Convert can't write into an existing image so it is better to copy the
         //(say) 16bit YUV image here than a 32bit RGB image somehwere else.
         //It is also not that expensive in time.
-        vout_CopyPicture( p_vout, p_outpic, p_pic );
+        picture_Copy( p_outpic, p_pic );
         VlcPictureToIplImage( p_vout, p_pic);
         //pass the image to the internal opencv filter for processing
         if ((p_vout->p_sys->p_opencv) && (p_vout->p_sys->p_opencv->p_module))
@@ -579,7 +579,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             p_vout->p_sys->p_opencv->pf_video_filter( p_vout->p_sys->p_opencv, &(p_vout->p_sys->hacked_pic));
         //copy the processed image into the output image
         if ((p_vout->p_sys->p_proc_image) && (p_vout->p_sys->p_proc_image->p_data))
-            vout_CopyPicture( p_vout, p_outpic, p_vout->p_sys->p_proc_image );
+            picture_Copy( p_outpic, p_vout->p_sys->p_proc_image );
     }
 
     //calculate duration

@@ -1172,7 +1172,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
 
     /* FIXME the copy is probably not needed anymore */
-    vout_CopyPicture( p_filter, p_region->p_picture, p_pic );
+    picture_Copy( p_region->p_picture, p_pic );
 
     p_sys->b_need_update = false;
 

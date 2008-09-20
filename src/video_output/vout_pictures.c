@@ -338,7 +338,7 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
             if( vout_LockPicture( p_vout, PP_OUTPUTPICTURE[0] ) )
                 return NULL;
 
-            vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
+            picture_Copy( PP_OUTPUTPICTURE[0], p_pic );
 
             spu_RenderSubpictures( p_vout->p_spu,
                                    PP_OUTPUTPICTURE[0], &p_vout->fmt_out,
@@ -366,7 +366,7 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         if( vout_LockPicture( p_vout, PP_OUTPUTPICTURE[0] ) )
             return NULL;
 
-        vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
+        picture_Copy( PP_OUTPUTPICTURE[0], p_pic );
         spu_RenderSubpictures( p_vout->p_spu,
                                PP_OUTPUTPICTURE[0], &p_vout->fmt_out,
                                p_subpic, &p_vout->fmt_in );
@@ -412,7 +412,7 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         if( vout_LockPicture( p_vout, &p_vout->p_picture[0] ) )
             return NULL;
 
-        vout_CopyPicture( p_vout, &p_vout->p_picture[0], p_tmp_pic );
+        picture_Copy( &p_vout->p_picture[0], p_tmp_pic );
     }
     else
     {
@@ -982,20 +982,6 @@ int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
         default:
             return 0;
     }
-}
-
-/*****************************************************************************
- * vout_CopyPicture: copy a picture to another one
- *****************************************************************************
- * This function takes advantage of the image format, and reduces the
- * number of calls to memcpy() to the minimum. Source and destination
- * images must have same width (hence i_visible_pitch), height, and chroma.
- *****************************************************************************/
-void __vout_CopyPicture( vlc_object_t *p_this,
-                         picture_t *p_dest, picture_t *p_src )
-{
-    VLC_UNUSED(p_this);
-    picture_Copy( p_dest, p_src );
 }
 
 /*****************************************************************************

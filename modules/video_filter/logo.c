@@ -583,7 +583,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_inpic )
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
-    vout_CopyPicture( p_vout, p_outpic, p_inpic );
+    picture_Copy( p_outpic, p_inpic );
     vout_DatePicture( p_sys->p_vout, p_outpic, p_inpic->date );
 
     if( p_pic )
@@ -874,7 +874,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
 
     /* FIXME the copy is probably not needed anymore */
-    vout_CopyPicture( p_filter, &p_region->p_picture, p_pic );
+    picture_Copy( p_region->p_picture, p_pic );
     vlc_mutex_unlock( &p_logo_list->lock );
 
     /*  where to locate the logo: */

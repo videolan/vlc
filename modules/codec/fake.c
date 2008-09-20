@@ -358,7 +358,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_next = (mtime_t)(p_sys->i_reload + mdate());
     }
     vlc_mutex_lock( &p_dec->p_sys->lock );
-    vout_CopyPicture( p_dec, p_pic, p_dec->p_sys->p_image );
+    picture_Copy( p_pic, p_dec->p_sys->p_image );
     vlc_mutex_unlock( &p_dec->p_sys->lock );
 
     p_pic->date = (*pp_block)->i_pts;

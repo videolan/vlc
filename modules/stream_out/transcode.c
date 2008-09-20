@@ -1996,7 +1996,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
                 if( p_tmp )
                 {
-                    vout_CopyPicture( p_stream, p_tmp, p_pic );
+                    picture_Copy( p_tmp, p_pic );
                     p_pic->pf_release( p_pic );
                     p_pic = p_tmp;
                 }
@@ -2061,7 +2061,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 p_pic2 = video_new_buffer_decoder( id->p_decoder );
                 if( p_pic2 != NULL )
                 {
-                    vout_CopyPicture( p_stream, p_pic2, p_pic );
+                    picture_Copy( p_pic2, p_pic );
                     p_pic2->date = i_pts;
                 }
             }

@@ -457,7 +457,8 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         /* Duplicate image */
         picture_Release( p_pif ); /* XXX: Better fix must be possible */
         p_pif = p_image->p_filter->pf_vout_buffer_new( p_image->p_filter );
-        if( p_pif ) vout_CopyPicture( p_image->p_parent, p_pif, p_pic );
+        if( p_pif )
+            picture_Copy( p_pif, p_pic );
     }
 
     return p_pif;

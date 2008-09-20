@@ -513,7 +513,6 @@ __vout_AllocatePicture
 vout_ChromaCmp
 vout_Close
 vout_ControlWindow
-__vout_CopyPicture
 __vout_Create
 vout_CreatePicture
 vout_DatePicture

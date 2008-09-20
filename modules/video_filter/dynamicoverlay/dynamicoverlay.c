@@ -366,7 +366,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         else
         {
             /* FIXME the copy is probably not needed anymore */
-            vout_CopyPicture( p_filter, p_region->p_picture, p_overlay->data.p_pic );
+            picture_Copy( p_region->p_picture, p_overlay->data.p_pic );
         }
         p_region->i_x = p_overlay->i_x;
         p_region->i_y = p_overlay->i_y;
