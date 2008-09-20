@@ -155,7 +155,7 @@ void *vlc_hold (gc_object_t * p_gc)
 #ifdef USE_SYNC
     refs = __sync_fetch_and_add (&p_gc->refs, 1);
 #elif defined(__APPLE__)
-    OSAtomicIncrement32Barrier((int*)&p_gc->refs);
+    refs = OSAtomicIncrement32Barrier((int*)&p_gc->refs) - 1;
 #else
     vlc_spin_lock (&p_gc->spin);
     refs = p_gc->refs++;
@@ -178,7 +178,7 @@ void vlc_release (gc_object_t *p_gc)
 #ifdef USE_SYNC
     refs = __sync_fetch_and_sub (&p_gc->refs, 1);
 #elif defined(__APPLE__)
-    OSAtomicDecrement32Barrier((int*)&p_gc->refs);
+    refs = OSAtomicDecrement32Barrier((int*)&p_gc->refs) + 1;
 #else
     vlc_spin_lock (&p_gc->spin);
     refs = p_gc->refs--;
