@@ -61,7 +61,6 @@ static void Yuv2Rgb( uint8_t *r, uint8_t *g, uint8_t *b, int y1, int u1, int v1 
 static int Open( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys;
 
     /* It only supports YUVP to YUVA/RGBA without scaling
      * (if scaling is required another filter can do it) */
