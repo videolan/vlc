@@ -1459,7 +1459,7 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
     int i_var;
     variable_t *p_var;
 
-    if( p_this->p_parent || p_this->p_libvlc )
+    if( p_this->p_parent || ( p_this->p_libvlc && p_this != p_this->p_libvlc ) )
     {
         vlc_object_internals_t *p_priv;
 
