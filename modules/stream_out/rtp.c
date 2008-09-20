@@ -263,16 +263,15 @@ struct sout_stream_sys_t
 
     /* */
     char     *psz_destination;
-    uint8_t   proto;
-    uint8_t   i_ttl;
     uint16_t  i_port;
     uint16_t  i_port_audio;
     uint16_t  i_port_video;
-    bool b_latm;
-    bool rtcp_mux;
-
+    uint8_t   proto;
+    bool      rtcp_mux;
+    int       i_ttl:9;
     /* when need to use a private one or when using muxer */
-    int i_payload_type;
+    unsigned  i_payload_type:7;
+    bool      b_latm;
 
     /* in case we do TS/PS over rtp */
     sout_mux_t        *p_mux;
