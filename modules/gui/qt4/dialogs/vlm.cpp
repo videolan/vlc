@@ -53,7 +53,6 @@
 #include <QScrollArea>
 #include <QFileDialog>
 
-static const char *psz_type[] = { "Broadcast", "Schedule", "VOD" };
 
 VLMDialog *VLMDialog::instance = NULL;
 
@@ -73,9 +72,9 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
     ui.saveButton->hide();
 
 #define ADDMEDIATYPES( str, type ) ui.mediaType->addItem( qtr( str ), QVariant( type ) );
-    ADDMEDIATYPES( "Broadcast", QVLM_Broadcast );
-    ADDMEDIATYPES( "Schedule", QVLM_Schedule );
-    ADDMEDIATYPES( "Video On Demand ( VOD )", QVLM_VOD );
+    ADDMEDIATYPES( N_("Broadcast"), QVLM_Broadcast );
+    ADDMEDIATYPES( N_("Schedule"), QVLM_Schedule );
+    ADDMEDIATYPES( N_("Video On Demand ( VOD )"), QVLM_VOD );
 #undef ADDMEDIATYPES
 
     /* Schedule Stuffs */
@@ -526,7 +525,7 @@ VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
                           : VLMAWidget( _name, _input, _output,
                                         _enabled, _parent, QVLM_Broadcast )
 {
-    nameLabel->setText( "Broadcast: " + name );
+    nameLabel->setText( qtr("Broadcast: ") + name );
     type = QVLM_Broadcast;
     b_looped = _looped;
 
@@ -594,7 +593,7 @@ VLMSchedule::VLMSchedule( QString name, QString input, QString output,
                           bool enabled, VLMDialog *parent )
             : VLMAWidget( name, input, output, enabled, parent, QVLM_Schedule )
 {
-    nameLabel->setText( "Schedule: " + name );
+    nameLabel->setText( qtr("Schedule: ") + name );
     schetime = _schetime;
     schedate = _schedate;
     rNumber = _scherepeatnumber;
@@ -616,7 +615,7 @@ VLMVod::VLMVod( QString name, QString input, QString output,
                 bool enabled, QString _mux, VLMDialog *parent)
        : VLMAWidget( name, input, output, enabled, parent, QVLM_VOD )
 {
-    nameLabel->setText( "VOD:" + name );
+    nameLabel->setText( qtr("VOD: ") + name );
 
     mux = _mux;
     muxLabel = new QLabel;
