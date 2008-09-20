@@ -60,6 +60,42 @@
 
 /* /!\ Warning: Unreadable code :/ */
 
+@interface VLCTreeItem : NSObject
+{
+    NSString *o_name;
+    NSString *o_title;
+    NSString *o_help;
+    vlc_object_t * _vlc_object;
+    VLCTreeItem *o_parent;
+    NSMutableArray *o_children;
+    int i_object_category;
+    NSMutableArray *o_subviews;
+}
+
+- (id)initWithName: (NSString *)o_item_name
+    withTitle: (NSString *)o_item_title
+    withHelp: (NSString *)o_item_help
+    withObject: (vlc_object_t *)object
+    parent:(VLCTreeItem *)o_parent_item
+    children:(NSMutableArray *)o_children_array
+    whithCategory: (int) i_category;
+
++ (VLCTreeItem *)rootItem;
+- (int)numberOfChildren;
+- (VLCTreeItem *)childAtIndex:(int)i_index;
+- (vlc_object_t*)vlcObject;
+- (NSString *)name;
+- (NSString *)title;
+- (NSString *)help;
+- (BOOL)hasPrefs:(NSString *)o_module_name;
+- (NSView *)showView:(NSScrollView *)o_prefs_view;
+- (void)applyChanges;
+- (void)resetView;
+
+@end
+
+#pragma mark -
+
 /*****************************************************************************
  * VLCPrefs implementation
  *****************************************************************************/
@@ -209,7 +245,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 - (id)outlineView:(NSOutlineView *)outlineView
     objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
-    return (item == nil) ? @"" : (id)[item getName];
+    return (item == nil) ? @"" : (id)[item name];
 }
 
 @end
@@ -223,7 +259,7 @@ static VLCTreeItem *o_root_item = nil;
 - (id)initWithName: (NSString *)o_item_name
     withTitle: (NSString *)o_item_title
     withHelp: (NSString *)o_item_help
-    ID: (int)i_id
+    withObject: (vlc_object_t *)object
     parent:(VLCTreeItem *)o_parent_item
     children:(NSMutableArray *)o_children_array
     whithCategory: (int) i_category
@@ -235,7 +271,7 @@ static VLCTreeItem *o_root_item = nil;
         o_name = [o_item_name copy];
         o_title= [o_item_title copy];
         o_help= [o_item_help copy];
-        i_object_id = i_id;
+        _vlc_object = object ? vlc_object_yield( object ) : NULL;
         o_parent = o_parent_item;
         o_children = o_children_array;
         i_object_category = i_category;
@@ -247,7 +283,7 @@ static VLCTreeItem *o_root_item = nil;
 + (VLCTreeItem *)rootItem
 {
    if (o_root_item == nil)
-        o_root_item = [[VLCTreeItem alloc] initWithName:@"main" withTitle:@"main" withHelp:@"" ID:0
+        o_root_item = [[VLCTreeItem alloc] initWithName:@"main" withTitle:@"main" withHelp:@"" withObject:NULL
             parent:nil children:[[NSMutableArray alloc] initWithCapacity:10]
             whithCategory: -1];
    return o_root_item;
@@ -255,6 +291,7 @@ static VLCTreeItem *o_root_item = nil;
 
 - (void)dealloc
 {
+    if(_vlc_object) vlc_object_release( _vlc_object );
     if (o_children != IsALeafNode) [o_children release];
     [o_name release];
     [o_title release];
@@ -276,7 +313,7 @@ static VLCTreeItem *o_root_item = nil;
         module_t        *p_main_module;
         module_config_t *p_items;
         int             i = 0;
-        if( [[self getName] isEqualToString: @"main"] )
+        if( [[self name] isEqualToString: @"main"] )
         {
             p_main_module = module_GetMainModule( p_intf );
             assert( p_main_module );
@@ -293,6 +330,7 @@ static VLCTreeItem *o_root_item = nil;
                 NSString *o_child_name;
                 NSString *o_child_title;
                 NSString *o_child_help;
+
                 switch( p_items[i].i_type )
                 {
                     case CONFIG_CATEGORY:
@@ -308,7 +346,7 @@ static VLCTreeItem *o_root_item = nil;
                             initWithName: o_child_name
                             withTitle: o_child_title
                             withHelp: o_child_help
-                            ID: ((vlc_object_t*)p_main_module)->i_object_id
+                            withObject: (vlc_object_t*)p_main_module
                             parent:self
                             children:[[NSMutableArray alloc]
                                 initWithCapacity:10]
@@ -336,7 +374,7 @@ static VLCTreeItem *o_root_item = nil;
                                 initWithName: o_child_name
                                 withTitle: o_child_title
                                 withHelp: o_child_help
-                                ID: ((vlc_object_t*)p_main_module)->i_object_id
+                                withObject: (vlc_object_t*)p_main_module
                                 parent:p_last_category
                                 children:[[NSMutableArray alloc]
                                     initWithCapacity:10]
@@ -431,7 +469,7 @@ static VLCTreeItem *o_root_item = nil;
                     withTitle:[[VLCMain sharedInstance]
                         localizedString:  module_GetLongName( p_module ) ]
                     withHelp: @""
-                    ID: ((vlc_object_t*)p_module)->i_object_id
+                    withObject: (vlc_object_t*)p_main_module
                     parent:p_subcategory_item
                     children:IsALeafNode
                     whithCategory: -1]];
@@ -442,24 +480,24 @@ static VLCTreeItem *o_root_item = nil;
     return o_children;
 }
 
-- (int)getObjectID
+- (vlc_object_t *)vlcObject
 {
-    return i_object_id;
+    return vlc_object_yield(_vlc_object);
 }
 
-- (NSString *)getName
+- (NSString *)name
 {
-    return o_name;
+    return [[o_name retain] autorelease];
 }
 
-- (NSString *)getTitle
+- (NSString *)title
 {
-    return o_title;
+    return [[o_title retain] autorelease];
 }
 
-- (NSString *)getHelp
+- (NSString *)help
 {
-    return o_help;
+    return [[o_help retain] autorelease];
 }
 
 - (VLCTreeItem *)childAtIndex:(int)i_index
@@ -509,7 +547,7 @@ static VLCTreeItem *o_root_item = nil;
     NSRect          s_vrc;
     NSView          *o_view;
 
-    [[VLCPrefs sharedInstance] setTitle: [self getTitle]];
+    [[VLCPrefs sharedInstance] setTitle: [self title]];
     /* NSLog( [self getHelp] ); */
     s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
     o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
@@ -531,7 +569,7 @@ static VLCTreeItem *o_root_item = nil;
         /* Get a pointer to the module */
         if( i_object_category == -1 )
         {
-            p_module = (module_t *) vlc_object_get( p_intf->p_libvlc, i_object_id );
+            p_module = (module_t *) [self vlcObject];
             assert( p_module );
 
             p_items = module_GetConfig( p_module, &confsize );

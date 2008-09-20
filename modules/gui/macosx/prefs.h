@@ -21,31 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-@interface VLCTreeItem : NSObject
-{
-    NSString *o_name;
-    NSString *o_title;
-    NSString *o_help;
-    int i_object_id;
-    VLCTreeItem *o_parent;
-    NSMutableArray *o_children;
-    int i_object_category;
-    NSMutableArray *o_subviews;
-}
-
-+ (VLCTreeItem *)rootItem;
-- (int)numberOfChildren;
-- (VLCTreeItem *)childAtIndex:(int)i_index;
-- (int)getObjectID;
-- (NSString *)getName;
-- (NSString *)getTitle;
-- (NSString *)getHelp;
-- (BOOL)hasPrefs:(NSString *)o_module_name;
-- (NSView *)showView:(NSScrollView *)o_prefs_view;
-- (void)applyChanges;
-- (void)resetView;
-
-@end
+@class VLCTreeItem;
 
 /*****************************************************************************
  * VLCPrefs interface
