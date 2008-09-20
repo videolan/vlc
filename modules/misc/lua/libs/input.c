@@ -51,7 +51,7 @@ input_thread_t * vlclua_get_input_internal( lua_State *L )
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
-    if( p_input ) vlc_object_yield( p_input );
+    if( p_input ) vlc_object_hold( p_input );
     PL_UNLOCK;
     vlclua_release_playlist_internal( p_playlist );
     return p_input;

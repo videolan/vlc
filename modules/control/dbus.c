@@ -322,7 +322,7 @@ DBUS_METHOD( Play )
     PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
     if( p_input )
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
     PL_UNLOCK;
 
     if( p_input )
@@ -807,7 +807,7 @@ static void Close   ( vlc_object_t *p_this )
     p_input = p_playlist->p_input;
     if ( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         var_DelCallback( p_input, "state", StateChange, p_intf );
         vlc_object_release( p_input );
     }
@@ -1006,7 +1006,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
         return VLC_SUCCESS;
     }
 
-    vlc_object_yield( p_input );
+    vlc_object_hold( p_input );
     pl_Release( p_intf );
 
     p_item = input_GetItem( p_input );

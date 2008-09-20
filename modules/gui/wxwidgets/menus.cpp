@@ -282,7 +282,7 @@ void VideoPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     POPUP_BOILERPLATE;
     if( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         as_varnames.Add( "video-es" );
         ai_objects.Add( p_input->i_object_id );
         as_varnames.Add( "spu-es" );
@@ -306,7 +306,7 @@ void AudioPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     POPUP_BOILERPLATE;
     if( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         as_varnames.Add( "audio-es" );
         ai_objects.Add( p_input->i_object_id );
         vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
@@ -330,7 +330,7 @@ void MiscPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     POPUP_BOILERPLATE;
     if( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         as_varnames.Add( "audio-es" );
         InputAutoMenuBuilder( VLC_OBJECT(p_input), ai_objects, as_varnames );
         PUSH_SEPARATOR;
@@ -357,7 +357,7 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     POPUP_BOILERPLATE;
     if( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         InputAutoMenuBuilder( VLC_OBJECT(p_input), ai_objects, as_varnames );
 
         /* Video menu */

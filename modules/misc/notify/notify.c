@@ -149,7 +149,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     intf_sys_t          *p_sys          = p_intf->p_sys;
 
     if( !p_input ) return VLC_SUCCESS;
-    vlc_object_yield( p_input );
+    vlc_object_hold( p_input );
 
     if( p_input->b_dead )
     {

@@ -330,7 +330,7 @@ void VlcProc::refreshInput()
     {
         getIntf()->p_sys->p_input = getIntf()->p_sys->p_playlist->p_input;
         if( getIntf()->p_sys->p_input )
-            vlc_object_yield( getIntf()->p_sys->p_input );
+            vlc_object_hold( getIntf()->p_sys->p_input );
     }
     else if( getIntf()->p_sys->p_input->b_dead )
     {

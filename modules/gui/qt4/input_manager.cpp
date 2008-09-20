@@ -87,7 +87,7 @@ void InputManager::setInput( input_thread_t *_p_input )
     p_input = _p_input;
     if( p_input && !( p_input->b_dead || !vlc_object_alive (p_input) ) )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         emit statusChanged( PLAYING_S );
         UpdateMeta();
         UpdateArt();
@@ -650,7 +650,7 @@ void MainInputManager::customEvent( QEvent *event )
             p_input = THEPL->p_input;
             if( p_input && !( !vlc_object_alive (p_input) || p_input->b_dead) )
             {
-                vlc_object_yield( p_input );
+                vlc_object_hold( p_input );
                 var_AddCallback( p_input, "state", PLItemChanged, this );
                 emit inputChanged( p_input );
             }

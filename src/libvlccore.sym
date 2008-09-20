@@ -481,7 +481,7 @@ __vlc_object_signal_unlocked
 __vlc_object_unlock
 __vlc_object_wait
 __vlc_object_waitpipe
-__vlc_object_yield
+__vlc_object_hold
 vlc_poll
 vlc_rand_bytes
 vlc_recvmsg

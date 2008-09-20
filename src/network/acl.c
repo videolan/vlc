@@ -218,7 +218,7 @@ vlc_acl_t *__ACL_Create( vlc_object_t *p_this, bool b_allow )
     if( p_acl == NULL )
         return NULL;
 
-    vlc_object_yield( p_this );
+    vlc_object_hold( p_this );
     p_acl->p_owner = p_this;
     p_acl->i_size = 0;
     p_acl->p_entries = NULL;
@@ -264,7 +264,7 @@ vlc_acl_t *__ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl )
     else
         p_dupacl->p_entries = NULL;
 
-    vlc_object_yield( p_this );
+    vlc_object_hold( p_this );
     p_dupacl->p_owner = p_this;
     p_dupacl->i_size = p_acl->i_size;
     p_dupacl->b_allow_default = p_acl->b_allow_default;

@@ -464,7 +464,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 
     p_input = THEMIM->getInput();
     if( p_input )
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
     p_aout = ( vlc_object_t * ) vlc_object_find( p_intf,
                                                  VLC_OBJECT_AOUT,
                                                  FIND_ANYWHERE );
@@ -519,7 +519,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 
     p_input = THEMIM->getInput();
     if( p_input )
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
     p_vout = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_VOUT,
             FIND_ANYWHERE );
 
@@ -713,7 +713,7 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
     POPUP_BOILERPLATE;
     if( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         vlc_object_t *p_vout = ( vlc_object_t * )vlc_object_find( p_input,
                 VLC_OBJECT_VOUT, FIND_CHILD );
         if( p_vout )
@@ -733,7 +733,7 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
     POPUP_BOILERPLATE;
     if( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         vlc_object_t *p_aout = ( vlc_object_t * )vlc_object_find( p_input,
                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
         AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
@@ -753,7 +753,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 
     if( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         varnames.push_back( "audio-es" );
         InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
         PUSH_SEPARATOR;
@@ -814,7 +814,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
             menu->addSeparator();
 
-            vlc_object_yield( p_input );
+            vlc_object_hold( p_input );
             InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
             vlc_object_release( p_input );
 

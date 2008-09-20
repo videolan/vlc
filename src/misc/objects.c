@@ -525,7 +525,7 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     /* If we are of the requested type ourselves, don't look further */
     if( !(i_mode & FIND_STRICT) && p_this->i_object_type == i_type )
     {
-        vlc_object_yield( p_this );
+        vlc_object_hold( p_this );
         return p_this;
     }
 
@@ -574,7 +574,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
         && p_this->psz_object_name
         && !strcmp( p_this->psz_object_name, psz_name ) )
     {
-        vlc_object_yield( p_this );
+        vlc_object_hold( p_this );
         return p_this;
     }
 
@@ -613,7 +613,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
 /**
  * Increment an object reference counter.
  */
-void * __vlc_object_yield( vlc_object_t *p_this )
+void * __vlc_object_hold( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
 
@@ -721,7 +721,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
     if( !p_this ) return;
 
-    vlc_object_yield (p_parent);
+    vlc_object_hold (p_parent);
     vlc_mutex_lock( &structure_lock );
 
     /* Attach the parent to its child */
@@ -867,7 +867,7 @@ vlc_list_t *__vlc_list_children( vlc_object_t *obj )
     l = NewList( priv->i_children );
     for (int i = 0; i < l->i_count; i++)
     {
-        vlc_object_yield( priv->pp_children[i] );
+        vlc_object_hold( priv->pp_children[i] );
         l->p_values[i].p_object = priv->pp_children[i];
     }
     vlc_mutex_unlock( &structure_lock );
@@ -1067,7 +1067,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
         {
             if( p_tmp->i_object_type == i_type )
             {
-                vlc_object_yield( p_tmp );
+                vlc_object_hold( p_tmp );
                 return p_tmp;
             }
             else
@@ -1083,7 +1083,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
             p_tmp = vlc_internals( p_this )->pp_children[i];
             if( p_tmp->i_object_type == i_type )
             {
-                vlc_object_yield( p_tmp );
+                vlc_object_hold( p_tmp );
                 return p_tmp;
             }
             else if( vlc_internals( p_tmp )->i_children )
@@ -1121,7 +1121,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name ) )
             {
-                vlc_object_yield( p_tmp );
+                vlc_object_hold( p_tmp );
                 return p_tmp;
             }
             else
@@ -1138,7 +1138,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name ) )
             {
-                vlc_object_yield( p_tmp );
+                vlc_object_hold( p_tmp );
                 return p_tmp;
             }
             else if( vlc_internals( p_tmp )->i_children )
@@ -1289,7 +1289,7 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
         return;
     }
 
-    vlc_object_yield( p_object );
+    vlc_object_hold( p_object );
 
     p_list->p_values[i_index].p_object = p_object;
 
@@ -1311,7 +1311,7 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
         return;
     }
 
-    vlc_object_yield( p_object );
+    vlc_object_hold( p_object );
 
     p_list->p_values[p_list->i_count].p_object = p_object;
     p_list->i_count++;

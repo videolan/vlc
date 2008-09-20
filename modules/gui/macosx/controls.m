@@ -1084,7 +1084,7 @@
     if( self != nil )
     {
         psz_name = strdup( name );
-        _vlc_object = vlc_object_yield( object );
+        _vlc_object = vlc_object_hold( object );
         value = val;
         i_type = type;
     }
@@ -1111,7 +1111,7 @@
 
 - (vlc_object_t *)vlcObject
 {
-    return vlc_object_yield( _vlc_object );
+    return vlc_object_hold( _vlc_object );
 }
 
 

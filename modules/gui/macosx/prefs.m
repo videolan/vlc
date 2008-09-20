@@ -271,7 +271,7 @@ static VLCTreeItem *o_root_item = nil;
         o_name = [o_item_name copy];
         o_title= [o_item_title copy];
         o_help= [o_item_help copy];
-        _vlc_object = object ? vlc_object_yield( object ) : NULL;
+        _vlc_object = object ? vlc_object_hold( object ) : NULL;
         o_parent = o_parent_item;
         o_children = o_children_array;
         i_object_category = i_category;
@@ -482,7 +482,7 @@ static VLCTreeItem *o_root_item = nil;
 
 - (vlc_object_t *)vlcObject
 {
-    return vlc_object_yield(_vlc_object);
+    return vlc_object_hold(_vlc_object);
 }
 
 - (NSString *)name

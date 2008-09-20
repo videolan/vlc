@@ -193,7 +193,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_input = p_playlist->p_input;
 
     if( !p_input ) return VLC_SUCCESS;
-    vlc_object_yield( p_input );
+    vlc_object_hold( p_input );
 
     if( p_input->b_dead || !input_GetItem(p_input)->psz_name )
     {

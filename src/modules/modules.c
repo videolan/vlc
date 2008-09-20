@@ -536,7 +536,7 @@ found_shortcut:
     p_tmp = p_first;
     while( p_tmp != NULL )
     {
-        vlc_object_yield( p_tmp->p_module );
+        vlc_object_hold( p_tmp->p_module );
         p_tmp = p_tmp->p_next;
     }
 
@@ -690,7 +690,7 @@ module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
         if( psz_module_name && !strcmp( psz_module_name, psz_name ) )
         {
             /* We can release the list, and return yes */
-            vlc_object_yield( p_module );
+            vlc_object_hold( p_module );
             vlc_list_release( p_list );
             return p_module;
         }

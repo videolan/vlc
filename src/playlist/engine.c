@@ -279,7 +279,7 @@ void playlist_set_current_input(
 
     if( p_input )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         p_playlist->p_input = p_input;
         vlc_event_manager_t * p_em = input_get_event_manager( p_input );
         vlc_event_attach( p_em, vlc_InputStateChanged,
@@ -296,7 +296,7 @@ input_thread_t * playlist_CurrentInput( playlist_t * p_playlist )
     input_thread_t * p_input;
     PL_LOCK;
     p_input = p_playlist->p_input;
-    if( p_input ) vlc_object_yield( p_input );
+    if( p_input ) vlc_object_hold( p_input );
     PL_UNLOCK;
     return p_input;
 }

@@ -1015,7 +1015,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
         ptrval.p_address = httpd;
         libvlc_priv (p_this->p_libvlc)->p_httpd = httpd;
-        vlc_object_yield( httpd );
+        vlc_object_hold( httpd );
         vlc_object_attach( httpd, p_this->p_libvlc );
     }
 

@@ -153,7 +153,7 @@ void MediaInfoDialog::update( input_thread_t *p_input )
     }
 
     /* Launch the update in all the panels */
-    vlc_object_yield( p_input );
+    vlc_object_hold( p_input );
 
     update( input_GetItem(p_input), true, true);
 
@@ -171,7 +171,7 @@ void MediaInfoDialog::updateOnTimeOut()
 
     if( p_input && !p_input->b_dead )
     {
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
         update( input_GetItem(p_input), false, false);
         vlc_object_release( p_input );
     }

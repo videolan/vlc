@@ -410,7 +410,7 @@ static interaction_t * InteractionGet( vlc_object_t *p_this )
 {
     interaction_t *obj = libvlc_priv(p_this->p_libvlc)->p_interaction;
     if( obj )
-        vlc_object_yield( obj );
+        vlc_object_hold( obj );
     return obj;
 }
 
@@ -612,7 +612,7 @@ static void InteractionManage( interaction_t *p_interaction )
         }
     }
     else
-        vlc_object_yield( p_interaction->p_intf );
+        vlc_object_hold( p_interaction->p_intf );
 
     for( i_index = 0 ; i_index < p_interaction->i_dialogs; i_index ++ )
     {

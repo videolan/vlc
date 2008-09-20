@@ -85,7 +85,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     p_vlm = *pp_vlm;
     if( p_vlm )
     {   /* VLM already exists */
-        vlc_object_yield( p_vlm );
+        vlc_object_hold( p_vlm );
         vlc_mutex_unlock( lockval.p_address );
         return p_vlm;
     }

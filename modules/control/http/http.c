@@ -387,7 +387,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     p_sys->p_input = p_sys->p_playlist->p_input;
     if( p_sys->p_input )
     {
-        vlc_object_yield( p_sys->p_input );
+        vlc_object_hold( p_sys->p_input );
         var_Get( p_sys->p_input, "position", &val);
         sprintf( position, "%d" , (int)((val.f_float) * 100.0));
         var_Get( p_sys->p_input, "time", &val);

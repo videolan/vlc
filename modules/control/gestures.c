@@ -144,7 +144,7 @@ static input_thread_t * input_from_playlist ( playlist_t *p_playlist )
     PL_LOCK;
     p_input = p_playlist->p_input;
     if( p_input )
-        vlc_object_yield( p_input );
+        vlc_object_hold( p_input );
     PL_UNLOCK;
 
     return p_input;

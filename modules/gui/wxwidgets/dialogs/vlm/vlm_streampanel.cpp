@@ -143,7 +143,7 @@ void VLMBroadcastStreamPanel::OnPlay( wxCommandEvent &event )
         p_stream->p_media->instance[0]->p_input )
     {
         vlc_value_t val;
-        vlc_object_yield( p_stream->p_media->instance[0]->p_input );
+        vlc_object_hold( p_stream->p_media->instance[0]->p_input );
         var_Get( p_stream->p_media->instance[0]->p_input, "state", &val );
         if( val.i_int != PAUSE_S )
         {

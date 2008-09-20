@@ -129,7 +129,7 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi,
     }
 
     p_input_thread = p_mi->p_input_thread;
-    vlc_object_yield( p_input_thread );
+    vlc_object_hold( p_input_thread );
 
     vlc_mutex_unlock( &p_mi->object_lock );
 
@@ -430,7 +430,7 @@ libvlc_media_player_t * libvlc_media_player_new_from_input_thread(
     }
 
     /* will be released in media_player_release() */
-    vlc_object_yield( p_input );
+    vlc_object_hold( p_input );
 
     p_mi->p_input_thread = p_input;
     p_mi->b_own_its_input_thread = false;

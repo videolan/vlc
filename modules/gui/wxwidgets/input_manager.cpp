@@ -200,7 +200,7 @@ void InputManager::UpdateInput()
         LockPlaylist( p_intf->p_sys, p_playlist );
         p_input = p_intf->p_sys->p_input = p_playlist->p_input;
         if( p_intf->p_sys->p_input )
-             vlc_object_yield( p_intf->p_sys->p_input );
+             vlc_object_hold( p_intf->p_sys->p_input );
         UnlockPlaylist( p_intf->p_sys, p_playlist );
         pl_Release( p_intf );
     }

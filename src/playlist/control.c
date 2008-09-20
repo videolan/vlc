@@ -49,10 +49,10 @@ playlist_t *__pl_Yield( vlc_object_t *p_this )
     pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
 
     assert( VLC_OBJECT(pl) != p_this /* This does not make sense to yield the playlist
-    using pl_Yield. use vlc_object_yield in this case */ );
+    using pl_Yield. use vlc_object_hold in this case */ );
 
     if (pl)
-        vlc_object_yield (pl);
+        vlc_object_hold (pl);
     return pl;
 }
 

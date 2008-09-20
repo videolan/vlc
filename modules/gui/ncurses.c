@@ -417,7 +417,7 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( !p_sys->p_input->b_dead )
                 {
-                    vlc_object_yield( p_sys->p_input );
+                    vlc_object_hold( p_sys->p_input );
                 }
             }
         }

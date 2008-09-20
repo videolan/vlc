@@ -144,7 +144,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
     /* If a video output was provided, lock it, otherwise look for one. */
     if( p_vout )
     {
-        vlc_object_yield( p_vout );
+        vlc_object_hold( p_vout );
     }
 
     /* TODO: find a suitable unused video output */

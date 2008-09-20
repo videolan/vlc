@@ -177,7 +177,7 @@ static void Run( intf_thread_t *p_intf )
         PL_LOCK;
         p_input = p_playlist->p_input;
         if( p_input )
-            vlc_object_yield( p_input );
+            vlc_object_hold( p_input );
         PL_UNLOCK;
 
         /* Update the vout */

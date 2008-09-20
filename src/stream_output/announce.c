@@ -96,7 +96,7 @@ sout_AnnounceRegisterSDP( sout_instance_t *p_sout, const char *psz_sdp,
         vlc_object_set_destructor ((vlc_object_t *)p_sap, sap_destroy);
     }
     else
-        vlc_object_yield ((vlc_object_t *)p_sap);
+        vlc_object_hold ((vlc_object_t *)p_sap);
     vlc_mutex_unlock (lockval.p_address);
 
     if (p_sap == NULL)

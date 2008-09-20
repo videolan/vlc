@@ -129,7 +129,7 @@ void FileInfo::Update()
     }
     pl_Release( p_intf );
 
-    vlc_object_yield( p_input );
+    vlc_object_hold( p_input );
     vlc_mutex_lock( &input_GetItem(p_input)->lock );
     if( b_need_update == true )
     {
