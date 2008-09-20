@@ -1079,8 +1079,8 @@ static void SpuRenderRegion( spu_t *p_spu,
                 {
                     /* Well we will try conversion+scaling */
                     msg_Warn( p_spu, "%4.4s to %4.4s conversion failed",
-                             &p_scale_yuvp->fmt_in.video.i_chroma,
-                             &p_scale_yuvp->fmt_out.video.i_chroma );
+                             (const char*)&p_scale_yuvp->fmt_in.video.i_chroma,
+                             (const char*)&p_scale_yuvp->fmt_out.video.i_chroma );
                 }
             }
 
