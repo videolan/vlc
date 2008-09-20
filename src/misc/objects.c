@@ -595,7 +595,7 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
  * Beware that objects found in this manner can be "owned" by another thread,
  * be of _any_ type, and be attached to any module (if any). With such an
  * object reference, you can set or get object variables, emit log messages,
- * and read write-once object parameters (i_object_id, psz_object_type, etc).
+ * and read write-once object parameters (psz_object_type, etc).
  * You CANNOT cast the object to a more specific object type, and you
  * definitely cannot invoke object type-specific callbacks with this.
  *
@@ -709,8 +709,8 @@ void __vlc_object_release( vlc_object_t *p_this )
             {
                 /* We are leaking this object */
                 fprintf( stderr,
-                         "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
-                         leaked->i_object_id, leaked->psz_object_type,
+                         "ERROR: leaking object (%p, type:%s, name:%s)\n",
+                         leaked, leaked->psz_object_type,
                          leaked->psz_object_name );
                 /* Dump object to ease debugging */
                 vlc_object_dump( leaked );
@@ -944,13 +944,9 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
         {
             char *end;
             int i_id = strtol( newval.psz_string, &end, 0 );
-            if( !*end )
-                p_object = vlc_object_get( p_libvlc, i_id );
-            else
-                /* try using the object's name to find it */
-                p_object = vlc_object_find_name( p_this, newval.psz_string,
-                                                 FIND_ANYWHERE );
-
+            /* try using the object's name to find it */
+            p_object = vlc_object_find_name( p_this, newval.psz_string,
+                                             FIND_ANYWHERE );
             if( !p_object )
             {
                 return VLC_ENOOBJ;
@@ -1241,10 +1237,10 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 
     psz_parent[0] = '\0';
     if( p_this->p_parent )
-        snprintf( psz_parent, 19, ", parent %i", p_this->p_parent->i_object_id );
+        snprintf( psz_parent, 19, ", parent %p", p_this->p_parent );
 
-    printf( " %so %.8i %s%s%s%s%s%s\n", psz_prefix,
-            p_this->i_object_id, p_this->psz_object_type,
+    printf( " %so %p %s%s%s%s%s%s\n", psz_prefix,
+            p_this, p_this->psz_object_type,
             psz_name, psz_thread, psz_refcount, psz_children,
             psz_parent );
     vlc_restorecancel (canc);
