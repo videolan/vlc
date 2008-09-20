@@ -154,7 +154,12 @@ void *vlc_hold (gc_object_t * p_gc)
     uintptr_t refs;
     assert( p_gc );
 
-#ifdef USE_SYNC
+#if defined (WIN32)
+    refs = -1 +
+        __builtin_choose_expr (sizeof (uintptr_t) == 4,
+            InterlockedIncrement (&p_gc->refs),
+            InterlockedIncrement64 (&p_gc->refs));
+#elif defined (USE_SYNC)
     refs = __sync_fetch_and_add (&p_gc->refs, 1);
 #elif defined(__APPLE__)
     refs = OSAtomicIncrement32Barrier((int*)&p_gc->refs) - 1;
@@ -177,7 +182,12 @@ void vlc_release (gc_object_t *p_gc)
 
     assert( p_gc );
 
-#ifdef USE_SYNC
+#if defined (WIN32)
+    refs = 1 +
+        __builtin_choose_expr (sizeof (uintptr_t) == 4,
+            InterlockedDecrement (&p_gc->refs),
+            InterlockedDecrement64 (&p_gc->refs));
+#elif defined (USE_SYNC)
     refs = __sync_fetch_and_sub (&p_gc->refs, 1);
 #elif defined(__APPLE__)
     refs = OSAtomicDecrement32Barrier((int*)&p_gc->refs) + 1;
