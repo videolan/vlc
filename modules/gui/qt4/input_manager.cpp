@@ -80,7 +80,7 @@ InputManager::~InputManager()
 
 /* Define the Input used.
    Add the callbacks on input
-   p_input is yield once here */
+   p_input is held once here */
 void InputManager::setInput( input_thread_t *_p_input )
 {
     delInput();

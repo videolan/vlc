@@ -652,7 +652,7 @@ void __vlc_object_release( vlc_object_t *p_this )
     /* Slow path */
     /* Remember that we cannot hold the spin while waiting on the mutex */
     vlc_mutex_lock( &structure_lock );
-    /* Take the spin again. Note that another thread may have yielded the
+    /* Take the spin again. Note that another thread may have held the
      * object in the (very short) mean time. */
     vlc_spin_lock( &internals->ref_spin );
     b_should_destroy = --internals->i_refcount == 0;

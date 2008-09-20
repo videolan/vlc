@@ -663,7 +663,7 @@ static int Demux( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    /* This item hasn't been yield by input_GetItem
+    /* This item hasn't been held by input_GetItem
      * don't release it */
     p_parent_input = input_GetItem( p_input );
 

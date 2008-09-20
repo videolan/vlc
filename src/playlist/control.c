@@ -48,7 +48,7 @@ playlist_t *__pl_Hold( vlc_object_t *p_this )
     barrier ();
     pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
 
-    assert( VLC_OBJECT(pl) != p_this /* This does not make sense to yield the playlist
+    assert( VLC_OBJECT(pl) != p_this /* This does not make sense to hold the playlist
     using pl_Hold. use vlc_object_hold in this case */ );
 
     if (pl)

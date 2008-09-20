@@ -540,7 +540,7 @@ found_shortcut:
         p_tmp = p_tmp->p_next;
     }
 
-    /* We can release the list, interesting modules were yielded */
+    /* We can release the list, interesting modules were held */
     vlc_list_release( p_all );
 
     /* Parse the linked list and use the first successful module */

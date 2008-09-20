@@ -78,7 +78,7 @@ typedef struct
     ass_renderer_t  *p_renderer;
     video_format_t  fmt;
 } ass_handle_t;
-static ass_handle_t *AssHandleYield( decoder_t *p_dec );
+static ass_handle_t *AssHandleHold( decoder_t *p_dec );
 static void AssHandleRelease( ass_handle_t * );
 
 /* */
@@ -98,7 +98,7 @@ struct decoder_sys_t
     subpicture_t *p_spu_final;
 };
 static void DecSysRelease( decoder_sys_t *p_sys );
-static void DecSysYield( decoder_sys_t *p_sys );
+static void DecSysHold( decoder_sys_t *p_sys );
 
 struct subpicture_sys_t
 {
@@ -140,7 +140,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* */
-    p_sys->p_ass = AssHandleYield( p_dec );
+    p_sys->p_ass = AssHandleHold( p_dec );
     if( !p_sys->p_ass )
     {
         free( p_sys );
@@ -174,7 +174,7 @@ static void Destroy( vlc_object_t *p_this )
     DecSysRelease( p_dec->p_sys );
 }
 
-static void DecSysYield( decoder_sys_t *p_sys )
+static void DecSysHold( decoder_sys_t *p_sys )
 {
     vlc_mutex_lock( &p_sys->lock );
     p_sys->i_refcount++;
@@ -290,7 +290,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->pf_destroy = DestroySubpicture;
     p_spu->p_sys->p_dec_sys = p_sys;
 
-    DecSysYield( p_sys );
+    DecSysHold( p_sys );
 
     block_Release( p_block );
 
@@ -630,7 +630,7 @@ static void SubpictureReleaseRegions( spu_t *p_spu, subpicture_t *p_subpic )
 }
 
 /* */
-static ass_handle_t *AssHandleYield( decoder_t *p_dec )
+static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 {
     vlc_mutex_t *p_lock = var_AcquireMutex( "libass" );
     if( !p_lock )
