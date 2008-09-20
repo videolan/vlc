@@ -1440,7 +1440,9 @@ static void * manage_cleanup( void * args )
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
+        pthread_test_cancel(); /* In 10.5 nanosleep is not a cancellation point */
         msleep( INTF_IDLE_SLEEP );
+
         [pool release];
     }
 
