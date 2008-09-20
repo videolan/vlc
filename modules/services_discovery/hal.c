@@ -300,7 +300,7 @@ static void ParseDevice( services_discovery_t *p_sd, const char *psz_device )
 /*****************************************************************************
  * Run: main HAL thread
  *****************************************************************************/
-static void *Run( voidt *data )
+static void *Run( void *data )
 {
     services_discovery_t     *p_sd  = data;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
