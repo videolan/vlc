@@ -60,7 +60,6 @@ struct input_item_t
 {
     VLC_GC_MEMBERS
     int        i_id;                 /**< Identifier of the item */
-    libvlc_int_t *p_libvlc;
 
     char       *psz_name;            /**< text describing this item */
     char       *psz_uri;             /**< mrl of this item */
@@ -186,9 +185,6 @@ VLC_EXPORT(int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, co
 #define input_item_NewExt(a,b,c,d,e,f) __input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f)
 VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, mtime_t i_duration )  );
 VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char *, const char *e, int, const char *const *, mtime_t i_duration, int ) );
-
-#define input_item_GetById(a,b) __input_item_GetById( VLC_OBJECT(a),b )
-VLC_EXPORT( input_item_t *, __input_item_GetById, (vlc_object_t *, int ) );
 
 /*****************************************************************************
  * Meta data helpers

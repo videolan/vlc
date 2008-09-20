@@ -206,11 +206,6 @@ typedef struct libvlc_priv_t
     vlc_mutex_t        config_lock; ///< config file lock
     char *             psz_configfile;   ///< location of config file
 
-    /* There is no real reason to keep a list of items, but not to break
-     * everything, let's keep it */
-    input_item_array_t input_items; ///< Array of all created input items
-    int                i_last_input_id ; ///< Last id of input item
-
     /* Messages */
     msg_bank_t         msg_bank;    ///< The message bank
     int                i_verbose;   ///< info messages

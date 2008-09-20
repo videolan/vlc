@@ -370,22 +370,8 @@ char *input_item_GetInfo( input_item_t *p_i,
 static void input_item_Destroy ( gc_object_t *gc )
 {
     input_item_t *p_input = vlc_priv(gc, input_item_t);
-    libvlc_int_t *p_libvlc = p_input->p_libvlc;
-    int i;
 
     input_item_Clean( p_input );
-
-    /* This is broken. Items must be removed from any table before their
-     * reference count drops to zero (unless the table is not used, but then
-     * why have it?). Full point, no buts. -- Courmisch */
-    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    vlc_object_lock( p_libvlc );
-
-    ARRAY_BSEARCH( priv->input_items,->i_id, int, p_input->i_id, i);
-    if( i != -1 )
-        ARRAY_REMOVE( priv->input_items, i);
-
-    vlc_object_unlock( p_libvlc );
     free( p_input );
 }
 
@@ -489,23 +475,6 @@ int input_item_AddInfo( input_item_t *p_i,
     return p_info->psz_value ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
-input_item_t *__input_item_GetById( vlc_object_t *p_obj, int i_id )
-{
-    libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
-    input_item_t * p_ret = NULL;
-    int i;
-
-    vlc_object_lock( p_obj->p_libvlc );
-
-    ARRAY_BSEARCH( priv->input_items, ->i_id, int, i_id, i);
-    if( i != -1 )
-        p_ret = ARRAY_VAL( priv->input_items, i);
-
-    vlc_object_unlock( p_obj->p_libvlc );
-
-    return p_ret;
-}
-
 input_item_t *__input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
                                   const char *psz_name,
                                   int i_options,
@@ -531,12 +500,6 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
 
     input_item_Init( p_obj, p_input );
     vlc_gc_init( p_input, input_item_Destroy );
-    p_input->p_libvlc = p_obj->p_libvlc;
-
-    vlc_object_lock( p_obj->p_libvlc );
-    p_input->i_id = ++priv->i_last_input_id;
-    ARRAY_APPEND( priv->input_items, p_input );
-    vlc_object_unlock( p_obj->p_libvlc );
 
     p_input->b_fixed_name = false;
 
