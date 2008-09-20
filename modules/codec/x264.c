@@ -433,9 +433,13 @@ vlc_module_begin();
         change_integer_range( 0, 16 );
 
 #if X264_BUILD >= 0x0013 /* r137 */
+#if X264_BUILD >= 63
+    add_integer( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
+                 B_ADAPT_LONGTEXT, false );
+#else
     add_bool( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
               B_ADAPT_LONGTEXT, false );
-
+#endif
     add_integer( SOUT_CFG_PREFIX "b-bias", 0, NULL, B_BIAS_TEXT,
                  B_BIAS_LONGTEXT, false );
         change_integer_range( -100, 100 );
