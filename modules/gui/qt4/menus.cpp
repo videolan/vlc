@@ -156,17 +156,17 @@ int DeleteNonStaticEntries( QMenu *menu )
  * Definitions of variables for the dynamic menus
  *****************************************************************************/
 #define PUSH_VAR( var ) varnames.push_back( var ); \
-    objects.push_back( p_object ? p_object->i_object_id : 0 )
+    objects.push_back( VLC_OBJECT(p_object) )
 
 #define PUSH_INPUTVAR( var ) varnames.push_back( var ); \
-    objects.push_back( p_input ? p_input->i_object_id : 0 );
+    objects.push_back( VLC_OBJECT(p_input) );
 
 #define PUSH_SEPARATOR if( objects.size() != i_last_separator ) { \
     objects.push_back( 0 ); varnames.push_back( "" ); \
     i_last_separator = objects.size(); }
 
 static int InputAutoMenuBuilder( vlc_object_t *p_object,
-        vector<int> &objects,
+        vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
 {
     PUSH_VAR( "bookmark" );
@@ -180,7 +180,7 @@ static int InputAutoMenuBuilder( vlc_object_t *p_object,
 
 static int VideoAutoMenuBuilder( vlc_object_t *p_object,
         input_thread_t *p_input,
-        vector<int> &objects,
+        vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
 {
     PUSH_INPUTVAR( "video-es" );
@@ -223,7 +223,7 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
 
 static int AudioAutoMenuBuilder( vlc_object_t *p_object,
         input_thread_t *p_input,
-        vector<int> &objects,
+        vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
 {
     PUSH_INPUTVAR( "audio-es" );
@@ -432,11 +432,11 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
  **/
 QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 {
-    vector<int> objects;
+    vector<vlc_object_t *> objects;
     vector<const char *> varnames;
     /** \todo add "switch to XXX" */
     varnames.push_back( "intf-add" );
-    objects.push_back( p_intf->i_object_id );
+    objects.push_back( VLC_OBJECT(p_intf) );
 
     return Populate( p_intf, current, varnames, objects );
 }
@@ -446,7 +446,7 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
  */
 QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
-    vector<int> objects;
+    vector<vlc_object_t *> objects;
     vector<const char *> varnames;
     vlc_object_t *p_aout;
     input_thread_t *p_input;
@@ -487,7 +487,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 {
     vlc_object_t *p_vout;
     input_thread_t *p_input;
-    vector<int> objects;
+    vector<vlc_object_t *> objects;
     vector<const char *> varnames;
 
     if( !current ) current = new QMenu();
@@ -540,7 +540,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     vlc_object_t *p_object;
-    vector<int> objects;
+    vector<vlc_object_t *> objects;
     vector<const char *> varnames;
 
     if( !menu ) menu = new QMenu();
@@ -634,7 +634,7 @@ QMenu *QVLCMenu::HelpMenu( QMenu *current )
  *****************************************************************************/
 #define POPUP_BOILERPLATE \
     unsigned int i_last_separator = 0; \
-    vector<int> objects; \
+    vector<vlc_object_t *> objects; \
     vector<const char *> varnames; \
     input_thread_t *p_input = THEMIM->getInput();
 
@@ -807,7 +807,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 if( b_isFullscreen )
                     CreateAndConnect( menu, "fullscreen",
                             qtr( "Leave Fullscreen" ),"" , ITEM_NORMAL,
-                            p_vout->i_object_id, val, VLC_VAR_BOOL,
+                            VLC_OBJECT(p_vout), val, VLC_VAR_BOOL,
                             b_isFullscreen );
                 vlc_object_release( p_vout );
             }
@@ -872,7 +872,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                      vlc_object_find( p_intf, VLC_OBJECT_INTF, FIND_PARENT );
                 if( p_object )
                 {
-                    objects.push_back( p_object->i_object_id );
+                    objects.push_back( p_object );
                     varnames.push_back( "intf-skins" );
                     Populate( p_intf, submenu, varnames, objects );
                     vlc_object_release( p_object );
@@ -950,7 +950,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
                             QMenu *current,
                             vector< const char *> & varnames,
-                            vector<int> & objects,
+                            vector<vlc_object_t *> & objects,
                             bool append )
 {
     QMenu *menu = current;
@@ -976,24 +976,9 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
             menu->addSeparator();
             continue;
         }
-
-        if( objects[i] == 0 )
-        {
-            p_object = NULL;
-        }
-        else
-        {
-            p_object = ( vlc_object_t * )vlc_object_get( p_intf->p_libvlc, objects[i] );
-            if( !p_object )
-            {
-                msg_Warn( p_intf, "object %d not found !", objects[i] );
-                continue;
-            }
-        }
+        p_object = objects[i];
 
         UpdateItem( p_intf, menu, varnames[i], p_object, true );
-        if( p_object )
-            vlc_object_release( p_object );
     }
     return menu;
 }
@@ -1141,14 +1126,14 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         case VLC_VAR_VOID:
             var_Get( p_object, psz_var, &val );
             CreateAndConnect( menu, psz_var, TEXT_OR_VAR, "", ITEM_NORMAL,
-                    p_object->i_object_id, val, i_type );
+                    p_object, val, i_type );
             break;
 
         case VLC_VAR_BOOL:
             var_Get( p_object, psz_var, &val );
             val.b_bool = !val.b_bool;
             CreateAndConnect( menu, psz_var, TEXT_OR_VAR, "", ITEM_CHECK,
-                    p_object->i_object_id, val, i_type, !val.b_bool );
+                    p_object, val, i_type, !val.b_bool );
             break;
     }
     FREENULL( text.psz_string );
@@ -1210,7 +1195,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 another_val.psz_string = strdup( CURVAL.psz_string );
                 menutext = qfu( CURTEXT ? CURTEXT : another_val.psz_string );
                 CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
-                        p_object->i_object_id, another_val, i_type,
+                        p_object, another_val, i_type,
                         val.psz_string && !strcmp( val.psz_string, CURVAL.psz_string ) );
 
                 free( val.psz_string );
@@ -1221,7 +1206,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 if( CURTEXT ) menutext = qfu( CURTEXT );
                 else menutext.sprintf( "%d", CURVAL.i_int );
                 CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
-                        p_object->i_object_id, CURVAL, i_type,
+                        p_object, CURVAL, i_type,
                         CURVAL.i_int == val.i_int );
                 break;
 
@@ -1230,7 +1215,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                 if( CURTEXT ) menutext = qfu( CURTEXT );
                 else menutext.sprintf( "%.2f", CURVAL.f_float );
                 CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
-                        p_object->i_object_id, CURVAL, i_type,
+                        p_object, CURVAL, i_type,
                         CURVAL.f_float == val.f_float );
                 break;
 
@@ -1250,7 +1235,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 
 void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
         QString text, QString help,
-        int i_item_type, int i_object_id,
+        int i_item_type, vlc_object_t *p_obj,
         vlc_value_t val, int i_val_type,
         bool checked )
 {
@@ -1262,7 +1247,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
     }
 
     action->setToolTip( help );
-    action->setEnabled( i_object_id != 0 );
+    action->setEnabled( p_obj != NULL );
 
     if( i_item_type == ITEM_CHECK )
     {
@@ -1278,7 +1263,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 
     action->setChecked( checked );
 
-    MenuItemData *itemData = new MenuItemData( THEDP->menusMapper, i_object_id, i_val_type,
+    MenuItemData *itemData = new MenuItemData( THEDP->menusMapper, p_obj, i_val_type,
             val, psz_var );
     CONNECT( action, triggered(), THEDP->menusMapper, map() );
     THEDP->menusMapper->setMapping( action, itemData );
@@ -1288,10 +1273,9 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
 {
     MenuItemData *itemData = qobject_cast<MenuItemData *>( data );
-    vlc_object_t *p_object = ( vlc_object_t * )vlc_object_get( p_intf->p_libvlc, itemData->i_object_id );
+    vlc_object_t *p_object = itemData->p_obj;
     if( p_object == NULL ) return;
 
     var_Set( p_object, itemData->psz_var, itemData->val );
-    vlc_object_release( p_object );
 }
 
