@@ -252,6 +252,10 @@ public:
     void attachVout( vout_thread_t *p_vout );
     void detachVout();
     void fullscreenChanged( vout_thread_t *, bool b_fs, int i_timeout );
+    vout_thread_t *p_vout;
+
+    int i_mouse_last_move_x;
+    int i_mouse_last_move_y;
 
 protected:
     friend class MainInterface;
@@ -291,7 +295,6 @@ private:
 
     virtual void customEvent( QEvent *event );
 
-    vout_thread_t *p_vout;
 
     /* Shared variable between FSC and VLC (protected by a lock) */
     vlc_mutex_t lock;
