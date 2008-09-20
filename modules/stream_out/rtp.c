@@ -263,14 +263,13 @@ struct sout_stream_sys_t
 
     /* */
     char     *psz_destination;
+    uint32_t  payload_bitmap;
     uint16_t  i_port;
     uint16_t  i_port_audio;
     uint16_t  i_port_video;
     uint8_t   proto;
     bool      rtcp_mux;
     int       i_ttl:9;
-    /* when need to use a private one or when using muxer */
-    unsigned  i_payload_type:7;
     bool      b_latm;
 
     /* in case we do TS/PS over rtp */
@@ -439,7 +438,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_latm = var_GetBool( p_stream, SOUT_CFG_PREFIX "mp4a-latm" );
 
-    p_sys->i_payload_type = 96;
+    p_sys->payload_bitmap = 0;
     p_sys->i_es = 0;
     p_sys->es   = NULL;
     p_sys->rtsp = NULL;
@@ -852,6 +851,12 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     int               i_port, cscov = -1;
     char              *psz_sdp;
 
+    if (0xffffffff == p_sys->payload_bitmap)
+    {
+        msg_Err (p_stream, "too many RTP elementary streams");
+        return NULL;
+    }
+
     id = vlc_object_create( p_stream, sizeof( sout_stream_id_t ) );
     if( id == NULL )
         return NULL;
@@ -889,7 +894,12 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->p_stream   = p_stream;
 
     id->i_sequence = rand()&0xffff;
-    id->i_payload_type = p_sys->i_payload_type;
+    /* Look for free dymanic payload type */
+    id->i_payload_type = 96;
+    while (p_sys->payload_bitmap & (1 << (id->i_payload_type - 96)))
+        id->i_payload_type++;
+    assert (id->i_payload_type < 128);
+
     id->ssrc[0] = rand()&0xff;
     id->ssrc[1] = rand()&0xff;
     id->ssrc[2] = rand()&0xff;
@@ -1223,7 +1233,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->pf_packetize = rtp_packetize_amr;
             break;
         case VLC_FOURCC( 's', 'p', 'x', ' ' ):
-            id->i_payload_type = p_sys->i_payload_type++;
             id->psz_enc = "SPEEX";
             id->pf_packetize = rtp_packetize_spx;
             break;
@@ -1238,14 +1247,14 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                      "codec:%4.4s)", (char*)&p_fmt->i_codec );
             goto error;
     }
+    if (id->i_payload_type >= 96)
+        /* Mark dynamic payload type in use */
+        p_sys->payload_bitmap |= 1 << (id->i_payload_type - 96);
 
     if( cscov != -1 )
         cscov += 8 /* UDP */ + 12 /* RTP */;
     if( id->sinkc > 0 )
         net_SetCSCov( id->sinkv[0].rtp_fd, cscov, -1 );
-
-    if( id->i_payload_type == p_sys->i_payload_type )
-        p_sys->i_payload_type++;
 
     if( p_sys->rtsp != NULL )
         id->rtsp_id = RtspAddId( p_sys->rtsp, id, p_sys->i_es,
@@ -1303,6 +1312,9 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         p_sys->i_port_audio = id->i_port;
     if( id->i_port == var_GetInteger( p_stream, "port-video" ) )
         p_sys->i_port_video = id->i_port;
+    /* Release dynamic payload type */
+    if (id->i_payload_type >= 96)
+        p_sys->payload_bitmap &= ~(1 << (id->i_payload_type - 96));
 
     free( id->psz_fmtp );
 
