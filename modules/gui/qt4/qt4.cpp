@@ -213,9 +213,11 @@ vlc_module_begin();
 
         set_callbacks( OpenDialogs, Close );
 
+#if 0
     add_submodule();
         set_capability( "vout window", 50 );
         set_callbacks( WindowOpen, WindowClose );
+#endif
 vlc_module_end();
 
 /*****************************************************************************
