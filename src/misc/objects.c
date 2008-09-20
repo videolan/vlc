@@ -514,47 +514,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
 }
 
 
-/**
- * Find an object given its ID.
- *
- * This function looks for the object whose i_object_id field is i_id.
- * This function is slow, and often used to hide bugs. Do not use it.
- * If you need to retain reference to an object, yield the object pointer with
- * vlc_object_yield(), use the pointer as your reference, and call
- * vlc_object_release() when you're done.
- */
-void * vlc_object_get( libvlc_int_t *p_anchor, int i_id )
-{
-    vlc_object_t *obj = NULL;
-#ifndef NDEBUG
-    int canc = vlc_savecancel ();
-    fprintf (stderr, "Use of deprecated vlc_object_get(%d) ", i_id);
-    vlc_backtrace ();
-    vlc_restorecancel (canc);
-#endif
-    vlc_mutex_lock( &structure_lock );
-
-    for( obj = vlc_internals (p_anchor)->next;
-         obj != VLC_OBJECT (p_anchor);
-         obj = vlc_internals (obj)->next )
-    {
-        if( obj->i_object_id == i_id )
-        {
-            vlc_object_yield( obj );
-            goto out;
-        }
-    }
-    obj = NULL;
-#ifndef NDEBUG
-    fprintf (stderr, "Object %d does not exist\n", i_id);
-#endif
-out:
-    vlc_mutex_unlock( &structure_lock );
-    return obj;
-}
-
-/**
- ****************************************************************************
+/*****************************************************************************
  * find a typed object and increment its refcount
  *****************************************************************************
  * This function recursively looks for a given object type. i_mode can be one
