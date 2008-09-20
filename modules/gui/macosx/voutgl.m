@@ -104,8 +104,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
     if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
     {
         msg_Warn( p_vout, "no OpenGL hardware acceleration found. "
-                          "Video display will be slow" );
-        return( 1 );
+                          "Video display might be slow" );
     }
     msg_Dbg( p_vout, "display is Quartz Extreme accelerated" );
 
