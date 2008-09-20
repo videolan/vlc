@@ -633,6 +633,7 @@ void * __vlc_object_yield( vlc_object_t *p_this )
 void __vlc_object_release( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
+    vlc_object_t *parent = NULL;
     bool b_should_destroy;
 
     vlc_spin_lock( &internals->ref_spin );
@@ -659,6 +660,10 @@ void __vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
+        /* We have no children */
+        assert (internals->i_children == 0);
+        parent = p_this->p_parent;
+
 #ifndef NDEBUG
         if( VLC_OBJECT(p_this->p_libvlc) == p_this )
         {
@@ -687,25 +692,21 @@ void __vlc_object_release( vlc_object_t *p_this )
         vlc_internals (internals->next)->prev = internals->prev;
         vlc_internals (internals->prev)->next = internals->next;
 
-        /* Detach from parent to protect against FIND_CHILDREN */
-        vlc_object_detach_unlocked (p_this);
-        /* Detach from children to protect against FIND_PARENT */
-        for (int i = 0; i < internals->i_children; i++)
-            internals->pp_children[i]->p_parent = NULL;
+        if (parent)
+            /* Detach from parent to protect against FIND_CHILDREN */
+            vlc_object_detach_unlocked (p_this);
     }
-
     vlc_mutex_unlock( &structure_lock );
 
     if( b_should_destroy )
     {
         int canc;
 
-        free( internals->pp_children );
-        internals->pp_children = NULL;
-        internals->i_children = 0;
         canc = vlc_savecancel ();
         vlc_object_destroy( p_this );
         vlc_restorecancel (canc);
+        if (parent)
+            vlc_object_release (parent);
     }
 }
 
@@ -720,6 +721,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
     if( !p_this ) return;
 
+    vlc_object_yield (p_parent);
     vlc_mutex_lock( &structure_lock );
 
     /* Attach the parent to its child */
@@ -785,14 +787,17 @@ static void vlc_object_detach_unlocked (vlc_object_t *p_this)
  *****************************************************************************/
 void __vlc_object_detach( vlc_object_t *p_this )
 {
+    vlc_object_t *p_parent;
     if( !p_this ) return;
 
     vlc_mutex_lock( &structure_lock );
-    if( !p_this->p_parent )
-        msg_Err( p_this, "object is not attached" );
-    else
+    p_parent = p_this->p_parent;
+    if (p_parent)
         vlc_object_detach_unlocked( p_this );
     vlc_mutex_unlock( &structure_lock );
+
+    if (p_parent)
+        vlc_object_release (p_parent);
 }
 
 
