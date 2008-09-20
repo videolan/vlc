@@ -477,7 +477,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
             p_queue->i_stop = (p_queue->i_stop + 1) % VLC_MSG_QSIZE;
 
             p_item->i_type =        VLC_MSG_WARN;
-            p_item->i_object_id =   p_this->i_object_id;
+            p_item->i_object_id =   (uintptr_t)p_this;
             p_item->psz_object_type = p_this->psz_object_type;
             p_item->psz_module =    strdup( "message" );
             p_item->psz_msg =       strdup( "message queue overflowed" );
@@ -498,7 +498,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 
     /* Fill message information fields */
     p_item->i_type =        i_type;
-    p_item->i_object_id =   p_this->i_object_id;
+    p_item->i_object_id =   (uintptr_t)p_this;
     p_item->psz_object_type = p_this->psz_object_type;
     p_item->psz_module =    strdup( psz_module );
     p_item->psz_msg =       psz_str;
@@ -635,40 +635,17 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 
 #else
     /* Send the message to stderr */
-    if( priv->b_color )
-    {
-        if( p_item->psz_header )
-        {
-            utf8_fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s %s%s: %s%s" GRAY
-                              "\n",
-                         p_item->i_object_id, p_item->psz_header,
-                         p_item->psz_module, psz_object,
-                         ppsz_type[i_type], ppsz_color[i_type],
-                         p_item->psz_msg );
-        }
-        else
-        {
-             utf8_fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s%s: %s%s" GRAY "\n",
-                         p_item->i_object_id, p_item->psz_module, psz_object,
-                         ppsz_type[i_type], ppsz_color[i_type],
-                         p_item->psz_msg );
-        }
-    }
-    else
-    {
-        if( p_item->psz_header )
-        {
-            utf8_fprintf( stderr, "[%.8i] %s %s %s%s: %s\n", p_item->i_object_id,
-                         p_item->psz_header, p_item->psz_module,
-                         psz_object, ppsz_type[i_type], p_item->psz_msg );
-        }
-        else
-        {
-            utf8_fprintf( stderr, "[%.8i] %s %s%s: %s\n", p_item->i_object_id,
-                         p_item->psz_module, psz_object, ppsz_type[i_type],
-                         p_item->psz_msg );
-        }
-    }
+    utf8_fprintf( stderr, "[%s%p%s] %s%s%s %s%s: %s%s%s\n",
+                  priv->b_color ? GREEN : "",
+                  (void *)p_item->i_object_id,
+                  priv->b_color ? GRAY : "",
+                  p_item->psz_header ? p_item->psz_header : "",
+                  p_item->psz_header ? " " : "",
+                  p_item->psz_module, psz_object,
+                  ppsz_type[i_type],
+                  priv->b_color ? ppsz_color[i_type] : "",
+                  p_item->psz_msg,
+                  priv->b_color ? GRAY : "" );
 
 #   if defined(WIN32)
     fflush( stderr );

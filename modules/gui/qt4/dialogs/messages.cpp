@@ -211,10 +211,10 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
     if( p_obj->psz_object_name )
         item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" +
                        qfu( p_obj->psz_object_name ) + "\" (" +
-                       QString::number(p_obj->i_object_id) + ")" );
+                       QString::number((uintptr_t)p_obj) + ")" );
     else
         item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
-                       QString::number(p_obj->i_object_id) + ")" );
+                       QString::number((uintptr_t)p_obj) + ")" );
 
     item->setExpanded( true );
 
