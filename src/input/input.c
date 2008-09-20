@@ -393,7 +393,7 @@ input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
  * \param p_parent a vlc_object
  * \param p_item an input item
  * \param b_block should we block until read is finished ?
- * \return the input object id if non blocking, an error code else
+ * \return an error code, VLC_SUCCESS on success
  */
 int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
                    bool b_block )
@@ -420,7 +420,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
             return VLC_EGENERIC;
         }
     }
-    return p_input->i_object_id;
+    return VLC_SUCCESS;
 }
 
 /**
