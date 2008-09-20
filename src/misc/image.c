@@ -316,7 +316,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
             p_image->p_filter->fmt_out.video = p_image->p_enc->fmt_in.video;
         }
 
-        picture_Yield( p_pic );
+        picture_Hold( p_pic );
 
         p_tmp_pic =
             p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
@@ -446,7 +446,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt_out;
     }
 
-    picture_Yield( p_pic );
+    picture_Hold( p_pic );
 
     p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 
@@ -493,7 +493,7 @@ static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_filter->fmt_out.video = *p_fmt;
     }
 
-    picture_Yield( p_pic );
+    picture_Hold( p_pic );
 
     return p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 }
@@ -587,7 +587,7 @@ static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 static void video_link_picture( decoder_t *p_dec, picture_t *p_pic )
 {
     (void)p_dec;
-    picture_Yield( p_pic );
+    picture_Hold( p_pic );
 }
 
 static void video_unlink_picture( decoder_t *p_dec, picture_t *p_pic )

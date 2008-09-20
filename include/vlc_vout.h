@@ -126,7 +126,7 @@ struct picture_t
 /**
  * This function will create a new picture.
  * The picture created will implement a default release management compatible
- * with picture_Yield and picture_Release. This default management will release
+ * with picture_Hold and picture_Release. This default management will release
  * picture_sys_t *p_sys field if non NULL.
  */
 VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
@@ -144,7 +144,7 @@ VLC_EXPORT( void, picture_Delete, ( picture_t * ) );
  * This function will increase the picture reference count.
  * It will not have any effect on picture obtained from vout
  */
-static inline void picture_Yield( picture_t *p_picture )
+static inline void picture_Hold( picture_t *p_picture )
 {
     if( p_picture->pf_release )
         p_picture->i_refcount++;
@@ -196,7 +196,7 @@ VLC_EXPORT( void, plane_CopyPixels, ( plane_t *p_dst, const plane_t *p_src ) );
 
 /**
  * This function will copy both picture dynamic properties and pixels.
- * You have to notice that sometime a simple picture_Yield may do what
+ * You have to notice that sometime a simple picture_Hold may do what
  * you want without the copy overhead.
  * Provided for convenience.
  */

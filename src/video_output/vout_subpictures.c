@@ -1061,7 +1061,7 @@ static void SpuRenderRegion( spu_t *p_spu,
             filter_t *p_scale = p_spu->p_scale;
 
             picture_t *p_picture = p_region->p_picture;
-            picture_Yield( p_picture );
+            picture_Hold( p_picture );
 
             /* Convert YUVP to YUVA/RGBA first for better scaling quality */
             if( b_using_palette )
