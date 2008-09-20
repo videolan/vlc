@@ -658,6 +658,7 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
     int i_x, i_y, i_len, i_color, i_pitch;
     uint16_t *p_source = (uint16_t *)p_spu_data->p_data;
     video_format_t fmt;
+    video_palette_t palette;
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -667,19 +668,7 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
     fmt.i_height = fmt.i_visible_height = p_spu_properties->i_height -
         p_spu_data->i_y_top_offset - p_spu_data->i_y_bottom_offset;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
-    if( !p_spu->p_region )
-    {
-        msg_Err( p_dec, "cannot allocate SPU region" );
-        return;
-    }
-
-    p_spu->p_region->i_x = p_spu_properties->i_x;
-    p_spu->p_region->i_y = p_spu_properties->i_y + p_spu_data->i_y_top_offset;
-    p_p = p_spu->p_region->p_picture->p->p_pixels;
-    i_pitch = p_spu->p_region->p_picture->p->i_pitch;
-
-    /* Build palette */
+    fmt.p_palette = &palette;
     fmt.p_palette->i_entries = 4;
     for( i_x = 0; i_x < fmt.p_palette->i_entries; i_x++ )
     {
@@ -690,6 +679,18 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
             p_spu_data->pi_alpha[i_x] == 0xf ? 0xff :
             p_spu_data->pi_alpha[i_x] << 4;
     }
+
+    p_spu->p_region = subpicture_region_New( &fmt );
+    if( !p_spu->p_region )
+    {
+        msg_Err( p_dec, "cannot allocate SPU region" );
+        return;
+    }
+
+    p_spu->p_region->i_x = p_spu_properties->i_x;
+    p_spu->p_region->i_y = p_spu_properties->i_y + p_spu_data->i_y_top_offset;
+    p_p = p_spu->p_region->p_picture->p->p_pixels;
+    i_pitch = p_spu->p_region->p_picture->p->i_pitch;
 
     /* Draw until we reach the bottom of the subtitle */
     for( i_y = 0; i_y < (int)fmt.i_height * i_pitch; i_y += i_pitch )

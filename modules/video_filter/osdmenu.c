@@ -375,7 +375,7 @@ static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
+    p_region = subpicture_region_New( &fmt );
     if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate another SPU region" );
@@ -401,6 +401,7 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
 {
     subpicture_region_t *p_region = NULL;
     video_format_t       fmt;
+    video_palette_t      palette;
 
     if( !p_spu ) return NULL;
 
@@ -412,19 +413,20 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
+    if( fmt.i_chroma == VLC_FOURCC('Y','U','V','P') )
+    {
+        fmt.p_palette = &palette;
+        fmt.p_palette->i_entries = 0;
+        fmt.i_visible_width = 0;
+        fmt.i_visible_height = 0;
+    }
 
-    p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
+    p_region = subpicture_region_New( &fmt );
     if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate SPU region" );
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
         return NULL;
-    }
-    if( !p_pic && ( fmt.i_chroma == VLC_FOURCC('Y','U','V','P') ) )
-    {
-        p_region->fmt.p_palette->i_entries = 0;
-        p_region->fmt.i_width = p_region->fmt.i_visible_width = 0;
-        p_region->fmt.i_height = p_region->fmt.i_visible_height = 0;
     }
     /* FIXME the copy is probably not needed anymore */
     if( p_pic )
@@ -570,13 +572,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
             if( !p_new )
             {
                 /* Cleanup when bailing out */
-                subpicture_region_t *p_tmp = NULL;
-                while( p_region_list )
-                {
-                    p_tmp = p_region_list->p_next;
-                    p_spu->pf_destroy_region( VLC_OBJECT(p_filter), p_region_list );
-                };
-                p_spu->pf_destroy_region( VLC_OBJECT(p_filter), p_region );
+                subpicture_region_ChainDelete( p_region_list );
+                subpicture_region_Delete( p_region );
+
                 p_filter->pf_sub_buffer_del( p_filter, p_spu );
                 return NULL;
             }

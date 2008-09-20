@@ -443,7 +443,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
 
-    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
+    p_spu->p_region = subpicture_region_New( &fmt );
     if( !p_spu->p_region )
     {
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
@@ -548,7 +548,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         fmt_out.i_height =
             fmt_out.i_visible_height = p_pic->p[Y_PLANE].i_visible_lines;
 
-        p_region = p_spu->pf_create_region( VLC_OBJECT( p_filter ), &fmt_out );
+        p_region = subpicture_region_New( &fmt_out );
         if( !p_region )
         {
             msg_Err( p_filter, "cannot allocate SPU region" );

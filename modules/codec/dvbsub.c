@@ -1500,6 +1500,7 @@ static subpicture_t *render( decoder_t *p_dec )
         subpicture_region_t *p_spu_region;
         uint8_t *p_src, *p_dst;
         video_format_t fmt;
+        video_palette_t palette;
         int i_pitch;
 
         i_timeout = p_sys->p_page->i_timeout;
@@ -1545,19 +1546,7 @@ static subpicture_t *render( decoder_t *p_dec )
         fmt.i_width = fmt.i_visible_width = p_region->i_width;
         fmt.i_height = fmt.i_visible_height = p_region->i_height;
         fmt.i_x_offset = fmt.i_y_offset = 0;
-        p_spu_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
-        if( !p_spu_region )
-        {
-            msg_Err( p_dec, "cannot allocate SPU region" );
-            continue;
-        }
-        p_spu_region->i_x = i_base_x + p_regiondef->i_x;
-        p_spu_region->i_y = i_base_y + p_regiondef->i_y;
-        p_spu_region->i_align = p_sys->i_spu_position;
-        *pp_spu_region = p_spu_region;
-        pp_spu_region = &p_spu_region->p_next;
-
-        /* Build palette */
+        fmt.p_palette = &palette;
         fmt.p_palette->i_entries = ( p_region->i_depth == 1 ) ? 4 :
             ( ( p_region->i_depth == 2 ) ? 16 : 256 );
         p_color = ( p_region->i_depth == 1 ) ? p_clut->c_2b :
@@ -1569,6 +1558,18 @@ static subpicture_t *render( decoder_t *p_dec )
             fmt.p_palette->palette[j][2] = p_color[j].Cr; /* V == Cr */
             fmt.p_palette->palette[j][3] = 0xff - p_color[j].T;
         }
+
+        p_spu_region = subpicture_region_New( &fmt );
+        if( !p_spu_region )
+        {
+            msg_Err( p_dec, "cannot allocate SPU region" );
+            continue;
+        }
+        p_spu_region->i_x = i_base_x + p_regiondef->i_x;
+        p_spu_region->i_y = i_base_y + p_regiondef->i_y;
+        p_spu_region->i_align = p_sys->i_spu_position;
+        *pp_spu_region = p_spu_region;
+        pp_spu_region = &p_spu_region->p_next;
 
         p_src = p_region->p_pixbuf;
         p_dst = p_spu_region->p_picture->Y_PIXELS;
@@ -1598,7 +1599,7 @@ static subpicture_t *render( decoder_t *p_dec )
             fmt.i_width = fmt.i_visible_width = p_region->i_width;
             fmt.i_height = fmt.i_visible_height = p_region->i_height;
             fmt.i_x_offset = fmt.i_y_offset = 0;
-            p_spu_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+            p_spu_region = subpicture_region_New( &fmt );
             if( !p_region )
             {
                 msg_Err( p_dec, "cannot allocate SPU region" );

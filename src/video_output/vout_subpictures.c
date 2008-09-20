@@ -253,26 +253,21 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
     }
 }
 
-/**
- * Create a subpicture region
- *
- * \param p_this vlc_object_t
- * \param p_fmt the format that this subpicture region should have
- */
-subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
-                                         video_format_t *p_fmt )
+/* */
+subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
 {
     subpicture_region_t *p_region = calloc( 1, sizeof(*p_region ) );
     if( !p_region )
         return NULL;
 
-    /* FIXME is that *really* wanted? */
-    if( p_fmt->i_chroma == VLC_FOURCC_YUVP )
-        p_fmt->p_palette = calloc( 1, sizeof(video_palette_t) );
-    else
-        p_fmt->p_palette = NULL;    /* XXX and that above all? */
-
     p_region->fmt = *p_fmt;
+    p_region->fmt.p_palette = NULL;
+    if( p_fmt->i_chroma == VLC_FOURCC_YUVP )
+    {
+        p_region->fmt.p_palette = calloc( 1, sizeof(*p_region->fmt.p_palette) );
+        if( p_fmt->p_palette )
+            *p_region->fmt.p_palette = *p_fmt->p_palette;
+    }
     p_region->i_alpha = 0xff;
     p_region->p_next = NULL;
     p_region->p_private = NULL;
@@ -295,13 +290,8 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     return p_region;
 }
 
-/**
- * Destroy a subpicture region
- *
- * \param p_this vlc_object_t
- * \param p_region the subpicture region to destroy
- */
-void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
+/* */
+void subpicture_region_Delete( subpicture_region_t *p_region )
 {
     if( !p_region )
         return;
@@ -318,6 +308,19 @@ void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
     free( p_region->psz_html );
     //free( p_region->p_style ); FIXME --fenrir plugin does not allocate the memory for it. I think it might lead to segfault, video renderer can live longer than the decoder
     free( p_region );
+}
+
+/* */
+void subpicture_region_ChainDelete( subpicture_region_t *p_head )
+{
+    while( p_head )
+    {
+        subpicture_region_t *p_next = p_head->p_next;
+
+        subpicture_region_Delete( p_head );
+
+        p_head = p_next;
+    }
 }
 
 /**
@@ -403,9 +406,6 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     p_subpic->p_sys      = NULL;
     vlc_mutex_unlock( &p_spu->subpicture_lock );
 
-    p_subpic->pf_create_region = __spu_CreateRegion;
-    p_subpic->pf_destroy_region = __spu_DestroyRegion;
-
     return p_subpic;
 }
 
@@ -437,12 +437,8 @@ void spu_DestroySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
                          p_subpic, p_subpic->i_status );
     }
 
-    while( p_subpic->p_region )
-    {
-        subpicture_region_t *p_region = p_subpic->p_region;
-        p_subpic->p_region = p_region->p_next;
-        spu_DestroyRegion( p_spu, p_region );
-    }
+    subpicture_region_ChainDelete( p_subpic->p_region );
+    p_subpic->p_region = NULL;
 
     if( p_subpic->pf_destroy )
     {
@@ -1543,12 +1539,8 @@ static void SpuClearChannel( spu_t *p_spu, int i_channel, bool b_locked )
 
         if( p_subpic->i_channel == i_channel )
         {
-            while( p_subpic->p_region )
-            {
-                subpicture_region_t *p_region = p_subpic->p_region;
-                p_subpic->p_region = p_region->p_next;
-                spu_DestroyRegion( p_spu, p_region );
-            }
+            subpicture_region_ChainDelete( p_subpic->p_region );
+            p_subpic->p_region = NULL;
 
             if( p_subpic->pf_destroy ) p_subpic->pf_destroy( p_subpic );
             p_subpic->i_status = FREE_SUBPICTURE;
@@ -1676,21 +1668,13 @@ static subpicture_t *spu_new_buffer( filter_t *p_filter )
     p_subpic->b_absolute = true;
     p_subpic->i_alpha    = 0xFF;
 
-    p_subpic->pf_create_region = __spu_CreateRegion;
-    p_subpic->pf_destroy_region = __spu_DestroyRegion;
-
     VLC_UNUSED(p_filter);
     return p_subpic;
 }
 
 static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 {
-    while( p_subpic->p_region )
-    {
-        subpicture_region_t *p_region = p_subpic->p_region;
-        p_subpic->p_region = p_region->p_next;
-        p_subpic->pf_destroy_region( VLC_OBJECT(p_filter), p_region );
-    }
+    subpicture_region_ChainDelete( p_subpic->p_region );
 
     free( p_subpic );
 }

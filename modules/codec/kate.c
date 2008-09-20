@@ -552,6 +552,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     subpicture_region_t *p_bitmap_region = NULL;
     int ret;
     video_format_t fmt;
+    video_format_t palette;
     kate_tracker kin;
     bool tracker_valid = false;
 
@@ -620,6 +621,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
 
 #ifdef ENABLE_BITMAPS
     if (ev->bitmap && ev->bitmap->type==kate_bitmap_type_paletted && ev->palette) {
+
         /* create a separate region for the bitmap */
         memset( &fmt, 0, sizeof(video_format_t) );
         fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
@@ -627,17 +629,16 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         fmt.i_width = fmt.i_visible_width = ev->bitmap->width;
         fmt.i_height = fmt.i_visible_height = ev->bitmap->height;
         fmt.i_x_offset = fmt.i_y_offset = 0;
+        fmt.p_palette = &palette;
+        CreateKatePalette( fmt.p_palette, ev->palette );
 
-        p_bitmap_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+        p_bitmap_region = subpicture_region_New( &fmt );
         if( !p_bitmap_region )
         {
             msg_Err( p_dec, "cannot allocate SPU region" );
             p_dec->pf_spu_buffer_del( p_dec, p_spu );
             return NULL;
         }
-
-        /* create the palette */
-        CreateKatePalette( fmt.p_palette, ev->palette );
 
         /* create the bitmap */
         CreateKateBitmap( p_bitmap_region->p_picture, ev->bitmap );
@@ -651,7 +652,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+    p_spu->p_region = subpicture_region_New( &fmt );
     if( !p_spu->p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );

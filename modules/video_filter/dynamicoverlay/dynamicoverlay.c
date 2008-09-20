@@ -347,8 +347,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     {
         subpicture_region_t *p_region;
 
-        *pp_region = p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter),
-                                                         &p_overlay->format );
+        *pp_region = p_region = subpicture_region_New( &p_overlay->format );
         if( !p_region )
             break;
 

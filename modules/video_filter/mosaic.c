@@ -641,10 +641,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             fmt_out.i_visible_height = fmt_out.i_height;
         }
 
-        p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt_out );
+        p_region = subpicture_region_New( &fmt_out );
         /* FIXME the copy is probably not needed anymore */
         if( p_region )
-            picture_Copy( &p_region->p_picture, p_converted );
+            picture_Copy( p_region->p_picture, p_converted );
         if( !p_sys->b_keep )
             picture_Release( p_converted );
 

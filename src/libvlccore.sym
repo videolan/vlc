@@ -336,10 +336,8 @@ sout_StreamDelete
 sout_StreamNew
 sout_UpdateStatistic
 __spu_Create
-__spu_CreateRegion
 spu_CreateSubpicture
 spu_Destroy
-__spu_DestroyRegion
 spu_DestroySubpicture
 spu_DisplaySubpicture
 spu_Init
@@ -374,6 +372,8 @@ stream_vaControl
 __str_format
 __str_format_meta
 str_format_time
+subpicture_region_New
+subpicture_region_Delete
 tls_ClientCreate
 tls_ClientDelete
 ToLocale

@@ -250,12 +250,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
     video_format_t fmt;
 
     /* TODO maybe checking if we really need redrawing */
-    while( p_subpic->p_region )
-    {
-        subpicture_region_t *p_region = p_subpic->p_region;
-        p_subpic->p_region = p_region->p_next;
-        spu_DestroyRegion( p_spu, p_region );
-    }
+    subpicture_region_ChainDelete( p_subpic->p_region );
     p_subpic->p_region = NULL;
 
     /* FIXME check why this is needed */
@@ -297,7 +292,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
     p_subpic->i_original_picture_height = fmt.i_height;
     p_subpic->i_original_picture_width = fmt.i_width;
 
-    p_spu_region = p_subpic->p_region = p_subpic->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+    p_spu_region = p_subpic->p_region = subpicture_region_New( &fmt );
 
     if( p_spu_region )
     {

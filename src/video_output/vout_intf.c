@@ -475,7 +475,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, image_handler_t *p_image, pic
     fmt_out.i_sar_num =
     fmt_out.i_sar_den = 0;
 
-    p_subpic->p_region = spu_CreateRegion( p_vout->p_spu, &fmt_out );
+    p_subpic->p_region = subpicture_region_New( &fmt_out );
     if( p_subpic->p_region )
     {
         picture_Release( p_subpic->p_region->p_picture );

@@ -467,6 +467,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     subpicture_t  *p_spu;
     subpicture_region_t *p_region;
     video_format_t fmt;
+    video_palette_t palette;
     int i;
 
     /* Allocate the subpicture internal data. */
@@ -494,20 +495,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     fmt.i_width = fmt.i_visible_width = p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_sys->i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
-    if( !p_region )
-    {
-        msg_Err( p_dec, "cannot allocate SVCD subtitle region" );
-        //goto error;
-    }
-
-    p_region->fmt.i_aspect = VOUT_ASPECT_FACTOR;
- 
-    p_spu->p_region = p_region;
-    p_region->i_x = p_sys->i_x_start;
-    p_region->i_y = p_sys->i_y_start;
-
-    /* Build palette */
+    fmt.p_palette = &palette;
     fmt.p_palette->i_entries = 4;
     for( i = 0; i < fmt.p_palette->i_entries; i++ )
     {
@@ -516,6 +504,18 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
         fmt.p_palette->palette[i][2] = p_sys->p_palette[i][2];
         fmt.p_palette->palette[i][3] = p_sys->p_palette[i][3];
     }
+
+    p_region = subpicture_region_New( &fmt );
+    if( !p_region )
+    {
+        msg_Err( p_dec, "cannot allocate SVCD subtitle region" );
+        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        return NULL;
+    }
+
+    p_spu->p_region = p_region;
+    p_region->i_x = p_sys->i_x_start;
+    p_region->i_y = p_sys->i_y_start;
 
     SVCDSubRenderImage( p_dec, p_data, p_region );
 

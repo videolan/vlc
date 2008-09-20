@@ -286,7 +286,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = 0;
     fmt.i_y_offset = 0;
-    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
+    p_spu->p_region = subpicture_region_New( &fmt );
     if( !p_spu->p_region )
     {
         p_filter->pf_sub_buffer_del( p_filter, p_spu );

@@ -164,7 +164,7 @@ static int CreatePicture( spu_t *p_spu, subpicture_t *p_subpic,
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_subpic->p_region = p_subpic->pf_create_region( VLC_OBJECT(p_spu), &fmt );
+    p_subpic->p_region = subpicture_region_New( &fmt );
     if( !p_subpic->p_region )
     {
         msg_Err( p_spu, "cannot allocate SPU region" );

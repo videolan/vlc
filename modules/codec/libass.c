@@ -399,7 +399,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
         fmt_region.i_height =
         fmt_region.i_visible_height = region[i].y1 - region[i].y0;
 
-        pp_region[i] = r = p_subpic->pf_create_region( VLC_OBJECT(p_spu), &fmt_region );
+        pp_region[i] = r = subpicture_region_New( &fmt_region );
         if( !r )
             break;
         r->i_x = region[i].x0;
@@ -620,12 +620,7 @@ static void RegionDraw( subpicture_region_t *p_region, ass_image_t *p_img )
 
 static void SubpictureReleaseRegions( spu_t *p_spu, subpicture_t *p_subpic )
 {
-    while( p_subpic->p_region )
-    {
-        subpicture_region_t *p_region = p_subpic->p_region;
-        p_subpic->p_region = p_region->p_next;
-        spu_DestroyRegion( p_spu, p_region );
-    }
+    subpicture_region_ChainDelete( p_subpic->p_region );
     p_subpic->p_region = NULL;
 }
 

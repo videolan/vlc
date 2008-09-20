@@ -386,7 +386,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_text_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+    p_text_region = subpicture_region_New( &fmt );
 
     if( p_text_region != NULL )
     {
@@ -396,7 +396,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
         p_text_region->psz_html = strndup( psz_subtitle, i_len );
         if( ! p_text_region->psz_html )
         {
-            p_spu->pf_destroy_region( VLC_OBJECT(p_dec), p_text_region );
+            subpicture_region_Delete( p_text_region );
             return NULL;
         }
 
@@ -1201,7 +1201,7 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
     fmt_out.i_height =
         fmt_out.i_visible_height = p_pic->format.i_visible_height;
 
-    p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt_out );
+    p_region = subpicture_region_New( &fmt_out );
     if( !p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );

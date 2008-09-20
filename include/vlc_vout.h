@@ -319,8 +319,30 @@ struct subpicture_region_t
     text_style_t    *p_style;        /**< a description of the text style formatting */
 
     subpicture_region_t *p_next;                /**< next region in the list */
-    subpicture_region_private_t *p_private;  /**< modified version of this region */
+    subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
 };
+
+/**
+ * This function will create a new subpicture.
+ * You can must use subpicture_region_Delete to destroy it.
+ */
+VLC_EXPORT( subpicture_region_t *, subpicture_region_New, ( const video_format_t *p_fmt ) );
+
+/**
+ * This function will destroy a subpicture allocated by
+ * subpicture_region_New.
+ *
+ * You may give it NULL.
+ */
+VLC_EXPORT( void, subpicture_region_Delete, ( subpicture_region_t *p_region ) );
+
+/**
+ * This function will destroy a list of subpicture allocated by
+ * subpicture_region_New.
+ *
+ * Provided for convenience.
+ */
+VLC_EXPORT( void, subpicture_region_ChainDelete, ( subpicture_region_t *p_head ) );
 
 /**
  * Video subtitle
@@ -375,10 +397,6 @@ struct subpicture_t
     void ( *pf_destroy ) ( subpicture_t * );
 
     /** Pointer to functions for region management */
-    subpicture_region_t * ( *pf_create_region ) ( vlc_object_t *,
-                                                  video_format_t * );
-    void ( *pf_destroy_region ) ( vlc_object_t *, subpicture_region_t * );
-
     void (*pf_pre_render)    ( spu_t *, subpicture_t *, const video_format_t * );
     void (*pf_update_regions)( spu_t *,
                                subpicture_t *, const video_format_t *, mtime_t );

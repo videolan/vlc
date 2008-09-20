@@ -483,7 +483,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     }
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
-    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+    p_spu->p_region = subpicture_region_New( &fmt );
     if( p_spu->p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
