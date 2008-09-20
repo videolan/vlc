@@ -1414,7 +1414,9 @@ static void * ManageThread( void *user_data )
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
+        vlc_object_unlock( p_intf );
         msleep( INTF_IDLE_SLEEP );
+        vlc_object_lock( p_intf );
     }
     vlc_object_unlock( p_intf );
     [o_pool release];
