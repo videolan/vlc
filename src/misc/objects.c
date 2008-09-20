@@ -613,7 +613,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
 /**
  * Increment an object reference counter.
  */
-void __vlc_object_yield( vlc_object_t *p_this )
+void * __vlc_object_yield( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
 
@@ -623,6 +623,7 @@ void __vlc_object_yield( vlc_object_t *p_this )
     /* Increment the counter */
     internals->i_refcount++;
     vlc_spin_unlock( &internals->ref_spin );
+    return p_this;
 }
 
 /*****************************************************************************

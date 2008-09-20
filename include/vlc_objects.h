@@ -84,7 +84,7 @@ __attribute__((deprecated))
 #endif
 VLC_EXPORT( void *, __vlc_object_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( vlc_object_t *, vlc_object_find_name, ( vlc_object_t *, const char *, int ) );
-VLC_EXPORT( void, __vlc_object_yield, ( vlc_object_t * ) );
+VLC_EXPORT( void *, __vlc_object_yield, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );
 VLC_EXPORT( vlc_list_t *, __vlc_list_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( vlc_list_t *, __vlc_list_children, ( vlc_object_t * ) );
