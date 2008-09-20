@@ -846,27 +846,27 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
 
     if( p_sys->p_text && p_sys->p_text->p_module )
     {
-        p_region = (subpicture_region_t *) malloc( sizeof(subpicture_region_t) );
+        video_format_t fmt;
+
+        memset( &fmt, 0, sizeof(fmt) );
+        fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+        fmt.i_aspect = 0;
+        fmt.i_width  = fmt.i_visible_width = 0;
+        fmt.i_height = fmt.i_visible_height = 0;
+        fmt.i_x_offset = 0;
+        fmt.i_y_offset = 0;
+
+        p_region = subpicture_region_New( &fmt );
         if( !p_region )
             return p_dest;
-
-        memset( p_region, 0, sizeof(subpicture_region_t) );
 
         p_region->psz_text = strdup( psz_string );
         if( !p_region->psz_text )
         {
-            free( p_region );
+            subpicture_region_Delete( p_region );
             return NULL;
         }
         p_region->p_style = p_style;
-
-        p_region->fmt.i_chroma = VLC_FOURCC('T','E','X','T');
-        p_region->fmt.i_aspect = 0;
-        p_region->fmt.i_width = p_region->fmt.i_visible_width = 0;
-        p_region->fmt.i_height = p_region->fmt.i_visible_height = 0;
-        p_region->fmt.i_x_offset = 0;
-        p_region->fmt.i_y_offset = 0;
-
         p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
 
         if( p_sys->p_text->pf_render_text )
@@ -887,9 +887,7 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
             p_dest = AllocatePicture( VLC_OBJECT(p_intf), &fmt_out );
             if( !p_dest )
             {
-                picture_Release( p_region->p_picture );
-                free( p_region->psz_text );
-                free( p_region );
+                subpicture_region_Delete( p_region );
                 return NULL;
             }
             picture_Copy( p_dest, p_region->p_picture );
@@ -898,13 +896,10 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
             p_dest = ConvertImage( p_intf, &p_region->p_picture,
                                    &p_region->fmt, &fmt_out );
 #endif
-            picture_Release( p_region->p_picture );
-            free( p_region->psz_text );
-            free( p_region );
+            subpicture_region_Delete( p_region );
             return p_dest;
         }
-        free( p_region->psz_text );
-        free( p_region );
+        subpicture_region_Delete( p_region );
     }
     return p_dest;
 }
