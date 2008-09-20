@@ -188,7 +188,11 @@ void vlc_release (gc_object_t *p_gc)
     assert (refs > 0);
     if (refs == 1)
     {
+#ifdef USE_SYNC
+#elif defined(__APPLE__)
+#else
         vlc_spin_destroy (&p_gc->spin);
+#endif
         p_gc->pf_destructor (p_gc);
     }
 }
