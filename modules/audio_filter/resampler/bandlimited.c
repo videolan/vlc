@@ -562,7 +562,8 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
 
     if( !p_block || !p_block->i_samples )
     {
-        if( p_block ) p_block->pf_release( p_block );
+        if( p_block )
+            block_Release( p_block );
         return NULL;
     }
 
@@ -576,7 +577,7 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     if( !p_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
-        p_block->pf_release( p_block );
+        block_Release( p_block );
         return NULL;
     }
 
@@ -604,7 +605,7 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
 
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
-    p_block->pf_release( p_block );
+    block_Release( p_block );
 
     p_out->i_buffer = out_buf.i_nb_bytes;
     p_out->i_samples = out_buf.i_nb_samples;
