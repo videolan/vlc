@@ -52,7 +52,6 @@ struct services_discovery_t
     services_discovery_sys_t *p_sys;
 };
 
-
 /***********************************************************************
  * Service Discovery
  ***********************************************************************/
@@ -65,7 +64,20 @@ VLC_EXPORT( char **, __services_discovery_GetServicesNames, ( vlc_object_t * p_s
 
 /* Creation of a service_discovery object */
 VLC_EXPORT( services_discovery_t *, services_discovery_Create, ( vlc_object_t * p_super, const char * psz_service_name ) );
-VLC_EXPORT( void,                   services_discovery_Destroy, ( services_discovery_t * p_this ) );
+VLC_EXPORT( bool,                   services_discovery_Start, ( services_discovery_t * p_this ) );
+VLC_EXPORT( void,                   services_discovery_Stop, ( services_discovery_t * p_this ) );
+
+static inline void services_discovery_CreateAndStart( vlc_object_t * p_super, const char * psz_service_name )
+{
+    services_discovery_t * sd = services_discovery_Create( p_super, psz_service_name );
+    services_discovery_Start( sd );
+}
+
+static inline void services_discovery_StopAndRelease( services_discovery_t * p_this )
+{
+    services_discovery_Stop( p_this );
+    vlc_object_release( p_this );
+}
 
 /* Read info from discovery object */
 VLC_EXPORT( char *,                 services_discovery_GetLocalizedName, ( services_discovery_t * p_this ) );

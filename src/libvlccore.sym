@@ -310,7 +310,8 @@ sdp_AddMedia
 secstotimestr
 services_discovery_AddItem
 services_discovery_Create
-services_discovery_Destroy
+services_discovery_Start
+services_discovery_Stop
 services_discovery_EventManager
 services_discovery_GetLocalizedName
 __services_discovery_GetServicesNames
