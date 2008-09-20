@@ -469,18 +469,22 @@ static int Init( vout_thread_t *p_vout )
     else
     {
 #ifdef OPENGL_MORE_EFFECT
-        p_sys->i_effect = 3;
-        while (( strcmp( val.psz_string, ppsz_effects[p_sys->i_effect]) ) && (pow(2,p_sys->i_effect) < INIFILE))
+        long i, size = sizeof(ppsz_effects)/sizeof(*ppsz_effects);
+        p_sys->i_effect = OPENGL_EFFECT_NONE;
+
+        for(i = 3; i < size; i++)
         {
-            p_sys->i_effect ++;
+            if(!strcmp( val.psz_string, ppsz_effects[i]))
+            {
+                p_sys->i_effect = 1 << i;
+                break;
+            }
         }
-        if (pow(2,p_sys->i_effect) < INIFILE)
-            p_sys->i_effect = pow(2,p_sys->i_effect);
-        else if ( strcmp( val.psz_string, ppsz_effects[p_sys->i_effect]))
+
+        if( p_sys->i_effect == OPENGL_EFFECT_NONE )
         {
             msg_Warn( p_vout, "no valid opengl effect provided, using "
                       "\"none\"" );
-            p_sys->i_effect = OPENGL_EFFECT_NONE;
         }
 #else
         msg_Warn( p_vout, "no valid opengl effect provided, using "
