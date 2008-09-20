@@ -494,7 +494,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 /**
  * Start the input for an item
  *
- * \param p_playlist the playlist objetc
+ * \param p_playlist the playlist object
  * \param p_item the item to play
  * \return nothing
  */
