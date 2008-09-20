@@ -54,6 +54,8 @@ extern "C" {
 
 #include <vlc_vout.h>
 
+typedef struct spu_private_t spu_private_t;
+
 /**
  * Subpicture unit descriptor
  */
@@ -61,26 +63,15 @@ struct spu_t
 {
     VLC_COMMON_MEMBERS
 
-    vlc_mutex_t  subpicture_lock;                  /**< subpicture heap lock */
-    subpicture_t p_subpicture[VOUT_MAX_SUBPICTURES];        /**< subpictures */
-    int i_channel;             /**< number of subpicture channels registered */
-    int64_t i_subpicture_order; /**< number of created subpicture since spu creation */
+    int (*pf_control)( spu_t *, int, va_list );
 
-    filter_t *p_blend;                            /**< alpha blending module */
-    filter_t *p_text;                              /**< text renderer module */
-    filter_t *p_scale_yuvp;                     /**< scaling module for YUVP */
-    filter_t *p_scale;                    /**< scaling module (all but YUVP) */
-    bool b_force_crop;                     /**< force cropping of subpicture */
-    int i_crop_x, i_crop_y, i_crop_width, i_crop_height;       /**< cropping */
+    spu_private_t *p;
+};
 
-    int i_margin;                        /**< force position of a subpicture */
-    bool b_force_palette;             /**< force palette of subpicture */
-    uint8_t palette[4][4];                               /**< forced palette */
-
-    int ( *pf_control ) ( spu_t *, int, va_list );
-
-    /* Supciture filters */
-    filter_chain_t *p_chain;
+enum spu_query_e
+{
+    SPU_CHANNEL_REGISTER,         /* arg1= int *   res=    */
+    SPU_CHANNEL_CLEAR             /* arg1= int     res=    */
 };
 
 static inline int spu_vaControl( spu_t *p_spu, int i_query, va_list args )
@@ -101,12 +92,6 @@ static inline int spu_Control( spu_t *p_spu, int i_query, ... )
     va_end( args );
     return i_result;
 }
-
-enum spu_query_e
-{
-    SPU_CHANNEL_REGISTER,         /* arg1= int *   res=    */
-    SPU_CHANNEL_CLEAR             /* arg1= int     res=    */
-};
 
 #define spu_Create(a) __spu_Create(VLC_OBJECT(a))
 VLC_EXPORT( spu_t *, __spu_Create, ( vlc_object_t * ) );
