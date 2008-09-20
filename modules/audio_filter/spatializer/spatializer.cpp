@@ -52,14 +52,14 @@ static void Close( vlc_object_t * );
 #define WIDTH_TEXT N_("Room width")
 #define WIDTH_LONGTEXT N_("Width of the virtual room")
 
-#define WET_TEXT N_("")
-#define WET_LONGTEXT N_("")
+#define WET_TEXT ""
+#define WET_LONGTEXT ""
 
-#define DRY_TEXT N_("")
-#define DRY_LONGTEXT N_("")
+#define DRY_TEXT ""
+#define DRY_LONGTEXT ""
 
-#define DAMP_TEXT N_("")
-#define DAMP_LONGTEXT N_("")
+#define DAMP_TEXT ""
+#define DAMP_LONGTEXT ""
 
 vlc_module_begin();
     set_description( N_("spatializer") );
