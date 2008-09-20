@@ -70,6 +70,11 @@ struct filter_owner_sys_t
 
 #define SCALE_UNIT (1000)
 
+#define VLC_FOURCC_YUVP VLC_FOURCC('Y','U','V','P')
+#define VLC_FOURCC_YUVA VLC_FOURCC('Y','U','V','A')
+#define VLC_FOURCC_RGBA VLC_FOURCC('R','G','B','A')
+#define VLC_FOURCC_TEXT VLC_FOURCC('T','E','X','T')
+
 /* */
 struct subpicture_region_private_t
 {
@@ -262,7 +267,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
         return NULL;
 
     /* FIXME is that *really* wanted? */
-    if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
+    if( p_fmt->i_chroma == VLC_FOURCC_YUVP )
         p_fmt->p_palette = calloc( 1, sizeof(video_palette_t) );
     else
         p_fmt->p_palette = NULL;    /* XXX and that above all? */
@@ -275,7 +280,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     p_region->p_style = NULL;
     p_region->p_picture = NULL;
 
-    if( p_fmt->i_chroma == VLC_FOURCC('T','E','X','T') )
+    if( p_fmt->i_chroma == VLC_FOURCC_TEXT )
         return p_region;
 
     p_region->p_picture = picture_New( p_fmt->i_chroma, p_fmt->i_width, p_fmt->i_height,
@@ -485,7 +490,8 @@ static void SpuRenderCreateBlend( spu_t *p_spu, vlc_fourcc_t i_chroma, int i_asp
     /* */
     vlc_object_attach( p_blend, p_spu );
 }
-static void SpuRenderUpdateBlend( spu_t *p_spu, int i_out_width, int i_out_height, const video_format_t *p_in_fmt )
+static void SpuRenderUpdateBlend( spu_t *p_spu, int i_out_width, int i_out_height,
+                                  const video_format_t *p_in_fmt )
 {
     filter_t *p_blend = p_spu->p_blend;
 
@@ -552,7 +558,9 @@ static void SpuRenderCreateAndLoadText( spu_t *p_spu )
         p_text->p_module = module_Need( p_text, "text renderer", NULL, false );
 }
 
-static filter_t *CreateAndLoadScale( vlc_object_t *p_obj, vlc_fourcc_t i_chroma )
+static filter_t *CreateAndLoadScale( vlc_object_t *p_obj,
+                                     vlc_fourcc_t i_src_chroma, vlc_fourcc_t i_dst_chroma,
+                                     bool b_resize )
 {
     filter_t *p_scale;
 
@@ -562,14 +570,14 @@ static filter_t *CreateAndLoadScale( vlc_object_t *p_obj, vlc_fourcc_t i_chroma 
         return NULL;
 
     es_format_Init( &p_scale->fmt_in, VIDEO_ES, 0 );
-    p_scale->fmt_in.video.i_chroma = i_chroma;
+    p_scale->fmt_in.video.i_chroma = i_src_chroma;
     p_scale->fmt_in.video.i_width =
     p_scale->fmt_in.video.i_height = 32;
 
     es_format_Init( &p_scale->fmt_out, VIDEO_ES, 0 );
-    p_scale->fmt_out.video.i_chroma = i_chroma;
+    p_scale->fmt_out.video.i_chroma = i_dst_chroma;
     p_scale->fmt_out.video.i_width =
-    p_scale->fmt_out.video.i_height = 16;
+    p_scale->fmt_out.video.i_height = b_resize ? 16 : 32;
 
     p_scale->pf_vout_buffer_new = spu_new_video_buffer;
     p_scale->pf_vout_buffer_del = spu_del_video_buffer;
@@ -581,18 +589,23 @@ static filter_t *CreateAndLoadScale( vlc_object_t *p_obj, vlc_fourcc_t i_chroma 
 }
 static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
 {
-    /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
-
     assert( !p_spu->p_scale );
     assert( !p_spu->p_scale_yuvp );
-    p_spu->p_scale = CreateAndLoadScale( VLC_OBJECT(p_spu), VLC_FOURCC('Y','U','V','A') );
-    p_spu->p_scale_yuvp = p_spu->p_scale_yuvp = CreateAndLoadScale( VLC_OBJECT(p_spu), VLC_FOURCC('Y','U','V','P') );
+    /* XXX p_spu->p_scale is used for all conversion/scaling except yuvp to
+     * yuva/rgba */
+    p_spu->p_scale = CreateAndLoadScale( VLC_OBJECT(p_spu),
+                                         VLC_FOURCC_YUVA, VLC_FOURCC_YUVA, true );
+    /* This one is used for YUVP to YUVA/RGBA without scaling
+     * FIXME rename it */
+    p_spu->p_scale_yuvp = CreateAndLoadScale( VLC_OBJECT(p_spu),
+                                              VLC_FOURCC_YUVP, VLC_FOURCC_YUVA, false );
 }
 
 static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
-                           subpicture_t *p_subpic, subpicture_region_t *p_region, int i_min_scale_ratio )
+                           subpicture_t *p_subpic, subpicture_region_t *p_region,
+                           int i_min_scale_ratio )
 {
-    assert( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') );
+    assert( p_region->fmt.i_chroma == VLC_FOURCC_TEXT );
 
     if( !p_spu->p_text || !p_spu->p_text->p_module )
         goto exit;
@@ -919,7 +932,6 @@ static void SpuRenderRegion( spu_t *p_spu,
     bool b_restore_format = false;
     int i_x_offset;
     int i_y_offset;
-    filter_t *p_scale;
 
     video_format_t region_fmt;
     picture_t *p_region_picture;
@@ -930,14 +942,14 @@ static void SpuRenderRegion( spu_t *p_spu,
     *p_area = spu_area_create( 0,0, 0,0, scale_size );
 
     /* Render text region */
-    if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
+    if( p_region->fmt.i_chroma == VLC_FOURCC_TEXT )
     {
         const int i_min_scale_ratio = SCALE_UNIT; /* FIXME what is the right value? (scale_size is not) */
         SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, i_min_scale_ratio );
         b_restore_format = b_rerender_text;
 
         /* Check if the rendering has failed ... */
-        if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
+        if( p_region->fmt.i_chroma == VLC_FOURCC_TEXT )
             goto exit;
     }
 
@@ -945,9 +957,10 @@ static void SpuRenderRegion( spu_t *p_spu,
      * FIXME b_force_palette and b_force_crop are applied to all subpictures using palette
      * instead of only the right one (being the dvd spu).
      */
-    const bool b_using_palette = p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','P');
+    const bool b_using_palette = p_region->fmt.i_chroma == VLC_FOURCC_YUVP;
     const bool b_force_palette = b_using_palette && p_spu->b_force_palette;
     const bool b_force_crop    = b_force_palette && p_spu->b_force_crop;
+    bool b_changed_palette     = false;
 
 
     /* Compute the margin which is expressed in destination pixel unit
@@ -971,9 +984,11 @@ static void SpuRenderRegion( spu_t *p_spu,
     /* Handle overlapping subtitles when possible */
     if( p_subpic->b_subtitle && !p_subpic->b_absolute )
     {
-        spu_area_t display = spu_area_create( 0, 0, p_fmt->i_width, p_fmt->i_height, spu_scale_unit() );
+        spu_area_t display = spu_area_create( 0, 0, p_fmt->i_width, p_fmt->i_height,
+                                              spu_scale_unit() );
 
-        SpuAreaFixOverlap( p_area, &display, p_subtitle_area, i_subtitle_area, p_region->i_align );
+        SpuAreaFixOverlap( p_area, &display, p_subtitle_area, i_subtitle_area,
+                           p_region->i_align );
     }
 
     /* Fix the position for the current scale_size */
@@ -983,12 +998,26 @@ static void SpuRenderRegion( spu_t *p_spu,
     /* */
     if( b_force_palette )
     {
-        /* It looks so wrong I won't comment
-         * p_palette->palette is [256][4] with a int i_entries
-         * p_spu->palette is [4][4]
-         * */
-        p_region->fmt.p_palette->i_entries = 4;
-        memcpy( p_region->fmt.p_palette->palette, p_spu->palette, 4*sizeof(uint32_t) );
+        video_palette_t *p_palette = p_region->fmt.p_palette;
+        video_palette_t palette;
+
+        /* We suppose DVD palette here */
+        palette.i_entries = 4;
+        for( int i = 0; i < 4; i++ )
+            for( int j = 0; j < 4; j++ )
+                palette.palette[i][j] = p_spu->palette[i][j];
+
+        if( p_palette->i_entries == palette.i_entries )
+        {
+            for( int i = 0; i < p_palette->i_entries; i++ )
+                for( int j = 0; j < 4; j++ )
+                    b_changed_palette |= p_palette->palette[i][j] != palette.palette[i][j];
+        }
+        else
+        {
+            b_changed_palette = true;
+        }
+        *p_palette = palette;
     }
 
     /* */
@@ -997,20 +1026,14 @@ static void SpuRenderRegion( spu_t *p_spu,
 
 
     /* Scale from rendered size to destination size */
-    p_scale = b_using_palette ? p_spu->p_scale_yuvp : p_spu->p_scale;
-
-    if( p_scale &&
-        ( scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || b_force_palette ) )
+    if( p_spu->p_scale && p_spu->p_scale->p_module &&
+        ( !b_using_palette || ( p_spu->p_scale_yuvp && p_spu->p_scale_yuvp->p_module ) ) &&
+        ( scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || b_using_palette ) )
     {
         const unsigned i_dst_width  = spu_scale_w( p_region->fmt.i_width, scale_size );
         const unsigned i_dst_height = spu_scale_h( p_region->fmt.i_height, scale_size );
 
-        /* TODO when b_using_palette is true, we should first convert it to YUVA to allow
-         * a proper rescaling */
-
-        /* Destroy the cache if unusable
-         * FIXME we should not use b_force_palette but check that the palettes
-         * are not the identical */
+        /* Destroy the cache if unusable */
         if( p_region->p_private )
         {
             subpicture_region_private_t *p_private = p_region->p_private;
@@ -1021,23 +1044,9 @@ static void SpuRenderRegion( spu_t *p_spu,
                 i_dst_height != p_private->fmt.i_height )
                 b_changed = true;
 
-            /* Check palette changes */
-            if( b_using_palette )
-            {
-                const video_palette_t *p_palette0 = p_region->fmt.p_palette;
-                const video_palette_t *p_palette1 = p_private->fmt.p_palette;
-
-                if( p_palette0->i_entries == p_palette1->i_entries )
-                {
-                    for( int i = 0; i < p_palette0->i_entries; i++ )
-                        for( int j = 0; j < 4; j++ )
-                            b_changed |= p_palette0->palette[i][j] != p_palette1->palette[i][j];
-                }
-                else
-                {
-                    b_changed = true;
-                }
-            }
+            /* Check forced palette changes */
+            if( b_changed_palette )
+                b_changed = true;
 
             if( b_changed )
             {
@@ -1049,31 +1058,67 @@ static void SpuRenderRegion( spu_t *p_spu,
         /* Scale if needed into cache */
         if( !p_region->p_private )
         {
-            picture_t *p_pic;
+            filter_t *p_scale = p_spu->p_scale;
 
-            p_scale->fmt_in.video = p_region->fmt;
-            p_scale->fmt_out.video = p_region->fmt;
+            picture_t *p_picture = p_region->p_picture;
+            picture_Yield( p_picture );
 
-            p_scale->fmt_out.video.i_width = i_dst_width;
-            p_scale->fmt_out.video.i_height = i_dst_height;
-
-            p_scale->fmt_out.video.i_visible_width =
-                spu_scale_w( p_region->fmt.i_visible_width, scale_size );
-            p_scale->fmt_out.video.i_visible_height =
-                spu_scale_h( p_region->fmt.i_visible_height, scale_size );
-
-            p_region->p_private = SpuRegionPrivateCreate( &p_scale->fmt_out.video );
-
-            if( p_scale->p_module )
+            /* Convert YUVP to YUVA/RGBA first for better scaling quality */
+            if( b_using_palette )
             {
-                picture_Yield( p_region->p_picture );
-                p_region->p_private->p_picture = p_scale->pf_video_filter( p_scale, p_region->p_picture );
+                filter_t *p_scale_yuvp = p_spu->p_scale_yuvp;
+
+                p_scale_yuvp->fmt_in.video = p_region->fmt;
+
+                /* TODO converting to RGBA for RGB video output is better */
+                p_scale_yuvp->fmt_out.video = p_region->fmt;
+                p_scale_yuvp->fmt_out.video.i_chroma = VLC_FOURCC_YUVA;
+
+                p_picture = p_scale_yuvp->pf_video_filter( p_scale_yuvp, p_picture );
+                if( !p_picture )
+                {
+                    /* Well we will try conversion+scaling */
+                    msg_Warn( p_spu, "%4.4s to %4.4s conversion failed",
+                             &p_scale_yuvp->fmt_in.video.i_chroma,
+                             &p_scale_yuvp->fmt_out.video.i_chroma );
+                }
             }
-            if( !p_region->p_private->p_picture )
+
+            /* Conversion(except from YUVP)/Scaling */
+            if( p_picture &&
+                ( p_picture->format.i_width != i_dst_width ||
+                  p_picture->format.i_height != i_dst_height ) )
             {
-                msg_Err( p_spu, "scaling failed (module not loaded)" );
-                SpuRegionPrivateDestroy( p_region->p_private );
-                p_region->p_private = NULL;
+                p_scale->fmt_in.video = p_picture->format;
+                p_scale->fmt_out.video = p_picture->format;
+
+                p_scale->fmt_out.video.i_width = i_dst_width;
+                p_scale->fmt_out.video.i_height = i_dst_height;
+
+                p_scale->fmt_out.video.i_visible_width =
+                    spu_scale_w( p_region->fmt.i_visible_width, scale_size );
+                p_scale->fmt_out.video.i_visible_height =
+                    spu_scale_h( p_region->fmt.i_visible_height, scale_size );
+
+                p_picture = p_scale->pf_video_filter( p_scale, p_picture );
+                if( !p_picture )
+                    msg_Err( p_spu, "scaling failed" );
+            }
+
+            /* */
+            p_region->p_private = SpuRegionPrivateCreate( &p_picture->format );
+            if( p_region->p_private )
+            {
+                p_region->p_private->p_picture = p_picture;
+                if( !p_region->p_private->p_picture )
+                {
+                    SpuRegionPrivateDestroy( p_region->p_private );
+                    p_region->p_private = NULL;
+                }
+            }
+            else
+            {
+                picture_Release( p_picture );
             }
         }
 
