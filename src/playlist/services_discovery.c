@@ -77,8 +77,6 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
     vlc_event_manager_register_event_type( &p_sd->event_manager,
             vlc_ServicesDiscoveryEnded );
 
-    p_sd->b_die = false; /* FIXME */
-
     vlc_object_attach( p_sd, p_super );
 
     return p_sd;
