@@ -36,7 +36,7 @@ static NSString * kPrefUpdateOnStartup = @"UpdateOnStartup";
 static NSString * kPrefUpdateLastTimeChecked = @"UpdateLastTimeChecked";
 
 /*****************************************************************************
- * VLCExtended implementation
+ * VLCUpdate implementation
  *****************************************************************************/
 
 @implementation VLCUpdate
@@ -85,6 +85,9 @@ static VLCUpdate *_o_sharedInstance = nil;
 {
     [[NSUserDefaults standardUserDefaults] setBool: check forKey: kPrefUpdateOnStartup];
     [o_chk_updateOnStartup setState: check];
+
+    /* make sure we got this set, even if we crash later on */
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (BOOL)shouldCheckForUpdate
@@ -107,7 +110,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     if( !o_last_update )
         return YES;
 
-    o_next_update = [[[NSDate alloc] initWithTimeInterval: 60*60*24*2 /* every two days */ sinceDate: o_last_update] autorelease];
+    o_next_update = [[[NSDate alloc] initWithTimeInterval: 60*60*24*7 /* every seven days */ sinceDate: o_last_update] autorelease];
     if( !o_next_update )
         return YES;
 
