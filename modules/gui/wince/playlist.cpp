@@ -289,7 +289,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
         // random, loop, repeat buttons states
         vlc_value_t val;
-        p_playlist = pl_Yield( p_intf );
+        p_playlist = pl_Hold( p_intf );
         if( !p_playlist ) break;
 
         var_Get( p_playlist , "random", &val );
@@ -517,7 +517,7 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
         return CDRF_NOTIFYITEMDRAW;
 
     case CDDS_ITEMPREPAINT: //Before an item is drawn
-        playlist_t *p_playlist = pl_Yield( p_intf );
+        playlist_t *p_playlist = pl_Hold( p_intf );
         if( p_playlist == NULL ) return CDRF_DODEFAULT;
         if( (int)lplvcd->nmcd.dwItemSpec == p_playlist->i_current_index )
         {
@@ -589,7 +589,7 @@ void Playlist::UpdatePlaylist()
         b_need_update = false;
     }
  
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
  
     /* Update the colour of items */
@@ -613,7 +613,7 @@ void Playlist::UpdatePlaylist()
  **********************************************************************/
 void Playlist::Rebuild()
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     int i_focused =
@@ -659,7 +659,7 @@ void Playlist::Rebuild()
  **********************************************************************/
 void Playlist::UpdateItem( int i )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
 
     if( p_playlist == NULL ) return;
 
@@ -693,7 +693,7 @@ void Playlist::UpdateItem( int i )
  **********************************************************************/
 void Playlist::DeleteItem( int item )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_DeleteFromInput( p_playlist, item, FALSE );
@@ -711,7 +711,7 @@ static void OnOpenCB( intf_dialog_args_t *p_arg )
 
     if( p_arg->i_results && p_arg->psz_results[0] )
     {
-        playlist_t * p_playlist = pl_Yield( p_intf );
+        playlist_t * p_playlist = pl_Hold( p_intf );
 
         if( p_playlist )
         {
@@ -743,7 +743,7 @@ static void OnSaveCB( intf_dialog_args_t *p_arg )
 
     if( p_arg->i_results && p_arg->psz_results[0] )
     {
-        playlist_t * p_playlist = pl_Yield( p_intf );
+        playlist_t * p_playlist = pl_Hold( p_intf );
 
         if( p_playlist )
         {
@@ -808,7 +808,7 @@ void Playlist::OnInvertSelection()
 
 void Playlist::OnEnableSelection()
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     for( long item = ListView_GetItemCount( hListView ) - 1;
@@ -827,7 +827,7 @@ void Playlist::OnEnableSelection()
 
 void Playlist::OnDisableSelection()
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     for( long item = ListView_GetItemCount( hListView ) - 1;
@@ -856,7 +856,7 @@ void Playlist::OnSelectAll()
 
 void Playlist::OnActivateItem( int i_item )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Skip( p_playlist, i_item - p_playlist->i_current_index );
@@ -866,7 +866,7 @@ void Playlist::OnActivateItem( int i_item )
 
 void Playlist::ShowInfos( HWND hwnd, int i_item )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     PL_LOCK;
@@ -890,7 +890,7 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
  ********************************************************************/
 void Playlist::OnUp()
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     /* We use the first selected item, so find it */
@@ -918,7 +918,7 @@ void Playlist::OnUp()
 
 void Playlist::OnDown()
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     /* We use the first selected item, so find it */
@@ -945,7 +945,7 @@ void Playlist::OnRandom()
     int bState = SendMessage( hwndTB, TB_GETSTATE, Random_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "random", val );
@@ -958,7 +958,7 @@ void Playlist::OnLoop ()
     int bState = SendMessage( hwndTB, TB_GETSTATE, Loop_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "loop", val );
@@ -971,7 +971,7 @@ void Playlist::OnRepeat ()
     int bState = SendMessage( hwndTB, TB_GETSTATE, Repeat_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     var_Set( p_playlist , "repeat", val );
@@ -983,7 +983,7 @@ void Playlist::OnRepeat ()
  ********************************************************************/
 void Playlist::OnSort( UINT event )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     switch( event )
@@ -1019,7 +1019,7 @@ void Playlist::OnSort( UINT event )
 
 void Playlist::OnColSelect( int iSubItem )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     switch( iSubItem )
@@ -1071,7 +1071,7 @@ void Playlist::OnPopupPlay()
     int i_popup_item =
         ListView_GetNextItem( hListView, -1, LVIS_SELECTED | LVNI_ALL );
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     if( i_popup_item != -1 )
@@ -1095,7 +1095,7 @@ void Playlist::OnPopupEna()
     int i_popup_item =
         ListView_GetNextItem( hListView, -1, LVIS_SELECTED | LVNI_ALL );
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_item_t *p_item =

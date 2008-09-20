@@ -333,7 +333,7 @@ void DialogsProvider::OnOpenFileSimple( int i_arg )
     TCHAR szFile[MAX_PATH] = _T("\0");
     static TCHAR szFilter[] = _T("wav (*.wav)\0*.wav\0mp3 (*.mp3 *.mpga)\0*.mp3;*.mpga\0All (*.*)\0*.*\0");
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     memset( &ofn, 0, sizeof(OPENFILENAME) );
@@ -407,7 +407,7 @@ void DialogsProvider::OnOpenDirectory( int i_arg )
 
     if( !SUCCEEDED( SHGetMalloc(&p_malloc) ) ) goto error;
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     if( !p_playlist ) goto error;
 
     memset( &bi, 0, sizeof(BROWSEINFO) );

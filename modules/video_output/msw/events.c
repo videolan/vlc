@@ -874,7 +874,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     /* the user wants to close the window */
     case WM_CLOSE:
     {
-        playlist_t * p_playlist = pl_Yield( p_vout );
+        playlist_t * p_playlist = pl_Hold( p_vout );
         if( p_playlist )
         {
             playlist_Stop( p_playlist );

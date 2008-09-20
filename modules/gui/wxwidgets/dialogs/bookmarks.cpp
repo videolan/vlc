@@ -204,7 +204,7 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     main_sizer->Add( main_panel, 1, wxEXPAND );
     SetSizer( main_sizer );
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist )
     {
        /* Some global changes happened -> Rebuild all */
@@ -216,7 +216,7 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
 
 BookmarksDialog::~BookmarksDialog()
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist )
     {
        var_DelCallback( p_playlist, "playlist-current",

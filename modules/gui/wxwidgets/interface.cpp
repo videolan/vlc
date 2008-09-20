@@ -1075,7 +1075,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 void Interface::PlayStream()
 {
     wxCommandEvent dummy;
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     if( !playlist_IsEmpty(p_playlist) )
@@ -1126,7 +1126,7 @@ void Interface::OnStopStream( wxCommandEvent& WXUNUSED(event) )
 }
 void Interface::StopStream()
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL )
     {
         return;
@@ -1144,7 +1144,7 @@ void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::PrevStream()
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL )
     {
         return;
@@ -1161,7 +1161,7 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::NextStream()
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL )
     {
         return;
@@ -1315,7 +1315,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
                                const wxArrayString& filenames )
 {
     /* Add dropped files to the playlist */
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL )
     {
         return FALSE;

@@ -54,7 +54,7 @@ Timer::Timer( intf_thread_t *_p_intf, HWND hwnd, Interface *_p_main_interface)
     i_old_rate = INPUT_RATE_DEFAULT;
 
     /* Register callback for the intf-popupmenu variable */
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist != NULL )
     {
         var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
@@ -67,7 +67,7 @@ Timer::Timer( intf_thread_t *_p_intf, HWND hwnd, Interface *_p_main_interface)
 Timer::~Timer()
 {
     /* Unregister callback */
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist != NULL )
     {
         var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );

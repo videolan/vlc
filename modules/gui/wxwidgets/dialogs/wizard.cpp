@@ -577,7 +577,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     openSizer->Fit(open_panel);
     mainSizer->Add( open_panel );
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist )
     {
         if( !playlist_IsEmpty( p_playlist ) )
@@ -715,7 +715,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
         if( i != -1 )
         {
             long data = listview->GetItemData( i );
-            playlist_t *p_playlist = pl_Yield( p_intf );
+            playlist_t *p_playlist = pl_Hold( p_intf );
             if( p_playlist )
             {
                 playlist_item_t * p_item = playlist_ItemGetById( p_playlist, (int)data, false );
@@ -1606,7 +1606,7 @@ void WizardDialog::Run()
             free( psz_sap_option );
         }
 
-        playlist_t *p_playlist = pl_Yield( p_intf );
+        playlist_t *p_playlist = pl_Hold( p_intf );
         if( p_playlist )
         {
             input_item_t *p_input = input_item_New( p_playlist, mrl,

@@ -514,7 +514,7 @@ static int Manage( vout_thread_t *p_vout )
         case SDL_QUIT:
             {
 #if 0
-                playlist_t *p_playlist = pl_Yield( p_vout );
+                playlist_t *p_playlist = pl_Hold( p_vout );
                 if( p_playlist != NULL )
                 {
                     playlist_Stop( p_playlist );

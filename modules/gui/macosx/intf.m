@@ -395,7 +395,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     o_size_with_playlist = [o_window contentRectForFrameRect:[o_window frame]].size;
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
 
     var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     val.b_bool = false;
@@ -745,7 +745,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* Kill the playlist, so that it doesn't accept new request
      * such as the play request from vlc.c (we are a blocking interface). */
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     vlc_object_kill( p_playlist );
     pl_Release( p_intf );
 
@@ -1394,7 +1394,7 @@ static void * manage_cleanup( void * args )
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
 
     var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
@@ -1487,7 +1487,7 @@ static void * manage_cleanup( void * args )
         bool b_seekable = false;
         bool b_chapters = false;
 
-        playlist_t * p_playlist = pl_Yield( p_intf );
+        playlist_t * p_playlist = pl_Hold( p_intf );
     /* TODO: fix i_size use */
         b_plmul = p_playlist->items.i_size > 1;
 
@@ -1675,7 +1675,7 @@ end:
 
 - (void)setupMenus
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
     if( p_input != NULL )
     {
@@ -1788,7 +1788,7 @@ end:
 
 - (void)resetScrollField
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
     i_end_scroll = -1;
@@ -1870,7 +1870,7 @@ end:
         default:
             return;
     }
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     p_input = playlist_CurrentInput( p_playlist );
     if( p_input != NULL )
     {

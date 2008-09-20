@@ -229,7 +229,7 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf, ArrayOfInts &ri_objects,
     unsigned int i_last_separator = 0; \
     ArrayOfInts ai_objects; \
     ArrayOfStrings as_varnames; \
-    playlist_t *p_playlist = pl_Yield( p_intf ); \
+    playlist_t *p_playlist = pl_Hold( p_intf ); \
     if( !p_playlist ) \
         return; \
     input_thread_t *p_input = p_playlist->p_input
@@ -936,7 +936,7 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
     if( event.GetId() >= Play_Event && event.GetId() <= Stop_Event )
     {
         input_thread_t *p_input;
-        playlist_t * p_playlist = pl_Yield( p_intf );
+        playlist_t * p_playlist = pl_Hold( p_intf );
         if( !p_playlist ) return;
 
         switch( event.GetId() )

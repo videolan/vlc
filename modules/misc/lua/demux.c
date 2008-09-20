@@ -246,7 +246,7 @@ static int Demux( demux_t *p_demux )
     input_thread_t *p_input_thread = (input_thread_t *)
         vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
     input_item_t *p_current_input = input_GetItem( p_input_thread );
-    playlist_t *p_playlist = pl_Yield( p_demux );
+    playlist_t *p_playlist = pl_Hold( p_demux );
 
     luaL_register( L, "vlc", p_reg_parse );
 

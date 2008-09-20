@@ -1482,7 +1482,7 @@ CoverArtLabel::CoverArtLabel( QWidget *parent,
     setContextMenuPolicy( Qt::ActionsContextMenu );
     CONNECT( this, updateRequested(), this, doUpdate() );
 
-    playlist_t *p_playlist = pl_Yield( p_this );
+    playlist_t *p_playlist = pl_Hold( p_this );
     var_AddCallback( p_playlist, "item-change",
                      downloadCoverCallback, this );
     pl_Release( p_this );
@@ -1500,7 +1500,7 @@ void CoverArtLabel::downloadCover()
 {
     if( p_input )
     {
-        playlist_t *p_playlist = pl_Yield( p_this );
+        playlist_t *p_playlist = pl_Hold( p_this );
         playlist_AskForArtEnqueue( p_playlist, p_input );
         pl_Release( p_this );
     }

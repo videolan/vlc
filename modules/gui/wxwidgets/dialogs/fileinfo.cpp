@@ -55,7 +55,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     p_intf = _p_intf;
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
 
     b_stats = config_GetInt(p_intf, "stats");
     /* Initializations */
@@ -114,7 +114,7 @@ void FileInfo::Update()
     if( mdate() - last_update < 400000L ) return;
     last_update = mdate();
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( !p_playlist ) return;
 
     input_thread_t *p_input = p_playlist->p_input ;

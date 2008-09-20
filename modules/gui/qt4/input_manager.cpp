@@ -663,7 +663,7 @@ void MainInputManager::customEvent( QEvent *event )
     else
     {
         /* we are working as a dialogs provider */
-        playlist_t *p_playlist = pl_Yield( p_intf );
+        playlist_t *p_playlist = pl_Hold( p_intf );
         p_input = playlist_CurrentInput( p_playlist );
         if( p_input )
         {

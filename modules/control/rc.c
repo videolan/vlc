@@ -506,7 +506,7 @@ static void Run( intf_thread_t *p_intf )
                                                    FIND_ANYWHERE );
                 if( p_input )
                 {
-                    p_playlist = pl_Yield( p_input );
+                    p_playlist = pl_Hold( p_input );
                 }
             }
             /* New input has been registered */
@@ -991,7 +991,7 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
     {
-        p_playlist = pl_Yield( p_input );
+        p_playlist = pl_Hold( p_input );
         char cmd[6];
         switch( p_playlist->status.i_status )
         {
@@ -1303,7 +1303,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t val;
 
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    playlist_t *p_playlist = pl_Yield( p_this );
+    playlist_t *p_playlist = pl_Hold( p_this );
 
     PL_LOCK;
     if( p_playlist->p_input )
@@ -1525,7 +1525,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
     playlist_t *p_playlist;
 
-    p_playlist = pl_Yield( p_this );
+    p_playlist = pl_Hold( p_this );
     playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );
     
@@ -1912,7 +1912,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_EGENERIC;
     }
 
-    p_playlist = pl_Yield( p_this );
+    p_playlist = pl_Hold( p_this );
 
     if( p_playlist->p_input )
     {

@@ -54,7 +54,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
     aout_instance_t *p_aout = (aout_instance_t *)p_object;
     if( !p_object )
     {
-        p_object = (vlc_object_t *)pl_Yield( p_intf );
+        p_object = (vlc_object_t *)pl_Hold( p_intf );
     }
 
     psz_string = var_GetNonEmptyString( p_object, "audio-filter" );
@@ -125,7 +125,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     vlc_object_t *p_object = vlc_object_find( p_intf,
                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_object == NULL )
-        p_object = (vlc_object_t *)pl_Yield( p_intf );
+        p_object = (vlc_object_t *)pl_Hold( p_intf );
 
     if( (BOOL)config_GetInt( p_intf, "macosx-eq-keep" ) == YES )
         psz_string = config_GetPsz( p_intf, "audio-filter" );
@@ -181,7 +181,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
     if( p_object == NULL )
-        p_object = (vlc_object_t *)pl_Yield( p_intf );
+        p_object = (vlc_object_t *)pl_Hold( p_intf );
 
     var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT |
                 VLC_VAR_DOINHERIT );
@@ -241,7 +241,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
     if( p_object == NULL )
-        p_object = (vlc_object_t *)pl_Yield( p_intf );
+        p_object = (vlc_object_t *)pl_Hold( p_intf );
 
     char psz_values[102];
     memset( psz_values, 0, 102 );
@@ -281,7 +281,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     vlc_object_t *p_object= vlc_object_find( p_intf,
                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_object == NULL )
-        p_object = (vlc_object_t *)pl_Yield( p_intf );
+        p_object = (vlc_object_t *)pl_Hold( p_intf );
 
     char psz_values[102];
     memset( psz_values, 0, 102 );
@@ -324,7 +324,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     vlc_object_t *p_object = vlc_object_find( p_intf,
                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_object == NULL )
-        p_object = (vlc_object_t *)pl_Yield( p_intf );
+        p_object = (vlc_object_t *)pl_Hold( p_intf );
 
     var_SetFloat( p_object, "equalizer-preamp", f_preamp );
 
@@ -362,7 +362,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
     aout_instance_t *p_aout = (aout_instance_t *)p_object;
     if( p_object == NULL )
-        p_object = (vlc_object_t *)pl_Yield( p_intf );
+        p_object = (vlc_object_t *)pl_Hold( p_intf );
 
     var_SetBool( p_object, "equalizer-2pass", b_2p );
     if( ( [o_ckb_enable state] ) && ( p_aout != NULL ) )
@@ -397,7 +397,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     vlc_object_t *p_object= vlc_object_find( VLCIntf,
                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if( p_object == NULL )
-        p_object = (vlc_object_t *)pl_Yield( VLCIntf );
+        p_object = (vlc_object_t *)pl_Hold( VLCIntf );
 
     [o_window setExcludedFromWindowsMenu: TRUE];
 

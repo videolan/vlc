@@ -303,7 +303,7 @@ playlist_ServicesDiscoveryAdd
 playlist_ServicesDiscoveryRemove
 playlist_TreeMove
 __pl_Release
-__pl_Yield
+__pl_Hold
 resolve_xml_special_chars
 sdp_AddAttribute
 sdp_AddMedia

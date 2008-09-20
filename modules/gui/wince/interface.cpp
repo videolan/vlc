@@ -640,7 +640,7 @@ void Interface::OnShowDialog( int i_dialog_event )
 
 void Interface::OnPlayStream( void )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     if( !playlist_IsEmpty(p_playlist) )
@@ -813,7 +813,7 @@ void Interface::VolumeUpdate()
 
 void Interface::OnStopStream( void )
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Stop( p_playlist );
@@ -823,7 +823,7 @@ void Interface::OnStopStream( void )
 
 void Interface::OnPrevStream( void )
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Prev( p_playlist );
@@ -832,7 +832,7 @@ void Interface::OnPrevStream( void )
 
 void Interface::OnNextStream( void )
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     playlist_Next( p_playlist );

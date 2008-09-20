@@ -41,7 +41,7 @@ static void PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
  * Playlist control
  *****************************************************************************/
 
-playlist_t *__pl_Yield( vlc_object_t *p_this )
+playlist_t *__pl_Hold( vlc_object_t *p_this )
 {
     playlist_t *pl;
 
@@ -49,7 +49,7 @@ playlist_t *__pl_Yield( vlc_object_t *p_this )
     pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
 
     assert( VLC_OBJECT(pl) != p_this /* This does not make sense to yield the playlist
-    using pl_Yield. use vlc_object_hold in this case */ );
+    using pl_Hold. use vlc_object_hold in this case */ );
 
     if (pl)
         vlc_object_hold (pl);
@@ -62,7 +62,7 @@ void __pl_Release( vlc_object_t *p_this )
     assert( pl != NULL );
 
     assert( VLC_OBJECT(pl) != p_this /* The rule is that pl_Release() should act on
-    the same object than pl_Yield() */ );
+    the same object than pl_Hold() */ );
 
     vlc_object_release( pl );
 }

@@ -1255,7 +1255,7 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         intf_thread_t * p_intf = VLCIntf;
 
-        playlist_t * p_playlist = pl_Yield( p_intf );
+        playlist_t * p_playlist = pl_Hold( p_intf );
 
         int x = 0;
         int y = [[o_userSelections objectForKey:@"pathToStrm"] count];

@@ -1158,7 +1158,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     }
 
     /* Update the playlist */
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     for( int i = 0; i < (int)mrl.GetCount(); i++ )

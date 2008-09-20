@@ -184,7 +184,7 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     PL_LOCK;
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     PL_UNLOCK;
@@ -205,7 +205,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t               *p_intf = ( intf_thread_t* ) p_this;
     intf_sys_t                  *p_sys  = p_intf->p_sys;
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     if( p_playlist )
     {
         PL_LOCK;
@@ -505,7 +505,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->b_meta_read      = false;
     p_sys->b_submit         = false;
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     PL_LOCK;
     p_input = p_playlist->p_input;
 
@@ -920,7 +920,7 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     intf_sys_t          *p_sys = p_this->p_sys;
 
-    p_playlist = pl_Yield( p_this );
+    p_playlist = pl_Hold( p_this );
     PL_LOCK;
     p_input = p_playlist->p_input;
     if( !p_input )

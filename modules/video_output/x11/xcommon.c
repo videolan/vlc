@@ -1463,7 +1463,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                      == p_vout->p_sys->p_win->wm_delete_window ) )
         {
             /* the user wants to close the window */
-            playlist_t * p_playlist = pl_Yield( p_vout );
+            playlist_t * p_playlist = pl_Hold( p_vout );
             if( p_playlist != NULL )
             {
                 playlist_Stop( p_playlist );

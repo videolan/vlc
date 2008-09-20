@@ -143,7 +143,7 @@
 - (IBAction)play:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     bool empty;
 
     PL_LOCK;
@@ -220,7 +220,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
 
     var_Get( p_playlist, "random", &val );
     val.b_bool = !val.b_bool;
@@ -260,7 +260,7 @@
 - (void)shuffle
 {
     vlc_value_t val;
-    playlist_t *p_playlist = pl_Yield( VLCIntf );
+    playlist_t *p_playlist = pl_Hold( VLCIntf );
     var_Get( p_playlist, "random", &val );
     [o_btn_shuffle setState: val.b_bool];
     vlc_object_release( p_playlist );
@@ -270,7 +270,7 @@
 {
     vlc_value_t looping,repeating;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
 
     var_Get( p_playlist, "repeat", &repeating );
     var_Get( p_playlist, "loop", &looping );
@@ -338,7 +338,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
 
     var_Get( p_playlist, "repeat", &val );
     if (!val.b_bool)
@@ -367,7 +367,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
 
     var_Get( p_playlist, "loop", &val );
     if (!val.b_bool)
@@ -506,7 +506,7 @@
     }
     else
     {
-        playlist_t * p_playlist = pl_Yield( VLCIntf );
+        playlist_t * p_playlist = pl_Hold( VLCIntf );
 
         if( [o_title isEqualToString: _NS("Fullscreen")] ||
             [sender isKindOfClass:[NSButton class]] )
@@ -927,7 +927,7 @@
     BOOL bEnabled = TRUE;
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
     if( [[o_mi title] isEqualToString: _NS("Faster")] ||

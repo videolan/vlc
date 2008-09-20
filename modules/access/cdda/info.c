@@ -864,7 +864,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 #endif
 
     if (! p_cdda->b_nav_mode ) {
-        p_playlist = pl_Yield( p_access );
+        p_playlist = pl_Hold( p_access );
     }
 
     if( b_single_track || p_cdda->b_nav_mode ) {

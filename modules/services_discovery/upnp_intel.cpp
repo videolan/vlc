@@ -298,7 +298,7 @@ static int Open( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = ( services_discovery_sys_t * )
         malloc( sizeof( services_discovery_sys_t ) );
-    playlist_t *p_playlist = pl_Yield( p_sd );
+    playlist_t *p_playlist = pl_Hold( p_sd );
 
     p_sd->p_sys = p_sys;
     p_sys->p_playlist = p_playlist;

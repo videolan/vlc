@@ -371,7 +371,7 @@ static int Manage( vout_thread_t *p_vout )
             break;
         case CACA_EVENT_QUIT:
         {
-            p_playlist = pl_Yield( p_vout );
+            p_playlist = pl_Hold( p_vout );
             if( p_playlist )
             {
                 playlist_Stop( p_playlist );

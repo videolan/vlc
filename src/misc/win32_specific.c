@@ -317,7 +317,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
         if( !p_this ) return 0;
 
         /* Add files to the playlist */
-        p_playlist = pl_Yield( p_this );
+        p_playlist = pl_Hold( p_this );
         if( !p_playlist ) return 0;
 
         if( pwm_data->lpData )

@@ -295,7 +295,7 @@ static int Open( vlc_object_t *p_this )
     if( config_GetInt(p_this, SOUT_CFG_PREFIX "bonjour") )
     {
         char                *psz_txt, *psz_name;
-        playlist_t          *p_playlist = pl_Yield( p_access );
+        playlist_t          *p_playlist = pl_Hold( p_access );
 
         char *psz_uri = input_item_GetURI( p_playlist->status.p_item->p_input );
         char *psz_newuri = psz_uri;

@@ -227,7 +227,7 @@ static void RunIntf( intf_thread_t *p_intf )
             case GESTURE(RIGHT,LEFT,NONE,NONE):
                 {
                     input_thread_t * p_input;
-                    p_playlist = pl_Yield( p_intf );
+                    p_playlist = pl_Hold( p_intf );
 
                     p_input = input_from_playlist( p_playlist );
                     vlc_object_release( p_playlist );
@@ -254,13 +254,13 @@ static void RunIntf( intf_thread_t *p_intf )
                 }
                 break;
             case GESTURE(LEFT,DOWN,NONE,NONE):
-                p_playlist = pl_Yield( p_intf );
+                p_playlist = pl_Hold( p_intf );
 
                 playlist_Prev( p_playlist );
                 vlc_object_release( p_playlist );
                 break;
             case GESTURE(RIGHT,DOWN,NONE,NONE):
-                p_playlist = pl_Yield( p_intf );
+                p_playlist = pl_Hold( p_intf );
 
                 playlist_Next( p_playlist );
                 vlc_object_release( p_playlist );
@@ -293,7 +293,7 @@ static void RunIntf( intf_thread_t *p_intf )
                    vlc_value_t val, list, list2;
                    int i_count, i;
 
-                    p_playlist = pl_Yield( p_intf );
+                    p_playlist = pl_Hold( p_intf );
 
                     p_input = input_from_playlist( p_playlist );
 
@@ -348,7 +348,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     vlc_value_t val, list, list2;
                     int i_count, i;
 
-                    p_playlist = pl_Yield( p_intf );
+                    p_playlist = pl_Hold( p_intf );
 
                     p_input = input_from_playlist( p_playlist );
                     vlc_object_release( p_playlist );

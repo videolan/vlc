@@ -203,7 +203,7 @@ InterfaceWindow::InterfaceWindow( intf_thread_t * _p_intf, BRect frame,
       fLastUpdateTime( system_time() ),
       fSettings( new BMessage( 'sett' ) )
 {
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
 
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, this );

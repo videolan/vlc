@@ -2123,7 +2123,7 @@ static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( (newval.b_bool && !p_vout->p_sys->b_wallpaper) ||
         (!newval.b_bool && p_vout->p_sys->b_wallpaper) )
     {
-        playlist_t *p_playlist = pl_Yield( p_vout );
+        playlist_t *p_playlist = pl_Hold( p_vout );
 
         if( p_playlist )
         {

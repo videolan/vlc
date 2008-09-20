@@ -111,7 +111,7 @@ PlaylistManager::PlaylistManager( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_cached_item_id = -1;
     i_update_counter = 0;
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     var_Create( p_intf, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );

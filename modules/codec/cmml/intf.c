@@ -437,7 +437,7 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         mtime_t i_seconds;
         vlc_value_t time;
 
-        p_playlist = pl_Yield( p_intf );
+        p_playlist = pl_Hold( p_intf );
 
         /* Get new URL */
         p_current_item = p_playlist->status.p_item;
@@ -641,7 +641,7 @@ void GoBack( intf_thread_t *p_intf )
 #endif
 
     /* Find the playlist */
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
 
     /* Retrieve navigation history from playlist */
     if( var_Get( p_playlist, "navigation-history", &history ) != VLC_SUCCESS ||
@@ -713,7 +713,7 @@ void GoForward( intf_thread_t *p_intf )
 #endif
 
     /* Find the playlist */
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
 
     /* Retrieve navigation history from playlist */
     if( var_Get( p_playlist, "navigation-history", &history ) != VLC_SUCCESS ||

@@ -435,7 +435,7 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
 
 void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL )
     {
         return;
@@ -476,7 +476,7 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
 
 void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL )
     {
         return;

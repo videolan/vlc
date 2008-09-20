@@ -289,7 +289,7 @@ static void Run( intf_thread_t *p_intf )
     gtk_tree_view_column_set_sort_column_id(p_column, 2);
 #endif
     /* update the playlist */
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     p_playlist_store = gtk_list_store_new (3,
                 G_TYPE_STRING, /* Filename */
                 G_TYPE_STRING, /* Time */
@@ -428,7 +428,7 @@ static int Manage( intf_thread_t *p_intf )
             p_intf->p_sys->b_playing = 1;
 
             /* update playlist interface */
-            p_playlist = pl_Yield( p_intf );
+            p_playlist = pl_Hold( p_intf );
             if (p_playlist != NULL)
             {
                 p_liststore = gtk_list_store_new (3,

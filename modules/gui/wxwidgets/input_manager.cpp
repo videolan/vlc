@@ -194,7 +194,7 @@ bool InputManager::IsPlaying()
  *****************************************************************************/
 void InputManager::UpdateInput()
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist != NULL )
     {
         LockPlaylist( p_intf->p_sys, p_playlist );

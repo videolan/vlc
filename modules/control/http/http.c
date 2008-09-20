@@ -128,7 +128,7 @@ static int Open( vlc_object_t *p_this )
         return( VLC_ENOMEM );
     }
 
-    p_sys->p_playlist = pl_Yield( p_this );
+    p_sys->p_playlist = pl_Hold( p_this );
     p_sys->p_input    = NULL;
     p_sys->p_vlm      = NULL;
     p_sys->psz_address = psz_address;

@@ -385,7 +385,7 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
-    playlist_t    *p_playlist = pl_Yield( p_intf );
+    playlist_t    *p_playlist = pl_Hold( p_intf );
     p_sys->p_playlist = p_playlist;
 
     int i_key;
@@ -587,7 +587,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     return 0; \
     } while(0)
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
 
     if( p_sys->i_box_type == BOX_PLAYLIST )
     {
@@ -1514,7 +1514,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     input_thread_t *p_input = p_sys->p_input;
-    playlist_t     *p_playlist = pl_Yield( p_intf );
+    playlist_t     *p_playlist = pl_Hold( p_intf );
     int y = 0;
     int h;
     int y_end;
@@ -2255,7 +2255,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     playlist_item_t *p_item;
 
     switch( p_sys->i_current_view )
@@ -2273,7 +2273,7 @@ static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
 static void PlaylistRebuild( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
 
     PL_LOCK;
 
@@ -2348,7 +2348,7 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_variable);
     VLC_UNUSED(oval); VLC_UNUSED(nval);
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     p_intf->p_sys->b_need_update = true;
     p_intf->p_sys->p_node = p_playlist->status.p_node;
     vlc_object_release( p_playlist );
@@ -2359,7 +2359,7 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 static inline bool PlaylistIsPlaying( intf_thread_t *p_intf,
                                             playlist_item_t *p_item )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     playlist_item_t *p_played_item = p_playlist->status.p_item;
     vlc_object_release( p_playlist );
     return( p_item != NULL && p_played_item != NULL &&
@@ -2416,7 +2416,7 @@ static void Eject( intf_thread_t *p_intf )
      * If it's neither of these, then return
      */
 
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     PL_LOCK;
 
     if( p_playlist->status.p_item == NULL )
@@ -2627,7 +2627,7 @@ static void ReadDir( intf_thread_t *p_intf )
 static void PlayPause( intf_thread_t *p_intf )
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     vlc_value_t val;
 
     if( p_input )

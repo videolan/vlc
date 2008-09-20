@@ -248,7 +248,7 @@ static VLCInfo *_o_sharedInstance = nil;
     {
         if( !input_item_IsPreparsed( p_item ) )
         {
-            playlist_t * p_playlist = pl_Yield( VLCIntf );
+            playlist_t * p_playlist = pl_Hold( VLCIntf );
             playlist_PreparseEnqueue( p_playlist, p_item );
             pl_Release( VLCIntf );
         }
@@ -363,7 +363,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (IBAction)saveMetaData:(id)sender
 {
-    playlist_t * p_playlist = pl_Yield( VLCIntf );
+    playlist_t * p_playlist = pl_Hold( VLCIntf );
     vlc_value_t val;
 
     if( !p_item ) goto error;

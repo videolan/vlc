@@ -291,7 +291,7 @@ PlayListWindow::UpdatePlaylist( bool rebuild )
     if( rebuild )
         fListView->RebuildList();
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     fListView->SetCurrent( p_playlist->i_index );
     fListView->SetPlaying( p_playlist->status.i_status == PLAYLIST_RUNNING );
     pl_Release( p_intf );

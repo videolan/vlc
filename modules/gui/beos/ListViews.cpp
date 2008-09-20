@@ -690,7 +690,7 @@ PlaylistView::MouseDown( BPoint where )
                 // only do something if user clicked the same item twice
                 if ( fLastClickedItem == item )
                 {
-                    playlist_t * p_playlist = pl_Yield( p_intf );
+                    playlist_t * p_playlist = pl_Hold( p_intf );
                     if( p_playlist )
                     {
                         playlist_Goto( p_playlist, i );
@@ -989,7 +989,7 @@ PlaylistView::SetPlaying( bool playing )
 void
 PlaylistView::RebuildList()
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
 
     // remove all items
     BListItem * item;
@@ -1077,7 +1077,7 @@ PlaylistView::SetDisplayMode( uint32 mode )
 BListItem*
 PlaylistView::_PlayingItem() const
 {
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
 
     if( !p_playlist )
     {
@@ -1099,7 +1099,7 @@ PlaylistView::_SetPlayingIndex( BListItem* playingItem )
     {
         if ( item == playingItem )
         {
-            playlist_t * p_playlist = pl_Yield( p_intf );
+            playlist_t * p_playlist = pl_Hold( p_intf );
  
             if( !p_playlist )
             {

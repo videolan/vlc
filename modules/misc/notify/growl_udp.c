@@ -90,7 +90,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     pl_Release( p_intf );
 
@@ -103,7 +103,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = pl_Yield( p_this );
+    playlist_t *p_playlist = pl_Hold( p_this );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
     pl_Release( p_this );
 }
@@ -121,7 +121,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_artist = NULL;
     char *psz_album = NULL;
     input_thread_t *p_input;
-    playlist_t *p_playlist = pl_Yield( p_this );
+    playlist_t *p_playlist = pl_Hold( p_this );
 
     p_input = p_playlist->p_input;
     pl_Release( p_this );

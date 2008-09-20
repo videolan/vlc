@@ -217,7 +217,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_sort_mode = MODE_NONE;
     b_need_update = false;
     i_items_to_append = 0;
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     SetIcon( *p_intf->p_sys->p_icon );

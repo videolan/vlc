@@ -187,7 +187,7 @@ static int Open( vlc_object_t *p_this )
    if( p_sys->i_track < 0 && i_mrl_tracknum <= 0 )
    {
         /* We only do separate items if the whole disc is requested */
-        playlist_t *p_playlist = pl_Yield( p_access );
+        playlist_t *p_playlist = pl_Hold( p_access );
 
         i_ret = -1;
         if( p_playlist )

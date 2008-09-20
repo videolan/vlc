@@ -41,7 +41,7 @@
     if ( [o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"] )
     {
         intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = pl_Yield( p_intf );
+        playlist_t * p_playlist = pl_Hold( p_intf );
         if( p_playlist == NULL )
         {
             return nil;
@@ -90,7 +90,7 @@
     NSString *o_command = [[self commandDescription] commandName];
 
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL )
     {
         return nil;

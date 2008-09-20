@@ -249,7 +249,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_mi = NULL;
 
     /* Access to the playlist */
-    p_intf->p_sys->p_playlist = pl_Yield( p_intf );
+    p_intf->p_sys->p_playlist = pl_Hold( p_intf );
     /* Listen to the messages */
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
     /* one settings to rule them all */

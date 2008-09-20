@@ -694,7 +694,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
             }
         }
-        var_SetInteger( pl_Yield( p_input ), "item-change", p_item->i_id );
+        var_SetInteger( pl_Hold( p_input ), "item-change", p_item->i_id );
         pl_Release( p_input );
         free( psz_comment );
         i++;

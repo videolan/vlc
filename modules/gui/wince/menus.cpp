@@ -222,7 +222,7 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
     }
     else
     {
-        playlist_t * p_playlist = pl_Yield( p_intf );
+        playlist_t * p_playlist = pl_Hold( p_intf );
         if( p_playlist && !playlist_IsEmpty( p_playlist ) )
         {
             AppendMenu( hmenu, MF_SEPARATOR, 0, _T("") );

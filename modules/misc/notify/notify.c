@@ -104,7 +104,7 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys->notification = NULL;
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     pl_Release( p_intf );
 
@@ -119,7 +119,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t   *p_intf = ( intf_thread_t* ) p_this;
     intf_sys_t      *p_sys  = p_intf->p_sys;
 
-    playlist_t *p_playlist = pl_Yield( p_this );
+    playlist_t *p_playlist = pl_Hold( p_this );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
     pl_Release( p_this );
 
@@ -257,7 +257,7 @@ static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
 { /* libnotify callback, called when the "Next" button is pressed */
     VLC_UNUSED(psz);
     notify_notification_close (notification, NULL);
-    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p) );
+    playlist_t *p_playlist = pl_Hold( ((vlc_object_t*) p) );
     playlist_Next( p_playlist );
     pl_Release( ((vlc_object_t*) p) );
 }
@@ -266,7 +266,7 @@ static void Prev( NotifyNotification *notification, gchar *psz, gpointer p )
 { /* libnotify callback, called when the "Previous" button is pressed */
     VLC_UNUSED(psz);
     notify_notification_close (notification, NULL);
-    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p) );
+    playlist_t *p_playlist = pl_Hold( ((vlc_object_t*) p) );
     playlist_Prev( p_playlist );
     pl_Release( ((vlc_object_t*) p) );
 }

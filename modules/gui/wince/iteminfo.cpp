@@ -272,7 +272,7 @@ void ItemInfoDialog::OnOk()
     vlc_mutex_lock( &p_item->p_input->lock );
     bool b_old_enabled = !(p_item->i_flags & PLAYLIST_DBL_FLAG);
 
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     if( p_playlist != NULL )
     {
         b_state = SendMessage( enabled_checkbox, BM_GETCHECK, 0, 0 );

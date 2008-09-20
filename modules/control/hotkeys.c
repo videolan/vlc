@@ -149,7 +149,7 @@ static void Run( intf_thread_t *p_intf )
     vout_thread_t *p_vout = NULL;
     vlc_value_t val;
     int i;
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     int canc = vlc_savecancel();
 
     vlc_cleanup_push( __pl_Release, p_intf );
@@ -947,7 +947,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
 {
     vlc_value_t val;
     char psz_bookmark_name[11];
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
 
     sprintf( psz_bookmark_name, "bookmark%i", i_num );
     var_Create( p_intf, psz_bookmark_name, VLC_VAR_STRING|VLC_VAR_DOINHERIT );
@@ -973,7 +973,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
 
 static void SetBookmark( intf_thread_t *p_intf, int i_num )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     char psz_bookmark_name[11];
     sprintf( psz_bookmark_name, "bookmark%i", i_num );
     var_Create( p_intf, psz_bookmark_name,

@@ -610,7 +610,7 @@ void OpenDialog::OnOk()
     ComboBox_SetCurSel( mrl_combo, ComboBox_GetCount( mrl_combo ) - 1 );*/
 
     /* Update the playlist */
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
  /*   for( int i = 0; i < i_args; i++ )

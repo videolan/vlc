@@ -208,7 +208,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     if( psz_name == NULL )
         return VLC_ENOMEM;
 
-    playlist_t         *p_playlist = pl_Yield( p_access );
+    playlist_t         *p_playlist = pl_Hold( p_access );
     input_thread_t     *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
 
     playlist_item_t    *p_item_in_category;

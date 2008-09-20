@@ -273,8 +273,8 @@ enum pl_locked_state
 #define PL_LOCK vlc_object_lock( p_playlist )
 #define PL_UNLOCK vlc_object_unlock( p_playlist )
 
-VLC_EXPORT( playlist_t *, __pl_Yield, ( vlc_object_t * ) );
-#define pl_Yield( a ) __pl_Yield( VLC_OBJECT(a) )
+VLC_EXPORT( playlist_t *, __pl_Hold, ( vlc_object_t * ) );
+#define pl_Hold( a ) __pl_Hold( VLC_OBJECT(a) )
 
 VLC_EXPORT( void, __pl_Release, ( vlc_object_t * ) );
 #define pl_Release(a) __pl_Release( VLC_OBJECT(a) )
@@ -420,7 +420,7 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
 #define pl_CurrentInput(a) __pl_CurrentInput( VLC_OBJECT(a) )
 static  inline input_thread_t * __pl_CurrentInput( vlc_object_t * p_this )
 {
-    playlist_t * p_playlist = pl_Yield( p_this );
+    playlist_t * p_playlist = pl_Hold( p_this );
     if( !p_playlist ) return NULL;
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
     pl_Release( p_this );

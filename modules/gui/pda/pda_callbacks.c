@@ -94,7 +94,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
     int           i_id , i_pos=0;
     GtkTreeView   *p_tvplaylist = NULL;
 
-    p_playlist = pl_Yield( p_intf );
+    p_playlist = pl_Hold( p_intf );
 
     if( p_playlist ==  NULL)
     {   /* Bail out when VLC's playlist object is not found. */
@@ -378,7 +378,7 @@ void onPause(GtkButton *button, gpointer user_data)
 void onPlay(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET( button ) );
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
 
     if (p_playlist)
     {
@@ -400,7 +400,7 @@ void onPlay(GtkButton *button, gpointer user_data)
 void onStop(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET( button ) );
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if (p_playlist)
     {
         playlist_Stop( p_playlist );
@@ -771,7 +771,7 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET(treeview) );
     GtkTreeSelection *p_selection = gtk_tree_view_get_selection(treeview);
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
 
     if( p_playlist == NULL )
     {
@@ -809,7 +809,7 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
 void onUpdatePlaylist(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *  p_intf = GtkGetIntf( button );
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     GtkTreeView *p_tvplaylist = NULL;
 
     if( p_playlist == NULL )
@@ -845,7 +845,7 @@ static void deleteItemFromPlaylist(gpointer data, gpointer user_data)
 void onDeletePlaylist(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     GtkTreeView    *p_tvplaylist;
 
     /* Delete an arbitrary item from the playlist */
@@ -914,7 +914,7 @@ void onDeletePlaylist(GtkButton *button, gpointer user_data)
 void onClearPlaylist(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Hold( p_intf );
     GtkTreeView    *p_tvplaylist;
     int item;
 
@@ -1039,7 +1039,7 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
     }
 
     /* Update the playlist */
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
     /* Get all the options. */
