@@ -89,7 +89,6 @@ static void vlc_object_dump( vlc_object_t *p_this );
  * Local structure lock
  *****************************************************************************/
 static vlc_mutex_t structure_lock;
-static unsigned    object_counter = 0;
 
 static void close_nocancel (int fd)
 {
@@ -179,7 +178,6 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->prev = vlc_internals (p_this)->prev;
     vlc_internals (p_this)->prev = p_new;
     vlc_internals (p_priv->prev)->next = p_new;
-    p_new->i_object_id = object_counter++; /* fetch THEN increment */
     vlc_mutex_unlock( &structure_lock );
 
     if( i_type == VLC_OBJECT_LIBVLC )
