@@ -140,6 +140,7 @@ struct rtp_source_t
     uint32_t ssrc;
     uint16_t bad_seq; /* tentatively next expected sequence for resync */
     uint16_t max_seq; /* next expected sequence */
+    uint32_t jitter;  /* interarrival delay jitter estimate */
 
     uint16_t last_seq; /* sequence of the last dequeued packet */
     block_t *blocks; /* re-ordered blocks queue */
