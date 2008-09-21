@@ -64,6 +64,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m, QSett
     {
         if( model->i_depth == DEPTH_SEL )  /* Selector Panel */
         {
+            i_showflags = 0;
             item_col_strings.append( "" );
         }
         else
@@ -185,7 +186,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
         return;
     }
 
-    assert( i_showflags < COLUMN_END );
+    i_showflags = parentItem ? parentItem->i_showflags : i_showflags;
 
     /* Meta: ID */
     if( i_showflags & COLUMN_NUMBER )
@@ -204,3 +205,4 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
         }
     }
 }
+
