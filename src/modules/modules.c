@@ -560,8 +560,7 @@ found_shortcut:
             if( p_new_module )
             {
                 CacheMerge( p_this, p_module, p_new_module );
-                vlc_object_attach( p_new_module, p_module );
-                DeleteModule( p_new_module, true );
+                DeleteModule( p_new_module, false );
             }
         }
 #endif
