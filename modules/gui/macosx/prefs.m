@@ -516,17 +516,17 @@ static VLCTreeItem *o_root_item = nil;
     intf_thread_t *p_intf = VLCIntf;
     module_t *p_parser;
 
-    psz_module_name = (char *)[o_module_name UTF8String];
+    const char *psz_module_name = (char *)[o_module_name UTF8String];
 
     /* look for module */
     p_parser = module_find( p_intf, psz_module_name );
     if( !p_parser )
         return( NO );
 
-     module_config_get( p_parser, &confsize );
-     BOOL b_has_prefs = confsize != 0;
-     module_release( p_parser );
-     return( b_has_prefs );
+    module_config_get( p_parser, &confsize );
+    BOOL b_has_prefs = confsize != 0;
+    module_release( p_parser );
+    return( b_has_prefs );
 }
 
 - (NSView *)showView:(NSScrollView *)o_prefs_view
