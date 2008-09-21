@@ -211,12 +211,13 @@ module_GetHelp
 __module_GetModulesNamesForCapability
 module_GetName
 module_GetObjName
+module_hold
 module_IsCapable
 module_list_free
 module_list_get
 __module_Need
-module_Put
 module_PutConfig
+module_release
 __module_Unneed
 __msg_Dbg
 __msg_DisableObjectPrinting

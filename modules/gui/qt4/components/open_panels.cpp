@@ -1214,6 +1214,6 @@ void CaptureOpenPanel::advancedDialog()
     }
     delete adv;
     module_PutConfig( p_config );
-    module_Put( p_module );
+    module_release (p_module);
 }
 

@@ -1196,7 +1196,7 @@ void KeySelectorControl::finish()
         }
     }
     module_PutConfig (p_config);
-    module_Put (p_main);
+    module_release (p_main);
 
     table->resizeColumnToContents( 0 );
 

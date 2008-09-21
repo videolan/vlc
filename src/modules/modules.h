@@ -149,17 +149,6 @@ struct module_t
     bool          b_loaded;        /* Set to true if the dll is loaded */
 };
 
-static inline module_t *module_hold (module_t *m)
-{
-    vlc_hold (&m->vlc_gc_data);
-    return m;
-}
-
-static inline void module_release (module_t *m)
-{
-    vlc_release (&m->vlc_gc_data);
-}
-
 #define module_InitBank(a)     __module_InitBank(VLC_OBJECT(a))
 void  __module_InitBank        ( vlc_object_t * );
 #define module_LoadBuiltins(a) __module_LoadBuiltins(VLC_OBJECT(a))

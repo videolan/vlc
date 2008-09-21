@@ -325,6 +325,17 @@ const char *module_GetHelp( const module_t *m )
     return m->psz_help;
 }
 
+module_t *module_hold (module_t *m)
+{
+    vlc_hold (&m->vlc_gc_data);
+    return m;
+}
+
+void module_release (module_t *m)
+{
+    vlc_release (&m->vlc_gc_data);
+}
+
 /**
  * Frees the flat list of VLC modules.
  * @param list list obtained by module_list_get
@@ -749,19 +760,6 @@ module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
     return module;
 }
 
-
-/**
- * Release a module_t pointer from module_Find().
- *
- * \param module the module to release
- * \return nothing
- */
-void module_Put( module_t *module )
-{
-    module_release( module );
-}
-
-
 /**
  * Tell if a module exists and release it in thic case
  *
@@ -773,14 +771,8 @@ bool __module_Exists( vlc_object_t *p_this, const char * psz_name )
 {
     module_t *p_module = __module_Find( p_this, psz_name );
     if( p_module )
-    {
-        module_Put( p_module );
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+        module_release (p_module);
+    return true != NULL;
 }
 
 /**

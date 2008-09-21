@@ -39,11 +39,12 @@ VLC_EXPORT( bool,  __module_Exists, ( vlc_object_t *, const char * ) );
 
 #define module_Find(a,b) __module_Find(VLC_OBJECT(a),b)
 VLC_EXPORT( module_t *, __module_Find, ( vlc_object_t *, const char * ) );
-VLC_EXPORT( void, module_Put, ( module_t *module ) );
 
 VLC_EXPORT( module_config_t *, module_GetConfig, ( const module_t *, unsigned * ) );
 VLC_EXPORT( void, module_PutConfig, ( module_config_t * ) );
 
+VLC_EXPORT( module_t *, module_hold, (module_t *module) );
+VLC_EXPORT( void, module_release, (module_t *module) );
 VLC_EXPORT( void, module_list_free, (module_t **) );
 VLC_EXPORT( module_t **, module_list_get, (size_t *n) );
 

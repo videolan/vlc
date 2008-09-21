@@ -515,7 +515,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         input_tab_array.Add( autopanel );
         notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
-        module_Put( p_module );
+        module_release (p_module);
     }
 
     p_module = module_Find( VLC_OBJECT(p_intf), "pvr" );
@@ -526,7 +526,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         input_tab_array.Add( autopanel );
         notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
-        module_Put( p_module );
+        module_release (p_module);
     }
 
     p_module = module_Find( VLC_OBJECT(p_intf), "dvb" );
@@ -537,7 +537,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         input_tab_array.Add( autopanel );
         notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
-        module_Put( p_module );
+        module_release (p_module);
     }
 
     p_module = module_Find( VLC_OBJECT(p_intf), "dshow" );
@@ -548,7 +548,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         input_tab_array.Add( autopanel );
         notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
-        module_Put( p_module );
+        module_release (p_module);
     }
 
     /* Update Disc panel */

@@ -1033,7 +1033,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
         if( config_data->i_type == TYPE_MODULE )
         {
-            module_Put( p_module );
+            module_release (p_module);
         }
         else
         {
