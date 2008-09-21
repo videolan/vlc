@@ -453,7 +453,6 @@ VLC-release.app: vlc
 	    simple_prefs.h \
 	    simple_prefs.m \
 	    vout.h \
-	    voutqt.m \
 	    voutgl.m \
 	    wizard.h \
 	    wizard.m \
@@ -621,7 +620,6 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	    simple_prefs.h \
 	    simple_prefs.m \
 	    vout.h \
-	    voutqt.m \
 	    voutgl.m \
 	    wizard.h \
 	    wizard.m \
