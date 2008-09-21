@@ -100,6 +100,7 @@ VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
 void spu_Attach( spu_t *, vlc_object_t *, bool );
 
 VLC_EXPORT( subpicture_t *, spu_CreateSubpicture, ( spu_t * ) );
+/* XXX you cannot call spu_DestroySubpicture on a displayed picture */
 VLC_EXPORT( void, spu_DestroySubpicture, ( spu_t *, subpicture_t * ) );
 VLC_EXPORT( void, spu_DisplaySubpicture, ( spu_t *, subpicture_t * ) );
 

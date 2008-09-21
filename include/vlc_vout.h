@@ -363,8 +363,6 @@ struct subpicture_t
        Should NOT be modified except by the vout thread */
     /**@{*/
     int64_t         i_order;                 /** an increasing unique number */
-    int             i_type;                                        /**< type */
-    int             i_status;                                     /**< flags */
     subpicture_t *  p_next;               /**< next subtitle to be displayed */
     /**@}*/
 
@@ -406,17 +404,8 @@ struct subpicture_t
     subpicture_sys_t *p_sys;                              /* subpicture data */
 };
 
-/* Subpicture type */
-#define EMPTY_SUBPICTURE       0     /* subtitle slot is empty and available */
-#define MEMORY_SUBPICTURE      100            /* subpicture stored in memory */
-
 /* Default subpicture channel ID */
 #define DEFAULT_CHAN           1
-
-/* Subpicture status */
-#define FREE_SUBPICTURE        0                   /* free and not allocated */
-#define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
-#define READY_SUBPICTURE       2                        /* ready for display */
 
 /* Subpicture position flags */
 #define SUBPICTURE_ALIGN_LEFT 0x1
