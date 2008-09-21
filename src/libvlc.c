@@ -126,6 +126,8 @@ static bool b_daemon = false;
  */
 void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
 {
+    /* There is no point in using the GC if there is destructor... */
+    assert (pf_destruct);
     p_gc->pf_destructor = pf_destruct;
 
     p_gc->refs = 1;
