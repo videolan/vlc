@@ -1130,7 +1130,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         NSFont * font = [NSFont fontWithDescriptor:[fd fontDescriptorWithFamily:fontFamilyName] textTransform:nil];
         [[NSFontManager sharedFontManager] setSelectedFont:font isMultiple:NO];
     }
-    [[NSFontManager sharedFontManager] setTarget:self];
+    [[NSFontManager sharedFontManager] setDelegate: self];
+    [o_sprefs_win makeFirstResponder: o_sprefs_win];
     [[NSFontPanel sharedFontPanel] orderFront:self];
 }
 
@@ -1316,4 +1317,17 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     return FALSE;
 }
 
+@end
+
+@implementation VLCSimplePrefsWindow
+
+- (BOOL)acceptsFirstResponder
+{
+    return YES;
+}
+
+- (void)changeFont:(id)sender
+{
+    [[[VLCMain sharedInstance] getSimplePreferences] changeFont: sender];
+}
 @end

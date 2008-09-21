@@ -166,6 +166,11 @@
                 "o_video_view" = id;
             };
             SUPERCLASS = NSObject;
+        },
+                {
+            CLASS = VLCSimplePrefsWindow;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSWindow;
         }
     );
     IBVersion = 1;

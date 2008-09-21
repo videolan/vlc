@@ -196,6 +196,7 @@
 - (IBAction)osdSettingChanged:(id)sender;
 - (IBAction)showFontPicker:(id)sender;
 - (void)showOSDSettings;
+- (void)changeFont:(id)sender;
 
 /* input & codecs */
 - (IBAction)inputSettingChanged:(id)sender;
@@ -211,5 +212,9 @@
 @end
 
 @interface VLCHotkeyChangeWindow : NSWindow
+
+@end
+
+@interface VLCSimplePrefsWindow : NSWindow
 
 @end
