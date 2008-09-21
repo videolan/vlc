@@ -259,7 +259,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 audioControl( alsa );
                 optionWidgets.append( alsaControl );
 
-                CONFIG_GENERIC2( "alsadev" , StringList , alsaLabel,
+                CONFIG_GENERIC2( "alsa-audio-device" , StringList , alsaLabel,
                                 alsaDevice );
             }
             else
@@ -268,7 +268,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             {
                 audioControl2( OSS );
                 optionWidgets.append( OSSControl );
-                CONFIG_GENERIC_FILE( "dspdev" , File , OSSLabel, OSSDevice,
+                CONFIG_GENERIC_FILE( "oss-audio-device" , File , OSSLabel, OSSDevice,
                                  OSSBrowse );
             }
             else

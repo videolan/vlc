@@ -108,7 +108,7 @@ vlc_module_begin();
     set_description( N_("ALSA audio output") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
-    add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
+    add_string( "alsa-audio-device", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
                 N_("ALSA Device Name"), NULL, false );
         change_string_list( ppsz_devices, ppsz_devices_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
@@ -320,7 +320,7 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
 
     /* Get device name */
-    if( (psz_device = config_GetPsz( p_aout, "alsadev" )) == NULL )
+    if( (psz_device = config_GetPsz( p_aout, "alsa-audio-device" )) == NULL )
     {
         msg_Err( p_aout, "no audio device given (maybe \"default\" ?)" );
         intf_UserFatal( p_aout, false, _("No Audio Device"),

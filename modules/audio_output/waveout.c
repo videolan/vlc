@@ -170,7 +170,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_bool( "waveout-float32", 1, 0, FLOAT_TEXT, FLOAT_LONGTEXT, true );
 
-    add_string( "waveout-dev", "wavemapper", NULL,
+    add_string( "waveout-audio-device", "wavemapper", NULL,
                  DEVICE_TEXT, DEVICE_LONG, false );
        change_string_list( ppsz_adev, ppsz_adev_text, ReloadWaveoutDevices );
        change_need_restart();
@@ -255,13 +255,13 @@ static int Open( vlc_object_t *p_this )
     /*
      initialize/update Device selection List
     */
-    ReloadWaveoutDevices( p_this, "waveout-dev", val, val, NULL);
+    ReloadWaveoutDevices( p_this, "waveout-audio-device", val, val, NULL);
 
 
     /*
       check for configured audio device!
     */
-    char *psz_waveout_dev = var_CreateGetString( p_aout, "waveout-dev");
+    char *psz_waveout_dev = var_CreateGetString( p_aout, "waveout-audio-device");
 
     p_aout->output.p_sys->i_wave_device_id =
          findDeviceID( psz_waveout_dev );
@@ -303,7 +303,7 @@ static int Open( vlc_object_t *p_this )
     if( var_Get( p_aout, "audio-device", &val ) < 0 )
     {
         /* Probe() has failed. */
-        var_Destroy( p_aout, "waveout-device");
+        var_Destroy( p_aout, "waveout-audio-device");
         free( p_aout->output.p_sys );
         return VLC_EGENERIC;
     }

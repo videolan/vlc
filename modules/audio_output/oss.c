@@ -112,7 +112,7 @@ vlc_module_begin();
 
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
-    add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
+    add_file( "oss-audio-device", "/dev/dsp", aout_FindAndRestart,
               N_("OSS DSP device"), NULL, false );
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, true );
 
@@ -283,7 +283,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Get device name */
-    if( (psz_device = config_GetPsz( p_aout, "dspdev" )) == NULL )
+    if( (psz_device = config_GetPsz( p_aout, "oss-audio-device" )) == NULL )
     {
         msg_Err( p_aout, "no audio device specified (maybe /dev/dsp?)" );
         free( p_sys );

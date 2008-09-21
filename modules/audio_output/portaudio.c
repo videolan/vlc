@@ -110,7 +110,7 @@ vlc_module_begin();
     set_description( N_("PORTAUDIO audio output") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
-    add_integer( "portaudio-device", 0, NULL,
+    add_integer( "portaudio-audio-device", 0, NULL,
                  DEVICE_TEXT, DEVICE_LONGTEXT, false );
     set_capability( "audio output", 0 );
     set_callbacks( Open, Close );
@@ -183,8 +183,8 @@ static int Open( vlc_object_t * p_this )
     p_aout->output.pf_play = Play;
 
     /* Retrieve output device id from config */
-    var_Create( p_aout, "portaudio-device", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
-    var_Get( p_aout, "portaudio-device", &val );
+    var_Create( p_aout, "portaudio-audio-device", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
+    var_Get( p_aout, "portaudio-audio-device", &val );
     p_sys->i_device_id = val.i_int;
 
 #ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
