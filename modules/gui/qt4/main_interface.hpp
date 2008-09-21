@@ -93,6 +93,7 @@ public:
 protected:
 //    void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);
+    void dropEventPlay( QDropEvent *, bool);
     void dragEnterEvent( QDragEnterEvent * );
     void dragMoveEvent( QDragMoveEvent * );
     void dragLeaveEvent( QDragLeaveEvent * );

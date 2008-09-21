@@ -135,7 +135,7 @@ PlaylistWidget::~PlaylistWidget()
 void PlaylistWidget::dropEvent(QDropEvent *event)
 {
     if( p_intf->p_sys->p_mi )
-        p_intf->p_sys->p_mi->dropEvent( event );
+        p_intf->p_sys->p_mi->dropEventPlay( event, false );
 }
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *event)
 {
