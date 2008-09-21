@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-@class VLCTreeItem;
+@class VLCTreeMainItem;
 
 /*****************************************************************************
  * VLCPrefs interface
@@ -29,7 +29,7 @@
 @interface VLCPrefs : NSObject
 {
     intf_thread_t *p_intf;
-    VLCTreeItem *o_config_tree;
+    VLCTreeMainItem * _rootTreeItem;
     NSView *o_empty_view;
     NSMutableDictionary *o_save_prefs;
 
