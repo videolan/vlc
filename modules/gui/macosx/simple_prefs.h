@@ -43,6 +43,7 @@
     IBOutlet id o_audio_lastuser_txt;
     IBOutlet id o_audio_norm_ckb;
     IBOutlet id o_audio_norm_fld;
+    IBOutlet id o_audio_norm_stepper;
     IBOutlet id o_audio_spdif_ckb;
     IBOutlet id o_audio_view;
     IBOutlet id o_audio_visual_pop;

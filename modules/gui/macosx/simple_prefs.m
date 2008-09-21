@@ -427,7 +427,11 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     
     psz_tmp = config_GetPsz( p_intf, "audio-filter" );
     if( psz_tmp )
-        [o_audio_norm_ckb setState: (int)strstr( psz_tmp, "normvol" )];
+    {
+        [o_audio_norm_ckb setState: (int)strstr( psz_tmp, "volnorm" )];
+        [o_audio_norm_fld setEnabled: [o_audio_norm_ckb state]];
+        [o_audio_norm_stepper setEnabled: [o_audio_norm_ckb state]];
+    }
     [o_audio_norm_fld setFloatValue: config_GetFloat( p_intf, "norm-max-level" )];
 
     [self setupButton: o_audio_visual_pop forModuleList: "audio-visual"];
@@ -749,21 +753,28 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutPsz( p_intf, "audio-language", [[o_audio_lang_fld stringValue] UTF8String] );
         config_PutInt( p_intf, "headphone-dolby", [o_audio_headphone_ckb state] );
 
-        psz_tmp = config_GetPsz( p_intf, "audio-filter" );
-        if(! psz_tmp)
-            config_PutPsz( p_intf, "audio-filter", "volnorm" );
-        else if( (int)strstr( psz_tmp, "normvol" ) == NO )
+        if( [o_audio_norm_ckb state] == NSOnState )
         {
-            /* work-around a GCC 4.0.1 bug */
-            psz_tmp = (char *)[[NSString stringWithFormat: @"%s:volnorm", psz_tmp] UTF8String];
-            config_PutPsz( p_intf, "audio-filter", psz_tmp );
+            psz_tmp = config_GetPsz( p_intf, "audio-filter" );
+            if(! psz_tmp)
+                config_PutPsz( p_intf, "audio-filter", "volnorm" );
+            else if( (int)strstr( psz_tmp, "normvol" ) == NO )
+            {
+                /* work-around a GCC 4.0.1 bug */
+                psz_tmp = (char *)[[NSString stringWithFormat: @"%s:volnorm", psz_tmp] UTF8String];
+                config_PutPsz( p_intf, "audio-filter", psz_tmp );
+            }
         }
         else
         {
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":volnorm"]] UTF8String];
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm:"]] UTF8String];
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm"]] UTF8String];
-            config_PutPsz( p_intf, "audio-filter", psz_tmp );
+            psz_tmp = config_GetPsz( p_intf, "audio-filter" );
+            if( psz_tmp )
+            {
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":volnorm"]] UTF8String];
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm:"]] UTF8String];
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm"]] UTF8String];
+                config_PutPsz( p_intf, "audio-filter", psz_tmp );
+            }
         }
         config_PutFloat( p_intf, "norm-max-level", [o_audio_norm_fld floatValue] );
 
@@ -1025,6 +1036,12 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     if( sender == o_audio_vol_fld )
         [o_audio_vol_sld setIntValue: [o_audio_vol_fld intValue]];
 
+    if( sender == o_audio_norm_ckb )
+    {
+        [o_audio_norm_stepper setEnabled: [o_audio_norm_ckb state]];
+        [o_audio_norm_fld setEnabled: [o_audio_norm_ckb state]];
+    }    
+    
     if( sender == o_audio_last_ckb )
     {
         if( [o_audio_last_ckb state] == NSOnState )
