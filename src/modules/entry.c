@@ -35,40 +35,78 @@
 # define dgettext(d, m) ((char *)(m))
 #endif
 
+static void vlc_module_destruct (gc_object_t *obj)
+{
+    module_t *module = vlc_priv (obj, module_t);
+
+    vlc_mutex_destroy (&module->lock);
+    free (module);
+}
+
 static const char default_name[] = "unnamed";
 
 module_t *vlc_module_create (vlc_object_t *obj)
 {
-    module_t *module =
-        (module_t *)vlc_custom_create (obj, sizeof (module_t),
-                                       VLC_OBJECT_MODULE, "module");
+    module_t *module = malloc (sizeof (*module));
     if (module == NULL)
         return NULL;
 
-    module->b_reentrant = module->b_unloadable = true;
     module->psz_object_name = strdup( default_name );
+    module->next = NULL;
+    module->submodule = NULL;
+    module->parent = NULL;
+    module->submodule_count = 0;
+    vlc_gc_init (module, vlc_module_destruct);
+    vlc_mutex_init (&module->lock);
+
+    module->psz_shortname = NULL;
     module->psz_longname = (char*)default_name;
+    module->psz_help = NULL;
+    for (unsigned i = 0; i < MODULE_SHORTCUT_MAX; i++)
+        module->pp_shortcuts[i] = NULL;
     module->psz_capability = (char*)"";
     module->i_score = 1;
-    module->i_config_items = module->i_bool_items = 0;
+    module->i_cpu = 0;
+    module->b_unloadable = true;
+    module->b_reentrant = true;
+    module->b_submodule = false;
+    module->pf_activate = NULL;
+    module->pf_deactivate = NULL;
+    module->p_config = NULL;
+    module->confsize = 0;
+    module->i_config_items = 0;
+    module->i_bool_items = 0;
+    /*module->handle = garbage */
+    module->psz_filename = NULL;
+    module->b_builtin = false;
+    module->b_loaded = false;
 
+    (void)obj;
     return module;
 }
 
 
+static void vlc_submodule_destruct (gc_object_t *obj)
+{
+    module_t *module = vlc_priv (obj, module_t);
+    free (module);
+}
+
 module_t *vlc_submodule_create (module_t *module)
 {
     assert (module != NULL);
-    assert (!module->b_submodule); // subsubmodules are not supported
 
-    module_t *submodule =
-        (module_t *)vlc_custom_create (VLC_OBJECT (module), sizeof (module_t),
-                                       VLC_OBJECT_MODULE, "submodule");
+    module_t *submodule = malloc (sizeof (*submodule));
     if (submodule == NULL)
         return NULL;
 
-    vlc_object_attach (submodule, module);
-    submodule->b_submodule = true;
+    memset (submodule, 0, sizeof (*submodule));
+    vlc_gc_init (submodule, vlc_submodule_destruct);
+
+    submodule->next = module->submodule;
+    submodule->parent = module;
+    module->submodule = submodule;
+    module->submodule_count++;
 
     /* Muahahaha! Heritage! Polymorphism! Ugliness!! */
     memcpy (submodule->pp_shortcuts, module->pp_shortcuts,
@@ -80,6 +118,7 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->psz_capability = module->psz_capability;
     submodule->i_score = module->i_score;
     submodule->i_cpu = module->i_cpu;
+    submodule->b_submodule = true;
     return submodule;
 }
 
@@ -220,7 +259,7 @@ module_config_t *vlc_config_create (module_t *module, int type)
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
     tab[confsize].i_type = type;
-    tab[confsize].p_lock = &(vlc_internals(module)->lock);
+    tab[confsize].p_lock = &module->lock;
 
     if (type & CONFIG_ITEM)
     {

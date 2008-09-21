@@ -131,6 +131,7 @@ void __module_InitBank( vlc_object_t *p_this )
         p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
         p_bank->b_cache = p_bank->b_cache_dirty =
         p_bank->b_cache_delete = false;
+        p_bank->head = NULL;
 
         /* Everything worked, attach the object */
         p_module_bank = p_bank;
@@ -325,6 +326,56 @@ const char *module_GetHelp( const module_t *m )
 }
 
 /**
+ * Frees the flat list of VLC modules.
+ * @param list list obtained by module_list_get
+ * @param length number of items on the list
+ * @return nothing.
+ */
+void module_list_free (module_t **list)
+{
+    if (list == NULL)
+        return;
+
+    for (size_t i = 0; list[i] != NULL; i++)
+         module_release (list[i]);
+    free (list);
+}
+
+/**
+ * Gets the flat list of VLC modules.
+ * @param n [OUT] pointer to the number of modules or NULL
+ * @return NULL-terminated table of module pointers
+ *         (release with module_list_free()), or NULL in case of error.
+ */
+module_t **module_list_get (size_t *n)
+{
+    /* TODO: this whole module lookup is quite inefficient */
+    /* Remove this and improve module_Need */
+    module_t **tab = NULL;
+    size_t i = 0;
+
+    for (module_t *mod = p_module_bank->head; mod; mod = mod->next)
+    {
+         module_t **nt;
+         nt  = realloc (tab, (i + 2 + mod->submodule_count) * sizeof (*tab));
+         if (nt == NULL)
+         {
+             module_list_free (tab);
+             return NULL;
+         }
+
+         tab = nt;
+         tab[i++] = module_hold (mod);
+         for (module_t *subm = mod->submodule; subm; subm = subm->next)
+             tab[i++] = module_hold (subm);
+         tab[i] = NULL;
+    }
+    if (n != NULL)
+        *n = i;
+    return tab;
+}
+
+/**
  * module Need
  *
  * Return the best module function, given a capability list.
@@ -356,7 +407,6 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     };
 
     module_list_t *p_list, *p_first, *p_tmp;
-    vlc_list_t *p_all;
 
     int i_which_module, i_index = 0;
 
@@ -418,17 +468,17 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
 
     /* Sort the modules and test them */
-    p_all = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    p_list = malloc( p_all->i_count * sizeof( module_list_t ) );
+    size_t count;
+    module_t **p_all = module_list_get (&count);
+    p_list = malloc( count * sizeof( module_list_t ) );
     p_first = NULL;
     unsigned i_cpu = vlc_CPU();
 
     /* Parse the module list for capabilities and probe each of them */
-    for( i_which_module = 0; i_which_module < p_all->i_count; i_which_module++ )
+    for( i_which_module = 0; i_which_module < count; i_which_module++ )
     {
         int i_shortcut_bonus = 0;
-
-        p_module = (module_t *)p_all->p_values[i_which_module].p_object;
+        p_module = p_all[i_which_module];
 
         /* Test that this module can do what we need */
         if( !module_IsCapable( p_module, psz_capability ) )
@@ -536,12 +586,12 @@ found_shortcut:
     p_tmp = p_first;
     while( p_tmp != NULL )
     {
-        vlc_object_hold( p_tmp->p_module );
+        module_hold( p_tmp->p_module );
         p_tmp = p_tmp->p_next;
     }
 
     /* We can release the list, interesting modules were held */
-    vlc_list_release( p_all );
+    module_list_free (p_all);
 
     /* Parse the linked list and use the first successful module */
     p_tmp = p_first;
@@ -551,7 +601,7 @@ found_shortcut:
         /* Make sure the module is loaded in mem */
         module_t *p_module = p_tmp->p_module;
         if( p_module->b_submodule )
-            p_module = (module_t *)p_module->p_parent;
+            p_module = p_module->parent;
 
         if( !p_module->b_builtin && !p_module->b_loaded )
         {
@@ -572,7 +622,7 @@ found_shortcut:
             break;
         }
 
-        vlc_object_release( p_tmp->p_module );
+        module_release( p_tmp->p_module );
         p_tmp = p_tmp->p_next;
     }
 
@@ -590,7 +640,7 @@ found_shortcut:
     /* Unlock the remaining modules */
     while( p_tmp != NULL )
     {
-        vlc_object_release( p_tmp->p_module );
+        module_release( p_tmp->p_module );
         p_tmp = p_tmp->p_next;
     }
 
@@ -667,7 +717,7 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
 
     msg_Dbg( p_this, "removing module \"%s\"", p_module->psz_object_name );
 
-    vlc_object_release( p_module );
+    module_release( p_module );
 }
 
 /**
@@ -679,23 +729,24 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
  */
 module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
 {
-    vlc_list_t *p_list;
-    int i;
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( i = 0 ; i < p_list->i_count; i++)
+    module_t **list, *module;
+
+    list = module_list_get (NULL);
+    if (!list)
+        return NULL;
+
+    for (size_t i = 0; (module = list[i]) != NULL; i++)
     {
-        module_t *p_module = ((module_t *) p_list->p_values[i].p_object);
-        const char *psz_module_name = p_module->psz_object_name;
+        const char *psz_module_name = module->psz_object_name;
+
         if( psz_module_name && !strcmp( psz_module_name, psz_name ) )
         {
-            /* We can release the list, and return yes */
-            vlc_object_hold( p_module );
-            vlc_list_release( p_list );
-            return p_module;
+            module_hold (module);
+            break;
         }
     }
-    vlc_list_release( p_list );
-    return NULL;
+    module_list_free (list);
+    return module;
 }
 
 
@@ -707,7 +758,7 @@ module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
  */
 void module_Put( module_t *module )
 {
-    vlc_object_release( module );
+    module_release( module );
 }
 
 
@@ -748,16 +799,17 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
                                                const char *psz_capability,
                                                char ***pppsz_longname )
 {
-    vlc_list_t *p_list;
-    int i, j, count = 0;
+    size_t count = 0;
     char **psz_ret;
 
+    module_t **list = module_list_get (NULL);
+
     /* Do it in two passes : count the number of modules before */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( i = 0 ; i < p_list->i_count; i++)
+    for (size_t i = 0; list[i]; i++)
     {
-        module_t *p_module = ((module_t *) p_list->p_values[i].p_object);
+        module_t *p_module = list[i];
         const char *psz_module_capability = p_module->psz_capability;
+
         if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
             count++;
     }
@@ -770,15 +822,15 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
         free( psz_ret );
         free( *pppsz_longname );
         *pppsz_longname = NULL;
-        vlc_list_release( p_list );
+        module_list_free (list);
         return NULL;
     }
 
-    j = 0;
-    for( i = 0 ; i < p_list->i_count; i++)
+    for (size_t i = 0, j = 0; list[i]; i++)
     {
-        module_t *p_module = ((module_t *) p_list->p_values[i].p_object);
+        module_t *p_module = list[i];
         const char *psz_module_capability = p_module->psz_capability;
+
         if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
         {
             int k = -1; /* hack to handle submodules properly */
@@ -796,7 +848,7 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
     }
     psz_ret[count] = NULL;
 
-    vlc_list_release( p_list );
+    module_list_free (list);
 
     return psz_ret;
 }
@@ -1192,8 +1244,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
 
         /* msg_Dbg( p_this, "plugin \"%s\", %s",
                     p_module->psz_object_name, p_module->psz_longname ); */
-
-        vlc_object_attach( p_module, p_module_bank );
+        p_module->next = p_module_bank->head;
+        p_module_bank->head = p_module;
 
         if( !p_module_bank->b_cache )
             return 0;
@@ -1248,10 +1300,10 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     p_module->b_loaded = true;
 
     /* Initialize the module: fill p_module, default config */
-    if( module_Call( VLC_OBJECT(p_module), p_module ) != 0 )
+    if( module_Call( p_this, p_module ) != 0 )
     {
         /* We couldn't call module_init() */
-        vlc_object_release( p_module );
+        module_release( p_module );
         module_Unload( handle );
         return NULL;
     }
@@ -1274,7 +1326,6 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
 static void DupModule( module_t *p_module )
 {
     char **pp_shortcut;
-    int i_submodule;
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
     {
@@ -1290,10 +1341,8 @@ static void DupModule( module_t *p_module )
     p_module->psz_help = p_module->psz_help ? strdup( p_module->psz_help )
                                             : NULL;
 
-    for( i_submodule = 0; i_submodule < vlc_internals( p_module )->i_children; i_submodule++ )
-    {
-        DupModule( (module_t*)vlc_internals( p_module )->pp_children[ i_submodule ] );
-    }
+    for (module_t *subm = p_module->submodule; subm; subm = subm->next)
+        DupModule (subm);
 }
 
 /*****************************************************************************
@@ -1304,12 +1353,9 @@ static void DupModule( module_t *p_module )
 static void UndupModule( module_t *p_module )
 {
     char **pp_shortcut;
-    int i_submodule;
 
-    for( i_submodule = 0; i_submodule < vlc_internals( p_module )->i_children; i_submodule++ )
-    {
-        UndupModule( (module_t*)vlc_internals( p_module )->pp_children[ i_submodule ] );
-    }
+    for (module_t *subm = p_module->submodule; subm; subm = subm->next)
+        UndupModule (subm);
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
     {
@@ -1349,17 +1395,19 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
         msg_Err( p_this, "failed calling entry point in builtin module" );
-        vlc_object_release( p_module );
+        module_release( p_module );
         return -1;
     }
 
     /* Everything worked fine ! The module is ready to be added to the list. */
     p_module->b_builtin = true;
+    /* LOCK */
+    p_module->next = p_module_bank->head;
+    p_module_bank->head = p_module;
+    /* UNLOCK */
 
     /* msg_Dbg( p_this, "builtin \"%s\", %s",
                 p_module->psz_object_name, p_module->psz_longname ); */
-
-    vlc_object_attach( p_module, p_module_bank );
 
     return 0;
 }
@@ -1372,9 +1420,6 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
 static void DeleteModule( module_t * p_module, bool b_detach )
 {
     assert( p_module );
-
-    if( b_detach )
-        vlc_object_detach( p_module );
 
     /* We free the structures that we strdup()ed in Allocate*Module(). */
 #ifdef HAVE_DYNAMIC_PLUGINS
@@ -1390,13 +1435,13 @@ static void DeleteModule( module_t * p_module, bool b_detach )
 #endif
 
     /* Free and detach the object's children */
-    while( vlc_internals( p_module )->i_children )
+    while (p_module->submodule)
     {
-        vlc_object_t *p_this = vlc_internals( p_module )->pp_children[0];
-        vlc_object_detach( p_this );
-        vlc_object_release( p_this );
+        module_t *submodule = p_module->submodule;
+        p_module->submodule = submodule->next;
+        module_release (submodule);
     }
 
     config_Free( p_module );
-    vlc_object_release( p_module );
+    module_release( p_module );
 }

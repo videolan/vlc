@@ -56,6 +56,8 @@ struct module_bank_t
 
     int            i_loaded_cache;
     module_cache_t **pp_loaded_cache;
+
+    module_t       *head;
 };
 
 /*****************************************************************************
@@ -98,7 +100,13 @@ typedef shl_t module_handle_t;
  */
 struct module_t
 {
-    VLC_COMMON_MEMBERS
+    char       *psz_object_name;
+    module_t   *next;
+    module_t   *submodule;
+    module_t   *parent;
+    unsigned    submodule_count;
+    gc_object_t vlc_gc_data;
+    vlc_mutex_t lock;
 
     /*
      * Variables set by the module to identify itself
@@ -141,6 +149,16 @@ struct module_t
     bool          b_loaded;        /* Set to true if the dll is loaded */
 };
 
+static inline module_t *module_hold (module_t *m)
+{
+    vlc_hold (&m->vlc_gc_data);
+    return m;
+}
+
+static inline void module_release (module_t *m)
+{
+    vlc_release (&m->vlc_gc_data);
+}
 
 #define module_InitBank(a)     __module_InitBank(VLC_OBJECT(a))
 void  __module_InitBank        ( vlc_object_t * );
