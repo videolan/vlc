@@ -45,7 +45,6 @@ vlc_module_end ();
 struct intf_sys_t
 {
     vlc_thread_t    thread;
-    int             signum;
 };
 
 static int Open (vlc_object_t *obj)
@@ -56,7 +55,6 @@ static int Open (vlc_object_t *obj)
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
-    p_sys->signum = 0;
     intf->p_sys = p_sys;
 
     if (vlc_clone (&p_sys->thread, SigThread, obj, VLC_THREAD_PRIORITY_LOW))
@@ -89,7 +87,6 @@ static void Close (vlc_object_t *obj)
 static void *SigThread (void *data)
 {
     intf_thread_t *obj = data;
-    intf_sys_t *p_sys = obj->p_sys;
     sigset_t set;
 
     sigemptyset (&set);
@@ -119,7 +116,7 @@ static void *SigThread (void *data)
             case SIGTERM:
             case SIGQUIT:
                 msg_Err (obj, "Caught %s signal, exiting...",
-                         strsignal (p_sys->signum));
+                         strsignal (signum));
                 vlc_object_kill (obj->p_libvlc);
                 break;
         }
