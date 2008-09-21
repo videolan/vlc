@@ -56,6 +56,8 @@
 }
 - (void)controlTintChanged;
 
+- (id)getVoutView;
+
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
 - (IBAction)faster:(id)sender;

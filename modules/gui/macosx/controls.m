@@ -158,9 +158,9 @@
     var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
 }
 
-/* Small helper method (Private) */
+/* FIXME: I want to be Private */
 
-- (id)_voutView
+- (id)getVoutView
 {
     id window;
     id voutView = nil;
