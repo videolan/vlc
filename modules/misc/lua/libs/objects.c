@@ -90,7 +90,6 @@ static int vlc_object_type_from_string( const char *psz_name )
         const char *psz_name;
     } pp_objects[] =
         { { VLC_OBJECT_LIBVLC, "libvlc" },
-          { VLC_OBJECT_MODULE, "module" },
           { VLC_OBJECT_INTF, "intf" },
           { VLC_OBJECT_INPUT, "input" },
           { VLC_OBJECT_DECODER, "decoder" },
