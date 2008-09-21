@@ -427,8 +427,8 @@ static void *Init( vlc_object_t *obj )
 
     /* Retrieve last known path used in file browsing */
     char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
-    p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? psz_path
-                                                        : config_GetHomeDir();
+    p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? config_GetHomeDir()
+                                                        : psz_path;
 
     /* Launch */
     app->exec();

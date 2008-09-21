@@ -297,7 +297,11 @@ QMenu *QVLCMenu::FileMenu()
     QMenu *menu = new QMenu();
 
     addDPStaticEntry( menu, qtr( "&Open File..." ), "",
-        ":/file-asym", SLOT( openFileDialog() ), "Ctrl+O" );
+#ifdef WIN32
+        ":/file-asym", SLOT( simpleOpenDialog() ), "Ctrl+O" );
+    addDPStaticEntry( menu, qtr( "Advanced Open File..." ), "",
+#endif
+        ":/file-asym", SLOT( openFileDialog() ), "" );
     addDPStaticEntry( menu, qtr( I_OPEN_FOLDER ), "",
         ":/folder-grey", SLOT( PLOpenDir() ), "Ctrl+F" );
     addDPStaticEntry( menu, qtr( "Open &Disc..." ), "",
