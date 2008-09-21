@@ -845,6 +845,16 @@ static uint8_t *hash_sha1_from_file( const char *psz_file,
         gcry_md_write( hd, p_sig->specific.v4.hashed_data_len, 2 );
         size_t i_len = scalar_number( p_sig->specific.v4.hashed_data_len, 2 );
         gcry_md_write( hd, p_sig->specific.v4.hashed_data, i_len );
+
+        gcry_md_putc( hd, 0x04 );
+        gcry_md_putc( hd, 0xFF );
+
+        i_len += 6; /* hashed data + 6 bytes header */
+
+        gcry_md_putc( hd, (i_len >> 24) & 0xff );
+        gcry_md_putc( hd, (i_len >> 16) & 0xff );
+        gcry_md_putc( hd, (i_len >> 8) & 0xff );
+        gcry_md_putc( hd, (i_len) & 0xff );
     }
     else
     {   /* RFC 4880 only tells about versions 3 and 4 */
@@ -978,9 +988,9 @@ static uint8_t *key_sign_hash( public_key_t *p_pkey )
 
     size_t i_len = strlen((char*)p_pkey->psz_username);
 
-    gcry_md_putc( hd, (i_len << 24) & 0xff );
-    gcry_md_putc( hd, (i_len << 16) & 0xff );
-    gcry_md_putc( hd, (i_len << 8) & 0xff );
+    gcry_md_putc( hd, (i_len >> 24) & 0xff );
+    gcry_md_putc( hd, (i_len >> 16) & 0xff );
+    gcry_md_putc( hd, (i_len >> 8) & 0xff );
     gcry_md_putc( hd, (i_len) & 0xff );
 
     gcry_md_write( hd, p_pkey->psz_username, i_len );
@@ -1000,14 +1010,14 @@ static uint8_t *key_sign_hash( public_key_t *p_pkey )
 
     i_hashed_data_len += 6; /* hashed data + 6 bytes header */
 
-    gcry_md_putc( hd, (i_hashed_data_len << 24) & 0xff);
-    gcry_md_putc( hd, (i_hashed_data_len << 16) &0xff );
-    gcry_md_putc( hd, (i_hashed_data_len << 8) & 0xff );
+    gcry_md_putc( hd, (i_hashed_data_len >> 24) & 0xff );
+    gcry_md_putc( hd, (i_hashed_data_len >> 16) & 0xff );
+    gcry_md_putc( hd, (i_hashed_data_len >> 8) & 0xff );
     gcry_md_putc( hd, (i_hashed_data_len) & 0xff );
 
     gcry_md_final( hd );
 
-    uint8_t *p_tmp = gcry_md_read( hd, GCRY_MD_SHA1);
+    uint8_t *p_tmp = gcry_md_read( hd, GCRY_MD_SHA1 );
 
     if( !p_tmp ||
         p_tmp[0] != p_pkey->sig.hash_verification[0] ||
@@ -1309,9 +1319,9 @@ static bool GetUpdateFile( update_t *p_update )
 
         i_len += 6; /* hashed data + 6 bytes header */
 
-        gcry_md_putc( hd, (i_len << 24) & 0xff);
-        gcry_md_putc( hd, (i_len << 16) &0xff );
-        gcry_md_putc( hd, (i_len << 8) & 0xff );
+        gcry_md_putc( hd, (i_len >> 24) & 0xff );
+        gcry_md_putc( hd, (i_len >> 16) & 0xff );
+        gcry_md_putc( hd, (i_len >> 8) & 0xff );
         gcry_md_putc( hd, (i_len) & 0xff );
     }
     else
@@ -1712,7 +1722,7 @@ end:
     p_udt->p_update->p_download = NULL;
 
     vlc_object_release( p_udt );
-    vlc_restorecancel (canc);
+    vlc_restorecancel( canc );
     return NULL;
 }
 
