@@ -375,7 +375,6 @@ __str_format_meta
 str_format_time
 subpicture_Delete
 subpicture_New
-subpicture_region_New
 subpicture_region_ChainDelete
 subpicture_region_Delete
 subpicture_region_New
