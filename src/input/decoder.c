@@ -80,6 +80,7 @@ struct decoder_owner_sys_t
 
     vout_thread_t   *p_spu_vout;
     int              i_spu_channel;
+    int64_t          i_spu_order;
 
     sout_instance_t         *p_sout;
     sout_packetizer_input_t *p_sout_input;
@@ -476,6 +477,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->p_owner->p_vout = NULL;
     p_dec->p_owner->p_spu_vout = NULL;
     p_dec->p_owner->i_spu_channel = 0;
+    p_dec->p_owner->i_spu_order = 0;
     p_dec->p_owner->p_sout = p_sout;
     p_dec->p_owner->p_sout_input = NULL;
     p_dec->p_owner->p_packetizer = NULL;
@@ -1454,6 +1456,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
     {
         spu_Control( p_vout->p_spu, SPU_CHANNEL_REGISTER,
                      &p_sys->i_spu_channel );
+        p_sys->i_spu_order = 0;
         p_sys->p_spu_vout = p_vout;
     }
 
@@ -1461,6 +1464,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
     if( p_subpic )
     {
         p_subpic->i_channel = p_sys->i_spu_channel;
+        p_subpic->i_order = p_sys->i_spu_order++;
         p_subpic->b_subtitle = true;
     }
 
