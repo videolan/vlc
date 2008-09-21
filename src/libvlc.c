@@ -76,12 +76,6 @@
 #   include <hal/libhal.h>
 #endif
 
-#if defined(__GNUC__)
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
-#define USE_SYNC
-#endif
-#endif
-
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
@@ -131,8 +125,9 @@ void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
     p_gc->pf_destructor = pf_destruct;
 
     p_gc->refs = 1;
-#ifdef USE_SYNC
+#if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
     __sync_synchronize ();
+#elif defined (WIN32)
 #elif defined(__APPLE__)
     OSMemoryBarrier ();
 #else
@@ -154,13 +149,13 @@ void *vlc_hold (gc_object_t * p_gc)
     uintptr_t refs;
     assert( p_gc );
 
-#if defined (WIN32)
+#if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+    refs = __sync_fetch_and_add (&p_gc->refs, 1);
+#elif defined (WIN32)
     refs = -1 +
         __builtin_choose_expr (sizeof (uintptr_t) == 4,
             InterlockedIncrement (&p_gc->refs),
             InterlockedIncrement64 (&p_gc->refs));
-#elif defined (USE_SYNC)
-    refs = __sync_fetch_and_add (&p_gc->refs, 1);
 #elif defined(__APPLE__)
     refs = OSAtomicIncrement32Barrier((int*)&p_gc->refs) - 1;
 #else
@@ -182,13 +177,13 @@ void vlc_release (gc_object_t *p_gc)
 
     assert( p_gc );
 
-#if defined (WIN32)
+#if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+    refs = __sync_fetch_and_sub (&p_gc->refs, 1);
+#elif defined (WIN32)
     refs = 1 +
         __builtin_choose_expr (sizeof (uintptr_t) == 4,
             InterlockedDecrement (&p_gc->refs),
             InterlockedDecrement64 (&p_gc->refs));
-#elif defined (USE_SYNC)
-    refs = __sync_fetch_and_sub (&p_gc->refs, 1);
 #elif defined(__APPLE__)
     refs = OSAtomicDecrement32Barrier((int*)&p_gc->refs) + 1;
 #else
