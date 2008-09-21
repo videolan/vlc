@@ -114,6 +114,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_file( "oss-audio-device", "/dev/dsp", aout_FindAndRestart,
               N_("OSS DSP device"), NULL, false );
+        add_deprecated_alias( "dspdev" );   /* deprecated since 0.9.3 */
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, true );
 
     set_capability( "audio output", 100 );
