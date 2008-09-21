@@ -74,6 +74,8 @@
   <file alias="pause_b">pixmaps/pause.png</file>
   <file alias="play">pixmaps/play_16px.png</file>
   <file alias="play_b">pixmaps/play.png</file>
+  <file alias="faster">pixmaps/faster.png</file>
+  <file alias="slower">pixmaps/slower.png</file>
   <file alias="previous">pixmaps/previous_16px.png</file>
   <file alias="previous_b">pixmaps/previous.png</file>
   <file alias="stop">pixmaps/stop_16px.png</file>

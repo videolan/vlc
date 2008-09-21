@@ -518,14 +518,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     slowerButton->setMaximumSize( QSize( 26, 20 ) );
     slowerButton->setFocusPolicy( Qt::NoFocus );
 
-    BUTTON_SET_ACT( slowerButton, "-", qtr( "Slower" ), slower() );
+    BUTTON_SET_ACT_I( slowerButton, "", slower, qtr( "Slower" ), slower() );
 
     fasterButton = new QToolButton;
     fasterButton->setAutoRaise( true );
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
     fasterButton->setFocusPolicy( Qt::NoFocus );
 
-    BUTTON_SET_ACT( fasterButton, "+", qtr( "Faster" ), faster() );
+    BUTTON_SET_ACT_I( fasterButton, "", faster, qtr( "Faster" ), faster() );
 
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
