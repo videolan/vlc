@@ -77,7 +77,7 @@
 #endif
 
 #if defined(__GNUC__)
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 0)
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 4)
 #define USE_SYNC
 #endif
 #endif
