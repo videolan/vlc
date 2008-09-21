@@ -344,10 +344,12 @@ static VLCWizard *_o_sharedInstance = nil;
     [[o_t2_matrix_inputSourceType cellAtRow:1 column:0] setTitle:
         _NS("Existing playlist item")];
     [o_t2_btn_chooseFile setTitle: _NS("Choose...")];
-    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"1"] headerCell]
+    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"name"] headerCell]
         setStringValue: _NS("Title")];
-    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"2"] headerCell]
+    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"artist"] headerCell]
         setStringValue: _NS("Author")];
+    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"duration"] headerCell]
+     setStringValue: _NS("Duration")];
     [o_t2_box_prtExtrct setTitle: _NS("Partial Extract")];
     [o_t2_ckb_enblPartExtrct setTitle: _NS("Enable")];
     [o_t2_ckb_enblPartExtrct setToolTip: _NS("This can be used to read only a "
