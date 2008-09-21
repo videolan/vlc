@@ -451,8 +451,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     else
     {
         /* Decode SSA/USF strings */
-        if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') )
-            ParseSSAString( p_dec, psz_subtitle, p_spu );
+        ParseSSAString( p_dec, psz_subtitle, p_spu );
 
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
