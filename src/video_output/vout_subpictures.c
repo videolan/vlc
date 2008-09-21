@@ -191,7 +191,7 @@ spu_t *__spu_Create( vlc_object_t *p_this )
 {
     spu_t *p_spu;
     spu_private_t *p_sys;
-    
+ 
     p_spu = vlc_custom_create( p_this, sizeof(spu_t) + sizeof(spu_private_t),
                                VLC_OBJECT_GENERIC, "subpicture" );
 
@@ -613,7 +613,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
             b_late = b_stop_valid && p_current->i_stop <= display_date;
 
             /* start_date will be used for correct automatic overlap support
-             * in case picture that should not be displayed anymore (display_time) 
+             * in case picture that should not be displayed anymore (display_time)
              * overlap with a picture to be displayed (p_current->i_start)  */
             if( !b_late && !p_current->b_ephemer )
                 start_date = p_current->i_start;
@@ -1601,7 +1601,7 @@ static int IntegerCmp( int64_t i0, int64_t i1 )
     return i0 < i1 ? -1 : i0 > i1 ? 1 : 0;
 }
 /**
- * This function compares 2 subpictures using the following properties 
+ * This function compares 2 subpictures using the following properties
  * (ordered by priority)
  * 1. absolute positionning
  * 2. start time
