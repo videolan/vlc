@@ -39,9 +39,7 @@
  *****************************************************************************/
 struct module_bank_t
 {
-    VLC_COMMON_MEMBERS
-
-    int              i_usage;
+    unsigned         i_usage;
 
     bool             b_builtins;
     bool             b_plugins;

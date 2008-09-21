@@ -491,8 +491,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         b_exit = true;
     }
 
-    msg_Dbg( p_libvlc, "module bank initialized, found %i modules",
-             vlc_internals( p_module_bank )->i_children );
+    size_t module_count;
+    module_t **list = module_list_get( &module_count );
+    module_list_free( list );
+    msg_Dbg( p_libvlc, "module bank initialized (%u modules)", module_count );
 
     /* Check for help on modules */
     if( (p_tmp = config_GetPsz( p_libvlc, "module" )) )

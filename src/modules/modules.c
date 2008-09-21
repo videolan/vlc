@@ -124,8 +124,7 @@ void __module_InitBank( vlc_object_t *p_this )
 
     if( p_module_bank == NULL )
     {
-        p_bank = vlc_custom_create( p_this, sizeof(module_bank_t),
-                                    VLC_OBJECT_GENERIC, "module bank");
+        p_bank = calloc (1, sizeof(*p_bank));
         p_bank->i_usage = 1;
         p_bank->i_cache = p_bank->i_loaded_cache = 0;
         p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
@@ -160,26 +159,24 @@ void __module_InitBank( vlc_object_t *p_this )
  */
 void __module_EndBank( vlc_object_t *p_this )
 {
-    module_t * p_next = NULL;
+    module_bank_t *p_bank;
 
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
-    if( !p_module_bank )
+    p_bank = p_module_bank;
+    assert (p_bank != NULL);
+    if( --p_bank->i_usage > 0 )
     {
         vlc_mutex_unlock( lock );
         return;
     }
-    if( --p_module_bank->i_usage )
-    {
-        vlc_mutex_unlock( lock );
-        return;
-    }
+    /*FIXME: For thread safety, we need to:
+    p_module_bank = NULL; - immediately, but that will crash the cache */
     vlc_mutex_unlock( lock );
 
     /* Save the configuration */
     config_AutoSaveConfigFile( p_this );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-# define p_bank p_module_bank
     if( p_bank->b_cache ) CacheSave( p_this );
     while( p_bank->i_loaded_cache-- )
     {
@@ -209,17 +206,13 @@ void __module_EndBank( vlc_object_t *p_this )
         free( p_bank->pp_cache );
         p_bank->pp_cache = NULL;
     }
-# undef p_bank
 #endif
 
-    while( vlc_internals( p_module_bank )->i_children )
-    {
-        p_next = (module_t *)vlc_internals( p_module_bank )->pp_children[0];
-        DeleteModule( p_next, true );
-    }
+    while( p_bank->head != NULL )
+        DeleteModule( p_bank->head, true );
 
-    vlc_object_release( p_module_bank );
-    p_module_bank = NULL;
+    p_module_bank = NULL; /* FIXME: do this inside the lock */
+    free( p_bank );
 }
 
 /**
@@ -1412,6 +1405,13 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
 static void DeleteModule( module_t * p_module, bool b_detach )
 {
     assert( p_module );
+
+    /* Unlist the module (if it is in the list) */
+    module_t **pp_self = &p_module_bank->head;
+    while (*pp_self != NULL && *pp_self != p_module)
+        pp_self = &((*pp_self)->next);
+    if (*pp_self)
+        *pp_self = p_module->next;
 
     /* We free the structures that we strdup()ed in Allocate*Module(). */
 #ifdef HAVE_DYNAMIC_PLUGINS
