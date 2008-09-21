@@ -357,7 +357,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         p_module = (module_t *)p_list->p_values[i_index].p_object;
-        if( !strcmp( module_GetObjName(p_module), "main" ) )
+        if( !strcmp( module_get_object(p_module), "main" ) )
             break;
     }
     if( i_index < p_list->i_count )
@@ -372,7 +372,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         /* Enumerate config categories and store a reference so we can
          * generate their config panel them when it is asked by the user. */
 
-        p_config = module_GetConfig( p_module, &i_confsize );
+        p_config = module_config_get( p_module, &i_confsize );
         for( size_t i = 0; i < i_confsize; i++ )
         {
             module_config_t *p_item = p_config + i;
@@ -495,7 +495,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             }
         }
 
-        module_PutConfig( p_config );
+        module_config_free( p_config );
     }
 
 
@@ -511,7 +511,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
         /* Exclude the main module */
-        if( !strcmp( module_GetObjName(p_module), "main" ) )
+        if( !strcmp( module_get_object(p_module), "main" ) )
             continue;
 #if 0
         /* Exclude empty plugins (submodules don't have config options, they
@@ -519,7 +519,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         if( module_IsSubModule(p_module) )
             continue;
 #endif
-        p_config = module_GetConfig( p_module, &i_confsize );
+        p_config = module_config_get( p_module, &i_confsize );
         for( size_t i = 0; i < i_confsize; i++ )
         {
             module_config_t *p_item = p_config + i;
@@ -611,7 +611,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         #else
         i_image = -1;
         #endif
-        AppendItem( subcategory_item, wxU( module_GetName(p_module, 0) ),
+        AppendItem( subcategory_item, wxU( module_get_name(p_module, 0) ),
                     i_image, -1, config_data );
     }
 
@@ -912,7 +912,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             for( i_index = 0; i_index < p_list->i_count; i_index++ )
             {
                 p_module = (module_t *)p_list->p_values[i_index].p_object;
-                if( !strcmp( module_GetObjName(p_module), "main" ) )
+                if( !strcmp( module_get_object(p_module), "main" ) )
                 {
                     b_found = true;
                     break;
@@ -931,10 +931,10 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
          *  parent module) */
 #if 0
         if( module_IsSubModule(p_module) )
-            p_start = module_GetConfig((module_t *)(((vlc_object_t *)p_module)->p_parent), &i_confsize);
+            p_start = module_config_get((module_t *)(((vlc_object_t *)p_module)->p_parent), &i_confsize);
         else
 #endif
-            p_start = module_GetConfig(p_module, &i_confsize);
+            p_start = module_config_get(p_module, &i_confsize);
 
         p_item = p_start;
         p_end = p_start + i_confsize;
@@ -1009,7 +1009,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             config_sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
         }
 
-        module_PutConfig( p_start );
+        module_config_free( p_start );
 
         config_sizer->Layout();
         config_window->SetSizer( config_sizer );

@@ -158,7 +158,7 @@ static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
     p_filter->p_cfg = p_cfg;
     p_filter->b_allow_fmt_out_change = p_chain->b_allow_fmt_out_change;
 
-    p_filter->p_module = module_Need( p_filter, p_chain->psz_capability,
+    p_filter->p_module = module_need( p_filter, p_chain->psz_capability,
                                       psz_name, psz_name ? true : false );
 
     if( !p_filter->p_module )
@@ -188,7 +188,7 @@ static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
         else
             msg_Err( p_chain->p_this, "Failed to create %s",
                      p_chain->psz_capability );
-        if( p_filter->p_module ) module_Unneed( p_filter,
+        if( p_filter->p_module ) module_unneed( p_filter,
                                                 p_filter->p_module );
         es_format_Clean( &p_filter->fmt_in );
         es_format_Clean( &p_filter->fmt_out );
@@ -283,7 +283,7 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *p_chain,
         p_chain->pf_buffer_allocation_clear( p_filter );
     vlc_object_detach( p_filter );
     if( p_filter->p_module )
-        module_Unneed( p_filter, p_filter->p_module );
+        module_unneed( p_filter, p_filter->p_module );
     vlc_object_release( p_filter );
 
     /* FIXME: check fmt_in/fmt_out consitency */

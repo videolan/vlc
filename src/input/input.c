@@ -2814,7 +2814,7 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
     if(! p_demux->p_private )
         return;
 
-    p_id3 = module_Need( p_demux, "meta reader", NULL, 0 );
+    p_id3 = module_need( p_demux, "meta reader", NULL, 0 );
     if( p_id3 )
     {
         demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
@@ -2832,7 +2832,7 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
                               p_demux_meta->i_attachments, p_demux_meta->attachments );
             vlc_mutex_unlock( &p_input->p->input.p_item->lock );
         }
-        module_Unneed( p_demux, p_id3 );
+        module_unneed( p_demux, p_id3 );
     }
     free( p_demux->p_private );
 }

@@ -219,7 +219,7 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
                                 intf_thread_t *_p_intf,
                                 const module_t *p_module )
   : wxPanel( parent, -1, wxDefaultPosition, wxDefaultSize ),
-    name( wxU(module_GetObjName(p_module)) ),
+    name( wxU(module_get_object(p_module)) ),
     p_advanced_mrl_combo( NULL ),
     p_intf( _p_intf ), p_open_dialog( dialog ), p_advanced_dialog( NULL )
 {
@@ -229,7 +229,7 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
     module_config_t *p_config;
     int n;
 
-    p_config = module_GetConfig (p_module, &i_confsize);
+    p_config = module_config_get (p_module, &i_confsize);
     for( n = 0; n < i_confsize; n++ )
     {
         module_config_t *p_item = p_config + n;
@@ -330,7 +330,7 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
         p_advanced_dialog->SetSizerAndFit( sizer );
     }
 
-    module_PutConfig (p_config);
+    module_config_free (p_config);
 
     this->SetSizerAndFit( sizer );
 }
@@ -507,46 +507,46 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     notebook->AddPage( NetPanel( notebook ), wxU(_("Network")),
                        i_access_method == NET_ACCESS );
 
-    module_t *p_module = module_Find( VLC_OBJECT(p_intf), "v4l" );
+    module_t *p_module = module_find( VLC_OBJECT(p_intf), "v4l" );
     if( p_module )
     {
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
+        notebook->AddPage( autopanel, wxU( module_get_name(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
         module_release (p_module);
     }
 
-    p_module = module_Find( VLC_OBJECT(p_intf), "pvr" );
+    p_module = module_find( VLC_OBJECT(p_intf), "pvr" );
     if( p_module )
     {
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
+        notebook->AddPage( autopanel, wxU( module_get_name(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
         module_release (p_module);
     }
 
-    p_module = module_Find( VLC_OBJECT(p_intf), "dvb" );
+    p_module = module_find( VLC_OBJECT(p_intf), "dvb" );
     if( p_module )
     {
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
+        notebook->AddPage( autopanel, wxU( module_get_name(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
         module_release (p_module);
     }
 
-    p_module = module_Find( VLC_OBJECT(p_intf), "dshow" );
+    p_module = module_find( VLC_OBJECT(p_intf), "dshow" );
     if( p_module )
     {
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
+        notebook->AddPage( autopanel, wxU( module_get_name(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
         module_release (p_module);
     }

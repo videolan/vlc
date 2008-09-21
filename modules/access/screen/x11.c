@@ -108,7 +108,7 @@ int screen_CloseCapture( demux_t *p_demux )
     XCloseDisplay( p_display );
     if( p_sys->p_blend )
     {
-        module_Unneed( p_sys->p_blend, p_sys->p_blend->p_module );
+        module_unneed( p_sys->p_blend, p_sys->p_blend->p_module );
         vlc_object_detach( p_sys->p_blend );
         vlc_object_release( p_sys->p_blend );
     }

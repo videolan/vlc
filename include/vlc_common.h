@@ -533,7 +533,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     /* Object properties */                                                 \
     volatile bool b_error;                  /**< set by the object */ \
     volatile bool b_die;                   /**< set by the outside */ \
-    bool b_force;      /**< set by the outside (eg. module_Need()) */ \
+    bool b_force;      /**< set by the outside (eg. module_need()) */ \
                                                                             \
     /** Just a reminder so that people don't cast garbage */                \
     bool be_sure_to_add_VLC_COMMON_MEMBERS_to_struct;                       \

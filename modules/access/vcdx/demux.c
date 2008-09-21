@@ -95,7 +95,7 @@ int VCDInit ( vlc_object_t *p_this )
     }
 
     p_input->p_private = (void*)&p_demux->mpeg;
-    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL, 0 );
+    p_demux->p_module = module_need( p_input, "mpeg-system", NULL, 0 );
     if( p_demux->p_module == NULL )
     {
         free( p_input->p_demux_data );
@@ -134,7 +134,7 @@ void VCDEnd ( vlc_object_t *p_this )
 
     p_vcd->p_intf = NULL;
 
-    module_Unneed( p_input, p_input->p_demux_data->p_module );
+    module_unneed( p_input, p_input->p_demux_data->p_module );
     free( p_input->p_demux_data );
 }
 

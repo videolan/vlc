@@ -254,7 +254,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC2( "directx-audio-device", IntegerList,
                     DirectXLabel, DirectXDevice );
 #else
-            if( module_Exists( p_intf, "alsa" ) )
+            if( module_exists( p_intf, "alsa" ) )
             {
                 audioControl( alsa );
                 optionWidgets.append( alsaControl );
@@ -264,7 +264,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             }
             else
                 optionWidgets.append( NULL );
-            if( module_Exists( p_intf, "oss" ) )
+            if( module_exists( p_intf, "oss" ) )
             {
                 audioControl2( OSS );
                 optionWidgets.append( OSSControl );
@@ -316,7 +316,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
-            if( module_Exists( p_intf, "audioscrobbler" ) )
+            if( module_exists( p_intf, "audioscrobbler" ) )
             {
                 CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
                         lastfm_user_edit );
@@ -422,9 +422,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             int i_cache = config_GetInt( p_intf, "file-caching");
 
             TestCaC( "udp-caching" );
-            if (module_Exists (p_intf, "dvdread"))
+            if (module_exists (p_intf, "dvdread"))
                 TestCaC( "dvdread-caching" );
-            if (module_Exists (p_intf, "dvdnav"))
+            if (module_exists (p_intf, "dvdnav"))
                 TestCaC( "dvdnav-caching" );
             TestCaC( "tcp-caching" );
             TestCaC( "fake-caching" ); TestCaC( "cdda-caching" );
@@ -432,18 +432,18 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             #ifdef WIN32
             TestCaC( "dshow-caching" );
             #else
-            if (module_Exists (p_intf, "v4l"))
+            if (module_exists (p_intf, "v4l"))
                 TestCaC( "v4l-caching" );
-            if (module_Exists (p_intf, "access_jack"))
+            if (module_exists (p_intf, "access_jack"))
                 TestCaC( "jack-input-caching" );
-            if (module_Exists (p_intf, "v4l2"))
+            if (module_exists (p_intf, "v4l2"))
                 TestCaC( "v4l2-caching" );
-            if (module_Exists (p_intf, "pvr"))
+            if (module_exists (p_intf, "pvr"))
                 TestCaC( "pvr-caching" );
             #endif
             TestCaCi( "rtsp-caching", 4 ); TestCaCi( "ftp-caching", 2 );
             TestCaCi( "http-caching", 4 );
-            if (module_Exists (p_intf, "access_realrtsp"))
+            if (module_exists (p_intf, "access_realrtsp"))
                 TestCaCi( "realrtsp-caching", 10 );
             TestCaCi( "mms-caching", 19 );
             if( b_cache_equal ) ui.cachingCombo->setCurrentIndex(
@@ -633,28 +633,28 @@ void SPrefsPanel::apply()
         if( i_comboValue )
         {
             CaC( "udp-caching" );
-            if (module_Exists (p_intf, "dvdread" ))
+            if (module_exists (p_intf, "dvdread" ))
                 CaC( "dvdread-caching" );
-            if (module_Exists (p_intf, "dvdnav" ))
+            if (module_exists (p_intf, "dvdnav" ))
                 CaC( "dvdnav-caching" );
             CaC( "tcp-caching" ); CaC( "vcd-caching" );
             CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
             CaC( "screen-caching" );
             CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
             CaCi( "http-caching", 4 );
-            if (module_Exists (p_intf, "access_realrtsp" ))
+            if (module_exists (p_intf, "access_realrtsp" ))
                 CaCi( "realrtsp-caching", 10 );
             CaCi( "mms-caching", 19 );
             #ifdef WIN32
             CaC( "dshow-caching" );
             #else
-            if (module_Exists (p_intf, "v4l" ))
+            if (module_exists (p_intf, "v4l" ))
                 CaC( "v4l-caching" );
-            if (module_Exists (p_intf, "access_jack" ))
+            if (module_exists (p_intf, "access_jack" ))
             CaC( "jack-input-caching" );
-            if (module_Exists (p_intf, "v4l2" ))
+            if (module_exists (p_intf, "v4l2" ))
                 CaC( "v4l2-caching" );
-            if (module_Exists (p_intf, "pvr" ))
+            if (module_exists (p_intf, "pvr" ))
                 CaC( "pvr-caching" );
             #endif
             //CaCi( "dv-caching" ) too short...

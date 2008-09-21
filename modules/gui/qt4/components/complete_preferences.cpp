@@ -75,14 +75,14 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 #undef BI
 
     /* Build the tree for the main module */
-    module_t *p_module = module_GetMainModule( p_intf );
+    module_t *p_module = module_get_main( p_intf );
 
     /* Initialisation and get the confsize */
     PrefsItemData *data = NULL;
     PrefsItemData *data_sub = NULL;
     QTreeWidgetItem *current_item = NULL;
     unsigned confsize;
-    module_config_t *const p_config = module_GetConfig (p_module, &confsize);
+    module_config_t *const p_config = module_config_get (p_module, &confsize);
 
     /* Go through the list of conf */
     for( size_t i = 0; i < confsize; i++ )
@@ -190,7 +190,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         /* Other items don't need yet a place on the tree */
         }
     }
-    module_PutConfig( p_config );
+    module_config_free( p_config );
     vlc_object_release( (vlc_object_t*)p_module );
 
 
@@ -203,11 +203,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
         // Main module excluded
-        if( module_IsMainModule( p_module) ) continue;
+        if( module_is_main( p_module) ) continue;
 
         unsigned i_subcategory = 0, i_category = 0, confsize;
         bool b_options = false;
-        module_config_t *const p_config = module_GetConfig (p_module, &confsize);
+        module_config_t *const p_config = module_config_get (p_module, &confsize);
 
         /* Loop through the configurations items */
         for (size_t i = 0; i < confsize; i++)
@@ -225,7 +225,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             if( b_options && i_category && i_subcategory )
                 break;
         }
-        module_PutConfig (p_config);
+        module_config_free (p_config);
 
         /* Dummy item, please proceed */
         if( !b_options || i_category == 0 || i_subcategory == 0 ) continue;
@@ -270,10 +270,10 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
         PrefsItemData *module_data = new PrefsItemData();
         module_data->i_type = TYPE_MODULE;
-        module_data->psz_name = strdup( module_GetObjName( p_module ) );
+        module_data->psz_name = strdup( module_get_object( p_module ) );
         module_data->help.clear();
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
-        module_item->setText( 0, qtr( module_GetName( p_module, false ) ) );
+        module_item->setText( 0, qtr( module_get_name( p_module, false ) ) );
         module_item->setData( 0, Qt::UserRole,
                               QVariant::fromValue( module_data) );
         module_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
@@ -358,15 +358,15 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( data->i_type == TYPE_CATEGORY )
         return;
     else if( data->i_type == TYPE_MODULE )
-        p_module = module_Find( p_intf, data->psz_name );
+        p_module = module_find( p_intf, data->psz_name );
     else
     {
-        p_module = module_GetMainModule( p_intf );
+        p_module = module_get_main( p_intf );
         assert( p_module );
     }
 
     unsigned confsize;
-    module_config_t *const p_config = module_GetConfig (p_module, &confsize),
+    module_config_t *const p_config = module_config_get (p_module, &confsize),
                     *p_item = p_config,
                     *p_end = p_config + confsize;
 
@@ -399,7 +399,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
     else
     {
-        const char *psz_help = module_GetHelp (p_module);
+        const char *psz_help = module_get_help (p_module);
         head = QString( qtr( module_GetLongName( p_module ) ) );
         if( psz_help )
         {

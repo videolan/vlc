@@ -272,12 +272,12 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( module_IsCapable( p_parser, p_item->psz_type ) )
+        if( module_provides( p_parser, p_item->psz_type ) )
         {
             combo->Append( wxU(module_GetLongName(p_parser)),
-                           (char *)module_GetObjName(p_parser) );
+                           (char *)module_get_object(p_parser) );
             if( p_item->value.psz && !strcmp(p_item->value.psz,
-                                             module_GetObjName(p_parser)) )
+                                             module_get_object(p_parser)) )
                 combo->SetValue( wxU(module_GetLongName(p_parser)) );
         }
     }
@@ -325,12 +325,12 @@ ModuleCatConfigControl::ModuleCatConfigControl( vlc_object_t *p_this,
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( !strcmp( module_GetObjName(p_parser), "main" ) )
+        if( !strcmp( module_get_object(p_parser), "main" ) )
               continue;
 
         unsigned int i_confsize;
         module_config_t *p_config, *p_start, *p_end;
-        p_start = module_GetConfig( p_parser, &i_confsize );
+        p_start = module_config_get( p_parser, &i_confsize );
         p_end = p_start + i_confsize;
 
         for( p_config = p_start; p_config < p_end; p_config++ )
@@ -340,14 +340,14 @@ ModuleCatConfigControl::ModuleCatConfigControl( vlc_object_t *p_this,
                 p_config->value.i == p_item->min.i )
             {
                 combo->Append( wxU(module_GetLongName(p_parser)),
-                               (char *)module_GetObjName(p_parser) );
+                               (char *)module_get_object(p_parser) );
                 if( p_item->value.psz &&
-                    !strcmp(p_item->value.psz, module_GetObjName(p_parser)) )
+                    !strcmp(p_item->value.psz, module_get_object(p_parser)) )
                     combo->SetValue( wxU(module_GetLongName(p_parser)) );
             }
         }
 
-        module_PutConfig( p_start );
+        module_config_free( p_start );
     }
     vlc_list_release( p_list );
 
@@ -400,13 +400,13 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( !strcmp( module_GetObjName(p_parser), "main" ) )
+        if( !strcmp( module_get_object(p_parser), "main" ) )
               continue;
 
         unsigned int i_confsize;
         module_config_t *p_config, *p_start, *p_end;
 
-        p_start = module_GetConfig( p_parser, &i_confsize );
+        p_start = module_config_get( p_parser, &i_confsize );
         p_end = p_start + i_confsize;
 
         for( p_config = p_start; p_config < p_end; p_config++ )
@@ -420,7 +420,7 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
                     new wxCheckBox( this, wxID_HIGHEST,
                                     wxU(module_GetLongName(p_parser)) );
 
-                mc->psz_module = strdup( module_GetObjName(p_parser) );
+                mc->psz_module = strdup( module_get_object(p_parser) );
                 pp_checkboxes.push_back( mc );
 
                 if( p_item->value.psz &&
@@ -432,7 +432,7 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
             }
         }
 
-        module_PutConfig( p_start );
+        module_config_free( p_start );
     }
     vlc_list_release( p_list );
 

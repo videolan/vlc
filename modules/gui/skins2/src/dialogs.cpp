@@ -115,7 +115,7 @@ Dialogs::~Dialogs()
         // Detach the dialogs provider from its parent interface
         vlc_object_detach( m_pProvider );
 
-        module_Unneed( m_pProvider, m_pModule );
+        module_unneed( m_pProvider, m_pModule );
         vlc_object_release( m_pProvider );
     }
 
@@ -166,7 +166,7 @@ bool Dialogs::init()
         return false;
     }
 
-    m_pModule = module_Need( m_pProvider, "dialogs provider", NULL, 0 );
+    m_pModule = module_need( m_pProvider, "dialogs provider", NULL, 0 );
     if( m_pModule == NULL )
     {
         msg_Err( getIntf(), "no suitable dialogs provider found (hint: compile the qt4 plugin, and make sure it is loaded properly)" );

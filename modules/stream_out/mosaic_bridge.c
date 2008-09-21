@@ -353,14 +353,14 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     //p_sys->p_decoder->p_cfg = p_sys->p_video_cfg;
 
     p_sys->p_decoder->p_module =
-        module_Need( p_sys->p_decoder, "decoder", "$codec", 0 );
+        module_need( p_sys->p_decoder, "decoder", "$codec", 0 );
 
     if( !p_sys->p_decoder->p_module || !p_sys->p_decoder->pf_decode_video )
     {
         if( p_sys->p_decoder->p_module )
         {
             msg_Err( p_stream, "instanciated a non video decoder" );
-            module_Unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
+            module_unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
         }
         else
         {
@@ -472,7 +472,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         decoder_owner_sys_t *p_owner = p_sys->p_decoder->p_owner;
 
         if( p_sys->p_decoder->p_module )
-            module_Unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
+            module_unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
         vlc_object_detach( p_sys->p_decoder );
         vlc_object_release( p_sys->p_decoder );
 

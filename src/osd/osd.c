@@ -80,7 +80,7 @@ static bool osd_ParserLoad( osd_menu_t *p_menu, const char *psz_file )
         else
             psz_type = (char*)"import-osd-xml";
 
-        p_menu->p_parser = module_Need( p_menu, "osd parser",
+        p_menu->p_parser = module_need( p_menu, "osd parser",
                                         psz_type, true );
         if( !p_menu->p_parser )
         {
@@ -96,7 +96,7 @@ static void osd_ParserUnload( osd_menu_t *p_menu )
         image_HandlerDelete( p_menu->p_image );
 
     if( p_menu->p_parser )
-        module_Unneed( p_menu, p_menu->p_parser );
+        module_unneed( p_menu, p_menu->p_parser );
 
     free( p_menu->psz_file );
 }

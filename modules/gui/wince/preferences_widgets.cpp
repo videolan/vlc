@@ -315,13 +315,13 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( module_IsCapable( p_parser, p_item->psz_type ) )
+        if( module_provides( p_parser, p_item->psz_type ) )
         {
             ComboBox_AddString( combo, _FROMMB(module_GetLongName( p_parser ) ));
             ComboBox_SetItemData( combo, i_index,
-                                  (void *) module_GetObjName( p_parser ) );
+                                  (void *) module_get_object( p_parser ) );
             if( p_item->value.psz && !strcmp( p_item->value.psz,
-                                             module_GetObjName( p_parser )) )
+                                             module_get_object( p_parser )) )
             {
                 ComboBox_SetCurSel( combo, i_index );
                 //ComboBox_SetText( combo, _FROMMB(p_parser->psz_longname) );

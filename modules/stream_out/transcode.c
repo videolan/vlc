@@ -1122,7 +1122,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
 
     id->p_decoder->p_module =
-        module_Need( id->p_decoder, "decoder", "$codec", 0 );
+        module_need( id->p_decoder, "decoder", "$codec", 0 );
     if( !id->p_decoder->p_module )
     {
         msg_Err( p_stream, "cannot find audio decoder" );
@@ -1158,13 +1158,13 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 
     id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
+        module_need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
     if( !id->p_encoder->p_module )
     {
         msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s)",
                  p_sys->psz_aenc ? p_sys->psz_aenc : "any",
                  (char *)&p_sys->i_acodec );
-        module_Unneed( id->p_decoder, id->p_decoder->p_module );
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
         return VLC_EGENERIC;
     }
@@ -1238,7 +1238,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
     {
 #if 1
-        module_Unneed( id->p_encoder, id->p_encoder->p_module );
+        module_unneed( id->p_encoder, id->p_encoder->p_module );
         id->p_encoder->p_module = NULL;
 
         /* This might work, but only if the encoder is restarted */
@@ -1260,14 +1260,14 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         /* reload encoder */
         id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
         id->p_encoder->p_module =
-            module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
+            module_need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
         if( !id->p_encoder->p_module ||
             fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels  ||
             fmt_last.i_codec != id->p_encoder->fmt_in.i_codec )
         {
             if( id->p_encoder->p_module )
             {
-                module_Unneed( id->p_encoder, id->p_encoder->p_module );
+                module_unneed( id->p_encoder, id->p_encoder->p_module );
                 id->p_encoder->p_module = NULL;
             }
             msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s)",
@@ -1317,12 +1317,12 @@ static void transcode_audio_close( sout_stream_id_t *id )
 
     /* Close decoder */
     if( id->p_decoder->p_module )
-        module_Unneed( id->p_decoder, id->p_decoder->p_module );
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
     id->p_decoder->p_module = NULL;
 
     /* Close encoder */
     if( id->p_encoder->p_module )
-        module_Unneed( id->p_encoder, id->p_encoder->p_module );
+        module_unneed( id->p_encoder, id->p_encoder->p_module );
     id->p_encoder->p_module = NULL;
 
     /* Close filters */
@@ -1508,7 +1508,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     /* id->p_decoder->p_cfg = p_sys->p_video_cfg; */
 
     id->p_decoder->p_module =
-        module_Need( id->p_decoder, "decoder", "$codec", 0 );
+        module_need( id->p_decoder, "decoder", "$codec", 0 );
 
     if( !id->p_decoder->p_module )
     {
@@ -1544,13 +1544,13 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     id->p_encoder->p_cfg = p_sys->p_video_cfg;
 
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "encoder", p_sys->psz_venc, true );
+        module_need( id->p_encoder, "encoder", p_sys->psz_venc, true );
     if( !id->p_encoder->p_module )
     {
         msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s)",
                  p_sys->psz_venc ? p_sys->psz_venc : "any",
                  (char *)&p_sys->i_vcodec );
-        module_Unneed( id->p_decoder, id->p_decoder->p_module );
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = 0;
         free( id->p_decoder->p_owner );
         return VLC_EGENERIC;
@@ -1558,7 +1558,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     /* Close the encoder.
      * We'll open it only when we have the first frame. */
-    module_Unneed( id->p_encoder, id->p_encoder->p_module );
+    module_unneed( id->p_encoder, id->p_encoder->p_module );
     if( id->p_encoder->fmt_out.p_extra )
     {
         free( id->p_encoder->fmt_out.p_extra );
@@ -1583,7 +1583,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
                                false ) )
         {
             msg_Err( p_stream, "cannot spawn encoder thread" );
-            module_Unneed( id->p_decoder, id->p_decoder->p_module );
+            module_unneed( id->p_decoder, id->p_decoder->p_module );
             id->p_decoder->p_module = 0;
             free( id->p_decoder->p_owner );
             return VLC_EGENERIC;
@@ -1765,7 +1765,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
              id->p_encoder->fmt_in.video.i_height );
 
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "encoder", p_sys->psz_venc, true );
+        module_need( id->p_encoder, "encoder", p_sys->psz_venc, true );
     if( !id->p_encoder->p_module )
     {
         msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s)",
@@ -1814,7 +1814,7 @@ static void transcode_video_close( sout_stream_t *p_stream,
 
     /* Close decoder */
     if( id->p_decoder->p_module )
-        module_Unneed( id->p_decoder, id->p_decoder->p_module );
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
 
     if( id->p_decoder->p_owner )
     {
@@ -1830,7 +1830,7 @@ static void transcode_video_close( sout_stream_t *p_stream,
 
     /* Close encoder */
     if( id->p_encoder->p_module )
-        module_Unneed( id->p_encoder, id->p_encoder->p_module );
+        module_unneed( id->p_encoder, id->p_encoder->p_module );
 
     /* Close filters */
     if( id->p_f_chain )
@@ -2329,7 +2329,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     /* id->p_decoder->p_cfg = p_sys->p_spu_cfg; */
 
     id->p_decoder->p_module =
-        module_Need( id->p_decoder, "decoder", "$codec", 0 );
+        module_need( id->p_decoder, "decoder", "$codec", 0 );
 
     if( !id->p_decoder->p_module )
     {
@@ -2347,11 +2347,11 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         id->p_encoder->p_cfg = p_sys->p_spu_cfg;
 
         id->p_encoder->p_module =
-            module_Need( id->p_encoder, "encoder", p_sys->psz_senc, true );
+            module_need( id->p_encoder, "encoder", p_sys->psz_senc, true );
 
         if( !id->p_encoder->p_module )
         {
-            module_Unneed( id->p_decoder, id->p_decoder->p_module );
+            module_unneed( id->p_decoder, id->p_decoder->p_module );
             msg_Err( p_stream, "cannot find spu encoder (%s)", p_sys->psz_senc );
             return VLC_EGENERIC;
         }
@@ -2370,11 +2370,11 @@ static void transcode_spu_close( sout_stream_id_t *id)
 {
     /* Close decoder */
     if( id->p_decoder->p_module )
-        module_Unneed( id->p_decoder, id->p_decoder->p_module );
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
 
     /* Close encoder */
     if( id->p_encoder->p_module )
-        module_Unneed( id->p_encoder, id->p_encoder->p_module );
+        module_unneed( id->p_encoder, id->p_encoder->p_module );
 }
 
 static int transcode_spu_process( sout_stream_t *p_stream,
@@ -2456,7 +2456,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         id->p_encoder->p_cfg = p_sys->p_osd_cfg;
 
         id->p_encoder->p_module =
-            module_Need( id->p_encoder, "encoder", p_sys->psz_osdenc, true );
+            module_need( id->p_encoder, "encoder", p_sys->psz_osdenc, true );
 
         if( !id->p_encoder->p_module )
         {
@@ -2491,7 +2491,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
  error:
     msg_Err( p_stream, "starting osd encoding thread failed" );
     if( id->p_encoder->p_module )
-            module_Unneed( id->p_encoder, id->p_encoder->p_module );
+            module_unneed( id->p_encoder, id->p_encoder->p_module );
     p_sys->b_osd = false;
     return VLC_EGENERIC;
 }
@@ -2504,7 +2504,7 @@ static void transcode_osd_close( sout_stream_t *p_stream, sout_stream_id_t *id)
     if( id )
     {
         if( id->p_encoder->p_module )
-            module_Unneed( id->p_encoder, id->p_encoder->p_module );
+            module_unneed( id->p_encoder, id->p_encoder->p_module );
     }
     p_sys->b_osd = false;
 }

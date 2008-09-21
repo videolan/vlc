@@ -797,7 +797,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Choose the best memcpy module
      */
-    priv->p_memcpy_module = module_Need( p_libvlc, "memcpy", "$memcpy", 0 );
+    priv->p_memcpy_module = module_need( p_libvlc, "memcpy", "$memcpy", 0 );
 
     priv->b_stats = config_GetInt( p_libvlc, "stats" ) > 0;
     priv->i_timers = 0;
@@ -834,7 +834,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         msg_Err( p_libvlc, "playlist initialization failed" );
         if( priv->p_memcpy_module != NULL )
         {
-            module_Unneed( p_libvlc, priv->p_memcpy_module );
+            module_unneed( p_libvlc, priv->p_memcpy_module );
         }
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
@@ -1121,7 +1121,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 
     if( priv->p_memcpy_module )
     {
-        module_Unneed( p_libvlc, priv->p_memcpy_module );
+        module_unneed( p_libvlc, priv->p_memcpy_module );
         priv->p_memcpy_module = NULL;
     }
 

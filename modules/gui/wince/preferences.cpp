@@ -388,11 +388,11 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         p_module = (module_t *)p_list->p_values[i_index].p_object;
-        if( strcmp( module_GetObjName( p_module ), "main" ) == 0 )
+        if( strcmp( module_get_object( p_module ), "main" ) == 0 )
             break;
     }
     /* TODO replace by
-     * p_module = module_GetMainModule( p_intf );
+     * p_module = module_get_main( p_intf );
      */
     if( i_index < p_list->i_count )
     {
@@ -404,7 +404,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
 
         /* Enumerate config categories and store a reference so we can
          * generate their config panel them when it is asked by the user. */
-        p_config = module_GetConfig (p_module, &confsize);
+        p_config = module_config_get (p_module, &confsize);
 
         for( size_t i = 0; i < confsize; i++ )
         {
@@ -503,7 +503,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                 }
          }
         TreeView_SortChildren( hwndTV, general_item, 0 );
-        module_PutConfig( p_config );
+        module_config_free( p_config );
     }
 
 
@@ -517,7 +517,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
         /* Exclude the main module */
-        if( !strcmp( module_GetObjName( p_module ), "main" ) )
+        if( !strcmp( module_get_object( p_module ), "main" ) )
             continue;
 
         /* Exclude empty plugins (submodules don't have config options, they
@@ -528,7 +528,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
         int i_category = 0, i_subcategory = 0, i_options = 0;
         bool b_options = false;
 
-        p_config = module_GetConfig( (module_t *) p_module,&confsize);
+        p_config = module_config_get( (module_t *) p_module,&confsize);
 
         /* Loop through the configurations items */
         for( size_t i = 0; i < confsize; i++ )
@@ -545,7 +545,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
             if( b_options && i_category && i_subcategory )
                 break;
         }
-        module_PutConfig (p_config);
+        module_config_free (p_config);
 
         //if( !i_options ) continue;
         /* Dummy item, please proceed */
@@ -582,13 +582,13 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                     {
                         config_data = new ConfigTreeData;
 
-                        config_data->psz_name = strdup( module_GetObjName( p_module ) );
+                        config_data->psz_name = strdup( module_get_object( p_module ) );
                         config_data->psz_help = NULL;
                         config_data->i_type = TYPE_MODULE;
                         config_data->i_object_id = p_item->value.i;
                         config_data->p_module = p_module;
 
-                        tvi.pszText = _FROMMB(module_GetName( p_module, false ));
+                        tvi.pszText = _FROMMB(module_name( p_module, false ));
                         tvi.cchTextMax = _tcslen(tvi.pszText);
 
                         tvi.lParam = (long)config_data;
@@ -794,7 +794,7 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
             for( i_index = 0; i_index < p_list->i_count; i_index++ )
             {
                 p_module = (module_t *)p_list->p_values[i_index].p_object;
-                if( !strcmp( module_GetObjName(p_module), "main" ) )
+                if( !strcmp( module_get_object(p_module), "main" ) )
                 {
                     b_found = true;
                     break;
@@ -812,7 +812,7 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
          * (submodules don't have config options, they are stored in the
          *  parent module) */
         unsigned confsize;
-        p_config = module_GetConfig( (module_t *) p_module,&confsize);
+        p_config = module_config_get( (module_t *) p_module,&confsize);
 
         p_item = p_config;
         p_end = p_config + confsize;

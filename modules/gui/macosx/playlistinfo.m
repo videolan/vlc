@@ -405,9 +405,9 @@ static VLCInfo *_o_sharedInstance = nil;
     PL_LOCK;
     p_playlist->p_private = &p_export;
 
-    module_t *p_mod = module_Need( p_playlist, "meta writer", NULL, 0 );
+    module_t *p_mod = module_need( p_playlist, "meta writer", NULL, 0 );
     if( p_mod )
-        module_Unneed( p_playlist, p_mod );
+        module_unneed( p_playlist, p_mod );
     PL_UNLOCK;
 
     val.b_bool = true;

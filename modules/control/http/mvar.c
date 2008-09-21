@@ -344,11 +344,11 @@ mvar_t *mvar_ObjectSetNew( intf_thread_t *p_intf, char *psz_name,
     for( i = 0; i < p_list->i_count; i++ )
     {
         module_t *p_parser = (module_t *)p_list->p_values[i].p_object;
-        if( module_IsCapable( p_parser, psz_capability ) )
+        if( module_provides( p_parser, psz_capability ) )
         {
-            mvar_t *sd = mvar_New( "sd", module_GetObjName( p_parser ) );
+            mvar_t *sd = mvar_New( "sd", module_get_object( p_parser ) );
             mvar_AppendNewVar( sd, "name",
-                                   module_GetName( p_parser, true ) );
+                                   module_get_name( p_parser, true ) );
             mvar_AppendVar( s, sd );
         }
     }

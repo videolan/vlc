@@ -72,11 +72,11 @@ static access_t *access_InternalNew( vlc_object_t *p_obj, const char *psz_access
     p_access->info.i_seekpoint = 0;
 
 
-    /* Before module_Need (for var_Create...) */
+    /* Before module_need (for var_Create...) */
     vlc_object_attach( p_access, p_obj );
 
     p_access->p_module =
-         module_Need( p_access, p_source ? "access_filter" : "access",
+         module_need( p_access, p_source ? "access_filter" : "access",
                       psz_access, true );
 
     if( p_access->p_module == NULL )
@@ -118,7 +118,7 @@ access_t *access_FilterNew( access_t *p_source, const char *psz_access_filter )
  *****************************************************************************/
 void access_Delete( access_t *p_access )
 {
-    module_Unneed( p_access, p_access->p_module );
+    module_unneed( p_access, p_access->p_module );
     vlc_object_detach( p_access );
 
     free( p_access->psz_access );

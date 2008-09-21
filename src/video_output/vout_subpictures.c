@@ -491,7 +491,7 @@ void spu_DestroySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 static void FilterRelease( filter_t *p_filter )
 {
     if( p_filter->p_module )
-        module_Unneed( p_filter, p_filter->p_module );
+        module_unneed( p_filter, p_filter->p_module );
 
     vlc_object_detach( p_filter );
     vlc_object_release( p_filter );
@@ -536,7 +536,7 @@ static void SpuRenderUpdateBlend( spu_t *p_spu, int i_out_width, int i_out_heigh
     {
         /* The chroma is not the same, we need to reload the blend module
          * XXX to match the old behaviour just test !p_blend->fmt_in.video.i_chroma */
-        module_Unneed( p_blend, p_blend->p_module );
+        module_unneed( p_blend, p_blend->p_module );
         p_blend->p_module = NULL;
     }
 
@@ -551,7 +551,7 @@ static void SpuRenderUpdateBlend( spu_t *p_spu, int i_out_width, int i_out_heigh
 
     /* */
     if( !p_blend->p_module )
-        p_blend->p_module = module_Need( p_blend, "video blending", 0, 0 );
+        p_blend->p_module = module_need( p_blend, "video blending", 0, 0 );
 }
 static void SpuRenderCreateAndLoadText( spu_t *p_spu )
 {
@@ -578,18 +578,18 @@ static void SpuRenderCreateAndLoadText( spu_t *p_spu )
 
     vlc_object_attach( p_text, p_spu );
 
-    /* FIXME TOCHECK shouldn't module_Need( , , psz_modulename, false ) do the
+    /* FIXME TOCHECK shouldn't module_need( , , psz_modulename, false ) do the
      * same than these 2 calls ? */
     char *psz_modulename = var_CreateGetString( p_spu, "text-renderer" );
     if( psz_modulename && *psz_modulename )
     {
-        p_text->p_module = module_Need( p_text, "text renderer",
+        p_text->p_module = module_need( p_text, "text renderer",
                                         psz_modulename, true );
     }
     free( psz_modulename );
 
     if( !p_text->p_module )
-        p_text->p_module = module_Need( p_text, "text renderer", NULL, false );
+        p_text->p_module = module_need( p_text, "text renderer", NULL, false );
 }
 
 static filter_t *CreateAndLoadScale( vlc_object_t *p_obj,
@@ -617,7 +617,7 @@ static filter_t *CreateAndLoadScale( vlc_object_t *p_obj,
     p_scale->pf_vout_buffer_del = spu_del_video_buffer;
 
     vlc_object_attach( p_scale, p_obj );
-    p_scale->p_module = module_Need( p_scale, "video filter2", 0, 0 );
+    p_scale->p_module = module_need( p_scale, "video filter2", 0, 0 );
 
     return p_scale;
 }

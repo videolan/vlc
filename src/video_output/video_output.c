@@ -441,7 +441,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     free( psz_parser );
     free( psz_tmp );
     p_vout->p_cfg = p_cfg;
-    p_vout->p_module = module_Need( p_vout,
+    p_vout->p_module = module_need( p_vout,
         ( p_vout->psz_filter_chain && *p_vout->psz_filter_chain ) ?
         "video filter" : "video output", psz_name, p_vout->psz_filter_chain && *p_vout->psz_filter_chain );
     free( psz_name );
@@ -503,7 +503,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( vlc_thread_create( p_vout, "video output", RunThread,
                            VLC_THREAD_PRIORITY_OUTPUT, true ) )
     {
-        module_Unneed( p_vout, p_vout->p_module );
+        module_unneed( p_vout, p_vout->p_module );
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -534,7 +534,7 @@ void vout_Close( vout_thread_t *p_vout )
 
     vlc_object_kill( p_vout );
     vlc_thread_join( p_vout );
-    module_Unneed( p_vout, p_vout->p_module );
+    module_unneed( p_vout, p_vout->p_module );
     p_vout->p_module = NULL;
 }
 
@@ -1290,7 +1290,7 @@ static int ChromaCreate( vout_thread_t *p_vout )
     VideoFormatImportRgb( &p_chroma->fmt_in.video, &p_vout->render );
     VideoFormatImportRgb( &p_chroma->fmt_out.video, &p_vout->output );
 
-    p_chroma->p_module = module_Need( p_chroma, "video filter2", NULL, 0 );
+    p_chroma->p_module = module_need( p_chroma, "video filter2", NULL, 0 );
 
     if( p_chroma->p_module == NULL )
     {
@@ -1316,7 +1316,7 @@ static void ChromaDestroy( vout_thread_t *p_vout )
     if( !p_vout->p_chroma )
         return;
 
-    module_Unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
+    module_unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
     vlc_object_release( p_vout->p_chroma );
     p_vout->p_chroma = NULL;
 }

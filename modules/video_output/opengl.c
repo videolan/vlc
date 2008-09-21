@@ -295,7 +295,7 @@ static int CreateVout( vlc_object_t *p_this )
                       psz ? psz : "default" );
 
     p_sys->p_vout->p_module =
-        module_Need( p_sys->p_vout, "opengl provider", psz, 0 );
+        module_need( p_sys->p_vout, "opengl provider", psz, 0 );
     free( psz );
     if( p_sys->p_vout->p_module == NULL )
     {
@@ -569,7 +569,7 @@ static void DestroyVout( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    module_Unneed( p_sys->p_vout, p_sys->p_vout->p_module );
+    module_unneed( p_sys->p_vout, p_sys->p_vout->p_module );
     vlc_object_release( p_sys->p_vout );
 
     free( p_sys );

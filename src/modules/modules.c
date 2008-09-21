@@ -283,7 +283,7 @@ void __module_LoadPlugins( vlc_object_t * p_this )
  * \param cap the capability to check
  * \return TRUE if the module have the capability
  */
-bool module_IsCapable( const module_t *m, const char *cap )
+bool module_provides( const module_t *m, const char *cap )
 {
     return !strcmp( m->psz_capability, cap );
 }
@@ -294,7 +294,7 @@ bool module_IsCapable( const module_t *m, const char *cap )
  * \param m the module
  * \return the module name
  */
-const char *module_GetObjName( const module_t *m )
+const char *module_get_object( const module_t *m )
 {
     return m->psz_object_name;
 }
@@ -306,7 +306,7 @@ const char *module_GetObjName( const module_t *m )
  * \param long_name TRUE to have the long name of the module
  * \return the short or long name of the module
  */
-const char *module_GetName( const module_t *m, bool long_name )
+const char *module_get_name( const module_t *m, bool long_name )
 {
     if( long_name && ( m->psz_longname != NULL) )
         return m->psz_longname;
@@ -320,7 +320,7 @@ const char *module_GetName( const module_t *m, bool long_name )
  * \param m the module
  * \return the help
  */
-const char *module_GetHelp( const module_t *m )
+const char *module_get_help( const module_t *m )
 {
     return m->psz_help;
 }
@@ -361,7 +361,7 @@ void module_list_free (module_t **list)
 module_t **module_list_get (size_t *n)
 {
     /* TODO: this whole module lookup is quite inefficient */
-    /* Remove this and improve module_Need */
+    /* Remove this and improve module_need */
     module_t **tab = NULL;
     size_t i = 0;
 
@@ -402,12 +402,12 @@ module_t **module_list_get (size_t *n)
  * \param b_strict TRUE yto use the strict mode
  * \return the module or NULL in case of a failure
  */
-module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
+module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
                           const char *psz_name, bool b_strict )
 {
     typedef struct module_list_t module_list_t;
 
-    stats_TimerStart( p_this, "module_Need()", STATS_TIMER_MODULE_NEED );
+    stats_TimerStart( p_this, "module_need()", STATS_TIMER_MODULE_NEED );
 
     struct module_list_t
     {
@@ -492,7 +492,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         p_module = p_all[i_which_module];
 
         /* Test that this module can do what we need */
-        if( !module_IsCapable( p_module, psz_capability ) )
+        if( !module_provides( p_module, psz_capability ) )
         {
             /* Don't recurse through the sub-modules because vlc_list_find()
              * will list them anyway. */
@@ -712,13 +712,13 @@ found_shortcut:
 /**
  * Module unneed
  *
- * This function must be called by the thread that called module_Need, to
+ * This function must be called by the thread that called module_need, to
  * decrease the reference count and allow for hiding of modules.
  * \param p_this vlc object structure
  * \param p_module the module structure
  * \return nothing
  */
-void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
+void __module_unneed( vlc_object_t * p_this, module_t * p_module )
 {
     /* Use the close method */
     if( p_module->pf_deactivate )
@@ -738,7 +738,7 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
  * \param psz_name the name of the module
  * \return a pointer to the module or NULL in case of a failure
  */
-module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
+module_t *__module_find( vlc_object_t *p_this, const char * psz_name )
 {
     module_t **list, *module;
 
@@ -767,9 +767,9 @@ module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
  * \param psz_name th name of the module
  * \return TRUE if the module exists
  */
-bool __module_Exists( vlc_object_t *p_this, const char * psz_name )
+bool __module_exists( vlc_object_t *p_this, const char * psz_name )
 {
-    module_t *p_module = __module_Find( p_this, psz_name );
+    module_t *p_module = __module_find( p_this, psz_name );
     if( p_module )
         module_release (p_module);
     return true != NULL;
@@ -834,7 +834,7 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
             psz_ret[j] = strdup( k>=0?p_module->pp_shortcuts[k]
                                      :p_module->psz_object_name );
             if( pppsz_longname )
-                (*pppsz_longname)[j] = strdup( module_GetName( p_module, true ) );
+                (*pppsz_longname)[j] = strdup( module_get_name( p_module, true ) );
             j++;
         }
     }
@@ -852,7 +852,7 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
  * \param psize the size of the configuration returned
  * \return the configuration as an array
  */
-module_config_t *module_GetConfig( const module_t *module, unsigned *restrict psize )
+module_config_t *module_config_get( const module_t *module, unsigned *restrict psize )
 {
     unsigned i,j;
     unsigned size = module->confsize;
@@ -886,7 +886,7 @@ module_config_t *module_GetConfig( const module_t *module, unsigned *restrict ps
  * \param the configuration
  * \return nothing
  */
-void module_PutConfig( module_config_t *config )
+void module_config_free( module_config_t *config )
 {
     free( config );
 }
@@ -1178,8 +1178,8 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
  * AllocatePluginFile: load a module into memory and initialize it.
  *****************************************************************************
  * This function loads a dynamically loadable module and allocates a structure
- * for its information data. The module can then be handled by module_Need
- * and module_Unneed. It can be removed by DeleteModule.
+ * for its information data. The module can then be handled by module_need
+ * and module_unneed. It can be removed by DeleteModule.
  *****************************************************************************/
 static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
                                int64_t i_file_time, int64_t i_file_size )
@@ -1266,8 +1266,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
  * AllocatePlugin: load a module into memory and initialize it.
  *****************************************************************************
  * This function loads a dynamically loadable module and allocates a structure
- * for its information data. The module can then be handled by module_Need
- * and module_Unneed. It can be removed by DeleteModule.
+ * for its information data. The module can then be handled by module_need
+ * and module_unneed. It can be removed by DeleteModule.
  *****************************************************************************/
 static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
 {
@@ -1367,8 +1367,8 @@ static void UndupModule( module_t *p_module )
  * AllocateBuiltinModule: initialize a builtin module.
  *****************************************************************************
  * This function registers a builtin module and allocates a structure
- * for its information data. The module can then be handled by module_Need
- * and module_Unneed. It can be removed by DeleteModule.
+ * for its information data. The module can then be handled by module_need
+ * and module_unneed. It can be removed by DeleteModule.
  *****************************************************************************/
 static int AllocateBuiltinModule( vlc_object_t * p_this,
                                   int ( *pf_entry ) ( module_t * ) )

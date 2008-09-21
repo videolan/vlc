@@ -43,7 +43,7 @@
  *****************************************************************************/
 int aout_MixerNew( aout_instance_t * p_aout )
 {
-    p_aout->mixer.p_module = module_Need( p_aout, "audio mixer", NULL, 0 );
+    p_aout->mixer.p_module = module_need( p_aout, "audio mixer", NULL, 0 );
     if ( p_aout->mixer.p_module == NULL )
     {
         msg_Err( p_aout, "no suitable audio mixer" );
@@ -61,7 +61,7 @@ int aout_MixerNew( aout_instance_t * p_aout )
 void aout_MixerDelete( aout_instance_t * p_aout )
 {
     if ( p_aout->mixer.b_error ) return;
-    module_Unneed( p_aout, p_aout->mixer.p_module );
+    module_unneed( p_aout, p_aout->mixer.p_module );
     p_aout->mixer.b_error = 1;
 }
 

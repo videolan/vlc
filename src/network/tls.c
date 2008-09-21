@@ -69,7 +69,7 @@ tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
         var_SetString (srv, "tls-x509-key", key_path);
     }
 
-    srv->p_module = module_Need (srv, "tls server", 0, 0);
+    srv->p_module = module_need (srv, "tls server", 0, 0);
     if (srv->p_module == NULL)
     {
         msg_Err (srv, "TLS server plugin not available");
@@ -92,7 +92,7 @@ void tls_ServerDelete (tls_server_t *srv)
     if (srv == NULL)
         return;
 
-    module_Unneed (srv, srv->p_module);
+    module_unneed (srv, srv->p_module);
     vlc_object_detach (srv);
     vlc_object_release (srv);
 }
@@ -185,7 +185,7 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     else
         msg_Dbg (cl, "requested anonymous server");
 
-    cl->p_module = module_Need (cl, "tls client", 0, 0);
+    cl->p_module = module_need (cl, "tls client", 0, 0);
     if (cl->p_module == NULL)
     {
         msg_Err (cl, "TLS client plugin not available");
@@ -207,7 +207,7 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     }
     msg_Err (cl, "TLS client session handshake error");
 
-    module_Unneed (cl, cl->p_module);
+    module_unneed (cl, cl->p_module);
     vlc_object_release (cl);
     return NULL;
 }
@@ -222,7 +222,7 @@ void tls_ClientDelete (tls_session_t *cl)
     if (cl == NULL)
         return;
 
-    module_Unneed (cl, cl->p_module);
+    module_unneed (cl, cl->p_module);
     vlc_object_detach (cl);
     vlc_object_release (cl);
 }

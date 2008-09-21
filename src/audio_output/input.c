@@ -107,14 +107,14 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
 
         /* Look for goom plugin */
-        if( module_Exists( VLC_OBJECT(p_aout), "goom" ) )
+        if( module_exists( VLC_OBJECT(p_aout), "goom" ) )
         {
             val.psz_string = (char*)"goom"; text.psz_string = (char*)"Goom";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 
         /* Look for galaktos plugin */
-        if( module_Exists( VLC_OBJECT(p_aout), "galaktos" ) )
+        if( module_exists( VLC_OBJECT(p_aout), "galaktos" ) )
         {
             val.psz_string = (char*)"galaktos"; text.psz_string = (char*)"GaLaktos";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
@@ -280,7 +280,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                 memcpy( &p_filter->output, &chain_output_format,
                         sizeof(audio_sample_format_t) );
 
-                p_filter->p_module = module_Need( p_filter, "visualization",
+                p_filter->p_module = module_need( p_filter, "visualization",
                                                   psz_parser, true );
             }
             else /* this can be a audio filter module as well as a visualization module */
@@ -291,7 +291,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                 memcpy( &p_filter->output, &chain_output_format,
                         sizeof(audio_sample_format_t) );
 
-                p_filter->p_module = module_Need( p_filter, "audio filter",
+                p_filter->p_module = module_need( p_filter, "audio filter",
                                               psz_parser, true );
 
                 if ( p_filter->p_module == NULL )
@@ -304,7 +304,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                     {
                         aout_FormatPrepare( &p_filter->input );
                         aout_FormatPrepare( &p_filter->output );
-                        p_filter->p_module = module_Need( p_filter,
+                        p_filter->p_module = module_need( p_filter,
                                                           "audio filter",
                                                           psz_parser, true );
                     }
@@ -315,7 +315,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                                 sizeof(audio_sample_format_t) );
                         memcpy( &p_filter->output, &chain_output_format,
                                 sizeof(audio_sample_format_t) );
-                        p_filter->p_module = module_Need( p_filter,
+                        p_filter->p_module = module_need( p_filter,
                                                           "visualization",
                                                           psz_parser, true );
                     }
@@ -346,7 +346,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                     msg_Err( p_aout, "cannot add user filter %s (skipped)",
                              psz_parser );
 
-                    module_Unneed( p_filter, p_filter->p_module );
+                    module_unneed( p_filter, p_filter->p_module );
                     vlc_object_detach( p_filter );
                     vlc_object_release( p_filter );
 

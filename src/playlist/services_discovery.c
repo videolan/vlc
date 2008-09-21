@@ -101,7 +101,7 @@ bool services_discovery_Start ( services_discovery_t * p_sd )
 {
     assert(!p_sd->p_module);
 
-    p_sd->p_module = module_Need( p_sd, "services_discovery", p_sd->psz_module, true );
+    p_sd->p_module = module_need( p_sd, "services_discovery", p_sd->psz_module, true );
 
     if( p_sd->p_module == NULL )
     {
@@ -129,7 +129,7 @@ void services_discovery_Stop ( services_discovery_t * p_sd )
     
     vlc_event_send( &p_sd->event_manager, &event );
 
-    module_Unneed( p_sd, p_sd->p_module );
+    module_unneed( p_sd, p_sd->p_module );
     p_sd->p_module = NULL;
 }
 

@@ -164,7 +164,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     }
     free( psz_title );
 
-    p_module = module_Need( p_playlist, "art finder", 0, false );
+    p_module = module_need( p_playlist, "art finder", 0, false );
 
     if( p_module )
         i_ret = 1;
@@ -188,7 +188,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     }
 
     if( p_module )
-        module_Unneed( p_playlist, p_module );
+        module_unneed( p_playlist, p_module );
     p_playlist->p_private = NULL;
     PL_UNLOCK;
 

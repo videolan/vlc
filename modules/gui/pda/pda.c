@@ -94,7 +94,7 @@ static int Open( vlc_object_t *p_this )
 #ifdef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Using gui-helper" );
     p_intf->p_sys->p_gtk_main =
-        module_Need( p_this, "gui-helper", "gtk2", true );
+        module_need( p_this, "gui-helper", "gtk2", true );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
@@ -128,7 +128,7 @@ static void Close( vlc_object_t *p_this )
 
 #ifdef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Releasing gui-helper" );
-    module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
+    module_unneed( p_intf, p_intf->p_sys->p_gtk_main );
 #endif
 
     /* Destroy structure */
@@ -367,7 +367,7 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
     {
         p_intf = (intf_thread_t *)p_list->p_values[i_index].p_object ;
 
-        if( strcmp( MODULE_STRING, module_GetObjName(p_intf->p_module) ) )
+        if( strcmp( MODULE_STRING, module_get_object(p_intf->p_module) ) )
         {
             continue;
         }

@@ -228,7 +228,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     vlc_object_attach( p_blend, p_filter );
     p_blend->fmt_out.video = p_sys->p_base_image->format;
     p_blend->fmt_in.video = p_sys->p_blend_image->format;
-    p_blend->p_module = module_Need( p_blend, "video blending", 0, 0 );
+    p_blend->p_module = module_need( p_blend, "video blending", 0, 0 );
     if( !p_blend->p_module )
     {
         picture_Release( p_pic );
@@ -254,7 +254,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                   p_sys->p_blend_image->p[Y_PLANE].i_visible_pitch *
                   p_sys->p_blend_image->p[Y_PLANE].i_visible_lines );
 
-    module_Unneed( p_blend, p_blend->p_module );
+    module_unneed( p_blend, p_blend->p_module );
 
     vlc_object_detach( p_blend );
     vlc_object_release( p_blend );

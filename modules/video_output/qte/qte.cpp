@@ -153,7 +153,7 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef NEED_QTE_MAIN
     p_vout->p_sys->p_qte_main =
-        module_Need( p_this, "gui-helper", "qte", true );
+        module_need( p_this, "gui-helper", "qte", true );
     if( p_vout->p_sys->p_qte_main == NULL )
     {
         free( p_vout->p_sys );
@@ -194,7 +194,7 @@ static void Close ( vlc_object_t *p_this )
 
 #ifdef NEED_QTE_MAIN
     msg_Dbg( p_vout, "releasing gui-helper" );
-    module_Unneed( p_vout, p_vout->p_sys->p_qte_main );
+    module_unneed( p_vout, p_vout->p_sys->p_qte_main );
 #endif
 
     if( p_vout->p_sys )

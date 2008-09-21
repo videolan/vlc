@@ -216,7 +216,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
                                i_priority, false ) )
         {
             msg_Err( p_dec, "cannot spawn decoder thread" );
-            module_Unneed( p_dec, p_dec->p_module );
+            module_unneed( p_dec, p_dec->p_module );
             DeleteDecoder( p_dec );
             vlc_object_release( p_dec );
             return NULL;
@@ -246,7 +246,7 @@ void input_DecoderDelete( decoder_t *p_dec )
 
         vlc_thread_join( p_dec );
 
-        /* Don't module_Unneed() here because of the dll loader that wants
+        /* Don't module_unneed() here because of the dll loader that wants
          * close() in the same thread than open()/decode() */
     }
     else
@@ -254,7 +254,7 @@ void input_DecoderDelete( decoder_t *p_dec )
         /* Flush */
         input_DecoderDecode( p_dec, NULL );
 
-        module_Unneed( p_dec, p_dec->p_module );
+        module_unneed( p_dec, p_dec->p_module );
     }
 
     /* */
@@ -408,7 +408,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         if( p_cc )
         {
             vlc_object_kill( p_cc );
-            module_Unneed( p_cc, p_cc->p_module );
+            module_unneed( p_cc, p_cc->p_module );
             DeleteDecoder( p_cc );
             vlc_object_release( p_cc );
         }
@@ -502,9 +502,9 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
     /* Find a suitable decoder/packetizer module */
     if( i_object_type == VLC_OBJECT_DECODER )
-        p_dec->p_module = module_Need( p_dec, "decoder", "$codec", 0 );
+        p_dec->p_module = module_need( p_dec, "decoder", "$codec", 0 );
     else
-        p_dec->p_module = module_Need( p_dec, "packetizer", "$packetizer", 0 );
+        p_dec->p_module = module_need( p_dec, "packetizer", "$packetizer", 0 );
 
     /* Check if decoder requires already packetized data */
     if( i_object_type == VLC_OBJECT_DECODER &&
@@ -523,7 +523,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
             vlc_object_attach( p_dec->p_owner->p_packetizer, p_input );
 
             p_dec->p_owner->p_packetizer->p_module =
-                module_Need( p_dec->p_owner->p_packetizer,
+                module_need( p_dec->p_owner->p_packetizer,
                              "packetizer", "$packetizer", 0 );
 
             if( !p_dec->p_owner->p_packetizer->p_module )
@@ -605,7 +605,7 @@ static void* DecoderThread( vlc_object_t *p_this )
 
     /* We do it here because of the dll loader that wants close() in the
      * same thread than open()/decode() */
-    module_Unneed( p_dec, p_dec->p_module );
+    module_unneed( p_dec, p_dec->p_module );
     vlc_restorecancel (canc);
     return NULL;
 }
@@ -1176,7 +1176,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 
     if( p_dec->p_owner->p_packetizer )
     {
-        module_Unneed( p_dec->p_owner->p_packetizer,
+        module_unneed( p_dec->p_owner->p_packetizer,
                        p_dec->p_owner->p_packetizer->p_module );
         es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_in );
         es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_out );

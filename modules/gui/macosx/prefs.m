@@ -315,7 +315,7 @@ static VLCTreeItem *o_root_item = nil;
         int             i = 0;
         if( [[self name] isEqualToString: @"main"] )
         {
-            p_main_module = module_GetMainModule( p_intf );
+            p_main_module = module_get_main( p_intf );
             assert( p_main_module );
 
             /* We found the main module */
@@ -323,7 +323,7 @@ static VLCTreeItem *o_root_item = nil;
              * generate their config panel them when it is asked by the user. */
             VLCTreeItem *p_last_category = NULL;
             unsigned int i_confsize;
-            p_items = module_GetConfig( p_main_module, &i_confsize );
+            p_items = module_config_get( p_main_module, &i_confsize );
             o_children = [[NSMutableArray alloc] initWithCapacity:10];
             for( int i = 0; i < i_confsize; i++ )
             {
@@ -401,12 +401,12 @@ static VLCTreeItem *o_root_item = nil;
                 p_module = (module_t *)p_list->p_values[i].p_object;
 
                 /* Exclude the main module */
-                if( module_IsMainModule( p_module ) )
+                if( module_is_main( p_module ) )
                     continue;
 
                 /* Exclude empty plugins (submodules don't have config */
                 /* options, they are stored in the parent module) */
-                p_items = module_GetConfig( p_module, &confsize );
+                p_items = module_config_get( p_module, &confsize );
 
                 unsigned int j;
 
@@ -465,7 +465,7 @@ static VLCTreeItem *o_root_item = nil;
 
                 [p_subcategory_item->o_children addObject:[[VLCTreeItem alloc]
                     initWithName:[[VLCMain sharedInstance]
-                        localizedString: module_GetName( p_module, false ) ]
+                        localizedString: module_get_name( p_module, false ) ]
                     withTitle:[[VLCMain sharedInstance]
                         localizedString:  module_GetLongName( p_module ) ]
                     withHelp: @""
@@ -527,10 +527,10 @@ static VLCTreeItem *o_root_item = nil;
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( !strcmp( module_GetObjName( p_parser ), psz_module_name ) )
+        if( !strcmp( module_get_object( p_parser ), psz_module_name ) )
         {
             unsigned int confsize;
-            module_GetConfig( p_parser, &confsize );
+            module_config_get( p_parser, &confsize );
             BOOL b_has_prefs = confsize != 0;
             vlc_list_release( p_list );
             return( b_has_prefs );
@@ -572,7 +572,7 @@ static VLCTreeItem *o_root_item = nil;
             p_module = (module_t *) [self vlcObject];
             assert( p_module );
 
-            p_items = module_GetConfig( p_module, &confsize );
+            p_items = module_config_get( p_module, &confsize );
 
             for( unsigned int i = 0; i < confsize; i++ )
             {
@@ -602,12 +602,12 @@ static VLCTreeItem *o_root_item = nil;
         }
         else
         {
-            p_main_module = module_GetMainModule( p_intf );
+            p_main_module = module_get_main( p_intf );
             assert( p_main_module );
             module_config_t *p_items;
 
             unsigned int i, confsize;
-            p_items = module_GetConfig( p_main_module, &confsize );
+            p_items = module_config_get( p_main_module, &confsize );
 
             /* We need to first, find the right (sub)category,
              * and then abort when we find a new (sub)category. Part of the Ugliness. */

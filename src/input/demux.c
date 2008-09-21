@@ -147,7 +147,7 @@ demux_t *__demux_New( vlc_object_t *p_obj,
         }
     }
 
-    /* Before module_Need (for var_Create...) */
+    /* Before module_need (for var_Create...) */
     vlc_object_attach( p_demux, p_obj );
 
     if( s )
@@ -159,14 +159,14 @@ demux_t *__demux_New( vlc_object_t *p_obj,
             SkipAPETag( p_demux );
 
         p_demux->p_module =
-            module_Need( p_demux, "demux", psz_module,
+            module_need( p_demux, "demux", psz_module,
                          !strcmp( psz_module, p_demux->psz_demux ) ?
                          true : false );
     }
     else
     {
         p_demux->p_module =
-            module_Need( p_demux, "access_demux", psz_module,
+            module_need( p_demux, "access_demux", psz_module,
                          !strcmp( psz_module, p_demux->psz_access ) ?
                          true : false );
     }
@@ -189,7 +189,7 @@ demux_t *__demux_New( vlc_object_t *p_obj,
  *****************************************************************************/
 void demux_Delete( demux_t *p_demux )
 {
-    module_Unneed( p_demux, p_demux->p_module );
+    module_unneed( p_demux, p_demux->p_module );
     vlc_object_detach( p_demux );
 
     free( p_demux->psz_path );
@@ -586,7 +586,7 @@ decoder_t *demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char
     p_packetizer->fmt_in = *p_fmt;
     es_format_Init( &p_packetizer->fmt_out, UNKNOWN_ES, 0 );
 
-    p_packetizer->p_module = module_Need( p_packetizer, "packetizer", NULL, 0 );
+    p_packetizer->p_module = module_need( p_packetizer, "packetizer", NULL, 0 );
     if( !p_packetizer->p_module )
     {
         es_format_Clean( p_fmt );
@@ -600,7 +600,7 @@ decoder_t *demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char
 void demux_PacketizerDestroy( decoder_t *p_packetizer )
 {
     if( p_packetizer->p_module )
-        module_Unneed( p_packetizer, p_packetizer->p_module );
+        module_unneed( p_packetizer, p_packetizer->p_module );
     es_format_Clean( &p_packetizer->fmt_in );
     vlc_object_release( p_packetizer );
 }

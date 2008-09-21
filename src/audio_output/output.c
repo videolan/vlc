@@ -54,7 +54,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_lock_output_fifo( p_aout );
 
     /* Find the best output plug-in. */
-    p_aout->output.p_module = module_Need( p_aout, "audio output", "$aout", 0);
+    p_aout->output.p_module = module_need( p_aout, "audio output", "$aout", 0);
     if ( p_aout->output.p_module == NULL )
     {
         msg_Err( p_aout, "no suitable audio output module" );
@@ -196,7 +196,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
                                      &p_aout->output.output ) < 0 )
     {
         msg_Err( p_aout, "couldn't create audio output pipeline" );
-        module_Unneed( p_aout, p_aout->output.p_module );
+        module_unneed( p_aout, p_aout->output.p_module );
         return -1;
     }
 
@@ -227,7 +227,7 @@ void aout_OutputDelete( aout_instance_t * p_aout )
         return;
     }
 
-    module_Unneed( p_aout, p_aout->output.p_module );
+    module_unneed( p_aout, p_aout->output.p_module );
 
     aout_FiltersDestroyPipeline( p_aout, p_aout->output.pp_filters,
                                  p_aout->output.i_nb_filters );

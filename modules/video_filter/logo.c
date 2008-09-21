@@ -411,7 +411,7 @@ static int Init( vout_thread_t *p_vout )
             p_vout->output.i_height;
 
     p_sys->p_blend->p_module =
-        module_Need( p_sys->p_blend, "video blending", 0, 0 );
+        module_need( p_sys->p_blend, "video blending", 0, 0 );
     if( !p_sys->p_blend->p_module )
     {
         msg_Err( p_vout, "can't open blending filter, aborting" );
@@ -494,7 +494,7 @@ static void End( vout_thread_t *p_vout )
     vout_CloseAndRelease( p_sys->p_vout );
 
     if( p_sys->p_blend->p_module )
-        module_Unneed( p_sys->p_blend, p_sys->p_blend->p_module );
+        module_unneed( p_sys->p_blend, p_sys->p_blend->p_module );
     vlc_object_detach( p_sys->p_blend );
     vlc_object_release( p_sys->p_blend );
 }

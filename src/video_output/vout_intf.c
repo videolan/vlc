@@ -115,7 +115,7 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     wnd->pos_y = *pi_y_hint;
     vlc_object_attach (wnd, p_vout);
 
-    wnd->module = module_Need (wnd, "vout window", 0, 0);
+    wnd->module = module_need (wnd, "vout window", 0, 0);
     if (wnd->module == NULL)
     {
         msg_Dbg (wnd, "no window provider available");
@@ -139,7 +139,7 @@ void vout_ReleaseWindow( vout_thread_t *p_vout, void *dummy )
     p_vout->p_window = NULL;
 
     assert (wnd->module);
-    module_Unneed (wnd, wnd->module);
+    module_unneed (wnd, wnd->module);
 
     vlc_object_release (wnd);
     (void)dummy;

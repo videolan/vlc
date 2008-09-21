@@ -67,7 +67,7 @@ static void intf_Destroy( vlc_object_t *obj )
 
     /* Unlock module if present (a switch may have failed) */
     if( p_intf->p_module )
-        module_Unneed( p_intf, p_intf->p_module );
+        module_unneed( p_intf, p_intf->p_module );
 
     free( p_intf->psz_intf );
     vlc_mutex_destroy( &p_intf->change_lock );
@@ -101,7 +101,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 
     /* Choose the best module */
     p_intf->psz_intf = strdup( psz_module );
-    p_intf->p_module = module_Need( p_intf, "interface", psz_module, false );
+    p_intf->p_module = module_need( p_intf, "interface", psz_module, false );
 
     if( p_intf->p_module == NULL )
     {

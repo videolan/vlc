@@ -563,12 +563,12 @@ void ModuleConfigControl::finish( bool bycat )
 
         if( bycat )
         {
-            if( !strcmp( module_GetObjName( p_parser ), "main" ) ) continue;
+            if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
 
             unsigned confsize;
             module_config_t *p_config;
 
-            p_config = module_GetConfig (p_parser, &confsize);
+            p_config = module_config_get (p_parser, &confsize);
              for (size_t i = 0; i < confsize; i++)
             {
                 /* Hack: required subcategory is stored in i_min */
@@ -576,19 +576,19 @@ void ModuleConfigControl::finish( bool bycat )
                 if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
                     p_cfg->value.i == p_item->min.i )
                     combo->addItem( qtr( module_GetLongName( p_parser )),
-                                    QVariant( module_GetObjName( p_parser ) ) );
+                                    QVariant( module_get_object( p_parser ) ) );
                 if( p_item->value.psz && !strcmp( p_item->value.psz,
-                                                  module_GetObjName( p_parser ) ) )
+                                                  module_get_object( p_parser ) ) )
                     combo->setCurrentIndex( combo->count() - 1 );
             }
-            module_PutConfig (p_config);
+            module_config_free (p_config);
         }
-        else if( module_IsCapable( p_parser, p_item->psz_type ) )
+        else if( module_provides( p_parser, p_item->psz_type ) )
         {
             combo->addItem( qtr(module_GetLongName( p_parser ) ),
-                            QVariant( module_GetObjName( p_parser ) ) );
+                            QVariant( module_get_object( p_parser ) ) );
             if( p_item->value.psz && !strcmp( p_item->value.psz,
-                                              module_GetObjName( p_parser ) ) )
+                                              module_get_object( p_parser ) ) )
                 combo->setCurrentIndex( combo->count() - 1 );
         }
     }
@@ -657,10 +657,10 @@ ModuleListConfigControl::~ModuleListConfigControl()
        checkBoxListItem *cbl = new checkBoxListItem; \
 \
        CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );\
-       cb->setToolTip( formatTooltip( qtr( module_GetHelp( p_parser ))));\
+       cb->setToolTip( formatTooltip( qtr( module_get_help( p_parser ))));\
        cbl->checkBox = cb; \
 \
-       cbl->psz_module = strdup( module_GetObjName( p_parser ) ); \
+       cbl->psz_module = strdup( module_get_object( p_parser ) ); \
        modules.push_back( cbl ); \
 \
        if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) ) \
@@ -681,10 +681,10 @@ void ModuleListConfigControl::finish( bool bycat )
 
         if( bycat )
         {
-            if( !strcmp( module_GetObjName( p_parser ), "main" ) ) continue;
+            if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
 
             unsigned confsize;
-            module_config_t *p_config = module_GetConfig (p_parser, &confsize);
+            module_config_t *p_config = module_config_get (p_parser, &confsize);
 
             for (size_t i = 0; i < confsize; i++)
             {
@@ -696,9 +696,9 @@ void ModuleListConfigControl::finish( bool bycat )
                     CHECKBOX_LISTS;
                 }
             }
-            module_PutConfig (p_config);
+            module_config_free (p_config);
         }
-        else if( module_IsCapable( p_parser, p_item->psz_type ) )
+        else if( module_provides( p_parser, p_item->psz_type ) )
         {
             CHECKBOX_LISTS;
         }
@@ -1161,14 +1161,14 @@ void KeySelectorControl::finish()
     table->setAlternatingRowColors( true );
 
     /* Get the main Module */
-    module_t *p_main = module_Find( p_this, "main" );
+    module_t *p_main = module_find( p_this, "main" );
     assert( p_main );
 
     /* Access to the module_config_t */
     unsigned confsize;
     module_config_t *p_config;
 
-    p_config = module_GetConfig (p_main, &confsize);
+    p_config = module_config_get (p_main, &confsize);
 
     for (size_t i = 0; i < confsize; i++)
     {
@@ -1195,7 +1195,7 @@ void KeySelectorControl::finish()
             table->addTopLevelItem( treeItem );
         }
     }
-    module_PutConfig (p_config);
+    module_config_free (p_config);
     module_release (p_main);
 
     table->resizeColumnToContents( 0 );
