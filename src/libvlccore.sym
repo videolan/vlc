@@ -339,9 +339,7 @@ sout_StreamDelete
 sout_StreamNew
 sout_UpdateStatistic
 __spu_Create
-spu_CreateSubpicture
 spu_Destroy
-spu_DestroySubpicture
 spu_DisplaySubpicture
 spu_Init
 spu_RenderSubpictures
@@ -375,6 +373,9 @@ stream_vaControl
 __str_format
 __str_format_meta
 str_format_time
+subpicture_Delete
+subpicture_New
+subpicture_region_New
 subpicture_region_ChainDelete
 subpicture_region_Delete
 subpicture_region_New

@@ -2419,14 +2419,14 @@ static int transcode_spu_process( sout_stream_t *p_stream,
 
 static subpicture_t *spu_new_buffer( decoder_t *p_dec )
 {
-    sout_stream_t *p_stream = (sout_stream_t *)p_dec->p_owner;
-    return spu_CreateSubpicture( p_stream->p_sys->p_spu );
+    VLC_UNUSED( p_dec );
+    return subpicture_New();
 }
 
 static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
 {
-    sout_stream_t *p_stream = (sout_stream_t *)p_dec->p_owner;
-    spu_DestroySubpicture( p_stream->p_sys->p_spu, p_subpic );
+    VLC_UNUSED( p_dec );
+    subpicture_Delete( p_subpic );
 }
 
 /*
@@ -2542,7 +2542,7 @@ static int transcode_osd_process( sout_stream_t *p_stream,
         }
 
         p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
-        spu_DestroySubpicture( p_sys->p_spu, p_subpic );
+        subpicture_Delete( p_subpic );
         if( p_block )
         {
             p_block->i_dts = p_block->i_pts = in->i_dts;

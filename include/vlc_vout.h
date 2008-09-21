@@ -322,14 +322,23 @@ struct subpicture_region_t
     subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
 };
 
+/* Subpicture region position flags */
+#define SUBPICTURE_ALIGN_LEFT 0x1
+#define SUBPICTURE_ALIGN_RIGHT 0x2
+#define SUBPICTURE_ALIGN_TOP 0x4
+#define SUBPICTURE_ALIGN_BOTTOM 0x8
+#define SUBPICTURE_ALIGN_MASK ( SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT| \
+                                SUBPICTURE_ALIGN_TOP |SUBPICTURE_ALIGN_BOTTOM )
+
 /**
- * This function will create a new subpicture.
- * You can must use subpicture_region_Delete to destroy it.
+ * This function will create a new subpicture region.
+ *
+ * You must use subpicture_region_Delete to destroy it.
  */
 VLC_EXPORT( subpicture_region_t *, subpicture_region_New, ( const video_format_t *p_fmt ) );
 
 /**
- * This function will destroy a subpicture allocated by
+ * This function will destroy a subpicture region allocated by
  * subpicture_region_New.
  *
  * You may give it NULL.
@@ -337,7 +346,7 @@ VLC_EXPORT( subpicture_region_t *, subpicture_region_New, ( const video_format_t
 VLC_EXPORT( void, subpicture_region_Delete, ( subpicture_region_t *p_region ) );
 
 /**
- * This function will destroy a list of subpicture allocated by
+ * This function will destroy a list of subpicture regions allocated by
  * subpicture_region_New.
  *
  * Provided for convenience.
@@ -404,16 +413,22 @@ struct subpicture_t
     subpicture_sys_t *p_sys;                              /* subpicture data */
 };
 
+
+/**
+ * This function create a new empty subpicture.
+ *
+ * You must use subpicture_Delete to destroy it.
+ */
+VLC_EXPORT( subpicture_t *, subpicture_New, ( void ) );
+
+/**
+ * This function delete a subpicture created by subpicture_New.
+ * You may give it NULL.
+ */
+VLC_EXPORT( void,  subpicture_Delete, ( subpicture_t *p_subpic ) );
+
 /* Default subpicture channel ID */
 #define DEFAULT_CHAN           1
-
-/* Subpicture position flags */
-#define SUBPICTURE_ALIGN_LEFT 0x1
-#define SUBPICTURE_ALIGN_RIGHT 0x2
-#define SUBPICTURE_ALIGN_TOP 0x4
-#define SUBPICTURE_ALIGN_BOTTOM 0x8
-#define SUBPICTURE_ALIGN_MASK ( SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT| \
-                                SUBPICTURE_ALIGN_TOP |SUBPICTURE_ALIGN_BOTTOM )
 
 /*****************************************************************************
  * Prototypes

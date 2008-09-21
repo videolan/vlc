@@ -1085,7 +1085,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 if( p_spu->i_start < p_dec->p_owner->i_preroll_end &&
                     ( p_spu->i_stop <= 0 || p_spu->i_stop < p_dec->p_owner->i_preroll_end ) )
                 {
-                    spu_DestroySubpicture( p_vout->p_spu, p_spu );
+                    subpicture_Delete( p_spu );
                 }
                 else
                     spu_DisplaySubpicture( p_vout->p_spu, p_spu );
@@ -1460,7 +1460,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
         p_sys->p_spu_vout = p_vout;
     }
 
-    p_subpic = spu_CreateSubpicture( p_vout->p_spu );
+    p_subpic = subpicture_New();
     if( p_subpic )
     {
         p_subpic->i_channel = p_sys->i_spu_channel;
@@ -1487,7 +1487,7 @@ static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
         return;
     }
 
-    spu_DestroySubpicture( p_vout->p_spu, p_subpic );
+    subpicture_Delete( p_subpic );
 
     vlc_object_release( p_vout );
 }

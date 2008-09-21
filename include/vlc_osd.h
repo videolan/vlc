@@ -99,11 +99,19 @@ VLC_EXPORT( int, spu_Init, ( spu_t * ) );
 VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
 void spu_Attach( spu_t *, vlc_object_t *, bool );
 
-VLC_EXPORT( subpicture_t *, spu_CreateSubpicture, ( spu_t * ) );
-/* XXX you cannot call spu_DestroySubpicture on a displayed picture */
-VLC_EXPORT( void, spu_DestroySubpicture, ( spu_t *, subpicture_t * ) );
+/**
+ * This function sends a subpicture to the spu_t core.
+ * 
+ * You cannot use the provided subpicture anymore. The spu_t core
+ * will destroy it at its convenience.
+ */
 VLC_EXPORT( void, spu_DisplaySubpicture, ( spu_t *, subpicture_t * ) );
 
+/**
+ * This function asks the spu_t core a list of subpictures to display.
+ *
+ * The returned list can only be used by spu_RenderSubpictures.
+ */
 VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t display_date, bool b_paused, bool b_subtitle_only ) );
 
 /**

@@ -80,7 +80,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
 
     if( !psz_string ) return VLC_EGENERIC;
 
-    p_spu = spu_CreateSubpicture( p_vout->p_spu );
+    p_spu = subpicture_New();
     if( !p_spu )
         return VLC_EGENERIC;
 
@@ -102,7 +102,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
     if( !p_spu->p_region )
     {
         msg_Err( p_vout, "cannot allocate SPU region" );
-        spu_DestroySubpicture( p_vout->p_spu, p_spu );
+        subpicture_Delete( p_spu );
         return VLC_EGENERIC;
     }
 

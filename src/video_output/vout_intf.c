@@ -457,7 +457,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, image_handler_t *p_image, pic
     if( !p_pip )
         return VLC_EGENERIC;
 
-    p_subpic = spu_CreateSubpicture( p_vout->p_spu );
+    p_subpic = subpicture_New();
     if( p_subpic == NULL )
     {
          picture_Release( p_pip );

@@ -48,11 +48,6 @@
 #define VLC_FOURCC_RGBA VLC_FOURCC('R','G','B','A')
 #define VLC_FOURCC_TEXT VLC_FOURCC('T','E','X','T')
 
-/* TODO export */
-static subpicture_t *subpicture_New( void );
-static void subpicture_Delete( subpicture_t *p_subpic );
-static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic );
-
 /* */
 typedef struct
 {
@@ -142,6 +137,7 @@ static bool spu_area_overlap( spu_area_t, spu_area_t );
 
 #define SCALE_UNIT (1000)
 
+static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic );
 static int SubpictureCmp( const void *s0, const void *s1 );
 
 static void SpuRenderRegion( spu_t *,
@@ -353,38 +349,6 @@ void spu_DisplaySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
         return;
     }
     vlc_mutex_unlock( &p_sys->lock );
-}
-
-/**
- * Allocate a subpicture in the spu heap.
- *
- * This function create a reserved subpicture in the spu heap.
- * A null pointer is returned if the function fails. This method provides an
- * already allocated zone of memory in the spu data fields. It needs locking
- * since several pictures can be created by several producers threads.
- * \param p_spu the subpicture unit in which to create the subpicture
- * \return NULL on error, a reserved subpicture otherwise
- */
-subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
-{
-    VLC_UNUSED(p_spu);
-
-    return subpicture_New();
-}
-
-/**
- * Remove a subpicture from the heap
- *
- * This function frees a previously reserved subpicture.
- * It is meant to be used when the construction of a picture aborted.
- * This function does not need locking since reserved subpictures are ignored
- * by the spu.
- */
-void spu_DestroySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
-{
-    VLC_UNUSED(p_spu);
-
-    subpicture_Delete( p_subpic );
 }
 
 /**
@@ -671,10 +635,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
 /*****************************************************************************
  * subpicture_t allocation
  *****************************************************************************/
-/**
- * This function create a new empty subpicture.
- */
-static subpicture_t *subpicture_New( void )
+subpicture_t *subpicture_New( void )
 {
     subpicture_t *p_subpic = calloc( 1, sizeof(*p_subpic) );
     if( !p_subpic )
@@ -693,7 +654,7 @@ static subpicture_t *subpicture_New( void )
     return p_subpic;
 }
 
-static void subpicture_Delete( subpicture_t *p_subpic )
+void subpicture_Delete( subpicture_t *p_subpic )
 {
     subpicture_region_ChainDelete( p_subpic->p_region );
     p_subpic->p_region = NULL;
