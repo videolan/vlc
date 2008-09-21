@@ -44,6 +44,9 @@ VLC_EXPORT( void, module_Put, ( module_t *module ) );
 VLC_EXPORT( module_config_t *, module_GetConfig, ( const module_t *, unsigned * ) );
 VLC_EXPORT( void, module_PutConfig, ( module_config_t * ) );
 
+VLC_EXPORT( void, module_list_free, (module_t **) );
+VLC_EXPORT( module_t **, module_list_get, (size_t *n) );
+
 /* Return a NULL terminated array with the names of the modules that have a
  * certain capability.
  * Free after uses both the string and the table. */

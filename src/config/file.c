@@ -158,7 +158,6 @@ static int strtoi (const char *str)
 int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    vlc_list_t *p_list;
     FILE *file;
 
     file = config_OpenConfigFile (p_this, "rt");
@@ -169,7 +168,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     vlc_mutex_lock( &priv->config_lock );
 
     /* Look for the selected module, if NULL then save everything */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    module_t **list = module_list_get (NULL);
 
     /* Look for UTF-8 Byte Order Mark */
     char * (*convert) (const char *) = strdupnull;
@@ -215,9 +214,9 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
             if ((psz_module_name == NULL)
              || (strcmp (psz_module_name, section) == 0))
             {
-                for (int i = 0; i < p_list->i_count; i++)
+                for (int i = 0; list[i]; i++)
                 {
-                    module_t *m = (module_t *)p_list->p_values[i].p_object;
+                    module_t *m = list[i];
 
                     if ((strcmp (section, m->psz_object_name) == 0)
                      && (m->i_config_items > 0)) /* ignore config-less modules */
@@ -317,7 +316,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     }
     fclose (file);
 
-    vlc_list_release( p_list );
+    module_list_free (list);
     if (loc != (locale_t)0)
     {
         uselocale (baseloc);
@@ -416,7 +415,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     module_t *p_parser;
-    vlc_list_t *p_list;
     FILE *file;
     char p_line[1024], *p_index2;
     int i_sizebuf = 0;
@@ -460,7 +458,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     p_bigbuffer[0] = 0;
 
     /* List all available modules */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    module_t **list = module_list_get (NULL);
 
     /* backup file into memory, we only need to backup the sections we won't
      * save later on */
@@ -471,10 +469,8 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         {
 
             /* we found a section, check if we need to do a backup */
-            for( i_index = 0; i_index < p_list->i_count; i_index++ )
+            for( i_index = 0; (p_parser = list[i_index]) != NULL; i_index++ )
             {
-                p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-
                 if( ((p_index2 - &p_line[1])
                        == (int)strlen(p_parser->psz_object_name) )
                     && !memcmp( &p_line[1], p_parser->psz_object_name,
@@ -488,7 +484,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                 }
             }
 
-            if( i_index == p_list->i_count )
+            if( list[i_index] == NULL )
             {
                 /* we don't have this section in our list so we need to back
                  * it up */
@@ -526,7 +522,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     file = config_OpenConfigFile (p_this, "wt");
     if( !file )
     {
-        vlc_list_release( p_list );
+        module_list_free (list);
         free( p_bigbuffer );
         vlc_mutex_unlock( &priv->config_lock );
         return -1;
@@ -540,10 +536,9 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     locale_t baseloc = uselocale (loc);
 
     /* Look for the selected module, if NULL then save everything */
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( i_index = 0; (p_parser = list[i_index]) != NULL; i_index++ )
     {
         module_config_t *p_item, *p_end;
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( psz_module_name && strcmp( psz_module_name,
                                        p_parser->psz_object_name ) )
@@ -644,7 +639,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         }
     }
 
-    vlc_list_release( p_list );
+    module_list_free (list);
     if (loc != (locale_t)0)
     {
         uselocale (baseloc);
@@ -666,18 +661,17 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 int config_AutoSaveConfigFile( vlc_object_t *p_this )
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    vlc_list_t *p_list;
-    int i_index, i_count;
+    size_t i_index;
+    bool done;
 
     assert( p_this );
 
     /* Check if there's anything to save */
     vlc_mutex_lock( &priv->config_lock );
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    i_count = p_list->i_count;
-    for( i_index = 0; i_index < i_count; i_index++ )
+    module_t **list = module_list_get (NULL);
+    for( i_index = 0; list[i_index]; i_index++ )
     {
-        module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        module_t *p_parser = list[i_index];
         module_config_t *p_item, *p_end;
 
         if( !p_parser->i_config_items ) continue;
@@ -690,11 +684,11 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
         }
         if( p_item < p_end ) break;
     }
-    vlc_list_release( p_list );
+    done = list[i_index] == NULL;
+    module_list_free (list);
     vlc_mutex_unlock( &priv->config_lock );
 
-    if( i_index == i_count ) return VLC_SUCCESS;
-    return SaveConfigFile( p_this, NULL, true );
+    return done ? VLC_SUCCESS : SaveConfigFile( p_this, NULL, true );
 }
 
 int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )

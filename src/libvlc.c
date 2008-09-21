@@ -1424,14 +1424,12 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
 #else
 #   define OPTION_VALUE_SEP " "
 #endif
-    vlc_list_t *p_list = NULL;
     char psz_spaces_text[PADDING_SPACES+LINE_START+1];
     char psz_spaces_longtext[LINE_START+3];
     char psz_format[sizeof(COLOR_FORMAT_STRING)];
     char psz_format_bool[sizeof(COLOR_FORMAT_STRING_BOOL)];
     char psz_buffer[10000];
     char psz_short[4];
-    int i_index;
     int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
     int i_width_description = i_width + PADDING_SPACES - 1;
     bool b_advanced    = config_GetInt( p_this, "advanced" ) > 0;
@@ -1466,7 +1464,9 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
     }
 
     /* List all modules */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    module_t **list = module_list_get (NULL);
+    if (!list)
+        return;
 
     /* Ugly hack to make sure that the help options always come first
      * (part 1) */
@@ -1474,10 +1474,10 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
         Usage( p_this, "help" );
 
     /* Enumerate the config for each module */
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for (size_t i = 0; list[i]; i++)
     {
         bool b_help_module;
-        module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object;
+        module_t *p_parser = list[i];
         module_config_t *p_item = NULL;
         module_config_t *p_section = NULL;
         module_config_t *p_end = p_parser->p_config + p_parser->confsize;
@@ -1870,7 +1870,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
     }
 
     /* Release the module list */
-    vlc_list_release( p_list );
+    module_list_free (list);
 }
 
 /*****************************************************************************
@@ -1881,10 +1881,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
  *****************************************************************************/
 static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 {
-    vlc_list_t *p_list = NULL;
-    module_t *p_parser = NULL;
+    module_t *p_parser;
     char psz_spaces[22];
-    int i_index;
 
     bool b_color = config_GetInt( p_this, "color" ) > 0;
 
@@ -1895,14 +1893,12 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 #endif
 
     /* List all modules */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    module_t **list = module_list_get (NULL);
 
     /* Enumerate each module */
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for (size_t j = 0; (p_parser = list[j]) != NULL; j++)
     {
         int i;
-
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         /* Nasty hack, but right now I'm too tired to think about a nice
          * solution */
@@ -1951,8 +1947,7 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 
         psz_spaces[i] = ' ';
     }
-
-    vlc_list_release( p_list );
+    module_list_free (list);
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
     PauseConsole();

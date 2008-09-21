@@ -409,17 +409,17 @@ void __config_PutFloat( vlc_object_t *p_this,
  *****************************************************************************/
 module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 {
-    vlc_list_t *p_list;
-    int i_index;
+    module_t *p_parser;
 
     if( !psz_name ) return NULL;
 
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    module_t **list = module_list_get (NULL);
+    if (list == NULL)
+        return NULL;
 
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for (size_t i = 0; (p_parser = list[i]) != NULL; i++)
     {
         module_config_t *p_item, *p_end;
-        module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object;
 
         if( !p_parser->i_config_items )
             continue;
@@ -435,14 +435,13 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
              || ( p_item->psz_oldname
               && !strcmp( psz_name, p_item->psz_oldname ) ) )
             {
-                vlc_list_release( p_list );
+                module_list_free (list);
                 return p_item;
             }
         }
     }
 
-    vlc_list_release( p_list );
-
+    module_list_free (list);
     return NULL;
 }
 
@@ -536,17 +535,15 @@ void __config_ResetAll( vlc_object_t *p_this )
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     int i_index;
-    vlc_list_t *p_list;
     module_t *p_module;
+    module_t **list = module_list_get (NULL);
 
     /* Acquire config file lock */
     vlc_mutex_lock( &priv->config_lock );
 
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for (size_t j = 0; (p_module = list[j]) != NULL; j++)
     {
-        p_module = (module_t *)p_list->p_values[i_index].p_object ;
         if( p_module->b_submodule ) continue;
 
         for (size_t i = 0; i < p_module->confsize; i++ )
@@ -566,6 +563,6 @@ void __config_ResetAll( vlc_object_t *p_this )
         }
     }
 
-    vlc_list_release( p_list );
+    module_list_free (list);
     vlc_mutex_unlock( &priv->config_lock );
 }

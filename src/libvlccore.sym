@@ -212,6 +212,8 @@ __module_GetModulesNamesForCapability
 module_GetName
 module_GetObjName
 module_IsCapable
+module_list_free
+module_list_get
 __module_Need
 module_Put
 module_PutConfig
