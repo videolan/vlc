@@ -111,7 +111,7 @@ VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
     vlc_object_find_name( VLC_OBJECT(a),b,c)
 
 #define vlc_object_hold(a) \
-    (typeof(a))__vlc_object_hold( VLC_OBJECT(a) )
+    __vlc_object_hold( VLC_OBJECT(a) )
 
 #define vlc_object_release(a) \
     __vlc_object_release( VLC_OBJECT(a) )
