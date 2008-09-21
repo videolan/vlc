@@ -191,7 +191,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         }
     }
     module_config_free( p_config );
-    vlc_object_release( (vlc_object_t*)p_module );
+    module_release( p_module );
 
 
     vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
