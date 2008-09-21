@@ -85,8 +85,11 @@ struct spu_private_t
     bool b_force_palette;             /**< force palette of subpicture */
     uint8_t palette[4][4];                               /**< forced palette */
 
-    /* Supciture filters */
+    /* Subpiture filters */
     filter_chain_t *p_chain;
+
+    /* */
+    mtime_t i_last_sort_date;
 };
 
 /* */
@@ -222,6 +225,9 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     /* Load text and scale module */
     SpuRenderCreateAndLoadText( p_spu );
     SpuRenderCreateAndLoadScale( p_spu );
+
+    /* */
+    p_sys->i_last_sort_date = -1;
 
     return p_spu;
 }
@@ -563,14 +569,21 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
      * ends with NULL since p_subpic was initialized to NULL. */
     for( i_channel = 0; i_channel < p_sys->i_channel; i_channel++ )
     {
-        subpicture_t *p_ephemer = NULL;
+        subpicture_t *p_available_subpic[VOUT_MAX_SUBPICTURES];
+        bool         pb_available_late[VOUT_MAX_SUBPICTURES];
+        int          i_available = 0;
+
+        mtime_t      start_date = display_date;
         mtime_t      ephemer_date = 0;
         int i_index;
 
+        /* Select available pictures */
         for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
         {
             spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_index];
             subpicture_t *p_current = p_entry->p_subpicture;
+            bool b_stop_valid;
+            bool b_late;
 
             if( !p_current || p_entry->b_reject )
             {
@@ -594,39 +607,49 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
             if( p_current->i_start > ephemer_date )
                 ephemer_date = p_current->i_start;
 
-            if( display_date > p_current->i_stop &&
-                ( !p_current->b_ephemer || p_current->i_stop > p_current->i_start ) &&
-                !( p_current->b_subtitle && b_paused ) ) /* XXX Assume that subtitle are pausable */
+            b_stop_valid = ( !p_current->b_ephemer || p_current->i_stop > p_current->i_start ) &&
+                           ( !p_current->b_subtitle || !b_paused ); /* XXX Assume that subtitle are pausable */
+
+            b_late = b_stop_valid && p_current->i_stop <= display_date;
+
+            /* start_date will be used for correct automatic overlap support
+             * in case picture that should not be displayed anymore (display_time) 
+             * overlap with a picture to be displayed (p_current->i_start)  */
+            if( !b_late && !p_current->b_ephemer )
+                start_date = p_current->i_start;
+
+            /* */
+            p_available_subpic[i_available] = p_current;
+            pb_available_late[i_available] = b_late;
+            i_available++;
+        }
+
+        /* Only forced old picture display at the transition */
+        if( start_date < p_sys->i_last_sort_date )
+            start_date = p_sys->i_last_sort_date;
+        if( start_date <= 0 )
+            start_date = INT64_MAX;
+
+        /* Select pictures to be displayed */
+        for( i_index = 0; i_index < i_available; i_index++ )
+        {
+            subpicture_t *p_current = p_available_subpic[i_index];
+            bool b_late = pb_available_late[i_index];
+
+            if( ( b_late && p_current->i_stop <= __MAX( start_date, p_sys->i_last_sort_date ) ) ||
+                ( p_current->b_ephemer && p_current->i_start < ephemer_date ) )
             {
-                SpuHeapDeleteAt( &p_sys->heap, i_index );
-            }
-            else if( p_current->b_ephemer )
-            {
-                SubpictureChain( &p_ephemer, p_current );
+                /* Destroy late and obsolete ephemer subpictures */
+                SpuHeapDeleteSubpicture( &p_sys->heap, p_current );
             }
             else
             {
                 SubpictureChain( &p_subpic, p_current );
             }
         }
-
-        /* If we found ephemer subpictures, check if they have to be
-         * displayed or destroyed */
-        while( p_ephemer != NULL )
-        {
-            subpicture_t *p_tmp = p_ephemer;
-            p_ephemer = p_ephemer->p_next;
-
-            if( p_tmp->i_start < ephemer_date )
-            {
-                SpuHeapDeleteSubpicture( &p_sys->heap, p_tmp );
-            }
-            else
-            {
-                SubpictureChain( &p_subpic, p_tmp );
-            }
-        }
     }
+
+    p_sys->i_last_sort_date = display_date;
     vlc_mutex_unlock( &p_sys->lock );
 
     return p_subpic;
