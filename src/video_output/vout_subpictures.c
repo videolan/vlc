@@ -91,6 +91,13 @@ struct subpicture_region_private_t
     picture_t      *p_picture;
 };
 
+/* Subpicture rendered flag
+ * FIXME ? it could be moved to private ? */
+#define SUBPICTURE_RENDERED  (0x1000)
+#ifdef SUBPICTURE_RENDERED < SUBPICTURE_ALIGN_MASK
+#   error SUBPICTURE_RENDERED too low
+#endif
+
 static void SpuRegionPrivateDestroy( subpicture_region_private_t *p_private );
 
 static void UpdateSPU   ( spu_t *, vlc_object_t * );
