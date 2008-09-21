@@ -2048,7 +2048,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 
     o_modulearray = [[NSMutableArray alloc] initWithCapacity:10];
     /* build a list of available modules */
-    p_list = module_list_get( );
+    p_list = module_list_get( NULL );
     for( i_module_index = 0; p_list[i_module_index]; i_module_index++ )
     {
         int i;
