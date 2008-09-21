@@ -136,11 +136,13 @@ int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt)
 /** State for an RTP source */
 struct rtp_source_t
 {
-    mtime_t  expiry;  /* inactivation date */
     uint32_t ssrc;
+    uint32_t jitter;  /* interarrival delay jitter estimate */
+    mtime_t  last_rx; /* last received packet local timestamp */
+    uint32_t last_ts; /* last received packet RTP timestamp */
+
     uint16_t bad_seq; /* tentatively next expected sequence for resync */
     uint16_t max_seq; /* next expected sequence */
-    uint32_t jitter;  /* interarrival delay jitter estimate */
 
     uint16_t last_seq; /* sequence of the last dequeued packet */
     block_t *blocks; /* re-ordered blocks queue */
@@ -161,6 +163,7 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
         return NULL;
 
     source->ssrc = ssrc;
+    source->jitter = 0;
     source->max_seq = source->bad_seq = init_seq;
     source->last_seq = init_seq - 1;
     source->blocks = NULL;
@@ -194,6 +197,12 @@ static inline uint16_t rtp_seq (const block_t *block)
 {
     assert (block->i_buffer >= 4);
     return GetWBE (block->p_buffer + 2);
+}
+
+static inline uint32_t rtp_timestamp (const block_t *block)
+{
+    assert (block->i_buffer >= 12);
+    return GetDWBE (block->p_buffer + 4);
 }
 
 /**
@@ -239,7 +248,7 @@ rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
         }
 
         /* RTP source garbage collection */
-        if (tmp->expiry < now)
+        if ((tmp->last_rx + (p_sys->timeout * CLOCK_FREQ)) < now)
         {
             rtp_source_destroy (demux, session, tmp);
             if (--session->srcc > 0)
@@ -267,7 +276,22 @@ rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
             goto drop;
 
         tab[session->srcc++] = src;
+        /* Cannot compute jitter yet */
     }
+    else if (session->ptc > 0)
+    {
+        /* Recompute jitter estimate. That is computed from the RTP timestamps
+         * and the system clock. It is independent of RTP sequence. */
+        /* FIXME: payload types have the same frequency? */
+        uint32_t freq = session->ptv[0].frequency;
+        uint32_t ts = rtp_timestamp (block);
+        int64_t d = ((now - src->last_rx) * freq) / CLOCK_FREQ;
+        d        -=    ts - src->last_ts;
+        if (d < 0) d = -d;
+        src->jitter += ((d - src->jitter) + 8) >> 4;
+    }
+    src->last_rx = now;
+    src->last_ts = rtp_timestamp (block);
 
     /* Be optimistic for the first packet. Certain codec, such as Vorbis
      * do not like loosing the first packet(s), so we cannot just wait
@@ -369,7 +393,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
      * Otherwise it would be impossible to compute consistent timestamps. */
     /* FIXME: handle timestamp wrap properly */
     /* TODO: sync multiple sources sanely... */
-    const uint32_t timestamp = GetDWBE (block->p_buffer + 4);
+    const uint32_t timestamp = rtp_timestamp (block);
     block->i_pts = UINT64_C(1) * CLOCK_FREQ * timestamp / pt->frequency;
 
     /* CSRC count */
