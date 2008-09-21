@@ -336,14 +336,13 @@ mvar_t *mvar_ObjectSetNew( intf_thread_t *p_intf, char *psz_name,
                                const char *psz_capability )
 {
     mvar_t *s = mvar_New( psz_name, "set" );
-    int i;
+    size_t i;
 
-    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
-                                        FIND_ANYWHERE );
+    module_t **p_list = module_list_get( NULL );
 
-    for( i = 0; i < p_list->i_count; i++ )
+    for( i = 0; p_list[i]; i++ )
     {
-        module_t *p_parser = (module_t *)p_list->p_values[i].p_object;
+        module_t *p_parser = p_list[i];
         if( module_provides( p_parser, psz_capability ) )
         {
             mvar_t *sd = mvar_New( "sd", module_get_object( p_parser ) );
@@ -353,7 +352,7 @@ mvar_t *mvar_ObjectSetNew( intf_thread_t *p_intf, char *psz_name,
         }
     }
 
-    vlc_list_release( p_list );
+    module_list_free( p_list );
 
     return s;
 }

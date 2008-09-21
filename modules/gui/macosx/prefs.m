@@ -308,11 +308,10 @@ static VLCTreeItem *o_root_item = nil;
     if( [ o_children count] == 0 )
     {
         intf_thread_t   *p_intf = VLCIntf;
-        vlc_list_t      *p_list;
+        module_t       **p_list;
         module_t        *p_module = NULL;
         module_t        *p_main_module;
         module_config_t *p_items;
-        int             i = 0;
         if( [[self name] isEqualToString: @"main"] )
         {
             p_main_module = module_get_main( p_intf );
@@ -390,15 +389,15 @@ static VLCTreeItem *o_root_item = nil;
             vlc_object_release( (vlc_object_t *)p_main_module );
 
             /* List the modules */
-            p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+            p_list = module_list_get( NULL );
             if( !p_list ) return nil;
 
             /* Build a tree of the plugins */
             /* Add the capabilities */
-            for( i = 0; i < p_list->i_count; i++ )
+            for( size_t i = 0; p_list[i]; i++ )
             {
                 unsigned int confsize;
-                p_module = (module_t *)p_list->p_values[i].p_object;
+                p_module = p_list[i];
 
                 /* Exclude the main module */
                 if( module_is_main( p_module ) )
@@ -474,7 +473,7 @@ static VLCTreeItem *o_root_item = nil;
                     children:IsALeafNode
                     whithCategory: -1]];
                 }
-            vlc_list_release( p_list );
+            module_list_free( p_list );
         }
     }
     return o_children;
@@ -512,34 +511,22 @@ static VLCTreeItem *o_root_item = nil;
 
 - (BOOL)hasPrefs:(NSString *)o_module_name
 {
+    unsigned int confsize;
+
     intf_thread_t *p_intf = VLCIntf;
     module_t *p_parser;
-    vlc_list_t *p_list;
-    char *psz_module_name;
-    int i_index;
 
     psz_module_name = (char *)[o_module_name UTF8String];
 
     /* look for module */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_parser = module_find( p_intf, psz_module_name );
+    if( !p_parser )
+        return( NO );
 
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
-    {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-
-        if( !strcmp( module_get_object( p_parser ), psz_module_name ) )
-        {
-            unsigned int confsize;
-            module_config_get( p_parser, &confsize );
-            BOOL b_has_prefs = confsize != 0;
-            vlc_list_release( p_list );
-            return( b_has_prefs );
-        }
-    }
-
-    vlc_list_release( p_list );
-
-    return( NO );
+     module_config_get( p_parser, &confsize );
+     BOOL b_has_prefs = confsize != 0;
+     module_release( p_parser );
+     return( b_has_prefs );
 }
 
 - (NSView *)showView:(NSScrollView *)o_prefs_view

@@ -363,14 +363,13 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 - (void)setupButton: (NSPopUpButton *)object forModuleList: (const char *)name
 {
     module_config_t *p_item;
-    vlc_list_t *p_list;
-    module_t *p_parser;
+    module_t *p_parser, **p_list;
     int y = 0;
     
     [object removeAllItems];
     
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = module_list_get( NULL );
     if( !p_item ||!p_list )
     {
         if( p_list ) vlc_list_release(p_list);
@@ -379,17 +378,17 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     }
 
     [object addItemWithTitle: _NS("Default")];
-    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( size_t i_index = 0; p_list[i_index]; i_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object;
-        if( p_parser && module_provides( p_parser, p_item->psz_type ) )
+        p_parser = p_list[i_index];
+        if( module_provides( p_parser, p_item->psz_type ) )
         {
             [object addItemWithTitle: [NSString stringWithUTF8String: module_GetLongName( p_parser ) ?: ""]];
             if( p_item->value.psz && !strcmp( p_item->value.psz, module_get_object( p_parser ) ) )
                 [object selectItem: [object lastItem]];
         }
     }
-    vlc_list_release( p_list );
+    module_list_free( p_list );
     [object setToolTip: _NS(p_item->psz_longtext)];
 }
 
@@ -675,15 +674,14 @@ static inline void save_string_list( intf_thread_t * p_intf, id object, const ch
 static inline void save_module_list( intf_thread_t * p_intf, id object, const char * name )
 {
     module_config_t *p_item;
-    module_t *p_parser;
-    vlc_list_t *p_list;
+    module_t *p_parser, **p_list;
 
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
 
-    p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( int i_module_index = 0; i_module_index < p_list->i_count; i_module_index++ )
+    p_list = module_list_get( NULL );
+    for( size_t i_module_index = 0; p_list[i_module_index]; i_module_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_module_index].p_object;
+        p_parser = p_list[i_module_index];
 
         if( p_item->i_type == CONFIG_ITEM_MODULE && module_provides( p_parser, p_item->psz_type ) )
         {
@@ -694,7 +692,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             }
         }
     }
-    vlc_list_release( p_list );
+    module_list_free( p_list );
     if( [[[object selectedItem] title] isEqualToString: _NS( "Default" )] )
         config_PutPsz( p_intf, name, "" );
 }

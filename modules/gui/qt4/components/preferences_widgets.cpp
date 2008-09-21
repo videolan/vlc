@@ -549,18 +549,15 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
 
 void ModuleConfigControl::finish( bool bycat )
 {
-    vlc_list_t *p_list;
     module_t *p_parser;
 
     combo->setEditable( false );
 
     /* build a list of available modules */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    module_t **p_list = module_list_get( NULL );
     combo->addItem( qtr("Default") );
-    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( size_t i = 0; (p_parser = p_list[i]) != NULL; i++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-
         if( bycat )
         {
             if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
@@ -592,7 +589,7 @@ void ModuleConfigControl::finish( bool bycat )
                 combo->setCurrentIndex( combo->count() - 1 );
         }
     }
-    vlc_list_release( p_list );
+    module_list_free( p_list );
     combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
@@ -670,15 +667,12 @@ ModuleListConfigControl::~ModuleListConfigControl()
 
 void ModuleListConfigControl::finish( bool bycat )
 {
-    vlc_list_t *p_list;
     module_t *p_parser;
 
     /* build a list of available modules */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    module_t **p_list = module_list_get( NULL );
+    for( size_t i = 0; (p_parser = p_list[i]) != NULL; i++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-
         if( bycat )
         {
             if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
@@ -703,7 +697,7 @@ void ModuleListConfigControl::finish( bool bycat )
             CHECKBOX_LISTS;
         }
     }
-    vlc_list_release( p_list );
+    module_list_free( p_list );
     text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     assert( groupBox );
     groupBox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );

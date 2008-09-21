@@ -194,14 +194,10 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     module_release( p_module );
 
 
-    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
-                                        FIND_ANYWHERE );
+    module_t **p_list = module_list_get( NULL );
     /* Build the tree of plugins */
-    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( size_t i = 0; (p_module = p_list[i]) != NULL; i++ )
     {
-        /* Take every module */
-        p_module = (module_t *)p_list->p_values[i_index].p_object;
-
         // Main module excluded
         if( module_is_main( p_module) ) continue;
 
@@ -283,7 +279,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     /* We got everything, just sort a bit */
     sortItems( 0, Qt::AscendingOrder );
 
-    vlc_list_release( p_list );
+    module_list_free( p_list );
 }
 
 PrefsTree::~PrefsTree() {}

@@ -1254,9 +1254,8 @@
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
-        int i_index;
-        vlc_list_t *p_list;
-        module_t *p_parser;
+        size_t i_index;
+        module_t *p_parser, **p_list;
         i_view_type = CONFIG_ITEM_MODULE;
 
         o_popupTooltip = [[VLCMain sharedInstance] wrapString:
@@ -1282,10 +1281,10 @@
         [o_popup selectItem: [o_popup lastItem]];
 
         /* build a list of available modules */
-        p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-        for( i_index = 0; i_index < p_list->i_count; i_index++ )
+        p_list = module_list_get( NULL );
+        for( i_index = 0; p_list[i_index]; i_index++ )
         {
-            p_parser = (module_t *)p_list->p_values[i_index].p_object;
+            p_parser = p_list[i_index];
 
             if( p_item->i_type == CONFIG_ITEM_MODULE )
             {
@@ -1304,7 +1303,7 @@
             {
                 int i;
 
-                if( !strcmp( module_get_object( p_parser ), "main" ) )
+                if( module_is_main( p_parser ) )
                     continue;
                 unsigned int confsize;
                 unsigned int unused;
@@ -1327,7 +1326,7 @@
                 }
             }
         }
-        vlc_list_release( p_list );
+        module_list_free( p_list );
         [self addSubview: o_popup];
     }
     return self;
@@ -1357,14 +1356,13 @@
 {
     NSString *newval = [o_popup titleOfSelectedItem];
     char *returnval = NULL;
-    int i_module_index;
-    vlc_list_t *p_list;
-    module_t *p_parser;
+    size_t i_module_index;
+    module_t *p_parser, **p_list;
 
-    p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( i_module_index = 0; i_module_index < p_list->i_count; i_module_index++ )
+    p_list = module_list_get( NULL );
+    for( i_module_index = 0; p_list[i_module_index]; i_module_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_module_index].p_object;
+        p_parser = p_list[i_module_index];
 
         if( p_item->i_type == CONFIG_ITEM_MODULE )
         {
@@ -1383,7 +1381,7 @@
         {
             int i;
 
-            if( !strcmp( module_get_object( p_parser ), "main" ) )
+            if( module_is_main( p_parser) )
                 continue;
             unsigned int confsize, unused;
             module_config_get( p_parser, &confsize );
@@ -1405,7 +1403,7 @@
             }
         }
     }
-    vlc_list_release( p_list );
+    module_list_free( p_list );
     return returnval;
 }
 @end
@@ -2043,21 +2041,20 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
         return nil;
 
 //Fill our array to know how may items we have...
-    vlc_list_t *p_list;
-    module_t *p_parser;
-    int i_module_index;
+    module_t *p_parser, **p_list;
+    size_t i_module_index;
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldString, *o_tooltip;
 
     o_modulearray = [[NSMutableArray alloc] initWithCapacity:10];
     /* build a list of available modules */
-    p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( i_module_index = 0; i_module_index < p_list->i_count; i_module_index++ )
+    p_list = module_list_get( );
+    for( i_module_index = 0; p_list[i_module_index]; i_module_index++ )
     {
         int i;
-        p_parser = (module_t *)p_list->p_values[i_module_index].p_object;
+        p_parser = p_list[i_module_index];
 
-        if( !strcmp( module_get_object( p_parser ), "main" ) )
+        if( module_is_main( p_parser ) )
             continue;
 
         unsigned int confsize;
@@ -2091,7 +2088,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
             }
         }
     }
-    vlc_list_release( p_list );
+    module_list_free( p_list );
 
     mainFrame.size.height = 30 + 18 * [o_modulearray count];
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
