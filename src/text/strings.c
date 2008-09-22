@@ -243,6 +243,7 @@ static struct xml_entity_s
     size_t i_length;
     const char *psz_char;
 } p_xml_entities[] = {
+    /* Important: this list has to be in alphabetical order (psz_entity-wise) */
     { "&AElig;", 7, "Æ" },
     { "&Aacute;", 8, "Á" },
     { "&Acirc;", 7, "Â" },
