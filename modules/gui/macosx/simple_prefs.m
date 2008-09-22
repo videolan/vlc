@@ -650,8 +650,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     if( i_return == NSAlertAlternateReturn )
     {
         config_ResetAll( p_intf );
-        b_intfSettingChanged = b_videoSettingChanged = b_audioSettingChanged = YES;
         [self resetControls];
+        config_SaveConfigFile( p_intf, NULL );
     }
 }
 
