@@ -102,7 +102,7 @@ static int  AllocatePluginFile  ( vlc_object_t *, char *, int64_t, int64_t );
 static module_t * AllocatePlugin( vlc_object_t *, char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
-static void DeleteModule ( module_t *, bool );
+static void DeleteModule ( module_t * );
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void   DupModule        ( module_t * );
 static void   UndupModule      ( module_t * );
@@ -183,8 +183,7 @@ void __module_EndBank( vlc_object_t *p_this )
         if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
         {
             DeleteModule(
-                    p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module,
-                    p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->b_used );
+                    p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
             p_bank->pp_loaded_cache[p_bank->i_loaded_cache] = NULL;
@@ -209,7 +208,7 @@ void __module_EndBank( vlc_object_t *p_this )
 #endif
 
     while( p_bank->head != NULL )
-        DeleteModule( p_bank->head, true );
+        DeleteModule( p_bank->head );
 
     p_module_bank = NULL; /* FIXME: do this inside the lock */
     free( p_bank );
@@ -1389,7 +1388,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
  *****************************************************************************
  * This function can only be called if the module isn't being used.
  *****************************************************************************/
-static void DeleteModule( module_t * p_module, bool b_detach )
+static void DeleteModule( module_t * p_module )
 {
     assert( p_module );
 
