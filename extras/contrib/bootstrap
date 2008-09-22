@@ -70,6 +70,15 @@ if test "$HOST" != "$BUILD"; then
     STRIP="${HOST}-strip"
 fi
 
+case $HOST in
+    *powerpc*|*ppc*)
+         echo "ARCH=ppc" >> config.mak
+     ;;
+    *86*)
+          echo "ARCH=i386" >> config.mak
+     ;;
+esac
+
 # Check the HAVE_{OS}
 case $HOST in
     *darwin*)

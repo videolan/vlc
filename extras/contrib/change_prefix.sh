@@ -45,20 +45,24 @@ fi
 cd $top_dir
 pwd
 files=`find . -type f`
-for file in $files; do
-  if test ".`file $file | grep Mach-O`" != "." ; then
+for file in $files; do 
+ if test ".`file $file | grep Mach-O`" != "." ; then
+    echo "Changing prefixes of '$file'"
     libs=`otool -L $file 2>/dev/null | grep $prefix | cut -d\  -f 1`
-    echo $libs
+    WD=`pwd`
+    first=y
     for i in "" $libs; do
-    echo $i
-      if ! test -z $i; then
-        install_name_tool -change $i \
-                          `echo $i | sed -e "s,$prefix,$new_prefix,"` \
-                          $file
+     if ! test -z $i; then
+         if test $first = y; then
+            install_name_tool -id `echo $i | sed -e "s,$prefix,$new_prefix,"` $file
+            first=n
+        else
+            install_name_tool -change $i `echo $i | sed -e "s,$prefix,$new_prefix,"` $file
+         fi
       fi
     done
   elif test ".`file $file | grep \"text\|shell\"`" != "." ; then
-
+   echo "Fixing up shell/text file "$file""
     sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
     mv -f $file.tmp $file
   fi
@@ -68,7 +72,7 @@ cd $new_prefix2/lib/
 pwd
 files=` ls -1 *.la`
 for file in $files; do
-   echo $file
+   echo "Fixing up .la $file"
    sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
    mv -f $file.tmp $file
 done

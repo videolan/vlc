@@ -30,8 +30,24 @@ BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp gecko-sdk
 all:
 	$(MAKE) -C src
 
-contrib-macosx.tar.bz2:
-	$(WGET) $(CONTRIB_URL)
+ifdef HAVE_DARWIN_OS
+
+CONTRIBREV=20080922
+contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
+	$(WGET) ftp://ftp.videolan.org/pub/videolan/testing/contrib/contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
+
+using-bin: contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
+	@if test -d tmp; then \
+		echo "Move away ./tmp, it's in the way" ; \
+		exit 1 ; \
+	fi
+	mkdir tmp
+	(cd tmp && tar jxvf ../contrib-macosx.tar.bz2)
+	./change_prefix.sh tmp @@CONTRIB_PREFIX@@  $(PREFIX)
+	for dir in `(cd tmp && find . -type d)`; do mkdir -p -- $$dir; done
+	for i in `(cd tmp && find . -not -type d)`; do mv -f tmp/$$i $$i; done
+	rm -rf tmp
+endif
 
 clean-src:
 	rm -rf $(BUILDDIRS)
@@ -45,6 +61,8 @@ clean:
 	$(MAKE) clean-src
 	rm -rf config.mak distro.mak
 
+bin: using-bin
+
 package-macosx:
 	@if test -d tmp; then \
 		echo "Move away ./tmp, it's in the way" ; \
@@ -55,7 +73,6 @@ package-macosx:
 		share/automake* share/gettext* \
 		| (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
-	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
 	rm -rf tmp
 
 DISTDIR = usr/win32
