@@ -102,6 +102,7 @@ struct intf_sys_t
     id o_wizard;                /* VLCWizard      */
     id o_extended;              /* VLCExtended    */
     id o_bookmarks;             /* VLCBookmarks   */
+    id o_vlm;                   /* VLCVLMController */
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_interaction_list;      /* VLCInteractionList*/
     VLCInformation * o_info;                  /* VLCInformation */
@@ -118,6 +119,7 @@ struct intf_sys_t
     BOOL nib_prefs_loaded;      /* preferences nibfile */
     BOOL nib_update_loaded;     /* update nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
+    BOOL nib_vlm_loaded;        /* VLM Panel nibfile */
 
     IBOutlet VLControllerWindow * o_window;       /* main window    */
     IBOutlet NSView * o_playlist_view;/* playlist view  */
@@ -189,6 +191,7 @@ struct intf_sys_t
     IBOutlet NSMenuItem * o_mi_open_recent;
     IBOutlet NSMenuItem * o_mi_open_recent_cm;
     IBOutlet NSMenuItem * o_mi_open_wizard;
+    IBOutlet NSMenuItem * o_mi_open_vlm;
 
     IBOutlet NSMenu * o_mu_edit;
     IBOutlet NSMenuItem * o_mi_cut;
@@ -380,6 +383,7 @@ struct intf_sys_t
 - (IBAction)intfOpenCapture:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
+- (IBAction)showVLM:(id)sender;
 - (IBAction)showExtended:(id)sender;
 - (IBAction)showBookmarks:(id)sender;
 

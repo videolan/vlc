@@ -154,6 +154,10 @@
 		CC402F420E00ABBB006A4BA4 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */; };
 		CC402F430E00ABBB006A4BA4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC1941240B9C1F8400635F6B /* QTKit.framework */; };
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
+		CCB60A420E6E5E3F00407004 /* VLM.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCB60A400E6E5E3F00407004 /* VLM.nib */; };
+		CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4B0E87C86D0034564A /* add_schedule.png */; };
+		CCD90F4F0E87C86D0034564A /* add_vod.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4C0E87C86D0034564A /* add_vod.png */; };
+		CCD90F500E87C86D0034564A /* add_broadcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4D0E87C86D0034564A /* add_broadcast.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -319,6 +323,9 @@
 		CC965D5F0DA5880F0088F222 /* display_right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = display_right.png; path = Resources/display_right.png; sourceTree = "<group>"; };
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
+		CCB60A3E0E6E5DD900407004 /* vlm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vlm.m; path = ../../../modules/gui/macosx/vlm.m; sourceTree = SOURCE_ROOT; };
+		CCB60A3F0E6E5DD900407004 /* vlm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vlm.h; path = ../../../modules/gui/macosx/vlm.h; sourceTree = SOURCE_ROOT; };
+		CCB60A410E6E5E3F00407004 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/VLM.nib; sourceTree = "<group>"; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
@@ -350,6 +357,9 @@
 		CCCB86D80ACFDFB300CF1E10 /* fs_stop_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop_highlight.png; path = Resources/fs_stop_highlight.png; sourceTree = "<group>"; };
 		CCCB86D90ACFDFB300CF1E10 /* fs_stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop.png; path = Resources/fs_stop.png; sourceTree = "<group>"; };
 		CCCB86DA0ACFDFB300CF1E10 /* fs_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_background.png; path = Resources/fs_background.png; sourceTree = "<group>"; };
+		CCD90F4B0E87C86D0034564A /* add_schedule.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_schedule.png; path = Resources/add_schedule.png; sourceTree = "<group>"; };
+		CCD90F4C0E87C86D0034564A /* add_vod.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_vod.png; path = Resources/add_vod.png; sourceTree = "<group>"; };
+		CCD90F4D0E87C86D0034564A /* add_broadcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_broadcast.png; path = Resources/add_broadcast.png; sourceTree = "<group>"; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
 		DC7F46EC08A183FC0027DB24 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Extended.nib; sourceTree = "<group>"; };
@@ -422,6 +432,7 @@
 				F69B0CA602E24F6401A80112 /* InfoPlist.strings */,
 				8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */,
 				CC1C41D00D9BAD7F002728FA /* noart.png */,
+				CCD90F4A0E87C82D0034564A /* VLM */,
 				CC0B71E00D54F0DD00448E00 /* simple prefs (taken from qt4) */,
 				8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */,
 				8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */,
@@ -480,6 +491,8 @@
 				CC6EDD500B9CA2140096068A /* eyetv.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
+				CCB60A3F0E6E5DD900407004 /* vlm.h */,
+				CCB60A3E0E6E5DD900407004 /* vlm.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -729,9 +742,20 @@
 			name = "Native FSPanel icons";
 			sourceTree = "<group>";
 		};
+		CCD90F4A0E87C82D0034564A /* VLM */ = {
+			isa = PBXGroup;
+			children = (
+				CCD90F4B0E87C86D0034564A /* add_schedule.png */,
+				CCD90F4C0E87C86D0034564A /* add_vod.png */,
+				CCD90F4D0E87C86D0034564A /* add_broadcast.png */,
+			);
+			name = VLM;
+			sourceTree = "<group>";
+		};
 		DCF358BC077F1236007DB450 /* nibs */ = {
 			isa = PBXGroup;
 			children = (
+				CCB60A400E6E5E3F00407004 /* VLM.nib */,
 				CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */,
 				DCA00AA7075F948800E6BF46 /* About.nib */,
 				F74F13EA02C2A79C01EE194C /* MainMenu.nib */,
@@ -933,6 +957,10 @@
 				CC402F3D0E00ABBB006A4BA4 /* display_middle.png in Resources */,
 				CC402F3E0E00ABBB006A4BA4 /* display_left.png in Resources */,
 				CC402F3F0E00ABBB006A4BA4 /* display_right.png in Resources */,
+				CCB60A420E6E5E3F00407004 /* VLM.nib in Resources */,
+				CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */,
+				CCD90F4F0E87C86D0034564A /* add_vod.png in Resources */,
+				CCD90F500E87C86D0034564A /* add_broadcast.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -971,6 +999,14 @@
 				CC26BF2B09A7A05000E94D62 /* English */,
 			);
 			name = Update.nib;
+			sourceTree = "<group>";
+		};
+		CCB60A400E6E5E3F00407004 /* VLM.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CCB60A410E6E5E3F00407004 /* English */,
+			);
+			name = VLM.nib;
 			sourceTree = "<group>";
 		};
 		CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */ = {
