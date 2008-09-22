@@ -115,7 +115,6 @@ vlc_module_begin();
                 BIND_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "path", "", NULL, PATH_TEXT,
                 PATH_LONGTEXT, false );
-        change_unsafe();
 
     add_bool( SOUT_CFG_PREFIX "sap", false, NULL, SAP_TEXT, SAP_LONGTEXT,
               true );

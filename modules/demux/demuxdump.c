@@ -57,7 +57,6 @@ vlc_module_begin();
     set_capability( "demux", 0 );
     add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT,
               FILE_LONGTEXT, false );
-        change_unsafe();
     add_bool( "demuxdump-append", 0, NULL, APPEND_TEXT, APPEND_LONGTEXT,
               false );
     set_callbacks( Open, Close );

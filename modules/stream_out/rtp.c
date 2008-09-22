@@ -167,7 +167,6 @@ vlc_module_begin();
 
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
                 DEST_LONGTEXT, true );
-        change_unsafe();
     add_string( SOUT_CFG_PREFIX "sdp", "", NULL, SDP_TEXT,
                 SDP_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,

@@ -172,7 +172,6 @@ vlc_module_begin();
     add_bool( "ts-silent", 0, NULL, SILENT_TEXT, SILENT_LONGTEXT, true );
 
     add_file( "ts-dump-file", NULL, NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, false );
-        change_unsafe();
     add_bool( "ts-dump-append", 0, NULL, APPEND_TEXT, APPEND_LONGTEXT, false );
     add_integer( "ts-dump-size", 16384, NULL, DUMPSIZE_TEXT,
                  DUMPSIZE_LONGTEXT, true );

@@ -73,7 +73,6 @@ vlc_module_begin();
     add_integer( "timeshift-granularity", 50, NULL, GRANULARITY_TEXT,
                  GRANULARITY_LONGTEXT, true );
     add_directory( "timeshift-dir", 0, 0, DIR_TEXT, DIR_LONGTEXT, false );
-        change_unsafe();
     add_bool( "timeshift-force", false, NULL, FORCE_TEXT, FORCE_LONGTEXT,
               false );
 vlc_module_end();

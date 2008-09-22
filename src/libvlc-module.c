@@ -1551,7 +1551,6 @@ vlc_module_begin();
     set_section( N_("Snapshot") , NULL );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, false );
-        change_unsafe();
     add_string( "snapshot-prefix", "vlcsnap-", NULL, SNAP_PREFIX_TEXT,
                    SNAP_PREFIX_LONGTEXT, false );
     add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
@@ -1877,7 +1876,6 @@ vlc_module_begin();
     add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
                    PLUGIN_PATH_LONGTEXT, true );
         change_need_restart();
-        change_unsafe();
 
     set_section( N_("Performance options"), NULL );
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,

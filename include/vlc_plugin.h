@@ -445,8 +445,6 @@ enum vlc_config_properties
 #define change_unsaveable() \
     vlc_config_set (p_config, VLC_CONFIG_VOLATILE);
 
-#define change_unsafe() (void)0; /* no-op */
-
 #define change_safe() \
     vlc_config_set (p_config, VLC_CONFIG_SAFE);
 
