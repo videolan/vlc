@@ -53,7 +53,7 @@ using-bin: contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 		exit 1 ; \
 	fi
 	mkdir tmp
-	(cd tmp && tar jxvf ../contrib-macosx.tar.bz2)
+	(cd tmp && tar jxvf ../contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2)
 	./change_prefix.sh tmp @@CONTRIB_PREFIX@@  $(PREFIX)
 	for dir in `(cd tmp && find . -type d)`; do mkdir -p -- $$dir; done
 	for i in `(cd tmp && find . -not -type d)`; do mv -f tmp/$$i $$i; done
