@@ -146,8 +146,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Connect the input manager to the GUI elements it manages */
 
     /* It is also connected to the control->slider, see the ControlsWidget */
-    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
-             this, setDisplayPosition( float, int, int ) );
     /* Change the SpeedRate in the Status */
     CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
 
@@ -291,11 +289,7 @@ inline void MainInterface::createStatusBar()
      *  Status Bar  *
      ****************/
     /* Widgets Creation*/
-    b_remainingTime = false;
-    timeLabel = new TimeLabel;
-    timeLabel->setText( " --:--/--:-- " );
-    timeLabel->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
-    timeLabel->setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
+    timeLabel = new TimeLabel( p_intf );
     nameLabel = new QLabel;
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
@@ -318,9 +312,7 @@ inline void MainInterface::createStatusBar()
        - double clicking opens the goto time dialog
        - right-clicking and clicking just toggle between remaining and
          elapsed time.*/
-    CONNECT( timeLabel, timeLabelClicked(), this, toggleTimeDisplay() );
     CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
-    CONNECT( timeLabel, timeLabelDoubleClicked(), this, toggleTimeDisplay() );
 
     /* Speed Label behaviour:
        - right click gives the vertical speed slider */
@@ -854,27 +846,6 @@ void MainInterface::visual()
 /************************************************************************
  * Other stuff
  ************************************************************************/
-void MainInterface::setDisplayPosition( float pos, int time, int length )
-{
-    char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
-    secstotimestr( psz_length, length );
-    secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time
-                                                           : time );
-
-    QString timestr;
-    timestr.sprintf( "%s/%s", psz_time,
-                            ( !length && time ) ? "--:--" : psz_length );
-
-    /* Add a minus to remaining time*/
-    if( b_remainingTime && length ) timeLabel->setText( " -"+timestr+" " );
-    else timeLabel->setText( " "+timestr+" " );
-}
-
-void MainInterface::toggleTimeDisplay()
-{
-    b_remainingTime = !b_remainingTime;
-}
-
 void MainInterface::setName( QString name )
 {
     input_name = name; /* store it for the QSystray use */

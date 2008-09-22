@@ -133,7 +133,6 @@ private:
     bool                 playlistVisible; ///< Is the playlist visible ?
     bool                 visualSelectorEnabled;
     bool                 notificationEnabled; /// Systray Notifications
-    bool                 b_remainingTime; /* Show elapsed or remaining time */
     bool                 bgWasVisible;
     int                  i_visualmode; ///< Visual Mode
     pl_dock_e            i_pl_dock;
@@ -171,8 +170,6 @@ private slots:
     void setRate( int );
     void setName( QString );
     void setVLCWindowsTitle( QString title = "" );
-    void setDisplayPosition( float, int, int );
-    void toggleTimeDisplay();
 #if 0
     void visual();
 #endif

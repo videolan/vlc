@@ -332,16 +332,25 @@ private:
 class TimeLabel : public QLabel
 {
     Q_OBJECT
-    void mousePressEvent( QMouseEvent *event )
+public:
+    TimeLabel( intf_thread_t *_p_intf );
+protected:
+    virtual void mousePressEvent( QMouseEvent *event )
     {
-        emit timeLabelClicked();
+        toggleTimeDisplay();
     }
-    void mouseDoubleClickEvent( QMouseEvent *event )
+    virtual void mouseDoubleClickEvent( QMouseEvent *event )
     {
+        toggleTimeDisplay();
         emit timeLabelDoubleClicked();
     }
+private slots:
+    void setDisplayPosition( float pos, int time, int length );
+private:
+    intf_thread_t *p_intf;
+    bool b_remainingTime;
+    void toggleTimeDisplay();
 signals:
-    void timeLabelClicked();
     void timeLabelDoubleClicked();
 };
 

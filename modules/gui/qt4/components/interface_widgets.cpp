@@ -1027,6 +1027,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     fsLayout->addWidget( slider, 0, 1, 1, 9 );
     fsLayout->addWidget( fasterButton, 0, 10 );
 
+    /* Second line */
     fsLayout->addWidget( playButton, 1, 0, 1, 2 );
     fsLayout->addLayout( controlButLayout, 1, 2 );
 
@@ -1036,8 +1037,12 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     fsLayout->addWidget( advControls, 1, 6, Qt::AlignVCenter );
 
     fsLayout->setColumnStretch( 7, 10 );
-    fsLayout->addWidget( volMuteLabel, 1, 8 );
-    fsLayout->addWidget( volumeSlider, 1, 9, 1, 2 );
+
+    TimeLabel *timeLabel = new TimeLabel( p_intf );
+
+    fsLayout->addWidget( timeLabel, 1, 8 );
+    fsLayout->addWidget( volMuteLabel, 1, 9 );
+    fsLayout->addWidget( volumeSlider, 1, 10,1, 2 );
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
@@ -1068,6 +1073,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     fullscreenButton->setIcon( QIcon( ":/defullscreen" ) );
 
     vlc_mutex_init_recursive( &lock );
+    setMinimumWidth( 450 );
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
@@ -1607,4 +1613,38 @@ void CoverArtLabel::doUpdate()
         free( psz_meta );
     }
 }
+
+TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
+{
+   b_remainingTime = false;
+   setText( " --:--/--:-- " );
+   setAlignment( Qt::AlignRight | Qt::AlignVCenter );
+   setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
+
+
+   CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
+             this, setDisplayPosition( float, int, int ) );
+}
+
+void TimeLabel::setDisplayPosition( float pos, int time, int length )
+{
+    char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
+    secstotimestr( psz_length, length );
+    secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time
+                                                           : time );
+
+    QString timestr;
+    timestr.sprintf( "%s/%s", psz_time,
+                            ( !length && time ) ? "--:--" : psz_length );
+
+    /* Add a minus to remaining time*/
+    if( b_remainingTime && length ) setText( " -"+timestr+" " );
+    else setText( " "+timestr+" " );
+}
+
+void TimeLabel::toggleTimeDisplay()
+{
+    b_remainingTime = !b_remainingTime;
+}
+
 
