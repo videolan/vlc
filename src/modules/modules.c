@@ -486,27 +486,15 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
 
         /* Test that this module can do what we need */
         if( !module_provides( p_module, psz_capability ) )
-        {
-            /* Don't recurse through the sub-modules because vlc_list_find()
-             * will list them anyway. */
             continue;
-        }
-
         /* Test if we have the required CPU */
         if( (p_module->i_cpu & i_cpu) != p_module->i_cpu )
-        {
             continue;
-        }
 
         /* If we required a shortcut, check this plugin provides it. */
         if( i_shortcuts > 0 )
         {
-            bool b_trash;
             const char *psz_name = psz_shortcuts;
-
-            /* Let's drop modules with a <= 0 score (unless they are
-             * explicitly requested) */
-            b_trash = p_module->i_score <= 0;
 
             for( unsigned i_short = i_shortcuts; i_short > 0; i_short-- )
             {
