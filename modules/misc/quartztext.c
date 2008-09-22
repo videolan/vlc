@@ -515,8 +515,8 @@ static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys,
 
 static void SetupLine( filter_t *p_filter, const char *psz_text_in,
                        UniChar **psz_text_out, uint32_t *pi_runs,
-                       uint32_t **ppi_run_lengths, ft_style_t ***ppp_styles,
-                       ft_style_t *p_style )
+                       uint32_t **ppi_run_lengths, ATSUStyle **ppp_styles,
+                       ATSUStyle p_style )
 {
     uint32_t i_string_length = 0;
 
@@ -532,7 +532,7 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
         else
             *ppp_styles = (ATSUStyle *) malloc( *pi_runs * sizeof( ATSUStyle ) );
 
-        (*ppp_styles)[ *pi_runs - 1 ] = GetStyleFromFontStack( p_sys, &p_fonts, b_bold, b_italic, b_uline );
+        (*ppp_styles)[ *pi_runs - 1 ] = p_style;
 
         if( *ppi_run_lengths )
             *ppi_run_lengths = (uint32_t *) realloc( *ppi_run_lengths, *pi_runs * sizeof( uint32_t ) );
@@ -541,20 +541,6 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
 
         (*ppi_run_lengths)[ *pi_runs - 1 ] = i_string_length;
     }
-}
-
-
-static void SetKaraokeLen( uint32_t i_runs, uint32_t *pi_run_lengths,
-                           uint32_t i_k_runs, uint32_t *pi_k_run_lengths )
-{
-    /* TODO */
-}
-
-static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
-                          uint32_t **ppi_k_run_lengths,
-                          uint32_t **ppi_k_durations )
-{
-    /* TODO */
 }
 
 static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
