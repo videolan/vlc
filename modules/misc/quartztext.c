@@ -508,6 +508,36 @@ static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys,
     return p_style;
 }
 
+static void SetupLine( filter_t *p_filter, const char *psz_text_in,
+                       uint32_t **psz_text_out, uint32_t *pi_runs,
+                       uint32_t **ppi_run_lengths, ft_style_t ***ppp_styles,
+                       ft_style_t *p_style )
+{
+    uint32_t i_string_length = 0;
+
+    ConvertToUTF16( psz_text_in, &i_string_length, psz_text_out );
+    *psz_text_out += i_string_length;
+
+    if( ppp_styles && ppi_run_lengths )
+    {
+        (*pi_runs)++;
+
+        if( *ppp_styles )
+            *ppp_styles = (ATSUStyle *) realloc( *ppp_styles, *pi_runs * sizeof( ATSUStyle ) );
+        else
+            *ppp_styles = (ATSUStyle *) malloc( *pi_runs * sizeof( ATSUStyle ) );
+
+        (*ppp_styles)[ *pi_runs - 1 ] = GetStyleFromFontStack( p_sys, &p_fonts, b_bold, b_italic, b_uline );
+
+        if( *ppi_run_lengths )
+            *ppi_run_lengths = (uint32_t *) realloc( *ppi_run_lengths, *pi_runs * sizeof( uint32_t ) );
+        else
+            *ppi_run_lengths = (uint32_t *) malloc( *pi_runs * sizeof( uint32_t ) );
+
+        (*ppi_run_lengths)[ *pi_runs - 1 ] = i_string_length;
+    }
+}
+
 static int ProcessNodes( filter_t *p_filter,
                          xml_reader_t *p_xml_reader,
                          text_style_t *p_font_style,
@@ -602,26 +632,13 @@ static int ProcessNodes( filter_t *p_filter,
                         b_uline = true;
                     else if( !strcasecmp( "br", psz_node ) )
                     {
-                        uint32_t i_string_length;
-
-                        ConvertToUTF16( "\n", &i_string_length, &psz_text );
-                        psz_text += i_string_length;
-
-                        (*pi_runs)++;
-
-                        if( *ppp_styles )
-                            *ppp_styles = (ATSUStyle *) realloc( *ppp_styles, *pi_runs * sizeof( ATSUStyle ) );
-                        else
-                            *ppp_styles = (ATSUStyle *) malloc( *pi_runs * sizeof( ATSUStyle ) );
-
-                        (*ppp_styles)[ *pi_runs - 1 ] = GetStyleFromFontStack( p_sys, &p_fonts, b_bold, b_italic, b_uline );
-
-                        if( *ppi_run_lengths )
-                            *ppi_run_lengths = (uint32_t *) realloc( *ppi_run_lengths, *pi_runs * sizeof( uint32_t ) );
-                        else
-                            *ppi_run_lengths = (uint32_t *) malloc( *pi_runs * sizeof( uint32_t ) );
-
-                        (*ppi_run_lengths)[ *pi_runs - 1 ] = i_string_length;
+                        SetupLine( p_filter, "\n", &psz_text,
+                                   pi_runs, ppi_run_lengths, ppp_styles,
+                                   GetStyleFromFontStack( p_sys,
+                                                          &p_fonts,
+                                                          b_bold,
+                                                          b_italic,
+                                                          b_uline ) );
                     }
                     free( psz_node );
                 }
