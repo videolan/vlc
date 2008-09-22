@@ -604,6 +604,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
     if( !psz_tag ) return NULL;
     size_t  i_buf_size     = strlen( psz_subtitle ) + 100;
     char   *psz_html_start = malloc( i_buf_size );
+    bool b_has_align = false;
 
     psz_tag[ 0 ] = '\0';
 
@@ -617,18 +618,6 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
 
     strcpy( psz_html, "<text>" );
     psz_html += 6;
-
-    /* Check for forced alignment */
-    if( !strncmp( psz_subtitle, "{\\an", 4 ) && psz_subtitle[4] >= '1' && psz_subtitle[4] <= '9' && psz_subtitle[5] == '}' )
-    {
-        static const int pi_vertical[3] = { SUBPICTURE_ALIGN_BOTTOM, 0, SUBPICTURE_ALIGN_TOP };
-        static const int pi_horizontal[3] = { SUBPICTURE_ALIGN_LEFT, 0, SUBPICTURE_ALIGN_RIGHT };
-        const int i_id = psz_subtitle[4] - '1';
-
-        *pi_align = pi_vertical[i_id/3] | pi_horizontal[i_id%3];
-
-        psz_subtitle += 6;
-    }
 
     /* */
     while( *psz_subtitle )
@@ -721,6 +710,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
             else if( !strncmp( psz_subtitle, "</", 2 ))
             {
                 bool   b_match     = false;
+                bool   b_ignore    = false;
                 int    i_len       = strlen( psz_tag ) - 1;
                 char  *psz_lastTag = NULL;
 
@@ -747,9 +737,16 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                         b_match = !strncasecmp( psz_subtitle, "</font>", 7 );
                         i_len   = 7;
                         break;
+                    case 'I':
+                        i_len = strcspn( psz_subtitle, ">" );
+                        b_match = psz_subtitle[i_len] == '>';
+                        b_ignore = true;
+                        if( b_match )
+                            i_len++;
+                        break;
                     }
                 }
-                if( ! b_match )
+                if( !b_match )
                 {
                     /* Not well formed -- kill everything */
                     free( psz_html_start );
@@ -757,13 +754,66 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                     break;
                 }
                 *psz_lastTag = '\0';
-                strncpy( psz_html, psz_subtitle, i_len );
-                psz_html += i_len;
+                if( !b_ignore )
+                    HtmlNPut( &psz_html, psz_subtitle, i_len );
+
                 psz_subtitle += i_len;
+            }
+            else if( ( psz_subtitle[1] < 'a' || psz_subtitle[1] > 'z' ) &&
+                     ( psz_subtitle[1] < 'A' || psz_subtitle[1] > 'Z' ) )
+            {
+                /* We have a single < */
+                HtmlPut( &psz_html, "&lt;" );
+                psz_subtitle++;
             }
             else
             {
-                psz_subtitle += strcspn( psz_subtitle, ">" );
+                /* We have an unknown tag or a single < */
+
+                /* Search for the next tag or end of tag or end of string */
+                char *psz_stop = psz_subtitle + 1 + strcspn( &psz_subtitle[1], "<>" );
+                char *psz_closing = strstr( psz_subtitle, "/>" );
+
+                if( psz_closing && psz_closing < psz_stop )
+                {
+                    /* We have a self closed tag, remove it */
+                    psz_subtitle = &psz_closing[2];
+                }
+                else if( *psz_stop == '>' )
+                {
+                    char psz_match[256];
+
+                    snprintf( psz_match, sizeof(psz_match), "</%s", &psz_subtitle[1] );
+                    psz_match[strcspn( psz_match, " \t>" )] = '\0';
+
+                    if( strstr( psz_subtitle, psz_match ) )
+                    {
+                        /* We have the closing tag, ignore it TODO */
+                        psz_subtitle = &psz_stop[1];
+                        strcat( psz_tag, "I" );
+                    }
+                    else
+                    {
+                        int i_len = psz_stop + 1 - psz_subtitle;
+
+                        /* Copy the whole data */
+                        for( ; i_len > 0; i_len--, psz_subtitle++ )
+                        {
+                            if( *psz_subtitle == '<' )
+                                HtmlPut( &psz_html, "&lt;" );
+                            else if( *psz_subtitle == '>' )
+                                HtmlPut( &psz_html, "&gt;" );
+                            else
+                                *psz_html++ = *psz_subtitle;
+                        }
+                    }
+                }
+                else
+                {
+                    /* We have a single < */
+                    HtmlPut( &psz_html, "&lt;" );
+                    psz_subtitle++;
+                }
             }
         }
         else if( *psz_subtitle == '&' )
@@ -785,6 +835,30 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                 HtmlPut( &psz_html, "&amp;" );
                 psz_subtitle++;
             }
+        }
+        else if( *psz_subtitle == '>' )
+        {
+            HtmlPut( &psz_html, "&gt;" );
+            psz_subtitle++;
+        }
+        else if( psz_subtitle[0] == '{' && psz_subtitle[1] == '\\' &&
+                 strchr( psz_subtitle, '}' ) )
+        {
+            /* Check for forced alignment */
+            if( !b_has_align &&
+                !strncmp( psz_subtitle, "{\\an", 4 ) && psz_subtitle[4] >= '1' && psz_subtitle[4] <= '9' && psz_subtitle[5] == '}' )
+            {
+                static const int pi_vertical[3] = { SUBPICTURE_ALIGN_BOTTOM, 0, SUBPICTURE_ALIGN_TOP };
+                static const int pi_horizontal[3] = { SUBPICTURE_ALIGN_LEFT, 0, SUBPICTURE_ALIGN_RIGHT };
+                const int i_id = psz_subtitle[4] - '1';
+
+                b_has_align = true;
+                *pi_align = pi_vertical[i_id/3] | pi_horizontal[i_id%3];
+            }
+            /* TODO fr -> rotation */
+
+            /* Hide {\stupidity} */
+            psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
         }
         else
         {
