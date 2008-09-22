@@ -1022,10 +1022,9 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     /* First line */
     slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);
-    slider->setMinimumWidth( 300 );
     fsLayout->addWidget( slowerButton, 0, 0 );
-    fsLayout->addWidget( slider, 0, 1, 1, 9 );
-    fsLayout->addWidget( fasterButton, 0, 10 );
+    fsLayout->addWidget( slider, 0, 1, 1, 11 );
+    fsLayout->addWidget( fasterButton, 0, 12 );
 
     /* Second line */
     fsLayout->addWidget( playButton, 1, 0, 1, 2 );
@@ -1042,7 +1041,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     fsLayout->addWidget( timeLabel, 1, 8 );
     fsLayout->addWidget( volMuteLabel, 1, 9 );
-    fsLayout->addWidget( volumeSlider, 1, 10,1, 2 );
+    fsLayout->addWidget( volumeSlider, 1, 10, 1, 2 );
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
@@ -1073,7 +1072,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     fullscreenButton->setIcon( QIcon( ":/defullscreen" ) );
 
     vlc_mutex_init_recursive( &lock );
-    setMinimumWidth( 450 );
+    setMinimumWidth( 600 );
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
