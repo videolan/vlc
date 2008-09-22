@@ -27,8 +27,19 @@ include ./config.mak
 
 BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp gecko-sdk
 
-all:
+ifdef HAVE_DARWIN_OS_ON_INTEL
+TARGETALL=using-bin
+else
+TARGETALL=using-src
+endif
+
+all: $(TARGETALL)
+
+using-src:
 	$(MAKE) -C src
+
+# shortcut
+src: using-src
 
 ifdef HAVE_DARWIN_OS
 
