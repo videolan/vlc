@@ -45,7 +45,7 @@ ifdef HAVE_DARWIN_OS
 
 CONTRIBREV=20080922
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
-	$(WGET) ftp://ftp.videolan.org/pub/videolan/testing/contrib/contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
+	$(WGET) ftp://ftp.videolan.org/pub/videolan/testing/contrib/$@
 
 using-bin: contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 	@if test -d tmp; then \
@@ -53,7 +53,7 @@ using-bin: contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 		exit 1 ; \
 	fi
 	mkdir tmp
-	(cd tmp && tar jxvf ../contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2)
+	(cd tmp && tar jxvf ../$<)
 	./change_prefix.sh tmp @@CONTRIB_PREFIX@@  $(PREFIX)
 	for dir in `(cd tmp && find . -type d)`; do mkdir -p -- $$dir; done
 	for i in `(cd tmp && find . -not -type d)`; do mv -f tmp/$$i $$i; done
