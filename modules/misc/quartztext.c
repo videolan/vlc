@@ -43,8 +43,6 @@
 
 #include <Carbon/Carbon.h>
 
-#include "text_renderer.h"
-
 #define DEFAULT_FONT           "Arial Black"
 #define DEFAULT_FONT_COLOR     0xffffff
 #define DEFAULT_REL_FONT_SIZE  16
@@ -154,6 +152,13 @@ struct filter_sys_t
     ATSFontContainerRef    *p_fonts;
     int                     i_fonts;
 };
+
+#define UCHAR UniChar
+#define TR_DEFAULT_FONT p_sys->psz_font_name
+#define TR_DEFAULT_COLOR p_sys->i_font_color
+#define TR_FONT_STYLE_PTR ATSUStyle
+
+#include "text_renderer.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Create: allocates osd-text video thread output method
@@ -509,7 +514,7 @@ static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys,
 }
 
 static void SetupLine( filter_t *p_filter, const char *psz_text_in,
-                       uint32_t **psz_text_out, uint32_t *pi_runs,
+                       UniChar **psz_text_out, uint32_t *pi_runs,
                        uint32_t **ppi_run_lengths, ft_style_t ***ppp_styles,
                        ft_style_t *p_style )
 {
@@ -542,187 +547,14 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
 static void SetKaraokeLen( uint32_t i_runs, uint32_t *pi_run_lengths,
                            uint32_t i_k_runs, uint32_t *pi_k_run_lengths )
 {
+    /* TODO */
 }
 
 static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
                           uint32_t **ppi_k_run_lengths,
                           uint32_t **ppi_k_durations )
 {
-}
-
-static int ProcessNodes( filter_t *p_filter,
-                         xml_reader_t *p_xml_reader,
-                         text_style_t *p_font_style,
-                         UniChar *psz_text,
-                         int *pi_len,
-
-                         uint32_t *pi_runs,
-                         uint32_t **ppi_run_lengths,
-                         ATSUStyle **ppp_styles )
-{
-    bool b_karaoke = false;
-    uint32_t *pi_k_runs = NULL;
-    uint32_t **ppi_k_run_lengths = NULL;
-    uint32_t **ppi_k_durations = NULL;
-
-
-    int           rv             = VLC_SUCCESS;
-    filter_sys_t *p_sys          = p_filter->p_sys;
-    UniChar      *psz_text_orig  = psz_text;
-    font_stack_t *p_fonts        = NULL;
-    vlc_value_t   val;
-    int           i_scale        = 1000;
-
-    char *psz_node  = NULL;
-
-    bool b_italic = false;
-    bool b_bold   = false;
-    bool b_uline  = false;
-
-    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-        i_scale = val.i_int;
-
-    if( p_font_style )
-    {
-        rv = PushFont( &p_fonts,
-               p_font_style->psz_fontname,
-               p_font_style->i_font_size * i_scale / 1000,
-               (p_font_style->i_font_color & 0xffffff) |
-                   ((p_font_style->i_font_alpha & 0xff) << 24),
-                   /* TODO no idea how ATSUStyle works
-               (p_font_style->i_karaoke_background_color & 0xffffff) |
-                   ((p_font_style->i_karaoke_background_alpha & 0xff) << 24)
-                   */
-                   0x00ffffff );
-
-
-        if( p_font_style->i_style_flags & STYLE_BOLD )
-            b_bold = true;
-        if( p_font_style->i_style_flags & STYLE_ITALIC )
-            b_italic = true;
-        if( p_font_style->i_style_flags & STYLE_UNDERLINE )
-            b_uline = true;
-    }
-    else
-    {
-        rv = PushFont( &p_fonts,
-                       p_sys->psz_font_name,
-                       p_sys->i_font_size,
-                       p_sys->i_font_color,
-                       0x00ffffff );
-    }
-    if( rv != VLC_SUCCESS )
-        return rv;
-
-    while ( ( xml_ReaderRead( p_xml_reader ) == 1 ) )
-    {
-        switch ( xml_ReaderNodeType( p_xml_reader ) )
-        {
-            case XML_READER_NONE:
-                break;
-            case XML_READER_ENDELEM:
-                psz_node = xml_ReaderName( p_xml_reader );
-                if( psz_node )
-                {
-                    if( !strcasecmp( "font", psz_node ) )
-                        PopFont( &p_fonts );
-                    else if( !strcasecmp( "b", psz_node ) )
-                        b_bold   = false;
-                    else if( !strcasecmp( "i", psz_node ) )
-                        b_italic = false;
-                    else if( !strcasecmp( "u", psz_node ) )
-                        b_uline  = false;
-
-                    free( psz_node );
-                }
-                break;
-            case XML_READER_STARTELEM:
-                psz_node = xml_ReaderName( p_xml_reader );
-                if( psz_node )
-                {
-                    if( !strcasecmp( "font", psz_node ) )
-                        rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
-                    else if( !strcasecmp( "b", psz_node ) )
-                        b_bold = true;
-                    else if( !strcasecmp( "i", psz_node ) )
-                        b_italic = true;
-                    else if( !strcasecmp( "u", psz_node ) )
-                        b_uline = true;
-                    else if( !strcasecmp( "br", psz_node ) )
-                    {
-                        SetupLine( p_filter, "\n", &psz_text,
-                                   pi_runs, ppi_run_lengths, ppp_styles,
-                                   GetStyleFromFontStack( p_sys,
-                                                          &p_fonts,
-                                                          b_bold,
-                                                          b_italic,
-                                                          b_uline ) );
-                    }
-                    else if( !strcasecmp( "k", psz_node ) )
-                    {
-                        /* Only valid in karaoke */
-                        if( b_karaoke )
-                        {
-                            if( *pi_k_runs > 0 )
-                            {
-                                SetKaraokeLen( *pi_runs, *ppi_run_lengths,
-                                               *pi_k_runs, *ppi_k_run_lengths );
-                            }
-                            SetupKaraoke( p_xml_reader, pi_k_runs,
-                                          ppi_k_run_lengths, ppi_k_durations );
-                        }
-                    }
-
-                    free( psz_node );
-                }
-                break;
-            case XML_READER_TEXT:
-                psz_node = xml_ReaderValue( p_xml_reader );
-                if( psz_node )
-                {
-                    // Turn any multiple-whitespaces into single spaces
-                    char *s = strpbrk( psz_node, "\t\r\n " );
-                    while( s )
-                    {
-                        int i_whitespace = strspn( s, "\t\r\n " );
-
-                        if( i_whitespace > 1 )
-                            memmove( &s[1],
-                                     &s[i_whitespace],
-                                     strlen( s ) - i_whitespace + 1 );
-                        *s++ = ' ';
-
-                        s = strpbrk( s, "\t\r\n " );
-                    }
-                    SetupLine( p_filter, psz_node, &psz_text,
-                               pi_runs, ppi_run_lengths, ppp_styles,
-                               GetStyleFromFontStack( p_sys,
-                                                      &p_fonts,
-                                                      b_bold,
-                                                      b_italic,
-                                                      b_uline ) );
-                    free( psz_node );
-                }
-                break;
-        }
-        if( rv != VLC_SUCCESS )
-        {
-            psz_text = psz_text_orig;
-            break;
-        }
-    }
-
-    if( b_karaoke )
-    {
-        SetKaraokeLen( *pi_runs, *ppi_run_lengths,
-                       *pi_k_runs, *ppi_k_run_lengths );
-    }
-
-    *pi_len = psz_text - psz_text_orig;
-
-    while( VLC_SUCCESS == PopFont( &p_fonts ) );
-
-    return rv;
+    /* TODO */
 }
 
 static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
@@ -787,7 +619,10 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                 UniChar    *psz_text;
                 int         i_len = 0;
                 uint32_t    i_runs = 0;
+                uint32_t    i_k_runs = 0;
                 uint32_t   *pi_run_lengths = NULL;
+                uint32_t   *pi_k_run_lengths = NULL;
+                uint32_t   *pi_k_durations = NULL;
                 ATSUStyle  *pp_styles = NULL;
 
                 psz_text = (UniChar *) malloc( strlen( p_region_in->psz_html ) *
@@ -798,7 +633,11 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
 
                     rv = ProcessNodes( p_filter, p_xml_reader,
                                   p_region_in->p_style, psz_text, &i_len,
-                                  &i_runs, &pi_run_lengths, &pp_styles );
+                                  &i_runs, &pi_run_lengths, &pp_styles,
+                                  /* No karaoke support */
+                                  false, &i_k_runs, &pi_k_run_lengths, &pi_k_durations );
+
+                    assert( pi_k_run_lengths == NULL && pi_k_durations == NULL );
 
                     p_region_out->i_x = p_region_in->i_x;
                     p_region_out->i_y = p_region_in->i_y;

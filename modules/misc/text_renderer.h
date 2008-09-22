@@ -33,6 +33,15 @@ struct font_stack_t
     font_stack_t  *p_next;
 };
 
+static void SetupLine( filter_t *p_filter, const char *psz_text_in,
+                       UCHAR **psz_text_out, uint32_t *pi_runs,
+                       uint32_t **ppi_run_lengths, TR_FONT_STYLE_PTR **ppp_styles,
+                       TR_FONT_STYLE_PTR p_style );
+
+static TR_FONT_STYLE_PTR GetStyleFromFontStack( filter_sys_t *p_sys,
+                                          font_stack_t **p_fonts, bool b_bold, bool b_italic,
+                                          bool b_uline );
+
 static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
                      uint32_t i_color, uint32_t i_karaoke_bg_color )
 {
@@ -388,3 +397,249 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     return rv;
 }
 
+static void SetKaraokeLen( uint32_t i_runs, uint32_t *pi_run_lengths,
+                           uint32_t i_k_runs, uint32_t *pi_k_run_lengths )
+{
+    /* Karaoke tags _PRECEDE_ the text they specify a duration
+     * for, therefore we are working out the length for the
+     * previous tag, and first time through we have nothing
+     */
+    if( pi_k_run_lengths )
+    {
+        int i_chars = 0;
+        uint32_t i;
+
+        /* Work out how many characters are presently in the string
+         */
+        for( i = 0; i < i_runs; i++ )
+            i_chars += pi_run_lengths[ i ];
+
+        /* Subtract away those we've already allocated to other
+         * karaoke tags
+         */
+        for( i = 0; i < i_k_runs; i++ )
+            i_chars -= pi_k_run_lengths[ i ];
+
+        pi_k_run_lengths[ i_k_runs - 1 ] = i_chars;
+    }
+}
+
+static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
+                          uint32_t **ppi_k_run_lengths,
+                          uint32_t **ppi_k_durations )
+{
+    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    {
+        char *psz_name = xml_ReaderName( p_xml_reader );
+        char *psz_value = xml_ReaderValue( p_xml_reader );
+
+        if( psz_name && psz_value &&
+            !strcasecmp( "t", psz_name ) )
+        {
+            if( ppi_k_durations && ppi_k_run_lengths )
+            {
+                (*pi_k_runs)++;
+
+                if( *ppi_k_durations )
+                {
+                    *ppi_k_durations = (uint32_t *)
+                        realloc( *ppi_k_durations,
+                                 *pi_k_runs * sizeof( uint32_t ) );
+                }
+                else if( *pi_k_runs == 1 )
+                {
+                    *ppi_k_durations = (uint32_t *)
+                        malloc( *pi_k_runs * sizeof( uint32_t ) );
+                }
+
+                if( *ppi_k_run_lengths )
+                {
+                    *ppi_k_run_lengths = (uint32_t *)
+                        realloc( *ppi_k_run_lengths,
+                                 *pi_k_runs * sizeof( uint32_t ) );
+                }
+                else if( *pi_k_runs == 1 )
+                {
+                    *ppi_k_run_lengths = (uint32_t *)
+                        malloc( *pi_k_runs * sizeof( uint32_t ) );
+                }
+                if( *ppi_k_durations )
+                    (*ppi_k_durations)[ *pi_k_runs - 1 ] = atoi( psz_value );
+
+                if( *ppi_k_run_lengths )
+                    (*ppi_k_run_lengths)[ *pi_k_runs - 1 ] = 0;
+            }
+        }
+        free( psz_name );
+        free( psz_value );
+    }
+}
+
+static int ProcessNodes( filter_t *p_filter,
+                         xml_reader_t *p_xml_reader,
+                         text_style_t *p_font_style,
+                         UCHAR *psz_text,
+                         int *pi_len,
+
+                         uint32_t *pi_runs,
+                         uint32_t **ppi_run_lengths,
+                         TR_FONT_STYLE_PTR **ppp_styles,
+
+                         bool b_karaoke,
+                         uint32_t *pi_k_runs,
+                         uint32_t **ppi_k_run_lengths,
+                         uint32_t **ppi_k_durations )
+{
+    int           rv             = VLC_SUCCESS;
+    filter_sys_t *p_sys          = p_filter->p_sys;
+    UCHAR        *psz_text_orig  = psz_text;
+    font_stack_t *p_fonts        = NULL;
+    vlc_value_t   val;
+    int           i_scale        = 1000;
+
+    char *psz_node  = NULL;
+
+    bool b_italic = false;
+    bool b_bold   = false;
+    bool b_uline  = false;
+
+    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+        i_scale = val.i_int;
+
+    if( p_font_style )
+    {
+        rv = PushFont( &p_fonts,
+               p_font_style->psz_fontname,
+               p_font_style->i_font_size * i_scale / 1000,
+               (p_font_style->i_font_color & 0xffffff) |
+                   ((p_font_style->i_font_alpha & 0xff) << 24),
+               (p_font_style->i_karaoke_background_color & 0xffffff) |
+                   ((p_font_style->i_karaoke_background_alpha & 0xff) << 24));
+
+        if( p_font_style->i_style_flags & STYLE_BOLD )
+            b_bold = true;
+        if( p_font_style->i_style_flags & STYLE_ITALIC )
+            b_italic = true;
+        if( p_font_style->i_style_flags & STYLE_UNDERLINE )
+            b_uline = true;
+    }
+    else
+    {
+        rv = PushFont( &p_fonts,
+                       TR_DEFAULT_FONT,
+                       p_sys->i_font_size,
+                       TR_DEFAULT_COLOR,
+                       0x00ffffff );
+    }
+    if( rv != VLC_SUCCESS )
+        return rv;
+
+    while ( ( xml_ReaderRead( p_xml_reader ) == 1 ) )
+    {
+        switch ( xml_ReaderNodeType( p_xml_reader ) )
+        {
+            case XML_READER_NONE:
+                break;
+            case XML_READER_ENDELEM:
+                psz_node = xml_ReaderName( p_xml_reader );
+                if( psz_node )
+                {
+                    if( !strcasecmp( "font", psz_node ) )
+                        PopFont( &p_fonts );
+                    else if( !strcasecmp( "b", psz_node ) )
+                        b_bold   = false;
+                    else if( !strcasecmp( "i", psz_node ) )
+                        b_italic = false;
+                    else if( !strcasecmp( "u", psz_node ) )
+                        b_uline  = false;
+
+                    free( psz_node );
+                }
+                break;
+            case XML_READER_STARTELEM:
+                psz_node = xml_ReaderName( p_xml_reader );
+                if( psz_node )
+                {
+                    if( !strcasecmp( "font", psz_node ) )
+                        rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
+                    else if( !strcasecmp( "b", psz_node ) )
+                        b_bold = true;
+                    else if( !strcasecmp( "i", psz_node ) )
+                        b_italic = true;
+                    else if( !strcasecmp( "u", psz_node ) )
+                        b_uline = true;
+                    else if( !strcasecmp( "br", psz_node ) )
+                    {
+                        SetupLine( p_filter, "\n", &psz_text,
+                                   pi_runs, ppi_run_lengths, ppp_styles,
+                                   GetStyleFromFontStack( p_sys,
+                                                          &p_fonts,
+                                                          b_bold,
+                                                          b_italic,
+                                                          b_uline ) );
+                    }
+                    else if( !strcasecmp( "k", psz_node ) )
+                    {
+                        /* Only valid in karaoke */
+                        if( b_karaoke )
+                        {
+                            if( *pi_k_runs > 0 )
+                            {
+                                SetKaraokeLen( *pi_runs, *ppi_run_lengths,
+                                               *pi_k_runs, *ppi_k_run_lengths );
+                            }
+                            SetupKaraoke( p_xml_reader, pi_k_runs,
+                                          ppi_k_run_lengths, ppi_k_durations );
+                        }
+                    }
+
+                    free( psz_node );
+                }
+                break;
+            case XML_READER_TEXT:
+                psz_node = xml_ReaderValue( p_xml_reader );
+                if( psz_node )
+                {
+                    /* Turn any multiple-whitespaces into single spaces */
+                    char *s = strpbrk( psz_node, "\t\r\n " );
+                    while( s )
+                    {
+                        int i_whitespace = strspn( s, "\t\r\n " );
+
+                        if( i_whitespace > 1 )
+                            memmove( &s[1],
+                                     &s[i_whitespace],
+                                     strlen( s ) - i_whitespace + 1 );
+                        *s++ = ' ';
+
+                        s = strpbrk( s, "\t\r\n " );
+                    }
+                    SetupLine( p_filter, psz_node, &psz_text,
+                               pi_runs, ppi_run_lengths, ppp_styles,
+                               GetStyleFromFontStack( p_sys,
+                                                      &p_fonts,
+                                                      b_bold,
+                                                      b_italic,
+                                                      b_uline ) );
+                    free( psz_node );
+                }
+                break;
+        }
+        if( rv != VLC_SUCCESS )
+        {
+            psz_text = psz_text_orig;
+            break;
+        }
+    }
+    if( b_karaoke )
+    {
+        SetKaraokeLen( *pi_runs, *ppi_run_lengths,
+                       *pi_k_runs, *ppi_k_run_lengths );
+    }
+
+    *pi_len = psz_text - psz_text_orig;
+
+    while( VLC_SUCCESS == PopFont( &p_fonts ) );
+
+    return rv;
+}
