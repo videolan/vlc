@@ -524,7 +524,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
                             fontSize );
             CONFIG_GENERIC( "freetype-effect", IntegerList, NULL, effect );
-            CONFIG_GENERIC( "sub-margin", Integer, NULL, subsPosition );
+            CONFIG_GENERIC_NO_BOOL( "sub-margin", Integer, NULL, subsPosition );
 
         END_SPREFS_CAT;
 
