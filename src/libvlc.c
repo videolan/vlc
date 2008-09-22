@@ -159,7 +159,7 @@ void *vlc_hold (gc_object_t * p_gc)
     refs = OSAtomicIncrement32Barrier((int*)&p_gc->refs);
 #else
     vlc_spin_lock (&p_gc->spin);
-    refs = p_gc->refs++;
+    refs = ++p_gc->refs;
     vlc_spin_unlock (&p_gc->spin);
 #endif
     assert (refs != 1); /* there had to be a reference already */
@@ -186,7 +186,7 @@ void vlc_release (gc_object_t *p_gc)
     refs = OSAtomicDecrement32Barrier((int*)&p_gc->refs);
 #else
     vlc_spin_lock (&p_gc->spin);
-    refs = p_gc->refs--;
+    refs = --p_gc->refs;
     vlc_spin_unlock (&p_gc->spin);
 #endif
 
