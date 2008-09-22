@@ -120,7 +120,7 @@ static bool b_daemon = false;
  */
 void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
 {
-    /* There is no point in using the GC if there is destructor... */
+    /* There is no point in using the GC if there is no destructor... */
     assert (pf_destruct);
     p_gc->pf_destructor = pf_destruct;
 
@@ -194,6 +194,7 @@ void vlc_release (gc_object_t *p_gc)
     if (refs == 0)
     {
 #ifdef USE_SYNC
+#elif defined (WIN32) && defined (__GNUC__)
 #elif defined(__APPLE__)
 #else
         vlc_spin_destroy (&p_gc->spin);
