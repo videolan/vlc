@@ -697,7 +697,7 @@ bool __module_exists( vlc_object_t *p_this, const char * psz_name )
     module_t *p_module = __module_find( p_this, psz_name );
     if( p_module )
         module_release (p_module);
-    return true != NULL;
+    return p_module != NULL;
 }
 
 /**
