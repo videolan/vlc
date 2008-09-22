@@ -378,6 +378,21 @@ module_t **module_list_get (size_t *n)
     return tab;
 }
 
+typedef struct module_list_t
+{
+    module_t *p_module;
+    uint16_t i_score;
+    bool     b_force;
+} module_list_t;
+
+static int modulecmp (const void *a, const void *b)
+{
+    const module_list_t *la = a, *lb = b;
+    /* Note that qsort() uses _ascending_ order,
+     * so the smallest module is the one with the biggest score. */
+    return lb->i_score - la->i_score;
+}
+
 /**
  * module Need
  *
@@ -397,28 +412,13 @@ module_t **module_list_get (size_t *n)
 module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
                           const char *psz_name, bool b_strict )
 {
-    typedef struct module_list_t module_list_t;
-
     stats_TimerStart( p_this, "module_need()", STATS_TIMER_MODULE_NEED );
 
-    struct module_list_t
-    {
-        module_t *p_module;
-        int i_score;
-        bool b_force;
-        module_list_t *p_next;
-    };
-
-    module_list_t *p_list, *p_first, *p_tmp;
-
-    int i_which_module, i_index = 0;
-
+    module_list_t *p_list;
     module_t *p_module;
-
-    int   i_shortcuts = 0;
+    int i_shortcuts = 0;
     char *psz_shortcuts = NULL, *psz_var = NULL, *psz_alias = NULL;
     bool b_force_backup = p_this->b_force;
-
 
     /* Deal with variables */
     if( psz_name && psz_name[0] == '$' )
@@ -474,14 +474,13 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
     size_t count;
     module_t **p_all = module_list_get (&count);
     p_list = malloc( count * sizeof( module_list_t ) );
-    p_first = NULL;
     unsigned i_cpu = vlc_CPU();
 
     /* Parse the module list for capabilities and probe each of them */
-    for( i_which_module = 0; i_which_module < count; i_which_module++ )
+    count = 0;
+    for (size_t i = 0; (p_module = p_all[i]) != NULL; i++)
     {
-        int i_shortcut_bonus = 0;
-        p_module = p_all[i_which_module];
+        bool b_shortcut_bonus = false;
 
         /* Test that this module can do what we need */
         if( !module_provides( p_module, psz_capability ) )
@@ -508,7 +507,7 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
                         /* Found it */
                         if( c && c[1] )
                             psz_alias = c+1;
-                        i_shortcut_bonus = i_short * 10000;
+                        b_shortcut_bonus = true;
                         goto found_shortcut;
                     }
                 }
@@ -530,109 +529,55 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
         }
 
 found_shortcut:
-
         /* Store this new module */
-        p_list[ i_index ].p_module = p_module;
-        p_list[ i_index ].i_score = p_module->i_score + i_shortcut_bonus;
-        p_list[ i_index ].b_force = i_shortcut_bonus && b_strict;
-
-        /* Add it to the modules-to-probe list */
-        if( i_index == 0 )
-        {
-            p_list[ 0 ].p_next = NULL;
-            p_first = p_list;
-        }
-        else
-        {
-            /* Ok, so at school you learned that quicksort is quick, and
-             * bubble sort sucks raw eggs. But that's when dealing with
-             * thousands of items. Here we have barely 50. */
-            module_list_t *p_newlist = p_first;
-
-            if( p_first->i_score < p_list[ i_index ].i_score )
-            {
-                p_list[ i_index ].p_next = p_first;
-                p_first = &p_list[ i_index ];
-            }
-            else
-            {
-                while( p_newlist->p_next != NULL &&
-                    p_newlist->p_next->i_score >= p_list[ i_index ].i_score )
-                {
-                    p_newlist = p_newlist->p_next;
-                }
-
-                p_list[ i_index ].p_next = p_newlist->p_next;
-                p_newlist->p_next = &p_list[ i_index ];
-            }
-        }
-
-        i_index++;
+        p_list[count].p_module = module_hold (p_module);
+        p_list[count].i_score = p_module->i_score;
+        if( b_shortcut_bonus )
+            p_list[count].i_score += 10000;
+        p_list[count].b_force = b_shortcut_bonus && b_strict;
+        count++;
     }
 
-    msg_Dbg( p_this, "looking for %s module: %i candidate%s", psz_capability,
-                                            i_index, i_index == 1 ? "" : "s" );
-
-    /* Lock all candidate modules */
-    p_tmp = p_first;
-    while( p_tmp != NULL )
-    {
-        module_hold( p_tmp->p_module );
-        p_tmp = p_tmp->p_next;
-    }
-
-    /* We can release the list, interesting modules were held */
+    /* We can release the list, interesting modules are held */
     module_list_free (p_all);
 
+    /* Sort candidates by descending score */
+    qsort (p_list, count, sizeof (p_list[0]), modulecmp);
+    msg_Dbg( p_this, "looking for %s module: %i candidate%s", psz_capability,
+             count, count == 1 ? "" : "s" );
+
     /* Parse the linked list and use the first successful module */
-    p_tmp = p_first;
-    while( p_tmp != NULL )
+    p_module = NULL;
+    for (size_t i = 0; (i < count) && (p_module == NULL); i++)
     {
+        module_t *p_cand = p_list[i].p_module;
 #ifdef HAVE_DYNAMIC_PLUGINS
         /* Make sure the module is loaded in mem */
-        module_t *p_module = p_tmp->p_module;
-        if( p_module->b_submodule )
-            p_module = p_module->parent;
+        module_t *p_real = p_cand->b_submodule ? p_cand->parent : p_cand;
 
-        if( !p_module->b_builtin && !p_module->b_loaded )
+        if( !p_real->b_builtin && !p_real->b_loaded )
         {
             module_t *p_new_module =
-                AllocatePlugin( p_this, p_module->psz_filename );
+                AllocatePlugin( p_this, p_real->psz_filename );
             if( p_new_module )
             {
-                CacheMerge( p_this, p_module, p_new_module );
-                DeleteModule( p_new_module, false );
+                CacheMerge( p_this, p_real, p_new_module );
+                DeleteModule( p_new_module );
             }
         }
 #endif
 
-        p_this->b_force = p_tmp->b_force;
-        if( p_tmp->p_module->pf_activate
-             && p_tmp->p_module->pf_activate( p_this ) == VLC_SUCCESS )
+        p_this->b_force = p_list[i].b_force;
+        if( p_cand->pf_activate
+         && p_cand->pf_activate( p_this ) == VLC_SUCCESS )
         {
-            break;
+            p_module = p_cand;
+            /* Release the remaining modules */
+            while (++i < count)
+                module_release (p_list[i].p_module);
         }
-
-        module_release( p_tmp->p_module );
-        p_tmp = p_tmp->p_next;
-    }
-
-    /* Store the locked module value */
-    if( p_tmp != NULL )
-    {
-        p_module = p_tmp->p_module;
-        p_tmp = p_tmp->p_next;
-    }
-    else
-    {
-        p_module = NULL;
-    }
-
-    /* Unlock the remaining modules */
-    while( p_tmp != NULL )
-    {
-        module_release( p_tmp->p_module );
-        p_tmp = p_tmp->p_next;
+        else
+            module_release( p_cand );
     }
 
     free( p_list );
@@ -642,13 +587,24 @@ found_shortcut:
     {
         msg_Dbg( p_this, "using %s module \"%s\"",
                  psz_capability, p_module->psz_object_name );
-    }
-    else if( p_first == NULL )
-    {
-        if( !strcmp( psz_capability, "access_demux" ) )
+        if( !p_this->psz_object_name )
         {
-            msg_Warn( p_this, "no %s module matched \"%s\"",
-                 psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
+            /* This assumes that p_this is the object which will be using the
+             * module. That's not always the case ... but it is in most cases.
+             */
+            if( psz_alias )
+                p_this->psz_object_name = strdup( psz_alias );
+            else
+                p_this->psz_object_name = strdup( p_module->psz_object_name );
+        }
+    }
+    else if( count == 0 )
+    {
+        if( !strcmp( psz_capability, "access_demux" )
+         && !strcmp( psz_capability, "vout_window" ) )
+        {
+            msg_Dbg( p_this, "no %s module matched \"%s\"",
+                psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
         }
         else
         {
@@ -666,17 +622,6 @@ found_shortcut:
     }
     else
         msg_StackSet( VLC_EGENERIC, "no suitable %s module", psz_capability );
-
-    if( p_module && !p_this->psz_object_name )
-    {
-        /* This assumes that p_this is the object which will be using the
-         * module. That's not always the case ... but it is in most cases.
-         */
-        if( psz_alias )
-            p_this->psz_object_name = strdup( psz_alias );
-        else
-            p_this->psz_object_name = strdup( p_module->psz_object_name );
-    }
 
     free( psz_shortcuts );
     free( psz_var );
