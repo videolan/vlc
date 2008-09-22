@@ -892,7 +892,8 @@ static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
                                     (int64_t)m2 * 60*1000 +
                                     (int64_t)s2 * 1000 +
                                     (int64_t)d2 ) * 1000;
-            break;
+            if( p_subtitle->i_start < p_subtitle->i_stop )
+                break;
         }
     }
 
