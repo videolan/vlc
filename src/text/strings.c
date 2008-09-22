@@ -387,6 +387,7 @@ void resolve_xml_special_chars( char *psz_value )
             else TRY_CHAR( "&apos;", 6, '\'' )
             else TRY_CHAR( "&gt;", 4, '>' )
             else TRY_CHAR( "&quot;", 6, '"' )
+#undef TRY_CHAR
             else if( psz_value[1] == '#' )
             {
                 char *psz_end;
@@ -1000,6 +1001,8 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
 
     return dst;
 }
+#undef INSERT_STRING
+#undef INSERT_STRING_NO_FREE
 
 /**
  * Apply str format time and str format meta
