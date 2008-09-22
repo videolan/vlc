@@ -2,7 +2,7 @@
 all: .autoconf .gnumake .automake .libtool .intl .pkgcfg .freetype \
     .fribidi .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
     .flac .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
-    .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig .asa \
+    .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig \
     .png .gpg-error .gcrypt .gnutls .cddb .cdio .vcdimager \
     .SDL_image .glib .gecko .mpcdec .dirac_encoder .dirac_decoder \
     .dca .tag .x264 .goom2k4 .lua .zvbi .fontconfig .ncurses .liboil \
