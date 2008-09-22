@@ -475,6 +475,58 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
     }
 }
 
+/* Turn any multiple-whitespaces into single spaces */
+static void HandleWhiteSpace( char *psz_node )
+{
+    char *s = strpbrk( psz_node, "\t\r\n " );
+    while( s )
+    {
+        int i_whitespace = strspn( s, "\t\r\n " );
+
+        if( i_whitespace > 1 )
+            memmove( &s[1],
+                     &s[i_whitespace],
+                     strlen( s ) - i_whitespace + 1 );
+        *s++ = ' ';
+
+        s = strpbrk( s, "\t\r\n " );
+    }
+}
+
+/* */
+static void HandleMarkup( char *psz_node )
+{
+    static const struct
+    {
+        const char *psz_pattern;
+        char i_char;
+    } p_replace[] = {
+        { "&lt;",   '<' },
+        { "&gt;",   '>' },
+        { "&amp;",  '&' },
+        { "&quot;", '"' },
+        /* This one will always match */
+        { "&",      '&' }
+    };
+
+    char *s = psz_node;
+    while( ( s = strchr( s, '&' ) ) != NULL )
+    {
+        size_t i_size;
+        int i;
+        for( i = 0; ; i++ )
+        {
+            i_size = strlen(p_replace[i].psz_pattern);
+            if( !strncmp( s, p_replace[i].psz_pattern, i_size ) )
+                break;
+        }
+        if( i_size > 1 )
+            memmove( &s[1], &s[i_size],
+                     strlen( s ) - i_size + 1 );
+        *s++ = p_replace[i].i_char;
+    }
+}
+
 static int ProcessNodes( filter_t *p_filter,
                          xml_reader_t *p_xml_reader,
                          text_style_t *p_font_style,
@@ -600,20 +652,10 @@ static int ProcessNodes( filter_t *p_filter,
                 psz_node = xml_ReaderValue( p_xml_reader );
                 if( psz_node )
                 {
-                    /* Turn any multiple-whitespaces into single spaces */
-                    char *s = strpbrk( psz_node, "\t\r\n " );
-                    while( s )
-                    {
-                        int i_whitespace = strspn( s, "\t\r\n " );
+                    /* */
+                    HandleWhiteSpace( psz_node );
+                    HandleMarkup( psz_node );
 
-                        if( i_whitespace > 1 )
-                            memmove( &s[1],
-                                     &s[i_whitespace],
-                                     strlen( s ) - i_whitespace + 1 );
-                        *s++ = ' ';
-
-                        s = strpbrk( s, "\t\r\n " );
-                    }
                     SetupLine( p_filter, psz_node, &psz_text,
                                pi_runs, ppi_run_lengths, ppp_styles,
                                GetStyleFromFontStack( p_sys,
