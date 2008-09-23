@@ -90,16 +90,16 @@ vlc_module_begin();
     set_capability( "video filter2", 80 );
 #elif defined (MODULE_NAME_IS_i420_yuy2_mmx)
     set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "video filter2", 100 );
+    set_capability( "video filter2", 160 );
     add_requirement( MMX );
 #elif defined (MODULE_NAME_IS_i420_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "video filter2", 120 );
+    set_capability( "video filter2", 250 );
     add_requirement( SSE2 );
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
     set_description(
             _("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "video filter2", 100 );
+    set_capability( "video filter2", 250 );
     add_requirement( ALTIVEC );
 #endif
     set_callbacks( Activate, NULL );
