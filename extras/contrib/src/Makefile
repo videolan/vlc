@@ -951,7 +951,6 @@ libebml-$(LIBEBML_VERSION).tar.bz2:
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 #endif
-
 ifdef HAVE_WIN32
 	(cd $@; patch -p0 < ../Patches/libebml-svn-win32.patch)
 endif
@@ -990,7 +989,7 @@ libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 #endif 
-
+	patch -p0 < ./Patches/libmatroska-kaxblock.patch
 ifdef HAVE_WIN32
 	(cd $@; patch -p0 < ../Patches/libmatroska-win32.patch)
 endif

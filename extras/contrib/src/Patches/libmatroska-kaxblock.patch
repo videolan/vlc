@@ -1,0 +1,11 @@
+diff -ruN libmatroska-0.8.1/matroska/KaxBlock.h libmatroska/matroska/KaxBlock.h
+--- libmatroska-0.8.1/matroska/KaxBlock.h	2007-01-14 18:20:35.000000000 +0100
++++ libmatroska/matroska/KaxBlock.h	2008-09-23 23:05:55.000000000 +0200
+@@ -367,6 +367,7 @@
+ 	public:
+ 		KaxBlockVirtual() :ParentCluster(NULL) {Data = DataBlock; Size = countof(DataBlock);}
+ 		KaxBlockVirtual(const KaxBlockVirtual & ElementToClone);
++                ~KaxBlockVirtual() { if( Data == DataBlock ) SetBuffer( NULL, 0 ); };
+ 		static EbmlElement & Create() {return *(new KaxBlockVirtual);}
+ 		const EbmlCallbacks & Generic() const {return ClassInfos;}
+ 		static const EbmlCallbacks ClassInfos;
