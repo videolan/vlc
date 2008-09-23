@@ -156,7 +156,6 @@ struct filter_sys_t
 
 #define UCHAR UniChar
 #define TR_DEFAULT_FONT p_sys->psz_font_name
-#define TR_DEFAULT_COLOR p_sys->i_font_color
 #define TR_FONT_STYLE_PTR ATSUStyle
 
 #include "text_renderer.h"

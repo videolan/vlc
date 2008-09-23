@@ -274,7 +274,6 @@ struct filter_sys_t
 
 #define UCHAR uint32_t
 #define TR_DEFAULT_FONT FC_DEFAULT_FONT
-#define TR_DEFAULT_COLOR 0x00ffffff
 #define TR_FONT_STYLE_PTR ft_style_t *
 
 #include "text_renderer.h"
