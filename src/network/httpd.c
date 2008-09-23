@@ -1120,6 +1120,7 @@ error:
     free( psz_host );
     if( httpd->i_host <= 0 )
     {
+        libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
         vlc_object_release( httpd );
         vlc_object_detach( httpd );
         vlc_object_release( httpd );
