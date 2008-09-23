@@ -733,10 +733,15 @@ void MainInterface::togglePlaylist()
 
         if( i_pl_dock == PL_UNDOCKED )
         {
-            playlistWidget->setWindowFlags( Qt::Window );
+            playlistWidget->setParent( this, Qt::Window );
 
+            /* This will restore the geometry but will not work for position,
+               because of parenting */
             QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
                     playlistWidget, QSize( 600, 300 ) );
+            /* Move it correctly then */
+            playlistWidget->move(
+                    getSettings()->value( "Playlist/GlobalPos" ).toPoint() );
         }
         else
         {

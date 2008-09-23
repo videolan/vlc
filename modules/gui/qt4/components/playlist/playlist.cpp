@@ -117,7 +117,9 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     // components shall never write there setting to a fixed location, may infer
     // with other uses of the same component...
     // getSettings()->beginGroup( "playlist" );
+    getSettings()->beginGroup("Playlist");
     restoreState( getSettings()->value("splitterSizes").toByteArray());
+    getSettings()->endGroup();
 
     setAcceptDrops( true );
     setWindowTitle( qtr( "Playlist" ) );
@@ -126,8 +128,9 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
 
 PlaylistWidget::~PlaylistWidget()
 {
-    getSettings()->beginGroup("playlistdialog");
+    getSettings()->beginGroup("Playlist");
     getSettings()->setValue( "splitterSizes", saveState() );
+    getSettings()->setValue( "GlobalPos", mapToGlobal( pos() ) );
     getSettings()->endGroup();
 }
 
