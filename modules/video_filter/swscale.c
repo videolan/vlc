@@ -181,10 +181,7 @@ static int OpenScaler( vlc_object_t *p_this )
     default: p_sys->i_sws_flags = SWS_BICUBIC; i_sws_mode = 2; break;
     }
 
-    p_sys->p_src_filter =
-        sws_getDefaultFilter( sws_lum_gblur, sws_chr_gblur,
-                              sws_lum_sharpen, sws_chr_sharpen,
-                              sws_chr_hshift, sws_chr_vshift, 0 );
+    p_sys->p_src_filter = NULL;
     p_sys->p_dst_filter = NULL;
 
     /* Misc init */
