@@ -237,11 +237,11 @@ char *encode_URI_component( const char *psz_url )
     return strdup( psz_enc );
 }
 
-static struct xml_entity_s
+static const struct xml_entity_s
 {
-    const char *psz_entity;
-    size_t i_length;
-    const char *psz_char;
+    char    psz_entity[9];
+    uint8_t i_length;
+    char    psz_char[4];
 } p_xml_entities[] = {
     /* Important: this list has to be in alphabetical order (psz_entity-wise) */
     { "&AElig;", 7, "Æ" },
