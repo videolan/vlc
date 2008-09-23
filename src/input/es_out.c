@@ -1900,8 +1900,9 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 p_pgrm = EsOutProgramAdd( out, i_group );   /* Create it */
 
             i_pcr = (int64_t)va_arg( args, int64_t );
-            /* search program */
-            input_ClockSetPCR( p_sys->p_input, &p_pgrm->clock, i_pcr );
+            /* search program
+             * TODO do not use mdate() but proper stream acquisition date */
+            input_ClockSetPCR( p_sys->p_input, &p_pgrm->clock, i_pcr, mdate() );
             return VLC_SUCCESS;
         }
 

@@ -377,7 +377,7 @@ typedef struct
 } input_clock_t;
 
 void    input_ClockInit( input_clock_t *, bool b_master, int i_cr_average, int i_rate );
-void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t );
+void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t i_clock, mtime_t i_system );
 void    input_ClockResetPCR( input_clock_t * );
 mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
 void    input_ClockSetRate( input_clock_t *cl, int i_rate );

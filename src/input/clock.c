@@ -144,19 +144,22 @@ void input_ClockInit( input_clock_t *cl, bool b_master, int i_cr_average, int i_
 
 /*****************************************************************************
  * input_ClockSetPCR: manages a clock reference
+ *
+ *  i_ck_stream: date in stream clock
+ *  i_ck_system: date in system clock
  *****************************************************************************/
 void input_ClockSetPCR( input_thread_t *p_input,
-                        input_clock_t *cl, mtime_t i_clock )
+                        input_clock_t *cl,
+                        mtime_t i_ck_stream, mtime_t i_ck_system )
 {
     const bool b_synchronize = p_input->b_can_pace_control && cl->b_master;
-    const mtime_t i_mdate = mdate();
 
     if( ( cl->i_synchro_state != SYNCHRO_OK ) ||
-        ( i_clock == 0 && cl->last_cr != 0 ) )
+        ( i_ck_stream == 0 && cl->last_cr != 0 ) )
     {
         /* Feed synchro with a new reference point. */
-        ClockNewRef( cl, i_clock,
-                         __MAX( cl->last_pts + CR_MEAN_PTS_GAP, i_mdate ) );
+        ClockNewRef( cl, i_ck_stream,
+                         __MAX( cl->last_pts + CR_MEAN_PTS_GAP, i_ck_system ) );
         cl->i_synchro_state = SYNCHRO_OK;
 
         if( !b_synchronize )
@@ -167,8 +170,8 @@ void input_ClockSetPCR( input_thread_t *p_input,
         }
     }
     else if ( cl->last_cr != 0 &&
-              ( (cl->last_cr - i_clock) > CR_MAX_GAP ||
-                (cl->last_cr - i_clock) < - CR_MAX_GAP ) )
+              ( (cl->last_cr - i_ck_stream) > CR_MAX_GAP ||
+                (cl->last_cr - i_ck_stream) < - CR_MAX_GAP ) )
     {
         /* Stream discontinuity, for which we haven't received a
          * warning from the stream control facilities (dd-edited
@@ -177,27 +180,27 @@ void input_ClockSetPCR( input_thread_t *p_input,
         input_ClockInit( cl, cl->b_master, cl->i_cr_average, cl->i_rate );
         /* Feed synchro with a new reference point. */
         msg_Warn( p_input, "feeding synchro with a new reference point trying to recover from clock gap" );
-        ClockNewRef( cl, i_clock,
-                         __MAX( cl->last_pts + CR_MEAN_PTS_GAP, i_mdate ) );
+        ClockNewRef( cl, i_ck_stream,
+                         __MAX( cl->last_pts + CR_MEAN_PTS_GAP, i_ck_system ) );
         cl->i_synchro_state = SYNCHRO_OK;
     }
 
-    cl->last_cr = i_clock;
-    cl->last_sysdate = i_mdate;
+    cl->last_cr = i_ck_stream;
+    cl->last_sysdate = i_ck_system;
 
-    if( !b_synchronize && i_mdate - cl->last_update > 200000 )
+    if( !b_synchronize && i_ck_system - cl->last_update > 200000 )
     {
         /* Smooth clock reference variations. */
         const mtime_t i_extrapoled_clock = ClockCurrent( cl );
         /* Bresenham algorithm to smooth variations. */
         const mtime_t i_tmp = cl->delta_cr * (cl->i_cr_average - 1) +
-                              ( i_extrapoled_clock - i_clock ) * 1  +
+                              ( i_extrapoled_clock - i_ck_stream ) * 1  +
                               cl->i_delta_cr_residue;
 
         cl->i_delta_cr_residue = i_tmp % cl->i_cr_average;
         cl->delta_cr           = i_tmp / cl->i_cr_average;
 
-        cl->last_update = i_mdate;
+        cl->last_update = i_ck_system;
     }
 }
 
