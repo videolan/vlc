@@ -1012,6 +1012,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     i_mouse_last_move_y = -1;
 
     setWindowFlags( Qt::ToolTip );
+    setMinimumWidth( 600 );
 
     setFrameShape( QFrame::StyledPanel );
     setFrameStyle( QFrame::Sunken );
@@ -1057,10 +1058,15 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     adjustSize ();  /* need to get real width and height for moving */
 
     /* center down */
-    QDesktopWidget * p_desktop = QApplication::desktop();
+    QWidget * p_desktop = QApplication::desktop()->screen(
+                QApplication::desktop()->screenNumber( _p_mi ) );
 
-    move( p_desktop->width() / 2 - width() / 2,
+    QPoint pos = QPoint( p_desktop->width() / 2 - width() / 2,
           p_desktop->height() - height() );
+
+    getSettings()->beginGroup( "FullScreen" );
+    move( getSettings()->value( "pos", pos ).toPoint() );
+    getSettings()->endGroup();
 
 #ifdef WIN32TRICK
     setWindowOpacity( 0.0 );
@@ -1072,11 +1078,13 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     fullscreenButton->setIcon( QIcon( ":/defullscreen" ) );
 
     vlc_mutex_init_recursive( &lock );
-    setMinimumWidth( 600 );
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
 {
+    getSettings()->beginGroup( "FullScreen" );
+    getSettings()->setValue( "pos", pos() );
+    getSettings()->endGroup();
     detachVout();
     vlc_mutex_destroy( &lock );
 }

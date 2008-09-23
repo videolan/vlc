@@ -213,8 +213,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
 
     /* Size and placement of interface */
+    settings->beginGroup( "MainWindow" );
     QVLCTools::restoreWidgetPosition( settings, this, QSize(380, 60) );
-
 
     bool b_visible = settings->value( "playlist-visible", 0 ).toInt();
     settings->endGroup();
@@ -378,19 +378,6 @@ void MainInterface::handleMainUi( QSettings *settings )
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
 
-#ifdef WIN32
-    if ( depth() > 8 )
-#endif
-    /* Create the FULLSCREEN CONTROLS Widget */
-    if( config_GetInt( p_intf, "qt-fs-controller" ) )
-    {
-        fullscreenControls = new FullscreenControllerWidget( p_intf, this,
-                settings->value( "adv-controls", false ).toBool(),
-                b_shiny );
-        CONNECT( fullscreenControls, advancedControlsToggled( bool ),
-                this, doComponentsUpdate() );
-    }
-
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
 
@@ -433,6 +420,20 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Finish the sizing */
     main->updateGeometry();
+
+    getSettings()->endGroup();
+#ifdef WIN32
+    if ( depth() > 8 )
+#endif
+    /* Create the FULLSCREEN CONTROLS Widget */
+    if( config_GetInt( p_intf, "qt-fs-controller" ) )
+    {
+        fullscreenControls = new FullscreenControllerWidget( p_intf, this,
+                settings->value( "adv-controls", false ).toBool(),
+                b_shiny );
+        CONNECT( fullscreenControls, advancedControlsToggled( bool ),
+                this, doComponentsUpdate() );
+    }
 }
 
 inline void MainInterface::askForPrivacy()
