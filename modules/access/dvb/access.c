@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
+#include <vlc_input.h>
 #include <vlc_interface.h>
 
 #ifdef HAVE_UNISTD_H
@@ -323,12 +324,8 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_block = Block;
     p_access->pf_control = Control;
     p_access->pf_seek = NULL;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
+
+    access_InitFields( p_access );
 
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
     if( !p_sys )
@@ -555,6 +552,10 @@ static block_t *Block( access_t *p_access )
     if( p_sys->i_read_once < DVB_READ_ONCE )
         p_sys->i_read_once++;
 
+    /* Update moderatly the signal properties */
+    if( (p_sys->i_stat_counter++ % 100) == 0 )
+        p_access->info.i_update |= INPUT_UPDATE_SIGNAL;
+
     return p_block;
 }
 
@@ -712,10 +713,12 @@ static block_t *BlockScan( access_t *p_access )
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    bool   *pb_bool, b_bool;
+    bool         *pb_bool, b_bool;
     int          *pi_int, i_int;
     int64_t      *pi_64;
+    double       *pf1, *pf2;
     dvbpsi_pmt_t *p_pmt;
+    frontend_statistic_t stat;
 
     switch( i_query )
     {
@@ -748,6 +751,18 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
+
+        case ACCESS_GET_SIGNAL:
+            pf1 = (double*)va_arg( args, double * );
+            pf2 = (double*)va_arg( args, double * );
+
+            *pf1 = *pf2 = 0;
+            if( !FrontendGetStatistic( p_access, &stat ) )
+            {
+                *pf1 = (double)stat.i_snr / 65535.0;
+                *pf2 = (double)stat.i_signal_strenth / 65535.0;
+            }
+            return VLC_SUCCESS;
 
         case ACCESS_SET_PRIVATE_ID_STATE:
             if( p_sys->b_scan_mode )

@@ -171,6 +171,8 @@ struct access_sys_t
     /* */
     int i_read_once;
 
+    int i_stat_counter;
+
 #ifdef ENABLE_HTTPD
     /* Local HTTP server */
     httpd_host_t        *p_httpd_host;
