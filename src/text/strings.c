@@ -381,13 +381,13 @@ void resolve_xml_special_chars( char *psz_value )
             if( !strncmp( psz_value1, src, len ) )   \
             {                                         \
                 *p_pos = dst;                         \
-                psz_value += len;                     \
+                psz_value += len + 1;                 \
             }
-            TRY_CHAR( "lt;", 4, '<' )
-            else TRY_CHAR( "amp;", 5, '&' )
-            else TRY_CHAR( "apos;", 6, '\'' )
-            else TRY_CHAR( "gt;", 4, '>' )
-            else TRY_CHAR( "quot;", 6, '"' )
+            TRY_CHAR( "lt;", 3, '<' )
+            else TRY_CHAR( "amp;", 4, '&' )
+            else TRY_CHAR( "apos;", 5, '\'' )
+            else TRY_CHAR( "gt;", 3, '>' )
+            else TRY_CHAR( "quot;", 5, '"' )
 #undef TRY_CHAR
             else if( *psz_value1 == '#' )
             {
