@@ -66,6 +66,12 @@
  * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
  */
 
+enum /* Synchro states */
+{
+    SYNCHRO_OK     = 0,
+    SYNCHRO_START  = 1,
+    SYNCHRO_REINIT = 2,
+};
 
 static void ClockNewRef( input_clock_t * p_pgrm,
                          mtime_t i_clock, mtime_t i_sysdate );
@@ -179,23 +185,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
     cl->last_cr = i_clock;
     cl->last_sysdate = i_mdate;
 
-    if( b_synchronize )
-    {
-        /* Wait a while before delivering the packets to the decoder.
-         * In case of multiple programs, we arbitrarily follow the
-         * clock of the selected program. */
-        if( !p_input->p->b_out_pace_control )
-        {
-            mtime_t i_wakeup = ClockToSysdate( cl, i_clock );
-            while( (i_wakeup - mdate()) / CLOCK_FREQ > 1 )
-            {
-                msleep( CLOCK_FREQ );
-                if( p_input->b_die ) i_wakeup = mdate();
-            }
-            mwait( i_wakeup );
-        }
-    }
-    else if ( i_mdate - cl->last_update > 200000 )
+    if( !b_synchronize && i_mdate - cl->last_update > 200000 )
     {
         /* Smooth clock reference variations. */
         const mtime_t i_extrapoled_clock = ClockCurrent( cl );
@@ -243,5 +233,24 @@ void input_ClockSetRate( input_clock_t *cl, int i_rate )
         ClockNewRef( cl, cl->last_cr, cl->last_sysdate );
 
     cl->i_rate = i_rate;
+}
+
+/*****************************************************************************
+ * input_ClockGetWakeup
+ *****************************************************************************/
+mtime_t input_ClockGetWakeup( input_thread_t *p_input, input_clock_t *cl )
+{
+    /* Not synchronized, we cannot wait */
+    if( cl->i_synchro_state != SYNCHRO_OK )
+        return 0;
+
+    /* We must not wait if not pace controled, or we are not the
+     * master clock */
+    if( !p_input->b_can_pace_control || !cl->b_master ||
+        p_input->p->b_out_pace_control )
+        return 0;
+
+    /* */
+    return ClockToSysdate( cl, cl->last_cr );
 }
 

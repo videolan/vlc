@@ -348,6 +348,15 @@ es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
     return NULL;
 }
 
+mtime_t input_EsOutGetWakeup( es_out_t *out )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+
+    if( !p_sys->p_pgrm )
+        return 0;
+    return input_ClockGetWakeup( p_sys->p_input, &p_sys->p_pgrm->clock );
+}
+
 static void EsOutDiscontinuity( es_out_t *out, bool b_flush, bool b_audio )
 {
     es_out_sys_t      *p_sys = out->p_sys;

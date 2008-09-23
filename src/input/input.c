@@ -727,40 +727,48 @@ static void MainLoop( input_thread_t *p_input )
         vlc_value_t val;
         mtime_t i_current;
         mtime_t i_deadline;
+        mtime_t i_wakeup;
 
         /* Demux data */
         b_force_update = false;
+        i_wakeup = 0;
         if( p_input->i_state != PAUSE_S )
+        {
             MainLoopDemux( p_input, &b_force_update, &i_start_mdate );
+            i_wakeup = input_EsOutGetWakeup( p_input->p->p_es_out );
+        }
 
         /* */
-        i_deadline = 0;
-        if( p_input->i_state == PAUSE_S )
-            i_deadline = __MIN( i_intf_update, i_statistic_update );
+        do {
+            i_deadline = i_wakeup;
+            if( p_input->i_state == PAUSE_S )
+                i_deadline = __MIN( i_intf_update, i_statistic_update );
 
-        /* Handle control */
-        vlc_mutex_lock( &p_input->p->lock_control );
-        ControlReduce( p_input );
-        while( !ControlPopNoLock( p_input, &i_type, &val, i_deadline ) )
-        {
-            msg_Dbg( p_input, "control type=%d", i_type );
-            if( Control( p_input, i_type, val ) )
-                b_force_update = true;
-        }
-        vlc_mutex_unlock( &p_input->p->lock_control );
+            /* Handle control */
+            vlc_mutex_lock( &p_input->p->lock_control );
+            ControlReduce( p_input );
+            while( !ControlPopNoLock( p_input, &i_type, &val, i_deadline ) )
+            {
+                msg_Dbg( p_input, "control type=%d", i_type );
+                if( Control( p_input, i_type, val ) )
+                    b_force_update = true;
+            }
+            vlc_mutex_unlock( &p_input->p->lock_control );
 
-        /* Update interface and statistics */
-        i_current = mdate();
-        if( i_intf_update < i_current || b_force_update )
-        {
-            MainLoopInterface( p_input );
-            i_intf_update = i_current + INT64_C(250000);
-        }
-        if( i_statistic_update < i_current )
-        {
-            MainLoopStatistic( p_input );
-            i_statistic_update = i_current + INT64_C(1000000);
-        }
+            /* Update interface and statistics */
+            i_current = mdate();
+            if( i_intf_update < i_current || b_force_update )
+            {
+                MainLoopInterface( p_input );
+                i_intf_update = i_current + INT64_C(250000);
+                b_force_update = false;
+            }
+            if( i_statistic_update < i_current )
+            {
+                MainLoopStatistic( p_input );
+                i_statistic_update = i_current + INT64_C(1000000);
+            }
+        } while( i_current < i_wakeup );
     }
 
     if( !p_input->b_eof && !p_input->b_error && p_input->p->input.b_eof )
