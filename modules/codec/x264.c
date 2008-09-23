@@ -86,8 +86,14 @@ static void Close( vlc_object_t * );
     "P-frames. Range 1 to 16." )
 
 #define B_ADAPT_TEXT N_("Adaptive B-frame decision")
+#if X264_BUILD >= 63
+#define B_ADAPT_LONGTEXT N_( "Force the specified number of " \
+    "consecutive B-frames to be used, except possibly before an I-frame." \
+    "Range 0 to 2." )
+#else
 #define B_ADAPT_LONGTEXT N_( "Force the specified number of " \
     "consecutive B-frames to be used, except possibly before an I-frame." )
+#endif
 
 #define B_BIAS_TEXT N_("Influence (bias) B-frames usage")
 #define B_BIAS_LONGTEXT N_( "Bias the choice to use B-frames. Positive values " \
@@ -432,14 +438,16 @@ vlc_module_begin();
                  BFRAMES_LONGTEXT, false );
         change_integer_range( 0, 16 );
 
-#if X264_BUILD >= 0x0013 /* r137 */
 #if X264_BUILD >= 63
     add_integer( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
                  B_ADAPT_LONGTEXT, false );
-#else
+        change_integer_range( 0, 2 );
+#elif  X264_BUILD >= 0x0013 /* r137 */
     add_bool( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
               B_ADAPT_LONGTEXT, false );
 #endif
+
+#if  X264_BUILD >= 0x0013 /* r137 */
     add_integer( SOUT_CFG_PREFIX "b-bias", 0, NULL, B_BIAS_TEXT,
                  B_BIAS_LONGTEXT, false );
         change_integer_range( -100, 100 );
