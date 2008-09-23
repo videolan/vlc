@@ -66,16 +66,6 @@
  * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
  */
 
-enum /* Synchro states */
-{
-    SYNCHRO_OK     = 0,
-    SYNCHRO_START  = 1,
-    SYNCHRO_REINIT = 2,
-};
-
-static void ClockNewRef( input_clock_t * p_pgrm,
-                         mtime_t i_clock, mtime_t i_sysdate );
-
 /*****************************************************************************
  * Constants
  *****************************************************************************/
@@ -92,7 +82,7 @@ static void ClockNewRef( input_clock_t * p_pgrm,
  *****************************************************************************/
 static mtime_t ClockToSysdate( input_clock_t *cl, mtime_t i_clock )
 {
-    if( cl->i_synchro_state != SYNCHRO_OK )
+    if( !cl->b_has_reference )
         return 0;
 
     return (i_clock - cl->cr_ref) * cl->i_rate / INPUT_RATE_DEFAULT +
@@ -102,10 +92,11 @@ static mtime_t ClockToSysdate( input_clock_t *cl, mtime_t i_clock )
 /*****************************************************************************
  * ClockCurrent: converts current system date to clock units
  *****************************************************************************
- * Caution : the synchro state must be SYNCHRO_OK for this to operate.
+ * Caution : a valid reference point is needed for this to operate.
  *****************************************************************************/
 static mtime_t ClockCurrent( input_clock_t *cl )
 {
+    assert( cl->b_has_reference );
     return (mdate() - cl->sysdate_ref) * INPUT_RATE_DEFAULT / cl->i_rate +
            cl->cr_ref;
 }
@@ -116,6 +107,7 @@ static mtime_t ClockCurrent( input_clock_t *cl )
 static void ClockNewRef( input_clock_t *cl,
                          mtime_t i_clock, mtime_t i_sysdate )
 {
+    cl->b_has_reference = true;
     cl->cr_ref = i_clock;
     cl->sysdate_ref = i_sysdate ;
 }
@@ -126,7 +118,7 @@ static void ClockNewRef( input_clock_t *cl,
  *****************************************************************************/
 void input_ClockInit( input_clock_t *cl, bool b_master, int i_cr_average, int i_rate )
 {
-    cl->i_synchro_state = SYNCHRO_START;
+    cl->b_has_reference = false;
 
     cl->last_cr = 0;
     cl->last_pts = 0;
@@ -153,21 +145,15 @@ void input_ClockSetPCR( input_thread_t *p_input,
                         mtime_t i_ck_stream, mtime_t i_ck_system )
 {
     const bool b_synchronize = p_input->b_can_pace_control && cl->b_master;
+    bool b_reset_reference = false;
 
-    if( ( cl->i_synchro_state != SYNCHRO_OK ) ||
+    if( ( !cl->b_has_reference ) ||
         ( i_ck_stream == 0 && cl->last_cr != 0 ) )
     {
-        /* Feed synchro with a new reference point. */
-        ClockNewRef( cl, i_ck_stream,
-                         __MAX( cl->last_pts + CR_MEAN_PTS_GAP, i_ck_system ) );
-        cl->i_synchro_state = SYNCHRO_OK;
+        cl->last_update = 0;
 
-        if( !b_synchronize )
-        {
-            cl->delta_cr = 0;
-            cl->i_delta_cr_residue = 0;
-            cl->last_update = 0;
-        }
+        /* */
+        b_reset_reference= true;
     }
     else if ( cl->last_cr != 0 &&
               ( (cl->last_cr - i_ck_stream) > CR_MAX_GAP ||
@@ -177,12 +163,20 @@ void input_ClockSetPCR( input_thread_t *p_input,
          * warning from the stream control facilities (dd-edited
          * stream ?). */
         msg_Warn( p_input, "clock gap, unexpected stream discontinuity" );
-        input_ClockInit( cl, cl->b_master, cl->i_cr_average, cl->i_rate );
-        /* Feed synchro with a new reference point. */
+        cl->last_pts = 0;
+
+        /* */
         msg_Warn( p_input, "feeding synchro with a new reference point trying to recover from clock gap" );
+        b_reset_reference= true;
+    }
+    if( b_reset_reference )
+    {
+        cl->delta_cr = 0;
+        cl->i_delta_cr_residue = 0;
+
+        /* Feed synchro with a new reference point. */
         ClockNewRef( cl, i_ck_stream,
                          __MAX( cl->last_pts + CR_MEAN_PTS_GAP, i_ck_system ) );
-        cl->i_synchro_state = SYNCHRO_OK;
     }
 
     cl->last_cr = i_ck_stream;
@@ -209,7 +203,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
  *****************************************************************************/
 void input_ClockResetPCR( input_clock_t *cl )
 {
-    cl->i_synchro_state =  SYNCHRO_REINIT;
+    cl->b_has_reference = false;
     cl->last_pts = 0;
 }
 
@@ -219,7 +213,7 @@ void input_ClockResetPCR( input_clock_t *cl )
 mtime_t input_ClockGetTS( input_thread_t * p_input,
                           input_clock_t *cl, mtime_t i_ts )
 {
-    if( cl->i_synchro_state != SYNCHRO_OK )
+    if( !cl->b_has_reference )
         return 0;
 
     cl->last_pts = ClockToSysdate( cl, i_ts + cl->delta_cr );
@@ -232,7 +226,7 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
 void input_ClockSetRate( input_clock_t *cl, int i_rate )
 {
     /* Move the reference point */
-    if( cl->i_synchro_state == SYNCHRO_OK )
+    if( cl->b_has_reference )
         ClockNewRef( cl, cl->last_cr, cl->last_sysdate );
 
     cl->i_rate = i_rate;
@@ -244,7 +238,7 @@ void input_ClockSetRate( input_clock_t *cl, int i_rate )
 mtime_t input_ClockGetWakeup( input_thread_t *p_input, input_clock_t *cl )
 {
     /* Not synchronized, we cannot wait */
-    if( cl->i_synchro_state != SYNCHRO_OK )
+    if( !cl->b_has_reference )
         return 0;
 
     /* We must not wait if not pace controled, or we are not the

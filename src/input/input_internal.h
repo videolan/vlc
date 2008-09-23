@@ -365,7 +365,7 @@ typedef struct
                                       * discontinuities                      */
     mtime_t                 last_pts;
     mtime_t                 last_update;
-    int                     i_synchro_state;
+    bool                    b_has_reference;
 
     bool                    b_master;
 
