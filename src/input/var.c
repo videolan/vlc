@@ -482,6 +482,12 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "teletext-es", VLC_VAR_INTEGER );
     var_SetInteger( p_input, "teletext-es", -1 );
 
+    var_Create( p_input, "signal-quality", VLC_VAR_FLOAT );
+    var_SetFloat( p_input, "signal-quality", -1 );
+
+    var_Create( p_input, "signal-strength", VLC_VAR_FLOAT );
+    var_SetFloat( p_input, "signal-strength", -1 );
+
     /* */
     var_Create( p_input, "access-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "access", VLC_VAR_STRING | VLC_VAR_DOINHERIT );

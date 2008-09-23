@@ -2090,6 +2090,19 @@ static int UpdateFromAccess( input_thread_t *p_input )
         InputUpdateMeta( p_input, p_meta );
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }
+    if( p_access->info.i_update & INPUT_UPDATE_SIGNAL )
+    {
+        double f_quality;
+        double f_strength;
+
+        if( access_Control( p_access, ACCESS_GET_SIGNAL, &f_quality, &f_strength ) )
+            f_quality = f_strength = -1;
+
+        var_SetFloat( p_input, "signal-quality", f_quality );
+        var_SetFloat( p_input, "signal-strength", f_strength );
+
+        p_access->info.i_update &= ~INPUT_UPDATE_SIGNAL;
+    }
 
     p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
 

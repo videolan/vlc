@@ -418,6 +418,7 @@ typedef enum input_state_e
 #define INPUT_UPDATE_TITLE      0x0010
 #define INPUT_UPDATE_SEEKPOINT  0x0020
 #define INPUT_UPDATE_META       0x0040
+#define INPUT_UPDATE_SIGNAL     0x0080
 
 /* Input control XXX: internal */
 #define INPUT_CONTROL_FIFO_SIZE    100
