@@ -523,7 +523,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
                            "0", video, "" );
     CREATE_AND_ADD_TO_CAT( vlost_frames_stat, qtr("Lost frames"),
                            "0", video, "" );
-    CREATE_AND_ADD_TO_CAT( vfps_stat, qtr("FPS"), "0", video, "" );
+//    CREATE_AND_ADD_TO_CAT( vfps_stat, qtr("FPS"), "0", video, "" );
 
     CREATE_AND_ADD_TO_CAT( send_stat, qtr("Sent packets"), "0", streaming, "" );
     CREATE_AND_ADD_TO_CAT( send_bytes_stat, qtr("Sent bytes"),
