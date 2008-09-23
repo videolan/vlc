@@ -207,10 +207,12 @@ int  MMSTUOpen( access_t *p_access )
     p_sys->p_keepalive = malloc( sizeof( mmstu_keepalive_t ) );
     p_sys->p_keepalive->p_access = p_access;
     vlc_mutex_init( &p_sys->p_keepalive->lock );
+    vlc_cond_init( &p_sys->p_keepalive->wait );
     p_sys->p_keepalive->b_paused = false;
     if( vlc_clone( &p_sys->p_keepalive->handle, KeepAliveThread,
                    p_sys->p_keepalive, VLC_THREAD_PRIORITY_LOW ) )
     {
+        vlc_cond_destroy( &p_sys->p_keepalive->wait );
         vlc_mutex_destroy( &p_sys->p_keepalive->lock );
         free( p_sys->p_keepalive );
         p_sys->p_keepalive = NULL;
@@ -230,6 +232,7 @@ void MMSTUClose( access_t *p_access )
     {
         vlc_cancel( p_sys->p_keepalive->handle );
         vlc_join( p_sys->p_keepalive->handle, NULL );
+        vlc_cond_destroy( &p_sys->p_keepalive->wait );
         vlc_mutex_destroy( &p_sys->p_keepalive->lock );
         free( p_sys->p_keepalive );
     }
