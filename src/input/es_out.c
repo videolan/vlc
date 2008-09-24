@@ -60,7 +60,7 @@ typedef struct
     bool b_selected;
 
     /* Clock for this program */
-    input_clock_t clock;
+    input_clock_t *p_clock;
 
     char    *psz_name;
     char    *psz_now_playing;
@@ -317,6 +317,7 @@ void input_EsOutDelete( es_out_t *out )
     for( i = 0; i < p_sys->i_pgrm; i++ )
     {
         es_out_pgrm_t *p_pgrm = p_sys->pgrm[i];
+        input_ClockDelete( p_pgrm->p_clock );
         free( p_pgrm->psz_now_playing );
         free( p_pgrm->psz_publisher );
         free( p_pgrm->psz_name );
@@ -354,7 +355,7 @@ mtime_t input_EsOutGetWakeup( es_out_t *out )
 
     if( !p_sys->p_pgrm )
         return 0;
-    return input_ClockGetWakeup( p_sys->p_input, &p_sys->p_pgrm->clock );
+    return input_ClockGetWakeup( p_sys->p_input, p_sys->p_pgrm->p_clock );
 }
 
 static void EsOutDiscontinuity( es_out_t *out, bool b_flush, bool b_audio )
@@ -385,7 +386,7 @@ void input_EsOutChangeRate( es_out_t *out, int i_rate )
     EsOutDiscontinuity( out, false, false );
 
     for( i = 0; i < p_sys->i_pgrm; i++ )
-        input_ClockSetRate( &p_sys->pgrm[i]->clock, i_rate );
+        input_ClockSetRate( p_sys->pgrm[i]->p_clock, i_rate );
 }
 
 int input_EsOutSetRecord(  es_out_t *out, bool b_record )
@@ -638,11 +639,9 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     p_pgrm->b_selected = true;
 
     /* Switch master stream */
-    if( p_sys->p_pgrm && p_sys->p_pgrm->clock.b_master )
-    {
-        p_sys->p_pgrm->clock.b_master = false;
-    }
-    p_pgrm->clock.b_master = true;
+    if( p_sys->p_pgrm )
+        input_ClockSetMaster( p_sys->p_pgrm->p_clock, false );
+    input_ClockSetMaster( p_pgrm->p_clock, true );
     p_sys->p_pgrm = p_pgrm;
 
     /* Update "program" */
@@ -680,7 +679,8 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     vlc_value_t       val;
 
     es_out_pgrm_t *p_pgrm = malloc( sizeof( es_out_pgrm_t ) );
-    if( !p_pgrm ) return NULL;
+    if( !p_pgrm )
+        return NULL;
 
     /* Init */
     p_pgrm->i_id = i_group;
@@ -690,7 +690,12 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
     p_pgrm->p_epg = NULL;
-    input_ClockInit( &p_pgrm->clock, false, p_input->p->input.i_cr_average, p_sys->i_rate );
+    p_pgrm->p_clock = input_ClockNew( false, p_input->p->input.i_cr_average, p_sys->i_rate );
+    if( !p_pgrm->p_clock )
+    {
+        free( p_pgrm );
+        return NULL;
+    }
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -743,7 +748,10 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     TAB_REMOVE( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
 
     /* If program is selected we need to unselect it */
-    if( p_sys->p_pgrm == p_pgrm ) p_sys->p_pgrm = NULL;
+    if( p_sys->p_pgrm == p_pgrm )
+        p_sys->p_pgrm = NULL;
+
+    input_ClockDelete( p_pgrm->p_clock );
 
     free( p_pgrm->psz_name );
     free( p_pgrm->psz_now_playing );
@@ -1153,7 +1161,7 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 }
 static void EsDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 {
-    es_out_sys_t   *p_sys = out->p_sys;
+    VLC_UNUSED(out);
 
     if( !p_es->p_dec )
         return;
@@ -1538,7 +1546,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else if( p_block->i_dts > 0 )
     {
         p_block->i_dts =
-            input_ClockGetTS( p_input, &p_pgrm->clock, p_block->i_dts ) + i_delay;
+            input_ClockGetTS( p_input, p_pgrm->p_clock, p_block->i_dts ) + i_delay;
     }
     if( p_block->i_pts > 0 && (p_block->i_flags&BLOCK_FLAG_PREROLL) )
     {
@@ -1547,7 +1555,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else if( p_block->i_pts > 0 )
     {
         p_block->i_pts =
-            input_ClockGetTS( p_input, &p_pgrm->clock, p_block->i_pts ) + i_delay;
+            input_ClockGetTS( p_input, p_pgrm->p_clock, p_block->i_pts ) + i_delay;
     }
     if ( p_block->i_rate == INPUT_RATE_DEFAULT &&
          es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
@@ -1902,13 +1910,13 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             i_pcr = (int64_t)va_arg( args, int64_t );
             /* search program
              * TODO do not use mdate() but proper stream acquisition date */
-            input_ClockSetPCR( p_sys->p_input, &p_pgrm->clock, i_pcr, mdate() );
+            input_ClockSetPCR( p_sys->p_input, p_pgrm->p_clock, i_pcr, mdate() );
             return VLC_SUCCESS;
         }
 
         case ES_OUT_RESET_PCR:
             for( i = 0; i < p_sys->i_pgrm; i++ )
-                input_ClockResetPCR( &p_sys->pgrm[i]->clock );
+                input_ClockResetPCR( p_sys->pgrm[i]->p_clock );
             return VLC_SUCCESS;
 
         case ES_OUT_GET_TS:
@@ -1917,7 +1925,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 int64_t i_ts = (int64_t)va_arg( args, int64_t );
                 int64_t *pi_ts = (int64_t *)va_arg( args, int64_t * );
                 *pi_ts = input_ClockGetTS( p_sys->p_input,
-                                           &p_sys->p_pgrm->clock, i_ts );
+                                           p_sys->p_pgrm->p_clock, i_ts );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

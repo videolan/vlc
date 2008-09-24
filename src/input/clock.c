@@ -78,6 +78,30 @@
 #define CR_MEAN_PTS_GAP 300000
 
 /*****************************************************************************
+ * Structures
+ *****************************************************************************/
+struct input_clock_t
+{
+    /* Synchronization information */
+    mtime_t                 delta_cr;
+    mtime_t                 cr_ref, sysdate_ref;
+    mtime_t                 last_sysdate;
+    mtime_t                 last_cr; /* reference to detect unexpected stream
+                                      * discontinuities                      */
+    mtime_t                 last_pts;
+    mtime_t                 last_update;
+    bool                    b_has_reference;
+
+    bool                    b_master;
+
+    int                     i_rate;
+
+    /* Config */
+    int                     i_cr_average;
+    int                     i_delta_cr_residue;
+};
+
+/*****************************************************************************
  * ClockToSysdate: converts a movie clock to system date
  *****************************************************************************/
 static mtime_t ClockToSysdate( input_clock_t *cl, mtime_t i_clock )
@@ -113,11 +137,14 @@ static void ClockNewRef( input_clock_t *cl,
 }
 
 /*****************************************************************************
- * input_ClockInit: reinitializes the clock reference after a stream
- *                  discontinuity
+ * input_ClockNew: create a new clock
  *****************************************************************************/
-void input_ClockInit( input_clock_t *cl, bool b_master, int i_cr_average, int i_rate )
+input_clock_t *input_ClockNew( bool b_master, int i_cr_average, int i_rate )
 {
+    input_clock_t *cl = malloc( sizeof(*cl) );
+    if( !cl )
+        return NULL;
+
     cl->b_has_reference = false;
 
     cl->last_cr = 0;
@@ -132,6 +159,16 @@ void input_ClockInit( input_clock_t *cl, bool b_master, int i_cr_average, int i_
     cl->i_cr_average = i_cr_average;
 
     cl->b_master = b_master;
+
+    return cl;
+}
+
+/*****************************************************************************
+ * input_ClockDelete: destroy a new clock
+ *****************************************************************************/
+void input_ClockDelete( input_clock_t *cl )
+{
+    free( cl );
 }
 
 /*****************************************************************************
@@ -230,6 +267,14 @@ void input_ClockSetRate( input_clock_t *cl, int i_rate )
         ClockNewRef( cl, cl->last_cr, cl->last_sysdate );
 
     cl->i_rate = i_rate;
+}
+
+/*****************************************************************************
+ * input_ClockSetMaster:
+ *****************************************************************************/
+void input_ClockSetMaster( input_clock_t *cl, bool b_master )
+{
+    cl->b_master = b_master;
 }
 
 /*****************************************************************************

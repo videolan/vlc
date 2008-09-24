@@ -355,32 +355,17 @@ void       input_EsOutChangeState( es_out_t * );
 void       input_EsOutChangePosition( es_out_t * );
 bool input_EsOutDecodersEmpty( es_out_t * );
 
-typedef struct
-{
-    /* Synchronization information */
-    mtime_t                 delta_cr;
-    mtime_t                 cr_ref, sysdate_ref;
-    mtime_t                 last_sysdate;
-    mtime_t                 last_cr; /* reference to detect unexpected stream
-                                      * discontinuities                      */
-    mtime_t                 last_pts;
-    mtime_t                 last_update;
-    bool                    b_has_reference;
+/* clock.c */
+typedef struct input_clock_t input_clock_t;
 
-    bool                    b_master;
+input_clock_t *input_ClockNew( bool b_master, int i_cr_average, int i_rate );
+void           input_ClockDelete( input_clock_t * );
 
-    int                     i_rate;
-
-    /* Config */
-    int                     i_cr_average;
-    int                     i_delta_cr_residue;
-} input_clock_t;
-
-void    input_ClockInit( input_clock_t *, bool b_master, int i_cr_average, int i_rate );
 void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t i_clock, mtime_t i_system );
 void    input_ClockResetPCR( input_clock_t * );
 mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
 void    input_ClockSetRate( input_clock_t *cl, int i_rate );
+void    input_ClockSetMaster( input_clock_t *cl, bool b_master );
 mtime_t input_ClockGetWakeup( input_thread_t *, input_clock_t *cl );
 
 /* Subtitles */
