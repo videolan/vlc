@@ -122,7 +122,7 @@ static mtime_t ClockStreamToSystem( input_clock_t *cl, mtime_t i_clock )
     if( !cl->b_has_reference )
         return 0;
 
-    return (i_clock - cl->ref.i_clock) * cl->i_rate / INPUT_RATE_DEFAULT +
+    return ( i_clock - cl->ref.i_clock ) * cl->i_rate / INPUT_RATE_DEFAULT +
            cl->ref.i_system;
 }
 
@@ -131,10 +131,10 @@ static mtime_t ClockStreamToSystem( input_clock_t *cl, mtime_t i_clock )
  *****************************************************************************
  * Caution : a valid reference point is needed for this to operate.
  *****************************************************************************/
-static mtime_t ClockSystemToStream( input_clock_t *cl, mtime_t i_ck_system )
+static mtime_t ClockSystemToStream( input_clock_t *cl, mtime_t i_system )
 {
     assert( cl->b_has_reference );
-    return ( i_ck_system - cl->ref.i_system ) * INPUT_RATE_DEFAULT / cl->i_rate +
+    return ( i_system - cl->ref.i_system ) * INPUT_RATE_DEFAULT / cl->i_rate +
             cl->ref.i_clock;
 }
 
@@ -142,11 +142,11 @@ static mtime_t ClockSystemToStream( input_clock_t *cl, mtime_t i_ck_system )
  * ClockSetReference: writes a new clock reference
  *****************************************************************************/
 static void ClockSetReference( input_clock_t *cl,
-                         mtime_t i_clock, mtime_t i_sysdate )
+                               mtime_t i_clock, mtime_t i_system )
 {
     cl->b_has_reference = true;
     cl->ref.i_clock = i_clock;
-    cl->ref.i_system = i_sysdate ;
+    cl->ref.i_system = i_system;
 }
 
 /*****************************************************************************
@@ -206,9 +206,9 @@ void input_clock_SetPCR( input_clock_t *cl,
         /* */
         b_reset_reference= true;
     }
-    else if ( cl->last.i_clock != 0 &&
-              ( (cl->last.i_clock - i_ck_stream) > CR_MAX_GAP ||
-                (cl->last.i_clock - i_ck_stream) < - CR_MAX_GAP ) )
+    else if( cl->last.i_clock != 0 &&
+             ( (cl->last.i_clock - i_ck_stream) > CR_MAX_GAP ||
+               (cl->last.i_clock - i_ck_stream) < -CR_MAX_GAP ) )
     {
         /* Stream discontinuity, for which we haven't received a
          * warning from the stream control facilities (dd-edited
