@@ -2352,8 +2352,8 @@ retry:
                     }
 
                     if( ( ( cl->query.i_proto == HTTPD_PROTO_HTTP ) &&
-                          ( ( cl->answer.i_version == 0 && b_keepalive ) ||
-                            ( cl->answer.i_version == 1 && !b_connection ) ) ) ||
+                          ( ( cl->query.i_version == 0 && b_keepalive ) ||
+                            ( cl->query.i_version == 1 && !b_connection ) ) ) ||
                         ( ( cl->query.i_proto == HTTPD_PROTO_RTSP ) &&
                           !b_query && !b_connection ) )
                     {
