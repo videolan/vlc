@@ -111,6 +111,8 @@ InstType $Name_InstTypeFull
   !insertmacro MUI_LANGUAGE "Slovak"
   !insertmacro MUI_LANGUAGE "Czech"
   !insertmacro MUI_LANGUAGE "Hungarian"
+  !insertmacro MUI_LANGUAGE "Catalan"
+  !insertmacro MUI_LANGUAGE "Bulgarian"
 
 ; Reserve files for solid compression
   !insertmacro MUI_RESERVEFILE_LANGDLL
@@ -637,6 +639,9 @@ Function .onInit
   StrCmp $LANGUAGE ${LANG_ITALIAN} Italian 0
   StrCmp $LANGUAGE ${LANG_HUNGARIAN} Hungarian 0
   StrCmp $LANGUAGE ${LANG_ROMANIAN} Romanian 0
+  StrCmp $LANGUAGE ${LANG_CATALAN} Catalan 0
+  StrCmp $LANGUAGE ${LANG_BULGARIAN} Bulgarian 0
+  StrCmp $LANGUAGE ${LANG_SLOVAK} Slovak 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -649,6 +654,15 @@ Function .onInit
   Goto EndLanguageCmp
   Romanian:
   !include "languages\romanian.nsh"
+  Goto EndLanguageCmp
+  Catalan:
+  !include "languages\catalan.nsh"
+  Goto EndLanguageCmp
+  Bulgarian:
+  !include "languages\bulgarian.nsh"
+  Goto EndLanguageCmp
+  Slovak:
+  !include "languages\slovak.nsh"
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
@@ -857,6 +871,9 @@ Function un.onInit
   StrCmp $LANGUAGE ${LANG_ITALIAN} Italian 0
   StrCmp $LANGUAGE ${LANG_HUNGARIAN} Hungarian 0
   StrCmp $LANGUAGE ${LANG_ROMANIAN} Romanian 0
+  StrCmp $LANGUAGE ${LANG_CATALAN} Catalan 0
+  StrCmp $LANGUAGE ${LANG_BULGARIAN} Bulgarian 0
+  StrCmp $LANGUAGE ${LANG_SLOVAK} Slovak 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -869,6 +886,15 @@ Function un.onInit
   Goto EndLanguageCmp
   Romanian:
   !include "languages\romanian.nsh"
+  Goto EndLanguageCmp
+  Catalan:
+  !include "languages\catalan.nsh"
+  Goto EndLanguageCmp
+  Bulgarian:
+  !include "languages\bulgarian.nsh"
+  Goto EndLanguageCmp
+  Slovak:
+  !include "languages\slovak.nsh"
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"

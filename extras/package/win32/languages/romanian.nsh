@@ -48,9 +48,9 @@ StrCpy $ContextMenuEntry_AddToPlaylist "Adaugã la lista de redare VLC media play
 
 StrCpy $Link_VisitWebsite "Vizitaþi saitul web VideoLAN VLC media player"
 
-StrCpy $Name_InstTypeRecommended "Recomandat"
-StrCpy $Name_InstTypeMinimum "Minim"
-StrCpy $Name_InstTypeFull "Complet"
+StrCpy $Name_InstTypeRecommended "Recomandatã"
+StrCpy $Name_InstTypeMinimum "Minimalã"
+StrCpy $Name_InstTypeFull "Completã"
 
 StrCpy $Action_OnArrivalDVD "Redã filmul DVD"
 StrCpy $Action_OnArrivalAudioCD "Redã CD-ul audio"
