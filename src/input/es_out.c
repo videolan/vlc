@@ -1546,7 +1546,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else if( p_block->i_dts > 0 )
     {
         p_block->i_dts =
-            input_clock_GetTS( p_pgrm->p_clock, p_input, p_block->i_dts ) + i_delay;
+            input_clock_GetTS( p_pgrm->p_clock, p_input->i_pts_delay, p_block->i_dts ) + i_delay;
     }
     if( p_block->i_pts > 0 && (p_block->i_flags&BLOCK_FLAG_PREROLL) )
     {
@@ -1555,7 +1555,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else if( p_block->i_pts > 0 )
     {
         p_block->i_pts =
-            input_clock_GetTS( p_pgrm->p_clock, p_input, p_block->i_pts ) + i_delay;
+            input_clock_GetTS( p_pgrm->p_clock, p_input->i_pts_delay, p_block->i_pts ) + i_delay;
     }
     if ( p_block->i_rate == INPUT_RATE_DEFAULT &&
          es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
@@ -1925,7 +1925,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 int64_t i_ts = (int64_t)va_arg( args, int64_t );
                 int64_t *pi_ts = (int64_t *)va_arg( args, int64_t * );
                 *pi_ts = input_clock_GetTS( p_sys->p_pgrm->p_clock,
-                                            p_sys->p_input, i_ts );
+                                            p_sys->p_input->i_pts_delay, i_ts );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

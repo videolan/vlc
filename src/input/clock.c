@@ -1,10 +1,11 @@
 /*****************************************************************************
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Laurent Aimar < fenrir _AT_ videolan _DOT_ org >
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,65 +76,77 @@
 
 /* Latency introduced on DVDs with CR == 0 on chapter change - this is from
  * my dice --Meuuh */
-#define CR_MEAN_PTS_GAP 300000
+#define CR_MEAN_PTS_GAP (300000)
 
 /*****************************************************************************
  * Structures
  *****************************************************************************/
 struct input_clock_t
 {
-    /* Synchronization information */
-    mtime_t                 delta_cr;
-    mtime_t                 cr_ref, sysdate_ref;
-    mtime_t                 last_sysdate;
-    mtime_t                 last_cr; /* reference to detect unexpected stream
-                                      * discontinuities                      */
-    mtime_t                 last_pts;
-    mtime_t                 last_update;
+    /* Reference point */
     bool                    b_has_reference;
+    struct
+    {
+        mtime_t i_clock;
+        mtime_t i_system;
+    } ref;
 
-    bool                    b_master;
+    /* Last point
+     * It is used to detect unexpected stream discontinuities */
+    struct
+    {
+        mtime_t i_clock;
+        mtime_t i_system;
+    } last;
 
-    int                     i_rate;
+    mtime_t last_pts;
 
-    /* Config */
-    int                     i_cr_average;
-    int                     i_delta_cr_residue;
+    /* Clock drift */
+    mtime_t i_delta_update; /* System time to wait for drift update */ 
+    mtime_t i_delta;
+    int     i_delta_residue;
+
+    /* Current modifiers */
+    bool    b_master;
+    int     i_rate;
+
+    /* Static configuration */
+    int     i_cr_average;
 };
 
 /*****************************************************************************
- * ClockToSysdate: converts a movie clock to system date
+ * ClockStreamToSystem: converts a movie clock to system date
  *****************************************************************************/
-static mtime_t ClockToSysdate( input_clock_t *cl, mtime_t i_clock )
+static mtime_t ClockStreamToSystem( input_clock_t *cl, mtime_t i_clock )
 {
     if( !cl->b_has_reference )
         return 0;
 
-    return (i_clock - cl->cr_ref) * cl->i_rate / INPUT_RATE_DEFAULT +
-           cl->sysdate_ref;
+    return (i_clock - cl->ref.i_clock) * cl->i_rate / INPUT_RATE_DEFAULT +
+           cl->ref.i_system;
 }
 
 /*****************************************************************************
- * ClockFromSysdate: converts a system date to movie clock
+ * ClockSystemToStream: converts a system date to movie clock
  *****************************************************************************
  * Caution : a valid reference point is needed for this to operate.
  *****************************************************************************/
-static mtime_t ClockFromSysdate( input_clock_t *cl, mtime_t i_ck_system )
+static mtime_t ClockSystemToStream( input_clock_t *cl, mtime_t i_ck_system )
 {
     assert( cl->b_has_reference );
-    return ( i_ck_system - cl->sysdate_ref ) * INPUT_RATE_DEFAULT / cl->i_rate +
-            cl->cr_ref;
+    return ( i_ck_system - cl->ref.i_system ) * INPUT_RATE_DEFAULT / cl->i_rate +
+            cl->ref.i_clock;
 }
 
 /*****************************************************************************
- * ClockNewRef: writes a new clock reference
+ * ClockSetReference: writes a new clock reference
  *****************************************************************************/
-static void ClockNewRef( input_clock_t *cl,
+static void ClockSetReference( input_clock_t *cl,
                          mtime_t i_clock, mtime_t i_sysdate )
 {
     cl->b_has_reference = true;
-    cl->cr_ref = i_clock;
-    cl->sysdate_ref = i_sysdate ;
+    cl->ref.i_clock = i_clock;
+    cl->ref.i_system = i_sysdate ;
 }
 
 /*****************************************************************************
@@ -146,19 +159,20 @@ input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
         return NULL;
 
     cl->b_has_reference = false;
+    cl->ref.i_clock = 0;
+    cl->ref.i_system = 0;
 
-    cl->last_cr = 0;
+    cl->last.i_clock = 0;
+    cl->last.i_system = 0;
     cl->last_pts = 0;
-    cl->last_sysdate = 0;
-    cl->cr_ref = 0;
-    cl->sysdate_ref = 0;
-    cl->delta_cr = 0;
-    cl->i_delta_cr_residue = 0;
+
+    cl->i_delta = 0;
+    cl->i_delta_residue = 0;
+
+    cl->b_master = b_master;
     cl->i_rate = i_rate;
 
     cl->i_cr_average = i_cr_average;
-
-    cl->b_master = b_master;
 
     return cl;
 }
@@ -185,16 +199,16 @@ void input_clock_SetPCR( input_clock_t *cl,
     bool b_reset_reference = false;
 
     if( ( !cl->b_has_reference ) ||
-        ( i_ck_stream == 0 && cl->last_cr != 0 ) )
+        ( i_ck_stream == 0 && cl->last.i_clock != 0 ) )
     {
-        cl->last_update = 0;
+        cl->i_delta_update = 0;
 
         /* */
         b_reset_reference= true;
     }
-    else if ( cl->last_cr != 0 &&
-              ( (cl->last_cr - i_ck_stream) > CR_MAX_GAP ||
-                (cl->last_cr - i_ck_stream) < - CR_MAX_GAP ) )
+    else if ( cl->last.i_clock != 0 &&
+              ( (cl->last.i_clock - i_ck_stream) > CR_MAX_GAP ||
+                (cl->last.i_clock - i_ck_stream) < - CR_MAX_GAP ) )
     {
         /* Stream discontinuity, for which we haven't received a
          * warning from the stream control facilities (dd-edited
@@ -208,30 +222,30 @@ void input_clock_SetPCR( input_clock_t *cl,
     }
     if( b_reset_reference )
     {
-        cl->delta_cr = 0;
-        cl->i_delta_cr_residue = 0;
+        cl->i_delta = 0;
+        cl->i_delta_residue = 0;
 
         /* Feed synchro with a new reference point. */
-        ClockNewRef( cl, i_ck_stream,
+        ClockSetReference( cl, i_ck_stream,
                          __MAX( cl->last_pts + CR_MEAN_PTS_GAP, i_ck_system ) );
     }
 
-    cl->last_cr = i_ck_stream;
-    cl->last_sysdate = i_ck_system;
+    cl->last.i_clock = i_ck_stream;
+    cl->last.i_system = i_ck_system;
 
-    if( !b_synchronize && i_ck_system - cl->last_update > 200000 )
+    if( !b_synchronize && i_ck_system - cl->i_delta_update > 200000 )
     {
         /* Smooth clock reference variations. */
-        const mtime_t i_extrapoled_clock = ClockFromSysdate( cl, i_ck_system );
+        const mtime_t i_extrapoled_clock = ClockSystemToStream( cl, i_ck_system );
         /* Bresenham algorithm to smooth variations. */
-        const mtime_t i_tmp = cl->delta_cr * (cl->i_cr_average - 1) +
+        const mtime_t i_tmp = cl->i_delta * (cl->i_cr_average - 1) +
                               ( i_extrapoled_clock - i_ck_stream ) * 1  +
-                              cl->i_delta_cr_residue;
+                              cl->i_delta_residue;
 
-        cl->i_delta_cr_residue = i_tmp % cl->i_cr_average;
-        cl->delta_cr           = i_tmp / cl->i_cr_average;
+        cl->i_delta_residue = i_tmp % cl->i_cr_average;
+        cl->i_delta         = i_tmp / cl->i_cr_average;
 
-        cl->last_update = i_ck_system;
+        cl->i_delta_update = i_ck_system;
     }
 }
 
@@ -248,13 +262,13 @@ void input_clock_ResetPCR( input_clock_t *cl )
  * input_clock_GetTS: manages a PTS or DTS
  *****************************************************************************/
 mtime_t input_clock_GetTS( input_clock_t *cl,
-                           input_thread_t *p_input, mtime_t i_ts )
+                           mtime_t i_pts_delay, mtime_t i_ts )
 {
     if( !cl->b_has_reference )
         return 0;
 
-    cl->last_pts = ClockToSysdate( cl, i_ts + cl->delta_cr );
-    return cl->last_pts + p_input->i_pts_delay;
+    cl->last_pts = ClockStreamToSystem( cl, i_ts + cl->i_delta );
+    return cl->last_pts + i_pts_delay;
 }
 
 /*****************************************************************************
@@ -264,7 +278,7 @@ void input_clock_SetRate( input_clock_t *cl, int i_rate )
 {
     /* Move the reference point */
     if( cl->b_has_reference )
-        ClockNewRef( cl, cl->last_cr, cl->last_sysdate );
+        ClockSetReference( cl, cl->last.i_clock, cl->last.i_system );
 
     cl->i_rate = i_rate;
 }
@@ -293,6 +307,6 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl, input_thread_t *p_input )
         return 0;
 
     /* */
-    return ClockToSysdate( cl, cl->last_cr );
+    return ClockStreamToSystem( cl, cl->last.i_clock );
 }
 
