@@ -462,6 +462,8 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
     return VLC_EGENERIC;
 }
 
+static int CacheSaveSubmodule( FILE *file, module_t *p_module );
+
 /*****************************************************************************
  * SavePluginsCache: saves the plugins cache to a file
  *****************************************************************************/
@@ -588,23 +590,8 @@ void CacheSave( vlc_object_t *p_this )
 
         i_submodule = pp_cache[i]->p_module->submodule_count;
         SAVE_IMMEDIATE( i_submodule );
-        for( module_t *p_module = pp_cache[i]->p_module->submodule;
-             p_module != NULL; p_module = p_module->next )
-        {
-            SAVE_STRING( p_module->psz_object_name );
-            SAVE_STRING( p_module->psz_shortname );
-            SAVE_STRING( p_module->psz_longname );
-            SAVE_STRING( p_module->psz_help );
-            for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
-            {
-                SAVE_STRING( p_module->pp_shortcuts[j] ); // FIX
-            }
-            SAVE_STRING( p_module->psz_capability );
-            SAVE_IMMEDIATE( p_module->i_score );
-            SAVE_IMMEDIATE( p_module->i_cpu );
-            SAVE_IMMEDIATE( p_module->b_unloadable );
-            SAVE_IMMEDIATE( p_module->b_reentrant );
-        }
+        if( CacheSaveSubmodule( file, pp_cache[i]->p_module->submodule ) )
+            goto error;
     }
 
     /* Fill-up file size */
@@ -626,6 +613,30 @@ error:
         fclose (file);
     }
 }
+
+static int CacheSaveSubmodule( FILE *file, module_t *p_module )
+{
+    if( p_module->next && CacheSaveSubmodule( file, p_module->next ) )
+        goto error;
+
+    SAVE_STRING( p_module->psz_object_name );
+    SAVE_STRING( p_module->psz_shortname );
+    SAVE_STRING( p_module->psz_longname );
+    SAVE_STRING( p_module->psz_help );
+    for( unsigned j = 0; j < MODULE_SHORTCUT_MAX; j++ )
+         SAVE_STRING( p_module->pp_shortcuts[j] ); // FIXME
+
+    SAVE_STRING( p_module->psz_capability );
+    SAVE_IMMEDIATE( p_module->i_score );
+    SAVE_IMMEDIATE( p_module->i_cpu );
+    SAVE_IMMEDIATE( p_module->b_unloadable );
+    SAVE_IMMEDIATE( p_module->b_reentrant );
+    return 0;
+
+error:
+    return -1;
+}
+
 
 static int CacheSaveConfig( module_t *p_module, FILE *file )
 {
