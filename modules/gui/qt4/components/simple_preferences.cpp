@@ -402,13 +402,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /* Caching */
             /* Add the things to the ComboBox */
             #define addToCachingBox( str, cachingNumber ) \
-                ui.cachingCombo->addItem( str, QVariant( cachingNumber ) );
-            addToCachingBox( "Custom", CachingCustom );
-            addToCachingBox( "Lowest latency", CachingLowest );
-            addToCachingBox( "Low latency", CachingLow );
-            addToCachingBox( "Normal", CachingNormal );
-            addToCachingBox( "High latency", CachingHigh );
-            addToCachingBox( "Higher latency", CachingHigher );
+                ui.cachingCombo->addItem( qtr(str), QVariant( cachingNumber ) );
+            addToCachingBox( N_("Custom"), CachingCustom );
+            addToCachingBox( N_("Lowest latency"), CachingLowest );
+            addToCachingBox( N_("Low latency"), CachingLow );
+            addToCachingBox( N_("Normal"), CachingNormal );
+            addToCachingBox( N_("High latency"), CachingHigh );
+            addToCachingBox( N_("Higher latency"), CachingHigher );
 
 #define TestCaC( name ) \
     b_cache_equal =  b_cache_equal && \
