@@ -30,8 +30,8 @@
 #endif
 
 #include <vlc_common.h>
-
-#include "input_internal.h"
+#include <vlc_input.h>
+#include "input_clock.h"
 
 /*
  * DISCUSSION : SYNCHRONIZATION METHOD
