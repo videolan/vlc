@@ -265,6 +265,7 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
     video_format_t fmt_in, fmt_out;
     char *psz_filename = NULL;
+    char *psz_temp = NULL;
     int i_ret;
 
     memset( &fmt_in, 0, sizeof(video_format_t) );
@@ -275,7 +276,7 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     fmt_out.i_width = p_sys->i_width;
     fmt_out.i_height = p_sys->i_height;
-    if( !strncmp( p_sys->psz_format, "png", 3 ) )
+    if( strlen( p_sys->psz_format ) == 3 )
         fmt_out.i_chroma = VLC_FOURCC('p','n','g',' ');
     else
         fmt_out.i_chroma = VLC_FOURCC('j','p','e','g');
@@ -294,7 +295,10 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
         fmt_out.i_height = fmt_in.i_height;
     }
 
-    /* Save the snapshot */
+    /*
+     * Save the snapshot to a temporary file and
+     * switch it to the real name afterwards.
+     */
     if( p_sys->b_replace )
         i_ret = asprintf( &psz_filename, "%s" DIR_SEP "%s.%s",
                           p_sys->psz_path, p_sys->psz_prefix,
@@ -307,16 +311,37 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     if( i_ret == -1 )
     {
         msg_Err( p_filter, "could not create snapshot %s", psz_filename );
-        return;
+        goto error;
     }
     path_sanitize( psz_filename );
 
+    i_ret = asprintf( &psz_temp, "%s.swp", psz_filename );
+    if( i_ret == -1 )
+    {
+        msg_Err( p_filter, "could not create snapshot temporarily file %s", psz_temp );
+        goto error;
+    }
+    path_sanitize( psz_temp );
+
     /* Save the image */
     i_ret = image_WriteUrl( p_sys->p_image, p_pic, &fmt_in, &fmt_out,
-                            psz_filename );
+                            psz_temp );
     if( i_ret != VLC_SUCCESS )
     {
-        msg_Err( p_filter, "could not create snapshot %s", psz_filename );
+        msg_Err( p_filter, "could not create snapshot %s", psz_temp );
     }
+    else
+    {
+        /* switch to the final destination */
+        i_ret = rename( psz_temp, psz_filename );
+        if( i_ret == -1 )
+        {
+            msg_Err( p_filter, "could not rename snapshot %s %m", psz_filename );
+            goto error;
+        }
+    }
+
+error:
+    free( psz_temp );
     free( psz_filename );
 }
