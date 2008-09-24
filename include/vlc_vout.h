@@ -703,7 +703,7 @@ VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, unsigned in
 
 /* DO NOT use vout_RenderPicture unless you are in src/video_ouput */
 picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
-                                                       subpicture_t * );
+                                                       subpicture_t *, bool b_paused );
 
 /* DO NOT use vout_CountPictureAvailable unless your are in src/input/dec.c (no exception) */
 int vout_CountPictureAvailable( vout_thread_t * );

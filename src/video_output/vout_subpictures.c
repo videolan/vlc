@@ -363,7 +363,7 @@ void spu_DisplaySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 void spu_RenderSubpictures( spu_t *p_spu,
                             picture_t *p_pic_dst, const video_format_t *p_fmt_dst,
                             subpicture_t *p_subpic_list,
-                            const video_format_t *p_fmt_src )
+                            const video_format_t *p_fmt_src, bool b_paused )
 {
     spu_private_t *p_sys = p_spu->p;
 
@@ -389,10 +389,10 @@ void spu_RenderSubpictures( spu_t *p_spu,
                 p_subpic = p_subpic->p_next )
     {
         /* */
-        if( p_subpic->pf_pre_render )
+        if( !b_paused && p_subpic->pf_pre_render )
             p_subpic->pf_pre_render( p_spu, p_subpic, p_fmt_dst );
 
-        if( p_subpic->pf_update_regions )
+        if( !b_paused && p_subpic->pf_update_regions )
         {
             video_format_t fmt_org = *p_fmt_dst;
             fmt_org.i_width =

@@ -2012,7 +2012,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 
             spu_RenderSubpictures( p_sys->p_spu, p_pic, &fmt,
-                                   p_subpic, &id->p_decoder->fmt_out.video );
+                                   p_subpic, &id->p_decoder->fmt_out.video, false );
         }
 
         /* Run user specified filter chain */

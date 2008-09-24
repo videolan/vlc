@@ -970,21 +970,22 @@ static void* RunThread( vlc_object_t *p_this )
         /*
          * Check for subpictures to display
          */
+        bool b_paused = false;
         if( display_date > 0 )
         {
             p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-            p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
-                                            p_input ? var_GetInteger( p_input, "state" ) == PAUSE_S : false,
-                                            b_snapshot );
+            b_paused = p_input && var_GetInteger( p_input, "state" ) == PAUSE_S;
             if( p_input )
                 vlc_object_release( p_input );
+
+            p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date, b_paused, b_snapshot );
         }
 
         /*
          * Perform rendering
          */
         i_displayed++;
-        p_directbuffer = vout_RenderPicture( p_vout, p_filtered_picture, p_subpic );
+        p_directbuffer = vout_RenderPicture( p_vout, p_filtered_picture, p_subpic, b_paused );
 
         /*
          * Take a snapshot if requested
