@@ -351,7 +351,8 @@ es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
 
 mtime_t input_EsOutGetWakeup( es_out_t *out )
 {
-    es_out_sys_t      *p_sys = out->p_sys;
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
 
     if( !p_sys->p_pgrm )
         return 0;
@@ -1916,7 +1917,8 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             i_pcr = (int64_t)va_arg( args, int64_t );
             /* search program
              * TODO do not use mdate() but proper stream acquisition date */
-            input_clock_SetPCR( p_pgrm->p_clock, p_sys->p_input, i_pcr, mdate() );
+            input_clock_SetPCR( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
+                                p_sys->p_input->b_can_pace_control, i_pcr, mdate() );
             return VLC_SUCCESS;
         }
 

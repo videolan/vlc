@@ -192,10 +192,10 @@ void input_clock_Delete( input_clock_t *cl )
  *  i_ck_system: date in system clock
  *****************************************************************************/
 void input_clock_SetPCR( input_clock_t *cl,
-                         input_thread_t *p_input,
+                         vlc_object_t *p_log, bool b_can_pace_control,
                          mtime_t i_ck_stream, mtime_t i_ck_system )
 {
-    const bool b_synchronize = p_input->b_can_pace_control && cl->b_master;
+    const bool b_synchronize = b_can_pace_control && cl->b_master;
     bool b_reset_reference = false;
 
     if( ( !cl->b_has_reference ) ||
@@ -213,11 +213,11 @@ void input_clock_SetPCR( input_clock_t *cl,
         /* Stream discontinuity, for which we haven't received a
          * warning from the stream control facilities (dd-edited
          * stream ?). */
-        msg_Warn( p_input, "clock gap, unexpected stream discontinuity" );
+        msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
         cl->last_pts = 0;
 
         /* */
-        msg_Warn( p_input, "feeding synchro with a new reference point trying to recover from clock gap" );
+        msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
         b_reset_reference= true;
     }
     if( b_reset_reference )
@@ -294,7 +294,7 @@ void input_clock_SetMaster( input_clock_t *cl, bool b_master )
 /*****************************************************************************
  * input_clock_GetWakeup
  *****************************************************************************/
-mtime_t input_clock_GetWakeup( input_clock_t *cl, input_thread_t *p_input )
+mtime_t input_clock_GetWakeup( input_clock_t *cl )
 {
     /* Not synchronized, we cannot wait */
     if( !cl->b_has_reference )

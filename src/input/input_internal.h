@@ -361,7 +361,8 @@ typedef struct input_clock_t input_clock_t;
 input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate );
 void           input_clock_Delete( input_clock_t * );
 
-void    input_clock_SetPCR( input_clock_t *, input_thread_t *, mtime_t i_clock, mtime_t i_system );
+void    input_clock_SetPCR( input_clock_t *, vlc_object_t *p_log,
+                            bool b_can_pace_control, mtime_t i_clock, mtime_t i_system );
 void    input_clock_ResetPCR( input_clock_t * );
 mtime_t input_clock_GetTS( input_clock_t *, mtime_t i_pts_delay, mtime_t );
 void    input_clock_SetRate( input_clock_t *cl, int i_rate );
