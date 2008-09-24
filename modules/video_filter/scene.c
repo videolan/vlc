@@ -275,7 +275,10 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     fmt_out.i_width = p_sys->i_width;
     fmt_out.i_height = p_sys->i_height;
-    fmt_out.i_chroma = VLC_FOURCC('p','n','g',' ');
+    if( !strncmp( p_sys->psz_format, "png", 3 ) )
+        fmt_out.i_chroma = VLC_FOURCC('p','n','g',' ');
+    else
+        fmt_out.i_chroma = VLC_FOURCC('j','p','e','g');
 
     if( (fmt_out.i_width == 0) && (fmt_out.i_height > 0) )
     {
@@ -285,7 +288,7 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     {
         fmt_out.i_height = (fmt_in.i_height * fmt_out.i_width) / fmt_in.i_width;
     }
-    else
+    else if( (fmt_out.i_width == 0) && (fmt_out.i_height == 0) )
     {
         fmt_out.i_width = fmt_in.i_width;
         fmt_out.i_height = fmt_in.i_height;
