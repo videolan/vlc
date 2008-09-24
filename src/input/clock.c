@@ -90,15 +90,15 @@ static mtime_t ClockToSysdate( input_clock_t *cl, mtime_t i_clock )
 }
 
 /*****************************************************************************
- * ClockCurrent: converts current system date to clock units
+ * ClockFromSysdate: converts a system date to movie clock
  *****************************************************************************
  * Caution : a valid reference point is needed for this to operate.
  *****************************************************************************/
-static mtime_t ClockCurrent( input_clock_t *cl )
+static mtime_t ClockFromSysdate( input_clock_t *cl, mtime_t i_ck_system )
 {
     assert( cl->b_has_reference );
-    return (mdate() - cl->sysdate_ref) * INPUT_RATE_DEFAULT / cl->i_rate +
-           cl->cr_ref;
+    return ( i_ck_system - cl->sysdate_ref ) * INPUT_RATE_DEFAULT / cl->i_rate +
+            cl->cr_ref;
 }
 
 /*****************************************************************************
@@ -185,7 +185,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
     if( !b_synchronize && i_ck_system - cl->last_update > 200000 )
     {
         /* Smooth clock reference variations. */
-        const mtime_t i_extrapoled_clock = ClockCurrent( cl );
+        const mtime_t i_extrapoled_clock = ClockFromSysdate( cl, i_ck_system );
         /* Bresenham algorithm to smooth variations. */
         const mtime_t i_tmp = cl->delta_cr * (cl->i_cr_average - 1) +
                               ( i_extrapoled_clock - i_ck_stream ) * 1  +
