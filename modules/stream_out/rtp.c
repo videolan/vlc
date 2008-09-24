@@ -994,7 +994,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
             default:
             {
-                int ttl = (p_sys->i_ttl > 0) ? p_sys->i_ttl : -1;
+                int ttl = (p_sys->i_ttl >= 0) ? p_sys->i_ttl : -1;
                 int fd = net_ConnectDgram( p_stream, p_sys->psz_destination,
                                            i_port, ttl, p_sys->proto );
                 if( fd == -1 )
