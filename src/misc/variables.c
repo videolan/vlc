@@ -1096,6 +1096,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         {
             msg_Err( p_obj, "unsafe option \"%s\" has been ignored for "
                             "security reasons", psz_name );
+            free( psz_name );
             return;
         }
     }
