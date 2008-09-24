@@ -358,15 +358,15 @@ bool input_EsOutDecodersEmpty( es_out_t * );
 /* clock.c */
 typedef struct input_clock_t input_clock_t;
 
-input_clock_t *input_ClockNew( bool b_master, int i_cr_average, int i_rate );
-void           input_ClockDelete( input_clock_t * );
+input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate );
+void           input_clock_Delete( input_clock_t * );
 
-void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t i_clock, mtime_t i_system );
-void    input_ClockResetPCR( input_clock_t * );
-mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
-void    input_ClockSetRate( input_clock_t *cl, int i_rate );
-void    input_ClockSetMaster( input_clock_t *cl, bool b_master );
-mtime_t input_ClockGetWakeup( input_thread_t *, input_clock_t *cl );
+void    input_clock_SetPCR( input_clock_t *, input_thread_t *, mtime_t i_clock, mtime_t i_system );
+void    input_clock_ResetPCR( input_clock_t * );
+mtime_t input_clock_GetTS( input_clock_t *, input_thread_t *, mtime_t );
+void    input_clock_SetRate( input_clock_t *cl, int i_rate );
+void    input_clock_SetMaster( input_clock_t *cl, bool b_master );
+mtime_t input_clock_GetWakeup( input_clock_t *cl, input_thread_t * );
 
 /* Subtitles */
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );

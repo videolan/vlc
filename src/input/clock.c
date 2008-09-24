@@ -137,9 +137,9 @@ static void ClockNewRef( input_clock_t *cl,
 }
 
 /*****************************************************************************
- * input_ClockNew: create a new clock
+ * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_ClockNew( bool b_master, int i_cr_average, int i_rate )
+input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
@@ -164,22 +164,22 @@ input_clock_t *input_ClockNew( bool b_master, int i_cr_average, int i_rate )
 }
 
 /*****************************************************************************
- * input_ClockDelete: destroy a new clock
+ * input_clock_Delete: destroy a new clock
  *****************************************************************************/
-void input_ClockDelete( input_clock_t *cl )
+void input_clock_Delete( input_clock_t *cl )
 {
     free( cl );
 }
 
 /*****************************************************************************
- * input_ClockSetPCR: manages a clock reference
+ * input_clock_SetPCR: manages a clock reference
  *
  *  i_ck_stream: date in stream clock
  *  i_ck_system: date in system clock
  *****************************************************************************/
-void input_ClockSetPCR( input_thread_t *p_input,
-                        input_clock_t *cl,
-                        mtime_t i_ck_stream, mtime_t i_ck_system )
+void input_clock_SetPCR( input_clock_t *cl,
+                         input_thread_t *p_input,
+                         mtime_t i_ck_stream, mtime_t i_ck_system )
 {
     const bool b_synchronize = p_input->b_can_pace_control && cl->b_master;
     bool b_reset_reference = false;
@@ -236,19 +236,19 @@ void input_ClockSetPCR( input_thread_t *p_input,
 }
 
 /*****************************************************************************
- * input_ClockResetPCR:
+ * input_clock_ResetPCR:
  *****************************************************************************/
-void input_ClockResetPCR( input_clock_t *cl )
+void input_clock_ResetPCR( input_clock_t *cl )
 {
     cl->b_has_reference = false;
     cl->last_pts = 0;
 }
 
 /*****************************************************************************
- * input_ClockGetTS: manages a PTS or DTS
+ * input_clock_GetTS: manages a PTS or DTS
  *****************************************************************************/
-mtime_t input_ClockGetTS( input_thread_t * p_input,
-                          input_clock_t *cl, mtime_t i_ts )
+mtime_t input_clock_GetTS( input_clock_t *cl,
+                           input_thread_t *p_input, mtime_t i_ts )
 {
     if( !cl->b_has_reference )
         return 0;
@@ -258,9 +258,9 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
 }
 
 /*****************************************************************************
- * input_ClockSetRate:
+ * input_clock_SetRate:
  *****************************************************************************/
-void input_ClockSetRate( input_clock_t *cl, int i_rate )
+void input_clock_SetRate( input_clock_t *cl, int i_rate )
 {
     /* Move the reference point */
     if( cl->b_has_reference )
@@ -270,17 +270,17 @@ void input_ClockSetRate( input_clock_t *cl, int i_rate )
 }
 
 /*****************************************************************************
- * input_ClockSetMaster:
+ * input_clock_SetMaster:
  *****************************************************************************/
-void input_ClockSetMaster( input_clock_t *cl, bool b_master )
+void input_clock_SetMaster( input_clock_t *cl, bool b_master )
 {
     cl->b_master = b_master;
 }
 
 /*****************************************************************************
- * input_ClockGetWakeup
+ * input_clock_GetWakeup
  *****************************************************************************/
-mtime_t input_ClockGetWakeup( input_thread_t *p_input, input_clock_t *cl )
+mtime_t input_clock_GetWakeup( input_clock_t *cl, input_thread_t *p_input )
 {
     /* Not synchronized, we cannot wait */
     if( !cl->b_has_reference )
