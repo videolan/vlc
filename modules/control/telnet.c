@@ -299,6 +299,7 @@ static void Run( intf_thread_t *p_intf )
                 net_Close( cl->fd );
                 TAB_REMOVE( p_intf->p_sys->i_clients ,
                             p_intf->p_sys->clients , cl );
+                free( cl->buffer_write );
                 free( cl );
                 continue;
             }
