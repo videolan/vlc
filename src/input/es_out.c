@@ -355,7 +355,13 @@ mtime_t input_EsOutGetWakeup( es_out_t *out )
 
     if( !p_sys->p_pgrm )
         return 0;
-    return input_clock_GetWakeup( p_sys->p_pgrm->p_clock, p_sys->p_input );
+
+    /* We do not have a wake up date if the input cannot have its speed
+     * controlled or sout is imposing its own */
+    if( !p_input->b_can_pace_control || p_input->p->b_out_pace_control )
+        return 0;
+
+    return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
 }
 
 static void EsOutDiscontinuity( es_out_t *out, bool b_flush, bool b_audio )

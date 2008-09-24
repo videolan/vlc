@@ -300,10 +300,8 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl, input_thread_t *p_input )
     if( !cl->b_has_reference )
         return 0;
 
-    /* We must not wait if not pace controled, or we are not the
-     * master clock */
-    if( !p_input->b_can_pace_control || !cl->b_master ||
-        p_input->p->b_out_pace_control )
+    /* We must not wait if we are not the master clock */
+    if( !cl->b_master  )
         return 0;
 
     /* */

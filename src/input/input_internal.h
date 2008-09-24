@@ -366,7 +366,7 @@ void    input_clock_ResetPCR( input_clock_t * );
 mtime_t input_clock_GetTS( input_clock_t *, mtime_t i_pts_delay, mtime_t );
 void    input_clock_SetRate( input_clock_t *cl, int i_rate );
 void    input_clock_SetMaster( input_clock_t *cl, bool b_master );
-mtime_t input_clock_GetWakeup( input_clock_t *cl, input_thread_t * );
+mtime_t input_clock_GetWakeup( input_clock_t *cl );
 
 /* Subtitles */
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
