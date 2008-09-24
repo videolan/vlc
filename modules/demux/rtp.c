@@ -72,6 +72,11 @@
     "RTP packets will be discarded if they are too far behind (i.e. in the " \
     "past) by this many packets from the last received packet." )
 
+#define RTP_TS_DEMUX_TEXT N_("Demux module for TS over RTP")
+#define RTP_TS_DEMUX_LONGTEXT N_( \
+    "MPEG Transport Stream packets within an RTP stream will be handled by " \
+    "the specified demux module." )
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -104,6 +109,9 @@ vlc_module_begin ();
     add_integer ("rtp-max-misorder", 100, NULL, RTP_MAX_MISORDER_TEXT,
                  RTP_MAX_MISORDER_LONGTEXT, true);
         change_integer_range (0, 32767);
+
+    add_module ("rtp-ts-demux", "demux", "ts", NULL, RTP_TS_DEMUX_TEXT,
+                RTP_TS_DEMUX_LONGTEXT, true);
 
     add_shortcut ("dccp");
     /*add_shortcut ("sctp");*/
@@ -609,7 +617,14 @@ static void mpv_decode (demux_t *demux, void *data, block_t *block)
  */
 static void *ts_init (demux_t *demux)
 {
-    return stream_init (demux, "ts");
+    char *ts_demux = var_CreateGetNonEmptyString (demux, "rtp-ts-demux");
+    msg_Dbg (demux, "using %s chained demux", ts_demux);
+    if (!ts_demux)
+        return NULL;
+
+    void *stream = stream_init (demux, ts_demux);
+    free (ts_demux);
+    return stream;
 }
 
 
