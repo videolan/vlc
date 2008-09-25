@@ -81,6 +81,26 @@
 /*****************************************************************************
  * Structures
  *****************************************************************************/
+
+/**
+ * This structure holds long term average
+ */
+typedef struct
+{
+    mtime_t i_value;
+    int     i_residue;
+
+    int     i_count;
+    int     i_divider;
+} average_t;
+static void    AverageInit( average_t *, int i_divider );
+static void    AverageClean( average_t * );
+
+static void    AverageReset( average_t * );
+static void    AverageUpdate( average_t *, mtime_t i_value );
+static mtime_t AverageGet( average_t * );
+
+/* */
 struct input_clock_t
 {
     /* Reference point */
@@ -99,20 +119,16 @@ struct input_clock_t
         mtime_t i_system;
     } last;
 
-    /* Maixmal timestamp returned by input_clock_GetTS (in system unit) */
+    /* Maximal timestamp returned by input_clock_GetTS (in system unit) */
     mtime_t i_ts_max;
 
     /* Clock drift */
-    mtime_t i_delta_update; /* System time to wait for drift update */ 
-    mtime_t i_delta;
-    int     i_delta_residue;
+    mtime_t i_next_drift_update;
+    average_t drift;
 
     /* Current modifiers */
     bool    b_master;
     int     i_rate;
-
-    /* Static configuration */
-    int     i_cr_average;
 };
 
 static mtime_t ClockStreamToSystem( input_clock_t *, mtime_t i_clock );
@@ -137,13 +153,11 @@ input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
 
     cl->i_ts_max = 0;
 
-    cl->i_delta = 0;
-    cl->i_delta_residue = 0;
+    cl->i_next_drift_update = 0;
+    AverageInit( &cl->drift, i_cr_average );
 
     cl->b_master = b_master;
     cl->i_rate = i_rate;
-
-    cl->i_cr_average = i_cr_average;
 
     return cl;
 }
@@ -153,6 +167,7 @@ input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
  *****************************************************************************/
 void input_clock_Delete( input_clock_t *cl )
 {
+    AverageClean( &cl->drift );
     free( cl );
 }
 
@@ -172,8 +187,6 @@ void input_clock_SetPCR( input_clock_t *cl,
     if( ( !cl->b_has_reference ) ||
         ( i_ck_stream == 0 && cl->last.i_clock != 0 ) )
     {
-        cl->i_delta_update = 0;
-
         /* */
         b_reset_reference= true;
     }
@@ -193,8 +206,8 @@ void input_clock_SetPCR( input_clock_t *cl,
     }
     if( b_reset_reference )
     {
-        cl->i_delta = 0;
-        cl->i_delta_residue = 0;
+        cl->i_next_drift_update = 0;
+        AverageReset( &cl->drift );
 
         /* Feed synchro with a new reference point. */
         ClockSetReference( cl, i_ck_stream,
@@ -204,19 +217,13 @@ void input_clock_SetPCR( input_clock_t *cl,
     cl->last.i_clock = i_ck_stream;
     cl->last.i_system = i_ck_system;
 
-    if( !b_synchronize && i_ck_system - cl->i_delta_update > 200000 )
+    if( !b_synchronize && cl->i_next_drift_update < i_ck_system )
     {
-        /* Smooth clock reference variations. */
-        const mtime_t i_extrapoled_clock = ClockSystemToStream( cl, i_ck_system );
-        /* Bresenham algorithm to smooth variations. */
-        const mtime_t i_tmp = cl->i_delta * (cl->i_cr_average - 1) +
-                              ( i_extrapoled_clock - i_ck_stream ) * 1  +
-                              cl->i_delta_residue;
+        const mtime_t i_converted = ClockSystemToStream( cl, i_ck_system );
 
-        cl->i_delta_residue = i_tmp % cl->i_cr_average;
-        cl->i_delta         = i_tmp / cl->i_cr_average;
+        AverageUpdate( &cl->drift, i_converted - i_ck_stream );
 
-        cl->i_delta_update = i_ck_system;
+        cl->i_next_drift_update = i_ck_system + CLOCK_FREQ/5; /* FIXME why that */
     }
 }
 
@@ -241,7 +248,7 @@ mtime_t input_clock_GetTS( input_clock_t *cl,
         return 0;
 
     /* */
-    i_converted_ts = ClockStreamToSystem( cl, i_ts + cl->i_delta );
+    i_converted_ts = ClockStreamToSystem( cl, i_ts + AverageGet( &cl->drift ) );
     if( i_converted_ts > cl->i_ts_max )
         cl->i_ts_max = i_converted_ts;
 
@@ -320,4 +327,46 @@ static void ClockSetReference( input_clock_t *cl,
     cl->ref.i_system = i_system;
 }
 
+/*****************************************************************************
+ * Long term average helpers
+ *****************************************************************************/
+typedef struct
+{
+    mtime_t i_value;
+    int     i_residue;
+
+    int     i_count;
+    int     i_divider;
+} averager_t;
+static void AverageInit( average_t *p_avg, int i_divider )
+{
+    p_avg->i_divider = i_divider;
+    AverageReset( p_avg );
+}
+static void AverageClean( average_t *p_avg )
+{
+    VLC_UNUSED(p_avg);
+}
+static void AverageReset( average_t *p_avg )
+{
+    p_avg->i_value = 0;
+    p_avg->i_residue = 0;
+    p_avg->i_count = 0;
+}
+static void AverageUpdate( average_t *p_avg, mtime_t i_value )
+{
+    const int i_f0 = __MIN( p_avg->i_divider - 1, p_avg->i_count );
+    const int i_f1 = p_avg->i_divider - i_f0;
+
+    const mtime_t i_tmp = i_f0 * p_avg->i_value + i_f1 * i_value + p_avg->i_residue;
+
+    p_avg->i_value   = i_tmp / p_avg->i_divider;
+    p_avg->i_residue = i_tmp % p_avg->i_divider;
+
+    p_avg->i_count++;
+}
+static mtime_t AverageGet( average_t *p_avg )
+{
+    return p_avg->i_value;
+}
 
