@@ -99,7 +99,8 @@ struct input_clock_t
         mtime_t i_system;
     } last;
 
-    mtime_t last_pts;
+    /* Maixmal timestamp returned by input_clock_GetTS (in system unit) */
+    mtime_t i_ts_max;
 
     /* Clock drift */
     mtime_t i_delta_update; /* System time to wait for drift update */ 
@@ -164,7 +165,8 @@ input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
 
     cl->last.i_clock = 0;
     cl->last.i_system = 0;
-    cl->last_pts = 0;
+
+    cl->i_ts_max = 0;
 
     cl->i_delta = 0;
     cl->i_delta_residue = 0;
@@ -214,7 +216,7 @@ void input_clock_SetPCR( input_clock_t *cl,
          * warning from the stream control facilities (dd-edited
          * stream ?). */
         msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
-        cl->last_pts = 0;
+        cl->i_ts_max = 0;
 
         /* */
         msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
@@ -227,7 +229,7 @@ void input_clock_SetPCR( input_clock_t *cl,
 
         /* Feed synchro with a new reference point. */
         ClockSetReference( cl, i_ck_stream,
-                         __MAX( cl->last_pts + CR_MEAN_PTS_GAP, i_ck_system ) );
+                         __MAX( cl->i_ts_max + CR_MEAN_PTS_GAP, i_ck_system ) );
     }
 
     cl->last.i_clock = i_ck_stream;
@@ -255,7 +257,7 @@ void input_clock_SetPCR( input_clock_t *cl,
 void input_clock_ResetPCR( input_clock_t *cl )
 {
     cl->b_has_reference = false;
-    cl->last_pts = 0;
+    cl->i_ts_max = 0;
 }
 
 /*****************************************************************************
@@ -264,11 +266,17 @@ void input_clock_ResetPCR( input_clock_t *cl )
 mtime_t input_clock_GetTS( input_clock_t *cl,
                            mtime_t i_pts_delay, mtime_t i_ts )
 {
+    mtime_t i_converted_ts;
+
     if( !cl->b_has_reference )
         return 0;
 
-    cl->last_pts = ClockStreamToSystem( cl, i_ts + cl->i_delta );
-    return cl->last_pts + i_pts_delay;
+    /* */
+    i_converted_ts = ClockStreamToSystem( cl, i_ts + cl->i_delta );
+    if( i_converted_ts > cl->i_ts_max )
+        cl->i_ts_max = i_converted_ts;
+
+    return i_converted_ts + i_pts_delay;
 }
 
 /*****************************************************************************
