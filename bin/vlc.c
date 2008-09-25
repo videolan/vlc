@@ -116,6 +116,8 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     /* Block all these signals */
     pthread_sigmask (SIG_BLOCK, &set, NULL);
+    sigdelset (&set, SIGPIPE);
+    sigdelset (&set, SIGCHLD);
 
     /* Note that FromLocale() can be used before libvlc is initialized */
     for (int i = 0; i < i_argc; i++)
@@ -133,7 +135,12 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     if (vlc != NULL)
     {
-        libvlc_add_intf (vlc, "signals", &dummy);
+        libvlc_add_intf (vlc, "signals", &ex);
+        if (libvlc_exception_raised (&ex))
+        {
+            libvlc_exception_clear (&ex);
+            pthread_sigmask (SIG_UNBLOCK, &set, NULL);
+        }
         libvlc_add_intf (vlc, NULL, &ex);
         libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
         libvlc_wait (vlc);
