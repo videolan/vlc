@@ -616,7 +616,9 @@ error:
 
 static int CacheSaveSubmodule( FILE *file, module_t *p_module )
 {
-    if( p_module->next && CacheSaveSubmodule( file, p_module->next ) )
+    if( !p_module )
+        return 0;
+    if( CacheSaveSubmodule( file, p_module->next ) )
         goto error;
 
     SAVE_STRING( p_module->psz_object_name );
