@@ -642,6 +642,9 @@ Function .onInit
   StrCmp $LANGUAGE ${LANG_CATALAN} Catalan 0
   StrCmp $LANGUAGE ${LANG_BULGARIAN} Bulgarian 0
   StrCmp $LANGUAGE ${LANG_SLOVAK} Slovak 0
+  StrCmp $LANGUAGE ${LANG_POLISH} Polish 0
+  StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
+  StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -663,6 +666,15 @@ Function .onInit
   Goto EndLanguageCmp
   Slovak:
   !include "languages\slovak.nsh"
+  Goto EndLanguageCmp
+  Polish:
+  !include "languages\polish.nsh"
+  Goto EndLanguageCmp
+  Dutch:
+  !include "languages\dutch.nsh"
+  Goto EndLanguageCmp
+  Schinese:
+  !include "languages\schinese.nsh"
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
@@ -874,6 +886,9 @@ Function un.onInit
   StrCmp $LANGUAGE ${LANG_CATALAN} Catalan 0
   StrCmp $LANGUAGE ${LANG_BULGARIAN} Bulgarian 0
   StrCmp $LANGUAGE ${LANG_SLOVAK} Slovak 0
+  StrCmp $LANGUAGE ${LANG_POLISH} Polish 0
+  StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
+  StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -895,6 +910,15 @@ Function un.onInit
   Goto EndLanguageCmp
   Slovak:
   !include "languages\slovak.nsh"
+  Goto EndLanguageCmp
+  Polish:
+  !include "languages\polish.nsh"
+  Goto EndLanguageCmp
+  Dutch:
+  !include "languages\dutch.nsh"
+  Goto EndLanguageCmp
+  Schinese:
+  !include "languages\schinese.nsh"
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
