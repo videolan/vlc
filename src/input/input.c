@@ -2200,12 +2200,9 @@ static int InputSourceInit( input_thread_t *p_input,
             }
         }
 
-        /* Try access_demux if no demux given */
-        if( *psz_demux == '\0' )
-        {
-            in->p_demux = demux_New( p_input, psz_access, psz_demux, psz_path,
-                                      NULL, p_input->p->p_es_out, false );
-        }
+        /* Try access_demux first */
+        in->p_demux = demux_New( p_input, psz_access, psz_demux, psz_path,
+                                  NULL, p_input->p->p_es_out, false );
     }
     else
     {
