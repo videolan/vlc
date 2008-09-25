@@ -342,11 +342,11 @@ void libvlc_event_send(
 
 /* Exception shorcuts */
 
-#define RAISENULL( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
-                                return NULL; }
-#define RAISEVOID( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
-                                return; }
-#define RAISEZERO( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
-                                return 0; }
+#define RAISENULL( ... ) { libvlc_exception_raise( p_e, __VA_ARGS__ ); \
+                           return NULL; }
+#define RAISEVOID( ... ) { libvlc_exception_raise( p_e, __VA_ARGS__ ); \
+                           return; }
+#define RAISEZERO( ... ) { libvlc_exception_raise( p_e, __VA_ARGS__ ); \
+                           return 0; }
 
 #endif
