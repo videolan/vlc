@@ -467,9 +467,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
-            i_margin = 7;
-            break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
             i_margin = 6;
             break;
@@ -503,9 +500,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             i_margin = 5;
             break;
         case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
             i_margin = 7;
             break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
@@ -544,9 +538,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
-            i_margin = 7;
-            break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
             i_margin = 6;
             break;
@@ -581,9 +572,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             i_margin = 8;
             break;
         case CONFIG_ITEM_BOOL:
-            i_margin = 10;
-            break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
             i_margin = 10;
             break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
@@ -622,9 +610,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 8;
             break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
-            i_margin = 8;
-            break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
             i_margin = 7;
             break;
@@ -659,9 +644,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             i_margin = 5;
             break;
         case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
             i_margin = 7;
             break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
@@ -700,9 +682,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
-            i_margin = 7;
-            break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
             i_margin = 6;
             break;
@@ -739,9 +718,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
-            i_margin = 7;
-            break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
             i_margin = 5;
             break;
@@ -750,45 +726,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             break;
         default:
             i_margin = 20;
-            break;
-        }
-        break;
-    case CONFIG_ITEM_KEY_BEFORE_10_3:
-        switch( i_lastItem )
-        {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_FILE:
-            i_margin = 4;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 2;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 3;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 3;
-            break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
-            i_margin = 10;
-            break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 6;
-            break;
-        default:
-            i_margin = 18;
             break;
         }
         break;
@@ -815,9 +752,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             i_margin = 5;
             break;
         case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
             i_margin = 7;
             break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
@@ -854,9 +788,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             i_margin = 5;
             break;
         case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
             i_margin = 7;
             break;
         case CONFIG_ITEM_KEY_AFTER_10_3:
