@@ -102,8 +102,8 @@ int main( int i_argc, const char *ppsz_argv[] )
         SIGINT, SIGHUP, SIGQUIT, SIGTERM,
     /* Signals that cause a no-op:
      * - SIGPIPE might happen with sockets and would crash VLC. It MUST be
-     *   blocked by any LibVLC-dependent application, in addition to VLC.
-     * - SIGCHLD is comes after exec*() (such as httpd CGI support) and must
+     *   blocked by any LibVLC-dependent application, not just VLC.
+     * - SIGCHLD comes after exec*() (such as httpd CGI support) and must
      *   be dequeued to cleanup zombie processes.
      */
         SIGPIPE, SIGCHLD
