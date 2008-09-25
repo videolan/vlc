@@ -478,41 +478,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             break;
         }
         break;
-        switch( i_lastItem )
-        {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_FILE:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 4;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 8;
-            break;
-        default:
-            i_margin = 20;
-            break;
-        }
-        break;
     case CONFIG_ITEM_STRING_LIST:
         switch( i_lastItem )
         {
