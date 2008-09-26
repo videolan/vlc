@@ -188,33 +188,33 @@
 
 /* Internal functions */
 #define _ARRAY_ALLOC(array, newsize) {                                      \
-    array.i_alloc = newsize;                                                \
-    array.p_elems = VLCCVP realloc( array.p_elems, array.i_alloc *          \
-                                    sizeof(*array.p_elems) );               \
+    (array).i_alloc = newsize;                                              \
+    (array).p_elems = VLCCVP realloc( (array).p_elems, (array).i_alloc *    \
+                                    sizeof(*(array).p_elems) );             \
 }
 
 #define _ARRAY_GROW1(array) {                                               \
-    if( array.i_alloc < 10 )                                                \
+    if( (array).i_alloc < 10 )                                              \
         _ARRAY_ALLOC(array, 10 )                                            \
-    else if( array.i_alloc == array.i_size )                                \
+    else if( (array).i_alloc == (array).i_size )                            \
         _ARRAY_ALLOC(array, (int)(array.i_alloc * 1.5) )                    \
 }
 
 #define _ARRAY_GROW(array,additional) {                                     \
-     int i_first = array.i_alloc;                                           \
-     while( array.i_alloc - i_first < additional )                          \
+     int i_first = (array).i_alloc;                                         \
+     while( (array).i_alloc - i_first < additional )                        \
      {                                                                      \
-         if( array.i_alloc < 10 )                                           \
+         if( (array).i_alloc < 10 )                                         \
             _ARRAY_ALLOC(array, 10 )                                        \
-        else if( array.i_alloc == array.i_size )                            \
-            _ARRAY_ALLOC(array, (int)(array.i_alloc * 1.5) )                \
+        else if( (array).i_alloc == (array).i_size )                        \
+            _ARRAY_ALLOC(array, (int)((array).i_alloc * 1.5) )              \
         else break;                                                         \
      }                                                                      \
 }
 
 #define _ARRAY_SHRINK(array) {                                              \
-    if( array.i_size > 10 && array.i_size < (int)(array.i_alloc / 1.5) ) {  \
-        _ARRAY_ALLOC(array, array.i_size + 5);                              \
+    if( (array).i_size > 10 && (array).i_size < (int)((array).i_alloc / 1.5) ) {  \
+        _ARRAY_ALLOC(array, (array).i_size + 5);                            \
     }                                                                       \
 }
 
@@ -230,45 +230,45 @@
 #define TYPEDEF_ARRAY(type, name) typedef DECL_ARRAY(type) name;
 
 #define ARRAY_INIT(array)                                                   \
-    array.i_alloc = 0;                                                      \
-    array.i_size = 0;                                                       \
-    array.p_elems = NULL;
+    (array).i_alloc = 0;                                                    \
+    (array).i_size = 0;                                                     \
+    (array).p_elems = NULL;
 
 #define ARRAY_RESET(array)                                                  \
-    array.i_alloc = 0;                                                      \
-    array.i_size = 0;                                                       \
-    free( array.p_elems ); array.p_elems = NULL;
+    (array).i_alloc = 0;                                                    \
+    (array).i_size = 0;                                                     \
+    free( (array).p_elems ); (array).p_elems = NULL;
 
 #define ARRAY_APPEND(array, elem) {                                         \
     _ARRAY_GROW1(array);                                                    \
-    array.p_elems[array.i_size] = elem;                                     \
-    array.i_size++;                                                         \
+    (array).p_elems[(array).i_size] = elem;                                 \
+    (array).i_size++;                                                       \
 }
 
 #define ARRAY_INSERT(array,elem,pos) {                                      \
     _ARRAY_GROW1(array);                                                    \
-    if( array.i_size - pos ) {                                              \
-        memmove( array.p_elems + pos + 1, array.p_elems + pos,              \
-                 (array.i_size-pos) * sizeof(*array.p_elems) );             \
+    if( (array).i_size - pos ) {                                            \
+        memmove( (array).p_elems + pos + 1, (array).p_elems + pos,          \
+                 ((array).i_size-pos) * sizeof(*(array).p_elems) );         \
     }                                                                       \
-    array.p_elems[pos] = elem;                                              \
-    array.i_size++;                                                         \
+    (array).p_elems[pos] = elem;                                            \
+    (array).i_size++;                                                       \
 }
 
 #define ARRAY_REMOVE(array,pos) {                                           \
-    if( array.i_size - (pos) - 1 )                                          \
+    if( (array).i_size - (pos) - 1 )                                        \
     {                                                                       \
-        memmove( array.p_elems + pos, array.p_elems + pos + 1,              \
-                 ( array.i_size - pos - 1 ) *sizeof(*array.p_elems) );      \
+        memmove( (array).p_elems + pos, (array).p_elems + pos + 1,          \
+                 ( (array).i_size - pos - 1 ) *sizeof(*(array).p_elems) );  \
     }                                                                       \
-    array.i_size--;                                                         \
+    (array).i_size--;                                                       \
     _ARRAY_SHRINK(array);                                                   \
 }
 
 #define ARRAY_VAL(array, pos) array.p_elems[pos]
 
 #define ARRAY_BSEARCH(array, elem, zetype, key, answer) \
-    BSEARCH( array.p_elems, array.i_size, elem, zetype, key, answer)
+    BSEARCH( (array).p_elems, (array).i_size, elem, zetype, key, answer)
 
 #define FOREACH_ARRAY( item, array ) { \
     int fe_idx; \
