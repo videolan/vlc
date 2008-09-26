@@ -19,7 +19,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #ifndef VLC_ARRAYS_H_
 #define VLC_ARRAYS_H_
@@ -230,22 +231,28 @@
 #define TYPEDEF_ARRAY(type, name) typedef DECL_ARRAY(type) name;
 
 #define ARRAY_INIT(array)                                                   \
+  do {                                                                      \
     (array).i_alloc = 0;                                                    \
     (array).i_size = 0;                                                     \
-    (array).p_elems = NULL;
+    (array).p_elems = NULL;                                                 \
+  } while(0)
 
 #define ARRAY_RESET(array)                                                  \
+  do {                                                                      \
     (array).i_alloc = 0;                                                    \
     (array).i_size = 0;                                                     \
-    free( (array).p_elems ); (array).p_elems = NULL;
+    free( (array).p_elems ); (array).p_elems = NULL;                        \
+  } while(0)
 
-#define ARRAY_APPEND(array, elem) {                                         \
+#define ARRAY_APPEND(array, elem)                                           \
+  do {                                                                      \
     _ARRAY_GROW1(array);                                                    \
     (array).p_elems[(array).i_size] = elem;                                 \
     (array).i_size++;                                                       \
-}
+  } while(0)
 
-#define ARRAY_INSERT(array,elem,pos) {                                      \
+#define ARRAY_INSERT(array,elem,pos)                                        \
+  do {                                                                      \
     _ARRAY_GROW1(array);                                                    \
     if( (array).i_size - pos ) {                                            \
         memmove( (array).p_elems + pos + 1, (array).p_elems + pos,          \
@@ -253,9 +260,10 @@
     }                                                                       \
     (array).p_elems[pos] = elem;                                            \
     (array).i_size++;                                                       \
-}
+  } while(0)
 
-#define ARRAY_REMOVE(array,pos) {                                           \
+#define ARRAY_REMOVE(array,pos)                                             \
+  do {                                                                      \
     if( (array).i_size - (pos) - 1 )                                        \
     {                                                                       \
         memmove( (array).p_elems + pos, (array).p_elems + pos + 1,          \
@@ -263,7 +271,7 @@
     }                                                                       \
     (array).i_size--;                                                       \
     _ARRAY_SHRINK(array);                                                   \
-}
+  } while(0)
 
 #define ARRAY_VAL(array, pos) array.p_elems[pos]
 
