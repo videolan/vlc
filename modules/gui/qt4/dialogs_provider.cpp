@@ -386,8 +386,7 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
     int i = 0;
     foreach( QString file, files )
     {
-        const char * psz_utf8 = qtu( toNativeSeparators( file ) );
-        playlist_Add( THEPL, psz_utf8, NULL,
+        playlist_Add( THEPL, qtu( toNativeSeparators( file ) ), NULL,
                       go ? ( PLAYLIST_APPEND | ( i ? 0 : PLAYLIST_GO ) |
                                                ( i ? PLAYLIST_PREPARSE : 0 ) )
                          : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
