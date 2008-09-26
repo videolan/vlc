@@ -1163,6 +1163,10 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
 
     var_Set( p_obj, psz_name, val );
 
+    // If that's a list, remove all elements allocated
+    if( i_type == VLC_VAR_LIST )
+        FreeList( &val );
+
 cleanup:
     free( psz_name );
 }
