@@ -31,18 +31,50 @@
 
 #include <vlc_common.h>
 
+/**
+ * This structure is used to manage clock drift and reception jitters
+ */
 typedef struct input_clock_t input_clock_t;
 
+/**
+ * This function creates a new input_clock_t.
+ * You must use input_clock_Delete to delete it once unused.
+ */
 input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate );
+/**
+ * This function destroys a input_clock_t created by input_clock_New.
+ */
 void           input_clock_Delete( input_clock_t * );
 
-void    input_clock_SetPCR( input_clock_t *, vlc_object_t *p_log,
+/**
+ * This function will update a input_clock_t with a new clock reference point.
+ */
+void    input_clock_Update( input_clock_t *, vlc_object_t *p_log,
                             bool b_can_pace_control, mtime_t i_clock, mtime_t i_system );
-void    input_clock_ResetPCR( input_clock_t * );
+/**
+ * This function will reset the drift of a input_clock_t.
+ *
+ * The actual jitter estimation will not be reseted by it.
+ */
+void    input_clock_Reset( input_clock_t * );
+
+/**
+ * This function converts a timestamp from stream clock to system clock.
+ */
 mtime_t input_clock_GetTS( input_clock_t *, mtime_t i_pts_delay, mtime_t );
-void    input_clock_SetRate( input_clock_t *cl, int i_rate );
-void    input_clock_SetMaster( input_clock_t *cl, bool b_master );
+/**
+ * This functions will return a deadline used to control the reading speed.
+ */
 mtime_t input_clock_GetWakeup( input_clock_t *cl );
+/**
+ * This functions allows to change the actual reading speed.
+ */
+void    input_clock_ChangeRate( input_clock_t *cl, int i_rate );
+/**
+ * This function allows to change the master status of a clock.
+ * FIXME it should probably be moved out of input_clock_t.
+ */
+void    input_clock_ChangeMaster( input_clock_t *cl, bool b_master );
 
 #endif
 

@@ -393,7 +393,7 @@ void input_EsOutChangeRate( es_out_t *out, int i_rate )
     EsOutDiscontinuity( out, false, false );
 
     for( i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_SetRate( p_sys->pgrm[i]->p_clock, i_rate );
+        input_clock_ChangeRate( p_sys->pgrm[i]->p_clock, i_rate );
 }
 
 int input_EsOutSetRecord(  es_out_t *out, bool b_record )
@@ -647,8 +647,8 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
 
     /* Switch master stream */
     if( p_sys->p_pgrm )
-        input_clock_SetMaster( p_sys->p_pgrm->p_clock, false );
-    input_clock_SetMaster( p_pgrm->p_clock, true );
+        input_clock_ChangeMaster( p_sys->p_pgrm->p_clock, false );
+    input_clock_ChangeMaster( p_pgrm->p_clock, true );
     p_sys->p_pgrm = p_pgrm;
 
     /* Update "program" */
@@ -1917,14 +1917,14 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             i_pcr = (int64_t)va_arg( args, int64_t );
             /* search program
              * TODO do not use mdate() but proper stream acquisition date */
-            input_clock_SetPCR( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
+            input_clock_Update( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
                                 p_sys->p_input->b_can_pace_control, i_pcr, mdate() );
             return VLC_SUCCESS;
         }
 
         case ES_OUT_RESET_PCR:
             for( i = 0; i < p_sys->i_pgrm; i++ )
-                input_clock_ResetPCR( p_sys->pgrm[i]->p_clock );
+                input_clock_Reset( p_sys->pgrm[i]->p_clock );
             return VLC_SUCCESS;
 
         case ES_OUT_GET_TS:

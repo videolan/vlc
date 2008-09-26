@@ -1401,7 +1401,7 @@ static inline int ControlPopNoLock( input_thread_t *p_input,
 
     while( p_input->p->i_control <= 0 )
     {
-        if( i_deadline <= 0 )
+        if( i_deadline < 0 )
             return VLC_EGENERIC;
 
         if( vlc_cond_timedwait( &p_input->p->wait_control, &p_input->p->lock_control, i_deadline ) )

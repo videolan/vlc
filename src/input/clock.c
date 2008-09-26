@@ -93,12 +93,12 @@ typedef struct
     int     i_count;
     int     i_divider;
 } average_t;
-static void    AverageInit( average_t *, int i_divider );
-static void    AverageClean( average_t * );
+static void    AvgInit( average_t *, int i_divider );
+static void    AvgClean( average_t * );
 
-static void    AverageReset( average_t * );
-static void    AverageUpdate( average_t *, mtime_t i_value );
-static mtime_t AverageGet( average_t * );
+static void    AvgReset( average_t * );
+static void    AvgUpdate( average_t *, mtime_t i_value );
+static mtime_t AvgGet( average_t * );
 
 /* */
 struct input_clock_t
@@ -154,7 +154,7 @@ input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
     cl->i_ts_max = 0;
 
     cl->i_next_drift_update = 0;
-    AverageInit( &cl->drift, i_cr_average );
+    AvgInit( &cl->drift, i_cr_average );
 
     cl->b_master = b_master;
     cl->i_rate = i_rate;
@@ -167,17 +167,17 @@ input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
  *****************************************************************************/
 void input_clock_Delete( input_clock_t *cl )
 {
-    AverageClean( &cl->drift );
+    AvgClean( &cl->drift );
     free( cl );
 }
 
 /*****************************************************************************
- * input_clock_SetPCR: manages a clock reference
+ * input_clock_Update: manages a clock reference
  *
  *  i_ck_stream: date in stream clock
  *  i_ck_system: date in system clock
  *****************************************************************************/
-void input_clock_SetPCR( input_clock_t *cl,
+void input_clock_Update( input_clock_t *cl,
                          vlc_object_t *p_log, bool b_can_pace_control,
                          mtime_t i_ck_stream, mtime_t i_ck_system )
 {
@@ -207,24 +207,23 @@ void input_clock_SetPCR( input_clock_t *cl,
     if( b_reset_reference )
     {
         cl->i_next_drift_update = 0;
-        AverageReset( &cl->drift );
+        AvgReset( &cl->drift );
 
         /* Feed synchro with a new reference point. */
         ClockSetReference( cl, i_ck_stream,
                          __MAX( cl->i_ts_max + CR_MEAN_PTS_GAP, i_ck_system ) );
     }
 
-    cl->last.i_clock = i_ck_stream;
-    cl->last.i_system = i_ck_system;
-
     if( !b_synchronize && cl->i_next_drift_update < i_ck_system )
     {
         const mtime_t i_converted = ClockSystemToStream( cl, i_ck_system );
 
-        AverageUpdate( &cl->drift, i_converted - i_ck_stream );
+        AvgUpdate( &cl->drift, i_converted - i_ck_stream );
 
         cl->i_next_drift_update = i_ck_system + CLOCK_FREQ/5; /* FIXME why that */
     }
+    cl->last.i_clock = i_ck_stream;
+    cl->last.i_system = i_ck_system;
 }
 
 /*****************************************************************************
@@ -248,7 +247,7 @@ mtime_t input_clock_GetTS( input_clock_t *cl,
         return 0;
 
     /* */
-    i_converted_ts = ClockStreamToSystem( cl, i_ts + AverageGet( &cl->drift ) );
+    i_converted_ts = ClockStreamToSystem( cl, i_ts + AvgGet( &cl->drift ) );
     if( i_converted_ts > cl->i_ts_max )
         cl->i_ts_max = i_converted_ts;
 
@@ -256,9 +255,9 @@ mtime_t input_clock_GetTS( input_clock_t *cl,
 }
 
 /*****************************************************************************
- * input_clock_SetRate:
+ * input_clock_ChangeRate:
  *****************************************************************************/
-void input_clock_SetRate( input_clock_t *cl, int i_rate )
+void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
 {
     /* Move the reference point */
     if( cl->b_has_reference )
@@ -268,9 +267,9 @@ void input_clock_SetRate( input_clock_t *cl, int i_rate )
 }
 
 /*****************************************************************************
- * input_clock_SetMaster:
+ * input_clock_ChangeMaster:
  *****************************************************************************/
-void input_clock_SetMaster( input_clock_t *cl, bool b_master )
+void input_clock_ChangeMaster( input_clock_t *cl, bool b_master )
 {
     cl->b_master = b_master;
 }
@@ -330,30 +329,22 @@ static void ClockSetReference( input_clock_t *cl,
 /*****************************************************************************
  * Long term average helpers
  *****************************************************************************/
-typedef struct
-{
-    mtime_t i_value;
-    int     i_residue;
-
-    int     i_count;
-    int     i_divider;
-} averager_t;
-static void AverageInit( average_t *p_avg, int i_divider )
+static void AvgInit( average_t *p_avg, int i_divider )
 {
     p_avg->i_divider = i_divider;
-    AverageReset( p_avg );
+    AvgReset( p_avg );
 }
-static void AverageClean( average_t *p_avg )
+static void AvgClean( average_t *p_avg )
 {
     VLC_UNUSED(p_avg);
 }
-static void AverageReset( average_t *p_avg )
+static void AvgReset( average_t *p_avg )
 {
     p_avg->i_value = 0;
     p_avg->i_residue = 0;
     p_avg->i_count = 0;
 }
-static void AverageUpdate( average_t *p_avg, mtime_t i_value )
+static void AvgUpdate( average_t *p_avg, mtime_t i_value )
 {
     const int i_f0 = __MIN( p_avg->i_divider - 1, p_avg->i_count );
     const int i_f1 = p_avg->i_divider - i_f0;
@@ -365,7 +356,7 @@ static void AverageUpdate( average_t *p_avg, mtime_t i_value )
 
     p_avg->i_count++;
 }
-static mtime_t AverageGet( average_t *p_avg )
+static mtime_t AvgGet( average_t *p_avg )
 {
     return p_avg->i_value;
 }
