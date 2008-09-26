@@ -306,7 +306,7 @@ static int extract_port (char **phost)
 
     if (host[0] == '[')
     {
-        host = *++phost; /* skip '[' */
+        host = ++*phost; /* skip '[' */
         port = strchr (host, ']');
         if (port)
             *port++ = '\0'; /* skip ']' */
