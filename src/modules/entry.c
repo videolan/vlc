@@ -40,6 +40,7 @@ static void vlc_module_destruct (gc_object_t *obj)
     module_t *module = vlc_priv (obj, module_t);
 
     vlc_mutex_destroy (&module->lock);
+    free (module->psz_object_name);
     free (module);
 }
 
@@ -89,6 +90,7 @@ module_t *vlc_module_create (vlc_object_t *obj)
 static void vlc_submodule_destruct (gc_object_t *obj)
 {
     module_t *module = vlc_priv (obj, module_t);
+    free (module->psz_object_name);
     free (module);
 }
 
