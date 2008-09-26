@@ -1,4 +1,4 @@
-Changes between 0.9.2 and 1.0.0-git:
+Changes between 0.9.3 and 1.0.0-git:
 ------------------------------------
 
 Inputs:
@@ -16,8 +16,47 @@ Stream output:
  * bridge-in can be used to configure a placeholder stream.
 
 
-Changes between 0.9.1 and 0.9.2
--------------------------------
+Changes between 0.9.2 and 0.9.3:
+--------------------------------
+
+Various bugfixes:
+ * Fixed DTS channel order on 5.1 systems
+ * Fixed pausing behavior for subtitles and for Audio-CD
+ * Multiple subtitles and podcast fixes
+ * Various crashes fixed in PS, SSA, mkv, xspf, freetype
+ * Fixed update system bugs
+ * Other bug fixes (dvd language selection, subtitle colours, HTTP keep-alive...+)
+
+Mac OS X port:
+ * Fixed ffmpeg slowness on PowerPC-based Macs
+ * Fixed crash on startup when installed on old preferences
+ * Fixed bug in directory opening on Mac OS X
+ * Fixed font selection in the Simple Preferences
+ * Thicker border to the subtitle renderer
+ * Fixed the appearance of playlist items in the Streaming/Transcoding Wizard
+ * Fixed AC3 passthrough on Mac OS X
+ * Fixed behavior of the Volume Normalizer settings on Mac OS X
+ * Removed the deprecated QuickDraw video output module to avoid crashes on
+   modern Mac OS X versions
+
+Windows port:
+ * Fixed sensitivity of Fullscreen Controller
+ * Fixed error messages on startup when VLC wasn't correctly uninstalled
+   before installation
+ * Fix showing of controller when returning from fullscreen playback
+ * Multiple directory and path location fixes.
+
+Qt4 interface:
+ * Added Faster/Slower icons to the controller panel
+ * Fixed lost playlist columns when switching the playlist view
+ * Added needed options to Simple preferences (to avoid NVIDIA drivers issues)
+ * Fullscreen controller: added time label, remembering of last position
+ * Fixed drag'n drop behaviour on the playlist
+ * Multiple other fixes (Enter hotkey in preferences, Skins selection...)
+
+
+Changes between 0.9.1 and 0.9.2:
+--------------------------------
 
  * Restored the old behavior of --sout-keep. It is now de-activated by default.
  * Skins2 interface repaired on Windows.
