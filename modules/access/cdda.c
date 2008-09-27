@@ -198,8 +198,8 @@ static int Open( vlc_object_t *p_this )
                 input_item_t *p_current = input_GetItem( p_input );
                 playlist_item_t *p_item;
 
-                if( p_playlist->status.p_item->p_input == p_current )
-                    p_item = p_playlist->status.p_item;
+                if( playlist_CurrentPlayingItem(p_playlist)->p_input == p_current )
+                    p_item = playlist_CurrentPlayingItem(p_playlist);
                 else
                     p_item = playlist_ItemGetByInput( p_playlist, p_current, pl_Unlocked );
 

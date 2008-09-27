@@ -66,6 +66,38 @@ typedef struct playlist_private_t
     playlist_preparse_t  preparse; /**< Preparser data */
     playlist_fetcher_t   fetcher; /**< Meta and art fetcher data */
     sout_instance_t      *p_sout; /**< Kept sout instance */
+
+    struct playlist_services_discovery_support_t {
+        /* the playlist items for category and onelevel */
+        playlist_item_t*    p_cat;
+        playlist_item_t*    p_one;
+        services_discovery_t * p_sd; /**< Loaded service discovery modules */
+    } ** pp_sds;
+    int                   i_sds;   /**< Number of service discovery modules */
+    input_thread_t *      p_input;  /**< the input thread associated
+                                     * with the current item */
+    struct {
+        /* Current status. These fields are readonly, only the playlist
+         * main loop can touch it*/
+        playlist_status_t   i_status;  /**< Current status of playlist */
+        playlist_item_t *   p_item; /**< Currently playing/active item */
+        playlist_item_t *   p_node; /**< Current node to play from */
+    } status;
+
+    struct {
+        /* Request. Use this to give orders to the playlist main loop  */
+        playlist_status_t   i_status; /**< requested playlist status */
+        playlist_item_t *   p_node;   /**< requested node to play from */
+        playlist_item_t *   p_item;   /**< requested item to play in the node */
+
+        int                 i_skip;   /**< Number of items to skip */
+
+        bool          b_request;/**< Set to true by the requester
+                                           The playlist sets it back to false
+                                           when processing the request */
+        vlc_mutex_t         lock;     /**< Lock to protect request */
+    } request;
+
 } playlist_private_t;
 
 #define pl_priv( pl ) ((playlist_private_t *)(pl))

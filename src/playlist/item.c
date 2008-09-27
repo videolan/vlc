@@ -852,12 +852,12 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
             p_parent = p_parent->p_parent;
         }
         assert( p_toplay );
-        p_playlist->request.b_request = true;
-        p_playlist->request.i_skip = 0;
-        p_playlist->request.p_item = p_toplay;
-        if( p_playlist->p_input )
-            input_StopThread( p_playlist->p_input );
-        p_playlist->request.i_status = PLAYLIST_RUNNING;
+        pl_priv(p_playlist)->request.b_request = true;
+        pl_priv(p_playlist)->request.i_skip = 0;
+        pl_priv(p_playlist)->request.p_item = p_toplay;
+        if( pl_priv(p_playlist)->p_input )
+            input_StopThread( pl_priv(p_playlist)->p_input );
+        pl_priv(p_playlist)->request.i_status = PLAYLIST_RUNNING;
         vlc_object_signal_unlocked( p_playlist );
     }
     /* Preparse if PREPARSE or SPREPARSE & not enough meta */
@@ -937,9 +937,9 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
         /* Hack we don't call playlist_Control for lock reasons */
         if( b_stop )
         {
-            p_playlist->request.i_status = PLAYLIST_STOPPED;
-            p_playlist->request.b_request = true;
-            p_playlist->request.p_item = NULL;
+            pl_priv(p_playlist)->request.i_status = PLAYLIST_STOPPED;
+            pl_priv(p_playlist)->request.b_request = true;
+            pl_priv(p_playlist)->request.p_item = NULL;
             msg_Info( p_playlist, "stopping playback" );
             vlc_object_signal_unlocked( VLC_OBJECT(p_playlist) );
         }

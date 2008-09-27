@@ -139,15 +139,7 @@ static int gesture( int i_pattern, int i_num )
  *****************************************************************************/
 static input_thread_t * input_from_playlist ( playlist_t *p_playlist )
 {
-    input_thread_t * p_input;
-
-    PL_LOCK;
-    p_input = p_playlist->p_input;
-    if( p_input )
-        vlc_object_hold( p_input );
-    PL_UNLOCK;
-
-    return p_input;
+    return playlist_CurrentInput( p_playlist );
 }
 
 /*****************************************************************************

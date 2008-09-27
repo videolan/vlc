@@ -268,6 +268,7 @@ static int vlclua_playlist_get( lua_State *L )
         else
         {
             int i;
+#ifdef FIX_THAT_CODE_NOT_TO_MESS_WITH_PLAYLIST_INTERNALS
             for( i = 0; i < p_playlist->i_sds; i++ )
             {
                 if( !strcasecmp( psz_what,
@@ -278,6 +279,10 @@ static int vlclua_playlist_get( lua_State *L )
                     break;
                 }
             }
+#else
+# warning Don't access playlist iternal, broken code here.
+            abort();
+#endif
             if( !p_item )
             {
                 PL_UNLOCK;
@@ -372,7 +377,8 @@ static int vlclua_playlist_status( lua_State *L )
     /*
     int i_count = 0;
     lua_settop( L, 0 );*/
-    if( p_playlist->p_input )
+    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
+    if( p_input )
     {
         /*char *psz_uri =
             input_item_GetURI( input_GetItem( p_playlist->p_input ) );
@@ -380,7 +386,7 @@ static int vlclua_playlist_status( lua_State *L )
         free( psz_uri );
         lua_pushnumber( L, config_GetInt( p_intf, "volume" ) );*/
         PL_LOCK;
-        switch( p_playlist->status.i_status )
+        switch( playlist_Status( p_playlist ) )
         {
             case PLAYLIST_STOPPED:
                 lua_pushstring( L, "stopped" );
@@ -397,6 +403,7 @@ static int vlclua_playlist_status( lua_State *L )
         }
         PL_UNLOCK;
         /*i_count += 3;*/
+        vlc_object_release( p_input );
     }
     else
     {

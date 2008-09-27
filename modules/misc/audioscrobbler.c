@@ -208,22 +208,18 @@ static void Close( vlc_object_t *p_this )
     p_playlist = pl_Hold( p_intf );
     if( p_playlist )
     {
-        PL_LOCK;
 
         var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
 
-        p_input = p_playlist->p_input;
+        p_input = playlist_CurrentInput( p_playlist );
         if ( p_input )
         {
-            vlc_object_hold( p_input );
-
             if( p_sys->b_state_cb )
                 var_DelCallback( p_input, "state", PlayingChange, p_intf );
 
             vlc_object_release( p_input );
         }
 
-        PL_UNLOCK;
         pl_Release( p_intf );
     }
 
@@ -506,18 +502,14 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->b_submit         = false;
 
     p_playlist = pl_Hold( p_intf );
-    PL_LOCK;
-    p_input = p_playlist->p_input;
+    p_input = playlist_CurrentInput( p_playlist );
 
     if( !p_input || p_input->b_dead )
     {
-        PL_UNLOCK;
         pl_Release( p_intf );
         return VLC_SUCCESS;
     }
 
-    vlc_object_hold( p_input );
-    PL_UNLOCK;
     pl_Release( p_intf );
 
     p_item = input_GetItem( p_input );
@@ -921,17 +913,13 @@ static int ReadMetaData( intf_thread_t *p_this )
     intf_sys_t          *p_sys = p_this->p_sys;
 
     p_playlist = pl_Hold( p_this );
-    PL_LOCK;
-    p_input = p_playlist->p_input;
+    p_input = playlist_CurrentInput( p_playlist );
     if( !p_input )
     {
-        PL_UNLOCK;
         pl_Release( p_this );
         return( VLC_SUCCESS );
     }
 
-    vlc_object_hold( p_input );
-    PL_UNLOCK;
     pl_Release( p_this );
 
     p_item = input_GetItem( p_input );

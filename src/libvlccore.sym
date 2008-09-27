@@ -276,13 +276,16 @@ playlist_BothAddInput
 playlist_ChildSearchName
 playlist_Clear
 playlist_Control
+playlist_CurrentId
 playlist_CurrentInput
+playlist_CurrentPlayingItem
 playlist_DeleteFromInput
 playlist_Export
 playlist_GetLastLeaf
 playlist_GetNextLeaf
 playlist_GetPreferredNode
 playlist_GetPrevLeaf
+playlist_IsPlaying
 playlist_IsServicesDiscoveryLoaded
 playlist_ItemGetById
 playlist_ItemGetByInput
@@ -304,6 +307,7 @@ playlist_PreparseEnqueueItem
 playlist_RecursiveNodeSort
 playlist_ServicesDiscoveryAdd
 playlist_ServicesDiscoveryRemove
+playlist_Status
 playlist_TreeMove
 __pl_Hold
 __pl_Release

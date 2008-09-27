@@ -565,10 +565,10 @@
     playlist_item_t *p_item, *p_temp_item;
     NSMutableArray *o_array = [NSMutableArray array];
 
-    p_item = p_playlist->status.p_item;
+    p_item = playlist_CurrentPlayingItem( p_playlist );
     if( p_item == NULL )
     {
-        vlc_object_release(p_playlist);
+        pl_Release( VLCIntf );
         return;
     }
 
@@ -591,8 +591,7 @@
 
     }
 
-    vlc_object_release( p_playlist );
-
+    pl_Release( VLCIntf );
 }
 
 /* Check if p_item is a child of p_node recursively. We need to check the item
@@ -904,8 +903,8 @@
         if( p_item->i_children != -1 )
         //is a node and not an item
         {
-            if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
-                [self isItem: p_playlist->status.p_item inNode:
+            if( playlist_Status( p_playlist ) != PLAYLIST_STOPPED &&
+                [self isItem: playlist_CurrentPlayingItem( p_playlist ) inNode:
                         ((playlist_item_t *)[o_item pointerValue])
                         checkItemExistence: NO locked:YES] == YES )
                 // if current item is in selected node and is playing then stop playlist
@@ -1378,7 +1377,7 @@
     id o_playing_item;
 
     o_playing_item = [o_outline_dict objectForKey:
-                [NSString stringWithFormat:@"%p",  p_playlist->status.p_item]];
+                [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem( p_playlist )]];
 
     if( [self isItem: [o_playing_item pointerValue] inNode:
                         [item pointerValue] checkItemExistence: YES]

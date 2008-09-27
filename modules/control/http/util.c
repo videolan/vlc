@@ -352,10 +352,10 @@ void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
             char value[512];
             char *psz;
             mvar_t *itm = mvar_New( name, "set" );
-
-            if( p_pl->status.p_item && p_node &&
-                p_pl->status.p_item->p_input && p_node->p_input &&
-                p_pl->status.p_item->p_input->i_id == p_node->p_input->i_id )
+            playlist_item_t * p_item = playlist_CurrentPlayingItem(p_pl);
+            if( p_item && p_node &&
+                p_item->p_input && p_node->p_input &&
+                p_item->p_input->i_id == p_node->p_input->i_id )
             {
                 mvar_AppendNewVar( itm, "current", "1" );
             }

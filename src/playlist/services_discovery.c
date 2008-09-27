@@ -356,7 +356,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
         p_sds->p_cat = p_cat;
 
         PL_LOCK;
-        TAB_APPEND( p_playlist->i_sds, p_playlist->pp_sds, p_sds );
+        TAB_APPEND( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds, p_sds );
         PL_UNLOCK;
 
     }
@@ -371,12 +371,12 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     int i;
 
     PL_LOCK;
-    for( i = 0 ; i< p_playlist->i_sds ; i ++ )
+    for( i = 0 ; i< pl_priv(p_playlist)->i_sds ; i ++ )
     {
-        if( !strcmp( psz_module, p_playlist->pp_sds[i]->p_sd->psz_module ) )
+        if( !strcmp( psz_module, pl_priv(p_playlist)->pp_sds[i]->p_sd->psz_module ) )
         {
-            p_sds = p_playlist->pp_sds[i];
-            REMOVE_ELEM( p_playlist->pp_sds, p_playlist->i_sds, i );
+            p_sds = pl_priv(p_playlist)->pp_sds[i];
+            REMOVE_ELEM( pl_priv(p_playlist)->pp_sds, pl_priv(p_playlist)->i_sds, i );
             break;
         }
     }
@@ -430,9 +430,9 @@ bool playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
     int i;
     PL_LOCK;
 
-    for( i = 0 ; i< p_playlist->i_sds ; i ++ )
+    for( i = 0 ; i< pl_priv(p_playlist)->i_sds ; i ++ )
     {
-        if( !strcmp( psz_module, p_playlist->pp_sds[i]->p_sd->psz_module ) )
+        if( !strcmp( psz_module, pl_priv(p_playlist)->pp_sds[i]->p_sd->psz_module ) )
         {
             PL_UNLOCK;
             return true;
@@ -444,7 +444,7 @@ bool playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
 
 void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist )
 {
-    while( p_playlist->i_sds > 0 )
+    while( pl_priv(p_playlist)->i_sds > 0 )
         playlist_ServicesDiscoveryRemove( p_playlist,
-                                     p_playlist->pp_sds[0]->p_sd->psz_module );
+                                     pl_priv(p_playlist)->pp_sds[0]->p_sd->psz_module );
 }

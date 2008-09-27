@@ -553,24 +553,25 @@ static void Run( intf_thread_t *p_intf )
             (p_playlist != NULL) )
         {
             PL_LOCK;
-            if( (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
-                (p_playlist->status.i_status == PLAYLIST_STOPPED) )
+            int status = playlist_Status( p_playlist );
+            if( (p_intf->p_sys->i_last_state != status) &&
+                (status == PLAYLIST_STOPPED) )
             {
                 p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
                 msg_rc( STATUS_CHANGE "( stop state: 5 )" );
             }
             else if(
-                (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
-                (p_playlist->status.i_status == PLAYLIST_RUNNING) )
+                (p_intf->p_sys->i_last_state != status) &&
+                (status == PLAYLIST_RUNNING) )
             {
-                p_intf->p_sys->i_last_state = p_playlist->status.i_status;
+                p_intf->p_sys->i_last_state = PLAYLIST_RUNNING;
                  msg_rc( STATUS_CHANGE "( play state: 3 )" );
             }
             else if(
-                (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
-                (p_playlist->status.i_status == PLAYLIST_PAUSED) )
+                (p_intf->p_sys->i_last_state != status) &&
+                (status == PLAYLIST_PAUSED) )
             {
-                p_intf->p_sys->i_last_state = p_playlist->status.i_status;
+                p_intf->p_sys->i_last_state = PLAYLIST_PAUSED;
                 msg_rc( STATUS_CHANGE "( pause state: 4 )" );
             }
             PL_UNLOCK;
@@ -993,7 +994,7 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
     {
         p_playlist = pl_Hold( p_input );
         char cmd[6];
-        switch( p_playlist->status.i_status )
+        switch( playlist_Status( p_playlist ) )
         {
         case PLAYLIST_STOPPED:
             strcpy( cmd, "stop" );
@@ -1304,20 +1305,20 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t *p_playlist = pl_Hold( p_this );
+    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
-    PL_LOCK;
-    if( p_playlist->p_input )
+    if( p_input )
     {
-        var_Get( p_playlist->p_input, "state", &val );
+        var_Get( p_input, "state", &val );
+        vlc_object_release( p_input );
+
         if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )
         {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
-            vlc_object_release( p_playlist );
-            PL_UNLOCK;
+            pl_Release( p_this );
             return VLC_EGENERIC;
         }
     }
-    PL_UNLOCK;
 
     /* Parse commands that require a playlist */
     if( !strcmp( psz_cmd, "prev" ) )
@@ -1476,18 +1477,19 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "status" ) )
     {
-        if( p_playlist->p_input )
+        input_thread_t * p_input = playlist_CurrentInput( p_playlist );
+        if( p_input )
         {
             /* Replay the current state of the system. */
             char *psz_uri =
-                    input_item_GetURI( input_GetItem( p_playlist->p_input ) );
+                    input_item_GetURI( input_GetItem( p_input ) );
             msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
             free( psz_uri );
             msg_rc( STATUS_CHANGE "( audio volume: %d )",
                     config_GetInt( p_intf, "volume" ));
 
             PL_LOCK;
-            switch( p_playlist->status.i_status )
+            switch( playlist_Status(p_playlist) )
             {
                 case PLAYLIST_STOPPED:
                     msg_rc( STATUS_CHANGE "( stop state: 5 )" );
@@ -1503,6 +1505,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                     break;
             }
             PL_UNLOCK;
+            vlc_object_release( p_input );
         }
     }
 
@@ -1514,7 +1517,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         msg_rc( "unknown command!" );
     }
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_this );
     return VLC_SUCCESS;
 }
 
@@ -1913,19 +1916,22 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     p_playlist = pl_Hold( p_this );
+    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
-    if( p_playlist->p_input )
+    if( p_input )
     {
-        var_Get( p_playlist->p_input, "state", &val );
+        var_Get( p_input, "state", &val );
+        vlc_object_release( p_input );
+
         if( ( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) ) &&
             ( strcmp( newval.psz_string, "select" ) != 0 ) )
         {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
-            vlc_object_release( p_playlist );
+            pl_Release( p_this );
             return VLC_EGENERIC;
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_this );
 
     val.psz_string = strdup( newval.psz_string );
     if( !val.psz_string )

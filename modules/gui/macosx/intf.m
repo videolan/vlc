@@ -1802,12 +1802,11 @@ end:
     if( p_input && vlc_object_alive (p_input) )
     {
         NSString *o_temp;
-        if( input_item_GetNowPlaying ( p_playlist->status.p_item->p_input ) )
-            o_temp = [NSString stringWithUTF8String: 
-                input_item_GetNowPlaying ( p_playlist->status.p_item->p_input )];
+        playlist_item_t * p_item = playlist_CurrentPlayingItem( p_playlist );
+        if( input_item_GetNowPlaying( p_item->p_input ) )
+            o_temp = [NSString stringWithUTF8String:input_item_GetNowPlaying( p_item->p_input )];
         else
-            o_temp = [NSString stringWithUTF8String:
-                p_playlist->status.p_item->p_input->psz_name];
+            o_temp = [NSString stringWithUTF8String:p_item->p_input->psz_name];
         [self setScrollField: o_temp stopAfter:-1];
         [[[self getControls] getFSPanel] setStreamTitle: o_temp];
         vlc_object_release( p_input );

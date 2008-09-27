@@ -158,14 +158,6 @@ struct playlist_t
 {
     VLC_COMMON_MEMBERS
 
-    struct playlist_services_discovery_support_t {
-        /* the playlist items for category and onelevel */
-        playlist_item_t*    p_cat;
-        playlist_item_t*    p_one;
-        services_discovery_t * p_sd; /**< Loaded service discovery modules */
-    } ** pp_sds;
-    int                   i_sds;   /**< Number of service discovery modules */
-
     playlist_item_array_t items; /**< Arrays of items */
     playlist_item_array_t all_items; /**< Array of items and nodes */
     playlist_item_array_t items_to_delete; /**< Array of items and nodes to
@@ -194,34 +186,11 @@ struct playlist_t
     bool            b_auto_preparse;
 
     /* Runtime */
-    input_thread_t *      p_input;  /**< the input thread associated
-                                     * with the current item */
     int                   i_sort; /**< Last sorting applied to the playlist */
     int                   i_order; /**< Last ordering applied to the playlist */
     mtime_t               gc_date;
     bool            b_cant_sleep;
 
-    struct {
-        /* Current status. These fields are readonly, only the playlist
-         * main loop can touch it*/
-        playlist_status_t   i_status;  /**< Current status of playlist */
-        playlist_item_t *   p_item; /**< Currently playing/active item */
-        playlist_item_t *   p_node; /**< Current node to play from */
-    } status;
-
-    struct {
-        /* Request. Use this to give orders to the playlist main loop  */
-        playlist_status_t   i_status; /**< requested playlist status */
-        playlist_item_t *   p_node;   /**< requested node to play from */
-        playlist_item_t *   p_item;   /**< requested item to play in the node */
-
-        int                 i_skip;   /**< Number of items to skip */
-
-        bool          b_request;/**< Set to true by the requester
-                                           The playlist sets it back to false
-                                           when processing the request */
-        vlc_mutex_t         lock;     /**< Lock to protect request */
-    } request;
 };
 
 /** Helper to add an item */
@@ -316,18 +285,14 @@ VLC_EXPORT( int, playlist_PreparseEnqueueItem, (playlist_t *, playlist_item_t *)
 /** Request the art for an input item to be fetched */
 VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t *) );
 
-/********************** Services discovery ***********************/
-
-/** Add a list of comma-separated service discovery modules */
-VLC_EXPORT( int, playlist_ServicesDiscoveryAdd, (playlist_t *, const char *));
-/** Remove a services discovery module by name */
-VLC_EXPORT( int, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
-/** Check whether a given SD is loaded */
-VLC_EXPORT( bool, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char *));
-
 /* Playlist sorting */
 VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
+
+VLC_EXPORT( playlist_item_t *,  playlist_CurrentPlayingItem, ( playlist_t * ) );
+VLC_EXPORT( int,  playlist_CurrentId, ( playlist_t * ) );
+VLC_EXPORT( bool,  playlist_IsPlaying, ( playlist_t * ) );
+VLC_EXPORT( int,   playlist_Status, ( playlist_t * ) );
 
 /**
  * Export a node of the playlist to a certain type of playlistfile
@@ -338,6 +303,17 @@ VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,
  * \return VLC_SUCCESS on success
  */
 VLC_EXPORT( int,  playlist_Export, ( playlist_t *p_playlist, const char *psz_name, playlist_item_t *p_export_root, const char *psz_type ) );
+
+/********************** Services discovery ***********************/
+
+/** Add a list of comma-separated service discovery modules */
+VLC_EXPORT( int, playlist_ServicesDiscoveryAdd, (playlist_t *, const char *));
+/** Remove a services discovery module by name */
+VLC_EXPORT( int, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
+/** Check whether a given SD is loaded */
+VLC_EXPORT( bool, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char *));
+
+
 
 /********************************************************
  * Item management
@@ -427,21 +403,11 @@ static  inline input_thread_t * __pl_CurrentInput( vlc_object_t * p_this )
     return p_input;
 }
 
-/** Tell if the playlist is currently running */
-#define playlist_IsPlaying( pl ) ( pl->status.i_status == PLAYLIST_RUNNING && \
-            !(pl->request.b_request && pl->request.i_status == PLAYLIST_STOPPED) )
-
-#define playlist_IsStopped( pl ) ( pl->status.i_status == PLAYLIST_STOPPED || \
-            (pl->request.b_request && pl->request.i_status == PLAYLIST_STOPPED) )
-
 /** Tell if the playlist is empty */
 #define playlist_IsEmpty( pl ) ( pl->items.i_size == 0 )
 
 /** Tell the number of items in the current playing context */
 #define playlist_CurrentSize( pl ) pl->current.i_size
-
-/** Tell the current item id in current  playing context */
-#define playlist_CurrentId( pl ) pl->status.p_item->i_id
 
 /** Ask the playlist to do some work */
 #define playlist_Signal( p_playlist ) vlc_object_signal( p_playlist )

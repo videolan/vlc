@@ -174,11 +174,7 @@ static void Run( intf_thread_t *p_intf )
         canc = vlc_savecancel();
 
         /* Update the input */
-        PL_LOCK;
-        p_input = p_playlist->p_input;
-        if( p_input )
-            vlc_object_hold( p_input );
-        PL_UNLOCK;
+        p_input = playlist_CurrentInput( p_playlist );
 
         /* Update the vout */
         p_last_vout = p_vout;
@@ -978,9 +974,10 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
     sprintf( psz_bookmark_name, "bookmark%i", i_num );
     var_Create( p_intf, psz_bookmark_name,
                 VLC_VAR_STRING|VLC_VAR_DOINHERIT );
-    if( p_playlist->status.p_item )
+    playlist_item_t * p_item = playlist_CurrentPlayingItem( p_playlist );
+    if( p_item )
     {
-        char *psz_uri = input_item_GetURI( p_playlist->status.p_item->p_input );
+        char *psz_uri = input_item_GetURI( p_item->p_input );
         config_PutPsz( p_intf, psz_bookmark_name, psz_uri);
         msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num, psz_uri);
         free( psz_uri );

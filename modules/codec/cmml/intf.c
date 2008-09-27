@@ -440,7 +440,7 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         p_playlist = pl_Hold( p_intf );
 
         /* Get new URL */
-        p_current_item = p_playlist->status.p_item;
+        p_current_item = playlist_CurrentPlayingItem( p_playlist );
         char *psz_uri = input_item_GetURI( p_current_item->p_input );
 #ifdef CMML_INTF_DEBUG
         msg_Dbg( p_intf, "Current playlist item URL is \"%s\"", psz_uri );
@@ -668,7 +668,7 @@ void GoBack( intf_thread_t *p_intf )
         return;
     }
 
-    p_current_item = p_playlist->status.p_item;
+    p_current_item = playlist_CurrentPlayingItem( p_playlist );
 
     /* Save the currently-playing media in a new history item */
     psz_timed_url = GetTimedURLFromPlaylistItem( p_intf, p_current_item );
@@ -750,7 +750,7 @@ void GoForward( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
         return;
     }
-    p_current_item = p_playlist->status.p_item;
+    p_current_item = playlist_CurrentPlayingItem( p_playlist );
     p_new_history_item->psz_uri = GetTimedURLFromPlaylistItem( p_intf,
             p_current_item );
     p_new_history_item->psz_name = p_new_history_item->psz_uri;

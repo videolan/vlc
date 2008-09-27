@@ -884,7 +884,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         {
             p_item = playlist_ItemGetByInput( p_playlist, input_GetItem(p_input), pl_Unlocked );
 
-            if( p_item == p_playlist->status.p_item && !b_single_track )
+            if( p_item == playlist_CurrentPlayingItem(p_playlist) && !b_single_track )
                 b_play = true;
             else
                 b_play = false;
@@ -964,7 +964,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     if( b_play )
     {
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked,
-                          p_playlist->status.p_item, NULL );
+                          playlist_CurrentPlayingItem(p_playlist), NULL );
     }
 
     if (p_playlist) pl_Release( p_access );
