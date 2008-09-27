@@ -244,7 +244,6 @@ static block_t *Block (access_t *p_access)
     access_sys_t *p_sys = p_access->p_sys;
     directory_t *current = p_sys->current;
 
-    msg_Dbg (p_access, "in Block");
     if (p_access->info.b_eof)
         return NULL;
 
@@ -285,7 +284,6 @@ static block_t *Block (access_t *p_access)
     }
 
     char *entry = utf8_readdir (current->handle);
-    msg_Dbg (p_access, "got file %s", entry);
     if (entry == NULL)
     {   /* End of directory, go back to parent */
         closedir (current->handle);
@@ -302,7 +300,6 @@ static block_t *Block (access_t *p_access)
             if (!block)
                 goto fatal;
             memcpy (block->p_buffer, footer, sizeof (footer) - 1);
-            msg_Dbg (p_access, "done");
             p_access->info.b_eof = true;
             return block;
         }
@@ -372,7 +369,6 @@ static block_t *Block (access_t *p_access)
                         "  <track><location>file://%s/%s</location></track>\n",
                         current->uri, encoded);
     free (encoded);
-    msg_Dbg (p_access, "%s", entry);
     if (len == -1)
         goto fatal;
 
