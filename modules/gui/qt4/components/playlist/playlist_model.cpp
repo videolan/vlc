@@ -585,6 +585,7 @@ void PLModel::rebuild()
 
 void PLModel::rebuild( playlist_item_t *p_root )
 {
+    playlist_item_t* p_item;
     /* Remove callbacks before locking to avoid deadlocks */
     delCallbacks();
     /* Invalidate cache */
@@ -611,13 +612,13 @@ void PLModel::rebuild( playlist_item_t *p_root )
     assert( rootItem );
     /* Recreate from root */
     UpdateNodeChildren( rootItem );
-    if( p_playlist->status.p_item )
+    if( p_item=playlist_CurrentPlayingItem(p_playlist) )
     {
         PLItem *currentItem = FindByInput( rootItem,
-                                     p_playlist->status.p_item->p_input->i_id );
+                                           p_item->p_input->i_id );
         if( currentItem )
         {
-            UpdateTreeItem( p_playlist->status.p_item, currentItem,
+            UpdateTreeItem( p_item, currentItem,
                             true, false );
         }
     }
@@ -667,7 +668,7 @@ void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
     if( !force && i_depth == DEPTH_SEL && p_item->p_parent &&
                                  p_item->p_parent->i_id != rootItem->i_id )
         return;
-    item->update( p_item, p_item == p_playlist->status.p_item );
+    item->update( p_item, p_item == playlist_CurrentPlayingItem( p_playlist ) );
     if( signal )
         emit dataChanged( index( item, 0 ) , index( item, 1 ) );
 }
