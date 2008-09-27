@@ -1381,7 +1381,7 @@ static bool Ogg_IsVorbisFormatCompatible( const es_format_t *p_new, const es_for
 }
 static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *p_stream )
 {
-    bool b_compatible;
+    bool b_compatible = false;
     if( !p_stream->fmt_old.i_cat || !p_stream->fmt_old.i_codec )
         return true;
 
