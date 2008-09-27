@@ -63,6 +63,7 @@ for file in $files; do
     done
   elif test ".`file $file | grep \"text\|shell\"`" != "." ; then
    echo "Fixing up shell/text file "$file""
+    cp $file $file.tmp
     sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
     mv -f $file.tmp $file
   fi
@@ -71,6 +72,7 @@ done
 files=`find . -name *.la`
 for file in $files; do
    echo "Fixing up .la $file"
+   cp $file $file.tmp
    sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
    mv -f $file.tmp $file
 done
