@@ -136,7 +136,7 @@ void Playtree::onUpdateItem( int id )
         playlist_item_t* pNode = (playlist_item_t*)(it->m_pData);
         UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
         it->m_cString = UStringPtr( pName );
-        it->m_playing = m_pPlaylist->status.p_item == pNode;
+        it->m_playing = playlist_CurrentPlayingItem( m_pPlaylist ) == pNode;
         if( it->m_playing ) descr.b_active_item = true;
     }
     else
@@ -200,7 +200,7 @@ void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
                                    pNode->pp_children[i]->p_input->psz_name );
         rTree.add( pNode->pp_children[i]->i_id, UStringPtr( pName ),
                      false,
-                     m_pPlaylist->status.p_item == pNode->pp_children[i],
+                     playlist_CurrentPlayingItem(m_pPlaylist) == pNode->pp_children[i],
                      false, pNode->pp_children[i]->i_flags & PLAYLIST_RO_FLAG,
                      pNode->pp_children[i] );
         if( pNode->pp_children[i]->i_children )

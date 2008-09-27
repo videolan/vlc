@@ -328,7 +328,8 @@ void VlcProc::refreshInput()
     // Update the input
     if( getIntf()->p_sys->p_input == NULL )
     {
-        getIntf()->p_sys->p_input = getIntf()->p_sys->p_playlist->p_input;
+        getIntf()->p_sys->p_input =
+            playlist_CurrentInput( getIntf()->p_sys->p_playlist );
         if( getIntf()->p_sys->p_input )
             vlc_object_hold( getIntf()->p_sys->p_input );
     }
@@ -560,10 +561,10 @@ int VlcProc::onInteraction( vlc_object_t *pObj, const char *pVariable,
 
 void VlcProc::updateStreamName( playlist_t *p_playlist )
 {
-    if( p_playlist && p_playlist->p_input )
+    if( p_playlist && playlist_CurrentInput( p_playlist ))
     {
         // Get playlist item information
-        input_item_t *pItem = input_GetItem(p_playlist->p_input);
+        input_item_t *pItem = input_GetItem(playlist_CurrentInput( p_playlist));
 
         VarText &rStreamName = getStreamNameVar();
         VarText &rStreamURI = getStreamURIVar();

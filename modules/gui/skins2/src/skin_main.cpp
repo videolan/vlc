@@ -322,7 +322,7 @@ static int DemuxOpen( vlc_object_t *p_this )
             playlist_t *p_playlist = pl_Hold( p_this );
             // Make sure the item is deleted afterwards
             /// \bug does not always work
-            p_playlist->status.p_item->i_flags |= PLAYLIST_REMOVE_FLAG;
+            playlist_CurrentPlayingItem( p_playlist )->i_flags |= PLAYLIST_REMOVE_FLAG;
             vlc_object_release( p_playlist );
 
             vlc_value_t val;
