@@ -168,7 +168,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
     }
 
-    id->p_dec = input_DecoderNew( p_sys->p_input, p_fmt, NULL );
+    id->p_dec = input_DecoderNew( p_sys->p_input, p_fmt, NULL, NULL );
     if( id->p_dec == NULL )
     {
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",

@@ -72,6 +72,7 @@ struct decoder_owner_sys_t
     int64_t         i_preroll_end;
 
     input_thread_t  *p_input;
+    input_clock_t   *p_clock;
 
     aout_instance_t *p_aout;
     aout_input_t    *p_aout_input;
@@ -149,7 +150,7 @@ mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
  * \return the spawned decoder object
  */
 decoder_t *input_DecoderNew( input_thread_t *p_input,
-                             es_format_t *fmt, sout_instance_t *p_sout  )
+                             es_format_t *fmt, input_clock_t *p_clock, sout_instance_t *p_sout  )
 {
     decoder_t   *p_dec = NULL;
     vlc_value_t val;
@@ -192,6 +193,8 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         vlc_object_release( p_dec );
         return NULL;
     }
+
+    p_dec->p_owner->p_clock = p_clock;
 
     if( p_sout && p_sout == p_input->p->p_sout && p_input->p->input.b_can_pace_control )
     {
@@ -305,9 +308,10 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
     }
     else
     {
-        if( p_dec->b_error || (p_block && p_block->i_buffer <= 0) )
+        if( p_dec->b_error || ( p_block && p_block->i_buffer <= 0 ) )
         {
-            if( p_block ) block_Release( p_block );
+            if( p_block )
+                block_Release( p_block );
         }
         else
         {
@@ -339,8 +343,8 @@ void input_DecoderDiscontinuity( decoder_t * p_dec, bool b_flush )
 
 bool input_DecoderEmpty( decoder_t * p_dec )
 {
-    if( p_dec->p_owner->b_own_thread
-     && block_FifoCount( p_dec->p_owner->p_fifo ) > 0 )
+    if( p_dec->p_owner->b_own_thread &&
+        block_FifoCount( p_dec->p_owner->p_fifo ) > 0 )
     {
         return false;
     }
@@ -582,7 +586,7 @@ static void* DecoderThread( vlc_object_t *p_this )
 {
     decoder_t * p_dec = (decoder_t *)p_this;
     block_t *p_block;
-    int canc = vlc_savecancel ();
+    int canc = vlc_savecancel();
 
     /* The decoder's main loop */
     while( !p_dec->b_die && !p_dec->b_error )
@@ -602,13 +606,14 @@ static void* DecoderThread( vlc_object_t *p_this )
     {
         /* Trash all received PES packets */
         p_block = block_FifoGet( p_dec->p_owner->p_fifo );
-        if( p_block ) block_Release( p_block );
+        if( p_block )
+            block_Release( p_block );
     }
 
     /* We do it here because of the dll loader that wants close() in the
      * same thread than open()/decode() */
     module_unneed( p_dec, p_dec->p_module );
-    vlc_restorecancel (canc);
+    vlc_restorecancel( canc );
     return NULL;
 }
 
