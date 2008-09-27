@@ -30,24 +30,15 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_input.h>
 #include <vlc_access.h>
-#include <vlc_demux.h>
 
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
-#endif
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
-#endif
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
 #endif
 
 #ifdef HAVE_UNISTD_H
