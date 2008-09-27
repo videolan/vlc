@@ -1584,12 +1584,6 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
                 VLC_FOURCC('c', 'c', '3', ' '),
                 VLC_FOURCC('c', 'c', '4', ' '),
             };
-            static const char ppsz_description[4][18] = {
-                N_("Closed captions 1"),
-                N_("Closed captions 2"),
-                N_("Closed captions 3"),
-                N_("Closed captions 4"),
-            };
             es_format_t fmt;
 
             if(  es->pb_cc_present[i] || !pb_cc[i] )
@@ -1598,7 +1592,9 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
             es_format_Init( &fmt, SPU_ES, fcc[i] );
             fmt.i_group = es->fmt.i_group;
-            fmt.psz_description = strdup( _(ppsz_description[i] ) );
+            if( asprintf( &fmt.psz_description,
+                          _("Closed captions %u"), 1 + i ) == -1 )
+                fmt.psz_description = NULL;
             es->pp_cc_es[i] = EsOutAdd( out, &fmt );
             es->pp_cc_es[i]->p_master = es;
             es_format_Clean( &fmt );
