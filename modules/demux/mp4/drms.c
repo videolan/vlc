@@ -2032,6 +2032,7 @@ static int GetiPodID( int64_t *p_ipod_id )
 
                 IOObjectRelease( iterator );
             }
+            CFRelease( match_dic );
         }
 
         mach_port_deallocate( mach_task_self(), port );
