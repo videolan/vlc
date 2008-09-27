@@ -168,7 +168,7 @@ DBUS_METHOD( PositionGet )
 
     playlist_t *p_playlist = pl_Hold( ((vlc_object_t*) p_this) );
     PL_LOCK;
-    input_thread_t *p_input = p_playlist->p_input;
+    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
 
     if( !p_input )
         i_pos = 0;
@@ -207,7 +207,7 @@ DBUS_METHOD( PositionSet )
     }
     p_playlist = pl_Hold( ((vlc_object_t*) p_this) );
     PL_LOCK;
-    input_thread_t *p_input = p_playlist->p_input;
+    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
 
     if( p_input )
     {
@@ -320,7 +320,7 @@ DBUS_METHOD( Play )
     playlist_t *p_playlist = pl_Hold( (vlc_object_t*) p_this );
 
     PL_LOCK;
-    input_thread_t *p_input = p_playlist->p_input;
+    input_thread_t *p_input =  playlist_CurrentInput( p_playlist );
     if( p_input )
         vlc_object_hold( p_input );
     PL_UNLOCK;
@@ -344,8 +344,9 @@ DBUS_METHOD( GetCurrentMetadata )
     OUT_ARGUMENTS;
     playlist_t* p_playlist = pl_Hold( (vlc_object_t*) p_this );
     PL_LOCK;
-    if( p_playlist->status.p_item )
-        GetInputMeta( p_playlist->status.p_item->p_input, &args );
+    playlist_item_t* p_item =  playlist_CurrentPlayingItem( p_playlist );
+    if(  p_item )
+        GetInputMeta( p_item->p_input, &args );
     PL_UNLOCK;
     pl_Release( (vlc_object_t*) p_this );
     REPLY_SEND;
@@ -804,7 +805,7 @@ static void Close   ( vlc_object_t *p_this )
     var_DelCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
     var_DelCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
 
-    p_input = p_playlist->p_input;
+    p_input = playlist_CurrentInput( p_playlist );
     if ( p_input )
     {
         vlc_object_hold( p_input );
@@ -997,7 +998,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->b_meta_read = false;
 
     p_playlist = pl_Hold( p_intf );
-    p_input = p_playlist->p_input;
+    p_input = playlist_CurrentInput( p_playlist );
 
     if( !p_input )
     {
@@ -1040,14 +1041,15 @@ static int UpdateCaps( intf_thread_t* p_intf, bool b_playlist_locked )
     
     if( p_playlist->current.i_size > 0 )
         i_caps |= CAPS_CAN_PLAY | CAPS_CAN_GO_PREV | CAPS_CAN_GO_NEXT;
-
-    if( p_playlist->p_input )
+    
+    input_thread_t* p_input = playlist_CurrentInput( p_playlist );
+    if( p_input )
     {
         /* XXX: if UpdateCaps() is called too early, these are
          * unconditionnaly true */
-        if( var_GetBool( p_playlist->p_input, "can-pause" ) )
+        if( var_GetBool( p_input, "can-pause" ) )
             i_caps |= CAPS_CAN_PAUSE;
-        if( var_GetBool( p_playlist->p_input, "seekable" ) )
+        if( var_GetBool( p_input, "seekable" ) )
             i_caps |= CAPS_CAN_SEEK;
     }
 
@@ -1166,7 +1168,7 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args,
 
     i_state = 2;
 
-    p_input = p_playlist->p_input;
+    p_input = playlist_CurrentInput( p_playlist );
     if( p_input )
     {
         var_Get( p_input, "state", &val );

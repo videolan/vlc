@@ -234,19 +234,20 @@ static void Run( intf_thread_t *p_intf )
             }
             free( psz_display );
             psz_display = NULL;
-            if( p_playlist->status.i_status == PLAYLIST_STOPPED )
+            int i_status = playlist_Status( p_playlist );
+            if( i_status == PLAYLIST_STOPPED )
             {
                 psz_display = strdup(_("Stop"));
                 pl_Release( p_intf );
             }
-            else if( p_playlist->status.i_status == PLAYLIST_PAUSED )
+            else if( i_status == PLAYLIST_PAUSED )
             {
                 psz_display = strdup(_("Pause"));
                 pl_Release( p_intf );
             }
             else
             {
-                p_item = p_playlist->status.p_item;
+                p_item = playlist_CurrentPlayingItem( p_playlist );
                 p_input = p_item->p_input;
 
                 pl_Release( p_intf );

@@ -144,7 +144,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char                *psz_artist     = NULL;
     char                *psz_album      = NULL;
     char                *psz_arturl     = NULL;
-    input_thread_t      *p_input        = ((playlist_t*) p_this)->p_input;
+    input_thread_t      *p_input        =  playlist_CurrentInput(
+                                                    (playlist_t*) p_this );
     intf_thread_t       *p_intf         = ( intf_thread_t* ) param;
     intf_sys_t          *p_sys          = p_intf->p_sys;
 

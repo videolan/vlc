@@ -137,12 +137,13 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     playlist_t *p_playlist = pl_Hold( p_this );
+    input_thread_t *p_input = NULL;
 
     PL_LOCK;
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
-    if( p_playlist->p_input )
-        var_DelCallback( p_playlist->p_input, "state", StateChange, p_intf );
+    if( (p_input = playlist_CurrentInput( p_playlist )) )
+        var_DelCallback( p_input, "state", StateChange, p_intf );
     PL_UNLOCK;
     pl_Release( p_this );
 
@@ -190,7 +191,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         p_intf->p_sys->i_item_changes++;
     }
 
-    p_input = p_playlist->p_input;
+    p_input = playlist_CurrentInput( p_playlist );
 
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_hold( p_input );
