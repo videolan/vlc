@@ -103,8 +103,9 @@ static void DecSysHold( decoder_sys_t *p_sys );
 struct subpicture_sys_t
 {
     decoder_sys_t *p_dec_sys;
-    void *p_subs_data;
-    int i_subs_len;
+    void          *p_subs_data;
+    int           i_subs_len;
+    mtime_t       i_stream_system_delta;
 };
 
 typedef struct
@@ -218,24 +219,9 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        msg_Dbg( p_dec, "Resetting libass track after time discontinuity" );
-        /* We need to reset our tracks for the time discontinuity to be
-         * handled */
-        vlc_mutex_lock( p_sys->p_ass->p_lock );
-        if( p_sys->p_track )
-            ass_free_track( p_sys->p_track );
-
-        p_sys->p_track = ass_new_track( p_sys->p_ass->p_library );
-        if( p_sys->p_track  )
-            ass_process_codec_private( p_sys->p_track,
-                                       p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-        vlc_mutex_unlock( p_sys->p_ass->p_lock );
-
         block_Release( p_block );
         return NULL;
     }
-    if( p_block->i_rate != 0 )
-        p_block->i_length = p_block->i_length * p_block->i_rate / INPUT_RATE_DEFAULT;
     *pp_block = NULL;
 
     if( p_block->i_buffer == 0 || p_block->p_buffer[0] == '\0' )
@@ -271,6 +257,8 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     memcpy( p_spu->p_sys->p_subs_data, p_block->p_buffer,
             p_block->i_buffer );
+    p_spu->p_sys->i_stream_system_delta =
+        p_block->i_pts - decoder_GetDisplayDate( p_dec, p_block->i_pts );
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -354,7 +342,8 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
 
     /* */
     int i_changed;
-    ass_image_t *p_img = ass_render_frame( p_ass->p_renderer, p_sys->p_track, i_ts/1000, &i_changed );
+    ass_image_t *p_img = ass_render_frame( p_ass->p_renderer, p_sys->p_track,
+                                           (i_ts + p_subpic->p_sys->i_stream_system_delta)/1000, &i_changed );
 
     if( !i_changed && !b_fmt_changed )
     {

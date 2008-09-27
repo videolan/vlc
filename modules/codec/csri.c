@@ -85,8 +85,9 @@ struct decoder_sys_t
 struct subpicture_sys_t
 {
     decoder_t *p_dec;
-    void *p_subs_data;
-    int i_subs_len;
+    void      *p_subs_data;
+    int       i_subs_len;
+    mtime_t   i_stream_system_delta;
 };
 
 /*****************************************************************************
@@ -165,8 +166,6 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
 
     p_block = *pp_block;
-    if( p_block->i_rate != 0 )
-        p_block->i_length = p_block->i_length * p_block->i_rate / INPUT_RATE_DEFAULT;
     *pp_block = NULL;
 
     if( p_block->i_buffer == 0 || p_block->p_buffer[0] == '\0' )
@@ -203,6 +202,8 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     memcpy( p_spu->p_sys->p_subs_data, p_block->p_buffer,
             p_block->i_buffer );
+    p_spu->p_sys->i_stream_system_delta =
+        p_block->i_pts - decoder_GetDisplayDate( p_dec, p_block->i_pts );
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -241,7 +242,7 @@ static void PreRender( spu_t *p_spu, subpicture_t *p_subpic,
 }
 
 static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
-                           const video_format_t *p_fmt, mtime_t ts )
+                           const video_format_t *p_fmt, mtime_t i_ts )
 {
     decoder_t *p_dec = p_subpic->p_sys->p_dec;
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -308,7 +309,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
         csri_frame.pixfmt = CSRI_F_BGRA;
         csri_frame.planes[0] = (unsigned char*)p_spu_region->p_picture->Y_PIXELS;
         csri_frame.strides[0] = p_spu_region->p_picture->Y_PITCH;
-        csri_render( p_sys->p_instance, &csri_frame, ts * 0.000001 );
+        csri_render( p_sys->p_instance, &csri_frame, (i_ts + p_subpic->p_sys->i_stream_system_delta) * 0.000001 );
     }
 }
 

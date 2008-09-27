@@ -57,7 +57,6 @@ struct decoder_sys_t
     mtime_t          i_current_pts;
     mtime_t          i_previous_dts;
     mtime_t          i_current_dts;
-    int              i_current_rate;
     picture_t *      p_picture_to_destroy;
     bool             b_garbage_pic;
     bool             b_after_sequence_header; /* is it the next frame after
@@ -247,7 +246,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if ( p_sys->b_slice_i )
                 {
                     decoder_SynchroNewPicture( p_sys->p_synchro,
-                        I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                        I_CODING_TYPE, 2, 0, 0,
                         p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                     decoder_SynchroDecode( p_sys->p_synchro );
                     decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
@@ -282,8 +281,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_previous_dts = p_sys->i_current_dts;
                 p_sys->i_current_dts = p_block->i_dts;
             }
-
-            p_sys->i_current_rate = p_block->i_rate;
 
             mpeg2_buffer( p_sys->p_mpeg2dec, p_block->p_buffer,
                           p_block->p_buffer + p_block->i_buffer );
@@ -355,7 +352,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 /* Intra-slice refresh. Simulate a blank I picture. */
                 msg_Dbg( p_dec, "intra-slice refresh stream" );
                 decoder_SynchroNewPicture( p_sys->p_synchro,
-                    I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                    I_CODING_TYPE, 2, 0, 0,
                     p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                 decoder_SynchroDecode( p_sys->p_synchro );
                 decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
@@ -405,7 +402,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
                 p_sys->p_info->current_picture->nb_fields == 1 ? 2 :
                 p_sys->p_info->current_picture->nb_fields, i_pts, i_dts,
-                p_sys->i_current_rate,
                 p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
 
             if( !p_dec->b_pace_control && !p_sys->b_preroll &&
@@ -455,7 +451,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                             p_sys->b_garbage_pic );
                 p_sys->b_garbage_pic = 0;
 
-                if ( p_sys->p_picture_to_destroy != p_pic )
+                if( p_sys->p_picture_to_destroy != p_pic )
                 {
                     p_pic->date = decoder_SynchroDate( p_sys->p_synchro );
                 }
@@ -535,7 +531,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->b_slice_i )
             {
                 decoder_SynchroNewPicture( p_sys->p_synchro,
-                        I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                        I_CODING_TYPE, 2, 0, 0,
                         p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                 decoder_SynchroDecode( p_sys->p_synchro );
                 decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );

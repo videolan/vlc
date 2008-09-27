@@ -138,8 +138,14 @@ int decoder_GetInputAttachments( decoder_t *p_dec,
  */
 mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
 {
-    VLC_UNUSED(p_dec);
-    return i_ts;
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    return input_clock_GetTS( p_owner->p_clock, p_owner->p_input->i_pts_delay, i_ts );
+}
+/* decoder_GetDisplayRate:
+ */
+int decoder_GetDisplayRate( decoder_t *p_dec )
+{
+    return input_clock_GetRate( p_dec->p_owner->p_clock );
 }
 
 /**
@@ -396,6 +402,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
             vlc_object_release( p_cc );
             return VLC_EGENERIC;
         }
+        p_cc->p_owner->p_clock = p_owner->p_clock;
 
         vlc_mutex_lock( &p_owner->lock_cc );
         p_dec->p_owner->pp_cc[i_channel] = p_cc;
@@ -626,10 +633,79 @@ static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
     else if( p->i_dts > 0 )
         *pi_preroll = __MIN( *pi_preroll, p->i_dts );
 }
+
+static mtime_t DecoderTeletextFixTs( mtime_t i_ts, mtime_t i_ts_delay )
+{
+    mtime_t current_date = mdate();
+
+    /* FIXME I don't really like that, es_out SHOULD do it using the video pts */
+    if( !i_ts || i_ts > current_date + 10000000 || i_ts < current_date )
+    {
+        /* ETSI EN 300 472 Annex A : do not take into account the PTS
+         * for teletext streams. */
+        return current_date + 400000 + i_ts_delay;
+    }
+    return i_ts;
+}
+
+static void DecoderSoutBufferFixTs( block_t *p_block,
+                                    input_clock_t *p_clock, mtime_t i_ts_delay,
+                                    bool b_teletext )
+{
+    p_block->i_rate = input_clock_GetRate( p_clock );
+
+    if( p_block->i_dts > 0 )
+        p_block->i_dts = input_clock_GetTS( p_clock, i_ts_delay, p_block->i_dts );
+
+    if( p_block->i_pts > 0 )
+        p_block->i_pts = input_clock_GetTS( p_clock, i_ts_delay, p_block->i_pts );
+
+    if( p_block->i_length > 0 )
+        p_block->i_length = ( p_block->i_length * p_block->i_rate +
+                                INPUT_RATE_DEFAULT-1 ) / INPUT_RATE_DEFAULT;
+
+    if( b_teletext )
+        p_block->i_pts = DecoderTeletextFixTs( p_block->i_pts, i_ts_delay );
+}
+static void DecoderAoutBufferFixTs( aout_buffer_t *p_buffer,
+                                    input_clock_t *p_clock, mtime_t i_ts_delay )
+{
+    if( p_buffer->start_date )
+        p_buffer->start_date = input_clock_GetTS( p_clock, i_ts_delay, p_buffer->start_date );
+
+    if( p_buffer->end_date )
+        p_buffer->end_date = input_clock_GetTS( p_clock, i_ts_delay, p_buffer->end_date );
+}
+static void DecoderVoutBufferFixTs( picture_t *p_picture,
+                                    input_clock_t *p_clock, mtime_t i_ts_delay )
+{
+    if( p_picture->date )
+        p_picture->date = input_clock_GetTS( p_clock, i_ts_delay, p_picture->date );
+}
+static void DecoderSpuBufferFixTs( subpicture_t *p_subpic,
+                                   input_clock_t *p_clock, mtime_t i_ts_delay,
+                                   bool b_teletext )
+{
+    bool b_ephemere = p_subpic->i_start == p_subpic->i_stop;
+
+    if( p_subpic->i_start )
+        p_subpic->i_start = input_clock_GetTS( p_clock, i_ts_delay, p_subpic->i_start );
+
+    if( p_subpic->i_stop )
+        p_subpic->i_stop = input_clock_GetTS( p_clock, i_ts_delay, p_subpic->i_stop );
+
+    /* Do not create ephemere picture because of rounding errors */
+    if( !b_ephemere && p_subpic->i_start == p_subpic->i_stop )
+        p_subpic->i_stop++;
+
+    if( b_teletext )
+        p_subpic->i_start = DecoderTeletextFixTs( p_subpic->i_start, i_ts_delay );
+}
+
 static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 {
     input_thread_t  *p_input = p_dec->p_owner->p_input;
-    const int       i_rate = p_block->i_rate;
+    input_clock_t   *p_clock = p_dec->p_owner->p_clock;
     aout_buffer_t   *p_aout_buf;
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
@@ -661,7 +737,14 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
             msg_Dbg( p_dec, "End of audio preroll" );
             p_dec->p_owner->i_preroll_end = -1;
         }
-        aout_DecPlay( p_aout, p_aout_input, p_aout_buf, i_rate );
+
+        const int i_rate = input_clock_GetRate( p_clock );
+        DecoderAoutBufferFixTs( p_aout_buf, p_clock, p_input->i_pts_delay );
+        if( i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
+            i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
+            aout_DecPlay( p_aout, p_aout_input, p_aout_buf, i_rate );
+        else
+            aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
     }
 }
 static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
@@ -743,6 +826,7 @@ static void VoutFlushPicture( vout_thread_t *p_vout )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
+#if 0
 static void DecoderOptimizePtsDelay( decoder_t *p_dec )
 {
     input_thread_t *p_input = p_dec->p_owner->p_input;
@@ -839,6 +923,7 @@ static void DecoderOptimizePtsDelay( decoder_t *p_dec )
         vlc_mutex_unlock( &p_vout->picture_lock );
     }
 }
+#endif
 
 static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 {
@@ -876,12 +961,16 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
             p_dec->p_owner->i_preroll_end = -1;
         }
 
-        if( ( !p_dec->p_owner->p_packetizer || !p_dec->p_owner->p_packetizer->pf_get_cc ) && p_dec->pf_get_cc )
+        if( p_dec->pf_get_cc &&
+            ( !p_dec->p_owner->p_packetizer || !p_dec->p_owner->p_packetizer->pf_get_cc ) )
             DecoderGetCc( p_dec, p_dec );
+
+        DecoderVoutBufferFixTs( p_pic, p_dec->p_owner->p_clock, p_input->i_pts_delay );
 
         vout_DatePicture( p_vout, p_pic, p_pic->date );
 
-        DecoderOptimizePtsDelay( p_dec );
+        /* Re-enable it but do it right this time */
+        //DecoderOptimizePtsDelay( p_dec );
 
         vout_DisplayPicture( p_vout, p_pic );
     }
@@ -897,7 +986,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
-    const int i_rate = p_block ? p_block->i_rate : INPUT_RATE_DEFAULT;
+    const bool b_telx = p_dec->fmt_in.i_codec == VLC_FOURCC('t','e','l','x');
 
     if( p_block && p_block->i_buffer <= 0 )
     {
@@ -952,7 +1041,9 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 block_t *p_next = p_sout_block->p_next;
 
                 p_sout_block->p_next = NULL;
-                p_sout_block->i_rate = i_rate;
+
+                DecoderSoutBufferFixTs( p_sout_block,
+                                        p_dec->p_owner->p_clock, p_dec->p_owner->p_input->i_pts_delay, b_telx );
 
                 sout_InputSendBuffer( p_dec->p_owner->p_sout_input,
                                       p_sout_block );
@@ -1000,7 +1091,6 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 {
                     block_t *p_next = p_packetized_block->p_next;
                     p_packetized_block->p_next = NULL;
-                    p_packetized_block->i_rate = i_rate;
 
                     DecoderDecodeAudio( p_dec, p_packetized_block );
 
@@ -1038,7 +1128,6 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 {
                     block_t *p_next = p_packetized_block->p_next;
                     p_packetized_block->p_next = NULL;
-                    p_packetized_block->i_rate = i_rate;
 
                     DecoderDecodeVideo( p_dec, p_packetized_block );
 
@@ -1093,7 +1182,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     subpicture_Delete( p_spu );
                 }
                 else
+                {
+                    DecoderSpuBufferFixTs( p_spu, p_dec->p_owner->p_clock, p_input->i_pts_delay, b_telx );
                     spu_DisplaySubpicture( p_vout->p_spu, p_spu );
+                }
             }
             else
             {

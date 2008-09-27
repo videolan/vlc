@@ -252,7 +252,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             block_BytestreamFlush( &p_sys->bytestream );
             p_pic->i_pts = p_sys->bytestream.p_block->i_pts;
             p_pic->i_dts = p_sys->bytestream.p_block->i_dts;
-            p_pic->i_rate = p_sys->bytestream.p_block->i_rate;
 
             block_GetBytes( &p_sys->bytestream, p_pic->p_buffer, p_pic->i_buffer );
 

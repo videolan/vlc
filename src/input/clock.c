@@ -313,6 +313,19 @@ mtime_t input_clock_GetTS( input_clock_t *cl,
 
     return i_converted_ts + i_pts_delay;
 }
+/*****************************************************************************
+ * input_clock_GetRate: Return current rate
+ *****************************************************************************/
+int input_clock_GetRate( input_clock_t *cl )
+{
+    int i_rate;
+
+    vlc_mutex_lock( &cl->lock );
+    i_rate = cl->i_rate;
+    vlc_mutex_unlock( &cl->lock );
+
+    return i_rate;
+}
 
 /*****************************************************************************
  * ClockStreamToSystem: converts a movie clock to system date

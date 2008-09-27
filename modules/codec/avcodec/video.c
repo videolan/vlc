@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 #include <vlc_vout.h>
-#include <vlc_input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
 #include <vlc_codecs.h>                               /* BITMAPINFOHEADER */
 
 /* ffmpeg header */
@@ -100,7 +99,7 @@ static void ffmpeg_CopyPicture    ( decoder_t *, picture_t *, AVFrame * );
 static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
-static void ffmpeg_NextPts( decoder_t *, int i_block_rate );
+static void ffmpeg_NextPts( decoder_t * );
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
@@ -617,7 +616,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if( !b_drawpicture && p_pic )
                 p_dec->pf_vout_buffer_del( p_dec, p_pic );
 
-            ffmpeg_NextPts( p_dec, p_block->i_rate );
+            ffmpeg_NextPts( p_dec );
             continue;
         }
 
@@ -671,7 +670,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             int i;
             p_pic->date = p_sys->i_pts;
 
-            ffmpeg_NextPts( p_dec, p_block->i_rate );
+            ffmpeg_NextPts( p_dec );
 
             if( p_sys->b_first_frame )
             {
@@ -1007,7 +1006,7 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     }
 }
 
-static void ffmpeg_NextPts( decoder_t *p_dec, int i_block_rate )
+static void ffmpeg_NextPts( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1020,16 +1019,14 @@ static void ffmpeg_NextPts( decoder_t *p_dec, int i_block_rate )
     {
         p_sys->i_pts += INT64_C(1000000) *
             (2 + p_sys->p_ff_pic->repeat_pict) *
-            p_dec->fmt_in.video.i_frame_rate_base *
-            i_block_rate / INPUT_RATE_DEFAULT /
+            p_dec->fmt_in.video.i_frame_rate_base /
             (2 * p_dec->fmt_in.video.i_frame_rate);
     }
     else if( p_sys->p_context->time_base.den > 0 )
     {
         p_sys->i_pts += INT64_C(1000000) *
             (2 + p_sys->p_ff_pic->repeat_pict) *
-            p_sys->p_context->time_base.num *
-            i_block_rate / INPUT_RATE_DEFAULT /
+            p_sys->p_context->time_base.num /
             (2 * p_sys->p_context->time_base.den);
     }
 }

@@ -33,7 +33,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_input.h>
 
 #include "vlc_vout.h"
 #include "vlc_bits.h"
@@ -458,8 +457,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( pp_block == NULL || *pp_block == NULL )
         return NULL;
     p_block = *pp_block;
-    if( p_block->i_rate != 0 )
-        p_block->i_length = p_block->i_length * p_block->i_rate / INPUT_RATE_DEFAULT;
     *pp_block = NULL;
 
     dbg((p_dec, "start of telx packet with header %2x\n",

@@ -36,7 +36,6 @@
 #include <vlc_sout.h>
 #include <vlc_codec.h>
 #include <vlc_block.h>
-#include <vlc_input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
 
 #include "vlc_bits.h"
 #include "vlc_block_helper.h"
@@ -295,7 +294,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             block_BytestreamFlush( &p_sys->bytestream );
             p_pic->i_pts = i_pts = p_sys->bytestream.p_block->i_pts;
             p_pic->i_dts = i_dts = p_sys->bytestream.p_block->i_dts;
-            p_pic->i_rate = p_sys->bytestream.p_block->i_rate;
 
             block_GetBytes( &p_sys->bytestream, p_pic->p_buffer,
                             p_pic->i_buffer );
@@ -569,15 +567,13 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
         p_dec->fmt_in.video.i_frame_rate_base > 0 )
     {
         p_sys->i_interpolated_pts += INT64_C(1000000) *
-        p_dec->fmt_in.video.i_frame_rate_base *
-        p_vop->i_rate / INPUT_RATE_DEFAULT /
+        p_dec->fmt_in.video.i_frame_rate_base /
         p_dec->fmt_in.video.i_frame_rate;
     }
     else if( p_dec->p_sys->i_fps_num )
         p_sys->i_interpolated_pts +=
             ( INT64_C(1000000) * (i_time_ref + i_time_increment -
-              p_sys->i_last_time - p_sys->i_last_timeincr) *
-              p_vop->i_rate / INPUT_RATE_DEFAULT /
+              p_sys->i_last_time - p_sys->i_last_timeincr) /
               p_dec->p_sys->i_fps_num );
 
     p_sys->i_last_time = i_time_ref;

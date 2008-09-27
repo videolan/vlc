@@ -63,17 +63,22 @@ void    input_clock_Reset( input_clock_t * );
 /**
  * This functions will return a deadline used to control the reading speed.
  */
-mtime_t input_clock_GetWakeup( input_clock_t *cl );
+mtime_t input_clock_GetWakeup( input_clock_t * );
 
 /**
  * This functions allows to change the actual reading speed.
  */
-void    input_clock_ChangeRate( input_clock_t *cl, int i_rate );
+void    input_clock_ChangeRate( input_clock_t *, int i_rate );
 
 /**
  * This function converts a timestamp from stream clock to system clock.
  */
 mtime_t input_clock_GetTS( input_clock_t *, mtime_t i_pts_delay, mtime_t );
+
+/**
+ * This function returns the current rate.
+ */
+int input_clock_GetRate( input_clock_t * );
 
 #endif
 

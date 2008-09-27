@@ -118,8 +118,6 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
 
     p_block = *pp_block;
-    if( p_block->i_rate != 0 )
-        p_block->i_length = p_block->i_length * p_block->i_rate / INPUT_RATE_DEFAULT;
 
     p_spu = ParseText( p_dec, p_block );
 

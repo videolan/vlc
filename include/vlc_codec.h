@@ -147,8 +147,31 @@ struct encoder_t
  * @}
  */
 
+/**
+ * This function returns a specific input attachment (using its name).
+ *
+ * You MUST release the returned value.
+ */
 VLC_EXPORT( input_attachment_t *, decoder_GetInputAttachment, ( decoder_t *, const char *psz_name ) LIBVLC_USED );
+
+/**
+ * This function gives all input attachments at once.
+ *
+ * You MUST release the returned values
+ */
 VLC_EXPORT( int, decoder_GetInputAttachments, ( decoder_t *p_dec, input_attachment_t ***ppp_attachment, int *pi_attachment ) );
+
+/**
+ * This function converts a decoder timestamp into a display date comparable
+ * to mdate().
+ * You MUST use it *only* for gathering statistics about speed.
+ */
 VLC_EXPORT( mtime_t, decoder_GetDisplayDate, ( decoder_t *, mtime_t ) LIBVLC_USED );
+
+/**
+ * This function returns the current input rate.
+ * You MUST use it *only* for gathering statistics about speed.
+ */
+VLC_EXPORT( int, decoder_GetDisplayRate, ( decoder_t * ) );
 
 #endif /* _VLC_CODEC_H */

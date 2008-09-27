@@ -135,7 +135,7 @@ struct es_out_sys_t
     int64_t i_audio_delay;
     int64_t i_spu_delay;
 
-    /* Rate used to rescale ES ts */
+    /* Rate used for clock */
     int         i_rate;
 
     /* Record */
@@ -390,7 +390,6 @@ void input_EsOutChangeRate( es_out_t *out, int i_rate )
     int i;
 
     p_sys->i_rate = i_rate;
-    EsOutDiscontinuity( out, false, false );
 
     for( i = 0; i < p_sys->i_pgrm; i++ )
         input_clock_ChangeRate( p_sys->pgrm[i]->p_clock, i_rate );
@@ -1507,11 +1506,11 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
  */
 static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
-    es_out_sys_t *p_sys = out->p_sys;
-    input_thread_t    *p_input = p_sys->p_input;
-    es_out_pgrm_t *p_pgrm = es->p_pgrm;
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+    es_out_pgrm_t  *p_pgrm = es->p_pgrm;
     int64_t i_delay;
-    int i_total=0;
+    int i_total = 0;
 
     if( es->fmt.i_cat == AUDIO_ES )
         i_delay = p_sys->i_audio_delay;
@@ -1520,7 +1519,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else
         i_delay = 0;
 
-    if( libvlc_stats (p_input) )
+    if( libvlc_stats( p_input ) )
     {
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
         stats_UpdateInteger( p_input, p_input->p->counters.p_demux_read,
@@ -1543,94 +1542,63 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
             es->i_preroll_end = -1;
     }
 
-    if( p_block->i_dts > 0 && (p_block->i_flags&BLOCK_FLAG_PREROLL) )
-    {
+    if( p_block->i_dts > 0 )
         p_block->i_dts += i_delay;
-    }
-    else if( p_block->i_dts > 0 )
-    {
-        p_block->i_dts =
-            input_clock_GetTS( p_pgrm->p_clock, p_input->i_pts_delay, p_block->i_dts ) + i_delay;
-    }
-    if( p_block->i_pts > 0 && (p_block->i_flags&BLOCK_FLAG_PREROLL) )
-    {
+
+    if( p_block->i_pts > 0 )
         p_block->i_pts += i_delay;
-    }
-    else if( p_block->i_pts > 0 )
-    {
-        p_block->i_pts =
-            input_clock_GetTS( p_pgrm->p_clock, p_input->i_pts_delay, p_block->i_pts ) + i_delay;
-    }
-    if ( p_block->i_rate == INPUT_RATE_DEFAULT &&
-         es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
-    {
-        mtime_t current_date = mdate();
-        if( !p_block->i_pts
-               || p_block->i_pts > current_date + 10000000
-               || current_date > p_block->i_pts )
-        {
-            /* ETSI EN 300 472 Annex A : do not take into account the PTS
-             * for teletext streams. */
-            p_block->i_pts = current_date + 400000
-                               + p_input->i_pts_delay + i_delay;
-        }
-    }
 
-    p_block->i_rate = p_sys->i_rate;
+    p_block->i_rate = 0;
 
-    /* TODO handle mute */
-    if( es->p_dec &&
-        ( es->fmt.i_cat != AUDIO_ES ||
-          ( p_sys->i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
-            p_sys->i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE ) ) )
-    {
-        bool pb_cc[4];
-        bool b_cc_new = false;
-        int i;
-        if( es->p_dec_record )
-        {
-            block_t *p_dup = block_Duplicate( p_block );
-            if( p_dup )
-                input_DecoderDecode( es->p_dec_record, p_dup );
-        }
-        input_DecoderDecode( es->p_dec, p_block );
-
-        /* Check CC status */
-        input_DecoderIsCcPresent( es->p_dec, pb_cc );
-        for( i = 0; i < 4; i++ )
-        {
-            static const vlc_fourcc_t fcc[4] = {
-                VLC_FOURCC('c', 'c', '1', ' '),
-                VLC_FOURCC('c', 'c', '2', ' '),
-                VLC_FOURCC('c', 'c', '3', ' '),
-                VLC_FOURCC('c', 'c', '4', ' '),
-            };
-            es_format_t fmt;
-
-            if(  es->pb_cc_present[i] || !pb_cc[i] )
-                continue;
-            msg_Dbg( p_input, "Adding CC track %d for es[%d]", 1+i, es->i_id );
-
-            es_format_Init( &fmt, SPU_ES, fcc[i] );
-            fmt.i_group = es->fmt.i_group;
-            if( asprintf( &fmt.psz_description,
-                          _("Closed captions %u"), 1 + i ) == -1 )
-                fmt.psz_description = NULL;
-            es->pp_cc_es[i] = EsOutAdd( out, &fmt );
-            es->pp_cc_es[i]->p_master = es;
-            es_format_Clean( &fmt );
-
-            /* */
-            es->pb_cc_present[i] = true;
-            b_cc_new = true;
-        }
-        if( b_cc_new )
-            var_SetBool( p_sys->p_input, "intf-change", true );
-    }
-    else
+    if( !es->p_dec )
     {
         block_Release( p_block );
+        return VLC_SUCCESS;
     }
+
+    /* Decode */
+    if( es->p_dec_record )
+    {
+        block_t *p_dup = block_Duplicate( p_block );
+        if( p_dup )
+            input_DecoderDecode( es->p_dec_record, p_dup );
+    }
+    input_DecoderDecode( es->p_dec, p_block );
+
+    /* Check CC status */
+    bool pb_cc[4];
+    bool b_cc_new = false;
+
+    input_DecoderIsCcPresent( es->p_dec, pb_cc );
+    for( int i = 0; i < 4; i++ )
+    {
+        static const vlc_fourcc_t fcc[4] = {
+            VLC_FOURCC('c', 'c', '1', ' '),
+            VLC_FOURCC('c', 'c', '2', ' '),
+            VLC_FOURCC('c', 'c', '3', ' '),
+            VLC_FOURCC('c', 'c', '4', ' '),
+        };
+        es_format_t fmt;
+
+        if(  es->pb_cc_present[i] || !pb_cc[i] )
+            continue;
+        msg_Dbg( p_input, "Adding CC track %d for es[%d]", 1+i, es->i_id );
+
+        es_format_Init( &fmt, SPU_ES, fcc[i] );
+        fmt.i_group = es->fmt.i_group;
+        if( asprintf( &fmt.psz_description,
+                      _("Closed captions %u"), 1 + i ) == -1 )
+            fmt.psz_description = NULL;
+        es->pp_cc_es[i] = EsOutAdd( out, &fmt );
+        es->pp_cc_es[i]->p_master = es;
+        es_format_Clean( &fmt );
+
+        /* */
+        es->pb_cc_present[i] = true;
+        b_cc_new = true;
+    }
+    if( b_cc_new )
+        var_SetBool( p_sys->p_input, "intf-change", true );
 
     return VLC_SUCCESS;
 }
@@ -2003,9 +1971,6 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             if( !es || !es->p_dec )
                 return VLC_EGENERIC;
 
-            /* XXX We should call input_clock_GetTS but PCR has been reseted
-             * and it will return 0, so we won't call input_clock_GetTS on all preroll samples
-             * but that's ugly(more time discontinuity), it need to be improved -- fenrir */
             es->i_preroll_end = i_date;
 
             return VLC_SUCCESS;
