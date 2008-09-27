@@ -44,6 +44,7 @@
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
 #include "input_internal.h"
+#include "input_clock.h"
 #include "input_decoder.h"
 
 static decoder_t *CreateDecoder( input_thread_t *, es_format_t *, int, sout_instance_t *p_sout );
