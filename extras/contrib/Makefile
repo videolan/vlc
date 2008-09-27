@@ -84,6 +84,7 @@ package-macosx:
 		share/automake* share/gettext* \
 		| (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
+	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
 	rm -rf tmp
 
 DISTDIR = usr/win32
