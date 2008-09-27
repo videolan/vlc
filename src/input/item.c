@@ -501,6 +501,10 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
     input_item_Init( p_obj, p_input );
     vlc_gc_init( p_input, input_item_Destroy );
 
+    vlc_object_lock( p_obj->p_libvlc );
+    p_input->i_id = ++priv->i_last_input_id;
+    vlc_object_unlock( p_obj->p_libvlc );
+
     p_input->b_fixed_name = false;
 
     if( psz_uri )

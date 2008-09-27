@@ -819,6 +819,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     vlc_mutex_init( &p_libvlc->p_stats->lock );
     priv->p_stats_computer = NULL;
 
+    priv->i_last_input_id = 0; /* Not very safe, should be removed */
+
     /*
      * Initialize hotkey handling
      */

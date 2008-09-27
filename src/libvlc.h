@@ -206,6 +206,8 @@ typedef struct libvlc_priv_t
     vlc_mutex_t        config_lock; ///< config file lock
     char *             psz_configfile;   ///< location of config file
 
+    int                i_last_input_id ; ///< Last id of input item
+
     /* Messages */
     msg_bank_t         msg_bank;    ///< The message bank
     int                i_verbose;   ///< info messages
