@@ -139,13 +139,18 @@ int decoder_GetInputAttachments( decoder_t *p_dec,
 mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    assert( !p_owner->p_clock );
     return input_clock_GetTS( p_owner->p_clock, p_owner->p_input->i_pts_delay, i_ts );
 }
 /* decoder_GetDisplayRate:
  */
 int decoder_GetDisplayRate( decoder_t *p_dec )
 {
-    return input_clock_GetRate( p_dec->p_owner->p_clock );
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    assert( !p_owner->p_clock );
+    return input_clock_GetRate( p_owner->p_clock );
 }
 
 /**
@@ -652,6 +657,8 @@ static void DecoderSoutBufferFixTs( block_t *p_block,
                                     input_clock_t *p_clock, mtime_t i_ts_delay,
                                     bool b_teletext )
 {
+    assert( p_clock );
+
     p_block->i_rate = input_clock_GetRate( p_clock );
 
     if( p_block->i_dts > 0 )
@@ -670,6 +677,10 @@ static void DecoderSoutBufferFixTs( block_t *p_block,
 static void DecoderAoutBufferFixTs( aout_buffer_t *p_buffer,
                                     input_clock_t *p_clock, mtime_t i_ts_delay )
 {
+    /* sout display module does not set clock */
+    if( !p_clock )
+        return;
+
     if( p_buffer->start_date )
         p_buffer->start_date = input_clock_GetTS( p_clock, i_ts_delay, p_buffer->start_date );
 
@@ -679,6 +690,10 @@ static void DecoderAoutBufferFixTs( aout_buffer_t *p_buffer,
 static void DecoderVoutBufferFixTs( picture_t *p_picture,
                                     input_clock_t *p_clock, mtime_t i_ts_delay )
 {
+    /* sout display module does not set clock */
+    if( !p_clock )
+        return;
+
     if( p_picture->date )
         p_picture->date = input_clock_GetTS( p_clock, i_ts_delay, p_picture->date );
 }
@@ -687,6 +702,10 @@ static void DecoderSpuBufferFixTs( subpicture_t *p_subpic,
                                    bool b_teletext )
 {
     bool b_ephemere = p_subpic->i_start == p_subpic->i_stop;
+
+    /* sout display module does not set clock */
+    if( !p_clock )
+        return;
 
     if( p_subpic->i_start )
         p_subpic->i_start = input_clock_GetTS( p_clock, i_ts_delay, p_subpic->i_start );
@@ -738,7 +757,8 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
             p_dec->p_owner->i_preroll_end = -1;
         }
 
-        const int i_rate = input_clock_GetRate( p_clock );
+        const int i_rate = p_clock ? input_clock_GetRate( p_clock ) : p_block->i_rate;
+
         DecoderAoutBufferFixTs( p_aout_buf, p_clock, p_input->i_pts_delay );
         if( i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
             i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
