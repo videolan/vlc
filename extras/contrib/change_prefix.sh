@@ -68,9 +68,7 @@ for file in $files; do
   fi
 done
 
-cd $new_prefix2/lib/
-pwd
-files=` ls -1 *.la`
+files=`find . -name *.la`
 for file in $files; do
    echo "Fixing up .la $file"
    sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
