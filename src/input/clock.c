@@ -101,23 +101,28 @@ static void    AvgUpdate( average_t *, mtime_t i_value );
 static mtime_t AvgGet( average_t * );
 
 /* */
+typedef struct
+{
+    mtime_t i_stream;
+    mtime_t i_system;
+} clock_point_t;
+
+static inline clock_point_t clock_point_Create( mtime_t i_stream, mtime_t i_system )
+{
+    clock_point_t p = { .i_stream = i_stream, .i_system = i_system };
+    return p;
+}
+
+/* */
 struct input_clock_t
 {
     /* Reference point */
-    bool                    b_has_reference;
-    struct
-    {
-        mtime_t i_clock;
-        mtime_t i_system;
-    } ref;
+    bool          b_has_reference;
+    clock_point_t ref;
 
     /* Last point
      * It is used to detect unexpected stream discontinuities */
-    struct
-    {
-        mtime_t i_clock;
-        mtime_t i_system;
-    } last;
+    clock_point_t last;
 
     /* Maximal timestamp returned by input_clock_GetTS (in system unit) */
     mtime_t i_ts_max;
@@ -131,9 +136,8 @@ struct input_clock_t
     int     i_rate;
 };
 
-static mtime_t ClockStreamToSystem( input_clock_t *, mtime_t i_clock );
+static mtime_t ClockStreamToSystem( input_clock_t *, mtime_t i_stream );
 static mtime_t ClockSystemToStream( input_clock_t *, mtime_t i_system );
-static void ClockSetReference( input_clock_t *, mtime_t i_clock, mtime_t i_system );
 
 /*****************************************************************************
  * input_clock_New: create a new clock
@@ -145,11 +149,9 @@ input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
         return NULL;
 
     cl->b_has_reference = false;
-    cl->ref.i_clock = 0;
-    cl->ref.i_system = 0;
+    cl->ref = clock_point_Create( 0, 0 );
 
-    cl->last.i_clock = 0;
-    cl->last.i_system = 0;
+    cl->last = clock_point_Create( 0, 0 );
 
     cl->i_ts_max = 0;
 
@@ -185,14 +187,14 @@ void input_clock_Update( input_clock_t *cl,
     bool b_reset_reference = false;
 
     if( ( !cl->b_has_reference ) ||
-        ( i_ck_stream == 0 && cl->last.i_clock != 0 ) )
+        ( i_ck_stream == 0 && cl->last.i_stream != 0 ) )
     {
         /* */
         b_reset_reference= true;
     }
-    else if( cl->last.i_clock != 0 &&
-             ( (cl->last.i_clock - i_ck_stream) > CR_MAX_GAP ||
-               (cl->last.i_clock - i_ck_stream) < -CR_MAX_GAP ) )
+    else if( cl->last.i_stream != 0 &&
+             ( (cl->last.i_stream - i_ck_stream) > CR_MAX_GAP ||
+               (cl->last.i_stream - i_ck_stream) < -CR_MAX_GAP ) )
     {
         /* Stream discontinuity, for which we haven't received a
          * warning from the stream control facilities (dd-edited
@@ -210,8 +212,9 @@ void input_clock_Update( input_clock_t *cl,
         AvgReset( &cl->drift );
 
         /* Feed synchro with a new reference point. */
-        ClockSetReference( cl, i_ck_stream,
-                         __MAX( cl->i_ts_max + CR_MEAN_PTS_GAP, i_ck_system ) );
+        cl->b_has_reference = true;
+        cl->ref = clock_point_Create( i_ck_stream,
+                                      __MAX( cl->i_ts_max + CR_MEAN_PTS_GAP, i_ck_system ) );
     }
 
     if( !b_synchronize && cl->i_next_drift_update < i_ck_system )
@@ -222,16 +225,16 @@ void input_clock_Update( input_clock_t *cl,
 
         cl->i_next_drift_update = i_ck_system + CLOCK_FREQ/5; /* FIXME why that */
     }
-    cl->last.i_clock = i_ck_stream;
-    cl->last.i_system = i_ck_system;
+    cl->last = clock_point_Create( i_ck_stream, i_ck_system );
 }
 
 /*****************************************************************************
- * input_clock_ResetPCR:
+ * input_clock_Reset:
  *****************************************************************************/
-void input_clock_ResetPCR( input_clock_t *cl )
+void input_clock_Reset( input_clock_t *cl )
 {
     cl->b_has_reference = false;
+    cl->ref = clock_point_Create( 0, 0 );
     cl->i_ts_max = 0;
 }
 
@@ -261,7 +264,7 @@ void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
 {
     /* Move the reference point */
     if( cl->b_has_reference )
-        ClockSetReference( cl, cl->last.i_clock, cl->last.i_system );
+        cl->ref = cl->last;
 
     cl->i_rate = i_rate;
 }
@@ -288,18 +291,18 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl )
         return 0;
 
     /* */
-    return ClockStreamToSystem( cl, cl->last.i_clock );
+    return ClockStreamToSystem( cl, cl->last.i_stream );
 }
 
 /*****************************************************************************
  * ClockStreamToSystem: converts a movie clock to system date
  *****************************************************************************/
-static mtime_t ClockStreamToSystem( input_clock_t *cl, mtime_t i_clock )
+static mtime_t ClockStreamToSystem( input_clock_t *cl, mtime_t i_stream )
 {
     if( !cl->b_has_reference )
         return 0;
 
-    return ( i_clock - cl->ref.i_clock ) * cl->i_rate / INPUT_RATE_DEFAULT +
+    return ( i_stream - cl->ref.i_stream ) * cl->i_rate / INPUT_RATE_DEFAULT +
            cl->ref.i_system;
 }
 
@@ -312,18 +315,7 @@ static mtime_t ClockSystemToStream( input_clock_t *cl, mtime_t i_system )
 {
     assert( cl->b_has_reference );
     return ( i_system - cl->ref.i_system ) * INPUT_RATE_DEFAULT / cl->i_rate +
-            cl->ref.i_clock;
-}
-
-/*****************************************************************************
- * ClockSetReference: writes a new clock reference
- *****************************************************************************/
-static void ClockSetReference( input_clock_t *cl,
-                               mtime_t i_clock, mtime_t i_system )
-{
-    cl->b_has_reference = true;
-    cl->ref.i_clock = i_clock;
-    cl->ref.i_system = i_system;
+            cl->ref.i_stream;
 }
 
 /*****************************************************************************
