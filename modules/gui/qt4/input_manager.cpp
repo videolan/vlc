@@ -646,17 +646,12 @@ void MainInputManager::customEvent( QEvent *event )
 
         if( !p_input )
         {
-            QPL_LOCK;
-            p_input = THEPL->p_input;
-            if( p_input && !( !vlc_object_alive (p_input) || p_input->b_dead) )
+            p_input = playlist_CurrentInput(THEPL);
+            if( p_input )
             {
-                vlc_object_hold( p_input );
                 var_AddCallback( p_input, "state", PLItemChanged, this );
                 emit inputChanged( p_input );
             }
-            else
-                p_input = NULL;
-            QPL_UNLOCK;
         }
         vlc_mutex_unlock( &p_intf->change_lock );
     }
