@@ -184,57 +184,52 @@ void decode_URI( char *psz )
     EnsureUTF8( psz );
 }
 
-static inline int isurlsafe( int c )
+static inline bool isurisafe( int c )
 {
+    /* These are the _unreserved_ URI characters (RFC3986 §2.3) */
     return ( (unsigned char)( c - 'a' ) < 26 )
             || ( (unsigned char)( c - 'A' ) < 26 )
             || ( (unsigned char)( c - '0' ) < 10 )
-        /* Hmm, we should not encode character that are allowed in URLs
-         * (even if they are not URL-safe), nor URL-safe characters.
-         * We still encode some of them because of Microsoft's crap browser.
-         */
-            || ( strchr( "-_.", c ) != NULL );
-}
-
-static inline char url_hexchar( int c )
-{
-    return ( c < 10 ) ? c + '0' : c + 'A' - 10;
+            || ( strchr( "-._~", c ) != NULL );
 }
 
 /**
- * encode_URI_component
- * Encodes an URI component.
+ * Encodes an URI component (RFC3986 §2).
  *
- * @param psz_url nul-terminated UTF-8 representation of the component.
+ * @param psz_uri nul-terminated UTF-8 representation of the component.
  * Obviously, you can't pass an URI containing a nul character, but you don't
  * want to do that, do you?
  *
- * @return encoded string (must be free()'d)
+ * @return encoded string (must be free()'d), or NULL for ENOMEM.
  */
-char *encode_URI_component( const char *psz_url )
+char *encode_URI_component( const char *psz_uri )
 {
-    char psz_enc[3 * strlen( psz_url ) + 1], *out = psz_enc;
-    const uint8_t *in;
+    char *psz_enc = malloc ((3 * strlen (psz_uri)) + 1), *out = psz_enc;
 
-    for( in = (const uint8_t *)psz_url; *in; in++ )
+    if (psz_enc == NULL)
+        return NULL;
+
+    while (*psz_uri)
     {
-        uint8_t c = *in;
+        static const char hex[16] = "0123456789ABCDEF";
+        uint8_t c = *psz_uri;
 
-        if( isurlsafe( c ) )
-            *out++ = (char)c;
-        else
-        if ( c == ' ')
-            *out++ = '+';
+        if( isurisafe( c ) )
+            *out++ = c;
+        /* This is URI encoding, not HTTP forms:
+         * Space is encoded as '%20', not '+'. */
         else
         {
             *out++ = '%';
-            *out++ = url_hexchar( c >> 4 );
-            *out++ = url_hexchar( c & 0xf );
+            *out++ = hex[c >> 4];
+            *out++ = hex[c & 0xf];
         }
+        psz_uri++;
     }
     *out++ = '\0';
 
-    return strdup( psz_enc );
+    out = realloc (psz_enc, out - psz_enc);
+    return out ? out : psz_enc; /* realloc() can fail (safe) */
 }
 
 static const struct xml_entity_s
