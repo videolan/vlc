@@ -575,11 +575,8 @@ error:
 {
     if( p_item ) vlc_gc_decref( p_item );
     p_item = [[[VLCMain sharedInstance] getInfo] item];
-    if( o_children != NULL )
-    {
-        [o_children release];
-        o_children = NULL;
-    }
+    [o_children release];
+    o_children = nil;
 }
 
 - (VLCInfoTreeItem *)childAtIndex:(int)i_index {
