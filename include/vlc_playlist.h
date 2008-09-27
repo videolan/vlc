@@ -160,8 +160,6 @@ struct playlist_t
 
     playlist_item_array_t items; /**< Arrays of items */
     playlist_item_array_t all_items; /**< Array of items and nodes */
-    playlist_item_array_t items_to_delete; /**< Array of items and nodes to
-            delete... At the very end. This sucks. */
 
     playlist_item_array_t current; /**< Items currently being played */
     int                   i_current_index; /**< Index in current array */

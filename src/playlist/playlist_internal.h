@@ -67,6 +67,9 @@ typedef struct playlist_private_t
     playlist_fetcher_t   fetcher; /**< Meta and art fetcher data */
     sout_instance_t      *p_sout; /**< Kept sout instance */
 
+    playlist_item_array_t items_to_delete; /**< Array of items and nodes to
+            delete... At the very end. This sucks. */
+
     struct playlist_services_discovery_support_t {
         /* the playlist items for category and onelevel */
         playlist_item_t*    p_cat;

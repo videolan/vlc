@@ -220,7 +220,7 @@ int playlist_ItemRelease( playlist_item_t *p_item )
      *
      * Who wants to add proper memory management? */
     uninstall_input_item_observer( p_item );
-    ARRAY_APPEND( p_item->p_playlist->items_to_delete, p_item);
+    ARRAY_APPEND( pl_priv(p_playlist)->items_to_delete, p_item);
     return VLC_SUCCESS;
 }
 
