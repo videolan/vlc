@@ -54,6 +54,13 @@ void vlc_thread_cancel (vlc_object_t *);
 void vlc_trace (const char *fn, const char *file, unsigned line);
 #define vlc_backtrace() vlc_trace(__func__, __FILE__, __LINE__)
 
+#if defined (LIBVLC_USE_PTHREAD) && !defined (NDEBUG)
+# define vlc_assert_locked( m ) \
+         assert (pthread_mutex_lock (m) == EDEADLK)
+#else
+# define vlc_assert_locked( m ) (void)m
+#endif
+
 /*
  * CPU capabilities
  */

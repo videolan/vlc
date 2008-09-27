@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include "aout_internal.h"
+#include "libvlc.h"
 
 /*
  * Instances management (internal and external)

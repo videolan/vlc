@@ -172,13 +172,6 @@ enum {
 
 #define vlc_thread_ready vlc_object_signal
 
-#if defined(LIBVLC_USE_PTHREAD)
-#   define vlc_assert_locked( m ) \
-           assert (pthread_mutex_lock (m) == EDEADLK)
-#else
-# define vlc_assert_locked( m ) (void)m
-#endif
-
 /**
  * Save the cancellation state and disable cancellation for the calling thread.
  * This function must be called before entering a piece of code that is not
