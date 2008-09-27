@@ -40,7 +40,7 @@ typedef struct input_clock_t input_clock_t;
  * This function creates a new input_clock_t.
  * You must use input_clock_Delete to delete it once unused.
  */
-input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate );
+input_clock_t *input_clock_New( int i_cr_average, int i_rate );
 /**
  * This function destroys a input_clock_t created by input_clock_New.
  */
@@ -59,22 +59,19 @@ void    input_clock_Update( input_clock_t *, vlc_object_t *p_log,
 void    input_clock_Reset( input_clock_t * );
 
 /**
- * This function converts a timestamp from stream clock to system clock.
- */
-mtime_t input_clock_GetTS( input_clock_t *, mtime_t i_pts_delay, mtime_t );
-/**
  * This functions will return a deadline used to control the reading speed.
  */
 mtime_t input_clock_GetWakeup( input_clock_t *cl );
+
 /**
  * This functions allows to change the actual reading speed.
  */
 void    input_clock_ChangeRate( input_clock_t *cl, int i_rate );
+
 /**
- * This function allows to change the master status of a clock.
- * FIXME it should probably be moved out of input_clock_t.
+ * This function converts a timestamp from stream clock to system clock.
  */
-void    input_clock_ChangeMaster( input_clock_t *cl, bool b_master );
+mtime_t input_clock_GetTS( input_clock_t *, mtime_t i_pts_delay, mtime_t );
 
 #endif
 

@@ -646,9 +646,6 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     p_pgrm->b_selected = true;
 
     /* Switch master stream */
-    if( p_sys->p_pgrm )
-        input_clock_ChangeMaster( p_sys->p_pgrm->p_clock, false );
-    input_clock_ChangeMaster( p_pgrm->p_clock, true );
     p_sys->p_pgrm = p_pgrm;
 
     /* Update "program" */
@@ -697,7 +694,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
     p_pgrm->p_epg = NULL;
-    p_pgrm->p_clock = input_clock_New( false, p_input->p->input.i_cr_average, p_sys->i_rate );
+    p_pgrm->p_clock = input_clock_New( p_input->p->input.i_cr_average, p_sys->i_rate );
     if( !p_pgrm->p_clock )
     {
         free( p_pgrm );

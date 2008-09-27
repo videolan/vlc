@@ -2,6 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2008 the VideoLAN team
+ * Copyright (C) 2008 Laurent Aimar
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -132,7 +133,6 @@ struct input_clock_t
     average_t drift;
 
     /* Current modifiers */
-    bool    b_master;
     int     i_rate;
 };
 
@@ -142,7 +142,7 @@ static mtime_t ClockSystemToStream( input_clock_t *, mtime_t i_system );
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
+input_clock_t *input_clock_New( int i_cr_average, int i_rate )
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
@@ -158,7 +158,6 @@ input_clock_t *input_clock_New( bool b_master, int i_cr_average, int i_rate )
     cl->i_next_drift_update = 0;
     AvgInit( &cl->drift, i_cr_average );
 
-    cl->b_master = b_master;
     cl->i_rate = i_rate;
 
     return cl;
@@ -183,7 +182,6 @@ void input_clock_Update( input_clock_t *cl,
                          vlc_object_t *p_log, bool b_can_pace_control,
                          mtime_t i_ck_stream, mtime_t i_ck_system )
 {
-    const bool b_synchronize = b_can_pace_control && cl->b_master;
     bool b_reset_reference = false;
 
     if( ( !cl->b_has_reference ) ||
@@ -217,7 +215,7 @@ void input_clock_Update( input_clock_t *cl,
                                       __MAX( cl->i_ts_max + CR_MEAN_PTS_GAP, i_ck_system ) );
     }
 
-    if( !b_synchronize && cl->i_next_drift_update < i_ck_system )
+    if( !b_can_pace_control && cl->i_next_drift_update < i_ck_system )
     {
         const mtime_t i_converted = ClockSystemToStream( cl, i_ck_system );
 
@@ -239,6 +237,31 @@ void input_clock_Reset( input_clock_t *cl )
 }
 
 /*****************************************************************************
+ * input_clock_ChangeRate:
+ *****************************************************************************/
+void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
+{
+    /* Move the reference point */
+    if( cl->b_has_reference )
+        cl->ref = cl->last;
+
+    cl->i_rate = i_rate;
+}
+
+/*****************************************************************************
+ * input_clock_GetWakeup
+ *****************************************************************************/
+mtime_t input_clock_GetWakeup( input_clock_t *cl )
+{
+    /* Not synchronized, we cannot wait */
+    if( !cl->b_has_reference )
+        return 0;
+
+    /* */
+    return ClockStreamToSystem( cl, cl->last.i_stream );
+}
+
+/*****************************************************************************
  * input_clock_GetTS: manages a PTS or DTS
  *****************************************************************************/
 mtime_t input_clock_GetTS( input_clock_t *cl,
@@ -255,43 +278,6 @@ mtime_t input_clock_GetTS( input_clock_t *cl,
         cl->i_ts_max = i_converted_ts;
 
     return i_converted_ts + i_pts_delay;
-}
-
-/*****************************************************************************
- * input_clock_ChangeRate:
- *****************************************************************************/
-void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
-{
-    /* Move the reference point */
-    if( cl->b_has_reference )
-        cl->ref = cl->last;
-
-    cl->i_rate = i_rate;
-}
-
-/*****************************************************************************
- * input_clock_ChangeMaster:
- *****************************************************************************/
-void input_clock_ChangeMaster( input_clock_t *cl, bool b_master )
-{
-    cl->b_master = b_master;
-}
-
-/*****************************************************************************
- * input_clock_GetWakeup
- *****************************************************************************/
-mtime_t input_clock_GetWakeup( input_clock_t *cl )
-{
-    /* Not synchronized, we cannot wait */
-    if( !cl->b_has_reference )
-        return 0;
-
-    /* We must not wait if we are not the master clock */
-    if( !cl->b_master  )
-        return 0;
-
-    /* */
-    return ClockStreamToSystem( cl, cl->last.i_stream );
 }
 
 /*****************************************************************************

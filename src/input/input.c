@@ -774,10 +774,7 @@ static void MainLoop( input_thread_t *p_input )
             {
                 mtime_t i_new_wakeup = input_EsOutGetWakeup( p_input->p->p_es_out );
                 if( !i_new_wakeup )
-                {
-                    msg_Err( p_input, "RESET" );
                     i_wakeup = 0;
-                }
             }
         } while( i_current < i_wakeup );
     }
