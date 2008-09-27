@@ -170,8 +170,8 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
             array_listeners_cached = malloc(sizeof(libvlc_event_listener_t)*(i_cached_listeners));
             if( !array_listeners_cached )
             {
-                printf( "Can't alloc memory in libvlc_event_send" );
-                break;
+                fprintf(stderr, "Can't alloc memory in libvlc_event_send" );
+                return;
             }
 
             listener_cached = array_listeners_cached;
