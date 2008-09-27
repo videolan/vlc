@@ -22,7 +22,7 @@
 function probe()
     return vlc.access == "http"
         and ( string.match( vlc.path, "^break.com" )
-           or string.match( vlc.path, "^www.break.com" )
+           or string.match( vlc.path, "^www.break.com" ) )
 end
 
 -- Parse function.
