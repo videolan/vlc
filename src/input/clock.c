@@ -34,6 +34,11 @@
 #include <vlc_input.h>
 #include "input_clock.h"
 
+/* TODO:
+ * - clean up locking once clock code is stable
+ *
+ */
+
 /*
  * DISCUSSION : SYNCHRONIZATION METHOD
  *
@@ -67,6 +72,7 @@
  * We use the following formula :
  * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
  */
+
 
 /*****************************************************************************
  * Constants
@@ -117,6 +123,9 @@ static inline clock_point_t clock_point_Create( mtime_t i_stream, mtime_t i_syst
 /* */
 struct input_clock_t
 {
+    /* */
+    vlc_mutex_t lock;
+
     /* Reference point */
     bool          b_has_reference;
     clock_point_t ref;
@@ -148,6 +157,7 @@ input_clock_t *input_clock_New( int i_cr_average, int i_rate )
     if( !cl )
         return NULL;
 
+    vlc_mutex_init( &cl->lock );
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( 0, 0 );
 
@@ -169,6 +179,7 @@ input_clock_t *input_clock_New( int i_cr_average, int i_rate )
 void input_clock_Delete( input_clock_t *cl )
 {
     AvgClean( &cl->drift );
+    vlc_mutex_destroy( &cl->lock );
     free( cl );
 }
 
@@ -184,6 +195,7 @@ void input_clock_Update( input_clock_t *cl,
 {
     bool b_reset_reference = false;
 
+    vlc_mutex_lock( &cl->lock );
     if( ( !cl->b_has_reference ) ||
         ( i_ck_stream == 0 && cl->last.i_stream != 0 ) )
     {
@@ -224,6 +236,8 @@ void input_clock_Update( input_clock_t *cl,
         cl->i_next_drift_update = i_ck_system + CLOCK_FREQ/5; /* FIXME why that */
     }
     cl->last = clock_point_Create( i_ck_stream, i_ck_system );
+
+    vlc_mutex_unlock( &cl->lock );
 }
 
 /*****************************************************************************
@@ -231,9 +245,13 @@ void input_clock_Update( input_clock_t *cl,
  *****************************************************************************/
 void input_clock_Reset( input_clock_t *cl )
 {
+    vlc_mutex_lock( &cl->lock );
+
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( 0, 0 );
     cl->i_ts_max = 0;
+
+    vlc_mutex_unlock( &cl->lock );
 }
 
 /*****************************************************************************
@@ -241,11 +259,15 @@ void input_clock_Reset( input_clock_t *cl )
  *****************************************************************************/
 void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
 {
+    vlc_mutex_lock( &cl->lock );
+
     /* Move the reference point */
     if( cl->b_has_reference )
         cl->ref = cl->last;
 
     cl->i_rate = i_rate;
+
+    vlc_mutex_unlock( &cl->lock );
 }
 
 /*****************************************************************************
@@ -253,12 +275,17 @@ void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
  *****************************************************************************/
 mtime_t input_clock_GetWakeup( input_clock_t *cl )
 {
-    /* Not synchronized, we cannot wait */
-    if( !cl->b_has_reference )
-        return 0;
+    mtime_t i_wakeup = 0;
 
-    /* */
-    return ClockStreamToSystem( cl, cl->last.i_stream );
+    vlc_mutex_lock( &cl->lock );
+
+    /* Synchronized, we can wait */
+    if( cl->b_has_reference )
+        i_wakeup = ClockStreamToSystem( cl, cl->last.i_stream );
+
+    vlc_mutex_unlock( &cl->lock );
+
+    return i_wakeup;
 }
 
 /*****************************************************************************
@@ -269,13 +296,20 @@ mtime_t input_clock_GetTS( input_clock_t *cl,
 {
     mtime_t i_converted_ts;
 
+    vlc_mutex_lock( &cl->lock );
+
     if( !cl->b_has_reference )
+    {
+        vlc_mutex_unlock( &cl->lock );
         return 0;
+    }
 
     /* */
     i_converted_ts = ClockStreamToSystem( cl, i_ts + AvgGet( &cl->drift ) );
     if( i_converted_ts > cl->i_ts_max )
         cl->i_ts_max = i_converted_ts;
+
+    vlc_mutex_unlock( &cl->lock );
 
     return i_converted_ts + i_pts_delay;
 }
