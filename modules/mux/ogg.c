@@ -872,6 +872,9 @@ static void OggSetDate( block_t *p_og, mtime_t i_dts, mtime_t i_length )
     {
         i_count++;
     }
+
+    if( i_count == 0 ) return; /* ignore. */
+
     i_delta = i_length / i_count;
 
     for( p_tmp = p_og; p_tmp != NULL; p_tmp = p_tmp->p_next )
