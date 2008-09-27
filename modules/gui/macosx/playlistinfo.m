@@ -573,8 +573,10 @@ error:
 
 - (void)refresh
 {
-    if( p_item ) vlc_gc_decref( p_item );
+    input_item_t * oldItem = p_item;
     p_item = [[[VLCMain sharedInstance] getInfo] item];
+    if( oldItem && oldItem != p_item ) vlc_gc_decref( oldItem );
+
     [o_children release];
     o_children = nil;
 }
