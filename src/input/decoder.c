@@ -44,12 +44,13 @@
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
 #include "input_internal.h"
+#include "input_decoder.h"
 
-static decoder_t * CreateDecoder( input_thread_t *, es_format_t *, int, sout_instance_t *p_sout );
-static void        DeleteDecoder( decoder_t * );
+static decoder_t *CreateDecoder( input_thread_t *, es_format_t *, int, sout_instance_t *p_sout );
+static void       DeleteDecoder( decoder_t * );
 
-static void*        DecoderThread( vlc_object_t * );
-static int         DecoderDecode( decoder_t * p_dec, block_t *p_block );
+static void      *DecoderThread( vlc_object_t * );
+static int        DecoderDecode( decoder_t * p_dec, block_t *p_block );
 
 /* Buffers allocation callbacks for the decoders */
 static aout_buffer_t *aout_new_buffer( decoder_t *, int );
@@ -1204,7 +1205,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
             if( p_vout && p_owner->p_spu_vout == p_vout )
             {
-                /* Prerool does not work very well with subtitle */
+                /* Preroll does not work very well with subtitle */
                 if( p_spu->i_start < p_owner->i_preroll_end &&
                     ( p_spu->i_stop <= 0 || p_spu->i_stop < p_owner->i_preroll_end ) )
                 {
@@ -1293,7 +1294,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         vout_thread_t *p_vout;
 
         p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-        if( p_vout )
+        if( p_vout && p_owner->p_spu_vout == p_vout )
         {
             spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR,
                          p_owner->i_spu_channel );
@@ -1568,10 +1569,12 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
 
     while( i_attempts-- )
     {
-        if( p_dec->b_die || p_dec->b_error ) break;
+        if( p_dec->b_die || p_dec->b_error )
+            break;
 
         p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-        if( p_vout ) break;
+        if( p_vout )
+            break;
 
         msleep( VOUT_DISPLAY_DELAY );
     }

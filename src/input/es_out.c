@@ -39,6 +39,7 @@
 #include <vlc_aout.h>
 
 #include "input_internal.h"
+#include "input_decoder.h"
 
 #include "../stream_output/stream_output.h"
 
