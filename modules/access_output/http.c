@@ -291,7 +291,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#ifdef HAVE_AVAHI_CLIENT
+#if 0 //def HAVE_AVAHI_CLIENT
     if( config_GetInt(p_this, SOUT_CFG_PREFIX "bonjour") )
     {
         char                *psz_txt, *psz_name;
