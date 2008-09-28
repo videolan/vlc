@@ -94,7 +94,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->b_reset_currently_playing = true;
     p_playlist->last_rebuild_date = 0;
 
-    p_playlist->b_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
+    pl_priv(p_playlist)->b_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
 
     p_playlist->b_doing_ml = false;
 
