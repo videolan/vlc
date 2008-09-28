@@ -146,6 +146,7 @@ struct intf_sys_t
 
 #define msg_rc( ... ) __msg_rc( p_intf, __VA_ARGS__ )
 
+LIBVLC_FORMAT(2, 3)
 static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {
     va_list args;
@@ -728,7 +729,7 @@ static void Run( intf_thread_t *p_intf )
             {
                 vlc_value_t time;
                 var_Get( p_input, "time", &time );
-                msg_rc( "%i", time.i_time / 1000000);
+                msg_rc( "%"PRIu64, time.i_time / 1000000);
             }
         }
         else if( !strcmp( psz_cmd, "get_length" ) )
@@ -741,14 +742,14 @@ static void Run( intf_thread_t *p_intf )
             {
                 vlc_value_t time;
                 var_Get( p_input, "length", &time );
-                msg_rc( "%i", time.i_time / 1000000);
+                msg_rc( "%"PRIu64, time.i_time / 1000000);
             }
         }
         else if( !strcmp( psz_cmd, "get_title" ) )
         {
             if( ! p_input )
             {
-                msg_rc("");
+                msg_rc("%s", "");
             }
             else
             {
