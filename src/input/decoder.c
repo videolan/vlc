@@ -153,7 +153,8 @@ mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    assert( p_owner->p_clock );
+    if( !p_owner->p_clock )
+        return i_ts;
     return input_clock_GetTS( p_owner->p_clock, p_owner->p_input->i_pts_delay, i_ts );
 }
 /* decoder_GetDisplayRate:
@@ -162,7 +163,8 @@ int decoder_GetDisplayRate( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    assert( p_owner->p_clock );
+    if( !p_owner->p_clock )
+        return INPUT_RATE_DEFAULT;
     return input_clock_GetRate( p_owner->p_clock );
 }
 
