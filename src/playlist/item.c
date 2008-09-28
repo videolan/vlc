@@ -632,7 +632,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
             DeleteFromInput( p_playlist, p_item_in_one->p_input->i_id,
                              p_playlist->p_root_onelevel, false );
         }
-        p_playlist->b_reset_currently_playing = true;
+        pl_priv(p_playlist)->b_reset_currently_playing = true;
         vlc_object_signal_unlocked( p_playlist );
         var_SetInteger( p_playlist, "item-change", p_item_in_category->
                                                         p_input->i_id );
@@ -769,7 +769,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     }
     else
         i_ret = TreeMove( p_playlist, p_item, p_node, i_newpos );
-    p_playlist->b_reset_currently_playing = true;
+    pl_priv(p_playlist)->b_reset_currently_playing = true;
     vlc_object_signal_unlocked( p_playlist );
     return i_ret;
 }
@@ -796,7 +796,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     p_add->i_item = i_item_id;
     p_add->i_node = i_node_id;
     val.p_address = p_add;
-    p_playlist->b_reset_currently_playing = true;
+    pl_priv(p_playlist)->b_reset_currently_playing = true;
     if( b_signal )
         vlc_object_signal_unlocked( p_playlist );
 
@@ -919,7 +919,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     {
         return playlist_NodeDelete( p_playlist, p_item, true, false );
     }
-    p_playlist->b_reset_currently_playing = true;
+    pl_priv(p_playlist)->b_reset_currently_playing = true;
     var_SetInteger( p_playlist, "item-deleted", i_id );
 
     /* Remove the item from the bank */

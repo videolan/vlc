@@ -170,7 +170,7 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
                                const char *psz_string )
 {
     PL_ASSERT_LOCKED;
-    p_playlist->b_reset_currently_playing = true;
+    pl_priv(p_playlist)->b_reset_currently_playing = true;
     playlist_LiveSearchUpdateInternal( p_playlist, p_root, psz_string );
     vlc_object_signal_unlocked( p_playlist );
     return VLC_SUCCESS;

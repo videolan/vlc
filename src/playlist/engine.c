@@ -45,7 +45,7 @@ static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     (void)psz_cmd; (void)oldval; (void)newval; (void)a;
 
-    ((playlist_t*)p_this)->b_reset_currently_playing = true;
+    pl_priv((playlist_t*)p_this)->b_reset_currently_playing = true;
     playlist_Signal( ((playlist_t*)p_this) );
     return VLC_SUCCESS;
 }
@@ -91,7 +91,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     ARRAY_INIT( p_playlist->current );
 
     p_playlist->i_current_index = 0;
-    p_playlist->b_reset_currently_playing = true;
+    pl_priv(p_playlist)->b_reset_currently_playing = true;
     pl_priv(p_playlist)->last_rebuild_date = 0;
 
     pl_priv(p_playlist)->b_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
@@ -362,7 +362,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
 
     PL_ASSERT_LOCKED;
 
-    if( p_playlist->b_reset_currently_playing &&
+    if( pl_priv(p_playlist)->b_reset_currently_playing &&
         mdate() - pl_priv(p_playlist)->last_rebuild_date > 30000 ) // 30 ms
     {
         ResetCurrentlyPlaying( p_playlist, var_GetBool( p_playlist, "random" ),

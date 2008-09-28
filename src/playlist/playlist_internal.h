@@ -107,6 +107,7 @@ typedef struct playlist_private_t
     bool     b_cant_sleep;
     mtime_t  gc_date;
     mtime_t  last_rebuild_date;
+    bool     b_reset_currently_playing; /** Reset current item array */
 
 } playlist_private_t;
 

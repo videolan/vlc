@@ -163,8 +163,6 @@ struct playlist_t
 
     playlist_item_array_t current; /**< Items currently being played */
     int                   i_current_index; /**< Index in current array */
-    /** Reset current item array */
-    bool            b_reset_currently_playing;
 
     int                   i_last_playlist_id; /**< Last id to an item */
 

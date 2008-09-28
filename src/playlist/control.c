@@ -118,7 +118,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         pl_priv(p_playlist)->request.p_node = p_node;
         pl_priv(p_playlist)->request.p_item = p_item;
         if( p_item && var_GetBool( p_playlist, "random" ) )
-            p_playlist->b_reset_currently_playing = true;
+            pl_priv(p_playlist)->b_reset_currently_playing = true;
         break;
 
     case PLAYLIST_PLAY:
@@ -325,7 +325,7 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist, bool b_random,
             ARRAY_VAL(p_playlist->current,j) = p_tmp;
         }
     }
-    p_playlist->b_reset_currently_playing = false;
+    pl_priv(p_playlist)->b_reset_currently_playing = false;
     stats_TimerStop( p_playlist, STATS_TIMER_PLAYLIST_BUILD );
 }
 
@@ -397,7 +397,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 
             set_current_status_node( p_playlist, pl_priv(p_playlist)->request.p_node );
             pl_priv(p_playlist)->request.p_node = NULL;
-            p_playlist->b_reset_currently_playing = true;
+            pl_priv(p_playlist)->b_reset_currently_playing = true;
         }
 
         /* If we are asked for a node, go to it's first child */
@@ -418,7 +418,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
             }
         }
 
-        if( p_playlist->b_reset_currently_playing )
+        if( pl_priv(p_playlist)->b_reset_currently_playing )
             /* A bit too bad to reset twice ... */
             ResetCurrentlyPlaying( p_playlist, b_random, p_new );
         else if( p_new )
@@ -469,7 +469,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
             get_current_status_item( p_playlist )->i_flags & PLAYLIST_SKIP_FLAG )
             return NULL;
 
-        if( p_playlist->b_reset_currently_playing )
+        if( pl_priv(p_playlist)->b_reset_currently_playing )
             ResetCurrentlyPlaying( p_playlist, b_random,
                                    get_current_status_item( p_playlist ) );
 
