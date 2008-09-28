@@ -177,8 +177,6 @@ struct playlist_t
     playlist_item_t *     p_local_onelevel; /** < "Playlist" in ONELEVEL view */
     playlist_item_t *     p_ml_onelevel; /** < "Library" in ONELEVEL view */
 
-    bool            b_auto_preparse;
-
     /* Runtime */
     int                   i_sort; /**< Last sorting applied to the playlist */
     int                   i_order; /**< Last ordering applied to the playlist */

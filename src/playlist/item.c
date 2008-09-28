@@ -863,7 +863,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
     /* Preparse if PREPARSE or SPREPARSE & not enough meta */
     char *psz_artist = input_item_GetArtist( p_item_cat->p_input );
     char *psz_album = input_item_GetAlbum( p_item_cat->p_input );
-    if( p_playlist->b_auto_preparse &&
+    if( pl_priv(p_playlist)->b_auto_preparse &&
           (i_mode & PLAYLIST_PREPARSE ||
           ( i_mode & PLAYLIST_SPREPARSE &&
             ( EMPTY_STR( psz_artist ) || ( EMPTY_STR( psz_album ) ) )

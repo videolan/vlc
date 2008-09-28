@@ -98,7 +98,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     pl_priv(p_playlist)->b_doing_ml = false;
 
-    p_playlist->b_auto_preparse =
+    pl_priv(p_playlist)->b_auto_preparse =
                         var_CreateGetBool( p_playlist, "auto-preparse" ) ;
 
     PL_LOCK; /* playlist_NodeCreate will check for it */
@@ -155,10 +155,10 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_order = ORDER_NORMAL;
 
 
-    b_save = p_playlist->b_auto_preparse;
-    p_playlist->b_auto_preparse = false;
+    b_save = pl_priv(p_playlist)->b_auto_preparse;
+    pl_priv(p_playlist)->b_auto_preparse = false;
     playlist_MLLoad( p_playlist );
-    p_playlist->b_auto_preparse = true;
+    pl_priv(p_playlist)->b_auto_preparse = true;
 
     vlc_object_set_destructor( p_playlist, playlist_Destructor );
 
