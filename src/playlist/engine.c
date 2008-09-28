@@ -151,10 +151,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->request.b_request = false;
     pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
 
-    p_playlist->i_sort = SORT_ID;
-    p_playlist->i_order = ORDER_NORMAL;
-
-
     b_save = pl_priv(p_playlist)->b_auto_preparse;
     pl_priv(p_playlist)->b_auto_preparse = false;
     playlist_MLLoad( p_playlist );

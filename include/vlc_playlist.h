@@ -176,10 +176,6 @@ struct playlist_t
     playlist_item_t *     p_ml_category; /** < "Library" in CATEGORY view */
     playlist_item_t *     p_local_onelevel; /** < "Playlist" in ONELEVEL view */
     playlist_item_t *     p_ml_onelevel; /** < "Library" in ONELEVEL view */
-
-    /* Runtime */
-    int                   i_sort; /**< Last sorting applied to the playlist */
-    int                   i_order; /**< Last ordering applied to the playlist */
 };
 
 /** Helper to add an item */
