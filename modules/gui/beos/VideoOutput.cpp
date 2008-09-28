@@ -1271,8 +1271,6 @@ int Init( vout_thread_t *p_vout )
     p_vout->output.i_chroma = colspace[p_vout->p_sys->p_window->colspace_index].chroma;
     p_vout->p_sys->i_index = 0;
 
-    p_vout->b_direct = 1;
-
     p_vout->output.i_rmask  = 0x00ff0000;
     p_vout->output.i_gmask  = 0x0000ff00;
     p_vout->output.i_bmask  = 0x000000ff;

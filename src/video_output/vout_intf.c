@@ -50,6 +50,7 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include "../libvlc.h"
+#include "vout_internal.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -257,10 +258,10 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-hide-timeout",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    p_vout->b_title_show = var_CreateGetBool( p_vout, "video-title-show" );
-    p_vout->i_title_timeout =
+    p_vout->p->b_title_show = var_CreateGetBool( p_vout, "video-title-show" );
+    p_vout->p->i_title_timeout =
         (mtime_t)var_CreateGetInteger( p_vout, "video-title-timeout" );
-    p_vout->i_title_position =
+    p_vout->p->i_title_position =
         var_CreateGetInteger( p_vout, "video-title-position" );
 
     var_AddCallback( p_vout, "video-title-show", TitleShowCallback, NULL );
@@ -352,14 +353,14 @@ void vout_IntfInit( vout_thread_t *p_vout )
         }
         if( !i_aspect_num || !i_aspect_den ) i_aspect_num = i_aspect_den = 1;
 
-        p_vout->i_par_num = i_aspect_num;
-        p_vout->i_par_den = i_aspect_den;
+        p_vout->p->i_par_num = i_aspect_num;
+        p_vout->p->i_par_den = i_aspect_den;
 
-        vlc_ureduce( &p_vout->i_par_num, &p_vout->i_par_den,
-                     p_vout->i_par_num, p_vout->i_par_den, 0 );
+        vlc_ureduce( &p_vout->p->i_par_num, &p_vout->p->i_par_den,
+                     p_vout->p->i_par_num, p_vout->p->i_par_den, 0 );
 
         msg_Dbg( p_vout, "overriding monitor pixel aspect-ratio: %i:%i",
-                 p_vout->i_par_num, p_vout->i_par_den );
+                 p_vout->p->i_par_num, p_vout->p->i_par_den );
         b_force_par = true;
     }
     free( val.psz_string );
@@ -877,7 +878,7 @@ int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
         return VLC_SUCCESS;
 
     case VOUT_SNAPSHOT:
-        p_vout->b_snapshot = true;
+        p_vout->p->b_snapshot = true;
         return VLC_SUCCESS;
 
     default:
@@ -1158,12 +1159,12 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
     p_vout->render.i_aspect = p_vout->fmt_in.i_aspect;
 
  aspect_end:
-    if( p_vout->i_par_num && p_vout->i_par_den )
+    if( p_vout->p->i_par_num && p_vout->p->i_par_den )
     {
-        p_vout->fmt_in.i_sar_num *= p_vout->i_par_den;
-        p_vout->fmt_in.i_sar_den *= p_vout->i_par_num;
+        p_vout->fmt_in.i_sar_num *= p_vout->p->i_par_den;
+        p_vout->fmt_in.i_sar_den *= p_vout->p->i_par_num;
         p_vout->fmt_in.i_aspect = p_vout->fmt_in.i_aspect *
-            p_vout->i_par_den / p_vout->i_par_num;
+            p_vout->p->i_par_den / p_vout->p->i_par_num;
         p_vout->render.i_aspect = p_vout->fmt_in.i_aspect;
     }
 
@@ -1231,7 +1232,7 @@ static int TitleShowCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->b_title_show = newval.b_bool;
+    p_vout->p->b_title_show = newval.b_bool;
     return VLC_SUCCESS;
 }
 
@@ -1240,7 +1241,7 @@ static int TitleTimeoutCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->i_title_timeout = (mtime_t) newval.i_int;
+    p_vout->p->i_title_timeout = (mtime_t) newval.i_int;
     return VLC_SUCCESS;
 }
 
@@ -1250,6 +1251,6 @@ static int TitlePositionCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->i_title_position = newval.i_int;
+    p_vout->p->i_title_position = newval.i_int;
     return VLC_SUCCESS;
 }

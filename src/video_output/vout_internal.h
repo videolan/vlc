@@ -30,6 +30,55 @@
 #ifndef _VOUT_INTERNAL_H
 #define _VOUT_INTERNAL_H 1
 
+struct vout_thread_sys_t
+{
+    /* */
+    vlc_mutex_t         vfilter_lock;         /**< video filter2 change lock */
+
+    /* */
+    uint32_t            render_time;           /**< last picture render time */
+    unsigned int        i_par_num;           /**< monitor pixel aspect-ratio */
+    unsigned int        i_par_den;           /**< monitor pixel aspect-ratio */
+
+    /* */
+    bool                b_direct;            /**< rendered are like direct ? */
+    filter_t           *p_chroma;
+
+    /**
+     * These numbers are not supposed to be accurate, but are a
+     * good indication of the thread status */
+    count_t       c_fps_samples;                         /**< picture counts */
+    mtime_t       p_fps_sample[VOUT_FPS_SAMPLES];     /**< FPS samples dates */
+
+#if 0
+    /* Statistics */
+    count_t         c_loops;
+    count_t         c_pictures, c_late_pictures;
+    mtime_t         display_jitter;    /**< average deviation from the PTS */
+    count_t         c_jitter_samples;  /**< number of samples used
+                                           for the calculation of the jitter  */
+#endif
+
+    /** delay created by internal caching */
+    int             i_pts_delay;
+
+    /* Filter chain */
+    char           *psz_filter_chain;
+    bool            b_filter_change;
+
+    /* Video filter2 chain */
+    filter_chain_t *p_vf2_chain;
+    char           *psz_vf2;
+
+    /* Misc */
+    bool            b_snapshot;     /**< take one snapshot on the next loop */
+
+    /* Show media title on videoutput */
+    bool            b_title_show;
+    mtime_t         i_title_timeout;
+    int             i_title_position;
+};
+
 /* DO NOT use vout_RenderPicture unless you are in src/video_ouput */
 picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
                                subpicture_t *, bool b_paused );

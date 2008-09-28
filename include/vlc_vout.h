@@ -470,6 +470,11 @@ VLC_EXPORT( int, __vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic
  */
 
 /**
+ * Video ouput thread private structure
+ */
+typedef struct vout_thread_sys_t vout_thread_sys_t;
+
+/**
  * Video output thread descriptor
  *
  * Any independent video output device, such as an X11 window or a GGI device,
@@ -484,7 +489,6 @@ struct vout_thread_t
     /**@{*/
     vlc_mutex_t         picture_lock;                 /**< picture heap lock */
     vlc_mutex_t         change_lock;                 /**< thread change lock */
-    vlc_mutex_t         vfilter_lock;         /**< video filter2 change lock */
     vout_sys_t *        p_sys;                     /**< system output method */
     /**@}*/
 
@@ -492,18 +496,11 @@ struct vout_thread_t
     /**@{*/
     uint16_t            i_changes;          /**< changes made to the thread.
                                                       \see \ref vout_changes */
-    float               f_gamma;                                  /**< gamma */
-    bool                b_grayscale;         /**< color or grayscale display */
-    bool                b_info;            /**< print additional information */
-    bool                b_interface;                   /**< render interface */
     bool                b_scale;                  /**< allow picture scaling */
     bool                b_fullscreen;         /**< toogle fullscreen display */
-    uint32_t            render_time;           /**< last picture render time */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
     unsigned int        i_alignment;          /**< video alignment in window */
-    unsigned int        i_par_num;           /**< monitor pixel aspect-ratio */
-    unsigned int        i_par_den;           /**< monitor pixel aspect-ratio */
 
     struct vout_window_t *p_window;   /**< window for embedded vout (if any) */
     /**@}*/
@@ -522,21 +519,11 @@ struct vout_thread_t
     int       ( *pf_control )    ( vout_thread_t *, int, va_list );
     /**@}*/
 
-    /** \name Statistics
-     * These numbers are not supposed to be accurate, but are a
-     * good indication of the thread status */
-    /**@{*/
-    count_t       c_fps_samples;                         /**< picture counts */
-    mtime_t       p_fps_sample[VOUT_FPS_SAMPLES];     /**< FPS samples dates */
-    /**@}*/
-
     /** \name Video heap and translation tables */
     /**@{*/
     int                 i_heap_size;                          /**< heap size */
     picture_heap_t      render;                       /**< rendered pictures */
     picture_heap_t      output;                          /**< direct buffers */
-    bool                b_direct;            /**< rendered are like direct ? */
-    filter_t           *p_chroma;                    /**< translation tables */
 
     video_format_t      fmt_render;      /* render format (from the decoder) */
     video_format_t      fmt_in;            /* input (modified render) format */
@@ -549,34 +536,11 @@ struct vout_thread_t
     /* Subpicture unit */
     spu_t          *p_spu;
 
-    /* Statistics */
-    count_t         c_loops;
-    count_t         c_pictures, c_late_pictures;
-    mtime_t         display_jitter;    /**< average deviation from the PTS */
-    count_t         c_jitter_samples;  /**< number of samples used
-                                           for the calculation of the
-                                           jitter  */
-    /** delay created by internal caching */
-    int             i_pts_delay;
-
-    /* Filter chain */
-    char           *psz_filter_chain;
-    bool            b_filter_change;
-
-    /* Video filter2 chain */
-    filter_chain_t *p_vf2_chain;
-    char           *psz_vf2;
-
-    /* Misc */
-    bool            b_snapshot;     /**< take one snapshot on the next loop */
-
     /* Video output configuration */
     config_chain_t *p_cfg;
 
-    /* Show media title on videoutput */
-    bool            b_title_show;
-    mtime_t         i_title_timeout;
-    int             i_title_position;
+    /* Private vout_thread data */
+    vout_thread_sys_t *p;
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures
@@ -591,14 +555,10 @@ struct vout_thread_t
  */
 /** b_info changed */
 #define VOUT_INFO_CHANGE        0x0001
-/** b_grayscale changed */
-#define VOUT_GRAYSCALE_CHANGE   0x0002
 /** b_interface changed */
 #define VOUT_INTF_CHANGE        0x0004
 /** b_scale changed */
 #define VOUT_SCALE_CHANGE       0x0008
-/** gamma changed */
-#define VOUT_GAMMA_CHANGE       0x0010
 /** b_cursor changed */
 #define VOUT_CURSOR_CHANGE      0x0020
 /** b_fullscreen changed */

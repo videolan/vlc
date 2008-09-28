@@ -378,12 +378,6 @@ static int QNXManage( vout_thread_t *p_vout )
                         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                         break;
 
-                    case Pk_c:
-                    case Pk_C:
-                        p_vout->b_grayscale = ! p_vout->b_grayscale;
-                        p_vout->i_changes |= VOUT_GRAYSCALE_CHANGE;
-                        break;
-
                     default:
                         break;
                     }

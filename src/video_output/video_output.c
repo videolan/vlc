@@ -160,7 +160,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
         /* We don't directly check for the "vout-filter" variable for obvious
          * performance reasons. */
-        if( p_vout->b_filter_change )
+        if( p_vout->p->b_filter_change )
         {
             var_Get( p_vout, "vout-filter", &val );
             psz_filter_chain = val.psz_string;
@@ -170,15 +170,15 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
                 free( psz_filter_chain );
                 psz_filter_chain = NULL;
             }
-            if( p_vout->psz_filter_chain && !*p_vout->psz_filter_chain )
+            if( p_vout->p->psz_filter_chain && !*p_vout->p->psz_filter_chain )
             {
-                free( p_vout->psz_filter_chain );
-                p_vout->psz_filter_chain = NULL;
+                free( p_vout->p->psz_filter_chain );
+                p_vout->p->psz_filter_chain = NULL;
             }
 
-            if( !psz_filter_chain && !p_vout->psz_filter_chain )
+            if( !psz_filter_chain && !p_vout->p->psz_filter_chain )
             {
-                p_vout->b_filter_change = false;
+                p_vout->p->b_filter_change = false;
             }
 
             free( psz_filter_chain );
@@ -187,7 +187,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         if( p_vout->fmt_render.i_chroma != p_fmt->i_chroma ||
             p_vout->fmt_render.i_width != p_fmt->i_width ||
             p_vout->fmt_render.i_height != p_fmt->i_height ||
-            p_vout->b_filter_change )
+            p_vout->p->b_filter_change )
         {
             vlc_mutex_unlock( &p_vout->change_lock );
 
@@ -254,7 +254,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
             /* Display title if we are not using the vout given to vout_Request.
              * XXX for now b_vout_provided is always true at this stage */
-            if( p_vout->b_title_show && !b_vout_provided )
+            if( p_vout->p->b_title_show && !b_vout_provided )
                 DisplayTitleOnOSD( p_vout );
         }
     }
@@ -306,6 +306,14 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( p_vout == NULL )
         return NULL;
 
+    /* */
+    p_vout->p = calloc( 1, sizeof(p_vout->p) );
+    if( !p_vout->p )
+    {
+        vlc_object_release( p_vout );
+        return NULL;
+    }
+
     /* Initialize pictures - translation tables and functions
      * will be initialized later in InitThread */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES + 1; i_index++)
@@ -351,24 +359,21 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* Initialize misc stuff */
     p_vout->i_changes    = 0;
-    p_vout->f_gamma      = 0;
-    p_vout->b_grayscale  = 0;
-    p_vout->b_info       = 0;
-    p_vout->b_interface  = 0;
     p_vout->b_scale      = 1;
     p_vout->b_fullscreen = 0;
     p_vout->i_alignment  = 0;
-    p_vout->render_time  = 10;
-    p_vout->c_fps_samples = 0;
-    p_vout->b_filter_change = 0;
+    p_vout->p->render_time  = 10;
+    p_vout->p->c_fps_samples = 0;
+    p_vout->p->b_filter_change = 0;
     p_vout->pf_control = NULL;
     p_vout->p_window = NULL;
-    p_vout->i_par_num = p_vout->i_par_den = 1;
+    p_vout->p->i_par_num =
+    p_vout->p->i_par_den = 1;
 
     /* Initialize locks */
     vlc_mutex_init( &p_vout->picture_lock );
     vlc_mutex_init( &p_vout->change_lock );
-    vlc_mutex_init( &p_vout->vfilter_lock );
+    vlc_mutex_init( &p_vout->p->vfilter_lock );
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
@@ -394,11 +399,11 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( p_parent->i_object_type != VLC_OBJECT_VOUT )
     {
         /* Look for the default filter configuration */
-        p_vout->psz_filter_chain =
+        p_vout->p->psz_filter_chain =
             var_CreateGetStringCommand( p_vout, "vout-filter" );
 
         /* Apply video filter2 objects on the first vout */
-        p_vout->psz_vf2 =
+        p_vout->p->psz_vf2 =
             var_CreateGetStringCommand( p_vout, "video-filter" );
     }
     else
@@ -407,25 +412,25 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         char *psz_tmp;
 
         /* Ugly hack to jump to our configuration chain */
-        p_vout->psz_filter_chain
-            = ((vout_thread_t *)p_parent)->psz_filter_chain;
-        p_vout->psz_filter_chain
-            = config_ChainCreate( &psz_tmp, &p_cfg, p_vout->psz_filter_chain );
+        p_vout->p->psz_filter_chain
+            = ((vout_thread_t *)p_parent)->p->psz_filter_chain;
+        p_vout->p->psz_filter_chain
+            = config_ChainCreate( &psz_tmp, &p_cfg, p_vout->p->psz_filter_chain );
         config_ChainDestroy( p_cfg );
         free( psz_tmp );
 
         /* Create a video filter2 var ... but don't inherit values */
         var_Create( p_vout, "video-filter",
                     VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-        p_vout->psz_vf2 = var_GetString( p_vout, "video-filter" );
+        p_vout->p->psz_vf2 = var_GetString( p_vout, "video-filter" );
     }
 
     var_AddCallback( p_vout, "video-filter", VideoFilter2Callback, NULL );
-    p_vout->p_vf2_chain = filter_chain_New( p_vout, "video filter2",
+    p_vout->p->p_vf2_chain = filter_chain_New( p_vout, "video filter2",
         false, video_filter_buffer_allocation_init, NULL, p_vout );
 
     /* Choose the video output module */
-    if( !p_vout->psz_filter_chain || !*p_vout->psz_filter_chain )
+    if( !p_vout->p->psz_filter_chain || !*p_vout->p->psz_filter_chain )
     {
         var_Create( p_vout, "vout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         var_Get( p_vout, "vout", &val );
@@ -433,8 +438,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
     else
     {
-        psz_parser = strdup( p_vout->psz_filter_chain );
-        p_vout->b_title_show = false;
+        psz_parser = strdup( p_vout->p->psz_filter_chain );
+        p_vout->p->b_title_show = false;
     }
 
     /* Create the vout thread */
@@ -443,8 +448,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     free( psz_tmp );
     p_vout->p_cfg = p_cfg;
     p_vout->p_module = module_need( p_vout,
-        ( p_vout->psz_filter_chain && *p_vout->psz_filter_chain ) ?
-        "video filter" : "video output", psz_name, p_vout->psz_filter_chain && *p_vout->psz_filter_chain );
+        ( p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain ) ?
+        "video filter" : "video output", psz_name, p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain );
     free( psz_name );
 
     if( p_vout->p_module == NULL )
@@ -493,12 +498,12 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
                                            VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input_thread )
     {
-        p_vout->i_pts_delay = p_input_thread->i_pts_delay;
+        p_vout->p->i_pts_delay = p_input_thread->i_pts_delay;
         vlc_object_release( p_input_thread );
     }
     else
     {
-        p_vout->i_pts_delay = DEFAULT_PTS_DELAY;
+        p_vout->p->i_pts_delay = DEFAULT_PTS_DELAY;
     }
 
     if( vlc_thread_create( p_vout, "video output", RunThread,
@@ -550,11 +555,13 @@ static void vout_Destructor( vlc_object_t * p_this )
     /* Destroy the locks */
     vlc_mutex_destroy( &p_vout->picture_lock );
     vlc_mutex_destroy( &p_vout->change_lock );
-    vlc_mutex_destroy( &p_vout->vfilter_lock );
+    vlc_mutex_destroy( &p_vout->p->vfilter_lock );
 
-    free( p_vout->psz_filter_chain );
+    free( p_vout->p->psz_filter_chain );
 
     config_ChainDestroy( p_vout->p_cfg );
+
+    free( p_vout->p );
 
 #ifndef __APPLE__
     vout_thread_t *p_another_vout;
@@ -706,7 +713,7 @@ static int InitThread( vout_thread_t *p_vout )
          * directly decode into them ! Map the first render buffers to
          * the first direct buffers, but keep the first direct buffer
          * for memcpy operations */
-        p_vout->b_direct = 1;
+        p_vout->p->b_direct = true;
 
         for( i = 1; i < VOUT_MAX_PICTURES; i++ )
         {
@@ -731,7 +738,7 @@ static int InitThread( vout_thread_t *p_vout )
         /* Rats... Something is wrong here, we could not find an output
          * plugin able to directly render what we decode. See if we can
          * find a chroma plugin to do the conversion */
-        p_vout->b_direct = 0;
+        p_vout->p->b_direct = false;
 
         if( ChromaCreate( p_vout ) )
         {
@@ -812,7 +819,7 @@ static void* RunThread( vlc_object_t *p_this )
 
     vlc_object_lock( p_vout );
 
-    if( p_vout->b_title_show )
+    if( p_vout->p->b_title_show )
         DisplayTitleOnOSD( p_vout );
 
     /*
@@ -898,12 +905,12 @@ static void* RunThread( vlc_object_t *p_this )
             }
 
             /* Compute FPS rate */
-            p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ]
+            p_vout->p->p_fps_sample[ p_vout->p->c_fps_samples++ % VOUT_FPS_SAMPLES ]
                 = display_date;
 
             if( !p_picture->b_force &&
                 p_picture != p_last_picture &&
-                display_date < current_date + p_vout->render_time &&
+                display_date < current_date + p_vout->p->render_time &&
                 b_drop_late )
             {
                 /* Picture is late: it will be destroyed and the thread
@@ -916,14 +923,14 @@ static void* RunThread( vlc_object_t *p_this )
             }
 
             if( display_date >
-                current_date + p_vout->i_pts_delay + VOUT_BOGUS_DELAY )
+                current_date + p_vout->p->i_pts_delay + VOUT_BOGUS_DELAY )
             {
                 /* Picture is waaay too early: it will be destroyed */
                 DropPicture( p_vout, p_picture );
                 i_lost++;
                 msg_Warn( p_vout, "vout warning: early picture skipped "
                           "(%"PRId64")", display_date - current_date
-                          - p_vout->i_pts_delay );
+                          - p_vout->p->i_pts_delay );
                 continue;
             }
 
@@ -949,7 +956,7 @@ static void* RunThread( vlc_object_t *p_this )
                 {
                     /* We set the display date to something high, otherwise
                      * we'll have lots of problems with late pictures */
-                    display_date = current_date + p_vout->render_time;
+                    display_date = current_date + p_vout->p->render_time;
                 }
             }
         }
@@ -959,14 +966,14 @@ static void* RunThread( vlc_object_t *p_this )
 
         p_filtered_picture = NULL;
         if( p_picture )
-            p_filtered_picture = filter_chain_VideoFilter( p_vout->p_vf2_chain,
+            p_filtered_picture = filter_chain_VideoFilter( p_vout->p->p_vf2_chain,
                                                            p_picture );
 
         /* FIXME it is a bit ugly that b_snapshot is not locked but I do not
          * know which lock to use (here and in the snapshot callback) */
-        const bool b_snapshot = p_vout->b_snapshot;
+        const bool b_snapshot = p_vout->p->b_snapshot;
         if( b_snapshot )
-            p_vout->b_snapshot = false;
+            p_vout->p->b_snapshot = false;
 
         /*
          * Check for subpictures to display
@@ -1010,14 +1017,14 @@ static void* RunThread( vlc_object_t *p_this )
         {
             mtime_t current_render_time = mdate() - current_date;
             /* if render time is very large we don't include it in the mean */
-            if( current_render_time < p_vout->render_time +
+            if( current_render_time < p_vout->p->render_time +
                 VOUT_DISPLAY_DELAY )
             {
                 /* Store render time using a sliding mean weighting to
                  * current value in a 3 to 1 ratio*/
-                p_vout->render_time *= 3;
-                p_vout->render_time += current_render_time;
-                p_vout->render_time >>= 2;
+                p_vout->p->render_time *= 3;
+                p_vout->p->render_time += current_render_time;
+                p_vout->p->render_time >>= 2;
             }
         }
 
@@ -1031,7 +1038,7 @@ static void* RunThread( vlc_object_t *p_this )
         {
             /* If there are filters in the chain, better give them the picture
              * in advance */
-            if( !p_vout->psz_filter_chain || !*p_vout->psz_filter_chain )
+            if( !p_vout->p->psz_filter_chain || !*p_vout->p->psz_filter_chain )
             {
                 mwait( display_date - VOUT_MWAIT_TOLERANCE );
             }
@@ -1096,7 +1103,7 @@ static void* RunThread( vlc_object_t *p_this )
 
             p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
-            assert( !p_vout->b_direct );
+            assert( !p_vout->p->b_direct );
 
             ChromaDestroy( p_vout );
 
@@ -1140,7 +1147,7 @@ static void* RunThread( vlc_object_t *p_this )
              * buffer!! */
             p_vout->i_changes &= ~VOUT_PICTURE_BUFFERS_CHANGE;
 
-            if( !p_vout->b_direct )
+            if( !p_vout->p->b_direct )
                 ChromaDestroy( p_vout );
 
             vlc_mutex_lock( &p_vout->picture_lock );
@@ -1160,23 +1167,23 @@ static void* RunThread( vlc_object_t *p_this )
         }
 
         /* Check for "video filter2" changes */
-        vlc_mutex_lock( &p_vout->vfilter_lock );
-        if( p_vout->psz_vf2 )
+        vlc_mutex_lock( &p_vout->p->vfilter_lock );
+        if( p_vout->p->psz_vf2 )
         {
             es_format_t fmt;
 
             es_format_Init( &fmt, VIDEO_ES, p_vout->fmt_render.i_chroma );
             fmt.video = p_vout->fmt_render;
-            filter_chain_Reset( p_vout->p_vf2_chain, &fmt, &fmt );
+            filter_chain_Reset( p_vout->p->p_vf2_chain, &fmt, &fmt );
 
-            if( filter_chain_AppendFromString( p_vout->p_vf2_chain,
-                                               p_vout->psz_vf2 ) < 0 )
+            if( filter_chain_AppendFromString( p_vout->p->p_vf2_chain,
+                                               p_vout->p->psz_vf2 ) < 0 )
                 msg_Err( p_vout, "Video filter chain creation failed" );
 
-            free( p_vout->psz_vf2 );
-            p_vout->psz_vf2 = NULL;
+            free( p_vout->p->psz_vf2 );
+            p_vout->p->psz_vf2 = NULL;
         }
-        vlc_mutex_unlock( &p_vout->vfilter_lock );
+        vlc_mutex_unlock( &p_vout->p->vfilter_lock );
     }
 
     /*
@@ -1220,7 +1227,7 @@ static void CleanThread( vout_thread_t *p_vout )
 {
     int     i_index;                                        /* index in heap */
 
-    if( !p_vout->b_direct )
+    if( !p_vout->p->b_direct )
         ChromaDestroy( p_vout );
 
     /* Destroy all remaining pictures */
@@ -1263,7 +1270,7 @@ static void EndThread( vout_thread_t *p_vout )
     spu_Destroy( p_vout->p_spu );
 
     /* Destroy the video filters2 */
-    filter_chain_Delete( p_vout->p_vf2_chain );
+    filter_chain_Delete( p_vout->p->p_vf2_chain );
 }
 
 /* Thread helpers */
@@ -1280,7 +1287,7 @@ static int ChromaCreate( vout_thread_t *p_vout )
     filter_t *p_chroma;
 
     /* Choose the best module */
-    p_chroma = p_vout->p_chroma =
+    p_chroma = p_vout->p->p_chroma =
         vlc_custom_create( p_vout, sizeof(filter_t), VLC_OBJECT_GENERIC,
                            typename );
 
@@ -1303,8 +1310,9 @@ static int ChromaCreate( vout_thread_t *p_vout )
                  p_chroma->fmt_out.video.i_width, p_chroma->fmt_out.video.i_height
                  );
 
-        vlc_object_release( p_vout->p_chroma );
-        p_vout->p_chroma = NULL;
+        vlc_object_release( p_vout->p->p_chroma );
+        p_vout->p->p_chroma = NULL;
+
         return VLC_EGENERIC;
     }
     p_chroma->pf_vout_buffer_new = ChromaGetPicture;
@@ -1313,14 +1321,14 @@ static int ChromaCreate( vout_thread_t *p_vout )
 
 static void ChromaDestroy( vout_thread_t *p_vout )
 {
-    assert( !p_vout->b_direct );
+    assert( !p_vout->p->b_direct );
 
-    if( !p_vout->p_chroma )
+    if( !p_vout->p->p_chroma )
         return;
 
-    module_unneed( p_vout->p_chroma, p_vout->p_chroma->p_module );
-    vlc_object_release( p_vout->p_chroma );
-    p_vout->p_chroma = NULL;
+    module_unneed( p_vout->p->p_chroma, p_vout->p->p_chroma->p_module );
+    vlc_object_release( p_vout->p->p_chroma );
+    p_vout->p->p_chroma = NULL;
 }
 
 static void DropPicture( vout_thread_t *p_vout, picture_t *p_picture )
@@ -1539,9 +1547,9 @@ static int VideoFilter2Callback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     (void)psz_cmd; (void)oldval; (void)p_data;
 
-    vlc_mutex_lock( &p_vout->vfilter_lock );
-    p_vout->psz_vf2 = strdup( newval.psz_string );
-    vlc_mutex_unlock( &p_vout->vfilter_lock );
+    vlc_mutex_lock( &p_vout->p->vfilter_lock );
+    p_vout->p->psz_vf2 = strdup( newval.psz_string );
+    vlc_mutex_unlock( &p_vout->p->vfilter_lock );
 
     return VLC_SUCCESS;
 }
@@ -1558,7 +1566,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
     if( p_input )
     {
         i_now = mdate();
-        i_stop = i_now + (mtime_t)(p_vout->i_title_timeout * 1000);
+        i_stop = i_now + (mtime_t)(p_vout->p->i_title_timeout * 1000);
         char *psz_nowplaying =
             input_item_GetNowPlaying( input_GetItem( p_input ) );
         char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
@@ -1572,7 +1580,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                    psz_nowplaying, NULL,
-                                   p_vout->i_title_position,
+                                   p_vout->p->i_title_position,
                                    30 + p_vout->fmt_in.i_width
                                       - p_vout->fmt_in.i_visible_width
                                       - p_vout->fmt_in.i_x_offset,
@@ -1586,7 +1594,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
             {
                 vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                        psz_string, NULL,
-                                       p_vout->i_title_position,
+                                       p_vout->p->i_title_position,
                                        30 + p_vout->fmt_in.i_width
                                           - p_vout->fmt_in.i_visible_width
                                           - p_vout->fmt_in.i_x_offset,
@@ -1599,7 +1607,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                    psz_name, NULL,
-                                   p_vout->i_title_position,
+                                   p_vout->p->i_title_position,
                                    30 + p_vout->fmt_in.i_width
                                       - p_vout->fmt_in.i_visible_width
                                       - p_vout->fmt_in.i_x_offset,

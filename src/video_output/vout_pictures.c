@@ -35,6 +35,7 @@
 #include <vlc_osd.h>
 #include <vlc_filter.h>
 #include "vout_pictures.h"
+#include "vout_internal.h"
 
 #include <assert.h>
 
@@ -357,7 +358,7 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
     /* Not a direct buffer. We either need to copy it to a direct buffer,
      * or render it if the chroma isn't the same. */
-    if( p_vout->b_direct )
+    if( p_vout->p->b_direct )
     {
         /* Picture is not in a direct buffer, but is exactly the
          * same size as the direct buffers. A memcpy() is enough,
@@ -401,8 +402,8 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         }
 
         /* Convert image to the first direct buffer */
-        p_vout->p_chroma->p_owner = (filter_owner_sys_t *)p_tmp_pic;
-        p_vout->p_chroma->pf_video_filter( p_vout->p_chroma, p_pic );
+        p_vout->p->p_chroma->p_owner = (filter_owner_sys_t *)p_tmp_pic;
+        p_vout->p->p_chroma->pf_video_filter( p_vout->p->p_chroma, p_pic );
 
         /* Render subpictures on the first direct buffer */
         spu_RenderSubpictures( p_vout->p_spu,
@@ -420,8 +421,8 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
             return NULL;
 
         /* Convert image to the first direct buffer */
-        p_vout->p_chroma->p_owner = (filter_owner_sys_t *)&p_vout->p_picture[0];
-        p_vout->p_chroma->pf_video_filter( p_vout->p_chroma, p_pic );
+        p_vout->p->p_chroma->p_owner = (filter_owner_sys_t *)&p_vout->p_picture[0];
+        p_vout->p->p_chroma->pf_video_filter( p_vout->p->p_chroma, p_pic );
 
         /* Render subpictures on the first direct buffer */
         spu_RenderSubpictures( p_vout->p_spu,
