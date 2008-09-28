@@ -146,7 +146,6 @@ __vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
  */
 extern module_bank_t *p_module_bank;
 
-vlc_object_t *vlc_global (void);
 extern char *psz_vlcpath;
 
 /**

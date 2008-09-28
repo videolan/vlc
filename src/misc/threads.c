@@ -59,12 +59,6 @@ static vlc_threadvar_t cancel_key;
  */
 static vlc_object_t *p_root;
 
-vlc_object_t *vlc_global( void )
-{
-    assert( i_initializations > 0 );
-    return p_root;
-}
-
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
 #endif
@@ -1109,4 +1103,22 @@ void vlc_control_cancel (int cmd, ...)
     }
     va_end (ap);
 #endif
+}
+
+
+#undef var_AcquireMutex
+/**
+ * Finds a process-wide mutex, creates it if needed, and locks it.
+ * Unlock with vlc_mutex_unlock().
+ */
+vlc_mutex_t *var_AcquireMutex( const char *name )
+{
+    vlc_value_t val;
+
+    if( var_Create( p_root, name, VLC_VAR_MUTEX ) )
+        return NULL;
+
+    var_Get( p_root, name, &val );
+    vlc_mutex_lock( val.p_address );
+    return val.p_address;
 }

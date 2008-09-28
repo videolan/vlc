@@ -369,7 +369,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 void system_End( libvlc_int_t *p_this )
 {
     HWND ipcwindow;
-    if( p_this && vlc_global() )
+    if( p_this )
     {
         free( psz_vlcpath );
         psz_vlcpath = NULL;
