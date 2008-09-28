@@ -151,15 +151,9 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     if( p_this == NULL )
     {
-        if( i_type == VLC_OBJECT_LIBVLC )
-        {
-            libvlc_int_t *self = (libvlc_int_t*)p_new;
-            p_new->p_libvlc = self;
-            vlc_mutex_init (&(libvlc_priv (self)->structure_lock));
-        }
-        else /* TODO: get rid of the dummy root object */
-            p_new->p_libvlc = NULL;
-
+        libvlc_int_t *self = (libvlc_int_t*)p_new;
+        p_new->p_libvlc = self;
+        vlc_mutex_init (&(libvlc_priv (self)->structure_lock));
         p_this = p_priv->next = p_priv->prev = p_new;
     }
     else
@@ -183,13 +177,11 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
     p_priv->next = p_this;
-    if (p_new->p_libvlc)
-        libvlc_lock (p_new->p_libvlc);
+    libvlc_lock (p_new->p_libvlc);
     p_priv->prev = vlc_internals (p_this)->prev;
     vlc_internals (p_this)->prev = p_new;
     vlc_internals (p_priv->prev)->next = p_new;
-    if (p_new->p_libvlc)
-        libvlc_unlock (p_new->p_libvlc);
+    libvlc_unlock (p_new->p_libvlc);
 
     if( i_type == VLC_OBJECT_LIBVLC )
     {
@@ -653,11 +645,6 @@ void __vlc_object_release( vlc_object_t *p_this )
     }
     vlc_spin_unlock( &internals->ref_spin );
 
-    if (p_this->p_libvlc == NULL) /* the legacy root object */
-    {
-        b_should_destroy = !--internals->i_refcount;
-        goto notree;
-    }
     /* Slow path */
     /* Remember that we cannot hold the spin while waiting on the mutex */
     libvlc_lock (p_this->p_libvlc);
@@ -706,7 +693,7 @@ void __vlc_object_release( vlc_object_t *p_this )
             vlc_object_detach_unlocked (p_this);
     }
     libvlc_unlock (p_this->p_libvlc);
-notree:
+
     if( b_should_destroy )
     {
         int canc;
