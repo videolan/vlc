@@ -770,7 +770,6 @@ next:
                                         i_column_sorting( i_flag ),
                                         order == Qt::AscendingOrder ?
                                             ORDER_NORMAL : ORDER_REVERSE );
-            p_playlist->b_reset_currently_playing = true;
         }
     }
     PL_UNLOCK;
