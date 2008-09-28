@@ -106,6 +106,8 @@ typedef struct playlist_private_t
     bool     b_auto_preparse;
     bool     b_cant_sleep;
     mtime_t  gc_date;
+    mtime_t  last_rebuild_date;
+
 } playlist_private_t;
 
 #define pl_priv( pl ) ((playlist_private_t *)(pl))

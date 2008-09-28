@@ -165,7 +165,6 @@ struct playlist_t
     int                   i_current_index; /**< Index in current array */
     /** Reset current item array */
     bool            b_reset_currently_playing;
-    mtime_t               last_rebuild_date;
 
     int                   i_last_playlist_id; /**< Last id to an item */
 

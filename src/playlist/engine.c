@@ -92,7 +92,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     p_playlist->i_current_index = 0;
     p_playlist->b_reset_currently_playing = true;
-    p_playlist->last_rebuild_date = 0;
+    pl_priv(p_playlist)->last_rebuild_date = 0;
 
     pl_priv(p_playlist)->b_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
 
@@ -363,11 +363,11 @@ void playlist_MainLoop( playlist_t *p_playlist )
     PL_ASSERT_LOCKED;
 
     if( p_playlist->b_reset_currently_playing &&
-        mdate() - p_playlist->last_rebuild_date > 30000 ) // 30 ms
+        mdate() - pl_priv(p_playlist)->last_rebuild_date > 30000 ) // 30 ms
     {
         ResetCurrentlyPlaying( p_playlist, var_GetBool( p_playlist, "random" ),
                                get_current_status_item( p_playlist ) );
-        p_playlist->last_rebuild_date = mdate();
+        pl_priv(p_playlist)->last_rebuild_date = mdate();
     }
 
 check_input:
