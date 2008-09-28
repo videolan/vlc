@@ -39,11 +39,6 @@
 #endif
 #include <signal.h>
 
-#define VLC_THREADS_UNINITIALIZED  0
-#define VLC_THREADS_PENDING        1
-#define VLC_THREADS_ERROR          2
-#define VLC_THREADS_READY          3
-
 /*****************************************************************************
  * Global mutex for lazy initialization of the threads system
  *****************************************************************************/
