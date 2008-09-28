@@ -168,7 +168,7 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     p_item->p_input = p_input;
     vlc_gc_incref( p_item->p_input );
 
-    p_item->i_id = ++p_playlist->i_last_playlist_id;
+    p_item->i_id = ++pl_priv(p_playlist)->i_last_playlist_id;
 
     p_item->p_parent = NULL;
     p_item->i_children = -1;

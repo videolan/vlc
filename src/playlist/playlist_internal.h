@@ -108,6 +108,7 @@ typedef struct playlist_private_t
     mtime_t  gc_date;
     mtime_t  last_rebuild_date;
     bool     b_reset_currently_playing; /** Reset current item array */
+    int      i_last_playlist_id; /**< Last id to an item */
 
 } playlist_private_t;
 

@@ -164,8 +164,6 @@ struct playlist_t
     playlist_item_array_t current; /**< Items currently being played */
     int                   i_current_index; /**< Index in current array */
 
-    int                   i_last_playlist_id; /**< Last id to an item */
-
     /* Predefined items */
     playlist_item_t *     p_root_category; /**< Root of category tree */
     playlist_item_t *     p_root_onelevel; /**< Root of onelevel tree */

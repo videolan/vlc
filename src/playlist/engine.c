@@ -79,7 +79,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     VariablesInit( p_playlist );
 
     /* Initialise data structures */
-    p_playlist->i_last_playlist_id = 0;
+    pl_priv(p_playlist)->i_last_playlist_id = 0;
     pl_priv(p_playlist)->p_input = NULL;
 
     pl_priv(p_playlist)->gc_date = 0;
