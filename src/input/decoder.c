@@ -964,7 +964,7 @@ static void DecoderOptimizePtsDelay( decoder_t *p_dec )
         return;
 
     /* Try to find if we can reduce the pts
-     * This first draft is way to simple, and we can't say if the
+     * This first draft is way too simple, and we can't say if the
      * algo will converge. It's also full of constants.
      * But this simple algo allows to reduce the latency
      * to the minimum.
