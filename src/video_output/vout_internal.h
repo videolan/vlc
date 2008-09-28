@@ -59,6 +59,10 @@ struct vout_thread_sys_t
                                            for the calculation of the jitter  */
 #endif
 
+    /* Pause */
+    bool            b_paused;
+    mtime_t         i_pause_date;
+
     /** delay created by internal caching */
     int             i_pts_delay;
 
@@ -85,6 +89,12 @@ picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
 
 /* DO NOT use vout_CountPictureAvailable unless your are in src/input/decoder.c (no exception) */
 int vout_CountPictureAvailable( vout_thread_t * );
+
+/**
+ * This function will (un)pause the display of pictures.
+ * It is thread safe
+ */
+void vout_ChangePause( vout_thread_t *, bool b_paused, mtime_t i_date );
 
 #endif
 

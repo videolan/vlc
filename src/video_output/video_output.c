@@ -307,7 +307,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         return NULL;
 
     /* */
-    p_vout->p = calloc( 1, sizeof(p_vout->p) );
+    p_vout->p = calloc( 1, sizeof(*p_vout->p) );
     if( !p_vout->p )
     {
         vlc_object_release( p_vout );
@@ -365,6 +365,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->render_time  = 10;
     p_vout->p->c_fps_samples = 0;
     p_vout->p->b_filter_change = 0;
+    p_vout->p->b_paused = false;
+    p_vout->p->i_pause_date = 0;
     p_vout->pf_control = NULL;
     p_vout->p_window = NULL;
     p_vout->p->i_par_num =
@@ -578,6 +580,31 @@ static void vout_Destructor( vlc_object_t * p_this )
     else
         vlc_object_release( p_another_vout );
 #endif
+}
+
+/* */
+void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
+{
+    vlc_object_lock( p_vout );
+
+    assert( (!p_vout->p->b_paused) != (!b_paused) );
+    if( p_vout->p->b_paused )
+    {
+        const mtime_t i_duration = i_date - p_vout->p->i_pause_date;
+
+        for( int i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
+        {
+            picture_t *p_pic = PP_RENDERPICTURE[i_index];
+
+            if( p_pic->i_status == READY_PICTURE )
+                p_pic->date += i_duration;
+        }
+        // TODO spu
+    }
+    p_vout->p->b_paused = b_paused;
+    p_vout->p->i_pause_date = i_date;
+
+    vlc_object_unlock( p_vout );
 }
 
 /*****************************************************************************
@@ -876,12 +903,14 @@ static void* RunThread( vlc_object_t *p_this )
                 display_date = p_picture->date;
             }
         }
+        if( p_vout->p->b_paused && p_last_picture != NULL )
+            p_picture = p_last_picture;
 
         if( p_picture )
         {
             /* If we met the last picture, parse again to see whether there is
              * a more appropriate one. */
-            if( p_picture == p_last_picture )
+            if( p_picture == p_last_picture && !p_vout->p->b_paused )
             {
                 for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
                 {
