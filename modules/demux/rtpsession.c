@@ -192,6 +192,10 @@ rtp_source_destroy (demux_t *demux, const rtp_session_t *session,
     free (source);
 }
 
+static inline uint8_t rtp_ptype (const block_t *block)
+{
+    return block->p_buffer[1] & 0x7F;
+}
 
 static inline uint16_t rtp_seq (const block_t *block)
 {
@@ -203,6 +207,24 @@ static inline uint32_t rtp_timestamp (const block_t *block)
 {
     assert (block->i_buffer >= 12);
     return GetDWBE (block->p_buffer + 4);
+}
+
+static const struct rtp_pt_t *
+rtp_find_ptype (const rtp_session_t *session, rtp_source_t *source,
+                const block_t *block, void **pt_data)
+{
+    uint8_t ptype = rtp_ptype (block);
+
+    for (unsigned i = 0; i < session->ptc; i++)
+    {
+        if (session->ptv[i].number == ptype)
+        {
+            if (pt_data != NULL)
+                *pt_data = source->opaque[i];
+            return &session->ptv[i];
+        }
+    }
+    return NULL;
 }
 
 /**
@@ -278,17 +300,22 @@ rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
         tab[session->srcc++] = src;
         /* Cannot compute jitter yet */
     }
-    else if (session->ptc > 0)
+    else
     {
-        /* Recompute jitter estimate. That is computed from the RTP timestamps
-         * and the system clock. It is independent of RTP sequence. */
-        /* FIXME: payload types have the same frequency? */
-        uint32_t freq = session->ptv[0].frequency;
-        uint32_t ts = rtp_timestamp (block);
-        int64_t d = ((now - src->last_rx) * freq) / CLOCK_FREQ;
-        d        -=    ts - src->last_ts;
-        if (d < 0) d = -d;
-        src->jitter += ((d - src->jitter) + 8) >> 4;
+        const rtp_pt_t *pt = rtp_find_ptype (session, src, block, NULL);
+
+        if (pt != NULL)
+        {
+            /* Recompute jitter estimate.
+             * That is computed from the RTP timestamps and the system clock.
+             * It is independent of RTP sequence. */
+            uint32_t freq = pt->frequency;
+            uint32_t ts = rtp_timestamp (block);
+            int64_t d = ((now - src->last_rx) * freq) / CLOCK_FREQ;
+            d        -=    ts - src->last_ts;
+            if (d < 0) d = -d;
+            src->jitter += ((d - src->jitter) + 8) >> 4;
+        }
     }
     src->last_rx = now;
     src->last_ts = rtp_timestamp (block);
@@ -367,23 +394,12 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     src->last_seq = rtp_seq (block);
 
     /* Match the payload type */
-    const rtp_pt_t *pt = NULL;
-    void *pt_data = NULL;
-    const uint8_t   ptype = block->p_buffer[1] & 0x7F;
-
-    for (unsigned i = 0; i < session->ptc; i++)
-    {
-        if (session->ptv[i].number == ptype)
-        {
-            pt = &session->ptv[i];
-            pt_data = src->opaque[i];
-            break;
-        }
-    }
-
+    void *pt_data;
+    const rtp_pt_t *pt = rtp_find_ptype (session, src, block, &pt_data);
     if (pt == NULL)
     {
-        msg_Dbg (demux, "ignoring unknown payload (%"PRIu8")", ptype);
+        msg_Dbg (demux, "ignoring unknown payload (%"PRIu8")",
+                 rtp_ptype (block));
         goto drop;
     }
 
