@@ -143,6 +143,8 @@ struct input_clock_t
 
     /* Current modifiers */
     int     i_rate;
+    bool    b_paused;
+    mtime_t i_pause_date;
 };
 
 static mtime_t ClockStreamToSystem( input_clock_t *, mtime_t i_stream );
@@ -169,6 +171,8 @@ input_clock_t *input_clock_New( int i_cr_average, int i_rate )
     AvgInit( &cl->drift, i_cr_average );
 
     cl->i_rate = i_rate;
+    cl->b_paused = false;
+    cl->i_pause_date = 0;
 
     return cl;
 }
@@ -196,6 +200,9 @@ void input_clock_Update( input_clock_t *cl,
     bool b_reset_reference = false;
 
     vlc_mutex_lock( &cl->lock );
+
+    assert( !cl->b_paused );
+
     if( ( !cl->b_has_reference ) ||
         ( i_ck_stream == 0 && cl->last.i_stream != 0 ) )
     {
@@ -266,6 +273,30 @@ void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
         cl->ref = cl->last;
 
     cl->i_rate = i_rate;
+
+    vlc_mutex_unlock( &cl->lock );
+}
+
+/*****************************************************************************
+ * input_clock_ChangePause:
+ *****************************************************************************/
+void input_clock_ChangePause( input_clock_t *cl, bool b_paused, mtime_t i_date )
+{
+    vlc_mutex_lock( &cl->lock );
+    assert( (!cl->b_paused) != (!b_paused) );
+
+    if( cl->b_paused )
+    {
+        const mtime_t i_duration = i_date - cl->i_pause_date;
+
+        if( cl->b_has_reference && i_duration > 0 )
+        {
+            cl->ref.i_system += i_duration;
+            cl->last.i_system += i_duration;
+        }
+    }
+    cl->i_pause_date = i_date;
+    cl->b_paused = b_paused;
 
     vlc_mutex_unlock( &cl->lock );
 }

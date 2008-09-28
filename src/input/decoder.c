@@ -99,9 +99,16 @@ struct decoder_owner_sys_t
     /* fifo */
     block_fifo_t *p_fifo;
 
+    /* Lock for communication with decoder thread */
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+
+    /* */
+    bool b_paused;
+    mtime_t i_pause_date;
+
     /* CC */
     bool b_cc_supported;
-    vlc_mutex_t lock_cc;
     bool pb_cc_present[4];
     decoder_t *pp_cc[4];
 };
@@ -252,10 +259,21 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
  */
 void input_DecoderDelete( decoder_t *p_dec )
 {
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
     vlc_object_kill( p_dec );
 
-    if( p_dec->p_owner->b_own_thread )
+    if( p_owner->b_own_thread )
     {
+        /* Make sure we aren't paused anymore */
+        vlc_mutex_lock( &p_owner->lock );
+        if( p_owner->b_paused )
+        {
+            p_owner->b_paused = false;
+            vlc_cond_signal( &p_owner->wait );
+        }
+        vlc_mutex_unlock( &p_owner->lock );
+
         /* Make sure the thread leaves the function by
          * sending it an empty block. */
         block_t *p_block = block_New( p_dec, 0 );
@@ -372,10 +390,10 @@ void input_DecoderIsCcPresent( decoder_t *p_dec, bool pb_present[4] )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     int i;
 
-    vlc_mutex_lock( &p_owner->lock_cc );
+    vlc_mutex_lock( &p_owner->lock );
     for( i = 0; i < 4; i++ )
         pb_present[i] =  p_owner->pb_cc_present[i];
-    vlc_mutex_unlock( &p_owner->lock_cc );
+    vlc_mutex_unlock( &p_owner->lock );
 }
 int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
 {
@@ -415,18 +433,18 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         }
         p_cc->p_owner->p_clock = p_owner->p_clock;
 
-        vlc_mutex_lock( &p_owner->lock_cc );
+        vlc_mutex_lock( &p_owner->lock );
         p_owner->pp_cc[i_channel] = p_cc;
-        vlc_mutex_unlock( &p_owner->lock_cc );
+        vlc_mutex_unlock( &p_owner->lock );
     }
     else
     {
         decoder_t *p_cc;
 
-        vlc_mutex_lock( &p_owner->lock_cc );
+        vlc_mutex_lock( &p_owner->lock );
         p_cc = p_owner->pp_cc[i_channel];
         p_owner->pp_cc[i_channel] = NULL;
-        vlc_mutex_unlock( &p_owner->lock_cc );
+        vlc_mutex_unlock( &p_owner->lock );
 
         if( p_cc )
         {
@@ -446,12 +464,26 @@ int input_DecoderGetCcState( decoder_t *p_dec, bool *pb_decode, int i_channel )
     if( i_channel < 0 || i_channel >= 4 || !p_owner->pb_cc_present[i_channel] )
         return VLC_EGENERIC;
 
-    vlc_mutex_lock( &p_owner->lock_cc );
+    vlc_mutex_lock( &p_owner->lock );
     *pb_decode = p_owner->pp_cc[i_channel] != NULL;
-    vlc_mutex_unlock( &p_owner->lock_cc );
+    vlc_mutex_unlock( &p_owner->lock );
     return VLC_EGENERIC;
 }
 
+void input_DecoderChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    /* TODO FIXME we may loose small pause here ! */
+    vlc_mutex_lock( &p_owner->lock );
+
+    assert( (!p_owner->b_paused) != (!b_paused) );
+    p_owner->b_paused = b_paused;
+    p_owner->i_pause_date = i_date;
+    vlc_cond_signal( &p_owner->wait );
+
+    vlc_mutex_unlock( &p_owner->lock );
+}
 /**
  * Create a decoder object
  *
@@ -586,7 +618,10 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
             p_owner->b_cc_supported = true;
     }
 
-    vlc_mutex_init( &p_owner->lock_cc );
+    vlc_mutex_init( &p_owner->lock );
+    vlc_cond_init( &p_owner->wait );
+    p_owner->b_paused = false;
+    p_owner->i_pause_date = 0;
     for( i = 0; i < 4; i++ )
     {
         p_owner->pb_cc_present[i] = false;
@@ -609,8 +644,24 @@ static void* DecoderThread( vlc_object_t *p_this )
     int canc = vlc_savecancel();
 
     /* The decoder's main loop */
-    while( !p_dec->b_die && !p_dec->b_error )
+    while( vlc_object_alive( p_dec ) && !p_dec->b_error )
     {
+        /* Handle pause
+         * TODO move it to just after the decode stage */
+        vlc_mutex_lock( &p_owner->lock );
+        if( p_owner->b_paused )
+        {
+            /* TODO pause vout/aout */
+
+            /* */
+            while( p_owner->b_paused )
+                vlc_cond_wait( &p_owner->wait, &p_owner->lock );
+
+            /* TODO unpause vout/aout */
+        }
+
+        vlc_mutex_unlock( &p_owner->lock );
+
         if( ( p_block = block_FifoGet( p_owner->p_fifo ) ) == NULL )
         {
             p_dec->b_error = 1;
@@ -622,7 +673,7 @@ static void* DecoderThread( vlc_object_t *p_this )
         }
     }
 
-    while( !p_dec->b_die )
+    while( vlc_object_alive( p_dec ) )
     {
         /* Trash all received PES packets */
         p_block = block_FifoGet( p_owner->p_fifo );
@@ -794,7 +845,7 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
     if( !p_cc )
         return;
 
-    vlc_mutex_lock( &p_owner->lock_cc );
+    vlc_mutex_lock( &p_owner->lock );
     for( i = 0, i_cc_decoder = 0; i < 4; i++ )
     {
         p_owner->pb_cc_present[i] |= pb_present[i];
@@ -813,7 +864,7 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
             DecoderDecode( p_owner->pp_cc[i], p_cc );
         i_cc_decoder--;
     }
-    vlc_mutex_unlock( &p_owner->lock_cc );
+    vlc_mutex_unlock( &p_owner->lock );
 }
 static void VoutDisplayedPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
@@ -1316,7 +1367,8 @@ static void DeleteDecoder( decoder_t * p_dec )
         vlc_object_release( p_owner->p_packetizer );
     }
 
-    vlc_mutex_destroy( &p_owner->lock_cc );
+    vlc_cond_destroy( &p_owner->wait );
+    vlc_mutex_destroy( &p_owner->lock );
 
     vlc_object_detach( p_dec );
 

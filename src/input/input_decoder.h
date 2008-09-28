@@ -35,30 +35,38 @@
 #define BLOCK_FLAG_CORE_FLUSH (1 <<BLOCK_FLAG_CORE_PRIVATE_SHIFT)
 
 /**
- * This functions warn the decoder about a discontinuity and allow flushing
+ * This function changes the pause state.
+ * The date parameter MUST hold the exact date at wich the change has been
+ * done for proper vout/aout pausing.
+ */
+void input_DecoderChangePause( decoder_t *, bool b_paused, mtime_t i_date );
+
+/**
+ * This function warn the decoder about a discontinuity and allow flushing
  * if requested.
  */
-void       input_DecoderDiscontinuity( decoder_t * p_dec, bool b_flush );
+void input_DecoderDiscontinuity( decoder_t *, bool b_flush );
 
 /**
  * This function returns true if the decoder fifo is empty and false otherwise.
  */
-bool       input_DecoderEmpty( decoder_t * p_dec );
+bool input_DecoderEmpty( decoder_t * );
 
 /**
  * This function activates the request closed caption channel.
  */
-int        input_DecoderSetCcState( decoder_t *, bool b_decode, int i_channel );
+int input_DecoderSetCcState( decoder_t *, bool b_decode, int i_channel );
+
 /**
  * This function returns an error if the requested channel does not exist and
  * set pb_decode to the channel status(active or not) otherwise.
  */
-int        input_DecoderGetCcState( decoder_t *, bool *pb_decode, int i_channel );
+int input_DecoderGetCcState( decoder_t *, bool *pb_decode, int i_channel );
 
 /**
  * This function set each pb_present entry to true if the corresponding channel
  * exists or false otherwise.
  */
-void       input_DecoderIsCcPresent( decoder_t *, bool pb_present[4] );
+void input_DecoderIsCcPresent( decoder_t *, bool pb_present[4] );
 
 #endif

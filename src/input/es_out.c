@@ -386,6 +386,33 @@ static void EsOutDiscontinuity( es_out_t *out, bool b_flush, bool b_audio )
         }
     }
 }
+static void EsOutDecoderChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    /* Pause decoders first */
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *es = p_sys->es[i];
+
+        /* Send a dummy block to let decoder know that
+         * there is a discontinuity */
+        if( es->p_dec )
+        {
+            input_DecoderChangePause( es->p_dec, b_paused, i_date );
+            if( es->p_dec_record )
+                input_DecoderChangePause( es->p_dec_record, b_paused, i_date );
+        }
+    }
+}
+static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    for( int i = 0; i < p_sys->i_pgrm; i++ )
+        input_clock_ChangePause( p_sys->pgrm[i]->p_clock, b_paused, i_date );
+}
+
 void input_EsOutChangeRate( es_out_t *out, int i_rate )
 {
     es_out_sys_t      *p_sys = out->p_sys;
@@ -477,21 +504,18 @@ void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
     else if( i_cat == SPU_ES )
         p_sys->i_spu_delay = i_delay;
 }
-void input_EsOutChangeState( es_out_t *out )
+void input_EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 {
-    es_out_sys_t *p_sys = out->p_sys;
-    input_thread_t *p_input = p_sys->p_input;
-
-    if( p_input->i_state  == PAUSE_S )
+    /* XXX the order is important */
+    if( b_paused )
     {
-        /* Send discontinuity to decoders (it will allow them to flush
-         *                  * if implemented */
-        EsOutDiscontinuity( out, false, false );
+        EsOutDecoderChangePause( out, true, i_date );
+        EsOutProgramChangePause( out, true, i_date );
     }
     else
     {
-        /* Out of pause, reset pcr */
-        es_out_Control( out, ES_OUT_RESET_PCR );
+        EsOutProgramChangePause( out, false, i_date );
+        EsOutDecoderChangePause( out, false, i_date );
     }
 }
 void input_EsOutChangePosition( es_out_t *out )

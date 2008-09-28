@@ -1471,9 +1471,11 @@ static void ControlReduce( input_thread_t *p_input )
 static bool Control( input_thread_t *p_input, int i_type,
                            vlc_value_t val )
 {
+    const mtime_t i_control_date = mdate();
     bool b_force_update = false;
 
-    if( !p_input ) return b_force_update;
+    if( !p_input )
+        return b_force_update;
 
     switch( i_type )
     {
@@ -1612,7 +1614,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 /* */
                 if( !i_ret )
-                    input_EsOutChangeState( p_input->p->p_es_out );
+                    input_EsOutChangePause( p_input->p->p_es_out, false, i_control_date );
             }
             else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S &&
                      p_input->p->b_can_pause )
@@ -1642,7 +1644,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 /* */
                 if( !i_ret )
-                    input_EsOutChangeState( p_input->p->p_es_out );
+                    input_EsOutChangePause( p_input->p->p_es_out, true, i_control_date );
             }
             else if( val.i_int == PAUSE_S && !p_input->p->b_can_pause )
             {

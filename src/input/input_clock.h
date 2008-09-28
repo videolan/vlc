@@ -71,6 +71,11 @@ mtime_t input_clock_GetWakeup( input_clock_t * );
 void    input_clock_ChangeRate( input_clock_t *, int i_rate );
 
 /**
+ * This function allows to change the pause status.
+ */
+void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date );
+
+/**
  * This function converts a timestamp from stream clock to system clock.
  */
 mtime_t input_clock_GetTS( input_clock_t *, mtime_t i_pts_delay, mtime_t );

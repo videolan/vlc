@@ -351,7 +351,7 @@ mtime_t    input_EsOutGetWakeup( es_out_t * );
 void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
 int        input_EsOutSetRecord( es_out_t *, bool b_record );
 void       input_EsOutChangeRate( es_out_t *, int );
-void       input_EsOutChangeState( es_out_t * );
+void       input_EsOutChangePause( es_out_t *, bool b_paused, mtime_t i_date );
 void       input_EsOutChangePosition( es_out_t * );
 bool input_EsOutDecodersEmpty( es_out_t * );
 
