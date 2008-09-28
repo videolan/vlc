@@ -1472,7 +1472,7 @@ static void SpuRenderRegion( spu_t *p_spu,
         }
 
         /* Scale if needed into cache */
-        if( !p_region->p_private )
+        if( !p_region->p_private && i_dst_width > 0 && i_dst_height > 0 )
         {
             filter_t *p_scale = p_sys->p_scale;
 
