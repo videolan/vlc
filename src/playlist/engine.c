@@ -96,7 +96,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     pl_priv(p_playlist)->b_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
 
-    p_playlist->b_doing_ml = false;
+    pl_priv(p_playlist)->b_doing_ml = false;
 
     p_playlist->b_auto_preparse =
                         var_CreateGetBool( p_playlist, "auto-preparse" ) ;

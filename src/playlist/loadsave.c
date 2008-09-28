@@ -160,7 +160,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                         input_item_subitem_added, p_playlist );
 
-    p_playlist->b_doing_ml = true;
+    pl_priv(p_playlist)->b_doing_ml = true;
     PL_UNLOCK;
 
     stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
@@ -168,7 +168,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     stats_TimerStop( p_playlist,STATS_TIMER_ML_LOAD );
 
     PL_LOCK;
-    p_playlist->b_doing_ml = false;
+    pl_priv(p_playlist)->b_doing_ml = false;
     PL_UNLOCK;
 
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,

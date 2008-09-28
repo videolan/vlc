@@ -415,7 +415,7 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
 {
     playlist_item_t *p_item_cat, *p_item_one;
     if( p_playlist->b_die ) return VLC_EGENERIC;
-    if( !p_playlist->b_doing_ml )
+    if( !pl_priv(p_playlist)->b_doing_ml )
         PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name,
                                              p_input->psz_uri );
 
@@ -889,7 +889,7 @@ static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     else
         playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
 
-    if( !p_playlist->b_doing_ml )
+    if( !pl_priv(p_playlist)->b_doing_ml )
         playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id,
                                  !( i_mode & PLAYLIST_NO_REBUILD ) );
 }

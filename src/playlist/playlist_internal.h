@@ -101,8 +101,8 @@ typedef struct playlist_private_t
         vlc_mutex_t         lock;     /**< Lock to protect request */
     } request;
 
-    bool                  b_tree; /**< Display as a tree */
-
+    bool     b_tree; /**< Display as a tree */
+    bool     b_doing_ml; /**< Doing media library stuff  get quicker */
 } playlist_private_t;
 
 #define pl_priv( pl ) ((playlist_private_t *)(pl))
