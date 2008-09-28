@@ -183,8 +183,8 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_internals (p_priv->prev)->next = p_new;
     libvlc_unlock (p_new->p_libvlc);
 
-    if( i_type == VLC_OBJECT_LIBVLC )
-    {
+    if (p_new == VLC_OBJECT(p_new->p_libvlc))
+    {   /* TODO: should be in src/libvlc.c */
         int canc = vlc_savecancel ();
         var_Create( p_new, "list", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
         var_AddCallback( p_new, "list", DumpCommand, NULL );
