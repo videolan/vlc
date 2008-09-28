@@ -180,7 +180,6 @@ struct playlist_t
     /* Runtime */
     int                   i_sort; /**< Last sorting applied to the playlist */
     int                   i_order; /**< Last ordering applied to the playlist */
-    mtime_t               gc_date;
 };
 
 /** Helper to add an item */
