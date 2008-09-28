@@ -47,6 +47,7 @@
 
 #include <vlc_filter.h>
 #include <vlc_osd.h>
+#include <assert.h>
 
 #if defined( __APPLE__ )
 /* Include darwin_specific.h here if needed */
@@ -57,8 +58,8 @@
 #include "input/input_internal.h"
 
 #include "modules/modules.h"
-#include <assert.h>
 #include "vout_pictures.h"
+#include "vout_internal.h"
 
 /*****************************************************************************
  * Local prototypes
