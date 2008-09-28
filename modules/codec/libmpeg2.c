@@ -33,6 +33,8 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include <vlc_codec.h>
+#include <vlc_block_helper.h>
+#include "../codec/cc.h"
 
 #include <mpeg2.h>
 
@@ -70,11 +72,16 @@ struct decoder_sys_t
      * Output properties
      */
     decoder_synchro_t *p_synchro;
-    int            i_aspect;
-    int            i_sar_num;
-    int            i_sar_den;
-    mtime_t        i_last_frame_pts;
+    int             i_aspect;
+    int             i_sar_num;
+    int             i_sar_den;
+    mtime_t         i_last_frame_pts;
 
+    /* Closed captioning support */
+    uint32_t        i_cc_flags;
+    mtime_t         i_cc_pts;
+    mtime_t         i_cc_dts;
+    cc_data_t       cc;
 };
 
 /*****************************************************************************
@@ -84,6 +91,7 @@ static int  OpenDecoder( vlc_object_t * );
 static void CloseDecoder( vlc_object_t * );
 
 static picture_t *DecodeBlock( decoder_t *, block_t ** );
+static block_t   *GetCc( decoder_t *p_dec, bool pb_present[4] );
 
 static picture_t *GetNewPicture( decoder_t *, uint8_t ** );
 static void GetAR( decoder_t *p_dec );
@@ -140,6 +148,14 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_second_field = 0;
     p_sys->b_skip     = 0;
     p_sys->b_preroll = false;
+
+    p_sys->i_cc_pts = 0;
+    p_sys->i_cc_dts = 0;
+    p_sys->i_cc_flags = 0;
+#if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
+    p_dec->pf_get_cc = GetCc;
+    cc_Init( &p_sys->cc );
+#endif
 
 #if defined( __i386__ ) || defined( __x86_64__ )
     if( vlc_CPU() & CPU_CAPABILITY_MMX )
@@ -215,6 +231,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 block_Release( p_block );
                 return NULL;
             }
+            if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY
+                                      | BLOCK_FLAG_CORRUPTED))
+                cc_Flush( &p_sys->cc );
 
             if( (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY
                                       | BLOCK_FLAG_CORRUPTED)) &&
@@ -432,7 +451,23 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 }
 
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
-        mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
+                mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
+            }
+#if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
+            if( p_sys->p_info->user_data_len > 2 )
+            {
+                p_sys->i_cc_pts = i_pts;
+                p_sys->i_cc_dts = i_dts;
+                if( (p_sys->p_info->current_picture->flags
+                             & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P )
+                    p_sys->i_cc_flags = BLOCK_FLAG_TYPE_P;
+                else if( (p_sys->p_info->current_picture->flags
+                             & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B )
+                    p_sys->i_cc_flags = BLOCK_FLAG_TYPE_B;
+                else p_sys->i_cc_flags = BLOCK_FLAG_TYPE_I;
+
+                cc_Extract( &p_sys->cc, &p_sys->p_info->user_data[0], p_sys->p_info->user_data_len );
+#endif
             }
         }
         break;
@@ -481,7 +516,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
                 return p_pic;
             }
-
             break;
 
         case STATE_INVALID:
@@ -498,6 +532,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
             mpeg2_skip( p_sys->p_mpeg2dec, 1 );
             p_sys->b_skip = 1;
+            cc_Flush( &p_sys->cc );
 
             if( p_sys->p_info->current_fbuf &&
                 p_sys->p_info->current_fbuf->id )
@@ -613,6 +648,33 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     pp_buf[2] = p_pic->p[2].p_pixels;
 
     return p_pic;
+}
+
+/*****************************************************************************
+ * GetCc: Retrieves the Closed Captions for the CC decoder.
+ *****************************************************************************/
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
+{
+    decoder_sys_t   *p_sys = p_dec->p_sys;
+    block_t         *p_cc = NULL;
+    int i;
+
+    for( i = 0; i < 4; i++ )
+        pb_present[i] = p_sys->cc.pb_present[i];
+
+    if( p_sys->cc.i_data <= 0 )
+        return NULL;
+
+    p_cc = block_New( p_dec, p_sys->cc.i_data);
+    if( p_cc )
+    {
+        memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
+        p_cc->i_dts =
+        p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
+        p_cc->i_flags = ( p_sys->cc.b_reorder  ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P ) & ( BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B);
+    }
+    cc_Flush( &p_sys->cc );
+    return p_cc;
 }
 
 /*****************************************************************************
