@@ -1559,8 +1559,12 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
         p_owner->video = p_dec->fmt_out.video;
 
-        p_vout = vout_Request( p_dec, p_owner->p_vout,
-                               &p_dec->fmt_out.video );
+        vlc_mutex_lock( &p_owner->lock );
+        p_vout = p_owner->p_vout;
+        p_owner->p_vout = NULL;
+        vlc_mutex_unlock( &p_owner->lock );
+
+        p_vout = vout_Request( p_dec, p_vout, &p_dec->fmt_out.video );
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
