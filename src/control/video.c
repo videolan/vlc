@@ -486,7 +486,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     vlc_object_t *p_vbi;
-    int i_ret = -1;
+    int i_ret;
 
     if( !p_vout ) return;
 
@@ -496,10 +496,10 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
     {
         i_ret = var_SetInteger( p_vbi, "vbi-page", i_page );
         vlc_object_release( p_vbi );
+        if( i_ret )
+            libvlc_exception_raise( p_e,
+                            "Unexpected error while setting teletext page" );
     }
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while setting teletext page" );
     vlc_object_release( p_vout );
 }
 
@@ -517,7 +517,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
     i_ret = var_SetBool( p_vout, "vbi-opaque", !opaque );
     if( i_ret )
         libvlc_exception_raise( p_e,
-                        "Unexpected error while setting teletext value" );
+                        "Unexpected error while setting teletext transparency" );
 
     vlc_object_release( p_vout );
 }
