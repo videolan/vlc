@@ -426,7 +426,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( !p_dec->b_pace_control && !p_sys->b_preroll &&
                 !(p_sys->b_slice_i
                    && ((p_sys->p_info->current_picture->flags
-                         & PIC_MASK_CODING_TYPE) == P_CODING_TYPE))
+                         & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P))
                    && !decoder_SynchroChoose( p_sys->p_synchro,
                               p_sys->p_info->current_picture->flags
                                 & PIC_MASK_CODING_TYPE,
@@ -526,7 +526,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             msg_Warn( p_dec, "invalid picture encountered" );
             if ( ( p_sys->p_info->current_picture == NULL ) ||
                ( ( p_sys->p_info->current_picture->flags &
-                   PIC_MASK_CODING_TYPE) != B_CODING_TYPE ) )
+                   PIC_MASK_CODING_TYPE) != PIC_FLAG_CODING_TYPE_B ) )
             {
                 if( p_sys->p_synchro ) decoder_SynchroReset( p_sys->p_synchro );
             }
