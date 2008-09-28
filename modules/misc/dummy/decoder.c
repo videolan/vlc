@@ -67,7 +67,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block );
 /*****************************************************************************
  * OpenDecoder: Open the decoder
  *****************************************************************************/
-int OpenDecoder ( vlc_object_t *p_this )
+static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -85,9 +85,13 @@ int OpenDecoder ( vlc_object_t *p_this )
     snprintf( psz_file, sizeof( psz_file), "stream.%p", p_dec );
 
 #ifndef UNDER_CE
-    var_Create( p_dec, "dummy-save-es", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "dummy-save-es", &val );
-    if( val.b_bool )
+    if( !b_force_dump )
+    {
+        var_Create( p_dec, "dummy-save-es", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Get( p_dec, "dummy-save-es", &val );
+        b_force_dump = val.b_bool;
+    }
+    if( b_force_dump )
     {
         p_sys->i_fd = open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
 
@@ -114,6 +118,15 @@ int OpenDecoder ( vlc_object_t *p_this )
         DecodeBlock;
 
     return VLC_SUCCESS;
+}
+
+int OpenDecoder( vlc_object_t *p_this )
+{
+    return OpenDecoderCommon( p_this, false );
+}
+int  OpenDecoderDump( vlc_object_t *p_this )
+{
+    return OpenDecoderCommon( p_this, true );
 }
 
 /****************************************************************************
