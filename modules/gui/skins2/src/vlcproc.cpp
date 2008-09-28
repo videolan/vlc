@@ -561,7 +561,7 @@ void VlcProc::updateStreamName( playlist_t *p_playlist )
 {
     if( p_playlist )
     {
-        input_thread_t * p_input = playlist_CurrentInput( p_playlist )
+        input_thread_t * p_input = playlist_CurrentInput( p_playlist );
         // Get playlist item information
         input_item_t *pItem = input_GetItem( p_input );
 
