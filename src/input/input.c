@@ -1398,6 +1398,9 @@ static inline int ControlPopNoLock( input_thread_t *p_input,
 
     while( p_input->p->i_control <= 0 )
     {
+        if( !vlc_object_alive( p_input ) )
+            return VLC_EGENERIC;
+
         if( i_deadline < 0 )
             return VLC_EGENERIC;
 
