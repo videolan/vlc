@@ -181,8 +181,6 @@ struct playlist_t
     int                   i_sort; /**< Last sorting applied to the playlist */
     int                   i_order; /**< Last ordering applied to the playlist */
     mtime_t               gc_date;
-    bool            b_cant_sleep;
-
 };
 
 /** Helper to add an item */

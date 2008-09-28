@@ -120,7 +120,7 @@ static void* RunControlThread ( vlc_object_t *p_this )
         if( !vlc_object_alive( p_playlist ) )
             break;
 
-        if( p_playlist->b_cant_sleep )
+        if( pl_priv(p_playlist)->b_cant_sleep )
         {
             /* 100 ms is an acceptable delay for playlist operations */
             vlc_object_unlock( p_playlist );

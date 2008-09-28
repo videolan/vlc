@@ -83,7 +83,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->p_input = NULL;
 
     p_playlist->gc_date = 0;
-    p_playlist->b_cant_sleep = false;
+    pl_priv(p_playlist)->b_cant_sleep = false;
 
     ARRAY_INIT( p_playlist->items );
     ARRAY_INIT( p_playlist->all_items );
@@ -217,14 +217,14 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
     {
         if( mdate() - p_playlist->gc_date < 1000000 )
         {
-            p_playlist->b_cant_sleep = true;
+           pl_priv(p_playlist)->b_cant_sleep = true;
             return;
         }
         else if( p_playlist->gc_date == 0 )
             return;
     }
 
-    p_playlist->b_cant_sleep = false;
+    pl_priv(p_playlist)->b_cant_sleep = false;
 }
 
 /* Input Callback */
@@ -403,7 +403,7 @@ check_input:
             playlist_release_current_input( p_playlist );
 
             p_playlist->gc_date = mdate();
-            p_playlist->b_cant_sleep = true;
+            pl_priv(p_playlist)->b_cant_sleep = true;
 
             i_activity= var_GetInteger( p_playlist, "activity" );
             var_SetInteger( p_playlist, "activity", i_activity -
