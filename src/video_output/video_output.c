@@ -587,7 +587,7 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
 {
     vlc_object_lock( p_vout );
 
-    assert( (!p_vout->p->b_paused) != (!b_paused) );
+    assert( !p_vout->p->b_paused || !b_paused );
     if( p_vout->p->b_paused )
     {
         const mtime_t i_duration = i_date - p_vout->p->i_pause_date;
