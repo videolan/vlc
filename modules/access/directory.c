@@ -326,6 +326,7 @@ static block_t *Block (access_t *p_access)
                 return NULL;
             }
             p_sys->current = sub;
+            return NULL;
         }
         else
             free (sub);
