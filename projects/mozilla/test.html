@@ -58,14 +58,14 @@ function init(){
 
 function getVLC(name)
 {
-    if (window.document[name]) 
+    if (window.document[name])
     {
         return window.document[name];
     }
     if (navigator.appName.indexOf("Microsoft Internet")==-1)
     {
         if (document.embeds && document.embeds[name])
-            return document.embeds[name]; 
+            return document.embeds[name];
     }
     else // if (navigator.appName.indexOf("Microsoft Internet")!=-1)
     {
@@ -90,7 +90,7 @@ MRL:
 </TD></TR>
 <TR><TD align="center" colspan="2">
 <!--
-Insert VideoLAN.VLCPlugin.2 
+Insert VideoLAN.VLCPlugin.2
 -->
 <OBJECT classid="clsid:9BE31822-FDAD-461B-AD51-BE1D1C159921"
         width="640"
@@ -137,7 +137,7 @@ Insert Slider widget
 <INPUT type=button value="Fullscreen" onClick='getVLC("vlc").video.toggleFullscreen();'>
 <INPUT type=button value="Version" onClick='alert("vlc " + getVLC("vlc").VersionInfo);'>
 <INPUT type=button value=" State " onClick='doState();'>
-</TD><TD align="right"> 
+</TD><TD align="right">
 <SPAN style="text-align:center">Volume:</SPAN>
 <INPUT type=button value=" - " onClick='updateVolume(-10)'>
 <SPAN id="volumeTextField" style="text-align:center">--</SPAN>
@@ -145,11 +145,19 @@ Insert Slider widget
 <INPUT type=button value="Mute" onClick='getVLC("vlc").audio.toggleMute();'>
 </TD>
 </TR>
-<TR><TD>Playlist: 
+<TR><TD>Playlist:
 <INPUT type=button value="Prev" onClick='getVLC("vlc").playlist.prev();'>
 <INPUT type=button value="Next" onClick='getVLC("vlc").playlist.next();'>
 <INPUT type=button value="Clear All" onClick='getVLC("vlc").playlist.clear(); doItemCount();'>
-<INPUT size=4 value="1:1" id="aspect"><INPUT type=submit value="AspectRatio" onClick="doAspectRatio(document.getElementById('aspect').value);">
+    Aspect Ratio:
+    <SELECT readonly onChange='doAspectRatio(this.value)'>
+      <OPTION value="default">Default</OPTION>
+      <OPTION value="1:1">1:1</OPTION>
+      <OPTION value="4:3">4:3</OPTION>
+      <OPTION value="16:9">16:9</OPTION>
+      <OPTION value="221:100">221:100</OPTION>
+      <OPTION value="5:4">5:4</OPTION>
+    </SELECT>
 </TD><TD align="right">
 <INPUT type=button id="itemCount" value=" Items 0 " onClick='doItemCount();'>
 <INPUT size=4 value="" id="removeid"><INPUT type=submit value="Delete" onClick="doRemoveItem(document.getElementById('removeid').value);">
@@ -189,6 +197,20 @@ Verbosity:
 <INPUT type=button value="get position" onClick='doGetPosition();'>
 </TD>
 </TR>
+<TR>
+<TD>Video Subtitle:
+    <INPUT type=button value=" + " onClick='doSubtitle(1);'>
+    <SPAN id="spuTextField" style="text-align:center">--</SPAN>
+    <INPUT type=button value=" - " onClick='doSubtitle(-1);'>
+</TD>
+</TR>
+<TR>
+<TD>
+    <INPUT type=button id="telx" value="Teletext off" onClick='doToggleTeletext();'>
+    Teletext page:
+    <INPUT size=4 value="100" id="telxPage" onClick="doTelxPage(document.getElementById('telxPage').value);">
+</TD>
+</TR>
 </TABLE>
 <SCRIPT language="javascript">
 <!--
@@ -199,6 +221,7 @@ var monitorTimerId = 0;
 var rateTimerId = 0;
 var inputTrackerScrolling = false;
 var inputTrackerIgnoreChange = false;
+var telxState = false;
 
 function doSetSlider()
 {
@@ -275,7 +298,40 @@ function doAspectRatio(value)
 {
    var vlc = getVLC("vlc");
    vlc.video.aspectRatio = value;
-   document.getElementById("aspect").value = vlc.video.aspectRatio;
+};
+
+function doSubtitle(value)
+{
+    var vlc = getVLC("vlc");
+    alert(vlc.video.subtitle + value);
+    vlc.video.subtitle = vlc.video.subtitle + value;
+    document.getElementById("spuTextField").innerHTML = vlc.video.subtitle;
+};
+
+function doTelxPage(value)
+{
+    var vlc = getVLC("vlc");
+    alert( value );
+    vlc.video.teletext = 889; //value;
+};
+
+function doToggleTeletext()
+{
+    var vlc = getVLC("vlc");
+
+    vlc.video.toggleTeletext();
+    if (telxState)
+    {
+        document.getElementById("telx").innerHTML = "Teletext on";
+        telxState = true;
+        alert( "telextext on" );
+    }
+    else
+    {
+        document.getElementById("telx").innerHTML = "Teletext off";
+        telxState = false;
+        alert( "telextext off" );
+    }
 }
 
 function doItemCount()
@@ -343,7 +399,7 @@ function doState()
 
     if( newState == 0 )
     {
-        // current media has stopped 
+        // current media has stopped
         onEnd();
     }
     else if( newState == 1 )
@@ -419,7 +475,7 @@ function monitor()
     {
         if( newState == 0 )
         {
-            // current media has stopped 
+            // current media has stopped
             onEnd();
         }
         else if( newState == 1 )
@@ -669,7 +725,7 @@ function onStop()
     // disable logging
     vlc.log.verbosity = -1;
 
-    if( ! inputTracker.disabled )
+    if( !inputTracker.disabled )
     {
         inputTracker.setValue(inputTracker.minVal);
         inputTracker.setDisabled(true);
