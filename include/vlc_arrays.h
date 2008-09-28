@@ -450,6 +450,7 @@ static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict )
             }
         }
         free( p_dict->p_entries );
+        p_dict->p_entries = NULL;
     }
     p_dict->i_size = 0;
 }
