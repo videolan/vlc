@@ -201,7 +201,7 @@ static void* Thread( vlc_object_t *p_this )
 
     /* Get on OpenGL provider */
     p_thread->p_opengl =
-        (vout_thread_t *)vlc_object_create( p_this, VLC_OBJECT_OPENGL );
+        (vout_thread_t *)vlc_object_create( p_this, sizeof( vout_thread_t ) );
     if( p_thread->p_opengl == NULL )
     {
         vlc_restorecancel (canc);
