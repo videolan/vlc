@@ -105,7 +105,7 @@ struct subpicture_sys_t
     decoder_sys_t *p_dec_sys;
     void          *p_subs_data;
     int           i_subs_len;
-    mtime_t       i_stream_system_delta;
+    mtime_t       i_pts;
 };
 
 typedef struct
@@ -257,8 +257,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     memcpy( p_spu->p_sys->p_subs_data, p_block->p_buffer,
             p_block->i_buffer );
-    p_spu->p_sys->i_stream_system_delta =
-        p_block->i_pts - decoder_GetDisplayDate( p_dec, p_block->i_pts );
+    p_spu->p_sys->i_pts = p_block->i_pts;
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -341,9 +340,10 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
     }
 
     /* */
+    const mtime_t i_stream_date = p_subpic->p_sys->i_pts + (i_ts - p_subpic->i_start);
     int i_changed;
     ass_image_t *p_img = ass_render_frame( p_ass->p_renderer, p_sys->p_track,
-                                           (i_ts + p_subpic->p_sys->i_stream_system_delta)/1000, &i_changed );
+                                           i_stream_date/1000, &i_changed );
 
     if( !i_changed && !b_fmt_changed )
     {

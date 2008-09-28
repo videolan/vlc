@@ -599,7 +599,7 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
             if( p_pic->i_status == READY_PICTURE )
                 p_pic->date += i_duration;
         }
-        // TODO spu
+        spu_OffsetSubtitleDate( p_vout->p_spu, i_duration );
     }
     p_vout->p->b_paused = b_paused;
     p_vout->p->i_pause_date = i_date;
@@ -1007,22 +1007,16 @@ static void* RunThread( vlc_object_t *p_this )
         /*
          * Check for subpictures to display
          */
-        bool b_paused = false;
         if( display_date > 0 )
-        {
-            p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-            b_paused = p_input && var_GetInteger( p_input, "state" ) == PAUSE_S;
-            if( p_input )
-                vlc_object_release( p_input );
-
-            p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date, b_paused, b_snapshot );
-        }
+            p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
+                                            p_vout->p->b_paused, b_snapshot );
 
         /*
          * Perform rendering
          */
         i_displayed++;
-        p_directbuffer = vout_RenderPicture( p_vout, p_filtered_picture, p_subpic, b_paused );
+        p_directbuffer = vout_RenderPicture( p_vout, p_filtered_picture,
+                                             p_subpic, p_vout->p->b_paused );
 
         /*
          * Take a snapshot if requested

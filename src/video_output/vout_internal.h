@@ -96,5 +96,10 @@ int vout_CountPictureAvailable( vout_thread_t * );
  */
 void vout_ChangePause( vout_thread_t *, bool b_paused, mtime_t i_date );
 
+/**
+ * This function will apply an offset on subtitle subpicture.
+ */
+void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration );
+
 #endif
 

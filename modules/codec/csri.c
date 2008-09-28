@@ -87,7 +87,7 @@ struct subpicture_sys_t
     decoder_t *p_dec;
     void      *p_subs_data;
     int       i_subs_len;
-    mtime_t   i_stream_system_delta;
+    mtime_t   i_pts;
 };
 
 /*****************************************************************************
@@ -202,8 +202,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     memcpy( p_spu->p_sys->p_subs_data, p_block->p_buffer,
             p_block->i_buffer );
-    p_spu->p_sys->i_stream_system_delta =
-        p_block->i_pts - decoder_GetDisplayDate( p_dec, p_block->i_pts );
+    p_spu->p_sys->i_pts = p_block->i_pts;
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -304,12 +303,14 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
         memset( p_spu_region->p_picture->Y_PIXELS, 0x00, p_spu_region->p_picture->Y_PITCH * p_sys->fmt_cached.i_height );
 
         /* */
+        const mtime_t i_stream_date = p_subpic->p_sys->i_pts + (i_ts - p_subpic->i_start);
+
         //msg_Dbg( p_dec, "TS %lf", ts * 0.000001 );
         memset( &csri_frame, 0, sizeof(csri_frame) );
         csri_frame.pixfmt = CSRI_F_BGRA;
         csri_frame.planes[0] = (unsigned char*)p_spu_region->p_picture->Y_PIXELS;
         csri_frame.strides[0] = p_spu_region->p_picture->Y_PITCH;
-        csri_render( p_sys->p_instance, &csri_frame, (i_ts + p_subpic->p_sys->i_stream_system_delta) * 0.000001 );
+        csri_render( p_sys->p_instance, &csri_frame, i_stream_date * 0.000001 );
     }
 }
 
