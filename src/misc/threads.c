@@ -52,12 +52,11 @@ static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
 static vlc_threadvar_t cancel_key;
 #endif
 
-/**
- * Global process-wide VLC object.
- * Contains the global named mutexes.
- * TODO: remove it.
- */
-static vlc_object_t *p_root;
+static struct
+{
+   vlc_dictionary_t list;
+   vlc_mutex_t      lock;
+} named_mutexes;
 
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
@@ -168,8 +167,6 @@ typedef struct vlc_cancel_t
  *****************************************************************************/
 int vlc_threads_init( void )
 {
-    int i_ret = VLC_SUCCESS;
-
     /* If we have lazy mutex initialization, use it. Otherwise, we just
      * hope nothing wrong happens. */
 #if defined( LIBVLC_USE_PTHREAD )
@@ -178,29 +175,19 @@ int vlc_threads_init( void )
 
     if( i_initializations == 0 )
     {
-        p_root = vlc_custom_create( (vlc_object_t *)NULL, sizeof( *p_root ),
-                                    VLC_OBJECT_GENERIC, "root" );
-        if( p_root == NULL )
-        {
-            i_ret = VLC_ENOMEM;
-            goto out;
-        }
-
-        /* We should be safe now. Do all the initialization stuff we want. */
+        vlc_dictionary_init (&named_mutexes.list, 0);
+        vlc_mutex_init (&named_mutexes.lock);
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
         vlc_threadvar_create( &cancel_key, free );
 #endif
     }
     i_initializations++;
 
-out:
-    /* If we have lazy mutex initialization support, unlock the mutex.
-     * Otherwize, we are screwed. */
 #if defined( LIBVLC_USE_PTHREAD )
     pthread_mutex_unlock( &once_mutex );
 #endif
 
-    return i_ret;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -218,10 +205,11 @@ void vlc_threads_end( void )
 
     if( i_initializations == 1 )
     {
-        vlc_object_release( p_root );
 #ifndef LIBVLC_USE_PTHREAD
         vlc_threadvar_delete( &cancel_key );
 #endif
+        vlc_mutex_destroy (&named_mutexes.lock);
+        vlc_dictionary_clear (&named_mutexes.list);
     }
     i_initializations--;
 
@@ -1110,15 +1098,23 @@ void vlc_control_cancel (int cmd, ...)
 /**
  * Finds a process-wide mutex, creates it if needed, and locks it.
  * Unlock with vlc_mutex_unlock().
+ * FIXME: This is very inefficient, this is not memory-safe and this leaks
+ * memory. Use static locks instead.
  */
 vlc_mutex_t *var_AcquireMutex( const char *name )
 {
-    vlc_value_t val;
+    vlc_mutex_t *lock;
 
-    if( var_Create( p_root, name, VLC_VAR_MUTEX ) )
-        return NULL;
+    vlc_mutex_lock (&named_mutexes.lock);
+    lock = vlc_dictionary_value_for_key (&named_mutexes.list, name);
+    if (lock == kVLCDictionaryNotFound)
+    {
+        lock = malloc (sizeof (*lock));
+        vlc_mutex_init (lock);
+        vlc_dictionary_insert (&named_mutexes.list, name, lock);
+    }
+    vlc_mutex_unlock (&named_mutexes.lock);
 
-    var_Get( p_root, name, &val );
-    vlc_mutex_lock( val.p_address );
-    return val.p_address;
+    vlc_mutex_lock (lock);
+    return lock;
 }
