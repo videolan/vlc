@@ -240,6 +240,7 @@ typedef struct libvlc_priv_t
 #ifdef ENABLE_SOUT
     sap_handler_t     *p_sap; ///< SAP SDP advertiser
 #endif
+    vlc_mutex_t        structure_lock;
 } libvlc_priv_t;
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
