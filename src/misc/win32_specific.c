@@ -76,7 +76,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
     }
 #endif
 
-    vlc_global()->psz_vlcpath = strdup( psz_path );
+    psz_vlcpath = strdup( psz_path );
 
     /* Set the default file-translation mode */
 #if !defined( UNDER_CE )
@@ -371,8 +371,8 @@ void system_End( libvlc_int_t *p_this )
     HWND ipcwindow;
     if( p_this && vlc_global() )
     {
-        free( vlc_global()->psz_vlcpath );
-        vlc_global()->psz_vlcpath = NULL;
+        free( psz_vlcpath );
+        psz_vlcpath = NULL;
     }
 
     if( ipcwindow = FindWindow( 0, L"VLC ipc "VERSION ) )

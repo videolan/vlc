@@ -36,7 +36,7 @@ static void set_libvlc_path (void)
 
     assert (strlen (LIBDIR) < sizeof (libvlc_path));
     strcpy (libvlc_path, LIBDIR); /* fail safe */
-    vlc_global ()->psz_vlcpath = libvlc_path;
+    psz_vlcpath = libvlc_path;
 
     /* Find the path to libvlc (i.e. ourselves) */
     FILE *maps = fopen ("/proc/self/maps", "rt");

@@ -59,11 +59,12 @@ static vlc_threadvar_t cancel_key;
 
 /**
  * Global process-wide VLC object.
- * Contains inter-instance data, such as the module cache and global mutexes.
+ * Contains the global named mutexes.
+ * TODO: remove it.
  */
-static libvlc_global_data_t *p_root;
+static vlc_object_t *p_root;
 
-libvlc_global_data_t *vlc_global( void )
+vlc_object_t *vlc_global( void )
 {
     assert( i_initializations > 0 );
     return p_root;

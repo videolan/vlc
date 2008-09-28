@@ -64,8 +64,7 @@ const char *config_GetDataDir( void )
 
     if( *path == '\0' )
     {
-        snprintf( path, sizeof( path ), "%s" DIR_SEP DIR_SHARE,
-                  vlc_global()->psz_vlcpath );
+        snprintf( path, sizeof( path ), "%s" DIR_SEP DIR_SHARE, psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
     return path;
@@ -155,7 +154,7 @@ const char *config_GetConfDir( void )
     if( *path == '\0' )
     {
         snprintf( path, sizeof( path ), "%s"DIR_SEP DIR_SHARE, /* FIXME: Duh? */
-                  vlc_global()->psz_vlcpath );
+                  psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
     return path;

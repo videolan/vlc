@@ -867,13 +867,15 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
     return path;
 }
 
+extern char *psz_vlcpath = NULL;
+
 /*****************************************************************************
  * AllocateAllPlugins: load all plugin modules we can find.
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
-    const char *vlcpath = vlc_global()->psz_vlcpath;
+    const char *vlcpath = psz_vlcpath;
     int count,i;
     char * path;
     vlc_array_t *arraypaths = vlc_array_new();

@@ -123,7 +123,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         p_char = strdup( ppsz_argv[ 0 ] );
     }
 
-    vlc_global()->psz_vlcpath = p_char;
+    psz_vlcpath = p_char;
 
     /* Remove trailing program name */
     for( ; *p_char ; )
@@ -186,6 +186,6 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
 void system_End( libvlc_int_t *p_this )
 {
     (void)p_this;
-    free( vlc_global()->psz_vlcpath );
+    free( psz_vlcpath );
 }
 

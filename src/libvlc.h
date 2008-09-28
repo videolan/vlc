@@ -140,26 +140,14 @@ __vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
 #define vlc_custom_create(o, s, t, n) \
         __vlc_custom_create(VLC_OBJECT(o), s, t, n)
 
-/**
- * libvlc_global_data_t (global variable)
- *
- * This structure has an unique instance, statically allocated in libvlc and
- * never accessed from the outside. It stores process-wide VLC variables,
- * mostly process-wide locks, and (currently) the module bank and objects tree.
- */
-typedef struct libvlc_global_data_t
-{
-    VLC_COMMON_MEMBERS
-
-    char *                 psz_vlcpath;
-} libvlc_global_data_t;
 
 /**
  * The module bank
  */
 extern module_bank_t *p_module_bank;
 
-libvlc_global_data_t *vlc_global (void);
+vlc_object_t *vlc_global (void);
+extern char *psz_vlcpath;
 
 /**
  * Private LibVLC data for each object.
