@@ -467,8 +467,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 else p_sys->i_cc_flags = BLOCK_FLAG_TYPE_I;
 
                 cc_Extract( &p_sys->cc, &p_sys->p_info->user_data[0], p_sys->p_info->user_data_len );
-#endif
             }
+#endif
         }
         break;
 
