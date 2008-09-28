@@ -245,6 +245,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                 msg_Err (p_access, "read failed (%m)");
                 intf_UserFatal (p_access, false, _("File reading failed"),
                                 _("VLC could not read the file."));
+                return 0;
         }
     }
     else if( i_ret > 0 )
