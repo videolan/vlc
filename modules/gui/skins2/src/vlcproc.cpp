@@ -330,8 +330,6 @@ void VlcProc::refreshInput()
     {
         getIntf()->p_sys->p_input =
             playlist_CurrentInput( getIntf()->p_sys->p_playlist );
-        if( getIntf()->p_sys->p_input )
-            vlc_object_hold( getIntf()->p_sys->p_input );
     }
     else if( getIntf()->p_sys->p_input->b_dead )
     {
@@ -561,10 +559,11 @@ int VlcProc::onInteraction( vlc_object_t *pObj, const char *pVariable,
 
 void VlcProc::updateStreamName( playlist_t *p_playlist )
 {
-    if( p_playlist && playlist_CurrentInput( p_playlist ))
+    if( p_playlist )
     {
+        input_thread_t * p_input = playlist_CurrentInput( p_playlist )
         // Get playlist item information
-        input_item_t *pItem = input_GetItem(playlist_CurrentInput( p_playlist));
+        input_item_t *pItem = input_GetItem( p_input );
 
         VarText &rStreamName = getStreamNameVar();
         VarText &rStreamURI = getStreamURIVar();
@@ -589,6 +588,7 @@ void VlcProc::updateStreamName( playlist_t *p_playlist )
         AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
         pQueue->push( CmdGenericPtr( pCmd1 ), false );
         pQueue->push( CmdGenericPtr( pCmd2 ), false );
+        vlc_object_release( p_input );
     }
 }
 

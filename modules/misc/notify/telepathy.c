@@ -139,12 +139,13 @@ static void Close( vlc_object_t *p_this )
     playlist_t *p_playlist = pl_Hold( p_this );
     input_thread_t *p_input = NULL;
 
-    PL_LOCK;
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     if( (p_input = playlist_CurrentInput( p_playlist )) )
+    {
         var_DelCallback( p_input, "state", StateChange, p_intf );
-    PL_UNLOCK;
+        vlc_object_release( p_input );
+    }
     pl_Release( p_this );
 
     /* Clears the Presence message ... else it looks like we're still playing
@@ -194,7 +195,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_input = playlist_CurrentInput( p_playlist );
 
     if( !p_input ) return VLC_SUCCESS;
-    vlc_object_hold( p_input );
 
     if( p_input->b_dead || !input_GetItem(p_input)->psz_name )
     {

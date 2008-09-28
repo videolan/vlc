@@ -1934,8 +1934,9 @@ static void AddStateVariableCallback(filter_t *p_filter)
     if(p_input)
     {
         var_AddCallback( p_input, "state", StateCallback, p_filter );
+        vlc_object_release( p_input );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_filter );
 }
 
 /*****************************************************************************
@@ -1952,8 +1953,9 @@ static void DelStateVariableCallback( filter_t *p_filter )
     if(p_input)
     {
         var_DelCallback( p_input, "state", StateCallback, p_filter );
+        vlc_object_release( p_input );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_filter );
 }
 
 
