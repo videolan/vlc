@@ -50,8 +50,10 @@ struct vout_thread_sys_t
     count_t       c_fps_samples;                         /**< picture counts */
     mtime_t       p_fps_sample[VOUT_FPS_SAMPLES];     /**< FPS samples dates */
 
-#if 0
     /* Statistics */
+    int             i_picture_lost;
+    int             i_picture_displayed;
+#if 0
     count_t         c_loops;
     count_t         c_pictures, c_late_pictures;
     mtime_t         display_jitter;    /**< average deviation from the PTS */
@@ -62,9 +64,6 @@ struct vout_thread_sys_t
     /* Pause */
     bool            b_paused;
     mtime_t         i_pause_date;
-
-    /** delay created by internal caching */
-    int             i_pts_delay;
 
     /* Filter chain */
     char           *psz_filter_chain;
@@ -100,6 +99,11 @@ void vout_ChangePause( vout_thread_t *, bool b_paused, mtime_t i_date );
  * This function will apply an offset on subtitle subpicture.
  */
 void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration );
+
+/**
+ * This function will return and reset internal statistics.
+ */
+void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_lost );
 
 #endif
 

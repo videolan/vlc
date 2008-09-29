@@ -55,8 +55,10 @@
 
 /** FIXME This is quite ugly but needed while we don't have counters
  * helpers */
-#include "input/input_internal.h"
+//#include "input/input_internal.h"
 
+#include <libvlc.h>
+#include <vlc_input.h>
 #include "modules/modules.h"
 #include "vout_pictures.h"
 #include "vout_internal.h"
@@ -278,7 +280,6 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 {
     vout_thread_t  * p_vout;                            /* thread descriptor */
-    input_thread_t * p_input_thread;
     int              i_index;                               /* loop variable */
     vlc_value_t      val, text;
 
@@ -364,6 +365,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->i_alignment  = 0;
     p_vout->p->render_time  = 10;
     p_vout->p->c_fps_samples = 0;
+    p_vout->p->i_picture_lost = 0;
+    p_vout->p->i_picture_displayed = 0;
     p_vout->p->b_filter_change = 0;
     p_vout->p->b_paused = false;
     p_vout->p->i_pause_date = 0;
@@ -495,19 +498,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_Change( p_vout, "vout-filter", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "vout-filter", FilterCallback, NULL );
 
-    /* Calculate delay created by internal caching */
-    p_input_thread = (input_thread_t *)vlc_object_find( p_vout,
-                                           VLC_OBJECT_INPUT, FIND_ANYWHERE );
-    if( p_input_thread )
-    {
-        p_vout->p->i_pts_delay = p_input_thread->i_pts_delay;
-        vlc_object_release( p_input_thread );
-    }
-    else
-    {
-        p_vout->p->i_pts_delay = DEFAULT_PTS_DELAY;
-    }
-
     if( vlc_thread_create( p_vout, "video output", RunThread,
                            VLC_THREAD_PRIORITY_OUTPUT, true ) )
     {
@@ -603,6 +593,18 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
     }
     p_vout->p->b_paused = b_paused;
     p_vout->p->i_pause_date = i_date;
+
+    vlc_object_unlock( p_vout );
+}
+void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_lost )
+{
+    vlc_object_lock( p_vout );
+
+    *pi_displayed = p_vout->p->i_picture_displayed;
+    *pi_lost = p_vout->p->i_picture_lost;
+
+    p_vout->p->i_picture_displayed = 0;
+    p_vout->p->i_picture_lost = 0;
 
     vlc_object_unlock( p_vout );
 }
@@ -822,7 +824,6 @@ static void* RunThread( vlc_object_t *p_this )
 
     bool            b_drop_late;
 
-    int             i_displayed = 0, i_lost = 0;
     int canc = vlc_savecancel ();
 
     /*
@@ -861,7 +862,6 @@ static void* RunThread( vlc_object_t *p_this )
         picture_t *p_filtered_picture;
         mtime_t display_date = 0;
         picture_t *p_directbuffer;
-        input_thread_t *p_input;
         int i_index;
 
 #if 0
@@ -872,21 +872,6 @@ static void* RunThread( vlc_object_t *p_this )
                      I_RENDERPICTURES, p_vout->i_heap_size );
         }
 #endif
-
-        /* Update statistics */
-        p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-        if( p_input )
-        {
-            vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_UpdateInteger( p_vout, p_input->p->counters.p_lost_pictures,
-                                 i_lost , NULL);
-            stats_UpdateInteger( p_vout,
-                                 p_input->p->counters.p_displayed_pictures,
-                                 i_displayed , NULL);
-            i_displayed = i_lost = 0;
-            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-            vlc_object_release( p_input );
-        }
 
         /*
          * Find the picture to display (the one with the earliest date).
@@ -945,21 +930,9 @@ static void* RunThread( vlc_object_t *p_this )
                 /* Picture is late: it will be destroyed and the thread
                  * will directly choose the next picture */
                 DropPicture( p_vout, p_picture );
-                i_lost++;
+                p_vout->p->i_picture_lost++;
                 msg_Warn( p_vout, "late picture skipped (%"PRId64")",
                                   current_date - display_date );
-                continue;
-            }
-
-            if( display_date >
-                current_date + p_vout->p->i_pts_delay + VOUT_BOGUS_DELAY )
-            {
-                /* Picture is waaay too early: it will be destroyed */
-                DropPicture( p_vout, p_picture );
-                i_lost++;
-                msg_Warn( p_vout, "vout warning: early picture skipped "
-                          "(%"PRId64")", display_date - current_date
-                          - p_vout->p->i_pts_delay );
                 continue;
             }
 
@@ -1014,7 +987,7 @@ static void* RunThread( vlc_object_t *p_this )
         /*
          * Perform rendering
          */
-        i_displayed++;
+        p_vout->p->i_picture_displayed++;
         p_directbuffer = vout_RenderPicture( p_vout, p_filtered_picture,
                                              p_subpic, p_vout->p->b_paused );
 

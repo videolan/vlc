@@ -880,8 +880,8 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
             {
                 msg_Warn( p_aout, "received buffer in the future (%"PRId64")",
                           p_aout_buf->start_date - mdate() );
-                i_lost++;
             }
+            i_lost++;
             aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
         }
 
@@ -891,12 +891,14 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     if( i_decoded > 0 || i_lost > 0 || i_played > 0 )
     {
         vlc_mutex_lock( &p_input->p->counters.counters_lock);
+
         stats_UpdateInteger( p_dec, p_input->p->counters.p_lost_abuffers,
                              i_lost, NULL );
         stats_UpdateInteger( p_dec, p_input->p->counters.p_played_abuffers,
                              i_played, NULL );
         stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_audio,
                              i_decoded, NULL );
+
         vlc_mutex_unlock( &p_input->p->counters.counters_lock);
     }
 }
@@ -1084,6 +1086,9 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_thread_t *p_input = p_owner->p_input;
     picture_t      *p_pic;
+    int i_lost = 0;
+    int i_decoded = 0;
+    int i_displayed = 0;
 
     while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
     {
@@ -1097,9 +1102,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
             break;
         }
 
-        vlc_mutex_lock( &p_input->p->counters.counters_lock );
-        stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_video, 1, NULL );
-        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+        i_decoded++;
 
         if( p_pic->date < p_owner->i_preroll_end )
         {
@@ -1124,12 +1127,51 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         DecoderVoutBufferFixTs( p_pic, p_owner->p_clock, p_input->i_pts_delay );
 
-        vout_DatePicture( p_vout, p_pic, p_pic->date );
+        /* Video is never delayed so simple */
+        const mtime_t i_max_date = mdate() + p_input->i_pts_delay + VOUT_BOGUS_DELAY;
 
-        /* Re-enable it but do it right this time */
-        //DecoderOptimizePtsDelay( p_dec );
+        if( p_pic->date > 0 && p_pic->date < i_max_date )
+        {
+            vout_DatePicture( p_vout, p_pic, p_pic->date );
 
-        vout_DisplayPicture( p_vout, p_pic );
+            /* Re-enable it but do it right this time */
+            //DecoderOptimizePtsDelay( p_dec );
+            vout_DisplayPicture( p_vout, p_pic );
+        }
+        else
+        {
+            if( p_pic->date <= 0 )
+            {
+                msg_Warn( p_vout, "non-dated video buffer received" );
+            }
+            else
+            {
+                msg_Warn( p_vout, "early picture skipped (%"PRId64")",
+                          p_pic->date - mdate() );
+            }
+            i_lost++;
+            VoutDisplayedPicture( p_vout, p_pic );
+        }
+        int i_tmp_display;
+        int i_tmp_lost;
+        vout_GetResetStatistic( p_vout, &i_tmp_display, &i_tmp_lost );
+
+        i_displayed += i_tmp_display;
+        i_lost += i_tmp_lost;
+    }
+    if( i_decoded > 0 || i_lost > 0 || i_displayed > 0 )
+    {
+        vlc_mutex_lock( &p_input->p->counters.counters_lock );
+
+        stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_video,
+                             i_decoded, NULL );
+        stats_UpdateInteger( p_dec, p_input->p->counters.p_lost_pictures,
+                             i_lost , NULL);
+
+        stats_UpdateInteger( p_dec, p_input->p->counters.p_displayed_pictures,
+                             i_displayed, NULL);
+
+        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }
 }
 
