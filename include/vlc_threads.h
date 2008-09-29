@@ -119,9 +119,6 @@ typedef struct
 typedef struct
 {
     CRITICAL_SECTION mutex;
-    LONG             owner;
-    unsigned         recursion;
-    bool             recursive;
 }
 vlc_mutex_t;
 typedef HANDLE  vlc_cond_t;

@@ -247,8 +247,9 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     return i_result;
 
 #elif defined( WIN32 )
+    /* This creates a recursive mutex. This is OK as fast mutexes have
+     * no defined behavior in case of recursive locking. */
     InitializeCriticalSection (&p_mutex->mutex);
-    p_mutex->recursive = false;
     return 0;
 
 #endif
@@ -275,9 +276,6 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 
 #elif defined( WIN32 )
     InitializeCriticalSection( &p_mutex->mutex );
-    p_mutex->owner = 0; /* the error value for GetThreadId()! */
-    p_mutex->recursion = 0;
-    p_mutex->recursive = true;
     return 0;
 
 #endif
@@ -317,24 +315,6 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("locking mutex");
 
 #elif defined( WIN32 )
-    if (p_mutex->recursive)
-    {
-        DWORD self = GetCurrentThreadId ();
-
-        if ((DWORD)InterlockedCompareExchange (&p_mutex->owner, self,
-                                               self) == self)
-        {   /* We already locked this recursive mutex */
-            p_mutex->recursion++;
-            return;
-        }
-
-        /* We need to lock this recursive mutex */
-        EnterCriticalSection (&p_mutex->mutex);
-        self = InterlockedExchange (&p_mutex->owner, self);
-        assert (self == 0); /* no previous owner */
-        return;
-    }
-    /* Non-recursive mutex */
     EnterCriticalSection (&p_mutex->mutex);
 
 #endif
@@ -352,18 +332,6 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("unlocking mutex");
 
 #elif defined( WIN32 )
-    if (p_mutex->recursive)
-    {
-        if (p_mutex->recursion != 0)
-        {
-            p_mutex->recursion--;
-            return; /* We still own this mutex */
-        }
-
-        /* We release the mutex */
-        InterlockedExchange (&p_mutex->owner, 0);
-        /* fall through */
-    }
     LeaveCriticalSection (&p_mutex->mutex);
 
 #endif
@@ -504,7 +472,6 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 #elif defined( WIN32 )
     DWORD result;
 
-    assert (!p_mutex->recursive);
     do
     {
         vlc_testcancel ();
@@ -545,7 +512,6 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 #elif defined( WIN32 )
     DWORD result;
 
-    assert (!p_mutex->recursive);
     do
     {
         vlc_testcancel ();
