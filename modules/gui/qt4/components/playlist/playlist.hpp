@@ -48,14 +48,13 @@ class PlaylistWidget : public QSplitter
 {
     Q_OBJECT;
 public:
-    PlaylistWidget( intf_thread_t *_p_i, QWidget *parent ) ;
+    PlaylistWidget( intf_thread_t *_p_i );
     virtual ~PlaylistWidget();
 private:
     PLSelector *selector;
     PLPanel *rightPanel;
     QPushButton *addButton;
     ArtLabel *art;
-    QWidget *parent;
 protected:
     intf_thread_t *p_intf;
     virtual void dropEvent( QDropEvent *);

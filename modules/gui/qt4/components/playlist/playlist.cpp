@@ -42,9 +42,7 @@
  * Playlist Widget. The embedded playlist
  **********************************************************************/
 
-PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
-                                QWidget *_parent )
-               : p_intf ( _p_i ), parent( _parent )
+PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
 {
     setContentsMargins( 3, 3, 3, 3 );
 
@@ -130,8 +128,8 @@ PlaylistWidget::~PlaylistWidget()
 {
     getSettings()->beginGroup("Playlist");
     getSettings()->setValue( "splitterSizes", saveState() );
-    getSettings()->setValue( "GlobalPos", mapToGlobal( pos() ) );
     getSettings()->endGroup();
+    msg_Dbg( p_intf, "Playlist Destroyed" );
 }
 
 #include "main_interface.hpp"

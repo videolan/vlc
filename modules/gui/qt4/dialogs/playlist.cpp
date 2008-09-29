@@ -52,7 +52,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
 
     getSettings()->beginGroup("playlistdialog");
 
-    playlistWidget = new PlaylistWidget( p_intf, this );
+    playlistWidget = new PlaylistWidget( p_intf );
     l->addWidget( playlistWidget );
 
     readSettings( getSettings(), QSize( 600,700 ) );
