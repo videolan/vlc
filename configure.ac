@@ -568,7 +568,7 @@ AC_CACHE_CHECK([for struct sockaddr_storage], ac_cv_struct_sockaddr_storage,
   [AC_TRY_COMPILE(
     [#include <sys/types.h>
      #if defined( UNDER_CE )
-     # include <winsock.h>
+     # include <winsock2.h>
      #elif defined( WIN32 )
      # include <winsock2.h>
      #else
