@@ -85,14 +85,16 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     }
 
     p_input = malloc(sizeof(aout_input_t));
-    if ( p_input == NULL )
+    if( p_input == NULL )
         goto error;
     memset( p_input, 0, sizeof(aout_input_t) );
 
     vlc_mutex_init( &p_input->lock );
 
-    p_input->b_changed = 0;
-    p_input->b_error = 1;
+    p_input->b_changed = false;
+    p_input->b_error = true;
+    p_input->b_paused = false;
+    p_input->i_pause_date = 0;
 
     aout_FormatPrepare( p_format );
 
@@ -267,7 +269,7 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
                                   / p_input->input.i_frame_length;
 
     /* Suppose the decoder doesn't have more than one buffered buffer */
-    p_input->b_changed = 0;
+    p_input->b_changed = false;
 
     aout_unlock_input( NULL, p_input );
 
@@ -329,7 +331,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         p_new_buffer->end_date = p_buffer->end_date;
         aout_BufferFree( p_buffer );
         p_buffer = p_new_buffer;
-        p_input->b_changed = 0;
+        p_input->b_changed = false;
     }
 
     int i_ret = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
@@ -357,5 +359,30 @@ int aout_DecGetResetLost( aout_instance_t *p_aout, aout_input_t *p_input )
     aout_unlock_input( p_aout, p_input );
 
     return i_value;
+}
+
+void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b_paused, mtime_t i_date )
+{
+    mtime_t i_duration = 0;
+    aout_lock_input( p_aout, p_input );
+    assert( !p_input->b_paused || !b_paused );
+    if( p_input->b_paused )
+    {
+        i_duration = i_date - p_input->i_pause_date;
+    }
+    p_input->b_paused = b_paused;
+    p_input->i_pause_date = i_date;
+    aout_unlock_input( p_aout, p_input );
+
+    if( i_duration != 0 )
+    {
+        aout_lock_mixer( p_aout );
+        for( aout_buffer_t *p = p_input->fifo.p_first; p != NULL; p = p->p_next )
+        {
+            p->start_date += i_duration;
+            p->end_date += i_duration;
+        }
+        aout_unlock_mixer( p_aout );
+    }
 }
 

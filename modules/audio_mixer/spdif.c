@@ -78,7 +78,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
     int i = 0;
     aout_input_t * p_input = p_aout->pp_inputs[i];
-    while ( p_input->b_error )
+    while ( p_input->b_error || p_input->b_paused )
     {
         p_input = p_aout->pp_inputs[++i];
     }
@@ -91,7 +91,8 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         aout_buffer_t * p_deleted;
 
         p_input = p_aout->pp_inputs[i];
-        if ( p_input->b_error ) continue;
+        if ( p_input->b_error || p_input->b_paused )
+            continue;
         p_fifo = &p_input->fifo;
         p_deleted = p_fifo->p_first;
         while ( p_deleted != NULL )

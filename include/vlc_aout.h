@@ -284,10 +284,14 @@ struct aout_input_t
     bool              b_changed;
 
     /* last rate from input */
-    int                     i_last_input_rate;
+    int               i_last_input_rate;
 
     /* */
-    int                     i_buffer_lost;
+    int               i_buffer_lost;
+
+    /* */
+    bool              b_paused;
+    mtime_t           i_pause_date;
  };
 
 /** an output stream for the audio output */

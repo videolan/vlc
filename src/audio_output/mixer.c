@@ -131,7 +131,8 @@ static int MixBuffer( aout_instance_t * p_aout )
             aout_fifo_t * p_fifo = &p_input->fifo;
             aout_buffer_t * p_buffer;
 
-            if ( p_input->b_error ) continue;
+            if ( p_input->b_error || p_input->b_paused )
+                continue;
 
             p_buffer = p_fifo->p_first;
             while ( p_buffer != NULL && p_buffer->start_date < mdate() )
@@ -176,7 +177,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         mtime_t prev_date;
         bool b_drop_buffers;
 
-        if ( p_input->b_error )
+        if ( p_input->b_error || p_input->b_paused )
         {
             if ( i_first_input == i ) i_first_input++;
             continue;

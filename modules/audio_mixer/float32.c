@@ -133,7 +133,8 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         float * p_out = (float *)p_buffer->p_buffer;
         float * p_in = (float *)p_input->p_first_byte_to_mix;
 
-        if ( p_input->b_error ) continue;
+        if ( p_input->b_error || p_input->b_paused )
+            continue;
 
         for ( ; ; )
         {

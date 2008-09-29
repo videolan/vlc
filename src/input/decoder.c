@@ -694,15 +694,17 @@ static void DecoderOutputChangePause( decoder_t *p_dec, bool b_paused, mtime_t i
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
+    vlc_assert_locked( &p_owner->lock );
+
     /* XXX only audio and video output have to be paused.
      * - for sout it is useless
      * - for subs, it is done by the vout
      */
     if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
-        // TODO
-        //if( p_own->p_vout )
-        //    aout_ChangePause( p_own->p_aout, p_own->p_aout_input, b_paused, i_date );
+        if( p_owner->p_aout && p_owner->p_aout_input )
+            aout_DecChangePause( p_owner->p_aout, p_owner->p_aout_input,
+                                 b_paused, i_date );
     }
     else if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
@@ -1377,7 +1379,8 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             if( p_vout && p_owner->p_spu_vout == p_vout )
             {
                 /* Preroll does not work very well with subtitle */
-                if( p_spu->i_start < p_owner->i_preroll_end &&
+                if( p_spu->i_start > 0 &&
+                    p_spu->i_start < p_owner->i_preroll_end &&
                     ( p_spu->i_stop <= 0 || p_spu->i_stop < p_owner->i_preroll_end ) )
                 {
                     subpicture_Delete( p_spu );

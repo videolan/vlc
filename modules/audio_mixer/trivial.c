@@ -83,7 +83,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
     uint8_t * p_in;
     uint8_t * p_out;
 
-    while ( p_input->b_error )
+    while ( p_input->b_error || p_input->b_paused )
     {
         p_input = p_aout->pp_inputs[++i];
         /* This can't crash because if no input has b_error == 0, the
@@ -133,7 +133,8 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         aout_buffer_t * p_deleted;
 
         p_input = p_aout->pp_inputs[i];
-        if ( p_input->b_error ) continue;
+        if ( p_input->b_error || p_input->b_paused )
+            continue;
         p_fifo = &p_input->fifo;
         p_deleted = p_fifo->p_first;
         while ( p_deleted != NULL )

@@ -487,21 +487,30 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     if( p_input->b_restart )
     {
-        aout_fifo_t fifo, dummy_fifo;
+        aout_fifo_t fifo;
         uint8_t     *p_first_byte_to_mix;
+        bool        b_paused;
+        mtime_t     i_pause_date;
 
         aout_lock_mixer( p_aout );
         aout_lock_input_fifos( p_aout );
 
-        /* A little trick to avoid loosing our input fifo */
-        aout_FifoInit( p_aout, &dummy_fifo, p_aout->mixer.mixer.i_rate );
+        /* A little trick to avoid loosing our input fifo and properties */
+
         p_first_byte_to_mix = p_input->p_first_byte_to_mix;
         fifo = p_input->fifo;
-        p_input->fifo = dummy_fifo;
+        b_paused = p_input->b_paused;
+        i_pause_date = p_input->i_pause_date;
+
+        aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
+
         aout_InputDelete( p_aout, p_input );
+
         aout_InputNew( p_aout, p_input );
         p_input->p_first_byte_to_mix = p_first_byte_to_mix;
         p_input->fifo = fifo;
+        p_input->b_paused = b_paused;
+        p_input->i_pause_date = i_pause_date;
 
         aout_unlock_input_fifos( p_aout );
         aout_unlock_mixer( p_aout );
