@@ -440,6 +440,7 @@ connect:
         if( p_sys->url.psz_username && p_sys->url.psz_password &&
             p_sys->auth.psz_nonce && p_sys->auth.i_nonce == 0 )
         {
+            Disconnect( p_access );
             goto connect;
         }
         snprintf( psz_msg, 250,
@@ -457,6 +458,7 @@ connect:
             if( psz_password ) p_sys->url.psz_password = strdup( psz_password );
             free( psz_login );
             free( psz_password );
+            Disconnect( p_access );
             goto connect;
         }
         else
