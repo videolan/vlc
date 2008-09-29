@@ -111,10 +111,14 @@ struct decoder_owner_sys_t
     /* Pause */
     bool b_paused;
     mtime_t i_pause_date;
+
     /* CC */
     bool b_cc_supported;
     bool pb_cc_present[4];
     decoder_t *pp_cc[4];
+
+    /* Delay */
+    mtime_t i_ts_delay;
 };
 
 /* */
@@ -491,6 +495,15 @@ void input_DecoderChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
     DecoderOutputChangePause( p_dec, b_paused, i_date );
     vlc_mutex_unlock( &p_owner->lock );
 }
+
+void input_DecoderChangeDelay( decoder_t *p_dec, mtime_t i_delay )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+    p_owner->i_ts_delay = i_delay;
+    vlc_mutex_unlock( &p_owner->lock );
+}
 /**
  * Create a decoder object
  *
@@ -634,6 +647,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         p_owner->pb_cc_present[i] = false;
         p_owner->pp_cc[i] = NULL;
     }
+    p_owner->i_ts_delay = 0;
     return p_dec;
 }
 
@@ -688,6 +702,19 @@ static void DecoderWaitUnpause( decoder_t *p_dec )
         vlc_cond_wait( &p_owner->wait, &p_owner->lock );
 
     vlc_mutex_unlock( &p_owner->lock );
+}
+
+static mtime_t DecoderGetTotalDelay( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+
+    mtime_t i_delay = p_owner->i_ts_delay;
+
+    vlc_mutex_unlock( &p_owner->lock );
+
+    return p_owner->p_input->i_pts_delay + i_delay;
 }
 
 static void DecoderOutputChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
@@ -847,7 +874,9 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 
         DecoderWaitUnpause( p_dec );
 
-        DecoderAoutBufferFixTs( p_aout_buf, p_clock, p_input->i_pts_delay );
+        const mtime_t i_delay = DecoderGetTotalDelay( p_dec );
+
+        DecoderAoutBufferFixTs( p_aout_buf, p_clock, i_delay );
 
         if( p_clock )
             i_rate = input_clock_GetRate( p_clock );
@@ -857,7 +886,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
             i_rate = INPUT_RATE_DEFAULT;
 
         /* FIXME TODO take care of audio-delay for mdate check */
-        const mtime_t i_max_date = mdate() + p_input->i_pts_delay + AOUT_MAX_ADVANCE_TIME;
+        const mtime_t i_max_date = mdate() + i_delay + AOUT_MAX_ADVANCE_TIME;
 
         if( p_aout_buf->start_date > 0 &&
             p_aout_buf->start_date <= i_max_date &&
@@ -1127,10 +1156,12 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         DecoderWaitUnpause( p_dec );
 
-        DecoderVoutBufferFixTs( p_pic, p_owner->p_clock, p_input->i_pts_delay );
+        const mtime_t i_delay = DecoderGetTotalDelay( p_dec );
+
+        DecoderVoutBufferFixTs( p_pic, p_owner->p_clock, i_delay );
 
         /* Video is never delayed so simple */
-        const mtime_t i_max_date = mdate() + p_input->i_pts_delay + VOUT_BOGUS_DELAY;
+        const mtime_t i_max_date = mdate() + i_delay + VOUT_BOGUS_DELAY;
 
         if( p_pic->date > 0 && p_pic->date < i_max_date )
         {
@@ -1245,8 +1276,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
                 DecoderWaitUnpause( p_dec );
 
+                const mtime_t i_delay = DecoderGetTotalDelay( p_dec );
+
                 DecoderSoutBufferFixTs( p_sout_block,
-                                        p_owner->p_clock, p_owner->p_input->i_pts_delay, b_telx );
+                                        p_owner->p_clock, i_delay, b_telx );
 
                 sout_InputSendBuffer( p_owner->p_sout_input,
                                       p_sout_block );

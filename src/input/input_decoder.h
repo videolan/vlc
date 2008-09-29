@@ -42,6 +42,11 @@
 void input_DecoderChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 
 /**
+ * This function changes the delay.
+ */
+void input_DecoderChangeDelay( decoder_t *, mtime_t i_delay );
+
+/**
  * This function warn the decoder about a discontinuity and allow flushing
  * if requested.
  */

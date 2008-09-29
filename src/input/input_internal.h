@@ -335,14 +335,6 @@ void stream_AccessDelete( stream_t *s );
 void stream_AccessReset( stream_t *s );
 void stream_AccessUpdate( stream_t *s );
 
-/* decoder.c */
-#define BLOCK_FLAG_CORE_FLUSH (1 <<BLOCK_FLAG_CORE_PRIVATE_SHIFT)
-void       input_DecoderDiscontinuity( decoder_t * p_dec, bool b_flush );
-bool input_DecoderEmpty( decoder_t * p_dec );
-int        input_DecoderSetCcState( decoder_t *, bool b_decode, int i_channel );
-int        input_DecoderGetCcState( decoder_t *, bool *pb_decode, int i_channel );
-void       input_DecoderIsCcPresent( decoder_t *, bool pb_present[4] );
-
 /* es_out.c */
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
 void       input_EsOutDelete( es_out_t * );

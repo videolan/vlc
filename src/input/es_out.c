@@ -386,7 +386,7 @@ static void EsOutDiscontinuity( es_out_t *out, bool b_flush, bool b_audio )
         }
     }
 }
-static void EsOutDecoderChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
+static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 {
     es_out_sys_t *p_sys = out->p_sys;
 
@@ -411,6 +411,25 @@ static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_dat
 
     for( int i = 0; i < p_sys->i_pgrm; i++ )
         input_clock_ChangePause( p_sys->pgrm[i]->p_clock, b_paused, i_date );
+}
+
+static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    mtime_t i_delay = 0;
+    if( p_es->fmt.i_cat == AUDIO_ES )
+        i_delay = p_sys->i_audio_delay;
+    else if( p_es->fmt.i_cat == SPU_ES )
+        i_delay = p_sys->i_spu_delay;
+
+    if( i_delay != 0 )
+    {
+        if( p_es->p_dec )
+            input_DecoderChangeDelay( p_es->p_dec, i_delay );
+        if( p_es->p_dec_record )
+            input_DecoderChangeDelay( p_es->p_dec, i_delay );
+    }
 }
 
 void input_EsOutChangeRate( es_out_t *out, int i_rate )
@@ -501,21 +520,24 @@ void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
 
     if( i_cat == AUDIO_ES )
         p_sys->i_audio_delay = i_delay;
-    else if( i_cat == SPU_ES )
+    else if( i_cat == AUDIO_ES )
         p_sys->i_spu_delay = i_delay;
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+        EsOutDecoderChangeDelay( out, p_sys->es[i] );
 }
 void input_EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 {
     /* XXX the order is important */
     if( b_paused )
     {
-        EsOutDecoderChangePause( out, true, i_date );
+        EsOutDecodersChangePause( out, true, i_date );
         EsOutProgramChangePause( out, true, i_date );
     }
     else
     {
         EsOutProgramChangePause( out, false, i_date );
-        EsOutDecoderChangePause( out, false, i_date );
+        EsOutDecodersChangePause( out, false, i_date );
     }
 }
 void input_EsOutChangePosition( es_out_t *out )
@@ -1187,6 +1209,8 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     p_es->p_dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_input->p->p_sout );
     if( p_es->p_dec && !p_es->p_master && p_sys->p_sout_record )
         p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
+
+    EsOutDecoderChangeDelay( out, p_es );
 }
 static void EsDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 {
@@ -1535,15 +1559,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
     es_out_pgrm_t  *p_pgrm = es->p_pgrm;
-    int64_t i_delay;
     int i_total = 0;
-
-    if( es->fmt.i_cat == AUDIO_ES )
-        i_delay = p_sys->i_audio_delay;
-    else if( es->fmt.i_cat == SPU_ES )
-        i_delay = p_sys->i_spu_delay;
-    else
-        i_delay = 0;
 
     if( libvlc_stats( p_input ) )
     {
@@ -1567,12 +1583,6 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         else
             es->i_preroll_end = -1;
     }
-
-    if( p_block->i_dts > 0 )
-        p_block->i_dts += i_delay;
-
-    if( p_block->i_pts > 0 )
-        p_block->i_pts += i_delay;
 
     p_block->i_rate = 0;
 
