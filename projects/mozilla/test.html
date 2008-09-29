@@ -208,7 +208,7 @@ Verbosity:
 <TD>
     <INPUT type=button id="telx" value="Teletext off" onClick='doToggleTeletext();'>
     Teletext page:
-    <INPUT size=4 value="100" id="telxPage" onClick="doTelxPage(document.getElementById('telxPage').value);">
+    <INPUT size=4 value="100" id="telxPage" onClick='doTelxPage(document.getElementById("telxPage").value);'>
 </TD>
 </TR>
 </TABLE>
@@ -303,7 +303,6 @@ function doAspectRatio(value)
 function doSubtitle(value)
 {
     var vlc = getVLC("vlc");
-    alert(vlc.video.subtitle + value);
     vlc.video.subtitle = vlc.video.subtitle + value;
     document.getElementById("spuTextField").innerHTML = vlc.video.subtitle;
 };
@@ -311,8 +310,7 @@ function doSubtitle(value)
 function doTelxPage(value)
 {
     var vlc = getVLC("vlc");
-    alert( value );
-    vlc.video.teletext = 889; //value;
+    vlc.video.teletext = parseInt(value);
 };
 
 function doToggleTeletext()
@@ -324,13 +322,11 @@ function doToggleTeletext()
     {
         document.getElementById("telx").innerHTML = "Teletext on";
         telxState = true;
-        alert( "telextext on" );
     }
     else
     {
         document.getElementById("telx").innerHTML = "Teletext off";
         telxState = false;
-        alert( "telextext off" );
     }
 }
 
@@ -430,17 +426,17 @@ function doState()
     else if( newState == 6 )
     {
         // current media is playing forward
-	onForward();
+        onForward();
     }
     else if( newState == 7 )
     {
         // current media is playing backward
-	onBackward();
+        onBackward();
     }
     else if( newState == 8 )
     {
-	// current media has ended
-	onEnd();
+        // current media has ended
+        onEnd();
     }
     else if( newState == 9 )
     {
@@ -465,7 +461,7 @@ function monitor()
             {
                 alert( msg.message );
             }
-	    document.getElementById("message").innerHTML = msg.message;
+            document.getElementById("message").innerHTML = msg.message;
         }
         // clear the log once finished to avoid clogging
         vlc.log.messages.clear();
@@ -498,27 +494,27 @@ function monitor()
             // current media is now paused
             onPause();
         }
-	else if( newState == 5 )
-	{
-	    // current media has stopped
-            onStop();
-	}
-	else if( newState == 6 )
-	{
-	    // current media is playing forward
-	    onForward();
-	}
-	else if( newState == 7 )
-	{
-	    // current media is playing backward
-	    onBackward();
-	}
-	else if( newState == 8 )
-	{
-	    // current media has ended
+        else if( newState == 5 )
+        {
+            // current media has stopped
+                onStop();
+        }
+        else if( newState == 6 )
+        {
+            // current media is playing forward
+            onForward();
+        }
+        else if( newState == 7 )
+        {
+            // current media is playing backward
+            onBackward();
+        }
+        else if( newState == 8 )
+        {
+            // current media has ended
             onEnd();
         }
-	else if( newState == 9 )
+        else if( newState == 9 )
         {
             // current media encountered error
             onError();
@@ -593,11 +589,11 @@ function doPlayOrPause()
     if( vlc.playlist.isPlaying )
     {
         vlc.playlist.togglePause();
-	monitor();
+        monitor();
     }
     else if( vlc.playlist.itemCount > 0 )
     {
-	// clear the message log and enable error logging
+        // clear the message log and enable error logging
         vlc.log.verbosity = 1;
         vlc.log.messages.clear();
         vlc.playlist.play();
@@ -605,7 +601,7 @@ function doPlayOrPause()
     }
     else
     {
-	// disable log
+        // disable log
         vlc.log.verbosity = -1;
         alert('nothing to play !');
     }
