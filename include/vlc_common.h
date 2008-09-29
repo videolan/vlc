@@ -498,11 +498,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
-#   if defined( UNDER_CE )
-#      define IS_WINNT 0
-#   else
-#      define IS_WINNT ( GetVersion() < 0x80000000 )
-#   endif
 #endif
 
 #include "vlc_mtime.h"

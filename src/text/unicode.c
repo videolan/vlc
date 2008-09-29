@@ -262,25 +262,23 @@ char *ToLocaleDup (const char *utf8)
  */
 int utf8_open (const char *filename, int flags, mode_t mode)
 {
-#if defined (WIN32) || defined (UNDER_CE)
-    if (GetVersion() < 0x80000000)
+#ifdef WIN32
+    /* for Windows NT and above */
+    wchar_t wpath[MAX_PATH + 1];
+
+    if (!MultiByteToWideChar (CP_UTF8, 0, filename, -1, wpath, MAX_PATH))
     {
-        /* for Windows NT and above */
-        wchar_t wpath[MAX_PATH + 1];
-
-        if (!MultiByteToWideChar (CP_UTF8, 0, filename, -1, wpath, MAX_PATH))
-        {
-            errno = ENOENT;
-            return -1;
-        }
-        wpath[MAX_PATH] = L'\0';
-
-        /*
-         * open() cannot open files with non-“ANSI” characters on Windows.
-         * We use _wopen() instead. Same thing for mkdir() and stat().
-         */
-        return _wopen (wpath, flags, mode);
+        errno = ENOENT;
+        return -1;
     }
+    wpath[MAX_PATH] = L'\0';
+
+    /*
+        * open() cannot open files with non-“ANSI” characters on Windows.
+        * We use _wopen() instead. Same thing for mkdir() and stat().
+        */
+    return _wopen (wpath, flags, mode);
+
 #endif
     const char *local_name = ToLocale (filename);
 
@@ -573,22 +571,19 @@ int utf8_scandir( const char *dirname, char ***namelist,
 static int utf8_statEx( const char *filename, struct stat *buf,
                         bool deref )
 {
-#if defined (WIN32) || defined (UNDER_CE)
-    /* retrieve Windows OS version */
-    if( GetVersion() < 0x80000000 )
+#if defined (WIN32)
+    /* for Windows NT and above */
+    wchar_t wpath[MAX_PATH + 1];
+
+    if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
     {
-        /* for Windows NT and above */
-        wchar_t wpath[MAX_PATH + 1];
-
-        if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
-        {
-            errno = ENOENT;
-            return -1;
-        }
-        wpath[MAX_PATH] = L'\0';
-
-        return _wstati64( wpath, buf );
+        errno = ENOENT;
+        return -1;
     }
+    wpath[MAX_PATH] = L'\0';
+
+    return _wstati64( wpath, buf );
+
 #endif
 #ifdef HAVE_SYS_STAT_H
     const char *local_name = ToLocale( filename );
@@ -636,25 +631,22 @@ int utf8_lstat( const char *filename, struct stat *buf)
  */
 int utf8_unlink( const char *filename )
 {
-#if defined (WIN32) || defined (UNDER_CE)
-    if( GetVersion() < 0x80000000 )
+#if defined (WIN32)
+    /* for Windows NT and above */
+    wchar_t wpath[MAX_PATH + 1];
+
+    if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
     {
-        /* for Windows NT and above */
-        wchar_t wpath[MAX_PATH + 1];
-
-        if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
-        {
-            errno = ENOENT;
-            return -1;
-        }
-        wpath[MAX_PATH] = L'\0';
-
-        /*
-         * unlink() cannot open files with non-“ANSI” characters on Windows.
-         * We use _wunlink() instead.
-         */
-        return _wunlink( wpath );
+        errno = ENOENT;
+        return -1;
     }
+    wpath[MAX_PATH] = L'\0';
+
+    /*
+        * unlink() cannot open files with non-“ANSI” characters on Windows.
+        * We use _wunlink() instead.
+        */
+    return _wunlink( wpath );
 #endif
     const char *local_name = ToLocale( filename );
 

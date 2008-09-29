@@ -107,9 +107,6 @@ static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
 
-    /* Only works on NT/2K/XP */
-    if( !IS_WINNT ) return VLC_EGENERIC;
-
     p_intf->pf_run = Run;
     return VLC_SUCCESS;
 }

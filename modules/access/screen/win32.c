@@ -264,7 +264,7 @@ block_t *screen_Capture( demux_t *p_demux )
                  p_sys->fmt.video.i_width, p_data->i_fragment_size,
                  p_data->hdc_src, p_sys->i_left, p_sys->i_top +
                  p_data->i_fragment * p_data->i_fragment_size,
-                 IS_WINNT ? SRCCOPY | CAPTUREBLT : SRCCOPY ) )
+                 SRCCOPY | CAPTUREBLT ) )
     {
         msg_Err( p_demux, "error during BitBlt()" );
         return NULL;
