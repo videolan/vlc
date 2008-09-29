@@ -188,7 +188,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* Delay */
     var_Create( p_input, "audio-delay", VLC_VAR_TIME );
-    val.i_time = 0;
+    val.i_time = INT64_C(1000) * var_GetInteger( p_input, "audio-desync" );
     var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
     var_Create( p_input, "spu-delay", VLC_VAR_TIME );
     val.i_time = 0;
@@ -770,15 +770,17 @@ static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp( psz_cmd, "audio-delay" ) )
     {
-        /*Change i_pts_delay to make sure es are decoded in time*/
-        if (newval.i_int < 0 || oldval.i_int < 0 )
+        /* Change i_pts_delay to make sure es are decoded in time */
+        if( newval.i_int < 0 || oldval.i_int < 0 )
         {
             p_input->i_pts_delay -= newval.i_int - oldval.i_int;
         }
         input_ControlPush( p_input, INPUT_CONTROL_SET_AUDIO_DELAY, &newval );
     }
     else if( !strcmp( psz_cmd, "spu-delay" ) )
+    {
         input_ControlPush( p_input, INPUT_CONTROL_SET_SPU_DELAY, &newval );
+    }
     return VLC_SUCCESS;
 }
 

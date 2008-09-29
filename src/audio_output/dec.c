@@ -155,21 +155,18 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     aout_unlock_input_fifos( p_aout );
 
     aout_unlock_mixer( p_aout );
-    p_input->i_desync = var_CreateGetInteger( p_this, "audio-desync" ) * 1000;
 
     p_input_thread = (input_thread_t *)vlc_object_find( p_this,
                                            VLC_OBJECT_INPUT, FIND_PARENT );
     if( p_input_thread )
     {
         p_input->i_pts_delay = p_input_thread->i_pts_delay;
-        p_input->i_pts_delay += p_input->i_desync;
         p_input->p_input_thread = p_input_thread;
         vlc_object_release( p_input_thread );
     }
     else
     {
         p_input->i_pts_delay = DEFAULT_PTS_DELAY;
-        p_input->i_pts_delay += p_input->i_desync;
         p_input->p_input_thread = NULL;
     }
 
@@ -334,10 +331,6 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         aout_BufferFree( p_buffer );
         return 0;
     }
-
-    /* Apply the desynchronisation requested by the user */
-    p_buffer->start_date += p_input->i_desync;
-    p_buffer->end_date += p_input->i_desync;
 
     if ( p_buffer->start_date > mdate() + p_input->i_pts_delay +
          AOUT_MAX_ADVANCE_TIME )

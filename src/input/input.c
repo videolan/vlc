@@ -925,7 +925,8 @@ static void InitTitle( input_thread_t * p_input )
     /* If the desynchronisation requested by the user is < 0, we need to
      * cache more data. */
     var_Get( p_input, "audio-desync", &val );
-    if( val.i_int < 0 ) p_input->i_pts_delay -= (val.i_int * 1000);
+    if( val.i_int < 0 )
+        p_input->i_pts_delay -= (val.i_int * 1000);
 
     /* Update cr_average depending on the caching */
     p_input->p->input.i_cr_average *= (10 * p_input->i_pts_delay / 200000);

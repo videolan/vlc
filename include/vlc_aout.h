@@ -290,9 +290,6 @@ struct aout_input_t
     int                     i_last_input_rate;
     /* internal caching delay from input */
     int                     i_pts_delay;
-    /* desynchronisation delay request by the user */
-    int                     i_desync;
-
 };
 
 /** an output stream for the audio output */
