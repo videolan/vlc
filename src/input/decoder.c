@@ -808,11 +808,17 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     input_thread_t  *p_input = p_owner->p_input;
     input_clock_t   *p_clock = p_owner->p_clock;
     aout_buffer_t   *p_aout_buf;
+    int i_decoded = 0;
+    int i_lost = 0;
+    int i_played = 0;
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
         aout_instance_t *p_aout = p_owner->p_aout;
         aout_input_t    *p_aout_input = p_owner->p_aout_input;
+        int i_rate;
+        int i_lost;
+        int i_played;
 
         if( p_dec->b_die )
         {
@@ -822,9 +828,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
                 block_Release( p_block );
             break;
         }
-        vlc_mutex_lock( &p_input->p->counters.counters_lock );
-        stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_audio, 1, NULL );
-        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+        i_decoded++;
 
         if( p_aout_buf->start_date < p_owner->i_preroll_end )
         {
@@ -841,14 +845,59 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 
         DecoderWaitUnpause( p_dec );
 
-        const int i_rate = p_clock ? input_clock_GetRate( p_clock ) : p_block->i_rate;
-
         DecoderAoutBufferFixTs( p_aout_buf, p_clock, p_input->i_pts_delay );
-        if( i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
-            i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
-            aout_DecPlay( p_aout, p_aout_input, p_aout_buf, i_rate );
+
+        if( p_clock )
+            i_rate = input_clock_GetRate( p_clock );
+        else if( p_block && p_block->i_rate > 0 )
+            i_rate = p_block->i_rate;
         else
+            i_rate = INPUT_RATE_DEFAULT;
+
+        /* FIXME TODO take care of audio-delay for mdate check */
+        const mtime_t i_max_date = mdate() + p_input->i_pts_delay + AOUT_MAX_ADVANCE_TIME;
+
+        if( p_aout_buf->start_date > 0 &&
+            p_aout_buf->start_date <= i_max_date &&
+            i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
+            i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
+        {
+            /* Wait if we are too early
+             * FIXME that's plain ugly to do it here */
+            mwait( p_aout_buf->start_date - AOUT_MAX_PREPARE_TIME );
+
+            if( !aout_DecPlay( p_aout, p_aout_input, p_aout_buf, i_rate ) )
+                i_played++;
+            i_lost += aout_DecGetResetLost( p_aout, p_aout_input );
+        }
+        else
+        {
+            if( p_aout_buf->start_date <= 0 )
+            {
+                msg_Warn( p_dec, "non-dated audio buffer received" );
+            }
+            else if( p_aout_buf->start_date > i_max_date )
+            {
+                msg_Warn( p_aout, "received buffer in the future (%"PRId64")",
+                          p_aout_buf->start_date - mdate() );
+                i_lost++;
+            }
             aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
+        }
+
+    }
+
+    /* Update ugly stat */
+    if( i_decoded > 0 || i_lost > 0 || i_played > 0 )
+    {
+        vlc_mutex_lock( &p_input->p->counters.counters_lock);
+        stats_UpdateInteger( p_dec, p_input->p->counters.p_lost_abuffers,
+                             i_lost, NULL );
+        stats_UpdateInteger( p_dec, p_input->p->counters.p_played_abuffers,
+                             i_played, NULL );
+        stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_audio,
+                             i_decoded, NULL );
+        vlc_mutex_unlock( &p_input->p->counters.counters_lock);
     }
 }
 static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )

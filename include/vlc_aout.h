@@ -251,9 +251,6 @@ struct aout_input_t
      * third-party. */
     vlc_mutex_t             lock;
 
-    /* The input thread that spawned this input */
-    input_thread_t         *p_input_thread;
-
     audio_sample_format_t   input;
     aout_alloc_t            input_alloc;
 
@@ -288,9 +285,10 @@ struct aout_input_t
 
     /* last rate from input */
     int                     i_last_input_rate;
-    /* internal caching delay from input */
-    int                     i_pts_delay;
-};
+
+    /* */
+    int                     i_buffer_lost;
+ };
 
 /** an output stream for the audio output */
 typedef struct aout_output_t

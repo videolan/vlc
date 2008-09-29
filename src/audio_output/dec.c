@@ -39,9 +39,6 @@
 
 #include "aout_internal.h"
 
-/** FIXME: Ugly but needed to access the counters */
-#include "input/input_internal.h"
-
 /*****************************************************************************
  * aout_DecNew : create a decoder
  *****************************************************************************/
@@ -50,7 +47,6 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
                               audio_replay_gain_t *p_replay_gain )
 {
     aout_input_t * p_input;
-    input_thread_t * p_input_thread;
 
     /* Sanitize audio format */
     if( p_format->i_channels > 32 )
@@ -155,20 +151,6 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     aout_unlock_input_fifos( p_aout );
 
     aout_unlock_mixer( p_aout );
-
-    p_input_thread = (input_thread_t *)vlc_object_find( p_this,
-                                           VLC_OBJECT_INPUT, FIND_PARENT );
-    if( p_input_thread )
-    {
-        p_input->i_pts_delay = p_input_thread->i_pts_delay;
-        p_input->p_input_thread = p_input_thread;
-        vlc_object_release( p_input_thread );
-    }
-    else
-    {
-        p_input->i_pts_delay = DEFAULT_PTS_DELAY;
-        p_input->p_input_thread = NULL;
-    }
 
     return p_input;
 
@@ -313,41 +295,10 @@ void aout_DecDeleteBuffer( aout_instance_t * p_aout, aout_input_t * p_input,
 int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   aout_buffer_t * p_buffer, int i_input_rate )
 {
-    if ( p_buffer->start_date == 0 )
-    {
-        msg_Warn( p_aout, "non-dated buffer received" );
-        aout_BufferFree( p_buffer );
-        return -1;
-    }
+    assert( i_input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE &&
+            i_input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE );
 
-#ifndef FIXME
-    /* This hack for #transcode{acodec=...}:display to work -- Courmisch */
-    if( i_input_rate == 0 )
-        i_input_rate = INPUT_RATE_DEFAULT;
-#endif
-    if( i_input_rate > INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE ||
-        i_input_rate < INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE )
-    {
-        aout_BufferFree( p_buffer );
-        return 0;
-    }
-
-    if ( p_buffer->start_date > mdate() + p_input->i_pts_delay +
-         AOUT_MAX_ADVANCE_TIME )
-    {
-        msg_Warn( p_aout, "received buffer in the future (%"PRId64")",
-                  p_buffer->start_date - mdate());
-        if( p_input->p_input_thread )
-        {
-            vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
-            stats_UpdateInteger( p_aout,
-                           p_input->p_input_thread->p->counters.p_lost_abuffers,
-                           1, NULL );
-            vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
-        }
-        aout_BufferFree( p_buffer );
-        return -1;
-    }
+    assert( p_buffer->start_date > 0 );
 
     p_buffer->end_date = p_buffer->start_date
                             + (mtime_t)p_buffer->i_nb_samples * 1000000
@@ -355,14 +306,14 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     aout_lock_input( p_aout, p_input );
 
-    if ( p_input->b_error )
+    if( p_input->b_error )
     {
         aout_unlock_input( p_aout, p_input );
         aout_BufferFree( p_buffer );
         return -1;
     }
 
-    if ( p_input->b_changed )
+    if( p_input->b_changed )
     {
         /* Maybe the allocation size has changed. Re-allocate a buffer. */
         aout_buffer_t * p_new_buffer;
@@ -381,27 +332,30 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         p_input->b_changed = 0;
     }
 
-    /* If the buffer is too early, wait a while. */
-    mwait( p_buffer->start_date - AOUT_MAX_PREPARE_TIME );
-
-    int ret = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
+    int i_ret = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
 
     aout_unlock_input( p_aout, p_input );
 
-    if ( ret == -1 ) return -1;
+    if( i_ret == -1 )
+        return -1;
 
     /* Run the mixer if it is able to run. */
     aout_lock_mixer( p_aout );
+
     aout_MixerRun( p_aout );
-    if( p_input->p_input_thread )
-    {
-        vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
-        stats_UpdateInteger( p_aout,
-                             p_input->p_input_thread->p->counters.p_played_abuffers,
-                             1, NULL );
-        vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
-    }
+
     aout_unlock_mixer( p_aout );
 
     return 0;
 }
+
+int aout_DecGetResetLost( aout_instance_t *p_aout, aout_input_t *p_input )
+{
+    aout_lock_input( p_aout, p_input );
+    int i_value = p_input->i_buffer_lost;
+    p_input->i_buffer_lost = 0;
+    aout_unlock_input( p_aout, p_input );
+
+    return i_value;
+}
+

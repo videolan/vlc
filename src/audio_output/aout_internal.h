@@ -139,6 +139,7 @@ int aout_DecDelete ( aout_instance_t *, aout_input_t * );
 aout_buffer_t * aout_DecNewBuffer( aout_input_t *, size_t );
 void aout_DecDeleteBuffer( aout_instance_t *, aout_input_t *, aout_buffer_t * );
 int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t *, int i_input_rate );
+int aout_DecGetResetLost( aout_instance_t *, aout_input_t * );
 
 /* Helpers */
 

@@ -42,11 +42,9 @@
 #   include <alloca.h>
 #endif
 #include <vlc_aout.h>
+#include <libvlc.h>
 
 #include "aout_internal.h"
-
-/** FIXME: Ugly but needed to access the counters */
-#include "input/input_internal.h"
 
 #define AOUT_ASSERT_MIXER_LOCKED vlc_assert_locked( &p_aout->mixer_lock )
 #define AOUT_ASSERT_INPUT_LOCKED vlc_assert_locked( &p_input->lock )
@@ -759,12 +757,7 @@ static void inputDrop( aout_instance_t *p_aout, aout_input_t *p_input, aout_buff
 {
     aout_BufferFree( p_buffer );
 
-    if( !p_input->p_input_thread )
-        return;
-
-    vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
-    stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
-    vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
+    p_input->i_buffer_lost++;
 }
 
 static void inputResamplingStop( aout_input_t *p_input )
