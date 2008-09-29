@@ -486,7 +486,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     vlc_object_t *p_vbi;
-    int i_ret;
+    int i_ret = -1;
 
     if( !p_vout ) return;
 
@@ -506,20 +506,62 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
 void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
-    /* We only work on the first vout */
-    vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    bool opaque; int i_ret;
+    input_thread_t *p_input_thread;
+    vlc_object_t *p_vbi;
+    int i_ret;
 
-    /* GetVout will raise the exception for us */
-    if( !p_vout ) return;
+    p_input_thread = libvlc_get_input_thread(p_mi, p_e);
+    if( !p_input_thread ) return;
 
-    opaque = var_GetBool( p_vout, "vbi-opaque" );
-    i_ret = var_SetBool( p_vout, "vbi-opaque", !opaque );
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while setting teletext transparency" );
+    p_vbi = (vlc_object_t *) vlc_object_find_name( p_input_thread, "zvbi",
+                                                   FIND_ANYWHERE );
+    if( p_vbi )
+    {
+        const int i_teletext_es = var_GetInteger( p_input_thread, "teletext-es" );
+        const int i_spu_es = var_GetInteger( p_input_thread, "spu-es" );
 
-    vlc_object_release( p_vout );
+        if( (i_teletext_es >= 0) && (i_teletext_es == i_spu_es) )
+        {
+            int i_page = 100;
+
+            i_page = var_GetInteger( p_vbi, "vbi-page" );
+            i_page = (i_teletext_es >= 0) ? i_page : 0;
+
+            i_ret = var_SetInteger( p_vbi, "vbi-page", i_page );
+            if( i_ret )
+                libvlc_exception_raise( p_e,
+                                "Unexpected error while setting teletext page" );
+        }
+        else if( i_teletext_es >= 0 )
+        {
+            bool opaque = true;
+
+            opaque = var_GetBool( p_vbi, "vbi-opaque" );
+            i_ret = var_SetBool( p_vbi, "vbi-opaque", !opaque );
+            if( i_ret )
+                libvlc_exception_raise( p_e,
+                                "Unexpected error while setting teletext transparency" );
+        }
+        vlc_object_release( p_vbi );
+    }
+    else
+    {
+        /* Teletext is not enabled yet, so enable it.
+         * Only after it is enable it is possible to view teletext pages
+         */
+        const int i_teletext_es = var_GetInteger( p_input_thread, "teletext-es" );
+
+        if( i_teletext_es >= 0 )
+        {
+            const int i_spu_es = var_GetInteger( p_input_thread, "spu-es" );
+
+            if( i_teletext_es == i_spu_es )
+                var_SetInteger( p_input_thread, "spu-es", -1 );
+            else
+                var_SetInteger( p_input_thread, "spu-es", i_teletext_es );
+        }
+    }
+    vlc_object_release( p_input_thread );
 }
 
 int libvlc_video_destroy( libvlc_media_player_t *p_mi,
