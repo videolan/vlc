@@ -50,7 +50,7 @@ VLC_EXPORT( int, utf8_scandir, ( const char *dirname, char ***namelist, int (*se
 VLC_EXPORT( int, utf8_mkdir, ( const char *filename, mode_t mode ) );
 VLC_EXPORT( int, utf8_unlink, ( const char *filename ) );
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( UNDER_CE )
 # define stat _stati64
 #endif
 
