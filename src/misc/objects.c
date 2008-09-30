@@ -395,7 +395,7 @@ error:
  * @param obj object that would be "killed"
  * @return a readable pipe descriptor, or -1 on error.
  */
-int __vlc_object_waitpipe( vlc_object_t *obj )
+int vlc_object_waitpipe( vlc_object_t *obj )
 {
     int pfd[2] = { -1, -1 };
     vlc_object_internals_t *internals = vlc_internals( obj );
