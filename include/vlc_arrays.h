@@ -432,7 +432,9 @@ static inline void vlc_dictionary_init( vlc_dictionary_t * p_dict, int i_size )
     p_dict->i_size = i_size;
 }
 
-static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict )
+static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict,
+                                         void ( * pf_free )( void * p_data, void * p_obj ),
+                                         void * p_obj )
 {
     int i;
     struct vlc_dictionary_entry_t * p_current, * p_next;
@@ -444,6 +446,8 @@ static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict )
             while( p_current )
             {
                 p_next = p_current->p_next;
+                if( pf_free != NULL )
+                    ( * pf_free )( p_current->p_value, p_obj );
                 free( p_current->psz_key );
                 free( p_current );
                 p_current = p_next;
@@ -553,7 +557,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
                 }
             }
 
-            vlc_dictionary_clear( p_dict );
+            vlc_dictionary_clear( p_dict, NULL, NULL );
             p_dict->i_size = new_dict.i_size;
             p_dict->p_entries = new_dict.p_entries;
         }
@@ -567,7 +571,9 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
 }
 
 static inline void
-vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_key )
+vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_key,
+                                     void ( * pf_free )( void * p_data, void * p_obj ),
+                                     void * p_obj )
 {
     if( !p_dict->p_entries )
         return;
@@ -584,6 +590,8 @@ vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char
     do {
         if( !strcmp( psz_key, p_entry->psz_key ) )
         {
+            if( pf_free != NULL )
+                ( * pf_free )( p_entry->p_value, p_obj );
             if( !p_prev )
                 p_dict->p_entries[i_pos] = p_entry->p_next;
             else

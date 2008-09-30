@@ -186,7 +186,7 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
     CloseHandle( QUEUE.logfile );
 #endif
 
-    vlc_dictionary_clear( &priv->msg_enabled_objects );
+    vlc_dictionary_clear( &priv->msg_enabled_objects, NULL, NULL );
 
     /* Destroy lock */
     vlc_mutex_destroy( &QUEUE.lock );

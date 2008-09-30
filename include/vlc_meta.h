@@ -93,6 +93,14 @@ struct vlc_meta_t
 #define vlc_meta_SetArtURL( meta, b )      vlc_meta_Set( meta, vlc_meta_ArtworkURL, b )
 #define vlc_meta_SetTrackID( meta, b )     vlc_meta_Set( meta, vlc_meta_TrackID, b )
 
+/* Free a dictonary key allocated by strdup() in vlc_meta_AddExtra() */
+static void vlc_meta_FreeExtraKey( void * p_data, void * p_obj )
+{
+    VLC_UNUSED( p_obj );
+    free( p_data );
+}
+
+
 static inline void vlc_meta_Set( vlc_meta_t * p_meta, vlc_meta_type_t meta_type, const char * psz_val )
 {
     free( p_meta->ppsz_meta[meta_type] );
@@ -119,7 +127,7 @@ static inline void vlc_meta_Delete( vlc_meta_t *m )
     int i;
     for( i = 0; i < VLC_META_TYPE_COUNT ; i++ )
         free( m->ppsz_meta[i] );
-    vlc_dictionary_clear( &m->extra_tags );
+    vlc_dictionary_clear( &m->extra_tags, &vlc_meta_FreeExtraKey, NULL );
     free( m );
 }
 
@@ -129,7 +137,8 @@ static inline void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const
     if( psz_oldvalue != kVLCDictionaryNotFound )
     {
         free( psz_oldvalue );
-        vlc_dictionary_remove_value_for_key( &m->extra_tags, psz_name );
+        vlc_dictionary_remove_value_for_key( &m->extra_tags, psz_name,
+                                             &vlc_meta_FreeExtraKey, NULL );
     }
     vlc_dictionary_insert( &m->extra_tags, psz_name, strdup(psz_value) );
 }
@@ -155,7 +164,7 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
     for( i = 0; ppsz_all_keys[i]; i++ )
     {
         /* Always try to remove the previous value */
-        vlc_dictionary_remove_value_for_key( &dst->extra_tags, ppsz_all_keys[i] );
+        vlc_dictionary_remove_value_for_key( &dst->extra_tags, ppsz_all_keys[i], NULL, NULL );
         void * p_value = vlc_dictionary_value_for_key( &src->extra_tags, ppsz_all_keys[i] );
         vlc_dictionary_insert( &dst->extra_tags, ppsz_all_keys[i], p_value );
         free( ppsz_all_keys[i] );

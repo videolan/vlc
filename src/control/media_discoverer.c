@@ -235,7 +235,7 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
     }
     free( all_keys );
 
-    vlc_dictionary_clear( &p_mdis->catname_to_submedialist );
+    vlc_dictionary_clear( &p_mdis->catname_to_submedialist, NULL, NULL );
 
     free( p_mdis );
 }

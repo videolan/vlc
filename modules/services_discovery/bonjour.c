@@ -232,7 +232,7 @@ static void browse_callback(
             services_discovery_RemoveItem( p_sd, p_item );
             vlc_dictionary_remove_value_for_key(
                         &p_sys->services_name_to_input_item,
-                        name );
+                        name, NULL, NULL );
         }
     }
 }
@@ -294,7 +294,7 @@ error:
     if( p_sys->poll != NULL )
         avahi_threaded_poll_free( p_sys->poll );
 
-    vlc_dictionary_clear( &p_sys->services_name_to_input_item );
+    vlc_dictionary_clear( &p_sys->services_name_to_input_item, NULL, NULL );
     free( p_sys );
 
     return VLC_EGENERIC;
@@ -312,6 +312,6 @@ static void Close( vlc_object_t *p_this )
     avahi_client_free( p_sys->client );
     avahi_threaded_poll_free( p_sys->poll );
 
-    vlc_dictionary_clear( &p_sys->services_name_to_input_item );
+    vlc_dictionary_clear( &p_sys->services_name_to_input_item, NULL, NULL );
     free( p_sys );
 }
