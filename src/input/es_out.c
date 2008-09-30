@@ -367,25 +367,6 @@ mtime_t input_EsOutGetWakeup( es_out_t *out )
     return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
 }
 
-static void EsOutDiscontinuity( es_out_t *out, bool b_flush, bool b_audio )
-{
-    es_out_sys_t      *p_sys = out->p_sys;
-    int i;
-
-    for( i = 0; i < p_sys->i_es; i++ )
-    {
-        es_out_id_t *es = p_sys->es[i];
-
-        /* Send a dummy block to let decoder know that
-         * there is a discontinuity */
-        if( es->p_dec && ( !b_audio || es->fmt.i_cat == AUDIO_ES ) )
-        {
-            input_DecoderDiscontinuity( es->p_dec, b_flush );
-            if( es->p_dec_record )
-                input_DecoderDiscontinuity( es->p_dec_record, b_flush );
-        }
-    }
-}
 static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -542,10 +523,23 @@ void input_EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 }
 void input_EsOutChangePosition( es_out_t *out )
 {
-    //es_out_sys_t *p_sys = out->p_sys;
+    es_out_sys_t      *p_sys = out->p_sys;
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *es = p_sys->es[i];
+
+        /* Send a dummy block to let decoder know that
+         * there is a discontinuity */
+        if( es->p_dec )
+        {
+            input_DecoderFlush( es->p_dec );
+            if( es->p_dec_record )
+                input_DecoderFlush( es->p_dec_record );
+        }
+    }
 
     es_out_Control( out, ES_OUT_RESET_PCR );
-    EsOutDiscontinuity( out, true, false );
 }
 
 bool input_EsOutDecodersEmpty( es_out_t *out )
@@ -557,9 +551,9 @@ bool input_EsOutDecodersEmpty( es_out_t *out )
     {
         es_out_id_t *es = p_sys->es[i];
 
-        if( es->p_dec && !input_DecoderEmpty( es->p_dec ) )
+        if( es->p_dec && !input_DecoderIsEmpty( es->p_dec ) )
             return false;
-        if( es->p_dec_record && !input_DecoderEmpty( es->p_dec_record ) )
+        if( es->p_dec_record && !input_DecoderIsEmpty( es->p_dec_record ) )
             return false;
     }
     return true;
@@ -1558,7 +1552,6 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
-    es_out_pgrm_t  *p_pgrm = es->p_pgrm;
     int i_total = 0;
 
     if( libvlc_stats( p_input ) )
@@ -1653,8 +1646,8 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     {
         while( !out->p_sys->p_input->b_die && es->p_dec )
         {
-            if( input_DecoderEmpty( es->p_dec ) &&
-                ( !es->p_dec_record || input_DecoderEmpty( es->p_dec_record ) ))
+            if( input_DecoderIsEmpty( es->p_dec ) &&
+                ( !es->p_dec_record || input_DecoderIsEmpty( es->p_dec_record ) ))
                 break;
             msleep( 20*1000 );
         }
@@ -1933,7 +1926,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             {
                 int64_t i_ts = (int64_t)va_arg( args, int64_t );
                 int64_t *pi_ts = (int64_t *)va_arg( args, int64_t * );
-                *pi_ts = input_clock_GetTS( p_sys->p_pgrm->p_clock,
+                *pi_ts = input_clock_GetTS( p_sys->p_pgrm->p_clock, NULL,
                                             p_sys->p_input->i_pts_delay, i_ts );
                 return VLC_SUCCESS;
             }

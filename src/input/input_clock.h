@@ -77,8 +77,11 @@ void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date 
 
 /**
  * This function converts a timestamp from stream clock to system clock.
+ *
+ * If pi_rate is provided it will be field with the rate value used for
+ * the conversion.
  */
-mtime_t input_clock_GetTS( input_clock_t *, mtime_t i_pts_delay, mtime_t );
+mtime_t input_clock_GetTS( input_clock_t *, int *pi_rate, mtime_t i_pts_delay, mtime_t );
 
 /**
  * This function returns the current rate.

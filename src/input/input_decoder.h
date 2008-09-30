@@ -47,15 +47,14 @@ void input_DecoderChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 void input_DecoderChangeDelay( decoder_t *, mtime_t i_delay );
 
 /**
- * This function warn the decoder about a discontinuity and allow flushing
- * if requested.
+ * This function will cause a flush of the decoder.
  */
-void input_DecoderDiscontinuity( decoder_t *, bool b_flush );
+void input_DecoderFlush( decoder_t * );
 
 /**
  * This function returns true if the decoder fifo is empty and false otherwise.
  */
-bool input_DecoderEmpty( decoder_t * );
+bool input_DecoderIsEmpty( decoder_t * );
 
 /**
  * This function activates the request closed caption channel.

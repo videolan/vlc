@@ -322,12 +322,15 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl )
 /*****************************************************************************
  * input_clock_GetTS: manages a PTS or DTS
  *****************************************************************************/
-mtime_t input_clock_GetTS( input_clock_t *cl,
+mtime_t input_clock_GetTS( input_clock_t *cl, int *pi_rate,
                            mtime_t i_pts_delay, mtime_t i_ts )
 {
     mtime_t i_converted_ts;
 
     vlc_mutex_lock( &cl->lock );
+
+    if( pi_rate )
+        *pi_rate = cl->i_rate;
 
     if( !cl->b_has_reference )
     {
