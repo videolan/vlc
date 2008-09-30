@@ -206,33 +206,24 @@ static void Close (vlc_object_t * p_this)
     free (p_sys);
 }
 
+
+#include <vlc_network.h>
+
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
 static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    ssize_t i_ret;
     int fd = p_sys->fd;
+    ssize_t i_ret;
 
-#if !defined(WIN32) && !defined(UNDER_CE)
-    if( !p_sys->b_seekable )
-    {
-        /* Note that POSIX regular files (b_seekable) opened for read are
-         * guaranteed to always set POLLIN immediately, so we can spare
-         * poll()ing them. */
-        /* Wait until some data is available. Impossible on Windows. */
-        struct pollfd ufd[2] = {
-            { .fd = fd, .events = POLLIN, },
-            { .fd = vlc_object_waitpipe (p_access), .events = POLLIN, },
-        };
-
-        if (poll (ufd, 2, -1) < 0 || ufd[1].revents)
-            return -1;
-    }
-#endif /* WIN32 || UNDER_CE */
-
+#ifndef WIN32
+    i_ret = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
+#else
     i_ret = read (fd, p_buffer, i_len);
+#endif
+    
     if( i_ret < 0 )
     {
         switch (errno)
