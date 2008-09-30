@@ -35,7 +35,7 @@
  */
 
 #if defined( UNDER_CE )
-                                                                /* WinCE API */
+#   include <errno.h>                                           /* WinCE API */
 #elif defined( WIN32 )
 #   include <process.h>                                         /* Win32 API */
 #   include <errno.h>

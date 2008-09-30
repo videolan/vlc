@@ -82,6 +82,9 @@ static const char *GetDir( bool b_appdata, bool b_common_appdata )
     wchar_t wdir[MAX_PATH];
 
 # if defined (UNDER_CE)
+    /*There are some errors in cegcc headers*/
+#undef SHGetSpecialFolderPath
+    BOOL WINAPI SHGetSpecialFolderPath(HWND,LPWSTR,int,BOOL);
     if( SHGetSpecialFolderPath( NULL, wdir, CSIDL_APPDATA, 1 ) )
 # else
     /* Get the "Application Data" folder for the current user */

@@ -258,7 +258,11 @@ void *vlc_wopendir( const wchar_t *wpath )
         if( !p_dir )
             return NULL;
         p_dir->p_real_dir = NULL;
+# if defined(UNDER_CE)
+        p_dir->i_drives = NULL;
+# elif
         p_dir->i_drives = GetLogicalDrives();
+#endif
         return (void *)p_dir;
     }
 
@@ -303,6 +307,10 @@ struct _wdirent *vlc_wreaddir( void *_p_dir )
 
     /* Drive letters mode */
     i_drives = p_dir->i_drives;
+#ifdef UNDER_CE
+    swprintf( p_dir->dd_dir.d_name, L"\\");
+    p_dir->dd_dir.d_namlen = wcslen(p_dir->dd_dir.d_name);
+#else
     if ( !i_drives )
         return NULL; /* end */
 
@@ -315,6 +323,7 @@ struct _wdirent *vlc_wreaddir( void *_p_dir )
     swprintf( p_dir->dd_dir.d_name, L"%c:\\", 'A' + i );
     p_dir->dd_dir.d_namlen = wcslen(p_dir->dd_dir.d_name);
     p_dir->i_drives &= ~(1UL << i);
+#endif
     return &p_dir->dd_dir;
 }
 

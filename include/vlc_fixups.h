@@ -281,4 +281,12 @@ typedef void *locale_t;
 #define N_(str) gettext_noop (str)
 #define gettext_noop(str) (str)
 
+#ifdef UNDER_CE
+static inline void rewind ( FILE *stream )
+{
+    fseek(stream, 0L, SEEK_SET);
+    clearerr(stream);
+}
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */

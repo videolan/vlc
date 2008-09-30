@@ -2060,7 +2060,7 @@ static int ConsoleWidth( void )
             i_width = 80;
         pclose( file );
     }
-#else
+#elif !defined (UNDER_CE)
     CONSOLE_SCREEN_BUFFER_INFO buf;
 
     if (GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &buf))
