@@ -234,7 +234,7 @@ char *vlc_strsep( char **ppsz_string, const char *psz_delimiters )
  * vlc_*dir_wrapper: wrapper under Windows to return the list of drive letters
  * when called with an empty argument or just '\'
  *****************************************************************************/
-#if defined(WIN32) && !defined(UNDER_CE)
+#if defined(WIN32)
 #   include <assert.h>
 
 typedef struct vlc_DIR
@@ -330,7 +330,7 @@ void vlc_rewinddir( void *_p_dir )
 /* This one is in the libvlccore exported symbol list */
 int vlc_wclosedir( void *_p_dir )
 {
-#if defined(WIN32) && !defined(UNDER_CE)
+#if defined(WIN32)
     vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
     int i_ret = 0;
 

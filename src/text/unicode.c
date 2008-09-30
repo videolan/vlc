@@ -262,7 +262,10 @@ char *ToLocaleDup (const char *utf8)
  */
 int utf8_open (const char *filename, int flags, mode_t mode)
 {
-#ifdef WIN32
+#ifdef UNDER_CE
+    /*_open translates to wchar internally on WinCE*/
+    return _open (filename, flags, mode);
+#elif defined (WIN32)
     /* for Windows NT and above */
     wchar_t wpath[MAX_PATH + 1];
 
@@ -571,7 +574,10 @@ int utf8_scandir( const char *dirname, char ***namelist,
 static int utf8_statEx( const char *filename, struct stat *buf,
                         bool deref )
 {
-#if defined (WIN32)
+#ifdef UNDER_CE
+    /*_stat translates to wchar internally on WinCE*/
+    return _stat( filename, buf );
+#elif defined (WIN32)
     /* for Windows NT and above */
     wchar_t wpath[MAX_PATH + 1];
 
@@ -631,7 +637,10 @@ int utf8_lstat( const char *filename, struct stat *buf)
  */
 int utf8_unlink( const char *filename )
 {
-#if defined (WIN32)
+#ifdef UNDER_CE
+    /*_open translates to wchar internally on WinCE*/
+    return _unlink( filename );
+#elif defined (WIN32)
     /* for Windows NT and above */
     wchar_t wpath[MAX_PATH + 1];
 

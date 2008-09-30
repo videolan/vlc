@@ -44,12 +44,54 @@ static inline char *strdup (const char *str)
 # include <stdarg.h>
 static inline int vasprintf (char **strp, const char *fmt, va_list ap)
 {
+#ifndef UNDER_CE
     int len = vsnprintf (NULL, 0, fmt, ap) + 1;
     char *res = (char *)malloc (len);
     if (res == NULL)
         return -1;
     *strp = res;
     return vsprintf (res, fmt, ap);
+#else
+    /* HACK: vsnprintf in the WinCE API behaves like
+     * the one in glibc 2.0 and doesn't return the number of characters
+     * it needed to copy the string.
+     * cf http://msdn.microsoft.com/en-us/library/1kt27hek.aspx
+     * and cf the man page of vsnprintf
+     *
+     Guess we need no more than 50 bytes. */
+    int n, size = 50;
+    char *res, *np;
+
+    if ((res = (char *) malloc (size)) == NULL)
+        return -1;
+
+    while (1)
+    {
+        n = vsnprintf (res, size, fmt, ap);
+
+        /* If that worked, return the string. */
+        if (n > -1 && n < size)
+        {
+            *strp = res;
+            return n;
+        }
+
+        /* Else try again with more space. */
+        if (n == -1)
+            size *= 2;  /* twice the old size */
+
+        if ((np = (char *) realloc (res, size)) == NULL)
+        {
+            free(res);
+            return -1;
+        }
+        else
+        {
+            res = np;
+        }
+
+    }
+#endif /* UNDER_CE */
 }
 #endif
 
