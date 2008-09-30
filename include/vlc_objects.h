@@ -157,7 +157,3 @@ static inline bool __vlc_object_alive (const vlc_object_t *obj)
 
 #define vlc_object_alive(a) \
     __vlc_object_alive( VLC_OBJECT(a) )
-
-VLC_EXPORT( int, __vlc_object_waitpipe, ( vlc_object_t *obj ));
-#define vlc_object_waitpipe(a) \
-    __vlc_object_waitpipe( VLC_OBJECT(a) )
