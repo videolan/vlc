@@ -45,6 +45,10 @@
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
+static inline int dirfd (void *dir)
+{
+    return -1;
+}
 #elif defined( UNDER_CE )
 #   define strcoll strcmp
 #endif
