@@ -1472,7 +1472,8 @@ static block_t* GrabVideo( demux_t *p_demux )
         /* Unlock */
         if( ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
         {
-            msg_Err (p_demux, "Failed to unlock (VIDIOC_QBUF)");
+            msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
+            block_Release( p_block );
             return 0;
         }
 
@@ -1519,7 +1520,8 @@ static block_t* GrabVideo( demux_t *p_demux )
         /* Unlock */
         if( ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
         {
-            msg_Err (p_demux, "Failed to unlock (VIDIOC_QBUF)");
+            msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
+            block_Release( p_block );
             return 0;
         }
 
