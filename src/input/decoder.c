@@ -486,7 +486,7 @@ void input_DecoderChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
 
     vlc_mutex_lock( &p_owner->lock );
 
-    assert( (!p_owner->b_paused) != (!b_paused) );
+    assert( !p_owner->b_paused || !b_paused );
     p_owner->b_paused = b_paused;
     p_owner->i_pause_date = i_date;
     if( p_owner->b_own_thread )
