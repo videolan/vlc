@@ -137,14 +137,14 @@ static VLCUpdate *_o_sharedInstance = nil;
 {
     /* provide a save dialogue */
     SEL sel = @selector(getLocationForSaving:returnCode:contextInfo:);
-    NSSavePanel * saveFilePanel = [[NSSavePanel alloc] init];
+    NSOpenPanel * saveFilePanel = [[NSOpenPanel alloc] init];
 
-    [saveFilePanel setRequiredFileType: @"dmg"];
-    [saveFilePanel setCanSelectHiddenExtension: YES];
+    [saveFilePanel setCanChooseFiles: NO];
+    [saveFilePanel setCanChooseDirectories: YES];
     [saveFilePanel setCanCreateDirectories: YES];
     update_release_t *p_release = update_GetRelease( p_u );
     assert( p_release );
-    [saveFilePanel beginSheetForDirectory:nil file:
+    [saveFilePanel beginSheetForDirectory:@"~/Downloads" file:
         [[[NSString stringWithUTF8String: p_release->psz_url] componentsSeparatedByString:@"/"] lastObject]
                            modalForWindow: o_update_window 
                             modalDelegate:self
@@ -152,14 +152,14 @@ static VLCUpdate *_o_sharedInstance = nil;
                               contextInfo:nil];
 }
 
-- (void)getLocationForSaving: (NSSavePanel *)sheet 
+- (void)getLocationForSaving: (NSOpenPanel *)sheet 
                   returnCode: (int)returnCode 
                  contextInfo: (void *)contextInfo
 {
     if( returnCode == NSOKButton )
     {
         /* perform download and pass the selected path */
-        [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:self withObject:[sheet filename]];
+        [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:self withObject:[sheet directory]];
     }
     [sheet release];
 }
