@@ -106,6 +106,7 @@
 
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
+- (IBAction)downloadCoverArt:(id)sender;
 - (void)initMediaPanelStats;
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 - (input_item_t *)item;

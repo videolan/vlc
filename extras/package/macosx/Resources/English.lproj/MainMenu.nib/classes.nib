@@ -490,17 +490,17 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>ITSlider</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSSlider</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -727,6 +727,8 @@
 				<string>id</string>
 				<key>deleteItem</key>
 				<string>id</string>
+				<key>downloadCoverArt</key>
+				<string>id</string>
 				<key>playItem</key>
 				<string>id</string>
 				<key>preparseItem</key>
@@ -765,6 +767,8 @@
 				<key>o_mi_addNode</key>
 				<string>id</string>
 				<key>o_mi_delete</key>
+				<string>id</string>
+				<key>o_mi_dl_cover_art</key>
 				<string>id</string>
 				<key>o_mi_info</key>
 				<string>id</string>

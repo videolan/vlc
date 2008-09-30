@@ -443,7 +443,8 @@
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_recursive_expand setTitle: _NS("Expand Node")];
     [o_mi_selectall setTitle: _NS("Select All")];
-    [o_mi_info setTitle: _NS("Information...")];
+    [o_mi_info setTitle: _NS("Media Information...")];
+    [o_mi_dl_cover_art setTitle: _NS("Download Cover Art")];
     [o_mi_preparse setTitle: _NS("Fetch Meta Data")];
     [o_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
     [o_mm_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
@@ -844,6 +845,37 @@
             {
                 msg_Dbg( p_intf, "preparsing nodes not implemented" );
             }
+        }
+    }
+    vlc_object_release( p_playlist );
+    [self playlistUpdated];
+}
+
+- (IBAction)downloadCoverArt:(id)sender
+{
+    int i_count;
+    NSMutableArray *o_to_preparse;
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = pl_Hold( p_intf );
+
+    o_to_preparse = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
+    i_count = [o_to_preparse count];
+
+    int i, i_row;
+    NSNumber *o_number;
+    playlist_item_t *p_item = NULL;
+
+    for( i = 0; i < i_count; i++ )
+    {
+        o_number = [o_to_preparse lastObject];
+        i_row = [o_number intValue];
+        p_item = [[o_outline_view itemAtRow:i_row] pointerValue];
+        [o_to_preparse removeObject: o_number];
+        [o_outline_view deselectRow: i_row];
+
+        if( p_item && p_item->i_children == -1 )
+        {
+            playlist_AskForArtEnqueue( p_playlist, p_item->p_input );
         }
     }
     vlc_object_release( p_playlist );

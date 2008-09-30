@@ -82,6 +82,7 @@
     IBOutlet id o_mi_preparse;
     IBOutlet id o_mi_revealInFinder;
     IBOutlet id o_mm_mi_revealInFinder;
+    IBOutlet id o_mi_dl_cover_art;
     IBOutlet id o_mi_selectall;
     IBOutlet id o_mi_sort_name;
     IBOutlet id o_mi_sort_author;
@@ -131,6 +132,7 @@
 - (IBAction)playItem:(id)sender;
 - (IBAction)revealItemInFinder:(id)sender;
 - (IBAction)preparseItem:(id)sender;
+- (IBAction)downloadCoverArt:(id)sender;
 - (IBAction)savePlaylist:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;

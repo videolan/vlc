@@ -425,6 +425,13 @@ error:
         _NS("OK"), nil, nil);
 }
 
+- (IBAction)downloadCoverArt:(id)sender
+{
+    playlist_t * p_playlist = pl_Hold( VLCIntf );
+    if( p_item) playlist_AskForArtEnqueue( p_playlist, p_item );
+    pl_Release( VLCIntf );
+}
+
 - (input_item_t *)item
 {
     if( p_item ) vlc_gc_incref( p_item );
