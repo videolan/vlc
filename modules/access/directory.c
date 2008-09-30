@@ -45,12 +45,6 @@
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
-static inline int dirfd (void *dir)
-{
-    return -1;
-}
-#elif defined( UNDER_CE )
-#   define strcoll strcmp
 #endif
 
 #ifdef HAVE_DIRENT_H
@@ -119,7 +113,9 @@ struct directory_t
     directory_t *parent;
     DIR         *handle;
     char        *uri;
+#ifndef WIN32
     struct stat  st;
+#endif
     char         path[1];
 };
 
@@ -225,12 +221,16 @@ static char *encode_path (const char *path)
 /* Detect directories that recurse into themselves. */
 static bool has_inode_loop (const directory_t *dir)
 {
+#ifndef WIN32
     dev_t dev = dir->st.st_dev;
     ino_t inode = dir->st.st_ino;
 
     while ((dir = dir->parent) != NULL)
         if ((dir->st.st_dev == dev) && (dir->st.st_ino == inode))
             return true;
+#else
+# define fstat( fd, st ) (0)
+#endif
     return false;
 }
 
