@@ -279,8 +279,6 @@
             [o_fullscreen_window setContentView:o_view];
 
             [o_fullscreen_window makeKeyAndOrderFront:self];
-
-            [o_fullscreen_window makeKeyAndOrderFront:self];
             [o_fullscreen_window orderFront:self animate:YES];
 
             [o_fullscreen_window setFrame:screen_rect display:YES];
