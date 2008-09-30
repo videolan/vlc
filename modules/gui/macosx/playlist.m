@@ -116,6 +116,7 @@
     [o_outline_view setDelegate: self];
     [o_outline_view setDataSource: self];
     [o_outline_view setAllowsEmptySelection: NO];
+    [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
 
     vlc_object_release( p_playlist );
     [self initStrings];
