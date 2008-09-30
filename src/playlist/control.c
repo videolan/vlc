@@ -67,6 +67,12 @@ void __pl_Release( vlc_object_t *p_this )
     vlc_object_release( pl );
 }
 
+void playlist_Signal( playlist_t *p_playlist )
+{
+    /* TODO: assert playlist lock? */
+    vlc_object_signal( p_playlist );
+}
+
 int playlist_Control( playlist_t * p_playlist, int i_query,
                       bool b_locked, ... )
 {

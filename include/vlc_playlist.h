@@ -390,7 +390,7 @@ static  inline input_thread_t * __pl_CurrentInput( vlc_object_t * p_this )
 #define playlist_CurrentSize( pl ) pl->current.i_size
 
 /** Ask the playlist to do some work */
-#define playlist_Signal( p_playlist ) vlc_object_signal( p_playlist )
+VLC_EXPORT( void, playlist_Signal, ( playlist_t * ) );
 
 /** @} */
 # ifdef __cplusplus

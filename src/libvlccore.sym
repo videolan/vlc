@@ -308,6 +308,7 @@ playlist_PreparseEnqueueItem
 playlist_RecursiveNodeSort
 playlist_ServicesDiscoveryAdd
 playlist_ServicesDiscoveryRemove
+playlist_Signal
 playlist_Status
 playlist_TreeMove
 __pl_Hold
