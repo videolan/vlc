@@ -875,3 +875,6 @@ VLC development is NOT about being a sed god.
 < thedj> LMAO
  -- #videolan
 %
+< Daught> wait cygwin does not even have qt4...
+< Daught> if I have to disable more stuff I will end up with windows media player
+%
