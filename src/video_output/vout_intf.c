@@ -495,7 +495,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, image_handler_t *p_image, pic
  */
 static char *VoutSnapshotGetDefaultDirectory( void )
 {
-    char *psz_path;
+    char *psz_path = NULL;
 #if defined(__APPLE__) || defined(SYS_BEOS)
 
     if( asprintf( &psz_path, "%s/Desktop",
