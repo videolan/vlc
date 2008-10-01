@@ -31,7 +31,7 @@
 
 #include "xurl.h"
 
-static char *streallocat( char *psz_string, char *psz_to_append );
+static char *streallocat( char *psz_string, const char *psz_to_append );
 
 #ifndef HAVE_STRDUP
 static char *xurl_strdup( const char *psz_string );
@@ -236,9 +236,9 @@ char *XURL_GetSchemeAndHostname( char *psz_url )
             strlen( psz_scheme ) + strlen( "://" ) +
             strlen( psz_hostname ) + 1);
     if( psz_scheme_and_hostname == NULL ) return NULL;
-    (void) strcpy( psz_scheme_and_hostname, psz_scheme );
-    (void) strcat( psz_scheme_and_hostname, "://" );
-    (void) strcat( psz_scheme_and_hostname, psz_hostname );
+    strcpy( psz_scheme_and_hostname, psz_scheme );
+    strcat( psz_scheme_and_hostname, "://" );
+    strcat( psz_scheme_and_hostname, psz_hostname );
 
     if (psz_scheme_and_hostname == NULL ) return NULL;
     return psz_scheme_and_hostname;
@@ -475,7 +475,7 @@ char *XURL_GetWithoutFragment( char *psz_url )
 }
 
 static
-char *streallocat( char *psz_string, char *psz_to_append )
+char *streallocat( char *psz_string, const char *psz_to_append )
 {
     size_t i_new_string_length = strlen( psz_string ) +
         strlen( psz_to_append ) + 1;
