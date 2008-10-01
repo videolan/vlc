@@ -597,41 +597,33 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
 
     if( i_request )
     {
-        psz_tmp = malloc( sizeof("QUERY_STRING=") + i_request );
-        sprintf( psz_tmp, "QUERY_STRING=%s", p_request );
+        asprintf( &psz_tmp, "QUERY_STRING=%s", p_request );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
-        psz_tmp = malloc( sizeof("REQUEST_URI=?") + strlen(p_url)
-                           + i_request );
-        sprintf( psz_tmp, "REQUEST_URI=%s?%s", p_url, p_request );
+        asprintf( &psz_tmp, "REQUEST_URI=%s?%s", p_url, p_request );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
     else
     {
-        psz_tmp = malloc( sizeof("REQUEST_URI=") + strlen(p_url) );
-        sprintf( psz_tmp, "REQUEST_URI=%s", p_url );
+        asprintf( &psz_tmp, "REQUEST_URI=%s", p_url );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
-    psz_tmp = malloc( sizeof("SCRIPT_NAME=") + strlen(p_url) );
-    sprintf( psz_tmp, "SCRIPT_NAME=%s", p_url );
+    asprintf( psz_tmp, "SCRIPT_NAME=%s", p_url );
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
 #define p_sys p_args->file.p_intf->p_sys
-    psz_tmp = malloc( sizeof("SERVER_NAME=") + strlen(p_sys->psz_address) );
-    sprintf( psz_tmp, "SERVER_NAME=%s", p_sys->psz_address );
+    asprintf( &psz_tmp, "SERVER_NAME=%s", p_sys->psz_address );
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
-    psz_tmp = malloc( sizeof("SERVER_PORT=") + 5 );
-    sprintf( psz_tmp, "SERVER_PORT=%u", p_sys->i_port );
+    asprintf( &psz_tmp, "SERVER_PORT=%u", p_sys->i_port );
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 #undef p_sys
 
     p = getenv( "PATH" );
     if( p != NULL )
     {
-        psz_tmp = malloc( sizeof("PATH=") + strlen(p) );
-        sprintf( psz_tmp, "PATH=%s", p );
+        asprintf( &psz_tmp, "PATH=%s", p );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
@@ -639,23 +631,20 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
     p = getenv( "windir" );
     if( p != NULL )
     {
-        psz_tmp = malloc( sizeof("SYSTEMROOT=") + strlen(p) );
-        sprintf( psz_tmp, "SYSTEMROOT=%s", p );
+        asprintf( &psz_tmp, "SYSTEMROOT=%s", p );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 #endif
 
     if( psz_remote_addr != NULL && *psz_remote_addr )
     {
-        psz_tmp = malloc( sizeof("REMOTE_ADDR=") + strlen(psz_remote_addr) );
-        sprintf( psz_tmp, "REMOTE_ADDR=%s", psz_remote_addr );
+        asprintf( &psz_tmp, "REMOTE_ADDR=%s", psz_remote_addr );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
     if( psz_remote_host != NULL && *psz_remote_host )
     {
-        psz_tmp = malloc( sizeof("REMOTE_HOST=") + strlen(psz_remote_host) );
-        sprintf( psz_tmp, "REMOTE_HOST=%s", psz_remote_host );
+        asprintf( &psz_tmp, "REMOTE_HOST=%s", psz_remote_host );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
@@ -670,8 +659,7 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
                 if( end == NULL )
                     break;
                 *end = '\0';
-                psz_tmp = malloc( sizeof("CONTENT_TYPE=") + strlen(p) );
-                sprintf( psz_tmp, "CONTENT_TYPE=%s", p );
+                asprintf( &psz_tmp, "CONTENT_TYPE=%s", p );
                 TAB_APPEND( i_env, ppsz_env, psz_tmp );
                 *end = '\r';
             }
@@ -682,8 +670,7 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
                 if( end == NULL )
                     break;
                 *end = '\0';
-                psz_tmp = malloc( sizeof("CONTENT_LENGTH=") + strlen(p) );
-                sprintf( psz_tmp, "CONTENT_LENGTH=%s", p );
+                asprintf( &psz_tmp, "CONTENT_LENGTH=%s", p );
                 TAB_APPEND( i_env, ppsz_env, psz_tmp );
                 *end = '\r';
             }
@@ -702,8 +689,7 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
     if( psz_file != NULL )
     {
         psz_file++;
-        psz_tmp = malloc( sizeof("SCRIPT_FILENAME=") + strlen(psz_file) );
-        sprintf( psz_tmp, "SCRIPT_FILENAME=%s", psz_file );
+        asprintf( &psz_tmp, "SCRIPT_FILENAME=%s", psz_file );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
         TAB_APPEND( p_args->p_association->i_argc,
