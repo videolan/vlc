@@ -57,8 +57,8 @@ mediacontrol_RGBPicture *private_mediacontrol_createRGBPicture( int, int, long, 
 #define RAISE( c, m )  if( exception ) { exception->code = c;    \
                                          exception->message = strdup(m); }
 
-#define RAISE_NULL( c, m ) { RAISE( c, m ); return NULL; }
-#define RAISE_VOID( c, m ) { RAISE( c, m ); return; }
+#define RAISE_NULL( c, m ) do{ RAISE( c, m ); return NULL; } while(0)
+#define RAISE_VOID( c, m ) do{ RAISE( c, m ); return;      } while(0)
 
 #define HANDLE_LIBVLC_EXCEPTION_VOID( e )  if( libvlc_exception_raised( e ) ) {    \
     RAISE( mediacontrol_InternalException, libvlc_exception_get_message( e )); \
