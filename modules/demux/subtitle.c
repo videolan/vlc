@@ -1463,7 +1463,10 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
         const char *s = TextGetLine( txt );
         if( !s )
+        {
+            free( psz_text );
             return VLC_EGENERIC;
+        }
 
         if( strstr( s, "FORMAT" ) )
         {
@@ -1475,7 +1478,10 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
             psz_temp = malloc( strlen(s) );
             if( !psz_temp )
+            {
+                free( psz_text );
                 return VLC_ENOMEM;
+            }
 
             if( sscanf( s, "FORMAT=%[^\r\n]", psz_temp ) )
             {
@@ -1508,7 +1514,10 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         const char *s = TextGetLine( txt );
 
         if( !s )
+        {
+            free( psz_text );
             return VLC_EGENERIC;
+        }
 
         int i_len = strlen( s );
         if( i_len == 0 )
