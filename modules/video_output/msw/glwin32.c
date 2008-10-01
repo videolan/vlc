@@ -246,11 +246,8 @@ static void CloseVideo( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_vout->p_sys->lock );
 
-    if( p_vout->p_sys )
-    {
-        free( p_vout->p_sys );
-        p_vout->p_sys = NULL;
-    }
+    free( p_vout->p_sys );
+    p_vout->p_sys = NULL;
 }
 
 /*****************************************************************************

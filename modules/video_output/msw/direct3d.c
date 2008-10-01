@@ -154,6 +154,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
         return VLC_ENOMEM;
+
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
     if( VLC_SUCCESS != Direct3DVoutCreate( p_vout ) )
@@ -307,11 +308,8 @@ static void CloseVideo( vlc_object_t *p_this )
             p_vout->p_sys->i_spi_screensavetimeout, NULL, 0);
     }
 
-    if( p_vout->p_sys )
-    {
-        free( p_vout->p_sys );
-        p_vout->p_sys = NULL;
-    }
+    free( p_vout->p_sys );
+    p_vout->p_sys = NULL;
 }
 
 /*****************************************************************************

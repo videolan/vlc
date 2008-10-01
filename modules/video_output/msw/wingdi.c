@@ -358,11 +358,8 @@ static void CloseVideo ( vlc_object_t *p_this )
     FreeLibrary( p_vout->p_sys->gapi_dll );
 #endif
 
-    if( p_vout->p_sys )
-    {
-        free( p_vout->p_sys );
-        p_vout->p_sys = NULL;
-    }
+    free( p_vout->p_sys );
+    p_vout->p_sys = NULL;
 }
 
 /*****************************************************************************
