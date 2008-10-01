@@ -313,6 +313,12 @@ static void CloseVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
+    if( p_vout->b_fullscreen )
+    {
+        Win32ToggleFullscreen( p_vout );
+        msg_Dbg( p_vout, "Quitting fullscreen" );
+    }
+
     if( p_vout->p_sys->p_event )
     {
         vlc_object_detach( p_vout->p_sys->p_event );
