@@ -1968,7 +1968,10 @@ static int ParseDKS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
             char *s = TextGetLine( txt );
             if( !s )
+            {
+                free( psz_text );
                 return VLC_EGENERIC;
+            }
 
             if( sscanf( s, "[%d:%d:%d]", &h2, &m2, &s2 ) == 3 )
                 p_subtitle->i_stop  = ( (int64_t)h2 * 3600*1000 +
