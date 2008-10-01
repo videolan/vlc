@@ -201,7 +201,7 @@ char *XURL_GetHostname( char *psz_url )
         }
 
         /* Copy hostname to a new string */
-        psz_new_hostname = xurl_malloc( i_hostname_length );
+        psz_new_hostname = malloc( i_hostname_length );
         if (psz_new_hostname == NULL) return NULL;
         strncpy( psz_new_hostname, psz_hostname, i_hostname_length );
 
@@ -232,7 +232,7 @@ char *XURL_GetSchemeAndHostname( char *psz_url )
     if( psz_hostname == NULL ) return NULL;
 
     /* malloc +1 for the terminating '\0' */
-    psz_scheme_and_hostname = xurl_malloc(
+    psz_scheme_and_hostname = malloc(
             strlen( psz_scheme ) + strlen( "://" ) +
             strlen( psz_hostname ) + 1);
     if( psz_scheme_and_hostname == NULL ) return NULL;
@@ -240,7 +240,7 @@ char *XURL_GetSchemeAndHostname( char *psz_url )
     strcat( psz_scheme_and_hostname, "://" );
     strcat( psz_scheme_and_hostname, psz_hostname );
 
-    if (psz_scheme_and_hostname == NULL ) return NULL;
+    if( psz_scheme_and_hostname == NULL ) return NULL;
     return psz_scheme_and_hostname;
 }
 
@@ -288,7 +288,7 @@ char *XURL_GetScheme( char *psz_url )
 
     i_scheme_length = psz_colon - psz_url;
 
-    new_scheme = xurl_malloc( i_scheme_length );
+    new_scheme = malloc( i_scheme_length );
     if( new_scheme == NULL ) return NULL;
 
     strncpy( new_scheme, psz_url, i_scheme_length );
@@ -307,7 +307,7 @@ XURL_Bool XURL_IsFileURL( char *psz_url )
     else
         b_return_value = XURL_FALSE;
 
-    xurl_free( psz_scheme );
+    free( psz_scheme );
 
     return b_return_value;
 }
@@ -322,7 +322,7 @@ char *xurl_strdup( const char *psz_string )
     if( !psz_string ) return NULL;
  
     i_length = strlen( psz_string ) + 1;
-    psz_new_string = (char *) xurl_malloc( i_length );
+    psz_new_string = (char *) malloc( i_length );
     if( psz_new_string == NULL ) return NULL;
 
     memcpy( psz_new_string, psz_string, i_length );
@@ -458,7 +458,7 @@ char *XURL_GetWithoutFragment( char *psz_url )
 
         i_pre_fragment_length = psz_fragment - psz_url;
 
-        psz_without_fragment = xurl_malloc( i_pre_fragment_length + 1 );
+        psz_without_fragment = malloc( i_pre_fragment_length + 1 );
         if( psz_without_fragment == NULL )
         {
             psz_return_value = NULL;

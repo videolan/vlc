@@ -34,10 +34,6 @@ typedef bool XURL_Bool;
 #define XURL_FALSE false
 #define XURL_TRUE true
 
-/* Specialise general C functions to VLC's standards */
-#define xurl_malloc malloc
-#define xurl_free free
-
 /* Use DOS/Windows path separators? */
 #ifdef WIN32
 #  define XURL_WIN32_PATHING
