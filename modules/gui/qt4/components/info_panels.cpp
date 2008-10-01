@@ -543,8 +543,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
     audio->setExpanded( true );
 
     StatsTree->resizeColumnToContents( 0 );
-    StatsTree->resizeColumnToContents( 1 );
-    StatsTree->setColumnWidth( 2 , 100 );
+    StatsTree->setColumnWidth( 1 , 200 );
 
     layout->addWidget(StatsTree, 1, 0 );
 }
