@@ -373,6 +373,8 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
 
 static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
 {
+    assert( p_block );
+
     decoder_sys_t *p_sys = p_dec->p_sys;
     const int64_t i_pts = p_block->i_pts;
     bool b_changed = false;
