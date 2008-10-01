@@ -593,11 +593,13 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                     }
                     if( i_nal_type == 7 )
                     {
+                        free( p_64_sps );
                         p_64_sps = vlc_b64_encode_binary( &p_buffer[4], i_size - 4 );
                         sprintf_hexa( hexa, &p_buffer[5], 3 );
                     }
                     else if( i_nal_type == 8 )
                     {
+                        free( p_64_pps );
                         p_64_pps = vlc_b64_encode_binary( &p_buffer[4], i_size - 4 );
                     }
                     i_buffer -= i_size;
