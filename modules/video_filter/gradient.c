@@ -635,16 +635,27 @@ static void FilterHough( filter_t *p_filter, picture_t *p_inpic,
     double d_sin;
     double d_cos;
     uint32_t *p_smooth;
+
     int *p_hough = malloc( i_diag * i_nb_steps * sizeof(int) );
     if( ! p_hough ) return;
+
     p_smooth = (uint32_t *)malloc( i_num_lines*i_src_visible*sizeof(uint32_t));
-    if( !p_smooth ) return;
+    if( !p_smooth )
+    {
+        free( p_hough );
+        return;
+    }
 
     if( ! p_pre_hough )
     {
         msg_Dbg(p_filter, "Starting precalculation");
         p_pre_hough = malloc( i_num_lines*i_src_visible*i_nb_steps*sizeof(int));
-        if( ! p_pre_hough ) return;
+        if( ! p_pre_hough )
+        {
+            free( p_smooth );
+            free( p_hough );
+            return;
+        }
         for( i = 0 ; i < i_nb_steps ; i++)
         {
             d_sin = sin(d_step * i);
