@@ -236,7 +236,7 @@ static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t
 {
     size_t i_size = 0;
     mtime_t i_length = 0;
-    int i_count;
+    int i_count = 0;
 
     while( p_list )
     {
