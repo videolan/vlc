@@ -242,8 +242,9 @@ static int parser_SetTextAlpha( char *psz_command, char *psz_end,
 static int parser_SetTextColor( char *psz_command, char *psz_end,
                                 commandparams_t *p_params )
 {
-    int r, g, b;
+    int r = 0, g = 0, b = 0;
     VLC_UNUSED(psz_end);
+
     skip_space( &psz_command );
     if( isdigit( *psz_command ) )
     {
