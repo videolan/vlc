@@ -51,8 +51,6 @@ char *XURL_Join( char *psz_url1, char *psz_url2 )
         return XURL_Concat( psz_url1, psz_url2 );
     else
         return XURL_Concat( psz_url2, psz_url1 );
-
-    return NULL;
 }
 
 /* TODO: replace XURL_Concat's rel/absolute calculation with the one
@@ -223,24 +221,20 @@ char *XURL_GetHostname( char *psz_url )
 
 char *XURL_GetSchemeAndHostname( char *psz_url )
 {
-    char *psz_scheme, *psz_hostname, *psz_scheme_and_hostname;
+    char *psz_scheme = NULL,
+         *psz_hostname = NULL,
+         *psz_scheme_and_hostname = NULL;
 
     psz_scheme = XURL_GetScheme( psz_url );
-    if( psz_scheme == NULL ) return NULL;
-
     psz_hostname = XURL_GetHostname( psz_url );
-    if( psz_hostname == NULL ) return NULL;
+    if( psz_hostname && psz_scheme )
+    {
+        if( asprintf( &psz_scheme_and_hostname, "%s://%s", psz_scheme, psz_hostname ) == -1)
+            psz_scheme_and_hostname = NULL;
+    }
 
-    /* malloc +1 for the terminating '\0' */
-    psz_scheme_and_hostname = malloc(
-            strlen( psz_scheme ) + strlen( "://" ) +
-            strlen( psz_hostname ) + 1);
-    if( psz_scheme_and_hostname == NULL ) return NULL;
-    strcpy( psz_scheme_and_hostname, psz_scheme );
-    strcat( psz_scheme_and_hostname, "://" );
-    strcat( psz_scheme_and_hostname, psz_hostname );
-
-    if( psz_scheme_and_hostname == NULL ) return NULL;
+    free( psz_hostname );
+    free( psz_scheme );
     return psz_scheme_and_hostname;
 }
 
@@ -280,7 +274,8 @@ char *XURL_GetScheme( char *psz_url )
     size_t i_scheme_length;
     char *new_scheme;
 
-    if( XURL_IsAbsolute( psz_url ) == XURL_FALSE ) return strdup( "file" );
+    if( XURL_IsAbsolute( psz_url ) == XURL_FALSE )
+        return strdup( "file" );
 
     /* this strchr will always succeed since we have an absolute URL, and thus
      * a scheme */
@@ -289,10 +284,10 @@ char *XURL_GetScheme( char *psz_url )
     i_scheme_length = psz_colon - psz_url;
 
     new_scheme = malloc( i_scheme_length );
-    if( new_scheme == NULL ) return NULL;
+    if( new_scheme == NULL )
+        return NULL;
 
     strncpy( new_scheme, psz_url, i_scheme_length );
-
     return new_scheme;
 }
 
