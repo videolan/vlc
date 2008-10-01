@@ -367,8 +367,6 @@ static void* Raw1394EventThread( vlc_object_t *p_this )
 
     AVCPlay( p_access, p_sys->i_node );
 
-    vlc_thread_ready( p_this );
-
     while( vlc_object_alive (p_sys->p_ev) )
     {
         while( ( result = poll( &(p_sys->raw1394_poll), 1, 200 ) ) < 0 )
