@@ -307,7 +307,7 @@ static int GetParameters( ScalerConfiguration *p_cfg,
         p_cfg->i_fmto = i_fmto;
         p_cfg->b_has_a = b_has_ai && b_has_ao;
         p_cfg->b_add_a = (!b_has_ai) && b_has_ao;
-        p_cfg->b_copy = i_fmti == i_fmto && p_fmti->i_width == p_fmto->i_width && p_fmti->i_width && p_fmto->i_height;
+        p_cfg->b_copy = i_fmti == i_fmto && p_fmti->i_width == p_fmto->i_width && p_fmti->i_height == p_fmto->i_height;
         p_cfg->i_sws_flags = i_sws_flags;
     }
 
