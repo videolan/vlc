@@ -258,9 +258,9 @@ void *vlc_wopendir( const wchar_t *wpath )
         if( !p_dir )
             return NULL;
         p_dir->p_real_dir = NULL;
-# if defined(UNDER_CE)
+#if defined(UNDER_CE)
         p_dir->i_drives = NULL;
-# elif
+#else
         p_dir->i_drives = GetLogicalDrives();
 #endif
         return (void *)p_dir;
