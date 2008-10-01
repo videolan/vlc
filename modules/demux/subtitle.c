@@ -1830,7 +1830,7 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     VLC_UNUSED( i_idx );
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
-    char *psz_text;
+    char *psz_text = NULL;
     char psz_end[12]= "", psz_begin[12] = "";
 
     for( ;; )
@@ -1840,7 +1840,10 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         const char *s = TextGetLine( txt );
 
         if( !s )
+        {
+            free( psz_text );
             return VLC_EGENERIC;
+        }
 
         psz_text = malloc( strlen( s ) + 1 );
         if( !psz_text )
@@ -1880,8 +1883,11 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             break;
         }
         /* Line is not recognized */
-        else continue;
-        free( psz_text );
+        else
+        {
+            free( psz_text );
+            continue;
+        }
     }
 
     /* Get the following Lines */
