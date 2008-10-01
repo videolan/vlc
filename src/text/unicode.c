@@ -99,6 +99,9 @@ static int find_charset (void)
 
 static char *locale_fast (const char *string, bool from)
 {
+    if( string == NULL )
+        return NULL;
+
 #if defined (USE_ICONV)
     if (find_charset ())
         return (char *)string;
@@ -112,9 +115,6 @@ static char *locale_fast (const char *string, bool from)
     size_t inb = strlen (string);
     size_t outb = inb * 6 + 1;
     char output[outb], *optr = output;
-
-    if (string == NULL)
-        return NULL;
 
     while (vlc_iconv (hd, &iptr, &inb, &optr, &outb) == (size_t)(-1))
     {
@@ -135,9 +135,6 @@ static char *locale_fast (const char *string, bool from)
 #elif defined (USE_MB2MB)
     char *out;
     int len;
-
-    if (string == NULL)
-        return NULL;
 
     len = 1 + MultiByteToWideChar (from ? CP_ACP : CP_UTF8,
                                    0, string, -1, NULL, 0);
