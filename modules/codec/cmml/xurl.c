@@ -33,12 +33,6 @@
 
 static char *streallocat( char *psz_string, const char *psz_to_append );
 
-#ifndef HAVE_STRDUP
-static char *xurl_strdup( const char *psz_string );
-#else
-#define xurl_strdup strdup
-#endif
-
 char        *XURL_FindQuery             ( char *psz_url );
 static char *XURL_FindHostname          ( char *psz_url );
 static char *XURL_FindPath              ( char *psz_url );
@@ -104,7 +98,7 @@ char *XURL_Concat( char *psz_url, char *psz_append )
         else
         {
             /* URL to append has an absolute path -- just use that instead */
-            psz_return_value = xurl_strdup( psz_append );
+            psz_return_value = strdup( psz_append );
         }
     }
 
@@ -307,24 +301,6 @@ XURL_Bool XURL_IsFileURL( char *psz_url )
     return b_return_value;
 }
 
-#ifndef HAVE_STRDUP
-static
-char *xurl_strdup( const char *psz_string )
-{
-    size_t i_length;
-    char *psz_new_string;
-
-    if( !psz_string ) return NULL;
- 
-    i_length = strlen( psz_string ) + 1;
-    psz_new_string = (char *) malloc( i_length );
-    if( psz_new_string == NULL ) return NULL;
-
-    memcpy( psz_new_string, psz_string, i_length );
-
-    return psz_new_string;
-}
-#endif
 
 static
 char *XURL_FindPath( char *psz_url )
@@ -348,7 +324,7 @@ char *XURL_FindPath( char *psz_url )
         }
         else
         {
-            return xurl_strdup (".");
+            return strdup (".");
         }
     }
 
@@ -363,7 +339,7 @@ char *XURL_GetPath( char *psz_url )
     char *pc_question_mark = NULL;
     char *pc_fragment = NULL;
 
-    psz_path = xurl_strdup( XURL_FindPath( psz_url ) );
+    psz_path = strdup( XURL_FindPath( psz_url ) );
 #ifdef XURL_DEBUG
     fprintf( stderr, "XURL_GetPath: XURL_FindPath returning \"%s\"\n",
              psz_path );
@@ -412,7 +388,7 @@ char *XURL_GetHead( const char *psz_path )
 #endif
     if( pc_last_slash == NULL )
     {
-        psz_path_head = xurl_strdup( psz_path );
+        psz_path_head = strdup( psz_path );
     }
     else
     {
@@ -444,7 +420,7 @@ char *XURL_GetWithoutFragment( char *psz_url )
     psz_fragment = XURL_FindFragment( psz_url );
     if( psz_fragment == NULL )
     {
-        psz_return_value = xurl_strdup( psz_url );
+        psz_return_value = strdup( psz_url );
     }
     else
     {
