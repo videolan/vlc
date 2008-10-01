@@ -437,7 +437,7 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
     p_sys->i_image_length  = p_sys->i_spu_size - p_sys->i_image_offset;
     p_sys->metadata_length = p_sys->i_image_offset;
 
-  if (p_sys && p_sys->i_debug & DECODE_DBG_PACKET)
+  if( p_sys->i_debug & DECODE_DBG_PACKET )
   {
       msg_Dbg( p_dec, "x-start: %d, y-start: %d, width: %d, height %d, "
            "spu size: %zu, duration: %"PRIu64" (d:%zu p:%"PRIu16")",
@@ -445,7 +445,7 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
            p_sys->i_width, p_sys->i_height,
            p_sys->i_spu_size, p_sys->i_duration,
            p_sys->i_image_length, p_sys->i_image_offset);
- 
+
       for( i = 0; i < 4; i++ )
       {
           msg_Dbg( p_dec, "palette[%d]= T: %2x, Y: %2x, u: %2x, v: %2x", i,
