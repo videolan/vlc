@@ -356,7 +356,12 @@ typedef CRITICAL_SECTION vlc_spinlock_t;
  */
 static inline int vlc_spin_init (vlc_spinlock_t *spin)
 {
+#ifdef UNDER_CE
+    InitializeCriticalSection(spin);
+    return 0;
+#else
     return !InitializeCriticalSectionAndSpinCount(spin, 4000);
+#endif
 }
 
 /**

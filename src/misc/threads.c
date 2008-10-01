@@ -1061,6 +1061,8 @@ void vlc_control_cancel (int cmd, ...)
 #endif
 #if defined (LIBVLC_USE_PTHREAD)
                 pthread_exit (PTHREAD_CANCELLED);
+#elif defined (UNDER_CE)
+                ExitThread(0);
 #elif defined (WIN32)
                 _endthread ();
 #else
