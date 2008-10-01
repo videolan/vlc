@@ -193,8 +193,7 @@ static void Run( intf_thread_t *p_intf )
         /* Quit */
         if( i_action == ACTIONID_QUIT )
         {
-            if( p_playlist )
-                playlist_Stop( p_playlist );
+            playlist_Stop( p_playlist );
             vlc_object_kill( p_intf->p_libvlc );
             vlc_object_kill( p_intf );
             ClearChannels( p_intf, p_vout );
