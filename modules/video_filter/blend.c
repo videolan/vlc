@@ -1390,7 +1390,6 @@ static void BlendRGBAYUVPacked( filter_t *p_filter,
 {
     int i_src_pitch, i_dst_pitch, i_src_pix_pitch;
     uint8_t *p_dst, *p_src;
-    uint8_t *p_trans;
     int i_x, i_y, i_pix_pitch, i_trans;
     bool b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
     int i_l_offset, i_u_offset, i_v_offset;
@@ -1415,7 +1414,7 @@ static void BlendRGBAYUVPacked( filter_t *p_filter,
     i_width &= ~1; /* Needs to be a multiple of 2 */
 
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src_pitch,
+    for( i_y = 0; i_y < i_height; i_y++,
          p_dst += i_dst_pitch,
          p_src += i_src_pitch )
     {
