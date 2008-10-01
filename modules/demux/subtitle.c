@@ -1352,7 +1352,10 @@ static int ParseAQT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         const char *s = TextGetLine( txt );
 
         if( !s )
+        {
+            free( psz_text );
             return VLC_EGENERIC;
+        }
 
         /* Data Lines */
         if( sscanf (s, "-->> %d", &t) == 1)
