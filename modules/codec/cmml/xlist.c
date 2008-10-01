@@ -116,7 +116,7 @@ xlist_append (XList * list, void * data)
   if (list == NULL) return l;
 
   last = xlist_tail (list);
-  if (last) last->next = l;
+  last->next = l;
   l->prev = last;
   return list;
 }
