@@ -1206,8 +1206,11 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
                           rect.right, rect.bottom,
                           SWP_NOZORDER|SWP_FRAMECHANGED );
 
+#ifdef UNDER_CE
             HWND topLevelParent = GetParent( p_vout->p_sys->hparent );
-            //HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
+#else
+            HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
+#endif
             ShowWindow( topLevelParent, SW_HIDE );
         }
 
@@ -1231,8 +1234,11 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
                           rect.right, rect.bottom,
                           SWP_NOZORDER|SWP_FRAMECHANGED );
 
+#ifdef UNDER_CE
             HWND topLevelParent = GetParent( p_vout->p_sys->hparent );
-            //HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
+#else
+            HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
+#endif
             ShowWindow( topLevelParent, SW_SHOW );
             SetForegroundWindow( p_vout->p_sys->hparent );
             ShowWindow( hwnd, SW_HIDE );
