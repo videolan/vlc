@@ -603,10 +603,15 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
     demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t     *p = pkt;
 
-    while( p < &pkt[i_pkt] )
+    while( p && p < &pkt[i_pkt] )
     {
-        int i_size = ps_pkt_size( p, &pkt[i_pkt] - p );
         block_t *p_pkt;
+        int i_size = &pkt[i_pkt] - p;
+
+        if( i_size < 6 )
+            break;
+ 
+        i_size = ps_pkt_size( p, i_size );
         if( i_size <= 0 )
         {
             break;
