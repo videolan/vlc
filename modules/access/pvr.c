@@ -547,7 +547,6 @@ static int Open( vlc_object_t * p_this )
     access_sys_t * p_sys;
     char * psz_tofree;
     char * psz_parser;
-    char * psz_device = NULL;
     vlc_value_t val;
     struct v4l2_capability device_capability;
     int result;
@@ -644,198 +643,91 @@ static int Open( vlc_object_t * p_this )
     /* parse command line options */
     psz_tofree = strdup( p_access->psz_path );
     if( !psz_tofree )
-        return VLC_ENOMEM;
+        return VLC_ENOMEM; /* <-- FIXME MEMORY LEAK */
 
     psz_parser = psz_tofree;
-    if( *psz_parser )
+    while( *psz_parser )
     {
-        for( ;; )
+        /* Leading slash -> device path */
+        if( *psz_parser == '/' )
         {
-            if ( !strncmp( psz_parser, "norm=", strlen( "norm=" ) ) )
-            {
-                char *psz_parser_init;
-                psz_parser += strlen( "norm=" );
-                psz_parser_init = psz_parser;
-                while ( (*psz_parser != ':')
-                        && (*psz_parser != ',')
-                        && (*psz_parser != '\0') )
-                {
-                    psz_parser++;
-                }
+            free( p_sys->psz_videodev );
+            p_sys->psz_videodev = strdup( psz_parser );
+            break;
+        }
 
-                if ( !strncmp( psz_parser_init, "secam" ,
-                               psz_parser - psz_parser_init ) )
-                {
-                    p_sys->i_standard = V4L2_STD_SECAM;
-                }
-                else if ( !strncmp( psz_parser_init, "pal" ,
-                                    psz_parser - psz_parser_init ) )
-                {
-                    p_sys->i_standard = V4L2_STD_PAL;
-                }
-                else if ( !strncmp( psz_parser_init, "ntsc" ,
-                                    psz_parser - psz_parser_init ) )
-                {
-                    p_sys->i_standard = V4L2_STD_NTSC;
-                }
-                else
-                {
-                    p_sys->i_standard = strtol( psz_parser_init ,
-                                                &psz_parser, 0 );
-                }
-            }
-            else if( !strncmp( psz_parser, "channel=",
-                               strlen( "channel=" ) ) )
-            {
-                p_sys->i_input =
-                    strtol( psz_parser + strlen( "channel=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "device=", strlen( "device=" ) ) )
-            {
-                int i_len = strlen( "/dev/videox" );
-                psz_device = calloc( i_len  + 1, 1 );
-                if( !psz_device )
-                    return VLC_ENOMEM;
+        /* Extract option name */
+        const char *optname = psz_parser;
+        psz_parser = strchr( psz_parser, '=' );
+        if( psz_parser == NULL )
+            break;
+        *psz_parser++ = '\0';
 
-                snprintf( psz_device, i_len, "/dev/video%ld",
-                            strtol( psz_parser + strlen( "device=" ),
-                            &psz_parser, 0 ) );
-            }
-            else if( !strncmp( psz_parser, "frequency=",
-                               strlen( "frequency=" ) ) )
-            {
-                p_sys->i_frequency =
-                    strtol( psz_parser + strlen( "frequency=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "framerate=",
-                               strlen( "framerate=" ) ) )
-            {
-                p_sys->i_framerate =
-                    strtol( psz_parser + strlen( "framerate=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "keyint=",
-                               strlen( "keyint=" ) ) )
-            {
-                p_sys->i_keyint =
-                    strtol( psz_parser + strlen( "keyint=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "bframes=",
-                               strlen( "bframes=" ) ) )
-            {
-                p_sys->i_bframes =
-                    strtol( psz_parser + strlen( "bframes=" ),
-                            &psz_parser, 0 );
-            }
+        /* Extract option value */
+        char *optval = psz_parser;
+        while( memchr( ":,", *psz_parser, 3 /* includes \0 */ ) == NULL )
+            psz_parser++;
+        if( *psz_parser ) /* more options to come */
+            *psz_parser++ = '\0'; /* skip , or : */
 
-            else if( !strncmp( psz_parser, "width=",
-                               strlen( "width=" ) ) )
-            {
-                p_sys->i_width =
-                    strtol( psz_parser + strlen( "width=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "height=",
-                               strlen( "height=" ) ) )
-            {
-                p_sys->i_height =
-                    strtol( psz_parser + strlen( "height=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "audio=",
-                               strlen( "audio=" ) ) )
-            {
-                p_sys->i_audio_bitmask =
-                    strtol( psz_parser + strlen( "audio=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "bitrate=",
-                               strlen( "bitrate=" ) ) )
-            {
-                p_sys->i_bitrate =
-                    strtol( psz_parser + strlen( "bitrate=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "maxbitrate=",
-                               strlen( "maxbitrate=" ) ) )
-            {
-                p_sys->i_bitrate_peak =
-                    strtol( psz_parser + strlen( "maxbitrate=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "bitratemode=",
-                               strlen( "bitratemode=" ) ) )
-            {
-                char *psz_parser_init;
-                psz_parser += strlen( "bitratemode=" );
-                psz_parser_init = psz_parser;
-                while ( (*psz_parser != ':')
-                        && (*psz_parser != ',')
-                        && (*psz_parser != '\0') )
-                {
-                    psz_parser++;
-                }
-
-                if ( !strncmp( psz_parser_init, "vbr" ,
-                               psz_parser - psz_parser_init ) )
-                {
-                     p_sys->i_bitrate_mode = 0;
-                }
-                else if ( !strncmp( psz_parser_init, "cbr" ,
-                                    psz_parser - psz_parser_init ) )
-                {
-                    p_sys->i_bitrate_mode = 1;
-                }
-            }
-            else if( !strncmp( psz_parser, "size=",
-                               strlen( "size=" ) ) )
-            {
-                p_sys->i_width =
-                    strtol( psz_parser + strlen( "size=" ),
-                            &psz_parser, 0 );
-                p_sys->i_height =
-                    strtol( psz_parser + 1 ,
-                            &psz_parser, 0 );
-            }
+        if ( !strcmp( optname, "norm" ) )
+        {
+            if ( !strcmp( optval, "secam" ) )
+                p_sys->i_standard = V4L2_STD_SECAM;
+            else if ( !strcmp( optval, "pal" ) )
+                p_sys->i_standard = V4L2_STD_PAL;
+            else if ( !strcmp( optval, "ntsc" ) )
+                p_sys->i_standard = V4L2_STD_NTSC;
             else
-            {
-                char *psz_parser_init;
-                psz_parser_init = psz_parser;
-                while ( (*psz_parser != ':') &&
-                        (*psz_parser != ',') &&
-                        (*psz_parser != '\0') )
-                {
-                    psz_parser++;
-                }
-                psz_device = calloc( psz_parser - psz_parser_init + 1, 1 );
-                if( !psz_device )
-                    return VLC_ENOMEM;
-
-                strncpy( psz_device, psz_parser_init,
-                         psz_parser - psz_parser_init );
-            }
-            if( *psz_parser )
-                psz_parser++;
-            else
-                break;
+                p_sys->i_standard = atoi( optval );
+        }
+        else if( !strcmp( optname, "channel" ) )
+            p_sys->i_input = atoi( optval );
+        else if( !strcmp( optname, "device" ) )
+        {
+            free( p_sys->psz_videodev );
+            if( asprintf( &p_sys->psz_videodev, "/dev/video%s", optval ) == -1)
+                p_sys->psz_videodev = NULL;
+        }
+        else if( !strcmp( optname, "frequency" ) )
+            p_sys->i_frequency = atoi( optval );
+        else if( !strcmp( optname, "framerate" ) )
+            p_sys->i_framerate = atoi( optval );
+        else if( !strcmp( optname, "keyint" ) )
+            p_sys->i_keyint = atoi( optval );
+        else if( !strcmp( optname, "bframes" ) )
+            p_sys->i_bframes = atoi( optval );
+        else if( !strcmp( optname, "width" ) )
+            p_sys->i_width = atoi( optval );
+        else if( !strcmp( optname, "height" ) )
+            p_sys->i_height = atoi( optval );
+        else if( !strcmp( optname, "audio" ) )
+            p_sys->i_audio_bitmask = atoi( optval );
+        else if( !strcmp( optname, "bitrate" ) )
+            p_sys->i_bitrate = atoi( optval );
+        else if( !strcmp( optname, "maxbitrate" ) )
+            p_sys->i_bitrate_peak = atoi( optval );
+        else if( !strcmp( optname, "bitratemode" ) )
+        {
+            if( !strcmp( optval, "vbr" ) )
+                p_sys->i_bitrate_mode = 0;
+            else if( !strcmp( optval, "cbr" ) )
+                p_sys->i_bitrate_mode = 1;
+        }
+        else if( !strcmp( optname, "size" ) )
+        {
+            p_sys->i_width = strtol( optval, &optval, 0 );
+            p_sys->i_height = atoi( optval );
         }
     }
     free( psz_tofree );
-
-    if( psz_device )
-    {
-        free( p_sys->psz_videodev );
-        p_sys->psz_videodev = psz_device;
-    }
 
     /* open the device */
     p_sys->i_fd = open( p_sys->psz_videodev, O_RDWR );
     if( p_sys->i_fd < 0 )
     {
-        msg_Err( p_access, "Cannot open device (%m)." );
+        msg_Err( p_access, "Cannot open device %s (%m).",
+                 p_sys->psz_videodev );
         Close( VLC_OBJECT(p_access) );
         return VLC_EGENERIC;
     }
