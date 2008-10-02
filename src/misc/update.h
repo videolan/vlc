@@ -149,7 +149,7 @@ typedef struct
 {
     VLC_COMMON_MEMBERS
     update_t *p_update;
-    char *psz_destdir;
+    char *psz_destination;
 } update_download_thread_t;
 
 /**
