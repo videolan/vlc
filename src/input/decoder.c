@@ -1332,7 +1332,8 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flus
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
 
-    // TODO flush
+    if( b_flush && p_owner->p_vout )
+        VoutFlushPicture( p_owner->p_vout, 1 );
 
     if( p_owner->p_packetizer )
     {
@@ -1373,7 +1374,10 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
 
-    // TODO flush
+    if( b_flush && p_owner->p_aout && p_owner->p_aout_input )
+    {
+        // TODO flush
+    }
 
     if( p_owner->p_packetizer )
     {
@@ -1491,11 +1495,11 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
     else
 #endif
     {
-        bool b_flushing = p_owner->i_preroll_end == INT64_MAX;
         bool b_flush = false;
 
         if( p_block )
         {
+            const bool b_flushing = p_owner->i_preroll_end == INT64_MAX;
             DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
 
             b_flush = !b_flushing && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH) != 0;
