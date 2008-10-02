@@ -500,10 +500,8 @@ void input_DecoderFlush( decoder_t *p_dec )
     /* Send a special block */
     p_null = block_New( p_dec, 128 );
     p_null->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-    if( p_dec->fmt_in.i_cat == SPU_ES )
-        p_null->i_flags |= BLOCK_FLAG_CORE_FLUSH;
-    /* FIXME check for p_packetizer or b_packitized from es_format_t of input ? */
-    if( p_owner->p_packetizer )
+    p_null->i_flags |= BLOCK_FLAG_CORE_FLUSH;
+    if( !p_dec->fmt_in.b_packetized )
         p_null->i_flags |= BLOCK_FLAG_CORRUPTED;
     memset( p_null->p_buffer, 0, p_null->i_buffer );
 
@@ -1330,12 +1328,11 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 
 /* This function process a video block
  */
-static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
+static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flush )
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
 
-    if( p_block )
-        DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
+    // TODO flush
 
     if( p_owner->p_packetizer )
     {
@@ -1372,11 +1369,11 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
 
 /* This function process a audio block
  */
-static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block )
+static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flush )
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
-    if( p_block )
-        DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
+
+    // TODO flush
 
     if( p_owner->p_packetizer )
     {
@@ -1411,7 +1408,7 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block )
 
 /* This function process a subtitle block
  */
-static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block )
+static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush )
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
     const bool b_telx = p_dec->fmt_in.i_codec == VLC_FOURCC('t','e','l','x');
@@ -1419,16 +1416,8 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block )
     input_thread_t *p_input = p_owner->p_input;
     vout_thread_t *p_vout;
     subpicture_t *p_spu;
-    bool b_flushing = p_owner->i_preroll_end == INT64_MAX;
-    bool b_flush = false;
 
-    if( p_block )
-    {
-        DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
-        b_flush = (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH) != 0;
-    }
-
-    if( !b_flushing && b_flush && p_owner->p_spu_vout )
+    if( b_flush && p_owner->p_spu_vout )
     {
         p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
 
@@ -1486,6 +1475,8 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block )
  */
 static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
 {
+    decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
+
     if( p_block && p_block->i_buffer <= 0 )
     {
         block_Release( p_block );
@@ -1499,22 +1490,36 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
     }
     else
 #endif
-    if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
-        DecoderProcessAudio( p_dec, p_block );
-    }
-    else if( p_dec->fmt_in.i_cat == VIDEO_ES )
-    {
-        DecoderProcessVideo( p_dec, p_block );
-    }
-    else if( p_dec->fmt_in.i_cat == SPU_ES )
-    {
-        DecoderProcessSpu( p_dec, p_block );
-    }
-    else
-    {
-        msg_Err( p_dec, "unknown ES format" );
-        p_dec->b_error = true;
+        bool b_flushing = p_owner->i_preroll_end == INT64_MAX;
+        bool b_flush = false;
+
+        if( p_block )
+        {
+            DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
+
+            b_flush = !b_flushing && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH) != 0;
+
+            p_block->i_flags &= ~BLOCK_FLAG_CORE_PRIVATE_MASK;
+        }
+
+        if( p_dec->fmt_in.i_cat == AUDIO_ES )
+        {
+            DecoderProcessAudio( p_dec, p_block, b_flush );
+        }
+        else if( p_dec->fmt_in.i_cat == VIDEO_ES )
+        {
+            DecoderProcessVideo( p_dec, p_block, b_flush );
+        }
+        else if( p_dec->fmt_in.i_cat == SPU_ES )
+        {
+            DecoderProcessSpu( p_dec, p_block, b_flush );
+        }
+        else
+        {
+            msg_Err( p_dec, "unknown ES format" );
+            p_dec->b_error = true;
+        }
     }
 
     return p_dec->b_error ? VLC_EGENERIC : VLC_SUCCESS;
