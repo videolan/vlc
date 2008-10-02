@@ -610,7 +610,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
     /* Special Hack */
     if( !p_item->psz_text ) return;
 
-    groupBox = new QGroupBox ( qtr(p_item->psz_text) );
+    groupBox = new QGroupBox ( qtr(p_item->psz_text), _parent );
     text = new QLineEdit;
     QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
 

@@ -453,7 +453,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 layout->addWidget( box, i_line, 0, 1, -1 );
                 i_line++;
             }
-            box = new QGroupBox( qtr( p_item->psz_text ) );
+            box = new QGroupBox( qtr( p_item->psz_text ), this );
             box->hide();
             boxlayout = new QGridLayout();
         }
