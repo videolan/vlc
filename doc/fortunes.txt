@@ -878,3 +878,14 @@ VLC development is NOT about being a sed god.
 < Daught> wait cygwin does not even have qt4...
 < Daught> if I have to disable more stuff I will end up with windows media player
 %
+< thedj> no, captcha are reasonably easy to crack.
+< ILEoo> just put up a porn site and ask user to check that captcha before showing video/images -> captcha cracked easily ;)
+< thedj> that's one way :D
+< thedj> MadlyMad: from our own sam..... http://caca.zoy.org/wiki/PWNtcha
+< MadlyMad> oh okey, impressive
+< thresh> sam was probably tired checking captchas on porn sites
+< sam> I saw that
+< thresh> wasnt me
+< thresh> a coworker of mine typed that, really
+ -- #videolan
+%
