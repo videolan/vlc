@@ -453,7 +453,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
                 mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
             }
-#if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
             if( p_sys->p_info->user_data_len > 2 )
             {
                 p_sys->i_cc_pts = i_pts;
@@ -468,7 +467,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
                 cc_Extract( &p_sys->cc, &p_sys->p_info->user_data[0], p_sys->p_info->user_data_len );
             }
-#endif
         }
         break;
 
