@@ -172,7 +172,6 @@ int libvlc_audio_get_track( libvlc_media_player_t *p_mi,
     return i_track;
 }
 
-
 /*****************************************************************************
  * libvlc_audio_set_track : Set the current audio track
  *****************************************************************************/
@@ -181,28 +180,26 @@ void libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track,
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
     vlc_value_t val_list;
+    vlc_value_t newval;
     int i_ret = -1;
-    int i;
 
     if( !p_input_thread )
         return;
 
     var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list, NULL );
-    for( i = 0; i < val_list.p_list->i_count; i++ )
+    if( (i_track < 0) && (i_track > val_list.p_list->i_count) )
     {
-        vlc_value_t val = val_list.p_list->p_values[i];
-        if( i_track == val.i_int )
-        {
-            i_ret = var_Set( p_input_thread, "audio-es", val );
-            if( i_ret < 0 )
-            {
-                libvlc_exception_raise( p_e, "Setting audio track failed" );
-            }
-            vlc_object_release( p_input_thread );
-            return;
-        }
+        libvlc_exception_raise( p_e, "Audio track out of range" );
+        vlc_object_release( p_input_thread );
+        return;
     }
-    libvlc_exception_raise( p_e, "Audio track out of range" );
+
+    newval = val_list.p_list->p_values[i_track];
+    i_ret = var_Set( p_input_thread, "audio-es", newval );
+    if( i_ret < 0 )
+    {
+        libvlc_exception_raise( p_e, "Setting audio track failed" );
+    }
     vlc_object_release( p_input_thread );
 }
 
