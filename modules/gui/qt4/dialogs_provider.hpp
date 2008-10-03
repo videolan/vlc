@@ -68,7 +68,7 @@
     string += ");;";
 #define ADD_FILTER_ALL( string )       \
     string += qtr( "All Files" );      \
-    string += " (*.*)";
+    string += " (*)";
 
 enum {
     EXT_FILTER_MEDIA     =  0x01,
