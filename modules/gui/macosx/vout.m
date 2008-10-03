@@ -694,16 +694,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     /* p_real_vout: the vout we have to use to check for video-on-top
        and a few other things. If we are the QuickTime output, it's us.
-       It we are the OpenGL provider, it is our parent. */
-    if( p_vout->i_object_type == VLC_OBJECT_OPENGL )
-    {
-        return (vout_thread_t *) p_vout->p_parent;
-    }
-    else
-    {
-        return p_vout;
-    }
-
+       It we are the OpenGL provider, it is our parent.
+       Since we can't be the QuickTime output anymore, we need to be
+       the parent.
+       FIXME: check with the caca and x11 vouts! */
+    return (vout_thread_t *) p_vout->p_parent;
 }
 
 + (id)getVoutView: (vout_thread_t *)p_vout subView: (NSView *)view
