@@ -158,9 +158,7 @@
     var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
 }
 
-/* FIXME: I want to be Private */
-
-- (id)getVoutView
+- (id)voutView
 {
     id window;
     id voutView = nil;
@@ -176,8 +174,8 @@
         /* We have a detached vout */
         else if( [[window className] isEqualToString: @"VLCVoutWindow"] )
         {
-            msg_Dbg( VLCIntf, "detached vout controls.m call getVoutView" );
-            voutView = [window getVoutView];
+            msg_Dbg( VLCIntf, "detached vout controls.m call voutView" );
+            voutView = [window voutView];
         }
     }
     return [[voutView retain] autorelease];
@@ -189,7 +187,7 @@
     var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_STOP );
     /* Close the window directly, because we do know that there
      * won't be anymore video. It's currently waiting a bit. */
-    [[[self _voutView] window] orderOut:self];
+    [[[self voutView] window] orderOut:self];
 }
 
 - (IBAction)faster:(id)sender

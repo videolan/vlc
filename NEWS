@@ -15,6 +15,9 @@ Stream output:
  * Multiple bridge-in instances are now possible.
  * bridge-in can be used to configure a placeholder stream.
 
+Mac OS X Interface:
+ * Reveal-in-Finder functionality for locally stored items
+
 
 Changes between 0.9.2 and 0.9.3:
 --------------------------------

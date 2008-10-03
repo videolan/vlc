@@ -87,7 +87,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     return o_toolbarItem;
 }
 
-- (NSToolbarItem *) toolbar: (NSToolbar *)o_sprefs_toolbar 
+- (NSToolbarItem *) toolbar: (NSToolbar *)o_vlm_toolbar 
       itemForItemIdentifier: (NSString *)o_itemIdent 
   willBeInsertedIntoToolbar: (BOOL)b_willBeInserted
 {

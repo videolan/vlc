@@ -532,7 +532,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                  ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
         {
             msg_Dbg( p_vout, "received NSRightMouseDown (generic method) or Ctrl clic" );
-            [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
+            [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] voutView]];
         }
     }
 
@@ -558,7 +558,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( p_vout && [o_event type] == NSRightMouseDown )
     {
         msg_Dbg( p_vout, "received NSRightMouseDown (specific method)" );
-        [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
+        [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] voutView]];
     }
 
     [super mouseDown: o_event];
@@ -603,7 +603,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         /* FIXME: this isn't the appropriate place, but we can't receive
          * NSRightMouseDown some how */
         msg_Dbg( p_vout, "received NSRightMouseUp" );
-        [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
+        [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] voutView]];
     }
 
     [super mouseUp: o_event];
@@ -701,8 +701,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     return (vout_thread_t *) p_vout->p_parent;
 }
 
-+ (id)getVoutView: (vout_thread_t *)p_vout subView: (NSView *)view
-                                    frame: (NSRect *)s_frame
++ (id)voutView: (vout_thread_t *)p_vout subView: (NSView *)view
+         frame: (NSRect *)s_frame
 {
     vlc_value_t value_drawable;
     int i_timeout;
@@ -1139,7 +1139,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [self setLevel: NSStatusWindowLevel];
 }
 
-- (id)getVoutView // FIXME Naming scheme!
+- (id)voutView
 {
     return o_view;
 }

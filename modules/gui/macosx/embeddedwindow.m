@@ -368,7 +368,7 @@
 
 - (void)hasBecomeFullscreen
 {
-    [o_fullscreen_window makeFirstResponder: [[[VLCMain sharedInstance] getControls] getVoutView]];
+    [o_fullscreen_window makeFirstResponder: [[[VLCMain sharedInstance] getControls] voutView]];
 
     [o_fullscreen_window makeKeyWindow];
     [o_fullscreen_window setAcceptsMouseMovedEvents: TRUE];

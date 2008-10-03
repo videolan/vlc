@@ -1599,7 +1599,7 @@ static void * manage_cleanup( void * args )
             [self setScrollField: aString stopAfter:-1];
             [[[self getControls] getFSPanel] setStreamTitle: aString];
 
-            [[o_controls getVoutView] updateTitle];
+            [[o_controls voutView] updateTitle];
  
             [o_playlist updateRowSelection];
             p_intf->p_sys->b_current_title_update = FALSE;

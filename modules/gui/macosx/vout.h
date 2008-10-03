@@ -72,8 +72,8 @@
 - (void)snapshot;
 - (id)getWindow;
 
-+ (id)getVoutView: (vout_thread_t *)p_vout subView: (NSView *) view
-            frame: (NSRect *) s_frame;
++ (id)voutView: (vout_thread_t *)p_vout subView: (NSView *) view
+         frame: (NSRect *) s_frame;
 + (vout_thread_t *)getRealVout: (vout_thread_t *)p_vout;
 
 - (void)enterFullscreen;
@@ -127,5 +127,5 @@
 - (id)initMainThread: (id) sender;
 - (void)leaveFullscreen;
 - (void)enterFullscreen;
-- (id)getVoutView;
+- (id)voutView;
 @end
