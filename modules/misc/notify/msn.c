@@ -141,10 +141,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_artist = NULL;
     char *psz_album = NULL;
     char *psz_buf = NULL;
-    playlist_t *p_playlist = pl_Hold( p_this );
-    input_thread_t *p_input =  playlist_CurrentInput( p_playlist );
-
-    pl_Release( p_this );
+    input_thread_t *p_input =  playlist_CurrentInput( (playlist_t *) p_this );
 
     if( !p_input ) return VLC_SUCCESS;
 
