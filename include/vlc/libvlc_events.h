@@ -82,7 +82,9 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaListPlayerStopped,
 
     libvlc_MediaDiscovererStarted,
-    libvlc_MediaDiscovererEnded
+    libvlc_MediaDiscovererEnded,
+
+    libvlc_MediaPlayerTitleChanged
 
 } libvlc_event_type_t;
 
@@ -134,6 +136,10 @@ typedef struct libvlc_event_t
         {
             libvlc_time_t new_time;
         } media_player_time_changed;
+        struct
+        {
+            int new_title;
+        } media_player_title_changed;
         struct
         {
             libvlc_time_t new_seekable;

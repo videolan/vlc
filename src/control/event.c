@@ -249,6 +249,7 @@ static const char event_type_to_name[][35] =
     EVENT(libvlc_MediaPlayerBackward),
     EVENT(libvlc_MediaPlayerEndReached),
     EVENT(libvlc_MediaPlayerTimeChanged),
+    EVENT(libvlc_MediaPlayerTitleChanged),
     EVENT(libvlc_MediaPlayerPositionChanged),
     EVENT(libvlc_MediaPlayerSeekableChanged),
     EVENT(libvlc_MediaPlayerPausableChanged),

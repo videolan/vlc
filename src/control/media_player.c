@@ -370,6 +370,8 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
             libvlc_MediaPlayerPositionChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerTimeChanged, p_e );
+     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaPlayerTitleChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerSeekableChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
@@ -857,7 +859,7 @@ int libvlc_media_player_get_chapter(
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
-        return -1.0;
+        return -1;
 
     var_Get( p_input_thread, "chapter", &val );
     vlc_object_release( p_input_thread );
@@ -874,12 +876,132 @@ int libvlc_media_player_get_chapter_count(
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
-        return -1.0;
+        return -1;
 
     var_Change( p_input_thread, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
     vlc_object_release( p_input_thread );
 
     return val.i_int;
+}
+
+int libvlc_media_player_get_chapter_count_for_title(
+                                 libvlc_media_player_t *p_mi,
+                                 int i_title,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if( !p_input_thread )
+        return -1;
+
+    char *psz_name = NULL;
+    if( asprintf( psz_name,  "title %2i", i_title ) == -1 )
+    {
+        vlc_object_release( p_input_thread );
+        return -1;
+    }
+    var_Change( p_input_thread, psz_name, VLC_VAR_CHOICESCOUNT, &val, NULL );
+    vlc_object_release( p_input_thread );
+    free( psz_name );
+
+    return val.i_int;
+}
+
+void libvlc_media_player_set_title(
+                                 libvlc_media_player_t *p_mi,
+                                 int i_title,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+    val.i_int = i_title;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    if( !p_input_thread )
+        return;
+
+    var_Set( p_input_thread, "title", val );
+    vlc_object_release( p_input_thread );
+
+    //send event
+    libvlc_event_t event;
+    event.type = libvlc_MediaPlayerTitleChanged;
+    event.u.media_player_title_changed.new_title = i_title;
+    libvlc_event_send( p_mi->p_event_manager, &event );
+}
+
+int libvlc_media_player_get_title(
+                                 libvlc_media_player_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if( !p_input_thread )
+        return -1;
+
+    var_Get( p_input_thread, "title", &val );
+    vlc_object_release( p_input_thread );
+
+    return val.i_int;
+}
+
+int libvlc_media_player_get_title_count(
+                                 libvlc_media_player_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if( !p_input_thread )
+        return -1;
+
+    var_Change( p_input_thread, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    vlc_object_release( p_input_thread );
+
+    return val.i_int;
+}
+
+void libvlc_media_player_next_chapter(
+                                 libvlc_media_player_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    if( !p_input_thread )
+        return;
+
+    int i_type = var_Type( p_input_thread, "next-chapter" );
+    vlc_value_t val;
+    val.b_bool = true;
+    var_Set( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "next-chapter":"next-title", val );
+
+    vlc_object_release( p_input_thread );
+}
+
+void libvlc_media_player_previous_chapter(
+                                 libvlc_media_player_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    if( !p_input_thread )
+        return;
+
+    int i_type = var_Type( p_input_thread, "next-chapter" );
+    vlc_value_t val;
+    val.b_bool = true;
+    var_Set( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "prev-chapter":"prev-title", val );
+
+    vlc_object_release( p_input_thread );
 }
 
 float libvlc_media_player_get_fps(

@@ -268,7 +268,7 @@ VLC_PUBLIC_API void libvlc_media_add_option(
 
 /**
  * Retain a reference to a media descriptor object (libvlc_media_t). Use
- * libvlc_media_release() to decrement the reference count of a 
+ * libvlc_media_release() to decrement the reference count of a
  * media descriptor object.
  *
  * \param p_meta_desc a media descriptor object.
@@ -381,8 +381,8 @@ VLC_PUBLIC_API int
                                          libvlc_exception_t * p_e );
 
 /**
- * Sets media descriptor's user_data. user_data is specialized data 
- * accessed by the host application, VLC.framework uses it as a pointer to 
+ * Sets media descriptor's user_data. user_data is specialized data
+ * accessed by the host application, VLC.framework uses it as a pointer to
  * an native object that references a libvlc_media_t pointer
  *
  * \param p_md media descriptor object
@@ -395,8 +395,8 @@ VLC_PUBLIC_API void
                                            libvlc_exception_t * p_e);
 
 /**
- * Get media descriptor's user_data. user_data is specialized data 
- * accessed by the host application, VLC.framework uses it as a pointer to 
+ * Get media descriptor's user_data. user_data is specialized data
+ * accessed by the host application, VLC.framework uses it as a pointer to
  * an native object that references a libvlc_media_t pointer
  *
  * \param p_md media descriptor object
@@ -439,8 +439,8 @@ VLC_PUBLIC_API libvlc_media_player_t * libvlc_media_player_new_from_media( libvl
 /**
  * Release a media_player after use
  * Decrement the reference count of a media player object. If the
- * reference count is 0, then libvlc_media_player_release() will 
- * release the media player object. If the media player object 
+ * reference count is 0, then libvlc_media_player_release() will
+ * release the media player object. If the media player object
  * has been released, then it should not be used again.
  *
  * \param p_mi the Media Player to free
@@ -455,7 +455,7 @@ VLC_PUBLIC_API void libvlc_media_player_release( libvlc_media_player_t * );
  */
 VLC_PUBLIC_API void libvlc_media_player_retain( libvlc_media_player_t * );
 
-/** 
+/**
  * Set the media that will be used by the media_player. If any,
  * previous md will be released.
  *
@@ -604,6 +604,60 @@ VLC_PUBLIC_API int libvlc_media_player_get_chapter( libvlc_media_player_t *, lib
  */
 VLC_PUBLIC_API int libvlc_media_player_get_chapter_count( libvlc_media_player_t *, libvlc_exception_t *);
 VLC_PUBLIC_API int libvlc_media_player_will_play        ( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Get title chapter count
+ *
+ * \param p_mi the Media Player
+ * \param i_title title
+ * \param p_e an initialized exception pointer
+ * \return number of chapters in title
+ */
+VLC_PUBLIC_API int libvlc_media_player_get_chapter_count_for_title(
+                       libvlc_media_player_t *, int, libvlc_exception_t *);
+
+/**
+ * Set movie title
+ *
+ * \param p_mi the Media Player
+ * \param i_title title number to play
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_media_player_set_title( libvlc_media_player_t *, int, libvlc_exception_t *);
+
+/**
+ * Get movie title
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return title number currently playing
+ */
+VLC_PUBLIC_API int libvlc_media_player_get_title( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Get movie title count
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return title number count
+ */
+VLC_PUBLIC_API int libvlc_media_player_get_title_count( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Set previous chapter
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_media_player_previous_chapter( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Set next chapter
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_media_player_next_chapter( libvlc_media_player_t *, libvlc_exception_t *);
 
 /**
  * Get movie play rate
@@ -1052,7 +1106,7 @@ VLC_PUBLIC_API void
 
 /**
  * Retain a reference to a media library object. This function will
- * increment the reference counting for this object. Use 
+ * increment the reference counting for this object. Use
  * libvlc_media_library_release() to decrement the reference count.
  *
  * \param p_mlib media library object
