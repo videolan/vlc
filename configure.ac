@@ -1801,6 +1801,8 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
           VLC_ADD_PLUGIN([live555])
           VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
         ],[],[${other_libs}]) ],[${other_libs_pic}])
+    ],[
+       AC_MSG_WARN([The development files for liveMedia (live555) can't be found])
     ])
     CPPFLAGS="${CPPFLAGS_save}"
     AC_LANG_POP(C++)
