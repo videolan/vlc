@@ -96,7 +96,7 @@ static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static int IORead( void *opaque, uint8_t *buf, int buf_size );
-static offset_t IOSeek( void *opaque, offset_t offset, int whence );
+static int64_t IOSeek( void *opaque, int64_t offset, int whence );
 
 static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time );
 
@@ -187,7 +187,7 @@ int OpenDemux( vlc_object_t *p_this )
                     (int (*) (URLContext *, unsigned char *, int))IORead;
     p_sys->url.prot->url_write = 0;
     p_sys->url.prot->url_seek =
-                    (offset_t (*) (URLContext *, offset_t, int))IOSeek;
+                    (int64_t (*) (URLContext *, int64_t, int))IOSeek;
     p_sys->url.prot->url_close = 0;
     p_sys->url.prot->next = 0;
     init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size,
@@ -650,7 +650,7 @@ static int IORead( void *opaque, uint8_t *buf, int buf_size )
     return i_ret ? i_ret : -1;
 }
 
-static offset_t IOSeek( void *opaque, offset_t offset, int whence )
+static int64_t IOSeek( void *opaque, int64_t offset, int whence )
 {
     URLContext *p_url = opaque;
     demux_t *p_demux = p_url->priv_data;
