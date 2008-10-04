@@ -149,6 +149,10 @@ extern module_bank_t *p_module_bank;
 
 extern char *psz_vlcpath;
 
+#ifdef LIBVLC_USE_PTHREAD
+# include <semaphore.h> /* TODO: get rid of vlc_thread_ready and this */
+#endif
+
 /**
  * Private LibVLC data for each object.
  */
@@ -162,6 +166,11 @@ typedef struct vlc_object_internals_t
     /* Thread properties, if any */
     vlc_thread_t    thread_id;
     bool            b_thread;
+#ifdef LIBVLC_USE_PTHREAD
+    sem_t           thread_ready;
+#elif defined (WIN32)
+    HANDLE          thread_ready;
+#endif
 
     /* Objects thread synchronization */
     vlc_mutex_t     lock;
