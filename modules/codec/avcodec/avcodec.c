@@ -202,6 +202,8 @@ vlc_module_begin();
 
 vlc_module_end();
 
+vlc_mutex_t avcodec_lock = VLC_STATIC_MUTEX;
+
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************/
@@ -319,9 +321,9 @@ static void CloseDecoder( vlc_object_t *p_this )
             free( p_sys->p_context->extradata );
         p_sys->p_context->extradata = NULL;
 
-        lock = var_AcquireMutex( "avcodec" );
+        vlc_mutex_lock( &avcodec_lock );
         avcodec_close( p_sys->p_context );
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &avcodec_lock );
         msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
         av_free( p_sys->p_context );
     }
@@ -331,8 +333,9 @@ static void CloseDecoder( vlc_object_t *p_this )
 
 void InitLibavcodec( vlc_object_t *p_object )
 {
-    static int b_ffmpeginit = 0;
-    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
+    static bool b_ffmpeginit = false;
+
+    vlc_mutex_lock( &avcodec_lock );
 
     /* *** init ffmpeg library (libavcodec) *** */
     if( !b_ffmpeginit )
@@ -340,9 +343,9 @@ void InitLibavcodec( vlc_object_t *p_object )
         avcodec_init();
         avcodec_register_all();
         av_log_set_callback( LibavutilCallback );
-        b_ffmpeginit = 1;
+        b_ffmpeginit = true;
 
-        msg_Dbg( p_object, "libavcodec initialized (interface %d )",
+        msg_Dbg( p_object, "libavcodec initialized (interface 0x%x)",
                  LIBAVCODEC_VERSION_INT );
     }
     else
@@ -350,5 +353,5 @@ void InitLibavcodec( vlc_object_t *p_object )
         msg_Dbg( p_object, "libavcodec already initialized" );
     }
 
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &avcodec_lock );
 }

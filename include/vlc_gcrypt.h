@@ -88,7 +88,19 @@ static const struct gcry_thread_cbs gcry_threads_vlc =
  */
 static inline void vlc_gcrypt_init (void)
 {
-    vlc_mutex_t *lock = var_AcquireMutex ("gcrypt_mutex");
-    gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
-    vlc_mutex_unlock (lock);
+    /* This would need a process-wide static mutex with all libraries linking
+     * to a given instance of libgcrypt. We cannot do this as we have different
+     * plugins linking with gcrypt, and some underlying libraries may use it
+     * behind our back. Only way is to always link gcrypt statically (ouch!) or
+     * have upstream gcrypt provide one shared object per threading system. */
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+    static bool done = false;
+
+    vlc_mutex_lock (&lock);
+    if (!done)
+    {
+        gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
+        done = true;
+    }
+    vlc_mutex_unlock (&lock);
 }

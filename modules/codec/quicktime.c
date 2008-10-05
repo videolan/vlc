@@ -326,6 +326,8 @@ static int Open( vlc_object_t *p_this )
     }
 }
 
+static vlc_mutex_t qt_mutex = VLC_STATIC_MUTEX;
+
 /*****************************************************************************
  * Close:
  *****************************************************************************/
@@ -333,10 +335,9 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    vlc_mutex_t   *lock;
 
     /* get lock, avoid segfault */
-    lock = var_AcquireMutex( "qt_mutex" );
+    vlc_mutex_lock( &qt_mutex );
 
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
     {
@@ -375,7 +376,7 @@ static void Close( vlc_object_t *p_this )
 #endif
 #endif
 
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &qt_mutex );
 
     free( p_sys );
 }
@@ -394,9 +395,7 @@ static int OpenAudio( decoder_t *p_dec )
     unsigned long   OutputBufferSize = 0;
 
     /* get lock, avoid segfault */
-    vlc_mutex_t    *lock = var_AcquireMutex( "qt_mutex" );
-    if( lock == NULL )
-        return VLC_EGENERIC;
+    vlc_mutex_lock( &qt_mutex );
 
     p_sys = calloc( sizeof( decoder_sys_t ), 1 );
     p_dec->p_sys = p_sys;
@@ -515,7 +514,7 @@ static int OpenAudio( decoder_t *p_dec )
     p_sys->i_out = 0;
     p_sys->i_out_frames = 0;
 
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &qt_mutex );
     return VLC_SUCCESS;
 
 exit_error:
@@ -523,7 +522,7 @@ exit_error:
 #ifdef LOADER
     Restore_LDT_Keeper( p_sys->ldt_fs );
 #endif
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &qt_mutex );
 
     free( p_sys );
     return VLC_EGENERIC;
@@ -595,7 +594,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         {
             int i_frames = p_sys->i_buffer / p_sys->InFrameSize;
             unsigned long i_out_frames, i_out_bytes;
-            vlc_mutex_t *lock = var_AcquireMutex( "qt_mutex ");
+            vlc_mutex_lock( &qt_mutex );
 
             i_error = p_sys->SoundConverterConvertBuffer( p_sys->myConverter,
                                                           p_sys->p_buffer,
@@ -603,7 +602,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
                                                           p_sys->out_buffer,
                                                           &i_out_frames,
                                                           &i_out_bytes );
-            vlc_mutex_unlock( lock );
+            vlc_mutex_unlock( &qt_mutex );
 
             /*
             msg_Dbg( p_dec, "decoded %d frames -> %ld frames (error=%d)",
@@ -674,7 +673,6 @@ static int OpenVideo( decoder_t *p_dec )
         return VLC_ENOMEM;
 
 #ifndef WIN32
-    vlc_mutex_t                        *lock;
     long                                i_result;
     ComponentDescription                desc;
     Component                           prev;
@@ -703,7 +701,7 @@ static int OpenVideo( decoder_t *p_dec )
              fcc, p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
 
     /* get lock, avoid segfault */
-    lock = var_AcquireMutex( "qt_mutex" );
+    vlc_mutex_lock( &qt_mutex );
 
 #ifdef __APPLE__
     EnterMovies();
@@ -845,14 +843,14 @@ static int OpenVideo( decoder_t *p_dec )
     p_dec->fmt_out.video.i_height= p_dec->fmt_in.video.i_height;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * p_dec->fmt_in.video.i_width / p_dec->fmt_in.video.i_height;
  
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &qt_mutex );
     return VLC_SUCCESS;
 
 exit_error:
 #ifdef LOADER
     Restore_LDT_Keeper( p_sys->ldt_fs );
 #endif
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &qt_mutex );
 
 #endif /* !WIN32 */
 
@@ -866,7 +864,6 @@ exit_error:
 static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    vlc_mutex_t   *lock;
     block_t       *p_block;
     picture_t     *p_pic;
     mtime_t       i_pts;
@@ -916,7 +913,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
  
-    lock = var_AcquireMutex( "qt_mutex" );
+    vlc_mutex_lock( &qt_mutex );
 
     if( ( p_pic = p_dec->pf_vout_buffer_new( p_dec ) ) )
     {
@@ -940,7 +937,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_pic->date = i_pts;
     }
  
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &qt_mutex );
 
     block_Release( p_block );
     return p_pic;

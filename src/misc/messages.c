@@ -87,6 +87,8 @@ static void QueueMsg ( vlc_object_t *, int, const char *,
 static void FlushMsg ( msg_queue_t * );
 static void PrintMsg ( vlc_object_t *, msg_item_t * );
 
+static vlc_mutex_t msg_stack_lock = VLC_STATIC_MUTEX;
+
 /**
  * Initialize messages queues
  * This function initializes all message queues
@@ -113,10 +115,10 @@ void msg_Create (libvlc_int_t *p_libvlc)
     SetFilePointer( QUEUE.logfile, 0, NULL, FILE_END );
 #endif
 
-    vlc_mutex_t *lock = var_AcquireMutex( "msg-stack" );
+    vlc_mutex_lock( &msg_stack_lock );
     if( banks++ == 0 )
         vlc_threadvar_create( &msg_context, NULL );
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &msg_stack_lock );
 }
 
 /**
@@ -175,10 +177,10 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
 
     FlushMsg( &QUEUE );
 
-    vlc_mutex_t *lock = var_AcquireMutex( "msg-stack" );
+    vlc_mutex_lock( &msg_stack_lock );
     if( --banks == 0 )
         vlc_threadvar_delete( &msg_context );
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &msg_stack_lock );
 
 #ifdef UNDER_CE
     CloseHandle( QUEUE.logfile );

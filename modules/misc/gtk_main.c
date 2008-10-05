@@ -82,14 +82,14 @@ vlc_module_begin();
     linked_with_a_crap_library_which_uses_atexit();
 vlc_module_end();
 
+static vlc_mutex_t gtk_lock = VLC_STATIC_MUTEX;
+
 /*****************************************************************************
  * Open: initialize and create window
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    vlc_mutex_t *lock;
-
-    lock = var_AcquireMutex( "gtk" );
+    vlc_mutex_lock( &gtk_lock );
 
     if( i_refcount > 0 )
     {
@@ -119,7 +119,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     i_refcount++;
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &gtk_lock );
 
     return VLC_SUCCESS;
 }
@@ -129,25 +129,19 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    vlc_mutex_t *lock;
-
-    lock = var_AcquireMutex( "gtk" );
+    vlc_mutex_lock( &gtk_lock );
 
     i_refcount--;
 
-    if( i_refcount > 0 )
+    if( --i_refcount == 0 )
     {
-        vlc_mutex_unlock( lock );
-        return;
+        gtk_main_quit();
+        vlc_thread_join( p_gtk_main );
+
+        vlc_object_release( p_gtk_main );
+        p_gtk_main = NULL;
     }
-
-    gtk_main_quit();
-    vlc_thread_join( p_gtk_main );
-
-    vlc_object_release( p_gtk_main );
-    p_gtk_main = NULL;
-
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &gtk_lock );
 }
 
 static gint foo( gpointer bar ) { return TRUE; }

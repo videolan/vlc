@@ -228,6 +228,8 @@ static int  VerboseCallback( vlc_object_t *, char const *,
 
 static void InitDeviceValues( libvlc_int_t * );
 
+vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
+
 /**
  * Allocate a libvlc instance, initialize global data if needed
  * It also initializes the threading system
@@ -240,7 +242,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have variables */
-    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
+    vlc_mutex_lock( &global_lock );
     if( i_instances == 0 )
     {
         /* Guess what CPU we have */
@@ -254,7 +256,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
                                   VLC_OBJECT_GENERIC, "libvlc" );
     if( p_libvlc != NULL )
         i_instances++;
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &global_lock );
 
     if( p_libvlc == NULL )
         return NULL;
@@ -1136,7 +1138,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
                      p_libvlc->p_hotkeys );
     FREENULL( p_libvlc->p_hotkeys );
 
-    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
+    vlc_mutex_lock( &global_lock );
     i_instances--;
 
     if( i_instances == 0 )
@@ -1144,7 +1146,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
         /* System specific cleaning code */
         system_End( p_libvlc );
     }
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &global_lock );
 
     msg_Flush( p_libvlc );
     msg_Destroy( p_libvlc );

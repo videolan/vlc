@@ -233,7 +233,7 @@ static void FreeLines( line_desc_t * );
 static void FreeLine( line_desc_t * );
 
 #ifdef HAVE_FONTCONFIG
-static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_lock  );
+static vlc_object_t *FontBuilderAttach( filter_t *p_filter );
 static void  FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder );
 static void* FontBuilderThread( vlc_object_t *p_this);
 static void  FontBuilderDestructor( vlc_object_t *p_this );
@@ -261,7 +261,6 @@ struct filter_sys_t
     int            i_default_font_size;
     int            i_display_height;
 #ifdef HAVE_FONTCONFIG
-    vlc_mutex_t   *p_fontconfig_lock;
     bool           b_fontconfig_ok;
     FcConfig      *p_fontconfig;
 #endif
@@ -367,7 +366,7 @@ static int Create( vlc_object_t *p_this )
 #ifdef HAVE_FONTCONFIG
     p_sys->b_fontconfig_ok = false;
     p_sys->p_fontconfig    = NULL;
-    p_sys->p_fontbuilder   = FontBuilderAttach( p_filter, &p_sys->p_fontconfig_lock );
+    p_sys->p_fontbuilder   = FontBuilderAttach( p_filter );
 #endif
 
     p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
@@ -434,10 +433,12 @@ static void Destroy( vlc_object_t *p_this )
 }
 
 #ifdef HAVE_FONTCONFIG
-static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_lock )
+static vlc_mutex_t fb_lock = VLC_STATIC_MUTEX;
+
+static vlc_object_t *FontBuilderAttach( filter_t *p_filter )
 {
     /* Check for an existing Fontbuilder thread */
-    vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
+    vlc_mutex_lock( &fb_lock );
     vlc_object_t *p_fontbuilder =
         vlc_object_find_name( p_filter->p_libvlc,
                               "fontlist builder", FIND_CHILD );
@@ -482,13 +483,12 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter, vlc_mutex_t **pp_loc
         var_AddCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
         FontBuilderGetFcConfig( p_filter, p_fontbuilder );
     }
-    vlc_mutex_unlock( p_lock );
-    *pp_lock = p_lock;
+    vlc_mutex_unlock( &fb_lock );
     return p_fontbuilder;
 }
 static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder )
 {
-    vlc_mutex_t *lock = var_AcquireMutex( "fontbuilder" );
+    vlc_mutex_lock( &fb_lock );
     if( p_fontbuilder )
     {
         const bool b_alive = vlc_object_alive( p_fontbuilder );
@@ -499,18 +499,18 @@ static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder )
         if( b_alive )
         {
             vlc_object_kill( p_fontbuilder );
-            vlc_mutex_unlock( lock );
+            vlc_mutex_unlock( &fb_lock );
 
             /* We need to unlock otherwise we may not join (the thread waiting
              * for the lock). It is safe to unlock as no one else will try a
              * join and we have a reference on the object) */
             vlc_thread_join( p_fontbuilder );
 
-            vlc_mutex_lock( lock );
+            vlc_mutex_lock( &fb_lock );
         }
         vlc_object_release( p_fontbuilder );
     }
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &fb_lock );
 }
 static void* FontBuilderThread( vlc_object_t *p_this )
 {
@@ -540,9 +540,9 @@ static void* FontBuilderThread( vlc_object_t *p_this )
         msg_Dbg( p_this, "Finished building font database." );
         msg_Dbg( p_this, "Took %ld seconds", (long)((t2 - t1)/1000000) );
 
-        vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
+        vlc_mutex_lock( &fb_lock );
         p_this->p_private = p_fontconfig;
-        vlc_mutex_unlock( p_lock );
+        vlc_mutex_unlock( &fb_lock );
 
         var_SetBool( p_this, "build-done", true );
         vlc_restorecancel (canc);
@@ -570,11 +570,11 @@ static int FontBuilderDone( vlc_object_t *p_this, const char *psz_var,
 
     if( newval.b_bool )
     {
-        vlc_mutex_t *p_lock = var_AcquireMutex( "fontbuilder" );
+        vlc_mutex_lock( &fb_lock );
 
         FontBuilderGetFcConfig( p_filter, p_this );
 
-        vlc_mutex_unlock( p_lock );
+        vlc_mutex_unlock( &fb_lock );
     }
 
     VLC_UNUSED(psz_var);
@@ -2019,7 +2019,7 @@ static int ProcessLines( filter_t *p_filter,
             {
                 char *psz_fontfile = NULL;
 
-                vlc_mutex_lock( p_sys->p_fontconfig_lock );
+                vlc_mutex_lock( &fb_lock );
                 if( p_sys->b_fontconfig_ok )
                 {
                     /* FIXME Is there really a race condition between FontConfig_Select with default fontconfig(NULL)
@@ -2030,7 +2030,7 @@ static int ProcessLines( filter_t *p_filter,
                                                       p_style->b_italic,
                                                       &i_idx );
                 }
-                vlc_mutex_unlock( p_sys->p_fontconfig_lock );
+                vlc_mutex_unlock( &fb_lock );
 
                 if( psz_fontfile && ! *psz_fontfile )
                 {

@@ -203,12 +203,13 @@ static void * load_syms_linux(decoder_t *p_dec, const char *path)
 }
 #endif
 
+static vlc_mutex_t rm_mutex = VLC_STATIC_MUTEX;
+
 static int InitVideo(decoder_t *p_dec)
 {
     int result;
     struct rv_init_t init_data;
     char fcc[4];
-    vlc_mutex_t  *lock;
     char *g_decode_path;
 
     int  i_vide = p_dec->fmt_in.i_extra;
@@ -309,9 +310,7 @@ static int InitVideo(decoder_t *p_dec)
         return VLC_EGENERIC;
     }
 
-    lock = var_AcquireMutex( "rm_mutex" );
-    if ( lock == NULL )
-        return VLC_EGENERIC;
+    vlc_mutex_lock( &rm_mutex );
 
     p_sys->handle=NULL;
     #ifdef WIN32
@@ -358,7 +357,7 @@ static int InitVideo(decoder_t *p_dec)
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * p_dec->fmt_in.video.i_width / p_dec->fmt_in.video.i_height;
     p_sys->inited = 0;
 
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &rm_mutex );
     return VLC_SUCCESS;
 }
 
@@ -397,10 +396,9 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    vlc_mutex_t   *lock;
 
     /* get lock, avoid segfault */
-    lock = var_AcquireMutex( "rm_mutex" );
+    vlc_mutex_lock( &rm_mutex );
 
     #ifdef WIN32
     if (dll_type == 1)
@@ -435,8 +433,7 @@ static void Close( vlc_object_t *p_this )
 #endif
     p_sys->inited = 0;
 
-    if ( lock )
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &rm_mutex );
 
     if ( p_sys )
         free( p_sys );
@@ -448,7 +445,6 @@ static void Close( vlc_object_t *p_this )
 static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    vlc_mutex_t   *lock;
     block_t       *p_block;
     picture_t     *p_pic;
     mtime_t       i_pts;
@@ -465,9 +461,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     i_pts = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
 
-    lock = var_AcquireMutex( "rm_mutex" );
-    if ( lock == NULL )
-        return NULL;
+    vlc_mutex_lock( &rm_mutex );
 
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
@@ -559,7 +553,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_pic->b_force = 1;
     }
 
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &rm_mutex );
 
     block_Release( p_block );
     return p_pic;

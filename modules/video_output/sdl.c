@@ -135,6 +135,8 @@ vlc_module_begin();
 #endif
 vlc_module_end();
 
+static vlc_mutex_t sdl_lock = VLC_STATIC_MUTEX;
+
 /*****************************************************************************
  * OpenVideo: allocate SDL video thread output method
  *****************************************************************************
@@ -146,7 +148,7 @@ static int Open ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     /* XXX: check for conflicts with the SDL audio output */
-    vlc_mutex_t *lock = var_AcquireMutex( "sdl" );
+    vlc_mutex_lock( &sdl_lock );
 
 #ifdef HAVE_SETENV
     char *psz_method;
@@ -158,7 +160,7 @@ static int Open ( vlc_object_t *p_this )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &sdl_lock );
         return VLC_ENOMEM;
     }
 
@@ -167,7 +169,7 @@ static int Open ( vlc_object_t *p_this )
     /* Check if SDL video module has been initialized */
     if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
     {
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &sdl_lock );
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
@@ -212,11 +214,11 @@ static int Open ( vlc_object_t *p_this )
     {
         msg_Err( p_vout, "cannot initialize SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &sdl_lock );
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &sdl_lock );
 
     /* Translate keys into unicode */
     SDL_EnableUNICODE(1);

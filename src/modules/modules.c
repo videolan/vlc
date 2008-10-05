@@ -120,7 +120,7 @@ void __module_InitBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank = NULL;
 
-    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
+    vlc_mutex_lock( &global_lock );
 
     if( p_module_bank == NULL )
     {
@@ -145,7 +145,7 @@ void __module_InitBank( vlc_object_t *p_this )
     else
         p_module_bank->i_usage++;
 
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &global_lock );
 }
 
 
@@ -161,17 +161,17 @@ void __module_EndBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank;
 
-    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
+    vlc_mutex_lock( &global_lock );
     p_bank = p_module_bank;
     assert (p_bank != NULL);
     if( --p_bank->i_usage > 0 )
     {
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &global_lock );
         return;
     }
     /*FIXME: For thread safety, we need to:
     p_module_bank = NULL; - immediately, but that will crash the cache */
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &global_lock );
 
     /* Save the configuration */
     config_AutoSaveConfigFile( p_this );
@@ -223,14 +223,14 @@ void __module_EndBank( vlc_object_t *p_this )
  */
 void __module_LoadBuiltins( vlc_object_t * p_this )
 {
-    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
+    vlc_mutex_lock( &global_lock );
     if( p_module_bank->b_builtins )
     {
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &global_lock );
         return;
     }
     p_module_bank->b_builtins = true;
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &global_lock );
 
     msg_Dbg( p_this, "checking builtin modules" );
     ALLOCATE_ALL_BUILTINS();
@@ -247,14 +247,14 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
 void __module_LoadPlugins( vlc_object_t * p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
-    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
+    vlc_mutex_lock( &global_lock );
     if( p_module_bank->b_plugins )
     {
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &global_lock );
         return;
     }
     p_module_bank->b_plugins = true;
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &global_lock );
 
     msg_Dbg( p_this, "checking plugin modules" );
 

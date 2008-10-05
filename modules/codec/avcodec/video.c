@@ -383,23 +383,16 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
     /* ***** Open the codec ***** */
-    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
-    if( lock == NULL )
-    {
-        free( p_sys->p_buffer_orig );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
-
+    vlc_mutex_lock( &avcodec_lock );
     if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
     {
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &avcodec_lock );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         free( p_sys->p_buffer_orig );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &avcodec_lock );
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
 

@@ -604,11 +604,11 @@ int OpenEncoder( vlc_object_t *p_this )
     p_context->extradata = NULL;
     p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
+    vlc_mutex_lock( &avcodec_lock );
 
     if( avcodec_open( p_context, p_codec ) )
     {
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &avcodec_lock );
         if( p_enc->fmt_in.i_cat == AUDIO_ES &&
              (p_context->channels > 2 || i_codec_id == CODEC_ID_MP2
                || i_codec_id == CODEC_ID_MP3) )
@@ -658,10 +658,10 @@ int OpenEncoder( vlc_object_t *p_this )
             }
 
             p_context->codec = NULL;
-            vlc_mutex_lock( lock );
+            vlc_mutex_lock( &avcodec_lock );
             if( avcodec_open( p_context, p_codec ) )
             {
-                vlc_mutex_unlock( lock );
+                vlc_mutex_unlock( &avcodec_lock );
                 msg_Err( p_enc, "cannot open encoder" );
                 intf_UserFatal( p_enc, false,
                                 _("Streaming / Transcoding failed"),
@@ -679,7 +679,7 @@ int OpenEncoder( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
-    vlc_mutex_unlock( lock);
+    vlc_mutex_unlock( &avcodec_lock );
 
     p_enc->fmt_out.i_extra = p_context->extradata_size;
     if( p_enc->fmt_out.i_extra )
@@ -1111,9 +1111,9 @@ void CloseEncoder( vlc_object_t *p_this )
         free( pp_contexts );
     }
 
-    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
+    vlc_mutex_lock( &avcodec_lock );
     avcodec_close( p_sys->p_context );
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &avcodec_lock );
     av_free( p_sys->p_context );
 
     free( p_sys->p_buffer );

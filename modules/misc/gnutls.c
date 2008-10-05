@@ -110,6 +110,8 @@ vlc_module_begin();
                     CACHE_SIZE_LONGTEXT, true );
 vlc_module_end();
 
+static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;
+
 /**
  * Initializes GnuTLS with proper locking.
  * @return VLC_SUCCESS on success, a VLC error code otherwise.
@@ -120,7 +122,7 @@ static int gnutls_Init (vlc_object_t *p_this)
 
     vlc_gcrypt_init (); /* GnuTLS depends on gcrypt */
 
-    vlc_mutex_t *lock = var_AcquireMutex ("gnutls_mutex");
+    vlc_mutex_lock (&gnutls_mutex);
     if (gnutls_global_init ())
     {
         msg_Err (p_this, "cannot initialize GnuTLS");
@@ -139,7 +141,7 @@ static int gnutls_Init (vlc_object_t *p_this)
     ret = VLC_SUCCESS;
 
 error:
-    vlc_mutex_unlock (lock);
+    vlc_mutex_unlock (&gnutls_mutex);
     return ret;
 }
 
@@ -149,11 +151,11 @@ error:
  */
 static void gnutls_Deinit (vlc_object_t *p_this)
 {
-    vlc_mutex_t *lock = var_AcquireMutex( "gnutls_mutex" );
+    vlc_mutex_lock (&gnutls_mutex);
 
     gnutls_global_deinit ();
     msg_Dbg (p_this, "GnuTLS deinitialized");
-    vlc_mutex_unlock (lock);
+    vlc_mutex_unlock (&gnutls_mutex);
 }
 
 

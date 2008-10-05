@@ -82,19 +82,19 @@ vlc_module_end();
 
 } /* extern "C" */
 
+static vlc_mutex_t qte_lock = VLC_STATIC_MUTEX;
+
 /*****************************************************************************
  * Open: initialize and create window
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    vlc_mutex_t *lock;
-
-    lock = var_AcquireMutex( "qte" );
+    vlc_mutex_lock( &qte_lock );
 
     if( i_refcount > 0 )
     {
         i_refcount++;
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &qte_lock );
 
         return VLC_SUCCESS;
     }
@@ -113,7 +113,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     i_refcount++;
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &qte_lock );
 
     vlc_object_attach( p_qte_main, p_this );
     msg_Dbg( p_this, "qte_main running" );
@@ -126,9 +126,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    vlc_mutex_t *lock;
-
-    lock = var_AcquireMutex( "qte" );
+    vlc_mutex_lock( &qte_lock );
 
     i_refcount--;
 
@@ -149,7 +147,7 @@ static void Close( vlc_object_t *p_this )
     vlc_object_release( p_qte_main );
     p_qte_main = NULL;
 
-    vlc_mutex_unlock( lock );
+    vlc_mutex_unlock( &qte_lock );
 }
 
 /*****************************************************************************

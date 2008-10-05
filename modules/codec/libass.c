@@ -72,7 +72,6 @@ typedef struct
 {
     vlc_object_t   *p_libvlc;
 
-    vlc_mutex_t     *p_lock;
     int             i_refcount;
     ass_library_t   *p_library;
     ass_renderer_t  *p_renderer;
@@ -120,6 +119,8 @@ static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, 
 static void SubpictureReleaseRegions( spu_t *p_spu, subpicture_t *p_subpic );
 static void RegionDraw( subpicture_region_t *p_region, ass_image_t *p_img );
 
+static vlc_mutex_t libass_lock = VLC_STATIC_MUTEX;
+
 //#define DEBUG_REGION
 
 /*****************************************************************************
@@ -151,16 +152,16 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_refcount = 1;
 
     /* Add a track */
-    vlc_mutex_lock( p_sys->p_ass->p_lock );
+    vlc_mutex_lock( &libass_lock );
     p_sys->p_track = p_track = ass_new_track( p_sys->p_ass->p_library );
     if( !p_track )
     {
-        vlc_mutex_unlock( p_sys->p_ass->p_lock );
+        vlc_mutex_unlock( &libass_lock );
         DecSysRelease( p_sys );
         return VLC_EGENERIC;
     }
     ass_process_codec_private( p_track, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-    vlc_mutex_unlock( p_sys->p_ass->p_lock );
+    vlc_mutex_unlock( &libass_lock );
 
     return VLC_SUCCESS;
 }
@@ -194,10 +195,10 @@ static void DecSysRelease( decoder_sys_t *p_sys )
     vlc_mutex_unlock( &p_sys->lock );
     vlc_mutex_destroy( &p_sys->lock );
 
-    vlc_mutex_lock( p_sys->p_ass->p_lock );
+    vlc_mutex_lock( &libass_lock );
     if( p_sys->p_track )
         ass_free_track( p_sys->p_track );
-    vlc_mutex_unlock( p_sys->p_ass->p_lock );
+    vlc_mutex_unlock( &libass_lock );
 
     AssHandleRelease( p_sys->p_ass );
     free( p_sys );
@@ -264,13 +265,13 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->b_ephemer = true;
     p_spu->b_absolute = true;
 
-    vlc_mutex_lock( p_sys->p_ass->p_lock );
+    vlc_mutex_lock( &libass_lock );
     if( p_sys->p_track )
     {
         ass_process_chunk( p_sys->p_track, p_spu->p_sys->p_subs_data, p_spu->p_sys->i_subs_len,
                            p_spu->i_start / 1000, (p_spu->i_stop-p_spu->i_start) / 1000 );
     }
-    vlc_mutex_unlock( p_sys->p_ass->p_lock );
+    vlc_mutex_unlock( &libass_lock );
 
     p_spu->pf_pre_render = PreRender;
     p_spu->pf_update_regions = UpdateRegions;
@@ -320,7 +321,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
         return;
     }
 
-    vlc_mutex_lock( p_ass->p_lock );
+    vlc_mutex_lock( &libass_lock );
 
     /* */
     fmt = *p_fmt;
@@ -347,7 +348,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
 
     if( !i_changed && !b_fmt_changed )
     {
-        vlc_mutex_unlock( p_ass->p_lock );
+        vlc_mutex_unlock( &libass_lock );
         return;
     }
 
@@ -368,7 +369,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
 
     if( i_region <= 0 )
     {
-        vlc_mutex_unlock( p_ass->p_lock );
+        vlc_mutex_unlock( &libass_lock );
         return;
     }
 
@@ -402,7 +403,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
         *pp_region_last = r;
         pp_region_last = &r->p_next;
     }
-    vlc_mutex_unlock( p_ass->p_lock );
+    vlc_mutex_unlock( &libass_lock );
 }
 
 static rectangle_t r_create( int x0, int y0, int x1, int y1 )
@@ -616,9 +617,7 @@ static void SubpictureReleaseRegions( spu_t *p_spu, subpicture_t *p_subpic )
 /* */
 static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 {
-    vlc_mutex_t *p_lock = var_AcquireMutex( "libass" );
-    if( !p_lock )
-        return NULL;
+    vlc_mutex_lock( &libass_lock );
 
     ass_handle_t *p_ass = NULL;
     ass_library_t *p_library = NULL;
@@ -635,7 +634,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 
         p_ass->i_refcount++;
 
-        vlc_mutex_unlock( p_lock );
+        vlc_mutex_unlock( &libass_lock );
         return p_ass;
     }
 
@@ -646,7 +645,6 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 
     /* */
     p_ass->p_libvlc = VLC_OBJECT(p_dec->p_libvlc);
-    p_ass->p_lock = p_lock;
     p_ass->i_refcount = 1;
 
     /* Create libass library */
@@ -713,7 +711,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     var_Set( p_dec->p_libvlc, "libass-handle", val );
 
     /* */
-    vlc_mutex_unlock( p_ass->p_lock );
+    vlc_mutex_unlock( &libass_lock );
     return p_ass;
 
 error:
@@ -723,16 +721,16 @@ error:
         ass_library_done( p_library );
 
     free( p_ass );
-    vlc_mutex_unlock( p_lock );
+    vlc_mutex_unlock( &libass_lock );
     return NULL;
 }
 static void AssHandleRelease( ass_handle_t *p_ass )
 {
-    vlc_mutex_lock( p_ass->p_lock );
+    vlc_mutex_lock( &libass_lock );
     p_ass->i_refcount--;
     if( p_ass->i_refcount > 0 )
     {
-        vlc_mutex_unlock( p_ass->p_lock );
+        vlc_mutex_unlock( &libass_lock );
         return;
     }
 
@@ -743,7 +741,7 @@ static void AssHandleRelease( ass_handle_t *p_ass )
     val.p_address = NULL;
     var_Set( p_ass->p_libvlc, "libass-handle", val );
 
-    vlc_mutex_unlock( p_ass->p_lock );
+    vlc_mutex_unlock( &libass_lock );
     free( p_ass );
 }
 
