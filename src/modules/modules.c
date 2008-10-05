@@ -128,7 +128,7 @@ void __module_InitBank( vlc_object_t *p_this )
         p_bank->i_usage = 1;
         p_bank->i_cache = p_bank->i_loaded_cache = 0;
         p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
-        p_bank->b_cache = p_bank->b_cache_dirty =
+        p_bank->b_cache = p_bank->b_cache_dirty = false;
         p_bank->head = NULL;
 
         /* Everything worked, attach the object */
