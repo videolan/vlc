@@ -94,6 +94,7 @@ static int Open( vlc_object_t *p_this )
 
     if( !notify_init( APPLICATION_NAME ) )
     {
+        free( p_sys );
         msg_Err( p_intf, "can't find notification daemon" );
         return VLC_EGENERIC;
     }
