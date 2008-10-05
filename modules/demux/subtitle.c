@@ -1655,12 +1655,15 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         }
     }
 	
-	while( psz_text[ strlen( psz_text ) - 1 ] == '\\' )
-	{
+    while( psz_text[ strlen( psz_text ) - 1 ] == '\\' )
+    {
         const char *s2 = TextGetLine( txt );
 
         if( !s2 )
+        {
+            free( psz_orig );
             return VLC_EGENERIC;
+        }
 
         int i_len = strlen( s2 );
         if( i_len == 0 )
@@ -1674,7 +1677,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
 		psz_orig = psz_text;
         strcat( psz_text, s2 );
-	}
+    }
 
     /* Skip the blanks */
     while( *psz_text == ' ' || *psz_text == '\t' ) psz_text++;
