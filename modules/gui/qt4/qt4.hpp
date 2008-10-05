@@ -48,6 +48,19 @@ class DialogsProvider;
 class VideoWidget;
 class QSettings;
 
+#if defined(Q_WS_WIN)
+#include <QApplication>
+
+class WinQtApp : public QApplication
+{
+public:
+    WinQtApp ( int & argc, char ** argv, bool GUIenabled ) : QApplication( argc, argv, GUIenabled ) {}
+    ~WinQtApp() {}
+protected:
+    bool winEventFilter(MSG *msg, long *result);
+};
+#endif /* Q_WS_WIN */
+
 struct intf_sys_t
 {
     QApplication *p_app;
