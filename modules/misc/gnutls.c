@@ -723,10 +723,11 @@ static int OpenClient (vlc_object_t *obj)
     char *servername = var_GetNonEmptyString (p_session, "tls-server-name");
     if (servername == NULL )
         msg_Err (p_session, "server name missing for TLS session");
+    else
+        gnutls_server_name_set (p_sys->session.session, GNUTLS_NAME_DNS,
+                                servername, strlen (servername));
 
     p_sys->session.psz_hostname = servername;
-    gnutls_server_name_set (p_sys->session.session, GNUTLS_NAME_DNS,
-                            servername, strlen (servername));
 
     return VLC_SUCCESS;
 
