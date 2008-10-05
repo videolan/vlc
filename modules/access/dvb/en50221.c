@@ -1204,8 +1204,11 @@ static void CAPMTFirst( access_t * p_access, int i_session_id,
                           0x3 /* only */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
 
-    if ( i_capmt_size )
+    if( i_capmt_size )
+    {
         APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+        free( p_capmt );
+    }
 }
 
 /*****************************************************************************
@@ -1238,8 +1241,11 @@ static void CAPMTAdd( access_t * p_access, int i_session_id,
                           0x4 /* add */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
 
-    if ( i_capmt_size )
+    if( i_capmt_size )
+    {
         APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+        free( p_capmt );
+    }
 }
 
 /*****************************************************************************
@@ -1258,8 +1264,11 @@ static void CAPMTUpdate( access_t * p_access, int i_session_id,
                           0x5 /* update */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
 
-    if ( i_capmt_size )
+    if( i_capmt_size )
+    {
         APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+        free( p_capmt );
+    }
 }
 
 /*****************************************************************************
@@ -1279,8 +1288,11 @@ static void CAPMTDelete( access_t * p_access, int i_session_id,
                           0x5 /* update */, 0x4 /* not selected */,
                           &i_capmt_size );
 
-    if ( i_capmt_size )
+    if( i_capmt_size )
+    {
         APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+        free( p_capmt );
+    }
 }
 
 /*****************************************************************************
