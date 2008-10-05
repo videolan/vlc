@@ -1073,7 +1073,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
     if( !trusted )
     {
         module_config_t *p_config = config_FindConfig( p_obj, psz_name );
-        if( !p_config->b_safe )
+        if( !p_config || !p_config->b_safe )
         {
             msg_Err( p_obj, "unsafe option \"%s\" has been ignored for "
                             "security reasons", psz_name );
