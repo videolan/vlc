@@ -506,7 +506,10 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         psz_title = p_item->psz_name;
 
     if( (!psz_artist || !psz_album ) && !psz_title )
+    {
+        free( psz_type );
         return;
+    }
 
     ArtCacheGetDirPath( p_input, psz_filename, psz_title, psz_artist, psz_album );
     ArtCacheCreateDir( psz_filename );
