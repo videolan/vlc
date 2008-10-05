@@ -45,17 +45,6 @@
 static vlc_threadvar_t cancel_key;
 #endif
 
-static struct
-{
-   vlc_dictionary_t list;
-   vlc_mutex_t      lock;
-} named_mutexes = {
-    { 0, NULL, },
-#ifdef LIBVLC_USE_PTHREAD
-    PTHREAD_MUTEX_INITIALIZER,
-#endif
-};
-
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
 #endif
@@ -167,8 +156,6 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
-            vlc_dictionary_init (&named_mutexes.list, 0);
-            vlc_mutex_init (&named_mutexes.lock);
             vlc_mutex_init (&super_mutex);
             vlc_threadvar_create (&cancel_key, free);
             break;
@@ -176,8 +163,6 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_DETACH:
             vlc_threadvar_delete( &cancel_key );
             vlc_mutex_destroy (&super_mutex);
-            vlc_mutex_destroy (&named_mutexes.lock);
-            vlc_dictionary_clear (&named_mutexes.list);
             break;
     }
     return TRUE;
@@ -1059,30 +1044,4 @@ void vlc_control_cancel (int cmd, ...)
     }
     va_end (ap);
 #endif
-}
-
-
-#undef var_AcquireMutex
-/**
- * Finds a process-wide mutex, creates it if needed, and locks it.
- * Unlock with vlc_mutex_unlock().
- * FIXME: This is very inefficient, this is not memory-safe and this leaks
- * memory. Use static locks instead.
- */
-vlc_mutex_t *var_AcquireMutex( const char *name )
-{
-    vlc_mutex_t *lock;
-
-    vlc_mutex_lock (&named_mutexes.lock);
-    lock = vlc_dictionary_value_for_key (&named_mutexes.list, name);
-    if (lock == kVLCDictionaryNotFound)
-    {
-        lock = malloc (sizeof (*lock));
-        vlc_mutex_init (lock);
-        vlc_dictionary_insert (&named_mutexes.list, name, lock);
-    }
-    vlc_mutex_unlock (&named_mutexes.lock);
-
-    vlc_mutex_lock (lock);
-    return lock;
 }

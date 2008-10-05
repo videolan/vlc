@@ -411,7 +411,6 @@ utf8_scandir
 utf8_stat
 utf8_unlink
 utf8_vfprintf
-var_AcquireMutex
 __var_AddCallback
 __var_Change
 __var_Command
