@@ -154,9 +154,6 @@ static int Open ( vlc_object_t *p_this )
     char *psz_method;
 #endif
 
-    if( lock == NULL )
-        return VLC_ENOMEM;
-
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
