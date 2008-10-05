@@ -969,7 +969,8 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
 
     /* Session resumption support */
     i_val = config_GetInt (p_server, "gnutls-cache-timeout");
-    gnutls_db_set_cache_expiration (session, i_val);
+    if (i_val >= 0)
+        gnutls_db_set_cache_expiration (session, i_val);
     gnutls_db_set_retrieve_function( session, cb_fetch );
     gnutls_db_set_remove_function( session, cb_delete );
     gnutls_db_set_store_function( session, cb_store );
@@ -1069,6 +1070,8 @@ static int OpenServer (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     p_sys->i_cache_size = config_GetInt (obj, "gnutls-cache-size");
+    if (p_sys->i_cache_size == -1) /* Duh, config subsystem exploded?! */
+        p_sys->i_cache_size = 0;
     p_sys->p_cache = calloc (p_sys->i_cache_size,
                              sizeof (struct saved_session_t));
     if (p_sys->p_cache == NULL)
