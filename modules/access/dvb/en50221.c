@@ -815,10 +815,8 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
         }
         else
         {
-            char *psz_hex;
             ca_msg.length = i_size + p - p_apdu;
             if ( i_size == 0 ) ca_msg.length=3;
-            psz_hex = (char*)malloc( ca_msg.length*3 + 1);
             memcpy( ca_msg.msg, p_apdu, i_size + p - p_apdu );
             i_ret = ioctl(p_sys->i_ca_handle, CA_SEND_MSG, &ca_msg );
             if ( i_ret < 0 )
