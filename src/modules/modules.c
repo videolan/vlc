@@ -706,15 +706,13 @@ bool module_exists (const char * psz_name)
  * Return a NULL terminated array with the names of the modules
  * that have a certain capability.
  * Free after uses both the string and the table.
- * \param p_this vlc object structure
  * \param psz_capability the capability asked
  * \param pppsz_longname an pointer to an array of string to contain
     the long names of the modules. If set to NULL the function don't use it.
  * \return the NULL terminated array
  */
-char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
-                                               const char *psz_capability,
-                                               char ***pppsz_longname )
+char ** module_GetModulesNamesForCapability( const char *psz_capability,
+                                             char ***pppsz_longname )
 {
     size_t count = 0;
     char **psz_ret;

@@ -47,7 +47,7 @@ static void services_discovery_Destructor ( services_discovery_t * p_sd );
 char ** __services_discovery_GetServicesNames( vlc_object_t * p_super,
                                                char ***pppsz_longnames )
 {
-    return module_GetModulesNamesForCapability( p_super, "services_discovery",
+    return module_GetModulesNamesForCapability( "services_discovery",
                                                 pppsz_longnames );
 }
 

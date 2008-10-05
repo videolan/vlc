@@ -210,7 +210,6 @@ module_config_get
 module_exists
 module_find
 module_get_help
-__module_GetModulesNamesForCapability
 module_get_name
 module_get_object
 module_hold

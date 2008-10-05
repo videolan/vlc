@@ -140,8 +140,16 @@ __vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
 #define vlc_custom_create(o, s, t, n) \
         __vlc_custom_create(VLC_OBJECT(o), s, t, n)
 
-
+/*
+ * To be cleaned-up module stuff:
+ */
 extern char *psz_vlcpath;
+
+/* Return a NULL terminated array with the names of the modules that have a
+ * certain capability.
+ * Free after uses both the string and the table. */
+VLC_EXPORT(char **, module_GetModulesNamesForCapability,
+                    ( const char * psz_capability, char ***psz_longname ) );
 
 #ifdef LIBVLC_USE_PTHREAD
 # include <semaphore.h> /* TODO: get rid of vlc_thread_ready and this */

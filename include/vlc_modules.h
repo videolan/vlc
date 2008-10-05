@@ -45,15 +45,6 @@ VLC_EXPORT( void, module_release, (module_t *module) );
 VLC_EXPORT( void, module_list_free, (module_t **) );
 VLC_EXPORT( module_t **, module_list_get, (size_t *n) );
 
-/* Return a NULL terminated array with the names of the modules that have a
- * certain capability.
- * Free after uses both the string and the table. */
- #define module_GetModulesNamesForCapability(a,b,c) \
-                    __module_GetModulesNamesForCapability(VLC_OBJECT(a),b,c)
-VLC_EXPORT(char **, __module_GetModulesNamesForCapability,
-                    ( vlc_object_t *p_this, const char * psz_capability,
-                      char ***psz_longname ) );
-
 VLC_EXPORT( bool, module_provides, ( const module_t *m, const char *cap ) );
 VLC_EXPORT( const char *, module_get_object, ( const module_t *m ) );
 VLC_EXPORT( const char *, module_get_name, ( const module_t *m, bool long_name ) );
