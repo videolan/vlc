@@ -238,11 +238,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     libvlc_priv_t *priv;
     char *psz_env = NULL;
 
-    /* vlc_threads_init *must* be the first internal call! No other call is
-     * allowed before the thread system has been initialized. */
-    if (vlc_threads_init ())
-        return NULL;
-
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have variables */
     vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
@@ -1160,11 +1155,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 
     vlc_object_release( p_libvlc );
     p_libvlc = NULL;
-
-    /* Stop thread system: last one out please shut the door!
-     * The number of initializations of the thread system is counted, we
-     * can call this each time */
-    vlc_threads_end ();
 
     return VLC_SUCCESS;
 }

@@ -39,15 +39,8 @@
 #endif
 #include <signal.h>
 
-/*****************************************************************************
- * Global mutex for lazy initialization of the threads system
- *****************************************************************************/
-static volatile unsigned i_initializations = 0;
-
 #if defined( LIBVLC_USE_PTHREAD )
 # include <sched.h>
-
-static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
 #else
 static vlc_threadvar_t cancel_key;
 #endif
@@ -56,7 +49,12 @@ static struct
 {
    vlc_dictionary_t list;
    vlc_mutex_t      lock;
-} named_mutexes;
+} named_mutexes = {
+    { 0, NULL, },
+#ifdef LIBVLC_USE_PTHREAD
+    PTHREAD_MUTEX_INITIALIZER,
+#endif
+};
 
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
@@ -158,65 +156,29 @@ typedef struct vlc_cancel_t
 # define VLC_CANCEL_INIT { NULL, true, false }
 #endif
 
-/*****************************************************************************
- * vlc_threads_init: initialize threads system
- *****************************************************************************
- * This function requires lazy initialization of a global lock in order to
- * keep the library really thread-safe. Some architectures don't support this
- * and thus do not guarantee the complete reentrancy.
- *****************************************************************************/
-int vlc_threads_init( void )
+#ifdef WIN32
+BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
-    /* If we have lazy mutex initialization, use it. Otherwise, we just
-     * hope nothing wrong happens. */
-#if defined( LIBVLC_USE_PTHREAD )
-    pthread_mutex_lock( &once_mutex );
-#endif
+    (void) hinstDll;
+    (void) lpvReserved;
 
-    if( i_initializations == 0 )
+    switch (fdwReason)
     {
-        vlc_dictionary_init (&named_mutexes.list, 0);
-        vlc_mutex_init (&named_mutexes.lock);
-#ifndef LIBVLC_USE_PTHREAD_CANCEL
-        vlc_threadvar_create( &cancel_key, free );
-#endif
+        case DLL_PROCESS_ATTACH:
+            vlc_dictionary_init (&named_mutexes.list, 0);
+            vlc_mutex_init (&named_mutexes.lock);
+            vlc_threadvar_create (&cancel_key, free);
+            break;
+
+        case DLL_PROCESS_DETACH:
+            vlc_threadvar_delete( &cancel_key );
+            vlc_mutex_destroy (&named_mutexes.lock);
+            vlc_dictionary_clear (&named_mutexes.list);
+            break;
     }
-    i_initializations++;
-
-#if defined( LIBVLC_USE_PTHREAD )
-    pthread_mutex_unlock( &once_mutex );
-#endif
-
-    return VLC_SUCCESS;
+    return TRUE;
 }
-
-/*****************************************************************************
- * vlc_threads_end: stop threads system
- *****************************************************************************
- * FIXME: This function is far from being threadsafe.
- *****************************************************************************/
-void vlc_threads_end( void )
-{
-#if defined( LIBVLC_USE_PTHREAD )
-    pthread_mutex_lock( &once_mutex );
 #endif
-
-    assert( i_initializations > 0 );
-
-    if( i_initializations == 1 )
-    {
-#ifndef LIBVLC_USE_PTHREAD
-        vlc_threadvar_delete( &cancel_key );
-#endif
-        vlc_mutex_destroy (&named_mutexes.lock);
-        vlc_dictionary_clear (&named_mutexes.list);
-    }
-    i_initializations--;
-
-#if defined( LIBVLC_USE_PTHREAD )
-    pthread_mutex_unlock( &once_mutex );
-#endif
-}
 
 #if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
 /* This is not prototyped under glibc, though it exists. */

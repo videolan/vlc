@@ -45,8 +45,6 @@ void system_End       ( libvlc_int_t * );
 /*
  * Threads subsystem
  */
-int vlc_threads_init( void );
-void vlc_threads_end( void );
 
 /* Hopefully, no need to export this. There is a new thread API instead. */
 void vlc_thread_cancel (vlc_object_t *);
