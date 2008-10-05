@@ -102,7 +102,7 @@ static int    CacheSaveConfig  ( module_t *, FILE * );
  * actually load the dynamically loadable module.
  * This allows us to only fully load plugins when they are actually used.
  *****************************************************************************/
-void CacheLoad( vlc_object_t *p_this )
+void CacheLoad( vlc_object_t *p_this, bool b_delete )
 {
     char *psz_filename, *psz_cachedir = config_GetCacheDir();
     FILE *file;
@@ -127,7 +127,7 @@ void CacheLoad( vlc_object_t *p_this )
     }
     free( psz_cachedir );
 
-    if( p_module_bank->b_cache_delete )
+    if( b_delete )
     {
 #if !defined( UNDER_CE )
         unlink( psz_filename );

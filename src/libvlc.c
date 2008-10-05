@@ -365,10 +365,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     priv->psz_configfile = config_GetCustomConfigFile( p_libvlc );
 
     /* Check for plugins cache options */
-    if( config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0 )
-    {
-        p_module_bank->b_cache_delete = true;
-    }
+    bool b_cache_delete = config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0;
 
     /* Will be re-done properly later on */
     priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
@@ -459,8 +456,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     psz_language = config_GetPsz( p_libvlc, "language" );
     if( psz_language && *psz_language && strcmp( psz_language, "auto" ) )
     {
-        bool b_cache_delete = p_module_bank->b_cache_delete;
-
         /* Reset the default domain */
         SetLanguage( psz_language );
 
@@ -472,7 +467,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( !config_GetInt( p_libvlc, "ignore-config" ) )
             config_LoadConfigFile( p_libvlc, "main" );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
-        p_module_bank->b_cache_delete = b_cache_delete;
     }
     free( psz_language );
 # endif
@@ -485,7 +479,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * default values.
      */
     module_LoadBuiltins( p_libvlc );
-    module_LoadPlugins( p_libvlc );
+    module_LoadPlugins( p_libvlc, b_cache_delete );
     if( p_libvlc->b_die )
     {
         b_exit = true;

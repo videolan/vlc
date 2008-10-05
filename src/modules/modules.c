@@ -129,7 +129,6 @@ void __module_InitBank( vlc_object_t *p_this )
         p_bank->i_cache = p_bank->i_loaded_cache = 0;
         p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
         p_bank->b_cache = p_bank->b_cache_dirty =
-        p_bank->b_cache_delete = false;
         p_bank->head = NULL;
 
         /* Everything worked, attach the object */
@@ -236,6 +235,7 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
     ALLOCATE_ALL_BUILTINS();
 }
 
+#undef module_LoadPlugins
 /**
  * Load all plugins
  *
@@ -244,7 +244,7 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
  * \param p_this vlc object structure
  * \return nothing
  */
-void __module_LoadPlugins( vlc_object_t * p_this )
+void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     vlc_mutex_lock( &global_lock );
@@ -261,8 +261,8 @@ void __module_LoadPlugins( vlc_object_t * p_this )
     if( config_GetInt( p_this, "plugins-cache" ) )
         p_module_bank->b_cache = true;
 
-    if( p_module_bank->b_cache ||
-        p_module_bank->b_cache_delete ) CacheLoad( p_this );
+    if( p_module_bank->b_cache || b_cache_delete )
+        CacheLoad( p_this, b_cache_delete );
 
     AllocateAllPlugins( p_this );
 #endif

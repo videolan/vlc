@@ -150,8 +150,8 @@ struct module_t
 void  __module_InitBank        ( vlc_object_t * );
 #define module_LoadBuiltins(a) __module_LoadBuiltins(VLC_OBJECT(a))
 void  __module_LoadBuiltins    ( vlc_object_t * );
-#define module_LoadPlugins(a)  __module_LoadPlugins(VLC_OBJECT(a))
-void  __module_LoadPlugins     ( vlc_object_t * );
+void module_LoadPlugins( vlc_object_t *, bool );
+#define module_LoadPlugins(a,b) module_LoadPlugins(VLC_OBJECT(a),b)
 #define module_EndBank(a)      __module_EndBank(VLC_OBJECT(a))
 void  __module_EndBank         ( vlc_object_t * );
 #define module_ResetBank(a)    __module_ResetBank(VLC_OBJECT(a))
@@ -164,7 +164,7 @@ void module_Unload (module_handle_t);
 
 /* Plugins cache */
 void   CacheMerge (vlc_object_t *, module_t *, module_t *);
-void   CacheLoad  (vlc_object_t * );
+void   CacheLoad  (vlc_object_t *, bool);
 void   CacheSave  (vlc_object_t * );
 module_cache_t * CacheFind (const char *, int64_t, int64_t);
 
