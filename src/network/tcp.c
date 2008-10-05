@@ -58,6 +58,8 @@
 #   define ETIMEDOUT WSAETIMEDOUT
 #endif
 
+#include "libvlc.h" /* vlc_object_waitpipe */
+
 static int SocksNegotiate( vlc_object_t *, int fd, int i_socks_version,
                            const char *psz_user, const char *psz_passwd );
 static int SocksHandshakeTCP( vlc_object_t *,
