@@ -141,11 +141,6 @@ __vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
         __vlc_custom_create(VLC_OBJECT(o), s, t, n)
 
 
-/**
- * The module bank
- */
-extern module_bank_t *p_module_bank;
-
 extern char *psz_vlcpath;
 
 #ifdef LIBVLC_USE_PTHREAD

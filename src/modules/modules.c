@@ -90,7 +90,7 @@
 #include "modules/modules.h"
 #include "modules/builtin.h"
 
-module_bank_t *p_module_bank = NULL;
+static module_bank_t *p_module_bank = NULL;
 
 /*****************************************************************************
  * Local prototypes
@@ -176,7 +176,7 @@ void __module_EndBank( vlc_object_t *p_this )
     config_AutoSaveConfigFile( p_this );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    if( p_bank->b_cache ) CacheSave( p_this );
+    if( p_bank->b_cache ) CacheSave( p_this, p_module_bank );
     while( p_bank->i_loaded_cache-- )
     {
         if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
@@ -262,7 +262,7 @@ void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
         p_module_bank->b_cache = true;
 
     if( p_module_bank->b_cache || b_cache_delete )
-        CacheLoad( p_this, b_cache_delete );
+        CacheLoad( p_this, p_module_bank, b_cache_delete );
 
     AllocateAllPlugins( p_this );
 #endif
@@ -1118,7 +1118,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
      * Check our plugins cache first then load plugin if needed
      */
     p_cache_entry =
-        CacheFind( psz_file, i_file_time, i_file_size );
+        CacheFind( p_module_bank, psz_file, i_file_time, i_file_size );
 
     if( !p_cache_entry )
     {
