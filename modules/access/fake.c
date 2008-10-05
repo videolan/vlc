@@ -228,7 +228,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    block_t *p_block = block_New( p_demux, 1 );
 
     if ( !p_sys->i_last_pts )
     {
@@ -244,6 +243,7 @@ static int Demux( demux_t *p_demux )
         mwait( p_sys->i_last_pts );
     }
 
+    block_t *p_block = block_New( p_demux, 1 );
     p_block->i_flags |= BLOCK_FLAG_TYPE_I;
     p_block->i_dts = p_block->i_pts = p_sys->i_last_pts;
 
