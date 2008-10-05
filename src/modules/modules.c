@@ -867,7 +867,7 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
     return path;
 }
 
-extern char *psz_vlcpath = NULL;
+char *psz_vlcpath = NULL;
 
 /*****************************************************************************
  * AllocateAllPlugins: load all plugin modules we can find.
