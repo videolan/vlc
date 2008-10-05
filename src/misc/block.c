@@ -124,6 +124,7 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
             return NULL;
 
         p_block = p_dup;
+        p_sys = (block_sys_t *)p_block;
     }
 
     /* Adjust reserved header if there is enough room */
