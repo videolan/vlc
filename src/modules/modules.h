@@ -47,7 +47,6 @@ struct module_bank_t
     /* Plugins cache */
     bool             b_cache;
     bool             b_cache_dirty;
-    bool             b_cache_delete;
 
     int            i_cache;
     module_cache_t **pp_cache;
