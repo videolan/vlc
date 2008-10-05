@@ -1246,9 +1246,9 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 }
                 assert (p_sdp->psz_sessionname == NULL); // no memleak here
                 p_sdp->psz_sessionname = strdup (data);
-                EnsureUTF8 (p_sdp->psz_sessionname);
                 if (p_sdp->psz_sessionname == NULL)
                     goto error;
+                EnsureUTF8 (p_sdp->psz_sessionname);
                 break;
             }
 
