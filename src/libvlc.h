@@ -45,7 +45,6 @@ void system_End       ( libvlc_int_t * );
 /*
  * Threads subsystem
  */
-extern vlc_mutex_t global_lock; /* TODO: remove this crap */
 
 /* Hopefully, no need to export this. There is a new thread API instead. */
 void vlc_thread_cancel (vlc_object_t *);

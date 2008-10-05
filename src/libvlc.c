@@ -228,7 +228,7 @@ static int  VerboseCallback( vlc_object_t *, char const *,
 
 static void InitDeviceValues( libvlc_int_t * );
 
-vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
+static vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
 
 /**
  * Allocate a libvlc instance, initialize global data if needed
