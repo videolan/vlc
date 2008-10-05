@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2003-2004 Commonwealth Scientific and Industrial Research
  *                         Organisation (CSIRO) Australia
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2008 the VideoLAN team
  *
  * $Id$
  *
@@ -55,7 +55,7 @@ char *XURL_Concat( char *psz_url, char *psz_append )
 {
     char *psz_return_value = NULL;
 
-    if( XURL_IsAbsolute( psz_append ) == XURL_TRUE )
+    if( XURL_IsAbsolute( psz_append ) )
         return strdup( psz_append );
 
     if( XURL_IsAbsolute( psz_url ) )
@@ -88,7 +88,7 @@ char *XURL_Concat( char *psz_url, char *psz_append )
     else
     {
         /* not an absolute URL */
-        if( XURL_HasAbsolutePath( psz_append ) == XURL_FALSE )
+        if( XURL_HasAbsolutePath( psz_append ) == false )
         {
             char *psz_new_url = XURL_GetHead( psz_url );
 
@@ -106,31 +106,31 @@ char *XURL_Concat( char *psz_url, char *psz_append )
 }
 
 
-XURL_Bool XURL_IsAbsolute( char *psz_url )
+bool XURL_IsAbsolute( char *psz_url )
 {
     if( XURL_FindHostname( psz_url ) == NULL )
     {
 #ifdef XURL_DEBUG
         fprintf( stderr, "XURL_IsAbsolute(%s) returning false\n", psz_url );
 #endif
-        return XURL_FALSE;
+        return false;
     }
     else
     {
 #ifdef XURL_DEBUG
         fprintf( stderr, "XURL_IsAbsolute(%s) returning true\n", psz_url );
 #endif
-        return XURL_TRUE;
+        return true;
     }
 }
 
 
-XURL_Bool XURL_HasFragment( char *psz_url )
+bool XURL_HasFragment( char *psz_url )
 {
     if( XURL_FindFragment( psz_url ) == NULL )
-        return XURL_FALSE;
+        return false;
     else
-        return XURL_TRUE;
+        return true;
 }
 
 
@@ -142,7 +142,8 @@ char *XURL_FindHostname( char *psz_url )
     if( psz_scheme_separator != NULL)
     {
         char *psz_hostname = psz_scheme_separator + strlen( "://" );
-        if( *psz_hostname != '\0') psz_return_value = psz_hostname;
+        if( *psz_hostname != '\0')
+            psz_return_value = psz_hostname;
 
 #ifdef XURL_DEBUG
         fprintf( stderr, "XURL_FindHostname(%s): returning \"%s\"\n",
@@ -154,16 +155,16 @@ char *XURL_FindHostname( char *psz_url )
 }
 
 
-XURL_Bool XURL_HasAbsolutePath( char *psz_url )
+bool XURL_HasAbsolutePath( char *psz_url )
 {
 #ifdef XURL_WIN32_PATHING
     if( psz_url[0] == '/' || psz_url[0] == '\\' )
 #else
     if( psz_url[0] == '/' )
 #endif
-        return XURL_TRUE;
+        return true;
     else
-        return XURL_FALSE;
+        return false;
 }
 
 
@@ -194,7 +195,8 @@ char *XURL_GetHostname( char *psz_url )
 
         /* Copy hostname to a new string */
         psz_new_hostname = malloc( i_hostname_length );
-        if (psz_new_hostname == NULL) return NULL;
+        if( psz_new_hostname == NULL )
+            return NULL;
         strncpy( psz_new_hostname, psz_hostname, i_hostname_length );
 
 #ifdef XURL_DEBUG
@@ -232,17 +234,14 @@ char *XURL_GetSchemeAndHostname( char *psz_url )
     return psz_scheme_and_hostname;
 }
 
-static
-char *XURL_FindFragment( char *psz_url )
+static char *XURL_FindFragment( char *psz_url )
 {
     char *pc_hash = NULL;
     char *pc_return_value = NULL;
  
     pc_hash = strchr( psz_url, '#' );
     if( pc_hash != NULL )
-    {
         pc_return_value = pc_hash;
-    }
 
     return pc_return_value;
 }
@@ -254,9 +253,7 @@ char *XURL_FindQuery( char *psz_url )
  
     pc_question_mark = strchr( psz_url, '?' );
     if( pc_question_mark != NULL )
-    {
         pc_return_value = pc_question_mark;
-    }
 
     return pc_return_value;
 }
@@ -268,7 +265,7 @@ char *XURL_GetScheme( char *psz_url )
     size_t i_scheme_length;
     char *new_scheme;
 
-    if( XURL_IsAbsolute( psz_url ) == XURL_FALSE )
+    if( XURL_IsAbsolute( psz_url ) == false )
         return strdup( "file" );
 
     /* this strchr will always succeed since we have an absolute URL, and thus
@@ -286,15 +283,15 @@ char *XURL_GetScheme( char *psz_url )
 }
 
 
-XURL_Bool XURL_IsFileURL( char *psz_url )
+bool XURL_IsFileURL( char *psz_url )
 {
-    XURL_Bool b_return_value;
+    bool b_return_value;
     char *psz_scheme = XURL_GetScheme( psz_url );
 
     if( strcasecmp( psz_scheme, "file" ) == 0 )
-        b_return_value = XURL_TRUE;
+        b_return_value = true;
     else
-        b_return_value = XURL_FALSE;
+        b_return_value = false;
 
     free( psz_scheme );
 
@@ -302,33 +299,23 @@ XURL_Bool XURL_IsFileURL( char *psz_url )
 }
 
 
-static
-char *XURL_FindPath( char *psz_url )
+static char *XURL_FindPath( char *psz_url )
 {
-    char *psz_return_value = NULL;
-
-    if( XURL_IsAbsolute( psz_url ) == XURL_TRUE )
+    if( XURL_IsAbsolute( psz_url ) )
     {
         char *psz_start_of_hostname = XURL_FindHostname( psz_url );
         if( psz_start_of_hostname != NULL )
-        {
-            char *psz_start_of_path = strchr( psz_start_of_hostname, '/' );
-            psz_return_value = psz_start_of_path;
-        }
+            return strchr( psz_start_of_hostname, '/' );
+        else
+           return NULL;
     }
     else
     {
-        if( XURL_HasAbsolutePath( psz_url ) == XURL_TRUE )
-        {
-            psz_return_value = psz_url;
-        }
+        if( XURL_HasAbsolutePath( psz_url ) == true )
+            return psz_url;
         else
-        {
             return strdup (".");
-        }
     }
-
-    return psz_return_value;
 }
 
 
@@ -397,8 +384,7 @@ char *XURL_GetHead( const char *psz_path )
         i_characters_until_last_slash = pc_last_slash - psz_path;
         psz_path_head = malloc(
                 ( i_characters_until_last_slash + 1 ) * sizeof(char) );
-        (void) strncpy( psz_path_head, psz_path,
-                i_characters_until_last_slash + 1 );
+        strncpy( psz_path_head, psz_path, i_characters_until_last_slash + 1 );
 
         /* terminate the resulting string with '\0' */
         *(psz_path_head +
@@ -445,8 +431,7 @@ char *XURL_GetWithoutFragment( char *psz_url )
     return psz_return_value;
 }
 
-static
-char *streallocat( char *psz_string, const char *psz_to_append )
+static char *streallocat( char *psz_string, const char *psz_to_append )
 {
     size_t i_new_string_length = strlen( psz_string ) +
         strlen( psz_to_append ) + 1;
