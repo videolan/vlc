@@ -298,7 +298,8 @@ static void* Thread( vlc_object_t* p_this )
               block_Release( p_block );
               p_block = NULL;
             }
-            p_block->i_buffer = i_read;
+            else
+                p_block->i_buffer = i_read;
         }
 
         if( p_block == NULL )
