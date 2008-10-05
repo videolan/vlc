@@ -279,9 +279,6 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
     int timeout = (i_wait < 0) ? -1 : i_wait / 1000;
     int evfd = vlc_object_waitpipe (p_this);
 
-    if (evfd == -1)
-        return -1;
-
     assert( pi_fd != NULL );
 
     for (;;)
