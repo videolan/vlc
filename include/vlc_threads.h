@@ -105,6 +105,7 @@
 #if defined (LIBVLC_USE_PTHREAD)
 typedef pthread_t       vlc_thread_t;
 typedef pthread_mutex_t vlc_mutex_t;
+#define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
 typedef pthread_cond_t  vlc_cond_t;
 typedef pthread_key_t   vlc_threadvar_t;
 
@@ -119,8 +120,10 @@ typedef struct
 typedef struct
 {
     CRITICAL_SECTION mutex;
-}
-vlc_mutex_t;
+    LONG initialized;
+} vlc_mutex_t;
+#define VLC_STATIC_MUTEX { .initialized = 0, }
+
 typedef HANDLE  vlc_cond_t;
 typedef DWORD   vlc_threadvar_t;
 

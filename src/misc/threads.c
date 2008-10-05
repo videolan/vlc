@@ -157,6 +157,8 @@ typedef struct vlc_cancel_t
 #endif
 
 #ifdef WIN32
+static vlc_mutex_t super_mutex;
+
 BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
     (void) hinstDll;
@@ -167,11 +169,13 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_ATTACH:
             vlc_dictionary_init (&named_mutexes.list, 0);
             vlc_mutex_init (&named_mutexes.lock);
+            vlc_mutex_init (&super_mutex);
             vlc_threadvar_create (&cancel_key, free);
             break;
 
         case DLL_PROCESS_DETACH:
             vlc_threadvar_delete( &cancel_key );
+            vlc_mutex_destroy (&super_mutex);
             vlc_mutex_destroy (&named_mutexes.lock);
             vlc_dictionary_clear (&named_mutexes.list);
             break;
@@ -238,6 +242,8 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 
 #elif defined( WIN32 )
     InitializeCriticalSection( &p_mutex->mutex );
+    InterlockedIncrement (&p_mutex->initialized);
+    barrier ();
     return 0;
 
 #endif
@@ -257,6 +263,7 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("destroying mutex");
 
 #elif defined( WIN32 )
+    InterlockedDecrement (&p_mutex->initialized);
     DeleteCriticalSection (&p_mutex->mutex);
 
 #endif
@@ -277,6 +284,15 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("locking mutex");
 
 #elif defined( WIN32 )
+    if (InterlockedCompareExchange (&p_mutex->initialized, 0, 0) == 0)
+    { /* ^^ We could also lock super_mutex all the time... sluggish */
+        assert (p_mutex != &super_mutex); /* this one cannot be static */
+
+        vlc_mutex_lock (&super_mutex);
+        vlc_mutex_init (p_mutex);
+        /* FIXME: destroy the mutex some time... */
+        vlc_mutex_unlock (&super_mutex);
+    }
     EnterCriticalSection (&p_mutex->mutex);
 
 #endif
