@@ -91,6 +91,7 @@
 #include "modules/builtin.h"
 
 static module_bank_t *p_module_bank = NULL;
+static vlc_mutex_t module_lock = VLC_STATIC_MUTEX;
 
 /*****************************************************************************
  * Local prototypes
@@ -102,7 +103,7 @@ static int  AllocatePluginFile  ( vlc_object_t *, char *, int64_t, int64_t );
 static module_t * AllocatePlugin( vlc_object_t *, char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
-static void DeleteModule ( module_t * );
+static void DeleteModule ( module_bank_t *, module_t * );
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void   DupModule        ( module_t * );
 static void   UndupModule      ( module_t * );
@@ -120,7 +121,7 @@ void __module_InitBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank = NULL;
 
-    vlc_mutex_lock( &global_lock );
+    vlc_mutex_lock( &module_lock );
 
     if( p_module_bank == NULL )
     {
@@ -144,7 +145,7 @@ void __module_InitBank( vlc_object_t *p_this )
     else
         p_module_bank->i_usage++;
 
-    vlc_mutex_unlock( &global_lock );
+    vlc_mutex_unlock( &module_lock );
 }
 
 
@@ -160,28 +161,28 @@ void __module_EndBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank;
 
-    vlc_mutex_lock( &global_lock );
+    /* Save the configuration */
+    config_AutoSaveConfigFile( p_this );
+
+    vlc_mutex_lock( &module_lock );
     p_bank = p_module_bank;
     assert (p_bank != NULL);
     if( --p_bank->i_usage > 0 )
     {
-        vlc_mutex_unlock( &global_lock );
+        vlc_mutex_unlock( &module_lock );
         return;
     }
-    /*FIXME: For thread safety, we need to:
-    p_module_bank = NULL; - immediately, but that will crash the cache */
-    vlc_mutex_unlock( &global_lock );
-
-    /* Save the configuration */
-    config_AutoSaveConfigFile( p_this );
+    p_module_bank = NULL;
+    vlc_mutex_unlock( &module_lock );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    if( p_bank->b_cache ) CacheSave( p_this, p_module_bank );
+    if( p_bank->b_cache )
+        CacheSave( p_this, p_bank );
     while( p_bank->i_loaded_cache-- )
     {
         if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
         {
-            DeleteModule(
+            DeleteModule( p_bank,
                     p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
@@ -207,9 +208,8 @@ void __module_EndBank( vlc_object_t *p_this )
 #endif
 
     while( p_bank->head != NULL )
-        DeleteModule( p_bank->head );
+        DeleteModule( p_bank, p_bank->head );
 
-    p_module_bank = NULL; /* FIXME: do this inside the lock */
     free( p_bank );
 }
 
@@ -222,16 +222,17 @@ void __module_EndBank( vlc_object_t *p_this )
  */
 void __module_LoadBuiltins( vlc_object_t * p_this )
 {
-    vlc_mutex_lock( &global_lock );
+    vlc_mutex_lock( &module_lock );
     if( p_module_bank->b_builtins )
     {
-        vlc_mutex_unlock( &global_lock );
+        vlc_mutex_unlock( &module_lock );
         return;
     }
     p_module_bank->b_builtins = true;
-    vlc_mutex_unlock( &global_lock );
+    vlc_mutex_unlock( &module_lock );
 
     msg_Dbg( p_this, "checking builtin modules" );
+    /* FIXME: race here - do this under the lock!! */
     ALLOCATE_ALL_BUILTINS();
 }
 
@@ -247,23 +248,22 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
 void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
-    vlc_mutex_lock( &global_lock );
+    vlc_mutex_lock( &module_lock );
     if( p_module_bank->b_plugins )
     {
-        vlc_mutex_unlock( &global_lock );
+        vlc_mutex_unlock( &module_lock );
         return;
     }
     p_module_bank->b_plugins = true;
-    vlc_mutex_unlock( &global_lock );
+    vlc_mutex_unlock( &module_lock );
 
     msg_Dbg( p_this, "checking plugin modules" );
-
-    if( config_GetInt( p_this, "plugins-cache" ) )
-        p_module_bank->b_cache = true;
+    p_module_bank->b_cache = config_GetInt( p_this, "plugins-cache" ) > 0;
 
     if( p_module_bank->b_cache || b_cache_delete )
         CacheLoad( p_this, p_module_bank, b_cache_delete );
 
+    /* FIXME: race - do this under the lock */
     AllocateAllPlugins( p_this );
 #endif
 }
@@ -330,7 +330,7 @@ void module_release (module_t *m)
 
 /**
  * Frees the flat list of VLC modules.
- * @param list list obtained by module_list_get
+ * @param list list obtained by module_list_get()
  * @param length number of items on the list
  * @return nothing.
  */
@@ -357,6 +357,7 @@ module_t **module_list_get (size_t *n)
     module_t **tab = NULL;
     size_t i = 0;
 
+    assert (p_module_bank);
     for (module_t *mod = p_module_bank->head; mod; mod = mod->next)
     {
          module_t **nt;
@@ -562,7 +563,7 @@ found_shortcut:
             if( p_new_module )
             {
                 CacheMerge( p_this, p_real, p_new_module );
-                DeleteModule( p_new_module );
+                DeleteModule( p_module_bank, p_new_module );
             }
         }
 #endif
@@ -1333,12 +1334,12 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
  *****************************************************************************
  * This function can only be called if the module isn't being used.
  *****************************************************************************/
-static void DeleteModule( module_t * p_module )
+static void DeleteModule( module_bank_t *p_bank, module_t * p_module )
 {
     assert( p_module );
 
     /* Unlist the module (if it is in the list) */
-    module_t **pp_self = &p_module_bank->head;
+    module_t **pp_self = &p_bank->head;
     while (*pp_self != NULL && *pp_self != p_module)
         pp_self = &((*pp_self)->next);
     if (*pp_self)
