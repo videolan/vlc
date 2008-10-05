@@ -121,24 +121,14 @@ int BufferPrintf( buffer_t *p_buffer, const char *p_fmt, ... )
     int status;
     char *psz_data;
 
-    va_list va_list1, va_list2;
-    va_start( va_list1, p_fmt );
-    va_copy( va_list2, va_list1 );
+    va_list va;
+    va_start( va, p_fmt );
 
-    i_len = vsnprintf( NULL, 0, p_fmt, va_list1 );
-    if( i_len < 0 )
-        return VLC_EGENERIC;
-    va_end( va_list1 );
-
-    psz_data = malloc( i_len + 1 );
-    if( psz_data == NULL ) {
+    i_len = vasprintf( &psz_data, p_fmt, va );
+    va_end( va );
+    if( i_len == -1 )
         return VLC_ENOMEM;
-    }
-    if( vsnprintf( psz_data, i_len + 1, p_fmt, va_list2 ) != i_len )
-    {
-        return VLC_EGENERIC;
-    }
-    va_end( va_list2 );
+
     status = BufferAdd( p_buffer, psz_data, i_len );
     free( psz_data );
     return status;
