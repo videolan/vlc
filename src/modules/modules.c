@@ -90,7 +90,7 @@
 #include "modules/modules.h"
 #include "modules/builtin.h"
 
-module_bank_t *p_module_bank;
+module_bank_t *p_module_bank = NULL;
 
 /*****************************************************************************
  * Local prototypes

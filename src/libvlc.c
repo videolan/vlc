@@ -248,7 +248,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
         /* Guess what CPU we have */
         cpu_flags = CPUCapabilities();
         /* The module bank will be initialized later */
-        p_module_bank = NULL;
     }
 
     /* Allocate a libvlc instance object */
