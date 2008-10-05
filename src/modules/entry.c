@@ -453,10 +453,6 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
         {
             const char *domain = va_arg (ap, const char *);
             size_t len = va_arg (ap, size_t);
-            char **dtext = malloc (sizeof (char *) * (len + 1));
-
-            if (dtext == NULL)
-                break;
 
             /* Copy values */
             if (IsConfigIntegerType (item->i_type))
@@ -510,18 +506,19 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             const char *const *text = va_arg (ap, const char *const *);
             if (text != NULL)
             {
-                for (size_t i = 0; i < len; i++)
-                    dtext[i] =
-                        text[i] ? strdup (dgettext (domain, text[i])) : NULL;
-
-                dtext[len] = NULL;
+                char **dtext = malloc (sizeof (char *) * (len + 1));
+                if( dtext != NULL )
+                {
+                    for (size_t i = 0; i < len; i++)
+                        dtext[i] = text[i] ?
+                                        strdup( dgettext( domain, text[i] ) ) :
+                                        NULL;
+                    dtext[len] = NULL;
+                }
                 item->ppsz_list_text = dtext;
             }
             else
-            {
-                free (dtext);
                 item->ppsz_list_text = NULL;
-            }
 
             item->i_list = len;
             item->pf_update_list = va_arg (ap, vlc_callback_t);
