@@ -931,12 +931,13 @@ static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
     msg_Dbg( p_media->p_vod, "closing session: %s, connections: %d",
              p_rtsp->psz_session, p_media->p_vod->p_sys->i_throttle_users );
 
-    while( p_rtsp->i_es-- )
+    while( p_rtsp->i_es )
     {
+        p_rtsp->i_es--;
         free( p_rtsp->es[p_rtsp->i_es]->psz_ip );
         free( p_rtsp->es[p_rtsp->i_es] );
-        if( !p_rtsp->i_es ) free( p_rtsp->es );
     }
+    free( p_rtsp->es );
 
     TAB_REMOVE( p_media->i_rtsp, p_media->rtsp, p_rtsp );
 
