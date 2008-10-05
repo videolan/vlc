@@ -663,7 +663,7 @@ void __module_unneed( vlc_object_t * p_this, module_t * p_module )
  * \param psz_name the name of the module
  * \return a pointer to the module or NULL in case of a failure
  */
-module_t *__module_find( vlc_object_t *p_this, const char * psz_name )
+module_t *module_find( const char * psz_name )
 {
     module_t **list, *module;
 
@@ -692,9 +692,9 @@ module_t *__module_find( vlc_object_t *p_this, const char * psz_name )
  * \param psz_name th name of the module
  * \return TRUE if the module exists
  */
-bool __module_exists( vlc_object_t *p_this, const char * psz_name )
+bool module_exists (const char * psz_name)
 {
-    module_t *p_module = __module_find( p_this, psz_name );
+    module_t *p_module = module_find (psz_name);
     if( p_module )
         module_release (p_module);
     return p_module != NULL;

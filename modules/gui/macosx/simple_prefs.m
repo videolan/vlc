@@ -437,7 +437,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [self setupButton: o_audio_visual_pop forModuleList: "audio-visual"];
 
     /* Last.FM is optional */
-    if( module_exists( p_intf, "audioscrobbler" ) )
+    if( module_exists( "audioscrobbler" ) )
     {
         [o_audio_lastuser_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-username" ) ?: ""]];
         [o_audio_lastpwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" ) ?: ""]];
@@ -538,9 +538,9 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     int i_cache = config_GetInt( p_intf, "file-caching");
     
     TestCaC( "udp-caching" );
-    if( module_exists (p_intf, "dvdread") )
+    if( module_exists ("dvdread") )
         TestCaC( "dvdread-caching" );
-    if( module_exists (p_intf, "dvdnav") )
+    if( module_exists ("dvdnav") )
         TestCaC( "dvdnav-caching" );
     TestCaC( "tcp-caching" );
     TestCaC( "fake-caching" );
@@ -550,7 +550,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     TestCaCi( "rtsp-caching", 4 );
     TestCaCi( "ftp-caching", 2 );
     TestCaCi( "http-caching", 4 );
-    if(module_exists (p_intf, "access_realrtsp"))
+    if(module_exists ("access_realrtsp"))
         TestCaCi( "realrtsp-caching", 10 );
     TestCaCi( "mms-caching", 19 );
     if( b_cache_equal )
@@ -781,7 +781,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         SaveModuleList( o_audio_visual_pop, "audio-visual" );
 
         /* Last.FM is optional */
-        if( module_exists( p_intf, "audioscrobbler" ) )
+        if( module_exists( "audioscrobbler" ) )
         {   
             [o_audio_last_ckb setEnabled: YES];
             if( [o_audio_last_ckb state] == NSOnState )
@@ -861,12 +861,12 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         #define CaC( name ) CaCi( name, 1 )
         msg_Dbg( p_intf, "Adjusting all cache values to: %i", [[o_input_cachelevel_pop selectedItem] tag] );
         CaC( "udp-caching" );
-        if( module_exists (p_intf, "dvdread" ) )
+        if( module_exists ( "dvdread" ) )
         {
             CaC( "dvdread-caching" );
             i = i + config_SaveConfigFile( p_intf, "dvdread" );
         }
-        if( module_exists (p_intf, "dvdnav" ) )
+        if( module_exists ( "dvdnav" ) )
         {
             CaC( "dvdnav-caching" );
             i = i + config_SaveConfigFile( p_intf, "dvdnav" );
@@ -876,7 +876,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         CaC( "screen-caching" );
         CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
         CaCi( "http-caching", 4 );
-        if( module_exists (p_intf, "access_realrtsp" ) )
+        if( module_exists ( "access_realrtsp" ) )
         {
             CaCi( "realrtsp-caching", 10 );
             i = i + config_SaveConfigFile( p_intf, "access_realrtsp" );

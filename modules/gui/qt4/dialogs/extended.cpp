@@ -76,7 +76,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     syncW = new SyncControls( p_intf, videoTab );
     mainTabW->addTab( syncW, qtr( "Synchronization" ) );
 
-    if( module_exists( p_intf, "v4l2" ) )
+    if( module_exists( "v4l2" ) )
     {
         ExtV4l2 *v4l2 = new ExtV4l2( p_intf, mainTabW );
         mainTabW->addTab( v4l2, qtr( "v4l2 controls" ) );

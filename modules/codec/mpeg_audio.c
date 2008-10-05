@@ -141,7 +141,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* HACK: Don't use this codec if we don't have an mpga audio filter */
     if( p_dec->i_object_type == VLC_OBJECT_DECODER &&
-        !module_exists( p_this, "mpgatofixed32" ) )
+        !module_exists( "mpgatofixed32" ) )
     {
         return VLC_EGENERIC;
     }

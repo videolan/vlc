@@ -105,14 +105,14 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
 
         /* Look for goom plugin */
-        if( module_exists( VLC_OBJECT(p_aout), "goom" ) )
+        if( module_exists( "goom" ) )
         {
             val.psz_string = (char*)"goom"; text.psz_string = (char*)"Goom";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 
         /* Look for galaktos plugin */
-        if( module_exists( VLC_OBJECT(p_aout), "galaktos" ) )
+        if( module_exists( "galaktos" ) )
         {
             val.psz_string = (char*)"galaktos"; text.psz_string = (char*)"GaLaktos";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );

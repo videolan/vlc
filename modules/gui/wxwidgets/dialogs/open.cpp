@@ -507,48 +507,40 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     notebook->AddPage( NetPanel( notebook ), wxU(_("Network")),
                        i_access_method == NET_ACCESS );
 
-    module_t *p_module = module_find( VLC_OBJECT(p_intf), "v4l" );
-    if( p_module )
+    if( module_exists( "v4l" ) )
     {
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
         notebook->AddPage( autopanel, wxU( module_get_name(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
-        module_release (p_module);
     }
 
-    p_module = module_find( VLC_OBJECT(p_intf), "pvr" );
-    if( p_module )
+    if( module_exists( "pvr" ) )
     {
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
         notebook->AddPage( autopanel, wxU( module_get_name(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
-        module_release (p_module);
     }
 
-    p_module = module_find( VLC_OBJECT(p_intf), "dvb" );
-    if( p_module )
+    if( module_exists( "dvb" ) )
     {
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
         notebook->AddPage( autopanel, wxU( module_get_name(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
-        module_release (p_module);
     }
 
-    p_module = module_find( VLC_OBJECT(p_intf), "dshow" );
-    if( p_module )
+    if( module_exists( "dshow" ) )
     {
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
         notebook->AddPage( autopanel, wxU( module_get_name(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
-        module_release (p_module);
     }
 
     /* Update Disc panel */

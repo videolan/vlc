@@ -251,7 +251,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
     char *psz_parser, *psz_string;
     const char *psz_filter_type;
 
-    module_t *p_obj = module_find( p_intf, psz_name );
+    module_t *p_obj = module_find( psz_name );
     if( !p_obj )
     {
         msg_Err( p_intf, "Unable to find filter module \"%s\n.", psz_name );

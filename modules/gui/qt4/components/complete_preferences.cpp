@@ -75,7 +75,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 #undef BI
 
     /* Build the tree for the main module */
-    module_t *p_module = module_get_main( p_intf );
+    module_t *p_module = module_get_main();
 
     /* Initialisation and get the confsize */
     PrefsItemData *data = NULL;
@@ -354,10 +354,10 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( data->i_type == TYPE_CATEGORY )
         return;
     else if( data->i_type == TYPE_MODULE )
-        p_module = module_find( p_intf, data->psz_name );
+        p_module = module_find( data->psz_name );
     else
     {
-        p_module = module_get_main( p_intf );
+        p_module = module_get_main();
         assert( p_module );
     }
 

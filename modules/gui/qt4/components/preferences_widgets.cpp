@@ -1155,7 +1155,7 @@ void KeySelectorControl::finish()
     table->setAlternatingRowColors( true );
 
     /* Get the main Module */
-    module_t *p_main = module_find( p_this, "main" );
+    module_t *p_main = module_get_main();
     assert( p_main );
 
     /* Access to the module_config_t */

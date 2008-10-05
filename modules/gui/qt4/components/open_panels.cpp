@@ -596,7 +596,7 @@ void CaptureOpenPanel::initialize()
     /*********************
      * DirectShow Stuffs *
      *********************/
-    if( module_exists( p_intf, "dshow" ) ){
+    if( module_exists( "dshow" ) ){
     addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
 
     /* dshow Main */
@@ -630,7 +630,7 @@ void CaptureOpenPanel::initialize()
     /**************
      * BDA Stuffs *
      **************/
-    if( module_exists( p_intf, "bda" ) ){
+    if( module_exists( "bda" ) ){
     addModuleAndLayouts( BDA_DEVICE, bda, "DVB DirectShow" );
 
     /* bda Main */
@@ -695,7 +695,7 @@ void CaptureOpenPanel::initialize()
     /*******
      * V4L2*
      *******/
-    if( module_exists( p_intf, "v4l2" ) ){
+    if( module_exists( "v4l2" ) ){
     addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video for Linux 2" );
 
     /* V4l Main panel */
@@ -730,7 +730,7 @@ void CaptureOpenPanel::initialize()
     /*******
      * V4L *
      *******/
-    if( module_exists( p_intf, "v4l" ) ){
+    if( module_exists( "v4l" ) ){
     addModuleAndLayouts( V4L_DEVICE, v4l, "Video for Linux" );
 
     /* V4l Main panel */
@@ -775,7 +775,7 @@ void CaptureOpenPanel::initialize()
     /*******
      * JACK *
      *******/
-    if( module_exists( p_intf, "jack" ) ){
+    if( module_exists( "jack" ) ){
     addModuleAndLayouts( JACK_DEVICE, jack, "JACK Audio Connection Kit" );
 
     /* Jack Main panel */
@@ -829,7 +829,7 @@ void CaptureOpenPanel::initialize()
     /************
      * PVR      *
      ************/
-    if( module_exists( p_intf, "pvr" ) ){
+    if( module_exists( "pvr" ) ){
     addModuleAndLayouts( PVR_DEVICE, pvr, "PVR" );
 
     /* PVR Main panel */
@@ -885,7 +885,7 @@ void CaptureOpenPanel::initialize()
     /**************
      * DVB Stuffs *
      **************/
-    if( module_exists( p_intf, "dvb" ) ){
+    if( module_exists( "dvb" ) ){
     addModuleAndLayouts( DVB_DEVICE, dvb, "DVB" );
 
     /* DVB Main */
@@ -1122,7 +1122,7 @@ void CaptureOpenPanel::advancedDialog()
 
     /* Get the corresponding module */
     module_t *p_module =
-        module_find( VLC_OBJECT(p_intf), psz_devModule[i_devicetype] );
+        module_find( psz_devModule[i_devicetype] );
     if( NULL == p_module ) return;
 
     /* Init */

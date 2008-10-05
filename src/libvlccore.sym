@@ -207,8 +207,8 @@ LocaleFree
 mdate
 module_config_free
 module_config_get
-__module_exists
-__module_find
+module_exists
+module_find
 module_get_help
 __module_GetModulesNamesForCapability
 module_get_name

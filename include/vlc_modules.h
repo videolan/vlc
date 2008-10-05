@@ -34,11 +34,8 @@
 VLC_EXPORT( module_t *, __module_need, ( vlc_object_t *, const char *, const char *, bool ) );
 #define module_unneed(a,b) __module_unneed(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __module_unneed, ( vlc_object_t *, module_t * ) );
-#define module_exists(a,b) __module_exists(VLC_OBJECT(a),b)
-VLC_EXPORT( bool,  __module_exists, ( vlc_object_t *, const char * ) );
-
-#define module_find(a,b) __module_find(VLC_OBJECT(a),b)
-VLC_EXPORT( module_t *, __module_find, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( bool,  module_exists, (const char *) );
+VLC_EXPORT( module_t *, module_find, (const char *) );
 
 VLC_EXPORT( module_config_t *, module_config_get, ( const module_t *, unsigned * ) );
 VLC_EXPORT( void, module_config_free, ( module_config_t * ) );
@@ -63,12 +60,11 @@ VLC_EXPORT( const char *, module_get_name, ( const module_t *m, bool long_name )
 #define module_GetLongName( m ) module_get_name( m, true )
 VLC_EXPORT( const char *, module_get_help, ( const module_t *m ) );
 
-
-#define module_get_main(a) __module_get_main(VLC_OBJECT(a))
-static inline module_t * __module_get_main( vlc_object_t * p_this )
+static inline module_t *module_get_main (void)
 {
-    return module_find( p_this, "main" );
+    return module_find ("main");
 }
+#define module_get_main(a) module_get_main()
 
 static inline bool module_is_main( const module_t * p_module )
 {
