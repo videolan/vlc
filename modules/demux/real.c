@@ -1491,6 +1491,8 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             msg_Dbg( p_demux, "        - extra data=%d", fmt.i_extra );
 
             tk = malloc( sizeof( real_track_t ) );
+            if( !tk )
+                return VLC_ENOMEM;
             tk->i_id = i_num;
             tk->fmt = fmt;
             tk->i_frame = 0;
@@ -1527,9 +1529,11 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             }
 
             /* Check if the calloc went correctly */
-            if( tk->p_subpackets == NULL )
+            if( !tk->p_subpackets && !tk->p_subpackets_timecode)
             {
-                tk->i_subpackets = 0;
+                free( tk->p_subpackets_timecode );
+                free( tk->p_subpackets );
+                free( tk );
                 msg_Err( p_demux, "Can't alloc subpacket" );
                 return VLC_EGENERIC;
             }
