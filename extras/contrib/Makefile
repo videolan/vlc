@@ -81,7 +81,7 @@ package-macosx:
 	fi
 	mkdir tmp
 	tar cf - bin sbin include lib vlc-lib share/aclocal* share/autoconf* \
-		share/automake* share/gettext* \
+		share/automake* share/gettext* share/libtool* \
 		| (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
 	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
