@@ -195,7 +195,7 @@ int vlm_ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 
 int64_t vlm_Date(void)
 {
-#ifdef WIN32
+#if defined (WIN32) && !defined (UNDER_CE)
     struct timeb tm;
     ftime( &tm );
     return ((int64_t)tm.time) * 1000000 + ((int64_t)tm.millitm) * 1000;
