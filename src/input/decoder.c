@@ -114,6 +114,9 @@ struct decoder_owner_sys_t
     bool b_paused;
     mtime_t i_pause_date;
 
+    /* Flushing */
+    bool b_flushing;
+
     /* CC */
     struct
     {
@@ -493,12 +496,22 @@ void input_DecoderFlush( decoder_t *p_dec )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     block_t *p_null;
 
-    /* Empty the fifo */
     if( p_owner->b_own_thread )
+    {
+        /* Empty the fifo */
         block_FifoEmpty( p_owner->p_fifo );
+
+        /* Monitor for flush end */
+        vlc_mutex_lock( &p_owner->lock );
+        p_owner->b_flushing = true;
+        vlc_cond_signal( &p_owner->wait );
+        vlc_mutex_unlock( &p_owner->lock );
+    }
 
     /* Send a special block */
     p_null = block_New( p_dec, 128 );
+    if( !p_null )
+        return;
     p_null->i_flags |= BLOCK_FLAG_DISCONTINUITY;
     p_null->i_flags |= BLOCK_FLAG_CORE_FLUSH;
     if( !p_dec->fmt_in.b_packetized )
@@ -506,6 +519,15 @@ void input_DecoderFlush( decoder_t *p_dec )
     memset( p_null->p_buffer, 0, p_null->i_buffer );
 
     input_DecoderDecode( p_dec, p_null );
+
+    /* */
+    if( p_owner->b_own_thread )
+    {
+        vlc_mutex_lock( &p_owner->lock );
+        while( p_owner->b_flushing )
+            vlc_cond_wait( &p_owner->wait, &p_owner->lock );
+        vlc_mutex_unlock( &p_owner->lock );
+    }
 }
 
 /**
@@ -647,6 +669,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     vlc_cond_init( &p_owner->wait );
     p_owner->b_paused = false;
     p_owner->i_pause_date = 0;
+    p_owner->b_flushing = false;
     for( i = 0; i < 4; i++ )
     {
         p_owner->cc.pb_present[i] = false;
@@ -697,16 +720,48 @@ static void *DecoderThread( vlc_object_t *p_this )
     return NULL;
 }
 
-static void DecoderWaitUnpause( decoder_t *p_dec )
+static void DecoderWaitUnpause( decoder_t *p_dec, bool *pb_reject )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     vlc_mutex_lock( &p_owner->lock );
 
-    while( p_owner->b_paused )
+    while( p_owner->b_paused && !p_owner->b_flushing )
         vlc_cond_wait( &p_owner->wait, &p_owner->lock );
 
+    if( pb_reject )
+        *pb_reject = p_owner->b_flushing;
+
     vlc_mutex_unlock( &p_owner->lock );
+}
+
+static void DecoderSignalFlushed( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+
+    if( p_owner->b_flushing )
+    {
+        p_owner->b_flushing = false;
+        vlc_cond_signal( &p_owner->wait );
+    }
+
+    vlc_mutex_unlock( &p_owner->lock );
+}
+
+static bool DecoderIsFlushing( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    bool b_flushing;
+
+    vlc_mutex_lock( &p_owner->lock );
+
+    b_flushing = p_owner->b_flushing;
+
+    vlc_mutex_unlock( &p_owner->lock );
+
+    return b_flushing;
 }
 
 static void DecoderGetDelays( decoder_t *p_dec, mtime_t *pi_ts_delay, mtime_t *pi_es_delay )
@@ -896,7 +951,8 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
             p_owner->i_preroll_end = -1;
         }
 
-        DecoderWaitUnpause( p_dec );
+        bool b_reject;
+        DecoderWaitUnpause( p_dec, &b_reject );
 
         int i_rate = INPUT_RATE_DEFAULT;
         mtime_t i_ts_delay;
@@ -912,7 +968,8 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         const mtime_t i_max_date = mdate() + i_ts_delay +
             i_es_delay * i_rate / INPUT_RATE_DEFAULT + AOUT_MAX_ADVANCE_TIME;
 
-        if( p_aout_buf->start_date > 0 &&
+        if( !b_reject &&
+            p_aout_buf->start_date > 0 &&
             p_aout_buf->start_date <= i_max_date &&
             i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
             i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
@@ -1179,7 +1236,8 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
             ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
             DecoderGetCc( p_dec, p_dec );
 
-        DecoderWaitUnpause( p_dec );
+        bool b_reject;
+        DecoderWaitUnpause( p_dec, &b_reject );
 
         mtime_t i_ts_delay;
         mtime_t i_es_delay;
@@ -1192,7 +1250,8 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
         const mtime_t i_max_date = mdate() + i_ts_delay +
             i_es_delay * i_rate / INPUT_RATE_DEFAULT + VOUT_BOGUS_DELAY;
 
-        if( p_pic->date > 0 && p_pic->date < i_max_date )
+        if( !b_reject &&
+            p_pic->date > 0 && p_pic->date < i_max_date )
         {
             if( i_rate != p_owner->i_last_rate  )
             {
@@ -1295,7 +1354,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 
             p_sout_block->p_next = NULL;
 
-            DecoderWaitUnpause( p_dec );
+            DecoderWaitUnpause( p_dec, NULL );
 
             mtime_t i_ts_delay;
             mtime_t i_es_delay;
@@ -1332,9 +1391,6 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flus
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
 
-    if( b_flush && p_owner->p_vout )
-        VoutFlushPicture( p_owner->p_vout, 1 );
-
     if( p_owner->p_packetizer )
     {
         block_t *p_packetized_block;
@@ -1366,6 +1422,9 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flus
     {
         DecoderDecodeVideo( p_dec, p_block );
     }
+
+    if( b_flush && p_owner->p_vout )
+        VoutFlushPicture( p_owner->p_vout, 1 );
 }
 
 /* This function process a audio block
@@ -1451,19 +1510,23 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
             }
             else
             {
-                DecoderWaitUnpause( p_dec );
+                bool b_reject;
+                DecoderWaitUnpause( p_dec, &b_reject );
 
                 mtime_t i_ts_delay;
                 mtime_t i_es_delay;
                 DecoderGetDelays( p_dec, &i_ts_delay, &i_es_delay );
 
                 DecoderSpuBufferFixTs( p_spu, p_owner->p_clock, i_ts_delay, i_es_delay, b_telx );
-                spu_DisplaySubpicture( p_vout->p_spu, p_spu );
+                if( !b_reject )
+                    spu_DisplaySubpicture( p_vout->p_spu, p_spu );
+                else
+                    subpicture_Delete( p_spu );
             }
         }
         else
         {
-            msg_Warn( p_dec, "no vout found, leaking subpicture" );
+            subpicture_Delete( p_spu );
         }
         if( p_vout )
             vlc_object_release( p_vout );
@@ -1480,9 +1543,11 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
 static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
+    const bool b_flush_request = p_block && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH);
 
     if( p_block && p_block->i_buffer <= 0 )
     {
+        assert( !b_flush_request );
         block_Release( p_block );
         return VLC_SUCCESS;
     }
@@ -1490,6 +1555,9 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
 #ifdef ENABLE_SOUT
     if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
     {
+        if( p_block )
+            p_block->i_flags &= ~BLOCK_FLAG_CORE_PRIVATE_MASK;
+
         DecoderProcessSout( p_dec, p_block );
     }
     else
@@ -1502,7 +1570,7 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
             const bool b_flushing = p_owner->i_preroll_end == INT64_MAX;
             DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
 
-            b_flush = !b_flushing && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH) != 0;
+            b_flush = !b_flushing && b_flush_request;
 
             p_block->i_flags &= ~BLOCK_FLAG_CORE_PRIVATE_MASK;
         }
@@ -1525,6 +1593,10 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
             p_dec->b_error = true;
         }
     }
+
+    /* */
+    if( b_flush_request )
+        DecoderSignalFlushed( p_dec );
 
     return p_dec->b_error ? VLC_EGENERIC : VLC_SUCCESS;
 }
@@ -1708,7 +1780,6 @@ int vout_CountPictureAvailable( vout_thread_t *p_vout );
 static picture_t *vout_new_buffer( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    picture_t *p_pic;
 
     if( p_owner->p_vout == NULL ||
         p_dec->fmt_out.video.i_width != p_owner->video.i_width ||
@@ -1801,8 +1872,9 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
     /* Get a new picture
      */
-    for( p_pic = NULL; ; )
+    for( ;; )
     {
+        picture_t *p_picture;
         int i_pic, i_ready_pic;
 
         if( p_dec->b_die || p_dec->b_error )
@@ -1815,10 +1887,13 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
          */
         if( vout_CountPictureAvailable( p_owner->p_vout ) >= 2 )
         {
-            p_pic = vout_CreatePicture( p_owner->p_vout, 0, 0, 0 );
-            if( p_pic )
-                break;
+            p_picture = vout_CreatePicture( p_owner->p_vout, 0, 0, 0 );
+            if( p_picture )
+                return p_picture;
         }
+
+        if( DecoderIsFlushing( p_dec ) )
+            return NULL;
 
         /* Check the decoder doesn't leak pictures */
         for( i_pic = 0, i_ready_pic = 0; i_pic < p_owner->p_vout->render.i_pictures; i_pic++ )
@@ -1854,7 +1929,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             /* Just free all the pictures */
             for( i_pic = 0; i_pic < p_owner->p_vout->render.i_pictures; i_pic++ )
             {
-                const picture_t *p_pic = p_owner->p_vout->render.pp_picture[i_pic];
+                picture_t *p_pic = p_owner->p_vout->render.pp_picture[i_pic];
 
                 if( p_pic->i_status == RESERVED_PICTURE )
                     vout_DestroyPicture( p_owner->p_vout, p_pic );
@@ -1865,8 +1940,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
         msleep( VOUT_OUTMEM_SLEEP );
     }
-
-    return p_pic;
 }
 
 static void vout_del_buffer( decoder_t *p_dec, picture_t *p_pic )
