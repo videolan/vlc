@@ -1820,10 +1820,11 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
                 break;
         }
 
-#define p_pic p_owner->p_vout->render.pp_picture[i_pic]
         /* Check the decoder doesn't leak pictures */
         for( i_pic = 0, i_ready_pic = 0; i_pic < p_owner->p_vout->render.i_pictures; i_pic++ )
         {
+            const picture_t *p_pic = p_owner->p_vout->render.pp_picture[i_pic];
+
             if( p_pic->i_status == READY_PICTURE )
             {
                 i_ready_pic++;
@@ -1843,6 +1844,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
                     break;
             }
         }
+
         if( i_pic == p_owner->p_vout->render.i_pictures )
         {
             /* Too many pictures are still referenced, there is probably a bug
@@ -1850,16 +1852,16 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             msg_Err( p_dec, "decoder is leaking pictures, resetting the heap" );
 
             /* Just free all the pictures */
-            for( i_pic = 0; i_pic < p_owner->p_vout->render.i_pictures;
-                 i_pic++ )
+            for( i_pic = 0; i_pic < p_owner->p_vout->render.i_pictures; i_pic++ )
             {
+                const picture_t *p_pic = p_owner->p_vout->render.pp_picture[i_pic];
+
                 if( p_pic->i_status == RESERVED_PICTURE )
                     vout_DestroyPicture( p_owner->p_vout, p_pic );
                 if( p_pic->i_refcount > 0 )
-                vout_UnlinkPicture( p_owner->p_vout, p_pic );
+                    vout_UnlinkPicture( p_owner->p_vout, p_pic );
             }
         }
-#undef p_pic
 
         msleep( VOUT_OUTMEM_SLEEP );
     }
