@@ -179,7 +179,7 @@ static int Open( vlc_object_t *p_this )
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
     p_sys->p_rtsp = malloc( sizeof( rtsp_client_t) );
 
-    p_sys->p_header = 0;
+    p_sys->p_header = NULL;
     p_sys->p_rtsp->p_userdata = p_access;
     p_sys->p_rtsp->pf_connect = RtspConnect;
     p_sys->p_rtsp->pf_disconnect = RtspDisconnect;
@@ -192,7 +192,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Dbg( p_access, "could not connect to: %s", p_access->psz_path );
         free( p_sys->p_rtsp );
-        p_sys->p_rtsp = 0;
+        p_sys->p_rtsp = NULL;
         goto error;
     }
 
@@ -284,12 +284,12 @@ static block_t *BlockRead( access_t *p_access )
     if( p_sys->p_header )
     {
         p_block = p_sys->p_header;
-        p_sys->p_header = 0;
+        p_sys->p_header = NULL;
         return p_block;
     }
 
     i_size = real_get_rdt_chunk_header( p_access->p_sys->p_rtsp, &pheader );
-    if( i_size <= 0 ) return 0;
+    if( i_size <= 0 ) return NULL;
 
     p_block = block_New( p_access, i_size );
     p_block->i_buffer = real_get_rdt_chunk( p_access->p_sys->p_rtsp, &pheader,

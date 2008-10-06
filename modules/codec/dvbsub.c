@@ -932,7 +932,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
         p_obj->i_x          = bs_read( s, 12 );
         bs_skip( s, 4 ); /* Reserved */
         p_obj->i_y          = bs_read( s, 12 );
-        p_obj->psz_text     = 0;
+        p_obj->psz_text     = NULL;
 
         i_processed_length += 6;
 

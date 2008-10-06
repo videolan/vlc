@@ -260,8 +260,8 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 static int Open( vlc_object_t *p_this )
 {
     vod_t *p_vod = (vod_t *)p_this;
-    vod_sys_t *p_sys = 0;
-    char *psz_url = 0;
+    vod_sys_t *p_sys = NULL;
+    char *psz_url = NULL;
     vlc_url_t url;
 
     psz_url = config_GetPsz( p_vod, "rtsp-host" );
@@ -378,7 +378,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     memset( p_media, 0, sizeof(vod_media_t) );
     p_media->id = p_sys->i_media_id++;
     TAB_INIT( p_media->i_es, p_media->es );
-    p_media->psz_mux = 0;
+    p_media->psz_mux = NULL;
     TAB_INIT( p_media->i_rtsp, p_media->rtsp );
     p_media->b_raw = false;
 

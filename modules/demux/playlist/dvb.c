@@ -193,13 +193,13 @@ static const struct
 static int ParseLine( char *psz_line, char **ppsz_name,
                       char ***pppsz_options, int *pi_options )
 {
-    char *psz_name = 0, *psz_parse = psz_line;
+    char *psz_name = NULL, *psz_parse = psz_line;
     int i_count = 0, i_program = 0, i_frequency = 0;
     bool b_valid = false;
 
-    if( pppsz_options ) *pppsz_options = 0;
+    if( pppsz_options ) *pppsz_options = NULL;
     if( pi_options ) *pi_options = 0;
-    if( ppsz_name ) *ppsz_name = 0;
+    if( ppsz_name ) *ppsz_name = NULL;
 
     /* Skip leading tabs and spaces */
     while( *psz_parse == ' ' || *psz_parse == '\t' ||
@@ -210,7 +210,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
 
     while( psz_parse )
     {
-        const char *psz_option = 0;
+        const char *psz_option = NULL;
         char *psz_end = strchr( psz_parse, ':' );
         if( psz_end ) { *psz_end = 0; psz_end++; }
 
@@ -281,7 +281,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
         /* This isn't a valid channels file, cleanup everything */
         while( (*pi_options)-- ) free( (*pppsz_options)[*pi_options] );
         free( *pppsz_options );
-        *pppsz_options = 0; *pi_options = 0;
+        *pppsz_options = NULL; *pi_options = 0;
     }
 
     if( i_program && pppsz_options && pi_options )
