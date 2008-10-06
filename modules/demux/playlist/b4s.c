@@ -98,7 +98,7 @@ static int Demux( demux_t *p_demux )
 
     psz_elname = stream_ReadLine( p_demux->s );
     free( psz_elname );
-    psz_elname = 0;
+    psz_elname = NULL;
 
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
     if( !p_xml_reader ) return -1;
@@ -142,7 +142,7 @@ static int Demux( demux_t *p_demux )
         free( psz_elname );
         return -1;
     }
-    free( psz_elname ); psz_elname = 0;
+    free( psz_elname ); psz_elname = NULL;
 
     // Read the attributes
     while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
@@ -293,6 +293,8 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "error while parsing data" );
     }
+
+   free( psz_elname );
 
     HANDLE_PLAY_AND_RELEASE;
     return 0; /* Needed for correct operation of go back */
