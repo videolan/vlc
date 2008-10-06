@@ -53,7 +53,7 @@
 #endif
 
 #if defined( UNDER_CE )
-#   include <windows.h>
+#   define SleepEx(a,b)  Sleep(a)
 #endif
 
 #if defined(HAVE_SYS_TIME_H)

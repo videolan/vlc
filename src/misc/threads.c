@@ -49,6 +49,10 @@ static vlc_threadvar_t cancel_key;
 # include <execinfo.h>
 #endif
 
+#ifdef UNDER_CE
+# define WaitForSingleObjectEx(a,b,c) WaitForSingleObject(a,b)
+#endif
+
 /**
  * Print a backtrace to the standard error for debugging purpose.
  */
@@ -689,6 +693,19 @@ void vlc_cancel (vlc_thread_t thread_id)
 {
 #if defined (LIBVLC_USE_PTHREAD_CANCEL)
     pthread_cancel (thread_id);
+#elif defined (UNDER_CE)
+    /* HACK:There is no way to use something
+     * like QueueUserAPC on Windows CE, so I rely
+     * on some crappy arch specific code */
+    CONTEXT context;
+    context.ContextFlags = CONTEXT_CONTROL;
+    GetThreadContext (thread_id->handle, &context);
+    /* Setting the instruction pointer for the canceled thread */
+#if defined(_ARM_) || defined(ARM)
+    context.Pc = (DWORD_PTR) vlc_cancel_self;
+#endif
+    SetThreadContext (thread_id->handle, &context);
+
 #elif defined (WIN32)
     QueueUserAPC (vlc_cancel_self, thread_id->handle, 0);
 #else
