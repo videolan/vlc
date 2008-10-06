@@ -555,7 +555,11 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     if( p_intf->p_sys->p_vlm == NULL )
                         p_intf->p_sys->p_vlm = vlm_New( p_intf );
 
-                    if( p_intf->p_sys->p_vlm == NULL ) break;
+                    if( p_intf->p_sys->p_vlm == NULL )
+                    {
+                        free( psz );
+                        break;
+                    }
 
                     ExtractURIValue( p_request, "name", name, 512 );
                     if( StrToMacroType( control ) == MVLC_VLM_NEW )
