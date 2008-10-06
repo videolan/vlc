@@ -205,6 +205,7 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     /* This creates a recursive mutex. This is OK as fast mutexes have
      * no defined behavior in case of recursive locking. */
     InitializeCriticalSection (&p_mutex->mutex);
+    p_mutex->initialized = 1;
     return 0;
 
 #endif
@@ -231,8 +232,7 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 
 #elif defined( WIN32 )
     InitializeCriticalSection( &p_mutex->mutex );
-    InterlockedIncrement (&p_mutex->initialized);
-    barrier ();
+    p_mutex->initialized = 1;
     return 0;
 
 #endif
@@ -252,7 +252,7 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("destroying mutex");
 
 #elif defined( WIN32 )
-    InterlockedDecrement (&p_mutex->initialized);
+    assert (p_mutex->initialized);
     DeleteCriticalSection (&p_mutex->mutex);
 
 #endif
