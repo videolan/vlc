@@ -48,7 +48,7 @@
 #   include <fcntl.h>
 #endif
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if defined( WIN32 )
 #   include <io.h>
 #   include <ctype.h>
 #else
@@ -62,15 +62,8 @@
 #   endif
 #   define lseek _lseeki64
 #elif defined( UNDER_CE )
-#   ifdef read
-#      undef read
-#   endif
-#   define read(a,b,c) fread(b,1,c,a)
-#   define close(a) fclose(a)
-#   ifdef lseek
-#      undef lseek
-#   endif
-#   define lseek fseek
+/* FIXME the commandline on wince is a mess */
+# define dup(a) -1
 #endif
 
 #include <vlc_charset.h>
@@ -223,7 +216,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 #else
     i_ret = read (fd, p_buffer, i_len);
 #endif
-    
+
     if( i_ret < 0 )
     {
         switch (errno)
@@ -348,21 +341,6 @@ static int open_file (access_t *p_access, const char *path)
         path++;
 #endif
 
-#ifdef UNDER_CE
-    p_sys->fd = utf8_fopen( path, "rb" );
-    if ( !p_sys->fd )
-    {
-        msg_Err( p_access, "cannot open file %s", path );
-        intf_UserFatal( p_access, false, _("File reading failed"),
-                        _("VLC could not open the file \"%s\"."), path );
-        return VLC_EGENERIC;
-    }
-
-    fseek( p_sys->fd, 0, SEEK_END );
-    p_access->info.i_size = ftell( p_sys->fd );
-    p_access->info.i_update |= INPUT_UPDATE_SIZE;
-    fseek( p_sys->fd, 0, SEEK_SET );
-#else
     int fd = utf8_open (path, O_RDONLY | O_NONBLOCK /* O_LARGEFILE*/, 0666);
     if (fd == -1)
     {
@@ -378,7 +356,6 @@ static int open_file (access_t *p_access, const char *path)
     fcntl (fd, F_RDAHEAD, 1);
     fcntl (fd, F_NOCACHE, 1);
 # endif
-#endif
 
     return fd;
 }
