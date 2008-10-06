@@ -28,23 +28,19 @@
 # include "config.h"
 #endif
 
+#include <vlc_common.h>
+
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <xlist.h>
+#include "xlist.h"
 
 #include <assert.h>
 
 #undef XTAG_DEBUG
-
-#undef FALSE
-#undef TRUE
-
-#define FALSE (0)
-#define TRUE (!FALSE)
 
 #undef MIN
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -106,27 +102,27 @@ static int
 xtag_cin (char c, int char_class)
 {
   if (char_class & X_WHITESPACE)
-    if (isspace(c)) return TRUE;
+    if (isspace(c)) return true;
 
   if (char_class & X_OPENTAG)
-    if (c == '<') return TRUE;
+    if (c == '<') return true;
 
   if (char_class & X_CLOSETAG)
-    if (c == '>') return TRUE;
+    if (c == '>') return true;
 
   if (char_class & X_DQUOTE)
-    if (c == '"') return TRUE;
+    if (c == '"') return true;
 
   if (char_class & X_SQUOTE)
-    if (c == '\'') return TRUE;
+    if (c == '\'') return true;
 
   if (char_class & X_EQUAL)
-    if (c == '=') return TRUE;
+    if (c == '=') return true;
 
   if (char_class & X_SLASH)
-    if (c == '/') return TRUE;
+    if (c == '/') return true;
 
-  return FALSE;
+  return false;
 }
 
 static int
@@ -220,18 +216,18 @@ xtag_assert_and_pass (XTagParser * parser, int char_class)
 {
   char * s;
 
-  if (!parser->valid) return FALSE;
+  if (!parser->valid) return false;
 
   s = parser->start;
 
   if (!xtag_cin (s[0], char_class)) {
-    parser->valid = FALSE;
-    return FALSE;
+    parser->valid = false;
+    return false;
   }
 
   parser->start = &s[1];
 
-  return TRUE;
+  return true;
 }
 
 static char *
@@ -314,7 +310,7 @@ xtag_parse_attribute (XTagParser * parser)
  err_free_name:
   free (name);
 
-  parser->valid = FALSE;
+  parser->valid = false;
 
   return NULL;
 }
@@ -397,7 +393,7 @@ xtag_parse_tag (XTagParser * parser)
 #ifdef XTAG_DEBUG
         printf ("got %s expected %s\n", name, tag->name);
 #endif
-        parser->valid = FALSE;
+        parser->valid = false;
       }
       free (name);
     }
@@ -452,7 +448,7 @@ xtag_new_parse (const char * s, int n)
   XTagParser parser;
   XTag * tag, * ttag, * wrapper;
 
-  parser.valid = TRUE;
+  parser.valid = true;
   parser.current_tag = NULL;
   parser.start = (char *)s;
 
