@@ -929,7 +929,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
-    if( config_GetInt( p_libvlc, "file-logging" ) > 0 )
+    if( (config_GetInt( p_libvlc, "file-logging" ) > 0) &&
+        !config_GetInt( p_libvlc, "syslog" ) )
     {
         libvlc_InternalAddIntf( p_libvlc, "logger,none" );
     }
