@@ -205,9 +205,6 @@ const char* psz_introspection_xml_data_tracklist =
 "</node>\n"
 ;
 
-#define MPRIS_DBUS_ROOT_PATH      "/"
-#define MPRIS_DBUS_PLAYER_PATH    "/Player"
-#define MPRIS_DBUS_TRACKLIST_PATH "/TrackList"
 
 /* Handle  messages reception */
 DBUS_METHOD( handle_root );

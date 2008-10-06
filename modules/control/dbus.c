@@ -39,13 +39,12 @@
  * Preamble
  *****************************************************************************/
 
-#include <dbus/dbus.h>
-
-#include "dbus.h"
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <dbus/dbus.h>
+#include "dbus.h"
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
