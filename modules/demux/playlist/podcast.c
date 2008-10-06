@@ -180,21 +180,25 @@ static int Demux( demux_t *p_demux )
                     {
                         free( psz_name );
                         free( psz_value );
+                        free( psz_elname );
                         return -1;
                     }
                     if( !strcmp( psz_elname, "enclosure" ) &&
                         !strcmp( psz_name, "url" ) )
                     {
+                        free( psz_item_mrl );
                         psz_item_mrl = strdup( psz_value );
                     }
                     else if( !strcmp( psz_elname, "enclosure" ) &&
                         !strcmp( psz_name, "length" ) )
                     {
+                        free( psz_item_size );
                         psz_item_size = strdup( psz_value );
                     }
                     else if( !strcmp( psz_elname, "enclosure" ) &&
                         !strcmp( psz_name, "type" ) )
                     {
+                        free( psz_item_type );
                         psz_item_type = strdup( psz_value );
                     }
                     else
@@ -237,6 +241,7 @@ static int Demux( demux_t *p_demux )
                 SET_DATA( psz_item_duration, "itunes:duration" )
                 SET_DATA( psz_item_keywords, "itunes:keywords" )
                 SET_DATA( psz_item_subtitle, "itunes:subtitle" )
+#undef SET_DATA
                 /* toplevel meta data */
                 else if( b_item == false && b_image == false
                          && !strcmp( psz_elname, "title" ) )
@@ -283,6 +288,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_mrl == NULL )
                     {
                         msg_Err( p_demux, "invalid XML (no enclosure markup)" );
+                        free( psz_elname );
                         return -1;
                     }
                     p_input = input_item_NewExt( p_demux, psz_item_mrl,
@@ -299,6 +305,7 @@ static int Demux( demux_t *p_demux )
                     ADD_INFO( "Podcast Subtitle", psz_item_subtitle );
                     ADD_INFO( "Podcast Summary", psz_item_summary );
                     ADD_INFO( "Podcast Type", psz_item_type );
+#undef ADD_INFO
                     if( psz_item_size )
                     {
                         input_item_AddInfo( p_input,
@@ -327,7 +334,7 @@ static int Demux( demux_t *p_demux )
                     b_image = false;
                 }
                 free( psz_elname );
-                psz_elname = strdup("");
+                psz_elname = strdup( "" );
 
                 break;
             }
@@ -338,6 +345,8 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "error while parsing data" );
     }
+
+    free( psz_elname );
 
     HANDLE_PLAY_AND_RELEASE;
     return 0; /* Needed for correct operation of go back */
