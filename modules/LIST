@@ -1,7 +1,6 @@
 List of vlc plugins (346)
 $Id$
  * a52: A/52 basic parser/packetizer
- * a52sys: A/52 decapsulation demuxer.
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
  * a52tospdif: Audio converter module to encapsulate A/52 into S/PDIF
  * aa: Ascii art video output
@@ -12,7 +11,6 @@ $Id$
  * access_file: File access module
  * access_filter_bandwidth: Bandwidth limit module
  * access_filter_dump: Raw input Dump module
- * access_filter_record: Raw input Recording module
  * access_filter_timeshift: Timeshifting module
  * access_ftp: FTP Network access module
  * access_gnomevfs: GnomeVFS access
@@ -33,6 +31,7 @@ $Id$
  * access_udp: UDP Network access module 
  * adjust: Contrast/Hue/saturation/Brightness adjust module
  * adpcm: ADPCM audio decoder
+ * aes3: aes3 decoder/packetizer
  * aiff: AIFF demuxer
  * alphamask: Alpha layer mask video filter
  * alsa: audio output module using the ALSA API.
@@ -65,7 +64,6 @@ $Id$
  * cddax: input module to read audio CDs via libcdio
  * cdg: CD-G decoder
  * chain: Video filtering using a chain of video filter modules
- * cinepak: Cinepack video decoder
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
  * colorthres:  Theshold color based on similarity to reference color Video filter
@@ -88,7 +86,6 @@ $Id$
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
  * dshow: DirectShow access plugin for encoding cards under Windows
  * dts: DTS basic parser/packetizer
- * dtssys: raw DTS stream input module
  * dtstofloat32: DTS Audio converter
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
  * dummy: dummy audio output, video output, interface and input modules.
@@ -172,7 +169,6 @@ $Id$
  * logo: video filter to put a logo on the video
  * lpcm: LPCM decoder
  * lua: Lua scripting inteface
- * m4a: MPEG-4 Audio Stream demuxer
  * m4v: MPEG-4 Video Stream demuxer
  * macosx: Video output, and interface module for Mac OS X.
  * magnify: zoom video filter
@@ -200,7 +196,6 @@ $Id$
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * mpgv: MPEG-I/II Video demuxer
  * msn: announce currently playing stream to MSN
- * musicbrainz: Art fetcher for music albums
  * mux_asf: ASF muxer
  * mux_avi: AVI muxer
  * mux_dummy: dummy muxer
@@ -272,6 +267,7 @@ $Id$
  * sap: Interface module to read SAP/SDP announcments
  * scale: Images rescaler
  * scaletempo: Scale audio tempo in sync with playback rate
+ * scene: scene video filter
  * schroedinger: Schroedinger video decoder
  * screen: a input module that takes screenshots of the primary monitor
  * screensaver: screensaver disabling module
@@ -298,6 +294,7 @@ $Id$
  * stream_out_es: stream out module outputing ES
  * stream_out_gather: stream out module gathering inputs for seemless transitions
  * stream_out_mosaic_bridge: stream output module to make a mosaic. To be used with VLM
+ * stream_out_record: record stream output module
  * stream_out_standard: standard stream output module
  * stream_out_switcher: stream output module to display backgrounds
  * stream_out_transcode: audio & video transcoder using ffmpeg
@@ -365,6 +362,8 @@ $Id$
  * xvid: Decoder for the Xvid codec, using libxvidcore
  * xvideo: video output module using the XVideo API.
  * xvmc: XVMC video output and decoder
+ * yuv: yuv video output
+ * yuvp: YUVP to YUVA/RGBA chroma converter
  * yuy2_i420: yuy2 to 4:2:0 conversions functions
  * yuy2_i422: yuy2 to 4:2:2 conversions functions
  * zvbi: Teletext decoder using libzbvi
