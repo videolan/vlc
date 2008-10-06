@@ -1450,6 +1450,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
     return;
 
 error:
+    free( string );
     free( tmp_rtmp_packet->body->body );
     free( tmp_rtmp_packet->body );
     free( tmp_rtmp_packet );
