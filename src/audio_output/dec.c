@@ -386,3 +386,13 @@ void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b
     }
 }
 
+void aout_DecFlush( aout_instance_t *p_aout, aout_input_t *p_input )
+{
+    aout_lock_input_fifos( p_aout );
+
+    aout_FifoSet( p_aout, &p_input->fifo, 0 );
+    p_input->p_first_byte_to_mix = NULL;
+
+    aout_unlock_input_fifos( p_aout );
+}
+

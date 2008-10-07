@@ -141,6 +141,7 @@ void aout_DecDeleteBuffer( aout_instance_t *, aout_input_t *, aout_buffer_t * );
 int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t *, int i_input_rate );
 int aout_DecGetResetLost( aout_instance_t *, aout_input_t * );
 void aout_DecChangePause( aout_instance_t *, aout_input_t *, bool b_paused, mtime_t i_date );
+void aout_DecFlush( aout_instance_t *, aout_input_t * );
 
 /* Helpers */
 

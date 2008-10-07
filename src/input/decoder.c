@@ -292,10 +292,8 @@ void input_DecoderDelete( decoder_t *p_dec )
         }
         vlc_mutex_unlock( &p_owner->lock );
 
-        /* Make sure the thread leaves the function by
-         * sending it an empty block. */
-        block_t *p_block = block_New( p_dec, 0 );
-        input_DecoderDecode( p_dec, p_block );
+        /* Make sure the thread leaves the function */
+        block_FifoWake( p_owner->p_fifo );
 
         vlc_thread_join( p_dec );
 
@@ -696,10 +694,7 @@ static void *DecoderThread( vlc_object_t *p_this )
     while( vlc_object_alive( p_dec ) && !p_dec->b_error )
     {
         if( ( p_block = block_FifoGet( p_owner->p_fifo ) ) == NULL )
-        {
-            p_dec->b_error = true;
-            break;
-        }
+            continue;
 
         if( DecoderProcess( p_dec, p_block ) != VLC_SUCCESS )
             break;
@@ -946,8 +941,10 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 
         if( p_owner->i_preroll_end > 0 )
         {
-            /* FIXME TODO flush audio output (don't know how to do that) */
             msg_Dbg( p_dec, "End of audio preroll" );
+            if( p_owner->p_aout && p_owner->p_aout_input )
+                aout_DecFlush( p_owner->p_aout, p_owner->p_aout_input );
+            /* */
             p_owner->i_preroll_end = -1;
         }
 
@@ -1433,11 +1430,6 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
 
-    if( b_flush && p_owner->p_aout && p_owner->p_aout_input )
-    {
-        // TODO flush
-    }
-
     if( p_owner->p_packetizer )
     {
         block_t *p_packetized_block;
@@ -1467,6 +1459,9 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
     {
         DecoderDecodeAudio( p_dec, p_block );
     }
+
+    if( b_flush && p_owner->p_aout && p_owner->p_aout_input )
+        aout_DecFlush( p_owner->p_aout, p_owner->p_aout_input );
 }
 
 /* This function process a subtitle block
