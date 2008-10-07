@@ -339,7 +339,7 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
         if( p_owner->p_input->p->b_out_pace_control )
         {
             /* FIXME !!!!! */
-            while( !p_dec->b_die && !p_dec->b_error &&
+            while( vlc_object_alive( p_dec ) && !p_dec->b_error &&
                    block_FifoCount( p_owner->p_fifo ) > 10 )
             {
                 msleep( 1000 );
@@ -724,7 +724,7 @@ static void DecoderFlush( decoder_t *p_dec )
     /* */
     if( p_owner->b_own_thread )
     {
-        while( p_owner->b_flushing )
+        while( vlc_object_alive( p_dec ) && p_owner->b_flushing )
             vlc_cond_wait( &p_owner->wait, &p_owner->lock );
     }
 }
