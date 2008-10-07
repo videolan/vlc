@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <windows.h>
 
+#ifndef UNDER_CE
 static char *FromWide (const wchar_t *wide)
 {
     size_t len;
@@ -45,7 +46,55 @@ static char *FromWide (const wchar_t *wide)
         WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
     return out;
 }
+#else
+static int parse_cmdline (char *line, char ***argvp)
+{
+    char **argv = malloc (sizeof (char *));
+    int argc = 0;
 
+    while (*line != '\0')
+    {
+        char quote = 0;
+
+        /* Skips white spaces */
+        while (strchr ("\t ", *line))
+            line++;
+        if (!*line)
+            break;
+
+        /* Starts a new parameter */
+        argv = realloc (argv, (argc + 2) * sizeof (char *));
+        if (*line == '"')
+        {
+            quote = '"';
+            line++;
+        }
+        argv[argc++] = line;
+
+    more:
+            while (*line && !strchr ("\t ", *line))
+            line++;
+
+    if (line > argv[argc - 1] && line[-1] == quote)
+        /* End of quoted parameter */
+        line[-1] = 0;
+    else
+        if (*line && quote)
+    {
+        /* Space within a quote */
+        line++;
+        goto more;
+    }
+    else
+        /* End of unquoted parameter */
+        if (*line)
+            *line++ = 0;
+    }
+    argv[argc] = NULL;
+    *argvp = argv;
+    return argc;
+}
+#endif
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #ifndef UNDER_CE
@@ -56,6 +105,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     int nCmdShow )
 {
     int argc, ret;
+#ifndef UNDER_CE
     wchar_t **wargv = CommandLineToArgvW (GetCommandLine (), &argc);
     if (wargv == NULL)
         return 1;
@@ -65,6 +115,14 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         argv[i] = FromWide (wargv[i]);
     argv[argc] = NULL;
     LocalFree (wargv);
+#else
+    char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
+
+    WideCharToMultiByte( CP_UTF8, 0, lpCmdLine, -1,
+                         psz_cmdline, sizeof (psz_cmdline), NULL, NULL );
+
+    argc = parse_cmdline (psz_cmdline, &argv);
+#endif
 
     libvlc_exception_t ex, dummy;
     libvlc_exception_init (&ex);
