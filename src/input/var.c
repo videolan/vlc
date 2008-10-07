@@ -463,8 +463,6 @@ void input_ConfigVarInit ( input_thread_t *p_input )
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
         var_Create( p_input, "clock-synchro",
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-        var_Create( p_input, "auto-adjust-pts-delay",
-                    VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     }
 
     var_Create( p_input, "seekable", VLC_VAR_BOOL );

@@ -245,7 +245,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_ControlVarInit( p_input );
 
     /* */
-    p_input->p->pts_adjust.b_auto_adjust = var_GetBool( p_input, "auto-adjust-pts-delay" );
     p_input->p->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
 
     if( !p_input->b_preparsing )
@@ -782,7 +781,7 @@ static void MainLoop( input_thread_t *p_input )
     if( !p_input->b_eof && !p_input->b_error && p_input->p->input.b_eof )
     {
         /* We have finish to demux data but not to play them */
-        while( !p_input->b_die )
+        while( vlc_object_alive( p_input ) )
         {
             if( input_EsOutDecodersEmpty( p_input->p->p_es_out ) )
                 break;

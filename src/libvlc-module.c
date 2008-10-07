@@ -1028,12 +1028,6 @@ static const char *const ppsz_clock_descriptions[] =
      "This option is useful if you want to lower the latency when " \
      "reading a stream")
 
-#define AUTO_ADJUST_PTS_DELAY N_("(Experimental) Minimize latency when" \
-     "reading live stream.")
-#define AUTO_ADJUST_PTS_DELAY_LONGTEXT N_( \
-     "This option is useful if you want to lower the latency when " \
-     "reading a stream")
-
 #define PLUGIN_PATH_TEXT N_("Modules search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
     "Additional path for VLC to look for its modules. You can add " \
@@ -1885,8 +1879,7 @@ vlc_module_begin();
     add_bool( "use-stream-immediate", false, NULL,
                USE_STREAM_IMMEDIATE, USE_STREAM_IMMEDIATE_LONGTEXT, true );
 
-    add_bool( "auto-adjust-pts-delay", false, NULL,
-              AUTO_ADJUST_PTS_DELAY, AUTO_ADJUST_PTS_DELAY_LONGTEXT, true );
+    add_obsolete_bool( "auto-adjust-pts-delay" );
 
 #if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
     add_bool( "rt-priority", false, NULL, RT_PRIORITY_TEXT,

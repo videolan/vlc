@@ -1106,105 +1106,6 @@ static void VoutFlushPicture( vout_thread_t *p_vout, mtime_t i_max_date )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-#if 0
-static void DecoderOptimizePtsDelay( decoder_t *p_dec )
-{
-    input_thread_t *p_input = p_dec->p_owner->p_input;
-    vout_thread_t *p_vout = p_dec->p_owner->p_vout;
-    input_thread_private_t *p_priv = p_input->p;
-
-    picture_t *p_old = NULL;
-    picture_t *p_young = NULL;
-    int i;
-
-    /* Enable with --auto-adjust-pts-delay */
-    if( !p_priv->pts_adjust.b_auto_adjust )
-        return;
-
-    for( i = 0; i < I_RENDERPICTURES; i++ )
-    {
-        picture_t *p_pic = PP_RENDERPICTURE[i];
-
-        if( p_pic->i_status != READY_PICTURE )
-            continue;
-
-        if( !p_old || p_pic->date < p_old->date )
-            p_old = p_pic;
-        if( !p_young || p_pic->date > p_young->date )
-            p_young = p_pic;
-    }
-
-    if( !p_young || !p_old )
-        return;
-
-    /* Try to find if we can reduce the pts
-     * This first draft is way too simple, and we can't say if the
-     * algo will converge. It's also full of constants.
-     * But this simple algo allows to reduce the latency
-     * to the minimum.
-     * The whole point of this, is to bypass the pts_delay set
-     * by the access but also the delay arbitraly set by
-     * the remote server.
-     * Actually the remote server's muxer may set up a
-     * pts<->dts delay in the muxed stream. That is
-     * why we may end up in having a negative pts_delay,
-     * to compensate that artificial delay. */
-    const mtime_t i_buffer_length = p_young->date - p_old->date;
-    int64_t i_pts_slide = 0;
-    if( i_buffer_length < 10000 )
-    {
-        if( p_priv->pts_adjust.i_num_faulty > 10 )
-        {
-            i_pts_slide = __MAX(p_input->i_pts_delay *3 / 2, 10000);
-            p_priv->pts_adjust.i_num_faulty = 0;
-        }
-        if( p_priv->pts_adjust.b_to_high )
-        {
-            p_priv->pts_adjust.b_to_high = !p_priv->pts_adjust.b_to_high;
-            p_priv->pts_adjust.i_num_faulty = 0;
-        }
-        p_priv->pts_adjust.i_num_faulty++;
-    }
-    else if( i_buffer_length > 100000 )
-    {
-        if( p_priv->pts_adjust.i_num_faulty > 25 )
-        {
-            i_pts_slide = -i_buffer_length/2;
-            p_priv->pts_adjust.i_num_faulty = 0;
-        }
-        if( p_priv->pts_adjust.b_to_high )
-        {
-            p_priv->pts_adjust.b_to_high = !p_priv->pts_adjust.b_to_high;
-            p_priv->pts_adjust.i_num_faulty = 0;
-        }
-        p_priv->pts_adjust.i_num_faulty++;
-    }
-    if( i_pts_slide != 0 )
-    {
-        const mtime_t i_pts_delay_org = p_input->i_pts_delay;
-
-        p_input->i_pts_delay += i_pts_slide;
-
-        /* Don't play with the pts delay for more than -2<->3sec */
-        if( p_input->i_pts_delay < -2000000 )
-            p_input->i_pts_delay = -2000000;
-        else if( p_input->i_pts_delay > 3000000 )
-            p_input->i_pts_delay = 3000000;
-        i_pts_slide = p_input->i_pts_delay - i_pts_delay_org;
-
-        msg_Dbg( p_input, "Sliding the pts by %dms pts delay at %dms picture buffer was %dms",
-            (int)i_pts_slide/1000, (int)p_input->i_pts_delay/1000, (int)i_buffer_length/1000);
-
-        vlc_mutex_lock( &p_vout->picture_lock );
-        /* Slide all the picture */
-        for( i = 0; i < I_RENDERPICTURES; i++ )
-            PP_RENDERPICTURE[i]->date += i_pts_slide;
-        /* FIXME: slide aout/spu */
-        vlc_mutex_unlock( &p_vout->picture_lock );
-    }
-}
-#endif
-
 static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -1273,8 +1174,6 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
             vout_DatePicture( p_vout, p_pic, p_pic->date );
 
-            /* Re-enable it but do it right this time */
-            //DecoderOptimizePtsDelay( p_dec );
             vout_DisplayPicture( p_vout, p_pic );
         }
         else
