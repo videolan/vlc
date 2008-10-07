@@ -57,6 +57,8 @@ static int        DecoderProcess( decoder_t *, block_t * );
 static void       DecoderOutputChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 static void       DecoderFlush( decoder_t * );
 
+static void       DecoderUnsupportedCodec( decoder_t *, vlc_fourcc_t );
+
 /* Buffers allocation callbacks for the decoders */
 static aout_buffer_t *aout_new_buffer( decoder_t *, int );
 static void aout_del_buffer( decoder_t *, aout_buffer_t * );
@@ -130,16 +132,9 @@ struct decoder_owner_sys_t
     mtime_t i_ts_delay;
 };
 
-/* */
-static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
-{
-    msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
-             "VLC probably does not support this sound or video format.",
-             (char*)&codec );
-    intf_UserFatal( p_dec, false, _("No suitable decoder module"), 
-                    _("VLC does not support the audio or video format \"%4.4s\". "
-                      "Unfortunately there is no way for you to fix this."), (char*)&codec );
-}
+/*****************************************************************************
+ * Public functions
+ *****************************************************************************/
 
 /* decoder_GetInputAttachment:
  */
@@ -504,6 +499,22 @@ void input_DecoderStartBuffering( decoder_t *p_dec )
 void input_DecoderStopBuffering( decoder_t *p_dec )
 {
 }
+
+/*****************************************************************************
+ * Internal functions
+ *****************************************************************************/
+
+/* */
+static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
+{
+    msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
+             "VLC probably does not support this sound or video format.",
+             (char*)&codec );
+    intf_UserFatal( p_dec, false, _("No suitable decoder module"), 
+                    _("VLC does not support the audio or video format \"%4.4s\". "
+                      "Unfortunately there is no way for you to fix this."), (char*)&codec );
+}
+
 
 /**
  * Create a decoder object
