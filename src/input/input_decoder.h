@@ -47,9 +47,14 @@ void input_DecoderChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 void input_DecoderChangeDelay( decoder_t *, mtime_t i_delay );
 
 /**
- * This function will cause a flush of the decoder.
+ * This function starts the buffering mode.
  */
-void input_DecoderFlush( decoder_t * );
+void input_DecoderStartBuffering( decoder_t * );
+
+/**
+ * This function stops the buffering mode.
+ */
+void input_DecoderStopBuffering( decoder_t * );
 
 /**
  * This function returns true if the decoder fifo is empty and false otherwise.

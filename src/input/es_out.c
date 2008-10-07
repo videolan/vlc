@@ -533,9 +533,13 @@ void input_EsOutChangePosition( es_out_t *out )
          * there is a discontinuity */
         if( es->p_dec )
         {
-            input_DecoderFlush( es->p_dec );
+            input_DecoderStartBuffering( es->p_dec );
+            input_DecoderStopBuffering( es->p_dec );
             if( es->p_dec_record )
-                input_DecoderFlush( es->p_dec_record );
+            {
+                input_DecoderStartBuffering( es->p_dec_record );
+                input_DecoderStopBuffering( es->p_dec_record );
+            }
         }
     }
 

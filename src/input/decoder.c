@@ -53,8 +53,9 @@ static decoder_t *CreateDecoder( input_thread_t *, es_format_t *, int, sout_inst
 static void       DeleteDecoder( decoder_t * );
 
 static void      *DecoderThread( vlc_object_t * );
-static int        DecoderProcess( decoder_t * p_dec, block_t *p_block );
-static void       DecoderOutputChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date );
+static int        DecoderProcess( decoder_t *, block_t * );
+static void       DecoderOutputChangePause( decoder_t *, bool b_paused, mtime_t i_date );
+static void       DecoderFlush( decoder_t * );
 
 /* Buffers allocation callbacks for the decoders */
 static aout_buffer_t *aout_new_buffer( decoder_t *, int );
@@ -489,43 +490,19 @@ void input_DecoderChangeDelay( decoder_t *p_dec, mtime_t i_delay )
     vlc_mutex_unlock( &p_owner->lock );
 }
 
-void input_DecoderFlush( decoder_t *p_dec )
+void input_DecoderStartBuffering( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    block_t *p_null;
 
-    if( p_owner->b_own_thread )
-    {
-        /* Empty the fifo */
-        block_FifoEmpty( p_owner->p_fifo );
+    vlc_mutex_lock( &p_owner->lock );
 
-        /* Monitor for flush end */
-        vlc_mutex_lock( &p_owner->lock );
-        p_owner->b_flushing = true;
-        vlc_cond_signal( &p_owner->wait );
-        vlc_mutex_unlock( &p_owner->lock );
-    }
+    DecoderFlush( p_dec );
 
-    /* Send a special block */
-    p_null = block_New( p_dec, 128 );
-    if( !p_null )
-        return;
-    p_null->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-    p_null->i_flags |= BLOCK_FLAG_CORE_FLUSH;
-    if( !p_dec->fmt_in.b_packetized )
-        p_null->i_flags |= BLOCK_FLAG_CORRUPTED;
-    memset( p_null->p_buffer, 0, p_null->i_buffer );
+    vlc_mutex_unlock( &p_owner->lock );
+}
 
-    input_DecoderDecode( p_dec, p_null );
-
-    /* */
-    if( p_owner->b_own_thread )
-    {
-        vlc_mutex_lock( &p_owner->lock );
-        while( p_owner->b_flushing )
-            vlc_cond_wait( &p_owner->wait, &p_owner->lock );
-        vlc_mutex_unlock( &p_owner->lock );
-    }
+void input_DecoderStopBuffering( decoder_t *p_dec )
+{
 }
 
 /**
@@ -713,6 +690,43 @@ static void *DecoderThread( vlc_object_t *p_this )
     module_unneed( p_dec, p_dec->p_module );
     vlc_restorecancel( canc );
     return NULL;
+}
+
+static void DecoderFlush( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    block_t *p_null;
+
+    if( p_owner->b_own_thread )
+    {
+         vlc_assert_locked( &p_owner->lock );
+
+        /* Empty the fifo */
+        block_FifoEmpty( p_owner->p_fifo );
+
+        /* Monitor for flush end */
+        p_owner->b_flushing = true;
+        vlc_cond_signal( &p_owner->wait );
+    }
+
+    /* Send a special block */
+    p_null = block_New( p_dec, 128 );
+    if( !p_null )
+        return;
+    p_null->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    p_null->i_flags |= BLOCK_FLAG_CORE_FLUSH;
+    if( !p_dec->fmt_in.b_packetized )
+        p_null->i_flags |= BLOCK_FLAG_CORRUPTED;
+    memset( p_null->p_buffer, 0, p_null->i_buffer );
+
+    input_DecoderDecode( p_dec, p_null );
+
+    /* */
+    if( p_owner->b_own_thread )
+    {
+        while( p_owner->b_flushing )
+            vlc_cond_wait( &p_owner->wait, &p_owner->lock );
+    }
 }
 
 static void DecoderWaitUnpause( decoder_t *p_dec, bool *pb_reject )
