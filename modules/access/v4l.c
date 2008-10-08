@@ -47,6 +47,7 @@
 #include <sys/mman.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <arpa/inet.h>
 
 /* From GStreamer's v4l plugin:
  * Because of some really cool feature in video4linux1, also known as
