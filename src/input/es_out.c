@@ -1737,7 +1737,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     /* We don't try to reselect */
     if( es->p_dec )
     {
-        while( !out->p_sys->p_input->b_die && es->p_dec )
+        while( !p_sys->p_input->b_die && !p_sys->b_buffering && es->p_dec )
         {
             if( input_DecoderIsEmpty( es->p_dec ) &&
                 ( !es->p_dec_record || input_DecoderIsEmpty( es->p_dec_record ) ))

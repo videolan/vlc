@@ -394,8 +394,8 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
 
 bool input_DecoderIsEmpty( decoder_t * p_dec )
 {
-    /* FIXME it is buggy if the decoder is buffering FIXME
-     * -> "deadlock" */
+    assert( !p_dec->p_owner->b_buffering );
+
     if( p_dec->p_owner->b_own_thread &&
         block_FifoCount( p_dec->p_owner->p_fifo ) > 0 )
     {
