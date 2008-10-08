@@ -179,6 +179,7 @@ static int Demux( demux_t *p_demux )
                                     _("VLC failed to load the ASF header.") );
                     return 0;
                 }
+                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 continue;
             }
         }
@@ -203,7 +204,7 @@ static int Demux( demux_t *p_demux )
     p_sys->i_time = GetMoviePTS( p_sys );
     if( p_sys->i_time >= 0 )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time+1 );
     }
 
     return 1;
@@ -346,6 +347,7 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
         {
             if( i_time < 0 ) i_time = tk->i_time;
             else i_time = __MIN( i_time, tk->i_time );
+            break;
         }
     }
 
@@ -579,6 +581,9 @@ static int DemuxPacket( demux_t *p_demux )
             {
                 /* send complete packet to decoder */
                 block_t *p_gather = block_ChainGather( tk->p_frame );
+
+                if( p_sys->i_time < 0 )
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, tk->i_time );
 
                 es_out_Send( p_demux->out, tk->p_es, p_gather );
 
@@ -1013,8 +1018,6 @@ static int DemuxInit( demux_t *p_demux )
         }
     }
 #endif
-
-    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
     return VLC_SUCCESS;
 
 error:
