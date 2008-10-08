@@ -382,7 +382,7 @@ module_t **module_list_get (size_t *n)
 typedef struct module_list_t
 {
     module_t *p_module;
-    uint16_t i_score;
+    int16_t  i_score;
     bool     b_force;
 } module_list_t;
 
