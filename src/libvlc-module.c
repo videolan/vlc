@@ -1019,10 +1019,6 @@ static const char *const ppsz_clock_descriptions[] =
     "priorities. You can use it to tune VLC priority against other " \
     "programs, or against other VLC instances.")
 
-#define MINIMIZE_THREADS_TEXT N_("Minimize number of threads")
-#define MINIMIZE_THREADS_LONGTEXT N_( \
-     "This option minimizes the number of threads needed to run VLC.")
-
 #define USE_STREAM_IMMEDIATE N_("(Experimental) Don't do caching at the access level.")
 #define USE_STREAM_IMMEDIATE_LONGTEXT N_( \
      "This option is useful if you want to lower the latency when " \
@@ -1872,9 +1868,7 @@ vlc_module_begin();
         change_need_restart();
 
     set_section( N_("Performance options"), NULL );
-    add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
-              MINIMIZE_THREADS_LONGTEXT, true );
-        change_need_restart();
+    add_obsolete_bool( "minimize-threads" );
 
     add_bool( "use-stream-immediate", false, NULL,
                USE_STREAM_IMMEDIATE, USE_STREAM_IMMEDIATE_LONGTEXT, true );

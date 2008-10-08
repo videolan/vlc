@@ -77,8 +77,6 @@ static es_format_t null_es_format;
 
 struct decoder_owner_sys_t
 {
-    bool      b_own_thread;
-
     int64_t         i_preroll_end;
 
     input_thread_t  *p_input;
@@ -212,8 +210,8 @@ int decoder_GetDisplayRate( decoder_t *p_dec )
 decoder_t *input_DecoderNew( input_thread_t *p_input,
                              es_format_t *fmt, input_clock_t *p_clock, sout_instance_t *p_sout  )
 {
-    decoder_t   *p_dec = NULL;
-    vlc_value_t val;
+    decoder_t *p_dec = NULL;
+    int i_priority;
 
 #ifndef ENABLE_SOUT
     (void)b_force_decoder;
@@ -256,35 +254,20 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
 
     p_dec->p_owner->p_clock = p_clock;
 
-    if( p_sout && p_sout == p_input->p->p_sout && p_input->p->input.b_can_pace_control )
-    {
-        msg_Dbg( p_input, "stream out mode -> no decoder thread" );
-        p_dec->p_owner->b_own_thread = false;
-    }
+    if( fmt->i_cat == AUDIO_ES )
+        i_priority = VLC_THREAD_PRIORITY_AUDIO;
     else
-    {
-        var_Get( p_input, "minimize-threads", &val );
-        p_dec->p_owner->b_own_thread = !val.b_bool;
-    }
+        i_priority = VLC_THREAD_PRIORITY_VIDEO;
 
-    if( p_dec->p_owner->b_own_thread )
+    /* Spawn the decoder thread */
+    if( vlc_thread_create( p_dec, "decoder", DecoderThread,
+                           i_priority, false ) )
     {
-        int i_priority;
-        if( fmt->i_cat == AUDIO_ES )
-            i_priority = VLC_THREAD_PRIORITY_AUDIO;
-        else
-            i_priority = VLC_THREAD_PRIORITY_VIDEO;
-
-        /* Spawn the decoder thread */
-        if( vlc_thread_create( p_dec, "decoder", DecoderThread,
-                               i_priority, false ) )
-        {
-            msg_Err( p_dec, "cannot spawn decoder thread" );
-            module_unneed( p_dec, p_dec->p_module );
-            DeleteDecoder( p_dec );
-            vlc_object_release( p_dec );
-            return NULL;
-        }
+        msg_Err( p_dec, "cannot spawn decoder thread" );
+        module_unneed( p_dec, p_dec->p_module );
+        DeleteDecoder( p_dec );
+        vlc_object_release( p_dec );
+        return NULL;
     }
 
     return p_dec;
@@ -303,33 +286,23 @@ void input_DecoderDelete( decoder_t *p_dec )
 
     vlc_object_kill( p_dec );
 
-    if( p_owner->b_own_thread )
+    /* Make sure we aren't paused anymore */
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->b_paused || p_owner->b_buffering )
     {
-        /* Make sure we aren't paused anymore */
-        vlc_mutex_lock( &p_owner->lock );
-        if( p_owner->b_paused || p_owner->b_buffering )
-        {
-            p_owner->b_paused = false;
-            p_owner->b_buffering = false;
-            vlc_cond_signal( &p_owner->wait );
-        }
-        vlc_mutex_unlock( &p_owner->lock );
-
-        /* Make sure the thread leaves the function */
-        block_FifoWake( p_owner->p_fifo );
-
-        vlc_thread_join( p_dec );
-
-        /* Don't module_unneed() here because of the dll loader that wants
-         * close() in the same thread than open()/decode() */
+        p_owner->b_paused = false;
+        p_owner->b_buffering = false;
+        vlc_cond_signal( &p_owner->wait );
     }
-    else
-    {
-        /* Flush */
-        input_DecoderDecode( p_dec, NULL );
+    vlc_mutex_unlock( &p_owner->lock );
 
-        module_unneed( p_dec, p_dec->p_module );
-    }
+    /* Make sure the thread leaves the function */
+    block_FifoWake( p_owner->p_fifo );
+
+    vlc_thread_join( p_dec );
+
+    /* Don't module_unneed() here because of the dll loader that wants
+     * close() in the same thread than open()/decode() */
 
     /* */
     if( p_dec->p_owner->cc.b_supported )
@@ -352,56 +325,37 @@ void input_DecoderDelete( decoder_t *p_dec )
  * \param p_dec the decoder object
  * \param p_block the data block
  */
-void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
+void input_DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    if( p_owner->b_own_thread )
+    if( p_owner->p_input->p->b_out_pace_control )
     {
-        if( p_owner->p_input->p->b_out_pace_control )
+        /* FIXME !!!!! */
+        while( vlc_object_alive( p_dec ) && !p_dec->b_error &&
+               block_FifoCount( p_owner->p_fifo ) > 10 )
         {
-            /* FIXME !!!!! */
-            while( vlc_object_alive( p_dec ) && !p_dec->b_error &&
-                   block_FifoCount( p_owner->p_fifo ) > 10 )
-            {
-                msleep( 1000 );
-            }
+            msleep( 1000 );
         }
-        else if( block_FifoSize( p_owner->p_fifo ) > 50000000 /* 50 MB */ )
-        {
-            /* FIXME: ideally we would check the time amount of data
-             * in the fifo instead of its size. */
-            msg_Warn( p_dec, "decoder/packetizer fifo full (data not "
-                      "consumed quickly enough), resetting fifo!" );
-            block_FifoEmpty( p_owner->p_fifo );
-        }
+    }
+    else if( block_FifoSize( p_owner->p_fifo ) > 50000000 /* 50 MB */ )
+    {
+        /* FIXME: ideally we would check the time amount of data
+         * in the fifo instead of its size. */
+        msg_Warn( p_dec, "decoder/packetizer fifo full (data not "
+                  "consumed quickly enough), resetting fifo!" );
+        block_FifoEmpty( p_owner->p_fifo );
+    }
 
-        block_FifoPut( p_owner->p_fifo, p_block );
-    }
-    else
-    {
-        if( p_dec->b_error || ( p_block && p_block->i_buffer <= 0 ) )
-        {
-            if( p_block )
-                block_Release( p_block );
-        }
-        else
-        {
-            DecoderProcess( p_dec, p_block );
-        }
-    }
+    block_FifoPut( p_owner->p_fifo, p_block );
 }
 
 bool input_DecoderIsEmpty( decoder_t * p_dec )
 {
     assert( !p_dec->p_owner->b_buffering );
 
-    if( p_dec->p_owner->b_own_thread &&
-        block_FifoCount( p_dec->p_owner->p_fifo ) > 0 )
-    {
-        return false;
-    }
-    return true;
+    /* FIXME that's not really true */
+    return block_FifoCount( p_dec->p_owner->p_fifo ) <= 0;
 }
 
 void input_DecoderIsCcPresent( decoder_t *p_dec, bool pb_present[4] )
@@ -496,12 +450,13 @@ void input_DecoderChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
     vlc_mutex_lock( &p_owner->lock );
 
     assert( !p_owner->b_paused || !b_paused );
+
     p_owner->b_paused = b_paused;
     p_owner->pause.i_date = i_date;
-    if( p_owner->b_own_thread )
-        vlc_cond_signal( &p_owner->wait );
+    vlc_cond_signal( &p_owner->wait );
 
     DecoderOutputChangePause( p_dec, b_paused, i_date );
+
     vlc_mutex_unlock( &p_owner->lock );
 }
 
@@ -626,7 +581,6 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         vlc_object_release( p_dec );
         return NULL;
     }
-    p_dec->p_owner->b_own_thread = true;
     p_dec->p_owner->i_preroll_end = -1;
     p_dec->p_owner->i_last_rate = INPUT_RATE_DEFAULT;
     p_dec->p_owner->p_input = p_input;
@@ -795,17 +749,14 @@ static void DecoderFlush( decoder_t *p_dec )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     block_t *p_null;
 
-    if( p_owner->b_own_thread )
-    {
-         vlc_assert_locked( &p_owner->lock );
+    vlc_assert_locked( &p_owner->lock );
 
-        /* Empty the fifo */
-        block_FifoEmpty( p_owner->p_fifo );
+    /* Empty the fifo */
+    block_FifoEmpty( p_owner->p_fifo );
 
-        /* Monitor for flush end */
-        p_owner->b_flushing = true;
-        vlc_cond_signal( &p_owner->wait );
-    }
+    /* Monitor for flush end */
+    p_owner->b_flushing = true;
+    vlc_cond_signal( &p_owner->wait );
 
     /* Send a special block */
     p_null = block_New( p_dec, 128 );
@@ -820,11 +771,8 @@ static void DecoderFlush( decoder_t *p_dec )
     input_DecoderDecode( p_dec, p_null );
 
     /* */
-    if( p_owner->b_own_thread )
-    {
-        while( vlc_object_alive( p_dec ) && p_owner->b_flushing )
-            vlc_cond_wait( &p_owner->wait, &p_owner->lock );
-    }
+    while( vlc_object_alive( p_dec ) && p_owner->b_flushing )
+        vlc_cond_wait( &p_owner->wait, &p_owner->lock );
 }
 
 static void DecoderSignalFlushed( decoder_t *p_dec )
@@ -1598,7 +1546,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 
             p_sout_block->p_next = NULL;
 
-            DecoderPlaySout( p_dec, p_block, b_telx );
+            DecoderPlaySout( p_dec, p_sout_block, b_telx );
 
             p_sout_block = p_next;
         }
