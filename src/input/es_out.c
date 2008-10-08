@@ -140,6 +140,9 @@ struct es_out_sys_t
     /* Rate used for clock */
     int         i_rate;
 
+    /* Used for buffering */
+    bool        b_buffering;
+
     /* Record */
     sout_instance_t *p_sout_record;
 };
@@ -155,6 +158,10 @@ static void         EsOutAddInfo( es_out_t *, es_out_id_t *es );
 static bool EsIsSelected( es_out_id_t *es );
 static void EsSelect( es_out_t *out, es_out_id_t *es );
 static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update );
+static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es );
+static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_date );
+static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_date );
+static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced );
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
 static char **LanguageSplit( const char *psz_langs );
@@ -274,6 +281,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 
     p_sys->i_rate = i_rate;
 
+    p_sys->b_buffering = true;
+
     p_sys->p_sout_record = NULL;
 
     return out;
@@ -360,57 +369,15 @@ mtime_t input_EsOutGetWakeup( es_out_t *out )
         return 0;
 
     /* We do not have a wake up date if the input cannot have its speed
-     * controlled or sout is imposing its own */
-    if( !p_input->b_can_pace_control || p_input->p->b_out_pace_control )
+     * controlled or sout is imposing its own or while buffering
+     *
+     * FIXME for !p_input->b_can_pace_control a wkeup time is still needed to avoid too strong buffering */
+    if( !p_input->b_can_pace_control ||
+        p_input->p->b_out_pace_control ||
+        p_sys->b_buffering )
         return 0;
 
     return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
-}
-
-static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
-{
-    es_out_sys_t *p_sys = out->p_sys;
-
-    /* Pause decoders first */
-    for( int i = 0; i < p_sys->i_es; i++ )
-    {
-        es_out_id_t *es = p_sys->es[i];
-
-        /* Send a dummy block to let decoder know that
-         * there is a discontinuity */
-        if( es->p_dec )
-        {
-            input_DecoderChangePause( es->p_dec, b_paused, i_date );
-            if( es->p_dec_record )
-                input_DecoderChangePause( es->p_dec_record, b_paused, i_date );
-        }
-    }
-}
-static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
-{
-    es_out_sys_t *p_sys = out->p_sys;
-
-    for( int i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_ChangePause( p_sys->pgrm[i]->p_clock, b_paused, i_date );
-}
-
-static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
-{
-    es_out_sys_t *p_sys = out->p_sys;
-
-    mtime_t i_delay = 0;
-    if( p_es->fmt.i_cat == AUDIO_ES )
-        i_delay = p_sys->i_audio_delay;
-    else if( p_es->fmt.i_cat == SPU_ES )
-        i_delay = p_sys->i_spu_delay;
-
-    if( i_delay != 0 )
-    {
-        if( p_es->p_dec )
-            input_DecoderChangeDelay( p_es->p_dec, i_delay );
-        if( p_es->p_dec_record )
-            input_DecoderChangeDelay( p_es->p_dec, i_delay );
-    }
 }
 
 void input_EsOutChangeRate( es_out_t *out, int i_rate )
@@ -473,6 +440,8 @@ int input_EsOutSetRecord(  es_out_t *out, bool b_record )
                 continue;
 
             p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
+            if( p_es->p_dec_record && p_sys->b_buffering )
+                input_DecoderStartBuffering( p_es->p_dec_record );
         }
     }
     else
@@ -527,29 +496,34 @@ void input_EsOutChangePosition( es_out_t *out )
 
     for( int i = 0; i < p_sys->i_es; i++ )
     {
-        es_out_id_t *es = p_sys->es[i];
+        es_out_id_t *p_es = p_sys->es[i];
 
-        /* Send a dummy block to let decoder know that
-         * there is a discontinuity */
-        if( es->p_dec )
-        {
-            input_DecoderStartBuffering( es->p_dec );
-            input_DecoderStopBuffering( es->p_dec );
-            if( es->p_dec_record )
-            {
-                input_DecoderStartBuffering( es->p_dec_record );
-                input_DecoderStopBuffering( es->p_dec_record );
-            }
-        }
+        if( !p_es->p_dec )
+            continue;
+
+        input_DecoderStartBuffering( p_es->p_dec );
+
+        if( p_es->p_dec_record )
+            input_DecoderStartBuffering( p_es->p_dec );
     }
 
-    es_out_Control( out, ES_OUT_RESET_PCR );
+    for( int i = 0; i < p_sys->i_pgrm; i++ )
+        input_clock_Reset( p_sys->pgrm[i]->p_clock );
+
+    p_sys->b_buffering = true;
 }
 
 bool input_EsOutDecodersEmpty( es_out_t *out )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     int i;
+
+    if( p_sys->b_buffering && p_sys->p_pgrm )
+    {
+        EsOutDecodersStopBuffering( out, true );
+        if( p_sys->b_buffering )
+            return true;
+    }
 
     for( i = 0; i < p_sys->i_es; i++ )
     {
@@ -566,6 +540,111 @@ bool input_EsOutDecodersEmpty( es_out_t *out )
 /*****************************************************************************
  *
  *****************************************************************************/
+static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+    int i_ret;
+
+    mtime_t i_stream_start;
+    mtime_t i_system_start;
+    mtime_t i_stream_duration;
+    mtime_t i_system_duration;
+    i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+                                  &i_stream_start, &i_system_start,
+                                  &i_stream_duration, &i_system_duration );
+    assert( !i_ret || b_forced );
+    if( i_ret )
+        return;
+
+    if( i_stream_duration <= p_sys->p_input->i_pts_delay && !b_forced )
+    {
+        msg_Dbg( p_sys->p_input, "Buffering %d%%", (int)(100 * i_stream_duration / p_sys->p_input->i_pts_delay) );
+        return;
+    }
+
+    msg_Dbg( p_sys->p_input, "Stream buffering done (%d ms in %d ms)",
+              (int)(i_stream_duration/1000), (int)(i_system_duration/1000) );
+    p_sys->b_buffering = false;
+
+    const mtime_t i_decoder_buffering_start = mdate();
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *p_es = p_sys->es[i];
+
+        if( !p_es->p_dec )
+            continue;
+        input_DecoderWaitBuffering( p_es->p_dec );
+        if( p_es->p_dec_record )
+            input_DecoderWaitBuffering( p_es->p_dec_record );
+    }
+
+    msg_Dbg( p_sys->p_input, "Decoder buffering done in %d ms",
+              (int)(mdate() - i_decoder_buffering_start)/1000 );
+
+    const mtime_t i_ts_delay = 10*1000 + /* FIXME CLEANUP thread wake up time*/
+                               mdate();
+    //msg_Dbg( p_sys->p_input, "==> %lld", i_ts_delay - p_sys->p_input->i_pts_delay );
+    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_clock, i_ts_delay - p_sys->p_input->i_pts_delay );
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *p_es = p_sys->es[i];
+
+        if( !p_es->p_dec )
+            continue;
+
+        input_DecoderStopBuffering( p_es->p_dec );
+        if( p_es->p_dec_record )
+            input_DecoderStopBuffering( p_es->p_dec );
+    }
+}
+static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    /* Pause decoders first */
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *es = p_sys->es[i];
+
+        /* Send a dummy block to let decoder know that
+         * there is a discontinuity */
+        if( es->p_dec )
+        {
+            input_DecoderChangePause( es->p_dec, b_paused, i_date );
+            if( es->p_dec_record )
+                input_DecoderChangePause( es->p_dec_record, b_paused, i_date );
+        }
+    }
+}
+static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    for( int i = 0; i < p_sys->i_pgrm; i++ )
+        input_clock_ChangePause( p_sys->pgrm[i]->p_clock, b_paused, i_date );
+}
+
+static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    mtime_t i_delay = 0;
+    if( p_es->fmt.i_cat == AUDIO_ES )
+        i_delay = p_sys->i_audio_delay;
+    else if( p_es->fmt.i_cat == SPU_ES )
+        i_delay = p_sys->i_spu_delay;
+
+    if( i_delay != 0 )
+    {
+        if( p_es->p_dec )
+            input_DecoderChangeDelay( p_es->p_dec, i_delay );
+        if( p_es->p_dec_record )
+            input_DecoderChangeDelay( p_es->p_dec, i_delay );
+    }
+}
+
+
 static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, const char *psz_language,
                                      bool b_delete )
 {
@@ -1205,8 +1284,18 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     input_thread_t *p_input = p_sys->p_input;
 
     p_es->p_dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_input->p->p_sout );
-    if( p_es->p_dec && !p_es->p_master && p_sys->p_sout_record )
-        p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
+    if( p_es->p_dec )
+    {
+        if( p_sys->b_buffering )
+            input_DecoderStartBuffering( p_es->p_dec );
+
+        if( !p_es->p_master && p_sys->p_sout_record )
+        {
+            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
+            if( p_es->p_dec_record && p_sys->b_buffering )
+                input_DecoderStartBuffering( p_es->p_dec_record );
+        }
+    }
 
     EsOutDecoderChangeDelay( out, p_es );
 }
@@ -1917,12 +2006,16 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
              * TODO do not use mdate() but proper stream acquisition date */
             input_clock_Update( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
                                 p_sys->p_input->b_can_pace_control, i_pcr, mdate() );
+            /* Check buffering state on master clock update */
+            if( p_sys->b_buffering && p_pgrm == p_sys->p_pgrm )
+                EsOutDecodersStopBuffering( out, false );
+
             return VLC_SUCCESS;
         }
 
         case ES_OUT_RESET_PCR:
-            for( i = 0; i < p_sys->i_pgrm; i++ )
-                input_clock_Reset( p_sys->pgrm[i]->p_clock );
+            msg_Err( p_sys->p_input, "ES_OUT_RESET_PCR called" );
+            input_EsOutChangePosition( out );
             return VLC_SUCCESS;
 
         case ES_OUT_GET_TS:

@@ -52,6 +52,11 @@ void input_DecoderChangeDelay( decoder_t *, mtime_t i_delay );
 void input_DecoderStartBuffering( decoder_t * );
 
 /**
+ * This function waits for the decoder to have buffered sufficient data.
+ */
+void input_DecoderWaitBuffering( decoder_t * );
+
+/**
  * This function stops the buffering mode.
  */
 void input_DecoderStopBuffering( decoder_t * );

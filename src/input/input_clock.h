@@ -76,6 +76,13 @@ void    input_clock_ChangeRate( input_clock_t *, int i_rate );
 void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date );
 
 /**
+ * This function allows to rebase the original system value date.
+ * It can be called only imediatly after a input_clock_Update call.
+ * FIXME ugly
+ */
+void    input_clock_ChangeSystemOrigin( input_clock_t *, mtime_t i_system );
+
+/**
  * This function converts a timestamp from stream clock to system clock.
  *
  * If pi_rate is provided it will be field with the rate value used for
@@ -87,6 +94,14 @@ mtime_t input_clock_GetTS( input_clock_t *, int *pi_rate, mtime_t i_pts_delay, m
  * This function returns the current rate.
  */
 int input_clock_GetRate( input_clock_t * );
+
+/**
+ * This function returns current clock state or VLC_EGENERIC if there is not a
+ * reference point.
+ */
+int input_clock_GetState( input_clock_t *,
+                          mtime_t *pi_stream_start, mtime_t *pi_system_start,
+                          mtime_t *pi_stream_duration, mtime_t *pi_system_duration );
 
 #endif
 
