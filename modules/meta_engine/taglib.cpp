@@ -409,7 +409,8 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
         }
     }
 
-#define SET( foo, bar ) vlc_meta_Set##foo( p_meta, p_tag->bar ().toCString(true))
+#define SET( foo, bar ) if( !p_tag->bar ().isNull() && !p_tag->bar ().isEmpty() ) \
+        vlc_meta_Set##foo( p_meta, p_tag->bar ().toCString(true))
 #define SETINT( foo, bar ) { \
         char psz_tmp[10]; \
         snprintf( (char*)psz_tmp, 10, "%d", p_tag->bar() ); \
