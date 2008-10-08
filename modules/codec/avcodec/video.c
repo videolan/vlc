@@ -590,8 +590,11 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_pts = p_sys->p_ff_pic->pts;
 
         /* Update frame late count (except when doing preroll) */
-        if( p_sys->i_pts && decoder_GetDisplayDate(p_dec, p_sys->i_pts) <= mdate() &&
-            !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
+        mtime_t i_display_date = 0;
+        if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
+            i_display_date = decoder_GetDisplayDate( p_dec, p_sys->i_pts );
+        i_display_date = 0;
+        if( i_display_date > 0 && i_display_date <= mdate() )
         {
             p_sys->i_late_frames++;
             if( p_sys->i_late_frames == 1 )

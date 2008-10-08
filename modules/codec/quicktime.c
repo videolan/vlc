@@ -573,7 +573,12 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->i_out_frames <= 0 )
     {
         p_sys->pts = p_block->i_pts;
-        if( decoder_GetDisplayDate( p_dec, p_block->i_pts ) < mdate() )
+
+        mtime_t i_display_date = 0;
+        if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
+            i_display_date = decoder_GetDisplayDate( p_dec, p_block->i_pts );
+
+        if( i_display_date > 0 && i_display_date < mdate() )
         {
             block_Release( p_block );
             *pp_block = NULL;
@@ -894,7 +899,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
  
     i_pts = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
 
-    if( decoder_GetDisplayDate( p_dec, i_pts ) < mdate() )
+    mtime_t i_display_date = 0;
+    if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
+        i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
+
+    if( i_display_date > 0 && i_display_date < mdate() )
     {
         p_sys->i_late++;
     }

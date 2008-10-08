@@ -185,8 +185,14 @@ mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    if( !p_owner->p_clock )
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->b_buffering )
+        i_ts = 0;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if( !p_owner->p_clock || !i_ts )
         return i_ts;
+
     return input_clock_GetTS( p_owner->p_clock, NULL, p_owner->p_input->i_pts_delay, i_ts );
 }
 /* decoder_GetDisplayRate:
