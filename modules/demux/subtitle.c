@@ -1902,7 +1902,10 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         const char *s = TextGetLine( txt );
 
         if( !s )
+        {
+            free( psz_text );
             return VLC_EGENERIC;
+        }
 
         int i_len = strlen( s );
         if( i_len == 0 ) break;
