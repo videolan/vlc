@@ -96,16 +96,13 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
             (float*)p_buffer->p_buffer;
 
     int16_t  *p_buffs;                    /* int16_t converted buffer */
-    int16_t  *p_s16_buff = NULL;                /* int16_t converted buffer */
+    int16_t  *p_s16_buff;                 /* int16_t converted buffer */
 
-    p_s16_buff = (int16_t*)malloc(
+    p_s16_buff = malloc(
               p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t));
 
     if( !p_s16_buff )
-    {
-        msg_Err(p_aout,"out of memory");
         return -1;
-    }
 
     p_buffs = p_s16_buff;
     i_nb_bands = config_GetInt ( p_aout, "visual-nbbands" );
@@ -125,10 +122,10 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
     if( !p_effect->p_data )
     {
-        p_effect->p_data=(void *)malloc(i_nb_bands * sizeof(int) );
+        p_effect->p_data = malloc(i_nb_bands * sizeof(int) );
         if( !p_effect->p_data)
         {
-            msg_Err(p_aout,"out of memory");
+            free( p_s16_buff );
             return -1;
         }
         peaks = (int *)p_effect->p_data;
@@ -144,10 +141,10 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     }
 
 
-    height = (int *)malloc( i_nb_bands * sizeof(int) );
-    if( !height)
+    height = malloc( i_nb_bands * sizeof(int) );
+    if( !height )
     {
-        msg_Err(p_aout,"out of memory");
+        free( p_s16_buff );
         return -1;
     }
     /* Convert the buffer to int16_t  */
@@ -165,6 +162,8 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     p_state  = visual_fft_init();
     if( !p_state)
     {
+        free( height );
+        free( p_s16_buff );
         msg_Err(p_aout,"unable to initialize FFT transform");
         return -1;
     }
