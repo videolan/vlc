@@ -108,7 +108,7 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     libvlc_int_t *p_libvlc_int = libvlc_InternalCreate();
     if( !p_libvlc_int ) RAISENULL( "VLC initialization failed" );
 
-    p_new = (libvlc_instance_t *)malloc( sizeof( libvlc_instance_t ) );
+    p_new = malloc( sizeof( libvlc_instance_t ) );
     if( !p_new ) RAISENULL( "Out of memory" );
 
     const char *my_argv[argc + 2];
@@ -121,11 +121,17 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     /** \todo Look for interface settings. If we don't have any, add -I dummy */
     /* Because we probably don't want a GUI by default */
 
-    i_ret=libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv );
+    i_ret = libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv );
     if( i_ret == VLC_EEXITSUCCESS )
-            return NULL;
+    {
+        free( p_new );
+        return NULL;
+    }
     else if( i_ret != 0 )
+    {
+        free( p_new );
         RAISENULL( "VLC initialization failed" );
+    }
 
     p_new->p_libvlc_int = p_libvlc_int;
     p_new->p_vlm = NULL;
