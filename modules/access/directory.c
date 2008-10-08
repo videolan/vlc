@@ -353,6 +353,9 @@ static block_t *Block (access_t *p_access)
                 if (type + extlen == end
                  && !strncasecmp (ext, type, extlen))
                     return NULL;
+
+                if (*end == '\0')
+                    break;
             }
         }
     }
