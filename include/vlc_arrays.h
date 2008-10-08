@@ -405,30 +405,31 @@ static inline uint64_t DictHash( const char *psz_string, int hashsize )
     return i_hash % hashsize;
 }
 
-struct vlc_dictionary_entry_t
+typedef struct vlc_dictionary_entry_t
 {
     char *   psz_key;
     void *   p_value;
     struct vlc_dictionary_entry_t * p_next;
-};
+} vlc_dictionary_entry_t;
 
 typedef struct vlc_dictionary_t
 {
     int i_size;
-    struct vlc_dictionary_entry_t ** p_entries;
+    vlc_dictionary_entry_t ** p_entries;
 } vlc_dictionary_t;
 
 static void * const kVLCDictionaryNotFound = NULL;
 
 static inline void vlc_dictionary_init( vlc_dictionary_t * p_dict, int i_size )
 {
+    p_dict->p_entries = NULL;
+
     if( i_size > 0 )
     {
-        p_dict->p_entries = (struct vlc_dictionary_entry_t **)malloc(sizeof(struct vlc_dictionary_entry_t *) * i_size);
-        memset( p_dict->p_entries, 0, sizeof(struct vlc_dictionary_entry_t *) * i_size );
+        p_dict->p_entries = (vlc_dictionary_entry_t **)calloc( i_size, sizeof(*p_dict->p_entries) );
+        if( !p_dict->p_entries )
+            i_size = 0;
     }
-    else
-        p_dict->p_entries = NULL;
     p_dict->i_size = i_size;
 }
 
@@ -436,12 +437,11 @@ static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict,
                                          void ( * pf_free )( void * p_data, void * p_obj ),
                                          void * p_obj )
 {
-    int i;
-    struct vlc_dictionary_entry_t * p_current, * p_next;
     if( p_dict->p_entries )
     {
-        for( i = 0; i < p_dict->i_size; i++ )
+        for( int i = 0; i < p_dict->i_size; i++ )
         {
+            vlc_dictionary_entry_t * p_current, * p_next;
             p_current = p_dict->p_entries[i];
             while( p_current )
             {
@@ -468,7 +468,7 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
         return kVLCDictionaryNotFound;
 
     int i_pos = DictHash( psz_key, p_dict->i_size );
-    struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
+    vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
 
     if( !p_entry )
         return kVLCDictionaryNotFound;
@@ -486,7 +486,7 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
 static inline int
 vlc_dictionary_keys_count( const vlc_dictionary_t * p_dict )
 {
-    struct vlc_dictionary_entry_t * p_entry;
+    vlc_dictionary_entry_t * p_entry;
     int i, count = 0;
 
     if( !p_dict->p_entries )
@@ -502,7 +502,7 @@ vlc_dictionary_keys_count( const vlc_dictionary_t * p_dict )
 static inline char **
 vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
 {
-    struct vlc_dictionary_entry_t * p_entry;
+    vlc_dictionary_entry_t * p_entry;
     char ** ppsz_ret;
     int i, count = vlc_dictionary_keys_count( p_dict );
 
@@ -526,9 +526,9 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
         vlc_dictionary_init( p_dict, 1 );
 
     int i_pos = DictHash( psz_key, p_dict->i_size );
-    struct vlc_dictionary_entry_t * p_entry;
+    vlc_dictionary_entry_t * p_entry;
 
-    p_entry = (struct vlc_dictionary_entry_t *)malloc(sizeof(struct vlc_dictionary_entry_t));
+    p_entry = (vlc_dictionary_entry_t *)malloc(sizeof(*p_entry));
     p_entry->psz_key = strdup( psz_key );
     p_entry->p_value = p_value;
     p_entry->p_next = p_dict->p_entries[i_pos];
@@ -537,7 +537,8 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
     {
         /* Count how many items there was */
         int count;
-        for( count = 1; p_entry->p_next; count++ ) p_entry = p_entry->p_next;
+        for( count = 1; p_entry->p_next; count++ )
+            p_entry = p_entry->p_next;
         if( count > 3 ) /* XXX: this need tuning */
         {
             /* Here it starts to be not good, rebuild a bigger dictionary */
@@ -552,7 +553,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
                 {
                     __vlc_dictionary_insert( &new_dict, p_entry->psz_key,
                                              p_entry->p_value,
-                                             0 /* To avoid multiple rebuild loop */);
+                                             false /* To avoid multiple rebuild loop */);
                     p_entry = p_entry->p_next;
                 }
             }
@@ -567,7 +568,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
 static inline void
 vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p_value )
 {
-    __vlc_dictionary_insert( p_dict, psz_key, p_value, 1 );
+    __vlc_dictionary_insert( p_dict, psz_key, p_value, true );
 }
 
 static inline void
@@ -579,8 +580,8 @@ vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char
         return;
 
     int i_pos = DictHash( psz_key, p_dict->i_size );
-    struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
-    struct vlc_dictionary_entry_t * p_prev;
+    vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
+    vlc_dictionary_entry_t * p_prev;
 
     if( !p_entry )
         return; /* Not found, nothing to do */
