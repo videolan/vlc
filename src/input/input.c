@@ -257,7 +257,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
             psz_parser = val.psz_string;
             while( (psz_start = strchr( psz_parser, '{' ) ) )
             {
-                 seekpoint_t *p_seekpoint = vlc_seekpoint_New();
+                 seekpoint_t *p_seekpoint;
                  char backup;
                  psz_start++;
                  psz_end = strchr( psz_start, '}' );
@@ -266,6 +266,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                  backup = *psz_parser;
                  *psz_parser = 0;
                  *psz_end = ',';
+
+                 p_seekpoint = vlc_seekpoint_New();
                  while( (psz_end = strchr( psz_start, ',' ) ) )
                  {
                      *psz_end = 0;
