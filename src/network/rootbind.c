@@ -45,6 +45,17 @@ int rootwrap_bind (int, int, int, const struct sockaddr *, size_t);
 #include <netinet/in.h>
 #include <pthread.h>
 
+/* Required yet non-standard cmsg functions */
+#ifndef CMSG_ALIGN
+# define CMSG_ALIGN(len) (((len) + sizeof(intptr_t)-1) & ~(sizeof(intptr_t)-1))
+#endif
+#ifndef CMSG_SPACE
+# define CMSG_SPACE(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + CMSG_ALIGN(len))
+#endif
+#ifndef CMSG_LEN
+# define CMSG_LEN(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + (len))
+#endif
+
 /**
  * Receive a file descriptor from another process
  */

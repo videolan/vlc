@@ -45,6 +45,16 @@
 #ifndef AF_LOCAL
 # define AF_LOCAL AF_UNIX
 #endif
+/* Required yet non-standard cmsg functions */
+#ifndef CMSG_ALIGN
+# define CMSG_ALIGN(len) (((len) + sizeof(intptr_t)-1) & ~(sizeof(intptr_t)-1))
+#endif
+#ifndef CMSG_SPACE
+# define CMSG_SPACE(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + CMSG_ALIGN(len))
+#endif
+#ifndef CMSG_LEN
+# define CMSG_LEN(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + (len))
+#endif
 
 static inline int is_allowed_port (uint16_t port)
 {
