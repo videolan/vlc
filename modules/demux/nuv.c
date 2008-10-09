@@ -385,7 +385,9 @@ static int Demux( demux_t *p_demux )
     }
 
     /* */
-    p_data = stream_Block( p_demux->s, fh.i_length );
+    if( ( p_data = stream_Block( p_demux->s, fh.i_length ) ) == NULL )
+        return 0;
+
     p_data->i_dts = (int64_t)fh.i_timecode * 1000;
     p_data->i_pts = (fh.i_type == 'V') ? 0 : p_data->i_dts;
 
