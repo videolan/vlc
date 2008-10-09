@@ -459,9 +459,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( p_vout->p_module == NULL )
     {
         msg_Err( p_vout, "no suitable vout module" );
-        // FIXME it's ugly but that's exactly the function that need to be called.
-        EndThread( p_vout );
-        vlc_object_detach( p_vout );
+        vlc_object_set_destructor( p_vout, vout_Destructor );
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -501,6 +499,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
                            VLC_THREAD_PRIORITY_OUTPUT, true ) )
     {
         module_unneed( p_vout, p_vout->p_module );
+        p_vout->p_module = NULL;
+        vlc_object_set_destructor( p_vout, vout_Destructor );
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -542,6 +542,9 @@ static void vout_Destructor( vlc_object_t * p_this )
 
     /* Make sure the vout was stopped first */
     assert( !p_vout->p_module );
+
+    /* */
+    spu_Destroy( p_vout->p_spu );
 
     /* Destroy the locks */
     vlc_mutex_destroy( &p_vout->picture_lock );
@@ -1262,7 +1265,6 @@ static void EndThread( vout_thread_t *p_vout )
 
     /* Destroy subpicture unit */
     spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
-    spu_Destroy( p_vout->p_spu );
 
     /* Destroy the video filters2 */
     filter_chain_Delete( p_vout->p->p_vf2_chain );
