@@ -729,11 +729,14 @@ static int DemuxInit( demux_t *p_demux )
     {
         asf_track_t    *tk;
         asf_object_stream_properties_t *p_sp;
+        asf_object_extended_stream_properties_t *p_esp;
+        asf_object_t *p_hdr_ext;
         bool b_access_selected;
 
         p_sp = ASF_FindObject( p_sys->p_root->p_hdr,
                                &asf_object_stream_properties_guid,
                                i_stream );
+        p_esp = NULL;
 
         tk = p_sys->track[p_sp->i_stream_number] = malloc( sizeof( asf_track_t ) );
         memset( tk, 0, sizeof( asf_track_t ) );
@@ -752,6 +755,26 @@ static int DemuxInit( demux_t *p_demux )
             msg_Dbg( p_demux, "ignoring not selected stream(ID:%d) (by access)",
                      p_sp->i_stream_number );
             continue;
+        }
+
+        /* Find the associated extended_stream_properties if any */
+        p_hdr_ext = ASF_FindObject( p_sys->p_root->p_hdr,
+                                    &asf_object_header_extension_guid, 0 );
+        if( p_hdr_ext )
+        {
+            int i_ext_stream = ASF_CountObject( p_hdr_ext,
+                                                &asf_object_extended_stream_properties );
+            for( i = 0; i < i_ext_stream; i++ )
+            {
+                asf_object_t *p_tmp =
+                    ASF_FindObject( p_hdr_ext,
+                                    &asf_object_extended_stream_properties, i );
+                if( p_tmp->ext_stream.i_stream_number == p_sp->i_stream_number )
+                {
+                    p_esp = &p_tmp->ext_stream;
+                    break;
+                }
+            }
         }
 
         if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
@@ -803,6 +826,11 @@ static int DemuxInit( demux_t *p_demux )
             fmt.video.i_width = GetDWLE( p_data + 4 );
             fmt.video.i_height= GetDWLE( p_data + 8 );
 
+            if( p_esp && p_esp->i_average_time_per_frame > 0 )
+            {
+                fmt.video.i_frame_rate = 10000000;
+                fmt.video.i_frame_rate_base = p_esp->i_average_time_per_frame;
+            }
 
             if( fmt.i_codec == VLC_FOURCC( 'D','V','R',' ') )
             {
@@ -853,7 +881,7 @@ static int DemuxInit( demux_t *p_demux )
                         (int64_t)fmt.video.i_width * VOUT_ASPECT_FACTOR /
                         fmt.video.i_height / i_aspect_y;
                 }
-        }
+            }
 
             tk->i_cat = VIDEO_ES;
             tk->p_es = es_out_Add( p_demux->out, &fmt );
