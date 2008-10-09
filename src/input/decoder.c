@@ -929,7 +929,7 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
         if( b_telx )
         {
             *pi_ts0 = DecoderTeletextFixTs( *pi_ts0, i_ts_delay );
-            if( *pi_ts1 && *pi_ts1 <= 0 )
+            if( pi_ts1 && *pi_ts1 <= 0 )
                 *pi_ts1 = *pi_ts0;
         }
     }
