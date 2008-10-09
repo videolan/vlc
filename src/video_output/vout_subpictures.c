@@ -91,8 +91,6 @@ struct spu_private_t
 
     /* */
     mtime_t i_last_sort_date;
-    /* */
-    mtime_t i_last_render_date;
 };
 
 /* */
@@ -231,7 +229,6 @@ spu_t *__spu_Create( vlc_object_t *p_this )
 
     /* */
     p_sys->i_last_sort_date = -1;
-    p_sys->i_last_render_date = -1;
 
     return p_spu;
 }
@@ -398,18 +395,13 @@ void spu_RenderSubpictures( spu_t *p_spu,
 
         if( !b_paused && p_subpic->pf_update_regions )
         {
-            mtime_t i_render_date;
             video_format_t fmt_org = *p_fmt_dst;
             fmt_org.i_width =
             fmt_org.i_visible_width = i_source_video_width;
             fmt_org.i_height =
             fmt_org.i_visible_height = i_source_video_height;
 
-            i_render_date = i_current_date;
-            if( p_subpic->b_subtitle && b_paused && p_sys->i_last_render_date > 0 )
-                i_render_date = p_sys->i_last_render_date;
-
-            p_subpic->pf_update_regions( p_spu, p_subpic, &fmt_org, i_render_date );
+            p_subpic->pf_update_regions( p_spu, p_subpic, &fmt_org, i_current_date );
         }
 
         /* */
@@ -422,9 +414,6 @@ void spu_RenderSubpictures( spu_t *p_spu,
         /* */
         pp_subpicture[i_subpicture++] = p_subpic;
     }
-
-    if( !b_paused )
-        p_sys->i_last_render_date = i_current_date;
 
     /* Be sure we have at least 1 picture to process */
     if( i_subpicture <= 0 )
