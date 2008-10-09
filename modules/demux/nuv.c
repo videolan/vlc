@@ -787,7 +787,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
         {
             p_kfa_table = malloc( fh.i_length );
 
-            if( p_seek_table == NULL )
+            if( p_kfa_table == NULL )
             {
                 free( p_seek_table );
                 return VLC_ENOMEM;
