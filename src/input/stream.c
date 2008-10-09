@@ -301,7 +301,15 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     stream_sys_t *p_sys;
     char *psz_list = NULL;
 
-    if( !s ) return NULL;
+    if( !s )
+        return NULL;
+
+    s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
+    if( !p_sys )
+    {
+        vlc_object_release( s );
+        return NULL;
+    }
 
     /* Attach it now, needed for b_die */
     vlc_object_attach( s, p_access );
@@ -310,10 +318,6 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     s->pf_peek   = NULL;
     s->pf_control = AStreamControl;
     s->pf_destroy = AStreamDestroy;
-
-    s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
-    if( p_sys == NULL )
-        goto error;
 
     /* UTF16 and UTF32 text file conversion */
     s->i_char_width = 1;
