@@ -640,7 +640,7 @@ static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
         if( p_es->p_dec )
             input_DecoderChangeDelay( p_es->p_dec, i_delay );
         if( p_es->p_dec_record )
-            input_DecoderChangeDelay( p_es->p_dec, i_delay );
+            input_DecoderChangeDelay( p_es->p_dec_record, i_delay );
     }
 }
 
