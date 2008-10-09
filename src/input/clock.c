@@ -201,8 +201,6 @@ void input_clock_Update( input_clock_t *cl,
 
     vlc_mutex_lock( &cl->lock );
 
-    assert( !cl->b_paused );
-
     if( ( !cl->b_has_reference ) ||
         ( i_ck_stream == 0 && cl->last.i_stream != 0 ) )
     {
@@ -393,6 +391,9 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, mtime_t i_system )
 
     cl->ref.i_system += i_offset;
     cl->last.i_system += i_offset;
+
+    if( cl->b_paused )
+        cl->i_pause_date = i_system;
 
     vlc_mutex_unlock( &cl->lock );
 }

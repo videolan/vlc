@@ -513,7 +513,7 @@ void input_EsOutChangePosition( es_out_t *out )
     p_sys->b_buffering = true;
 }
 
-bool input_EsOutDecodersEmpty( es_out_t *out )
+bool input_EsOutDecodersIsEmpty( es_out_t *out )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     int i;
@@ -537,6 +537,11 @@ bool input_EsOutDecodersEmpty( es_out_t *out )
     return true;
 }
 
+bool input_EsOutIsBuffering( es_out_t *out )
+{
+    return out->p_sys->b_buffering;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -556,9 +561,21 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     if( i_ret )
         return;
 
-    if( i_stream_duration <= p_sys->p_input->i_pts_delay && !b_forced )
+    mtime_t i_preroll_duration = 0;
+    mtime_t i_preroll_end = 0;
+    for( int i = 0; i < p_sys->i_es; i++ )
     {
-        msg_Dbg( p_sys->p_input, "Buffering %d%%", (int)(100 * i_stream_duration / p_sys->p_input->i_pts_delay) );
+        es_out_id_t *p_es = p_sys->es[i];
+
+        if( p_es->p_dec && p_es->i_preroll_end > 0 )
+            i_preroll_end = __MAX( i_preroll_end, p_es->i_preroll_end );
+    }
+    if( i_preroll_end > 0 )
+        i_preroll_duration = __MAX( i_preroll_end - i_stream_start, 0 );
+
+    if( i_stream_duration <= p_sys->p_input->i_pts_delay + i_preroll_duration && !b_forced )
+    {
+        msg_Dbg( p_sys->p_input, "Buffering %d%%", (int)(100 * i_stream_duration / ( p_sys->p_input->i_pts_delay + i_preroll_duration )) );
         return;
     }
 

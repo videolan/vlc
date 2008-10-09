@@ -729,11 +729,15 @@ static void MainLoop( input_thread_t *p_input )
         mtime_t i_current;
         mtime_t i_deadline;
         mtime_t i_wakeup;
+        bool b_paused;
 
         /* Demux data */
         b_force_update = false;
         i_wakeup = 0;
-        if( p_input->i_state != PAUSE_S )
+        b_paused = p_input->i_state == PAUSE_S &&
+                   !input_EsOutIsBuffering( p_input->p->p_es_out );
+
+        if( !b_paused )
         {
             MainLoopDemux( p_input, &b_force_update, &i_start_mdate );
             i_wakeup = input_EsOutGetWakeup( p_input->p->p_es_out );
@@ -742,7 +746,7 @@ static void MainLoop( input_thread_t *p_input )
         /* */
         do {
             i_deadline = i_wakeup;
-            if( p_input->i_state == PAUSE_S )
+            if( b_paused )
                 i_deadline = __MIN( i_intf_update, i_statistic_update );
 
             /* Handle control */
@@ -785,7 +789,7 @@ static void MainLoop( input_thread_t *p_input )
         /* We have finish to demux data but not to play them */
         while( vlc_object_alive( p_input ) )
         {
-            if( input_EsOutDecodersEmpty( p_input->p->p_es_out ) )
+            if( input_EsOutDecodersIsEmpty( p_input->p->p_es_out ) )
                 break;
 
             msg_Dbg( p_input, "waiting decoder fifos to empty" );
