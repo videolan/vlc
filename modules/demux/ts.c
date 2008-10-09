@@ -578,6 +578,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Fill dump mode fields */
     p_sys->i_write = 0;
+    p_sys->buffer = NULL;
     p_sys->p_file = NULL;
     p_sys->b_file_out = false;
     p_sys->psz_file = var_CreateGetString( p_demux, "ts-dump-file" );
@@ -650,6 +651,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->pid[8191].b_seen = true;
     p_sys->i_packet_size = i_packet_size;
     p_sys->b_udp_out = false;
+    p_sys->fd = -1;
     p_sys->i_ts_read = 50;
     p_sys->csa = NULL;
     p_sys->b_start_record = false;
@@ -685,8 +687,7 @@ static int Open( vlc_object_t *p_this )
 #endif
 
     /* Init PMT array */
-    p_sys->i_pmt = 0;
-    p_sys->pmt   = NULL;
+    TAB_INIT( p_sys->i_pmt, p_sys->pmt );
 
     /* Read config */
     var_Create( p_demux, "ts-es-id-pid", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -854,21 +855,16 @@ static void Close( vlc_object_t *p_this )
 
     }
 
-    if( p_sys->b_udp_out )
-    {
-        net_Close( p_sys->fd );
-    }
     vlc_mutex_lock( &p_sys->csa_lock );
     if( p_sys->csa )
     {
         var_DelCallback( p_demux, "ts-csa-ck", ChangeKeyCallback, NULL );
         var_DelCallback( p_demux, "ts-csa2-ck", ChangeKeyCallback, NULL );
         csa_Delete( p_sys->csa );
-        p_sys->csa = NULL;
     }
     vlc_mutex_unlock( &p_sys->csa_lock );
 
-    if( p_sys->i_pmt ) free( p_sys->pmt );
+    TAB_CLEAN( p_sys->i_pmt, p_sys->pmt );
 
     if ( p_sys->p_programs_list )
     {
@@ -886,13 +882,16 @@ static void Close( vlc_object_t *p_this )
         if( p_sys->p_file != stdout )
         {
             fclose( p_sys->p_file );
-            p_sys->p_file = NULL;
         }
+    }
+    /* When streaming, close the port */
+    if( p_sys->fd > -1 )
+    {
+        net_Close( p_sys->fd );
     }
 
     free( p_sys->buffer );
     free( p_sys->psz_file );
-    p_sys->psz_file = NULL;
 
     vlc_mutex_destroy( &p_sys->csa_lock );
     free( p_sys );
