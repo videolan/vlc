@@ -210,6 +210,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         block_ChainRelease( id->p_first );
     es_format_Clean( &id->fmt );
 
+    assert( !id->id || p_sys->p_out );
     if( id->id )
         sout_StreamIdDel( p_sys->p_out, id->id );
 
