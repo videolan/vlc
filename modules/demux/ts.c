@@ -857,7 +857,6 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->b_udp_out )
     {
         net_Close( p_sys->fd );
-        free( p_sys->buffer );
     }
     vlc_mutex_lock( &p_sys->csa_lock );
     if( p_sys->csa )
@@ -889,10 +888,9 @@ static void Close( vlc_object_t *p_this )
             fclose( p_sys->p_file );
             p_sys->p_file = NULL;
         }
-
-        free( p_sys->buffer );
     }
 
+    free( p_sys->buffer );
     free( p_sys->psz_file );
     p_sys->psz_file = NULL;
 
