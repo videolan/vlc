@@ -610,7 +610,24 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_l
 
     vlc_object_unlock( p_vout );
 }
+void vout_Flush( vout_thread_t *p_vout, mtime_t i_date )
+{
+    vlc_mutex_lock( &p_vout->picture_lock );
+    for( int i = 0; i < p_vout->render.i_pictures; i++ )
+    {
+        picture_t *p_pic = p_vout->render.pp_picture[i];
 
+        if( p_pic->i_status == READY_PICTURE ||
+            p_pic->i_status == DISPLAYED_PICTURE )
+        {
+            /* We cannot change picture status if it is in READY_PICTURE state,
+             * Just make sure they won't be displayed */
+            if( p_pic->date > i_date )
+                p_pic->date = i_date;
+        }
+    }
+    vlc_mutex_unlock( &p_vout->picture_lock );
+}
 /*****************************************************************************
  * InitThread: initialize video output thread
  *****************************************************************************

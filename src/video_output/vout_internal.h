@@ -105,5 +105,11 @@ void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration );
  */
 void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_lost );
 
+/**
+ * This function will ensure that all ready/displayed pciture have at most
+ * the provided dat
+ */
+void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
+
 #endif
 
