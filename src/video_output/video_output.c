@@ -908,7 +908,30 @@ static void* RunThread( vlc_object_t *p_this )
             }
         }
         if( p_vout->p->b_paused && p_last_picture != NULL )
-            p_picture = p_last_picture;
+        {
+            p_picture = NULL;
+            if( p_last_picture->date == 1 )
+            {
+                for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
+                {
+                    picture_t *p_pic = PP_RENDERPICTURE[i_index];
+
+                    if( p_pic->i_status != READY_PICTURE )
+                        continue;
+                    if( p_pic->date <= p_last_picture->date && p_pic != p_last_picture )
+                    {
+                        DropPicture( p_vout, p_pic );
+                    }
+                    else if( p_pic->date > p_last_picture->date && ( p_picture == NULL || p_pic->date < display_date ) )
+                    {
+                        p_picture = p_pic;
+                        display_date = p_picture->date;
+                    }
+                }
+            }
+            if( !p_picture )
+                p_picture = p_last_picture;
+        }
 
         if( p_picture )
         {
