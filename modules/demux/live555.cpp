@@ -407,15 +407,15 @@ error:
     if( p_sys->i_track ) free( p_sys->track );
     if( p_sys->p_out_asf ) stream_DemuxDelete( p_sys->p_out_asf );
     if( p_sys->rtsp && p_sys->ms ) p_sys->rtsp->teardownMediaSession( *p_sys->ms );
-    if( p_sys->ms ) Medium::close( p_sys->ms );
-    if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
-    if( p_sys->env ) p_sys->env->reclaim();
     if( p_sys->p_timeout )
     {
         vlc_cancel( p_sys->p_timeout->handle );
         vlc_join( p_sys->p_timeout->handle, NULL );
         free( p_sys->p_timeout );
     }
+    if( p_sys->ms ) Medium::close( p_sys->ms );
+    if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
+    if( p_sys->env ) p_sys->env->reclaim();
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
     free( p_sys->psz_path );
@@ -448,15 +448,15 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->i_track ) free( p_sys->track );
     if( p_sys->p_out_asf ) stream_DemuxDelete( p_sys->p_out_asf );
     if( p_sys->rtsp && p_sys->ms ) p_sys->rtsp->teardownMediaSession( *p_sys->ms );
-    if( p_sys->ms ) Medium::close( p_sys->ms );
-    if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
-    if( p_sys->env ) p_sys->env->reclaim();
     if( p_sys->p_timeout )
     {
         vlc_cancel( p_sys->p_timeout->handle );
         vlc_join( p_sys->p_timeout->handle, NULL );
         free( p_sys->p_timeout );
     }
+    if( p_sys->ms ) Medium::close( p_sys->ms );
+    if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
+    if( p_sys->env ) p_sys->env->reclaim();
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
     free( p_sys->psz_path );
@@ -1042,15 +1042,22 @@ static int Play( demux_t *p_demux )
         {
             msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
             p_sys->p_timeout = (timeout_thread_t *)malloc( sizeof(timeout_thread_t) );
-            p_sys->p_timeout->p_sys = p_demux->p_sys; /* lol, object recursion :D */
-            if( vlc_clone( &p_sys->p_timeout->handle,  TimeoutPrevention,
-                           p_sys->p_timeout, VLC_THREAD_PRIORITY_LOW ) )
+            if( p_sys->p_timeout )
             {
-                msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
-                free( p_sys->p_timeout );
-                p_sys->p_timeout = NULL;
+                memset( p_sys->p_timeout, 0, sizeof(timeout_thread_t) );
+                p_sys->p_timeout->p_sys = p_demux->p_sys; /* lol, object recursion :D */
+                if( vlc_clone( &p_sys->p_timeout->handle,  TimeoutPrevention,
+                               p_sys->p_timeout, VLC_THREAD_PRIORITY_LOW ) )
+                {
+                    msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
+                    free( p_sys->p_timeout );
+                    p_sys->p_timeout = NULL;
+                }
+                else
+                    msg_Dbg( p_demux, "spawned timeout thread" );
             }
-            msg_Dbg( p_demux, "spawned timeout thread" );
+            else
+                msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
         }
     }
     p_sys->i_pcr = 0;
