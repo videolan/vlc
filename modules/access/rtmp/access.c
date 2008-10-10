@@ -115,7 +115,10 @@ static int Open( vlc_object_t *p_this )
     }
 
     length_path = strlen( p_sys->p_thread->url.psz_path );
-    length_media_name = strlen( strrchr( p_sys->p_thread->url.psz_path, '/' ) ) - 1;
+    char* psz_tmp = strrchr( p_sys->p_thread->url.psz_path, '/' );
+    if( !psz_tmp )
+        goto error;
+    length_media_name = strlen( psz_tmp ) - 1;
 
     p_sys->p_thread->psz_application = strndup( p_sys->p_thread->url.psz_path + 1, length_path - length_media_name - 2 );
     p_sys->p_thread->psz_media = strdup( p_sys->p_thread->url.psz_path + ( length_path - length_media_name ) );
