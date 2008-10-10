@@ -136,12 +136,7 @@ static int Open (vlc_object_t *p_this)
     /* Autodetect mmap() support */
     if (st.st_size > 0)
     {
-        int flags = MAP_PRIVATE;
-#if defined(MAP_NOCACHE)
-        flags |= MAP_NOCACHE;
-#endif
-
-        void *addr = mmap (NULL, 1, PROT_READ|PROT_WRITE, flags, fd, 0);
+        void *addr = mmap (NULL, 1, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
         if (addr != MAP_FAILED)
             munmap (addr, 1);
         else
@@ -225,8 +220,11 @@ static block_t *Block (access_t *p_access)
     /* NOTE: We use PROT_WRITE and MAP_PRIVATE so that the block can be
      * modified down the chain, without messing up with the underlying
      * original file. This does NOT need open write permission. */
-    void *addr = mmap (NULL, length, PROT_READ|PROT_WRITE, MAP_PRIVATE,
-                       p_sys->fd, outer_offset);
+    void *addr = mmap (NULL, length, PROT_READ|PROT_WRITE, MAP_PRIVATE
+#ifdef MAP_NO_CACHE
+                       | MAP_NOCACHE
+#endif
+                       , p_sys->fd, outer_offset);
     if (addr == MAP_FAILED)
     {
         msg_Err (p_access, "memory mapping failed (%m)");
