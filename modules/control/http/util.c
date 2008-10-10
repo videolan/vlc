@@ -345,95 +345,81 @@ void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
                            playlist_item_t *p_node, char *name, mvar_t *s,
                            int i_depth )
 {
-    if( p_node != NULL )
+    if( !p_node || !p_node->p_input )
+        return;
+
+    if( p_node->i_children == -1 )
     {
-        if( p_node->i_children == -1 )
-        {
-            char value[512];
-            char *psz;
-            mvar_t *itm = mvar_New( name, "set" );
-            playlist_item_t * p_item = playlist_CurrentPlayingItem(p_pl);
-            if( p_item && p_node &&
-                p_item->p_input && p_node->p_input &&
-                p_item->p_input->i_id == p_node->p_input->i_id )
-            {
-                mvar_AppendNewVar( itm, "current", "1" );
-            }
-            else
-            {
-                mvar_AppendNewVar( itm, "current", "0" );
-            }
-
-            sprintf( value, "%d", p_node->i_id );
-            mvar_AppendNewVar( itm, "index", value );
-
-            psz = input_item_GetName( p_node->p_input );
-            mvar_AppendNewVar( itm, "name", psz );
-            free( psz );
-
-            psz = input_item_GetURI( p_node->p_input );
-            mvar_AppendNewVar( itm, "uri", psz );
-            free( psz );
-
-            sprintf( value, "Item");
-            mvar_AppendNewVar( itm, "type", value );
-
-            sprintf( value, "%d", i_depth );
-            mvar_AppendNewVar( itm, "depth", value );
-
-            if( p_node->i_flags & PLAYLIST_RO_FLAG )
-            {
-                mvar_AppendNewVar( itm, "ro", "ro" );
-            }
-            else
-            {
-                mvar_AppendNewVar( itm, "ro", "rw" );
-            }
-
-            sprintf( value, "%ld",
-                    (long) input_item_GetDuration( p_node->p_input ) );
-            mvar_AppendNewVar( itm, "duration", value );
-
-            mvar_AppendVar( s, itm );
-        }
+        char value[512];
+        char *psz;
+        mvar_t *itm = mvar_New( name, "set" );
+        playlist_item_t * p_item = playlist_CurrentPlayingItem( p_pl );
+        if( !p_item || !p_item->p_input )
+            return;
+        if( p_item->p_input->i_id == p_node->p_input->i_id )
+            mvar_AppendNewVar( itm, "current", "1" );
         else
-        {
-            char value[512];
-            int i_child;
-            mvar_t *itm = mvar_New( name, "set" );
+            mvar_AppendNewVar( itm, "current", "0" );
 
-            mvar_AppendNewVar( itm, "name", p_node->p_input->psz_name );
-            mvar_AppendNewVar( itm, "uri", p_node->p_input->psz_name );
+        sprintf( value, "%d", p_node->i_id );
+        mvar_AppendNewVar( itm, "index", value );
 
-            sprintf( value, "Node" );
-            mvar_AppendNewVar( itm, "type", value );
+        psz = input_item_GetName( p_node->p_input );
+        mvar_AppendNewVar( itm, "name", psz );
+        free( psz );
 
-            sprintf( value, "%d", p_node->i_id );
-            mvar_AppendNewVar( itm, "index", value );
+        psz = input_item_GetURI( p_node->p_input );
+        mvar_AppendNewVar( itm, "uri", psz );
+        free( psz );
 
-            sprintf( value, "%d", p_node->i_children);
-            mvar_AppendNewVar( itm, "i_children", value );
+        sprintf( value, "Item");
+        mvar_AppendNewVar( itm, "type", value );
 
-            sprintf( value, "%d", i_depth );
-            mvar_AppendNewVar( itm, "depth", value );
+        sprintf( value, "%d", i_depth );
+        mvar_AppendNewVar( itm, "depth", value );
 
-            if( p_node->i_flags & PLAYLIST_RO_FLAG )
-            {
-                mvar_AppendNewVar( itm, "ro", "ro" );
-            }
-            else
-            {
-                mvar_AppendNewVar( itm, "ro", "rw" );
-            }
+        if( p_node->i_flags & PLAYLIST_RO_FLAG )
+            mvar_AppendNewVar( itm, "ro", "ro" );
+        else
+            mvar_AppendNewVar( itm, "ro", "rw" );
 
-            mvar_AppendVar( s, itm );
+        sprintf( value, "%ld",
+                 (long) input_item_GetDuration( p_node->p_input ) );
+        mvar_AppendNewVar( itm, "duration", value );
 
-            for (i_child = 0 ; i_child < p_node->i_children ; i_child++)
-                PlaylistListNode( p_intf, p_pl,
-                                      p_node->pp_children[i_child],
-                                      name, s, i_depth + 1);
+        mvar_AppendVar( s, itm );
+    }
+    else
+    {
+        char value[512];
+        int i_child;
+        mvar_t *itm = mvar_New( name, "set" );
 
-        }
+        mvar_AppendNewVar( itm, "name", p_node->p_input->psz_name );
+        mvar_AppendNewVar( itm, "uri", p_node->p_input->psz_name );
+
+        sprintf( value, "Node" );
+        mvar_AppendNewVar( itm, "type", value );
+
+        sprintf( value, "%d", p_node->i_id );
+        mvar_AppendNewVar( itm, "index", value );
+
+        sprintf( value, "%d", p_node->i_children);
+        mvar_AppendNewVar( itm, "i_children", value );
+
+        sprintf( value, "%d", i_depth );
+        mvar_AppendNewVar( itm, "depth", value );
+
+        if( p_node->i_flags & PLAYLIST_RO_FLAG )
+            mvar_AppendNewVar( itm, "ro", "ro" );
+        else
+            mvar_AppendNewVar( itm, "ro", "rw" );
+
+        mvar_AppendVar( s, itm );
+
+        for( i_child = 0 ; i_child < p_node->i_children ; i_child++ )
+             PlaylistListNode( p_intf, p_pl, p_node->pp_children[i_child],
+                               name, s, i_depth + 1);
     }
 }
 
