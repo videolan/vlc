@@ -1711,6 +1711,9 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     {
         psz_variable = "video-snapshot";
     }
+    else
+        /* This case can't happend */
+        return VLC_EGENERIC;
 
     if( newval.psz_string && *newval.psz_string )
     {
@@ -1726,7 +1729,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
             i_error = var_Set( p_vout, psz_variable, newval );
         }
     }
-    else  if( !strcmp( psz_cmd, "snapshot" ) )
+    else if( !strcmp( psz_cmd, "snapshot" ) )
     {
         vlc_value_t val;
         val.b_bool = true;
