@@ -481,41 +481,40 @@ playlist_item_t *GetNextItem( playlist_t *p_playlist,
                               playlist_item_t *p_root,
                               playlist_item_t *p_item )
 {
-    playlist_item_t *p_parent;
-    int i;
+    /* If the item is NULL, return the firt child of root */
+    if( p_item == NULL )
+    {
+        if( p_root->i_children > 0 )
+            return p_root->pp_children[0];
+        else
+            return NULL;
+    }
 
     /* Node with children, get the first one */
-    if( p_item && p_item->i_children > 0 )
+    if( p_item->i_children > 0 )
         return p_item->pp_children[0];
 
-    if( p_item != NULL )
-        p_parent = p_item->p_parent;
-    else
-        p_parent = p_root;
-    for( i= 0 ; i < p_parent->i_children ; i++ )
+    playlist_item_t* p_parent = p_item->p_parent;
+    for( int i = 0 ; i < p_parent->i_children ; i++ )
     {
-        if( p_item == NULL || p_parent->pp_children[i] == p_item )
+        if( p_parent->pp_children[i] == p_item )
         {
-            if( p_item == NULL )
-                i = -1;
-
-            if( i+1 >= p_parent->i_children )
+            // Return the next children
+            if( i + 1 < p_parent->i_children )
+                return p_parent->pp_children[i+1];
+            // We are the least one, so try to have uncles
+            else
             {
-                /* Was already the last sibling. Look for uncles */
                 PL_DEBUG2( "Current item is the last of the node,"
                            "looking for uncle from %s",
                             p_parent->p_input->psz_name );
-
                 if( p_parent == p_root )
                 {
                     PL_DEBUG2( "already at root" );
                     return NULL;
                 }
-                return GetNextUncle( p_playlist, p_item, p_root );
-            }
-            else
-            {
-                return  p_parent->pp_children[i+1];
+                else
+                    return GetNextUncle( p_playlist, p_item, p_root );
             }
         }
     }
