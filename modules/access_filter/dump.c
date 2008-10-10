@@ -114,7 +114,12 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
     memset (p_sys, 0, sizeof (*p_sys));
 
+# ifndef UNDER_CE
     if ((p_sys->stream = tmpfile ()) == NULL)
+# else
+    char buf[75];
+    if(GetTempFileName("\\Temp\\","vlc",0,buf) || ((p_sys->stream = fopen(buf,"wb+")) ==NULL))
+#endif
     {
         msg_Err (access, "cannot create temporary file: %m");
         free (p_sys);

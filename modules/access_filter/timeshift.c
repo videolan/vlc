@@ -40,7 +40,7 @@
 
 #include <unistd.h>
 
-#ifdef WIN32
+#if defined (WIN32) && !defined (UNDER_CE)
 #  include <direct.h>                                        /* _wgetcwd  */
 #endif
 
@@ -579,7 +579,7 @@ static char *GetTmpFilePath( access_t *p_access )
 
     if( psz_dir == NULL )
     {
-#ifdef WIN32
+#if defined (WIN32) && !defined (UNDER_CE)
         DWORD ret = GetTempPathW (0, NULL);
         wchar_t wdir[ret + 3]; // can at least old "C:" + nul
         const wchar_t *pwdir = wdir;
