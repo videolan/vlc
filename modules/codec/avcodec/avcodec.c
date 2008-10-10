@@ -317,8 +317,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     {
         vlc_mutex_t *lock;
 
-        if( p_sys->p_context->extradata )
-            free( p_sys->p_context->extradata );
+        free( p_sys->p_context->extradata );
         p_sys->p_context->extradata = NULL;
 
         vlc_mutex_lock( &avcodec_lock );
