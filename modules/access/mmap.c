@@ -122,12 +122,16 @@ static int Open (vlc_object_t *p_this)
         goto error;
     }
 
-# if defined(HAVE_FCNTL_H) && defined(F_FDAHEAD) && defined(F_NOCACHE)
+#if defined(HAVE_FCNTL_H)
     /* We'd rather use any available memory for reading ahead
      * than for caching what we've already mmap'ed */
+# if defined(F_RDAHEAD)
     fcntl (fd, F_RDAHEAD, 1);
+# endif
+# if defined(F_NOCACHE)
     fcntl (fd, F_NOCACHE, 1);
 # endif
+#endif
 
     /* Autodetect mmap() support */
     if (st.st_size > 0)
