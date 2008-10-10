@@ -4021,7 +4021,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 
             if( !pid->b_valid || pid->psi ) continue;
 
-            for( j = 0; j < i_pmt_rm; j++ )
+            for( j = 0; j < i_pmt_rm && pid->b_valid; j++ )
             {
                 int i_prg;
                 for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
@@ -4041,8 +4041,6 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                     PIDClean( p_demux->out, pid );
                     break;
                 }
-
-                if( !pid->b_valid ) break;
             }
         }
 
