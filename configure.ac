@@ -327,8 +327,6 @@ case "${host_os}" in
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
-        VLC_ADD_CPPFLAGS([libvlc vlc],[-Dmain(a,b)=maince(a,b)])
-        VLC_ADD_LDFLAGS([libvlc vlc],[-e WinMainCRTStartup])
         VLC_ADD_LIBS([libvlc access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp sap http netsync audioscrobbler growl rtp stream_out_rtp remoteosd],[-lws2])
         VLC_ADD_LIBS([libvlc],[-lmmtimer])
    fi
