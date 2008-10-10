@@ -136,7 +136,7 @@ static int Open (vlc_object_t *p_this)
     /* Autodetect mmap() support */
     if (st.st_size > 0)
     {
-        void *addr = mmap (NULL, 1, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
+        void *addr = mmap (NULL, 1, PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_NOCACHE, fd, 0);
         if (addr != MAP_FAILED)
             munmap (addr, 1);
         else
