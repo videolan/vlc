@@ -218,7 +218,10 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
         psz_bol += sizeof("Stream=\"") - 1;
         if ( !psz_bol )
             return 0;
-        strrchr( psz_bol, '"' )[0] = '\0';
+        char* psz_tmp = strrchr( psz_bol, '"' );
+        if( !psz_tmp )
+            return 0;
+        psz_tmp[0] = '\0';
         /* We cheat around xdma. for some reason xdma links work different then rtsp */
         if( !strncasecmp( psz_bol, "xdma://", sizeof("xdma://") - 1 ) )
         {
