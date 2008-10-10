@@ -30,7 +30,9 @@
 #if defined( WIN32 )
 # define _WIN32_IE IE5
 # include <w32api.h>
+#ifndef UNDER_CE
 # include <direct.h>
+#endif
 # include <shlobj.h>
 #else
 # include <unistd.h>
