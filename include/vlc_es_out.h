@@ -86,8 +86,8 @@ enum es_out_query_e
     /* Try not to use this one as it is a bit hacky */
     ES_OUT_SET_FMT,     /* arg1= es_out_id_t* arg2=es_format_t* */
 
-    /* Allow preroll of data (data with dts/pts < i_pts for one ES will be decoded but not displayed */
-    ES_OUT_SET_NEXT_DISPLAY_TIME,   /* arg1=es_out_id_t* arg2=int64_t i_pts(microsecond) */
+    /* Allow preroll of data (data with dts/pts < i_pts for all ES will be decoded but not displayed */
+    ES_OUT_SET_NEXT_DISPLAY_TIME,   /* arg1=int64_t i_pts(microsecond) */
     /* Set meta data for group (dynamic) */
     ES_OUT_SET_GROUP_META,  /* arg1=int i_group arg2=vlc_meta_t */
     /* Set epg for group (dynamic) */

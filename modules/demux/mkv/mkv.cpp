@@ -701,8 +701,8 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             tracks[i_track]->b_search_keyframe = true;
             i_track_skipping++;
         }
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, i_date );
     }
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
 
     while( i_track_skipping > 0 )
     {
@@ -759,8 +759,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     {
         sys.i_start_pts = sys.i_pts;
 
-        for( i_track = 0; i_track < tracks.size(); i_track++ )
-            es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, sys.i_start_pts );
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
     }
 }
 

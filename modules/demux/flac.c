@@ -229,10 +229,7 @@ static int Demux( demux_t *p_demux )
             p_block_out->i_dts += p_sys->i_time_offset;
 
             /* set PCR */
-            if( p_block_out->i_dts >= p_sys->i_pts_start + p_sys->i_time_offset )
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
-            else
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
 
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
@@ -306,7 +303,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
 
         p_sys->i_time_offset = p_sys->seekpoint[i]->i_time_offset - p_sys->i_pts;
         p_sys->i_pts_start = p_sys->i_pts+i_delta_time;
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, p_sys->p_es, p_sys->i_pts_start + p_sys->i_time_offset );
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, p_sys->i_pts_start + p_sys->i_time_offset );
     }
     else
     {

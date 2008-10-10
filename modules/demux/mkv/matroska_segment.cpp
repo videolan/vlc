@@ -1097,9 +1097,8 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                             ES_OUT_SET_DEFAULT,
                             tracks[i_track]->p_es );
         }
-
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, i_start_time );
     }
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_start_time );
  
     sys.i_start_pts = i_start_time;
     // reset the stream reading to the first cluster of the segment used

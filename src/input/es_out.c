@@ -77,9 +77,6 @@ struct es_out_id_t
     int       i_id;
     es_out_pgrm_t *p_pgrm;
 
-    /* Misc. */
-    int64_t i_preroll_end;
-
     /* Channel in the track type */
     int         i_channel;
     es_format_t fmt;
@@ -139,6 +136,9 @@ struct es_out_sys_t
 
     /* Rate used for clock */
     int         i_rate;
+
+    /* Current preroll */
+    int64_t     i_preroll_end;
 
     /* Used for buffering */
     bool        b_buffering;
@@ -282,6 +282,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->i_rate = i_rate;
 
     p_sys->b_buffering = true;
+    p_sys->i_preroll_end = -1;
 
     p_sys->p_sout_record = NULL;
 
@@ -511,6 +512,7 @@ void input_EsOutChangePosition( es_out_t *out )
         input_clock_Reset( p_sys->pgrm[i]->p_clock );
 
     p_sys->b_buffering = true;
+    p_sys->i_preroll_end = -1;
 }
 
 bool input_EsOutDecodersIsEmpty( es_out_t *out )
@@ -562,16 +564,8 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
         return;
 
     mtime_t i_preroll_duration = 0;
-    mtime_t i_preroll_end = 0;
-    for( int i = 0; i < p_sys->i_es; i++ )
-    {
-        es_out_id_t *p_es = p_sys->es[i];
-
-        if( p_es->p_dec && p_es->i_preroll_end > 0 )
-            i_preroll_end = __MAX( i_preroll_end, p_es->i_preroll_end );
-    }
-    if( i_preroll_end > 0 )
-        i_preroll_duration = __MAX( i_preroll_end - i_stream_start, 0 );
+    if( p_sys->i_preroll_end >= 0 )
+        i_preroll_duration = __MAX( p_sys->i_preroll_end - i_stream_start, 0 );
 
     if( i_stream_duration <= p_sys->p_input->i_pts_delay + i_preroll_duration && !b_forced )
     {
@@ -582,13 +576,12 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     msg_Dbg( p_sys->p_input, "Stream buffering done (%d ms in %d ms)",
               (int)(i_stream_duration/1000), (int)(i_system_duration/1000) );
     p_sys->b_buffering = false;
+    p_sys->i_preroll_end = -1;
 
     const mtime_t i_decoder_buffering_start = mdate();
     for( int i = 0; i < p_sys->i_es; i++ )
     {
         es_out_id_t *p_es = p_sys->es[i];
-
-        p_es->i_preroll_end = -1;
 
         if( !p_es->p_dec )
             continue;
@@ -1196,7 +1189,6 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     es->i_id = fmt->i_id;
     es->p_pgrm = p_pgrm;
     es_format_Copy( &es->fmt, fmt );
-    es->i_preroll_end = -1;
 
     switch( fmt->i_cat )
     {
@@ -1390,7 +1382,6 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
             }
         }
 
-        es->i_preroll_end = -1;
         EsCreateDecoder( out, es );
 
         if( es->p_dec == NULL || es->p_pgrm != p_sys->p_pgrm )
@@ -1677,13 +1668,13 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     /* Mark preroll blocks */
-    if( es->i_preroll_end >= 0 )
+    if( p_sys->i_preroll_end >= 0 )
     {
         int64_t i_date = p_block->i_pts;
         if( i_date <= 0 )
             i_date = p_block->i_dts;
 
-        if( i_date < es->i_preroll_end )
+        if( i_date < p_sys->i_preroll_end )
             p_block->i_flags |= BLOCK_FLAG_PREROLL;
     }
 
@@ -2106,15 +2097,12 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_SET_NEXT_DISPLAY_TIME:
         {
-            int64_t i_date;
+            const int64_t i_date = (int64_t)va_arg( args, int64_t );
 
-            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            i_date = (int64_t)va_arg( args, int64_t );
-
-            if( !es || !es->p_dec )
+            if( i_date < 0 )
                 return VLC_EGENERIC;
 
-            es->i_preroll_end = i_date;
+            p_sys->i_preroll_end = i_date;
 
             return VLC_SUCCESS;
         }
