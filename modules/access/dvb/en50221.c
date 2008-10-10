@@ -427,7 +427,7 @@ static void SessionOpen( access_t * p_access, uint8_t i_slot,
         if ( !p_sys->p_sessions[i_session_id - 1].i_resource_id )
             break;
     }
-    if ( i_session_id == MAX_SESSIONS )
+    if ( i_session_id > MAX_SESSIONS )
     {
         msg_Err( p_access, "too many sessions !" );
         return;
