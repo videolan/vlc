@@ -6,7 +6,7 @@ http://developers.videolan.org/vlc/
 Bootstrapping VLC
 =================
 
-If you retrieved VLC from the SVN server and do not have a "configure"
+If you retrieved VLC from the git server and do not have a "configure"
 script, please refer to the HACKING file.
 
 Configuring VLC
