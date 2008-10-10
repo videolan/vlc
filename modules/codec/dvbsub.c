@@ -838,13 +838,12 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
         msg_Dbg( p_dec, "new region: %i", i_id );
 #endif
         p_region = *pp_region = malloc( sizeof(dvbsub_region_t) );
-        if( p_region )
-        {
-            memset( p_region, 0, sizeof(dvbsub_region_t) );
-            p_region->p_object_defs = NULL;
-            p_region->p_pixbuf = NULL;
-            p_region->p_next = NULL;
-        }
+        if( !p_region )
+            return;
+        memset( p_region, 0, sizeof(dvbsub_region_t) );
+        p_region->p_object_defs = NULL;
+        p_region->p_pixbuf = NULL;
+        p_region->p_next = NULL;
     }
 
     /* Region attributes */
