@@ -41,7 +41,7 @@
 #ifdef OVERLAP
     #include <math.h>
     // OS CODE DEPENDENT to get display dimensions
-    #ifdef SYS_MINGW32
+    #ifdef WIN32
         #include <windows.h>
     #else
         #include <X11/Xlib.h>
@@ -188,7 +188,7 @@ vlc_module_begin();
     add_integer_with_range( CFG_PREFIX "bz-whitelevel-red", 0, 0, 255, NULL, RGAMMA_WL_TEXT, RGAMMA_WL_LONGTEXT, true );
     add_integer_with_range( CFG_PREFIX "bz-whitelevel-green", 0, 0, 255, NULL, GGAMMA_WL_TEXT, GGAMMA_WL_LONGTEXT, true );
     add_integer_with_range( CFG_PREFIX "bz-whitelevel-blue", 0, 0, 255, NULL, BGAMMA_WL_TEXT, BGAMMA_WL_LONGTEXT, true );
-#ifndef SYS_MINGW32
+#ifndef WIN32
 #define XINERAMA_TEXT N_("Xinerama option")
 #define XINERAMA_LONGTEXT N_("Uncheck if you have not used xinerama")
     add_bool( CFG_PREFIX "xinerama", 1, NULL, XINERAMA_TEXT, XINERAMA_LONGTEXT, true );
@@ -244,7 +244,7 @@ struct vout_sys_t
     uint8_t         LUT2[VOUT_MAX_PLANES][256][500];
 #endif
 #endif
-#ifndef SYS_MINGW32
+#ifndef WIN32
     bool   b_xinerama;
 #endif
 #endif
@@ -358,7 +358,7 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
     p_vout->p_sys->i_row = var_CreateGetInteger( p_vout, CFG_PREFIX "rows" );
 
 // OS dependent code :  Autodetect number of displays in wall
-#ifdef SYS_MINGW32
+#ifdef WIN32
     if ((p_vout->p_sys->i_col < 0) || (p_vout->p_sys->i_row < 0) )
     {
         int nbMonitors = GetSystemMetrics(SM_CMONITORS);
@@ -411,7 +411,7 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
     p_vout->p_sys->f_gamma_green = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-green" );
     p_vout->p_sys->f_gamma_blue = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-blue" );
 #endif
-#ifndef SYS_MINGW32
+#ifndef WIN32
     p_vout->p_sys->b_xinerama = var_CreateGetBool( p_vout, CFG_PREFIX "xinerama" );
 #endif
 #else
@@ -554,7 +554,7 @@ static int AdjustHeight( vout_thread_t *p_vout )
     // OS DEPENDENT CODE to get display dimensions
     if (b_fullscreen )
     {
-#ifdef SYS_MINGW32
+#ifdef WIN32
         i_window_width  = GetSystemMetrics(SM_CXSCREEN);
         i_window_height = GetSystemMetrics(SM_CYSCREEN);
 #else
