@@ -118,7 +118,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
         /* Peek for 'style' argument */
         pos = ftell( fd );
         if( pos < 0 )
-                goto error;
+            goto error;
 
         result = fscanf(fd, "%24s %24s", &cmd[0], &action[0] );
         if( result == 0 || result == EOF )
@@ -510,7 +510,8 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
 
 error:
     msg_Err( p_menu, "parsing file failed (returned %d)", result );
-    osd_MenuFree( p_menu );
+    if( p_menu )
+        osd_MenuFree( p_menu );
     fclose( fd );
     return VLC_EGENERIC;
 }
