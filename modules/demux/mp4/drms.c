@@ -2083,7 +2083,7 @@ static int GetiPodID( int64_t *p_ipod_id )
 
 #else /* !defined( UNDER_CE ) */
 
-void *drms_alloc( char *psz_homedir ){ return 0; }
+void *drms_alloc( const char *psz_homedir ){ return 0; }
 void drms_free( void *a ){}
 void drms_decrypt( void *a, uint32_t *b, uint32_t c  ){}
 int drms_init( void *a, uint32_t b, uint8_t *c, uint32_t d ){ return -1; }
