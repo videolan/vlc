@@ -588,6 +588,8 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     {
         es_out_id_t *p_es = p_sys->es[i];
 
+        p_es->i_preroll_end = -1;
+
         if( !p_es->p_dec )
             continue;
         input_DecoderWaitBuffering( p_es->p_dec );
@@ -601,7 +603,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     const mtime_t i_ts_delay = 10*1000 + /* FIXME CLEANUP thread wake up time*/
                                mdate();
     //msg_Dbg( p_sys->p_input, "==> %lld", i_ts_delay - p_sys->p_input->i_pts_delay );
-    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_clock, i_ts_delay - p_sys->p_input->i_pts_delay );
+    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_clock, i_ts_delay - p_sys->p_input->i_pts_delay - i_preroll_duration );
 
     for( int i = 0; i < p_sys->i_es; i++ )
     {
@@ -1683,8 +1685,6 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
         if( i_date < es->i_preroll_end )
             p_block->i_flags |= BLOCK_FLAG_PREROLL;
-        else
-            es->i_preroll_end = -1;
     }
 
     p_block->i_rate = 0;
