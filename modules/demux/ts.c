@@ -1664,7 +1664,7 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
 static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
 {
     block_t *p_pes = pid->es->p_pes;
-    uint8_t header[30];
+    uint8_t header[34];
     int     i_pes_size = 0;
     int     i_skip = 0;
     mtime_t i_dts = -1;
@@ -1679,7 +1679,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     pid->es->pp_last = &pid->es->p_pes;
 
     /* FIXME find real max size */
-    i_max = block_ChainExtract( p_pes, header, 30 );
+    i_max = block_ChainExtract( p_pes, header, 34 );
 
 
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
