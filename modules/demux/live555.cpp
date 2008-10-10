@@ -1252,7 +1252,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                         p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
                 }
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 p_sys->i_pcr = 0;
 
                 /* Retrieve RTP-Info values */
@@ -1338,7 +1337,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_npt_start = 0;
             p_sys->i_pcr = 0;
             p_sys->i_npt = 0.;
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() + 0.5 );
             return VLC_SUCCESS;

@@ -649,7 +649,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                 {
                     ParseCluster();
                     msg_Dbg( &sys.demuxer, "we found a cluster that is in the neighbourhood" );
-                    es_out_Control( sys.demuxer.out, ES_OUT_RESET_PCR );
                     return;
                 }
             }
@@ -689,8 +688,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     cluster = NULL;
 
     sys.i_start_pts = i_date;
-
-    es_out_Control( sys.demuxer.out, ES_OUT_RESET_PCR );
 
     /* now parse until key frame */
     i_track_skipping = 0;
@@ -744,7 +741,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                 }
                 if( !tracks[i_track]->b_search_keyframe )
                 {
-                    //es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, sys.i_pts );
                     BlockDecode( &sys.demuxer, block, simpleblock, sys.i_pts, 0, i_block_ref1 >= 0 || i_block_ref2 > 0 );
                 }
             }
@@ -865,10 +861,10 @@ static int Demux( demux_t *p_demux)
         else
             p_sys->i_pts = (p_sys->i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
 
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
+
         if( p_sys->i_pts >= p_sys->i_start_pts  )
         {
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
-
             if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             {
                 i_return = 1;

@@ -327,7 +327,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 ModPlug_Seek( p_sys->f, i64 / 1000 );
                 p_sys->i_time = i64 + 1;
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 return VLC_SUCCESS;
             }
@@ -350,7 +349,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 ModPlug_Seek( p_sys->f, i64 / 1000 );
                 p_sys->i_time = i64 + 1;
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 return VLC_SUCCESS;
             }

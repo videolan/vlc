@@ -794,7 +794,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 msg_Dbg(p_demux, "Seek in real rtsp stream!");
                 p_sys->i_pcr = (int64_t)1000 * ( p_sys->i_our_duration * f  );
 
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR , p_sys->i_pcr );
                 p_sys->b_seek = 1;
 
                 return stream_Seek( p_demux->s, p_sys->i_pcr );
@@ -819,8 +818,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
                 p_sys->i_pcr = 1000 * (int64_t) p_index->time_offset;
 
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR , p_sys->i_pcr );
-
                 return stream_Seek( p_demux->s, i64 );
             }
         case DEMUX_SET_TIME:
@@ -840,7 +837,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             p_sys->i_pcr = 1000 * (int64_t) p_index->time_offset;
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR , p_sys->i_pcr );
 
             return stream_Seek( p_demux->s, i64 );
 

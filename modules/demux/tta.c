@@ -236,7 +236,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_POSITION:
             f = (double)va_arg( args, double );
             i64 = (int64_t)(f * (stream_Size( p_demux->s ) - p_sys->i_start));
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             if( i64 > 0 )
             {
                 int64_t tmp = 0;

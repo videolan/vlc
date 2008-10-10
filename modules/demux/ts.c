@@ -1235,11 +1235,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             f = (double) va_arg( args, double );
             i64 = stream_Size( p_demux->s );
 
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             if( stream_Seek( p_demux->s, (int64_t)(i64 * f) ) )
-            {
                 return VLC_EGENERIC;
-            }
+
             return VLC_SUCCESS;
 #if 0
 

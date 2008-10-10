@@ -1104,7 +1104,6 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
 
     /* to hell with syncing any audio or video, just start reading records... :) */
     /*p_sys->lastAudioPTS = p_sys->lastVideoPTS = 0;*/
-    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
     return VLC_SUCCESS;
 }
 

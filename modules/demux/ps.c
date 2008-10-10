@@ -449,7 +449,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             f = (double) va_arg( args, double );
             i64 = stream_Size( p_demux->s );
             p_sys->i_current_pts = 0;
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             return stream_Seek( p_demux->s, (int64_t)(i64 * f) );
 
@@ -494,7 +493,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 int64_t i_offset = i_pos / (i_now / 1000000) * ((i64 - i_now) / 1000000);
                 stream_Seek( p_demux->s, i_pos + i_offset);
 
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
