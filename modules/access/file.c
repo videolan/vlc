@@ -349,6 +349,7 @@ static int open_file (access_t *p_access, const char *path)
                         _("VLC could not open the file \"%s\"."), path);
         return -1;
     }
+    fcntl (fd, F_SETFD, fcntl (fd, F_GETFD) | FD_CLOEXEC);
 
 #if defined(HAVE_FCNTL_H)
     /* We'd rather use any available memory for reading ahead

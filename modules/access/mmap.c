@@ -104,6 +104,7 @@ static int Open (vlc_object_t *p_this)
         msg_Warn (p_access, "cannot open %s: %m", path);
         goto error;
     }
+    fcntl (fd, F_SETFD, fcntl (fd, F_GETFD) | FD_CLOEXEC);
 
     /* mmap() is only safe for regular and block special files.
      * For other types, it may be some idiosyncrasic interface (e.g. packet
