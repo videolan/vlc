@@ -729,10 +729,10 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
                 p_bk->i_pts = 0;     /*only first packet has a pts */
                 break;
             }
-            else if( i == p_sys->i_tracks - 1 )
-            {
-                block_Release( p_pkt );
-            }
+        }
+        if( i >= p_sys->i_tracks )
+        {
+            block_Release( p_pkt );
         }
     }
 
