@@ -32,6 +32,10 @@
 #include <spawn.h>
 #include <sys/wait.h>
 #include <sys/ioctl.h>
+#ifdef __linux__
+# include <sys/uio.h>
+# include <sys/mman.h>
+#endif
 
 #include <assert.h>
 
@@ -71,10 +75,12 @@ static void cloexec (int fd)
 
 extern char **environ;
 
-static void cleanup_fd (void *data)
+static const size_t bufsize = 65536;
+static void cleanup_mmap (void *addr)
 {
-    close ((intptr_t)data);
+    munmap (addr, bufsize);
 }
+
 
 static void *Thread (void *data)
 {
@@ -83,17 +89,19 @@ static void *Thread (void *data)
     int fd = p_sys->write_fd;
     bool error = false;
 
-    vlc_cleanup_push (cleanup_fd, (void *)(intptr_t)fd);
-
     do
     {
-#ifdef __linux__
-        /* TODO: mmap() + vmsplice() */
-#endif
-        unsigned char buf[65536];
+        ssize_t len;
         int canc = vlc_savecancel ();
-        ssize_t len = stream_Read (demux->s, buf, sizeof (buf));
+#ifdef __linux__
+        unsigned char *buf = mmap (NULL, bufsize, PROT_READ|PROT_WRITE,
+                                   MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+        vlc_cleanup_push (cleanup_mmap, buf);
+#else
+        unsigned char buf[bufsize];
+#endif
 
+        len = stream_Read (demux->s, buf, bufsize);
         vlc_restorecancel (canc);
 
         if (len <= 0)
@@ -101,7 +109,13 @@ static void *Thread (void *data)
 
         for (ssize_t i = 0, j = 0; i < len; i += j)
         {
-            j = write (fd, buf + i, len - i);
+            struct iovec iov[1] = { { buf + i, len - i, } };
+
+#ifdef __linux__
+            j = vmsplice (fd, iov, 1, SPLICE_F_GIFT);
+#else
+            j = writev (fd, iov, 1);
+#endif
             if (j == -1)
             {
                 msg_Err (demux, "cannot write data (%m)");
@@ -109,10 +123,13 @@ static void *Thread (void *data)
                 break;
             }
         }
+#ifdef __linux__
+        vlc_cleanup_run (); /* munmap (buf, bufsize) */
+#endif
     }
     while (!error);
 
-    vlc_cleanup_run (); /* close(fd) */
+    msg_Dbg (demux, "compressed stream at EOF");
     return NULL;
 }
 
@@ -249,6 +266,7 @@ static void Close (vlc_object_t *obj)
     stream_DemuxDelete (p_sys->out);
     close (p_sys->read_fd);
     vlc_join (p_sys->thread, NULL);
+    close (p_sys->write_fd);
 
     msg_Dbg (obj, "waiting for PID %u", (unsigned)p_sys->pid);
     while (waitpid (p_sys->pid, &status, 0) == -1);
