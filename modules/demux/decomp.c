@@ -81,10 +81,11 @@ static void *Thread (void *data)
     demux_t *demux = data;
     demux_sys_t *p_sys = demux->p_sys;
     int fd = p_sys->write_fd;
+    bool error = false;
 
     vlc_cleanup_push (cleanup_fd, (void *)(intptr_t)fd);
 
-    for (;;)
+    do
     {
 #ifdef __linux__
         /* TODO: mmap() + vmsplice() */
@@ -104,10 +105,12 @@ static void *Thread (void *data)
             if (j == -1)
             {
                 msg_Err (demux, "cannot write data (%m)");
+                error = true;
                 break;
             }
         }
     }
+    while (!error);
 
     vlc_cleanup_run (); /* close(fd) */
     return NULL;
