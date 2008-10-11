@@ -448,7 +448,7 @@ void RefreshAudioMenu( intf_thread_t *_p_intf, HMENU hMenu );
 void RefreshVideoMenu( intf_thread_t *_p_intf, HMENU hMenu );
 void RefreshNavigMenu( intf_thread_t *_p_intf, HMENU hMenu );
 void RefreshMenu( intf_thread_t *, vector<MenuItemExt*> *, HMENU, int,
-                  char **, int *, int );
+                  char **, vlc_object_t **, int );
 int wce_GetMenuItemCount( HMENU );
 void CreateMenuItem( intf_thread_t *, vector<MenuItemExt*> *, HMENU, char *,
                      vlc_object_t *, int * );
@@ -465,7 +465,7 @@ class MenuItemExt
 public:
     /* Constructor */
     MenuItemExt( intf_thread_t *_p_intf, int _id, char *_psz_var,
-                 int _i_object_id, vlc_value_t _val, int _i_val_type );
+                 vlc_object_t * p_object, vlc_value_t _val, int _i_val_type );
 
     virtual ~MenuItemExt();
 
@@ -475,7 +475,7 @@ public:
     intf_thread_t *p_intf;
     char *psz_var;
     int  i_val_type;
-    int  i_object_id;
+    vlc_object_t * p_object;
     vlc_value_t val;
 
 private:
