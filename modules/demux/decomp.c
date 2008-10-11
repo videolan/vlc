@@ -66,7 +66,7 @@ struct demux_sys_t
 static void cloexec (int fd)
 {
     int flags = fcntl (fd, F_GETFD);
-    fcntl (fd, F_SETFD, O_CLOEXEC | (flags != -1) ? flags : 0);
+    fcntl (fd, F_SETFD, FD_CLOEXEC | ((flags != -1) ? flags : 0));
 }
 
 extern char **environ;
@@ -202,7 +202,7 @@ static int Open (demux_t *demux, const char *path)
                 if (!posix_spawn_file_actions_adddup2 (&actions, comp[0], 0)
                  && !posix_spawn_file_actions_addclose (&actions, comp[0])
                  && !posix_spawn_file_actions_adddup2 (&actions, uncomp[1], 1)
-                 && !posix_spawn_file_actions_addclose (&actions, comp[1])
+                 && !posix_spawn_file_actions_addclose (&actions, uncomp[1])
                  && !posix_spawnp (&p_sys->pid, path, &actions, NULL, argv,
                                    environ))
                 {
