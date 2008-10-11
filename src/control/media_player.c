@@ -896,8 +896,8 @@ int libvlc_media_player_get_chapter_count_for_title(
     if( !p_input_thread )
         return -1;
 
-    char *psz_name = NULL;
-    if( asprintf( psz_name,  "title %2i", i_title ) == -1 )
+    char *psz_name;
+    if( asprintf( &psz_name,  "title %2i", i_title ) == -1 )
     {
         vlc_object_release( p_input_thread );
         return -1;
