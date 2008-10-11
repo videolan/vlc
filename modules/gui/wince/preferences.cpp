@@ -321,10 +321,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                               PrefsDialog *_p_prefs_dialog, HWND hwnd,
                               HINSTANCE hInst )
 {
-    vlc_list_t      *p_list;
     module_t        *p_module = NULL;
     module_config_t *p_item;
-    int i_index;
 
     INITCOMMONCONTROLSEX iccex;
     RECT rcClient;
@@ -362,10 +360,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
 
     tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-    /* List the plugins */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    if( !p_list ) return;
-
     /*
      * Build a tree of the main options
      */
@@ -385,39 +379,72 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
     general_item = hPrev;
 
     /* Build the categories list */
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    p_module = module_get_main();
+
+    unsigned int confsize;
+    const char *psz_help;
+    module_config_t * p_config;
+
+    /* Enumerate config categories and store a reference so we can
+     * generate their config panel when it is asked by the user. */
+    p_config = module_config_get (p_module, &confsize);
+
+    for( size_t i = 0; i < confsize; i++ )
     {
-        p_module = (module_t *)p_list->p_values[i_index].p_object;
-        if( strcmp( module_get_object( p_module ), "main" ) == 0 )
-            break;
-    }
-    /* TODO replace by
-     * p_module = module_get_main( p_intf );
-     */
-    if( i_index < p_list->i_count )
-    {
-        unsigned int confsize;
-        const char *psz_help;
-        module_config_t * p_config;
+    /* Work on a new item */
+        module_config_t *p_item = p_config + i;
 
-        /* We found the main module */
+            switch( p_item->i_type )
+            {
+                case CONFIG_CATEGORY:
+                    if( p_item->value.i == -1 )   break; // Don't display it
+                    config_data = new ConfigTreeData;
+                    config_data->psz_name = strdup( config_CategoryNameGet(p_item->value.i ) );
+                    psz_help = config_CategoryHelpGet( p_item->value.i );
+                    if( psz_help )
+                    {
+                        config_data->psz_help = wraptext( strdup( psz_help ), 72 );
+                    }
+                    else
+                    {
+                        config_data->psz_help = NULL;
+                    }
 
-        /* Enumerate config categories and store a reference so we can
-         * generate their config panel them when it is asked by the user. */
-        p_config = module_config_get (p_module, &confsize);
+                    config_data->i_type = TYPE_CATEGORY;
+                    config_data->i_object_id = p_item->value.i;
+                    config_data->p_module =  p_module;
+                    tvi.pszText = _FROMMB(config_data->psz_name);
+                    tvi.cchTextMax = _tcslen(tvi.pszText);
 
-        for( size_t i = 0; i < confsize; i++ )
-        {
-        /* Work on a new item */
-            module_config_t *p_item = p_config + i;
+                    /* Add the category to the tree */
+                    tvi.lParam = (long)config_data;
+                    tvins.item = tvi;
+                    tvins.hInsertAfter = hPrev;
+                    tvins.hParent = general_item; //level 3
 
-                switch( p_item->i_type )
-                {
-                    case CONFIG_CATEGORY:
-                        if( p_item->value.i == -1 )   break; // Don't display it
-                        config_data = new ConfigTreeData;
-                        config_data->psz_name = strdup( config_CategoryNameGet(p_item->value.i ) );
-                        psz_help = config_CategoryHelpGet( p_item->value.i );
+                    // Add the item to the tree-view control.
+                    hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
+                    break;
+
+                case CONFIG_SUBCATEGORY:
+                    if( p_item->value.i == -1 ) break; // Don't display it
+                    /* Special case: move the "general" subcategories to their parent category */
+                    if(config_data && p_item->value.i == SUBCAT_VIDEO_GENERAL ||
+                        p_item->value.i == SUBCAT_ADVANCED_MISC ||
+                        p_item->value.i == SUBCAT_INPUT_GENERAL ||
+                        p_item->value.i == SUBCAT_INTERFACE_GENERAL ||
+                        p_item->value.i == SUBCAT_SOUT_GENERAL||
+                        p_item->value.i == SUBCAT_PLAYLIST_GENERAL||
+                        p_item->value.i == SUBCAT_AUDIO_GENERAL )
+                    {
+
+                        config_data->i_type = TYPE_CATSUBCAT;
+                        config_data->i_subcat_id = p_item->value.i;
+                        free( config_data->psz_name );
+                        config_data->psz_name = strdup( config_CategoryNameGet( p_item->value.i ) );
+
+                        free( config_data->psz_help );
+                        const char *psz_help = config_CategoryHelpGet( p_item->value.i );
                         if( psz_help )
                         {
                             config_data->psz_help = wraptext( strdup( psz_help ), 72 );
@@ -426,98 +453,54 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                         {
                             config_data->psz_help = NULL;
                         }
+                        continue;
+                    }
 
-                        config_data->i_type = TYPE_CATEGORY;
-                        config_data->i_object_id = p_item->value.i;
-                        config_data->p_module =  p_module;
-                        tvi.pszText = _FROMMB(config_data->psz_name);
-                        tvi.cchTextMax = _tcslen(tvi.pszText);
+                    config_data = new ConfigTreeData;
 
-                        /* Add the category to the tree */
-                        tvi.lParam = (long)config_data;
-                        tvins.item = tvi;
-                        tvins.hInsertAfter = hPrev;
-                        tvins.hParent = general_item; //level 3
+                    config_data->psz_name = strdup(  config_CategoryNameGet( p_item->value.i ) );
+                    psz_help = config_CategoryHelpGet( p_item->value.i );
+                    if( psz_help )
+                    {
+                        config_data->psz_help = wraptext( strdup( psz_help ), 72 );
+                    }
+                    else
+                    {
+                        config_data->psz_help = NULL;
+                    }
+                    config_data->i_type = TYPE_SUBCATEGORY;
+                    config_data->i_object_id = p_item->value.i;
 
-                        // Add the item to the tree-view control.
-                        hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
-                        break;
+                    tvi.pszText = _FROMMB(config_data->psz_name);
+                    tvi.cchTextMax = _tcslen(tvi.pszText);
 
-                    case CONFIG_SUBCATEGORY:
-                        if( p_item->value.i == -1 ) break; // Don't display it
-                        /* Special case: move the "general" subcategories to their parent category */
-                        if(config_data && p_item->value.i == SUBCAT_VIDEO_GENERAL ||
-                            p_item->value.i == SUBCAT_ADVANCED_MISC ||
-                            p_item->value.i == SUBCAT_INPUT_GENERAL ||
-                            p_item->value.i == SUBCAT_INTERFACE_GENERAL ||
-                            p_item->value.i == SUBCAT_SOUT_GENERAL||
-                            p_item->value.i == SUBCAT_PLAYLIST_GENERAL||
-                            p_item->value.i == SUBCAT_AUDIO_GENERAL )
-                        {
+                    tvi.lParam = (long)config_data;
+                    tvins.item = tvi;
+                    tvins.hInsertAfter = hPrev;
+                    tvins.hParent = hPrev;
 
-                            config_data->i_type = TYPE_CATSUBCAT;
-                            config_data->i_subcat_id = p_item->value.i;
-                            free( config_data->psz_name );
-                            config_data->psz_name = strdup( config_CategoryNameGet( p_item->value.i ) );
+                    // Add the item to the tree-view control.
+                    TreeView_InsertItem( hwndTV, &tvins );
+                    break;
 
-                            free( config_data->psz_help );
-                            const char *psz_help = config_CategoryHelpGet( p_item->value.i );
-                            if( psz_help )
-                            {
-                                config_data->psz_help = wraptext( strdup( psz_help ), 72 );
-                            }
-                            else
-                            {
-                                config_data->psz_help = NULL;
-                            }
-                            continue;
-                        }
+            }
+        }
+    TreeView_SortChildren( hwndTV, general_item, 0 );
+    module_config_free( p_config );
 
-                        config_data = new ConfigTreeData;
+    /* List the plugins */
+    module_t **p_list = module_list_get( NULL );
 
-                        config_data->psz_name = strdup(  config_CategoryNameGet( p_item->value.i ) );
-                        psz_help = config_CategoryHelpGet( p_item->value.i );
-                        if( psz_help )
-                        {
-                            config_data->psz_help = wraptext( strdup( psz_help ), 72 );
-                        }
-                        else
-                        {
-                            config_data->psz_help = NULL;
-                        }
-                        config_data->i_type = TYPE_SUBCATEGORY;
-                        config_data->i_object_id = p_item->value.i;
-
-                        tvi.pszText = _FROMMB(config_data->psz_name);
-                        tvi.cchTextMax = _tcslen(tvi.pszText);
-
-                        tvi.lParam = (long)config_data;
-                        tvins.item = tvi;
-                        tvins.hInsertAfter = hPrev;
-                        tvins.hParent = hPrev;
-
-                        // Add the item to the tree-view control.
-                        TreeView_InsertItem( hwndTV, &tvins );
-                        break;
-
-                }
-         }
-        TreeView_SortChildren( hwndTV, general_item, 0 );
-        module_config_free( p_config );
-    }
-
-
-    module_config_t *p_config;
     /*
     * Build a tree of all the plugins
     */
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( size_t i_index = 0; p_list[i_index]; i_index++ )
     {
         /* Take every module */
-        p_module = (module_t *)p_list->p_values[i_index].p_object;
+        p_module = p_list[i_index];
 
         /* Exclude the main module */
-        if( !strcmp( module_get_object( p_module ), "main" ) )
+        if( module_is_main( p_module ) )
             continue;
 
         /* Exclude empty plugins (submodules don't have config options, they
@@ -547,7 +530,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
         }
         module_config_free (p_config);
 
-        //if( !i_options ) continue;
         /* Dummy item, please proceed */
         if( !b_options || i_category == 0 || i_subcategory == 0 ) continue;
 
@@ -588,7 +570,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                         config_data->i_object_id = p_item->value.i;
                         config_data->p_module = p_module;
 
-                        tvi.pszText = _FROMMB(module_name( p_module, false ));
+                        tvi.pszText = _FROMMB(module_get_name( p_module, false ));
                         tvi.cchTextMax = _tcslen(tvi.pszText);
 
                         tvi.lParam = (long)config_data;
@@ -621,7 +603,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
     }
 
     /* Clean-up everything */
-    vlc_list_release( p_list );
+    module_list_free( p_list );
 
     TreeView_Expand( hwndTV, general_item, TVE_EXPANDPARTIAL |TVE_EXPAND );
 }
@@ -764,7 +746,7 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
     /* Initializations */
     p_intf = _p_intf;
     p_prefs_dialog = _p_prefs_dialog;
-    vlc_list_t *p_list = NULL;
+    module_t **p_list;
 
     b_advanced = true;
 
@@ -786,14 +768,13 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
         else
         {
             /* List the plugins */
-            int i_index;
+            size_t i_index;
             bool b_found = false;
-            p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-            if( !p_list ) return;
+            p_list = module_list_get( NULL );
 
-            for( i_index = 0; i_index < p_list->i_count; i_index++ )
+            for( i_index = 0; p_list[i_index]; i_index++ )
             {
-                p_module = (module_t *)p_list->p_values[i_index].p_object;
+                p_module = p_list[i_index];
                 if( !strcmp( module_get_object(p_module), "main" ) )
                 {
                     b_found = true;

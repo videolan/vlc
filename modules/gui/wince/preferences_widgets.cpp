@@ -287,7 +287,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
                                           int * py_pos )
   : ConfigControl( p_this, p_item, parent, hInst )
 {
-    vlc_list_t *p_list;
+    module_t **p_list;
     module_t *p_parser;
 
     label = CreateWindow( _T("STATIC"), _FROMMB(p_item->psz_text),
@@ -306,14 +306,15 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     *py_pos += 15 + 10;
 
     /* build a list of available modules */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = module_list_get( NULL );
     ComboBox_AddString( combo, _T("Default") );
     ComboBox_SetItemData( combo, 0, (void *)NULL );
     ComboBox_SetCurSel( combo, 0 );
     //ComboBox_SetText( combo, _T("Default") );
-    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+
+    for( size_t i_index = 0; p_list[i_index]; i_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        p_parser = p_list[i_index];
 
         if( module_provides( p_parser, p_item->psz_type ) )
         {
@@ -324,11 +325,11 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
                                              module_get_object( p_parser )) )
             {
                 ComboBox_SetCurSel( combo, i_index );
-                //ComboBox_SetText( combo, _FROMMB(p_parser->psz_longname) );
+                //ComboBox_SetText( combo, _FROMMB( module_GetLongName(p_parser)) );
             }
         }
     }
-    vlc_list_release( p_list );
+    module_list_free( p_list );
 }
 
 ModuleConfigControl::~ModuleConfigControl()
