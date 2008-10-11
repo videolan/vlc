@@ -1,8 +1,8 @@
 Index: configure.ac
 ===================================================================
---- configure.ac	(revision 1107)
+--- configure.ac	(revision 1157)
 +++ configure.ac	(working copy)
-@@ -137,24 +137,59 @@
+@@ -137,27 +137,59 @@
  dnl ---------------------------------------------
  dnl dynamic linker
  dnl ---------------------------------------------
@@ -14,12 +14,15 @@ Index: configure.ac
 -  *cygwin*)
 -    LDFLAGS="-no-undefined $LDFLAGS"
 -    ;;
+-  *os2*)
+-    LDFLAGS="-no-undefined -Zbin-files $LDFLAGS"
+-    ;;
 -  *)
 -    AC_CHECK_LIB(c, dlopen,
--	         DYNAMIC_LD_LIBS="",
--	         AC_CHECK_LIB(dl, dlopen,
--             	              DYNAMIC_LD_LIBS="-ldl",
--	                      AC_MSG_ERROR(dynamic linker needed)))
+-                 DYNAMIC_LD_LIBS="",
+-                 AC_CHECK_LIB(dl, dlopen,
+-                              DYNAMIC_LD_LIBS="-ldl",
+-                              AC_MSG_ERROR(dynamic linker needed)))
 -    AC_SUBST(DYNAMIC_LD_LIBS)
 -    ;;
 -esac
