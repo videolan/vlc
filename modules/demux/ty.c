@@ -789,24 +789,17 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
     /* Send the CC data */
     if( p_block_in->i_pts > 0 && p_sys->cc.i_data > 0 )
     {
-        int i_cc_count;
-
-        block_t *p_cc = block_New( p_demux, p_sys->cc.i_data );
-        p_cc->i_flags |= BLOCK_FLAG_TYPE_I;
-        p_cc->i_pts = p_block_in->i_pts;
-        memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
-
-        for( i = 0, i_cc_count = 0; i < 4; i++ )
-            i_cc_count += p_sys->p_cc[i] ? 1 : 0;
-
         for( i = 0; i < 4; i++ )
         {
-            if( !p_sys->p_cc[i] )
-                continue;
-            if( i_cc_count > 1 )
-                es_out_Send( p_demux->out, p_sys->p_cc[i], block_Duplicate( p_cc ) );
-            else
+            if( p_sys->p_cc[i] )
+            {
+                block_t *p_cc = block_New( p_demux, p_sys->cc.i_data );
+                p_cc->i_flags |= BLOCK_FLAG_TYPE_I;
+                p_cc->i_pts = p_block_in->i_pts;
+                memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
+
                 es_out_Send( p_demux->out, p_sys->p_cc[i], p_cc );
+            }
         }
         cc_Flush( &p_sys->cc );
     }
