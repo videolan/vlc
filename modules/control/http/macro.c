@@ -338,25 +338,17 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     p_input = MRLParse( p_intf, mrl, psz_name );
 
-                    char *psz_uri = input_item_GetURI( p_input );
-                    if( !p_input || !psz_uri || !*psz_uri )
-                    {
-                        msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
-                    }
+                    char *psz_uri = p_input ? input_item_GetURI( p_input ) : NULL;
+                    if( psz_uri && *psz_uri &&
+                        playlist_AddInput( p_sys->p_playlist, p_input,
+                                           PLAYLIST_APPEND, PLAYLIST_END,
+                                           true, false) == VLC_SUCCESS )
+                        msg_Dbg( p_intf, "requested mrl add: %s", mrl );
                     else
-                    {
-                        int i_ret = playlist_AddInput( p_sys->p_playlist,
-                                     p_input,
-                                     PLAYLIST_APPEND, PLAYLIST_END, true,
-                                     false);
-                        vlc_gc_decref( p_input );
-                        if( i_ret == VLC_SUCCESS )
-                            msg_Dbg( p_intf, "requested mrl add: %s", mrl );
-                        else
-                            msg_Warn( p_intf, "adding mrl %s failed", mrl );
-                    }
+                        msg_Warn( p_intf, "adding mrl failed: %s", mrl );
                     free( psz_uri );
-
+                    if( p_input )
+                        vlc_gc_decref( p_input );
                     break;
                 }
                 case MVLC_DEL:
