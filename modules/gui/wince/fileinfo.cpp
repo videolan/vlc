@@ -120,9 +120,7 @@ void FileInfo::UpdateFileInfo()
 
     tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-    // Set the text of the item. Not right, but I don't know yet how to handle this
-    //tvi.pszText = _FROMMB( p_input->input.p_item->psz_name ); <- old line
-    input_item_t * inp_item = input_item_GetById( p_input, 1 );
+    input_item_t * inp_item = input_GetItem(p_input);
     tvi.pszText = _FROMMB( input_item_GetName( inp_item ) );
     tvi.cchTextMax = _tcslen( tvi.pszText );
 
