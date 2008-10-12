@@ -58,11 +58,7 @@ vlc_module_begin();
     set_capability ("access", 52);
     add_shortcut ("file");
     set_callbacks (Open, Close);
-#ifdef __APPLE__
     add_bool ("file-mmap", false, NULL,
-#else
-    add_bool ("file-mmap", true, NULL,
-#endif
               FILE_MMAP_TEXT, FILE_MMAP_LONGTEXT, true);
 vlc_module_end();
 
@@ -85,6 +81,8 @@ static int Open (vlc_object_t *p_this)
     access_sys_t *p_sys;
     const char *path = p_access->psz_path;
     int fd;
+
+    assert ((INT64_C(1) << 63) == ((off_t)(INT64_C(1) << 63)));
 
     if (!var_CreateGetBool (p_this, "file-mmap"))
         return VLC_EGENERIC; /* disabled */
