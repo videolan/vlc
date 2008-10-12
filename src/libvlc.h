@@ -70,7 +70,10 @@ uint32_t CPUCapabilities( void );
  * Message/logging stuff
  */
 
-typedef struct msg_queue_t
+/**
+ * Store all data required by messages interfaces.
+ */
+typedef struct msg_bank_t
 {
     /** Message queue lock */
     vlc_mutex_t             lock;
@@ -89,15 +92,6 @@ typedef struct msg_queue_t
 #ifdef UNDER_CE
     FILE *logfile;
 #endif
-} msg_queue_t;
-
-/**
- * Store all data required by messages interfaces.
- */
-typedef struct msg_bank_t
-{
-    vlc_mutex_t             lock;
-    msg_queue_t             queue;
 } msg_bank_t;
 
 void msg_Create  (libvlc_int_t *);

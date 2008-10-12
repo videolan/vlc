@@ -75,16 +75,14 @@ static uintptr_t banks = 0;
 #   define vlc_va_copy(dest,src) (dest)=(src)
 #endif
 
-#define QUEUE priv->msg_bank.queue
-#define LOCK_BANK vlc_mutex_lock( &priv->msg_bank.lock );
-#define UNLOCK_BANK vlc_mutex_unlock( &priv->msg_bank.lock );
+#define QUEUE priv->msg_bank
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void QueueMsg ( vlc_object_t *, int, const char *,
                        const char *, va_list );
-static void FlushMsg ( msg_queue_t * );
+static void FlushMsg ( msg_bank_t * );
 static void PrintMsg ( vlc_object_t *, msg_item_t * );
 
 static vlc_mutex_t msg_stack_lock = VLC_STATIC_MUTEX;
@@ -96,7 +94,6 @@ static vlc_mutex_t msg_stack_lock = VLC_STATIC_MUTEX;
 void msg_Create (libvlc_int_t *p_libvlc)
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    vlc_mutex_init( &priv->msg_bank.lock );
     vlc_mutex_init( &QUEUE.lock );
     vlc_dictionary_init( &priv->msg_enabled_objects, 0 );
     priv->msg_all_objects_enabled = true;
@@ -190,7 +187,6 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
 
     /* Destroy lock */
     vlc_mutex_destroy( &QUEUE.lock );
-    vlc_mutex_destroy( &priv->msg_bank.lock);
 }
 
 /**
@@ -204,7 +200,6 @@ msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this )
     if (p_sub == NULL)
         return NULL;
 
-    LOCK_BANK;
     vlc_mutex_lock( &QUEUE.lock );
 
     TAB_APPEND( QUEUE.i_sub, QUEUE.pp_sub, p_sub );
@@ -215,7 +210,6 @@ msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this )
     p_sub->p_lock  = &QUEUE.lock;
 
     vlc_mutex_unlock( &QUEUE.lock );
-    UNLOCK_BANK;
 
     return p_sub;
 }
@@ -227,7 +221,6 @@ void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
 
-    LOCK_BANK;
     vlc_mutex_lock( &QUEUE.lock );
     for( int j = 0 ; j< QUEUE.i_sub ; j++ )
     {
@@ -238,7 +231,6 @@ void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
         }
     }
     vlc_mutex_unlock( &QUEUE.lock );
-    UNLOCK_BANK;
 }
 
 /*****************************************************************************
@@ -311,7 +303,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     va_list      args;
     msg_item_t * p_item = NULL;                        /* pointer to message */
     msg_item_t   item;                    /* message in case of a full queue */
-    msg_queue_t *p_queue;
+    msg_bank_t  *p_queue;
 
 #if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
     int          i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
@@ -446,7 +438,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     psz_str[ i_size - 1 ] = 0; /* Just in case */
 #endif
 
-    LOCK_BANK;
     p_queue = &QUEUE;
     vlc_mutex_lock( &p_queue->lock );
 
@@ -516,7 +507,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     }
 
     vlc_mutex_unlock ( &p_queue->lock );
-    UNLOCK_BANK;
 }
 
 /* following functions are local */
@@ -527,7 +517,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
  * Print all messages remaining in queue. MESSAGE QUEUE MUST BE LOCKED, since
  * this function does not check the lock.
  *****************************************************************************/
-static void FlushMsg ( msg_queue_t *p_queue )
+static void FlushMsg ( msg_bank_t *p_queue )
 {
     int i_index, i_start, i_stop;
 
