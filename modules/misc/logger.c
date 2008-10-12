@@ -76,20 +76,26 @@
 #include <syslog.h>
 #endif
 
+struct msg_cb_data_t
+{
+    intf_thread_t *p_intf;
+    FILE *p_file;
+    int   i_mode;
+};
+
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
  *****************************************************************************/
 struct intf_sys_t
 {
-    int i_mode;
     struct
     {
         FILE *stream;
         vlc_thread_t thread;
     } rrd;
 
-    FILE *    p_file; /* The log file */
     msg_subscription_t *p_sub;
+    msg_cb_data_t msg;
 };
 
 /*****************************************************************************
@@ -97,9 +103,8 @@ struct intf_sys_t
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-static void Run     ( intf_thread_t * );
 
-static void FlushQueue        ( msg_subscription_t *, FILE *, int, int );
+static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overruns);
 static void TextPrint         ( const msg_item_t *, FILE * );
 static void HtmlPrint         ( const msg_item_t *, FILE * );
 #ifdef HAVE_SYSLOG_H
@@ -159,7 +164,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
-    char *psz_mode, *psz_file, *psz_rrd_file;
+    char *psz_mode, *psz_rrd_file;
 
     CONSOLE_INTRO_MSG;
     msg_Info( p_intf, "using logger..." );
@@ -169,40 +174,38 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
+    p_sys->msg.p_intf = p_intf;
+    p_sys->msg.i_mode = MODE_TEXT;
     psz_mode = var_CreateGetString( p_intf, "logmode" );
     if( psz_mode )
     {
         if( !strcmp( psz_mode, "text" ) )
-        {
-            p_sys->i_mode = MODE_TEXT;
-        }
+            ;
         else if( !strcmp( psz_mode, "html" ) )
         {
-            p_sys->i_mode = MODE_HTML;
+            p_sys->msg.i_mode = MODE_HTML;
         }
 #ifdef HAVE_SYSLOG_H
         else if( !strcmp( psz_mode, "syslog" ) )
         {
-            p_sys->i_mode = MODE_SYSLOG;
+            p_sys->msg.i_mode = MODE_SYSLOG;
         }
 #endif
         else
         {
             msg_Warn( p_intf, "invalid log mode `%s', using `text'", psz_mode );
-            p_sys->i_mode = MODE_TEXT;
+            p_sys->msg.i_mode = MODE_TEXT;
         }
-
         free( psz_mode );
     }
     else
     {
         msg_Warn( p_intf, "no log mode specified, using `text'" );
-        p_intf->p_sys->i_mode = MODE_TEXT;
     }
 
-    if( p_sys->i_mode != MODE_SYSLOG )
+    if( p_sys->msg.i_mode != MODE_SYSLOG )
     {
-        psz_file = config_GetPsz( p_intf, "logfile" );
+        char *psz_file = config_GetPsz( p_intf, "logfile" );
         if( !psz_file )
         {
 #ifdef __APPLE__
@@ -211,7 +214,7 @@ static int Open( vlc_object_t *p_this )
                                              : LOG_FILE_TEXT ) == -1 )
                 psz_file = NULL;
 #else
-            switch( p_sys->i_mode )
+            switch( p_sys->msg.i_mode )
             {
             case MODE_HTML:
                 psz_file = strdup( LOG_FILE_HTML );
@@ -228,33 +231,33 @@ static int Open( vlc_object_t *p_this )
 
         /* Open the log file and remove any buffering for the stream */
         msg_Dbg( p_intf, "opening logfile `%s'", psz_file );
-        p_sys->p_file = utf8_fopen( psz_file, "at" );
-        if( p_sys->p_file == NULL )
+        p_sys->msg.p_file = utf8_fopen( psz_file, "at" );
+        if( p_sys->msg.p_file == NULL )
         {
             msg_Err( p_intf, "error opening logfile `%s'", psz_file );
             free( p_sys );
             free( psz_file );
             return -1;
         }
-        setvbuf( p_sys->p_file, NULL, _IONBF, 0 );
+        setvbuf( p_sys->msg.p_file, NULL, _IONBF, 0 );
 
         free( psz_file );
 
-        switch( p_sys->i_mode )
+        switch( p_sys->msg.i_mode )
         {
         case MODE_HTML:
-            fputs( HTML_HEADER, p_sys->p_file );
+            fputs( HTML_HEADER, p_sys->msg.p_file );
             break;
         case MODE_TEXT:
         default:
-            fputs( TEXT_HEADER, p_sys->p_file );
+            fputs( TEXT_HEADER, p_sys->msg.p_file );
             break;
         }
 
     }
     else
     {
-        p_sys->p_file = NULL;
+        p_sys->msg.p_file = NULL;
 #ifdef HAVE_SYSLOG_H
         openlog( "vlc", LOG_PID|LOG_NDELAY, LOG_DAEMON );
 #endif
@@ -281,8 +284,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->rrd.stream = NULL;
     free( psz_rrd_file );
 
-    p_sys->p_sub = msg_Subscribe( p_intf );
-    p_intf->pf_run = Run;
+    p_sys->p_sub = msg_Subscribe( p_intf->p_libvlc, Overflow, &p_sys->msg );
 
     return 0;
 }
@@ -302,15 +304,13 @@ static void Close( vlc_object_t *p_this )
     }
 
     /* Flush the queue and unsubscribe from the message queue */
-    FlushQueue( p_sys->p_sub, p_sys->p_file,
-                p_sys->i_mode,
-                var_CreateGetInteger( p_intf, "verbose" ) );
-    msg_Unsubscribe( p_intf, p_sys->p_sub );
+    /* FIXME: flush */
+    msg_Unsubscribe( p_sys->p_sub );
 
-    switch( p_sys->i_mode )
+    switch( p_sys->msg.i_mode )
     {
     case MODE_HTML:
-        fputs( HTML_FOOTER, p_sys->p_file );
+        fputs( HTML_FOOTER, p_sys->msg.p_file );
         break;
 #ifdef HAVE_SYSLOG_H
     case MODE_SYSLOG:
@@ -319,88 +319,48 @@ static void Close( vlc_object_t *p_this )
 #endif
     case MODE_TEXT:
     default:
-        fputs( TEXT_FOOTER, p_sys->p_file );
+        fputs( TEXT_FOOTER, p_sys->msg.p_file );
         break;
     }
 
     /* Close the log file */
-    if( p_sys->i_mode != MODE_SYSLOG )
-        fclose( p_sys->p_file );
+    if( p_sys->msg.p_file )
+        fclose( p_sys->msg.p_file );
 
     /* Destroy structure */
     free( p_sys );
 }
 
-static void Run( intf_thread_t *p_intf )
+/**
+ * Log a message
+ */
+static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overruns)
 {
-    for( ;; )
-    {
-        int canc = vlc_savecancel();
-        FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
-                    p_intf->p_sys->i_mode,
-                    var_CreateGetInteger( p_intf, "verbose" ) );
+    int verbosity = var_CreateGetInteger( p_sys->p_intf, "verbose" );
+    int priority = 0;
 
-        vlc_restorecancel( canc );
-        /* FIXME: this is WRONG. */
-        msleep( INTF_IDLE_SLEEP );
+    switch( p_item->i_type )
+    {
+        case VLC_MSG_WARN: priority = 1; break;
+        case VLC_MSG_DBG:  priority = 2; break;
     }
-}
+    if (verbosity < priority)
+        return;
 
-/*****************************************************************************
- * FlushQueue: flush the message queue into the log
- *****************************************************************************/
-static void FlushQueue( msg_subscription_t *p_sub, FILE *p_file, int i_mode,
-                        int i_verbose )
-{
-    int i_start, i_stop;
-
-    vlc_mutex_lock( p_sub->p_lock );
-    i_stop = *p_sub->pi_stop;
-    vlc_mutex_unlock( p_sub->p_lock );
-
-    if( p_sub->i_start != i_stop )
+    switch( p_sys->i_mode )
     {
-        /* Append all messages to log file */
-        for( i_start = p_sub->i_start;
-             i_start != i_stop;
-             i_start = (i_start+1) % VLC_MSG_QSIZE )
-        {
-            switch( p_sub->p_msg[i_start].i_type )
-            {
-            case VLC_MSG_ERR:
-                if( i_verbose < 0 ) continue;
-                break;
-            case VLC_MSG_INFO:
-                if( i_verbose < 0 ) continue;
-                break;
-            case VLC_MSG_WARN:
-                if( i_verbose < 1 ) continue;
-                break;
-            case VLC_MSG_DBG:
-                if( i_verbose < 2 ) continue;
-                break;
-            }
-
-            switch( i_mode )
-            {
-            case MODE_HTML:
-                HtmlPrint( &p_sub->p_msg[i_start], p_file );
-                break;
+        case MODE_HTML:
+            HtmlPrint( p_item, p_sys->p_file );
+            break;
 #ifdef HAVE_SYSLOG_H
-            case MODE_SYSLOG:
-                SyslogPrint( &p_sub->p_msg[i_start] );
-                break;
+        case MODE_SYSLOG:
+            SyslogPrint( p_item );
+            break;
 #endif
-            case MODE_TEXT:
-            default:
-                TextPrint( &p_sub->p_msg[i_start], p_file );
-                break;
-            }
-        }
-
-        vlc_mutex_lock( p_sub->p_lock );
-        p_sub->i_start = i_start;
-        vlc_mutex_unlock( p_sub->p_lock );
+        case MODE_TEXT:
+        default:
+            TextPrint( p_item, p_sys->p_file );
+            break;
     }
 }
 
