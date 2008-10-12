@@ -76,13 +76,14 @@ uint32_t CPUCapabilities( void );
 typedef struct msg_bank_t
 {
     /** Message queue lock */
-    vlc_mutex_t             lock;
-    bool              b_overflow;
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
 
     /* Message queue */
     msg_item_t              msg[VLC_MSG_QSIZE];           /**< message queue */
     int i_start;
     int i_stop;
+    bool b_overflow;
 
     /* Subscribers */
     int i_sub;

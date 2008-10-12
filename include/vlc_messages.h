@@ -71,14 +71,6 @@ typedef struct
  * Used by interface plugins which subscribe to the message bank.
  */
 typedef struct msg_subscription_t msg_subscription_t;
-struct msg_subscription_t
-{
-    int   i_start;
-    int*  pi_stop;
-
-    msg_item_t*  p_msg;
-    vlc_mutex_t* p_lock;
-};
 
 /*****************************************************************************
  * Prototypes
@@ -100,10 +92,16 @@ VLC_EXPORT( void, __msg_GenericVa, ( vlc_object_t *, int, const char *, const ch
       __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_DBG, \
                      MODULE_STRING, __VA_ARGS__ )
 
-#define msg_Subscribe(a) __msg_Subscribe(VLC_OBJECT(a))
-#define msg_Unsubscribe(a,b) __msg_Unsubscribe(VLC_OBJECT(a),b)
-VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t * ) );
-VLC_EXPORT( void, __msg_Unsubscribe, ( vlc_object_t *, msg_subscription_t * ) );
+typedef struct msg_cb_data_t msg_cb_data_t;
+
+/**
+ * Message logging callback signature.
+ * Accepts one private data pointer, the message, and an overrun counter.
+ */
+typedef void (*msg_callback_t) (msg_cb_data_t *, msg_item_t *, unsigned);
+
+VLC_EXPORT( msg_subscription_t*, msg_Subscribe, ( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) );
+VLC_EXPORT( void, msg_Unsubscribe, ( msg_subscription_t * ) );
 
 /* Enable or disable a certain object debug messages */
 #define msg_EnableObjectPrinting(a,b) __msg_EnableObjectPrinting(VLC_OBJECT(a),b)

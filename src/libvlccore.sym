@@ -223,8 +223,8 @@ __msg_DisableObjectPrinting
 __msg_EnableObjectPrinting
 __msg_Generic
 __msg_GenericVa
-__msg_Subscribe
-__msg_Unsubscribe
+msg_Subscribe
+msg_Unsubscribe
 msleep
 mstrtime
 mwait
