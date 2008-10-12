@@ -609,7 +609,7 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
-    asprintf( psz_tmp, "SCRIPT_NAME=%s", p_url );
+    asprintf( &psz_tmp, "SCRIPT_NAME=%s", p_url );
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
 #define p_sys p_args->file.p_intf->p_sys
