@@ -70,6 +70,7 @@ typedef struct
 /**
  * Used by interface plugins which subscribe to the message bank.
  */
+typedef struct msg_subscription_t msg_subscription_t;
 struct msg_subscription_t
 {
     int   i_start;

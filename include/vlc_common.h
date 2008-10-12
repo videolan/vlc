@@ -143,9 +143,6 @@ typedef struct date_t date_t;
 typedef struct dict_entry_t dict_entry_t;
 typedef struct dict_t dict_t;
 
-/* Messages */
-typedef struct msg_subscription_t msg_subscription_t;
-
 /* Playlist */
 
 /* FIXME */
