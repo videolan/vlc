@@ -123,6 +123,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
  *  - intf-change
  *  - intf-change-vout for when a vout is created or destroyed
  *  - rate-change for when playback rate changes
+ *  - stats-change for when statistics are updated
  * TODO explain when Callback is called
  * TODO complete this list (?)
  *****************************************************************************/
@@ -706,6 +707,7 @@ static void MainLoopStatistic( input_thread_t *p_input )
         stats_ComputeGlobalStats( p_input->p_libvlc,
                                   p_input->p_libvlc->p_stats );
     }
+    var_SetBool( p_input, "stats-change", true );
 }
 
 /**

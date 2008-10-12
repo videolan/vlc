@@ -223,11 +223,15 @@ void input_ControlVarInit ( input_thread_t *p_input )
          *
          * Add rate-change to inform about rate changin
          *
+         * stats-change to inform when statistics are computed
+         *
          * TODO list all changes warn by this callbacks */
         var_Create( p_input, "intf-change", VLC_VAR_BOOL );
         var_SetBool( p_input, "intf-change", true );
         var_Create( p_input, "rate-change", VLC_VAR_BOOL );
         var_SetBool( p_input, "rate-change", true );
+        var_Create( p_input, "stats-change", VLC_VAR_BOOL );
+        var_SetBool( p_input, "stats-change", true );
 
         var_Create( p_input, "intf-change-vout", VLC_VAR_BOOL );
         var_SetBool( p_input, "intf-change-vout", true );

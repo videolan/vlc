@@ -42,6 +42,8 @@ static int PLItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int InterfaceChanged( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void * );
+static int StatisticsUpdated( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
 static int InterfaceVoutChanged( vlc_object_t *, const char *,
                                  vlc_value_t, vlc_value_t, void * );
 static int ItemStateChanged( vlc_object_t *, const char *,
@@ -158,6 +160,8 @@ void InputManager::addCallbacks()
     var_AddCallback( p_input, "title", ItemTitleChanged, this );
     /* src/input/input.c:734 for timers update*/
     var_AddCallback( p_input, "intf-change", InterfaceChanged, this );
+    /* src/input/input.c:710 for statistics update*/
+    var_AddCallback( p_input, "stats-change", StatisticsUpdated, this );
     /* src/input/input.c for vout creation/destruction */
     var_AddCallback( p_input, "intf-change-vout", InterfaceVoutChanged, this );
 }
@@ -172,6 +176,7 @@ void InputManager::delCallbacks()
     var_DelCallback( p_input, "rate-change", ItemRateChanged, this );
     var_DelCallback( p_input, "title", ItemTitleChanged, this );
     var_DelCallback( p_input, "intf-change", InterfaceChanged, this );
+    var_DelCallback( p_input, "stats-change", StatisticsUpdated, this );
     var_DelCallback( p_input, "intf-change-vout", InterfaceVoutChanged, this );
 }
 
@@ -188,6 +193,7 @@ void InputManager::customEvent( QEvent *event )
          type != ItemSpuChanged_Type &&
          type != ItemTeletextChanged_Type &&
          type != ItemStateChanged_Type &&
+         type != StatisticsUpdate_Type &&
          type != InterfaceVoutUpdate_Type )
         return;
 
@@ -204,12 +210,14 @@ void InputManager::customEvent( QEvent *event )
           type != ItemSpuChanged_Type &&
           type != ItemTeletextChanged_Type &&
           type != ItemStateChanged_Type &&
+          type != StatisticsUpdate_Type &&
           type != InterfaceVoutUpdate_Type
         )
         && ( i_input_id != ple->i_id ) )
         return;
 
-    if( type != PositionUpdate_Type )
+    if( type != PositionUpdate_Type &&
+        type != StatisticsUpdate_Type )
         msg_Dbg( p_intf, "New Event: type %i", type );
 
     /* Actions */
@@ -217,6 +225,9 @@ void InputManager::customEvent( QEvent *event )
     {
     case PositionUpdate_Type:
         UpdatePosition();
+        break;
+    case StatisticsUpdate_Type:
+        UpdateStats();
         break;
     case ItemChanged_Type:
         UpdateMeta();
@@ -245,6 +256,11 @@ void InputManager::customEvent( QEvent *event )
         UpdateVout();
         break;
     }
+}
+
+void InputManager::UpdateStats()
+{
+    emit statisticsUpdated( input_GetItem( p_input ) );
 }
 
 void InputManager::UpdatePosition()
@@ -722,6 +738,16 @@ static int InterfaceChanged( vlc_object_t *p_this, const char *psz_var,
     if(!counter)
         return VLC_SUCCESS;
     IMEvent *event = new IMEvent( PositionUpdate_Type, 0 );
+    QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    return VLC_SUCCESS;
+}
+
+static int StatisticsUpdated( vlc_object_t *p_this, const char *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    InputManager *im = (InputManager*)param;
+
+    IMEvent *event = new IMEvent( StatisticsUpdate_Type, 0 );
     QApplication::postEvent( im, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }

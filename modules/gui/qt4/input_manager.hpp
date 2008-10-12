@@ -45,11 +45,12 @@ static int const VolumeChanged_Type      = QEvent::User + IMEventType + 6;
 static int const ItemSpuChanged_Type     = QEvent::User + IMEventType + 7;
 static int const ItemTeletextChanged_Type= QEvent::User + IMEventType + 8;
 static int const InterfaceVoutUpdate_Type= QEvent::User + IMEventType + 9;
+static int const StatisticsUpdate_Type   = QEvent::User + IMEventType + 10;
 
-static int const FullscreenControlToggle_Type = QEvent::User + IMEventType + 10;
-static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 11;
-static int const FullscreenControlHide_Type = QEvent::User + IMEventType + 12;
-static int const FullscreenControlPlanHide_Type = QEvent::User + IMEventType + 13;
+static int const FullscreenControlToggle_Type = QEvent::User + IMEventType + 11;
+static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 12;
+static int const FullscreenControlHide_Type = QEvent::User + IMEventType + 13;
+static int const FullscreenControlPlanHide_Type = QEvent::User + IMEventType + 14;
 
 class IMEvent : public QEvent
 {
@@ -98,6 +99,7 @@ private:
     void UpdateTeletext();
     void UpdateArt();
     void UpdateVout();
+    void UpdateStats();
 
 public slots:
     void setInput( input_thread_t * ); ///< Our controlled input changed
@@ -122,6 +124,8 @@ signals:
     void nameChanged( QString );
     /// Used to signal whether we should show navigation buttons
     void navigationChanged( int );
+    /// Statistics are updated
+    void statisticsUpdated( input_item_t* );
     /// Play/pause status
     void statusChanged( int );
     void artChanged( input_item_t* );

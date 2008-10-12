@@ -162,9 +162,9 @@ void MediaInfoDialog::update( input_thread_t *p_input )
 
 void MediaInfoDialog::updateOnTimeOut()
 {
-    /* Timer runs at 150 ms, dont' update more than 2 times per second */
+    /* Timer runs at 150 ms, dont' update more than 2 times per second
     i_runs++;
-    if( i_runs % 4 != 0 ) return;
+    if( i_runs % 4 != 0 ) return;*/
 
     /* Get Input and clear if non-existant */
     input_thread_t *p_input = THEMIM->getInput();
