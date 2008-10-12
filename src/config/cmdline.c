@@ -58,7 +58,6 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
     module_t *p_parser;
     struct option *p_longopts;
-    int i_modules_index;
     const char **argv_copy = NULL;
 
     /* Short options */
