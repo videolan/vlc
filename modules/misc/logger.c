@@ -35,7 +35,7 @@
 #include <vlc_playlist.h>
 #include <vlc_charset.h>
 
-#include <errno.h>                                                 /* ENOMEM */
+#include <assert.h>
 
 #ifdef UNDER_CE
 #   define _IONBF 0x0004
@@ -84,9 +84,11 @@
 struct intf_sys_t
 {
     int i_mode;
-    FILE *p_rrd;
-    mtime_t last_update;
-    time_t now;  /* timestamp for rrd-log */
+    struct
+    {
+        FILE *stream;
+        vlc_thread_t thread;
+    } rrd;
 
     FILE *    p_file; /* The log file */
     msg_subscription_t *p_sub;
@@ -106,7 +108,7 @@ static void HtmlPrint         ( const msg_item_t *, FILE * );
 static void SyslogPrint       ( const msg_item_t *);
 #endif
 
-static void DoRRD( intf_thread_t *p_intf );
+static void *DoRRD( void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -260,15 +262,19 @@ static int Open( vlc_object_t *p_this )
 #endif
     }
 
-    p_intf->p_sys->last_update = 0;
-    p_intf->p_sys->p_rrd = NULL;
-
     psz_rrd_file = config_GetPsz( p_intf, "rrd-file" );
     if( psz_rrd_file && *psz_rrd_file )
     {
-        p_intf->p_sys->p_rrd = utf8_fopen( psz_rrd_file, "w" );
-        if (p_intf->p_sys->p_rrd != NULL)
-            setvbuf (p_intf->p_sys->p_rrd, NULL, _IOLBF, BUFSIZ);
+        FILE *rrd = utf8_fopen( psz_rrd_file, "w" );
+        if (rrd != NULL)
+        {
+            setvbuf (rrd, NULL, _IOLBF, BUFSIZ);
+            if (!vlc_clone (&p_sys->rrd.thread, DoRRD, p_intf,
+                            VLC_THREAD_PRIORITY_LOW))
+                p_sys->rrd.stream = rrd;
+            else
+                fclose (rrd);
+        }
     }
     free( psz_rrd_file );
 
@@ -284,6 +290,13 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    if (p_sys->rrd.stream)
+    {
+        vlc_cancel (p_sys->rrd.thread);
+        vlc_join (p_sys->rrd.thread, NULL);
+    }
 
     /* Flush the queue and unsubscribe from the message queue */
     FlushQueue( p_sys->p_sub, p_sys->p_file,
@@ -329,8 +342,6 @@ static void Run( intf_thread_t *p_intf )
         FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
                     p_intf->p_sys->i_mode,
                     var_CreateGetInteger( p_intf, "verbose" ) );
-        if( p_intf->p_sys->p_rrd )
-            DoRRD( p_intf );
 
         vlc_restorecancel( canc );
         /* FIXME: this is WRONG. */
@@ -438,24 +449,29 @@ static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
     LOG_STRING( "</span>\n", p_file );
 }
 
-static void DoRRD( intf_thread_t *p_intf )
+static void *DoRRD (void *data)
 {
-    mtime_t now = mdate();
-    if( now - p_intf->p_sys->last_update < 1000000 )
-        return;
-    p_intf->p_sys->last_update = now;
+    intf_thread_t *p_intf = data;
+    FILE *file = p_intf->p_sys->rrd.stream;
 
-    if( p_intf->p_libvlc->p_stats )
+    for (;;)
     {
-        time(&p_intf->p_sys->now);
-        lldiv_t in = lldiv( p_intf->p_libvlc->p_stats->f_input_bitrate * 1000000,
-                             1000 );
-        lldiv_t dm = lldiv( p_intf->p_libvlc->p_stats->f_demux_bitrate * 1000000,
-                             1000 );
-        lldiv_t out = lldiv( p_intf->p_libvlc->p_stats->f_output_bitrate * 1000000,
-                             1000 );
-        fprintf( p_intf->p_sys->p_rrd,
-                 "%"PRIi64":%lld.%03llu:%lld.%03llu:%lld.%03llu\n",
-                 now, in.quot, in.rem, dm.quot, dm.rem, out.quot, out.rem );
+        /* FIXME: I wonder how memory synchronization occurs here...
+         * -- Courmisch */
+        if( p_intf->p_libvlc->p_stats )
+        {
+            lldiv_t in = lldiv( p_intf->p_libvlc->p_stats->f_input_bitrate * 1000000,
+                                1000 );
+            lldiv_t dm = lldiv( p_intf->p_libvlc->p_stats->f_demux_bitrate * 1000000,
+                                1000 );
+            lldiv_t out = lldiv( p_intf->p_libvlc->p_stats->f_output_bitrate * 1000000,
+                                1000 );
+            fprintf( file,
+                    "%"PRIi64":%lld.%03llu:%lld.%03llu:%lld.%03llu\n",
+                    (int64_t)time(NULL), in.quot, in.rem, dm.quot, dm.rem, out.quot, out.rem );
+        }
+#undef msleep /* yeah, we really want to wake up every second here */
+        msleep (CLOCK_FREQ);
     }
+    assert (0);
 }
