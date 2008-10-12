@@ -254,35 +254,6 @@ void __msg_GenericVa( vlc_object_t *p_this, int i_type, const char *psz_module,
     QueueMsg( p_this, i_type, psz_module, psz_format, args );
 }
 
-/* Generic functions used when variadic macros are not available. */
-#define DECLARE_MSG_FN( FN_NAME, FN_TYPE ) \
-    void FN_NAME( vlc_object_t *p_this, const char *psz_format, ... ) \
-    { \
-        va_list args; \
-        va_start( args, psz_format ); \
-        QueueMsg( p_this, FN_TYPE, "unknown", psz_format, args ); \
-        va_end( args ); \
-    } \
-    struct _
-/**
- * Output an informational message.
- * \note Do not use this for debug messages
- * \see input_AddInfo
- */
-DECLARE_MSG_FN( __msg_Info, VLC_MSG_INFO );
-/**
- * Output an error message.
- */
-DECLARE_MSG_FN( __msg_Err,  VLC_MSG_ERR );
-/**
- * Output a waring message
- */
-DECLARE_MSG_FN( __msg_Warn, VLC_MSG_WARN );
-/**
- * Output a debug message
- */
-DECLARE_MSG_FN( __msg_Dbg,  VLC_MSG_DBG );
-
 /**
  * Add a message to a queue
  *
