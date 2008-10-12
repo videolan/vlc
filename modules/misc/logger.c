@@ -1,7 +1,7 @@
 /*****************************************************************************
  * logger.c : file logging plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -328,12 +328,6 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-/*****************************************************************************
- * Run: rc thread
- *****************************************************************************
- * This part of the interface is in a separate thread so that we can call
- * exec() from within it without annoying the rest of the program.
- *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
     for( ;; )
