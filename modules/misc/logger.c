@@ -266,6 +266,8 @@ static int Open( vlc_object_t *p_this )
     if( psz_rrd_file && *psz_rrd_file )
     {
         p_intf->p_sys->p_rrd = utf8_fopen( psz_rrd_file, "w" );
+        if (p_intf->p_sys->p_rrd != NULL)
+            setvbuf (p_intf->p_sys->p_rrd, NULL, _IOLBF, BUFSIZ);
     }
     free( psz_rrd_file );
 
@@ -454,6 +456,5 @@ static void DoRRD( intf_thread_t *p_intf )
         fprintf( p_intf->p_sys->p_rrd,
                  "%"PRIi64":%lld.%03llu:%lld.%03llu:%lld.%03llu\n",
                  now, in.quot, in.rem, dm.quot, dm.rem, out.quot, out.rem );
-        fflush( p_intf->p_sys->p_rrd );
     }
 }
