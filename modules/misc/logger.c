@@ -445,18 +445,15 @@ static void DoRRD( intf_thread_t *p_intf )
     if( p_intf->p_libvlc->p_stats )
     {
         time(&p_intf->p_sys->now);
-        lldiv_t din = lldiv( p_intf->p_libvlc->p_stats->f_input_bitrate * 1000000,
+        lldiv_t in = lldiv( p_intf->p_libvlc->p_stats->f_input_bitrate * 1000000,
                              1000 );
-        lldiv_t ddm = lldiv( p_intf->p_libvlc->p_stats->f_demux_bitrate * 1000000,
+        lldiv_t dm = lldiv( p_intf->p_libvlc->p_stats->f_demux_bitrate * 1000000,
                              1000 );
-        lldiv_t dout = lldiv( p_intf->p_libvlc->p_stats->f_output_bitrate * 1000000,
+        lldiv_t out = lldiv( p_intf->p_libvlc->p_stats->f_output_bitrate * 1000000,
                              1000 );
         fprintf( p_intf->p_sys->p_rrd,
-                   "%"PRIi64":%lld.%03u:%lld.%03u:%lld.%03u\n",
-                   (uintmax_t)p_intf->p_sys->now,
-                   din.quot, (unsigned int)din.rem,
-                   ddm.quot, (unsigned int)ddm.rem,
-                   dout.quot, (unsigned int)dout.rem );
+                 "%"PRIi64":%lld.%03llu:%lld.%03llu:%lld.%03llu\n",
+                 now, in.quot, in.rem, dm.quot, dm.rem, out.quot, out.rem );
         fflush( p_intf->p_sys->p_rrd );
     }
 }
