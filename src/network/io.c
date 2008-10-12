@@ -429,7 +429,7 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 
         ufd[0].revents = ufd[1].revents = 0;
 
-        if (poll (ufd, 1, -1) == -1)
+        if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) == -1)
         {
             if (errno == EINTR)
                 continue;
