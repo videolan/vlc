@@ -271,9 +271,14 @@ static int Open( vlc_object_t *p_this )
                             VLC_THREAD_PRIORITY_LOW))
                 p_sys->rrd.stream = rrd;
             else
+            {
                 fclose (rrd);
+                p_sys->rrd.stream = NULL;
+            }
         }
     }
+    else
+        p_sys->rrd.stream = NULL;
     free( psz_rrd_file );
 
     p_sys->p_sub = msg_Subscribe( p_intf );
