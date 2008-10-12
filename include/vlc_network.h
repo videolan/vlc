@@ -143,10 +143,10 @@ struct virtual_socket_t
 };
 
 #define net_Read(a,b,c,d,e,f) __net_Read(VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( ssize_t, __net_Read, ( vlc_object_t *p_this, int fd, const v_socket_t *, uint8_t *p_data, size_t i_data, bool b_retry ) );
+VLC_EXPORT( ssize_t, __net_Read, ( vlc_object_t *p_this, int fd, const v_socket_t *, void *p_data, size_t i_data, bool b_retry ) );
 
 #define net_Write(a,b,c,d,e) __net_Write(VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( ssize_t, __net_Write, ( vlc_object_t *p_this, int fd, const v_socket_t *, const uint8_t *p_data, size_t i_data ) );
+VLC_EXPORT( ssize_t, __net_Write, ( vlc_object_t *p_this, int fd, const v_socket_t *, const void *p_data, size_t i_data ) );
 
 #define net_Gets(a,b,c) __net_Gets(VLC_OBJECT(a),b,c)
 VLC_EXPORT( char *, __net_Gets, ( vlc_object_t *p_this, int fd, const v_socket_t * ) );

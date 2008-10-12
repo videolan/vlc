@@ -288,7 +288,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
  *****************************************************************************/
 ssize_t
 __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
-            uint8_t *restrict p_buf, size_t i_buflen, bool waitall)
+            void *restrict p_buf, size_t i_buflen, bool waitall)
 {
     size_t i_total = 0;
     struct pollfd ufd[2] = {
@@ -394,7 +394,7 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             break; // EOF
 
         i_total += n;
-        p_buf += n;
+        p_buf = (char *)p_buf + n;
         i_buflen -= n;
 
         if (!waitall)
@@ -412,7 +412,7 @@ silent:
 
 /* Write exact amount requested */
 ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
-                     const uint8_t *p_data, size_t i_data )
+                     const void *restrict p_data, size_t i_data )
 {
     size_t i_total = 0;
     struct pollfd ufd[2] = {
@@ -473,7 +473,7 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
             break;
         }
 
-        p_data += val;
+        p_data = (const char *)p_data + val;
         i_data -= val;
         i_total += val;
     }
@@ -485,6 +485,13 @@ error:
     return -1;
 }
 
+/**
+ * Reads a line from a file descriptor.
+ * This function is not thread-safe; the same file descriptor cI/O annot be read
+ * by another thread at the same time (although it can be written to).
+ *
+ * @return nul-terminated heap-allocated string, or NULL on I/O error.
+ */
 char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
 {
     char *psz_line = NULL, *ptr = NULL;
@@ -500,7 +507,7 @@ char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
             ptr = psz_line + i_line;
         }
 
-        if( net_Read( p_this, fd, p_vs, (uint8_t *)ptr, 1, true ) != 1 )
+        if( net_Read( p_this, fd, p_vs, ptr, 1, true ) != 1 )
         {
             if( i_line == 0 )
             {
@@ -546,7 +553,7 @@ ssize_t __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
     int i_size = vasprintf( &psz, psz_fmt, args );
     if( i_size == -1 )
         return -1;
-    i_ret = __net_Write( p_this, fd, p_vs, (uint8_t *)psz, i_size ) < i_size
+    i_ret = __net_Write( p_this, fd, p_vs, psz, i_size ) < i_size
         ? -1 : i_size;
     free( psz );
 
