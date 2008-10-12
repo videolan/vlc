@@ -147,7 +147,10 @@ static int Open( vlc_object_t *p_this )
 
     p_sys = malloc (sizeof (*p_sys));
     if (!p_sys)
+    {
+        closedir( handle );
         return VLC_ENOMEM;
+    }
 
     p_access->p_sys = p_sys;
     p_sys->current = NULL;
