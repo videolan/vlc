@@ -91,7 +91,7 @@ struct libvlc_media_list_t
     libvlc_media_t * p_md; /* The media from which the
                                        * mlist comes, if any. */
     vlc_array_t                items;
- 
+
     /* Other way to see that media list */
     /* Used in flat_media_list.c */
     libvlc_media_list_t *       p_flat_mlist;
@@ -126,7 +126,7 @@ struct libvlc_media_list_view_t
     libvlc_instance_t *         p_libvlc_instance;
     int                         i_refcount;
     vlc_mutex_t                 object_lock;
-    
+
     libvlc_media_list_t *       p_mlist;
 
     struct libvlc_media_list_view_private_t * p_this_view_data;
@@ -153,7 +153,7 @@ struct libvlc_media_player_t
     libvlc_media_t * p_md; /* current media descriptor */
     libvlc_event_manager_t *    p_event_manager;
     libvlc_drawable_t           drawable;
-    
+
     bool        b_own_its_input_thread;
 };
 
@@ -338,6 +338,12 @@ void libvlc_event_manager_register_event_type(
 void libvlc_event_send(
         libvlc_event_manager_t * p_em,
         libvlc_event_t * p_event );
+
+/* Media player - audio, video */
+libvlc_track_description_t * libvlc_get_track_description(
+        libvlc_media_player_t *p_mi,
+        const char *psz_variable,
+        libvlc_exception_t *p_e );
 
 
 /* Exception shorcuts */

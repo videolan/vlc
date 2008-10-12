@@ -209,6 +209,30 @@ typedef struct libvlc_playlist_item_t
 
 /**@} */
 
+/*****************************************************************************
+ * Media Player
+ *****************************************************************************/
+/** \defgroup libvlc_media_player libvlc_media_player
+ * \ingroup libvlc
+ * LibVLC Media Player, object that let you play a media
+ * in a libvlc_drawable_t
+ * @{
+ */
+
+/**
+ * Description for video, audio tracks and subtitles. It contains
+ * id, name (description string) and pointer to next record.
+ */
+typedef struct libvlc_track_description_t
+{
+    int   i_id;
+    char *psz_name;
+    struct libvlc_track_description_t *p_next;
+
+} libvlc_track_description_t;
+
+/**@} */
+
 
 /*****************************************************************************
  * Video
@@ -218,7 +242,7 @@ typedef struct libvlc_playlist_item_t
  * LibVLC Video handling
  * @{
  */
- 
+
 /**
 * Downcast to this general type as placeholder for a platform specific one, such as:
 *  Drawable on X11,

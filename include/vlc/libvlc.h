@@ -721,6 +721,13 @@ VLC_PUBLIC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
  */
 VLC_PUBLIC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e );
 
+/**
+ * Release (free) libvlc_track_description_t
+ *
+ * \param p_track_description the structure to release
+ */
+VLC_PUBLIC_API void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
+
 /** \defgroup libvlc_video libvlc_video
  * \ingroup libvlc_media_player
  * LibVLC Video handling
@@ -799,6 +806,25 @@ VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *, char
 VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
+ * Get the number of available video subtitles.
+ *
+ * \param p_mediaplayer the media player
+ * \param p_e an initialized exception pointer
+ * \return the number of available video subtitles
+ */
+VLC_PUBLIC_API int libvlc_video_get_spu_count( libvlc_media_player_t *, libvlc_exception_t * );
+
+/**
+ * Get the description of available video subtitles.
+ *
+ * \param p_mediaplayer the media player
+ * \param p_e an initialized exception pointer
+ * \return list containing description of available video subtitles
+ */
+VLC_PUBLIC_API libvlc_track_description_t *
+        libvlc_video_get_spu_description( libvlc_media_player_t *, libvlc_exception_t * );
+
+/**
  * Set new video subtitle.
  *
  * \param p_mediaplayer the media player
@@ -816,6 +842,27 @@ VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_media_player_t *, int , libvlc_
  * \return the success status (boolean)
  */
 VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, char *, libvlc_exception_t * );
+
+/**
+ * Get the description of available titles.
+ *
+ * \param p_mediaplayer the media player
+ * \param p_e an initialized exception pointer
+ * \return list containing description of available titles
+ */
+VLC_PUBLIC_API libvlc_track_description_t *
+        libvlc_video_get_title_description( libvlc_media_player_t *, libvlc_exception_t * );
+
+/**
+ * Get the description of available chapters for specific title.
+ *
+ * \param p_mediaplayer the media player
+ * \param i_title selected title
+ * \param p_e an initialized exception pointer
+ * \return list containing description of available chapter for title i_title
+ */
+VLC_PUBLIC_API libvlc_track_description_t *
+        libvlc_video_get_chapter_description( libvlc_media_player_t *, int, libvlc_exception_t * );
 
 /**
  * Get current crop filter geometry.
@@ -860,6 +907,43 @@ VLC_PUBLIC_API int libvlc_video_get_teletext( libvlc_media_player_t *, libvlc_ex
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_player_t *, int, libvlc_exception_t * );
+
+/**
+ * Get number of available video tracks.
+ *
+ * \param p_mi media player
+ * \param p_e an initialized exception
+ * \return the number of available video tracks (int)
+ */
+VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t *,  libvlc_exception_t * );
+
+/**
+ * Get the description of available video tracks.
+ *
+ * \param p_mi media player
+ * \param p_e an initialized exception
+ * \return list with description of available video tracks
+ */
+VLC_PUBLIC_API libvlc_track_description_t *
+        libvlc_video_get_track_description( libvlc_media_player_t *,  libvlc_exception_t * );
+
+/**
+ * Get current video track.
+ *
+ * \param p_mi media player
+ * \param p_e an initialized exception pointer
+ * \return the video track (int)
+ */
+VLC_PUBLIC_API int libvlc_video_get_track( libvlc_media_player_t *, libvlc_exception_t * );
+
+/**
+ * Set video track.
+ *
+ * \param p_mi media player
+ * \param i_track the track (int)
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_video_set_track( libvlc_media_player_t *, int, libvlc_exception_t * );
 
 /**
  * Take a snapshot of the current video window.

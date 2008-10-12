@@ -383,6 +383,27 @@ int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
     return i_spu;
 }
 
+int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi,
+                                libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    vlc_value_t val_list;
+
+    if( !p_input_thread )
+        return -1;
+
+    var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    vlc_object_release( p_input_thread );
+    return val_list.p_list->i_count;
+}
+
+libvlc_track_description_t *
+        libvlc_video_get_spu_description( libvlc_media_player_t *p_mi,
+                                          libvlc_exception_t *p_e )
+{
+    return libvlc_get_track_description( p_mi, "spu-es", p_e);
+}
+
 void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
                            libvlc_exception_t *p_e )
 {
@@ -424,6 +445,23 @@ int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
         vlc_object_release( p_input_thread );
     }
     return b_ret;
+}
+
+libvlc_track_description_t *
+        libvlc_video_get_title_description( libvlc_media_player_t *p_mi,
+                                            libvlc_exception_t * p_e )
+{
+    return libvlc_get_track_description( p_mi, "title", p_e);
+}
+
+libvlc_track_description_t *
+        libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi,
+                                              int i_title,
+                                              libvlc_exception_t *p_e )
+{
+    char psz_title[12];
+    sprintf( psz_title,  "title %2i", i_title );
+    return libvlc_get_track_description( p_mi, psz_title, p_e);
 }
 
 char *libvlc_video_get_crop_geometry( libvlc_media_player_t *p_mi,
@@ -556,6 +594,90 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
                 var_SetInteger( p_input_thread, "spu-es", i_teletext_es );
         }
     }
+    vlc_object_release( p_input_thread );
+}
+
+int libvlc_video_get_track_count( libvlc_media_player_t *p_mi,
+                                  libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    vlc_value_t val_list;
+
+    if( !p_input_thread )
+        return -1;
+
+    var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    vlc_object_release( p_input_thread );
+    return val_list.p_list->i_count;
+}
+
+libvlc_track_description_t *
+        libvlc_video_get_track_description( libvlc_media_player_t *p_mi,
+                                            libvlc_exception_t *p_e )
+{
+    return libvlc_get_track_description( p_mi, "video-es", p_e);
+}
+
+int libvlc_video_get_track( libvlc_media_player_t *p_mi,
+                            libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    vlc_value_t val_list;
+    vlc_value_t val;
+    int i_track = -1;
+    int i_ret = -1;
+    int i;
+
+    if( !p_input_thread )
+        return -1;
+
+    i_ret = var_Get( p_input_thread, "video-es", &val );
+    if( i_ret < 0 )
+    {
+        libvlc_exception_raise( p_e, "Getting Video track information failed" );
+        vlc_object_release( p_input_thread );
+        return i_ret;
+    }
+
+    var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    for( i = 0; i < val_list.p_list->i_count; i++ )
+    {
+        vlc_value_t track_val = val_list.p_list->p_values[i];
+        if( track_val.i_int == val.i_int )
+        {
+            i_track = i;
+            break;
+       }
+    }
+    vlc_object_release( p_input_thread );
+    return i_track;
+}
+
+void libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track,
+                             libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    vlc_value_t val_list;
+    int i_ret = -1;
+    int i;
+
+    if( !p_input_thread )
+        return;
+
+    var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    for( i = 0; i < val_list.p_list->i_count; i++ )
+    {
+        vlc_value_t val = val_list.p_list->p_values[i];
+        if( i_track == val.i_int )
+        {
+            i_ret = var_Set( p_input_thread, "audio-es", val );
+            if( i_ret < 0 )
+                libvlc_exception_raise( p_e, "Setting video track failed" );
+            vlc_object_release( p_input_thread );
+            return;
+        }
+    }
+    libvlc_exception_raise( p_e, "Video track out of range" );
     vlc_object_release( p_input_thread );
 }
 
