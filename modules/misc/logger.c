@@ -52,8 +52,6 @@
 #define LOG_FILE_TEXT "vlc-log.txt"
 #define LOG_FILE_HTML "vlc-log.html"
 
-#define LOG_STRING( msg, file ) fwrite( msg, strlen( msg ), 1, file );
-
 #define TEXT_HEADER "-- logger module started --\n"
 #define TEXT_FOOTER "-- logger module stopped --\n"
 
@@ -238,18 +236,18 @@ static int Open( vlc_object_t *p_this )
             free( psz_file );
             return -1;
         }
-        setvbuf( p_intf->p_sys->p_file, NULL, _IONBF, 0 );
+        setvbuf( p_sys->p_file, NULL, _IONBF, 0 );
 
         free( psz_file );
 
-        switch( p_intf->p_sys->i_mode )
+        switch( p_sys->i_mode )
         {
         case MODE_HTML:
-            LOG_STRING( HTML_HEADER, p_sys->p_file );
+            fputs( HTML_HEADER, p_sys->p_file );
             break;
         case MODE_TEXT:
         default:
-            LOG_STRING( TEXT_HEADER, p_sys->p_file );
+            fputs( TEXT_HEADER, p_sys->p_file );
             break;
         }
 
@@ -307,7 +305,7 @@ static void Close( vlc_object_t *p_this )
     switch( p_sys->i_mode )
     {
     case MODE_HTML:
-        LOG_STRING( HTML_FOOTER, p_sys->p_file );
+        fputs( HTML_FOOTER, p_sys->p_file );
         break;
 #ifdef HAVE_SYSLOG_H
     case MODE_SYSLOG:
@@ -316,7 +314,7 @@ static void Close( vlc_object_t *p_this )
 #endif
     case MODE_TEXT:
     default:
-        LOG_STRING( TEXT_FOOTER, p_sys->p_file );
+        fputs( TEXT_FOOTER, p_sys->p_file );
         break;
     }
 
@@ -401,15 +399,17 @@ static void FlushQueue( msg_subscription_t *p_sub, FILE *p_file, int i_mode,
     }
 }
 
-static const char *ppsz_type[4] = { ": ", " error: ",
-                                    " warning: ", " debug: " };
+static const char ppsz_type[4][11] = {
+    ": ",
+    " error: ",
+    " warning: ",
+    " debug: ",
+};
 
 static void TextPrint( const msg_item_t *p_msg, FILE *p_file )
 {
-    LOG_STRING( p_msg->psz_module, p_file );
-    LOG_STRING( ppsz_type[p_msg->i_type], p_file );
-    LOG_STRING( p_msg->psz_msg, p_file );
-    LOG_STRING( "\n", p_file );
+    fprintf( p_file, "%s%s%s\n", p_msg->psz_module, ppsz_type[p_msg->i_type],
+             p_msg->psz_msg );
 }
 
 #ifdef HAVE_SYSLOG_H
@@ -431,16 +431,16 @@ static void SyslogPrint( const msg_item_t *p_msg )
 
 static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
 {
-    static const char *ppsz_color[4] = { "<span style=\"color: #ffffff\">",
-                                         "<span style=\"color: #ff6666\">",
-                                         "<span style=\"color: #ffff66\">",
-                                         "<span style=\"color: #aaaaaa\">" };
+    static const char ppsz_color[4][30] = {
+        "<span style=\"color: #ffffff\">",
+        "<span style=\"color: #ff6666\">",
+        "<span style=\"color: #ffff66\">",
+        "<span style=\"color: #aaaaaa\">",
+    };
 
-    LOG_STRING( p_msg->psz_module, p_file );
-    LOG_STRING( ppsz_type[p_msg->i_type], p_file );
-    LOG_STRING( ppsz_color[p_msg->i_type], p_file );
-    LOG_STRING( p_msg->psz_msg, p_file );
-    LOG_STRING( "</span>\n", p_file );
+    fprintf( p_file, "%s%s%s%s</span>\n", p_msg->psz_module,
+             ppsz_type[p_msg->i_type], ppsz_color[p_msg->i_type],
+             p_msg->psz_msg );
 }
 
 static void *DoRRD (void *data)
