@@ -309,12 +309,12 @@ static void Close( vlc_object_t *p_this )
     case MODE_HTML:
         LOG_STRING( HTML_FOOTER, p_sys->p_file );
         break;
-    case MODE_TEXT:
 #ifdef HAVE_SYSLOG_H
     case MODE_SYSLOG:
         closelog();
         break;
 #endif
+    case MODE_TEXT:
     default:
         LOG_STRING( TEXT_FOOTER, p_sys->p_file );
         break;
