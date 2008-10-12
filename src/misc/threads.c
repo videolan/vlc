@@ -392,7 +392,6 @@ void vlc_cond_broadcast (vlc_cond_t *p_condvar)
 }
 
 #ifdef UNDER_CE
-# warning FIXME
 # define WaitForMultipleObjectsEx(a,b,c) WaitForMultipleObjects(a,b)
 #endif
 
@@ -510,8 +509,6 @@ int vlc_threadvar_create( vlc_threadvar_t *p_tls, void (*destr) (void *) )
 
 #if defined( LIBVLC_USE_PTHREAD )
     i_ret =  pthread_key_create( p_tls, destr );
-#elif defined( UNDER_CE )
-    i_ret = ENOSYS;
 #elif defined( WIN32 )
     /* FIXME: remember/use the destr() callback and stop leaking whatever */
     *p_tls = TlsAlloc();
@@ -526,7 +523,6 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
 #if defined( LIBVLC_USE_PTHREAD )
     pthread_key_delete (*p_tls);
-#elif defined( UNDER_CE )
 #elif defined( WIN32 )
     TlsFree (*p_tls);
 #else
@@ -645,6 +641,7 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
 
     if (hThread)
     {
+#ifndef UNDER_CE
         /* Thread closes the handle when exiting, duplicate it here
          * to be on the safe side when joining. */
         if (!DuplicateHandle (GetCurrentProcess (), hThread,
@@ -655,6 +652,9 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
             free (th);
             return ENOMEM;
         }
+#else
+        th->handle = hThread;
+#endif
 
         ResumeThread (hThread);
         if (priority)
@@ -920,6 +920,7 @@ void __vlc_thread_join( vlc_object_t *p_this )
     FILETIME create_ft, exit_ft, kernel_ft, user_ft;
     int64_t real_time, kernel_time, user_time;
 
+#ifndef UNDER_CE
     if( ! DuplicateHandle(GetCurrentProcess(),
             p_priv->thread_id->handle,
             GetCurrentProcess(),
@@ -931,6 +932,9 @@ void __vlc_thread_join( vlc_object_t *p_this )
         p_priv->b_thread = false;
         return; /* We have a problem! */
     }
+#else
+    hThread = p_priv->thread_id->handle;
+#endif
 
     vlc_join( p_priv->thread_id, NULL );
 
