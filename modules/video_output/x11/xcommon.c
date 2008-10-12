@@ -2261,7 +2261,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         EnablePixelDoubling( p_vout );
 #endif
 
-#if 0
         /* Activate the window (give it the focus) */
         XClientMessageEvent event;
 
@@ -2283,7 +2282,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                     DefaultRootWindow( p_vout->p_sys->p_display ),
                     False, SubstructureRedirectMask,
                     (XEvent*)&event );
-#endif
     }
     else
     {
@@ -2309,7 +2307,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
      * window has already been mapped because the XMapWindow() request
      * has not necessarily been sent directly to our window (remember,
      * the call is first redirected to the window manager) */
-#if 0
     do
     {
         XWindowEvent( p_vout->p_sys->p_display,
@@ -2323,9 +2320,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                    p_vout->p_sys->p_win->base_window,
                    RevertToParent,
                    CurrentTime);
-#else
-    XSync( p_vout->p_sys->p_display, False );
-#endif
 
     /* signal that the size needs to be updated */
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
