@@ -133,8 +133,8 @@ void msg_Flush (libvlc_int_t *p_libvlc)
 /**
  * Object Printing selection
  */
-static void const * kObjectPrintingEnabled = (void *) 1;
-static void const * kObjectPrintingDisabled = (void *) -1;
+static void const * kObjectPrintingEnabled = &kObjectPrintingEnabled;
+static void const * kObjectPrintingDisabled = &kObjectPrintingDisabled;
 
 void __msg_EnableObjectPrinting (vlc_object_t *p_this, char * psz_object)
 {
