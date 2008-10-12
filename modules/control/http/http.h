@@ -127,7 +127,7 @@ char *ExtractURIString( const char *restrict psz_uri,
 int TestURIParam( char *psz_uri, const char *psz_name );
 
 /** This function parses a MRL */
-input_item_t *MRLParse( intf_thread_t *, char *psz, char *psz_name );
+input_item_t *MRLParse( intf_thread_t *, const char *psz, char *psz_name );
 
 /** Return the first word from a string (works in-place) */
 char *FirstWord( char *psz, char *new );

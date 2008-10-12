@@ -820,14 +820,12 @@ static char *FirstOption( char *psz, char *new )
         return NULL;
 }
 
-input_item_t *MRLParse( intf_thread_t *p_intf, char *_psz,
+input_item_t *MRLParse( intf_thread_t *p_intf, const char *mrl,
                                    char *psz_name )
 {
-    char *psz = strdup( _psz );
-    char *s_mrl = psz;
-    char *s_temp;
-    input_item_t * p_input = NULL;
-
+    char *psz = strdup( mrl ), *s_mrl = psz, *s_temp;
+    if( psz == NULL )
+        return NULL;
     /* extract the mrl */
     s_temp = FirstOption( s_mrl, s_mrl );
     if( s_temp == NULL )
@@ -835,7 +833,9 @@ input_item_t *MRLParse( intf_thread_t *p_intf, char *_psz,
         s_temp = s_mrl + strlen( s_mrl );
     }
 
-    p_input = input_item_New( p_intf, s_mrl, psz_name );
+    input_item_t *p_input = input_item_New( p_intf, s_mrl, psz_name );
+    if( p_input == NULL )
+        return NULL;
     s_mrl = s_temp;
 
     /* now we can take care of the options */
@@ -852,7 +852,6 @@ input_item_t *MRLParse( intf_thread_t *p_intf, char *_psz,
         s_mrl = s_temp;
     }
 
-    free( psz );
     return p_input;
 }
 
