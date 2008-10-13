@@ -37,6 +37,7 @@
 
 #include "input_internal.h"
 #include "es_out.h"
+#include "demux.h"
 
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"

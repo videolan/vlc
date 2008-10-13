@@ -29,6 +29,7 @@
 #include <vlc_codec.h>
 
 #include "input_internal.h"
+#include "demux.h"
 
 static bool SkipID3Tag( demux_t * );
 static bool SkipAPETag( demux_t *p_demux );
