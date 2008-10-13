@@ -1000,6 +1000,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
             p_audio = p_owner->buffer.p_audio;
 
             p_owner->buffer.p_audio = p_audio->p_next;
+            p_owner->buffer.i_count--;
 
             b_has_more = p_owner->buffer.p_audio != NULL;
             if( !b_has_more )
@@ -1254,6 +1255,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             p_picture = p_owner->buffer.p_picture;
 
             p_owner->buffer.p_picture = p_picture->p_next;
+            p_owner->buffer.i_count--;
 
             b_has_more = p_owner->buffer.p_picture != NULL;
             if( !b_has_more )
@@ -1447,6 +1449,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic,
             p_subpic = p_owner->buffer.p_subpic;
 
             p_owner->buffer.p_subpic = p_subpic->p_next;
+            p_owner->buffer.i_count--;
 
             b_has_more = p_owner->buffer.p_subpic != NULL;
             if( !b_has_more )
