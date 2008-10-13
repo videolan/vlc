@@ -17,7 +17,7 @@
       --enable-dca \
       --enable-libass \
       --enable-x264 \
-      --disable-zvbi --enable-telx \
+      --enable-zvbi --disable-telx \
       --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \
       --enable-shout \
       --enable-goom \
@@ -25,7 +25,7 @@
       --enable-portaudio \
       --enable-sdl --with-sdl-config-path=/usr/win32/bin \
       --enable-qt4 \
-      --enable-wxwidgets --with-wx-config-path=/usr/win32/lib/wx/config \
+      --disable-wxwidgets \
       --with-freetype-config-path=/usr/win32/bin \
       --with-fribidi-config-path=/usr/win32/bin \
       --with-xml2-config-path=/usr/win32/bin \

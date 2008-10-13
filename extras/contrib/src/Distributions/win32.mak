@@ -6,6 +6,6 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .png .gpg-error .gcrypt .gnutls .mpcdec \
         .dvdnav .dvbpsi .qt4_win32 .schroedinger .SDL_image \
         .dx_headers .dshow_headers .gecko-win32 .dca \
-        .lua .tag .fontconfig .portaudio .kate .libass \
+        .lua .tag .fontconfig .portaudio .kate .libass .zvbi \
         .aclocal
 #       .daap .cddb .cdio .vcdimager

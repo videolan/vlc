@@ -1761,7 +1761,7 @@ zvbi-$(ZVBI_VERSION).tar.bz2:
 zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
-	(cd $@; patch -p1 < ../Patches/zvbi-win32.patch; autoreconf)
+	(cd $@; patch -p1 < ../Patches/zvbi-win32.patch; patch -p1 < ../Patches/zvbi-makefile.patch; autoreconf)
 endif
 
 ifdef HAVE_WIN32
@@ -1772,7 +1772,11 @@ endif
 ifdef HAVE_DARWIN_OS
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
 else
+ifdef HAVE_WIN32
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) --std=gnu99" LIBS="-lpthreadGC2" && make && make install)
+else
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make -C src && make -C src install)
+endif
 endif
 	$(INSTALL_NAME)
 	touch $@
@@ -2362,7 +2366,7 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(EXTRACT_GZ)
 
 .pthreads: pthreads
-	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.a $(PREFIX)/lib/)
+	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.{a,dll} $(PREFIX)/lib/)
 	$(INSTALL_NAME)
 	touch $@
 
