@@ -36,6 +36,7 @@
 #include <assert.h>
 
 #include "input_internal.h"
+#include "es_out.h"
 
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"

@@ -39,8 +39,9 @@
 #include <vlc_aout.h>
 
 #include "input_internal.h"
-#include "input_clock.h"
-#include "input_decoder.h"
+#include "clock.h"
+#include "decoder.h"
+#include "es_out.h"
 
 #include "../stream_output/stream_output.h"
 

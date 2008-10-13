@@ -306,8 +306,9 @@ SOURCES_libvlc_common = \
 	input/es_out.c \
 	input/input.c \
 	input/meta.c \
-	input/input_clock.h \
-	input/input_decoder.h \
+	input/clock.h \
+	input/decoder.h \
+	input/es_out.h \
 	input/input_internal.h \
 	input/vlm_internal.h \
 	input/stream.c \

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * input_decoder.h: Input decoder functions
+ * decoder.h: Input decoder functions
  *****************************************************************************
  * Copyright (C) 1998-2008 the VideoLAN team
  * Copyright (C) 2008 Laurent Aimar
