@@ -781,9 +781,15 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/theora.patch
 	patch -p0 < Patches/libtheora-includes.patch
+ifdef HAVE_WIN32
+	patch -p0 < Patches/theora-doc.patch
+endif
 	(cd $@; autoconf)
 
 THEORACONF = --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples
+ifdef HAVE_WIN32
+THEORACONF += --disable-docs
+endif
 
 .theora: libtheora .ogg
 ifdef HAVE_BEOS

@@ -1,0 +1,54 @@
+--- libtheora/configure.ac	2008-04-16 22:25:55.000000000 +0200
++++ libtheora.new/configure.ac	2008-10-07 10:06:22.000000000 +0200
+@@ -351,6 +351,12 @@ AC_ARG_ENABLE(examples,
+      [ ac_enable_examples=$enableval ], [ ac_enable_examples=yes] )
+ AM_CONDITIONAL(THEORA_ENABLE_EXAMPLES, [test "x${ac_enable_examples}" != xno])
+ 
++ac_enable_docs=yes
++AC_ARG_ENABLE(docs,
++     [  --disable-docs            disable docs ],
++     [ ac_enable_docs=$enableval ], [ac_enable_docs=yes ] )
++AM_CONDITIONAL(THEORA_ENABLE_DOCS, [test "x${ac_enable_docs}" != xno])
++
+ dnl --------------------------------------------------
+ dnl Check for headers
+ dnl --------------------------------------------------
+@@ -410,7 +416,7 @@ AS_AC_EXPAND(INCLUDEDIR, ${includedir})
+ AS_AC_EXPAND(BINDIR, ${bindir})
+ AS_AC_EXPAND(DOCDIR, ${datadir}/doc)
+ 
+-if test $HAVE_DOXYGEN = "false"; then
++if test $HAVE_DOXYGEN = "false" -o "x${ac_enable_docs}" = xno; then
+   doc_build="no"
+ else
+   doc_build="yes"
+--- libtheora/Makefile.am.orig	2008-10-07 10:01:12.000000000 +0200
++++ libtheora/Makefile.am	2008-10-07 10:00:36.000000000 +0200
+@@ -8,7 +8,13 @@ else
+ EXAMPLES_DIR =
+ endif
+ 
+-SUBDIRS = lib include doc tests m4 $(EXAMPLES_DIR)
++if THEORA_ENABLE_DOCS
++DOC_DIR = doc
++else
++DOC_DIR =
++endif
++
++SUBDIRS = lib include ${DOC_DIR} tests m4 $(EXAMPLES_DIR)
+ 
+ 
+ # we include the whole debian/ dir in EXTRA_DIST because there's a problem
+--- libtheora/Makefile.in	2008-10-07 10:21:32.000000000 +0200
++++ libtheora.new/Makefile.in	2008-10-07 10:21:05.000000000 +0200
+@@ -245,7 +245,9 @@ top_srcdir = @top_srcdir@
+ AUTOMAKE_OPTIONS = foreign 1.6 dist-zip dist-bzip2
+ @THEORA_ENABLE_EXAMPLES_FALSE@EXAMPLES_DIR =
+ @THEORA_ENABLE_EXAMPLES_TRUE@EXAMPLES_DIR = examples
+-SUBDIRS = lib include doc tests m4 $(EXAMPLES_DIR)
++@THEORA_ENABLE_DOCS_FALSE@DOC_DIR=
++@THEORA_ENABLE_DOCS_TRUE@DOC_DIR=doc
++SUBDIRS = lib include ${DOC_DIR} tests m4 $(EXAMPLES_DIR)
+ 
+ # we include the whole debian/ dir in EXTRA_DIST because there's a problem
+# with autotools and HFS+ MacOSX file systems that caused debian/Makefile.am
