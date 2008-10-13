@@ -1437,6 +1437,7 @@ libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
 	patch -p0 < Patches/libmodplug-win32.patch
+	(cd $@; autoreconf)
 endif
 
 .mod: libmodplug
@@ -2472,7 +2473,7 @@ libass: libass-$(ASS_VERSION).tar.bz2
 	patch -p0 < Patches/libass_mplayer_updates.patch
 ifneq ($(HOST),$(BUILD))
 	patch -p0 < Patches/libass-cross.patch
-	cd $@; autoconf; automake
+	(cd $@; autoreconf; automake)
 endif
 
 .libass: libass .png
