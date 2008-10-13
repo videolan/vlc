@@ -544,6 +544,38 @@ bool input_EsOutIsBuffering( es_out_t *out )
 {
     return out->p_sys->b_buffering;
 }
+void input_EsOutFrameNext( es_out_t *out )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+    es_out_id_t *p_es_video = NULL;
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *p_es = p_sys->es[i];
+
+        if( p_es->fmt.i_cat == VIDEO_ES && p_es->p_dec )
+        {
+            p_es_video = p_es;
+            break;
+        }
+    }
+
+    if( !p_es_video )
+    {
+        msg_Warn( p_sys->p_input, "No video track selected, ignoring 'frame next'" );
+        return;
+    }
+
+#if 0
+    input_DecoderFrameNext( p_es_video->p_dec );
+    if( !p_sys->b_buffering )
+    {
+        TODO();
+    }
+#endif
+
+    msg_Err( out->p_sys->p_input, "TODO input_EsOutFrameNext" );
+}
 
 /*****************************************************************************
  *

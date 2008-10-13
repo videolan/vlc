@@ -1485,6 +1485,58 @@ static void ControlReduce( input_thread_t *p_input )
         }
     }
 }
+/* Pause input */
+static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
+{
+    int i_ret;
+    int i_state;
+    if( p_input->p->input.p_access )
+        i_ret = access_Control( p_input->p->input.p_access,
+                                 ACCESS_SET_PAUSE_STATE, true );
+    else
+        i_ret = demux_Control( p_input->p->input.p_demux,
+                                DEMUX_SET_PAUSE_STATE, true );
+
+    i_state = PAUSE_S;
+    if( i_ret )
+    {
+        msg_Warn( p_input, "cannot set pause state" );
+        i_state = p_input->i_state;
+    }
+
+    /* Switch to new state */
+    input_ChangeStateWithVarCallback( p_input, i_state, false );
+
+    /* */
+    if( !i_ret )
+        input_EsOutChangePause( p_input->p->p_es_out, true, i_control_date );
+}
+static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
+{
+    int i_ret;
+    if( p_input->p->input.p_access )
+        i_ret = access_Control( p_input->p->input.p_access,
+                                 ACCESS_SET_PAUSE_STATE, false );
+    else
+        i_ret = demux_Control( p_input->p->input.p_demux,
+                                DEMUX_SET_PAUSE_STATE, false );
+
+    if( i_ret )
+    {
+        /* FIXME What to do ? */
+        msg_Warn( p_input, "cannot unset pause -> EOF" );
+        vlc_mutex_unlock( &p_input->p->lock_control );
+        input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
+        vlc_mutex_lock( &p_input->p->lock_control );
+    }
+
+    /* Switch to play */
+    input_ChangeStateWithVarCallback( p_input, PLAYING_S, false );
+
+    /* */
+    if( !i_ret )
+        input_EsOutChangePause( p_input->p->p_es_out, false, i_control_date );
+}
 
 static bool Control( input_thread_t *p_input, int i_type,
                            vlc_value_t val )
@@ -1608,61 +1660,16 @@ static bool Control( input_thread_t *p_input, int i_type,
             if( ( val.i_int == PLAYING_S && p_input->i_state == PAUSE_S ) ||
                 ( val.i_int == PAUSE_S && p_input->i_state == PAUSE_S ) )
             {
-                int i_ret;
-                if( p_input->p->input.p_access )
-                    i_ret = access_Control( p_input->p->input.p_access,
-                                             ACCESS_SET_PAUSE_STATE, false );
-                else
-                    i_ret = demux_Control( p_input->p->input.p_demux,
-                                            DEMUX_SET_PAUSE_STATE, false );
-
-                if( i_ret )
-                {
-                    /* FIXME What to do ? */
-                    msg_Warn( p_input, "cannot unset pause -> EOF" );
-                    vlc_mutex_unlock( &p_input->p->lock_control );
-                    input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
-                    vlc_mutex_lock( &p_input->p->lock_control );
-                }
+                ControlUnpause( p_input, i_control_date );
 
                 b_force_update = true;
-
-                /* Switch to play */
-                input_ChangeStateWithVarCallback( p_input, PLAYING_S, false );
-
-                /* */
-                if( !i_ret )
-                    input_EsOutChangePause( p_input->p->p_es_out, false, i_control_date );
             }
             else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S &&
                      p_input->p->b_can_pause )
             {
-                int i_ret, state;
-                if( p_input->p->input.p_access )
-                    i_ret = access_Control( p_input->p->input.p_access,
-                                             ACCESS_SET_PAUSE_STATE, true );
-                else
-                    i_ret = demux_Control( p_input->p->input.p_demux,
-                                            DEMUX_SET_PAUSE_STATE, true );
+                ControlPause( p_input, i_control_date );
 
                 b_force_update = true;
-
-                if( i_ret )
-                {
-                    msg_Warn( p_input, "cannot set pause state" );
-                    state = p_input->i_state;
-                }
-                else
-                {
-                    state = PAUSE_S;
-                }
-
-                /* Switch to new state */
-                input_ChangeStateWithVarCallback( p_input, state, false );
-
-                /* */
-                if( !i_ret )
-                    input_EsOutChangePause( p_input->p->p_es_out, true, i_control_date );
             }
             else if( val.i_int == PAUSE_S && !p_input->p->b_can_pause )
             {
@@ -2029,6 +2036,25 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 b_force_update = true;
             }
+            break;
+
+        case INPUT_CONTROL_SET_FRAME_NEXT:
+            if( !p_input->p->b_can_pause )
+                break;
+
+            if( p_input->i_state == PAUSE_S )
+            {
+                input_EsOutFrameNext( p_input->p->p_es_out );
+            }
+            else if( p_input->i_state == PLAYING_S )
+            {
+                ControlPause( p_input, i_control_date );
+            }
+            else
+            {
+                msg_Err( p_input, "invalid state for frame next" );
+            }
+            b_force_update = true;
             break;
 
         case INPUT_CONTROL_SET_BOOKMARK:

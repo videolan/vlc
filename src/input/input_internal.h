@@ -193,6 +193,8 @@ enum input_control_e
     INPUT_CONTROL_ADD_SUBTITLE,
 
     INPUT_CONTROL_SET_RECORD_STATE,
+
+    INPUT_CONTROL_SET_FRAME_NEXT,
 };
 
 /* Internal helpers */

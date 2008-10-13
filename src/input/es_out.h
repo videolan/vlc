@@ -42,5 +42,6 @@ void       input_EsOutChangePause( es_out_t *, bool b_paused, mtime_t i_date );
 void       input_EsOutChangePosition( es_out_t * );
 bool       input_EsOutDecodersIsEmpty( es_out_t * );
 bool       input_EsOutIsBuffering( es_out_t * );
+void       input_EsOutFrameNext( es_out_t * );
 
 #endif
