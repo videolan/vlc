@@ -1218,6 +1218,9 @@ static const char *const ppsz_albumart_descriptions[] =
 #define JFLONG_KEY_TEXT N_("Long forward jump")
 #define JFLONG_KEY_LONGTEXT \
     N_("Select the hotkey to make a long forward jump.")
+#define FRAME_NEXT_KEY_TEXT N_("Next frame")
+#define FRAME_NEXT_KEY_LONGTEXT \
+    N_("Select the hotkey to got to the next video frame.")
 
 #define JIEXTRASHORT_TEXT N_("Very short jump length")
 #define JIEXTRASHORT_LONGTEXT N_("Very short jump length, in seconds.")
@@ -2073,6 +2076,7 @@ vlc_module_begin();
 #   define KEY_JUMP_PMEDIUM       KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_RIGHT
 #   define KEY_JUMP_MLONG         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_LEFT
 #   define KEY_JUMP_PLONG         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_RIGHT
+#   define KEY_FRAME_NEXT         KEY_UNSET
 #   define KEY_NAV_ACTIVATE       KEY_ENTER
 #   define KEY_NAV_UP             KEY_UP
 #   define KEY_NAV_DOWN           KEY_DOWN
@@ -2180,6 +2184,7 @@ vlc_module_begin();
 #   define KEY_JUMP_PMEDIUM       KEY_MODIFIER_CTRL|KEY_RIGHT
 #   define KEY_JUMP_MLONG         KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|KEY_LEFT
 #   define KEY_JUMP_PLONG         KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|KEY_RIGHT
+#   define KEY_FRAME_NEXT         KEY_UNSET
 #   define KEY_NAV_ACTIVATE       KEY_ENTER
 #   define KEY_NAV_UP             KEY_UP
 #   define KEY_NAV_DOWN           KEY_DOWN
@@ -2308,6 +2313,8 @@ vlc_module_begin();
              JBLONG_KEY_LONGTEXT, false );
     add_key( "key-jump+long", KEY_JUMP_PLONG, NULL, JFLONG_KEY_TEXT,
              JFLONG_KEY_LONGTEXT, false );
+    add_key( "key-frame-next", KEY_FRAME_NEXT, NULL, FRAME_NEXT_KEY_TEXT,
+             FRAME_NEXT_KEY_LONGTEXT, false );
     add_key( "key-nav-activate", KEY_NAV_ACTIVATE, NULL, NAV_ACTIVATE_KEY_TEXT,
              NAV_ACTIVATE_KEY_LONGTEXT, true );
     add_key( "key-nav-up", KEY_NAV_UP, NULL, NAV_UP_KEY_TEXT,
@@ -2613,6 +2620,7 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-jump+medium", ACTIONID_JUMP_FORWARD_MEDIUM, 0, },
     { "key-jump-long", ACTIONID_JUMP_BACKWARD_LONG, 0, },
     { "key-jump+long", ACTIONID_JUMP_FORWARD_LONG, 0, },
+    { "key-frame-next", ACTIONID_FRAME_NEXT, 0, },
     { "key-prev", ACTIONID_PREV, 0, },
     { "key-next", ACTIONID_NEXT, 0, },
     { "key-faster", ACTIONID_FASTER, 0, },

@@ -699,6 +699,12 @@ static void Run( intf_thread_t *p_intf )
             {
                 playlist_Stop( p_playlist );
             }
+            else if( i_action == ACTIONID_FRAME_NEXT )
+            {
+                var_SetVoid( p_input, "frame-next" );
+                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                 _("Next frame") );
+            }
             else if( i_action == ACTIONID_FASTER )
             {
                 var_SetVoid( p_input, "rate-faster" );
