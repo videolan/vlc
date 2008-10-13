@@ -1,7 +1,7 @@
 /*****************************************************************************
- * mem_stream.c: stream_t wrapper around memory buffer
+ * stream_memory.c: stream_t wrapper around memory buffer
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -25,9 +25,7 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
-#include "input_internal.h"
+#include "stream.h"
 
 struct stream_sys_t
 {

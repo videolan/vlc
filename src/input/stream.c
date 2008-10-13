@@ -26,16 +26,19 @@
 #endif
 
 #include <dirent.h>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_strings.h>
 #include <vlc_osd.h>
 #include <vlc_charset.h>
 
-#include <assert.h>
+#include <libvlc.h>
+
+#include "access.h"
+#include "stream.h"
 
 #include "input_internal.h"
-#include "access.h"
 
 #undef STREAM_DEBUG
 

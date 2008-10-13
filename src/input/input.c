@@ -39,6 +39,7 @@
 #include "es_out.h"
 #include "access.h"
 #include "demux.h"
+#include "stream.h"
 
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"

@@ -31,6 +31,7 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
+#include <libvlc.h>
 
 /*****************************************************************************
  *  Private input fields
@@ -371,35 +372,5 @@ static inline void input_ChangeState( input_thread_t *p_input, int state )
 char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const char *psz_prefix, const char *psz_extension );
 
 #define INPUT_RECORD_PREFIX "vlc-record-%Y-%m-%d-%H:%M:%S-$ N-$ p"
-
-/* Stream */
-/**
- * stream_t definition
- */
-struct stream_t
-{
-    VLC_COMMON_MEMBERS
-
-    /*block_t *(*pf_block)  ( stream_t *, int i_size );*/
-    int      (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
-    int      (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
-    int      (*pf_control)( stream_t *, int i_query, va_list );
-    void     (*pf_destroy)( stream_t *);
-
-    stream_sys_t *p_sys;
-
-    /* UTF-16 and UTF-32 file reading */
-    vlc_iconv_t     conv;
-    int             i_char_width;
-    bool            b_little_endian;
-};
-
-#include <libvlc.h>
-
-static inline stream_t *vlc_stream_create( vlc_object_t *obj )
-{
-    return (stream_t *)vlc_custom_create( obj, sizeof(stream_t),
-                                          VLC_OBJECT_GENERIC, "stream" );
-}
 
 #endif

@@ -25,10 +25,8 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <libvlc.h>
-
 #include "access.h"
+#include <libvlc.h>
 
 /*****************************************************************************
  * access_InternalNew:
