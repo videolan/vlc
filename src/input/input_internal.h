@@ -322,12 +322,6 @@ void input_ControlVarTitle( input_thread_t *, int i_title );
 
 void input_ConfigVarInit ( input_thread_t * );
 
-/* stream.c */
-stream_t *stream_AccessNew( access_t *p_access, bool );
-void stream_AccessDelete( stream_t *s );
-void stream_AccessReset( stream_t *s );
-void stream_AccessUpdate( stream_t *s );
-
 /* Subtitles */
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
 int subtitles_Filter( const char *);

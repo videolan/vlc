@@ -61,5 +61,11 @@ static inline stream_t *vlc_stream_create( vlc_object_t *obj )
                                           VLC_OBJECT_GENERIC, "stream" );
 }
 
+/* */
+stream_t *stream_AccessNew( access_t *p_access, bool );
+void stream_AccessDelete( stream_t *s );
+void stream_AccessReset( stream_t *s );
+void stream_AccessUpdate( stream_t *s );
+
 #endif
 
