@@ -116,8 +116,10 @@ static void *Thread (void *data)
 #else
             j = writev (fd, iov, 1);
 #endif
-            if (j == -1)
+            if (j <= 0)
             {
+                if (j == 0)
+                    errno = EPIPE;
                 msg_Err (demux, "cannot write data (%m)");
                 error = true;
                 break;
