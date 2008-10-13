@@ -29,7 +29,7 @@
 #ifndef _INPUT_DEMUX_H
 #define _INPUT_DEMUX_H 1
 
-#include <vlc_common.h>
+#include <libvlc.h>
 #include <vlc_demux.h>
 
 /* stream_t *s could be null and then it mean a access+demux in one */

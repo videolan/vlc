@@ -26,8 +26,9 @@
 #endif
 
 #include <vlc_common.h>
+#include <libvlc.h>
 
-#include "input_internal.h"
+#include "access.h"
 
 /*****************************************************************************
  * access_InternalNew:
@@ -81,7 +82,6 @@ static access_t *access_InternalNew( vlc_object_t *p_obj, const char *psz_access
 
     if( p_access->p_module == NULL )
     {
-        msg_StackAdd( "could not create access" );
         vlc_object_detach( p_access );
         free( p_access->psz_access );
         free( p_access->psz_path );

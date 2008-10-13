@@ -35,6 +35,7 @@
 #include <assert.h>
 
 #include "input_internal.h"
+#include "access.h"
 
 #undef STREAM_DEBUG
 
