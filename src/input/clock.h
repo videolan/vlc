@@ -30,6 +30,7 @@
 #define _INPUT_CLOCK_H 1
 
 #include <vlc_common.h>
+#include <vlc_input.h> /* FIXME Needed for input_clock_t */
 
 /** @struct input_clock_t
  * This structure is used to manage clock drift and reception jitters
