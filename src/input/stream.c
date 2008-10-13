@@ -264,6 +264,15 @@ static inline uint8_t * stream_buffer( stream_t *s )
 }
 
 /****************************************************************************
+ * stream_CommonNew: create an empty stream structure
+ ****************************************************************************/
+stream_t *stream_CommonNew( vlc_object_t *p_obj )
+{
+    return (stream_t *)vlc_custom_create( p_obj, sizeof(stream_t),
+                                          VLC_OBJECT_GENERIC, "stream" );
+}
+
+/****************************************************************************
  * stream_UrlNew: create a stream from a access
  ****************************************************************************/
 stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
@@ -301,7 +310,7 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 
 stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
 {
-    stream_t *s = vlc_stream_create( VLC_OBJECT(p_access) );
+    stream_t *s = stream_CommonNew( VLC_OBJECT(p_access) );
     stream_sys_t *p_sys;
     char *psz_list = NULL;
 

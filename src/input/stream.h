@@ -53,13 +53,8 @@ struct stream_t
     bool            b_little_endian;
 };
 
-#include <libvlc.h>
-
-static inline stream_t *vlc_stream_create( vlc_object_t *obj )
-{
-    return (stream_t *)vlc_custom_create( obj, sizeof(stream_t),
-                                          VLC_OBJECT_GENERIC, "stream" );
-}
+/* */
+stream_t *stream_CommonNew( vlc_object_t * );
 
 /* */
 stream_t *stream_AccessNew( access_t *p_access, bool );

@@ -324,7 +324,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     stream_t       *s;
     d_stream_sys_t *p_sys;
 
-    s = vlc_stream_create( p_obj );
+    s = stream_CommonNew( p_obj );
     if( s == NULL )
         return NULL;
     s->pf_read   = DStreamRead;
