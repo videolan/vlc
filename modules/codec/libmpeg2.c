@@ -423,6 +423,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->p_info->current_picture->nb_fields, i_pts, i_dts,
                 p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
 
+
+            bool b_skip = false;
             if( !p_dec->b_pace_control && !p_sys->b_preroll &&
                 !(p_sys->b_slice_i
                    && ((p_sys->p_info->current_picture->flags
@@ -433,22 +435,31 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                               /*p_sys->p_vout->render_time*/ 0 /*FIXME*/,
                               p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY ) )
             {
+                b_skip = true;
+            }
+
+            p_pic = NULL;
+            if( !b_skip )
+                p_pic = GetNewPicture( p_dec, buf );
+
+            if( b_skip || !p_pic )
+            {
                 mpeg2_skip( p_sys->p_mpeg2dec, 1 );
                 p_sys->b_skip = 1;
                 decoder_SynchroTrash( p_sys->p_synchro );
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, NULL );
+
+                if( !b_skip )
+                {
+                    block_Release( p_block );
+                    return NULL;
+                }
             }
             else
             {
                 mpeg2_skip( p_sys->p_mpeg2dec, 0 );
                 p_sys->b_skip = 0;
                 decoder_SynchroDecode( p_sys->p_synchro );
-
-                if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
-                {
-                    block_Release( p_block );
-                    return NULL;
-                }
 
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
                 mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
