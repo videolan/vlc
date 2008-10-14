@@ -134,6 +134,7 @@ void MessagesDialog::updateTab( int index )
 
 void MessagesDialog::updateLog()
 {
+#if 0
     msg_subscription_t *p_sub = p_intf->p_sys->p_sub;
     int i_start;
 
@@ -196,6 +197,7 @@ void MessagesDialog::updateLog()
         p_sub->i_start = i_start;
         vlc_mutex_unlock( p_sub->p_lock );
     }
+#endif
 }
 
 void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
