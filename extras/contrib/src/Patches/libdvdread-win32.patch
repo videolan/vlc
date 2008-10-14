@@ -1,8 +1,8 @@
 Index: src/dvd_reader.c
 ===================================================================
---- src/dvd_reader.c	(revision 1107)
+--- src/dvd_reader.c	(revision 1157)
 +++ src/dvd_reader.c	(working copy)
-@@ -32,6 +32,7 @@
+@@ -34,6 +34,7 @@
  #include <limits.h>
  #include <dirent.h>
  
@@ -10,13 +10,11 @@ Index: src/dvd_reader.c
  /* misc win32 helpers */
  #ifdef WIN32
  #ifndef HAVE_GETTIMEOFDAY
-@@ -50,7 +51,8 @@
+@@ -52,6 +53,7 @@
  #include <io.h> /* read() */
  #define lseek64 _lseeki64
  #endif
-- 
 +#endif
-+
- #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__)|| defined(__DARWIN__)
+ 
+ #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__DARWIN__)
  #define SYS_BSD 1
- #endif
