@@ -874,10 +874,7 @@ VCDOpen ( vlc_object_t *p_this )
     p_vcdplayer = malloc( sizeof(vcdplayer_t) );
 
     if( p_vcdplayer == NULL )
-    {
-        LOG_ERR ("out of memory" );
         return VLC_ENOMEM;
-    }
 
     p_vcdplayer->i_debug = config_GetInt( p_this, MODULE_STRING "-debug" );
     p_access->p_sys = (access_sys_t *) p_vcdplayer;
@@ -1109,9 +1106,8 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
             dbg_print( INPUT_DBG_EVENT, "GET TITLE: i_titles %d",
                        p_vcdplayer->i_titles );
 
-            if( psz_mrl == NULL ) {
-               msg_Warn( p_access, "out of memory" );
-            } else {
+            if( psz_mrl  )
+            {
                snprintf(psz_mrl, psz_mrl_max, "%s%s",
                         VCD_MRL_PREFIX, p_vcdplayer->psz_source);
                VCDMetaInfo( p_access, psz_mrl );

@@ -79,10 +79,7 @@ int OpenAudio( vlc_object_t *p_this )
     /* allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->output.p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         return -1;
-    }
 
     /* open audio device */
     if( ( i_ret = snd_pcm_open_preferred( &p_aout->output.p_sys->p_pcm_handle,

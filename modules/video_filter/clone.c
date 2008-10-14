@@ -201,7 +201,6 @@ static int Create( vlc_object_t *p_this )
                                      sizeof(vout_thread_t *) );
     if( p_vout->p_sys->pp_vout == NULL )
     {
-        msg_Err( p_vout, "out of memory" );
         free( p_vout->p_sys );
         return VLC_ENOMEM;
     }

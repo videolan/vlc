@@ -69,10 +69,7 @@ int OpenAudio ( vlc_object_t * p_this )
     aout_instance_t * p_aout = (aout_instance_t*) p_this;
     p_aout->output.p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
     if( p_aout->output.p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         return -1;
-    }
     aout_sys_t * p_sys = p_aout->output.p_sys;
 
     aout_VolumeSoftInit( p_aout );

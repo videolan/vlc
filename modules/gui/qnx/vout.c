@@ -144,10 +144,7 @@ int OpenVideo ( vlc_object_t *p_this )
     /* allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return( 1 );
-    }
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
@@ -309,10 +306,7 @@ static int QNXManage( vout_thread_t *p_vout )
     /* allocate buffer for event */
     i_buflen = sizeof( PhEvent_t ) * 4;
     if( ( p_event = malloc( i_buflen ) ) == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return( 1 );
-    }
 
     /* event loop */
     do
@@ -324,10 +318,7 @@ static int QNXManage( vout_thread_t *p_vout )
         {
             i_buflen = PhGetMsgSize( p_event );
             if( ( p_event = realloc( p_event, i_buflen ) ) == NULL )
-            {
-                msg_Err( p_vout, "out of memory" );
                 return( 1 );
-            }
         }
         else if( i_ev == Ph_EVENT_MSG )
         {

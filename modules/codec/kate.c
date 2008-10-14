@@ -716,10 +716,7 @@ static void ParseKateComments( decoder_t *p_dec )
     {
         psz_comment = strdup( p_dec->p_sys->kc.user_comments[i] );
         if( !psz_comment )
-        {
-            msg_Warn( p_dec, "out of memory" );
             break;
-        }
         psz_name = psz_comment;
         psz_value = strchr( psz_comment, '=' );
         if( psz_value )

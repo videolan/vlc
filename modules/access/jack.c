@@ -1,7 +1,7 @@
 /*****************************************************************************
  * jack.c: JACK audio input module
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2008 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques
  * Copyright (C) 2007 Savoir-faire Linux
  *
@@ -170,7 +170,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* find some specifics ports if user entered a regexp */
-    if( p_sys->psz_ports)
+    if( p_sys->psz_ports )
     {
         Port_finder( p_demux );
         if( p_sys->i_channels == 0 )

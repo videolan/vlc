@@ -1228,10 +1228,7 @@ int OpenVideo ( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = (vout_sys_t*) malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
-        return( 1 );
-    }
+        return 1;
     p_vout->p_sys->i_width = p_vout->render.i_width;
     p_vout->p_sys->i_height = p_vout->render.i_height;
     p_vout->p_sys->source_chroma = p_vout->render.i_chroma;

@@ -1910,10 +1910,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
 #endif
 
     if( !( p_box->data.p_cmov = malloc( sizeof( MP4_Box_data_cmov_t ) ) ) )
-    {
-        msg_Err( p_stream, "out of memory" );
         return 0;
-    }
     memset( p_box->data.p_cmov, 0, sizeof( MP4_Box_data_cmov_t ) );
 
     if( !p_box->p_father ||
