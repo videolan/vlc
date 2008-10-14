@@ -351,21 +351,49 @@ CapturePin::~CapturePin()
     FreeMediaType(cx_media_type);
 }
 
+/**
+ * Returns the complete queue of samples that have been received so far.
+ * Lock the p_sys->lock before calling this function.
+ * @param samples_queue [out] Empty queue that will get all elements from
+ * the pin queue.
+ * @return S_OK if a sample was available, S_FALSE if no sample was
+ * available
+ */
+HRESULT CapturePin::CustomGetSamples( deque<VLCMediaSample> &external_queue )
+{
+#if 0 //def DEBUG_DSHOW
+    msg_Dbg( p_input, "CapturePin::CustomGetSamples: %d samples in the queue", samples_queue.size());
+#endif
+
+    if( !samples_queue.empty() )
+    {
+        external_queue.swap(samples_queue);
+        return S_OK;
+    }
+    return S_FALSE;
+}
+
+/**
+ * Returns a sample from its sample queue. Proper locking must be done prior
+ * to this call. Current dshow code protects the access to any sample queue
+ * (audio and video) with the p_sys->lock
+ * @param vlc_sample [out] Address of a sample if sucessfull. Undefined
+ * otherwise.
+ * @return S_OK if a sample was available, S_FALSE if no sample was
+ * available
+ */
 HRESULT CapturePin::CustomGetSample( VLCMediaSample *vlc_sample )
 {
 #if 0 //def DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::CustomGetSample" );
 #endif
 
-    vlc_mutex_lock( &p_sys->lock );
     if( samples_queue.size() )
     {
         *vlc_sample = samples_queue.back();
         samples_queue.pop_back();
-        vlc_mutex_unlock( &p_sys->lock );
         return S_OK;
     }
-    vlc_mutex_unlock( &p_sys->lock );
     return S_FALSE;
 }
 

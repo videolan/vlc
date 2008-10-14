@@ -131,6 +131,8 @@ class CapturePin: public IPin, public IMemInputPin
 
     /* Custom methods */
     HRESULT CustomGetSample( VLCMediaSample * );
+    HRESULT CustomGetSamples( deque<VLCMediaSample> &external_queue );
+
     AM_MEDIA_TYPE &CustomGetMediaType();
 };
 
