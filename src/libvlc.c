@@ -744,11 +744,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( priv->b_color )
         priv->b_color = config_GetInt( p_libvlc, "color" ) > 0;
 
-    /*
-     * Output messages that may still be in the queue
-     */
-    msg_Flush( p_libvlc );
-
     if( !config_GetInt( p_libvlc, "fpu" ) )
         cpu_flags &= ~CPU_CAPABILITY_FPU;
 
@@ -1142,7 +1137,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
     }
     vlc_mutex_unlock( &global_lock );
 
-    msg_Flush( p_libvlc );
     msg_Destroy( p_libvlc );
 
     /* Destroy mutexes */

@@ -55,6 +55,7 @@ typedef struct
     char *  psz_header;                         /**< Additional header */
 
     mtime_t date;                               /**< Message date */
+    gc_object_t vlc_gc_data;
 } msg_item_t;
 
 /* Message types */
@@ -66,6 +67,17 @@ typedef struct
 #define VLC_MSG_WARN  2
 /** debug messages */
 #define VLC_MSG_DBG   3
+
+static inline msg_item_t *msg_Hold (msg_item_t *msg)
+{
+    vlc_hold (&msg->vlc_gc_data);
+    return msg;
+}
+
+static inline void msg_Release (msg_item_t *msg)
+{
+    vlc_release (&msg->vlc_gc_data);
+}
 
 /**
  * Used by interface plugins which subscribe to the message bank.

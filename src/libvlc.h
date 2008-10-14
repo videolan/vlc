@@ -79,12 +79,6 @@ typedef struct msg_bank_t
     vlc_mutex_t lock;
     vlc_cond_t  wait;
 
-    /* Message queue */
-    msg_item_t              msg[VLC_MSG_QSIZE];           /**< message queue */
-    int i_start;
-    int i_stop;
-    bool b_overflow;
-
     /* Subscribers */
     int i_sub;
     msg_subscription_t **pp_sub;
@@ -96,7 +90,6 @@ typedef struct msg_bank_t
 } msg_bank_t;
 
 void msg_Create  (libvlc_int_t *);
-void msg_Flush   (libvlc_int_t *);
 void msg_Destroy (libvlc_int_t *);
 
 /** Internal message stack context */
