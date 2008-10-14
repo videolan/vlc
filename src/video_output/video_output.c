@@ -628,13 +628,13 @@ void vout_Flush( vout_thread_t *p_vout, mtime_t i_date )
     }
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
-void vout_FixLeaks( vout_thread_t *p_vout )
+void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced )
 {
     int i_pic, i_ready_pic;
 
     vlc_mutex_lock( &p_vout->picture_lock );
 
-    for( i_pic = 0, i_ready_pic = 0; i_pic < p_vout->render.i_pictures; i_pic++ )
+    for( i_pic = 0, i_ready_pic = 0; i_pic < p_vout->render.i_pictures && !b_forced; i_pic++ )
     {
         const picture_t *p_pic = p_vout->render.pp_picture[i_pic];
 
@@ -657,7 +657,7 @@ void vout_FixLeaks( vout_thread_t *p_vout )
                 break;
         }
     }
-    if( i_pic < p_vout->render.i_pictures )
+    if( i_pic < p_vout->render.i_pictures && !b_forced )
     {
         vlc_mutex_unlock( &p_vout->picture_lock );
         return;
@@ -665,7 +665,8 @@ void vout_FixLeaks( vout_thread_t *p_vout )
 
     /* Too many pictures are still referenced, there is probably a bug
      * with the decoder */
-    msg_Err( p_vout, "pictures leaked, resetting the heap" );
+    if( !b_forced )
+        msg_Err( p_vout, "pictures leaked, resetting the heap" );
 
     /* Just free all the pictures */
     for( i_pic = 0; i_pic < p_vout->render.i_pictures; i_pic++ )

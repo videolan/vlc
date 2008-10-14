@@ -110,7 +110,7 @@ void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
  *
  * XXX This function is there to workaround bugs in decoder
  */
-void vout_FixLeaks( vout_thread_t *p_vout );
+void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced );
 
 /**
  * This functions will drop a picture retreived by vout_CreatePicture.

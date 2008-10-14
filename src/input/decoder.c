@@ -1818,15 +1818,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     if( p_owner->p_vout )
     {
         /* Hack to make sure all the the pictures are freed by the decoder */
-        for( int i_pic = 0; i_pic < p_owner->p_vout->render.i_pictures; i_pic++ )
-        {
-            picture_t *p_pic = p_owner->p_vout->render.pp_picture[i_pic];
-
-            if( p_pic->i_status == RESERVED_PICTURE )
-                vout_DestroyPicture( p_owner->p_vout, p_pic );
-            if( p_pic->i_refcount > 0 )
-                vout_UnlinkPicture( p_owner->p_vout, p_pic );
-        }
+        vout_FixLeaks( p_owner->p_vout, true );
 
         /* We are about to die. Reattach video output to p_vlc. */
         vout_Request( p_dec, p_owner->p_vout, NULL );
@@ -2088,7 +2080,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         DecoderSignalBuffering( p_dec, true );
 
         /* Check the decoder doesn't leak pictures */
-        vout_FixLeaks( p_owner->p_vout );
+        vout_FixLeaks( p_owner->p_vout, false );
 
         msleep( VOUT_OUTMEM_SLEEP );
     }
