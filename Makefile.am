@@ -752,6 +752,9 @@ package-win32-base-debug: package-win-common
 	    $(INSTALL) "$$i" "vlc-$(VERSION)/plugins/" ; \
 	  fi ; done
 
+# Contrib *.dll's
+	cp $(srcdir)/extras/contrib/lib/*.dll "vlc-$(VERSION)/"
+
 # Copy the lua scripts (HTTP)
 if BUILD_LUA
 	mkdir -p "$(win32_lua_destdir)/http/images"
@@ -886,6 +889,7 @@ package-win-common-strip: package-win32-base-debug
 	$(STRIP) "vlc-$(VERSION)/vlc$(EXEEXT)"
 	$(STRIP) "vlc-$(VERSION)/libvlccore$(LIBEXT)"
 	$(STRIP) "vlc-$(VERSION)/libvlc$(LIBEXT)"
+	$(STRIP) "vlc-$(VERSION)/pthreadGC2$(LIBEXT)"
 if BUILD_MOZILLA
 	$(STRIP) "vlc-$(VERSION)/mozilla/npvlc$(LIBEXT)"
 endif
