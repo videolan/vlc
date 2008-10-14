@@ -1318,9 +1318,14 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
 
                                 if( i_width )
                                 {
-                                    if( i_width % pVSCC->OutputGranularityX
-                                     || pVSCC->MinOutputSize.cx > i_width
-                                     || i_width > pVSCC->MaxOutputSize.cx )
+                                    if((   !pVSCC->OutputGranularityX
+                                           && i_width != pVSCC->MinOutputSize.cx
+                                           && i_width != pVSCC->MaxOutputSize.cx)
+                                       ||
+                                       (   pVSCC->OutputGranularityX
+                                           && ((i_width % pVSCC->OutputGranularityX)
+                                               || pVSCC->MinOutputSize.cx > i_width
+                                               || i_width > pVSCC->MaxOutputSize.cx )))
                                     {
                                         // required width not compatible, try next media type
                                         FreeMediaType( *p_mt );
@@ -1332,9 +1337,14 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
 
                                 if( i_height )
                                 {
-                                    if( i_height % pVSCC->OutputGranularityY
-                                     || pVSCC->MinOutputSize.cy > i_height
-                                     || i_height > pVSCC->MaxOutputSize.cy )
+                                    if((   !pVSCC->OutputGranularityY
+                                           && i_height != pVSCC->MinOutputSize.cy
+                                           && i_height != pVSCC->MaxOutputSize.cy)
+                                       ||
+                                       (   pVSCC->OutputGranularityY
+                                           && ((i_height % pVSCC->OutputGranularityY)
+                                               || pVSCC->MinOutputSize.cy > i_height
+                                               || i_height > pVSCC->MaxOutputSize.cy )))
                                     {
                                         // required height not compatible, try next media type
                                         FreeMediaType( *p_mt );
@@ -1375,9 +1385,14 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                     if( ! val )
                                         val = 2;
 
-                                    if( val % pASCC->ChannelsGranularity
-                                     || (unsigned int)val < pASCC->MinimumChannels
-                                     || (unsigned int)val > pASCC->MaximumChannels )
+                                    if( (   !pASCC->ChannelsGranularity
+                                            && (unsigned int)val != pASCC->MinimumChannels
+                                            && (unsigned int)val != pASCC->MaximumChannels)
+                                        ||
+                                        (   pASCC->ChannelsGranularity
+                                            && ((val % pASCC->ChannelsGranularity)
+                                                || (unsigned int)val < pASCC->MinimumChannels
+                                                || (unsigned int)val > pASCC->MaximumChannels)))
                                     {
                                         // required number channels not available, try next media type
                                         FreeMediaType( *p_mt );
@@ -1390,9 +1405,14 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                     if( ! val )
                                         val = 44100;
 
-                                    if( val % pASCC->SampleFrequencyGranularity
-                                     || (unsigned int)val < pASCC->MinimumSampleFrequency
-                                     || (unsigned int)val > pASCC->MaximumSampleFrequency )
+                                    if( (   !pASCC->SampleFrequencyGranularity
+                                            && (unsigned int)val != pASCC->MinimumSampleFrequency
+                                            && (unsigned int)val != pASCC->MaximumSampleFrequency)
+                                        ||
+                                        (   pASCC->SampleFrequencyGranularity
+                                            && ((val % pASCC->SampleFrequencyGranularity)
+                                                || (unsigned int)val < pASCC->MinimumSampleFrequency
+                                                || (unsigned int)val > pASCC->MaximumSampleFrequency )))
                                     {
                                         // required sampling rate not available, try next media type
                                         FreeMediaType( *p_mt );
@@ -1410,9 +1430,14 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                             val = 16;
                                     }
 
-                                    if( val % pASCC->BitsPerSampleGranularity
-                                     || (unsigned int)val < pASCC->MinimumBitsPerSample
-                                     || (unsigned int)val > pASCC->MaximumBitsPerSample )
+                                    if( (   !pASCC->BitsPerSampleGranularity
+                                            && (unsigned int)val != pASCC->MinimumBitsPerSample
+                                            &&	(unsigned int)val != pASCC->MaximumBitsPerSample )
+                                        ||
+                                        (   pASCC->BitsPerSampleGranularity
+                                            && ((val % pASCC->BitsPerSampleGranularity)
+                                                || (unsigned int)val < pASCC->MinimumBitsPerSample
+                                                || (unsigned int)val > pASCC->MaximumBitsPerSample )))
                                     {
                                         // required sample size not available, try next media type
                                         FreeMediaType( *p_mt );
