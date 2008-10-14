@@ -142,10 +142,7 @@ static int CreateVout( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = p_sys = calloc( sizeof( vout_sys_t ), 1 );
     if( p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
         return VLC_EGENERIC;
-    }
 
     p_sys->i_tex_width  = p_vout->fmt_in.i_width;
     p_sys->i_tex_height = p_vout->fmt_in.i_height;
@@ -204,10 +201,7 @@ static int Init( vout_thread_t *p_vout )
         p_sys->pp_buffer[i] =
             malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
         if( !p_sys->pp_buffer[i] )
-        {
-            msg_Err( p_vout, "out of memory" );
             return VLC_EGENERIC;
-        }
     }
     p_sys->b_frame_available = false;
     p_sys->i_index = 0;

@@ -272,7 +272,10 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout =
         (vout_thread_t *)vlc_object_create( p_this, sizeof( vout_thread_t ) );
     if( p_sys->p_vout == NULL )
+    {
+        free( p_sys );
         return VLC_ENOMEM;
+    }
     vlc_object_attach( p_sys->p_vout, p_this );
 
     p_sys->p_vout->i_window_width = p_vout->i_window_width;
