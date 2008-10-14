@@ -78,8 +78,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
-        msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     snprintf( psz_file, sizeof( psz_file), "stream.%p", p_dec );
@@ -98,6 +97,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
         if( p_sys->i_fd == -1 )
         {
             msg_Err( p_dec, "cannot create `%s'", psz_file );
+            free( p_sys );
             return VLC_EGENERIC;
         }
 
@@ -164,8 +164,10 @@ void CloseDecoder ( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
 #ifndef UNDER_CE
-    if( p_sys->i_fd >= 0 ) close( p_sys->i_fd );
+    if( p_sys->i_fd >= 0 )
+        close( p_sys->i_fd );
 #endif
 
     free( p_sys );
 }
+
