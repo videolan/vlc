@@ -765,7 +765,7 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->i_width = var_CreateGetInteger( p_obj, "v4l2-width" );
     p_sys->i_height = var_CreateGetInteger( p_obj, "v4l2-height" );
 
-    var_CreateGetBool( p_obj, "v4l2-controls-reset" );
+    var_Create( p_obj, "v4l2-controls-reset", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     p_sys->f_fps = var_CreateGetFloat( p_obj, "v4l2-fps" );
     p_sys->i_sample_rate = var_CreateGetInteger( p_obj, "v4l2-samplerate" );
@@ -1680,18 +1680,14 @@ static int InitRead( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
 
     p_sys->p_buffers = calloc( 1, sizeof( *p_sys->p_buffers ) );
     if( !p_sys->p_buffers )
-        goto open_failed;
+        return VLC_EGENERIC;
 
     p_sys->p_buffers[0].length = i_buffer_size;
     p_sys->p_buffers[0].start = malloc( i_buffer_size );
     if( !p_sys->p_buffers[0].start )
-        goto open_failed;
+        return VLC_ENOMEM;
 
     return VLC_SUCCESS;
-
-open_failed:
-    return VLC_EGENERIC;
-
 }
 
 /*****************************************************************************
