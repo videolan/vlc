@@ -494,6 +494,7 @@ AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
 AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
 AC_CHECK_FUNCS(strcasestr,,[AC_CHECK_FUNCS(stristr)])
 AC_FUNC_ALLOCA
+AC_CHECK_FUNCS(fcntl)
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 

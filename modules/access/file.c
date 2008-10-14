@@ -350,7 +350,7 @@ static int open_file (access_t *p_access, const char *path)
         return -1;
     }
 
-#if defined(HAVE_FCNTL_H)
+#if defined(HAVE_FCNTL)
     fcntl (fd, F_SETFD, fcntl (fd, F_GETFD) | FD_CLOEXEC);
 
     /* We'd rather use any available memory for reading ahead
