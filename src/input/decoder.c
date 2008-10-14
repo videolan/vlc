@@ -1160,47 +1160,6 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
     }
     vlc_mutex_unlock( &p_owner->lock );
 }
-static void VoutDisplayedPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    vlc_mutex_lock( &p_vout->picture_lock );
-
-    if( p_pic->i_status == READY_PICTURE )
-    {
-        /* Grr cannot destroy ready picture by myself so be sure vout won't like it */
-        p_pic->date = 1;
-    }
-    else if( p_pic->i_refcount > 0 )
-    {
-        p_pic->i_status = DISPLAYED_PICTURE;
-    }
-    else
-    {
-        p_pic->i_status = DESTROYED_PICTURE;
-        picture_CleanupQuant( p_pic );
-        p_vout->i_heap_size--;
-    }
-
-    vlc_mutex_unlock( &p_vout->picture_lock );
-}
-static void VoutFlushPicture( vout_thread_t *p_vout, mtime_t i_max_date )
-{
-    int i;
-    vlc_mutex_lock( &p_vout->picture_lock );
-    for( i = 0; i < p_vout->render.i_pictures; i++ )
-    {
-        picture_t *p_pic = p_vout->render.pp_picture[i];
-
-        if( p_pic->i_status == READY_PICTURE ||
-            p_pic->i_status == DISPLAYED_PICTURE )
-        {
-            /* We cannot change picture status if it is in READY_PICTURE state,
-             * Just make sure they won't be displayed */
-            if( p_pic->date > i_max_date )
-                p_pic->date = i_max_date;
-        }
-    }
-    vlc_mutex_unlock( &p_vout->picture_lock );
-}
 
 static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
                               int *pi_played_sum, int *pi_lost_sum )
@@ -1212,7 +1171,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     {
         msg_Warn( p_vout, "non-dated video buffer received" );
         *pi_lost_sum += 1;
-        VoutDisplayedPicture( p_vout, p_picture );
+        vout_DropPicture( p_vout, p_picture );
         return;
     }
 
@@ -1297,7 +1256,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             if( i_rate != p_owner->i_last_rate  )
             {
                 /* Be sure to not display old picture after our own */
-                VoutFlushPicture( p_vout, p_picture->date );
+                vout_Flush( p_vout, p_picture->date );
                 p_owner->i_last_rate = i_rate;
             }
 
@@ -1317,7 +1276,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
                           p_picture->date - mdate() );
             }
             *pi_lost_sum += 1;
-            VoutDisplayedPicture( p_vout, p_picture );
+            vout_DropPicture( p_vout, p_picture );
         }
         int i_tmp_display;
         int i_tmp_lost;
@@ -1353,7 +1312,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
         if( p_dec->b_die )
         {
             /* It prevent freezing VLC in case of broken decoder */
-            VoutDisplayedPicture( p_vout, p_pic );
+            vout_DropPicture( p_vout, p_pic );
             if( p_block )
                 block_Release( p_block );
             break;
@@ -1363,7 +1322,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         if( p_pic->date < p_owner->i_preroll_end )
         {
-            VoutDisplayedPicture( p_vout, p_pic );
+            vout_DropPicture( p_vout, p_pic );
             continue;
         }
 
@@ -1371,7 +1330,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
         {
             msg_Dbg( p_dec, "End of video preroll" );
             if( p_vout )
-                VoutFlushPicture( p_vout, 1 );
+                vout_Flush( p_vout, 1 );
             /* */
             p_owner->i_preroll_end = -1;
         }
@@ -1513,7 +1472,7 @@ static void DecoderFlushBuffering( decoder_t *p_dec )
         p_owner->buffer.i_count--;
 
         if( p_owner->p_vout )
-            VoutDisplayedPicture( p_owner->p_vout, p_picture );
+            vout_DropPicture( p_owner->p_vout, p_picture );
 
         if( !p_owner->buffer.p_picture )
             p_owner->buffer.pp_picture_next = &p_owner->buffer.p_picture;
@@ -1655,7 +1614,7 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flus
     }
 
     if( b_flush && p_owner->p_vout )
-        VoutFlushPicture( p_owner->p_vout, 1 );
+        vout_Flush( p_owner->p_vout, 1 );
 }
 
 /* This function process a audio block
@@ -2106,7 +2065,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
     for( ;; )
     {
         picture_t *p_picture;
-        int i_pic, i_ready_pic;
 
         if( p_dec->b_die || p_dec->b_error )
             return NULL;
@@ -2130,47 +2088,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         DecoderSignalBuffering( p_dec, true );
 
         /* Check the decoder doesn't leak pictures */
-        for( i_pic = 0, i_ready_pic = 0; i_pic < p_owner->p_vout->render.i_pictures; i_pic++ )
-        {
-            const picture_t *p_pic = p_owner->p_vout->render.pp_picture[i_pic];
-
-            if( p_pic->i_status == READY_PICTURE )
-            {
-                i_ready_pic++;
-                /* If we have at least 2 ready pictures, wait for the vout thread to
-                 * process one */
-                if( i_ready_pic >= 2 )
-                    break;
-
-                continue;
-            }
-
-            if( p_pic->i_status == DISPLAYED_PICTURE )
-            {
-                /* If at least one displayed picture is not referenced
-                 * let vout free it */
-                if( p_pic->i_refcount == 0 )
-                    break;
-            }
-        }
-
-        if( i_pic == p_owner->p_vout->render.i_pictures )
-        {
-            /* Too many pictures are still referenced, there is probably a bug
-             * with the decoder */
-            msg_Err( p_dec, "decoder is leaking pictures, resetting the heap" );
-
-            /* Just free all the pictures */
-            for( i_pic = 0; i_pic < p_owner->p_vout->render.i_pictures; i_pic++ )
-            {
-                picture_t *p_pic = p_owner->p_vout->render.pp_picture[i_pic];
-
-                if( p_pic->i_status == RESERVED_PICTURE )
-                    vout_DestroyPicture( p_owner->p_vout, p_pic );
-                if( p_pic->i_refcount > 0 )
-                    vout_UnlinkPicture( p_owner->p_vout, p_pic );
-            }
-        }
+        vout_FixLeaks( p_owner->p_vout );
 
         msleep( VOUT_OUTMEM_SLEEP );
     }
@@ -2178,7 +2096,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
 static void vout_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 {
-    VoutDisplayedPicture( p_dec->p_owner->p_vout, p_pic );
+    vout_DropPicture( p_dec->p_owner->p_vout, p_pic );
 }
 
 static void vout_link_picture( decoder_t *p_dec, picture_t *p_pic )

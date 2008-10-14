@@ -53,13 +53,6 @@ struct vout_thread_sys_t
     /* Statistics */
     int             i_picture_lost;
     int             i_picture_displayed;
-#if 0
-    count_t         c_loops;
-    count_t         c_pictures, c_late_pictures;
-    mtime_t         display_jitter;    /**< average deviation from the PTS */
-    count_t         c_jitter_samples;  /**< number of samples used
-                                           for the calculation of the jitter  */
-#endif
 
     /* Pause */
     bool            b_paused;
@@ -110,6 +103,19 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_l
  * the provided dat
  */
 void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
+
+/**
+ * This function will try to detect if pictures are being leaked. If so it
+ * will release them.
+ *
+ * XXX This function is there to workaround bugs in decoder
+ */
+void vout_FixLeaks( vout_thread_t *p_vout );
+
+/**
+ * This functions will drop a picture retreived by vout_CreatePicture.
+ */
+void vout_DropPicture( vout_thread_t *p_vout, picture_t * );
 
 #endif
 

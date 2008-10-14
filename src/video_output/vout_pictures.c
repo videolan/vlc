@@ -268,6 +268,30 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
+/* */
+void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
+{
+    vlc_mutex_lock( &p_vout->picture_lock );
+
+    if( p_pic->i_status == READY_PICTURE )
+    {
+        /* Grr cannot destroy ready picture by myself so be sure vout won't like it */
+        p_pic->date = 1;
+    }
+    else if( p_pic->i_refcount > 0 )
+    {
+        p_pic->i_status = DISPLAYED_PICTURE;
+    }
+    else
+    {
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_vout->i_heap_size--;
+        picture_CleanupQuant( p_pic );
+    }
+
+    vlc_mutex_unlock( &p_vout->picture_lock );
+}
+
 /**
  * Increment reference counter of a picture
  *

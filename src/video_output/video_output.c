@@ -375,7 +375,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->i_par_den = 1;
 
     /* Initialize locks */
-    vlc_mutex_init( &p_vout->picture_lock );
+    vlc_mutex_init_recursive( &p_vout->picture_lock );
     vlc_mutex_init( &p_vout->change_lock );
     vlc_mutex_init( &p_vout->p->vfilter_lock );
 
@@ -628,6 +628,58 @@ void vout_Flush( vout_thread_t *p_vout, mtime_t i_date )
     }
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
+void vout_FixLeaks( vout_thread_t *p_vout )
+{
+    int i_pic, i_ready_pic;
+
+    vlc_mutex_lock( &p_vout->picture_lock );
+
+    for( i_pic = 0, i_ready_pic = 0; i_pic < p_vout->render.i_pictures; i_pic++ )
+    {
+        const picture_t *p_pic = p_vout->render.pp_picture[i_pic];
+
+        if( p_pic->i_status == READY_PICTURE )
+        {
+            i_ready_pic++;
+            /* If we have at least 2 ready pictures, wait for the vout thread to
+             * process one */
+            if( i_ready_pic >= 2 )
+                break;
+
+            continue;
+        }
+
+        if( p_pic->i_status == DISPLAYED_PICTURE )
+        {
+            /* If at least one displayed picture is not referenced
+             * let vout free it */
+            if( p_pic->i_refcount == 0 )
+                break;
+        }
+    }
+    if( i_pic < p_vout->render.i_pictures )
+    {
+        vlc_mutex_unlock( &p_vout->picture_lock );
+        return;
+    }
+
+    /* Too many pictures are still referenced, there is probably a bug
+     * with the decoder */
+    msg_Err( p_vout, "pictures leaked, resetting the heap" );
+
+    /* Just free all the pictures */
+    for( i_pic = 0; i_pic < p_vout->render.i_pictures; i_pic++ )
+    {
+        picture_t *p_pic = p_vout->render.pp_picture[i_pic];
+
+        if( p_pic->i_status == RESERVED_PICTURE )
+            vout_DestroyPicture( p_vout, p_pic );
+        if( p_pic->i_refcount > 0 )
+            vout_UnlinkPicture( p_vout, p_pic );
+    }
+    vlc_mutex_unlock( &p_vout->picture_lock );
+}
+
 /*****************************************************************************
  * InitThread: initialize video output thread
  *****************************************************************************
@@ -658,10 +710,6 @@ static bool ChromaIsEqual( const picture_heap_t *p_output, const picture_heap_t 
 static int InitThread( vout_thread_t *p_vout )
 {
     int i, i_aspect_x, i_aspect_y;
-
-#ifdef STATS
-    p_vout->c_loops = 0;
-#endif
 
     /* Initialize output method, it allocates direct buffers for us */
     if( p_vout->pf_init( p_vout ) )
@@ -843,7 +891,7 @@ static void* RunThread( vlc_object_t *p_this )
 
     bool            b_drop_late;
 
-    int canc = vlc_savecancel ();
+    int canc = vlc_savecancel();
 
     /*
      * Initialize thread
@@ -860,7 +908,7 @@ static void* RunThread( vlc_object_t *p_this )
     {
         EndThread( p_vout );
         vlc_mutex_unlock( &p_vout->change_lock );
-        vlc_restorecancel (canc);
+        vlc_restorecancel( canc );
         return NULL;
     }
 
@@ -882,15 +930,6 @@ static void* RunThread( vlc_object_t *p_this )
         mtime_t display_date = 0;
         picture_t *p_directbuffer;
         int i_index;
-
-#if 0
-        p_vout->c_loops++;
-        if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
-        {
-            msg_Dbg( p_vout, "picture heap: %d/%d",
-                     I_RENDERPICTURES, p_vout->i_heap_size );
-        }
-#endif
 
         /*
          * Find the picture to display (the one with the earliest date).
@@ -1236,7 +1275,7 @@ static void* RunThread( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_vout->change_lock );
 
     vlc_object_unlock( p_vout );
-    vlc_restorecancel (canc);
+    vlc_restorecancel( canc );
     return NULL;
 }
 
