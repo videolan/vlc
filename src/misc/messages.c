@@ -336,6 +336,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         return; /* Uho! */
 
     vlc_gc_init (p_item, msg_Free);
+    p_item->psz_module = p_item->psz_msg = p_item->psz_header = NULL;
 
 #if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
     int          i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
@@ -343,7 +344,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 
     if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
         (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
-        return;
+        goto out;
 
 #ifndef __GLIBC__
     /* Expand %m to strerror(errno) - only once */
@@ -434,7 +435,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         va_end( args );
         fputs( "\n", stderr );
         vlc_restorecancel (canc);
-        return;
+        goto out;
     }
 
     i_header_size = 0;
@@ -497,6 +498,8 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     }
     vlc_cond_broadcast (&bank->wait);
     vlc_mutex_unlock (&bank->lock);
+out:
+    msg_Release (p_item);
 }
 
 /*****************************************************************************
