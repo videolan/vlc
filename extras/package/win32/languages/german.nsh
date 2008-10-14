@@ -1,7 +1,7 @@
 StrCpy $Name_Section01 "Media Player (erforderlich)"
 StrCpy $Name_Section02a "Verknüpfung im Startmenü"
 StrCpy $Name_Section02b "Verknüpfung auf den Desktop"
-StrCpy $Name_Section03 "Mozilla-Plugin
+StrCpy $Name_Section03 "Mozilla-Plugin"
 StrCpy $Name_Section04 "ActiveX-Plugin"
 StrCpy $Name_Section05 "Wiedergabe von Datenträgern"
 StrCpy $Name_Section06 "Dateitypzuordnungen"
