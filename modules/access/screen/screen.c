@@ -341,9 +341,7 @@ void RenderCursor( demux_t *p_demux, int i_x, int i_y,
     if( !p_sys->p_blend )
     {
         p_sys->p_blend = vlc_object_create( p_demux, sizeof(filter_t) );
-        if( !p_sys->p_blend )
-            msg_Err( p_demux, "Could not allocate memory for blending module" );
-        else
+        if( p_sys->p_blend )
         {
             es_format_Init( &p_sys->p_blend->fmt_in, VIDEO_ES,
                             VLC_FOURCC('R','G','B','A') );

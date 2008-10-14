@@ -460,16 +460,12 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
         p_sys->immediate.i_end = 0;
         p_sys->immediate.p_buffer = malloc( STREAM_CACHE_SIZE );
 
+        if( p_sys->immediate.p_buffer == NULL )
+            goto error;
+
         msg_Dbg( s, "p_buffer %p-%p",
                  p_sys->immediate.p_buffer,
                  &p_sys->immediate.p_buffer[STREAM_CACHE_SIZE] );
-
-        if( p_sys->immediate.p_buffer == NULL )
-        {
-            msg_Err( s, "Out of memory when allocating stream cache (%d bytes)",
-                        STREAM_CACHE_SIZE );
-            goto error;
-        }
     }
     else
     {
@@ -487,11 +483,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
         p_sys->stream.i_tk     = 0;
         p_sys->stream.p_buffer = malloc( STREAM_CACHE_SIZE );
         if( p_sys->stream.p_buffer == NULL )
-        {
-            msg_Err( s, "Out of memory when allocating stream cache (%d bytes)",
-                        STREAM_CACHE_SIZE );
             goto error;
-        }
         p_sys->stream.i_used   = 0;
         access_Control( p_access, ACCESS_GET_MTU,
                          &p_sys->stream.i_read_size );

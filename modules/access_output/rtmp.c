@@ -90,10 +90,7 @@ static int Open( vlc_object_t *p_this )
     int i;
 
     if( !( p_sys = calloc ( 1, sizeof( sout_access_out_sys_t ) ) ) )
-    {
-        msg_Err( p_access, "not enough memory" );
         return VLC_ENOMEM;
-    }
     p_access->p_sys = p_sys;
 
     p_sys->p_thread =

@@ -655,16 +655,12 @@ void onAddCameraToPlaylist(GtkButton *button, gpointer user_data)
 
     ppsz_options = (char **) malloc(11 *sizeof(char*));
     if (ppsz_options == NULL)
-    {
-        msg_Err(p_intf, "No memory to allocate for v4l options.");
         return;
-    }
     for (i=0; i<11; i++)
     {
         ppsz_options[i] = (char *) malloc(VLC_MAX_MRL * sizeof(char));
         if (ppsz_options[i] == NULL)
         {
-            msg_Err(p_intf, "No memory to allocate for v4l options string %i.", i);
             for (i-=1; i>=0; i--)
                 free(ppsz_options[i]);
             free(ppsz_options);
@@ -1021,16 +1017,12 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
 
     ppsz_options = (char **) malloc(3 *sizeof(char*));
     if (ppsz_options == NULL)
-    {
-        msg_Err(p_intf, "No memory to allocate for v4l options.");
         return;
-    }
     for (i=0; i<3; i++)
     {
         ppsz_options[i] = (char *) malloc(VLC_MAX_MRL * sizeof(char));
         if (ppsz_options[i] == NULL)
         {
-            msg_Err(p_intf, "No memory to allocate for v4l options string %i.", i);
             for (i-=1; i>=0; i--)
                 free(ppsz_options[i]);
             free(ppsz_options);

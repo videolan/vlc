@@ -87,10 +87,7 @@ static int Open( vlc_object_t *p_this )
     intf_sys_t      *p_sys  = malloc( sizeof( intf_sys_t ) );
 
     if( !p_sys )
-    {
-        msg_Err( p_intf, "Out of memory" );
         return VLC_ENOMEM;
-    }
 
     if( !notify_init( APPLICATION_NAME ) )
     {

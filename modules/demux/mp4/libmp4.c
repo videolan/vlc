@@ -1872,10 +1872,7 @@ static int MP4_ReadBox_cmvd( stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_cmvd->i_compressed_size = i_read;
 
     if( !( p_box->data.p_cmvd->p_data = malloc( i_read ) ) )
-    {
-        msg_Dbg( p_stream, "read box: \"cmvd\" not enough memory to load data" );
         return( 1 );
-    }
 
     /* now copy compressed data */
     memcpy( p_box->data.p_cmvd->p_data,
@@ -1949,11 +1946,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     /* decompress data */
     /* allocate a new buffer */
     if( !( p_data = malloc( p_cmvd->data.p_cmvd->i_uncompressed_size ) ) )
-    {
-        msg_Err( p_stream, "read box: \"cmov\" not enough memory to "
-                 "uncompress data" );
         return 1;
-    }
     /* init default structures */
     z_data.next_in   = p_cmvd->data.p_cmvd->p_data;
     z_data.avail_in  = p_cmvd->data.p_cmvd->i_compressed_size;

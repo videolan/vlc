@@ -931,10 +931,7 @@ static void ReadRealIndex( demux_t *p_demux )
     p_sys->p_index = 
             (rm_index_t *)malloc( sizeof( rm_index_t ) * (i_index_count+1) );
     if( p_sys->p_index == NULL )
-    {
-        msg_Err( p_demux, "Memory allocation error" ); 
         return;
-    }
 
     memset( p_sys->p_index, 0, sizeof(rm_index_t) * (i_index_count+1) );
 

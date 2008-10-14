@@ -1717,10 +1717,7 @@ static int InitMmap( demux_t *p_demux, int i_fd )
 
     p_sys->p_buffers = calloc( req.count, sizeof( *p_sys->p_buffers ) );
     if( !p_sys->p_buffers )
-    {
-        msg_Err( p_demux, "Out of memory" );
         goto open_failed;
-    }
 
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < req.count; ++p_sys->i_nbuffers )
     {

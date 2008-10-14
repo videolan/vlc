@@ -56,10 +56,7 @@ osd_menu_t *osd_MenuNew( osd_menu_t *p_menu, const char *psz_path,
 
     p_menu->p_state = (osd_menu_state_t *) malloc( sizeof( osd_menu_state_t ) );
     if( !p_menu->p_state )
-    {
-        msg_Err( p_menu, "Memory allocation for OSD Menu state failed" );
         return NULL;
-    }
 
     memset(p_menu->p_state, 0, sizeof(osd_menu_state_t));
     if( psz_path != NULL )

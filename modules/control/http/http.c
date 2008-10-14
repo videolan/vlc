@@ -263,10 +263,7 @@ static int Open( vlc_object_t *p_this )
         /* FIXME: we're leaking h */
         httpd_handler_sys_t *h = malloc( sizeof( httpd_handler_sys_t ) );
         if( !h )
-        {
-            msg_Err( p_intf, "not enough memory to allocate album art handler" );
             goto failed;
-        }
         h->file.p_intf = p_intf;
         h->file.file = NULL;
         h->file.name = NULL;
