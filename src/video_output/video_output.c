@@ -931,10 +931,9 @@ static void* RunThread( vlc_object_t *p_this )
         picture_t *p_directbuffer;
         int i_index;
 
-        /*
-         * Find the picture to display (the one with the earliest date).
-         * This operation does not need lock, since only READY_PICTUREs
-         * are handled. */
+        /* Find the picture to display (the one with the earliest date). */
+        vlc_mutex_lock( &p_vout->picture_lock );
+
         for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
         {
             picture_t *p_pic = PP_RENDERPICTURE[i_index];
@@ -1014,6 +1013,7 @@ static void* RunThread( vlc_object_t *p_this )
                 p_vout->p->i_picture_lost++;
                 msg_Warn( p_vout, "late picture skipped (%"PRId64")",
                                   current_date - display_date );
+                vlc_mutex_unlock( &p_vout->picture_lock );
                 continue;
             }
 
@@ -1043,6 +1043,7 @@ static void* RunThread( vlc_object_t *p_this )
                 }
             }
         }
+        vlc_mutex_unlock( &p_vout->picture_lock );
 
         if( p_picture == NULL )
             i_idle_loops++;
