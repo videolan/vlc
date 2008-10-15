@@ -769,6 +769,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     b_fullscreen        = false;
     i_hide_timeout      = 1;
     p_vout              = NULL;
+    i_screennumber      = -1;
 
     setWindowFlags( Qt::ToolTip );
     setMinimumWidth( 600 );
@@ -845,28 +846,34 @@ void FullscreenControllerWidget::showFSC()
     adjustSize();
     /* center down */
     int number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
-    int totalCount = QApplication::desktop()->numScreens();
-    QRect screenRes = QApplication::desktop()->screenGeometry(number);
-    int offset_x = 0;
-    int offset_y = 0;
-    /* Loop all screens to get needed offset_x/y for
-     * physical screen center.
-     */
-    for(int i=0; i <= totalCount ; i++)
+    if( number != i_screennumber )
     {
-         QRect displayRect = QApplication::desktop()->screenGeometry(i);
-         if (displayRect.width()+offset_x <= screenRes.x())
-         {
-              offset_x += displayRect.width();
-         }
-         if ( displayRect.height()+offset_y <= screenRes.y())
-         {
-              offset_y += displayRect.height();
-         }
+        msg_Dbg( p_intf, "Calculation fullscreen controllers center");
+        /* screen has changed, calculate new position */
+        i_screennumber = number;
+        int totalCount = QApplication::desktop()->numScreens();
+        QRect screenRes = QApplication::desktop()->screenGeometry(number);
+        int offset_x = 0;
+        int offset_y = 0;
+        /* Loop all screens to get needed offset_x/y for
+         * physical screen center.
+         */
+        for(int i=0; i <= totalCount ; i++)
+        {
+             QRect displayRect = QApplication::desktop()->screenGeometry(i);
+             if (displayRect.width()+offset_x <= screenRes.x())
+             {
+                  offset_x += displayRect.width();
+             }
+             if ( displayRect.height()+offset_y <= screenRes.y())
+             {
+                  offset_y += displayRect.height();
+             }
+        }
+        QPoint pos = QPoint( offset_x + (screenRes.width() / 2) - (width() / 2),
+                             offset_y + screenRes.height() - height());
+        move( pos );
     }
-    QPoint pos = QPoint( offset_x + (screenRes.width() / 2) - (width() / 2),
-                         offset_y + screenRes.height() - height());
-    move( pos );
 #ifdef WIN32TRICK
     // after quiting and going to fs, we need to call show()
     if( isHidden() )
