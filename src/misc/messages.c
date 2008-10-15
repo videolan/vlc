@@ -275,6 +275,15 @@ void msg_Unsubscribe (msg_subscription_t *sub)
     vlc_mutex_unlock (&bank->lock);
 
     vlc_join (sub->thread, NULL);
+
+    /* Free dangling (not flushed) messages. */
+    /* NOTE: no locking, only this thread can refer to the subscription now. */
+    while (sub->begin != sub->end)
+    {
+        msg_Release (sub->items[sub->begin]);
+        if (++sub->begin == VLC_MSG_QSIZE)
+            sub->begin = 0;
+    }
     free (sub);
 }
 
