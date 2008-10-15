@@ -172,7 +172,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, bool b_flat,
     case FASTER_BUTTON:{
         QToolButton *fasterButton = new QToolButton;
         setupButton( fasterButton );
-        CONNECT_MAP_SET( fasterButton, SLOWER_ACTION );
+        CONNECT_MAP_SET( fasterButton, FASTER_ACTION );
         BUTTON_SET_BAR( fasterButton, faster, qtr( "Faster" ) );
         ENABLE_ON_INPUT( fasterButton );
         widget = fasterButton;
