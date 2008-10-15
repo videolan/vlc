@@ -178,8 +178,6 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
             p_freepic->i_nb_fields          = i_nb_fields;
             p_freepic->b_top_field_first    = b_top_field_first;
 
-            p_freepic->i_matrix_coefficients = 1;
-
             p_vout->i_heap_size++;
         }
         else
