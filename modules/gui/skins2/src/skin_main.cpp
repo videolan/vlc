@@ -96,7 +96,9 @@ static int Open( vlc_object_t *p_this )
     p_intf->pf_run = Run;
 
     // Suscribe to messages bank
+#if 0
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+#endif
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->p_playlist = pl_Hold( p_intf );
@@ -123,35 +125,45 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_intf, "cannot initialize OSFactory" );
         vlc_object_release( p_intf->p_sys->p_playlist );
+#if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+#endif
         return VLC_EGENERIC;
     }
     if( AsyncQueue::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot initialize AsyncQueue" );
         vlc_object_release( p_intf->p_sys->p_playlist );
+#if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+#endif
         return VLC_EGENERIC;
     }
     if( Interpreter::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot instanciate Interpreter" );
         vlc_object_release( p_intf->p_sys->p_playlist );
+#if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+#endif
         return VLC_EGENERIC;
     }
     if( VarManager::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot instanciate VarManager" );
         vlc_object_release( p_intf->p_sys->p_playlist );
+#if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+#endif
         return VLC_EGENERIC;
     }
     if( VlcProc::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot initialize VLCProc" );
         vlc_object_release( p_intf->p_sys->p_playlist );
+#if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+#endif
         return VLC_EGENERIC;
     }
     Dialogs::instance( p_intf );
@@ -187,7 +199,9 @@ static void Close( vlc_object_t *p_this )
     }
 
     // Unsubscribe from messages bank
+#if 0
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+#endif
 
     // Destroy structure
     free( p_intf->p_sys );

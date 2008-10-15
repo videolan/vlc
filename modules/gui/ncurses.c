@@ -260,7 +260,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_box_cleared = false;
     p_sys->i_box_plidx = 0;
     p_sys->i_box_bidx = 0;
-    p_sys->p_sub = msg_Subscribe( p_intf );
+// FIXME    p_sys->p_sub = msg_Subscribe( p_intf );
     p_sys->b_color = var_CreateGetBool( p_intf, "color" );
     p_sys->b_color_started = false;
 
@@ -368,7 +368,7 @@ static void Close( vlc_object_t *p_this )
     /* Close the ncurses interface */
     endwin();
 
-    msg_Unsubscribe( p_intf, p_sys->p_sub );
+// FIXME    msg_Unsubscribe( p_intf, p_sys->p_sub );
 
     /* Restores initial verbose setting */
     vlc_value_t val;
@@ -1885,11 +1885,14 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     }
     else if( p_sys->i_box_type == BOX_LOG )
     {
+#warning Deprecated API
+#if 0
         int i_line = 0;
         int i_stop;
         int i_start;
 
         DrawBox( p_sys->w, y++, 0, h, COLS, _(" Logs "), p_sys->b_color );
+
 
         i_start = p_intf->p_sys->p_sub->i_start;
 
@@ -1926,6 +1929,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         p_intf->p_sys->p_sub->i_start = i_stop;
         vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
         y = y_end;
+#endif
     }
     else if( p_sys->i_box_type == BOX_BROWSE )
     {
