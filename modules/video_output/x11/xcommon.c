@@ -2199,11 +2199,28 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                         (XEvent*)&event );
         }
 
+/* "bad fullscreen" - set this to 0. doing fullscreen this way is problematic
+ * for many reasons and basically fights with the window manager as the wm
+ * reparents AND vlc goes and reparents - multiple times. don't do it. it just
+ * makes it more inefficient and less "nice" to the x11 citizenry. this turns
+ * it off */
+#define BADFS 0
+/* explicitly asking for focus when you fullscreened is a little silly. the
+ * window manager SHOULD be handling this itself based on its own focus
+ * policies. if the user is "using" a given xinerama/xrandr screen or x11
+ * multihead screen AND vlc wants to fullscreen the wm should also focus it
+ * as its the only thing on the screen. if vlc fullscreens and its on
+ * "another monitor" to the one the user is using - this may "steal" the focus
+ * as really the wm should be deciding if, on fullscreening of a window
+ * the focus should go there or not, so let the wm decided */
+#define APPFOCUS 0
         /* Make sure the change is effective */
+#if BADFS // RASTER: why do this? you already mapped the window in CreateWindow?
         XReparentWindow( p_vout->p_sys->p_display,
                          p_vout->p_sys->p_win->base_window,
                          DefaultRootWindow( p_vout->p_sys->p_display ),
-                         0, 0 );
+                         -2, -2 );
+#endif
 
 #ifdef HAVE_XINERAMA
         if( XineramaQueryExtension( p_vout->p_sys->p_display, &i_d1, &i_d2 ) &&
@@ -2309,6 +2326,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         EnablePixelDoubling( p_vout );
 #endif
 
+#if APPFOCUS // RASTER: let the wm do focus policy
         /* Activate the window (give it the focus) */
         XClientMessageEvent event;
 
@@ -2330,6 +2348,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                     DefaultRootWindow( p_vout->p_sys->p_display ),
                     False, SubstructureRedirectMask,
                     (XEvent*)&event );
+#endif
     }
     else
     {
@@ -2355,12 +2374,17 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
      * window has already been mapped because the XMapWindow() request
      * has not necessarily been sent directly to our window (remember,
      * the call is first redirected to the window manager) */
+
+#if BADFS // RASTER: this is silly... if we have already mapped before
     do
     {
         XWindowEvent( p_vout->p_sys->p_display,
                       p_vout->p_sys->p_win->base_window,
                       StructureNotifyMask, &xevent );
     } while( xevent.type != MapNotify );
+#else
+   XSync(p_vout->p_sys->p_display, False);
+#endif
 
     /* Be careful, this can generate a BadMatch error if the window is not
      * already mapped by the server (see above) */
