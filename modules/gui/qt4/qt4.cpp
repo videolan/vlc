@@ -264,11 +264,7 @@ static int Open( vlc_object_t *p_this )
     /* Access to the playlist */
     p_intf->p_sys->p_playlist = pl_Hold( p_intf );
     /* Listen to the messages */
-<<<<<<< Updated upstream:modules/gui/qt4/qt4.cpp
     //p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_libvlc, NULL, NULL );
-=======
-    //p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
->>>>>>> Stashed changes:modules/gui/qt4/qt4.cpp
     /* one settings to rule them all */
 
     var_Create( p_this, "window_widget", VLC_VAR_ADDRESS );
