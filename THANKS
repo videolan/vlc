@@ -52,6 +52,7 @@ Bruno Queirós <brunoqueiros at portugalmail dot com> - Portuguese localisation
 Bruno Vella <allevb at tin.it> - Italian localization
 Carlo Calabrò <murray at via.ecp.fr> - Italian localization
 Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fix
+Carsten Haitzler <raster __at__ rasterman dot com> - x11 fullscreen fix
 Cédric Cocquebert - Misc opengl effects for the OpenGL Video Output. "Panoramix" video filter for image walls with automatic attenuation. Fix on sharpen filter.
 Chris Clepper - OpenGL fix
 Christian Henz - libupnp service discovery plugin, CyberLink UPnP fixes
@@ -158,6 +159,7 @@ Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface
 Leo Spalteholz <leo dot spalteholz at gmail dot com> - Qt interface design
 Loox Thefuture <loox.thefuture at gmail dot com> - Media key in X11 vout
 Lorena Gomes - Catalan translation
+Ludovic Fauvet <etix # l0cal dot com> - Qt4 patch
 Lukas Durfina <lukas.durfina at gmail.com> - Qt4: full screen controller. Teletext button fix. Various fixes.
 Mahrazi Mohd Kamal <mahrazi at gmail.com> - Malay Translation
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
