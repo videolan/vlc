@@ -818,17 +818,6 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
 
     adjustSize ();  /* need to get real width and height for moving */
 
-    /* center down */
-    QRect desktopRect = QApplication::desktop()->
-        screenGeometry( p_intf->p_sys->p_mi );
-
-    QPoint pos = QPoint( desktopRect.width() / 2 - width() / 2,
-          desktopRect.height() - height() );
-
-    getSettings()->beginGroup( "FullScreen" );
-    move( getSettings()->value( "pos", pos ).toPoint() );
-    getSettings()->endGroup();
-
 #ifdef WIN32TRICK
     setWindowOpacity( 0.0 );
     b_fscHidden = true;
@@ -854,11 +843,34 @@ FullscreenControllerWidget::~FullscreenControllerWidget()
 void FullscreenControllerWidget::showFSC()
 {
     adjustSize();
+    /* center down */
+    int number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+    int totalCount = QApplication::desktop()->numScreens();
+    QRect screenRes = QApplication::desktop()->screenGeometry(number);
+    int offset_x = 0;
+    int offset_y = 0;
+    /* Loop all screens to get needed offset_x/y for
+     * physical screen center.
+     */
+    for(int i=0; i <= totalCount ; i++)
+    {
+         QRect displayRect = QApplication::desktop()->screenGeometry(i);
+         if (displayRect.width()+offset_x <= screenRes.x())
+         {
+              offset_x += displayRect.width();
+         }
+         if ( displayRect.height()+offset_y <= screenRes.y())
+         {
+              offset_y += displayRect.height();
+         }
+    }
+    QPoint pos = QPoint( offset_x + (screenRes.width() / 2) - (width() / 2),
+                         offset_y + screenRes.height() - height());
+    move( pos );
 #ifdef WIN32TRICK
     // after quiting and going to fs, we need to call show()
     if( isHidden() )
         show();
-
     if( b_fscHidden )
     {
         b_fscHidden = false;
