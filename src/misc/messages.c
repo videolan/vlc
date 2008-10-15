@@ -338,10 +338,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     vlc_gc_init (p_item, msg_Free);
     p_item->psz_module = p_item->psz_msg = p_item->psz_header = NULL;
 
-#if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
-    int          i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
-#endif
-
     if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
         (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
         goto out;
@@ -403,14 +399,10 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 #endif
 
     /* Convert message to string  */
-#if defined(HAVE_VASPRINTF) && !defined(__APPLE__) && !defined( SYS_BEOS )
     vlc_va_copy( args, _args );
     if( vasprintf( &psz_str, psz_format, args ) == -1 )
         psz_str = NULL;
     va_end( args );
-#else
-    psz_str = (char*) malloc( i_size );
-#endif
 
     if( psz_str == NULL )
     {
@@ -463,13 +455,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         free( psz_old );
         p_obj = p_obj->p_parent;
     }
-
-#if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
-    vlc_va_copy( args, _args );
-    vsnprintf( psz_str, i_size, psz_format, args );
-    va_end( args );
-    psz_str[ i_size - 1 ] = 0; /* Just in case */
-#endif
 
     msg_bank_t *p_queue = &QUEUE;
     vlc_mutex_lock( &p_queue->lock );
