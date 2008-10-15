@@ -2094,6 +2094,39 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     {
         msg_Dbg( p_vout, "entering fullscreen mode" );
 
+        /* Getting current window position */
+        Window root_win;
+        Window* child_windows;
+        int num_child_windows;
+        Window parent_win;
+        Window child_win;
+        XWindowAttributes win_attr;
+        int screen_x,screen_y;
+
+        XGetWindowAttributes(
+                p_vout->p_sys->p_display,
+                p_vout->p_sys->p_win->video_window,
+                &win_attr);
+
+        XQueryTree(
+                p_vout->p_sys->p_display,
+                p_vout->p_sys->p_win->video_window,
+                &root_win,
+                &parent_win,
+                &child_windows,
+                &num_child_windows);
+        XFree(child_windows);
+
+        XTranslateCoordinates(
+                p_vout->p_sys->p_display,
+                parent_win, win_attr.root,
+                win_attr.x,win_attr.y,
+                &screen_x,&screen_y,
+                &child_win);
+
+        msg_Dbg( p_vout, "X %d/%d Y %d/%d", win_attr.x,screen_x,win_attr.y,screen_y);
+        /* screen_x and screen_y are current position */
+
         p_vout->p_sys->b_altfullscreen =
             config_GetInt( p_vout, MODULE_STRING "-altfullscreen" );
 
@@ -2190,11 +2223,26 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
             SCREEN = config_GetInt( p_vout,
                                         MODULE_STRING "-xineramascreen" );
 
-            /* just check that user has entered a good value */
+            /* just check that user has entered a good value,
+             * otherwise use that screen where window is */
             if( SCREEN >= i_num_screens || SCREEN < 0 )
             {
                 msg_Dbg( p_vout, "requested screen number invalid (%d/%d)", SCREEN, i_num_screens );
-                SCREEN = 0;
+#define left screens[SCREEN].x_org
+#define right left + screens[SCREEN].width
+#define top screens[SCREEN].y_org
+#define bottom top + screens[SCREEN].height
+
+                 for( SCREEN = i_num_screens-1; SCREEN > 0; SCREEN--)
+                 {
+                     if( left <= screen_x && screen_x <= right &&
+                             top <= screen_y && screen_y <= bottom )
+                         break;
+                 }
+#undef bottom
+#undef top
+#undef right
+#undef left
             }
 
             /* Get the X/Y upper left corner coordinate of the above screen */

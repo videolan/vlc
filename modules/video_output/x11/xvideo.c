@@ -89,7 +89,7 @@ vlc_module_begin();
     add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true );
 #endif
 #ifdef HAVE_XINERAMA
-    add_integer ( "xvideo-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
+    add_integer ( "xvideo-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
 #endif
 
     set_description( N_("XVideo extension video output") );

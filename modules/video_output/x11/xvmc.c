@@ -143,7 +143,7 @@ vlc_module_begin();
     add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true );
 #endif
 #ifdef HAVE_XINERAMA
-    add_integer ( "xvmc-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
+    add_integer ( "xvmc-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
 #endif
     add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, false );
     add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, false );

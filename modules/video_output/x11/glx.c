@@ -130,7 +130,7 @@ vlc_module_begin();
     add_bool( "glx-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true );
 #endif
 #ifdef HAVE_XINERAMA
-    add_integer ( "glx-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
+    add_integer ( "glx-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
 #endif
 vlc_module_end();
 
