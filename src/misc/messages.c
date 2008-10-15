@@ -330,17 +330,10 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     char *       psz_str = NULL;                 /* formatted message string */
     char *       psz_header = NULL;
     va_list      args;
-    msg_item_t * p_item = malloc (sizeof (*p_item));
-
-    if (p_item == NULL)
-        return; /* Uho! */
-
-    vlc_gc_init (p_item, msg_Free);
-    p_item->psz_module = p_item->psz_msg = p_item->psz_header = NULL;
 
     if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
         (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
-        goto out;
+        return;
 
 #ifndef __GLIBC__
     /* Expand %m to strerror(errno) - only once */
@@ -427,8 +420,18 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         va_end( args );
         fputs( "\n", stderr );
         vlc_restorecancel (canc);
-        goto out;
+        return;
     }
+
+    msg_item_t * p_item = malloc (sizeof (*p_item));
+
+    if (p_item == NULL)
+        return; /* Uho! */
+
+    vlc_gc_init (p_item, msg_Free);
+    p_item->psz_module = p_item->psz_msg = p_item->psz_header = NULL;
+
+
 
     i_header_size = 0;
     p_obj = p_this;
@@ -483,7 +486,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     }
     vlc_cond_broadcast (&bank->wait);
     vlc_mutex_unlock (&bank->lock);
-out:
     msg_Release (p_item);
 }
 
