@@ -65,6 +65,8 @@ public:
 class InputManager : public QObject
 {
     Q_OBJECT;
+    friend class MainInputManager;
+
 public:
     InputManager( QObject *, intf_thread_t * );
     virtual ~InputManager();
@@ -107,7 +109,6 @@ private:
 public slots:
     void setInput( input_thread_t * ); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
-    void togglePlayPause();
     /* SpeedRate Rate Management */
     void slower();
     void faster();
@@ -125,6 +126,8 @@ public slots:
     /* A to B Loop */
     void setAtoB();
 
+private slots:
+    void togglePlayPause();
 
 signals:
     /// Send new position, new time and new length

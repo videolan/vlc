@@ -428,10 +428,13 @@ void InputManager::sliderUpdate( float new_pos )
 void InputManager::togglePlayPause()
 {
     vlc_value_t state;
-    var_Get( p_input, "state", &state );
-    state.i_int = ( state.i_int != PLAYING_S ) ? PLAYING_S : PAUSE_S;
-    var_Set( p_input, "state", state );
-    emit statusChanged( state.i_int );
+    if( hasInput() )
+    {
+        var_Get( p_input, "state", &state );
+        state.i_int = ( state.i_int != PLAYING_S ) ? PLAYING_S : PAUSE_S;
+        var_Set( p_input, "state", state );
+        emit statusChanged( state.i_int );
+    }
 }
 
 void InputManager::sectionPrev()
@@ -741,18 +744,16 @@ void MainInputManager::prev()
 
 void MainInputManager::togglePlayPause()
 {
-    if( p_input == NULL )
-    {
+    /* No input, play */
+    if( !p_input )
         playlist_Play( THEPL );
-        return;
-    }
-    getIM()->togglePlayPause();
+    else
+        getIM()->togglePlayPause();
 }
 
 bool MainInputManager::teletextState()
 {
-    im = getIM();
-    if( im->hasInput() )
+    if( getIM()->hasInput() )
     {
         const int i_teletext_es = var_GetInteger( getInput(), "teletext-es" );
         const int i_spu_es = var_GetInteger( getInput(), "spu-es" );
